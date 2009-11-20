@@ -3,7 +3,7 @@ package org.basex.index;
 import java.util.Arrays;
 import org.basex.util.IntList;
 import org.basex.util.Num;
-import org.basex.util.Set;
+import org.basex.util.TokenSet;
 
 /**
  * This class indexes the tokens in a hash structure.
@@ -12,7 +12,7 @@ import org.basex.util.Set;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class FTHash extends Set {
+final class FTHash extends TokenSet {
   /** Compressed pre values. */
   byte[][] pre = new byte[CAP][];
   /** Compressed pos values. */

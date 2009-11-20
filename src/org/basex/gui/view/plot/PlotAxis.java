@@ -5,7 +5,7 @@ import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.data.StatsKey.Kind;
 import org.basex.util.Array;
-import org.basex.util.Set;
+import org.basex.util.TokenSet;
 
 /**
  * Axis component of the scatter plot visualization.
@@ -154,7 +154,7 @@ public final class PlotAxis {
     while(i < vl && vals[i].length == 0) co[tmpI[i++]] = -1;
 
     // count number of unique values
-    final Set set = new Set();
+    final TokenSet set = new TokenSet();
     for(final byte[] v : vals) set.add(v);
     nrCats = set.size();
     if(i > 0) nrCats--;

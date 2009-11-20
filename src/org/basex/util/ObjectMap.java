@@ -4,13 +4,13 @@ import java.util.Arrays;
 
 /**
  * This is a simple hash map, extending the even simpler
- * {@link Set hash set}.
+ * {@link TokenSet hash set}.
  * @param <E> generic value type
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class Map<E> extends Set {
+public class ObjectMap<E> extends TokenSet {
   /** Values. */
   private Object[] values = new Object[CAP];
 

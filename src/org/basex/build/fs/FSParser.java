@@ -14,7 +14,7 @@ import org.basex.core.Text;
 import org.basex.core.proc.CreateFS;
 import org.basex.io.BufferInput;
 import org.basex.io.IO;
-import org.basex.util.Map;
+import org.basex.util.ObjectMap;
 import org.basex.util.Token;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.extractors.AbstractExtractor;
@@ -53,7 +53,8 @@ public final class FSParser extends Parser {
   /** Path to root of the backing store. */
   private final String backingpath;
   /** Meta data index. */
-  private final Map<AbstractExtractor> meta = new Map<AbstractExtractor>();
+  private final ObjectMap<AbstractExtractor> meta =
+    new ObjectMap<AbstractExtractor>();
   /** Root flag to parse root node or all partitions (C:, D: ...). */
   private final boolean root;
   /** Reference to the database builder. */

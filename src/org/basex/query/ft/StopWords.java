@@ -3,7 +3,7 @@ package org.basex.query.ft;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.IO;
-import org.basex.util.Set;
+import org.basex.util.TokenSet;
 
 /**
  * Simple stop words set for full-text requests.
@@ -11,7 +11,7 @@ import org.basex.util.Set;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class StopWords extends Set {
+public final class StopWords extends TokenSet {
   /**
    * Reads a stop words file.
    * @param fl file reference

@@ -9,7 +9,7 @@ import java.util.Arrays;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class Set {
+public class TokenSet {
   /** Initial hash capacity. */
   protected static final int CAP = 1 << 3;
   /** Hash keys. */

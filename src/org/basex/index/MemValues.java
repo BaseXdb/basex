@@ -2,7 +2,7 @@ package org.basex.index;
 
 import java.util.Arrays;
 import org.basex.core.Main;
-import org.basex.util.Set;
+import org.basex.util.TokenSet;
 import org.basex.util.Token;
 
 /**
@@ -54,7 +54,7 @@ public final class MemValues extends Index {
   public void close() { }
 
   /** MemValue Index. */
-  static final class MemValueIndex extends Set {
+  static final class MemValueIndex extends TokenSet {
     /** IDs. */
     int[][] ids = new int[CAP][];
     /** ID array lengths. */

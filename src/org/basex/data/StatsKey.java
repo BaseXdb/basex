@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.util.Set;
+import org.basex.util.TokenSet;
 
 /**
  * This class provides statistics for a tag or attribute name
@@ -25,7 +25,7 @@ public final class StatsKey {
   /** Node kind. */
   public Kind kind;
   /** Categories. */
-  public Set cats;
+  public TokenSet cats;
   /** Minimum value. */
   public double min;
   /** Maximum value. */
@@ -41,7 +41,7 @@ public final class StatsKey {
    * Default constructor.
    */
   public StatsKey() {
-    cats = new Set();
+    cats = new TokenSet();
     kind = Kind.INT;
     min = Double.MAX_VALUE;
     max = Double.MIN_VALUE;
@@ -60,7 +60,7 @@ public final class StatsKey {
       min = in.readDouble();
       max = in.readDouble();
     } else if(kind == Kind.CAT) {
-      cats = new Set();
+      cats = new TokenSet();
       final int cl = in.readNum();
       for(int i = 0; i < cl; i++) cats.add(in.readBytes());
     }

@@ -13,7 +13,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.util.Err;
-import org.basex.util.Map;
+import org.basex.util.ObjectMap;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
@@ -26,9 +26,9 @@ import org.basex.util.Tokenizer;
  */
 public final class Thesaurus {
   /** Thesaurus root references. */
-  private final Map<ThesNode> nodes = new Map<ThesNode>();
+  private final ObjectMap<ThesNode> nodes = new ObjectMap<ThesNode>();
   /** Relationships. */
-  private static final Map<byte[]> RSHIPS = new Map<byte[]>();
+  private static final ObjectMap<byte[]> RSHIPS = new ObjectMap<byte[]>();
   /** Database properties. */
   private final Context ctx;
 

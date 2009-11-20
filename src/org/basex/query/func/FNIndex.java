@@ -8,7 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Err;
 import org.basex.util.Levenshtein;
-import org.basex.util.Set;
+import org.basex.util.TokenSet;
 
 /**
  * Global expression context.
@@ -16,7 +16,7 @@ import org.basex.util.Set;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class FNIndex extends Set {
+public final class FNIndex extends TokenSet {
   /** Function classes. */
   private FunDef[] funcs;
   /** Singleton instance. */

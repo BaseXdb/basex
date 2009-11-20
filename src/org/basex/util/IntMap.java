@@ -4,12 +4,12 @@ import java.util.Arrays;
 
 /**
  * This is a simple hash map, extending the even simpler
- * {@link Set hash set}.
+ * {@link TokenSet hash set}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class IntMap extends Set {
+public final class IntMap extends TokenSet {
   /** Values. */
   private int[] values = new int[CAP];
 

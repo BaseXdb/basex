@@ -6,8 +6,8 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.util.Map;
-import org.basex.util.Set;
+import org.basex.util.ObjectMap;
+import org.basex.util.TokenSet;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.TokenBuilder;
@@ -19,7 +19,7 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Namespaces extends Set {
+public final class Namespaces extends TokenSet {
   /** Root node. */
   private NSNode root;
   /** Current node. */
@@ -201,7 +201,7 @@ public final class Namespaces extends Set {
   public byte[] info() {
     if(size() == 0) return EMPTY;
 
-    final Map<TokenList> map = new Map<TokenList>();
+    final ObjectMap<TokenList> map = new ObjectMap<TokenList>();
     info(map, root);
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] val : map.keys()) {
@@ -228,7 +228,7 @@ public final class Namespaces extends Set {
    * @param map namespace map
    * @param n namespace node
    */
-  public void info(final Map<TokenList> map, final NSNode n) {
+  public void info(final ObjectMap<TokenList> map, final NSNode n) {
     for(int i = 0; i < n.key.length; i++) {
       final byte[] key = keys[n.val[i]];
       final byte[] val = keys[n.key[i]];

@@ -1,7 +1,7 @@
 package org.basex.index;
 
 import java.util.Arrays;
-import org.basex.util.Set;
+import org.basex.util.TokenSet;
 
 /**
  * This class caches sizes and pointers from full-text results.
@@ -9,7 +9,7 @@ import org.basex.util.Set;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Sebastian Gath
  */
-final class FTTokenMap extends Set {
+final class FTTokenMap extends TokenSet {
   /** Number of position values. */
   private int[] sizes = new int[CAP];
   /** Pointer on token data. */

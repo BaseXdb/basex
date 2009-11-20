@@ -7,7 +7,7 @@ import org.basex.data.StatsKey;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Array;
-import org.basex.util.Set;
+import org.basex.util.TokenSet;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  * @author Lukas Kircher
  */
-public final class Names extends Set {
+public final class Names extends TokenSet {
   /** Statistic information. */
   private StatsKey[] stat;
   /** total number of entries. */
