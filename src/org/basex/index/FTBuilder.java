@@ -40,6 +40,8 @@ abstract class FTBuilder extends IndexBuilder {
   private int min;
   /** Current token. */
   private int token;
+  /** Current frequency. */
+  private int fc;
 
   /**
    * Constructor.
@@ -81,7 +83,7 @@ abstract class FTBuilder extends IndexBuilder {
       token = 0;
       getFreq();
     }
-
+    
     // normalization
     token = 0;
     write();
@@ -109,8 +111,8 @@ abstract class FTBuilder extends IndexBuilder {
     int p = Num.read(vpre, np);
     final int ns = Num.size(vpre);
     while(np < ns) {
-      int up = unit.find(p);
-      if(up < 0) up = -up - 1;
+      int u = unit.find(p);
+      if(u < 0) u = -u - 1;
 
       int fr = 0;
       do {
@@ -119,11 +121,11 @@ abstract class FTBuilder extends IndexBuilder {
         if(np >= ns) break;
         p = Num.read(vpre, np);
         nl = Num.len(vpre, np);
-      } while(scm == 1 && (up == unit.size() || p < unit.get(up)) ||
-          scm == 2 && p == unit.get(up));
+      } while(scm == 1 && (u == unit.size() || p < unit.get(u)) ||
+          scm == 2 && p == unit.get(u));
 
-      if(maxfreq[up] < fr) maxfreq[up] = fr;
       freq.add(fr);
+      if(maxfreq[u] < fr) maxfreq[u] = fr;
       ntoken[token]++;
     }
     token++;
@@ -139,23 +141,24 @@ abstract class FTBuilder extends IndexBuilder {
   protected final void writeFTData(final DataOutput out, final byte[] vpre,
       final byte[] vpos) throws IOException {
 
-    int np = 4, pp = 4, lp = -1, up = -1, fc = -1, p;
+    int np = 4, pp = 4, lp = -1, u = -1, lu = -1, p;
     final int ns = Num.size(vpre);
     while(np < ns) {
       if(scm > 0) {
         p = Num.read(vpre, np);
         if(lp != p) {
           // find document root
-          up = unit.find(p);
-          if(up < 0) up = -up - 1;
+          u = unit.find(p);
+          if(u < 0) u = -u - 1;
 
-          if(scm == 1 && (up == unit.size() || p < unit.get(up)) || scm == 2) {
+          if(lu != u) {
             final int s = Scoring.tfIDF(freq.get(++fc),
-                maxfreq[up], unit.size(), ntoken[token]);
+                maxfreq[u], unit.size(), ntoken[token]);
             if(max < s) max = s;
             if(min > s) min = s;
             if(np != 4) out.write(0);
             out.write(Num.num(s));
+            lu = u;
           }
           lp = p;
         }

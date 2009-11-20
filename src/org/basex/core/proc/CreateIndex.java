@@ -105,6 +105,6 @@ public final class CreateIndex extends ACreate {
 
   @Override
   public String toString() {
-    return Cmd.CREATE + " " + CmdCreate.INDEX + " " + args();
+    return Cmd.CREATE + " " + CmdCreate.INDEX + args();
   }
 }

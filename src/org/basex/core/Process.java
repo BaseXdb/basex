@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.Commands.CmdPerm;
@@ -98,11 +99,12 @@ public abstract class Process extends Progress {
     boolean ok = false;
     try {
       ok = exec(out);
-    } catch(final IOException ex) {
-      return error(ex.getMessage());
     } catch(final Throwable ex) {
-      // catch unexpected errors...
+      Performance.gc(2);
       Main.debug(ex);
+      abort();
+      if(ex instanceof OutOfMemoryError) return error(PROCOUTMEM);
+      if(ex instanceof IOException) return error(ex.getMessage());
       return error(PROCERR, this, ex.toString());
     }
     return ok;
@@ -144,6 +146,11 @@ public abstract class Process extends Progress {
    * @throws IOException I/O exception
    */
   protected abstract boolean exec(final PrintOutput out) throws IOException;
+
+  /**
+   * Aborts a failed process.
+   */
+  protected void abort() { }
 
   /**
    * Adds the error message to the message buffer {@link #info}.

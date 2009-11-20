@@ -213,8 +213,9 @@ public final class Scoring {
    * @param sc current score value
    * @return new score value
    */
-  public static double descAxis(final int r, final int d, final Data data, final double sc) {
-    return sc * 1d / Math.sqrt(distTo(data, d, r));    
+  public static double descAxis(final int r, final int d, final Data data,
+      final double sc) {
+    return sc * 1d / Math.sqrt(distTo(data, d, r));
 //    return sc * SCORESTEP;
   }
 

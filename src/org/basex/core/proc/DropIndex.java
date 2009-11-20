@@ -77,6 +77,6 @@ public final class DropIndex extends ACreate {
 
   @Override
   public String toString() {
-    return Cmd.DROP + " " + CmdDrop.INDEX + " " + args();
+    return Cmd.DROP + " " + CmdDrop.INDEX + args();
   }
 }

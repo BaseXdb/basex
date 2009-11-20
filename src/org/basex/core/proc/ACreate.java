@@ -20,7 +20,6 @@ import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.FTTrieBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
-import org.basex.util.Performance;
 
 /**
  * Abstract class for database creation.
@@ -29,6 +28,9 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 abstract class ACreate extends Process {
+  /** Builder instance. */
+  private Builder builder;
+  
   /**
    * Protected constructor.
    * @param p command properties
@@ -50,10 +52,9 @@ abstract class ACreate extends Process {
     final boolean mem = prop.is(Prop.MAINMEM);
     if(!mem && context.pinned(db)) return error(DBLOCKED, db);
 
-    final Builder builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
+    builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
     progress(builder);
 
-    String err = null;
     try {
       final Data data = builder.build(db);
       if(mem) {
@@ -67,32 +68,29 @@ abstract class ACreate extends Process {
       return info(DBCREATED, db, perf);
     } catch(final FileNotFoundException ex) {
       Main.debug(ex);
-      err = Main.info(FILEWHICH, p.io);
+      return error(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
-      err = PROGERR;
+      return error(PROGERR);
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();
-      err = Main.info(msg != null ? msg : args[0]);
-    } catch(final Throwable ex) {
+      return error(msg != null ? msg : args[0]);
+    } catch(final Exception ex) {
       Main.debug(ex);
-      if(ex instanceof OutOfMemoryError) {
-        Performance.gc(2);
-        err = PROCOUTMEM;
-      } else {
-        err = Main.info(CREATEERR, args[0]);
-      }
+      return error(CREATEERR, args[0]);
     }
-    if(!mem) {
-      try {
-        builder.close();
-      } catch(final IOException ex) {
-        Main.debug(ex);
-      }
-    }
-    return error(err);
   }
 
+  @Override
+  protected void abort() {
+    try {
+      if(builder != null) builder.close();
+    } catch(final IOException ex) {
+      Main.debug(ex);
+    }
+  }
+
+  
   /**
    * Builds the indexes.
    * @param data data reference
@@ -113,16 +111,16 @@ abstract class ACreate extends Process {
    */
   protected void buildIndex(final Type i, final Data d) throws IOException {
     final Prop pr = d.meta.prop;
-    IndexBuilder builder = null;
+    IndexBuilder b = null;
     switch(i) {
-      case TXT: builder = new ValueBuilder(d, true); break;
-      case ATV: builder = new ValueBuilder(d, false); break;
-      case FTX: builder = d.meta.ftfz ?
+      case TXT: b = new ValueBuilder(d, true); break;
+      case ATV: b = new ValueBuilder(d, false); break;
+      case FTX: b = d.meta.ftfz ?
           new FTFuzzyBuilder(d, pr) : new FTTrieBuilder(d, pr); break;
       default: break;
     }
     d.closeIndex(i);
-    progress(builder);
-    d.setIndex(i, builder.build());
+    progress(b);
+    d.setIndex(i, b.build());
   }
 }
