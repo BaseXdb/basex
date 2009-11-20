@@ -115,9 +115,10 @@ public final class InexSubmit {
     String l;
     while((l = br.readLine()) != null) {
       final int i1 = l.indexOf(';');
-      final int i2 = l.lastIndexOf(';');
+      final int i2 = l.indexOf(';', i1 + 1);
+      final int i3 = l.lastIndexOf(';');
       tid.add(l.substring(i1 + 1, i2));
-      queries.add(l.substring(i2 + 1));
+      queries.add(l.substring(i3 + 1));
     }
     br.close();
 
