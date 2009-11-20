@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.List;
@@ -193,7 +193,7 @@ public final class InexSubmit {
         queries.get(qu) + " order by $s descending " +
         "return (basex:sum-path($i), $s, base-uri($i))";
 
-    final Process proc = new XQuery(que);
+    final Proc proc = new XQuery(que);
     final CachedOutput res = new CachedOutput();
     session.execute(proc, res);
 

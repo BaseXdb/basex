@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.Box;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -48,7 +48,7 @@ public final class TextView extends View implements ActionListener {
   /** Text Area. */
   private final BaseXText area;
   /** Result process. */
-  private Process proc;
+  private Proc proc;
   /** Result nodes. */
   private Nodes ns;
   /** Refresh flag. */
@@ -164,7 +164,7 @@ public final class TextView extends View implements ActionListener {
    * @param out output cache
    * @param p process
    */
-  public void setText(final CachedOutput out, final Process p) {
+  public void setText(final CachedOutput out, final Proc p) {
     area.setText(out.buffer(), out.size());
     header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
     home.setEnabled(gui.context.data != null);

@@ -92,7 +92,7 @@ public abstract class Main {
    */
   protected final boolean process(final String in) throws IOException {
     try {
-      for(final Process p : new CommandParser(in, context).parse()) {
+      for(final Proc p : new CommandParser(in, context).parse()) {
         if(p instanceof Exit) return false;
 
         // offer optional password input
@@ -118,7 +118,7 @@ public abstract class Main {
    * @return true if operation was successful
    * @throws IOException I/O exception
    */
-  protected final boolean process(final Process pr, final boolean v)
+  protected final boolean process(final Proc pr, final boolean v)
       throws IOException {
 
     final Session ss = session();

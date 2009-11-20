@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 
 import org.basex.BaseXServer;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Session;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.CreateIndex;
@@ -108,7 +108,7 @@ public class PermissionTest {
    * @param pr process reference
    * @param s Session
    */
-  static void ok(final Process pr, final Session s) {
+  static void ok(final Proc pr, final Session s) {
     final String msg = process(pr, s);
     if(msg != null) fail(msg);
   }
@@ -118,7 +118,7 @@ public class PermissionTest {
    * @param pr process reference
    * @param s Session
    */
-  private void no(final Process pr, final Session s) {
+  private void no(final Proc pr, final Session s) {
     ok(process(pr, s) != null);
   }
 
@@ -136,7 +136,7 @@ public class PermissionTest {
    * @param session Session
    * @return success flag
    */
-  private static String process(final Process pr, final Session session) {
+  private static String process(final Proc pr, final Session session) {
     try {
       return session.execute(pr) ? null : session.info();
     } catch(final Exception ex) {

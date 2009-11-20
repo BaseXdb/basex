@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
@@ -25,7 +25,7 @@ import org.basex.util.Performance;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-abstract class AQuery extends Process {
+abstract class AQuery extends Proc {
   /** Query processor. */
   private QueryProcessor qp;
   /** Parsing time. */

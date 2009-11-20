@@ -28,7 +28,7 @@ public abstract class Session {
    * @throws IOException I/O exception
    * @return success of operation
    */
-  public abstract boolean execute(final Process pr, final OutputStream out)
+  public abstract boolean execute(final Proc pr, final OutputStream out)
     throws IOException;
 
   /**
@@ -38,7 +38,7 @@ public abstract class Session {
    * @throws IOException I/O exception
    * @return success of operation
    */
-  public final boolean execute(final Process pr) throws IOException {
+  public final boolean execute(final Proc pr) throws IOException {
     return execute(pr, null);
   }
 

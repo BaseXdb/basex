@@ -5,7 +5,7 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.MetaData;
@@ -21,12 +21,12 @@ import org.basex.util.Table;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class List extends Process {
+public final class List extends Proc {
   /**
    * Default constructor.
    */
   public List() {
-    super(User.ADMIN);
+    super(STANDARD);
   }
 
   @Override
@@ -40,15 +40,20 @@ public final class List extends Process {
       final StringList entry = new StringList();
       entry.add(name);
       DataInput in = null;
+      String file = null;
       try {
         in = new DataInput(prop.dbfile(name, DATAINFO));
-        entry.add(new MetaData(name, in, prop).file.toString());
+        final MetaData meta = new MetaData(name, in, prop);
+        if(context.perm(User.READ, meta) == -1) file = meta.file.toString();
       } catch(final IOException ex) {
-        entry.add(INFODBERR);
+        file = INFODBERR;
       } finally {
         try { if(in != null) in.close(); } catch(final IOException ex) { }
       }
-      table.contents.add(entry);
+      if(file != null) {
+        entry.add(file);
+        table.contents.add(entry);
+      }
     }
     table.sort();
     out.println(table.finish());

@@ -21,7 +21,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class Process extends Progress {
+public abstract class Proc extends Progress {
   /** Commands flag: standard. */
   public static final int STANDARD = 256;
   /** Commands flag: data reference needed. */
@@ -49,7 +49,7 @@ public abstract class Process extends Progress {
    * @param f command flags
    * @param a arguments
    */
-  public Process(final int f, final String... a) {
+  public Proc(final int f, final String... a) {
     flags = f;
     args = a;
   }
@@ -93,7 +93,7 @@ public abstract class Process extends Progress {
     final Data data = context.data;
     if(data == null && (flags & DATAREF) != 0) return error(PROCNODB);
     // check permissions
-    final int i = context.perm(flags & 0xFF, data);
+    final int i = context.perm(flags & 0xFF, data != null ? data.meta : null);
     if(i != -1) return error(PERMNO, CmdPerm.values()[i]);
 
     boolean ok = false;

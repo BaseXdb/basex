@@ -221,9 +221,8 @@ public final class InexTest {
       session.execute(new Set(Prop.INFO, true));
       session.execute(new Set(Prop.ALLINFO, info));
     } catch(final Exception ex) {
-      ok = false;
-      Main.errln("Please run BaseXServer for using server mode.");
       ex.printStackTrace();
+      ok = false;
     }
 
     if(!ok) {

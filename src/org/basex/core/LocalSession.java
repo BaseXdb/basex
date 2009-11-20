@@ -15,7 +15,7 @@ public class LocalSession extends Session {
   /** Database Context. */
   protected final Context ctx;
   /** Process reference. */
-  protected Process proc;
+  protected Proc proc;
 
   /**
    * Constructor.
@@ -37,7 +37,7 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public boolean execute(final Process pr, final OutputStream out) {
+  public boolean execute(final Proc pr, final OutputStream out) {
     proc = pr;
     return pr.execute(ctx, out instanceof PrintOutput ? (PrintOutput) out :
       new PrintOutput(out));

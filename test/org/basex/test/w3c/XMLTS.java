@@ -4,7 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
@@ -84,7 +84,7 @@ public final class XMLTS {
       final boolean valid = text("@TYPE", srcRoot).equals("valid");
 
       context.prop.set(Prop.INTPARSE, true);
-      Process proc = new CreateDB(PATH + uri);
+      Proc proc = new CreateDB(PATH + uri);
       final boolean success = proc.execute(context);
       final boolean correct = valid == success;
 

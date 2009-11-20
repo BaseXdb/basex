@@ -22,7 +22,7 @@ import javax.swing.border.EtchedBorder;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.proc.Find;
@@ -124,7 +124,7 @@ public final class GUI extends JFrame {
   /** Thread counter. */
   private int threadID;
   /** Current process. */
-  private Process proc;
+  private Proc proc;
 
   /**
    * Default constructor.
@@ -332,7 +332,7 @@ public final class GUI extends JFrame {
       final int i = cmd ? 0 : 1;
       if(in.length() > i) {
         try {
-          for(final Process p : new CommandParser(in.substring(i),
+          for(final Proc p : new CommandParser(in.substring(i),
               context).parse()) {
             if(!exec(p, p instanceof XQuery)) break;
           }
@@ -373,7 +373,7 @@ public final class GUI extends JFrame {
    * if an update operation takes place.
    * @param pr process to be launched
    */
-  public void execute(final Process pr) {
+  public void execute(final Proc pr) {
     execute(pr, false);
   }
 
@@ -383,7 +383,7 @@ public final class GUI extends JFrame {
    * @param pr process to be launched
    * @param main call from main window
    */
-  void execute(final Process pr, final boolean main) {
+  void execute(final Proc pr, final boolean main) {
     if(updating) return;
     new Thread() {
       @Override
@@ -407,7 +407,7 @@ public final class GUI extends JFrame {
    * @return success flag
    */
   // [CG] check exec/execute/... references
-  boolean exec(final Process pr, final boolean main) {
+  boolean exec(final Proc pr, final boolean main) {
     final int thread = ++threadID;
 
     // wait when command is still running

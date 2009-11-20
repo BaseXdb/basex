@@ -141,14 +141,14 @@ abstract class FTBuilder extends IndexBuilder {
   protected final void writeFTData(final DataOutput out, final byte[] vpre,
       final byte[] vpos) throws IOException {
 
-    int np = 4, pp = 4, lp = -1, u = -1, lu = -1, p;
+    int np = 4, pp = 4, lp = -1, lu = -1;
     final int ns = Num.size(vpre);
     while(np < ns) {
       if(scm > 0) {
-        p = Num.read(vpre, np);
+        int p = Num.read(vpre, np);
         if(lp != p) {
           // find document root
-          u = unit.find(p);
+          int u = unit.find(p);
           if(u < 0) u = -u - 1;
 
           if(lu != u) {

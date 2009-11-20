@@ -9,7 +9,7 @@ import java.io.IOException;
 import javax.swing.AbstractButton;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
@@ -70,7 +70,7 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = dialog.path();
       final String db = dialog.dbname();
-      progress(gui, PROGCREATE, new Process[] { new CreateDB(in, db) });
+      progress(gui, PROGCREATE, new Proc[] { new CreateDB(in, db) });
     }
   },
 
@@ -100,9 +100,9 @@ public enum GUICommands implements GUICommand {
           d.meta.txtindex = ind[0];
           d.meta.atvindex = ind[1];
           d.meta.ftxindex = ind[2];
-          progress(gui, INFOOPT, new Process[] { new Optimize() });
+          progress(gui, INFOOPT, new Proc[] { new Optimize() });
         } else {
-          Process[] proc = new Process[0];
+          Proc[] proc = new Proc[0];
           if(ind[0] != d.meta.pathindex)
             proc = Array.add(proc, cmd(ind[0], CmdIndex.SUMMARY));
           if(ind[1] != d.meta.txtindex)
@@ -123,7 +123,7 @@ public enum GUICommands implements GUICommand {
      * @param index name of index
      * @return process reference
      */
-    private Process cmd(final boolean create, final CmdIndex index) {
+    private Proc cmd(final boolean create, final CmdIndex index) {
       return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },
@@ -692,7 +692,7 @@ public enum GUICommands implements GUICommand {
       final String p = gprop.is(GUIProp.FSALL) ? "/"
           : gui.prop.get(GUIProp.FSBACKING).replace('\\', '/');
       final String n = gprop.get(GUIProp.FSDBNAME);
-      progress(gui, CREATEFSTITLE, new Process[] { new CreateFS(p, n) });
+      progress(gui, CREATEFSTITLE, new Proc[] { new CreateFS(p, n) });
     }
   },
 
@@ -876,12 +876,12 @@ public enum GUICommands implements GUICommand {
    * @param t dialog title
    * @param procs processes
    */
-  static void progress(final GUI gui, final String t, final Process[] procs) {
+  static void progress(final GUI gui, final String t, final Proc[] procs) {
     // start database creation thread
     new Thread() {
       @Override
       public void run() {
-        for(final Process p : procs) {
+        for(final Proc p : procs) {
           final boolean ci = p instanceof CreateIndex;
           final boolean fs = p instanceof CreateFS;
           final boolean di = p instanceof DropIndex;

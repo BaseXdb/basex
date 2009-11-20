@@ -53,7 +53,7 @@ import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 
 /**
- * This is a parser for command strings, creating {@link Process} instances.
+ * This is a parser for command strings, creating {@link Proc} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
@@ -91,8 +91,8 @@ public final class CommandParser extends InputParser {
    * @return commands
    * @throws QueryException query exception
    */
-  public Process[] parse() throws QueryException {
-    Process[] list = new Process[0];
+  public Proc[] parse() throws QueryException {
+    Proc[] list = new Proc[0];
     if(!more()) return list;
 
     while(true) {
@@ -110,7 +110,7 @@ public final class CommandParser extends InputParser {
    * @return process
    * @throws QueryException query exception
    */
-  private Process parse(final Cmd cmd) throws QueryException {
+  private Proc parse(final Cmd cmd) throws QueryException {
     switch(cmd) {
       // user commands
 

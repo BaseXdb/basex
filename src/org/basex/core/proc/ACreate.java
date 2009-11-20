@@ -10,7 +10,7 @@ import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -27,7 +27,7 @@ import org.basex.index.ValueBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-abstract class ACreate extends Process {
+abstract class ACreate extends Proc {
   /** Builder instance. */
   private Builder builder;
   
@@ -62,7 +62,7 @@ abstract class ACreate extends Process {
       } else {
         index(data);
         data.close();
-        final Process pr = new Open(db);
+        final Proc pr = new Open(db);
         if(!pr.execute(context)) return error(pr.info());
       }
       return info(DBCREATED, db, perf);

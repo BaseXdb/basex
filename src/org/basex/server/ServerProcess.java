@@ -7,7 +7,7 @@ import org.basex.BaseXServer;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.proc.Close;
@@ -39,7 +39,7 @@ public final class ServerProcess extends Thread {
   /** Output stream. */
   private PrintOutput out;
   /** Core. */
-  private Process proc;
+  private Proc proc;
   /** Timeout thread. */
   private Thread timeout;
   /** Log. */
@@ -163,7 +163,7 @@ public final class ServerProcess extends Thread {
    * Starts a timeout thread for the specified process.
    * @param p process reference
    */
-  private void startTimer(final Process p) {
+  private void startTimer(final Proc p) {
     final long to = context.prop.num(Prop.TIMEOUT);
     if(to == 0) return;
 

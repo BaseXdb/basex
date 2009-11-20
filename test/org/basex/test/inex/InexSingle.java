@@ -1,10 +1,12 @@
 package org.basex.test.inex;
 
 import static org.basex.core.Text.*;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.OutputStream;
 import java.util.HashMap;
 
 import org.basex.core.Context;
@@ -12,6 +14,7 @@ import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.proc.List;
 import org.basex.core.proc.XQuery;
+import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -35,7 +38,9 @@ public final class InexSingle {
   /** Session. */
   private LocalSession session = new LocalSession(ctx);
   /** Maximum number of queries. */
-  private int quindex;
+  private int quindex = -1;
+  /** Quiet flag (suppress output). */
+  private boolean quiet;
 
   /**
    * Main test method.
@@ -128,11 +133,11 @@ public final class InexSingle {
       "return <results query=\"" + query + "\">{ $hits }</results>\n");
 
     String file = Integer.toString(quindex) + ".xml";
-    final PrintOutput out = new PrintOutput(file);
+    while(file.length() < 7) file = "0" + file;
+    final OutputStream out = quiet ? new NullOutput() : new PrintOutput(file);
     final boolean ok = session.execute(new XQuery(qu.toString()), out);
     out.close();
     if(ok) {
-      while(file.length() < 7) file = "0" + file;
       // output result
       Main.outln("- " + query);
       Main.outln("Result saved to % in %", file, p);
@@ -148,14 +153,27 @@ public final class InexSingle {
    */
   private boolean parseArguments(final String[] args) {
     final Args arg = new Args(args);
-    final boolean ok = arg.more();
-
-    if(ok) {
-      quindex = arg.num();
-    } else {
-      Main.outln("Usage: " + Main.name(this) + " query" + NL +
-        "  query  perform specified query (1-#queries)");
+    boolean ok = true;
+    try {
+      while(arg.more() && ok) {
+        if(arg.dash()) {
+          final char c = arg.next();
+          if(c == 'q') {
+            quiet = true;
+          } else {
+            ok = false;
+          }
+        } else {
+          quindex = arg.num();
+        }
+      }
+    } catch(final Exception ex) {
+      ok = false;
     }
+    if(!ok || quindex == -1)
+      Main.outln("Usage: " + Main.name(this) + " [options] query" + NL +
+          "  -q     quiet mode (suppress output)" + NL +
+          "  query  perform specified query (1-#queries)");
     return ok;
   }
 }

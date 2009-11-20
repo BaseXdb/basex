@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
@@ -112,7 +112,7 @@ public abstract class UpdateTest {
    * if errors occur.
    * @param proc process instance
    */
-  private void exec(final Process proc) {
+  private void exec(final Proc proc) {
     if(!proc.execute(CONTEXT)) {
       Main.errln(proc + ": " + proc.info());
       System.exit(1);

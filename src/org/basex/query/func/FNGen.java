@@ -33,10 +33,11 @@ public final class FNGen extends Fun {
       case DATA:
         return data(ctx.iter(expr[0]));
       case COLLECT:
-        Iter iter = expr.length != 0 ? ctx.iter(expr[0]) : null;
-        Item it = iter != null ? iter.next() : null;
-        if(iter != null && it == null) Err.empty(this);
-        return ctx.coll(iter == null ? null : checkStr(it));
+        if(expr.length == 0) return ctx.coll(null);
+        Iter iter = ctx.iter(expr[0]);
+        Item it = iter.next();
+        if(it == null) Err.empty(this);
+        return ctx.coll(checkStr(it));
       case PUT:
         /* [LK] fn:put() operations should be moved to pending list
          * - FOUP0002 could be revised (kinda dirty right now)
@@ -98,6 +99,10 @@ public final class FNGen extends Fun {
       if(!expr[0].i()) return this;
       final Item it = (Item) expr[0];
       return it.type == Type.DOC ? it : ctx.doc(checkStr(it), false, false);
+    } else if(func == FunDef.COLLECT) {
+      if(expr.length == 0 || !expr[0].i()) return this;
+      final Item it = (Item) expr[0];
+      return it.type == Type.STR ? ctx.coll(checkStr(it)).finish() : this;
     }
     return this;
   }

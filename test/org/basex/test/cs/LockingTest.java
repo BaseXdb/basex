@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.Main;
 import org.basex.core.Session;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.Open;
@@ -234,7 +234,7 @@ public final class LockingTest {
    * @param session session
    * @return String result
    */
-  String checkRes(final Process pr, final Session session) {
+  String checkRes(final Proc pr, final Session session) {
     final CachedOutput out = new CachedOutput();
     try {
       session.execute(pr, out);
@@ -258,7 +258,7 @@ public final class LockingTest {
    * @param session Session
    * @return success flag
    */
-  String process(final Process pr, final Session session) {
+  String process(final Proc pr, final Session session) {
     try {
       return session.execute(pr) ? null : session.info();
     } catch(final Exception ex) {

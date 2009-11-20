@@ -438,6 +438,7 @@ public final class QueryContext extends Progress {
 
     // add document to array
     final DBNode node = new DBNode(data, 0);
+    // [CG] XQuery: how to handle collections?
     addDoc(node);
     return node;
   }
@@ -477,7 +478,7 @@ public final class QueryContext extends Progress {
    * @return collection
    * @throws QueryException query exception
    */
-  public Iter coll(final byte[] coll) throws QueryException {
+  public SeqIter coll(final byte[] coll) throws QueryException {
     // no collection specified.. return default collection/current context set
     if(coll == null) {
       if(colls == 0) Err.or(COLLDEF);

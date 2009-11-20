@@ -3,7 +3,7 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
@@ -18,7 +18,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Export extends Process {
+public final class Export extends Proc {
   /** Document Declaration. */
   private static final String DOCDECL =
     "<?xml version=\"1.0\" encoding=\"%\"?>";

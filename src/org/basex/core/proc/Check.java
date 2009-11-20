@@ -2,7 +2,7 @@ package org.basex.core.proc;
 
 import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -15,7 +15,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Check extends Process {
+public final class Check extends Proc {
   /**
    * Default constructor.
    * @param path file path
@@ -30,7 +30,7 @@ public final class Check extends Process {
 
     final String path = args[0];
     final String db = IO.get(path).dbname();
-    final Process p = MetaData.found(path, db, context.prop) ?
+    final Proc p = MetaData.found(path, db, context.prop) ?
       new Open(db) : new CreateDB(path);
     final boolean ok = p.execute(context, out);
     info(p.info().trim());

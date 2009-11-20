@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
@@ -17,7 +17,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Open extends Process {
+public final class Open extends Proc {
   /**
    * Default constructor.
    * @param name name of database
@@ -64,7 +64,7 @@ public final class Open extends Process {
     }
 
     // check permissions
-    if(ctx.perm(User.READ, data) != -1) {
+    if(ctx.perm(User.READ, data.meta) != -1) {
       Close.close(ctx, data);
       throw new IOException(Main.info(PERMNO, CmdPerm.READ));
     }

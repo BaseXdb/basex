@@ -3,7 +3,7 @@ package org.basex.test.cs;
 import org.basex.core.Session;
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Text;
 import org.basex.core.proc.*;
 import org.basex.core.Commands.*;
@@ -264,7 +264,7 @@ public class CmdTest {
    * Assumes that this command is successful.
    * @param pr process reference
    */
-  private void ok(final Process pr) {
+  private void ok(final Proc pr) {
     final String msg = process(pr);
     if(msg != null) fail(msg);
   }
@@ -273,7 +273,7 @@ public class CmdTest {
    * Assumes that this command fails.
    * @param pr process reference
    */
-  private void no(final Process pr) {
+  private void no(final Proc pr) {
     ok(process(pr) != null);
   }
 
@@ -282,7 +282,7 @@ public class CmdTest {
    * @param pr process reference
    * @return success flag
    */
-  private String process(final Process pr) {
+  private String process(final Proc pr) {
     try {
       return session.execute(pr, new NullOutput()) ? null : session.info();
     } catch(final Exception ex) {

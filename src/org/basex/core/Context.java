@@ -2,6 +2,7 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.server.ServerProcess;
@@ -174,14 +175,14 @@ public final class Context {
   /**
    * Checks if the current user has the specified permissions.
    * @param p permissions
-   * @param d optional data reference
+   * @param m optional meta data reference
    * @return result of check (-1: ok, other: failure)
    */
-  public int perm(final int p, final Data d) {
+  public int perm(final int p, final MetaData m) {
     final User u = user;
     int up = u.perm;
-    if(d != null) {
-      final User us = d.meta.users.get(u.name);
+    if(m != null) {
+      final User us = m.users.get(u.name);
       if(us != null) up = up & ~(User.READ | User.WRITE) | us.perm;
     }
     int i = 4;

@@ -84,7 +84,7 @@ public final class PendingUpdates {
       DBPrimitives dp = dbs.get(d);
       if(dp == null) {
         // check permissions
-        if(ctx.context.perm(User.WRITE, d) != -1)
+        if(ctx.context.perm(User.WRITE, d.meta) != -1)
           throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
 
         dp = new DBPrimitives(d);

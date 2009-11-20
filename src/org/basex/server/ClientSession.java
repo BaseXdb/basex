@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import org.basex.core.Session;
 import org.basex.core.Context;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.BufferInput;
@@ -93,7 +93,7 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public boolean execute(final Process pr, final OutputStream o)
+  public boolean execute(final Proc pr, final OutputStream o)
       throws IOException {
     return execute(pr.toString(), o);
   }

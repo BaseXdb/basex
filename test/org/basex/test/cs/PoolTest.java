@@ -3,7 +3,7 @@ package org.basex.test.cs;
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 import org.basex.BaseXServer;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Session;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
@@ -120,7 +120,7 @@ public class PoolTest {
    * @param pr process reference
    * @param s Session
    */
-  void ok(final Process pr, final Session s) {
+  void ok(final Proc pr, final Session s) {
     final String msg = process(pr, s);
     if(msg != null) fail(msg);
   }
@@ -130,7 +130,7 @@ public class PoolTest {
    * @param pr process reference
    * @param s Session
    */
-  private void no(final Process pr, final Session s) {
+  private void no(final Proc pr, final Session s) {
     ok(process(pr, s) != null);
   }
 
@@ -148,7 +148,7 @@ public class PoolTest {
    * @param session Session
    * @return success flag
    */
-  private String process(final Process pr, final Session session) {
+  private String process(final Proc pr, final Session session) {
     try {
       return session.execute(pr) ? null : session.info();
     } catch(final Exception ex) {

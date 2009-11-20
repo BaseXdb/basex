@@ -56,14 +56,15 @@ public final class DropDB extends ACreate {
       final String pat, final Prop pr) {
 
     final File path = pr.dbpath(db);
-    if(!path.exists()) return false;
+    final File[] files = path.listFiles();
+    // path not found/no permissions...
+    if(!path.exists() || files == null) return false;
 
-    boolean ok = true;
-    for(final File sub : path.listFiles()) {
-      if(pat == null || sub.getName().matches(pat)) ok &= sub.delete();
+    for(final File sub : files) {
+      if(pat == null || sub.getName().matches(pat))
+        if(!sub.delete()) return false;
     }
-    if(pat == null) ok &= path.delete();
-    return ok;
+    return pat == null || path.delete();
   }
 
   @Override

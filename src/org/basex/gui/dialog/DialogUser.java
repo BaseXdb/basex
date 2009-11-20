@@ -17,7 +17,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Session;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.proc.AlterUser;
@@ -55,7 +55,7 @@ public final class DialogUser extends BaseXBack {
   Session sess;
 
   /** List of permission processes. */
-  final ArrayList<Process> permps = new ArrayList<Process>();
+  final ArrayList<Proc> permps = new ArrayList<Proc>();
   /** List of temp global permissions. */
   final ArrayList<StringList> tempP = new ArrayList<StringList>();
   /** Change button. */
@@ -194,7 +194,7 @@ public final class DialogUser extends BaseXBack {
 
     try {
       if(BUTTONCHANGE.equals(cmd)) {
-        for(final Process p : permps)
+        for(final Proc p : permps)
           if(!sess.execute(p)) msg = sess.info();
         permps.clear();
         setData();

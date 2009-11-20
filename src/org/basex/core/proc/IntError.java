@@ -1,6 +1,6 @@
 package org.basex.core.proc;
 
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.io.PrintOutput;
 
 /**
@@ -9,7 +9,7 @@ import org.basex.io.PrintOutput;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class IntError extends Process {
+public final class IntError extends Proc {
   /**
    * Default constructor.
    * @param msg error message

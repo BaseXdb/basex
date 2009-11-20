@@ -3,7 +3,7 @@ package org.basex.test.query;
 import org.basex.core.AProp;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
@@ -101,7 +101,7 @@ public final class QueryTest {
     final String file = test.doc.replaceAll("\\\"", "\\\\\"");
     final String name = Main.name(test);
     final boolean up = test instanceof XQUPTest;
-    Process proc = new CreateDB(file, name);
+    Proc proc = new CreateDB(file, name);
     boolean ok = proc.execute(context);
 
     if(ok) {

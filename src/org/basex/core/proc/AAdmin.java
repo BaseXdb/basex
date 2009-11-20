@@ -3,7 +3,7 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
@@ -14,7 +14,7 @@ import org.basex.data.Data;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public abstract class AAdmin extends Process {
+public abstract class AAdmin extends Proc {
   /**
    * Default constructor.
    * @param a arguments

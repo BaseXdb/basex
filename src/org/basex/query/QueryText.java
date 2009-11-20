@@ -520,13 +520,13 @@ public interface QueryText {
   /** XUTY0004: XQuery Update type exception. */
   Object[] UPNOATTRPER = { XUTY, 4, "Attribute must follow root element." };
   /** XUTY0005: XQuery Update type exception. */
-  Object[] UPTRGTYP = { XUTY, 5, "Wrong type of target node." };
+  Object[] UPTRGTYP = { XUTY, 5, "Single node expected as target." };
   /** XUTY0006: XQuery Update type exception. */
-  Object[] UPTRGTYP2 = { XUTY, 6, "Wrong type of target node." };
+  Object[] UPTRGTYP2 = { XUTY, 6, "Single node expected as target." };
   /** XUTY0007: XQuery Update type exception. */
   Object[] UPTRGDELEMPT = { XUTY, 7, "Only nodes can be deleted." };
   /** XUTY0008: XQuery Update type exception. */
-  Object[] UPTRGMULT = { XUTY, 8, "Target result must be a single node." };
+  Object[] UPTRGMULT = { XUTY, 8, "Single node expected as target." };
   /** XUTY0011: XQuery Update type exception. */
   Object[] UPWRELM = { XUTY, 10, "Replace nodes must not be attribute nodes." };
   /** XUTY0010: XQuery Update type exception. */

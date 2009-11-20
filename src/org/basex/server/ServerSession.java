@@ -4,7 +4,7 @@ import java.io.OutputStream;
 
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.User;
 
 /**
@@ -28,7 +28,7 @@ public class ServerSession extends LocalSession {
   }
 
   @Override
-  public boolean execute(final Process pr, final OutputStream out) {
+  public boolean execute(final Proc pr, final OutputStream out) {
     final boolean up = pr.updating(ctx) || (pr.flags & User.CREATE) != 0;
     sem.before(up);
     final boolean ok = super.execute(pr, out);
