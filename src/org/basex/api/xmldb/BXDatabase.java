@@ -3,7 +3,7 @@ package org.basex.api.xmldb;
 import static org.basex.core.Text.*;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.Process;
+import org.basex.core.Proc;
 import org.basex.core.proc.Set;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
@@ -53,7 +53,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
   public void setProperty(final String key, final String value)
       throws XMLDBException {
-    final Process proc = new Set(key, value);
+    final Proc proc = new Set(key, value);
     if(!proc.execute(ctx)) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
     }
