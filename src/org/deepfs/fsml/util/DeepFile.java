@@ -172,7 +172,8 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean,
+   *   boolean, boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param file the associated file in the file system.
@@ -439,7 +440,8 @@ public class DeepFile {
    * @param dataType the xml data type to set for this metadata element or
    *          <code>null</code> if the default data type should be used.
    */
-  private void addMeta(final MetaElem e, final byte[] value, final Type dataType) {
+  private void addMeta(final MetaElem e, final byte[] value,
+      final Type dataType) {
     if(metaFinished || value.length == 0) return;
     if(e.equals(MetaElem.TYPE) | e.equals(MetaElem.FORMAT)) {
       Main.bug(

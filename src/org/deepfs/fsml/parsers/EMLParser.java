@@ -212,7 +212,7 @@ public final class EMLParser implements IFileParser {
   public boolean check(final BufferedFileChannel f) throws IOException {
     while(readLine())
       if(mCurrLine.startsWith("From:") && MAILPATTERN.matcher(mCurrLine).find())
-      /* */return true;
+        return true;
     return false;
   }
 
@@ -454,7 +454,7 @@ public final class EMLParser implements IFileParser {
    * @param text the text to chop.
    * @return the chopped text.
    */
-  private byte[] chop(byte[] text) {
+  private byte[] chop(final byte[] text) {
     int start = 0;
     int end = text.length - 1;
     boolean finished = false;

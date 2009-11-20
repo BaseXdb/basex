@@ -50,8 +50,8 @@ public final class InexSingle {
 
   /**
    * Converts ids of a submission file. 
-   * @param subfile
-   * @throws Exception
+   * @param subfile sub file
+   * @throws Exception exception
    */
   public static void convert(final String subfile) throws Exception {    
     String l;
@@ -66,7 +66,8 @@ public final class InexSingle {
     br.close();
     
     final BufferedReader in = new BufferedReader(new FileReader(subfile));
-    final String subfileN = subfile.substring(0, subfile.indexOf('.')) + "1" + ".xml";
+    final String subfileN = subfile.substring(0, subfile.indexOf('.')) +
+      "1" + ".xml";
     System.out.println("........ Creating: " + subfileN);
     final BufferedWriter out = new BufferedWriter(new FileWriter(subfileN));
     while((l = in.readLine()) != null) {
@@ -114,7 +115,8 @@ public final class InexSingle {
     for(final String s : List.list(ctx)) {
       if(s.startsWith(DBPREFIX)) {
         if(d++ != 0) qu.add(",\n");
-        qu.add("doc('" + s + "')" + query);
+        final String doc = "doc('" + s + "')";
+        qu.add(doc + query.replaceAll("\\| ", "| " + doc));
       }
     }
     qu.add(")\n" +

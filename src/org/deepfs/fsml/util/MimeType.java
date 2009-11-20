@@ -33,7 +33,8 @@ public enum MimeType {
   /** JPG. */
   JPG("image/jpeg", "jpg", FileType.PICTURE),
   /** KML. */
-  KML("application/vnd.google-earth.kml+xml", "kml", FileType.XML, FileType.MAP),
+  KML("application/vnd.google-earth.kml+xml", "kml", FileType.XML,
+      FileType.MAP),
   /** MP3. */
   MP3("audio/mp3", "mp3", FileType.AUDIO),
   /** Object file. */
