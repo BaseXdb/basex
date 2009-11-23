@@ -64,6 +64,7 @@ public final class BaseXServer extends Main implements Runnable {
       log.write("Server started...");
       if(console) quit(console());
     } catch(final Exception ex) {
+      log.write(ex.getMessage());
       error(ex, true);
     }
   }
@@ -101,6 +102,7 @@ public final class BaseXServer extends Main implements Runnable {
       if(console) System.in.close();
       server.close();
     } catch(final IOException ex) {
+      log.write(ex.getMessage());
       error(ex, false);
     }
 
