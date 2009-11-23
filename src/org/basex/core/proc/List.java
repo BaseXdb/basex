@@ -37,8 +37,8 @@ public final class List extends Proc {
     table.header.add(INFODOC);
 
     for(final String name : list(context)) {
-      final StringList entry = new StringList();
-      entry.add(name);
+      if(name.startsWith(".")) continue; 
+
       DataInput in = null;
       String file = null;
       try {
@@ -51,8 +51,10 @@ public final class List extends Proc {
         try { if(in != null) in.close(); } catch(final IOException ex) { }
       }
       if(file != null) {
-        entry.add(file);
-        table.contents.add(entry);
+        final StringList sl = new StringList();
+        sl.add(name);
+        sl.add(file);
+        table.contents.add(sl);
       }
     }
     table.sort();

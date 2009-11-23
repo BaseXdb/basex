@@ -32,13 +32,11 @@ public final class ServerProcess extends Thread {
   private final Socket socket;
   /** Server reference. */
   private final Semaphore sem;
-  /** Info flag. */
-  private final boolean info;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
   private PrintOutput out;
-  /** Core. */
+  /** Current process. */
   private Proc proc;
   /** Timeout thread. */
   private Thread timeout;
@@ -49,16 +47,12 @@ public final class ServerProcess extends Thread {
    * Constructor.
    * @param s socket
    * @param b server reference
-   * @param i info flag
-   * @param l log
    */
-  public ServerProcess(final Socket s, final BaseXServer b, final boolean i,
-      final Log l) {
+  public ServerProcess(final Socket s, final BaseXServer b) {
     context = new Context(b.context);
     sem = b.sem;
+    log = b.log;
     socket = s;
-    info = i;
-    log = l;
   }
 
   /**
@@ -77,12 +71,8 @@ public final class ServerProcess extends Thread {
       final boolean ok = context.user != null;
       send(ok);
 
-      if(ok) {
-        start();
-      } else {
-        log.write(this + " Failed: " + us);
-        if(info) Main.outln(this + " Failed: " + us);
-      }
+      if(ok) start();
+      else log.write(this, "LOGIN " + us, "failed");
       return ok;
     } catch(final IOException ex) {
       Main.error(ex, false);
@@ -93,8 +83,7 @@ public final class ServerProcess extends Thread {
 
   @Override
   public void run() {
-    if(info) Main.outln(this + " Login: " + context.user.name);
-    log.write(this + " Login: " + context.user.name);
+    log.write(this, "LOGIN " + context.user.name, "successful");
     try {
       while(true) {
         String input = null;
@@ -138,11 +127,9 @@ public final class ServerProcess extends Thread {
         send(ok);
         stopTimer();
         sem.after(up);
-        log.write(this + " " + proc.toString() + ": " + context.user.name);
-        if(info) Main.outln(this + " " + in + ": " + perf);
+        log.write(this, proc, perf, ok ? "OK" : " (Error: " + inf + ")");
       }
-      if(info) Main.outln(this + " Logout: " + context.user.name);
-      log.write(this + " Logout: " + context.user.name);  
+      log.write(this, "LOGOUT " + context.user.name);  
     } catch(final IOException ex) {
       log.write(ex.getMessage());
       Main.error(ex, false);

@@ -21,8 +21,7 @@ public class ObjectMap<E> extends TokenSet {
    * @param val value
    */
   public final void add(final byte[] key, final E val) {
-    final int i = add(key);
-    values[Math.abs(i)] = val;
+    values[Math.abs(add(key))] = val;
   }
 
   /**

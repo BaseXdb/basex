@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
@@ -69,8 +68,8 @@ public final class InfoDB extends AInfo {
     format(tb, INFODOCSIZE, Performance.format(meta.filesize));
     format(tb, INFOENCODING, meta.encoding);
     format(tb, INFONDOCS, Integer.toString(meta.ndocs));
-    format(tb, INFOCHOP, Main.flag(meta.chop));
-    format(tb, INFOENTITY, Main.flag(meta.entity));
+    format(tb, INFOCHOP, flag(meta.chop));
+    format(tb, INFOENTITY, flag(meta.entity));
 
     if(index) {
       tb.add(NL);
@@ -78,10 +77,10 @@ public final class InfoDB extends AInfo {
       if(meta.oldindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {
-        format(tb, INFOPATHINDEX, Main.flag(meta.pathindex));
-        format(tb, INFOTEXTINDEX, Main.flag(meta.txtindex));
-        format(tb, INFOATTRINDEX, Main.flag(meta.atvindex));
-        format(tb, INFOFTINDEX, Main.flag(meta.ftxindex) + (meta.ftxindex &&
+        format(tb, INFOPATHINDEX, flag(meta.pathindex));
+        format(tb, INFOTEXTINDEX, flag(meta.txtindex));
+        format(tb, INFOATTRINDEX, flag(meta.atvindex));
+        format(tb, INFOFTINDEX, flag(meta.ftxindex) + (meta.ftxindex &&
             meta.ftfz ? " (" + INFOFZINDEX + ")" : ""));
       }
     }

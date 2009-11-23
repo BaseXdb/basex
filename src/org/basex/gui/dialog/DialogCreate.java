@@ -75,13 +75,12 @@ public final class DialogCreate extends Dialog {
 
     // create panels
     final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new TableLayout(7, 1));
+    p1.setLayout(new TableLayout(3, 1, 0, 4));
     p1.setBorder(8, 8, 8, 8);
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 3, 6, 0));
-    p.add(new BaseXLabel(CREATETITLE + ":", false, true));
-    p.add(new BaseXLabel(CREATEFILT + ":", false, true));
+    BaseXBack p = new BaseXBack();
+    p.setLayout(new TableLayout(2, 2, 6, 0));
+    p.add(new BaseXLabel(CREATETITLE + COL, false, true));
     p.add(new BaseXLabel(""));
 
     path = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
@@ -92,14 +91,6 @@ public final class DialogCreate extends Dialog {
     BaseXLayout.setWidth(path, 240);
     p.add(path);
 
-    filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
-    path.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) { action(null); }
-    });
-    BaseXLayout.setWidth(filter, 54);
-    p.add(filter);
-
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, this);
     button.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) { choose(); }
@@ -107,9 +98,11 @@ public final class DialogCreate extends Dialog {
     p.add(button);
     p1.add(p);
 
-    final BaseXLabel l = new BaseXLabel(CREATENAME, false, true);
-    l.setBorder(0, 0, 0, 0);
-    p1.add(l);
+    p = new BaseXBack();
+    p.setLayout(new TableLayout(2, 2, 6, 0));
+    p.add(new BaseXLabel(CREATENAME, false, true));
+    p.add(new BaseXLabel(CREATEFILT + COL, false, true));
+
     dbname = new BaseXTextField(this);
     dbname.setText(IO.get(gprop.get(GUIProp.OPENPATH)).dbname());
     dbname.addKeyListener(new KeyAdapter() {
@@ -117,10 +110,19 @@ public final class DialogCreate extends Dialog {
       public void keyReleased(final KeyEvent e) { action(null); }
     });
     BaseXLayout.setWidth(dbname, 240);
-    p1.add(dbname);
+    p.add(dbname);
+
+    filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
+    path.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) { action(null); }
+    });
+    BaseXLayout.setWidth(filter, 54);
+    p.add(filter);
+    p1.add(p);
 
     info = new BaseXLabel(" ");
-    info.setBorder(40, 0, 0, 0);
+    info.setBorder(32, 0, 0, 0);
     p1.add(info);
 
     // create checkboxes

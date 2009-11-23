@@ -45,7 +45,7 @@ public final class Set extends Proc {
         prop.set(key, b);
 
         final boolean all = ALL.equalsIgnoreCase(val);
-        val = Main.flag(b);
+        val = AInfo.flag(b);
         if(s == CmdSet.INFO) {
           prop.set(Prop.ALLINFO, all);
           if(all) {

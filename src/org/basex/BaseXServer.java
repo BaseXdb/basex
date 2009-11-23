@@ -29,16 +29,16 @@ import org.basex.util.Token;
 public final class BaseXServer extends Main implements Runnable {
   /** Semaphore for managing processes. */
   public final Semaphore sem = new Semaphore();
+  /** Log. */
+  public Log log;
+  /** Quiet mode (no logging). */
+  public boolean quiet;
   /** Stop file. */
   private static final IO STOP = IO.get(Prop.TMP + "bxs");
   /** Server socket. */
-  ServerSocket server;
+  private ServerSocket server;
   /** Flag for server activity. */
-  boolean running = true;
-  /** Verbose mode. */
-  boolean info;
-  /** Log. */
-  private final Log log = new Log();
+  private boolean running = true;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -56,12 +56,13 @@ public final class BaseXServer extends Main implements Runnable {
   public BaseXServer(final String... args) {
     super(args);
     if(!success) return;
+    log = new Log(context, quiet);
+    
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
       new Thread(this).start();
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
-      log.write("Server started...");
       if(console) quit(console());
     } catch(final Exception ex) {
       log.write(ex.getMessage());
@@ -75,11 +76,9 @@ public final class BaseXServer extends Main implements Runnable {
   public void run() {
     while(running) {
       try {
-        final ServerProcess s = new ServerProcess(server.accept(), this,
-            info, log);
+        final ServerProcess s = new ServerProcess(server.accept(), this);
         if(STOP.exists()) {
           STOP.delete();
-          outln(SERVERSTOPPED);
           quit(false);
         } else if(s.init()) {
           context.add(s);
@@ -132,9 +131,9 @@ public final class BaseXServer extends Main implements Runnable {
         } else if(c == 'p') {
           // parse server port
           context.prop.set(Prop.SERVERPORT, arg.num());
-        } else if(c == 'v') {
-          // show process info
-          info = true;
+        } else if(c == 'z') {
+          // suppress logging
+          quiet = true;
         } else {
           success = false;
         }

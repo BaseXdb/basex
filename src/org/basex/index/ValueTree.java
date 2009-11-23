@@ -80,8 +80,8 @@ final class ValueTree {
   private int spos;
 
   /**
-   * Initializes the tree iterator. Note that the index structure will be
-   * destroyed here to save memory.
+   * Initializes the tree iterator. Note that, to save memory, the original
+   * index structure will be destroyed by the iterator.
    */
   void init() {
     t = null;

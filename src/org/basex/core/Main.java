@@ -228,15 +228,6 @@ public abstract class Main {
   }
 
   /**
-   * Returns an info message for the specified flag.
-   * @param flag current flag status
-   * @return ON/OFF message
-   */
-  public static String flag(final boolean flag) {
-    return flag ? INFOON : INFOOFF;
-  }
-
-  /**
    * Global method for printing a newline.
    */
   public static void outln() {

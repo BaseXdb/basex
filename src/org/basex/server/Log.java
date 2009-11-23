@@ -6,50 +6,72 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.io.IO;
 
 /**
  * Management of logging.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class Log {
-  /** Log folder checker. */
-  private IO logdir;
-  /** Daily log file. */
-  private File logfile;
+public final class Log {
+  /** Date format. */
+  private static final SimpleDateFormat DATE =
+    new SimpleDateFormat("yyyy-MM-dd");
+  /** Time format. */
+  private static final SimpleDateFormat TIME =
+    new SimpleDateFormat("HH:mm:ss.SSS");
+  /** Quiet flag. */
+  private final boolean quiet;
+  /** Logging directory. */
+  private final String dir;
   /** Start date of log. */
   private Date start;
-  /** FileWriter. */
+  /** File writer. */
   private FileWriter fw;
 
   /**
    * Constructor.
+   * @param ctx context reference
+   * @param q quiet flag (no logging)
    */
-  public Log() {
-    start = new Date();
-    createLogDir();
-    createLogFile(start);
+  public Log(final Context ctx, final boolean q) {
+    dir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
+    quiet = q;
+    if(quiet) return;
+
+    create(new Date());
+    write(SERVERSTART);
+
     // guarantee correct shutdown...
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        Log.this.write("Server stopped.");
-        Log.this.closeLog();
+        write(SERVERSTOPPED);
+        close();
       }
     });
   }
 
   /**
-   * Creates a folder for log files.
+   * Writes into the log file.
+   * @param str strings to be written
    */
-  private void createLogDir() {
-    logdir = IO.get(Prop.HOME + "/BaseXLogs");
-    if(!logdir.exists()) {
-      new File(Prop.HOME + "/BaseXLogs").mkdir();
+  public void write(final Object... str) {
+    if(quiet) return;
+
+    final Date now = new Date();
+    if(!DATE.format(start).equals(DATE.format(now))) {
+      close();
+      create(now);
+    }
+    try {
+      final StringBuilder sb = new StringBuilder(TIME.format(now));
+      for(final Object s : str) sb.append("\t" + s);
+      fw.write(sb.append(NL).toString());
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
   }
 
@@ -57,61 +79,25 @@ public class Log {
    * Creates a log file.
    * @param d Date
    */
-  private void createLogFile(final Date d) {
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    logfile = new File(Prop.HOME + "/BaseXLogs/" +
-        sdf.format(d) + ".log");
+  void create(final Date d) {
+    new File(dir).mkdirs();
+    final String file = dir + DATE.format(d) + ".log";
+    start = d;
     try {
-      fw = new FileWriter(logfile, true);
-    } catch(IOException e) {
-      e.printStackTrace();
+      fw = new FileWriter(file, true);
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
-  }
-  
-  /**
-   * Checks if a new day is on.
-   * @param d Date
-   * @return boolean for new day
-   */
-  private boolean checkDay(final Date d) {
-    SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
-    String past = sdf.format(start);
-    String present = sdf.format(d);
-    return past.equals(present);
   }
 
   /**
-   * Writes into the log file.
-   * @param s String
-   */
-  public void write(final String s) {
-    Date now = new Date();
-    if (!checkDay(now)) {
-      try {
-        fw.close();
-      } catch(IOException e) {
-        e.printStackTrace();
-      }
-      createLogFile(now);
-    }
-    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
-    String tmp = sdf.format(now) + " : " + s + NL;
-    try {
-      fw.write(tmp);
-    } catch(IOException e) {
-      e.printStackTrace();
-    }
-  }
-  
-  /**
    * Closes the log file.
    */
-  public void closeLog() {
+  void close() {
     try {
       fw.close();
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(final IOException ex) {
+      ex.printStackTrace();
     }
   }
-  
 }

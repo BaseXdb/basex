@@ -19,8 +19,7 @@ public final class TokenMap extends TokenSet {
    * @param val value
    */
   public void add(final byte[] key, final byte[] val) {
-    final int i = add(key);
-    if(i > 0) values[i] = val;
+    values[Math.abs(add(key))] = val;
   }
 
   /**

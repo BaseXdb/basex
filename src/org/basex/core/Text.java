@@ -127,7 +127,7 @@ public interface Text {
     " stop     stop server" + NL +
     " -d       debug mode" + NL +
     " -p<port> server port" + NL +
-    " -v       verbose mode";
+    " -z       suppress logging";
 
   // COMMANDS =================================================================
 

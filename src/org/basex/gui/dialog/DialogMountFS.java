@@ -177,7 +177,7 @@ public final class DialogMountFS extends Dialog {
       warn.setText(" ");
       warn.setIcon(null);
       if(ok) {
-        doc.setText("Mount " + db + ":");
+        doc.setText("Mount " + db + COL);
         DataInput in = null;
         try {
           // fill detail panel with db info
