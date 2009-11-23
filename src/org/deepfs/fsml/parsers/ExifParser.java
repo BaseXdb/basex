@@ -12,6 +12,7 @@ import org.basex.core.Main;
 import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
 import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.util.ParserUtil;
 
 /**
  * Parser for Exif data. This is not a standalone parser. Only used for parsing
@@ -315,7 +316,7 @@ public final class ExifParser {
   void dateEvent(final MetaElem elem, final byte[] date) {
     try {
       final Date d = SDF.parse(new String(date));
-      deepFile.addMeta(elem, d);
+      deepFile.addMeta(elem, ParserUtil.convertDateTime(d));
     } catch(final ParseException ex) {
       Main.debug(ex.getMessage());
     }

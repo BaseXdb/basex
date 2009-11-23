@@ -138,16 +138,16 @@ public final class FSImporter implements FSTraversal {
           xmlFragment = FSMLSerializer.serialize(deepFile);
         } catch(final IOException ex) {
           Main.debug(
-              "Failed to extract metadata/contents from the file (% - %)",
-              f.getAbsolutePath(), ex);
+              "FSImporter: Failed to extract metadata/contents from the file " +
+              "(% - %)", f.getAbsolutePath(), ex);
         } finally {
           try {
             bfc.close();
-          } catch(final IOException e1) { }
+          } catch(final IOException e1) {}
         }
       } catch(final IOException e) {
-        // opening failed
-        Main.debug("Failed to open the file (% - %)", f.getAbsolutePath(), e);
+        Main.debug("FSImporter: Failed to open the file (% - %)",
+            f.getAbsolutePath(), e);
       }
     }
 
@@ -159,13 +159,13 @@ public final class FSImporter implements FSTraversal {
         qp.query();
       } catch(final QueryException ex) { // insertion failed
         Main.debug(
-            "Failed to insert a node for the file % into the document (%)",
-            f.getAbsolutePath(), ex);
+            "FSImporter: Failed to insert a node for the file % into the " +
+            "document (%)", f.getAbsolutePath(), ex);
       } finally {
         try {
           qp.close();
         } catch(final IOException e) {
-          Main.debug("Failed to close query processor (%).", e);
+          Main.debug("FSImporter: Failed to close query processor (%).", e);
         }
       }
     }

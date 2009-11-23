@@ -17,6 +17,7 @@ import org.deepfs.fsml.util.FileType;
 import org.deepfs.fsml.util.MetaElem;
 import org.deepfs.fsml.util.MimeType;
 import org.deepfs.fsml.util.ParserRegistry;
+import org.deepfs.fsml.util.ParserUtil;
 
 /**
  * Parser for EML files.
@@ -52,7 +53,8 @@ public final class EMLParser implements IFileParser {
       public boolean parse(final EMLParser obj) {
         try {
           final Date d = SDF.parse(obj.mCurrLine);
-          obj.deepFile.addMeta(MetaElem.DATE_CREATED, d);
+          obj.deepFile.addMeta(MetaElem.DATE_CREATED,
+              ParserUtil.convertDateTime(d));
         } catch(final ParseException ex) {
           Main.debug("%: %", obj.bfc.getFileName(), ex.getMessage());
         }
@@ -69,7 +71,7 @@ public final class EMLParser implements IFileParser {
             && !obj.mCurrLine.contains(": ")) {
           tb.add(obj.mCurrLine);
         }
-        byte[] text = tb.finish();
+        final byte[] text = tb.finish();
         obj.deepFile.addMeta(MetaElem.SUBJECT, obj.decode(text));
         return false;
       }
@@ -251,7 +253,8 @@ public final class EMLParser implements IFileParser {
         deepFile.setFileType(FileType.MESSAGE);
         deepFile.setFileFormat(MimeType.EML);
         deepFile.addMeta(MetaElem.ENCODING, mBodyCharset);
-      } else System.out.println("------");
+      } else Main.debug("Invalid mail file - no sender found (%).",
+          bfc.getFileName());
       if(df.extractText()) if(mCurrLine != null) parseContent();
     } else if(df.extractText()) {
       do {
@@ -440,9 +443,9 @@ public final class EMLParser implements IFileParser {
       lastMatch = match;
       deepFile.addMeta(email, m.group());
 
-      int end = m.start() - 2;
+      final int end = m.start() - 2;
       if(end > pos) {
-        byte[] text = chop(Token.token(addresses.substring(pos, end)));
+        final byte[] text = chop(Token.token(addresses.substring(pos, end)));
         deepFile.addMeta(name, chop(decode(text)));
       }
       pos = m.end() + 2;
@@ -459,7 +462,7 @@ public final class EMLParser implements IFileParser {
     int end = text.length - 1;
     boolean finished = false;
     while(!finished && start < end) {
-      byte b = text[start];
+      final byte b = text[start];
       switch(b) {
         case ' ':
         case '\t':
@@ -473,7 +476,7 @@ public final class EMLParser implements IFileParser {
     }
     finished = false;
     while(!finished && start < end) {
-      byte b = text[end];
+      final byte b = text[end];
       switch(b) {
         case ' ':
         case '\t':
@@ -486,8 +489,8 @@ public final class EMLParser implements IFileParser {
       }
     }
     if(start != 0 || end != text.length - 1) {
-      int size = end - start + 1;
-      byte[] newText = new byte[size];
+      final int size = end - start + 1;
+      final byte[] newText = new byte[size];
       System.arraycopy(text, start, newText, 0, size);
       return newText;
     }

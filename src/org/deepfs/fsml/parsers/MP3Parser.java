@@ -4,10 +4,11 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.basex.core.Main;
 import org.basex.util.Token;
@@ -272,8 +273,6 @@ public final class MP3Parser implements IFileParser {
   private static final int ENC_UTF_16_NO_BOM = 2;
   /** Flag for UTF-8 encoding. */
   private static final int ENC_UTF_8 = 3;
-  /** The format of the date values. */
-  static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy");
 
   static {
     ParserRegistry.register("mp3", MP3Parser.class);
@@ -346,14 +345,8 @@ public final class MP3Parser implements IFileParser {
     if(!ws(array)) deepFile.addMeta(MetaElem.ALBUM, Token.trim(array));
     final byte[] a2 = new byte[4];
     bfc.get(a2, 0, 4);
-    if(!ws(array)) {
-      try {
-        final Date d = SDF.parse(new String(a2));
-        deepFile.addMeta(MetaElem.DATE, d);
-      } catch(final ParseException ex) {
-        Main.debug(ex.getMessage());
-      }
-    }
+    if(!ws(a2)) deepFile.addMeta(MetaElem.YEAR,
+        ParserUtil.convertYear(Token.toInt(a2)));
     bfc.get(array, 0, 30);
     if(array[28] == 0) { // detect ID3v1.1, last byte represents track
       if(array[29] != 0) {
@@ -600,6 +593,45 @@ public final class MP3Parser implements IFileParser {
     return Arrays.copyOfRange(value, start, i);
   }
 
+  /**
+   * Parses a date and returns the corresponding xml calendar.
+   * @param d the date to parse.
+   * @return the xml date.
+   */
+  XMLGregorianCalendar parseDate(final byte[] d) {
+    final int len = d.length;
+    if(len >= 4) { // yyyy
+      final int year = Token.toInt(d, 0, 4);
+      if(len >= 7) { // yyyy-MM
+        if(d[4] != '-') return null;
+        final int month = Token.toInt(d, 5, 7);
+        if(len >= 10) { // yyyy-MM-dd
+          if(d[7] != '-') return null;
+          final int day = Token.toInt(d, 8, 10);
+          if(len >= 13) { // yyyy-MM-ddTHH
+            if(d[10] != 'T') return null;
+            GregorianCalendar gc = new GregorianCalendar();
+            gc.set(year, month, day);
+            gc.set(Calendar.HOUR_OF_DAY, Token.toInt(d, 11, 13));
+            if(len >= 16) {
+              if(d[13] != ':') return null;
+              gc.set(Calendar.MINUTE, Token.toInt(d, 14, 16));
+              if(len >= 19) {
+                if(d[16] != ':') return null;
+                gc.set(Calendar.SECOND, Token.toInt(d, 17, 19));
+              }
+            }
+            return ParserUtil.convertDateTime(gc);
+          }
+          return ParserUtil.convertDate(year, month, day);
+        }
+        return ParserUtil.convertYearMonth(year, month);
+      }
+      return ParserUtil.convertYear(year);
+    }
+    return null;
+  }
+
   // ---------------------------------------------------------------------------
   // ----- Frame enumeration that fires all the events -------------------------
   // ---------------------------------------------------------------------------
@@ -609,83 +641,8 @@ public final class MP3Parser implements IFileParser {
    * @author Bastian Lemke
    */
   private enum Frame {
-        /** */
-    TIT2 {
-      @Override
-      void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.deepFile.addMeta(MetaElem.TITLE, obj.readText(size));
-      }
-    },
-        /** */
-    TPE1 {
-      @Override
-      void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.deepFile.addMeta(MetaElem.CREATOR_NAME, obj.readText(size));
-      }
-    },
-        /** */
-    TALB {
-      @Override
-      void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.deepFile.addMeta(MetaElem.ALBUM, obj.readText(size));
-      }
-    },
-        /** */
-    TYER {
-      @Override
-      void parse(final MP3Parser obj, final int size) throws IOException {
-        try {
-          final Date d = SDF.parse(new String(obj.readText(size)));
-          obj.deepFile.addMeta(MetaElem.DATE, d);
-        } catch(final ParseException ex) {
-          Main.debug(ex.getMessage());
-        }
-      }
-    },
-        /** */
-    TCON {
-      @Override
-      void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.fireGenreEvents(size);
-      }
-    },
-        /** */
-    COMM {
-      @Override
-      void parse(final MP3Parser obj, final int size) throws IOException {
-        final String encoding = obj.readEncoding();
-        byte[] lang = obj.readText(3, "");
-        for(final byte b : lang) {
-          if(ws(b) || b == 0) {
-            lang = EMPTY;
-            break;
-          }
-        }
-        int pos = 4;
-        // ignore short content description
-        while(obj.bfc.get() != 0 && ++pos < size)
-          ;
-        if(pos >= size) return;
-        obj.deepFile.addMeta(MetaElem.DESCRIPTION, obj.readText(size - pos,
-            encoding));
-      }
-    },
-        /** */
-    TRCK {
-      @Override
-      void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.deepFile.addMeta(MetaElem.TRACK, obj.readTrack(size));
-      }
-    },
-        /** */
-    TLEN {
-      @Override
-      void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.deepFile.addMeta(MetaElem.DURATION,
-            ParserUtil.convertDuration(obj.readText(size)));
-      }
-    },
-        /** */
+
+    /** Embedded picture. */
     APIC {
       @Override
       void parse(final MP3Parser obj, final int s) throws IOException {
@@ -725,6 +682,355 @@ public final class MP3Parser implements IFileParser {
         }
         final int size = (int) (s - (obj.bfc.position() - pos));
         obj.deepFile.subfile(name, size, suffixes);
+      }
+    },
+
+    /** Comments. */
+    COMM {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        final String encoding = obj.readEncoding();
+        byte[] lang = obj.readText(3, "");
+        for(final byte b : lang) {
+          if(ws(b) || b == 0) {
+            lang = EMPTY;
+            break;
+          }
+        }
+        int pos = 4;
+        // ignore short content description
+        while(obj.bfc.get() != 0 && ++pos < size)
+          ;
+        if(pos >= size) return;
+        obj.deepFile.addMeta(MetaElem.DESCRIPTION, obj.readText(size - pos,
+            encoding));
+      }
+    },
+
+    /** Album title. */
+    TALB {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.ALBUM, obj.readText(size));
+      }
+    },
+
+    /** Beats per minute. */
+    TBPM {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.BEATS_PER_MINUTE,
+            Integer.parseInt(string(obj.readText(size))));
+      }
+    },
+
+    /** Composer. */
+    TCOM {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.COMPOSER, obj.readText(size));
+      }
+    },
+
+    /** Content type (genre). */
+    TCON {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.fireGenreEvents(size);
+      }
+    },
+
+    /** Copyright message. */
+    TCOP {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.RIGHTS, obj.readText(size));
+      }
+    },
+
+    /** Recording time. */
+    TDRC {
+      @Override
+      public void parse(MP3Parser obj, int size) {
+      // [BL] different elements for gYear, gYearMonth, ...
+      }
+    },
+
+    /** Tagging time. */
+    TDTG {
+      @Override
+      public void parse(MP3Parser obj, int size) {
+      // [BL] different elements for gYear, gYearMonth, ...
+      }
+    },
+
+    /** Encoded by... */
+    TENC {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.ENCODER, obj.readText(size));
+      }
+    },
+
+    /** File type. */
+    TFLT {
+      @Override
+      public void parse(MP3Parser obj, int size) {
+      // [BL] parse file type
+
+      // TFLT
+      // The 'File type' frame indicates which type of audio this tag defines.
+      // The following types and refinements are defined:
+      //
+      // MIME MIME type follows
+      // MPG MPEG Audio
+      // /1 MPEG 1/2 layer I
+      // /2 MPEG 1/2 layer II
+      // /3 MPEG 1/2 layer III
+      // /2.5 MPEG 2.5
+      // /AAC Advanced audio compression
+      // VQF Transform-domain Weighted Interleave Vector Quantisation
+      // PCM Pulse Code Modulated audio
+      //
+      // but other types may be used, but not for these types though. This is
+      // used in a similar way to the predefined types in the "TMED" frame,
+      // but without parentheses. If this frame is not present audio type is
+      // assumed to be "MPG".
+      }
+    },
+
+    /** Content group description. */
+    TIT1 {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.DESCRIPTION, obj.readText(size));
+      }
+    },
+
+    /** Title/songname/content description. */
+    TIT2 {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.TITLE, obj.readText(size));
+      }
+    },
+
+    /** Subtitle/Description refinement. */
+    TIT3 {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.DESCRIPTION, obj.readText(size));
+      }
+    },
+
+    /** Language. */
+    TLAN {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.LANGUAGE, obj.readText(size));
+      }
+    },
+
+    /** Length. */
+    TLEN {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.DURATION,
+            ParserUtil.convertDuration(obj.readText(size)));
+      }
+    },
+
+    /** Media type. */
+    TMED {
+      @Override
+      public void parse(MP3Parser obj, int size) {
+      // [BL] parse media type
+
+      // TMED
+      // The 'Media type' frame describes from which media the sound
+      // originated. This may be a text string or a reference to the
+      // predefined media types found in the list below. Example:
+      // "VID/PAL/VHS" $00.
+      //
+      // DIG Other digital media
+      // /A Analogue transfer from media
+      //
+      // ANA Other analogue media
+      // /WAC Wax cylinder
+      // /8CA 8-track tape cassette
+      //
+      // CD CD
+      // /A Analogue transfer from media
+      // /DD DDD
+      // /AD ADD
+      // /AA AAD
+      //
+      // LD Laserdisc
+      //
+      // TT Turntable records
+      // /33 33.33 rpm
+      // /45 45 rpm
+      // /71 71.29 rpm
+      // /76 76.59 rpm
+      // /78 78.26 rpm
+      // /80 80 rpm
+      //
+      // MD MiniDisc
+      // /A Analogue transfer from media
+      //
+      // DAT DAT
+      // /A Analogue transfer from media
+      // /1 standard, 48 kHz/16 bits, linear
+      // /2 mode 2, 32 kHz/16 bits, linear
+      // /3 mode 3, 32 kHz/12 bits, non-linear, low speed
+      // /4 mode 4, 32 kHz/12 bits, 4 channels
+      // /5 mode 5, 44.1 kHz/16 bits, linear
+      // /6 mode 6, 44.1 kHz/16 bits, 'wide track' play
+      //
+      // DCC DCC
+      // /A Analogue transfer from media
+      //
+      // DVD DVD
+      // /A Analogue transfer from media
+      //
+      // TV Television
+      // /PAL PAL
+      // /NTSC NTSC
+      // /SECAM SECAM
+      //
+      // VID Video
+      // /PAL PAL
+      // /NTSC NTSC
+      // /SECAM SECAM
+      // /VHS VHS
+      // /SVHS S-VHS
+      // /BETA BETAMAX
+      //
+      // RAD Radio
+      // /FM FM
+      // /AM AM
+      // /LW LW
+      // /MW MW
+      //
+      // TEL Telephone
+      // /I ISDN
+      //
+      // MC MC (normal cassette)
+      // /4 4.75 cm/s (normal speed for a two sided cassette)
+      // /9 9.5 cm/s
+      // /I Type I cassette (ferric/normal)
+      // /II Type II cassette (chrome)
+      // /III Type III cassette (ferric chrome)
+      // /IV Type IV cassette (metal)
+      //
+      // REE Reel
+      // /9 9.5 cm/s
+      // /19 19 cm/s
+      // /38 38 cm/s
+      // /76 76 cm/s
+      // /I Type I cassette (ferric/normal)
+      // /II Type II cassette (chrome)
+      // /III Type III cassette (ferric chrome)
+      // /IV Type IV cassette (metal)
+      }
+    },
+
+    /** Original artist(s)/performer(s). */
+    TOPE {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.ORIGINAL_ARTIST, obj.readText(size));
+      }
+    },
+
+    // [BL] distinguish between different TPE fields
+
+    /** Lead performer(s)/Soloist(s) */
+    TPE1 {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.ARTIST, obj.readText(size));
+      }
+    },
+
+    /** Band/orchestra/accompaniment. */
+    TPE2 {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.ARTIST, obj.readText(size));
+      }
+    },
+
+    /** Conductor/performer refinement. */
+    TPE3 {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.ARTIST, obj.readText(size));
+      }
+    },
+
+    /** Interpreted, remixed, or otherwise modified by. */
+    TPE4 {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.ARTIST, obj.readText(size));
+      }
+    },
+
+    /** Part of a set. */
+    TPOS {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.SET, obj.readText(size));
+      }
+    },
+
+    /** Publisher. */
+    TPUB {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.PUBLISHER, obj.readText(size));
+      }
+    },
+
+    /** Track number/Position in set. */
+    TRCK {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.TRACK, obj.readTrack(size));
+      }
+    },
+
+    /** Software/Hardware and settings used for encoding. */
+    TSSE {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.SOFTWARE, obj.readTrack(size));
+      }
+    },
+
+    /** Recording year. */
+    TYER {
+      @Override
+      void parse(final MP3Parser obj, final int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.YEAR,
+            ParserUtil.convertYear(Token.toInt(obj.readText(size))));
+      }
+    },
+
+    /** User defined text information frame. */
+    TXXX {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.COMMENT, obj.readTrack(size));
+      }
+    },
+
+    /** Lyrics. */
+    USLT {
+      @Override
+      public void parse(MP3Parser obj, int size) throws IOException {
+        obj.deepFile.addMeta(MetaElem.LYRICS, obj.readText(size));
       }
     };
 

@@ -120,16 +120,68 @@ public final class ParserUtil {
 
   /**
    * Converts a date value to an xml date value.
-   * @param date the {@link Date} value to convert.
-   * @return byte array, containing the date value as xml date value or
-   *         <code>null</code> if the conversion fails.
+   * @param gc the calendar value to convert.
+   * @return the calendar.
    */
-  protected static byte[] convertDate(final Date date) {
-    final GregorianCalendar gc = new GregorianCalendar();
-    gc.setTime(date);
+  public static XMLGregorianCalendar convertDateTime(final GregorianCalendar gc) {
     final XMLGregorianCalendar xgc = factory == null ? null
         : factory.newXMLGregorianCalendar(gc);
-    return token(xgc.toXMLFormat());
+    return xgc;
+  }
+
+  /**
+   * Converts a date value to an xml date value.
+   * @param date the {@link Date} value to convert.
+   * @return the calendar.
+   */
+  public static XMLGregorianCalendar convertDateTime(final Date date) {
+    final GregorianCalendar gc = new GregorianCalendar();
+    gc.setTime(date);
+    return convertDateTime(gc);
+  }
+
+  /**
+   * Converts the given values into an xml date value.
+   * @param year the year.
+   * @param month the month.
+   * @param day the number of days.
+   * @return the calendar.
+   */
+  public static XMLGregorianCalendar convertDate(final int year,
+      final int month, final int day) {
+    final XMLGregorianCalendar xgc = factory == null ? null
+        : factory.newXMLGregorianCalendar();
+    xgc.setYear(year);
+    xgc.setMonth(month);
+    xgc.setDay(day);
+    return xgc;
+  }
+
+  /**
+   * Converts the given values into an xml date value.
+   * @param year the year.
+   * @param month the month.
+   * @return the calendar.
+   */
+  public static XMLGregorianCalendar convertYearMonth(final int year,
+      final int month) {
+    final XMLGregorianCalendar xgc = factory == null ? null
+        : factory.newXMLGregorianCalendar();
+    xgc.setYear(year);
+    xgc.setMonth(month);
+    return xgc;
+  }
+
+  /**
+   * Converts a year value to an xml date value.
+   * @param year the year value to convert.
+   * @return the calendar.
+   */
+  public static XMLGregorianCalendar convertYear(final int year) {
+    final XMLGregorianCalendar xgc = factory == null ? null
+        : factory.newXMLGregorianCalendar();
+    xgc.setYear(year);
+    return xgc;
   }
 
   /**

@@ -158,7 +158,7 @@ public final class SpotlightExtractor implements IFileParser {
       void parse(final DeepFile deepFile, final Object o) {
         if(check(o, Date.class)) deepFile.addMeta(
             MetaElem.DATE_ATTRIBUTE_MODIFIED,
-            (Date) o);
+            ParserUtil.convertDateTime((Date) o));
       }
     },
         /**
@@ -223,7 +223,7 @@ public final class SpotlightExtractor implements IFileParser {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
         if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATE_CREATED,
-            (Date) o);
+            ParserUtil.convertDateTime((Date) o));
       }
     },
         // /** Date and time when the content of this item was modified. */
@@ -389,7 +389,7 @@ public final class SpotlightExtractor implements IFileParser {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
         if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATE_LAST_USED,
-            (Date) o);
+            ParserUtil.convertDateTime((Date) o));
       }
     },
         /** Lyricist of the song in the audio file. */

@@ -8,10 +8,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.TreeMap;
 
+import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.Duration;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
 
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -150,8 +152,7 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
-   *  boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param f the {@link BufferedFileChannel}.
@@ -485,7 +486,9 @@ public class DeepFile {
   public void addMeta(final MetaElem elem, final byte[] value) {
     if(!elem.getType().instance(Type.STR)) Main.bug("Invalid data type for " +
         "metadata element " + elem + " (string - as byte array).");
-    addMeta(elem, ParserUtil.checkUTF(value), null);
+    final byte[] data = new byte[value.length];
+    System.arraycopy(value, 0, data, 0, value.length);
+    addMeta(elem, ParserUtil.checkUTF(data), null);
   }
 
   /**
@@ -508,7 +511,7 @@ public class DeepFile {
     if(!elem.getType().instance(Type.SHR)) Main.bug("Invalid data type for " +
         "metadata element " + elem + " (short).");
 
-    addMeta(elem, ParserUtil.checkUTF(Token.token(value)), Type.SHR);
+    addMeta(elem, Token.token(value), Type.SHR);
   }
 
   /**
@@ -519,7 +522,7 @@ public class DeepFile {
   public void addMeta(final MetaElem elem, final int value) {
     if(!elem.getType().instance(Type.ITR)) Main.bug("Invalid data type for " +
         "metadata element " + elem + " (int).");
-    addMeta(elem, ParserUtil.checkUTF(Token.token(value)), null);
+    addMeta(elem, Token.token(value), null);
   }
 
   /**
@@ -530,18 +533,7 @@ public class DeepFile {
   public void addMeta(final MetaElem elem, final long value) {
     if(!elem.getType().instance(Type.LNG)) Main.bug("Invalid data type for " +
         "metadata element " + elem + " (long).");
-    addMeta(elem, ParserUtil.checkUTF(Token.token(value)), Type.LNG);
-  }
-
-  /**
-   * Add a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
-   * @param value date value.
-   */
-  public void addMeta(final MetaElem elem, final Date value) {
-    if(!elem.getType().instance(Type.DTM)) Main.bug("Invalid data type for " +
-        "metadata element " + elem + " (date).");
-    addMeta(elem, ParserUtil.convertDate(value), null);
+    addMeta(elem, Token.token(value), Type.LNG);
   }
 
   /**
@@ -553,6 +545,22 @@ public class DeepFile {
     if(!elem.getType().instance(Type.DUR)) Main.bug("Invalid data type for " +
         "metadata element " + elem + " (date).");
     addMeta(elem, Token.token(value.toString()), null);
+  }
+
+  /**
+   * Add a metadata key-value pair for the current file.
+   * @param elem metadata element (the key).
+   * @param xgc calendar value.
+   */
+  public void addMeta(final MetaElem elem, final XMLGregorianCalendar xgc) {
+    Type t = elem.getType();
+    QName st = xgc.getXMLSchemaType();
+    if((t.instance(Type.DAT) && !st.equals(DatatypeConstants.DATE))
+        || (t.instance(Type.YEA) && !st.equals(DatatypeConstants.GYEAR))) {
+      Main.debug("Invalid data type for metadata element "
+          + elem + " (expected " + t + " got " + st.getLocalPart() + ").");
+    }
+    addMeta(elem, token(xgc.toXMLFormat()), null);
   }
 
   /**

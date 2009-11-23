@@ -39,7 +39,7 @@ public final class TXTParser implements IFileParser {
     try {
       final DeepFile deepFile = new DeepFile(bfc);
       return extract0(deepFile);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       return false;
     }
   }

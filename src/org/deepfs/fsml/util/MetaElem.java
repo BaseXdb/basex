@@ -27,9 +27,13 @@ public enum MetaElem {
   DATE_CREATED(NS.FSMETA, "dateCreated", Type.DTM, false),
   /** Date of the last usage. */
   DATE_LAST_USED(NS.FSMETA, "dateLastUsed", Type.DTM, false),
+  /** Year. */
+  YEAR(NS.FSMETA, "year", Type.YEA, false),
 
   // ----- integer fields ----------------------------------------------------
 
+  /** Beats per minute. */
+  BEATS_PER_MINUTE(NS.FSMETA, "beatsPerMinute", Type.ITR, false),
   /** Group ID of the owner of the file. */
   FS_OWNER_GROUP_ID(NS.FSMETA, "fsOwnerGroupId", Type.ITR, false),
   /** User ID of the owner of the file. */
@@ -57,6 +61,8 @@ public enum MetaElem {
   ALBUM(NS.FSMETA, "album", Type.STR, true),
   /** Alternative title. */
   ALTERNATIVE(NS.DCTERMS, "alternative", Type.STR, true),
+  /** Artist. */
+  ARTIST(NS.FSMETA, "artist", Type.STR, true),
   /** Comment. */
   COMMENT(NS.FSMETA, "comment", Type.STR, true),
   /** Composer. */
@@ -73,6 +79,8 @@ public enum MetaElem {
   CREATOR_EMAIL(NS.FSMETA, "creatorEmail", Type.STR, true),
   /** Description. */
   DESCRIPTION(NS.DCTERMS, "description", Type.STR, true),
+  /** Encoding software. */
+  ENCODER(NS.FSMETA, "encoder", Type.STR, false),
   /** Text encoding. */
   ENCODING(NS.FSMETA, "encoding", Type.STR, false),
   /** Genre. */
@@ -95,8 +103,16 @@ public enum MetaElem {
    * @see <a href="http://www.ietf.org/rfc/rfc4646.txt">RFC 4646</a>
    */
   LANGUAGE(NS.DCTERMS, "language", Type.STR, false),
+  /** Lyrics. */
+  LYRICS(NS.FSMETA, "lyrics", Type.STR, true),
   /** Lyricist. */
   LYRICIST(NS.FSMETA, "lyricist", Type.STR, true),
+  /** Original artist. */
+  ORIGINAL_ARTIST(NS.FSMETA, "originalArtist", Type.STR, false),
+  /** Copyright message. */
+  RIGHTS(NS.DCTERMS, "rights", Type.STR, false),
+  /** Software. */
+  SOFTWARE(NS.FSMETA, "software", Type.STR, false),
 
   // ----- location -----
   /** City. */
@@ -114,6 +130,8 @@ public enum MetaElem {
   SENDER_NAME(NS.FSMETA, "senderName", Type.STR, false),
   /** Sender (email address). */
   SENDER_EMAIL(NS.FSMETA, "senderEmail", Type.STR, false),
+  /** Set. */
+  SET(NS.FSMETA, "set", Type.STR, false),
   /** Message or document subject. */
   SUBJECT(NS.DCTERMS, "subject", Type.STR, false),
   /** Table of contents. */
@@ -148,7 +166,7 @@ public enum MetaElem {
    * @param name metadata key.
    * @param namespace namespace for the metadata attribute.
    * @param dataType xml datatype.
-   * @param mv flag, if the metadata element may hava multiple values.
+   * @param mv flag, if the metadata element may have multiple values.
    */
   private MetaElem(final NS namespace, final String name, final Type dataType,
       final boolean mv) {
