@@ -83,6 +83,7 @@ public final class ServerProcess extends Thread {
 
   @Override
   public void run() {
+    context.user.setLoggedIn(true);
     log.write(this, "LOGIN " + context.user.name, "successful");
     try {
       while(true) {
@@ -181,6 +182,7 @@ public final class ServerProcess extends Thread {
     context.delete(this);
 
     try {
+      context.user.setLoggedIn(false);
       socket.close();
     } catch(final IOException ex) {
       log.write(ex.getMessage());

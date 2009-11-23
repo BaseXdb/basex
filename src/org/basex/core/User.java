@@ -22,6 +22,8 @@ public class User {
   byte[] pw;
   /** Permission. */
   int perm;
+  /** Flag if user is logged in. */
+  boolean loggedIn;
 
   /**
    * Constructor.
@@ -61,4 +63,22 @@ public class User {
   public User copy() {
     return new User(name, pw, perm);
   }
+  
+  /** 
+   * Returns flag if user is logged in.
+   * @return loggedIn flag
+   */
+  public boolean isLoggedIn() {
+    return loggedIn;
+  }
+
+  /**
+   * Sets the loggedIn flag.
+   * @param l boolean
+   */
+  public void setLoggedIn(final boolean l) {
+    this.loggedIn = l;
+  }
+  
+  
 }

@@ -24,7 +24,9 @@ public final class DropUser extends AAdmin {
   protected boolean exec(final PrintOutput out) {
     // [CG] check if user is logged in
     final String user = args[0];
-    return user.equals(ADMIN) ? error(USERADMIN) : context.users.drop(args[0]) ?
+    return context.users.get(user).isLoggedIn() ? 
+        error("User is currently logged in.") : 
+          user.equals(ADMIN) ? error(USERADMIN) : context.users.drop(args[0]) ?
       info(USERDROP, user) : error(USERNO, user);
   }
 
