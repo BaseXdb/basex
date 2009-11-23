@@ -6,13 +6,35 @@ import static org.junit.Assert.*;
 import org.basex.BaseXServer;
 import org.basex.core.Proc;
 import org.basex.core.Session;
+import org.basex.core.Commands.CmdIndex;
+import org.basex.core.Commands.CmdSet;
+import org.basex.core.proc.AlterUser;
+import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.CreateFS;
 import org.basex.core.proc.CreateIndex;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.DropDB;
+import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.DropUser;
+import org.basex.core.proc.Export;
+import org.basex.core.proc.Find;
 import org.basex.core.proc.Grant;
+import org.basex.core.proc.Help;
+import org.basex.core.proc.InfoDB;
+import org.basex.core.proc.InfoIndex;
+import org.basex.core.proc.InfoTable;
+import org.basex.core.proc.Kill;
+import org.basex.core.proc.List;
+import org.basex.core.proc.Open;
+import org.basex.core.proc.Optimize;
+import org.basex.core.proc.Password;
 import org.basex.core.proc.Revoke;
+import org.basex.core.proc.Set;
+import org.basex.core.proc.Show;
+import org.basex.core.proc.XQuery;
+import org.basex.io.IO;
+import org.basex.io.NullOutput;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 import org.junit.AfterClass;
@@ -59,49 +81,158 @@ public class PermissionTest {
     }
   }
   
-  /** Tests revoke and grant permissions. */
+  /** Tests all commands where no permission is needed. */
   @Test
-  public final void revokegrantPerms() {
-    no(new Grant("admin", "test"), testSession);
+  public final void noPermsNeeded() {
+    ok(new CreateDB("<xml>This is a test</xml>", "test"), adminSession);
+    ok(new Revoke("all", "test"), adminSession);
+    
+    ok(new Set(CmdSet.INFO, false), testSession);
+    ok(new Password("test"), testSession);
+    ok(new Help("list"), testSession);
+    ok(new Close(), testSession);
+    ok(new List(), testSession);
+    no(new Open("test"), testSession);
+    no(new InfoDB(), testSession);
+    no(new InfoIndex(), testSession);
+    no(new InfoTable(), testSession);
+    // XQuery read
+    no(new XQuery("//xml"), testSession);
+    no(new Find("test"), testSession);
+    no(new Optimize(), testSession);
+    // XQuery update
+    no(new XQuery("for $item in fn:doc('test')//xml return rename" +
+    " node $item as 'null'"), testSession);
+    no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    no(new CreateFS("c:/test", "test"), testSession);
+    no(new CreateIndex("SUMMARY"), testSession);
+    no(new DropDB("test"), testSession);
+    no(new DropIndex("SUMMARY"), testSession);
+    no(new CreateUser("test", "test"), testSession);
+    no(new DropUser("test"), testSession);
+    no(new Export("c:/test"), testSession);
+    no(new Kill(), testSession);
+    no(new Show("Users"), testSession);
+    no(new Grant("read", "test"), testSession);
+    no(new Revoke("read", "test"), testSession);
+    no(new AlterUser("test", "test"), testSession);
+  }
+  
+  /** Tests all commands where read permission is needed. */
+  @Test
+  public final void readPermsNeeded() {
+    ok(new Grant("read", "test"), adminSession);
+    
+    ok(new Open("test"), testSession);
+    ok(new InfoDB(), testSession);
+    ok(new InfoIndex(), testSession);
+    ok(new InfoTable("1", "2"), testSession);
+    // XQuery read
+    ok(new XQuery("//xml"), testSession);
+    ok(new Find("test"), testSession);
+    // XQuery update
+    no(new XQuery("for $item in fn:doc('test')//xml return rename" +
+    " node $item as 'null'"), testSession);
+    no(new Optimize(), testSession);
+    no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    no(new CreateFS("c:/test", "test"), testSession);
+    no(new CreateIndex("SUMMARY"), testSession);
+    no(new DropDB("test"), testSession);
+    no(new DropIndex("SUMMARY"), testSession);
+    no(new CreateUser("test", "test"), testSession);
+    no(new DropUser("test"), testSession);
+    no(new Export("c:/test"), testSession);
+    no(new Kill(), testSession);
+    no(new Show("Users"), testSession);
+    no(new Grant("read", "test"), testSession);
+    no(new Revoke("read", "test"), testSession);
+    no(new AlterUser("test", "test"), testSession);
+  }
+  
+  /** Tests all commands where write permission is needed. */
+  @Test
+  public void writePermsNeeded() {
+    ok(new Grant("write", "test"), adminSession);
+    
+    // XQuery Update
+    ok(new XQuery("for $item in fn:doc('test')//xml return rename" +
+        " node $item as 'null'"), testSession);
+    ok(new Optimize(), testSession);
+    no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    no(new CreateFS("c:/test", "test"), testSession);
+    /*for(final CmdIndex cmd : CmdIndex.values()) {
+      ok(new CreateIndex(cmd), testSession);
+    }*/
+    no(new DropDB("test"), testSession);
+    // [CG] Index can be created without admin or create rights??
+    /*for(final CmdIndex cmd : CmdIndex.values()) {
+      ok(new DropIndex(cmd), testSession);
+    }*/
+    no(new CreateUser("test", "test"), testSession);
+    no(new DropUser("test"), testSession);
+    no(new Export("c:/test"), testSession);
+    no(new Kill(), testSession);
+    no(new Show("Users"), testSession);
+    no(new Grant("read", "test"), testSession);
+    no(new Revoke("read", "test"), testSession);
+    no(new AlterUser("test", "test"), testSession);
+  }
+  
+  /** Tests all commands where create permission is needed. */
+  @Test
+  public void createPermsNeeded() {
+    ok(new Grant("create", "test"), adminSession);
+    
+    ok(new CreateDB("<xml>This is a test</xml>", "test2"), testSession);
+    ok(new CreateFS("c:/test", "test3"), testSession);
+    for(final CmdIndex cmd : CmdIndex.values()) {
+      ok(new CreateIndex(cmd), testSession);
+    }
+    ok(new Close(), adminSession);
+    ok(new DropDB("test"), testSession);
+    no(new CreateUser("test", "test"), testSession);
+    no(new DropUser("test"), testSession);
+    no(new Export("c:/test"), testSession);
+    no(new Kill(), testSession);
+    no(new Show("Users"), testSession);
+    no(new Grant("read", "test"), testSession);
+    no(new Revoke("read", "test"), testSession);
+    no(new AlterUser("test", "test"), testSession);
+  }
+  
+  /** Tests all commands where admin permission is needed. */
+  @Test
+  public void adminPermsNeeded() {
     ok(new Grant("admin", "test"), adminSession);
-    no(new Revoke("admin", "admin"), testSession);
-    no(new Revoke("admin", "admin"), adminSession);
-    ok(new Revoke("admin", "test"), testSession);
+    
+    ok(new CreateUser("test2", "test"), testSession);
+    ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    final IO io = IO.get("export.xml");
+    ok(new Export(io.path()), testSession);
+    ok(new Show("Users"), testSession);
+    ok(new Grant("admin", "test2"), testSession);
+    ok(new Revoke("admin", "test2"), testSession);
+    ok(new AlterUser("test", "test"), testSession);
+    ok(new DropUser("test2"), testSession);
+    ok(new Close(), testSession);
+    ok(new Close(), adminSession);
+    ok(new DropDB("test"), adminSession);
+    ok(new DropDB("test2"), adminSession);
+    ok(new DropDB("test3"), adminSession);
+  }
+  
+
+  /** Tests some usability stuff. */
+  @Test
+  public void use() {
     // [CG] Admin right should include Create right?
     ok(new Grant("admin", "test"), adminSession);
     ok(new Grant("create", "test"), testSession);
-  }
-  
-  /** Tests create permissions. */
-  @Test
-  public final void createPerms() {
-    ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
-    ok(new CreateIndex("SUMMARY"), testSession);
-    ok(new CreateUser("test2", "test2"), testSession);
-    ok(new DropUser("test2"), testSession);
-    ok(new Revoke("create", "test"), adminSession);
-    ok(new Revoke("admin", "test"), adminSession);
-    no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
-    // [CG] Index can be created without admin or create rights??
-    // no(new CreateIndex("SUMMARY"), testSession);
-    no(new CreateUser("test2", "test2"), testSession);
-    ok(new CreateUser("test2", "test2"), adminSession);
-  }
-  
-  /** Tests drop permissions. */
-  @Test
-  public final void dropPerms() {
-    ok(new Grant("admin", "test"), adminSession);
     // [CG] Selfdropping...
     // no(new DropUser("test"), testSession);
-    no(new DropUser("admin"), testSession);
     // [CG] Dropping of logged in user...
     // no(new DropUser("test"), adminSession);
-    ok(new DropUser("test2"), testSession);
-    ok(new DropDB("test"), testSession);
   }
-
-  
   
   /**
    * Assumes that this command is successful.
@@ -138,7 +269,7 @@ public class PermissionTest {
    */
   private static String process(final Proc pr, final Session session) {
     try {
-      return session.execute(pr) ? null : session.info();
+      return session.execute(pr, new NullOutput()) ? null : session.info();
     } catch(final Exception ex) {
       return ex.toString();
     }
