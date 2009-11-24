@@ -17,6 +17,7 @@ import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.DropUser;
+import org.basex.core.proc.Exit;
 import org.basex.core.proc.Export;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.Grant;
@@ -55,6 +56,8 @@ public class PermissionTest {
   static Session adminSession;
   /** Socket reference. */
   static Session testSession;
+  /** IO. */
+  final IO io = IO.get("export.xml");
   
   /** Starts the server. */
   @BeforeClass
@@ -85,6 +88,7 @@ public class PermissionTest {
   @Test
   public final void noPermsNeeded() {
     ok(new CreateDB("<xml>This is a test</xml>", "test"), adminSession);
+    ok(new Close(), adminSession);
     ok(new Revoke("all", "test"), adminSession);
     
     ok(new Set(CmdSet.INFO, false), testSession);
@@ -141,7 +145,7 @@ public class PermissionTest {
     no(new DropIndex("SUMMARY"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export("c:/test"), testSession);
+    no(new Export(io.path()), testSession);
     no(new Kill(), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
@@ -158,19 +162,18 @@ public class PermissionTest {
     ok(new XQuery("for $item in fn:doc('test')//xml return rename" +
         " node $item as 'null'"), testSession);
     ok(new Optimize(), testSession);
+    for(final CmdIndex cmd : CmdIndex.values()) {
+    ok(new CreateIndex(cmd), testSession);
+    }
+    for(final CmdIndex cmd : CmdIndex.values()) {
+    ok(new DropIndex(cmd), testSession);
+    }
     no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
     no(new CreateFS("c:/test", "test"), testSession);
-    /*for(final CmdIndex cmd : CmdIndex.values()) {
-      ok(new CreateIndex(cmd), testSession);
-    }*/
     no(new DropDB("test"), testSession);
-    // [CG] Index can be created without admin or create rights??
-    /*for(final CmdIndex cmd : CmdIndex.values()) {
-      ok(new DropIndex(cmd), testSession);
-    }*/
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export("c:/test"), testSession);
+    no(new Export(io.path()), testSession);
     no(new Kill(), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
@@ -182,17 +185,16 @@ public class PermissionTest {
   @Test
   public void createPermsNeeded() {
     ok(new Grant("create", "test"), adminSession);
-    
-    ok(new CreateDB("<xml>This is a test</xml>", "test2"), testSession);
-    ok(new CreateFS("c:/test", "test3"), testSession);
+    ok(new Close(), testSession);
+    ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    //ok(new CreateFS("bin", "fs"), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);
     }
-    ok(new Close(), adminSession);
     ok(new DropDB("test"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export("c:/test"), testSession);
+    no(new Export(io.path()), testSession);
     no(new Kill(), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
@@ -204,10 +206,8 @@ public class PermissionTest {
   @Test
   public void adminPermsNeeded() {
     ok(new Grant("admin", "test"), adminSession);
-    
     ok(new CreateUser("test2", "test"), testSession);
     ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
-    final IO io = IO.get("export.xml");
     ok(new Export(io.path()), testSession);
     ok(new Show("Users"), testSession);
     ok(new Grant("admin", "test2"), testSession);
@@ -217,21 +217,16 @@ public class PermissionTest {
     ok(new Close(), testSession);
     ok(new Close(), adminSession);
     ok(new DropDB("test"), adminSession);
-    ok(new DropDB("test2"), adminSession);
-    ok(new DropDB("test3"), adminSession);
   }
   
 
   /** Tests some usability stuff. */
   @Test
   public void use() {
-    // [CG] Admin right should include Create right?
-    ok(new Grant("admin", "test"), adminSession);
-    ok(new Grant("create", "test"), testSession);
-    // [CG] Selfdropping...
-    // no(new DropUser("test"), testSession);
-    // [CG] Dropping of logged in user...
-    // no(new DropUser("test"), adminSession);
+    no(new DropUser("test"), testSession);
+    no(new DropUser("test"), adminSession);
+    ok(new Exit(), testSession);
+    ok(new DropUser("test"), adminSession);
   }
   
   /**
@@ -280,7 +275,6 @@ public class PermissionTest {
   public static void stop() {
     try {
       adminSession.close();
-      testSession.close();
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }
