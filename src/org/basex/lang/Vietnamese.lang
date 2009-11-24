@@ -73,7 +73,7 @@ dc_ftstem=Nhét đầy
 dc_ftdc=Dấu phụ phân biệt
 dc_ftcs=Trường hợp nhạy cảm
 dc_ftsw=Stopword List
-dc_ftsct=Extended Scoring
+dc_ftsct=TF/IDF Scoring
 dc_chopinfo=Lựa chọn này xóa hết khoảng trắng giữa tags và nội dung
 dc_intparseinfo=Mở lựa chọn này để sử dụng bộ phân tích XML được xây dựng bên trong
 dc_pathinfo=A path summary speeds up path resolutions
@@ -121,6 +121,12 @@ dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.\nBạn chắc không?
 
 dx_question=Bạn thực sự muốn xóa?
 dq_question=Save changes to %?
+
+dx_outfile=Output file
+dx_outdir=Output directory
+dx_overfile=File will be overwritten.
+dx_indent=Indent with withespaces
+dx_invpath=Invalid path.
 
 dp_title=Những ưu tiên
 dp_dbpath=Đường dẫn tới cơ sở dữ liệu ( cơ sở dữ liệu phải chuyển bằng tay)

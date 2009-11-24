@@ -74,7 +74,7 @@ dc_ftstem=Stemming (englisch)
 dc_ftdc=Diakritische Zeichen
 dc_ftcs=Groß- und Kleinschreibung
 dc_ftsw=Stopwortliste
-dc_ftsct=Erweitertes Scoring
+dc_ftsct=TF/IDF-Scoring
 dc_chopinfo=Diese Option entfernt Leerzeichen zwischen Tags und Textknoten
 dc_intparseinfo=Wenn die Option aktiviert ist, wird der interne XML-Parser genutzt
 dc_pathinfo=Ein Path Summary beschleunigt Pfadauflösungen
@@ -122,6 +122,12 @@ dd_question=Die Datenbank '%' wird gelöscht.\nSind Sie sicher?
 
 dx_question=Möchten Sie wirklich löschen?
 dq_question=Änderungen speichern in %?
+
+dx_outfile=Ausgabedatei
+dx_outdir=Ausgabeverzeichnis
+dx_overfile=Datei wird überschrieben.
+dx_indent=Mit Leerzeichen einrücken
+dx_invpath=Ungültiger Pfad.
 
 dp_title=Einstellungen
 dp_dbpath=Datenbank-Pfad (Dateien müssen manuell verschoben werden)

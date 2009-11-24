@@ -274,7 +274,7 @@ public final class CmpG extends Arr {
     } else {
       ic.ctx.compInfo(OPTATVINDEX);
       // add attribute step
-      final Step step = orig.step[0];
+      final Step step = orig.step[orig.step.length - 1];
       Step[] steps = { Step.get(Axis.SELF, step.test) };
       for(final Step s : path.step) steps = Array.add(steps, s);
       path.step = steps;

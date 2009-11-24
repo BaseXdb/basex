@@ -149,7 +149,11 @@ public final class XMLSerializer extends Serializer {
       }
       wl = ftt.p;
     }
-    while(wl < b.length) ch(b[wl++]);
+    while(wl < b.length) {
+      ch(cp(b, wl));
+      //ch(b[wl++]);
+      wl += cl(b[wl]);
+    }
     indent = false;
   }
 

@@ -64,7 +64,7 @@ public final class DropDB extends ACreate {
       if(pat == null || sub.getName().matches(pat))
         if(!sub.delete()) return false;
     }
-    return pat == null || path.delete();
+    return pat != null || path.delete();
   }
 
   @Override

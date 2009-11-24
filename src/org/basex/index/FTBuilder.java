@@ -43,7 +43,7 @@ abstract class FTBuilder extends IndexBuilder {
   private int token;
   /** Current frequency. */
   private int fc;
-  /** Stopword list. */
+  /** Stop word list. */
   private StopWords sw;
 
   /**

@@ -73,7 +73,7 @@ dc_ftstem=(English) Stemming
 dc_ftdc=Diacritics
 dc_ftcs=Case Sensitivity
 dc_ftsw=Stopword List
-dc_ftsct=Extended Scoring
+dc_ftsct=TF/IDF Scoring
 dc_chopinfo=This option removes whitespaces between tags and contents
 dc_intparseinfo=Switch this option on to use the built-in XML parser
 dc_pathinfo=A path summary speeds up path resolutions
@@ -121,6 +121,12 @@ dd_question=Database '%' will be dropped.\nAre you sure?
 
 dx_question=Do you really want to delete?
 dq_question=Save changes to %?
+
+dx_outfile=Output file
+dx_outdir=Output directory
+dx_overfile=File will be overwritten.
+dx_indent=Indent with withespaces
+dx_invpath=Invalid path.
 
 dp_title=Preferences
 dp_dbpath=Database Path (databases must be manually moved)
@@ -203,7 +209,7 @@ c_edittt=Edits XML nodes.
 c_exit=Exit
 c_exittt=Exits the application.
 c_export=Export XML
-c_exporttt=Exports the current database to XML file(s).
+c_exporttt=Exports the current database to XML.
 c_filter=Filter Selected
 c_filtertt=Filters the selected nodes.
 c_fonts=Fonts...

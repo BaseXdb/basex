@@ -200,6 +200,7 @@ public class AxisPath extends Path {
 
     // check if context is set to document nodes
     final Data data = ctx.data();
+    // [CG] XQuery/Index: check if only paths with root should be optimized
     if(data != null) {
       boolean doc = true;
       final Item item = ctx.item;
@@ -212,7 +213,7 @@ public class AxisPath extends Path {
 
       if(doc) {
         // check if no position is used
-        if(!pos) {
+        if(!pos && root != null) {
           // check index access
           final Expr e = index(ctx, data);
           if(e != this) return e;
@@ -333,6 +334,7 @@ public class AxisPath extends Path {
       for(int p = 0; p < stp.pred.length; p++) {
         final IndexContext ic = new IndexContext(ctx, data, stp, d);
         if(!stp.pred[p].indexAccessible(ic)) continue;
+        
         if(ic.is == 0) {
           if(ic.not) {
             // not operator... accept all results

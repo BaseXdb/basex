@@ -259,7 +259,8 @@ public final class FTWords extends FTExpr {
     ic.is = 0;
     while(ft.more()) {
       if(ft.get().length > Token.MAXLEN) return false;
-      final int s = ic.data.nrIDs(ft);
+      // divide by 4 to favor full text index requests
+      final int s = (ic.data.nrIDs(ft) + 3) >> 2;
       if(ic.is > s || ic.is == 0) ic.is = s;
       if(s == 0) break;
     }

@@ -74,7 +74,7 @@ dc_ftstem=語幹抽出 (English)
 dc_ftdc=分音符号
 dc_ftcs=大文字・小文字の区別
 dc_ftsw=Stopword List
-dc_ftsct=Extended Scoring
+dc_ftsct=TF/IDF Scoring
 dc_chopinfo=このオプションはタグとコンテンツの間にある全ての空白を削除します。
 dc_intparseinfo=このオプションをオフにすると、Java標準のXMLパーサーが使用されます。
 dc_pathinfo=A path summary speeds up path resolutions
@@ -122,6 +122,12 @@ dd_question=データベース '%' を削除します。\nよろしいですか�
 
 dx_question=ノードの削除か。
 dq_question=Save changes to %?
+
+dx_outfile=Output file
+dx_outdir=Output directory
+dx_overfile=File will be overwritten.
+dx_indent=Indent with withespaces
+dx_invpath=Invalid path.
 
 dp_title=設定
 dp_dbpath=データベースパス (データベースを手動で移動する必要があります。)

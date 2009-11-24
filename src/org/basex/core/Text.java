@@ -45,7 +45,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-  String VERSION = "5.81";
+  String VERSION = "5.83";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -1109,6 +1109,17 @@ public interface Text {
   String DELETECONF = lang("dx_question");
   /** Dialog title for closing XQuery file. */
   String XQUERYCONF = lang("dq_question");
+
+  /** Dialog title for exporting nodes. */
+  String OUTFILE = lang("dx_outfile");
+  /** Dialog title for exporting nodes. */
+  String OUTDIR = lang("dx_outdir");
+  /** Dialog title for exporting nodes. */
+  String OVERFILE = lang("dx_overfile");
+  /** Dialog title for exporting nodes. */
+  String INDENT = lang("dx_indent");
+  /** Dialog title for exporting nodes. */
+  String INVPATH = lang("dx_invpath");
 
   /** Dialog title for inserting new data. */
   String INSERTTITLE = lang("dn_title");

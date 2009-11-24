@@ -74,7 +74,7 @@ dc_ftstem=Stemming (Inglese)
 dc_ftdc=Diacritici
 dc_ftcs=Case Sensitive
 dc_ftsw=Stopword List
-dc_ftsct=Extended Scoring
+dc_ftsct=TF/IDF Scoring
 dc_chopinfo=Quest'opzione rimuove gli spazi vuoti tra i tag ed il contenuto
 dc_intparseinfo=Attiva quest'opzione per usare il parser XML integrato
 dc_pathinfo=Un Path Summary velocizza path resolutions
@@ -123,8 +123,13 @@ dd_question=Il Database '%' verrà cancellato.\nSei sicuro?
 dx_question=Cancellare. Sei sicuro?
 dq_question=Save changes to %?
 
-dp_title=Preferenze
+dx_outfile=Output file
+dx_outdir=Output directory
+dx_overfile=File will be overwritten.
+dx_indent=Indent with withespaces
+dx_invpath=Invalid path.
 
+dp_title=Preferenze
 dp_dbpath=Database Path (Il Database dev'essere rimosso manualmente)
 dp_inter=GUI & Interazioni
 dp_lf=Usa il Layout di Java

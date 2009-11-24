@@ -2,10 +2,8 @@ package org.basex.query.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataInput;
@@ -31,7 +29,7 @@ public final class StopWords extends TokenSet {
    * @param dat data reference
    * @throws IOException IOExcetion 
    */
-  public StopWords(final Data dat) throws IOException{
+  public StopWords(final Data dat) throws IOException {
     read(new DataInput(getFile(dat)));
   }
  

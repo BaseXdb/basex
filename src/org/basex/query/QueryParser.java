@@ -2430,7 +2430,7 @@ public class QueryParser extends InputParser {
         if(consumeWS(DEFAULT)) {
           try {
             opt.sw = new StopWords(ctx.context.data);
-          } catch (Exception e) {};
+          } catch (Exception e) { }
           if(!using) error(FTSTOP);
         } else {
           if(opt.sw != null) error(FTDUP, STOP + ' ' + WORDS);

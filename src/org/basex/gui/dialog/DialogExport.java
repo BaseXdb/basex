@@ -49,19 +49,6 @@ public final class DialogExport extends Dialog {
   private final BaseXCombo encoding;
   /** Buttons. */
   private final BaseXBack buttons;
-
-  /** Text (to be externalized). */
-  private static final String ENCODING = "Encoding";
-  /** Text (to be externalized). */
-  private static final String OUTFORMAT = "Indentation";
-  /** Text (to be externalized). */
-  private static final String OUTFILE = "Output file";
-  /** Text (to be externalized). */
-  private static final String OUTDIR = "Output directory";
-  /** Text (to be externalized). */
-  private static final String OUTOVER = "File will be overwritten.";
-  /** Text (to be externalized). */
-  private static final String INVPTH = "Invalid path.";
   
   /**
    * Default constructor.
@@ -102,7 +89,7 @@ public final class DialogExport extends Dialog {
 
     p = new BaseXBack();
     p.setLayout(new TableLayout(2, 1));
-    p.add(new BaseXLabel(ENCODING + COL, false, true));
+    p.add(new BaseXLabel(INFOENCODING + COL, false, true));
 
     final Prop prop = gui.context.prop;
     encoding = new BaseXCombo(ENCODINGS, this);
@@ -115,8 +102,7 @@ public final class DialogExport extends Dialog {
     p.add(encoding);
     pp.add(p);
 
-    format = new BaseXCheckBox(OUTFORMAT,
-        prop.is(Prop.XMLFORMAT), 0, this);
+    format = new BaseXCheckBox(INDENT, prop.is(Prop.XMLFORMAT), 0, this);
     pp.add(format);
     set(pp, BorderLayout.CENTER);
     
@@ -167,7 +153,8 @@ public final class DialogExport extends Dialog {
     ok = !empty && (file && (!exists || !io.isDir()) ||
         !file && (!exists || io.isDir()));
 
-    String inf = ok && file && exists ? OUTOVER : !ok && !empty ? INVPTH : null;
+    String inf = ok && file && exists ? OVERFILE : !ok && !empty ?
+        INVPATH : null;
     info.setError(inf, ok);
     enableOK(buttons, BUTTONOK, ok);
   }
