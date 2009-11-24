@@ -78,6 +78,10 @@ public final class Prop extends AProp {
   public static final Object[] SERIALIZE = { "SERIALIZE", true };
   /** Flag for serialization as XML. */
   public static final Object[] XMLOUTPUT = { "XMLOUTPUT", false };
+  /** Format output. */
+  public static final Object[] XMLFORMAT = { "XMLFORMAT", true };
+  /** Format output. */
+  public static final Object[] XMLENCODING = { "XMLENCODING", "UTF-8" };
   /** Dots the query plan. */
   public static final Object[] DOTPLAN = { "DOTPLAN", false };
   /** Path to dotty. */

@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Proc;
+import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.XMLSerializer;
@@ -19,10 +20,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Export extends Proc {
-  /** Document Declaration. */
-  private static final String DOCDECL =
-    "<?xml version=\"1.0\" encoding=\"%\"?>";
-
   /**
    * Default constructor.
    * @param path export path
@@ -43,8 +40,10 @@ public final class Export extends Proc {
           io.merge(IO.get(Token.string(data.text(pre))));
 
         final PrintOutput po = new PrintOutput(file.path());
-        po.println(Main.info(DOCDECL, Token.UTF8));
-        new XMLSerializer(po).node(data, pre);
+        final XMLSerializer xml = new XMLSerializer(po, false,
+            context.prop.is(Prop.XMLFORMAT));
+        xml.encoding(context.prop.get(Prop.XMLENCODING));
+        xml.node(data, pre);
         po.close();
       }
       return info(DBEXPORTED, data.meta.name, perf);

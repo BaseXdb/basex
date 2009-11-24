@@ -190,9 +190,9 @@ public interface DataText {
   byte[] PI2 = token("?>");
 
   /** Element output. */
-  byte[] ELEM1 = { '<'};
+  byte[] ELEM1 = { '<' };
   /** Element output. */
-  byte[] ELEM2 = { '>'};
+  byte[] ELEM2 = { '>' };
   /** Element output. */
   byte[] ELEM3 = token("</");
   /** Element output. */

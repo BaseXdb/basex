@@ -718,7 +718,8 @@ public final class MP3Parser implements IFileParser {
     /** Beats per minute. */
     TBPM {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.BEATS_PER_MINUTE,
             Integer.parseInt(string(obj.readText(size))));
       }
@@ -727,7 +728,8 @@ public final class MP3Parser implements IFileParser {
     /** Composer. */
     TCOM {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.COMPOSER, obj.readText(size));
       }
     },
@@ -743,7 +745,8 @@ public final class MP3Parser implements IFileParser {
     /** Copyright message. */
     TCOP {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.RIGHTS, obj.readText(size));
       }
     },
@@ -751,7 +754,7 @@ public final class MP3Parser implements IFileParser {
     /** Recording time. */
     TDRC {
       @Override
-      public void parse(MP3Parser obj, int size) {
+      public void parse(final MP3Parser obj, final int size) {
       // [BL] different elements for gYear, gYearMonth, ...
       }
     },
@@ -759,7 +762,7 @@ public final class MP3Parser implements IFileParser {
     /** Tagging time. */
     TDTG {
       @Override
-      public void parse(MP3Parser obj, int size) {
+      public void parse(final MP3Parser obj, final int size) {
       // [BL] different elements for gYear, gYearMonth, ...
       }
     },
@@ -767,7 +770,8 @@ public final class MP3Parser implements IFileParser {
     /** Encoded by... */
     TENC {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.ENCODER, obj.readText(size));
       }
     },
@@ -775,7 +779,7 @@ public final class MP3Parser implements IFileParser {
     /** File type. */
     TFLT {
       @Override
-      public void parse(MP3Parser obj, int size) {
+      public void parse(final MP3Parser obj, final int size) {
       // [BL] parse file type
 
       // TFLT
@@ -802,7 +806,8 @@ public final class MP3Parser implements IFileParser {
     /** Content group description. */
     TIT1 {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.DESCRIPTION, obj.readText(size));
       }
     },
@@ -818,7 +823,8 @@ public final class MP3Parser implements IFileParser {
     /** Subtitle/Description refinement. */
     TIT3 {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.DESCRIPTION, obj.readText(size));
       }
     },
@@ -826,7 +832,8 @@ public final class MP3Parser implements IFileParser {
     /** Language. */
     TLAN {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.LANGUAGE, obj.readText(size));
       }
     },
@@ -843,7 +850,7 @@ public final class MP3Parser implements IFileParser {
     /** Media type. */
     TMED {
       @Override
-      public void parse(MP3Parser obj, int size) {
+      public void parse(final MP3Parser obj, final int size) {
       // [BL] parse media type
 
       // TMED
@@ -938,7 +945,8 @@ public final class MP3Parser implements IFileParser {
     /** Original artist(s)/performer(s). */
     TOPE {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.ORIGINAL_ARTIST, obj.readText(size));
       }
     },
@@ -980,7 +988,8 @@ public final class MP3Parser implements IFileParser {
     /** Part of a set. */
     TPOS {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.SET, obj.readText(size));
       }
     },
@@ -988,7 +997,8 @@ public final class MP3Parser implements IFileParser {
     /** Publisher. */
     TPUB {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.PUBLISHER, obj.readText(size));
       }
     },
@@ -1004,7 +1014,8 @@ public final class MP3Parser implements IFileParser {
     /** Software/Hardware and settings used for encoding. */
     TSSE {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.SOFTWARE, obj.readTrack(size));
       }
     },
@@ -1021,7 +1032,8 @@ public final class MP3Parser implements IFileParser {
     /** User defined text information frame. */
     TXXX {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.COMMENT, obj.readTrack(size));
       }
     },
@@ -1029,7 +1041,8 @@ public final class MP3Parser implements IFileParser {
     /** Lyrics. */
     USLT {
       @Override
-      public void parse(MP3Parser obj, int size) throws IOException {
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
         obj.deepFile.addMeta(MetaElem.LYRICS, obj.readText(size));
       }
     };

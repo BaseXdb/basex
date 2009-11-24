@@ -143,7 +143,7 @@ public final class FSImporter implements FSTraversal {
         } finally {
           try {
             bfc.close();
-          } catch(final IOException e1) {}
+          } catch(final IOException e1) { }
         }
       } catch(final IOException e) {
         Main.debug("FSImporter: Failed to open the file (% - %)",

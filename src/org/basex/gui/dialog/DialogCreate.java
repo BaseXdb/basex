@@ -91,11 +91,11 @@ public final class DialogCreate extends Dialog {
     BaseXLayout.setWidth(path, 240);
     p.add(path);
 
-    final BaseXButton button = new BaseXButton(BUTTONBROWSE, this);
-    button.addActionListener(new ActionListener() {
+    final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
+    browse.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
-    p.add(button);
+    p.add(browse);
     p1.add(p);
 
     p = new BaseXBack();
@@ -113,10 +113,6 @@ public final class DialogCreate extends Dialog {
     p.add(dbname);
 
     filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
-    path.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) { action(null); }
-    });
     BaseXLayout.setWidth(filter, 54);
     p.add(filter);
     p1.add(p);
@@ -201,7 +197,7 @@ public final class DialogCreate extends Dialog {
   /**
    * Opens a file dialog to choose an XML document or directory.
    */
-  public void choose() {
+  void choose() {
     final GUIProp gprop = gui.prop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
         gprop.get(GUIProp.OPENPATH), gui);
@@ -241,9 +237,8 @@ public final class DialogCreate extends Dialog {
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
 
-    final String pth = path();
-    final IO file = IO.get(pth);
-    final boolean exists = !pth.isEmpty() && file.exists();
+    final IO file = IO.get(path());
+    final boolean exists = !path().isEmpty() && file.exists();
     if(exists) gui.prop.set(GUIProp.OPENPATH, file.path());
 
     final String nm = dbname();

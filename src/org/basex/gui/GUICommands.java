@@ -1,6 +1,7 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
+
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -30,6 +31,7 @@ import org.basex.gui.dialog.DialogColors;
 import org.basex.gui.dialog.DialogCreate;
 import org.basex.gui.dialog.DialogCreateFS;
 import org.basex.gui.dialog.DialogEdit;
+import org.basex.gui.dialog.DialogExport;
 import org.basex.gui.dialog.DialogFontChooser;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.gui.dialog.DialogInfo;
@@ -132,8 +134,12 @@ public enum GUICommands implements GUICommand {
   EXPORT(GUIEXPORT + DOTS, null, GUIEXPORTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final IO file = save(gui, gui.context.data.doc().length == 1);
-      if(file != null) gui.execute(new Export(file.path()));
+      final DialogExport dialog = new DialogExport(gui);
+      if(!dialog.ok()) return;
+
+      final IO io = IO.get(dialog.path());
+      if(!io.exists() || Dialog.confirm(gui, Main.info(FILEREPLACE, io)))
+          gui.execute(new Export(io.path()));
     }
   },
 
@@ -154,10 +160,10 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Server Dialog. */
-  SERVER("Server...", "% serv", "SERVER", false, false) {
+  SERVER("Server...", null, "SERVER", false, false) {
     @Override
     public void execute(final GUI gui) {
-   // open file chooser for XML creation
+      // open file chooser for XML creation
       new DialogServer(gui);
     }
   },

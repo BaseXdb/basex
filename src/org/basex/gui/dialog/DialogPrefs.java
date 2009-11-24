@@ -85,7 +85,6 @@ public final class DialogPrefs extends Dialog {
     });
 
     BaseXLayout.setWidth(path, 280);
-    BaseXLayout.setHeight(path, button.getPreferredSize().height);
     p.add(path);
     p.add(button);
     pp.add(p);

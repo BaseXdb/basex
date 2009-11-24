@@ -121,9 +121,9 @@ public final class GUIProp extends AProp {
   public static final Object[] HELPSIZE =
     { "HELPSIZE", new int[] { 300, 250 } };
 
-  /** Path for creating new XML Documents. */
+  /** Path for opening XML Documents. */
   public static final Object[] OPENPATH = { "OPENPATH", Prop.WORK };
-  /** Path for creating new XML Documents. */
+  /** Path for saving XML Documents. */
   public static final Object[] SAVEPATH = { "SAVEPATH", Prop.WORK };
   /** Path for XQuery files. */
   public static final Object[] XQPATH = { "XQPATH", Prop.WORK };

@@ -65,7 +65,7 @@ dc_gzdesc=GZipped XML Documents
 dc_xqdesc=XQuery files
 dc_advtitle=Create Database
 dc_chop=Chop Whitespaces
-dc_intparse=Use internal XML parser
+dc_intparse=Use internal XML Parser
 dc_entities=Parse Entities
 dc_dtd=Parse DTDs
 dc_fzindex=Support Fuzzy Searching
@@ -398,6 +398,7 @@ ad_userknown=User '%' exists already.
 ad_usercreate=User '%' created.
 ad_useralter=Password of user '%' changed.
 ad_userdrop=User '%' dropped.
+ad_userlog=User '%' is currently logged in.
 ad_passno=No password specified.
 ad_admin=Admin user cannot be modified.
 

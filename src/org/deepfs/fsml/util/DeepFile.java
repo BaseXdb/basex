@@ -152,7 +152,8 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean, boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean,
+   *   boolean, boolean, int)}
    * for parsing several files for better performance.
    * </p>
    * @param f the {@link BufferedFileChannel}.

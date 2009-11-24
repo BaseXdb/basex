@@ -2,6 +2,9 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import java.util.Arrays;
+import java.util.Iterator;
+
+import org.basex.core.Main;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 
@@ -11,7 +14,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Sessions {
+public final class Sessions implements Iterable<ServerProcess> {
   /** Entries. */
   ServerProcess[] list = new ServerProcess[1];
   /** Number of entries. */
@@ -67,5 +70,14 @@ public final class Sessions {
     for(int i = 0; i < size; i++) tb.add(NL + LI +
         list[i].context.user.name + " " + list[i].info());
     return tb.toString();
+  }
+
+  public Iterator<ServerProcess> iterator() {
+    return new Iterator<ServerProcess>() {
+      private int c = -1;
+      public boolean hasNext() { return ++c < size; }
+      public ServerProcess next() { return list[c]; }
+      public void remove() { Main.notexpected(); }
+    };
   }
 }

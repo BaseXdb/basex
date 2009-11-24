@@ -37,8 +37,6 @@ public final class List extends Proc {
     table.header.add(INFODOC);
 
     for(final String name : list(context)) {
-      if(name.startsWith(".")) continue; 
-
       DataInput in = null;
       String file = null;
       try {
@@ -74,7 +72,10 @@ public final class List extends Proc {
     final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
     if(!dir.exists()) return db;
 
-    for(final IO f : dir.children()) if(f.isDir()) db.add(f.name());
+    for(final IO f : dir.children()) {
+      if(f.name().startsWith(".")) continue;
+      if(f.isDir()) db.add(f.name());
+    }
     db.sort(false);
     return db;
   }
@@ -85,28 +86,21 @@ public final class List extends Proc {
    * @return available databases.
    */
   public static StringList listFS(final Context ctx) {
+    final StringList dbs = list(ctx);
     final StringList dbl = new StringList();
 
-    final IO dir = IO.get(ctx.prop.get(Prop.DBPATH));
-    if(!dir.exists()) return dbl;
-
-    for(final IO f : dir.children()) {
+    for(final String name : dbs) {
       DataInput in = null;
-      if(f.isDir()) {
-        final String dbname = f.name();
-        try {
-          in = new DataInput(ctx.prop.dbfile(dbname, DATAINFO));
-          final MetaData meta = new MetaData(dbname, in, ctx.prop);
-          if (meta.deepfs)
-            dbl.add(dbname);
-        } catch(final IOException ex) {
-          Main.debug(ex.getMessage());
-        } finally {
-          try { if(in != null) in.close(); } catch(final IOException ex) { }
-        }
+      try {
+        in = new DataInput(ctx.prop.dbfile(name, DATAINFO));
+        final MetaData meta = new MetaData(name, in, ctx.prop);
+        if(meta.deepfs) dbl.add(name);
+      } catch(final IOException ex) {
+        Main.debug(ex.getMessage());
+      } finally {
+        try { if(in != null) in.close(); } catch(final IOException ex) { }
       }
     }
-    dbl.sort(false);
     return dbl;
   }
 }

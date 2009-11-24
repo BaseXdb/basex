@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.PrintOutput;
+import org.basex.server.ServerProcess;
 
 /**
  * Evaluates the 'drop user' command and drops a user.
@@ -22,11 +23,11 @@ public final class DropUser extends AAdmin {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    // [CG] check if user is logged in
     final String user = args[0];
-    return context.users.get(user).isLoggedIn() ? 
-        error("User is currently logged in.") : 
-          user.equals(ADMIN) ? error(USERADMIN) : context.users.drop(args[0]) ?
+    for(final ServerProcess s : context.sessions) {
+      if(s.context.user.name.equals(user)) return error(USERLOG, user);
+    }
+    return user.equals(ADMIN) ? error(USERADMIN) : context.users.drop(args[0]) ?
       info(USERDROP, user) : error(USERNO, user);
   }
 

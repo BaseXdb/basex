@@ -323,7 +323,7 @@ public final class DialogUser extends BaseXBack {
     ((TableModel) table.getModel()).fireTableChanged(null);
     if(!global) {
       TableColumn col = table.getColumnModel().getColumn(0);
-      col.setCellEditor(new MyComboBoxEditor(items.getList()));
+      col.setCellEditor(new MyComboBoxEditor(items.finish()));
     }
   }
 

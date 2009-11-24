@@ -514,6 +514,8 @@ public interface Text {
   String USERNO = lang("ad_userno");
   /** User dropped. */
   String USERDROP = lang("ad_userdrop");
+  /** User dropped. */
+  String USERLOG = lang("ad_userlog");
   /** User added. */
   String USERCREATE = lang("ad_usercreate");
   /** User changed. */

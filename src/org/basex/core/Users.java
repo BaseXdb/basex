@@ -17,11 +17,9 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public final class Users {
+public final class Users extends ArrayList<User> {
   /** Default permissions for new users. */
   private static final int PERM = User.READ | User.WRITE;
-  /** User list. */
-  private final ArrayList<User> users = new ArrayList<User>();
   /** Filename; set to null for local user permissions. */
   private String file;
 
@@ -39,7 +37,7 @@ public final class Users {
           in.close();
         } else {
           // create initial admin user with all rights
-          users.add(new User(ADMIN, token(md5(ADMIN)),
+          add(new User(ADMIN, token(md5(ADMIN)),
               User.READ | User.WRITE | User.CREATE | User.ADMIN));
           write();
         }
@@ -59,22 +57,6 @@ public final class Users {
   }
 
   /**
-   * Adds the specified user.
-   * @param user user reference
-   */
-  public void add(final User user) {
-    users.add(user);
-  }
-
-  /**
-   * Removes the specified user.
-   * @param user user reference
-   */
-  public void remove(final User user) {
-    users.remove(user);
-  }
-
-  /**
    * Stores a user and encrypted password.
    * @param usern user name
    * @param pass password
@@ -85,7 +67,7 @@ public final class Users {
     if(get(usern) != null) return false;
 
     final User user = new User(usern, token(md5(pass)), PERM);
-    users.add(user);
+    add(user);
     write();
     return true;
   }
@@ -114,7 +96,8 @@ public final class Users {
   public boolean drop(final String usern) {
     final User user = get(usern);
     if(user == null) return false;
-    users.remove(user);
+
+    remove(user);
     write();
     return true;
   }
@@ -137,7 +120,7 @@ public final class Users {
    * @return success of operation
    */
   public User get(final String usern) {
-    for(final User user : users) if(user.name.equals(usern)) return user;
+    for(final User user : this) if(user.name.equals(usern)) return user;
     return null;
   }
 
@@ -151,7 +134,7 @@ public final class Users {
     for(int u = 0; u < s; u++) {
       final User user = new User(Token.string(in.readBytes()),
         in.readBytes(), in.readNum());
-      users.add(user);
+      add(user);
     }
   }
 
@@ -175,10 +158,8 @@ public final class Users {
    */
   public void write(final DataOutput out) throws IOException {
     // skip writing of local rights
-    final int s = users.size();
-    out.writeNum(s);
-    for(int u = 0; u < s; u++) {
-      final User user = users.get(u);
+    out.writeNum(size());
+    for(final User user : this) {
       out.writeString(user.name);
       out.writeBytes(user.pw);
       out.writeNum(user.perm);
@@ -196,9 +177,7 @@ public final class Users {
     final int sz = file == null ? 3 : 5;
     for(int u = 0; u < sz; u++) table.header.add(USERHEAD[u]);
 
-    final int size = users.size();
-    for(int i = 0; i < size; i++) {
-      final User user = users.get(i);
+    for(final User user : this) {
       final StringList entry = new StringList();
       entry.add(user.name);
       entry.add(user.perm(User.READ) ? "X" : "");
@@ -211,13 +190,5 @@ public final class Users {
     }
     table.sort();
     return table.finish();
-  }
-
-  /**
-   * Returns the Userslist.
-   * @return list of users
-   */
-  public ArrayList<User> getUsers() {
-    return users;
   }
 }

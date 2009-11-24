@@ -64,6 +64,8 @@ public final class Token {
   /** UTF8 encoding string (variant). */
   public static final String UTF82 = "UTF8";
   /** UTF16 encoding string. */
+  public static final String UTF16 = "UTF-16";
+  /** UTF16 encoding string. */
   public static final String UTF16LE = "UTF-16LE";
   /** UTF16 encoding string. */
   public static final String UTF16BE = "UTF-16BE";
@@ -175,6 +177,19 @@ public final class Token {
     }
   }
 
+  /**
+   * Returns a unified representation of the specified encoding.
+   * @param enc input encoding
+   * @return encoding
+   */
+  public static String enc(final String enc) {
+    final String e = enc.toUpperCase();
+    if(e.equals(UTF8) || e.equals(UTF82)) return UTF8;
+    if(e.equals(UTF16BE) || e.equals(UTF16)) return UTF16BE;
+    if(e.equals(UTF16LE)) return UTF16LE;
+    return enc;
+  }
+  
   /**
    * Returns the codepoint (unicode value) of the specified token,
    * starting at the specified position.

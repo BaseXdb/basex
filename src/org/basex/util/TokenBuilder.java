@@ -129,8 +129,9 @@ public final class TokenBuilder {
   /**
    * Adds the specified UTF8 character.
    * @param c the character to be added
+   * @return self reference
    */
-  public void addUTF(final int c) {
+  public TokenBuilder addUTF(final int c) {
     if(c <= 0x7F) {
       add((byte) c);
     } else if(c <= 0x7FF) {
@@ -146,6 +147,7 @@ public final class TokenBuilder {
       add((byte) (c >>  6 & 0x3F | 0x80));
       add((byte) (c >>  0 & 0x3F | 0x80));
     }
+    return this;
   }
 
   /**

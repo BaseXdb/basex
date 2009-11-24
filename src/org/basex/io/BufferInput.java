@@ -12,7 +12,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
 import java.util.zip.ZipInputStream;
-
 import org.basex.util.TokenBuilder;
 
 /**
@@ -22,6 +21,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public class BufferInput {
+  /** UTF8 cache. */
+  private final byte[] cache = new byte[4];
   /** Byte buffer. */
   protected byte[] buffer;
   /** Current buffer position. */
@@ -140,10 +141,7 @@ public class BufferInput {
    */
   public final void encoding(final String e) throws IOException {
     try {
-      if(e.equals(UTF8) || e.equals(UTF82)) enc = UTF8;
-      else if(e.equals(UTF16BE)) enc = UTF16BE;
-      else if(e.equals(UTF16LE)) enc = UTF16LE;
-      else enc = e;
+      enc = enc(e);
       csd = Charset.forName(e).newDecoder();
     } catch(final Exception ex) {
       throw new IOException(ex.toString());
@@ -209,20 +207,20 @@ public class BufferInput {
     if(enc == UTF8) {
       final int cl = cl(ch);
       if(cl == 1) return ch & 0xFF;
-      CACHE[0] = ch;
-      for(int c = 1; c < cl; c++) CACHE[c] = readByte();
-      return cp(CACHE, 0);
+      cache[0] = ch;
+      for(int c = 1; c < cl; c++) cache[c] = readByte();
+      return cp(cache, 0);
     }
     if(ch >= 0) return ch;
 
     // convert other encodings.. loop until all needed bytes have been read
     int p = 0;
     while(true) {
-      if(p == 4) return -CACHE[0];
-      CACHE[p++] = ch;
+      if(p == 4) return -cache[0];
+      cache[p++] = ch;
       try {
         final CharBuffer cb = csd.decode(
-            ByteBuffer.wrap(Arrays.copyOf(CACHE, p)));
+            ByteBuffer.wrap(Arrays.copyOf(cache, p)));
         int i = 0;
         for(int c = 0; c < cb.limit(); c++) i |= cb.get(c) << (c << 3);
         return i;
@@ -231,9 +229,6 @@ public class BufferInput {
       }
     }
   }
-
-  /** UTF8 cache. */
-  private static final byte[] CACHE = new byte[4];
 
   /**
    * Closes the input stream.

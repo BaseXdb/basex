@@ -399,6 +399,7 @@ ad_userknown=Benutzer '%' existiert schon.
 ad_usercreate=Benutzer '%' erzeugt.
 ad_useralter=Passwort von Benutzer '%' geändert.
 ad_userdrop=Benutzer '%' entfernt.
+ad_userlog=Benutzer '%' ist gerade eingeloggt.
 ad_passno=Kein Passwort angegeben.
 ad_admin=Admin-Benutzer kann nicht modifiziert werden.
 
