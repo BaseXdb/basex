@@ -14,6 +14,7 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
+import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
@@ -56,7 +57,13 @@ public final class DialogCreate extends Dialog {
   /** Fulltext index flag. */
   private final BaseXCheckBox ftxindex;
   /** Full-text indexing. */
-  private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
+  private final BaseXCheckBox[] ft = new BaseXCheckBox[6];
+  /** Full-text scoring type. */
+  private final BaseXCombo ftsct;
+  /** Path for Full-text stopword list.*/
+  private final BaseXTextField ftswlpath;
+  /** Path button for full-text stopword list path. */
+  private final BaseXButton ftswlpb;
   /** Buttons. */
   private final BaseXBack buttons;
   /** Available databases. */
@@ -172,13 +179,45 @@ public final class DialogCreate extends Dialog {
 
     final String[] cb = { CREATEFZ, CREATESTEM, CREATECS, CREATEDC };
     final boolean[] val = { prop.is(Prop.FTFUZZY), prop.is(Prop.FTST),
-        prop.is(Prop.FTCS), prop.is(Prop.FTDC)
+        prop.is(Prop.FTCS), prop.is(Prop.FTDC) 
     };
-    for(int f = 0; f < ft.length; f++) {
+    int f = 0;
+    for(; f < ft.length - 2; f++) {
       ft[f] = new BaseXCheckBox(cb[f], val[f], this);
       p4.add(ft[f]);
     }
 
+    final BaseXBack b1 = new BaseXBack();
+    b1.setLayout(new TableLayout(1, 2, 6, 0));
+    ft[f] = new BaseXCheckBox(CREATESCT, prop.num(Prop.FTSCTYPE) > 0, this);
+    b1.add(ft[f++]);
+    ftsct = new BaseXCombo(
+        new String[]{"document based scoring", 
+            "textnode based scoring"}, this);    
+    b1.add(ftsct);
+    p4.add(b1);
+
+    final BaseXBack b2 = new BaseXBack();
+    b2.setLayout(new TableLayout(1, 3, 6, 0));
+    ft[f] = new BaseXCheckBox(CREATESW, !prop.get(Prop.FTSTOPW).equals(""), this);
+    b2.add(ft[f]);
+    ftswlpath = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
+    BaseXLayout.setWidth(ftswlpath, 150);
+    ftswlpath.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyReleased(final KeyEvent e) { action(null); }
+    });
+    b2.add(ftswlpath);
+
+    ftswlpb = new BaseXButton(BUTTONBROWSE, this);
+    ftswlpb.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) { chooseStopWordFile(); }
+    });
+    b2.add(ftswlpb);
+    p4.add(b2);
+    
+    
+    
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p1);
     tabs.addTab(PARSEINFO, p2);
@@ -214,6 +253,22 @@ public final class DialogCreate extends Dialog {
   }
 
   /**
+   * Opens a file dialog to choose a Stopwordlist.
+   */
+  public void chooseStopWordFile() {
+    final GUIProp gprop = gui.prop;
+    final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
+        gprop.get(GUIProp.OPENPATH), gui);
+//    fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
+    
+    final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
+    if(file != null) {
+      ftswlpath.setText(file.path());
+    }
+  }
+
+  
+  /**
    * Returns the chosen XML file or directory path.
    * @return file or directory
    */
@@ -233,7 +288,10 @@ public final class DialogCreate extends Dialog {
   public void action(final String cmd) {
     final boolean ftx = ftxindex.isSelected();
     for(final BaseXCheckBox f : ft) f.setEnabled(ftx);
-
+    ftsct.setEnabled(ft[4].isEnabled() && ft[4].isSelected());
+    ftswlpath.setEnabled(ft[5].isEnabled() && ft[5].isSelected());
+    ftswlpb.setEnabled(ft[5].isEnabled() && ft[5].isSelected());
+    
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
 
@@ -278,5 +336,24 @@ public final class DialogCreate extends Dialog {
     prop.set(Prop.FTST, ft[1].isSelected());
     prop.set(Prop.FTCS, ft[2].isSelected());
     prop.set(Prop.FTDC, ft[3].isSelected());
+    prop.set(Prop.FTSCTYPE, getScoringType());
+    prop.set(Prop.FTSTOPW, getFTStopwordFile());
+  }
+  
+  /**
+   * Get uri of stopword file.
+   * @return uri of the stopword file
+   */
+  private String getFTStopwordFile() {
+    if (ft[5].isEnabled() && ft[5].isSelected()) return ftswlpath.getText(); 
+      return "";    
+  }
+  /**
+   * Get scoring type.
+   * @return scoring type
+   */
+  private int getScoringType() {
+    if (!ft[4].isEnabled()) return 0;
+    return ftsct.getSelectedIndex() + 1;
   }
 }

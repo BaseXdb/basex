@@ -45,8 +45,9 @@ public final class FTFuzzyBuilder extends FTBuilder {
    * Constructor.
    * @param d data reference
    * @param pr database properties
+   * @throws IOException IOException
    */
-  public FTFuzzyBuilder(final Data d, final Prop pr) {
+  public FTFuzzyBuilder(final Data d, final Prop pr) throws IOException {
     super(d, pr);
   }
 

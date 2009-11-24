@@ -15,6 +15,7 @@ import org.basex.io.DataOutput;
 import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
+import org.basex.query.ft.StopWords;
 import org.basex.util.Token;
 
 /**
@@ -87,6 +88,7 @@ public final class DiskData extends Data {
         else if(k.equals(DBATTS)) atts = new Names(in);
         else if(k.equals(DBPATH)) path = new PathSummary(in);
         else if(k.equals(DBNS))   ns   = new Namespaces(in);
+        else if(k.equals(DBFTSTOPW)) swl = new StopWords(this);
       }
 
       // open data and indexes..

@@ -946,6 +946,10 @@ public interface Text {
   String CREATECS = lang("dc_ftcs");
   /** Full-text index information. */
   String CREATEDC = lang("dc_ftdc");
+  /** Full-text index using stopwordlist. */
+  String CREATESW = lang("dc_ftsw");
+  /** Full-text scoring type. */
+  String CREATESCT = lang("dc_ftsct");
 
   /** Whitespaces information. */
   String CHOPPINGINFO = lang("dc_chopinfo");

@@ -8,6 +8,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.query.ft.Scoring;
+import org.basex.query.ft.StopWords;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
@@ -42,18 +43,23 @@ abstract class FTBuilder extends IndexBuilder {
   private int token;
   /** Current frequency. */
   private int fc;
+  /** Stopword list. */
+  private StopWords sw;
 
   /**
    * Constructor.
    * @param d data reference
    * @param pr database properties
+   * @throws IOException IOException
    */
-  protected FTBuilder(final Data d, final Prop pr) {
+  protected FTBuilder(final Data d, final Prop pr) throws IOException {
     super(d);
     scm = pr.num(Prop.FTSCTYPE);
     wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr);
+    
     max = -1;
     min = Integer.MAX_VALUE;
+    sw = new StopWords(d, pr.get(Prop.FTSTOPW));
   }
 
   /**
@@ -74,7 +80,7 @@ abstract class FTBuilder extends IndexBuilder {
       while(wp.more()) {
         final byte[] tok = wp.get();
         // skip too long tokens
-        if(tok.length <= MAXLEN) index(tok);
+        if(tok.length <= MAXLEN && !sw.contains(tok)) index(tok);
       }
     }
     if(scm > 0) {

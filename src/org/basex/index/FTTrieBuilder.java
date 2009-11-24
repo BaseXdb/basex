@@ -25,8 +25,9 @@ public final class FTTrieBuilder extends FTBuilder {
    * Constructor.
    * @param d data reference
    * @param pr database properties
+   * @throws IOException IOException
    */
-  public FTTrieBuilder(final Data d, final Prop pr) {
+  public FTTrieBuilder(final Data d, final Prop pr) throws IOException {
     super(d, pr);
   }
 

@@ -7,6 +7,7 @@ import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
+import org.basex.query.ft.StopWords;
 import org.basex.util.IntList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -57,6 +58,8 @@ public abstract class Data {
   public Namespaces ns;
   /** Path Summary. */
   public PathSummary path;
+  /** Stopwordlist access file. */
+  public StopWords swl;
 
   /** Text index. */
   protected Index txtindex;

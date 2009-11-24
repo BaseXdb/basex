@@ -136,6 +136,9 @@ public final class Prop extends AProp {
   /** Flag for full-text scoring algorithm. */
   /** Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] FTSCTYPE = { "FTSCTYPE", 1 };
+  /** Flag for full-text stopword list. */
+  public static final Object[] FTSTOPW = { "FTSTOPW", ""};
+  
 
   /** Levenshtein default error. */
   public static final Object[] LSERR = { "LSERR", 0 };

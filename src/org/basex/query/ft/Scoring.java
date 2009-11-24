@@ -192,7 +192,7 @@ public final class Scoring {
    * @param sc current score value
    * @return new score value
    */
-  public static double childAxis(final double sc) {
+  public static double childAxis(final double sc) {    
     return sc * SCORESTEP;
   }
 
