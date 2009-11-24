@@ -21,18 +21,18 @@ import org.basex.util.TokenSet;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class StopWords extends TokenSet {
-    
+public final class StopWords extends TokenSet {  
   /**
    * Default Constructor.
    */
-  public StopWords(){}
+  public StopWords() { }
+
   /**
    * Constructor, reading an existing database stopword file.
    * @param dat data reference
    * @throws IOException IOExcetion 
    */
-  public StopWords(final DiskData dat) throws IOException{
+  public StopWords(final DiskData dat) throws IOException {
     read(new DataInput(getFile(dat)));
   }
  
@@ -49,7 +49,7 @@ public final class StopWords extends TokenSet {
   }
 
   /**
-   * Get database stopword list file
+   * Get database stopword list file.
    * @param dat data reference
    * @return database stopword list file
    */
@@ -88,7 +88,7 @@ public final class StopWords extends TokenSet {
    * @param tok token looking for
    * @return result 
    */
-  public final boolean contains (final byte[] tok) {
+  public boolean contains(final byte[] tok) {
     if (size == 0) return false;
     return id(tok) > 0;
   }

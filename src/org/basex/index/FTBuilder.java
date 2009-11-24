@@ -158,7 +158,7 @@ abstract class FTBuilder extends IndexBuilder {
           if(u < 0) u = -u - 1;
 
           if(lu != u) {
-            final int s = Scoring.tfIDF(freq.get(++fc),
+            final int s = Scoring.tfIDF(freq.get(fc++),
                 maxfreq[u], unit.size(), ntoken[token]);
             if(max < s) max = s;
             if(min > s) min = s;

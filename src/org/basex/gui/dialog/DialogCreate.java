@@ -199,7 +199,8 @@ public final class DialogCreate extends Dialog {
 
     final BaseXBack b2 = new BaseXBack();
     b2.setLayout(new TableLayout(1, 3, 6, 0));
-    ft[f] = new BaseXCheckBox(CREATESW, !prop.get(Prop.FTSTOPW).equals(""), this);
+    ft[f] = new BaseXCheckBox(CREATESW, !prop.get(Prop.FTSTOPW).isEmpty(),
+        this);
     b2.add(ft[f]);
     ftswlpath = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
     BaseXLayout.setWidth(ftswlpath, 150);

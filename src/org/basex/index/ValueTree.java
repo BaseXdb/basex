@@ -12,16 +12,22 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 final class ValueTree {
-  /** Left nodes. */
-  private int[] z = new int[4];
-  /** Tokens. */
-  private byte[][] t = new byte[1][];
-  /** IDs. */
+  /** Compressed pre values. */
   byte[][] pre = new byte[1][];
+  /** Tokens. */
+  byte[][] t = new byte[1][];
   /** Number of pre values. */
   int[] ns = new int[1];
   /** Number of entries. */
   int size;
+
+  /** Node references. */
+  private int[] z = new int[4];
+  /** Integer list for iterating the tree. */
+  private int[] stack = new int[1];
+  /** Current iterator position. */
+  private int spos;
+
 
   /**
    * Indexes the specified token.
@@ -42,14 +48,13 @@ final class ValueTree {
           ns[c]++;
           return;
         }
-        c = d > 0 ? z[n + 1] : z[n];
+        c = z[n + (d > 0 ? 1 : 0)];
         if(c == 0) {
           ++size;
           c = size << 1;
           if(c == z.length) z = Arrays.copyOf(z, c << 1);
           add(k, pr);
-          if(d > 0) z[n + 1] = c;
-          else z[n] = c;
+          z[n + (d > 0 ? 1 : 0)] = c;
           return;
         }
         n = c;
@@ -73,11 +78,6 @@ final class ValueTree {
     pre[size] = Num.newNum(id);
     ns[size] = 1;
   }
-
-  /** Integer list. */
-  private int[] stack = new int[1];
-  /** Current iterator. */
-  private int spos;
 
   /**
    * Initializes the tree iterator. Note that, to save memory, the original
