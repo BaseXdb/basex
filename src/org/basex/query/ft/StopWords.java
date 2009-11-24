@@ -8,7 +8,6 @@ import java.io.IOException;
 
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.data.DiskData;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -32,7 +31,7 @@ public final class StopWords extends TokenSet {
    * @param dat data reference
    * @throws IOException IOExcetion 
    */
-  public StopWords(final DiskData dat) throws IOException {
+  public StopWords(final Data dat) throws IOException{
     read(new DataInput(getFile(dat)));
   }
  
