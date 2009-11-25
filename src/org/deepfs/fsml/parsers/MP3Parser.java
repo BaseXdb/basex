@@ -610,7 +610,7 @@ public final class MP3Parser implements IFileParser {
           final int day = Token.toInt(d, 8, 10);
           if(len >= 13) { // yyyy-MM-ddTHH
             if(d[10] != 'T') return null;
-            GregorianCalendar gc = new GregorianCalendar();
+            final GregorianCalendar gc = new GregorianCalendar();
             gc.set(year, month, day);
             gc.set(Calendar.HOUR_OF_DAY, Token.toInt(d, 11, 13));
             if(len >= 16) {
@@ -755,7 +755,7 @@ public final class MP3Parser implements IFileParser {
     TDRC {
       @Override
       public void parse(final MP3Parser obj, final int size) {
-      // [BL] different elements for gYear, gYearMonth, ...
+          // [BL] different elements for gYear, gYearMonth, ...
       }
     },
 
@@ -763,7 +763,7 @@ public final class MP3Parser implements IFileParser {
     TDTG {
       @Override
       public void parse(final MP3Parser obj, final int size) {
-      // [BL] different elements for gYear, gYearMonth, ...
+          // [BL] different elements for gYear, gYearMonth, ...
       }
     },
 
@@ -780,7 +780,7 @@ public final class MP3Parser implements IFileParser {
     TFLT {
       @Override
       public void parse(final MP3Parser obj, final int size) {
-      // [BL] parse file type
+          // [BL] parse file type
 
       // TFLT
       // The 'File type' frame indicates which type of audio this tag defines.
@@ -851,7 +851,7 @@ public final class MP3Parser implements IFileParser {
     TMED {
       @Override
       public void parse(final MP3Parser obj, final int size) {
-      // [BL] parse media type
+          // [BL] parse media type
 
       // TMED
       // The 'Media type' frame describes from which media the sound

@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.basex.core.Main;
+import org.basex.util.Token;
 import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
 import org.deepfs.fsml.util.MetaElem;
@@ -22,6 +23,92 @@ import org.deepfs.fsml.util.ParserUtil;
  * @author Bastian Lemke
  */
 public final class ExifParser {
+
+  /** Image orientation viewed in terms of rows and columns. */
+  static final byte[][] ORIENTATION = bytes("", "Top Left", "Top Right",
+      "Bottom Right", "Bottom Left", "Left Top", "Right Top", "Right Bottom",
+      "Left Bottom");
+
+  /**
+   * Converts strings to byte arrays.
+   * @param str string array
+   * @return byte array
+   */
+  static byte[][] bytes(final String... str) {
+    final byte[][] val = new byte[str.length][];
+    for(int v = 0; v < val.length; v++)
+      val[v] = Token.token(str[v]);
+    return val;
+  }
+
+  /**
+   * Format of an IFD field.
+   * @author Bastian Lemke
+   */
+  private enum Format {
+    /** 8-bit unsigned integer. */
+    BYTE,
+
+    /** 8-bit byte containing on 7-bit ASCII code (NULL-terminated). */
+    ASCII,
+
+    /** 16-bit unsigned integer. */
+    SHORT,
+
+    /** 32-bit unsigned integer. */
+    LONG,
+
+    /**
+     * Two LONGs. The first LONG is the numerator and the second LONG expresses
+     * the denominator.
+     */
+    RATIONAL,
+
+    /** 8-bit byte that can take any value depending on the field definition. */
+    UNDEFINED,
+
+    /** 32-bit signed integer (2's complement notation). */
+    SLONG,
+
+    /**
+     * two SLONGs, The first SLONG is the numerator and the second SLONG is the
+     * denominator.
+     */
+    SRATIONAL;
+
+    /**
+     * Returns the field format for a id.
+     * @param i the id.
+     * @return the field format.
+     */
+    static Format getForId(final int i) {
+      switch(i) {
+        case 1:
+          return BYTE;
+        case 2:
+          return ASCII;
+        case 3:
+          return SHORT;
+        case 4:
+          return LONG;
+        case 5:
+          return RATIONAL;
+        case 6:
+          return null;
+        case 7:
+          return UNDEFINED;
+        case 8:
+          return null;
+        case 9:
+          return SLONG;
+        case 10:
+          return SRATIONAL;
+        default:
+          return null;
+      }
+    }
+  }
+
   /**
    * <p>
    * Enum for all IFD tags that should be parsed. Each enum constant is the
@@ -31,79 +118,112 @@ public final class ExifParser {
    * </p>
    * @author Bastian Lemke
    */
-  private enum IFD_TAG {
-        /*
-     * HOWTO add more fields: . . . . . . . . . . . . . . . . . . . . . . . . ..
-     * 1. Read Exif spec: http://www.Exif.org/Exif2-2.PDF and search for the . .
-     * .. metadata that should be extracted. . . . . . . . . . . . . . . . . . .
-     * 2. Pick the corresponding hexadecimal TAG ID (e.g. 100 for "Image width")
-     * 3. add an item to this enum - the item name has to be the char 'h' . . ..
-     * .. followed by the lowercase hex value of the TAG ID. . . . . . . . . . .
-     * 4. implement the abstract parse() method, fill metadata container . . . .
-     * .. o.meta with the metadata and fire metadata events . . . . . . . . ..
-     * .. (o.fsparser.metaEvent(o.meta))
-     */
+  private enum Tag {
+
     /** Image width. */
-    h100 {
+    h100(1, Format.SHORT, Format.LONG) {
       @Override
-      void parse(final ExifParser o, final ByteBuffer buf) {
-        final int type = buf.getShort();
-        if(buf.getInt() == 1) {
-          if(type == IFD_TYPE_SHORT) {
-            o.deepFile.addMeta(MetaElem.PIXEL_WIDTH, buf.getShort() & 0xFFFF);
-            buf.getShort(); // empty two bytes
-          } else if(type == IFD_TYPE_LONG) {
-            o.deepFile.addMeta(MetaElem.PIXEL_WIDTH, buf.getInt());
-          } else error(o, "Image width (0x0100)");
-        } else error(o, "Image width (0x0100)");
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        final MetaElem elem = MetaElem.PIXEL_WIDTH;
+        if(o.deepFile.isMetaSet(elem)) return;
+        metaSimple(o, buf, f, elem);
       }
     },
-        /** Image length. */
-    h101 {
+
+    /** Image length. */
+    h101(1, Format.SHORT, Format.LONG) {
       @Override
-      void parse(final ExifParser o, final ByteBuffer buf) {
-        final int type = buf.getShort();
-        if(buf.getInt() == 1) {
-          if(type == IFD_TYPE_SHORT) {
-            o.deepFile.addMeta(MetaElem.PIXEL_HEIGHT, buf.getShort() & 0xFFFF);
-          } else if(type == IFD_TYPE_LONG) {
-            o.deepFile.addMeta(MetaElem.PIXEL_HEIGHT, buf.getInt());
-          } else error(o, "Image length (0x0101)");
-        } else error(o, "Image length (0x0101)");
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        final MetaElem elem = MetaElem.PIXEL_HEIGHT;
+        if(o.deepFile.isMetaSet(elem)) return;
+        metaSimple(o, buf, f, elem);
       }
     },
-        /** Image description. */
-    h10e {
+
+    /** Image description/title. */
+    h10e(null, Format.ASCII) {
       @Override
-      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
-        if(buf.getShort() == IFD_TYPE_ASCII) {
-          o.deepFile.addMeta(MetaElem.DESCRIPTION, o.readAscii(buf));
-        } else error(o, "Image description (0x010E)");
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        metaSimple(o, buf, f, MetaElem.TITLE);
       }
     },
-        /** DateTime of image creation. */
-    h132 {
+
+    /** Image input equipment manufacturer. */
+    h10f(null, Format.ASCII) {
       @Override
-      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
-        if(buf.getShort() == IFD_TYPE_ASCII && buf.getInt() >= 20) {
-          o.bfc.position(buf.getInt());
-          o.bfc.buffer(20);
-          final byte[] data = new byte[20];
-          o.bfc.get(data);
-          o.dateEvent(MetaElem.DATE_CREATED, data);
-        } else error(o, "DateTime (0x0132)");
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        metaSimple(o, buf, f, MetaElem.MAKE);
       }
     },
-        /** Creator. */
-    h13b {
+
+    /** Image input equipment model. */
+    h110(null, Format.ASCII) {
       @Override
-      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
-        if(buf.getShort() == IFD_TYPE_ASCII) {
-          o.deepFile.addMeta(MetaElem.CREATOR_NAME, o.readAscii(buf));
-        } else error(o, "Creator (0x013B)");
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        metaSimple(o, buf, f, MetaElem.MODEL);
       }
     },
-        // /** Exif Image Width. */
+
+    /** Orientation. */
+    h112(1, Format.SHORT) {
+      @Override
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        final int val = buf.getShort();
+        if(val >= 0 && val < ORIENTATION.length) {
+          o.deepFile.addMeta(MetaElem.ORIENTATION, ORIENTATION[val]);
+          return;
+        }
+        err(o);
+      }
+    },
+
+    /** XResolution. */
+    h11a(1, Format.RATIONAL) {
+      @Override
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+          // [BL] xresolution
+      }
+    },
+
+    /** YResolution. */
+    h11b(1, Format.RATIONAL) {
+      @Override
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+          // [BL] yresolution
+      }
+    },
+
+    /** resolution unit. */
+    h128(1, Format.SHORT) {
+      @Override
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+          // [BL] resolution unit
+      }
+    },
+
+    /** Software. */
+    h131(null, Format.ASCII) {
+      @Override
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        metaSimple(o, buf, f, MetaElem.SOFTWARE);
+      }
+    },
+
+    /** DateTime of image creation. */
+    h132(20, Format.ASCII) {
+      @Override
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        metaDate(o, buf, MetaElem.DATE_CREATED);
+      }
+    },
+    /** Creator. */
+    h13b(null, Format.ASCII) {
+      @Override
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        metaSimple(o, buf, f, MetaElem.CREATOR_NAME);
+      }
+    },
+    // /** Exif Image Width. */
     // ha002 {
     // @Override
     // void parse(final ExifParser o, final ByteBuffer buf)
@@ -151,78 +271,178 @@ public final class ExifParser {
     // }
     // },
     /** EXIF IFD. */
-    h8769 {
+    h8769(1, Format.LONG) {
       @Override
-      void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
-        if(buf.getShort() == IFD_TYPE_LONG && buf.getInt() == 1) {
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        try {
           o.bfc.position(buf.getInt());
           o.readIFD();
-        } else error(o, "Exif (0x8769)");
+        } catch(IOException e) {
+          err(o, e);
+        }
       }
     };
 
-    /**
-     * <p>
-     * Tag specific parse method.
-     * </p>
-     * @param exifParser {@link ExifParser} instance to send parser events from.
-     * @param buf the {@link ByteBuffer} to read from.
-     * @throws IOException if any error occurs while reading additional data
-     *           from the file channel.
-     */
-    abstract void parse(final ExifParser exifParser, final ByteBuffer buf)
-        throws IOException;
+    /** The format of the date values. */
+    private static final SimpleDateFormat SDF = new SimpleDateFormat(
+        "yyyy:MM:dd HH:mm:ss");
+    /** The expected value. */
+    final Integer expVal;
+    /** The allowed field formats. */
+    final Format[] aFormats;
 
     /**
-     * Log error.
-     * @param o the current {@link ExifParser} instance.
-     * @param fieldName the name of the current IFD field.
+     * Initilizes a tag.
+     * @param expectedValue the expected value.
+     * @param allowedFormats formats that are allowed for the tag field.
      */
-    void error(final ExifParser o, final String fieldName) {
-      Main.debug("ExifParser: Invalid " + fieldName + " field (%)",
+    private Tag(final Integer expectedValue, final Format... allowedFormats) {
+      expVal = expectedValue;
+      aFormats = allowedFormats;
+    }
+
+    /**
+     * Parses the tag.
+     * @param o {@link ExifParser} instance to send parser events from.
+     * @param buf the {@link ByteBuffer} to read from.
+     */
+    void parse(final ExifParser o, final ByteBuffer buf) {
+      final Format f = check(o, buf);
+      if(f != null) parse0(o, buf, f);
+    }
+
+    /**
+     * Tag specific parse method.
+     * @param o {@link ExifParser} instance to send parser events from.
+     * @param buf the {@link ByteBuffer} to read from.
+     * @param f the format of the field.
+     */
+    abstract void parse0(final ExifParser o, final ByteBuffer buf,
+        final Format f);
+
+    /**
+     * Checks if the field is valid.
+     * @param o the ExifParser instance.
+     * @param buf the ByteBuffer to read from.
+     * @return the field format if the field is valid, <code>null</code>
+     *         otherwise.
+     */
+    private Format check(final ExifParser o, final ByteBuffer buf) {
+      Format format = Format.getForId(buf.getShort());
+      for(Format f : aFormats) {
+        if(f.equals(format)) {
+          if(expVal == null || (buf.getInt() & 0xFFFFFFFFL) == expVal) return f;
+        }
+      }
+      err(o);
+      return null;
+    }
+    
+    /**
+     * Generates a debug message.
+     * @param o the ExifParser.
+     */
+    void err(final ExifParser o) {
+      Main.debug("ExifParser: Invalid field found (%, file: %)", toString(),
           o.bfc.getFileName());
     }
-  }
+    
+    /**
+     * Generates a debug message.
+     * @param o the ExifParser.
+     * @param ex the exception to log.
+     */
+    void err(final ExifParser o, final Exception ex) {
+      Main.debug(
+          "ExifParser: Invalid field found (%, file: %, error message: %)",
+          toString(), o.bfc.getFileName(), ex);
+    }
 
-  // /** IFD field format: 8-bit unsigned integer. */
-  // private static final int IFD_TYPE_BYTE = 1;
-  /**
-   * IFD field format: 8-bit byte containing on 7-bit ASCII code
-   * (NULL-terminated).
-   */
-  private static final int IFD_TYPE_ASCII = 2;
-  /** IFD field format: 16-bit unsigned integer. */
-  private static final int IFD_TYPE_SHORT = 3;
-  /** IFD field format: 32-bit unsigned integer. */
-  private static final int IFD_TYPE_LONG = 4;
-  // /**
-  // * IFD field format: two LONGs. The first LONG is the numerator and the
-  // second
-  // * LONG expresses the denominator.
-  // */
-  // private static final int IFD_TYPE_RATIONAL = 5;
-  // /**
-  // * IFD field format: 8-bit byte that can take any value depending on the
-  // field
-  // * definition.
-  // */
-  // private static final int IFD_TYPE_UNDEFINED = 7;
-  // /** IFD field format: 32-bit signed integer (2's complement notation). */
-  // private static final int IFD_TYPE_SLONG = 9;
-  // /**
-  // * IFD field format: two SLONGs, The first SLONG is the numerator and the
-  // * second SLONG is the denominator.
-  // */
-  // private static final int IFD_TYPE_SRATIONAL = 10;
-  // ---------------------------------------------------------------------------
+    /**
+     * Reads variable size ascii data from a IFD field.
+     * @param b the {@link BufferedFileChannel} to read from if the data is not
+     *          inlined.
+     * @param buf the {@link ByteBuffer} to read from.
+     * @return the ascii data.
+     * @throws IOException if any error occurs while reading from the file
+     *           channel.
+     */
+    private byte[] readAscii(final BufferedFileChannel b, final ByteBuffer buf)
+        throws IOException {
+      final int size = buf.getInt();
+      final byte[] data = new byte[size];
+      if(size <= 4) { // data is inlined
+        buf.get(data);
+      } else {
+        b.position(buf.getInt());
+        b.buffer(size);
+        b.get(data);
+      }
+      return data;
+    }
+
+    /**
+     * Converts the date to the correct format and adds it to the DeepFile.
+     * @param o the ExifParser.
+     * @param buf the ByteBuffer to read from.
+     * @param elem the metadata element to use for the metadata item.
+     */
+    void metaDate(final ExifParser o, final ByteBuffer buf,
+        final MetaElem elem) {
+      try {
+        o.bfc.position(buf.getInt());
+        o.bfc.buffer(20);
+        final byte[] data = new byte[20];
+        o.bfc.get(data);
+        final Date d = SDF.parse(Token.string(data));
+        o.deepFile.addMeta(elem, ParserUtil.convertDateTime(d));
+        return;
+      } catch(final ParseException ex) {
+        err(o, ex);
+      } catch(IOException e) {
+        err(o, e);
+      }
+    }
+
+    /**
+     * Parses a field and adds the metadata to the deep file of the exif parser.
+     * @param o the ExifParser.
+     * @param buf the buffer to read from.
+     * @param f the format of the field.
+     * @param elem the MetaElement.
+     */
+    void metaSimple(final ExifParser o, final ByteBuffer buf, final Format f,
+        final MetaElem elem) {
+      final DeepFile d = o.deepFile;
+      switch(f) {
+        case BYTE:  d.addMeta(elem, (short) (buf.get() & 0xFF)); break;
+        case ASCII:
+          try {
+            d.addMeta(elem, readAscii(o.bfc, buf));
+          } catch(IOException e) {
+            err(o, e);
+          }
+          break;
+        case SHORT: d.addMeta(elem, buf.getShort() & 0xFFFF); break;
+        case LONG:  d.addMeta(elem, buf.getInt() & 0xFFFFFFFFL); break;
+        case RATIONAL:  break; // [BL] implement parsing of RATIONAL fields.
+        case UNDEFINED: break; // [BL] implement parsing of UNDEFINED fields.
+        case SLONG:     break; // [BL] implement parsing of SLONG fields.
+        case SRATIONAL: break; // [BL] implement parsing of SRATIONAL fields.
+        default: Main.debug("ExifParser: Unknown field type (%)", f);
+      }
+    }
+
+    @Override
+    public String toString() {
+      return name().replace("h", "0x");
+    }
+  }
 
   /** The {@link BufferedFileChannel} to read from. */
   BufferedFileChannel bfc;
   /** The metadata and content store. */
   DeepFile deepFile;
-  /** The format of the date values. */
-  private static final SimpleDateFormat SDF = new SimpleDateFormat(
-      "yyyy:MM:dd HH:mm:ss");
 
   /**
    * Checks if the Exif IFD is valid.
@@ -286,42 +506,6 @@ public final class ExifParser {
     }
   }
 
-  // ----- methods used by IFD_TAG parse methods -------------------------------
-
-  /**
-   * Reads variable size ascii data from a IFD field.
-   * @param buf the {@link ByteBuffer} to read from.
-   * @return the ascii data.
-   * @throws IOException if any error occurs while reading from the file
-   *           channel.
-   */
-  byte[] readAscii(final ByteBuffer buf) throws IOException {
-    final int size = buf.getInt();
-    final byte[] data = new byte[size];
-    if(size <= 4) { // data is inlined
-      buf.get(data);
-    } else {
-      bfc.position(buf.getInt());
-      bfc.buffer(size);
-      bfc.get(data);
-    }
-    return data;
-  }
-
-  /**
-   * Converts the date to the correct format and fires a date event.
-   * @param elem the metadata element to use for the metadata item.
-   * @param date the date value.
-   */
-  void dateEvent(final MetaElem elem, final byte[] date) {
-    try {
-      final Date d = SDF.parse(new String(date));
-      deepFile.addMeta(elem, ParserUtil.convertDateTime(d));
-    } catch(final ParseException ex) {
-      Main.debug(ex.getMessage());
-    }
-  }
-
   // ----- utility methods -----------------------------------------------------
 
   /**
@@ -347,10 +531,8 @@ public final class ExifParser {
   private void readField(final ByteBuffer data) {
     final int tagNr = data.getShort() & 0xFFFF;
     try {
-      final IFD_TAG tag = IFD_TAG.valueOf("h" + Integer.toHexString(tagNr));
+      final Tag tag = Tag.valueOf("h" + Integer.toHexString(tagNr));
       tag.parse(this, data);
-    } catch(final IOException ex) {
-      Main.debug("%", ex);
-    } catch(final IllegalArgumentException ex) { /* */}
+    } catch(final IllegalArgumentException ex) { /* tag is not registered. */}
   }
 }

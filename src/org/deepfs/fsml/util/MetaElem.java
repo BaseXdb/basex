@@ -107,6 +107,12 @@ public enum MetaElem {
   LYRICS(NS.FSMETA, "lyrics", Type.STR, true),
   /** Lyricist. */
   LYRICIST(NS.FSMETA, "lyricist", Type.STR, true),
+  /** Make. */
+  MAKE(NS.FSMETA, "make", Type.STR, false),
+  /** Model. */
+  MODEL(NS.FSMETA, "model", Type.STR, false),
+  /** Orientation. */
+  ORIENTATION(NS.FSMETA, "orientation", Type.STR, false),
   /** Original artist. */
   ORIGINAL_ARTIST(NS.FSMETA, "originalArtist", Type.STR, false),
   /** Copyright message. */

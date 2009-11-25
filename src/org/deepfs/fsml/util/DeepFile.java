@@ -463,12 +463,16 @@ public class DeepFile {
    * @param value value as byte array. Must contain only correct UTF-8 values!
    */
   private void addMeta0(final MetaElem e, final byte[] value) {
+    final TokenBuilder tb = new TokenBuilder(value);
+    tb.chop();
+    final byte[] data = tb.finish();
+    if(data.length == 0) return;
     final ArrayList<byte[]> vals;
     if(metaElements.containsKey(e)) {
       if(!e.isMultiVal()) {
         Main.debug(
-            "Failed to add metadata value. Multiple values are forbidden for " +
-            "attribute % (%).", e, bfc.getFileName());
+            "Failed to add metadata value. Multiple values are forbidden for "
+            + "attribute % (%).", e, bfc.getFileName());
         return;
       }
       vals = metaElements.get(e);
@@ -476,7 +480,7 @@ public class DeepFile {
       vals = new ArrayList<byte[]>();
       metaElements.put(e, vals);
     }
-    vals.add(value);
+    vals.add(data);
   }
 
   /**
@@ -487,9 +491,7 @@ public class DeepFile {
   public void addMeta(final MetaElem elem, final byte[] value) {
     if(!elem.getType().instance(Type.STR)) Main.bug("Invalid data type for " +
         "metadata element " + elem + " (string - as byte array).");
-    final byte[] data = new byte[value.length];
-    System.arraycopy(value, 0, data, 0, value.length);
-    addMeta(elem, ParserUtil.checkUTF(data), null);
+    addMeta(elem, ParserUtil.checkUTF(value), null);
   }
 
   /**
@@ -1017,15 +1019,20 @@ public class DeepFile {
 
   /** All namespaces used in the DeepFile. */
   public enum NS {
-        /** XML schema namespace. */
+
+    /** XML schema namespace. */
     XS("xs", "http://www.w3.org/2001/XMLSchema"),
-        /** XML schema instance namespace. */
+
+    /** XML schema instance namespace. */
     XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-        /** DeepFS filesystem namespace. */
+
+    /** DeepFS filesystem namespace. */
     DEEPURL("", "http://www.deepfs.org/fs/1.0/"),
-        /** DeepFS metadata namespace. */
+
+    /** DeepFS metadata namespace. */
     FSMETA("", "http://www.deepfs.org/fsmeta/1.0/"),
-        /** Dublin Core metadata terms namespace. */
+
+    /** Dublin Core metadata terms namespace. */
     DCTERMS("", "http://purl.org/dc/terms/");
 
     /** The namespace prefix. */
