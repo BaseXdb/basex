@@ -28,7 +28,7 @@ public final class ReplaceElemContent extends UpdatePrimitive {
   }
 
   @Override
-  public void check() { }
+  public void prepare() { }
 
   @Override
   public void apply(final int add) {

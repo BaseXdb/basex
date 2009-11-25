@@ -69,9 +69,8 @@ public final class ReplacePrimitive extends NodeCopy {
   @Override
   public String[] addAtt() {
     if(!a) return null;
-    final String[] at = new String[m.atts.size()];
-    int i = 0;
-    for(final byte[] b : m.atts.keys()) at[i++] = Token.string(b);
+    final String[] at = new String[m.meta.size];
+    for(int i = 0; i < m.meta.size; i++) at[i] = Token.string(m.attName(i));
     return at;
   }
 

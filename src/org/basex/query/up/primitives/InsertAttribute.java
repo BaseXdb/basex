@@ -46,9 +46,8 @@ public final class InsertAttribute extends NodeCopy {
 
   @Override
   public String[] addAtt() {
-    final String[] a = new String[m.atts.size()];
-    int i = 0;
-    for(final byte[] b : m.atts.keys()) a[i++] = Token.string(b);
+    final String[] a = new String[m.meta.size];
+    for(int i = 0; i < m.meta.size; i++) a[i] = Token.string(m.attName(i));
     return a;
   }
 }

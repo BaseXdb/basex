@@ -2,14 +2,21 @@ package org.basex.query.up;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.basex.core.Main;
+import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
+import org.basex.data.MemData;
+import org.basex.data.Namespaces;
+import org.basex.data.PathSummary;
+import org.basex.index.Names;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -27,9 +34,12 @@ import org.basex.query.util.Err;
  */
 public final class PendingUpdates {
   /** Update primitives which target nodes are DBNodes. */
-  private final Map<Data, DBPrimitives> dbs = new HashMap<Data, DBPrimitives>();
-  /** Update primitives which target nodes are fragments. */
-  private final DBPrimitives frags = new DBPrimitives(null);
+  private final Map<Data, Primitives> primitives = 
+    new HashMap<Data, Primitives>();
+  /** Data dummy for fragment updates. */
+  private final Data dataDummy = new MemData(16, new Names(), new Names(),
+      new Namespaces(), new PathSummary(), new Prop());
+
   /** The update operations are part of a transform expression. */
   private final boolean t;
   /** Holds all data references created by the copy clause of a transform
@@ -39,8 +49,6 @@ public final class PendingUpdates {
    * part of this set, hence the target node has not been copied.
    */
   private Set<Data> refs;
-  /** Validates updates. */
-  private final ValidateUpdates val = new ValidateUpdates();
 
   /**
    * Constructor.
@@ -76,22 +84,18 @@ public final class PendingUpdates {
     if(t && (frag || !refs.contains(((DBNode) p.node).data)))
       Err.or(UPWRONGTRG, p.node);
 
-    if(frag) {
-      frags.add(p);
-    } else if(p.node instanceof DBNode) {
-      final Data d = ((DBNode) p.node).data;
-
-      DBPrimitives dp = dbs.get(d);
-      if(dp == null) {
-        // check permissions
-        if(ctx.context.perm(User.WRITE, d.meta) != -1)
-          throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
-
-        dp = new DBPrimitives(d);
-        dbs.put(d, dp);
-      }
-      dp.add(p);
+    final Data d = frag ? dataDummy : ((DBNode) p.node).data;
+    
+    Primitives prim = primitives.get(d);
+    if(prim == null) {
+      // check permissions
+      if(!frag && ctx.context.perm(User.WRITE, d.meta) != -1)
+        throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
+      
+      prim = frag ? new FragmentPrimitives() : new DBPrimitives();
+      primitives.put(d, prim);
     }
+    prim.add(p);
   }
 
   /**
@@ -101,23 +105,42 @@ public final class PendingUpdates {
    * @throws QueryException query exception
    */
   public void apply() throws QueryException {
-    // validate updates
-    final int[] fnodes = frags.getNodes();
-    for(final int fnode : fnodes)
-      val.validate(frags.op.get(fnode));
-    for(final DBPrimitives dbp : dbs.values()) {
+    // prepare database update primitives
+    // [LK] check violations for dbnodes
+    for(final Primitives dbp : primitives.values()) {
       for(final int node : dbp.getNodes()) {
-        val.validate(dbp.op.get(node));
+        for(final UpdatePrimitive p : dbp.op.get(node)) {
+          if(p == null) continue;
+          p.prepare();
+        }
       }
     }
-    // check status of validation
-    val.status();
-
+    
     // apply updates if validation finds no errors
-    frags.apply();
-    for(final Data d : dbs.keySet().toArray(new Data[dbs.size()])) {
-      dbs.get(d).apply();
+    for(final Data d : primitives.keySet().toArray(new Data[primitives.size()])) {
+      primitives.get(d).apply();
       d.flush();
     }
   }
+  
+//  private void findDuplicates(final Map<String, Integer> m) 
+//    throws QueryException {
+//    for(final String s : m.keySet()) {
+//      if(m.get(s) > 1) 
+//        Err.or(UPATTDUPL, s);
+//    }
+//  }
+//  
+//  private void changeAttr(final Map<String, Integer> m, final boolean add,
+//      final String... s) {
+//    if(s == null) return;
+//    Integer i;
+//    for(final String st : s) {
+//      i = m.get(st);
+//      if(i == null) {
+//        m.put(st, 1);
+//      } else
+//        m.put(st, add ? ++i : --i);
+//    }
+//  }
 }

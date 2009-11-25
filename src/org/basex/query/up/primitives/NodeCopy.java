@@ -33,7 +33,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
   }
 
   @Override
-  public void check() throws QueryException {
+  public void prepare() throws QueryException {
     if(!(node instanceof DBNode)) return;
 
     if(c.size() == 0) return;

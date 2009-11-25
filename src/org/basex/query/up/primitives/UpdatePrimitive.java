@@ -28,10 +28,10 @@ public abstract class UpdatePrimitive {
   public abstract PrimitiveType type();
 
   /**
-   * Checks for constraints, etc.
+   * Prepares the update.
    * @throws QueryException query exception
    */
-  public abstract void check() throws QueryException;
+  public abstract void prepare() throws QueryException;
 
   /**
    * Applies the update operation represented by this primitive to the
