@@ -84,11 +84,9 @@ public interface BuildText {
   /** Scanner Error. */
   String RECENT = "Recursive entity definition.";
 
-  /** DTD Scanner Error. */
-  String FILEERR = "Could not parse \"%\".";
-  /** DTD: WHITESPACEERROR. */
+  /** DTD Whitespace error. */
   String WSERROR = "Missing Whitespace.";
-  /** DTD: QUOTEERROR. */
+  /** DTD Error. */
   String ERRDT = "Error in DTD.";
 
   /** Ampersand. */

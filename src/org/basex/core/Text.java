@@ -381,7 +381,7 @@ public interface Text {
   /** Database created. */
   String DBCREATED = lang("pc_created");
   /** Parse error. */
-  String CREATEERR = lang("pc_err");
+  String PARSEERR = lang("pc_err");
 
   /** File not found. */
   String FILEWHICH = lang("pc_filenf");

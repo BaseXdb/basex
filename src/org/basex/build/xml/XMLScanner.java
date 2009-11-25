@@ -715,7 +715,7 @@ public final class XMLScanner extends Progress {
           input = new XMLInput(new IOContent(cont, name));
         } catch(final IOException ex) {
           Main.debug(ex);
-          error(FILEERR, name);
+          error(PARSEERR, name);
         }
 
         if(consume(XDECL)) {

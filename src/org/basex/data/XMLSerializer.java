@@ -55,13 +55,18 @@ public final class XMLSerializer extends Serializer {
   }
 
   /**
-   * Sets the encoding.
+   * Sets the encoding and prints a document declaration.
+   * Must be called at the beginning of a serialization.
    * @param e encoding
-   * @throws IOException IOException
+   * @throws IOException I/O exception
    */
   public void encoding(final String e) throws IOException {
     enc = enc(e);
-    print("<?xml version='1.0' encoding='" + e + "'?>");
+    print(PI1);
+    print(DOCDECL);
+    print(enc);
+    print('\'');
+    print(PI2);
     print(NL);
   }
   
@@ -77,20 +82,8 @@ public final class XMLSerializer extends Serializer {
     print(DOCTYPE);
     print(' ');
     print(t);
-    if(te != null) {
-      print(' ');
-      print(SYSTEM);
-      print(' ');
-      print('"');
-      print(te);
-      print('"');
-    }
-    if(ti != null) {
-      print(' ');
-      print('"');
-      print(ti);
-      print('"');
-    }
+    if(te != null) print(" " + SYSTEM + " \"" + te + "\"");
+    if(ti != null) print(" \"" + ti + "\"");
     print(ELEM2);
     print(NL);
   }
@@ -244,7 +237,7 @@ public final class XMLSerializer extends Serializer {
   }
 
   /**
-   * Writes a token in the specified encoding.
+   * Writes a token in the current encoding.
    * @param token token to be printed
    * @throws IOException I/O exception
    */
@@ -258,7 +251,7 @@ public final class XMLSerializer extends Serializer {
   }
 
   /**
-   * Writes a character in the specified encoding.
+   * Writes a character in the current encoding.
    * @param ch character to be printed
    * @throws IOException I/O exception
    */
@@ -273,7 +266,7 @@ public final class XMLSerializer extends Serializer {
   }
 
   /**
-   * Writes a string in the specified encoding.
+   * Writes a string in the current encoding.
    * @param s string to be printed
    * @throws IOException I/O exception
    */

@@ -505,10 +505,11 @@ public interface QueryText {
   Object[] UPMULTREPV = { XUDY, 17, "Multiple replaces on %." };
   /** XUDY0021: XQuery Update dynamic exception. */
   Object[] UPATTDUPL = { XUDY, 21, "Duplicate attribute \"%\"." };
-  /** XUDY0023: XQuery Update dynamic exception. */
+  /* XUDY0023: XQuery Update dynamic exception.
   Object[] UPCONFNSPAR = { XUDY, 23, "Namespace conflicts." };
-  /** XUDY0024: XQuery Update dynamic exception. */
+  /** XUDY0024: XQuery Update dynamic exception.
   Object[] UPCONFNS = { XUDY, 24, "Namespace conflicts." };
+  */
   /** XUDY0027: XQuery Update dynamic exception. */
   Object[] UPSEQEMP = { XUDY, 27, "Target must not be empty." };
   /** XUDY0029: XQuery Update dynamic exception. */

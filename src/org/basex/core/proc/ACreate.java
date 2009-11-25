@@ -77,7 +77,7 @@ abstract class ACreate extends Proc {
       return error(msg != null ? msg : args[0]);
     } catch(final Exception ex) {
       Main.debug(ex);
-      return error(CREATEERR, args[0]);
+      return error(PARSEERR, args[0]);
     }
   }
 

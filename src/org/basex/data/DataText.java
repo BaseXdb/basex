@@ -86,6 +86,7 @@ public interface DataText {
   String DBNS = "NS";
 
   // DEEPFS STRINGS ===========================================================
+
   /** DeepFS tag. */
   String S_DEEPFS = "deepfs";
   /** Directory tag. */
@@ -117,8 +118,6 @@ public interface DataText {
   byte[] TEXT_CONTENT = token("text");
   /** XML content tag. */
   byte[] XML_CONTENT = token("xml");
-  /** Unknown tag (place holder). */
-  byte[] UNKNOWN = token("unknown");
 
   /** Name attribute token. */
   byte[] NAME = token(S_NAME);
@@ -178,6 +177,9 @@ public interface DataText {
   byte[] KIND = token("kind");
   /** Count attribute. */
   byte[] COUNT = token("count");
+
+  /** Document declaration. */
+  byte[] DOCDECL = token("xml version='1.0' encoding='");
   /** Doctype output. */
   byte[] DOCTYPE = token("<!DOCTYPE");
   /** Doctype system keyword. */
@@ -212,7 +214,7 @@ public interface DataText {
   /** Processing instruction. */
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
-  byte[] ATT = { '@'};
+  byte[] ATT = { '@' };
 
   // TABLE SERIALIZATION ======================================================
 

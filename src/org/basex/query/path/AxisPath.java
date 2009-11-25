@@ -591,6 +591,7 @@ public class AxisPath extends Path {
   @Override
   public final Expr addText(final QueryContext ctx) throws QueryException {
     final Step s = step[step.length - 1];
+    // [CG] XQuery/Optimize: steps with namespaces.. Test.Kind.STD
     if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
         s.test.type == Type.ATT) return this;
 

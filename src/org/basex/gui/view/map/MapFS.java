@@ -1,7 +1,7 @@
 package org.basex.gui.view.map;
 
 import static org.basex.gui.GUIConstants.*;
-import static org.basex.build.BuildText.*;
+//import static org.basex.build.BuildText.*;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
@@ -282,7 +282,7 @@ final class MapFS extends MapPainter {
         s = fileBuf.length;
       }
     } catch(final IOException ex) {
-      if(!error) Main.debug(FILEERR, path);
+      if(!error) Main.debug(PARSEERR, path);
       Main.debug(ex);
       error = true;
       return true;

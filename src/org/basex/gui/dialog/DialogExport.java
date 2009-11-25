@@ -6,6 +6,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.nio.charset.Charset;
+import java.util.SortedMap;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
@@ -27,14 +29,6 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class DialogExport extends Dialog {
-  /** Encodings. */
-  private static final String[] ENCODINGS = {
-    "UTF-8", "UTF-16BE", "UTF-16LE", "ISO-8859-1", "ISO-8859-2", "ISO-8859-3",
-    "ISO-8859-4", "ISO-8859-5", "ISO-8859-9", "ISO-8859-7", "ISO-8859-8",
-    "ISO-8859-9", "ISO-8859-13", "ISO-8859-15", "US-ASCII", "Windows-1250",
-    "Windows-1251", "Windows-1252", "Windows-1253", "Windows-1257", "BIG5",
-    "EUC-JP", "EUC-KR", "GB2312", "ISO-2020-JP", "Koi8-R", "Shift_JIS"
-  };
   /** Directory path. */
   private final BaseXTextField path;
   /** Directory/File flag. */
@@ -92,7 +86,9 @@ public final class DialogExport extends Dialog {
     p.add(new BaseXLabel(INFOENCODING + COL, false, true));
 
     final Prop prop = gui.context.prop;
-    encoding = new BaseXCombo(ENCODINGS, this);
+    final SortedMap<String, Charset> cs = Charset.availableCharsets();
+    final String[] encodings = cs.keySet().toArray(new String[cs.size()]);
+    encoding = new BaseXCombo(encodings, this);
     encoding.setSelectedItem(prop.get(Prop.XMLENCODING));
     encoding.addKeyListener(new KeyAdapter() {
       @Override

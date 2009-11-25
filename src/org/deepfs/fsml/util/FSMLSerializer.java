@@ -118,7 +118,8 @@ public class FSMLSerializer {
       text(atts.val[i]);
       o.write('"');
     }
-    o.write(close ? ELEM4 : ELEM2);
+    if(close) o.write(ELEM4);
+    else o.write(ELEM2);
   }
 
   /**

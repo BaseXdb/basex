@@ -122,6 +122,12 @@ public final class BaseXLayout {
       comp.addKeyListener(new KeyAdapter() {
         @Override
         public void keyPressed(final KeyEvent e) {
+          
+          if(e.getSource() instanceof BaseXCombo) {
+            BaseXCombo c = (BaseXCombo) e.getSource();
+            if(c.isPopupVisible()) return;
+          }
+          
           // process key events
           final int code = e.getKeyCode();
           if(code == KeyEvent.VK_ENTER) {
