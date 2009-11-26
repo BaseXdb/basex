@@ -25,6 +25,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class MAB2Parser extends Parser {
+  /** Encoding of MAB2 input. */
+  private static final String ENCODING = "iso-8859-1";
   /** Temporary token builder. */
   private final TokenBuilder buffer = new TokenBuilder();
   /** Subject assignments. */
@@ -113,6 +115,9 @@ public final class MAB2Parser extends Parser {
 
   @Override
   public void parse(final Builder b) throws IOException {
+    // define input encoding
+    b.encoding(ENCODING);
+
     // read in indexes
     final String dir = io.getDir();
     index(mediatypes, dir + "/mediatypes.dat");
@@ -138,9 +143,6 @@ public final class MAB2Parser extends Parser {
         input.read1() != '#') {
       throw new BuildException("Invalid MAB2 input (doesn't start with ###)");
     }
-
-    b.encoding("ISO-8859-1");
-    //b.encoding(Prop.ENCODING);
 
     builder = b;
     builder.startDoc(token(io.name()));
@@ -387,31 +389,31 @@ public final class MAB2Parser extends Parser {
 
         // add line below to omit root nodes
         builder.startElem(MEDIUM, atts);
-        addTag(TYPE, type);
-        addTag(LANGUAGE, language);
-        for(int s = 0; s < nrPers; s++) addTag(PERSON, pers[s]);
-        for(int s = 0; s < nrInst; s++) addTag(INSTITUTE, inst[s]);
-        addTag(ORIGINAL, original);
-        addTag(TITLE, title);
-        addTag(SUBTITLE, subtitle);
-        addTag(DESCRIPTION, description);
-        addTag(TOWN, town);
-        addTag(PUBLISHER, publisher);
-        addTag(YEAR, year);
-        addTag(FORMAT, format);
-        addTag(DETAILS, details);
-        addTag(NOTE, note);
-        for(int s = 0; s < nrSigs; s++) addTag(SIGNATURE, sig[s]);
+        add(TYPE, type);
+        add(LANGUAGE, language);
+        for(int s = 0; s < nrPers; s++) add(PERSON, pers[s]);
+        for(int s = 0; s < nrInst; s++) add(INSTITUTE, inst[s]);
+        add(ORIGINAL, original);
+        add(TITLE, title);
+        add(SUBTITLE, subtitle);
+        add(DESCRIPTION, description);
+        add(TOWN, town);
+        add(PUBLISHER, publisher);
+        add(YEAR, year);
+        add(FORMAT, format);
+        add(DETAILS, details);
+        add(NOTE, note);
+        for(int s = 0; s < nrSigs; s++) add(SIGNATURE, sig[s]);
         // actually: several subjects/lending numbers per medium..
         for(int s = 0; s < nrSigs; s++) {
           if(subject == null) subject = subjects.get(subject(sig[s]));
         }
-        addTag(SUBJECT, subject);
-        addTag(ISBN, isbn);
-        addTag(POSTER, posters.get(bibID));
-        addTag(GENRE, genres.get(mvID));
-        addTag(STATUS, status.get(bibID));
-        addTag(LENDINGS, lendings.get(bibID));
+        add(SUBJECT, subject);
+        add(ISBN, isbn);
+        add(POSTER, posters.get(bibID));
+        add(GENRE, genres.get(mvID));
+        add(STATUS, status.get(bibID));
+        add(LENDINGS, lendings.get(bibID));
         if(sb == 0 || flat) builder.endElem(MEDIUM);
         return title;
       }
@@ -424,8 +426,9 @@ public final class MAB2Parser extends Parser {
    * @param cont content to be added
    * @throws IOException I/O exception
    */
-  private void addTag(final byte[] tag, final byte[] cont) throws IOException {
-    if(cont != null) builder.nodeAndText(tag, atts.reset(), cont);
+  private void add(final byte[] tag, final byte[] cont) throws IOException {
+    if(cont == null) return;
+    builder.nodeAndText(tag, atts.reset(), utf8(cont, ENCODING));
   }
 
   /**

@@ -44,17 +44,8 @@ public final class Nodes implements Result {
    * @param r root flag (all nodes will refer to root documents)
    */
   public Nodes(final Data d, final boolean r) {
-    this(r ? d.doc() : new int[] {}, d, Prop.gui ? new FTPosData() : null);
+    this(r ? d.doc() : new int[] {}, d);
     doc = r;
-  }
-
-  /**
-   * Node Set constructor.
-   * @param d data reference
-   * @param ft ft position data
-   */
-  public Nodes(final Data d, final FTPosData ft) {
-    this(new int[] {}, d, ft);
   }
 
   /**
@@ -81,7 +72,7 @@ public final class Nodes implements Result {
    * @param d data reference
    * @param ft ft position data
    */
-  private Nodes(final int[] n, final Data d, final FTPosData ft) {
+  public Nodes(final int[] n, final Data d, final FTPosData ft) {
     data = d;
     ftpos = ft;
     set(n);

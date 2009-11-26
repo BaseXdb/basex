@@ -25,7 +25,16 @@ public final class Export extends Proc {
    * @param path export path
    */
   public Export(final String path) {
-    super(DATAREF | User.READ | User.ADMIN, path);
+    this(path, null);
+  }
+
+  /**
+   * Default constructor, specifying an optional output filename.
+   * @param path export path
+   * @param name optional name of output file
+   */
+  public Export(final String path, final String name) {
+    super(DATAREF | User.READ | User.ADMIN, path, name);
   }
 
   @Override
@@ -36,8 +45,8 @@ public final class Export extends Proc {
       final IO io = IO.get(args[0]);
       if(docs.length != 1) io.md();
       for(final int pre : docs) {
-        final IO file = docs.length == 1 ? io :
-          io.merge(IO.get(Token.string(data.text(pre))));
+        final IO file = io.merge(IO.get(docs.length == 1 && args[1] != null ?
+            args[1] : Token.string(data.text(pre))));
 
         final PrintOutput po = new PrintOutput(file.path());
         final XMLSerializer xml = new XMLSerializer(po, false,

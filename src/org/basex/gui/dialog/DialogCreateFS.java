@@ -108,7 +108,6 @@ public final class DialogCreateFS extends Dialog {
         action(null);
       }
     });
-    BaseXLayout.setWidth(path, 240);
     p.add(path);
 
     all = new BaseXCheckBox(IMPORTALL, gprop.is(GUIProp.FSALL), this);
@@ -121,7 +120,7 @@ public final class DialogCreateFS extends Dialog {
     });
     p.add(all);
 
-    final BaseXLabel lab1 = new BaseXLabel(CREATEFSNAME, false, true);
+    final BaseXLabel lab1 = new BaseXLabel(CREATENAME, false, true);
     lab1.setBorder(new EmptyBorder(4, 4, 4, 0));
     p.add(lab1);
     p.add(new BaseXLabel(""));
@@ -133,7 +132,6 @@ public final class DialogCreateFS extends Dialog {
         action(null);
       }
     });
-    BaseXLayout.setWidth(dbname, 240);
     p.add(dbname);
     p1.add(p);
 

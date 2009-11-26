@@ -138,7 +138,6 @@ public final class Prop extends AProp {
   public static final Object[] FTSCTYPE = { "FTSCTYPE", 1 };
   /** Flag for full-text stopword list. */
   public static final Object[] FTSTOPW = { "FTSTOPW", ""};
-  
 
   /** Levenshtein default error. */
   public static final Object[] LSERR = { "LSERR", 0 };

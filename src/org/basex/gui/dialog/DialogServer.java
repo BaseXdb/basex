@@ -110,7 +110,7 @@ public final class DialogServer extends Dialog {
     loguser.addKeyListener(keys);
     logpass = new JPasswordField(gui.prop.get(GUIProp.SERVERPASS));
     logpass.addKeyListener(keys);
-    BaseXLayout.setWidth(logpass, 200);
+    BaseXLayout.setWidth(logpass, BaseXTextField.TWIDTH);
     info = new BaseXLabel(" ");
     info.setBorder(8, 0, 0, 0);
 

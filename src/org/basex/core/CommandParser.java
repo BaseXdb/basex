@@ -173,7 +173,7 @@ public final class CommandParser extends InputParser {
       case OPTIMIZE:
         return new Optimize();
       case EXPORT:
-        return new Export(string(cmd));
+        return new Export(string(cmd), string(null));
       case XQUERY: case X:
         return new XQuery(xquery(cmd));
       case RUN:

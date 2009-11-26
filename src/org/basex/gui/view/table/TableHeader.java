@@ -50,10 +50,6 @@ final class TableHeader extends BaseXPanel {
   private int moveC = -1;
   /** Moved X position. */
   private int mouseX = -1;
-  /** Shift flag. */
-  private boolean shift;
-  /** Alt flag. */
-  private boolean alt;
 
   /**
    * Constructor.
@@ -70,8 +66,14 @@ final class TableHeader extends BaseXPanel {
     addKeyListener(this);
     // restore default focus traversal with TAB key
     setFocusTraversalKeysEnabled(false);
+    setFocusable(true);
 
     addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(final FocusEvent e) {
+        filter(e.getOppositeComponent() instanceof TableView ? 0 : 
+          tdata.cols.length - 1);
+      }
       @Override
       public void focusLost(final FocusEvent e) {
         // tab key pressed..
@@ -354,7 +356,7 @@ final class TableHeader extends BaseXPanel {
    * Handles the filter columns.
    * @param col current column
    */
-  private void filter(final int col) {
+  void filter(final int col) {
     // activate table filter
     if(inputCol != col) {
       if(box != null) box.stop();
@@ -377,8 +379,8 @@ final class TableHeader extends BaseXPanel {
   public void keyPressed(final KeyEvent e) {
     if(tdata.roots.size() == 0) return;
 
-    shift = e.isShiftDown();
-    alt = e.isAltDown();
+    final boolean shift = e.isShiftDown();
+    final boolean alt = e.isAltDown();
     if(box == null && alt || inputCol == -1) return;
 
     final int c = e.getKeyCode();
@@ -392,9 +394,15 @@ final class TableHeader extends BaseXPanel {
         tdata.cols[inputCol].filter = box.text;
         box.stop();
       }
-      inputCol = (inputCol + (shift ? -1 : 1)) % tdata.cols.length;
-      if(inputCol == -1) inputCol = tdata.cols.length - 1;
-      box = new TableInput(TableHeader.this, tdata.cols[inputCol].filter);
+      final int in = inputCol + (shift ? -1 : 1);
+      if(in < 0) {
+        transferFocusBackward();
+      } else if(in == tdata.cols.length) {
+        transferFocus();
+      } else {
+        inputCol = in;
+        box = new TableInput(TableHeader.this, tdata.cols[inputCol].filter);
+      }
     } else {
       box.code(c);
     }
@@ -404,8 +412,6 @@ final class TableHeader extends BaseXPanel {
   @Override
   public void keyReleased(final KeyEvent e) {
     if(tdata.roots == null || tdata.roots.size() == 0) return;
-    shift = e.isShiftDown();
-    alt = e.isAltDown();
   }
 }
 

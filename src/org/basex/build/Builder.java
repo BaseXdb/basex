@@ -190,7 +190,7 @@ public abstract class Builder extends Progress {
   public final void startDoc(final byte[] doc) throws IOException {
     parStack[level++] = meta.size;
     if(meta.pathindex) path.add(0, level, Data.DOC);
-    addDoc(utf8(doc, Prop.ENCODING));
+    addDoc(doc);
   }
 
   /**
@@ -224,8 +224,8 @@ public abstract class Builder extends Progress {
    */
   public final int startElem(final byte[] tag, final Atts att)
       throws IOException {
-    final int pre = addElem(tag, att);
 
+    final int pre = addElem(tag, att);
     if(meta.height < ++level) meta.height = level;
     return pre;
   }
@@ -254,9 +254,8 @@ public abstract class Builder extends Progress {
       throw new ProgressException();
     }
 
-    final byte[] t = utf8(tag, meta.encoding);
-    if(--level == 0 || tags.id(t) != tagStack[level])
-      error(CLOSINGTAG, parser.det(), t, tags.key(tagStack[level]));
+    if(--level == 0 || tags.id(tag) != tagStack[level])
+      error(CLOSINGTAG, parser.det(), tag, tags.key(tagStack[level]));
 
     final int pre = parStack[level];
     setSize(pre, meta.size - pre);
@@ -345,15 +344,12 @@ public abstract class Builder extends Progress {
 
   /**
    * Adds an element node to the storage.
-   * @param name tag name
+   * @param tag tag name
    * @param att attributes
    * @return pre value of the created node
    * @throws IOException I/O exception
    */
-  private int addElem(final byte[] name, final Atts att) throws IOException {
-    // convert tag to utf8
-    final byte[] tag = utf8(name, meta.encoding);
-
+  private int addElem(final byte[] tag, final Atts att) throws IOException {
     // get tag reference
     final int tid = tags.index(tag, null, true);
 
@@ -426,8 +422,7 @@ public abstract class Builder extends Progress {
   private void addText(final TokenBuilder txt, final byte kind)
       throws IOException {
 
-    final byte[] t = utf8(txt.finish(), meta.encoding);
-
+    final byte[] t = txt.finish();
     // text node processing for statistics
     if(kind == Data.TEXT) tags.index(tagStack[level - 1], t);
     if(meta.pathindex) path.add(0, level, kind);

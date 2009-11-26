@@ -48,14 +48,14 @@ public final class XMLScanner extends Progress {
   }
 
   /** Character buffer for the current token. */
-  TokenBuilder token = new TokenBuilder();
+  final TokenBuilder token = new TokenBuilder();
+  /** Document encoding. */
+  String encoding = UTF8;
   /** Current token type. */
   Type type;
   /** Whitespace flag. */
   boolean ws;
 
-  /** Document encoding (currently not used). */
-  String encoding = UTF8;
   /** Index for all entity names. */
   private final TokenMap ents;
   /** Index for all PEReferences. */

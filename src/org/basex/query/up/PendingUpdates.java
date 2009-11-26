@@ -117,7 +117,8 @@ public final class PendingUpdates {
     }
     
     // apply updates if validation finds no errors
-    for(final Data d : primitives.keySet().toArray(new Data[primitives.size()])) {
+    for(final Data d : primitives.keySet().toArray(
+        new Data[primitives.size()])) {
       primitives.get(d).apply();
       d.flush();
     }

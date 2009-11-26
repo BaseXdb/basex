@@ -195,7 +195,8 @@ public final class Find extends AQuery {
         tb.add('[');
 
         final boolean elm = elem.get(i);
-        if(!elm) tb.add('@');
+        tb.add(elm ? ".//" : "@");
+        //if(!elm) tb.add('@');
         tb.add(cols.get(i));
 
         if(term[0] == '<' || term[0] == '>') {

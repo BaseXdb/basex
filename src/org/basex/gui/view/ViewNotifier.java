@@ -160,7 +160,7 @@ public final class ViewNotifier {
    */
   public void context(final Nodes nodes, final boolean quick, final View vw) {
     final Context context = gui.context;
-    final Nodes n = new Nodes(context.data, context.marked.ftpos);
+    final Nodes n = new Nodes(new int[] {}, context.data, context.marked.ftpos);
 
     if(!cont[hist].same(quick ? context.current : context.marked)) {
       if(!quick) {

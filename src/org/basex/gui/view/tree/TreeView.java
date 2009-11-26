@@ -128,38 +128,38 @@ public final class TreeView extends View {
   }
 
   @Override
-  protected void refreshContext(final boolean more, final boolean quick) {
+  public void refreshContext(final boolean more, final boolean quick) {
     wwidth = -1;
     wheight = -1;
     repaint();
   }
 
   @Override
-  protected void refreshFocus() {
+  public void refreshFocus() {
     refreshedFocus = true;
     repaint();
   }
 
   @Override
-  protected void refreshInit() {
+  public void refreshInit() {
     wwidth = -1;
     wheight = -1;
     repaint();
   }
 
   @Override
-  protected void refreshLayout() {
+  public void refreshLayout() {
     if(gui.context.data != null) repaint();
   }
 
   @Override
-  protected void refreshMark() {
+  public void refreshMark() {
     refreshedMark = true;
     repaint();
   }
 
   @Override
-  protected void refreshUpdate() {
+  public void refreshUpdate() {
     repaint();
   }
 

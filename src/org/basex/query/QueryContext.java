@@ -277,16 +277,11 @@ public final class QueryContext extends Progress {
       }
 
       // completed... return standard nodeset with full-text positions
-      if(i == null) {
-        final Nodes n = new Nodes(pre.finish(), data);
-        n.ftpos = ftpos;
-        return n;
-      }
+      if(i == null) return new Nodes(pre.finish(), data, ftpos);
 
-      // add nodes to standard iterator
+      // otherwise, add nodes to standard iterator
       final int ps = pre.size();
-      for(int p = 0; p < ps; p++)
-        ir.add(new DBNode(data, pre.get(p)));
+      for(int p = 0; p < ps; p++) ir.add(new DBNode(data, pre.get(p)));
       ir.add(i);
     }
 

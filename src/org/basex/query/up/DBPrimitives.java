@@ -14,7 +14,7 @@ import org.basex.util.IntList;
  */
 public final class DBPrimitives extends Primitives {
   /**
-   * Constructor
+   * Constructor.
    */
   public DBPrimitives() {
     super();

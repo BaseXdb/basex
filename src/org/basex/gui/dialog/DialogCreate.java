@@ -95,7 +95,6 @@ public final class DialogCreate extends Dialog {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
     });
-    BaseXLayout.setWidth(path, 240);
     p.add(path);
 
     final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
@@ -116,7 +115,6 @@ public final class DialogCreate extends Dialog {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
     });
-    BaseXLayout.setWidth(dbname, 240);
     p.add(dbname);
 
     filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
@@ -203,7 +201,6 @@ public final class DialogCreate extends Dialog {
     final BaseXBack b2 = new BaseXBack();
     b2.setLayout(new TableLayout(1, 3, 6, 0));
     ftswlpath = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
-    BaseXLayout.setWidth(ftswlpath, 240);
     ftswlpath.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -265,7 +262,6 @@ public final class DialogCreate extends Dialog {
       ftswlpath.setText(file.path());
     }
   }
-
 
   /**
    * Returns the chosen XML file or directory path.

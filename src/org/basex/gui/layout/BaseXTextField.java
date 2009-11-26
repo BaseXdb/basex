@@ -16,6 +16,8 @@ import javax.swing.JTextField;
  * @author Christian Gruen
  */
 public class BaseXTextField extends JTextField {
+  /** Default width of text fields. */
+  public static final int TWIDTH = 240;
   /** Last Input. */
   String last = "";
   /** Button help. */
@@ -35,7 +37,7 @@ public class BaseXTextField extends JTextField {
    * @param win parent window
    */
   public BaseXTextField(final String txt, final Window win) {
-    BaseXLayout.setWidth(this, 200);
+    BaseXLayout.setWidth(this, TWIDTH);
     BaseXLayout.addInteraction(this, null, win);
 
     if(txt != null) {

@@ -17,7 +17,6 @@ import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
@@ -84,7 +83,6 @@ public final class DialogPrefs extends Dialog {
       }
     });
 
-    BaseXLayout.setWidth(path, 280);
     p.add(path);
     p.add(button);
     pp.add(p);

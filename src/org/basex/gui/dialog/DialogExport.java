@@ -29,6 +29,8 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class DialogExport extends Dialog {
+  /** Available encodings. */
+  private static String[] encodings;
   /** Directory path. */
   private final BaseXTextField path;
   /** Directory/File flag. */
@@ -43,7 +45,7 @@ public final class DialogExport extends Dialog {
   private final BaseXCombo encoding;
   /** Buttons. */
   private final BaseXBack buttons;
-  
+
   /**
    * Default constructor.
    * @param main reference to the main window
@@ -71,7 +73,6 @@ public final class DialogExport extends Dialog {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
     });
-    BaseXLayout.setWidth(path, 240);
     p.add(path);
 
     final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
@@ -86,22 +87,31 @@ public final class DialogExport extends Dialog {
     p.add(new BaseXLabel(INFOENCODING + COL, false, true));
 
     final Prop prop = gui.context.prop;
-    final SortedMap<String, Charset> cs = Charset.availableCharsets();
-    final String[] encodings = cs.keySet().toArray(new String[cs.size()]);
+    if(encodings == null) {
+      final SortedMap<String, Charset> cs = Charset.availableCharsets();
+      encodings = cs.keySet().toArray(new String[cs.size()]);
+    }
     encoding = new BaseXCombo(encodings, this);
-    encoding.setSelectedItem(prop.get(Prop.XMLENCODING));
+    String enc = data.meta.encoding;
+    boolean f = false;
+    for(final String s : encodings) f |= s.equals(enc);
+    if(!f) {
+      enc = enc.toUpperCase();
+      for(final String s : encodings) f |= s.equals(enc);
+    }
+    encoding.setSelectedItem(f ? enc : prop.get(Prop.XMLENCODING));
     encoding.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
     });
-    BaseXLayout.setWidth(encoding, 240);
+    BaseXLayout.setWidth(encoding, BaseXTextField.TWIDTH);
     p.add(encoding);
     pp.add(p);
 
     format = new BaseXCheckBox(INDENT, prop.is(Prop.XMLFORMAT), 0, this);
     pp.add(format);
     set(pp, BorderLayout.CENTER);
-    
+
     // create buttons
     p = new BaseXBack();
     p.setLayout(new BorderLayout());
@@ -120,11 +130,8 @@ public final class DialogExport extends Dialog {
    * Opens a file dialog to choose an XML document or directory.
    */
   void choose() {
-    final BaseXFileChooser fc = new BaseXFileChooser(DIALOGFC, path.getText(),
-        gui);
-    //if(file) fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
-    final IO io = fc.select(file ? BaseXFileChooser.Mode.FOPEN :
-      BaseXFileChooser.Mode.DOPEN);
+    final IO io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).select(
+        file ? BaseXFileChooser.Mode.FOPEN : BaseXFileChooser.Mode.DOPEN);
     if(io != null) path.setText(io.path());
   }
 
@@ -135,13 +142,17 @@ public final class DialogExport extends Dialog {
   public String path() {
     return path.getText().trim();
   }
-  
+
+  /**
+   * Indicates if the specified path is a file or directory.
+   * @return result of check
+   */
+  public boolean file() {
+    return file;
+  }
+
   @Override
   public void action(final String cmd) {
-    final Prop prop = gui.context.prop;
-    prop.set(Prop.XMLFORMAT, format.isSelected());
-    prop.set(Prop.XMLENCODING, encoding.getSelectedItem().toString());
-
     out.setText((file ? OUTFILE : OUTDIR) + COL);
     final IO io = IO.get(path());
     final boolean empty = path().isEmpty();
@@ -149,9 +160,17 @@ public final class DialogExport extends Dialog {
     ok = !empty && (file && (!exists || !io.isDir()) ||
         !file && (!exists || io.isDir()));
 
-    String inf = ok && file && exists ? OVERFILE : !ok && !empty ?
-        INVPATH : null;
-    info.setError(inf, ok);
+    info.setError(ok && file && exists ? OVERFILE : !ok && !empty ?
+        INVPATH : null, ok);
     enableOK(buttons, BUTTONOK, ok);
+  }
+
+  @Override
+  public void close() {
+    if(!ok) return;
+    super.close();
+    final Prop prop = gui.context.prop;
+    prop.set(Prop.XMLFORMAT, format.isSelected());
+    prop.set(Prop.XMLENCODING, encoding.getSelectedItem().toString());
   }
 }

@@ -56,7 +56,7 @@ abstract class FTBuilder extends IndexBuilder {
     super(d);
     scm = pr.num(Prop.FTSCTYPE);
     wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr);
-    
+
     max = -1;
     min = Integer.MAX_VALUE;
     sw = new StopWords(d, pr.get(Prop.FTSTOPW));
@@ -89,11 +89,11 @@ abstract class FTBuilder extends IndexBuilder {
       token = 0;
       getFreq();
     }
-    
+
     // normalization
     token = 0;
     write();
-    
+
     if(Prop.debug) {
       Performance.gc(4);
       Main.debug("Memory: " + Performance.getMem());

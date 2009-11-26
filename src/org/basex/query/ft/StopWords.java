@@ -18,7 +18,7 @@ import org.basex.util.TokenSet;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class StopWords extends TokenSet {  
+public final class StopWords extends TokenSet {
   /**
    * Default Constructor.
    */
@@ -27,14 +27,14 @@ public final class StopWords extends TokenSet {
   /**
    * Constructor, reading an existing database stopword file.
    * @param dat data reference
-   * @throws IOException IOExcetion 
+   * @throws IOException IOExcetion
    */
   public StopWords(final Data dat) throws IOException {
     read(new DataInput(getFile(dat)));
   }
- 
+
   /**
-   * Constructor, reading stopwordlist from disk. 
+   * Constructor, reading stopwordlist from disk.
    * And creating database stopword file.
    * @param dat data reference
    * @param file stopword list file
@@ -66,7 +66,7 @@ public final class StopWords extends TokenSet {
     size = in.readNum();
     in.close();
   }
-  
+
   /**
    * Writes database stopword list to disk.
    * @param out output stream
@@ -83,13 +83,12 @@ public final class StopWords extends TokenSet {
   /**
    * Checks if a token is contained in the stopword list.
    * @param tok token looking for
-   * @return result 
+   * @return result
    */
   public boolean contains(final byte[] tok) {
-    if (size == 0) return false;
-    return id(tok) > 0;
+    return size != 0 && id(tok) > 0;
   }
-  
+
   /**
    * Reads a stop words file.
    * @param fl file reference
@@ -99,10 +98,8 @@ public final class StopWords extends TokenSet {
   public boolean read(final IO fl, final boolean e) {
     try {
       final byte[] content = norm(fl.content());
-      byte s;
-      if (Token.contains(content, ' ')) s = ' ';
-      else s = '\n'; 
-      
+      final int s = Token.contains(content, ' ') ? ' ' : '\n';
+
       for(final byte[] sl : split(content, s)) {
         if(e) delete(sl);
         else if(id(sl) == 0) add(sl);

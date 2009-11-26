@@ -802,7 +802,7 @@ public final class PlotView extends View implements Runnable {
   }
 
   @Override
-  protected void refreshContext(final boolean more, final boolean quick) {
+  public void refreshContext(final boolean more, final boolean quick) {
     // all plot data is recalculated, assignments stay the same
     plotData.refreshItems(nextContext != null && more && rightClick ?
         nextContext : gui.context.current, !more || !rightClick);
@@ -820,12 +820,12 @@ public final class PlotView extends View implements Runnable {
   }
 
   @Override
-  protected void refreshFocus() {
+  public void refreshFocus() {
     repaint();
   }
 
   @Override
-  protected void refreshInit() {
+  public void refreshInit() {
     plotData = null;
 
     final Data data = gui.context.data;
@@ -848,7 +848,7 @@ public final class PlotView extends View implements Runnable {
   }
 
   @Override
-  protected void refreshLayout() {
+  public void refreshLayout() {
     itemImg = itemImage(false, false, false);
     itemImgMarked = itemImage(false, true, false);
     itemImgFocused = itemImage(true, false, false);
@@ -865,14 +865,14 @@ public final class PlotView extends View implements Runnable {
   }
 
   @Override
-  protected void refreshMark() {
+  public void refreshMark() {
     drawSubNodes = true;
     markingChanged = true;
     repaint();
   }
 
   @Override
-  protected void refreshUpdate() {
+  public void refreshUpdate() {
     refreshContext(false, true);
   }
 

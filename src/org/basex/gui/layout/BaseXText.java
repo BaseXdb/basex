@@ -62,6 +62,7 @@ public class BaseXText extends BaseXPanel {
   public BaseXText(final boolean edit, final Window win) {
     super(win);
     setFocusable(true);
+    setFocusTraversalKeysEnabled(false);
 
     BaseXLayout.addInteraction(this, null, win);
     addMouseMotionListener(this);
@@ -325,6 +326,12 @@ public class BaseXText extends BaseXPanel {
     final boolean ctrl = (Toolkit.getDefaultToolkit().
         getMenuShortcutKeyMask() & e.getModifiers()) != 0;
 
+    // traverse focus to next/previous panel if ctrl-tab was pressed..  
+    if(c == KeyEvent.VK_TAB && ctrl) {
+      if(shf) transferFocusBackward();
+      else transferFocus();
+      return;
+    }
     if(ctrl && c == 'F') {
       if(find != null) find.requestFocusInWindow();
       return;

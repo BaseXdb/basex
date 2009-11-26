@@ -69,7 +69,7 @@ public final class XMLSerializer extends Serializer {
     print(PI2);
     print(NL);
   }
-  
+
   /**
    * Doctype declaration.
    * @param t document root element tag

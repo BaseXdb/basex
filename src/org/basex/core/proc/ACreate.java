@@ -30,7 +30,7 @@ import org.basex.index.ValueBuilder;
 abstract class ACreate extends Proc {
   /** Builder instance. */
   private Builder builder;
-  
+
   /**
    * Protected constructor.
    * @param p command properties
@@ -90,7 +90,6 @@ abstract class ACreate extends Proc {
     }
   }
 
-  
   /**
    * Builds the indexes.
    * @param data data reference

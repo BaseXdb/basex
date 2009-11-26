@@ -227,7 +227,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPEXPORT = {
-    "[" + PATH + "]", lang("ch_export1"), lang("ch_export2", PATH)
+    "[" + PATH + "] [" + NAM + "?]", lang("ch_export1"),
+    lang("ch_export2", PATH)
   };
   /** Command help. */
   String[] HELPOPTIMIZE = {
@@ -1040,8 +1041,6 @@ public interface Text {
   String CREATEFSPROG = "Traversing filesystem...";
   /** Dialog title for import options. */
   String CREATEFSTITLE = lang("dfs_newtitle");
-  /** Dialog title for creating a filesystem database. */
-  String CREATEFSNAME = lang("dfs_name") + COLS;
   /** Import options. */
   String IMPORTALL = lang("dfs_all");
   /** Import options. */

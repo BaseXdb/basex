@@ -37,35 +37,35 @@ public abstract class View extends BaseXPanel {
   /**
    * Called when the data reference has changed.
    */
-  protected abstract void refreshInit();
+  public abstract void refreshInit();
 
   /**
    * Called when a new focus has been chosen.
    */
-  protected abstract void refreshFocus();
+  public abstract void refreshFocus();
 
   /**
    * Called when a context set has been
    * marked.
    */
-  protected abstract void refreshMark();
+  public abstract void refreshMark();
 
   /**
    * Called when a new context set has been chosen.
    * @param more show more details
    * @param quick perform a quick context switch
    */
-  protected abstract void refreshContext(boolean more, boolean quick);
+  public abstract void refreshContext(boolean more, boolean quick);
 
   /**
    * Called when GUI design has changed.
    */
-  protected abstract void refreshLayout();
+  public abstract void refreshLayout();
 
   /**
    * Called when updates have been done in the data structure.
    */
-  protected abstract void refreshUpdate();
+  public abstract void refreshUpdate();
 
   /**
    * Returns if this view is currently visible.

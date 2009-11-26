@@ -164,28 +164,17 @@ public final class XQueryView extends View {
     sp.add(filter);
     south.add(sp, BorderLayout.EAST);
     add(south, BorderLayout.SOUTH);
-
     refreshLayout();
   }
 
   @Override
-  protected void refreshContext(final boolean more, final boolean quick) { }
+  public void refreshInit() { }
 
   @Override
-  protected void refreshFocus() { }
+  public void refreshFocus() { }
 
   @Override
-  protected void refreshInit() { }
-
-  @Override
-  protected void refreshLayout() {
-    header.setFont(GUIConstants.lfont);
-    text.setFont(GUIConstants.mfont);
-    refreshMark();
-  }
-
-  @Override
-  protected void refreshMark() {
+  public void refreshMark() {
     go.setEnabled(!gui.prop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked;
     filter.setEnabled(!gui.prop.is(GUIProp.FILTERRT) &&
@@ -193,8 +182,17 @@ public final class XQueryView extends View {
   }
 
   @Override
-  protected void refreshUpdate() {
+  public void refreshContext(final boolean more, final boolean quick) { }
+
+  @Override
+  public void refreshLayout() {
+    header.setFont(GUIConstants.lfont);
+    text.setFont(GUIConstants.mfont);
+    refreshMark();
   }
+
+  @Override
+  public void refreshUpdate() { }
 
   @Override
   public boolean visible() {
