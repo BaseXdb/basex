@@ -26,8 +26,6 @@ public final class InsertAttribute extends NodeCopy {
 
   @Override
   public void apply(final int add) {
-    if(!(node instanceof DBNode)) return;
-
     if(m == null) return;
     final DBNode n = (DBNode) node;
     final Data d = n.data;

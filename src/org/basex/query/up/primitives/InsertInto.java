@@ -31,8 +31,6 @@ public final class InsertInto extends NodeCopy {
 
   @Override
   public void apply(final int add) {
-    if(!(node instanceof DBNode)) return;
-
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pos = n.pre + d.size(n.pre, Nod.kind(node.type)) + add;

@@ -27,10 +27,5 @@ public class FragmentPrimitives extends Primitives {
   }
   
   @Override
-  public void check() {
-  }
-
-  @Override
-  public void apply() {
-  }
+  public void apply() { };
 }

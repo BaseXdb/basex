@@ -69,7 +69,7 @@ public abstract class Primitives {
   /**
    * Checks updates for violations.
    */
-  public abstract void check();
+  public void check() { };
 
   /**
    * Checks constraints and applies all updates to the databases.

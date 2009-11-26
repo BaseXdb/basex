@@ -34,8 +34,6 @@ public abstract class NodeCopy extends UpdatePrimitive {
 
   @Override
   public void prepare() throws QueryException {
-    if(!(node instanceof DBNode)) return;
-
     if(c.size() == 0) return;
     final NodIter seq = new NodIter();
     final Iterator<NodIter> it = c.iterator();

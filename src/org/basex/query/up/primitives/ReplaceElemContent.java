@@ -32,7 +32,6 @@ public final class ReplaceElemContent extends UpdatePrimitive {
 
   @Override
   public void apply(final int add) {
-    if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;

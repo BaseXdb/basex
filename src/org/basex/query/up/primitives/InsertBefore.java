@@ -23,8 +23,6 @@ public final class InsertBefore extends NodeCopy {
 
   @Override
   public void apply(final int add) {
-    if(!(node instanceof DBNode)) return;
-
     // source nodes may be empty, thus insert has no effect at all
     if(m == null) return;
     final DBNode n = (DBNode) node;

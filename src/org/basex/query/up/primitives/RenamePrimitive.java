@@ -34,7 +34,6 @@ public final class RenamePrimitive extends NewValue {
 
   @Override
   public void apply(final int add) {
-    if(!(node instanceof DBNode)) return;
     final DBNode n = (DBNode) node;
     rename(n.pre, name, n.data);
   }

@@ -29,10 +29,6 @@ public final class DBPrimitives extends Primitives {
     nodes = il.finish();
     finished = true;
   }
-  
-  @Override
-  public void check() {
-  }
 
   /**
    * Checks constraints and applies all updates to the databases.

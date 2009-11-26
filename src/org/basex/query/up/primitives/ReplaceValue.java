@@ -28,8 +28,6 @@ public final class ReplaceValue extends NewValue {
 
   @Override
   public void apply(final int add) {
-    if(!(node instanceof DBNode)) return;
-
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int k = d.kind(n.pre);
