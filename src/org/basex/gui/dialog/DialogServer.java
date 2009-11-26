@@ -2,9 +2,14 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.BindException;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import org.basex.BaseXServer;
 import org.basex.core.Context;
@@ -16,6 +21,7 @@ import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
+import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
@@ -46,6 +52,8 @@ public final class DialogServer extends Dialog {
   private final DialogUser user = new DialogUser(true, this, gui);
   /** Sessions/Databases panel. */
   private final BaseXBack sedb = new BaseXBack();
+  /** Log panel. */
+  private final BaseXBack logs = new BaseXBack();
   /** Stop button. */
   private final BaseXButton stop;
   /** Start button. */
@@ -56,12 +64,20 @@ public final class DialogServer extends Dialog {
   private final BaseXButton disconnect;
   /** Refresh button. */
   private final BaseXButton refresh;
+  /** Shows log file. */
+  private final BaseXButton show;
+  /** Deletes log file. */
+  private final BaseXButton delete;
+  /** Deletes all log files. */
+  private final BaseXButton deleteAll;
   /** Server host. */
   private final BaseXTextField host;
   /** Local server port. */
   private final BaseXTextField ports;
   /** Server port. */
   private final BaseXTextField portc;
+  /** Log text. */
+  private final JTextArea logt;
   /** Change button. */
   private final BaseXTabs tabs;
   /** Username textfield. */
@@ -70,6 +86,14 @@ public final class DialogServer extends Dialog {
   private final JPasswordField logpass;
   /** Info label. */
   private final BaseXLabel info;
+  /** Info label. */
+  private final BaseXLabel info2;
+  /** Combobox for log files. */
+  private final BaseXCombo logc;
+  /** Scrollpane for log panel. */
+  private final JScrollPane scroll;
+  /** String for log dir. */
+  private final String logdir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
 
   /** Boolean for check is server is running. */
   private boolean running;
@@ -92,6 +116,7 @@ public final class DialogServer extends Dialog {
     tabs.add(SERVERN, conn);
     tabs.add(USERS, user);
     tabs.add(SESSIONS + "/" + DATABASES, sedb);
+    tabs.add("Logs", logs);
 
     start = new BaseXButton(BUTTONSTASERV, this);
     stop = new BaseXButton(BUTTONSTOSERV, this);
@@ -150,6 +175,31 @@ public final class DialogServer extends Dialog {
     conn.add(new BaseXLabel(LOGIN + COLS, false, true));
     conn.add(p2);
     conn.add(info);
+    
+    logc = new BaseXCombo(new String[] {}, this);
+    logFiles();
+    logt = new JTextArea();
+    logs.setLayout(new TableLayout(3, 1, 2, 2));
+    final BaseXBack pl1 = new BaseXBack();
+    show = new BaseXButton("Show", this);
+    delete = new BaseXButton("Delete", this);
+    deleteAll = new BaseXButton("Delete All", this);
+    pl1.add(logc);
+    pl1.add(show);
+    pl1.add(delete);
+    pl1.add(deleteAll);
+    logs.add(pl1);
+    info2 = new BaseXLabel(" ");
+    info2.setBorder(8, 0, 0, 0);
+    final BaseXBack pl2 = new BaseXBack();
+    scroll = new JScrollPane();
+    scroll.setViewportView(logt);
+    scroll.setPreferredSize(new Dimension(420, 240));
+    scroll.setVisible(false);
+    pl2.add(scroll);
+    logs.add(pl2);
+    logs.add(info2);
+    
     set(tabs, BorderLayout.CENTER);
 
     // test if server is running
@@ -177,6 +227,7 @@ public final class DialogServer extends Dialog {
   @Override
   public void action(final String cmd) {
     String msg = null;
+    String msg2 = null;
 
     try {
       if(BUTTONSTASERV.equals(cmd)) {
@@ -212,6 +263,32 @@ public final class DialogServer extends Dialog {
         connected = false;
       } else if(BUTTONREFRESH.equals(cmd)) {
         fillsedb();
+      } else if("Show".equals(cmd)) {
+        FileReader fread = new FileReader(logdir + logc.
+            getSelectedItem().toString());
+        logt.read(fread, logc.getSelectedItem().toString());
+        fread.close();
+        scroll.setVisible(true);
+        logs.validate();
+      } else if("Delete".equals(cmd)) {
+        File f = new File(logdir + logc.getSelectedItem().toString());
+        if(f.delete()) {
+        logFiles();
+        scroll.setVisible(false);
+        logs.validate();
+        } else {
+          msg2 = "Delete not possible";
+        }
+      } else if("Delete All".equals(cmd)) {
+        boolean d = false;
+        for(int i = 0; i < logc.getItemCount(); i++) {
+          File f = new File(logdir + logc.getItemAt(i).toString());
+          d = f.delete();
+        }
+        if(!d) msg2 = "Delete of all logs not possible";
+        logFiles();
+        scroll.setVisible(false);
+        logs.validate();
       } else if(connected) {
         user.action(cmd);
       }
@@ -231,14 +308,14 @@ public final class DialogServer extends Dialog {
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
     boolean warn = true;
-    if(msg != null) {
+    if(msg != null || msg2 != null) {
       warn = false;
     } else if(!(valpl && valh && valp && vallu && vallp)) {
       msg = Main.info(INVALID, !valpl ? LOCALPORT : !valh ? HOST :
         !valp ? PORT : !vallu ? SERVERUSER : SERVERPW);
     }
     info.setError(msg, warn);
-
+    info2.setError(msg2, warn);
     ports.setEnabled(!running);
     start.setEnabled(!running && valpl);
     stop.setEnabled(running);
@@ -251,6 +328,9 @@ public final class DialogServer extends Dialog {
     disconnect.setEnabled(connected);
     tabs.setEnabledAt(1, connected);
     tabs.setEnabledAt(2, connected);
+    show.setEnabled(logc.getSelectedIndex() != -1);
+    delete.setEnabled(logc.getSelectedIndex() != -1);
+    deleteAll.setEnabled(logc.getItemCount() > 0);
     ctx.prop.write();
   }
 
@@ -290,6 +370,18 @@ public final class DialogServer extends Dialog {
     dbs.add(text1);
     sedb.add(dbs);
     sedb.add(refresh);
+  }
+  
+  /**
+   * Fills combobox with all log files.
+   */
+  private void logFiles() {
+    logc.removeAllItems();
+    File f = new File(logdir);
+    for(String s : f.list()) {
+    logc.addItem(s);
+    }
+    logc.setSelectedIndex(-1);
   }
 
   @Override
