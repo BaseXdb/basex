@@ -138,6 +138,9 @@ public enum MetaElem {
   RIGHTS(NS.DCTERMS, "rights", Type.STR, false),
   /** Software. */
   SOFTWARE(NS.FSMETA, "software", Type.STR, false),
+  /** White point. */
+  // [BL] whitePoint data type
+  WHITE_POINT(NS.FSMETA, "whitePoint", Type.STR, false),
 
   // ----- location -----
   /** City. */

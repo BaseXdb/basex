@@ -24,11 +24,6 @@ import org.deepfs.fsml.util.ParserUtil;
  */
 public final class ExifParser {
 
-  /** Image orientation viewed in terms of rows and columns. */
-  static final byte[][] ORIENTATION = bytes("", "top left", "top right",
-      "bottom right", "bottom left", "left top", "right top", "right bottom",
-      "left bottom");
-
   /**
    * Converts strings to byte arrays.
    * @param str string array
@@ -47,34 +42,48 @@ public final class ExifParser {
    */
   private enum Format {
     /** 8-bit unsigned integer. */
-    BYTE,
-
+    BYTE(1),
     /** 8-bit byte containing on 7-bit ASCII code (NULL-terminated). */
-    ASCII,
-
+    ASCII(1),
     /** 16-bit unsigned integer. */
-    SHORT,
-
+    SHORT(2),
     /** 32-bit unsigned integer. */
-    LONG,
-
+    LONG(4),
     /**
      * Two LONGs. The first LONG is the numerator and the second LONG expresses
      * the denominator.
      */
-    RATIONAL,
-
+    RATIONAL(8),
     /** 8-bit byte that can take any value depending on the field definition. */
-    UNDEFINED,
-
+    UNDEFINED(1),
     /** 32-bit signed integer (2's complement notation). */
-    SLONG,
-
+    SLONG(4),
     /**
      * two SLONGs, The first SLONG is the numerator and the second SLONG is the
      * denominator.
      */
-    SRATIONAL;
+    SRATIONAL(8),
+    /** Date (20 ASCII chars). */
+    DATE(20);
+    
+    /** The size in bytes. */
+    private final int size;
+    
+    /**
+     * Constructor.
+     * @param s the size in bytes.
+     */
+    private Format(final int s) {
+      size = s;
+    }
+    
+    /**
+     * Returns the size in bytes.
+     * @return the size in bytes.
+     */
+    int getSize() {
+      return size;
+    }
 
     /**
      * Returns the field format for a id.
@@ -83,28 +92,17 @@ public final class ExifParser {
      */
     static Format getForId(final int i) {
       switch(i) {
-        case 1:
-          return BYTE;
-        case 2:
-          return ASCII;
-        case 3:
-          return SHORT;
-        case 4:
-          return LONG;
-        case 5:
-          return RATIONAL;
-        case 6:
-          return null;
-        case 7:
-          return UNDEFINED;
-        case 8:
-          return null;
-        case 9:
-          return SLONG;
-        case 10:
-          return SRATIONAL;
-        default:
-          return null;
+        case 1:  return BYTE;
+        case 2:  return ASCII;
+        case 3:  return SHORT;
+        case 4:  return LONG;
+        case 5:  return RATIONAL;
+        case 6:  return null;
+        case 7:  return UNDEFINED;
+        case 8:  return null;
+        case 9:  return SLONG;
+        case 10: return SRATIONAL;
+        default: return null;
       }
     }
   }
@@ -119,151 +117,104 @@ public final class ExifParser {
    * @author Bastian Lemke
    */
   private enum Tag {
-
     /** Image width. */
-    h100(1, Format.SHORT, Format.LONG) {
+    h100(1, MetaElem.PIXEL_WIDTH, Format.SHORT, Format.LONG) {
       @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        final MetaElem elem = MetaElem.PIXEL_WIDTH;
-        if(o.deepFile.isMetaSet(elem)) return;
-        metaSimple(o, buf, f, elem);
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        if(d.isMetaSet(elem)) return;
+        metaSimple(d, b);
       }
     },
-
     /** Image length. */
-    h101(1, Format.SHORT, Format.LONG) {
+    h101(1, MetaElem.PIXEL_HEIGHT, Format.SHORT, Format.LONG) {
       @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        final MetaElem elem = MetaElem.PIXEL_HEIGHT;
-        if(o.deepFile.isMetaSet(elem)) return;
-        metaSimple(o, buf, f, elem);
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        if(d.isMetaSet(elem)) return;
+        metaSimple(d, b);
       }
     },
-
     /** Image description/title. */
-    h10e(null, Format.ASCII) {
-      @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        metaSimple(o, buf, f, MetaElem.TITLE);
-      }
-    },
-
+    h10e(MetaElem.TITLE, Format.ASCII),
     /** Image input equipment manufacturer. */
-    h10f(null, Format.ASCII) {
-      @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        metaSimple(o, buf, f, MetaElem.MAKE);
-      }
-    },
-
+    h10f(MetaElem.MAKE, Format.ASCII),
     /** Image input equipment model. */
-    h110(null, Format.ASCII) {
-      @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        metaSimple(o, buf, f, MetaElem.MODEL);
-      }
-    },
-
+    h110(MetaElem.MODEL, Format.ASCII),
     /** Orientation. */
-    h112(1, Format.SHORT) {
+    h112(1, MetaElem.ORIENTATION, Format.SHORT) {
       @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        final int val = buf.getShort();
-        if(val >= 0 && val < ORIENTATION.length) {
-          o.deepFile.addMeta(MetaElem.ORIENTATION, ORIENTATION[val]);
-          return;
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 1:  s = "top left";     break;
+          case 2:  s = "top right";    break;
+          case 3:  s = "bottom right"; break;
+          case 4:  s = "bottom left";  break;
+          case 5:  s = "left top";     break;
+          case 6:  s = "right top";    break;
+          case 7:  s = "right bottom"; break;
+          case 8:  s = "left bottom";  break;
+          default: s = null;
         }
-        err(o);
+        if(s != null) d.addMeta(elem, s);
       }
     },
-
     /** XResolution. */
-    h11a(1, Format.RATIONAL) {
-      @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        metaSimple(o, buf, f, MetaElem.X_RESOLUTION);
-      }
-    },
-
+    h11a(1, MetaElem.X_RESOLUTION, Format.RATIONAL),
     /** YResolution. */
-    h11b(1, Format.RATIONAL) {
-      @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        metaSimple(o, buf, f, MetaElem.Y_RESOLUTION);
-      }
-    },
-
+    h11b(1, MetaElem.Y_RESOLUTION, Format.RATIONAL),
     /** resolution unit. */
-    h128(1, Format.SHORT) {
+    h128(1, MetaElem.RESOLUTION_UNIT, Format.SHORT) {
       @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        final MetaElem e = MetaElem.RESOLUTION_UNIT;
-        final String v;
-        switch(buf.getShort()) {
-          case 2:  v = "inches";      break;
-          case 3:  v = "centimeters"; break;
-          default: v = null;
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 2:  s = "inches";      break;
+          case 3:  s = "centimeters"; break;
+          default: s = null;
         }
-        if(v != null) o.deepFile.addMeta(e, v);
+        if(s != null) d.addMeta(elem, s);
       }
     },
-
     /** Software. */
-    h131(null, Format.ASCII) {
-      @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        metaSimple(o, buf, f, MetaElem.SOFTWARE);
-      }
-    },
-
+    h131(MetaElem.SOFTWARE, Format.ASCII),
     /** DateTime of image creation. */
-    h132(20, Format.ASCII) {
-      @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        metaDate(o, buf, MetaElem.DATE_CREATED);
-      }
-    },
+    h132(1, MetaElem.DATE_CREATED, Format.DATE),
     /** Creator. */
-    h13b(null, Format.ASCII) {
+    h13b(MetaElem.CREATOR_NAME, Format.ASCII),
+    /** White point. */
+    h13e(2, MetaElem.WHITE_POINT, Format.RATIONAL) {
       @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        metaSimple(o, buf, f, MetaElem.CREATOR_NAME);
+      public void meta(final DeepFile d, final BufferedFileChannel b) {
+        d.addMeta(elem, readRational(b) + " " + readRational(b));
       }
     },
     /** Exif Image Width. */
-    ha002(1, Format.SHORT, Format.LONG) {
+    ha002(1, MetaElem.PIXEL_WIDTH, Format.SHORT, Format.LONG) {
       @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-        final MetaElem elem = MetaElem.PIXEL_WIDTH;
-        if(o.deepFile.isMetaSet(elem)) return;
-        metaSimple(o, buf, f, elem);
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        if(d.isMetaSet(elem)) return;
+        metaSimple(d, b);
       }
      },
      /** Exif Image Height. */
-     ha003(1, Format.SHORT, Format.LONG) {
+     ha003(1, MetaElem.PIXEL_HEIGHT, Format.SHORT, Format.LONG) {
        @Override
-       void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-         final MetaElem elem = MetaElem.PIXEL_HEIGHT;
-         if(o.deepFile.isMetaSet(elem)) return;
-         metaSimple(o, buf, f, elem);
+       void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+         if(d.isMetaSet(elem)) return;
+         metaSimple(d, b);
        }
      },
     /** Exposure time in seconds. */
-    h829a(1, Format.RATIONAL) {
+    h829a(1, MetaElem.EXPOSURE_TIME, Format.RATIONAL) {
       @Override
-      public void parse0(final ExifParser o, final ByteBuffer buf,
-          final Format f) {
-        try {
-          final double sec = readRational(o.bfc, buf);
-          o.deepFile.addMeta(MetaElem.EXPOSURE_TIME_MS, sec * 1000);
-          final StringBuilder str = new StringBuilder();
-          if(sec < 1) str.append("1/").append((int) (1 / sec));
-          else str.append((int) sec);
-          str.append(" seconds");
-          o.deepFile.addMeta(MetaElem.EXPOSURE_TIME, str.toString());
-        } catch(final IOException e) {
-          err(o, e);
-        }
+      void meta(final DeepFile d, final BufferedFileChannel b) {
+        final double sec = readRational(b);
+        d.addMeta(MetaElem.EXPOSURE_TIME_MS, sec * 1000);
+        final StringBuilder str = new StringBuilder();
+        if(sec < 1) str.append("1/").append((int) (1 / sec));
+        else str.append((int) sec);
+        str.append(" seconds");
+        d.addMeta(MetaElem.EXPOSURE_TIME, str.toString());
       }
     },
     // /** GPS IFD. */
@@ -278,49 +229,55 @@ public final class ExifParser {
     // }
     // },
     /** EXIF IFD. */
-    h8769(1, Format.LONG) {
+    h8769(1, null, Format.LONG) {
       @Override
-      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+      void parse(final ExifParser o, final ByteBuffer buf) {
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
-        } catch(final IOException e) {
-          err(o, e);
+        } catch(IOException e) {
+          err(o.deepFile, e);
         }
       }
     },
     /** Aperture value. */
-    h9202(1, Format.RATIONAL) {
-      @Override
-      public void parse0(final ExifParser o, final ByteBuffer buf,
-          final Format f) {
-        metaSimple(o, buf, f, MetaElem.APERTURE_VALUE);
-      }
-    },
+    h9202(1, MetaElem.APERTURE_VALUE, Format.RATIONAL),
     /** Max aperture value. */
-    h9205(1, Format.RATIONAL) {
-      @Override
-      public void parse0(final ExifParser o, final ByteBuffer buf,
-          final Format f) {
-        metaSimple(o, buf, f, MetaElem.APERTURE_VALUE_MAX);
-      }
-    };
+    h9205(1, MetaElem.APERTURE_VALUE_MAX, Format.RATIONAL);
 
     /** The format of the date values. */
     private static final SimpleDateFormat SDF = new SimpleDateFormat(
         "yyyy:MM:dd HH:mm:ss");
-    /** The expected value. */
-    final Integer expVal;
     /** The allowed field formats. */
-    final Format[] aFormats;
+    private final Format[] aFormats;
+    /** The actual format of the field. */
+    Format format;
+    /** The corresponding {@link MetaElem} (for simple fields only). */
+    final MetaElem elem;
+    /** The number of values. */
+    int count;
+    /** Flag if the value of the field is inlined. */
+    boolean inlined;
 
     /**
-     * Initilizes a tag.
-     * @param expectedValue the expected value.
+     * Initializes a tag.
+     * @param metaElem the corresponding {@link MetaElem}.
      * @param allowedFormats formats that are allowed for the tag field.
      */
-    private Tag(final Integer expectedValue, final Format... allowedFormats) {
-      expVal = expectedValue;
+    private Tag(final MetaElem metaElem, final Format... allowedFormats) {
+      this(-1, metaElem, allowedFormats);
+    }
+    
+    /**
+     * Initializes a tag.
+     * @param expectedCount the expected number of values.
+     * @param metaElem the corresponding {@link MetaElem}.
+     * @param allowedFormats formats that are allowed for the tag field.
+     */
+    private Tag(final int expectedCount, final MetaElem metaElem,
+        final Format... allowedFormats) {
+      count = expectedCount;
+      elem = metaElem;
       aFormats = allowedFormats;
     }
 
@@ -330,37 +287,139 @@ public final class ExifParser {
      * @param buf the {@link ByteBuffer} to read from.
      */
     void parse(final ExifParser o, final ByteBuffer buf) {
-      final Format f = check(o, buf);
-      if(f != null) parse0(o, buf, f);
+      if(check(o, buf)) {
+        if(inlined) meta(o.deepFile, buf);
+        else meta(o.deepFile, o.bfc);
+      }
     }
 
     /**
-     * Tag specific parse method.
-     * @param o {@link ExifParser} instance to send parser events from.
-     * @param buf the {@link ByteBuffer} to read from.
-     * @param f the format of the field.
+     * Reads the metadata from the ByteBuffer and adds it to the DeepFile. Must
+     * be overridden for complex fields that occupy at most 4 bytes (and are
+     * inlined in the IFD field).
+     * @param d the DeepFile to add the metadata to.
+     * @param b the ByteBuffer to read from.
      */
-    abstract void parse0(final ExifParser o, final ByteBuffer buf,
-        final Format f);
+    void meta(final DeepFile d, final ByteBuffer b) {
+      metaSimple(d, b);
+    }
+
+    /**
+     * Reads the metadata from the BufferedFileChannel and adds it to the
+     * DeepFile. Must be overridden for complex fields that occupy at least 5
+     * bytes (and are not inlined in the IFD field).
+     * @param d the DeepFile to add the metadata to.
+     * @param b the {@link BufferedFileChannel} to read from.
+     */
+    void meta(final DeepFile d, final BufferedFileChannel b) {
+      metaSimple(d, b);
+    }
 
     /**
      * Checks if the field is valid.
      * @param o the ExifParser instance.
      * @param buf the ByteBuffer to read from.
-     * @return the field format if the field is valid, <code>null</code>
-     *         otherwise.
+     * @return true if the current IFD field is valid.
      */
-    private Format check(final ExifParser o, final ByteBuffer buf) {
-      final Format format = Format.getForId(buf.getShort());
+    private boolean check(final ExifParser o, final ByteBuffer buf) {
+      format = Format.getForId(buf.getShort());
       for(final Format f : aFormats) {
         if(f.equals(format)) {
-          if(expVal == null || (buf.getInt() & 0xFFFFFFFFL) == expVal) return f;
+          final long c = buf.getInt() & 0xFFFFFFFFL;
+          if (c > Integer.MAX_VALUE) {
+            err(o, "Invalid item count.");
+            return false;
+          }
+          if(count == Long.MIN_VALUE) count = (int) c;
+          else if(count != c) return false;
+          final int size = count * format.getSize();
+          if(size <= 4) inlined = true;
+          try {
+            o.bfc.position(buf.getInt());
+            o.bfc.buffer(size);
+          } catch(IOException e) {
+            err(o, e);
+            return false;
+          }
+          inlined = false;
+          return true;
         }
       }
       err(o);
-      return null;
+      return false;
     }
     
+    /**
+     * Reads a rational value from a IFD field.
+     * @param b the {@link BufferedFileChannel} to read the rational from.
+     * @return the rational value as double.
+     */
+    double readRational(final BufferedFileChannel b) {
+      final long numerator = b.getInt() & 0xFFFFFFFFL;
+      final long denominator = b.getInt() & 0xFFFFFFFFL;
+      return (double) numerator / denominator;
+    }
+    
+    // [BL] implement parsing of UNDEFINED fields.
+    // [BL] implement parsing of SLONG fields.
+    // [BL] implement parsing of SRATIONAL fields.
+
+    /**
+     * Parses a field that is not inlined and adds the metadata to the deep
+     * file.
+     * @param d the {@link DeepFile} to add the metadata to.
+     * @param b the {@link BufferedFileChannel} to read from.
+     */
+    void metaSimple(final DeepFile d, final BufferedFileChannel b) {
+      try {
+        switch(format) {
+          case ASCII:    d.addMeta(elem, b.get(new byte[count])); break;
+          case RATIONAL: d.addMeta(elem, readRational(b));        break;
+          case DATE:     metaDate(d, b);                          break;
+          default:
+            Main.debug("ExifParser: Unknown or unsupported field type (%)",
+                format);
+        }
+      } catch(final IOException e) {
+        err(d, e);
+      }
+    }
+    
+    /**
+     * Parses an inlined field and adds the metadata to the deep file.
+     * @param d the {@link DeepFile} to add the metadata to.
+     * @param buf the buffer to read from.
+     */
+    void metaSimple(final DeepFile d, final ByteBuffer buf) {
+      switch(format) {
+        case BYTE:  d.addMeta(elem, (short) (buf.get() & 0xFF));        break;
+        case ASCII: d.addMeta(elem, buf.get(new byte[count]).array());  break;
+        case SHORT: d.addMeta(elem, buf.getShort() & 0xFFFF);           break;
+        case LONG:  d.addMeta(elem, buf.getInt() & 0xFFFFFFFFL);        break;
+        default: Main.debug("ExifParser: Unknown or unsupported field type (%)",
+                  format);
+      }
+    }
+
+    /**
+     * Converts the date to the correct format and adds it to the DeepFile.
+     * @param d the {@link DeepFile} to add the date to.
+     * @param b the {@link BufferedFileChannel} to read from.
+     */
+    void metaDate(final DeepFile d, final BufferedFileChannel b) {
+      try {
+        final byte[] data = new byte[20];
+        b.get(data);
+        final Date date = SDF.parse(Token.string(data));
+        d.addMeta(elem, ParserUtil.convertDateTime(date));
+        return;
+      } catch(final ParseException ex) {
+        err(d, ex);
+      } catch(final IOException e) {
+        err(d, e);
+      }
+    }
+
     /**
      * Generates a debug message.
      * @param o the ExifParser.
@@ -369,7 +428,7 @@ public final class ExifParser {
       Main.debug("ExifParser: Invalid field found (%, file: %)", toString(),
           o.bfc.getFileName());
     }
-    
+
     /**
      * Generates a debug message.
      * @param o the ExifParser.
@@ -377,105 +436,30 @@ public final class ExifParser {
      */
     void err(final ExifParser o, final Exception ex) {
       Main.debug(
-          "ExifParser: Invalid field found (%, file: %, error message: %)",
+          "ExifParser: Invalid field found (%, file: %, error: %)",
           toString(), o.bfc.getFileName(), ex);
-    }
-
-    /**
-     * Reads an IFD ASCII field value.
-     * @param b the {@link BufferedFileChannel} to read from, if the data is not
-     *          inlined.
-     * @param buf the {@link ByteBuffer}, containing the IFD ASCII field.
-     * @return the value.
-     * @throws IOException if any error occurs while reading from the file.
-     */
-    private byte[] readAscii(final BufferedFileChannel b, final ByteBuffer buf)
-        throws IOException {
-      final int size = buf.getInt();
-      final byte[] data = new byte[size];
-      if(size <= 4) { // data is inlined
-        buf.get(data);
-      } else {
-        b.position(buf.getInt());
-        b.buffer(size);
-        b.get(data);
-      }
-      return data;
     }
     
     /**
-     * Reads a rational value from a IFD field.
-     * @param b the {@link BufferedFileChannel} to read the rational from.
-     * @param buf the buffer containing the IFD field.
-     * @return the rational value as double.
-     * @throws IOException if any error occurs while reading from the file.
+     * Generates a debug message.
+     * @param d the DeepFile.
+     * @param ex the exception to log.
      */
-    double readRational(final BufferedFileChannel b,
-        final ByteBuffer buf) throws IOException {
-      // [BL] are there RATIONAL fields with size > 1?
-      // size was already read
-      b.position(buf.getInt());
-      b.buffer(8); // 2 LONGs => 8 bytes
-      final long numerator = b.getInt() & 0xFFFFFFFFL;
-      final long denominator = b.getInt() & 0xFFFFFFFFL;
-      return (double) numerator / denominator;
+    void err(final DeepFile d, final Exception ex) {
+      Main.debug(
+          "ExifParser: Invalid field found (%, file: %, error message: %)",
+          toString(), d.getBufferedFileChannel().getFileName(), ex);
     }
-
+    
     /**
-     * Converts the date to the correct format and adds it to the DeepFile.
+     * Generates a debug message.
      * @param o the ExifParser.
-     * @param buf the ByteBuffer to read from.
-     * @param elem the metadata element to use for the metadata item.
+     * @param ex the message to log.
      */
-    void metaDate(final ExifParser o, final ByteBuffer buf,
-        final MetaElem elem) {
-      try {
-        o.bfc.position(buf.getInt());
-        o.bfc.buffer(20);
-        final byte[] data = new byte[20];
-        o.bfc.get(data);
-        final Date d = SDF.parse(Token.string(data));
-        o.deepFile.addMeta(elem, ParserUtil.convertDateTime(d));
-        return;
-      } catch(final ParseException ex) {
-        err(o, ex);
-      } catch(final IOException e) {
-        err(o, e);
-      }
-    }
-
-    /**
-     * Parses a field and adds the metadata to the deep file of the exif parser.
-     * @param o the ExifParser.
-     * @param buf the buffer to read from.
-     * @param f the format of the field.
-     * @param elem the MetaElement.
-     */
-    void metaSimple(final ExifParser o, final ByteBuffer buf, final Format f,
-        final MetaElem elem) {
-      final DeepFile d = o.deepFile;
-      switch(f) {
-        case BYTE:  d.addMeta(elem, (short) (buf.get() & 0xFF)); break;
-        case ASCII:
-          try {
-            d.addMeta(elem, readAscii(o.bfc, buf));
-          } catch(final IOException e) {
-            err(o, e);
-          }
-          break;
-        case SHORT: d.addMeta(elem, buf.getShort() & 0xFFFF); break;
-        case LONG:  d.addMeta(elem, buf.getInt() & 0xFFFFFFFFL); break;
-        case RATIONAL:  try {
-            d.addMeta(elem, readRational(o.bfc, buf));
-          } catch(final IOException e) {
-            err(o, e);
-          }
-          break;
-        case UNDEFINED: break; // [BL] implement parsing of UNDEFINED fields.
-        case SLONG:     break; // [BL] implement parsing of SLONG fields.
-        case SRATIONAL: break; // [BL] implement parsing of SRATIONAL fields.
-        default: Main.debug("ExifParser: Unknown field type (%)", f);
-      }
+    void err(final ExifParser o, final String ex) {
+      Main.debug(
+          "ExifParser: Invalid field found (%, file: %, error message: %)",
+          toString(), o.bfc.getFileName(), ex);
     }
 
     @Override
