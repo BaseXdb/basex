@@ -112,6 +112,7 @@ public class BaseXText extends BaseXPanel {
    */
   public final void setText(final byte[] t) {
     setText(t, t.length);
+    if(undo != null) undo.reset();
   }
 
   /**
@@ -323,16 +324,15 @@ public class BaseXText extends BaseXPanel {
   public void keyPressed(final KeyEvent e) {
     final int c = e.getKeyCode();
     final boolean shf = e.isShiftDown();
-    final boolean ctrl = (Toolkit.getDefaultToolkit().
-        getMenuShortcutKeyMask() & e.getModifiers()) != 0;
+    final boolean mod = BaseXLayout.mod(e);
 
     // traverse focus to next/previous panel if ctrl-tab was pressed..  
-    if(c == KeyEvent.VK_TAB && ctrl) {
+    if(c == KeyEvent.VK_TAB && mod) {
       if(shf) transferFocusBackward();
       else transferFocus();
       return;
     }
-    if(ctrl && c == 'F') {
+    if(mod && c == KeyEvent.VK_F) {
       if(find != null) find.requestFocusInWindow();
       return;
     }
@@ -350,29 +350,29 @@ public class BaseXText extends BaseXPanel {
     final byte[] txt = text.text;
 
     boolean down = true;
-    if(!ctrl && !e.isActionKey()) return;
+    if(!mod && !e.isActionKey()) return;
 
     if(c != KeyEvent.VK_DOWN && c != KeyEvent.VK_UP) col = -1;
 
-    if(ctrl && !shf) {
-      if(c == 'A') {
+    if(mod && !shf) {
+      if(c == KeyEvent.VK_A) {
         selectAll();
         text.setCaret();
         return;
       }
-      if(c == 'C') {
+      if(c == KeyEvent.VK_C) {
         copy();
         return;
       }
 
       if(undo != null) {
-        if(c == 'X') {
+        if(c == KeyEvent.VK_X) {
           cut();
-        } else if(c == 'V') {
+        } else if(c == KeyEvent.VK_V) {
           paste();
-        } else if(c == 'Z') {
+        } else if(c == KeyEvent.VK_Z) {
           undo();
-        } else if(c == 'Y') {
+        } else if(c == KeyEvent.VK_Y) {
           redo();
         }
       }
@@ -384,7 +384,7 @@ public class BaseXText extends BaseXPanel {
     final int h = getHeight();
 
     if(c == KeyEvent.VK_RIGHT) {
-      if(ctrl) {
+      if(mod) {
         final boolean ch = ftChar(text.next(shf));
         while(text.pos() < text.size() && ch == ftChar(text.curr()))
           text.next(shf);
@@ -392,7 +392,7 @@ public class BaseXText extends BaseXPanel {
         text.next(shf);
       }
     } else if(c == KeyEvent.VK_LEFT) {
-      if(ctrl) {
+      if(mod) {
         final boolean ch = ftChar(text.prev(shf));
         while(text.pos() > 0 && ch == ftChar(text.prev(shf)));
         if(text.pos() != 0) text.next(shf);
@@ -401,13 +401,13 @@ public class BaseXText extends BaseXPanel {
       }
       down = false;
     } else if(c == KeyEvent.VK_DOWN) {
-      if(ctrl) {
+      if(mod) {
         scroll.pos(scroll.pos() + fh);
         return;
       }
       down(1, shf);
     } else if(c == KeyEvent.VK_UP) {
-      if(ctrl) {
+      if(mod) {
         scroll.pos(scroll.pos() - fh);
         return;
       }
@@ -417,11 +417,11 @@ public class BaseXText extends BaseXPanel {
       if(!shf) text.noMark();
 
       if(c == KeyEvent.VK_HOME) {
-        if(ctrl) text.pos(0);
+        if(mod) text.pos(0);
         else text.home(shf);
         down = false;
       } else if(c == KeyEvent.VK_END) {
-        if(ctrl) text.pos(text.size());
+        if(mod) text.pos(text.size());
         else text.end(Integer.MAX_VALUE, shf);
       } else if(c == KeyEvent.VK_PAGE_DOWN) {
         down(h / fh, shf);
@@ -504,8 +504,7 @@ public class BaseXText extends BaseXPanel {
     final byte[] txt = text.text;
     text.pos(text.cursor());
 
-    final boolean ctrl = (Toolkit.getDefaultToolkit().
-        getMenuShortcutKeyMask() & e.getModifiers()) != 0;
+    final boolean mod = BaseXLayout.mod(e);
 
     if(ch == KeyEvent.VK_BACK_SPACE) {
       if(text.start() == -1) {
@@ -514,7 +513,7 @@ public class BaseXText extends BaseXPanel {
       }
       final boolean ld = ftChar(text.curr());
       text.delete();
-      if(ctrl) {
+      if(mod) {
         while(text.pos() > 0 && ld == ftChar(text.prev())) text.delete();
         if(text.pos() != 0) text.next();
       }
@@ -523,10 +522,10 @@ public class BaseXText extends BaseXPanel {
       if(text.start() == -1 && text.pos() == text.size()) return;
       final boolean ld = ftChar(text.curr());
       text.delete();
-      while(ctrl && text.pos() < text.size() && ld == ftChar(text.curr()))
+      while(mod && text.pos() < text.size() && ld == ftChar(text.curr()))
         text.delete();
     } else {
-      if(ctrl) return;
+      if(mod) return;
       if(text.start() != -1) text.delete();
       text.add(String.valueOf(ch));
     }

@@ -80,5 +80,13 @@ public final class Undo {
     cur[pos] = c;
     max = pos;
   }
+
+  /**
+   * Resets the undo history.
+   */
+  public void reset() {
+    pos = 0;
+    max = 0;
+  }
 }
 

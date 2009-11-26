@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import java.awt.Font;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -54,8 +53,7 @@ public class BaseXTextField extends JTextField {
       @Override
       public void keyPressed(final KeyEvent e) {
         final int c = e.getKeyCode();
-        if((Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() &
-            e.getModifiers()) != 0 && (c == 'Z' || c == 'Y')) {
+        if(BaseXLayout.mod(e) && (c == KeyEvent.VK_Z || c == KeyEvent.VK_Y)) {
           final String t = getText();
           setText(last);
           last = t;

@@ -671,7 +671,7 @@ public final class MapView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
 
-    if(!gui.prop.is(GUIProp.MAPINTERACTION) || !e.isControlDown()) {
+    if(!gui.prop.is(GUIProp.MAPINTERACTION) || !BaseXLayout.mod(e)) {
       if(focus()) {
         if(!(mouseX > tinyx && mouseX < tinyx + tinyw && mouseY > tinyy &&
             mouseY < tinyy + tinyh)) {
@@ -785,7 +785,7 @@ public final class MapView extends View implements Runnable {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
-    } else if(e.isControlDown()) {
+    } else if(BaseXLayout.mod(e)) {
       gui.notify.mark(2, null);
     } else {
       if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);
@@ -842,7 +842,7 @@ public final class MapView extends View implements Runnable {
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
     if(gui.updating) return;
-    if(mainRects == null || e.isControlDown() || e.isAltDown()) return;
+    if(mainRects == null || BaseXLayout.mod(e) || e.isAltDown()) return;
 
     final int key = e.getKeyCode();
     final boolean shift = e.isShiftDown();

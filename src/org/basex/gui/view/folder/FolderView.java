@@ -405,7 +405,7 @@ public final class FolderView extends View {
       gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
-    } else if(e.isControlDown()) {
+    } else if(BaseXLayout.mod(e)) {
       gui.notify.mark(2, null);
     } else if(!SwingUtilities.isLeftMouseButton(e) ||
         getCursor() != CURSORHAND) {

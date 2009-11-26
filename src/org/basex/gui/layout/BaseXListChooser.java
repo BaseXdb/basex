@@ -59,28 +59,31 @@ public final class BaseXListChooser extends BaseXBack {
 
       @Override
       public void keyPressed(final KeyEvent e) {
-        final int oldpos = list.getSelectedIndex();
-        int newpos = oldpos;
+        final int op = list.getSelectedIndex();
+        int np = op;
         final int page = getHeight() / getFont().getSize();
 
         // process key events
-        if(e.getKeyCode() == KeyEvent.VK_DOWN) {
-          newpos = Math.min(oldpos + 1, values.length - 1);
-        } else if(e.getKeyCode() == KeyEvent.VK_UP) {
-          newpos = Math.max(oldpos - 1, 0);
-        } else if(e.getKeyCode() == KeyEvent.VK_PAGE_DOWN) {
-          newpos = Math.min(oldpos + page, values.length - 1);
-        } else if(e.getKeyCode() == KeyEvent.VK_PAGE_UP) {
-          newpos = Math.max(oldpos - page, 0);
-        } else if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_HOME) {
-          newpos = 0;
-        } else if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_END) {
-          newpos = values.length - 1;
+        final int c = e.getKeyCode();
+        final boolean mod = BaseXLayout.mod(e);
+
+        if(c == KeyEvent.VK_DOWN) {
+          np = Math.min(op + 1, values.length - 1);
+        } else if(c == KeyEvent.VK_UP) {
+          np = Math.max(op - 1, 0);
+        } else if(c == KeyEvent.VK_PAGE_DOWN) {
+          np = Math.min(op + page, values.length - 1);
+        } else if(c == KeyEvent.VK_PAGE_UP) {
+          np = Math.max(op - page, 0);
+        } else if(mod && c == KeyEvent.VK_HOME) {
+          np = 0;
+        } else if(mod && c == KeyEvent.VK_END) {
+          np = values.length - 1;
         }
         // choose new list value
-        if(oldpos != newpos && newpos < values.length) {
-          list.setSelectedValue(values[newpos], true);
-          text.setText(values[newpos]);
+        if(op != np && np < values.length) {
+          list.setSelectedValue(values[np], true);
+          text.setText(values[np]);
           text.selectAll();
           typed = false;
         }

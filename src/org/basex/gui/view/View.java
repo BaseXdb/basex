@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
 
 /**
@@ -98,7 +99,7 @@ public abstract class View extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     if(gui.updating) return;
-    final boolean ctrl = e.isControlDown();
+    final boolean ctrl = BaseXLayout.mod(e);
     final boolean shift = e.isShiftDown();
     final int key = e.getKeyCode();
 

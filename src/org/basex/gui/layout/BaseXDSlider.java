@@ -164,26 +164,26 @@ public final class BaseXDSlider extends BaseXPanel {
   public void keyPressed(final KeyEvent e) {
     if(e.isAltDown()) return;
 
-    final int code = e.getKeyCode();
+    final int c = e.getKeyCode();
     oldMin = min;
     oldMax = min;
     double diffMin = 0;
     double diffMax = 0;
-    if(code == KeyEvent.VK_LEFT) {
+    if(c == KeyEvent.VK_LEFT) {
       diffMin = -1;
       diffMax = -1;
-    } else if(code == KeyEvent.VK_RIGHT) {
+    } else if(c == KeyEvent.VK_RIGHT) {
       diffMin = 1;
       diffMax = 1;
-    } else if(code == KeyEvent.VK_UP) {
+    } else if(c == KeyEvent.VK_UP) {
       diffMin = -1;
       diffMax = 1;
-    } else if(code == KeyEvent.VK_DOWN) {
+    } else if(c == KeyEvent.VK_DOWN) {
       diffMin = 1;
       diffMax = -1;
-    } else if(code == KeyEvent.VK_HOME) {
+    } else if(c == KeyEvent.VK_HOME) {
       min = totMin;
-    } else if(code == KeyEvent.VK_END) {
+    } else if(c == KeyEvent.VK_END) {
       max = totMax;
     }
 
@@ -191,7 +191,7 @@ public final class BaseXDSlider extends BaseXPanel {
       diffMin /= 10;
       diffMax /= 10;
     }
-    if(e.isControlDown()) {
+    if(BaseXLayout.mod(e)) {
       diffMin /= 100;
       diffMax /= 100;
     }

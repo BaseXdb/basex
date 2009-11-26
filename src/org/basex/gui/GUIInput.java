@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import javax.swing.DefaultComboBoxModel;
@@ -12,6 +13,7 @@ import javax.swing.plaf.basic.BasicComboPopup;
 import org.basex.core.CommandParser;
 import org.basex.data.Data;
 import org.basex.gui.layout.BaseXCombo;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -49,7 +51,7 @@ public final class GUIInput extends BaseXTextField {
     box = new BaseXCombo(new String[] {}, main);
     box.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(e.getModifiers() == 16) completeInput();
+        if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
       }
     });
     pop = new ComboPopup(box);
@@ -108,7 +110,7 @@ public final class GUIInput extends BaseXTextField {
       @Override
       public void keyReleased(final KeyEvent e) {
         final int c = e.getKeyCode();
-        if(e.getKeyChar() == 0xFFFF || e.isControlDown() ||
+        if(e.getKeyChar() == 0xFFFF || BaseXLayout.mod(e) ||
             c == KeyEvent.VK_DOWN || c == KeyEvent.VK_UP) return;
 
         if(c == KeyEvent.VK_ESCAPE) {
