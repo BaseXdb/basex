@@ -11,6 +11,8 @@ import org.basex.query.item.Type;
  */
 public enum MetaElem {
 
+  // ----- duration fields ---------------------------------------------------
+  
   /** Duration. */
   DURATION(NS.FSMETA, "duration", Type.DUR, false),
 
@@ -52,6 +54,19 @@ public enum MetaElem {
   PIXEL_WIDTH(NS.FSMETA, "pixelWidth", Type.ITR, false),
   /** Track number. */
   TRACK(NS.FSMETA, "track", Type.ITR, false),
+  
+  // ----- double fields -----------------------------------------------------
+  
+  /** Aperture value. */
+  APERTURE_VALUE(NS.FSMETA, "apertureValue", Type.DBL, false),
+  /** Maximum aperture value. */
+  APERTURE_VALUE_MAX(NS.FSMETA, "apertureValueMax", Type.DBL, false),
+  /** Exposure time in seconds. */
+  EXPOSURE_TIME_MS(NS.FSMETA, "exposureTimeMs", Type.DBL, false),
+  /** X resolution. */
+  X_RESOLUTION(NS.FSMETA, "xResolution", Type.DBL, false),
+  /** Y resolution. */
+  Y_RESOLUTION(NS.FSMETA, "yResolution", Type.DBL, false),
 
   // ----- string fields -----------------------------------------------------
 
@@ -83,6 +98,8 @@ public enum MetaElem {
   ENCODER(NS.FSMETA, "encoder", Type.STR, false),
   /** Text encoding. */
   ENCODING(NS.FSMETA, "encoding", Type.STR, false),
+  /** Exposure time as string. */
+  EXPOSURE_TIME(NS.FSMETA, "exposureTime", Type.STR, false),
   /** Genre. */
   GENRE(NS.FSMETA, "genre", Type.STR, true),
   /**
@@ -115,6 +132,8 @@ public enum MetaElem {
   ORIENTATION(NS.FSMETA, "orientation", Type.STR, false),
   /** Original artist. */
   ORIGINAL_ARTIST(NS.FSMETA, "originalArtist", Type.STR, false),
+  /** Resolution unit. */
+  RESOLUTION_UNIT(NS.FSMETA, "resolutionUnit", Type.STR, false),
   /** Copyright message. */
   RIGHTS(NS.DCTERMS, "rights", Type.STR, false),
   /** Software. */

@@ -15,6 +15,9 @@ import org.deepfs.util.FSWalker;
  */
 public class FSTraversalParser extends Progress {
 
+  // [BL] fix windows paths
+  // [BL] representation for multiple windows devices.
+  
   /** The FSImporter. */
   private FSImporter importer;
 

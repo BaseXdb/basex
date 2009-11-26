@@ -25,9 +25,9 @@ import org.deepfs.fsml.util.ParserUtil;
 public final class ExifParser {
 
   /** Image orientation viewed in terms of rows and columns. */
-  static final byte[][] ORIENTATION = bytes("", "Top Left", "Top Right",
-      "Bottom Right", "Bottom Left", "Left Top", "Right Top", "Right Bottom",
-      "Left Bottom");
+  static final byte[][] ORIENTATION = bytes("", "top left", "top right",
+      "bottom right", "bottom left", "left top", "right top", "right bottom",
+      "left bottom");
 
   /**
    * Converts strings to byte arrays.
@@ -181,7 +181,7 @@ public final class ExifParser {
     h11a(1, Format.RATIONAL) {
       @Override
       void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-          // [BL] xresolution
+        metaSimple(o, buf, f, MetaElem.X_RESOLUTION);
       }
     },
 
@@ -189,7 +189,7 @@ public final class ExifParser {
     h11b(1, Format.RATIONAL) {
       @Override
       void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-          // [BL] yresolution
+        metaSimple(o, buf, f, MetaElem.Y_RESOLUTION);
       }
     },
 
@@ -197,7 +197,14 @@ public final class ExifParser {
     h128(1, Format.SHORT) {
       @Override
       void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
-          // [BL] resolution unit
+        final MetaElem e = MetaElem.RESOLUTION_UNIT;
+        final String v;
+        switch(buf.getShort()) {
+          case 2:  v = "inches";      break;
+          case 3:  v = "centimeters"; break;
+          default: v = null;
+        }
+        if(v != null) o.deepFile.addMeta(e, v);
       }
     },
 
@@ -223,42 +230,42 @@ public final class ExifParser {
         metaSimple(o, buf, f, MetaElem.CREATOR_NAME);
       }
     },
-    // /** Exif Image Width. */
-    // ha002 {
-    // @Override
-    // void parse(final ExifParser o, final ByteBuffer buf)
-    // throws IOException {
-    // final int type = buf.getShort();
-    // if(buf.getInt() == 1) {
-    // if(type == IFD_TYPE_LONG) {
-    // o.meta.setLong(IntField.PIXEL_WIDTH,
-    // (long) buf.getInt() & 0xFFFFFFFF);
-    // } else if(type == IFD_TYPE_SHORT) {
-    // o.meta.setShort(IntField.PIXEL_WIDTH,
-    // (short) (buf.getShort() & 0xFFFF));
-    // } else error(o, "Exif Image Width (0xA002)");
-    // } else error(o, "Exif Image Width (0xA002)");
-    // o.fsparser.metaEvent(o.meta);
-    // }
-    // },
-    // /** Exif Image Height. */
-    // ha003 {
-    // @Override
-    // void parse(final ExifParser o, final ByteBuffer buf)
-    // throws IOException {
-    // final int type = buf.getShort();
-    // if(buf.getInt() == 1) {
-    // if(type == IFD_TYPE_LONG) {
-    // o.meta.setLong(IntField.PIXEL_HEIGHT,
-    // (long) buf.getInt() & 0xFFFFFFFF);
-    // } else if(type == IFD_TYPE_SHORT) {
-    // o.meta.setShort(IntField.PIXEL_HEIGHT,
-    // (short) (buf.getShort() & 0xFFFF));
-    // } else error(o, "Exif Image Height (0xA003)");
-    // } else error(o, "Exif Image Height (0xA003)");
-    // o.fsparser.metaEvent(o.meta);
-    // }
-    // },
+    /** Exif Image Width. */
+    ha002(1, Format.SHORT, Format.LONG) {
+      @Override
+      void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+        final MetaElem elem = MetaElem.PIXEL_WIDTH;
+        if(o.deepFile.isMetaSet(elem)) return;
+        metaSimple(o, buf, f, elem);
+      }
+     },
+     /** Exif Image Height. */
+     ha003(1, Format.SHORT, Format.LONG) {
+       @Override
+       void parse0(final ExifParser o, final ByteBuffer buf, final Format f) {
+         final MetaElem elem = MetaElem.PIXEL_HEIGHT;
+         if(o.deepFile.isMetaSet(elem)) return;
+         metaSimple(o, buf, f, elem);
+       }
+     },
+    /** Exposure time in seconds. */
+    h829a(1, Format.RATIONAL) {
+      @Override
+      public void parse0(final ExifParser o, final ByteBuffer buf,
+          final Format f) {
+        try {
+          final double sec = readRational(o.bfc, buf);
+          o.deepFile.addMeta(MetaElem.EXPOSURE_TIME_MS, sec * 1000);
+          final StringBuilder str = new StringBuilder();
+          if(sec < 1) str.append("1/").append((int) (1 / sec));
+          else str.append((int) sec);
+          str.append(" seconds");
+          o.deepFile.addMeta(MetaElem.EXPOSURE_TIME, str.toString());
+        } catch(final IOException e) {
+          err(o, e);
+        }
+      }
+    },
     // /** GPS IFD. */
     // h8825 {
     // @Override
@@ -277,9 +284,25 @@ public final class ExifParser {
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
-        } catch(IOException e) {
+        } catch(final IOException e) {
           err(o, e);
         }
+      }
+    },
+    /** Aperture value. */
+    h9202(1, Format.RATIONAL) {
+      @Override
+      public void parse0(final ExifParser o, final ByteBuffer buf,
+          final Format f) {
+        metaSimple(o, buf, f, MetaElem.APERTURE_VALUE);
+      }
+    },
+    /** Max aperture value. */
+    h9205(1, Format.RATIONAL) {
+      @Override
+      public void parse0(final ExifParser o, final ByteBuffer buf,
+          final Format f) {
+        metaSimple(o, buf, f, MetaElem.APERTURE_VALUE_MAX);
       }
     };
 
@@ -328,8 +351,8 @@ public final class ExifParser {
      *         otherwise.
      */
     private Format check(final ExifParser o, final ByteBuffer buf) {
-      Format format = Format.getForId(buf.getShort());
-      for(Format f : aFormats) {
+      final Format format = Format.getForId(buf.getShort());
+      for(final Format f : aFormats) {
         if(f.equals(format)) {
           if(expVal == null || (buf.getInt() & 0xFFFFFFFFL) == expVal) return f;
         }
@@ -359,13 +382,12 @@ public final class ExifParser {
     }
 
     /**
-     * Reads variable size ascii data from a IFD field.
-     * @param b the {@link BufferedFileChannel} to read from if the data is not
+     * Reads an IFD ASCII field value.
+     * @param b the {@link BufferedFileChannel} to read from, if the data is not
      *          inlined.
-     * @param buf the {@link ByteBuffer} to read from.
-     * @return the ascii data.
-     * @throws IOException if any error occurs while reading from the file
-     *           channel.
+     * @param buf the {@link ByteBuffer}, containing the IFD ASCII field.
+     * @return the value.
+     * @throws IOException if any error occurs while reading from the file.
      */
     private byte[] readAscii(final BufferedFileChannel b, final ByteBuffer buf)
         throws IOException {
@@ -379,6 +401,24 @@ public final class ExifParser {
         b.get(data);
       }
       return data;
+    }
+    
+    /**
+     * Reads a rational value from a IFD field.
+     * @param b the {@link BufferedFileChannel} to read the rational from.
+     * @param buf the buffer containing the IFD field.
+     * @return the rational value as double.
+     * @throws IOException if any error occurs while reading from the file.
+     */
+    double readRational(final BufferedFileChannel b,
+        final ByteBuffer buf) throws IOException {
+      // [BL] are there RATIONAL fields with size > 1?
+      // size was already read
+      b.position(buf.getInt());
+      b.buffer(8); // 2 LONGs => 8 bytes
+      final long numerator = b.getInt() & 0xFFFFFFFFL;
+      final long denominator = b.getInt() & 0xFFFFFFFFL;
+      return (double) numerator / denominator;
     }
 
     /**
@@ -399,7 +439,7 @@ public final class ExifParser {
         return;
       } catch(final ParseException ex) {
         err(o, ex);
-      } catch(IOException e) {
+      } catch(final IOException e) {
         err(o, e);
       }
     }
@@ -419,13 +459,18 @@ public final class ExifParser {
         case ASCII:
           try {
             d.addMeta(elem, readAscii(o.bfc, buf));
-          } catch(IOException e) {
+          } catch(final IOException e) {
             err(o, e);
           }
           break;
         case SHORT: d.addMeta(elem, buf.getShort() & 0xFFFF); break;
         case LONG:  d.addMeta(elem, buf.getInt() & 0xFFFFFFFFL); break;
-        case RATIONAL:  break; // [BL] implement parsing of RATIONAL fields.
+        case RATIONAL:  try {
+            d.addMeta(elem, readRational(o.bfc, buf));
+          } catch(final IOException e) {
+            err(o, e);
+          }
+          break;
         case UNDEFINED: break; // [BL] implement parsing of UNDEFINED fields.
         case SLONG:     break; // [BL] implement parsing of SLONG fields.
         case SRATIONAL: break; // [BL] implement parsing of SRATIONAL fields.

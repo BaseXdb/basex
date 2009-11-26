@@ -538,6 +538,17 @@ public class DeepFile {
         "metadata element " + elem + " (long).");
     addMeta(elem, Token.token(value), Type.LNG);
   }
+  
+  /**
+   * Add a metadata key-value pair for the current file.
+   * @param elem metadata element (the key).
+   * @param value double value.
+   */
+  public void addMeta(final MetaElem elem, final double value) {
+    if(!elem.getType().instance(Type.DBL)) Main.bug("Invalid data type for " +
+        "metadata element " + elem + " (double).");
+    addMeta(elem, Token.token(value), Type.DBL);
+  }
 
   /**
    * Add a metadata key-value pair for the current file.
