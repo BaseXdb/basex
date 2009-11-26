@@ -635,7 +635,7 @@ public enum Type {
       if(o instanceof Document) {
         try {
           // [CG] API/should use instance properties
-          final Prop prop = new Prop();
+          final Prop prop = new Prop(false);
           final DOCWrapper p = new DOCWrapper((Document) o, "", prop);
           final Data data = new MemBuilder(p).build();
           return new DBNode(data, 0);

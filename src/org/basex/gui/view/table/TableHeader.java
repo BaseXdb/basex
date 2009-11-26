@@ -91,7 +91,7 @@ final class TableHeader extends BaseXPanel {
     g.setFont(font);
     g.setColor(Color.black);
     if(tdata.rows == null) {
-      BaseXLayout.drawCenter(g, NOTABLE, getWidth(), getHeight() / 2);
+      BaseXLayout.drawCenter(g, NODATA, getWidth(), getHeight() / 2);
       return;
     }
 

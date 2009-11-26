@@ -888,7 +888,7 @@ public interface Text {
   // VISUALIZATIONS ===========================================================
 
   /** Help string. */
-  String NOTABLE = lang("no_table") + DOT;
+  String NODATA = lang("no_data") + DOT;
   /** Help string. */
   String NOSPACE = lang("no_space");
   /** Binary file. */

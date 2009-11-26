@@ -45,7 +45,7 @@ b_refresh=Aktualisieren
 s_ok=OK
 
 # Visualizations
-no_table=Tabelle für aktuelle Daten nicht verfügbar
+no_data=Keine Daten verfügbar
 no_space=Zu wenig Platz
 map_binary=Binärdatei
 info_title=Query-Info

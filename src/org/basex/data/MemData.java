@@ -53,6 +53,14 @@ public class MemData extends Data {
     this(cap, data.tags, data.atts, data.ns, data.path, data.meta.prop);
   }
 
+  /**
+   * Constructor, creating a new, empty database.
+   * @param pr property reference
+   */
+  public MemData(final Prop pr) {
+    this(16, new Names(), new Names(), new Namespaces(), new PathSummary(), pr);
+  }
+
   @Override
   public final void flush() { }
 

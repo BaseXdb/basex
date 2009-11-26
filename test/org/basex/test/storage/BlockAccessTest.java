@@ -28,7 +28,7 @@ public final class BlockAccessTest {
   private static final String DBNAME =
     BlockAccessTest.class.getSimpleName();
   /** Test file we do updates with. */
-  private static final Prop PROP = new Prop();
+  private static final Prop PROP = new Prop(true);
   /** BlockStorage. */
   private TableDiskAccess tba;
   /** Test file size. */

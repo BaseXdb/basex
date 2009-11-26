@@ -1,16 +1,11 @@
 package org.basex.query.up;
 
 import static org.basex.util.Token.*;
-
 import java.util.HashSet;
 import java.util.Set;
-
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Namespaces;
-import org.basex.data.PathSummary;
-import org.basex.index.Names;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTxt;
@@ -158,13 +153,13 @@ public final class UpdateFunctions {
 
     // [LK] usage of index refs only possible if target node is a dbnode,
     // because insert/replace etc. nodes can be mixed up (DBNode, FNode ...)
-    final MemData m = d == null ? new MemData(16, new Names(), new Names(),
-        new Namespaces(), new PathSummary(), new Prop()) : new MemData(16, d);
+    final MemData md = d == null ? new MemData(new Prop(false)) :
+      new MemData(16, d);
 
     int pre = 1;
     Nod n;
-    while((n = ch.next()) != null) pre = addFragment(n, m, pre, 0);
-    return m;
+    while((n = ch.next()) != null) pre = addFragment(n, md, pre, 0);
+    return md;
   }
 
   /**

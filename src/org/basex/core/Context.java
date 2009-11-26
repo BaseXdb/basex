@@ -47,7 +47,7 @@ public final class Context {
    * Constructor.
    */
   public Context() {
-    prop = new Prop();
+    prop = new Prop(true);
     pool = new DataPool();
     sessions = new Sessions();
     users = new Users(true);
@@ -59,7 +59,7 @@ public final class Context {
    * @param ctx parent context
    */
   public Context(final Context ctx) {
-    prop = new Prop();
+    prop = new Prop(true);
     pool = ctx.pool;
     sessions = ctx.sessions;
     users = ctx.users;

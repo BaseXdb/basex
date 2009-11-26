@@ -82,9 +82,11 @@ public final class Undo {
   }
 
   /**
-   * Resets the undo history.
+   * Resets the undo history with the specified text.
+   * @param text initial text
    */
-  public void reset() {
+  public void reset(final byte[] text) {
+    hist[0] = text;
     pos = 0;
     max = 0;
   }

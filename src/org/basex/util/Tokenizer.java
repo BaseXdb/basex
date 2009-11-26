@@ -282,13 +282,10 @@ public class Tokenizer implements IndexToken {
   private static byte[] dia(final byte[] t, final boolean a) {
     if(a) return t;
     final String s = utf8(t, 0, t.length);
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder sb = new TokenBuilder();
     final int jl = s.length();
-    for(int j = 0; j < jl; j++) {
-      final char c = s.charAt(j);
-      sb.append(c < 192 || c > 255 ? c : (char) NORM[c - 192]);
-    }
-    return token(sb.toString());
+    for(int j = 0; j < jl; j++) sb.addUTF(Token.norm(s.charAt(j)));
+    return sb.finish();
   }
 
   /**

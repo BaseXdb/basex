@@ -4,10 +4,7 @@ import org.basex.core.AProp;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
-import org.basex.data.PathSummary;
-import org.basex.index.Names;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Itr;
@@ -22,9 +19,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 abstract class AbstractTest {
-  /** Dummy data reference to suppress exception. */
-  private static final Data DATA = new MemData(1, new Names(), new Names(),
-      new Namespaces(), new PathSummary(), new Prop());
+  /** Dummy data reference. */
+  private static final Data DATA = new MemData(new Prop(false));
   /** Document. */
   String doc;
   /** Queries. */

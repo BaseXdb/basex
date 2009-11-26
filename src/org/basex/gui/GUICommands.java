@@ -584,7 +584,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows the explorer view. */
-  SHOWEXPLORER(GUISHOWEXPLORE, "% 6", GUISHOWEXPLORETT, true, true) {
+  SHOWEXPLORE(GUISHOWEXPLORE, "% 6", GUISHOWEXPLORETT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWEXPLORE);

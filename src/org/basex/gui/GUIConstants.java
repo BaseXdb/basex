@@ -88,7 +88,7 @@ public final class GUIConstants {
   public static final GUICommand[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, INFO, null,
       SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
-      SHOWTABLE, SHOWPLOT, null, SHOWHELP
+      SHOWTABLE, SHOWPLOT, SHOWEXPLORE, null, SHOWHELP
   };
 
   // MENUBARS =================================================================
@@ -108,7 +108,7 @@ public final class GUIConstants {
   }, {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, null,
     MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWFOLDER, SHOWTABLE, SHOWPLOT,
-    SHOWEXPLORER, null, FULL
+    SHOWEXPLORE, null, FULL
   }, {
     MENUINTER, RTEXEC, RTFILTER, null,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT,

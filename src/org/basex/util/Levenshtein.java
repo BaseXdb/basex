@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import static org.basex.util.Token.*;
+
 /**
  * Levenshtein implementation, based on
  * "Levenshtein [1965], Binary codes capable of correcting spurious insertions
@@ -32,38 +34,39 @@ public final class Levenshtein {
    * @return true if the arrays are similar
    */
   public boolean similar(final byte[] token, final byte[] sub, final int err) {
-    final int tl = token.length;
+    int sl = 0, tl = 0;
+    for(int s = 0; s < sub.length; s += cl(sub[s])) sl++;
+    for(int t = 0; t < token.length; t += cl(token[t])) tl++;
     if(tl == 0) return false;
-    final int sl = sub.length;
 
     // use exact search for too short and too long values
-    if(sl < 4 || tl > MAX || sl > MAX) return eq(token, tl, sub);
+    if(sl < 4 || tl > MAX || sl > MAX) return sl == tl && same(token, sub);
 
     // skip different tokens with too different lengths
     final int k = err == 0 ? Math.max(1, sl >> 2) : err;
-    return Math.abs(sl - tl) <= k && ls(token, tl, sub, k);
+    return Math.abs(sl - tl) <= k && ls(token, tl, sub, sl, k);
   }
 
   /**
    * Calculates a Levenshtein distance.
    * @param tk token to be compared
-   * @param tl token length to be checked
+   * @param tl token length
    * @param sb sub token to be compared
+   * @param sl string length
    * @param k maximum number of accepted errors
    * @return true if the arrays are similar
    */
   private boolean ls(final byte[] tk, final int tl, final byte[] sb,
-      final int k) {
+      final int sl, final int k) {
     int e2 = -1, f2 = -1;
-    final int sl = sb.length;
     for(int t = 0; t < tl; t++) {
-      final int e = Token.norm(tk[t]);
+      final int e = norm(lc(cp(tk, t)));
       int d = Integer.MAX_VALUE;
-      for(int q = 0; q < sl; q++) {
-        final int f = Token.norm(sb[q]);
-        int c = m(m[t][q + 1] + 1, m[t + 1][q] + 1, m[t][q] + (e == f ? 0 : 1));
-        if(e == f2 && f == e2) c = m[t][q];
-        m[t + 1][q + 1] = c;
+      for(int s = 0; s < sl; s++) {
+        final int f = norm(lc(cp(sb, s)));
+        int c = m(m[t][s + 1] + 1, m[t + 1][s] + 1, m[t][s] + (e == f ? 0 : 1));
+        if(e == f2 && f == e2) c = m[t][s];
+        m[t + 1][s + 1] = c;
         d = Math.min(d, c);
         f2 = f;
       }
@@ -88,14 +91,13 @@ public final class Levenshtein {
   /**
    * Compares two character arrays for equality.
    * @param tk token to be compared
-   * @param tl length of token
    * @param sb second token to be compared
    * @return true if the arrays are equal
    */
-  private boolean eq(final byte[] tk, final int tl, final byte[] sb) {
-    if(tl != sb.length) return false;
-    for(int t = 0; t < tl; t++) {
-      if(Token.norm(tk[t]) != Token.norm(sb[t])) return false;
+  private boolean same(final byte[] tk, final byte[] sb) {
+    int t = 0, s = 0;
+    for(; t < tk.length && s < sb.length; t += cl(tk[t]), s += cl(sb[s])) {
+      if(lc(norm(cp(tk, t))) != lc(norm(cp(sb, t)))) return false;
     }
     return true;
   }

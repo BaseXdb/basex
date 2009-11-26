@@ -44,7 +44,7 @@ b_refresh=Refresh
 s_ok=OK
 
 # Visualizations
-no_table=No table available for this data
+no_data=No data available
 no_space=Too less space
 map_binary=Binary File
 info_title=Query Info

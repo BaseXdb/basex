@@ -44,7 +44,7 @@ b_refresh=Refresh
 s_ok=OK
 
 # Visualizations
-no_table=Không bản nào trống cho dữ liệu này
+no_data=No data available
 no_space=Thiếu chỗ
 map_binary=Tệp nhị phân
 info_title=Thông tin câu hỏi

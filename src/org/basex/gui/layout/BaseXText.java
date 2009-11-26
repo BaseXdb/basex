@@ -112,7 +112,7 @@ public class BaseXText extends BaseXPanel {
    */
   public final void setText(final byte[] t) {
     setText(t, t.length);
-    if(undo != null) undo.reset();
+    if(undo != null) undo.reset(t);
   }
 
   /**

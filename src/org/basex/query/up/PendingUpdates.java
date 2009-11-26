@@ -2,21 +2,16 @@ package org.basex.query.up;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Namespaces;
-import org.basex.data.PathSummary;
-import org.basex.index.Names;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -37,8 +32,10 @@ public final class PendingUpdates {
   private final Map<Data, Primitives> primitives = 
     new HashMap<Data, Primitives>();
   /** Data dummy for fragment updates. */
-  private final Data dataDummy = new MemData(16, new Names(), new Names(),
-      new Namespaces(), new PathSummary(), new Prop());
+  // [LK] problem is fixed; prop instance from main context could be adopted,
+  // though (QueryContext.Context.Prop), if needed at all.
+  // could be done in UpdateFunctions.buildDB(...) as well
+  private final Data dataDummy = new MemData(new Prop(false));
 
   /** The update operations are part of a transform expression. */
   private final boolean t;

@@ -28,7 +28,8 @@ public abstract class AProp {
    * Constructor.
    * Reads the configuration file and initializes the project properties. The
    * file is located in the user's home directory.
-   * @param prop property file
+   * If the <code>prop</code> argument is set to null, reading is omitted.
+   * @param prop property file extension
    */
   public AProp(final String prop) {
     filename = HOME + IO.BASEXSUFFIX + prop;
@@ -43,6 +44,7 @@ public abstract class AProp {
     } catch(final Exception ex) {
       Main.notexpected(ex);
     }
+    if(prop == null) return;
 
     final File file = new File(filename);
     if(!file.exists()) return;

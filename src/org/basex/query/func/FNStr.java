@@ -292,15 +292,15 @@ final class FNStr extends Fun {
    */
   private Item normuni(final QueryContext ctx) throws QueryException {
     final byte[] str = checkStr(expr[0], ctx);
-    String norm = null;
+    String nr = null;
     if(expr.length == 2) {
       final Item is = expr[1].atomic(ctx);
       if(is == null) Err.empty(this);
       final String n = string(uc(trim(checkStr(is))));
-      for(final String nrm : NORMS) if(nrm.equals(n)) norm = nrm;
-      if(norm == null) Err.or(NORMUNI, n);
+      for(final String nrm : NORMS) if(nrm.equals(n)) nr = nrm;
+      if(nr == null) Err.or(NORMUNI, n);
     } else {
-      norm = NORMS[0];
+      nr = NORMS[0];
     }
     // [CG] XQuery/normalize-unicode
     return Str.get(str);

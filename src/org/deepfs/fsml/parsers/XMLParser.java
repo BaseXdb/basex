@@ -56,7 +56,8 @@ public final class XMLParser implements IFileParser {
     final byte[] data = new byte[(int) f.size()];
     f.get(data);
     try {
-      final Parser p = Parser.xmlParser(new IOContent(data), new Prop());
+      // [BL] better approach.. aropt prop instance from main context
+      final Parser p = Parser.xmlParser(new IOContent(data), new Prop(false));
       return new MemBuilder(p).build();
     } catch(final IOException ex) {
       // XML parsing exception...

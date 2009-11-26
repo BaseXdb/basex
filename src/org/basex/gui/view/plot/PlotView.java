@@ -130,7 +130,7 @@ public final class PlotView extends View implements Runnable {
         gui.prop.set(GUIProp.PLOTDOTS, dots.value());
         refreshLayout();
       }
-    }, -10, 10, gui.prop.num(GUIProp.PLOTDOTS), gui);
+    }, -6, 6, gui.prop.num(GUIProp.PLOTDOTS), gui);
     BaseXLayout.setWidth(dots, 40);
     yLog = new BaseXCheckBox(PLOTLOG, false, null);
     yLog.setSelected(gui.prop.is(GUIProp.PLOTYLOG));
@@ -234,8 +234,8 @@ public final class PlotView extends View implements Runnable {
       final boolean marked, final boolean markedSub) {
 
     final int size = Math.max(1, gui.prop.num(GUIProp.FONTSIZE) +
-        gui.prop.num(GUIProp.PLOTDOTS) + (focus ? 2 :
-          marked || markedSub ? 0 : -2));
+        gui.prop.num(GUIProp.PLOTDOTS) - (focus ? 2 :
+          marked || markedSub ? 4 : 6));
     final BufferedImage img = new BufferedImage(size, size,
         Transparency.TRANSLUCENT);
 
@@ -291,8 +291,6 @@ public final class PlotView extends View implements Runnable {
 
   @Override
   public void paintComponent(final Graphics g) {
-    final Data data = gui.context.data;
-    if(data == null || !data.meta.pathindex) return;
     super.paintComponent(g);
 
     if(plotData == null) {
@@ -304,12 +302,14 @@ public final class PlotView extends View implements Runnable {
     final int h = getHeight();
     plotWidth = w - (MARGIN[1] + MARGIN[3]);
     plotHeight = h - (MARGIN[0] + MARGIN[2]);
-
     final int sz = sizeFactor();
-    if(plotWidth - sz < 0 || plotHeight - sz < 0) {
-      g.setFont(font);
-      g.setColor(Color.black);
-      BaseXLayout.drawCenter(g, NOSPACE, w, h / 2 - MARGIN[0]);
+
+    g.setFont(font);
+    g.setColor(Color.black);
+    final Data data = gui.context.data;
+    final boolean nd = data == null || !data.meta.pathindex;
+    if(nd || plotWidth - sz < 0 || plotHeight - sz < 0) {
+      BaseXLayout.drawCenter(g, nd ? NODATA : NOSPACE, w, h / 2 - MARGIN[0]);
       return;
     }
 
@@ -971,7 +971,7 @@ public final class PlotView extends View implements Runnable {
    * @return size value
    */
   private int sizeFactor() {
-    return Math.max(2, gui.prop.num(GUIProp.FONTSIZE) * 2);
+    return Math.max(2, gui.prop.num(GUIProp.FONTSIZE) << 1);
   }
 
   /**
