@@ -141,8 +141,10 @@ public final class JPGParser implements IFileParser {
     if(bfc.get() == 8) {
       final int height = bfc.getShort();
       final int width = bfc.getShort();
-      deepFile.addMeta(MetaElem.PIXEL_HEIGHT, height);
-      deepFile.addMeta(MetaElem.PIXEL_WIDTH, width);
+      MetaElem e = MetaElem.PIXEL_HEIGHT;
+      if(!deepFile.isMetaSet(e)) deepFile.addMeta(e, height);
+      e = MetaElem.PIXEL_WIDTH;
+      if(!deepFile.isMetaSet(e)) deepFile.addMeta(e, width);
     } else {
       Main.debug("JPGParser: Wrong data precision field (%).",
           bfc.getFileName());

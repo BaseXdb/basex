@@ -209,7 +209,7 @@ public class FSMLSerializer {
         startElem(CONTENT_NS, atts);
       } else { // regular file
         final Atts a = d.getFSAtts();
-        startElem(FILE_NS, a);
+        startElem(FILE_NS, a == null ? new Atts() : a);
       }
 
       // serialize metadata

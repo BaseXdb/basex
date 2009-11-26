@@ -62,9 +62,7 @@ public final class ExifParser {
      * two SLONGs, The first SLONG is the numerator and the second SLONG is the
      * denominator.
      */
-    SRATIONAL(8),
-    /** Date (20 ASCII chars). */
-    DATE(20);
+    SRATIONAL(8);
     
     /** The size in bytes. */
     private final int size;
@@ -178,7 +176,12 @@ public final class ExifParser {
     /** Software. */
     h131(MetaElem.SOFTWARE, Format.ASCII),
     /** DateTime of image creation. */
-    h132(1, MetaElem.DATE_CREATED, Format.DATE),
+    h132(20, MetaElem.DATE_CREATED, Format.ASCII) {
+      @Override
+      void meta(final DeepFile d, final BufferedFileChannel b) {
+        metaDate(d, b);
+      }
+    },
     /** Creator. */
     h13b(MetaElem.CREATOR_NAME, Format.ASCII),
     /** White point. */
@@ -195,15 +198,15 @@ public final class ExifParser {
         if(d.isMetaSet(elem)) return;
         metaSimple(d, b);
       }
-     },
-     /** Exif Image Height. */
-     ha003(1, MetaElem.PIXEL_HEIGHT, Format.SHORT, Format.LONG) {
-       @Override
-       void meta(final DeepFile d, final ByteBuffer b) { // always inlined
-         if(d.isMetaSet(elem)) return;
-         metaSimple(d, b);
-       }
-     },
+    },
+    /** Exif Image Height. */
+    ha003(1, MetaElem.PIXEL_HEIGHT, Format.SHORT, Format.LONG) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        if(d.isMetaSet(elem)) return;
+        metaSimple(d, b);
+      }
+    },
     /** Exposure time in seconds. */
     h829a(1, MetaElem.EXPOSURE_TIME, Format.RATIONAL) {
       @Override
@@ -232,6 +235,7 @@ public final class ExifParser {
     h8769(1, null, Format.LONG) {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) {
+        if(!check(o, buf)) err(o);
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
@@ -254,6 +258,8 @@ public final class ExifParser {
     Format format;
     /** The corresponding {@link MetaElem} (for simple fields only). */
     final MetaElem elem;
+    /** The default number of values. */
+    final int defaultCount;
     /** The number of values. */
     int count;
     /** Flag if the value of the field is inlined. */
@@ -276,7 +282,8 @@ public final class ExifParser {
      */
     private Tag(final int expectedCount, final MetaElem metaElem,
         final Format... allowedFormats) {
-      count = expectedCount;
+      assert expectedCount > 0 || expectedCount == -1;
+      defaultCount = expectedCount;
       elem = metaElem;
       aFormats = allowedFormats;
     }
@@ -290,7 +297,7 @@ public final class ExifParser {
       if(check(o, buf)) {
         if(inlined) meta(o.deepFile, buf);
         else meta(o.deepFile, o.bfc);
-      }
+      } else err(o);
     }
 
     /**
@@ -321,27 +328,30 @@ public final class ExifParser {
      * @param buf the ByteBuffer to read from.
      * @return true if the current IFD field is valid.
      */
-    private boolean check(final ExifParser o, final ByteBuffer buf) {
+    boolean check(final ExifParser o, final ByteBuffer buf) {
       format = Format.getForId(buf.getShort());
       for(final Format f : aFormats) {
         if(f.equals(format)) {
           final long c = buf.getInt() & 0xFFFFFFFFL;
-          if (c > Integer.MAX_VALUE) {
+          if (c > Integer.MAX_VALUE || c < 1) {
             err(o, "Invalid item count.");
             return false;
           }
-          if(count == Long.MIN_VALUE) count = (int) c;
-          else if(count != c) return false;
+          if(defaultCount == -1) count = (int) c;
+          else if(defaultCount != c) return false;
+          else count = defaultCount; // defaultCount == c
           final int size = count * format.getSize();
           if(size <= 4) inlined = true;
-          try {
-            o.bfc.position(buf.getInt());
-            o.bfc.buffer(size);
-          } catch(IOException e) {
-            err(o, e);
-            return false;
+          else {
+            try {
+              o.bfc.position(buf.getInt());
+              o.bfc.buffer(size);
+            } catch(IOException e) {
+              err(o, e);
+              return false;
+            }
+            inlined = false;
           }
-          inlined = false;
           return true;
         }
       }
@@ -375,10 +385,9 @@ public final class ExifParser {
         switch(format) {
           case ASCII:    d.addMeta(elem, b.get(new byte[count])); break;
           case RATIONAL: d.addMeta(elem, readRational(b));        break;
-          case DATE:     metaDate(d, b);                          break;
           default:
-            Main.debug("ExifParser: Unknown or unsupported field type (%)",
-                format);
+            Main.debug("ExifParser: Unknown or unsupported field type for " +
+                "non-inlined data (%)", format);
         }
       } catch(final IOException e) {
         err(d, e);
@@ -396,8 +405,9 @@ public final class ExifParser {
         case ASCII: d.addMeta(elem, buf.get(new byte[count]).array());  break;
         case SHORT: d.addMeta(elem, buf.getShort() & 0xFFFF);           break;
         case LONG:  d.addMeta(elem, buf.getInt() & 0xFFFFFFFFL);        break;
-        default: Main.debug("ExifParser: Unknown or unsupported field type (%)",
-                  format);
+        default:
+          Main.debug("ExifParser: Unknown or unsupported field type for " +
+              "inlined data (%)", format);
       }
     }
 
