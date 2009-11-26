@@ -2,6 +2,7 @@ package org.basex.index;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -18,7 +19,7 @@ import org.basex.util.Token;
  */
 public final class ValueBuilder extends IndexBuilder {
   /** Temporary value tree. */
-  private final ValueTree index = new ValueTree();
+  private final ValueTreeNew index;
   /** Index type (attributes/texts). */
   private final boolean text;
 
@@ -29,6 +30,7 @@ public final class ValueBuilder extends IndexBuilder {
    */
   public ValueBuilder(final Data d, final boolean txt) {
     super(d);
+    index = new ValueTreeNew(d.meta.lastid);
     text = txt;
   }
 
@@ -51,34 +53,36 @@ public final class ValueBuilder extends IndexBuilder {
     }
 
     index.init();
-    final int hs = index.size;
+    final int hs = index.tokens.size();
     final DataOutput outl = new DataOutput(prop.dbfile(db, f + 'l'));
     outl.writeNum(hs);
     final DataOutput outr = new DataOutput(prop.dbfile(db, f + 'r'));
     while(index.more()) {
-      outr.write5(outl.size());
-      final int p = index.next();
-      final int ds = index.ns[p];
-      outl.writeNum(ds);
+      index.nextTok();
+      final byte[] pres = index.nextPres();
+      final int size = Num.size(pres);
+      int v = 0;
+      for(int ip = 4; ip < size; v++) {
+        pre = Num.read(pres, ip);
+        ip += Num.len(pres, ip);        
+      }
 
-      // write id lists
-      final byte[] tmp = index.pre[p];
-      index.pre[p] = null;
-      for(int v = 0, ip = 4, o = 0; v < ds; ip += Num.len(tmp, ip), v++) {
-        final int pr = Num.read(tmp, ip);
+      outr.write5(outl.size());
+      outl.writeNum(v);
+      
+      for(int j = 0, ip = 4, o = 0; j < v; ip += Num.len(pres, ip), j++) {
+        final int pr = Num.read(pres, ip);
         outl.writeNum(pr - o);
         o = pr;
       }
     }
-    index.pre = null;
-    index.ns = null;
 
     outl.close();
     outr.close();
 
     return new Values(data, text);
   }
-
+  
   @Override
   public String det() {
     return text ? INDEXTXT : INDEXATT;
