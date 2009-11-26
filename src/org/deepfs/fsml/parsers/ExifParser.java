@@ -176,7 +176,7 @@ public final class ExifParser {
     /** Software. */
     h131(MetaElem.SOFTWARE, Format.ASCII),
     /** DateTime of image creation. */
-    h132(20, MetaElem.DATE_CREATED, Format.ASCII) {
+    h132(20, MetaElem.DATETIME_CREATED, Format.ASCII) {
       @Override
       void meta(final DeepFile d, final BufferedFileChannel b) {
         metaDate(d, b);
@@ -191,6 +191,157 @@ public final class ExifParser {
         d.addMeta(elem, readRational(b) + " " + readRational(b));
       }
     },
+    /** White point. */
+    h13f(6, MetaElem.PRIMARY_CHROMATICITIES, Format.RATIONAL) {
+      @Override
+      public void meta(final DeepFile d, final BufferedFileChannel b) {
+        final StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 6; i++)
+          sb.append(readRational(b)).append(" ");
+        d.addMeta(elem, sb.toString());
+      }
+    },
+    /** YCbCrCoefficients. */
+    h211(3, MetaElem.YCBCR_COEFFICIENTS, Format.RATIONAL) {
+      @Override
+      public void meta(final DeepFile d, final BufferedFileChannel b) {
+        final StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 3; i++)
+          sb.append(readRational(b)).append(" ");
+        d.addMeta(elem, sb.toString());
+      }
+    },
+    /** YCbCrPositioning. */
+    h213(1, MetaElem.YCBCR_POSITIONING, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 1:  s = "centered"; break;
+          case 2:  s = "co-sited"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** ReferenceBlackWhite. */
+    h214(6, MetaElem.REFERENCE_BLACK_WHITE, Format.RATIONAL) {
+      @Override
+      public void meta(final DeepFile d, final BufferedFileChannel b) {
+        final StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 6; i++)
+          sb.append(readRational(b)).append(" ");
+        d.addMeta(elem, sb.toString());
+      }
+    },
+    /** Copyright. */
+    h8298(MetaElem.RIGHTS, Format.ASCII),
+    /** Exposure time in seconds. */
+    h829a(1, MetaElem.EXPOSURE_TIME, Format.RATIONAL) {
+      @Override
+      void meta(final DeepFile d, final BufferedFileChannel b) {
+        final double sec = readRational(b);
+        d.addMeta(MetaElem.EXPOSURE_TIME_MS, sec * 1000);
+        final StringBuilder str = new StringBuilder();
+        if(sec < 1) str.append("1/").append((int) (1 / sec));
+        else str.append((int) sec);
+        str.append(" seconds");
+        d.addMeta(MetaElem.EXPOSURE_TIME, str.toString());
+      }
+    },
+    /** FNumber. */
+    h829d(1, MetaElem.F_NUMBER, Format.RATIONAL),
+    /** ExposureProgram. */
+    h8822(1, MetaElem.EXPOSURE_PROGRAM, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "not defined";       break;
+          case 1:  s = "manual";            break;
+          case 2:  s = "normal program";    break;
+          case 3:  s = "aperture priority"; break;
+          case 4:  s = "shutter priority";  break;
+          case 5:
+            s = "creative program (biased toward depth of field)";
+            break;
+          case 6:
+            s = "action program (biased toward fast shutter speed)";
+            break;
+          case 7:
+            s = "portrait mode (for closeup photos with the background out " +
+                "of focus)"; break;
+          case 8:
+            s = "landscape mode (for landscape photos with the background in " +
+                "focus)"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** GPS IFD. */
+    h8825(1, null, Format.LONG) {
+      @Override
+      void parse(final ExifParser o, final ByteBuffer buf) {
+        if(!check(o, buf)) err(o);
+        try {
+          o.bfc.position(buf.getInt());
+          o.readIFD();
+        } catch(IOException e) {
+          err(o.deepFile, e);
+        }
+      }
+    },
+    /** ISO speed ratings. */
+    h8827(MetaElem.ISO_SPEED_RATINGS, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) {
+        final StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < count; i++)
+          sb.append(b.getShort()).append(" ");
+        d.addMeta(elem, sb.toString());
+      }
+      @Override
+      void meta(final DeepFile d, final BufferedFileChannel b) {
+        final StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < count; i++)
+          sb.append(b.getShort()).append(" ");
+        d.addMeta(elem, sb.toString());
+      }
+    },
+    /** EXIF IFD. */
+    h8769(1, null, Format.LONG) {
+      @Override
+      void parse(final ExifParser o, final ByteBuffer buf) {
+        if(!check(o, buf)) err(o);
+        try {
+          o.bfc.position(buf.getInt());
+          o.readIFD();
+        } catch(IOException e) {
+          err(o.deepFile, e);
+        }
+      }
+    },
+    /** DateTimeOriginal. */
+    h9003(20, MetaElem.DATETIME_ORIGINAL, Format.ASCII) {
+      @Override
+      void meta(final DeepFile d, final BufferedFileChannel b) {
+        metaDate(d, b);
+      }
+    },
+    /** DateTimeDigitized. */
+    h9004(20, MetaElem.DATETIME_DIGITIZED, Format.ASCII) {
+      @Override
+      void meta(final DeepFile d, final BufferedFileChannel b) {
+        metaDate(d, b);
+      }
+    },
+    /** CompressedBitsPerPixel. */
+    h9102(1, MetaElem.COMPRESSED_BITS_PER_PIXEL, Format.RATIONAL),
+    /** Aperture value. */
+    h9202(1, MetaElem.APERTURE_VALUE, Format.RATIONAL),
+    /** Max aperture value. */
+    h9205(1, MetaElem.APERTURE_VALUE_MAX, Format.RATIONAL),
     /** Exif Image Width. */
     ha002(1, MetaElem.PIXEL_WIDTH, Format.SHORT, Format.LONG) {
       @Override
@@ -206,48 +357,7 @@ public final class ExifParser {
         if(d.isMetaSet(elem)) return;
         metaSimple(d, b);
       }
-    },
-    /** Exposure time in seconds. */
-    h829a(1, MetaElem.EXPOSURE_TIME, Format.RATIONAL) {
-      @Override
-      void meta(final DeepFile d, final BufferedFileChannel b) {
-        final double sec = readRational(b);
-        d.addMeta(MetaElem.EXPOSURE_TIME_MS, sec * 1000);
-        final StringBuilder str = new StringBuilder();
-        if(sec < 1) str.append("1/").append((int) (1 / sec));
-        else str.append((int) sec);
-        str.append(" seconds");
-        d.addMeta(MetaElem.EXPOSURE_TIME, str.toString());
-      }
-    },
-    // /** GPS IFD. */
-    // h8825 {
-    // @Override
-    // void parse(final ExifParser o, final ByteBuffer buf)
-    // throws IOException {
-    // if(buf.getShort() == IFD_TYPE_LONG && buf.getInt() == 1) {
-    // o.bfc.position(buf.getInt());
-    // o.readIFD();
-    // } else error(o, "GPS (0x8825)");
-    // }
-    // },
-    /** EXIF IFD. */
-    h8769(1, null, Format.LONG) {
-      @Override
-      void parse(final ExifParser o, final ByteBuffer buf) {
-        if(!check(o, buf)) err(o);
-        try {
-          o.bfc.position(buf.getInt());
-          o.readIFD();
-        } catch(IOException e) {
-          err(o.deepFile, e);
-        }
-      }
-    },
-    /** Aperture value. */
-    h9202(1, MetaElem.APERTURE_VALUE, Format.RATIONAL),
-    /** Max aperture value. */
-    h9205(1, MetaElem.APERTURE_VALUE_MAX, Format.RATIONAL);
+    };
 
     /** The format of the date values. */
     private static final SimpleDateFormat SDF = new SimpleDateFormat(

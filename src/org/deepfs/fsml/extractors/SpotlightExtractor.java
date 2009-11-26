@@ -157,7 +157,7 @@ public final class SpotlightExtractor implements IFileParser {
       @Override
       void parse(final DeepFile deepFile, final Object o) {
         if(check(o, Date.class)) deepFile.addMeta(
-            MetaElem.DATE_ATTRIBUTE_MODIFIED,
+            MetaElem.DATETIME_ATTRIBUTE_MODIFIED,
             ParserUtil.convertDateTime((Date) o));
       }
     },
@@ -222,7 +222,7 @@ public final class SpotlightExtractor implements IFileParser {
     ContentCreationDate {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
-        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATE_CREATED,
+        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATETIME_CREATED,
             ParserUtil.convertDateTime((Date) o));
       }
     },
@@ -388,7 +388,7 @@ public final class SpotlightExtractor implements IFileParser {
     LastUsedDate {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
-        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATE_LAST_USED,
+        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATETIME_LAST_USED,
             ParserUtil.convertDateTime((Date) o));
       }
     },
@@ -480,7 +480,7 @@ public final class SpotlightExtractor implements IFileParser {
     RecordingDate {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
-        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATE_CREATED,
+        if(check(o, Date.class)) deepFile.addMeta(MetaElem.DATETIME_CREATED,
             (String) o);
       }
     },

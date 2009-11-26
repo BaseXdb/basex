@@ -22,13 +22,19 @@ public enum MetaElem {
   DATE(NS.DCTERMS, "date", Type.DAT, false),
 
   /** Date of the last change made to a metadata attribute. */
-  DATE_ATTRIBUTE_MODIFIED(NS.FSMETA, "dateAttributeModified", Type.DTM, false),
+  DATETIME_ATTRIBUTE_MODIFIED(NS.FSMETA, "dateTimeAttributeModified",
+      Type.DTM, false),
   /** Date of the last change made to the content. */
-  DATE_CONTENT_MODIFIED(NS.FSMETA, "dateContentModified", Type.DTM, false),
+  DATETIME_CONTENT_MODIFIED(NS.FSMETA, "dateTimeContentModified", Type.DTM,
+      false),
   /** Date when the content was created. */
-  DATE_CREATED(NS.FSMETA, "dateCreated", Type.DTM, false),
+  DATETIME_CREATED(NS.FSMETA, "dateTimeCreated", Type.DTM, false),
+  /** Date when the content was digitized. */
+  DATETIME_DIGITIZED(NS.FSMETA, "dateTimeDigitized", Type.DTM, false),
   /** Date of the last usage. */
-  DATE_LAST_USED(NS.FSMETA, "dateLastUsed", Type.DTM, false),
+  DATETIME_LAST_USED(NS.FSMETA, "dateTimeLastUsed", Type.DTM, false),
+  /** Original date. */
+  DATETIME_ORIGINAL(NS.FSMETA, "dateTimeOriginal", Type.DTM, false),
   /** Year. */
   YEAR(NS.FSMETA, "year", Type.YEA, false),
 
@@ -61,8 +67,13 @@ public enum MetaElem {
   APERTURE_VALUE(NS.FSMETA, "apertureValue", Type.DBL, false),
   /** Maximum aperture value. */
   APERTURE_VALUE_MAX(NS.FSMETA, "apertureValueMax", Type.DBL, false),
+  /** Compressed bits per pixel. */
+  COMPRESSED_BITS_PER_PIXEL(NS.FSMETA, "compressedBitsPerPixel", Type.DBL,
+      false),
   /** Exposure time in seconds. */
   EXPOSURE_TIME_MS(NS.FSMETA, "exposureTimeMs", Type.DBL, false),
+  /** F number. */
+  F_NUMBER(NS.FSMETA, "fNumber", Type.DBL, false),
   /** X resolution. */
   X_RESOLUTION(NS.FSMETA, "xResolution", Type.DBL, false),
   /** Y resolution. */
@@ -100,6 +111,8 @@ public enum MetaElem {
   ENCODING(NS.FSMETA, "encoding", Type.STR, false),
   /** Exposure time as string. */
   EXPOSURE_TIME(NS.FSMETA, "exposureTime", Type.STR, false),
+  /** Exposure program. */
+  EXPOSURE_PROGRAM(NS.FSMETA, "exposureProgram", Type.STR, false),
   /** Genre. */
   GENRE(NS.FSMETA, "genre", Type.STR, true),
   /**
@@ -138,9 +151,19 @@ public enum MetaElem {
   RIGHTS(NS.DCTERMS, "rights", Type.STR, false),
   /** Software. */
   SOFTWARE(NS.FSMETA, "software", Type.STR, false),
+  
   /** White point. */
-  // [BL] whitePoint data type
   WHITE_POINT(NS.FSMETA, "whitePoint", Type.STR, false),
+  /** Primary chromaticities. */
+  PRIMARY_CHROMATICITIES(NS.FSMETA, "primaryChromaticities", Type.STR, false),
+  /** YCbCrCoefficients. */
+  YCBCR_COEFFICIENTS(NS.FSMETA, "yCbCrCoefficients", Type.STR, false),
+  /** YCbCrPositioning. */
+  YCBCR_POSITIONING(NS.FSMETA, "yCbCrPositioning", Type.STR, false),
+  /** ReferenceBlackWhite. */
+  REFERENCE_BLACK_WHITE(NS.FSMETA, "referenceBlackWhite", Type.STR, false),
+  /** ISO speed ratings. */
+  ISO_SPEED_RATINGS(NS.FSMETA, "isoSpeedRatings", Type.STR, false),
 
   // ----- location -----
   /** City. */

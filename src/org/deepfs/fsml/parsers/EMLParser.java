@@ -53,7 +53,7 @@ public final class EMLParser implements IFileParser {
       public boolean parse(final EMLParser obj) {
         try {
           final Date d = SDF.parse(obj.mCurrLine);
-          obj.deepFile.addMeta(MetaElem.DATE_CREATED,
+          obj.deepFile.addMeta(MetaElem.DATETIME_CREATED,
               ParserUtil.convertDateTime(d));
         } catch(final ParseException ex) {
           Main.debug("%: %", obj.bfc.getFileName(), ex.getMessage());
