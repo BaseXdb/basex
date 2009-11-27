@@ -1,0 +1,374 @@
+package org.basex.gui.view.tree;
+
+import java.awt.Graphics;
+import java.util.ArrayList;
+
+import org.basex.data.Data;
+import org.basex.gui.layout.BaseXLayout;
+import org.basex.util.IntList;
+import org.basex.util.Token;
+
+/**
+ * This class determines nodes per level and caches them.
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Wolfgang Miller
+ */
+public class TreeCaching implements TreeViewOptions {
+
+  /** document depth. */
+  public int maxLevel = -1;
+
+  /** All nodes document nodes per level. */
+  private ArrayList<int[]> nodesPerLevel;
+  /** Rectangles per level. */
+  private ArrayList<RectangleCache[]> rectsPerLevel;
+  /** Lists per level if big rectangle or not. */
+  private boolean[] bigRectangle;
+
+  /**
+   * This constructor invokes methods to cache all document nodes.
+   * @param data data reference.
+   */
+  public TreeCaching(final Data data) {
+    maxLevel = data.meta.height + 1;
+    cacheNodes(data);
+  }
+
+  /**
+   * Determines nodes in each level and caches them.
+   * @param data data reference.
+   */
+  private void cacheNodes(final Data data) {
+
+    nodesPerLevel = null;
+    ArrayList<int[]> nL = new ArrayList<int[]>();
+
+    int[] parentList = { 0};
+    int level = 0;
+
+    while(maxLevel > level++) {
+      nL.add(parentList);
+      parentList = getNextNodeLine(parentList, data);
+    }
+    nL.trimToSize();
+    nodesPerLevel = nL;
+  }
+
+  /**
+   * Saves node line in parentList.
+   * @param parentList array with nodes of the line before.
+   * @param data the data reference.
+   * @return array filled with nodes of the current line.
+   */
+  private int[] getNextNodeLine(final int[] parentList, final Data data) {
+    final int l = parentList.length;
+    final IntList temp = new IntList();
+
+    for(int i = 0; i < l; i++) {
+
+      final int p = parentList[i];
+      final ChildIterator iterator = new ChildIterator(data, p);
+
+      while(iterator.more()) {
+        final int pre = iterator.next();
+
+        if(data.kind(pre) == Data.ELEM || !ONLY_ELEMENT_NODES) {
+          temp.add(pre);
+        }
+      }
+    }
+    return temp.finish();
+  }
+
+  /**
+   * Generates cached rectangles.
+   * @param g graphics reference
+   * @param d data reference
+   * @param sW screen width
+   */
+  public void generateRects(final Graphics g, final Data d, final int sW) {
+
+    rectsPerLevel = new ArrayList<RectangleCache[]>();
+    bigRectangle = new boolean[maxLevel];
+    int[] doc = d.doc();
+
+    if(doc.length == 1 && doc[0] > 0) {
+      System.out.println(doc[0]);
+    }
+
+    for(int i = 0; i < maxLevel; i++) {
+      int[] currLine = nodesPerLevel.get(i);
+      int lS = currLine.length;
+      double w = sW / (double) lS;
+
+      if(w < 2) {
+        bigRectangle[i] = true;
+        rectsPerLevel.add(bigRectangle(sW));
+      } else {
+        bigRectangle[i] = false;
+        rectsPerLevel.add(normalRectangle(g, d, i, w, lS));
+      }
+    }
+    rectsPerLevel.trimToSize();
+  }
+
+  /**
+   * Invoked if not enough space for more than one big rectangle.
+   * @param w the width
+   * @return big rectangle
+   */
+  private RectangleCache[] bigRectangle(final double w) {
+    final RectangleCache bigRect = new RectangleCache(0, (int) w);
+    RectangleCache[] rL = { bigRect};
+    return rL;
+  }
+
+  /**
+   * Creates normal rectangles.
+   * @param g graphics reference
+   * @param d data reference
+   * @param l level
+   * @param w width
+   * @param s size
+   * @return rectangles
+   */
+  private RectangleCache[] normalRectangle(final Graphics g, final Data d,
+      final int l, final double w, final int s) {
+
+    double xx = 0;
+    double ww = w;
+
+    // new array, to be filled with the rectangles of the current level
+    final RectangleCache[] rects = new RectangleCache[s];
+
+    for(int i = 0; i < s; i++) {
+
+      final double boxMiddle = xx + ww / 2f;
+
+      if(SLIM_TO_TEXT) {
+        String st = getText(d, getPrePerLevelAndIndex(l, i));
+        int o = calcOptimalRectWidth(g, st) + 10;
+        if(o < MIN_SPACE) o = MIN_SPACE;
+
+        if(w > o) {
+          xx = boxMiddle - o / 2;
+          ww = o;
+        }
+      }
+
+      final RectangleCache rect = new RectangleCache((int) xx, (int) ww);
+
+      rects[i] = rect;
+
+      xx += w;
+    }
+
+    return rects;
+  }
+
+  /**
+   * Returns TreeRects in given level.
+   * @param l level
+   * @return TreeRect array
+   */
+  public TreeRect[] getTreeRectsPerLevel(final int l) {
+    int s = isBigRectangle(l) ? 1 : getSizePerLevel(l);
+    TreeRect[] tr = new TreeRect[s];
+
+    for(int i = 0; i < s; i++) {
+      tr[i] = getTreeRect(l, i);
+    }
+    return tr;
+  }
+
+  /**
+   * Determines the index position of given pre value.
+   * @param lv level to be searched
+   * @param pre the pre value
+   * @return the determined index position
+   */
+  public int searchPreArrayPosition(final int lv, final int pre) {
+
+    final int[] a = nodesPerLevel.get(lv);
+    int index = -1;
+    int l = 0;
+    int r = a.length - 1;
+
+    while(r >= l && index == -1) {
+      final int m = l + (r - l) / 2;
+
+      if(a[m] < pre) {
+        l = m + 1;
+      } else if(a[m] > pre) {
+        r = m - 1;
+      } else {
+        index = m;
+      }
+    }
+    return index;
+  }
+
+  /**
+   * Uses binary search to find the rectangle with given pre value.
+   * @param lv level
+   * @param pre the pre value to be found.
+   * @return the rectangle containing the given pre value, null else.
+   */
+  public TreeRect searchRect(final int lv, final int pre) {
+
+    int[] pres = nodesPerLevel.get(lv);
+    TreeRect rect = null;
+    int l = 0;
+    int r = pres.length - 1;
+    int m = -1;
+
+    while(r >= l && rect == null) {
+      m = l + (r - l) / 2;
+
+      if(pres[m] < pre) {
+        l = m + 1;
+      } else if(pres[m] > pre) {
+        r = m - 1;
+      } else {
+        rect = getTreeRect(lv, m);
+      }
+    }
+    return rect;
+  }
+
+  /**
+   * Returns size of given level.
+   * @param l level
+   * @return size
+   */
+  public int getSizePerLevel(final int l) {
+    return nodesPerLevel.get(l).length;
+  }
+
+  /**
+   * Return pre value at given level and index.
+   * @param l level
+   * @param i index
+   * @return pre value
+   */
+  public int getPrePerLevelAndIndex(final int l, final int i) {
+    return nodesPerLevel.get(l)[i];
+  }
+
+  /**
+   * Extends CachedRect to TreeRect.
+   * @param l level
+   * @param i index
+   * @return TreeRect
+   */
+  private TreeRect getTreeRect(final int l, final int i) {
+    TreeRect r = new TreeRect(rectsPerLevel.get(l)[i]);
+    r.pre = isBigRectangle(l) ? -1 : nodesPerLevel.get(l)[i];
+    return r;
+  }
+
+  /**
+   * returns the node text.
+   * @param data data reference
+   * @param pre the pre value
+   * @return String with node text
+   */
+  public String getText(final Data data, final int pre) {
+    final int kind = data.kind(pre);
+    String s = "";
+
+    if(data.meta.deepfs) {
+      if(data.fs.isFile(pre)) s += Token.string(data.fs.name(pre));
+      else s += Token.string(data.attValue(pre + 1));
+
+    } else {
+
+      if(kind == Data.ELEM) {
+        s += Token.string(data.tag(pre));
+      } else {
+        s += Token.string(data.text(pre));
+      }
+    }
+
+    return s;
+  }
+
+  /**
+   * Returns true if big rectangle, false else.
+   * @param l level
+   * @return boolean
+   */
+  public boolean isBigRectangle(final int l) {
+    return bigRectangle[l];
+  }
+
+  /**
+   * Calculates optimal rectangle width.
+   * @param g the graphics reference
+   * @param s given string
+   * @return optimal rectangle width
+   */
+  private int calcOptimalRectWidth(final Graphics g, final String s) {
+    return BaseXLayout.width(g, s);
+  }
+
+  /**
+   * This is class is used to cache rectangles.
+   * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+   * @author Wolfgang Miller
+   */
+  private class RectangleCache {
+    /** X position. */
+    public int x;
+    /** Width. */
+    public int w;
+
+    /**
+     * Saves width and x position.
+     * @param xx x position
+     * @param ww width
+     */
+    public RectangleCache(final int xx, final int ww) {
+      w = ww;
+      x = xx;
+    }
+  }
+
+  /**
+   * This is class is used to handle rectangles.
+   * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+   * @author Wolfgang Miller
+   */
+  public class TreeRect extends RectangleCache {
+    /** The pre value. */
+    public int pre;
+
+    /**
+     * Initializes TreeRect.
+     * @param xx x position
+     * @param ww width
+     */
+    public TreeRect(final int xx, final int ww) {
+      super(xx, ww);
+    }
+
+    /**
+     * Initializes TreeRect.
+     * @param c RectangleCache
+     */
+    public TreeRect(final RectangleCache c) {
+      super(c.x, c.w);
+    }
+
+    /**
+     * Verifies if the specified coordinates are inside the rectangle.
+     * @param xx x position
+     * @return result of comparison
+     */
+    public boolean contains(final int xx) {
+      return xx >= x && xx <= x + w || xx >= x + w && xx <= x;
+    }
+  }
+
+}
