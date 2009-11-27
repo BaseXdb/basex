@@ -41,7 +41,7 @@
     <copy todir="${build}/org/basex/gui/img">
       <fileset dir="${src}/org/basex/gui/img"/>
     </copy>
-    <javac srcdir="${src}" destdir="${build}">
+    <javac srcdir="${src}" destdir="${build}" encoding="UTF-8">
 	 <classpath refid="build.classpath"/>
     </javac>
   </target>
@@ -51,7 +51,7 @@
           depends="build_init" 
           description="Compile client only"> 
     <!-- includesfile="${conf}/files4clientjar.inc" -->
-    <javac srcdir="${src}" destdir="${build}" 
+    <javac srcdir="${src}" destdir="${build}" encoding="UTF-8" 
            excludes="${guipath}/**"/>
   </target>
 
@@ -59,7 +59,7 @@
   <target name="build_server"
           depends="build_init" 
           description="Compile server only"> 
-    <javac srcdir="${src}" destdir="${build}" 
+    <javac srcdir="${src}" destdir="${build}" encoding="UTF-8" 
            excludes="${guipath}/**"/>
   </target>
 
@@ -67,8 +67,7 @@
   <target name="build_tests"
           depends="build_init,build" 
           description="Compile all tests"> 
-    <javac srcdir="${test}" 
-           destdir="${build}"/>
+    <javac srcdir="${test}" destdir="${build}" encoding="UTF-8" />
   </target>
 
   <!-- ===================================================================== -->
