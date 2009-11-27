@@ -23,18 +23,18 @@ final class ValueTreeNew {
   
   /** Flag if a node has changed. */
   final BoolList changed = new BoolList();
-  /** tree root node */
+  /** Tree root node. */
   int root = -1;
-  /** current number of tokens in the index */
+  /** Current number of tokens in the index. */
   int numPre;
-  /** iterator reference */
+  /** Iterator reference. */
   Iterator iterator;
 
   /**
    * Constructor.
    * @param maxPre maximal pre value
    */
-  ValueTreeNew (final int maxPre) {
+  ValueTreeNew(final int maxPre) {
     pres = new byte[maxPre][];
   }
   
@@ -276,7 +276,7 @@ final class ValueTreeNew {
 
   
   /**
-   * Adjust tree balance
+   * Adjusts tree balance.
    * @param n node to be adjusted
    */
   private void adjust(final int n) {
@@ -360,14 +360,14 @@ final class ValueTreeNew {
   }
 
 
-  /** depth first tree iterator */
+  /** Depth first tree iterator. */
   private class Iterator {
     /** Current tree node. */
     int node;
     /** Last tree node. */
     int last;
 
-    /** iterator constructor */
+    /** Iterator constructor. */
     Iterator() {
       // get left-most node
       node = root;
