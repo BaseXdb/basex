@@ -2,6 +2,7 @@ package org.basex.gui.view.map;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -12,12 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
-import java.util.Random;
 import javax.swing.SwingUtilities;
-import java.io.File;
-import java.io.IOException;
-import javax.imageio.ImageIO;
-import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIProp;
@@ -671,7 +667,7 @@ public final class MapView extends View implements Runnable {
     mouseX = e.getX();
     mouseY = e.getY();
 
-    if(!gui.prop.is(GUIProp.MAPINTERACTION) || !BaseXLayout.mod(e)) {
+    if(!gui.prop.is(GUIProp.MAPINTERACTION) || !sc(e)) {
       if(focus()) {
         if(!(mouseX > tinyx && mouseX < tinyx + tinyw && mouseY > tinyy &&
             mouseY < tinyy + tinyh)) {
@@ -785,7 +781,7 @@ public final class MapView extends View implements Runnable {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
-    } else if(BaseXLayout.mod(e)) {
+    } else if(sc(e)) {
       gui.notify.mark(2, null);
     } else {
       if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);
@@ -841,72 +837,33 @@ public final class MapView extends View implements Runnable {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(gui.updating) return;
-    if(mainRects == null || BaseXLayout.mod(e) || e.isAltDown()) return;
+    if(gui.updating || mainRects == null || ignoreTyped(e)) return;
 
-    final int key = e.getKeyCode();
-    final boolean shift = e.isShiftDown();
-
-    final Context context = gui.context;
-    final Data data = context.data;
-    final int size = data.meta.size;
-    final Nodes current = context.current;
-
-    int pre = current.nodes[0];
-    final GUIProp prop = gui.prop;
-    if(key == 'R') {
-      final Random rnd = new Random();
-      do {
-        pre = rnd.nextInt(size);
-      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(prop, data, pre));
-      gui.notify.jump(new Nodes(pre, data));
-    } else if(key == 'N') {
-      // jump to next node
-      do {
-        pre = (pre + 1) % size;
-      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(prop, data, pre));
-      gui.notify.jump(new Nodes(pre, data));
-    } else if(key == 'P') {
-      // jump to previous node
-      do {
-        pre = (pre == 0 ? size : pre) - 1;
-      } while(data.kind(pre) != Data.ELEM || !ViewData.isLeaf(prop, data, pre));
-
-      gui.notify.jump(new Nodes(pre, data));
-    } else if(key == KeyEvent.VK_ESCAPE) {
+    if(pressed(ESCAPE, e)) {
       tinyw = 0;
       tinyh = 0;
       repaint();
-      // [JH] to be included only in test versions
-    } else if(gui.prop.is(GUIProp.MAPINTERACTION) && key == '1') {
-      try {
-        final File file1 = new File("baseXTM.png");
-        ImageIO.write(mainMap, "png", file1);
-        final File file2 = new File("baseXhugeTM.png");
-        ImageIO.write(hugeMap, "png", file2);
-      } catch(final IOException exc) {
-        exc.printStackTrace();
-      }
     }
 
-    final boolean cursor = key == KeyEvent.VK_UP || key == KeyEvent.VK_DOWN
-        || key == KeyEvent.VK_LEFT || key == KeyEvent.VK_RIGHT;
+    final boolean cursor = pressed(UP, e) || pressed(DOWN, e) ||
+      pressed(LEFT, e) || pressed(RIGHT, e);
     if(!cursor) return;
 
     if(focused == null) focused = mainRects.get(0);
 
     final int fs = gui.prop.num(GUIProp.FONTSIZE);
     int o = fs + 4;
-    if(key == KeyEvent.VK_UP) {
+    final boolean shift = e.isShiftDown();
+    if(pressed(UP, e)) {
       mouseY = focused.y + (shift ? focused.h - fs : 0) - 1;
       if(shift) mouseX = focused.x + (focused.w >> 1);
-    } else if(key == KeyEvent.VK_DOWN) {
+    } else if(pressed(DOWN, e)) {
       mouseY = focused.y + (shift ? o : focused.h + 1);
       if(shift) mouseX = focused.x + (focused.w >> 1);
-    } else if(key == KeyEvent.VK_LEFT) {
+    } else if(pressed(LEFT, e)) {
       mouseX = focused.x + (shift ? focused.w - fs : 0) - 1;
       if(shift) mouseY = focused.y + (focused.h >> 1);
-    } else if(key == KeyEvent.VK_RIGHT) {
+    } else if(pressed(RIGHT, e)) {
       mouseX = focused.x + (shift ? o : focused.w + 1);
       if(shift) mouseY = focused.y + (focused.h >> 1);
     }
@@ -916,17 +873,6 @@ public final class MapView extends View implements Runnable {
     mouseY = Math.max(o << 1, Math.min(getHeight() - o - 1, mouseY));
 
     if(focus()) repaint();
-  }
-
-  @Override
-  public void keyTyped(final KeyEvent e) {
-    if(gui.updating) return;
-    final char ch = e.getKeyChar();
-    if(ch == '|') {
-      gui.prop.set(GUIProp.MAPOFFSETS,
-        (gui.prop.num(GUIProp.MAPOFFSETS) + 1) % MAPOFFSET.length);
-      gui.notify.layout();
-    }
   }
 
   @Override

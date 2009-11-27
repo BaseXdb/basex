@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -24,7 +25,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.MatteBorder;
 import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
@@ -62,7 +62,7 @@ public class BaseXText extends BaseXPanel {
   public BaseXText(final boolean edit, final Window win) {
     super(win);
     setFocusable(true);
-    setFocusTraversalKeysEnabled(false);
+    setFocusTraversalKeysEnabled(!edit);
 
     BaseXLayout.addInteraction(this, null, win);
     addMouseMotionListener(this);
@@ -110,7 +110,7 @@ public class BaseXText extends BaseXPanel {
    * Sets the output text.
    * @param t output text
    */
-  public final void setText(final byte[] t) {
+  public void setText(final byte[] t) {
     setText(t, t.length);
     if(undo != null) undo.reset(t);
   }
@@ -309,133 +309,153 @@ public class BaseXText extends BaseXPanel {
    */
   private void selectLine() {
     text.pos(text.cursor());
-    text.home(true);
+    text.bol(true);
     text.startMark();
-    text.end(Integer.MAX_VALUE, true);
+    text.forward(Integer.MAX_VALUE, true);
     text.endMark();
   }
 
   // KEY INTERACTIONS =======================================================
 
-  /** Last horizontal position. */
-  private int col = -1;
-
   @Override
   public void keyPressed(final KeyEvent e) {
-    final int c = e.getKeyCode();
-    final boolean shf = e.isShiftDown();
-    final boolean mod = BaseXLayout.mod(e);
+    if(modifier(e)) return;
 
-    // traverse focus to next/previous panel if ctrl-tab was pressed..  
-    if(c == KeyEvent.VK_TAB && mod) {
-      if(shf) transferFocusBackward();
-      else transferFocus();
+    // operations that change the focus are put first..
+    if(pressed(PREVTAB, e)) {
+      transferFocusBackward();
       return;
     }
-    if(mod && c == KeyEvent.VK_F) {
+    if(pressed(NEXTTAB, e)) {
+      transferFocus();
+      return;
+    }
+    if(pressed(FIND, e)) {
       if(find != null) find.requestFocusInWindow();
       return;
     }
-    if(c == KeyEvent.VK_F3) {
-      find(rend.find(shf, true));
+
+    // re-animate cursor
+    cursor(true);
+
+    // operations without cursor movement...
+    final int fh = rend.fontH();
+    if(pressed(SCROLLDOWN, e)) {
+      scroll.pos(scroll.pos() + fh);
+      return;
+    }
+    if(pressed(SCROLLUP, e)) {
+      scroll.pos(scroll.pos() - fh);
+      return;
+    }
+    if(pressed(COPY, e)) {
+      copy();
       return;
     }
 
-    if(e.isAltDown() || c == KeyEvent.VK_SHIFT || c == KeyEvent.VK_META ||
-        c == KeyEvent.VK_CONTROL || c == KeyEvent.VK_ESCAPE) return;
-
+    // set cursor position and reset last column
     text.pos(text.cursor());
-    cursor(true);
+    if(!pressed(UP, e) && !pressed(DOWN, e)) lastCol = -1;
+
+    if(pressed(FINDNEXT, e) || pressed(FINDPREV, e)) {
+      find(rend.find(pressed(FINDPREV, e), true));
+      return;
+    }
+    if(pressed(SELECTALL, e)) {
+      selectAll();
+      text.setCaret();
+      return;
+    }
+
+    final boolean marking = e.isShiftDown();
+    final boolean nomark = text.start() == -1;
+    if(marking && nomark) text.startMark();
+    boolean down = true;
+    boolean consumed = true;
+
+    // operations that consider the last text mark..
+    if(pressed(WORDRIGHT, e)) {
+      final boolean ch = ftChar(text.next(marking));
+      while(text.pos() < text.size() && ch == ftChar(text.curr()))
+        text.next(marking);
+    } else if(pressed(WORDLEFT, e)) {
+      final boolean ch = ftChar(text.prev(marking));
+      while(text.pos() > 0 && ch == ftChar(text.prev(marking)));
+      if(text.pos() != 0) text.next(marking);
+      down = false;
+    } else if(pressed(BOT, e)) {
+      if(!marking) text.noMark();
+      text.pos(0);
+      down = false;
+    } else if(pressed(EOT, e)) {
+      if(!marking) text.noMark();
+      text.pos(text.size());
+    } else if(pressed(BOL, e)) {
+      text.bol(marking);
+      down = false;
+    } else if(pressed(EOL, e)) {
+      text.forward(Integer.MAX_VALUE, marking);
+    } else if(pressed(PAGEDOWN, e)) {
+      down(getHeight() / fh, marking);
+    } else if(pressed(PAGEUP, e)) {
+      up(getHeight() / fh, marking);
+      down = false;
+    } else if(pressed(RIGHT, e)) {
+      text.next(marking);
+    } else if(pressed(LEFT, e)) {
+      text.prev(marking);
+      down = false;
+    } else if(pressed(UP, e)) {
+      up(1, marking);
+      down = false;
+    } else if(pressed(DOWN, e)) {
+      down(1, marking);
+    } else {
+      consumed = false;
+    }
 
     final byte[] txt = text.text;
-
-    boolean down = true;
-    if(!mod && !e.isActionKey()) return;
-
-    if(c != KeyEvent.VK_DOWN && c != KeyEvent.VK_UP) col = -1;
-
-    if(mod && !shf) {
-      if(c == KeyEvent.VK_A) {
-        selectAll();
-        text.setCaret();
-        return;
-      }
-      if(c == KeyEvent.VK_C) {
-        copy();
-        return;
-      }
-
-      if(undo != null) {
-        if(c == KeyEvent.VK_X) {
-          cut();
-        } else if(c == KeyEvent.VK_V) {
-          paste();
-        } else if(c == KeyEvent.VK_Z) {
-          undo();
-        } else if(c == KeyEvent.VK_Y) {
-          redo();
+    if(marking) {
+      // refresh scroll position
+      text.endMark();
+    } else if(undo != null) {
+      // edit operations...
+      if(pressed(CUT, e)) {
+        cut();
+      } else if(pressed(PASTE, e)) {
+        paste();
+      } else if(pressed(UNDO, e)) {
+        undo();
+      } else if(pressed(REDO, e)) {
+        redo();
+      } else if(pressed(DELWORD, e) || pressed(DEL, e)) {
+        if(nomark && text.pos() == text.size()) return;
+        final boolean ld = ftChar(text.curr());
+        text.delete();
+        if(nomark && pressed(DELWORD, e)) {
+          while(text.pos() < text.size() && ld == ftChar(text.curr()))
+            text.delete();
         }
+      } else if(pressed(DELWORDBACK, e) || pressed(DELBACK, e)) {
+        if(nomark) {
+          if(text.pos() == 0) return;
+          text.prev();
+        }
+        final boolean ld = ftChar(text.curr());
+        text.delete();
+        if(nomark && pressed(DELWORDBACK, e)) {
+          while(text.pos() > 0 && ld == ftChar(text.prev())) text.delete();
+          if(text.pos() != 0) text.next();
+        }
+        down = false;
+      } else {
+        consumed = false;
       }
     }
-
-    if(shf && text.start() == -1) text.startMark();
-
-    final int fh = rend.fontH();
-    final int h = getHeight();
-
-    if(c == KeyEvent.VK_RIGHT) {
-      if(mod) {
-        final boolean ch = ftChar(text.next(shf));
-        while(text.pos() < text.size() && ch == ftChar(text.curr()))
-          text.next(shf);
-      } else {
-        text.next(shf);
-      }
-    } else if(c == KeyEvent.VK_LEFT) {
-      if(mod) {
-        final boolean ch = ftChar(text.prev(shf));
-        while(text.pos() > 0 && ch == ftChar(text.prev(shf)));
-        if(text.pos() != 0) text.next(shf);
-      } else {
-        text.prev(shf);
-      }
-      down = false;
-    } else if(c == KeyEvent.VK_DOWN) {
-      if(mod) {
-        scroll.pos(scroll.pos() + fh);
-        return;
-      }
-      down(1, shf);
-    } else if(c == KeyEvent.VK_UP) {
-      if(mod) {
-        scroll.pos(scroll.pos() - fh);
-        return;
-      }
-      up(1, shf);
-      down = false;
-    } else {
-      if(!shf) text.noMark();
-
-      if(c == KeyEvent.VK_HOME) {
-        if(mod) text.pos(0);
-        else text.home(shf);
-        down = false;
-      } else if(c == KeyEvent.VK_END) {
-        if(mod) text.pos(text.size());
-        else text.end(Integer.MAX_VALUE, shf);
-      } else if(c == KeyEvent.VK_PAGE_DOWN) {
-        down(h / fh, shf);
-      } else if(c == KeyEvent.VK_PAGE_UP) {
-        up(h / fh, shf);
-        down = false;
-      }
-    }
-
-    // refresh scroll position
-    if(shf) text.endMark();
+    if(consumed) e.consume();
 
     text.setCaret();
-    if(txt != text.text) rend.calc(); // comparison by reference
+    if(txt != text.text) rend.calc();
     showCursor(down ? 2 : 0);
   }
 
@@ -455,84 +475,58 @@ public class BaseXText extends BaseXPanel {
   }
 
   /**
-   * Moves the cursor down.
+   * Moves the cursor down. The current column position is remembered in
+   * {@link #lastCol} and, if possible, restored.
    * @param l number of lines to move cursor
-   * @param shf shift flag
+   * @param mark mark flag
    */
-  private void down(final int l, final boolean shf) {
-    if(!shf) text.noMark();
-    final int x = text.home(shf);
-    if(col == -1) col = x;
+  private void down(final int l, final boolean mark) {
+    if(!mark) text.noMark();
+    final int x = text.bol(mark);
+    if(lastCol == -1) lastCol = x;
     for(int i = 0; i < l; i++) {
-      text.end(Integer.MAX_VALUE, shf);
-      text.next(shf);
+      text.forward(Integer.MAX_VALUE, mark);
+      text.next(mark);
     }
-    text.end(col, shf);
-    if(text.pos() == text.size()) col = -1;
+    text.forward(lastCol, mark);
+    if(text.pos() == text.size()) lastCol = -1;
   }
 
   /**
    * Moves the cursor up.
    * @param l number of lines to move cursor
-   * @param shf shift flag
+   * @param mark mark flag
    */
-  private void up(final int l, final boolean shf) {
-    if(!shf) text.noMark();
-    final int x = text.home(shf);
-    if(col == -1) col = x;
+  private void up(final int l, final boolean mark) {
+    if(!mark) text.noMark();
+    final int x = text.bol(mark);
+    if(lastCol == -1) lastCol = x;
     if(text.pos() == 0) {
-      col = -1;
+      lastCol = -1;
       return;
     }
     for(int i = 0; i < l; i++) {
-      text.prev(shf);
-      text.home(shf);
+      text.prev(mark);
+      text.bol(mark);
     }
-    text.end(col, shf);
+    text.forward(lastCol, mark);
   }
+
+  /** Last horizontal position. */
+  private int lastCol = -1;
 
   @Override
   public final void keyTyped(final KeyEvent e) {
-    if(undo == null) return;
+    if(undo == null || ignoreTyped(e) || pressed(ESCAPE, e) ||
+        pressed(DEL, e) || pressed(DELBACK, e)) return;
 
-    // not nice here.. no alternative, though
-    final char ch = e.getKeyChar();
-    if(!Prop.MAC && e.isAltDown() || e.isActionKey() ||
-      ch == KeyEvent.VK_ESCAPE) return;
-
-    boolean down = true;
-    final byte[] txt = text.text;
     text.pos(text.cursor());
-
-    final boolean mod = BaseXLayout.mod(e);
-
-    if(ch == KeyEvent.VK_BACK_SPACE) {
-      if(text.start() == -1) {
-        if(text.pos() == 0) return;
-        text.prev();
-      }
-      final boolean ld = ftChar(text.curr());
-      text.delete();
-      if(mod) {
-        while(text.pos() > 0 && ld == ftChar(text.prev())) text.delete();
-        if(text.pos() != 0) text.next();
-      }
-      down = false;
-    } else if(ch == KeyEvent.VK_DELETE) {
-      if(text.start() == -1 && text.pos() == text.size()) return;
-      final boolean ld = ftChar(text.curr());
-      text.delete();
-      while(mod && text.pos() < text.size() && ld == ftChar(text.curr()))
-        text.delete();
-    } else {
-      if(mod) return;
-      if(text.start() != -1) text.delete();
-      text.add(String.valueOf(ch));
-    }
-    e.consume();
+    if(text.start() != -1) text.delete();
+    text.add(String.valueOf(e.getKeyChar()));
     text.setCaret();
-    if(txt != text.text) rend.calc(); // comparison by reference
-    showCursor(down ? 2 : 0);
+    rend.calc();
+    showCursor(2);
+    e.consume();
   }
 
   @Override

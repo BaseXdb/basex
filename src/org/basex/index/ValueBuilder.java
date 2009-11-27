@@ -53,27 +53,22 @@ public final class ValueBuilder extends IndexBuilder {
     }
 
     index.init();
-    final int hs = index.tokens.size();
     final DataOutput outl = new DataOutput(prop.dbfile(db, f + 'l'));
-    outl.writeNum(hs);
+    outl.writeNum(index.size());
     final DataOutput outr = new DataOutput(prop.dbfile(db, f + 'r'));
     while(index.more()) {
-      index.nextTok();
-      final byte[] pres = index.nextPres();
-      final int size = Num.size(pres);
+      final byte[] pres = index.next();
+      final int is = Num.size(pres);
       int v = 0;
-      for(int ip = 4; ip < size; v++) {
-        pre = Num.read(pres, ip);
-        ip += Num.len(pres, ip);        
-      }
+      for(int ip = 4; ip < is; ip += Num.len(pres, ip)) v++;
 
       outr.write5(outl.size());
       outl.writeNum(v);
-      
-      for(int j = 0, ip = 4, o = 0; j < v; ip += Num.len(pres, ip), j++) {
-        final int pr = Num.read(pres, ip);
-        outl.writeNum(pr - o);
-        o = pr;
+
+      for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {
+        final int p = Num.read(pres, ip);
+        outl.writeNum(p - o);
+        o = p;
       }
     }
 
@@ -82,7 +77,7 @@ public final class ValueBuilder extends IndexBuilder {
 
     return new Values(data, text);
   }
-  
+
   @Override
   public String det() {
     return text ? INDEXTXT : INDEXATT;

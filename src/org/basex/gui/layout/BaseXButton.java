@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -43,7 +44,7 @@ public final class BaseXButton extends JButton {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(e.getKeyCode() == KeyEvent.VK_ESCAPE) d.cancel();
+        if(pressed(ESCAPE, e)) d.cancel();
       }
     });
   }

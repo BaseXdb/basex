@@ -1012,16 +1012,15 @@ public final class Token {
    */
   public static int norm(final int ch) {
     if(norm == null) {
-      norm = new int[1 << 16];
-      for(int n = 0, nl = norm.length; n < nl; n++) norm[n] = n;
-      for(int n = 0, nl = NC.length; n < nl; n++) norm[NC[n][0]] = NC[n][1];
+      norm = new char[1 << 16];
+      for(int n = 0; n < norm.length; n++) norm[n] = (char) n;
+      for(int n = 0; n < NC.length; n++) norm[NC[n][0]] = NC[n][1];
     }
     return ch < 0x80 ? ch : norm[ch];
   }
 
   /** Normed characters. */
-  private static int[] norm;
-
+  private static char[] norm;
   /**
    * Normalized special characters.
    */

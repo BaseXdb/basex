@@ -29,10 +29,10 @@ public final class Prop extends AProp {
 
   /** OS Flag (should be ignored whenever possible). */
   private static final String OS = System.getProperty("os.name");
-  /** Flag denoting if OS belongs not to Windows family.
-  public static final boolean UNIX = OS.charAt(0) != 'W';*/
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.charAt(0) == 'M';
+  /** Flag denoting if OS belongs to Linux family. */
+  public static final boolean LINUX = !MAC && OS.charAt(0) != 'W';
 
   /** Property information. */
   static final String PROPHEADER = "# Property File." + NL +

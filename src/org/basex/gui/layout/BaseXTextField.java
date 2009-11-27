@@ -1,5 +1,7 @@
 package org.basex.gui.layout;
 
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;
@@ -52,8 +54,7 @@ public class BaseXTextField extends JTextField {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        final int c = e.getKeyCode();
-        if(BaseXLayout.mod(e) && (c == KeyEvent.VK_Z || c == KeyEvent.VK_Y)) {
+        if(pressed(UNDO, e) || pressed(REDO, e)) {
           final String t = getText();
           setText(last);
           last = t;
@@ -75,20 +76,19 @@ public class BaseXTextField extends JTextField {
       @Override
       public void keyPressed(final KeyEvent e) {
         final String text = getText();
-        final int co = e.getKeyCode();
-        final boolean enter = co == KeyEvent.VK_ENTER;
-        if(co == KeyEvent.VK_ESCAPE || enter && text.isEmpty()) {
+        final boolean enter = pressed(ENTER, e);
+        if(pressed(ESCAPE, e) || enter && text.isEmpty()) {
           area.requestFocusInWindow();
-        } else if(enter || co == KeyEvent.VK_F3) {
-          area.find(text, e.isShiftDown());
+        } else if(enter || pressed(FINDNEXT, e) || pressed(FINDPREV, e)) {
+          area.find(text, pressed(FINDPREV, e));
         }
       }
       @Override
       public void keyReleased(final KeyEvent e) {
         final String text = getText();
         final char ch = e.getKeyChar();
-        if(ch != KeyEvent.VK_ENTER && Character.isDefined(ch))
-          area.find(text, false);
+        if(!ignoreTyped(e) && Character.isDefined(ch) &&
+            ch != KeyEvent.VK_ENTER) area.find(text, false);
         repaint();
       }
     });

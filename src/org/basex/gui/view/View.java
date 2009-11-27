@@ -1,11 +1,11 @@
 package org.basex.gui.view;
 
+import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPanel;
 
 /**
@@ -99,15 +99,11 @@ public abstract class View extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     if(gui.updating) return;
-    final boolean ctrl = BaseXLayout.mod(e);
-    final boolean shift = e.isShiftDown();
-    final int key = e.getKeyCode();
-
-    if(key == KeyEvent.VK_ESCAPE) {
+    if(pressed(ESCAPE, e)) {
       gui.fullscreen(false);
-    } else if(key == KeyEvent.VK_SPACE) {
-      gui.notify.mark(ctrl ? 2 : shift ? 1 : 0, null);
-    } else if(key == KeyEvent.VK_BACK_SPACE) {
+    } else if(pressed(SPACE, e)) {
+      gui.notify.mark(sc(e) ? 2 : e.isShiftDown() ? 1 : 0, null);
+    } else if(pressed(DELBACK, e)) {
       GUICommands.GOBACK.execute(gui);
     }
   }

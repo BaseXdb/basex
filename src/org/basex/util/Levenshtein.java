@@ -59,10 +59,10 @@ public final class Levenshtein {
   private boolean ls(final byte[] tk, final int tl, final byte[] sb,
       final int sl, final int k) {
     int e2 = -1, f2 = -1;
-    for(int t = 0; t < tl; t++) {
+    for(int t = 0; t < tl; t += cl(tk[t])) {
       final int e = norm(lc(cp(tk, t)));
       int d = Integer.MAX_VALUE;
-      for(int s = 0; s < sl; s++) {
+      for(int s = 0; s < sl; s += cl(sb[s])) {
         final int f = norm(lc(cp(sb, s)));
         int c = m(m[t][s + 1] + 1, m[t + 1][s] + 1, m[t][s] + (e == f ? 0 : 1));
         if(e == f2 && f == e2) c = m[t][s];

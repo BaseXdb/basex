@@ -192,19 +192,6 @@ public final class ViewNotifier {
   }
 
   /**
-   * Notifies all views of a context switch without storing
-   * nodes in the history.
-   * @param nodes new context nodes
-   */
-  public void jump(final Nodes nodes) {
-    final Context context = gui.context;
-    init(context, nodes, new Nodes(context.data));
-
-    for(final View v : view) if(v.visible()) v.refreshContext(true, true);
-    gui.refreshControls();
-  }
-
-  /**
    * Notifies all views of updates in the data structure.
    */
   public void update() {

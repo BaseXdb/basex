@@ -164,7 +164,7 @@ public final class BaseXTextTokens {
    * @param mark mark flag
    * @return number of moved characters
    */
-  int home(final boolean mark) {
+  int bol(final boolean mark) {
     int c = 0;
     if(ps == 0) return 0;
     do c += curr() == '\t' ? TAB : 1; while(prev(mark) != '\n');
@@ -201,7 +201,7 @@ public final class BaseXTextTokens {
    * @param p position to move to
    * @param mark mark flag
    */
-  void end(final int p, final boolean mark) {
+  void forward(final int p, final boolean mark) {
     int nc = 0;
     while(curr() != '\n') {
       if((nc += curr() == '\t' ? TAB : 1) >= p) return;

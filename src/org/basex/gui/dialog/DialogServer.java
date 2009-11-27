@@ -12,6 +12,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import org.basex.BaseXServer;
+import org.basex.core.Commands.CmdShow;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -346,7 +347,7 @@ public final class DialogServer extends Dialog {
     CachedOutput out = new CachedOutput();
     sess.setLayout(new TableLayout(2, 1, 2, 2));
     sess.add(new BaseXLabel(SESSIONS + COLS, false, true));
-    cs.execute(new Show("Sessions"), out);
+    cs.execute(new Show(CmdShow.SESSIONS), out);
     BaseXText text = new BaseXText(false, this);
     text.setFont(getFont());
     text.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -359,7 +360,7 @@ public final class DialogServer extends Dialog {
     final BaseXBack dbs = new BaseXBack();
     dbs.setLayout(new TableLayout(2, 1, 2, 2));
     out = new CachedOutput();
-    cs.execute(new Show("Databases"), out);
+    cs.execute(new Show(CmdShow.DATABASES), out);
     BaseXText text1 = new BaseXText(false, this);
     text1.setFont(getFont());
     text1.setBorder(new EmptyBorder(5, 5, 5, 5));

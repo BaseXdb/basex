@@ -86,7 +86,7 @@ public final class GUIConstants {
 
   /** Toolbar entries, containing the button commands. */
   public static final GUICommand[] TOOLBAR = {
-    GOBACK, GOUP, GOFORWARD, ROOT, null, CREATE, OPEN, INFO, null,
+    GOBACK, GOUP, GOFORWARD, GOHOME, null, CREATE, OPEN, INFO, null,
       SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
       SHOWTABLE, SHOWPLOT, SHOWEXPLORE, null, SHOWHELP
   };

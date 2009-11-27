@@ -1,5 +1,7 @@
 package org.basex.gui.layout;
 
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,10 +47,7 @@ public final class BaseXPopup extends JPopupMenu {
     comp.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        final int key = e.getKeyCode();
-        if(!gui.updating && key == KeyEvent.VK_CONTEXT_MENU) {
-          show(e.getComponent(), 10, 10);
-        }
+        if(!gui.updating && pressed(CONTEXT, e)) show(e.getComponent(), 10, 10);
       }
     });
 

@@ -2,6 +2,8 @@ package org.basex.gui.view.table;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
@@ -295,24 +297,22 @@ public final class TableView extends View implements Runnable {
     super.keyPressed(e);
     if(tdata.rows == null) return;
 
-    final int key = e.getKeyCode();
-
     final int lines = (getHeight() - header.getHeight()) / tdata.rowH;
     final int oldPre = tdata.getRoot(gui.context.data, gui.context.focused);
     int pre = oldPre;
 
     final IntList rows = tdata.rows;
-    if(key == KeyEvent.VK_HOME) {
+    if(pressed(BOL, e)) {
       pre = rows.get(0);
-    } else if(key == KeyEvent.VK_END) {
+    } else if(pressed(EOL, e)) {
       pre = rows.get(rows.size() - 1);
-    } else if(key == KeyEvent.VK_UP) {
+    } else if(pressed(UP, e)) {
       pre = rows.get(Math.max(0, getOff(pre) - 1));
-    } else if(key == KeyEvent.VK_DOWN) {
+    } else if(pressed(DOWN, e)) {
       pre = rows.get(Math.min(rows.size() - 1, getOff(pre) + 1));
-    } else if(key == KeyEvent.VK_PAGE_UP) {
+    } else if(pressed(PAGEUP, e)) {
       pre = rows.get(Math.max(0, getOff(pre) - lines));
-    } else if(key == KeyEvent.VK_PAGE_DOWN) {
+    } else if(pressed(PAGEDOWN, e)) {
       pre = rows.get(Math.min(rows.size() - 1, getOff(pre) + lines));
     }
 

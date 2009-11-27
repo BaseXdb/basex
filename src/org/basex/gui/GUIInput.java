@@ -1,5 +1,7 @@
 package org.basex.gui;
 
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -13,7 +15,6 @@ import javax.swing.plaf.basic.BasicComboPopup;
 import org.basex.core.CommandParser;
 import org.basex.data.Data;
 import org.basex.gui.layout.BaseXCombo;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -60,9 +61,7 @@ public final class GUIInput extends BaseXTextField {
       @Override
       public void keyPressed(final KeyEvent e) {
         final int count = box.getItemCount();
-        final int c = e.getKeyCode();
-
-        if(c == KeyEvent.VK_ENTER) {
+        if(pressed(ENTER, e)) {
           if(pop.isVisible()) {
             completeInput();
           } else {
@@ -91,13 +90,13 @@ public final class GUIInput extends BaseXTextField {
         if(count == 0) return;
 
         int bi = box.getSelectedIndex();
-        if(c == KeyEvent.VK_DOWN) {
+        if(pressed(DOWN, e)) {
           if(!pop.isVisible()) {
             showPopup();
           } else {
             if(++bi == count) bi = 0;
           }
-        } else if(c == KeyEvent.VK_UP) {
+        } else if(pressed(UP, e)) {
           if(!pop.isVisible()) {
             showPopup();
           } else {
@@ -109,18 +108,11 @@ public final class GUIInput extends BaseXTextField {
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        final int c = e.getKeyCode();
-        if(e.getKeyChar() == 0xFFFF || BaseXLayout.mod(e) ||
-            c == KeyEvent.VK_DOWN || c == KeyEvent.VK_UP) return;
-
-        if(c == KeyEvent.VK_ESCAPE) {
+        if(pressed(ESCAPE, e)) {
           pop.setVisible(false);
-          return;
-        }
-
-        if(c == KeyEvent.VK_ENTER) {
+        } else if(pressed(ENTER, e)) {
           pop.hide();
-        } else {
+        } else if(!ignoreTyped(e) && !pressed(DOWN, e) && !pressed(UP, e)) {
           showPopup();
           // skip commands
           if(gui.prop.is(GUIProp.EXECRT) && !cmdMode()) main.execute();
@@ -157,6 +149,7 @@ public final class GUIInput extends BaseXTextField {
     if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
     setText(pre + sel);
     showPopup();
+    if(gui.prop.is(GUIProp.EXECRT) && !cmdMode()) gui.execute();
   }
 
   /**

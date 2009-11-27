@@ -1,6 +1,8 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Polygon;
@@ -162,41 +164,33 @@ public final class BaseXDSlider extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if(e.isAltDown()) return;
-
-    final int c = e.getKeyCode();
     oldMin = min;
     oldMax = min;
     double diffMin = 0;
     double diffMax = 0;
-    if(c == KeyEvent.VK_LEFT) {
+    if(pressed(LEFT, e)) {
       diffMin = -1;
       diffMax = -1;
-    } else if(c == KeyEvent.VK_RIGHT) {
+    } else if(pressed(RIGHT, e)) {
       diffMin = 1;
       diffMax = 1;
-    } else if(c == KeyEvent.VK_UP) {
+    } else if(pressed(UP, e)) {
       diffMin = -1;
       diffMax = 1;
-    } else if(c == KeyEvent.VK_DOWN) {
+    } else if(pressed(DOWN, e)) {
       diffMin = 1;
       diffMax = -1;
-    } else if(c == KeyEvent.VK_HOME) {
+    } else if(pressed(BOL, e)) {
       min = totMin;
-    } else if(c == KeyEvent.VK_END) {
+    } else if(pressed(EOL, e)) {
       max = totMax;
     }
-
     if(e.isShiftDown()) {
       diffMin /= 10;
       diffMax /= 10;
     }
-    if(BaseXLayout.mod(e)) {
-      diffMin /= 100;
-      diffMax /= 100;
-    }
+
     final double dist = encode(totMax) - encode(totMin);
-    //final double dist = encode(totalMax - totalMin);
     diffMin = dist / 20 * diffMin;
     diffMax = dist / 20 * diffMax;
 

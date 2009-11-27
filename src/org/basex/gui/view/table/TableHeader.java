@@ -2,6 +2,7 @@ package org.basex.gui.view.table;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -367,34 +368,21 @@ final class TableHeader extends BaseXPanel {
   }
 
   @Override
-  public void keyTyped(final KeyEvent e) {
-    if(tdata.roots.size() != 0 && box != null && inputCol != -1 &&
-        !e.isAltDown() && box.add(e.getKeyChar())) {
-      tdata.cols[inputCol].filter = box.text;
-      view.query();
-    }
-  }
-
-  @Override
   public void keyPressed(final KeyEvent e) {
     if(tdata.roots.size() == 0) return;
+    if(box == null && ignoreTyped(e) || inputCol == -1) return;
 
-    final boolean shift = e.isShiftDown();
-    final boolean alt = e.isAltDown();
-    if(box == null && alt || inputCol == -1) return;
-
-    final int c = e.getKeyCode();
-    if(c == KeyEvent.VK_ENTER) {
+    if(pressed(ENTER, e)) {
       box.stop();
       inputCol = -1;
       final Nodes marked = view.gui.context.marked;
       if(marked.size() != 0) view.gui.notify.context(marked, false, null);
-    } else if(c == KeyEvent.VK_TAB) {
+    } else if(pressed(TAB, e)) {
       if(box != null) {
         tdata.cols[inputCol].filter = box.text;
         box.stop();
       }
-      final int in = inputCol + (shift ? -1 : 1);
+      final int in = inputCol + (e.isShiftDown() ? -1 : 1);
       if(in < 0) {
         transferFocusBackward();
       } else if(in == tdata.cols.length) {
@@ -404,9 +392,17 @@ final class TableHeader extends BaseXPanel {
         box = new TableInput(TableHeader.this, tdata.cols[inputCol].filter);
       }
     } else {
-      box.code(c);
+      box.code(e);
     }
     repaint();
+  }
+
+  @Override
+  public void keyTyped(final KeyEvent e) {
+    if(tdata.roots.size() == 0 || box == null || inputCol == -1 ||
+        ignoreTyped(e) || !box.add(e)) return;
+    tdata.cols[inputCol].filter = box.text;
+    view.query();
   }
 
   @Override

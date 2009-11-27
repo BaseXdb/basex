@@ -1,5 +1,7 @@
 package org.basex.gui.layout;
 
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Window;
@@ -135,19 +137,18 @@ public final class BaseXSlider extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    final int code = e.getKeyCode();
     final int old = curr;
-    if(code == KeyEvent.VK_LEFT || code == KeyEvent.VK_UP) {
+    if(pressed(LEFT, e) || pressed(UP, e)) {
       curr = Math.max(min, curr - 1);
-    } else if(code == KeyEvent.VK_RIGHT || code == KeyEvent.VK_DOWN) {
+    } else if(pressed(RIGHT, e) || pressed(DOWN, e)) {
       curr = Math.min(max, curr + 1);
-    } else if(code == KeyEvent.VK_PAGE_DOWN) {
+    } else if(pressed(PAGEDOWN, e)) {
       curr = Math.max(min, curr + 10);
-    } else if(code == KeyEvent.VK_PAGE_UP) {
+    } else if(pressed(PAGEUP, e)) {
       curr = Math.min(max, curr - 10);
-    } else if(code == KeyEvent.VK_HOME) {
+    } else if(pressed(BOL, e)) {
       curr = min;
-    } else if(code == KeyEvent.VK_END) {
+    } else if(pressed(EOL, e)) {
       curr = max;
     }
     if(curr != old) {

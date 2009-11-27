@@ -2,6 +2,8 @@ package org.basex.gui.view.folder;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -405,7 +407,7 @@ public final class FolderView extends View {
       gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
-    } else if(BaseXLayout.mod(e)) {
+    } else if(sc(e)) {
       gui.notify.mark(2, null);
     } else if(!SwingUtilities.isLeftMouseButton(e) ||
         getCursor() != CURSORHAND) {
@@ -456,19 +458,20 @@ public final class FolderView extends View {
     final int focusPre = gui.context.focused;
     final Data data = gui.context.data;
     int kind = data.kind(focusPre);
-    int key = e.getKeyCode();
 
     final boolean fs = data.fs != null;
-    if(key == KeyEvent.VK_RIGHT || key == KeyEvent.VK_LEFT) {
+    final boolean right = pressed(RIGHT, e);
+    boolean down = pressed(DOWN, e);
+    boolean up = pressed(UP, e);
+    if(right || pressed(LEFT, e)) {
       // open/close subtree
-      final boolean open = key == KeyEvent.VK_RIGHT;
       if(e.isShiftDown()) {
-        opened[focusPre] = open;
+        opened[focusPre] = right;
         final int s = data.meta.size;
         for(int pre = focusPre + (fs ? data.attSize(focusPre, kind) : 1);
           pre != s && data.parent(pre, data.kind(pre)) >= focusPre;
           pre += fs ? data.attSize(pre, kind) : 1) {
-          opened[pre] = open;
+          opened[pre] = right;
           kind = data.kind(pre);
         }
         refreshHeight();
@@ -476,27 +479,29 @@ public final class FolderView extends View {
         return;
       }
 
-      if(open ^ opened[focusPre] && (!ViewData.isLeaf(gui.prop, data, focusPre)
+      if(right ^ opened[focusPre] && (!ViewData.isLeaf(gui.prop, data, focusPre)
           || data.attSize(focusPre, kind) > 1)) {
-        opened[focusPre] = open;
+        opened[focusPre] = right;
         refreshHeight();
         repaint();
+      } else if(right) {
+        down = true;
       } else {
-        key = open ? KeyEvent.VK_DOWN : KeyEvent.VK_UP;
+        up = true;
       }
     }
 
-    if(key == KeyEvent.VK_DOWN) {
+    if(down) {
       focus = Math.min(data.meta.size - 1, focus + 1);
-    } else if(key == KeyEvent.VK_UP) {
+    } else if(up) {
       focus = Math.max(0, focus - 1);
-    } else if(key == KeyEvent.VK_PAGE_DOWN) {
+    } else if(pressed(PAGEDOWN, e)) {
       focus = Math.min(data.meta.size - 1, focus + getHeight() / lineH);
-    } else if(key == KeyEvent.VK_PAGE_UP) {
+    } else if(pressed(PAGEUP, e)) {
       focus = Math.max(0, focus - getHeight() / lineH);
-    } else if(key == KeyEvent.VK_HOME) {
+    } else if(pressed(BOT, e)) {
       focus = 0;
-    } else if(key == KeyEvent.VK_END) {
+    } else if(pressed(EOT, e)) {
       focus = data.meta.size - 1;
     }
     if(focus == focusedPos) return;
@@ -508,7 +513,7 @@ public final class FolderView extends View {
     final FolderIterator it = new FolderIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;
 
-    if(pre == curr.nodes[0] && key == KeyEvent.VK_DOWN) pre++;
+    if(pre == curr.nodes[0] && down) pre++;
     gui.notify.focus(pre, this);
     jumpTo(pre, false);
     repaint();

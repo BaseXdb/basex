@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.awt.event.KeyAdapter;
@@ -63,21 +64,17 @@ public final class BaseXListChooser extends BaseXBack {
         int np = op;
         final int page = getHeight() / getFont().getSize();
 
-        // process key events
-        final int c = e.getKeyCode();
-        final boolean mod = BaseXLayout.mod(e);
-
-        if(c == KeyEvent.VK_DOWN) {
+        if(pressed(DOWN, e)) {
           np = Math.min(op + 1, values.length - 1);
-        } else if(c == KeyEvent.VK_UP) {
+        } else if(pressed(UP, e)) {
           np = Math.max(op - 1, 0);
-        } else if(c == KeyEvent.VK_PAGE_DOWN) {
+        } else if(pressed(PAGEDOWN, e)) {
           np = Math.min(op + page, values.length - 1);
-        } else if(c == KeyEvent.VK_PAGE_UP) {
+        } else if(pressed(PAGEUP, e)) {
           np = Math.max(op - page, 0);
-        } else if(mod && c == KeyEvent.VK_HOME) {
+        } else if(pressed(BOT, e)) {
           np = 0;
-        } else if(mod && c == KeyEvent.VK_END) {
+        } else if(pressed(EOT, e)) {
           np = values.length - 1;
         }
         // choose new list value

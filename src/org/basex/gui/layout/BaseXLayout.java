@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.GUIConstants.*;
+import static org.basex.gui.layout.BaseXKeys.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Component;
@@ -10,7 +11,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -88,16 +88,6 @@ public final class BaseXLayout {
   }
 
   /**
-   * Returns true if the system's modifier key was pressed.
-   * @param e input event
-   * @return result of check
-   */
-  public static boolean mod(final InputEvent e) {
-    return (Toolkit.getDefaultToolkit().
-        getMenuShortcutKeyMask() & e.getModifiers()) != 0;
-  }
-
-  /**
    * Sets the component size.
    * @param comp component
    * @param w width
@@ -133,18 +123,14 @@ public final class BaseXLayout {
       comp.addKeyListener(new KeyAdapter() {
         @Override
         public void keyPressed(final KeyEvent e) {
-          
           if(e.getSource() instanceof BaseXCombo) {
-            BaseXCombo c = (BaseXCombo) e.getSource();
-            if(c.isPopupVisible()) return;
+            if(((BaseXCombo) e.getSource()).isPopupVisible()) return;
           }
-          
           // process key events
-          final int c = e.getKeyCode();
-          if(c == KeyEvent.VK_ENTER) {
+          if(pressed(ENTER, e)) {
             final Object s = e.getSource();
             if(!(s instanceof BaseXButton || s instanceof BaseXText)) d.close();
-          } else if(c == KeyEvent.VK_ESCAPE) {
+          } else if(pressed(ESCAPE, e)) {
             d.cancel();
           }
         }
@@ -156,35 +142,32 @@ public final class BaseXLayout {
     comp.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        final int c = e.getKeyCode();
-        final boolean mod = mod(e);
-
         // browse back/forward
-        if(e.isAltDown() && gui.context.data != null) {
-          if(c == KeyEvent.VK_LEFT) {
+        if(gui.context.data != null) {
+          if(pressed(GOBACK, e)) {
             GUICommands.GOBACK.execute(gui);
-          } else if(c == KeyEvent.VK_RIGHT) {
+          } else if(pressed(GOFORWARD, e)) {
             GUICommands.GOFORWARD.execute(gui);
-          } else if(c == KeyEvent.VK_UP) {
+          } else if(pressed(GOUP, e)) {
             GUICommands.GOUP.execute(gui);
-          } else if(c == KeyEvent.VK_HOME) {
-            GUICommands.ROOT.execute(gui);
+          } else if(pressed(GOHOME, e)) {
+            GUICommands.GOHOME.execute(gui);
           }
         }
 
-        if(mod) {
-          final int fs = gui.prop.num(GUIProp.FONTSIZE);
-          int nfs = fs;
-          if(c == '+' || c == '-' || c == '=') {
-            nfs = Math.max(1, fs + (c == '-' ? -1 : 1));
-          } else if(c == '0') {
-            nfs = 12;
-          }
-          if(fs != nfs) {
-            gui.prop.set(GUIProp.FONTSIZE, nfs);
-            GUIConstants.initFonts(gui.prop);
-            gui.notify.layout();
-          }
+        final int fs = gui.prop.num(GUIProp.FONTSIZE);
+        int nfs = fs;
+        if(pressed(INCFONT1, e) || pressed(INCFONT2, e)) {
+          nfs = fs + 1;
+        } else if(pressed(DECFONT, e)) {
+          nfs = Math.max(1, fs - 1);
+        } else if(pressed(NORMFONT, e)) {
+          nfs = 12;
+        }
+        if(fs != nfs) {
+          gui.prop.set(GUIProp.FONTSIZE, nfs);
+          GUIConstants.initFonts(gui.prop);
+          gui.notify.layout();
         }
       }
     });

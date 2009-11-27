@@ -22,10 +22,10 @@ final class XQueryText extends BaseXText {
   private static final Pattern ERRPATTERN = Pattern.compile(
       ".* line ([0-9]+), column ([0-9]+).*", Pattern.DOTALL);
 
-  /** Last Query. */
-  private byte[] last = Token.EMPTY;
   /** View reference. */
   private final XQueryView view;
+  /** Last Query. */
+  private byte[] last = Token.EMPTY;
 
   /** Last error position. */
   int error = -1;
@@ -40,6 +40,12 @@ final class XQueryText extends BaseXText {
     super(true, v.gui);
     view = v;
     setSyntax(new XQuerySyntax());
+  }
+
+  @Override
+  public void setText(final byte[] t) {
+    super.setText(t);
+    last = t;
   }
 
   @Override

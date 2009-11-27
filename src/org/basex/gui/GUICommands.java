@@ -824,7 +824,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Goes to the root node. */
-  ROOT(GUIROOT, "alt HOME", GUIROOTTT, true, false) {
+  GOHOME(GUIROOT, "alt HOME", GUIROOTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       gui.execute(new Cs("/"));

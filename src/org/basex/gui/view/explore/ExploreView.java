@@ -117,6 +117,6 @@ public final class ExploreView extends View {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if(e.isAltDown()) super.keyPressed(e);
+    // overwrite default interactions
   }
 }

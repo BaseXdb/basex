@@ -214,7 +214,8 @@ public final class XQueryView extends View {
     try {
       if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
       modified(false, true);
-      text.setText(file.content());
+      final byte[] query = file.content();
+      text.setText(query);
       if(gui.prop.is(GUIProp.EXECRT)) text.query();
     } catch(final IOException ex) {
       Dialog.error(gui, NOTOPENED);

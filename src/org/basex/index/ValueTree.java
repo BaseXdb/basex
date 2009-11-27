@@ -28,7 +28,6 @@ final class ValueTree {
   /** Current iterator position. */
   private int spos;
 
-
   /**
    * Indexes the specified token.
    * @param k token
