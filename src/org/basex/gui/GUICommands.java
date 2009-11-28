@@ -11,6 +11,7 @@ import javax.swing.AbstractButton;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Proc;
+import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
@@ -688,7 +689,8 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows a preference dialog. */
-  PREFS(GUIPREFS + DOTS, "% P", GUIPREFSTT, false, false) {
+  PREFS(GUIPREFS + DOTS, Prop.MAC ? "% COMMA" : "% P", GUIPREFSTT, false,
+      false) {
     @Override
     public void execute(final GUI gui) {
       new DialogPrefs(gui);

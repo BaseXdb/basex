@@ -80,14 +80,14 @@ public final class BaseXKeys {
   public static final int[] PAGEDOWN = { 0, VK_PAGE_DOWN };
   /** Next panel. */
   public static final int[] NEXTTAB = {
-    MAC ? ALT | SHF : SC, MAC ? VK_RIGHT : VK_TAB };
+    MAC ? SC | ALT : SC, MAC ? VK_RIGHT : VK_TAB };
   /** Previous panel. */
   public static final int[] PREVTAB = {
-    MAC ? ALT | SHF : SC | SHF, MAC ? VK_LEFT : VK_TAB };
+    MAC ? SC | ALT : SC | SHF, MAC ? VK_LEFT : VK_TAB };
   /** Delete word backwards. */
-  public static final int[] DELWORDBACK = { SC, MAC ? 0 : VK_BACK_SPACE };
+  public static final int[] DELWORDBACK = { MAC ? ALT : SC, VK_BACK_SPACE };
   /** Delete word. */
-  public static final int[] DELWORD = { SC, MAC ? 0 : VK_DELETE };
+  public static final int[] DELWORD = { MAC ? ALT : SC, VK_DELETE };
   /** Delete backwards. */
   public static final int[] DELBACK = { 0, VK_BACK_SPACE };
   /** Delete. */
