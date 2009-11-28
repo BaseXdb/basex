@@ -19,7 +19,9 @@ public final class TokenMap extends TokenSet {
    * @param val value
    */
   public void add(final byte[] key, final byte[] val) {
-    values[Math.abs(add(key))] = val;
+    // array bounds are checked before array is resized..
+    final int i = add(key);
+    values[i] = val;
   }
 
   /**

@@ -27,16 +27,6 @@ public class ObjectMap<E> extends TokenSet {
   }
 
   /**
-   * Update the old value of the entry.
-   * @param key key
-   * @param val value
-   */
-  public final void set(final byte[] key, final E val) {
-    final int i = id(key);
-    if(i != 0) values[Math.abs(i)] = val;
-  }
-
-  /**
    * Returns the value for the specified key.
    * @param key key to be found
    * @return value or null if nothing was found

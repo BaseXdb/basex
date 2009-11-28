@@ -4,10 +4,13 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.io.IOException;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -19,7 +22,7 @@ import org.basex.util.Token;
  */
 public final class ValueBuilder extends IndexBuilder {
   /** Temporary value tree. */
-  private final ValueTreeNew index;
+  private final ValueTree index = new ValueTree();
   /** Index type (attributes/texts). */
   private final boolean text;
 
@@ -30,12 +33,13 @@ public final class ValueBuilder extends IndexBuilder {
    */
   public ValueBuilder(final Data d, final boolean txt) {
     super(d);
-    index = new ValueTreeNew(d.meta.lastid);
     text = txt;
   }
 
   @Override
   public Values build() throws IOException {
+    final Performance perf = Prop.debug ? new Performance() : null;
+
     final Prop prop = data.meta.prop;
     final String db = data.meta.name;
     final String f = text ? DATATXT : DATAATV;
@@ -52,10 +56,10 @@ public final class ValueBuilder extends IndexBuilder {
       if(tok.length <= Token.MAXLEN && !Token.ws(tok)) index.index(tok, pre);
     }
 
-    index.init();
     final DataOutput outl = new DataOutput(prop.dbfile(db, f + 'l'));
     outl.writeNum(index.size());
     final DataOutput outr = new DataOutput(prop.dbfile(db, f + 'r'));
+    index.init();
     while(index.more()) {
       final byte[] pres = index.next();
       final int is = Num.size(pres);
@@ -75,6 +79,11 @@ public final class ValueBuilder extends IndexBuilder {
     outl.close();
     outr.close();
 
+    if(perf != null) {
+      Performance.gc(4);
+      Main.debug((text ? "Texts" : "Attributes") + ": " + perf + " (" +
+          Performance.getMem() + ")");
+    }
     return new Values(data, text);
   }
 
