@@ -46,7 +46,7 @@ public abstract class Builder extends Progress {
   /** Tag stack. */
   private final int[] tagStack = new int[IO.MAXHEIGHT];
   /** Namespace stack. */
-  private final int[] nsStack = new int[IO.MAXHEIGHT];
+  private final int[] uriStack = new int[IO.MAXHEIGHT];
   /** Size Stack. */
   private boolean inDoc;
   /** Current tree height. */
@@ -206,13 +206,13 @@ public abstract class Builder extends Progress {
 
   /**
    * Adds a new namespace; called by the building instance.
-   * @param name the attribute name to be processed
-   * @param val attribute value
+   * @param pref the namespace prefix
+   * @param uri namespace uri
    */
-  public final void startNS(final byte[] name, final byte[] val) {
-    final int n = ns.add(name, val);
+  public final void startNS(final byte[] pref, final byte[] uri) {
+    final int u = ns.add(pref, uri);
     // default namespace...
-    if(name.length == 0) nsStack[level] = n;
+    if(pref.length == 0) uriStack[level] = u;
   }
 
   /**
@@ -260,7 +260,7 @@ public abstract class Builder extends Progress {
     final int pre = parStack[level];
     setSize(pre, meta.size - pre);
     ns.close(pre);
-    nsStack[level] = nsStack[level - 1];
+    uriStack[level] = uriStack[level - 1];
   }
 
   /**
@@ -351,12 +351,12 @@ public abstract class Builder extends Progress {
    */
   private int addElem(final byte[] tag, final Atts att) throws IOException {
     // get tag reference
-    final int tid = tags.index(tag, null, true);
+    int nm = tags.index(tag, null, true);
 
-    if(meta.pathindex) path.add(tid, level, Data.ELEM);
+    if(meta.pathindex) path.add(nm, level, Data.ELEM);
 
     // remember tag id and parent reference
-    tagStack[level] = tid;
+    tagStack[level] = nm;
     parStack[level] = meta.size;
     // cache pre value
     final int pre = meta.size;
@@ -365,23 +365,21 @@ public abstract class Builder extends Progress {
     final int dis = level != 0 ? meta.size - parStack[level - 1] : 1;
     final int al = att.size;
 
-    // get namespaces reference
-    int tns = ns.get(tag);
-    if(tns == 0) tns = nsStack[level];
-    nsStack[level + 1] = nsStack[level];
+    // get namespace URI reference
+    int uri = ns.uri(tag);
+    if(uri == 0) uri = uriStack[level];
+    uriStack[level + 1] = uriStack[level];
 
     // store namespaces
     final boolean n = ns.open(meta.size);
-
-    addElem(tid, tns, dis, al + 1, n);
+    addElem(nm, uri, dis, al + 1, n);
 
     // create numeric attribute references
     for(int a = 0; a < al; a++) {
-      final byte[] av = att.val[a];
-      final int an = atts.index(att.key[a], av, true);
-      final int ans = ns.get(att.key[a]);
-      if(meta.pathindex) path.add(an, level + 1, Data.ATTR);
-      addAttr(an, ans, av, a + 1);
+      nm = atts.index(att.key[a], att.val[a], true);
+      uri = ns.uri(att.key[a]);
+      if(meta.pathindex) path.add(nm, level + 1, Data.ATTR);
+      addAttr(nm, uri, att.val[a], a + 1);
     }
 
     if(level != 0) {

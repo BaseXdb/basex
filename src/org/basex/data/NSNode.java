@@ -2,12 +2,12 @@ package org.basex.data;
 
 import java.io.IOException;
 import java.util.Arrays;
-import org.basex.core.Main;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.util.TokenBuilder;
 
 /**
- * This class provides a single namespace node.
+ * This class stores a single namespace node.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -15,19 +15,16 @@ import org.basex.io.DataOutput;
 final class NSNode {
   /** Children. */
   NSNode[] ch;
-  /** Keys. */
-  int[] key;
-  /** Values. */
-  int[] val;
   /** Parent node. */
   NSNode par;
+  /** References to Prefix/URI pairs. */
+  int[] vals;
   /** Pre value. */
   int pre;
 
   /** Default constructor. */
   NSNode() {
-    key = new int[] {};
-    val = new int[] {};
+    vals = new int[] {};
     ch = new NSNode[0];
   }
 
@@ -40,79 +37,144 @@ final class NSNode {
   NSNode(final DataInput in, final NSNode p) throws IOException {
     par = p;
     pre = in.readNum();
-    key = in.readNums();
-    val = in.readNums();
+    vals = in.readNums();
     final int cl = in.readNum();
     ch = new NSNode[cl];
     for(int c = 0; c < cl; c++) ch[c] = new NSNode(in, this);
   }
 
   /**
-   * Finishes the tree structure.
+   * Writes a single node to disk.
    * @param out output stream
    * @throws IOException I/O exception
    */
-  void finish(final DataOutput out) throws IOException {
+  void write(final DataOutput out) throws IOException {
     out.writeNum(pre);
-    out.writeNums(key);
-    out.writeNums(val);
+    out.writeNums(vals);
     out.writeNum(ch.length);
-    for(final NSNode c : ch) c.finish(out);
-  }
-
-  /**
-   * Adds the specified key and value.
-   * @param k key
-   * @param v value
-   */
-  void add(final int k, final int v) {
-    final int s = key.length;
-    key = Arrays.copyOf(key, s + 1);
-    val = Arrays.copyOf(val, s + 1);
-    key[s] = k;
-    val[s] = v;
+    for(final NSNode c : ch) c.write(out);
   }
 
   /**
    * Adds the specified child.
-   * @param c child
+   * @param n child node
    */
-  void add(final NSNode c) {
-    final int s = ch.length;
-    ch = Arrays.copyOf(ch, s + 1);
-    ch[s] = c;
+  void add(final NSNode n) {
+    final int c = ch.length;
+    ch = Arrays.copyOf(ch, c + 1);
+    ch[c] = n;
   }
 
   /**
-   * Returns the value reference for the specified key.
-   * @param k key to be found
-   * @return v value or 0
+   * Adds the specified prefix and URI reference.
+   * @param p prefix reference
+   * @param u uri reference
    */
-  int get(final int k) {
-    for(int i = 0; i < key.length; i++) if(key[i] == k) return val[i];
-    return 0;
+  void add(final int p, final int u) {
+    final int s = vals.length;
+    vals = Arrays.copyOf(vals, s + 2);
+    vals[s] = p;
+    vals[s + 1] = u;
   }
 
+  // Requesting Namespaces ====================================================
+
   /**
-   * Finds the closest namespace definitions for the specified pre value.
+   * Finds the closest namespace node for the specified pre value.
    * @param p pre value
    * @return node
    */
   NSNode find(final int p) {
-    if(ch.length == 0) return this;
-    int l = 0, m = 0, h = ch.length - 1;
+    final int s = fnd(p);
+    return s == -1 ? this : ch[s].pre == p ? ch[s] : ch[s].find(p);
+  }
+
+  /**
+   * Returns the namespace URI reference for the specified prefix.
+   * @param p prefix reference
+   * @return u uri reference or 0
+   */
+  int uri(final int p) {
+    for(int v = 0; v < vals.length; v += 2) if(vals[v] == p) return vals[v + 1];
+    return 0;
+  }
+
+  /**
+   * Deletes nodes in the specified range (p .. p + nr) and updates the
+   * following pre values
+   * @param p pre value
+   * @param nr number of nodes to be deleted
+   */
+  void delete(final int p, final int nr) {
+    int s = fnd(p);
+    if(s == -1 || ch[s].pre != p) s++;
+    int e = s;
+    while(e < ch.length && p + nr > ch[e].pre) e++;
+    if(s != e) {
+      final NSNode[] nd = new NSNode[ch.length - e + s];
+      System.arraycopy(ch, 0, nd, 0, s);
+      System.arraycopy(ch, e, nd, s, ch.length - e);
+      ch = nd;
+    }
+    update(s, -nr);
+  }
+
+  /**
+   * Recursively modified the pre values by the specified offset.
+   * @param s start position
+   * @param o offset
+   */
+  private void update(final int s, final int o) {
+    for(int c = s; c < ch.length; c++) {
+      ch[c].pre += o;
+      ch[c].update(0, o);
+    }
+  }
+
+  /**
+   * Finds the closest namespace node for the specified pre value.
+   * @param p pre value
+   * @return node
+   */
+  private int fnd(final int p) {
+    int l = 0, h = ch.length - 1;
     while(l <= h) { // binary search
-      m = l + h >>> 1;
+      final int m = l + h >>> 1;
       final int v = ch[m].pre;
-      if(v == p) return ch[m];
+      if(v == p) return m;
       if(v < p) l = m + 1;
       else h = m - 1;
     }
-    return ch[m == 0 || ch[m].pre < p ? m : m - 1].find(p);
+    return l - 1;
+  }
+
+  // Printing Namespaces ======================================================
+
+  /**
+   * Prints the node structure for debugging purposes.
+   * @param tb string builder
+   * @param ns namespace reference
+   * @param l level
+   */
+  void print(final TokenBuilder tb, final int l, final Namespaces ns) {
+    tb.add('\n');
+    for(int i = 0; i < l; i++) tb.add("  ");
+    tb.add("Pre[" + pre + "] ");
+    for(int i = 0; i < vals.length; i += 2) {
+      tb.add("xmlns");
+      final byte[] p = ns.key(vals[i]);
+      if(p.length != 0) tb.add(':');
+      tb.add(p);
+      tb.add("='");
+      tb.add(ns.key(vals[i + 1]));
+      tb.add("' ");
+    }
+    for(final NSNode c : ch) c.print(tb, l + 1, ns);
   }
 
   @Override
   public String toString() {
-    return Main.name(this) + "[pre:" + pre + "]";
+    return "Pre[" + pre + "]";
+    //return Main.name(this) + "[pre:" + pre + "]";
   }
 }

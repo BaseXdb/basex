@@ -33,15 +33,15 @@ public final class Thesaurus {
   private final Context ctx;
 
   static {
-    RSHIPS.add(token("NT"), token("BT"));
-    RSHIPS.add(token("BT"), token("BT"));
-    RSHIPS.add(token("BTG"), token("NTG"));
-    RSHIPS.add(token("NTG"), token("BTG"));
-    RSHIPS.add(token("BTP"), token("NTP"));
-    RSHIPS.add(token("NTP"), token("BTP"));
-    RSHIPS.add(token("USE"), token("UF"));
-    RSHIPS.add(token("UF"), token("USE"));
-    RSHIPS.add(token("RT"), token("RT"));
+    RSHIPS.put(token("NT"), token("BT"));
+    RSHIPS.put(token("BT"), token("BT"));
+    RSHIPS.put(token("BTG"), token("NTG"));
+    RSHIPS.put(token("NTG"), token("BTG"));
+    RSHIPS.put(token("BTP"), token("NTP"));
+    RSHIPS.put(token("NTP"), token("BTP"));
+    RSHIPS.put(token("USE"), token("UF"));
+    RSHIPS.put(token("UF"), token("USE"));
+    RSHIPS.put(token("RT"), token("RT"));
   }
 
   /** Thesaurus node. */
@@ -156,7 +156,7 @@ public final class Thesaurus {
     if(node == null) {
       node = new ThesNode();
       node.term = term;
-      nodes.add(term, node);
+      nodes.put(term, node);
     }
     return node;
   }

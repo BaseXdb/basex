@@ -85,7 +85,7 @@ public final class BaseXKeys {
   public static final int[] PREVTAB = {
     MAC ? SC | ALT : SC | SHF, MAC ? VK_LEFT : VK_TAB };
   /** Delete word backwards. */
-  public static final int[] DELWORDBACK = { MAC ? ALT : SC, VK_BACK_SPACE };
+  public static final int[] DELWORDLEFT = { MAC ? ALT : SC, VK_BACK_SPACE };
   /** Delete word. */
   public static final int[] DELWORD = { MAC ? ALT : SC, VK_DELETE };
   /** Delete backwards. */

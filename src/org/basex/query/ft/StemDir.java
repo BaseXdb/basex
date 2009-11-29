@@ -23,7 +23,7 @@ public final class StemDir extends ObjectMap<byte[]> {
         byte[] val = null;
         for(final byte[] st : split(norm(sl), ' ')) {
           if(val == null) val = st;
-          else add(st, val);
+          else put(st, val);
         }
         add(sl);
       }

@@ -436,14 +436,14 @@ public class BaseXText extends BaseXPanel {
           while(text.pos() < text.size() && ld == ftChar(text.curr()))
             text.delete();
         }
-      } else if(pressed(DELWORDBACK, e) || pressed(DELBACK, e)) {
+      } else if(pressed(DELWORDLEFT, e) || pressed(DELBACK, e)) {
         if(nomark) {
           if(text.pos() == 0) return;
           text.prev();
         }
         final boolean ld = ftChar(text.curr());
         text.delete();
-        if(nomark && pressed(DELWORDBACK, e)) {
+        if(nomark && pressed(DELWORDLEFT, e)) {
           while(text.pos() > 0 && ld == ftChar(text.prev())) text.delete();
           if(text.pos() != 0) text.next();
         }

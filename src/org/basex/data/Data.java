@@ -429,8 +429,11 @@ public abstract class Data {
     // size of the subtree to delete
     int k = kind(pre);
     int s = size(pre, k);
-    // ignore deletions of single root node
-    if(pre == 0 && s == meta.size) return;
+    ns.delete(pre, s);
+
+    // [CG] ignore deletions of single root node
+    if(pre == 0 && s == meta.size && s == 1) return;
+
     // reduce size of ancestors
     int par = pre;
     // check if we are an attribute (different size counters)

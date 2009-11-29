@@ -13,9 +13,9 @@ public interface DataText {
 
   /** Database version; if it's modified, old database instances can't
    * be parsed anymore. */
-  String STORAGE = "5.6";
+  String STORAGE = "5.84";
   /** Index version; if it's modified, old indexes can't be parsed anymore. */
-  String ISTORAGE = "5.8";
+  String ISTORAGE = "5.84";
 
   /** Database version. */
   String DBSTR = "STORAGE";
@@ -218,6 +218,8 @@ public interface DataText {
 
   // TABLE SERIALIZATION ======================================================
 
+  /** First table Header. */
+  String TABLEID = "ID";
   /** First table Header. */
   String TABLEPRE = "PRE";
   /** Second table Header. */

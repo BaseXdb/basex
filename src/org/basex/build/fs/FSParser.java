@@ -81,18 +81,18 @@ public final class FSParser extends Parser {
 
     backingpath = io.path();
 
-    meta.add(TYPEGIF, new GIFExtractor());
-    meta.add(TYPEPNG, new PNGExtractor());
-    meta.add(TYPEJPG, new JPGExtractor());
-    meta.add(TYPEJPEG, new JPGExtractor());
-    meta.add(TYPEBMP, new BMPExtractor());
-    meta.add(TYPETIF, new TIFExtractor());
-    meta.add(TYPETIFF, new TIFExtractor());
-    meta.add(TYPEMP3, new MP3Extractor());
-    meta.add(TYPEEML, new EMLExtractor());
-    meta.add(TYPEMBS, new EMLExtractor());
-    meta.add(TYPEMBX, new EMLExtractor());
-    meta.add(TYPEXML, new XMLExtractor());
+    meta.put(TYPEGIF, new GIFExtractor());
+    meta.put(TYPEPNG, new PNGExtractor());
+    meta.put(TYPEJPG, new JPGExtractor());
+    meta.put(TYPEJPEG, new JPGExtractor());
+    meta.put(TYPEBMP, new BMPExtractor());
+    meta.put(TYPETIF, new TIFExtractor());
+    meta.put(TYPETIFF, new TIFExtractor());
+    meta.put(TYPEMP3, new MP3Extractor());
+    meta.put(TYPEEML, new EMLExtractor());
+    meta.put(TYPEMBS, new EMLExtractor());
+    meta.put(TYPEMBX, new EMLExtractor());
+    meta.put(TYPEXML, new XMLExtractor());
   }
 
   /**

@@ -32,7 +32,6 @@ public class TokenSet {
     for(int id = bucket[p]; id != 0; id = next[id]) {
       if(Token.eq(key, keys[id])) return -id;
     }
-
     next[size] = bucket[p];
     keys[size] = key;
     bucket[p] = size;

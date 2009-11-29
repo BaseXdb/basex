@@ -165,7 +165,7 @@ public final class MAB2Parser extends Parser {
       MAB2Entry entry = ids.get(key);
       if(entry == null) {
         entry = new MAB2Entry();
-        ids.add(key, entry);
+        ids.put(key, entry);
       }
       if(child) entry.add(pos);
       else entry.pos(pos);

@@ -102,6 +102,7 @@ public final class SAXWrapper extends Parser {
       }
     });
     source.setInputSource(in);
+    source.setSystemId(is.getSystemId());
     length = io.length();
     return in;
   }
