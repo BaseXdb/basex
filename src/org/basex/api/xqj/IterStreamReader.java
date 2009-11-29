@@ -85,7 +85,7 @@ final class IterStreamReader implements XMLStreamReader {
 
   public String getAttributePrefix(final int i) {
     getAttributes();
-    return string(atts.item[i].qname().pre());
+    return string(atts.item[i].qname().pref());
   }
 
   public String getAttributeType(final int i) {
@@ -225,7 +225,7 @@ final class IterStreamReader implements XMLStreamReader {
   public String getPrefix() {
     checkType(START_ELEMENT, END_ELEMENT);
     final QNm qn = ((Nod) item).qname();
-    return !qn.ns() ? null : string(qn.pre());
+    return !qn.ns() ? null : string(qn.pref());
   }
 
   public Object getProperty(final String s) {
