@@ -120,11 +120,11 @@ public final class DBPrimitives extends Primitives {
     if(ups == null) return;
     for(final UpdatePrimitive up: ups) {
       if(up == null) continue;
-      if(up.type() == PrimitiveType.DELETE || 
-          up.type() == PrimitiveType.REPLACENODE) {
-        m.clear();
-        return;
-      }
+//      if(up.type() == PrimitiveType.DELETE || 
+//          up.type() == PrimitiveType.REPLACENODE) {
+//        m.clear();
+//        return;
+//      }
       changeAttributePool(m, true, up.addAtt());
       changeAttributePool(m, false, up.remAtt());
     }
