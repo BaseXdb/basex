@@ -1,5 +1,7 @@
 package org.basex.query.up;
 
+import static org.basex.query.QueryText.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,6 +10,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.util.Err;
 
 /**
  * Holds all update primitives for a specific data reference.
@@ -68,12 +71,52 @@ public abstract class Primitives {
   
   /**
    * Checks updates for violations.
+   * @throws QueryException query exception 
    */
-  public void check() { };
+  public void check() throws QueryException { 
+    for(final int node : getNodes()) {
+      for(final UpdatePrimitive p : op.get(node)) {
+        if(p == null) continue;
+        p.prepare();
+      }
+    }
+  };
 
   /**
    * Checks constraints and applies all updates to the databases.
    * @throws QueryException query exception
    */
   public abstract void apply() throws QueryException;
+  
+  /**
+   * Finds string duplicates in the given map. 
+   * @param m map reference
+   * @throws QueryException query exception
+   */
+  public static void findDuplicates(final Map<String, Integer> m) 
+  throws QueryException {
+    for(final String s : m.keySet()) {
+      if(m.get(s) > 1) 
+        Err.or(UPATTDUPL, s);
+    }
+  }
+
+  /**
+   * Increases or decreases the counters for the given string set.
+   * @param m map reference
+   * @param add increase if true
+   * @param s string set
+   */
+  public static void changeAttributePool(final Map<String, Integer> m, 
+      final boolean add, final String... s) {
+    if(s == null) return;
+    Integer i;
+    for(final String st : s) {
+      i = m.get(st);
+      if(i == null) {
+        m.put(st, 1);
+      } else
+        m.put(st, add ? ++i : --i);
+    }
+  }
 }

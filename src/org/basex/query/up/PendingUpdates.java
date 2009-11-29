@@ -21,8 +21,7 @@ import org.basex.query.util.Err;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
- * constraints and finally executes them. Update primitives with fragment
- * as target node are only checked for constraints.
+ * constraints and finally executes the updates.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
@@ -40,7 +39,7 @@ public final class PendingUpdates {
   /** The update operations are part of a transform expression. */
   private final boolean t;
   /** Holds all data references created by the copy clause of a transform
-   * expression. Adding an update primitive that was declared within the modify
+   * expression. Adding an update primitive that is declared within the modify
    * clause of this transform expression will cause a query exception
    * (XUDY0014) if the data reference of the corresponding target node is not
    * part of this set, hence the target node has not been copied.
@@ -89,7 +88,7 @@ public final class PendingUpdates {
       if(!frag && ctx.context.perm(User.WRITE, d.meta) != -1)
         throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
       
-      prim = frag ? new FragmentPrimitives() : new DBPrimitives();
+      prim = frag ? new FragmentPrimitives() : new DBPrimitives(d);
       primitives.put(d, prim);
     }
     prim.add(p);
@@ -102,43 +101,13 @@ public final class PendingUpdates {
    * @throws QueryException query exception
    */
   public void apply() throws QueryException {
-    // prepare database update primitives
-    // [LK] check violations for dbnodes
     for(final Primitives dbp : primitives.values()) {
-      for(final int node : dbp.getNodes()) {
-        for(final UpdatePrimitive p : dbp.op.get(node)) {
-          if(p == null) continue;
-          p.prepare();
-        }
-      }
+      dbp.check();
     }
     
-    // apply updates if validation finds no errors
     for(final Data d : primitives.keySet().toArray(
         new Data[primitives.size()])) {
       primitives.get(d).apply();
-      d.flush();
     }
   }
-  
-//  private void findDuplicates(final Map<String, Integer> m) 
-//    throws QueryException {
-//    for(final String s : m.keySet()) {
-//      if(m.get(s) > 1) 
-//        Err.or(UPATTDUPL, s);
-//    }
-//  }
-//  
-//  private void changeAttr(final Map<String, Integer> m, final boolean add,
-//      final String... s) {
-//    if(s == null) return;
-//    Integer i;
-//    for(final String st : s) {
-//      i = m.get(st);
-//      if(i == null) {
-//        m.put(st, 1);
-//      } else
-//        m.put(st, add ? ++i : --i);
-//    }
-//  }
 }

@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import org.basex.query.QueryException;
 import org.basex.util.IntList;
 
 /**
@@ -23,6 +24,11 @@ public class FragmentPrimitives extends Primitives {
     for(final int i : op.keySet()) il.add(i);
     nodes = il.finish();
     finished = true;
+  }
+  
+  @Override
+  public void check() throws QueryException {
+    super.check();
   }
   
   @Override

@@ -1,8 +1,10 @@
 package org.basex.query.up;
 
 import static org.basex.util.Token.*;
+
 import java.util.HashSet;
 import java.util.Set;
+
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -51,7 +53,7 @@ public final class UpdateFunctions {
     }
     return s;
   }
-
+  
   /**
    * Blabooo.
    * @param at ?

@@ -6,6 +6,7 @@ import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
+import org.basex.util.Token;
 
 /**
  * Insert attribute primitive.
@@ -42,9 +43,9 @@ public final class InsertAttribute extends NodeCopy {
   }
 
   @Override
-  public byte[][] addAtt() {
-    final byte[][] a = new byte[m.meta.size][];
-    for(int i = 0; i < m.meta.size; i++) a[i] = m.attName(i);
+  public String[] addAtt() {
+    final String[] a = new String[m.meta.size];
+    for(int i = 0; i < m.meta.size; i++) a[i] = Token.string(m.attName(i));
     return a;
   }
 }

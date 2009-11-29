@@ -54,11 +54,11 @@ public abstract class UpdatePrimitive {
    * States which attributes are added to the attribute pool.
    * @return names of added attributes
    */
-  public byte[][] addAtt() { return null; };
+  public String[] addAtt() { return null; };
 
   /**
    * States which attributes are removed from the attribute pool.
    * @return names of removed attributes if target node is an attribute
    */
-  public byte[][] remAtt() { return null; };
+  public String[] remAtt() { return null; };
 }
