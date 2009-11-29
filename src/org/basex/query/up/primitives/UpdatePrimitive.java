@@ -43,8 +43,8 @@ public abstract class UpdatePrimitive {
   public abstract void apply(final int add);
 
   /**
-   * Merges if possible two update primitives of the same type if they are
-   * applied on the same target.
+   * Merges if possible two update primitives of the same type if they have the
+   * same target node.
    * @param p primitive to be merged with
    * @throws QueryException query exception
    */
