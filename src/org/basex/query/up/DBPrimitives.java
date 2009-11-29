@@ -47,10 +47,13 @@ public final class DBPrimitives extends Primitives {
     super.check();
     
     int i = nodes.length - 1;
-    int par;
+    int par = -1;
     int k;
     int pre;
     while(i >= 0) {
+      // parent has already been checked
+      if(par == nodes[i]) 
+        if(i > 0) i--; else return;
       pre = nodes[i];
       k = d.kind(pre);
       if(k == Data.ELEM) findAttributeDuplicates(new int[] {pre});

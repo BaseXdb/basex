@@ -114,7 +114,7 @@ public abstract class Primitives {
     for(final String st : s) {
       i = m.get(st);
       if(i == null) {
-        m.put(st, 1);
+        m.put(st, add ? 1 : -1);
       } else
         m.put(st, add ? ++i : --i);
     }
