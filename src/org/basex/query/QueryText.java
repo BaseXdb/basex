@@ -515,8 +515,8 @@ public interface QueryText {
   /** XUDY0029: XQuery Update dynamic exception. */
   Object[] UPPAREMPTY = { XUDY, 29, "Target has no parent node." };
   /** XUDY0030: XQuery Update dynamic exception. */
-  Object[] UPATTDOC = { XUDY, 30,
-      "Attribute cannot be inserted after/before a document node." };
+  Object[] UPATTELM = { XUDY, 30,
+      "Attributes must be inserted after/before an element." };
 
   /** XUTY0004: XQuery Update type exception. */
   Object[] UPNOATTRPER = { XUTY, 4, "Attribute must follow root element." };
@@ -539,7 +539,7 @@ public interface QueryText {
   Object[] UPCOPYMULT = { XUTY, 13,
       "Source expression in copy clause must return single node." };
   /** XUTY0022: XQuery Update type exception. */
-  Object[] UPWRTRGTYP2 = { XUTY, 22, "Wrong target type." };
+  Object[] UPATTELM2 = { XUTY, 22, "Insertion target must be an element." };
 
   /** XUST0001: Parsing exception. */
   Object[] UPNOT = { XUST, 1, "No updating expression allowed." };

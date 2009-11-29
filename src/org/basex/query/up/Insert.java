@@ -2,12 +2,15 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -57,8 +60,8 @@ public final class Insert extends Update {
   @Override
   public Seq atomic(final QueryContext ctx) throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
-    final NodIter seq = c.children;
-    final NodIter aSeq = c.ats;
+    final NodIter cList = c.children;
+    final NodIter aList = c.ats;
     if(c.errAtt) Err.or(UPNOATTRPER);
     if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
 
@@ -79,29 +82,33 @@ public final class Insert extends Update {
     }
 
     UpdatePrimitive up = null;
-    if(aSeq.size() > 0) {
-      if(before || after) {
-        if(par.type != Type.ELM) Err.or(UPATTDOC, this);
-//        if(!UpdateFunctions.checkAttNames(par.attr(), aSeq, null))
-//          Err.or(UPATTDUPL, n.nname());
-        up = new InsertAttribute(par, aSeq);
-      } else {
-        if(n.type != Type.ELM) Err.or(UPWRTRGTYP2, this);
-//        if(!UpdateFunctions.checkAttNames(n.attr(), aSeq, null))
-//          Err.or(UPATTDUPL, n.nname());
-        up = new InsertAttribute(n, aSeq);
+    if(aList.size() > 0) {
+      final Nod tar = before || after ? par : n;
+      if(tar.type != Type.ELM)
+        Err.or(before || after ? UPATTELM : UPATTELM2, this);
+
+      //if(!UpdateFunctions.checkAttNames(tar.attr(), aSeq, null))
+      //Err.or(UPATTDUPL, tar.nname());
+
+      for(int a = 0; a < aList.size(); a++) {
+        final QNm name = aList.get(a).qname();
+        final byte[] uri = tar.uri(name.pref(), ctx);
+        if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPCONFNS);
       }
+      
+      up = new InsertAttribute(tar, aList);
       ctx.updates.add(up, ctx);
     }
-    if(seq.size() > 0) {
+
+    if(cList.size() > 0) {
       if(before) {
-        up = new InsertBefore(n, seq);
+        up = new InsertBefore(n, cList);
       } else if(after) {
-        up = new InsertAfter(n, seq);
+        up = new InsertAfter(n, cList);
       } else if(first) {
-        up = new InsertIntoFirst(n, seq);
+        up = new InsertIntoFirst(n, cList);
       } else {
-        up = new InsertInto(n, seq, last);
+        up = new InsertInto(n, cList, last);
       }
       ctx.updates.add(up, ctx);
     }

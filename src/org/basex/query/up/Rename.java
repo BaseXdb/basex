@@ -64,8 +64,7 @@ public final class Rename extends Update {
       i.type == Type.ATT ? tar.parent() : null;
 
     if(test != null) {
-      byte[] uri = test.uri(name.pref());
-      if(uri == null && name.pref().length == 0) uri = ctx.nsElem;
+      final byte[] uri = test.uri(name.pref(), ctx);
       if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPCONFNS);
     }
 

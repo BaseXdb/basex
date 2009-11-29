@@ -10,6 +10,7 @@ import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
 import org.basex.core.Main;
 import org.basex.data.Data;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
@@ -126,15 +127,18 @@ public abstract class Nod extends Item {
   /**
    * Returns the uri for the specified prefix.
    * @param pref prefix
+   * @param ctx query context
    * @return uri
    */
-  public byte[] uri(final byte[] pref) {
+  public byte[] uri(final byte[] pref, final QueryContext ctx) {
     final Atts at = ns();
-    if(at == null) return null;
-    final int i = at.get(pref);
-    if(i != -1) return at.val[i];
-    final Nod n = parent();
-    return n != null ? n.uri(pref) : null;
+    if(at != null) {
+      final int i = at.get(pref);
+      if(i != -1) return at.val[i];
+      final Nod n = parent();
+      if(n != null) return n.uri(pref, ctx);
+    }
+    return pref.length == 0 ? ctx.nsElem : null;
   }
 
   /**

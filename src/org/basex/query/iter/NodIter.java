@@ -93,7 +93,7 @@ public final class NodIter extends NodeIter {
   }
 
   @Override
-  public Item get(final long i) {
+  public Nod get(final long i) {
     return i < size ? item[(int) i] : null;
   }
 
