@@ -49,7 +49,7 @@ public final class QNm extends Item {
   public QNm(final byte[] n, final QueryContext ctx) throws QueryException {
     this(n);
     if(!XMLToken.isQName(val)) Err.value(type, val);
-    if(ns()) uri = Uri.uri(ctx.ns.uri(pre(), false));
+    if(ns()) uri = Uri.uri(ctx.ns.uri(pref(), false));
   }
 
   /**
@@ -134,7 +134,7 @@ public final class QNm extends Item {
    * Returns the prefix.
    * @return prefix
    */
-  public byte[] pre() {
+  public byte[] pref() {
     return ns == -1 ? EMPTY : substring(val, 0, ns);
   }
 
@@ -148,7 +148,7 @@ public final class QNm extends Item {
 
   @Override
   public QName java() {
-    return new QName(string(uri.str()), string(ln()), string(pre()));
+    return new QName(string(uri.str()), string(ln()), string(pref()));
   }
 
   @Override

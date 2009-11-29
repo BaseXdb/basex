@@ -9,7 +9,6 @@ import org.basex.util.IntList;
  * @author Lukas Kircher
  */
 public class FragmentPrimitives extends Primitives {
-
   /**
    * Constructor.
    */

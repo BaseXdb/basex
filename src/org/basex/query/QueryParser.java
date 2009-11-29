@@ -631,9 +631,9 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final boolean up) throws QueryException {
     final QNm name = new QNm(qName(DECLFUNC));
-    name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pre(), false) : ctx.nsFunc);
+    name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pref(), false) : ctx.nsFunc);
 
-    if(name.pre().length == 0 && Type.find(name, true) != null)
+    if(name.pref().length == 0 && Type.find(name, true) != null)
       error(FUNCRES, name);
     if(module != null && !name.uri.eq(module.uri)) error(MODNS, name);
 
@@ -1529,7 +1529,7 @@ public class QueryParser extends InputParser {
   private QNm varName() throws QueryException {
     check(DOLLAR);
     final QNm name = new QNm(qName(NOVARNAME));
-    if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pre(), false));
+    if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pref(), false));
     ctx.ns.uri(name);
     return name;
   }
@@ -1567,7 +1567,7 @@ public class QueryParser extends InputParser {
         ap = qp;
         ctx.ns.uri(name);
         name.uri = Uri.uri(name.ns() ?
-            ctx.ns.uri(name.pre(), false) : ctx.nsFunc);
+            ctx.ns.uri(name.pref(), false) : ctx.nsFunc);
         final Expr func = ctx.fun.get(name, exprs, ctx);
         if(func != null) {
           alter = null;
@@ -1973,7 +1973,7 @@ public class QueryParser extends InputParser {
 
     if(seq.type == null) {
       final byte[] uri = type.uri.str();
-      if(uri.length == 0 && type.ns()) error(PREUNKNOWN, type.pre());
+      if(uri.length == 0 && type.ns()) error(PREUNKNOWN, type.pref());
       final String ln = string(type.ln());
       error(eq(uri, Type.NOT.uri) && ln.equals(Type.NOT.name) ||
           ln.equals(Type.AAT.name) ? CASTUNKNOWN : TYPEUNKNOWN, type);
@@ -2001,7 +2001,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final int mode = consume('?') ? 1 : consume('+') ? 2 :
       consume('*') ? 3 : 0;
-    if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pre(), false));
+    if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pref(), false));
 
     final byte[] ext = tok.finish();
     final SeqType seq = new SeqType(type, mode, true);

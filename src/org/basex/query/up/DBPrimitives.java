@@ -1,6 +1,5 @@
 package org.basex.query.up;
 
-import org.basex.query.QueryException;
 import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -32,10 +31,9 @@ public final class DBPrimitives extends Primitives {
 
   /**
    * Checks constraints and applies all updates to the databases.
-   * @throws QueryException query exception
    */
   @Override
-  public void apply() throws QueryException {
+  public void apply() {
     // apply updates backwards, starting with the highest pre value -> no id's
     // and less table alterations needed
     for(int i = nodes.length - 1; i >= 0; i--) {

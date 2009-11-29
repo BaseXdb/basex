@@ -2,6 +2,8 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CAttr;
@@ -11,6 +13,7 @@ import org.basex.query.expr.CPI;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -53,7 +56,20 @@ public final class Rename extends Update {
     } else {
       Err.or(UPWRTRGTYP, this);
     }
-    ctx.updates.add(new RenamePrimitive((Nod) i, ex.atomic(ctx).qname()), ctx);
+
+    // check namespace conflicts...
+    final QNm name = ex.atomic(ctx).qname();
+    final Nod tar = (Nod) i;
+    final Nod test = i.type == Type.ELM ? tar :
+      i.type == Type.ATT ? tar.parent() : null;
+
+    if(test != null) {
+      byte[] uri = test.uri(name.pref());
+      if(uri == null && name.pref().length == 0) uri = ctx.nsElem;
+      if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPCONFNS);
+    }
+
+    ctx.updates.add(new RenamePrimitive(tar, name), ctx);
     return Seq.EMPTY;
   }
 

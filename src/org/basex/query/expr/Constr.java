@@ -81,7 +81,7 @@ public final class Constr {
         // split attribute name
         final QNm name = node.qname();
         final byte[] ln = name.ln();
-        final byte[] pre = name.pre();
+        final byte[] pre = name.pref();
         if(eq(pre, XML) && eq(ln, BASE)) base = it.str();
 
         // check for duplicate attribute names

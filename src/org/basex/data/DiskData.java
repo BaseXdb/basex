@@ -396,6 +396,12 @@ public final class DiskData extends Data {
     if(k == ELEM || k == DOC) table.write4(pre, 8, v);
   }
 
+  @Override
+  public void ns(final int pre, final int k) {
+    final int i = table.read1(pre, 0) & 0x07;
+    table.write1(pre, 0, i | k << 4 | (k == 0 ? 0 : 1 << 3));
+  }
+
   // TABLE UPDATES ============================================================
 
   @Override

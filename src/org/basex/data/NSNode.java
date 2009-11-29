@@ -60,9 +60,7 @@ final class NSNode {
    * @param n child node
    */
   void add(final NSNode n) {
-    final int c = ch.length;
-    ch = Arrays.copyOf(ch, c + 1);
-    ch[c] = n;
+    add(n, ch.length);
   }
 
   /**
@@ -132,7 +130,7 @@ final class NSNode {
   }
 
   /**
-   * Finds the closest namespace node for the specified pre value.
+   * Adds a child at the specified position.
    * @param p pre value
    * @return node
    */
@@ -148,8 +146,31 @@ final class NSNode {
     return l - 1;
   }
 
+  /**
+   * Adds a child to the specified position.
+   * @param nd child
+   * @param s inserting position
+   */
+  private void add(final NSNode nd, final int s) {
+    final NSNode[] tmp = new NSNode[ch.length + 1];
+    System.arraycopy(ch, 0, tmp, 0, s);
+    tmp[s] = nd;
+    ch = tmp;
+  }
+
   // Printing Namespaces ======================================================
 
+  /**
+   * Prints the node structure for debugging purposes.
+   * @param ns namespace reference
+   * @return string
+   */
+  String print(final Namespaces ns) {
+    final TokenBuilder tb = new TokenBuilder();
+    print(tb, 0, ns);
+    return tb.toString();
+  }
+  
   /**
    * Prints the node structure for debugging purposes.
    * @param tb string builder

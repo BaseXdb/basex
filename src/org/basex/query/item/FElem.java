@@ -194,7 +194,7 @@ public final class FElem extends FNode {
       final QNm atn = nod.qname();
       if(atn.ns()) {
         if(!NSGlobal.standard(atn.uri.str())) {
-          final byte[] pre = atn.pre();
+          final byte[] pre = atn.pref();
           final int i = ser.ns.get(pre);
           if(i == -1) ser.namespace(pre, atn.uri.str());
         }

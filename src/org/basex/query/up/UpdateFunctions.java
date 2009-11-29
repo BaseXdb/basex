@@ -10,7 +10,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
-import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
@@ -96,8 +95,8 @@ public final class UpdateFunctions {
     // some pre value checks to prevent databases errors
     final int s = d.meta.size;
     if(a >= s || b >= s || a == b || a < 0 || b < 0) return false;
-    if(!(d.kind(a) == Data.TEXT && d.kind(b) == Data.TEXT)) return false;
-    if(d.parent(a, d.kind(a)) != d.parent(b, d.kind(b))) return false;
+    if(d.kind(a) != Data.TEXT || d.kind(b) != Data.TEXT) return false;
+    if(d.parent(a, Data.TEXT) != d.parent(b, Data.TEXT)) return false;
 
     d.update(a, concat(d.text(a), d.text(b)));
     d.delete(b);
@@ -116,28 +115,6 @@ public final class UpdateFunctions {
     final int ss = m.meta.size;
     for(int s = 0; s < ss; s++) {
       d.insert(pre + s, par, m.attName(s), m.attValue(s));
-    }
-  }
-
-  /**
-   * Renames the specified node.
-   * @param pre pre value
-   * @param name new name
-   * @param data data reference
-   */
-  public static void rename(final int pre, final QNm name, final Data data) {
-    // passed on pre value must refer to element, pi or attribute node
-    final int k = data.kind(pre);
-    // [LK] update methods should consider namespace, defined in QName (name)
-    if(k == Data.ELEM) {
-      data.update(pre, name.str());
-    } else if(k == Data.PI) {
-      final byte[] val = data.text(pre);
-      final int i = indexOf(val, ' ');
-      data.update(pre, i == -1 ? name.str() :
-        concat(name.str(), SPACE, substring(val, i + 1)));
-    } else {
-      data.update(pre, name.str(), data.attValue(pre));
     }
   }
 

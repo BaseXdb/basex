@@ -127,7 +127,7 @@ public final class Namespaces extends TokenSet {
    * @param pre pre value
    * @return namespace URI reference or 0 if no namespace was found
    */
-  public int get(final byte[] name, final int pre) {
+  public int uri(final byte[] name, final int pre) {
     return ns(pref(name), root.find(pre));
   }
 
@@ -168,6 +168,28 @@ public final class Namespaces extends TokenSet {
     }
   }
 
+  /**
+   * Adds a namespace for the specified pre value.
+   * @param p prefix
+   * @param u uri
+   * @param pre pre value
+   */
+  public void add(final byte[] p, final byte[] u, final int pre) {
+    final int k = Math.abs(add(p));
+    final int v = Math.abs(add(u));
+    NSNode nd = root.find(pre);
+    
+    if(nd.pre != pre) {
+      final NSNode t = new NSNode();
+      t.pre = pre;
+      t.add(k, v);
+      t.par = nd;
+      nd.add(t);
+    } else {
+      nd.add(k, v);
+    }
+  }
+
   // Printing Namespaces ======================================================
 
   /**
@@ -177,7 +199,7 @@ public final class Namespaces extends TokenSet {
    */
   public byte[] table(final boolean all) {
     if(root.ch.length == 0) return null;
-    System.out.println(this);
+    //System.out.println(this);
 
     final Table t = new Table();
     t.header.add(TABLEID);
@@ -258,8 +280,6 @@ public final class Namespaces extends TokenSet {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder();
-    root.print(tb, 0, this);
-    return tb.toString();
+    return root.print(this);
   }
 }

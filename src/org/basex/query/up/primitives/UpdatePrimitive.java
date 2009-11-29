@@ -39,9 +39,8 @@ public abstract class UpdatePrimitive {
    * the pre value of t changes. Thus the number of inserted nodes is added to
    * the pre value of t for all following update operations.
    * @param add size to add
-   * @throws QueryException query exception
    */
-  public abstract void apply(final int add) throws QueryException;
+  public abstract void apply(final int add);
 
   /**
    * Merges if possible two update primitives of the same type if they are
@@ -55,11 +54,11 @@ public abstract class UpdatePrimitive {
    * States which attributes are added to the attribute pool.
    * @return names of added attributes
    */
-  public String[] addAtt() { return null; };
+  public byte[][] addAtt() { return null; };
 
   /**
    * States which attributes are removed from the attribute pool.
    * @return names of removed attributes if target node is an attribute
    */
-  public String[] remAtt() { return null; };
+  public byte[][] remAtt() { return null; };
 }

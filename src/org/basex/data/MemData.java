@@ -285,6 +285,12 @@ public class MemData extends Data {
     if(k == ELEM || k == DOC) val2[pre] = (int) val2[pre] | (long) val << 32;
   }
 
+  @Override
+  public void ns(final int pre, final int k) {
+    val1[pre] = val1[pre] & 0x07FFFFFFFFFFFFFFL |
+      (long) k << 60 | (k == 0 ? 0 : 1L << 59);
+  }
+
   // UPDATES ON VALUE ARRAYS ==================================================
 
   @Override

@@ -3,14 +3,12 @@ package org.basex.query.up.primitives;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.UpdateFunctions.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
-
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
-import org.basex.util.Token;
 
 /**
  * Replace primitive.
@@ -65,15 +63,15 @@ public final class ReplacePrimitive extends NodeCopy {
   }
 
   @Override
-  public String[] addAtt() {
+  public byte[][] addAtt() {
     if(!a) return null;
-    final String[] at = new String[m.meta.size];
-    for(int i = 0; i < m.meta.size; i++) at[i] = Token.string(m.attName(i));
+    final byte[][] at = new byte[m.meta.size][];
+    for(int i = 0; i < m.meta.size; i++) at[i] = m.attName(i);
     return at;
   }
 
   @Override
-  public String[] remAtt() {
-    return a ? new String[] { Token.string(node.nname()) } : null;
+  public byte[][] remAtt() {
+    return a ? new byte[][] { node.nname() } : null;
   }
 }

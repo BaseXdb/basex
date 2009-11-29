@@ -90,10 +90,10 @@ public final class TreeView extends View implements TreeViewOptions {
 
   @Override
   public void refreshInit() {
+    if(!visible()) return;
     wwidth = -1;
     wheight = -1;
-    if(gui.context.data != null) cache = new TreeCaching(gui.context.data);
-
+    cache = new TreeCaching(gui.context.data);
     repaint();
   }
 
@@ -106,6 +106,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
   @Override
   public void refreshMark() {
+    if(!visible()) return;
     markNodes();
     repaint();
   }

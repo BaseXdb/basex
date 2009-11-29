@@ -124,6 +124,20 @@ public abstract class Nod extends Item {
   }
 
   /**
+   * Returns the uri for the specified prefix.
+   * @param pref prefix
+   * @return uri
+   */
+  public byte[] uri(final byte[] pref) {
+    final Atts at = ns();
+    if(at == null) return null;
+    final int i = at.get(pref);
+    if(i != -1) return at.val[i];
+    final Nod n = parent();
+    return n != null ? n.uri(pref) : null;
+  }
+
+  /**
    * Returns the database name.
    * @return database name
    */

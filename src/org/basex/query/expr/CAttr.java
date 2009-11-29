@@ -53,7 +53,7 @@ public final class CAttr extends CFrag {
     final Item it = atn.atomic(ctx);
     if(it == null) Err.empty(this);
     final QNm name = name(ctx, it);
-    final byte[] pre = name.pre();
+    final byte[] pre = name.pref();
     final byte[] ln = name.ln();
     if(comp && (eq(name.str(), XMLNS) || eq(pre, XMLNS))) Err.or(NSATTCONS);
 
@@ -83,7 +83,7 @@ public final class CAttr extends CFrag {
       name = new QNm(nm);
     }
 
-    if(name.uri == Uri.EMPTY) name.uri = Uri.uri(ctx.ns.uri(name.pre(),
+    if(name.uri == Uri.EMPTY) name.uri = Uri.uri(ctx.ns.uri(name.pref(),
         name != i));
     return name;
   }

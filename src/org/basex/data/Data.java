@@ -279,7 +279,7 @@ public abstract class Data {
   public abstract double attNum(int pre);
 
   /**
-   * Sets the distance for the specified node.
+   * Sets the distance.
    * @param pre pre value
    * @param kind node kind
    * @param v value
@@ -295,12 +295,19 @@ public abstract class Data {
   public abstract void attSize(final int pre, final int kind, final int v);
 
   /**
-   * Stores a size value to the table.
+   * Sets the size value.
    * @param pre pre reference
    * @param kind node kind
    * @param val value to be stored
    */
   public abstract void size(final int pre, final int kind, final int val);
+
+  /**
+   * Sets a namespace flag.
+   * @param pre pre reference
+   * @param k namespace key
+   */
+  public abstract void ns(final int pre, final int k);
 
   /**
    * Finds the specified attribute and returns its value.

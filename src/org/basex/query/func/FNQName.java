@@ -61,15 +61,12 @@ final class FNQName extends Fun {
       case PREQNAME:
         if(it == null) return null;
         nm = (QNm) check(it, Type.QNM);
-        return !nm.ns() ? null : new NCN(nm.pre());
+        return !nm.ns() ? null : new NCN(nm.pref());
       case NSURIPRE:
         final byte[] pre = checkStr(it);
-        if(pre.length == 0) return Uri.uri(ctx.nsElem);
         final Atts at = ((Nod) check(it2, Type.ELM)).ns();
-        for(int a = 0; a < at.size; a++) {
-          if(eq(pre, at.key[a])) return Uri.uri(at.val[a]);
-        }
-        return null;
+        final int i = at.get(pre);
+        return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
         if(it == null) return null;
         final Uri rel = Uri.uri(checkStr(it));
@@ -96,25 +93,15 @@ final class FNQName extends Fun {
 
     final byte[] name = trim(checkStr(q));
     if(!XMLToken.isQName(name)) Err.value(Type.QNM, q);
+
     final QNm nm = new QNm(name);
-
-    final byte[] pre = nm.pre();
-    Nod n = (Nod) check(it, Type.ELM);
-    nm.uri = n.qname().uri;
-    if(nm.uri != Uri.EMPTY) return nm;
-
-    while(n != null) {
-      final Atts at = n.ns();
-      if(at == null) break;
-      final int i = at.get(pre);
-      if(i != -1) {
-        nm.uri = Uri.uri(at.val[i]);
-        return nm;
-      }
-      n = n.parent();
+    final byte[] pref = nm.pref();
+    byte[] uri = ((Nod) check(it, Type.ELM)).uri(pref);
+    if(uri == null) {
+      if(pref.length != 0) Err.or(NSDECL, pref);
+      uri = ctx.nsElem;
     }
-    if(pre.length != 0) Err.or(NSDECL, pre);
-    nm.uri = Uri.uri(ctx.nsElem);
+    nm.uri = Uri.uri(uri);
     return nm;
   }
 

@@ -31,6 +31,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param data data reference.
    */
   public TreeCaching(final Data data) {
+    if(data == null) return;
     maxLevel = data.meta.height + 1;
     cacheNodes(data);
   }

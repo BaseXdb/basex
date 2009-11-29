@@ -71,11 +71,11 @@ public class TokenSet {
 
   /**
    * Returns the specified key.
-   * @param p key index
+   * @param i key index
    * @return key
    */
-  public final byte[] key(final int p) {
-    return keys[p];
+  public final byte[] key(final int i) {
+    return keys[i];
   }
 
   /**

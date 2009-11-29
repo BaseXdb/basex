@@ -49,7 +49,7 @@ public final class NSLocal {
    * @param qname qname
    */
   public void uri(final QNm qname) {
-    final byte[] pre = qname.pre();
+    final byte[] pre = qname.pref();
     if(pre.length == 0) return;
     final byte[] uri = find(pre);
     qname.uri = Uri.uri(uri != null ? uri : NSGlobal.uri(pre));
