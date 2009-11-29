@@ -33,12 +33,14 @@ public final class ReplaceValue extends NewValue {
     final int k = d.kind(n.pre);
     // [LK] update methods should consider namespace, defined in QName (name)
     final byte[] nn = name.str();
-    if(k == Data.ATTR) {
+    
+    if(k == Data.TEXT && nn.length == 0) 
+      d.delete(n.pre);
+    else if(k == Data.ATTR) {
       d.update(n.pre, d.attName(n.pre), nn);
     } else {
       d.update(n.pre, k == Data.PI ? concat(n.nname(), SPACE, nn) : nn);
     }
-    // [LK] add delete if replace with empty string ?
   }
 
   @Override
