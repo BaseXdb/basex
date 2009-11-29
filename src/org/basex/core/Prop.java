@@ -162,7 +162,7 @@ public final class Prop extends AProp {
    * FSTraversal implementation. If true, the FSTraversal implementation (based
    * on XQuery Update) is used.
    */
-  public static final Object[] FSTRAVERSAL = { "FSTRAVERSAL", false };
+  public static final Object[] FSTRAVERSAL = { "FSTRAVERSAL", true };
   /** Fuse support. [AH] check this flag. */
   public static final Object[] FUSE = { "FUSE", false };
   /** Propagate changes in DeepFS back to original filesystem. */

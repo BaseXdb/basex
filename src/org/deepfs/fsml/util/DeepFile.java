@@ -251,7 +251,7 @@ public class DeepFile {
   private DeepFile(final DeepFile df, final int contentSize)
       throws IOException {
     parser = df.parser;
-    bfc = df.bfc.subChannel(df.bfc.getFileName(), contentSize);
+    bfc = df.bfc.subChannel("", contentSize);
     fsmeta = df.fsmeta;
     metaFinished = !fsmeta;
     fsxml = df.fsxml;
@@ -472,7 +472,7 @@ public class DeepFile {
       if(!e.isMultiVal()) {
         Main.debug(
             "Failed to add metadata value. Multiple values are forbidden for "
-            + "attribute % (%).", e, bfc.getFileName());
+            + "metadata element % (%).", e, bfc.getFileName());
         return;
       }
       vals = metaElements.get(e);

@@ -107,8 +107,8 @@ public final class BufferedFileChannel {
       final FileChannel fileChannel, final ByteBuffer buffer,
       final long bytesToRead) throws IOException {
     f = file;
-    name = f.getAbsolutePath() + subfilename == null ? "" : Prop.SEP
-        + subfilename;
+    name = subfilename.equals("") ? f.getAbsolutePath() : f.getAbsolutePath()
+        + Prop.SEP + subfilename;
     fc = fileChannel;
     buf = buffer;
     mark = absolutePosition();

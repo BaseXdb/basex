@@ -8,7 +8,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.basex.core.Main;
+import org.basex.query.item.Type;
 import org.basex.util.Token;
 import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
@@ -116,21 +119,9 @@ public final class ExifParser {
    */
   private enum Tag {
     /** Image width. */
-    h100(1, MetaElem.PIXEL_WIDTH, Format.SHORT, Format.LONG) {
-      @Override
-      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
-        if(d.isMetaSet(elem)) return;
-        metaSimple(d, b);
-      }
-    },
+    h100(1, MetaElem.PIXEL_WIDTH, true, Format.SHORT, Format.LONG),
     /** Image length. */
-    h101(1, MetaElem.PIXEL_HEIGHT, Format.SHORT, Format.LONG) {
-      @Override
-      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
-        if(d.isMetaSet(elem)) return;
-        metaSimple(d, b);
-      }
-    },
+    h101(1, MetaElem.PIXEL_HEIGHT, true, Format.SHORT, Format.LONG),
     /** Image description/title. */
     h10e(MetaElem.TITLE, Format.ASCII),
     /** Image input equipment manufacturer. */
@@ -141,6 +132,7 @@ public final class ExifParser {
     h112(1, MetaElem.ORIENTATION, Format.SHORT) {
       @Override
       void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        if(d.isMetaSet(elem)) return;
         final String s;
         switch(b.getShort()) {
           case 1:  s = "top left";     break;
@@ -176,41 +168,15 @@ public final class ExifParser {
     /** Software. */
     h131(MetaElem.SOFTWARE, Format.ASCII),
     /** DateTime of image creation. */
-    h132(20, MetaElem.DATETIME_CREATED, Format.ASCII) {
-      @Override
-      void meta(final DeepFile d, final BufferedFileChannel b) {
-        metaDate(d, b);
-      }
-    },
+    h132(20, MetaElem.DATETIME_CREATED, Format.ASCII),
     /** Creator. */
     h13b(MetaElem.CREATOR_NAME, Format.ASCII),
     /** White point. */
-    h13e(2, MetaElem.WHITE_POINT, Format.RATIONAL) {
-      @Override
-      public void meta(final DeepFile d, final BufferedFileChannel b) {
-        d.addMeta(elem, readRational(b) + " " + readRational(b));
-      }
-    },
+    h13e(2, MetaElem.WHITE_POINT, Format.RATIONAL),
     /** White point. */
-    h13f(6, MetaElem.PRIMARY_CHROMATICITIES, Format.RATIONAL) {
-      @Override
-      public void meta(final DeepFile d, final BufferedFileChannel b) {
-        final StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < 6; i++)
-          sb.append(readRational(b)).append(" ");
-        d.addMeta(elem, sb.toString());
-      }
-    },
+    h13f(6, MetaElem.PRIMARY_CHROMATICITIES, Format.RATIONAL),
     /** YCbCrCoefficients. */
-    h211(3, MetaElem.YCBCR_COEFFICIENTS, Format.RATIONAL) {
-      @Override
-      public void meta(final DeepFile d, final BufferedFileChannel b) {
-        final StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < 3; i++)
-          sb.append(readRational(b)).append(" ");
-        d.addMeta(elem, sb.toString());
-      }
-    },
+    h211(3, MetaElem.YCBCR_COEFFICIENTS, Format.RATIONAL),
     /** YCbCrPositioning. */
     h213(1, MetaElem.YCBCR_POSITIONING, Format.SHORT) {
       @Override
@@ -225,15 +191,7 @@ public final class ExifParser {
       }
     },
     /** ReferenceBlackWhite. */
-    h214(6, MetaElem.REFERENCE_BLACK_WHITE, Format.RATIONAL) {
-      @Override
-      public void meta(final DeepFile d, final BufferedFileChannel b) {
-        final StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < 6; i++)
-          sb.append(readRational(b)).append(" ");
-        d.addMeta(elem, sb.toString());
-      }
-    },
+    h214(6, MetaElem.REFERENCE_BLACK_WHITE, Format.RATIONAL),
     /** Copyright. */
     h8298(MetaElem.RIGHTS, Format.ASCII),
     /** Exposure time in seconds. */
@@ -283,7 +241,7 @@ public final class ExifParser {
     h8825(1, null, Format.LONG) {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) {
-        if(!check(o, buf)) err(o);
+        if(!check(o, buf)) return;
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
@@ -293,27 +251,12 @@ public final class ExifParser {
       }
     },
     /** ISO speed ratings. */
-    h8827(MetaElem.ISO_SPEED_RATINGS, Format.SHORT) {
-      @Override
-      void meta(final DeepFile d, final ByteBuffer b) {
-        final StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < count; i++)
-          sb.append(b.getShort()).append(" ");
-        d.addMeta(elem, sb.toString());
-      }
-      @Override
-      void meta(final DeepFile d, final BufferedFileChannel b) {
-        final StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < count; i++)
-          sb.append(b.getShort()).append(" ");
-        d.addMeta(elem, sb.toString());
-      }
-    },
+    h8827(MetaElem.ISO_SPEED_RATINGS, Format.SHORT),
     /** EXIF IFD. */
     h8769(1, null, Format.LONG) {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) {
-        if(!check(o, buf)) err(o);
+        if(!check(o, buf));
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
@@ -323,39 +266,322 @@ public final class ExifParser {
       }
     },
     /** DateTimeOriginal. */
-    h9003(20, MetaElem.DATETIME_ORIGINAL, Format.ASCII) {
-      @Override
-      void meta(final DeepFile d, final BufferedFileChannel b) {
-        metaDate(d, b);
-      }
-    },
+    h9003(20, MetaElem.DATETIME_ORIGINAL, Format.ASCII),
     /** DateTimeDigitized. */
-    h9004(20, MetaElem.DATETIME_DIGITIZED, Format.ASCII) {
-      @Override
-      void meta(final DeepFile d, final BufferedFileChannel b) {
-        metaDate(d, b);
-      }
-    },
+    h9004(20, MetaElem.DATETIME_DIGITIZED, Format.ASCII),
     /** CompressedBitsPerPixel. */
     h9102(1, MetaElem.COMPRESSED_BITS_PER_PIXEL, Format.RATIONAL),
+    /** Shutter speed value. */
+    h9201(1, MetaElem.SHUTTER_SPEED_VALUE, Format.SRATIONAL),
     /** Aperture value. */
     h9202(1, MetaElem.APERTURE_VALUE, Format.RATIONAL),
+    /** Brightness value. */
+    h9203(1, MetaElem.BRIGHTNESS_VALUE, Format.SRATIONAL),
+    /** Exposure bias value. */
+    h9204(1, MetaElem.EXPOSURE_BIAS_VALUE, Format.SRATIONAL),
     /** Max aperture value. */
     h9205(1, MetaElem.APERTURE_VALUE_MAX, Format.RATIONAL),
-    /** Exif Image Width. */
-    ha002(1, MetaElem.PIXEL_WIDTH, Format.SHORT, Format.LONG) {
+    /** Subject distance. */
+    h9206(1, MetaElem.SUBJECT_DISTANCE, Format.RATIONAL),
+    /** Metering mode. */
+    h9207(1, MetaElem.METERING_MODE, Format.SHORT) {
       @Override
       void meta(final DeepFile d, final ByteBuffer b) { // always inlined
-        if(d.isMetaSet(elem)) return;
-        metaSimple(d, b);
+        final String s;
+        final int v = b.getShort();
+        switch(v) {
+          case 0:   s = "unknown";                 break;
+          case 1:   s = "average";                 break;
+          case 2:   s = "center weighted average"; break;
+          case 3:   s = "spot";                    break;
+          case 4:   s = "multi spot";              break;
+          case 5:   s = "pattern";                 break;
+          case 6:   s = "partial";                 break;
+          default:  s = v == 255 ? "other" : null;
+        }
+        if(s != null) d.addMeta(elem, s);
       }
     },
-    /** Exif Image Height. */
-    ha003(1, MetaElem.PIXEL_HEIGHT, Format.SHORT, Format.LONG) {
+    /** Light source. */
+    h9208(1, MetaElem.LIGHT_SOURCE, Format.SHORT) {
       @Override
       void meta(final DeepFile d, final ByteBuffer b) { // always inlined
-        if(d.isMetaSet(elem)) return;
-        metaSimple(d, b);
+        final String s;
+        final int v = b.getShort();
+        switch(v) {
+          case 0:  s = "unknown"; break;
+          case 1:  s = "daylight"; break;
+          case 2:  s = "fluorescent"; break;
+          case 3:  s = "tungsten (incandescent light)"; break;
+          case 4:  s = "flash"; break;
+          case 5:  s = null; break;
+          case 6:  s = null; break;
+          case 7:  s = null; break;
+          case 8:  s = null; break;
+          case 9:  s = "fine weather"; break;
+          case 10: s = "cloudy weather"; break;
+          case 11: s = "shade"; break;
+          case 12: s = "daylight fluorescent (D 5700 - 7100K)"; break;
+          case 13: s = "day white fluorescent ( N 4600 - 5400K)"; break;
+          case 14: s = "cool white fluorescent (W 3900 - 4500K)"; break;
+          case 15: s = "white fluorescent (WW 3200 - 3700K)"; break;
+          case 16: s = null; break;
+          case 17: s = "standard light A"; break;
+          case 18: s = "standard light B"; break;
+          case 19: s = "standard light C"; break;
+          case 20: s = "D55"; break;
+          case 21: s = "D65"; break;
+          case 22: s = "D75"; break;
+          case 23: s = "D50"; break;
+          case 24: s = "ISO studio tungsten"; break;
+          default: s = v == 255 ? "other light source" : null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Flash. */
+    h9209(1, MetaElem.FLASH, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        final int v = b.getShort();
+        switch(v) {
+          case 0:  s = "flash did not fire."; break;
+          case 1:  s = "flash fired."; break;
+          case 5:  s = "strobe return light not detected."; break;
+          case 7:  s = "strobe return light detected."; break;
+          case 9:  s = "flash fired, compulsory flash mode"; break;
+          case 13: s = "flash fired, compulsory flash mode, return light not " +
+              "detected"; break;
+          case 15: s = "flash fired, compulsory flash mode, return light " +
+              "detected"; break;
+          case 16: s = "flash did not fire, compulsory flash mode"; break;
+          case 24: s = "flash did not fire, auto mode"; break;
+          case 25: s = "flash fired, auto mode"; break;
+          case 29: s = "flash fired, auto mode, return light not " +
+              "detected"; break;
+          case 31: s = "flash fired, auto mode, return light detected"; break;
+          case 32: s = "no flash function"; break;
+          case 65: s = "flash fired, red-eye reduction mode"; break;
+          case 69: s = "flash fired, red-eye reduction mode, return light " +
+              "not detected"; break;
+          case 71: s = "flash fired, red-eye reduction mode, return light " +
+              "detected"; break;
+          case 73: s = "flash fired, compulsory flash mode, red-eye " +
+              "reduction mode"; break;
+          case 77: s = "flash fired, compulsory flash mode, red-eye " +
+              "reduction mode, return light not detected"; break;
+          case 79: s = "flash fired, compulsory flash mode, red-eye " +
+              "reduction mode, return light detected"; break;
+          case 89: s = "flash fired, auto mode, red-eye reduction mode"; break;
+          case 93: s = "flash fired, auto mode, return light not detected, " +
+              "red-eye reduction mode"; break;
+          case 95: s = "flash fired, auto mode, return light detected, " +
+              "red-eye reduction mode"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Focal length in mm. */
+    h920a(1, MetaElem.FOCAL_LENGTH, Format.RATIONAL),
+    /** User comment. */
+    h9286(MetaElem.COMMENT, Format.ASCII),
+    // [BL] parse subsecond data
+    // /** Subsecond data - fractions of seconds for the original datetime. */
+    // h9291(null, Format.ASCII),
+    // /**
+    // * Subsecond data - fractions of seconds for the date time digitalized
+    // tag.
+    // */
+    // h9292(null, Format.ASCII),
+    /** Color space. */
+    ha001(1, MetaElem.COLOR_SPACE, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort() & 0xFFFF) {
+          case 1     :  s = "sRGB";         break;
+          case 0xFFFF:  s = "uncalibrated"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Exif Image Width. */
+    ha002(1, MetaElem.PIXEL_WIDTH, true, Format.SHORT, Format.LONG),
+    /** Exif Image Height. */
+    ha003(1, MetaElem.PIXEL_HEIGHT, true, Format.SHORT, Format.LONG),
+    /** Related sound file. */
+    ha004(13, MetaElem.RELATED_SOUND_FILE, Format.ASCII),
+    /** Focal plane X resolution. */
+    ha20e(1, MetaElem.FOCAL_PLANE_X_RESOLUTION, Format.RATIONAL),
+    /** Focal plane y resolution. */
+    ha20f(1, MetaElem.FOCAL_PLANE_Y_RESOLUTION, Format.RATIONAL),
+    /** Focal plane resolution unit. */
+    ha210(1, MetaElem.FOCAL_PLANE_RESOLUTION_UNIT, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 2:  s = "inches";      break;
+          case 3:  s = "centimeters"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Exposure index. */
+    ha215(1, MetaElem.EXPOSURE_INDEX, Format.RATIONAL),
+    /** Sensing method. */
+    ha217(1, MetaElem.SENSING_METHOD, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 1:  s = "not defined";                    break;
+          case 2:  s = "one-chip color area sensor";     break;
+          case 3:  s = "two-chip color area sensor";     break;
+          case 4:  s = "three-chip color area sensor";   break;
+          case 5:  s = "color sequential area sensor";   break;
+          case 6:  s = null; break;
+          case 7:  s = "trilinear sensor";               break;
+          case 8:  s = "color sequential linear sensor"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Custom rendered. */
+    ha401(1, MetaElem.CUSTOM_RENDERED, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "normal process"; break;
+          case 1:  s = "custom process"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Exposure mode. */
+    ha402(1, MetaElem.EXPOSURE_MODE, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "auto exposure";   break;
+          case 1:  s = "manual exposure"; break;
+          case 2:  s = "auto bracket";    break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }      
+    },
+    /** White balance. */
+    ha403(1, MetaElem.WHITE_BALANCE, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "auto white balance";   break;
+          case 1:  s = "manual white balance"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Digital zoom ratio. */
+    ha404(1, MetaElem.DIGITAL_ZOOM_RATIO, Format.RATIONAL),
+    /** Focal length in 35mm film. */
+    ha405(1, MetaElem.FOCAL_LENGTH_IN_35MM_FILM, Format.SHORT),
+    /** Scene capture type. */
+    ha406(1, MetaElem.SCENE_CAPTURE_TYPE, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "standard";    break;
+          case 1:  s = "landscape";   break;
+          case 2:  s = "portrait";    break;
+          case 3:  s = "night scene"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Gain control. */
+    ha407(1, MetaElem.GAIN_CONTROL, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "none";           break;
+          case 1:  s = "low gain up";    break;
+          case 2:  s = "high gain up";   break;
+          case 3:  s = "low gain down";  break;
+          case 4:  s = "high gain down"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Contrast. */
+    ha408(1, MetaElem.CONTRAST, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "normal"; break;
+          case 1:  s = "soft";   break;
+          case 2:  s = "hard";   break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Saturation. */
+    ha409(1, MetaElem.SATURATION, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "normal";          break;
+          case 1:  s = "low saturation";  break;
+          case 2:  s = "high saturation"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Sharpness. */
+    ha40a(1, MetaElem.SHARPNESS, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "normal"; break;
+          case 1:  s = "soft"; break;
+          case 2:  s = "hard"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
+      }
+    },
+    /** Subject distance range. */
+    ha40c(1, MetaElem.SUBJECT_DISTANCE_RANGE, Format.SHORT) {
+      @Override
+      void meta(final DeepFile d, final ByteBuffer b) { // always inlined
+        final String s;
+        switch(b.getShort()) {
+          case 0:  s = "unknown";      break;
+          case 1:  s = "macro";        break;
+          case 2:  s = "close view";   break;
+          case 3:  s = "distant view"; break;
+          default: s = null;
+        }
+        if(s != null) d.addMeta(elem, s);
       }
     };
 
@@ -374,6 +600,8 @@ public final class ExifParser {
     int count;
     /** Flag if the value of the field is inlined. */
     boolean inlined;
+    /** Flag if the meta element must be checked to be unique. */
+    final boolean unique;
 
     /**
      * Initializes a tag.
@@ -381,7 +609,7 @@ public final class ExifParser {
      * @param allowedFormats formats that are allowed for the tag field.
      */
     private Tag(final MetaElem metaElem, final Format... allowedFormats) {
-      this(-1, metaElem, allowedFormats);
+      this(-1, metaElem, false, allowedFormats);
     }
     
     /**
@@ -392,10 +620,24 @@ public final class ExifParser {
      */
     private Tag(final int expectedCount, final MetaElem metaElem,
         final Format... allowedFormats) {
+      this(expectedCount, metaElem, false, allowedFormats);
+    }
+
+    /**
+     * Initializes a tag.
+     * @param expectedCount the expected number of values.
+     * @param metaElem the corresponding {@link MetaElem}.
+     * @param checkExisting if true, the value for the metaElem is only set if
+     *          there was no value set previously.
+     * @param allowedFormats formats that are allowed for the tag field.
+     */
+    private Tag(final int expectedCount, final MetaElem metaElem,
+        final boolean checkExisting, final Format... allowedFormats) {
       assert expectedCount > 0 || expectedCount == -1;
       defaultCount = expectedCount;
       elem = metaElem;
       aFormats = allowedFormats;
+      unique = checkExisting;
     }
 
     /**
@@ -404,32 +646,9 @@ public final class ExifParser {
      * @param buf the {@link ByteBuffer} to read from.
      */
     void parse(final ExifParser o, final ByteBuffer buf) {
-      if(check(o, buf)) {
-        if(inlined) meta(o.deepFile, buf);
-        else meta(o.deepFile, o.bfc);
-      } else err(o);
-    }
-
-    /**
-     * Reads the metadata from the ByteBuffer and adds it to the DeepFile. Must
-     * be overridden for complex fields that occupy at most 4 bytes (and are
-     * inlined in the IFD field).
-     * @param d the DeepFile to add the metadata to.
-     * @param b the ByteBuffer to read from.
-     */
-    void meta(final DeepFile d, final ByteBuffer b) {
-      metaSimple(d, b);
-    }
-
-    /**
-     * Reads the metadata from the BufferedFileChannel and adds it to the
-     * DeepFile. Must be overridden for complex fields that occupy at least 5
-     * bytes (and are not inlined in the IFD field).
-     * @param d the DeepFile to add the metadata to.
-     * @param b the {@link BufferedFileChannel} to read from.
-     */
-    void meta(final DeepFile d, final BufferedFileChannel b) {
-      metaSimple(d, b);
+      if(!check(o, buf)) return;
+      if(inlined) meta(o.deepFile, buf);
+      else meta(o.deepFile, o.bfc);
     }
 
     /**
@@ -442,22 +661,28 @@ public final class ExifParser {
       format = Format.getForId(buf.getShort());
       for(final Format f : aFormats) {
         if(f.equals(format)) {
-          final long c = buf.getInt() & 0xFFFFFFFFL;
+          final long c = buf.getInt() & 0xFFFFFFFFL; // read count value
           if (c > Integer.MAX_VALUE || c < 1) {
-            err(o, "Invalid item count.");
+            err(o.deepFile, "Invalid item count (" + c + ")");
             return false;
           }
           if(defaultCount == -1) count = (int) c;
-          else if(defaultCount != c) return false;
-          else count = defaultCount; // defaultCount == c
+          else if(defaultCount != c) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("Invalid item count (expected: ");
+            sb.append(defaultCount).append(", found: ");
+            sb.append(c).append(")");
+            err(o.deepFile, sb.toString());
+            return false;
+          } else count = defaultCount;
           final int size = count * format.getSize();
           if(size <= 4) inlined = true;
           else {
-            try {
+            try { // prepare the byte buffer
               o.bfc.position(buf.getInt());
               o.bfc.buffer(size);
             } catch(IOException e) {
-              err(o, e);
+              err(o.deepFile, e);
               return false;
             }
             inlined = false;
@@ -465,24 +690,72 @@ public final class ExifParser {
           return true;
         }
       }
-      err(o);
+      final StringBuilder sb = new StringBuilder();
+      sb.append("Invalid field format (expected: ");
+      int i = 0;
+      final int numFormats = aFormats.length;
+      sb.append(aFormats[i++]);
+      for(int max = numFormats - 1; i < max; i++)
+        sb.append(", ").append(aFormats[i]);
+      if (i < numFormats) sb.append(" or ").append(aFormats[i]);
+      sb.append(", found: ").append(format).append(")");
+      err(o.deepFile, sb.toString());
       return false;
+    }
+
+    /**
+     * Reads the metadata from the ByteBuffer and adds it to the DeepFile. May
+     * be overridden for complex fields that occupy at most 4 bytes (and are
+     * inlined in the IFD field).
+     * @param d the DeepFile to add the metadata to.
+     * @param b the ByteBuffer to read from.
+     */
+    void meta(final DeepFile d, final ByteBuffer b) {
+      if(unique && d.isMetaSet(elem)) return;
+      metaSimple(d, b);
+    }
+
+    /**
+     * Reads the metadata from the BufferedFileChannel and adds it to the
+     * DeepFile. May be overridden for complex fields that occupy at least 5
+     * bytes (and are not inlined in the IFD field).
+     * @param d the DeepFile to add the metadata to.
+     * @param b the {@link BufferedFileChannel} to read from.
+     */
+    void meta(final DeepFile d, final BufferedFileChannel b) {
+      if(unique && d.isMetaSet(elem)) return;
+      metaSimple(d, b);
     }
     
     /**
-     * Reads a rational value from a IFD field.
-     * @param b the {@link BufferedFileChannel} to read the rational from.
-     * @return the rational value as double.
+     * Parses an inlined field and adds the metadata to the deep file.
+     * @param d the {@link DeepFile} to add the metadata to.
+     * @param b the buffer to read from.
      */
-    double readRational(final BufferedFileChannel b) {
-      final long numerator = b.getInt() & 0xFFFFFFFFL;
-      final long denominator = b.getInt() & 0xFFFFFFFFL;
-      return (double) numerator / denominator;
+    void metaSimple(final DeepFile d, final ByteBuffer b) {
+      switch(format) {
+        case BYTE:
+          final StringBuilder sbb = new StringBuilder();
+          for(int i = 0, max = count - 1; i < max; i++)
+            sbb.append(readByte(b)).append(", ");
+          sbb.append(readByte(b));
+          d.addMeta(elem, sbb.toString());
+          break;
+        case ASCII: d.addMeta(elem, readAscii(b)); break;
+        case SHORT:
+          final StringBuilder sbs = new StringBuilder();
+          for(int i = 0, max = count - 1; i < max; i++)
+            sbs.append(readShort(b)).append(", ");
+          sbs.append(readShort(b));
+          d.addMeta(elem, sbs.toString());
+          break;
+        case LONG:  d.addMeta(elem, readLong(b));  break;
+        case SLONG: d.addMeta(elem, readSLong(b)); break;
+        default:
+          Main.debug("ExifParser: Unknown or unsupported field type for " +
+              "inlined data (%)", format);
+      }
     }
-    
-    // [BL] implement parsing of UNDEFINED fields.
-    // [BL] implement parsing of SLONG fields.
-    // [BL] implement parsing of SRATIONAL fields.
 
     /**
      * Parses a field that is not inlined and adds the metadata to the deep
@@ -493,93 +766,217 @@ public final class ExifParser {
     void metaSimple(final DeepFile d, final BufferedFileChannel b) {
       try {
         switch(format) {
-          case ASCII:    d.addMeta(elem, b.get(new byte[count])); break;
-          case RATIONAL: d.addMeta(elem, readRational(b));        break;
+          case BYTE:
+            final StringBuilder sbb = new StringBuilder();
+            for(int i = 0, max = count - 1; i < max; i++)
+              sbb.append(readByte(b)).append(", ");
+            sbb.append(readByte(b));
+            d.addMeta(elem, sbb.toString());
+            break;
+          case ASCII:
+            if(elem.getType().instance(Type.DTM)) d.addMeta(elem, readDate(b));
+            else d.addMeta(elem, readAscii(b));
+            break;
+          case SHORT:
+            final StringBuilder sbs = new StringBuilder();
+            for(int i = 0, max = count - 1; i < max; i++)
+              sbs.append(readShort(b)).append(", ");
+            sbs.append(readShort(b));
+            d.addMeta(elem, sbs.toString());
+            break;
+          case LONG:
+            final StringBuilder sbl = new StringBuilder();
+            for(int i = 0, max = count - 1; i < max; i++)
+              sbl.append(readLong(b)).append(", ");
+            sbl.append(readLong(b));
+            d.addMeta(elem, sbl.toString());
+            break;
+          case RATIONAL:
+            final StringBuilder sbr = new StringBuilder();
+            for(int i = 0; i < count; i++) {
+              final double db = readRational(b);
+              final long rounded = Math.round(db);
+              if(rounded == db) sbr.append(rounded);
+              else sbr.append(db);
+              sbr.append(", ");
+            }
+            d.addMeta(elem, sbr.substring(0, sbr.length() - 2));
+            break;
+          case SLONG:
+            final StringBuilder sbsl = new StringBuilder();
+            for(int i = 0, max = count - 1; i < max; i++)
+              sbsl.append(readSLong(b)).append(", ");
+            sbsl.append(readSLong(b));
+            d.addMeta(elem, sbsl.toString());
+            break;
+          case SRATIONAL:
+            final StringBuilder sbsr = new StringBuilder();
+            for(int i = 0; i < count; i++) {
+              final double db = readSRational(b);
+              final long rounded = Math.round(db);
+              if(rounded == db) sbsr.append(rounded);
+              else sbsr.append(db);
+              sbsr.append(", ");
+            }
+            d.addMeta(elem, sbsr.substring(0, sbsr.length() - 2));
+            break;
           default:
             Main.debug("ExifParser: Unknown or unsupported field type for " +
                 "non-inlined data (%)", format);
         }
-      } catch(final IOException e) {
-        err(d, e);
+      } catch(final Exception e) {
+        err(d, e.getMessage());
       }
     }
     
     /**
-     * Parses an inlined field and adds the metadata to the deep file.
-     * @param d the {@link DeepFile} to add the metadata to.
-     * @param buf the buffer to read from.
+     * Reads a byte from the {@link ByteBuffer}.
+     * @param b the {@link ByteBuffer} to read from.
+     * @return the byte value.
      */
-    void metaSimple(final DeepFile d, final ByteBuffer buf) {
-      switch(format) {
-        case BYTE:  d.addMeta(elem, (short) (buf.get() & 0xFF));        break;
-        case ASCII: d.addMeta(elem, buf.get(new byte[count]).array());  break;
-        case SHORT: d.addMeta(elem, buf.getShort() & 0xFFFF);           break;
-        case LONG:  d.addMeta(elem, buf.getInt() & 0xFFFFFFFFL);        break;
-        default:
-          Main.debug("ExifParser: Unknown or unsupported field type for " +
-              "inlined data (%)", format);
-      }
+    short readByte(final ByteBuffer b) {
+      return (short) (b.get() & 0xFF);
     }
-
+    
     /**
-     * Converts the date to the correct format and adds it to the DeepFile.
-     * @param d the {@link DeepFile} to add the date to.
+     * Reads a byte from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from.
+     * @return the byte value.
      */
-    void metaDate(final DeepFile d, final BufferedFileChannel b) {
-      try {
-        final byte[] data = new byte[20];
-        b.get(data);
-        final Date date = SDF.parse(Token.string(data));
-        d.addMeta(elem, ParserUtil.convertDateTime(date));
-        return;
-      } catch(final ParseException ex) {
-        err(d, ex);
-      } catch(final IOException e) {
-        err(d, e);
-      }
+    short readByte(final BufferedFileChannel b) {
+      return (short) b.get();
+    }
+    
+    /**
+     * Reads a short from the {@link ByteBuffer}.
+     * @param b the {@link ByteBuffer} to read from.
+     * @return the short value.
+     */
+    int readShort(final ByteBuffer b) {
+      return b.getShort() & 0xFFFF;
+    }
+    
+    /**
+     * Reads a short from the {@link BufferedFileChannel}.
+     * @param b the {@link BufferedFileChannel} to read from.
+     * @return the short value.
+     */
+    int readShort(final BufferedFileChannel b) {
+      return b.getShort();
+    }
+    
+    /**
+     * Reads an unsigned long from the {@link ByteBuffer}.
+     * @param b the {@link ByteBuffer} to read from.
+     * @return the long value.
+     */
+    long readLong(final ByteBuffer b) {
+      return b.getInt() & 0xFFFFFFFFL;
+    }
+    
+    /**
+     * Reads an unsigned long from the {@link BufferedFileChannel}.
+     * @param b the {@link BufferedFileChannel} to read from.
+     * @return the long value.
+     */
+    long readLong(final BufferedFileChannel b) {
+      return b.getInt() & 0xFFFFFFFFL;
+    }
+    
+    /**
+     * Reads a signed long from the {@link ByteBuffer}.
+     * @param b the {@link ByteBuffer} to read from.
+     * @return the long value.
+     */
+    int readSLong(final ByteBuffer b) {
+      return b.getInt();
+    }
+    
+    /**
+     * Reads a signed long from the {@link BufferedFileChannel}.
+     * @param b the {@link BufferedFileChannel} to read from.
+     * @return the long value.
+     */
+    int readSLong(final BufferedFileChannel b) {
+      return b.getInt();
+    }
+    
+    /**
+     * Reads an ASCII value from the {@link ByteBuffer} and returns it as byte
+     * array.
+     * @param b the {@link ByteBuffer} to read from.
+     * @return the ASCII value as byte array.
+     */
+    byte[] readAscii(final ByteBuffer b) {
+      return b.get(new byte[count]).array();
     }
 
     /**
-     * Generates a debug message.
-     * @param o the ExifParser.
+     * Reads an ASCII value from the {@link BufferedFileChannel} and returns it
+     * as byte array.
+     * @param b the {@link BufferedFileChannel} to read from.
+     * @return the ASCII value as byte array.
+     * @throws IOException if any error occurs while reading from the channel.
      */
-    void err(final ExifParser o) {
-      Main.debug("ExifParser: Invalid field found (%, file: %)", toString(),
-          o.bfc.getFileName());
+    byte[] readAscii(final BufferedFileChannel b)
+        throws IOException {
+      return b.get(new byte[count]);
+    }
+    
+    /**
+     * Reads a rational value from a IFD field.
+     * @param b the {@link BufferedFileChannel} to read the rational from.
+     * @return the rational value as double.
+     */
+    double readRational(final BufferedFileChannel b) {
+      final long numerator = readLong(b);
+      final long denominator = readLong(b);
+      return (double) numerator / denominator;
+    }
+    
+    /**
+     * Reads a signed rational value from a IFD field.
+     * @param b the {@link BufferedFileChannel} to read the rational from.
+     * @return the rational value as double.
+     */
+    double readSRational(final BufferedFileChannel b) {
+      final int numerator = readSLong(b);
+      final int denominator = readSLong(b);
+      return (double) numerator / denominator;
     }
 
     /**
-     * Generates a debug message.
-     * @param o the ExifParser.
-     * @param ex the exception to log.
+     * Reads a date value from the {@link BufferedFileChannel} and returns it as
+     * {@link XMLGregorianCalendar}.
+     * @param b the {@link BufferedFileChannel} to read from.
+     * @return the date value.
+     * @throws ParseException if the date could not be parsed.
+     * @throws IOException if any error occurs while reading from the channel.
      */
-    void err(final ExifParser o, final Exception ex) {
-      Main.debug(
-          "ExifParser: Invalid field found (%, file: %, error: %)",
-          toString(), o.bfc.getFileName(), ex);
+    XMLGregorianCalendar readDate(final BufferedFileChannel b)
+        throws ParseException, IOException {
+      final Date date = SDF.parse(Token.string(readAscii(b)));
+      return ParserUtil.convertDateTime(date);
     }
     
     /**
      * Generates a debug message.
-     * @param d the DeepFile.
+     * @param d the {@link DeepFile}.
      * @param ex the exception to log.
      */
     void err(final DeepFile d, final Exception ex) {
-      Main.debug(
-          "ExifParser: Invalid field found (%, file: %, error message: %)",
-          toString(), d.getBufferedFileChannel().getFileName(), ex);
+      err(d, ex.getMessage());
     }
     
     /**
      * Generates a debug message.
-     * @param o the ExifParser.
+     * @param d the {@link DeepFile}.
      * @param ex the message to log.
      */
-    void err(final ExifParser o, final String ex) {
+    void err(final DeepFile d, final String ex) {
       Main.debug(
-          "ExifParser: Invalid field found (%, file: %, error message: %)",
-          toString(), o.bfc.getFileName(), ex);
+          "ExifParser: Invalid field (file: %, field id: % (%), error message: "
+              + "%)", d.getBufferedFileChannel().getFileName(), this, elem, ex);
     }
 
     @Override
