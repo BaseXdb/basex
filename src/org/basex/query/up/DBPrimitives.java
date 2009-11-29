@@ -83,8 +83,10 @@ public final class DBPrimitives extends Primitives {
       } else {
         addElementChanges(m, pre);
         int p = pre + 1;
-        while(p < pre + d.attSize(pre, Data.ELEM) && !ats.contains(p)) {
-          changeAttributePool(m, true, Token.string(d.attName(p++)));
+        while(p < pre + d.attSize(pre, Data.ELEM)) {
+          if(!ats.contains(p))
+            changeAttributePool(m, true, Token.string(d.attName(p)));
+          p++;
         }
       }
     }
