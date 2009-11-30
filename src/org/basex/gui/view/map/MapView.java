@@ -829,7 +829,7 @@ public final class MapView extends View implements Runnable {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
-    if(e.getWheelRotation() > 0) gui.notify.context(
+    if(e.getWheelRotation() < 0) gui.notify.context(
         new Nodes(gui.context.focused, gui.context.data), false, null);
     else gui.notify.hist(false);
   }
