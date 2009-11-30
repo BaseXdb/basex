@@ -41,7 +41,7 @@ public final class ServerProcess extends Thread {
   /** Timeout thread. */
   private Thread timeout;
   /** Log. */
-  private Log log;
+  private final Log log;
 
   /**
    * Constructor.
@@ -129,7 +129,7 @@ public final class ServerProcess extends Thread {
         sem.after(up);
         log.write(this, proc, perf, ok ? "OK" : " (Error: " + inf + ")");
       }
-      log.write(this, "LOGOUT " + context.user.name);  
+      log.write(this, "LOGOUT " + context.user.name);
     } catch(final IOException ex) {
       log.write(ex.getMessage());
       Main.error(ex, false);

@@ -1,7 +1,5 @@
 package org.basex.query.up;
 
-import java.util.HashSet;
-import java.util.Set;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.NodeCopy;
@@ -43,25 +41,28 @@ final class DBPrimitives extends Primitives {
 
     int i = nodes.length - 1;
     int par = -1;
-    int k;
-    int pre;
     while(i >= 0) {
       // parent has already been checked
-      if(par == nodes[i])
+      if(par == nodes[i]) {
         if(i > 0) i--; else return;
-      pre = nodes[i];
-      k = d.kind(pre);
-      if(k == Data.ELEM) findAttributeDuplicates(new int[] {pre});
+      }
+      int pre = nodes[i];
+      final int k = d.kind(pre);
+      if(k == Data.ELEM) {
+        findAttributeDuplicates(new int[] { pre });
+      }
       if(k == Data.ATTR) {
-        par = d.parent(pre, Data.ATTR);
+        par = d.parent(pre, k);
         final IntList il = new IntList(1);
         while(i >= 0 && (pre = nodes[i]) > par) {
           il.add(pre);
           i--;
         }
-        il.add(par);
+        if(par != -1) il.add(par);
         findAttributeDuplicates(il.finish());
-      } else i--;
+      } else {
+        i--;
+      }
     }
   }
 
@@ -72,16 +73,12 @@ final class DBPrimitives extends Primitives {
    */
   private void findAttributeDuplicates(final int[] pres) throws QueryException {
     final ObjectMap<Integer> m = new ObjectMap<Integer>();
-    final Set<Integer> ats = new HashSet<Integer>();
+    final IntList ats = new IntList();
     for(final int pre : pres) {
       // pres consists exclusively of element and attribute nodes
       if(d.kind(pre) == Data.ATTR) {
         ats.add(pre);
-        for(final UpdatePrimitive up : op.get(pre)) {
-          if(up == null) continue;
-          changeAttributePool(m, true, up.addAtt());
-          changeAttributePool(m, false, up.remAtt());
-        }
+        addElementChanges(m, pre);
       } else {
         addElementChanges(m, pre);
         for(int p = pre + 1; p < pre + d.attSize(pre, Data.ELEM); p++) {
@@ -97,16 +94,11 @@ final class DBPrimitives extends Primitives {
    * @param m map reference
    * @param pre node pre value
    */
-  private void addElementChanges(final ObjectMap<Integer> m, final int pre)  {
+  private void addElementChanges(final ObjectMap<Integer> m, final int pre) {
     final UpdatePrimitive[] ups = op.get(pre);
     if(ups == null) return;
     for(final UpdatePrimitive up : ups) {
       if(up == null) continue;
-//      if(up.type() == PrimitiveType.DELETE ||
-//          up.type() == PrimitiveType.REPLACENODE) {
-//        m.clear();
-//        return;
-//      }
       changeAttributePool(m, true, up.addAtt());
       changeAttributePool(m, false, up.remAtt());
     }
@@ -116,7 +108,7 @@ final class DBPrimitives extends Primitives {
    * Checks constraints and applies all updates to the databases.
    */
   @Override
-  protected void apply() {
+  protected void apply() throws QueryException {
     // apply updates backwards, starting with the highest pre value -> no id's
     // and less table alterations needed
     for(int i = nodes.length - 1; i >= 0; i--) {

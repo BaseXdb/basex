@@ -39,7 +39,7 @@ final class FragmentPrimitives extends Primitives {
   }
 
   @Override
-  protected void apply() {
+  protected void apply() throws QueryException {
     for(final UpdatePrimitive[] ups : op.values()) {
       final Put put = (Put) ups[PrimitiveType.PUT.ordinal()];
       if(put == null) continue;

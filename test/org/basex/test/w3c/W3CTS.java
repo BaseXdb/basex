@@ -382,18 +382,18 @@ public abstract class W3CTS {
           it.serialize(xml);
         }
         xml.close();
-      } catch(final Exception ex) {
+      } catch(final QueryException ex) {
         error = ex.getMessage();
-        if(error == null) {
-          error = ex.toString();
-          ex.printStackTrace();
-        }
         if(error.startsWith(STOPPED)) {
           error = error.substring(error.indexOf('\n') + 1);
         }
         if(error.startsWith("[")) {
           error = error.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
         }
+      } catch(final Exception ex) {
+        error = ex.getMessage() != null ? ex.getMessage() : ex.toString();
+        System.err.print("\n" + inname + ": ");
+        ex.printStackTrace();
       }
 
       final Nodes outFiles = nodes("*:output-file/text()", state);

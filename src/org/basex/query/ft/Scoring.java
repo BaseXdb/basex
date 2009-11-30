@@ -138,11 +138,11 @@ public final class Scoring {
    * as the total minimum value will be subtracted by 1 to avoid eventual
    * <code>0</code> scores; for more information, see how the scoring
    * is evaluated in the {@link FTIndex} class.
-   * 
+   *
    * [SG] Some tf-idf variants could return values which are better normalized;
    * see e.g.: http://nlp.stanford.edu/IR-book/html/htmledition/
    *   variant-tf-idf-functions-1.html
-   * 
+   *
    * @param freq frequency of the token. TF: freq(i, j)
    * @param mfreq maximum occurrence of a token. TF: max(l, freq(l, j))
    * @param docs number of documents in the collection. IDF: N
@@ -153,7 +153,7 @@ public final class Scoring {
       final double docs, final double tokens) {
     return (int) Math.max(2, MP * freq / mfreq * Math.log(1 + docs / tokens));
   }
-  
+
   /**
    * Returns the score for a text node.
    * Used when no index score is available.
@@ -192,7 +192,7 @@ public final class Scoring {
    * @param sc current score value
    * @return new score value
    */
-  public static double childAxis(final double sc) {    
+  public static double childAxis(final double sc) {
     return sc * SCORESTEP;
   }
 
@@ -219,7 +219,7 @@ public final class Scoring {
 //    return sc * SCORESTEP;
   }
 
-  
+
   /**
    * Scoring the parent axis step by using meta information.
    * @param data Data reference
@@ -227,7 +227,7 @@ public final class Scoring {
    * @return score value
    */
   public static double parentAxis(final Data data, final DBNode nod) {
-    return nod.score() * 
+    return nod.score() *
       (1d - (double) distTo(data, nod.pre, 0) / data.meta.height);
   }
 

@@ -10,7 +10,7 @@ import org.basex.query.up.UpdateFunctions;
 import static org.basex.query.up.UpdateFunctions.*;
 
 /**
- * Abstract update primitive which holds a copy of nodes to be inserted i.e..
+ * Abstract update primitive which holds a copy of nodes to be inserted.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher

@@ -103,7 +103,7 @@ public final class Transform extends Arr {
     final StringBuilder sb = new StringBuilder(COPY + ' ');
     for(final ForLet t : copies)
       sb.append(t.var + " " + ASSIGN + ' ' + t.expr + ' ');
-    return sb.append(MODIFY + ' ' + expr[0] + ' '  + RETURN + ' ' +
+    return sb.append(MODIFY + ' ' + expr[0] + ' ' + RETURN + ' ' +
         expr[1]).toString();
   }
 }

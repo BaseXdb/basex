@@ -39,8 +39,9 @@ public abstract class UpdatePrimitive {
    * the pre value of t changes. Thus the number of inserted nodes is added to
    * the pre value of t for all following update operations.
    * @param add size to add
+   * @throws QueryException query exception
    */
-  public abstract void apply(final int add);
+  public abstract void apply(final int add) throws QueryException;
 
   /**
    * Merges if possible two update primitives of the same type if they have the

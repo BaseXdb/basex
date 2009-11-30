@@ -39,6 +39,6 @@ public final class Grant extends AAdmin {
   public String toString() {
     final StringBuilder sb = new StringBuilder(Cmd.GRANT + " " + args[0]);
     if(args[2] != null) sb.append(" " + ON + " " + args[2]);
-    return sb.append(" " +  TO + " " + args[1]).toString();
+    return sb.append(" " + TO + " " + args[1]).toString();
   }
 }

@@ -1,10 +1,7 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
-
-import org.basex.core.Main;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -22,8 +19,6 @@ import org.basex.util.Token;
 public final class Put extends UpdatePrimitive {
   /** Put location. */
   private final Uri u;
-  /** Output stream. */
-  private PrintOutput out;
 
   /**
    * Constructor.
@@ -36,25 +31,24 @@ public final class Put extends UpdatePrimitive {
   }
 
   @Override
-  public void apply(final int add) {
+  public void apply(final int add) throws QueryException {
+    // [CG] to be checked..
+    // - node.pre reference might be invalid after an update
+    PrintOutput out = null;
     try {
+      out = new PrintOutput(Token.string(path()));
       final XMLSerializer ser = new XMLSerializer(out);
       node.serialize(ser);
       ser.close();
-      out.close();
-    } catch(IOException e) {
-      e.printStackTrace();
+    } catch(IOException ex) {
+      Err.or(UPFOURI, path());
+    } finally {
+      try { if(out != null) out.close(); } catch(final IOException ex) { }
     }
   }
 
   @Override
-  public void prepare() throws QueryException {
-    try {
-      out = new PrintOutput(Token.string(path()));
-    } catch(final IOException ex) {
-      Main.debug(ex);
-      Err.or(UPFOURI, path());
-    }
+  public void prepare() {
   }
 
   @Override

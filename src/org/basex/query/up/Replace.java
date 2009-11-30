@@ -88,6 +88,6 @@ public final class Replace extends Update {
   @Override
   public String toString() {
     return REPLACE + ' ' + (value ? VALUEE + ' ' + OF : "") +
-      ' ' + NODE +  ' ' + expr[0] + ' ' + WITH + ' ' + expr[1];
+      ' ' + NODE + ' ' + expr[0] + ' ' + WITH + ' ' + expr[1];
   }
 }
