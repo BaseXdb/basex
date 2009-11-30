@@ -53,6 +53,7 @@ public abstract class Primitives {
     // Possible to use node id cause nodes in map belong to the same
     // database. Thus there won't be any collisions between dbnodes and
     // fragments.
+    else if(p.type() == PrimitiveType.PUT) i = -1;
     else i = ((FNode) p.node).id();
     UpdatePrimitive[] l = op.get(i);
     final int pos = p.type().ordinal();

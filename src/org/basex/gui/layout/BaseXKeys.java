@@ -23,6 +23,8 @@ public final class BaseXKeys {
   private static final int SHF = Event.SHIFT_MASK;
   /** Alt key. */
   private static final int ALT = Event.ALT_MASK;
+  /** Ctrl key. */
+  private static final int CTRL = Event.CTRL_MASK;
 
   /** Find search term. */
   public static final int[] FIND = { SC, VK_F };
@@ -80,10 +82,10 @@ public final class BaseXKeys {
   public static final int[] PAGEDOWN = { 0, VK_PAGE_DOWN };
   /** Next panel. */
   public static final int[] NEXTTAB = {
-    MAC ? SC | ALT : SC, MAC ? VK_RIGHT : VK_TAB };
+     CTRL, VK_TAB };
   /** Previous panel. */
   public static final int[] PREVTAB = {
-    MAC ? SC | ALT : SC | SHF, MAC ? VK_LEFT : VK_TAB };
+    CTRL | SHF, VK_TAB };
   /** Delete word backwards. */
   public static final int[] DELWORDLEFT = { MAC ? ALT : SC, VK_BACK_SPACE };
   /** Delete word. */

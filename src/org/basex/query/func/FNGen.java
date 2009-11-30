@@ -2,23 +2,23 @@ package org.basex.query.func;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
-import java.io.IOException;
+
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.data.XMLSerializer;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Atm;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
+import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
+import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
-import org.basex.util.Token;
 
 /**
  * Generating functions.
@@ -46,23 +46,16 @@ public final class FNGen extends Fun {
          */
         if(!ctx.context.user.perm(User.ADMIN))
           throw new QueryException(Main.info(PERMNO, CmdPerm.ADMIN));
-
         final byte[] file = checkStr(expr[1], ctx);
         it = expr[0].atomic(ctx);
+
         if(it == null || it.type != Type.DOC && it.type != Type.ELM)
           Err.or(UPFOTYPE, expr[0]);
-
-        try {
-          final PrintOutput out = new PrintOutput(Token.string(file));
-          final XMLSerializer xml = new XMLSerializer(out);
-          it.serialize(xml);
-          xml.close();
-          out.close();
-        } catch(final IOException ex) {
-          Main.debug(ex);
-          Err.or(UPFOURI, file);
-          return null;
-        }
+        
+        final Uri u = Uri.uri(file);
+        if(u == Uri.EMPTY || !u.valid()) Err.or(UPFOURI, file);
+        ctx.updates.add(new Put((Nod) it, u), ctx);
+        
         return Iter.EMPTY;
       default:
         return super.iter(ctx);

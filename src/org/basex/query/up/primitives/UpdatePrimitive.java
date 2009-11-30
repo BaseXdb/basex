@@ -20,7 +20,7 @@ public abstract class UpdatePrimitive {
   protected UpdatePrimitive(final Nod n) {
     node = n;
   }
-
+  
   /**
    * Returns the type of the update primitive.
    * @return type

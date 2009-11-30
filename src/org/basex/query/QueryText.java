@@ -517,6 +517,8 @@ public interface QueryText {
   /** XUDY0030: XQuery Update dynamic exception. */
   Object[] UPATTELM = { XUDY, 30,
       "Attributes must be inserted after/before an element." };
+  /** XUDY0031: XQuery Update dynamic exception. */
+  Object[] UPURIDUP = { XUDY, 31, "Multiple use of URI: \"%\"." };
 
   /** XUTY0004: XQuery Update type exception. */
   Object[] UPNOATTRPER = { XUTY, 4, "Attribute must follow root element." };
