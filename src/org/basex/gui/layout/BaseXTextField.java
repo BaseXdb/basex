@@ -87,8 +87,8 @@ public class BaseXTextField extends JTextField {
       public void keyReleased(final KeyEvent e) {
         final String text = getText();
         final char ch = e.getKeyChar();
-        if(!ignoreTyped(e) && Character.isDefined(ch) &&
-            ch != KeyEvent.VK_ENTER) area.find(text, false);
+        if(!ignoreTyped(e) && Character.isDefined(ch) && !pressed(ENTER, e))
+          area.find(text, false);
         repaint();
       }
     });

@@ -65,7 +65,7 @@ public final class DialogFontChooser extends Dialog {
     set(p, BorderLayout.CENTER);
 
     finish(gprop.nums(GUIProp.FONTSLOC));
-    font.focus();
+    font.requestFocusInWindow();
   }
 
   @Override

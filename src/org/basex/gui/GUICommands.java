@@ -405,7 +405,6 @@ public enum GUICommands implements GUICommand {
         marked = new Nodes(pre, ctx.data);
       }
       gui.notify.context(marked, false, null);
-      gui.input.requestFocusInWindow();
     }
 
     @Override

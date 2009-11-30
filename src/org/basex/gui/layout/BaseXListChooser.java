@@ -130,7 +130,7 @@ public final class BaseXListChooser extends BaseXBack {
         final Object i = list.getSelectedValue();
         if(i == null) return;
         text.setText(i.toString());
-        focus();
+        text.requestFocusInWindow();
         text.selectAll();
         d.action(null);
       }
@@ -225,10 +225,8 @@ public final class BaseXListChooser extends BaseXBack {
     setIndex(0);
   }
 
-  /**
-   * Focuses the text field.
-   */
-  public void focus() {
-    text.requestFocusInWindow();
+  @Override
+  public boolean requestFocusInWindow() {
+    return text.requestFocusInWindow();
   }
 }
