@@ -5,6 +5,7 @@ import org.basex.util.Token;
 
 /**
  * Available MIME types.
+ * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
 public enum MimeType {

@@ -7,6 +7,7 @@ import org.basex.query.item.Type;
 
 /**
  * Available metadata elements.
+ * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
 public enum MetaElem {

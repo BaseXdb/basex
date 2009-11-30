@@ -2,6 +2,7 @@ package org.deepfs.fsml.util;
 
 /**
  * An exception class used for signaling failure of parser operations.
+ * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
 public class ParserException extends Exception {

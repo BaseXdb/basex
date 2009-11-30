@@ -10,6 +10,7 @@ import org.deepfs.fsml.parsers.TXTParser;
 
 /**
  * Registry for file parsers.
+ * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
 public class ParserRegistry {

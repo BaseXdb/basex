@@ -176,7 +176,6 @@ public final class FSImporter implements FSTraversal {
     query.append(FSImporter.escape(name));
     query.append("\" />");
     query.append(" into ").append(targetNode);
-    System.out.println(query.toString());
     final QueryProcessor qp = new QueryProcessor(query.toString(), ctx);
     try {
       qp.query();

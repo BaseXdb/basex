@@ -4,6 +4,7 @@ import org.basex.util.Token;
 
 /**
  * Available file types.
+ * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
 public enum FileType {
