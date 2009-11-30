@@ -271,6 +271,7 @@ public final class BaseXTextTokens {
    */
   void endMark() {
     me = ps;
+    if(ms == me) ms = -1;
   }
 
   /**
@@ -377,5 +378,10 @@ public final class BaseXTextTokens {
    */
   public int size() {
     return size;
+  }
+  
+  @Override
+  public String toString() {
+    return copy();
   }
 }

@@ -355,7 +355,7 @@ public class BaseXText extends BaseXPanel {
 
     // set cursor position and reset last column
     text.pos(text.cursor());
-    if(!pressed(UP, e) && !pressed(DOWN, e)) lastCol = -1;
+    if(!pressed(PREVLINE, e) && !pressed(NEXTLINE, e)) lastCol = -1;
 
     if(pressed(FINDNEXT, e) || pressed(FINDPREV, e)) {
       find(rend.find(pressed(FINDPREV, e), true));
@@ -374,41 +374,41 @@ public class BaseXText extends BaseXPanel {
     boolean consumed = true;
 
     // operations that consider the last text mark..
-    if(pressed(WORDRIGHT, e)) {
+    if(pressed(NEXTWORD, e)) {
       final boolean ch = ftChar(text.next(marking));
       while(text.pos() < text.size() && ch == ftChar(text.curr()))
         text.next(marking);
-    } else if(pressed(WORDLEFT, e)) {
+    } else if(pressed(PREVWORD, e)) {
       final boolean ch = ftChar(text.prev(marking));
       while(text.pos() > 0 && ch == ftChar(text.prev(marking)));
       if(text.pos() != 0) text.next(marking);
       down = false;
-    } else if(pressed(BOT, e)) {
+    } else if(pressed(TEXTSTART, e)) {
       if(!marking) text.noMark();
       text.pos(0);
       down = false;
-    } else if(pressed(EOT, e)) {
+    } else if(pressed(TEXTEND, e)) {
       if(!marking) text.noMark();
       text.pos(text.size());
-    } else if(pressed(BOL, e)) {
+    } else if(pressed(LINESTART, e)) {
       text.bol(marking);
       down = false;
-    } else if(pressed(EOL, e)) {
+    } else if(pressed(LINEEND, e)) {
       text.forward(Integer.MAX_VALUE, marking);
-    } else if(pressed(PAGEDOWN, e)) {
+    } else if(pressed(NEXTPAGE, e)) {
       down(getHeight() / fh, marking);
-    } else if(pressed(PAGEUP, e)) {
+    } else if(pressed(PREVPAGE, e)) {
       up(getHeight() / fh, marking);
       down = false;
-    } else if(pressed(RIGHT, e)) {
+    } else if(pressed(NEXT, e)) {
       text.next(marking);
-    } else if(pressed(LEFT, e)) {
+    } else if(pressed(PREV, e)) {
       text.prev(marking);
       down = false;
-    } else if(pressed(UP, e)) {
+    } else if(pressed(PREVLINE, e)) {
       up(1, marking);
       down = false;
-    } else if(pressed(DOWN, e)) {
+    } else if(pressed(NEXTLINE, e)) {
       down(1, marking);
     } else {
       consumed = false;
@@ -428,22 +428,24 @@ public class BaseXText extends BaseXPanel {
         undo();
       } else if(pressed(REDO, e)) {
         redo();
-      } else if(pressed(DELWORD, e) || pressed(DEL, e)) {
+      } else if(pressed(DELNEXTWORD, e) || pressed(DELNEXT, e)) {
         if(nomark && text.pos() == text.size()) return;
         final boolean ld = ftChar(text.curr());
         text.delete();
-        if(nomark && pressed(DELWORD, e)) {
+        if(nomark && pressed(DELNEXTWORD, e)) {
           while(text.pos() < text.size() && ld == ftChar(text.curr()))
             text.delete();
         }
-      } else if(pressed(DELWORDLEFT, e) || pressed(DELBACK, e)) {
+        // [CG] add DELLINESTART/DELLINEEND
+
+      } else if(pressed(DELPREVWORD, e) || pressed(DELPREV, e)) {
         if(nomark) {
           if(text.pos() == 0) return;
           text.prev();
         }
         final boolean ld = ftChar(text.curr());
         text.delete();
-        if(nomark && pressed(DELWORDLEFT, e)) {
+        if(nomark && pressed(DELPREVWORD, e)) {
           while(text.pos() > 0 && ld == ftChar(text.prev())) text.delete();
           if(text.pos() != 0) text.next();
         }
@@ -518,8 +520,8 @@ public class BaseXText extends BaseXPanel {
   @Override
   public final void keyTyped(final KeyEvent e) {
     if(undo == null || ignoreTyped(e) || pressed(ESCAPE, e) ||
-        pressed(DEL, e) || pressed(DELBACK, e)) return;
-
+        pressed(DELNEXT, e) || pressed(DELPREV, e)) return;
+    
     text.pos(text.cursor());
     if(text.start() != -1) text.delete();
     text.add(String.valueOf(e.getKeyChar()));

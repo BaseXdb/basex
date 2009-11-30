@@ -90,13 +90,13 @@ public final class GUIInput extends BaseXTextField {
         if(count == 0) return;
 
         int bi = box.getSelectedIndex();
-        if(pressed(DOWN, e)) {
+        if(pressed(NEXTLINE, e)) {
           if(!pop.isVisible()) {
             showPopup();
           } else {
             if(++bi == count) bi = 0;
           }
-        } else if(pressed(UP, e)) {
+        } else if(pressed(PREVLINE, e)) {
           if(!pop.isVisible()) {
             showPopup();
           } else {
@@ -112,7 +112,8 @@ public final class GUIInput extends BaseXTextField {
           pop.setVisible(false);
         } else if(pressed(ENTER, e)) {
           pop.hide();
-        } else if(!ignoreTyped(e) && !pressed(DOWN, e) && !pressed(UP, e)) {
+        } else if(!ignoreTyped(e) && !pressed(NEXTLINE, e) &&
+            !pressed(PREVLINE, e)) {
           showPopup();
           // skip commands
           if(gui.prop.is(GUIProp.EXECRT) && !cmdMode()) main.execute();

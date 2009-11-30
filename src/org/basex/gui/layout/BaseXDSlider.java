@@ -168,21 +168,21 @@ public final class BaseXDSlider extends BaseXPanel {
     oldMax = min;
     double diffMin = 0;
     double diffMax = 0;
-    if(pressed(LEFT, e)) {
+    if(pressed(PREV, e)) {
       diffMin = -1;
       diffMax = -1;
-    } else if(pressed(RIGHT, e)) {
+    } else if(pressed(NEXT, e)) {
       diffMin = 1;
       diffMax = 1;
-    } else if(pressed(UP, e)) {
+    } else if(pressed(PREVLINE, e)) {
       diffMin = -1;
       diffMax = 1;
-    } else if(pressed(DOWN, e)) {
+    } else if(pressed(NEXTLINE, e)) {
       diffMin = 1;
       diffMax = -1;
-    } else if(pressed(BOL, e)) {
+    } else if(pressed(LINESTART, e)) {
       min = totMin;
-    } else if(pressed(EOL, e)) {
+    } else if(pressed(LINEEND, e)) {
       max = totMax;
     }
     if(e.isShiftDown()) {

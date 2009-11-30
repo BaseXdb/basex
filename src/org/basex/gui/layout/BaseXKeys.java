@@ -2,7 +2,6 @@ package org.basex.gui.layout;
 
 import static java.awt.event.KeyEvent.*;
 import java.awt.Event;
-import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import org.basex.core.Prop;
@@ -16,15 +15,14 @@ import org.basex.core.Prop;
 public final class BaseXKeys {
   /** Mac OS flag. */
   private static final boolean MAC = Prop.MAC;
-  /** Shortcut key (CTRL/META). */
-  public static final int SC =
-    Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
   /** Shift key. */
   private static final int SHF = Event.SHIFT_MASK;
   /** Alt key. */
   private static final int ALT = Event.ALT_MASK;
   /** Ctrl key. */
   private static final int CTRL = Event.CTRL_MASK;
+  /** Shortcut key (CTRL/META). */
+  public static final int SC = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
 
   /** Find search term. */
   public static final int[] FIND = { SC, VK_F };
@@ -53,47 +51,52 @@ public final class BaseXKeys {
   /** Redo. */
   public static final int[] REDO = { MAC ? SC | SHF : SC, MAC ? VK_Z : VK_Y };
   /** Word Right. */
-  public static final int[] WORDRIGHT = { MAC ? ALT : SC, VK_RIGHT };
+  public static final int[] NEXTWORD = { MAC ? ALT : SC, VK_RIGHT };
   /** Word Left. */
-  public static final int[] WORDLEFT = { MAC ? ALT : SC, VK_LEFT };
+  public static final int[] PREVWORD = { MAC ? ALT : SC, VK_LEFT };
   /** Right. */
-  public static final int[] RIGHT = { 0, VK_RIGHT };
+  public static final int[] NEXT = { 0, VK_RIGHT };
   /** Left. */
-  public static final int[] LEFT = { 0, VK_LEFT };
+  public static final int[] PREV = { 0, VK_LEFT };
   /** Up. */
-  public static final int[] UP = { 0, VK_UP };
+  public static final int[] PREVLINE = { 0, VK_UP };
   /** Down. */
-  public static final int[] DOWN = { 0, VK_DOWN };
+  public static final int[] NEXTLINE = { 0, VK_DOWN };
   /** Scroll up. */
   public static final int[] SCROLLUP = { MAC ? ALT : SC, VK_UP };
   /** Scroll down. */
   public static final int[] SCROLLDOWN = { MAC ? ALT : SC, VK_DOWN };
   /** Beginning of line. */
-  public static final int[] BOL = { MAC ? SC : 0, MAC ? VK_LEFT : VK_HOME };
+  public static final int[] LINESTART =
+    { MAC ? SC : 0, MAC ? VK_LEFT : VK_HOME };
   /** End of line. */
-  public static final int[] EOL = { MAC ? SC : 0, MAC ? VK_RIGHT : VK_END };
+  public static final int[] LINEEND = { MAC ? SC : 0, MAC ? VK_RIGHT : VK_END };
   /** Beginning of text. */
-  public static final int[] BOT = { SC, MAC ? VK_UP : VK_HOME };
+  public static final int[] TEXTSTART = { SC, MAC ? VK_UP : VK_HOME };
   /** End of text. */
-  public static final int[] EOT = { SC, MAC ? VK_DOWN : VK_END };
+  public static final int[] TEXTEND = { SC, MAC ? VK_DOWN : VK_END };
   /** Page up. */
-  public static final int[] PAGEUP = { 0, VK_PAGE_UP };
+  public static final int[] PREVPAGE = { 0, VK_PAGE_UP };
   /** Page down. */
-  public static final int[] PAGEDOWN = { 0, VK_PAGE_DOWN };
+  public static final int[] NEXTPAGE = { 0, VK_PAGE_DOWN };
   /** Next panel. */
-  public static final int[] NEXTTAB = {
-     CTRL, VK_TAB };
+  public static final int[] NEXTTAB = { CTRL, VK_TAB };
   /** Previous panel. */
-  public static final int[] PREVTAB = {
-    CTRL | SHF, VK_TAB };
+  public static final int[] PREVTAB = { CTRL | SHF, VK_TAB };
   /** Delete word backwards. */
-  public static final int[] DELWORDLEFT = { MAC ? ALT : SC, VK_BACK_SPACE };
+  public static final int[] DELPREVWORD = { MAC ? ALT : SC, VK_BACK_SPACE };
   /** Delete word. */
-  public static final int[] DELWORD = { MAC ? ALT : SC, VK_DELETE };
+  public static final int[] DELNEXTWORD = { MAC ? ALT : SC, VK_DELETE };
+  /** Delete line to begin. */
+  public static final int[] DELLINESTART =
+    { MAC ? SC : SC | SHF, VK_BACK_SPACE };
+  /** Delete line to end. */
+  public static final int[] DELLINEEND =
+    { MAC ? SC : SC | SHF, VK_DELETE };
   /** Delete backwards. */
-  public static final int[] DELBACK = { 0, VK_BACK_SPACE };
+  public static final int[] DELPREV = { 0, VK_BACK_SPACE };
   /** Delete. */
-  public static final int[] DEL = { 0, VK_DELETE };
+  public static final int[] DELNEXT = { 0, VK_DELETE };
   /** Enter. */
   public static final int[] ENTER = { 0, VK_ENTER };
   /** Escape. */

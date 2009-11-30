@@ -64,17 +64,17 @@ public final class BaseXListChooser extends BaseXBack {
         int np = op;
         final int page = getHeight() / getFont().getSize();
 
-        if(pressed(DOWN, e)) {
+        if(pressed(NEXTLINE, e)) {
           np = Math.min(op + 1, values.length - 1);
-        } else if(pressed(UP, e)) {
+        } else if(pressed(PREVLINE, e)) {
           np = Math.max(op - 1, 0);
-        } else if(pressed(PAGEDOWN, e)) {
+        } else if(pressed(NEXTPAGE, e)) {
           np = Math.min(op + page, values.length - 1);
-        } else if(pressed(PAGEUP, e)) {
+        } else if(pressed(PREVPAGE, e)) {
           np = Math.max(op - page, 0);
-        } else if(pressed(BOT, e)) {
+        } else if(pressed(TEXTSTART, e)) {
           np = 0;
-        } else if(pressed(EOT, e)) {
+        } else if(pressed(TEXTEND, e)) {
           np = values.length - 1;
         }
         // choose new list value

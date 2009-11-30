@@ -460,10 +460,10 @@ public final class FolderView extends View {
     int kind = data.kind(focusPre);
 
     final boolean fs = data.fs != null;
-    final boolean right = pressed(RIGHT, e);
-    boolean down = pressed(DOWN, e);
-    boolean up = pressed(UP, e);
-    if(right || pressed(LEFT, e)) {
+    final boolean right = pressed(NEXT, e);
+    boolean down = pressed(NEXTLINE, e);
+    boolean up = pressed(PREVLINE, e);
+    if(right || pressed(PREV, e)) {
       // open/close subtree
       if(e.isShiftDown()) {
         opened[focusPre] = right;
@@ -495,13 +495,13 @@ public final class FolderView extends View {
       focus = Math.min(data.meta.size - 1, focus + 1);
     } else if(up) {
       focus = Math.max(0, focus - 1);
-    } else if(pressed(PAGEDOWN, e)) {
+    } else if(pressed(NEXTPAGE, e)) {
       focus = Math.min(data.meta.size - 1, focus + getHeight() / lineH);
-    } else if(pressed(PAGEUP, e)) {
+    } else if(pressed(PREVPAGE, e)) {
       focus = Math.max(0, focus - getHeight() / lineH);
-    } else if(pressed(BOT, e)) {
+    } else if(pressed(TEXTSTART, e)) {
       focus = 0;
-    } else if(pressed(EOT, e)) {
+    } else if(pressed(TEXTEND, e)) {
       focus = data.meta.size - 1;
     }
     if(focus == focusedPos) return;
