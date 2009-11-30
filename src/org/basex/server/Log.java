@@ -70,6 +70,7 @@ public final class Log {
       final StringBuilder sb = new StringBuilder(TIME.format(now));
       for(final Object s : str) sb.append("\t" + s);
       fw.write(sb.append(NL).toString());
+      fw.flush();
     } catch(final IOException ex) {
       ex.printStackTrace();
     }

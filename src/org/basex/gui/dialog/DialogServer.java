@@ -9,6 +9,9 @@ import java.net.BindException;
 import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 import org.basex.BaseXServer;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.Context;
@@ -77,7 +80,7 @@ public final class DialogServer extends Dialog {
   /** Server port. */
   private final BaseXTextField portc;
   /** Log text. */
-  private final BaseXText logt;
+  final BaseXText logt;
   /** Change button. */
   private final BaseXTabs tabs;
   /** Username textfield. */
@@ -89,9 +92,7 @@ public final class DialogServer extends Dialog {
   /** Info label. */
   private final BaseXLabel info2;
   /** Combobox for log files. */
-  private final BaseXCombo logc;
-  /** Scrollpane for log panel. */
-  //private final JScrollPane scroll;
+  final BaseXCombo logc;
   /** String for log dir. */
   private final String logdir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
 
@@ -199,7 +200,22 @@ public final class DialogServer extends Dialog {
 
     // test if server is running
     running = ping(true);
-
+    
+    // Register a change listener
+    tabs.addChangeListener(new ChangeListener() {
+        // This method is called whenever the selected tab changes
+        public void stateChanged(final ChangeEvent evt) {
+            BaseXTabs pane = (BaseXTabs) evt.getSource();
+            if (pane.getSelectedIndex() == 3) {
+              if (!logt.getText().equals(Token.EMPTY)) {
+                action("Show");
+              } else {
+                logFiles();
+              }
+            }
+        }
+    });
+    
     logFiles();
     action(null);
     finish(null);
@@ -363,12 +379,14 @@ public final class DialogServer extends Dialog {
   /**
    * Fills combobox with all log files.
    */
-  private void logFiles() {
+  void logFiles() {
     logc.removeAllItems();
     final File f = new File(logdir);
     final String[] files = f.list();
     if(files != null) {
-      for(final String s : files) logc.addItem(s);
+      for(final String s : files) {
+        if(s.endsWith(".log")) logc.addItem(s);
+      }
     }
     logc.setSelectedIndex(-1);
     logt.setText(Token.EMPTY);
