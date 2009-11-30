@@ -207,16 +207,17 @@ public final class DialogServer extends Dialog {
         public void stateChanged(final ChangeEvent evt) {
             BaseXTabs pane = (BaseXTabs) evt.getSource();
             if (pane.getSelectedIndex() == 3) {
-              if (!logt.getText().equals(Token.EMPTY)) {
-                action("Show");
-              } else {
-                logFiles();
+              Object tmp = logc.getSelectedItem();
+              int i = logc.getSelectedIndex();
+              if(i != -1) {
+              action("Show");
               }
+              refreshLog();
+              logc.setSelectedItem(tmp);
             }
         }
     });
-    
-    logFiles();
+    initLog();
     action(null);
     finish(null);
   }
@@ -281,7 +282,7 @@ public final class DialogServer extends Dialog {
       } else if("Delete".equals(cmd)) {
         File f = new File(logdir + logc.getSelectedItem().toString());
         if(f.delete()) {
-          logFiles();
+          initLog();
         } else {
           msg2 = "Delete not possible";
         }
@@ -292,7 +293,7 @@ public final class DialogServer extends Dialog {
           d = f.delete();
         }
         if(!d) msg2 = "Delete of all logs not possible";
-        logFiles();
+        initLog();
       } else if(connected) {
         user.action(cmd);
       }
@@ -377,9 +378,18 @@ public final class DialogServer extends Dialog {
   }
   
   /**
-   * Fills combobox with all log files.
+   * Inits the log panel.
    */
-  void logFiles() {
+  void initLog() {
+    refreshLog();
+    logc.setSelectedIndex(-1);
+    logt.setText(Token.EMPTY);
+  }
+  
+  /**
+   * Refreshs the log panel.
+   */
+  void refreshLog() {
     logc.removeAllItems();
     final File f = new File(logdir);
     final String[] files = f.list();
@@ -388,8 +398,6 @@ public final class DialogServer extends Dialog {
         if(s.endsWith(".log")) logc.addItem(s);
       }
     }
-    logc.setSelectedIndex(-1);
-    logt.setText(Token.EMPTY);
   }
 
   @Override
