@@ -23,10 +23,10 @@ public final class Put extends UpdatePrimitive {
   /** Put location. */
   final Uri u;
   /** Output stream. */
-  private PrintOutput out = null;
+  private PrintOutput out;
 
   /**
-   * Construtor.
+   * Constructor.
    * @param n node to put
    * @param uri location uri
    */
@@ -36,7 +36,7 @@ public final class Put extends UpdatePrimitive {
   }
 
   @Override
-  public void apply(int add) {
+  public void apply(final int add) {
     try {
       final XMLSerializer ser = new XMLSerializer(out);
       node.serialize(ser);
@@ -64,7 +64,7 @@ public final class Put extends UpdatePrimitive {
   }
 
   @Override
-  public void merge(UpdatePrimitive p) {
+  public void merge(final UpdatePrimitive p) {
   }
 
   /**
