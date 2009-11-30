@@ -2,14 +2,12 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.BindException;
+
+import javax.swing.Box;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 import org.basex.BaseXServer;
 import org.basex.core.Commands.CmdShow;
@@ -30,6 +28,7 @@ import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.CachedOutput;
+import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
 import org.basex.server.LoginException;
@@ -78,7 +77,7 @@ public final class DialogServer extends Dialog {
   /** Server port. */
   private final BaseXTextField portc;
   /** Log text. */
-  private final JTextArea logt;
+  private final BaseXText logt;
   /** Change button. */
   private final BaseXTabs tabs;
   /** Username textfield. */
@@ -92,7 +91,7 @@ public final class DialogServer extends Dialog {
   /** Combobox for log files. */
   private final BaseXCombo logc;
   /** Scrollpane for log panel. */
-  private final JScrollPane scroll;
+  //private final JScrollPane scroll;
   /** String for log dir. */
   private final String logdir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
 
@@ -178,9 +177,9 @@ public final class DialogServer extends Dialog {
     conn.add(info);
     
     logc = new BaseXCombo(new String[] {}, this);
-    logFiles();
-    logt = new JTextArea();
-    logs.setLayout(new TableLayout(3, 1, 2, 2));
+    logt = new BaseXText(false, this);
+    logs.setLayout(new BorderLayout(2, 0));
+    logs.setBorder(8, 8, 8, 8);
     final BaseXBack pl1 = new BaseXBack();
     show = new BaseXButton("Show", this);
     delete = new BaseXButton("Delete", this);
@@ -189,23 +188,19 @@ public final class DialogServer extends Dialog {
     pl1.add(show);
     pl1.add(delete);
     pl1.add(deleteAll);
-    logs.add(pl1);
+    pl1.add(Box.createHorizontalGlue());
+    logs.add(pl1, BorderLayout.NORTH);
     info2 = new BaseXLabel(" ");
     info2.setBorder(8, 0, 0, 0);
-    final BaseXBack pl2 = new BaseXBack();
-    scroll = new JScrollPane();
-    scroll.setViewportView(logt);
-    scroll.setPreferredSize(new Dimension(420, 240));
-    scroll.setVisible(false);
-    pl2.add(scroll);
-    logs.add(pl2);
-    logs.add(info2);
+    logs.add(logt, BorderLayout.CENTER);
+    logs.add(info2, BorderLayout.SOUTH);
     
     set(tabs, BorderLayout.CENTER);
 
     // test if server is running
     running = ping(true);
 
+    logFiles();
     action(null);
     finish(null);
   }
@@ -265,18 +260,12 @@ public final class DialogServer extends Dialog {
       } else if(BUTTONREFRESH.equals(cmd)) {
         fillsedb();
       } else if("Show".equals(cmd)) {
-        FileReader fread = new FileReader(logdir + logc.
-            getSelectedItem().toString());
-        logt.read(fread, logc.getSelectedItem().toString());
-        fread.close();
-        scroll.setVisible(true);
-        logs.validate();
+        final IO io = IO.get(logdir + logc.getSelectedItem().toString());
+        logt.setText(io.content());
       } else if("Delete".equals(cmd)) {
         File f = new File(logdir + logc.getSelectedItem().toString());
         if(f.delete()) {
-        logFiles();
-        scroll.setVisible(false);
-        logs.validate();
+          logFiles();
         } else {
           msg2 = "Delete not possible";
         }
@@ -288,8 +277,6 @@ public final class DialogServer extends Dialog {
         }
         if(!d) msg2 = "Delete of all logs not possible";
         logFiles();
-        scroll.setVisible(false);
-        logs.validate();
       } else if(connected) {
         user.action(cmd);
       }
@@ -351,7 +338,7 @@ public final class DialogServer extends Dialog {
     BaseXText text = new BaseXText(false, this);
     text.setFont(getFont());
     text.setBorder(new EmptyBorder(5, 5, 5, 5));
-    text.setText(Token.token(out.toString()));
+    text.setText(out.finish());
     BaseXLayout.setWidth(text, 420);
     BaseXLayout.setHeight(text, 100);
     sess.add(text);
@@ -364,7 +351,7 @@ public final class DialogServer extends Dialog {
     BaseXText text1 = new BaseXText(false, this);
     text1.setFont(getFont());
     text1.setBorder(new EmptyBorder(5, 5, 5, 5));
-    text1.setText(Token.token(out.toString()));
+    text1.setText(out.finish());
     BaseXLayout.setWidth(text1, 420);
     BaseXLayout.setHeight(text1, 100);
     dbs.add(new BaseXLabel(DATABASES + COLS, false, true));
@@ -378,11 +365,13 @@ public final class DialogServer extends Dialog {
    */
   private void logFiles() {
     logc.removeAllItems();
-    File f = new File(logdir);
-    for(String s : f.list()) {
-    logc.addItem(s);
+    final File f = new File(logdir);
+    final String[] files = f.list();
+    if(files != null) {
+      for(final String s : files) logc.addItem(s);
     }
     logc.setSelectedIndex(-1);
+    logt.setText(Token.EMPTY);
   }
 
   @Override

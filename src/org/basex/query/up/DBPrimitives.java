@@ -75,7 +75,7 @@ public final class DBPrimitives extends Primitives {
    * @param pres pre values of nodes to check
    * @throws QueryException query exception
    */
-  private void findAttributeDuplicates(int[] pres) throws QueryException {
+  private void findAttributeDuplicates(final int[] pres) throws QueryException {
     final Map<String, Integer> m = new HashMap<String, Integer>();
     final Set<Integer> ats = new HashSet<Integer>();
     for(final int pre : pres) {
@@ -121,7 +121,7 @@ public final class DBPrimitives extends Primitives {
   final int pre)  {
     final UpdatePrimitive[] ups = op.get(pre);
     if(ups == null) return;
-    for(final UpdatePrimitive up: ups) {
+    for(final UpdatePrimitive up : ups) {
       if(up == null) continue;
 //      if(up.type() == PrimitiveType.DELETE || 
 //          up.type() == PrimitiveType.REPLACENODE) {
