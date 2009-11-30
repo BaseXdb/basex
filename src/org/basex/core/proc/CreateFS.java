@@ -39,9 +39,9 @@ public final class CreateFS extends ACreate {
     if(!prop.is(Prop.FSTRAVERSAL)) return build(new FSParser(path, prop), db);
 
     // XQUP-based implementation
-    FSTraversalParser parser = new FSTraversalParser();
+    FSTraversalParser parser = new FSTraversalParser(path, context, db);
     progress(parser);
-    parser.parse(path, context, db);
+    parser.parse();
     final Optimize opt = new Optimize();
     progress(opt);
     opt.execute(context);

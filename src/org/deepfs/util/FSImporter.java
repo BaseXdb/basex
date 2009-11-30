@@ -1,5 +1,7 @@
 package org.deepfs.util;
 
+import static org.deepfs.fsml.util.DeepFile.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -7,10 +9,10 @@ import java.nio.ByteBuffer;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.CreateDB;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.util.Token;
 import org.deepfs.fsml.extractors.SpotlightExtractor;
 import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
@@ -33,13 +35,11 @@ public final class FSImporter implements FSTraversal {
 
   /** Database context. */
   private final Context ctx;
-  /** Root node. */
-  private final String rootNode = "/deepfs";
+  /** Document node. */
+  public static final String DOC_NODE = "fsml";
   /** Insertion target. */
-  private String targetNode = rootNode;
+  private String targetNode = "/" + DOC_NODE;
 
-  /** The name of the database. */
-  private final String db;
   /** The name of the current file. */
   private String currentFile;
   /** The spotlight extractor. */
@@ -48,15 +48,13 @@ public final class FSImporter implements FSTraversal {
   /**
    * Constructor.
    * @param context the database context.
-   * @param dbName name of the database.
    */
-  public FSImporter(final Context context, final String dbName) {
+  public FSImporter(final Context context) {
     ctx = context;
     final Prop prop = ctx.prop;
     prop.set(Prop.INTPARSE, true);
     prop.set(Prop.ENTITY, false);
     prop.set(Prop.DTD, false);
-    db = dbName;
 
     if(prop.is(Prop.FSMETA) && prop.is(Prop.SPOTLIGHT) && Prop.MAC) {
       SpotlightExtractor spot;
@@ -77,7 +75,7 @@ public final class FSImporter implements FSTraversal {
    * @param text the text to check.
    * @return the escaped text.
    */
-  private String escape(final String text) {
+  public static String escape(final String text) {
     final StringBuilder sb = new StringBuilder(text.length());
     for(final char c : text.toCharArray()) {
       switch(c) {
@@ -162,9 +160,7 @@ public final class FSImporter implements FSTraversal {
       } finally {
         try {
           qp.close();
-        } catch(final IOException e) {
-          Main.debug("FSImporter: Failed to close query processor (%).", e);
-        }
+        } catch(final IOException e) { /* */ }
       }
     }
 
@@ -173,11 +169,25 @@ public final class FSImporter implements FSTraversal {
 
   @Override
   public void preTraversalVisit(final File d) {
-    final CreateDB c = new CreateDB("<deepfs backingstore=\""
-        + escape(d.getAbsolutePath()) + "\"/>", db);
-    if(!c.execute(ctx)) throw new RuntimeException(
-        "Failed to create file system database (" + c.info() + ").");
-    ctx.data.meta.deepfs = true;
+    final String name = FSImporter.escape(d.getAbsolutePath());
+    final StringBuilder query = new StringBuilder();
+    query.append("insert nodes ");
+    query.append("<").append(Token.string(DIR_NS)).append(" name=\"");
+    query.append(FSImporter.escape(name));
+    query.append("\" />");
+    query.append(" into ").append(targetNode);
+    System.out.println(query.toString());
+    final QueryProcessor qp = new QueryProcessor(query.toString(), ctx);
+    try {
+      qp.query();
+    } catch(Exception e) {
+      Main.notexpected("FSImporter: Failed to insert root node (" + e + ").");
+    } finally {
+      try {
+        qp.close();
+      } catch(IOException e) { /* */ }
+    }
+    targetNode += "/dir[@name = \"" + name + "\"]";
   }
 
   @Override
