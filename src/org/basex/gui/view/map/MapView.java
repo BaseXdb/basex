@@ -774,14 +774,14 @@ public final class MapView extends View implements Runnable {
     mouseY = e.getY();
     dragTol = 0;
     if(!focus() && gui.context.focused == -1) return;
-
+    
     // add or remove marked node
     final Nodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {
       if(mainRects.size != 1) gui.notify.context(marked, false, null);
     } else if(e.isShiftDown()) {
       gui.notify.mark(1, null);
-    } else if(sc(e)) {
+    } else if(sc(e) && SwingUtilities.isLeftMouseButton(e)) {
       gui.notify.mark(2, null);
     } else {
       if(!marked.contains(gui.context.focused)) gui.notify.mark(0, null);

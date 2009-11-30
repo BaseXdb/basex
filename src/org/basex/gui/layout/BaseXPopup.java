@@ -11,7 +11,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 
@@ -39,8 +38,8 @@ public final class BaseXPopup extends JPopupMenu {
 
     comp.addMouseListener(new MouseAdapter() {
       @Override
-      public void mouseReleased(final MouseEvent e) {
-        if(!gui.updating && !SwingUtilities.isLeftMouseButton(e))
+      public void mousePressed(final MouseEvent e) {
+        if(!gui.updating && e.isPopupTrigger())
           show(e.getComponent(), e.getX() - 10, e.getY() - 15);
       }
     });
