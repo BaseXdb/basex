@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Progress;
-import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -249,10 +248,7 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void endElem(final byte[] tag) throws IOException {
-    if(stopped) {
-      close();
-      throw new ProgressException();
-    }
+    checkStop();
 
     if(--level == 0 || tags.id(tag) != tagStack[level])
       error(CLOSINGTAG, parser.det(), tag, tags.key(tagStack[level]));

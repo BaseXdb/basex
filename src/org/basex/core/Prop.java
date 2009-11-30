@@ -97,9 +97,9 @@ public final class Prop extends AProp {
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };
   /** Flag for parsing DTDs in internal parser. */
-  public static final Object[] DTD = { "DTD", true };
+  public static final Object[] DTD = { "DTD", false };
   /** Flag for entity parsing in internal parser. */
-  public static final Object[] ENTITY = { "ENTITY", true };
+  public static final Object[] ENTITY = { "ENTITY", false };
 
   /** Number of query executions. */
   public static final Object[] RUNS = { "RUNS", 1 };

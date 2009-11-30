@@ -39,11 +39,6 @@ public final class FNGen extends Fun {
         if(it == null) Err.empty(this);
         return ctx.coll(checkStr(it));
       case PUT:
-        /* [LK] fn:put() operations should be moved to pending list
-         * - FOUP0002 could be revised (kinda dirty right now)
-         * - XUDY0031 missing
-         * - as usual, check other notes in specs (2.6.1)
-         */
         if(!ctx.context.user.perm(User.ADMIN))
           throw new QueryException(Main.info(PERMNO, CmdPerm.ADMIN));
         final byte[] file = checkStr(expr[1], ctx);

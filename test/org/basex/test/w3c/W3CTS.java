@@ -384,6 +384,10 @@ public abstract class W3CTS {
         xml.close();
       } catch(final Exception ex) {
         error = ex.getMessage();
+        if(error == null) {
+          error = ex.toString();
+          ex.printStackTrace();
+        }
         if(error.startsWith(STOPPED)) {
           error = error.substring(error.indexOf('\n') + 1);
         }

@@ -36,11 +36,16 @@ public final class BaseXPopup extends JPopupMenu {
     popup = pop;
     gui = comp.gui;
 
+    // both listeners must be implemented to support different platforms
     comp.addMouseListener(new MouseAdapter() {
       @Override
       public void mousePressed(final MouseEvent e) {
         if(!gui.updating && e.isPopupTrigger())
           show(e.getComponent(), e.getX() - 10, e.getY() - 15);
+      }
+      @Override
+      public void mouseReleased(final MouseEvent e) {
+        mousePressed(e);
       }
     });
     comp.addKeyListener(new KeyAdapter() {

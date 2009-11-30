@@ -78,7 +78,7 @@ public final class PendingUpdates {
 
     final boolean frag = p.node instanceof FNode;
     if(t && (frag || !refs.contains(((DBNode) p.node).data)))
-      Err.or(UPWRONGTRG, p.node);
+      Err.or(UPNOTCOPIED, p.node);
 
     final Data d = frag ? dataDummy : ((DBNode) p.node).data;
     

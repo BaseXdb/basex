@@ -70,6 +70,7 @@ abstract class ACreate extends Proc {
       Main.debug(ex);
       return error(FILEWHICH, p.io);
     } catch(final ProgressException ex) {
+      abort();
       return error(PROGERR);
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -78,15 +79,6 @@ abstract class ACreate extends Proc {
     } catch(final Exception ex) {
       Main.debug(ex);
       return error(PARSEERR, args[0]);
-    }
-  }
-
-  @Override
-  protected void abort() {
-    try {
-      if(builder != null) builder.close();
-    } catch(final IOException ex) {
-      Main.debug(ex);
     }
   }
 

@@ -15,13 +15,13 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-final class MapFSImages {
+final class MapFSImages extends Thread {
   /** Maximum number of cached images. */
   private static final int MAXNR = 5000;
   /** Reference to the treemap panel. */
   final MapView view;
   /** Image cache. */
-  BufferedImage[] imgs = new BufferedImage[MAXNR];
+  final BufferedImage[] imgs = new BufferedImage[MAXNR];
   /** Maximum image size. */
   final boolean[] imgmax = new boolean[MAXNR];
   /** Image id cache. */
@@ -80,72 +80,71 @@ final class MapFSImages {
    */
   void load() {
     if(thread != null || loaderC == 0) return;
-    
-    thread = new Thread() {
-      @Override
-      public void run() {
-        while(loaderC > 0) {
-          final int id = idCache[--loaderC];
-          int ww = wCache[loaderC];
-          int hh = hCache[loaderC];
-
-          // find new image id in cached images
-          int ic = -1;
-          while(++ic < MAXNR && imgid[ic] != id);
-
-          // check if the image exists already, or if the existing version
-          // is bigger than the new one
-          if(ic != MAXNR && (imgmax[ic] || imgs[ic].getWidth() + 1 >= ww ||
-              imgs[ic].getHeight() + 1 >= hh)) continue;
-
-          try {
-            // database closed - quit
-            final Data data = view.gui.context.data;
-            if(data == null) {
-              loaderC = 0;
-              break;
-            }
-
-            // load image and wait until it's done
-            final File f = new File(Token.string(data.fs.path(id, false)));
-            BufferedImage image = ImageIO.read(f);
-
-            // calculate optimal image size
-            final double iw = image.getWidth();
-            final double ih = image.getHeight();
-            final double min = Math.min(ww / iw, hh / ih);
-
-            // create scaled image instance
-            if(min < 1) {
-              ww = (int) (iw * min);
-              hh = (int) (ih * min);
-
-              final BufferedImage bi = new BufferedImage(ww, hh,
-                  BufferedImage.TYPE_INT_BGR);
-              bi.createGraphics().drawImage(image, 0, 0, ww, hh, null);
-              image = bi;
-            }
-
-            // cache image
-            if(ic == MAXNR) {
-              ic = imgc;
-              imgid[ic] = id;
-              imgc = (ic + 1) % MAXNR;
-            }
-            imgs[ic] = image;
-            imgmax[ic] = min >= 1;
-
-            if((loaderC & 5) == 0 && !view.gui.painting) paint();
-          } catch(final Exception ex) {
-            // catch and ignore any kind of exception
-            Main.debug(ex);
-          }
-        }
-        paint();
-        thread = null;
-      }
-    };
+    thread = new Thread(this);
     thread.start();
+  }
+
+  @Override
+  public void run() {
+    while(loaderC > 0) {
+      final int id = idCache[--loaderC];
+      int ww = wCache[loaderC];
+      int hh = hCache[loaderC];
+
+      // find new image id in cached images
+      int ic = -1;
+      while(++ic < MAXNR && imgid[ic] != id);
+
+      // check if the image exists already, or if the existing version
+      // is bigger than the new one
+      if(ic != MAXNR && (imgmax[ic] || imgs[ic].getWidth() + 1 >= ww ||
+          imgs[ic].getHeight() + 1 >= hh)) continue;
+
+      try {
+        // database closed - quit
+        final Data data = view.gui.context.data;
+        if(data == null) {
+          loaderC = 0;
+          break;
+        }
+
+        // load image and wait until it's done
+        final File f = new File(Token.string(data.fs.path(id, false)));
+        BufferedImage image = ImageIO.read(f);
+
+        // calculate optimal image size
+        final double iw = image.getWidth();
+        final double ih = image.getHeight();
+        final double min = Math.min(ww / iw, hh / ih);
+
+        // create scaled image instance
+        if(min < 1) {
+          ww = (int) (iw * min);
+          hh = (int) (ih * min);
+
+          final BufferedImage bi = new BufferedImage(ww, hh,
+              BufferedImage.TYPE_INT_BGR);
+          bi.createGraphics().drawImage(image, 0, 0, ww, hh, null);
+          image = bi;
+        }
+
+        // cache image
+        if(ic == MAXNR) {
+          ic = imgc;
+          imgid[ic] = id;
+          imgc = (ic + 1) % MAXNR;
+        }
+        imgs[ic] = image;
+        imgmax[ic] = min >= 1;
+
+        if((loaderC & 5) == 0 && !view.gui.painting) paint();
+      } catch(final Exception ex) {
+        // catch and ignore any kind of exception
+        Main.debug(ex);
+      }
+    }
+    paint();
+    thread = null;
   }
 
   /**
@@ -187,10 +186,9 @@ final class MapFSImages {
    */
   void close() {
     reset();
-    for(int i = 0; i < MAXNR; i++) {
+    /*for(int i = 0; i < MAXNR; i++) {
       imgs[i] = null;
       imgid[i] = 0;
-      imgmax[i] = true;
-    }
+    }*/
   }
 }

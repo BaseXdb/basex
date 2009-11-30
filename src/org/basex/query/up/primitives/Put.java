@@ -21,7 +21,7 @@ import org.basex.util.Token;
  */
 public final class Put extends UpdatePrimitive {
   /** Put location. */
-  final Uri u;
+  private final Uri u;
   /** Output stream. */
   private PrintOutput out;
 
@@ -42,7 +42,6 @@ public final class Put extends UpdatePrimitive {
       node.serialize(ser);
       ser.close();
       out.close();
-
     } catch(IOException e) {
       e.printStackTrace();
     }
@@ -51,7 +50,7 @@ public final class Put extends UpdatePrimitive {
   @Override
   public void prepare() throws QueryException {
     try {
-      out = new PrintOutput(path());
+      out = new PrintOutput(Token.string(path()));
     } catch(final IOException ex) {
       Main.debug(ex);
       Err.or(UPFOURI, path());
@@ -71,7 +70,7 @@ public final class Put extends UpdatePrimitive {
    * Returns uri as string.
    * @return string uri
    */
-  public String path() {
-    return Token.string(u.str());
+  public byte[] path() {
+    return u.str();
   }
 }

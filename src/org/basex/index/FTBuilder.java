@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.query.ft.Scoring;
@@ -203,6 +204,11 @@ abstract class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   abstract void write() throws IOException;
+
+  @Override
+  public void abort() {
+    DropDB.drop(data.meta.name, data.meta.prop);
+  }
 
   @Override
   public final String det() {

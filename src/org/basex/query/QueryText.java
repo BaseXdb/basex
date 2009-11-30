@@ -496,7 +496,7 @@ public interface QueryText {
   /** XUDY0009: XQuery Update dynamic exception. */
   Object[] UPNOPAR = { XUDY, 9, "Target % has no parent." };
   /** XUDY0014: XQuery Update dynamic exception. */
-  Object[] UPWRONGTRG = { XUDY, 14, "% not copied by copy clause." };
+  Object[] UPNOTCOPIED = { XUDY, 14, "% not copied by copy clause." };
   /** XUDY0015: XQuery Update dynamic exception. */
   Object[] UPMULTREN = { XUDY, 15, "Multiple renames on %." };
   /** XUDY0016: XQuery Update dynamic exception. */

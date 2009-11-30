@@ -148,11 +148,6 @@ public abstract class Proc extends Progress {
   protected abstract boolean exec(final PrintOutput out) throws IOException;
 
   /**
-   * Aborts a failed process.
-   */
-  protected void abort() { }
-
-  /**
    * Adds the error message to the message buffer {@link #info}.
    * @param msg error message
    * @param ext error extension

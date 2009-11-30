@@ -90,4 +90,11 @@ public abstract class Progress {
   public void checkStop() {
     if(stopped) throw new ProgressException();
   }
+
+  /**
+   * Aborts a failed or interrupted progress.
+   */
+  public void abort() {
+    if(sub != null) sub.abort();
+  }
 }

@@ -3,6 +3,8 @@ package org.basex.build;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
@@ -90,6 +92,16 @@ public final class DiskBuilder extends Builder {
 
     // return database instance
     return new DiskData(meta, tags, atts, path, ns);
+  }
+
+  @Override
+  public void abort() {
+    try {
+      close();
+    } catch(IOException ex) {
+      Main.debug(ex);
+    }
+    DropDB.drop(meta.name, meta.prop);
   }
 
   @Override

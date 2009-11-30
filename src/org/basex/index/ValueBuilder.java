@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
@@ -85,6 +86,11 @@ public final class ValueBuilder extends IndexBuilder {
           Performance.getMem() + ")");
     }
     return new Values(data, text);
+  }
+
+  @Override
+  public void abort() {
+    DropDB.drop(data.meta.name, data.meta.prop);
   }
 
   @Override

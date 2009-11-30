@@ -1,6 +1,5 @@
 package org.basex.query.up.primitives;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -36,10 +35,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
   public void prepare() throws QueryException {
     if(c.size() == 0) return;
     final NodIter seq = new NodIter();
-    final Iterator<NodIter> it = c.iterator();
-    while(it.hasNext()) {
-      final NodIter ni = it.next();
-      ni.reset();
+    for(final NodIter ni : c) {
       Nod i;
       while((i = ni.next()) != null) seq.add(i);
     }
