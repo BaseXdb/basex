@@ -19,22 +19,22 @@ final class MapFSImages {
   /** Maximum number of cached images. */
   private static final int MAXNR = 5000;
   /** Reference to the treemap panel. */
-  MapView view;
+  final MapView view;
   /** Image cache. */
   BufferedImage[] imgs = new BufferedImage[MAXNR];
   /** Maximum image size. */
-  boolean[] imgmax = new boolean[MAXNR];
+  final boolean[] imgmax = new boolean[MAXNR];
   /** Image id cache. */
-  int[] imgid = new int[MAXNR];
+  final int[] imgid = new int[MAXNR];
   /** Pointer to next cached image. */
   int imgc;
 
   /** Image id cache. */
-  int[] idCache = new int[MAXNR];
+  final int[] idCache = new int[MAXNR];
   /** Image width cache. */
-  int[] wCache = new int[MAXNR];
+  final int[] wCache = new int[MAXNR];
   /** Image height cache. */
-  int[] hCache = new int[MAXNR];
+  final int[] hCache = new int[MAXNR];
   /** Cache counter. */
   int loaderC;
 
@@ -80,7 +80,7 @@ final class MapFSImages {
    */
   void load() {
     if(thread != null || loaderC == 0) return;
-
+    
     thread = new Thread() {
       @Override
       public void run() {
@@ -187,6 +187,10 @@ final class MapFSImages {
    */
   void close() {
     reset();
-    for(int i = 0; i < MAXNR; i++) imgs[i] = null;
+    for(int i = 0; i < MAXNR; i++) {
+      imgs[i] = null;
+      imgid[i] = 0;
+      imgmax[i] = true;
+    }
   }
 }
