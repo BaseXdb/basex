@@ -39,25 +39,26 @@ public final class XMLParser implements IFileParser {
 
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
-    return parse(f) != null ? true : false;
+    return parse(f, new Prop(false)) != null ? true : false;
   }
 
   /**
    * Checks if the document is well-formed and returns the corresponding main
    * memory database.
    * @param f the {@link BufferedFileChannel} to read the xml document from
+   * @param prop the database properties to use.
    * @return the main memory database or <code>null</code> if the document is
    *         not wellformed.
    * @throws IOException if any error occurs
    */
-  public Data parse(final BufferedFileChannel f) throws IOException {
+  public Data parse(final BufferedFileChannel f, final Prop prop)
+      throws IOException {
     if(f.size() > Integer.MAX_VALUE) throw new IOException(
         "Input file too big.");
     final byte[] data = new byte[(int) f.size()];
     f.get(data);
     try {
-      // [BL] better approach.. aropt prop instance from main context
-      final Parser p = Parser.xmlParser(new IOContent(data), new Prop(false));
+      final Parser p = Parser.xmlParser(new IOContent(data), prop);
       return new MemBuilder(p).build();
     } catch(final IOException ex) {
       // XML parsing exception...
@@ -70,7 +71,7 @@ public final class XMLParser implements IFileParser {
     final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
     final int maxSize = deepFile.maxTextSize();
     if(bfc.size() <= maxSize) {
-      final Data data = parse(bfc);
+      final Data data = parse(bfc, deepFile.getContext().prop);
       if(data != null) {
         if(deepFile.extractMeta()) {
           deepFile.setFileType(FileType.XML);

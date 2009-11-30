@@ -17,6 +17,7 @@ import javax.xml.namespace.QName;
 
 import org.basex.core.Context;
 import org.basex.core.Main;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
@@ -47,16 +48,10 @@ public class DeepFile {
   // [BL] integrate BufferedFileChannel
 
   /**
-   * Default value for the maximum number of bytes to extract from text
-   * contents.
-   */
-  public static final int DEFAULT_TEXT_MAX = 10240;
-
-  /**
    * A reference to the parser registry that can be used to parse file
    * fragments.
    */
-  private final ParserRegistry parser;
+  private final ParserRegistry registry;
   /**
    * The file channel to access the file. This channel links the DeepFile object
    * with a file in the file system.
@@ -74,16 +69,11 @@ public class DeepFile {
   /** All xml contents that are extracted from the file as string. */
   private final ArrayList<XMLContent> xmlContents;
 
-  /** Flag, if metadata should be extracted from the current file. */
-  private final boolean fsmeta;
+  /** The BaseX context. */
+  private final Context context;
+  
   /** Flag, if metadata extraction is finished. */
   private boolean metaFinished;
-  /** Flag, if text contents should be extracted from the current file. */
-  private final boolean fscont;
-  /** Flag, if xml contents should be extracted from the current file. */
-  private final boolean fsxml;
-  /** Maximum number of bytes to extract from text contents. */
-  private final int fstextmax;
   /** Offset of the deep file inside the current regular file. */
   private final long offset;
   /** Size of the deep file in bytes (-1 means unknown size). */
@@ -104,8 +94,7 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
-   *  boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, Context)}
    * for parsing several files for better performance.
    * </p>
    * @param file the name of the associated file in the file system.
@@ -127,8 +116,7 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean, boolean,
-   *  boolean, int)}
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, Context)}
    * for parsing several files for better performance.
    * </p>
    * @param file the associated file in the file system.
@@ -136,9 +124,7 @@ public class DeepFile {
    * @see IFileParser#extract(DeepFile)
    */
   public DeepFile(final File file) throws IOException {
-    this(new ParserRegistry(), file.isDirectory() ? null
-        : new BufferedFileChannel(file), true, true, true, 0,
-        file.isDirectory() ? -1 : file.length(), DEFAULT_TEXT_MAX);
+    this(file.isDirectory() ? null : new BufferedFileChannel(file));
   }
 
   /**
@@ -152,16 +138,18 @@ public class DeepFile {
    * </p>
    * <p>
    * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean,
-   *   boolean, boolean, int)}
-   * for parsing several files for better performance.
+   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, Context)}
+   * for parsing multiple files for better performance.
    * </p>
    * @param f the {@link BufferedFileChannel}.
    * @throws IOException if any error occurs.
    */
   public DeepFile(final BufferedFileChannel f) throws IOException {
-    this(new ParserRegistry(), f, true, true, true, 0, f.size(),
-        DEFAULT_TEXT_MAX);
+    this(new ParserRegistry(), f, new Context(), 0, f.size());
+    final Prop p = context.prop;
+    p.set(Prop.FSMETA, true);
+    p.set(Prop.FSCONT, true);
+    p.set(Prop.FSXML, true);
   }
 
   /**
@@ -169,77 +157,57 @@ public class DeepFile {
    * Constructor.
    * </p>
    * <p>
-   * Creates a DeepFile object for a file that can be used to extract metadata
-   * and text/xml contents.
+   * Uses the given parser registry to retrieve the corresponding parser for the
+   * file which is represented by the buffered file channel. Depending on the
+   * properties of the context, metadata, text content and xml content is
+   * extracted.
    * </p>
    * <p>
-   * This constructor should only be used to parse a single file. Use
-   * {@link #DeepFile(ParserRegistry, BufferedFileChannel, boolean,
-   *   boolean, boolean, int)}
-   * for parsing several files for better performance.
+   * The properties can be set as follows:<br />
+   * <code>ctx.prop.set(Prop.FSMETA, true); // extract metadata</code><br/>
+   * <code>ctx.prop.set(Prop.FSCONT, true); // extract text content</code> <br/>
+   * <code>ctx.prop.set(Prop.FSXML, true); // extract xml content</code> <br/>
+   * <code>ctx.prop.set(Prop.FSTEXTMAX, 10240); // amount of text/xml content to
+   * extract (in bytes)</code>
+   * <br/>
    * </p>
-   * @param file the associated file in the file system.
-   * @param meta extract/propagate metadata.
-   * @param xmlContent extract/propagate xml data.
-   * @param textContent extract/propagate content data.
-   * @throws IOException if any I/O error occurs.
-   * @see IFileParser#extract(DeepFile)
-   */
-  public DeepFile(final File file, final boolean meta,
-      final boolean xmlContent, final boolean textContent) throws IOException {
-    this(new ParserRegistry(), file.isDirectory() ? null
-        : new BufferedFileChannel(file), meta, xmlContent, textContent, 0,
-        file.isDirectory() ? -1 : file.length(), DEFAULT_TEXT_MAX);
-  }
-
-  /**
-   * Constructor.
    * @param parserRegistry a reference to the parser registry that can be used
    *          to parse file fragments.
    * @param bufferedFileChannel {@link BufferedFileChannel} to access the file.
-   * @param meta extract/propagate metadata.
-   * @param xmlContent extract/propagate xml data.
-   * @param textContent extract/propagate content data.
-   * @param textMax maximum number of bytes to extract from texts.
-   * @throws IOException if any error occurs;
+   * @param ctx the database context.
+   * @throws IOException if any error occurs.
    */
   public DeepFile(final ParserRegistry parserRegistry,
-      final BufferedFileChannel bufferedFileChannel, final boolean meta,
-      final boolean xmlContent, final boolean textContent, final int textMax)
+      final BufferedFileChannel bufferedFileChannel, final Context ctx)
       throws IOException {
-    this(parserRegistry, bufferedFileChannel, meta, xmlContent, textContent,
-        bufferedFileChannel.getOffset(), bufferedFileChannel.size(), textMax);
+    this(parserRegistry, bufferedFileChannel, ctx,
+        bufferedFileChannel.getOffset(), bufferedFileChannel.size());
   }
-
+  
   /**
    * Constructor.
    * @param parserRegistry a reference to the parser registry that can be used
    *          to parse file fragments.
    * @param bufferedFileChannel {@link BufferedFileChannel} to access the file.
-   * @param meta extract/propagate metadata.
-   * @param xmlContent extract/propagate xml data.
-   * @param textContent extract/propagate content data.
+   * @param ctx the database context.
    * @param position the position inside the file in the file system.
    * @param contentSize the size of the deep file.
-   * @param textMax maximum number of bytes to extract from texts.
    */
   private DeepFile(final ParserRegistry parserRegistry,
-      final BufferedFileChannel bufferedFileChannel, final boolean meta,
-      final boolean xmlContent, final boolean textContent, final long position,
-      final long contentSize, final int textMax) {
-    parser = parserRegistry;
+      final BufferedFileChannel bufferedFileChannel, final Context ctx,
+      final long position, final long contentSize) {
+    registry = parserRegistry;
     bfc = bufferedFileChannel;
-    fsmeta = meta;
-    metaFinished = !fsmeta;
-    fsxml = xmlContent;
-    fscont = textContent;
-    fstextmax = textMax;
+    context = ctx;
+    final Prop p = ctx.prop;
+    final boolean meta = p.is(Prop.FSMETA); 
+    metaFinished = !meta;
     offset = position;
     size = contentSize;
     fileFragments = new ArrayList<DeepFile>();
-    metaElements = fsmeta ? new TreeMap<MetaElem, ArrayList<byte[]>>() : null;
-    textContents = fscont ? new ArrayList<TextContent>() : null;
-    xmlContents = fsxml ? new ArrayList<XMLContent>() : null;
+    metaElements = meta ? new TreeMap<MetaElem, ArrayList<byte[]>>() : null;
+    textContents = p.is(Prop.FSCONT) ? new ArrayList<TextContent>() : null;
+    xmlContents = p.is(Prop.FSXML) ? new ArrayList<XMLContent>() : null;
   }
 
   /**
@@ -250,13 +218,10 @@ public class DeepFile {
    */
   private DeepFile(final DeepFile df, final int contentSize)
       throws IOException {
-    parser = df.parser;
+    registry = df.registry;
     bfc = df.bfc.subChannel("", contentSize);
-    fsmeta = df.fsmeta;
-    metaFinished = !fsmeta;
-    fsxml = df.fsxml;
-    fscont = df.fscont;
-    fstextmax = df.fstextmax;
+    context = df.getContext();
+    metaFinished = df.metaFinished;
     offset = df.offset;
     size = df.size;
     fileFragments = df.fileFragments;
@@ -290,7 +255,7 @@ public class DeepFile {
    * @throws ParserException if the fallback parser could not be loaded.
    */
   public void fallback() throws IOException, ParserException {
-    final IFileParser p = parser.getFallbackParser();
+    final IFileParser p = registry.getFallbackParser();
     bfc.reset();
     p.extract(this);
     bfc.finish();
@@ -315,7 +280,7 @@ public class DeepFile {
    * @return true, if text contents should be extracted.
    */
   public boolean extractText() {
-    return fscont;
+    return context.prop.is(Prop.FSCONT);
   }
 
   /**
@@ -323,7 +288,7 @@ public class DeepFile {
    * @return true, if xml contents should be extracted.
    */
   public boolean extractXML() {
-    return fsxml;
+    return context.prop.is(Prop.FSXML);
   }
 
   /**
@@ -332,11 +297,19 @@ public class DeepFile {
    * @return the maximum number of bytes to extract.
    */
   public int maxTextSize() {
-    return fstextmax;
+    return context.prop.num(Prop.FSTEXTMAX);
   }
 
   // ----- deep file properties and metadata/contents --------------------------
 
+  /**
+   * Returns the database context.
+   * @return the database context.
+   */
+  public Context getContext() {
+    return context;
+  }
+  
   /**
    * Returns the offset of the deep file inside the regular file in the file
    * system.
@@ -666,13 +639,14 @@ public class DeepFile {
    */
   public void addText(final long position, final int byteCount,
       final TokenBuilder text) {
-    if(!fscont) return;
+    if(!extractText()) return;
     text.chop();
     if(text.size() == 0) return;
     final byte[] data;
-    if(text.size() > fstextmax) {
-      data = new byte[fstextmax];
-      System.arraycopy(text.finish(), 0, data, 0, fstextmax);
+    final int textmax = context.prop.num(Prop.FSTEXTMAX);
+    if(text.size() > textmax) {
+      data = new byte[textmax];
+      System.arraycopy(text.finish(), 0, data, 0, textmax);
     } else data = text.finish();
     textContents.add(new TextContent(position, byteCount, data));
   }
@@ -686,7 +660,7 @@ public class DeepFile {
    */
   public void addXML(final long position, final int byteCount,
       final Data data) throws IOException {
-    if(!fsxml) return;
+    if(!extractXML()) return;
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     final PrintOutput po = new PrintOutput(baos);
     final XMLSerializer ser = new XMLSerializer(po);
@@ -704,11 +678,12 @@ public class DeepFile {
       xmlContent = new byte[] { };
     }
     if(xmlContent.length == 0) return;
-    if(xmlContent.length > fstextmax) {
-      if(!fscont) return;
-      final byte[] text = new byte[fstextmax];
-      System.arraycopy(xmlContent, 0, text, 0, fstextmax);
-      textContents.add(new TextContent(position, fstextmax, text));
+    final int textmax = context.prop.num(Prop.FSTEXTMAX);
+    if(xmlContent.length > textmax) {
+      if(!extractText()) return;
+      final byte[] text = new byte[textmax];
+      System.arraycopy(xmlContent, 0, text, 0, textmax);
+      textContents.add(new TextContent(position, textmax, text));
     } else {
       xmlContents.add(new XMLContent(position, byteCount,
           new String(xmlContent)));
@@ -764,7 +739,7 @@ public class DeepFile {
     IFileParser p = null;
     for(final String s : suffix) {
       try {
-        p = parser.getParser(s.toLowerCase());
+        p = registry.getParser(s.toLowerCase());
       } catch(final ParserException e) { /* ignore and continue ... */}
       if(p != null) break;
     }
@@ -810,11 +785,11 @@ public class DeepFile {
         "Can't create a subfile for a deep file that is " +
         "not associated with a regular file.");
     final BufferedFileChannel sub = bfc.subChannel(fileName, fileSize);
-    final DeepFile content = new DeepFile(parser, sub, fsmeta, fsxml, fscont,
-        sub.absolutePosition(), sub.size(), fstextmax);
+    final DeepFile content = new DeepFile(registry, sub, context,
+        sub.absolutePosition(), sub.size());
     fileFragments.add(content);
     if(fileName != null) content.addMeta(MetaElem.TITLE, fileName);
-    if(parser != null) process(content, suffix);
+    if(registry != null) process(content, suffix);
     return content;
   }
 
@@ -871,8 +846,8 @@ public class DeepFile {
       final int contentSize) throws IOException {
     bfc.position();
     final BufferedFileChannel sub = bfc.subChannel(title, contentSize);
-    final DeepFile subFile = new DeepFile(parser, sub, fsmeta, fsxml, fscont,
-        position, contentSize, fstextmax);
+    final DeepFile subFile = new DeepFile(registry, sub, context, position,
+        contentSize);
     subFile.addMeta(MetaElem.TITLE, title);
     return subFile;
   }
@@ -893,8 +868,7 @@ public class DeepFile {
    * @see #setSize(long)
    */
   public DeepFile newContentSection(final long position) {
-    return new DeepFile(parser, bfc, fsmeta, fsxml, fscont, position, -1,
-        fstextmax);
+    return new DeepFile(registry, bfc, context, position, -1);
   }
 
   /**

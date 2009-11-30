@@ -127,9 +127,7 @@ public final class FSImporter implements FSTraversal {
       try {
         final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
         try {
-          final DeepFile deepFile = new DeepFile(parserRegistry, bfc,
-              ctx.prop.is(Prop.FSMETA), ctx.prop.is(Prop.FSXML),
-              ctx.prop.is(Prop.FSCONT), ctx.prop.num(Prop.FSTEXTMAX));
+          final DeepFile deepFile = new DeepFile(parserRegistry, bfc, ctx);
           if(spotlight != null) {
             spotlight.extract(deepFile);
             deepFile.finishMetaExtraction();
