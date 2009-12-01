@@ -145,8 +145,9 @@ public class FSWalker implements FSTraversal {
    * Creates a new FSWalker and {@link #register(FSTraversal)} a visitor.
    * @param v visitor implementing #{@link FSTraversal} to be registered
    */
-  public FSWalker(final FSTraversal v) {
-      register(v);
+  public FSWalker(final FSTraversal... v) {
+    for(final FSTraversal vi : v)
+      register(vi);
   }
 
   /**

@@ -8,6 +8,7 @@ import org.basex.core.Progress;
 import org.basex.core.Text;
 import org.basex.core.proc.CreateDB;
 import org.deepfs.util.FSImporter;
+import org.deepfs.util.FSTraversal;
 import org.deepfs.util.FSWalker;
 
 /**
@@ -23,7 +24,7 @@ public class FSTraversalParser extends Progress {
   private final Context context;
   /** Root file(s). */
   private final File[] roots;
-  
+
   /**
    * Constructor.
    * @param path import root.
@@ -43,8 +44,9 @@ public class FSTraversalParser extends Progress {
 
   /** Recursively parses the given path. */
   public void parse() {
-    final FSWalker walker = new FSWalker(importer);
-    for (final File file : roots)
+    final FSWalker walker = new FSWalker(importer,
+        new FSImporterProgress(this));
+    for(final File file : roots)
       walker.traverse(file);
   }
 
@@ -63,4 +65,40 @@ public class FSTraversalParser extends Progress {
     return 0;
   }
 
+  /**
+   * Used to stop the importer.
+   * @author Bastian Lemke
+   */
+  private class FSImporterProgress implements FSTraversal {
+
+    /** The progress. */
+    final Progress p;
+
+    /**
+     * Constructor.
+     * @param progress the progress.
+     */
+    FSImporterProgress(final Progress progress) { p = progress; }
+
+    @Override
+    public void levelUpdate(final int l) { /* NOT_USED */}
+
+    @Override
+    public void postDirectoryVisit(final File d) { /* NOT_USED */}
+
+    @Override
+    public void postTraversalVisit(final File d) { p.checkStop(); }
+
+    @Override
+    public void preDirectoryVisit(final File d) { /* NOT_USED */}
+
+    @Override
+    public void preTraversalVisit(final File d) { /* NOT_USED */}
+
+    @Override
+    public void regularFileVisit(final File f) { p.checkStop(); }
+
+    @Override
+    public void symLinkVisit(final File f) { /* NOT_USED */}
+  }
 }

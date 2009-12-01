@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 
 import org.basex.build.fs.FSParser;
 import org.basex.build.fs.FSTraversalParser;
+import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -41,11 +42,16 @@ public final class CreateFS extends ACreate {
     // XQUP-based implementation
     FSTraversalParser parser = new FSTraversalParser(path, context, db);
     progress(parser);
+    try {
     parser.parse();
+    } catch(final ProgressException ex) {
+      new Open(db).execute(context);
+      return error(PROGERR);
+    }
     final Optimize opt = new Optimize();
     progress(opt);
     opt.execute(context);
-    new Open(args[1]).execute(context);
+    new Open(db).execute(context);
     return info(DBCREATED, args[1], perf);
   }
 
