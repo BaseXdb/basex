@@ -19,7 +19,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
   /** Insertion nodes. */
   final LinkedList<NodIter> c = new LinkedList<NodIter>();
   /** Final copy of insertion nodes. */
-  public Data m;
+  public Data md;
 
   /**
    * Constructor.
@@ -41,6 +41,6 @@ public abstract class NodeCopy extends UpdatePrimitive {
     }
     // Text nodes still need to be merged. Two adjacent iterators in c may
     // lead to two adjacent text nodes.
-    m = UpdateFunctions.buildDB(mergeText(seq), ((DBNode) node).data);
+    md = UpdateFunctions.buildDB(mergeText(seq), ((DBNode) node).data);
   }
 }

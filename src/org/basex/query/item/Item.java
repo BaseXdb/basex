@@ -138,14 +138,6 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Returns a hash code.
-   * @return hash code
-   */
-  public int hash() {
-    return Token.hash(str());
-  }
-
-  /**
    * Returns a Java object.
    * @return string representation
    */
@@ -290,6 +282,11 @@ public abstract class Item extends Expr {
     ser.openElement(this);
     ser.attribute(VAL, str());
     ser.closeElement();
+  }
+
+  @Override
+  public int hashCode() {
+    return Token.hash(str());
   }
 
   @Override

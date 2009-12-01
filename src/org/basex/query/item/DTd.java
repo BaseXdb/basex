@@ -128,13 +128,13 @@ public final class DTd extends Dur {
   }
 
   @Override
-  public int hash() {
-    return sc.intValue();
-  }
-
-  @Override
   public int diff(final Item it) throws QueryException {
     if(it.type != type) Err.cmp(it, this);
     return sc.subtract(((Dur) it).sc).signum();
+  }
+
+  @Override
+  public int hashCode() {
+    return sc.intValue();
   }
 }

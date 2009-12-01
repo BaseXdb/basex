@@ -77,13 +77,13 @@ public final class Flt extends Item {
   }
 
   @Override
-  public int hash() {
-    return (int) val;
+  public Object java() {
+    return val;
   }
 
   @Override
-  public Object java() {
-    return val;
+  public int hashCode() {
+    return (int) val;
   }
 
   /**

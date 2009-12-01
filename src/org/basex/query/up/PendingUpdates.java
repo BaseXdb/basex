@@ -105,7 +105,7 @@ public final class PendingUpdates {
   public void apply() throws QueryException {
     // Constraints are checked first. No updates are applied if any problems
     // are found.
-    for(final Primitives dbp : primitives.values()) dbp.check();
-    for(final Primitives dbp : primitives.values()) dbp.apply();
+    for(final Primitives p : primitives.values()) p.check();
+    for(final Primitives p : primitives.values()) p.apply();
   }
 }

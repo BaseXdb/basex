@@ -34,9 +34,9 @@ public final class InsertInto extends NodeCopy {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pos = n.pre + d.size(n.pre, Nod.kind(node.type)) + add;
-    d.insert(pos, n.pre, m);
+    d.insert(pos, n.pre, md);
     if(!mergeTextNodes(d, pos - 1, pos)) {
-      final int s = m.meta.size;
+      final int s = md.meta.size;
       mergeTextNodes(d, pos + s - 1, pos + s);
     }
   }

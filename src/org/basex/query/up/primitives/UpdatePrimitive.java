@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 
 /**
  * Abstract XQuery Update Primitive.
@@ -57,11 +58,11 @@ public abstract class UpdatePrimitive {
    * States which attributes are added to the attribute pool.
    * @return names of added attributes
    */
-  public byte[][] addAtt() { return null; };
+  public QNm[] addAtt() { return null; };
 
   /**
    * States which attributes are removed from the attribute pool.
    * @return names of removed attributes if target node is an attribute
    */
-  public byte[][] remAtt() { return null; };
+  public QNm[] remAtt() { return null; };
 }

@@ -91,11 +91,6 @@ public class Itr extends Item {
   }
 
   @Override
-  public final int hash() {
-    return (int) val;
-  }
-
-  @Override
   public final Object java() {
     // BigInteger and long are avoided to increase compatibility
     switch(type) {
@@ -113,6 +108,11 @@ public class Itr extends Item {
       default:
         return new BigInteger(Token.string(str()));
     }
+  }
+
+  @Override
+  public final int hashCode() {
+    return (int) val;
   }
 
   /**

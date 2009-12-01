@@ -71,12 +71,12 @@ public final class RenamePrimitive extends NewValue {
   }
 
   @Override
-  public byte[][] addAtt() {
-    return a ? new byte[][] { name.str() } : null;
+  public QNm[] addAtt() {
+    return a ? new QNm[] { name } : null;
   }
 
   @Override
-  public byte[][] remAtt() {
-    return a ? new byte[][] { node.nname() } : null;
+  public QNm[] remAtt() {
+    return a ? new QNm[] { node.qname() } : null;
   }
 }

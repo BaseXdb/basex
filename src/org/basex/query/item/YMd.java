@@ -93,13 +93,13 @@ public final class YMd extends Dur {
   }
 
   @Override
-  public int hash() {
-    return mon;
-  }
-
-  @Override
   public int diff(final Item it) throws QueryException {
     if(it.type != type) Err.cmp(it, this);
     return mon - ((Dur) it).mon;
+  }
+
+  @Override
+  public int hashCode() {
+    return mon;
   }
 }

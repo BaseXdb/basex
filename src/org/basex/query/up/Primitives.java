@@ -1,14 +1,17 @@
 package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.QNm;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
-import org.basex.util.ObjectMap;
+import org.basex.util.Atts;
 
 /**
  * Holds all update primitives for a specific data reference.
@@ -91,10 +94,21 @@ abstract class Primitives {
    * @param m map reference
    * @throws QueryException query exception
    */
-  protected static final void findDuplicates(final ObjectMap<Integer> m)
+  protected static final void findDuplicates(final Map<QNm, Integer> m)
       throws QueryException {
-    for(final byte[] s : m.keys()) {
-      if(m.get(s) > 1) Err.or(UPATTDUPL, s);
+
+    final Atts at = new Atts();
+    for(final QNm name : m.keySet()) {
+      if(m.get(name) > 1) Err.or(UPATTDUPL, name);
+
+      // [CG] namespace check still buggy (see {@link ReplacePrimitive}...
+      final byte[] an = name.pref();
+      final int ai = at.get(name.pref());
+      if(ai == -1) {
+        at.add(an, name.uri.str());
+      } else if(!eq(name.uri.str(), at.val[ai])) {
+        Err.or(UPNSCONFL2);
+      }
     }
   }
 
@@ -104,11 +118,11 @@ abstract class Primitives {
    * @param add increase if true
    * @param s string set
    */
-  protected static final void changeAttributePool(final ObjectMap<Integer> m,
-      final boolean add, final byte[]... s) {
+  protected static final void changeAttributePool(final Map<QNm, Integer> m,
+      final boolean add, final QNm... s) {
 
     if(s == null) return;
-    for(final byte[] st : s) {
+    for(final QNm st : s) {
       final Integer i = m.get(st);
       m.put(st, (i == null ? 0 : i) + (add ? 1 : -1));
     }

@@ -1,12 +1,14 @@
 package org.basex.query.up;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
+import org.basex.query.item.QNm;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.util.IntList;
-import org.basex.util.ObjectMap;
 
 /**
  * Holds all update primitives for a specific data reference.
@@ -72,7 +74,7 @@ final class DBPrimitives extends Primitives {
    * @throws QueryException query exception
    */
   private void findAttributeDuplicates(final int[] pres) throws QueryException {
-    final ObjectMap<Integer> m = new ObjectMap<Integer>();
+    final Map<QNm, Integer> m = new HashMap<QNm, Integer>();
     final IntList ats = new IntList();
     for(final int pre : pres) {
       // pres consists exclusively of element and attribute nodes
@@ -82,7 +84,8 @@ final class DBPrimitives extends Primitives {
       } else {
         addElementChanges(m, pre);
         for(int p = pre + 1; p < pre + d.attSize(pre, Data.ELEM); p++) {
-          if(!ats.contains(p)) changeAttributePool(m, true, d.attName(p));
+          if(!ats.contains(p))
+            changeAttributePool(m, true, new QNm(d.attName(p)));
         }
       }
     }
@@ -94,7 +97,7 @@ final class DBPrimitives extends Primitives {
    * @param m map reference
    * @param pre node pre value
    */
-  private void addElementChanges(final ObjectMap<Integer> m, final int pre) {
+  private void addElementChanges(final Map<QNm, Integer> m, final int pre) {
     final UpdatePrimitive[] ups = op.get(pre);
     if(ups == null) return;
     for(final UpdatePrimitive up : ups) {
@@ -121,7 +124,7 @@ final class DBPrimitives extends Primitives {
         // further down, hence increases its pre value by the number of
         // inserted nodes.
         if(pp.type() == PrimitiveType.INSERTBEFORE) {
-          add = ((NodeCopy) pp).m.meta.size;
+          add = ((NodeCopy) pp).md.meta.size;
         }
         pp.apply(add);
         // operations cannot be applied to a node which has been replaced

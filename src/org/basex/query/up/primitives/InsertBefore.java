@@ -24,12 +24,12 @@ public final class InsertBefore extends NodeCopy {
   @Override
   public void apply(final int add) {
     // source nodes may be empty, thus insert has no effect at all
-    if(m == null) return;
+    if(md == null) return;
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pos = n.pre;
 //    System.out.println(d.toString(180, -1);
-    d.insert(pos, d.parent(pos, Nod.kind(node.type)), m);
+    d.insert(pos, d.parent(pos, Nod.kind(node.type)), md);
 //    final int s = m.meta.size;
 //    System.out.println(d.toString(180, -1);
 //    if(!mergeTextNodes(d, pos + s - 1, pos + s))

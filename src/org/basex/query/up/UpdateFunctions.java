@@ -1,5 +1,6 @@
 package org.basex.query.up;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -13,6 +14,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
 
@@ -72,6 +74,27 @@ public final class UpdateFunctions {
     d.delete(b);
     return true;
   }
+  
+  /**
+   * Checks for namespace conflicts.
+   * @param aList attribute list
+   * @throws QueryException query exception
+   */
+  public static void checkNS(final NodIter aList) throws QueryException {
+    final Atts at = new Atts();
+    for(int a = 0; a < aList.size(); a++) {
+      final Nod n = aList.get(a);
+      if(n.type != Type.ATT) continue;
+      final QNm name = n.qname();
+      final byte[] an = name.pref();
+      int ai = at.get(name.pref());
+      if(ai == -1) {
+        at.add(an, name.uri.str());
+      } else if(!eq(name.uri.str(), at.val[ai])) {
+        Err.or(UPNSCONFL2);
+      }
+    }
+  }
 
   /**
    * Adds a set of attributes to a node.
@@ -106,7 +129,6 @@ public final class UpdateFunctions {
     int pre = 1;
     Nod n;
     while((n = ch.next()) != null) pre = addNode(n, md, pre, 0);
-    //System.out.println(md);
     return md;
   }
 
@@ -159,7 +181,14 @@ public final class UpdateFunctions {
         return p;
       case Data.ATTR:
         QNm q = nd.qname();
-        int u = q.uri.str().length != 0 ? Math.abs(md.ns.add(q.uri.str())) : 0;
+        byte[] uri = q.uri.str();
+        int u = 0;
+        if(uri.length != 0) {
+          u = md.ns.add(uri);
+          if(u > 0) md.ns.add(q.pref(), uri);
+          else u = Math.abs(u);
+          md.ns.open(md.meta.size);
+        }
         md.addAtt(md.atts.index(q.str(), null, false), u, nd.str(), pre - par);
         return pre + 1;
       case Data.PI:
@@ -170,15 +199,15 @@ public final class UpdateFunctions {
         md.addText(nd.str(), pre - par, k);
         return pre + 1;
       default:
-        final int s = md.meta.size;
         q = nd.qname();
         u = 0;
         if(par == 0) {
           final Atts ns = FElem.ns(nd);
           for(int a = 0; a < ns.size; a++) md.ns.add(ns.key[a], ns.val[a]);
         }
-        final boolean ne = md.ns.open(s);
-        u = q.uri.str().length != 0 ? Math.abs(md.ns.add(q.uri.str())) : 0;
+        final boolean ne = md.ns.open(md.meta.size);
+        uri = q.uri.str();
+        u = uri.length != 0 ? Math.abs(md.ns.add(uri)) : 0;
         md.addElem(md.tags.index(q.str(), null, false), u, pre - par,
             size(nd, true), size(nd, false), ne);
         ir = nd.attr();

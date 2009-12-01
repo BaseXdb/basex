@@ -109,11 +109,6 @@ public final class Dec extends Item {
   }
 
   @Override
-  public int hash() {
-    return val.intValue();
-  }
-
-  @Override
   public Object java() {
     switch(type) {
       case ULN:
@@ -121,6 +116,11 @@ public final class Dec extends Item {
       default:
         return val;
     }
+  }
+
+  @Override
+  public int hashCode() {
+    return val.intValue();
   }
 
   /**

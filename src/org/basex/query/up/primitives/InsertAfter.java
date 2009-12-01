@@ -25,15 +25,15 @@ public final class InsertAfter extends NodeCopy {
   @Override
   public void apply(final int add) {
     // source nodes may be empty, thus insert has no effect at all
-    if(m == null) return;
+    if(md == null) return;
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;
     final Data d = n.data;
     final int k = Nod.kind(node.type);
     // [LK] check if parent null?
-    d.insert(p + d.size(p, k), d.parent(p, k), m);
+    d.insert(p + d.size(p, k), d.parent(p, k), md);
     if(!mergeTextNodes(d, p - 1, p)) {
-      final int s = m.meta.size;
+      final int s = md.meta.size;
       mergeTextNodes(d, p + s - 1, p + s);
     }
   }

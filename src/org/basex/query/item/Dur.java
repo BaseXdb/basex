@@ -177,11 +177,6 @@ public class Dur extends Item {
   }
 
   @Override
-  public int hash() {
-    return (int) ((3 + mon) * (7 + sc.doubleValue()));
-  }
-
-  @Override
   public final boolean eq(final Item it) {
     final Dur d = (Dur) it;
     final double s1 = sc == null ? 0 : sc.doubleValue();
@@ -198,6 +193,11 @@ public class Dur extends Item {
   @Override
   public final Duration java() {
     return Date.df.newDuration(string(str()));
+  }
+
+  @Override
+  public int hashCode() {
+    return (int) ((3 + mon) * (7 + sc.doubleValue()));
   }
 
   @Override

@@ -82,11 +82,13 @@ public final class Replace extends Update {
           final byte[] uri = par.uri(name.pref(), ctx);
           if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
         }
-        ctx.updates.add(new ReplacePrimitive(targ, aList, true), ctx);
+
+        //checkNS(par, aList, ctx);
+        ctx.updates.add(new ReplacePrimitive(targ, aList), ctx);
       } else {
         // replace non-attribute node
         if(aList.size() > 0) Err.or(UPWRELM, i);
-        ctx.updates.add(new ReplacePrimitive(targ, cList, false), ctx);
+        ctx.updates.add(new ReplacePrimitive(targ, cList), ctx);
       }
     }
     return Seq.EMPTY;

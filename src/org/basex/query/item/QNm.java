@@ -152,6 +152,16 @@ public final class QNm extends Item {
   }
 
   @Override
+  public boolean equals(final Object o) {
+    return o instanceof QNm && eq((QNm) o);
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode();
+  }
+  
+  @Override
   public String toString() {
     return "\"" + string(val) + "\"";
   }

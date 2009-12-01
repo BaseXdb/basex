@@ -34,7 +34,7 @@ public final class ItemSet {
   public boolean index(final Item i) throws QueryException {
     if(size == next.length) rehash();
 
-    final int h = i.hash();
+    final int h = i.hashCode();
     final int p = h & bucket.length - 1;
     final boolean nan = i.n() && Double.isNaN(i.dbl());
     for(int id = bucket[p]; id != 0; id = next[id]) {

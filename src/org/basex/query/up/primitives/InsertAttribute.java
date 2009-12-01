@@ -3,6 +3,8 @@ package org.basex.query.up.primitives;
 import static org.basex.query.up.UpdateFunctions.*;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
+import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
 
 /**
@@ -23,9 +25,9 @@ public final class InsertAttribute extends NodeCopy {
 
   @Override
   public void apply(final int add) {
-    if(m == null) return;
+    if(md == null) return;
     final DBNode n = (DBNode) node;
-    insertAttributes(n.pre + 1, n.pre, n.data, m);
+    insertAttributes(n.pre + 1, n.pre, n.data, md);
   }
 
   @Override
@@ -39,9 +41,15 @@ public final class InsertAttribute extends NodeCopy {
   }
 
   @Override
-  public byte[][] addAtt() {
-    final byte[][] a = new byte[m.meta.size][];
-    for(int i = 0; i < m.meta.size; i++) a[i] = m.attName(i);
-    return a;
+  public QNm[] addAtt() {
+    // [CG] namespace check still buggy (see {@link ReplacePrimitive}...
+    final QNm[] at = new QNm[md.meta.size];
+    for(int i = 0; i < md.meta.size; i++) {
+      final byte[] nm = md.attName(i);
+      final int j = md.ns.uri(nm);
+      at[i] = new QNm(md.attName(i));
+      if(j != 0) at[i].uri = Uri.uri(md.ns.key(j));
+    }
+    return at;
   }
 }

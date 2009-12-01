@@ -92,7 +92,8 @@ public final class Insert extends Update {
         final byte[] uri = targ.uri(name.pref(), ctx);
         if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
       }
-      
+
+      //checkNS(targ, aList, ctx);
       up = new InsertAttribute(targ, aList);
       ctx.updates.add(up, ctx);
     }

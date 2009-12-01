@@ -70,12 +70,12 @@ public final class Group extends Expr {
         next = group.item(i);
         if(next == null)
           continue;
-        if(groups.containsKey(next.hash())) {
-          final int[] items = groups.get(next.hash());
-          groups.put(next.hash(), merge(items, i));
+        if(groups.containsKey(next.hashCode())) {
+          final int[] items = groups.get(next.hashCode());
+          groups.put(next.hashCode(), merge(items, i));
         } else {
           final int[] vals = {i};
-          groups.put(next.hash(), vals);
+          groups.put(next.hashCode(), vals);
         }
       }
       return;
