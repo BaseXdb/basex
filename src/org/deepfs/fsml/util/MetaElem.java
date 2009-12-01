@@ -335,9 +335,9 @@ public enum MetaElem {
    * @param dataType the new xml data type to set for this metadata element.
    */
   void refineDataType(final Type dataType) {
-    if(!dataType.instance(dt)) Main.bug("Failed to refine the xml data type "
-        + "for the metadata element " + string(n) + " (invalid data type: "
-        + dataType + ")");
+    if(!dataType.instance(dt)) Main.notexpected("Failed to refine the xml " +
+        "data type " + "for the metadata element " + string(n)
+        + " (invalid data type: " + dataType + ")");
     else pdt = dataType;
   }
 

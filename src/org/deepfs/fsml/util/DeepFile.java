@@ -419,11 +419,10 @@ public class DeepFile {
       final Type dataType) {
     if(metaFinished || value.length == 0) return;
     if(e.equals(MetaElem.TYPE) | e.equals(MetaElem.FORMAT)) {
-      Main.bug(
-          "The metadata attributes " + MetaElem.TYPE + " and "
-          + MetaElem.FORMAT
-          + " must not be set by an addMetaElem() method." +
-          " Use setMetaType() and setFormat() instead.");
+      Main.debug("The metadata attributes " + MetaElem.TYPE + " and "
+          + MetaElem.FORMAT + " must not be set by an addMetaElem() method."
+          + " Use setMetaType() and setFormat() instead.");
+      return;
     }
     if(dataType != null) e.refineDataType(dataType);
     else e.reset();
@@ -462,9 +461,9 @@ public class DeepFile {
    * @param value string value as byte array.
    */
   public void addMeta(final MetaElem elem, final byte[] value) {
-    if(!elem.getType().instance(Type.STR)) Main.bug("Invalid data type for " +
+    if(!elem.getType().instance(Type.STR)) Main.debug("Invalid data type for " +
         "metadata element " + elem + " (string - as byte array).");
-    addMeta(elem, ParserUtil.checkUTF(value), null);
+    else addMeta(elem, ParserUtil.checkUTF(value), null);
   }
 
   /**
@@ -473,9 +472,9 @@ public class DeepFile {
    * @param value string value.
    */
   public void addMeta(final MetaElem elem, final String value) {
-    if(!elem.getType().instance(Type.STR)) Main.bug("Invalid data type for " +
+    if(!elem.getType().instance(Type.STR)) Main.debug("Invalid data type for " +
         "metadata element " + elem + " (string).");
-    addMeta(elem, ParserUtil.checkUTF(Token.token(value)), null);
+    else addMeta(elem, ParserUtil.checkUTF(Token.token(value)), null);
   }
 
   /**
@@ -484,10 +483,9 @@ public class DeepFile {
    * @param value integer value.
    */
   public void addMeta(final MetaElem elem, final short value) {
-    if(!elem.getType().instance(Type.SHR)) Main.bug("Invalid data type for " +
+    if(!elem.getType().instance(Type.SHR)) Main.debug("Invalid data type for " +
         "metadata element " + elem + " (short).");
-
-    addMeta(elem, Token.token(value), Type.SHR);
+    else addMeta(elem, Token.token(value), Type.SHR);
   }
 
   /**
@@ -496,9 +494,9 @@ public class DeepFile {
    * @param value integer value.
    */
   public void addMeta(final MetaElem elem, final int value) {
-    if(!elem.getType().instance(Type.ITR)) Main.bug("Invalid data type for " +
+    if(!elem.getType().instance(Type.ITR)) Main.debug("Invalid data type for " +
         "metadata element " + elem + " (int).");
-    addMeta(elem, Token.token(value), null);
+    else addMeta(elem, Token.token(value), null);
   }
 
   /**
@@ -507,9 +505,9 @@ public class DeepFile {
    * @param value long value.
    */
   public void addMeta(final MetaElem elem, final long value) {
-    if(!elem.getType().instance(Type.LNG)) Main.bug("Invalid data type for " +
+    if(!elem.getType().instance(Type.LNG)) Main.debug("Invalid data type for " +
         "metadata element " + elem + " (long).");
-    addMeta(elem, Token.token(value), Type.LNG);
+    else addMeta(elem, Token.token(value), Type.LNG);
   }
   
   /**
@@ -518,9 +516,9 @@ public class DeepFile {
    * @param value double value.
    */
   public void addMeta(final MetaElem elem, final double value) {
-    if(!elem.getType().instance(Type.DBL)) Main.bug("Invalid data type for " +
+    if(!elem.getType().instance(Type.DBL)) Main.debug("Invalid data type for " +
         "metadata element " + elem + " (double).");
-    addMeta(elem, Token.token(value), Type.DBL);
+    else addMeta(elem, Token.token(value), Type.DBL);
   }
 
   /**
@@ -529,9 +527,9 @@ public class DeepFile {
    * @param value duration value.
    */
   public void addMeta(final MetaElem elem, final Duration value) {
-    if(!elem.getType().instance(Type.DUR)) Main.bug("Invalid data type for " +
+    if(!elem.getType().instance(Type.DUR)) Main.debug("Invalid data type for " +
         "metadata element " + elem + " (date).");
-    addMeta(elem, Token.token(value.toString()), null);
+    else addMeta(elem, Token.token(value.toString()), null);
   }
 
   /**
@@ -543,11 +541,10 @@ public class DeepFile {
     Type t = elem.getType();
     QName st = xgc.getXMLSchemaType();
     if((t.instance(Type.DAT) && !st.equals(DatatypeConstants.DATE))
-        || (t.instance(Type.YEA) && !st.equals(DatatypeConstants.GYEAR))) {
+        || (t.instance(Type.YEA) && !st.equals(DatatypeConstants.GYEAR)))
       Main.debug("Invalid data type for metadata element "
           + elem + " (expected " + t + " got " + st.getLocalPart() + ").");
-    }
-    addMeta(elem, token(xgc.toXMLFormat()), null);
+    else addMeta(elem, token(xgc.toXMLFormat()), null);
   }
 
   /**
