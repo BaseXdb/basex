@@ -31,6 +31,10 @@ public enum MimeType {
   ICS("application/ics", "ics", FileType.CALENDAR),
   /** Java archive. */
   JAR("application/java-archive", "jar", FileType.ARCHIVE),
+  /** Java source file. */
+  JAVA("text/x-java-source", "java", FileType.TEXT),
+  /** Java source file (alternate MIME type). */
+  JAVA2("text/plain", "java", FileType.TEXT),
   /** JPG. */
   JPG("image/jpeg", "jpg", FileType.PICTURE),
   /** KML. */
