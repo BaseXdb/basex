@@ -8,12 +8,14 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
-import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
+import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
 
 /**
@@ -55,7 +57,6 @@ public final class Transform extends Arr {
     if(!expr[0].uses(Use.UPD, ctx) && !expr[0].v()) Err.or(UPEXPECT);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
-
     ctx.updating = u;
     return this;
   }
@@ -65,11 +66,11 @@ public final class Transform extends Arr {
     final int s = ctx.vars.size();
     final PendingUpdates tUpd = new PendingUpdates(true);
     for(final Let fo : copies) {
-      final Constr c = new Constr(ctx, fo.expr);
-      final int cs = c.children.size();
-      final int os = cs + c.ats.size();
-      if(os != 1) Err.or(UPCOPYMULT, this);
-      final Data m = UpdateFunctions.buildDB(cs > 0 ? c.children : c.ats, null);
+      final Iter ir = fo.expr.iter(ctx);
+      final Item i = ir.next();
+      if(i == null || !i.node() || ir.next() != null) Err.or(UPCOPYMULT, this);
+      final Data m = UpdateFunctions.buildDB(
+          new NodIter(new Nod[] { (Nod) i }, 1), null);
       ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());
       tUpd.addDataReference(m);
     }

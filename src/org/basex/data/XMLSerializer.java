@@ -29,6 +29,8 @@ public final class XMLSerializer extends Serializer {
   private final boolean xml;
   /** Indent flag. */
   private boolean indent;
+  /** Item flag. */
+  private boolean item;
 
   /**
    * Constructor.
@@ -176,6 +178,7 @@ public final class XMLSerializer extends Serializer {
     if(indent) print(' ');
     for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));
     indent = true;
+    item = true;
   }
 
   /**
@@ -231,6 +234,10 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void indent(final boolean close) throws IOException {
+    if(item) {
+      item = false;
+      return;
+    }
     print(NL);
     final int s = level() + (close ? 1 : 0);
     for(int l = 1; l < s; l++) print(INDENT);

@@ -4,6 +4,7 @@ import static org.basex.query.up.UpdateFunctions.*;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Type;
 
 /**
  * Delete primitive.
@@ -12,16 +13,12 @@ import org.basex.query.item.Nod;
  * @author Lukas Kircher
  */
 public final class DeletePrimitive extends UpdatePrimitive {
-  /** Target node is an attribute. */
-  final boolean a;
-
   /**
    * Constructor.
    * @param n expression target node
    */
   public DeletePrimitive(final Nod n) {
     super(n);
-    a = Nod.kind(n.type) == Data.ATTR;
   }
 
   @Override
@@ -40,6 +37,6 @@ public final class DeletePrimitive extends UpdatePrimitive {
 
   @Override
   public byte[][] remAtt() {
-    return a ? new byte[][] { node.nname() } : null;
+    return node.type == Type.ATT ? new byte[][] { node.nname() } : null;
   }
 }

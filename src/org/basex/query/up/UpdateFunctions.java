@@ -6,6 +6,7 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.FElem;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
@@ -14,7 +15,6 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 
 /**
  * XQuery Update update functions.
@@ -29,8 +29,7 @@ public final class UpdateFunctions {
   private UpdateFunctions() { }
 
   /**
-   * Merges all adjacent text nodes in the given sequence. The given iterator
-   * must contain
+   * Merges all adjacent text nodes in the given sequence.
    * @param n iterator
    * @return iterator with merged text nodes
    */
@@ -52,36 +51,6 @@ public final class UpdateFunctions {
     }
     return s;
   }
-
-  /*
-   * Blabooo.
-   * @param at ?
-   * @param r ?
-   * @param m ?
-   * @return ?
-  public static boolean checkAttNames(final NodIter at, final NodIter r,
-      final String m) {
-    final Set<String> s = new HashSet<String>();
-    Nod n = at.next();
-
-    while(n != null) {
-      s.add(string(n.nname()));
-      n = at.next();
-    }
-
-    n = r.next();
-    while(n != null) {
-      final String t = string(n.nname());
-      final boolean b = s.add(t);
-      if(!b) {
-        if(m == null) return false;
-        if(!t.equals(m)) return false;
-      }
-      n = r.next();
-    }
-    return true;
-  }
-   */
 
   /**
    * Merges two adjacent text nodes in a database. The two node arguments must
@@ -136,7 +105,8 @@ public final class UpdateFunctions {
 
     int pre = 1;
     Nod n;
-    while((n = ch.next()) != null) pre = addFragment(n, md, pre, 0);
+    while((n = ch.next()) != null) pre = addNode(n, md, pre, 0);
+    //System.out.println(md);
     return md;
   }
 
@@ -166,7 +136,7 @@ public final class UpdateFunctions {
   }
 
   /**
-   * Adds a fragment to a data instance.
+   * Adds a fragment to a database instance.
    * Document nodes are ignored.
    * @param nd node to be added
    * @param md data reference
@@ -175,56 +145,47 @@ public final class UpdateFunctions {
    * @return pre value of next node
    * @throws QueryException query exception
    */
-  private static int addFragment(final Nod nd, final MemData md,
+  private static int addNode(final Nod nd, final MemData md,
       final int pre, final int par) throws QueryException {
 
     final int k = Nod.kind(nd.type);
     switch(k) {
+      case Data.DOC:
+        md.addDoc(nd.base(), size(nd, false));
+        int p = pre + 1;
+        NodeIter ir = nd.child();
+        Nod i;
+        while((i = ir.next()) != null) p = addNode(i, md, p, pre);
+        return p;
       case Data.ATTR:
-        QNm qn = nd.qname();
-        int uri = Math.abs(md.ns.add(qn.uri.str()));
-        md.addAtt(md.atts.index(qn.str(), null, false), uri,
-            nd.str(), pre - par);
+        QNm q = nd.qname();
+        int u = q.uri.str().length != 0 ? Math.abs(md.ns.add(q.uri.str())) : 0;
+        md.addAtt(md.atts.index(q.str(), null, false), u, nd.str(), pre - par);
         return pre + 1;
       case Data.PI:
-        final byte[] nm = nd.nname();
-        final byte[] vl = nd.str();
-        md.addText(vl.length == 0 ? nm : concat(nm, SPACE, vl), pre - par, k);
+        md.addText(trim(concat(nd.nname(), SPACE, nd.str())), pre - par, k);
         return pre + 1;
       case Data.TEXT:
       case Data.COMM:
         md.addText(nd.str(), pre - par, k);
         return pre + 1;
       default:
-        int s = md.meta.size;
-        boolean ne = false;
+        final int s = md.meta.size;
+        q = nd.qname();
+        u = 0;
         if(par == 0) {
-          final TokenList nsp = new TokenList();
-          Nod n = nd;
-          do {
-            final Atts nns = n.ns();
-            for(int a = nns.size - 1; a >= 0; a--) {
-              final byte[] key = nns.key[a];
-              if(nsp.contains(key)) continue;
-              nsp.add(key);
-              md.ns.add(key, nns.val[a]);
-            }
-            n = n.parent();
-          } while(n != null && n.type == Type.ELM);
-          ne = nsp.size() != 0;
-          if(ne) md.ns.open(s);
+          final Atts ns = FElem.ns(nd);
+          for(int a = 0; a < ns.size; a++) md.ns.add(ns.key[a], ns.val[a]);
         }
-        qn = nd.qname();
-        ne |= qn.uri.str().length != 0;
-        uri = ne ? Math.abs(md.ns.add(qn.uri.str())) : 0;
-        md.addElem(md.tags.index(qn.str(), null, false),
-            uri, pre - par, size(nd, true), size(nd, false), ne);
-        NodeIter ir = nd.attr();
-        Nod i;
-        int p = pre + 1;
-        while((i = ir.next()) != null) p = addFragment(i, md, p, pre);
+        final boolean ne = md.ns.open(s);
+        u = q.uri.str().length != 0 ? Math.abs(md.ns.add(q.uri.str())) : 0;
+        md.addElem(md.tags.index(q.str(), null, false), u, pre - par,
+            size(nd, true), size(nd, false), ne);
+        ir = nd.attr();
+        p = pre + 1;
+        while((i = ir.next()) != null) p = addNode(i, md, p, pre);
         ir = nd.child();
-        while((i = ir.next()) != null) p = addFragment(i, md, p, pre);
+        while((i = ir.next()) != null) p = addNode(i, md, p, pre);
         return p;
     }
   }

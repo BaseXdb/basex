@@ -9,7 +9,6 @@ import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenList;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -143,27 +142,16 @@ public final class FElem extends FNode {
 
     // serialize all namespaces at top level...
     if(ser.level() == 1) {
-      final TokenList nsp = new TokenList();
-      Nod node = this;
-      do {
-        final Atts nns = node.ns();
-        for(int a = nns.size - 1; a >= 0; a--) {
-          final byte[] key = nns.key[a];
-          // namespace has already been serialized
-          if(nsp.contains(key)) continue;
-          nsp.add(key);
-
-          final byte[] val = nns.val[a];
-          if(key.length == 0) {
-            xmlns = true;
-            if(Token.eq(ser.dn, val)) continue;
-            // reset default namespace
-            ser.dn = val;
-          }
-          ser.namespace(key, val);
+      final Atts nns = ns(this);
+      for(int a = 0; a < nns.size; a++) {
+        if(nns.key[a].length == 0) {
+          xmlns = true;
+          if(Token.eq(ser.dn, nns.val[a])) continue;
+          // reset default namespace
+          ser.dn = nns.val[a];
         }
-        node = node.parent();
-      } while(node instanceof FElem);
+        ser.namespace(nns.key[a], nns.val[a]);
+      }
 
       // serialize default namespace if not done yet
       for(int p = ser.ns.size - 1; p >= 0 && !xmlns; p--) {
@@ -210,6 +198,26 @@ public final class FElem extends FNode {
     ser.dn = dn;
   }
 
+  /**
+   * Returns the namespace hierarchy for the specified node.
+   * @param node input node
+   * @return namespaces
+   */
+  public static Atts ns(final Nod node) {
+    final Atts ns = new Atts();
+    Nod n = node;
+    do {
+      final Atts nns = n.ns();
+      for(int a = nns.size - 1; a >= 0; a--) {
+        final byte[] key = nns.key[a];
+        if(ns.contains(key)) continue;
+        ns.add(key, nns.val[a]);
+      }
+      n = n.parent();
+    } while(n != null && n.type == Type.ELM);
+    return ns;
+  }
+  
   @Override
   public FElem copy() {
     final NodIter ch = new NodIter();

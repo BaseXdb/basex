@@ -8,7 +8,6 @@ import org.basex.query.expr.Return;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
-import org.basex.util.Token;
 
 /**
  * Stores a sequence type definition.
@@ -44,10 +43,11 @@ public final class SeqType {
   public boolean instance(final Iter iter) throws QueryException {
     Item it = iter.next();
     if(it == null) return type == Type.EMP || occ % 2 != 0;
-    if(occ < 2) return iter.next() == null && it.type.instance(type);
+    if(occ < 2) return iter.next() == null && it.type.instance(type) &&
+      checkInstance(it);
 
     do {
-      if(!it.type.instance(type)) return false;
+      if(!it.type.instance(type) || !checkInstance(it)) return false;
     } while((it = iter.next()) != null);
     return true;
   }
@@ -121,18 +121,17 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   private Item check(final Item it) throws QueryException {
-    if(ext != null) {
-      switch(type) {
-        case PI:
-          if(!Token.eq(ext.str(), ((Nod) it).nname()))
-              Err.or(XPCAST, it.type, ext);
-          break;
-        // [CG] XQuery/check other types
-        default:
-      }
-      //Err.cast(type, item);
-    }
+    if(!checkInstance(it)) Err.or(XPCAST, it.type, ext);
     return it;
+  }
+
+  /**
+   * Checks the sequence extension.
+   * @param it item
+   * @return same item
+   */
+  private boolean checkInstance(final Item it) {
+    return ext == null || ext.eq(((Nod) it).qname());
   }
 
   /**

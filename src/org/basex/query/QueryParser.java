@@ -2030,8 +2030,10 @@ public class QueryParser extends InputParser {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx);
       if(!eq(test.uri.str(), XSURI)) error(TESTINVALID, t, test);
       nm = trim(substring(nm, 0, i));
+      final byte[] ln = test.ln();
+      if(!eq(ln, ANYTYPE) && !eq(ln, ANYSIMPLE) && !eq(ln, UNTYPED) &&
+          !eq(ln, UNATOMIC)) return new QNm(EMPTY);
     }
-
     return (t == Type.ELM || t == Type.ATT) && nm.length == 1 && nm[0] == '*' ?
         null : new QNm(nm, ctx);
   }

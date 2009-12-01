@@ -3,7 +3,6 @@ package org.basex.query.up;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CComm;
@@ -14,6 +13,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.ReplaceElemContent;
@@ -54,15 +54,15 @@ public final class Replace extends Update {
     Item i = t.next();
     // check target constraints
     if(i == null) Err.or(UPSEQEMP, i);
-    final int k = Nod.kind(i.type);
-    if(!(i instanceof Nod) || k == Data.DOC || t.next() != null)
+    final Type type = i.type;
+    if(!(i instanceof Nod) || type == Type.DOC || t.next() != null)
       Err.or(UPTRGMULT, i);
     final Nod n = (Nod) i;
 
     // replace node
     if(!value) {
       if(n.parent() == null) Err.or(UPNOPAR, i);
-      if(k != Data.ATTR) {
+      if(type != Type.ATT) {
         // replace non-attribute node
         if(aSeq.size() > 0) Err.or(UPWRELM, i);
         ctx.updates.add(new ReplacePrimitive(n, seq, false), ctx);
@@ -76,9 +76,9 @@ public final class Replace extends Update {
     } else {
       // replace value of node
       final byte[] txt = seq.size() < 1 ? EMPTY : seq.get(0).str();
-      if(k == Data.COMM) CComm.check(txt);
-      if(k == Data.PI) CPI.check(txt);
-      ctx.updates.add(k == Data.ELEM ? new ReplaceElemContent(n, txt) :
+      if(type == Type.COM) CComm.check(txt);
+      if(type == Type.PI) CPI.check(txt);
+      ctx.updates.add(type == Type.ELM ? new ReplaceElemContent(n, txt) :
         // [LK] rewritten to pass on QNm - probably wrong for comments etc.
         new ReplaceValue(n, new QNm(txt)), ctx);
     }

@@ -697,8 +697,8 @@ public abstract class Data {
 
   @Override
   public String toString() {
-    return string(InfoTable.table(this, 0, meta.size));
-    //return string(InfoTable.table(this, 0, meta.size)) + ns.toString();
+    //return string(InfoTable.table(this, 0, meta.size));
+    return ns + string(InfoTable.table(this, 0, meta.size));
   }
 
   /**

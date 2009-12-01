@@ -357,6 +357,17 @@ public interface QueryTokens {
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
 
+  // TYPES ====================================================================
+
+  /** AnyType. */
+  byte[] ANYTYPE = token("anyType");
+  /** AnySimpleType. */
+  byte[] ANYSIMPLE = token("anySimpleType");
+  /** Untyped. */
+  byte[] UNTYPED = token("untyped");
+  /** Untyped. */
+  byte[] UNATOMIC = token("untypedAtomic");
+
   // PREFIXES =================================================================
 
   /** Base token. */

@@ -334,7 +334,7 @@ public class AxisPath extends Path {
       for(int p = 0; p < stp.pred.length; p++) {
         final IndexContext ic = new IndexContext(ctx, data, stp, d);
         if(!stp.pred[p].indexAccessible(ic)) continue;
-        
+
         if(ic.is == 0) {
           if(ic.not) {
             // not operator... accept all results
@@ -422,15 +422,22 @@ public class AxisPath extends Path {
     final Item c = ctx.item;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-
-    final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
+    Item it = root != null ? ctx.iter(root).finish() : c;
 
     if(!cache || citer == null || litem.type != Type.DOC ||
         it.type != Type.DOC || !((Nod) litem).is((Nod) it)) {
       litem = it;
-      ctx.item = it;
       citer = new NodIter();
-      iter(0, citer, ctx);
+      if(it != null && it.size(ctx) != 1) {
+        final Iter ir = it.iter(ctx);
+        while((it = ir.next()) != null) {
+          ctx.item = it;
+          iter(0, citer, ctx);
+        }
+      } else {
+        ctx.item = it;
+        iter(0, citer, ctx);
+      }
       citer.sort(true);
     } else {
       citer.reset();

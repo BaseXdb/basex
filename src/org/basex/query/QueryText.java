@@ -511,8 +511,8 @@ public interface QueryText {
   Object[] UPCONFNS = { XUDY, 24, "Namespace conflicts." };
   */
   /** XUDY0027: XQuery Update dynamic exception. */
-  Object[] UPSEQEMP = { XUDY, 27, 
-      "Update expression yields no single target node." };
+  Object[] UPSEQEMP = { XUDY, 27,
+      "Target expression yields an empty sequence." };
   /** XUDY0029: XQuery Update dynamic exception. */
   Object[] UPPAREMPTY = { XUDY, 29, "Target has no parent node." };
   /** XUDY0030: XQuery Update dynamic exception. */
