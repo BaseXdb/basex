@@ -283,7 +283,7 @@ public abstract class W3CTS {
     bw.write("===============================================================");
     bw.close();
 
-    bw = new BufferedWriter(new FileWriter(pathhis, true));
+    bw = new BufferedWriter(new FileWriter(path + pathhis, true));
     bw.write(dat + "\t" + ok + "\t" + ok2 + "\t" + err + "\t" + err2 + NL);
     bw.close();
 

@@ -301,7 +301,7 @@ ds_sessions=Sessions
 # Commands & Processes
 proc_time=Time Needed
 proc_syntax=Syntax
-proc_err=Could not execute '%'
+proc_err=Could not execute %
 proc_nodb=No database opened.
 proc_mm=Command is not available in main memory mode.
 proc_outmem=Out of Main Memory.\nThe following hints might help you:\n- increase Java's heap size with the flag -Xmx<size>\n- choose the internal XML parser in the GUI or via 'set intparse on'\n- deactivate the text and attribute indexes

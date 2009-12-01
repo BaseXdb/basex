@@ -183,10 +183,13 @@ public abstract class Main {
    * @return dummy object
    */
   public static String bug(final Object... ext) {
-    final TokenBuilder sb = new TokenBuilder(
-        "Bug? Please send to " + MAIL);
-    if(ext.length != 0) sb.add(" (%)", ext);
-    return sb.toString();
+    final TokenBuilder tb = new TokenBuilder(
+        "Possible bug? Feedback is welcome: " + MAIL);
+    if(ext.length != 0) {
+      tb.add(NL + NAME + ' ' + VERSION + COLS + NL);
+      for(final Object e : ext) tb.add(e + NL);
+    }
+    return tb.toString();
   }
 
   /**

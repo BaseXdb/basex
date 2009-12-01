@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.up.primitives.PrimitiveType.*;
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
@@ -63,7 +62,7 @@ public final class RenamePrimitive extends NewValue {
 
   @Override
   public PrimitiveType type() {
-    return RENAME;
+    return PrimitiveType.RENAME;
   }
 
   @Override

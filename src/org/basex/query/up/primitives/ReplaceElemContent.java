@@ -28,9 +28,6 @@ public final class ReplaceElemContent extends UpdatePrimitive {
   }
 
   @Override
-  public void prepare() { }
-
-  @Override
   public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final int p = n.pre + add;

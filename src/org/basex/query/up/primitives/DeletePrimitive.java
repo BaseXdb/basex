@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.up.UpdateFunctions.*;
-import static org.basex.query.up.primitives.PrimitiveType.*;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -26,9 +25,6 @@ public final class DeletePrimitive extends UpdatePrimitive {
   }
 
   @Override
-  public void prepare() { }
-
-  @Override
   public void apply(final int add) {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
@@ -39,11 +35,7 @@ public final class DeletePrimitive extends UpdatePrimitive {
 
   @Override
   public PrimitiveType type() {
-    return DELETE;
-  }
-
-  @Override
-  public void merge(final UpdatePrimitive p) {
+    return PrimitiveType.DELETE;
   }
 
   @Override

@@ -28,12 +28,6 @@ public abstract class UpdatePrimitive {
   public abstract PrimitiveType type();
 
   /**
-   * Prepares the update.
-   * @throws QueryException query exception
-   */
-  public abstract void prepare() throws QueryException;
-
-  /**
    * Applies the update operation represented by this primitive to the
    * database. If an 'insert before' primitive is applied to a target node t,
    * the pre value of t changes. Thus the number of inserted nodes is added to
@@ -44,12 +38,20 @@ public abstract class UpdatePrimitive {
   public abstract void apply(final int add) throws QueryException;
 
   /**
+   * Prepares the update.
+   * @throws QueryException query exception
+   */
+  @SuppressWarnings("unused")
+  public void prepare() throws QueryException { }
+
+  /**
    * Merges if possible two update primitives of the same type if they have the
    * same target node.
    * @param p primitive to be merged with
    * @throws QueryException query exception
    */
-  public abstract void merge(final UpdatePrimitive p) throws QueryException;
+  @SuppressWarnings("unused")
+  public void merge(final UpdatePrimitive p) throws QueryException { }
 
   /**
    * States which attributes are added to the attribute pool.

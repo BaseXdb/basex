@@ -302,7 +302,7 @@ ds_sessions=Sessions
 # Commands & Processes
 proc_time=所要時間
 proc_syntax=文法
-proc_err='%'を実行できませんでした。
+proc_err=%を実行できませんでした。
 proc_nodb=メモリー上にデータベースはありません。
 proc_mm=メインメモリモードでは（この？）コマンドは使用できません。
 proc_outmem=メモリー不足。\n以下のヒントが役に立つかもしれません。\n- -Xmx<サイズ>を使うことで、Javaのヒープサイズを増やすことが出来ます。\n- BaseXの内部XMLパーサーに 'set intparse on' を設定してみて下さい。 \n- いくつかのインデックスを無効にすることによりメモリーを節約できます。

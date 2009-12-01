@@ -59,15 +59,14 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  public void addElem(final int tok, final int s, final int dis,
-      final int a, final boolean n) throws IOException {
+  public void addElem(final int tok, final int s, final int dis, final int a,
+      final boolean n) throws IOException {
     data.addElem(tok, s, dis, a, a, n);
     if(data.meta.size < 0) throw new IOException(LIMITRANGE);
   }
 
   @Override
-  public void addAttr(final int n, final int s, final byte[] v,
-      final int d) {
+  public void addAttr(final int n, final int s, final byte[] v, final int d) {
     data.addAtt(n, s, v, d);
   }
 

@@ -170,7 +170,7 @@ final class NSNode {
     print(tb, 0, ns);
     return tb.toString();
   }
-  
+
   /**
    * Prints the node structure for debugging purposes.
    * @param tb string builder

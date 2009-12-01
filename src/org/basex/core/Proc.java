@@ -104,8 +104,14 @@ public abstract class Proc extends Progress {
       Main.debug(ex);
       abort();
       if(ex instanceof OutOfMemoryError) return error(PROCOUTMEM);
+      // [CG] shouldn't occur here anymore..
       if(ex instanceof IOException) return error(ex.getMessage());
-      return error(PROCERR, this, ex.toString());
+
+      final Object[] st = ex.getStackTrace();
+      final Object[] obj = new Object[st.length + 1];
+      obj[0] = ex.toString();
+      System.arraycopy(st, 0, obj, 1, st.length);
+      return error(Main.bug(obj));
     }
     return ok;
   }

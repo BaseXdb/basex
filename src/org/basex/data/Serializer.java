@@ -300,9 +300,9 @@ public abstract class Serializer {
         // add namespace definitions
         byte[] empty = names[l];
         if(nsp != null) {
+          // collect namespaces from database
           nsp.reset();
           int pp = p;
-          // collect namespaces from database
           do {
             final int[] nm = data.ns(pp);
             for(int n = 0; n < nm.length; n += 2) {
@@ -314,9 +314,9 @@ public abstract class Serializer {
                 if(key.length == 0) empty = val;
               }
             }
-            pp = data.parent(pp, k);
-            k = data.kind(pp);
-          } while(k == Data.ELEM && l == 0 && tags.size() == 1);
+            pp = data.parent(pp, data.kind(pp));
+          } while(pp >= 0 && data.kind(pp) == Data.ELEM &&
+              l == 0 && tags.size() == 1);
 
           // check namespace of current element
           final byte[] key = pref(name);

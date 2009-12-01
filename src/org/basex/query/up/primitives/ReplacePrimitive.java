@@ -2,7 +2,6 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.UpdateFunctions.*;
-import static org.basex.query.up.primitives.PrimitiveType.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -54,7 +53,7 @@ public final class ReplacePrimitive extends NodeCopy {
 
   @Override
   public PrimitiveType type() {
-    return REPLACENODE;
+    return PrimitiveType.REPLACENODE;
   }
 
   @Override

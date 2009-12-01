@@ -12,6 +12,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
@@ -53,7 +54,7 @@ public final class UpdateFunctions {
     }
     return s;
   }
-  
+
   /**
    * Blabooo.
    * @param at ?
@@ -168,39 +169,43 @@ public final class UpdateFunctions {
 
   /**
    * Adds a fragment to a data instance.
-   * @param n node to be added
+   * @param nd node to be added
    * @param m data reference
    * @param pre node position
    * @param par node parent
    * @return pre value of next node
    * @throws QueryException query exception
    */
-  private static int addFragment(final Nod n, final MemData m,
+  private static int addFragment(final Nod nd, final MemData m,
       final int pre, final int par) throws QueryException {
 
-    final int k = Nod.kind(n.type);
+    final int k = Nod.kind(nd.type);
     switch(k) {
       case Data.ATTR:
-        m.addAtt(m.atts.index(n.nname(), null, false), 0, n.str(), pre - par);
+        QNm n = nd.qname();
+        int uri = Math.abs(m.ns.add(n.uri.str()));
+        m.addAtt(m.atts.index(n.str(), null, false), uri, nd.str(), pre - par);
         return pre + 1;
       case Data.PI:
-        final byte[] nm = n.nname();
-        final byte[] vl = n.str();
+        final byte[] nm = nd.nname();
+        final byte[] vl = nd.str();
         m.addText(vl.length == 0 ? nm : concat(nm, SPACE, vl), pre - par, k);
         return pre + 1;
       case Data.TEXT:
       case Data.COMM:
-        m.addText(n.str(), pre - par, k);
+        m.addText(nd.str(), pre - par, k);
         return pre + 1;
       default:
         // no document nodes will occur at this point..
-        m.addElem(m.tags.index(n.nname(), null, false),
-            0, pre - par, size(n, true), size(n, false), false);
-        NodeIter ir = n.attr();
+        n = nd.qname();
+        uri = Math.abs(m.ns.add(n.uri.str()));
+        m.addElem(m.tags.index(n.str(), null, false),
+            uri, pre - par, size(nd, true), size(nd, false), false);
+        NodeIter ir = nd.attr();
         Nod i;
         int p = pre + 1;
         while((i = ir.next()) != null) p = addFragment(i, m, p, pre);
-        ir = n.child();
+        ir = nd.child();
         while((i = ir.next()) != null) p = addFragment(i, m, p, pre);
         return p;
     }

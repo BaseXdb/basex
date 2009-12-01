@@ -177,8 +177,8 @@ public final class Namespaces extends TokenSet {
   public void add(final byte[] p, final byte[] u, final int pre) {
     final int k = Math.abs(add(p));
     final int v = Math.abs(add(u));
-    NSNode nd = root.find(pre);
-    
+    final NSNode nd = root.find(pre);
+
     if(nd.pre != pre) {
       final NSNode t = new NSNode();
       t.pre = pre;

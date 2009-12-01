@@ -48,16 +48,8 @@ public final class Put extends UpdatePrimitive {
   }
 
   @Override
-  public void prepare() {
-  }
-
-  @Override
   public PrimitiveType type() {
     return PrimitiveType.PUT;
-  }
-
-  @Override
-  public void merge(final UpdatePrimitive p) {
   }
 
   /**
