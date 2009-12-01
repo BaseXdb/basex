@@ -83,20 +83,17 @@ public final class Insert extends Update {
 
     UpdatePrimitive up = null;
     if(aList.size() > 0) {
-      final Nod tar = before || after ? par : n;
-      if(tar.type != Type.ELM)
+      final Nod targ = before || after ? par : n;
+      if(targ.type != Type.ELM)
         Err.or(before || after ? UPATTELM : UPATTELM2, this);
-
-      //if(!UpdateFunctions.checkAttNames(tar.attr(), aSeq, null))
-      //Err.or(UPATTDUPL, tar.nname());
 
       for(int a = 0; a < aList.size(); a++) {
         final QNm name = aList.get(a).qname();
-        final byte[] uri = tar.uri(name.pref(), ctx);
-        if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPCONFNS);
+        final byte[] uri = targ.uri(name.pref(), ctx);
+        if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
       }
       
-      up = new InsertAttribute(tar, aList);
+      up = new InsertAttribute(targ, aList);
       ctx.updates.add(up, ctx);
     }
 

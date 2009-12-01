@@ -59,16 +59,16 @@ public final class Rename extends Update {
 
     // check namespace conflicts...
     final QNm name = ex.atomic(ctx).qname();
-    final Nod tar = (Nod) i;
-    final Nod test = i.type == Type.ELM ? tar :
-      i.type == Type.ATT ? tar.parent() : null;
+    final Nod targ = (Nod) i;
+    final Nod test = i.type == Type.ELM ? targ :
+      i.type == Type.ATT ? targ.parent() : null;
 
     if(test != null) {
       final byte[] uri = test.uri(name.pref(), ctx);
-      if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPCONFNS);
+      if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
     }
 
-    ctx.updates.add(new RenamePrimitive(tar, name), ctx);
+    ctx.updates.add(new RenamePrimitive(targ, name), ctx);
     return Seq.EMPTY;
   }
 

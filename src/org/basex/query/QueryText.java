@@ -506,7 +506,7 @@ public interface QueryText {
   /** XUDY0021: XQuery Update dynamic exception. */
   Object[] UPATTDUPL = { XUDY, 21, "Duplicate attribute \"%\"." };
   /** XUDY0023: XQuery Update dynamic exception. */
-  Object[] UPCONFNS = { XUDY, 23, "Conflicts with existing namespaces." };
+  Object[] UPNSCONFL = { XUDY, 23, "Conflicts with existing namespaces." };
   /** XUDY0024: XQuery Update dynamic exception.
   Object[] UPCONFNS = { XUDY, 24, "Namespace conflicts." };
   */

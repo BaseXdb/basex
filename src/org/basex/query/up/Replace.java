@@ -3,6 +3,7 @@ package org.basex.query.up;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CComm;
@@ -45,8 +46,8 @@ public final class Replace extends Update {
   @Override
   public Seq atomic(final QueryContext ctx) throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
-    final NodIter seq = c.children;
-    final NodIter aSeq = c.ats;
+    final NodIter cList = c.children;
+    final NodIter aList = c.ats;
     if(c.errAtt) Err.or(UPNOATTRPER);
     if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
 
@@ -57,30 +58,36 @@ public final class Replace extends Update {
     final Type type = i.type;
     if(!(i instanceof Nod) || type == Type.DOC || t.next() != null)
       Err.or(UPTRGMULT, i);
-    final Nod n = (Nod) i;
+    final Nod targ = (Nod) i;
 
     // replace node
-    if(!value) {
-      if(n.parent() == null) Err.or(UPNOPAR, i);
-      if(type != Type.ATT) {
-        // replace non-attribute node
-        if(aSeq.size() > 0) Err.or(UPWRELM, i);
-        ctx.updates.add(new ReplacePrimitive(n, seq, false), ctx);
-      } else {
-        // replace attribute node
-        if(seq.size() > 0) Err.or(UPWRATTR, i);
-//        if(!UpdateFunctions.checkAttNames(p.attr(), aSeq, string(n.nname())))
-//          Err.or(UPATTDUPL, n.nname());
-        ctx.updates.add(new ReplacePrimitive(n, aSeq, true), ctx);
-      }
-    } else {
+    if(value) {
       // replace value of node
-      final byte[] txt = seq.size() < 1 ? EMPTY : seq.get(0).str();
+      final byte[] txt = cList.size() < 1 ? EMPTY : cList.get(0).str();
       if(type == Type.COM) CComm.check(txt);
       if(type == Type.PI) CPI.check(txt);
-      ctx.updates.add(type == Type.ELM ? new ReplaceElemContent(n, txt) :
+
+      ctx.updates.add(type == Type.ELM ? new ReplaceElemContent(targ, txt) :
         // [LK] rewritten to pass on QNm - probably wrong for comments etc.
-        new ReplaceValue(n, new QNm(txt)), ctx);
+        new ReplaceValue(targ, new QNm(txt)), ctx);
+    } else {
+      final Nod par = targ.parent();
+      if(par == null) Err.or(UPNOPAR, i);
+      if(type == Type.ATT) {
+        // replace attribute node
+        if(cList.size() > 0) Err.or(UPWRATTR, i);
+
+        for(int a = 0; a < aList.size(); a++) {
+          final QNm name = aList.get(a).qname();
+          final byte[] uri = par.uri(name.pref(), ctx);
+          if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
+        }
+        ctx.updates.add(new ReplacePrimitive(targ, aList, true), ctx);
+      } else {
+        // replace non-attribute node
+        if(aList.size() > 0) Err.or(UPWRELM, i);
+        ctx.updates.add(new ReplacePrimitive(targ, cList, false), ctx);
+      }
     }
     return Seq.EMPTY;
   }
