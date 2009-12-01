@@ -735,19 +735,25 @@ public final class ExifParser {
     void metaSimple(final DeepFile d, final ByteBuffer b) {
       switch(format) {
         case BYTE:
-          final StringBuilder sbb = new StringBuilder();
-          for(int i = 0, max = count - 1; i < max; i++)
-            sbb.append(readByte(b)).append(", ");
-          sbb.append(readByte(b));
-          d.addMeta(elem, sbb.toString());
+          if(count == 1) d.addMeta(elem, readByte(b));
+          else {
+            final StringBuilder sbb = new StringBuilder();
+            for(int i = 0, max = count - 1; i < max; i++)
+              sbb.append(readByte(b)).append(", ");
+            sbb.append(readByte(b));
+            d.addMeta(elem, sbb.toString());
+          }
           break;
         case ASCII: d.addMeta(elem, readAscii(b)); break;
         case SHORT:
-          final StringBuilder sbs = new StringBuilder();
-          for(int i = 0, max = count - 1; i < max; i++)
-            sbs.append(readShort(b)).append(", ");
-          sbs.append(readShort(b));
-          d.addMeta(elem, sbs.toString());
+          if(count == 1) d.addMeta(elem, readShort(b));
+          else {
+            final StringBuilder sbs = new StringBuilder();
+            for(int i = 0, max = count - 1; i < max; i++)
+              sbs.append(readShort(b)).append(", ");
+            sbs.append(readShort(b));
+            d.addMeta(elem, sbs.toString());
+          }
           break;
         case LONG:  d.addMeta(elem, readLong(b));  break;
         case SLONG: d.addMeta(elem, readSLong(b)); break;
@@ -767,58 +773,76 @@ public final class ExifParser {
       try {
         switch(format) {
           case BYTE:
-            final StringBuilder sbb = new StringBuilder();
-            for(int i = 0, max = count - 1; i < max; i++)
-              sbb.append(readByte(b)).append(", ");
-            sbb.append(readByte(b));
-            d.addMeta(elem, sbb.toString());
+            if(count == 1) d.addMeta(elem, readByte(b));
+            else {
+              final StringBuilder sbb = new StringBuilder();
+              for(int i = 0, max = count - 1; i < max; i++)
+                sbb.append(readByte(b)).append(", ");
+              sbb.append(readByte(b));
+              d.addMeta(elem, sbb.toString());
+            }
             break;
           case ASCII:
             if(elem.getType().instance(Type.DTM)) d.addMeta(elem, readDate(b));
             else d.addMeta(elem, readAscii(b));
             break;
           case SHORT:
-            final StringBuilder sbs = new StringBuilder();
-            for(int i = 0, max = count - 1; i < max; i++)
-              sbs.append(readShort(b)).append(", ");
-            sbs.append(readShort(b));
-            d.addMeta(elem, sbs.toString());
+            if(count == 1) d.addMeta(elem, readShort(b));
+            else {
+              final StringBuilder sbs = new StringBuilder();
+              for(int i = 0, max = count - 1; i < max; i++)
+                sbs.append(readShort(b)).append(", ");
+              sbs.append(readShort(b));
+              d.addMeta(elem, sbs.toString());
+            }
             break;
           case LONG:
-            final StringBuilder sbl = new StringBuilder();
-            for(int i = 0, max = count - 1; i < max; i++)
-              sbl.append(readLong(b)).append(", ");
-            sbl.append(readLong(b));
-            d.addMeta(elem, sbl.toString());
+            if(count == 1) d.addMeta(elem, readLong(b));
+            else {
+              final StringBuilder sbl = new StringBuilder();
+              for(int i = 0, max = count - 1; i < max; i++)
+                sbl.append(readLong(b)).append(", ");
+              sbl.append(readLong(b));
+              d.addMeta(elem, sbl.toString());
+            }
             break;
           case RATIONAL:
-            final StringBuilder sbr = new StringBuilder();
-            for(int i = 0; i < count; i++) {
-              final double db = readRational(b);
-              final long rounded = Math.round(db);
-              if(rounded == db) sbr.append(rounded);
-              else sbr.append(db);
-              sbr.append(", ");
+            if(count == 1) d.addMeta(elem, readRational(b));
+            else {
+              final StringBuilder sbr = new StringBuilder();
+              for(int i = 0; i < count; i++) {
+                final double db = readRational(b);
+                final long rounded = Math.round(db);
+                if(rounded == db) sbr.append(rounded);
+                else sbr.append(db);
+                sbr.append(", ");
+              }
+              d.addMeta(elem, sbr.substring(0, sbr.length() - 2));
             }
-            d.addMeta(elem, sbr.substring(0, sbr.length() - 2));
             break;
           case SLONG:
-            final StringBuilder sbsl = new StringBuilder();
-            for(int i = 0, max = count - 1; i < max; i++)
-              sbsl.append(readSLong(b)).append(", ");
-            sbsl.append(readSLong(b));
-            d.addMeta(elem, sbsl.toString());
+            if(count == 1) d.addMeta(elem, readSLong(b));
+            else {
+              final StringBuilder sbsl = new StringBuilder();
+              for(int i = 0, max = count - 1; i < max; i++)
+                sbsl.append(readSLong(b)).append(", ");
+              sbsl.append(readSLong(b));
+              d.addMeta(elem, sbsl.toString());
+            }
             break;
           case SRATIONAL:
-            final StringBuilder sbsr = new StringBuilder();
-            for(int i = 0; i < count; i++) {
-              final double db = readSRational(b);
-              final long rounded = Math.round(db);
-              if(rounded == db) sbsr.append(rounded);
-              else sbsr.append(db);
-              sbsr.append(", ");
+            if(count == 1) d.addMeta(elem, readSRational(b));
+            else {
+              final StringBuilder sbsr = new StringBuilder();
+              for(int i = 0; i < count; i++) {
+                final double db = readSRational(b);
+                final long rounded = Math.round(db);
+                if(rounded == db) sbsr.append(rounded);
+                else sbsr.append(db);
+                sbsr.append(", ");
+              }
+              d.addMeta(elem, sbsr.substring(0, sbsr.length() - 2));
             }
-            d.addMeta(elem, sbsr.substring(0, sbsr.length() - 2));
             break;
           default:
             Main.debug("ExifParser: Unknown or unsupported field type for " +

@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -17,6 +16,7 @@ import org.deepfs.fsml.util.DeepFile;
 import org.deepfs.fsml.util.FileType;
 import org.deepfs.fsml.util.MetaElem;
 import org.deepfs.fsml.util.MimeType;
+import org.deepfs.fsml.util.ParserException;
 import org.deepfs.fsml.util.ParserRegistry;
 import org.deepfs.fsml.util.ParserUtil;
 
@@ -578,8 +578,9 @@ public final class MP3Parser implements IFileParser {
    * @return a byte array that contains only ASCII bytes that are valid integer
    *         numbers.
    * @throws IOException if any error occurs while reading the file.
+   * @throws ParserException if the track number could not be parsed.
    */
-  byte[] readTrack(final int s) throws IOException {
+  int readTrack(final int s) throws IOException, ParserException {
     final byte[] value = readText(s);
     final int size = value.length;
     int i = 0;
@@ -590,7 +591,10 @@ public final class MP3Parser implements IFileParser {
     while(i < size && value[i] >= '0' && value[i] <= '9')
       i++;
     // number of bytes of the number
-    return Arrays.copyOfRange(value, start, i);
+    final int track = Token.toInt(value, start, i);
+    if(track == Integer.MIN_VALUE) throw new ParserException(
+        "Failed to parse track number");
+    return track; 
   }
 
   /**
@@ -1007,7 +1011,11 @@ public final class MP3Parser implements IFileParser {
     TRCK {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
-        obj.deepFile.addMeta(MetaElem.TRACK, obj.readTrack(size));
+        try {
+          obj.deepFile.addMeta(MetaElem.TRACK, obj.readTrack(size));
+        } catch(ParserException e) {
+          Main.debug("MP3Parser: % (%)", e.getMessage(), obj.bfc.getFileName());
+        }
       }
     },
 
@@ -1016,7 +1024,7 @@ public final class MP3Parser implements IFileParser {
       @Override
       public void parse(final MP3Parser obj, final int size)
           throws IOException {
-        obj.deepFile.addMeta(MetaElem.SOFTWARE, obj.readTrack(size));
+        obj.deepFile.addMeta(MetaElem.SOFTWARE, obj.readText(size));
       }
     },
 
@@ -1034,7 +1042,7 @@ public final class MP3Parser implements IFileParser {
       @Override
       public void parse(final MP3Parser obj, final int size)
           throws IOException {
-        obj.deepFile.addMeta(MetaElem.COMMENT, obj.readTrack(size));
+        obj.deepFile.addMeta(MetaElem.COMMENT, obj.readText(size));
       }
     },
 

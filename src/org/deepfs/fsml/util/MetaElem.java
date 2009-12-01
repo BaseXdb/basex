@@ -46,32 +46,34 @@ public enum MetaElem {
   DATETIME_ORIGINAL(NS.FSMETA, "dateTimeOriginal", Type.DTM, false),
   /** Year. */
   YEAR(NS.FSMETA, "year", Type.YEA, false),
-
+  
   // ----- integer fields ----------------------------------------------------
 
   /** Beats per minute. */
-  BEATS_PER_MINUTE(NS.FSMETA, "beatsPerMinute", Type.ITR, false),
+  BEATS_PER_MINUTE(NS.FSMETA, "beatsPerMinute", Type.INT, false),
+  /** ISO speed ratings. */
+  ISO_SPEED_RATINGS(NS.FSMETA, "isoSpeedRatings", Type.INT, false),
   /** Focal length in 35mm film. */
-  FOCAL_LENGTH_IN_35MM_FILM(NS.FSMETA, "focalLengthIn35mmFilm", Type.ITR,
+  FOCAL_LENGTH_IN_35MM_FILM(NS.FSMETA, "focalLengthIn35mmFilm", Type.INT,
       false),
   /** Group ID of the owner of the file. */
-  FS_OWNER_GROUP_ID(NS.FSMETA, "fsOwnerGroupId", Type.ITR, false),
+  FS_OWNER_GROUP_ID(NS.FSMETA, "fsOwnerGroupId", Type.INT, false),
   /** User ID of the owner of the file. */
-  FS_OWNER_USER_ID(NS.FSMETA, "fsOwnerUserId", Type.ITR, false),
+  FS_OWNER_USER_ID(NS.FSMETA, "fsOwnerUserId", Type.INT, false),
   /** Size of the file in the file system. */
-  FS_SIZE(NS.FSMETA, "fsSize", Type.ITR, false),
+  FS_SIZE(NS.FSMETA, "fsSize", Type.INT, false),
   /** Height in millimeters. */
-  MM_HEIGHT(NS.FSMETA, "mmHeight", Type.ITR, false),
+  MM_HEIGHT(NS.FSMETA, "mmHeight", Type.INT, false),
   /** Width in millimeters. */
-  MM_WIDTH(NS.FSMETA, "mmWidth", Type.ITR, false),
+  MM_WIDTH(NS.FSMETA, "mmWidth", Type.INT, false),
   /** Number of pages. */
-  NUMBER_OF_PAGES(NS.FSMETA, "numberOfPages", Type.ITR, false),
+  NUMBER_OF_PAGES(NS.FSMETA, "numberOfPages", Type.INT, false),
   /** Height in pixels. */
-  PIXEL_HEIGHT(NS.FSMETA, "pixelHeight", Type.ITR, false),
+  PIXEL_HEIGHT(NS.FSMETA, "pixelHeight", Type.INT, false),
   /** Width in pixels. */
-  PIXEL_WIDTH(NS.FSMETA, "pixelWidth", Type.ITR, false),
+  PIXEL_WIDTH(NS.FSMETA, "pixelWidth", Type.INT, false),
   /** Track number. */
-  TRACK(NS.FSMETA, "track", Type.ITR, false),
+  TRACK(NS.FSMETA, "track", Type.INT, false),
   
   // ----- double fields -----------------------------------------------------
   
@@ -175,8 +177,6 @@ public enum MetaElem {
   HIDDEN_RECEIVER_EMAIL(NS.FSMETA, "hiddenReceiverEmail", Type.STR, true),
   /** Unique identifier. */
   IDENTIFIER(NS.DCTERMS, "identifier", Type.STR, false),
-  /** ISO speed ratings. */
-  ISO_SPEED_RATINGS(NS.FSMETA, "isoSpeedRatings", Type.STR, false),
   /** Keyword. */
   KEYWORD(NS.FSMETA, "keyword", Type.STR, true),
   /**

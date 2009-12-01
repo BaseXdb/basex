@@ -45,8 +45,6 @@ import org.deepfs.fsml.parsers.IFileParser;
  */
 public class DeepFile {
 
-  // [BL] integrate BufferedFileChannel
-
   /**
    * A reference to the parser registry that can be used to parse file
    * fragments.
@@ -443,8 +441,8 @@ public class DeepFile {
     if(metaElements.containsKey(e)) {
       if(!e.isMultiVal()) {
         Main.debug(
-            "Failed to add metadata value. Multiple values are forbidden for "
-            + "metadata element % (%).", e, bfc.getFileName());
+            "DeepFile: Failed to add metadata value. Multiple values are " +
+            "forbidden for " + "metadata element % (%).", e, bfc.getFileName());
         return;
       }
       vals = metaElements.get(e);
@@ -461,8 +459,8 @@ public class DeepFile {
    * @param value string value as byte array.
    */
   public void addMeta(final MetaElem elem, final byte[] value) {
-    if(!elem.getType().instance(Type.STR)) Main.debug("Invalid data type for " +
-        "metadata element " + elem + " (string - as byte array).");
+    if(!Type.STR.instance(elem.getType()))
+      metaDebug(elem, "string - as byte array");
     else addMeta(elem, ParserUtil.checkUTF(value), null);
   }
 
@@ -472,9 +470,8 @@ public class DeepFile {
    * @param value string value.
    */
   public void addMeta(final MetaElem elem, final String value) {
-    if(!elem.getType().instance(Type.STR)) Main.debug("Invalid data type for " +
-        "metadata element " + elem + " (string).");
-    else addMeta(elem, ParserUtil.checkUTF(Token.token(value)), null);
+    if(!checkType(elem, Type.STR)) return; 
+    addMeta(elem, ParserUtil.checkUTF(Token.token(value)), null);
   }
 
   /**
@@ -483,9 +480,8 @@ public class DeepFile {
    * @param value integer value.
    */
   public void addMeta(final MetaElem elem, final short value) {
-    if(!elem.getType().instance(Type.SHR)) Main.debug("Invalid data type for " +
-        "metadata element " + elem + " (short).");
-    else addMeta(elem, Token.token(value), Type.SHR);
+    if(!checkType(elem, Type.SHR)) return;
+    addMeta(elem, Token.token(value), Type.SHR);
   }
 
   /**
@@ -494,9 +490,10 @@ public class DeepFile {
    * @param value integer value.
    */
   public void addMeta(final MetaElem elem, final int value) {
-    if(!elem.getType().instance(Type.ITR)) Main.debug("Invalid data type for " +
-        "metadata element " + elem + " (int).");
-    else addMeta(elem, Token.token(value), null);
+    if(!Type.INT.instance(elem.getType())) {
+      if(value <= Short.MAX_VALUE) addMeta(elem, (short) value);
+      else metaDebug(elem, "integer");
+    } else addMeta(elem, Token.token(value), null);
   }
 
   /**
@@ -505,9 +502,10 @@ public class DeepFile {
    * @param value long value.
    */
   public void addMeta(final MetaElem elem, final long value) {
-    if(!elem.getType().instance(Type.LNG)) Main.debug("Invalid data type for " +
-        "metadata element " + elem + " (long).");
-    else addMeta(elem, Token.token(value), Type.LNG);
+    if(!Type.LNG.instance(elem.getType())) {
+      if(value <= Integer.MAX_VALUE) addMeta(elem, (int) value);
+      else metaDebug(elem, "long");
+    } else addMeta(elem, Token.token(value), Type.LNG);
   }
   
   /**
@@ -516,9 +514,8 @@ public class DeepFile {
    * @param value double value.
    */
   public void addMeta(final MetaElem elem, final double value) {
-    if(!elem.getType().instance(Type.DBL)) Main.debug("Invalid data type for " +
-        "metadata element " + elem + " (double).");
-    else addMeta(elem, Token.token(value), Type.DBL);
+    if(!checkType(elem, Type.DBL)) return;
+    addMeta(elem, Token.token(value), Type.DBL);
   }
 
   /**
@@ -527,9 +524,8 @@ public class DeepFile {
    * @param value duration value.
    */
   public void addMeta(final MetaElem elem, final Duration value) {
-    if(!elem.getType().instance(Type.DUR)) Main.debug("Invalid data type for " +
-        "metadata element " + elem + " (date).");
-    else addMeta(elem, Token.token(value.toString()), null);
+    if(!checkType(elem, Type.DUR)) return;
+    addMeta(elem, Token.token(value.toString()), null);
   }
 
   /**
@@ -540,11 +536,34 @@ public class DeepFile {
   public void addMeta(final MetaElem elem, final XMLGregorianCalendar xgc) {
     Type t = elem.getType();
     QName st = xgc.getXMLSchemaType();
-    if((t.instance(Type.DAT) && !st.equals(DatatypeConstants.DATE))
-        || (t.instance(Type.YEA) && !st.equals(DatatypeConstants.GYEAR)))
-      Main.debug("Invalid data type for metadata element "
-          + elem + " (expected " + t + " got " + st.getLocalPart() + ").");
+    if((Type.DAT.instance(t) && !st.equals(DatatypeConstants.DATE))
+        || (Type.YEA.instance(t) && !st.equals(DatatypeConstants.GYEAR)))
+      metaDebug(elem, st.getLocalPart());
     else addMeta(elem, token(xgc.toXMLFormat()), null);
+  }
+  
+  /**
+   * Checks if the found type is valid for the given metadata element.
+   * @param elem the metadata element.
+   * @param foundType the found data type.
+   * @return true if it is valid, false otherwise.
+   */
+  private boolean checkType(final MetaElem elem, final Type foundType) {
+    if(foundType.instance(elem.getType())) return true;
+    metaDebug(elem, foundType.toString());
+    return false;
+  }
+
+  /**
+   * Prints a debug message if an attempt was made to set an invalid value for a
+   * metadata element.
+   * @param elem the current metadata element.
+   * @param foundType the type that was tried to set.
+   */
+  private void metaDebug(final MetaElem elem, final String foundType) {
+    Main.debug("DeepFile: Invalid data type (file: %, metadata element: %, " +
+        "expected data type: %, found data type: %).", bfc.getFileName(), elem,
+        elem.getType(), foundType);
   }
 
   /**
