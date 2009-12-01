@@ -28,6 +28,9 @@ public final class TXTParser implements IFileParser {
     SUFFIXES.put("txt", MimeType.TXT);
     SUFFIXES.put("html", MimeType.HTML);
     SUFFIXES.put("htm", MimeType.HTML);
+    SUFFIXES.put("css", MimeType.CSS);
+    SUFFIXES.put("java", MimeType.JAVA);
+    SUFFIXES.put("xq", MimeType.TXT);
     for(final String suf : SUFFIXES.keySet())
       ParserRegistry.register(suf, TXTParser.class);
     ParserRegistry.registerFallback(TXTParser.class);
