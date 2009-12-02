@@ -39,7 +39,7 @@ public class FSTraversalParser extends Progress {
         "Failed to create file system database (%).", c.info());
     importer = new FSImporter(context);
     context.data.meta.deepfs = true;
-    roots = path.equals("/") ? File.listRoots() : new File[] { new File(path)};
+    roots = path.equals("/") ? File.listRoots() : new File[] { new File(path) };
   }
 
   /** Recursively parses the given path. */

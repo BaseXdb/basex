@@ -13,7 +13,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Token;
-import org.deepfs.fsml.extractors.SpotlightExtractor;
+import org.deepfs.fsml.parsers.SpotlightExtractor;
 import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
 import org.deepfs.fsml.util.FSMLSerializer;

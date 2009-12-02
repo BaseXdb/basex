@@ -171,14 +171,40 @@ public class FSMLSerializer {
   }
 
   /**
+   * Checks if a char has to be escaped for xquery update and writes it to the
+   * output.
+   * @param b the char to check.
+   * @throws IOException if any error occurs.
+   */
+  private void escapeXQUP(final byte b) throws IOException {
+    switch(b) {
+      case '{':
+        o.print("{{");
+        break;
+      case '}':
+        o.print("}})");
+        break;
+      default:
+        o.write(b);
+    }
+  }
+
+  /**
    * Writes an xml text node.
    * @param t the text.
    * @throws IOException if any error occurs.
    */
   private void text(final byte[] t) throws IOException {
-    for(final byte b : t) {
-      escape(b);
-    }
+    for(final byte b : t) escape(b);
+  }
+  
+  /**
+   * Writes an xml fragment.
+   * @param x the xml fragment.
+   * @throws IOException if any error occurs.
+   */
+  private void xml(final byte[] x) throws IOException {
+    for(final byte b : x) escapeXQUP(b);
   }
 
   /**
@@ -242,7 +268,7 @@ public class FSMLSerializer {
           atts.add(OFFSET, token(x.getOffset()));
           atts.add(SIZE, token(x.getSize()));
           startElem(XML_CONTENT_NS, atts);
-          o.write(token(x.asString()));
+          xml(token(x.asString()));
           endElem(XML_CONTENT_NS);
         }
       }
