@@ -9,13 +9,10 @@ import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
 import javax.swing.Box;
-import javax.swing.DefaultCellEditor;
-import javax.swing.JComboBox;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumn;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Session;
@@ -69,6 +66,8 @@ public final class DialogUser extends BaseXBack {
   private final BaseXButton drop;
   /** Remove button. */
   private final BaseXButton remove;
+  /** Add button. */
+  private final BaseXButton add;
   /** Username textfield. */
   private final BaseXTextField user;
   /** Password textfield. */
@@ -76,11 +75,13 @@ public final class DialogUser extends BaseXBack {
   /** Password textfield. */
   private final JPasswordField newpass;
   /** User columns. */
-  private final BaseXCombo userco1;
+  private final BaseXCombo dropUser;
   /** User columns. */
-  private final BaseXCombo userco2;
+  private final BaseXCombo  alterUser;
   /** User columns. */
-  private final BaseXCombo userco3;
+  private final BaseXCombo removeUser;
+  /** User columns. */
+  private final BaseXCombo addUser;
   /** User table. */
   final JTable table;
   /** Info label. */
@@ -127,9 +128,9 @@ public final class DialogUser extends BaseXBack {
     newpass.addKeyListener(keys);
     BaseXLayout.setWidth(newpass, 100);
     alter = new BaseXButton(BUTTONALTER, dia);
-    userco2 = new BaseXCombo(new String[] {}, dia);
+    alterUser = new BaseXCombo(new String[] {}, dia);
     change = new BaseXButton(BUTTONCHANGE, dia);
-    userco1 = new BaseXCombo(new String[] {}, dia);
+    dropUser = new BaseXCombo(new String[] {}, dia);
     drop = new BaseXButton(BUTTONDROP, dia);
     info = new BaseXLabel(" ");
 
@@ -148,7 +149,7 @@ public final class DialogUser extends BaseXBack {
 
     final BaseXBack p2 = new BaseXBack();
     p2.setLayout(new TableLayout(1, 4, 6, 0));
-    p2.add(userco2);
+    p2.add(alterUser);
     p2.add(new BaseXLabel(NEWPW));
     p2.add(newpass);
     p2.add(alter);
@@ -157,12 +158,20 @@ public final class DialogUser extends BaseXBack {
     add(new BaseXLabel(DROPU + COLS, false, true));
     final BaseXBack p4 = new BaseXBack();
     p4.setLayout(new TableLayout(1, 2, 6, 0));
-    p4.add(userco1);
+    p4.add(dropUser);
     p4.add(drop);
     add(p4);
-
     tablePanel = new BaseXBack();
-    tablePanel.setLayout(new TableLayout(5, 1, 2, 2));
+    tablePanel.setLayout(new TableLayout(7, 1, 2, 2));
+    add = new BaseXButton("Add", dia);
+    addUser = new BaseXCombo(new String[] {}, dia);
+    if(!global) {
+      tablePanel.add(new BaseXLabel("Add:", false, true));
+      final BaseXBack addPanel = new BaseXBack();
+      addPanel.add(addUser);
+      addPanel.add(add);
+      tablePanel.add(addPanel);
+    }
     tablePanel.add(new BaseXLabel(PERMS, false, true));
     tablePanel.add(new JScrollPane(table));
     final BaseXBack tablePanel1 = new BaseXBack();
@@ -171,12 +180,12 @@ public final class DialogUser extends BaseXBack {
     tablePanel1.add(info, BorderLayout.WEST);
     BaseXLayout.setWidth(tablePanel1, 420);
     tablePanel.add(tablePanel1);
-    userco3 = new BaseXCombo(new String[] {}, dia);
+    removeUser = new BaseXCombo(new String[] {}, dia);
     remove = new BaseXButton("Remove", dia);
     if(!global) {
       tablePanel.add(new BaseXLabel("Remove:", false, true));
       final BaseXBack removePanel = new BaseXBack();
-      removePanel.add(userco3);
+      removePanel.add(removeUser);
       removePanel.add(remove);
       tablePanel.add(removePanel);
     }
@@ -197,6 +206,7 @@ public final class DialogUser extends BaseXBack {
         for(final Proc p : permps)
           if(!sess.execute(p)) msg = sess.info();
         permps.clear();
+        // [AW] if !global send refresh to server, Problem: no user?
         setData();
       } else if(BUTTONCREATE.equals(cmd)) {
         final String u = user.getText();
@@ -206,22 +216,42 @@ public final class DialogUser extends BaseXBack {
         pass.setText("");
         setData();
       } else if(BUTTONDROP.equals(cmd)) {
-        final String u = userco1.getSelectedItem().toString();
+        final String u = dropUser.getSelectedItem().toString();
         if(Dialog.confirm(this, Main.info(DRQUESTION, u))) {
           if(!sess.execute(new DropUser(u))) msg = sess.info();
         }
         setData();
       } else if(BUTTONALTER.equals(cmd)) {
-        final String u = userco2.getSelectedItem().toString();
+        final String u = alterUser.getSelectedItem().toString();
         final String p = new String(newpass.getPassword());
         if(!sess.execute(new AlterUser(u, p))) msg = sess.info();
         newpass.setText("");
         setData();
       } else if("Remove".equals(cmd)) {
         gui.context.data.meta.users.remove(
-            gui.context.data.meta.users.get(userco3.
+            gui.context.data.meta.users.get(removeUser.
                 getSelectedItem().toString()));
         setData();
+      } else if("Add".equals(cmd)) {
+        String value = addUser.getSelectedItem().toString();
+        for(StringList l : tempP) {
+          if(l.get(0).equals(value)) {
+            String db = dia.gui.context.data.meta.name;
+            String o = l.get(1);
+            Object val = o.equals("") ? Boolean.FALSE : o.equals("X") ?
+                Boolean.TRUE : o;
+            String right = CmdPerm.values()[0].toString();
+            permps.add(val.equals(true) ? new Grant(right, value, db) :
+              new Revoke(right, value, db));
+            o = l.get(2);
+            val = o.equals("") ? Boolean.FALSE : o.equals("X") ? 
+                Boolean.TRUE : o;
+            right = CmdPerm.values()[1].toString();
+            permps.add(val.equals(true) ? new Grant(right, value, db) :
+              new Revoke(right, value, db));
+          }
+        }
+        action(BUTTONCHANGE);
       }
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -235,8 +265,8 @@ public final class DialogUser extends BaseXBack {
     final boolean valnewpass = new String(newpass.
         getPassword()).matches("[\\w]*");
     boolean disname = !user.getText().equals(ADMIN);
-    for(int i = 0; i < userco1.getItemCount(); i++) {
-      disname &= !user.getText().equals(userco1.getItemAt(i).toString());
+    for(int i = 0; i < dropUser.getItemCount(); i++) {
+      disname &= !user.getText().equals(dropUser.getItemAt(i).toString());
     }
 
     boolean warn = true;
@@ -249,11 +279,12 @@ public final class DialogUser extends BaseXBack {
     info.setError(msg, warn);
 
     alter.setEnabled(valnewpass && newpass.getPassword().length != 0
-        && userco2.getSelectedIndex() != -1);
+        && alterUser.getSelectedIndex() != -1);
     create.setEnabled(valuname && valpass && disname
         && !user.getText().isEmpty() && pass.getPassword().length != 0);
-    drop.setEnabled(userco1.getSelectedIndex() != -1);
-    remove.setEnabled(userco3.getSelectedIndex() != -1);
+    drop.setEnabled(dropUser.getSelectedIndex() != -1);
+    remove.setEnabled(removeUser.getSelectedIndex() != -1);
+    add.setEnabled(addUser.getSelectedIndex() != -1);
     change.setEnabled(false);
   }
 
@@ -267,14 +298,10 @@ public final class DialogUser extends BaseXBack {
       throw new IOException(sess.info());
     }
     data = new Table(out.toString());
-    StringList items = new StringList();
     if(!global) {
-      userco3.removeAllItems();
-      StringList empty = new StringList();
-      empty.add(" ");
-      empty.add("");
-      empty.add("");
-      data.contents.add(empty);
+      removeUser.removeAllItems();
+      addUser.removeAllItems();
+      tempP.clear();
       out = new CachedOutput();
       sess.execute(new Show("Users"), out);
       Table data2 = new Table(out.toString());
@@ -288,7 +315,7 @@ public final class DialogUser extends BaseXBack {
       }
       for(String s : tmp2) {
         if(!tmp1.contains(s) && !s.equals(ADMIN)) {
-          items.add(s);
+          addUser.addItem(s);
           for(StringList l : data2.contents) {
             if(l.get(0).equals(s)) {
               StringList tmp = new StringList();
@@ -299,32 +326,29 @@ public final class DialogUser extends BaseXBack {
             }
           }
         } else if(!s.equals(ADMIN)) {
-          userco3.addItem(s);
+          removeUser.addItem(s);
         }
       }
     }
-    userco1.removeAllItems();
-    userco2.removeAllItems();
+    dropUser.removeAllItems();
+    alterUser.removeAllItems();
     StringList tmp = new StringList();
     for(final StringList o : data.contents) {
       final String check = o.get(0);
       if(!check.equals(ADMIN)) {
-        userco1.addItem(check);
-        userco2.addItem(check);
+        dropUser.addItem(check);
+        alterUser.addItem(check);
       } else {
-        userco2.addItem(check);
+        alterUser.addItem(check);
         tmp = o;
       }
     }
-    userco1.setSelectedIndex(-1);
-    userco2.setSelectedIndex(-1);
-    userco3.setSelectedIndex(-1);
+    dropUser.setSelectedIndex(-1);
+    alterUser.setSelectedIndex(-1);
+    removeUser.setSelectedIndex(-1);
+    addUser.setSelectedIndex(-1);
     data.contents.remove(tmp);
     ((TableModel) table.getModel()).fireTableChanged(null);
-    if(!global) {
-      TableColumn col = table.getColumnModel().getColumn(0);
-      col.setCellEditor(new MyComboBoxEditor(items.finish()));
-    }
   }
 
   /**
@@ -389,30 +413,6 @@ public final class DialogUser extends BaseXBack {
 
     @Override
     public void setValueAt(final Object value, final int row, final int col) {
-      if(row == getRowCount() - 1 && col == 0) {
-        if(value != null) {
-          data.contents.get(row).set(value.toString(), col);
-          fireTableCellUpdated(row, col);
-          for(StringList l : tempP) {
-            if(l.get(0).equals(value.toString())) {
-              data.contents.get(row).set(l.get(1), col + 1);
-              data.contents.get(row).set(l.get(2), col + 2);
-              fireTableCellUpdated(row, col + 1);
-              fireTableCellUpdated(row, col + 2);
-              String db = dia.gui.context.data.meta.name;
-              String right = CmdPerm.values()[col].toString();
-              permps.add(getValueAt(row, col + 1).equals(true) ? new Grant(
-                  right, value.toString(), db) : new Revoke(right,
-                  value.toString(), db));
-              right = CmdPerm.values()[col + 1].toString();
-              permps.add(getValueAt(row, col + 2).equals(true) ? new Grant(
-                  right, value.toString(), db) : new Revoke(right,
-                  value.toString(), db));
-            }
-          }
-          if(permps.size() != 0) action(BUTTONCHANGE);
-        }
-      } else {
         final String uname = data.contents.get(row).get(0);
         if(!uname.equals(" ")) {
           final String right = CmdPerm.values()[col - 1].toString();
@@ -427,24 +427,7 @@ public final class DialogUser extends BaseXBack {
           data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
           fireTableCellUpdated(row, col);
           change.setEnabled(true);
-        }
       }
-    }
-  }
-
-  /**
-   * Combobox in JTable.
-   *
-   * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
-   * @author Andreas Weiler
-   */
-  public class MyComboBoxEditor extends DefaultCellEditor {
-    /**
-     * Constructor.
-     * @param items String[]
-     */
-    public MyComboBoxEditor(final String[] items) {
-      super(new JComboBox(items));
     }
   }
 }

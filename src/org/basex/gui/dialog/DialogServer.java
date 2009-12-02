@@ -2,6 +2,8 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
@@ -67,8 +69,8 @@ public final class DialogServer extends Dialog {
   private final BaseXButton disconnect;
   /** Refresh button. */
   private final BaseXButton refresh;
-  /** Shows log file. */
-  private final BaseXButton show;
+  /** Updates log file. */
+  private final BaseXButton update;
   /** Deletes log file. */
   private final BaseXButton delete;
   /** Deletes all log files. */
@@ -182,11 +184,10 @@ public final class DialogServer extends Dialog {
     logs.setLayout(new BorderLayout(2, 0));
     logs.setBorder(8, 8, 8, 8);
     final BaseXBack pl1 = new BaseXBack();
-    show = new BaseXButton("Show", this);
+    update = new BaseXButton("Update", this);
     delete = new BaseXButton("Delete", this);
     deleteAll = new BaseXButton("Delete All", this);
     pl1.add(logc);
-    pl1.add(show);
     pl1.add(delete);
     pl1.add(deleteAll);
     pl1.add(Box.createHorizontalGlue());
@@ -194,30 +195,30 @@ public final class DialogServer extends Dialog {
     info2 = new BaseXLabel(" ");
     info2.setBorder(8, 0, 0, 0);
     logs.add(logt, BorderLayout.CENTER);
-    logs.add(info2, BorderLayout.SOUTH);
+    final BaseXBack pl2 = new BaseXBack();
+    pl2.setLayout(new BorderLayout(0, 2));
+    pl2.add(info2, BorderLayout.WEST);
+    pl2.add(update, BorderLayout.EAST);
+    logs.add(pl2, BorderLayout.SOUTH);
     
     set(tabs, BorderLayout.CENTER);
 
     // test if server is running
     running = ping(true);
     
-    // Register a change listener
     tabs.addChangeListener(new ChangeListener() {
-        // This method is called whenever the selected tab changes
         public void stateChanged(final ChangeEvent evt) {
             BaseXTabs pane = (BaseXTabs) evt.getSource();
             if (pane.getSelectedIndex() == 3) {
-              Object tmp = logc.getSelectedItem();
-              int i = logc.getSelectedIndex();
-              if(i != -1) {
-              action("Show");
-              }
-              refreshLog();
-              logc.setSelectedItem(tmp);
+                refreshLog();
             }
         }
     });
-    initLog();
+    logc.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent event) {
+        action("Update");
+      }
+    });
     action(null);
     finish(null);
   }
@@ -276,13 +277,18 @@ public final class DialogServer extends Dialog {
         connected = false;
       } else if(BUTTONREFRESH.equals(cmd)) {
         fillsedb();
-      } else if("Show".equals(cmd)) {
+      } else if("Update".equals(cmd)) {
+        if(logc.getSelectedIndex() != -1) {
         final IO io = IO.get(logdir + logc.getSelectedItem().toString());
         logt.setText(io.content());
+        } else {
+          logt.setText(Token.EMPTY);
+        }
       } else if("Delete".equals(cmd)) {
         File f = new File(logdir + logc.getSelectedItem().toString());
         if(f.delete()) {
-          initLog();
+          logc.setSelectedIndex(-1);
+          refreshLog();
         } else {
           msg2 = "Delete not possible";
         }
@@ -292,8 +298,12 @@ public final class DialogServer extends Dialog {
           File f = new File(logdir + logc.getItemAt(i).toString());
           d = f.delete();
         }
-        if(!d) msg2 = "Delete of all logs not possible";
-        initLog();
+        if(!d) {
+          msg2 = "Delete of all logs not possible";
+        } else {
+          logc.setSelectedIndex(-1);
+        }
+        refreshLog();
       } else if(connected) {
         user.action(cmd);
       }
@@ -333,7 +343,7 @@ public final class DialogServer extends Dialog {
     disconnect.setEnabled(connected);
     tabs.setEnabledAt(1, connected);
     tabs.setEnabledAt(2, connected);
-    show.setEnabled(logc.getSelectedIndex() != -1);
+    update.setEnabled(logc.getSelectedIndex() != -1);
     delete.setEnabled(logc.getSelectedIndex() != -1);
     deleteAll.setEnabled(logc.getItemCount() > 0);
     ctx.prop.write();
@@ -378,15 +388,6 @@ public final class DialogServer extends Dialog {
   }
   
   /**
-   * Inits the log panel.
-   */
-  void initLog() {
-    refreshLog();
-    logc.setSelectedIndex(-1);
-    logt.setText(Token.EMPTY);
-  }
-  
-  /**
    * Refreshs the log panel.
    */
   void refreshLog() {
@@ -398,6 +399,7 @@ public final class DialogServer extends Dialog {
         if(s.endsWith(".log")) logc.addItem(s);
       }
     }
+    action("Update");
   }
 
   @Override
