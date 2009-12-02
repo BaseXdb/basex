@@ -59,14 +59,12 @@ public final class ReplacePrimitive extends NodeCopy {
 
   @Override
   public QNm[] addAtt() {
-    // [CG] namespace check still buggy (see {@link InsertAttribute}...
     if(node.type != Type.ATT) return null;
     final QNm[] at = new QNm[md.meta.size];
-    for(int i = 0; i < md.meta.size; i++) {
-      final byte[] nm = md.attName(i);
-      final int j = md.ns.uri(nm);
-      at[i] = new QNm(md.attName(i));
-      if(j != 0) at[i].uri = Uri.uri(md.ns.key(j));
+    for(int pre = 0; pre < md.meta.size; pre++) {
+      final int n = md.tagNS(pre);
+      at[pre] = new QNm(md.attName(pre));
+      if(n != 0) at[pre].uri = Uri.uri(md.ns.key(n));
     }
     return at;
   }

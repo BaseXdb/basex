@@ -133,31 +133,6 @@ public final class UpdateFunctions {
   }
 
   /**
-   * Determines the number of descendants of a fragment.
-   * @param n fragment node
-   * @param a count attribute size of node
-   * @return number of descendants + 1 or attribute size + 1
-   * @throws QueryException query exception
-   */
-  private static int size(final Nod n, final boolean a) throws QueryException {
-    if(n instanceof DBNode) {
-      final DBNode dbn = (DBNode) n;
-      final int k = Nod.kind(n.type);
-      return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
-    }
-
-    int s = 1;
-    NodeIter ch = n.attr();
-    while(ch.next() != null) s++;
-    if(!a) {
-      ch = n.child();
-      Nod i;
-      while((i = ch.next()) != null) s += size(i, a);
-    }
-    return s;
-  }
-
-  /**
    * Adds a fragment to a database instance.
    * Document nodes are ignored.
    * @param nd node to be added
@@ -183,12 +158,7 @@ public final class UpdateFunctions {
         QNm q = nd.qname();
         byte[] uri = q.uri.str();
         int u = 0;
-        if(uri.length != 0) {
-          u = md.ns.add(uri);
-          if(u > 0) md.ns.add(q.pref(), uri);
-          else u = Math.abs(u);
-          md.ns.open(md.meta.size);
-        }
+        if(uri.length != 0) u = Math.abs(md.ns.add(uri));
         md.addAtt(md.atts.index(q.str(), null, false), u, nd.str(), pre - par);
         return pre + 1;
       case Data.PI:
@@ -217,5 +187,30 @@ public final class UpdateFunctions {
         while((i = ir.next()) != null) p = addNode(i, md, p, pre);
         return p;
     }
+  }
+
+  /**
+   * Determines the number of descendants of a fragment.
+   * @param n fragment node
+   * @param a count attribute size of node
+   * @return number of descendants + 1 or attribute size + 1
+   * @throws QueryException query exception
+   */
+  private static int size(final Nod n, final boolean a) throws QueryException {
+    if(n instanceof DBNode) {
+      final DBNode dbn = (DBNode) n;
+      final int k = Nod.kind(n.type);
+      return a ? dbn.data.attSize(dbn.pre, k) : dbn.data.size(dbn.pre, k);
+    }
+
+    int s = 1;
+    NodeIter ch = n.attr();
+    while(ch.next() != null) s++;
+    if(!a) {
+      ch = n.child();
+      Nod i;
+      while((i = ch.next()) != null) s += size(i, a);
+    }
+    return s;
   }
 }

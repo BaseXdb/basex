@@ -712,6 +712,7 @@ public final class DeepFS implements DataText {
     if(pre == -1 || !isFile(pre)) return;
 
     try {
+      System.out.println("=> " +  new File(string(path(pre, false))));
       Desktop.getDesktop().open(new File(string(path(pre, false))));
     } catch(final Exception ex) {
       Main.debug(ex);

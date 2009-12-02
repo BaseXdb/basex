@@ -35,6 +35,7 @@ public final class CreateFS extends ACreate {
     prop.set(Prop.ENTITY, true);
     final String path = args[0];
     final String db = args[1];
+    System.out.println(path);
 
     // old FSParser
     if(!prop.is(Prop.FSTRAVERSAL)) return build(new FSParser(path, prop), db);

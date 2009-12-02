@@ -231,8 +231,8 @@ public class MemData extends Data {
   public final void addAtt(final int t, final int n, final byte[] v,
       final int d) {
     check();
-    val1[meta.size] = ((long) n << 60) + ((long) ATTR << 56) +
-      ((long) t << 40) + attIndex(v);
+    val1[meta.size] = ((long) n << 60) + (n != 0 ? 1L << 59 : 0) +
+      ((long) ATTR << 56) + ((long) t << 40) + attIndex(v);
     val2[meta.size++] = ((long) d << 32) + meta.size;
   }
 
