@@ -508,7 +508,6 @@ public class XQSequenceTest extends XQJTestCase {
     assertTrue("A-XQS-12.5: Item must be XQResultItem", xqs.getItem() instanceof XQResultItem);
   }
 
-
   public void testGetSequenceAsStream() throws XQException {
     XQExpression xqe;
     XQSequence xqs;
@@ -800,7 +799,6 @@ public class XQSequenceTest extends XQJTestCase {
     }
     xqe.close();
   }
-
 
   public void testIsLast() throws XQException {
     XQExpression xqe;

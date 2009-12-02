@@ -17,7 +17,6 @@ public class XQPreparedExpressionTest extends XQJTestCase {
       fail("A-XQPE-1.1: cancellation of prepared expression failed with message: " + e.getMessage());
     }
 
-
     xqpe.close();
     try {
       xqpe.cancel();

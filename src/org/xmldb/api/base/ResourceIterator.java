@@ -67,7 +67,6 @@ public interface ResourceIterator {
     */
    boolean hasMoreResources() throws XMLDBException;
 
-
    /**
     * Returns the next <code>Resource</code> instance in the iterator.
     *

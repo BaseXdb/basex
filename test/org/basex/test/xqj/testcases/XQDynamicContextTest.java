@@ -875,7 +875,6 @@ public class XQDynamicContextTest extends XQJTestCase {
     XQExpression xqe;
     XQSequence xqs;
 
-
     String msg = "A-XQDC-4.1: bindObject implements casting rules of '14.2 Mapping a Java Data Type to an XQuery Data Type'";
 
     boolean jdk14;

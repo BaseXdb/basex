@@ -819,7 +819,6 @@ public class XQDataFactoryTest extends XQJTestCase {
     // prepared expression we use to create sequences
     XQPreparedExpression xqpe = xqc.prepareExpression("'Hello world!'");
 
-
     XQConnection xqdf = xqds.getConnection();
     xqdf.close();
     xqs = xqpe.executeQuery();
