@@ -169,7 +169,7 @@ public final class FSParser extends Parser {
    * @throws IOException I/O exception
    */
   private void dir(final File f) throws IOException {
-    preStack[++lvl] = builder.startElem(DIR, DeepFS.atts(f));
+    preStack[++lvl] = builder.startElem(DIR, DeepFS.atts(f, false));
     sizeStack[lvl] = 0;
     parse(f);
     builder.endElem(DIR);
@@ -192,7 +192,7 @@ public final class FSParser extends Parser {
   private void file(final File f) throws IOException {
     curr = f;
     if(!singlemode)
-      builder.startElem(FILE, DeepFS.atts(f));
+      builder.startElem(FILE, DeepFS.atts(f, false));
     if(f.canRead()) {
       if(prop.is(Prop.FSMETA) && f.getName().indexOf('.') != -1) {
         final String name = f.getName();

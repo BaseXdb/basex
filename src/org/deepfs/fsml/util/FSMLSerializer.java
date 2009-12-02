@@ -67,14 +67,17 @@ public class FSMLSerializer {
   /**
    * Serializes a file without metadata and content.
    * @param file the file to serialize.
+   * @param absolutePath if true, the absolute path is added instead of the file
+   *          name.
    * @return the xml data as string.
    * @throws IOException if any error occurs.
    */
-  public static String serializeFile(final File file) throws IOException {
+  public static String serializeFile(final File file,
+      final boolean absolutePath) throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     final PrintOutput po = new PrintOutput(baos);
     final FSMLSerializer ser = new FSMLSerializer(po);
-    final Atts atts = DeepFS.atts(file);
+    final Atts atts = DeepFS.atts(file, absolutePath);
     ser.startElem(file.isDirectory() ? DIR_NS : FILE_NS, atts, true);
     final String s = baos.toString();
     po.close();

@@ -2,6 +2,9 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.basex.build.fs.FSParser;
 import org.basex.build.fs.FSTraversalParser;
 import org.basex.core.ProgressException;
@@ -33,9 +36,14 @@ public final class CreateFS extends ACreate {
   protected boolean exec(final PrintOutput out) {
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
-    final String path = args[0];
+    final String path;
+    try {
+      path = new File(args[0]).getCanonicalPath();
+    } catch(IOException e) {
+      return error("Could not get the canonical path for the given " +
+          "directory%(%)", Prop.NL, e);
+    }
     final String db = args[1];
-    System.out.println(path);
 
     // old FSParser
     if(!prop.is(Prop.FSTRAVERSAL)) return build(new FSParser(path, prop), db);
@@ -44,7 +52,7 @@ public final class CreateFS extends ACreate {
     FSTraversalParser parser = new FSTraversalParser(path, context, db);
     progress(parser);
     try {
-    parser.parse();
+      parser.parse();
     } catch(final ProgressException ex) {
       new Open(db).execute(context);
       return error(PROGERR);

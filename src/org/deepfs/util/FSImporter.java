@@ -1,7 +1,5 @@
 package org.deepfs.util;
 
-import static org.deepfs.fsml.util.DeepFile.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,8 +10,7 @@ import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.util.Token;
-import org.deepfs.fsml.parsers.SpotlightExtractor;
+import org.deepfs.fsml.plugin.SpotlightExtractor;
 import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
 import org.deepfs.fsml.util.FSMLSerializer;
@@ -27,6 +24,10 @@ import org.deepfs.fsml.util.ParserRegistry;
  * @author Bastian Lemke
  */
 public final class FSImporter implements FSTraversal {
+  
+  // [BL] better exception handling
+  // [BL] more consistent way to set file name atts (file name vs. full path)
+  // [BL] more consistent way to unify the file system paths
 
   /** The buffer to use for parsing the file contents. */
   private final ByteBuffer buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
@@ -110,14 +111,16 @@ public final class FSImporter implements FSTraversal {
   /**
    * Builds an update query & inserts a file node.
    * @param f file to be inserted
+   * @param absolutePath if true, the absolute path is added instead of the file
+   *          name.
    * @return escaped file name
    */
-  private String insert(final File f) {
+  private String insert(final File f, final boolean absolutePath) {
     currentFile = f.toString();
     String xmlFragment = null;
     if(f.isDirectory()) {
       try {
-        xmlFragment = FSMLSerializer.serializeFile(f);
+        xmlFragment = FSMLSerializer.serializeFile(f, absolutePath);
       } catch(final IOException e) {
         Main.debug("Failed to open dir (%)", e);
       }
@@ -132,6 +135,11 @@ public final class FSImporter implements FSTraversal {
           }
           deepFile.extract();
           xmlFragment = FSMLSerializer.serialize(deepFile);
+          if(absolutePath) {
+            final String par = escape(f.getParent().replace("\\", "/"));
+            xmlFragment = xmlFragment.replace("<file name=\"",
+                "<file name=\"" + par + "/");
+          }
         } catch(final IOException ex) {
           Main.debug(
               "FSImporter: Failed to extract metadata/contents from the file " +
@@ -164,40 +172,26 @@ public final class FSImporter implements FSTraversal {
       }
     }
 
-    return f.getName();
+    return escape(absolutePath ? f.getAbsolutePath().replace("\\", "/")
+        : f.getName());
   }
 
   @Override
   public void preTraversalVisit(final File d) {
-    final String name = FSImporter.escape(d.getAbsolutePath());
-    final StringBuilder query = new StringBuilder();
-    query.append("insert nodes ");
-    query.append("<").append(Token.string(DIR_NS)).append(" name=\"");
-    query.append(FSImporter.escape(name));
-    query.append("\" />");
-    query.append(" into ").append(targetNode);
-    final QueryProcessor qp = new QueryProcessor(query.toString(), ctx);
-    try {
-      qp.query();
-    } catch(Exception e) {
-      Main.notexpected("FSImporter: Failed to insert root node (" + e + ").");
-    } finally {
-      try {
-        qp.close();
-      } catch(IOException e) { /* */ }
-    }
-    targetNode += "/dir[@name = \"" + name + "\"]";
+    final String fname = insert(d, true);
+    if(d.isDirectory())
+      targetNode += "/dir[@name = \"" + escape(fname) + "\"]";
   }
 
   @Override
-  public void postTraversalVisit(final File d) { /* NOT_USED */}
+  public void postTraversalVisit(final File d) { postDirectoryVisit(d); }
 
   @Override
   public void levelUpdate(final int l) { /* NOT_USED */}
 
   @Override
   public void preDirectoryVisit(final File d) {
-    final String fname = insert(d);
+    final String fname = insert(d, false);
     targetNode += "/dir[@name = \"" + escape(fname) + "\"]";
   }
 
@@ -208,7 +202,7 @@ public final class FSImporter implements FSTraversal {
 
   @Override
   public void regularFileVisit(final File f) {
-    insert(f);
+    insert(f, false);
   }
 
   @Override

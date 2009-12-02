@@ -72,9 +72,9 @@ public final class DeepFS implements DataText {
   /** Index References. */
   public int contentID;
 
-  /** OS user id.*/
+  /** OS user id. */
   private long sUID;
-  /** OS group id.*/
+  /** OS group id. */
   private long sGID;
 
   /**
@@ -173,7 +173,7 @@ public final class DeepFS implements DataText {
   private String pn2xp(final String path, final boolean dir) {
     final StringBuilder qb = new StringBuilder();
     final StringBuilder eb = new StringBuilder();
-    //qb.append(S_DPFSNS);
+    // qb.append(S_DPFSNS);
     qb.append("/" + S_DEEPFS);
     if(path.equals("/")) return qb.toString();
 
@@ -215,7 +215,6 @@ public final class DeepFS implements DataText {
       return -1;
     }
   }
-
 
   /**
    * Resolve child axis from path and return pre values of children.
@@ -310,10 +309,13 @@ public final class DeepFS implements DataText {
   /**
    * Constructs attributes for file and directory tags.
    * @param f file name
+   * @param absolutePath if true, the absolute path is added instead of the file
+   *          name.
    * @return attributes as byte[][]
    */
-  public static Atts atts(final File f) {
-    final String name = f.getName();
+  public static Atts atts(final File f, final boolean absolutePath) {
+    final String name = absolutePath ? f.getAbsolutePath().replace("\\", "/")
+        : f.getName();
     final byte[] time = token(System.currentTimeMillis());
 
     /** Temporary attribute array. */
@@ -332,7 +334,6 @@ public final class DeepFS implements DataText {
     atts.add(SUFFIX, getSuffix(name));
     return atts;
   }
-
 
   /**
    * Returns mountpoint attribute value.
@@ -517,7 +518,7 @@ public final class DeepFS implements DataText {
    */
   public boolean isFile(final int pre) {
     return data.kind(pre) == Data.ELEM
-    && data.tagID(pre) == data.tags.id(DataText.FILE);
+        && data.tagID(pre) == data.tags.id(DataText.FILE);
   }
 
   /**
@@ -527,7 +528,7 @@ public final class DeepFS implements DataText {
    */
   public boolean isDir(final int pre) {
     return data.kind(pre) == Data.ELEM
-    && data.tagID(pre) == data.tags.id(DataText.DIR);
+        && data.tagID(pre) == data.tags.id(DataText.DIR);
   }
 
   /**
@@ -582,7 +583,6 @@ public final class DeepFS implements DataText {
 
   /**
    * Read directory entries.
-   *
    * @param path directory to be listed.
    * @return directory entries, null on failure
    */
@@ -602,7 +602,8 @@ public final class DeepFS implements DataText {
     ctx.close();
   }
 
-  /** Getter for actual context.
+  /**
+   * Getter for actual context.
    * @return context
    */
   public Context getContext() {
@@ -611,7 +612,6 @@ public final class DeepFS implements DataText {
 
   /**
    * Remove directory.
-   *
    * @param path to directory to be removed
    * @return zero on success, -1 on failure
    */
@@ -672,10 +672,10 @@ public final class DeepFS implements DataText {
     if(s != 0) {
       final byte[] b = data.meta.prop.is(Prop.FUSE) && !backing ?
           mountpoint(il.get(s - 1)) : backingstore(il.get(s - 1));
-          if(b.length != 0) {
-            tb.add(b);
-            if(!endsWith(b, '/')) tb.add('/');
-          }
+      if(b.length != 0) {
+        tb.add(b);
+        if(!endsWith(b, '/')) tb.add('/');
+      }
     }
     for(int i = s - 2; i >= 0; i--) {
       final byte[] node = replace(name(il.get(i)), '\\', '/');
@@ -712,7 +712,8 @@ public final class DeepFS implements DataText {
     if(pre == -1 || !isFile(pre)) return;
 
     try {
-      System.out.println("=> " +  new File(string(path(pre, false))));
+      // [AH] fails if there is no default application for this file type
+      // the user doesn't get any feedback...
       Desktop.getDesktop().open(new File(string(path(pre, false))));
     } catch(final Exception ex) {
       Main.debug(ex);
@@ -763,8 +764,8 @@ public final class DeepFS implements DataText {
     return n;
   }
 
-  /** Unlink a file node.
-   *
+  /**
+   * Unlink a file node.
    * @param path to file to be deleted
    * @return success or failure
    */

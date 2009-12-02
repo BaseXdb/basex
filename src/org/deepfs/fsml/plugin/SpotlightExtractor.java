@@ -1,4 +1,4 @@
-package org.deepfs.fsml.parsers;
+package org.deepfs.fsml.plugin;
 
 import java.util.Date;
 import java.util.Map;
@@ -7,6 +7,9 @@ import java.util.Map.Entry;
 
 import org.basex.core.Main;
 import org.basex.util.Token;
+import org.deepfs.fsml.parsers.EMLParser;
+import org.deepfs.fsml.parsers.IFileParser;
+import org.deepfs.fsml.parsers.MP3Parser;
 import org.deepfs.fsml.util.BufferedFileChannel;
 import org.deepfs.fsml.util.DeepFile;
 import org.deepfs.fsml.util.FileType;
