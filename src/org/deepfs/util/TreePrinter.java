@@ -100,7 +100,6 @@ public final class TreePrinter implements FSTraversal {
         printFileNode(f);
     }
 
-
     /**
      * Prints absolute path of directory to be visited subsequently.
      * @param d directory the traversal starts from

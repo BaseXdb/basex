@@ -436,7 +436,7 @@ public class BaseXText extends BaseXPanel {
           while(text.pos() < text.size() && ld == ftChar(text.curr()))
             text.delete();
         }
-        // [CG] add DELLINESTART/DELLINEEND
+        // [CG] GUI/Editor: add DELLINESTART/DELLINEEND shortcuts
 
       } else if(pressed(DELPREVWORD, e) || pressed(DELPREV, e)) {
         if(nomark) {
@@ -521,7 +521,7 @@ public class BaseXText extends BaseXPanel {
   public final void keyTyped(final KeyEvent e) {
     if(undo == null || ignoreTyped(e) || pressed(ESCAPE, e) ||
         pressed(DELNEXT, e) || pressed(DELPREV, e)) return;
-    
+
     text.pos(text.cursor());
     if(text.start() != -1) text.delete();
     text.add(String.valueOf(e.getKeyChar()));

@@ -232,9 +232,7 @@ public final class GUIConstants {
   /** Bold character widths. */
   public static int[] bwidth;
 
-  /**
-   * Preventing class instantiation.
-   */
+  /** Private constructor, preventing class instantiation. */
   private GUIConstants() { }
 
   /**

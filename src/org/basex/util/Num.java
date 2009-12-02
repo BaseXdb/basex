@@ -40,7 +40,6 @@ public final class Num {
     return array;
   }
 
-
   /**
    * Compresses and writes an integer value to the specified array and
    * returns the array.

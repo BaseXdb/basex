@@ -54,22 +54,22 @@ public final class InexSingle {
   }
 
   /**
-   * Converts ids of a submission file. 
+   * Converts ids of a submission file.
    * @param subfile sub file
    * @throws Exception exception
    */
-  public static void convert(final String subfile) throws Exception {    
+  public static void convert(final String subfile) throws Exception {
     String l;
     HashMap<String, String> hs = new HashMap<String, String>();
-    
+
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
     while((l = br.readLine()) != null) {
       final int i1 = l.indexOf(';');
       final int i2 = l.indexOf(';', i1 + 1);
-      hs.put(l.substring(0, i1), l.substring(i1 + 1, i2));      
+      hs.put(l.substring(0, i1), l.substring(i1 + 1, i2));
     }
     br.close();
-    
+
     final BufferedReader in = new BufferedReader(new FileReader(subfile));
     final String subfileN = subfile.substring(0, subfile.indexOf('.')) +
       "1" + ".xml";
@@ -81,14 +81,14 @@ public final class InexSingle {
         final int i2 = l.indexOf("\"", i1 + 1);
         final String key = l.substring(i1 + 1, i2);
         l = l.substring(0, i1 + 1) + hs.get(key) + l.substring(i2);
-      }  
-      out.write(l + NL); 
+      }
+      out.write(l + NL);
     }
     out.close();
-    br.close();    
+    br.close();
     System.out.println("done!");
   }
-  
+
   /**
    * Default constructor.
    * @param args command-line arguments
@@ -128,7 +128,7 @@ public final class InexSingle {
       "order by $s descending\n" +
       "return <result score='{ $s }' " +
       "file='{ replace(base-uri($i), '.*/', '') }'>{ $i }</result>)" +
-      "\n" + 
+      "\n" +
       //      "[position() <= " + MAX + "]\n" +
       "return <results query=\"" + query + "\">{ $hits }</results>\n");
 

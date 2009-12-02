@@ -100,15 +100,11 @@ abstract class Primitives {
     final Atts at = new Atts();
     for(final QNm name : m.keySet()) {
       if(m.get(name) > 1) Err.or(UPATTDUPL, name);
-
-      // [CG] namespace check still buggy (see {@link ReplacePrimitive}...
       final byte[] an = name.pref();
-      final int ai = at.get(name.pref());
-      if(ai == -1) {
-        at.add(an, name.uri.str());
-      } else if(!eq(name.uri.str(), at.val[ai])) {
-        Err.or(UPNSCONFL2);
-      }
+      final byte[] uri = name.uri.str();
+      final int ai = at.get(an);
+      if(ai == -1) at.add(an, uri);
+      else if(!eq(uri, at.val[ai])) Err.or(UPNSCONFL2);
     }
   }
 

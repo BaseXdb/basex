@@ -2,7 +2,7 @@ package org.basex.gui.view.tree;
 
 /**
  * This interface contains options for the tree view.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller
  */
@@ -29,17 +29,13 @@ public interface TreeViewOptions {
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 7;
 
-
   /** Minimum space in rectangles needed for tags. **/
   int MIN_SPACE = 25;
   /** Minimum space between the levels. **/
   int MINIMUM_LEVEL_DISTANCE = 15;
 
-
   /** Draw kind rectangle. */
   byte DRAW_RECTANGLE = 0x00;
   /** Draw kind highlighting. */
   byte DRAW_HIGHLIGHT = 0x01;
-
-
 }

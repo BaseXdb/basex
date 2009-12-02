@@ -121,7 +121,7 @@ public final class Lang {
   }
 
   /**
-   * Parse all available language files and return the names and credits.
+   * Parses all available language files and returns the names and credits.
    * @return language arrays
    */
   public static synchronized String[][] parse() {

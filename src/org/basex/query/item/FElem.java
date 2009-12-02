@@ -217,7 +217,7 @@ public final class FElem extends FNode {
     } while(n != null && n.type == Type.ELM);
     return ns;
   }
-  
+
   @Override
   public FElem copy() {
     final NodIter ch = new NodIter();

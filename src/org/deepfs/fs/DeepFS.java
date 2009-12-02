@@ -114,7 +114,7 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Initialize often used tags and attributes.
+   * Initializes often used tags and attributes.
    */
   private void initNames() {
     // initialize tags and attribute names
@@ -137,7 +137,7 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Initialize default file attributes for root ('/') access.
+   * Initializes default file attributes for root ('/') access.
    */
   private void initRootStat() {
     rootStat = new DeepStat();
@@ -217,7 +217,7 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Resolve child axis from path and return pre values of children.
+   * Resolves child axis from path and return pre values of children.
    * @param path to be resolved
    * @return pre values of children found
    */
@@ -260,7 +260,7 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Extract file name suffix.
+   * Extracts file name suffix.
    * @param name of the file
    * @return suffix or EMPTY token
    */
@@ -271,7 +271,7 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Construct file node as MemData object, ready to be inserted into main
+   * Constructs file node as MemData object, ready to be inserted into main
    * data instance.
    * @param path to file to build MemData for
    * @param mode to determine file type
@@ -532,7 +532,7 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Resolve filesystem pathname and fill stat information.
+   * Resolves filesystem pathname and fill stat information.
    * For root access ('/') return default access.
    * Note we store the pre value as inode.
    * @param path to file
@@ -582,7 +582,7 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Read directory entries.
+   * Reads directory entries.
    * @param path directory to be listed.
    * @return directory entries, null on failure
    */
@@ -611,7 +611,7 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Remove directory.
+   * Removes directory.
    * @param path to directory to be removed
    * @return zero on success, -1 on failure
    */
@@ -809,7 +809,7 @@ public final class DeepFS implements DataText {
   //   */
   //
   //  /**
-  //   * Mount database as FUSE.
+  //   * Mounts database as FUSE.
   //   * @param mp path where to mount BaseX.
   //   * @param bs path to backing storage root of this instance.
   //   * @return 0 on success, errno in case of failure.
@@ -817,14 +817,14 @@ public final class DeepFS implements DataText {
   //  public native int nativeMount(final String mp, final String bs);
   //
   //  /**
-  //   * Unlink file in backing store.
+  //   * Unlinks file in backing store.
   //   * @param pathname to file to delete
   //   * @return 0 on success, errno in case of failure.
   //   */
   //  public native int nativeUnlink(final String pathname);
   //
   //  /**
-  //   * Tell DeepFS that the database will shutdown.
+  //   * Tells DeepFS that the database will shutdown.
   //   */
   //  public native void nativeShutDown();
 

@@ -374,7 +374,7 @@ public final class MapView extends View implements Runnable {
       layout.makeMap(rect, new MapList(nodes.nodes.clone()),
           0, nodes.size() - 1);
       mainRects = layout.rectangles.copy();
-      // [CG] check..
+      // [CG] GUI/MapView: check if the copy is needed; if yes, add comment..
       // mainRects = layout.rectangles;
     }
 
@@ -641,7 +641,7 @@ public final class MapView extends View implements Runnable {
   void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
     final Graphics g = map.getGraphics();
     smooth(g);
-    // [CG] check null reference...
+    // [CG] GUI/MapView: check if null reference is necessary...
     if(rects != null) painter.drawRectangles(g, rects, sc);
   }
 
@@ -774,7 +774,7 @@ public final class MapView extends View implements Runnable {
     mouseY = e.getY();
     dragTol = 0;
     if(!focus() && gui.context.focused == -1) return;
-    
+
     // add or remove marked node
     final Nodes marked = gui.context.marked;
     if(e.getClickCount() == 2) {

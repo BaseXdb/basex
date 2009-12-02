@@ -132,7 +132,7 @@ public final class LockingTest {
     new Thread() {
       @Override
       public void run() {
-        server = new BaseXServer("-v");
+        server = new BaseXServer();
       }
     }.start();
 

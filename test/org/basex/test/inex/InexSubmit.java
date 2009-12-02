@@ -256,7 +256,6 @@ public final class InexSubmit {
     return tmp;
   }
 
-
   /**
    * Parses the command line arguments.
    * @param args the command line arguments
@@ -374,7 +373,7 @@ public final class InexSubmit {
   }
 
   /**
-   * Create and print submission file.
+   * Closes the submission file.
    * @throws Exception Exception
    */
   private void closeSubFile() throws Exception {
@@ -384,7 +383,7 @@ public final class InexSubmit {
   }
 
   /**
-   * Update query times in submission.xml.
+   * Updates query times in submission.xml.
    * @param args files with times
    * @throws IOException IOException
    */

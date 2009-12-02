@@ -40,7 +40,7 @@ public final class RenamePrimitive extends NewValue {
     final byte[] uri = name.uri.str();
     final byte[] pref = pref(nm);
 
-    // [CG] check...
+    // [CG] XQuery/Update Namespaces: check if empty uris cause troubles...
     if(data.ns.uri(nm, pre) == 0 && uri.length != 0) {
       data.ns.add(pref, uri, pre);
       data.ns(pre, data.ns.id(pref));

@@ -31,7 +31,7 @@ public final class JFUSEAdapter { //implements FileModeFlags {
   private JFUSEAdapter() { }
 
   /**
-   * Check (and load) native Java FUSE bindings.
+   * Checks (and loads) native Java FUSE bindings.
    * @return true in case of success.
    */
   public static boolean loadJFUSELibrary() {
@@ -45,7 +45,7 @@ public final class JFUSEAdapter { //implements FileModeFlags {
   }
 
   /**
-   * Get (native) user id or default value.
+   * Gets (native) user id or default value.
    * @return user id
    */
   public static long getUID() {
@@ -56,7 +56,7 @@ public final class JFUSEAdapter { //implements FileModeFlags {
   }
 
   /**
-   * Get (native) group id or default value.
+   * Gets (native) group id or default value.
    * @return group id
    */
   public static long getGID() {

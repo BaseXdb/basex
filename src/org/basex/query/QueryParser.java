@@ -1481,7 +1481,6 @@ public class QueryParser extends InputParser {
     return null;
   }
 
-
   /**
    * [ 85] Parses a Literal.
    * @return query expression

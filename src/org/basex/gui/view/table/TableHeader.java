@@ -72,7 +72,7 @@ final class TableHeader extends BaseXPanel {
     addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(final FocusEvent e) {
-        filter(e.getOppositeComponent() instanceof TableView ? 0 : 
+        filter(e.getOppositeComponent() instanceof TableView ? 0 :
           tdata.cols.length - 1);
       }
       @Override

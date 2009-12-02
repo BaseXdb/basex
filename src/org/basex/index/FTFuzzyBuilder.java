@@ -40,7 +40,6 @@ public final class FTFuzzyBuilder extends FTBuilder {
   /** Number of indexed tokens. */
   private int ntok;
 
-
   /**
    * Constructor.
    * @param d data reference

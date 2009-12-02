@@ -42,7 +42,7 @@ public final class UpdateTestText extends UpdateTest {
   }
 
   /**
-   * Test insert as last child.
+   * Tests insert as last child.
    * @throws Exception in case of problems.
    */
   @Test

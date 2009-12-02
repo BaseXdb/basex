@@ -41,7 +41,7 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class PlotView extends View implements Runnable {
+public final class PlotView extends View {
   /** Rotate factor. */
   private static final double ROTATE = Math.sin(30);
   /** Plot margin: top, left, bottom, right margin. */
@@ -884,12 +884,6 @@ public final class PlotView extends View implements Runnable {
   @Override
   protected boolean db() {
     return true;
-  }
-
-  /**
-   * One day this might start the zoom animation thread.
-   */
-  public void run() {
   }
 
   /**

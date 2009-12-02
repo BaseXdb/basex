@@ -154,7 +154,6 @@ public final class TreeView extends View implements TreeViewOptions {
 
     g.drawImage(treeImage, 0, 0, getWidth(), getHeight(), this);
 
-        
     // highlights marked nodes
     // if(refreshedMark) markNodes();
 
@@ -178,7 +177,7 @@ public final class TreeView extends View implements TreeViewOptions {
   private void createNewMainImage() {
     treeImage = createImage();
     final Graphics tIg = treeImage.getGraphics();
-    
+
     cache.generateRects(tIg, gui.context, getWidth());
 
     for(int i = 0; i < cache.maxLevel; i++) {
@@ -267,7 +266,7 @@ public final class TreeView extends View implements TreeViewOptions {
     for(int i = 0; i < size; i++) {
       final int yL = getYperLevel(i);
 
-      if((yL >= f || yL + nodeHeight >= f) && 
+      if((yL >= f || yL + nodeHeight >= f) &&
           (yL <= t || yL + nodeHeight <= t)) {
 
         final TreeRect[] rl = cache.getTreeRectsPerLevel(i);
@@ -356,7 +355,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
           if(index > -1) {
 
-            final int x = (int) (currRect.w * index / 
+            final int x = (int) (currRect.w * index /
                 (double) cache.getSizePerLevel(k));
 
             mIg.setColor(Color.RED);
@@ -426,7 +425,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(childX > -1) {
       g.drawLine(childX, getYperLevel(l + 1) - 1,
-          multiPreX == -1 ? (2 * r.x + r.w) / 2 : 
+          multiPreX == -1 ? (2 * r.x + r.w) / 2 :
             multiPreX, y + nodeHeight + 1);
     }
 
@@ -584,7 +583,7 @@ public final class TreeView extends View implements TreeViewOptions {
           // if multiple pre values, then approximate pre value
           if(cache.isBigRectangle(level)) {
             final double ratio = mousePosX / (double) r.w;
-            final int index = (int) 
+            final int index = (int)
             ((cache.getSizePerLevel(level) - 1) * ratio);
             pre = cache.getPrePerLevelAndIndex(level, index);
             r.pre = pre;

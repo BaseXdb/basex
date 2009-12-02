@@ -106,6 +106,7 @@ public final class ServerProcess extends Thread {
           out.print(ex.extended());
           out.write(0);
           send(false);
+          continue;
         }
 
         // stop console

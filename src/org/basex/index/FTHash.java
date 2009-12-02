@@ -68,7 +68,7 @@ final class FTHash extends TokenSet {
   }
 
   /**
-   * Initialize the iterator. init() has to be called first!
+   * Initializes the iterator. init() has to be called first!
    */
   void initIter() {
     it = 0;

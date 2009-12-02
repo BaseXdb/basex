@@ -634,7 +634,7 @@ public enum Type {
 
       if(o instanceof Document) {
         try {
-          // [CG] API/should use instance properties
+          // [CG] XQuery/DOM: Use existing property reference?
           final Prop prop = new Prop(false);
           final DOCWrapper p = new DOCWrapper((Document) o, "", prop);
           final Data data = new MemBuilder(p).build();

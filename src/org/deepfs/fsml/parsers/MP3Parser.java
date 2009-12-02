@@ -594,7 +594,7 @@ public final class MP3Parser implements IFileParser {
     final int track = Token.toInt(value, start, i);
     if(track == Integer.MIN_VALUE) throw new ParserException(
         "Failed to parse track number");
-    return track; 
+    return track;
   }
 
   /**

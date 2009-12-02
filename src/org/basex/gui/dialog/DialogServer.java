@@ -178,7 +178,7 @@ public final class DialogServer extends Dialog {
     conn.add(new BaseXLabel(LOGIN + COLS, false, true));
     conn.add(p2);
     conn.add(info);
-    
+
     logc = new BaseXCombo(new String[] {}, this);
     logt = new BaseXText(false, this);
     logs.setLayout(new BorderLayout(2, 0));
@@ -200,12 +200,12 @@ public final class DialogServer extends Dialog {
     pl2.add(info2, BorderLayout.WEST);
     pl2.add(update, BorderLayout.EAST);
     logs.add(pl2, BorderLayout.SOUTH);
-    
+
     set(tabs, BorderLayout.CENTER);
 
     // test if server is running
     running = ping(true);
-    
+
     tabs.addChangeListener(new ChangeListener() {
         public void stateChanged(final ChangeEvent evt) {
             BaseXTabs pane = (BaseXTabs) evt.getSource();
@@ -386,9 +386,9 @@ public final class DialogServer extends Dialog {
     sedb.add(dbs);
     sedb.add(refresh);
   }
-  
+
   /**
-   * Refreshs the log panel.
+   * Refreshes the log panel.
    */
   void refreshLog() {
     logc.removeAllItems();

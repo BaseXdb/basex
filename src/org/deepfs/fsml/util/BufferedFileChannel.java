@@ -460,7 +460,7 @@ public final class BufferedFileChannel {
   }
 
   /**
-   * Read a line of text. A line is considered to be terminated by any one of a
+   * Reads a line of text. A line is considered to be terminated by any one of a
    * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
    * immediately by a linefeed.
    * @param inputEncoding the input encoding.

@@ -46,11 +46,11 @@ public final class FNGen extends Fun {
 
         if(it == null || it.type != Type.DOC && it.type != Type.ELM)
           Err.or(UPFOTYPE, expr[0]);
-        
+
         final Uri u = Uri.uri(file);
         if(u == Uri.EMPTY || !u.valid()) Err.or(UPFOURI, file);
         ctx.updates.add(new Put((Nod) it, u), ctx);
-        
+
         return Iter.EMPTY;
       default:
         return super.iter(ctx);

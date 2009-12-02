@@ -379,7 +379,7 @@ public final class BaseXTextTokens {
   public int size() {
     return size;
   }
-  
+
   @Override
   public String toString() {
     return copy();

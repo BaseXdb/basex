@@ -39,11 +39,13 @@ public class Pred extends Preds {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     root = checkUp(root, ctx).comp(ctx);
-    // [CG] check reset of context item
+    // [CG] XQuery/Pred: re-check consequences of caching the context item
+    //  and remove caching (or add comments)
     final Item tmp = ctx.item;
     ctx.item = null;
-    if(super.comp(ctx) != this) return Seq.EMPTY;
+    final Expr e = super.comp(ctx);
     ctx.item = tmp;
+    if(e != this) return e;
 
     if(root.e()) {
       ctx.compInfo(OPTPRE, this);

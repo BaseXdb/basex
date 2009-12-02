@@ -16,12 +16,12 @@ public enum MetaElem {
   TYPE(NS.DCTERMS, "type", Type.STR, true),
   /** Format (MIME type). */
   FORMAT(NS.DCTERMS, "format", Type.STR, false),
-  
+
   /** container element "content". */
   CONTENT(NS.DEEPURL, "content"),
 
   // ----- duration fields ---------------------------------------------------
-  
+
   /** Duration. */
   DURATION(NS.FSMETA, "duration", Type.DUR, false),
 
@@ -46,7 +46,7 @@ public enum MetaElem {
   DATETIME_ORIGINAL(NS.FSMETA, "dateTimeOriginal", Type.DTM, false),
   /** Year. */
   YEAR(NS.FSMETA, "year", Type.YEA, false),
-  
+
   // ----- integer fields ----------------------------------------------------
 
   /** Beats per minute. */
@@ -74,9 +74,9 @@ public enum MetaElem {
   PIXEL_WIDTH(NS.FSMETA, "pixelWidth", Type.INT, false),
   /** Track number. */
   TRACK(NS.FSMETA, "track", Type.INT, false),
-  
+
   // ----- double fields -----------------------------------------------------
-  
+
   /** Aperture value. */
   APERTURE_VALUE(NS.FSMETA, "apertureValue", Type.DBL, false),
   /** Maximum aperture value. */
@@ -248,7 +248,6 @@ public enum MetaElem {
   YCBCR_COEFFICIENTS(NS.FSMETA, "yCbCrCoefficients", Type.STR, false),
   /** YCbCrPositioning. */
   YCBCR_POSITIONING(NS.FSMETA, "yCbCrPositioning", Type.STR, false);
-  
 
   /** Metadata key as byte array. */
   private final byte[] n;
@@ -330,7 +329,7 @@ public enum MetaElem {
   }
 
   /**
-   * Override the default data type of the metadata element with a more precise
+   * Overrides the default data type of the metadata element with a more precise
    * data type (e.g. "short" instead of "integer").
    * @param dataType the new xml data type to set for this metadata element.
    */

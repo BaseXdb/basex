@@ -174,15 +174,14 @@ public final class Context {
 
   /**
    * Checks if the current user has the specified permissions.
-   * @param p permissions
+   * @param p requested permissions
    * @param m optional meta data reference
    * @return result of check (-1: ok, other: failure)
    */
   public int perm(final int p, final MetaData m) {
-    final User u = user;
-    int up = u.perm;
+    int up = user.perm;
     if(m != null) {
-      final User us = m.users.get(u.name);
+      final User us = m.users.get(user.name);
       if(us != null) up = up & ~(User.READ | User.WRITE) | us.perm;
     }
     int i = 4;

@@ -44,7 +44,7 @@ public final class DeepStat {
   public long stgen;
 
   /**
-   * Print stat fields to provided stream.
+   * Prints stat fields to the provided stream.
    * @param prefix to output
    * @param ps stream to be printed to
    */

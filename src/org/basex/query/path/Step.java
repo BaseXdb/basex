@@ -76,8 +76,7 @@ public class Step extends Preds {
     }
     final Expr e = super.comp(ctx);
     ctx.leaf = false;
-
-    if(e != this) return Seq.EMPTY;
+    if(e != this) return e;
 
     // no predicates.. evaluate via simple iterator
     if(pred.length == 0) return get(axis, test);

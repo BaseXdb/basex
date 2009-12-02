@@ -1,10 +1,8 @@
 package org.basex.query.ft;
 
-import org.basex.data.Data;
 import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
 import org.basex.index.FTIndex;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.FTItem;
 
 /**
@@ -66,7 +64,6 @@ public final class Scoring {
    * Determines a single scoring value out of two FTAnd combined terms.
    * The minimum scoring value is chosen and weighted by the average distance
    * of the single result terms in the text node.
-   *
    * @param item1 item1
    * @param item2 item2
    * @return scoring value
@@ -114,15 +111,13 @@ public final class Scoring {
         p[sm.q - 1] = -1;
       }
     }
-
     int count = 0;
     for(final int pp : p) if(pp == -1) count++;
-
     return score * (count > m ? 1 : count / m);
   }
 
   /**
-   * Inverse the scoring value for FTNot.
+   * Inverses the scoring value for FTNot.
    * @param d scoring value
    * @return inverse scoring value
    */
@@ -179,65 +174,45 @@ public final class Scoring {
   }
 
   /**
-   * Scoring the parent axis step.
+   * Returns a score for a single step.
    * @param sc current score value
    * @return new score value
    */
-  public static double parentAxis(final double sc) {
-      return sc * SCORESTEP;
-  }
-
-  /**
-   * Scoring the child axis step.
-   * @param sc current score value
-   * @return new score value
-   */
-  public static double childAxis(final double sc) {
+  public static double step(final double sc) {
     return sc * SCORESTEP;
   }
 
   /**
-   * Scoring the descendant axis step.
-   * @param sc current score value
-   * @return new score value
-   */
-  public static double descAxis(final double sc) {
-    return sc * SCORESTEP;
-  }
-
-  /**
-   * Scoring the descendant axis step.
+   * Returns a score for the descendant axis step.
    * @param r current node
    * @param d descendant node
    * @param data data reference
    * @param sc current score value
    * @return new score value
-   */
   public static double descAxis(final int r, final int d, final Data data,
       final double sc) {
     return sc * 1d / Math.sqrt(distTo(data, d, r));
-//    return sc * SCORESTEP;
+    //return sc * SCORESTEP;
   }
-
+   */
 
   /**
-   * Scoring the parent axis step by using meta information.
+   * Returns a score for the parent axis step, using meta information.
    * @param data Data reference
    * @param nod current node
    * @return score value
-   */
   public static double parentAxis(final Data data, final DBNode nod) {
     return nod.score() *
       (1d - (double) distTo(data, nod.pre, 0) / data.meta.height);
   }
+   */
 
   /**
-   * Determine distance between two nodes using parent steps.
+   * Determines the distance between two nodes using parent steps.
    * @param data Data reference
    * @param n1 start node
    * @param n2 destination node
    * @return distance to root node
-   */
   private static int distTo(final Data data, final int n1, final int n2) {
     int dist = 0;
     int parent = data.parent(n1, data.kind(n1));
@@ -247,4 +222,5 @@ public final class Scoring {
     }
     return dist;
   }
+   */
 }

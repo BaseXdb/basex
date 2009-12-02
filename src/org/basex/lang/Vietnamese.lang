@@ -19,11 +19,11 @@ m_inter=Tương tác
 m_layout=Nền
 
 # Buttons
-b_ok=OK  
+b_ok=OK
 b_opt=Tối ưu...
 b_rename=Đổi tên...
-b_open=Mở 
-b_mount= Mount 
+b_open=Mở
+b_mount= Mount
 b_cancel=Hủy
 b_drop=Xóa
 b_cmd=Lệnh
@@ -378,15 +378,15 @@ qu_plan=Kết hoạch hỏi
 qu_hits=Hết(s)
 
 # Query Commands.. the following strings must have the same length
-qu_tabquery=Hỏi     
-qu_tabpars=Phân tích   
-qu_tabcomp=Dịch 
+qu_tabquery=Hỏi
+qu_tabpars=Phân tích
+qu_tabcomp=Dịch
 qu_tabeval=Đáng giá
-qu_tabprint=In ra  
+qu_tabprint=In ra
 qu_tabtotal=Thời gian
-qu_tabmem=Bộ nhớ    
-qu_tabprinted=Đã in   
-qu_tabhits=Kết quả   
+qu_tabmem=Bộ nhớ
+qu_tabprinted=Đã in
+qu_tabhits=Kết quả
 qu_nodeserr==Lệnh hỏi phải lấy một tập nút.
 qu_stopped=Stopped at
 qu_line=line %

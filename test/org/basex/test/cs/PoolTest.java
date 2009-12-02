@@ -91,7 +91,6 @@ public class PoolTest {
     pins(0, NAME);
   }
 
-
   /** Stops the server. */
   @AfterClass
   public static void stop() {

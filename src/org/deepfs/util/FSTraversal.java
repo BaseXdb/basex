@@ -3,11 +3,11 @@ package org.deepfs.util;
 import java.io.File;
 
 /**
- * Interface assembling the events fired during a filesystem traversal. 
- * 
+ * Interface assembling the events fired during a filesystem traversal.
+ *
  * #{@link FSWalker} descends into a directory hierarchy and notifies
  * registered visitors about the events assembled in this interface.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek
  */

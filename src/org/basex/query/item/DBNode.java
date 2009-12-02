@@ -187,7 +187,7 @@ public class DBNode extends Nod {
     // check if parent constructor exists; if not, include document root node
     final DBNode node = copy();
     node.set(p, data.kind(p));
-    node.score(Scoring.parentAxis(node.score));
+    node.score(Scoring.step(node.score));
     return node;
   }
 
@@ -246,7 +246,7 @@ public class DBNode extends Nod {
         if(!more()) return null;
         k = data.kind(p);
         node.set(p, k);
-        node.score(Scoring.childAxis(sc));
+        node.score(Scoring.step(sc));
         p += data.size(p, k);
         return node;
       }
@@ -268,7 +268,7 @@ public class DBNode extends Nod {
         k = data.kind(p);
         node.set(p, k);
         p += data.attSize(p, k);
-        node.score(Scoring.descAxis(sc));
+        node.score(Scoring.step(sc));
         return node;
       }
     };

@@ -189,7 +189,7 @@ public final class Token {
     if(e.equals(UTF16LE)) return UTF16LE;
     return enc;
   }
-  
+
   /**
    * Returns the codepoint (unicode value) of the specified token,
    * starting at the specified position.

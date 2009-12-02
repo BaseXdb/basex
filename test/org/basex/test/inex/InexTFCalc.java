@@ -48,7 +48,6 @@ public final class InexTFCalc {
   /** Container for qtimes and results. */
   private PrintOutput res = new PrintOutput(WORDSF);
 
-
   /**
    * Main test method.
    * @param args command-line arguments

@@ -11,7 +11,7 @@ import org.basex.util.Token;
 
 /**
  * This class determines nodes per level and caches them.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller
  */
@@ -93,7 +93,7 @@ public class TreeCaching implements TreeViewOptions {
 //    final int rl = rlp[0];
 //    final int ri = rlp[1];
 //
-//    int np = nodesPerLevel.get(rl).length > ri + 1 ? 
+//    int np = nodesPerLevel.get(rl).length > ri + 1 ?
 //  nodesPerLevel.get(rl)[ri + 1]
 //        : -1;
 //
@@ -325,7 +325,7 @@ public class TreeCaching implements TreeViewOptions {
   }
 
   /**
-   * Return pre value at given level and index.
+   * Returns pre value at given level and index.
    * @param l level
    * @param i index
    * @return pre value

@@ -87,7 +87,7 @@ public class IntList {
   }
 
   /**
-     * Searches for the specified value via binary search. 
+     * Searches for the specified value via binary search.
      * Note that the values must be sorted.
      * @param v value to find
      * @return index of the search key, or the negative insertion point - 1.

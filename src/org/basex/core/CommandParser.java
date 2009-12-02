@@ -106,7 +106,7 @@ public final class CommandParser extends InputParser {
   }
 
   /**
-   * Parse command.
+   * Parses a single command.
    * @param cmd command
    * @return process
    * @throws QueryException query exception

@@ -141,7 +141,7 @@ public enum GUICommands implements GUICommand {
       final IO io = IO.get(dialog.path());
       if(io.exists() && !Dialog.confirm(gui,
           Main.info(FILEREPLACE, io))) return;
-      
+
       String path = io.path();
       String name = null;
       if(dialog.file()) {

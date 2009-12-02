@@ -265,7 +265,7 @@ public final class DeepShell {
   }
 
   /**
-   * Leave shell.
+   * Leaves the shell.
    * @param args argument vector (currently not used)
    */
   @Command(shortcut = 'q', help = "quit shell (unmounts fuse and closes db)")
@@ -276,7 +276,7 @@ public final class DeepShell {
   }
 
   /**
-   * Serialize FS instance.
+   * Serializes the FS instance.
    * @param args argument vector (currently not used)
    */
   @Command(shortcut = 'x', help = "print file hierarchy as XML")

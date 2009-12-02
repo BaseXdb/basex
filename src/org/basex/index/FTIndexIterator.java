@@ -43,8 +43,8 @@ public abstract class FTIndexIterator extends IndexIterator {
   }
 
   /**
-   * Get number of indexed results.
-   * @return number of indexed results
+   * Returns the number of index entries.
+   * @return number of index entries
    */
   public final int indexSize() {
     return size;

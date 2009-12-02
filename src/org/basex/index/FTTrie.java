@@ -252,10 +252,10 @@ public final class FTTrie extends FTIndex {
   private int skippedChars;
 
   /**
-   * Looking up node with value, which match ending.
-   * The parameter lastFound shows, whether chars were found in last recursive
-   * call, which correspond to the ending, consequently those chars are
-   * considered, which occur successive in ending.
+   * Looks up a node with value, which matches the ending.
+   * The parameter lastFound shows whether chars were found in last recursive
+   * call, which correspond to the ending; consequently, those chars are
+   * considered which occur successive in the ending.
    * pointerNode shows the position comparison between value[nodeId] and
    * ending starts
    * pointerEnding shows the position comparison between ending and
@@ -373,7 +373,7 @@ public final class FTTrie extends FTIndex {
   }
 
   /**
-   * Save number compared chars at wildcard search.
+   * Saves the number of compared chars at wildcard search.
    * counter[0] = total number compared chars
    * counter[1] = number current method call (gets initialized before each call)
    */

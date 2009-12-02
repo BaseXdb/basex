@@ -6,6 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
@@ -47,7 +48,7 @@ public abstract class Preds extends Expr {
       if(ex.i()) {
         if(!((Item) ex).bool()) {
           ctx.compInfo(OPTFALSE, ex);
-          e = null;
+          e = Seq.EMPTY;
           break;
         }
         ctx.compInfo(OPTTRUE, ex);

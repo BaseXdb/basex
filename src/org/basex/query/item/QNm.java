@@ -63,7 +63,7 @@ public final class QNm extends Item {
   }
 
   /**
-   * Convenient method for converting a Java QName to a project specific one.
+   * Convenience method for converting a Java QName.
    * @param qn qname
    */
   public QNm(final QName qn) {
@@ -160,7 +160,7 @@ public final class QNm extends Item {
   public int hashCode() {
     return super.hashCode();
   }
-  
+
   @Override
   public String toString() {
     return "\"" + string(val) + "\"";

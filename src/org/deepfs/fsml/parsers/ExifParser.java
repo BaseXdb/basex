@@ -66,10 +66,10 @@ public final class ExifParser {
      * denominator.
      */
     SRATIONAL(8);
-    
+
     /** The size in bytes. */
     private final int size;
-    
+
     /**
      * Constructor.
      * @param s the size in bytes.
@@ -77,7 +77,7 @@ public final class ExifParser {
     private Format(final int s) {
       size = s;
     }
-    
+
     /**
      * Returns the size in bytes.
      * @return the size in bytes.
@@ -477,7 +477,7 @@ public final class ExifParser {
           default: s = null;
         }
         if(s != null) d.addMeta(elem, s);
-      }      
+      }
     },
     /** White balance. */
     ha403(1, MetaElem.WHITE_BALANCE, Format.SHORT) {
@@ -611,7 +611,7 @@ public final class ExifParser {
     private Tag(final MetaElem metaElem, final Format... allowedFormats) {
       this(-1, metaElem, false, allowedFormats);
     }
-    
+
     /**
      * Initializes a tag.
      * @param expectedCount the expected number of values.
@@ -726,7 +726,7 @@ public final class ExifParser {
       if(unique && d.isMetaSet(elem)) return;
       metaSimple(d, b);
     }
-    
+
     /**
      * Parses an inlined field and adds the metadata to the deep file.
      * @param d the {@link DeepFile} to add the metadata to.
@@ -852,7 +852,7 @@ public final class ExifParser {
         err(d, e.getMessage());
       }
     }
-    
+
     /**
      * Reads a byte from the {@link ByteBuffer}.
      * @param b the {@link ByteBuffer} to read from.
@@ -861,7 +861,7 @@ public final class ExifParser {
     short readByte(final ByteBuffer b) {
       return (short) (b.get() & 0xFF);
     }
-    
+
     /**
      * Reads a byte from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from.
@@ -870,7 +870,7 @@ public final class ExifParser {
     short readByte(final BufferedFileChannel b) {
       return (short) b.get();
     }
-    
+
     /**
      * Reads a short from the {@link ByteBuffer}.
      * @param b the {@link ByteBuffer} to read from.
@@ -879,7 +879,7 @@ public final class ExifParser {
     int readShort(final ByteBuffer b) {
       return b.getShort() & 0xFFFF;
     }
-    
+
     /**
      * Reads a short from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from.
@@ -888,7 +888,7 @@ public final class ExifParser {
     int readShort(final BufferedFileChannel b) {
       return b.getShort();
     }
-    
+
     /**
      * Reads an unsigned long from the {@link ByteBuffer}.
      * @param b the {@link ByteBuffer} to read from.
@@ -897,7 +897,7 @@ public final class ExifParser {
     long readLong(final ByteBuffer b) {
       return b.getInt() & 0xFFFFFFFFL;
     }
-    
+
     /**
      * Reads an unsigned long from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from.
@@ -906,7 +906,7 @@ public final class ExifParser {
     long readLong(final BufferedFileChannel b) {
       return b.getInt() & 0xFFFFFFFFL;
     }
-    
+
     /**
      * Reads a signed long from the {@link ByteBuffer}.
      * @param b the {@link ByteBuffer} to read from.
@@ -915,7 +915,7 @@ public final class ExifParser {
     int readSLong(final ByteBuffer b) {
       return b.getInt();
     }
-    
+
     /**
      * Reads a signed long from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from.
@@ -924,7 +924,7 @@ public final class ExifParser {
     int readSLong(final BufferedFileChannel b) {
       return b.getInt();
     }
-    
+
     /**
      * Reads an ASCII value from the {@link ByteBuffer} and returns it as byte
      * array.
@@ -946,7 +946,7 @@ public final class ExifParser {
         throws IOException {
       return b.get(new byte[count]);
     }
-    
+
     /**
      * Reads a rational value from a IFD field.
      * @param b the {@link BufferedFileChannel} to read the rational from.
@@ -957,7 +957,7 @@ public final class ExifParser {
       final long denominator = readLong(b);
       return (double) numerator / denominator;
     }
-    
+
     /**
      * Reads a signed rational value from a IFD field.
      * @param b the {@link BufferedFileChannel} to read the rational from.
@@ -982,7 +982,7 @@ public final class ExifParser {
       final Date date = SDF.parse(Token.string(readAscii(b)));
       return ParserUtil.convertDateTime(date);
     }
-    
+
     /**
      * Generates a debug message.
      * @param d the {@link DeepFile}.
@@ -991,7 +991,7 @@ public final class ExifParser {
     void err(final DeepFile d, final Exception ex) {
       err(d, ex.getMessage());
     }
-    
+
     /**
      * Generates a debug message.
      * @param d the {@link DeepFile}.
@@ -1032,7 +1032,7 @@ public final class ExifParser {
   }
 
   /**
-   * Parse the Exif data.
+   * Parses the Exif data.
    * @param df the DeepFile to store metadata and file content.
    * @throws IOException if any error occurs while reading from the channel.
    */

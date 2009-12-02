@@ -30,7 +30,6 @@ public final class FDoc extends FNode {
     base = b;
   }
 
-
   /**
    * Constructor for DOM nodes (partial).
    * Provided by Erdal Karaca.

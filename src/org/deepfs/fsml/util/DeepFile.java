@@ -69,7 +69,7 @@ public class DeepFile {
 
   /** The BaseX context. */
   private final Context context;
-  
+
   /** Flag, if metadata extraction is finished. */
   private boolean metaFinished;
   /** Offset of the deep file inside the current regular file. */
@@ -181,7 +181,7 @@ public class DeepFile {
     this(parserRegistry, bufferedFileChannel, ctx,
         bufferedFileChannel.getOffset(), bufferedFileChannel.size());
   }
-  
+
   /**
    * Constructor.
    * @param parserRegistry a reference to the parser registry that can be used
@@ -198,7 +198,7 @@ public class DeepFile {
     bfc = bufferedFileChannel;
     context = ctx;
     final Prop p = ctx.prop;
-    final boolean meta = p.is(Prop.FSMETA); 
+    final boolean meta = p.is(Prop.FSMETA);
     metaFinished = !meta;
     offset = position;
     size = contentSize;
@@ -233,7 +233,7 @@ public class DeepFile {
   // ---------------------------------------------------------------------------
 
   /**
-   * Extract metadata and text/xml contents from the associated file.
+   * Extracts metadata and text/xml contents from the associated file.
    * @throws IOException if any error occurs while reading from the file.
    */
   public void extract() throws IOException {
@@ -307,7 +307,7 @@ public class DeepFile {
   public Context getContext() {
     return context;
   }
-  
+
   /**
    * Returns the offset of the deep file inside the regular file in the file
    * system.
@@ -407,7 +407,7 @@ public class DeepFile {
   }
 
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param e metadata element (the key).
    * @param value value as byte array. Must contain only correct UTF-8 values!
    * @param dataType the xml data type to set for this metadata element or
@@ -428,7 +428,7 @@ public class DeepFile {
   }
 
   /**
-   * Add the metadata to the TreeMap.
+   * Adds the metadata to the TreeMap.
    * @param e metadata element (the key).
    * @param value value as byte array. Must contain only correct UTF-8 values!
    */
@@ -454,7 +454,7 @@ public class DeepFile {
   }
 
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param elem metadata element (the key). Must be a string attribute.
    * @param value string value as byte array.
    */
@@ -465,17 +465,17 @@ public class DeepFile {
   }
 
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param elem metadata element (the key).
    * @param value string value.
    */
   public void addMeta(final MetaElem elem, final String value) {
-    if(!checkType(elem, Type.STR)) return; 
+    if(!checkType(elem, Type.STR)) return;
     addMeta(elem, ParserUtil.checkUTF(Token.token(value)), null);
   }
 
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param elem metadata element (the key).
    * @param value integer value.
    */
@@ -485,7 +485,7 @@ public class DeepFile {
   }
 
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param elem metadata element (the key).
    * @param value integer value.
    */
@@ -497,7 +497,7 @@ public class DeepFile {
   }
 
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param elem metadata element (the key).
    * @param value long value.
    */
@@ -507,9 +507,9 @@ public class DeepFile {
       else metaDebug(elem, "long");
     } else addMeta(elem, Token.token(value), Type.LNG);
   }
-  
+
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param elem metadata element (the key).
    * @param value double value.
    */
@@ -519,7 +519,7 @@ public class DeepFile {
   }
 
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param elem metadata element (the key).
    * @param value duration value.
    */
@@ -529,7 +529,7 @@ public class DeepFile {
   }
 
   /**
-   * Add a metadata key-value pair for the current file.
+   * Adds a metadata key-value pair for the current file.
    * @param elem metadata element (the key).
    * @param xgc calendar value.
    */
@@ -541,7 +541,7 @@ public class DeepFile {
       metaDebug(elem, st.getLocalPart());
     else addMeta(elem, token(xgc.toXMLFormat()), null);
   }
-  
+
   /**
    * Checks if the found type is valid for the given metadata element.
    * @param elem the metadata element.
@@ -567,7 +567,8 @@ public class DeepFile {
   }
 
   /**
-   * Finish the extraction of metadata and extracts the file system attributes.
+   * Finishes the extraction of metadata and extracts the file system
+   * attributes.
    * @throws IOException if any error occurs while extracting the file system
    *           attributes.
    */
@@ -709,7 +710,7 @@ public class DeepFile {
   // ---------------------------------------------------------------------------
 
   /**
-   * Extract the file system attributes from the file.
+   * Extracts the file system attributes from the file.
    * @return the file system attributes.
    * @throws IOException if any error occurs while reading from the file.
    */

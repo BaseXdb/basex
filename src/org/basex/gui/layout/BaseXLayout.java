@@ -96,7 +96,7 @@ public final class BaseXLayout {
   static void setSize(final Component comp, final int w, final int h) {
     comp.setPreferredSize(new Dimension(w, h));
   }
-  
+
   /**
    * Adds default interactions to the specified component.
    * @param comp component

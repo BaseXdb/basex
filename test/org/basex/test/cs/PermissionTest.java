@@ -34,7 +34,6 @@ import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.Show;
 import org.basex.core.proc.XQuery;
-import org.basex.io.IO;
 import org.basex.io.NullOutput;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
@@ -49,16 +48,15 @@ import org.junit.Test;
  * @author Andreas Weiler
  */
 public class PermissionTest {
-  
   /** Server reference. */
   static BaseXServer server;
   /** Socket reference. */
   static Session adminSession;
   /** Socket reference. */
   static Session testSession;
-  /** IO. */
-  final IO io = IO.get("export.xml");
-  
+  /** Export file. */
+  final String export = "export.xml";
+
   /** Starts the server. */
   @BeforeClass
   public static void start() {
@@ -71,11 +69,11 @@ public class PermissionTest {
 
     // wait for server to be started
     Performance.sleep(200);
-    
+
     try {
       adminSession = new ClientSession(server.context, ADMIN, ADMIN);
-      if(server.context.users.get("test") != null) { 
-      ok(new DropUser("test"), adminSession);
+      if(server.context.users.get("test") != null) {
+        ok(new DropUser("test"), adminSession);
       }
       ok(new CreateUser("test", "test"), adminSession);
       testSession = new ClientSession(server.context, "test", "test");
@@ -83,14 +81,14 @@ public class PermissionTest {
       throw new AssertionError(ex.toString());
     }
   }
-  
+
   /** Tests all commands where no permission is needed. */
   @Test
   public final void noPermsNeeded() {
     ok(new CreateDB("<xml>This is a test</xml>", "test"), adminSession);
     ok(new Close(), adminSession);
     ok(new Revoke("all", "test"), adminSession);
-    
+
     ok(new Set(CmdSet.INFO, false), testSession);
     ok(new Password("test"), testSession);
     ok(new Help("list"), testSession);
@@ -121,12 +119,11 @@ public class PermissionTest {
     no(new Revoke("read", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
   }
-  
+
   /** Tests all commands where read permission is needed. */
   @Test
   public final void readPermsNeeded() {
     ok(new Grant("read", "test"), adminSession);
-    
     ok(new Open("test"), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoIndex(), testSession);
@@ -145,19 +142,19 @@ public class PermissionTest {
     no(new DropIndex("SUMMARY"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export(io.path()), testSession);
+    no(new Export(".", export), testSession);
     no(new Kill(), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
   }
-  
+
   /** Tests all commands where write permission is needed. */
   @Test
   public void writePermsNeeded() {
     ok(new Grant("write", "test"), adminSession);
-    
+
     // XQuery Update
     ok(new XQuery("for $item in fn:doc('test')//xml return rename" +
         " node $item as 'null'"), testSession);
@@ -173,14 +170,14 @@ public class PermissionTest {
     no(new DropDB("test"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export(io.path()), testSession);
+    no(new Export(".", export), testSession);
     no(new Kill(), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
   }
-  
+
   /** Tests all commands where create permission is needed. */
   @Test
   public void createPermsNeeded() {
@@ -194,21 +191,21 @@ public class PermissionTest {
     ok(new DropDB("test"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export(io.path()), testSession);
+    no(new Export(".", export), testSession);
     no(new Kill(), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
   }
-  
+
   /** Tests all commands where admin permission is needed. */
   @Test
   public void adminPermsNeeded() {
     ok(new Grant("admin", "test"), adminSession);
     ok(new CreateUser("test2", "test"), testSession);
     ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
-    ok(new Export(io.path()), testSession);
+    ok(new Export(".", export), testSession);
     ok(new Show("Users"), testSession);
     ok(new Grant("admin", "test2"), testSession);
     ok(new Revoke("admin", "test2"), testSession);
@@ -218,7 +215,6 @@ public class PermissionTest {
     ok(new Close(), adminSession);
     ok(new DropDB("test"), adminSession);
   }
-  
 
   /** Tests some usability stuff. */
   @Test
@@ -228,7 +224,7 @@ public class PermissionTest {
     ok(new Exit(), testSession);
     ok(new DropUser("test"), adminSession);
   }
-  
+
   /**
    * Assumes that this command is successful.
    * @param pr process reference
@@ -269,7 +265,7 @@ public class PermissionTest {
       return ex.toString();
     }
   }
-  
+
   /** Stops the server. */
   @AfterClass
   public static void stop() {

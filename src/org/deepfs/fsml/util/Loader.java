@@ -35,7 +35,7 @@ public final class Loader extends ClassLoader {
 
   /**
    * <p>
-   * Load all subclasses of <code>superClass</code> from the package
+   * Loads all subclasses of <code>superClass</code> from the package
    * <code>pkg</code>. The classes may either be in a directory or inside a java
    * archive file. If one of the classes is already loaded, nothing is done (but
    * the class will be included in the results).

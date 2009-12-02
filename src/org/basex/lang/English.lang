@@ -20,11 +20,11 @@ m_inter=Interaction
 m_layout=Layout
 
 # Buttons
-b_ok=  OK  
+b_ok=  OK
 b_opt=Optimize...
 b_rename=Rename...
-b_open= Open 
-b_mount= Mount 
+b_open= Open
+b_mount= Mount
 b_cancel=Cancel
 b_drop=Drop
 b_cmd=Command
@@ -294,7 +294,7 @@ ds_drquestion=User '%' will be dropped.\nAre you sure?
 ds_alterpw=Alter Password
 ds_newpw=New Password
 ds_invalid=% is invalid
-ds_login=Login 
+ds_login=Login
 ds_databases=Databases
 ds_sessions=Sessions
 
@@ -378,15 +378,15 @@ qu_plan=Query plan
 qu_hits=Hit(s)
 
 # Query Commands.. the following strings must have the same length
-qu_tabquery=Query     
-qu_tabpars=Parsing   
-qu_tabcomp=Compiling 
+qu_tabquery=Query
+qu_tabpars=Parsing
+qu_tabcomp=Compiling
 qu_tabeval=Evaluating
-qu_tabprint=Printing  
+qu_tabprint=Printing
 qu_tabtotal=Total Time
-qu_tabmem=Memory    
-qu_tabprinted=Printed   
-qu_tabhits=Results   
+qu_tabmem=Memory
+qu_tabprinted=Printed
+qu_tabhits=Results
 qu_nodeserr=Query must yield a nodeset.
 qu_stopped=Stopped at
 qu_line=line %

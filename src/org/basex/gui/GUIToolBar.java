@@ -38,7 +38,7 @@ public final class GUIToolBar extends JToolBar {
   }
 
   /**
-   * Refresh buttons.
+   * Refreshes the buttons.
    */
   public void refresh() {
     for(int b = 0; b < cmd.length; b++) {

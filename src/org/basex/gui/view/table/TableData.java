@@ -263,7 +263,7 @@ final class TableData {
   }
 
   /**
-   * Sort columns.
+   * Sorts column entries.
    */
   void sort() {
     if(sortCol == -1) return;

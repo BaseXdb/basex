@@ -37,9 +37,9 @@ public final class BaseXKeys {
   /** Browse forward. */
   public static final int[] GOFORWARD = { MAC ? SC : ALT, VK_RIGHT };
   /** Browse up. */
-  public static final int[] GOUP = { MAC ? SC : ALT, VK_LEFT };
+  public static final int[] GOUP = { MAC ? SC : ALT, VK_UP };
   /** Browse home. */
-  public static final int[] GOHOME = { MAC ? SC : ALT, VK_RIGHT };
+  public static final int[] GOHOME = { MAC ? SC : ALT, VK_HOME };
   /** Copy. */
   public static final int[] COPY = { SC, VK_C };
   /** Cut. */
@@ -115,7 +115,7 @@ public final class BaseXKeys {
   public static final int[] SPACE = { 0, VK_SPACE };
   /** Tab key. */
   public static final int[] TAB = { 0, VK_TAB };
-  
+
   /** Private constructor. */
   private BaseXKeys() { }
 

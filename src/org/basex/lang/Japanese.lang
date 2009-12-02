@@ -20,11 +20,11 @@ m_inter=Interaction
 m_layout=レイアウト
 
 # Buttons
-b_ok=  OK  
+b_ok=  OK
 b_opt=最適化
 b_rename=名前の変更
 b_open= 開く
-b_mount= Mount 
+b_mount= Mount
 b_cancel=中止
 b_drop=削除
 b_cmd=コマンド
@@ -372,7 +372,7 @@ bye4=じゃーね。
 
 # Query Commands
 qu_query=クエリー　　
-qu_comp=コンパイル中 
+qu_comp=コンパイル中
 qu_eval=計算中
 qu_time=タイミング
 qu_result=結果

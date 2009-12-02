@@ -69,7 +69,7 @@ abstract class FTBuilder extends IndexBuilder {
    */
   protected final void index() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
-    
+
     for(pre = 0; pre < total; pre++) {
       final int k = data.kind(pre);
       if(k != Data.TEXT) {

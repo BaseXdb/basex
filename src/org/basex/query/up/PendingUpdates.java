@@ -30,7 +30,7 @@ import org.basex.query.util.Err;
  */
 public final class PendingUpdates {
   /** Update primitives which target nodes are DBNodes. */
-  private final Map<Data, Primitives> primitives = 
+  private final Map<Data, Primitives> primitives =
     new HashMap<Data, Primitives>();
   /** Data dummy for fragment updates. */
   // [LK] problem is fixed; prop instance from main context could be adopted,
@@ -83,13 +83,13 @@ public final class PendingUpdates {
       Err.or(UPNOTCOPIED, p.node);
 
     final Data d = frag ? dataDummy : ((DBNode) p.node).data;
-    
+
     Primitives prim = primitives.get(d);
     if(prim == null) {
       // check permissions
       if(!frag && ctx.context.perm(User.WRITE, d.meta) != -1)
         throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
-      
+
       prim = frag ? new FragmentPrimitives() : new DBPrimitives(d);
       primitives.put(d, prim);
     }

@@ -57,7 +57,7 @@ public final class BaseXServer extends Main implements Runnable {
     super(args);
     if(!success) return;
     log = new Log(context, quiet);
-    
+
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
       new Thread(this).start();

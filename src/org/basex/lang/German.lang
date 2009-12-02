@@ -20,11 +20,11 @@ m_inter=Interaktion
 m_layout=Layout
 
 # Buttons
-b_ok=  OK  
+b_ok=  OK
 b_opt=Optimieren...
 b_rename=Umbenennen...
 b_open=Öffnen
-b_mount= Mount 
+b_mount= Mount
 b_cancel=Abbrechen
 b_drop=Löschen
 b_browse=Auswahl
@@ -379,15 +379,15 @@ qu_plan=Ausführungsplan
 qu_hits=Treffer
 
 # Query Commands.. the following strings must have the same length
-qu_tabquery=Anfrage     
-qu_tabpars=Parsing     
+qu_tabquery=Anfrage
+qu_tabpars=Parsing
 qu_tabcomp=Kompilierung
-qu_tabeval=Ausführung 
-qu_tabprint=Ausgabe     
-qu_tabtotal=Gesamt      
-qu_tabmem=Speicher    
-qu_tabprinted=Gedruckt    
-qu_tabhits=Ergebnisse  
+qu_tabeval=Ausführung
+qu_tabprint=Ausgabe
+qu_tabtotal=Gesamt
+qu_tabmem=Speicher
+qu_tabprinted=Gedruckt
+qu_tabhits=Ergebnisse
 qu_nodeserr=Anfrage muss eine Knotenmenge zurückliefern.
 qu_stopped=Gestoppt bei
 qu_line=Zeile %

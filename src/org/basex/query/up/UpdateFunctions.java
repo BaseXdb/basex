@@ -74,7 +74,7 @@ public final class UpdateFunctions {
     d.delete(b);
     return true;
   }
-  
+
   /**
    * Checks for namespace conflicts.
    * @param aList attribute list

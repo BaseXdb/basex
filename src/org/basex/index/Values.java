@@ -69,8 +69,6 @@ public final class Values extends Index {
     return tb.finish();
   }
 
-  
-  
   @Override
   public IndexIterator ids(final IndexToken tok) {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
@@ -79,11 +77,9 @@ public final class Values extends Index {
     if(pos == 0) return IndexIterator.EMPTY;
 
     final int id = cache.id(tok.get());
-    if (id > 0) 
+    if (id > 0)
       return iter(cache.getSize(id), cache.getPointer(id));
     return iter(idxl.readNum(pos), idxl.pos());
-    
-    
   }
 
   @Override
@@ -92,7 +88,7 @@ public final class Values extends Index {
     final byte[] tok = it.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
-    
+
     final long pos = get(tok);
     final int numPre =  idxl.readNum(pos);
     cache.add(it.get(), numPre, pos + Num.len(numPre));
@@ -133,7 +129,7 @@ public final class Values extends Index {
       public double score() { return -1; }
     };
   }
-  
+
   /**
    * Performs a range query.
    * @param tok index term

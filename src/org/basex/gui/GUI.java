@@ -135,7 +135,7 @@ public final class GUI extends JFrame {
     context = ctx;
     prop = gprops;
     setTitle(Text.TITLE);
-    // [CG] use setIconImages(...)
+    // [CG] use setIconImages(...) to allow different image sizes (since 1.6)
     setIconImage(BaseXLayout.image("icon"));
 
     // set window size
@@ -403,7 +403,7 @@ public final class GUI extends JFrame {
    * @param main call from the main input field
    * @return success flag
    */
-  // [CG] check exec/execute/... references
+  // [CG] GUI: check/merge exec/execute/... references
   boolean exec(final Proc pr, final boolean main) {
     final int thread = ++threadID;
 

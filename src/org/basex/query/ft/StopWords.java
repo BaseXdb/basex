@@ -34,7 +34,7 @@ public final class StopWords extends TokenSet {
   }
 
   /**
-   * Constructor, reading stopwordlist from disk.
+   * Constructor, reading stopword list from disk.
    * And creating database stopword file.
    * @param dat data reference
    * @param file stopword list file
@@ -46,7 +46,7 @@ public final class StopWords extends TokenSet {
   }
 
   /**
-   * Get database stopword list file.
+   * Returns the database stopword list file.
    * @param dat data reference
    * @return database stopword list file
    */
@@ -55,7 +55,7 @@ public final class StopWords extends TokenSet {
   }
 
   /**
-   * Read database stopword list from disk.
+   * Reads the database stopword list from disk.
    * @param in input stream
    * @throws IOException I/O exception
    */
@@ -68,7 +68,7 @@ public final class StopWords extends TokenSet {
   }
 
   /**
-   * Writes database stopword list to disk.
+   * Writes the database stopword list to disk.
    * @param out output stream
    * @throws IOException I/O exception
    */

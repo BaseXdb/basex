@@ -108,7 +108,6 @@ public final class NodIter extends NodeIter {
     return Seq.get(item, size);
   }
 
-
   /**
    * Checks if binary search can be applied to this iterator, i.e.
    * if all nodes are {@link DBNode} references and refer to the same database.
@@ -147,7 +146,6 @@ public final class NodIter extends NodeIter {
     return false;
   }
 
-
   /**
    * Sorts the nodes.
    * @param force force sort
@@ -163,7 +161,7 @@ public final class NodIter extends NodeIter {
       for(int j = 1; j < size; j++) {
 //        int c = 1;
         while(item[i - 1].is(item[j])) {
-          item[i - 1].score = Math.max(item[j++].score, item[i - 1].score); 
+          item[i - 1].score = Math.max(item[j++].score, item[i - 1].score);
 //          c++;
           if(j == size) break;
         }
