@@ -3,6 +3,7 @@ package org.basex.gui.view.tree;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.IntList;
@@ -82,36 +83,90 @@ public class TreeCaching implements TreeViewOptions {
     return temp.finish();
   }
 
+//  /**
+//   * @param data data reference
+//   * @param pre
+//   */
+//  private int[][] generateLevelBorders(final Data data, final int pre) {
+//
+//    final int[] rlp = findPre(pre);
+//    final int rl = rlp[0];
+//    final int ri = rlp[1];
+//
+//    int np = nodesPerLevel.get(rl).length > ri + 1 ? 
+//  nodesPerLevel.get(rl)[ri + 1]
+//        : -1;
+//
+//    // level pair
+//    int[][] lp = new int[maxLevel][2];
+//    lp[rl] = new int[] { ri, 1};
+//
+//    for(int i = rl + 1; i < maxLevel; i++) {
+//
+//      int idx = -1;
+//      int j = -1;
+//      int[] n = nodesPerLevel.get(i);
+//      while(n[++j] < pre)
+//        ;
+//      idx = j;
+//
+//      if(np == -1) {
+//        lp[i] = new int[] { idx, n.length - idx};
+//
+//      } else {
+//
+//        while(j < n.length && n[j++] < np)
+//          ;
+//
+//        lp[i] = new int[] { idx, j - 1};
+//
+//      }
+//
+//      np = n.length > j + 1 ? n[j + 1] : -1;
+//
+//    }
+//    return lp;
+//  }
+
   /**
    * Generates cached rectangles.
    * @param g graphics reference
-   * @param d data reference
+   * @param c database context
    * @param sW screen width
    */
-  public void generateRects(final Graphics g, final Data d, final int sW) {
+  public void generateRects(final Graphics g, final Context c, final int sW) {
 
-    rectsPerLevel = new ArrayList<RectangleCache[]>();
-    bigRectangle = new boolean[maxLevel];
-    int[] doc = d.doc();
+    final Data d = c.data;
+    final int[] roots = c.current.nodes;
+    final int rc = roots.length;
+    final double width = sW / (double) rc;
 
-    if(doc.length == 1 && doc[0] > 0) {
-      System.out.println(doc[0]);
-    }
+    for(int r = 0; r < rc; r++) {
 
-    for(int i = 0; i < maxLevel; i++) {
-      int[] currLine = nodesPerLevel.get(i);
-      int lS = currLine.length;
-      double w = sW / (double) lS;
+      int root = roots[r];
 
-      if(w < 2) {
-        bigRectangle[i] = true;
-        rectsPerLevel.add(bigRectangle(sW));
-      } else {
-        bigRectangle[i] = false;
-        rectsPerLevel.add(normalRectangle(g, d, i, w, lS));
+      if(root > 0) {
+//        generateLevelBorders(d, root);
       }
+
+      rectsPerLevel = new ArrayList<RectangleCache[]>();
+      bigRectangle = new boolean[maxLevel];
+
+      for(int i = 0; i < maxLevel; i++) {
+        int[] currLine = nodesPerLevel.get(i);
+        int lS = currLine.length;
+        double w = width / lS;
+
+        if(w < 2) {
+          bigRectangle[i] = true;
+          rectsPerLevel.add(bigRectangle(width));
+        } else {
+          bigRectangle[i] = false;
+          rectsPerLevel.add(normalRectangle(g, d, i, w, lS));
+        }
+      }
+      rectsPerLevel.trimToSize();
     }
-    rectsPerLevel.trimToSize();
   }
 
   /**
@@ -181,6 +236,28 @@ public class TreeCaching implements TreeViewOptions {
       tr[i] = getTreeRect(l, i);
     }
     return tr;
+  }
+
+  /**
+   * Finds pre value in cached nodes and returns level and index position.
+   * @param pre pre value
+   * @return level and position pair
+   */
+  @SuppressWarnings("unused")
+  private int[] findPre(final int pre) {
+
+    int pos = -1;
+    int l;
+
+    for(l = 0; l < maxLevel; l++) {
+
+      pos = searchPreArrayPosition(l, pre);
+
+      if(pos > -1) break;
+
+    }
+
+    return pos > -1 ? new int[] { l, pos} : null;
   }
 
   /**
@@ -371,5 +448,4 @@ public class TreeCaching implements TreeViewOptions {
       return xx >= x && xx <= x + w || xx >= x + w && xx <= x;
     }
   }
-
 }

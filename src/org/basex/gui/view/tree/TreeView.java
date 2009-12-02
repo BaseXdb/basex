@@ -131,8 +131,6 @@ public final class TreeView extends View implements TreeViewOptions {
     super.paintComponent(g);
     g.setFont(GUIConstants.font);
 
-    Data data = gui.context.data;
-
     // timer
     // final Performance perf = new Performance();
     // perf.initTimer();
@@ -150,11 +148,13 @@ public final class TreeView extends View implements TreeViewOptions {
       }
 
       focusedRect = null;
-      createNewMainImage(data);
+      createNewMainImage();
+
     }
 
     g.drawImage(treeImage, 0, 0, getWidth(), getHeight(), this);
 
+        
     // highlights marked nodes
     // if(refreshedMark) markNodes();
 
@@ -174,13 +174,12 @@ public final class TreeView extends View implements TreeViewOptions {
 
   /**
    * Creates new image and draws rectangles in it.
-   * @param data data reference
    */
-  private void createNewMainImage(final Data data) {
+  private void createNewMainImage() {
     treeImage = createImage();
     final Graphics tIg = treeImage.getGraphics();
-
-    cache.generateRects(tIg, data, getWidth());
+    
+    cache.generateRects(tIg, gui.context, getWidth());
 
     for(int i = 0; i < cache.maxLevel; i++) {
       TreeRect[] lr = cache.getTreeRectsPerLevel(i);
