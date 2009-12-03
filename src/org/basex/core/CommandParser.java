@@ -38,7 +38,6 @@ import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Password;
-import org.basex.core.proc.Refresh;
 import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
 import org.basex.core.proc.Run;
@@ -228,8 +227,6 @@ public final class CommandParser extends InputParser {
         key(FROM, cmd);
         return db == null ? new Revoke(perm, name(cmd)) :
           new Revoke(perm, name(cmd), db);
-      case REFRESH:
-        return new Refresh(name(cmd));
       default:
     }
     return null;
