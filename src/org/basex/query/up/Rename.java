@@ -56,6 +56,8 @@ public final class Rename extends Update {
     } else {
       Err.or(UPWRTRGTYP, this);
     }
+    
+    // [LK] rename26/25 in conflict? XQDY0074/XPTY0004
 
     // check namespace conflicts...
     final QNm name = ex.atomic(ctx).qname();
