@@ -44,6 +44,8 @@ public final class DialogCreateFS extends Dialog {
   private final BaseXCheckBox meta;
   /** Context inclusion. */
   private final BaseXCheckBox cont;
+  /** XML inclusion. */
+  private final BaseXCheckBox xml;
   /** Button panel. */
   private final BaseXBack buttons;
   /** ComboBox. */
@@ -163,6 +165,14 @@ public final class DialogCreateFS extends Dialog {
       }
     });
     p.add(cont, BorderLayout.WEST);
+    
+    xml = new BaseXCheckBox(IMPORTXML, prop.is(Prop.FSXML), this);
+    xml.addActionListener(new ActionListener() {
+      public void actionPerformed(final ActionEvent e) {
+        action(null);
+      }
+    });
+    p.add(xml, BorderLayout.SOUTH);
 
     maxsize = new BaseXCombo(IMPORTFSMAX, this);
 
@@ -287,6 +297,7 @@ public final class DialogCreateFS extends Dialog {
     final Prop prop = gui.context.prop;
     prop.set(Prop.FSCONT, cont.isSelected());
     prop.set(Prop.FSMETA, meta.isSelected());
+    prop.set(Prop.FSXML, xml.isSelected());
     prop.set(Prop.FSTEXTMAX, IMPORTFSMAXSIZE[maxsize.getSelectedIndex()]);
     prop.set(Prop.PATHINDEX, pathindex.isSelected());
     prop.set(Prop.TEXTINDEX, txtindex.isSelected());

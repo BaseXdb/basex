@@ -108,6 +108,7 @@ dfs_text=Map Directory to DeepFS XML
 dfs_text1=File Information & Metadata
 dfs_text2=File Contents
 dfs_cont=Include textual file contents
+dfs_xml=Include xml contents
 dfs_meta=Include metadata
 
 dr_title=Rename Database

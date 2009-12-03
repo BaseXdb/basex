@@ -109,6 +109,7 @@ dfs_text=DeepFS Wurzelverzeichnis
 dfs_text1=Datei-Information & Meta-Daten
 dfs_text2=Datei-Inhalte
 dfs_cont=Importiere Datei-Inhalte
+dfs_xml=Importiere XML-Inhalte
 dfs_meta=Importiere Meta-Daten
 
 dr_title=Datenbank umbenennen

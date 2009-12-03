@@ -49,11 +49,8 @@ public class ParserRegistry {
           IFileParser.class);
       for(final Class<?> c : classes) {
         final String name = c.getSimpleName();
-        if(REGISTRY.containsValue(c)) {
-          Main.debug("Successfully loaded parser: %", name);
-        } else if(fallbackParser == c) {
-          Main.debug("Successfully loaded fallback parser: %", name);
-        } else Main.debug("Loading % ... FAILED", name);
+        if(!REGISTRY.containsValue(c) && fallbackParser != c)
+          Main.debug("Loading % ... FAILED", name);
       }
     } catch(final IOException ex) {
       Main.errln("Failed to load parsers (%)", ex.getMessage());

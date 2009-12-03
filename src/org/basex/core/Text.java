@@ -1058,6 +1058,8 @@ public interface Text {
   /** Import options. */
   String IMPORTCONT = lang("dfs_cont");
   /** Import options. */
+  String IMPORTXML = lang("dfs_xml");
+  /** Import options. */
   String IMPORTMETA = lang("dfs_meta") + " (MP3, JPG, TIF, PNG, GIF, ...)";
   /** Import options. */
   String[] IMPORTFSMAX = {

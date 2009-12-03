@@ -574,23 +574,25 @@ public class DeepFile {
    */
   public void finishMetaExtraction() throws IOException {
     metaFinished = true;
-    final ArrayList<byte[]> type = metaElements.get(MetaElem.TYPE);
-    if(type != null && Token.eq(type.get(0), FileType.MESSAGE.get())) {
-      ArrayList<byte[]> creator = metaElements.get(MetaElem.CREATOR_NAME);
-      boolean err = false;
-      if(creator != null) {
-        if(creator.size() > 1) err = true;
-        addMeta0(MetaElem.SENDER_NAME, creator.get(0));
-        metaElements.remove(MetaElem.CREATOR_NAME);
+    if(metaElements != null) {
+      final ArrayList<byte[]> type = metaElements.get(MetaElem.TYPE);
+      if(type != null && Token.eq(type.get(0), FileType.MESSAGE.get())) {
+        ArrayList<byte[]> creator = metaElements.get(MetaElem.CREATOR_NAME);
+        boolean err = false;
+        if(creator != null) {
+          if(creator.size() > 1) err = true;
+          addMeta0(MetaElem.SENDER_NAME, creator.get(0));
+          metaElements.remove(MetaElem.CREATOR_NAME);
+        }
+        creator = metaElements.get(MetaElem.CREATOR_EMAIL);
+        if(creator != null) {
+          if(creator.size() > 1) err = true;
+          addMeta0(MetaElem.SENDER_EMAIL, creator.get(0));
+          metaElements.remove(MetaElem.CREATOR_EMAIL);
+        }
+        if(err) Main.debug("Found multiple creators for a message. " +
+            "All but the first one are dropped (%).", bfc.getFileName());
       }
-      creator = metaElements.get(MetaElem.CREATOR_EMAIL);
-      if(creator != null) {
-        if(creator.size() > 1) err = true;
-        addMeta0(MetaElem.SENDER_EMAIL, creator.get(0));
-        metaElements.remove(MetaElem.CREATOR_EMAIL);
-      }
-      if(err) Main.debug("Found multiple creators for a message. " +
-          "All but the first one are dropped (%).", bfc.getFileName());
     }
     if(fsAtts == null) fsAtts = extractFSAtts();
   }
@@ -726,16 +728,25 @@ public class DeepFile {
     atts.add(SIZE, token(bfc.size()));
     if(f.isDirectory()) atts.add(MODE, token(getSIFDIR() | 0755));
     else atts.add(MODE, token(getSIFREG() | 0644));
-    final ArrayList<byte[]> uid = metaElements.get(MetaElem.FS_OWNER_USER_ID);
-    if(uid != null) {
-      atts.add(UID, uid.get(0));
-      metaElements.remove(MetaElem.FS_OWNER_USER_ID);
-    } else atts.add(UID, token(getUID()));
-    final ArrayList<byte[]> gid = metaElements.get(MetaElem.FS_OWNER_GROUP_ID);
-    if(gid != null) {
-      atts.add(GID, gid.get(0));
-      metaElements.remove(MetaElem.FS_OWNER_GROUP_ID);
-    } else atts.add(GID, token(getGID()));
+    
+    byte[] uidVal = null;
+    byte[] gidVal = null;
+    if(metaElements != null) {
+      final ArrayList<byte[]> uid = metaElements.get(MetaElem.FS_OWNER_USER_ID);
+      if(uid != null) {
+        uidVal = uid.get(0);
+        metaElements.remove(MetaElem.FS_OWNER_USER_ID);
+      }
+      final ArrayList<byte[]> gid = 
+        metaElements.get(MetaElem.FS_OWNER_GROUP_ID);
+      if(gid != null) {
+        gidVal = gid.get(0);
+        metaElements.remove(MetaElem.FS_OWNER_GROUP_ID);
+      }
+    }
+    atts.add(UID, uidVal == null ? token(getUID()) : uidVal);
+    atts.add(GID, gidVal == null ? token(getGID()) : gidVal);
+    
     atts.add(ATIME, time);
     atts.add(CTIME, time);
     atts.add(MTIME, token(f.lastModified()));

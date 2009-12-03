@@ -109,6 +109,7 @@ dfs_text=Directory da importare
 dfs_text1=Informazione & metadata del file
 dfs_text2=Contenuti del file
 dfs_cont=Includi i contenuti testuali del file
+dfs_cont=Includi i contenuti XML del file
 dfs_meta=Includi i metadata
 
 dr_title=Rinomina Database

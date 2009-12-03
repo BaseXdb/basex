@@ -108,6 +108,7 @@ dfs_text=Thư mục để nhập vào
 dfs_text1=Thông tin tệp va metadata
 dfs_text2=Nội dung tệp
 dfs_cont=Bao gồm nội dung tệp chứa text
+dfs_xml=Include xml contents
 dfs_meta=Bao gồm metadata
 
 dr_title=Đổi tên cơ sở dữ liệu
