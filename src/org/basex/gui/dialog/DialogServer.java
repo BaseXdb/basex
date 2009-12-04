@@ -55,6 +55,8 @@ public final class DialogServer extends Dialog {
   private final BaseXBack conn = new BaseXBack();
   /** User panel. */
   private final DialogUser user = new DialogUser(true, this, gui);
+  /** Databases panel. */
+  private final DialogUser dbsP = new DialogUser(false, this, gui);
   /** Sessions/Databases panel. */
   private final BaseXBack sedb = new BaseXBack();
   /** Log panel. */
@@ -102,6 +104,8 @@ public final class DialogServer extends Dialog {
   private boolean running;
   /** Boolean for check if client is connected. */
   private boolean connected;
+  /** Int which tab is activated. */
+  int tab;
 
   /**
    * Default constructor.
@@ -115,9 +119,13 @@ public final class DialogServer extends Dialog {
     // Server panel
     conn.setLayout(new TableLayout(5, 1, 0, 4));
     conn.setBorder(8, 8, 8, 8);
+    
+    BaseXBack db = dbsP.getTablePanel();
+    db.setBorder(8, 8, 8, 8);
 
     tabs.add(SERVERN, conn);
     tabs.add(USERS, user);
+    tabs.add(DATABASES, db);
     tabs.add(SESSIONS + "/" + DATABASES, sedb);
     tabs.add("Logs", logs);
 
@@ -209,7 +217,8 @@ public final class DialogServer extends Dialog {
     tabs.addChangeListener(new ChangeListener() {
         public void stateChanged(final ChangeEvent evt) {
             BaseXTabs pane = (BaseXTabs) evt.getSource();
-            if (pane.getSelectedIndex() == 3) {
+            tab = pane.getSelectedIndex();
+            if (tab == 3) {
                 refreshLog();
             }
         }
@@ -270,6 +279,7 @@ public final class DialogServer extends Dialog {
         cs = new ClientSession(ctx, gui.prop.get(GUIProp.SERVERUSER),
             gui.prop.get(GUIProp.SERVERPASS));
         user.setSess(cs);
+        dbsP.setSess(cs);
         fillsedb();
         connected = true;
       } else if(BUTTONDISCONNECT.equals(cmd)) {
@@ -305,7 +315,8 @@ public final class DialogServer extends Dialog {
         }
         refreshLog();
       } else if(connected) {
-        user.action(cmd);
+        if(tab == 1) user.action(cmd);
+        if(tab == 2) dbsP.action(cmd);
       }
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -343,6 +354,7 @@ public final class DialogServer extends Dialog {
     disconnect.setEnabled(connected);
     tabs.setEnabledAt(1, connected);
     tabs.setEnabledAt(2, connected);
+    tabs.setEnabledAt(3, connected);
     update.setEnabled(logc.getSelectedIndex() != -1);
     delete.setEnabled(logc.getSelectedIndex() != -1);
     deleteAll.setEnabled(logc.getItemCount() > 0);
