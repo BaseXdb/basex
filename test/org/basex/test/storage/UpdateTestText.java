@@ -15,7 +15,7 @@ import org.junit.Test;
 public final class UpdateTestText extends UpdateTest {
   /**
    * Tests insert as last child.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test
   public void testInsertTextAsOnly1() throws Exception {
@@ -43,7 +43,7 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests insert as last child.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test
   public void testInsertTextAsOnly2() throws Exception {
@@ -71,7 +71,7 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests insert as last child.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test
   public void testInsertTextAsOnly3() throws Exception {
@@ -99,7 +99,7 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests insert as last child.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test
   public void testInsertTextAfterAttsAsFirst() throws Exception {
@@ -125,7 +125,7 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests insert as last child.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test
   public void testInsertTextAfterAttsAsSecond() throws Exception {
@@ -152,7 +152,7 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests insert as last child.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test
   public void testInsertTextAfterAttsAsLast() throws Exception {
@@ -178,7 +178,7 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests insert text before text.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test(expected = IOException.class)
   public void testInsertTextBeforeText() throws Exception {
@@ -187,7 +187,7 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests insert text before text.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test(expected = IOException.class)
   public void testInsertTextAfterTextAsSecond() throws Exception {
@@ -196,7 +196,7 @@ public final class UpdateTestText extends UpdateTest {
 
   /**
    * Tests insert text before text.
-   * @throws Exception in case of problems.
+   * @throws Exception in case of problems
    */
   @Test(expected = IOException.class)
   public void testInsertTextAfterTextAsLast() throws Exception {

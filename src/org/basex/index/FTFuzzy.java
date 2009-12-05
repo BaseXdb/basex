@@ -149,7 +149,7 @@ public final class FTFuzzy extends FTIndex {
 
   /**
    * Determines the pointer on a token.
-   * @param tok token looking for.
+   * @param tok token looking for
    * @return int pointer or -1 if token was not found
    */
   private int token(final byte[] tok) {

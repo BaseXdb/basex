@@ -835,7 +835,7 @@ public final class Token {
   /**
    * Normalizes all whitespace occurrences from the specified token.
    * @param tok token
-   * @return normalized token.
+   * @return normalized token
    */
   public static byte[] norm(final byte[] tok) {
     final int l = tok.length;

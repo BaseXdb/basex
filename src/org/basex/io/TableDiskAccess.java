@@ -64,88 +64,9 @@ public final class TableDiskAccess extends TableAccess {
     blockIndex = in.readNums();
     in.close();
 
-    // INITIALIZE FILE
+    // INITIALIZE DATA FILE
     data = new RandomAccessFile(meta.file(pf), "rw");
     readBlock(0, 0, blocks > 1 ? firstPres[1] : md.size);
-  }
-
-  /**
-   * Searches for the block containing the entry for that pre. then it
-   * reads the block and returns it's offset inside the block.
-   * @param pre pre of the entry to search for
-   * @return offset of the entry in currentBlock
-   */
-  private synchronized int cursor(final int pre) {
-    int fp = firstPre;
-    int np = nextPre;
-
-    if(pre < fp || pre >= np) {
-      final int last = blocks - 1;
-      int l = 0;
-      int h = last;
-      int m = index;
-      while(l <= h) {
-        if(pre < fp) h = m - 1;
-        else if(pre >= np) l = m + 1;
-        else break;
-        m = h + l >>> 1;
-        fp = firstPres[m];
-        np = m == last ? fp + ENTRIES : firstPres[m + 1];
-      }
-      if(l > h) Main.notexpected("Invalid Data Access [pre:" + pre +
-          ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
-
-      readBlock(m, fp, np);
-    }
-    return pre - firstPre << IO.NODEPOWER;
-  }
-
-  /**
-   * Fetches the requested block into blockNumber and set firstPre and
-   * blockSize.
-   * @param ind index number of the block to fetch
-   * @param first first entry in that block
-   * @param next first entry in the next block
-   */
-  private synchronized void readBlock(final int ind, final int first,
-      final int next) {
-
-    index = ind;
-    firstPre = first;
-    nextPre = next;
-
-    final int b = blockIndex[ind];
-    final boolean ch = bm.cursor(b);
-    bf = bm.curr();
-    if(ch) {
-      try {
-        if(bf.dirty) writeBlock(bf);
-        bf.pos = b;
-        data.seek(bf.pos * IO.BLOCKSIZE);
-        data.read(bf.buf);
-      } catch(final IOException ex) {
-        ex.printStackTrace();
-      }
-    }
-  }
-
-  /**
-   * Checks whether the current block needs to be written and write it.
-   * @param buf buffer to write
-   * @throws IOException I/O exception
-   */
-  private synchronized void writeBlock(final Buffer buf) throws IOException {
-    data.seek(buf.pos * IO.BLOCKSIZE);
-    data.write(buf.buf);
-    buf.dirty = false;
-  }
-
-  /**
-   * Fetches next block.
-   */
-  private synchronized void nextBlock() {
-    readBlock(index + 1, nextPre, index + 2 >= blocks ? meta.size :
-      firstPres[index + 2]);
   }
 
   @Override
@@ -293,17 +214,6 @@ public final class TableDiskAccess extends TableAccess {
     updatePre(nr);
   }
 
-  /**
-   * Updates the firstPre index entries.
-   * @param nr number of entries to move
-   */
-  private synchronized void updatePre(final int nr) {
-    // update index entries for all following blocks and reduce counter
-    for(int i = index + 1; i < blocks; i++) firstPres[i] -= nr;
-    meta.size -= nr;
-    nextPre = index + 1 >= blocks ? meta.size : firstPres[index + 1];
-  }
-
   @Override
   public synchronized void insert(final int pre, final byte[] entries) {
     dirty = true;
@@ -380,6 +290,113 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
+   * Returns the number of entries; needed for JUnit tests.
+   * @return number of used blocks
+   */
+  public synchronized int size() {
+    return meta.size;
+  }
+
+  /**
+   * Returns the number of used blocks; needed for JUnit tests.
+   * @return number of used blocks
+   */
+  public synchronized int blocks() {
+    return blocks;
+  }
+
+  // PRIVATE METHODS ==========================================================
+
+  /**
+   * Searches for the block containing the entry for that pre. then it
+   * reads the block and returns it's offset inside the block.
+   * @param pre pre of the entry to search for
+   * @return offset of the entry in currentBlock
+   */
+  private synchronized int cursor(final int pre) {
+    int fp = firstPre;
+    int np = nextPre;
+
+    if(pre < fp || pre >= np) {
+      final int last = blocks - 1;
+      int l = 0;
+      int h = last;
+      int m = index;
+      while(l <= h) {
+        if(pre < fp) h = m - 1;
+        else if(pre >= np) l = m + 1;
+        else break;
+        m = h + l >>> 1;
+        fp = firstPres[m];
+        np = m == last ? fp + ENTRIES : firstPres[m + 1];
+      }
+      if(l > h) Main.notexpected("Invalid Data Access [pre:" + pre +
+          ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
+
+      readBlock(m, fp, np);
+    }
+    return pre - firstPre << IO.NODEPOWER;
+  }
+  
+  /**
+   * Fetches the requested block and update pointers.
+   * @param ind index number of the block to fetch
+   * @param first first entry in that block
+   * @param next first entry in the next block
+   */
+  private synchronized void readBlock(final int ind, final int first,
+      final int next) {
+
+    index = ind;
+    firstPre = first;
+    nextPre = next;
+
+    final int b = blockIndex[ind];
+    final boolean ch = bm.cursor(b);
+    bf = bm.curr();
+    if(ch) {
+      try {
+        if(bf.dirty) writeBlock(bf);
+        bf.pos = b;
+        data.seek(bf.pos * IO.BLOCKSIZE);
+        data.read(bf.buf);
+      } catch(final IOException ex) {
+        ex.printStackTrace();
+      }
+    }
+  }
+
+  /**
+   * Checks whether the current block needs to be written and write it.
+   * @param buf buffer to write
+   * @throws IOException I/O exception
+   */
+  private synchronized void writeBlock(final Buffer buf) throws IOException {
+    data.seek(buf.pos * IO.BLOCKSIZE);
+    data.write(buf.buf);
+    buf.dirty = false;
+  }
+
+  /**
+   * Fetches next block.
+   */
+  private synchronized void nextBlock() {
+    readBlock(index + 1, nextPre, index + 2 >= blocks ? meta.size :
+      firstPres[index + 2]);
+  }
+
+  /**
+   * Updates the firstPre index entries.
+   * @param nr number of entries to move
+   */
+  private synchronized void updatePre(final int nr) {
+    // update index entries for all following blocks and reduce counter
+    for(int i = index + 1; i < blocks; i++) firstPres[i] -= nr;
+    meta.size -= nr;
+    nextPre = index + 1 >= blocks ? meta.size : firstPres[index + 1];
+  }
+
+  /**
    * Creates a new, empty block.
    */
   private synchronized void newBlock() {
@@ -405,21 +422,5 @@ public final class TableDiskAccess extends TableAccess {
     System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
         l << IO.NODEPOWER);
     bf.dirty = true;
-  }
-
-  /**
-   * Returns the number of entries; needed for JUnit tests.
-   * @return number of used blocks.
-   */
-  public synchronized int size() {
-    return meta.size;
-  }
-
-  /**
-   * Returns the number of used blocks; needed for JUnit tests.
-   * @return number of used blocks.
-   */
-  public synchronized int blocks() {
-    return blocks;
   }
 }

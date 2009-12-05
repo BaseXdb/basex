@@ -33,8 +33,8 @@ public final class GIFParser implements IFileParser {
   /**
    * Checks if the gif header is valid.
    * @param f the file channel to read from
-   * @return true if the header is valid, false otherwise.
-   * @throws IOException if any error occurs while reading from the channel.
+   * @return true if the header is valid, false otherwise
+   * @throws IOException if any error occurs while reading from the channel
    */
   public boolean check(final BufferedFileChannel f) throws IOException {
     final int len = HEADERGIF87.length;

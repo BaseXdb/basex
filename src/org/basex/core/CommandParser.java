@@ -275,7 +275,7 @@ public final class CommandParser extends InputParser {
   /**
    * Parses and returns a name. A name can include letters, digits, dashes
    * and periods.
-   * @param cmd referring command; if specified, the result must not be empty.
+   * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */
@@ -289,7 +289,7 @@ public final class CommandParser extends InputParser {
   /**
    * Parses and returns the specified keyword.
    * @param key token to be parsed
-   * @param cmd referring command; if specified, the result must not be empty.
+   * @param cmd referring command; if specified, the result must not be empty
    * @return position
    * @throws QueryException query exception
    */
@@ -303,7 +303,7 @@ public final class CommandParser extends InputParser {
 
   /**
    * Parses and returns a name.
-   * @param cmd referring command; if specified, the result must not be empty.
+   * @param cmd referring command; if specified, the result must not be empty
    * @param s input string
    * @return name
    * @throws QueryException query exception
@@ -317,7 +317,7 @@ public final class CommandParser extends InputParser {
 
   /**
    * Parses and returns a number.
-   * @param cmd referring command; if specified, the result must not be empty.
+   * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
    */

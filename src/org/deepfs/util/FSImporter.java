@@ -24,7 +24,7 @@ import org.deepfs.fsml.util.ParserRegistry;
  * @author Bastian Lemke
  */
 public final class FSImporter implements FSTraversal {
-  
+
   // [BL] better exception handling
   // [BL] more consistent way to set file name atts (file name vs. full path)
   // [BL] more consistent way to unify the file system paths
@@ -48,7 +48,7 @@ public final class FSImporter implements FSTraversal {
 
   /**
    * Constructor.
-   * @param context the database context.
+   * @param context the database context
    */
   public FSImporter(final Context context) {
     ctx = context;
@@ -73,8 +73,8 @@ public final class FSImporter implements FSTraversal {
 
   /**
    * Escapes a string.
-   * @param text the text to check.
-   * @return the escaped text.
+   * @param text the text to check
+   * @return the escaped text
    */
   public static String escape(final String text) {
     final StringBuilder sb = new StringBuilder(text.length());
@@ -112,7 +112,7 @@ public final class FSImporter implements FSTraversal {
    * Builds an update query & inserts a file node.
    * @param f file to be inserted
    * @param absolutePath if true, the absolute path is added instead of the file
-   *          name.
+   *          name
    * @return escaped file name
    */
   private String insert(final File f, final boolean absolutePath) {
@@ -210,7 +210,7 @@ public final class FSImporter implements FSTraversal {
 
   /**
    * Returns the current file name.
-   * @return the current file name.
+   * @return the current file name
    */
   public String getCurrentFileName() {
     return currentFile;

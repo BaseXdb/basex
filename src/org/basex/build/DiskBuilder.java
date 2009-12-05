@@ -115,7 +115,15 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void addDoc(final byte[] txt) throws IOException {
+  public void setAttValue(final int pre, final byte[] val) throws IOException {
+    sout.writeBool(false);
+    sout.writeNum(pre);
+    sout.write5(inline(val, false));
+    ssize++;
+  }
+
+  @Override
+  protected void addDoc(final byte[] txt) throws IOException {
     tout.write(Data.DOC);
     tout.write2(0);
     tout.write5(inline(txt, true));
@@ -124,7 +132,7 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void addElem(final int dis, final int n, final int as, final int u, 
+  protected void addElem(final int dis, final int n, final int as, final int u,
       final boolean ne) throws IOException {
 
     tout.write(as << 3 | Data.ELEM);
@@ -136,7 +144,7 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void addAttr(final int n, final byte[] v, final int dis,
+  protected void addAttr(final int n, final byte[] v, final int dis,
       final int u) throws IOException {
 
     tout.write(dis << 3 | Data.ATTR);
@@ -147,7 +155,7 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void addText(final byte[] txt, final int dis, final byte kind)
+  protected void addText(final byte[] txt, final int dis, final byte kind)
       throws IOException {
 
     tout.write(kind);
@@ -155,6 +163,14 @@ public final class DiskBuilder extends Builder {
     tout.write5(inline(txt, true));
     tout.writeInt(dis);
     tout.writeInt(meta.size++);
+  }
+
+  @Override
+  protected void setSize(final int pre, final int val) throws IOException {
+    sout.writeBool(true);
+    sout.writeNum(pre);
+    sout.writeNum(val);
+    ssize++;
   }
 
   /**
@@ -177,21 +193,5 @@ public final class DiskBuilder extends Builder {
       vallen += vout.writeBytes(val);
     }
     return v;
-  }
-
-  @Override
-  public void setSize(final int pre, final int val) throws IOException {
-    sout.writeBool(true);
-    sout.writeNum(pre);
-    sout.writeNum(val);
-    ssize++;
-  }
-
-  @Override
-  public void setAttValue(final int pre, final byte[] val) throws IOException {
-    sout.writeBool(false);
-    sout.writeNum(pre);
-    sout.write5(inline(val, false));
-    ssize++;
   }
 }

@@ -27,17 +27,17 @@ import org.basex.io.IO;
 public abstract class Builder extends Progress {
   /** Parser instance. */
   public final Parser parser;
-
   /** Meta data on built database. */
   public MetaData meta;
+
   /** Tag name index. */
-  protected Names tags;
+  protected final Names tags = new Names();
   /** Attribute name index. */
-  protected Names atts;
+  protected final Names atts = new Names();
   /** Namespace index. */
-  protected Namespaces ns = new Namespaces();
+  protected final Namespaces ns = new Namespaces();
   /** Tree structure. */
-  protected PathSummary path = new PathSummary();
+  protected final PathSummary path = new PathSummary();
 
   /** Parent stack. */
   private final int[] parStack = new int[IO.MAXHEIGHT];
@@ -58,89 +58,7 @@ public abstract class Builder extends Progress {
    */
   protected Builder(final Parser p) {
     parser = p;
-    tags = new Names();
-    atts = new Names();
   }
-
-  // Abstract Methods ==========================================================
-
-  /**
-   * Initializes the database construction.
-   * @param db name of database
-   * @throws IOException I/O exception
-   */
-  public abstract void init(String db) throws IOException;
-
-  /**
-   * Finishes the build process and returns a database reference.
-   * @return data database instance
-   * @throws IOException I/O exception
-   */
-  protected abstract Data finish() throws IOException;
-
-  /**
-   * Closes open references.
-   * @throws IOException I/O exception
-   */
-  public abstract void close() throws IOException;
-
-  /**
-   * Adds a document node to the database.
-   * @param txt name of the document
-   * @throws IOException I/O exception
-   */
-  public abstract void addDoc(byte[] txt) throws IOException;
-
-  /**
-   * Adds an element node to the database. This method stores a preliminary
-   * size value; if this node has further descendants, {@link #setSize} must
-   * be called to set the final size value.
-   * @param n the tag name reference
-   * @param u namespace uri reference
-   * @param dis distance to parent
-   * @param as number of attributes
-   * @param ne namespace flag
-   * @throws IOException I/O exception
-   */
-  public abstract void addElem(int n, int u, int dis, int as, boolean ne)
-    throws IOException;
-
-  /**
-   * Adds an attribute to the database.
-   * @param n attribute name
-   * @param v attribute value
-   * @param dis distance to parent
-   * @param u namespace uri reference
-   * @throws IOException I/O exception
-   */
-  public abstract void addAttr(int n, byte[] v, int dis, int u)
-    throws IOException;
-
-  /**
-   * Adds a text node to the database.
-   * @param tok the token to be added (tag name or content)
-   * @param dis distance to parent
-   * @param kind the node kind
-   * @throws IOException I/O exception
-   */
-  public abstract void addText(byte[] tok, int dis, byte kind)
-    throws IOException;
-
-  /**
-   * Stores a size value to the specified table position.
-   * @param pre pre reference
-   * @param val value to be stored
-   * @throws IOException I/O exception
-   */
-  public abstract void setSize(int pre, int val) throws IOException;
-
-  /**
-   * Stores an attribute value to the specified table position.
-   * @param pre pre reference
-   * @param val value to be stored
-   * @throws IOException I/O exception
-   */
-  public abstract void setAttValue(int pre, byte[] val) throws IOException;
 
   // Public Methods ============================================================
 
@@ -323,6 +241,86 @@ public abstract class Builder extends Progress {
   public final double prog() {
     return parser.prog();
   }
+
+  // Abstract Methods ==========================================================
+
+  /**
+   * Closes open references.
+   * @throws IOException I/O exception
+   */
+  public abstract void close() throws IOException;
+
+  /**
+   * Stores an attribute value to the specified table position.
+   * @param pre pre reference
+   * @param val value to be stored
+   * @throws IOException I/O exception
+   */
+  public abstract void setAttValue(int pre, byte[] val) throws IOException;
+
+  /**
+   * Initializes the database construction.
+   * @param db name of database
+   * @throws IOException I/O exception
+   */
+  protected abstract void init(String db) throws IOException;
+
+  /**
+   * Finishes the build process and returns a database reference.
+   * @return data database instance
+   * @throws IOException I/O exception
+   */
+  protected abstract Data finish() throws IOException;
+
+  /**
+   * Adds a document node to the database.
+   * @param txt name of the document
+   * @throws IOException I/O exception
+   */
+  protected abstract void addDoc(byte[] txt) throws IOException;
+
+  /**
+   * Adds an element node to the database. This method stores a preliminary
+   * size value; if this node has further descendants, {@link #setSize} must
+   * be called to set the final size value.
+   * @param n the tag name reference
+   * @param u namespace uri reference
+   * @param dis distance to parent
+   * @param as number of attributes
+   * @param ne namespace flag
+   * @throws IOException I/O exception
+   */
+  protected abstract void addElem(int n, int u, int dis, int as, boolean ne)
+    throws IOException;
+
+  /**
+   * Adds an attribute to the database.
+   * @param n attribute name
+   * @param v attribute value
+   * @param dis distance to parent
+   * @param u namespace uri reference
+   * @throws IOException I/O exception
+   */
+  protected abstract void addAttr(int n, byte[] v, int dis, int u)
+    throws IOException;
+
+  /**
+   * Adds a text node to the database.
+   * @param tok the token to be added (tag name or content)
+   * @param dis distance to parent
+   * @param kind the node kind
+   * @throws IOException I/O exception
+   */
+  protected abstract void addText(byte[] tok, int dis, byte kind)
+    throws IOException;
+
+  /**
+   * Stores a size value to the specified table position.
+   * @param pre pre reference
+   * @param val value to be stored
+   * @throws IOException I/O exception
+   */
+  protected abstract void setSize(int pre, int val) throws IOException;
 
   // Private Methods ===========================================================
 

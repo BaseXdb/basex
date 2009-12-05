@@ -70,7 +70,7 @@ public abstract class View extends BaseXPanel {
 
   /**
    * Returns if this view is currently visible.
-   * @return result of check.
+   * @return result of check
    */
   public abstract boolean visible();
 

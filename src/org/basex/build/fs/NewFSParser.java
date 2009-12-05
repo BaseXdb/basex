@@ -50,8 +50,8 @@
 //
 //  /**
 //   * Registers a parser implementation with the fs parser.
-//   * @param suffix the suffix to register the parser implementation for.
-//   * @param c the parser implementation class.
+//   * @param suffix the suffix to register the parser implementation for
+//   * @param c the parser implementation class
 //   */
 //  public static void register(final String suffix,
 //      final Class<? extends IFileParser> c) {
@@ -60,7 +60,7 @@
 //
 //  /**
 //   * Registers a fallback parser implementation with the fs parser.
-//   * @param c the parser implementation class.
+//   * @param c the parser implementation class
 //   */
 //  public static void registerFallback(final Class<? extends IFileParser> c) {
 //    if(fallbackParser != null) {
@@ -177,9 +177,9 @@
 //
 //  /**
 //   * Gets a parser implementation for given file suffix.
-//   * @param suffix the file suffix to get the parser for.
+//   * @param suffix the file suffix to get the parser for
 //   * @return the parser implementation or <code>null</code> if no
-//   *         implementation is available.
+//   *         implementation is available
 //   */
 //  private IFileParser getParser(final String suffix) {
 //    IFileParser instance = parserInstances.get(suffix);
@@ -206,7 +206,7 @@
 //  /**
 //   * Gets the fallback parser implementation.
 //   * @return the fallback parser implementation or <code>null</code> if no
-//   *         fallback parser is available.
+//   *         fallback parser is available
 //   */
 //  private IFileParser getFallbackParser() {
 //    if(fallbackParser == null) return null;
@@ -226,7 +226,7 @@
 //  /**
 //   * Main entry point for the import of a file hierarchy. Instantiates the
 //   * engine and starts the traversal.
-//   * @param build instance passed by {@link CreateFS}.
+//   * @param build instance passed by {@link CreateFS}
 //   * @throws IOException I/O exception
 //   */
 //  @Override
@@ -268,9 +268,9 @@
 //
 //  /**
 //   * Adds the size value to the current node.
-//   * @param id the ID of the size attribute.
-//   * @param size the size to set.
-//   * @throws IOException I/O exception.
+//   * @param id the ID of the size attribute
+//   * @param size the size to set
+//   * @throws IOException I/O exception
 //   */
 //  private void setSize(final int id, final long size) throws IOException {
 //    builder.setAttValue(id, token(size));
@@ -278,7 +278,7 @@
 //
 //  /**
 //   * Determines if the specified file is valid and no symbolic link.
-//   * @param f file to be tested.
+//   * @param f file to be tested
 //   * @return true for a symbolic link
 //   */
 //  private static boolean valid(final File f) {
@@ -393,10 +393,10 @@
 //   * {@link BufferedFileChannel} instance via
 //   * {@link BufferedFileChannel#subChannel(int)}.
 //   * </p>
-//   * @param df the DeepFile to fill with metadata and contents.
+//   * @param df the DeepFile to fill with metadata and contents
 //   * @param suffix the file suffix(es). More than one suffix means that the
-//   *          file type is unknown. All given suffixes will be tested.
-//   * @throws IOException if any error occurs while reading from the file.
+//   *          file type is unknown. All given suffixes will be tested
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  public void parseFileFragment(final DeepFile df, final String... suffix)
 //      throws IOException {
@@ -444,8 +444,8 @@
 //   * This method is intended to be called from a parser implementation that
 //   * failed to parse a file.
 //   * </p>
-//   * @param df the {@link DeepFile} to fill with metadata and contents.
-//   * @throws IOException if any error occurs while reading from the file.
+//   * @param df the {@link DeepFile} to fill with metadata and contents
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  public void parseWithFallbackParser(final DeepFile df) throws IOException {
 //    final IFileParser parser = getFallbackParser();
@@ -458,9 +458,9 @@
 //
 //  /**
 //   * Starts the parser implementation.
-//   * @param parser the parser instance.
-//   * @param deepFile the {@link DeepFile} to fill with metadata and contents.
-//   * @throws IOException if any error occurs while reading from the file.
+//   * @param parser the parser instance
+//   * @param deepFile the {@link DeepFile} to fill with metadata and contents
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  private void parse0(final IFileParser parser, final DeepFile deepFile)
 //      throws IOException {
@@ -489,8 +489,8 @@
 //
 //  /**
 //   * Deletes a non-empty directory.
-//   * @param dir to be deleted.
-//   * @return boolean true for success, false for failure.
+//   * @param dir to be deleted
+//   * @return boolean true for success, false for failure
 //   */
 //  public static boolean deleteDir(final File dir) {
 //    if(dir.isDirectory()) {
@@ -509,8 +509,8 @@
 //   * Generates the xml representation for a map with key-value pairs that
 //   * contains the metadata information for the current file.
 //   * @param metaElements {@link TreeMap}, containing metadata information for
-//   *          the current file.
-//   * @throws IOException if any error occurs.
+//   *          the current file
+//   * @throws IOException if any error occurs
 //   */
 //  public void addMeta(final TreeMap<MetaElem, byte[]> metaElements)
 //      throws IOException {
@@ -523,12 +523,12 @@
 //   * Adds a text element.
 //   * @param offset the absolute position of the first byte of the file
 //   *          fragment represented by this content element inside the current
-//   *          file. A negative value stands for an unknown offset.
-//   * @param size the size of the content element.
-//   * @param text the text to add.
+//   *          file. A negative value stands for an unknown offset
+//   * @param size the size of the content element
+//   * @param text the text to add
 //   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
-//   *          set.
-//   * @throws IOException if any error occurs while reading from the file.
+//   *          set
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  public void textContent(final long offset, final long size,
 //      final String text, final boolean preserveSpace) throws IOException {
@@ -539,12 +539,12 @@
 //   * Adds a text element.
 //   * @param offset the absolute position of the first byte of the file
 //   *          fragment represented by this content element inside the current
-//   *          file. A negative value stands for an unknown offset.
-//   * @param size the size of the content element.
-//   * @param text the text to add.
+//   *          file. A negative value stands for an unknown offset
+//   * @param size the size of the content element
+//   * @param text the text to add
 //   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
-//   *          set.
-//   * @throws IOException if any error occurs while reading from the file.
+//   *          set
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  public void textContent(final long offset, final long size,
 //      final byte[] text, final boolean preserveSpace) throws IOException {
@@ -560,12 +560,12 @@
 //   * </p>
 //   * @param offset the absolute position of the first byte of the file
 //   *          fragment represented by this content element inside the current
-//   *          file. A negative value stands for an unknown offset.
-//   * @param size the size of the content element.
-//   * @param text the text to add.
+//   *          file. A negative value stands for an unknown offset
+//   * @param size the size of the content element
+//   * @param text the text to add
 //   * @param preserveSpace if true, the xml attribute <code>xml:space</code> is
-//   *          set.
-//   * @throws IOException if any error occurs while reading from the file.
+//   *          set
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  @SuppressWarnings("all")
 //  // suppress dead code warning for ADD_ATTS
@@ -592,8 +592,8 @@
 //   * </p>
 //   * @param offset the absolute position of the first byte of the file
 //   *          fragment represented by this content element inside the current
-//   *          file. A negative value stands for an unknown offset.
-//   * @throws IOException if any I/O error occurs.
+//   *          file. A negative value stands for an unknown offset
+//   * @throws IOException if any I/O error occurs
 //   */
 //  public void startContent(final long offset) throws IOException {
 //    if(!prop.is(Prop.FSCONT)) return;
@@ -607,8 +607,8 @@
 //
 //  /**
 //   * Sets the size value for the last opened content element.
-//   * @param size the size value to set.
-//   * @throws IOException if any I/O error occurs.
+//   * @param size the size value to set
+//   * @throws IOException if any I/O error occurs
 //   */
 //  public void setContentSize(final long size) throws IOException {
 //    if(!prop.is(Prop.FSCONT)) return;
@@ -623,9 +623,9 @@
 //   * </p>
 //   * @param offset the absolute position of the first byte of the file
 //   *          fragment represented by this content element inside the current
-//   *          file. A negative value stands for an unknown offset.
-//   * @param size the size of the content element.
-//   * @throws IOException if any I/O error occurs.
+//   *          file. A negative value stands for an unknown offset
+//   * @param size the size of the content element
+//   * @throws IOException if any I/O error occurs
 //   */
 //  public void startContent(final long offset, final long size)
 //      throws IOException {
@@ -646,7 +646,7 @@
 //
 //  /**
 //   * Closes the last opened content element.
-//   * @throws IOException if any error occurs while reading from the file.
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  public void endContent() throws IOException {
 //    if(!prop.is(Prop.FSCONT)) return;
@@ -661,9 +661,9 @@
 //   * current file or content node node.
 //   * @param offset the absolute position of the first byte of the
 //   *   file fragment
-//   *          represented by this content element inside the current file.
-//   * @param size the size of the content element.
-//   * @throws IOException if any error occurs while reading from the file.
+//   *          represented by this content element inside the current file
+//   * @param size the size of the content element
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  public void startXMLContent(final long offset, final long size)
 //      throws IOException {
@@ -676,7 +676,7 @@
 //
 //  /**
 //   * Closes the last opened XML content element.
-//   * @throws IOException if any error occurs while reading from the file.
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  public void endXMLContent() throws IOException {
 //    if(!prop.is(Prop.FSCONT)) return;
@@ -686,10 +686,10 @@
 //  /**
 //   * Checks if a parser for the given suffix is available and the file
 //   * is in the correct format.
-//   * @param f the {@link BufferedFileChannel} to check.
-//   * @param suffix the file suffix.
-//   * @return true if the data is supported.
-//   * @throws IOException if any error occurs while reading from the file.
+//   * @param f the {@link BufferedFileChannel} to check
+//   * @param suffix the file suffix
+//   * @return true if the data is supported
+//   * @throws IOException if any error occurs while reading from the file
 //   */
 //  public boolean isParseable(final BufferedFileChannel f, final String suffix)
 //      throws IOException {

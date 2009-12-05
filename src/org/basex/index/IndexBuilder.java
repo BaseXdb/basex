@@ -2,9 +2,10 @@ package org.basex.index;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
 import org.basex.core.Main;
 import org.basex.core.Progress;
-import org.basex.core.ProgressException;
+import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 
 /**
@@ -19,6 +20,8 @@ public abstract class IndexBuilder extends Progress {
   protected final Data data;
   /** Total parsing value. */
   protected final int total;
+  /** Database is kept open if process is canceled. */
+  protected final boolean open;
   /** Current parsing value. */
   protected int pre;
 
@@ -32,22 +35,24 @@ public abstract class IndexBuilder extends Progress {
   /**
    * Constructor.
    * @param d reference
+   * @param o flag for keeping the database open if the process is canceled
    */
-  public IndexBuilder(final Data d) {
+  public IndexBuilder(final Data d, final boolean o) {
     data = d;
     total = data.meta.size;
+    open = o;
   }
 
   @Override
-  public final void checkStop() {
-    if(stopped) {
-      try {
-        data.close();
-      } catch(final Exception ex) {
-        Main.debug(ex);
-      }
-      throw new ProgressException();
+  public void abort() {
+    data.meta.dirty = true;
+    if(open) return;
+    try {
+      data.close();
+    } catch(final Exception ex) {
+      Main.debug(ex);
     }
+    DropDB.drop(data.meta.name, data.meta.prop);
   }
 
   @Override

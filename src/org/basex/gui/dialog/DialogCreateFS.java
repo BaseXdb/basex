@@ -165,7 +165,7 @@ public final class DialogCreateFS extends Dialog {
       }
     });
     p.add(cont, BorderLayout.WEST);
-    
+
     xml = new BaseXCheckBox(IMPORTXML, prop.is(Prop.FSXML), this);
     xml.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {

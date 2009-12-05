@@ -31,7 +31,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
   /**
    * Checks the endian of numeric values in the input stream.
    * @param in input stream
-   * @return false if TIFF endian is invalid.
+   * @return false if TIFF endian is invalid
    * @throws IOException I/O exception
    */
   protected boolean checkEndian(final InputStream in) throws IOException {
@@ -44,7 +44,7 @@ abstract class EXIFExtractor extends AbstractExtractor {
    * Checks the endian of numeric values for the specified bytes.
    * @param b1 first byte
    * @param b2 second byte
-   * @return false if TIFF endian is invalid.
+   * @return false if TIFF endian is invalid
    */
   private boolean checkEndian(final int b1, final int b2) {
     // check if the header is valid

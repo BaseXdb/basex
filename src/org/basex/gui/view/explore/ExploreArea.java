@@ -253,7 +253,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
 
   /**
    * Runs a query.
-   * @param force force the execution of a new query.
+   * @param force force the execution of a new query
    */
   void query(final boolean force) {
     if(!force && !gui.prop.is(GUIProp.EXECRT)) return;

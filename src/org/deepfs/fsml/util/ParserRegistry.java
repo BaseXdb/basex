@@ -24,8 +24,8 @@ public class ParserRegistry {
 
   /**
    * Registers a parser implementation with the fs parser.
-   * @param suffix the suffix to register the parser implementation for.
-   * @param c the parser implementation class.
+   * @param suffix the suffix to register the parser implementation for
+   * @param c the parser implementation class
    */
   public static void register(final String suffix,
       final Class<? extends IFileParser> c) {
@@ -34,7 +34,7 @@ public class ParserRegistry {
 
   /**
    * Registers a fallback parser implementation with the fs parser.
-   * @param c the parser implementation class.
+   * @param c the parser implementation class
    */
   public static void registerFallback(final Class<? extends IFileParser> c) {
     if(fallbackParser != null) {
@@ -71,10 +71,10 @@ public class ParserRegistry {
 
   /**
    * Gets a parser implementation for given file suffix.
-   * @param suffix the file suffix to get the parser for.
+   * @param suffix the file suffix to get the parser for
    * @return the parser implementation or <code>null</code> if no implementation
-   *         is available.
-   * @throws ParserException if the parser could not be loaded.
+   *         is available
+   * @throws ParserException if the parser could not be loaded
    */
   public IFileParser getParser(final String suffix) throws ParserException {
     IFileParser instance = parserInstances.get(suffix);
@@ -104,8 +104,8 @@ public class ParserRegistry {
   /**
    * Gets the fallback parser implementation.
    * @return the fallback parser implementation or <code>null</code> if no
-   *         fallback parser is available.
-   * @throws ParserException if the parser could not be loaded.
+   *         fallback parser is available
+   * @throws ParserException if the parser could not be loaded
    */
   public IFileParser getFallbackParser() throws ParserException {
     if(fallbackParser == null) return null;

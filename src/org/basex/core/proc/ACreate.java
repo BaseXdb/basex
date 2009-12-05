@@ -1,17 +1,13 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
-
 import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Main;
 import org.basex.core.Proc;
-import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -60,54 +56,48 @@ abstract class ACreate extends Proc {
       if(mem) {
         context.openDB(data);
       } else {
-        index(data);
+        index(data, false);
         data.close();
         final Proc pr = new Open(db);
         if(!pr.execute(context)) return error(pr.info());
       }
       return info(DBCREATED, db, perf);
-    } catch(final FileNotFoundException ex) {
-      Main.debug(ex);
-      return error(FILEWHICH, p.io);
-    } catch(final ProgressException ex) {
-      abort();
-      return error(PROGERR);
     } catch(final IOException ex) {
       Main.debug(ex);
+      abort();
       final String msg = ex.getMessage();
       return error(msg != null ? msg : args[0]);
-    } catch(final Exception ex) {
-      Main.debug(ex);
-      return error(PARSEERR, args[0]);
     }
   }
 
   /**
    * Builds the indexes.
    * @param data data reference
+   * @param o flag for keeping the database open if the process is canceled
    * @throws IOException I/O exception
    */
-  protected void index(final Data data) throws IOException {
-    if(data instanceof MemData) return;
-    if(data.meta.txtindex) buildIndex(Type.TXT, data);
-    if(data.meta.atvindex) buildIndex(Type.ATV, data);
-    if(data.meta.ftxindex) buildIndex(Type.FTX, data);
+  protected void index(final Data data, final boolean o) throws IOException {
+    if(data.meta.txtindex) index(Type.TXT, data, o);
+    if(data.meta.atvindex) index(Type.ATV, data, o);
+    if(data.meta.ftxindex) index(Type.FTX, data, o);
   }
 
   /**
    * Builds the specified index.
-   * @param i index to be built.
+   * @param i index to be built
    * @param d data reference
+   * @param o flag for keeping the database open if the process is canceled
    * @throws IOException I/O exception
    */
-  protected void buildIndex(final Type i, final Data d) throws IOException {
-    final Prop pr = d.meta.prop;
+  protected void index(final Type i, final Data d, final boolean o)
+      throws IOException {
+    if(d instanceof MemData) return;
     IndexBuilder b = null;
     switch(i) {
-      case TXT: b = new ValueBuilder(d, true); break;
-      case ATV: b = new ValueBuilder(d, false); break;
+      case TXT: b = new ValueBuilder(d, true, o); break;
+      case ATV: b = new ValueBuilder(d, false, o); break;
       case FTX: b = d.meta.ftfz ?
-          new FTFuzzyBuilder(d, pr) : new FTTrieBuilder(d, pr); break;
+          new FTFuzzyBuilder(d, o) : new FTTrieBuilder(d, o); break;
       default: break;
     }
     d.closeIndex(i);

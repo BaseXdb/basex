@@ -95,7 +95,7 @@ final class XQueryText extends BaseXText {
   /**
    * Performs the specified query.
    * @param query to be processed
-   * @param force perform query, even if it has not changed.
+   * @param force perform query, even if it has not changed
    */
   void query(final byte[] query, final boolean force) {
     if(force) {

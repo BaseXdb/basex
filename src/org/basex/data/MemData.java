@@ -1,6 +1,5 @@
 package org.basex.data;
 
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.index.Index;
 import org.basex.index.MemValues;
@@ -27,7 +26,7 @@ public final class MemData extends Data {
    */
   public MemData(final Names tag, final Names att, final Namespaces n,
       final PathSummary s, final Prop pr) {
-    
+
     meta = new MetaData("", pr);
     table = new TableMemAccess(meta, null, 16);
     txtindex = new MemValues();
@@ -66,7 +65,6 @@ public final class MemData extends Data {
 
   @Override
   public void setIndex(final Type type, final Index ind) {
-    Main.notimplemented();
   }
 
   @Override

@@ -316,8 +316,8 @@ public final class MP3Parser implements IFileParser {
   /**
    * Checks if the file contains a ID3v1 tag and sets the file pointer to the
    * beginning of the tag.
-   * @return true if the file contains a valid ID3v1 tag.
-   * @throws IOException if any error occurs while reading the file.
+   * @return true if the file contains a valid ID3v1 tag
+   * @throws IOException if any error occurs while reading the file
    */
   private boolean checkID3v1() throws IOException {
     final long size = bfc.size();
@@ -366,8 +366,8 @@ public final class MP3Parser implements IFileParser {
   /**
    * Checks if the file contains a ID3v2 tag and sets the file pointer to the
    * beginning of the ID3 header fields.
-   * @return true if the file contains a ID3v2 tag.
-   * @throws IOException if any error occurs while reading the file.
+   * @return true if the file contains a ID3v2 tag
+   * @throws IOException if any error occurs while reading the file
    */
   private boolean checkID3v2() throws IOException {
     final int size = HEADER_LENGTH + MINIMAL_FRAME_SIZE;
@@ -382,7 +382,7 @@ public final class MP3Parser implements IFileParser {
    * Reads the ID3v2 metadata from the file. The behavior is undefined if there
    * is no ID3v2 tag available, therefore {@link #checkID3v1()} should always be
    * called before.
-   * @throws IOException if any error occurs while reading the ID3v2 tag.
+   * @throws IOException if any error occurs while reading the ID3v2 tag
    */
   private void readMetaID3v2() throws IOException {
     setTypeAndFormat();
@@ -401,8 +401,8 @@ public final class MP3Parser implements IFileParser {
 
   /**
    * Reads the ID3v2 header and returns the header size.
-   * @return the size of the ID3v2 header.
-   * @throws IOException if any error occurs while reading the file.
+   * @return the size of the ID3v2 header
+   * @throws IOException if any error occurs while reading the file
    */
   private int readID3v2Header() throws IOException {
     // already buffered by checkID3v2()
@@ -415,8 +415,8 @@ public final class MP3Parser implements IFileParser {
    * buffer position is set to the first byte after this frame.
    * @return the number of bytes read, {@link Integer#MAX_VALUE} if the end of
    *         the header was detected or the number of bytes read (as negative
-   *         number) if the frame was not parsed.
-   * @throws IOException if any error occurs while reading the file.
+   *         number) if the frame was not parsed
+   * @throws IOException if any error occurs while reading the file
    */
   private int readID3v2Frame() throws IOException {
     bfc.buffer(MINIMAL_FRAME_SIZE);
@@ -443,8 +443,8 @@ public final class MP3Parser implements IFileParser {
   /**
    * Returns the textual representation of the genre with the code
    * <code>b</code>.
-   * @param b the "code" of the genre.
-   * @return the textual representation of the genre.
+   * @param b the "code" of the genre
+   * @return the textual representation of the genre
    */
   public static byte[] getGenre(final int b) {
     return b < GENRES.length && b >= 0 ? GENRES[b] : EMPTY;
@@ -456,7 +456,7 @@ public final class MP3Parser implements IFileParser {
    * integers to distinguish them from data in other blocks. The most
    * significant bit of each byte is zero, making seven bits out of eight
    * available.
-   * @return the integer.
+   * @return the integer
    */
   private int readSynchsafeInt() {
     final int b1 = bfc.get();
@@ -472,8 +472,8 @@ public final class MP3Parser implements IFileParser {
 
   /**
    * Skips the text encoding description bytes.
-   * @return the number of skipped bytes.
-   * @throws IOException if any error occurs while reading from the file.
+   * @return the number of skipped bytes
+   * @throws IOException if any error occurs while reading from the file
    */
   int skipEncBytes() throws IOException {
     bfc.buffer(3);
@@ -491,8 +491,8 @@ public final class MP3Parser implements IFileParser {
    * Assure that at least one byte is buffered before calling this method.
    * @return a string with the name of the encoding that was detected or
    *         <code>null</code> if an invalid or unsupported encoding was
-   *         detected. If no encoding is set, an empty string is returned.
-   * @throws IOException if any error occurs while reading from the file.
+   *         detected. If no encoding is set, an empty string is returned
+   * @throws IOException if any error occurs while reading from the file
    */
   String readEncoding() throws IOException {
     final int c = bfc.get();
@@ -517,9 +517,9 @@ public final class MP3Parser implements IFileParser {
   /**
    * Reads and parses text from the file. Assure that at least <code>s</code>
    * bytes are buffered before calling this method.
-   * @param s number of bytes to read.
-   * @return byte array with the text.
-   * @throws IOException if any error occurs while reading from the file.
+   * @param s number of bytes to read
+   * @return byte array with the text
+   * @throws IOException if any error occurs while reading from the file
    */
   byte[] readText(final int s) throws IOException {
     return s <= 1 ? EMPTY : readText(s, readEncoding());
@@ -528,10 +528,10 @@ public final class MP3Parser implements IFileParser {
   /**
    * Reads and parses text with the given encoding from the file. Assure that at
    * least <code>s</code> bytes are buffered before calling this method.
-   * @param s number of bytes to read.
-   * @param encoding the encoding of the text.
-   * @return byte array with the text.
-   * @throws IOException if any error occurs while reading from the file.
+   * @param s number of bytes to read
+   * @param encoding the encoding of the text
+   * @return byte array with the text
+   * @throws IOException if any error occurs while reading from the file
    */
   byte[] readText(final int s, final String encoding) throws IOException {
     int size = s;
@@ -547,8 +547,8 @@ public final class MP3Parser implements IFileParser {
 
   /**
    * Reads and parses the genre from the file and fires events for each genre.
-   * @param s number of bytes to read.
-   * @throws IOException if any error occurs while reading the file.
+   * @param s number of bytes to read
+   * @throws IOException if any error occurs while reading the file
    */
   void fireGenreEvents(final int s) throws IOException {
     final byte[] value = readText(s);
@@ -576,9 +576,9 @@ public final class MP3Parser implements IFileParser {
    * of tracks in the whole set). Everything after '/' is deleted.
    * @param s number of bytes to read
    * @return a byte array that contains only ASCII bytes that are valid integer
-   *         numbers.
-   * @throws IOException if any error occurs while reading the file.
-   * @throws ParserException if the track number could not be parsed.
+   *         numbers
+   * @throws IOException if any error occurs while reading the file
+   * @throws ParserException if the track number could not be parsed
    */
   int readTrack(final int s) throws IOException, ParserException {
     final byte[] value = readText(s);
@@ -599,8 +599,8 @@ public final class MP3Parser implements IFileParser {
 
   /**
    * Parses a date and returns the corresponding xml calendar.
-   * @param d the date to parse.
-   * @return the xml date.
+   * @param d the date to parse
+   * @return the xml date
    */
   XMLGregorianCalendar parseDate(final byte[] d) {
     final int len = d.length;
@@ -1059,9 +1059,9 @@ public final class MP3Parser implements IFileParser {
      * <p>
      * Frame specific parse method.
      * </p>
-     * @param obj {@link MP3Parser} instance to send parser events from.
-     * @param size the size of the frame in bytes.
-     * @throws IOException if any error occurs while reading the file.
+     * @param obj {@link MP3Parser} instance to send parser events from
+     * @param size the size of the frame in bytes
+     * @throws IOException if any error occurs while reading the file
      */
     abstract void parse(final MP3Parser obj, final int size) throws IOException;
   }

@@ -37,7 +37,7 @@ public final class BaseXListChooser extends BaseXBack {
 
   /**
    * Default constructor.
-   * @param choice the input values for the list.
+   * @param choice the input values for the list
    * @param d dialog reference
    */
   public BaseXListChooser(final String[] choice, final Dialog d) {
@@ -194,7 +194,7 @@ public final class BaseXListChooser extends BaseXBack {
 
   /**
    * Returns the current list index.
-   * @return list index entry.
+   * @return list index entry
    */
   public int getIndex() {
     return list.getSelectedIndex();

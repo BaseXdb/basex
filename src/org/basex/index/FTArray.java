@@ -25,7 +25,7 @@ final class FTArray {
 
   /**
    * Constructor.
-   * @param is index size, number of tokens to index.
+   * @param is index size, number of tokens to index
    */
   FTArray(final int is) {
     next = new IntArrayList(is);

@@ -27,7 +27,7 @@ public abstract class Parser extends Progress {
 
   /**
    * Constructor.
-   * @param f file reference.
+   * @param f file reference
    * @param p database properties
    */
   protected Parser(final IO f, final Prop p) {

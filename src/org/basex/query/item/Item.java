@@ -29,7 +29,7 @@ public abstract class Item extends Expr {
 
   /**
    * Constructor.
-   * @param t data type.
+   * @param t data type
    */
   protected Item(final Type t) {
     type = t;
@@ -201,7 +201,7 @@ public abstract class Item extends Expr {
 
   /**
    * Checks the items for equality.
-   * @param it item to be compared.
+   * @param it item to be compared
    * @return result of check
    * @throws QueryException query exception
    */
@@ -209,7 +209,7 @@ public abstract class Item extends Expr {
 
   /**
    * Returns the difference between the current and the specified item.
-   * @param it item to be compared.
+   * @param it item to be compared
    * @return difference
    * @throws QueryException query exception
    */

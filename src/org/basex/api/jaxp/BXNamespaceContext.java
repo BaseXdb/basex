@@ -18,7 +18,7 @@ public final class BXNamespaceContext implements NamespaceContext {
 
   /**
    * Constructor.
-   * @param n namespace references.
+   * @param n namespace references
    */
   public BXNamespaceContext(final NSLocal n) {
     ns = n;

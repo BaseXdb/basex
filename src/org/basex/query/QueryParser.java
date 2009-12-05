@@ -2703,7 +2703,7 @@ public class QueryParser extends InputParser {
   /**
    * Checks for the specified character and throws an exception if
    * something else is found.
-   * @param ch character to be found.
+   * @param ch character to be found
    * @throws QueryException query exception
    */
   private void check(final int ch) throws QueryException {
@@ -2713,7 +2713,7 @@ public class QueryParser extends InputParser {
   /**
    * Checks for the specified string and throws an exception if
    * something else is found.
-   * @param s string to be found.
+   * @param s string to be found
    * @throws QueryException query exception
    */
   protected final void check(final String s) throws QueryException {
@@ -2723,7 +2723,7 @@ public class QueryParser extends InputParser {
   /**
    * Checks if the specified character is not found; if the input is
    * exhausted, throws an exception.
-   * @param ch character to be found.
+   * @param ch character to be found
    * @return result of check
    * @throws QueryException query exception
    */

@@ -61,7 +61,8 @@ public final class CreateIndex extends ACreate {
       if(data instanceof MemData) return error(PROCMM);
 
       data.flush();
-      buildIndex(index, data);
+      index(index, data, true);
+
       return info(DBINDEXED, perf);
     } catch(final IOException ex) {
       Main.debug(ex);

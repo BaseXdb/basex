@@ -542,7 +542,7 @@ public final class GUI extends JFrame {
    * Updates the control panel.
    * @param comp component to be updated
    * @param show true if component is visible
-   * @param layout component layout.
+   * @param layout component layout
    */
   void updateControl(final JComponent comp, final boolean show,
       final String layout) {

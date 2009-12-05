@@ -72,7 +72,7 @@ public final class ExifParser {
 
     /**
      * Constructor.
-     * @param s the size in bytes.
+     * @param s the size in bytes
      */
     private Format(final int s) {
       size = s;
@@ -80,7 +80,7 @@ public final class ExifParser {
 
     /**
      * Returns the size in bytes.
-     * @return the size in bytes.
+     * @return the size in bytes
      */
     int getSize() {
       return size;
@@ -88,8 +88,8 @@ public final class ExifParser {
 
     /**
      * Returns the field format for a id.
-     * @param i the id.
-     * @return the field format.
+     * @param i the id
+     * @return the field format
      */
     static Format getForId(final int i) {
       switch(i) {
@@ -605,8 +605,8 @@ public final class ExifParser {
 
     /**
      * Initializes a tag.
-     * @param metaElem the corresponding {@link MetaElem}.
-     * @param allowedFormats formats that are allowed for the tag field.
+     * @param metaElem the corresponding {@link MetaElem}
+     * @param allowedFormats formats that are allowed for the tag field
      */
     private Tag(final MetaElem metaElem, final Format... allowedFormats) {
       this(-1, metaElem, false, allowedFormats);
@@ -614,9 +614,9 @@ public final class ExifParser {
 
     /**
      * Initializes a tag.
-     * @param expectedCount the expected number of values.
-     * @param metaElem the corresponding {@link MetaElem}.
-     * @param allowedFormats formats that are allowed for the tag field.
+     * @param expectedCount the expected number of values
+     * @param metaElem the corresponding {@link MetaElem}
+     * @param allowedFormats formats that are allowed for the tag field
      */
     private Tag(final int expectedCount, final MetaElem metaElem,
         final Format... allowedFormats) {
@@ -625,11 +625,11 @@ public final class ExifParser {
 
     /**
      * Initializes a tag.
-     * @param expectedCount the expected number of values.
-     * @param metaElem the corresponding {@link MetaElem}.
+     * @param expectedCount the expected number of values
+     * @param metaElem the corresponding {@link MetaElem}
      * @param checkExisting if true, the value for the metaElem is only set if
-     *          there was no value set previously.
-     * @param allowedFormats formats that are allowed for the tag field.
+     *          there was no value set previously
+     * @param allowedFormats formats that are allowed for the tag field
      */
     private Tag(final int expectedCount, final MetaElem metaElem,
         final boolean checkExisting, final Format... allowedFormats) {
@@ -642,8 +642,8 @@ public final class ExifParser {
 
     /**
      * Parses the tag.
-     * @param o {@link ExifParser} instance to send parser events from.
-     * @param buf the {@link ByteBuffer} to read from.
+     * @param o {@link ExifParser} instance to send parser events from
+     * @param buf the {@link ByteBuffer} to read from
      */
     void parse(final ExifParser o, final ByteBuffer buf) {
       if(!check(o, buf)) return;
@@ -653,9 +653,9 @@ public final class ExifParser {
 
     /**
      * Checks if the field is valid.
-     * @param o the ExifParser instance.
-     * @param buf the ByteBuffer to read from.
-     * @return true if the current IFD field is valid.
+     * @param o the ExifParser instance
+     * @param buf the ByteBuffer to read from
+     * @return true if the current IFD field is valid
      */
     boolean check(final ExifParser o, final ByteBuffer buf) {
       format = Format.getForId(buf.getShort());
@@ -706,9 +706,9 @@ public final class ExifParser {
     /**
      * Reads the metadata from the ByteBuffer and adds it to the DeepFile. May
      * be overridden for complex fields that occupy at most 4 bytes (and are
-     * inlined in the IFD field).
-     * @param d the DeepFile to add the metadata to.
-     * @param b the ByteBuffer to read from.
+     * inlined in the IFD field)
+     * @param d the DeepFile to add the metadata to
+     * @param b the ByteBuffer to read from
      */
     void meta(final DeepFile d, final ByteBuffer b) {
       if(unique && d.isMetaSet(elem)) return;
@@ -719,8 +719,8 @@ public final class ExifParser {
      * Reads the metadata from the BufferedFileChannel and adds it to the
      * DeepFile. May be overridden for complex fields that occupy at least 5
      * bytes (and are not inlined in the IFD field).
-     * @param d the DeepFile to add the metadata to.
-     * @param b the {@link BufferedFileChannel} to read from.
+     * @param d the DeepFile to add the metadata to
+     * @param b the {@link BufferedFileChannel} to read from
      */
     void meta(final DeepFile d, final BufferedFileChannel b) {
       if(unique && d.isMetaSet(elem)) return;
@@ -729,8 +729,8 @@ public final class ExifParser {
 
     /**
      * Parses an inlined field and adds the metadata to the deep file.
-     * @param d the {@link DeepFile} to add the metadata to.
-     * @param b the buffer to read from.
+     * @param d the {@link DeepFile} to add the metadata to
+     * @param b the buffer to read from
      */
     void metaSimple(final DeepFile d, final ByteBuffer b) {
       switch(format) {
@@ -766,8 +766,8 @@ public final class ExifParser {
     /**
      * Parses a field that is not inlined and adds the metadata to the deep
      * file.
-     * @param d the {@link DeepFile} to add the metadata to.
-     * @param b the {@link BufferedFileChannel} to read from.
+     * @param d the {@link DeepFile} to add the metadata to
+     * @param b the {@link BufferedFileChannel} to read from
      */
     void metaSimple(final DeepFile d, final BufferedFileChannel b) {
       try {
@@ -855,8 +855,8 @@ public final class ExifParser {
 
     /**
      * Reads a byte from the {@link ByteBuffer}.
-     * @param b the {@link ByteBuffer} to read from.
-     * @return the byte value.
+     * @param b the {@link ByteBuffer} to read from
+     * @return the byte value
      */
     short readByte(final ByteBuffer b) {
       return (short) (b.get() & 0xFF);
@@ -864,8 +864,8 @@ public final class ExifParser {
 
     /**
      * Reads a byte from the {@link BufferedFileChannel}.
-     * @param b the {@link BufferedFileChannel} to read from.
-     * @return the byte value.
+     * @param b the {@link BufferedFileChannel} to read from
+     * @return the byte value
      */
     short readByte(final BufferedFileChannel b) {
       return (short) b.get();
@@ -873,8 +873,8 @@ public final class ExifParser {
 
     /**
      * Reads a short from the {@link ByteBuffer}.
-     * @param b the {@link ByteBuffer} to read from.
-     * @return the short value.
+     * @param b the {@link ByteBuffer} to read from
+     * @return the short value
      */
     int readShort(final ByteBuffer b) {
       return b.getShort() & 0xFFFF;
@@ -882,8 +882,8 @@ public final class ExifParser {
 
     /**
      * Reads a short from the {@link BufferedFileChannel}.
-     * @param b the {@link BufferedFileChannel} to read from.
-     * @return the short value.
+     * @param b the {@link BufferedFileChannel} to read from
+     * @return the short value
      */
     int readShort(final BufferedFileChannel b) {
       return b.getShort();
@@ -891,8 +891,8 @@ public final class ExifParser {
 
     /**
      * Reads an unsigned long from the {@link ByteBuffer}.
-     * @param b the {@link ByteBuffer} to read from.
-     * @return the long value.
+     * @param b the {@link ByteBuffer} to read from
+     * @return the long value
      */
     long readLong(final ByteBuffer b) {
       return b.getInt() & 0xFFFFFFFFL;
@@ -900,8 +900,8 @@ public final class ExifParser {
 
     /**
      * Reads an unsigned long from the {@link BufferedFileChannel}.
-     * @param b the {@link BufferedFileChannel} to read from.
-     * @return the long value.
+     * @param b the {@link BufferedFileChannel} to read from
+     * @return the long value
      */
     long readLong(final BufferedFileChannel b) {
       return b.getInt() & 0xFFFFFFFFL;
@@ -909,8 +909,8 @@ public final class ExifParser {
 
     /**
      * Reads a signed long from the {@link ByteBuffer}.
-     * @param b the {@link ByteBuffer} to read from.
-     * @return the long value.
+     * @param b the {@link ByteBuffer} to read from
+     * @return the long value
      */
     int readSLong(final ByteBuffer b) {
       return b.getInt();
@@ -918,8 +918,8 @@ public final class ExifParser {
 
     /**
      * Reads a signed long from the {@link BufferedFileChannel}.
-     * @param b the {@link BufferedFileChannel} to read from.
-     * @return the long value.
+     * @param b the {@link BufferedFileChannel} to read from
+     * @return the long value
      */
     int readSLong(final BufferedFileChannel b) {
       return b.getInt();
@@ -928,8 +928,8 @@ public final class ExifParser {
     /**
      * Reads an ASCII value from the {@link ByteBuffer} and returns it as byte
      * array.
-     * @param b the {@link ByteBuffer} to read from.
-     * @return the ASCII value as byte array.
+     * @param b the {@link ByteBuffer} to read from
+     * @return the ASCII value as byte array
      */
     byte[] readAscii(final ByteBuffer b) {
       return b.get(new byte[count]).array();
@@ -938,9 +938,9 @@ public final class ExifParser {
     /**
      * Reads an ASCII value from the {@link BufferedFileChannel} and returns it
      * as byte array.
-     * @param b the {@link BufferedFileChannel} to read from.
-     * @return the ASCII value as byte array.
-     * @throws IOException if any error occurs while reading from the channel.
+     * @param b the {@link BufferedFileChannel} to read from
+     * @return the ASCII value as byte array
+     * @throws IOException if any error occurs while reading from the channel
      */
     byte[] readAscii(final BufferedFileChannel b)
         throws IOException {
@@ -949,8 +949,8 @@ public final class ExifParser {
 
     /**
      * Reads a rational value from a IFD field.
-     * @param b the {@link BufferedFileChannel} to read the rational from.
-     * @return the rational value as double.
+     * @param b the {@link BufferedFileChannel} to read the rational from
+     * @return the rational value as double
      */
     double readRational(final BufferedFileChannel b) {
       final long numerator = readLong(b);
@@ -960,8 +960,8 @@ public final class ExifParser {
 
     /**
      * Reads a signed rational value from a IFD field.
-     * @param b the {@link BufferedFileChannel} to read the rational from.
-     * @return the rational value as double.
+     * @param b the {@link BufferedFileChannel} to read the rational from
+     * @return the rational value as double
      */
     double readSRational(final BufferedFileChannel b) {
       final int numerator = readSLong(b);
@@ -972,10 +972,10 @@ public final class ExifParser {
     /**
      * Reads a date value from the {@link BufferedFileChannel} and returns it as
      * {@link XMLGregorianCalendar}.
-     * @param b the {@link BufferedFileChannel} to read from.
-     * @return the date value.
-     * @throws ParseException if the date could not be parsed.
-     * @throws IOException if any error occurs while reading from the channel.
+     * @param b the {@link BufferedFileChannel} to read from
+     * @return the date value
+     * @throws ParseException if the date could not be parsed
+     * @throws IOException if any error occurs while reading from the channel
      */
     XMLGregorianCalendar readDate(final BufferedFileChannel b)
         throws ParseException, IOException {
@@ -985,8 +985,8 @@ public final class ExifParser {
 
     /**
      * Generates a debug message.
-     * @param d the {@link DeepFile}.
-     * @param ex the exception to log.
+     * @param d the {@link DeepFile}
+     * @param ex the exception to log
      */
     void err(final DeepFile d, final Exception ex) {
       err(d, ex.getMessage());
@@ -994,8 +994,8 @@ public final class ExifParser {
 
     /**
      * Generates a debug message.
-     * @param d the {@link DeepFile}.
-     * @param ex the message to log.
+     * @param d the {@link DeepFile}
+     * @param ex the message to log
      */
     void err(final DeepFile d, final String ex) {
       Main.debug(
@@ -1016,9 +1016,9 @@ public final class ExifParser {
 
   /**
    * Checks if the Exif IFD is valid.
-   * @param f the {@link BufferedFileChannel} to read from.
-   * @return true if the IFD is valid, false otherwise.
-   * @throws IOException if any error occurs while reading from the channel.
+   * @param f the {@link BufferedFileChannel} to read from
+   * @return true if the IFD is valid, false otherwise
+   * @throws IOException if any error occurs while reading from the channel
    */
   boolean check(final BufferedFileChannel f) throws IOException {
     try {
@@ -1033,8 +1033,8 @@ public final class ExifParser {
 
   /**
    * Parses the Exif data.
-   * @param df the DeepFile to store metadata and file content.
-   * @throws IOException if any error occurs while reading from the channel.
+   * @param df the DeepFile to store metadata and file content
+   * @throws IOException if any error occurs while reading from the channel
    */
   public void extract(final DeepFile df)
       throws IOException {
@@ -1063,7 +1063,7 @@ public final class ExifParser {
    * Reads an IFD (an array of fixed length fields) from the current file
    * channel position. At least 2 bytes have to be buffered.
    * @throws IOException if any error occurs while reading from the file
-   *           channel.
+   *           channel
    */
   void readIFD() throws IOException {
     bfc.buffer(2);
@@ -1081,8 +1081,8 @@ public final class ExifParser {
   /**
    * Checks if the two endianness bytes are correct and set the ByteBuffer's
    * endianness according to these bytes.
-   * @param f the {@link BufferedFileChannel} to read from.
-   * @return true if the endianness bytes are valid, false otherwise.
+   * @param f the {@link BufferedFileChannel} to read from
+   * @return true if the endianness bytes are valid, false otherwise
    */
   private boolean checkEndianness(final BufferedFileChannel f) {
     final int b1 = f.get();
@@ -1096,7 +1096,7 @@ public final class ExifParser {
 
   /**
    * Reads a single tag field from the IFD array.
-   * @param data the {@link ByteBuffer} containing the field data.
+   * @param data the {@link ByteBuffer} containing the field data
    */
   private void readField(final ByteBuffer data) {
     final int tagNr = data.getShort() & 0xFFFF;

@@ -87,7 +87,7 @@ public final class Optimize extends ACreate {
       data.meta.txtindex = prop.is(Prop.TEXTINDEX);
       data.meta.atvindex = prop.is(Prop.ATTRINDEX);
       data.meta.ftxindex = prop.is(Prop.FTINDEX);
-      index(data);
+      index(data, true);
     } catch(final IOException ex) {
       Main.debug(ex);
     }

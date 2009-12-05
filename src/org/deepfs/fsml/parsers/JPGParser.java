@@ -49,9 +49,9 @@ public final class JPGParser implements IFileParser {
 
   /**
    * Checks if the JPG header is valid.
-   * @param f the file channel to read from.
-   * @return true if the header is valid, false otherwise.
-   * @throws IOException if any error occurs while reading from the channel.
+   * @param f the file channel to read from
+   * @return true if the header is valid, false otherwise
+   * @throws IOException if any error occurs while reading from the channel
    */
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {
@@ -103,7 +103,7 @@ public final class JPGParser implements IFileParser {
   /**
    * Reads two bytes from the {@link BufferedFileChannel} and returns the value
    * as integer.
-   * @return the size value.
+   * @return the size value
    */
   private int readSize() {
     return bfc.getShort() - 2;
@@ -118,9 +118,9 @@ public final class JPGParser implements IFileParser {
    * <b>Assure that at least <code>a.length</code> bytes are buffered, before
    * calling this method.</b>
    * <p>
-   * @param a the array content to check.
+   * @param a the array content to check
    * @return true if the next bytes are equals to the array content, false
-   *         otherwise.
+   *         otherwise
    */
   private boolean checkNextBytes(final byte[] a) {
     final int len = a.length;
@@ -134,7 +134,7 @@ public final class JPGParser implements IFileParser {
   /**
    * Reads image width and height.
    * @throws IOException if any error occurs while reading from the file
-   *           channel.
+   *           channel
    */
   private void readDimensions() throws IOException {
     bfc.buffer(9);
@@ -153,8 +153,8 @@ public final class JPGParser implements IFileParser {
 
   /**
    * Reads an Exif segment.
-   * @param size the size of the segment.
-   * @throws IOException if any error occurs while reading from the file.
+   * @param size the size of the segment
+   * @throws IOException if any error occurs while reading from the file
    * @see <a href="http://www.Exif.org/Exif2-2.PDF">Exif 2.2</a>
    */
   private void readExif(final int size) throws IOException {
@@ -176,7 +176,7 @@ public final class JPGParser implements IFileParser {
   /**
    * Reads a JFIF (JPEG File Interchange Format) segment.
    * @param size the size of the segment
-   * @throws IOException if any error occurs while reading from the file.
+   * @throws IOException if any error occurs while reading from the file
    * @see <a href="http://www.w3.org/Graphics/JPEG/jfif3.pdf">JFIF 1.02 spec</a>
    */
   private void readJFIF(final int size) throws IOException {
@@ -193,8 +193,8 @@ public final class JPGParser implements IFileParser {
 
   /**
    * Reads an extended JFIF segment.
-   * @param size the size of the segment.
-   * @throws IOException if any error occurs while reading from the file.
+   * @param size the size of the segment
+   * @throws IOException if any error occurs while reading from the file
    */
   private void readJFXX(final int size) throws IOException {
     // method is only called from readJFIF() which cares about buffering
@@ -237,8 +237,8 @@ public final class JPGParser implements IFileParser {
 
   /**
    * Reads an comment segment.
-   * @param size the size of the segment.
-   * @throws IOException if any error occurs while reading from the file.
+   * @param size the size of the segment
+   * @throws IOException if any error occurs while reading from the file
    */
   private void readComment(final int size) throws IOException {
     deepFile.addMeta(MetaElem.DESCRIPTION, bfc.get(new byte[size]));

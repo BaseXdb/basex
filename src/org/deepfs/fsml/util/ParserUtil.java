@@ -59,9 +59,9 @@ public final class ParserUtil {
 
   /**
    * Converts a duration value in milliseconds to an {@link Duration} instance.
-   * @param milliseconds the number of milliseconds to convert.
+   * @param milliseconds the number of milliseconds to convert
    * @return the {@link Duration} instance or <code>null</code> if the
-   *         conversion fails.
+   *         conversion fails
    */
   public static Duration convertMsDuration(final int milliseconds) {
     return factory == null ? null : factory.newDuration(milliseconds);
@@ -70,9 +70,9 @@ public final class ParserUtil {
   /**
    * Checks if the value is of the form <code>mm:ss</code> or if it is a
    * milliseconds value and returns a {@link Duration} instance.
-   * @param value the byte array to convert.
+   * @param value the byte array to convert
    * @return the {@link Duration} instance or <code>null</code> if the
-   *         conversion fails.
+   *         conversion fails
    */
   public static Duration convertDuration(final byte[] value) {
     return Token.contains(value, ':') ? convertMinSecDuration(value)
@@ -82,9 +82,9 @@ public final class ParserUtil {
   /**
    * Converts a duration value of the form <code>mm:ss</code> to an
    * {@link Duration} instance.
-   * @param minSec the byte array containing the duration value.
+   * @param minSec the byte array containing the duration value
    * @return the {@link Duration} instance or <code>null</code> if the
-   *         conversion fails.
+   *         conversion fails
    */
   private static Duration convertMinSecDuration(final byte[] minSec) {
     if(factory == null) return null;
@@ -120,8 +120,8 @@ public final class ParserUtil {
 
   /**
    * Converts a date value to an xml date value.
-   * @param gc the calendar value to convert.
-   * @return the calendar.
+   * @param gc the calendar value to convert
+   * @return the calendar
    */
   public static XMLGregorianCalendar convertDateTime(
       final GregorianCalendar gc) {
@@ -132,8 +132,8 @@ public final class ParserUtil {
 
   /**
    * Converts a date value to an xml date value.
-   * @param date the {@link Date} value to convert.
-   * @return the calendar.
+   * @param date the {@link Date} value to convert
+   * @return the calendar
    */
   public static XMLGregorianCalendar convertDateTime(final Date date) {
     final GregorianCalendar gc = new GregorianCalendar();
@@ -143,10 +143,10 @@ public final class ParserUtil {
 
   /**
    * Converts the given values into an xml date value.
-   * @param year the year.
-   * @param month the month.
-   * @param day the number of days.
-   * @return the calendar.
+   * @param year the year
+   * @param month the month
+   * @param day the number of days
+   * @return the calendar
    */
   public static XMLGregorianCalendar convertDate(final int year,
       final int month, final int day) {
@@ -160,9 +160,9 @@ public final class ParserUtil {
 
   /**
    * Converts the given values into an xml date value.
-   * @param year the year.
-   * @param month the month.
-   * @return the calendar.
+   * @param year the year
+   * @param month the month
+   * @return the calendar
    */
   public static XMLGregorianCalendar convertYearMonth(final int year,
       final int month) {
@@ -175,8 +175,8 @@ public final class ParserUtil {
 
   /**
    * Converts a year value to an xml date value.
-   * @param year the year value to convert.
-   * @return the calendar.
+   * @param year the year value to convert
+   * @return the calendar
    */
   public static XMLGregorianCalendar convertYear(final int year) {
     final XMLGregorianCalendar xgc = factory == null ? null
@@ -188,8 +188,8 @@ public final class ParserUtil {
   /**
    * Checks if the given byte array only contains valid UTF-8 characters. All
    * invalid chars are replaced by spaces.
-   * @param data the byte array to check.
-   * @return a byte array containing only valid UTF-8 chars.
+   * @param data the byte array to check
+   * @return a byte array containing only valid UTF-8 chars
    */
   public static byte[] checkUTF(final byte[] data) {
     final int size = data.length;

@@ -79,7 +79,7 @@ public final class DeepFS implements DataText {
 
   /**
    * Constructor for {@link DeepShell} and java only test cases (no mount).
-   * @param dbname name of (initially empty) database.
+   * @param dbname name of (initially empty) database
    * @param mountpoint of DeepFS database
    */
   public DeepFS(final String dbname, final String mountpoint) {
@@ -310,7 +310,7 @@ public final class DeepFS implements DataText {
    * Constructs attributes for file and directory tags.
    * @param f file name
    * @param absolutePath if true, the absolute path is added instead of the file
-   *          name.
+   *          name
    * @return attributes as byte[][]
    */
   public static Atts atts(final File f, final boolean absolutePath) {
@@ -338,7 +338,7 @@ public final class DeepFS implements DataText {
   /**
    * Returns mountpoint attribute value.
    * @param pre pre value
-   * @return mountpoint value.
+   * @return mountpoint value
    */
   private byte[] mountpoint(final int pre) {
     return attr(pre, data.fs.mountpointID);
@@ -347,7 +347,7 @@ public final class DeepFS implements DataText {
   /**
    * Returns backing store attribute value.
    * @param pre pre value
-   * @return path mountpoint.
+   * @return path mountpoint
    */
   private byte[] backingstore(final int pre) {
     return attr(pre, data.fs.backingstoreID);
@@ -357,7 +357,7 @@ public final class DeepFS implements DataText {
    * Returns a file attribute.
    * @param pre pre value
    * @param at the attribute id of the attribute to be found
-   * @return attribute or empty token.
+   * @return attribute or empty token
    */
   private byte[] attr(final int pre, final int at) {
     final int a = pre + data.attSize(pre, data.kind(pre));
@@ -405,7 +405,7 @@ public final class DeepFS implements DataText {
 
   //  /**
   //   * Extracts content of file and build a MemData object.
-  //   * @param path from which to include content (it's in backing store).
+  //   * @param path from which to include content (it's in backing store)
   //   * @return MemData reference
   //   */
   //  private MemData buildContentData(final String path) {
@@ -469,8 +469,8 @@ public final class DeepFS implements DataText {
 
   //  /**
   //   * Deletes a non-empty directory.
-  //   * @param dir to be deleted.
-  //   * @return boolean true for success, false for failure.
+  //   * @param dir to be deleted
+  //   * @return boolean true for success, false for failure
   //   */
   //  private static boolean deleteDir(final File dir) {
   //    if(dir.isDirectory()) {
@@ -505,7 +505,7 @@ public final class DeepFS implements DataText {
   /**
    * Creates a new regular file or directory node.
    * @param path to the file to be created
-   * @param mode of file (directory, regular file ..., permission bits)
+   * @param mode of file (directory, regular file ..., permission bits
    * @return id of the newly created file or -1 on failure
    */
   private int createNode(final String path, final int mode) {
@@ -585,7 +585,7 @@ public final class DeepFS implements DataText {
 
   /**
    * Reads directory entries.
-   * @param path directory to be listed.
+   * @param path directory to be listed
    * @return directory entries, null on failure
    */
   public byte[][] readdir(final String path) {
@@ -657,7 +657,7 @@ public final class DeepFS implements DataText {
    * Returns the absolute file path.
    * @param pre pre value
    * @param backing whether to return backing path or mountpath
-   * @return file path.
+   * @return file path
    */
   public byte[] path(final int pre, final boolean backing) {
     int p = pre;
@@ -691,7 +691,7 @@ public final class DeepFS implements DataText {
   /**
    * Returns the name of a file.
    * @param pre pre value
-   * @return file name.
+   * @return file name
    */
   public byte[] name(final int pre) {
     return attr(pre, data.nameID);
@@ -812,16 +812,16 @@ public final class DeepFS implements DataText {
   //
   //  /**
   //   * Mounts database as FUSE.
-  //   * @param mp path where to mount BaseX.
-  //   * @param bs path to backing storage root of this instance.
-  //   * @return 0 on success, errno in case of failure.
+  //   * @param mp path where to mount BaseX
+  //   * @param bs path to backing storage root of this instance
+  //   * @return 0 on success, errno in case of failure
   //   */
   //  public native int nativeMount(final String mp, final String bs);
   //
   //  /**
   //   * Unlinks file in backing store.
   //   * @param pathname to file to delete
-  //   * @return 0 on success, errno in case of failure.
+  //   * @return 0 on success, errno in case of failure
   //   */
   //  public native int nativeUnlink(final String pathname);
   //

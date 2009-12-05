@@ -169,6 +169,8 @@ public final class TableMemAccess extends TableAccess {
     }
   }
 
+  // PRIVATE METHODS ==========================================================
+
   /**
    * Moves data inside the value arrays.
    * @param op source position

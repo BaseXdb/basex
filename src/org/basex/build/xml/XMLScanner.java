@@ -116,7 +116,7 @@ public final class XMLScanner extends Progress {
 
   /**
    * Reads and interprets the next token from the input stream.
-   * @return true if the document scanning has been completed.
+   * @return true if the document scanning has been completed
    * @throws IOException I/O exception
    */
   boolean more() throws IOException {
@@ -332,7 +332,7 @@ public final class XMLScanner extends Progress {
       c = consume();
       f = false;
     }
-    if(ws) type = Type.EOF;    
+    if(ws) type = Type.EOF;
   }
 
   /**

@@ -266,10 +266,10 @@ public enum MetaElem {
 
   /**
    * Constructor for key-value pairs.
-   * @param name metadata key.
-   * @param namespace namespace for the metadata attribute.
-   * @param dataType xml datatype.
-   * @param mv flag, if the metadata element may have multiple values.
+   * @param name metadata key
+   * @param namespace namespace for the metadata attribute
+   * @param dataType xml datatype
+   * @param mv flag, if the metadata element may have multiple values
    */
   private MetaElem(final NS namespace, final String name, final Type dataType,
       final boolean mv) {
@@ -282,8 +282,8 @@ public enum MetaElem {
   /**
    * Constructor for the content container element (map with several key-value
    * pairs).
-   * @param namespace namespace for the container element.
-   * @param name name of the container element.
+   * @param namespace namespace for the container element
+   * @param name name of the container element
    */
   private MetaElem(final NS namespace, final String name) {
     ns = namespace;
@@ -294,7 +294,7 @@ public enum MetaElem {
 
   /**
    * Returns the metadata attribute name as byte array.
-   * @return the metadata attribute name.
+   * @return the metadata attribute name
    */
   public byte[] get() {
     return n;
@@ -302,7 +302,7 @@ public enum MetaElem {
 
   /**
    * Returns the xml datatype for the metadata attribute.
-   * @return the xml datatype for the metadata attribute.
+   * @return the xml datatype for the metadata attribute
    */
   public Type getType() {
     if(pdt != null) return pdt;
@@ -311,7 +311,7 @@ public enum MetaElem {
 
   /**
    * Returns true, if multiple values are allowed for the metadata attribute.
-   * @return true, if multiple values are allowed for the metadata attribute.
+   * @return true, if multiple values are allowed for the metadata attribute
    */
   public boolean isMultiVal() {
     return multiVal;
@@ -331,7 +331,7 @@ public enum MetaElem {
   /**
    * Overrides the default data type of the metadata element with a more precise
    * data type (e.g. "short" instead of "integer").
-   * @param dataType the new xml data type to set for this metadata element.
+   * @param dataType the new xml data type to set for this metadata element
    */
   void refineDataType(final Type dataType) {
     if(!dataType.instance(dt)) Main.notexpected("Failed to refine the xml " +

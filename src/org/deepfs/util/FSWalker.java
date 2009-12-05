@@ -63,7 +63,7 @@ public class FSWalker implements FSTraversal {
 
   /**
    * Determines if the specified file is valid and no symbolic link.
-   * @param f file to be tested.
+   * @param f file to be tested
    * @return false for a symbolic link
    */
   public static boolean valid(final File f) {
@@ -120,7 +120,7 @@ public class FSWalker implements FSTraversal {
 
   /**
    * Traverses a directory hierarchy.
-   * @param d directory traversal starts from.
+   * @param d directory traversal starts from
    */
   private void startTraversal(final File d) {
     final File[] files = d.listFiles();
@@ -160,7 +160,7 @@ public class FSWalker implements FSTraversal {
 
   /**
    * Entry point for a directory traversal.
-   * @param d directory traversal should start from.
+   * @param d directory traversal should start from
    */
   public void traverse(final File d) {
     preTraversal(d);

@@ -2,12 +2,9 @@ package org.basex.index;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.Num;
@@ -31,9 +28,10 @@ public final class ValueBuilder extends IndexBuilder {
    * Constructor.
    * @param d data reference
    * @param txt value type (text/attribute)
+   * @param o flag for keeping database open
    */
-  public ValueBuilder(final Data d, final boolean txt) {
-    super(d);
+  public ValueBuilder(final Data d, final boolean txt, final boolean o) {
+    super(d, o);
     text = txt;
   }
 
@@ -74,7 +72,6 @@ public final class ValueBuilder extends IndexBuilder {
         o = p;
       }
     }
-
     outl.close();
     outr.close();
 
@@ -88,7 +85,9 @@ public final class ValueBuilder extends IndexBuilder {
 
   @Override
   public void abort() {
-    DropDB.drop(data.meta.name, data.meta.prop);
+    if(text) data.meta.txtindex = false;
+    else data.meta.atvindex = false;
+    super.abort();
   }
 
   @Override

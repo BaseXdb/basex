@@ -21,7 +21,7 @@ public class ParserException extends Exception {
    * not initialized, and may subsequently be initialized by a call to
    * {@link #initCause}.
    * @param message the detail message. The detail message is saved for later
-   *          retrieval by the {@link #getMessage()} method.
+   *          retrieval by the {@link #getMessage()} method
    */
   public ParserException(final String message) {
     super(message);
@@ -47,7 +47,7 @@ public class ParserException extends Exception {
    * Note that the detail message associated with <code>cause</code> is
    * <i>not</i> automatically incorporated in this exception's detail message.
    * @param message the detail message (which is saved for later retrieval by
-   *          the {@link #getMessage()} method).
+   *          the {@link #getMessage()} method)
    * @param cause the cause (which is saved for later retrieval by the
    *          {@link #getCause()} method). (A <tt>null</tt> value is permitted,
    *          and indicates that the cause is nonexistent or unknown.)

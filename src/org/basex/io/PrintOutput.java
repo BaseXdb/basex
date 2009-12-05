@@ -115,7 +115,7 @@ public class PrintOutput extends OutputStream {
 
   /**
    * Returns the number of written bytes.
-   * @return number of written bytes.
+   * @return number of written bytes
    */
   public final int size() {
     return size;

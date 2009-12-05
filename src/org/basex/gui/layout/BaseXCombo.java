@@ -15,7 +15,7 @@ import org.basex.gui.dialog.Dialog;
 public final class BaseXCombo extends JComboBox {
   /**
    * Constructor.
-   * @param ch combobox choices.
+   * @param ch combobox choices
    * @param win parent window
    */
   public BaseXCombo(final String[] ch, final Window win) {

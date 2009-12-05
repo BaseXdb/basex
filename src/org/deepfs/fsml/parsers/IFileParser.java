@@ -17,17 +17,17 @@ public interface IFileParser {
    * Checks if there is a File in correct format and can be read by the parser.
    * Checks e.g. header bytes.
    * </p>
-   * @param bfc the {@link BufferedFileChannel} to read from.
-   * @return true if the file is supported.
-   * @throws IOException if an error occurs while reading from the file.
+   * @param bfc the {@link BufferedFileChannel} to read from
+   * @return true if the file is supported
+   * @throws IOException if an error occurs while reading from the file
    */
   boolean check(final BufferedFileChannel bfc)
       throws IOException;
 
   /**
    * Extracts metadata and file contents.
-   * @param deepFile the {@link DeepFile} to save metadata and content to.
-   * @throws IOException if any error occurs while reading from the file.
+   * @param deepFile the {@link DeepFile} to save metadata and content to
+   * @throws IOException if any error occurs while reading from the file
    */
   void extract(final DeepFile deepFile) throws IOException;
 
@@ -35,8 +35,8 @@ public interface IFileParser {
    * Propagates the metadata and file contents back to the file in the file
    * system.
    * @param deepFile the {@link DeepFile} that contains the metadata and file
-   *          contents.
-   * @throws IOException if any error occurs.
+   *          contents
+   * @throws IOException if any error occurs
    */
   void propagate(final DeepFile deepFile) throws IOException;
 }

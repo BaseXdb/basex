@@ -65,7 +65,7 @@ final class FNDate extends Fun {
   /**
    * Returns the years of the specified date.
    * @param it date
-   * @return time.
+   * @return years
    */
   private Item yea(final Item it) {
     return Itr.get(it instanceof Dur ? ((Dur) it).yea() :
@@ -75,7 +75,7 @@ final class FNDate extends Fun {
   /**
    * Returns the months of the specified date.
    * @param it date
-   * @return time.
+   * @return months
    */
   private Item mon(final Item it) {
     return Itr.get(it instanceof Dur ? ((Dur) it).mon() :
@@ -83,9 +83,9 @@ final class FNDate extends Fun {
   }
 
   /**
-   * Returns the months of the specified date.
+   * Returns the days of the specified date.
    * @param it date
-   * @return time.
+   * @return days
    */
   private Item day(final Item it) {
     return Itr.get(it instanceof Dur ? (int) ((Dur) it).day() :
@@ -95,7 +95,7 @@ final class FNDate extends Fun {
   /**
    * Returns the hours of the specified date.
    * @param it date
-   * @return time.
+   * @return hours
    */
   private Item hou(final Item it) {
     return Itr.get(it instanceof Dur ? (int) ((Dur) it).hou() :
@@ -105,7 +105,7 @@ final class FNDate extends Fun {
   /**
    * Returns the minutes of the specified date.
    * @param it date
-   * @return time.
+   * @return minutes
    */
   private Item min(final Item it) {
     return Itr.get(it instanceof Dur ? ((Dur) it).min() :
@@ -115,7 +115,7 @@ final class FNDate extends Fun {
   /**
    * Returns the seconds of the specified date.
    * @param it date
-   * @return time.
+   * @return seconds
    */
   private Item sec(final Item it) {
     if(it instanceof Dur) return Dec.get(((Dur) it).sec().doubleValue());

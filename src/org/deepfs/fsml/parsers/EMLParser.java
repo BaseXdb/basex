@@ -122,11 +122,11 @@ public final class EMLParser implements IFileParser {
     /**
      * Parses the current (and perhaps the following) line(s) and fire meta
      * events.
-     * @param obj the {@link EMLParser} to fire events from.
+     * @param obj the {@link EMLParser} to fire events from
      * @return flag if a new line has to be read afterwards. If true, a new line
      *         must be read, if false, a new line is already stored to
      *         <code>mCurrLine</code>
-     * @throws IOException if any error occurs while reading from the file.
+     * @throws IOException if any error occurs while reading from the file
      */
     abstract boolean parse(final EMLParser obj) throws IOException;
   }
@@ -160,9 +160,9 @@ public final class EMLParser implements IFileParser {
 
     /**
      * Decodes the text.
-     * @param text the text to decode.
+     * @param text the text to decode
      * @param utf flag if its utf-encoded
-     * @return the decoded text.
+     * @return the decoded text
      */
     abstract byte[] decode(final byte[] text, final boolean utf);
   }
@@ -279,8 +279,8 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Checks if the given string contains a valid email address.
-   * @param str the string to check.
-   * @return true if the string contains a valid email address.
+   * @param str the string to check
+   * @return true if the string contains a valid email address
    */
   public static boolean isEmailAddress(final String str) {
     final Matcher m = MAILPATTERN.matcher(str);
@@ -289,7 +289,7 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Parses the mail content.
-   * @throws IOException if any I/O error occurs.
+   * @throws IOException if any I/O error occurs
    */
   private void parseContent() throws IOException {
     boolean multipart = false;
@@ -309,7 +309,7 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Extracts the body text of an email.
-   * @param multipart flag if it's a multipart message.
+   * @param multipart flag if it's a multipart message
    * @return true if more parts are found
    * @throws IOException I/O exception
    */
@@ -368,8 +368,8 @@ public final class EMLParser implements IFileParser {
   /**
    * Extracts content-type information of the body or the attachment. true means
    * body, false means attachment.
-   * @param contentMeta metadata store for the current section.
-   * @return true if content is plaintext, false otherwise.
+   * @param contentMeta metadata store for the current section
+   * @return true if content is plaintext, false otherwise
    * @throws IOException I/O exception
    */
   private boolean readSectionHeader(final DeepFile contentMeta)
@@ -413,7 +413,7 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Parses a multipart/related section.
-   * @throws IOException if any I/O error occurs.
+   * @throws IOException if any I/O error occurs
    */
   void multipartRelated() throws IOException {
     // [BL] test multipart mails
@@ -425,9 +425,9 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Parses mail addresses and fires parser events.
-   * @param name the metadata element to set (name).
-   * @param email the metadata element to set (email address).
-   * @throws IOException if any error occurs while reading from the file.
+   * @param name the metadata element to set (name)
+   * @param email the metadata element to set (email address)
+   * @throws IOException if any error occurs while reading from the file
    */
   void parseMailAddresses(final MetaElem name, final MetaElem email)
       throws IOException {
@@ -454,8 +454,8 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Removes leading and trailing whitespaces and quoting signs.
-   * @param text the text to chop.
-   * @return the chopped text.
+   * @param text the text to chop
+   * @return the chopped text
    */
   private byte[] chop(final byte[] text) {
     int start = 0;
@@ -515,7 +515,7 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Returns the charset.
-   * @return the charset.
+   * @return the charset
    */
   String getCharset() {
     if(mCurrLine.contains("charset=")) {
@@ -546,8 +546,8 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Decodes a text.
-   * @param text the text to decode.
-   * @return the decoded text as byte array.
+   * @param text the text to decode
+   * @return the decoded text as byte array
    */
   byte[] decode(final byte[] text) {
     final int len = text.length;
@@ -595,10 +595,10 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Adds a byte to the TokenBuilder.
-   * @param tb the TokenBuilder to add the byte to.
-   * @param b the byte to add.
+   * @param tb the TokenBuilder to add the byte to
+   * @param b the byte to add
    * @param utf true, if the byte is part of an utf-encoded string, false
-   *          otherwise.
+   *          otherwise
    */
   private static void addByte(final TokenBuilder tb, final int b,
       final boolean utf) {
@@ -643,9 +643,9 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Decodes a base64 encoded text.
-   * @param text the text to be decoded.
+   * @param text the text to be decoded
    * @param utf flag if the text is utf-encoded
-   * @return the decoded text.
+   * @return the decoded text
    */
   static byte[] decodeBase64(final byte[] text, final boolean utf) {
     final TokenBuilder tmp = new TokenBuilder();
@@ -707,8 +707,8 @@ public final class EMLParser implements IFileParser {
 
   /**
    * Translates an ascii char to the base64 value.
-   * @param b the char to convert.
-   * @return the base64 value;
+   * @param b the char to convert
+   * @return the base64 value
    */
   private static byte base64Val(final byte b) {
     final byte val = BASE64MAPPING[b - 0x2B];

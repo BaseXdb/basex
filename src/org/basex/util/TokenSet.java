@@ -32,7 +32,7 @@ public class TokenSet {
     next = new int[CAP];
     bucket = new int[CAP];
   }
-  
+
   /**
    * Constructor.
    * @param in input stream
@@ -65,7 +65,7 @@ public class TokenSet {
     out.writeNums(bucket);
     out.writeNum(size);
   }
-  
+
   /**
    * Indexes the specified key and returns the offset of the added key.
    * If the key exists already, a negative offset is returned.
@@ -137,7 +137,7 @@ public class TokenSet {
 
   /**
    * Returns number of entries.
-   * @return number of entries.
+   * @return number of entries
    */
   public final int size() {
     return size - 1;

@@ -32,7 +32,7 @@ public final class JFUSEAdapter { //implements FileModeFlags {
 
   /**
    * Checks (and loads) native Java FUSE bindings.
-   * @return true in case of success.
+   * @return true in case of success
    */
   public static boolean loadJFUSELibrary() {
 //    try {

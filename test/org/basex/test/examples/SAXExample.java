@@ -25,7 +25,7 @@ public final class SAXExample extends DefaultHandler {
 
   /**
    * Main method of the example class.
-   * @param args an optional query can be specified on the command line.
+   * @param args an optional query can be specified on the command line
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {

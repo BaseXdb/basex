@@ -90,7 +90,7 @@ public class IntList {
      * Searches for the specified value via binary search.
      * Note that the values must be sorted.
      * @param v value to find
-     * @return index of the search key, or the negative insertion point - 1.
+     * @return index of the search key, or the negative insertion point - 1
    */
   public final int find(final int v) {
     return Arrays.binarySearch(list, 0, size, v);

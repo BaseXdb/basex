@@ -84,7 +84,7 @@ public final class List extends Proc {
   /**
    * Returns a list of all DeepFS databases.
    * @param ctx context reference
-   * @return available databases.
+   * @return available databases
    */
   public static StringList listFS(final Context ctx) {
     final StringList dbs = list(ctx);

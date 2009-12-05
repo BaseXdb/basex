@@ -104,6 +104,7 @@ public final class MetaData {
     ftst = prop.is(Prop.FTST);
     ftdc = prop.is(Prop.FTDC);
     ftcs = prop.is(Prop.FTCS);
+    ftsctype = prop.num(Prop.FTSCTYPE);
     users = new Users(false);
   }
 

@@ -20,7 +20,7 @@ abstract class MapPainter {
 
   /**
    * Constructor.
-   * @param m map reference.
+   * @param m map reference
    * @param pr gui properties
    */
   MapPainter(final MapView m, final GUIProp pr) {

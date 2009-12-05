@@ -603,8 +603,8 @@ public final class TreeView extends View implements TreeViewOptions {
 
   /**
    * Returns the y-axis value for a given level.
-   * @param level the level.
-   * @return the y-axis value.
+   * @param level the level
+   * @return the y-axis value
    */
   private int getYperLevel(final int level) {
     return level * nodeHeight + level * levelDistance + TOP_MARGIN;
@@ -612,8 +612,8 @@ public final class TreeView extends View implements TreeViewOptions {
 
   /**
    * Determines the level of a y-axis value.
-   * @param y the y-axis value.
-   * @return the level if inside a node rectangle, -1 else.
+   * @param y the y-axis value
+   * @return the level if inside a node rectangle, -1 else
    */
   private int getLevelPerY(final int y) {
     final double f = y / ((float) levelDistance + nodeHeight);
@@ -713,10 +713,10 @@ public final class TreeView extends View implements TreeViewOptions {
   /**
    * Draws text into the rectangles.
    * @param g graphics reference
-   * @param pre the pre value.
-   * @param boxMiddle the middle of the rectangle.
-   * @param w the width of the.
-   * @param y the y value;
+   * @param pre the pre value
+   * @param boxMiddle the middle of the rectangle
+   * @param w the width of the
+   * @param y the y value
    */
   private void drawTextIntoRectangle(final Graphics g, final int pre,
       final int boxMiddle, final int w, final int y) {

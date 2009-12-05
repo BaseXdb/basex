@@ -260,7 +260,7 @@ public final class DialogUser extends BaseXBack {
             permps.add(val.equals(true) ? new Grant(right, value, db) :
               new Revoke(right, value, db));
             o = l.get(2);
-            val = o.equals("") ? Boolean.FALSE : o.equals("X") ? 
+            val = o.equals("") ? Boolean.FALSE : o.equals("X") ?
                 Boolean.TRUE : o;
             right = CmdPerm.values()[1].toString();
             permps.add(val.equals(true) ? new Grant(right, value, db) :

@@ -67,7 +67,7 @@ public final class TableLayout implements LayoutManager {
 
   /**
    * Removes the specified component from the layout.
-   * @param comp the component to be removed.
+   * @param comp the component to be removed
    */
   public void removeLayoutComponent(final Component comp) { }
 

@@ -48,7 +48,7 @@ public final class Sessions implements Iterable<ServerProcess> {
 
   /**
    * Deletes the specified entry.
-   * @param s entry to be deleted.
+   * @param s entry to be deleted
    */
   public void delete(final ServerProcess s) {
     for(int i = 0; i < size; i++) {

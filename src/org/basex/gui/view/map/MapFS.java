@@ -41,7 +41,7 @@ final class MapFS extends MapPainter {
 
   /**
    * Constructor.
-   * @param m map reference.
+   * @param m map reference
    * @param pr gui properties
    * @param f fs reference
    */

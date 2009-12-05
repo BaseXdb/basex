@@ -47,7 +47,7 @@ final class ChildIterator {
 
   /**
    * Returns the pre value of the next child.
-   * @return next child reference.
+   * @return next child reference
    */
   int next() {
     final int p = pre;

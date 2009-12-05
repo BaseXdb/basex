@@ -30,9 +30,9 @@ public class BMPParser implements IFileParser {
 
   /**
    * Checks the header bytes.
-   * @param f the {@link BufferedFileChannel} to read from.
-   * @return true if the header is valid.
-   * @throws IOException if any error occurs while reading from the channel.
+   * @param f the {@link BufferedFileChannel} to read from
+   * @return true if the header is valid
+   * @throws IOException if any error occurs while reading from the channel
    */
   @Override
   public boolean check(final BufferedFileChannel f) throws IOException {

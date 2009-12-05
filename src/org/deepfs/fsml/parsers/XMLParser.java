@@ -46,9 +46,9 @@ public final class XMLParser implements IFileParser {
    * Checks if the document is well-formed and returns the corresponding main
    * memory database.
    * @param f the {@link BufferedFileChannel} to read the xml document from
-   * @param prop the database properties to use.
+   * @param prop the database properties to use
    * @return the main memory database or <code>null</code> if the document is
-   *         not wellformed.
+   *         not wellformed
    * @throws IOException if any error occurs
    */
   public Data parse(final BufferedFileChannel f, final Prop prop)

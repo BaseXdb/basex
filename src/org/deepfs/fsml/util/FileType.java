@@ -53,7 +53,7 @@ public enum FileType {
 
   /**
    * Returns the enum value as byte array.
-   * @return the enum value.
+   * @return the enum value
    */
   public byte[] get() {
     return val;

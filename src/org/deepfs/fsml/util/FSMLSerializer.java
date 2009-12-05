@@ -30,8 +30,8 @@ public class FSMLSerializer {
 
   /**
    * Constructor.
-   * @param df the DeepFile.
-   * @param po the output.
+   * @param df the DeepFile
+   * @param po the output
    */
   public FSMLSerializer(final DeepFile df, final PrintOutput po) {
     deepFile = df;
@@ -40,7 +40,7 @@ public class FSMLSerializer {
 
   /**
    * Constructor.
-   * @param po the output.
+   * @param po the output
    */
   private FSMLSerializer(final PrintOutput po) {
     deepFile = null;
@@ -49,9 +49,9 @@ public class FSMLSerializer {
 
   /**
    * Serializes a DeepFile.
-   * @param deepFile the DeepFile to serialize.
-   * @return the xml data as string.
-   * @throws IOException if any error occurs.
+   * @param deepFile the DeepFile to serialize
+   * @return the xml data as string
+   * @throws IOException if any error occurs
    */
   public static String serialize(final DeepFile deepFile) throws IOException {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -65,11 +65,11 @@ public class FSMLSerializer {
 
   /**
    * Serializes a file without metadata and content.
-   * @param file the file to serialize.
+   * @param file the file to serialize
    * @param absolutePath if true, the absolute path is added instead of the file
-   *          name.
-   * @return the xml data as string.
-   * @throws IOException if any error occurs.
+   *          name
+   * @return the xml data as string
+   * @throws IOException if any error occurs
    */
   public static String serializeFile(final File file,
       final boolean absolutePath) throws IOException {
@@ -85,7 +85,7 @@ public class FSMLSerializer {
 
   /**
    * Serializes the DeepFile.
-   * @throws IOException if any error occurs.
+   * @throws IOException if any error occurs
    */
   public void serialize() throws IOException {
     serializeDeepFiles(false, deepFile);
@@ -93,9 +93,9 @@ public class FSMLSerializer {
 
   /**
    * Starts an xml element.
-   * @param e the name of the element.
-   * @param atts the xml attributes.
-   * @throws IOException if any error occurs.
+   * @param e the name of the element
+   * @param atts the xml attributes
+   * @throws IOException if any error occurs
    */
   private void startElem(final byte[] e, final Atts atts) throws IOException {
     startElem(e, atts, false);
@@ -103,11 +103,11 @@ public class FSMLSerializer {
 
   /**
    * Starts an xml element.
-   * @param e the name of the element.
-   * @param atts the xml attributes.
+   * @param e the name of the element
+   * @param atts the xml attributes
    * @param close flag if the attribute should be closed (
-   *          <code>&lt;element/&gt;</code>).
-   * @throws IOException if any error occurs.
+   *          <code>&lt;element/&gt;</code>)
+   * @throws IOException if any error occurs
    */
   private void startElem(final byte[] e, final Atts atts, final boolean close)
       throws IOException {
@@ -127,10 +127,10 @@ public class FSMLSerializer {
 
   /**
    * Writes an xml element that contains a text node.
-   * @param n name of the xml element.
-   * @param a xml attributes of the element.
-   * @param t text content of the element (the text node).
-   * @throws IOException if any error occurs.
+   * @param n name of the xml element
+   * @param a xml attributes of the element
+   * @param t text content of the element (the text node)
+   * @throws IOException if any error occurs
    */
   private void nodeAndText(final byte[] n, final Atts a, final byte[] t)
       throws IOException {
@@ -141,8 +141,8 @@ public class FSMLSerializer {
 
   /**
    * Checks if a char has to be escaped and writes it to the output.
-   * @param b the char.
-   * @throws IOException if any error occurs.
+   * @param b the char
+   * @throws IOException if any error occurs
    */
   private void escape(final byte b) throws IOException {
     switch(b) {
@@ -175,8 +175,8 @@ public class FSMLSerializer {
   /**
    * Checks if a char has to be escaped for xquery update and writes it to the
    * output.
-   * @param b the char to check.
-   * @throws IOException if any error occurs.
+   * @param b the char to check
+   * @throws IOException if any error occurs
    */
   private void escapeXQUP(final byte b) throws IOException {
     switch(b) {
@@ -193,17 +193,17 @@ public class FSMLSerializer {
 
   /**
    * Writes an xml text node.
-   * @param t the text.
-   * @throws IOException if any error occurs.
+   * @param t the text
+   * @throws IOException if any error occurs
    */
   private void text(final byte[] t) throws IOException {
     for(final byte b : t) escape(b);
   }
-  
+
   /**
    * Writes an xml fragment.
-   * @param x the xml fragment.
-   * @throws IOException if any error occurs.
+   * @param x the xml fragment
+   * @throws IOException if any error occurs
    */
   private void xml(final byte[] x) throws IOException {
     for(final byte b : x) escapeXQUP(b);
@@ -211,8 +211,8 @@ public class FSMLSerializer {
 
   /**
    * Ends an xml element.
-   * @param e the name of the xml element.
-   * @throws IOException if any error occurs.
+   * @param e the name of the xml element
+   * @throws IOException if any error occurs
    */
   private void endElem(final byte[] e) throws IOException {
     o.write(ELEM3);
@@ -224,9 +224,9 @@ public class FSMLSerializer {
    * Serializes one or more DeepFiles.
    * @param subfile flag if the DeepFile(s) are inside a real file (content
    *          sections) or if the DeepFile(s) represent regular files in the
-   *          file system.
+   *          file system
    * @param c the DeepFile(s)
-   * @throws IOException if any error occurs.
+   * @throws IOException if any error occurs
    */
   private void serializeDeepFiles(final boolean subfile, final DeepFile... c)
       throws IOException {

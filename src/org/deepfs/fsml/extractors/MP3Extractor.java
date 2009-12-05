@@ -110,8 +110,8 @@ public final class MP3Extractor extends AbstractExtractor {
 
   /**
    * Reads a single byte from buffered input stream (mp3 file).
-   * @return int, the read byte.
-   * @exception IOException in case of premature EOF or IO error.
+   * @return int, the read byte
+   * @exception IOException in case of premature EOF or IO error
    */
   private int read() throws IOException {
     int i = 0;

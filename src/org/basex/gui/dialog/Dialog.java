@@ -153,7 +153,7 @@ public abstract class Dialog extends JDialog {
 
   /**
    * Creates a OK and CANCEL button.
-   * @param dialog reference to the component, reacting on button clicks.
+   * @param dialog reference to the component, reacting on button clicks
    * @return button list
    */
   protected static BaseXBack okCancel(final Dialog dialog) {
@@ -162,7 +162,7 @@ public abstract class Dialog extends JDialog {
 
   /**
    * Creates a new button list.
-   * @param dialog reference to the component, reacting on button clicks.
+   * @param dialog reference to the component, reacting on button clicks
    * @param hor horizontal alignment
    * @param texts button names
    * @return button list

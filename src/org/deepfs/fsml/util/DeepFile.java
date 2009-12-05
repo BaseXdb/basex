@@ -95,8 +95,8 @@ public class DeepFile {
    * {@link #DeepFile(ParserRegistry, BufferedFileChannel, Context)}
    * for parsing several files for better performance.
    * </p>
-   * @param file the name of the associated file in the file system.
-   * @throws IOException if any I/O error occurs.
+   * @param file the name of the associated file in the file system
+   * @throws IOException if any I/O error occurs
    * @see IFileParser#extract(DeepFile)
    */
   public DeepFile(final String file) throws IOException {
@@ -117,8 +117,8 @@ public class DeepFile {
    * {@link #DeepFile(ParserRegistry, BufferedFileChannel, Context)}
    * for parsing several files for better performance.
    * </p>
-   * @param file the associated file in the file system.
-   * @throws IOException if any I/O error occurs.
+   * @param file the associated file in the file system
+   * @throws IOException if any I/O error occurs
    * @see IFileParser#extract(DeepFile)
    */
   public DeepFile(final File file) throws IOException {
@@ -139,8 +139,8 @@ public class DeepFile {
    * {@link #DeepFile(ParserRegistry, BufferedFileChannel, Context)}
    * for parsing multiple files for better performance.
    * </p>
-   * @param f the {@link BufferedFileChannel}.
-   * @throws IOException if any error occurs.
+   * @param f the {@link BufferedFileChannel}
+   * @throws IOException if any error occurs
    */
   public DeepFile(final BufferedFileChannel f) throws IOException {
     this(new ParserRegistry(), f, new Context(), 0, f.size());
@@ -170,10 +170,10 @@ public class DeepFile {
    * <br/>
    * </p>
    * @param parserRegistry a reference to the parser registry that can be used
-   *          to parse file fragments.
-   * @param bufferedFileChannel {@link BufferedFileChannel} to access the file.
-   * @param ctx the database context.
-   * @throws IOException if any error occurs.
+   *          to parse file fragments
+   * @param bufferedFileChannel {@link BufferedFileChannel} to access the file
+   * @param ctx the database context
+   * @throws IOException if any error occurs
    */
   public DeepFile(final ParserRegistry parserRegistry,
       final BufferedFileChannel bufferedFileChannel, final Context ctx)
@@ -185,11 +185,11 @@ public class DeepFile {
   /**
    * Constructor.
    * @param parserRegistry a reference to the parser registry that can be used
-   *          to parse file fragments.
-   * @param bufferedFileChannel {@link BufferedFileChannel} to access the file.
-   * @param ctx the database context.
-   * @param position the position inside the file in the file system.
-   * @param contentSize the size of the deep file.
+   *          to parse file fragments
+   * @param bufferedFileChannel {@link BufferedFileChannel} to access the file
+   * @param ctx the database context
+   * @param position the position inside the file in the file system
+   * @param contentSize the size of the deep file
    */
   private DeepFile(final ParserRegistry parserRegistry,
       final BufferedFileChannel bufferedFileChannel, final Context ctx,
@@ -211,8 +211,8 @@ public class DeepFile {
   /**
    * Clones the DeepFile to map only a fragment of the file.
    * @param df the DeepFile to clone
-   * @param contentSize the size of the underlying {@link BufferedFileChannel}.
-   * @throws IOException if any error occurs.
+   * @param contentSize the size of the underlying {@link BufferedFileChannel}
+   * @throws IOException if any error occurs
    */
   private DeepFile(final DeepFile df, final int contentSize)
       throws IOException {
@@ -234,7 +234,7 @@ public class DeepFile {
 
   /**
    * Extracts metadata and text/xml contents from the associated file.
-   * @throws IOException if any error occurs while reading from the file.
+   * @throws IOException if any error occurs while reading from the file
    */
   public void extract() throws IOException {
     if(bfc == null) return;
@@ -249,8 +249,8 @@ public class DeepFile {
 
   /**
    * Calls the fallback parser for the associated file to extract text contents.
-   * @throws IOException if any error occurs while reading from the file.
-   * @throws ParserException if the fallback parser could not be loaded.
+   * @throws IOException if any error occurs while reading from the file
+   * @throws ParserException if the fallback parser could not be loaded
    */
   public void fallback() throws IOException, ParserException {
     final IFileParser p = registry.getFallbackParser();
@@ -267,7 +267,7 @@ public class DeepFile {
 
   /**
    * Returns true, if metadata should be extracted.
-   * @return true, if metadata should be extracted.
+   * @return true, if metadata should be extracted
    */
   public boolean extractMeta() {
     return !metaFinished;
@@ -275,7 +275,7 @@ public class DeepFile {
 
   /**
    * Returns true, if text contents should be extracted.
-   * @return true, if text contents should be extracted.
+   * @return true, if text contents should be extracted
    */
   public boolean extractText() {
     return context.prop.is(Prop.FSCONT);
@@ -283,7 +283,7 @@ public class DeepFile {
 
   /**
    * Returns true, if xml contents should be extracted.
-   * @return true, if xml contents should be extracted.
+   * @return true, if xml contents should be extracted
    */
   public boolean extractXML() {
     return context.prop.is(Prop.FSXML);
@@ -292,7 +292,7 @@ public class DeepFile {
   /**
    * Returns the number of bytes that should be extracted from text and xml
    * contents.
-   * @return the maximum number of bytes to extract.
+   * @return the maximum number of bytes to extract
    */
   public int maxTextSize() {
     return context.prop.num(Prop.FSTEXTMAX);
@@ -302,7 +302,7 @@ public class DeepFile {
 
   /**
    * Returns the database context.
-   * @return the database context.
+   * @return the database context
    */
   public Context getContext() {
     return context;
@@ -311,7 +311,7 @@ public class DeepFile {
   /**
    * Returns the offset of the deep file inside the regular file in the file
    * system.
-   * @return the offset.
+   * @return the offset
    */
   public long getOffset() {
     return offset;
@@ -319,7 +319,7 @@ public class DeepFile {
 
   /**
    * Returns the size of the deep file.
-   * @return the size.
+   * @return the size
    */
   public long getSize() {
     return size;
@@ -329,7 +329,7 @@ public class DeepFile {
    * Returns the file system attributes for the deep file. The file system
    * attributes are extracted after finishing the metadata extraction.
    * @return the file system attributes or <code>null</code> if the metadata
-   *         extraction was not finished yet.
+   *         extraction was not finished yet
    * @see #finishMetaExtraction()
    */
   public Atts getFSAtts() {
@@ -339,7 +339,7 @@ public class DeepFile {
   /**
    * Returns all metadata key-value pairs or <code>null</code> if metadata
    * extraction is disabled.
-   * @return the metadata.
+   * @return the metadata
    */
   public TreeMap<MetaElem, ArrayList<byte[]>> getMeta() {
     return metaElements;
@@ -347,7 +347,7 @@ public class DeepFile {
 
   /**
    * Returns all subfiles.
-   * @return the subfiles.
+   * @return the subfiles
    */
   public DeepFile[] getContent() {
     return fileFragments.toArray(new DeepFile[fileFragments.size()]);
@@ -356,7 +356,7 @@ public class DeepFile {
   /**
    * Returns all text sections or <code>null</code> if no text content
    * extraction is disabled.
-   * @return all text sections.
+   * @return all text sections
    */
   public TextContent[] getTextContents() {
     return textContents == null ? null
@@ -366,7 +366,7 @@ public class DeepFile {
   /**
    * Returns all xml sections or <code>null</code> if xml extraction is
    * disabled.
-   * @return all xml sections.
+   * @return all xml sections
    */
   public XMLContent[] getXMLContents() {
     return xmlContents == null ? null
@@ -380,7 +380,7 @@ public class DeepFile {
   /**
    * Returns the associated {@link BufferedFileChannel} that links this
    * {@link DeepFile} with a file in the file system.
-   * @return the {@link BufferedFileChannel}.
+   * @return the {@link BufferedFileChannel}
    */
   public BufferedFileChannel getBufferedFileChannel() {
     return bfc;
@@ -390,7 +390,7 @@ public class DeepFile {
 
   /**
    * Sets the type of the file (e.g. audio, video, ...).
-   * @param type the file type.
+   * @param type the file type
    */
   public void setFileType(final FileType type) {
     if(metaFinished) return;
@@ -399,7 +399,7 @@ public class DeepFile {
 
   /**
    * Sets the MIME type of the file. A previously set value will be replaced.
-   * @param format the MIME type.
+   * @param format the MIME type
    */
   public void setFileFormat(final MimeType format) {
     if(metaFinished) return;
@@ -408,10 +408,10 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param e metadata element (the key).
+   * @param e metadata element (the key)
    * @param value value as byte array. Must contain only correct UTF-8 values!
    * @param dataType the xml data type to set for this metadata element or
-   *          <code>null</code> if the default data type should be used.
+   *          <code>null</code> if the default data type should be used
    */
   private void addMeta(final MetaElem e, final byte[] value,
       final Type dataType) {
@@ -429,7 +429,7 @@ public class DeepFile {
 
   /**
    * Adds the metadata to the TreeMap.
-   * @param e metadata element (the key).
+   * @param e metadata element (the key)
    * @param value value as byte array. Must contain only correct UTF-8 values!
    */
   private void addMeta0(final MetaElem e, final byte[] value) {
@@ -455,8 +455,8 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param elem metadata element (the key). Must be a string attribute.
-   * @param value string value as byte array.
+   * @param elem metadata element (the key). Must be a string attribute
+   * @param value string value as byte array
    */
   public void addMeta(final MetaElem elem, final byte[] value) {
     if(!Type.STR.instance(elem.getType()))
@@ -466,8 +466,8 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
-   * @param value string value.
+   * @param elem metadata element (the key)
+   * @param value string value
    */
   public void addMeta(final MetaElem elem, final String value) {
     if(!checkType(elem, Type.STR)) return;
@@ -476,8 +476,8 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
-   * @param value integer value.
+   * @param elem metadata element (the key)
+   * @param value integer value
    */
   public void addMeta(final MetaElem elem, final short value) {
     if(!checkType(elem, Type.SHR)) return;
@@ -486,8 +486,8 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
-   * @param value integer value.
+   * @param elem metadata element (the key)
+   * @param value integer value
    */
   public void addMeta(final MetaElem elem, final int value) {
     if(!Type.INT.instance(elem.getType())) {
@@ -498,8 +498,8 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
-   * @param value long value.
+   * @param elem metadata element (the key)
+   * @param value long value
    */
   public void addMeta(final MetaElem elem, final long value) {
     if(!Type.LNG.instance(elem.getType())) {
@@ -510,8 +510,8 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
-   * @param value double value.
+   * @param elem metadata element (the key)
+   * @param value double value
    */
   public void addMeta(final MetaElem elem, final double value) {
     if(!checkType(elem, Type.DBL)) return;
@@ -520,8 +520,8 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
-   * @param value duration value.
+   * @param elem metadata element (the key)
+   * @param value duration value
    */
   public void addMeta(final MetaElem elem, final Duration value) {
     if(!checkType(elem, Type.DUR)) return;
@@ -530,8 +530,8 @@ public class DeepFile {
 
   /**
    * Adds a metadata key-value pair for the current file.
-   * @param elem metadata element (the key).
-   * @param xgc calendar value.
+   * @param elem metadata element (the key)
+   * @param xgc calendar value
    */
   public void addMeta(final MetaElem elem, final XMLGregorianCalendar xgc) {
     Type t = elem.getType();
@@ -544,9 +544,9 @@ public class DeepFile {
 
   /**
    * Checks if the found type is valid for the given metadata element.
-   * @param elem the metadata element.
-   * @param foundType the found data type.
-   * @return true if it is valid, false otherwise.
+   * @param elem the metadata element
+   * @param foundType the found data type
+   * @return true if it is valid, false otherwise
    */
   private boolean checkType(final MetaElem elem, final Type foundType) {
     if(foundType.instance(elem.getType())) return true;
@@ -557,8 +557,8 @@ public class DeepFile {
   /**
    * Prints a debug message if an attempt was made to set an invalid value for a
    * metadata element.
-   * @param elem the current metadata element.
-   * @param foundType the type that was tried to set.
+   * @param elem the current metadata element
+   * @param foundType the type that was tried to set
    */
   private void metaDebug(final MetaElem elem, final String foundType) {
     Main.debug("DeepFile: Invalid data type (file: %, metadata element: %, " +
@@ -570,7 +570,7 @@ public class DeepFile {
    * Finishes the extraction of metadata and extracts the file system
    * attributes.
    * @throws IOException if any error occurs while extracting the file system
-   *           attributes.
+   *           attributes
    */
   public void finishMetaExtraction() throws IOException {
     metaFinished = true;
@@ -599,8 +599,8 @@ public class DeepFile {
 
   /**
    * Returns the string value for a {@link MetaElem} that was previously added.
-   * @param elem the metadata element.
-   * @return the metadata value as string.
+   * @param elem the metadata element
+   * @return the metadata value as string
    */
   public String[] getValueAsString(final MetaElem elem) {
     final ArrayList<byte[]> vals = metaElements.get(elem);
@@ -614,8 +614,8 @@ public class DeepFile {
 
   /**
    * Returns true, if a value is set for the given metadata element.
-   * @param elem the metadata element.
-   * @return true, if a value is set.
+   * @param elem the metadata element
+   * @return true, if a value is set
    */
   public boolean isMetaSet(final MetaElem elem) {
     return metaElements.containsKey(elem);
@@ -623,7 +623,7 @@ public class DeepFile {
 
   /**
    * Returns true, if the file type is set for the current deep file.
-   * @return true, if the file type is set.
+   * @return true, if the file type is set
    */
   public boolean isFileTypeSet() {
     return metaElements.containsKey(MetaElem.TYPE);
@@ -635,9 +635,9 @@ public class DeepFile {
    * Adds a text section.
    * @param position the absolute position of the first byte of the file
    *          fragment represented by this content element inside the current
-   *          file. A negative value stands for an unknown offset.
-   * @param byteCount the size of the content element.
-   * @param text the text to add.
+   *          file. A negative value stands for an unknown offset
+   * @param byteCount the size of the content element
+   * @param text the text to add
    */
   public void addText(final long position, final int byteCount,
       final byte[] text) {
@@ -652,9 +652,9 @@ public class DeepFile {
    * </p>
    * @param position the absolute position of the first byte of the file
    *          fragment represented by this content element inside the current
-   *          file. A negative value stands for an unknown offset.
-   * @param byteCount the size of the content element.
-   * @param text the text to add.
+   *          file. A negative value stands for an unknown offset
+   * @param byteCount the size of the content element
+   * @param text the text to add
    */
   public void addText(final long position, final int byteCount,
       final TokenBuilder text) {
@@ -672,10 +672,10 @@ public class DeepFile {
 
   /**
    * Adds a xml document or fragment to the DeepFile.
-   * @param position offset of the xml document/fragement inside the file.
-   * @param byteCount number of bytes of the xml document/fragment.
-   * @param data the xml document/fragment.
-   * @throws IOException if any error occurs.
+   * @param position offset of the xml document/fragement inside the file
+   * @param byteCount number of bytes of the xml document/fragment
+   * @param data the xml document/fragment
+   * @throws IOException if any error occurs
    */
   public void addXML(final long position, final int byteCount,
       final Data data) throws IOException {
@@ -713,8 +713,8 @@ public class DeepFile {
 
   /**
    * Extracts the file system attributes from the file.
-   * @return the file system attributes.
-   * @throws IOException if any error occurs while reading from the file.
+   * @return the file system attributes
+   * @throws IOException if any error occurs while reading from the file
    */
   private Atts extractFSAtts() throws IOException {
     final File f = bfc.getAssociatedFile();
@@ -728,7 +728,7 @@ public class DeepFile {
     atts.add(SIZE, token(bfc.size()));
     if(f.isDirectory()) atts.add(MODE, token(getSIFDIR() | 0755));
     else atts.add(MODE, token(getSIFREG() | 0644));
-    
+
     byte[] uidVal = null;
     byte[] gidVal = null;
     if(metaElements != null) {
@@ -737,7 +737,7 @@ public class DeepFile {
         uidVal = uid.get(0);
         metaElements.remove(MetaElem.FS_OWNER_USER_ID);
       }
-      final ArrayList<byte[]> gid = 
+      final ArrayList<byte[]> gid =
         metaElements.get(MetaElem.FS_OWNER_GROUP_ID);
       if(gid != null) {
         gidVal = gid.get(0);
@@ -746,7 +746,7 @@ public class DeepFile {
     }
     atts.add(UID, uidVal == null ? token(getUID()) : uidVal);
     atts.add(GID, gidVal == null ? token(getGID()) : gidVal);
-    
+
     atts.add(ATIME, time);
     atts.add(CTIME, time);
     atts.add(MTIME, token(f.lastModified()));
@@ -757,10 +757,10 @@ public class DeepFile {
 
   /**
    * Processes a DeepFile and extracts metadata/content.
-   * @param df the DeepFile to process.
+   * @param df the DeepFile to process
    * @param suffix the file suffix(es). More than one suffix means that the file
-   *          type is unknown. All given suffixes will be tested.
-   * @throws IOException if any error occurs while reading from the file.
+   *          type is unknown. All given suffixes will be tested
+   * @throws IOException if any error occurs while reading from the file
    */
   private void process(final DeepFile df, final String... suffix)
       throws IOException {
@@ -776,7 +776,7 @@ public class DeepFile {
 
   /**
    * Finishes the deep file.
-   * @throws IOException if any error occurs.
+   * @throws IOException if any error occurs
    * @see BufferedFileChannel#finish()
    */
   public void finish() throws IOException {
@@ -799,12 +799,12 @@ public class DeepFile {
    * the same {@link BufferedFileChannel}, then the method
    * {@link #newContentSection(long)} can be used instead.
    * </p>
-   * @param fileName the name of the subfile.
-   * @param fileSize the size of the subfile.
+   * @param fileName the name of the subfile
+   * @param fileSize the size of the subfile
    * @param suffix the file suffix(es). More than one suffix means that the file
-   *          type is unknown. All given suffixes will be tested.
-   * @return the subfile.
-   * @throws IOException if any error occurs.
+   *          type is unknown. All given suffixes will be tested
+   * @return the subfile
+   * @throws IOException if any error occurs
    * @see #newContentSection(long)
    */
   public DeepFile subfile(final String fileName, final int fileSize,
@@ -825,11 +825,11 @@ public class DeepFile {
    * Clones the DeepFile to map only a part of the file. The returned DeepFile
    * uses an underlying BufferedFileChannel that starts at the given byte
    * position. The cloned DeepFile must be finished after usage.
-   * @param position the position where the subchannel should start.
+   * @param position the position where the subchannel should start
    * @param contentSize the size of the file fragment (the size of the
-   *          BufferedFileChannel).
-   * @return the new DeepFile.
-   * @throws IOException if any error occurs.
+   *          BufferedFileChannel)
+   * @return the new DeepFile
+   * @throws IOException if any error occurs
    * @see #finish()
    */
   public DeepFile subfile(final long position, final int contentSize)
@@ -843,9 +843,9 @@ public class DeepFile {
    * uses an underlying BufferedFileChannel that starts at the current byte
    * position. The cloned DeepFile must be finished after usage.
    * @param contentSize the size of the file fragment (the size of the
-   *          BufferedFileChannel).
-   * @return the new DeepFile.
-   * @throws IOException if any error occurs.
+   *          BufferedFileChannel)
+   * @return the new DeepFile
+   * @throws IOException if any error occurs
    * @see #finish()
    */
   public DeepFile subfile(final int contentSize) throws IOException {
@@ -862,11 +862,11 @@ public class DeepFile {
    * subchannel has to be finished after usage (
    * {@link BufferedFileChannel#finish()}).
    * </p>
-   * @param title the title of the content section.
-   * @param position the offset in the regular file where the section starts.
-   * @param contentSize the size of the content section.
-   * @return the DeepFile instance representing the content section.
-   * @throws IOException if any error occurs.
+   * @param title the title of the content section
+   * @param position the offset in the regular file where the section starts
+   * @param contentSize the size of the content section
+   * @return the DeepFile instance representing the content section
+   * @throws IOException if any error occurs
    * @see #subfile(String, int, String...)
    * @see BufferedFileChannel#subChannel(String, int)
    */
@@ -890,8 +890,8 @@ public class DeepFile {
    * The returned DeepFile instance uses the same underlying BufferedFileChannel
    * as the current DeepFile.
    * </p>
-   * @param position the offset in the regular file where the section starts.
-   * @return the DeepFile instance representing the content section.
+   * @param position the offset in the regular file where the section starts
+   * @return the DeepFile instance representing the content section
    * @see #subfile(String, int, String...)
    * @see #setSize(long)
    */
@@ -903,7 +903,7 @@ public class DeepFile {
    * Sets the size value for the DeepFile. If the current DeepFile instance is
    * not a content section, or if the size value was set before, this method
    * does nothing.
-   * @param contentSize the size value to set for the content section.
+   * @param contentSize the size value to set for the content section
    * @see #newContentSection(long)
    */
   public void setSize(final long contentSize) {
@@ -912,8 +912,8 @@ public class DeepFile {
 
   /**
    * Returns the xml representation for this deep file.
-   * @return the xml representation as string.
-   * @throws IOException if any error occurs.
+   * @return the xml representation as string
+   * @throws IOException if any error occurs
    */
   public String toXML() throws IOException {
     return FSMLSerializer.serialize(this);
@@ -945,8 +945,8 @@ public class DeepFile {
 
     /**
      * Constructor.
-     * @param position offset inside the regular file.
-     * @param byteCount size of the text section (byte count).
+     * @param position offset inside the regular file
+     * @param byteCount size of the text section (byte count)
      */
     public AbstrCont(final long position, final int byteCount) {
       o = position;
@@ -955,7 +955,7 @@ public class DeepFile {
 
     /**
      * Returns the offset.
-     * @return the offset.
+     * @return the offset
      */
     public long getOffset() {
       return o;
@@ -963,7 +963,7 @@ public class DeepFile {
 
     /**
      * Returns the size.
-     * @return the size.
+     * @return the size
      */
     public int getSize() {
       return s;
@@ -980,9 +980,9 @@ public class DeepFile {
 
     /**
      * Constructor.
-     * @param position offset inside the regular file.
-     * @param byteCount size of the text section (byte count).
-     * @param text byte array, containing the text.
+     * @param position offset inside the regular file
+     * @param byteCount size of the text section (byte count)
+     * @param text byte array, containing the text
      */
     TextContent(final long position, final int byteCount, final byte[] text) {
       super(position, byteCount);
@@ -991,7 +991,7 @@ public class DeepFile {
 
     /**
      * Returns the text.
-     * @return the text.
+     * @return the text
      */
     public byte[] getText() {
       return t;
@@ -1008,9 +1008,9 @@ public class DeepFile {
 
     /**
      * Constructor.
-     * @param position offset inside the regular file.
-     * @param byteCount size of the text section (byte count).
-     * @param xml String, containing the xml document/fragment as text.
+     * @param position offset inside the regular file
+     * @param byteCount size of the text section (byte count)
+     * @param xml String, containing the xml document/fragment as text
      */
     XMLContent(final long position, final int byteCount, final String xml) {
       super(position, byteCount);
@@ -1019,7 +1019,7 @@ public class DeepFile {
 
     /**
      * Returns the xml content as string.
-     * @return the xml content.
+     * @return the xml content
      */
     public String asString() {
       return t;
@@ -1055,8 +1055,8 @@ public class DeepFile {
 
     /**
      * Initializes a namespace instance.
-     * @param p the prefix.
-     * @param u the URI.
+     * @param p the prefix
+     * @param u the URI
      */
     NS(final String p, final String u) {
       prefix = token(p);
@@ -1079,7 +1079,7 @@ public class DeepFile {
     /**
      * Converts the xml element into a byte array containing the correct
      * namespace prefix.
-     * @param element the xml element to convert.
+     * @param element the xml element to convert
      * @return the converted element as byte array;
      */
     public byte[] tag(final String element) {
@@ -1089,7 +1089,7 @@ public class DeepFile {
     /**
      * Converts the xml element into a byte array containing the correct
      * namespace prefix.
-     * @param element the xml element to convert.
+     * @param element the xml element to convert
      * @return the converted element as byte array;
      */
     public byte[] tag(final byte[] element) {

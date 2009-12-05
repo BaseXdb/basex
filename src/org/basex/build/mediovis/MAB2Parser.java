@@ -562,7 +562,7 @@ public final class MAB2Parser extends Parser {
 
   /**
    * Fills the specified hash with the file input.
-   * @param hash hash to be filled.
+   * @param hash hash to be filled
    * @param fn file to be read
    */
   private void index(final TokenMap hash, final String fn) {

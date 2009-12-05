@@ -54,9 +54,9 @@ public final class TXTParser implements IFileParser {
 
   /**
    * Tries to extract the text contents.
-   * @param deepFile the deep file to fill with the text contents.
-   * @return true if the extraction was successful, false otherwise.
-   * @throws IOException if any error occurs.
+   * @param deepFile the deep file to fill with the text contents
+   * @return true if the extraction was successful, false otherwise
+   * @throws IOException if any error occurs
    */
   private boolean extract0(final DeepFile deepFile) throws IOException {
     final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();

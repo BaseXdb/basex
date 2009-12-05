@@ -2,7 +2,6 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.Token;
@@ -43,11 +42,11 @@ public final class FTFuzzyBuilder extends FTBuilder {
   /**
    * Constructor.
    * @param d data reference
-   * @param pr database properties
+   * @param o flag for keeping database open
    * @throws IOException IOException
    */
-  public FTFuzzyBuilder(final Data d, final Prop pr) throws IOException {
-    super(d, pr);
+  public FTFuzzyBuilder(final Data d, final boolean o) throws IOException {
+    super(d, o);
   }
 
   @Override

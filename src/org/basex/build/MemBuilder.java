@@ -34,13 +34,8 @@ public final class MemBuilder extends Builder {
     meta.file = parser.io;
   }
 
-  /**
-   * Uses the specified data instance (and its indexes) for the build process.
-   * @param mdata data instance
-   */
-  public void init(final MemData mdata) {
-    data = mdata;
-  }
+  @Override
+  public void close() { }
 
   @Override
   protected MemData finish() throws IOException {
@@ -49,36 +44,34 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  public void close() { }
+  public void setAttValue(final int pre, final byte[] val) {
+    data.text(pre, val, false);
+  }
 
   @Override
-  public void addDoc(final byte[] txt) {
+  protected void addDoc(final byte[] txt) {
     data.insertDoc(meta.size, 0, txt);
   }
 
   @Override
-  public void addElem(final int dis, final int n, final int as, final int u,
+  protected void addElem(final int dis, final int n, final int as, final int u,
       final boolean ne) {
     data.insertElem(meta.size, dis, n, as, as, u, ne);
   }
 
   @Override
-  public void addAttr(final int n, final byte[] v, final int d, final int u) {
+  protected void addAttr(final int n, final byte[] v, final int d,
+      final int u) {
     data.insertAttr(meta.size, d, n, v, u);
   }
 
   @Override
-  public void addText(final byte[] tok, final int dis, final byte kind) {
+  protected void addText(final byte[] tok, final int dis, final byte kind) {
     data.insertText(meta.size, dis, tok, kind);
   }
 
   @Override
-  public void setSize(final int pre, final int val) {
+  protected void setSize(final int pre, final int val) {
     data.size(pre, Data.ELEM, val);
-  }
-
-  @Override
-  public void setAttValue(final int pre, final byte[] val) {
-    data.text(pre, val, false);
   }
 }

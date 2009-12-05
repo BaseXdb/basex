@@ -105,8 +105,8 @@ public final class SpotlightExtractor implements IFileParser {
     /**
      * Initializes the content type instance with a {@link FileType} and a
      * {@link MimeType}.
-     * @param f the corresponding file type.
-     * @param m the corresponding mime type.
+     * @param f the corresponding file type
+     * @param m the corresponding mime type
      */
     private SpotlightContentType(final FileType f, final MimeType m) {
       fileType = f;
@@ -124,7 +124,7 @@ public final class SpotlightExtractor implements IFileParser {
 
     /**
      * Initializes the content type instance with a {@link FileType}.
-     * @param f the corresponding {@link FileType}.
+     * @param f the corresponding {@link FileType}
      */
     private SpotlightContentType(final FileType f) {
       fileType = f;
@@ -133,7 +133,7 @@ public final class SpotlightExtractor implements IFileParser {
 
     /**
      * Returns the deepFile type for this spotlight media type.
-     * @return the {@link MimeType}.
+     * @return the {@link MimeType}
      */
     MimeType getFormat() {
       return mimeType;
@@ -141,7 +141,7 @@ public final class SpotlightExtractor implements IFileParser {
 
     /**
      * Returns the deepFile type for this spotlight content type.
-     * @return the {@link FileType}.
+     * @return the {@link FileType}
      */
     FileType getType() {
       return fileType;
@@ -498,7 +498,7 @@ public final class SpotlightExtractor implements IFileParser {
     /**
      * Parses the data and fires parser events.
      * @param deepFile {@link DeepFile} to store the metadata information to
-     * @param o the data to parse.
+     * @param o the data to parse
      */
     abstract void parse(final DeepFile deepFile, final Object o);
 
@@ -509,10 +509,10 @@ public final class SpotlightExtractor implements IFileParser {
 
     /**
      * Checks the type of the given object.
-     * @param o the object to check.
-     * @param c the data type.
+     * @param o the object to check
+     * @param c the data type
      * @return true if the object is an instance of the given class, false
-     *         otherwise.
+     *         otherwise
      */
     boolean check(final Object o, final Class<?> c) {
       if(c.isInstance(o)) return true;
@@ -524,9 +524,9 @@ public final class SpotlightExtractor implements IFileParser {
     /**
      * Converts the object to a Byte/Short/Integer/Long/Float or Double and adds
      * it to the metadata store.
-     * @param deepFile the metadata store for the current file.
-     * @param elem the corresponding metadata element for this object.
-     * @param o the object to convert.
+     * @param deepFile the metadata store for the current file
+     * @param elem the corresponding metadata element for this object
+     * @param o the object to convert
      */
     void parseInt(final DeepFile deepFile, final MetaElem elem,
         final Object o) {
@@ -536,9 +536,9 @@ public final class SpotlightExtractor implements IFileParser {
 
     /**
      * Converts the object to a Duration and adds it to the metadata store.
-     * @param ms the metadata store for the current file.
-     * @param e the corresponding metadata element for this object.
-     * @param o the object to convert.
+     * @param ms the metadata store for the current file
+     * @param e the corresponding metadata element for this object
+     * @param o the object to convert
      */
     void parseDuration(final DeepFile ms, final MetaElem e, final Object o) {
       final Long value = long0(o);
@@ -548,9 +548,9 @@ public final class SpotlightExtractor implements IFileParser {
 
     /**
      * Returns the long value for an object.
-     * @param o the object to parse.
+     * @param o the object to parse
      * @return the long value or <code>null</code> if the object can't be
-     *         parsed.
+     *         parsed
      */
     private Long long0(final Object o) {
       long value;
@@ -585,7 +585,7 @@ public final class SpotlightExtractor implements IFileParser {
      * Returns the enum constant for the string. Use this method instead of
      * {@link #valueOf(String)}!
      * @param n the name of the constant
-     * @return the enum instance.
+     * @return the enum instance
      */
     public static Item getValue(final String n) {
       return valueOf(n.substring(7));
@@ -594,7 +594,7 @@ public final class SpotlightExtractor implements IFileParser {
 
   /**
    * Constructor.
-   * @throws ParserException if the spotex library is not available.
+   * @throws ParserException if the spotex library is not available
    */
   public SpotlightExtractor() throws ParserException {
     if(!LIBAVAILABLE)
@@ -632,9 +632,9 @@ public final class SpotlightExtractor implements IFileParser {
 
   /**
    * Native method for retrieving all available metadata for a file.
-   * @param filename the path to the file.
+   * @param filename the path to the file
    * @return map containing the queried metadata attributes or <code>null</code>
-   *         if any error occurs.
+   *         if any error occurs
    */
   private native Map<String, Object> getMetadata(final String filename);
 }

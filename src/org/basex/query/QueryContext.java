@@ -469,7 +469,7 @@ public final class QueryContext extends Progress {
 
   /**
    * Adds a collection instance or returns an existing one.
-   * @param coll name of the collection to be returned.
+   * @param coll name of the collection to be returned
    * @return collection
    * @throws QueryException query exception
    */

@@ -240,7 +240,7 @@ final class FNStr extends Fun {
    * @param tok token
    * @param srch characters to be found
    * @param rep characters to be replaced
-   * @return translated token.
+   * @return translated token
    */
   private static byte[] translate(final String tok, final String srch,
       final String rep) {

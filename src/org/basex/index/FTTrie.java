@@ -217,7 +217,7 @@ public final class FTTrie extends FTIndex {
 
   /**
    * Checks whether a node is an inner node or a leaf node.
-   * @param ne current node entry.
+   * @param ne current node entry
    * @return boolean leaf node or inner node
    */
   private boolean hasNextNodes(final int[] ne) {

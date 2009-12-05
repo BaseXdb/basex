@@ -27,9 +27,9 @@ public class FSTraversalParser extends Progress {
 
   /**
    * Constructor.
-   * @param path import root.
-   * @param ctx the database context to use.
-   * @param dbname the name of the database to create.
+   * @param path import root
+   * @param ctx the database context to use
+   * @param dbname the name of the database to create
    */
   public FSTraversalParser(final String path, final Context ctx,
       final String dbname) {
@@ -76,7 +76,7 @@ public class FSTraversalParser extends Progress {
 
     /**
      * Constructor.
-     * @param progress the progress.
+     * @param progress the progress
      */
     FSImporterProgress(final Progress progress) { p = progress; }
 

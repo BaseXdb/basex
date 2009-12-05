@@ -24,8 +24,8 @@ public final class Loader extends ClassLoader {
 
   /**
    * Returns the {@link URL} for the package <code>pkg</code>.
-   * @param pkg the name of the package to get the URL for.
-   * @return the URL.
+   * @param pkg the name of the package to get the URL for
+   * @return the URL
    */
   private static URL getURL(final String pkg) {
     String pkgPath = pkg.replace('.', '/');
@@ -49,12 +49,12 @@ public final class Loader extends ClassLoader {
    * This method breaks after the first error. Subsequent classes are not
    * loaded.
    * </p>
-   * @param pkg the package to load the classes from.
+   * @param pkg the package to load the classes from
    * @param superClass either the interface that has to be implemented by the
-   *          classes or a class that has to be extended.
-   * @return an array with all the loaded classes.
+   *          classes or a class that has to be extended
+   * @return an array with all the loaded classes
    * @throws IOException if the classes are located inside a JAR file and any
-   *           error occurs while reading from this file.
+   *           error occurs while reading from this file
    */
   public static Class<?>[] load(final Package pkg, final Class<?> superClass)
       throws IOException {
@@ -120,9 +120,9 @@ public final class Loader extends ClassLoader {
   /**
    * Initializes the given classes. Breaks after the first error. Subsequent
    * classes are not initialized.
-   * @param classes the classes to initialize.
+   * @param classes the classes to initialize
    * @return the number of successfully initialized classes (breaks after the
-   *         first error).
+   *         first error)
    */
   private static int initializeClasses(final ArrayList<Class<?>> classes) {
     int counter = 0;

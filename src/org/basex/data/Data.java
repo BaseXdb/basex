@@ -16,11 +16,11 @@ import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
 
 /**
- * This class provides access to the database storage. 
+ * This class provides access to the database storage.
  * Note that the methods of this class are optimized for performance.
  * They will not check if correct data is requested, i.e. if a text is
  * requested, a pre value must points to a text node.
- * 
+ *
  * All nodes in the table are accessed by their
  * implicit pre value. The following restrictions are imposed on the data:
  * <ul>

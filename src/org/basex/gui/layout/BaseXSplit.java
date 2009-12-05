@@ -81,7 +81,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
 
   /**
    * Removes the specified component.
-   * @param comp the component to be removed.
+   * @param comp the component to be removed
    */
   public void removeLayoutComponent(final Component comp) { }
 

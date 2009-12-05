@@ -2,14 +2,11 @@ package org.basex.query.up;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
@@ -33,10 +30,7 @@ public final class PendingUpdates {
   private final Map<Data, Primitives> primitives =
     new HashMap<Data, Primitives>();
   /** Data dummy for fragment updates. */
-  // [LK] problem is fixed; prop instance from main context could be adopted,
-  // though (QueryContext.Context.Prop), if needed at all.
-  // could be done in UpdateFunctions.buildDB(...) as well
-  private static final Data DATADUMMY = new MemData(new Prop(false));
+  private Data fdata;
 
   /** The update operations are part of a transform expression. */
   private final boolean t;
@@ -82,7 +76,8 @@ public final class PendingUpdates {
     if(t && (frag || !refs.contains(((DBNode) p.node).data)))
       Err.or(UPNOTCOPIED, p.node);
 
-    final Data d = frag ? DATADUMMY : ((DBNode) p.node).data;
+    if(frag && fdata == null) fdata = new MemData(ctx.context.prop);
+    final Data d = frag ? fdata : ((DBNode) p.node).data;
 
     Primitives prim = primitives.get(d);
     if(prim == null) {

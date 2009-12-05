@@ -92,20 +92,19 @@ public final class CreateDB extends ACreate {
   public static Data xml(final Context ctx, final Parser p, final String db)
       throws IOException {
 
-    final Prop pr = p.prop;
-    if(pr.is(Prop.MAINMEM)) return new MemBuilder(p).build(db);
+    if(ctx.prop.is(Prop.MAINMEM)) return new MemBuilder(p).build(db);
     if(ctx.pinned(db)) throw new IOException(Main.info(DBLOCKED, db));
 
     final Builder builder = new DiskBuilder(p);
     try {
       final Data data = builder.build(db);
       if(data.meta.txtindex) data.setIndex(Type.TXT,
-        new ValueBuilder(data, true).build());
+        new ValueBuilder(data, true, false).build());
       if(data.meta.atvindex) data.setIndex(Type.ATV,
-        new ValueBuilder(data, false).build());
+        new ValueBuilder(data, false, false).build());
       if(data.meta.ftxindex) data.setIndex(Type.FTX, data.meta.ftfz ?
-        new FTFuzzyBuilder(data, pr).build() :
-        new FTTrieBuilder(data, pr).build());
+        new FTFuzzyBuilder(data, false).build() :
+        new FTTrieBuilder(data, false).build());
       data.close();
     } catch(final IOException ex) {
       try {

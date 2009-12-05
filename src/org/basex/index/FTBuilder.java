@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.query.ft.Scoring;
@@ -50,17 +49,23 @@ abstract class FTBuilder extends IndexBuilder {
   /**
    * Constructor.
    * @param d data reference
-   * @param pr database properties
+   * @param o flag for keeping database open
    * @throws IOException IOException
    */
-  protected FTBuilder(final Data d, final Prop pr) throws IOException {
-    super(d);
-    scm = pr.num(Prop.FTSCTYPE);
-    wp = scm > 0 ? new ScoringTokenizer(pr) : new Tokenizer(pr);
-
+  protected FTBuilder(final Data d, final boolean o) throws IOException {
+    super(d, o);
+    final Prop prop = d.meta.prop;
+    scm = d.meta.ftsctype;
+    wp = scm > 0 ? new ScoringTokenizer(prop) : new Tokenizer(prop);
     max = -1;
     min = Integer.MAX_VALUE;
-    sw = new StopWords(d, pr.get(Prop.FTSTOPW));
+    sw = new StopWords(d, prop.get(Prop.FTSTOPW));
+  }
+
+  @Override
+  public void abort() {
+    data.meta.ftxindex = false;
+    super.abort();
   }
 
   /**
@@ -100,7 +105,6 @@ abstract class FTBuilder extends IndexBuilder {
     if(scm > 0) {
       data.meta.ftscmax = max;
       data.meta.ftscmin = min;
-      data.meta.ftsctype = scm;
       data.meta.dirty = true;
     }
 
@@ -204,11 +208,6 @@ abstract class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   abstract void write() throws IOException;
-
-  @Override
-  public void abort() {
-    DropDB.drop(data.meta.name, data.meta.prop);
-  }
 
   @Override
   public final String det() {

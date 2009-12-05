@@ -27,7 +27,7 @@ public final class LibraryLoader {
 
   /**
    * Loads native library if not already present.
-   * @param lib name of the library to be loaded.
+   * @param lib name of the library to be loaded
    * @return true on success
    */
   public static boolean load(final String lib) {
@@ -36,8 +36,8 @@ public final class LibraryLoader {
 
   /**
    * Checks if a library is loaded.
-   * @param lib name of the library.
-   * @return true if the library is loaded, false otherwise.
+   * @param lib name of the library
+   * @return true if the library is loaded, false otherwise
    */
   public static boolean isLoaded(final String lib) {
     final Boolean b = LIBS.get(lib);
@@ -46,7 +46,7 @@ public final class LibraryLoader {
 
   /**
    * Loads a native library from java.library.path.
-   * @param lib name of the library to be loaded.
+   * @param lib name of the library to be loaded
    * @return true on success
    */
   private static boolean loadLibrary(final String lib) {

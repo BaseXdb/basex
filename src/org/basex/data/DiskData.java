@@ -193,7 +193,7 @@ public final class DiskData extends Data {
   private static boolean num(final long o) {
     return (o & IO.NUMOFF) != 0;
   }
-  
+
   // UPDATE OPERATIONS ========================================================
 
   @Override

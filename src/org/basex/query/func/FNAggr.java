@@ -66,7 +66,7 @@ public final class FNAggr extends Fun {
    * @param iter iterator
    * @param it first item
    * @param avg calculating the average
-   * @return summed up item.
+   * @return summed up item
    * @throws QueryException query exception
    */
   private Item sum(final Iter iter, final Item it, final boolean avg)

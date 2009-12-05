@@ -28,7 +28,7 @@ public class TreeCaching implements TreeViewOptions {
 
   /**
    * This constructor invokes methods to cache all document nodes.
-   * @param data data reference.
+   * @param data data reference
    */
   public TreeCaching(final Data data) {
     if(data == null) return;
@@ -38,7 +38,7 @@ public class TreeCaching implements TreeViewOptions {
 
   /**
    * Determines nodes in each level and caches them.
-   * @param data data reference.
+   * @param data data reference
    */
   private void cacheNodes(final Data data) {
 
@@ -58,9 +58,9 @@ public class TreeCaching implements TreeViewOptions {
 
   /**
    * Saves node line in parentList.
-   * @param parentList array with nodes of the line before.
-   * @param data the data reference.
-   * @return array filled with nodes of the current line.
+   * @param parentList array with nodes of the line before
+   * @param data the data reference
+   * @return array filled with nodes of the current line
    */
   private int[] getNextNodeLine(final int[] parentList, final Data data) {
     final int l = parentList.length;
@@ -289,8 +289,8 @@ public class TreeCaching implements TreeViewOptions {
   /**
    * Uses binary search to find the rectangle with given pre value.
    * @param lv level
-   * @param pre the pre value to be found.
-   * @return the rectangle containing the given pre value, null else.
+   * @param pre the pre value to be found
+   * @return the rectangle containing the given pre value, null else
    */
   public TreeRect searchRect(final int lv, final int pre) {
 

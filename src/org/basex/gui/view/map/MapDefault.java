@@ -19,7 +19,7 @@ import org.basex.gui.view.ViewData;
 final class MapDefault extends MapPainter {
   /**
    * Constructor.
-   * @param m map reference.
+   * @param m map reference
    * @param pr gui properties
    */
   MapDefault(final MapView m, final GUIProp pr) {

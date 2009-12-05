@@ -98,7 +98,7 @@ public final class FSParser extends Parser {
   /**
    * Main entry point for the import of a file hierarchy.
    * Instantiates the engine and starts the traversal.
-   * @param build instance passed by {@link CreateFS}.
+   * @param build instance passed by {@link CreateFS}
    * @throws IOException I/O exception
    */
   @Override
@@ -135,7 +135,7 @@ public final class FSParser extends Parser {
 
   /**
    * Visits files in a directory or steps further down.
-   * @param d the directory to be visited.
+   * @param d the directory to be visited
    * @throws IOException on failure
    */
   private void parse(final File d) throws IOException {
@@ -151,7 +151,7 @@ public final class FSParser extends Parser {
 
   /**
    * Determines if the specified file is valid and no symbolic link.
-   * @param f file to be tested.
+   * @param f file to be tested
    * @return true for a symbolic link
    */
   private static boolean valid(final File f) {

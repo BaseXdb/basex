@@ -319,7 +319,7 @@ public abstract class W3CTS {
    * Parses the specified test case.
    * @param root root node
    * @throws Exception exception
-   * @return true if the query, specified by {@link #single}, was evaluated.
+   * @return true if the query, specified by {@link #single}, was evaluated
    */
   private boolean parse(final Nodes root) throws Exception {
     final String pth = text("@FilePath", root);

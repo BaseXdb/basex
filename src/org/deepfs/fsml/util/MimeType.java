@@ -88,9 +88,9 @@ public enum MimeType {
 
   /**
    * Constructor for initializing an element.
-   * @param element the xml element string.
-   * @param defaultSuffix the default file suffix for the MIME type.
-   * @param mt the associated meta types.
+   * @param element the xml element string
+   * @param defaultSuffix the default file suffix for the MIME type
+   * @param mt the associated meta types
    */
   MimeType(final String element, final String defaultSuffix,
       final FileType... mt) {
@@ -101,7 +101,7 @@ public enum MimeType {
 
   /**
    * Returns the xml element name as byte array.
-   * @return the xml element name.
+   * @return the xml element name
    */
   public byte[] get() {
     return elem;
@@ -109,7 +109,7 @@ public enum MimeType {
 
   /**
    * Returns the default file suffix for the MIME type.
-   * @return the default file suffix.
+   * @return the default file suffix
    */
   public byte[] getDefaultSuffix() {
     return suff;
@@ -117,7 +117,7 @@ public enum MimeType {
 
   /**
    * Returns the associated meta types.
-   * @return the associated meta types.
+   * @return the associated meta types
    */
   public FileType[] getMetaTypes() {
     return types;
@@ -125,9 +125,9 @@ public enum MimeType {
 
   /**
    * Tries to find the MimeType item for the given MIME type string.
-   * @param name the MIME type string to find.
+   * @param name the MIME type string to find
    * @return the {@link MimeType} item or <code>null</code> if the item was not
-   *         found.
+   *         found
    */
   public static MimeType getItem(final String name) {
     final byte[] token = Token.token(name);

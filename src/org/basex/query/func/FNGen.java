@@ -97,7 +97,7 @@ public final class FNGen extends Fun {
 
   /**
    * Performs the data function.
-   * @param iter iterator.
+   * @param iter iterator
    * @return resulting iterator
    */
   private Iter data(final Iter iter) {

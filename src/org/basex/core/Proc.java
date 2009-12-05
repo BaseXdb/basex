@@ -99,13 +99,15 @@ public abstract class Proc extends Progress {
     boolean ok = false;
     try {
       ok = exec(out);
+    } catch(final ProgressException ex) {
+      abort();
+      return error(PROGERR);
     } catch(final Throwable ex) {
       Performance.gc(2);
       Main.debug(ex);
       abort();
+
       if(ex instanceof OutOfMemoryError) return error(PROCOUTMEM);
-      // [CG] shouldn't occur here anymore..
-      if(ex instanceof IOException) return error(ex.getMessage());
 
       final Object[] st = ex.getStackTrace();
       final Object[] obj = new Object[st.length + 1];
