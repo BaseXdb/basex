@@ -55,7 +55,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
     ctx = c;
     try {
-      ctx.openDB(open ? Open.open(ctx, name) : CreateDB.emptyXml(ctx, name));
+      ctx.openDB(open ? Open.open(ctx, name) : CreateDB.empty(ctx, name));
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
@@ -116,7 +116,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     final StringList sl = new StringList();
     final Data data = ctx.data;
-    for(final int d : data.doc()) sl.add(Token.string(data.text(d)));
+    for(final int d : data.doc()) sl.add(Token.string(data.text(d, true)));
     return sl.finish();
   }
 
@@ -193,7 +193,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     final Data data = ctx.data;
     final byte[] idd = Token.token(id);
     for(final int d : data.doc()) {
-      if(Token.eq(data.text(d), idd))
+      if(Token.eq(data.text(d, true), idd))
         return new BXXMLResource(data, d, id, this);
     }
     return null;

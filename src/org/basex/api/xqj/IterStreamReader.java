@@ -423,9 +423,9 @@ final class IterStreamReader implements XMLStreamReader {
     /** Data size. */
     private final int s;
     /** Parent stack. */
-    private final int[] parent = new int[IO.BLOCKSIZE];
+    private final int[] parent = new int[IO.MAXHEIGHT];
     /** Pre stack. */
-    private final int[] pre = new int[IO.BLOCKSIZE];
+    private final int[] pre = new int[IO.MAXHEIGHT];
     /** Current level. */
     private int l;
     /** Current pre value. */
@@ -490,9 +490,9 @@ final class IterStreamReader implements XMLStreamReader {
   /** Reader for traversing {@link FNode} instances. */
   final class FNodeReader extends NodeReader {
     /** Iterator. */
-    private final NodeIter[] iter = new NodeIter[IO.BLOCKSIZE];
+    private final NodeIter[] iter = new NodeIter[IO.MAXHEIGHT];
     /** Iterator. */
-    private final Nod[] node = new Nod[IO.BLOCKSIZE];
+    private final Nod[] node = new Nod[IO.MAXHEIGHT];
     /** Iterator Level. */
     private int l;
 

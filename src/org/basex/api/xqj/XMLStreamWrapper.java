@@ -60,7 +60,7 @@ final class XMLStreamWrapper extends Parser {
             builder.endElem(token(reader.getLocalName()));
             break;
           case XMLStreamConstants.CHARACTERS:
-            builder.text(new TokenBuilder(reader.getText()), false);
+            builder.text(new TokenBuilder(reader.getText()));
             nodes++;
             break;
           case XMLStreamConstants.PROCESSING_INSTRUCTION:

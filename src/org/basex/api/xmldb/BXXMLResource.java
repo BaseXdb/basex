@@ -134,7 +134,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     int p = pre;
     while(p >= 0) {
       final int k = data.kind(p);
-      if(k == Data.DOC) return string(data.text(p));
+      if(k == Data.DOC) return string(data.text(p, true));
       p = data.parent(p, k);
     }
     return null;
