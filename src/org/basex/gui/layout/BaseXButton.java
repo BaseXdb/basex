@@ -38,7 +38,7 @@ public final class BaseXButton extends JButton {
         final String text = getText();
         if(text.equals(BUTTONCANCEL)) d.cancel();
         else if(text.equals(BUTTONOK)) d.close();
-        else d.action(text);
+        else d.action(e.getSource());
       }
     });
     addKeyListener(new KeyAdapter() {

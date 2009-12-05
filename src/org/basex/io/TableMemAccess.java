@@ -169,6 +169,15 @@ public final class TableMemAccess extends TableAccess {
     }
   }
 
+  @Override
+  public void set(final int pre, final byte[] entries) {
+    final int nr = entries.length >>> IO.NODEPOWER;
+    for(int l = 0, i = pre; i < pre + nr; i++, l += 1 << IO.NODEPOWER) {
+      buf1[i] = getLong(entries, l);
+      buf2[i] = getLong(entries, l + 8);
+    }
+  }
+
   // PRIVATE METHODS ==========================================================
 
   /**

@@ -49,6 +49,8 @@ public final class DialogInfo extends Dialog {
   private final BaseXBack buttons;
   /** Optimize flag. */
   public boolean opt;
+  /** Optimize button. */
+  private Object optimize;
 
   /**
    * Default constructor.
@@ -187,8 +189,9 @@ public final class DialogInfo extends Dialog {
 
     set(tabs, BorderLayout.CENTER);
 
-    buttons = newButtons(this, true,
-        new String[] { BUTTONOPT, BUTTONOK, BUTTONCANCEL });
+    optimize = new BaseXButton(BUTTONOPT, this);
+    buttons = newButtons(this,
+        new Object[] { optimize, BUTTONOK, BUTTONCANCEL });
     set(buttons, BorderLayout.SOUTH);
 
     action(null);
@@ -238,8 +241,8 @@ public final class DialogInfo extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
-    if(BUTTONOPT.equals(cmd)) {
+  public void action(final Object cmp) {
+    if(cmp == optimize) {
       opt = true;
       close();
     }

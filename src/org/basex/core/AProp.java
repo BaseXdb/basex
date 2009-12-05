@@ -133,7 +133,7 @@ public abstract class AProp {
         final Object obj = f.get(null);
         if(!(obj instanceof Object[])) continue;
         final String key = ((Object[]) obj)[0].toString();
-        if(key.equals("SKIP")) break;
+        if(key.equals(Prop.SKIP[0])) break;
 
         final Object val = props.get(key);
         if(val instanceof String[]) {

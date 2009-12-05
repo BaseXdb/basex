@@ -27,10 +27,7 @@ public final class InfoUsers extends AInfo {
     final ArrayList<User> loc = context.data.meta.users;
     for(int i = 0; i < loc.size(); i++) {
       final User us = context.users.get(loc.get(i).name);
-      if(us == null) {
-        loc.remove(us);
-        --i;
-      }
+      if(us == null) loc.remove(loc.get(i--));
     }
     out.println(context.data.meta.users.info());
     return true;

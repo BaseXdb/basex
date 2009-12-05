@@ -189,8 +189,7 @@ public final class DialogCreate extends Dialog {
     b1.setLayout(new TableLayout(1, 2, 6, 0));
     ft[f] = new BaseXCheckBox(CREATESCT, prop.num(Prop.FTSCTYPE) > 0, this);
     b1.add(ft[f++]);
-    ftsct = new BaseXCombo(
-        new String[] { "document based", "text-node based" }, this);
+    ftsct = new BaseXCombo(new String[] { CREATESCT1, CREATESCT2 }, this);
     b1.add(ftsct);
     p4.add(b1);
 
@@ -280,7 +279,7 @@ public final class DialogCreate extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     final boolean ftx = ftxindex.isSelected();
     for(final BaseXCheckBox f : ft) f.setEnabled(ftx);
     ftsct.setEnabled(ft[4].isSelected());

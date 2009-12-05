@@ -79,8 +79,8 @@ public final class TableLayout implements LayoutManager {
    */
   public Dimension preferredLayoutSize(final Container parent) {
     synchronized(parent.getTreeLock()) {
-      final Insets insets = parent.getInsets();
-      final int nrComponents = parent.getComponentCount();
+      final Insets in = parent.getInsets();
+      final int nr = parent.getComponentCount();
 
       int maxW = 0;
       int maxH = 0;
@@ -91,22 +91,19 @@ public final class TableLayout implements LayoutManager {
 
         for(int j = 0; j < rows; j++) {
           final int n = j * cols + i;
-          if(n >= nrComponents) break;
+          if(n >= nr) break;
 
-          final Component comp = parent.getComponent(n);
-          final Dimension dim = comp.getPreferredSize();
-
-          if(maxW < w + dim.width) maxW = w + dim.width;
-
+          final Component c = parent.getComponent(n);
+          final Dimension d = c.getPreferredSize();
+          if(maxW < w + d.width) maxW = w + d.width;
           if(posY[j] < h) posY[j] = h;
           else h = posY[j];
-
-          h += dim.height;
+          h += d.height;
         }
         if(maxH < h) maxH = h;
       }
-      width = insets.left + maxW + (cols - 1) * insetX + insets.right;
-      height = insets.top + maxH + (rows - 1) * insetY + insets.bottom;
+      width = in.left + maxW + (cols - 1) * insetX + in.right;
+      height = in.top + maxH + (rows - 1) * insetY + in.bottom;
 
       return new Dimension(width, height);
     }
@@ -124,28 +121,23 @@ public final class TableLayout implements LayoutManager {
 
   /**
    * Lays out the specified container using this layout.
-   * @param parent the layout container
+   * @param p the layout container
    */
-  public void layoutContainer(final Container parent) {
-    preferredLayoutSize(parent);
-
-    synchronized(parent.getTreeLock()) {
-      final Insets insets = parent.getInsets();
-      final int nrComponents = parent.getComponentCount();
+  public void layoutContainer(final Container p) {
+    preferredLayoutSize(p);
+    synchronized(p.getTreeLock()) {
+      final Insets in = p.getInsets();
+      final int nr = p.getComponentCount();
       for(int j = 0; j < rows; j++) {
         for(int i = 0; i < cols; i++) {
           final int n = j * cols + i;
-          if(n >= nrComponents) return;
-
-          final Dimension compSize = parent.getComponent(n).getPreferredSize();
-
-          final int x = insets.left + posX[i] + i * insetX;
-          final int y = insets.top + posY[j] + j * insetY;
-          final int w = compSize.width > 0 ? compSize.width :
-            width - insets.left - insets.right;
-          final int h = compSize.height > 0 ? compSize.height :
-            height - insets.top - insets.bottom;
-          parent.getComponent(n).setBounds(x, y, w, h);
+          if(n >= nr) return;
+          final Dimension cs = p.getComponent(n).getPreferredSize();
+          final int x = in.left + posX[i] + i * insetX;
+          final int y = in.top + posY[j] + j * insetY;
+          final int w = cs.width > 0 ? cs.width : width - in.left - in.right;
+          final int h = cs.height > 0 ? cs.height : height - in.top - in.bottom;
+          p.getComponent(n).setBounds(x, y, w, h);
         }
       }
     }

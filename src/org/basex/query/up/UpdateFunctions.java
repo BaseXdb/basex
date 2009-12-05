@@ -1,6 +1,5 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.data.MemData;
@@ -13,7 +12,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
 
@@ -72,44 +70,6 @@ public final class UpdateFunctions {
     d.replace(a, Data.TEXT, concat(d.text(a, true), d.text(b, true)));
     d.delete(b);
     return true;
-  }
-
-  /**
-   * Checks for namespace conflicts.
-   * @param aList attribute list
-   * @throws QueryException query exception
-   */
-  public static void checkNS(final NodIter aList) throws QueryException {
-    final Atts at = new Atts();
-    for(int a = 0; a < aList.size(); a++) {
-      final Nod n = aList.get(a);
-      if(n.type != Type.ATT) continue;
-      final QNm name = n.qname();
-      final byte[] an = name.pref();
-      int ai = at.get(name.pref());
-      if(ai == -1) {
-        at.add(an, name.uri.str());
-      } else if(!eq(name.uri.str(), at.val[ai])) {
-        Err.or(UPNSCONFL2);
-      }
-    }
-  }
-
-  /**
-   * Adds a set of attributes to a node.
-   * @param pre target pre value
-   * @param par parent node
-   * @param d target data reference
-   * @param m data instance holding attributes
-   */
-  public static void insertAttributes(final int pre, final int par,
-      final Data d, final Data m) {
-
-    final int ss = m.meta.size;
-    for(int s = 0; s < ss; s++) {
-      d.insertAttr(pre + s, par, m.name(s, false), m.text(s, false),
-          m.uri(s, Data.ATTR));
-    }
   }
 
   /**
@@ -176,7 +136,6 @@ public final class UpdateFunctions {
         uri = q.uri.str();
         u = uri.length != 0 ? Math.abs(md.ns.addURI(uri)) : 0;
         final int tn = md.tags.index(q.str(), null, false);
-        // [CG] missing: ne/u
         md.insertElem(md.meta.size, pre - par, tn, size(nd, true),
             size(nd, false), u, ne);
         ir = nd.attr();

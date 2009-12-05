@@ -74,13 +74,19 @@ public final class Context {
   }
 
   /**
-   * Returns true if all current nodes refer to document nodes.
+   * Returns true if the current node set contains all documents.
    * @return result of check
    */
   public boolean root() {
-    if(current == null) return true;
-    for(final int n : current.nodes) if(data.kind(n) != Data.DOC) return false;
-    return true;
+    return current != null && current.doc;
+  }
+
+  /**
+   * Returns all document nodes.
+   * @return result of check
+   */
+  public int[] doc() {
+    return current.doc ? current.nodes : data.doc();
   }
 
   /**
@@ -109,7 +115,8 @@ public final class Context {
    * Updates references to the document nodes.
    */
   public void update() {
-    current = new Nodes(data, true);
+    current = new Nodes(data.doc(), data);
+    current.doc = true;
   }
 
   /**

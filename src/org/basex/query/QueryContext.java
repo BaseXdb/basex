@@ -206,17 +206,14 @@ public final class QueryContext extends Progress {
       // cache the initial context nodes
       if(nodes != null) {
         final Data data = nodes.data;
-        if(nodes.doc) doc = new DBNode[nodes.size()];
-
-        // create document nodes
-        final int dl = nodes.size();
-        for(int d = 0; d < dl; d++) {
-          final int p = nodes.nodes[d];
-          if(nodes.doc || data.kind(p) == Data.DOC) {
-            addDoc(new DBNode(data, p, Data.DOC));
+        if(nodes.doc) {
+          // create document nodes
+          doc = new DBNode[nodes.size()];
+          final int dl = nodes.size();
+          for(int d = 0; d < dl; d++) {
+            addDoc(new DBNode(data, nodes.nodes[d], Data.DOC));
           }
-        }
-        if(docs == 0) {
+        } else {
           for(final int p : data.doc()) addDoc(new DBNode(data, p));
         }
         rootDocs = docs;
@@ -234,11 +231,9 @@ public final class QueryContext extends Progress {
           }
           item = si.finish();
         }
-
         // add collection instances
         addColl(new NodIter(doc, docs), token(data.meta.name));
       }
-      if(doc == null) doc = new DBNode[1];
 
       // evaluates the query and returns the result
       if(inf) compInfo(QUERYCOMP);

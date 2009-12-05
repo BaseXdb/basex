@@ -1,11 +1,11 @@
 package org.basex.gui.dialog;
 
+import static javax.swing.JOptionPane.*;
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -13,7 +13,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -105,10 +104,10 @@ public abstract class Dialog extends JDialog {
 
   /**
    * Reacts on user input; can be overwritten.
-   * @param cmd the action command
+   * @param comp the action component
    */
   @SuppressWarnings("unused")
-  public void action(final String cmd) { /* */}
+  public void action(final Object comp) { /* */}
 
   /**
    * Called when GUI design has changed.
@@ -157,35 +156,30 @@ public abstract class Dialog extends JDialog {
    * @return button list
    */
   protected static BaseXBack okCancel(final Dialog dialog) {
-    return newButtons(dialog, true, new String[] { BUTTONOK, BUTTONCANCEL});
+    return newButtons(dialog, new String[] { BUTTONOK, BUTTONCANCEL});
   }
 
   /**
    * Creates a new button list.
    * @param dialog reference to the component, reacting on button clicks
-   * @param hor horizontal alignment
    * @param texts button names
    * @return button list
    */
-  protected static BaseXBack newButtons(final Dialog dialog, final boolean hor,
-      final String[] texts) {
+  protected static BaseXBack newButtons(final Dialog dialog,
+      final Object[] texts) {
 
     // horizontal/vertical layout
     final BaseXBack panel = new BaseXBack();
-    if(hor) {
-      panel.setBorder(12, 0, 0, 0);
-      panel.setLayout(new TableLayout(1, texts.length, 8, 0));
-    } else {
-      panel.setBorder(0, 0, 0, 0);
-      panel.setLayout(new GridLayout(texts.length, 1, 0, 3));
-    }
+    panel.setBorder(12, 0, 0, 0);
+    panel.setLayout(new TableLayout(1, texts.length, 8, 0));
     for(int i = 0; i < texts.length; i++) {
-      panel.add(new BaseXButton(texts[i], dialog));
+      panel.add(texts[i] instanceof Component ?
+        (Component) texts[i] : new BaseXButton(texts[i].toString(), dialog));
     }
 
     final BaseXBack buttons = new BaseXBack();
     buttons.setLayout(new BorderLayout());
-    buttons.add(panel, hor ? BorderLayout.EAST : BorderLayout.NORTH);
+    buttons.add(panel, BorderLayout.EAST);
     return buttons;
   }
 
@@ -216,9 +210,8 @@ public abstract class Dialog extends JDialog {
    * @return true if dialog was confirmed
    */
   public static boolean confirm(final Component comp, final String text) {
-    return JOptionPane.showConfirmDialog(comp, text, NAME,
-        JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) ==
-          JOptionPane.YES_OPTION;
+    return showConfirmDialog(comp, text, NAME,
+        YES_NO_OPTION, WARNING_MESSAGE) == YES_OPTION;
   }
 
   /**
@@ -227,8 +220,7 @@ public abstract class Dialog extends JDialog {
    * @param text text
    */
   public static void error(final Component comp, final String text) {
-    JOptionPane.showMessageDialog(comp, text, DIALOGINFO,
-        JOptionPane.ERROR_MESSAGE);
+    showMessageDialog(comp, text, DIALOGINFO, ERROR_MESSAGE);
   }
 
   /**
@@ -237,7 +229,6 @@ public abstract class Dialog extends JDialog {
    * @param text text
    */
   public static void info(final Component comp, final String text) {
-    JOptionPane.showMessageDialog(comp, text, DIALOGINFO,
-        JOptionPane.INFORMATION_MESSAGE);
+    showMessageDialog(comp, text, DIALOGINFO, INFORMATION_MESSAGE);
   }
 }

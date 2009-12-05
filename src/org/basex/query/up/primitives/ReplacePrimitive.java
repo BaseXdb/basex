@@ -40,8 +40,11 @@ public final class ReplacePrimitive extends NodeCopy {
       return;
     }
     final int par = d.parent(p, Nod.kind(n.type));
-    if(n.type == Type.ATT) insertAttributes(p, par, d, md);
-    else d.insert(p, par , md);
+    if(n.type == Type.ATT) {
+      d.insertAttr(p, par, md);
+    } else {
+      d.insert(p, par , md);
+    }
     d.delete(p + md.meta.size);
     mergeTextNodes(d, p, p + 1);
     mergeTextNodes(d, p - 1, p);

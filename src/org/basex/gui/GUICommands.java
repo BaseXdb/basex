@@ -813,14 +813,19 @@ public enum GUICommands implements GUICommand {
   GOUP(GUIGOUP, "alt UP", GUIGOUPTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.execute(new Cs(".."));
+      final Context ctx = gui.context;
+      if(!ctx.root()) {
+        boolean root = true;
+        for(final int pre : ctx.current.nodes) {
+          root &= ctx.data.kind(pre) == Data.DOC;
+        }
+        gui.execute(new Cs(root ? "/" : ".."));
+      }
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      final boolean en = !gui.context.root();
-      b.setEnabled(en);
-      b.setToolTipText(en ? GUIGOUP : null);
+      b.setEnabled(!gui.context.root());
     }
   },
 
@@ -828,7 +833,12 @@ public enum GUICommands implements GUICommand {
   GOHOME(GUIROOT, "alt HOME", GUIROOTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      gui.execute(new Cs("/"));
+      if(!gui.context.root()) gui.execute(new Cs("/"));
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      b.setEnabled(!gui.context.root());
     }
   },
 

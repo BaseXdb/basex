@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.nio.charset.Charset;
 import java.util.SortedMap;
 import org.basex.core.Prop;
-import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -63,8 +62,7 @@ public final class DialogExport extends Dialog {
     p.add(out);
     p.add(new BaseXLabel(""));
 
-    final Data data = gui.context.data;
-    file = data.doc().length == 1;
+    file = gui.context.doc().length == 1;
 
     IO io = gui.context.data.meta.file;
     final String fn = file ? io.path() : io.getDir();
@@ -92,7 +90,7 @@ public final class DialogExport extends Dialog {
       encodings = cs.keySet().toArray(new String[cs.size()]);
     }
     encoding = new BaseXCombo(encodings, this);
-    String enc = data.meta.encoding;
+    String enc = gui.context.data.meta.encoding;
     boolean f = false;
     for(final String s : encodings) f |= s.equals(enc);
     if(!f) {
@@ -152,7 +150,7 @@ public final class DialogExport extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     out.setText((file ? OUTFILE : OUTDIR) + COL);
     final IO io = IO.get(path());
     final boolean empty = path().isEmpty();

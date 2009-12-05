@@ -44,7 +44,7 @@ public final class BaseXCheckBox extends JCheckBox {
     if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        ((Dialog) win).action(getText());
+        ((Dialog) win).action(this);
       }
     });
   }

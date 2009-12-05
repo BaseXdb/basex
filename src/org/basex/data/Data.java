@@ -11,7 +11,6 @@ import org.basex.io.TableAccess;
 import org.basex.query.ft.StopWords;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
 
@@ -499,9 +498,6 @@ public abstract class Data {
     int s = size(pre, k);
     ns.delete(pre, s);
 
-    // [CG] ignore deletions of single root node?
-    if(pre == 0 && s == meta.size && s == 1) return;
-
     // reduce size of ancestors
     int par = pre;
     // check if we are an attribute (different size counters)
@@ -518,21 +514,21 @@ public abstract class Data {
       k = kind(par);
       size(par, k, size(par, k) - s);
     }
+
     // preserve empty root node
     int p = pre;
     final boolean empty = p == 0 && s == meta.size;
     if(empty) {
       p++;
-      s = size(p, kind(p));
+      s--;
     }
+
     // delete node from table structure and reduce document size
     table.delete(pre, s);
     updateDist(p, -s);
-    // restore root node
-    if(empty) {
-      size(0, DOC, 1);
-      text(0, Token.EMPTY, true);
-    }
+
+    // restore empty document node
+    if(empty) table.set(0, doc(0, 1, EMPTY));
   }
 
   /**
@@ -570,42 +566,15 @@ public abstract class Data {
   }
 
   /**
-   * Inserts a document, text, comment or pi.
+   * Inserts attributes.
    * @param pre pre value
    * @param par parent of node
-   * @param val value to be inserted
-   * @param k node kind
+   * @param dt data instance to copy from
    */
-  // [CG] to be removed?
-  public final void insert(final int pre, final int par, final byte[] val,
-      final int k) {
-
+  public final void insertAttr(final int pre, final int par, final Data dt) {
     meta.update();
-    if(k == DOC) {
-      insertDoc(pre, 1, val);
-    } else {
-      insertText(pre, pre - par, val, k);
-    }
-    updateTable(pre, par, 1);
-  }
-
-  /**
-   * Inserts an attribute.
-   * @param pre pre value
-   * @param par parent of node
-   * @param name attribute name
-   * @param val attribute value
-   * @param u namespace uri reference
-   */
-  // [CG] to be removed?
-  public final void insertAttr(final int pre, final int par, final byte[] name,
-      final byte[] val, final int u) {
-
-    meta.update();
-    // insert attribute and increase attSize of parent element
-    insertAttr(pre, pre - par, atts.index(name, val, false), val, u);
-    attSize(par, ELEM, attSize(par, ELEM) + 1);
-    updateTable(pre, par, 1);
+    insert(pre, par, dt);
+    attSize(par, ELEM, attSize(par, ELEM) + dt.meta.size);
   }
 
   /**
@@ -634,8 +603,8 @@ public abstract class Data {
         case ELEM:
           // add element
           int n = tags.index(dt.name(s, true), null, false);
-          insertElem(p, d, n, dt.attSize(s, k), dt.size(s, k),
-              dt.uri(s, k), dt.nsFlag(s));
+          insertElem(p, d, n, dt.attSize(s, k), dt.size(s, k), dt.uri(s, k),
+              dt.nsFlag(s));
           break;
         case TEXT:
         case COMM:
@@ -653,7 +622,7 @@ public abstract class Data {
     // no document was inserted - update table structure
     if(par >= 0) updateTable(pre, par, ss);
     // delete old empty root node
-    if(size(0, DOC) == 1) delete(0);
+    if(size(0, DOC) == 1 && name(0, true).length == 0) delete(0);
   }
 
   /**
@@ -696,19 +665,31 @@ public abstract class Data {
    * Inserts a text node without updating the table structure.
    * @param pre insert position
    * @param sz node size
-   * @param val tag name or text node
+   * @param val document name
    */
   public final void insertDoc(final int pre, final int sz, final byte[] val) {
+    table.insert(pre, doc(pre, sz, val));
+  }
+
+  /**
+   * Returns a document entry.
+   * @param pre pre value
+   * @param sz node size
+   * @param val document name
+   * @return document entry
+   */
+  public final byte[] doc(final int pre, final int sz, final byte[] val) {
     // build and insert new entry
     final long id = ++meta.lastid;
     final long v = index(val, pre, true);
-    table.insert(pre, new byte[] {
+    return new byte[] {
         DOC, 0, 0, (byte) (v >> 32),
         (byte) (v >> 24), (byte) (v >> 16), (byte) (v >> 8), (byte) v,
         (byte) (sz >> 24), (byte) (sz >> 16), (byte) (sz >> 8), (byte) sz,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
+        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
   }
-
+  
+  
   /**
    * Inserts an element node without updating the table structure.
    * @param pre insert position

@@ -1,7 +1,5 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.up.UpdateFunctions.*;
-
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -29,7 +27,7 @@ public final class InsertAttribute extends NodeCopy {
   public void apply(final int add) {
     if(md == null) return;
     final DBNode n = (DBNode) node;
-    insertAttributes(n.pre + 1, n.pre, n.data, md);
+    n.data.insertAttr(n.pre + 1, n.pre, md);
   }
 
   @Override

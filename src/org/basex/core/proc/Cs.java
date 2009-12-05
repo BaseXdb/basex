@@ -24,7 +24,18 @@ public final class Cs extends AQuery {
   protected boolean exec(final PrintOutput out) {
     queryNodes();
     if(result == null) return false;
-    if(result.size() != 0) context.current = (Nodes) result;
+
+    if(result.size() != 0) {
+      final Nodes nodes = (Nodes) result;
+      context.current = nodes;
+      // determine if new context set refers to root documents
+      final int[] docs = context.data.doc();
+      if(nodes.nodes.length != docs.length) return true;
+      for(int i = 0; i < docs.length; i++) {
+        if(nodes.nodes[i] != docs[i]) return true;
+      }
+      nodes.doc = true;
+    }
     return true;
   }
 

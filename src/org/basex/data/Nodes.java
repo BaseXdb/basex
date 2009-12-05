@@ -35,17 +35,7 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final Data d) {
-    this(d, false);
-  }
-
-  /**
-   * Node Set constructor.
-   * @param d data reference
-   * @param r root flag (all nodes will refer to root documents)
-   */
-  public Nodes(final Data d, final boolean r) {
-    this(r ? d.doc() : new int[] {}, d);
-    doc = r;
+    this(new int[] {}, d);
   }
 
   /**
@@ -80,8 +70,8 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Node Set constructor. Only used by test classes, as no data
-   * reference is defined by this constructor.
+   * Node Set constructor (used by test classes).
+   * No data reference is defined by this constructor.
    * @param n node set
    */
   public Nodes(final int[] n) {

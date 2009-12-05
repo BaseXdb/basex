@@ -82,7 +82,7 @@ public final class DialogMapLayout extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     final boolean fs = gui.context.data.fs != null;
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.MAPOFFSETS, border.getSelectedIndex());

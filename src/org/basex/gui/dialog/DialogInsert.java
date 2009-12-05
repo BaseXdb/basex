@@ -140,7 +140,7 @@ public final class DialogInsert extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     for(int i = 1; i < EDITKIND.length; i++) if(radio[i].isSelected()) kind = i;
     lkind = kind;
 

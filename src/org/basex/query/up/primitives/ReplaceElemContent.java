@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -15,7 +16,7 @@ import org.basex.query.util.Err;
  */
 public final class ReplaceElemContent extends UpdatePrimitive {
   /** Replacing text node. */
-  public byte[] txt;
+  private final byte[] txt;
 
   /**
    * Constructor.
@@ -30,11 +31,17 @@ public final class ReplaceElemContent extends UpdatePrimitive {
   @Override
   public void apply(final int add) {
     final DBNode n = (DBNode) node;
-    final int p = n.pre + add;
+    final int par = n.pre + add;
     final Data d = n.data;
-    final int j = p + d.attSize(p, Data.ELEM);
-    while(p + d.size(p, Data.ELEM) > j) d.delete(j);
-    if(txt.length > 0) d.insert(j, p, txt, Data.TEXT);
+    final int pre = par + d.attSize(par, Data.ELEM);
+    while(par + d.size(par, Data.ELEM) > pre) {
+      d.delete(pre);
+    }
+    if(txt.length > 0) {
+      final MemData md = new MemData(n.data);
+      md.insertText(0, pre - par, txt, Data.TEXT);
+      d.insert(pre, par, md);
+    }
   }
 
   @Override

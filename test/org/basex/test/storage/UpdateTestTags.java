@@ -1,6 +1,5 @@
 package org.basex.test.storage;
 
-import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.junit.Test;
@@ -173,12 +172,12 @@ public final class UpdateTestTags extends UpdateTest {
   @Test
   public void testUpdateTagName() {
     final Data data = CONTEXT.data;
-    data.rename(6, Data.ELEM, token("JUnit"));
+    data.rename(6, Data.ELEM, JUNIT);
     assertEquals(Data.ELEM, data.kind(6));
-    assertByteArraysEqual(token("JUnit"), data.name(6, true));
+    assertByteArraysEqual(JUNIT, data.name(6, true));
     reload();
     assertEquals(Data.ELEM, data.kind(6));
-    assertByteArraysEqual(token("JUnit"), data.name(6, true));
+    assertByteArraysEqual(JUNIT, data.name(6, true));
   }
 
   /**

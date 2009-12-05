@@ -122,7 +122,7 @@ public final class DialogEdit extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     String msg = null;
     ok = kind != Data.TEXT || input3.getText().length != 0;
     if(kind != Data.TEXT && kind != Data.COMM) {

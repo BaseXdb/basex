@@ -91,16 +91,11 @@ public final class Users extends ArrayList<User> {
 
   /**
    * Drops a user from the list.
-   * @param usern user name
-   * @return success of operation
+   * @param user user reference
    */
-  public boolean drop(final String usern) {
-    final User user = get(usern);
-    if(user == null) return false;
-
+  public void drop(final User user) {
     remove(user);
     write();
-    return true;
   }
 
   /**

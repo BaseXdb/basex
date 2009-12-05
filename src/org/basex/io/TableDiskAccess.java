@@ -289,6 +289,16 @@ public final class TableDiskAccess extends TableAccess {
     nextPre = index + 1 >= blocks ? meta.size : firstPres[index + 1];
   }
 
+  @Override
+  public synchronized void set(final int pre, final byte[] entries) {
+    dirty = true;
+    final int nr = entries.length >>> IO.NODEPOWER;
+    for(int l = 0, i = pre; i < pre + nr; i++, l += 1 << IO.NODEPOWER) {
+      final int o = cursor(pre);
+      System.arraycopy(entries, l, bf.buf, o, 1 << IO.NODEPOWER);
+    }
+  }
+
   /**
    * Returns the number of entries; needed for JUnit tests.
    * @return number of used blocks

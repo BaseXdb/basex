@@ -257,7 +257,7 @@ public class CmdTest {
    * @param size expected size
    */
   private static void ok(final Nodes nodes, final int size) {
-    if(nodes != null) assertEquals(nodes.size(), size);
+    if(nodes != null) assertEquals(size, nodes.size());
   }
 
   /**

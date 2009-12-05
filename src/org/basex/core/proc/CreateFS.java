@@ -36,9 +36,8 @@ public final class CreateFS extends ACreate {
     final String path;
     try {
       path = new File(args[0]).getCanonicalPath();
-    } catch(IOException e) {
-      return error("Could not get the canonical path for the given " +
-          "directory%(%)", Prop.NL, e);
+    } catch(IOException ex) {
+      return error(ex.getMessage());
     }
     final String db = args[1];
 

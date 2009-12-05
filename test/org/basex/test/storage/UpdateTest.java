@@ -34,6 +34,18 @@ public abstract class UpdateTest {
 
   /** JUnit tag. */
   protected static final byte[] JUNIT = token("junit");
+  /** JUnit tag. */
+  protected static final byte[] FOO = token("foo");
+  /** JUnit tag. */
+  protected static final byte[] NAME = token("name");
+  /** JUnit tag. */
+  protected static final byte[] PARENTNODE = token("parentnode");
+  /** JUnit tag. */
+  protected static final byte[] CONTEXTNODE = token("contextnode");
+  /** JUnit tag. */
+  protected static final byte[] ID = token("id");
+  /** JUnit tag. */
+  protected static final byte[] B = token("b");
   /** Database context. */
   protected static final Context CONTEXT = new Context();
   /** Test file size in nodes. */

@@ -72,7 +72,7 @@ public final class ServerProcess extends Thread {
       send(ok);
 
       if(ok) start();
-      else log.write(this, "LOGIN " + us, "failed");
+      else if(us.length() != 0) log.write(this, "LOGIN " + us, "failed");
       return ok;
     } catch(final IOException ex) {
       Main.error(ex, false);
@@ -84,9 +84,9 @@ public final class ServerProcess extends Thread {
   @Override
   public void run() {
     log.write(this, "LOGIN " + context.user.name, "successful");
+    String input = null;
     try {
       while(true) {
-        String input = null;
         try {
           input = in.readString();
         } catch(final IOException ex) {
@@ -102,6 +102,7 @@ public final class ServerProcess extends Thread {
           proc = new CommandParser(input, context, true).parse()[0];
         } catch(final QueryException ex) {
           // invalid command was sent by a client; create error feedback
+          log.write(this, input, perf, "Error: " + ex.extended());
           out.write(0);
           out.print(ex.extended());
           out.write(0);
@@ -128,11 +129,11 @@ public final class ServerProcess extends Thread {
         send(ok);
         stopTimer();
         sem.after(up);
-        log.write(this, proc, perf, ok ? "OK" : " (Error: " + inf + ")");
+        log.write(this, proc, perf, ok ? "OK" : "Error: " + inf);
       }
       log.write(this, "LOGOUT " + context.user.name);
     } catch(final IOException ex) {
-      log.write(ex.getMessage());
+      log.write(this, input, "Error: " + ex.getMessage());
       Main.error(ex, false);
     }
   }

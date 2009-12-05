@@ -69,7 +69,7 @@ public final class DialogFontChooser extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.FONT, font.getValue());
     gprop.set(GUIProp.MONOFONT, font2.getValue());

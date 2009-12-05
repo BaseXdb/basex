@@ -20,6 +20,7 @@ import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.CreateFS;
 import org.basex.core.proc.CreateIndex;
 import org.basex.core.proc.CreateMAB;
+import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.DropIndex;
 import org.basex.core.proc.DropUser;
@@ -139,6 +140,8 @@ public final class CommandParser extends InputParser {
         return new Check(string(cmd));
       case ADD:
         return new Add(string(cmd));
+      case DELETE:
+        return new Delete(string(cmd));
       case INFO: case I:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
@@ -167,7 +170,9 @@ public final class CommandParser extends InputParser {
           case INDEX:
             return new DropIndex(consume(CmdIndex.class, cmd));
           case USER:
-            return new DropUser(name(cmd));
+            final String name = name(cmd);
+            final String db = key(ON, null) ? name(cmd) : null;
+            return new DropUser(name, db);
         }
         break;
       case OPTIMIZE:
@@ -184,7 +189,7 @@ public final class CommandParser extends InputParser {
         return new Cs(xquery(cmd));
       case SET:
         final String opt = name(cmd);
-        String val = string(null);
+        final String val = string(null);
         final Object type = ctx.prop.object(opt.toUpperCase());
         if(type == null) help(null, cmd);
         return new Set(opt, val);
@@ -434,7 +439,7 @@ public final class CommandParser extends InputParser {
    */
   public StringList list(final Enum<?>[] comp) {
     final StringList list = new StringList();
-    for(Enum<?> c : comp) list.add(c.name().toLowerCase());
+    for(final Enum<?> c : comp) list.add(c.name().toLowerCase());
     return list;
   }
 }

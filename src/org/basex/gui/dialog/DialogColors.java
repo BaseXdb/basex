@@ -65,7 +65,7 @@ public final class DialogColors extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object comp) {
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.COLORRED, MAXCOLOR - sliderRed.value());
     gprop.set(GUIProp.COLORGREEN, MAXCOLOR - sliderGreen.value());

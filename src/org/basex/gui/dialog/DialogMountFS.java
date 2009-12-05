@@ -45,12 +45,13 @@ public final class DialogMountFS extends Dialog {
   /** Information panel. */
   private final BaseXText detail;
   /** Browse button. */
-  private final BaseXButton button;
+  private final BaseXButton browse;
+  /** Mount button. */
+  private final Object mount;
   /** Mountpoint warning. */
   private final BaseXLabel warn;
   /** Buttons. */
-  private BaseXBack buttons;
-
+  private final BaseXBack buttons;
   /** Mountpoint path. */
   final BaseXTextField mountpoint;
 
@@ -104,15 +105,15 @@ public final class DialogMountFS extends Dialog {
     });
     BaseXLayout.setWidth(mountpoint, 300);
     m.add(mountpoint);
-    button = new BaseXButton(BUTTONBROWSE, this);
-    button.addActionListener(new ActionListener() {
+    browse = new BaseXButton(BUTTONBROWSE, this);
+    browse.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, mountpoint.getText(),
             main).select(BaseXFileChooser.Mode.DOPEN);
          if(file != null) mountpoint.setText(file.path());
       }
     });
-    m.add(button);
+    m.add(browse);
     warn = new BaseXLabel(" ");
     warn.setBorder(5, 5, 0, 0);
     m.add(warn);
@@ -124,7 +125,8 @@ public final class DialogMountFS extends Dialog {
     pp.add(info, BorderLayout.CENTER);
 
     // create buttons
-    buttons = newButtons(this, true, new String[] { BUTTONMOUNT, BUTTONCANCEL});
+    mount = new BaseXButton(BUTTONMOUNT, this);
+    buttons = newButtons(this, new Object[] { mount, BUTTONCANCEL});
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     p.add(buttons, BorderLayout.EAST);
@@ -164,12 +166,12 @@ public final class DialogMountFS extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     final Context ctx = gui.context;
     final String db = choice.getValue().trim();
     final String mp = mountpoint.getText().trim();
 
-    if(BUTTONMOUNT.equals(cmd)) {
+    if(cmp == mount) {
       //DeepFSImpl.main(new String[] {mp, db});
       close();
     } else {

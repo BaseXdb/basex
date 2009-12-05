@@ -29,6 +29,18 @@ public abstract class TableAccess {
   }
 
   /**
+   * Flushes the table contents.
+   * @throws IOException I/O exception
+   */
+  public abstract void flush() throws IOException;
+
+  /**
+   * Closes the table access.
+   * @throws IOException I/O exception
+   */
+  public abstract void close() throws IOException;
+
+  /**
    * Reads a byte value and returns it as an integer value.
    * @param p pre value
    * @param o offset
@@ -101,20 +113,15 @@ public abstract class TableAccess {
 
   /**
    * Inserts the specified entries into the database.
-   * @param pre pre value of node to insert after
+   * @param pre pre value
    * @param entries array of bytes containing the entries to insert
    */
   public abstract void insert(int pre, byte[] entries);
 
   /**
-   * Flushes the table contents.
-   * @throws IOException I/O exception
+   * Copies the specified entry into the database.
+   * @param pre pre value
+   * @param entries array of bytes containing the entries to insert
    */
-  public abstract void flush() throws IOException;
-
-  /**
-   * Closes the table access.
-   * @throws IOException I/O exception
-   */
-  public abstract void close() throws IOException;
+  public abstract void set(int pre, byte[] entries);
 }

@@ -61,8 +61,8 @@ public final class Set extends Proc {
         Main.notexpected();
       }
       try {
-        return info(Text.class.getField("INFO" + s).get(null).toString() +
-            ": " + val);
+        return info(Text.class.getField(
+            Prop.INFO[0].toString() + s).get(null) + ": " + val);
       } catch(final Exception ex) {
         return info(key + ": " + val);
       }

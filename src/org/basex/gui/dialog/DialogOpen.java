@@ -2,7 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +20,7 @@ import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
+import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
@@ -47,15 +47,21 @@ public final class DialogOpen extends Dialog {
   private BaseXBack buttons;
   /** Write through flag. */
   private final BaseXCheckBox wth;
+  /** Rename button. */
+  private Object rename;
+  /** Drop button. */
+  private Object drop;
+  /** Open button. */
+  private Object open;
 
   /**
    * Default constructor.
    * @param main reference to the main window
-   * @param drop show drop dialog
+   * @param dr show drop dialog
    * @param fs file system flag
    */
-  public DialogOpen(final GUI main, final boolean drop, final boolean fs) {
-    super(main, drop ? DROPTITLE : fs ? OPENDQETITLE : OPENTITLE);
+  public DialogOpen(final GUI main, final boolean dr, final boolean fs) {
+    super(main, dr ? DROPTITLE : fs ? OPENDQETITLE : OPENTITLE);
 
     // create database chooser
     final StringList db = fs ? List.listFS(main.context) :
@@ -100,12 +106,13 @@ public final class DialogOpen extends Dialog {
     p.setLayout(new BorderLayout());
     if(fs) p.add(wth, BorderLayout.WEST);
 
-    if(drop) {
-      buttons = newButtons(this, true,
-          new String[] { BUTTONDROP, BUTTONCANCEL });
+    rename = new BaseXButton(BUTTONRENAME, this);
+    open = new BaseXButton(BUTTONOPEN, this);
+    drop = new BaseXButton(BUTTONDROP, this);
+    if(dr) {
+      buttons = newButtons(this, new Object[] { drop, BUTTONCANCEL });
     } else {
-      buttons = newButtons(this, true,
-          new String[] { BUTTONRENAME, BUTTONOPEN, BUTTONCANCEL });
+      buttons = newButtons(this, new Object[] { rename, open, BUTTONCANCEL });
     }
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
@@ -135,15 +142,15 @@ public final class DialogOpen extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     final Context ctx = gui.context;
 
-    if(BUTTONRENAME.equals(cmd)) {
+    if(cmp == rename) {
       new DialogRename(gui, choice.getValue());
       choice.setData(List.list(ctx).finish());
-    } else if(BUTTONOPEN.equals(cmd)) {
+    } else if(cmp == open) {
       close();
-    } else if(BUTTONDROP.equals(cmd)) {
+    } else if(cmp == drop) {
       final String db = choice.getValue();
       if(db.isEmpty()) return;
       if(Dialog.confirm(this, Main.info(DROPCONF, db))) {
@@ -168,7 +175,7 @@ public final class DialogOpen extends Dialog {
           in = new DataInput(meta.file(DATAINFO));
           meta.read(in);
           detail.setText(InfoDB.db(meta, true, true).finish());
-          if(WTHROUGH.equals(cmd) && wth.isSelected()) {
+          if(cmp == wth && wth.isSelected()) {
             final boolean dec = Dialog.confirm(this,
                 Main.info(WTHROUGHOK, meta.name, meta.backing));
             ctx.prop.set(Prop.WTHROUGH, dec);

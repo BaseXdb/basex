@@ -19,6 +19,7 @@ import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Session;
 import org.basex.core.Commands.CmdPerm;
+import org.basex.core.Commands.CmdShow;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateUser;
@@ -29,7 +30,6 @@ import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
-import org.basex.gui.GUI;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -49,8 +49,6 @@ import org.basex.util.Table;
  * @author Andreas Weiler
  */
 public final class DialogUser extends BaseXBack {
-  /** Reference to main window. */
-  public final GUI gui;
   /** ArrayList for table. */
   Table data = new Table();
   /** Session. */
@@ -98,7 +96,7 @@ public final class DialogUser extends BaseXBack {
   /** Dialog. */
   final Dialog dia;
   /** Table panel. */
-  BaseXBack tablePanel;
+  final BaseXBack tablePanel;
 
   /** Key listener. */
   private final KeyAdapter keys = new KeyAdapter() {
@@ -111,13 +109,11 @@ public final class DialogUser extends BaseXBack {
   /**
    * Constructor.
    * @param g global/local flag
-   * @param d Dialog window
-   * @param gu Gui
+   * @param d dialog window
    */
-  public DialogUser(final boolean g, final Dialog d, final GUI gu) {
+  public DialogUser(final boolean g, final Dialog d) {
     global = g;
     dia = d;
-    gui = gu;
 
     setLayout(new TableLayout(8, 1, 0, 4));
     setBorder(8, 8, 8, 8);
@@ -129,20 +125,19 @@ public final class DialogUser extends BaseXBack {
     pass = new JPasswordField();
     pass.addKeyListener(keys);
     BaseXLayout.setWidth(pass, 100);
-    table = new JTable(new TableModel());
-    table.setPreferredScrollableViewportSize(new Dimension(420, 100));
     newpass = new JPasswordField();
     newpass.addKeyListener(keys);
     BaseXLayout.setWidth(newpass, 100);
     alter = new BaseXButton(BUTTONALTER, dia);
     alterUser = new BaseXCombo(new String[] {}, dia);
+    BaseXLayout.setWidth(alterUser, BaseXCombo.TWIDTH);
     change = new BaseXButton(BUTTONCHANGE, dia);
     dropUser = new BaseXCombo(new String[] {}, dia);
+    BaseXLayout.setWidth(dropUser, BaseXCombo.TWIDTH);
     drop = new BaseXButton(BUTTONDROP, dia);
     info = new BaseXLabel(" ");
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
-
     final BaseXBack p1 = new BaseXBack();
     p1.setLayout(new TableLayout(1, 5, 6, 0));
     p1.setBorder(0, 0, 5, 0);
@@ -152,8 +147,8 @@ public final class DialogUser extends BaseXBack {
     p1.add(pass);
     p1.add(create);
     add(p1);
-    add(new BaseXLabel(ALTERPW + COLS, false, true));
 
+    add(new BaseXLabel(ALTERPW + COLS, false, true));
     final BaseXBack p2 = new BaseXBack();
     p2.setLayout(new TableLayout(1, 4, 6, 0));
     p2.add(alterUser);
@@ -168,106 +163,112 @@ public final class DialogUser extends BaseXBack {
     p4.add(dropUser);
     p4.add(drop);
     add(p4);
+
     tablePanel = new BaseXBack();
-    tablePanel.setLayout(new TableLayout(7, 1, 2, 2));
+    tablePanel.setLayout(new BorderLayout(0, 5));
     add = new BaseXButton("Add", dia);
+    databases = new BaseXCombo(new String[] {}, dia);
+    BaseXLayout.setWidth(databases, 100);
     addUser = new BaseXCombo(new String[] {}, dia);
+    BaseXLayout.setWidth(addUser, BaseXCombo.TWIDTH);
     removeUser = new BaseXCombo(new String[] {}, dia);
     remove = new BaseXButton("Remove", dia);
-    databases = new BaseXCombo(new String[] {}, dia);
+    BaseXLayout.setWidth(removeUser, BaseXCombo.TWIDTH);
+
     if(!global) {
       final BaseXBack tmp = new BaseXBack();
-      tmp.setLayout(new TableLayout(2, 4, 2, 2));
+      tmp.setLayout(new TableLayout(2, 5, 8, 2));
       tmp.add(new BaseXLabel("Databases: ", false, true));
-      tmp.add(Box.createHorizontalStrut(80));
       tmp.add(new BaseXLabel("Add: ", false, true));
+      tmp.add(new BaseXLabel(""));
       tmp.add(new BaseXLabel("Remove: ", false, true));
-      final BaseXBack dPanel = new BaseXBack();
-      dPanel.add(databases);
-      tmp.add(dPanel);
-      tmp.add(Box.createHorizontalStrut(20));
-      final BaseXBack addPanel = new BaseXBack();
-      addPanel.add(addUser);
-      addPanel.add(add);
-      tmp.add(addPanel);
-      final BaseXBack removePanel = new BaseXBack();
-      removePanel.add(removeUser);
-      removePanel.add(remove);
-      tmp.add(removePanel);
-      tablePanel.add(tmp);
+      tmp.add(new BaseXLabel(""));
+      tmp.add(databases);
+      tmp.add(addUser);
+      tmp.add(add);
+      tmp.add(removeUser);
+      tmp.add(remove);
+      tablePanel.add(tmp, BorderLayout.NORTH);
     }
-    tablePanel.add(new BaseXLabel(PERMS, false, true));
-    tablePanel.add(new JScrollPane(table));
-    final BaseXBack tablePanel1 = new BaseXBack();
-    tablePanel1.setLayout(new BorderLayout());
-    tablePanel1.add(change, BorderLayout.EAST);
-    tablePanel1.add(info, BorderLayout.WEST);
-    BaseXLayout.setWidth(tablePanel1, 420);
-    tablePanel.add(tablePanel1);
+
+    BaseXBack tmp = new BaseXBack();
+    tmp.setLayout(new TableLayout(2, 1, 0, 5));
+    table = new JTable(new TableModel());
+    table.setPreferredScrollableViewportSize(new Dimension(390, 100));
+    tmp.add(new BaseXLabel(PERMS, false, true));
+    tmp.add(new JScrollPane(table));
+    tablePanel.add(tmp, BorderLayout.CENTER);
+    tmp = new BaseXBack();
+    tmp.setLayout(new BorderLayout());
+    tmp.add(change, BorderLayout.EAST);
+    tmp.add(info, BorderLayout.WEST);
+    tablePanel.add(tmp, BorderLayout.SOUTH);
     add(tablePanel);
+
     add(Box.createVerticalStrut(20));
     action(null);
   }
 
   /**
-   * Action.
-   * @param cmd Command
+   * Reacts on user input.
+   * @param cmp calling component
    */
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     String msg = null;
-
     try {
-      if(BUTTONCHANGE.equals(cmd)) {
-        for(final Proc p : permps)
-          if(!sess.execute(p)) msg = sess.info();
+      if(cmp == change) {
+        for(final Proc p : permps) {
+          if(!sess.execute(p)) {
+            msg = sess.info();
+            break;
+          }
+        }
         permps.clear();
         if(global) {
           setData();
         } else {
           setDataL();
         }
-      } else if(BUTTONCREATE.equals(cmd)) {
+      } else if(cmp == create) {
         final String u = user.getText();
         final String p = new String(pass.getPassword());
         if(!sess.execute(new CreateUser(u, p))) msg = sess.info();
         user.setText("");
         pass.setText("");
         setData();
-      } else if(BUTTONDROP.equals(cmd)) {
+      } else if(cmp == drop) {
         final String u = dropUser.getSelectedItem().toString();
-        if(Dialog.confirm(this, Main.info(DRQUESTION, u))) {
-          if(!sess.execute(new DropUser(u))) msg = sess.info();
-        }
+        if(Dialog.confirm(this, Main.info(DRQUESTION, u)) &&
+          !sess.execute(new DropUser(u))) msg = sess.info();
         setData();
-      } else if(BUTTONALTER.equals(cmd)) {
+      } else if(cmp == alter) {
         final String u = alterUser.getSelectedItem().toString();
         final String p = new String(newpass.getPassword());
         if(!sess.execute(new AlterUser(u, p))) msg = sess.info();
         newpass.setText("");
         setData();
-      } else if("Remove".equals(cmd)) {
+      } else if(cmp == remove) {
         // [AW] send remove to server...
+        final String u = removeUser.getSelectedItem().toString();
+        final String db = databases.getSelectedItem().toString();
+        if(!sess.execute(new DropUser(u, db))) msg = sess.info();
         setDataL();
-      } else if("Add".equals(cmd)) {
-        String value = addUser.getSelectedItem().toString();
-        for(StringList l : tempP) {
+      } else if(cmp == add) {
+        final String value = addUser.getSelectedItem().toString();
+        for(final StringList l : tempP) {
           if(l.get(0).equals(value)) {
-            String db = databases.getSelectedItem().toString();
-            String o = l.get(1);
-            Object val = o.equals("") ? Boolean.FALSE : o.equals("X") ?
-                Boolean.TRUE : o;
-            String right = CmdPerm.values()[0].toString();
-            permps.add(val.equals(true) ? new Grant(right, value, db) :
-              new Revoke(right, value, db));
-            o = l.get(2);
-            val = o.equals("") ? Boolean.FALSE : o.equals("X") ?
-                Boolean.TRUE : o;
-            right = CmdPerm.values()[1].toString();
-            permps.add(val.equals(true) ? new Grant(right, value, db) :
-              new Revoke(right, value, db));
+            final String db = databases.getSelectedItem().toString();
+            for(int i = 1; i <= 2; i++) {
+              final String o = l.get(i);
+              final Object val = o.equals("") ? Boolean.FALSE : o.equals("X") ?
+                  Boolean.TRUE : o;
+              final String right = CmdPerm.values()[0].toString();
+              permps.add(val.equals(true) ? new Grant(right, value, db) :
+                new Revoke(right, value, db));
+            }
           }
         }
-        action(BUTTONCHANGE);
+        action(change);
       }
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -309,10 +310,10 @@ public final class DialogUser extends BaseXBack {
    * @throws IOException I/O Exception
    */
   public void setData() throws IOException {
-    CachedOutput out = new CachedOutput();
-    if(!sess.execute(new Show("Users"), out)) {
+    final CachedOutput out = new CachedOutput();
+    if(!sess.execute(new Show(CmdShow.USERS), out))
       throw new IOException(sess.info());
-    }
+
     data = new Table(out.toString());
     dropUser.removeAllItems();
     alterUser.removeAllItems();
@@ -321,55 +322,55 @@ public final class DialogUser extends BaseXBack {
       final String check = o.get(0);
       if(!check.equals(ADMIN)) {
         dropUser.addItem(check);
-        alterUser.addItem(check);
       } else {
-        alterUser.addItem(check);
         tmp = o;
       }
+      alterUser.addItem(check);
     }
     dropUser.setSelectedIndex(-1);
     alterUser.setSelectedIndex(-1);
     data.contents.remove(tmp);
     ((TableModel) table.getModel()).fireTableChanged(null);
   }
-  
+
   /**
    * Sets local data.
    * @throws IOException I/O Exception
    */
   void setDataL() throws IOException {
     CachedOutput out = new CachedOutput();
-    if(!sess.execute(new InfoUsers(), out)) {
+    if(!sess.execute(new InfoUsers(), out))
       throw new IOException(sess.info());
-    }
-    data = new Table(out.toString());
+    final String users = out.toString();
+    out = new CachedOutput();
+    if(!sess.execute(new Show(CmdShow.USERS), out))
+      throw new IOException(sess.info());
+
+    data = new Table(users);
     removeUser.removeAllItems();
     addUser.removeAllItems();
     tempP.clear();
-    out = new CachedOutput();
-    sess.execute(new Show("Users"), out);
-    Table data2 = new Table(out.toString());
-    StringList tmp1 = new StringList();
-    for(StringList l : data.contents) {
-      tmp1.add(l.get(0));
-    }
-    StringList tmp2 = new StringList();
-    for(StringList l : data2.contents) {
-      tmp2.add(l.get(0));
-    }
-    for(String s : tmp2) {
-      if(!tmp1.contains(s) && !s.equals(ADMIN)) {
+
+    final Table data2 = new Table(out.toString());
+    final StringList tmp1 = new StringList();
+    for(final StringList l : data.contents) tmp1.add(l.get(0));
+    final StringList tmp2 = new StringList();
+    for(final StringList l : data2.contents) tmp2.add(l.get(0));
+
+    for(final String s : tmp2) {
+      if(s.equals(ADMIN)) continue;
+      if(!tmp1.contains(s)) {
         addUser.addItem(s);
-        for(StringList l : data2.contents) {
+        for(final StringList l : data2.contents) {
           if(l.get(0).equals(s)) {
-            StringList tmp = new StringList();
+            final StringList tmp = new StringList();
             tmp.add(s);
             tmp.add(l.get(1));
             tmp.add(l.get(2));
             tempP.add(tmp);
           }
         }
-      } else if(!s.equals(ADMIN)) {
+      } else {
         removeUser.addItem(s);
       }
     }
@@ -388,11 +389,11 @@ public final class DialogUser extends BaseXBack {
     if(global) {
       setData();
     } else {
-      CachedOutput out = new CachedOutput();
+      final CachedOutput out = new CachedOutput();
       sess.execute(new List(), out);
-      Table dbs = new Table(out.toString());
+      final Table dbs = new Table(out.toString());
       databases.removeAllItems();
-      for(StringList l : dbs.contents) {
+      for(final StringList l : dbs.contents) {
         databases.addItem(l.get(0));
       }
       databases.setSelectedIndex(-1);
@@ -404,7 +405,7 @@ public final class DialogUser extends BaseXBack {
               sess.execute(new Close());
               sess.execute(new Open(databases.getSelectedItem().toString()));
               setDataL();
-            } catch(IOException e1) {
+            } catch(final IOException e1) {
               e1.printStackTrace();
             }
           }
@@ -414,7 +415,7 @@ public final class DialogUser extends BaseXBack {
   }
 
   /**
-   * Returns tablepanel.
+   * Returns table panel.
    * @return BaseXBack
    */
   public BaseXBack getTablePanel() {
@@ -465,7 +466,7 @@ public final class DialogUser extends BaseXBack {
             permps.add(value.equals(true) ? new Grant(right, uname)
                 : new Revoke(right, uname));
           } else {
-            String db = databases.getSelectedItem().toString();
+            final String db = databases.getSelectedItem().toString();
             permps.add(value.equals(true) ? new Grant(right, uname, db)
                 : new Revoke(right, uname, db));
           }

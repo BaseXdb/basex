@@ -41,7 +41,7 @@ public final class Export extends Proc {
   protected boolean exec(final PrintOutput out) {
     try {
       final Data data = context.data;
-      final int[] docs = data.doc();
+      final int[] docs = context.doc();
       final IO io = IO.get(args[0]);
       if(docs.length != 1) io.md();
       for(final int pre : docs) {

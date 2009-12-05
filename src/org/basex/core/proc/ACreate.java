@@ -16,6 +16,7 @@ import org.basex.index.FTFuzzyBuilder;
 import org.basex.index.FTTrieBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.ValueBuilder;
+import org.basex.util.Token;
 
 /**
  * Abstract class for database creation.
@@ -103,5 +104,17 @@ abstract class ACreate extends Proc {
     d.closeIndex(i);
     progress(b);
     d.setIndex(i, b.build());
+  }
+
+  /**
+   * Finds the specified document in the current database.
+   * @param nm document name
+   * @return pre value or -1
+   */
+  protected int findDoc(final byte[] nm) {
+    for(final int p : context.doc()) {
+      if(Token.eq(nm, context.data.text(p, true))) return p;
+    }
+    return -1;
   }
 }

@@ -7,13 +7,10 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
-
-import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-
 import org.basex.BaseXServer;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.Context;
@@ -51,16 +48,18 @@ public final class DialogServer extends Dialog {
   /** ClientSession. */
   ClientSession cs;
 
+  /** Tabulators. */
+  final BaseXTabs tabs;
   /** Server panel. */
-  private final BaseXBack conn = new BaseXBack();
+  final BaseXBack conn = new BaseXBack();
   /** User panel. */
-  private final DialogUser user = new DialogUser(true, this, gui);
+  final DialogUser user = new DialogUser(true, this);
   /** Databases panel. */
-  private final DialogUser dbsP = new DialogUser(false, this, gui);
+  final DialogUser dbsP = new DialogUser(false, this);
   /** Sessions/Databases panel. */
-  private final BaseXBack sedb = new BaseXBack();
+  final BaseXBack sess = new BaseXBack();
   /** Log panel. */
-  private final BaseXBack logs = new BaseXBack();
+  final BaseXBack logs = new BaseXBack();
   /** Stop button. */
   private final BaseXButton stop;
   /** Start button. */
@@ -70,9 +69,9 @@ public final class DialogServer extends Dialog {
   /** Disconnect button. */
   private final BaseXButton disconnect;
   /** Refresh button. */
-  private final BaseXButton refresh;
+  private final BaseXButton refreshSess;
   /** Updates log file. */
-  private final BaseXButton update;
+  final BaseXButton refreshLog;
   /** Deletes log file. */
   private final BaseXButton delete;
   /** Deletes all log files. */
@@ -83,10 +82,12 @@ public final class DialogServer extends Dialog {
   private final BaseXTextField ports;
   /** Server port. */
   private final BaseXTextField portc;
+  /** Current databases. */
+  private final BaseXText sese;
+  /** Current sessions. */
+  private final BaseXText sedb;
   /** Log text. */
-  final BaseXText logt;
-  /** Change button. */
-  private final BaseXTabs tabs;
+  private final BaseXText logt;
   /** Username textfield. */
   private final BaseXTextField loguser;
   /** Password textfield. */
@@ -96,7 +97,7 @@ public final class DialogServer extends Dialog {
   /** Info label. */
   private final BaseXLabel info2;
   /** Combobox for log files. */
-  final BaseXCombo logc;
+  private final BaseXCombo logc;
   /** String for log dir. */
   private final String logdir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
 
@@ -119,21 +120,21 @@ public final class DialogServer extends Dialog {
     // Server panel
     conn.setLayout(new TableLayout(5, 1, 0, 4));
     conn.setBorder(8, 8, 8, 8);
-    
-    BaseXBack db = dbsP.getTablePanel();
+
+    final BaseXBack db = dbsP.getTablePanel();
     db.setBorder(8, 8, 8, 8);
 
     tabs.add(SERVERN, conn);
     tabs.add(USERS, user);
     tabs.add(DATABASES, db);
-    tabs.add(SESSIONS + "/" + DATABASES, sedb);
+    tabs.add(SESSIONS, sess);
     tabs.add("Logs", logs);
 
     start = new BaseXButton(BUTTONSTASERV, this);
     stop = new BaseXButton(BUTTONSTOSERV, this);
     connect = new BaseXButton(BUTTONCONNECT, this);
     disconnect = new BaseXButton(BUTTONDISCONNECT, this);
-    refresh = new BaseXButton(BUTTONREFRESH, this);
+    refreshSess = new BaseXButton(BUTTONREFRESH, this);
     host = new BaseXTextField(ctx.prop.get(Prop.HOST), this);
     host.addKeyListener(keys);
     ports = new BaseXTextField(Integer.toString(ctx.prop.num(Prop.SERVERPORT)),
@@ -187,26 +188,59 @@ public final class DialogServer extends Dialog {
     conn.add(p2);
     conn.add(info);
 
-    logc = new BaseXCombo(new String[] {}, this);
-    logt = new BaseXText(false, this);
-    logs.setLayout(new BorderLayout(2, 0));
+    // Session panel
+    sess.setLayout(new TableLayout(4, 1, 2, 2));
+    sess.setBorder(8, 8, 8, 8);
+    final BaseXBack ses = new BaseXBack();
+    ses.setLayout(new TableLayout(2, 1, 2, 2));
+    ses.add(new BaseXLabel(SESSIONS + COLS, false, true));
+    sese = new BaseXText(false, this);
+    sese.setFont(getFont());
+    sese.setBorder(new EmptyBorder(5, 5, 5, 5));
+    BaseXLayout.setWidth(sese, 420);
+    BaseXLayout.setHeight(sese, 100);
+    ses.add(sese);
+    sess.add(ses);
+    sess.add(new BaseXLabel("  "));
+    final BaseXBack dbs = new BaseXBack();
+    dbs.setLayout(new TableLayout(2, 1, 2, 2));
+    sedb = new BaseXText(false, this);
+    sedb.setFont(getFont());
+    sedb.setBorder(new EmptyBorder(5, 5, 5, 5));
+    BaseXLayout.setWidth(sedb, 420);
+    BaseXLayout.setHeight(sedb, 100);
+    dbs.add(new BaseXLabel(DATABASES + COLS, false, true));
+    dbs.add(sedb);
+    sess.add(dbs);
+    sess.add(refreshSess);
+
+    // Log panel
+    logs.setLayout(new BorderLayout());
     logs.setBorder(8, 8, 8, 8);
-    final BaseXBack pl1 = new BaseXBack();
-    update = new BaseXButton("Update", this);
+
     delete = new BaseXButton("Delete", this);
     deleteAll = new BaseXButton("Delete All", this);
+    logc = new BaseXCombo(new String[] {}, this);
+    logt = new BaseXText(false, this);
+    logt.setFont(getFont());
+    logt.setBorder(new EmptyBorder(5, 5, 5, 5));
+    info2 = new BaseXLabel(" ");
+    info2.setBorder(8, 0, 0, 0);
+    refreshLog = new BaseXButton(BUTTONREFRESH, this);
+
+    final BaseXBack pl = new BaseXBack();
+    pl.setLayout(new BorderLayout());
+    final BaseXBack pl1 = new BaseXBack();
     pl1.add(logc);
     pl1.add(delete);
     pl1.add(deleteAll);
-    pl1.add(Box.createHorizontalGlue());
-    logs.add(pl1, BorderLayout.NORTH);
-    info2 = new BaseXLabel(" ");
-    info2.setBorder(8, 0, 0, 0);
+    pl.add(pl1, BorderLayout.WEST);
+    logs.add(pl, BorderLayout.NORTH);
     logs.add(logt, BorderLayout.CENTER);
     final BaseXBack pl2 = new BaseXBack();
-    pl2.setLayout(new BorderLayout(0, 2));
+    pl2.setLayout(new BorderLayout(8, 0));
     pl2.add(info2, BorderLayout.WEST);
-    pl2.add(update, BorderLayout.EAST);
+    pl2.add(refreshLog, BorderLayout.EAST);
     logs.add(pl2, BorderLayout.SOUTH);
 
     set(tabs, BorderLayout.CENTER);
@@ -215,17 +249,16 @@ public final class DialogServer extends Dialog {
     running = ping(true);
 
     tabs.addChangeListener(new ChangeListener() {
-        public void stateChanged(final ChangeEvent evt) {
-            BaseXTabs pane = (BaseXTabs) evt.getSource();
-            tab = pane.getSelectedIndex();
-            if (tab == 3) {
-                refreshLog();
-            }
-        }
+      public void stateChanged(final ChangeEvent evt) {
+        final BaseXTabs pane = (BaseXTabs) evt.getSource();
+        tab = pane.getSelectedIndex();
+        final Object o = pane.getSelectedComponent();
+        if(o == logs) refreshLog();
+      }
     });
     logc.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent event) {
-        action("Update");
+        action(refreshLog);
       }
     });
     action(null);
@@ -248,12 +281,12 @@ public final class DialogServer extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     String msg = null;
     String msg2 = null;
 
     try {
-      if(BUTTONSTASERV.equals(cmd)) {
+      if(cmp == start) {
         final int p = Integer.parseInt(ports.getText());
         ctx.prop.set(Prop.SERVERPORT, p);
         if(host.getText().equals("localhost")) {
@@ -267,11 +300,11 @@ public final class DialogServer extends Dialog {
         new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
             "-p", String.valueOf(p)}).start();
         running = ping(true);
-      } else if(BUTTONSTOSERV.equals(cmd)) {
+      } else if(cmp == stop) {
         BaseXServer.stop(gui.context);
         running = ping(true);
         connected = connected && ping(false);
-      } else if(BUTTONCONNECT.equals(cmd)) {
+      } else if(cmp == connect) {
         gui.prop.set(GUIProp.SERVERUSER, loguser.getText());
         gui.prop.set(GUIProp.SERVERPASS, new String(logpass.getPassword()));
         ctx.prop.set(Prop.HOST, host.getText());
@@ -280,32 +313,31 @@ public final class DialogServer extends Dialog {
             gui.prop.get(GUIProp.SERVERPASS));
         user.setSess(cs);
         dbsP.setSess(cs);
-        fillsedb();
         connected = true;
-      } else if(BUTTONDISCONNECT.equals(cmd)) {
+        refreshSess();
+      } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
-      } else if(BUTTONREFRESH.equals(cmd)) {
-        fillsedb();
-      } else if("Update".equals(cmd)) {
+      } else if(cmp == refreshSess) {
+        refreshSess();
+      } else if(cmp == refreshLog) {
+        byte[] cont = Token.EMPTY;
         if(logc.getSelectedIndex() != -1) {
-        final IO io = IO.get(logdir + logc.getSelectedItem().toString());
-        logt.setText(io.content());
-        } else {
-          logt.setText(Token.EMPTY);
+          cont = IO.get(logdir + logc.getSelectedItem().toString()).content();
         }
-      } else if("Delete".equals(cmd)) {
-        File f = new File(logdir + logc.getSelectedItem().toString());
+        logt.setText(cont);
+      } else if(cmp == delete) {
+        final File f = new File(logdir + logc.getSelectedItem().toString());
         if(f.delete()) {
           logc.setSelectedIndex(-1);
           refreshLog();
         } else {
           msg2 = "Delete not possible";
         }
-      } else if("Delete All".equals(cmd)) {
+      } else if(cmp == deleteAll) {
         boolean d = false;
         for(int i = 0; i < logc.getItemCount(); i++) {
-          File f = new File(logdir + logc.getItemAt(i).toString());
+          final File f = new File(logdir + logc.getItemAt(i).toString());
           d = f.delete();
         }
         if(!d) {
@@ -315,8 +347,8 @@ public final class DialogServer extends Dialog {
         }
         refreshLog();
       } else if(connected) {
-        if(tab == 1) user.action(cmd);
-        if(tab == 2) dbsP.action(cmd);
+        if(tab == 1) user.action(cmp);
+        if(tab == 2) dbsP.action(cmp);
       }
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -355,7 +387,7 @@ public final class DialogServer extends Dialog {
     tabs.setEnabledAt(1, connected);
     tabs.setEnabledAt(2, connected);
     tabs.setEnabledAt(3, connected);
-    update.setEnabled(logc.getSelectedIndex() != -1);
+    refreshLog.setEnabled(logc.getSelectedIndex() != -1);
     delete.setEnabled(logc.getSelectedIndex() != -1);
     deleteAll.setEnabled(logc.getItemCount() > 0);
     ctx.prop.write();
@@ -365,38 +397,13 @@ public final class DialogServer extends Dialog {
    * Fills sessions/databases panel.
    * @throws IOException Exception
    */
-  private void fillsedb() throws IOException {
-    sedb.removeAll();
-    sedb.setLayout(new TableLayout(4, 1, 2, 2));
-    sedb.setBorder(8, 8, 8, 8);
-    final BaseXBack sess = new BaseXBack();
+  void refreshSess() throws IOException {
     CachedOutput out = new CachedOutput();
-    sess.setLayout(new TableLayout(2, 1, 2, 2));
-    sess.add(new BaseXLabel(SESSIONS + COLS, false, true));
     cs.execute(new Show(CmdShow.SESSIONS), out);
-    BaseXText text = new BaseXText(false, this);
-    text.setFont(getFont());
-    text.setBorder(new EmptyBorder(5, 5, 5, 5));
-    text.setText(out.finish());
-    BaseXLayout.setWidth(text, 420);
-    BaseXLayout.setHeight(text, 100);
-    sess.add(text);
-    sedb.add(sess);
-    sedb.add(new BaseXLabel("  "));
-    final BaseXBack dbs = new BaseXBack();
-    dbs.setLayout(new TableLayout(2, 1, 2, 2));
+    sese.setText(out.finish());
     out = new CachedOutput();
     cs.execute(new Show(CmdShow.DATABASES), out);
-    BaseXText text1 = new BaseXText(false, this);
-    text1.setFont(getFont());
-    text1.setBorder(new EmptyBorder(5, 5, 5, 5));
-    text1.setText(out.finish());
-    BaseXLayout.setWidth(text1, 420);
-    BaseXLayout.setHeight(text1, 100);
-    dbs.add(new BaseXLabel(DATABASES + COLS, false, true));
-    dbs.add(text1);
-    sedb.add(dbs);
-    sedb.add(refresh);
+    sedb.setText(out.finish());
   }
 
   /**
@@ -407,11 +414,9 @@ public final class DialogServer extends Dialog {
     final File f = new File(logdir);
     final String[] files = f.list();
     if(files != null) {
-      for(final String s : files) {
-        if(s.endsWith(".log")) logc.addItem(s);
-      }
+      for(final String s : files) if(s.endsWith(".log")) logc.addItem(s);
     }
-    action("Update");
+    action(refreshLog);
   }
 
   @Override

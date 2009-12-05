@@ -347,8 +347,12 @@ public abstract class W3CTS {
 
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
-      if(cont.size() != 0) curr = new Nodes(Check.check(context,
-          srcs.get(string(data.atom(cont.nodes[0])))), true);
+      if(cont.size() != 0) {
+        final Data d = Check.check(context,
+            srcs.get(string(data.atom(cont.nodes[0]))));
+        curr = new Nodes(d.doc(), d);
+        curr.doc = true;
+      }
 
       final QueryProcessor xq = new QueryProcessor(in, curr, context);
       final QueryContext qctx = xq.ctx;

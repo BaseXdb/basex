@@ -240,7 +240,7 @@ public final class DialogCreateFS extends Dialog {
   }
 
   @Override
-  public void action(final String cmd) {
+  public void action(final Object cmp) {
     final boolean ftx = ftxindex.isSelected();
     for(final BaseXCheckBox f : ft) f.setEnabled(ftx);
 
