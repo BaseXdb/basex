@@ -145,7 +145,7 @@ final class BXQItemType implements XQItemType {
 
   /**
    * Returns the item type.
-   * @return type.
+   * @return type
    */
   Type getType() {
     return type;
