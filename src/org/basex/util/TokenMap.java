@@ -15,13 +15,14 @@ public final class TokenMap extends TokenSet {
 
   /**
    * Indexes the specified keys and values.
+   * If the key exists, the value is updated.
    * @param key key
    * @param val value
    */
   public void add(final byte[] key, final byte[] val) {
     // array bounds are checked before array is resized..
     final int i = add(key);
-    values[i] = val;
+    values[Math.abs(i)] = val;
   }
 
   /**

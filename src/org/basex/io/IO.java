@@ -36,10 +36,12 @@ public abstract class IO {
   public static final int BLOCKSIZE = 1 << 12;
   /** Table NodeSize Power. */
   public static final int NODEPOWER = 4;
-  /** Fill Factor (greater than 0.0, maximum 1.0). */
+  /** Fill Factor (0.0 - 1.0). */
   public static final double BLOCKFILL = 1;
   /** Maximum Tree depth. */
   public static final int MAXHEIGHT = 1 << 8;
+  /** Offset for inlining numbers. */
+  public static final long NUMOFF = 0x8000000000L;
 
   /** File path and name. */
   protected String path = "";

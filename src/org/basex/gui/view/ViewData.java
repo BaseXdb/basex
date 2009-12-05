@@ -80,19 +80,19 @@ public final class ViewData {
    */
   public static byte[] content(final Data data, final int p, final boolean s) {
     switch(data.kind(p)) {
-      case Data.ELEM: return data.tag(p);
-      case Data.DOC:  return data.text(p);
-      case Data.TEXT: return s ? TEXT : data.text(p);
-      case Data.COMM: return s ? COMM : data.text(p);
-      case Data.PI:   return s ? PI : data.text(p);
+      case Data.ELEM: return data.name(p, true);
+      case Data.DOC:  return data.text(p, true);
+      case Data.TEXT: return s ? TEXT : data.text(p, true);
+      case Data.COMM: return s ? COMM : data.text(p, true);
+      case Data.PI:   return s ? PI : data.text(p, true);
     }
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(ATT);
-    tb.add(data.attName(p));
+    tb.add(data.name(p, false));
     if(!s) {
       tb.add(ATT1);
-      tb.add(data.attValue(p));
+      tb.add(data.text(p, false));
       tb.add(ATT2);
     }
     return tb.finish();
@@ -115,10 +115,25 @@ public final class ViewData {
     }
 
     if(prop.is(GUIProp.SHOWNAME) && data.nameID != 0) {
-      final byte[] att = data.attValue(data.nameID, pre);
+      final byte[] att = attValue(data, data.nameID, pre);
       if(att != null) return att;
     }
     return content(data, pre, true);
+  }
+
+  /**
+   * Finds the specified attribute and returns its value.
+   * @param data data reference
+   * @param att the attribute id of the attribute to be found
+   * @param pre pre value
+   * @return attribute value
+   */
+  public static byte[] attValue(final Data data, final int att,
+      final int pre) {
+    final int a = pre + data.attSize(pre, data.kind(pre));
+    int p = pre;
+    while(++p != a) if(data.name(p) == att) return data.text(p, false);
+    return null;
   }
 
   /**

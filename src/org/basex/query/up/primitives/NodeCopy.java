@@ -2,6 +2,7 @@ package org.basex.query.up.primitives;
 
 import java.util.LinkedList;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
@@ -41,6 +42,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
     }
     // Text nodes still need to be merged. Two adjacent iterators in c may
     // lead to two adjacent text nodes.
-    md = UpdateFunctions.buildDB(mergeText(seq), ((DBNode) node).data);
+    md = UpdateFunctions.buildDB(mergeText(seq),
+        new MemData(((DBNode) node).data));
   }
 }

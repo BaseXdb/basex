@@ -2,6 +2,7 @@ package org.basex.data;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+import java.io.File;
 import java.io.IOException;
 import org.basex.build.BuildException;
 import org.basex.core.Main;
@@ -107,19 +108,6 @@ public final class MetaData {
   }
 
   /**
-   * Constructor, specifying the database name and the input reference.
-   * @param db database name
-   * @param in input stream
-   * @param pr database properties
-   * @throws IOException I/O exception
-   */
-  public MetaData(final String db, final DataInput in, final Prop pr)
-      throws IOException {
-    this(db, pr);
-    read(in);
-  }
-
-  /**
    * Checks if the specified file path refers to the specified database.
    * @param path file path
    * @param db database name
@@ -134,7 +122,7 @@ public final class MetaData {
     DataInput in = null;
     try {
       // match filename of database instance
-      in = new DataInput(pr.dbfile(db, DATAINFO));
+      in = new DataInput(file(db, DATAINFO, pr));
       String str = "", k;
       IO f = null;
       long t = 0;
@@ -155,6 +143,28 @@ public final class MetaData {
   }
 
   /**
+   * Adds the database suffix to the specified filename and creates
+   * a file instance.
+   * @param fn filename
+   * @return database filename
+   */
+  public File file(final String fn) {
+    return file(name, fn, prop);
+  }
+
+  /**
+   * Adds the database suffix to the specified filename and creates
+   * a file instance.
+   * @param db name of the database
+   * @param fn filename
+   * @param pr database properties
+   * @return database filename
+   */
+  private static File file(final String db, final String fn, final Prop pr) {
+    return new File(pr.get(Prop.DBPATH) + '/' + db + '/' + fn + IO.BASEXSUFFIX);
+  }
+
+  /**
    * Notifies the meta structures of an update and invalidates the indexes.
    */
   void update() {
@@ -171,7 +181,7 @@ public final class MetaData {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  private void read(final DataInput in) throws IOException {
+  public void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
     while(true) {
       final String k = Token.string(in.readBytes());

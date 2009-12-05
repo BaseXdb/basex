@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
 import org.basex.core.Main;
-import org.basex.core.Prop;
+import org.basex.data.MetaData;
 import org.basex.util.Array;
 
 /**
@@ -26,7 +26,7 @@ public final class TableDiskAccess extends TableAccess {
   private Buffer bf;
 
   /** File storing all blocks. */
-  public final RandomAccessFile file;
+  public final RandomAccessFile data;
 
   /** Index array storing the FirstPre values. this one is sorted ascending. */
   private int[] firstPres;
@@ -44,33 +44,29 @@ public final class TableDiskAccess extends TableAccess {
   private int blocks;
   /** Index number of the current block, referencing indexBlockNumber array. */
   private int index = -1;
-  /** Number of entries in the storage. */
-  private int size;
 
   /**
    * Constructor.
-   * @param nm name of the database
-   * @param fn prefix for all files (no ending)
-   * @param pr database properties
+   * @param md meta data
+   * @param pf file prefix
    * @throws IOException I/O exception
    */
-  public TableDiskAccess(final String nm, final String fn, final Prop pr)
+  public TableDiskAccess(final MetaData md, final String pf)
       throws IOException {
 
-    super(nm, fn, pr);
+    super(md, pf);
 
     // READ INFO FILE AND INDEX
-    final DataInput in = new DataInput(pr.dbfile(nm, fn + 'i'));
+    final DataInput in = new DataInput(meta.file(pf + 'i'));
     allBlocks = in.readNum();
     blocks = in.readNum();
-    size = in.readNum();
     firstPres = in.readNums();
     blockIndex = in.readNums();
     in.close();
 
     // INITIALIZE FILE
-    file = new RandomAccessFile(pr.dbfile(nm, fn), "rw");
-    readBlock(0, 0, blocks > 1 ? firstPres[1] : size);
+    data = new RandomAccessFile(meta.file(pf), "rw");
+    readBlock(0, 0, blocks > 1 ? firstPres[1] : md.size);
   }
 
   /**
@@ -125,8 +121,8 @@ public final class TableDiskAccess extends TableAccess {
       try {
         if(bf.dirty) writeBlock(bf);
         bf.pos = b;
-        file.seek(bf.pos * IO.BLOCKSIZE);
-        file.read(bf.buf);
+        data.seek(bf.pos * IO.BLOCKSIZE);
+        data.read(bf.buf);
       } catch(final IOException ex) {
         ex.printStackTrace();
       }
@@ -139,8 +135,8 @@ public final class TableDiskAccess extends TableAccess {
    * @throws IOException I/O exception
    */
   private synchronized void writeBlock(final Buffer buf) throws IOException {
-    file.seek(buf.pos * IO.BLOCKSIZE);
-    file.write(buf.buf);
+    data.seek(buf.pos * IO.BLOCKSIZE);
+    data.write(buf.buf);
     buf.dirty = false;
   }
 
@@ -148,7 +144,7 @@ public final class TableDiskAccess extends TableAccess {
    * Fetches next block.
    */
   private synchronized void nextBlock() {
-    readBlock(index + 1, nextPre, index + 2 >= blocks ? size :
+    readBlock(index + 1, nextPre, index + 2 >= blocks ? meta.size :
       firstPres[index + 2]);
   }
 
@@ -157,10 +153,9 @@ public final class TableDiskAccess extends TableAccess {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
 
     if(dirty) {
-      final DataOutput out = new DataOutput(prop.dbfile(db, pref + 'i'));
+      final DataOutput out = new DataOutput(meta.file(pref + 'i'));
       out.writeNum(allBlocks);
       out.writeNum(blocks);
-      out.writeNum(size);
       out.writeNums(firstPres);
       out.writeNums(blockIndex);
       out.close();
@@ -171,7 +166,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized void close() throws IOException {
     flush();
-    file.close();
+    data.close();
   }
 
   @Override
@@ -259,14 +254,13 @@ public final class TableDiskAccess extends TableAccess {
     // check if all entries are in current block => handle and return
     if(last - 1 < nextPre) {
       copy(bf.buf, from + nr, bf.buf, from, nextPre - last);
-
       updatePre(nr);
 
       // if whole block was deleted, remove it from the index
       if(nextPre == firstPre) {
         Array.move(firstPres, index + 1, -1, blocks - index - 1);
         Array.move(blockIndex, index + 1, -1, blocks - index - 1);
-        readBlock(index, firstPre, index + 2 > --blocks ? size :
+        readBlock(index, firstPre, index + 2 > --blocks ? meta.size :
           firstPres[index + 1]);
       }
       return;
@@ -306,15 +300,15 @@ public final class TableDiskAccess extends TableAccess {
   private synchronized void updatePre(final int nr) {
     // update index entries for all following blocks and reduce counter
     for(int i = index + 1; i < blocks; i++) firstPres[i] -= nr;
-    size -= nr;
-    nextPre = index + 1 >= blocks ? size : firstPres[index + 1];
+    meta.size -= nr;
+    nextPre = index + 1 >= blocks ? meta.size : firstPres[index + 1];
   }
 
   @Override
   public synchronized void insert(final int pre, final byte[] entries) {
     dirty = true;
     final int nr = entries.length >>> IO.NODEPOWER;
-    size += nr;
+    meta.size += nr;
     cursor(pre - 1);
 
     final int ins = pre - firstPre;
@@ -382,7 +376,7 @@ public final class TableDiskAccess extends TableAccess {
     // update cached variables
     firstPre = pre;
     if(rest.length > 0) firstPre += nr;
-    nextPre = index + 1 >= blocks ? size : firstPres[index + 1];
+    nextPre = index + 1 >= blocks ? meta.size : firstPres[index + 1];
   }
 
   /**
@@ -414,11 +408,11 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   /**
-   * Returns the entryCount; needed for JUnit tests.
-   * @return number of entries in storage.
+   * Returns the number of entries; needed for JUnit tests.
+   * @return number of used blocks.
    */
   public synchronized int size() {
-    return size;
+    return meta.size;
   }
 
   /**

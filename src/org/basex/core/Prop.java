@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import java.io.File;
-import org.basex.io.IO;
 
 /**
  * This class assembles properties which are used all around the project. They
@@ -197,17 +196,6 @@ public final class Prop extends AProp {
   public Prop(final boolean read) {
     super(read ? "" : null);
     if(read) finish();
-  }
-
-  /**
-   * Adds the database suffix to the specified filename and creates
-   * a file instance.
-   * @param db name of the database
-   * @param file filename
-   * @return database filename
-   */
-  public File dbfile(final String db, final String file) {
-    return new File(get(DBPATH) + '/' + db + '/' + file + IO.BASEXSUFFIX);
   }
 
   /**

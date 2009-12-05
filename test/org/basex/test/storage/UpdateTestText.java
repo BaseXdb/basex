@@ -209,12 +209,12 @@ public final class UpdateTestText extends UpdateTest {
   @Test
   public void testUpdateText() {
     final Data data = CONTEXT.data;
-    data.update(10, token("JUnit"));
+    data.replace(10, Data.TEXT, token("JUnit"));
     assertEquals(Data.TEXT, data.kind(10));
-    assertByteArraysEqual(token("JUnit"), data.text(10));
+    assertByteArraysEqual(token("JUnit"), data.text(10, true));
     reload();
     assertEquals(Data.TEXT, data.kind(10));
-    assertByteArraysEqual(token("JUnit"), data.text(10));
+    assertByteArraysEqual(token("JUnit"), data.text(10, true));
   }
 
   /**

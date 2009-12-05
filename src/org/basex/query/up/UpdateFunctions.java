@@ -2,7 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
@@ -70,7 +69,7 @@ public final class UpdateFunctions {
     if(d.kind(a) != Data.TEXT || d.kind(b) != Data.TEXT) return false;
     if(d.parent(a, Data.TEXT) != d.parent(b, Data.TEXT)) return false;
 
-    d.update(a, concat(d.text(a), d.text(b)));
+    d.replace(a, Data.TEXT, concat(d.text(a, true), d.text(b, true)));
     d.delete(b);
     return true;
   }
@@ -105,31 +104,27 @@ public final class UpdateFunctions {
    */
   public static void insertAttributes(final int pre, final int par,
       final Data d, final Data m) {
+
     final int ss = m.meta.size;
     for(int s = 0; s < ss; s++) {
-      d.insert(pre + s, par, m.attName(s), m.attValue(s));
+      d.insertAttr(pre + s, par, m.name(s, false), m.text(s, false),
+          m.uri(s, Data.ATTR));
     }
   }
 
   /**
    * Builds new data instance from iterator.
    * @param ch sequence iterator
-   * @param d data reference for indices
+   * @param data memory data reference
    * @return new data instance
    * @throws QueryException query exception
    */
-  public static Data buildDB(final NodIter ch, final Data d)
+  public static Data buildDB(final NodIter ch, final MemData data)
       throws QueryException {
-
-    // [LK] usage of index refs only possible if target node is a dbnode,
-    // because insert/replace etc. nodes can be mixed up (DBNode, FNode ...)
-    final MemData md = d == null ? new MemData(new Prop(false)) :
-      new MemData(16, d);
-
     int pre = 1;
     Nod n;
-    while((n = ch.next()) != null) pre = addNode(n, md, pre, 0);
-    return md;
+    while((n = ch.next()) != null) pre = addNode(n, data, pre, 0);
+    return data;
   }
 
   /**
@@ -148,7 +143,7 @@ public final class UpdateFunctions {
     final int k = Nod.kind(nd.type);
     switch(k) {
       case Data.DOC:
-        md.addDoc(nd.base(), size(nd, false));
+        md.insertDoc(md.meta.size, size(nd, false), nd.base());
         int p = pre + 1;
         NodeIter ir = nd.child();
         Nod i;
@@ -158,28 +153,32 @@ public final class UpdateFunctions {
         QNm q = nd.qname();
         byte[] uri = q.uri.str();
         int u = 0;
-        if(uri.length != 0) u = Math.abs(md.ns.add(uri));
-        md.addAtt(md.atts.index(q.str(), null, false), u, nd.str(), pre - par);
+        if(uri.length != 0) u = Math.abs(md.ns.addURI(uri));
+        final int n = md.atts.index(q.str(), null, false);
+        md.insertAttr(md.meta.size, pre - par, n, nd.str(), u);
         return pre + 1;
       case Data.PI:
-        md.addText(trim(concat(nd.nname(), SPACE, nd.str())), pre - par, k);
+        final byte[] v = trim(concat(nd.nname(), SPACE, nd.str()));
+        md.insertText(md.meta.size, pre - par, v, k);
         return pre + 1;
       case Data.TEXT:
       case Data.COMM:
-        md.addText(nd.str(), pre - par, k);
+        md.insertText(md.meta.size, pre - par, nd.str(), k);
         return pre + 1;
       default:
         q = nd.qname();
-        u = 0;
+        //u = 0;
         if(par == 0) {
           final Atts ns = FElem.ns(nd);
           for(int a = 0; a < ns.size; a++) md.ns.add(ns.key[a], ns.val[a]);
         }
         final boolean ne = md.ns.open(md.meta.size);
         uri = q.uri.str();
-        u = uri.length != 0 ? Math.abs(md.ns.add(uri)) : 0;
-        md.addElem(md.tags.index(q.str(), null, false), u, pre - par,
-            size(nd, true), size(nd, false), ne);
+        u = uri.length != 0 ? Math.abs(md.ns.addURI(uri)) : 0;
+        final int tn = md.tags.index(q.str(), null, false);
+        // [CG] missing: ne/u
+        md.insertElem(md.meta.size, pre - par, tn, size(nd, true),
+            size(nd, false), u, ne);
         ir = nd.attr();
         p = pre + 1;
         while((i = ir.next()) != null) p = addNode(i, md, p, pre);

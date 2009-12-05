@@ -170,7 +170,7 @@ public final class DialogMountFS extends Dialog {
     final String mp = mountpoint.getText().trim();
 
     if(BUTTONMOUNT.equals(cmd)) {
-//      DeepFSImpl.main(new String[] {mp, db});
+      //DeepFSImpl.main(new String[] {mp, db});
       close();
     } else {
       ok = !db.isEmpty() && ctx.prop.dbexists(db);
@@ -179,10 +179,11 @@ public final class DialogMountFS extends Dialog {
       if(ok) {
         doc.setText("Mount " + db + COL);
         DataInput in = null;
+        final MetaData meta = new MetaData(db, ctx.prop);
         try {
           // fill detail panel with db info
-          in = new DataInput(ctx.prop.dbfile(db, DATAINFO));
-          final MetaData meta = new MetaData(db, in, ctx.prop);
+          in = new DataInput(meta.file(DATAINFO));
+          meta.read(in);
           detail.setText(InfoDB.db(meta, true, true).finish());
           // check for valid mountpoint
           final IO file = IO.get(mp);
@@ -197,9 +198,7 @@ public final class DialogMountFS extends Dialog {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;
         } finally {
-          try {
-            if(in != null) in.close();
-          } catch(final IOException ex) { /* */}
+          try { if(in != null) in.close(); } catch(final IOException ex) { }
         }
       }
       enableOK(buttons, BUTTONMOUNT, ok);

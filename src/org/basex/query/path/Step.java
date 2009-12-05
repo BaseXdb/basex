@@ -72,7 +72,7 @@ public class Step extends Preds {
       final byte[] ln = ((NameTest) test).ln;
       final boolean att = test.type == Type.ATT;
       ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
-        data.tags.stat(att ? data.attNameID(ln) : data.tagID(ln)).leaf;
+        data.tags.stat((att ? data.atts : data.tags).id(ln)).leaf;
     }
     final Expr e = super.comp(ctx);
     ctx.leaf = false;
@@ -164,7 +164,7 @@ public class Step extends Preds {
       if(n == null) {
         if(test.kind != null && test.kind != Kind.ALL) return null;
       } else if(kind == Data.ELEM) {
-        name = data.tagID(n);
+        name = data.tags.id(n);
       }
     }
     final boolean desc = axis == Axis.DESC;

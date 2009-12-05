@@ -2,12 +2,11 @@ package org.basex.gui.view.tree;
 
 import java.awt.Graphics;
 import java.util.ArrayList;
-
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.IntList;
-import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class determines nodes per level and caches them.
@@ -354,22 +353,19 @@ public class TreeCaching implements TreeViewOptions {
    */
   public String getText(final Data data, final int pre) {
     final int kind = data.kind(pre);
-    String s = "";
+    TokenBuilder tb = new TokenBuilder();
 
     if(data.meta.deepfs) {
-      if(data.fs.isFile(pre)) s += Token.string(data.fs.name(pre));
-      else s += Token.string(data.attValue(pre + 1));
-
+      if(data.fs.isFile(pre)) tb.add(data.fs.name(pre));
+      else tb.add(data.text(pre + 1, false));
     } else {
-
       if(kind == Data.ELEM) {
-        s += Token.string(data.tag(pre));
+        tb.add(data.name(pre, true));
       } else {
-        s += Token.string(data.text(pre));
+        tb.add(data.text(pre, true));
       }
     }
-
-    return s;
+    return tb.toString();
   }
 
   /**

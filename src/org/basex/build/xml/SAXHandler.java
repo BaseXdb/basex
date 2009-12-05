@@ -121,7 +121,7 @@ public final class SAXHandler extends DefaultHandler implements LexicalHandler {
    */
   private void finishText() throws IOException {
     if(tb.size() != 0) {
-      builder.text(tb, false);
+      builder.text(tb);
       tb.reset();
     }
     for(int i = 0; i < ns.size; i++) builder.startNS(ns.key[i], ns.val[i]);

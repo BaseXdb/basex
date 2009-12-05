@@ -169,7 +169,7 @@ public final class PathSummary {
     for(final byte[] i : tl) {
       final boolean att = startsWith(i, '@');
       final byte kind = att ? Data.ATTR : Data.ELEM;
-      final int id = att ? data.attNameID(substring(i, 1)) : data.tagID(i);
+      final int id = att ? data.atts.id(substring(i, 1)) : data.tags.id(i);
 
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
       for(final PathNode n : in) {

@@ -45,7 +45,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-  String VERSION = "5.85";
+  String VERSION = "5.9";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -361,12 +361,6 @@ public interface Text {
   String INDUPDATE = lang("pc_indupdate");
   /** Builder error. */
   String CANCELCREATE = lang("pc_cancel");
-  /** Builder error. */
-  String LIMITRANGE = lang("pc_range");
-  /** Builder error. */
-  String LIMITTAGS = lang("pc_tags");
-  /** Builder error. */
-  String LIMITATTS = lang("pc_atts");
   /** Create database information. */
   String NODESPARSED = " " + lang("pc_parse");
   /** Scanner position. */

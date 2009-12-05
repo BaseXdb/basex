@@ -2,11 +2,12 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.Token;
@@ -21,7 +22,7 @@ public final class Users extends ArrayList<User> {
   /** Default permissions for new users. */
   private static final int PERM = User.READ | User.WRITE;
   /** Filename; set to null for local user permissions. */
-  private String file;
+  private File file;
 
   /**
    * Global constructor.
@@ -29,9 +30,9 @@ public final class Users extends ArrayList<User> {
    */
   public Users(final boolean global) {
     if(global) {
-      file = Prop.HOME + ".basexperm";
+      file = new File(Prop.HOME + ".basexperm");
       try {
-        if(IO.get(file).exists()) {
+        if(file.exists()) {
           final DataInput in = new DataInput(file);
           read(in);
           in.close();

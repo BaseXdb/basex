@@ -915,10 +915,9 @@ public final class MapView extends View implements Runnable {
 
       parStack[l] = pre;
 
-      if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI) {
-        textLen[pre] = data.textLen(pre);
-      } else if(kind == Data.ATTR) {
-        textLen[pre] = data.attLen(pre);
+      if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI ||
+          kind == Data.ATTR) {
+        textLen[pre] = data.textLen(pre, kind != Data.ATTR);
       } else if((kind == Data.ELEM || kind == Data.DOC) &&
           data.size(pre, kind) > 1) {
         l++;

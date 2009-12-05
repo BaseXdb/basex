@@ -16,7 +16,7 @@ public class ObjectMap<E> extends TokenSet {
 
   /**
    * Indexes the specified keys and values.
-   * If the entry exists, the old value is replaced.
+   * If the key exists, the value is updated.
    * @param key key
    * @param val value
    */

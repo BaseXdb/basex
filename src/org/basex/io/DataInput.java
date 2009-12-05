@@ -16,15 +16,6 @@ public final class DataInput extends BufferInput {
    * @param file the file to be read
    * @throws IOException IO Exception
    */
-  public DataInput(final String file) throws IOException {
-    super(file);
-  }
-
-  /**
-   * Initializes the file reader.
-   * @param file the file to be read
-   * @throws IOException IO Exception
-   */
   public DataInput(final File file) throws IOException {
     super(file);
   }

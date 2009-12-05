@@ -277,14 +277,14 @@ public abstract class Serializer {
         p++;
       } else if(k == Data.TEXT) {
         final FTPos ftd = ft != null ? ft.get(p) : null;
-        if(ftd != null) text(data.text(p++), ftd);
-        else text(data.text(p++));
+        if(ftd != null) text(data.text(p++, true), ftd);
+        else text(data.text(p++, true));
       } else if(k == Data.COMM) {
-        comment(data.text(p++));
+        comment(data.text(p++, true));
       } else if(k == Data.ATTR) {
-        attribute(data.attName(p), data.attValue(p++));
+        attribute(data.name(p, false), data.text(p++, false));
       } else if(k == Data.PI) {
-        byte[] n = data.text(p++);
+        byte[] n = data.text(p++, true);
         byte[] v = EMPTY;
         final int i = indexOf(n, ' ');
         if(i != -1) {
@@ -294,7 +294,7 @@ public abstract class Serializer {
         pi(n, v);
       } else {
         // add element node
-        final byte[] name = data.tag(p);
+        final byte[] name = data.name(p, true);
         openElement(name);
 
         // add namespace definitions
@@ -304,11 +304,11 @@ public abstract class Serializer {
           nsp.reset();
           int pp = p;
           do {
-            final int[] nm = data.ns(pp);
-            for(int n = 0; n < nm.length; n += 2) {
-              final byte[] key = data.ns.key(nm[n]);
+            final Atts atn = data.ns(pp);
+            for(int n = 0; n < atn.size; n++) {
+              final byte[] key = atn.key[n];
+              final byte[] val = atn.val[n];
               if(!nsp.contains(key)) {
-                final byte[] val = data.ns.key(nm[n + 1]);
                 nsp.add(key);
                 namespace(key, val);
                 if(key.length == 0) empty = val;
@@ -320,7 +320,7 @@ public abstract class Serializer {
 
           // check namespace of current element
           final byte[] key = pref(name);
-          byte[] val = data.ns.key(data.tagNS(p));
+          byte[] val = data.ns.uri(data.uri(p, k));
           if(val == null) val = EMPTY;
           if(key.length != 0) {
             if(ns.get(key) == -1) namespace(key, val);
@@ -334,7 +334,7 @@ public abstract class Serializer {
 
         // serialize attributes
         final int as = p + data.attSize(p, k);
-        while(++p != as) attribute(data.attName(p), data.attValue(p));
+        while(++p != as) attribute(data.name(p, false), data.text(p, false));
         parent[l++] = r;
         names[l] = empty;
       }

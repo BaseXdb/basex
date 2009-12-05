@@ -82,8 +82,6 @@ public final class Replace extends Update {
           final byte[] uri = par.uri(name.pref(), ctx);
           if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
         }
-
-        //checkNS(par, aList, ctx);
         ctx.updates.add(new ReplacePrimitive(targ, aList), ctx);
       } else {
         // replace non-attribute node

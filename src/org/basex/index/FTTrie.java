@@ -46,11 +46,9 @@ public final class FTTrie extends FTIndex {
    */
   public FTTrie(final Data d) throws IOException {
     super(d);
-    final String db = d.meta.name;
-    final Prop pr = d.meta.prop;
-    inN = new DataAccess(db, DATAFTX + 'a', pr);
-    inD = new DataAccess(db, DATAFTX + 'b', pr);
-    inS = new DataAccess(db, DATAFTX + 'c', pr);
+    inN = new DataAccess(d.meta.file(DATAFTX + 'a'));
+    inD = new DataAccess(d.meta.file(DATAFTX + 'b'));
+    inS = new DataAccess(d.meta.file(DATAFTX + 'c'));
   }
 
   @Override

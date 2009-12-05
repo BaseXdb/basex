@@ -85,11 +85,9 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   void write() throws IOException {
-    final String db = data.meta.name;
-    final Prop pr = data.meta.prop;
-    final DataOutput outx = new DataOutput(pr.dbfile(db, DATAFTX + 'x'));
-    final DataOutput outy = new DataOutput(pr.dbfile(db, DATAFTX + 'y'));
-    final DataOutput outz = new DataOutput(pr.dbfile(db, DATAFTX + 'z'));
+    final DataOutput outx = new DataOutput(data.meta.file(DATAFTX + 'x'));
+    final DataOutput outy = new DataOutput(data.meta.file(DATAFTX + 'y'));
+    final DataOutput outz = new DataOutput(data.meta.file(DATAFTX + 'z'));
 
     // write index size
     outx.write(isize);

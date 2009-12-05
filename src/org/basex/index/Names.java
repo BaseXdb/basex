@@ -81,16 +81,9 @@ public final class Names extends TokenSet {
     stat[i].add(v);
   }
 
-  /**
-   * Writes the names to the specified output stream.
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
+  @Override
   public synchronized void write(final DataOutput out) throws IOException {
-    out.writeBytesArray(keys);
-    out.writeNums(next);
-    out.writeNums(bucket);
-    out.writeNum(size);
+    super.write(out);
     for(int s = 1; s < size; s++) {
       if(stat[s] == null) stat[s] = new StatsKey();
       stat[s].finish(out);

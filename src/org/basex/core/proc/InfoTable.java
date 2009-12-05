@@ -114,11 +114,11 @@ public final class InfoTable extends AInfo {
     sl.add(p - data.parent(p, k));
     sl.add(data.size(p, k));
     sl.add(data.attSize(p, k));
-    sl.add(data.tagNS(p));
+    sl.add(data.uri(p, k));
     sl.add(TABLEKINDS[k]);
-    sl.add(string(chop(k == Data.ELEM ? data.tag(p) : k != Data.ATTR ?
-        data.text(p) : concat(data.attName(p), ATT1,
-        data.attValue(p), ATT2), 64)).replaceAll("\n", "\\\\n"));
+    sl.add(string(chop(k == Data.ELEM ? data.name(p, true) : k != Data.ATTR ?
+        data.text(p, true) : concat(data.name(p, false), ATT1,
+        data.text(p, false), ATT2), 64)).replaceAll("\n", "\\\\n"));
     t.contents.add(sl);
   }
 

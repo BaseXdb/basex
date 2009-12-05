@@ -1,7 +1,6 @@
 package org.basex.build;
 
 import static org.basex.build.BuildText.*;
-import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Main;
@@ -87,40 +86,40 @@ public abstract class Builder extends Progress {
 
   /**
    * Adds a document node to the database.
-   * @param tok the token to be added (tag name or content)
+   * @param txt name of the document
    * @throws IOException I/O exception
    */
-  public abstract void addDoc(byte[] tok) throws IOException;
+  public abstract void addDoc(byte[] txt) throws IOException;
 
   /**
    * Adds an element node to the database. This method stores a preliminary
-   * size value; if this node has further descendants, {@link #setSize} has
-   * to be called with the final size value.
-   * @param tok the tag name reference
-   * @param tns the tag namespace
-   * @param dis distance (relative parent reference)
+   * size value; if this node has further descendants, {@link #setSize} must
+   * be called to set the final size value.
+   * @param n the tag name reference
+   * @param u namespace uri reference
+   * @param dis distance to parent
    * @param as number of attributes
-   * @param n element has namespaces
+   * @param ne namespace flag
    * @throws IOException I/O exception
    */
-  public abstract void addElem(int tok, int tns, int dis, int as, boolean n)
+  public abstract void addElem(int n, int u, int dis, int as, boolean ne)
     throws IOException;
 
   /**
    * Adds an attribute to the database.
    * @param n attribute name
-   * @param s namespace
    * @param v attribute value
-   * @param d distance (relative parent reference)
+   * @param dis distance to parent
+   * @param u namespace uri reference
    * @throws IOException I/O exception
    */
-  public abstract void addAttr(int n, int s, byte[] v, int d)
+  public abstract void addAttr(int n, byte[] v, int dis, int u)
     throws IOException;
 
   /**
    * Adds a text node to the database.
    * @param tok the token to be added (tag name or content)
-   * @param dis distance (relative parent reference)
+   * @param dis distance to parent
    * @param kind the node kind
    * @throws IOException I/O exception
    */
@@ -174,10 +173,6 @@ public abstract class Builder extends Progress {
       endDoc();
       setSize(0, meta.size);
     }
-
-    // check if data ranges exceed database limits
-    if(tags.size() > 0xFFFF) throw new IOException(LIMITTAGS);
-    if(atts.size() > 0xFFFF) throw new IOException(LIMITATTS);
     return finish();
   }
 
@@ -262,19 +257,12 @@ public abstract class Builder extends Progress {
   /**
    * Stores a text node.
    * @param t text value
-   * @param w whitespace flag
    * @throws IOException I/O exception
    */
-  public final void text(final TokenBuilder t, final boolean w)
-      throws IOException {
-
+  public final void text(final TokenBuilder t) throws IOException {
     // checks if text appears before or after root node
-    final boolean out = !inDoc || level == 1;
-    if(!w) {
-      if(out) error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
-    } else if(t.size() == 0 || out) {
-      return;
-    }
+    if(!inDoc || level == 1)
+      error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
 
     // chop whitespaces in text nodes
     if(meta.chop) t.chop();
@@ -317,7 +305,7 @@ public abstract class Builder extends Progress {
   public final void nodeAndText(final byte[] tag, final Atts att,
       final byte[] txt) throws IOException {
     startElem(tag, att);
-    text(new TokenBuilder(txt), false);
+    text(new TokenBuilder(txt));
     endElem(tag);
   }
 
@@ -347,35 +335,34 @@ public abstract class Builder extends Progress {
    */
   private int addElem(final byte[] tag, final Atts att) throws IOException {
     // get tag reference
-    int nm = tags.index(tag, null, true);
+    int n = tags.index(tag, null, true);
 
-    if(meta.pathindex) path.add(nm, level, Data.ELEM);
+    if(meta.pathindex) path.add(n, level, Data.ELEM);
 
     // remember tag id and parent reference
-    tagStack[level] = nm;
+    tagStack[level] = n;
     parStack[level] = meta.size;
     // cache pre value
     final int pre = meta.size;
 
     // add node
     final int dis = level != 0 ? meta.size - parStack[level - 1] : 1;
-    final int al = att.size;
+    final int as = att.size;
 
     // get namespace URI reference
-    int uri = ns.uri(tag);
-    if(uri == 0) uri = uriStack[level];
+    int u = ns.uri(tag);
+    if(u == 0) u = uriStack[level];
     uriStack[level + 1] = uriStack[level];
 
     // store namespaces
-    final boolean n = ns.open(meta.size);
-    addElem(nm, uri, dis, al + 1, n);
+    addElem(dis, n, as + 1, u, ns.open(meta.size));
 
     // create numeric attribute references
-    for(int a = 0; a < al; a++) {
-      nm = atts.index(att.key[a], att.val[a], true);
-      uri = ns.uri(att.key[a]);
-      if(meta.pathindex) path.add(nm, level + 1, Data.ATTR);
-      addAttr(nm, uri, att.val[a], a + 1);
+    for(int a = 0; a < as; a++) {
+      n = atts.index(att.key[a], att.val[a], true);
+      u = ns.uri(att.key[a]);
+      if(meta.pathindex) path.add(n, level + 1, Data.ATTR);
+      addAttr(n, att.val[a], a + 1, u);
     }
 
     if(level != 0) {
@@ -394,16 +381,36 @@ public abstract class Builder extends Progress {
       else if(c % 50000 == 0) Main.err("!");
       else if(c % 10000 == 0) Main.err(".");
     }
+
+    // check if data ranges exceed database limits,
+    // based on the storage details in {@link Data}.
+    limit(tags.size(), 0x8000, LIMITTAGS);
+    limit(atts.size(), 0x8000, LIMITATTS);
+    limit(ns.size(), 0x100, LIMITNS);
+    limit(as, 0x20, LIMITATT);
+    if(meta.size < 0) limit(0, 0, LIMITRANGE);
     return pre;
+  }
+
+  /**
+   * Checks a value limit and optionally throws an exception.
+   * @param v value
+   * @param l limit
+   * @param m message
+   * @throws BuildException build exception
+   */
+  private void limit(final int v, final int l, final String m)
+      throws BuildException {
+    if(v >= l) error(m, parser.det(), l);
   }
 
   /**
    * Throws an error message.
    * @param m message
    * @param e message extension
-   * @throws IOException I/O exception
+   * @throws BuildException build exception
    */
-  private void error(final String m, final Object... e) throws IOException {
+  private void error(final String m, final Object... e) throws BuildException {
     throw new BuildException(m, e);
   }
 

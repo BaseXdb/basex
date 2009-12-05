@@ -2,6 +2,7 @@ package org.basex.test.storage;
 
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -27,7 +28,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.tag(4));
+    assertByteArraysEqual(JUNIT, data.name(4, true));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
@@ -35,7 +36,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.tag(4));
+    assertByteArraysEqual(JUNIT, data.name(4, true));
   }
 
   /**
@@ -53,7 +54,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.tag(4));
+    assertByteArraysEqual(JUNIT, data.name(4, true));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
@@ -61,7 +62,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.tag(4));
+    assertByteArraysEqual(JUNIT, data.name(4, true));
   }
 
   /**
@@ -79,7 +80,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.tag(4));
+    assertByteArraysEqual(JUNIT, data.name(4, true));
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(3, data.parent(4, Data.ELEM));
@@ -87,7 +88,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(1, data.parent(5, Data.ELEM));
     assertEquals(5, data.parent(6, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(JUNIT, data.tag(4));
+    assertByteArraysEqual(JUNIT, data.name(4, true));
   }
 
   /**
@@ -101,7 +102,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
-    assertByteArraysEqual(JUNIT, data.tag(9));
+    assertByteArraysEqual(JUNIT, data.name(9, true));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
@@ -109,7 +110,7 @@ public final class UpdateTestTags extends UpdateTest {
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
     assertEquals(6, data.parent(9, Data.ELEM));
-    assertByteArraysEqual(JUNIT, data.tag(9));
+    assertByteArraysEqual(JUNIT, data.name(9, true));
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
     assertEquals(nextid + 1, data.meta.lastid);
@@ -125,7 +126,7 @@ public final class UpdateTestTags extends UpdateTest {
     insertTag(6, 2, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertByteArraysEqual(JUNIT, data.tag(11));
+    assertByteArraysEqual(JUNIT, data.name(11, true));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -134,7 +135,7 @@ public final class UpdateTestTags extends UpdateTest {
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertByteArraysEqual(JUNIT, data.tag(11));
+    assertByteArraysEqual(JUNIT, data.name(11, true));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -151,7 +152,7 @@ public final class UpdateTestTags extends UpdateTest {
     insertTag(6, 0, JUNIT, Data.ELEM);
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertByteArraysEqual(JUNIT, data.tag(11));
+    assertByteArraysEqual(JUNIT, data.name(11, true));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -159,7 +160,7 @@ public final class UpdateTestTags extends UpdateTest {
     reload();
     assertEquals(size + 1, data.meta.size);
     assertEquals(Data.ELEM, data.kind(9));
-    assertByteArraysEqual(JUNIT, data.tag(11));
+    assertByteArraysEqual(JUNIT, data.name(11, true));
     assertEquals(6, data.parent(11, Data.ELEM));
     assertEquals(6, data.parent(9, Data.ELEM));
     assertEquals(4, data.parent(12, Data.ELEM));
@@ -172,12 +173,12 @@ public final class UpdateTestTags extends UpdateTest {
   @Test
   public void testUpdateTagName() {
     final Data data = CONTEXT.data;
-    data.update(6, token("JUnit"));
+    data.rename(6, Data.ELEM, token("JUnit"));
     assertEquals(Data.ELEM, data.kind(6));
-    assertByteArraysEqual(token("JUnit"), data.tag(6));
+    assertByteArraysEqual(token("JUnit"), data.name(6, true));
     reload();
     assertEquals(Data.ELEM, data.kind(6));
-    assertByteArraysEqual(token("JUnit"), data.tag(6));
+    assertByteArraysEqual(token("JUnit"), data.name(6, true));
   }
 
   /**
@@ -211,6 +212,9 @@ public final class UpdateTestTags extends UpdateTest {
         currPos++;
       }
     }
-    data.insert(root, par, name, Data.ELEM);
+    final MemData md = new MemData(CONTEXT.data);
+    final int n = CONTEXT.data.tags.index(name, null, false);
+    md.insertElem(0, 1, n, 1, 1, 0, false);
+    data.insert(root, par, md);
   }
 }

@@ -20,16 +20,16 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public final class QueryTest {
-  /** Test instances. */
-  private static final AbstractTest[] TESTS = {
-    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest()
-  };
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Test all flag. */
   private static final boolean ALL = false;
   /** Database Context. */
   private final Context context = new Context();
+  /** Test instances. */
+  private static final AbstractTest[] TESTS = {
+    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest()
+  };
 
   /** Wrong results counter. */
   private int wrong;
@@ -68,6 +68,7 @@ public final class QueryTest {
       }
     } else {
       // single test
+      //prop.set(Prop.MAINMEM, true);
       prop.set(Prop.FTINDEX, true);
       prop.set(Prop.FTFUZZY, true);
       prop.set(Prop.FTST, true);

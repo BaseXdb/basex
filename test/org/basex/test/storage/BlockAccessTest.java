@@ -31,6 +31,8 @@ public final class BlockAccessTest {
   private static final Prop PROP = new Prop(true);
   /** BlockStorage. */
   private TableDiskAccess tba;
+  /** Data reference. */
+  private Data data;
   /** Test file size. */
   private int size;
   /** Starting storage. */
@@ -58,10 +60,10 @@ public final class BlockAccessTest {
   public void setUp() {
     try {
       final XMLParser parser = new XMLParser(IO.get(TESTFILE), PROP);
-      final Data data = new DiskBuilder(parser).build(DBNAME);
+      data = new DiskBuilder(parser).build(DBNAME);
       size = data.meta.size;
       data.close();
-      tba = new TableDiskAccess(DBNAME, DATATBL, PROP);
+      tba = new TableDiskAccess(data.meta, DATATBL);
     } catch(final Exception ex) {
       ex.printStackTrace();
     }
@@ -95,7 +97,7 @@ public final class BlockAccessTest {
   private void closeAndReload() {
     try {
       tba.close();
-      tba = new TableDiskAccess(DBNAME, DATATBL, PROP);
+      tba = new TableDiskAccess(data.meta, DATATBL);
     } catch(final IOException ex) {
       fail();
     }
@@ -327,7 +329,7 @@ public final class BlockAccessTest {
   /**
    * Creates a test-byte array containing the specified number of entries.
    * All bytes are set to (byte) 5.
-   * @param e number of Entries to create
+   * @param e number of entries to create
    * @return byte array containing the number of entries (all bytes 5)
    */
   private byte[] getTestEntries(final int e) {

@@ -41,25 +41,23 @@ public final class ValueBuilder extends IndexBuilder {
   public Values build() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
 
-    final Prop prop = data.meta.prop;
-    final String db = data.meta.name;
     final String f = text ? DATATXT : DATAATV;
     int cap = 1 << 2;
-    final int max = (int) (prop.dbfile(db, f).length() >>> 7);
+    final int max = (int) (data.meta.file(f).length() >>> 7);
     while(cap < max && cap < 1 << 24) cap <<= 1;
 
     final int type = text ? Data.TEXT : Data.ATTR;
     for(pre = 0; pre < total; pre++) {
       if(data.kind(pre) != type) continue;
       checkStop();
-      final byte[] tok = text ? data.text(pre) : data.attValue(pre);
+      final byte[] tok = data.text(pre, text);
       // skip too long and pure whitespace tokens
       if(tok.length <= Token.MAXLEN && !Token.ws(tok)) index.index(tok, pre);
     }
 
-    final DataOutput outl = new DataOutput(prop.dbfile(db, f + 'l'));
+    final DataOutput outl = new DataOutput(data.meta.file(f + 'l'));
     outl.writeNum(index.size());
-    final DataOutput outr = new DataOutput(prop.dbfile(db, f + 'r'));
+    final DataOutput outr = new DataOutput(data.meta.file(f + 'r'));
     index.init();
     while(index.more()) {
       final byte[] pres = index.next();

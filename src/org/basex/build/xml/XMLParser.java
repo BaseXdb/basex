@@ -43,11 +43,13 @@ public final class XMLParser extends Parser {
     scanner.more();
     while(true) {
       if(scanner.type == Type.TEXT) {
-        builder.text(scanner.token, scanner.ws);
+        builder.text(scanner.token);
       } else if(scanner.type == Type.COMMENT) {
         builder.comment(scanner.token);
       } else if(scanner.type == Type.PI) {
         builder.pi(scanner.token);
+      } else if(scanner.type == Type.EOF) {
+        break;
       } else if(scanner.type != Type.DTD) {
         if(!parseTag()) break;
         continue;

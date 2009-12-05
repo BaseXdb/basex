@@ -1,6 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+
+import org.basex.data.MemData;
 import org.basex.data.StatsKey;
 import org.basex.index.RangeToken;
 import org.basex.query.IndexContext;
@@ -122,7 +124,7 @@ public final class CmpR extends Single {
   public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
     final Step s = CmpG.indexStep(expr);
-    if(s == null) return false;
+    if(s == null || ic.data instanceof MemData) return false;
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
@@ -177,12 +179,12 @@ public final class CmpR extends Single {
       final Step step = st == 1 ? ic.step : path.step[st - 2];
       if(!(step.test.kind == Kind.NAME)) return null;
       final byte[] nm = ((NameTest) step.test).ln;
-      return ic.data.tags.stat(ic.data.tagID(nm));
+      return ic.data.tags.stat(ic.data.tags.id(nm));
     }
 
     final Step step = path.step[st - 1];
     return !step.simple(Axis.ATTR, true) ? null :
-      ic.data.atts.stat(ic.data.attNameID(((NameTest) step.test).ln));
+      ic.data.atts.stat(ic.data.atts.id(((NameTest) step.test).ln));
   }
 
   @Override

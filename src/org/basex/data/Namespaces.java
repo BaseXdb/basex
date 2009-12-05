@@ -2,11 +2,11 @@ package org.basex.data;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.ObjectMap;
+import org.basex.util.Token;
 import org.basex.util.TokenSet;
 import org.basex.util.StringList;
 import org.basex.util.Table;
@@ -19,7 +19,11 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Namespaces extends TokenSet {
+public final class Namespaces {
+  /** Prefixes. */
+  private final TokenSet pref;
+  /** URIs. */
+  private final TokenSet uri;
   /** Root node. */
   private NSNode root;
   /** Current node. */
@@ -28,10 +32,34 @@ public final class Namespaces extends TokenSet {
   // Building Namespaces ======================================================
 
   /**
-   * Default constructor.
+   * Empty constructor.
    */
   public Namespaces() {
     root = new NSNode();
+    pref = new TokenSet();
+    uri = new TokenSet();
+  }
+
+  /**
+   * Constructor, specifying an input stream.
+   * @param in input stream
+   * @throws IOException I/O exception
+   */
+  Namespaces(final DataInput in) throws IOException {
+    pref = new TokenSet(in);
+    uri = new TokenSet(in);
+    root = new NSNode(in, null);
+  }
+
+  /**
+   * Writes the namespaces to disk.
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  void write(final DataOutput out) throws IOException {
+    pref.write(out);
+    uri.write(out);
+    root.write(out);
   }
 
   /**
@@ -65,59 +93,66 @@ public final class Namespaces extends TokenSet {
    */
   public int add(final byte[] p, final byte[] u) {
     if(tmp == null) tmp = new NSNode();
-    final int k = Math.abs(add(p));
-    final int v = Math.abs(add(u));
+    final int k = Math.abs(pref.add(p));
+    final int v = Math.abs(uri.add(u));
     tmp.add(k, v);
     return v;
   }
 
   /**
-   * Returns the namespace URI reference for the specified QName,
+   * Adds the specified namespace uri.
+   * @param u namespace uri
+   * @return reference
+   */
+  public int addURI(final byte[] u) {
+    return uri.add(u);
+  }
+
+  /**
+   * Returns the namespace uri reference for the specified name,
    * or 0 if namespace cannot be found.
    * @param n tag/attribute name
    * @return namespace
    */
   public int uri(final byte[] n) {
-    final byte[] pref = pref(n);
-    return pref.length == 0 ? 0 : ns(pref, root);
-  }
-
-  // Managing Namespaces ======================================================
-
-  /**
-   * Constructor, specifying an input stream.
-   * @param in input stream
-   * @throws IOException I/O exception
-   */
-  Namespaces(final DataInput in) throws IOException {
-    keys = in.readBytesArray();
-    next = in.readNums();
-    bucket = in.readNums();
-    size = in.readNum();
-    root = new NSNode(in, null);
+    final byte[] pr = Token.pref(n);
+    return pr.length == 0 ? 0 : ns(pr, root);
   }
 
   /**
-   * Writes the namespaces to disk.
-   * @param out output stream
-   * @throws IOException I/O exception
+   * Returns the number of uri references.
+   * @return number of uri references
    */
-  void write(final DataOutput out) throws IOException {
-    out.writeBytesArray(keys);
-    out.writeNums(next);
-    out.writeNums(bucket);
-    out.writeNum(size);
-    root.write(out);
+  public int size() {
+    return uri.size();
   }
 
   // Requesting Namespaces ====================================================
+
+  /**
+   * Returns the specified prefix.
+   * @param id prefix id
+   * @return prefix
+   */
+  public byte[] pref(final int id) {
+    return pref.key(id);
+  }
+
+  /**
+   * Returns the specified prefix.
+   * @param id prefix id
+   * @return prefix
+   */
+  public byte[] uri(final int id) {
+    return uri.key(id);
+  }
 
   /**
    * Returns the prefix and URI references for the specified pre value.
    * @param pre pre value
    * @return namespace references
    */
-  int[] get(final int pre) {
+  public int[] get(final int pre) {
     return root.find(pre).vals;
   }
 
@@ -128,19 +163,19 @@ public final class Namespaces extends TokenSet {
    * @return namespace URI reference or 0 if no namespace was found
    */
   public int uri(final byte[] name, final int pre) {
-    return ns(pref(name), root.find(pre));
+    return ns(Token.pref(name), root.find(pre));
   }
 
   /**
    * Returns the namespace URI reference for the specified prefix and node,
    * or 0 if namespace cannot be found.
-   * @param pref prefix
+   * @param pr prefix
    * @param node node to start with
    * @return namespace
    */
-  private int ns(final byte[] pref, final NSNode node) {
-    if(eq(XML, pref)) return 0;
-    final int k = id(pref);
+  private int ns(final byte[] pr, final NSNode node) {
+    if(Token.eq(Token.XML, pr)) return 0;
+    final int k = pref.id(pr);
     if(k == 0) return 0;
 
     NSNode nd = node;
@@ -173,10 +208,11 @@ public final class Namespaces extends TokenSet {
    * @param p prefix
    * @param u uri
    * @param pre pre value
+   * @return uri reference
    */
-  public void add(final byte[] p, final byte[] u, final int pre) {
-    final int k = Math.abs(add(p));
-    final int v = Math.abs(add(u));
+  public int add(final byte[] p, final byte[] u, final int pre) {
+    final int k = Math.abs(pref.add(p));
+    final int v = Math.abs(uri.add(u));
     final NSNode nd = root.find(pre);
 
     if(nd.pre != pre) {
@@ -188,6 +224,7 @@ public final class Namespaces extends TokenSet {
     } else {
       nd.add(k, v);
     }
+    return v;
   }
 
   // Printing Namespaces ======================================================
@@ -199,7 +236,6 @@ public final class Namespaces extends TokenSet {
    */
   public byte[] table(final boolean all) {
     if(root.ch.length == 0) return null;
-    //System.out.println(this);
 
     final Table t = new Table();
     t.header.add(TABLEID);
@@ -224,8 +260,8 @@ public final class Namespaces extends TokenSet {
       sl.add(n.vals[i + 1]);
       sl.add(n.pre);
       sl.add(n.pre - n.par.pre);
-      sl.add(string(keys[n.vals[i]]));
-      sl.add(string(keys[n.vals[i + 1]]));
+      sl.add(Token.string(pref.key(n.vals[i])));
+      sl.add(Token.string(uri.key(n.vals[i + 1])));
       t.contents.add(sl);
     }
     if(all || n.vals.length == 0) for(final NSNode c : n.ch) table(t, c, all);
@@ -265,15 +301,14 @@ public final class Namespaces extends TokenSet {
    */
   private void info(final ObjectMap<TokenList> map, final NSNode n) {
     for(int i = 0; i < n.vals.length; i += 2) {
-      final byte[] key = keys[n.vals[i + 1]];
-      final byte[] val = keys[n.vals[i]];
+      final byte[] key = uri.key(n.vals[i + 1]);
+      final byte[] val = pref.key(n.vals[i]);
       TokenList old = map.get(key);
       if(old == null) {
         old = new TokenList();
         map.put(key, old);
       }
       if(!old.contains(val)) old.add(val);
-      //map.put(key, old);
     }
     for(final NSNode c : n.ch) info(map, c);
   }

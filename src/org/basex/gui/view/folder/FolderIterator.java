@@ -22,7 +22,7 @@ final class FolderIterator {
   int pre;
 
   /** Stack for parent nodes. */
-  private final int[] parents = new int[IO.BLOCKSIZE];
+  private final int[] parents = new int[IO.MAXHEIGHT];
   /** Panel height. */
   private final int height;
   /** Flag for a found context node. */

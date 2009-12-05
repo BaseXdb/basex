@@ -357,10 +357,10 @@ public final class GUI extends JFrame {
   public void xquery(final String qu, final boolean main) {
     // check and add default namespace
     final Namespaces ns = context.data.ns;
-    final int uri = ns.uri(Token.EMPTY, 0);
+    final int u = ns.uri(Token.EMPTY, 0);
     String in = qu.trim().isEmpty() ? "." : qu;
-    if(uri != 0) in = Main.info("declare default element namespace \"%\"; %",
-        ns.key(uri), in);
+    if(u != 0) in = Main.info("declare default element namespace \"%\"; %",
+        ns.uri(u), in);
 
     execute(new XQuery(in), main);
   }

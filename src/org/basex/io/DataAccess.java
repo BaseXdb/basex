@@ -3,7 +3,6 @@ package org.basex.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import org.basex.core.Prop;
 import org.basex.util.Num;
 
 /**
@@ -21,18 +20,6 @@ public final class DataAccess {
   private long len;
   /** Offset. */
   private int off;
-
-  /**
-   * Constructor, initializing the file reader.
-   * @param db name of the database
-   * @param fn the file to be read
-   * @param pr database properties
-   * @throws IOException IO Exception
-   */
-  public DataAccess(final String db, final String fn, final Prop pr)
-      throws IOException {
-    this(pr.dbfile(db, fn));
-  }
 
   /**
    * Constructor, initializing the file reader.

@@ -67,12 +67,11 @@ public final class FTFuzzy extends FTIndex {
    */
   public FTFuzzy(final Data d) throws IOException {
     super(d);
-    final String db = d.meta.name;
-    ti = new DataAccess(db, DATAFTX + 'y', d.meta.prop);
-    dat = new DataAccess(db, DATAFTX + 'z', d.meta.prop);
 
     // cache token length index
-    li = new DataAccess(db, DATAFTX + 'x', d.meta.prop);
+    ti = new DataAccess(d.meta.file(DATAFTX + 'y'));
+    dat = new DataAccess(d.meta.file(DATAFTX + 'z'));
+    li = new DataAccess(d.meta.file(DATAFTX + 'x'));
     for(int i = 0; i < tp.length; i++) tp[i] = -1;
     int is = li.read1();
     while(--is >= 0) {

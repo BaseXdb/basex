@@ -30,7 +30,9 @@ public final class StopWords extends TokenSet {
    * @throws IOException IOExcetion
    */
   public StopWords(final Data dat) throws IOException {
-    read(new DataInput(getFile(dat)));
+    final DataInput in = new DataInput(getFile(dat));
+    read(in);
+    in.close();
   }
 
   /**
@@ -42,7 +44,9 @@ public final class StopWords extends TokenSet {
    */
   public StopWords(final Data dat, final String file) throws IOException {
     if(!dat.meta.prop.get(Prop.FTSTOPW).equals("")) read(IO.get(file), false);
-    write(new DataOutput(getFile(dat)));
+    final DataOutput out = new DataOutput(getFile(dat));
+    write(out);
+    out.close();
   }
 
   /**
@@ -51,33 +55,7 @@ public final class StopWords extends TokenSet {
    * @return database stopword list file
    */
   private File getFile(final Data dat) {
-    return dat.meta.prop.dbfile(dat.meta.name, DATASWL);
-  }
-
-  /**
-   * Reads the database stopword list from disk.
-   * @param in input stream
-   * @throws IOException I/O exception
-   */
-  private void read(final DataInput in) throws IOException {
-    keys = in.readBytesArray();
-    next = in.readNums();
-    bucket = in.readNums();
-    size = in.readNum();
-    in.close();
-  }
-
-  /**
-   * Writes the database stopword list to disk.
-   * @param out output stream
-   * @throws IOException I/O exception
-   */
-  private void write(final DataOutput out) throws IOException {
-    out.writeBytesArray(keys);
-    out.writeNums(next);
-    out.writeNums(bucket);
-    out.writeNum(size);
-    out.close();
+    return dat.meta.file(DATASWL);
   }
 
   /**

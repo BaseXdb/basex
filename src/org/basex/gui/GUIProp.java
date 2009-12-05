@@ -87,7 +87,7 @@ public final class GUIProp extends AProp {
   /** Flag for realtime context switch. */
   public static final Object[] FILTERRT = { "FILTERRT", false };
   /** Flag for realtime context switch. */
-  public static final Object[] EXECRT = { "EXECRT", true };
+  public static final Object[] EXECRT = { "EXECRT", false };
 
   /** Show attributes in treemap. */
   public static final Object[] MAPATTS = { "MAPATTS", false };

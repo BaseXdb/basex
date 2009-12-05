@@ -280,20 +280,20 @@ public final class DeepFS implements DataText {
   private MemData buildFileNode(final String path, final int mode) {
     final String fname = basename(path);
     final int nodeSize = 11; // 1x elem, 10x attr
-    final MemData m = new MemData(nodeSize, data);
+    final MemData m = new MemData(data);
     final int tagID = isReg(mode) ? fileID : dirID;
     final byte [] time = token(System.currentTimeMillis());
-    m.addElem(tagID , 0, 1, nodeSize, nodeSize, false);
-    m.addAtt(nameID , 0, token(fname), 1);
-    m.addAtt(sizeID , 0, ZERO, 2);
-    m.addAtt(modeID , 0, token(mode), 3);
-    m.addAtt(uidID  , 0, token(getUID()), 4);
-    m.addAtt(gidID  , 0, token(getGID()), 5);
-    m.addAtt(atimeID, 0, time, 6);
-    m.addAtt(ctimeID, 0, time, 7);
-    m.addAtt(mtimeID, 0, time, 8);
-    m.addAtt(nlinkID, 0, token("1"), 9);
-    m.addAtt(suffixID, 0, getSuffix(fname), 10);
+    m.insertElem(m.meta.size, 1, tagID, nodeSize, nodeSize, 0, false);
+    m.insertAttr(m.meta.size, 1, nameID, token(fname), 0);
+    m.insertAttr(m.meta.size, 2, sizeID, ZERO, 0);
+    m.insertAttr(m.meta.size, 3, modeID, token(mode), 0);
+    m.insertAttr(m.meta.size, 4, uidID, token(getUID()), 0);
+    m.insertAttr(m.meta.size, 5, gidID, token(getGID()), 0);
+    m.insertAttr(m.meta.size, 6, atimeID, time, 0);
+    m.insertAttr(m.meta.size, 7, ctimeID, time, 0);
+    m.insertAttr(m.meta.size, 8, mtimeID, time, 0);
+    m.insertAttr(m.meta.size, 9, nlinkID, token("1"), 0);
+    m.insertAttr(m.meta.size, 10, suffixID, getSuffix(fname), 0);
     return m;
   }
 
@@ -360,8 +360,10 @@ public final class DeepFS implements DataText {
    * @return attribute or empty token.
    */
   private byte[] attr(final int pre, final int at) {
-    final byte[] att = data.attValue(at, pre);
-    return att != null ? att : EMPTY;
+    final int a = pre + data.attSize(pre, data.kind(pre));
+    int p = pre;
+    while(++p != a) if(data.name(p) == at) return data.text(p, false);
+    return EMPTY;
   }
 
   /**
@@ -517,8 +519,8 @@ public final class DeepFS implements DataText {
    * @return result of comparison
    */
   public boolean isFile(final int pre) {
-    return data.kind(pre) == Data.ELEM
-        && data.tagID(pre) == data.tags.id(DataText.FILE);
+    return data.kind(pre) == Data.ELEM &&
+      data.name(pre) == data.tags.id(DataText.FILE);
   }
 
   /**
@@ -527,8 +529,8 @@ public final class DeepFS implements DataText {
    * @return result of comparison
    */
   public boolean isDir(final int pre) {
-    return data.kind(pre) == Data.ELEM
-        && data.tagID(pre) == data.tags.id(DataText.DIR);
+    return data.kind(pre) == Data.ELEM &&
+      data.name(pre) == data.tags.id(DataText.DIR);
   }
 
   /**

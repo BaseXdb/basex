@@ -63,17 +63,17 @@ public final class Optimize extends ACreate {
         parStack[level++] = pre;
         if(path) data.path.add(0, level, kind);
       } else if(kind == Data.ELEM) {
-        final int id = data.tagID(pre);
+        final int id = data.name(pre);
         data.tags.index(data.tags.key(id), null, true);
         if(path) data.path.add(id, level, kind);
         tagStack[level] = id;
         parStack[level++] = pre;
       } else if(kind == Data.ATTR) {
-        final int id = data.attNameID(pre);
-        data.atts.index(data.atts.key(id), data.attValue(pre), true);
+        final int id = data.name(pre);
+        data.atts.index(data.atts.key(id), data.text(pre, false), true);
         if(path) data.path.add(id, level, kind);
       } else {
-        final byte[] txt = data.text(pre);
+        final byte[] txt = data.text(pre, true);
         if(kind == Data.TEXT) data.tags.index(tagStack[level - 1], txt);
         if(path) data.path.add(0, level, kind);
       }

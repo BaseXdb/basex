@@ -51,8 +51,8 @@ public final class CreateDB extends ACreate {
   @Override
   protected boolean exec(final PrintOutput out) {
     final IO io = IO.get(args[0]);
-    if(!io.exists()) return error(FILEWHICH, io);
-    return build(new DirParser(io, prop), args[1]);
+    return io.exists() ? build(new DirParser(io, prop), args[1]) :
+      error(FILEWHICH, io);
   }
 
   /**
@@ -62,13 +62,13 @@ public final class CreateDB extends ACreate {
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static Data emptyXml(final Context ctx, final String name)
+  public static Data empty(final Context ctx, final String name)
       throws IOException {
     return xml(ctx, Parser.emptyParser(IO.get(name), ctx.prop), name);
   }
 
   /**
-   * Creates a database for the specified XML document.
+   * Creates a database for the specified file.
    * @param ctx database context
    * @param io file reference
    * @param name name of the database
@@ -85,8 +85,7 @@ public final class CreateDB extends ACreate {
    * Creates a database instance from the specified parser.
    * @param ctx database context
    * @param p xml parser
-   * @param db name of the database to be created; if db is <code>null</code>,
-   * a main memory instance is created
+   * @param db name of the database
    * @return database instance
    * @throws IOException I/O exception
    */
@@ -130,8 +129,7 @@ public final class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a main memory database from the specified
-   * input reference.
+   * Creates a main memory database from the specified input reference.
    * @param io file reference
    * @param pr database properties
    * @return database instance

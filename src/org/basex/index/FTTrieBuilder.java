@@ -55,9 +55,7 @@ public final class FTTrieBuilder extends FTBuilder {
 
   @Override
   void write() throws IOException {
-    final String db = data.meta.name;
-    final Prop pr = data.meta.prop;
-    final DataOutput outb = new DataOutput(pr.dbfile(db, DATAFTX + 'b'));
+    final DataOutput outb = new DataOutput(data.meta.file(DATAFTX + 'b'));
 
     if(scm == 0) hash.init();
     else hash.initIter();
@@ -82,10 +80,10 @@ public final class FTTrieBuilder extends FTBuilder {
     // v1= the first byte of each token n1 points, ...
     // s = size of pre values saved at pointer p
     // [byte, byte[l], byte, int, byte, ..., int, long]
-    final DataOutput outN = new DataOutput(pr.dbfile(db, DATAFTX + 'a'));
+    final DataOutput outN = new DataOutput(data.meta.file(DATAFTX + 'a'));
     // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
     // each node entries size is stored here
-    final DataOutput outS = new DataOutput(pr.dbfile(db, DATAFTX + 'c'));
+    final DataOutput outS = new DataOutput(data.meta.file(DATAFTX + 'c'));
 
     // document contains any text nodes -> empty index created;
     // only root node is kept

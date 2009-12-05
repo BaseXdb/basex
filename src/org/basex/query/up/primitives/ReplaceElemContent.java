@@ -15,7 +15,7 @@ import org.basex.query.util.Err;
  */
 public final class ReplaceElemContent extends UpdatePrimitive {
   /** Replacing text node. */
-  public byte[] r;
+  public byte[] txt;
 
   /**
    * Constructor.
@@ -24,7 +24,7 @@ public final class ReplaceElemContent extends UpdatePrimitive {
    */
   public ReplaceElemContent(final Nod n, final byte[] tn) {
     super(n);
-    r = tn;
+    txt = tn;
   }
 
   @Override
@@ -34,7 +34,7 @@ public final class ReplaceElemContent extends UpdatePrimitive {
     final Data d = n.data;
     final int j = p + d.attSize(p, Data.ELEM);
     while(p + d.size(p, Data.ELEM) > j) d.delete(j);
-    if(r.length > 0) d.insert(j, p, r, Data.TEXT);
+    if(txt.length > 0) d.insert(j, p, txt, Data.TEXT);
   }
 
   @Override

@@ -39,25 +39,14 @@ public final class RenamePrimitive extends NewValue {
     final byte[] nm = name.str();
     final byte[] uri = name.uri.str();
     final byte[] pref = pref(nm);
+    final int k = data.kind(pre);
 
     // [CG] XQuery/Update Namespaces: check if empty uris cause troubles...
+    //   should pi's be skipped here?
     if(data.ns.uri(nm, pre) == 0 && uri.length != 0) {
-      data.ns.add(pref, uri, pre);
-      data.ns(pre, data.ns.id(pref));
+      data.uri(pre, k, data.ns.add(pref, uri, pre));
     }
-
-    // passed on pre value must refer to element, attribute node or pi
-    final int k = data.kind(pre);
-    // [LK] update methods should consider namespace, defined in QName (name)
-    if(k == Data.ELEM) {
-      data.update(pre, nm);
-    } else if(k == Data.ATTR) {
-      data.update(pre, nm, data.attValue(pre));
-    } else {
-      final byte[] val = data.text(pre);
-      final int i = indexOf(val, ' ');
-      data.update(pre, i == -1 ? nm : concat(nm, SPACE, substring(val, i + 1)));
-    }
+    data.rename(pre, k, nm);
   }
 
   @Override

@@ -93,7 +93,7 @@ final class MapList extends IntList {
     if(textLen != null) {
       d = textLen[list[i]];
     } else {
-      final byte[] val = data.attValue(data.sizeID, list[i]);
+      final byte[] val = ViewData.attValue(data, data.sizeID, list[i]);
       d = val != null ? Token.toLong(val) : 0;
     }
     return d > 1 ? d : 1;

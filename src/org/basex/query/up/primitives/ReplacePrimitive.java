@@ -62,9 +62,9 @@ public final class ReplacePrimitive extends NodeCopy {
     if(node.type != Type.ATT) return null;
     final QNm[] at = new QNm[md.meta.size];
     for(int pre = 0; pre < md.meta.size; pre++) {
-      final int n = md.tagNS(pre);
-      at[pre] = new QNm(md.attName(pre));
-      if(n != 0) at[pre].uri = Uri.uri(md.ns.key(n));
+      final int u = md.uri(pre, Data.ATTR);
+      at[pre] = new QNm(md.name(pre, false));
+      if(u != 0) at[pre].uri = Uri.uri(md.ns.uri(u));
     }
     return at;
   }

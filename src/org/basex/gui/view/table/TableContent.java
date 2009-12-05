@@ -121,9 +121,9 @@ final class TableContent extends BaseXBack {
         if(tb[c].size() < 100) {
           if(tb[c].size() != 0) tb[c].add("; ");
           if(ti.elem) {
-            tb[c].add(data.text(ti.pre));
+            tb[c].add(data.text(ti.pre, true));
           } else {
-            byte[] txt = data.attValue(ti.pre);
+            byte[] txt = data.text(ti.pre, false);
             if(data.fs != null) {
               final boolean size = tdata.cols[c].id == data.sizeID;
               final boolean time = tdata.cols[c].id == data.fs.mtimeID;

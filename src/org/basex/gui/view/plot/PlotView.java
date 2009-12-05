@@ -31,6 +31,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.layout.BaseXSlider;
 import org.basex.gui.view.View;
+import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
@@ -345,7 +346,8 @@ public final class PlotView extends View {
         int ya = calcCoordinate(false, y1) + gui.prop.num(GUIProp.PLOTDOTS);
         final int ww = getWidth();
 
-        final byte[] nm = data.attValue(data.nameID, gui.context.focused);
+        final byte[] nm = ViewData.attValue(data, data.nameID,
+            gui.context.focused);
         String name = nm != null ? string(nm) : "";
         if(name.length() > 0 && plotData.xAxis.attrID != data.nameID &&
             plotData.yAxis.attrID != data.nameID) {

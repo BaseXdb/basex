@@ -175,12 +175,13 @@ final class TableHeader extends BaseXPanel {
     final int w = getWidth() - BaseXBar.SIZE;
     if(header(e.getY())) {
       moveC = colSep(w, mouseX);
+      if(moveC != -1) cursor = CURSORMOVEH;
     } else {
       moveC = -1;
       if(mouseX < w) cursor = CURSORTEXT;
       if(gui.prop.is(GUIProp.MOUSEFOCUS)) {
-        final int col = tdata.column(w, mouseX);
-        if(col != -1) filter(col);
+        final int c = tdata.column(w, mouseX);
+        if(c != -1) filter(c);
       }
     }
     view.gui.cursor(cursor);

@@ -552,7 +552,6 @@ public final class FTTest extends AbstractTest {
         "//fti [text() contains text 'adf' ftor ftnot (ftnot 'adf')]" },
       { "FTUnaryNot 15", nodes(25, 27, 29, 31, 33),
         "//fti [text() contains text 'adf' ftor ftnot 'adf']" },
-
     };
   }
 

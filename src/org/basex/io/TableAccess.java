@@ -1,7 +1,7 @@
 package org.basex.io;
 
 import java.io.IOException;
-import org.basex.core.Prop;
+import org.basex.data.MetaData;
 
 /**
  * This abstract class defines the methods for accessing the
@@ -11,10 +11,8 @@ import org.basex.core.Prop;
  * @author Christian Gruen
  */
 public abstract class TableAccess {
-  /** Database properties. */
-  protected final Prop prop;
-  /** Name of the database. */
-  protected final String db;
+  /** Meta data. */
+  protected final MetaData meta;
   /** Filename prefix. */
   protected final String pref;
   /** Dirty index flag. */
@@ -22,14 +20,12 @@ public abstract class TableAccess {
 
   /**
    * Constructor.
-   * @param nm name of the database
-   * @param f prefix for all files (no ending)
-   * @param pr database properties
+   * @param md meta data
+   * @param pf file prefix
    */
-  public TableAccess(final String nm, final String f, final Prop pr) {
-    db = nm;
-    pref = f;
-    prop = pr;
+  public TableAccess(final MetaData md, final String pf) {
+    meta = md;
+    pref = pf;
   }
 
   /**

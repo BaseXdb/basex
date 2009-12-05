@@ -89,10 +89,10 @@ public final class CreateIndex extends ACreate {
         parStack[level++] = pre;
         data.path.add(0, level, kind);
       } else if(kind == Data.ELEM) {
-        data.path.add(data.tagID(pre), level, kind);
+        data.path.add(data.name(pre), level, kind);
         parStack[level++] = pre;
       } else if(kind == Data.ATTR) {
-        data.path.add(data.attNameID(pre), level, kind);
+        data.path.add(data.name(pre), level, kind);
       } else {
         data.path.add(0, level, kind);
       }

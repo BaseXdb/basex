@@ -23,7 +23,6 @@ import org.deepfs.fsml.util.DeepFile.XMLContent;
  * @author Bastian Lemke
  */
 public class FSMLSerializer {
-
   /** The DeepFile to serialize. */
   private final DeepFile deepFile;
   /** The output to write the xml data to. */

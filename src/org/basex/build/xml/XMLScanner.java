@@ -53,8 +53,6 @@ public final class XMLScanner extends Progress {
   String encoding = UTF8;
   /** Current token type. */
   Type type;
-  /** Whitespace flag. */
-  boolean ws;
 
   /** Index for all entity names. */
   private final TokenMap ents;
@@ -113,6 +111,7 @@ public final class XMLScanner extends Progress {
       final int ch = nextChar();
       if(ch != '?' || nextChar() != '>') error(DECLWRONG);
     }
+    if(!s(consume())) prev(1);
   }
 
   /**
@@ -300,7 +299,7 @@ public final class XMLScanner extends Progress {
    */
   private void content(final int ch) throws IOException {
     type = Type.TEXT;
-    ws = true;
+    boolean ws = true;
     boolean f = true;
     int c = ch;
     while(c != 0) {
@@ -333,6 +332,7 @@ public final class XMLScanner extends Progress {
       c = consume();
       f = false;
     }
+    if(ws) type = Type.EOF;    
   }
 
   /**

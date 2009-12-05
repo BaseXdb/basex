@@ -36,7 +36,7 @@ public final class PendingUpdates {
   // [LK] problem is fixed; prop instance from main context could be adopted,
   // though (QueryContext.Context.Prop), if needed at all.
   // could be done in UpdateFunctions.buildDB(...) as well
-  private final Data dataDummy = new MemData(new Prop(false));
+  private static final Data DATADUMMY = new MemData(new Prop(false));
 
   /** The update operations are part of a transform expression. */
   private final boolean t;
@@ -82,7 +82,7 @@ public final class PendingUpdates {
     if(t && (frag || !refs.contains(((DBNode) p.node).data)))
       Err.or(UPNOTCOPIED, p.node);
 
-    final Data d = frag ? dataDummy : ((DBNode) p.node).data;
+    final Data d = frag ? DATADUMMY : ((DBNode) p.node).data;
 
     Primitives prim = primitives.get(d);
     if(prim == null) {

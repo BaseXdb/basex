@@ -21,7 +21,7 @@ public final class PlotAxis {
   /** Tag reference to selected attribute. */
   int attrID;
   /** True if attribute is a tag, false if attribute. */
-  boolean isTag;
+  boolean tag;
   /** Number of different categories for x attribute. */
   int nrCats;
   /** Data type. */
@@ -64,7 +64,7 @@ public final class PlotAxis {
    * (Re)Initializes axis.
    */
   private void initialize() {
-    isTag = false;
+    tag = false;
     type = Kind.INT;
     co = new double[0];
     nrCats = -1;
@@ -88,10 +88,10 @@ public final class PlotAxis {
     if(attribute == null) return false;
     initialize();
     byte[] b = token(attribute);
-    isTag = !contains(b, '@');
+    tag = !contains(b, '@');
     b = delete(b, '@');
     final Data data = plotData.context.data;
-    attrID = isTag ? data.tags.id(b) : data.atts.id(b);
+    attrID = (tag ? data.tags : data.atts).id(b);
     refreshAxis();
     return true;
   }
@@ -103,7 +103,7 @@ public final class PlotAxis {
    */
   void refreshAxis() {
     final Data data = plotData.context.data;
-    final StatsKey key = isTag ? data.tags.stat(attrID) :
+    final StatsKey key = tag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
     type = key.kind;
     if(type == null) return;
@@ -213,7 +213,7 @@ public final class PlotAxis {
     // newer files. the newest file gets the lowest value (max - d + min) but is
     // still displayed on the right end of the plot.
     final Data data = plotData.context.data;
-    if(data.fs != null && !isTag && attrID == data.fs.mtimeID) {
+    if(data.fs != null && !tag && attrID == data.fs.mtimeID) {
       range = ln(max - min);
       return 1 - 1 / range * ln(max - d);
     }
@@ -263,12 +263,8 @@ public final class PlotAxis {
     final int limit = pre + data.size(pre, Data.ELEM);
     for(int p = pre; p < limit; p++) {
       final int kind = data.kind(p);
-      if(kind == Data.ELEM && isTag && attrID == data.tagID(p)) {
-        return data.atom(p);
-      }
-      if(kind == Data.ATTR && !isTag && attrID == data.attNameID(p)) {
-        return data.atom(p);
-      }
+      if((kind == Data.ELEM && tag || kind == Data.ATTR && !tag) &&
+          attrID == data.name(p)) return data.atom(p);
     }
     return EMPTY;
   }

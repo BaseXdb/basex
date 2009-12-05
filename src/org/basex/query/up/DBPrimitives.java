@@ -85,7 +85,7 @@ final class DBPrimitives extends Primitives {
         addElementChanges(m, pre);
         for(int p = pre + 1; p < pre + d.attSize(pre, Data.ELEM); p++) {
           if(!ats.contains(p))
-            changeAttributePool(m, true, new QNm(d.attName(p)));
+            changeAttributePool(m, true, new QNm(d.name(p, false)));
         }
       }
     }

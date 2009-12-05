@@ -119,11 +119,11 @@ final class MapFS extends MapPainter {
           k = data.kind(p);
           if(k == Data.ELEM) {
             if(elem) tb.add('\n');
-            tb.add(data.tag(p));
+            tb.add(data.name(p, true));
             tb.add(": ");
             elem = true;
           } else if(k == Data.TEXT) {
-            tb.add(data.text(p));
+            tb.add(data.text(p, true));
             tb.add('\n');
             elem = false;
           }
@@ -181,7 +181,7 @@ final class MapFS extends MapPainter {
     final int fullsize = full && file && prop.is(GUIProp.MAPFS) ? 1 : 0;
     final int off = (16 << fullsize) + fullsize * 8;
 
-    final byte[] text = tag ? name : data.text(pre);
+    final byte[] text = tag ? name : data.text(pre, true);
     g.setFont(tag ? fullsize == 1 ? lfont : font : mfont);
 
     // determine icon size
@@ -242,7 +242,7 @@ final class MapFS extends MapPainter {
         rect.w -= 24;
         rect.h -= 24;
         g.setColor(Color.black);
-        MapRenderer.drawText(g, rect, data.text(pre),
+        MapRenderer.drawText(g, rect, data.text(pre, true),
             prop.num(GUIProp.FONTSIZE));
       }
     }
@@ -294,7 +294,7 @@ final class MapFS extends MapPainter {
     final int size = data.size(pre, Data.ELEM);
     rect.pos = null;
     for(int i = pre; i < pre + size; i++) {
-      if(data.kind(i) == Data.ELEM && data.tagID(i) == fs.contentID) {
+      if(data.kind(i) == Data.ELEM && data.name(i) == fs.contentID) {
         rect.pos = view.gui.context.marked.ftpos.get(i + 1);
         break;
       }

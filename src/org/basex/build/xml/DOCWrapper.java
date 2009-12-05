@@ -71,13 +71,13 @@ public final class DOCWrapper extends Parser {
           }
           builder.startElem(Token.token(n.getNodeName()), atts);
         } else if(n instanceof Text) {
-          builder.text(new TokenBuilder(n.getNodeValue()), false);
+          builder.text(new TokenBuilder(n.getNodeValue()));
         } else if(n instanceof Comment) {
           builder.comment(new TokenBuilder(n.getNodeValue()));
         } else if(n instanceof ProcessingInstruction) {
           builder.pi(new TokenBuilder(n.getNodeName() + ' ' +
               n.getNodeValue()));
-          builder.text(new TokenBuilder(n.getNodeValue()), false);
+          builder.text(new TokenBuilder(n.getNodeValue()));
         }
         nodes++;
       } else {

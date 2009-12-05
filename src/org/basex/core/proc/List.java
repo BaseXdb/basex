@@ -39,9 +39,10 @@ public final class List extends Proc {
     for(final String name : list(context)) {
       DataInput in = null;
       String file = null;
+      final MetaData meta = new MetaData(name, prop);
       try {
-        in = new DataInput(prop.dbfile(name, DATAINFO));
-        final MetaData meta = new MetaData(name, in, prop);
+        in = new DataInput(meta.file(DATAINFO));
+        meta.read(in);
         if(context.perm(User.READ, meta) == -1) file = meta.file.toString();
       } catch(final IOException ex) {
         file = INFODBERR;
@@ -91,9 +92,10 @@ public final class List extends Proc {
 
     for(final String name : dbs) {
       DataInput in = null;
+      final MetaData meta = new MetaData(name, ctx.prop);
       try {
-        in = new DataInput(ctx.prop.dbfile(name, DATAINFO));
-        final MetaData meta = new MetaData(name, in, ctx.prop);
+        in = new DataInput(meta.file(DATAINFO));
+        meta.read(in);
         if(meta.deepfs) dbl.add(name);
       } catch(final IOException ex) {
         Main.debug(ex.getMessage());

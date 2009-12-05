@@ -99,11 +99,11 @@ public class DBNode extends Nod {
   public final byte[] nname() {
     switch(type) {
       case ELM:
-        return data.tag(pre);
+        return data.name(pre, true);
       case ATT:
-        return data.attName(pre);
+        return data.name(pre, false);
       case PI:
-        final byte[] name = data.text(pre);
+        final byte[] name = data.text(pre, true);
         final int i = indexOf(name, ' ');
         return i != -1 ? substring(name, 0, i) : name;
       default:
@@ -123,8 +123,8 @@ public class DBNode extends Nod {
     name.uri = Uri.EMPTY;
     final boolean ns = name.ns();
     if(ns || data.ns.size() != 0) {
-      final int n = ns ? data.ns.uri(nm, pre) : data.tagNS(pre);
-      name.uri = Uri.uri(n > 0 ? data.ns.key(n) : ns ?
+      final int n = ns ? data.ns.uri(nm, pre) : data.uri(pre, data.kind(pre));
+      name.uri = Uri.uri(n > 0 ? data.ns.uri(n) : ns ?
           NSGlobal.uri(pref(nm)) : EMPTY);
     }
     return name;
@@ -132,12 +132,7 @@ public class DBNode extends Nod {
 
   @Override
   public final Atts ns() {
-    if(type != Type.ELM || nsp != null) return nsp;
-    nsp = new Atts();
-    final int[] ns = data.ns(pre);
-    for(int n = 0; n < ns.length; n += 2) {
-      nsp.add(data.ns.key(ns[n]), data.ns.key(ns[n + 1]));
-    }
+    if(type == Type.ELM && nsp == null) nsp = data.ns(pre);
     return nsp;
   }
 
@@ -145,7 +140,7 @@ public class DBNode extends Nod {
   public final byte[] base() {
     if(type != Type.DOC) return EMPTY;
     final IO dir = IO.get(data.meta.file.path());
-    final IO file = IO.get(string(data.text(pre)));
+    final IO file = IO.get(string(data.text(pre, true)));
     return token(dir.merge(file).url());
   }
 
@@ -321,12 +316,12 @@ public class DBNode extends Nod {
   public String toString() {
     switch(type) {
       case ATT:
-        return type + " " + string(data.attName(pre)) + " { \"" +
-          string(data.attValue(pre)) + "\" }";
-      case DOC:
-        return type + " { \"" + data.meta.name + "\" }";
+      case PI:
+        return type + " " + string(nname()) + " { \"" + string(str()) + "\" }";
       case ELM:
-        return type + " " + string(data.tag(pre)) + " { ... }";
+        return type + " " + string(nname()) + " { ... }";
+      case DOC:
+        return type + " { \"" + string(base()) + "\" }";
       default:
         return type + " { \"" + Err.chop(str()) + "\" }";
     }

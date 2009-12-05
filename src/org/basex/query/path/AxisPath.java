@@ -235,7 +235,7 @@ public class AxisPath extends Path {
    */
   private AxisPath children(final QueryContext ctx, final Data data) {
     for(int i = 0; i < step.length; i++) {
-      if(step[i].axis != Axis.DESC) continue;
+      if(step[i].axis != Axis.DESC || step[i].uses(Use.POS, ctx)) continue;
 
       // check if child steps can be retrieved for current step
       ArrayList<PathNode> nodes = pathNodes(data, i);
@@ -289,7 +289,7 @@ public class AxisPath extends Path {
       if(!desc && step[s].axis != Axis.CHILD || step[s].test.kind != Kind.NAME)
         return null;
 
-      final int name = data.tagID(step[s].test.name.ln());
+      final int name = data.tags.id(step[s].test.name.ln());
 
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
       for(final PathNode sn : data.path.desc(in, desc)) {

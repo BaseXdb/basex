@@ -99,7 +99,7 @@ public final class PlotData {
   void refreshItems(final Nodes ctx, final boolean sub) {
     final Data data = context.data;
     final IntList tmpPres = new IntList();
-    final int itmID = data.tagID(item);
+    final int itmID = data.tags.id(item);
 
     if(!sub) {
       pres = ctx.nodes;
@@ -114,7 +114,7 @@ public final class PlotData {
       while(p < nl) {
         final int kind = data.kind(p);
         if(kind == Data.ELEM) {
-          if(data.tagID(p) == itmID) tmpPres.add(p);
+          if(data.name(p) == itmID) tmpPres.add(p);
           p += data.attSize(p, kind);
         } else {
           p++;

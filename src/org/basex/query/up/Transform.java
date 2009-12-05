@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -70,7 +71,7 @@ public final class Transform extends Arr {
       final Item i = ir.next();
       if(i == null || !i.node() || ir.next() != null) Err.or(UPCOPYMULT, this);
       final Data m = UpdateFunctions.buildDB(
-          new NodIter(new Nod[] { (Nod) i }, 1), null);
+          new NodIter(new Nod[] { (Nod) i }, 1), new MemData(ctx.context.prop));
       ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());
       tUpd.addDataReference(m);
     }

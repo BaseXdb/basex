@@ -12,57 +12,22 @@ import org.basex.index.Values;
 import org.basex.io.DataAccess;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.io.TableAccess;
+import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
 import org.basex.query.ft.StopWords;
 import org.basex.util.Token;
 
 /**
- * This class stores and organizes the node table and the index structures for
- * textual content. All nodes in the table are accessed by their
- * implicit pre value. Some restrictions on the data are currently given:
- * <ul>
- * <li>The table is limited to 2^31 entries (pre values are signed int's)</li>
- * <li>A maximum of 2^16 different tag and attribute names is allowed</li>
- * <li>A maximum of 2^4 different namespaces is allowed</li>
- * <li>A tag can have a maximum of 256 attributes</li>
- * </ul>
- * Each node occupies 128 bits. The current storage layout looks like follows:
- *
- * <pre>
- * COMMON ATTRIBUTES:
- * - Byte     0:  KIND: Node kind (0-2)
- * ELEMENT NODES:
- * - Byte     0:  NSPC: Namespace (4-7), NS Definition flag (3)
- * - Byte   1-2:  NAME: Name
- * - Byte     3:  ATTS: Number of attributes
- * - Byte  4- 7:  DIST: Distance to parent node
- * - Byte  8-11:  SIZE: Number of descendants
- * - Byte 12-15:  UNID: Unique Node ID
- * DOCUMENT NODES:
- * - Byte  3- 7:  TEXT: Text reference
- * - Byte  8-11:  SIZE: Number of descendants
- * - Byte 12-15:  UNID: Unique Node ID
- * TEXT, COMMENT, PI NODES:
- * - Byte  3- 7:  TEXT: Text reference
- * - Byte  8-11:  DIST: Distance to parent node
- * - Byte 12-15:  UNID: Unique Node ID
- * ATTRIBUTE NODES:
- * - Byte     0:  NSPC: Namespace (4-7)
- * - Byte   1-2:  NAME: Name
- * - Byte  3- 7:  TEXT: Attribute value reference
- * - Byte    11:  DIST: Distance to parent node
- * - Byte 12-15:  UNID: Unique Node ID
- * </pre>
+ * This class stores and organizes the database table and the index structures
+ * for textual content in a compressed disk structure.
+ * The table mapping is documented in {@link Data}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
 public final class DiskData extends Data {
-  /** Table access file. */
-  public TableAccess table;
   /** Texts access file. */
   private DataAccess texts;
   /** Values access file. */
@@ -75,12 +40,12 @@ public final class DiskData extends Data {
    * @throws IOException IO Exception
    */
   public DiskData(final String db, final Prop pr) throws IOException {
-    DataInput in = null;
+    meta = new MetaData(db, pr);
+
+    final DataInput in = new DataInput(meta.file(DATAINFO));
     try {
       // read meta data and indexes
-      in = new DataInput(pr.dbfile(db, DATAINFO));
-      meta = new MetaData(db, in, pr);
-
+      meta.read(in);
       while(true) {
         final String k = Token.string(in.readBytes());
         if(k.isEmpty()) break;
@@ -100,7 +65,7 @@ public final class DiskData extends Data {
     } catch(final IOException ex) {
       throw ex;
     } finally {
-      if(in != null) try { in.close(); } catch(final IOException ex) { }
+      try { in.close(); } catch(final IOException ex) { }
     }
   }
 
@@ -128,12 +93,10 @@ public final class DiskData extends Data {
   @Override
   public void init() throws IOException {
     // table main memory mode..
-    final String db = meta.name;
-    table = meta.prop.is(Prop.TABLEMEM) ?
-      new TableMemAccess(db, DATATBL, meta.size, meta.prop) :
-      new TableDiskAccess(db, DATATBL, meta.prop);
-    texts = new DataAccess(db, DATATXT, meta.prop);
-    values = new DataAccess(db, DATAATV, meta.prop);
+    table = meta.prop.is(Prop.TABLEMEM) ? new TableMemAccess(meta, DATATBL) :
+      new TableDiskAccess(meta, DATATBL);
+    texts = new DataAccess(meta.file(DATATXT));
+    values = new DataAccess(meta.file(DATAATV));
     super.init();
   }
 
@@ -141,8 +104,8 @@ public final class DiskData extends Data {
    * Writes all meta data to disk.
    * @throws IOException I/O exception
    */
-  public void write() throws IOException {
-    final File file = meta.prop.dbfile(meta.name, DATAINFO);
+  private void write() throws IOException {
+    final File file = meta.file(DATAINFO);
     final DataOutput out = new DataOutput(file);
     meta.write(out);
     out.writeString(DBTAGS);
@@ -202,305 +165,63 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public int id(final int pre) {
-    return table.read4(pre, 12);
-  }
-
-  @Override
-  public int pre(final int id) {
-    // find pre value in table
-    for(int p = id; p < meta.size; p++) if(id == id(p)) return p;
-    for(int p = 0; p < id; p++) if(id == id(p)) return p;
-    // id not found
-    return -1;
-  }
-
-  @Override
-  public int kind(final int pre) {
-    return table.read1(pre, 0) & 0x07;
-  }
-
-  @Override
-  public int parent(final int pre, final int k) {
-    return pre - dist(pre, k);
-  }
-
-  @Override
-  protected int dist(final int pre, final int k) {
-   switch(k) {
-      case ELEM: return table.read4(pre, 4);
-      case TEXT:
-      case COMM:
-      case PI:   return table.read4(pre, 8);
-      case ATTR: return table.read1(pre, 11);
-      default:   return pre + 1;
-    }
-  }
-
-  @Override
-  public int attSize(final int pre, final int k) {
-    return k == ELEM ? table.read1(pre, 3) : 1;
-  }
-
-  @Override
-  public int size(final int pre, final int k) {
-    return k == ELEM || k == DOC ? table.read4(pre, 8) : 1;
-  }
-
-  @Override
-  public int tagID(final int pre) {
-    return table.read2(pre, 1);
-  }
-
-  @Override
-  public int tagNS(final int pre) {
-    return table.read1(pre, 0) >>> 4 & 0x0F;
-  }
-
-  @Override
-  public int[] ns(final int pre) {
-    return (table.read1(pre, 0) & 0x08) != 0 ? ns.get(pre) : new int[] {};
-  }
-
-  @Override
-  public int attNameID(final int pre) {
-    return table.read2(pre, 1);
-  }
-
-  @Override
-  public int attNS(final int pre) {
-    return table.read1(pre, 0) >>> 4 & 0x0F;
-  }
-
-  @Override
-  public byte[] text(final int pre) {
-    return txt(pre, texts);
-  }
-
-  @Override
-  public byte[] attValue(final int pre) {
-    return txt(pre, values);
-  }
-
-  /**
-   * Returns the text of a text/attribute value.
-   * @param pre pre value
-   * @param da text reference
-   * @return disk offset
-   */
-  private byte[] txt(final int pre, final DataAccess da) {
+  public byte[] text(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return (o & 0x8000000000L) != 0 ? token(o) : da.readToken(o);
+    return num(o) ? Token.token((int) o) :
+      (text ? texts : values).readToken(o);
   }
 
   @Override
-  public double textNum(final int pre) {
-    return txtNum(pre, texts);
+  public double textNum(final int pre, final boolean text) {
+    final long o = textOff(pre);
+    return num(o) ? o & (IO.NUMOFF - 1) :
+      Token.toDouble((text ? texts : values).readToken(o));
   }
 
   @Override
-  public double attNum(final int pre) {
-    return txtNum(pre, values);
+  public int textLen(final int pre, final boolean text) {
+    final long o = textOff(pre);
+    return num(o) ? Token.numDigits((int) o) :
+      (text ? texts : values).readNum(o);
   }
 
   /**
-   * Returns the double value of the specified pre value.
-   * @param pre pre value
-   * @param da text reference
-   * @return disk offset
+   * Returns true if the specified offset contains a numeric value.
+   * @param o offset
+   * @return result of check
    */
-  private double txtNum(final int pre, final DataAccess da) {
-    final long off = textOff(pre);
-    return (off & 0x8000000000L) != 0 ? (int) off :
-      Token.toDouble(da.readToken(off));
+  private static boolean num(final long o) {
+    return (o & IO.NUMOFF) != 0;
   }
+  
+  // UPDATE OPERATIONS ========================================================
 
   @Override
-  public int textLen(final int pre) {
-    return txtLen(pre, texts);
-  }
-
-  @Override
-  public int attLen(final int pre) {
-    return txtLen(pre, values);
-  }
-
-  /**
-   * Returns the disk offset of a text/attribute value.
-   * @param pre pre value
-   * @param da text reference
-   * @return disk offset
-   */
-  private int txtLen(final int pre, final DataAccess da) {
-    final long off = textOff(pre);
-    return (off & 0x8000000000L) != 0 ? Token.numDigits((int) off) :
-      da.readNum(off);
-  }
-
-  /**
-   * Returns the disk offset of a text/attribute value.
-   * @param pre pre value
-   * @return disk offset
-   */
-  private long textOff(final int pre) {
-    return table.read5(pre, 3);
-  }
-
-  /**
-   * Converts the specified long value into a byte array.
-   * @param i int value to be converted
-   * @return byte array
-   */
-  private static byte[] token(final long i) {
-    int n = (int) i;
-    if(n == 0) return Token.ZERO;
-    int j = Token.numDigits(n);
-    final byte[] num = new byte[j];
-
-    // faster division by 10 for values < 81920 (see {@link Integer#getChars}
-    while(n > 81919) {
-      final int q = n / 10;
-      num[--j] = (byte) (n - (q << 3) - (q << 1) + '0');
-      n = q;
-    }
-    while(n != 0) {
-      final int q = n * 52429 >>> 19;
-      num[--j] = (byte) (n - (q << 3) - (q << 1) + '0');
-      n = q;
-    }
-    return num;
-  }
-
-  /**
-   * Sets the disk offset of a text/attribute value.
-   * @param pre pre value
-   * @param off offset
-   */
-  private void textOff(final int pre, final long off) {
-    table.write5(pre, 3, off);
-  }
-
-  @Override
-  public void dist(final int pre, final int k, final int v) {
-    if(k == ATTR) table.write1(pre, 11, v);
-    else if(k != DOC) table.write4(pre, k == ELEM ? 4 : 8, v);
-  }
-
-  @Override
-  public void attSize(final int pre, final int k, final int v) {
-    if(k == ELEM) table.write1(pre, 3, v);
-  }
-
-  @Override
-  public void size(final int pre, final int k, final int v) {
-    if(k == ELEM || k == DOC) table.write4(pre, 8, v);
-  }
-
-  @Override
-  public void ns(final int pre, final int k) {
-    final int i = table.read1(pre, 0) & 0x07;
-    table.write1(pre, 0, i | k << 4 | (k == 0 ? 0 : 1 << 3));
-  }
-
-  // TABLE UPDATES ============================================================
-
-  @Override
-  protected void update(final int pre, final byte[] val, final boolean txt) {
+  public void text(final int pre, final byte[] val, final boolean txt) {
     final long v = Token.toSimpleInt(val);
     if(v != Integer.MIN_VALUE) {
-      textOff(pre, v | 0x8000000000L);
+      textOff(pre, v | IO.NUMOFF);
     } else {
-      long off = textOff(pre);
-      final boolean replace = (off & 0x8000000000L) == 0 &&
-        val.length <= (txt ? textLen(pre) : attLen(pre));
       final DataAccess da = txt ? texts : values;
-
-      // default: append new text to the end of file
-      if(replace) {
-        // new text is shorter than last one; replace it
-        da.writeBytes(off, val);
+      long o = textOff(pre);
+      if(!num(o) && val.length <= textLen(pre, txt)) {
+        // text is replaced with old one if it is shorter
+        da.writeBytes(o, val);
       } else {
-        // if current text is placed last, replace it with new one
-        if(da.readNum(off) + da.pos() != da.length()) off = da.length();
-        da.writeBytes(off, val);
-        textOff(pre, off);
+        // if old text is numeric or not placed last, append text at the end
+        if(num(o) || da.readNum(o) + da.pos() != da.length()) o = da.length();
+        // otherwise, replace it with new one
+        da.writeBytes(o, val);
+        textOff(pre, o);
       }
     }
   }
 
   @Override
-  protected void insertElem(final int pre, final int dis, final byte[] tag,
-      final int as, final int s) {
-
-    final long id = ++meta.lastid;
-    final int t = tags.index(tag, null, false);
-    table.insert(pre, new byte[] { ELEM, (byte) (t >> 8), (byte) t, (byte) as,
-        (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
-        (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
-    meta.size++;
-  }
-
-  @Override
-  protected void insertDoc(final int pre, final int s, final byte[] val) {
-    // build and insert new entry
-    final long id = ++meta.lastid;
-    final long txt = texts.length();
-    texts.writeBytes(txt, val);
-
-    table.insert(pre, new byte[] { DOC, 0, 0, (byte) (txt >> 32),
-        (byte) (txt >> 24), (byte) (txt >> 16), (byte) (txt >> 8), (byte) txt,
-        (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
-    meta.size++;
-  }
-
-  @Override
-  protected void insertText(final int pre, final int dis, final byte[] val,
-      final int k) {
-
-    // build and insert new entry
-    final long id = ++meta.lastid;
-    final long txt = texts.length();
-    texts.writeBytes(txt, val);
-
-    table.insert(pre, new byte[] { (byte) k, 0, 0, (byte) (txt >> 32),
-        (byte) (txt >> 24), (byte) (txt >> 16), (byte) (txt >> 8), (byte) txt,
-        (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
-    meta.size++;
-  }
-
-  @Override
-  protected void insertAttr(final int pre, final int dis, final byte[] name,
-      final byte[] val) {
-
-    // add attribute to text storage
-    final long len = values.length();
-    values.writeBytes(len, val);
-
-    // build and insert new entry
-    final int att = atts.index(name, val, false);
-    final long id = ++meta.lastid;
-    table.insert(pre, new byte[] { ATTR, (byte) (att >> 8), (byte) att,
-        (byte) (len >> 32), (byte) (len >> 24), (byte) (len >> 16),
-        (byte) (len >> 8), (byte) len, 0, 0, 0, (byte) dis,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
-    meta.size++;
-  }
-
-  @Override
-  protected void tagID(final int pre, final int v) {
-    table.write2(pre, 1, v);
-  }
-
-  @Override
-  protected void attNameID(final int pre, final int v) {
-    table.write2(pre, 1, v);
-  }
-
-  @Override
-  protected void delete(final int pre, final int nr) {
-    table.delete(pre, nr);
+  protected long index(final byte[] txt, final int pre, final boolean text) {
+    final DataAccess da = text ? texts : values;
+    final long off = da.length();
+    da.writeBytes(off, txt);
+    return off;
   }
 }

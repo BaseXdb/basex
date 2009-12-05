@@ -76,8 +76,8 @@ public final class NameTest extends Test {
         if(kind == Kind.STD && !name.ns()) kind = Kind.NAME;
 
         // pre-evaluate unknown tag/attribute names
-        if(kind == Kind.NAME && (type == Type.ELM ? data.tagID(ln) :
-          data.attNameID(ln)) == 0) {
+        if(kind == Kind.NAME && (type == Type.ELM ?
+            data.tags : data.atts).id(ln) == 0) {
             ctx.compInfo(OPTNAME, ln);
             return false;
         }

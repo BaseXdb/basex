@@ -70,16 +70,16 @@ public final class DialogEdit extends Dialog {
     pp.add(label, BorderLayout.NORTH);
 
     if(kind == Data.ELEM) {
-      old1 = string(data.tag(pre));
+      old1 = string(data.name(pre, true));
     } else if(kind == Data.DOC) {
-      old1 = string(data.text(pre));
+      old1 = string(data.text(pre, true));
     } else if(kind == Data.TEXT || kind == Data.COMM) {
-      old3 = data.text(pre);
+      old3 = data.text(pre, true);
     } else if(kind == Data.ATTR) {
-      old1 = string(data.attName(pre));
-      old2 = string(data.attValue(pre));
+      old1 = string(data.name(pre, false));
+      old2 = string(data.text(pre, false));
     } else {
-      final String[] v = string(data.text(pre)).split(" ", 2);
+      final String[] v = string(data.text(pre, true)).split(" ", 2);
       old1 = v[0];
       old3 = v.length == 1 ? EMPTY : token(v[1]);
     }

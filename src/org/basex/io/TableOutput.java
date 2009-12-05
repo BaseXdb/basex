@@ -2,7 +2,7 @@ package org.basex.io;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import org.basex.core.Prop;
+import org.basex.data.MetaData;
 import org.basex.util.IntList;
 
 /**
@@ -24,12 +24,10 @@ public final class TableOutput extends FileOutputStream {
   /** Index Entries. */
   private final IntList blocks = new IntList();
 
-  /** Name of the database. */
-  private final String name;
+  /** Meta data. */
+  private final MetaData meta;
   /** Current Filename. */
   private final String file;
-  /** Database properties. */
-  private final Prop prop;
 
   /** Position inside buffer. */
   private int pos;
@@ -41,17 +39,14 @@ public final class TableOutput extends FileOutputStream {
   /**
    * Initializes the output.
    * The database suffix will be added to all filenames.
-   * @param db name of the database
+   * @param md meta data
    * @param fn the file to be written to
-   * @param pr database properties
    * @throws IOException IO Exception
    */
-  public TableOutput(final String db, final String fn, final Prop pr)
-      throws IOException {
-    super(pr.dbfile(db, fn));
-    name = db;
+  public TableOutput(final MetaData md, final String fn) throws IOException {
+    super(md.file(fn));
+    meta = md;
     file = fn;
-    prop = pr;
   }
 
   @Override
@@ -75,14 +70,11 @@ public final class TableOutput extends FileOutputStream {
     flush();
     super.close();
 
-    final DataOutput info = new DataOutput(prop.dbfile(name, file + 'i'));
+    final DataOutput info = new DataOutput(meta.file(file + 'i'));
     info.writeNum(bcount);
     info.writeNum(bcount);
-    info.writeNum(fpre);
-    info.writeNum(bcount);
-    for(int i = 0; i < bcount; i++) info.writeNum(firstPres.get(i));
-    info.writeNum(bcount);
-    for(int i = 0; i < bcount; i++) info.writeNum(blocks.get(i));
+    info.writeNums(firstPres.finish());
+    info.writeNums(blocks.finish());
     info.close();
   }
 }

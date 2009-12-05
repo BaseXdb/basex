@@ -1,9 +1,6 @@
 package org.basex.test.query;
 
 import org.basex.core.AProp;
-import org.basex.core.Prop;
-import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.data.Nodes;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dec;
@@ -19,8 +16,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 abstract class AbstractTest {
-  /** Dummy data reference. */
-  private static final Data DATA = new MemData(new Prop(false));
   /** Document. */
   String doc;
   /** Queries. */
@@ -40,7 +35,7 @@ abstract class AbstractTest {
    * @return node array
    */
   static Nodes nodes(final int... nodes) {
-    return new Nodes(nodes, DATA);
+    return new Nodes(nodes);
   }
 
   /**

@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
@@ -20,7 +19,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class Values extends Index {
+public final class Values implements Index {
   /** Number of hash entries. */
   int size;
   /** ID references. */
@@ -41,13 +40,11 @@ public final class Values extends Index {
    * @throws IOException IO Exception
    */
   public Values(final Data d, final boolean txt) throws IOException {
-    final String db = d.meta.name;
     data = d;
     text = txt;
     final String file = txt ? DATATXT : DATAATV;
-    final Prop pr = d.meta.prop;
-    idxl = new DataAccess(db, file + 'l', pr);
-    idxr = new DataAccess(db, file + 'r', pr);
+    idxl = new DataAccess(d.meta.file(file + 'l'));
+    idxr = new DataAccess(d.meta.file(file + 'r'));
     size = idxl.readNum();
   }
 
@@ -60,10 +57,7 @@ public final class Values extends Index {
     final IndexStats stats = new IndexStats(data.meta.prop);
     for(int m = 0; m < size; m++) {
       final int oc = idxl.readNum(idxr.read5(m * 5L));
-      if(stats.adding(oc)) {
-        final int p = idxl.readNum();
-        stats.add(text ? data.text(p) : data.attValue(p));
-      }
+      if(stats.adding(oc)) stats.add(data.text(idxl.readNum(), text));
     }
     stats.print(tb);
     return tb.finish();
@@ -147,7 +141,7 @@ public final class Values extends Index {
     for(int l = 0; l < size - 1; l++) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
-      final double v = text ? data.textNum(pre) : data.attNum(pre);
+      final double v = data.textNum(pre, text);
 
       if(!found) {
         found = v == v;
@@ -155,15 +149,13 @@ public final class Values extends Index {
       } else if(v == v) {
         // skip if if min, max and the current value have the same length
         // and if current value is larger
-        if(sl && (text ? data.textLen(pre) : data.attLen(pre)) == mx &&
-            v > max) break;
+        if(sl && data.textLen(pre, text) == mx && v > max) break;
         if(v < min || v > max) continue;
       } else {
         // skip if all numbers have been parsed
-        if((text ? data.text(pre) : data.attValue(pre))[0] > '9') break;
+        if(data.text(pre, text)[0] > '9') break;
         continue;
       }
-
       ids.add(pre);
       for(int d = 0; d < ds - 1; d++) ids.add(pre += idxl.readNum());
     }
@@ -195,7 +187,7 @@ public final class Values extends Index {
       idxl.readNum(pos);
 //      idxl.read4(pos);
       final int pre = idxl.readNum();
-      final byte[] txt = text ? data.text(pre) : data.attValue(pre);
+      final byte[] txt = data.text(pre, text);
       final int d = Token.diff(txt, key);
       if(d == 0) return pos;
       if(d < 0) l = m + 1;

@@ -1,9 +1,7 @@
 package org.basex.build;
 
-import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.DropDB;
@@ -19,8 +17,8 @@ import org.basex.io.TableOutput;
 import org.basex.util.Token;
 
 /**
- * This class creates a disk based database instance. The disk layout is
- * described in the {@link DiskData} class.
+ * This class creates a disk based database instance. The storage layout is
+ * described in the {@link Data} class.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -66,10 +64,10 @@ public final class DiskBuilder extends Builder {
     int bs = IO.BLOCKSIZE;
     while(bs < meta.filesize && bs < 1 << 22) bs <<= 1;
 
-    tout = new DataOutput(new TableOutput(db, DATATBL, pr));
-    xout = new DataOutput(pr.dbfile(db, DATATXT), bs);
-    vout = new DataOutput(pr.dbfile(db, DATAATV), bs);
-    sout = new DataOutput(pr.dbfile(db, DATATMP), bs);
+    tout = new DataOutput(new TableOutput(meta, DATATBL));
+    xout = new DataOutput(meta.file(DATATXT), bs);
+    vout = new DataOutput(meta.file(DATAATV), bs);
+    sout = new DataOutput(meta.file(DATATMP), bs);
   }
 
   @Override
@@ -77,9 +75,8 @@ public final class DiskBuilder extends Builder {
     close();
 
     // copy temporary values into database table
-    final String tmp = meta.name;
-    final TableAccess ta = new TableDiskAccess(tmp, DATATBL, parser.prop);
-    final DataInput in = new DataInput(parser.prop.dbfile(tmp, DATATMP));
+    final TableAccess ta = new TableDiskAccess(meta, DATATBL);
+    final DataInput in = new DataInput(meta.file(DATATMP));
     for(int pre = 0; pre < ssize; pre++) {
       final boolean sz = in.readBool();
       final int p = in.readNum();
@@ -88,7 +85,7 @@ public final class DiskBuilder extends Builder {
     }
     ta.close();
     in.close();
-    parser.prop.dbfile(tmp, DATATMP).delete();
+    meta.file(DATATMP).delete();
 
     // return database instance
     return new DiskData(meta, tags, atts, path, ns);
@@ -98,7 +95,7 @@ public final class DiskBuilder extends Builder {
   public void abort() {
     try {
       close();
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       Main.debug(ex);
     }
     DropDB.drop(meta.name, meta.prop);
@@ -127,26 +124,25 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void addElem(final int t, final int s, final int dis,
-      final int as, final boolean n) throws IOException {
+  public void addElem(final int dis, final int n, final int as, final int u, 
+      final boolean ne) throws IOException {
 
-    tout.write(Data.ELEM + (s << 4) + (n ? 1 << 3 : 0));
-    tout.write2(t);
-    tout.write(as);
+    tout.write(as << 3 | Data.ELEM);
+    tout.write2((ne ? 1 << 15 : 0) | n);
+    tout.write(u);
     tout.writeInt(dis);
     tout.writeInt(as);
     tout.writeInt(meta.size++);
-    if(meta.size < 0) throw new IOException(LIMITRANGE);
   }
 
   @Override
-  public void addAttr(final int t, final int s, final byte[] txt,
-      final int dis) throws IOException {
+  public void addAttr(final int n, final byte[] v, final int dis,
+      final int u) throws IOException {
 
-    tout.write(Data.ATTR + (s << 4));
-    tout.write2(t);
-    tout.write5(inline(txt, false));
-    tout.writeInt(dis);
+    tout.write(dis << 3 | Data.ATTR);
+    tout.write2(n);
+    tout.write5(inline(v, false));
+    tout.writeInt(u);
     tout.writeInt(meta.size++);
   }
 
@@ -172,7 +168,7 @@ public final class DiskBuilder extends Builder {
     // inline integer values...
     long v = Token.toSimpleInt(val);
     if(v != Integer.MIN_VALUE) {
-      v |= 0x8000000000L;
+      v |= IO.NUMOFF;
     } else if(txt) {
       v = txtlen;
       txtlen += xout.writeBytes(val);

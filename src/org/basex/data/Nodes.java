@@ -79,6 +79,16 @@ public final class Nodes implements Result {
     if(d == null) Main.notexpected("No data available");
   }
 
+  /**
+   * Node Set constructor. Only used by test classes, as no data
+   * reference is defined by this constructor.
+   * @param n node set
+   */
+  public Nodes(final int[] n) {
+    nodes = n;
+    size = nodes.length;
+  }
+
   public int size() {
     return size;
   }

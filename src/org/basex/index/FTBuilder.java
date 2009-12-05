@@ -79,7 +79,7 @@ abstract class FTBuilder extends IndexBuilder {
       if(scm == 2) unit.add(pre);
 
       checkStop();
-      wp.init(data.text(pre));
+      wp.init(data.text(pre, true));
       while(wp.more()) {
         final byte[] tok = wp.get();
         // skip too long tokens

@@ -169,7 +169,7 @@ final class TableData {
    */
   private void addCol(final byte[] name, final boolean elem) {
     final Data data = context.data;
-    final int id = elem ? data.tagID(name) : data.attNameID(name);
+    final int id = (elem ? data.tags : data.atts).id(name);
     if(id == 0) return;
     final TableCol col = new TableCol();
     col.id = id;
@@ -190,13 +190,13 @@ final class TableData {
       final int s = p + data.size(p, data.kind(p));
       // find first root tag
       do {
-        if(data.kind(p) == Data.ELEM && data.tagID(p) == root) break;
+        if(data.kind(p) == Data.ELEM && data.name(p) == root) break;
       } while(++p < s);
 
       // parse whole document and collect root tags
       while(p < s) {
         final int k = data.kind(p);
-        if(k == Data.ELEM && data.tagID(p) == root) rows.add(p);
+        if(k == Data.ELEM && data.name(p) == root) rows.add(p);
         p += data.attSize(p, k);
       }
     }
@@ -223,9 +223,11 @@ final class TableData {
       // find all row contents
       ti.init(pre);
       while(ti.more()) {
+        // [CG] !GUI/TableData: check inputs
         // add string length...
-        cols[ti.col].width += ti.elem ? data.textLen(ti.pre) :
-          data.attValue(ti.pre).length;
+        cols[ti.col].width += data.textLen(ti.pre, ti.elem);
+        //cols[ti.col].width += ti.elem ? data.textLen(ti.pre) :
+        //  data.text(ti.pre, false).length;
       }
     }
 
@@ -282,8 +284,7 @@ final class TableData {
       final int s = p + data.size(p, data.kind(p));
       while(p != s) {
         final int k = data.kind(p);
-        if(e && k == Data.ELEM && data.tagID(p) == c ||
-           !e && k == Data.ATTR && data.attNameID(p) == c) {
+        if((e && k == Data.ELEM || !e && k == Data.ATTR) && data.name(p) == c) {
           tokens[r] = data.atom(p);
           break;
         }
@@ -306,7 +307,7 @@ final class TableData {
     if(pre == -1) return -1;
     int p = pre;
     int k = data.kind(p);
-    while(p != -1 && (k != Data.ELEM || data.tagID(p) != root)) {
+    while(p != -1 && (k != Data.ELEM || data.name(p) != root)) {
       p = data.parent(p, k);
       k = p != -1 ? data.kind(p) : 0;
     }

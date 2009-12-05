@@ -75,8 +75,8 @@ public class CmdTest {
   /** Command Test. */
   @Test
   public final void createFS() {
-    ok(new CreateFS("bin", "fs"));
-    ok(new DropDB("fs"));
+    ok(new CreateFS("test", "test"));
+    ok(new DropDB("test"));
   }
 
   /** Command Test. */

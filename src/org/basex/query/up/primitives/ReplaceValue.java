@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -30,15 +29,12 @@ public final class ReplaceValue extends NewValue {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int k = d.kind(n.pre);
-    // [LK] update methods should consider namespace, defined in QName (name)
     final byte[] nn = name.str();
 
-    if(k == Data.TEXT && nn.length == 0)
+    if(k == Data.TEXT && nn.length == 0) {
       d.delete(n.pre);
-    else if(k == Data.ATTR) {
-      d.update(n.pre, d.attName(n.pre), nn);
     } else {
-      d.update(n.pre, k == Data.PI ? concat(n.nname(), SPACE, nn) : nn);
+      d.replace(n.pre, k, nn);
     }
   }
 

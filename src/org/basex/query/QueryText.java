@@ -341,8 +341,8 @@ public interface QueryText {
   /** XPTY0004: Typing Exception. */
   Object[] XPEMPTYPE = { XPTY, 4, "%: % expected, empty sequence found." };
   /** XPTY0004: Typing exception. */
-  Object[] XPEMPTYNUM =
-    { XPTY, 4, "%: number expected, empty sequence found." };
+  Object[] XPEMPTYNUM = { XPTY, 4,
+      "%: number expected, empty sequence found." };
   /** XPTY0004: Typing exception. */
   Object[] XPDUR = { XPTY, 4, "%: duration expected, % found." };
   /** XPTY0004: Typing Exception. */
@@ -490,13 +490,13 @@ public interface QueryText {
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
 
   /** XQTY0024: Parsing exception. */
-  Object[] NOATTALL = { XQTY, 24, "Attribute must follow root element." };
+  Object[] NOATTALL = { XQTY, 24, "Attribute must follow the root element." };
 
   //[LK] xquery update error msgs, work on texts
   /** XUDY0009: XQuery Update dynamic exception. */
   Object[] UPNOPAR = { XUDY, 9, "Target % has no parent." };
   /** XUDY0014: XQuery Update dynamic exception. */
-  Object[] UPNOTCOPIED = { XUDY, 14, "% not copied by copy clause." };
+  Object[] UPNOTCOPIED = { XUDY, 14, "% was not copied by copy clause." };
   /** XUDY0015: XQuery Update dynamic exception. */
   Object[] UPMULTREN = { XUDY, 15, "Multiple renames on %." };
   /** XUDY0016: XQuery Update dynamic exception. */
@@ -510,7 +510,8 @@ public interface QueryText {
   /** XUDY0023: XQuery Update dynamic exception. */
   Object[] UPNSCONFL = { XUDY, 23, "Conflicts with existing namespaces." };
   /** XUDY0024: XQuery Update dynamic exception. */
-  Object[] UPNSCONFL2 = { XUDY, 24, "Namespaces conflict with each other." };
+  Object[] UPNSCONFL2 = { XUDY, 24,
+      "New namespaces conflict with each other." };
   /** XUDY0027: XQuery Update dynamic exception. */
   Object[] UPSEQEMP = { XUDY, 27,
       "Target expression yields an empty sequence." };
@@ -522,33 +523,12 @@ public interface QueryText {
   /** XUDY0031: XQuery Update dynamic exception. */
   Object[] UPURIDUP = { XUDY, 31, "Multiple use of URI: \"%\"." };
 
-  /** XUTY0004: XQuery Update type exception. */
-  Object[] UPNOATTRPER = { XUTY, 4, "Attribute must follow root element." };
-  /** XUTY0005: XQuery Update type exception. */
-  Object[] UPTRGTYP = { XUTY, 5, "Single node expected as target." };
-  /** XUTY0006: XQuery Update type exception. */
-  Object[] UPTRGTYP2 = { XUTY, 6, "Single node expected as target." };
-  /** XUTY0007: XQuery Update type exception. */
-  Object[] UPTRGDELEMPT = { XUTY, 7, "Only nodes can be deleted." };
-  /** XUTY0008: XQuery Update type exception. */
-  Object[] UPTRGMULT = { XUTY, 8, "Single node expected as target." };
-  /** XUTY0011: XQuery Update type exception. */
-  Object[] UPWRELM = { XUTY, 10, "Replace nodes must not be attribute nodes." };
-  /** XUTY0010: XQuery Update type exception. */
-  Object[] UPWRATTR = { XUTY, 11, "Replace nodes must be attribute nodes." };
-  /** XUTY0012: XQuery Update type exception. */
-  Object[] UPWRTRGTYP = { XUTY, 12,
-      "Target must be element, attribute or processing instruction." };
-  /** XUTY0013: XQuery Update type exception. */
-  Object[] UPCOPYMULT = { XUTY, 13,
-      "Source expression in copy clause must return single node." };
-  /** XUTY0022: XQuery Update type exception. */
-  Object[] UPATTELM2 = { XUTY, 22, "Insertion target must be an element." };
-
   /** XUST0001: Parsing exception. */
-  Object[] UPNOT = { XUST, 1, "No updating expression allowed." };
+  Object[] UPNOT = { XUST, 1,
+      "No updating expression allowed in this context." };
   /** XUST0002: Parsing exception. */
-  Object[] UPEXPECT = { XUST, 2, "Updating expression expected." };
+  Object[] UPEXPECT = { XUST, 2,
+      "Updating expression expected in this context." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
   /** XUST0026: Parsing exception. */
@@ -556,6 +536,32 @@ public interface QueryText {
   /** XUST0028: Parsing exception. */
   Object[] UPFUNCTYPE = { XUST, 28,
       "No return type allowed in updating functions." };
+
+  /** XUTY0004: XQuery Update type exception. */
+  Object[] UPNOATTRPER = { XUTY, 4, "Attribute must follow the root element." };
+  /** XUTY0005: XQuery Update type exception. */
+  Object[] UPTRGTYP = { XUTY, 5,
+      "Single element or document expected as target." };
+  /** XUTY0006: XQuery Update type exception. */
+  Object[] UPTRGTYP2 = { XUTY, 6,
+      "Single element, text, comment or pi expected as target." };
+  /** XUTY0007: XQuery Update type exception. */
+  Object[] UPTRGDELEMPT = { XUTY, 7, "Only nodes can be deleted." };
+  /** XUTY0008: XQuery Update type exception. */
+  Object[] UPTRGMULT = { XUTY, 8,
+      "Single element, text, attribute, comment or pi expected as target." };
+  /** XUTY0010: XQuery Update type exception. */
+  Object[] UPWRELM = { XUTY, 10, "Replace nodes must not be attribute nodes." };
+  /** XUTY0011: XQuery Update type exception. */
+  Object[] UPWRATTR = { XUTY, 11, "Replace nodes must be attribute nodes." };
+  /** XUTY0012: XQuery Update type exception. */
+  Object[] UPWRTRGTYP = { XUTY, 12,
+      "Target must be element, attribute or pi." };
+  /** XUTY0013: XQuery Update type exception. */
+  Object[] UPCOPYMULT = { XUTY, 13,
+      "Source expression in copy clause must return single node." };
+  /** XUTY0022: XQuery Update type exception. */
+  Object[] UPATTELM2 = { XUTY, 22, "Insertion target must be an element." };
 
   // OPTIMIZATIONS
 

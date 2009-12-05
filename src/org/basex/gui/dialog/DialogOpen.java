@@ -2,6 +2,7 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -162,9 +163,10 @@ public final class DialogOpen extends Dialog {
       if(ok) {
         doc.setText(db);
         DataInput in = null;
+        final MetaData meta = new MetaData(db, ctx.prop);
         try {
-          in = new DataInput(ctx.prop.dbfile(db, DATAINFO));
-          final MetaData meta = new MetaData(db, in, ctx.prop);
+          in = new DataInput(meta.file(DATAINFO));
+          meta.read(in);
           detail.setText(InfoDB.db(meta, true, true).finish());
           if(WTHROUGH.equals(cmd) && wth.isSelected()) {
             final boolean dec = Dialog.confirm(this,

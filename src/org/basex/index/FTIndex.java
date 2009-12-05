@@ -10,7 +10,7 @@ import org.basex.io.DataAccess;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public abstract class FTIndex extends Index {
+public abstract class FTIndex implements Index {
   /** Cache for number of hits and data reference per token. */
   final FTTokenMap cache = new FTTokenMap();
   /** Values file. */

@@ -1,6 +1,9 @@
 package org.basex.util;
 
+import java.io.IOException;
 import java.util.Arrays;
+import org.basex.io.DataInput;
+import org.basex.io.DataOutput;
 
 /**
  * This is a simple hash set, storing keys in byte arrays.
@@ -13,14 +16,56 @@ public class TokenSet {
   /** Initial hash capacity. */
   protected static final int CAP = 1 << 3;
   /** Hash keys. */
-  protected byte[][] keys = new byte[CAP][];
+  protected byte[][] keys;
   /** Pointers to the next token. */
-  protected int[] next = new int[CAP];
+  protected int[] next;
   /** Hash table buckets. */
-  protected int[] bucket = new int[CAP];
+  protected int[] bucket;
   /** Hash entries. Actual hash size is <code>size - 1</code>. */
   protected int size = 1;
 
+  /**
+   * Constructor.
+   */
+  public TokenSet() {
+    keys = new byte[CAP][];
+    next = new int[CAP];
+    bucket = new int[CAP];
+  }
+  
+  /**
+   * Constructor.
+   * @param in input stream
+   * @throws IOException I/O exception
+   */
+  public TokenSet(final DataInput in) throws IOException {
+    read(in);
+  }
+
+  /**
+   * Reads the token set from the specified input.
+   * @param in input stream
+   * @throws IOException I/O exception
+   */
+  public void read(final DataInput in) throws IOException {
+    keys = in.readBytesArray();
+    next = in.readNums();
+    bucket = in.readNums();
+    size = in.readNum();
+  }
+
+  /**
+   * Writes the token set to the specified output.
+   * @param out output stream
+   * @throws IOException I/O exception
+   */
+  public void write(final DataOutput out) throws IOException {
+    out.writeBytesArray(keys);
+    out.writeNums(next);
+    out.writeNums(bucket);
+    out.writeNum(size);
+  }
+  
   /**
    * Indexes the specified key and returns the offset of the added key.
    * If the key exists already, a negative offset is returned.

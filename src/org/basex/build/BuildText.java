@@ -17,6 +17,20 @@ public interface BuildText {
   String CLOSINGTAG = "%: </%> found, </%> expected.";
   /** Builder error: Tag Mismatch. */
   String MOREROOTS = "%: More than one root node: '<%>'";
+
+  /** Builder error. */
+  String LIMITNS = "%: Document has too many different namespaces (limit: %).";
+  /** Builder error. */
+  String LIMITRANGE = "%: Document is too large for being processed.";
+  /** Builder error. */
+  String LIMITTAGS = "%: Document has too many different tag names (limit: %).";
+  /** Builder error. */
+  String LIMITATTS =
+    "%: Document has too many different attribute names (limit: %).";;
+  /** Builder error. */
+  String LIMITATT =
+    "%: Element has too many different attributes (limit: %).";
+
   /** Parser Error. */
   String PARSEINVALID = "%: % expected, % found.";
   /** Parser Error. */

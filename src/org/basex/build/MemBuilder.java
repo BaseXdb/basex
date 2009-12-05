@@ -1,10 +1,8 @@
 package org.basex.build;
 
-import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.MetaData;
 
 /**
  * This class creates a memory based database instance.
@@ -26,14 +24,14 @@ public final class MemBuilder extends Builder {
 
   @Override
   public void init(final String db) {
-    // always index values in main memory mode
-    meta = new MetaData(db, parser.prop);
+    // index values are always indexed in main memory mode
+    data = new MemData(tags, atts, ns, path, parser.prop);
+    meta = data.meta;
+    meta.name = db;
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;
     meta.file = parser.io;
-    data = new MemData(16, tags, atts, ns, path, parser.prop);
-    data.meta = meta;
   }
 
   /**
@@ -54,25 +52,24 @@ public final class MemBuilder extends Builder {
   public void close() { }
 
   @Override
-  public void addDoc(final byte[] tok) {
-    data.addDoc(tok, 0);
+  public void addDoc(final byte[] txt) {
+    data.insertDoc(meta.size, 0, txt);
   }
 
   @Override
-  public void addElem(final int tok, final int s, final int dis, final int a,
-      final boolean n) throws IOException {
-    data.addElem(tok, s, dis, a, a, n);
-    if(data.meta.size < 0) throw new IOException(LIMITRANGE);
+  public void addElem(final int dis, final int n, final int as, final int u,
+      final boolean ne) {
+    data.insertElem(meta.size, dis, n, as, as, u, ne);
   }
 
   @Override
-  public void addAttr(final int n, final int s, final byte[] v, final int d) {
-    data.addAtt(n, s, v, d);
+  public void addAttr(final int n, final byte[] v, final int d, final int u) {
+    data.insertAttr(meta.size, d, n, v, u);
   }
 
   @Override
-  public void addText(final byte[] tok, final int par, final byte kind) {
-    data.addText(tok, par, kind);
+  public void addText(final byte[] tok, final int dis, final byte kind) {
+    data.insertText(meta.size, dis, tok, kind);
   }
 
   @Override
@@ -82,6 +79,6 @@ public final class MemBuilder extends Builder {
 
   @Override
   public void setAttValue(final int pre, final byte[] val) {
-    data.attValue(pre, val);
+    data.text(pre, val, false);
   }
 }

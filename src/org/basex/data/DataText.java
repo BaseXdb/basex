@@ -13,9 +13,9 @@ public interface DataText {
 
   /** Database version; if it's modified, old database instances can't
    * be parsed anymore. */
-  String STORAGE = "5.84";
+  String STORAGE = "5.9";
   /** Index version; if it's modified, old indexes can't be parsed anymore. */
-  String ISTORAGE = "5.84";
+  String ISTORAGE = "5.9";
 
   /** Database version. */
   String DBSTR = "STORAGE";
