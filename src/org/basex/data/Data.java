@@ -228,7 +228,8 @@ public abstract class Data {
         return text(pre, false);
       case PI:
         final byte[] txt = text(pre, true);
-        return substring(txt, indexOf(txt, ' ') + 1);
+        final int i = indexOf(txt, ' ');
+        return i == -1 ? EMPTY : substring(txt, i + 1);
       default:
         // create atomized text node
         final TokenBuilder tb = new TokenBuilder();
@@ -342,7 +343,7 @@ public abstract class Data {
     if(k == Data.PI) {
       final byte[] name = text(pre, true);
       final int i = indexOf(name, ' ');
-      return i != -1 ? substring(name, 0, i) : name;
+      return i == -1 ? name : substring(name, 0, i);
     }
     return (k == Data.ELEM ? tags : atts).key(name(pre));
   }
@@ -432,12 +433,16 @@ public abstract class Data {
     if(k == Data.PI) {
       text(pre, trim(concat(nm, SPACE, atom(pre))), true);
     } else {
-      // [CG] Data/Namespaces: check
+      // update/set namespace reference
       final int ou = ns.uri(nm, pre);
-      final int u = ou == 0 && uri.length != 0 ? ns.add(nm, uri, pre) :
+      final boolean ne = ou == 0 && uri.length != 0;
+      final int u = ne ? ns.add(pref(nm), uri, pre) :
         ou != 0 && eq(ns.uri(ou), uri) ? ou : 0;
+
+      // write namespace uri reference
       table.write1(pre, k == ELEM ? 3 : 11, u);
-      table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) |
+      // write namespace flag and name reference
+      table.write2(pre, 1, (ne | nsFlag(pre) ? 1 << 15 : 0) |
         (k == ELEM ? tags : atts).index(nm, null, false));
     }
   }
@@ -460,7 +465,6 @@ public abstract class Data {
    */
   public final void delete(final int pre) {
     meta.update();
-    //if(fs != null) fs.delete(pre);
 
     // size of the subtree to delete
     int k = kind(pre);
@@ -477,7 +481,7 @@ public abstract class Data {
       k = kind(par);
     }
 
-    // reduce size of remaining ancestors
+    // reduce size of ancestors
     while(par > 0 && k != DOC) {
       par = parent(par, k);
       k = kind(par);
@@ -537,9 +541,15 @@ public abstract class Data {
           break;
         case ELEM:
           // add element
-          int n = tags.index(dt.name(s, k), null, false);
-          insertElem(p, d, n, dt.attSize(s, k), dt.size(s, k), dt.uri(s, k),
-              dt.nsFlag(s));
+          final boolean ne = dt.nsFlag(s);
+          byte[] nm = dt.name(s, k);
+          if(ne) {
+            final Atts at = dt.ns(s);
+            for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], p);
+          }
+          int u = ns.uri(nm);
+          int n = tags.index(nm, null, false);
+          insertElem(p, d, n, dt.attSize(s, k), dt.size(s, k), u, ne);
           break;
         case TEXT:
         case COMM:
@@ -549,35 +559,26 @@ public abstract class Data {
           break;
         case ATTR:
           // add attribute
-          n = atts.index(dt.name(s, k), null, false);
-          insertAttr(p, d, n, dt.text(s, false), dt.uri(s, k));
+          nm = dt.name(s, k);
+          n = atts.index(nm, null, false);
+          // [CG] check (mergeUpdates-001 ?)...
+          u = ns.uri(nm);
+          System.out.println(u + "/" + dt.uri(s, k));
+          insertAttr(p, d, n, dt.text(s, false), u);
           break;
       }
     }
-    // no document was inserted - update table structure
-    if(par >= 0) updateTable(pre, par, ss);
-    // delete old empty root node
-    if(size(0, DOC) == 1) delete(0);
-    //if(size(0, DOC) == 1 && text(0, true).length == 0) delete(0);
-  }
-
-  /**
-   * This method is called after a table modification. It updates the
-   * size values of the ancestors and the distance values of the
-   * following siblings.
-   * @param pre root node
-   * @param par parent node
-   * @param s size to be added
-   */
-  private void updateTable(final int pre, final int par, final int s) {
-    // increase sizes
+    // increase size of ancestors
     int p = par;
     while(p >= 0) {
       final int k = kind(p);
-      size(p, k, size(p, k) + s);
+      size(p, k, size(p, k) + ss);
       p = parent(p, k);
     }
-    updateDist(pre + s, s);
+    updateDist(pre + ss, ss);
+
+    // delete old empty root node
+    if(size(0, DOC) == 1) delete(0);
   }
 
   /**
@@ -758,11 +759,11 @@ public abstract class Data {
    * @return table
    */
   public String toString(final int s, final int e) {
-    return string(InfoTable.table(this, s, e));
+    return string(InfoTable.table(this, s, e)) + ns.toString(s, e);
   }
 
   @Override
   public String toString() {
-    return string(InfoTable.table(this, 0, meta.size));
+    return toString(0, meta.size);
   }
 }

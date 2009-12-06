@@ -6,7 +6,6 @@ import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
-import org.basex.util.IntList;
 import org.basex.util.TokenSet;
 
 /**
@@ -16,14 +15,6 @@ import org.basex.util.TokenSet;
  * @author Lukas Kircher
  */
 final class FragmentPrimitives extends Primitives {
-  @Override
-  protected void finish() {
-    // get keys (pre values) and sort ascending
-    final IntList il = new IntList(op.size());
-    for(final int i : op.keySet()) il.add(i);
-    nodes = il.finish();
-  }
-
   @Override
   protected void check() throws QueryException {
     super.check();

@@ -98,10 +98,10 @@ public class DBNode extends Nod {
   @Override
   public final byte[] nname() {
     switch(type) {
-      case ELM: return data.name(pre, Data.ELEM);
-      case ATT: return data.name(pre, Data.ATTR);
-      case PI:  return data.name(pre, Data.PI);
-      default:  return EMPTY;
+      case ELM: case ATT: case PI:
+        return data.name(pre, kind(type));
+      default:
+        return EMPTY;
     }
   }
 

@@ -32,9 +32,9 @@ public final class InsertAfter extends NodeCopy {
     final int k = Nod.kind(node.type);
     // [LK] check if parent null?
     d.insert(p + d.size(p, k), d.parent(p, k), md);
-    if(!mergeTextNodes(d, p - 1, p)) {
+    if(!mergeTexts(d, p - 1, p)) {
       final int s = md.meta.size;
-      mergeTextNodes(d, p + s - 1, p + s);
+      mergeTexts(d, p + s - 1, p + s);
     }
   }
 

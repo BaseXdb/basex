@@ -18,18 +18,18 @@ import static org.basex.query.up.UpdateFunctions.*;
  */
 public abstract class NodeCopy extends UpdatePrimitive {
   /** Insertion nodes. */
-  final LinkedList<NodIter> c = new LinkedList<NodIter>();
+  protected final LinkedList<NodIter> c = new LinkedList<NodIter>();
   /** Final copy of insertion nodes. */
   public Data md;
 
   /**
    * Constructor.
    * @param n target node
-   * @param copy node copy
+   * @param ni nodes to be inserted
    */
-  protected NodeCopy(final Nod n, final NodIter copy) {
+  protected NodeCopy(final Nod n, final NodIter ni) {
     super(n);
-    c.add(copy);
+    c.add(ni);
   }
 
   @Override

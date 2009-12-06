@@ -56,11 +56,18 @@ final class NSNode {
   }
 
   /**
-   * Adds the specified child.
+   * Sorts the specified node into the child array.
    * @param n child node
    */
   void add(final NSNode n) {
-    add(n, ch.length);
+    int s = ch.length;
+    while(--s >= 0 && n.pre < ch[s].pre);
+    s++;
+    final NSNode[] tmp = new NSNode[ch.length + 1];
+    System.arraycopy(ch, 0, tmp, 0, s);
+    System.arraycopy(ch, s, tmp, s + 1, ch.length - s);
+    tmp[s] = n;
+    ch = tmp;
   }
 
   /**
@@ -146,28 +153,18 @@ final class NSNode {
     return l - 1;
   }
 
-  /**
-   * Adds a child to the specified position.
-   * @param nd child
-   * @param s inserting position
-   */
-  private void add(final NSNode nd, final int s) {
-    final NSNode[] tmp = new NSNode[ch.length + 1];
-    System.arraycopy(ch, 0, tmp, 0, s);
-    tmp[s] = nd;
-    ch = tmp;
-  }
-
   // Printing Namespaces ======================================================
 
   /**
    * Prints the node structure for debugging purposes.
    * @param ns namespace reference
+   * @param s start pre value
+   * @param e end pre value
    * @return string
    */
-  String print(final Namespaces ns) {
+  String print(final Namespaces ns, final int s, final int e) {
     final TokenBuilder tb = new TokenBuilder();
-    print(tb, 0, ns);
+    print(tb, 0, ns, s, e);
     return tb.toString();
   }
 
@@ -176,21 +173,26 @@ final class NSNode {
    * @param tb string builder
    * @param ns namespace reference
    * @param l level
+   * @param s start pre value
+   * @param e end pre value
    */
-  void print(final TokenBuilder tb, final int l, final Namespaces ns) {
-    tb.add('\n');
-    for(int i = 0; i < l; i++) tb.add("  ");
-    tb.add("Pre[" + pre + "] ");
-    for(int i = 0; i < vals.length; i += 2) {
-      tb.add("xmlns");
-      final byte[] p = ns.pref(vals[i]);
-      if(p.length != 0) tb.add(':');
-      tb.add(p);
-      tb.add("='");
-      tb.add(ns.uri(vals[i + 1]));
-      tb.add("' ");
+  private void print(final TokenBuilder tb, final int l, final Namespaces ns,
+      final int s, final int e) {
+    if(pre >= s && pre <= e) {
+      tb.add('\n');
+      for(int i = 0; i < l; i++) tb.add("  ");
+      tb.add("Pre[" + pre + "] ");
+      for(int i = 0; i < vals.length; i += 2) {
+        tb.add("xmlns");
+        final byte[] p = ns.pref(vals[i]);
+        if(p.length != 0) tb.add(':');
+        tb.add(p);
+        tb.add("=\"");
+        tb.add(ns.uri(vals[i + 1]));
+        tb.add("\" ");
+      }
     }
-    for(final NSNode c : ch) c.print(tb, l + 1, ns);
+    for(final NSNode c : ch) c.print(tb, l + 1, ns, s, e);
   }
 
   @Override

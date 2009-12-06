@@ -138,7 +138,7 @@ public abstract class Nod extends Item {
       final Nod n = parent();
       if(n != null) return n.uri(pref, ctx);
     }
-    return pref.length == 0 ? ctx.nsElem : null;
+    return pref.length == 0 ? Token.EMPTY : null;
   }
 
   /**

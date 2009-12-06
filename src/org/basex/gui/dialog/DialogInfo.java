@@ -12,6 +12,7 @@ import javax.swing.border.EtchedBorder;
 import org.basex.core.Prop;
 import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
+import org.basex.data.DiskData;
 import org.basex.data.MetaData;
 import org.basex.data.XMLSerializer;
 import org.basex.data.Data.Type;
@@ -159,6 +160,8 @@ public final class DialogInfo extends Dialog {
 
     ftedit = !meta.ftxindex;
     indexes[3] = new BaseXCheckBox(INFOFTINDEX, meta.ftxindex, 0, this);
+
+    for(final BaseXCheckBox b : indexes) b.setEnabled(data instanceof DiskData);
 
     p = new BaseXBack();
     p.setLayout(ftedit ? new TableLayout(10, 1) : new BorderLayout());

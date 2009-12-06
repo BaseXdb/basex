@@ -55,7 +55,7 @@ public final class Transform extends Arr {
     }
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
 
-    if(!expr[0].uses(Use.UPD, ctx) && !expr[0].v()) Err.or(UPEXPECT);
+    if(!expr[0].uses(Use.UPD, ctx) && !expr[0].v()) Err.or(UPEXPECTT);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
     ctx.updating = u;
@@ -65,7 +65,7 @@ public final class Transform extends Arr {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
-    final PendingUpdates tUpd = new PendingUpdates(true);
+    final PendingUpdates pu = new PendingUpdates(true);
     for(final Let fo : copies) {
       final Iter ir = fo.expr.iter(ctx);
       final Item i = ir.next();
@@ -73,14 +73,14 @@ public final class Transform extends Arr {
       final Data m = UpdateFunctions.buildDB(
           new NodIter(new Nod[] { (Nod) i }, 1), new MemData(ctx.context.prop));
       ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());
-      tUpd.addDataReference(m);
+      pu.addDataReference(m);
     }
 
-    final PendingUpdates upd = ctx.updates;
-    ctx.updates = tUpd;
+    final PendingUpdates tmp = ctx.updates;
+    ctx.updates = pu;
     ctx.iter(expr[0]).finish();
     ctx.updates.apply();
-    ctx.updates = upd;
+    ctx.updates = tmp;
 
     final Item im = expr[1].iter(ctx).finish();
     ctx.vars.reset(s);

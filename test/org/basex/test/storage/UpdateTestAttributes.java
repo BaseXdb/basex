@@ -52,7 +52,7 @@ public final class UpdateTestAttributes extends UpdateTest {
   public void testAddAttribute() {
     final Data data = CONTEXT.data;
     final long nextid = data.meta.lastid;
-    
+
     final MemData md = new MemData(CONTEXT.data);
     md.insertAttr(0, 1, data.atts.index(FOO, null, false), JUNIT, 0);
     data.insertAttr(9, 6, md);

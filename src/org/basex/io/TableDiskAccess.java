@@ -347,7 +347,7 @@ public final class TableDiskAccess extends TableAccess {
     }
     return pre - firstPre << IO.NODEPOWER;
   }
-  
+
   /**
    * Fetches the requested block and update pointers.
    * @param ind index number of the block to fetch

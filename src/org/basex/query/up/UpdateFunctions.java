@@ -60,10 +60,10 @@ public final class UpdateFunctions {
    * @param b node pre value
    * @return true if nodes have been merged
    */
-  public static boolean mergeTextNodes(final Data d, final int a, final int b) {
+  public static boolean mergeTexts(final Data d, final int a, final int b) {
     // some pre value checks to prevent databases errors
     final int s = d.meta.size;
-    if(a >= s || b >= s || a == b || a < 0 || b < 0) return false;
+    if(a >= s || b >= s) return false;
     if(d.kind(a) != Data.TEXT || d.kind(b) != Data.TEXT) return false;
     if(d.parent(a, Data.TEXT) != d.parent(b, Data.TEXT)) return false;
 

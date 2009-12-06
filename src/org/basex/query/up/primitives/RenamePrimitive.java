@@ -28,7 +28,6 @@ public final class RenamePrimitive extends NewValue {
   @Override
   public void apply(final int add) {
     final DBNode n = (DBNode) node;
-
     final Data data = n.data;
     final int pre = n.pre;
     data.rename(pre, data.kind(pre), name.str(), name.uri.str());

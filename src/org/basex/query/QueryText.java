@@ -527,8 +527,11 @@ public interface QueryText {
   Object[] UPNOT = { XUST, 1,
       "No updating expression allowed in this context." };
   /** XUST0002: Parsing exception. */
-  Object[] UPEXPECT = { XUST, 2,
-      "Updating expression expected in this context." };
+  Object[] UPEXPECTT = { XUST, 2,
+      "Updating expression expected in modify clause." };
+  /** XUST0002: Parsing exception. */
+  Object[] UPEXPECTF = { XUST, 2,
+      "Updating expression expected in function declaration." };
   /** XUST0003: Parsing exception. */
   Object[] DUPLREVAL = { XUST, 3, "Duplicate 'revalidation' declaration." };
   /** XUST0026: Parsing exception. */

@@ -403,8 +403,8 @@ qu_file=in %
 
 # Admin Commands
 ad_databases=% geöffnete Datenbanken
-ad_sessions=%-Recht benötigt.
-ad_permno=% permission needed.
+ad_sessions=% Verbindung(en)
+ad_permno='%'-Recht benötigt.
 ad_perminv=Angabe von ungültigen Benutzerrechten.
 ad_permdel=Benutzerrecht entzogen.
 ad_permadd=Benutzerrecht zugewiesen.

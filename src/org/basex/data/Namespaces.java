@@ -130,30 +130,12 @@ public final class Namespaces {
   // Requesting Namespaces ====================================================
 
   /**
-   * Returns the specified prefix.
-   * @param id prefix id
-   * @return prefix
-   */
-  public byte[] pref(final int id) {
-    return pref.key(id);
-  }
-
-  /**
-   * Returns the specified prefix.
-   * @param id prefix id
+   * Returns the specified namespace uri.
+   * @param id namespace uri reference
    * @return prefix
    */
   public byte[] uri(final int id) {
     return uri.key(id);
-  }
-
-  /**
-   * Returns the prefix and URI references for the specified pre value.
-   * @param pre pre value
-   * @return namespace references
-   */
-  public int[] get(final int pre) {
-    return root.find(pre).vals;
   }
 
   /**
@@ -164,6 +146,24 @@ public final class Namespaces {
    */
   public int uri(final byte[] name, final int pre) {
     return ns(Token.pref(name), root.find(pre));
+  }
+
+  /**
+   * Returns the specified prefix.
+   * @param id prefix reference
+   * @return prefix
+   */
+  byte[] pref(final int id) {
+    return pref.key(id);
+  }
+
+  /**
+   * Returns the prefix and URI references for the specified pre value.
+   * @param pre pre value
+   * @return namespace references
+   */
+  int[] get(final int pre) {
+    return root.find(pre).vals;
   }
 
   /**
@@ -192,7 +192,7 @@ public final class Namespaces {
    * @param pre pre value of the first node to delete
    * @param nr number of entries to be deleted
    */
-  public void delete(final int pre, final int nr) {
+  void delete(final int pre, final int nr) {
     NSNode nd = root.find(pre);
     if(nd.pre == pre) nd = nd.par;
     if(nd == null) root = new NSNode();
@@ -210,8 +210,8 @@ public final class Namespaces {
    * @param pre pre value
    * @return uri reference
    */
-  public int add(final byte[] nm, final byte[] u, final int pre) {
-    final int k = Math.abs(pref.add(Token.pref(nm)));
+  int add(final byte[] nm, final byte[] u, final int pre) {
+    final int k = Math.abs(pref.add(nm));
     final int v = Math.abs(uri.add(u));
     final NSNode nd = root.find(pre);
 
@@ -231,11 +231,12 @@ public final class Namespaces {
 
   /**
    * Returns a tabular representation of the namespaces.
-   * @param all print all namespaces or just the root entries
+   * @param s start pre value
+   * @param e end pre value
    * @return namespaces
    */
-  public byte[] table(final boolean all) {
-    if(root.ch.length == 0) return null;
+  public byte[] table(final int s, final int e) {
+    if(root.ch.length == 0) return Token.EMPTY;
 
     final Table t = new Table();
     t.header.add(TABLEID);
@@ -244,18 +245,20 @@ public final class Namespaces {
     t.header.add(TABLEPREF);
     t.header.add(TABLEURI);
     for(int i = 0; i < 3; i++) t.align.add(true);
-    table(t, root, all);
-    return t.finish();
+    table(t, root, s, e);
+    return t.contents.size() != 0 ? t.finish() : Token.EMPTY;
   }
 
   /**
    * Adds the namespace structure for a node to the specified table.
    * @param t table
    * @param n namespace node
-   * @param all print all namespaces or just the root entries
+   * @param s start pre value
+   * @param e end pre value
    */
-  private void table(final Table t, final NSNode n, final boolean all) {
+  private void table(final Table t, final NSNode n, final int s, final int e) {
     for(int i = 0; i < n.vals.length; i += 2) {
+      if(n.pre < s || n.pre > e) continue;
       final StringList sl = new StringList();
       sl.add(n.vals[i + 1]);
       sl.add(n.pre);
@@ -264,7 +267,7 @@ public final class Namespaces {
       sl.add(Token.string(uri.key(n.vals[i + 1])));
       t.contents.add(sl);
     }
-    if(all || n.vals.length == 0) for(final NSNode c : n.ch) table(t, c, all);
+    if(n.vals.length == 0) for(final NSNode c : n.ch) table(t, c, s, e);
   }
 
   /**
@@ -313,8 +316,18 @@ public final class Namespaces {
     for(final NSNode c : n.ch) info(map, c);
   }
 
+  /**
+   * Returns a string representation of the namespaces.
+   * @param s start pre value
+   * @param e end pre value
+   * @return string
+   */
+  public String toString(final int s, final int e) {
+    return root.print(this, s, e);
+  }
+
   @Override
   public String toString() {
-    return root.print(this);
+    return toString(0, Integer.MAX_VALUE);
   }
 }

@@ -1,7 +1,5 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.basex.query.QueryException;
@@ -9,8 +7,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.QNm;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.Err;
-import org.basex.util.Atts;
+import org.basex.util.IntList;
 
 /**
  * Holds all update primitives for a specific data reference.
@@ -23,18 +20,9 @@ abstract class Primitives {
   protected final Map<Integer, UpdatePrimitive[]> op =
     new HashMap<Integer, UpdatePrimitive[]>();
   /** Pre values of the target nodes which are updated, sorted ascending. */
-  protected int[] nodes;
+  protected IntList nodes;
   /** Static put counter. */
   protected static int putCount;
-
-  /**
-   * Getter.
-   * @return sorted pre values of target nodes
-   */
-  protected final int[] getNodes() {
-    if(nodes == null) finish();
-    return nodes;
-  }
 
   /**
    * Adds a primitive to a primitive list depending on its type.
@@ -65,18 +53,18 @@ abstract class Primitives {
   }
 
   /**
-   * Finishes something. Not finished yet.
-   * [LK] ..to be merged and moved into this class?
-   */
-  protected abstract void finish();
-
-  /**
    * Checks updates for violations.
    * @throws QueryException query exception
    */
   protected void check() throws QueryException {
-    for(final int node : getNodes()) {
-      for(final UpdatePrimitive p : op.get(node)) {
+    // get and sort keys (pre/id values)
+    final int s = op.size();
+    nodes = new IntList(s);
+    for(final int i : op.keySet()) nodes.add(i);
+    nodes.sort();
+
+    for(int i = 0; i < s; i++) {
+      for(final UpdatePrimitive p : op.get(nodes.get(i))) {
         if(p != null) p.prepare();
       }
     }
@@ -89,37 +77,18 @@ abstract class Primitives {
   protected abstract void apply() throws QueryException;
 
   /**
-   * Finds string duplicates in the given map.
+   * Increases or decreases the counters for the given QName set.
    * @param m map reference
-   * @throws QueryException query exception
-   */
-  protected static final void findDuplicates(final Map<QNm, Integer> m)
-      throws QueryException {
-
-    final Atts at = new Atts();
-    for(final QNm name : m.keySet()) {
-      if(m.get(name) > 1) Err.or(UPATTDUPL, name);
-      final byte[] an = name.pref();
-      final byte[] uri = name.uri.str();
-      final int ai = at.get(an);
-      if(ai == -1) at.add(an, uri);
-      else if(!eq(uri, at.val[ai])) Err.or(UPNSCONFL2);
-    }
-  }
-
-  /**
-   * Increases or decreases the counters for the given string set.
-   * @param m map reference
-   * @param add increase if true
+   * @param a increase if true
    * @param s string set
    */
-  protected static final void changeAttributePool(final Map<QNm, Integer> m,
-      final boolean add, final QNm... s) {
+  protected static final void changePool(final Map<QNm, Integer> m,
+      final boolean a, final QNm... s) {
 
     if(s == null) return;
     for(final QNm st : s) {
       final Integer i = m.get(st);
-      m.put(st, (i == null ? 0 : i) + (add ? 1 : -1));
+      m.put(st, (i == null ? 0 : i) + (a ? 1 : -1));
     }
   }
 }

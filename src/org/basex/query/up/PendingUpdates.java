@@ -82,7 +82,7 @@ public final class PendingUpdates {
     Primitives prim = primitives.get(d);
     if(prim == null) {
       // check permissions
-      if(!frag && ctx.context.perm(User.WRITE, d.meta) != -1)
+      if(!t && !frag && ctx.context.perm(User.WRITE, d.meta) != -1)
         throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
 
       prim = frag ? new FragmentPrimitives() : new DBPrimitives(d);

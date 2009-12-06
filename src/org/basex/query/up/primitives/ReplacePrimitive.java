@@ -46,8 +46,8 @@ public final class ReplacePrimitive extends NodeCopy {
       d.insert(p, par , md);
     }
     d.delete(p + md.meta.size);
-    mergeTextNodes(d, p, p + 1);
-    mergeTextNodes(d, p - 1, p);
+    mergeTexts(d, p, p + 1);
+    mergeTexts(d, p - 1, p);
   }
 
   @Override

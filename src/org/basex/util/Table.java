@@ -118,7 +118,7 @@ public class Table {
       }
       tb.add(NL);
     }
-    if(desc != null) tb.add(NL + contents.size() + ' ' + desc + " found.");
+    if(desc != null) tb.add(NL + contents.size() + ' ' + desc + DOT);
     return tb.finish();
   }
 }

@@ -49,7 +49,7 @@ public final class Func extends Single {
     final boolean u = expr.uses(Use.UPD, ctx);
     if(updating) {
       if(var.type != null) Err.or(UPFUNCTYPE);
-      if(!u && !expr.v()) Err.or(UPEXPECT);
+      if(!u && !expr.v()) Err.or(UPEXPECTF);
     } else if(u) {
       Err.or(UPNOT);
     }

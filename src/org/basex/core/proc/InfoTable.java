@@ -76,11 +76,11 @@ public final class InfoTable extends AInfo {
     for(int p = ps; p < pe; p++) table(table, data, p);
     tb.add(table.finish());
 
-    final byte[] ns = data.ns.table(ps == 0 && pe == data.meta.size);
-    if(ns != null) {
+    final byte[] ns = data.ns.table(ps, pe);
+    if(ns.length != 0) {
       tb.add(NL);
       tb.add(ns);
-      tb.add(data.ns);
+      tb.add(data.ns.toString(ps, pe));
       tb.add(NL);
     }
     return tb.finish();
