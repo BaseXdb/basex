@@ -61,9 +61,4 @@ final class BinaryAlgo extends MapAlgo {
 
     return rects;
   }
-
-  @Override
-  String getName() {
-    return "Binary";
-  }
 }

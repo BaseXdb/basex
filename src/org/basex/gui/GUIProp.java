@@ -131,7 +131,7 @@ public final class GUIProp extends AProp {
   /** Path to mapped file hierarchy. */
   public static final Object[] FSBACKING = { "FSBACKING", Prop.HOME };
   /** Name of the DeepFS database. */
-  public static final Object[] FSDBNAME = { "FSDBNAME", "DeepFS_Database" };
+  public static final Object[] FSDBNAME = { "FSDBNAME", "DeepFS" };
   /** Name of the mountpoint. */
   public static final Object[] FSMOUNT = { "FSMOUNT", "/mnt/deepfs" };
   /** Flag indicating the mapping of the complete disk. */

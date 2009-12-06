@@ -2,7 +2,6 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

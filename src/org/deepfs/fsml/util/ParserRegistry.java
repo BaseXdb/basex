@@ -3,7 +3,6 @@ package org.deepfs.fsml.util;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.basex.core.Main;
 import org.deepfs.fsml.parsers.IFileParser;
 import org.deepfs.fsml.parsers.TXTParser;

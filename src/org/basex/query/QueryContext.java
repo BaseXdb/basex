@@ -418,7 +418,7 @@ public final class QueryContext extends Progress {
       try {
         data = Open.open(context, nm);
       } catch(final IOException ex) {
-        Err.or(db ? NODB : NODOC, nm);
+        Err.or(NODB, nm);
       }
     } else {
       final IO file = file();

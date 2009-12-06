@@ -77,15 +77,16 @@ final class DBPrimitives extends Primitives {
     final Map<QNm, Integer> m = new HashMap<QNm, Integer>();
     final IntList ats = new IntList();
     for(final int pre : pres) {
-      // pres consists exclusively of element and attribute nodes
+      // pre values consists exclusively of element and attribute nodes
       if(d.kind(pre) == Data.ATTR) {
         ats.add(pre);
         addElementChanges(m, pre);
       } else {
         addElementChanges(m, pre);
-        for(int p = pre + 1; p < pre + d.attSize(pre, Data.ELEM); p++) {
+        final int pl = pre + d.attSize(pre, Data.ELEM);
+        for(int p = pre + 1; p < pl; p++) {
           if(!ats.contains(p))
-            changeAttributePool(m, true, new QNm(d.name(p, false)));
+            changeAttributePool(m, true, new QNm(d.name(p, Data.ATTR)));
         }
       }
     }

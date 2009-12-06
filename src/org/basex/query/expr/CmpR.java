@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.data.MemData;
 import org.basex.data.StatsKey;
 import org.basex.index.RangeToken;

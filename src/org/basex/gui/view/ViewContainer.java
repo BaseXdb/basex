@@ -85,7 +85,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     gui = main;
     // build layout or use default if something goes wrong
     if(!buildLayout(gui.prop.get(GUIProp.LAYOUT)) && !buildLayout(LAYOUT)) {
-      Main.errln("Could not build layout \"%\"", LAYOUT);
+      Main.errln(Main.name(this) + ": could not build layout \"%\"", LAYOUT);
     }
   }
 
@@ -399,10 +399,10 @@ public final class ViewContainer extends BaseXBack implements Runnable {
         }
       }
       if(nv == views.length) return true;
-      Main.errln("Missing Views: " + cnstr);
+      Main.errln(Main.name(this) + "Missing Views: " + cnstr);
     } catch(final Exception ex) {
       Main.debug(ex);
-      Main.errln("Could not build layout: " + cnstr);
+      Main.errln(Main.name(this) + ": could not build layout: " + cnstr);
     }
     return false;
   }
@@ -417,7 +417,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     for(final ViewPanel view : views) {
       if(view.toString().equals(name)) return view;
     }
-    Main.debug("ViewContainer.getView: Unknown view \"%\"", name);
+    Main.debug(Main.name(this) + ": Unknown view \"%\"", name);
     return null;
   }
 }

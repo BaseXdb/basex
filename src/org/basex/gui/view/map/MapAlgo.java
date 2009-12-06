@@ -7,7 +7,6 @@ package org.basex.gui.view.map;
  * @author Joerg Hauser
  */
 public abstract class MapAlgo {
-
   /**
    * Calculates the average aspect Ratios of rectangles given in the list.
    * @param r Array of rectangles
@@ -41,12 +40,6 @@ public abstract class MapAlgo {
    */
   abstract MapRects calcMap(final MapRect r, final MapList l, final int ns,
       final int ne);
-
-  /**
-   * Returns the name of the algorithm used.
-   * @return name of the alfo
-   */
-  abstract String getName();
 
   /*
    * Calculates the worst aspect ratio of the rectangles given in the list.

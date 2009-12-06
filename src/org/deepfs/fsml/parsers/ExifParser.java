@@ -7,9 +7,7 @@ import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.core.Main;
 import org.basex.query.item.Type;
 import org.basex.util.Token;

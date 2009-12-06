@@ -352,15 +352,15 @@ public class TreeCaching implements TreeViewOptions {
    * @return String with node text
    */
   public String getText(final Data data, final int pre) {
-    final int kind = data.kind(pre);
+    final int k = data.kind(pre);
     TokenBuilder tb = new TokenBuilder();
 
     if(data.meta.deepfs) {
       if(data.fs.isFile(pre)) tb.add(data.fs.name(pre));
       else tb.add(data.text(pre + 1, false));
     } else {
-      if(kind == Data.ELEM) {
-        tb.add(data.name(pre, true));
+      if(k == Data.ELEM) {
+        tb.add(data.name(pre, k));
       } else {
         tb.add(data.text(pre, true));
       }

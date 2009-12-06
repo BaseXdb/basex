@@ -105,7 +105,7 @@ public interface Text {
   // SERVER ===================================================================
 
   /** Server start. */
-  String SERVERSTART = lang("srv_start");
+  String SERVERSTART = lang("srv_start") + DOTS;
   /** Server stop. */
   String SERVERSTOPPED = lang("srv_stop");
   /** Server started. */
@@ -325,7 +325,7 @@ public interface Text {
 
   /** Process time. */
   String PROCTIME = lang("proc_time") + ": %";
-  /** No document warning. */
+  /** Command syntax info. */
   String PROCSYNTAX = lang("proc_syntax") + ": %";
   /** Command execution error. */
   String PROCERR = lang("proc_err") + COL + NL + "%";
@@ -405,6 +405,12 @@ public interface Text {
   String DBOPENED = lang("db_opened");
   /** Database exported. */
   String DBEXPORTED = lang("db_exported");
+  /** Database not deleted. */
+  String DBNOTDELETED = lang("db_notdeleted");
+  /** Document found. */
+  String DBDOC = lang("db_doc");
+  /** Document found. */
+  String DBNODOC = lang("db_nodoc");
 
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
@@ -703,7 +709,7 @@ public interface Text {
   /** Command info. */
   String GUIFILTERTT = lang("c_filtertt");
   /** Command info. */
-  String GUIFONTS = lang("c_fonts");
+  String GUIFONTS = lang("c_fonts") + DOTS;
   /** Command info. */
   String GUIFONTSTT = lang("c_fontstt");
   /** Command info. */
@@ -739,7 +745,7 @@ public interface Text {
   /** Command info. */
   String GUIINSERTTT = lang("c_inserttt");
   /** Command info. */
-  String GUIMAPLAYOUT = lang("c_maplayout");
+  String GUIMAPLAYOUT = lang("c_maplayout") + DOTS;
   /** Command info. */
   String GUIMAPLAYOUTTT = lang("c_maplayouttt");
   /** Command info. */
@@ -768,6 +774,10 @@ public interface Text {
   String GUIRTFILTER = lang("c_rtfilter");
   /** Command info. */
   String GUIRTFILTERTT = lang("c_rtfiltertt");
+  /** Command info. */
+  String GUISERVER = lang("c_server");
+  /** Command info. */
+  String GUISERVERTT = lang("c_servertt");
   /** Command info. */
   String GUISHOWBUTTONS = lang("c_showbuttons");
   /** Command info. */
@@ -844,9 +854,9 @@ public interface Text {
   /** Button text for confirming actions. */
   String BUTTONOK = lang("b_ok");
   /** Button text for confirming actions. */
-  String BUTTONOPT = lang("b_opt");
+  String BUTTONOPT = lang("b_opt") + DOTS;
   /** Button text for opening files. */
-  String BUTTONRENAME = lang("b_rename");
+  String BUTTONRENAME = lang("b_rename") + DOTS;
   /** Button text for opening files. */
   String BUTTONOPEN = lang("b_open");
   /** Button text for mounting database. */
@@ -864,15 +874,23 @@ public interface Text {
   /** Button text for alter password. */
   String BUTTONALTER = lang("b_alter");
   /** Button for starting the server. */
-  String BUTTONSTASERV = lang("b_staserv");
+  String BUTTONSTART = lang("b_start");
   /** Button for starting the server. */
-  String BUTTONSTOSERV = lang("b_stoserv");
+  String BUTTONSTOP = lang("b_stop");
   /** Button for connecting. */
   String BUTTONCONNECT = lang("b_connect");
   /** Button for disconnecting. */
   String BUTTONDISCONNECT = lang("b_disconnect");
   /** Button for refreshing. */
   String BUTTONREFRESH = lang("b_refresh");
+  /** Button for removing. */
+  String BUTTONREMOVE = lang("b_remove");
+  /** Button for deleting. */
+  String BUTTONDELETE = lang("b_delete");
+  /** Button for deleting all. */
+  String BUTTONDELALL = lang("b_delall");
+  /** Button for adding. */
+  String BUTTONADD = lang("b_add");
 
   // STATUS BAR ===============================================================
 
@@ -1000,10 +1018,6 @@ public interface Text {
   /** File dialog replace information. */
   String FILEREPLACE = lang("c_replace");
 
-  /** Server title. */
-  String SRVTITLE = lang("ds_servdia");
-  /** Server. */
-  String SERVERN = lang("ds_server");
   /** Server. */
   String LOCALSERVER = lang("ds_localserver");
   /** Users. */
@@ -1034,6 +1048,8 @@ public interface Text {
   String DATABASES = lang("ds_databases");
   /** Sessions. */
   String SESSIONS = lang("ds_sessions");
+  /** Logs. */
+  String LOGS = lang("ds_logs");
 
   /** Progress text for filesystem import. */
   String CREATEFSPROG = "Traversing filesystem...";
@@ -1076,11 +1092,11 @@ public interface Text {
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
   /** Info for renaming a database. */
-  String RENAMEEXISTS = lang("dr_exists");
+  String RENAMEEXISTS = lang("dr_exists") + DOT;
   /** Info for overwriting  a database. */
-  String RENAMEOVER = lang("dr_over");
+  String RENAMEOVER = lang("dr_over") + DOT;
   /** Info for overwriting a database and deleting backing store. */
-  String RENAMEOVERBACKING = lang("dr_overbacking");
+  String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
 
   /** Dialog title for dropping a database. */
   String DROPTITLE = lang("dd_title");

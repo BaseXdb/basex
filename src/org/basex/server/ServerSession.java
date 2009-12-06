@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import java.io.OutputStream;
-
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
 import org.basex.core.Proc;

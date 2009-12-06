@@ -1,14 +1,12 @@
 package org.basex.test.inex;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.OutputStream;
 import java.util.HashMap;
-
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;

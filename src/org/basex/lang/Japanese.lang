@@ -20,7 +20,7 @@ m_inter=Interaction
 m_layout=レイアウト
 
 # Buttons
-b_ok=  OK
+b_ok=  OK  
 b_opt=最適化
 b_rename=名前の変更
 b_open= 開く
@@ -30,16 +30,19 @@ b_drop=削除
 b_cmd=コマンド
 b_xquery=XQuery
 b_browse=参照
-#b_simple=簡易
 b_search=検索
 b_change=Change
 b_create=Create
 b_alter=Alter
-b_staserv=Start server
-b_stoserv=Stop server
+b_start=Start
+b_stop=Stop
 b_connect=Connect
 b_disconnect=Disconnect
 b_refresh=Refresh
+b_remove=Remove
+b_delete=Delete
+b_delall=Delete All
+b_add=Add
 
 # Status messages
 s_ok=OK
@@ -117,7 +120,7 @@ dfs_meta=メタデータを含める
 dr_title=データベースの名前を変更
 dr_exists=同じ名前のデータベースが存在します。
 dr_over=古いデータベースは上書きされます。
-dr_overbacking=古いデータベースは上書きされます。(backing store will be deleted, too).
+dr_overbacking=古いデータベースは上書きされます。(backing store will be deleted, too)
 
 dd_title=データベースの削除
 dd_question=データベース '%' を削除します。\nよろしいですか。
@@ -283,9 +286,9 @@ c_saveas=Save as
 c_notopened=ファイルが開けませんでした。
 c_notsaved=ファイルを保存できませんでした。
 c_replace=ファイル "%" は既に存在します。\n置換してよろしいですか。
+c_server=Server
+c_servertt=Display the server dialog.
 
-ds_servdia=Server Properties
-ds_server=Server
 ds_localserver=Local Server
 ds_users=Users
 ds_host=Host
@@ -301,6 +304,7 @@ ds_invalid=% is invalid
 ds_login=Login
 ds_databases=Databases
 ds_sessions=Sessions
+ds_logs=Logs
 
 # Commands & Processes
 proc_time=所要時間
@@ -348,6 +352,9 @@ info_nodeepfs=No DeepFS database found
 db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。
+db_notdeleted=File '%' could not be deleted.
+db_doc=Document '%' exists already.
+db_nodoc=Document '%' not found.
 
 # Index commands
 in_created=% にインデックスが作成されました。

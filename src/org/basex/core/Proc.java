@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.Commands.CmdPerm;

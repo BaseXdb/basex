@@ -72,15 +72,17 @@ public final class InfoTable extends AInfo {
     final TokenBuilder tb = new TokenBuilder();
     final int ps = Math.max(0, s);
     final int pe = Math.min(data.meta.size, e);
-    final byte[] ns = data.ns.table(ps == 0 && pe == data.meta.size);
-    if(ns != null) {
-      tb.add(ns);
-      tb.add(NL);
-    }
-
     final Table table = th();
     for(int p = ps; p < pe; p++) table(table, data, p);
     tb.add(table.finish());
+
+    final byte[] ns = data.ns.table(ps == 0 && pe == data.meta.size);
+    if(ns != null) {
+      tb.add(NL);
+      tb.add(ns);
+      tb.add(data.ns);
+      tb.add(NL);
+    }
     return tb.finish();
   }
 
@@ -116,8 +118,8 @@ public final class InfoTable extends AInfo {
     sl.add(data.attSize(p, k));
     sl.add(data.uri(p, k));
     sl.add(TABLEKINDS[k]);
-    sl.add(string(chop(k == Data.ELEM ? data.name(p, true) : k != Data.ATTR ?
-        data.text(p, true) : concat(data.name(p, false), ATT1,
+    sl.add(string(chop(k == Data.ELEM ? data.name(p, k) : k != Data.ATTR ?
+        data.text(p, true) : concat(data.name(p, k), ATT1,
         data.text(p, false), ATT2), 64)).replaceAll("\n", "\\\\n"));
     t.contents.add(sl);
   }

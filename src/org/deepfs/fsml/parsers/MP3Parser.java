@@ -1,14 +1,11 @@
 package org.deepfs.fsml.parsers;
 
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-
 import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.deepfs.fsml.util.BufferedFileChannel;

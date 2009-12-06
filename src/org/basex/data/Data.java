@@ -157,248 +157,6 @@ public abstract class Data {
    */
   public abstract void setIndex(Type type, Index ind);
 
-  // RETRIEVING VALUES ========================================================
-
-  /**
-   * Returns a pre value.
-   * @param id unique node id
-   * @return pre value or -1 if id was not found
-   */
-  public final int pre(final int id) {
-    // find pre value in table
-    for(int p = id; p < meta.size; p++) if(id == id(p)) return p;
-    for(int p = 0; p < id; p++) if(id == id(p)) return p;
-    // id not found
-    return -1;
-  }
-
-  /**
-   * Returns a unique node id.
-   * @param pre pre value
-   * @return node id
-   */
-  public final int id(final int pre) {
-    return table.read4(pre, 12);
-  }
-
-  /**
-   * Returns a node kind.
-   * @param pre pre value
-   * @return node kind
-   */
-  public final int kind(final int pre) {
-    return table.read1(pre, 0) & 0x07;
-  }
-
-  /**
-   * Returns a pre value of the parent node.
-   * @param pre pre value
-   * @param k node kind
-   * @return pre value of the parent node
-   */
-  public final int parent(final int pre, final int k) {
-    return pre - dist(pre, k);
-  }
-
-  /**
-   * Returns the distance of the specified node.
-   * @param pre pre value
-   * @param k node kind
-   * @return distance
-   */
-  protected final int dist(final int pre, final int k) {
-    switch(k) {
-      case ELEM: return table.read4(pre, 4);
-      case TEXT:
-      case COMM:
-      case PI:   return table.read4(pre, 8);
-      case ATTR: return table.read1(pre, 0) >> 3 & 0x1F;
-      default:   return pre + 1;
-    }
-  }
-
-  /**
-   * Returns a size value (number of descendant table entries).
-   * @param pre pre value
-   * @param k node kind
-   * @return size value
-   */
-  public final int size(final int pre, final int k) {
-    return k == ELEM || k == DOC ? table.read4(pre, 8) : 1;
-  }
-
-  /**
-   * Returns a number of attributes.
-   * @param pre pre value
-   * @param k node kind
-   * @return number of attributes
-   */
-  public final int attSize(final int pre, final int k) {
-    return k == ELEM ? table.read1(pre, 0) >> 3 & 0x1F : 1;
-  }
-
-  /**
-   * Returns a reference to the tag or attribute name id
-   * (reference to the tag index).
-   * @param pre pre value
-   * @return token reference
-   */
-  public final int name(final int pre) {
-    return table.read2(pre, 1) & 0x7FFF;
-  }
-
-  /**
-   * Returns a tag or attribute name.
-   * @param pre pre value
-   * @param elem element/attribute flag
-   * @return name reference
-   */
-  public final byte[] name(final int pre, final boolean elem) {
-    return (elem ? tags : atts).key(name(pre));
-  }
-
-  /**
-   * Returns a reference to the tag or attribute namespace URI.
-   * @param pre pre value
-   * @return token reference
-   * @param k node kind
-   */
-  public final int uri(final int pre, final int k) {
-    return k == ELEM || k == ATTR ?
-        table.read1(pre, k == ELEM ? 3 : 11) & 0xFF : 0;
-  }
-
-  /**
-   * Returns a namespace flag.
-   * Should be only called for element nodes.
-   * @param pre pre value
-   * @return namespace flag
-   */
-  public final boolean nsFlag(final int pre) {
-    return (table.read1(pre, 1) & 0x80) != 0;
-  }
-
-  /**
-   * Returns namespace key and value ids.
-   * Should be only called for element nodes.
-   * @param pre pre value
-   * @return key and value ids
-   */
-  public final Atts ns(final int pre) {
-    final Atts as = new Atts();
-    if(nsFlag(pre)) {
-      final int[] nsp = ns.get(pre);
-      for(int n = 0; n < nsp.length; n += 2)
-        as.add(ns.pref(nsp[n]), ns.uri(nsp[n + 1]));
-    }
-    return as;
-  }
-
-  /**
-   * Returns the disk offset of a text/attribute value.
-   * @param pre pre value
-   * @return disk offset
-   */
-  protected final long textOff(final int pre) {
-    return table.read5(pre, 3);
-  }
-
-  /**
-   * Returns a text or attribute value.
-   * @param pre pre value
-   * @param text text/attribute flag
-   * @return atomized value
-   */
-  public abstract byte[] text(int pre, boolean text);
-
-  /**
-   * Returns a text as double value.
-   * @param pre pre value
-   * @param text text/attribute flag
-   * @return numeric value
-   */
-  public abstract double textNum(int pre, boolean text);
-
-  /**
-   * Returns a text length.
-   * @param pre pre value
-   * @param text text/attribute flag
-   * @return length
-   */
-  public abstract int textLen(int pre, boolean text);
-
-  // STORING VALUES ===========================================================
-
-  /**
-   * Sets the distance.
-   * @param pre pre value
-   * @param k node kind
-   * @param v value
-   */
-  public final void dist(final int pre, final int k, final int v) {
-    if(k == ATTR) table.write1(pre, 0, v << 3 | ATTR);
-    else if(k != DOC) table.write4(pre, k == ELEM ? 4 : 8, v);
-  }
-
-  /**
-   * Sets the size value.
-   * @param pre pre reference
-   * @param k node kind
-   * @param v value to be stored
-   */
-  public final void size(final int pre, final int k, final int v) {
-    if(k == ELEM || k == DOC) table.write4(pre, 8, v);
-  }
-
-  /**
-   * Sets the attribute size.
-   * @param pre pre value
-   * @param k node kind
-   * @param v value
-   */
-  public final void attSize(final int pre, final int k, final int v) {
-    if(k == ELEM) table.write1(pre, 0, v << 3 | ELEM);
-  }
-
-  /**
-   * Sets a reference to the tag or attribute namespace URI.
-   * @param pre pre reference
-   * @param k node kind
-   * @param u namespace uri
-   */
-  public final void uri(final int pre, final int k, final int u) {
-    table.write1(pre, k == ELEM ? 3 : 11, u);
-  }
-
-  /**
-   * Stores the tag/attribute name.
-   * @param pre pre value
-   * @param v tag id
-   */
-  protected final void name(final int pre, final int v) {
-    table.write2(pre, 1, v);
-  }
-
-  /**
-   * Sets the disk offset of a text/attribute value.
-   * @param pre pre value
-   * @param off offset
-   */
-  protected final void textOff(final int pre, final long off) {
-    table.write5(pre, 3, off);
-  }
-
-  /**
-   * Updates the specified text or attribute value.
-   * @param pre pre value
-   * @param val content
-   * @param txt text (text, comment or pi) or attribute flag
-   */
-  public abstract void text(final int pre, final byte[] val,
-      final boolean txt);
-
-  // OTHER DATA METHODS =======================================================
-
   /**
    * Returns the indexed id references for the specified token.
    * @param token index token reference
@@ -485,6 +243,217 @@ public abstract class Data {
     }
   }
 
+  // RETRIEVING VALUES ========================================================
+
+  /**
+   * Returns a pre value.
+   * @param id unique node id
+   * @return pre value or -1 if id was not found
+   */
+  public final int pre(final int id) {
+    // find pre value in table
+    for(int p = id; p < meta.size; p++) if(id == id(p)) return p;
+    for(int p = 0; p < id; p++) if(id == id(p)) return p;
+    // id not found
+    return -1;
+  }
+
+  /**
+   * Returns a unique node id.
+   * @param pre pre value
+   * @return node id
+   */
+  public final int id(final int pre) {
+    return table.read4(pre, 12);
+  }
+
+  /**
+   * Returns a node kind.
+   * @param pre pre value
+   * @return node kind
+   */
+  public final int kind(final int pre) {
+    return table.read1(pre, 0) & 0x07;
+  }
+
+  /**
+   * Returns a pre value of the parent node.
+   * @param pre pre value
+   * @param k node kind
+   * @return pre value of the parent node
+   */
+  public final int parent(final int pre, final int k) {
+    return pre - dist(pre, k);
+  }
+
+  /**
+   * Returns the distance of the specified node.
+   * @param pre pre value
+   * @param k node kind
+   * @return distance
+   */
+  protected final int dist(final int pre, final int k) {
+    switch(k) {
+      case ELEM: return table.read4(pre, 4);
+      case TEXT:
+      case COMM:
+      case PI:   return table.read4(pre, 8);
+      case ATTR: return table.read1(pre, 0) >> 3 & 0x1F;
+      default:   return pre + 1;
+    }
+  }
+
+  /**
+   * Returns a size value (number of descendant table entries).
+   * @param pre pre value
+   * @param k node kind
+   * @return size value
+   */
+  public final int size(final int pre, final int k) {
+    return k == ELEM || k == DOC ? table.read4(pre, 8) : 1;
+  }
+
+  /**
+   * Returns a number of attributes.
+   * @param pre pre value
+   * @param k node kind
+   * @return number of attributes
+   */
+  public final int attSize(final int pre, final int k) {
+    return k == ELEM ? table.read1(pre, 0) >> 3 & 0x1F : 1;
+  }
+
+  /**
+   * Returns a reference to the tag or attribute name id.
+   * @param pre pre value
+   * @return token reference
+   */
+  public final int name(final int pre) {
+    return table.read2(pre, 1) & 0x7FFF;
+  }
+
+  /**
+   * Returns a tag, attribute or pi name.
+   * @param pre pre value
+   * @param k node kind
+   * @return name reference
+   */
+  public final byte[] name(final int pre, final int k) {
+    if(k == Data.PI) {
+      final byte[] name = text(pre, true);
+      final int i = indexOf(name, ' ');
+      return i != -1 ? substring(name, 0, i) : name;
+    }
+    return (k == Data.ELEM ? tags : atts).key(name(pre));
+  }
+
+  /**
+   * Returns a reference to the tag or attribute namespace URI.
+   * @param pre pre value
+   * @return token reference
+   * @param k node kind
+   */
+  public final int uri(final int pre, final int k) {
+    return k == ELEM || k == ATTR ?
+        table.read1(pre, k == ELEM ? 3 : 11) & 0xFF : 0;
+  }
+
+  /**
+   * Returns a namespace flag.
+   * Should be only called for element nodes.
+   * @param pre pre value
+   * @return namespace flag
+   */
+  public final boolean nsFlag(final int pre) {
+    return (table.read1(pre, 1) & 0x80) != 0;
+  }
+
+  /**
+   * Returns namespace key and value ids.
+   * Should be only called for element nodes.
+   * @param pre pre value
+   * @return key and value ids
+   */
+  public final Atts ns(final int pre) {
+    final Atts as = new Atts();
+    if(nsFlag(pre)) {
+      final int[] nsp = ns.get(pre);
+      for(int n = 0; n < nsp.length; n += 2)
+        as.add(ns.pref(nsp[n]), ns.uri(nsp[n + 1]));
+    }
+    return as;
+  }
+
+  /**
+   * Returns the disk offset of a text (text, comment, pi) or attribute value.
+   * @param pre pre value
+   * @return disk offset
+   */
+  protected final long textOff(final int pre) {
+    return table.read5(pre, 3);
+  }
+
+  /**
+   * Returns a text (text, comment, pi) or attribute value.
+   * @param pre pre value
+   * @param text text/attribute flag
+   * @return atomized value
+   */
+  public abstract byte[] text(int pre, boolean text);
+
+  /**
+   * Returns a text (text, comment, pi) as double value.
+   * @param pre pre value
+   * @param text text/attribute flag
+   * @return numeric value
+   */
+  public abstract double textNum(int pre, boolean text);
+
+  /**
+   * Returns a text (text, comment, pi) length.
+   * @param pre pre value
+   * @param text text/attribute flag
+   * @return length
+   */
+  public abstract int textLen(int pre, boolean text);
+
+  // UPDATE OPERATIONS ========================================================
+
+  /**
+   * Renames (updates) an element, name or pi name.
+   * @param pre pre value
+   * @param k node kind
+   * @param nm new tag, attribute or pi name
+   * @param uri uri
+   */
+  public final void rename(final int pre, final int k, final byte[] nm,
+      final byte[] uri) {
+    meta.update();
+    if(k == Data.PI) {
+      text(pre, trim(concat(nm, SPACE, atom(pre))), true);
+    } else {
+      // [CG] Data/Namespaces: check
+      final int ou = ns.uri(nm, pre);
+      final int u = ou == 0 && uri.length != 0 ? ns.add(nm, uri, pre) :
+        ou != 0 && eq(ns.uri(ou), uri) ? ou : 0;
+      table.write1(pre, k == ELEM ? 3 : 11, u);
+      table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) |
+        (k == ELEM ? tags : atts).index(nm, null, false));
+    }
+  }
+
+  /**
+   * Replaces (updates) a text, comment, pi or attribute value.
+   * @param pre pre value
+   * @param k node kind
+   * @param val value to be updated (tag name, text, comment, pi)
+   */
+  public final void replace(final int pre, final int k, final byte[] val) {
+    meta.update();
+    final byte[] v = k == PI ? trim(concat(name(pre, k), SPACE, val)) : val;
+    text(pre, v, k != ATTR);
+  }
+
   /**
    * Deletes a node and its descendants.
    * @param pre pre value of the node to delete
@@ -532,40 +501,6 @@ public abstract class Data {
   }
 
   /**
-   * Renames an element, name or pi name.
-   * @param pre pre value
-   * @param k node kind
-   * @param nm new tag, attribute or pi name
-   */
-  public final void rename(final int pre, final int k, final byte[] nm) {
-    meta.update();
-    if(k == PI) {
-      final byte[] val = text(pre, true);
-      final int i = indexOf(val, ' ');
-      text(pre, i == -1 ? nm : concat(nm, SPACE, substring(val, i + 1)), true);
-    } else {
-      name(pre, (k == ELEM ? tags : atts).index(nm, null, false));
-    }
-  }
-
-  /**
-   * Replaces a text, comment, pi or attribute value.
-   * @param pre pre value
-   * @param k node kind
-   * @param val value to be updated (tag name, text, comment, pi)
-   */
-  public final void replace(final int pre, final int k, final byte[] val) {
-    meta.update();
-    byte[] v = val;
-    if(k == PI) {
-      final byte[] o = text(pre, true);
-      final int i = indexOf(o, ' ');
-      v = concat(i == -1 ? o : substring(o, 0, i), SPACE, v);
-    }
-    text(pre, v, k != ATTR);
-  }
-
-  /**
    * Inserts attributes.
    * @param pre pre value
    * @param par parent of node
@@ -602,7 +537,7 @@ public abstract class Data {
           break;
         case ELEM:
           // add element
-          int n = tags.index(dt.name(s, true), null, false);
+          int n = tags.index(dt.name(s, k), null, false);
           insertElem(p, d, n, dt.attSize(s, k), dt.size(s, k), dt.uri(s, k),
               dt.nsFlag(s));
           break;
@@ -614,7 +549,7 @@ public abstract class Data {
           break;
         case ATTR:
           // add attribute
-          n = atts.index(dt.name(s, false), null, false);
+          n = atts.index(dt.name(s, k), null, false);
           insertAttr(p, d, n, dt.text(s, false), dt.uri(s, k));
           break;
       }
@@ -622,7 +557,8 @@ public abstract class Data {
     // no document was inserted - update table structure
     if(par >= 0) updateTable(pre, par, ss);
     // delete old empty root node
-    if(size(0, DOC) == 1 && name(0, true).length == 0) delete(0);
+    if(size(0, DOC) == 1) delete(0);
+    //if(size(0, DOC) == 1 && text(0, true).length == 0) delete(0);
   }
 
   /**
@@ -659,7 +595,56 @@ public abstract class Data {
     }
   }
 
-  // UPDATE OPERATIONS ========================================================
+  /**
+   * Sets the size value.
+   * @param pre pre reference
+   * @param k node kind
+   * @param v value to be stored
+   */
+  public final void size(final int pre, final int k, final int v) {
+    if(k == ELEM || k == DOC) table.write4(pre, 8, v);
+  }
+
+  /**
+   * Sets the disk offset of a text/attribute value.
+   * @param pre pre value
+   * @param off offset
+   */
+  protected final void textOff(final int pre, final long off) {
+    table.write5(pre, 3, off);
+  }
+
+  /**
+   * Updates the specified text or attribute value.
+   * @param pre pre value
+   * @param val content
+   * @param txt text (text, comment or pi) or attribute flag
+   */
+  protected abstract void text(final int pre, final byte[] val,
+      final boolean txt);
+
+  /**
+   * Sets the distance.
+   * @param pre pre value
+   * @param k node kind
+   * @param v value
+   */
+  private void dist(final int pre, final int k, final int v) {
+    if(k == ATTR) table.write1(pre, 0, v << 3 | ATTR);
+    else if(k != DOC) table.write4(pre, k == ELEM ? 4 : 8, v);
+  }
+
+  /**
+   * Sets the attribute size.
+   * @param pre pre value
+   * @param k node kind
+   * @param v value
+   */
+  private void attSize(final int pre, final int k, final int v) {
+    if(k == ELEM) table.write1(pre, 0, v << 3 | ELEM);
+  }
+
+  // INSERTS WITHOUT TABLE UPDATES ============================================
 
   /**
    * Inserts a text node without updating the table structure.
@@ -678,7 +663,7 @@ public abstract class Data {
    * @param val document name
    * @return document entry
    */
-  public final byte[] doc(final int pre, final int sz, final byte[] val) {
+  private byte[] doc(final int pre, final int sz, final byte[] val) {
     // build and insert new entry
     final long id = ++meta.lastid;
     final long v = index(val, pre, true);
@@ -688,8 +673,7 @@ public abstract class Data {
         (byte) (sz >> 24), (byte) (sz >> 16), (byte) (sz >> 8), (byte) sz,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
   }
-  
-  
+
   /**
    * Inserts an element node without updating the table structure.
    * @param pre insert position
@@ -779,7 +763,6 @@ public abstract class Data {
 
   @Override
   public String toString() {
-    //return string(InfoTable.table(this, 0, meta.size));
-    return ns + string(InfoTable.table(this, 0, meta.size));
+    return string(InfoTable.table(this, 0, meta.size));
   }
 }

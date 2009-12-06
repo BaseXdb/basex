@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -17,17 +16,13 @@ import org.basex.query.util.Err;
  * @author Lukas Kircher
  */
 public final class RenamePrimitive extends NewValue {
-  /** Target node is an attribute. */
-  final boolean a;
-
   /**
    * Constructor.
    * @param n target node
-   * @param newName new name
+   * @param nm new name
    */
-  public RenamePrimitive(final Nod n, final QNm newName) {
-    super(n, newName);
-    a = n.type == Type.ATT;
+  public RenamePrimitive(final Nod n, final QNm nm) {
+    super(n, nm);
   }
 
   @Override
@@ -36,17 +31,7 @@ public final class RenamePrimitive extends NewValue {
 
     final Data data = n.data;
     final int pre = n.pre;
-    final byte[] nm = name.str();
-    final byte[] uri = name.uri.str();
-    final byte[] pref = pref(nm);
-    final int k = data.kind(pre);
-
-    // [CG] XQuery/Update Namespaces: check if empty uris cause troubles...
-    //   should pi's be skipped here?
-    if(data.ns.uri(nm, pre) == 0 && uri.length != 0) {
-      data.uri(pre, k, data.ns.add(pref, uri, pre));
-    }
-    data.rename(pre, k, nm);
+    data.rename(pre, data.kind(pre), name.str(), name.uri.str());
   }
 
   @Override
@@ -61,11 +46,11 @@ public final class RenamePrimitive extends NewValue {
 
   @Override
   public QNm[] addAtt() {
-    return a ? new QNm[] { name } : null;
+    return node.type == Type.ATT ? new QNm[] { name } : null;
   }
 
   @Override
   public QNm[] remAtt() {
-    return a ? new QNm[] { node.qname() } : null;
+    return node.type == Type.ATT ? new QNm[] { node.qname() } : null;
   }
 }

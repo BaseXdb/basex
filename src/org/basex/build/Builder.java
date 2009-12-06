@@ -346,6 +346,7 @@ public abstract class Builder extends Progress {
     // add node
     final int dis = level != 0 ? meta.size - parStack[level - 1] : 1;
     final int as = att.size;
+    final boolean ne = ns.open(meta.size);
 
     // get namespace URI reference
     int u = ns.uri(tag);
@@ -353,7 +354,7 @@ public abstract class Builder extends Progress {
     uriStack[level + 1] = uriStack[level];
 
     // store namespaces
-    addElem(dis, n, as + 1, u, ns.open(meta.size));
+    addElem(dis, n, as + 1, u, ne);
 
     // create numeric attribute references
     for(int a = 0; a < as; a++) {

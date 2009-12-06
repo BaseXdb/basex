@@ -737,7 +737,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
       switch(nodeKind) {
         case Data.ELEM:
-          s = Token.string(data.name(pre, true));
+          s = Token.string(data.name(pre, nodeKind));
           g.setColor(Color.BLACK);
           break;
         case Data.COMM:

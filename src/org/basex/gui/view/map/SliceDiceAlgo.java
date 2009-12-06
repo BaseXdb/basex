@@ -47,9 +47,4 @@ final class SliceDiceAlgo extends MapAlgo {
     }
     return rects;
   }
-
-  @Override
-  String getName() {
-    return "Slice and Dice";
-  }
 }

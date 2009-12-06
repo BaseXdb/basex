@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Window;

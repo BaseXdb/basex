@@ -197,7 +197,7 @@ public final class DiskData extends Data {
   // UPDATE OPERATIONS ========================================================
 
   @Override
-  public void text(final int pre, final byte[] val, final boolean txt) {
+  protected void text(final int pre, final byte[] val, final boolean txt) {
     final long v = Token.toSimpleInt(val);
     if(v != Integer.MIN_VALUE) {
       textOff(pre, v | IO.NUMOFF);

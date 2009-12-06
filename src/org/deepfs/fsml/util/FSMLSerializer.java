@@ -3,14 +3,12 @@ package org.deepfs.fsml.util;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import static org.deepfs.fsml.util.DeepFile.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
-
 import org.basex.io.PrintOutput;
 import org.basex.util.Atts;
 import org.deepfs.fs.DeepFS;

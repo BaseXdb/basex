@@ -20,9 +20,9 @@ m_inter=Interazione
 m_layout=Layout
 
 # Buttons
-b_ok=  OK
-b_opt=Ottimizza...
-b_rename=Rinomina...
+b_ok=  OK  
+b_opt=Ottimizza
+b_rename=Rinomina
 b_open= Apri
 b_mount= Mount
 b_cancel=Annulla
@@ -30,16 +30,19 @@ b_drop=Cancella
 b_cmd=Comando
 b_xquery=XQuery
 b_browse=Sfoglia
-#b_simple=Semplice
 b_search=Cerca
 b_change=Change
 b_create=Create
 b_alter=Alter
-b_staserv=Start server
-b_stoserv=Stop server
+b_start=Start
+b_stop=Stop
 b_connect=Connect
 b_disconnect=Disconnect
 b_refresh=Refresh
+b_remove=Remove
+b_delete=Delete
+b_delall=Delete All
+b_add=Add
 
 # Status messages
 s_ok=OK
@@ -115,9 +118,9 @@ dfs_cont=Includi i contenuti XML del file
 dfs_meta=Includi i metadata
 
 dr_title=Rinomina Database
-dr_exists=Il Database esiste già.
-dr_over=Il vecchio Database verrà sovrascritto.
-dr_overbacking=Old database and backing store will be overwritten.
+dr_exists=Il Database esiste già
+dr_over=Il vecchio Database verrà sovrascritto
+dr_overbacking=Old database and backing store will be overwritten
 
 dd_title=Cancella Database
 dd_question=Il Database '%' verrà cancellato.\nSei sicuro?
@@ -203,7 +206,7 @@ c_copytt=Copia i nodi XML selezionati.
 c_cppath=Copia Path
 c_cppathtt=Copia il Path nei nodi XML selezionati.
 c_create=Nuovo
-c_creatett=Crea un database a partire dal documento XML selezionato.
+c_creatett=Crea un database.
 c_delete=Cancella
 c_deletett=Cancella i nodi XML.
 c_drop=Cancella
@@ -216,7 +219,7 @@ c_export=Esporta su XML
 c_exporttt=Esporta il database attuale su XML documento/i.
 c_filter=Filtra selezione
 c_filtertt=Filtra i nodi selezionati.
-c_fonts=Carattere...
+c_fonts=Carattere
 c_fontstt=Permettere di cambiare i caratteri dell'applicazione.
 c_full=Schermo intero
 c_fulltt=Passa a modalità schermo intero.
@@ -234,7 +237,7 @@ c_props=Informazioni
 c_propstt=Mostra le informazioni sul Database attualmente in uso.
 c_insert=Nuovo
 c_inserttt=Crea un nuovo nodo XML.
-c_maplayout=Map Layout...
+c_maplayout=Map Layout
 c_maplayouttt=Cambia il map layout.
 c_open=Apri
 c_opentt=Apre un database.
@@ -284,9 +287,9 @@ c_saveas=Save as
 c_notopened=Impossibile aprire il file.
 c_notsaved=Impossibile salvare il file.
 c_replace=Il file "%" esiste già.\nVuoi sovrascriverlo?
+c_server=Server
+c_servertt=Display the server dialog.
 
-ds_servdia=Server Properties
-ds_server=Server
 ds_localserver=Local Server
 ds_users=Users
 ds_host=Host
@@ -302,6 +305,7 @@ ds_invalid=% non valido
 ds_login=Login
 ds_databases=Databases
 ds_sessions=Sessions
+ds_logs=Logs
 
 # Commands & Processes
 proc_time=Tempo necessario
@@ -348,6 +352,9 @@ db_notdropped=Impossibile cancellare il Database.
 db_notopened=Impossibile aprire il Database '%'.
 db_opened=Database '%' aperto in %.
 db_exported=Database '%' esportato in %.
+db_notdeleted=File '%' could not be deleted.
+db_doc=Document '%' exists already.
+db_nodoc=Document '%' not found.
 
 # Index commands
 in_created=Indici creati in %.
@@ -359,7 +366,7 @@ srv_login=Access denied.
 srv_connect=Impossibile comunicare col Server.
 srv_timeout=Your process reached the timeout.
 srv_bind=Il server sta lavorando o il permesso è stato negato.
-srv_start=Attendo richieste...
+srv_start=Attendo richieste
 srv_stop=Server fermato.
 srv_user=Username
 srv_pw=Password

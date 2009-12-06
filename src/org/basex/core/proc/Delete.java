@@ -29,7 +29,7 @@ public final class Delete extends ACreate {
     if(!io.exists()) return error(FILEWHICH, io);
 
     final int pre = findDoc(Token.token(io.name()));
-    if(pre == -1) return error("Document \"%\" not found.", args[0]);
+    if(pre == -1) return error(DBNODOC, args[0]);
 
     final Data data = context.data;
     data.delete(pre);

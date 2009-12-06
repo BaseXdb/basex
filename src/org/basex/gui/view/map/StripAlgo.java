@@ -82,9 +82,4 @@ final class StripAlgo extends MapAlgo {
     rects.add(row);
     return rects;
   }
-
-  @Override
-  String getName() {
-    return "Strip";
-  }
 }

@@ -205,13 +205,13 @@ public final class Namespaces {
 
   /**
    * Adds a namespace for the specified pre value.
-   * @param p prefix
+   * @param nm tag name
    * @param u uri
    * @param pre pre value
    * @return uri reference
    */
-  public int add(final byte[] p, final byte[] u, final int pre) {
-    final int k = Math.abs(pref.add(p));
+  public int add(final byte[] nm, final byte[] u, final int pre) {
+    final int k = Math.abs(pref.add(Token.pref(nm)));
     final int v = Math.abs(uri.add(u));
     final NSNode nd = root.find(pre);
 

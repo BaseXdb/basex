@@ -70,18 +70,17 @@ public final class DialogEdit extends Dialog {
     pp.add(label, BorderLayout.NORTH);
 
     if(kind == Data.ELEM) {
-      old1 = string(data.name(pre, true));
+      old1 = string(data.name(pre, kind));
     } else if(kind == Data.DOC) {
       old1 = string(data.text(pre, true));
     } else if(kind == Data.TEXT || kind == Data.COMM) {
-      old3 = data.text(pre, true);
+      old3 = data.atom(pre);
     } else if(kind == Data.ATTR) {
-      old1 = string(data.name(pre, false));
-      old2 = string(data.text(pre, false));
+      old1 = string(data.name(pre, kind));
+      old2 = string(data.atom(pre));
     } else {
-      final String[] v = string(data.text(pre, true)).split(" ", 2);
-      old1 = v[0];
-      old3 = v.length == 1 ? EMPTY : token(v[1]);
+      old1 = string(data.name(pre, kind));
+      old3 = data.atom(pre);
     }
     final BaseXBack b = new BaseXBack();
     b.setLayout(new TableLayout(2, 1, 0, 4));

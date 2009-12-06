@@ -176,10 +176,9 @@ public final class DialogMountFS extends Dialog {
       close();
     } else {
       ok = !db.isEmpty() && ctx.prop.dbexists(db);
-      warn.setText(" ");
-      warn.setIcon(null);
+      warn.setError(null, false);
       if(ok) {
-        doc.setText("Mount " + db + COL);
+        doc.setText(BUTTONMOUNT + " " + db + COL);
         DataInput in = null;
         final MetaData meta = new MetaData(db, ctx.prop);
         try {
@@ -191,10 +190,7 @@ public final class DialogMountFS extends Dialog {
           final IO file = IO.get(mp);
           final boolean mpok = !mp.isEmpty() && file.exists() &&
             file.isDir();
-          if (!mpok) {
-            warn.setText(NOVALIDMOUNT);
-            warn.setIcon(BaseXLayout.icon("error"));
-          }
+          if(!mpok) warn.setError(NOVALIDMOUNT, false);
           ok &= mpok;
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));

@@ -1,7 +1,6 @@
 package org.basex.gui.layout;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-
 import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.KeyAdapter;

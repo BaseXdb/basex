@@ -42,8 +42,7 @@ public final class MemData extends Data {
    * @param data data reference
    */
   public MemData(final Data data) {
-    // [CG] check if namespace reference influences original data
-    this(data.tags, data.atts, data.ns, data.path, data.meta.prop);
+    this(data.tags, data.atts, new Namespaces(), data.path, data.meta.prop);
   }
 
   /**

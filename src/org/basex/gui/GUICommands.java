@@ -1,7 +1,6 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -169,7 +168,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Server Dialog. */
-  SERVER("Server...", null, "SERVER", false, false) {
+  SERVER(GUISERVER + DOTS, null, GUISERVERTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
@@ -972,8 +971,8 @@ public enum GUICommands implements GUICommand {
    * @return result of check
    */
   static boolean updatable(final Nodes n, final int... no) {
-    if(n == null || n.data.ns.size() != 0 || (no.length == 0 ?
-        n.size() < 1 : n.size() != 1)) return false;
+    if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1))
+      return false;
 
     final int k = n.data.kind(n.nodes[0]);
     for(final int i : no) if(k == i) return false;

@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
-
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;

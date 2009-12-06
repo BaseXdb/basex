@@ -1,7 +1,6 @@
 package org.basex.build.fs;
 
 import java.io.File;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Progress;

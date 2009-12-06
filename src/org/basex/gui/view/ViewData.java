@@ -79,8 +79,9 @@ public final class ViewData {
    * @return name
    */
   public static byte[] content(final Data data, final int p, final boolean s) {
-    switch(data.kind(p)) {
-      case Data.ELEM: return data.name(p, true);
+    final int k = data.kind(p);
+    switch(k) {
+      case Data.ELEM: return data.name(p, k);
       case Data.DOC:  return data.text(p, true);
       case Data.TEXT: return s ? TEXT : data.text(p, true);
       case Data.COMM: return s ? COMM : data.text(p, true);
@@ -89,7 +90,7 @@ public final class ViewData {
 
     final TokenBuilder tb = new TokenBuilder();
     tb.add(ATT);
-    tb.add(data.name(p, false));
+    tb.add(data.name(p, k));
     if(!s) {
       tb.add(ATT1);
       tb.add(data.text(p, false));

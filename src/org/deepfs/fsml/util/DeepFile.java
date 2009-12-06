@@ -3,18 +3,15 @@ package org.deepfs.fsml.util;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
-
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;

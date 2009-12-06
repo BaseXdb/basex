@@ -113,7 +113,7 @@ public final class DialogServer extends Dialog {
    * @param main reference to the main window
    */
   public DialogServer(final GUI main) {
-    super(main, SRVTITLE);
+    super(main, GUISERVER);
 
     tabs = new BaseXTabs(this);
 
@@ -124,14 +124,14 @@ public final class DialogServer extends Dialog {
     final BaseXBack db = dbsP.getTablePanel();
     db.setBorder(8, 8, 8, 8);
 
-    tabs.add(SERVERN, conn);
+    tabs.add(GUISERVER, conn);
     tabs.add(USERS, user);
     tabs.add(DATABASES, db);
     tabs.add(SESSIONS, sess);
-    tabs.add("Logs", logs);
+    tabs.add(LOGS, logs);
 
-    start = new BaseXButton(BUTTONSTASERV, this);
-    stop = new BaseXButton(BUTTONSTOSERV, this);
+    start = new BaseXButton(BUTTONSTART, this);
+    stop = new BaseXButton(BUTTONSTOP, this);
     connect = new BaseXButton(BUTTONCONNECT, this);
     disconnect = new BaseXButton(BUTTONDISCONNECT, this);
     refreshSess = new BaseXButton(BUTTONREFRESH, this);
@@ -218,8 +218,8 @@ public final class DialogServer extends Dialog {
     logs.setLayout(new BorderLayout());
     logs.setBorder(8, 8, 8, 8);
 
-    delete = new BaseXButton("Delete", this);
-    deleteAll = new BaseXButton("Delete All", this);
+    delete = new BaseXButton(BUTTONDELETE, this);
+    deleteAll = new BaseXButton(BUTTONDELALL, this);
     logc = new BaseXCombo(new String[] {}, this);
     logt = new BaseXText(false, this);
     logt.setFont(getFont());
@@ -332,19 +332,17 @@ public final class DialogServer extends Dialog {
           logc.setSelectedIndex(-1);
           refreshLog();
         } else {
-          msg2 = "Delete not possible";
+          msg2 = Main.info(DBNOTDELETED, f.getName());
         }
       } else if(cmp == deleteAll) {
-        boolean d = false;
         for(int i = 0; i < logc.getItemCount(); i++) {
           final File f = new File(logdir + logc.getItemAt(i).toString());
-          d = f.delete();
+          if(!f.delete()) {
+            msg2 = Main.info(DBNOTDELETED, f.getName());
+            break;
+          }
         }
-        if(!d) {
-          msg2 = "Delete of all logs not possible";
-        } else {
-          logc.setSelectedIndex(-1);
-        }
+        logc.setSelectedIndex(-1);
         refreshLog();
       } else if(connected) {
         if(tab == 1) user.action(cmp);

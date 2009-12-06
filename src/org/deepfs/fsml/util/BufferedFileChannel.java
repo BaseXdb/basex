@@ -8,7 +8,6 @@ import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
-
 import org.basex.core.Prop;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;

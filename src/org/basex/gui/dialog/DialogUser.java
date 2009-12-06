@@ -166,22 +166,22 @@ public final class DialogUser extends BaseXBack {
 
     tablePanel = new BaseXBack();
     tablePanel.setLayout(new BorderLayout(0, 5));
-    add = new BaseXButton("Add", dia);
+    add = new BaseXButton(BUTTONADD, dia);
     databases = new BaseXCombo(new String[] {}, dia);
     BaseXLayout.setWidth(databases, 100);
     addUser = new BaseXCombo(new String[] {}, dia);
     BaseXLayout.setWidth(addUser, BaseXCombo.TWIDTH);
     removeUser = new BaseXCombo(new String[] {}, dia);
-    remove = new BaseXButton("Remove", dia);
+    remove = new BaseXButton(BUTTONREMOVE, dia);
     BaseXLayout.setWidth(removeUser, BaseXCombo.TWIDTH);
 
     if(!global) {
       final BaseXBack tmp = new BaseXBack();
       tmp.setLayout(new TableLayout(2, 5, 8, 2));
-      tmp.add(new BaseXLabel("Databases: ", false, true));
-      tmp.add(new BaseXLabel("Add: ", false, true));
+      tmp.add(new BaseXLabel(DATABASES + COL, false, true));
+      tmp.add(new BaseXLabel(BUTTONADD + COL, false, true));
       tmp.add(new BaseXLabel(""));
-      tmp.add(new BaseXLabel("Remove: ", false, true));
+      tmp.add(new BaseXLabel(BUTTONREMOVE + COL, false, true));
       tmp.add(new BaseXLabel(""));
       tmp.add(databases);
       tmp.add(addUser);

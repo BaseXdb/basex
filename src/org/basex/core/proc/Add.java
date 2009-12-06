@@ -33,7 +33,7 @@ public final class Add extends ACreate {
     if(!io.exists()) return error(FILEWHICH, io);
 
     final int pre = findDoc(Token.token(io.name()));
-    if(pre != -1) return error("Document \"%\" exists already.", args[0]);
+    if(pre != -1) return error(DBDOC, args[0]);
 
     final DirParser p = new DirParser(io, context.prop);
     Data d = null;

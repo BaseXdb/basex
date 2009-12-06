@@ -20,11 +20,11 @@ final class SplitAlgo extends MapAlgo {
    * @param ml children array
    * @param ns start array position
    * @param ne end array position
-   * @param sumweight weight of this recursion level
+   * @param sw weight of this recursion level
    * @return ArrayList containing rectangles
    */
   private MapRects calcMap(final MapRect r, final MapList ml,
-      final int ns, final int ne, final double sumweight) {
+      final int ns, final int ne, final double sw) {
 
     if(ne - ns == 0) {
       final MapRects rects = new MapRects();
@@ -37,19 +37,19 @@ final class SplitAlgo extends MapAlgo {
 
     // increment pivot until left rectangle contains more or equal
     // than half the weight or leave with just setting it to ne - 1
-    double weight = 0;
+    double w = 0;
     for(; ni < ne;) {
-      weight += ml.weight[++ni];
-      if(weight >= sumweight / 2 || ni == ne - 1) break;
+      w += ml.weight[++ni];
+      if(w >= sw / 2 || ni == ne - 1) break;
     }
 
     int xx = r.x;
     int yy = r.y;
-    int ww = !(r.w > r.h) ? r.w : (int) (r.w * 1 / sumweight * weight);
-    int hh = r.w > r.h ? r.h : (int) (r.h * 1 / sumweight * weight);
+    int ww = !(r.w > r.h) ? r.w : (int) (r.w * 1 / sw * w);
+    int hh = r.w > r.h ? r.h : (int) (r.h * 1 / sw * w);
     // paint both rectangles if enough space is left
-    if(ww > 0 && hh > 0 && weight > 0) rects.add(calcMap(
-        new MapRect(xx, yy, ww, hh, 0, r.level), ml, ns, ni, weight));
+    if(ww > 0 && hh > 0 && w > 0) rects.add(calcMap(
+        new MapRect(xx, yy, ww, hh, 0, r.level), ml, ns, ni, w));
     if(r.w > r.h) {
       xx += ww;
       ww = r.w - ww;
@@ -58,15 +58,10 @@ final class SplitAlgo extends MapAlgo {
       hh = r.h - hh;
     }
 
-    if(ww > 0 && hh > 0 && sumweight - weight > 0 && ni + 1 <= ne)
-        rects.add(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level),
-        ml, ni + 1, ne, sumweight - weight));
+    if(ww > 0 && hh > 0 && sw - w > 0 && ni + 1 <= ne)
+      rects.add(calcMap(new MapRect(xx, yy, ww, hh, 0, r.level),
+      ml, ni + 1, ne, sw - w));
 
     return rects;
-  }
-
-  @Override
-  String getName() {
-    return "Split";
   }
 }

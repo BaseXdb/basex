@@ -282,19 +282,12 @@ public abstract class Serializer {
       } else if(k == Data.COMM) {
         comment(data.text(p++, true));
       } else if(k == Data.ATTR) {
-        attribute(data.name(p, false), data.text(p++, false));
+        attribute(data.name(p, k), data.text(p++, false));
       } else if(k == Data.PI) {
-        byte[] n = data.text(p++, true);
-        byte[] v = EMPTY;
-        final int i = indexOf(n, ' ');
-        if(i != -1) {
-          v = substring(n, i + 1);
-          n = substring(n, 0, i);
-        }
-        pi(n, v);
+        pi(data.name(p, k), data.atom(p++));
       } else {
         // add element node
-        final byte[] name = data.name(p, true);
+        final byte[] name = data.name(p, k);
         openElement(name);
 
         // add namespace definitions
@@ -334,7 +327,9 @@ public abstract class Serializer {
 
         // serialize attributes
         final int as = p + data.attSize(p, k);
-        while(++p != as) attribute(data.name(p, false), data.text(p, false));
+        while(++p != as) {
+          attribute(data.name(p, Data.ATTR), data.text(p, false));
+        }
         parent[l++] = r;
         names[l] = empty;
       }

@@ -2,6 +2,7 @@ package org.basex.test.storage;
 
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.util.Token;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -18,14 +19,14 @@ public final class UpdateTestAttributes extends UpdateTest {
   @Test
   public void testUpdateAttribute() {
     final Data data = CONTEXT.data;
-    data.rename(7, Data.ATTR, NAME);
+    data.rename(7, Data.ATTR, NAME, Token.EMPTY);
     data.replace(7, Data.ATTR, JUNIT);
     assertEquals(size, data.meta.size);
-    assertByteArraysEqual(NAME, data.name(7, false));
+    assertByteArraysEqual(NAME, data.name(7, Data.ATTR));
     assertByteArraysEqual(JUNIT, data.text(7, false));
     reload();
     assertEquals(size, data.meta.size);
-    assertByteArraysEqual(NAME, data.name(7, false));
+    assertByteArraysEqual(NAME, data.name(7, Data.ATTR));
     assertByteArraysEqual(JUNIT, data.text(7, false));
   }
 
@@ -35,7 +36,7 @@ public final class UpdateTestAttributes extends UpdateTest {
   @Test
   public void testUpdateAttribute2() {
     final Data data = CONTEXT.data;
-    data.rename(8, Data.ATTR, NAME);
+    data.rename(8, Data.ATTR, NAME, Token.EMPTY);
     data.replace(8, Data.ATTR, JUNIT);
     assertEquals(size, data.meta.size);
     assertByteArraysEqual(JUNIT, data.text(8, false));
@@ -63,7 +64,7 @@ public final class UpdateTestAttributes extends UpdateTest {
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(10, data.parent(11, Data.TEXT));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(FOO, data.name(9, false));
+    assertByteArraysEqual(FOO, data.name(9, Data.ATTR));
     assertByteArraysEqual(JUNIT, data.text(9, false));
     reload();
     assertEquals(size + 1, data.meta.size);
@@ -74,7 +75,7 @@ public final class UpdateTestAttributes extends UpdateTest {
     assertEquals(6, data.parent(10, Data.ELEM));
     assertEquals(10, data.parent(11, Data.TEXT));
     assertEquals(nextid + 1, data.meta.lastid);
-    assertByteArraysEqual(FOO, data.name(9, false));
+    assertByteArraysEqual(FOO, data.name(9, Data.ATTR));
     assertByteArraysEqual(JUNIT, data.text(9, false));
   }
 }

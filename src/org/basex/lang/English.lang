@@ -20,9 +20,9 @@ m_inter=Interaction
 m_layout=Layout
 
 # Buttons
-b_ok=  OK
-b_opt=Optimize...
-b_rename=Rename...
+b_ok=  OK  
+b_opt=Optimize
+b_rename=Rename
 b_open= Open
 b_mount= Mount
 b_cancel=Cancel
@@ -34,11 +34,15 @@ b_search=Search
 b_change=Change
 b_create=Create
 b_alter=Alter
-b_staserv=Start server
-b_stoserv=Stop server
+b_start=Start
+b_stop=Stop
 b_connect=Connect
 b_disconnect=Disconnect
 b_refresh=Refresh
+b_remove=Remove
+b_delete=Delete
+b_delall=Delete All
+b_add=Add
 
 # Status messages
 s_ok=OK
@@ -101,7 +105,7 @@ dqe_title=Open DeepFS instance
 dmnt_title=Mount DeepFS instance
 dmnt_nomountpath=No valid mount point
 
-dfs_newtitle=Create new DeepFS Database...
+dfs_newtitle=Create new DeepFS Database
 dfs_all=Complete
 dfs_allinfo=Creates a complete (C:, D: etc. on Windows, '/' on UNIX) mapping of the filesystem
 dfs_wrt=Write through
@@ -114,9 +118,9 @@ dfs_xml=Include xml contents
 dfs_meta=Include metadata
 
 dr_title=Rename Database
-dr_exists=Database exists already.
-dr_over=Old database will be overwritten.
-dr_overbacking=Old database and backing store will be overwritten.
+dr_exists=Database exists already
+dr_over=Old database will be overwritten
+dr_overbacking=Old database and backing store will be overwritten
 
 dd_title=Drop Database
 dd_question=Database '%' will be dropped.\nAre you sure?
@@ -201,7 +205,7 @@ c_copytt=Copies the currently selected XML nodes.
 c_cppath=Copy Path
 c_cppathtt=Copies the path to the selected XML nodes.
 c_create=New
-c_creatett=Creates a database from the selected XML document.
+c_creatett=Creates a new database.
 c_delete=Delete
 c_deletett=Deletes XML nodes.
 c_drop=Drop
@@ -214,7 +218,7 @@ c_export=Export XML
 c_exporttt=Exports the current database to XML.
 c_filter=Filter Selected
 c_filtertt=Filters the selected nodes.
-c_fonts=Fonts...
+c_fonts=Fonts
 c_fontstt=Allows to change the used fonts.
 c_full=Fullscreen
 c_fulltt=Switches to fullscreen.
@@ -232,7 +236,7 @@ c_props=Properties
 c_propstt=Show information on the currently opened database.
 c_insert=New
 c_inserttt=Creates a new XML node.
-c_maplayout=Map Layout...
+c_maplayout=Map Layout
 c_maplayouttt=Changes the map layout.
 c_open=Open
 c_opentt=Opens a database.
@@ -282,9 +286,9 @@ c_saveas=Save as
 c_notopened=File could not be opened.
 c_notsaved=File could not be saved.
 c_replace=% already exists.\nDo you want to replace it?
+c_server=Server
+c_servertt=Display the server dialog.
 
-ds_servdia=Server Properties
-ds_server=Server
 ds_localserver=Local Server
 ds_users=Users
 ds_host=Host
@@ -300,6 +304,7 @@ ds_invalid=% is invalid
 ds_login=Login
 ds_databases=Databases
 ds_sessions=Sessions
+ds_logs=Logs
 
 # Commands & Processes
 proc_time=Time Needed
@@ -346,6 +351,9 @@ db_notdropped=Database could not be dropped.
 db_notopened=Database '%' could not be opened.
 db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
+db_notdeleted=File '%' could not be deleted.
+db_doc=Document '%' exists already.
+db_nodoc=Document '%' not found.
 
 # Index commands
 in_created=Index created in %.
@@ -357,7 +365,7 @@ srv_login=Access denied.
 srv_connect=Can't communicate with the server.
 srv_timeout=Your process reached the timeout.
 srv_bind=Server is running or permission was denied.
-srv_start=Waiting for requests...
+srv_start=Waiting for requests
 srv_stop=Server stopped.
 srv_user=Username
 srv_pw=Password

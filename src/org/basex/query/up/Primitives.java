@@ -2,7 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.basex.query.QueryException;

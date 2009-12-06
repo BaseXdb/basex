@@ -146,7 +146,6 @@ public final class XMLSerializer extends Serializer {
     }
     while(wl < b.length) {
       ch(cp(b, wl));
-      //ch(b[wl++]);
       wl += cl(b[wl]);
     }
     indent = false;

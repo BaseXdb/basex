@@ -50,7 +50,7 @@ public final class Mount extends AAdmin {
             signature[1] = DeepFS.class;
             cls.getMethod("mount", signature).invoke(null, mp, fs);
           } catch (Exception e) {
-            Main.err("Can not mount: ", e);
+            Main.err("Cannot mount: ", e);
           }
         }
       }.start();
@@ -58,7 +58,6 @@ public final class Mount extends AAdmin {
       Main.err("Missing native fuse support.");
       return false;
     }
-
     return true;
   }
 }

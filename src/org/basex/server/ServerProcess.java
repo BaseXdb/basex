@@ -102,7 +102,7 @@ public final class ServerProcess extends Thread {
           proc = new CommandParser(input, context, true).parse()[0];
         } catch(final QueryException ex) {
           // invalid command was sent by a client; create error feedback
-          log.write(this, input, perf, "Error: " + ex.extended());
+          log.write(this, input, perf, INFOERROR + ex.extended());
           out.write(0);
           out.print(ex.extended());
           out.write(0);
@@ -129,11 +129,11 @@ public final class ServerProcess extends Thread {
         send(ok);
         stopTimer();
         sem.after(up);
-        log.write(this, proc, perf, ok ? "OK" : "Error: " + inf);
+        log.write(this, proc, perf, ok ? "OK" : INFOERROR + inf);
       }
       log.write(this, "LOGOUT " + context.user.name);
     } catch(final IOException ex) {
-      log.write(this, input, "Error: " + ex.getMessage());
+      log.write(this, input, INFOERROR + ex.getMessage());
       Main.error(ex, false);
     }
   }

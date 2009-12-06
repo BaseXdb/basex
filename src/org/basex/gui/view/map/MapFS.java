@@ -119,7 +119,7 @@ final class MapFS extends MapPainter {
           k = data.kind(p);
           if(k == Data.ELEM) {
             if(elem) tb.add('\n');
-            tb.add(data.name(p, true));
+            tb.add(data.name(p, k));
             tb.add(": ");
             elem = true;
           } else if(k == Data.TEXT) {
