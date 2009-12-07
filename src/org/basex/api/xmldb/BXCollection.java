@@ -15,6 +15,7 @@ import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Open;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.data.MetaData;
 import org.basex.io.IOContent;
 import org.basex.util.StringList;
@@ -178,7 +179,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop);
 
       final Data data = ctx.data;
-      final Data d = new MemBuilder(p).build(id);
+      final MemData d = (MemData) new MemBuilder(p).build(id);
       data.insert(data.meta.size, -1, d);
       data.flush();
       ctx.update();
