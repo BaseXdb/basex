@@ -46,11 +46,13 @@ public enum MetaElem {
   DATETIME_ORIGINAL(NS.FSMETA, "dateTimeOriginal", Type.DTM, false),
   /** Year. */
   YEAR(NS.FSMETA, "year", Type.YEA, false),
-
+  
   // ----- integer fields ----------------------------------------------------
 
   /** Beats per minute. */
   BEATS_PER_MINUTE(NS.FSMETA, "beatsPerMinute", Type.INT, false),
+  /** Bitrate. */
+  BITRATE_KBIT(NS.FSMETA, "bitrateKBitS", Type.INT, false),
   /** ISO speed ratings. */
   ISO_SPEED_RATINGS(NS.FSMETA, "isoSpeedRatings", Type.INT, false),
   /** Focal length in 35mm film. */
@@ -72,6 +74,8 @@ public enum MetaElem {
   PIXEL_HEIGHT(NS.FSMETA, "pixelHeight", Type.INT, false),
   /** Width in pixels. */
   PIXEL_WIDTH(NS.FSMETA, "pixelWidth", Type.INT, false),
+  /** Sample rate. */
+  SAMPLE_RATE(NS.FSMETA, "sampleRate", Type.INT, false),
   /** Track number. */
   TRACK(NS.FSMETA, "track", Type.INT, false),
 
@@ -126,6 +130,8 @@ public enum MetaElem {
   ARTIST(NS.FSMETA, "artist", Type.STR, true),
   /** City. */
   CITY(NS.FSMETA, "city", Type.STR, true),
+  /** Codec. */
+  CODEC(NS.FSMETA, "codec", Type.STR, false),
   /** Color space. */
   COLOR_SPACE(NS.FSMETA, "colorSpace", Type.STR, false),
   /** Comment. */
@@ -150,9 +156,11 @@ public enum MetaElem {
   CUSTOM_RENDERED(NS.FSMETA, "customRendered", Type.STR, false),
   /** Description. */
   DESCRIPTION(NS.DCTERMS, "description", Type.STR, true),
+  /** Emphasis. */
+  EMPHASIS(NS.FSMETA, "emphasis", Type.STR, false),
   /** Encoding software. */
   ENCODER(NS.FSMETA, "encoder", Type.STR, false),
-  /** Text encoding. */
+  /** Encoding. */
   ENCODING(NS.FSMETA, "encoding", Type.STR, false),
   /** Exposure mode. */
   EXPOSURE_MODE(NS.FSMETA, "exposureMode", Type.STR, false),
@@ -194,6 +202,8 @@ public enum MetaElem {
   MAKE(NS.FSMETA, "make", Type.STR, false),
   /** Metering mode. */
   METERING_MODE(NS.FSMETA, "meteringMode", Type.STR, false),
+  /** Mode. */
+  MODE(NS.FSMETA, "mode", Type.STR, false),
   /** Model. */
   MODEL(NS.FSMETA, "model", Type.STR, false),
   /** Orientation. */

@@ -174,14 +174,13 @@ public final class BufferedFileChannel {
       }
     } else { // n < 0
       if(n < -position()) throw new IllegalArgumentException(
-          "Negative channel " + "position");
-      final int bPos = buf.position();
+          "Negative channel position");
+      final int bPos = size() == rem ? 0 : buf.position();
       if(bPos < -n) {
-        final int bufLim = buf.limit();
-        final long skip = n - bufLim;
+        final long skip = n - buffered;
         fc.position(fc.position() + skip);
-        buf.position(bufLim);
-        rem -= skip + buffered;
+        buf.position(buf.limit());
+        rem -= skip;
       } else buf.position(buf.position() + (int) n);
     }
   }

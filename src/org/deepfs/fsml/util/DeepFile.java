@@ -536,7 +536,15 @@ public class DeepFile {
     if((Type.DAT.instance(t) && !st.equals(DatatypeConstants.DATE))
         || (Type.YEA.instance(t) && !st.equals(DatatypeConstants.GYEAR)))
       metaDebug(elem, st.getLocalPart());
-    else addMeta(elem, token(xgc.toXMLFormat()), null);
+    else {
+      try {
+        final byte[] data = token(xgc.toXMLFormat());
+        addMeta(elem, data, null);
+      } catch(IllegalStateException e) {
+        Main.debug("DeepFile: Invalid date (file: %, error message: %)",
+            bfc.getFileName(), e.getMessage());
+      }
+    }
   }
 
   /**

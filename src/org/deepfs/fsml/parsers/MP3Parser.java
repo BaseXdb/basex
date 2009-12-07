@@ -1,6 +1,7 @@
 package org.deepfs.fsml.parsers;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.util.Calendar;
@@ -270,6 +271,44 @@ public final class MP3Parser implements IFileParser {
   private static final int ENC_UTF_16_NO_BOM = 2;
   /** Flag for UTF-8 encoding. */
   private static final int ENC_UTF_8 = 3;
+  
+  /** MP3 modes. */
+  private static final byte[][] MODES = { token("Stereo"),
+    token("Joint Stereo"), token("Dual Channel"), token("Mono") };
+  /** MP3 emphases. */
+  private static final byte[][] EMPH = { token("None"),
+    token("5015MS"), token("Illegal"), token("CCITT") };
+  /** Available bit rates. */
+  private static final int[][][] BITRATES = { {
+    { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448 },
+    { 0, 32, 48, 56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320, 384 },
+    { 0, 32, 40, 48,  56,  64,  80,  96, 112, 128, 160, 192, 224, 256, 320 },
+  }, {
+    { 0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256 },
+    { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160 },
+    { 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 16 },
+  } };
+  /** MP3 sample rates. */
+  private static final int[][] SAMPLES = {
+    { 11025, 12000, 8000, }, { 0, 0, 0 },
+    { 22050, 24000, 16000 }, { 44100, 48000, 32000 }
+  };
+  /** MP3 sample rates. */
+  private static final int[][] FSIZE = { { 32, 17, }, { 17, 9 } };
+  /** MP3 samples per frame. */
+  private static final int[][] SPF = new int[][] {
+    { 384, 1152, 1152 }, { 384, 1152, 576 }
+  };
+  /** MP3 Types. */
+  private static final byte[][] VERSIONS = new byte[][] {
+    token("MPEG-2.5 "), EMPTY, token("MPEG-2 "), token("MPEG-1 "),
+  };
+  /** MP3 Types. */
+  private static final byte[][] LAYERS = new byte[][] {
+    token("Layer 1"), token("Layer 2"), token("Layer 3"), EMPTY
+  };
+  /** MP3 encoding. */
+  private static final byte[][] ENCODE = { token("CBR"), token("VBR") };
 
   static {
     ParserRegistry.register("mp3", MP3Parser.class);
@@ -305,6 +344,72 @@ public final class MP3Parser implements IFileParser {
     deepFile.setFileType(FileType.AUDIO);
     deepFile.setFileFormat(MimeType.MP3);
   }
+  
+  /**
+   * Reads technical information and adds it to the deep file.
+   * @param size the size of the ID3 tags.
+   */
+  private void techInfo(final int size) {
+    try {
+      int b0, b1, b2, b3;
+      do {
+        bfc.buffer(1);
+        b0 = bfc.get();
+      } while(b0 != 0xFF);
+      
+      bfc.buffer(3);
+      b1 = bfc.get();
+      b2 = bfc.get();
+      b3 = bfc.get();
+      while(b0 != 0xFF || (b1 & 0xE0) != 0xE0 || (b1 & 0x18) == 0x08
+          || (b1 & 0x06) == 0x00 || (b2 & 0xF0) == 0xF0 || (b2 & 0xF0) == 0x00
+          || (b2 & 0x0C) == 0x0C) {
+        bfc.buffer(1);
+        b0 = b1; b1 = b2; b2 = b3; b3 = bfc.get();
+      }
+      
+      final int vers = b1 >> 3 & 0x03;
+      final int layr = 3 - (b1 >> 1 & 0x03);
+      final int rate = b2 >> 4 & 0x0F;
+      final int smpl = b2 >> 2 & 0x03;
+      final int emph = b3 & 0x03;
+      final int version = vers == 3 ? 0 : 1;
+
+      final int samples = SAMPLES[vers][smpl];
+      final int mode = b3 >> 6 & 0x03;
+      int bitrate = BITRATES[version][layr][rate];
+      int seconds = (int) ((bfc.size() - size) * 8 / bitrate) / 1000;
+      
+      // look for VBR XING header to correct track length and bitrate
+      int encoding = 0;
+      final int fsize = FSIZE[version][mode == 3 ? 1 : 0];
+      bfc.skip(fsize);
+      final byte[] vbrh = new byte[4];
+      bfc.get(vbrh);
+      if(Token.eq(token("Xing"), vbrh)) {
+        bfc.skip(3);
+        bfc.buffer(5);
+        if((bfc.get() & 0x01) != 0) {
+          final int nf = (bfc.get() << 24) + (bfc.get() << 16)
+              + (bfc.get() << 8) + bfc.get();
+          seconds = nf * SPF[version][layr] / samples;
+          encoding++;
+          if(seconds != 0) bitrate = (int) ((bfc.size() - size) * 8 /
+              seconds / 1000);
+        }
+      }
+      
+      if(!deepFile.isMetaSet(MetaElem.DURATION)) deepFile.addMeta(
+          MetaElem.DURATION, ParserUtil.convertMsDuration(seconds * 1000));
+      deepFile.addMeta(MetaElem.CODEC, Token.concat(VERSIONS[vers],
+          LAYERS[layr]));
+      deepFile.addMeta(MetaElem.BITRATE_KBIT, bitrate);
+      deepFile.addMeta(MetaElem.SAMPLE_RATE, samples);
+      deepFile.addMeta(MetaElem.MODE, MODES[mode]);
+      deepFile.addMeta(MetaElem.EMPHASIS, EMPH[emph]);
+      deepFile.addMeta(MetaElem.ENCODING, ENCODE[encoding]);
+    } catch(IOException e) { /* end of file ... */ }
+  }
 
   // ---------------------------------------------------------------------------
   // ----- ID3v1 methods -------------------------------------------------------
@@ -329,8 +434,9 @@ public final class MP3Parser implements IFileParser {
   /**
    * Reads the ID3v1 metadata from the file. {@link #checkID3v1()} must be
    * called before (and must return <code>true</code>).
+   * @throws IOException if any error occurs while reading from the file.
    */
-  private void readMetaID3v1() {
+  private void readMetaID3v1() throws IOException {
     setTypeAndFormat();
     // tag is already buffered by checkID3v1()
     final byte[] array = new byte[30];
@@ -354,6 +460,8 @@ public final class MP3Parser implements IFileParser {
     if(!ws(array)) deepFile.addMeta(MetaElem.DESCRIPTION, Token.trim(array));
     final int genreId = bfc.get() & 0xFF;
     if(genreId != 0) deepFile.addMeta(MetaElem.GENRE, getGenre(genreId));
+    bfc.position(0);
+    techInfo(128);
   }
 
   // ---------------------------------------------------------------------------
@@ -383,17 +491,23 @@ public final class MP3Parser implements IFileParser {
    */
   private void readMetaID3v2() throws IOException {
     setTypeAndFormat();
-    int size = readID3v2Header();
-    while(size >= MINIMAL_FRAME_SIZE) {
+    final int size = readID3v2Header();
+    int s = size;
+    while(s >= MINIMAL_FRAME_SIZE) {
       final int res = readID3v2Frame();
       if(res > 0) {
-        size -= res;
+        s -= res;
       } else {
-        size += res;
-        if(size < MINIMAL_FRAME_SIZE) break;
+        s += res;
+        if(s < MINIMAL_FRAME_SIZE) break;
         bfc.skip(-res);
       }
     }
+    final long pos = bfc.position();
+    if(checkID3v1()) {
+      bfc.position(pos);
+      techInfo(size + 128);
+    } else techInfo(size);
   }
 
   /**

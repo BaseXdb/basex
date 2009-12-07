@@ -139,7 +139,7 @@ public final class FSImporter implements FSTraversal {
             xmlFragment = xmlFragment.replace("<file name=\"",
                 "<file name=\"" + par + "/");
           }
-        } catch(final IOException ex) {
+        } catch(final Exception ex) {
           Main.debug(
               "FSImporter: Failed to extract metadata/contents from the file " +
               "(% - %)", f.getAbsolutePath(), ex);
@@ -150,6 +150,15 @@ public final class FSImporter implements FSTraversal {
         }
       } catch(final IOException e) {
         Main.debug("FSImporter: Failed to open the file (% - %)",
+            f.getAbsolutePath(), e);
+      }
+    }
+    
+    if(xmlFragment == null) {
+      try {
+        xmlFragment = FSMLSerializer.serializeFile(f, absolutePath);
+      } catch(IOException e) {
+        Main.debug("FSImporter: Failed to parse file attributes (% - %)",
             f.getAbsolutePath(), e);
       }
     }
