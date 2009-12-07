@@ -62,12 +62,17 @@ final class NSNode {
   void add(final NSNode n) {
     int s = ch.length;
     while(--s >= 0 && n.pre < ch[s].pre);
-    s++;
-    final NSNode[] tmp = new NSNode[ch.length + 1];
-    System.arraycopy(ch, 0, tmp, 0, s);
-    System.arraycopy(ch, s, tmp, s + 1, ch.length - s);
-    tmp[s] = n;
-    ch = tmp;
+    if(s >= 0 && n.pre == ch[s].pre) {
+      for(int v = 0; v < n.vals.length; v += 2) {
+        ch[s].add(n.vals[v], n.vals[v + 1]);
+      }
+    } else {
+      final NSNode[] tmp = new NSNode[ch.length + 1];
+      tmp[++s] = n;
+      System.arraycopy(ch, 0, tmp, 0, s);
+      System.arraycopy(ch, s, tmp, s + 1, ch.length - s);
+      ch = tmp;
+    }
   }
 
   /**

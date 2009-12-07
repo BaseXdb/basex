@@ -117,7 +117,7 @@ public final class Namespaces {
    */
   public int uri(final byte[] n) {
     final byte[] pr = Token.pref(n);
-    return pr.length == 0 ? 0 : ns(pr, root);
+    return pr.length == 0 ? 0 : uri(pr, root);
   }
 
   /**
@@ -146,7 +146,7 @@ public final class Namespaces {
    * @return namespace URI reference or 0 if no namespace was found
    */
   public int uri(final byte[] name, final int pre) {
-    return ns(Token.pref(name), root.find(pre));
+    return uri(Token.pref(name), root.find(pre));
   }
 
   /**
@@ -174,15 +174,15 @@ public final class Namespaces {
    * @param node node to start with
    * @return namespace
    */
-  private int ns(final byte[] pr, final NSNode node) {
+  private int uri(final byte[] pr, final NSNode node) {
     if(Token.eq(Token.XML, pr)) return 0;
-    final int k = pref.id(pr);
-    if(k == 0) return 0;
+    final int i = pref.id(pr);
+    if(i == 0) return 0;
 
     NSNode nd = node;
     while(nd != null) {
-      final int i = nd.uri(k);
-      if(i != 0) return i;
+      final int u = nd.uri(i);
+      if(u != 0) return u;
       nd = nd.par;
     }
     return 0;
@@ -217,15 +217,11 @@ public final class Namespaces {
     final int v = Math.abs(uri.add(u));
     final NSNode nd = root.find(par);
 
-    if(nd.pre != par) {
-      final NSNode t = new NSNode();
-      t.pre = pre;
-      t.add(k, v);
-      t.par = nd;
-      nd.add(t);
-    } else {
-      nd.add(k, v);
-    }
+    final NSNode t = new NSNode();
+    t.pre = pre;
+    t.add(k, v);
+    t.par = nd;
+    nd.add(t);
     return v;
   }
 
@@ -325,7 +321,7 @@ public final class Namespaces {
    * @return string
    */
   public String toString(final int s, final int e) {
-    return root.print(this, s, e);
+    return root.print(this, s - 1, e);
   }
 
   @Override

@@ -553,7 +553,7 @@ public abstract class Data {
               ns.add(at.key[a], at.val[a], p, p - d);
             }
           }
-          int u = ns.uri(nm);
+          int u = ns.uri(nm, p);
           int n = tags.index(nm, null, false);
           tb.add(elem(d, n, dt.attSize(mp, k), dt.size(mp, k), u, ne));
           break;
@@ -568,7 +568,7 @@ public abstract class Data {
           nm = dt.name(mp, k);
           n = atts.index(nm, null, false);
           // [CG] check (mergeUpdates-001 ?)...
-          u = ns.uri(nm);
+          u = pref(nm).length != 0 ? ns.uri(nm, p) : 0;
           tb.add(attr(p, d, n, dt.text(mp, false), u));
           break;
       }

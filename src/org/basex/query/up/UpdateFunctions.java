@@ -101,9 +101,10 @@ public final class UpdateFunctions {
       final int pre, final int par) throws QueryException {
 
     final int k = Nod.kind(nd.type);
+    final int ms = m.meta.size;
     switch(k) {
       case Data.DOC:
-        m.insert(m.meta.size, m.doc(m.meta.size, size(nd, false), nd.base()));
+        m.insert(ms, m.doc(ms, size(nd, false), nd.base()));
         int p = pre + 1;
         NodeIter ir = nd.child();
         Nod i;
@@ -115,28 +116,26 @@ public final class UpdateFunctions {
         int u = 0;
         if(uri.length != 0) u = Math.abs(m.ns.addURI(uri));
         final int n = m.atts.index(q.str(), null, false);
-        m.insert(m.meta.size, m.attr(m.meta.size, pre - par, n, nd.str(), u));
+        m.insert(ms, m.attr(ms, pre - par, n, nd.str(), u));
         return pre + 1;
       case Data.PI:
-        final byte[] v = trim(concat(nd.nname(), SPACE, nd.str()));
-        m.insert(m.meta.size, m.text(m.meta.size, pre - par, v, k));
-        return pre + 1;
       case Data.TEXT:
       case Data.COMM:
-        m.insert(m.meta.size, m.text(m.meta.size, pre - par, nd.str(), k));
+        byte[] v = nd.str();
+        if(k == Data.PI) v = trim(concat(nd.nname(), SPACE, v));
+        m.insert(ms, m.text(ms, pre - par, v, k));
         return pre + 1;
       default:
         q = nd.qname();
-        //u = 0;
         if(par == 0) {
           final Atts ns = FElem.ns(nd);
           for(int a = 0; a < ns.size; a++) m.ns.add(ns.key[a], ns.val[a]);
         }
-        final boolean ne = m.ns.open(m.meta.size);
+        final boolean ne = m.ns.open(ms);
         uri = q.uri.str();
         u = uri.length != 0 ? Math.abs(m.ns.addURI(uri)) : 0;
         final int tn = m.tags.index(q.str(), null, false);
-        m.insert(m.meta.size, m.elem(pre - par, tn, size(nd, true),
+        m.insert(ms, m.elem(pre - par, tn, size(nd, true),
             size(nd, false), u, ne));
         ir = nd.attr();
         p = pre + 1;
