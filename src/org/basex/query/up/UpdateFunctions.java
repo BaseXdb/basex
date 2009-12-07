@@ -79,7 +79,7 @@ public final class UpdateFunctions {
    * @return new data instance
    * @throws QueryException query exception
    */
-  public static Data buildDB(final NodIter ch, final MemData data)
+  public static MemData buildDB(final NodIter ch, final MemData data)
       throws QueryException {
     int pre = 1;
     Nod n;
@@ -91,58 +91,58 @@ public final class UpdateFunctions {
    * Adds a fragment to a database instance.
    * Document nodes are ignored.
    * @param nd node to be added
-   * @param md data reference
+   * @param m data reference
    * @param pre node position
    * @param par node parent
    * @return pre value of next node
    * @throws QueryException query exception
    */
-  private static int addNode(final Nod nd, final MemData md,
+  private static int addNode(final Nod nd, final MemData m,
       final int pre, final int par) throws QueryException {
 
     final int k = Nod.kind(nd.type);
     switch(k) {
       case Data.DOC:
-        md.insertDoc(md.meta.size, size(nd, false), nd.base());
+        m.insert(m.meta.size, m.doc(m.meta.size, size(nd, false), nd.base()));
         int p = pre + 1;
         NodeIter ir = nd.child();
         Nod i;
-        while((i = ir.next()) != null) p = addNode(i, md, p, pre);
+        while((i = ir.next()) != null) p = addNode(i, m, p, pre);
         return p;
       case Data.ATTR:
         QNm q = nd.qname();
         byte[] uri = q.uri.str();
         int u = 0;
-        if(uri.length != 0) u = Math.abs(md.ns.addURI(uri));
-        final int n = md.atts.index(q.str(), null, false);
-        md.insertAttr(md.meta.size, pre - par, n, nd.str(), u);
+        if(uri.length != 0) u = Math.abs(m.ns.addURI(uri));
+        final int n = m.atts.index(q.str(), null, false);
+        m.insert(m.meta.size, m.attr(m.meta.size, pre - par, n, nd.str(), u));
         return pre + 1;
       case Data.PI:
         final byte[] v = trim(concat(nd.nname(), SPACE, nd.str()));
-        md.insertText(md.meta.size, pre - par, v, k);
+        m.insert(m.meta.size, m.text(m.meta.size, pre - par, v, k));
         return pre + 1;
       case Data.TEXT:
       case Data.COMM:
-        md.insertText(md.meta.size, pre - par, nd.str(), k);
+        m.insert(m.meta.size, m.text(m.meta.size, pre - par, nd.str(), k));
         return pre + 1;
       default:
         q = nd.qname();
         //u = 0;
         if(par == 0) {
           final Atts ns = FElem.ns(nd);
-          for(int a = 0; a < ns.size; a++) md.ns.add(ns.key[a], ns.val[a]);
+          for(int a = 0; a < ns.size; a++) m.ns.add(ns.key[a], ns.val[a]);
         }
-        final boolean ne = md.ns.open(md.meta.size);
+        final boolean ne = m.ns.open(m.meta.size);
         uri = q.uri.str();
-        u = uri.length != 0 ? Math.abs(md.ns.addURI(uri)) : 0;
-        final int tn = md.tags.index(q.str(), null, false);
-        md.insertElem(md.meta.size, pre - par, tn, size(nd, true),
-            size(nd, false), u, ne);
+        u = uri.length != 0 ? Math.abs(m.ns.addURI(uri)) : 0;
+        final int tn = m.tags.index(q.str(), null, false);
+        m.insert(m.meta.size, m.elem(pre - par, tn, size(nd, true),
+            size(nd, false), u, ne));
         ir = nd.attr();
         p = pre + 1;
-        while((i = ir.next()) != null) p = addNode(i, md, p, pre);
+        while((i = ir.next()) != null) p = addNode(i, m, p, pre);
         ir = nd.child();
-        while((i = ir.next()) != null) p = addNode(i, md, p, pre);
+        while((i = ir.next()) != null) p = addNode(i, m, p, pre);
         return p;
     }
   }

@@ -116,7 +116,7 @@ public final class InfoTable extends AInfo {
     sl.add(p - data.parent(p, k));
     sl.add(data.size(p, k));
     sl.add(data.attSize(p, k));
-    sl.add(data.uri(p, k));
+    sl.add((data.nsFlag(p) ? "+" : "") + data.uri(p, k));
     sl.add(TABLEKINDS[k]);
     sl.add(string(chop(k == Data.ELEM ? data.name(p, k) : k != Data.ATTR ?
         data.text(p, true) : concat(data.name(p, k), ATT1,

@@ -421,7 +421,7 @@ public abstract class Data {
   // UPDATE OPERATIONS ========================================================
 
   /**
-   * Renames (updates) an element, name or pi name.
+   * Renames (updates) an element, attribute or pi name.
    * @param pre pre value
    * @param k node kind
    * @param nm new tag, attribute or pi name
@@ -436,14 +436,17 @@ public abstract class Data {
       // update/set namespace reference
       final int ou = ns.uri(nm, pre);
       final boolean ne = ou == 0 && uri.length != 0;
-      final int u = ne ? ns.add(pref(nm), uri, pre) :
+      int p = k == Data.ATTR ? parent(pre, k) : pre;
+      int u = ne ? ns.add(pref(nm), uri, p, parent(p, ELEM)) :
         ou != 0 && eq(ns.uri(ou), uri) ? ou : 0;
 
       // write namespace uri reference
       table.write1(pre, k == ELEM ? 3 : 11, u);
-      // write namespace flag and name reference
-      table.write2(pre, 1, (ne | nsFlag(pre) ? 1 << 15 : 0) |
+      // write name reference
+      table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) |
         (k == ELEM ? tags : atts).index(nm, null, false));
+      // write namespace flag
+      table.write2(p, 1, (ne | nsFlag(p) ? 1 << 15 : 0) | name(p));
     }
   }
 
@@ -510,7 +513,7 @@ public abstract class Data {
    * @param par parent of node
    * @param dt data instance to copy from
    */
-  public final void insertAttr(final int pre, final int par, final Data dt) {
+  public final void insertAttr(final int pre, final int par, final MemData dt) {
     meta.update();
     insert(pre, par, dt);
     attSize(par, ELEM, attSize(par, ELEM) + dt.meta.size);
@@ -523,58 +526,65 @@ public abstract class Data {
    * @param par parent pre value of node
    * @param dt data instance to copy from
    */
-  public final void insert(final int pre, final int par, final Data dt) {
+  public final void insert(final int pre, final int par, final MemData dt) {
     meta.update();
 
     // copy database entries
-    final int ss = dt.meta.size;
-    for(int s = 0; s < ss; s++) {
-      final int k = dt.kind(s);
-      final int r = dt.parent(s, k);
-      final int p = s + pre;
-      final int d = r >= 0 ? s - r : p - par;
+    final TokenBuilder tb = new TokenBuilder();
+    final int ms = dt.meta.size;
+    for(int mp = 0; mp < ms; mp++) {
+      final int k = dt.kind(mp);
+      final int p = pre + mp;
+      final int r = dt.parent(mp, k);
+      final int d = r >= 0 ? mp - r : p - par;
 
       switch(k) {
         case DOC:
           // add document
-          insertDoc(p, dt.size(s, k), dt.text(s, true));
+          tb.add(doc(p, dt.size(mp, k), dt.text(mp, true)));
           break;
         case ELEM:
           // add element
-          final boolean ne = dt.nsFlag(s);
-          byte[] nm = dt.name(s, k);
+          final boolean ne = dt.nsFlag(mp);
+          byte[] nm = dt.name(mp, k);
           if(ne) {
-            final Atts at = dt.ns(s);
-            for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], p);
+            final Atts at = dt.ns(mp);
+            for(int a = 0; a < at.size; a++) {
+              ns.add(at.key[a], at.val[a], p, p - d);
+            }
           }
           int u = ns.uri(nm);
           int n = tags.index(nm, null, false);
-          insertElem(p, d, n, dt.attSize(s, k), dt.size(s, k), u, ne);
+          tb.add(elem(d, n, dt.attSize(mp, k), dt.size(mp, k), u, ne));
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          insertText(p, d, dt.text(s, true), k);
+          tb.add(text(p, d, dt.text(mp, true), k));
           break;
         case ATTR:
           // add attribute
-          nm = dt.name(s, k);
+          nm = dt.name(mp, k);
           n = atts.index(nm, null, false);
           // [CG] check (mergeUpdates-001 ?)...
           u = ns.uri(nm);
-          insertAttr(p, d, n, dt.text(s, false), u);
+          tb.add(attr(p, d, n, dt.text(mp, false), u));
           break;
       }
     }
+    table.insert(pre, tb.finish());
+    
     // increase size of ancestors
     int p = par;
     while(p >= 0) {
       final int k = kind(p);
-      size(p, k, size(p, k) + ss);
+      size(p, k, size(p, k) + ms);
       p = parent(p, k);
     }
-    updateDist(pre + ss, ss);
+    updateDist(pre + ms, ms);
+
+    //System.out.println(this);
 
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
@@ -647,13 +657,13 @@ public abstract class Data {
   // INSERTS WITHOUT TABLE UPDATES ============================================
 
   /**
-   * Inserts a text node without updating the table structure.
+   * Inserts the specified table entries into the storage
+   * without updating the table structure.
    * @param pre insert position
-   * @param sz node size
-   * @param val document name
+   * @param entries to insert
    */
-  public final void insertDoc(final int pre, final int sz, final byte[] val) {
-    table.insert(pre, doc(pre, sz, val));
+  public final void insert(final int pre, final byte[] entries) {
+    table.insert(pre, entries);
   }
 
   /**
@@ -663,7 +673,7 @@ public abstract class Data {
    * @param val document name
    * @return document entry
    */
-  private byte[] doc(final int pre, final int sz, final byte[] val) {
+  public byte[] doc(final int pre, final int sz, final byte[] val) {
     // build and insert new entry
     final long id = ++meta.lastid;
     final long v = index(val, pre, true);
@@ -675,70 +685,70 @@ public abstract class Data {
   }
 
   /**
-   * Inserts an element node without updating the table structure.
-   * @param pre insert position
+   * Returns an element entry.
    * @param dis parent distance
    * @param tn tag name index
    * @param as number of attributes
    * @param s node size
    * @param u namespace uri reference
    * @param ne namespace flag
+   * @return element entry
    */
-  public final void insertElem(final int pre, final int dis,
-      final int tn, final int as, final int s, final int u, final boolean ne) {
+  public final byte[] elem(final int dis, final int tn,
+      final int as, final int s, final int u, final boolean ne) {
 
+    // build and insert new entry
     final long id = ++meta.lastid;
-    table.insert(pre, new byte[] {
+    return new byte[] {
         (byte) (as << 3 | ELEM), (byte) ((ne ? 1 << 7 : 0) | (byte) (tn >> 8)),
         (byte) tn, (byte) u,
         (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
         (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
+        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
   }
 
   /**
-   * Inserts a text, comment or pi without updating the table structure.
+   * Returns a text entry.
    * @param pre insert position
    * @param dis parent distance
    * @param val tag name or text node
    * @param k node kind
+   * @return text entry
    */
-  public final void insertText(final int pre, final int dis,
+  public final byte[] text(final int pre, final int dis,
       final byte[] val, final int k) {
 
     // build and insert new entry
     final long id = ++meta.lastid;
     final long len = index(val, pre, true);
-
-    table.insert(pre, new byte[] {
+    return new byte[] {
         (byte) k, 0, 0, (byte) (len >> 32),
         (byte) (len >> 24), (byte) (len >> 16), (byte) (len >> 8), (byte) len,
         (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
+        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
   }
 
   /**
-   * Inserts an attribute without updating the table structure.
+   * Returns an attribute entry.
    * @param pre pre value
    * @param dis parent distance
    * @param name attribute name
    * @param val attribute value
    * @param u namespace uri reference
+   * @return attribute entry
    */
-  public final void insertAttr(final int pre, final int dis, final int name,
+  public final byte[] attr(final int pre, final int dis, final int name,
       final byte[] val, final int u) {
 
     // add attribute to text storage
     final long len = index(val, pre, false);
-
-    // build and insert new entry
     final long id = ++meta.lastid;
-    table.insert(pre, new byte[] {
+    return new byte[] {
         (byte) (dis << 3 | ATTR), (byte) (name >> 8),
         (byte) name, (byte) (len >> 32),
         (byte) (len >> 24), (byte) (len >> 16), (byte) (len >> 8), (byte) len,
         0, 0, 0, (byte) u,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id });
+        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
   }
 
   /**

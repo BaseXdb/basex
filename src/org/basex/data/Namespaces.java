@@ -36,6 +36,7 @@ public final class Namespaces {
    */
   public Namespaces() {
     root = new NSNode();
+    root.pre = -1;
     pref = new TokenSet();
     uri = new TokenSet();
   }
@@ -208,14 +209,15 @@ public final class Namespaces {
    * @param nm tag name
    * @param u uri
    * @param pre pre value
+   * @param par parent
    * @return uri reference
    */
-  int add(final byte[] nm, final byte[] u, final int pre) {
+  int add(final byte[] nm, final byte[] u, final int pre, final int par) {
     final int k = Math.abs(pref.add(nm));
     final int v = Math.abs(uri.add(u));
-    final NSNode nd = root.find(pre);
+    final NSNode nd = root.find(par);
 
-    if(nd.pre != pre) {
+    if(nd.pre != par) {
       final NSNode t = new NSNode();
       t.pre = pre;
       t.add(k, v);

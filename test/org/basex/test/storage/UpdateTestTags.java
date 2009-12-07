@@ -214,7 +214,7 @@ public final class UpdateTestTags extends UpdateTest {
     }
     final MemData md = new MemData(CONTEXT.data);
     final int n = CONTEXT.data.tags.index(name, null, false);
-    md.insertElem(0, 1, n, 1, 1, 0, false);
+    md.insert(0, md.elem(1, n, 1, 1, 0, false));
     data.insert(root, par, md);
   }
 }

@@ -278,22 +278,22 @@ public final class DeepFS implements DataText {
    * @return MemData reference
    */
   private MemData buildFileNode(final String path, final int mode) {
-    final String fname = basename(path);
+    final String fn = basename(path);
     final int nodeSize = 11; // 1x elem, 10x attr
     final MemData m = new MemData(data);
     final int tagID = isReg(mode) ? fileID : dirID;
     final byte [] time = token(System.currentTimeMillis());
-    m.insertElem(m.meta.size, 1, tagID, nodeSize, nodeSize, 0, false);
-    m.insertAttr(m.meta.size, 1, nameID, token(fname), 0);
-    m.insertAttr(m.meta.size, 2, sizeID, ZERO, 0);
-    m.insertAttr(m.meta.size, 3, modeID, token(mode), 0);
-    m.insertAttr(m.meta.size, 4, uidID, token(getUID()), 0);
-    m.insertAttr(m.meta.size, 5, gidID, token(getGID()), 0);
-    m.insertAttr(m.meta.size, 6, atimeID, time, 0);
-    m.insertAttr(m.meta.size, 7, ctimeID, time, 0);
-    m.insertAttr(m.meta.size, 8, mtimeID, time, 0);
-    m.insertAttr(m.meta.size, 9, nlinkID, token("1"), 0);
-    m.insertAttr(m.meta.size, 10, suffixID, getSuffix(fname), 0);
+    m.insert(m.meta.size, m.elem(1, tagID, nodeSize, nodeSize, 0, false));
+    m.insert(m.meta.size, m.attr(m.meta.size, 1, nameID, token(fn), 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 2, sizeID, ZERO, 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 3, modeID, token(mode), 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 4, uidID, token(getUID()), 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 5, gidID, token(getGID()), 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 6, atimeID, time, 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 7, ctimeID, time, 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 8, mtimeID, time, 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 9, nlinkID, token("1"), 0));
+    m.insert(m.meta.size, m.attr(m.meta.size, 10, suffixID, getSuffix(fn), 0));
     return m;
   }
 

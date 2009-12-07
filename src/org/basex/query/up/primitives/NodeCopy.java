@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import java.util.LinkedList;
-import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -20,7 +19,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
   /** Insertion nodes. */
   protected final LinkedList<NodIter> c = new LinkedList<NodIter>();
   /** Final copy of insertion nodes. */
-  public Data md;
+  public MemData md;
 
   /**
    * Constructor.

@@ -39,7 +39,7 @@ public final class ReplaceElemContent extends UpdatePrimitive {
     }
     if(txt.length > 0) {
       final MemData md = new MemData(n.data);
-      md.insertText(0, pre - par, txt, Data.TEXT);
+      md.insert(0, md.text(0, pre - par, txt, Data.TEXT));
       d.insert(pre, par, md);
     }
   }

@@ -8,6 +8,7 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -36,9 +37,9 @@ public final class Add extends ACreate {
     if(pre != -1) return error(DBDOC, args[0]);
 
     final DirParser p = new DirParser(io, context.prop);
-    Data d = null;
+    MemData d = null;
     try {
-      d = new MemBuilder(p).build(io.dbname());
+      d = (MemData) new MemBuilder(p).build(io.dbname());
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();
