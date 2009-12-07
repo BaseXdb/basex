@@ -2,8 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
@@ -220,7 +218,7 @@ public final class DialogServer extends Dialog {
 
     delete = new BaseXButton(BUTTONDELETE, this);
     deleteAll = new BaseXButton(BUTTONDELALL, this);
-    logc = new BaseXCombo(new String[] {}, this);
+    logc = new BaseXCombo(true, new String[] {}, this);
     logt = new BaseXText(false, this);
     logt.setFont(getFont());
     logt.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -254,11 +252,6 @@ public final class DialogServer extends Dialog {
         tab = pane.getSelectedIndex();
         final Object o = pane.getSelectedComponent();
         if(o == logs) refreshLog();
-      }
-    });
-    logc.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent event) {
-        action(refreshLog);
       }
     });
     action(null);
@@ -344,6 +337,8 @@ public final class DialogServer extends Dialog {
         }
         logc.setSelectedIndex(-1);
         refreshLog();
+      } else if(cmp == logc) {
+        action(refreshLog);
       } else if(connected) {
         if(tab == 1) user.action(cmp);
         if(tab == 2) dbsP.action(cmp);
