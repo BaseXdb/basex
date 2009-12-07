@@ -1024,9 +1024,9 @@ public final class ExifParser {
     } catch(final EOFException e) {
       return false;
     }
-    if(!checkEndianness(f)) return false;
-    if(f.getShort() != 0x2A) return false; // magic number
-    return true;
+    if(checkEndianness(f) && f.getShort() == 0x2A) return true;
+    f.setByteOrder(ByteOrder.BIG_ENDIAN);
+    return false;
   }
 
   /**
@@ -1053,8 +1053,13 @@ public final class ExifParser {
      */
     assert ifdOffset >= 8;
     bfc.position(ifdOffset);
-    readIFD();
-    bfc.setByteOrder(ByteOrder.BIG_ENDIAN); // set byte order to default value
+    try {
+      readIFD();
+    } catch(IOException e) {
+      throw e;
+    } finally {
+      bfc.setByteOrder(ByteOrder.BIG_ENDIAN); // set byte order to default value
+    }
   }
 
   /**

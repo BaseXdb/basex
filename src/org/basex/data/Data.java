@@ -563,7 +563,6 @@ public abstract class Data {
           n = atts.index(nm, null, false);
           // [CG] check (mergeUpdates-001 ?)...
           u = ns.uri(nm);
-          System.out.println(u + "/" + dt.uri(s, k));
           insertAttr(p, d, n, dt.text(s, false), u);
           break;
       }
