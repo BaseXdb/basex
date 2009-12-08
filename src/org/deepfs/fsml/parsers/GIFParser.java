@@ -4,12 +4,12 @@ import static org.basex.util.Token.*;
 import java.io.EOFException;
 import java.io.IOException;
 import org.basex.core.Main;
-import org.deepfs.fsml.util.BufferedFileChannel;
-import org.deepfs.fsml.util.DeepFile;
-import org.deepfs.fsml.util.FileType;
-import org.deepfs.fsml.util.MetaElem;
-import org.deepfs.fsml.util.MimeType;
-import org.deepfs.fsml.util.ParserRegistry;
+import org.deepfs.fsml.BufferedFileChannel;
+import org.deepfs.fsml.DeepFile;
+import org.deepfs.fsml.FileType;
+import org.deepfs.fsml.MetaElem;
+import org.deepfs.fsml.MimeType;
+import org.deepfs.fsml.ParserRegistry;
 
 /**
  * Parser for GIF files.

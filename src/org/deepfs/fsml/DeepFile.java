@@ -1,4 +1,4 @@
-package org.deepfs.fsml.util;
+package org.deepfs.fsml;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
@@ -24,9 +24,10 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.item.Type;
 import org.basex.util.Atts;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.util.XMLToken;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.parsers.IFileParser;
+import org.deepfs.fsml.ser.FSMLSerializer;
 
 /**
  * <p>
@@ -41,6 +42,8 @@ import org.deepfs.fsml.parsers.IFileParser;
  * @author Bastian Lemke
  */
 public class DeepFile {
+  
+  // [BL] always set default file type
 
   /**
    * A reference to the parser registry that can be used to parse file
@@ -56,13 +59,13 @@ public class DeepFile {
   /** The file system attributes for the file. */
   private Atts fsAtts;
   /** Map, containing all metadata key-value pairs for the current file. */
-  private final TreeMap<MetaElem, ArrayList<byte[]>> metaElements;
+  private final TreeMap<MetaElem, ArrayList<String>> metaElements;
   /** List with all file fragments (fs:content elements). */
   private final ArrayList<DeepFile> fileFragments;
   /** All text contents that are extracted from the file. */
-  private final ArrayList<TextContent> textContents;
+  private final ArrayList<Content> textContents;
   /** All xml contents that are extracted from the file as string. */
-  private final ArrayList<XMLContent> xmlContents;
+  private final ArrayList<Content> xmlContents;
 
   /** The BaseX context. */
   private final Context context;
@@ -200,9 +203,9 @@ public class DeepFile {
     offset = position;
     size = contentSize;
     fileFragments = new ArrayList<DeepFile>();
-    metaElements = meta ? new TreeMap<MetaElem, ArrayList<byte[]>>() : null;
-    textContents = p.is(Prop.FSCONT) ? new ArrayList<TextContent>() : null;
-    xmlContents = p.is(Prop.FSXML) ? new ArrayList<XMLContent>() : null;
+    metaElements = meta ? new TreeMap<MetaElem, ArrayList<String>>() : null;
+    textContents = p.is(Prop.FSCONT) ? new ArrayList<Content>() : null;
+    xmlContents = p.is(Prop.FSXML) ? new ArrayList<Content>() : null;
   }
 
   /**
@@ -236,11 +239,12 @@ public class DeepFile {
   public void extract() throws IOException {
     if(bfc == null) return;
     final String fname = bfc.getFileName();
+    String suffix = "";
     if(fname.indexOf('.') != -1) {
       final int dot = fname.lastIndexOf('.');
-      final String suffix = fname.substring(dot + 1).toLowerCase();
-      process(this, suffix);
+      suffix = fname.substring(dot + 1).toLowerCase();
     }
+    process(this, suffix);
     finish();
   }
 
@@ -338,7 +342,7 @@ public class DeepFile {
    * extraction is disabled.
    * @return the metadata
    */
-  public TreeMap<MetaElem, ArrayList<byte[]>> getMeta() {
+  public TreeMap<MetaElem, ArrayList<String>> getMeta() {
     return metaElements;
   }
 
@@ -355,9 +359,9 @@ public class DeepFile {
    * extraction is disabled.
    * @return all text sections
    */
-  public TextContent[] getTextContents() {
+  public Content[] getTextContents() {
     return textContents == null ? null
-        : textContents.toArray(new TextContent[textContents.size()]);
+        : textContents.toArray(new Content[textContents.size()]);
   }
 
   /**
@@ -365,9 +369,9 @@ public class DeepFile {
    * disabled.
    * @return all xml sections
    */
-  public XMLContent[] getXMLContents() {
+  public Content[] getXMLContents() {
     return xmlContents == null ? null
-        : xmlContents.toArray(new XMLContent[xmlContents.size()]);
+        : xmlContents.toArray(new Content[xmlContents.size()]);
   }
 
   // ---------------------------------------------------------------------------
@@ -391,7 +395,7 @@ public class DeepFile {
    */
   public void setFileType(final FileType type) {
     if(metaFinished) return;
-    addMeta0(MetaElem.TYPE, type.get());
+    addMeta0(MetaElem.TYPE, type.toString());
   }
 
   /**
@@ -400,19 +404,19 @@ public class DeepFile {
    */
   public void setFileFormat(final MimeType format) {
     if(metaFinished) return;
-    addMeta0(MetaElem.FORMAT, format.get());
+    addMeta0(MetaElem.FORMAT, format.toString());
   }
 
   /**
    * Adds a metadata key-value pair for the current file.
    * @param e metadata element (the key)
-   * @param value value as byte array. Must contain only correct UTF-8 values!
+   * @param value the value to add.
    * @param dataType the xml data type to set for this metadata element or
    *          <code>null</code> if the default data type should be used
    */
-  private void addMeta(final MetaElem e, final byte[] value,
+  private void addMeta(final MetaElem e, final String value,
       final Type dataType) {
-    if(metaFinished || value.length == 0) return;
+    if(metaFinished || value.length() == 0) return;
     if(e.equals(MetaElem.TYPE) | e.equals(MetaElem.FORMAT)) {
       Main.debug("The metadata attributes " + MetaElem.TYPE + " and "
           + MetaElem.FORMAT + " must not be set by an addMetaElem() method."
@@ -427,14 +431,12 @@ public class DeepFile {
   /**
    * Adds the metadata to the TreeMap.
    * @param e metadata element (the key)
-   * @param value value as byte array. Must contain only correct UTF-8 values!
+   * @param value the value to add.
    */
-  private void addMeta0(final MetaElem e, final byte[] value) {
-    final TokenBuilder tb = new TokenBuilder(value);
-    tb.chop();
-    final byte[] data = tb.finish();
-    if(data.length == 0) return;
-    final ArrayList<byte[]> vals;
+  private void addMeta0(final MetaElem e, final String value) {
+    final String s = value.trim();
+    if(s.length() == 0) return;
+    final ArrayList<String> vals;
     if(metaElements.containsKey(e)) {
       if(!e.isMultiVal()) {
         Main.debug(
@@ -444,10 +446,10 @@ public class DeepFile {
       }
       vals = metaElements.get(e);
     } else {
-      vals = new ArrayList<byte[]>();
+      vals = new ArrayList<String>();
       metaElements.put(e, vals);
     }
-    vals.add(data);
+    vals.add(s);
   }
 
   /**
@@ -458,7 +460,7 @@ public class DeepFile {
   public void addMeta(final MetaElem elem, final byte[] value) {
     if(!Type.STR.instance(elem.getType()))
       metaDebug(elem, "string - as byte array");
-    else addMeta(elem, ParserUtil.checkUTF(value), null);
+    else addMeta(elem, string(removeNonUTF8(value, true)), null);
   }
 
   /**
@@ -468,7 +470,7 @@ public class DeepFile {
    */
   public void addMeta(final MetaElem elem, final String value) {
     if(!checkType(elem, Type.STR)) return;
-    addMeta(elem, ParserUtil.checkUTF(Token.token(value)), null);
+    addMeta(elem, string(removeNonUTF8(Token.token(value), true)), null);
   }
 
   /**
@@ -478,7 +480,7 @@ public class DeepFile {
    */
   public void addMeta(final MetaElem elem, final short value) {
     if(!checkType(elem, Type.SHR)) return;
-    addMeta(elem, Token.token(value), Type.SHR);
+    addMeta(elem, String.valueOf(value), Type.SHR);
   }
 
   /**
@@ -490,7 +492,7 @@ public class DeepFile {
     if(!Type.INT.instance(elem.getType())) {
       if(value <= Short.MAX_VALUE) addMeta(elem, (short) value);
       else metaDebug(elem, "integer");
-    } else addMeta(elem, Token.token(value), null);
+    } else addMeta(elem, String.valueOf(value), null);
   }
 
   /**
@@ -502,7 +504,7 @@ public class DeepFile {
     if(!Type.LNG.instance(elem.getType())) {
       if(value <= Integer.MAX_VALUE) addMeta(elem, (int) value);
       else metaDebug(elem, "long");
-    } else addMeta(elem, Token.token(value), Type.LNG);
+    } else addMeta(elem, String.valueOf(value), Type.LNG);
   }
 
   /**
@@ -512,7 +514,7 @@ public class DeepFile {
    */
   public void addMeta(final MetaElem elem, final double value) {
     if(!checkType(elem, Type.DBL)) return;
-    addMeta(elem, Token.token(value), Type.DBL);
+    addMeta(elem, String.valueOf(value), Type.DBL);
   }
 
   /**
@@ -522,7 +524,7 @@ public class DeepFile {
    */
   public void addMeta(final MetaElem elem, final Duration value) {
     if(!checkType(elem, Type.DUR)) return;
-    addMeta(elem, Token.token(value.toString()), null);
+    addMeta(elem, String.valueOf(value.toString()), null);
   }
 
   /**
@@ -538,8 +540,7 @@ public class DeepFile {
       metaDebug(elem, st.getLocalPart());
     else {
       try {
-        final byte[] data = token(xgc.toXMLFormat());
-        addMeta(elem, data, null);
+        addMeta(elem, xgc.toXMLFormat(), null);
       } catch(IllegalStateException e) {
         Main.debug("DeepFile: Invalid date (file: %, error message: %)",
             bfc.getFileName(), e.getMessage());
@@ -580,9 +581,9 @@ public class DeepFile {
   public void finishMetaExtraction() throws IOException {
     metaFinished = true;
     if(metaElements != null) {
-      final ArrayList<byte[]> type = metaElements.get(MetaElem.TYPE);
-      if(type != null && Token.eq(type.get(0), FileType.MESSAGE.get())) {
-        ArrayList<byte[]> creator = metaElements.get(MetaElem.CREATOR_NAME);
+      final ArrayList<String> type = metaElements.get(MetaElem.TYPE);
+      if(type != null && type.get(0).equals(FileType.MESSAGE.toString())) {
+        ArrayList<String> creator = metaElements.get(MetaElem.CREATOR_NAME);
         boolean err = false;
         if(creator != null) {
           if(creator.size() > 1) err = true;
@@ -603,17 +604,15 @@ public class DeepFile {
   }
 
   /**
-   * Returns the string value for a {@link MetaElem} that was previously added.
+   * Returns the string values for the {@link MetaElem}.
    * @param elem the metadata element
-   * @return the metadata value as string
+   * @return the metadata values as Strings
    */
-  public String[] getValueAsString(final MetaElem elem) {
-    final ArrayList<byte[]> vals = metaElements.get(elem);
+  public String[] getValues(final MetaElem elem) {
+    final ArrayList<String> vals = metaElements.get(elem);
     if(vals == null) return null;
     final int max = vals.size();
     final String[] strings = new String[max];
-    for(int i = 0; i < max; i++)
-      strings[i] = Token.string(vals.get(0));
     return strings;
   }
 
@@ -637,19 +636,6 @@ public class DeepFile {
   // ----- contents ------------------------------------------------------------
 
   /**
-   * Adds a text section.
-   * @param position the absolute position of the first byte of the file
-   *          fragment represented by this content element inside the current
-   *          file. A negative value stands for an unknown offset
-   * @param byteCount the size of the content element
-   * @param text the text to add
-   */
-  public void addText(final long position, final int byteCount,
-      final byte[] text) {
-    addText(position, byteCount, new TokenBuilder(ParserUtil.checkUTF(text)));
-  }
-
-  /**
    * <p>
    * Adds a text section. <b><code>text</code> MUST contain only valid UTF-8
    * characters!</b> Otherwise the generated XML document may be not
@@ -662,17 +648,19 @@ public class DeepFile {
    * @param text the text to add
    */
   public void addText(final long position, final int byteCount,
-      final TokenBuilder text) {
+      final String text) {
     if(!extractText()) return;
-    text.chop();
-    if(text.size() == 0) return;
-    final byte[] data;
-    final int textmax = context.prop.num(Prop.FSTEXTMAX);
-    if(text.size() > textmax) {
-      data = new byte[textmax];
-      System.arraycopy(text.finish(), 0, data, 0, textmax);
-    } else data = text.finish();
-    textContents.add(new TextContent(position, byteCount, data));
+    final String s = text.trim();
+    if(s.equals("")) return;
+    for(int i = 0; i < s.length(); i++)
+      if(!XMLToken.valid(s.charAt(i))) {
+        unknown();
+        return;
+      }
+    final int max = context.prop.num(Prop.FSTEXTMAX);
+    final Content c = new Content(position, byteCount,
+        s.length() > max ? s.substring(0, max) : s);
+    textContents.add(c);
   }
 
   /**
@@ -684,34 +672,50 @@ public class DeepFile {
    */
   public void addXML(final long position, final int byteCount,
       final Data data) throws IOException {
-    if(!extractXML()) return;
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     final PrintOutput po = new PrintOutput(baos);
     final XMLSerializer ser = new XMLSerializer(po);
     final Context ctx = new Context();
     ctx.openDB(data);
     final QueryProcessor qp = new QueryProcessor("/", ctx);
-    byte[] xmlContent;
     try {
       final Result res = qp.query();
       res.serialize(ser);
-      xmlContent = baos.toByteArray();
+      final String xml = baos.toString();
       ser.close();
       po.close();
-    } catch(final QueryException e) {
-      xmlContent = new byte[] { };
+      addXML(position, byteCount, xml);
+    } catch(final QueryException e) { return; }
+  }
+  
+  /**
+   * Adds a xml document or fragment to the DeepFile.
+   * @param pos offset of the xml document/fragement inside the file
+   * @param byteCount number of bytes of the xml document/fragment
+   * @param xml the xml document/fragment
+   */
+  public void addXML(final long pos, final int byteCount, final String xml) {
+    if(!extractXML() || xml.equals("")) return;
+    if(xml.length() > context.prop.num(Prop.FSTEXTMAX))
+      addText(pos, byteCount, xml);
+    else {
+      for(int i = 0; i < xml.length(); i++)
+        if(!XMLToken.valid(xml.charAt(i))) {
+          unknown();
+          return;
+        }
+      xmlContents.add(new Content(pos, byteCount, xml));
     }
-    if(xmlContent.length == 0) return;
-    final int textmax = context.prop.num(Prop.FSTEXTMAX);
-    if(xmlContent.length > textmax) {
-      if(!extractText()) return;
-      final byte[] text = new byte[textmax];
-      System.arraycopy(xmlContent, 0, text, 0, textmax);
-      textContents.add(new TextContent(position, textmax, text));
-    } else {
-      xmlContents.add(new XMLContent(position, byteCount,
-          new String(xmlContent)));
-    }
+  }
+  
+  /** Sets format and type to 'unknown'. */
+  private void unknown() {
+    final ArrayList<String> val = new ArrayList<String>();
+    val.add(MimeType.UNKNOWN.toString());
+    metaElements.put(MetaElem.FORMAT, val);
+    val.clear();
+    val.add(FileType.UNKNOWN.toString());
+    metaElements.put(MetaElem.TYPE, val);
   }
 
   // ---------------------------------------------------------------------------
@@ -734,23 +738,23 @@ public class DeepFile {
     if(f.isDirectory()) atts.add(MODE, token(getSIFDIR() | 0755));
     else atts.add(MODE, token(getSIFREG() | 0644));
 
-    byte[] uidVal = null;
-    byte[] gidVal = null;
+    String uidVal = null;
+    String gidVal = null;
     if(metaElements != null) {
-      final ArrayList<byte[]> uid = metaElements.get(MetaElem.FS_OWNER_USER_ID);
+      final ArrayList<String> uid = metaElements.get(MetaElem.FS_OWNER_USER_ID);
       if(uid != null) {
         uidVal = uid.get(0);
         metaElements.remove(MetaElem.FS_OWNER_USER_ID);
       }
-      final ArrayList<byte[]> gid =
+      final ArrayList<String> gid =
         metaElements.get(MetaElem.FS_OWNER_GROUP_ID);
       if(gid != null) {
         gidVal = gid.get(0);
         metaElements.remove(MetaElem.FS_OWNER_GROUP_ID);
       }
     }
-    atts.add(UID, uidVal == null ? token(getUID()) : uidVal);
-    atts.add(GID, gidVal == null ? token(getGID()) : gidVal);
+    atts.add(UID, uidVal == null ? token(getUID()) : token(uidVal));
+    atts.add(GID, gidVal == null ? token(getGID()) : token(gidVal));
 
     atts.add(ATIME, time);
     atts.add(CTIME, time);
@@ -773,8 +777,13 @@ public class DeepFile {
     for(final String s : suffix) {
       try {
         p = registry.getParser(s.toLowerCase());
-      } catch(final ParserException e) { /* ignore and continue ... */}
+      } catch(final ParserException e) { /* ignore and continue ... */ }
       if(p != null) break;
+    }
+    if(p == null) {
+      try {
+        p = registry.getFallbackParser();
+      } catch(final ParserException e) { /* ignore and continue ... */ }
     }
     if(p != null) p.extract(df);
   }
@@ -935,27 +944,41 @@ public class DeepFile {
           + " content sections)";
     }
   }
+  
+  /**
+   * Verbose debug message.
+   * @param str debug string
+   * @param ext text optional extensions
+   */
+  public void debug(final String str, final Object...ext) {
+    if(context.prop.is(Prop.FSVERBOSE))
+      Main.debug(bfc.getFileName() + " - " + str, ext);
+  }
 
   // ---------------------------------------------------------------------------
 
   /**
-   * Abstract class for file contents.
+   * File content.
    * @author Bastian Lemke
    */
-  public abstract class AbstrCont {
+  public class Content {
     /** offset inside the regular file. */
     final long o;
     /** size of the text section. */
     final int s;
+    /** the content. */
+    final String t;
 
     /**
      * Constructor.
-     * @param position offset inside the regular file
+     * @param pos offset inside the regular file
      * @param byteCount size of the text section (byte count)
+     * @param text the content.
      */
-    public AbstrCont(final long position, final int byteCount) {
-      o = position;
+    public Content(final long pos, final int byteCount, final String text) {
+      o = pos;
       s = byteCount;
+      t = text;
     }
 
     /**
@@ -973,60 +996,12 @@ public class DeepFile {
     public int getSize() {
       return s;
     }
-  }
-
-  /**
-   * Text content of a file.
-   * @author Bastian Lemke
-   */
-  public final class TextContent extends AbstrCont {
-    /** byte array, containing the text. */
-    private final byte[] t;
-
+    
     /**
-     * Constructor.
-     * @param position offset inside the regular file
-     * @param byteCount size of the text section (byte count)
-     * @param text byte array, containing the text
+     * Returns the content.
+     * @return the content.
      */
-    TextContent(final long position, final int byteCount, final byte[] text) {
-      super(position, byteCount);
-      t = text;
-    }
-
-    /**
-     * Returns the text.
-     * @return the text
-     */
-    public byte[] getText() {
-      return t;
-    }
-  }
-
-  /**
-   * XML content of a file.
-   * @author Bastian Lemke
-   */
-  public final class XMLContent extends AbstrCont {
-    /** byte array, containing the xml as text. */
-    private final String t;
-
-    /**
-     * Constructor.
-     * @param position offset inside the regular file
-     * @param byteCount size of the text section (byte count)
-     * @param xml String, containing the xml document/fragment as text
-     */
-    XMLContent(final long position, final int byteCount, final String xml) {
-      super(position, byteCount);
-      t = xml;
-    }
-
-    /**
-     * Returns the xml content as string.
-     * @return the xml content
-     */
-    public String asString() {
+    public String getContent() {
       return t;
     }
   }
@@ -1034,85 +1009,19 @@ public class DeepFile {
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
-
-  /** All namespaces used in the DeepFile. */
-  public enum NS {
-
-    /** XML schema namespace. */
-    XS("xs", "http://www.w3.org/2001/XMLSchema"),
-
-    /** XML schema instance namespace. */
-    XSI("xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-
-    /** DeepFS filesystem namespace. */
-    DEEPURL("", "http://www.deepfs.org/fs/1.0/"),
-
-    /** DeepFS metadata namespace. */
-    FSMETA("", "http://www.deepfs.org/fsmeta/1.0/"),
-
-    /** Dublin Core metadata terms namespace. */
-    DCTERMS("", "http://purl.org/dc/terms/");
-
-    /** The namespace prefix. */
-    private byte[] prefix;
-    /** The namespace URI. */
-    private byte[] uri;
-
-    /**
-     * Initializes a namespace instance.
-     * @param p the prefix
-     * @param u the URI
-     */
-    NS(final String p, final String u) {
-      prefix = token(p);
-      uri = token(u);
-    }
-
-    @Override
-    public String toString() {
-      final StringBuilder str = new StringBuilder("xmlns");
-      if(prefix.length > 0) {
-        str.append(':');
-        str.append(string(prefix));
-      }
-      str.append("=\"");
-      str.append(string(uri));
-      str.append("\"");
-      return str.toString();
-    }
-
-    /**
-     * Converts the xml element into a byte array containing the correct
-     * namespace prefix.
-     * @param element the xml element to convert
-     * @return the converted element as byte array;
-     */
-    public byte[] tag(final String element) {
-      return tag(token(element));
-    }
-
-    /**
-     * Converts the xml element into a byte array containing the correct
-     * namespace prefix.
-     * @param element the xml element to convert
-     * @return the converted element as byte array;
-     */
-    public byte[] tag(final byte[] element) {
-      if(prefix.length == 0) return element;
-      return concat(prefix, new byte[] { ':'}, element);
-    }
-  }
 
   /** DeepFS tag in fs namespace. */
-  public static final byte[] DEEPFS_NS = NS.DEEPURL.tag(DEEPFS);
+  public static final String DEEPFS_NS = DeepNS.DEEPURL.tag(string(DEEPFS));
   /** Directory tag in fs namespace. */
-  public static final byte[] DIR_NS = NS.DEEPURL.tag(DIR);
+  public static final String DIR_NS = DeepNS.DEEPURL.tag(string(DIR));
   /** File tag in fs namespace. */
-  public static final byte[] FILE_NS = NS.DEEPURL.tag(FILE);
+  public static final String FILE_NS = DeepNS.DEEPURL.tag(string(FILE));
   /** Content tag in fs namespace. */
-  public static final byte[] CONTENT_NS = NS.DEEPURL.tag(CONTENT);
+  public static final String CONTENT_NS = DeepNS.DEEPURL.tag(string(CONTENT));
   /** Text content tag in fs namespace. */
-  public static final byte[] TEXT_CONTENT_NS = NS.DEEPURL.tag(TEXT_CONTENT);
+  public static final String TEXT_CONTENT_NS =
+    DeepNS.DEEPURL.tag(string(TEXT_CONTENT));
   /** XML content tag in fs namespace. */
-  public static final byte[] XML_CONTENT_NS = NS.DEEPURL.tag(XML_CONTENT);
+  public static final String XML_CONTENT_NS =
+    DeepNS.DEEPURL.tag(string(XML_CONTENT));
 }

@@ -7,13 +7,14 @@ import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.core.Main;
+
 import org.basex.query.item.Type;
 import org.basex.util.Token;
-import org.deepfs.fsml.util.BufferedFileChannel;
-import org.deepfs.fsml.util.DeepFile;
-import org.deepfs.fsml.util.MetaElem;
+import org.deepfs.fsml.BufferedFileChannel;
+import org.deepfs.fsml.DeepFile;
+import org.deepfs.fsml.MetaElem;
 import org.deepfs.fsml.util.ParserUtil;
 
 /**
@@ -756,7 +757,7 @@ public final class ExifParser {
         case LONG:  d.addMeta(elem, readLong(b));  break;
         case SLONG: d.addMeta(elem, readSLong(b)); break;
         default:
-          Main.debug("ExifParser: Unknown or unsupported field type for " +
+          d.debug("ExifParser: Unknown or unsupported field type for " +
               "inlined data (%)", format);
       }
     }
@@ -843,7 +844,7 @@ public final class ExifParser {
             }
             break;
           default:
-            Main.debug("ExifParser: Unknown or unsupported field type for " +
+            d.debug("ExifParser: Unknown or unsupported field type for " +
                 "non-inlined data (%)", format);
         }
       } catch(final Exception e) {
@@ -996,9 +997,8 @@ public final class ExifParser {
      * @param ex the message to log
      */
     void err(final DeepFile d, final String ex) {
-      Main.debug(
-          "ExifParser: Invalid field (file: %, field id: % (%), error message: "
-              + "%)", d.getBufferedFileChannel().getFileName(), this, elem, ex);
+      d.debug("ExifParser: Invalid field (field id: % (%), error message: %)",
+          this, elem, ex);
     }
 
     @Override
@@ -1072,8 +1072,7 @@ public final class ExifParser {
     bfc.buffer(2);
     final int numFields = bfc.getShort();
     // one field contains 12 bytes
-    final byte[] buf = new byte[numFields * 12];
-    bfc.get(buf);
+    final byte[] buf = bfc.get(new byte[numFields * 12]);
     for(int i = 0; i < numFields; i++) {
       readField(ByteBuffer.wrap(buf, i * 12, 12).order(bfc.getByteOrder()));
     }

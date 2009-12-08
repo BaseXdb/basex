@@ -9,13 +9,13 @@ import java.util.GregorianCalendar;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.core.Main;
 import org.basex.util.Token;
-import org.deepfs.fsml.util.BufferedFileChannel;
-import org.deepfs.fsml.util.DeepFile;
-import org.deepfs.fsml.util.FileType;
-import org.deepfs.fsml.util.MetaElem;
-import org.deepfs.fsml.util.MimeType;
-import org.deepfs.fsml.util.ParserException;
-import org.deepfs.fsml.util.ParserRegistry;
+import org.deepfs.fsml.BufferedFileChannel;
+import org.deepfs.fsml.DeepFile;
+import org.deepfs.fsml.FileType;
+import org.deepfs.fsml.MetaElem;
+import org.deepfs.fsml.MimeType;
+import org.deepfs.fsml.ParserException;
+import org.deepfs.fsml.ParserRegistry;
 import org.deepfs.fsml.util.ParserUtil;
 
 /**
@@ -613,9 +613,8 @@ public final class MP3Parser implements IFileParser {
       case ENC_UTF_8:
         return "UTF-8";
       case ENC_UTF_16_NO_BOM:
-        Main.debug(
-            "MP3Parser: Unsupported text encoding (UTF-16 without BOM) found "
-            + "(%).", bfc.getFileName());
+        deepFile.debug(
+            "MP3Parser: Unsupported text encoding (UTF-16 without BOM)");
         return null;
       case ENC_UTF_16_WITH_BOM:
         return "UTF-16";
@@ -1125,7 +1124,7 @@ public final class MP3Parser implements IFileParser {
         try {
           obj.deepFile.addMeta(MetaElem.TRACK, obj.readTrack(size));
         } catch(ParserException e) {
-          Main.debug("MP3Parser: % (%)", e.getMessage(), obj.bfc.getFileName());
+          obj.deepFile.debug("MP3Parser: Failed to parse track number (%).", e);
         }
       }
     },

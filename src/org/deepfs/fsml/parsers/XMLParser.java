@@ -8,12 +8,12 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.IOContent;
-import org.deepfs.fsml.util.BufferedFileChannel;
-import org.deepfs.fsml.util.DeepFile;
-import org.deepfs.fsml.util.FileType;
-import org.deepfs.fsml.util.MimeType;
-import org.deepfs.fsml.util.ParserException;
-import org.deepfs.fsml.util.ParserRegistry;
+import org.deepfs.fsml.BufferedFileChannel;
+import org.deepfs.fsml.DeepFile;
+import org.deepfs.fsml.FileType;
+import org.deepfs.fsml.MimeType;
+import org.deepfs.fsml.ParserException;
+import org.deepfs.fsml.ParserRegistry;
 
 /**
  * Parser for XML files.
@@ -54,8 +54,7 @@ public final class XMLParser implements IFileParser {
       throws IOException {
     if(f.size() > Integer.MAX_VALUE) throw new IOException(
         "Input file too big.");
-    final byte[] data = new byte[(int) f.size()];
-    f.get(data);
+    final byte[] data = f.get(new byte[(int) f.size()]);
     try {
       final Parser p = Parser.xmlParser(new IOContent(data), prop);
       return new MemBuilder(p).build();
@@ -91,8 +90,9 @@ public final class XMLParser implements IFileParser {
       try {
         deepFile.fallback();
       } catch(final ParserException e) {
-        Main.debug("Failed to read text content from xml file with " +
-            "fallback parser (%).", e);
+        deepFile.debug(
+            "XMLParser: Failed to read text content from file with " +
+                "fallback parser (%).", e);
       }
     }
   }

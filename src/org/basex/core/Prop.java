@@ -156,6 +156,8 @@ public final class Prop extends AProp {
   public static final Object[] FSXML = { "FSXML", true };
   /** Maximum size for textual imports. */
   public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 10240 };
+  /** Verbose debug informations for FSTraversal. */
+  public static final Object[] FSVERBOSE = { "FSVERBOSE", false };
 
   /**
    * FSTraversal implementation. If true, the FSTraversal implementation (based

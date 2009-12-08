@@ -9,12 +9,12 @@ import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.deepfs.fsml.BufferedFileChannel;
+import org.deepfs.fsml.DeepFile;
+import org.deepfs.fsml.ParserException;
+import org.deepfs.fsml.ParserRegistry;
 import org.deepfs.fsml.plugin.SpotlightExtractor;
-import org.deepfs.fsml.util.BufferedFileChannel;
-import org.deepfs.fsml.util.DeepFile;
-import org.deepfs.fsml.util.FSMLSerializer;
-import org.deepfs.fsml.util.ParserException;
-import org.deepfs.fsml.util.ParserRegistry;
+import org.deepfs.fsml.ser.FSMLSerializer;
 
 /**
  * Build a FSML database while traversing a directory hierarchy.
@@ -118,11 +118,7 @@ public final class FSImporter implements FSTraversal {
     currentFile = f.toString();
     String xmlFragment = null;
     if(f.isDirectory()) {
-      try {
-        xmlFragment = FSMLSerializer.serializeFile(f, absolutePath);
-      } catch(final IOException e) {
-        Main.debug("Failed to open dir (%)", e);
-      }
+      xmlFragment = FSMLSerializer.serializeFile(f, absolutePath);
     } else {
       try {
         final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
@@ -154,14 +150,8 @@ public final class FSImporter implements FSTraversal {
       }
     }
     
-    if(xmlFragment == null) {
-      try {
-        xmlFragment = FSMLSerializer.serializeFile(f, absolutePath);
-      } catch(IOException e) {
-        Main.debug("FSImporter: Failed to parse file attributes (% - %)",
-            f.getAbsolutePath(), e);
-      }
-    }
+    if(xmlFragment == null)
+      xmlFragment = FSMLSerializer.serializeFile(f, absolutePath);
 
     if(xmlFragment != null) {
       final String query = "insert nodes " + xmlFragment + " into "

@@ -1,7 +1,6 @@
-package org.deepfs.fsml.util;
+package org.deepfs.fsml;
 
 import org.basex.core.Main;
-import org.basex.util.Token;
 
 /**
  * Available MIME types.
@@ -59,6 +58,8 @@ public enum MimeType {
   PPS("application/vnd.ms-powerpoint", "pps", FileType.PRESENTATION),
   /** Rich text format. */
   RTF("text/rtf", "rtf", FileType.TEXT, FileType.DOCUMENT),
+  /** Shell script. */
+  SH("text/plain", "sh", FileType.SCRIPT),
   /** TIFF. */
   TIFF("image/tiff", "tif", FileType.PICTURE),
   /** Plaintext. */
@@ -79,40 +80,32 @@ public enum MimeType {
   ZIP("application/zip", "zip", FileType.ARCHIVE);
 
   /** The element name as byte array. */
-  private final byte[] elem;
+  private final String val;
   /** The default file suffix. */
-  private final byte[] suff;
+  private final String suf;
 
   /** The associated meta types. */
   private FileType[] types;
 
   /**
    * Constructor for initializing an element.
-   * @param element the xml element string
+   * @param value the MIME value
    * @param defaultSuffix the default file suffix for the MIME type
    * @param mt the associated meta types
    */
-  MimeType(final String element, final String defaultSuffix,
+  MimeType(final String value, final String defaultSuffix,
       final FileType... mt) {
-    elem = Token.token(element);
-    suff = Token.token(defaultSuffix);
+    val = value;
+    suf = defaultSuffix;
     types = mt;
-  }
-
-  /**
-   * Returns the xml element name as byte array.
-   * @return the xml element name
-   */
-  public byte[] get() {
-    return elem;
   }
 
   /**
    * Returns the default file suffix for the MIME type.
    * @return the default file suffix
    */
-  public byte[] getDefaultSuffix() {
-    return suff;
+  public String getDefaultSuffix() {
+    return suf;
   }
 
   /**
@@ -130,11 +123,14 @@ public enum MimeType {
    *         found
    */
   public static MimeType getItem(final String name) {
-    final byte[] token = Token.token(name);
-    for(final MimeType mt : MimeType.values()) {
-      if(Token.eq(mt.elem, token)) return mt;
-    }
+    for(final MimeType mt : MimeType.values())
+      if(mt.val.equals(name)) return mt;
     Main.debug("MIME type not found: " + name);
     return null;
+  }
+  
+  @Override
+  public String toString() {
+    return val;
   }
 }

@@ -1,4 +1,4 @@
-package org.deepfs.fsml.util;
+package org.deepfs.fsml;
 
 /**
  * An exception class used for signaling failure of parser operations.

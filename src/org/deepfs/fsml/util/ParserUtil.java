@@ -183,55 +183,6 @@ public final class ParserUtil {
   }
 
   /**
-   * Checks if the given byte array only contains valid UTF-8 characters. All
-   * invalid chars are replaced by spaces.
-   * @param data the byte array to check
-   * @return a byte array containing only valid UTF-8 chars
-   */
-  public static byte[] checkUTF(final byte[] data) {
-    final int size = data.length;
-    int b;
-    for(int i = 0; i < size; i++) { // loop all chars
-      b = data[i] & 0xFF;
-      if(b >= 0 && b < ' ' && !ws(b)) data[i] = ' '; // control character
-      else if(b > 0x7F) { // not an ascii char ... perhaps UTF-8?
-        final int numBytes;
-        if(b >= 0xC2 && b <= 0xDF) { // two byte UTF-8 char
-          numBytes = 2;
-        } else if(b >= 0xE0 && b <= 0xEF) { // three byte UTF-8 char
-          numBytes = 3;
-        } else if(b >= 0xF0 && b <= 0xF4) { // four byte UTF-8 char
-          numBytes = 4;
-        } else {
-          data[i] = ' '; // not an UTF-8 character
-          continue;
-        }
-        if(size - i < numBytes) { // UTF-8 sequence is not complete
-          while(i < size)
-            data[i++] = ' ';
-        } else {
-          boolean valid = true;
-          for(int j = 1; j < numBytes; j++) {
-            final int b2 = data[i + j] & 0xFF;
-            if(b2 < 0x80 || b2 > 0xBF) {
-              valid = false;
-              break;
-            }
-          }
-          // replace complete sequence if any of the chars is invalid
-          if(!valid) {
-            data[i] = ' ';
-            for(int j = 1; j < numBytes; j++) {
-              data[i + j] = ' ';
-            }
-          } else i += numBytes - 1;
-        }
-      } // else valid ASCII char,
-    }
-    return data;
-  }
-
-  /**
    * Converts a size value (number of bytes) into a human readable string (e.g.
    * 100 MiB).
    * @param size the number of bytes to convert to a human readable string

@@ -124,6 +124,62 @@ public final class Token {
     for(final byte t : text) if(t < 0) return false;
     return true;
   }
+  
+  /**
+   * Checks if the specified UTF-8 characters are valid.
+   * @param text UTF-8 characters
+   * @return result of check
+   */
+  public static boolean isValidUTF8(final byte[] text) {
+    final int len = text.length;
+    int i = 0;
+    while(i < len) {
+      int cl = cl2(text[i]);
+      if(cl <= 0 || cl > len - i++) return false;
+      if(len == i) return true;
+      final int b = text[i] & 0xFF;
+      if(b >= 0 && b < ' ' && !ws(b)) return false; // control character
+      while(--cl > 0)
+        if(cl2(text[i++]) != 0) return false;
+    }
+    return true;
+  }
+  
+  /**
+   * Removes invalid characters from the UTF-8 sequence.
+   * @param text the UTF-8 sequence to remove the invalid chars from
+   * @param chop if true, all leading and trailing whitespaces are removed
+   * @return the cleaned UTF-8 sequence
+   */
+  public static byte[] removeNonUTF8(final byte[] text, final boolean chop) {
+    final int len = text.length;
+    if(len == 0) return EMPTY;
+    final byte[] t = new byte[len];
+    int i = 0, pos = 0;
+    if(chop) while(i < len && ws(text[i])) ++i;
+    if(i == len) return EMPTY;
+    out: while(i < len) {
+      final int cl = cl2(text[i]);
+      if(cl <= 0) { ++i; continue; } // invalid ... ignore this one
+      if(cl > len - i) break; // not enough bytes left, ignore everything behind
+      final int b = text[i] & 0xFF;
+      if(b >= 0 && b < ' ' && !ws(b)) { ++i; continue; } // ignore control chars
+      t[pos++] = text[i++]; // byte is valid .. copy to new array
+      for(int j = 1; j < cl; j++) { // process all following bytes
+        /* All following bytes must have a codepoint length of zero. */
+        if(cl2(text[i]) != 0) {
+          --pos; // drop the already added first byte
+          i += cl - j; // skip all bytes of this sequence
+          continue out; // continue with the next UTF-8 character
+        }
+      }
+      // all bytes are valid .. add them to the array
+      for(int j = 1; j < cl; j++) t[pos++] = text[i++];
+    }
+    if(chop) while(pos > 0 && ws(t[pos - 1])) --pos;
+    if(pos == 0) return EMPTY;
+    return Arrays.copyOf(t, pos);
+  }
 
   /**
    * Converts a string to a byte array.
@@ -225,6 +281,26 @@ public final class Token {
   /*** Character lengths. */
   private static final int[] CHLEN = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 3, 4
+  };
+
+  /**
+   * Checks if the byte is part of a valid UTF-8 character. Returns the expected
+   * codepoint length of the specified byte, if it is the first byte of the
+   * sequence. If the given byte is the second, third or fourth byte of the
+   * sequence, zero is returned. A return value of -1 indicates an invalid UTF-8
+   * character.
+   * @param v first character byte
+   * @return character length, if the byte is the first byte; zero if not; -1 if
+   *         invalid
+   */
+  public static int cl2(final byte v) {
+    final int i = v & 0xFF;
+    return (i == 0xC0 || i == 0xC1 || i > 0xF4) ? -1 : CHLEN2[i >> 4];
+  }
+
+  /*** Character lengths. */
+  private static final int[] CHLEN2 = {
+    1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 3, 4
   };
 
   /**

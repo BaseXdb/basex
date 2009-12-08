@@ -1,4 +1,4 @@
-package org.deepfs.fsml.util;
+package org.deepfs.fsml;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -6,6 +6,7 @@ import java.util.Map;
 import org.basex.core.Main;
 import org.deepfs.fsml.parsers.IFileParser;
 import org.deepfs.fsml.parsers.TXTParser;
+import org.deepfs.fsml.util.Loader;
 
 /**
  * Registry for file parsers.

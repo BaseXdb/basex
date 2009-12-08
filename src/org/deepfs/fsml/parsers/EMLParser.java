@@ -7,15 +7,16 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
-import org.deepfs.fsml.util.BufferedFileChannel;
-import org.deepfs.fsml.util.DeepFile;
-import org.deepfs.fsml.util.FileType;
-import org.deepfs.fsml.util.MetaElem;
-import org.deepfs.fsml.util.MimeType;
-import org.deepfs.fsml.util.ParserRegistry;
+import org.deepfs.fsml.BufferedFileChannel;
+import org.deepfs.fsml.DeepFile;
+import org.deepfs.fsml.FileType;
+import org.deepfs.fsml.MetaElem;
+import org.deepfs.fsml.MimeType;
+import org.deepfs.fsml.ParserRegistry;
 import org.deepfs.fsml.util.ParserUtil;
 
 /**
@@ -55,7 +56,7 @@ public final class EMLParser implements IFileParser {
           obj.deepFile.addMeta(MetaElem.DATETIME_CREATED,
               ParserUtil.convertDateTime(d));
         } catch(final ParseException ex) {
-          Main.debug("%: %", obj.bfc.getFileName(), ex.getMessage());
+          obj.deepFile.debug("EMLParser: Failed to parse date", ex);
         }
         return true;
       }
@@ -71,7 +72,11 @@ public final class EMLParser implements IFileParser {
           tb.add(obj.mCurrLine);
         }
         final byte[] text = tb.finish();
-        obj.deepFile.addMeta(MetaElem.SUBJECT, obj.decode(text));
+        try {
+          obj.deepFile.addMeta(MetaElem.SUBJECT, obj.decode(text));
+        } catch(final DecodingException e) {
+          obj.deepFile.debug("EMLParser: Failed to decode subject (%)", e);
+        }
         return false;
       }
     },
@@ -152,7 +157,8 @@ public final class EMLParser implements IFileParser {
         /** base64 encoding. */
     BASE64 {
       @Override
-      public byte[] decode(final byte[] text, final boolean utf) {
+      public byte[] decode(final byte[] text, final boolean utf)
+          throws DecodingException {
         return decodeBase64(text, utf);
       }
     };
@@ -162,8 +168,10 @@ public final class EMLParser implements IFileParser {
      * @param text the text to decode
      * @param utf flag if its utf-encoded
      * @return the decoded text
+     * @throws DecodingException if any error occurs 
      */
-    abstract byte[] decode(final byte[] text, final boolean utf);
+    abstract byte[] decode(final byte[] text, final boolean utf)
+        throws DecodingException;
   }
 
   // ----- static stuff --------------------------------------------------------
@@ -252,8 +260,7 @@ public final class EMLParser implements IFileParser {
         deepFile.setFileType(FileType.MESSAGE);
         deepFile.setFileFormat(MimeType.EML);
         deepFile.addMeta(MetaElem.ENCODING, mBodyCharset);
-      } else Main.debug("Invalid mail file - no sender found (%).",
-          bfc.getFileName());
+      } else deepFile.debug("EMLParser: Invalid mail file (no sender found).");
       if(df.extractText()) if(mCurrLine != null) parseContent();
     } else if(df.extractText()) {
       do {
@@ -344,10 +351,14 @@ public final class EMLParser implements IFileParser {
       }
 
       // fire parser event
-      final byte[] text = tb.finish();
-      final byte[] data = bodyEnc.decode(text, utf);
-      final int size = data.length;
-      if(size > 0) deepFile.addText(pos2, text.length, data);
+      try {
+        final byte[] text = tb.finish();
+        final byte[] data = bodyEnc.decode(text, utf);
+        final int size = data.length;
+        if(size > 0) deepFile.addText(pos2, text.length, Token.string(data));
+      } catch(final DecodingException e) {
+        deepFile.debug("EMLParser: Failed to decode text (%)", e);
+      }
     } else {
       while(readLine()) {
         if(multipart) if(mCurrLine.contains(mBoundary)) break;
@@ -445,7 +456,12 @@ public final class EMLParser implements IFileParser {
       final int end = m.start() - 2;
       if(end > pos) {
         final byte[] text = chop(Token.token(addresses.substring(pos, end)));
-        deepFile.addMeta(name, chop(decode(text)));
+        try {
+          deepFile.addMeta(name, chop(decode(text)));
+        } catch(final DecodingException e) {
+          deepFile.debug("EMLParser: Failed to decode mail address (% - %)",
+              name, e);
+        }
       }
       pos = m.end() + 2;
     }
@@ -547,8 +563,9 @@ public final class EMLParser implements IFileParser {
    * Decodes a text.
    * @param text the text to decode
    * @return the decoded text as byte array
+   * @throws DecodingException if the text could not be decoded.
    */
-  byte[] decode(final byte[] text) {
+  byte[] decode(final byte[] text) throws DecodingException {
     final int len = text.length;
     final TokenBuilder tmp = new TokenBuilder(len);
     int i = 0;
@@ -584,8 +601,7 @@ public final class EMLParser implements IFileParser {
         assert text[i] == '=';
         ++i;
       } else {
-        Main.debug("EMLParser: Found invalid chars in subject (%)",
-            bfc.getFileName());
+        deepFile.debug("EMLParser: Found invalid chars in subject.");
         break; // stop reading
       }
     }
@@ -645,14 +661,16 @@ public final class EMLParser implements IFileParser {
    * @param text the text to be decoded
    * @param utf flag if the text is utf-encoded
    * @return the decoded text
+   * @throws DecodingException if any error occurs.
    */
-  static byte[] decodeBase64(final byte[] text, final boolean utf) {
+  static byte[] decodeBase64(final byte[] text, final boolean utf)
+      throws DecodingException {
     final TokenBuilder tmp = new TokenBuilder();
 
     final byte[] data = Token.delete(text, 0xA); // delete line feeds
     final int size = data.length;
-    if(size % 4 != 0) Main.debug("EMLParser: Invalid base64 encoding (%)",
-        Token.string(data));
+    if(size % 4 != 0)
+      throw new DecodingException("Invalid number of bytes (" + size + ")");
     byte b1, b2, b3, b4;
     int i, max;
     boolean valid = true;
@@ -698,9 +716,9 @@ public final class EMLParser implements IFileParser {
         }
       }
     } catch(final Exception ex) {
-      Main.debug("EMLParser: invalid base64 encoding");
+      throw new DecodingException(ex);
     }
-    if(!valid) Main.debug("EMLParser: invalid base64 encoding");
+    if(!valid) throw new DecodingException();
     return tmp.finish();
   }
 

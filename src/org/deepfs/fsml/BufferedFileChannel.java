@@ -1,4 +1,4 @@
-package org.deepfs.fsml.util;
+package org.deepfs.fsml;
 
 import java.io.EOFException;
 import java.io.File;

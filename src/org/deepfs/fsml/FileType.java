@@ -1,6 +1,4 @@
-package org.deepfs.fsml.util;
-
-import org.basex.util.Token;
+package org.deepfs.fsml;
 
 /**
  * Available file types.
@@ -43,19 +41,8 @@ public enum FileType {
   /** XML(-based) resource. */
   XML;
 
-  /** The attribute value as byte array. */
-  private final byte[] val;
-
-  /** Standard constructor for initializing the enum instance. */
-  FileType() {
-    val = Token.token(toString().toLowerCase().replace("_", " "));
-  }
-
-  /**
-   * Returns the enum value as byte array.
-   * @return the enum value
-   */
-  public byte[] get() {
-    return val;
+  @Override
+  public String toString() {
+    return name().toLowerCase().replace("_", " ");
   }
 }

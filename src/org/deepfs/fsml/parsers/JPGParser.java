@@ -3,12 +3,12 @@ package org.deepfs.fsml.parsers;
 import java.io.EOFException;
 import java.io.IOException;
 import org.basex.core.Main;
-import org.deepfs.fsml.util.BufferedFileChannel;
-import org.deepfs.fsml.util.DeepFile;
-import org.deepfs.fsml.util.FileType;
-import org.deepfs.fsml.util.MetaElem;
-import org.deepfs.fsml.util.MimeType;
-import org.deepfs.fsml.util.ParserRegistry;
+import org.deepfs.fsml.BufferedFileChannel;
+import org.deepfs.fsml.DeepFile;
+import org.deepfs.fsml.FileType;
+import org.deepfs.fsml.MetaElem;
+import org.deepfs.fsml.MimeType;
+import org.deepfs.fsml.ParserRegistry;
 
 /**
  * Parser for JPG files.
@@ -145,8 +145,7 @@ public final class JPGParser implements IFileParser {
       e = MetaElem.PIXEL_WIDTH;
       if(!deepFile.isMetaSet(e)) deepFile.addMeta(e, width);
     } else {
-      Main.debug("JPGParser: Wrong data precision field (%).",
-          bfc.getFileName());
+      deepFile.debug("JPGParser: Wrong data precision field.");
     }
   }
 
@@ -167,7 +166,7 @@ public final class JPGParser implements IFileParser {
       try {
         subFile.finish();
       } catch(final Exception ex) {
-        Main.debug(ex);
+        deepFile.debug("JPGParser: Failed to parse Exif data.", ex);
       }
     }
   }
@@ -228,8 +227,7 @@ public final class JPGParser implements IFileParser {
         content.addMeta(MetaElem.PIXEL_HEIGHT, bfc.get());
         break;
       default:
-        Main.debug("JPGParser: Illegal or unsupported JFIF header (%)",
-            bfc.getFileName());
+        deepFile.debug("JPGParser: Illegal or unsupported JFIF header.");
     }
     bfc.skip(s);
   }
