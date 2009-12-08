@@ -123,7 +123,7 @@ public interface Text {
 
   /** Start information. */
   String SERVERINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + SERVERMODE + " [-dpv] [stop]" + NL +
+    "Usage: " + NAME + SERVERMODE + " [-dpz] [stop]" + NL +
     " stop     stop server" + NL +
     " -d       debug mode" + NL +
     " -p<port> server port" + NL +
