@@ -72,6 +72,7 @@ final class NSNode {
       System.arraycopy(ch, 0, tmp, 0, s);
       System.arraycopy(ch, s, tmp, s + 1, ch.length - s);
       ch = tmp;
+      n.par = this;
     }
   }
 

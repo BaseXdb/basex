@@ -64,13 +64,12 @@ public final class Namespaces {
   }
 
   /**
-   * Opens a node.
+   * Completes the temporary node and adds it to the storage.
    * @param pre pre value
    * @return true if a new namespace has been added
    */
   public boolean open(final int pre) {
     if(tmp == null) return false;
-    tmp.par = root;
     tmp.pre = pre;
     root.add(tmp);
     root = tmp;
@@ -87,26 +86,35 @@ public final class Namespaces {
   }
 
   /**
-   * Adds the specified namespace.
+   * Adds the specified namespace to a temporary node.
    * @param p prefix
    * @param u uri
    * @return uri reference
    */
   public int add(final byte[] p, final byte[] u) {
     if(tmp == null) tmp = new NSNode();
-    final int k = Math.abs(pref.add(p));
-    final int v = Math.abs(uri.add(u));
+    final int k = addPref(p);
+    final int v = addURI(u);
     tmp.add(k, v);
     return v;
   }
 
   /**
    * Adds the specified namespace uri.
-   * @param u namespace uri
+   * @param u namespace uri to be added
    * @return reference
    */
   public int addURI(final byte[] u) {
-    return uri.add(u);
+    return Math.abs(uri.add(u));
+  }
+
+  /**
+   * Adds the specified prefix.
+   * @param p prefix to be added
+   * @return reference
+   */
+  public int addPref(final byte[] p) {
+    return Math.abs(pref.add(p));
   }
 
   /**
@@ -206,21 +214,21 @@ public final class Namespaces {
 
   /**
    * Adds a namespace for the specified pre value.
-   * @param nm tag name
-   * @param u uri
    * @param pre pre value
    * @param par parent
+   * @param p prefix
+   * @param u uri
    * @return uri reference
    */
-  int add(final byte[] nm, final byte[] u, final int pre, final int par) {
-    final int k = Math.abs(pref.add(nm));
-    final int v = Math.abs(uri.add(u));
+  public int add(final int pre, final int par, final byte[] p, final byte[] u) {
+    // [CG] ...to be merged with add()/open()/close() ?
     final NSNode nd = root.find(par);
-
     final NSNode t = new NSNode();
     t.pre = pre;
+
+    final int k = addPref(p);
+    final int v = addURI(u);
     t.add(k, v);
-    t.par = nd;
     nd.add(t);
     return v;
   }

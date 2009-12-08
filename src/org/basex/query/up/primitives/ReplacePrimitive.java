@@ -31,23 +31,23 @@ public final class ReplacePrimitive extends NodeCopy {
   @Override
   public void apply(final int add) {
     final DBNode n = (DBNode) node;
-    final int p = n.pre + add;
+    final int pre = n.pre + add;
     final Data d = n.data;
     // source nodes may be empty, thus the replace results in deleting the
     // target node
     if(md == null) {
-      d.delete(p);
+      d.delete(pre);
       return;
     }
-    final int par = d.parent(p, Nod.kind(n.type));
+    final int par = d.parent(pre, Nod.kind(n.type));
     if(n.type == Type.ATT) {
-      d.insertAttr(p, par, md);
+      d.insertAttr(pre, par, md);
     } else {
-      d.insert(p, par , md);
+      d.insert(pre, par, md);
     }
-    d.delete(p + md.meta.size);
-    mergeTexts(d, p, p + 1);
-    mergeTexts(d, p - 1, p);
+    d.delete(pre + md.meta.size);
+    mergeTexts(d, pre, pre + 1);
+    mergeTexts(d, pre - 1, pre);
   }
 
   @Override

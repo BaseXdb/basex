@@ -8,7 +8,6 @@ import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
 import org.basex.io.TableAccess;
-import org.basex.query.ft.StopWords;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
@@ -109,8 +108,6 @@ public abstract class Data {
   protected Index atvindex;
   /** Full-text index instance. */
   protected Index ftxindex;
-  /** Stopword list access file. */
-  protected StopWords swl;
 
   /**
    * Dissolves the references to often used tag names and attributes.
@@ -436,8 +433,8 @@ public abstract class Data {
       // update/set namespace reference
       final int ou = ns.uri(nm, pre);
       final boolean ne = ou == 0 && uri.length != 0;
-      int p = k == Data.ATTR ? parent(pre, k) : pre;
-      int u = ne ? ns.add(pref(nm), uri, p, parent(p, ELEM)) :
+      final int p = k == Data.ATTR ? parent(pre, k) : pre;
+      final int u = ne ? ns.add(p, parent(p, ELEM), pref(nm), uri) :
         ou != 0 && eq(ns.uri(ou), uri) ? ou : 0;
 
       // write namespace uri reference
@@ -522,69 +519,77 @@ public abstract class Data {
   /**
    * Inserts a data instance at the specified pre value.
    * Note that the specified data instance must differ from this instance.
-   * @param pre value at which to insert new data
-   * @param par parent pre value of node
-   * @param dt data instance to copy from
+   * @param ipre value at which to insert new data
+   * @param ipar parent pre value of node
+   * @param md data instance to copy from
    */
-  public final void insert(final int pre, final int par, final MemData dt) {
+  public final void insert(final int ipre, final int ipar, final MemData md) {
     meta.update();
 
     // copy database entries
     final TokenBuilder tb = new TokenBuilder();
-    final int ms = dt.meta.size;
-    for(int mp = 0; mp < ms; mp++) {
-      final int k = dt.kind(mp);
-      final int p = pre + mp;
-      final int r = dt.parent(mp, k);
-      final int d = r >= 0 ? mp - r : p - par;
+    final int ms = md.meta.size;
+    for(int mpre = 0; mpre < ms; mpre++) {
+      final int mk = md.kind(mpre);
+      final int mpar = md.parent(mpre, mk);
+      final int pre = ipre + mpre;
+      final int dis = mpar >= 0 ? mpre - mpar : pre - ipar;
 
-      switch(k) {
+      switch(mk) {
         case DOC:
           // add document
-          tb.add(doc(p, dt.size(mp, k), dt.text(mp, true)));
+          tb.add(doc(pre, md.size(mpre, mk), md.text(mpre, true)));
           break;
         case ELEM:
           // add element
-          final boolean ne = dt.nsFlag(mp);
-          byte[] nm = dt.name(mp, k);
+          final boolean ne = md.nsFlag(mpre);
+          byte[] nm = md.name(mpre, mk);
           if(ne) {
-            final Atts at = dt.ns(mp);
+            // [CG] introduce local namespace stack?
+            final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) {
-              ns.add(at.key[a], at.val[a], p, p - d);
+              ns.add(pre, ipar, at.key[a], at.val[a]);
             }
           }
-          int u = ns.uri(nm, p);
+          int u = ns.uri(nm, pre);
+          /*
+          System.out.print(string(nm) + ":\t");
+          System.out.print("IPRE/IPAR: " + ipre + "/" + ipar + "\t");
+          System.out.print("MPRE/MPAR: " + mpre + "/" + mpar + "\t");
+          System.out.print("DIS/URI: " + dis + "/" + u + "\n");
+          */
           int n = tags.index(nm, null, false);
-          tb.add(elem(d, n, dt.attSize(mp, k), dt.size(mp, k), u, ne));
+          tb.add(elem(dis, n, md.attSize(mpre, mk), md.size(mpre, mk), u, ne));
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          tb.add(text(p, d, dt.text(mp, true), k));
+          tb.add(text(pre, dis, md.text(mpre, true), mk));
           break;
         case ATTR:
           // add attribute
-          nm = dt.name(mp, k);
+          nm = md.name(mpre, mk);
           n = atts.index(nm, null, false);
-          // [CG] check (mergeUpdates-001 ?)...
-          u = pref(nm).length != 0 ? ns.uri(nm, p) : 0;
-          tb.add(attr(p, d, n, dt.text(mp, false), u));
+          if(md.nsFlag(mpre)) {
+            ns.add(ipar, ipar, pref(nm), md.ns.uri(md.uri(mpre, mk)));
+            table.write2(ipar, 1, 1 << 15 | name(ipar));
+          }
+          u = pref(nm).length != 0 ? ns.uri(nm, pre) : 0;
+          tb.add(attr(pre, dis, n, md.text(mpre, false), u, false));
           break;
       }
     }
-    table.insert(pre, tb.finish());
-    
+    table.insert(ipre, tb.finish());
+
     // increase size of ancestors
-    int p = par;
+    int p = ipar;
     while(p >= 0) {
       final int k = kind(p);
       size(p, k, size(p, k) + ms);
       p = parent(p, k);
     }
-    updateDist(pre + ms, ms);
-
-    //System.out.println(this);
+    updateDist(ipre + ms, ms);
 
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
@@ -735,17 +740,18 @@ public abstract class Data {
    * @param name attribute name
    * @param val attribute value
    * @param u namespace uri reference
+   * @param ne namespace flag
    * @return attribute entry
    */
   public final byte[] attr(final int pre, final int dis, final int name,
-      final byte[] val, final int u) {
+      final byte[] val, final int u, final boolean ne) {
 
     // add attribute to text storage
     final long len = index(val, pre, false);
     final long id = ++meta.lastid;
     return new byte[] {
-        (byte) (dis << 3 | ATTR), (byte) (name >> 8),
-        (byte) name, (byte) (len >> 32),
+        (byte) (dis << 3 | ATTR), (byte) ((ne ? 1 << 7 : 0) |
+            (byte) (name >> 8)), (byte) name, (byte) (len >> 32),
         (byte) (len >> 24), (byte) (len >> 16), (byte) (len >> 8), (byte) len,
         0, 0, 0, (byte) u,
         (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };

@@ -271,7 +271,6 @@ public final class BaseXTextTokens {
    */
   void endMark() {
     me = ps;
-    if(ms == me) ms = -1;
   }
 
   /**

@@ -2267,19 +2267,7 @@ public class QueryParser extends InputParser {
     final FTOpt fto = new FTOpt(ctx.context.prop);
     boolean found = false;
     while(ftMatchOption(fto)) found = true;
-    if(consumeWS(WEIGHT)) {
-      expr = new FTWeight(expr, range());
-      /*skipWS();
-      Expr r = null;
-      if(consume('{')) {
-        r = range();
-        check('}');
-      } else {
-        r = literal();
-      }
-     if(r == null) error(NOENCLEXPR);
-     expr = new FTWeight(expr, r);*/
-    }
+    if(consumeWS(WEIGHT)) expr = new FTWeight(expr, enclosed(NOENCLEXPR));
     // skip options if none were specified...
     return found ? new FTOptions(expr, fto) : expr;
   }

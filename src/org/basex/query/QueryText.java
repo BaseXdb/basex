@@ -513,8 +513,7 @@ public interface QueryText {
   Object[] UPNSCONFL2 = { XUDY, 24,
       "New namespaces conflict with each other." };
   /** XUDY0027: XQuery Update dynamic exception. */
-  Object[] UPSEQEMP = { XUDY, 27,
-      "Target expression yields an empty sequence." };
+  Object[] UPSEQEMP = { XUDY, 27, "% target must not be empty." };
   /** XUDY0029: XQuery Update dynamic exception. */
   Object[] UPPAREMPTY = { XUDY, 29, "Target has no parent node." };
   /** XUDY0030: XQuery Update dynamic exception. */
@@ -544,27 +543,27 @@ public interface QueryText {
   Object[] UPNOATTRPER = { XUTY, 4, "Attribute must follow the root element." };
   /** XUTY0005: XQuery Update type exception. */
   Object[] UPTRGTYP = { XUTY, 5,
-      "Single element or document expected as target." };
+      "Single element or document expected as insert target." };
   /** XUTY0006: XQuery Update type exception. */
   Object[] UPTRGTYP2 = { XUTY, 6,
-      "Single element, text, comment or pi expected as target." };
+      "Single element, text, comment or pi expected as insert target." };
   /** XUTY0007: XQuery Update type exception. */
   Object[] UPTRGDELEMPT = { XUTY, 7, "Only nodes can be deleted." };
   /** XUTY0008: XQuery Update type exception. */
-  Object[] UPTRGMULT = { XUTY, 8,
-      "Single element, text, attribute, comment or pi expected as target." };
+  Object[] UPTRGMULT = { XUTY, 8, "Single element, text, attribute, " +
+      "comment or pi expected as replace target." };
   /** XUTY0010: XQuery Update type exception. */
   Object[] UPWRELM = { XUTY, 10, "Replace nodes must not be attribute nodes." };
   /** XUTY0011: XQuery Update type exception. */
   Object[] UPWRATTR = { XUTY, 11, "Replace nodes must be attribute nodes." };
   /** XUTY0012: XQuery Update type exception. */
   Object[] UPWRTRGTYP = { XUTY, 12,
-      "Target must be element, attribute or pi." };
+      "Single element, attribute or pi expected as rename target." };
   /** XUTY0013: XQuery Update type exception. */
   Object[] UPCOPYMULT = { XUTY, 13,
-      "Source expression in copy clause must return single node." };
+      "Source expression in copy clause must return a single node." };
   /** XUTY0022: XQuery Update type exception. */
-  Object[] UPATTELM2 = { XUTY, 22, "Insertion target must be an element." };
+  Object[] UPATTELM2 = { XUTY, 22, "Insert target must be an element." };
 
   // OPTIMIZATIONS
 

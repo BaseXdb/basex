@@ -62,7 +62,7 @@ public final class MemBuilder extends Builder {
   @Override
   protected void addAttr(final int n, final byte[] v, final int d,
       final int u) {
-    data.insert(meta.size, data.attr(meta.size, d, n, v, u));
+    data.insert(meta.size, data.attr(meta.size, d, n, v, u, false));
   }
 
   @Override

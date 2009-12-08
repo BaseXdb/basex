@@ -283,17 +283,28 @@ public final class DeepFS implements DataText {
     final MemData m = new MemData(data);
     final int tagID = isReg(mode) ? fileID : dirID;
     final byte [] time = token(System.currentTimeMillis());
-    m.insert(m.meta.size, m.elem(1, tagID, nodeSize, nodeSize, 0, false));
-    m.insert(m.meta.size, m.attr(m.meta.size, 1, nameID, token(fn), 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 2, sizeID, ZERO, 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 3, modeID, token(mode), 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 4, uidID, token(getUID()), 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 5, gidID, token(getGID()), 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 6, atimeID, time, 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 7, ctimeID, time, 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 8, mtimeID, time, 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 9, nlinkID, token("1"), 0));
-    m.insert(m.meta.size, m.attr(m.meta.size, 10, suffixID, getSuffix(fn), 0));
+    m.insert(m.meta.size,
+        m.elem(1, tagID, nodeSize, nodeSize, 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 1, nameID, token(fn), 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 2, sizeID, ZERO, 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 3, modeID, token(mode), 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 4, uidID, token(getUID()), 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 5, gidID, token(getGID()), 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 6, atimeID, time, 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 7, ctimeID, time, 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 8, mtimeID, time, 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 9, nlinkID, token("1"), 0, false));
+    m.insert(m.meta.size,
+        m.attr(m.meta.size, 10, suffixID, getSuffix(fn), 0, false));
     return m;
   }
 

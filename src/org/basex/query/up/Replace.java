@@ -3,6 +3,8 @@ package org.basex.query.up;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+
+import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CComm;
@@ -53,7 +55,7 @@ public final class Replace extends Update {
     final Iter t = expr[0].iter(ctx);
     Item i = t.next();
     // check target constraints
-    if(i == null) Err.or(UPSEQEMP, i);
+    if(i == null) Err.or(UPSEQEMP, Main.name(this));
     final Type type = i.type;
     if(!(i instanceof Nod) || type == Type.DOC || t.next() != null)
       Err.or(UPTRGMULT, i);
@@ -93,7 +95,7 @@ public final class Replace extends Update {
 
   @Override
   public String toString() {
-    return REPLACE + ' ' + (value ? VALUEE + ' ' + OF : "") +
+    return REPLACE + (value ? ' ' + VALUEE + ' ' + OF : "") +
       ' ' + NODE + ' ' + expr[0] + ' ' + WITH + ' ' + expr[1];
   }
 }

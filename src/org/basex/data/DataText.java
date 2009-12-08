@@ -61,8 +61,6 @@ public interface DataText {
   String DBSCMIN = "FTSCMIN";
   /** Maximal indexed full-text score. */
   String DBSCTYPE = "FTSCTYPE";
-  /** Stopword list. */
-  String DBFTSTOPW = "FTSTOPW";
   /** Up-to-date flag. */
   String DBUTD = "UPTODATE";
   /** Last (highest) id. */

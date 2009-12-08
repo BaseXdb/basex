@@ -75,16 +75,16 @@ public final class UpdateFunctions {
   /**
    * Builds new data instance from iterator.
    * @param ch sequence iterator
-   * @param data memory data reference
+   * @param md memory data reference
    * @return new data instance
    * @throws QueryException query exception
    */
-  public static MemData buildDB(final NodIter ch, final MemData data)
+  public static MemData buildDB(final NodIter ch, final MemData md)
       throws QueryException {
     int pre = 1;
     Nod n;
-    while((n = ch.next()) != null) pre = addNode(n, data, pre, 0);
-    return data;
+    while((n = ch.next()) != null) pre = addNode(n, md, pre, 0);
+    return md;
   }
 
   /**
@@ -114,9 +114,13 @@ public final class UpdateFunctions {
         QNm q = nd.qname();
         byte[] uri = q.uri.str();
         int u = 0;
-        if(uri.length != 0) u = Math.abs(m.ns.addURI(uri));
+        boolean ne = uri.length != 0;
+        if(ne) {
+          u = m.ns.addURI(uri);
+          if(par == 0) m.ns.add(ms, pre - par, q.pref(), uri);
+        }
         final int n = m.atts.index(q.str(), null, false);
-        m.insert(ms, m.attr(ms, pre - par, n, nd.str(), u));
+        m.insert(ms, m.attr(ms, pre - par, n, nd.str(), u, ne));
         return pre + 1;
       case Data.PI:
       case Data.TEXT:
@@ -131,7 +135,7 @@ public final class UpdateFunctions {
           final Atts ns = FElem.ns(nd);
           for(int a = 0; a < ns.size; a++) m.ns.add(ns.key[a], ns.val[a]);
         }
-        final boolean ne = m.ns.open(ms);
+        ne = m.ns.open(ms);
         uri = q.uri.str();
         u = uri.length != 0 ? Math.abs(m.ns.addURI(uri)) : 0;
         final int tn = m.tags.index(q.str(), null, false);

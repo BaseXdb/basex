@@ -418,6 +418,7 @@ public class BaseXText extends BaseXPanel {
     if(marking) {
       // refresh scroll position
       text.endMark();
+      text.checkMark();
     } else if(undo != null) {
       // edit operations...
       if(pressed(CUT, e)) {

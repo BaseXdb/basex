@@ -26,9 +26,9 @@ public final class InsertIntoFirst extends NodeCopy {
     // source nodes may be empty, thus insert has no effect at all
     if(md == null) return;
     final DBNode n = (DBNode) node;
-    final int p = n.pre + add;
+    final int pre = n.pre + add;
     final Data d = n.data;
-    d.insert(p + d.attSize(p, Nod.kind(node.type)), p, md);
+    d.insert(pre + d.attSize(pre, Nod.kind(node.type)), pre, md);
   }
 
   @Override

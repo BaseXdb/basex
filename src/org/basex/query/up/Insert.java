@@ -3,6 +3,8 @@ package org.basex.query.up;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
+
+import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
@@ -67,7 +69,7 @@ public final class Insert extends Update {
     // check target constraints
     final Iter t = expr[0].iter(ctx);
     Item i = t.next();
-    if(i == null) Err.or(UPSEQEMP, this);
+    if(i == null) Err.or(UPSEQEMP, Main.name(this));
     if(!(i instanceof Nod) || t.next() != null)
       Err.or(before || after ? UPTRGTYP2 : UPTRGTYP, this);
 
