@@ -314,8 +314,7 @@ public final class MapView extends View implements Runnable {
       repaint();
     }
     // wait until current painting is finished
-    while(gui.painting)
-      Performance.sleep(zoomSpeed);
+    while(gui.painting) Performance.sleep(zoomSpeed);
 
     // remove old rectangle and repaint map
     zoomStep = 0;

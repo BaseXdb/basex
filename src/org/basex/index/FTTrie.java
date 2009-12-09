@@ -55,12 +55,12 @@ public final class FTTrie extends FTIndex {
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(TRIE + NL);
-    tb.add("- %: %" + NL, CREATESTEM, AInfo.flag(data.meta.ftst));
-    tb.add("- %: %" + NL, CREATECS, AInfo.flag(data.meta.ftcs));
-    tb.add("- %: %" + NL, CREATEDC, AInfo.flag(data.meta.ftdc));
+    tb.add("- %: %" + NL, CREATESTEM, AInfo.flag(data.meta.stemming));
+    tb.add("- %: %" + NL, CREATECS, AInfo.flag(data.meta.casesens));
+    tb.add("- %: %" + NL, CREATEDC, AInfo.flag(data.meta.diacritics));
     final long l = inN.length() + inD.length() + inS.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
-    final IndexStats stats = new IndexStats(data.meta.prop);
+    final IndexStats stats = new IndexStats();
     addOccs(0, stats, EMPTY);
     stats.print(tb);
     return tb.finish();
@@ -94,7 +94,7 @@ public final class FTTrie extends FTIndex {
 
     // support fuzzy search
     if(ft.fz) {
-      int k = data.meta.prop.num(Prop.LSERR);
+      int k = data.meta.prop.num(Prop.LSERROR);
       if(k == 0) k = tok.length >> 2;
       return fuzzy(0, null, -1, tok, 0, 0, 0, k, ft.fast);
     }

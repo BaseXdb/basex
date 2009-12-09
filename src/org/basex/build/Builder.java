@@ -46,7 +46,7 @@ public abstract class Builder extends Progress {
   /** Size Stack. */
   private boolean inDoc;
   /** Current tree height. */
-  private int level;
+  private int lvl;
   /** Element counter. */
   private int c;
 
@@ -70,17 +70,14 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Builds the database by running the specified parser.
+   * Builds the database.
    * @param db name of database
-   * @return data database instance
    * @throws IOException I/O exception
    */
-  public final Data build(final String db) throws IOException {
-    init(db);
-
+  protected final void parse(final String db) throws IOException {
     // add document node and parse document
     parser.parse(this);
-    if(level != 0) error(DOCOPEN, parser.det(), tags.key(tagStack[level]));
+    if(lvl != 0) error(DOCOPEN, parser.det(), tags.key(tagStack[lvl]));
 
     meta.lastid = meta.size;
     // no nodes inserted: add default document node
@@ -89,7 +86,6 @@ public abstract class Builder extends Progress {
       endDoc();
       setSize(0, meta.size);
     }
-    return finish();
   }
 
   /**
@@ -98,8 +94,8 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void startDoc(final byte[] doc) throws IOException {
-    parStack[level++] = meta.size;
-    if(meta.pathindex) path.add(0, level, Data.DOC);
+    parStack[lvl++] = meta.size;
+    if(meta.pathindex) path.add(0, lvl, Data.DOC);
     addDoc(doc);
     ns.open(meta.size);
   }
@@ -109,7 +105,7 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void endDoc() throws IOException {
-    final int pre = parStack[--level];
+    final int pre = parStack[--lvl];
     setSize(pre, meta.size - pre);
     meta.ndocs++;
     ns.close(meta.size);
@@ -136,7 +132,7 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     final int pre = addElem(tag, att);
-    if(meta.height < ++level) meta.height = level;
+    if(meta.height < ++lvl) meta.height = lvl;
     return pre;
   }
 
@@ -150,7 +146,7 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     addElem(tag, att);
-    ns.close(parStack[level]);
+    ns.close(parStack[lvl]);
   }
 
   /**
@@ -161,10 +157,10 @@ public abstract class Builder extends Progress {
   public final void endElem(final byte[] tag) throws IOException {
     checkStop();
 
-    if(--level == 0 || tags.id(tag) != tagStack[level])
-      error(CLOSINGTAG, parser.det(), tag, tags.key(tagStack[level]));
+    if(--lvl == 0 || tags.id(tag) != tagStack[lvl])
+      error(CLOSINGTAG, parser.det(), tag, tags.key(tagStack[lvl]));
 
-    final int pre = parStack[level];
+    final int pre = parStack[lvl];
     setSize(pre, meta.size - pre);
     ns.close(pre);
   }
@@ -175,13 +171,15 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void text(final TokenBuilder t) throws IOException {
-    // checks if text appears before or after root node
-    if(!inDoc || level == 1)
-      error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
-
     // chop whitespaces in text nodes
     if(meta.chop) t.chop();
-    if(t.size() != 0) addText(t, Data.TEXT);
+    
+    // check if text appears before or after root node
+    if((meta.chop && t.size() != 0 || !t.wsp()) && (!inDoc || lvl == 1))
+      error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
+
+    if(t.size() == 0) return;
+    addText(t, Data.TEXT);
   }
 
   /**
@@ -242,6 +240,14 @@ public abstract class Builder extends Progress {
   // Abstract Methods ==========================================================
 
   /**
+   * Builds the database by running the specified parser.
+   * @param db name of database
+   * @return data database instance
+   * @throws IOException I/O exception
+   */
+  public abstract Data build(final String db) throws IOException;
+
+  /**
    * Closes open references.
    * @throws IOException I/O exception
    */
@@ -254,20 +260,6 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public abstract void setAttValue(int pre, byte[] val) throws IOException;
-
-  /**
-   * Initializes the database construction.
-   * @param db name of database
-   * @throws IOException I/O exception
-   */
-  protected abstract void init(String db) throws IOException;
-
-  /**
-   * Finishes the build process and returns a database reference.
-   * @return data database instance
-   * @throws IOException I/O exception
-   */
-  protected abstract Data finish() throws IOException;
 
   /**
    * Adds a document node to the database.
@@ -332,16 +324,16 @@ public abstract class Builder extends Progress {
     // get tag reference
     int n = tags.index(tag, null, true);
 
-    if(meta.pathindex) path.add(n, level, Data.ELEM);
+    if(meta.pathindex) path.add(n, lvl, Data.ELEM);
 
     // cache pre value
     final int pre = meta.size;
     // remember tag id and parent reference
-    tagStack[level] = n;
-    parStack[level] = pre;
+    tagStack[lvl] = n;
+    parStack[lvl] = pre;
 
     // get and store element references
-    final int dis = level != 0 ? pre - parStack[level - 1] : 1;
+    final int dis = lvl != 0 ? pre - parStack[lvl - 1] : 1;
     final int as = att.size;
     final boolean ne = ns.open(pre);
     int u = ns.uri(tag, true);
@@ -351,14 +343,14 @@ public abstract class Builder extends Progress {
     for(int a = 0; a < as; a++) {
       n = atts.index(att.key[a], att.val[a], true);
       u = ns.uri(att.key[a], false);
-      if(meta.pathindex) path.add(n, level + 1, Data.ATTR);
+      if(meta.pathindex) path.add(n, lvl + 1, Data.ATTR);
       addAttr(n, att.val[a], a + 1, u);
     }
 
-    if(level != 0) {
-      if(level > 1) {
+    if(lvl != 0) {
+      if(lvl > 1) {
         // set leaf node information in index
-        tags.stat(tagStack[level - 1]).leaf = false;
+        tags.stat(tagStack[lvl - 1]).leaf = false;
       } else if(inDoc) {
         // don't allow more than one root node
         error(MOREROOTS, parser.det(), tag);
@@ -405,9 +397,9 @@ public abstract class Builder extends Progress {
 
     final byte[] t = txt.finish();
     // text node processing for statistics
-    if(kind == Data.TEXT) tags.index(tagStack[level - 1], t);
-    if(meta.pathindex) path.add(0, level, kind);
-    addText(t, level == 0 ? 1 : meta.size - parStack[level - 1], kind);
+    if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], t);
+    if(meta.pathindex) path.add(0, lvl, kind);
+    addText(t, lvl == 0 ? 1 : meta.size - parStack[lvl - 1], kind);
   }
 
   /**

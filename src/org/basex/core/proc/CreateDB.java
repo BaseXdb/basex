@@ -17,8 +17,7 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
-import org.basex.index.FTTrieBuilder;
-import org.basex.index.FTFuzzyBuilder;
+import org.basex.index.FTBuilder;
 import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
@@ -99,12 +98,11 @@ public final class CreateDB extends ACreate {
     try {
       final Data data = builder.build(db);
       if(data.meta.txtindex) data.setIndex(Type.TXT,
-        new ValueBuilder(data, true, false).build());
+        new ValueBuilder(data, true).build());
       if(data.meta.atvindex) data.setIndex(Type.ATV,
-        new ValueBuilder(data, false, false).build());
-      if(data.meta.ftxindex) data.setIndex(Type.FTX, data.meta.ftfz ?
-        new FTFuzzyBuilder(data, false).build() :
-        new FTTrieBuilder(data, false).build());
+        new ValueBuilder(data, false).build());
+      if(data.meta.ftxindex) data.setIndex(Type.FTX, 
+        FTBuilder.get(data, data.meta.wildcards).build());
       data.close();
     } catch(final IOException ex) {
       try {

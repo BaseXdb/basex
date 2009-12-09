@@ -39,7 +39,7 @@ public final class Add extends ACreate {
     final DirParser p = new DirParser(io, context.prop);
     MemData d = null;
     try {
-      d = (MemData) new MemBuilder(p).build(io.dbname());
+      d = new MemBuilder(p).build(io.dbname());
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();

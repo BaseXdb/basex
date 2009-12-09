@@ -214,9 +214,9 @@ public final class DialogCreateFS extends Dialog {
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 
-    final String[] cb = { CREATEFZ, CREATESTEM, CREATECS, CREATEDC };
-    final boolean[] val = { prop.is(Prop.FTFUZZY), prop.is(Prop.FTST),
-        prop.is(Prop.FTCS), prop.is(Prop.FTDC)
+    final String[] cb = { CREATEWC, CREATESTEM, CREATECS, CREATEDC };
+    final boolean[] val = { prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING),
+        prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS)
     };
     for(int f = 0; f < ft.length; f++) {
       ft[f] = new BaseXCheckBox(cb[f], val[f], this);
@@ -303,10 +303,10 @@ public final class DialogCreateFS extends Dialog {
     prop.set(Prop.TEXTINDEX, txtindex.isSelected());
     prop.set(Prop.ATTRINDEX, atvindex.isSelected());
     prop.set(Prop.FTINDEX, ftxindex.isSelected());
-    prop.set(Prop.FTFUZZY, ft[0].isSelected());
-    prop.set(Prop.FTST, ft[1].isSelected());
-    prop.set(Prop.FTCS, ft[2].isSelected());
-    prop.set(Prop.FTDC, ft[3].isSelected());
+    prop.set(Prop.WILDCARDS, ft[0].isSelected());
+    prop.set(Prop.STEMMING, ft[1].isSelected());
+    prop.set(Prop.CASESENS, ft[2].isSelected());
+    prop.set(Prop.DIACRITICS, ft[3].isSelected());
 
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.FSALL, all.isSelected());

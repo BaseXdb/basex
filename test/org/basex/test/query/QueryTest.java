@@ -57,10 +57,10 @@ public final class QueryTest {
     if(ALL) {
       // testing all kinds of combinations
       for(int a = 0; a < 2; a++) { prop.set(Prop.FTINDEX, a == 0);
-        for(int b = 0; b < 2; b++) { prop.set(Prop.FTFUZZY, b == 0);
-          for(int c = 0; c < 2; c++) { prop.set(Prop.FTST, c == 0);
-            for(int d = 0; d < 2; d++) { prop.set(Prop.FTDC, d == 0);
-              for(int e = 0; e < 2; e++) { prop.set(Prop.FTCS, e == 0);
+        for(int b = 0; b < 2; b++) { prop.set(Prop.WILDCARDS, b == 0);
+          for(int c = 0; c < 2; c++) { prop.set(Prop.STEMMING, c == 0);
+            for(int d = 0; d < 2; d++) { prop.set(Prop.DIACRITICS, d == 0);
+              for(int e = 0; e < 2; e++) { prop.set(Prop.CASESENS, e == 0);
                 ok &= test(prop);
               }
             }
@@ -71,10 +71,10 @@ public final class QueryTest {
       // single test
       //prop.set(Prop.MAINMEM, true);
       prop.set(Prop.FTINDEX, true);
-      prop.set(Prop.FTFUZZY, true);
-      prop.set(Prop.FTST, true);
-      prop.set(Prop.FTDC, true);
-      prop.set(Prop.FTCS, true);
+      prop.set(Prop.WILDCARDS, true);
+      prop.set(Prop.STEMMING, true);
+      prop.set(Prop.DIACRITICS, true);
+      prop.set(Prop.CASESENS, true);
       ok &= test(prop);
     }
 

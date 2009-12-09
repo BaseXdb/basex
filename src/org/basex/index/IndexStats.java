@@ -1,7 +1,6 @@
 package org.basex.index;
 
 import static org.basex.core.Text.*;
-import org.basex.core.Prop;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -12,6 +11,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class IndexStats {
+  /** Number of entries to print. */
+  private static final int MAX = 10;
   /** Minimum occurrences. */
   private final int[] occMin;
   /** Maximum occurrences. */
@@ -20,8 +21,6 @@ final class IndexStats {
   private final byte[][] txtMin;
   /** Maximal occurring tokens. */
   private final byte[][] txtMax;
-  /** Number of entries to print. */
-  private final int nr;
   /** Number of index entries. */
   private int size;
   /** Current number of occurrence. */
@@ -29,14 +28,12 @@ final class IndexStats {
 
   /**
    * Default constructor.
-   * @param prop database properties
    */
-  IndexStats(final Prop prop) {
-    nr = prop.is(Prop.INDEXALL) ? 1 << 10 : 10;
-    occMin = new int[nr];
-    occMax = new int[nr];
-    txtMin = new byte[nr][];
-    txtMax = new byte[nr][];
+  IndexStats() {
+    occMin = new int[MAX];
+    occMax = new int[MAX];
+    txtMin = new byte[MAX][];
+    txtMax = new byte[MAX][];
     for(int o = 0; o < txtMin.length; o++) {
       txtMin[o] = Token.EMPTY;
       txtMax[o] = Token.EMPTY;
@@ -52,7 +49,7 @@ final class IndexStats {
   boolean adding(final int oc) {
     co = oc;
     size++;
-    return oc > occMax[nr - 1] || oc < occMin[nr - 1];
+    return oc > occMax[MAX - 1] || oc < occMin[MAX - 1];
   }
 
   /**
@@ -60,10 +57,10 @@ final class IndexStats {
    * @param tx token to be added
    */
   void add(final byte[] tx) {
-    final boolean dsc = co > occMax[nr - 1];
+    final boolean dsc = co > occMax[MAX - 1];
     final byte[][] txt = dsc ? txtMax : txtMin;
     final int[] ocs = dsc ? occMax : occMin;
-    for(int a = nr - 1; a >= 0; a--) {
+    for(int a = MAX - 1; a >= 0; a--) {
       if(a == 0 || dsc && co < ocs[a - 1] || !dsc && co > ocs[a - 1]) {
         txt[a] = tx;
         ocs[a] = co;
@@ -82,7 +79,7 @@ final class IndexStats {
     tb.add(IDXENTRIES + size + NL);
     int max = 0;
     int c = 0;
-    for(int o = 0; o < nr; o++) {
+    for(int o = 0; o < MAX; o++) {
       int tl = txtMin[o].length;
       if(tl == 0) c++;
       else if(max < tl) max = tl;

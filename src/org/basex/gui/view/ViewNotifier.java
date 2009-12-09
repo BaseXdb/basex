@@ -163,26 +163,23 @@ public final class ViewNotifier {
     final Nodes n = new Nodes(new int[] {}, context.data, context.marked.ftpos);
 
     if(!cont[hist].same(quick ? context.current : context.marked)) {
+      checkHist();
       if(!quick) {
-        final String input = gui.input.getText();
-
         // add new entry
-        checkHist();
-        queries[hist] = input;
+        final String in = gui.input.getText();
+        queries[hist] = in;
         marked[hist] = context.marked;
         cont[++hist] = nodes;
-        queries[hist] = input;
+        queries[hist] = in;
         marked[hist] = n;
-        maxhist = hist;
       } else {
         // check if current node set has already been cached
-        checkHist();
         // add new entry
         queries[hist] = "";
         marked[hist] = new Nodes(context.data);
         cont[++hist] = context.current;
-        maxhist = hist;
       }
+      maxhist = hist;
     }
     init(context, nodes, n);
 

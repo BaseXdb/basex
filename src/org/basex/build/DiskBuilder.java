@@ -50,7 +50,7 @@ public final class DiskBuilder extends Builder {
   }
 
   @Override
-  public void init(final String db) throws IOException {
+  public DiskData build(final String db) throws IOException {
     final Prop pr = parser.prop;
     DropDB.drop(db, pr);
     pr.dbpath(db).mkdirs();
@@ -68,10 +68,8 @@ public final class DiskBuilder extends Builder {
     xout = new DataOutput(meta.file(DATATXT), bs);
     vout = new DataOutput(meta.file(DATAATV), bs);
     sout = new DataOutput(meta.file(DATATMP), bs);
-  }
-
-  @Override
-  protected synchronized DiskData finish() throws IOException {
+    
+    parse(db);
     close();
 
     // copy temporary values into database table

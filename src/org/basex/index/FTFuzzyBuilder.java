@@ -42,11 +42,10 @@ public final class FTFuzzyBuilder extends FTBuilder {
   /**
    * Constructor.
    * @param d data reference
-   * @param o flag for keeping database open
    * @throws IOException IOException
    */
-  public FTFuzzyBuilder(final Data d, final boolean o) throws IOException {
-    super(d, o);
+  protected FTFuzzyBuilder(final Data d) throws IOException {
+    super(d);
   }
 
   @Override

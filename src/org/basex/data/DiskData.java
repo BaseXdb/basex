@@ -58,8 +58,8 @@ public final class DiskData extends Data {
       init();
       if(meta.txtindex) txtindex = new Values(this, true);
       if(meta.atvindex) atvindex = new Values(this, false);
-      if(meta.ftxindex) ftxindex = meta.ftfz ?
-          new FTFuzzy(this) : new FTTrie(this);
+      if(meta.ftxindex) ftxindex = meta.wildcards ?
+          new FTTrie(this) : new FTFuzzy(this);
     } catch(final IOException ex) {
       throw ex;
     } finally {

@@ -104,14 +104,14 @@ public final class Prop extends AProp {
   public static final Object[] RUNS = { "RUNS", 1 };
   /** Flag for whitespace chopping. */
   public static final Object[] CHOP = { "CHOP", true };
-  /** Flag for creating a path summary. */
-  public static final Object[] PATHINDEX = { "PATHINDEX", true };
   /** Flag for creating a text index. */
   public static final Object[] TEXTINDEX = { "TEXTINDEX", true };
   /** Flag for creating an attribute value index. */
   public static final Object[] ATTRINDEX = { "ATTRINDEX", true };
   /** Flag for creating a full-text index. */
   public static final Object[] FTINDEX = { "FTINDEX", false };
+  /** Flag for creating a path summary. */
+  public static final Object[] PATHINDEX = { "PATHINDEX", true };
 
   /** Flag for loading database table into main memory. */
   public static final Object[] TABLEMEM = { "TABLEMEM", false };
@@ -121,25 +121,23 @@ public final class Prop extends AProp {
   public static final Object[] CREATEFILTER = { "CREATEFILTER", "*.xml" };
   /** Maximum text size to be displayed. */
   public static final Object[] MAXTEXT = { "MAXTEXT", 1 << 21 };
-  /** Show all index info. */
-  public static final Object[] INDEXALL = { "INDEXALL", false };
 
-  /** Flag for creating a fuzzy index. */
-  public static final Object[] FTFUZZY = { "FTFUZZY", true };
+  /** Flag for creating a wildcard index. */
+  public static final Object[] WILDCARDS = { "WILDCARDS", false };
   /** Flag for full-text stemming. */
-  public static final Object[] FTST = { "FTST", false };
+  public static final Object[] STEMMING = { "STEMMING", false };
   /** Flag for full-text case sensitivity. */
-  public static final Object[] FTCS = { "FTCS", false };
+  public static final Object[] CASESENS = { "CASESENS", false };
   /** Flag for full-text diacritics sensitivity. */
-  public static final Object[] FTDC = { "FTDC", false };
+  public static final Object[] DIACRITICS = { "DIACRITICS", false };
   /** Flag for full-text scoring algorithm. */
   /** Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
-  public static final Object[] FTSCTYPE = { "FTSCTYPE", 0 };
-  /** Flag for full-text stopword list. */
-  public static final Object[] FTSTOPW = { "FTSTOPW", ""};
+  public static final Object[] SCORING = { "SCORING", 0 };
+  /** Path to full-text stopword list. */
+  public static final Object[] STOPWORDS = { "STOPWORDS", "" };
 
   /** Levenshtein default error. */
-  public static final Object[] LSERR = { "LSERR", 0 };
+  public static final Object[] LSERROR = { "LSERR", 0 };
   /** Flag for creating flat MAB2 data. */
   public static final Object[] MAB2FLAT = { "MAB2flat", false };
 
@@ -173,11 +171,6 @@ public final class Prop extends AProp {
    * instead of the internal parser implementations.
    */
   public static final Object[] SPOTLIGHT = { "SPOTLIGHT", false };
-
-  // WEBSERVER OPTIONS ========================================================
-
-  /** PHP Path. */
-  public static final Object[] PHPPATH = { "PHPPATH", "php" };
 
   // STATIC PROPERTIES ========================================================
 

@@ -10,16 +10,6 @@ import org.basex.core.Prop;
  * @author Christian Gruen
  */
 public final class FTTest extends AbstractTest {
-  /**
-   * Returns a flag string.
-   * @param key key
-   * @param val value
-   * @return string
-   */
-  private String set(final String key, final boolean val) {
-    return "set " + key + " " + val;
-  }
-
   /** Constructor. */
   FTTest() {
     doc =
@@ -558,13 +548,24 @@ public final class FTTest extends AbstractTest {
   @Override
   String details(final AProp prop) {
     final StringBuilder sb = new StringBuilder();
-    sb.append(set("ftindex", prop.is(Prop.FTINDEX)) + ";");
-    sb.append(set("ftfuzzy", prop.is(Prop.FTFUZZY)) + ";");
-    sb.append(set("ftst", prop.is(Prop.FTST)) + ";");
-    sb.append(set("ftdc", prop.is(Prop.FTCS)) + ";");
-    sb.append(set("ftcs", prop.is(Prop.FTCS)));
+    sb.append(set(Prop.FTINDEX, prop) + ";");
+    sb.append(set(Prop.WILDCARDS, prop) + ";");
+    sb.append(set(Prop.STEMMING, prop) + ";");
+    sb.append(set(Prop.DIACRITICS, prop) + ";");
+    sb.append(set(Prop.CASESENS, prop));
     return sb.toString();
   }
+
+  /**
+   * Returns a flag string.
+   * @param key key
+   * @param prop properties
+   * @return string
+   */
+  private String set(final Object[] key, final AProp prop) {
+    return "set " + key[0] + " " + prop.is(key);
+  }
+
 
   /** TABLE REPRESENTATION
   PRE DIS SIZ ATS  NS  KIND  CONTENT

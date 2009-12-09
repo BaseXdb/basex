@@ -174,7 +174,7 @@ public final class DialogOpen extends Dialog {
         try {
           in = new DataInput(meta.file(DATAINFO));
           meta.read(in);
-          detail.setText(InfoDB.db(meta, true, true).finish());
+          detail.setText(InfoDB.db(meta, true, true, true));
           if(cmp == wth && wth.isSelected()) {
             final boolean dec = Dialog.confirm(this,
                 Main.info(WTHROUGHOK, meta.name, meta.backing));

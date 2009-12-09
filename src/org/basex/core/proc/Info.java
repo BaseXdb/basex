@@ -42,8 +42,8 @@ public final class Info extends AInfo {
     format(tb, INFOTEXTINDEX, flag(prop.is(Prop.TEXTINDEX)));
     format(tb, INFOATTRINDEX, flag(prop.is(Prop.ATTRINDEX)));
     format(tb, INFOFTINDEX, flag(prop.is(Prop.FTINDEX)) +
-        (prop.is(Prop.FTINDEX) && prop.is(Prop.FTFUZZY) ?
-        " (" + INFOFZINDEX + ")" : ""));
+        (prop.is(Prop.FTINDEX) && prop.is(Prop.WILDCARDS) ?
+        " (" + INFOWCINDEX + ")" : ""));
     out.print(tb.finish());
     return true;
   }

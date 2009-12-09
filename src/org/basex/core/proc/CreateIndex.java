@@ -46,11 +46,11 @@ public final class CreateIndex extends ACreate {
           break;
         case FULLTEXT:
           data.meta.ftxindex = true;
-          data.meta.ftfz = prop.is(Prop.FTFUZZY);
-          data.meta.ftst = prop.is(Prop.FTST);
-          data.meta.ftcs = prop.is(Prop.FTCS);
-          data.meta.ftdc = prop.is(Prop.FTDC);
-          data.meta.ftsctype = prop.num(Prop.FTSCTYPE);
+          data.meta.wildcards = prop.is(Prop.WILDCARDS);
+          data.meta.stemming = prop.is(Prop.STEMMING);
+          data.meta.casesens = prop.is(Prop.CASESENS);
+          data.meta.diacritics = prop.is(Prop.DIACRITICS);
+          data.meta.scoring = prop.num(Prop.SCORING);
           index = Type.FTX;
           break;
         case SUMMARY:
@@ -60,8 +60,8 @@ public final class CreateIndex extends ACreate {
       }
       if(data instanceof MemData) return error(PROCMM);
 
+      index(index, data);
       data.flush();
-      index(index, data, true);
 
       return info(DBINDEXED, perf);
     } catch(final IOException ex) {

@@ -70,7 +70,7 @@ public final class FTOpt extends ExprInfo {
    */
   public FTOpt(final Prop pr) {
     qu = new Tokenizer(pr);
-    lserr = pr.num(Prop.LSERR);
+    lserr = pr.num(Prop.LSERROR);
   }
 
   /**
@@ -98,7 +98,7 @@ public final class FTOpt extends ExprInfo {
   public void comp(final QueryContext ctx) {
     if(sw != null) sw.comp(ctx);
   }
-  
+
   /**
    * Sets the specified flag.
    * @param f flag to be set

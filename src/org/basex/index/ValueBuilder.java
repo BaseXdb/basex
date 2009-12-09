@@ -28,10 +28,9 @@ public final class ValueBuilder extends IndexBuilder {
    * Constructor.
    * @param d data reference
    * @param txt value type (text/attribute)
-   * @param o flag for keeping database open
    */
-  public ValueBuilder(final Data d, final boolean txt, final boolean o) {
-    super(d, o);
+  public ValueBuilder(final Data d, final boolean txt) {
+    super(d);
     text = txt;
   }
 

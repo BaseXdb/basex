@@ -47,8 +47,8 @@ public interface DataText {
   String DBATVIDX = "ATVINDEX";
   /** Full-text indexing. */
   String DBFTXIDX = "FTXINDEX";
-  /** Full-text fuzzy indexing. */
-  String DBFZIDX = "FZINDEX";
+  /** Full-text wildcards indexing. */
+  String DBWCIDX = "WCINDEX";
   /** Full-text stemming. */
   String DBFTST = "FTSTEM";
   /** Full-text case sensitivity. */

@@ -31,9 +31,9 @@ import org.basex.util.StringList;
  * @author Christian Gruen
  */
 public final class DialogCreate extends Dialog {
-  /** Database Input. */
+  /** File path. */
   private final BaseXTextField path;
-  /** Database Input. */
+  /** Document filter. */
   private final BaseXTextField filter;
   /** Database name. */
   private final BaseXTextField dbname;
@@ -151,11 +151,6 @@ public final class DialogCreate extends Dialog {
     p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
 
-    pathindex = new BaseXCheckBox(INFOPATHINDEX,
-        prop.is(Prop.PATHINDEX), 0, this);
-    p3.add(pathindex);
-    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
-
     txtindex = new BaseXCheckBox(INFOTEXTINDEX,
         prop.is(Prop.TEXTINDEX), 0, this);
     p3.add(txtindex);
@@ -166,6 +161,11 @@ public final class DialogCreate extends Dialog {
     p3.add(atvindex);
     p3.add(new BaseXLabel(ATTINDEXINFO, true, false));
 
+    pathindex = new BaseXCheckBox(INFOPATHINDEX,
+        prop.is(Prop.PATHINDEX), 0, this);
+    p3.add(pathindex);
+    p3.add(new BaseXLabel(PATHINDEXINFO, true, false));
+
     // create checkboxes
     final BaseXBack p4 = new BaseXBack();
     p4.setLayout(new TableLayout(10, 1, 0, 0));
@@ -175,9 +175,9 @@ public final class DialogCreate extends Dialog {
     p4.add(ftxindex);
     p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 
-    final String[] cb = { CREATEFZ, CREATESTEM, CREATECS, CREATEDC };
-    final boolean[] val = { prop.is(Prop.FTFUZZY), prop.is(Prop.FTST),
-        prop.is(Prop.FTCS), prop.is(Prop.FTDC)
+    final String[] cb = { CREATEWC, CREATESTEM, CREATECS, CREATEDC };
+    final boolean[] val = { prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING),
+        prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS)
     };
     int f = 0;
     for(; f < ft.length - 2; f++) {
@@ -187,19 +187,19 @@ public final class DialogCreate extends Dialog {
 
     final BaseXBack b1 = new BaseXBack();
     b1.setLayout(new TableLayout(1, 2, 6, 0));
-    ft[f] = new BaseXCheckBox(CREATESCT, prop.num(Prop.FTSCTYPE) > 0, this);
+    ft[f] = new BaseXCheckBox(CREATESCT, prop.num(Prop.SCORING) > 0, this);
     b1.add(ft[f++]);
     ftsct = new BaseXCombo(new String[] { CREATESCT1, CREATESCT2 }, this);
     b1.add(ftsct);
     p4.add(b1);
 
-    ft[f] = new BaseXCheckBox(CREATESW, !prop.get(Prop.FTSTOPW).isEmpty(),
-        this);
+    final String sw = prop.get(Prop.STOPWORDS);
+    ft[f] = new BaseXCheckBox(CREATESW, !sw.isEmpty(), this);
     p4.add(ft[f]);
 
     final BaseXBack b2 = new BaseXBack();
     b2.setLayout(new TableLayout(1, 3, 6, 0));
-    ftswlpath = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
+    ftswlpath = new BaseXTextField(prop.get(Prop.STOPWORDS), this);
     ftswlpath.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) { action(null); }
@@ -326,12 +326,12 @@ public final class DialogCreate extends Dialog {
     prop.set(Prop.ATTRINDEX, atvindex.isSelected());
     prop.set(Prop.FTINDEX, ftxindex.isSelected());
     prop.set(Prop.INTPARSE, intparse.isSelected());
-    prop.set(Prop.FTFUZZY, ft[0].isSelected());
-    prop.set(Prop.FTST, ft[1].isSelected());
-    prop.set(Prop.FTCS, ft[2].isSelected());
-    prop.set(Prop.FTDC, ft[3].isSelected());
-    prop.set(Prop.FTSCTYPE,
+    prop.set(Prop.WILDCARDS, ft[0].isSelected());
+    prop.set(Prop.STEMMING, ft[1].isSelected());
+    prop.set(Prop.CASESENS, ft[2].isSelected());
+    prop.set(Prop.DIACRITICS, ft[3].isSelected());
+    prop.set(Prop.SCORING,
         ft[4].isSelected() ? ftsct.getSelectedIndex() + 1 : 0);
-    prop.set(Prop.FTSTOPW, ft[5].isSelected() ? ftswlpath.getText() : "");
+    prop.set(Prop.STOPWORDS, ft[5].isSelected() ? ftswlpath.getText() : "");
   }
 }

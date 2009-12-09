@@ -247,12 +247,12 @@ public final class FTWords extends FTExpr {
 
     if(txt == null || occ != null ||
         mode != FTMode.ANY && mode != FTMode.ALL && mode != FTMode.PHRASE ||
-        md.ftcs != fto.is(FTOpt.CS) || md.ftdc != fto.is(FTOpt.DC) ||
-        md.ftst != fto.is(FTOpt.ST)) return false;
+        md.casesens != fto.is(FTOpt.CS) || md.diacritics != fto.is(FTOpt.DC) ||
+        md.stemming != fto.is(FTOpt.ST)) return false;
 
     // limit index access to trie version and simple wildcard patterns
     if(fto.is(FTOpt.WC)) {
-      if(md.ftfz || txt[0] == '.') return false;
+      if(!md.wildcards || txt[0] == '.') return false;
       int d = 0;
       for(final byte w : txt) {
         if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;

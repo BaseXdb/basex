@@ -185,7 +185,7 @@ public final class DialogMountFS extends Dialog {
           // fill detail panel with db info
           in = new DataInput(meta.file(DATAINFO));
           meta.read(in);
-          detail.setText(InfoDB.db(meta, true, true).finish());
+          detail.setText(InfoDB.db(meta, true, true, true));
           // check for valid mountpoint
           final IO file = IO.get(mp);
           final boolean mpok = !mp.isEmpty() && file.exists() &&

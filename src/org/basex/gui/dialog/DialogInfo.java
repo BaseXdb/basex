@@ -74,7 +74,8 @@ public final class DialogInfo extends Dialog {
     doc.setBorder(0, 0, 5, 0);
     tab1.add(doc, BorderLayout.NORTH);
 
-    final TokenBuilder info = InfoDB.db(meta, true, false);
+    final byte[] db = InfoDB.db(meta, true, false, true);
+    final TokenBuilder info = new TokenBuilder(db);
     if(data.ns.size() != 0) {
       info.high().add(NL + INFONS + NL).norm().add(data.ns.info());
     }
@@ -169,9 +170,10 @@ public final class DialogInfo extends Dialog {
 
     if(ftedit) {
       p.add(new BaseXLabel(FTINDEXINFO, ftedit, false));
-      final String[] cb = { CREATEFZ, CREATESTEM, CREATEDC, CREATECS };
+      final String[] cb = { CREATEWC, CREATESTEM, CREATEDC, CREATECS };
       final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
-      final boolean[] val = { meta.ftfz, meta.ftst, meta.ftdc, meta.ftcs };
+      final boolean[] val = { meta.wildcards, meta.stemming,
+          meta.diacritics, meta.casesens };
       for(int f = 0; f < ft.length; f++) {
         ft[f] = new BaseXCheckBox(cb[f], val[f], 0, this);
         fl[f] = new BaseXLabel(desc[f], true, false);
@@ -265,10 +267,10 @@ public final class DialogInfo extends Dialog {
     super.close();
     if(ftedit) {
       final Prop prop = gui.context.prop;
-      prop.set(Prop.FTFUZZY, ft[0].isSelected());
-      prop.set(Prop.FTST, ft[1].isSelected());
-      prop.set(Prop.FTDC, ft[2].isSelected());
-      prop.set(Prop.FTCS, ft[3].isSelected());
+      prop.set(Prop.WILDCARDS, ft[0].isSelected());
+      prop.set(Prop.STEMMING, ft[1].isSelected());
+      prop.set(Prop.DIACRITICS, ft[2].isSelected());
+      prop.set(Prop.CASESENS, ft[3].isSelected());
     }
   }
 }

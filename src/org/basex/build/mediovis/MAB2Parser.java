@@ -428,7 +428,9 @@ public final class MAB2Parser extends Parser {
    */
   private void add(final byte[] tag, final byte[] cont) throws IOException {
     if(cont == null) return;
-    builder.nodeAndText(tag, atts.reset(), utf8(cont, ENCODING));
+    builder.startElem(tag, atts.reset());
+    builder.text(new TokenBuilder(utf8(cont, ENCODING)));
+    builder.endElem(tag);
   }
 
   /**

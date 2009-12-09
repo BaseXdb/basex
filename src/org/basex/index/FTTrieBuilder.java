@@ -23,11 +23,10 @@ public final class FTTrieBuilder extends FTBuilder {
   /**
    * Constructor.
    * @param d data reference
-   * @param o flag for keeping database open
    * @throws IOException IOException
    */
-  public FTTrieBuilder(final Data d, final boolean o) throws IOException {
-    super(d, o);
+  protected FTTrieBuilder(final Data d) throws IOException {
+    super(d);
   }
 
   @Override

@@ -34,7 +34,8 @@ public final class InfoDB extends AInfo {
 
   @Override
   protected boolean exec(final PrintOutput out) throws IOException {
-    out.print(db(context.data.meta, false, true).finish());
+    final boolean admin = context.user.perm(User.CREATE);
+    out.print(db(context.data.meta, false, true, admin));
     return true;
   }
 
@@ -43,10 +44,11 @@ public final class InfoDB extends AInfo {
    * @param meta meta data
    * @param bold header bold header flag
    * @param index add index information
+   * @param admin admin user
    * @return info string
    */
-  public static TokenBuilder db(final MetaData meta, final boolean bold,
-      final boolean index) {
+  public static byte[] db(final MetaData meta, final boolean bold,
+      final boolean index, final boolean admin) {
 
     final File dir = meta.prop.dbpath(meta.name);
     long len = 0;
@@ -63,7 +65,7 @@ public final class InfoDB extends AInfo {
 
     tb.add(NL);
     tb.add(header, INFOCREATE);
-    format(tb, INFODOC, meta.file.path());
+    if(admin) format(tb, INFODOC, meta.file.path());
     format(tb, INFOTIME, DATE.format(new Date(meta.time)));
     format(tb, INFODOCSIZE, Performance.format(meta.filesize));
     format(tb, INFOENCODING, meta.encoding);
@@ -81,10 +83,10 @@ public final class InfoDB extends AInfo {
         format(tb, INFOTEXTINDEX, flag(meta.txtindex));
         format(tb, INFOATTRINDEX, flag(meta.atvindex));
         format(tb, INFOFTINDEX, flag(meta.ftxindex) + (meta.ftxindex &&
-            meta.ftfz ? " (" + INFOFZINDEX + ")" : ""));
+            meta.wildcards ? " (" + INFOWCINDEX + ")" : ""));
       }
     }
-    return tb;
+    return tb.finish();
   }
 
   @Override

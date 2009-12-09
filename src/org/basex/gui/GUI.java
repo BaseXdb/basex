@@ -380,7 +380,7 @@ public final class GUI extends JFrame {
    * @param pr process to be launched
    * @param main call from main window
    */
-  void execute(final Proc pr, final boolean main) {
+  private void execute(final Proc pr, final boolean main) {
     if(updating) return;
     new Thread() {
       @Override

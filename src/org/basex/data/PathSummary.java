@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.basex.core.Prop;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -206,9 +205,7 @@ public final class PathSummary {
    * @return info
    */
   public byte[] info(final Data data) {
-    byte[] info = root.info(data, 0);
-    if(!data.meta.prop.is(Prop.INDEXALL)) info = chop(info, 1 << 13);
-    return info;
+    return chop(root.info(data, 0), 1 << 13);
   }
 
   /**

@@ -36,7 +36,8 @@ public final class StopWords extends TokenSet {
    * @throws IOException I/O exception
    */
   public StopWords(final Data data, final String file) throws IOException {
-    if(!data.meta.prop.get(Prop.FTSTOPW).equals("")) read(IO.get(file), false);
+    if(!data.meta.prop.get(Prop.STOPWORDS).equals(""))
+      read(IO.get(file), false);
     final DataOutput out = new DataOutput(data.meta.file(DATASWL));
     write(out);
     out.close();

@@ -54,7 +54,7 @@ public final class Values implements Index {
     tb.add(TXTINDEX + NL);
     final long l = idxl.length() + idxr.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
-    final IndexStats stats = new IndexStats(data.meta.prop);
+    final IndexStats stats = new IndexStats();
     for(int m = 0; m < size; m++) {
       final int oc = idxl.readNum(idxr.read5(m * 5L));
       if(stats.adding(oc)) stats.add(data.text(idxl.readNum(), text));

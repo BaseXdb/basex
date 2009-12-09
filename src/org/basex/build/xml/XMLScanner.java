@@ -26,8 +26,6 @@ import org.basex.util.TokenMap;
 public final class XMLScanner extends Progress {
   /** PublicID characters. */
   private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
-  /** Verbose mode. */
-  private static final boolean VERBOSE = false;
   /** Quote Entity. */
   private static final byte[] E_QU = token("quot");
   /** Ampersand Entity. */
@@ -134,18 +132,6 @@ public final class XMLScanner extends Progress {
       case TAG:
       case ATT: scanTAG(ch); break;
       case QUOTE: scanATTVALUE(ch);
-    }
-
-    if(VERBOSE) {
-      // get string representations
-      String typ = type.toString();
-      String sta = state.toString();
-      // formatted output
-      while(sta.length() < 12) sta += " ";
-      while(typ.length() < 13) typ += " ";
-      String out = sta + typ;
-      if(token != null) out += "'" + token + "'";
-      Main.outln(out);
     }
     return true;
   }
@@ -277,7 +263,7 @@ public final class XMLScanner extends Progress {
     boolean wrong = false;
     int c = ch;
     do {
-      if(c == 0) error(ATTCLOSE , (char) c);
+      if(c == 0) error(ATTCLOSE, (char) c);
       wrong |= c == '\'' || c == '"';
       if(c == '<') error(wrong ? ATTCLOSE : ATTCHAR, (char) c);
       if(c == 0x0A) c = ' ';

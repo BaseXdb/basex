@@ -23,7 +23,7 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  public void init(final String db) {
+  public MemData build(final String db) throws IOException {
     // index values are always indexed in main memory mode
     data = new MemData(tags, atts, ns, path, parser.prop);
     meta = data.meta;
@@ -32,16 +32,14 @@ public final class MemBuilder extends Builder {
     meta.atvindex = true;
     meta.ftxindex = false;
     meta.file = parser.io;
+
+    parse(db);
+    data.init();
+    return data;
   }
 
   @Override
   public void close() { }
-
-  @Override
-  protected MemData finish() throws IOException {
-    data.init();
-    return data;
-  }
 
   @Override
   public void setAttValue(final int pre, final byte[] val) {

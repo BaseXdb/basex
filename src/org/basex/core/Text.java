@@ -605,7 +605,7 @@ public interface Text {
   /** Info on full-text indexing. */
   String INFOFTINDEX = lang("info_ftindex");
   /** Info on fuzzy indexing. */
-  String INFOFZINDEX = lang("info_fzindex");
+  String INFOWCINDEX = lang("info_wcindex");
   /** Info on index. */
   String INFOOUTOFDATED = lang("info_outofdated");
 
@@ -952,7 +952,7 @@ public interface Text {
   String CREATEINTPARSE = lang("dc_intparse");
 
   /** Full-text index information. */
-  String CREATEFZ = lang("dc_fzindex");
+  String CREATEWC = lang("dc_wcindex");
   /** Full-text index information. */
   String CREATESTEM = lang("dc_ftstem");
   /** Full-text index information. */

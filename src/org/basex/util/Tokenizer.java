@@ -91,9 +91,9 @@ public class Tokenizer implements IndexToken {
   public Tokenizer(final byte[] txt, final Prop pr) {
     init(txt);
     if(pr != null) {
-      st = pr.is(Prop.FTST);
-      dc = pr.is(Prop.FTDC);
-      cs = pr.is(Prop.FTCS);
+      st = pr.is(Prop.STEMMING);
+      dc = pr.is(Prop.DIACRITICS);
+      cs = pr.is(Prop.CASESENS);
     }
   }
 

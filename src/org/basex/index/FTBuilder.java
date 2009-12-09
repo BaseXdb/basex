@@ -21,10 +21,10 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-abstract class FTBuilder extends IndexBuilder {
+public abstract class FTBuilder extends IndexBuilder {
   /** Word parser. */
   protected final Tokenizer wp;
-  /** Scoring mode; see {@link Prop#FTSCTYPE}. */
+  /** Scoring mode; see {@link Prop#SCORING}. */
   protected final int scm;
 
   /** Document units (all document or text nodes in a document). */
@@ -47,19 +47,30 @@ abstract class FTBuilder extends IndexBuilder {
   private StopWords sw;
 
   /**
-   * Constructor.
+   * Returns a new full-text index builder.
    * @param d data reference
-   * @param o flag for keeping database open
+   * @param wild wildcard index
+   * @return index builder
    * @throws IOException IOException
    */
-  protected FTBuilder(final Data d, final boolean o) throws IOException {
-    super(d, o);
+  public static FTBuilder get(final Data d, final boolean wild)
+      throws IOException {
+    return wild ? new FTTrieBuilder(d) : new FTFuzzyBuilder(d);
+  }
+  
+  /**
+   * Constructor.
+   * @param d data reference
+   * @throws IOException IOException
+   */
+  protected FTBuilder(final Data d) throws IOException {
+    super(d);
     final Prop prop = d.meta.prop;
-    scm = d.meta.ftsctype;
+    scm = d.meta.scoring;
     wp = scm > 0 ? new ScoringTokenizer(prop) : new Tokenizer(prop);
     max = -1;
     min = Integer.MAX_VALUE;
-    sw = new StopWords(d, prop.get(Prop.FTSTOPW));
+    sw = new StopWords(d, prop.get(Prop.STOPWORDS));
   }
 
   @Override
