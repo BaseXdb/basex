@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.data.Serializer;
 import org.basex.query.ExprInfo;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.util.Err;
@@ -76,7 +77,7 @@ public final class FTOpt extends ExprInfo {
    * Compiles the full-text options, inheriting the options of the argument.
    * @param opt parent full-text options
    */
-  public void compile(final FTOpt opt) {
+  public void init(final FTOpt opt) {
     for(int i = 0; i < flag.length; i++) {
       if(!set[i]) {
         set[i] = opt.set[i];
@@ -90,6 +91,14 @@ public final class FTOpt extends ExprInfo {
     else if(opt.th != null) th.merge(opt.th);
   }
 
+  /**
+   * Compiles the full-text options.
+   * @param ctx query context
+   */
+  public void comp(final QueryContext ctx) {
+    if(sw != null) sw.comp(ctx);
+  }
+  
   /**
    * Sets the specified flag.
    * @param f flag to be set

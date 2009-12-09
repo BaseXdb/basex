@@ -300,7 +300,7 @@ public class QueryParser extends InputParser {
         } else if(consumeWS(FTOPTION)) {
           final FTOpt opt = new FTOpt(ctx.context.prop);
           while(ftMatchOption(opt));
-          ctx.ftopt.compile(opt);
+          ctx.ftopt.init(opt);
         } else {
           qp = p;
           return;
@@ -2416,14 +2416,11 @@ public class QueryParser extends InputParser {
         // add union/except
         check(WORDS);
 
+        if(opt.sw != null) error(FTDUP, STOP + ' ' + WORDS);
+        opt.sw = new StopWords();
         if(consumeWS(DEFAULT)) {
-          try {
-            opt.sw = new StopWords(ctx.context.data);
-          } catch (Exception e) { }
           if(!using) error(FTSTOP);
         } else {
-          if(opt.sw != null) error(FTDUP, STOP + ' ' + WORDS);
-          opt.sw = new StopWords();
           boolean union = false;
           boolean except = false;
           while(using) {

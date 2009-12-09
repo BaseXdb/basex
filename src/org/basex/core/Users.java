@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
  * This class organizes all users.
@@ -173,7 +173,7 @@ public final class Users extends ArrayList<User> {
     for(int u = 0; u < sz; u++) table.header.add(USERHEAD[u]);
 
     for(final User user : this) {
-      final StringList entry = new StringList();
+      final TokenList entry = new TokenList();
       entry.add(user.name);
       entry.add(user.perm(User.READ) ? "X" : "");
       entry.add(user.perm(User.WRITE) ? "X" : "");

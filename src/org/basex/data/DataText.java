@@ -217,28 +217,32 @@ public interface DataText {
   // TABLE SERIALIZATION ======================================================
 
   /** First table Header. */
-  String TABLEID = "ID";
+  byte[] TABLEID = token("ID");
   /** First table Header. */
-  String TABLEPRE = "PRE";
+  byte[] TABLEPRE = token("PRE");
   /** Second table Header. */
-  String TABLEDIST = "DIS";
+  byte[] TABLEDIST = token("DIS");
   /** Third table Header. */
-  String TABLESIZE = "SIZ";
+  byte[] TABLESIZE = token("SIZ");
   /** Fourth table Header. */
-  String TABLEATS = "ATS";
-  /** Namespace header. */
-  String TABLENS = "NS";
-  /** Prefix header. */
-  String TABLEPREF = "PREFIX";
-  /** URI header. */
-  String TABLEURI = "NAMESPACE";
-  /** Table Kinds. */
-  String[] TABLEKINDS = { "DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  "};
+  byte[] TABLEATS = token("ATS");
+  /** Fifth table Header. */
+  byte[] TABLEKND = token("KIND");
+  /** Sixth table Header. */
+  byte[] TABLECON = token("CONTENT");
 
-  /** Fifth table Header. */
-  String TABLEKND = "KIND";
-  /** Fifth table Header. */
-  String TABLECON = "CONTENT";
+  /** Namespace header. */
+  byte[] TABLENS = token("NS");
+  /** Prefix header. */
+  byte[] TABLEPREF = token("PREFIX");
+  /** URI header. */
+  byte[] TABLEURI = token("NAMESPACE");
+  /** Table Kinds. */
+  byte[][] TABLEKINDS = {
+      { 'D', 'O', 'C', ' ' }, { 'E', 'L', 'E', 'M' },
+      { 'T', 'E', 'X', 'T' }, { 'A', 'T', 'T', 'R' },
+      { 'C', 'O', 'M', 'M' }, { 'P', 'I', ' ', ' ' }
+  };
 
   // DATABASE FILES ===========================================================
 

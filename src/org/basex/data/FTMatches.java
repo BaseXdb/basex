@@ -94,13 +94,14 @@ public final class FTMatches implements Iterable<FTMatch> {
   /**
    * Combines two matches as phrase.
    * @param all second match list
+   * @param dis word distance
    * @return true if matches are left
    */
-  public boolean phrase(final FTMatches all) {
+  public boolean phrase(final FTMatches all, final int dis) {
     int a = 0, b = 0, c = 0;
     while(a < size && b < all.size) {
       final int e = all.match[b].match[0].s;
-      final int d = e - match[a].match[0].e - 1;
+      final int d = e - match[a].match[0].e - dis;
       if(d == 0) {
         match[c] = match[a];
         match[c++].match[0].e = e;

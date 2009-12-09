@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -14,13 +15,13 @@ import java.util.Scanner;
  */
 public class Table {
   /** Table header. */
-  public StringList header = new StringList();
+  public TokenList header = new TokenList();
   /** Distance between table columns. */
   public static final int DIST = 2;
   /** Alignment (false: left, true: right alignment). */
   public BoolList align = new BoolList();
   /** Data (usually strings). */
-  public ArrayList<StringList> contents = new ArrayList<StringList>();
+  public ArrayList<TokenList> contents = new ArrayList<TokenList>();
   /** Data description. */
   public String desc;
 
@@ -53,9 +54,9 @@ public class Table {
     // parse table entries
     final int s = il.size() - 1;
     while(!(line = scan.nextLine()).isEmpty()) {
-      final StringList entry = new StringList();
+      final TokenList entry = new TokenList();
       for(int e = 0; e < s; e++) {
-        entry.add(line.substring(il.get(e), il.get(e + 1)).trim());
+        entry.add(token(line.substring(il.get(e), il.get(e + 1)).trim()));
       }
       contents.add(entry);
     }
@@ -66,10 +67,10 @@ public class Table {
    */
   public void sort() {
     for(int i = 0; i < contents.size() - 2; i++) {
-      final String s = contents.get(i).get(0).toLowerCase();
+      final byte[] s = lc(contents.get(i).get(0));
       for(int j = i + 1; j < contents.size(); j++) {
-        if(s.compareTo(contents.get(j).get(0).toLowerCase()) > 0) {
-          final StringList tmp = contents.get(i);
+        if(diff(s, lc(contents.get(j).get(0))) > 0) {
+          final TokenList tmp = contents.get(i);
           contents.set(i, contents.get(j));
           contents.set(j, tmp);
         }
@@ -85,16 +86,16 @@ public class Table {
     final int[] ind = new int[header.size()];
     final int sz = header.size();
     for(int s = 0; s < sz; s++) {
-      for(final StringList e : contents) {
-        ind[s] = Math.max(ind[s], e.get(s).length());
+      for(final TokenList e : contents) {
+        ind[s] = Math.max(ind[s], e.get(s).length);
       }
-      ind[s] = Math.max(ind[s], header.get(s).length());
+      ind[s] = Math.max(ind[s], header.get(s).length);
     }
 
     final TokenBuilder tb = new TokenBuilder();
     for(int u = 0; u < sz; u++) {
-      final String s = header.get(u);
-      final int is = ind[u] - s.length() + DIST;
+      final byte[] s = header.get(u);
+      final int is = ind[u] - s.length + DIST;
       tb.add(s);
       for(int i = 0; i < is; i++) tb.add(' ');
     }
@@ -103,18 +104,18 @@ public class Table {
       for(int i = 0; i < ind[u] + (u + 1 == sz ? 0 : DIST); i++) tb.add('-');
     }
     tb.add(NL);
-    for(final StringList e : contents) {
+    for(final TokenList e : contents) {
       for(int u = 0; u < sz; u++) {
-        final String s = e.get(u);
-        final int is = ind[u] - s.length();
+        final byte[] s = e.get(u);
+        final int is = ind[u] - s.length;
         if(u < align.size() && align.get(u)) {
-          for(int i = 0; i < is; i++) tb.add(' ');
+          for(int i = 0; i < is; i++) tb.add((byte) ' ');
           tb.add(s);
         } else {
           tb.add(s);
-          for(int i = 0; i < is; i++) tb.add(' ');
+          for(int i = 0; i < is; i++) tb.add((byte) ' ');
         }
-        for(int i = 0; i < DIST; i++) tb.add(' ');
+        for(int i = 0; i < DIST; i++) tb.add((byte) ' ');
       }
       tb.add(NL);
     }

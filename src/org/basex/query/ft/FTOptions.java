@@ -31,7 +31,8 @@ public final class FTOptions extends FTExpr {
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
     final FTOpt tmp = ctx.ftopt;
-    opt.compile(tmp);
+    opt.init(tmp);
+    opt.comp(ctx);
     ctx.ftopt = opt;
     expr[0] = expr[0].comp(ctx);
     ctx.ftopt = tmp;

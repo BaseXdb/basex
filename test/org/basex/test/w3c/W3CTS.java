@@ -145,7 +145,7 @@ public abstract class W3CTS {
    * @param nm name of test
    */
   public W3CTS(final String nm) {
-    input = nm + "Catalog.xml";
+    input = nm + "Catalog" + IO.XMLSUFFIX;
     testid = nm.substring(0, 4);
     pathhis = testid.toLowerCase() + ".hist";
     pathlog = testid.toLowerCase() + ".log";
@@ -237,7 +237,7 @@ public abstract class W3CTS {
       final TokenList dl = new TokenList();
       final Nodes doc = nodes("*:input-document", nodes);
       for(int d = 0; d < doc.size(); d++) {
-        dl.add(token(sources + string(data.atom(doc.nodes[d])) + ".xml"));
+        dl.add(token(sources + string(data.atom(doc.nodes[d])) + IO.XMLSUFFIX));
       }
       colls.put(cname, dl.finish());
     }
@@ -289,10 +289,10 @@ public abstract class W3CTS {
 
     if(reporting) {
       bw = new BufferedWriter(new OutputStreamWriter(
-          new FileOutputStream(report + NAME + ".xml"), UTF8));
-      write(bw, report + NAME + "Pre.xml");
+          new FileOutputStream(report + NAME + IO.XMLSUFFIX), UTF8));
+      write(bw, report + NAME + "Pre" + IO.XMLSUFFIX);
       bw.write(logReport.toString());
-      write(bw, report + NAME + "Pos.xml");
+      write(bw, report + NAME + "Pos" + IO.XMLSUFFIX);
       bw.close();
     }
 
@@ -336,7 +336,7 @@ public abstract class W3CTS {
       final Nodes state = new Nodes(nodes.nodes[n], nodes.data);
 
       final String inname = text("*:query/@name", state);
-      context.query = IO.get(queries + pth + inname + ".xq");
+      context.query = IO.get(queries + pth + inname + IO.XQSUFFIX);
       final String in = read(context.query);
       String error = null;
       SeqIter iter = null;
@@ -372,7 +372,7 @@ public abstract class W3CTS {
 
         for(final int p : nodes("*:module", root).nodes) {
           final String ns = text("@namespace", new Nodes(p, data));
-          final String f = mods.get(string(data.atom(p))) + ".xq";
+          final String f = mods.get(string(data.atom(p))) + IO.XQSUFFIX;
           xq.module(ns, f);
         }
 
@@ -416,7 +416,7 @@ public abstract class W3CTS {
       }
       String expError = text("*:expected-error/text()", state);
 
-      final StringBuilder log = new StringBuilder(pth + inname + ".xq");
+      final StringBuilder log = new StringBuilder(pth + inname + IO.XQSUFFIX);
       if(files.size() != 0) {
         log.append(" [");
         log.append(files);
@@ -510,7 +510,8 @@ public abstract class W3CTS {
             logErr.append(norm(out.toString()));
             logErr.append(NL);
             logErr.append(NL);
-            addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
+            addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
+                out.toString());
           }
           correct = false;
           err++;
@@ -521,7 +522,8 @@ public abstract class W3CTS {
             logOK.append(norm(out.toString()));
             logOK.append(NL);
             logOK.append(NL);
-            addLog(pth, outname + (xml ? ".xml" : ".txt"), out.toString());
+            addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
+                out.toString());
           }
           ok++;
         }
@@ -696,7 +698,7 @@ public abstract class W3CTS {
       final QueryContext ctx) throws Exception {
 
     for(int c = 0; c < nod.size(); c++) {
-      final String file = pth + string(data.atom(nod.nodes[c])) + ".xq";
+      final String file = pth + string(data.atom(nod.nodes[c])) + IO.XQSUFFIX;
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
       final Item item = xq.eval();

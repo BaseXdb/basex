@@ -494,6 +494,8 @@ public abstract class Data {
     if(empty) {
       p++;
       s--;
+    } else {
+      if(kind(p) == DOC) meta.ndocs--;
     }
 
     // delete node from table structure and reduce document size
@@ -539,6 +541,7 @@ public abstract class Data {
         case DOC:
           // add document
           tb.add(doc(pre, md.size(mpre, mk), md.text(mpre, true)));
+          meta.ndocs++;
           break;
         case ELEM:
           // add element

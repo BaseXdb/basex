@@ -88,7 +88,7 @@ abstract class FTBuilder extends IndexBuilder {
       while(wp.more()) {
         final byte[] tok = wp.get();
         // skip too long tokens
-        if(tok.length <= MAXLEN && !sw.contains(tok)) index(tok);
+        if(tok.length <= MAXLEN && sw.id(tok) == 0) index(tok);
       }
     }
     if(scm > 0) {

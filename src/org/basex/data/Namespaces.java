@@ -5,10 +5,10 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
+import org.basex.io.IO;
 import org.basex.util.ObjectMap;
 import org.basex.util.Token;
 import org.basex.util.TokenSet;
-import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -20,6 +20,10 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  */
 public final class Namespaces {
+  /** Namespace stack. */
+  private final int[] uriStack = new int[IO.MAXHEIGHT];
+  /** Current level. */
+  private int uriL;
   /** Prefixes. */
   private final TokenSet pref;
   /** URIs. */
@@ -64,11 +68,26 @@ public final class Namespaces {
   }
 
   /**
+   * Adds the specified namespace to a temporary node.
+   * @param p prefix
+   * @param u uri
+   */
+  public void add(final byte[] p, final byte[] u) {
+    if(tmp == null) tmp = new NSNode();
+    final int k = addPref(p);
+    final int v = addURI(u);
+    tmp.add(k, v);
+    if(p.length == 0) uriStack[uriL] = v;
+  }
+
+  /**
    * Completes the temporary node and adds it to the storage.
    * @param pre pre value
    * @return true if a new namespace has been added
    */
   public boolean open(final int pre) {
+    final int us = uriStack[uriL];
+    uriStack[++uriL] = us;
     if(tmp == null) return false;
     tmp.pre = pre;
     root.add(tmp);
@@ -83,49 +102,22 @@ public final class Namespaces {
    */
   public void close(final int pre) {
     while(root.pre >= pre) root = root.par;
-  }
-
-  /**
-   * Adds the specified namespace to a temporary node.
-   * @param p prefix
-   * @param u uri
-   * @return uri reference
-   */
-  public int add(final byte[] p, final byte[] u) {
-    if(tmp == null) tmp = new NSNode();
-    final int k = addPref(p);
-    final int v = addURI(u);
-    tmp.add(k, v);
-    return v;
-  }
-
-  /**
-   * Adds the specified namespace uri.
-   * @param u namespace uri to be added
-   * @return reference
-   */
-  public int addURI(final byte[] u) {
-    return Math.abs(uri.add(u));
-  }
-
-  /**
-   * Adds the specified prefix.
-   * @param p prefix to be added
-   * @return reference
-   */
-  public int addPref(final byte[] p) {
-    return Math.abs(pref.add(p));
+    --uriL;
   }
 
   /**
    * Returns the namespace uri reference for the specified name,
    * or 0 if namespace cannot be found.
    * @param n tag/attribute name
+   * @param elem element flag
    * @return namespace
    */
-  public int uri(final byte[] n) {
+  public int uri(final byte[] n, final boolean elem) {
+    if(uri.size() == 0) return 0;
     final byte[] pr = Token.pref(n);
-    return pr.length == 0 ? 0 : uri(pr, root);
+    int u = elem ? uriStack[uriL] : 0;
+    if(pr.length != 0) u = uri(pr, root);
+    return u;
   }
 
   /**
@@ -233,6 +225,24 @@ public final class Namespaces {
     return v;
   }
 
+  /**
+   * Adds the specified namespace uri.
+   * @param u namespace uri to be added
+   * @return reference
+   */
+  public int addURI(final byte[] u) {
+    return Math.abs(uri.add(u));
+  }
+
+  /**
+   * Adds the specified prefix.
+   * @param p prefix to be added
+   * @return reference
+   */
+  public int addPref(final byte[] p) {
+    return Math.abs(pref.add(p));
+  }
+
   // Printing Namespaces ======================================================
 
   /**
@@ -265,12 +275,12 @@ public final class Namespaces {
   private void table(final Table t, final NSNode n, final int s, final int e) {
     for(int i = 0; i < n.vals.length; i += 2) {
       if(n.pre < s || n.pre > e) continue;
-      final StringList sl = new StringList();
+      final TokenList sl = new TokenList();
       sl.add(n.vals[i + 1]);
       sl.add(n.pre);
       sl.add(n.pre - n.par.pre);
-      sl.add(Token.string(pref.key(n.vals[i])));
-      sl.add(Token.string(uri.key(n.vals[i + 1])));
+      sl.add(pref.key(n.vals[i]));
+      sl.add(uri.key(n.vals[i + 1]));
       t.contents.add(sl);
     }
     if(n.vals.length == 0) for(final NSNode c : n.ch) table(t, c, s, e);

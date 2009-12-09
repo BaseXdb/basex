@@ -131,11 +131,14 @@ public final class UpdateFunctions {
         return pre + 1;
       default:
         q = nd.qname();
+        ne = false;
         if(par == 0) {
           final Atts ns = FElem.ns(nd);
-          for(int a = 0; a < ns.size; a++) m.ns.add(ns.key[a], ns.val[a]);
+          for(int a = 0; a < ns.size; a++) {
+            m.ns.add(ms, -1, ns.key[a], ns.val[a]);
+            ne = true;
+          }
         }
-        ne = m.ns.open(ms);
         uri = q.uri.str();
         u = uri.length != 0 ? Math.abs(m.ns.addURI(uri)) : 0;
         final int tn = m.tags.index(q.str(), null, false);

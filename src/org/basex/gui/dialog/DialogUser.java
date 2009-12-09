@@ -39,6 +39,8 @@ import org.basex.io.CachedOutput;
 import org.basex.server.LoginException;
 import org.basex.util.StringList;
 import org.basex.util.Table;
+import org.basex.util.Token;
+import org.basex.util.TokenList;
 
 /**
  * Panel for displaying information about global/lokal users.
@@ -326,9 +328,9 @@ public final class DialogUser extends BaseXBack {
     data = new Table(out.toString());
     dropUser.removeAllItems();
     alterUser.removeAllItems();
-    StringList tmp = new StringList();
-    for(final StringList o : data.contents) {
-      final String check = o.get(0);
+    TokenList tmp = null;
+    for(final TokenList o : data.contents) {
+      final String check = Token.string(o.get(0));
       if(!check.equals(ADMIN)) {
         dropUser.addItem(check);
       } else {
@@ -362,20 +364,20 @@ public final class DialogUser extends BaseXBack {
 
     final Table data2 = new Table(out.toString());
     final StringList tmp1 = new StringList();
-    for(final StringList l : data.contents) tmp1.add(l.get(0));
+    for(final TokenList l : data.contents) tmp1.add(Token.string(l.get(0)));
     final StringList tmp2 = new StringList();
-    for(final StringList l : data2.contents) tmp2.add(l.get(0));
+    for(final TokenList l : data2.contents) tmp2.add(Token.string(l.get(0)));
 
     for(final String s : tmp2) {
       if(s.equals(ADMIN)) continue;
       if(!tmp1.contains(s)) {
         addUser.addItem(s);
-        for(final StringList l : data2.contents) {
-          if(l.get(0).equals(s)) {
+        for(final TokenList l : data2.contents) {
+          if(Token.string(l.get(0)).equals(s)) {
             final StringList tmp = new StringList();
             tmp.add(s);
-            tmp.add(l.get(1));
-            tmp.add(l.get(2));
+            tmp.add(Token.string(l.get(1)));
+            tmp.add(Token.string(l.get(2)));
             tempP.add(tmp);
           }
         }
@@ -402,8 +404,8 @@ public final class DialogUser extends BaseXBack {
       sess.execute(new List(), out);
       final Table dbs = new Table(out.toString());
       databases.removeAllItems();
-      for(final StringList l : dbs.contents) {
-        databases.addItem(l.get(0));
+      for(final TokenList l : dbs.contents) {
+        databases.addItem(Token.string(l.get(0)));
       }
       databases.setSelectedIndex(-1);
     }
@@ -434,11 +436,11 @@ public final class DialogUser extends BaseXBack {
 
     @Override
     public String getColumnName(final int col) {
-      return data.header.get(col);
+      return Token.string(data.header.get(col));
     }
 
     public Object getValueAt(final int row, final int col) {
-      final String o = data.contents.get(row).get(col);
+      final String o = Token.string(data.contents.get(row).get(col));
       return o.equals("") ? Boolean.FALSE : o.equals("X") ? Boolean.TRUE : o;
     }
 
@@ -454,7 +456,7 @@ public final class DialogUser extends BaseXBack {
 
     @Override
     public void setValueAt(final Object value, final int row, final int col) {
-        final String uname = data.contents.get(row).get(0);
+        final String uname = Token.string(data.contents.get(row).get(0));
         if(!uname.equals(" ")) {
           final String right = CmdPerm.values()[col - 1].toString();
           if(global) {
@@ -465,7 +467,8 @@ public final class DialogUser extends BaseXBack {
             permps.add(value.equals(true) ? new Grant(right, uname, db)
                 : new Revoke(right, uname, db));
           }
-          data.contents.get(row).set(value == Boolean.TRUE ? "X" : "", col);
+          data.contents.get(row).set(
+              Token.token(value == Boolean.TRUE ? "X" : ""), col);
           fireTableCellUpdated(row, col);
           change.setEnabled(true);
       }

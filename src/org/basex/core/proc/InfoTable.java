@@ -10,9 +10,9 @@ import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.io.PrintOutput;
-import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 
 /**
  * Evaluates the 'info table' command and returns the table representation
@@ -111,16 +111,18 @@ public final class InfoTable extends AInfo {
    */
   private static void table(final Table t, final Data data, final int p) {
     final int k = data.kind(p);
-    final StringList sl = new StringList();
+    final TokenList sl = new TokenList();
     sl.add(p);
     sl.add(p - data.parent(p, k));
     sl.add(data.size(p, k));
     sl.add(data.attSize(p, k));
-    sl.add((data.nsFlag(p) ? "+" : "") + data.uri(p, k));
+    final int u = data.uri(p, k);
+    if(data.nsFlag(p)) sl.add("+" + u);
+    else sl.add(u);
     sl.add(TABLEKINDS[k]);
-    sl.add(string(chop(k == Data.ELEM ? data.name(p, k) : k != Data.ATTR ?
+    sl.add(replace(chop(k == Data.ELEM ? data.name(p, k) : k != Data.ATTR ?
         data.text(p, true) : concat(data.name(p, k), ATT1,
-        data.text(p, false), ATT2), 64)).replaceAll("\n", "\\\\n"));
+        data.text(p, false), ATT2), 64), '\n', ' '));
     t.contents.add(sl);
   }
 

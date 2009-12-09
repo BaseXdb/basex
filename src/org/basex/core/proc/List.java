@@ -14,6 +14,7 @@ import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.StringList;
 import org.basex.util.Table;
+import org.basex.util.TokenList;
 
 /**
  * Evaluates the 'list' command and shows all available databases.
@@ -50,7 +51,7 @@ public final class List extends Proc {
         try { if(in != null) in.close(); } catch(final IOException ex) { }
       }
       if(file != null) {
-        final StringList sl = new StringList();
+        final TokenList sl = new TokenList();
         sl.add(name);
         sl.add(file);
         table.contents.add(sl);

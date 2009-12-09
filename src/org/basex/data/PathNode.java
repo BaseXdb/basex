@@ -160,7 +160,7 @@ public final class PathNode {
    * @throws IOException I/O exception
    */
   public void plan(final Data data, final Serializer ser) throws IOException {
-    ser.openElement(NODE, KIND, Token.token(TABLEKINDS[kind]));
+    ser.openElement(NODE, KIND, TABLEKINDS[kind]);
     if(kind == Data.ELEM) {
       ser.attribute(NAME, data.tags.key(name));
     } else if(kind == Data.ATTR) {

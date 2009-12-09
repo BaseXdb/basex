@@ -97,8 +97,9 @@ public final class FTWords extends FTExpr {
 
     final int c = contains(ctx);
     if(c == 0) all.size = 0;
-//    return new FTItem(all, fast || c == 0 ? 0 : 1);
-    // scoring: pass on number of tokens
+    // return new FTItem(all, fast || c == 0 ? 0 : 1);
+    // [SG] check scoring remainders
+    //   scoring: pass on number of tokens
     return new FTItem(all, fast || c == 0 ? 0 :
       ctx.score.word(c, ctx.fttoken.count()));
   }
@@ -112,19 +113,24 @@ public final class FTWords extends FTExpr {
       @Override
       public FTItem next() {
         if(iat == null) {
-            final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast,
-                ctx.context.prop);
-            ft.fast &= ft.count() == 1;
-            ft.init();
-            while(ft.more()) {
+          final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast,
+              ctx.context.prop);
+          ft.fast &= ft.count() == 1;
+          ft.init();
+          int d = 0;
+          while(ft.more()) {
+            if(ctx.ftopt.sw != null && ctx.ftopt.sw.id(ft.get()) != 0) {
+              d++;
+            } else {
               final FTIndexIterator it = (FTIndexIterator) data.ids(ft);
-              iat = iat == null ? it : FTIndexIterator.phrase(iat, it);
+              iat = iat == null ? it : FTIndexIterator.phrase(iat, it, ++d);
+              d = 0;
             }
+          }
           iat.setTokenNum(++ctx.ftoknum);
         }
-        return iat.more() ? new FTItem(iat.matches(),
-            data, iat.next(), txt.length, iat.indexSize(),
-            iat.score()) : null;
+        return iat.more() ? new FTItem(iat.matches(), data, iat.next(),
+            txt.length, iat.indexSize(), iat.score()) : null;
       }
     };
   }
@@ -139,7 +145,7 @@ public final class FTWords extends FTExpr {
     // speed up default case
     final FTOpt opt = ctx.ftopt;
     first = true;
-    if(simple) return opt.contains(txt, ctx.fttoken, this); // txt.length;
+    if(simple) return opt.contains(txt, ctx.fttoken, this);
 
     // process special cases
     final Iter iter = ctx.iter(query);
@@ -235,7 +241,6 @@ public final class FTWords extends FTExpr {
      * - no FTTimes option is specified
      * - FTMode is different to ANY, ALL and PHRASE
      * - case sensitivity, diacritics and stemming flags comply with index
-     * - no stop words are specified
      */
     final MetaData md = ic.data.meta;
     final FTOpt fto = ic.ctx.ftopt;
@@ -243,7 +248,7 @@ public final class FTWords extends FTExpr {
     if(txt == null || occ != null ||
         mode != FTMode.ANY && mode != FTMode.ALL && mode != FTMode.PHRASE ||
         md.ftcs != fto.is(FTOpt.CS) || md.ftdc != fto.is(FTOpt.DC) ||
-        md.ftst != fto.is(FTOpt.ST) || fto.sw != null) return false;
+        md.ftst != fto.is(FTOpt.ST)) return false;
 
     // limit index access to trie version and simple wildcard patterns
     if(fto.is(FTOpt.WC)) {
@@ -258,7 +263,10 @@ public final class FTWords extends FTExpr {
     final Tokenizer ft = new Tokenizer(txt, fto, fast, ic.ctx.context.prop);
     ic.is = 0;
     while(ft.more()) {
-      if(ft.get().length > Token.MAXLEN) return false;
+      final byte[] tok = ft.get();
+      if(tok.length > Token.MAXLEN) return false;
+      if(fto.sw != null && fto.sw.id(tok) != 0) continue;
+      
       // divide by 4 to favor full text index requests
       final int s = (ic.data.nrIDs(ft) + 3) >> 2;
       if(ic.is > s || ic.is == 0) ic.is = s;

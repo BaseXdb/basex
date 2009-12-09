@@ -72,7 +72,7 @@ public final class XQFTTS extends W3CTS {
   void parse(final QueryContext qctx, final Nodes root) throws Exception {
     qctx.stop = stop;
     qctx.thes = thes;
-
+    
     for(final String s : aux("stopwords", root)) {
       final String fn = stop2.get(s);
       if(fn != null) {

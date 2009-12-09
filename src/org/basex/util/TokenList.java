@@ -43,6 +43,30 @@ public final class TokenList implements Iterable<byte[]> {
   }
 
   /**
+   * Adds next value.
+   * @param v value to be added
+   */
+  public void add(final int v) {
+    add(token(v));
+  }
+
+  /**
+   * Adds next value.
+   * @param v value to be added
+   */
+  public void add(final String v) {
+    add(Token.token(v));
+  }
+
+  /**
+   * Adds next value.
+   * @param v value to be added
+  public void add(final String v) {
+    add(token(v));
+  }
+   */
+
+  /**
    * Returns the number of entries.
    * @return number of entries
    */
@@ -82,7 +106,7 @@ public final class TokenList implements Iterable<byte[]> {
    * @return true if value is found
    */
   public boolean contains(final byte[] v) {
-    for(int i = 0; i < size; i++) if(Token.eq(list[i], v)) return true;
+    for(int i = 0; i < size; i++) if(eq(list[i], v)) return true;
     return false;
   }
 
@@ -118,7 +142,7 @@ public final class TokenList implements Iterable<byte[]> {
   public void sort(final boolean cs) {
     Arrays.sort(list, 0, size, new Comparator<byte[]>() {
       public int compare(final byte[] s1, final byte[] s2) {
-        return cs ? Token.diff(s1, s2) : Token.diff(Token.lc(s1), Token.lc(s2));
+        return cs ? diff(s1, s2) : diff(lc(s1), lc(s2));
       }
     });
   }

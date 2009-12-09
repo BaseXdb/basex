@@ -43,8 +43,6 @@ public abstract class Builder extends Progress {
   private final int[] parStack = new int[IO.MAXHEIGHT];
   /** Tag stack. */
   private final int[] tagStack = new int[IO.MAXHEIGHT];
-  /** Namespace stack. */
-  private final int[] uriStack = new int[IO.MAXHEIGHT];
   /** Size Stack. */
   private boolean inDoc;
   /** Current tree height. */
@@ -103,6 +101,7 @@ public abstract class Builder extends Progress {
     parStack[level++] = meta.size;
     if(meta.pathindex) path.add(0, level, Data.DOC);
     addDoc(doc);
+    ns.open(meta.size);
   }
 
   /**
@@ -113,6 +112,7 @@ public abstract class Builder extends Progress {
     final int pre = parStack[--level];
     setSize(pre, meta.size - pre);
     meta.ndocs++;
+    ns.close(meta.size);
     inDoc = false;
   }
 
@@ -122,9 +122,7 @@ public abstract class Builder extends Progress {
    * @param uri namespace uri
    */
   public final void startNS(final byte[] pref, final byte[] uri) {
-    final int u = ns.add(pref, uri);
-    // default namespace...
-    if(pref.length == 0) uriStack[level] = u;
+    ns.add(pref, uri);
   }
 
   /**
@@ -169,7 +167,6 @@ public abstract class Builder extends Progress {
     final int pre = parStack[level];
     setSize(pre, meta.size - pre);
     ns.close(pre);
-    uriStack[level] = uriStack[level - 1];
   }
 
   /**
@@ -337,29 +334,23 @@ public abstract class Builder extends Progress {
 
     if(meta.pathindex) path.add(n, level, Data.ELEM);
 
-    // remember tag id and parent reference
-    tagStack[level] = n;
-    parStack[level] = meta.size;
     // cache pre value
     final int pre = meta.size;
+    // remember tag id and parent reference
+    tagStack[level] = n;
+    parStack[level] = pre;
 
-    // add node
-    final int dis = level != 0 ? meta.size - parStack[level - 1] : 1;
+    // get and store element references
+    final int dis = level != 0 ? pre - parStack[level - 1] : 1;
     final int as = att.size;
-    final boolean ne = ns.open(meta.size);
-
-    // get namespace URI reference
-    int u = ns.uri(tag);
-    if(u == 0) u = uriStack[level];
-    uriStack[level + 1] = uriStack[level];
-
-    // store namespaces
+    final boolean ne = ns.open(pre);
+    int u = ns.uri(tag, true);
     addElem(dis, n, as + 1, u, ne);
 
-    // create numeric attribute references
+    // get and store attribute references
     for(int a = 0; a < as; a++) {
       n = atts.index(att.key[a], att.val[a], true);
-      u = ns.uri(att.key[a]);
+      u = ns.uri(att.key[a], false);
       if(meta.pathindex) path.add(n, level + 1, Data.ATTR);
       addAttr(n, att.val[a], a + 1, u);
     }
@@ -404,16 +395,6 @@ public abstract class Builder extends Progress {
   }
 
   /**
-   * Throws an error message.
-   * @param m message
-   * @param e message extension
-   * @throws BuildException build exception
-   */
-  private void error(final String m, final Object... e) throws BuildException {
-    throw new BuildException(m, e);
-  }
-
-  /**
    * Adds a simple text, comment or processing instruction to the database.
    * @param txt the value to be added
    * @param kind the node type
@@ -427,5 +408,16 @@ public abstract class Builder extends Progress {
     if(kind == Data.TEXT) tags.index(tagStack[level - 1], t);
     if(meta.pathindex) path.add(0, level, kind);
     addText(t, level == 0 ? 1 : meta.size - parStack[level - 1], kind);
+  }
+
+  /**
+   * Throws an error message.
+   * @param m message
+   * @param e message extension
+   * @throws BuildException build exception
+   */
+  private static void error(final String m, final Object... e)
+      throws BuildException {
+    throw new BuildException(m, e);
   }
 }

@@ -124,27 +124,26 @@ public final class Token {
     for(final byte t : text) if(t < 0) return false;
     return true;
   }
-  
+
   /**
    * Checks if the specified UTF-8 characters are valid.
    * @param text UTF-8 characters
    * @return result of check
    */
   public static boolean isValidUTF8(final byte[] text) {
-    final int len = text.length;
+    final int l = text.length;
     int i = 0;
-    while(i < len) {
+    while(i < l) {
       int cl = cl2(text[i]);
-      if(cl <= 0 || cl > len - i++) return false;
-      if(len == i) return true;
-      final int b = text[i] & 0xFF;
+      if(cl <= 0 || cl > l - i++) return false;
+      if(l == i) return true;
+      final byte b = text[i];
       if(b >= 0 && b < ' ' && !ws(b)) return false; // control character
-      while(--cl > 0)
-        if(cl2(text[i++]) != 0) return false;
+      while(--cl > 0) if(cl2(text[i++]) != 0) return false;
     }
     return true;
   }
-  
+
   /**
    * Removes invalid characters from the UTF-8 sequence.
    * @param text the UTF-8 sequence to remove the invalid chars from
@@ -152,33 +151,32 @@ public final class Token {
    * @return the cleaned UTF-8 sequence
    */
   public static byte[] removeNonUTF8(final byte[] text, final boolean chop) {
-    final int len = text.length;
-    if(len == 0) return EMPTY;
-    final byte[] t = new byte[len];
-    int i = 0, pos = 0;
-    if(chop) while(i < len && ws(text[i])) ++i;
-    if(i == len) return EMPTY;
-    out: while(i < len) {
+    final int l = text.length;
+    if(l == 0) return EMPTY;
+    final byte[] t = new byte[l];
+    int i = 0, p = 0;
+    if(chop) while(i < l && ws(text[i])) ++i;
+    if(i == l) return EMPTY;
+    out: while(i < l) {
       final int cl = cl2(text[i]);
       if(cl <= 0) { ++i; continue; } // invalid ... ignore this one
-      if(cl > len - i) break; // not enough bytes left, ignore everything behind
-      final int b = text[i] & 0xFF;
+      if(cl > l - i) break; // not enough bytes left, ignore everything behind
+      final byte b = text[i];
       if(b >= 0 && b < ' ' && !ws(b)) { ++i; continue; } // ignore control chars
-      t[pos++] = text[i++]; // byte is valid .. copy to new array
+      t[p++] = text[i++]; // byte is valid .. copy to new array
       for(int j = 1; j < cl; j++) { // process all following bytes
-        /* All following bytes must have a codepoint length of zero. */
+        // all following bytes must have a codepoint length of zero.
         if(cl2(text[i]) != 0) {
-          --pos; // drop the already added first byte
+          --p; // drop the already added first byte
           i += cl - j; // skip all bytes of this sequence
           continue out; // continue with the next UTF-8 character
         }
       }
       // all bytes are valid .. add them to the array
-      for(int j = 1; j < cl; j++) t[pos++] = text[i++];
+      for(int j = 1; j < cl; j++) t[p++] = text[i++];
     }
-    if(chop) while(pos > 0 && ws(t[pos - 1])) --pos;
-    if(pos == 0) return EMPTY;
-    return Arrays.copyOf(t, pos);
+    if(chop) while(p > 0 && ws(t[p - 1])) --p;
+    return p == 0 ? EMPTY : Arrays.copyOf(t, p);
   }
 
   /**
@@ -293,7 +291,7 @@ public final class Token {
    * @return character length, if the byte is the first byte; zero if not; -1 if
    *         invalid
    */
-  public static int cl2(final byte v) {
+  private static int cl2(final byte v) {
     final int i = v & 0xFF;
     return (i == 0xC0 || i == 0xC1 || i > 0xF4) ? -1 : CHLEN2[i >> 4];
   }
@@ -1097,48 +1095,57 @@ public final class Token {
 
   /** Normed characters. */
   private static char[] norm;
-  /**
-   * Normalized special characters.
-   */
+
+  /** Normalized special characters. */
   private static final char[][] NC = {
-    { 'À', 'A' }, { 'Á', 'A' }, { 'Â', 'A' }, { 'Ã', 'A' }, { 'Ä', 'A' },
-    { 'Å', 'A' }, { 'Æ', 'A' }, { 'Ç', 'C' }, { 'È', 'E' }, { 'É', 'E' },
-    { 'Ê', 'E' }, { 'Ë', 'E' }, { 'Ì', 'I' }, { 'Í', 'I' }, { 'Î', 'I' },
-    { 'Ï', 'I' }, { 'Ð', 'D' }, { 'Ñ', 'N' }, { 'Ò', 'O' }, { 'Ó', 'O' },
-    { 'Ô', 'O' }, { 'Õ', 'O' }, { 'Ö', 'O' }, { 'Ø', 'O' }, { 'Ù', 'U' },
-    { 'Ú', 'U' }, { 'Û', 'U' }, { 'Ü', 'U' }, { 'Ý', 'Y' }, { 'Þ', 'd' },
-    { 'ß', 's' }, { 'à', 'a' }, { 'á', 'a' }, { 'â', 'a' }, { 'ã', 'a' },
-    { 'ä', 'a' }, { 'å', 'a' }, { 'æ', 'a' }, { 'ç', 'c' }, { 'è', 'e' },
-    { 'é', 'e' }, { 'ê', 'e' }, { 'ë', 'e' }, { 'ì', 'i' }, { 'í', 'i' },
-    { 'î', 'i' }, { 'ï', 'i' }, { 'ð', 'd' }, { 'ñ', 'n' }, { 'ò', 'o' },
-    { 'ó', 'o' }, { 'ô', 'o' }, { 'õ', 'o' }, { 'ö', 'o' }, { 'ø', 'o' },
-    { 'ù', 'u' }, { 'ú', 'u' }, { 'û', 'u' }, { 'ü', 'u' }, { 'ý', 'y' },
-    { 'þ', 'd' }, { 'ÿ', 'y' }, { 'Ā', 'A' }, { 'ā', 'a' }, { 'Ă', 'A' },
-    { 'ă', 'a' }, { 'Ą', 'A' }, { 'ą', 'a' }, { 'Ć', 'C' }, { 'ć', 'c' },
-    { 'Ĉ', 'C' }, { 'ĉ', 'c' }, { 'Ċ', 'C' }, { 'ċ', 'c' }, { 'Č', 'C' },
-    { 'č', 'c' }, { 'Ď', 'D' }, { 'ď', 'd' }, { 'Đ', 'D' }, { 'đ', 'd' },
-    { 'Ē', 'E' }, { 'ē', 'e' }, { 'Ĕ', 'E' }, { 'ĕ', 'e' }, { 'Ė', 'E' },
-    { 'ė', 'e' }, { 'Ę', 'E' }, { 'ę', 'e' }, { 'Ě', 'E' }, { 'ě', 'e' },
-    { 'Ĝ', 'G' }, { 'ĝ', 'g' }, { 'Ğ', 'G' }, { 'ğ', 'g' }, { 'Ġ', 'G' },
-    { 'ġ', 'g' }, { 'Ģ', 'G' }, { 'ģ', 'g' }, { 'Ĥ', 'H' }, { 'ĥ', 'h' },
-    { 'Ħ', 'H' }, { 'ħ', 'h' }, { 'Ĩ', 'I' }, { 'ĩ', 'i' }, { 'Ī', 'I' },
-    { 'ī', 'i' }, { 'Ĭ', 'I' }, { 'ĭ', 'i' }, { 'Į', 'I' }, { 'į', 'i' },
-    { 'İ', 'I' }, { 'ı', 'i' }, { 'Ĳ', 'I' }, { 'ĳ', 'i' }, { 'Ĵ', 'J' },
-    { 'ĵ', 'j' }, { 'Ķ', 'K' }, { 'ķ', 'k' }, { 'ĸ', 'k' }, { 'Ĺ', 'L' },
-    { 'ĺ', 'l' }, { 'Ļ', 'L' }, { 'ļ', 'l' }, { 'Ľ', 'L' }, { 'ľ', 'l' },
-    { 'Ŀ', 'L' }, { 'ŀ', 'l' }, { 'Ł', 'L' }, { 'ł', 'l' }, { 'Ń', 'N' },
-    { 'ń', 'n' }, { 'Ņ', 'N' }, { 'ņ', 'n' }, { 'Ň', 'N' }, { 'ň', 'n' },
-    { 'ŉ', 'n' }, { 'Ŋ', 'N' }, { 'ŋ', 'n' }, { 'Ō', 'O' }, { 'ō', 'o' },
-    { 'Ŏ', 'O' }, { 'ŏ', 'o' }, { 'Ő', 'O' }, { 'ő', 'o' }, { 'Œ', 'O' },
-    { 'œ', 'o' }, { 'Ŕ', 'R' }, { 'ŕ', 'r' }, { 'Ŗ', 'R' }, { 'ŗ', 'r' },
-    { 'Ř', 'R' }, { 'ř', 'r' }, { 'Ś', 'S' }, { 'ś', 's' }, { 'Ŝ', 'S' },
-    { 'ŝ', 's' }, { 'Ş', 'S' }, { 'ş', 's' }, { 'Š', 'S' }, { 'š', 's' },
-    { 'Ţ', 'T' }, { 'ţ', 't' }, { 'Ť', 'T' }, { 'ť', 't' }, { 'Ŧ', 'T' },
-    { 'ŧ', 't' }, { 'Ũ', 'U' }, { 'ũ', 'u' }, { 'Ū', 'U' }, { 'ū', 'u' },
-    { 'Ŭ', 'U' }, { 'ŭ', 'u' }, { 'Ů', 'U' }, { 'ů', 'u' }, { 'Ű', 'U' },
-    { 'ű', 'u' }, { 'Ų', 'U' }, { 'ų', 'u' }, { 'Ŵ', 'W' }, { 'ŵ', 'w' },
-    { 'Ŷ', 'Y' }, { 'ŷ', 'y' }, { 'Ÿ', 'Y' }, { 'Ź', 'Z' }, { 'ź', 'z' },
-    { 'Ż', 'Z' }, { 'ż', 'z' }, { 'Ž', 'Z' }, { 'ž', 'z' }, { 'Ǻ', 'A' },
-    { 'ǻ', 'a' }, { 'Ǽ', 'A' }, { 'ǽ', 'a' }, { 'Ǿ', 'O' }, { 'ǿ', 'o' }
+    { '\u00C0', 'A' }, { '\u00C1', 'A' }, { '\u00C2', 'A' }, { '\u00C3', 'A' },
+    { '\u00C4', 'A' }, { '\u00C5', 'A' }, { '\u00C6', 'A' }, { '\u00C7', 'C' },
+    { '\u00C8', 'E' }, { '\u00C9', 'E' }, { '\u00CA', 'E' }, { '\u00CB', 'E' },
+    { '\u00CC', 'I' }, { '\u00CD', 'I' }, { '\u00CE', 'I' }, { '\u00CF', 'I' },
+    { '\u00D0', 'D' }, { '\u00D1', 'N' }, { '\u00D2', 'O' }, { '\u00D3', 'O' },
+    { '\u00D4', 'O' }, { '\u00D5', 'O' }, { '\u00D6', 'O' }, { '\u00D8', 'O' },
+    { '\u00D9', 'U' }, { '\u00DA', 'U' }, { '\u00DB', 'U' }, { '\u00DC', 'U' },
+    { '\u00DD', 'Y' }, { '\u00DE', 'd' }, { '\u00DF', 's' }, { '\u00E0', 'a' },
+    { '\u00E1', 'a' }, { '\u00E2', 'a' }, { '\u00E3', 'a' }, { '\u00E4', 'a' },
+    { '\u00E5', 'a' }, { '\u00E6', 'a' }, { '\u00E7', 'c' }, { '\u00E8', 'e' },
+    { '\u00E9', 'e' }, { '\u00EA', 'e' }, { '\u00EB', 'e' }, { '\u00EC', 'i' },
+    { '\u00ED', 'i' }, { '\u00EE', 'i' }, { '\u00EF', 'i' }, { '\u00F0', 'd' },
+    { '\u00F1', 'n' }, { '\u00F2', 'o' }, { '\u00F3', 'o' }, { '\u00F4', 'o' },
+    { '\u00F5', 'o' }, { '\u00F6', 'o' }, { '\u00F8', 'o' }, { '\u00F9', 'u' },
+    { '\u00FA', 'u' }, { '\u00FB', 'u' }, { '\u00FC', 'u' }, { '\u00FD', 'y' },
+    { '\u00FE', 'd' }, { '\u00FF', 'y' }, { '\u0100', 'A' }, { '\u0101', 'a' },
+    { '\u0102', 'A' }, { '\u0103', 'a' }, { '\u0104', 'A' }, { '\u0105', 'a' },
+    { '\u0106', 'C' }, { '\u0107', 'c' }, { '\u0108', 'C' }, { '\u0109', 'c' },
+    { '\u010A', 'C' }, { '\u010B', 'c' }, { '\u010C', 'C' }, { '\u010D', 'c' },
+    { '\u010E', 'D' }, { '\u010F', 'd' }, { '\u0110', 'D' }, { '\u0111', 'd' },
+    { '\u0112', 'E' }, { '\u0113', 'e' }, { '\u0114', 'E' }, { '\u0115', 'e' },
+    { '\u0116', 'E' }, { '\u0117', 'e' }, { '\u0118', 'E' }, { '\u0119', 'e' },
+    { '\u011A', 'E' }, { '\u011B', 'e' }, { '\u011C', 'G' }, { '\u011D', 'g' },
+    { '\u011E', 'G' }, { '\u011F', 'g' }, { '\u0120', 'G' }, { '\u0121', 'g' },
+    { '\u0122', 'G' }, { '\u0123', 'g' }, { '\u0124', 'H' }, { '\u0125', 'h' },
+    { '\u0126', 'H' }, { '\u0127', 'h' }, { '\u0128', 'I' }, { '\u0129', 'i' },
+    { '\u012A', 'I' }, { '\u012B', 'i' }, { '\u012C', 'I' }, { '\u012D', 'i' },
+    { '\u012E', 'I' }, { '\u012F', 'i' }, { '\u0130', 'I' }, { '\u0131', 'i' },
+    { '\u0132', 'I' }, { '\u0133', 'i' }, { '\u0134', 'J' }, { '\u0135', 'j' },
+    { '\u0136', 'K' }, { '\u0137', 'k' }, { '\u0138', 'k' }, { '\u0139', 'L' },
+    { '\u013A', 'l' }, { '\u013B', 'L' }, { '\u013C', 'l' }, { '\u013D', 'L' },
+    { '\u013E', 'l' }, { '\u013F', 'L' }, { '\u0140', 'l' }, { '\u0141', 'L' },
+    { '\u0142', 'l' }, { '\u0143', 'N' }, { '\u0144', 'n' }, { '\u0145', 'N' },
+    { '\u0146', 'n' }, { '\u0147', 'N' }, { '\u0148', 'n' }, { '\u0149', 'n' },
+    { '\u014A', 'N' }, { '\u014B', 'n' }, { '\u014C', 'O' }, { '\u014D', 'o' },
+    { '\u014E', 'O' }, { '\u014F', 'o' }, { '\u0150', 'O' }, { '\u0151', 'o' },
+    { '\u0152', 'O' }, { '\u0153', 'o' }, { '\u0154', 'R' }, { '\u0155', 'r' },
+    { '\u0156', 'R' }, { '\u0157', 'r' }, { '\u0158', 'R' }, { '\u0159', 'r' },
+    { '\u015A', 'S' }, { '\u015B', 's' }, { '\u015C', 'S' }, { '\u015D', 's' },
+    { '\u015E', 'S' }, { '\u015F', 's' }, { '\u0160', 'S' }, { '\u0161', 's' },
+    { '\u0162', 'T' }, { '\u0163', 't' }, { '\u0164', 'T' }, { '\u0165', 't' },
+    { '\u0166', 'T' }, { '\u0167', 't' }, { '\u0168', 'U' }, { '\u0169', 'u' },
+    { '\u016A', 'U' }, { '\u016B', 'u' }, { '\u016C', 'U' }, { '\u016D', 'u' },
+    { '\u016E', 'U' }, { '\u016F', 'u' }, { '\u0170', 'U' }, { '\u0171', 'u' },
+    { '\u0172', 'U' }, { '\u0173', 'u' }, { '\u0174', 'W' }, { '\u0175', 'w' },
+    { '\u0176', 'Y' }, { '\u0177', 'y' }, { '\u0178', 'Y' }, { '\u0179', 'Z' },
+    { '\u017A', 'z' }, { '\u017B', 'Z' }, { '\u017C', 'z' }, { '\u017D', 'Z' },
+    { '\u017E', 'z' }, { '\u01FA', 'A' }, { '\u01FB', 'a' }, { '\u01FC', 'A' },
+    { '\u01FD', 'a' }, { '\u01FE', 'O' }, { '\u01FF', 'o' }
   };
 }
