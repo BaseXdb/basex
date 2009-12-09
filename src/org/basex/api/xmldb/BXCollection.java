@@ -179,7 +179,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         Parser.xmlParser(new IOContent((byte[]) cont, id), ctx.prop);
 
       final Data data = ctx.data;
-      final MemData d = (MemData) new MemBuilder(p).build(id);
+      final MemData d = new MemBuilder(p).build(id);
       data.insert(data.meta.size, -1, d);
       data.flush();
       ctx.update();
