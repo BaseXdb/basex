@@ -15,6 +15,7 @@ import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.MetaElem;
 import org.deepfs.fsml.DeepFile.Content;
+import org.deepfs.util.FSImporter;
 
 /**
  * DeepFile Serializer. Serializes DeepFiles in XML.
@@ -74,15 +75,18 @@ public class FSMLSerializer {
   /**
    * Serializes a file without metadata and content.
    * @param file the file to serialize
-   * @param absolutePath if true, the absolute path is added instead of the file
-   *          name
+   * @param root if true, a filesystem root is are created instead of a simple
+   *          directory.
    * @return the xml data as string
    */
   public static String serializeFile(final File file,
-      final boolean absolutePath) {
+      final boolean root) {
     final FSMLSerializer ser = new FSMLSerializer();
-    final Atts atts = DeepFS.atts(file, absolutePath);
-    ser.startElem(file.isDirectory() ? DIR_NS : FILE_NS, convAtts(atts), true);
+    final Atts atts = DeepFS.atts(file, root);
+    final String name;
+    if(file.isDirectory()) name = root ? FSImporter.ROOT_NODE : DIR_NS;
+    else name = FILE_NS;
+    ser.startElem(name, convAtts(atts), true);
     return ser.toString();
   }
 

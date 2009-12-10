@@ -33,7 +33,7 @@ import org.deepfs.jfuse.DeepStat;
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Alexander Holupirek, Christian Gruen, Hannes Schwarz
+ * @author Alexander Holupirek, Christian Gruen, Hannes Schwarz, Bastian Lemke
  */
 public final class DeepFS implements DataText {
 
@@ -350,19 +350,20 @@ public final class DeepFS implements DataText {
   /**
    * Constructs attributes for file and directory tags.
    * @param f file name
-   * @param absolutePath if true, the absolute path is added instead of the file
-   *          name
+   * @param root if true, attributes for a filesystem root node are created
+   *          instead of attributes for a simple directory.
    * @return attributes as byte[][]
    */
-  public static Atts atts(final File f, final boolean absolutePath) {
-    final String name = absolutePath ? f.getAbsolutePath().replace("\\", "/")
-        : f.getName();
+  public static Atts atts(final File f, final boolean root) {
+    final String name = f.getName();
     final byte[] time = token(System.currentTimeMillis());
 
     /** Temporary attribute array. */
     final Atts atts = new Atts();
     atts.reset();
-    atts.add(NAME, token(name));
+    if(root)
+      atts.add(BACKINGSTORE, token(f.getAbsolutePath().replace("\\", "/")));
+    else atts.add(NAME, token(name));
     atts.add(SIZE, token(f.length()));
     if(f.isDirectory()) atts.add(MODE, token(getSIFDIR() | 0755));
     else atts.add(MODE, token(getSIFREG() | 0644));

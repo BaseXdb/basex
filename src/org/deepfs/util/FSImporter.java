@@ -1,16 +1,19 @@
 package org.deepfs.util;
 
+import static org.basex.util.Token.string;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
+import org.deepfs.fsml.DeepNS;
 import org.deepfs.fsml.ParserException;
 import org.deepfs.fsml.ParserRegistry;
 import org.deepfs.fsml.plugin.SpotlightExtractor;
@@ -24,10 +27,6 @@ import org.deepfs.fsml.ser.FSMLSerializer;
  */
 public final class FSImporter implements FSTraversal {
 
-  // [BL] better exception handling
-  // [BL] more consistent way to set file name atts (file name vs. full path)
-  // [BL] more consistent way to unify the file system paths
-
   /** The buffer to use for parsing the file contents. */
   private final ByteBuffer buffer = ByteBuffer.allocateDirect(IO.BLOCKSIZE);
   /** The parser registry. */
@@ -36,7 +35,9 @@ public final class FSImporter implements FSTraversal {
   /** Database context. */
   private final Context ctx;
   /** Document node. */
-  public static final String DOC_NODE = "fsml";
+  public static final String DOC_NODE = DeepNS.DEEPURL.tag("fsml");
+  /** Root node for a file system. */
+  public static final String ROOT_NODE = DeepNS.DEEPURL.tag("deepfs");
   /** Insertion target. */
   private String targetNode = "/" + DOC_NODE;
 
@@ -110,15 +111,15 @@ public final class FSImporter implements FSTraversal {
   /**
    * Builds an update query & inserts a file node.
    * @param f file to be inserted
-   * @param absolutePath if true, the absolute path is added instead of the file
-   *          name
+   * @param root adds a filesystem root node instead of a simple directory node
+   *          (flag is ignored if the file is not a directory)
    * @return escaped file name
    */
-  private String insert(final File f, final boolean absolutePath) {
+  private String insert(final File f, final boolean root) {
     currentFile = f.toString();
     String xmlFragment = null;
     if(f.isDirectory()) {
-      xmlFragment = FSMLSerializer.serializeFile(f, absolutePath);
+      xmlFragment = FSMLSerializer.serializeFile(f, root);
     } else {
       try {
         final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
@@ -130,11 +131,6 @@ public final class FSImporter implements FSTraversal {
           }
           deepFile.extract();
           xmlFragment = FSMLSerializer.serialize(deepFile);
-          if(absolutePath) {
-            final String par = escape(f.getParent().replace("\\", "/"));
-            xmlFragment = xmlFragment.replace("<file name=\"",
-                "<file name=\"" + par + "/");
-          }
         } catch(final Exception ex) {
           Main.debug(
               "FSImporter: Failed to extract metadata/contents from the file " +
@@ -148,11 +144,10 @@ public final class FSImporter implements FSTraversal {
         Main.debug("FSImporter: Failed to open the file (% - %)",
             f.getAbsolutePath(), e);
       }
+      if(xmlFragment == null)
+        xmlFragment = FSMLSerializer.serializeFile(f, false);
     }
     
-    if(xmlFragment == null)
-      xmlFragment = FSMLSerializer.serializeFile(f, absolutePath);
-
     if(xmlFragment != null) {
       final String query = "insert nodes " + xmlFragment + " into "
           + targetNode;
@@ -170,15 +165,17 @@ public final class FSImporter implements FSTraversal {
       }
     }
 
-    return escape(absolutePath ? f.getAbsolutePath().replace("\\", "/")
-        : f.getName());
+    return escape(root ? f.getAbsolutePath().replace("\\", "/") : f.getName());
   }
 
   @Override
   public void preTraversalVisit(final File d) {
-    final String fname = insert(d, true);
-    if(d.isDirectory())
-      targetNode += "/dir[@name = \"" + escape(fname) + "\"]";
+    if(d.isDirectory()) targetNode += "/" + ROOT_NODE + "[@"
+    + string(DataText.BACKINGSTORE) + " = \"" + insert(d, true) + "\"]";
+    else {
+      preTraversalVisit(d.getParentFile());
+      insert(d, false);
+    }
   }
 
   @Override
@@ -189,8 +186,7 @@ public final class FSImporter implements FSTraversal {
 
   @Override
   public void preDirectoryVisit(final File d) {
-    final String fname = insert(d, false);
-    targetNode += "/dir[@name = \"" + escape(fname) + "\"]";
+    targetNode += "/dir[@name = \"" + insert(d, false) + "\"]";
   }
 
   @Override
