@@ -375,13 +375,9 @@ public class BaseXText extends BaseXPanel {
 
     // operations that consider the last text mark..
     if(pressed(NEXTWORD, e)) {
-      final boolean ch = ftChar(text.next(marking));
-      while(text.pos() < text.size() && ch == ftChar(text.curr()))
-        text.next(marking);
+      text.nextToken(marking);
     } else if(pressed(PREVWORD, e)) {
-      final boolean ch = ftChar(text.prev(marking));
-      while(text.pos() > 0 && ch == ftChar(text.prev(marking)));
-      if(text.pos() != 0) text.next(marking);
+      text.prevToken(marking);
       down = false;
     } else if(pressed(TEXTSTART, e)) {
       if(!marking) text.noMark();
@@ -429,27 +425,36 @@ public class BaseXText extends BaseXPanel {
         undo();
       } else if(pressed(REDO, e)) {
         redo();
-      } else if(pressed(DELNEXTWORD, e) || pressed(DELNEXT, e)) {
-        if(nomark && text.pos() == text.size()) return;
-        final boolean ld = ftChar(text.curr());
-        text.delete();
-        if(nomark && pressed(DELNEXTWORD, e)) {
-          while(text.pos() < text.size() && ld == ftChar(text.curr()))
-            text.delete();
+      } else if(pressed(DELLINEEND, e) || pressed(DELNEXTWORD, e) ||
+          pressed(DELNEXT, e)) {
+        if(nomark) {
+          if(text.pos() == text.size()) return;
+          text.startMark();
+          if(pressed(DELNEXTWORD, e)) {
+            text.nextToken(true);
+          } else if(pressed(DELLINEEND, e)) {
+            text.forward(Integer.MAX_VALUE, true);
+          } else {
+            text.next(true);
+          }
+          text.endMark();
         }
-        // [CG] GUI/Editor: add DELLINESTART/DELLINEEND shortcuts
-
-      } else if(pressed(DELPREVWORD, e) || pressed(DELPREV, e)) {
+        text.delete();
+      } else if(pressed(DELLINESTART, e) || pressed(DELPREVWORD, e) ||
+          pressed(DELPREV, e)) {
         if(nomark) {
           if(text.pos() == 0) return;
-          text.prev();
+          text.startMark();
+          if(pressed(DELPREVWORD, e)) {
+            text.prevToken(true);
+          } else if(pressed(DELLINESTART, e)) {
+            text.bol(true);
+          } else {
+            text.prev();
+          }
+          text.endMark();
         }
-        final boolean ld = ftChar(text.curr());
         text.delete();
-        if(nomark && pressed(DELPREVWORD, e)) {
-          while(text.pos() > 0 && ld == ftChar(text.prev())) text.delete();
-          if(text.pos() != 0) text.next();
-        }
         down = false;
       } else {
         consumed = false;

@@ -417,6 +417,8 @@ ad_userdrop=User '%' dropped.
 ad_userlog=User '%' is currently logged in.
 ad_passno=No password specified.
 ad_admin=Admin user cannot be modified.
+ad_kill=% sessions killed.
+ad_killself='%' cannot kill itself.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
@@ -508,8 +510,8 @@ ch_find2=I seguenti modificatori possono essere usati:\n =  : cerca nodi di test
 ch_cs1=Esegui query XQuery ed imposta i risultati come un nuovo context set.
 ch_cs2=Esegue la specifica XQuery ed imposta i risultati\ncome un nuovo context set.
 ch_helpadmin0=Admin comandi:
-ch_kill1=Kill database sessions.
-ch_kill2=Kills all current database sessions.
+ch_kill1=Kill user sessions.
+ch_kill2=Kills all sessions of the specified user.
 ch_show1=Show server information.
 ch_show21=Shows server information:
 ch_show22=shows currently opened databases.

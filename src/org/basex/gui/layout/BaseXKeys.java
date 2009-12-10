@@ -88,11 +88,9 @@ public final class BaseXKeys {
   /** Delete word. */
   public static final int[] DELNEXTWORD = { MAC ? ALT : SC, VK_DELETE };
   /** Delete line to begin. */
-  public static final int[] DELLINESTART =
-    { MAC ? SC : SC | SHF, VK_BACK_SPACE };
+  public static final int[] DELLINESTART = { MAC ? SC : ALT, VK_BACK_SPACE };
   /** Delete line to end. */
-  public static final int[] DELLINEEND =
-    { MAC ? SC : SC | SHF, VK_DELETE };
+  public static final int[] DELLINEEND = { MAC ? SC : ALT, VK_DELETE };
   /** Delete backwards. */
   public static final int[] DELPREV = { 0, VK_BACK_SPACE };
   /** Delete. */

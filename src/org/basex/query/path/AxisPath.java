@@ -85,62 +85,32 @@ public class AxisPath extends Path {
 
   /**
    * Checks if the path is iterable.
-   * To check if the result of a path is in document order so that no special
-   * ordering functions are needed and we can use the iterative evaluation,
-   * we are geared to an automaton that is provided in the paper
-   * "Avoiding Unnecessary Ordering Operations in XPath" by
-   * Jan Hidders and Philippe Michiels (Page 6 - Figure 5).
-   * Since the implementation has a slightly different implementation,
-   * it is possible to have alternating child and parent steps or more parent
-   * steps - different than described in the paper.
    * @param ctx context reference
    * @return resulting operator
    */
   private boolean iterable(final QueryContext ctx) {
-    // skip paths with variables and roots with duplicates
-    if(root == null || root.uses(Use.VAR, ctx) || root.duplicates(ctx)) {
+    if(root == null || root.uses(Use.VAR, ctx) || root.duplicates(ctx))
       return false;
-    }
 
     int i = 0;
     while(true) {
-      final Step s = step[i];
-
-      // first steps can be attribute, parent or self steps.
-      if(s.axis == Axis.ATTR || s.axis == Axis.PARENT || s.axis == Axis.SELF) {
-        if(++i == step.length) return true;
-        continue;
-      }
-
-      // if after only-parent steps or without any parent steps the next
-      // and only step is an descendant, descendant-or-self, preceding
-      // or following step, the result of the path is still in document order.
-      if(s.axis == Axis.DESC || s.axis == Axis.DESCORSELF ||
-          s.axis == Axis.FOLL || s.axis == Axis.PREC) {
-        return ++i == step.length;
-      }
-
-      // if after only-parent steps or without any parent steps the next
-      // step is an attribute, child, self, preceding-sibling or
-      // following-sibling step, the result of the path is still in
-      // document order.
-      if(s.axis == Axis.CHILD || s.axis == Axis.FOLLSIBL ||
-          s.axis == Axis.PRECSIBL) {
-        if(++i == step.length) return true;
-
-        // in this state finite attribute, child, parent or self steps
-        // are possible.
-        while(step[i].axis == Axis.ATTR || step[i].axis == Axis.CHILD ||
-            step[i].axis == Axis.PARENT || step[i].axis == Axis.SELF) {
+      switch(step[i].axis) {
+        case ANC: case ANCORSELF:
+          return false;
+        case DESC: case DESCORSELF: case FOLL: case PREC:
+          return ++i == step.length;
+        case CHILD: case FOLLSIBL: case PRECSIBL:
+          do {
+            if(++i == step.length) return true;
+            final Axis a = step[i].axis;
+            if(a != Axis.ATTR && a != Axis.CHILD && a != Axis.PARENT &&
+                a != Axis.SELF) break;
+          } while(true);
+          return i + 1 == step.length && (step[i].axis == Axis.DESC ||
+            step[i].axis == Axis.DESCORSELF);
+        case ATTR: case PARENT: case SELF:
           if(++i == step.length) return true;
-        }
-
-        // the last step can be a attribute, child, parent or self step,
-        // and also a descendant or descendant-or-self step.
-        return i + 1 == step.length && (step[i].axis == Axis.DESC ||
-          step[i].axis == Axis.DESCORSELF);
       }
-      return false;
     }
   }
 

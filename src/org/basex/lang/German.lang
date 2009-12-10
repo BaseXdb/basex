@@ -416,6 +416,8 @@ ad_userdrop=Benutzer '%' entfernt.
 ad_userlog=Benutzer '%' ist gerade eingeloggt.
 ad_passno=Kein Passwort angegeben.
 ad_admin=Admin-Benutzer kann nicht modifiziert werden.
+ad_kill=% Verbindungen beendet.
+ad_killself='%' kann sich nicht selbst beenden.
 
 # General Commands
 gc_seterr=Fehler beim Setzen der Eigenschaft '%' auf '%'.
@@ -507,8 +509,8 @@ ch_find2=Die folgenden Modifikatoren sind erlaubt:\n =  : sucht nach exakten Tex
 ch_cs1=Ausführung einer Anfrage und Wechsel zu neuer Kontextmenge.
 ch_cs2=Führt die angegebene XQuery aus und setzt das\nErgebnis als neue Kontextmenge.
 ch_helpadmin0=Administrator-Befehle:
-ch_kill1=Beendung der Datenbankverbindungen.
-ch_kill2=Beendet alle Datenbankverbindungen.
+ch_kill1=Beendung der Verbindungen.
+ch_kill2=Beendet alle Verbindungen des angegebenen Benutzers.
 ch_show1=Anzeige von Server-Information.
 ch_show21=Zeigt Server-Information an:
 ch_show22=zeigt aktuell geöffnete Datenbanken.

@@ -112,7 +112,7 @@ public class PermissionTest {
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
     no(new Export("c:/test"), testSession);
-    no(new Kill(), testSession);
+    no(new Kill("dada"), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
@@ -142,7 +142,7 @@ public class PermissionTest {
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
     no(new Export(".", export), testSession);
-    no(new Kill(), testSession);
+    no(new Kill("dada"), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
@@ -170,7 +170,7 @@ public class PermissionTest {
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
     no(new Export(".", export), testSession);
-    no(new Kill(), testSession);
+    no(new Kill("dada"), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
@@ -191,7 +191,7 @@ public class PermissionTest {
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
     no(new Export(".", export), testSession);
-    no(new Kill(), testSession);
+    no(new Kill("dada"), testSession);
     no(new Show("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);

@@ -41,32 +41,26 @@ public final class Values implements Index {
    * @throws IOException IO Exception
    */
   public Values(final Data d, final boolean txt) throws IOException {
-    data = d;
-    text = txt;
-    final String file = txt ? DATATXT : DATAATV;
-    idxl = new DataAccess(d.meta.file(file + 'l'));
-    idxr = new DataAccess(d.meta.file(file + 'r'));
-    size = idxl.read4();
+    this(d, txt, txt ? DATATXT : DATAATV);
   }
 
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
    * @param txt value type (texts/attributes)
-   * @param cf number of index files
+   * @param pre file prefix
    * @throws IOException IO Exception
    */
-  public Values(final Data d, final boolean txt, final int cf) throws IOException {
+  public Values(final Data d, final boolean txt, final String pre)
+      throws IOException {
     data = d;
     text = txt;
-    idxl = new DataAccess(d.meta.file((txt ? DATATXT : DATAATV) + cf + 'l'));
-    idxr = new DataAccess(d.meta.file((txt ? DATATXT : DATAATV) + cf + 'r'));
-//    idxl = new DataAccess(db, file + cf + 'l', pr);
-//    idxr = new DataAccess(db, file + cf + 'r', pr);
+    idxl = new DataAccess(d.meta.file(pre + 'l'));
+    idxr = new DataAccess(d.meta.file(pre + 'r'));
     size = idxl.read4();
   }
 
-  
+
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
@@ -121,9 +115,9 @@ public final class Values implements Index {
 //    final int s = Num.size(si);
     final long v = idxr.read5(idxr.pos());
     final long posl = v + s;
-    return idxl.readBytes(v, posl);    
+    return idxl.readBytes(v, posl);
   }
-  
+
   /**
    * Iterator method.
    * @param s number of pre values
@@ -132,10 +126,7 @@ public final class Values implements Index {
    */
   private IndexIterator iter(final int s, final long ps) {
     return new IndexIterator() {
-      /** Number of results. */
-//      int s = idxl.readNum(pos);
       /** Last index position. */
-//      long p = idxl.pos();
       long p = ps;
       /** Current position. */
       int c = -1;
@@ -220,9 +211,8 @@ public final class Values implements Index {
       final int m = l + h >>> 1;
       final long pos = idxr.read5(m * 5L);
       idxl.readNum(pos);
-//      idxl.read4(pos);
       final int pre = idxl.readNum();
-      final byte[] txt = data.text(pre, text);      
+      final byte[] txt = data.text(pre, text);
       final int d = Token.diff(txt, key);
       if(d == 0) return pos;
       if(d < 0) l = m + 1;

@@ -417,6 +417,8 @@ ad_userdrop=User '%' dropped.
 ad_userlog=User '%' is currently logged in.
 ad_passno=No password specified.
 ad_admin=Admin user cannot be modified.
+ad_kill=% sessions killed.
+ad_killself='%' cannot kill itself.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
@@ -507,8 +509,8 @@ ch_find2=以下の修飾子が使えます。:\n =  : 完全に一致するテ�
 ch_cs1=XQueryクエリーを評価、結果を新しいコンテキストセットに（？）
 ch_cs2=指定されたXQueryを評価し、結果を新しい\nコンテキストセットにします。
 ch_helpadmin0=Admin Commands:
-ch_kill1=Kill database sessions.
-ch_kill2=Kills all current database sessions.
+ch_kill1=Kill user sessions.
+ch_kill2=Kills all sessions of the specified user.
 ch_show1=Show server information.
 ch_show21=Shows server information:
 ch_show22=shows currently opened databases.

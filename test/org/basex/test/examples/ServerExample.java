@@ -23,7 +23,7 @@ public final class ServerExample {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    // Start server in a new thread.
+    // Start server on port 16387 in a new thread.
     new Thread() {
       @Override
       public void run() {
@@ -34,7 +34,7 @@ public final class ServerExample {
     // Wait for the thread to be started.
     Thread.sleep(100);
 
-    // Create client session, specifying the server name and port
+    // Create client session, specifying a server name and port
     session = new ClientSession("localhost", 1984, "admin", "admin");
 
     System.out.println("\n=== Create a database:");

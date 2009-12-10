@@ -207,7 +207,7 @@ public final class CommandParser extends InputParser {
 
       // admin commands
       case KILL:
-        return new Kill();
+        return new Kill(name(cmd));
       case SHOW:
         final CmdShow show = consume(CmdShow.class, cmd);
         switch(show) {

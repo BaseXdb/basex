@@ -101,10 +101,46 @@ public final class BaseXTextTokens {
    * @return character
    */
   int next(final boolean mark) {
-    if(mark || ms == -1) return next();
-    ps = Math.max(ms, me);
-    noMark();
-    return curr();
+    return noMark(mark, true) ? curr() : next();
+  }
+
+  /**
+   * Moves one token forward.
+   * @param mark mark flag
+   */
+  void nextToken(final boolean mark) {
+    int ch = next(mark);
+    if(ch == '\n') return;
+    if(Character.isLetterOrDigit(ch)) {
+      while(Character.isLetterOrDigit(ch)) ch = next();
+      while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+    } else if(Character.isWhitespace(ch)) {
+      while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+    } else {
+      while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
+          !Character.isWhitespace(ch)) ch = next();
+      while(ch != '\n' && Character.isWhitespace(ch)) ch = next();
+    }
+    if(ps != size) prev();
+  }
+
+  /**
+   * Moves one token back.
+   * @param mark mark flag
+   */
+  void prevToken(final boolean mark) {
+    int ch = prev(mark);
+    if(ch == '\n') return;
+    if(Character.isLetterOrDigit(ch)) {
+      while(Character.isLetterOrDigit(ch)) ch = prev();
+    } else if(Character.isWhitespace(ch)) {
+      while(ch != '\n' && Character.isWhitespace(ch)) ch = prev();
+      while(Character.isLetterOrDigit(ch)) ch = prev();
+    } else {
+      while(ch != '\n' && !Character.isLetterOrDigit(ch) &&
+          !Character.isWhitespace(ch)) ch = prev();
+    }
+    if(ps != 0) next();
   }
 
   /**
@@ -178,10 +214,7 @@ public final class BaseXTextTokens {
    * @return character
    */
   int prev(final boolean mark) {
-    if(mark || ms == -1) return prev();
-    ps = Math.min(ms, me);
-    noMark();
-    return curr();
+    return noMark(mark, false) ? curr() : prev();
   }
 
   /**
@@ -249,6 +282,21 @@ public final class BaseXTextTokens {
   }
 
   // TEXT MARKING =============================================================
+
+  /**
+   * Jumps to the maximum/minimum position and resets the selection.
+   * @param mark marking flag
+   * @param max maximum/minimum flag
+   * @return true if mark was reset
+   */
+  boolean noMark(final boolean mark, final boolean max) {
+    final boolean rs = !mark && ms != -1;
+    if(rs) {
+      ps = (max ^ ms < me) ? ms : me;
+      noMark();
+    }
+    return rs;
+  }
 
   /**
    * Resets the selection.

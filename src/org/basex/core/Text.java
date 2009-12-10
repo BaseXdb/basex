@@ -45,7 +45,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-  String VERSION = "5.9";
+  String VERSION = "5.91";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -258,7 +258,7 @@ public interface Text {
   String[] HELPA = { lang("ch_helpadmin0") };
   /** Command help. */
   String[] HELPKILL = {
-    "", lang("ch_kill1"), lang("ch_kill2")
+    "[" + NAM + "]", lang("ch_kill1"), lang("ch_kill2")
   };
   /** Command help. */
   String[] HELPSHOW = {
@@ -503,7 +503,7 @@ public interface Text {
   String SRVDATABASES = lang("ad_databases");
   /** Show sessions. */
   String SRVSESSIONS = lang("ad_sessions");
-  /** Show sessions. */
+  /** Permission needed. */
   String PERMNO = lang("ad_permno");
   /** Invalid permissions. */
   String PERMINV = lang("ad_perminv");
@@ -515,18 +515,22 @@ public interface Text {
   String USERNO = lang("ad_userno");
   /** User dropped. */
   String USERDROP = lang("ad_userdrop");
-  /** User dropped. */
+  /** User is logged in. */
   String USERLOG = lang("ad_userlog");
   /** User added. */
   String USERCREATE = lang("ad_usercreate");
-  /** User changed. */
+  /** Password changed. */
   String USERALTER = lang("ad_useralter");
-  /** User added. */
+  /** User unknown. */
   String USERKNOWN = lang("ad_userknown");
-  /** User not found. */
+  /** No password specified. */
   String PASSNO = lang("ad_passno");
-  /** User not found. */
+  /** Admin user. */
   String USERADMIN = lang("ad_admin");
+  /** Killed sessions. */
+  String USERKILL = lang("ad_kill");
+  /** User kills itself. */
+  String USERKILLSELF = lang("ad_killself");
 
   // GENERAL COMMANDS =========================================================
 

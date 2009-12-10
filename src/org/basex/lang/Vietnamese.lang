@@ -415,6 +415,8 @@ ad_userdrop=User '%' dropped.
 ad_userlog=User '%' is currently logged in.
 ad_passno=No password specified.
 ad_admin=Admin user cannot be modified.
+ad_kill=% sessions killed.
+ad_killself='%' cannot kill itself.
 
 # General Commands
 gc_seterr=Could not set property '%' to '%'.
@@ -506,8 +508,8 @@ ch_find2=Những từ bổ nghỉa sau được dùng:\n =  : tìm chính xác n
 ch_cs1=Đánh giá lệnh hỏi XQuery và gán kết quả theo tập hợp ngữ cảnh mới.
 ch_cs2=Đánh giá lệnh hỏi XQuery cụ thể và gán kết quả\ntheo tập hợp ngữ cảnh mới.
 ch_helpadmin0=Admin Commands:
-ch_kill1=Kill database sessions.
-ch_kill2=Kills all current database sessions.
+ch_kill1=Kill user sessions.
+ch_kill2=Kills all sessions of the specified user.
 ch_show1=Show server information.
 ch_show21=Shows server information:
 ch_show22=shows currently opened databases.
