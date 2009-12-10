@@ -2,9 +2,12 @@ package org.deepfs.fs;
 
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+
 import org.basex.build.fs.FSParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -15,6 +18,7 @@ import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
+import org.basex.gui.view.ViewData;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Atts;
@@ -22,6 +26,7 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.deepfs.DeepShell;
+import org.deepfs.fsml.DeepFile;
 import org.deepfs.jfuse.DeepStat;
 
 /**
@@ -111,6 +116,31 @@ public final class DeepFS implements DataText {
     data = ctx.data;
     initNames();
     initRootStat();
+  }
+  
+  /**
+   * Returns the text contents of this file node.
+   * @param pre the pre value of a file node
+   * @param data the data reference
+   * @return the text contents
+   */
+  public static byte[][] getText(final int pre, final Data data) {
+    int node = pre;
+    final ArrayList<byte[]> contents = new ArrayList<byte[]>();
+    byte[] textElemName = token(DeepFile.TEXT_CONTENT_NS);
+    final int size = data.size(pre, data.kind(pre));
+    for(int i = 0; i < size; i++) {
+      final byte[] nodeName = data.name(++node, data.kind(node));
+      if(eq(nodeName, textElemName)) {
+        int textNodeSize = data.size(node, data.kind(node));
+        while(--textNodeSize > 0) {
+          if(data.kind(++node) == Data.TEXT) {
+            contents.add(ViewData.content(data, node, false));
+          }
+        }
+      }
+    }
+    return contents.toArray(new byte[contents.size()][]);
   }
 
   /**
@@ -525,23 +555,56 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Checks if the specified node is a file.
+   * Checks if this node is a file.
    * @param pre pre value
-   * @return result of comparison
+   * @return true if this node is a file, false otherwise
    */
   public boolean isFile(final int pre) {
+    return isFile(data, pre);
+  }
+  
+  /**
+   * Checks if this node is a file.
+   * @param data data reference
+   * @param pre pre value
+   * @return true if this node is a file, false otherwise
+   */
+  public static boolean isFile(final Data data, final int pre) {
     return data.kind(pre) == Data.ELEM &&
-      data.name(pre) == data.tags.id(DataText.FILE);
+        data.name(pre) == data.tags.id(token(DeepFile.FILE_NS));
   }
 
   /**
-   * Checks if the specified node is a directory.
+   * Checks if this node is a file.
    * @param pre pre value
-   * @return result of comparison
+   * @return true if this node is a directory, false otherwise
    */
   public boolean isDir(final int pre) {
+    return isDir(data, pre);
+  }
+  
+  /**
+   * Checks if this node is a directory.
+   * @param data data reference
+   * @param pre pre value
+   * @return true if this node is a file, false otherwise
+   */
+  public static boolean isDir(final Data data, final int pre) {
     return data.kind(pre) == Data.ELEM &&
-      data.name(pre) == data.tags.id(DataText.DIR);
+        data.name(pre) == data.tags.id(token(DeepFile.DIR_NS));
+  }
+  
+  /**
+   * Checks if this node is a file or adirectory.
+   * @param data data reference
+   * @param pre pre value
+   * @return true if this node is a file or a directory, false otherwise
+   */  
+  public static boolean isFileOrDir(final Data data, final int pre) {
+    final int name = data.name(pre);
+    return data.kind(pre) == Data.ELEM &&
+        (name == data.tags.id(token(DeepFile.FILE_NS)) ||
+            name == data.tags.id(token(DeepFile.DIR_NS)));
   }
 
   /**

@@ -19,15 +19,16 @@ import org.basex.data.Nodes;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
-import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
+import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
+import org.deepfs.fs.DeepFS;
 
 /**
  * This view is a TreeMap implementation.
@@ -891,8 +892,7 @@ public final class MapView extends View implements Runnable {
     painter.reset();
 
     final Data data = gui.context.current.data;
-    if(data.fs != null || textLen != null ||
-        gui.prop.num(GUIProp.MAPWEIGHT) == 0) return;
+    if(textLen != null || gui.prop.num(GUIProp.MAPWEIGHT) == 0) return;
 
     final int size = data.meta.size;
     textLen = new int[size];
@@ -914,12 +914,21 @@ public final class MapView extends View implements Runnable {
 
       parStack[l] = pre;
 
-      if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI ||
-          kind == Data.ATTR) {
-        textLen[pre] = data.textLen(pre, kind != Data.ATTR);
-      } else if((kind == Data.ELEM || kind == Data.DOC) &&
-          data.size(pre, kind) > 1) {
-        l++;
+      if(data.fs != null) {
+        if(DeepFS.isFileOrDir(data, pre)) {
+          textLen[pre] = Token.toInt(data.atom(pre + 2));
+          if(DeepFS.isFile(data, pre))
+            pre += data.size(pre, kind) - 1; // skip file content
+          l++;
+        }
+      } else {
+        if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI ||
+            kind == Data.ATTR) {
+          textLen[pre] = data.textLen(pre, kind != Data.ATTR);
+        } else if((kind == Data.ELEM || kind == Data.DOC) &&
+            data.size(pre, kind) > 1) {
+          l++;
+        }
       }
     }
     while(--l >= 0)
