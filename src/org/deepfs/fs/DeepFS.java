@@ -746,15 +746,15 @@ public final class DeepFS implements DataText {
 
     final TokenBuilder tb = new TokenBuilder();
     final int s = il.size();
-    if(s != 0) {
+    if(s > 1) {
       final byte[] b = data.meta.prop.is(Prop.FUSE) && !backing ?
-          mountpoint(il.get(s - 1)) : backingstore(il.get(s - 1));
+          mountpoint(il.get(s - 2)) : backingstore(il.get(s - 2));
       if(b.length != 0) {
         tb.add(b);
         if(!endsWith(b, '/')) tb.add('/');
       }
     }
-    for(int i = s - 2; i >= 0; i--) {
+    for(int i = s - 3; i >= 0; i--) {
       final byte[] node = replace(name(il.get(i)), '\\', '/');
       tb.add(node);
       if(!endsWith(node, '/')) tb.add('/');
