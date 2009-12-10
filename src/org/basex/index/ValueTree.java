@@ -14,15 +14,15 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-final class ValueTree {
+class ValueTree {
   /** Compressed pre values. */
-  private final TokenList pres = new TokenList();
+  public final TokenList pres = new TokenList(1.25);
   /** Tree structure [left, right, parent]. */
-  private final IntList tree = new IntList();
+  public final IntList tree = new IntList(1.25);
   /** Tokens saved in the tree. */
-  private TokenList tokens = new TokenList();
+  public TokenList tokens = new TokenList(1.25);
   /** Flag if a node has modified. */
-  private BoolList mod = new BoolList();
+  public BoolList mod = new BoolList();
   /** Tree root node. */
   private int root = -1;
 
@@ -30,7 +30,7 @@ final class ValueTree {
   private int cn;
   /** Last iterator node. */
   private int ln;
-
+  
   /**
    * Check if specified token was already indexed; if yes, its pre
    * value is added to the existing values. otherwise, create new index entry.
@@ -39,7 +39,7 @@ final class ValueTree {
    */
   void index(final byte[] tok, final int pre) {
     // index is empty.. create root node
-    if(root == -1) {
+    if(root == -1) {      
       root = n(tok, pre, -1);
       return;
     }

@@ -52,7 +52,7 @@ public final class DropDB extends ACreate {
    * @param pr database properties
    * @return success of operation
    */
-  static synchronized boolean delete(final String db,
+  public static synchronized boolean delete(final String db,
       final String pat, final Prop pr) {
 
     final File path = pr.dbpath(db);

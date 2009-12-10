@@ -10,6 +10,8 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public class IntList {
+  /** Resize factor for extending the the byte arrays. */
+  double factor = 2;
   /** Value array. */
   protected int[] list;
   /** Number of entries. */
@@ -29,6 +31,16 @@ public class IntList {
   public IntList(final int is) {
     list = new int[is];
   }
+  
+  /**
+   * Constructor.
+   * @param f resize factor
+   */
+  public IntList(final double f) {
+    this(8);
+    factor = f;
+  }
+
 
   /**
    * Constructor, specifying an initial array.
@@ -44,7 +56,10 @@ public class IntList {
    * @param v value to be added
    */
   public final void add(final int v) {
-    if(size == list.length) list = Arrays.copyOf(list, size << 1);
+    if(size == list.length) {
+      final int ns = Math.max(size + 1, (int) (size * factor));
+      list = Arrays.copyOf(list, ns);
+    }
     list[size++] = v;
   }
 

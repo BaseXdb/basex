@@ -263,6 +263,17 @@ public final class DataAccess {
   }
 
   /**
+   * Writes an integer value to the specified output stream.
+   * @param v value to be written
+   */
+  public void writeInt(final int v) {
+    write(v >>> 24);
+    write(v >>> 16);
+    write(v >>>  8);
+    write(v);
+  }
+
+  /**
    * Returns the next block.
    * @return buffer
    */

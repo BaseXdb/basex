@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.IntList;
@@ -45,9 +46,27 @@ public final class Values implements Index {
     final String file = txt ? DATATXT : DATAATV;
     idxl = new DataAccess(d.meta.file(file + 'l'));
     idxr = new DataAccess(d.meta.file(file + 'r'));
-    size = idxl.readNum();
+    size = idxl.read4();
   }
 
+  /**
+   * Constructor, initializing the index structure.
+   * @param d data reference
+   * @param txt value type (texts/attributes)
+   * @param cf number of index files
+   * @throws IOException IO Exception
+   */
+  public Values(final Data d, final boolean txt, final int cf) throws IOException {
+    data = d;
+    text = txt;
+    idxl = new DataAccess(d.meta.file((txt ? DATATXT : DATAATV) + cf + 'l'));
+    idxr = new DataAccess(d.meta.file((txt ? DATATXT : DATAATV) + cf + 'r'));
+//    idxl = new DataAccess(db, file + cf + 'l', pr);
+//    idxr = new DataAccess(db, file + cf + 'r', pr);
+    size = idxl.read4();
+  }
+
+  
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
@@ -67,12 +86,12 @@ public final class Values implements Index {
   public IndexIterator ids(final IndexToken tok) {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
 
-    final long pos = get(tok.get());
-    if(pos == 0) return IndexIterator.EMPTY;
-
     final int id = cache.id(tok.get());
     if (id > 0)
       return iter(cache.getSize(id), cache.getPointer(id));
+
+    final long pos = get(tok.get());
+    if(pos == 0) return IndexIterator.EMPTY;
     return iter(idxl.readNum(pos), idxl.pos());
   }
 
@@ -84,11 +103,27 @@ public final class Values implements Index {
     if(id > 0) return cache.getSize(id);
 
     final long pos = get(tok);
+    if (pos == 0) return 0;
     final int numPre =  idxl.readNum(pos);
     cache.add(it.get(), numPre, pos + Num.len(numPre));
+
     return numPre;
   }
 
+  /**
+   * Returns next pre values.
+   * @return compressed pre values
+   */
+  public byte[] nextPres() {
+    if (idxr.pos() >= idxr.length()) return new byte[]{};
+    final int s = idxl.read4();
+//    final byte[] si = idxl.readBytes(posl, posl + 4);
+//    final int s = Num.size(si);
+    final long v = idxr.read5(idxr.pos());
+    final long posl = v + s;
+    return idxl.readBytes(v, posl);    
+  }
+  
   /**
    * Iterator method.
    * @param s number of pre values
@@ -187,7 +222,7 @@ public final class Values implements Index {
       idxl.readNum(pos);
 //      idxl.read4(pos);
       final int pre = idxl.readNum();
-      final byte[] txt = data.text(pre, text);
+      final byte[] txt = data.text(pre, text);      
       final int d = Token.diff(txt, key);
       if(d == 0) return pos;
       if(d < 0) l = m + 1;

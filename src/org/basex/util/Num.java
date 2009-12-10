@@ -140,7 +140,7 @@ public final class Num {
    * @param array array
    * @param len new length
    */
-  private static void size(final byte[] array, final int len) {
+  public static void size(final byte[] array, final int len) {
     array[0] = (byte) (len >>> 24);
     array[1] = (byte) (len >>> 16);
     array[2] = (byte) (len >>> 8);

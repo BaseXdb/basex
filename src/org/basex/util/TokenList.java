@@ -13,6 +13,8 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public final class TokenList implements Iterable<byte[]> {
+  /** Resize factor for extending the the byte arrays. */
+  double factor = 2;
   /** Value array. */
   byte[][] list;
   /** Current array size. */
@@ -22,7 +24,7 @@ public final class TokenList implements Iterable<byte[]> {
    * Default constructor.
    */
   public TokenList() {
-    list = new byte[8][];
+    this(8);
   }
 
   /**
@@ -34,11 +36,23 @@ public final class TokenList implements Iterable<byte[]> {
   }
 
   /**
+   * Constructor.
+   * @param f resize factor
+   */
+  public TokenList(final double f) {
+    this(8);
+    factor = f;    
+  }
+
+  /**
    * Adds next value.
    * @param v value to be added
    */
   public void add(final byte[] v) {
-    if(size == list.length) list = Arrays.copyOf(list, size << 1);
+    if(size == list.length) {
+      final int ns = Math.max(size + 1, (int) (size * factor));
+      list = Arrays.copyOf(list, ns);
+    }
     list[size++] = v;
   }
 
