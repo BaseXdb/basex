@@ -361,6 +361,8 @@ public final class MP3Parser implements IFileParser {
       b1 = bfc.get();
       b2 = bfc.get();
       b3 = bfc.get();
+      
+      // check if technical bits are correct... if not, parse next bytes
       while(b0 != 0xFF || (b1 & 0xE0) != 0xE0 || (b1 & 0x18) == 0x08
           || (b1 & 0x06) == 0x00 || (b2 & 0xF0) == 0xF0 || (b2 & 0xF0) == 0x00
           || (b2 & 0x0C) == 0x0C) {
@@ -504,10 +506,10 @@ public final class MP3Parser implements IFileParser {
       }
     }
     final long pos = bfc.position();
-    if(checkID3v1()) {
-      bfc.position(pos);
-      techInfo(size + 128);
-    } else techInfo(size);
+    s = size;
+    if(checkID3v1()) s += 128;
+    bfc.position(pos);
+    techInfo(s);
   }
 
   /**
