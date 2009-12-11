@@ -333,7 +333,9 @@ pc_indextxt=Indiziere Texte
 pc_indexatt=Indiziere Attribute
 pc_indexftx=Indiziere Volltext
 pc_parse="%" (% Knoten eingelesen)
-pc_created=Datenbank '%' erzeugt in %.
+pc_created=Datenbank '%' erzeugt (%).
+pc_added=Dokument '%' hinzugefügt (%).
+pc_deleted=Dokument '%' gelöscht (%).
 pc_filenf="%" wurde nicht gefunden.
 pc_pathnf=Datei oder Verzeichnis nicht gefunden.
 pc_dbnf=Bitte geben Sie einen Datenbanknamen ein.
@@ -356,8 +358,8 @@ db_doc=Das Dokument '%' existiert schon.
 db_nodoc=Das Dokument '%' wurde nicht gefunden.
 
 # Index commands
-in_created=Index wurde erzeugt in %.
-in_dropped=Index wurde gelöscht in %.
+in_created=Index erzeugt (%).
+in_dropped=Index gelöscht (%).
 in_notdropped=Index konnte nicht gelöscht werden.
 
 # Server Info

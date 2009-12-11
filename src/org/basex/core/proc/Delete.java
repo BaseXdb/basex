@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
@@ -35,7 +36,7 @@ public final class Delete extends ACreate {
     data.delete(pre);
     data.flush();
     context.update();
-    return true;
+    return info(DOCDELETED, io.name(), perf);
   }
 
   @Override

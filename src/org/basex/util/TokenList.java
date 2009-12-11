@@ -50,8 +50,7 @@ public final class TokenList implements Iterable<byte[]> {
    */
   public void add(final byte[] v) {
     if(size == list.length) {
-      final int ns = Math.max(size + 1, (int) (size * factor));
-      list = Arrays.copyOf(list, ns);
+      list = Arrays.copyOf(list, Math.max(size + 1, (int) (size * factor)));
     }
     list[size++] = v;
   }

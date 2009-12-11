@@ -136,7 +136,6 @@ public abstract class Main {
         }
       }
     }
-    if(v && console) outln();
     return ok;
   }
 

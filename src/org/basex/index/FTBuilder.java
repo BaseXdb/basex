@@ -76,7 +76,6 @@ public abstract class FTBuilder extends IndexBuilder {
   @Override
   public void abort() {
     data.meta.ftxindex = false;
-    super.abort();
   }
 
   /**

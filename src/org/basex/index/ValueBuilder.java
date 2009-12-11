@@ -2,7 +2,7 @@ package org.basex.index;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -14,7 +14,6 @@ import org.basex.io.IO;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -43,38 +42,44 @@ public final class ValueBuilder extends IndexBuilder {
   @Override
   public Values build() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
+    final String f = text ? DATATXT : DATAATV;
+
     final Runtime rt = Runtime.getRuntime();
     Performance.gc(2);
-    System.out.println("[0] " + (rt.totalMemory() - rt.freeMemory()));
-
-    final String f = text ? DATATXT : DATAATV;
-    int cap = 1 << 2;
-    final int max = (int) (data.meta.file(f).length() >>> 7);
-    while(cap < max && cap < 1 << 24) cap <<= 1;
-    final long maxMem = (long) (rt.maxMemory() * 0.8);
+    final long maxMem = (long) (rt.maxMemory() * 0.9);
 
     final int type = text ? Data.TEXT : Data.ATTR;
     int cf = 0;
+    int cc = 0;
+
     for(pre = 0; pre < total; pre++) {
-      if(data.kind(pre) != type) continue;
-      checkStop();
-      final byte[] tok = data.text(pre, text);
-      // skip too long and pure whitespace tokens
-      if(tok.length <= Token.MAXLEN && !Token.ws(tok)) index.index(tok, pre);
+      if((pre & 0x0FFF) == 0) {
+        checkStop();
+        // check if main memory is exhausted
+        if(rt.totalMemory() - rt.freeMemory() > maxMem) {
+          // safely abort if index caching is done too often
+          if(cc >= 0) throw new IOException(PROCOUTMEM);
 
-
-      if((pre & 0x3F) == 0 && rt.totalMemory() - rt.freeMemory() > maxMem) {
-        final DataOutput outl = new DataOutput(data.meta.file(f + cf + 'l'));
-        outl.writeInt(index.size());
-        final DataOutput outr = new DataOutput(data.meta.file(f + cf + 'r'));
-        write(index, outl, outr);
-        cf++;
-        index = new ValueTree();
-        Performance.gc(1);
+          final DataOutput outl = new DataOutput(data.meta.file(f + cf + 'l'));
+          outl.writeInt(index.size());
+          final DataOutput outr = new DataOutput(data.meta.file(f + cf + 'r'));
+          write(index, outl, outr);
+          index = new ValueTree();
+          Performance.gc(1);
+          cc = 50;
+          cf++;
+        } else {
+          cc--;
+        }
       }
+      if(data.kind(pre) != type) continue;
+
+      // skip too long and pure whitespace tokens
+      final byte[] tok = data.text(pre, text);
+      if(tok.length <= MAXLEN && !ws(tok)) index.index(tok, pre);
     }
 
-    if (cf == 0) {
+    if(cf == 0) {
       final DataOutput outl = new DataOutput(data.meta.file(f + 'l'));
       final DataOutput outr = new DataOutput(data.meta.file(f + 'r'));
       writeSingle(outl, outr);
@@ -82,12 +87,11 @@ public final class ValueBuilder extends IndexBuilder {
       final DataOutput outl = new DataOutput(data.meta.file(f + cf + 'l'));
       outl.writeInt(0);
       final DataOutput outr = new DataOutput(data.meta.file(f + cf + 'r'));
-
       write(index, outl, outr);
       cf++;
       index = null;
 
-      final int size = mergeFiles(cf);
+      final int size = merge(cf);
       final DataAccess da = new DataAccess(data.meta.file(f + 'l'));
       da.writeInt(size);
       da.close();
@@ -133,84 +137,82 @@ public final class ValueBuilder extends IndexBuilder {
   }
 
   /**
-   * Merges several Value files.
+   * Merges cached index files.
    * @param cf number of value files
    * @return returns number of indexed tokens
    * @throws IOException I/O exception
    */
-  private int mergeFiles(final int cf) throws IOException {
+  private int merge(final int cf) throws IOException {
     final String f = text ? DATATXT : DATAATV;
     final Values[] v = new Values[cf];
     final DataOutput outl = new DataOutput(data.meta.file(f + 'l'));
-    int size = 0;
+    outl.writeInt(0);
     final DataOutput outr = new DataOutput(data.meta.file(f + 'r'));
 
     final byte[][] t = new byte[cf][];
-    final byte[][] pres = new byte[cf][];
+    final byte[][] p = new byte[cf][];
     for(int i = 0; i < cf; i++) {
       v[i] = new Values(data, text, f + i);
-      pres[i] = v[i].nextPres();
-      t[i] = pres[i].length > 0 ? data.text(Num.read(pres[i], 4), text) :
-        Token.EMPTY;
+      p[i] = v[i].nextPres();
+      t[i] = p[i].length > 0 ? data.text(Num.read(p[i], 4), text) : EMPTY;
     }
-    outl.writeInt(size);
 
     int min;
-    IntList merge;
-    while(check(pres)) {
+    int size = 0;
+    final IntList merge = new IntList();
+    while(check(p)) {
       size++;
       outr.write5(outl.size());
       min = 0;
-      merge = new IntList();
+      merge.reset();
       for(int i = 0; i < cf; i++) {
-        if (min == i || t[i].length == 0) continue;
-        final int d = Token.diff(t[min], t[i]);
+        if(min == i || t[i].length == 0) continue;
+        final int d = diff(t[min], t[i]);
         if(d > 0 || t[min].length == 0) {
           min = i;
-          merge = new IntList();
+          merge.reset();
         } else if(d == 0 && t[i].length > 0) {
           if(merge.size() == 0) merge.add(min);
           merge.add(i);
         }
       }
 
-      if (merge.size() == 0) {
-        writeWithNum(outl, pres[min]);
-        pres[min] = v[min].nextPres();
-        t[min] = pres[min].length > 0 ?
-            data.text(Num.read(pres[min], 4), text) : Token.EMPTY;
+      if(merge.size() == 0) {
+        writeWithNum(outl, p[min]);
+        p[min] = v[min].nextPres();
+        t[min] = p[min].length > 0 ? data.text(Num.read(p[min], 4), text) :
+          EMPTY;
       } else {
-        final TokenBuilder p = new TokenBuilder();
-        p.add(new byte[4]);
+        final TokenBuilder tb = new TokenBuilder();
+        tb.add(new byte[4]);
         int npre = 0;
         int opre = 0;
         for(int j = 0; j < merge.size(); j++) {
           final int m = merge.get(j);
           if(j == 0) {
             int l = 4;
-            while(l < pres[m].length) {
-              final int diff = Num.read(pres[m], l);
+            while(l < p[m].length) {
+              final int diff = Num.read(p[m], l);
               opre += diff;
               l += Num.len(diff);
             }
-            p.add(Token.substring(pres[m], 4));
+            tb.add(substring(p[m], 4));
           } else {
-            npre = Num.read(pres[m], 4);
-            p.add(Num.num(npre - opre));
+            npre = Num.read(p[m], 4);
+            tb.add(Num.num(npre - opre));
             int l = 4 + Num.len(npre);
-            p.add(Token.substring(pres[m], l));
+            tb.add(substring(p[m], l));
             opre = npre;
-            while(l < pres[m].length) {
-              final int diff = Num.read(pres[m], l);
+            while(l < p[m].length) {
+              final int diff = Num.read(p[m], l);
               opre += diff;
               l += Num.len(diff);
             }
           }
-          pres[m] = v[m].nextPres();
-          t[m] = pres[m].length > 0 ? data.text(Num.read(pres[m], 4), text) :
-            Token.EMPTY;
+          p[m] = v[m].nextPres();
+          t[m] = p[m].length > 0 ? data.text(Num.read(p[m], 4), text) : EMPTY;
         }
-        final byte[] tmp = p.finish();
+        final byte[] tmp = tb.finish();
         Num.size(tmp, tmp.length);
         writeWithNum(outl, tmp);
       }
@@ -227,7 +229,7 @@ public final class ValueBuilder extends IndexBuilder {
    * @return boolean
    */
   private boolean check(final byte[][] pres) {
-    for (final byte[] b : pres) if (b.length > 0) return true;
+    for(final byte[] b : pres) if (b.length > 0) return true;
     return false;
   }
 
@@ -239,7 +241,8 @@ public final class ValueBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   private long writeWithSize(final DataOutput outl, final byte[] pres)
-  throws IOException {
+      throws IOException {
+
     final int is = Num.size(pres);
     final byte[] tmp = new byte[4 + is];
     Num.size(tmp, 4);
@@ -261,7 +264,8 @@ public final class ValueBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   private void writeWithNum(final DataOutput outl, final byte[] pres)
-  throws IOException {
+      throws IOException {
+
     final int is = Num.size(pres);
     int v = 0;
     for(int ip = 4; ip < is; ip += Num.len(pres, ip)) v++;
@@ -281,8 +285,7 @@ public final class ValueBuilder extends IndexBuilder {
     i.init();
     while(i.more()) {
       outr.write5(outl.size());
-      final byte[] pres = i.next();
-      writeWithSize(outl, pres);
+      writeWithSize(outl, i.next());
     }
     outl.close();
     outr.close();
@@ -292,7 +295,6 @@ public final class ValueBuilder extends IndexBuilder {
   public void abort() {
     if(text) data.meta.txtindex = false;
     else data.meta.atvindex = false;
-    super.abort();
   }
 
   @Override

@@ -92,26 +92,19 @@ public class AxisPath extends Path {
     if(root == null || root.uses(Use.VAR, ctx) || root.duplicates(ctx))
       return false;
 
-    int i = 0;
-    while(true) {
+    for(int i = 0; i < step.length; i++) {
       switch(step[i].axis) {
-        case ANC: case ANCORSELF:
+        // reverse results - don't iterate
+        case ANC: case ANCORSELF: case PREC: case PRECSIBL:
           return false;
-        case DESC: case DESCORSELF: case FOLL: case PREC:
-          return ++i == step.length;
-        case CHILD: case FOLLSIBL: case PRECSIBL:
-          do {
-            if(++i == step.length) return true;
-            final Axis a = step[i].axis;
-            if(a != Axis.ATTR && a != Axis.CHILD && a != Axis.PARENT &&
-                a != Axis.SELF) break;
-          } while(true);
-          return i + 1 == step.length && (step[i].axis == Axis.DESC ||
-            step[i].axis == Axis.DESCORSELF);
-        case ATTR: case PARENT: case SELF:
-          if(++i == step.length) return true;
+        // multiple, unsorted results - only iterate at last step
+        case DESC: case DESCORSELF: case FOLL: case FOLLSIBL:
+          return i + 1 == step.length;
+        // allow iteration for CHILD, ATTR, PARENT and SELF
+        default:
       }
     }
+    return true;
   }
 
   @Override
@@ -155,18 +148,11 @@ public class AxisPath extends Path {
     // check if steps have predicates
     boolean pos = false;
     for(final Step s : step) {
-      // check if we have a predicate
-      if(s.pred.length != 0) {
-        if(s.uses(Use.POS, ctx)) {
-          // variable and position test found - skip optimizations
-          if(s.uses(Use.VAR, ctx)) return this;
-          pos = true;
-        }
-      }
+      // variable found - skip optimizations
+      if(s.uses(Use.VAR, ctx)) return this;
+      // position found
+      pos = pos || s.uses(Use.POS, ctx);
     }
-
-    // analyze if result set can be cached - no predicates/variables...
-    cache = root != null && !root.uses(Use.VAR, ctx);
 
     // check if context is set to document nodes
     final Data data = ctx.data();
@@ -193,6 +179,9 @@ public class AxisPath extends Path {
         if(e != this) return e;
       }
     }
+    // analyze if result set can be cached - no predicates/variables...
+    cache = root != null && !root.uses(Use.VAR, ctx);
+
     // if applicable, return iterator
     return iterator(ctx);
   }

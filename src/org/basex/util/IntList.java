@@ -37,7 +37,7 @@ public class IntList {
    * @param f resize factor
    */
   public IntList(final double f) {
-    this(8);
+    this();
     factor = f;
   }
 
@@ -57,8 +57,7 @@ public class IntList {
    */
   public final void add(final int v) {
     if(size == list.length) {
-      final int ns = Math.max(size + 1, (int) (size * factor));
-      list = Arrays.copyOf(list, ns);
+      list = Arrays.copyOf(list, Math.max(size + 1, (int) (size * factor)));
     }
     list[size++] = v;
   }

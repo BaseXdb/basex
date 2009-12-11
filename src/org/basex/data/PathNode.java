@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import org.basex.core.Text;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
-import org.basex.util.Array;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -73,7 +72,11 @@ public final class PathNode {
       }
     }
     final PathNode n = new PathNode(t, k, this);
-    ch = Array.add(ch, n);
+    final int cs = ch.length;
+    final PathNode[] tmp = new PathNode[cs + 1];
+    System.arraycopy(ch, 0, tmp, 0, cs);
+    tmp[cs] = n;
+    ch = tmp;
     return n;
   }
 

@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
@@ -49,7 +50,7 @@ public final class Add extends ACreate {
     data.insert(data.meta.size, -1, d);
     data.flush();
     context.update();
-    return true;
+    return info(DOCADDED, io.name(), perf);
   }
 
   @Override

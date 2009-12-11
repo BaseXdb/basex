@@ -375,6 +375,10 @@ public interface Text {
 
   /** Database created. */
   String DBCREATED = lang("pc_created");
+  /** Document added. */
+  String DOCADDED = lang("pc_added");
+  /** Document added. */
+  String DOCDELETED = lang("pc_deleted");
   /** Parse error. */
   String PARSEERR = lang("pc_err");
 
