@@ -149,9 +149,9 @@ public final class Prop extends AProp {
   /** Flag for importing file metadata. */
   public static final Object[] FSMETA = { "FSMETA", true };
   /** Flag for importing file contents. */
-  public static final Object[] FSCONT = { "FSCONT", true };
+  public static final Object[] FSCONT = { "FSCONT", false };
   /** Flag for importing xml contents. */
-  public static final Object[] FSXML = { "FSXML", true };
+  public static final Object[] FSXML = { "FSXML", false };
   /** Maximum size for textual imports. */
   public static final Object[] FSTEXTMAX = { "FSTEXTMAX", 10240 };
   /** Verbose debug informations for FSTraversal. */

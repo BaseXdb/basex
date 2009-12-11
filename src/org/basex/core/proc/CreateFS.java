@@ -33,6 +33,7 @@ public final class CreateFS extends ACreate {
   protected boolean exec(final PrintOutput out) {
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
+
     final String path;
     try {
       path = new File(args[0]).getCanonicalPath();
