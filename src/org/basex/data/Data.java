@@ -12,7 +12,6 @@ import org.basex.io.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
 import org.basex.util.Bytes;
-import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
 
@@ -599,8 +598,8 @@ public abstract class Data {
                 md.ns.uri(md.uri(mpre, mk)));
             table.write2(ipar, 1, 1 << 15 | name(ipar));
           }
-          final int u = pref(nm).length != 0 ? ns.uri(nm, pre) : 0;
-          //int u = ns.uri(nm, false);
+          //final int u = pref(nm).length != 0 ? ns.uri(nm, pre) : 0;
+          final int u = ns.uri(nm, false);
           attr(pre, dis, atts.index(nm, null, false), md.text(mpre, false),
               u, false);
           break;
@@ -608,8 +607,6 @@ public abstract class Data {
     }
     while(l > 0) ns.close(preStack[--l]);
 
-    Performance.gc(4);
-    System.out.println(Performance.getMem());
     if(b.pos() != 0) insert(ipre + (mpre - 1) - (mpre - 1) % buf);
 
     // increase size of ancestors
