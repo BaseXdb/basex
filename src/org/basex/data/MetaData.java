@@ -244,7 +244,7 @@ public final class MetaData {
    * @param out output stream
    * @throws IOException IO Exception
    */
-  synchronized void write(final DataOutput out) throws IOException {
+  void write(final DataOutput out) throws IOException {
     writeInfo(out, DBSTR,    STORAGE);
     writeInfo(out, IDBSTR,   ISTORAGE);
     writeInfo(out, DBFNAME,  file.path());

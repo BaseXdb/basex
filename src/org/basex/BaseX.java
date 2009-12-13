@@ -68,7 +68,7 @@ public class BaseX extends Main {
         if(qu != null) process(new XQuery(qu), true);
       } else if(query != null) {
         // query file contents
-        if(query != null) process(new XQuery(query), true);
+        process(new XQuery(query), true);
       } else if(commands != null) {
         // process command-line arguments
         process(commands);

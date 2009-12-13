@@ -61,7 +61,7 @@ public final class PendingUpdates {
 
   /**
    * Adds an update primitive to the corresponding primitive list. Update
-   * primitives which target nodes are fragments are treated differently,
+   * primitives with fragments as target nodes are treated differently,
    * because they don't effect any existing databases. They may not hurt
    * any constraints however.
    *
@@ -97,7 +97,7 @@ public final class PendingUpdates {
    * XQueryUP specification 3.2.2
    * @throws QueryException query exception
    */
-  public void apply() throws QueryException {
+  public synchronized void apply() throws QueryException {
     // Constraints are checked first. No updates are applied if any problems
     // are found.
     for(final Primitives p : primitives.values()) p.check();

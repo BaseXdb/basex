@@ -87,8 +87,7 @@ public final class XQueryView extends View {
         final ActionListener al = new ActionListener() {
           public void actionPerformed(final ActionEvent ac) {
             confirm();
-            final IO file = IO.get(ac.getActionCommand());
-            setQuery(file);
+            setQuery(IO.get(ac.getActionCommand()));
           }
         };
         for(final String en : gui.prop.strings(GUIProp.QUERIES)) {

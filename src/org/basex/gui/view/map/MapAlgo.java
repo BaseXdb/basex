@@ -21,9 +21,9 @@ public abstract class MapAlgo {
       if(rect.w != 0 && rect.h != 0) {
         dev++;
         if(rect.w > rect.h) {
-          ar += rect.w / rect.h;
+          ar += (double) rect.w / rect.h;
         } else {
-          ar += rect.h / rect.w;
+          ar += (double) rect.h / rect.w;
         }
       }
     }

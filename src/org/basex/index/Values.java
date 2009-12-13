@@ -221,7 +221,7 @@ public final class Values implements Index {
   }
 
   @Override
-  public synchronized void close() throws IOException {
+  public void close() throws IOException {
     idxl.close();
     idxr.close();
   }

@@ -91,7 +91,7 @@ public final class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  public synchronized void quit(final boolean user) {
+  public void quit(final boolean user) {
     if(!running) return;
     running = false;
     super.quit(user);

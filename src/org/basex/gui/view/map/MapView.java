@@ -289,8 +289,8 @@ public final class MapView extends View implements Runnable {
 
     // calculate zooming speed (slower for large zooming scales)
     if(mainRect.w > 0 && mainRect.h > 0) {
-      zoomSpeed = (int) (Math.log(64 * getWidth() / mainRect.w) + Math.log(64
-          * getHeight() / mainRect.h));
+      zoomSpeed = (int) (Math.log(64d * getWidth() / mainRect.w) +
+          Math.log(64d * getHeight() / mainRect.h));
     }
 
     if(quick) {
@@ -395,7 +395,7 @@ public final class MapView extends View implements Runnable {
     final Data data = gui.context.data;
     final GUIProp gprop = gui.prop;
 
-    if(mainRects == null || mainRects.size == 0) {
+    if(data == null || mainRects == null || mainRects.size == 0) {
       super.paintComponent(g);
       refreshInit();
       return;
@@ -467,7 +467,7 @@ public final class MapView extends View implements Runnable {
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focused.level + 5);
       }
 
-      if(focused != null && focused.thumb) {
+      if(focused.thumb) {
         focused.x += 3;
         focused.w -= 3;
         final byte[] text = ViewData.content(data, focused.pre, false);

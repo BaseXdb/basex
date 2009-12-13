@@ -254,6 +254,7 @@ public final class EMLParser implements IFileParser {
         }
         if(readNext && !readLine()) return;
       } while(!mCurrLine.isEmpty());
+
       if(deepFile.isMetaSet(MetaElem.SENDER_EMAIL)
           || deepFile.isMetaSet(MetaElem.SENDER_NAME)) {
         deepFile.setFileType(FileType.MESSAGE);

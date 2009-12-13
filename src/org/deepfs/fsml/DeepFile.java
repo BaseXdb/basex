@@ -416,7 +416,7 @@ public class DeepFile {
   private void addMeta(final MetaElem e, final String value,
       final Type dataType) {
     if(metaFinished || value.length() == 0) return;
-    if(e.equals(MetaElem.TYPE) | e.equals(MetaElem.FORMAT)) {
+    if(e.equals(MetaElem.TYPE) || e.equals(MetaElem.FORMAT)) {
       Main.debug("The metadata attributes " + MetaElem.TYPE + " and "
           + MetaElem.FORMAT + " must not be set by an addMetaElem() method."
           + " Use setMetaType() and setFormat() instead.");

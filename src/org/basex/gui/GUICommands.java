@@ -877,8 +877,6 @@ public enum GUICommands implements GUICommand {
     checked = c;
   }
 
-  public abstract void execute(final GUI gui);
-
   public void refresh(final GUI gui, final AbstractButton b) {
     final boolean e = !data || gui.context.data != null;
     if(b.isEnabled() != e) b.setEnabled(e);

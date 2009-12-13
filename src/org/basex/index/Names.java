@@ -82,7 +82,7 @@ public final class Names extends TokenSet {
   }
 
   @Override
-  public synchronized void write(final DataOutput out) throws IOException {
+  public void write(final DataOutput out) throws IOException {
     super.write(out);
     for(int s = 1; s < size; s++) {
       if(stat[s] == null) stat[s] = new StatsKey();

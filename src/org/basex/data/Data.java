@@ -445,7 +445,7 @@ public abstract class Data {
       final int ou = ns.uri(nm, pre);
       final boolean ne = ou == 0 && uri.length != 0;
       final int p = k == Data.ATTR ? parent(pre, k) : pre;
-      final int u = ne ? ns.add(p, parent(p, ELEM), pref(nm), uri) :
+      final int u = ne ? ns.add(p, p, pref(nm), uri) :
         ou != 0 && eq(ns.uri(ou), uri) ? ou : 0;
 
       // write namespace uri reference
@@ -454,7 +454,7 @@ public abstract class Data {
       table.write2(pre, 1, (nsFlag(pre) ? 1 << 15 : 0) |
         (k == ELEM ? tags : atts).index(nm, null, false));
       // write namespace flag
-      table.write2(p, 1, (ne | nsFlag(p) ? 1 << 15 : 0) | name(p));
+      table.write2(p, 1, (ne || nsFlag(p) ? 1 << 15 : 0) | name(p));
     }
   }
 
@@ -598,10 +598,8 @@ public abstract class Data {
                 md.ns.uri(md.uri(mpre, mk)));
             table.write2(ipar, 1, 1 << 15 | name(ipar));
           }
-          //final int u = pref(nm).length != 0 ? ns.uri(nm, pre) : 0;
-          final int u = ns.uri(nm, false);
           attr(pre, dis, atts.index(nm, null, false), md.text(mpre, false),
-              u, false);
+              ns.uri(nm, false), false);
           break;
       }
     }

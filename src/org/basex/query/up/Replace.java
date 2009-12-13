@@ -46,8 +46,6 @@ public final class Replace extends Update {
   @Override
   public Seq atomic(final QueryContext ctx) throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
-    final NodIter cList = c.children;
-    final NodIter aList = c.ats;
     if(c.errAtt) Err.or(UPNOATTRPER);
     if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
 
@@ -61,9 +59,11 @@ public final class Replace extends Update {
     final Nod targ = (Nod) i;
 
     // replace node
+    final NodIter aList = c.ats;
+    NodIter list = c.children;
     if(value) {
       // replace value of node
-      final byte[] txt = cList.size() < 1 ? EMPTY : cList.get(0).str();
+      final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).str();
       if(type == Type.COM) CComm.check(txt);
       if(type == Type.PI) CPI.check(txt);
 
@@ -75,19 +75,19 @@ public final class Replace extends Update {
       if(par == null) Err.or(UPNOPAR, i);
       if(type == Type.ATT) {
         // replace attribute node
-        if(cList.size() > 0) Err.or(UPWRATTR, i);
+        if(list.size() > 0) Err.or(UPWRATTR, i);
 
         for(int a = 0; a < aList.size(); a++) {
           final QNm name = aList.get(a).qname();
           final byte[] uri = par.uri(name.pref(), ctx);
           if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
         }
-        ctx.updates.add(new ReplacePrimitive(targ, aList), ctx);
+        list = aList;
       } else {
         // replace non-attribute node
         if(aList.size() > 0) Err.or(UPWRELM, i);
-        ctx.updates.add(new ReplacePrimitive(targ, cList), ctx);
       }
+      ctx.updates.add(new ReplacePrimitive(targ, list), ctx);
     }
     return Seq.EMPTY;
   }

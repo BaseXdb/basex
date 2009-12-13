@@ -59,7 +59,7 @@ public final class Semaphore {
    * Modifications after executing a process.
    * @param up updating flag
    */
-  public void after(final boolean up) {
+  public synchronized void after(final boolean up) {
     if(up) {
       activeW = false;
       if(waitingR > 0) notifyReaders();

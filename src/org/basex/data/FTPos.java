@@ -28,7 +28,7 @@ public final class FTPos {
     pos = ps;
     int x = -1;
     for(final int i : ps) {
-      sorted &= i >= x;
+      sorted = sorted && i >= x;
       x = i;
       if(!sorted) break;
     }
@@ -53,7 +53,7 @@ public final class FTPos {
     pos = ts;
     int x = -1;
     for(final int i : pos) {
-      sorted &= i >= x;
+      sorted = sorted && i >= x;
       x = i;
       if(!sorted) break;
     }

@@ -70,7 +70,7 @@ public final class PathSummary {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public synchronized void write(final DataOutput out) throws IOException {
+  public void write(final DataOutput out) throws IOException {
     out.writeBool(root != null);
     if(root != null) root.finish(out);
   }

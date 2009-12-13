@@ -123,7 +123,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void write1(final int p, final int o, final int v) {
+  public synchronized void write1(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = ((o < 8 ? 7 : 15) - o) << 3;
@@ -131,7 +131,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void write2(final int p, final int o, final int v) {
+  public synchronized void write2(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = ((o < 8 ? 6 : 14) - o) << 3;
@@ -139,7 +139,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void write4(final int p, final int o, final int v) {
+  public synchronized void write4(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = ((o < 8 ? 4 : 12) - o) << 3;
@@ -147,7 +147,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void write5(final int p, final int o, final long v) {
+  public synchronized void write5(final int p, final int o, final long v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = ((o < 8 ? 3 : 11) - o) << 3;
@@ -185,7 +185,7 @@ public final class TableMemAccess extends TableAccess {
    * @param op source position
    * @param np destination position
    */
-  private void move(final int op, final int np) {
+  private synchronized void move(final int op, final int np) {
     dirty = true;
     final int l = meta.size - op;
     while(l + np >= buf1.length) {

@@ -49,7 +49,7 @@ public class FTContains extends Expr {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     expr = checkUp(expr, ctx).comp(ctx).addText(ctx);
     final boolean fast = ctx.ftfast;
-    ctx.ftfast &= ctx.ftpos == null;
+    ctx.ftfast = ctx.ftfast && ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
     ctx.ftfast = fast;
     ft = new Tokenizer(ctx.context.prop);

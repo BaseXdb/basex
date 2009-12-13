@@ -119,7 +119,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public synchronized void flush() {
+  public void flush() {
     try {
       table.flush();
       texts.flush();

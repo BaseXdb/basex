@@ -105,7 +105,7 @@ public final class DataPool {
   /**
    * Closes all data references.
    */
-  synchronized void close() {
+  void close() {
     try {
       for(int i = 0; i < size; i++) data[i].close();
     } catch(final IOException ex) {

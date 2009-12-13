@@ -146,7 +146,8 @@ public final class FNBaseX extends Fun {
 
     if(expr.length == 2) {
       final Item it = expr[1].atomic(ctx);
-      if(it == null || !it.u() && !it.n()) Err.num(info(), it);
+      if(it == null) Err.empty(expr[1]);
+      if(!it.u() && !it.n()) Err.num(info(), it);
       final long pre = it.itr();
       if(pre < 0 || pre >= node.data.meta.size) Err.or(NOPRE, pre);
       node = new DBNode(node.data, (int) pre);

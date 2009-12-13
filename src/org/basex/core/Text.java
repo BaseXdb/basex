@@ -175,22 +175,39 @@ public interface Text {
   String[] HELPDB = { lang("ch_helpdatabase0") };
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
+    "[" + CmdCreate.DB + "|" + CmdCreate.COLL + "|" + CmdCreate.FS + "|" +
     CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
     LI + CmdCreate.DB + " [" + PATH + "] [" + NAM + "?]:" + NL +
       "  " + lang("ch_create3", NAM, PATH) + NL +
+    LI + CmdCreate.COLL + " [" + NAM + "]:" + NL +
+      "  " + lang("ch_create4", NAM) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.SUMMARY + "]: " + NL +
-      "  " + lang("ch_create4") + NL +
+      "  " + lang("ch_create5") + NL +
     LI + CmdCreate.FS + " [" + PATH + "] [" + NAM +
       "] ([mountpoint] [backingstore]): " + NL +
-      "  " + lang("ch_create5", NAM, PATH) + NL +
-      "  " + lang("ch_create6", "mountpoint", "backingstore") + NL +
+      "  " + lang("ch_create6", NAM, PATH) + NL +
+      "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
     LI + CmdCreate.USER + " [" + NAM + "] [" + PW + "?]: " + NL +
-      "  " + lang("ch_create7")
+      "  " + lang("ch_create8")
   };
+
+  /** Command help. */
+  String[] HELPADD = {
+    "[" + PATH  + "]",
+    lang("ch_add1"),
+    lang("ch_add2")
+  };
+
+  /** Command help. */
+  String[] HELPDELETE = {
+    "[" + NAM  + "]",
+    lang("ch_delete1"),
+    lang("ch_delete2")
+  };
+
   /** Command help. */
   String[] HELPOPEN = {
     "[" + NAM + "]", lang("ch_open1"), lang("ch_open2", NAM)

@@ -209,7 +209,7 @@ public class Tokenizer implements IndexToken {
     return true;
   }
 
-  public byte[] get() {
+  public final byte[] get() {
     return get(orig());
   }
 

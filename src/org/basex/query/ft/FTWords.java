@@ -115,7 +115,7 @@ public final class FTWords extends FTExpr {
         if(iat == null) {
           final Tokenizer ft = new Tokenizer(txt, ctx.ftopt, fast,
               ctx.context.prop);
-          ft.fast &= ft.count() == 1;
+          ft.fast = ft.fast && ft.count() == 1;
           ft.init();
           int d = 0;
           while(ft.more()) {

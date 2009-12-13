@@ -74,7 +74,7 @@ public abstract class Main {
    * Quits the console mode.
    * @param user quit by user
    */
-  protected synchronized void quit(final boolean user) {
+  protected void quit(final boolean user) {
     try {
       if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
       process(new Exit(), true);

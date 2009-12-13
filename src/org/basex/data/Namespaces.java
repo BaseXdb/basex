@@ -217,10 +217,15 @@ public final class Namespaces {
     final NSNode nd = root.find(par);
     final NSNode t = new NSNode(pre);
 
+    // [CG] check...
     final int k = addPref(p);
     final int v = addURI(u);
-    t.add(k, v);
-    nd.add(t);
+    if(nd.pre == pre) {
+      nd.add(k, v);
+    } else {
+      t.add(k, v);
+      nd.add(t);
+    }
     return v;
   }
 

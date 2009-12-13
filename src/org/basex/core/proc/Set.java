@@ -32,9 +32,7 @@ public final class Set extends Proc {
     String val = args[1];
 
     CmdSet s = null;
-    try {
-      s = Enum.valueOf(CmdSet.class, key);
-    } catch(final Exception ex) { }
+    try { s = Enum.valueOf(CmdSet.class, key); } catch(final Exception ex) { }
 
     try {
       final Object type = prop.object(key);

@@ -33,12 +33,6 @@ public final class ReplacePrimitive extends NodeCopy {
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;
-    // source nodes may be empty, thus the replace results in deleting the
-    // target node
-    if(md == null) {
-      d.delete(pre);
-      return;
-    }
     final int par = d.parent(pre, Nod.kind(n.type));
     if(n.type == Type.ATT) {
       d.insertAttr(pre, par, md);

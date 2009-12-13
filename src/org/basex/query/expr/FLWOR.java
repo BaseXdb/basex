@@ -69,7 +69,7 @@ public class FLWOR extends Expr {
     for(int f = 0; f != fl.length; f++) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
-      ctx.ftfast &= fl[f].standard();
+      ctx.ftfast = ctx.ftfast && fl[f].standard();
       final Expr e = fl[f].comp(ctx);
       fl[f] = e == Seq.EMPTY ? null : (ForLet) e;
       ctx.ftfast = fast;

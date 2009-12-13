@@ -84,7 +84,8 @@ final class DBPrimitives extends Primitives {
         }
       }
     }
-    for(final QNm n : m.keySet()) if(m.get(n) > 1) Err.or(UPATTDUPL, n);
+    for(final Map.Entry<QNm, Integer> n : m.entrySet())
+      if(n.getValue() > 1) Err.or(UPATTDUPL, n.getKey());
 
     // find namespace conflicts
     final Atts at = new Atts();

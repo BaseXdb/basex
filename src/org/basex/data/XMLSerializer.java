@@ -84,8 +84,8 @@ public final class XMLSerializer extends Serializer {
     print(DOCTYPE);
     print(' ');
     print(t);
-    if(te != null) print(" " + SYSTEM + " \"" + te + "\"");
-    if(ti != null) print(" \"" + ti + "\"");
+    if(te != null) print(" " + string(SYSTEM) + " \"" + string(te) + "\"");
+    if(ti != null) print(" \"" + string(ti) + "\"");
     print(ELEM2);
     print(NL);
   }
@@ -277,6 +277,7 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void print(final String s) throws IOException {
+    // comparison by reference
     if(enc == UTF8) {
       out.write(token(s));
     } else {

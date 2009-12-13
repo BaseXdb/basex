@@ -219,7 +219,7 @@ public final class Token {
    * @param enc input encoding
    */
   public static byte[] utf8(final byte[] s, final String enc) {
-    // no UTF8 (string constant..) & no special characters: return input string
+    // no UTF8 (comparison by ref.) & no special characters: return input string
     if(enc == UTF8 || ascii(s)) return s;
     // convert to utf8
     try {

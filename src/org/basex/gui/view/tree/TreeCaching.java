@@ -207,7 +207,7 @@ public class TreeCaching implements TreeViewOptions {
         if(o < MIN_SPACE) o = MIN_SPACE;
 
         if(w > o) {
-          xx = boxMiddle - o / 2;
+          xx = boxMiddle - o / 2d;
           ww = o;
         }
       }

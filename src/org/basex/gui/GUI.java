@@ -204,12 +204,12 @@ public final class GUI extends JFrame {
     hist = new BaseXButton(this, "hist", HELPHIST);
     hist.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu popup = new JPopupMenu("History");
+        final JPopupMenu pop = new JPopupMenu("History");
         final ActionListener al = new ActionListener() {
           public void actionPerformed(final ActionEvent ac) {
             input.setText(ac.getActionCommand());
             input.requestFocusInWindow();
-            popup.setVisible(false);
+            pop.setVisible(false);
           }
         };
         final int i = context.data == null ? 2 :
@@ -219,9 +219,9 @@ public final class GUI extends JFrame {
         for(final String en : hs) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
-          popup.add(jmi);
+          pop.add(jmi);
         }
-        popup.show(hist, 0, hist.getHeight());
+        pop.show(hist, 0, hist.getHeight());
       }
     });
 

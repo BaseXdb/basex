@@ -141,7 +141,7 @@ public final class FTFuzzy extends FTIndex {
   }
 
   @Override
-  public synchronized void close() throws IOException {
+  public void close() throws IOException {
     li.close();
     ti.close();
     dat.close();

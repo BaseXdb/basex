@@ -802,6 +802,7 @@ public final class MP3Parser implements IFileParser {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
         final String encoding = obj.readEncoding();
+        // [BL] lang variable isn't evaluated in the rest of this method
         byte[] lang = obj.readText(3, "");
         for(final byte b : lang) {
           if(ws(b) || b == 0) {
@@ -811,8 +812,7 @@ public final class MP3Parser implements IFileParser {
         }
         int pos = 4;
         // ignore short content description
-        while(obj.bfc.get() != 0 && ++pos < size)
-          ;
+        while(obj.bfc.get() != 0 && ++pos < size);
         if(pos >= size) return;
         obj.deepFile.addMeta(MetaElem.DESCRIPTION, obj.readText(size - pos,
             encoding));

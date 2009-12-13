@@ -36,11 +36,6 @@ public final class ScoringTokenizer extends Tokenizer{
   }
 
   @Override
-  public byte[] get() {
-    return super.get();
-  }
-
-  @Override
   public void init(final byte[] txt) {
     super.init(txt);
     initScoring();
