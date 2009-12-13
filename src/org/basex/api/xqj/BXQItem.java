@@ -99,7 +99,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   }
 
   public XMLStreamReader getItemAsStream() {
-    return new IterStreamReader(new SeqIter(it));
+    return new IterStreamReader(new SeqIter(new Item[] { it }, 1));
   }
 
   public String getItemAsString(final Properties props) throws XQException {
