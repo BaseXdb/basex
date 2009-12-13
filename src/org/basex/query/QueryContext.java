@@ -423,12 +423,12 @@ public final class QueryContext extends Progress {
     } else {
       final IO file = file();
       data = check(nm, file == null, coll);
-      if(data == null) data = check(file.merge(io).path(), true, coll);
+      if(data == null) data = check(file.merge(string(path)).path(),
+          true, coll);
     }
 
     // add document to array
     final DBNode node = new DBNode(data, 0);
-    // [CG] XQuery: how to handle collections?
     addDoc(node);
     return node;
   }
@@ -457,7 +457,7 @@ public final class QueryContext extends Progress {
     try {
       return Check.check(context, path);
     } catch(final IOException ex) {
-      if(err) Err.or(coll ? NOCOLL : NODOC, path);
+      if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
       return null;
     }
   }

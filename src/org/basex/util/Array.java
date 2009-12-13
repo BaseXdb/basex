@@ -53,24 +53,6 @@ public final class Array {
   }
 
   /**
-   * Inserts an entry at the specified position.
-   * @param <T> array type
-   * @param ar array to be resized
-   * @param a entry to be inserted
-   * @param p position
-   * @return array
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> T[] insert(final T[] ar, final T a, final int p) {
-    final T[] tmp = (T[]) java.lang.reflect.Array.newInstance(
-        ar.getClass().getComponentType(), ar.length + 1);
-    System.arraycopy(ar, 0, tmp, 0, p);
-    System.arraycopy(ar, p, tmp, p + 1, ar.length - p);
-    tmp[p] = a;
-    return tmp;
-  }
-
-  /**
    * Sorts the specified tokens and returns an integer array
    * with offsets to of the sorted tokens.
    * @param tok token array to sort by

@@ -104,7 +104,8 @@ public final class UpdateFunctions {
     final int ms = m.meta.size;
     switch(k) {
       case Data.DOC:
-        m.insert(ms, m.doc(ms, size(nd, false), nd.base()));
+        m.doc(ms, size(nd, false), nd.base());
+        m.insert(ms);
         int p = pre + 1;
         NodeIter ir = nd.child();
         Nod i;
@@ -120,14 +121,16 @@ public final class UpdateFunctions {
           if(par == 0) m.ns.add(ms, pre - par, q.pref(), uri);
         }
         final int n = m.atts.index(q.str(), null, false);
-        m.insert(ms, m.attr(ms, pre - par, n, nd.str(), u, ne));
+        m.attr(ms, pre - par, n, nd.str(), u, ne);
+        m.insert(ms);
         return pre + 1;
       case Data.PI:
       case Data.TEXT:
       case Data.COMM:
         byte[] v = nd.str();
         if(k == Data.PI) v = trim(concat(nd.nname(), SPACE, v));
-        m.insert(ms, m.text(ms, pre - par, v, k));
+        m.text(ms, pre - par, v, k);
+        m.insert(ms);
         return pre + 1;
       default:
         q = nd.qname();
@@ -142,8 +145,8 @@ public final class UpdateFunctions {
         uri = q.uri.str();
         u = uri.length != 0 ? Math.abs(m.ns.addURI(uri)) : 0;
         final int tn = m.tags.index(q.str(), null, false);
-        m.insert(ms, m.elem(pre - par, tn, size(nd, true),
-            size(nd, false), u, ne));
+        m.elem(pre - par, tn, size(nd, true), size(nd, false), u, ne);
+        m.insert(ms);
         ir = nd.attr();
         p = pre + 1;
         while((i = ir.next()) != null) p = addNode(i, m, p, pre);

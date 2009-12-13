@@ -22,10 +22,14 @@ final class NSNode {
   /** Pre value. */
   int pre;
 
-  /** Default constructor. */
-  NSNode() {
+  /**
+   * Default constructor.
+   * @param p pre value
+   */
+  NSNode(final int p) {
     vals = new int[] {};
     ch = new NSNode[0];
+    pre = p;
   }
 
   /**
@@ -58,22 +62,26 @@ final class NSNode {
   /**
    * Sorts the specified node into the child array.
    * @param n child node
+   * @return node
    */
-  void add(final NSNode n) {
+  NSNode add(final NSNode n) {
     int s = ch.length;
-    while(--s >= 0 && n.pre < ch[s].pre);
-    if(s >= 0 && n.pre == ch[s].pre) {
+    while(--s >= 0) {
+      final int d = n.pre - ch[s].pre;
+      if(d > 0) break;
+      if(d <= 0) continue;
       for(int v = 0; v < n.vals.length; v += 2) {
         ch[s].add(n.vals[v], n.vals[v + 1]);
       }
-    } else {
-      final NSNode[] tmp = new NSNode[ch.length + 1];
-      tmp[++s] = n;
-      System.arraycopy(ch, 0, tmp, 0, s);
-      System.arraycopy(ch, s, tmp, s + 1, ch.length - s);
-      ch = tmp;
-      n.par = this;
+      return this;
     }
+    final NSNode[] tmp = new NSNode[ch.length + 1];
+    tmp[++s] = n;
+    System.arraycopy(ch, 0, tmp, 0, s);
+    System.arraycopy(ch, s, tmp, s + 1, ch.length - s);
+    ch = tmp;
+    n.par = this;
+    return n;
   }
 
   /**
@@ -114,20 +122,20 @@ final class NSNode {
    * Deletes nodes in the specified range (p .. p + nr) and updates the
    * following pre values
    * @param p pre value
-   * @param nr number of nodes to be deleted
+   * @param sz number of nodes to be deleted
    */
-  void delete(final int p, final int nr) {
+  void delete(final int p, final int sz) {
     int s = fnd(p);
     if(s == -1 || ch[s].pre != p) s++;
     int e = s;
-    while(e < ch.length && p + nr > ch[e].pre) e++;
+    while(e < ch.length && p + sz > ch[e].pre) e++;
     if(s != e) {
       final NSNode[] nd = new NSNode[ch.length - e + s];
       System.arraycopy(ch, 0, nd, 0, s);
       System.arraycopy(ch, e, nd, s, ch.length - e);
       ch = nd;
     }
-    update(s, -nr);
+    update(s, -sz);
   }
 
   /**
@@ -204,6 +212,5 @@ final class NSNode {
   @Override
   public String toString() {
     return "Pre[" + pre + "]";
-    //return Main.name(this) + "[pre:" + pre + "]";
   }
 }

@@ -45,7 +45,6 @@ public final class ValueBuilder extends IndexBuilder {
     final String f = text ? DATATXT : DATAATV;
 
     final Runtime rt = Runtime.getRuntime();
-    Performance.gc(2);
     final long maxMem = (long) (rt.maxMemory() * 0.9);
 
     final int type = text ? Data.TEXT : Data.ATTR;

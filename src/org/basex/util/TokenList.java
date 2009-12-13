@@ -41,7 +41,7 @@ public final class TokenList implements Iterable<byte[]> {
    */
   public TokenList(final double f) {
     this(8);
-    factor = f;    
+    factor = f;
   }
 
   /**

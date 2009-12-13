@@ -564,7 +564,7 @@ public class QueryParser extends InputParser {
     if(ctx.modLoaded.contains(f)) return;
     // check specified path and path relative to query file
     IO fl = IO.get(f);
-    if(!fl.exists() && file != null) fl = file.merge(fl);
+    if(!fl.exists() && file != null) fl = file.merge(f);
 
     String query = null;
     try {
@@ -2436,7 +2436,7 @@ public class QueryParser extends InputParser {
               if(ctx.stop != null) fn = ctx.stop.get(fn);
 
               IO fl = IO.get(fn);
-              if(!fl.exists() && file != null) fl = file.merge(fl);
+              if(!fl.exists() && file != null) fl = file.merge(fn);
               if(!opt.sw.read(fl, except)) error(NOSTOPFILE, fl);
             } else if(!union && !except) {
               error(FTSTOP);
@@ -2474,7 +2474,7 @@ public class QueryParser extends InputParser {
     if(ctx.thes != null) fn = ctx.thes.get(fn);
     IO fl = IO.get(fn);
 
-    if(!fl.exists() && file != null) fl = file.merge(file);
+    if(!fl.exists() && file != null) fl = file.merge(file.path());
     final byte[] rel = consumeWS2(RELATIONSHIP) ? stringLiteral() : EMPTY;
     final Expr[] range = ftRange();
     long min = 0;

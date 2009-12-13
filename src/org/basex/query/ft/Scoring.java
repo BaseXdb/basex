@@ -1,7 +1,5 @@
 package org.basex.query.ft;
 
-import org.basex.data.FTMatch;
-import org.basex.data.FTStringMatch;
 import org.basex.index.FTIndex;
 import org.basex.query.item.FTItem;
 
@@ -89,7 +87,7 @@ public final class Scoring {
 //    return count == 0 ? 0 : score / Math.sqrt((double) sum / count);
   }
 
-  /**
+  /*
    * Determines a single scoring value out of two FTOr combined terms.
    * The maximum scoring value is chosen and weighted by the number
    * of term in the current text node at the ratio of the
@@ -100,7 +98,6 @@ public final class Scoring {
    * @param n number of tokens in the or expression
    * @param m number of tokens int the entire query
    * @return double scoring value
-   */
   public double ftOr(final FTItem item1, final FTItem item2, final int n,
       final int m) {
 
@@ -115,6 +112,7 @@ public final class Scoring {
     for(final int pp : p) if(pp == -1) count++;
     return score * (count > m ? 1 : count / m);
   }
+   */
 
   /**
    * Inverses the scoring value for FTNot.

@@ -14,8 +14,6 @@ public final class ScoringTokenizer extends Tokenizer{
   private IntMap token;
   /** Maximum score. */
   private int max = 1;
-  /** Container for frequency. */
-  private IntMap freq;
 
   /**
    * Empty constructor.
@@ -49,6 +47,8 @@ public final class ScoringTokenizer extends Tokenizer{
     init();
   }
 
+  // [CG] review...
+
   /**
    * Returns the score for the specified key.
    * @param key key
@@ -57,12 +57,12 @@ public final class ScoringTokenizer extends Tokenizer{
   public int score(final byte[] key) {
     final int c = token.get(key);
     token.set(key, -1);
-    if(c > 0 && freq != null) {
+    /*if(c > 0 && freq != null) {
       final int f = freq.get(key);
       if(f > 0) {
         return Math.max(1, (int) (Math.log(2666130d / f) * c * 1000 / max));
       }
-    }
+    }*/
     return c == 0 ? 0 : Math.max(1, c * 1000 / max);
   }
 

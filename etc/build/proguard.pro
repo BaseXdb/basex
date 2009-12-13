@@ -1,4 +1,4 @@
--injars 'd:\Projects\BaseX56b6.jar'
+-injars 'D:\Projects\BaseX.jar'
 
 -libraryjars 'C:\Programme\Java\jre6\lib\rt.jar'
 

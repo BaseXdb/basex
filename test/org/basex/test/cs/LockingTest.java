@@ -69,7 +69,7 @@ public final class LockingTest {
     // concurrent create test
     conCreate();
     Main.outln(server.context.pool.info());
-    if(server.context.size("factbook") == 2) {
+    if(server.context.pool.pins("factbook") == 2) {
       Main.outln("--> Test 1 successful, Test 2 started...");
     } else {
       err("test failed conCreate");

@@ -30,7 +30,7 @@ class ValueTree {
   private int cn;
   /** Last iterator node. */
   private int ln;
-  
+
   /**
    * Check if specified token was already indexed; if yes, its pre
    * value is added to the existing values. otherwise, create new index entry.
@@ -39,7 +39,7 @@ class ValueTree {
    */
   void index(final byte[] tok, final int pre) {
     // index is empty.. create root node
-    if(root == -1) {      
+    if(root == -1) {
       root = n(tok, pre, -1);
       return;
     }

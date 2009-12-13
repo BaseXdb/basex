@@ -1,12 +1,8 @@
 package org.deepfs.fsml.parsers;
 
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.deepfs.fsml.BufferedFileChannel;
@@ -271,7 +267,7 @@ public final class MP3Parser implements IFileParser {
   private static final int ENC_UTF_16_NO_BOM = 2;
   /** Flag for UTF-8 encoding. */
   private static final int ENC_UTF_8 = 3;
-  
+
   /** MP3 modes. */
   private static final byte[][] MODES = { token("Stereo"),
     token("Joint Stereo"), token("Dual Channel"), token("Mono") };
@@ -344,10 +340,10 @@ public final class MP3Parser implements IFileParser {
     deepFile.setFileType(FileType.AUDIO);
     deepFile.setFileFormat(MimeType.MP3);
   }
-  
+
   /**
    * Reads technical information and adds it to the deep file.
-   * @param size the size of the ID3 tags.
+   * @param size the size of the ID3 tags
    */
   private void techInfo(final int size) {
     try {
@@ -356,12 +352,12 @@ public final class MP3Parser implements IFileParser {
         bfc.buffer(1);
         b0 = bfc.get();
       } while(b0 != 0xFF);
-      
+
       bfc.buffer(3);
       b1 = bfc.get();
       b2 = bfc.get();
       b3 = bfc.get();
-      
+
       // check if technical bits are correct... if not, parse next bytes
       while(b0 != 0xFF || (b1 & 0xE0) != 0xE0 || (b1 & 0x18) == 0x08
           || (b1 & 0x06) == 0x00 || (b2 & 0xF0) == 0xF0 || (b2 & 0xF0) == 0x00
@@ -369,7 +365,7 @@ public final class MP3Parser implements IFileParser {
         bfc.buffer(1);
         b0 = b1; b1 = b2; b2 = b3; b3 = bfc.get();
       }
-      
+
       final int vers = b1 >> 3 & 0x03;
       final int layr = 3 - (b1 >> 1 & 0x03);
       final int rate = b2 >> 4 & 0x0F;
@@ -381,7 +377,7 @@ public final class MP3Parser implements IFileParser {
       final int mode = b3 >> 6 & 0x03;
       int bitrate = BITRATES[version][layr][rate];
       int seconds = (int) ((bfc.size() - size) * 8 / bitrate) / 1000;
-      
+
       // look for VBR XING header to correct track length and bitrate
       int encoding = 0;
       final int fsize = FSIZE[version][mode == 3 ? 1 : 0];
@@ -400,7 +396,7 @@ public final class MP3Parser implements IFileParser {
               seconds / 1000);
         }
       }
-      
+
       if(!deepFile.isMetaSet(MetaElem.DURATION)) deepFile.addMeta(
           MetaElem.DURATION, ParserUtil.convertMsDuration(seconds * 1000));
       deepFile.addMeta(MetaElem.CODEC, Token.concat(VERSIONS[vers],
@@ -436,7 +432,7 @@ public final class MP3Parser implements IFileParser {
   /**
    * Reads the ID3v1 metadata from the file. {@link #checkID3v1()} must be
    * called before (and must return <code>true</code>).
-   * @throws IOException if any error occurs while reading from the file.
+   * @throws IOException if any error occurs while reading from the file
    */
   private void readMetaID3v1() throws IOException {
     setTypeAndFormat();
@@ -713,7 +709,6 @@ public final class MP3Parser implements IFileParser {
    * Parses a date and returns the corresponding xml calendar.
    * @param d the date to parse
    * @return the xml date
-   */
   XMLGregorianCalendar parseDate(final byte[] d) {
     final int len = d.length;
     if(len >= 4) { // yyyy
@@ -747,6 +742,7 @@ public final class MP3Parser implements IFileParser {
     }
     return null;
   }
+   */
 
   // ---------------------------------------------------------------------------
   // ----- Frame enumeration that fires all the events -------------------------

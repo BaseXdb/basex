@@ -131,7 +131,7 @@ public class CmdTest {
     final IO io = IO.get("export.xml");
     no(new Export(io.path()));
     ok(new CreateDB(FILE));
-    ok(new Export(".", io.path()));
+    ok(new Export(".", io.name()));
     ok(io.exists());
     ok(io.delete());
   }

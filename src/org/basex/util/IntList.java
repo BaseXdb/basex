@@ -31,7 +31,7 @@ public class IntList {
   public IntList(final int is) {
     list = new int[is];
   }
-  
+
   /**
    * Constructor.
    * @param f resize factor

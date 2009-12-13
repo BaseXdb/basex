@@ -24,7 +24,7 @@ import org.basex.io.IO;
 public final class BaseXWin {
   /**
    * Main method.
-   * @param args command-line arguments.
+   * @param args command-line arguments
    * An initial XML document or query file can be specified as argument
    */
   public static void main(final String[] args) {

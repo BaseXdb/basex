@@ -27,14 +27,6 @@ public final class StringList implements Iterable<String> {
   }
 
   /**
-   * Adds an integer as string to the array.
-   * @param s string to be added
-   */
-  public void add(final int s) {
-    add(Integer.toString(s));
-  }
-
-  /**
    * Returns the number of entries.
    * @return number of entries
    */
@@ -49,17 +41,6 @@ public final class StringList implements Iterable<String> {
    */
   public String get(final int p) {
     return list[p];
-  }
-
-  /**
-   * Sets a value at the specified position.
-   * @param v value to be added
-   * @param p position
-   */
-  public void set(final String v, final int p) {
-    if(p >= list.length) list = Arrays.copyOf(list, p + 1);
-    list[p] = v;
-    size = Math.max(size, p + 1);
   }
 
   /**

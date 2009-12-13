@@ -35,11 +35,9 @@ public interface QueryText {
   /** BASX0002: Evaluation exception. */
   Object[] WHICHIDX = { BASX, 2, "Unknown index: '%'." };
   /** BASX0003: Evaluation exception. */
-  Object[] FILEERR = { BASX, 3, "File '%' could not be evaluated." };
+  Object[] NODB = { BASX, 3, "Database '%' not found." };
   /** BASX0003: Evaluation exception. */
-  Object[] NODB = { BASX, 4, "Database '%' not found." };
-  /** BASX0003: Evaluation exception. */
-  Object[] NOPRE = { BASX, 5, "Pre value '%' out of range." };
+  Object[] NOPRE = { BASX, 4, "Pre value '%' out of range." };
 
   /** FOAR0001: Evaluation exception. */
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };
@@ -71,9 +69,11 @@ public interface QueryText {
   /** FODC0002: Evaluation exception. */
   Object[] COLLDEF = { FODC, 2, "No default collection available." };
   /** FODC0002: Evaluation exception. */
-  Object[] NODOC = { FODC, 2, "\"%\" could not be opened." };
+  Object[] NODOC = { FODC, 2, "%" };
+  /** FODC0002: Evaluation exception. */
+  Object[] DOCERR = { FODC, 2, "\"%\" could not be opened." };
   /** FODC0004: Evaluation exception. */
-  Object[] NOCOLL = { FODC, 4, "Collection \"%\" could not be opened." };
+  Object[] NOCOLL = { FODC, 4, "%" };
   /** FODC0005: Evaluation exception. */
   Object[] INVDOC = { FODC, 5, "Invalid document \"%\"." };
 

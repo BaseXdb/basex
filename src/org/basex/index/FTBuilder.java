@@ -44,7 +44,7 @@ public abstract class FTBuilder extends IndexBuilder {
   /** Current frequency. */
   private int fc;
   /** Stop word list. */
-  private StopWords sw;
+  private final StopWords sw;
 
   /**
    * Returns a new full-text index builder.
@@ -57,7 +57,7 @@ public abstract class FTBuilder extends IndexBuilder {
       throws IOException {
     return wild ? new FTTrieBuilder(d) : new FTFuzzyBuilder(d);
   }
-  
+
   /**
    * Constructor.
    * @param d data reference
@@ -168,7 +168,7 @@ public abstract class FTBuilder extends IndexBuilder {
     final int ns = Num.size(vpre);
     while(np < ns) {
       if(scm > 0) {
-        int p = Num.read(vpre, np);
+        final int p = Num.read(vpre, np);
         if(lp != p) {
           // find document root
           int u = unit.find(p);

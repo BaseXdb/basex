@@ -111,7 +111,7 @@ public class PoolTest {
    * @param name name of database
    */
   private void pins(final int pin, final String name) {
-    assertEquals(pin, server.context.size(name));
+    assertEquals(pin, server.context.pool.pins(name));
   }
 
   /**

@@ -48,24 +48,28 @@ public final class MemBuilder extends Builder {
 
   @Override
   protected void addDoc(final byte[] txt) {
-    data.insert(meta.size, data.doc(meta.size, 0, txt));
+    data.doc(meta.size, 0, txt);
+    data.insert(meta.size);
   }
 
   @Override
   protected void addElem(final int dis, final int n, final int as, final int u,
       final boolean ne) {
-    data.insert(meta.size, data.elem(dis, n, as, as, u, ne));
+    data.elem(dis, n, as, as, u, ne);
+    data.insert(meta.size);
   }
 
   @Override
   protected void addAttr(final int n, final byte[] v, final int d,
       final int u) {
-    data.insert(meta.size, data.attr(meta.size, d, n, v, u, false));
+    data.attr(meta.size, d, n, v, u, false);
+    data.insert(meta.size);
   }
 
   @Override
   protected void addText(final byte[] tok, final int dis, final byte kind) {
-    data.insert(meta.size, data.text(meta.size, dis, tok, kind));
+    data.text(meta.size, dis, tok, kind);
+    data.insert(meta.size);
   }
 
   @Override

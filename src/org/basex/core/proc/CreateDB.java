@@ -76,7 +76,8 @@ public final class CreateDB extends ACreate {
    */
   public static Data xml(final Context ctx, final IO io, final String name)
       throws IOException {
-    if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
+    if(!io.exists()) throw new BuildException(FILEWHICH,
+        ctx.user.perm(User.ADMIN) ? io : io.name());
     return xml(ctx, new DirParser(io, ctx.prop), name);
   }
 
@@ -101,7 +102,7 @@ public final class CreateDB extends ACreate {
         new ValueBuilder(data, true).build());
       if(data.meta.atvindex) data.setIndex(Type.ATV,
         new ValueBuilder(data, false).build());
-      if(data.meta.ftxindex) data.setIndex(Type.FTX, 
+      if(data.meta.ftxindex) data.setIndex(Type.FTX,
         FTBuilder.get(data, data.meta.wildcards).build());
       data.close();
     } catch(final IOException ex) {

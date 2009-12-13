@@ -7,9 +7,12 @@ import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.Names;
+import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
+import org.basex.util.Bytes;
+import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
 
@@ -81,9 +84,6 @@ public abstract class Data {
     /** Full-text index. */ FTX,
   };
 
-  /** Table access file. */
-  protected TableAccess table;
-
   /** Meta data. */
   public MetaData meta;
   /** Tag index. */
@@ -102,6 +102,10 @@ public abstract class Data {
   /** Index References. */
   public int sizeID;
 
+  /** Array for caching new table entries. */
+  protected final Bytes b = new Bytes(1 << IO.NODEPOWER);
+  /** Table access file. */
+  protected TableAccess table;
   /** Text index. */
   protected Index txtindex;
   /** Attribute value index. */
@@ -209,6 +213,14 @@ public abstract class Data {
       case FTX: return ftxindex.info();
       default: return EMPTY;
     }
+  }
+
+  /**
+   * Sets the buffer to a new size.
+   * @param s buffer size (number of table entries)
+   */
+  public final void buffer(final int s) {
+    b.init(s << IO.NODEPOWER);
   }
 
   /**
@@ -503,7 +515,11 @@ public abstract class Data {
     updateDist(p, -s);
 
     // restore empty document node
-    if(empty) table.set(0, doc(0, 1, EMPTY));
+    if(empty) {
+      doc(0, 1, EMPTY);
+      table.set(0, b.get());
+      b.reset();
+    }
   }
 
   /**
@@ -528,62 +544,73 @@ public abstract class Data {
   public final void insert(final int ipre, final int ipar, final MemData md) {
     meta.update();
 
-    // copy database entries
-    final TokenBuilder tb = new TokenBuilder();
+    final int[] preStack = new int[IO.MAXHEIGHT];
+    int l = 0;
+
     final int ms = md.meta.size;
-    for(int mpre = 0; mpre < ms; mpre++) {
+    final int buf = Math.min(ms, IO.BLOCKSIZE >> IO.NODEPOWER);
+    // resize buffer to cache more entries
+    buffer(buf);
+
+    // loop through all entries
+    int mpre = -1;
+    while(++mpre != ms) {
+      if(mpre != 0 && mpre % buf == 0) insert(ipre + mpre - buf);
+
       final int mk = md.kind(mpre);
       final int mpar = md.parent(mpre, mk);
       final int pre = ipre + mpre;
       final int dis = mpar >= 0 ? mpre - mpar : pre - ipar;
+      final int par = pre - dis;
+      while(l > 0 && preStack[l - 1] > par) ns.close(preStack[--l]);
 
       switch(mk) {
         case DOC:
           // add document
-          tb.add(doc(pre, md.size(mpre, mk), md.text(mpre, true)));
+          doc(pre, md.size(mpre, mk), md.text(mpre, true));
           meta.ndocs++;
+          ns.open();
+          preStack[l++] = pre;
           break;
         case ELEM:
           // add element
           final boolean ne = md.nsFlag(mpre);
           byte[] nm = md.name(mpre, mk);
           if(ne) {
-            // [CG] introduce local namespace stack?
             final Atts at = md.ns(mpre);
-            for(int a = 0; a < at.size; a++) {
-              ns.add(pre, ipar, at.key[a], at.val[a]);
-            }
+            for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
           }
-          int u = ns.uri(nm, pre);
-          /*
-          System.out.print(string(nm) + ":\t");
-          System.out.print("IPRE/IPAR: " + ipre + "/" + ipar + "\t");
-          System.out.print("MPRE/MPAR: " + mpre + "/" + mpar + "\t");
-          System.out.print("DIS/URI: " + dis + "/" + u + "\n");
-          */
-          int n = tags.index(nm, null, false);
-          tb.add(elem(dis, n, md.attSize(mpre, mk), md.size(mpre, mk), u, ne));
+          ns.open();
+          elem(dis, tags.index(nm, null, false), md.attSize(mpre, mk),
+              md.size(mpre, mk), ns.uri(nm, true), ne);
+          preStack[l++] = pre;
           break;
         case TEXT:
         case COMM:
         case PI:
           // add text
-          tb.add(text(pre, dis, md.text(mpre, true), mk));
+          text(pre, dis, md.text(mpre, true), mk);
           break;
         case ATTR:
           // add attribute
           nm = md.name(mpre, mk);
-          n = atts.index(nm, null, false);
           if(md.nsFlag(mpre)) {
-            ns.add(ipar, ipar, pref(nm), md.ns.uri(md.uri(mpre, mk)));
+            ns.add(par, l == 0 ? ipar : preStack[l - 1], pref(nm),
+                md.ns.uri(md.uri(mpre, mk)));
             table.write2(ipar, 1, 1 << 15 | name(ipar));
           }
-          u = pref(nm).length != 0 ? ns.uri(nm, pre) : 0;
-          tb.add(attr(pre, dis, n, md.text(mpre, false), u, false));
+          final int u = pref(nm).length != 0 ? ns.uri(nm, pre) : 0;
+          //int u = ns.uri(nm, false);
+          attr(pre, dis, atts.index(nm, null, false), md.text(mpre, false),
+              u, false);
           break;
       }
     }
-    table.insert(ipre, tb.finish());
+    while(l > 0) ns.close(preStack[--l]);
+
+    Performance.gc(4);
+    System.out.println(Performance.getMem());
+    if(b.pos() != 0) insert(ipre + (mpre - 1) - (mpre - 1) % buf);
 
     // increase size of ancestors
     int p = ipar;
@@ -596,6 +623,8 @@ public abstract class Data {
 
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
+    // reset buffer to old size
+    buffer(1);
   }
 
   /**
@@ -665,99 +694,90 @@ public abstract class Data {
   // INSERTS WITHOUT TABLE UPDATES ============================================
 
   /**
-   * Inserts the specified table entries into the storage
+   * Inserts the internal buffer to the storage
    * without updating the table structure.
    * @param pre insert position
-   * @param entries to insert
    */
-  public final void insert(final int pre, final byte[] entries) {
-    table.insert(pre, entries);
+  public final void insert(final int pre) {
+    table.insert(pre, b.get());
+    b.reset();
   }
 
   /**
-   * Returns a document entry.
+   * Adds a document entry to the internal update buffer.
    * @param pre pre value
-   * @param sz node size
-   * @param val document name
-   * @return document entry
+   * @param s node size
+   * @param vl document name
    */
-  public byte[] doc(final int pre, final int sz, final byte[] val) {
-    // build and insert new entry
-    final long id = ++meta.lastid;
-    final long v = index(val, pre, true);
-    return new byte[] {
-        DOC, 0, 0, (byte) (v >> 32),
-        (byte) (v >> 24), (byte) (v >> 16), (byte) (v >> 8), (byte) v,
-        (byte) (sz >> 24), (byte) (sz >> 16), (byte) (sz >> 8), (byte) sz,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
+  public void doc(final int pre, final int s, final byte[] vl) {
+    final long i = ++meta.lastid;
+    final long v = index(vl, pre, true);
+    b.s(DOC); b.s(0); b.s(0); b.s(v >> 32);
+    b.s(v >> 24); b.s(v >> 16); b.s(v >> 8); b.s(v);
+    b.s(s >> 24); b.s(s >> 16); b.s(s >> 8); b.s(s);
+    b.s(i >> 24); b.s(i >> 16); b.s(i >> 8); b.s(i);
   }
 
   /**
-   * Returns an element entry.
-   * @param dis parent distance
+   * Adds an element entry to the internal update buffer.
+   * @param d parent distance
    * @param tn tag name index
    * @param as number of attributes
    * @param s node size
    * @param u namespace uri reference
    * @param ne namespace flag
-   * @return element entry
    */
-  public final byte[] elem(final int dis, final int tn,
-      final int as, final int s, final int u, final boolean ne) {
+  public final void elem(final int d, final int tn, final int as, final int s,
+      final int u, final boolean ne) {
 
     // build and insert new entry
-    final long id = ++meta.lastid;
-    return new byte[] {
-        (byte) (as << 3 | ELEM), (byte) ((ne ? 1 << 7 : 0) | (byte) (tn >> 8)),
-        (byte) tn, (byte) u,
-        (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
-        (byte) (s >> 24), (byte) (s >> 16), (byte) (s >> 8), (byte) s,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
+    final long i = ++meta.lastid;
+    final int n = ne ? 1 << 7 : 0;
+    b.s(as << 3 | ELEM); b.s(n | (byte) (tn >> 8)); b.s(tn); b.s(u);
+    b.s(d >> 24); b.s(d >> 16); b.s(d >> 8); b.s(d);
+    b.s(s >> 24); b.s(s >> 16); b.s(s >> 8); b.s(s);
+    b.s(i >> 24); b.s(i >> 16); b.s(i >> 8); b.s(i);
   }
 
   /**
-   * Returns a text entry.
+   * Adds a text entry to the internal update buffer.
    * @param pre insert position
-   * @param dis parent distance
-   * @param val tag name or text node
+   * @param d parent distance
+   * @param vl tag name or text node
    * @param k node kind
-   * @return text entry
    */
-  public final byte[] text(final int pre, final int dis,
-      final byte[] val, final int k) {
+  public final void text(final int pre, final int d, final byte[] vl,
+      final int k) {
 
     // build and insert new entry
-    final long id = ++meta.lastid;
-    final long len = index(val, pre, true);
-    return new byte[] {
-        (byte) k, 0, 0, (byte) (len >> 32),
-        (byte) (len >> 24), (byte) (len >> 16), (byte) (len >> 8), (byte) len,
-        (byte) (dis >> 24), (byte) (dis >> 16), (byte) (dis >> 8), (byte) dis,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
+    final long i = ++meta.lastid;
+    final long v = index(vl, pre, true);
+    b.s(k); b.s(0); b.s(0); b.s(v >> 32);
+    b.s(v >> 24); b.s(v >> 16); b.s(v >> 8); b.s(v);
+    b.s(d >> 24); b.s(d >> 16); b.s(d >> 8); b.s(d);
+    b.s(i >> 24); b.s(i >> 16); b.s(i >> 8); b.s(i);
   }
 
   /**
-   * Returns an attribute entry.
+   * Adds an attribute entry to the internal update buffer.
    * @param pre pre value
-   * @param dis parent distance
-   * @param name attribute name
-   * @param val attribute value
+   * @param d parent distance
+   * @param tn attribute name
+   * @param vl attribute value
    * @param u namespace uri reference
    * @param ne namespace flag
-   * @return attribute entry
    */
-  public final byte[] attr(final int pre, final int dis, final int name,
-      final byte[] val, final int u, final boolean ne) {
+  public final void attr(final int pre, final int d, final int tn,
+      final byte[] vl, final int u, final boolean ne) {
 
     // add attribute to text storage
-    final long len = index(val, pre, false);
-    final long id = ++meta.lastid;
-    return new byte[] {
-        (byte) (dis << 3 | ATTR), (byte) ((ne ? 1 << 7 : 0) |
-            (byte) (name >> 8)), (byte) name, (byte) (len >> 32),
-        (byte) (len >> 24), (byte) (len >> 16), (byte) (len >> 8), (byte) len,
-        0, 0, 0, (byte) u,
-        (byte) (id >> 24), (byte) (id >> 16), (byte) (id >> 8), (byte) id };
+    final long v = index(vl, pre, false);
+    final long i = ++meta.lastid;
+    final int n = ne ? 1 << 7 : 0;
+    b.s(d << 3 | ATTR); b.s(n | (byte) (tn >> 8)); b.s(tn); b.s(v >> 32);
+    b.s(v >> 24); b.s(v >> 16); b.s(v >> 8); b.s(v);
+    b.s(0); b.s(0); b.s(0); b.s(u);
+    b.s(i >> 24); b.s(i >> 16); b.s(i >> 8); b.s(i);
   }
 
   /**
@@ -777,7 +797,7 @@ public abstract class Data {
    * @return table
    */
   public String toString(final int s, final int e) {
-    return string(InfoTable.table(this, s, e)) + ns.toString(s, e);
+    return string(InfoTable.table(this, s, e));
   }
 
   @Override

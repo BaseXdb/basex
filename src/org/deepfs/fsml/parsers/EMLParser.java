@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -168,7 +167,7 @@ public final class EMLParser implements IFileParser {
      * @param text the text to decode
      * @param utf flag if its utf-encoded
      * @return the decoded text
-     * @throws DecodingException if any error occurs 
+     * @throws DecodingException if any error occurs
      */
     abstract byte[] decode(final byte[] text, final boolean utf)
         throws DecodingException;
@@ -563,7 +562,7 @@ public final class EMLParser implements IFileParser {
    * Decodes a text.
    * @param text the text to decode
    * @return the decoded text as byte array
-   * @throws DecodingException if the text could not be decoded.
+   * @throws DecodingException if the text could not be decoded
    */
   byte[] decode(final byte[] text) throws DecodingException {
     final int len = text.length;
@@ -661,7 +660,7 @@ public final class EMLParser implements IFileParser {
    * @param text the text to be decoded
    * @param utf flag if the text is utf-encoded
    * @return the decoded text
-   * @throws DecodingException if any error occurs.
+   * @throws DecodingException if any error occurs
    */
   static byte[] decodeBase64(final byte[] text, final boolean utf)
       throws DecodingException {

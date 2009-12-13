@@ -45,8 +45,8 @@ public final class Export extends Proc {
       final IO io = IO.get(args[0]);
       if(docs.length != 1) io.md();
       for(final int pre : docs) {
-        final IO file = io.merge(IO.get(docs.length == 1 && args[1] != null ?
-            args[1] : Token.string(data.text(pre, true))));
+        final IO file = io.merge(docs.length == 1 && args[1] != null ?
+            args[1] : Token.string(data.text(pre, true)));
 
         final PrintOutput po = new PrintOutput(file.path());
         final XMLSerializer xml = new XMLSerializer(po, false,

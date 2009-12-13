@@ -44,7 +44,7 @@ public enum MetaElem {
   DATETIME_ORIGINAL(DeepNS.FSMETA, "dateTimeOriginal", Type.DTM, false),
   /** Year. */
   YEAR(DeepNS.FSMETA, "year", Type.YEA, false),
-  
+
   // ----- integer fields ----------------------------------------------------
 
   /** Beats per minute. */

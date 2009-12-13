@@ -22,8 +22,6 @@ public class User {
   byte[] pw;
   /** Permission. */
   int perm;
-  /** Flag if user is logged in. */
-  boolean loggedIn;
 
   /**
    * Constructor.

@@ -34,7 +34,7 @@ public final class List extends Proc {
   protected boolean exec(final PrintOutput out) throws IOException {
     final Table table = new Table();
     table.desc = DATABASES;
-    
+
     final boolean admin = context.user.perm(User.CREATE);
     table.header.add(INFODBNAME);
     if(admin) table.header.add(INFODOC);

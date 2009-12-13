@@ -674,10 +674,7 @@ public class BaseXText extends BaseXPanel {
 
   /** Text Command. */
   abstract class TextCmd implements GUICommand {
-    public abstract void execute(final GUI main);
-    public abstract void refresh(final GUI main, final AbstractButton button);
     public boolean checked() { return false; }
-    public abstract String desc();
     public String help() { return null; }
     public String key() { return null; }
   }

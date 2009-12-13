@@ -46,58 +46,60 @@ public abstract class AProp {
     }
     if(prop == null) return;
 
-    final File file = new File(filename);
-    if(!file.exists()) return;
-
     final TokenBuilder err = new TokenBuilder();
-    try {
-      final BufferedReader br = new BufferedReader(new FileReader(file));
-      String line = null;
+    final File file = new File(filename);
+    if(!file.exists()) {
+      err.add("Saving properties in \"" + filename + "\"..." + NL, filename);
+    } else {
+      try {
+        final BufferedReader br = new BufferedReader(new FileReader(file));
+        String line = null;
 
-      while((line = br.readLine()) != null) {
-        line = line.trim();
-        if(line.isEmpty() || line.charAt(0) == '#') continue;
-        final int d = line.indexOf('=');
-        if(d < 0) {
-          err.add("%: \"%\" ignored. " + NL, filename, line);
-          continue;
-        }
+        while((line = br.readLine()) != null) {
+          line = line.trim();
+          if(line.isEmpty() || line.charAt(0) == '#') continue;
+          final int d = line.indexOf('=');
+          if(d < 0) {
+            err.add("%: \"%\" ignored. " + NL, filename, line);
+            continue;
+          }
 
-        final String val = line.substring(d + 1).trim();
-        String key = line.substring(0, d).trim().toUpperCase();
-        // extract numeric value in key
-        int num = 0;
-        for(int s = 0; s < key.length(); s++) {
-          if(Character.isDigit(key.charAt(s))) {
-            num = Integer.parseInt(key.substring(s));
-            key = key.substring(0, s);
-            break;
+          final String val = line.substring(d + 1).trim();
+          String key = line.substring(0, d).trim().toUpperCase();
+          // extract numeric value in key
+          int num = 0;
+          for(int s = 0; s < key.length(); s++) {
+            if(Character.isDigit(key.charAt(s))) {
+              num = Integer.parseInt(key.substring(s));
+              key = key.substring(0, s);
+              break;
+            }
+          }
+
+          final Object entry = props.get(key);
+          if(entry == null) {
+            err.add("%: \"%\" not found. " + NL, filename, key);
+          } else if(entry instanceof String) {
+            props.put(key, val);
+          } else if(entry instanceof Integer) {
+            props.put(key, Integer.parseInt(val));
+          } else if(entry instanceof Boolean) {
+            props.put(key, Boolean.parseBoolean(val));
+          } else if(entry instanceof String[]) {
+            if(num == 0) {
+              props.put(key, new String[Integer.parseInt(val)]);
+            } else {
+              ((String[]) entry)[num - 1] = val;
+            }
+          } else if(entry instanceof int[]) {
+            ((int[]) entry)[num] = Integer.parseInt(val);
           }
         }
-
-        final Object entry = props.get(key);
-        if(entry == null) {
-          err.add("%: \"%\" not found. " + NL, filename, key);
-        } else if(entry instanceof String) {
-          props.put(key, val);
-        } else if(entry instanceof Integer) {
-          props.put(key, Integer.parseInt(val));
-        } else if(entry instanceof Boolean) {
-          props.put(key, Boolean.parseBoolean(val));
-        } else if(entry instanceof String[]) {
-          if(num == 0) {
-            props.put(key, new String[Integer.parseInt(val)]);
-          } else {
-            ((String[]) entry)[num - 1] = val;
-          }
-        } else if(entry instanceof int[]) {
-          ((int[]) entry)[num] = Integer.parseInt(val);
-        }
+        br.close();
+      } catch(final Exception ex) {
+        err.add("% could not be parsed." + NL, filename);
+        Main.debug(ex);
       }
-      br.close();
-    } catch(final Exception ex) {
-      err.add("% could not be parsed." + NL, filename);
-      Main.debug(ex);
     }
     if(err.size() != 0) {
       Main.err(err.toString());

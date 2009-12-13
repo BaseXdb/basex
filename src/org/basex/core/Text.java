@@ -45,7 +45,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-  String VERSION = "5.91";
+  String VERSION = "5.95";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -228,7 +228,7 @@ public interface Text {
   /** Command help. */
   String[] HELPEXPORT = {
     "[" + PATH + "] [" + NAM + "?]", lang("ch_export1"),
-    lang("ch_export2", PATH)
+    lang("ch_export2", PATH + "/" + NAM + "?")
   };
   /** Command help. */
   String[] HELPOPTIMIZE = {

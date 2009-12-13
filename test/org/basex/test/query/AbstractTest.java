@@ -4,6 +4,7 @@ import org.basex.core.AProp;
 import org.basex.data.Nodes;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dec;
+import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
@@ -41,36 +42,45 @@ abstract class AbstractTest {
   /**
    * Creates an iterator for the specified string.
    * @param str string
-   * @return literal
+   * @return iterator
    */
   static SeqIter string(final String str) {
-    return new SeqIter(Str.get(Token.token(str)));
+    return item(Str.get(Token.token(str)));
   }
 
   /**
    * Creates an iterator for the specified double.
    * @param d double value
-   * @return literal
+   * @return iterator
    */
   static SeqIter itr(final long d) {
-    return new SeqIter(Itr.get(d));
+    return item(Itr.get(d));
   }
 
   /**
    * Creates an iterator for the specified double.
    * @param d double value
-   * @return literal
+   * @return iterator
    */
   static SeqIter dec(final double d) {
-    return new SeqIter(Dec.get(d));
+    return item(Dec.get(d));
   }
 
   /**
    * Creates an iterator for the specified boolean.
    * @param b boolean value
-   * @return literal
+   * @return iterator
    */
   static SeqIter bool(final boolean b) {
-    return new SeqIter(Bln.get(b));
+    return item(Bln.get(b));
+  }
+
+  /**
+   * Creates an iterator for the specified item.
+   * @param i item
+   * @return iterator
+   */
+  private static SeqIter item(final Item i) {
+    return new SeqIter(new Item[] { i }, 1);
   }
 }

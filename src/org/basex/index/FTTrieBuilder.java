@@ -96,7 +96,8 @@ public final class FTTrieBuilder extends FTBuilder {
       // write token
       outN.write((byte) -1);
       // write next pointer
-      int j = 1, js = next.get(0).length - 2;
+      int j = 1;
+      final int js = next.get(0).length - 2;
       for(; j < js; j++) {
         outN.writeInt(next.get(0)[j]); // pointer
         // first char of next node

@@ -2,23 +2,20 @@ package org.deepfs.fs;
 
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
-
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-
 import org.basex.build.fs.FSParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Open;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.MemData;
 import org.basex.data.Nodes;
-import org.basex.gui.view.ViewData;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Atts;
@@ -117,13 +114,12 @@ public final class DeepFS implements DataText {
     initNames();
     initRootStat();
   }
-  
+
   /**
    * Returns the text contents of this file node.
    * @param pre the pre value of a file node
    * @param data the data reference
    * @return the text contents
-   */
   public static byte[][] getText(final int pre, final Data data) {
     int node = pre;
     final ArrayList<byte[]> contents = new ArrayList<byte[]>();
@@ -142,6 +138,7 @@ public final class DeepFS implements DataText {
     }
     return contents.toArray(new byte[contents.size()][]);
   }
+   */
 
   /**
    * Initializes often used tags and attributes.
@@ -313,28 +310,19 @@ public final class DeepFS implements DataText {
     final MemData m = new MemData(data);
     final int tagID = isReg(mode) ? fileID : dirID;
     final byte [] time = token(System.currentTimeMillis());
-    m.insert(m.meta.size,
-        m.elem(1, tagID, nodeSize, nodeSize, 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 1, nameID, token(fn), 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 2, sizeID, ZERO, 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 3, modeID, token(mode), 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 4, uidID, token(getUID()), 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 5, gidID, token(getGID()), 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 6, atimeID, time, 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 7, ctimeID, time, 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 8, mtimeID, time, 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 9, nlinkID, token("1"), 0, false));
-    m.insert(m.meta.size,
-        m.attr(m.meta.size, 10, suffixID, getSuffix(fn), 0, false));
+    m.buffer(nodeSize);
+    m.elem(1, tagID, nodeSize, nodeSize, 0, false);
+    m.attr(1, 1, nameID, token(fn), 0, false);
+    m.attr(2, 2, sizeID, ZERO, 0, false);
+    m.attr(3, 3, modeID, token(mode), 0, false);
+    m.attr(4, 4, uidID, token(getUID()), 0, false);
+    m.attr(5, 5, gidID, token(getGID()), 0, false);
+    m.attr(6, 6, atimeID, time, 0, false);
+    m.attr(7, 7, ctimeID, time, 0, false);
+    m.attr(8, 8, mtimeID, time, 0, false);
+    m.attr(9, 9, nlinkID, token("1"), 0, false);
+    m.attr(10, 10, suffixID, getSuffix(fn), 0, false);
+    m.insert(0);
     return m;
   }
 
@@ -351,7 +339,7 @@ public final class DeepFS implements DataText {
    * Constructs attributes for file and directory tags.
    * @param f file name
    * @param root if true, attributes for a filesystem root node are created
-   *          instead of attributes for a simple directory.
+   *          instead of attributes for a simple directory
    * @return attributes as byte[][]
    */
   public static Atts atts(final File f, final boolean root) {
@@ -360,7 +348,6 @@ public final class DeepFS implements DataText {
 
     /** Temporary attribute array. */
     final Atts atts = new Atts();
-    atts.reset();
     if(root)
       atts.add(BACKINGSTORE, token(f.getAbsolutePath().replace("\\", "/")));
     else atts.add(NAME, token(name));
@@ -563,7 +550,7 @@ public final class DeepFS implements DataText {
   public boolean isFile(final int pre) {
     return isFile(data, pre);
   }
-  
+
   /**
    * Checks if this node is a file.
    * @param data data reference
@@ -583,7 +570,7 @@ public final class DeepFS implements DataText {
   public boolean isDir(final int pre) {
     return isDir(data, pre);
   }
-  
+
   /**
    * Checks if this node is a directory.
    * @param data data reference
@@ -594,13 +581,13 @@ public final class DeepFS implements DataText {
     return data.kind(pre) == Data.ELEM &&
         data.name(pre) == data.tags.id(token(DeepFile.DIR_NS));
   }
-  
+
   /**
    * Checks if this node is a file or adirectory.
    * @param data data reference
    * @param pre pre value
    * @return true if this node is a file or a directory, false otherwise
-   */  
+   */
   public static boolean isFileOrDir(final Data data, final int pre) {
     final int name = data.name(pre);
     return data.kind(pre) == Data.ELEM &&
@@ -705,7 +692,7 @@ public final class DeepFS implements DataText {
    */
   public void close() throws IOException {
     if(data.meta.prop.is(Prop.FUSE)) {
-      final String method = "[BaseX.close] ";
+      final String method = "[" + Text.NAME + ".close] ";
       Main.debug(method + "Initiating DeepFS shutdown sequence ");
       // -- unmount running fuse.
       for(int i = 3; i > 0; i--) {
@@ -845,12 +832,12 @@ public final class DeepFS implements DataText {
    * Unlink a file node.
    * @param path to file to be deleted
    * @return success or failure
-   */
   public int unlink(final String path) {
     final int n = delete(path, false, false);
     refresh();
     return n;
   }
+   */
 
   //  public int opendir(final String path) {
   //    try {

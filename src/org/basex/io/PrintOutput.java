@@ -42,17 +42,6 @@ public class PrintOutput extends OutputStream {
     os = out;
   }
 
-  /**
-   * Protected constructor, given an output stream and
-   * a maximum number of bytes to write.
-   * @param out output stream reference
-   * @param m maximum number of bytes to write
-   */
-  protected PrintOutput(final OutputStream out, final int m) {
-    os = out;
-    max = m;
-  }
-
   @Override
   public void write(final int b) throws IOException {
     if(size++ < max) os.write(b);

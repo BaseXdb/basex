@@ -2,10 +2,8 @@ package org.basex.query.ft;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;

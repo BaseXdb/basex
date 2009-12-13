@@ -35,7 +35,7 @@ public final class BaseXCombo extends JComboBox {
       }
     });
   }
-  
+
   /**
    * Constructor.
    * @param listen boolean for Itemlistener

@@ -2,7 +2,6 @@ package org.deepfs.fsml.parsers;
 
 import java.io.IOException;
 import java.util.TreeMap;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.util.Token;

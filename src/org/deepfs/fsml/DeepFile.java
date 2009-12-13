@@ -42,7 +42,7 @@ import org.deepfs.fsml.ser.FSMLSerializer;
  * @author Bastian Lemke
  */
 public class DeepFile {
-  
+
   // [BL] always set default file type
 
   /**
@@ -67,7 +67,7 @@ public class DeepFile {
   /** All xml contents that are extracted from the file as string. */
   private final ArrayList<Content> xmlContents;
 
-  /** The BaseX context. */
+  /** The database context. */
   private final Context context;
 
   /** Flag, if metadata extraction is finished. */
@@ -81,7 +81,7 @@ public class DeepFile {
   // ----- constructors. -------------------------------------------------------
   // ---------------------------------------------------------------------------
 
-  /**
+  /*
    * <p>
    * Constructor.
    * </p>
@@ -98,12 +98,11 @@ public class DeepFile {
    * @param file the name of the associated file in the file system
    * @throws IOException if any I/O error occurs
    * @see IFileParser#extract(DeepFile)
-   */
   public DeepFile(final String file) throws IOException {
     this(new File(file));
   }
 
-  /**
+  /*
    * <p>
    * Constructor.
    * </p>
@@ -120,12 +119,12 @@ public class DeepFile {
    * @param file the associated file in the file system
    * @throws IOException if any I/O error occurs
    * @see IFileParser#extract(DeepFile)
-   */
   public DeepFile(final File file) throws IOException {
     this(file.isDirectory() ? null : new BufferedFileChannel(file));
   }
+   */
 
-  /**
+  /*
    * <p>
    * Constructor.
    * </p>
@@ -141,7 +140,6 @@ public class DeepFile {
    * </p>
    * @param f the {@link BufferedFileChannel}
    * @throws IOException if any error occurs
-   */
   public DeepFile(final BufferedFileChannel f) throws IOException {
     this(new ParserRegistry(), f, new Context(), 0, f.size());
     final Prop p = context.prop;
@@ -149,6 +147,7 @@ public class DeepFile {
     p.set(Prop.FSCONT, true);
     p.set(Prop.FSXML, true);
   }
+   */
 
   /**
    * <p>
@@ -410,7 +409,7 @@ public class DeepFile {
   /**
    * Adds a metadata key-value pair for the current file.
    * @param e metadata element (the key)
-   * @param value the value to add.
+   * @param value the value to add
    * @param dataType the xml data type to set for this metadata element or
    *          <code>null</code> if the default data type should be used
    */
@@ -431,7 +430,7 @@ public class DeepFile {
   /**
    * Adds the metadata to the TreeMap.
    * @param e metadata element (the key)
-   * @param value the value to add.
+   * @param value the value to add
    */
   private void addMeta0(final MetaElem e, final String value) {
     final String s = value.trim();
@@ -687,7 +686,7 @@ public class DeepFile {
       addXML(position, byteCount, xml);
     } catch(final QueryException e) { return; }
   }
-  
+
   /**
    * Adds a xml document or fragment to the DeepFile.
    * @param pos offset of the xml document/fragement inside the file
@@ -707,7 +706,7 @@ public class DeepFile {
       xmlContents.add(new Content(pos, byteCount, xml));
     }
   }
-  
+
   /** Sets format and type to 'unknown'. */
   private void unknown() {
     final ArrayList<String> val = new ArrayList<String>();
@@ -732,7 +731,6 @@ public class DeepFile {
 
     /** Temporary attribute array. */
     final Atts atts = new Atts();
-    atts.reset();
     atts.add(NAME, token(name));
     atts.add(SIZE, token(bfc.size()));
     if(f.isDirectory()) atts.add(MODE, token(getSIFDIR() | 0755));
@@ -835,7 +833,7 @@ public class DeepFile {
     return content;
   }
 
-  /**
+  /*
    * Clones the DeepFile to map only a part of the file. The returned DeepFile
    * uses an underlying BufferedFileChannel that starts at the given byte
    * position. The cloned DeepFile must be finished after usage.
@@ -845,12 +843,12 @@ public class DeepFile {
    * @return the new DeepFile
    * @throws IOException if any error occurs
    * @see #finish()
-   */
   public DeepFile subfile(final long position, final int contentSize)
       throws IOException {
     bfc.position(position);
     return new DeepFile(this, contentSize);
   }
+   */
 
   /**
    * Clones the DeepFile to map only a part of the file. The returned DeepFile
@@ -944,7 +942,7 @@ public class DeepFile {
           + " content sections)";
     }
   }
-  
+
   /**
    * Verbose debug message.
    * @param str debug string
@@ -973,7 +971,7 @@ public class DeepFile {
      * Constructor.
      * @param pos offset inside the regular file
      * @param byteCount size of the text section (byte count)
-     * @param text the content.
+     * @param text the content
      */
     public Content(final long pos, final int byteCount, final String text) {
       o = pos;
@@ -996,10 +994,10 @@ public class DeepFile {
     public int getSize() {
       return s;
     }
-    
+
     /**
      * Returns the content.
-     * @return the content.
+     * @return the content
      */
     public String getContent() {
       return t;

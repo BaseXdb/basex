@@ -134,8 +134,7 @@ public class DBNode extends Nod {
   public final byte[] base() {
     if(type != Type.DOC) return EMPTY;
     final IO dir = IO.get(data.meta.file.path());
-    final IO file = IO.get(string(data.text(pre, true)));
-    return token(dir.merge(file).url());
+    return token(dir.merge(string(data.text(pre, true))).url());
   }
 
   @Override

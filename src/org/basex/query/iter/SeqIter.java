@@ -41,15 +41,6 @@ public final class SeqIter extends Iter implements Result {
   }
 
   /**
-   * Constructor.
-   * @param it initial item
-   */
-  public SeqIter(final Item it) {
-    item = new Item[] { it };
-    size = 1;
-  }
-
-  /**
    * Constructor, specifying the query context.
    * @param c query context
    */

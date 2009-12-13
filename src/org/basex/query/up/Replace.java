@@ -3,7 +3,6 @@ package org.basex.query.up;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-
 import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;

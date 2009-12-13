@@ -117,8 +117,10 @@ public final class MetaData {
    */
   public static boolean found(final String path, final String db,
       final Prop pr) {
+
     // true is returned if path and database name are equal and if the db exists
-    if(path.equals(db) && pr.dbpath(db).exists()) return true;
+    final boolean exists = pr.dbpath(db).exists();
+    if(!exists || path.equals(db)) return exists;
 
     DataInput in = null;
     try {

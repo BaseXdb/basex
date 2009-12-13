@@ -43,15 +43,6 @@ public final class IntMap extends TokenSet {
     return key != null ? values[id(key)] : 0;
   }
 
-  /**
-   * Returns the specified value.
-   * @param p value index
-   * @return value
-   */
-  public int value(final int p) {
-    return values[p];
-  }
-
   @Override
   protected void rehash() {
     super.rehash();

@@ -3,13 +3,11 @@ package org.deepfs.fsml.ser;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import static org.deepfs.fsml.DeepFile.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
-
 import org.basex.util.Atts;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.DeepFile;
@@ -55,11 +53,11 @@ public class FSMLSerializer {
     ser.serialize();
     return ser.toString();
   }
-  
+
   /**
-   * Converts a BaseX atts object into a String array.
-   * @param atts the atts to convert
-   * @return the xml attributes as String array.
+   * Converts attributes object into a String array.
+   * @param atts the attributes to convert
+   * @return the xml attributes as String array
    */
   private static String[][] convAtts(final Atts atts) {
     if(atts == null) return null;
@@ -76,7 +74,7 @@ public class FSMLSerializer {
    * Serializes a file without metadata and content.
    * @param file the file to serialize
    * @param root if true, a filesystem root is are created instead of a simple
-   *          directory.
+   *          directory
    * @return the xml data as string
    */
   public static String serializeFile(final File file,
@@ -99,7 +97,7 @@ public class FSMLSerializer {
     serializeDeepFiles(false, deepFile);
     return xml.toString();
   }
-  
+
   /**
    * Starts an xml element.
    * @param e the name of the element
@@ -142,7 +140,7 @@ public class FSMLSerializer {
     text(t);
     endElem(n);
   }
-  
+
   /**
    * Checks if a char has to be escaped and adds it to the output.
    * @param ch the char
@@ -255,7 +253,7 @@ public class FSMLSerializer {
       endElem(subfile ? CONTENT_NS : FILE_NS);
     }
   }
-  
+
   @Override
   public String toString() {
     return xml.toString();

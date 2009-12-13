@@ -40,7 +40,7 @@ public abstract class Builder extends Progress {
   protected final PathSummary path = new PathSummary();
 
   /** Parent stack. */
-  private final int[] parStack = new int[IO.MAXHEIGHT];
+  private final int[] preStack = new int[IO.MAXHEIGHT];
   /** Tag stack. */
   private final int[] tagStack = new int[IO.MAXHEIGHT];
   /** Size Stack. */
@@ -94,10 +94,10 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void startDoc(final byte[] doc) throws IOException {
-    parStack[lvl++] = meta.size;
+    preStack[lvl++] = meta.size;
     if(meta.pathindex) path.add(0, lvl, Data.DOC);
     addDoc(doc);
-    ns.open(meta.size);
+    ns.open();
   }
 
   /**
@@ -105,7 +105,7 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   public final void endDoc() throws IOException {
-    final int pre = parStack[--lvl];
+    final int pre = preStack[--lvl];
     setSize(pre, meta.size - pre);
     meta.ndocs++;
     ns.close(meta.size);
@@ -118,7 +118,7 @@ public abstract class Builder extends Progress {
    * @param uri namespace uri
    */
   public final void startNS(final byte[] pref, final byte[] uri) {
-    ns.add(pref, uri);
+    ns.add(pref, uri, meta.size);
   }
 
   /**
@@ -146,7 +146,7 @@ public abstract class Builder extends Progress {
       throws IOException {
 
     addElem(tag, att);
-    ns.close(parStack[lvl]);
+    ns.close(preStack[lvl]);
   }
 
   /**
@@ -160,7 +160,7 @@ public abstract class Builder extends Progress {
     if(--lvl == 0 || tags.id(tag) != tagStack[lvl])
       error(CLOSINGTAG, parser.det(), tag, tags.key(tagStack[lvl]));
 
-    final int pre = parStack[lvl];
+    final int pre = preStack[lvl];
     setSize(pre, meta.size - pre);
     ns.close(pre);
   }
@@ -173,7 +173,7 @@ public abstract class Builder extends Progress {
   public final void text(final TokenBuilder t) throws IOException {
     // chop whitespaces in text nodes
     if(meta.chop) t.chop();
-    
+
     // check if text appears before or after root node
     if((meta.chop && t.size() != 0 || !t.wsp()) && (!inDoc || lvl == 1))
       error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
@@ -330,12 +330,12 @@ public abstract class Builder extends Progress {
     final int pre = meta.size;
     // remember tag id and parent reference
     tagStack[lvl] = n;
-    parStack[lvl] = pre;
+    preStack[lvl] = pre;
 
     // get and store element references
-    final int dis = lvl != 0 ? pre - parStack[lvl - 1] : 1;
+    final int dis = lvl != 0 ? pre - preStack[lvl - 1] : 1;
     final int as = att.size;
-    final boolean ne = ns.open(pre);
+    final boolean ne = ns.open();
     int u = ns.uri(tag, true);
     addElem(dis, n, as + 1, u, ne);
 
@@ -399,7 +399,7 @@ public abstract class Builder extends Progress {
     // text node processing for statistics
     if(kind == Data.TEXT) tags.index(tagStack[lvl - 1], t);
     if(meta.pathindex) path.add(0, lvl, kind);
-    addText(t, lvl == 0 ? 1 : meta.size - parStack[lvl - 1], kind);
+    addText(t, lvl == 0 ? 1 : meta.size - preStack[lvl - 1], kind);
   }
 
   /**

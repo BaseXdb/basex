@@ -696,7 +696,7 @@ public final class XMLScanner extends Progress {
         try {
           final String dir = input.file.dir();
           IO file = IO.get(dir == null ? name : dir + "/" + name);
-          if(!file.exists()) file = input.file.merge(IO.get(name));
+          if(!file.exists()) file = input.file.merge(name);
           cont = file.content();
           input = new XMLInput(new IOContent(cont, name));
         } catch(final IOException ex) {

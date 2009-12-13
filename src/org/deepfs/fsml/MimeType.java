@@ -128,7 +128,7 @@ public enum MimeType {
     Main.debug("MIME type not found: " + name);
     return null;
   }
-  
+
   @Override
   public String toString() {
     return val;

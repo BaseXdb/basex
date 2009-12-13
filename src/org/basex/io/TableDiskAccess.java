@@ -240,7 +240,6 @@ public final class TableDiskAccess extends TableAccess {
     // save entries to be added into new block after inserted blocks
     final int move = nextPre - pre;
     final byte[] rest = new byte[move << IO.NODEPOWER];
-
     copy(bf.buf, ins, rest, 0, move);
 
     // make room in index for new blocks
@@ -297,22 +296,6 @@ public final class TableDiskAccess extends TableAccess {
       final int o = cursor(pre);
       System.arraycopy(entries, l, bf.buf, o, 1 << IO.NODEPOWER);
     }
-  }
-
-  /**
-   * Returns the number of entries; needed for JUnit tests.
-   * @return number of used blocks
-   */
-  public synchronized int size() {
-    return meta.size;
-  }
-
-  /**
-   * Returns the number of used blocks; needed for JUnit tests.
-   * @return number of used blocks
-   */
-  public synchronized int blocks() {
-    return blocks;
   }
 
   // PRIVATE METHODS ==========================================================
@@ -432,5 +415,23 @@ public final class TableDiskAccess extends TableAccess {
     System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
         l << IO.NODEPOWER);
     bf.dirty = true;
+  }
+
+  // TEST METHODS =============================================================
+
+  /**
+   * Returns the number of entries; needed for JUnit tests.
+   * @return number of used blocks
+   */
+  public synchronized int size() {
+    return meta.size;
+  }
+
+  /**
+   * Returns the number of used blocks; needed for JUnit tests.
+   * @return number of used blocks
+   */
+  public synchronized int blocks() {
+    return blocks;
   }
 }

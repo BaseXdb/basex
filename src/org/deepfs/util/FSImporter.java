@@ -147,7 +147,7 @@ public final class FSImporter implements FSTraversal {
       if(xmlFragment == null)
         xmlFragment = FSMLSerializer.serializeFile(f, false);
     }
-    
+
     if(xmlFragment != null) {
       final String query = "insert nodes " + xmlFragment + " into "
           + targetNode;

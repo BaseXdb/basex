@@ -7,7 +7,7 @@ package org.deepfs.jfuse;
 /**
  * This class assembles all references to the external jfuse library.
  *
- * In order to keep BaseX independent from external libraries this class
+ * In order to keep the database independent from external libraries this class
  * assembles all calls to the Java FUSE bindings and provides default values. In
  * case jfuse.jar is removed from the build path this class and the actual FUSE
  * implementation should be the only classes to be modified or removed. In fact,
@@ -33,7 +33,6 @@ public final class JFUSEAdapter { //implements FileModeFlags {
   /**
    * Checks (and loads) native Java FUSE bindings.
    * @return true in case of success
-   */
   public static boolean loadJFUSELibrary() {
 //    try {
 //      JNILoader.ensureLoaded();
@@ -43,6 +42,7 @@ public final class JFUSEAdapter { //implements FileModeFlags {
 //    }
      return false;
   }
+   */
 
   /**
    * Gets (native) user id or default value.

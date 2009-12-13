@@ -151,11 +151,7 @@ public abstract class IO {
    * @param f filename of the file
    * @return contents
    */
-  @SuppressWarnings("unused")
-  public IO merge(final IO f) {
-    Main.notexpected();
-    return null;
-  }
+  public abstract IO merge(final String f);
 
   /**
    * Creates the directory.

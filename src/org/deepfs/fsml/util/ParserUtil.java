@@ -17,28 +17,29 @@ import org.basex.util.Token;
  */
 public final class ParserUtil {
 
-  /** 1 Kibibyte. */
+  /* 1 Kibibyte.
   private static final int KIB = 1024;
-  /** 1 Mebibyte. */
+  /* 1 Mebibyte.
   private static final int MIB = 1048576;
-  /** 1 Gibibyte. */
+  /* 1 Gibibyte.
   private static final int GIB = 1073741824;
-  /** 1 Tibibyte. */
+  /* 1 Tibibyte.
   private static final long TIB = 1099511627776L;
-  /** 1 Pebibyte. */
+  /* 1 Pebibyte.
   private static final long PIB = 1125899906842624L;
-  /** Byte abbreviation. */
+  /* Byte abbreviation.
   private static final byte[] B_STR = token(" B");
-  /** Kibibyte abbreviation. */
+  /* Kibibyte abbreviation.
   private static final byte[] KIB_STR = token(" KiB");
-  /** Mebibyte abbreviation. */
+  /* Mebibyte abbreviation.
   private static final byte[] MIB_STR = token(" MiB");
-  /** Gibibyte abbreviation. */
+  /* Gibibyte abbreviation.
   private static final byte[] GIB_STR = token(" GiB");
-  /** Tibibyte abbreviation. */
+  /* Tibibyte abbreviation.
   private static final byte[] TIB_STR = token(" TiB");
-  /** Pebibyte abbreviation. */
+  /* Pebibyte abbreviation.
   private static final byte[] PIB_STR = token(" PiB");
+  */
 
   /** Factory to create date and duration values. */
   private static DatatypeFactory factory;
@@ -138,13 +139,12 @@ public final class ParserUtil {
     return convertDateTime(gc);
   }
 
-  /**
+  /*
    * Converts the given values into an xml date value.
    * @param year the year
    * @param month the month
    * @param day the number of days
    * @return the calendar
-   */
   public static XMLGregorianCalendar convertDate(final int year,
       final int month, final int day) {
     final XMLGregorianCalendar xgc = factory == null ? null
@@ -154,13 +154,13 @@ public final class ParserUtil {
     xgc.setDay(day);
     return xgc;
   }
+   */
 
-  /**
+  /*
    * Converts the given values into an xml date value.
    * @param year the year
    * @param month the month
    * @return the calendar
-   */
   public static XMLGregorianCalendar convertYearMonth(final int year,
       final int month) {
     final XMLGregorianCalendar xgc = factory == null ? null
@@ -169,6 +169,7 @@ public final class ParserUtil {
     xgc.setMonth(month);
     return xgc;
   }
+   */
 
   /**
    * Converts a year value to an xml date value.
@@ -187,7 +188,6 @@ public final class ParserUtil {
    * 100 MiB).
    * @param size the number of bytes to convert to a human readable string
    * @return the size as byte array
-   */
   public static byte[] humanReadableSize(final long size) {
     final float d = 100.0f;
     assert size >= 0;
@@ -204,4 +204,5 @@ public final class ParserUtil {
       return concat(token(Math.round(size * d / PIB) / d), PIB_STR);
     }
   }
+   */
 }

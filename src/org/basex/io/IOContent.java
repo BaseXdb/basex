@@ -43,8 +43,8 @@ public final class IOContent extends IO {
   }
 
   @Override
-  public IO merge(final IO f) {
-    return f;
+  public IO merge(final String f) {
+    return IO.get(f);
   }
 
   @Override

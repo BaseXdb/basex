@@ -14,6 +14,7 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.Text;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -230,7 +231,7 @@ public final class DeepShell {
    * @param args argument vector
    */
   @Command(shortcut = 'i',
-      args = "", help = "info table (BaseX command)")
+      args = "", help = "info table (" + Text.NAME + " command)")
   public void info(final String[] args) {
     if(args.length != 1) {
       help(new String[] { "help", "info"});

@@ -35,7 +35,7 @@ public final class IOUrl extends IO {
   }
 
   @Override
-  public IO merge(final IO f) {
+  public IO merge(final String f) {
     return this;
   }
 }

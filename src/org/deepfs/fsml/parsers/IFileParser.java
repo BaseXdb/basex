@@ -1,7 +1,6 @@
 package org.deepfs.fsml.parsers;
 
 import java.io.IOException;
-
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 

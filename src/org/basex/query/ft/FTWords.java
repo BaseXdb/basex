@@ -266,7 +266,7 @@ public final class FTWords extends FTExpr {
       final byte[] tok = ft.get();
       if(tok.length > Token.MAXLEN) return false;
       if(fto.sw != null && fto.sw.id(tok) != 0) continue;
-      
+
       // divide by 4 to favor full text index requests
       final int s = (ic.data.nrIDs(ft) + 3) >> 2;
       if(ic.is > s || ic.is == 0) ic.is = s;

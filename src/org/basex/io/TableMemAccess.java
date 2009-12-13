@@ -218,13 +218,13 @@ public final class TableMemAccess extends TableAccess {
    * @param p position
    */
   private void copy(final long v, final byte[] a, final int p) {
-    a[p    ] = (byte) (v >>> 56);
-    a[p + 1] = (byte) (v >>> 48);
-    a[p + 2] = (byte) (v >>> 40);
-    a[p + 3] = (byte) (v >>> 32);
-    a[p + 4] = (byte) (v >>> 24);
-    a[p + 5] = (byte) (v >>> 16);
-    a[p + 6] = (byte) (v >>>  8);
+    a[p    ] = (byte) (v >> 56);
+    a[p + 1] = (byte) (v >> 48);
+    a[p + 2] = (byte) (v >> 40);
+    a[p + 3] = (byte) (v >> 32);
+    a[p + 4] = (byte) (v >> 24);
+    a[p + 5] = (byte) (v >> 16);
+    a[p + 6] = (byte) (v >>  8);
     a[p + 7] = (byte) v;
   }
 }

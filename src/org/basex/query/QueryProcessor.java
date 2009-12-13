@@ -7,7 +7,6 @@ import org.basex.core.Progress;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
-import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -82,15 +81,6 @@ public final class QueryProcessor extends Progress {
   public Iter iter() throws QueryException {
     compile();
     return ctx.iter();
-  }
-
-  /**
-   * Returns the result as an item.
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  public Item eval() throws QueryException {
-    return iter().finish();
   }
 
   /**

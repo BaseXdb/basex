@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;

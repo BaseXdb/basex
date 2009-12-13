@@ -146,8 +146,8 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public IO merge(final IO f) {
-    return f instanceof IOUrl ? f : new IOFile(dir() + "/" + f.name());
+  public IO merge(final String f) {
+    return new IOFile(new File(dir(), f));
   }
 
   @Override

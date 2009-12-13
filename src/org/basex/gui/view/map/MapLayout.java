@@ -71,28 +71,6 @@ final class MapLayout {
   }
 
   /**
-   * Computes average aspect ratio of a rectangle list.
-   * note: as specified by Shneiderman only leaf nodes should be checked
-   * @param r array list of rectangles
-   * @return aspect ratio
-   */
-  // [JH] why not weight the bigger nodes more than smaller ones???
-  static double aar(final MapRects r) {
-    double aar = 0;
-    int nrLeaves = 1;
-    for(int i = 0; i < r.size; i++) {
-      final MapRect curr = r.get(i);
-      // only leaves: children(data, curr.pre).size == 0 && curr.isLeaf
-      if(curr.w != 0 && curr.h != 0) {
-        nrLeaves++;
-        aar += curr.w > curr.h ? (double) curr.w / (double) curr.h :
-          (double) curr.h / (double) curr.w;
-      }
-    }
-    return nrLeaves > 0 ? aar / nrLeaves : -1;
-  }
-
-  /**
    * Returns all children of the specified node.
    * @param par parent node
    * @return children

@@ -68,7 +68,7 @@ public final class DiskBuilder extends Builder {
     xout = new DataOutput(meta.file(DATATXT), bs);
     vout = new DataOutput(meta.file(DATAATV), bs);
     sout = new DataOutput(meta.file(DATATMP), bs);
-    
+
     parse(db);
     close();
 

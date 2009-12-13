@@ -75,14 +75,12 @@ public final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Item run(final QueryContext ctx) throws QueryException {
-    final byte[] name = checkStr(expr[0], ctx);
-    final IO io = IO.get(string(name));
-    if(!ctx.context.user.perm(User.ADMIN) || !io.exists()) Err.or(NODOC, name);
+    final IO io = file(ctx);
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
       Main.debug(ex);
-      Err.or(FILEERR, name);
+      Err.or(NODOC, ex.getMessage());
       return null;
     }
   }
@@ -103,15 +101,13 @@ public final class FNBaseX extends Fun {
   }
 
   /**
-   * Performs the text function.
+   * Performs the read function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
   private Item read(final QueryContext ctx) throws QueryException {
-    final byte[] name = checkStr(expr[0], ctx);
-    final IO io = IO.get(string(name));
-    if(!ctx.context.user.perm(User.ADMIN) || !io.exists()) Err.or(NODOC, name);
+    final IO io = file(ctx);
     try {
       final XMLInput in = new XMLInput(io);
       final int len = (int) in.length();
@@ -121,9 +117,22 @@ public final class FNBaseX extends Fun {
       return Str.get(tb.finish());
     } catch(final IOException ex) {
       Main.debug(ex);
-      Err.or(FILEERR, name);
+      Err.or(NODOC, ex.getMessage());
       return null;
     }
+  }
+
+  /**
+   * Returns a file instance for the first argument.
+   * @param ctx query context
+   * @return io instance
+   * @throws QueryException query exception
+   */
+  private IO file(final QueryContext ctx) throws QueryException {
+    final byte[] name = checkStr(expr[0], ctx);
+    final IO io = IO.get(string(name));
+    if(!ctx.context.user.perm(User.ADMIN) || !io.exists()) Err.or(DOCERR, name);
+    return io;
   }
 
   /**

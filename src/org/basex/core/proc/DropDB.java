@@ -41,7 +41,7 @@ public final class DropDB extends ACreate {
    * @param pr database properties
    * @return success flag
    */
-  public static boolean drop(final String db, final Prop pr) {
+  public static synchronized boolean drop(final String db, final Prop pr) {
     return delete(db, null, pr);
   }
 

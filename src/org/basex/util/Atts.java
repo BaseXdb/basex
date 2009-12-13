@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import java.util.Arrays;
+import org.basex.core.Main;
 
 /**
  * This is a simple container for attributes (keys and values).
@@ -80,5 +81,17 @@ public final class Atts {
   public Atts reset() {
     size = 0;
     return this;
+  }
+
+  @Override
+  public String toString() {
+    final TokenBuilder sb = new TokenBuilder(Main.name(this) + "[");
+    for(int i = 0; i < size; i++) {
+      sb.add(key[i]);
+      sb.add("=\"");
+      sb.add(val[i]);
+      sb.add("\"");
+    }
+    return sb.add("]").toString();
   }
 }

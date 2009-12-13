@@ -241,8 +241,6 @@ public class TreeCaching implements TreeViewOptions {
    * Finds pre value in cached nodes and returns level and index position.
    * @param pre pre value
    * @return level and position pair
-   */
-  @SuppressWarnings("unused")
   private int[] findPre(final int pre) {
 
     int pos = -1;
@@ -258,6 +256,7 @@ public class TreeCaching implements TreeViewOptions {
 
     return pos > -1 ? new int[] { l, pos} : null;
   }
+   */
 
   /**
    * Determines the index position of given pre value.

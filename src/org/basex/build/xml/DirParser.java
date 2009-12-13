@@ -33,7 +33,7 @@ public final class DirParser extends Parser {
   public DirParser(final IO f, final Prop pr) {
     super(f, pr);
     root = IO.get(f.path());
-    
+
     if(f.isDir()) {
       filter = pr.get(Prop.CREATEFILTER).replaceAll("\\*", ".*");
       if(!filter.contains(".")) filter = ".*" + filter + ".*";

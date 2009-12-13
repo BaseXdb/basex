@@ -234,9 +234,9 @@ public interface DataText {
   /** Namespace header. */
   byte[] TABLENS = token("NS");
   /** Prefix header. */
-  byte[] TABLEPREF = token("PREFIX");
+  byte[] TABLEPREF = token("PREF");
   /** URI header. */
-  byte[] TABLEURI = token("NAMESPACE");
+  byte[] TABLEURI = token("URI");
   /** Table Kinds. */
   byte[][] TABLEKINDS = {
       { 'D', 'O', 'C', ' ' }, { 'E', 'L', 'E', 'M' },

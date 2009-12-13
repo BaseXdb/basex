@@ -155,15 +155,6 @@ public final class Context {
   }
 
   /**
-   * Returns the number of references of the specified database in the pool.
-   * @param db name of the database
-   * @return number of references
-   */
-  public int size(final String db) {
-    return pool.size(db);
-  }
-
-  /**
    * Adds the specified session.
    * @param s session to be added
    */

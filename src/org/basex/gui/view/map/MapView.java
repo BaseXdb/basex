@@ -134,6 +134,7 @@ public final class MapView extends View implements Runnable {
     mainRects = null;
     focused = null;
     textLen = null;
+    mainMap = null;
     zoomStep = 0;
 
     final Data data = gui.context.data;
@@ -829,10 +830,13 @@ public final class MapView extends View implements Runnable {
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
     if(gui.updating || gui.context.focused == -1) return;
-    // [CG] MapView: strange behaviour of mouse wheel
-    if(e.getWheelRotation() <= 0) gui.notify.context(
-        new Nodes(gui.context.focused, gui.context.data), false, null);
-    else gui.notify.hist(false);
+    if(e.getWheelRotation() <= 0) {
+      final Nodes m = new Nodes(gui.context.focused, gui.context.data);
+      gui.context.marked = m;
+      gui.notify.context(m, false, null);
+    } else {
+      gui.notify.hist(false);
+    }
   }
 
   @Override
@@ -899,11 +903,10 @@ public final class MapView extends View implements Runnable {
 
     final int[] parStack = new int[IO.MAXHEIGHT];
     int l = 0;
-    int par = 0;
 
     for(int pre = 0; pre < size; pre++) {
       final int kind = data.kind(pre);
-      par = data.parent(pre, kind);
+      final int par = data.parent(pre, kind);
 
       final int ll = l;
       while(l > 0 && parStack[l - 1] > par) {
@@ -916,7 +919,7 @@ public final class MapView extends View implements Runnable {
 
       if(data.fs != null) {
         if(DeepFS.isFileOrDir(data, pre)) {
-          textLen[pre] = Token.toInt(data.atom(pre + 2));
+          textLen[pre] = Token.toInt(ViewData.attValue(data, data.sizeID, pre));
           if(DeepFS.isFile(data, pre))
             pre += data.size(pre, kind) - 1; // skip file content
           l++;
@@ -925,8 +928,7 @@ public final class MapView extends View implements Runnable {
         if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI ||
             kind == Data.ATTR) {
           textLen[pre] = data.textLen(pre, kind != Data.ATTR);
-        } else if((kind == Data.ELEM || kind == Data.DOC) &&
-            data.size(pre, kind) > 1) {
+        } else if(kind == Data.ELEM || kind == Data.DOC) {
           l++;
         }
       }
