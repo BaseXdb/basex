@@ -133,7 +133,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     return item();
   }
 
-  public synchronized XMLStreamReader getItemAsStream() throws XQException {
+  public XMLStreamReader getItemAsStream() throws XQException {
     opened();
     return item().getItemAsStream();
   }
@@ -169,7 +169,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     return pos != -1 ? pos : iter.size() + 1;
   }
 
-  public synchronized XMLStreamReader getSequenceAsStream() throws XQException {
+  public XMLStreamReader getSequenceAsStream() throws XQException {
     opened();
     if(it != null && !next) throw new BXQException(TWICE);
     return new IterStreamReader(result);

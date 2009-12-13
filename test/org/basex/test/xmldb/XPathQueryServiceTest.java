@@ -123,7 +123,7 @@ public class XPathQueryServiceTest extends TestCase {
     try {
       serv.queryResource("UnknownDoc", "/");
       fail("Query was executed on unknown document.");
-    } catch(final XMLDBException ex) { }
+    } catch(final XMLDBException ex) { /* ignored. */ }
   }
 
   @Test
