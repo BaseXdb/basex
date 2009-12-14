@@ -22,9 +22,8 @@ public final class ObsoleteTexts {
   /** Classes to test. */
   private static final Class<?>[] CLASSES = {
     org.basex.core.Text.class,       org.basex.build.BuildText.class,
-    org.basex.build.fs.FSText.class, org.basex.data.DataText.class,
-    org.basex.api.dom.BXText.class,  org.basex.query.QueryText.class,
-    org.basex.query.QueryTokens.class,
+    org.basex.data.DataText.class,   org.basex.api.dom.BXText.class,
+    org.basex.query.QueryText.class, org.basex.query.QueryTokens.class,
     org.basex.build.mediovis.MAB2.class,
   };
 

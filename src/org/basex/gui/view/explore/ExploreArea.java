@@ -30,13 +30,13 @@ import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
-import org.deepfs.fsml.DeepFile;
 
 /**
  * This is a simple user search panel.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
+ * @author Bastian Lemke
  */
 final class ExploreArea extends BaseXPanel implements ActionListener {
   /** Component width. */
@@ -144,7 +144,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final TokenList sl = new TokenList();
     final int cs = panel.getComponentCount();
     final boolean fs = data.fs != null;
-    if(fs) sl.add(Token.token(DeepFile.FILE_NS));
+    if(fs) sl.add(Token.token(DataText.S_FILE));
     else {
       for(int c = 0; c < cs; c += 2) {
         final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
@@ -220,6 +220,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
           final Names names = att ? data.atts : data.tags;
           final byte[] key = Token.token(att ? item.substring(1) : item);
           final StatsKey stat = names.stat(names.id(key));
+          // [BL] detect xml duration/dateTime values and add sliders
           switch(stat.kind) {
             case INT:
               addSlider(stat.min, stat.max, cp + 1,
@@ -304,7 +305,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         }
       }
 
-      if(data.fs != null) if(tb.size() == 0) tb.add("//%", DeepFile.FILE_NS);
+      if(data.fs != null) if(tb.size() == 0) tb.add("//%", DataText.S_FILE);
       if(attr) {
         if(tb.size() == 0) tb.add("//*");
         if(pattern.isEmpty()) pattern = PATSIMPLE;

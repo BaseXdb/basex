@@ -388,7 +388,7 @@ public final class BufferedFileChannel {
     final long len = remaining();
     skip(len);
     if(parent != null) {
-      parent.rem = fc.size() - fc.position() + parent.mark;
+      parent.rem -= size();
       parent.locked = false;
     }
   }

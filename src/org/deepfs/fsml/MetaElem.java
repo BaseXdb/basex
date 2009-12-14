@@ -2,6 +2,7 @@ package org.deepfs.fsml;
 
 import org.basex.core.Main;
 import org.basex.query.item.Type;
+import org.basex.util.Token;
 
 /**
  * Available metadata elements.
@@ -307,6 +308,14 @@ public enum MetaElem {
    */
   public String get() {
     return n;
+  }
+  
+  /**
+   * Returns the metadata attribute name as byte[].
+   * @return the metadata attribute name as byte[]
+   */
+  public byte[] tok() {
+    return Token.token(n);
   }
 
   /**

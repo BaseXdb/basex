@@ -3,8 +3,7 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.File;
 import java.io.IOException;
-import org.basex.build.fs.FSParser;
-import org.basex.build.fs.FSTraversalParser;
+import org.basex.build.FSParser;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -44,11 +43,7 @@ public final class CreateFS extends ACreate {
     }
     final String db = args[1];
 
-    // old FSParser
-    if(!prop.is(Prop.FSTRAVERSAL)) return build(new FSParser(path, prop), db);
-
-    // XQUP-based implementation
-    FSTraversalParser parser = new FSTraversalParser(path, context, db);
+    FSParser parser = new FSParser(path, context, db);
     progress(parser);
     parser.parse();
 

@@ -5,7 +5,6 @@ import static org.deepfs.jfuse.JFUSEAdapter.*;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import org.basex.build.fs.FSParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -24,7 +23,6 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.deepfs.DeepShell;
 import org.deepfs.jfuse.DeepStat;
-import org.deepfs.util.FSImporter;
 
 /**
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
@@ -326,14 +324,14 @@ public final class DeepFS implements DataText {
     return m;
   }
 
-  /**
-   * Offset of size value.
-   * Used to calculated the dir size in {@link FSParser}.
-   * @return offset of size attribute
-   */
-  public static int getSizeOffset() {
-    return 3;
-  }
+  // /**
+  // * Offset of size value.
+  // * Used to calculated the dir size in {@link FSParser}.
+  // * @return offset of size attribute
+  // */
+  // public static int getSizeOffset() {
+  // return 3;
+  // }
 
   /**
    * Constructs attributes for file and directory tags.
@@ -569,8 +567,8 @@ public final class DeepFS implements DataText {
     final int name = data.name(pre);
     return data.kind(pre) == Data.ELEM  &&
       (data.name(pre) == fileID || data.name(pre) == dirID ||
-        name == data.tags.id(token(FSImporter.DOC_NODE)) ||
-        name == data.tags.id(token(FSImporter.ROOT_NODE)));
+        name == data.tags.id(DataText.FSML) ||
+        name == data.tags.id(DataText.DEEPFS));
   }
 
   /**

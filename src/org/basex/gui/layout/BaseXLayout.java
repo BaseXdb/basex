@@ -41,7 +41,7 @@ public final class BaseXLayout {
     new HashMap<String, ImageIcon>();
   /** Date Format. */
   private static final SimpleDateFormat DATE =
-    new SimpleDateFormat("dd.MM.yyyy hh:mm");
+    new SimpleDateFormat("dd.MM.yyyy HH:mm");
 
   /** Private constructor. */
   private BaseXLayout() { }

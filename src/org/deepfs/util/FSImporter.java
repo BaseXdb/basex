@@ -13,7 +13,6 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
-import org.deepfs.fsml.DeepNS;
 import org.deepfs.fsml.ParserException;
 import org.deepfs.fsml.ParserRegistry;
 import org.deepfs.fsml.plugin.SpotlightExtractor;
@@ -34,12 +33,8 @@ public final class FSImporter implements FSTraversal {
 
   /** Database context. */
   private final Context ctx;
-  /** Document node. */
-  public static final String DOC_NODE = DeepNS.DEEPURL.tag("fsml");
-  /** Root node for a file system. */
-  public static final String ROOT_NODE = DeepNS.DEEPURL.tag("deepfs");
   /** Insertion target. */
-  private String targetNode = "/" + DOC_NODE;
+  private String targetNode = "/" + DataText.S_FSML;
 
   /** The name of the current file. */
   private String currentFile;
@@ -80,29 +75,14 @@ public final class FSImporter implements FSTraversal {
     final StringBuilder sb = new StringBuilder(text.length());
     for(final char c : text.toCharArray()) {
       switch(c) {
-        case '&':
-          sb.append("&amp;");
-          break;
-        case '>':
-          sb.append("&gt;");
-          break;
-        case '<':
-          sb.append("&lt;");
-          break;
-        case '\"':
-          sb.append("&quot;");
-          break;
-        case '\'':
-          sb.append("&apos;");
-          break;
-        case '{':
-          sb.append("{{");
-          break;
-        case '}':
-          sb.append("}}");
-          break;
-        default:
-          sb.append(c);
+        case '&':  sb.append("&amp;");  break;
+        case '>':  sb.append("&gt;");   break;
+        case '<':  sb.append("&lt;");   break;
+        case '\"': sb.append("&quot;"); break;
+        case '\'': sb.append("&apos;"); break;
+        case '{':  sb.append("{{");     break;
+        case '}':  sb.append("}}");     break;
+        default:   sb.append(c);
       }
     }
     return sb.toString();
@@ -170,7 +150,7 @@ public final class FSImporter implements FSTraversal {
 
   @Override
   public void preTraversalVisit(final File d) {
-    if(d.isDirectory()) targetNode += "/" + ROOT_NODE + "[@"
+    if(d.isDirectory()) targetNode += "/" + DataText.S_DEEPFS + "[@"
     + string(DataText.BACKINGSTORE) + " = \"" + insert(d, true) + "\"]";
     else {
       preTraversalVisit(d.getParentFile());
@@ -186,7 +166,8 @@ public final class FSImporter implements FSTraversal {
 
   @Override
   public void preDirectoryVisit(final File d) {
-    targetNode += "/dir[@name = \"" + insert(d, false) + "\"]";
+    targetNode += "/" + DataText.S_DIR + "[@" + DataText.S_NAME + " = \""
+        + insert(d, false) + "\"]";
   }
 
   @Override

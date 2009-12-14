@@ -2,18 +2,17 @@ package org.deepfs.fsml.ser;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-import static org.deepfs.fsml.DeepFile.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
+import org.basex.data.DataText;
 import org.basex.util.Atts;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.MetaElem;
 import org.deepfs.fsml.DeepFile.Content;
-import org.deepfs.util.FSImporter;
 
 /**
  * DeepFile Serializer. Serializes DeepFiles in XML.
@@ -82,8 +81,8 @@ public class FSMLSerializer {
     final FSMLSerializer ser = new FSMLSerializer();
     final Atts atts = DeepFS.atts(file, root);
     final String name;
-    if(file.isDirectory()) name = root ? FSImporter.ROOT_NODE : DIR_NS;
-    else name = FILE_NS;
+    if(file.isDirectory()) name = root ? DataText.S_DEEPFS : DataText.S_DIR;
+    else name = DataText.S_FILE;
     ser.startElem(name, convAtts(atts), true);
     return ser.toString();
   }
@@ -208,10 +207,10 @@ public class FSMLSerializer {
       if(subfile) { // content section
         atts.add(OFFSET, token(d.getOffset()));
         atts.add(SIZE, token(d.getSize()));
-        startElem(CONTENT_NS, convAtts(atts));
+        startElem(DataText.S_CONTENT, convAtts(atts));
       } else { // regular file
         final Atts a = d.getFSAtts();
-        startElem(FILE_NS, convAtts(a));
+        startElem(DataText.S_FILE, convAtts(a));
       }
 
       // serialize metadata
@@ -229,9 +228,9 @@ public class FSMLSerializer {
           atts.reset();
           atts.add(OFFSET, token(t.getOffset()));
           atts.add(SIZE, token(t.getSize()));
-          startElem(TEXT_CONTENT_NS, convAtts(atts));
+          startElem(DataText.S_TEXT_CONTENT, convAtts(atts));
           text(t.getContent());
-          endElem(TEXT_CONTENT_NS);
+          endElem(DataText.S_TEXT_CONTENT);
         }
       }
 
@@ -242,15 +241,15 @@ public class FSMLSerializer {
           atts.reset();
           atts.add(OFFSET, token(x.getOffset()));
           atts.add(SIZE, token(x.getSize()));
-          startElem(XML_CONTENT_NS, convAtts(atts));
+          startElem(DataText.S_XML_CONTENT, convAtts(atts));
           xml(x.getContent());
-          endElem(XML_CONTENT_NS);
+          endElem(DataText.S_XML_CONTENT);
         }
       }
 
       // process all content sections
       serializeDeepFiles(true, d.getContent());
-      endElem(subfile ? CONTENT_NS : FILE_NS);
+      endElem(subfile ? DataText.S_CONTENT : DataText.S_FILE);
     }
   }
 

@@ -1008,23 +1008,4 @@ public class DeepFile {
       return t;
     }
   }
-
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-  // ---------------------------------------------------------------------------
-
-  /** DeepFS tag in fs namespace. */
-  public static final String DEEPFS_NS = DeepNS.DEEPURL.tag(string(DEEPFS));
-  /** Directory tag in fs namespace. */
-  public static final String DIR_NS = DeepNS.DEEPURL.tag(string(DIR));
-  /** File tag in fs namespace. */
-  public static final String FILE_NS = DeepNS.DEEPURL.tag(string(FILE));
-  /** Content tag in fs namespace. */
-  public static final String CONTENT_NS = DeepNS.DEEPURL.tag(string(CONTENT));
-  /** Text content tag in fs namespace. */
-  public static final String TEXT_CONTENT_NS =
-    DeepNS.DEEPURL.tag(string(TEXT_CONTENT));
-  /** XML content tag in fs namespace. */
-  public static final String XML_CONTENT_NS =
-    DeepNS.DEEPURL.tag(string(XML_CONTENT));
 }
