@@ -1,5 +1,6 @@
 package org.basex.gui.view.map;
 
+import static org.basex.core.Text.*;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -7,6 +8,8 @@ import java.io.File;
 import javax.imageio.ImageIO;
 import org.basex.core.Main;
 import org.basex.data.Data;
+import org.basex.gui.dialog.Dialog;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -18,6 +21,9 @@ import org.basex.util.Token;
 final class MapFSImages extends Thread {
   /** Maximum number of cached images. */
   private static final int MAXNR = 5000;
+  /** Memory error. */
+  private static int err;
+
   /** Reference to the treemap panel. */
   final MapView view;
   /** Image cache. */
@@ -110,7 +116,16 @@ final class MapFSImages extends Thread {
 
         // load image and wait until it's done
         final File f = new File(Token.string(data.fs.path(id, false)));
-        BufferedImage image = ImageIO.read(f);
+        BufferedImage image = null;
+        try {
+          image = ImageIO.read(f);
+        } catch(final Throwable ex) {
+          if(ex instanceof OutOfMemoryError) {
+            Performance.gc(2);
+            if(err++ == 0) Dialog.error(view.gui, PROCOUTMEM);
+          }
+          image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_BGR);
+        }
 
         // calculate optimal image size
         final double iw = image.getWidth();

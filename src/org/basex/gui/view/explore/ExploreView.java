@@ -3,10 +3,7 @@ package org.basex.gui.view.explore;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import javax.swing.Box;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
@@ -15,7 +12,6 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 
@@ -30,8 +26,6 @@ public final class ExploreView extends View {
   private final BaseXLabel header;
   /** Current search panel. */
   final ExploreArea search;
-  /** Execute button. */
-  final BaseXButton go;
   /** Filter button. */
   final BaseXButton filter;
 
@@ -52,23 +46,10 @@ public final class ExploreView extends View {
     b.setLayout(new BorderLayout());
     b.add(header, BorderLayout.CENTER);
 
-    go = new BaseXButton(gui, "go", HELPGO);
-    go.addKeyListener(this);
-    go.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        search.query(true);
-      }
-    });
-
     filter = BaseXButton.command(GUICommands.FILTER, gui);
     filter.addKeyListener(this);
 
-    final BaseXBack sp = new BaseXBack(Fill.NONE);
-    sp.setLayout(new TableLayout(1, 5));
-    sp.add(go);
-    sp.add(Box.createHorizontalStrut(1));
-    sp.add(filter);
-    b.add(sp, BorderLayout.EAST);
+    b.add(filter, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 
     search = new ExploreArea(this);
@@ -87,7 +68,6 @@ public final class ExploreView extends View {
 
   @Override
   public void refreshMark() {
-    go.setEnabled(!gui.prop.is(GUIProp.EXECRT));
     final Nodes marked = gui.context.marked;
     filter.setEnabled(!gui.prop.is(GUIProp.FILTERRT) &&
         marked != null && marked.size() != 0);
