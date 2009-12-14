@@ -36,7 +36,8 @@ public final class DBExample {
    indexExample();
 
    queryExample();
-   System.out.println("\n=== III information on the specified database context.");
+   System.out.println("\n=== III information on the specified " +
+       "database context.");
    // Dumps information on the specified database context
    new InfoDB().exec(context, System.out);
  
@@ -97,11 +98,9 @@ public final class DBExample {
    */
   private static void indexExample() throws BaseXException {
     // I Index Creation & Maintenance
-    new CreateIndex("fulltext").exec(context,System.out);
+    new CreateIndex("fulltext").exec(context, System.out);
     
     // Optimize the index structure 
-    new Optimize().exec(context,System.out);
-    
-    
+    new Optimize().exec(context, System.out);
   }
 }

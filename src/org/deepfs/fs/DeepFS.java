@@ -114,31 +114,6 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Returns the text contents of this file node.
-   * @param pre the pre value of a file node
-   * @param data the data reference
-   * @return the text contents
-  public static byte[][] getText(final int pre, final Data data) {
-    int node = pre;
-    final ArrayList<byte[]> contents = new ArrayList<byte[]>();
-    byte[] textElemName = token(DeepFile.TEXT_CONTENT_NS);
-    final int size = data.size(pre, data.kind(pre));
-    for(int i = 0; i < size; i++) {
-      final byte[] nodeName = data.name(++node, data.kind(node));
-      if(eq(nodeName, textElemName)) {
-        int textNodeSize = data.size(node, data.kind(node));
-        while(--textNodeSize > 0) {
-          if(data.kind(++node) == Data.TEXT) {
-            contents.add(ViewData.content(data, node, false));
-          }
-        }
-      }
-    }
-    return contents.toArray(new byte[contents.size()][]);
-  }
-   */
-
-  /**
    * Initializes often used tags and attributes.
    */
   private void initNames() {
@@ -324,15 +299,6 @@ public final class DeepFS implements DataText {
     return m;
   }
 
-  // /**
-  // * Offset of size value.
-  // * Used to calculated the dir size in {@link FSParser}.
-  // * @return offset of size attribute
-  // */
-  // public static int getSizeOffset() {
-  // return 3;
-  // }
-
   /**
    * Constructs attributes for file and directory tags.
    * @param f file name
@@ -394,15 +360,6 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Refreshes the data reference and GUI.
-   */
-  private void refresh() {
-    // gui reference temporarily removed..
-    // if(gui != null) gui.notify.update();
-    // data.flush();
-  }
-
-  /**
    * Inserts MemData at given pre position and refresh GUI.
    * @param pre value at which to insert (content or file)
    * @param md memory data insert to insert
@@ -411,60 +368,8 @@ public final class DeepFS implements DataText {
   private int insert(final int pre, final MemData md) {
     final int npre = pre + data.size(pre, data.kind(pre));
     data.insert(npre, pre, md);
-    refresh();
     return npre;
   }
-
-  //  /**
-  //   * Evaluates given path and returns the pre value.
-  //   * @param path to be traversed
-  //   * @return pre value of file node or -1 if none is found
-  //   */
-  //  private int pathPre(final String path) {
-  //    try {
-  //      final Nodes n = xquery(pn2xp(path, false));
-  //      return n.size() == 0 ? -1 : n.nodes[0];
-  //    } catch(final QueryException ex) {
-  //      ex.printStackTrace();
-  //      return -1;
-  //    }
-  //  }
-
-  //  /**
-  //   * Extracts content of file and build a MemData object.
-  //   * @param path from which to include content (it's in backing store)
-  //   * @return MemData reference
-  //   */
-  //  private MemData buildContentData(final String path) {
-  //    final Prop prop = data.meta.prop;
-  //    final MemData md = new MemData(64, data.tags, data.atts, data.ns,
-  //        data.path, prop);
-  //
-  //    try {
-  //      prop.set(Prop.FSCONT, true);
-  //      prop.set(Prop.FSMETA, true);
-  //      final String bpath = data.meta.backing + path;
-  //      final Parser p = prop.is(Prop.NEWFSPARSER) ? new NewFSParser(
-  //          bpath, ctx.prop) : new FSParser(bpath, ctx.prop);
-  //      final MemBuilder mb = new MemBuilder(p);
-  //      mb.init(md);
-  //      BaseX.debug("[DataFS_parse_file] path : " + path + " -> " + bpath);
-  //      return (MemData) mb.build();
-  //    } catch(final IOException ex) {
-  //      ex.printStackTrace();
-  //    }
-  //    return md;
-  //  }
-
-  //  /**
-  //   * Inserts extracted file content.
-  //   * @param path to file at which to insert the extracted content
-  //   * @return pre value of newly inserted content, -1 on failure
-  //   */
-  //  private int insertContent(final String path) {
-  //    final int fpre = pathPre(path);
-  //    return fpre == -1 ? -1 : insert(fpre, buildContentData(path));
-  //  }
 
   /**
    * Evaluates given path and returns the pre value of the parent directory (if
@@ -494,18 +399,6 @@ public final class DeepFS implements DataText {
     return insert(ppre, buildFileNode(path, mode));
   }
 
-  //  /**
-  //   * Deletes a non-empty directory.
-  //   * @param dir to be deleted
-  //   * @return boolean true for success, false for failure
-  //   */
-  //  private static boolean deleteDir(final File dir) {
-  //    if(dir.isDirectory()) {
-  //      for(final File ch : dir.listFiles()) if(!deleteDir(ch)) return false;
-  //    }
-  //    return dir.delete();
-  //  }
-
   /**
    * Deletes a file node.
    * @param path of file to delete
@@ -521,7 +414,6 @@ public final class DeepFS implements DataText {
       final Nodes n = xquery(qb.toString());
       if(n.size() == 0) return -1;
       data.delete(n.nodes[0]);
-      refresh();
     } catch(final QueryException ex) {
       ex.printStackTrace();
       return -1;
@@ -658,7 +550,6 @@ public final class DeepFS implements DataText {
   public int rmdir(final String path) {
     Main.debug("[basex_rmdir] path: " + path);
     final int n = delete(path, true, false);
-    refresh();
     return n;
   }
 
@@ -760,20 +651,6 @@ public final class DeepFS implements DataText {
     }
   }
 
-  /*
-   * Deletes a non-empty directory.
-   * @param pre pre value
-  public void delete(final int pre) {
-    if(data.meta.prop.is(Prop.FUSE)) {
-      final String bpath = Token.string(path(pre, true));
-      final File f = new File(bpath);
-      if(f.isDirectory()) deleteDir(f);
-      else if(f.isFile()) f.delete();
-      nativeUnlink(Token.string(path(pre, false)));
-    }
-  }
-  */
-
   /**
    * Creates a new directory.
    * @param path to directory to be created
@@ -786,7 +663,6 @@ public final class DeepFS implements DataText {
     final int n = createNode(path, getSIFDIR() | mode);
     Main.debug(method + "path: " + path + " mode: "
         + Integer.toOctalString(mode) + " id : (" + n + ")");
-    refresh();
     return n;
   }
 
@@ -799,73 +675,6 @@ public final class DeepFS implements DataText {
   public int create(final String path, final int mode) {
     // if(!isFile(mode)) return -1; // Linux does not submit S_IFREG.
     final int n = createNode(path, getSIFREG() | mode);
-    refresh();
     return n;
   }
-
-  /*
-   * Unlink a file node.
-   * @param path to file to be deleted
-   * @return success or failure
-  public int unlink(final String path) {
-    final int n = delete(path, false, false);
-    refresh();
-    return n;
-  }
-   */
-
-  //  public int opendir(final String path) {
-  //    try {
-  //      final String query = "count(" + pn2xp(path, true) + "/child::*)";
-  //      final QueryProcessor xq = new QueryProcessor(query, ctx);
-  //      final Result result = xq.query();
-  //      final SeqIter s = (SeqIter) result;
-  //      final Item i = s.next();
-  //      return i != null ? (int) i.itr() : -1;
-  //    } catch(final QueryException ex) {
-  //      ex.printStackTrace();
-  //      return -1;
-  //    }
-  //  }
-  //
-  //  public int release(final String path) {
-  //    final boolean dirty = true;
-  //
-  //    final String method = "[-basex_release] ";
-  //    BaseX.debug(method + "path: " + path);
-  //
-  //    if(dirty) {
-  //      delete(path, false, true);
-  //      insertContent(path);
-  //    }
-  //    return 0;
-  //  }
-
-  //  /*
-  //   * -----------------------------------------------------------------------
-  //   * Native deepfs method declarations (org_basex_fuse_DeepFS.h)
-  //   * -----------------------------------------------------------------------
-  //   */
-  //
-  //  /**
-  //   * Mounts database as FUSE.
-  //   * @param mp path where to mount BaseX
-  //   * @param bs path to backing storage root of this instance
-  //   * @return 0 on success, errno in case of failure
-  //   */
-  //  public native int nativeMount(final String mp, final String bs);
-  //
-  //  /**
-  //   * Unlinks file in backing store.
-  //   * @param pathname to file to delete
-  //   * @return 0 on success, errno in case of failure
-  //   */
-  //  public native int nativeUnlink(final String pathname);
-  //
-  //  /**
-  //   * Tells DeepFS that the database will shutdown.
-  //   */
-  //  public native void nativeShutDown();
-
-  /* ------------------------------------------------------------------------ */
 }
