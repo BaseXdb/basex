@@ -157,10 +157,9 @@ public final class Prop extends AProp {
   /** Verbose debug informations for FSTraversal. */
   public static final Object[] FSVERBOSE = { "FSVERBOSE", false };
 
-  /** Fuse support. [AH] check this flag. */
+  /** Fuse support. */
   public static final Object[] FUSE = { "FUSE", false };
-  /** Propagate changes in DeepFS back to original filesystem. */
-  public static final Object[] WTHROUGH = {"WTHROUGH", false };
+
   /**
    * Spotlight integration. If true, on mac platforms spotlight index is used
    * instead of the internal parser implementations.

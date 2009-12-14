@@ -2,26 +2,24 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.awt.BorderLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
+
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.List;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
-import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXListChooser;
@@ -45,8 +43,6 @@ public final class DialogOpen extends Dialog {
   private final BaseXText detail;
   /** Buttons. */
   private BaseXBack buttons;
-  /** Write through flag. */
-  private final BaseXCheckBox wth;
   /** Rename button. */
   private Object rename;
   /** Drop button. */
@@ -93,18 +89,9 @@ public final class DialogOpen extends Dialog {
     pp.setLayout(new BorderLayout());
     pp.add(info, BorderLayout.CENTER);
 
-    wth = new BaseXCheckBox(WTHROUGH, false, this);
-    wth.setBorder(new EmptyBorder(4, 4, 0, 0));
-    wth.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        action(null);
-      }
-    });
-
     // create buttons
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
-    if(fs) p.add(wth, BorderLayout.WEST);
 
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
@@ -175,13 +162,6 @@ public final class DialogOpen extends Dialog {
           in = new DataInput(meta.file(DATAINFO));
           meta.read(in);
           detail.setText(InfoDB.db(meta, true, true, true));
-          if(cmp == wth && wth.isSelected()) {
-            final boolean dec = Dialog.confirm(this,
-                Main.info(WTHROUGHOK, meta.name, meta.backing));
-            ctx.prop.set(Prop.WTHROUGH, dec);
-            gui.prop.set(GUIProp.FSWTHROUGH, dec);
-            wth.setSelected(dec);
-          }
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;
