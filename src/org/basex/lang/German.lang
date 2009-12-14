@@ -116,6 +116,7 @@ dfs_text2=Datei-Inhalte
 dfs_cont=Importiere Datei-Inhalte
 dfs_xml=Importiere XML-Inhalte
 dfs_meta=Importiere Meta-Daten
+dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Datenbank umbenennen
 dr_exists=Datenbank existiert schon

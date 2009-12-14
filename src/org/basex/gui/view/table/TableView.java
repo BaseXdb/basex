@@ -8,12 +8,15 @@ import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.io.IOException;
+
 import javax.swing.SwingUtilities;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
@@ -278,7 +281,11 @@ public final class TableView extends View implements Runnable {
   public void mouseClicked(final MouseEvent e) {
     final Data data = gui.context.data;
     if(data.fs != null && tdata.mouseX < 20) {
-      data.fs.launch(ViewData.parent(data, gui.context.focused));
+      try {
+        data.fs.launch(ViewData.parent(data, gui.context.focused));
+      } catch (IOException ex) {
+        Dialog.info(this, NODEFAULTAPP);
+      }
     }
   }
 

@@ -638,17 +638,11 @@ public final class DeepFS implements DataText {
   /**
    * Opens the file which is defined by the specified pre value.
    * @param pre pre value
+   * @throws IOException thrown if no default application to launch exists
    */
-  public void launch(final int pre) {
+  public void launch(final int pre) throws IOException {
     if(pre == -1 || !isFile(pre)) return;
-
-    try {
-      // [AH] fails if there is no default application for this file type
-      // the user doesn't get any feedback...
-      Desktop.getDesktop().open(new File(string(path(pre, false))));
-    } catch(final Exception ex) {
-      Main.debug(ex);
-    }
+    Desktop.getDesktop().open(new File(string(path(pre, false))));
   }
 
   /**

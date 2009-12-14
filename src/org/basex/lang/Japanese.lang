@@ -116,6 +116,7 @@ dfs_text2=ファイルの内容
 dfs_cont=ファイル内のテキスト情報を含める
 dfs_xml=Include xml contents
 dfs_meta=メタデータを含める
+dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=データベースの名前を変更
 dr_exists=同じ名前のデータベースが存在します。

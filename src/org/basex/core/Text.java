@@ -1109,7 +1109,10 @@ public interface Text {
   String OPENMOUNTTITLE = lang("dmnt_title") + DOTS;
   /** No valid path to mount point. */
   String NOVALIDMOUNT = lang("dmnt_nomountpath") + DOT;
-
+  
+  /** No default application registered to open file type.*/
+  String NODEFAULTAPP = lang("dfs_nodefaultapp") + DOT;
+  
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
   /** Info for renaming a database. */

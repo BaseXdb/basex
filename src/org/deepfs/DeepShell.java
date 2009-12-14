@@ -196,7 +196,6 @@ public final class DeepShell {
       args = "<directory>", help = "tree(1)-like output directory hierarchy")
   public void tree(final String[] args) {
     if(args.length == 1) {
-      // [BL] Treeprinter registers for notifications during traversal.
       new FSWalker(new TreePrinter()).traverse(new File(Prop.WORK));
       return;
     }

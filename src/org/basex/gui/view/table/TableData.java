@@ -119,7 +119,6 @@ final class TableData {
     rowH = 1;
 
     if(data.fs != null && root == -1) {
-      System.out.println("bla");
       root = data.tags.id(DataText.FILE);
       addCol(DataText.SUFFIX, false);
       addCol(DataText.NAME, false);

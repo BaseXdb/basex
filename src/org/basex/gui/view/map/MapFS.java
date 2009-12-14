@@ -16,6 +16,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
+import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
 import org.basex.io.BufferInput;
@@ -325,7 +326,13 @@ final class MapFS extends MapPainter {
       mx - r.x < 16 && fs.isFile(r.pre) &&
       GUIFS.mime(fs.name(r.pre)) != GUIFS.Type.IMAGE;
 
-    if(active && click) fs.launch(view.gui.context.focused);
+    if(active && click) {
+      try {
+        fs.launch(view.gui.context.focused);
+      } catch (IOException ex) {
+        Dialog.info(view, NODEFAULTAPP);;
+      }
+    }
     return active;
   }
 

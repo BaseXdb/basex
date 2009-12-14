@@ -116,6 +116,7 @@ dfs_text2=Contenuti del file
 dfs_cont=Includi i contenuti testuali del file
 dfs_cont=Includi i contenuti XML del file
 dfs_meta=Includi i metadata
+dfs_nodefaultapp=No default application is registered to open this file type
 
 dr_title=Rinomina Database
 dr_exists=Il Database esiste già
