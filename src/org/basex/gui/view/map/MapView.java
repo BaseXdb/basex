@@ -25,7 +25,6 @@ import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
-import org.deepfs.fs.DeepFS;
 
 /**
  * This view is a TreeMap implementation.
@@ -623,14 +622,16 @@ public final class MapView extends View implements Runnable {
       parStack[l] = pre;
 
       if(data.fs != null) {
-        if(DeepFS.isFSnode(data, pre)) {
-          if(DeepFS.isFile(data, pre)) {
+        if(data.fs.isFSnode(pre)) {
+          if(data.fs.isFile(pre)) {
             textLen[pre] = Token.toInt(ViewData.attValue(data, data.sizeID,
                 pre));
             textLen[parStack[l - 1]] += textLen[pre];
             pre += data.size(pre, kind) - 1; // skip file content
-            assert pre == size - 1 || DeepFS.isFSnode(data, pre + 1);
-          } else l++;
+            assert pre == size - 1 || data.fs.isFSnode(pre + 1);
+          } else {
+            l++;
+          }
         }
       } else {
         if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI ||

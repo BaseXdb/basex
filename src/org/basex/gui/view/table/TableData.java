@@ -93,13 +93,15 @@ final class TableData {
    */
   void init(final Data data) {
     roots = new TokenList();
+    // sort keys by occurrence
     for(final byte[] k : data.path.desc(Token.EMPTY, data, true, true)) {
       int c = 0;
       for(final byte[] kk : data.path.desc(k, data, true, false)) {
-        final Names index = !startsWith(kk, '@') ? data.tags : data.atts;
-        if(index.stat(index.id(delete(kk, '@'))).leaf) c++;
+        final Names nm = startsWith(kk, '@') ? data.atts : data.tags;
+        if(nm.stat(nm.id(delete(kk, '@'))).leaf) c++;
       }
-      if(c > 1) roots.add(k);
+      // add keys with a minimum of three columns
+      if(c > 2) roots.add(k);
     }
     init(data, -1);
   }

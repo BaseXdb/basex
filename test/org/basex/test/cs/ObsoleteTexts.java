@@ -69,11 +69,9 @@ public final class ObsoleteTexts {
         read(f, set);
       } else if(name.endsWith(".java")) {
         name = name.replaceAll("\\.java", "");
-        boolean found = false;
-        for(final Class<?> c : CLASSES) {
-          found |= c.getSimpleName().equals(name);
-        }
-        if(found) continue;
+        boolean x = false;
+        for(final Class<?> c : CLASSES) x = x || c.getSimpleName().equals(name);
+        if(x) continue;
 
         final BufferedReader br = new BufferedReader(new FileReader(f));
         while(true) {

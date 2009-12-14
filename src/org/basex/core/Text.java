@@ -196,16 +196,12 @@ public interface Text {
 
   /** Command help. */
   String[] HELPADD = {
-    "[" + PATH  + "]",
-    lang("ch_add1"),
-    lang("ch_add2")
+    "[" + PATH  + "]", lang("ch_add1"), lang("ch_add2")
   };
 
   /** Command help. */
   String[] HELPDELETE = {
-    "[" + NAM  + "]",
-    lang("ch_delete1"),
-    lang("ch_delete2")
+    "[" + NAM  + "]", lang("ch_delete1"), lang("ch_delete2")
   };
 
   /** Command help. */

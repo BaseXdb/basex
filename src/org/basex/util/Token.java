@@ -273,7 +273,7 @@ public final class Token {
    * @return character length
    */
   public static int cl(final byte v) {
-    return v >= 0 ? 1 : CHLEN[(v & 0xFF) >> 4];
+    return v >= 0 ? 1 : CHLEN[v >> 4 & 0xF];
   }
 
   /*** Character lengths. */
@@ -288,8 +288,8 @@ public final class Token {
    * sequence, zero is returned. A return value of -1 indicates an invalid UTF-8
    * character.
    * @param v first character byte
-   * @return character length, if the byte is the first byte; zero if not; -1 if
-   *         invalid
+   * @return character length, if the byte is the first byte;
+   *          zero if not; -1 if invalid
    */
   private static int cl2(final byte v) {
     final int i = v & 0xFF;
@@ -417,8 +417,8 @@ public final class Token {
     final byte[] b = dt(f);
     if(b != null) return b;
 
-    // not that brilliant here.. no chance for elegant code either,
-    // so let's see first how often this is used
+    // not that brilliant here.. no chance for elegant code either
+    // due to the nifty differences between Java and XQuery
     for(int i = 0; i < FLT.length; i++) if(f == FLT[i]) return FLTSTR[i];
     final float a = Math.abs(f);
     final boolean small = a >= 1e-6f && a < 1e6f;
@@ -1057,9 +1057,9 @@ public final class Token {
       md.update(Token.token(pw));
       final TokenBuilder tb = new TokenBuilder();
       for(final byte b : md.digest()) {
-        final int l = b & 0x0F;
         final int h = b >> 4 & 0x0F;
         tb.add((byte) (h + (h > 9 ? 0x57 : 0x30)));
+        final int l = b & 0x0F;
         tb.add((byte) (l + (l > 9 ? 0x57 : 0x30)));
       }
       return tb.toString();
@@ -1080,10 +1080,10 @@ public final class Token {
   }
 
   /**
-   * Returns a lowercase ASCII character of the specified full-text character.
-   * Note that this method does not support unicode characters.
+   * Returns a normalized character without diacritics.
+   * This method supports all latin1 characters, including supplements.
    * @param ch character to be converted
-   * @return converted character
+   * @return normalized character
    */
   public static int norm(final int ch) {
     if(norm == null) {

@@ -2,6 +2,8 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.Arrays;
+
 import org.basex.core.proc.InfoTable;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
@@ -11,7 +13,6 @@ import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
-import org.basex.util.Bytes;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
 
@@ -101,8 +102,6 @@ public abstract class Data {
   /** Index References. */
   public int sizeID;
 
-  /** Array for caching new table entries. */
-  protected final Bytes b = new Bytes(1 << IO.NODEPOWER);
   /** Table access file. */
   protected TableAccess table;
   /** Text index. */
@@ -212,14 +211,6 @@ public abstract class Data {
       case FTX: return ftxindex.info();
       default: return EMPTY;
     }
-  }
-
-  /**
-   * Sets the buffer to a new size.
-   * @param s buffer size (number of table entries)
-   */
-  public final void buffer(final int s) {
-    b.init(s << IO.NODEPOWER);
   }
 
   /**
@@ -516,8 +507,7 @@ public abstract class Data {
     // restore empty document node
     if(empty) {
       doc(0, 1, EMPTY);
-      table.set(0, b.get());
-      b.reset();
+      table.set(0, f());
     }
   }
 
@@ -605,7 +595,9 @@ public abstract class Data {
     }
     while(l > 0) ns.close(preStack[--l]);
 
-    if(b.pos() != 0) insert(ipre + (mpre - 1) - (mpre - 1) % buf);
+    if(bp != 0) insert(ipre + (mpre - 1) - (mpre - 1) % buf);
+    // reset buffer to old size
+    buffer(1);
 
     // increase size of ancestors
     int p = ipar;
@@ -618,8 +610,6 @@ public abstract class Data {
 
     // delete old empty root node
     if(size(0, DOC) == 1) delete(0);
-    // reset buffer to old size
-    buffer(1);
   }
 
   /**
@@ -688,14 +678,27 @@ public abstract class Data {
 
   // INSERTS WITHOUT TABLE UPDATES ============================================
 
+  /** Buffer for caching new table entries. */
+  private byte[] b = new byte[1 << IO.NODEPOWER];
+  /** Buffer position. */
+  private int bp;
+
+  /**
+   * Sets the update buffer to a new size.
+   * @param s number of table entries
+   */
+  public final void buffer(final int s) {
+    int bs = s << IO.NODEPOWER;
+    if(b.length != bs) b = new byte[bs];
+  }
+
   /**
    * Inserts the internal buffer to the storage
    * without updating the table structure.
    * @param pre insert position
    */
   public final void insert(final int pre) {
-    table.insert(pre, b.get());
-    b.reset();
+    table.insert(pre, f());
   }
 
   /**
@@ -707,10 +710,10 @@ public abstract class Data {
   public void doc(final int pre, final int s, final byte[] vl) {
     final long i = ++meta.lastid;
     final long v = index(vl, pre, true);
-    b.s(DOC); b.s(0); b.s(0); b.s(v >> 32);
-    b.s(v >> 24); b.s(v >> 16); b.s(v >> 8); b.s(v);
-    b.s(s >> 24); b.s(s >> 16); b.s(s >> 8); b.s(s);
-    b.s(i >> 24); b.s(i >> 16); b.s(i >> 8); b.s(i);
+    s(DOC); s(0); s(0); s(v >> 32);
+    s(v >> 24); s(v >> 16); s(v >> 8); s(v);
+    s(s >> 24); s(s >> 16); s(s >> 8); s(s);
+    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
   }
 
   /**
@@ -728,10 +731,10 @@ public abstract class Data {
     // build and insert new entry
     final long i = ++meta.lastid;
     final int n = ne ? 1 << 7 : 0;
-    b.s(as << 3 | ELEM); b.s(n | (byte) (tn >> 8)); b.s(tn); b.s(u);
-    b.s(d >> 24); b.s(d >> 16); b.s(d >> 8); b.s(d);
-    b.s(s >> 24); b.s(s >> 16); b.s(s >> 8); b.s(s);
-    b.s(i >> 24); b.s(i >> 16); b.s(i >> 8); b.s(i);
+    s(as << 3 | ELEM); s(n | (byte) (tn >> 8)); s(tn); s(u);
+    s(d >> 24); s(d >> 16); s(d >> 8); s(d);
+    s(s >> 24); s(s >> 16); s(s >> 8); s(s);
+    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
   }
 
   /**
@@ -747,10 +750,10 @@ public abstract class Data {
     // build and insert new entry
     final long i = ++meta.lastid;
     final long v = index(vl, pre, true);
-    b.s(k); b.s(0); b.s(0); b.s(v >> 32);
-    b.s(v >> 24); b.s(v >> 16); b.s(v >> 8); b.s(v);
-    b.s(d >> 24); b.s(d >> 16); b.s(d >> 8); b.s(d);
-    b.s(i >> 24); b.s(i >> 16); b.s(i >> 8); b.s(i);
+    s(k); s(0); s(0); s(v >> 32);
+    s(v >> 24); s(v >> 16); s(v >> 8); s(v);
+    s(d >> 24); s(d >> 16); s(d >> 8); s(d);
+    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
   }
 
   /**
@@ -769,12 +772,38 @@ public abstract class Data {
     final long v = index(vl, pre, false);
     final long i = ++meta.lastid;
     final int n = ne ? 1 << 7 : 0;
-    b.s(d << 3 | ATTR); b.s(n | (byte) (tn >> 8)); b.s(tn); b.s(v >> 32);
-    b.s(v >> 24); b.s(v >> 16); b.s(v >> 8); b.s(v);
-    b.s(0); b.s(0); b.s(0); b.s(u);
-    b.s(i >> 24); b.s(i >> 16); b.s(i >> 8); b.s(i);
+    s(d << 3 | ATTR); s(n | (byte) (tn >> 8)); s(tn); s(v >> 32);
+    s(v >> 24); s(v >> 16); s(v >> 8); s(v);
+    s(0); s(0); s(0); s(u);
+    s(i >> 24); s(i >> 16); s(i >> 8); s(i);
   }
 
+  /**
+   * Stores the specified value in the update buffer.
+   * @param v value to be stored
+   */
+  private void s(final int v) {
+    b[bp++] = (byte) v;
+  }
+
+  /**
+   * Stores the specified value in the update buffer.
+   * @param v value to be stored
+   */
+  private void s(final long v) {
+    b[bp++] = (byte) v;
+  }
+
+  /**
+   * Returns the byte buffer.
+   * @return byte buffer
+   */
+  private byte[] f() {
+    final byte[] bb = bp == b.length ? b : Arrays.copyOf(b, bp);
+    bp = 0;
+    return bb;
+  }
+  
   /**
    * Indexes a text and returns the reference.
    * @param txt text to be indexed

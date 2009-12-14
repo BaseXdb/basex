@@ -118,21 +118,21 @@ public interface Commands {
       return sb.toString();
     }
 
-    /*
+    /**
      * Returns a help string as html.
      * @return string
-  public final String html() {
-    final StringBuilder sb = new StringBuilder();
-    if(dummy()) {
-      sb.append("<br/>" + NL + "<h2>" + help[0] + "</h2>" + NL);
-    } else {
-      if(args != null && !dummy() && !internal()) {
+    public final String html() {
+      final StringBuilder sb = new StringBuilder();
+      if(help.length == 1) {
+        sb.append("<br/>" + NL + "<h2>" + help[0] + "</h2>" + NL);
+      } else if(help.length > 1) {
         String name = name().toLowerCase();
         sb.append("<a name=\"" + name + "\"></a>");
         sb.append("<h3>" + name.substring(0, 1).toUpperCase() +
             name.substring(1) + "</h3>" + NL);
         sb.append("<p>" + NL);
-        sb.append("<code>" + name() + " " + help[0] + "</code><br/><br/>" + NL);
+        sb.append("<code>" + name() + " " + help[0] +
+            "</code><br/><br/>" + NL);
         final String help2 = help[2];
 
         final String help1 = Pattern.compile("\n\r?\n.*", Pattern.DOTALL).
@@ -156,9 +156,8 @@ public interface Commands {
         if(!first) sb.append("</li>" + NL + "</ul>" + NL);
         sb.append(NL);
       }
+      return sb.toString();
     }
-    return sb.toString();
-  }
      */
   }
 }

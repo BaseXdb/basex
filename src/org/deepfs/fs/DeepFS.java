@@ -23,7 +23,6 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.deepfs.DeepShell;
-import org.deepfs.fsml.DeepFile;
 import org.deepfs.jfuse.DeepStat;
 import org.deepfs.util.FSImporter;
 
@@ -146,7 +145,7 @@ public final class DeepFS implements DataText {
    */
   private void initNames() {
     // initialize tags and attribute names
-    data.tags.index(DEEPFS,       null, false);
+    data.tags.index(DEEPFS, null, false);
     dirID          = data.tags.index(DIR,          null, false);
     fileID         = data.tags.index(FILE,         null, false);
     contentID      = data.tags.index(CONTENT,      null, false);
@@ -170,8 +169,8 @@ public final class DeepFS implements DataText {
   private void initRootStat() {
     rootStat = new DeepStat();
     rootStat.statimespec = System.currentTimeMillis();
-    rootStat.stctimespec = System.currentTimeMillis();
-    rootStat.stmtimespec = System.currentTimeMillis();
+    rootStat.stctimespec = rootStat.statimespec;
+    rootStat.stmtimespec = rootStat.statimespec;
     rootStat.stmode = getSIFDIR() | 0755;
     rootStat.stsize = 0;
     rootStat.stuid =  sUID;
@@ -307,10 +306,10 @@ public final class DeepFS implements DataText {
    */
   private MemData buildFileNode(final String path, final int mode) {
     final String fn = basename(path);
-    final int nodeSize = 11; // 1x elem, 10x attr
     final MemData m = new MemData(data);
     final int tagID = isReg(mode) ? fileID : dirID;
     final byte [] time = token(System.currentTimeMillis());
+    final int nodeSize = 11; // 1x elem, 10x attr
     m.buffer(nodeSize);
     m.elem(1, tagID, nodeSize, nodeSize, 0, false);
     m.attr(1, 1, nameID, token(fn), 0, false);
@@ -549,51 +548,27 @@ public final class DeepFS implements DataText {
    * @return true if this node is a file, false otherwise
    */
   public boolean isFile(final int pre) {
-    return isFile(data, pre);
-  }
-
-  /**
-   * Checks if this node is a file.
-   * @param data data reference
-   * @param pre pre value
-   * @return true if this node is a file, false otherwise
-   */
-  public static boolean isFile(final Data data, final int pre) {
-    return data.kind(pre) == Data.ELEM &&
-        data.name(pre) == data.tags.id(token(DeepFile.FILE_NS));
-  }
-
-  /**
-   * Checks if this node is a file.
-   * @param pre pre value
-   * @return true if this node is a directory, false otherwise
-   */
-  public boolean isDir(final int pre) {
-    return isDir(data, pre);
+    return data.kind(pre) == Data.ELEM && data.name(pre) == fileID;
   }
 
   /**
    * Checks if this node is a directory.
-   * @param data data reference
    * @param pre pre value
-   * @return true if this node is a file, false otherwise
+   * @return true if this node is a directory, false otherwise
    */
-  public static boolean isDir(final Data data, final int pre) {
-    return data.kind(pre) == Data.ELEM &&
-        data.name(pre) == data.tags.id(token(DeepFile.DIR_NS));
+  public boolean isDir(final int pre) {
+    return data.kind(pre) == Data.ELEM && data.name(pre) == dirID;
   }
 
   /**
    * Checks if this node is a file, directory, fsml or deepfs node.
-   * @param data data reference
    * @param pre pre value
    * @return true if this node is a deepfs node, false otherwise
    */
-  public static boolean isFSnode(final Data data, final int pre) {
+  public boolean isFSnode(final int pre) {
     final int name = data.name(pre);
     return data.kind(pre) == Data.ELEM  &&
-       (name == data.tags.id(token(DeepFile.FILE_NS))    ||
-        name == data.tags.id(token(DeepFile.DIR_NS))     ||
+      (data.name(pre) == fileID || data.name(pre) == dirID ||
         name == data.tags.id(token(FSImporter.DOC_NODE)) ||
         name == data.tags.id(token(FSImporter.ROOT_NODE)));
   }
@@ -787,20 +762,19 @@ public final class DeepFS implements DataText {
     }
   }
 
-  /**
+  /*
    * Deletes a non-empty directory.
    * @param pre pre value
-   */
   public void delete(final int pre) {
-    if (pre == 0) /* avoid checkstyle warnings. */;
-    //    if(data.meta.prop.is(Prop.FUSE)) {
-    //      final String bpath = Token.string(path(pre, true));
-    //      final File f = new File(bpath);
-    //      if(f.isDirectory()) deleteDir(f);
-    //      else if(f.isFile()) f.delete();
-    //      nativeUnlink(Token.string(path(pre, false)));
-    //    }
+    if(data.meta.prop.is(Prop.FUSE)) {
+      final String bpath = Token.string(path(pre, true));
+      final File f = new File(bpath);
+      if(f.isDirectory()) deleteDir(f);
+      else if(f.isFile()) f.delete();
+      nativeUnlink(Token.string(path(pre, false)));
+    }
   }
+  */
 
   /**
    * Creates a new directory.
@@ -831,7 +805,7 @@ public final class DeepFS implements DataText {
     return n;
   }
 
-  /**
+  /*
    * Unlink a file node.
    * @param path to file to be deleted
    * @return success or failure
