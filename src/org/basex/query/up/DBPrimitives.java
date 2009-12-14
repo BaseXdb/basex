@@ -1,9 +1,6 @@
 package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-import java.util.HashMap;
-import java.util.Map;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
@@ -11,7 +8,6 @@ import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
-import org.basex.util.Atts;
 import org.basex.util.IntList;
 
 /**
@@ -53,9 +49,9 @@ final class DBPrimitives extends Primitives {
           p--;
         }
         if(par != -1) il.add(par);
-        findDuplicates(il.finish());
+        checkNames(il.finish());
       } else {
-        if(k == Data.ELEM) findDuplicates(pre);
+        if(k == Data.ELEM) checkNames(pre);
         p--;
       }
     }
@@ -66,56 +62,37 @@ final class DBPrimitives extends Primitives {
    * @param pres pre values of nodes to check (in descending order)
    * @throws QueryException query exception
    */
-  private void findDuplicates(final int... pres) throws QueryException {
-    final Map<QNm, Integer> m = new HashMap<QNm, Integer>();
+  private void checkNames(final int... pres) throws QueryException {
+    final NamePool pool = new NamePool();
     final IntList ats = new IntList();
+
     for(final int pre : pres) {
+      final UpdatePrimitive[] ups = op.get(pre);
+      if(ups != null) {
+        for(final UpdatePrimitive up : ups) {
+          if(up != null) up.update(pool);
+        }
+      }
+
       // pre values consists exclusively of element and attribute nodes
       if(d.kind(pre) == Data.ATTR) {
         ats.add(pre);
-        addElementChanges(m, pre);
       } else {
-        addElementChanges(m, pre);
         final int ps = pre + d.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; p++) {
-          if(!ats.contains(p)) {
-            changePool(m, true, new QNm(d.name(p, Data.ATTR)));
-          }
+          if(!ats.contains(p)) pool.add(new QNm(d.name(p, Data.ATTR)), true);
         }
       }
     }
-    for(final Map.Entry<QNm, Integer> n : m.entrySet())
-      if(n.getValue() > 1) Err.or(UPATTDUPL, n.getKey());
+
+    // find duplicate attributes
+    final QNm dup = pool.duplicate();
+    if(dup != null) Err.or(UPATTDUPL, dup);
 
     // find namespace conflicts
-    final Atts at = new Atts();
-    for(final QNm name : m.keySet()) {
-      final byte[] an = name.pref();
-      final byte[] uri = name.uri.str();
-      final int ai = at.get(an);
-      if(ai == -1) at.add(an, uri);
-      else if(!eq(uri, at.val[ai])) Err.or(UPNSCONFL2);
-    }
+    if(!pool.nsOK()) Err.or(UPNSCONFL2);
   }
 
-  /**
-   * Determines the resulting attribute set for an element node.
-   * @param m map reference
-   * @param pre node pre value
-   */
-  private void addElementChanges(final Map<QNm, Integer> m, final int pre) {
-    final UpdatePrimitive[] ups = op.get(pre);
-    if(ups == null) return;
-    for(final UpdatePrimitive up : ups) {
-      if(up == null) continue;
-      changePool(m, true, up.addAtt());
-      changePool(m, false, up.remAtt());
-    }
-  }
-
-  /**
-   * Checks constraints and applies all updates to the databases.
-   */
   @Override
   protected void apply() throws QueryException {
     // apply updates backwards, starting with the highest pre value -> no id's

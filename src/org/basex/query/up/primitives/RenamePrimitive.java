@@ -7,6 +7,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
+import org.basex.query.up.NamePool;
 import org.basex.query.util.Err;
 
 /**
@@ -34,22 +35,18 @@ public final class RenamePrimitive extends NewValue {
   }
 
   @Override
-  public PrimitiveType type() {
-    return PrimitiveType.RENAME;
-  }
-
-  @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
     Err.or(UPMULTREN, node);
   }
 
   @Override
-  public QNm[] addAtt() {
-    return node.type == Type.ATT ? new QNm[] { name } : null;
+  public void update(final NamePool pool) {
+    pool.add(name, node.type == Type.ATT);
+    pool.remove(node);
   }
 
   @Override
-  public QNm[] remAtt() {
-    return node.type == Type.ATT ? new QNm[] { node.qname() } : null;
+  public PrimitiveType type() {
+    return PrimitiveType.RENAME;
   }
 }

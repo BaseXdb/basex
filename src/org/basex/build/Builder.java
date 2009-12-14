@@ -208,20 +208,6 @@ public abstract class Builder extends Progress {
     meta.encoding = enc.equals(UTF8) || enc.equals(UTF82) ? UTF8 : enc;
   }
 
-  /**
-   * Convenience method for adding an element and text node.
-   * @param tag the tag to be processed
-   * @param att attributes
-   * @param txt text node
-   * @throws IOException I/O exception
-   */
-  public final void nodeAndText(final byte[] tag, final Atts att,
-      final byte[] txt) throws IOException {
-    startElem(tag, att);
-    text(new TokenBuilder(txt));
-    endElem(tag);
-  }
-
   @Override
   public final String tit() {
     return parser.tit();

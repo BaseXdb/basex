@@ -47,16 +47,16 @@ public final class Put extends UpdatePrimitive {
     }
   }
 
-  @Override
-  public PrimitiveType type() {
-    return PrimitiveType.PUT;
-  }
-
   /**
    * Returns uri as string.
    * @return string uri
    */
   public byte[] path() {
     return u.str();
+  }
+
+  @Override
+  public PrimitiveType type() {
+    return PrimitiveType.PUT;
   }
 }

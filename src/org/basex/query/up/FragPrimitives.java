@@ -14,7 +14,7 @@ import org.basex.util.TokenSet;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-final class FragmentPrimitives extends Primitives {
+final class FragPrimitives extends Primitives {
   @Override
   protected void check() throws QueryException {
     super.check();

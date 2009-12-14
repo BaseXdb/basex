@@ -65,7 +65,7 @@ public final class Transform extends Arr {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
-    final PendingUpdates pu = new PendingUpdates(true);
+    final Updates pu = new Updates(true);
     for(final Let fo : copies) {
       final Iter ir = fo.expr.iter(ctx);
       final Item i = ir.next();
@@ -76,7 +76,7 @@ public final class Transform extends Arr {
       pu.addDataReference(m);
     }
 
-    final PendingUpdates tmp = ctx.updates;
+    final Updates tmp = ctx.updates;
     ctx.updates = pu;
     ctx.iter(expr[0]).finish();
     ctx.updates.apply();

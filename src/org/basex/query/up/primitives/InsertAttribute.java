@@ -6,6 +6,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
+import org.basex.query.up.NamePool;
 
 /**
  * Insert attribute primitive.
@@ -36,18 +37,17 @@ public final class InsertAttribute extends NodeCopy {
   }
 
   @Override
-  public PrimitiveType type() {
-    return PrimitiveType.INSERTATTR;
+  public void update(final NamePool pool) {
+    for(int pre = 0; pre < md.meta.size; pre++) {
+      final int u = md.uri(pre, Data.ATTR);
+      final QNm qnm = new QNm(md.name(pre, Data.ATTR));
+      if(u != 0) qnm.uri = Uri.uri(md.ns.uri(u));
+      pool.add(qnm, true);
+    }
   }
 
   @Override
-  public QNm[] addAtt() {
-    final QNm[] at = new QNm[md.meta.size];
-    for(int pre = 0; pre < md.meta.size; pre++) {
-      final int u = md.uri(pre, Data.ATTR);
-      at[pre] = new QNm(md.name(pre, Data.ATTR));
-      if(u != 0) at[pre].uri = Uri.uri(md.ns.uri(u));
-    }
-    return at;
+  public PrimitiveType type() {
+    return PrimitiveType.INSERTATTR;
   }
 }

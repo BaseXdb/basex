@@ -4,8 +4,7 @@ import static org.basex.query.up.UpdateFunctions.*;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
+import org.basex.query.up.NamePool;
 
 /**
  * Delete primitive.
@@ -32,12 +31,12 @@ public final class DeletePrimitive extends UpdatePrimitive {
   }
 
   @Override
-  public PrimitiveType type() {
-    return PrimitiveType.DELETE;
+  public void update(final NamePool pool) {
+    pool.remove(node);
   }
 
   @Override
-  public QNm[] remAtt() {
-    return node.type == Type.ATT ? new QNm[] { node.qname() } : null;
+  public PrimitiveType type() {
+    return PrimitiveType.DELETE;
   }
 }

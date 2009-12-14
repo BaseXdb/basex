@@ -39,12 +39,12 @@ public final class ReplaceValue extends NewValue {
   }
 
   @Override
-  public PrimitiveType type() {
-    return PrimitiveType.REPLACEVALUE;
+  public void merge(final UpdatePrimitive p) throws QueryException {
+    Err.or(UPMULTREPV, node);
   }
 
   @Override
-  public void merge(final UpdatePrimitive p) throws QueryException {
-    Err.or(UPMULTREPV, node);
+  public PrimitiveType type() {
+    return PrimitiveType.REPLACEVALUE;
   }
 }

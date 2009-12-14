@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.QNm;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.util.IntList;
@@ -32,9 +31,9 @@ abstract class Primitives {
   protected final void add(final UpdatePrimitive p) throws QueryException {
     int i;
     if(p.node instanceof DBNode) i = ((DBNode) p.node).pre;
-    // Assign unique negative id to put operations (hmm..)
+    // Assign negative ids to put operations (hmm..)
     else if(p.type() == PrimitiveType.PUT) i = --putCount;
-    // Possible to use node id cause nodes in map belong to the same
+    // Possible to use node id because nodes in map belong to the same
     // database. Thus there won't be any collisions between dbnodes and
     // fragments.
     else i = p.node.id();
@@ -75,20 +74,4 @@ abstract class Primitives {
    * @throws QueryException query exception
    */
   protected abstract void apply() throws QueryException;
-
-  /**
-   * Increases or decreases the counters for the given QName set.
-   * @param m map reference
-   * @param a increase if true
-   * @param s string set
-   */
-  protected static final void changePool(final Map<QNm, Integer> m,
-      final boolean a, final QNm... s) {
-
-    if(s == null) return;
-    for(final QNm st : s) {
-      final Integer i = m.get(st);
-      m.put(st, (i == null ? 0 : i) + (a ? 1 : -1));
-    }
-  }
 }

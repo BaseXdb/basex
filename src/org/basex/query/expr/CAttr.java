@@ -53,6 +53,8 @@ public final class CAttr extends CFrag {
     final Item it = atn.atomic(ctx);
     if(it == null) Err.empty(this);
     final QNm name = name(ctx, it);
+    // [CG] XQuery/CAttr: might be included in name() method
+    if(!name.ns()) name.uri = Uri.EMPTY;
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
     if(comp && (eq(name.str(), XMLNS) || eq(pre, XMLNS))) Err.or(NSATTCONS);

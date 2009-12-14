@@ -49,7 +49,7 @@ s_ok=OK
 
 # Visualizations
 no_data=No data available
-no_space=Too less space
+no_space=Not enough space
 map_binary=Binary File
 info_title=Query Info
 help_title=Help

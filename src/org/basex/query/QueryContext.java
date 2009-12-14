@@ -34,7 +34,7 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.up.PendingUpdates;
+import org.basex.query.up.Updates;
 import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.NSLocal;
@@ -158,7 +158,7 @@ public final class QueryContext extends Progress {
   private final boolean inf;
 
   /** Pending updates. */
-  public PendingUpdates updates = new PendingUpdates(false);
+  public Updates updates = new Updates(false);
   /** Indicates if this query performs updates. */
   public boolean updating;
 

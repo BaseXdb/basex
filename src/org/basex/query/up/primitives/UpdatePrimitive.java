@@ -2,7 +2,7 @@ package org.basex.query.up.primitives;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
-import org.basex.query.item.QNm;
+import org.basex.query.up.NamePool;
 
 /**
  * Abstract XQuery Update Primitive.
@@ -55,14 +55,10 @@ public abstract class UpdatePrimitive {
   public void merge(final UpdatePrimitive p) throws QueryException { }
 
   /**
-   * States which attributes are added to the attribute pool.
-   * @return names of added attributes
+   * Updates the name pool, which is used for finding duplicate attributes
+   * and namespace conflicts.
+   * @param pool name pool
    */
-  public QNm[] addAtt() { return null; };
-
-  /**
-   * States which attributes are removed from the attribute pool.
-   * @return names of removed attributes if target node is an attribute
-   */
-  public QNm[] remAtt() { return null; };
+  @SuppressWarnings("unused")
+  public void update(final NamePool pool) { };
 }

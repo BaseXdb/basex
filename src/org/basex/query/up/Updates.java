@@ -25,7 +25,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Lukas Kircher
  */
-public final class PendingUpdates {
+public final class Updates {
   /** Update primitives which target nodes are DBNodes. */
   private final Map<Data, Primitives> primitives =
     new HashMap<Data, Primitives>();
@@ -46,7 +46,7 @@ public final class PendingUpdates {
    * Constructor.
    * @param transform update operations are triggered by a transform expression
    */
-  public PendingUpdates(final boolean transform) {
+  public Updates(final boolean transform) {
     t = transform;
     if(t) refs = new HashSet<Data>();
   }
@@ -85,7 +85,7 @@ public final class PendingUpdates {
       if(!t && !frag && ctx.context.perm(User.WRITE, d.meta) != -1)
         throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
 
-      prim = frag ? new FragmentPrimitives() : new DBPrimitives(d);
+      prim = frag ? new FragPrimitives() : new DBPrimitives(d);
       primitives.put(d, prim);
     }
     prim.add(p);
