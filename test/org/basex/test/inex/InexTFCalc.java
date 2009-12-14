@@ -166,7 +166,9 @@ public final class InexTFCalc {
           qu + 1, databases.get(db), items);
       final int n = Integer.parseInt(items);
       if (n > 0) freq[qu] += n;
-    } else  Main.outln(session.info());
+    } else {
+      Main.outln(session.info());
+    }
   }
 
   /**

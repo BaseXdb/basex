@@ -58,7 +58,7 @@ public final class FTNot extends FTExpr {
   FTItem not(final QueryContext ctx, final FTItem item) {
     if(item != null) {
       item.all = not(item.all);
-      item.score(ctx.score.ftNot(item.score()));
+      item.score(ctx.score.not(item.score()));
     }
     return item;
   }

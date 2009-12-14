@@ -167,22 +167,6 @@ public final class GUIProp extends AProp {
 
   /** Shows real file contents in the treemap. */
   public static final Object[] MAPFS = { "MAPFS", true };
-  /** Choice of interacting with TreeeMap. */
-  public static final Object[] MAPINTERACTION = { "MAPINTERACTION", false };
-  /** Distort map in mouse context. */
-  public static final Object[] MAPDIST = { "MAPDIST", false };
-  /** Size of thumb focus in map view fraction of total size. */
-  public static final Object[] MAPTHUMBSIZE = { "MAPTHUMBSIZE", 4 };
-  /** Scaling to use in the Map One-click-focus. */
-  public static final Object[] LENSSCALE = { "LENSSCALE", 2 };
-  /** Alpha value of the zoom box. */
-  public static final Object[] ZOOMBOXALPHA = { "ZOOMBOXALPHA", 100 };
-  /** Width of the fisheye view. */
-  public static final Object[] FISHW = { "FISHW", 300 };
-  /** Height of the fisheye view. */
-  public static final Object[] FISHH = { "FISHH", 200 };
-  /** Show file contents in TreeMap. */
-  public static final Object[] FILECONT = { "FILECONT", true };
 
   /**
    * Constructor.

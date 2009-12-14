@@ -137,11 +137,12 @@ public interface QueryText {
   /** FORX0004: Evaluation exception. */
   Object[] REGERR = { FORX, 4, "Regular expression: '%'." };
 
-  // [LK] to be revised...
   /** FOUP0001: Evaluation exception. */
   Object[] UPFOTYPE = { FOUP, 1, "Document or element expected, % found." };
   /** FOUP0002: Evaluation exception. */
   Object[] UPFOURI = { FOUP, 2, "No valid URI: '%'." };
+  /** FOUP0002: Evaluation exception. */
+  Object[] UPPUTERR = { FOUP, 2, "'%' could not be written." };
 
   /** FTDY0016: Evaluation exception. */
   Object[] FTWEIGHT = { FTDY, 16, "Invalid weight value: %" };
@@ -492,7 +493,6 @@ public interface QueryText {
   /** XQTY0024: Parsing exception. */
   Object[] NOATTALL = { XQTY, 24, "Attribute must follow the root element." };
 
-  //[LK] xquery update error msgs, work on texts
   /** XUDY0009: XQuery Update dynamic exception. */
   Object[] UPNOPAR = { XUDY, 9, "Target % has no parent." };
   /** XUDY0014: XQuery Update dynamic exception. */

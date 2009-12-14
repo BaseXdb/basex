@@ -111,14 +111,4 @@ final class MapRects implements Iterable<MapRect> {
       public void remove() { Main.notexpected(); }
     };
   }
-
-  /**
-   * Creates a copy of the rectangles.
-   * @return copy
-   */
-  MapRects copy() {
-    final MapRects rects = new MapRects(size);
-    rects.add(this);
-    return rects;
-  }
 }

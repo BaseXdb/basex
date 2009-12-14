@@ -47,15 +47,17 @@ public final class XMLParser implements IFileParser {
    * @param f the {@link BufferedFileChannel} to read the xml document from
    * @param prop the database properties to use
    * @return the main memory database or <code>null</code> if the document is
-   *         not wellformed
+   *         not well-formed
    * @throws IOException if any error occurs
    */
   public Data parse(final BufferedFileChannel f, final Prop prop)
       throws IOException {
-    if(f.size() > Integer.MAX_VALUE) throw new IOException(
-        "Input file too big.");
-    final byte[] data = f.get(new byte[(int) f.size()]);
+
+    if(f.size() > Integer.MAX_VALUE)
+     throw new IOException("Input file too big.");
+
     try {
+      final byte[] data = f.get(new byte[(int) f.size()]);
       final Parser p = Parser.xmlParser(new IOContent(data), prop);
       return new MemBuilder(p).build();
     } catch(final IOException ex) {
@@ -86,7 +88,7 @@ public final class XMLParser implements IFileParser {
         return; // successfully parsed xml content
       }
     }
-    if(deepFile.extractText()) { // if file too big or not wellformed
+    if(deepFile.extractText()) { // if file too big or not well-formed
       try {
         deepFile.fallback();
       } catch(final ParserException e) {

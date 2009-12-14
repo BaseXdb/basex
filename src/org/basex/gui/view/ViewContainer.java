@@ -105,7 +105,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     Performance.sleep(1000);
     while(++count < STEPS.length - 1) {
       Performance.sleep(50);
-      repaint();
+      if(getComponentCount() == 0) repaint();
     }
   }
 

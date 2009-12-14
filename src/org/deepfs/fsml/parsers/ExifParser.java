@@ -398,9 +398,9 @@ public final class ExifParser {
       void meta(final DeepFile d, final ByteBuffer b) { // always inlined
         final String s;
         switch(b.getShort() & 0xFFFF) {
-          case 1     :  s = "sRGB";         break;
-          case 0xFFFF:  s = "uncalibrated"; break;
-          default: s = null;
+          case 1:      s = "sRGB";         break;
+          case 0xFFFF: s = "uncalibrated"; break;
+          default:     s = null;
         }
         if(s != null) d.addMeta(elem, s);
       }

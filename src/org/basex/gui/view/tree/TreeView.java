@@ -184,8 +184,6 @@ public final class TreeView extends View implements TreeViewOptions {
       TreeRect[] lr = cache.getTreeRectsPerLevel(i);
       int y = getYperLevel(i);
 
-      // System.out.println("l: " + i + " x: " + lr[0].x + " w: " + lr[0].w);
-
       for(int z = 0; z < lr.length; z++) {
         TreeRect r = lr[z];
         drawRectangle(tIg, i, r.x, y, r.w, nodeHeight, BORDER_RECTANGLES,
@@ -439,7 +437,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
         if(cache.isBigRectangle(lv)) {
           // final TreeRect mPreRect = rList[0];
-          // TODO [W M] mPreRect.pre = par;
+          // [WM] mPreRect.pre = par;
 
           // highlightNode(g, mPreRect, lv, multiPreX == -1 ? (2 * r.x + r.w) /
           // 2
@@ -466,7 +464,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final ChildIterator chIt = new ChildIterator(data, pre);
 
       if(cache.isBigRectangle(lv)) {
-        // TODO [WM]
+        // [WM]
         // TreeRect cRect = rList.get(0);
         //
         // int firstChildPre = chIt.pre;
@@ -729,7 +727,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(data.meta.deepfs) {
 
-      // TODO [WM]
+      // [WM]
       if(data.fs.isFile(pre)) s = Token.string(data.fs.name(pre));
       else s = "hi";
 

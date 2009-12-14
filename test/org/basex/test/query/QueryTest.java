@@ -28,8 +28,7 @@ public final class QueryTest {
   private final Context context = new Context();
   /** Test instances. */
   private static final AbstractTest[] TESTS = {
-    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest(),
-    new XQUPNSTest()
+    new SimpleTest(), new XPathMarkFTTest(), new FTTest(), new XQUPTest()
   };
 
   /** Wrong results counter. */

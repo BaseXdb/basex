@@ -179,7 +179,7 @@ public final class ParserUtil {
   public static XMLGregorianCalendar convertYear(final int year) {
     final XMLGregorianCalendar xgc = factory == null ? null
         : factory.newXMLGregorianCalendar();
-    // [BL] xgc can be null here...
+    // [BL] CG: xgc can be null here...
     xgc.setYear(year);
     return xgc;
   }

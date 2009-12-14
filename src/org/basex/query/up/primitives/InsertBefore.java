@@ -28,13 +28,10 @@ public final class InsertBefore extends NodeCopy {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int pre = n.pre;
-//    System.out.println(d.toString(180, -1);
     d.insert(pre, d.parent(pre, Nod.kind(node.type)), md);
 //    final int s = m.meta.size;
-//    System.out.println(d.toString(180, -1);
 //    if(!mergeTextNodes(d, pos + s - 1, pos + s))
 //      mergeTextNodes(d, pos - 1, pos);
-//    System.out.println(d.toString(180, -1);
   }
 
   @Override

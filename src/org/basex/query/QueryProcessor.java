@@ -24,9 +24,8 @@ public final class QueryProcessor extends Progress {
   private static final byte[] PLAN = Token.token("QueryPlan");
   /** Expression context. */
   public final QueryContext ctx;
-  /** Initial node set. */
-  public String query;
-
+  /** Query. */
+  private String query;
   /** Parsed flag. */
   private boolean parsed;
   /** Compilation flag. */

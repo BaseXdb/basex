@@ -17,10 +17,10 @@ final class SliceDiceAlgo extends MapAlgo {
     double ww = 0;
     double hh = 0;
 
-    int tmpx = -1;
-    int tmpy = -1;
-    int tmph = -1;
-    int tmpw = -1;
+    int tx = -1;
+    int ty = -1;
+    int th = -1;
+    int tw = -1;
 
     final MapRects rects = new MapRects();
     // calculate map for each rectangle on this level
@@ -36,14 +36,14 @@ final class SliceDiceAlgo extends MapAlgo {
         hh = r.h;
       }
 
-      if(ww > 0 && hh > 0 && (tmpx != (int) xx || tmpy != (int) yy ||
-          tmph != (int) hh || tmpw != (int) ww))
+      if(ww > 0 && hh > 0 && (tx != (int) xx || ty != (int) yy ||
+          th != (int) hh || tw != (int) ww))
         rects.add(new MapRect((int) xx, (int) yy, (int) ww, (int) hh,
             ml.get(i), r.level));
-      tmpx = (int) xx;
-      tmpy = (int) yy;
-      tmph = (int) hh;
-      tmpw = (int) ww;
+      tx = (int) xx;
+      ty = (int) yy;
+      th = (int) hh;
+      tw = (int) ww;
     }
     return rects;
   }

@@ -335,12 +335,10 @@ public class QueryParser extends InputParser {
       if(consumeWS(VARIABLE)) {
         varDecl();
       } else if(consumeWS(UPDATING)) {
-        // [LK] CG: check if function performs an update
         ctx.updating = true;
         check(FUNCTION);
         functionDecl(true);
       } else if(consumeWS(FUNCTION)) {
-        // [LK] CG: check if function performs no updates
         functionDecl(false);
       } else if(consumeWS(OPTION)) {
         optionDecl();
@@ -2504,7 +2502,6 @@ public class QueryParser extends InputParser {
       return null;
     }
 
-    // [LK] evaluate as element constructor?
     final Expr s = check(single(), INCOMPLETE);
     boolean first = false;
     boolean last = false;

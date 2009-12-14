@@ -172,7 +172,7 @@ public abstract class IO {
     final String n = name();
     final int i = n.lastIndexOf(".");
     final String nm = i != -1 ? n.substring(0, i) : n;
-    // [CG] IO: check this
+    // [CG] IO: default database name
     return nm.isEmpty() ? "database" : nm;
   }
 

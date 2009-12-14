@@ -97,7 +97,7 @@ public final class For extends ForLet {
         if(it != null) {
           v.bind(it, ctx);
           if(p != null) p.bind(Itr.get(++c), ctx);
-          if(s != null) s.bind(Dbl.get(ctx.score.finish(it.score())), ctx);
+          if(s != null) s.bind(Dbl.get(it.score()), ctx);
         } else {
           reset();
         }

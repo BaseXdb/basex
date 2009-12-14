@@ -57,189 +57,48 @@ public final class MP3Parser implements IFileParser {
    * genre X is stored at GENRES[X].
    */
   static final byte[][] GENRES = new byte[][] {
-      new byte[] { 66, 108, 117, 101, 115}, // Blues
-      new byte[] { 67, 108, 97, 115, 115, 105, 99, 32, 82, 111, //
-          99, 107}, // Classic Rock
-      new byte[] { 67, 111, 117, 110, 116, 114, 121}, // Country
-      new byte[] { 68, 97, 110, 99, 101}, // Dance
-      new byte[] { 68, 105, 115, 99, 111}, // Disco
-      new byte[] { 70, 117, 110, 107}, // Funk
-      new byte[] { 71, 114, 117, 110, 103, 101}, // Grunge
-      new byte[] { 72, 105, 112, 45, 72, 111, 112}, // Hip-Hop
-      new byte[] { 74, 97, 122, 122}, // Jazz
-      new byte[] { 77, 101, 116, 97, 108}, // Metal
-      new byte[] { 78, 101, 119, 32, 65, 103, 101}, // New Age
-      new byte[] { 79, 108, 100, 105, 101, 115}, // Oldies
-      new byte[] { 79, 116, 104, 101, 114}, // Other
-      new byte[] { 80, 111, 112}, // Pop
-      new byte[] { 82, 38, 66}, // R&B
-      new byte[] { 82, 97, 112}, // Rap
-      new byte[] { 82, 101, 103, 103, 97, 101}, // Reggae
-      new byte[] { 82, 111, 99, 107}, // Rock
-      new byte[] { 84, 101, 99, 104, 110, 111}, // Techno
-      new byte[] { 73, 110, 100, 117, 115, 116, 114, 105, //
-          97, 108}, // Industrial
-      new byte[] { 65, 108, 116, 101, 114, 110, 97, 116, 105, //
-          118, 101}, // Alternative
-      new byte[] { 83, 107, 97}, // Ska
-      new byte[] { 68, 101, 97, 116, 104, 32, 77, 101, 116, //
-          97, 108}, // Death Metal
-      new byte[] { 80, 114, 97, 110, 107, 115}, // Pranks
-      new byte[] { 83, 111, 117, 110, 100, 116, 114, 97, 99, 107}, // Soundtrack
-      new byte[] { 69, 117, 114, 111, 45, 84, 101, 99, 104, 110, //
-          111}, // Euro-Techno
-      new byte[] { 65, 109, 98, 105, 101, 110, 116}, // Ambient
-      new byte[] { 84, 114, 105, 112, 45, 72, 111, 112}, // Trip-Hop
-      new byte[] { 86, 111, 99, 97, 108}, // Vocal
-      new byte[] { 74, 97, 122, 122, 43, 70, 117, 110, 107}, // Jazz+Funk
-      new byte[] { 70, 117, 115, 105, 111, 110}, // Fusion
-      new byte[] { 84, 114, 97, 110, 99, 101}, // Trance
-      new byte[] { 67, 108, 97, 115, 115, 105, 99, 97, 108}, // Classical
-      new byte[] { 73, 110, 115, 116, 114, 117, 109, 101, 110, //
-          116, 97, 108}, // Instrumental
-      new byte[] { 65, 99, 105, 100}, // Acid
-      new byte[] { 72, 111, 117, 115, 101}, // House
-      new byte[] { 71, 97, 109, 101}, // Game
-      new byte[] { 83, 111, 117, 110, 100, 32, 67, 108, 105, 112}, // Sound Clip
-      new byte[] { 71, 111, 115, 112, 101, 108}, // Gospel
-      new byte[] { 78, 111, 105, 115, 101}, // Noise
-      new byte[] { 65, 108, 116, 101, 114, 110, 82, 111, 99, 107}, // AlternRock
-      new byte[] { 66, 97, 115, 115}, // Bass
-      new byte[] { 83, 111, 117, 108}, // Soul
-      new byte[] { 80, 117, 110, 107}, // Punk
-      new byte[] { 83, 112, 97, 99, 101}, // Space
-      new byte[] { 77, 101, 100, 105, 116, 97, 116, 105, //
-          118, 101}, // Meditative
-      new byte[] { 73, 110, 115, 116, 114, 117, 109, 101, 110, 116, 97, 108, //
-          32, 80, 111, 112}, // Instrumental Pop
-      new byte[] { 73, 110, 115, 116, 114, 117, 109, 101, 110, 116, 97, 108, //
-          32, 82, 111, 99, 107}, // Instrumental Rock
-      new byte[] { 69, 116, 104, 110, 105, 99}, // Ethnic
-      new byte[] { 71, 111, 116, 104, 105, 99}, // Gothic
-      new byte[] { 68, 97, 114, 107, 119, 97, 118, 101}, // Darkwave
-      new byte[] { 84, 101, 99, 104, 110, 111, 45, 73, 110, 100, 117, 115, //
-          116, 114, 105, 97, 108}, // Techno-Industrial
-      new byte[] { 69, 108, 101, 99, 116, 114, 111, 110, 105, 99}, // Electronic
-      new byte[] { 80, 111, 112, 45, 70, 111, 108, 107}, // Pop-Folk
-      new byte[] { 69, 117, 114, 111, 100, 97, 110, 99, 101}, // Eurodance
-      new byte[] { 68, 114, 101, 97, 109}, // Dream
-      new byte[] { 83, 111, 117, 116, 104, 101, 114, 110, 32, 82, //
-          111, 99, 107}, // Southern Rock
-      new byte[] { 67, 111, 109, 101, 100, 121}, // Comedy
-      new byte[] { 67, 117, 108, 116}, // Cult
-      new byte[] { 71, 97, 110, 103, 115, 116, 97}, // Gangsta
-      new byte[] { 84, 111, 112, 32, 52, 48}, // Top 40
-      new byte[] { 67, 104, 114, 105, 115, 116, 105, 97, 110, 32, 82, //
-          97, 112}, // Christian Rap
-      new byte[] { 80, 111, 112, 47, 70, 117, 110, 107}, // Pop/Funk
-      new byte[] { 74, 117, 110, 103, 108, 101}, // Jungle
-      new byte[] { 78, 97, 116, 105, 118, 101, 32, 65, 109, 101, 114, 105, //
-          99, 97, 110}, // Native American
-      new byte[] { 67, 97, 98, 97, 114, 101, 116}, // Cabaret
-      new byte[] { 78, 101, 119, 32, 87, 97, 118, 101}, // New Wave
-      new byte[] { 80, 115, 121, 99, 104, 97, 100, 101, 108, 105, //
-          99}, // Psychadelic
-      new byte[] { 82, 97, 118, 101}, // Rave
-      new byte[] { 83, 104, 111, 119, 116, 117, 110, 101, 115}, // Showtunes
-      new byte[] { 84, 114, 97, 105, 108, 101, 114}, // Trailer
-      new byte[] { 76, 111, 45, 70, 105}, // Lo-Fi
-      new byte[] { 84, 114, 105, 98, 97, 108}, // Tribal
-      new byte[] { 65, 99, 105, 100, 32, 80, 117, 110, 107}, // Acid Punk
-      new byte[] { 65, 99, 105, 100, 32, 74, 97, 122, 122}, // Acid Jazz
-      new byte[] { 80, 111, 108, 107, 97}, // Polka
-      new byte[] { 82, 101, 116, 114, 111}, // Retro
-      new byte[] { 77, 117, 115, 105, 99, 97, 108}, // Musical
-      new byte[] { 82, 111, 99, 107, 32, 38, 32, 82, 111, 108, //
-          108}, // Rock & Roll
-      new byte[] { 72, 97, 114, 100, 32, 82, 111, 99, 107}, // Hard Rock
-      new byte[] { 70, 111, 108, 107}, // Folk
-      new byte[] { 70, 111, 108, 107, 45, 82, 111, 99, 107}, // Folk-Rock
-      new byte[] { 78, 97, 116, 105, 111, 110, 97, 108, 32, 70, //
-          111, 108, 107}, // National Folk
-      new byte[] { 83, 119, 105, 110, 103}, // Swing
-      new byte[] { 70, 97, 115, 116, 32, 70, 117, 115, 105, 111, //
-          110}, // Fast Fusion
-      new byte[] { 66, 101, 98, 111, 98}, // Bebob
-      new byte[] { 76, 97, 116, 105, 110}, // Latin
-      new byte[] { 82, 101, 118, 105, 118, 97, 108}, // Revival
-      new byte[] { 67, 101, 108, 116, 105, 99}, // Celtic
-      new byte[] { 66, 108, 117, 101, 103, 114, 97, 115, 115}, // Bluegrass
-      new byte[] { 65, 118, 97, 110, 116, 103, 97, 114, 100, 101}, // Avantgarde
-      new byte[] { 71, 111, 116, 104, 105, 99, 32, 82, 111, 99, //
-          107}, // Gothic Rock
-      new byte[] { 80, 114, 111, 103, 114, 101, 115, 115, 105, 118, 101, 32, //
-          82, 111, 99, 107}, // Progressive Rock
-      new byte[] { 80, 115, 121, 99, 104, 101, 100, 101, 108, 105, 99, 32, //
-          82, 111, 99, 107}, // Psychedelic Rock
-      new byte[] { 83, 121, 109, 112, 104, 111, 110, 105, 99, 32, 82, 111, //
-          99, 107}, // Symphonic Rock
-      new byte[] { 83, 108, 111, 119, 32, 82, 111, 99, 107}, // Slow Rock
-      new byte[] { 66, 105, 103, 32, 66, 97, 110, 100}, // Big Band
-      new byte[] { 67, 104, 111, 114, 117, 115}, // Chorus
-      new byte[] { 69, 97, 115, 121, 32, 76, 105, 115, 116, 101, 110, 105, //
-          110, 103}, // Easy Listening
-      new byte[] { 65, 99, 111, 117, 115, 116, 105, 99}, // Acoustic
-      new byte[] { 72, 117, 109, 111, 117, 114}, // Humour
-      new byte[] { 83, 112, 101, 101, 99, 104}, // Speech
-      new byte[] { 67, 104, 97, 110, 115, 111, 110}, // Chanson
-      new byte[] { 79, 112, 101, 114, 97}, // Opera
-      new byte[] { 67, 104, 97, 109, 98, 101, 114, 32, 77, 117, //
-          115, 105, 99}, // Chamber Music
-      new byte[] { 83, 111, 110, 97, 116, 97}, // Sonata
-      new byte[] { 83, 121, 109, 112, 104, 111, 110, 121}, // Symphony
-      new byte[] { 66, 111, 111, 116, 121, 32, 66, 114, 97, 115, //
-          115}, // Booty Brass
-      new byte[] { 80, 114, 105, 109, 117, 115}, // Primus
-      new byte[] { 80, 111, 114, 110, 32, 71, 114, 111, 111, //
-          118, 101}, // Porn Groove
-      new byte[] { 83, 97, 116, 105, 114, 101}, // Satire
-      new byte[] { 83, 108, 111, 119, 32, 74, 97, 109}, // Slow Jam
-      new byte[] { 67, 108, 117, 98}, // Club
-      new byte[] { 84, 97, 110, 103, 111}, // Tango
-      new byte[] { 83, 97, 109, 98, 97}, // Samba
-      new byte[] { 70, 111, 108, 107, 108, 111, 114, 101}, // Folklore
-      new byte[] { 66, 97, 108, 108, 97, 100}, // Ballad
-      new byte[] { 80, 111, 119, 101, 101, 114, 32, 66, 97, 108, 108, //
-          97, 100}, // Poweer Ballad
-      new byte[] { 82, 104, 121, 116, 109, 105, 99, 32, 83, 111, 117, //
-          108}, // Rhytmic Soul
-      new byte[] { 70, 114, 101, 101, 115, 116, 121, 108, 101}, // Freestyle
-      new byte[] { 68, 117, 101, 116}, // Duet
-      new byte[] { 80, 117, 110, 107, 32, 82, 111, 99, 107}, // Punk Rock
-      new byte[] { 68, 114, 117, 109, 32, 83, 111, 108, 111}, // Drum Solo
-      new byte[] { 65, 32, 67, 97, 112, 101, 108, 97}, // A Capela
-      new byte[] { 69, 117, 114, 111, 45, 72, 111, 117, 115, 101}, // Euro-House
-      new byte[] { 68, 97, 110, 99, 101, 32, 72, 97, 108, 108}, // Dance Hall
-      new byte[] { 71, 111, 97}, // Goa
-      new byte[] { 68, 114, 117, 109, 32, 38, 32, 66, 97, 115, //
-          115}, // Drum & Bass
-      new byte[] { 67, 108, 117, 98, 45, 72, 111, 117, 115, 101}, // Club-House
-      new byte[] { 72, 97, 114, 100, 99, 111, 114, 101}, // Hardcore
-      new byte[] { 84, 101, 114, 114, 111, 114}, // Terror
-      new byte[] { 73, 110, 100, 105, 101}, // Indie
-      new byte[] { 66, 114, 105, 116, 80, 111, 112}, // BritPop
-      new byte[] { 78, 101, 103, 101, 114, 112, 117, 110, 107}, // Negerpunk
-      new byte[] { 80, 111, 108, 115, 107, 32, 80, 117, 110, 107}, // Polsk Punk
-      new byte[] { 66, 101, 97, 116}, // Beat
-      new byte[] { 67, 104, 114, 105, 115, 116, 105, 97, 110, 32, 71, 97, //
-          110, 103, 115, 116, 97, 32, 82, 97, 112}, // Christian Gangsta Rap
-      new byte[] { 72, 101, 97, 118, 121, 32, 77, 101, 116, //
-          97, 108}, // Heavy Metal
-      new byte[] { 66, 108, 97, 99, 107, 32, 77, 101, 116, 97, //
-          108}, // Black Metal
-      new byte[] { 67, 114, 111, 115, 115, 111, 118, 101, 114}, // Crossover
-      new byte[] { 67, 111, 110, 116, 101, 109, 112, 111, 114, 97, 114, 121, //
-          32, 67, 104, 114, 105, 115, 116, 105, //
-          97, 110}, // Contemporary Christian
-      new byte[] { 67, 104, 114, 105, 115, 116, 105, 97, 110, 32, 82, 111, //
-          99, 107}, // Christian Rock
-      new byte[] { 77, 101, 114, 101, 110, 103, 117, 101}, // Merengue
-      new byte[] { 83, 97, 108, 115, 97}, // Salsa
-      new byte[] { 84, 114, 97, 115, 104, 32, 77, 101, 116, //
-          97, 108}, // Trash Metal
-      new byte[] { 65, 110, 105, 109, 101}, // Anime
-      new byte[] { 74, 112, 111, 112}, // Jpop
-      new byte[] { 83, 121, 110, 116, 104, 112, 111, 112}, // Synthpop
+    token("Blues"), token("Classic Rock"), token("Country"), token("Dance"),
+    token("Disco"), token("Funk"), token("Grunge"), token("Hip-Hop"),
+    token("Jazz"), token("Metal"), token("New Age"), token("Oldies"),
+    token("Other"), token("Pop"), token("R&B"), token("Rap"), token("Reggae"),
+    token("Rock"), token("Techno"), token("Industrial"), token("Alternative"),
+    token("Ska"), token("Death Metal"), token("Pranks"), token("Soundtrack"),
+    token("Euro-Techno"), token("Ambient"), token("Trip-Hop"), token("Vocal"),
+    token("Jazz+Funk"), token("Fusion"), token("Trance"), token("Classical"),
+    token("Instrumental"), token("Acid"), token("House"), token("Game"),
+    token("Sound Clip"), token("Gospel"), token("Noise"), token("AlternRock"),
+    token("Bass"), token("Soul"), token("Punk"), token("Space"),
+    token("Meditative"), token("Instrumental Pop"), token("Instrumental Rock"),
+    token("Ethnic"), token("Gothic"), token("Darkwave"),
+    token("Techno-Industrial"), token("Electronic"), token("Pop-Folk"),
+    token("Eurodance"), token("Dream"), token("Southern Rock"), token("Comedy"),
+    token("Cult"), token("Gangsta"), token("Top 40"), token("Christian Rap"),
+    token("Pop/Funk"), token("Jungle"), token("Native American"),
+    token("Cabaret"), token("New Wave"), token("Psychadelic"), token("Rave"),
+    token("Showtunes"), token("Trailer"), token("Lo-Fi"), token("Tribal"),
+    token("Acid Punk"), token("Acid Jazz"), token("Polka"), token("Retro"),
+    token("Musical"), token("Rock & Roll"), token("Hard Rock"), token("Folk"),
+    token("Folk-Rock"), token("National Folk"), token("Swing"),
+    token("Fast Fusion"), token("Bebob"), token("Latin"), token("Revival"),
+    token("Celtic"), token("Bluegrass"), token("Avantgarde"),
+    token("Gothic Rock"), token("Progressive Rock"), token("Psychedelic Rock"),
+    token("Symphonic Rock"), token("Slow Rock"), token("Big Band"),
+    token("Chorus"), token("Easy Listening"), token("Acoustic"),
+    token("Humour"), token("Speech"), token("Chanson"), token("Opera"),
+    token("Chamber Music"), token("Sonata"), token("Symphony"), 
+    token("Booty Brass"), token("Primus"), token("Porn Groove"),
+    token("Satire"), token("Slow Jam"), token("Club"), token("Tango"),
+    token("Samba"), token("Folklore"), token("Ballad"), token("Poweer Ballad"),
+    token("Rhytmic Soul"), token("Freestyle"), token("Duet"),
+    token("Punk Rock"), token("Drum Solo"), token("A Capela"),
+    token("Euro-House"), token("Dance Hall"), token("Goa"),
+    token("Drum & Bass"), token("Club-House"), token("Hardcore"),
+    token("Terror"), token("Indie"), token("BritPop"), token("Negerpunk"),
+    token("Polsk Punk"), token("Beat"), token("Christian Gangsta Rap"),
+    token("Heavy Metal"), token("Black Metal"), token("Crossover"),
+    token("Contemporary Christian"), token("Christian Rock"), token("Merengue"),
+    token("Salsa"), token("Trash Metal"), token("Anime"), token("Jpop"),
+    token("Synthpop")
   };
 
   /** All available picture types for APIC frames. */
@@ -802,7 +661,7 @@ public final class MP3Parser implements IFileParser {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
         final String encoding = obj.readEncoding();
-        // [BL] lang variable isn't evaluated in the rest of this method
+        // [BL] CG: lang variable isn't evaluated in the rest of this method
         byte[] lang = obj.readText(3, "");
         for(final byte b : lang) {
           if(ws(b) || b == 0) {

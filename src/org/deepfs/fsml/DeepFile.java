@@ -532,15 +532,15 @@ public class DeepFile {
    * @param xgc calendar value
    */
   public void addMeta(final MetaElem elem, final XMLGregorianCalendar xgc) {
-    Type t = elem.getType();
-    QName st = xgc.getXMLSchemaType();
+    final Type t = elem.getType();
+    final QName st = xgc.getXMLSchemaType();
     if((Type.DAT.instance(t) && !st.equals(DatatypeConstants.DATE))
         || (Type.YEA.instance(t) && !st.equals(DatatypeConstants.GYEAR)))
       metaDebug(elem, st.getLocalPart());
     else {
       try {
         addMeta(elem, xgc.toXMLFormat(), null);
-      } catch(IllegalStateException e) {
+      } catch(final IllegalStateException e) {
         Main.debug("DeepFile: Invalid date (file: %, error message: %)",
             bfc.getFileName(), e.getMessage());
       }

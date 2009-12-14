@@ -63,7 +63,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void flush() { }
+  public synchronized void flush() { }
 
   @Override
   public synchronized void close() throws IOException {
@@ -99,25 +99,25 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public int read1(final int p, final int o) {
+  public synchronized int read1(final int p, final int o) {
     return (int) ((o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 7 : 15) - o << 3) & 0xFF);
   }
 
   @Override
-  public int read2(final int p, final int o) {
+  public synchronized int read2(final int p, final int o) {
     return (int) ((o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 6 : 14) - o << 3) & 0xFFFF);
   }
 
   @Override
-  public int read4(final int p, final int o) {
+  public synchronized int read4(final int p, final int o) {
     return (int) ((o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 4 : 12) - o << 3));
   }
 
   @Override
-  public long read5(final int p, final int o) {
+  public synchronized long read5(final int p, final int o) {
     return (o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 3 : 11) - o << 3) & 0xFFFFFFFFFFL;
   }
@@ -155,12 +155,12 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void delete(final int pre, final int nr) {
+  public synchronized void delete(final int pre, final int nr) {
     move(pre + nr, pre);
   }
 
   @Override
-  public void insert(final int pre, final byte[] entries) {
+  public synchronized void insert(final int pre, final byte[] entries) {
     final int nr = entries.length >>> IO.NODEPOWER;
     move(pre, pre + nr);
     for(int l = 0, i = pre; i < pre + nr; i++, l += 16) {
@@ -170,7 +170,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public void set(final int pre, final byte[] entries) {
+  public synchronized void set(final int pre, final byte[] entries) {
     final int nr = entries.length >>> IO.NODEPOWER;
     for(int l = 0, i = pre; i < pre + nr; i++, l += 1 << IO.NODEPOWER) {
       buf1[i] = getLong(entries, l);
@@ -217,7 +217,7 @@ public final class TableMemAccess extends TableAccess {
    * @param a array
    * @param p position
    */
-  private void copy(final long v, final byte[] a, final int p) {
+  private synchronized void copy(final long v, final byte[] a, final int p) {
     a[p    ] = (byte) (v >> 56);
     a[p + 1] = (byte) (v >> 48);
     a[p + 2] = (byte) (v >> 40);

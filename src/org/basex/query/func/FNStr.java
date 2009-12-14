@@ -302,7 +302,7 @@ final class FNStr extends Fun {
     } else {
       nr = NORMS[0];
     }
-    // [CG] XQuery/normalize-unicode
+    // [CG] XQuery/normalize-unicode()
     return Str.get(str);
   }
 

@@ -206,7 +206,7 @@ public final class DeepShell {
         new FSWalker(new TreePrinter()).traverse(d);
         return;
       }
-      System.out.println("No such directory " + d.getAbsolutePath());
+      System.err.println("No such directory " + d.getAbsolutePath());
     }
     help(new String[] { "help", "tree"});
     return;

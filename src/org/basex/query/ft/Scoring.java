@@ -1,8 +1,5 @@
 package org.basex.query.ft;
 
-import org.basex.index.FTIndex;
-import org.basex.query.item.FTItem;
-
 /**
  * Simple default scoring model, assembling all scoring calculations.
  *
@@ -10,7 +7,7 @@ import org.basex.query.item.FTItem;
  * @author Christian Gruen
  */
 public final class Scoring {
-  /** Scoring multiplier to save values as integers. */
+  /** Scoring multiplier to store values as integers. */
   public static final int MP = 1000;
   /** Logarithmic base for calculating the score value. */
   private static final double LOG = Math.E - 1;
@@ -49,78 +46,22 @@ public final class Scoring {
   }
 
   /**
-   * Creates a final scoring value.
-   * @param s input value
-   * @return result
-   */
-  public double finish(final double s) {
-    return s;
-    //return Math.min(1, (int) (s * 1000) / 1000d);
-  }
-
-  /**
-   * Determines a single scoring value out of two FTAnd combined terms.
-   * The minimum scoring value is chosen and weighted by the average distance
-   * of the single result terms in the text node.
-   * @param item1 item1
-   * @param item2 item2
-   * @return scoring value
-   */
-  public double ftAnd(final FTItem item1, final FTItem item2) {
-    final double score = Math.min(item1.score(), item2.score());
-    return score;
-//    int sum = 0;
-//    int count = 0;
-//
-//    for(final FTMatch m1 : item1.all) {
-//      for(final FTStringMatch sm1 : m1) {
-//        if(sm1.n) continue;
-//        for(final FTMatch m2 : item2.all) {
-//          for(final FTStringMatch sm2 : m2) {
-//            if(sm2.n) continue;
-//            sum += Math.abs(sm1.s - sm2.s);
-//            count++;
-//          }
-//        }
-//      }
-//    }
-//    return count == 0 ? 0 : score / Math.sqrt((double) sum / count);
-  }
-
-  /*
-   * Determines a single scoring value out of two FTOr combined terms.
-   * The maximum scoring value is chosen and weighted by the number
-   * of term in the current text node at the ratio of the
-   * number of terms out of the query.
-   *
-   * @param item1 item1
-   * @param item2 item2
-   * @param n number of tokens in the or expression
-   * @param m number of tokens int the entire query
-   * @return double scoring value
-  public double ftOr(final FTItem item1, final FTItem item2, final int n,
-      final int m) {
-
-    final double score = Math.max(item1.score(), item2.score());
-    final int[] p = new int[n];
-    for(final FTMatch mi : item1.all) {
-      for(final FTStringMatch sm : mi) {
-        p[sm.q - 1] = -1;
-      }
-    }
-    int count = 0;
-    for(final int pp : p) if(pp == -1) count++;
-    return score * (count > m ? 1 : count / m);
-  }
-   */
-
-  /**
    * Inverses the scoring value for FTNot.
    * @param d scoring value
    * @return inverse scoring value
    */
-  public double ftNot(final double d) {
+  public double not(final double d) {
     return 1 - d;
+  }
+
+  /**
+   * Returns a score for the let clause.
+   * @param s summed up scoring values
+   * @param c number of values
+   * @return new score value
+   */
+  public double let(final double s, final int c) {
+    return s / c;
   }
 
   /**
@@ -129,12 +70,7 @@ public final class Scoring {
    * The result is multiplied with the {@link #MP} constant to yield
    * integer values. The value <code>2</code> is used as minimum score,
    * as the total minimum value will be subtracted by 1 to avoid eventual
-   * <code>0</code> scores; for more information, see how the scoring
-   * is evaluated in the {@link FTIndex} class.
-   *
-   * [SG] Some tf-idf variants could return values which are better normalized;
-   * see e.g.: http://nlp.stanford.edu/IR-book/html/htmledition/
-   *   variant-tf-idf-functions-1.html
+   * <code>0</code> scores.
    *
    * @param freq frequency of the token. TF: freq(i, j)
    * @param mfreq maximum occurrence of a token. TF: max(l, freq(l, j))
@@ -172,6 +108,16 @@ public final class Scoring {
   }
 
   /**
+   * Returns the union value.
+   * @param w1 score of word1
+   * @param w2 score of word2
+   * @return score of the phrase
+   */
+  public static double union(final double w1, final double w2) {
+    return Math.max(w1, w2);
+  }
+
+  /**
    * Returns a score for a single step.
    * @param sc current score value
    * @return new score value
@@ -179,46 +125,4 @@ public final class Scoring {
   public static double step(final double sc) {
     return sc * SCORESTEP;
   }
-
-  /**
-   * Returns a score for the descendant axis step.
-   * @param r current node
-   * @param d descendant node
-   * @param data data reference
-   * @param sc current score value
-   * @return new score value
-  public static double descAxis(final int r, final int d, final Data data,
-      final double sc) {
-    return sc * 1d / Math.sqrt(distTo(data, d, r));
-    //return sc * SCORESTEP;
-  }
-   */
-
-  /**
-   * Returns a score for the parent axis step, using meta information.
-   * @param data Data reference
-   * @param nod current node
-   * @return score value
-  public static double parentAxis(final Data data, final DBNode nod) {
-    return nod.score() *
-      (1d - (double) distTo(data, nod.pre, 0) / data.meta.height);
-  }
-   */
-
-  /**
-   * Determines the distance between two nodes using parent steps.
-   * @param data Data reference
-   * @param n1 start node
-   * @param n2 destination node
-   * @return distance to root node
-  private static int distTo(final Data data, final int n1, final int n2) {
-    int dist = 0;
-    int parent = data.parent(n1, data.kind(n1));
-    while(parent > n2) {
-      dist++;
-      parent = data.parent(parent, data.kind(parent));
-    }
-    return dist;
-  }
-   */
 }

@@ -11,21 +11,21 @@ import org.basex.gui.view.ViewData;
  * @author Joerg Hauser
  */
 final class MapLayout {
+  /** List of rectangles. */
+  final MapRects rectangles = new MapRects();
   /** Font size. */
   private final int off;
   /** Data reference. */
   private final Data data;
   /** Map algorithm to use in this layout. */
-  final MapAlgo algo;
+  private final MapAlgo algo;
   /** Text lengths. */
   private final int[] textLen;
+  /** Widow properties. */
+  private final GUIProp prop;
 
-  /** List of rectangles. */
-  final MapRects rectangles;
   /** Layout rectangle. */
   final MapRect layout;
-  /** Widow properties. */
-  final GUIProp prop;
 
   /**
    * Constructor.
@@ -37,7 +37,6 @@ final class MapLayout {
     data = d;
     textLen = tl;
     prop = pr;
-    rectangles = new MapRects();
     off = prop.num(GUIProp.FONTSIZE) + 4;
 
     switch(prop.num(GUIProp.MAPOFFSETS)) {
@@ -122,7 +121,7 @@ final class MapLayout {
    * One rectangle left, add it and continue with its children.
    * @param r parent rectangle
    */
-  public void putRect(final MapRect r) {
+  private void putRect(final MapRect r) {
     // position, with and height calculated using sizes of former level
     final int x = r.x + layout.x;
     final int y = r.y + layout.y;

@@ -97,9 +97,7 @@ public final class FTWords extends FTExpr {
 
     final int c = contains(ctx);
     if(c == 0) all.size = 0;
-    // return new FTItem(all, fast || c == 0 ? 0 : 1);
-    // [SG] check scoring remainders
-    //   scoring: pass on number of tokens
+    // scoring: pass on number of tokens
     return new FTItem(all, fast || c == 0 ? 0 :
       ctx.score.word(c, ctx.fttoken.count()));
   }
@@ -210,12 +208,9 @@ public final class FTWords extends FTExpr {
    * @return fast fast evaluation
    */
   boolean add(final int s, final int e) {
-    // [CG] FT: check if this is needed/correct
-    if(!first && (mode == FTMode.ALL || mode == FTMode.ALLWORDS)) {
-      all.and(s, e);
-    } else {
-      all.or(s, e);
-    }
+    // [CG] FT: check if this is needed and correct
+    if(!first && (mode == FTMode.ALL || mode == FTMode.ALLWORDS)) all.and(s, e);
+    else all.or(s, e);
     return fast;
   }
 

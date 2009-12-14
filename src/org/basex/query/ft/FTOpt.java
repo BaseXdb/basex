@@ -160,20 +160,20 @@ public final class FTOpt extends ExprInfo {
 
     if(qu.fz && ls == null) ls = new Levenshtein();
 
-    int count = 0;
+    int c = 0;
     while(tk.more()) {
       final int tp = tk.p;
       final int tpos = tk.pos;
       byte[] t = tk.get();
       boolean f = false;
-      boolean c = false;
+      boolean m = false;
       qu.init();
       while(qu.more()) {
-        if(c) {
+        if(m) {
           tk.more();
           t = tk.get();
         } else {
-          c = true;
+          m = true;
         }
         final byte[] s = qu.get();
         if(sw != null && sw.id(s) != 0) continue;
@@ -194,7 +194,7 @@ public final class FTOpt extends ExprInfo {
       }
 
       if(f) {
-        count++;
+        c++;
         if(words.add(tpos, tpos + qu.pos - 1)) break;
       }
       tk.p = tp;
@@ -203,7 +203,7 @@ public final class FTOpt extends ExprInfo {
 
     words.all.sTokenNum++;
     words.first = false;
-    return count;
+    return c;
   }
 
   /**

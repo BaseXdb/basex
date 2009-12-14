@@ -25,7 +25,7 @@ final class TableIterator {
   /** Current column. */
   int col;
   /** Element flag. */
-  boolean elem;
+  boolean text;
 
   /**
    * Default constructor.
@@ -55,14 +55,14 @@ final class TableIterator {
   boolean more() {
     while(++pre < last) {
       final int k = data.kind(pre);
-      elem = k == Data.TEXT;
+      text = k == Data.TEXT;
 
       // content found...
-      if(elem || k == Data.ATTR) {
-        final int id = elem ? tag : data.name(pre);
+      if(text || k == Data.ATTR) {
+        final int id = text ? tag : data.name(pre);
         // find correct column...
         for(col = 0; col < tdata.cols.length; col++) {
-          if(tdata.cols[col].id == id && tdata.cols[col].elem == elem) {
+          if(tdata.cols[col].id == id && tdata.cols[col].elem == text) {
             return true;
           }
         }

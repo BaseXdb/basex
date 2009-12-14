@@ -32,8 +32,8 @@ public final class Put extends UpdatePrimitive {
 
   @Override
   public void apply(final int add) throws QueryException {
-    // [CG] to be checked..
-    // - node.pre reference might be invalid after an update
+    // [CG] XQuery/Put: to be checked..
+    // - node.pre reference might have changed after an update
     PrintOutput out = null;
     try {
       out = new PrintOutput(Token.string(path()));
@@ -41,7 +41,7 @@ public final class Put extends UpdatePrimitive {
       node.serialize(ser);
       ser.close();
     } catch(IOException ex) {
-      Err.or(UPFOURI, path());
+      Err.or(UPPUTERR, path());
     } finally {
       try { if(out != null) out.close(); } catch(final IOException ex) { }
     }

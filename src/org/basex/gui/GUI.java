@@ -135,7 +135,6 @@ public final class GUI extends JFrame {
     context = ctx;
     prop = gprops;
     setTitle(Text.TITLE);
-    // [CG] use setIconImages(...) to allow different image sizes (since 1.6)
     setIconImage(BaseXLayout.image("icon"));
 
     // set window size

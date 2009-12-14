@@ -196,7 +196,7 @@ public final class Find extends AQuery {
 
         final boolean elm = elem.get(i);
         tb.add(elm ? ".//" : "@");
-        //if(!elm) tb.add('@');
+        tb.add("*:");
         tb.add(cols.get(i));
 
         if(term[0] == '<' || term[0] == '>') {
@@ -210,9 +210,8 @@ public final class Find extends AQuery {
         tb.add(']');
       }
     }
-    // [CG] no query - jump to root or context? dep. on realtime filtering?
     return tb.size() == 0 ? "/" : (root ? "/" : "") +
-        Axis.DESCORSELF + "::" + string(tag) + tb;
+        Axis.DESCORSELF + "::*:" + string(tag) + tb;
   }
 
   /**

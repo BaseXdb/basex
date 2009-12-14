@@ -1007,7 +1007,7 @@ public interface Text {
   /** Full-text index information. */
   String FTINDEXINFO = lang("dc_ftxinfo");
   /** Full-text index information. */
-  String FZINDEXINFO = lang("dc_fzinfo");
+  String WCINDEXINFO = lang("dc_wcinfo");
   /** Full-text index information. */
   String FTSTEMINFO = lang("dc_ftsteminfo");
   /** Full-text index information. */

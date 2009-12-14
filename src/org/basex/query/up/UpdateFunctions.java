@@ -117,8 +117,8 @@ public final class UpdateFunctions {
         int u = 0;
         boolean ne = uri.length != 0;
         if(ne) {
-          u = m.ns.addURI(uri);
           if(par == 0) m.ns.add(ms, pre - par, q.pref(), uri);
+          u = m.ns.addURI(uri);
         }
         final int n = m.atts.index(q.str(), null, false);
         m.attr(ms, pre - par, n, nd.str(), u, ne);

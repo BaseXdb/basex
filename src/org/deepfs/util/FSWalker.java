@@ -129,10 +129,11 @@ public class FSWalker implements FSTraversal {
     for(final File f : files) {
       if(!valid(f)) {
         visitSymLink(f);
-        continue;
+      } else if(f.isDirectory()) {
+        visitDirectory(f);
+      } else {
+        visitFile(f);
       }
-      if(f.isDirectory()) visitDirectory(f);
-      else visitFile(f);
     }
   }
 

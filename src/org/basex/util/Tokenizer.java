@@ -15,7 +15,7 @@ import org.basex.query.ft.StemDir;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class Tokenizer implements IndexToken {
+public final class Tokenizer implements IndexToken {
   /** Units. */
   public enum FTUnit {
     /** Word unit. */      WORD,
@@ -97,7 +97,7 @@ public class Tokenizer implements IndexToken {
     }
   }
 
-  public final Type type() {
+  public Type type() {
     return Type.FTX;
   }
 
@@ -139,7 +139,7 @@ public class Tokenizer implements IndexToken {
   /**
    * Initializes the iterator.
    */
-  public final void init() {
+  public void init() {
     sent = 0;
     para = 0;
     pos = -1;
@@ -150,7 +150,7 @@ public class Tokenizer implements IndexToken {
    * Checks if more tokens are to be returned.
    * @return result of check
    */
-  public final boolean more() {
+  public boolean more() {
     final int l = text.length;
     pos++;
 
@@ -209,7 +209,7 @@ public class Tokenizer implements IndexToken {
     return true;
   }
 
-  public final byte[] get() {
+  public byte[] get() {
     return get(orig());
   }
 
@@ -218,7 +218,7 @@ public class Tokenizer implements IndexToken {
    * @param tok input token
    * @return result
    */
-  public final byte[] get(final byte[] tok) {
+  public byte[] get(final byte[] tok) {
     byte[] n = tok;
     final boolean a = ascii(n);
     if(!dc) n = dia(n, a);
@@ -232,7 +232,7 @@ public class Tokenizer implements IndexToken {
    * Returns the original token.
    * @return original token
    */
-  public final byte[] orig() {
+  public byte[] orig() {
     return Arrays.copyOfRange(text, s, p);
   }
 
@@ -240,7 +240,7 @@ public class Tokenizer implements IndexToken {
    * Counts the number of tokens.
    * @return number of tokens
    */
-  public final int count() {
+  public int count() {
     if(count == -1) {
       init();
       while(more());
@@ -256,7 +256,7 @@ public class Tokenizer implements IndexToken {
    * @param u unit
    * @return new position
    */
-  public final int pos(final int w, final FTUnit u) {
+  public int pos(final int w, final FTUnit u) {
     if(u == FTUnit.WORD) return w;
 
     // if necessary, calculate sentences and paragraphs
@@ -368,7 +368,7 @@ public class Tokenizer implements IndexToken {
   }
 
   @Override
-  public final String toString() {
+  public String toString() {
     return Main.name(this) + '[' + string(text) + ']';
   }
 }

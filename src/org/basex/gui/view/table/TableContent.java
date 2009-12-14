@@ -120,7 +120,7 @@ final class TableContent extends BaseXBack {
         // add content to column (skip too long contents)...
         if(tb[c].size() < 100) {
           if(tb[c].size() != 0) tb[c].add("; ");
-          if(ti.elem) {
+          if(ti.text) {
             tb[c].add(data.text(ti.pre, true));
           } else {
             byte[] txt = data.text(ti.pre, false);

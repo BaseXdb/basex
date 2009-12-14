@@ -80,7 +80,7 @@ public final class DialogUser extends BaseXBack {
   /** User columns. */
   private final BaseXCombo dropUser;
   /** User columns. */
-  private final BaseXCombo  alterUser;
+  private final BaseXCombo alterUser;
   /** User columns. */
   final BaseXCombo removeUser;
   /** User columns. */
@@ -288,27 +288,26 @@ public final class DialogUser extends BaseXBack {
       else msg = ex.getMessage(); // SERVERERR;
     }
 
-    final boolean valuname = user.getText().matches("[\\w]*");
-    final boolean valpass = new String(pass.getPassword()).matches("[\\w]*");
-    final boolean valnewpass = new String(newpass.
-        getPassword()).matches("[\\w]*");
-    boolean disname = !user.getText().equals(ADMIN);
+    final boolean n = user.getText().matches("[\\w]*");
+    final boolean p = new String(pass.getPassword()).matches("[\\w]*");
+    final boolean np = new String(newpass.getPassword()).matches("[\\w]*");
+    boolean na = !user.getText().equals(ADMIN);
     for(int i = 0; i < dropUser.getItemCount(); i++) {
-      disname &= !user.getText().equals(dropUser.getItemAt(i).toString());
+      na &= !user.getText().equals(dropUser.getItemAt(i).toString());
     }
 
     boolean warn = true;
     if(msg != null) {
       warn = false;
-    } else if(!(valuname && valpass && valnewpass && disname)) {
-      msg = !disname ? Main.info(USERKNOWN, user.getText()) : Main.info(
-          INVALID, !valuname ? SERVERUSER : SERVERPW);
+    } else if(!(n && p && np && na)) {
+      msg = !na ? Main.info(USERKNOWN, user.getText()) : Main.info(
+          INVALID, !n ? SERVERUSER : SERVERPW);
     }
     info.setError(msg, warn);
 
-    alter.setEnabled(valnewpass && newpass.getPassword().length != 0
+    alter.setEnabled(np && newpass.getPassword().length != 0
         && alterUser.getSelectedIndex() != -1);
-    create.setEnabled(valuname && valpass && disname
+    create.setEnabled(n && p && na
         && !user.getText().isEmpty() && pass.getPassword().length != 0);
     drop.setEnabled(dropUser.getSelectedIndex() != -1);
     remove.setEnabled(removeUser.getSelectedIndex() != -1);

@@ -156,7 +156,7 @@ public class AxisPath extends Path {
 
     // check if context is set to document nodes
     final Data data = ctx.data();
-    // [CG] XQuery/Index: check if only paths with root should be optimized
+    // [CG] XQuery/Index: check if optimization is limited to paths with roots
     if(data != null) {
       boolean doc = true;
       final Item item = ctx.item;
@@ -556,16 +556,16 @@ public class AxisPath extends Path {
 
   @Override
   public final Expr addText(final QueryContext ctx) throws QueryException {
-    final Step s = step[step.length - 1];
     // [CG] XQuery/Optimize: steps with namespaces.. Test.Kind.STD
-    if(s.pred.length > 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
+    final Step s = step[step.length - 1];
+    if(s.pred.length != 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
         s.test.type == Type.ATT) return this;
 
     final Data data = ctx.data();
-    if(data == null) return this;
-    final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
+    if(data == null || !data.meta.uptodate) return this;
 
-    if(data.meta.uptodate && stats != null && stats.leaf) {
+    final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
+    if(stats != null && stats.leaf) {
       step = Array.add(step, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
       ctx.compInfo(OPTTEXT, this);
     }

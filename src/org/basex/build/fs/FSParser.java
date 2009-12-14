@@ -114,8 +114,8 @@ public final class FSParser extends Parser {
     } else {
       final byte[] bck = token(backingpath);
       atts.reset();
-      atts.add(MOUNTPOINT  , NOTMOUNTED);
-      atts.add(SIZE        , Token.EMPTY);
+      atts.add(MOUNTPOINT, NOTMOUNTED);
+      atts.add(SIZE, Token.EMPTY);
       atts.add(BACKINGSTORE, bck);
 
       builder.startElem(DEEPFS, atts);

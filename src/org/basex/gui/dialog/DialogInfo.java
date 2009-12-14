@@ -171,7 +171,7 @@ public final class DialogInfo extends Dialog {
     if(ftedit) {
       p.add(new BaseXLabel(FTINDEXINFO, ftedit, false));
       final String[] cb = { CREATEWC, CREATESTEM, CREATEDC, CREATECS };
-      final String[] desc = { FZINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
+      final String[] desc = { WCINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
       final boolean[] val = { meta.wildcards, meta.stemming,
           meta.diacritics, meta.casesens };
       for(int f = 0; f < ft.length; f++) {

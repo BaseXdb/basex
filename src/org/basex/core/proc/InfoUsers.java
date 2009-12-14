@@ -23,7 +23,6 @@ public final class InfoUsers extends AInfo {
 
   @Override
   protected boolean exec(final PrintOutput out) throws IOException {
-    // [CG] to be moved...
     final ArrayList<User> loc = context.data.meta.users;
     for(int i = 0; i < loc.size(); i++) {
       final User us = context.users.get(loc.get(i).name);

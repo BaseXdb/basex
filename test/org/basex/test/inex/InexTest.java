@@ -61,7 +61,7 @@ public final class InexTest {
   /** Container for qtimes and results. */
   private PrintOutput res;
   /** Budget for a query in ms. */
-  private double  budget = -1;
+  private double budget = -1;
   /** Remaining query time - used for budget queries.  */
   private double[] rqt;
 

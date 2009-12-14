@@ -1,7 +1,6 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
-import org.basex.core.Prop;
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
@@ -114,12 +113,7 @@ public final class FTAnd extends FTExpr {
         all.add(new FTMatch().add(s1).add(s2));
       }
     }
-    if(ctx.context.prop.num(Prop.SCORING) > 0) {
-      i1.score(ctx.score.and(i1.score(), i2.score()));
-      //i1.score(Math.min(i1.score(), i2.score()));
-    } else {
-      i1.score(ctx.score.ftAnd(i1, i2));
-    }
+    i1.score(ctx.score.and(i1.score(), i2.score()));
     i1.all = all;
   }
 

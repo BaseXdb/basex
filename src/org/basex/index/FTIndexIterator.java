@@ -92,9 +92,8 @@ public abstract class FTIndexIterator extends IndexIterator {
 
       @Override
       public double score() {
-        return Math.max(i1.score(), i2.score());
+        return Scoring.union(i1.score(), i2.score());
       }
-
     };
   }
 

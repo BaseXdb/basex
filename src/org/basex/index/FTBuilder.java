@@ -12,7 +12,6 @@ import org.basex.query.ft.StopWords;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
-import org.basex.util.ScoringTokenizer;
 import org.basex.util.Tokenizer;
 
 /**
@@ -67,7 +66,7 @@ public abstract class FTBuilder extends IndexBuilder {
     super(d);
     final Prop prop = d.meta.prop;
     scm = d.meta.scoring;
-    wp = scm > 0 ? new ScoringTokenizer(prop) : new Tokenizer(prop);
+    wp = new Tokenizer(prop);
     max = -1;
     min = Integer.MAX_VALUE;
     sw = new StopWords(d, prop.get(Prop.STOPWORDS));

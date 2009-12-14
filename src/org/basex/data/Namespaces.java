@@ -30,8 +30,6 @@ public final class Namespaces {
   private final TokenSet uri;
   /** Root node. */
   private NSNode root;
-  /** Current node.
-  private NSNode tmp;*/
   /** New namespace flag. */
   private boolean newns;
 
@@ -122,6 +120,8 @@ public final class Namespaces {
     return u;
   }
 
+  // Requesting Namespaces ====================================================
+
   /**
    * Returns the number of uri references.
    * @return number of uri references
@@ -129,8 +129,6 @@ public final class Namespaces {
   public int size() {
     return uri.size();
   }
-
-  // Requesting Namespaces ====================================================
 
   /**
    * Returns the specified namespace uri.
@@ -217,7 +215,7 @@ public final class Namespaces {
     final NSNode nd = root.find(par);
     final NSNode t = new NSNode(pre);
 
-    // [CG] check...
+    // [CG] Namespaces: check...
     final int k = addPref(p);
     final int v = addURI(u);
     if(nd.pre == pre) {

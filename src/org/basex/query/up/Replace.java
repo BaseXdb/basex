@@ -68,7 +68,6 @@ public final class Replace extends Update {
       if(type == Type.PI) CPI.check(txt);
 
       ctx.updates.add(type == Type.ELM ? new ReplaceElemContent(targ, txt) :
-        // [LK] rewritten to pass on QNm - probably wrong for comments etc.
         new ReplaceValue(targ, new QNm(txt)), ctx);
     } else {
       final Nod par = targ.parent();

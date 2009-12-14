@@ -218,17 +218,9 @@ final class TableData {
 
     final int ll = Math.min(nRows, MAXROWS);
     for(int l = 0; l < ll; l++) {
-      final int pre = rows.get(l);
-
-      // find all row contents
-      ti.init(pre);
-      while(ti.more()) {
-        // [CG] !GUI/TableData: check inputs
-        // add string length...
-        cols[ti.col].width += data.textLen(ti.pre, ti.elem);
-        //cols[ti.col].width += ti.elem ? data.textLen(ti.pre) :
-        //  data.text(ti.pre, false).length;
-      }
+      // find all row contents and add string lengths
+      ti.init(rows.get(l));
+      while(ti.more()) cols[ti.col].width += data.textLen(ti.pre, ti.text);
     }
 
     // sort columns by string lengths

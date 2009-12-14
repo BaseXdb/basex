@@ -107,7 +107,6 @@ public class XQUPTest extends AbstractTest {
         { "ren3", nodes(28),
         "//processing-instruction('BADVICE')" },
 
-        //[LK] add fragment tests?
         // replace elem
         { "xxxrep1", nodes(),
         "replace node /up/cars/good/car[1] with /up/cars/good/car[2]" },
@@ -178,7 +177,6 @@ public class XQUPTest extends AbstractTest {
           "insert node 'foo' into /up/cars/good/car/wheels"},
           { "MERGEins", nodes(11),
           "/up/cars/good/car/wheels[text()='optionalfoo']" },
-        // [LK] test emtpy insertion node set for insert/replace
 
         // parser tests
     };

@@ -160,7 +160,6 @@ public final class ServerProcess extends Thread {
       @Override
       public void run() {
         Performance.sleep(to * 1000);
-        System.out.println("?");
         p.stop();
       }
     };

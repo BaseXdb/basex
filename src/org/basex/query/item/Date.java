@@ -202,16 +202,16 @@ public abstract class Date extends Item {
    * @return days
    */
   private static long dpm(final int y, final int m) {
-    return DAYS[m] + (m == 1 && leap(y) ? 1 : 0);
+    return DAYS[m] + (m == 1 ? leap(y) : 0);
   }
 
   /***
-   * Checks if the specified year is a leap year.
+   * Adds an offset for a leap year.
    * @param y year
    * @return result of check
    */
-  private static boolean leap(final int y) {
-    return y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
+  private static int leap(final int y) {
+    return y % 4 == 0 && (y % 100 != 0 || y % 400 == 0) ? 1 : 0;
   }
 
   /***
@@ -222,9 +222,9 @@ public abstract class Date extends Item {
    * @return days
    */
   private static long days(final int y, final int m, final int d) {
-    // [CG] XQuery/days: too slow
     long n = 0;
-    for(int i = 0; i < Math.abs(y); i++) n += 365 + (leap(i) ? 1 : 0);
+    final int yy = Math.abs(y);
+    for(int i = 0; i < yy; i++) n += 365 + leap(i);
     for(int i = 0; i < m; i++) n += dpm(y, i);
     return n + d;
   }
