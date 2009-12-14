@@ -194,7 +194,8 @@ public final class ExifParser {
     /** Exposure time in seconds. */
     h829a(1, MetaElem.EXPOSURE_TIME, Format.RATIONAL) {
       @Override
-      void meta(final DeepFile d, final BufferedFileChannel b) {
+      void meta(final DeepFile d, final BufferedFileChannel b)
+          throws IOException {
         final double sec = readRational(b);
         d.addMeta(MetaElem.EXPOSURE_TIME_MS, sec * 1000);
         final StringBuilder str = new StringBuilder();
@@ -242,7 +243,7 @@ public final class ExifParser {
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
-        } catch(IOException e) {
+        } catch(final IOException e) {
           err(o.deepFile, e);
         }
       }
@@ -257,7 +258,7 @@ public final class ExifParser {
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
-        } catch(IOException e) {
+        } catch(final IOException e) {
           err(o.deepFile, e);
         }
       }
@@ -641,8 +642,9 @@ public final class ExifParser {
      * Parses the tag.
      * @param o {@link ExifParser} instance to send parser events from
      * @param buf the {@link ByteBuffer} to read from
+     * @throws IOException if any error occurs
      */
-    void parse(final ExifParser o, final ByteBuffer buf) {
+    void parse(final ExifParser o, final ByteBuffer buf) throws IOException {
       if(!check(o, buf)) return;
       if(inlined) meta(o.deepFile, buf);
       else meta(o.deepFile, o.bfc);
@@ -678,7 +680,7 @@ public final class ExifParser {
             try { // prepare the byte buffer
               o.bfc.position(buf.getInt());
               o.bfc.buffer(size);
-            } catch(IOException e) {
+            } catch(final IOException e) {
               err(o.deepFile, e);
               return false;
             }
@@ -692,7 +694,7 @@ public final class ExifParser {
       int i = 0;
       final int numFormats = aFormats.length;
       sb.append(aFormats[i++]);
-      for(int max = numFormats - 1; i < max; i++)
+      for(final int max = numFormats - 1; i < max; i++)
         sb.append(", ").append(aFormats[i]);
       if (i < numFormats) sb.append(" or ").append(aFormats[i]);
       sb.append(", found: ").append(format).append(")");
@@ -718,8 +720,11 @@ public final class ExifParser {
      * bytes (and are not inlined in the IFD field).
      * @param d the DeepFile to add the metadata to
      * @param b the {@link BufferedFileChannel} to read from
+     * @throws IOException if any error occurs
      */
-    void meta(final DeepFile d, final BufferedFileChannel b) {
+    @SuppressWarnings("unused")
+    void meta(final DeepFile d, final BufferedFileChannel b)
+        throws IOException {
       if(unique && d.isMetaSet(elem)) return;
       metaSimple(d, b);
     }
@@ -863,8 +868,9 @@ public final class ExifParser {
      * Reads a byte from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from
      * @return the byte value
+     * @throws IOException if any error occurs
      */
-    short readByte(final BufferedFileChannel b) {
+    short readByte(final BufferedFileChannel b) throws IOException {
       return (short) b.get();
     }
 
@@ -881,8 +887,9 @@ public final class ExifParser {
      * Reads a short from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from
      * @return the short value
+     * @throws IOException if any error occurs
      */
-    int readShort(final BufferedFileChannel b) {
+    int readShort(final BufferedFileChannel b) throws IOException {
       return b.getShort();
     }
 
@@ -899,8 +906,9 @@ public final class ExifParser {
      * Reads an unsigned long from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from
      * @return the long value
+     * @throws IOException if any error occurs
      */
-    long readLong(final BufferedFileChannel b) {
+    long readLong(final BufferedFileChannel b) throws IOException {
       return b.getInt() & 0xFFFFFFFFL;
     }
 
@@ -917,8 +925,9 @@ public final class ExifParser {
      * Reads a signed long from the {@link BufferedFileChannel}.
      * @param b the {@link BufferedFileChannel} to read from
      * @return the long value
+     * @throws IOException if any error occurs
      */
-    int readSLong(final BufferedFileChannel b) {
+    int readSLong(final BufferedFileChannel b) throws IOException {
       return b.getInt();
     }
 
@@ -948,8 +957,9 @@ public final class ExifParser {
      * Reads a rational value from a IFD field.
      * @param b the {@link BufferedFileChannel} to read the rational from
      * @return the rational value as double
+     * @throws IOException if any error occurs 
      */
-    double readRational(final BufferedFileChannel b) {
+    double readRational(final BufferedFileChannel b) throws IOException {
       final long numerator = readLong(b);
       final long denominator = readLong(b);
       return (double) numerator / denominator;
@@ -959,8 +969,9 @@ public final class ExifParser {
      * Reads a signed rational value from a IFD field.
      * @param b the {@link BufferedFileChannel} to read the rational from
      * @return the rational value as double
+     * @throws IOException if any error occurs
      */
-    double readSRational(final BufferedFileChannel b) {
+    double readSRational(final BufferedFileChannel b) throws IOException {
       final int numerator = readSLong(b);
       final int denominator = readSLong(b);
       return (double) numerator / denominator;
@@ -1053,7 +1064,7 @@ public final class ExifParser {
     bfc.position(ifdOffset);
     try {
       readIFD();
-    } catch(IOException e) {
+    } catch(final IOException e) {
       throw e;
     } finally {
       bfc.setByteOrder(ByteOrder.BIG_ENDIAN); // set byte order to default value
@@ -1083,8 +1094,10 @@ public final class ExifParser {
    * endianness according to these bytes.
    * @param f the {@link BufferedFileChannel} to read from
    * @return true if the endianness bytes are valid, false otherwise
+   * @throws IOException if any error occurs
    */
-  private boolean checkEndianness(final BufferedFileChannel f) {
+  private boolean checkEndianness(final BufferedFileChannel f)
+      throws IOException {
     final int b1 = f.get();
     final int b2 = f.get();
     if(b1 == 0x49 && b2 == 0x49) {
@@ -1097,8 +1110,9 @@ public final class ExifParser {
   /**
    * Reads a single tag field from the IFD array.
    * @param data the {@link ByteBuffer} containing the field data
+   * @throws IOException if any error occurs
    */
-  private void readField(final ByteBuffer data) {
+  private void readField(final ByteBuffer data) throws IOException {
     final int tagNr = data.getShort() & 0xFFFF;
     try {
       final Tag tag = Tag.valueOf("h" + Integer.toHexString(tagNr));

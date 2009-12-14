@@ -25,6 +25,7 @@ import org.basex.util.TokenBuilder;
 import org.deepfs.DeepShell;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.jfuse.DeepStat;
+import org.deepfs.util.FSImporter;
 
 /**
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.
@@ -583,16 +584,18 @@ public final class DeepFS implements DataText {
   }
 
   /**
-   * Checks if this node is a file or adirectory.
+   * Checks if this node is a file, directory, fsml or deepfs node.
    * @param data data reference
    * @param pre pre value
-   * @return true if this node is a file or a directory, false otherwise
+   * @return true if this node is a deepfs node, false otherwise
    */
-  public static boolean isFileOrDir(final Data data, final int pre) {
+  public static boolean isFSnode(final Data data, final int pre) {
     final int name = data.name(pre);
-    return data.kind(pre) == Data.ELEM &&
-        (name == data.tags.id(token(DeepFile.FILE_NS)) ||
-            name == data.tags.id(token(DeepFile.DIR_NS)));
+    return data.kind(pre) == Data.ELEM  &&
+       (name == data.tags.id(token(DeepFile.FILE_NS))    ||
+        name == data.tags.id(token(DeepFile.DIR_NS))     ||
+        name == data.tags.id(token(FSImporter.DOC_NODE)) ||
+        name == data.tags.id(token(FSImporter.ROOT_NODE)));
   }
 
   /**

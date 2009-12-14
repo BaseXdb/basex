@@ -32,6 +32,7 @@ import org.deepfs.fs.DeepFS;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
+ * @author Bastian Lemke
  */
 public final class MapView extends View implements Runnable {
   /** Dynamic zooming steps. */
@@ -622,11 +623,14 @@ public final class MapView extends View implements Runnable {
       parStack[l] = pre;
 
       if(data.fs != null) {
-        if(DeepFS.isFileOrDir(data, pre)) {
-          textLen[pre] = Token.toInt(ViewData.attValue(data, data.sizeID, pre));
-          if(DeepFS.isFile(data, pre))
+        if(DeepFS.isFSnode(data, pre)) {
+          if(DeepFS.isFile(data, pre)) {
+            textLen[pre] = Token.toInt(ViewData.attValue(data, data.sizeID,
+                pre));
+            textLen[parStack[l - 1]] += textLen[pre];
             pre += data.size(pre, kind) - 1; // skip file content
-          l++;
+            assert pre == size - 1 || DeepFS.isFSnode(data, pre + 1);
+          } else l++;
         }
       } else {
         if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI ||

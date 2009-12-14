@@ -51,23 +51,25 @@ public final class TXTParser implements IFileParser {
   public void extract(final DeepFile deepFile) throws IOException {
     final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
 
+    final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
+    final byte[] text = bfc.get(new byte[len]);
+    final boolean valid = Token.isValidUTF8(text);
+    
+    if(deepFile.extractText() && valid)
+      deepFile.addText(0, len, Token.string(text));
+    
     if(deepFile.extractMeta()) {
       final String name = bfc.getFileName();
-      final String suf = name.substring(name.lastIndexOf('.') +
-          1).toLowerCase();
-      final MimeType mime = SUFFIXES.get(suf);
+      final String s = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
+      final MimeType mime = SUFFIXES.get(s);
       if(mime == null) {
-        deepFile.setFileType(FileType.TEXT);
+        deepFile.setFileType(valid ? FileType.TEXT : FileType.UNKNOWN);
         deepFile.setFileFormat(MimeType.UNKNOWN);
       } else {
-        for(final FileType ft : mime.getMetaTypes()) deepFile.setFileType(ft);
+        for(final FileType ft : mime.getMetaTypes())
+          deepFile.setFileType(ft);
         deepFile.setFileFormat(mime);
       }
-    }
-    if(deepFile.extractText()) {
-      final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
-      final byte[] text = bfc.get(new byte[len]);
-      if(Token.isValidUTF8(text)) deepFile.addText(0, len, Token.string(text));
     }
   }
 

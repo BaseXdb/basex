@@ -457,6 +457,7 @@ public class DeepFile {
    * @param value string value as byte array
    */
   public void addMeta(final MetaElem elem, final byte[] value) {
+    if(value == null) return;
     if(!Type.STR.instance(elem.getType()))
       metaDebug(elem, "string - as byte array");
     else addMeta(elem, string(removeNonUTF8(value, true)), null);
@@ -468,6 +469,7 @@ public class DeepFile {
    * @param value string value
    */
   public void addMeta(final MetaElem elem, final String value) {
+    if(value == null) return;
     if(!checkType(elem, Type.STR)) return;
     addMeta(elem, string(removeNonUTF8(Token.token(value), true)), null);
   }
@@ -522,6 +524,7 @@ public class DeepFile {
    * @param value duration value
    */
   public void addMeta(final MetaElem elem, final Duration value) {
+    if(value == null) return;
     if(!checkType(elem, Type.DUR)) return;
     addMeta(elem, String.valueOf(value.toString()), null);
   }
@@ -532,10 +535,11 @@ public class DeepFile {
    * @param xgc calendar value
    */
   public void addMeta(final MetaElem elem, final XMLGregorianCalendar xgc) {
+    if(xgc == null) return;
     final Type t = elem.getType();
     final QName st = xgc.getXMLSchemaType();
-    if((Type.DAT.instance(t) && !st.equals(DatatypeConstants.DATE))
-        || (Type.YEA.instance(t) && !st.equals(DatatypeConstants.GYEAR)))
+    if(Type.DAT.instance(t) && !st.equals(DatatypeConstants.DATE)
+        || Type.YEA.instance(t) && !st.equals(DatatypeConstants.GYEAR))
       metaDebug(elem, st.getLocalPart());
     else {
       try {
@@ -830,6 +834,7 @@ public class DeepFile {
     fileFragments.add(content);
     if(fileName != null) content.addMeta(MetaElem.TITLE, fileName);
     if(registry != null) process(content, suffix);
+    sub.finish();
     return content;
   }
 

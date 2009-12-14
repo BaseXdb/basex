@@ -100,13 +100,10 @@ public enum MetaElem {
   F_NUMBER(DeepNS.FSMETA, "fNumber", Type.DBL, false),
   /** Focal length. */
   FOCAL_LENGTH(DeepNS.FSMETA, "focalLengthMM", Type.DBL, false),
-    /** Focal plane resolution unit. */
-  FOCAL_PLANE_RESOLUTION_UNIT(DeepNS.FSMETA, "focalPlaneResolutionUnit",
-      Type.DBL, false),
-    /** Focal plane X resolution. */
+  /** Focal plane X resolution. */
   FOCAL_PLANE_X_RESOLUTION(DeepNS.FSMETA, "focalPlaneXresolution", Type.DBL,
       false),
-    /** Focal plane Y resolution. */
+  /** Focal plane Y resolution. */
   FOCAL_PLANE_Y_RESOLUTION(DeepNS.FSMETA, "focalPlaneYresolution", Type.DBL,
       false),
   /** Shutter speed value. */
@@ -170,6 +167,9 @@ public enum MetaElem {
   EXPOSURE_PROGRAM(DeepNS.FSMETA, "exposureProgram", Type.STR, false),
   /** Flash. */
   FLASH(DeepNS.FSMETA, "flash", Type.STR, false),
+  /** Focal plane resolution unit. */
+  FOCAL_PLANE_RESOLUTION_UNIT(DeepNS.FSMETA, "focalPlaneResolutionUnit",
+      Type.STR, false),
   /** Gain control. */
   GAIN_CONTROL(DeepNS.FSMETA, "gainControl", Type.STR, false),
   /** Genre. */

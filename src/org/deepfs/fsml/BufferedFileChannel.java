@@ -37,6 +37,10 @@ public final class BufferedFileChannel {
   private final ByteBuffer buf;
   /** The "first" byte of this {@link BufferedFileChannel} (absolute value). */
   private final long mark;
+  /** The parent buffered file channel. */
+  private final BufferedFileChannel parent;
+  /** If true, the channel is locked because a subchannel is not finished .*/
+  private boolean locked;
   /**
    * Maximum number of bytes that can be read from the FileChannel. The value
    * may be negative. In this case, the rightmost <code>-rem</code> bytes of the
@@ -89,6 +93,7 @@ public final class BufferedFileChannel {
     buffer.position(buffer.limit());
     rem = fc.size();
     buf = buffer;
+    parent = null;
   }
 
   /**
@@ -99,12 +104,13 @@ public final class BufferedFileChannel {
    * @param buffer the {@link ByteBuffer} to use
    * @param bytesToRead the maximum number of bytes to read from the FileChannel
    *          (including the already buffered bytes)
+   * @param p the parent channel.
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}
    */
   private BufferedFileChannel(final File file, final String subfilename,
       final FileChannel fileChannel, final ByteBuffer buffer,
-      final long bytesToRead) throws IOException {
+      final long bytesToRead, final BufferedFileChannel p) throws IOException {
     f = file;
     name = subfilename.equals("") ? f.getAbsolutePath() : f.getAbsolutePath()
         + Prop.SEP + subfilename;
@@ -112,6 +118,7 @@ public final class BufferedFileChannel {
     buf = buffer;
     mark = absolutePosition();
     rem = bytesToRead - buf.remaining();
+    parent = p;
   }
 
   /**
@@ -140,9 +147,8 @@ public final class BufferedFileChannel {
       throws IOException {
     if(remaining() < bytesToRead) throw new EOFException(
         "Requested number of bytes to read is too large.");
-    rem -= bytesToRead;
-    rem += buf.remaining();
-    return new BufferedFileChannel(f, subfilename, fc, buf, bytesToRead);
+    locked = true;
+    return new BufferedFileChannel(f, subfilename, fc, buf, bytesToRead, this);
   }
 
   /**
@@ -159,6 +165,7 @@ public final class BufferedFileChannel {
    * @throws IOException if any error occurs while reading the file
    */
   public void skip(final long n) throws IOException {
+    checkLock();
     if(n == 0) return;
     final int buffered = buf.remaining();
     if(n > 0) {
@@ -211,6 +218,7 @@ public final class BufferedFileChannel {
    * @throws IOException if any error occurs while reading from the channel
    */
   public void position(final long newPosition) throws IOException {
+    checkLock();
     skip(newPosition - position());
   }
 
@@ -229,7 +237,9 @@ public final class BufferedFileChannel {
    * @throws IOException if any error occurs while calculating the size
    */
   public long size() throws IOException {
-    return fc.position() + rem - mark;
+    final long s = fc.position() + rem - mark;
+    assert s <= fc.size() || locked;
+    return s;
   }
 
   /**
@@ -247,6 +257,7 @@ public final class BufferedFileChannel {
    * @throws IOException if any error occurs while reading from the channel
    */
   public void reset() throws IOException {
+    checkLock();
     final int bPos = buf.position();
     final long offset = absolutePosition() - mark;
     if(offset == 0) return;
@@ -268,6 +279,7 @@ public final class BufferedFileChannel {
    *           available or any error occurs while reading from the channel
    */
   public byte[] get(final byte[] dst) throws IOException {
+    checkLock();
     int bytesToRead = dst.length;
     if(buffer(bytesToRead)) {
       buf.get(dst, 0, bytesToRead);
@@ -297,8 +309,11 @@ public final class BufferedFileChannel {
    * @param dst the arrray to write the data to
    * @param start the first position to write the data to
    * @param length the number of bytes to read
+   * @throws IOException if the channel is locked
    */
-  public void get(final byte[] dst, final int start, final int length) {
+  public void get(final byte[] dst, final int start, final int length)
+      throws IOException {
+    checkLock();
     buf.get(dst, start, length);
   }
 
@@ -313,8 +328,10 @@ public final class BufferedFileChannel {
    * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
    * @return The byte at the channel's current position
+   * @throws IOException if the channel is locked
    */
-  public int get() {
+  public int get() throws IOException {
+    checkLock();
     return buf.get() & 0xFF;
   }
 
@@ -329,8 +346,10 @@ public final class BufferedFileChannel {
    * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
    * @return The next two bytes at the channel's current position as integer
+   * @throws IOException if the channel is locked
    */
-  public int getShort() {
+  public int getShort() throws IOException {
+    checkLock();
     return buf.getShort() & 0xFFFF;
   }
 
@@ -345,8 +364,10 @@ public final class BufferedFileChannel {
    * {@link BufferUnderflowException} may be thrown.</b>
    * </p>
    * @return The next four bytes at the channel's current position as integer
+   * @throws IOException if the channel is locked
    */
-  public int getInt() {
+  public int getInt() throws IOException {
+    checkLock();
     return buf.getInt();
   }
 
@@ -366,6 +387,10 @@ public final class BufferedFileChannel {
   public void finish() throws IOException {
     final long len = remaining();
     skip(len);
+    if(parent != null) {
+      parent.rem = fc.size() - fc.position() + parent.mark;
+      parent.locked = false;
+    }
   }
 
   /**
@@ -455,6 +480,15 @@ public final class BufferedFileChannel {
    */
   public ByteOrder getByteOrder() {
     return buf.order();
+  }
+  
+  /**
+   * Checks if the channel is locked.
+   * @throws IOException if the channel is locked.
+   */
+  private void checkLock() throws IOException {
+    if(locked) throw new IOException(
+        "BufferedFileChannel is locked because a subchannel is not finished.");
   }
 
   /**

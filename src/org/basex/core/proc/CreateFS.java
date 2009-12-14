@@ -36,7 +36,9 @@ public final class CreateFS extends ACreate {
 
     final String path;
     try {
-      path = new File(args[0]).getCanonicalPath();
+      final File f = new File(args[0]).getCanonicalFile();
+      if(!f.exists()) return error(FILEWHICH, f.getAbsolutePath());
+      path = f.getCanonicalPath();
     } catch(IOException ex) {
       return error(ex.getMessage());
     }
@@ -54,7 +56,7 @@ public final class CreateFS extends ACreate {
     progress(opt);
     opt.execute(context);
     new Open(db).execute(context);
-    return info(DBCREATED, args[1], perf);
+    return info(DBCREATED, db, perf);
   }
 
   @Override

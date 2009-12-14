@@ -103,8 +103,9 @@ public final class JPGParser implements IFileParser {
    * Reads two bytes from the {@link BufferedFileChannel} and returns the value
    * as integer.
    * @return the size value
+   * @throws IOException if any error occurs
    */
-  private int readSize() {
+  private int readSize() throws IOException {
     return bfc.getShort() - 2;
   }
 
@@ -120,8 +121,9 @@ public final class JPGParser implements IFileParser {
    * @param a the array content to check
    * @return true if the next bytes are equals to the array content, false
    *         otherwise
+   * @throws IOException if any error occurs
    */
-  private boolean checkNextBytes(final byte[] a) {
+  private boolean checkNextBytes(final byte[] a) throws IOException {
     final int len = a.length;
     final byte[] a2 = new byte[len];
     bfc.get(a2, 0, len);

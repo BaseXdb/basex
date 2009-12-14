@@ -177,9 +177,8 @@ public final class ParserUtil {
    * @return the calendar
    */
   public static XMLGregorianCalendar convertYear(final int year) {
-    final XMLGregorianCalendar xgc = factory == null ? null
-        : factory.newXMLGregorianCalendar();
-    // [BL] CG: xgc can be null here...
+    if(factory == null) return null;
+    final XMLGregorianCalendar xgc = factory.newXMLGregorianCalendar();
     xgc.setYear(year);
     return xgc;
   }

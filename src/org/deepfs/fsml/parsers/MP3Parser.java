@@ -265,7 +265,7 @@ public final class MP3Parser implements IFileParser {
       deepFile.addMeta(MetaElem.MODE, MODES[mode]);
       deepFile.addMeta(MetaElem.EMPHASIS, EMPH[emph]);
       deepFile.addMeta(MetaElem.ENCODING, ENCODE[encoding]);
-    } catch(IOException e) { /* end of file ... */ }
+    } catch(final IOException e) { /* end of file ... */ }
   }
 
   // ---------------------------------------------------------------------------
@@ -425,8 +425,9 @@ public final class MP3Parser implements IFileParser {
    * significant bit of each byte is zero, making seven bits out of eight
    * available.
    * @return the integer
+   * @throws IOException if any error occurs
    */
-  private int readSynchsafeInt() {
+  private int readSynchsafeInt() throws IOException {
     final int b1 = bfc.get();
     final int b2 = bfc.get();
     final int b3 = bfc.get();
@@ -505,9 +506,8 @@ public final class MP3Parser implements IFileParser {
     if(size <= 1 || encoding == null) return EMPTY;
     if(bfc.get() != 0) bfc.skip(-1); // skip leading zero byte
     else size--;
-    if(encoding.isEmpty()) { // no encoding specified
+    if(encoding.isEmpty()) // no encoding specified
       return bfc.get(new byte[size]);
-    }
     final byte[] array = new byte[size - 1];
     return token(new String(bfc.get(array), encoding));
   }
@@ -661,14 +661,7 @@ public final class MP3Parser implements IFileParser {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
         final String encoding = obj.readEncoding();
-        // [BL] CG: lang variable isn't evaluated in the rest of this method
-        byte[] lang = obj.readText(3, "");
-        for(final byte b : lang) {
-          if(ws(b) || b == 0) {
-            lang = EMPTY;
-            break;
-          }
-        }
+        obj.bfc.skip(3); // skip language
         int pos = 4;
         // ignore short content description
         while(obj.bfc.get() != 0 && ++pos < size);
@@ -980,7 +973,7 @@ public final class MP3Parser implements IFileParser {
       void parse(final MP3Parser obj, final int size) throws IOException {
         try {
           obj.deepFile.addMeta(MetaElem.TRACK, obj.readTrack(size));
-        } catch(ParserException e) {
+        } catch(final ParserException e) {
           obj.deepFile.debug("MP3Parser: Failed to parse track number (%).", e);
         }
       }
