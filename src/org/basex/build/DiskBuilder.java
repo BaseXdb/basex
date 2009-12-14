@@ -76,10 +76,7 @@ public final class DiskBuilder extends Builder {
     final TableAccess ta = new TableDiskAccess(meta, DATATBL);
     final DataInput in = new DataInput(meta.file(DATATMP));
     for(int pre = 0; pre < ssize; pre++) {
-      final boolean sz = in.readBool();
-      final int p = in.readNum();
-      if(sz) ta.write4(p, 8, in.readNum());
-      else ta.write5(p, 3, in.read5());
+      ta.write4(in.readNum(), 8, in.readNum());
     }
     ta.close();
     in.close();
@@ -110,14 +107,6 @@ public final class DiskBuilder extends Builder {
     vout = null;
     sout.close();
     sout = null;
-  }
-
-  @Override
-  public void setAttValue(final int pre, final byte[] val) throws IOException {
-    sout.writeBool(false);
-    sout.writeNum(pre);
-    sout.write5(inline(val, false));
-    ssize++;
   }
 
   @Override
@@ -165,7 +154,6 @@ public final class DiskBuilder extends Builder {
 
   @Override
   protected void setSize(final int pre, final int val) throws IOException {
-    sout.writeBool(true);
     sout.writeNum(pre);
     sout.writeNum(val);
     ssize++;

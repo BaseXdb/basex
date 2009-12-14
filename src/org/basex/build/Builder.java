@@ -240,14 +240,6 @@ public abstract class Builder extends Progress {
   public abstract void close() throws IOException;
 
   /**
-   * Stores an attribute value to the specified table position.
-   * @param pre pre reference
-   * @param val value to be stored
-   * @throws IOException I/O exception
-   */
-  public abstract void setAttValue(int pre, byte[] val) throws IOException;
-
-  /**
    * Adds a document node to the database.
    * @param txt name of the document
    * @throws IOException I/O exception

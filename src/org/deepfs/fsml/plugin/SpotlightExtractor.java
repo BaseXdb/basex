@@ -113,15 +113,6 @@ public final class SpotlightExtractor implements IFileParser {
     }
 
     /**
-     * Initializes the content type instance with a {@link MimeType}.
-     * @param m the corresponding MIME type
-     */
-    private SpotlightContentType(final MimeType m) {
-      mimeType = m;
-      fileType = null;
-    }
-
-    /**
      * Initializes the content type instance with a {@link FileType}.
      * @param f the corresponding {@link FileType}
      */

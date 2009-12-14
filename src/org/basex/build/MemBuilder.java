@@ -42,11 +42,6 @@ public final class MemBuilder extends Builder {
   public void close() { }
 
   @Override
-  public void setAttValue(final int pre, final byte[] val) {
-    data.text(pre, val, false);
-  }
-
-  @Override
   protected void addDoc(final byte[] txt) {
     data.doc(meta.size, 0, txt);
     data.insert(meta.size);
