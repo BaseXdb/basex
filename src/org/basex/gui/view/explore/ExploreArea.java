@@ -30,6 +30,7 @@ import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.deepfs.fsml.DeepFile;
 
 /**
  * This is a simple user search panel.
@@ -142,14 +143,18 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   private void addKeys(final Data data) {
     final TokenList sl = new TokenList();
     final int cs = panel.getComponentCount();
-    for(int c = 0; c < cs; c += 2) {
-      final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
-      if(combo.getSelectedIndex() == 0) continue;
-      final String elem = combo.getSelectedItem().toString();
-      if(!elem.startsWith("@")) sl.add(Token.token(elem));
+    final boolean fs = data.fs != null;
+    if(fs) sl.add(Token.token(DeepFile.FILE_NS));
+    else {
+      for(int c = 0; c < cs; c += 2) {
+        final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
+        if(combo.getSelectedIndex() == 0) continue;
+        final String elem = combo.getSelectedItem().toString();
+        if(!elem.startsWith("@")) sl.add(Token.token(elem));
+      }
     }
 
-    final TokenList tmp = data.path.desc(sl, data, true, false);
+    final TokenList tmp = data.path.desc(sl, data, !fs, false);
     if(tmp.size() == 0) return;
 
     final String[] keys = entries(tmp.finish());
@@ -281,7 +286,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
             pattern = PATEX;
           } else {
             pattern = attr && data.meta.atvindex ||
-              !attr && data.meta.txtindex ? PATEX : PATSUB;
+              !attr && data.meta.txtindex ? PATSUB : PATEX;
           }
         }
       } else if(comp instanceof BaseXCombo) {
@@ -301,14 +306,17 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         }
       }
 
+      if(data.fs != null) if(tb.size() == 0) tb.add("//%", DeepFile.FILE_NS);
       if(attr) {
         if(tb.size() == 0) tb.add("//*");
         if(pattern.isEmpty()) pattern = PATSIMPLE;
       } else {
-        tb.add("//" + key);
+        if(data.fs != null) tb.add("[%", key);
+        else tb.add("//" + key);
         key = "text()";
       }
       tb.add(pattern, key, val1, key, val2);
+      if(data.fs != null && !attr) tb.add("]");
     }
 
     String qu = tb.toString();

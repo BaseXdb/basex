@@ -262,9 +262,7 @@ public final class EMLParser implements IFileParser {
         deepFile.addMeta(MetaElem.ENCODING, mBodyCharset);
       } else deepFile.debug("EMLParser: Invalid mail file (no sender found).");
 
-      // [BL] CG: mCurrLine cannot be null
-      //   (or it could be.. then line 256 might throw an unexpected exception)
-      if(df.extractText()) if(mCurrLine != null) parseContent();
+      if(df.extractText()) parseContent();
     } else if(df.extractText()) {
       do {
         String type = "";
