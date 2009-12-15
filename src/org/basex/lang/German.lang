@@ -20,7 +20,7 @@ m_inter=Interaktion
 m_layout=Layout
 
 # Buttons
-b_ok=  OK  
+b_ok=OK
 b_opt=Optimieren
 b_rename=Umbenennen
 b_open=Öffnen
@@ -44,9 +44,6 @@ b_delete=Löschen
 b_delall=Alles löschen
 b_add=Hinzufügen
 
-# Status messages
-s_ok=OK
-
 # Visualizations
 no_data=Keine Daten verfügbar
 no_space=Zu wenig Platz
@@ -61,7 +58,7 @@ d_info=Information
 d_fctitle=Verzeichnis
 
 dc_filter=Filter
-dc_title=XML-Dokument oder Verzeichnis
+dc_choose=XML-Dokument oder Verzeichnis
 dc_name=Name der Datenbank
 dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente
@@ -87,9 +84,11 @@ dc_txtinfo=Dieser Index beschleunigt Textvergleiche in Prädikaten
 dc_attinfo=Dieser Index beschleunigt Attributvergleiche in Prädikaten
 dc_ftxinfo=Ein Volltext-Index beschleunigt Volltext-Anfragen
 dc_wcinfo=Diese Option beschleunigt Wildcard-Suchen
-dc_ftsteminfo=Alle Begriffe werden vor der Indexierung normalisiert
-dc_ftdcinfo=Diakritische Zeichen werden im Index berücksichtigt
-dc_ftcsinfo=Groß- und Kleinschreibung wird im Index berücksichtigt
+dc_ftsteminfo=Begriffe werden vor der Indexierung auf die Stammform reduziert
+dc_ftcsinfo=Groß- und Kleinschreibung wird im Index beibehalten
+dc_ftdcinfo=Diakritische Zeichen werden im Index beibehalten
+dc_ftscinfo=Scoring-Werte werden berechnet und im Index gespeichert
+dc_ftswinfo=Auswahl einer Stoppwort-Liste, um häufige Begriffe zu ignorieren
 dc_general=Allgemein
 dc_parse=Parsing
 dc_names=Namen
@@ -108,8 +107,6 @@ dmnt_nomountpath=No valid mount point
 dfs_newtitle=Neue DeepFS Instanz erstellen
 dfs_all=Komplett
 dfs_allinfo=Erstellt eine komplette Repräsentation des Dateisystems (C:, D: etc. unter Windows, '/' unter Unix)
-dfs_wrt=Write through
-dfs_wrtok=Alle Änderungen die an der Datenbank "%" durchgeführt werden,\nwerden ins Verzeichnis "%" übertragen?
 dfs_text=DeepFS Wurzelverzeichnis
 dfs_text1=Datei-Information & Meta-Daten
 dfs_text2=Datei-Inhalte
@@ -534,13 +531,12 @@ ch_set2=Verfügbare Optionen [%] mit [%] = on/off:
 ch_set21=Anzeige (aller) Prozess-Informationen
 ch_set22=Anzeige von Debug-Informationen
 ch_set23=Ausgabe der Anfrageergebnisse
-ch_set24=Ausgabe der Ergebnisse als XML
-ch_set25=Hauptspeicher-Modus
 ch_set26=Leerzeichenentfernung in neuen XML-Dokumenten
 ch_set27=Parsen von XML-Entities
 ch_set28=Text-Indexierung
 ch_set29=Attributwert-Indexierung
 ch_set31=Volltext-Indexierung
+ch_set32=Pfad-Indexierung
 ch_password1=Ändern des Passworts.
 ch_password2=Ändert das Passwort des angemeldeten Benutzers.
 ch_help1=Hilfe für %-Befehle.

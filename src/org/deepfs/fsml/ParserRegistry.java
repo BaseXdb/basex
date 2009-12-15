@@ -13,7 +13,7 @@ import org.deepfs.fsml.util.Loader;
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
-public class ParserRegistry {
+public final class ParserRegistry {
 
   /** Registry for MetadataAdapter implementations. */
   static final Map<String, Class<? extends IFileParser>> REGISTRY =

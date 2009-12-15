@@ -11,7 +11,6 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.Type;
-import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
 /**
@@ -53,8 +52,9 @@ public final class CreateIndex extends ACreate {
           data.meta.scoring = prop.num(Prop.SCORING);
           index = Type.FTX;
           break;
-        case SUMMARY:
-          return summary(data);
+        case PATH:
+          data.path.build(data);
+          return true;
         default:
           return false;
       }
@@ -68,40 +68,6 @@ public final class CreateIndex extends ACreate {
       Main.debug(ex);
       return error(ex.getMessage());
     }
-  }
-
-  /**
-   * Creates a new path summary.
-   * @param data data reference
-   * @return true if operation was successful
-   */
-  public static boolean summary(final Data data) {
-    final int[] parStack = new int[IO.MAXHEIGHT];
-    int h = 0;
-    int level = 0;
-
-    data.path.init();
-    for(int pre = 0; pre < data.meta.size; pre++) {
-      final byte kind = (byte) data.kind(pre);
-      final int par = data.parent(pre, kind);
-      while(level > 0 && parStack[level - 1] > par) --level;
-
-      if(kind == Data.DOC) {
-        parStack[level++] = pre;
-        data.path.add(0, level, kind);
-      } else if(kind == Data.ELEM) {
-        data.path.add(data.name(pre), level, kind);
-        parStack[level++] = pre;
-      } else if(kind == Data.ATTR) {
-        data.path.add(data.name(pre), level, kind);
-      } else {
-        data.path.add(0, level, kind);
-      }
-      if(h < level) h = level;
-    }
-    data.meta.pathindex = true;
-    data.flush();
-    return true;
   }
 
   @Override

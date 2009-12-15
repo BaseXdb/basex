@@ -108,13 +108,10 @@ public final class Values implements Index {
    * @return compressed pre values
    */
   public byte[] nextPres() {
-    if (idxr.pos() >= idxr.length()) return new byte[]{};
+    if(idxr.pos() >= idxr.length()) return EMPTY;
     final int s = idxl.read4();
-//    final byte[] si = idxl.readBytes(posl, posl + 4);
-//    final int s = Num.size(si);
     final long v = idxr.read5(idxr.pos());
-    final long posl = v + s;
-    return idxl.readBytes(v, posl);
+    return idxl.readBytes(v, v + s);
   }
 
   /**

@@ -43,7 +43,7 @@ public final class DropIndex extends ACreate {
       case FULLTEXT:
         data.meta.ftxindex = false;
         return drop(Type.FTX, DATAFTX);
-      case SUMMARY:
+      case PATH:
         if(data.meta.pathindex) {
           data.meta.pathindex = false;
           data.path.root = null;

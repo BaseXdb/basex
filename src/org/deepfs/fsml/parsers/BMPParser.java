@@ -17,7 +17,7 @@ import org.deepfs.fsml.ParserRegistry;
  * @author Christian Gruen
  * @author Bastian Lemke
  */
-public class BMPParser implements IFileParser {
+public final class BMPParser implements IFileParser {
 
   /** BMP header info. */
   private static final byte[] HEADERBMP = token("BM");

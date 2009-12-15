@@ -51,6 +51,36 @@ public final class PathSummary {
   // Path Summary creation ====================================================
 
   /**
+   * Builds the whole path summary.
+   * @param data data reference
+   */
+  public void build(final Data data) {
+    final int[] parStack = new int[IO.MAXHEIGHT];
+    int h = 0, l = 0;
+    init();
+    for(int pre = 0; pre < data.meta.size; pre++) {
+      final byte kind = (byte) data.kind(pre);
+      final int par = data.parent(pre, kind);
+      while(l > 0 && parStack[l - 1] > par) --l;
+
+      if(kind == Data.DOC) {
+        parStack[l++] = pre;
+        add(0, l, kind);
+      } else if(kind == Data.ELEM) {
+        add(data.name(pre), l, kind);
+        parStack[l++] = pre;
+      } else if(kind == Data.ATTR) {
+        add(data.name(pre), l, kind);
+      } else {
+        add(0, l, kind);
+      }
+      if(h < l) h = l;
+    }
+    data.meta.pathindex = true;
+    data.flush();
+  }
+  
+  /**
    * Opens an element.
    * @param n name reference
    * @param l current level

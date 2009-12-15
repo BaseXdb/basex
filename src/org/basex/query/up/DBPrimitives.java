@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
+import org.basex.query.item.Type;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -64,7 +65,7 @@ final class DBPrimitives extends Primitives {
    */
   private void checkNames(final int... pres) throws QueryException {
     final NamePool pool = new NamePool();
-    final IntList ats = new IntList();
+    final IntList il = new IntList();
 
     for(final int pre : pres) {
       final UpdatePrimitive[] ups = op.get(pre);
@@ -76,11 +77,11 @@ final class DBPrimitives extends Primitives {
 
       // pre values consists exclusively of element and attribute nodes
       if(d.kind(pre) == Data.ATTR) {
-        ats.add(pre);
+        il.add(pre);
       } else {
         final int ps = pre + d.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; p++) {
-          if(!ats.contains(p)) pool.add(new QNm(d.name(p, Data.ATTR)), true);
+          if(!il.contains(p)) pool.add(new QNm(d.name(p, Data.ATTR)), Type.ATT);
         }
       }
     }

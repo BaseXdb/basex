@@ -6,7 +6,7 @@ package org.basex.core;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class User {
+public final class User {
   /** Flag for read permissions. */
   public static final int READ = 1;
   /** Flag for write permissions. */

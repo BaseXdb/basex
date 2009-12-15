@@ -23,13 +23,13 @@ public interface Commands {
   enum CmdPerm { READ, WRITE, CREATE, ADMIN, ALL }
   /** Set command definitions. */
   enum CmdSet {
-    INFO, DEBUG, SERIALIZE, XMLOUTPUT, MAINMEM, CHOP,
-    ENTITY, TEXTINDEX, ATTRINDEX, FTINDEX
+    INFO, DEBUG, SERIALIZE, CHOP, ENTITY, TEXTINDEX, ATTRINDEX, FTINDEX,
+    PATHINDEX, DBPATH
   }
-  /** Node types for updates. Order equals the data kind definitions. */
+  /** Node types. Must have same order as node kinds defined in {@link Data}. */
   enum CmdUpdate { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
   /** Index types. */
-  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, SUMMARY }
+  enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, PATH }
 
   /** Command flag: command which will not be shown in the help. */
   int HID = 1;

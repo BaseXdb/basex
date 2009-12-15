@@ -481,7 +481,7 @@ public final class BufferedFileChannel {
   public ByteOrder getByteOrder() {
     return buf.order();
   }
-  
+
   /**
    * Checks if the channel is locked.
    * @throws IOException if the channel is locked.

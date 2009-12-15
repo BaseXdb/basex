@@ -803,7 +803,7 @@ public abstract class Data {
     bp = 0;
     return bb;
   }
-  
+
   /**
    * Indexes a text and returns the reference.
    * @param txt text to be indexed

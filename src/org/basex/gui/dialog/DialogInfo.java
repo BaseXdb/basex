@@ -6,10 +6,10 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import javax.swing.JComponent;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-import org.basex.core.Prop;
 import org.basex.core.proc.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
@@ -25,7 +25,6 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXText;
-import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -40,12 +39,8 @@ import org.basex.util.TokenBuilder;
 public final class DialogInfo extends Dialog {
   /** Index Checkbox. */
   private final BaseXCheckBox[] indexes = new BaseXCheckBox[4];
-  /** Full-text indexing. */
-  private final BaseXCheckBox[] ft = new BaseXCheckBox[4];
-  /** Full-text labels. */
-  private final BaseXLabel[] fl = new BaseXLabel[4];
   /** Editable full-text options. */
-  private final boolean ftedit;
+  private DialogFT ft;
   /** Button panel. */
   private final BaseXBack buttons;
   /** Optimize flag. */
@@ -92,98 +87,78 @@ public final class DialogInfo extends Dialog {
     tab2.add(addIndex(true, data));
     tab2.add(addIndex(false, data));
 
-    // third tab
-    BaseXBack tab3 = null;
-    final boolean pi = data.meta.pathindex;
-    indexes[0] = new BaseXCheckBox(INFOPATHINDEX, pi, 0, this);
+    String[] cb = { INFOPATHINDEX, INFOTEXTINDEX, INFOATTRINDEX, INFOFTINDEX };
+    boolean[] val = { data.meta.pathindex, data.meta.txtindex,
+        data.meta.atvindex, data.meta.ftxindex };
+    
+    BaseXBack[] panels = new BaseXBack[indexes.length];
+    for(int i = 0; i < indexes.length; i++) {
+      indexes[i] = new BaseXCheckBox(cb[i], val[i], 0, this);
+      indexes[i].setEnabled(data instanceof DiskData);
+      panels[i] = new BaseXBack();
+      panels[i].setLayout(new BorderLayout());
+    }
 
-    tab3 = new BaseXBack();
+    // third tab
+    final BaseXBack tab3 = new BaseXBack();
     tab3.setLayout(new GridLayout(1, 1));
     tab3.setBorder(8, 8, 8, 8);
 
-    final BaseXBack north = new BaseXBack();
-    north.setLayout(new BorderLayout());
-    north.add(indexes[0], BorderLayout.WEST);
-    final BaseXButton export = new BaseXButton(GUIEXPORT, this);
-    export.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
-        final IO file = GUICommands.save(gui, true);
-        if(file != null) {
-          PrintOutput out = null;
-          try {
-            out = new PrintOutput(file.path());
-            data.path.plan(data, new XMLSerializer(out));
-          } catch(final IOException ex) {
-            Dialog.error(gui, NOTSAVED);
-          } finally {
-            if(out != null) try { out.close(); } catch(final Exception x) { }
+    JComponent north = indexes[0];
+    if(val[0]) {
+      north = new BaseXBack();
+      north.setLayout(new BorderLayout());
+      north.add(indexes[0], BorderLayout.WEST);
+      final BaseXButton export = new BaseXButton(GUIEXPORT, this);
+      export.addActionListener(new ActionListener() {
+        public void actionPerformed(final ActionEvent e) {
+          final IO file = GUICommands.save(gui, true);
+          if(file != null) {
+            PrintOutput out = null;
+            try {
+              out = new PrintOutput(file.path());
+              data.path.plan(data, new XMLSerializer(out));
+            } catch(final IOException ex) {
+              Dialog.error(gui, NOTSAVED);
+            } finally {
+              if(out != null) try { out.close(); } catch(final Exception x) { }
+            }
           }
         }
-      }
-    });
-    if(pi) north.add(export, BorderLayout.EAST);
+      });
+      north.add(export, BorderLayout.EAST);
+    }
 
-    BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-    p.add(north, BorderLayout.NORTH);
-    if(pi) p.add(text(data.path.info(data)), BorderLayout.CENTER);
-    tab3.add(p);
+    panels[0].add(north, BorderLayout.NORTH);
+    panels[0].add(text(meta.pathindex ? data.path.info(data) :
+      Token.token(PATHINDEXINFO)), BorderLayout.CENTER);
+    tab3.add(panels[0]);
 
     // fourth tab
     final BaseXBack tab4 = new BaseXBack();
     tab4.setLayout(new GridLayout(2, 1));
     tab4.setBorder(8, 8, 0, 8);
 
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-
-    indexes[1] = new BaseXCheckBox(INFOTEXTINDEX, meta.txtindex, 0, this);
-    p.add(indexes[1], BorderLayout.NORTH);
-
-    p.add(text(meta.txtindex ? data.info(Type.TXT) :
+    panels[1].add(indexes[1], BorderLayout.NORTH);
+    panels[1].add(text(val[1] ? data.info(Type.TXT) :
       Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
-    tab4.add(p);
+    tab4.add(panels[1]);
 
-    p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-
-    indexes[2] = new BaseXCheckBox(INFOATTRINDEX, meta.atvindex, 0, this);
-    p.add(indexes[2], BorderLayout.NORTH);
-
-    p.add(text(meta.atvindex ? data.info(Type.ATV) :
+    panels[2].add(indexes[2], BorderLayout.NORTH);
+    panels[2].add(text(val[2] ? data.info(Type.ATV) :
       Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
-    tab4.add(p);
+    tab4.add(panels[2]);
 
     // fifth tab
     final BaseXBack tab5 = new BaseXBack();
     tab5.setLayout(new GridLayout(1, 1));
     tab5.setBorder(8, 8, 8, 8);
 
-    ftedit = !meta.ftxindex;
-    indexes[3] = new BaseXCheckBox(INFOFTINDEX, meta.ftxindex, 0, this);
-
-    for(final BaseXCheckBox b : indexes) b.setEnabled(data instanceof DiskData);
-
-    p = new BaseXBack();
-    p.setLayout(ftedit ? new TableLayout(10, 1) : new BorderLayout());
-    p.add(indexes[3], BorderLayout.NORTH);
-
-    if(ftedit) {
-      p.add(new BaseXLabel(FTINDEXINFO, ftedit, false));
-      final String[] cb = { CREATEWC, CREATESTEM, CREATEDC, CREATECS };
-      final String[] desc = { WCINDEXINFO, FTSTEMINFO, FTDCINFO, FTCSINFO };
-      final boolean[] val = { meta.wildcards, meta.stemming,
-          meta.diacritics, meta.casesens };
-      for(int f = 0; f < ft.length; f++) {
-        ft[f] = new BaseXCheckBox(cb[f], val[f], 0, this);
-        fl[f] = new BaseXLabel(desc[f], true, false);
-        p.add(ft[f]);
-        p.add(fl[f]);
-      }
-    } else {
-      p.add(text(data.info(Type.FTX)), BorderLayout.CENTER);
-    }
-    tab5.add(p);
+    panels[3].add(indexes[3], BorderLayout.NORTH);
+    if(!val[3]) ft = new DialogFT(this, false);
+    panels[3].add(val[3] ? text(data.info(Type.FTX)) : ft,
+        BorderLayout.CENTER);
+    tab5.add(panels[3]);
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, tab1);
@@ -251,13 +226,7 @@ public final class DialogInfo extends Dialog {
       opt = true;
       close();
     }
-    if(ftedit) {
-      final boolean ftx = indexes[3].isSelected();
-      for(int f = 0; f < ft.length; f++) {
-        ft[f].setEnabled(ftx);
-        fl[f].setEnabled(ftx);
-      }
-    }
+    if(ft != null) ft.action(indexes[3].isSelected());
     final Data data = gui.context.data;
     enableOK(buttons, BUTTONOPT, !data.meta.uptodate);
   }
@@ -265,12 +234,6 @@ public final class DialogInfo extends Dialog {
   @Override
   public void close() {
     super.close();
-    if(ftedit) {
-      final Prop prop = gui.context.prop;
-      prop.set(Prop.WILDCARDS, ft[0].isSelected());
-      prop.set(Prop.STEMMING, ft[1].isSelected());
-      prop.set(Prop.DIACRITICS, ft[2].isSelected());
-      prop.set(Prop.CASESENS, ft[3].isSelected());
-    }
+    if(ft != null) ft.close();
   }
 }

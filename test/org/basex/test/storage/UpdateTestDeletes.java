@@ -69,7 +69,7 @@ public final class UpdateTestDeletes extends UpdateTest {
     final int oldParentSize = data.size(4, Data.ELEM);
     data.delete(6);
     assertEquals(size - 5, data.meta.size);
-    assertByteArraysEqual(B,         data.name(6, Data.ELEM));
+    assertByteArraysEqual(B, data.name(6, Data.ELEM));
     assertEquals(oldDocSize - 5, data.size(0, Data.DOC));
     assertEquals(oldRootSize - 5, data.size(1, Data.ELEM));
     assertEquals(oldParentSize - 5, data.size(4, Data.ELEM));

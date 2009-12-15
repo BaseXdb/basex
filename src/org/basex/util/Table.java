@@ -13,7 +13,7 @@ import java.util.Scanner;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class Table {
+public final class Table {
   /** Table header. */
   public TokenList header = new TokenList();
   /** Distance between table columns. */

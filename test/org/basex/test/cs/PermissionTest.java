@@ -46,7 +46,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class PermissionTest {
+public final class PermissionTest {
   /** Server reference. */
   static BaseXServer server;
   /** Socket reference. */
@@ -83,7 +83,7 @@ public class PermissionTest {
 
   /** Tests all commands where no permission is needed. */
   @Test
-  public final void noPermsNeeded() {
+  public void noPermsNeeded() {
     ok(new CreateDB("<xml>This is a test</xml>", "test"), adminSession);
     ok(new Close(), adminSession);
     ok(new Revoke("all", "test"), adminSession);
@@ -121,7 +121,7 @@ public class PermissionTest {
 
   /** Tests all commands where read permission is needed. */
   @Test
-  public final void readPermsNeeded() {
+  public void readPermsNeeded() {
     ok(new Grant("read", "test"), adminSession);
     ok(new Open("test"), testSession);
     ok(new InfoDB(), testSession);

@@ -59,10 +59,7 @@ public final class ValueBuilder extends IndexBuilder {
           // safely abort if index caching is done too often
           if(cc >= 0) throw new IOException(PROCOUTMEM);
 
-          final DataOutput outl = new DataOutput(data.meta.file(f + cf + 'l'));
-          outl.writeInt(index.size());
-          final DataOutput outr = new DataOutput(data.meta.file(f + cf + 'r'));
-          write(index, outl, outr);
+          write(f + cf);
           index = new ValueTree();
           Performance.gc(1);
           cc = 50;
@@ -79,16 +76,11 @@ public final class ValueBuilder extends IndexBuilder {
     }
 
     if(cf == 0) {
-      final DataOutput outl = new DataOutput(data.meta.file(f + 'l'));
-      final DataOutput outr = new DataOutput(data.meta.file(f + 'r'));
-      writeSingle(outl, outr);
+      writeSingle(f);
     } else {
-      final DataOutput outl = new DataOutput(data.meta.file(f + cf + 'l'));
-      outl.writeInt(0);
-      final DataOutput outr = new DataOutput(data.meta.file(f + cf + 'r'));
-      write(index, outl, outr);
-      cf++;
+      write(f + cf);
       index = null;
+      cf++;
 
       final int size = merge(cf);
       final DataAccess da = new DataAccess(data.meta.file(f + 'l'));
@@ -107,17 +99,31 @@ public final class ValueBuilder extends IndexBuilder {
   }
 
   /**
+   * Writes the current value tree to disk.
+   * @param n name
+   * @throws IOException I/O exception
+   */
+  private void write(final String n) throws IOException {
+    final DataOutput outl = new DataOutput(data.meta.file(n + 'l'));
+    outl.writeInt(index.size());
+    System.out.println(index.size());
+    final DataOutput outr = new DataOutput(data.meta.file(n + 'r'));
+    write(outl, outr);
+  }
+  
+  /**
    * Write single index to disk.
-   * @param outl DataOutput
-   * @param outr DataOutput
+   * @param n name
    * @throws IOException IOException
    */
-  private void writeSingle(final DataOutput outl,
-      final DataOutput outr) throws IOException {
+  private void writeSingle(final String n) throws IOException {
+    final DataOutput outl = new DataOutput(data.meta.file(n + 'l'));
+    final DataOutput outr = new DataOutput(data.meta.file(n + 'r'));
     outl.writeInt(index.size());
     index.init();
     while(index.more()) {
-      final byte[] pres = index.next();
+      final int i = index.next();
+      final byte[] pres = index.pres.get(i);
       final int is = Num.size(pres);
       int v = 0;
       for(int ip = 4; ip < is; ip += Num.len(pres, ip)) v++;
@@ -274,17 +280,17 @@ public final class ValueBuilder extends IndexBuilder {
 
   /**
    * Writes a value tree after its creation to disk.
-   * @param i value tree to write
    * @param outl DataOutput
    * @param outr DataOutput
    * @throws IOException IOException
    */
-  private void write(final ValueTree i, final DataOutput outl,
-      final DataOutput outr) throws IOException {
-    i.init();
-    while(i.more()) {
+  private void write(final DataOutput outl, final DataOutput outr)
+      throws IOException {
+    index.init();
+    while(index.more()) {
       outr.write5(outl.size());
-      writeWithSize(outl, i.next());
+      final int i = index.next();
+      writeWithSize(outl, index.pres.get(i));
     }
     outl.close();
     outr.close();

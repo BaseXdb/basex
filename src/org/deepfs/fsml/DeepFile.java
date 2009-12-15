@@ -41,7 +41,7 @@ import org.deepfs.fsml.ser.FSMLSerializer;
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
-public class DeepFile {
+public final class DeepFile {
 
   // [BL] always set default file type
 
@@ -964,7 +964,7 @@ public class DeepFile {
    * File content.
    * @author Bastian Lemke
    */
-  public class Content {
+  public static final class Content {
     /** offset inside the regular file. */
     final long o;
     /** size of the text section. */

@@ -100,7 +100,7 @@ public interface DataText {
   String S_TEXT_CONTENT = DeepNS.DEEPURL.tag("text");
   /** Content tag in fs namespace. */
   String S_CONTENT = DeepNS.DEEPURL.tag("content");
-  
+
   // attributes
   /** file/dir name. */
   String S_NAME = "name";
@@ -114,7 +114,7 @@ public interface DataText {
   String S_CTIME = "ctime";
   /** Time of last modification. */
   String S_MTIME = "mtime";
-  
+
   /** Number of links token. */
   String S_NLINK = "nlink";
   /** User ID token. */

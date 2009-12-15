@@ -14,11 +14,9 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller
  */
-public class TreeCaching implements TreeViewOptions {
-
+final class TreeCaching implements TreeViewOptions {
   /** document depth. */
-  public int maxLevel = -1;
-
+  int maxLevel = -1;
   /** All nodes document nodes per level. */
   private ArrayList<int[]> nodesPerLevel;
   /** Rectangles per level. */
@@ -30,7 +28,7 @@ public class TreeCaching implements TreeViewOptions {
    * This constructor invokes methods to cache all document nodes.
    * @param data data reference
    */
-  public TreeCaching(final Data data) {
+  TreeCaching(final Data data) {
     if(data == null) return;
     maxLevel = data.meta.height + 1;
     cacheNodes(data);
@@ -133,7 +131,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param c database context
    * @param sW screen width
    */
-  public void generateRects(final Graphics g, final Context c, final int sW) {
+  void generateRects(final Graphics g, final Context c, final int sW) {
 
     final Data d = c.data;
     final int[] roots = c.current.nodes;
@@ -227,7 +225,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param l level
    * @return TreeRect array
    */
-  public TreeRect[] getTreeRectsPerLevel(final int l) {
+  TreeRect[] getTreeRectsPerLevel(final int l) {
     int s = isBigRectangle(l) ? 1 : getSizePerLevel(l);
     TreeRect[] tr = new TreeRect[s];
 
@@ -264,7 +262,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param pre the pre value
    * @return the determined index position
    */
-  public int searchPreArrayPosition(final int lv, final int pre) {
+  int searchPreArrayPosition(final int lv, final int pre) {
 
     final int[] a = nodesPerLevel.get(lv);
     int index = -1;
@@ -291,7 +289,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param pre the pre value to be found
    * @return the rectangle containing the given pre value, null else
    */
-  public TreeRect searchRect(final int lv, final int pre) {
+  TreeRect searchRect(final int lv, final int pre) {
 
     int[] pres = nodesPerLevel.get(lv);
     TreeRect rect = null;
@@ -318,7 +316,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param l level
    * @return size
    */
-  public int getSizePerLevel(final int l) {
+  int getSizePerLevel(final int l) {
     return nodesPerLevel.get(l).length;
   }
 
@@ -328,7 +326,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param i index
    * @return pre value
    */
-  public int getPrePerLevelAndIndex(final int l, final int i) {
+  int getPrePerLevelAndIndex(final int l, final int i) {
     return nodesPerLevel.get(l)[i];
   }
 
@@ -350,7 +348,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param pre the pre value
    * @return String with node text
    */
-  public String getText(final Data data, final int pre) {
+  String getText(final Data data, final int pre) {
     final int k = data.kind(pre);
     TokenBuilder tb = new TokenBuilder();
 
@@ -372,7 +370,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param l level
    * @return boolean
    */
-  public boolean isBigRectangle(final int l) {
+  boolean isBigRectangle(final int l) {
     return bigRectangle[l];
   }
 
@@ -391,11 +389,11 @@ public class TreeCaching implements TreeViewOptions {
    * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
    * @author Wolfgang Miller
    */
-  private class RectangleCache {
+  private static class RectangleCache {
     /** X position. */
-    public int x;
+    final int x;
     /** Width. */
-    public int w;
+    final int w;
 
     /**
      * Saves width and x position.
@@ -413,16 +411,16 @@ public class TreeCaching implements TreeViewOptions {
    * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
    * @author Wolfgang Miller
    */
-  public class TreeRect extends RectangleCache {
+  static class TreeRect extends RectangleCache {
     /** The pre value. */
-    public int pre;
+    int pre;
 
     /**
      * Initializes TreeRect.
      * @param xx x position
      * @param ww width
      */
-    public TreeRect(final int xx, final int ww) {
+    TreeRect(final int xx, final int ww) {
       super(xx, ww);
     }
 
@@ -430,7 +428,7 @@ public class TreeCaching implements TreeViewOptions {
      * Initializes TreeRect.
      * @param c RectangleCache
      */
-    public TreeRect(final RectangleCache c) {
+    TreeRect(final RectangleCache c) {
       super(c.x, c.w);
     }
 
@@ -439,7 +437,7 @@ public class TreeCaching implements TreeViewOptions {
      * @param xx x position
      * @return result of comparison
      */
-    public boolean contains(final int xx) {
+    boolean contains(final int xx) {
       return xx >= x && xx <= x + w || xx >= x + w && xx <= x;
     }
   }

@@ -12,7 +12,7 @@ import java.util.ListIterator;
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Alexander Holupirek
  */
-public class FSWalker implements FSTraversal {
+public final class FSWalker implements FSTraversal {
 
   /** Registered visitors to be notified of events. */
   private final List<FSTraversal> visitors = new LinkedList<FSTraversal>();

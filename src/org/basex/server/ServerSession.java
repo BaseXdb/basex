@@ -12,7 +12,7 @@ import org.basex.core.User;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class ServerSession extends LocalSession {
+public final class ServerSession extends LocalSession {
   /** Server reference. */
   private final Semaphore sem;
 

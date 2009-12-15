@@ -136,8 +136,6 @@ public final class GUIProp extends AProp {
   public static final Object[] FSMOUNT = { "FSMOUNT", "/mnt/deepfs" };
   /** Flag indicating the mapping of the complete disk. */
   public static final Object[] FSALL = { "FSALL", false };
-  /** Flag write through in Desktop Query Engine. */
-  public static final Object[] FSWTHROUGH = { "FSWTHROUGH", false };
 
   /** Last command inputs. */
   public static final Object[] COMMANDS = { "COMMANDS", new String[0] };

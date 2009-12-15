@@ -19,7 +19,7 @@ import org.deepfs.fsml.DeepFile.Content;
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
-public class FSMLSerializer {
+public final class FSMLSerializer {
   /** The DeepFile to serialize. */
   private final DeepFile deepFile;
   /** The xml fragment. */

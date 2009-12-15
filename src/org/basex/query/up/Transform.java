@@ -17,6 +17,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
+import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
 
 /**
@@ -70,7 +71,7 @@ public final class Transform extends Arr {
       final Iter ir = fo.expr.iter(ctx);
       final Item i = ir.next();
       if(i == null || !i.node() || ir.next() != null) Err.or(UPCOPYMULT, this);
-      final Data m = UpdateFunctions.buildDB(
+      final Data m = UpdatePrimitive.buildDB(
           new NodIter(new Nod[] { (Nod) i }, 1), new MemData(ctx.context.prop));
       ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());
       pu.addDataReference(m);

@@ -16,8 +16,7 @@ import org.deepfs.util.FSWalker;
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
-public class FSParser extends Progress {
-
+public final class FSParser extends Progress {
   /** The FSImporter. */
   private final FSImporter importer;
   /** The database context. */

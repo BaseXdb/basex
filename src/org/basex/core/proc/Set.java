@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Prop;
-import org.basex.core.Text;
 import org.basex.io.PrintOutput;
 
 /**
@@ -15,6 +14,12 @@ import org.basex.io.PrintOutput;
  * @author Christian Gruen
  */
 public final class Set extends Proc {
+  /** Info strings (same order as options defined in {@link CmdSet}). */
+  private static final String[] STRINGS = {
+    INFOINFO, INFODEBUG, INFOSERIALIZE, INFOCHOP, INFOENTITY, INFOTEXTINDEX,
+    INFOATTRINDEX, INFOFTINDEX, INFOPATHINDEX, INFODBPATH
+  };
+
   /**
    * Default constructor.
    * @param key property
@@ -28,7 +33,7 @@ public final class Set extends Proc {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    final String key = args[0].toUpperCase();
+    String key = args[0].toUpperCase();
     String val = args[1];
 
     CmdSet s = null;
@@ -58,12 +63,9 @@ public final class Set extends Proc {
       } else {
         Main.notexpected();
       }
-      try {
-        return info(Text.class.getField(
-            Prop.INFO[0].toString() + s).get(null) + ": " + val);
-      } catch(final Exception ex) {
-        return info(key + ": " + val);
-      }
+      CmdSet[] cs = CmdSet.values();
+      for(int c = 0; c < cs.length; c++) if(cs[c] == s) key = STRINGS[c];
+      return info(key + ": " + val);
     } catch(final Exception ex) {
       Main.debug(ex);
       return error(SETERR, key, val);

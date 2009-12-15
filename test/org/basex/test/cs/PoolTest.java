@@ -21,7 +21,7 @@ import org.junit.Test;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Andreas Weiler
  */
-public class PoolTest {
+public final class PoolTest {
   /** Server reference. */
   static BaseXServer server;
 
@@ -57,7 +57,7 @@ public class PoolTest {
 
   /** Create and Drop Tests. */
   @Test
-  public final void createAndDrop() {
+  public void createAndDrop() {
     ok(new CreateDB(FILE), session1);
     pins(1, NAME);
     ok(new CreateDB(FILE), session1);
@@ -74,7 +74,7 @@ public class PoolTest {
 
   /** Close and Open Tests. */
   @Test
-  public final void closeAndOpen() {
+  public void closeAndOpen() {
     ok(new CreateDB(FILE), session2);
     pins(1, NAME);
     ok(new Close(), session1);

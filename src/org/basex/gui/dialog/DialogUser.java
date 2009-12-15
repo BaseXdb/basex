@@ -424,7 +424,7 @@ public final class DialogUser extends BaseXBack {
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author Andreas Weiler
    */
-  class TableModel extends AbstractTableModel {
+  final class TableModel extends AbstractTableModel {
     public int getColumnCount() {
       return data.header.size();
     }

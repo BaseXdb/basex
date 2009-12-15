@@ -101,7 +101,7 @@ public final class Optimize extends ACreate {
 
   @Override
   public double prog() {
-    return pre / (double) size;
+    return (double) pre / size;
   }
 
   @Override

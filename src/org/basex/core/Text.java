@@ -184,7 +184,7 @@ public interface Text {
     LI + CmdCreate.COLL + " [" + NAM + "]:" + NL +
       "  " + lang("ch_create4", NAM) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
-      "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.SUMMARY + "]: " + NL +
+      "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]: " + NL +
       "  " + lang("ch_create5") + NL +
     LI + CmdCreate.FS + " [" + PATH + "] [" + NAM +
       "] ([mountpoint] [backingstore]): " + NL +
@@ -233,7 +233,7 @@ public interface Text {
     lang("ch_drop2") + NL +
     LI + CmdDrop.DB + " [" + NAM + "]:" + NL +
       "  " + lang("ch_drop21") + NL +
-    LI + CmdDrop.INDEX + " [" + CmdIndex.SUMMARY + "|" + CmdIndex.TEXT + "|" +
+    LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
     LI + CmdDrop.USER + " [" + NAM + "]:" + NL + "  " + lang("ch_drop3", NAM)
@@ -313,13 +313,12 @@ public interface Text {
     LI + CmdSet.INFO + " [all?]" + COLS + lang("ch_set21") + NL +
     LI + CmdSet.DEBUG     + COLS + lang("ch_set22") + NL +
     LI + CmdSet.SERIALIZE + COLS + lang("ch_set23") + NL +
-    LI + CmdSet.XMLOUTPUT + COLS + lang("ch_set24") + NL +
-    LI + CmdSet.MAINMEM   + COLS + lang("ch_set25") + NL +
     LI + CmdSet.CHOP      + COLS + lang("ch_set26") + NL +
     LI + CmdSet.ENTITY    + COLS + lang("ch_set27") + NL +
     LI + CmdSet.TEXTINDEX + COLS + lang("ch_set28") + NL +
     LI + CmdSet.ATTRINDEX + COLS + lang("ch_set29") + NL +
-    LI + CmdSet.FTINDEX   + COLS + lang("ch_set31")
+    LI + CmdSet.FTINDEX   + COLS + lang("ch_set31") + NL +
+    LI + CmdSet.PATHINDEX + COLS + lang("ch_set32")
   };
   /** Command help. */
   String[] HELPPASSWORD = {
@@ -510,7 +509,7 @@ public interface Text {
   // USER COMMANDS ============================================================
 
   /** User name. */
-  String[] USERHEAD = { "Username",  "Read", "Write", "Create", "Admin" };
+  String[] USERHEAD = { "Username", "Read", "Write", "Create", "Admin" };
   /** Admin user. */
   String ADMIN = "admin";
 
@@ -591,41 +590,43 @@ public interface Text {
   /** Info on used main memory. */
   String INFOMEM = lang("info_mem");
 
-  /** Info on database path. */
-  String INFODBPATH = lang("info_dbpath");
   /** No document opened. */
   String INFONODB = lang("info_nodb") + DOT;
   /** Info on database. */
   String INFODBERR = lang("info_dberror");
 
+  // The following strings are dynamically bound by the SET command
+
   /** Info on query verbosity. */
   String INFOINFO = lang("info_info");
-  /** Info on query verbosity. */
-  String INFOALL = lang("info_all");
   /** Info on debug mode. */
   String INFODEBUG = lang("info_debug");
+  /** Info on result serialization. */
+  String INFOSERIALIZE = lang("info_serialize");
   /** Info on whitespace chopping. */
   String INFOCHOP = lang("info_chop");
   /** Info on entity parsing. */
   String INFOENTITY = lang("info_entities");
-  /** Info on result serialization. */
-  String INFOSERIALIZE = lang("info_serialize");
-
-  /** Info on tags. */
-  String INFOTAGS = lang("info_tags");
-  /** Info on attributes. */
-  String INFOATTS = lang("info_atts");
-  /** Info on namespaces. */
-  String INFONS = lang("info_ns");
-  /** Info on path summary. */
-  String INFOPATHINDEX = lang("info_pathindex");
   /** Info on text indexing. */
   String INFOTEXTINDEX = lang("info_txtindex");
   /** Info on attribute indexing. */
   String INFOATTRINDEX = lang("info_atvindex");
   /** Info on full-text indexing. */
   String INFOFTINDEX = lang("info_ftindex");
-  /** Info on fuzzy indexing. */
+  /** Info on path summary. */
+  String INFOPATHINDEX = lang("info_pathindex");
+  /** Info on database path. */
+  String INFODBPATH = lang("info_dbpath");
+
+  /** Info on query verbosity. */
+  String INFOALL = lang("info_all");
+  /** Info on tags. */
+  String INFOTAGS = lang("info_tags");
+  /** Info on attributes. */
+  String INFOATTS = lang("info_atts");
+  /** Info on namespaces. */
+  String INFONS = lang("info_ns");
+  /** Info on wildcard indexing. */
   String INFOWCINDEX = lang("info_wcindex");
   /** Info on index. */
   String INFOOUTOFDATED = lang("info_outofdated");
@@ -873,7 +874,7 @@ public interface Text {
   /** XQuery mode. */
   String BUTTONXQUERY = lang("b_xquery");
   /** Button text for confirming actions. */
-  String BUTTONOK = lang("b_ok");
+  String BUTTONOK = "  " + lang("b_ok") + "  ";
   /** Button text for confirming actions. */
   String BUTTONOPT = lang("b_opt") + DOTS;
   /** Button text for opening files. */
@@ -916,7 +917,7 @@ public interface Text {
   // STATUS BAR ===============================================================
 
   /** Default message. */
-  String STATUSOK = lang("s_ok") + ". ";
+  String STATUSOK = "OK.";
 
   // VISUALIZATIONS ===========================================================
 
@@ -948,7 +949,7 @@ public interface Text {
   String DIALOGFC = lang("d_fctitle");
 
   /** Dialog title for choosing a file. */
-  String CREATETITLE = lang("dc_title");
+  String CREATETITLE = lang("dc_choose");
   /** Database creation filter. */
   String CREATEFILT = lang("dc_filter");
   /** Dialog title for creating a database. */
@@ -1010,6 +1011,10 @@ public interface Text {
   String FTCSINFO = lang("dc_ftcsinfo");
   /** Full-text index information. */
   String FTDCINFO = lang("dc_ftdcinfo");
+  /** Full-text index information. */
+  String FTSCINFO = lang("dc_ftscinfo");
+  /** Full-text index information. */
+  String FTSWINFO = lang("dc_ftswinfo");
 
   /** General info. */
   String GENERALINFO = lang("dc_general");
@@ -1080,10 +1085,6 @@ public interface Text {
   String IMPORTALL = lang("dfs_all");
   /** Import options. */
   String IMPORTALLINFO = lang("dfs_allinfo") + DOT;
-  /** Write from db to fs option. */
-  String WTHROUGH = lang("dfs_wrt");
-  /** Dialog question to activate write through. */
-  String WTHROUGHOK = lang("dfs_wrtok");
   /** Import options. */
   String IMPORTFSTEXT = lang("dfs_text") + COL;
   /** Import options. */
@@ -1109,10 +1110,10 @@ public interface Text {
   String OPENMOUNTTITLE = lang("dmnt_title") + DOTS;
   /** No valid path to mount point. */
   String NOVALIDMOUNT = lang("dmnt_nomountpath") + DOT;
-  
+
   /** No default application registered to open file type.*/
   String NODEFAULTAPP = lang("dfs_nodefaultapp") + DOT;
-  
+
   /** Dialog title for renaming a database. */
   String RENAMETITLE = lang("dr_title");
   /** Info for renaming a database. */

@@ -20,7 +20,7 @@ m_inter=Interaction
 m_layout=Layout
 
 # Buttons
-b_ok=  OK  
+b_ok=OK
 b_opt=Optimize
 b_rename=Rename
 b_open= Open
@@ -44,9 +44,6 @@ b_delete=Delete
 b_delall=Delete All
 b_add=Add
 
-# Status messages
-s_ok=OK
-
 # Visualizations
 no_data=No data available
 no_space=Not enough space
@@ -60,13 +57,13 @@ explore_title=Explore
 d_info=Information
 d_fctitle=Choose Directory
 
-dc_title=Input file or directory
+dc_choose=Input file or directory
 dc_filter=Filter
 dc_name=Name of Database
 dc_xmldesc=XML Documents
 dc_zipdesc=Zipped XML Documents
 dc_gzdesc=GZipped XML Documents
-dc_xqdesc=XQuery files
+dc_xqdesc=XQuery Files
 dc_advtitle=Create Database
 dc_chop=Chop Whitespaces
 dc_intparse=Use internal XML Parser
@@ -87,9 +84,11 @@ dc_txtinfo=This index speeds up text comparisons in predicates
 dc_attinfo=This index speeds up attribute comparisons in predicates
 dc_ftxinfo=A full-text index speeds up full-text queries
 dc_wcinfo=This option speeds up wildcard searches
-dc_ftsteminfo=All tokens are stemmed before they are indexed
-dc_ftcsinfo=Case sensitive is considered in the index
-dc_ftdcinfo=Diacritics are considered in the index
+dc_ftsteminfo=Terms are stemmed before they are indexed
+dc_ftcsinfo=Case sensitivity is retained in the index
+dc_ftdcinfo=Diacritics are retained in the index
+dc_ftscinfo=Scoring values are calculated and stored in the index
+dc_ftswinfo=Choose a stopword list to skip frequent terms
 dc_general=General
 dc_parse=Parsing
 dc_names=Names
@@ -108,8 +107,6 @@ dmnt_nomountpath=No valid mount point
 dfs_newtitle=Create new DeepFS Database
 dfs_all=Complete
 dfs_allinfo=Creates a complete (C:, D: etc. on Windows, '/' on UNIX) mapping of the filesystem
-dfs_wrt=Write through
-dfs_wrtok=Any changes made to the database "%"\nare propagated to "%" in the filesystem?
 dfs_text=Map Directory to DeepFS XML
 dfs_text1=File Information & Metadata
 dfs_text2=File Contents
@@ -534,13 +531,12 @@ ch_set2=Available options [%] with value [%] = on/off:
 ch_set21=Display of (all) process info
 ch_set22=Display of debug info
 ch_set23=Serialization of query results
-ch_set24=Serialization of results as XML
-ch_set25=Main Memory Mode
 ch_set26=Chopping of XML whitespaces
 ch_set27=Parsing of XML entities
 ch_set28=Text indexing
 ch_set29=Attribute value indexing
 ch_set31=Full-text indexing
+ch_set32=Path indexing
 ch_password1=Change password.
 ch_password2=Changes the user's password.
 ch_help1=Get help on % commands.

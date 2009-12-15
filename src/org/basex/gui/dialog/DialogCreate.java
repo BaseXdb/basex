@@ -14,7 +14,6 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
-import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
@@ -56,14 +55,8 @@ public final class DialogCreate extends Dialog {
   private final BaseXCheckBox atvindex;
   /** Fulltext index flag. */
   private final BaseXCheckBox ftxindex;
-  /** Full-text indexing. */
-  private final BaseXCheckBox[] ft = new BaseXCheckBox[6];
-  /** Full-text scoring type. */
-  private final BaseXCombo ftsct;
-  /** Path for Full-text stopword list.*/
-  private final BaseXTextField ftswlpath;
-  /** Path button for full-text stopword list path. */
-  private final BaseXButton ftswlpb;
+  /** Editable full-text options. */
+  private final DialogFT ft;
   /** Buttons. */
   private final BaseXBack buttons;
   /** Available databases. */
@@ -168,50 +161,15 @@ public final class DialogCreate extends Dialog {
 
     // create checkboxes
     final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new TableLayout(10, 1, 0, 0));
+    
+    p4.setLayout(new TableLayout(2, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 
     ftxindex = new BaseXCheckBox(INFOFTINDEX, prop.is(Prop.FTINDEX), 0, this);
     p4.add(ftxindex);
-    p4.add(new BaseXLabel(FTINDEXINFO, true, false));
 
-    final String[] cb = { CREATEWC, CREATESTEM, CREATECS, CREATEDC };
-    final boolean[] val = { prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING),
-        prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS)
-    };
-    int f = 0;
-    for(; f < ft.length - 2; f++) {
-      ft[f] = new BaseXCheckBox(cb[f], val[f], this);
-      p4.add(ft[f]);
-    }
-
-    final BaseXBack b1 = new BaseXBack();
-    b1.setLayout(new TableLayout(1, 2, 6, 0));
-    ft[f] = new BaseXCheckBox(CREATESCT, prop.num(Prop.SCORING) > 0, this);
-    b1.add(ft[f++]);
-    ftsct = new BaseXCombo(new String[] { CREATESCT1, CREATESCT2 }, this);
-    b1.add(ftsct);
-    p4.add(b1);
-
-    final String sw = prop.get(Prop.STOPWORDS);
-    ft[f] = new BaseXCheckBox(CREATESW, !sw.isEmpty(), this);
-    p4.add(ft[f]);
-
-    final BaseXBack b2 = new BaseXBack();
-    b2.setLayout(new TableLayout(1, 3, 6, 0));
-    ftswlpath = new BaseXTextField(prop.get(Prop.STOPWORDS), this);
-    ftswlpath.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) { action(null); }
-    });
-    b2.add(ftswlpath);
-
-    ftswlpb = new BaseXButton(BUTTONBROWSE, this);
-    ftswlpb.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) { chooseStopWordFile(); }
-    });
-    b2.add(ftswlpb);
-    p4.add(b2);
+    ft = new DialogFT(this, true);
+    p4.add(ft);
 
     final BaseXTabs tabs = new BaseXTabs(this);
     tabs.addTab(GENERALINFO, p1);
@@ -248,21 +206,6 @@ public final class DialogCreate extends Dialog {
   }
 
   /**
-   * Opens a file dialog to choose a Stopwordlist.
-   */
-  public void chooseStopWordFile() {
-    final GUIProp gprop = gui.prop;
-    final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        gprop.get(GUIProp.OPENPATH), gui);
-//    fc.addFilter(CREATEGZDESC, IO.GZSUFFIX);
-
-    final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
-    if(file != null) {
-      ftswlpath.setText(file.path());
-    }
-  }
-
-  /**
    * Returns the chosen XML file or directory path.
    * @return file or directory
    */
@@ -280,11 +223,7 @@ public final class DialogCreate extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    final boolean ftx = ftxindex.isSelected();
-    for(final BaseXCheckBox f : ft) f.setEnabled(ftx);
-    ftsct.setEnabled(ft[4].isSelected());
-    ftswlpath.setEnabled(ft[5].isSelected());
-    ftswlpb.setEnabled(ft[5].isSelected());
+    ft.action(ftxindex.isSelected());
 
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
@@ -326,12 +265,6 @@ public final class DialogCreate extends Dialog {
     prop.set(Prop.ATTRINDEX, atvindex.isSelected());
     prop.set(Prop.FTINDEX, ftxindex.isSelected());
     prop.set(Prop.INTPARSE, intparse.isSelected());
-    prop.set(Prop.WILDCARDS, ft[0].isSelected());
-    prop.set(Prop.STEMMING, ft[1].isSelected());
-    prop.set(Prop.CASESENS, ft[2].isSelected());
-    prop.set(Prop.DIACRITICS, ft[3].isSelected());
-    prop.set(Prop.SCORING,
-        ft[4].isSelected() ? ftsct.getSelectedIndex() + 1 : 0);
-    prop.set(Prop.STOPWORDS, ft[5].isSelected() ? ftswlpath.getText() : "");
+    ft.close();
   }
 }

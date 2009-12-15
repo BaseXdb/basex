@@ -6,7 +6,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Type;
 import org.basex.query.up.NamePool;
 import org.basex.query.util.Err;
 
@@ -41,7 +40,7 @@ public final class RenamePrimitive extends NewValue {
 
   @Override
   public void update(final NamePool pool) {
-    pool.add(name, node.type == Type.ATT);
+    pool.add(name, node.type);
     pool.remove(node);
   }
 

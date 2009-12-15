@@ -100,7 +100,7 @@ class ValueTree {
    * Returns the next pre values.
    * @return next iterator token
    */
-  byte[] next() {
+  int next() {
     ln = cn;
     if(r(cn) != -1) {
       cn = r(cn);
@@ -113,9 +113,7 @@ class ValueTree {
         cn = p(cn);
       }
     }
-    final byte[] pp = pres.get(ln);
-    pres.set(null, ln);
-    return pp;
+    return ln;
   }
 
   // PRIVATE METHODS ==========================================================

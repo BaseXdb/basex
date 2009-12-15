@@ -5,7 +5,7 @@ package org.deepfs.fsml;
  * @author Workgroup DBIS, University of Konstanz 2009, ISC License
  * @author Bastian Lemke
  */
-public class ParserException extends Exception {
+public final class ParserException extends Exception {
 
   /**
    * Constructs a new exception with <code>null</code> as its detail message.

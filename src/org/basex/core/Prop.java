@@ -30,8 +30,6 @@ public final class Prop extends AProp {
   private static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.charAt(0) == 'M';
-  /** Flag denoting if OS belongs to Linux family. */
-  public static final boolean LINUX = !MAC && OS.charAt(0) != 'W';
 
   /** Property information. */
   static final String PROPHEADER = "# Property File." + NL +
@@ -66,8 +64,6 @@ public final class Prop extends AProp {
 
   /** Debug mode. */
   public static final Object[] DEBUG = { "DEBUG", false };
-  /** Web server mode. */
-  public static final Object[] WEB = { "WEB", false };
 
   /** Short query info. */
   public static final Object[] INFO = { "INFO", false };

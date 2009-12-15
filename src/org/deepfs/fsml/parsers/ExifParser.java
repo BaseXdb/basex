@@ -957,7 +957,7 @@ public final class ExifParser {
      * Reads a rational value from a IFD field.
      * @param b the {@link BufferedFileChannel} to read the rational from
      * @return the rational value as double
-     * @throws IOException if any error occurs 
+     * @throws IOException if any error occurs
      */
     double readRational(final BufferedFileChannel b) throws IOException {
       final long numerator = readLong(b);

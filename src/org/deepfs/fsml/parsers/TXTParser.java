@@ -54,10 +54,10 @@ public final class TXTParser implements IFileParser {
     final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
     final byte[] text = bfc.get(new byte[len]);
     final boolean valid = Token.isValidUTF8(text);
-    
+
     if(deepFile.extractText() && valid)
       deepFile.addText(0, len, Token.string(text));
-    
+
     if(deepFile.extractMeta()) {
       final String name = bfc.getFileName();
       final String s = name.substring(name.lastIndexOf('.') + 1).toLowerCase();

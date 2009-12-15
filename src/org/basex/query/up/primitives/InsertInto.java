@@ -1,6 +1,5 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.up.UpdateFunctions.*;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;

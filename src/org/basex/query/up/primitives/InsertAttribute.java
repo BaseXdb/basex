@@ -1,10 +1,7 @@
 package org.basex.query.up.primitives;
 
-import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.item.QNm;
-import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.NamePool;
 
@@ -38,12 +35,7 @@ public final class InsertAttribute extends NodeCopy {
 
   @Override
   public void update(final NamePool pool) {
-    for(int pre = 0; pre < md.meta.size; pre++) {
-      final int u = md.uri(pre, Data.ATTR);
-      final QNm qnm = new QNm(md.name(pre, Data.ATTR));
-      if(u != 0) qnm.uri = Uri.uri(md.ns.uri(u));
-      pool.add(qnm, true);
-    }
+    add(pool);
   }
 
   @Override

@@ -24,7 +24,8 @@ public final class ObsoleteTexts {
     org.basex.core.Text.class,       org.basex.build.BuildText.class,
     org.basex.data.DataText.class,   org.basex.api.dom.BXText.class,
     org.basex.query.QueryText.class, org.basex.query.QueryTokens.class,
-    org.basex.build.mediovis.MAB2.class,
+    org.basex.build.mediovis.MAB2.class, org.basex.gui.GUIProp.class,
+    org.basex.core.Prop.class,
   };
 
   /** Private constructor, preventing instantiation. */

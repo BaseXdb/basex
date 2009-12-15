@@ -2,7 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.util.Token.*;
 import java.util.Arrays;
-
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
@@ -14,7 +13,7 @@ import org.basex.util.Atts;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class NamePool {
+public final class NamePool {
   /** Names. */
   private QNm[] names = new QNm[1];
   /** Attribute/element flag. */
@@ -23,26 +22,28 @@ public class NamePool {
   private int[] occ = new int[1];
   /** Number of entries. */
   private int size;
-  
+
   /**
    * Adds an entry to the pool.
    * @param name name
-   * @param at attribute/element flag
+   * @param type node type
    */
-  public void add(final QNm name, final boolean at) {
-    final int i = index(name, at);
+  public void add(final QNm name, final Type type) {
+    if(type != Type.ATT && type != Type.ELM) return;
+    final int i = index(name, type == Type.ATT);
     occ[i]++;
   }
-  
+
   /**
    * Removes an entry from the pool.
    * @param nod node
    */
   public void remove(final Nod nod) {
+    if(nod.type != Type.ATT && nod.type != Type.ELM) return;
     final int i = index(nod.qname(), nod.type == Type.ATT);
     occ[i]--;
   }
-  
+
   /**
    * Finds duplicate attributes.
    * @return duplicate attribute
@@ -68,7 +69,7 @@ public class NamePool {
     }
     return true;
   }
-  
+
   /**
    * Returns an index to an existing entry, or -1.
    * @param name name to be found

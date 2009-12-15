@@ -309,7 +309,7 @@ public enum MetaElem {
   public String get() {
     return n;
   }
-  
+
   /**
    * Returns the metadata attribute name as byte[].
    * @return the metadata attribute name as byte[]

@@ -4,14 +4,13 @@ package org.deepfs.fsml.parsers;
  * An exception class used for signaling failure of a decode operation.
  * @author Bastian Lemke
  */
-public class DecodingException extends Exception {
-
+final class DecodingException extends Exception {
   /**
    * Constructs a new exception with <code>null</code> as its detail message.
    * The cause is not initialized, and may subsequently be initialized by a
    * call to {@link #initCause}.
    */
-  public DecodingException() {
+  DecodingException() {
     super();
   }
 
@@ -22,7 +21,7 @@ public class DecodingException extends Exception {
    * @param message the detail message. The detail message is saved for later
    *          retrieval by the {@link #getMessage()} method
    */
-  public DecodingException(final String message) {
+  DecodingException(final String message) {
     super(message);
   }
 
@@ -38,7 +37,7 @@ public class DecodingException extends Exception {
    *          permitted,
    *          and indicates that the cause is nonexistent or unknown.)
    */
-  public DecodingException(final Throwable cause) {
+  DecodingException(final Throwable cause) {
     super(cause);
   }
 }

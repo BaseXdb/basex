@@ -106,7 +106,7 @@ public enum GUICommands implements GUICommand {
         } else {
           Proc[] proc = new Proc[0];
           if(ind[0] != d.meta.pathindex)
-            proc = Array.add(proc, cmd(ind[0], CmdIndex.SUMMARY));
+            proc = Array.add(proc, cmd(ind[0], CmdIndex.PATH));
           if(ind[1] != d.meta.txtindex)
             proc = Array.add(proc, cmd(ind[1], CmdIndex.TEXT));
           if(ind[2] != d.meta.atvindex)

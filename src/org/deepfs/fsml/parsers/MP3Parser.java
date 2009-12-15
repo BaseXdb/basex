@@ -85,7 +85,7 @@ public final class MP3Parser implements IFileParser {
     token("Symphonic Rock"), token("Slow Rock"), token("Big Band"),
     token("Chorus"), token("Easy Listening"), token("Acoustic"),
     token("Humour"), token("Speech"), token("Chanson"), token("Opera"),
-    token("Chamber Music"), token("Sonata"), token("Symphony"), 
+    token("Chamber Music"), token("Sonata"), token("Symphony"),
     token("Booty Brass"), token("Primus"), token("Porn Groove"),
     token("Satire"), token("Slow Jam"), token("Club"), token("Tango"),
     token("Samba"), token("Folklore"), token("Ballad"), token("Poweer Ballad"),
@@ -639,7 +639,7 @@ public final class MP3Parser implements IFileParser {
         obj.bfc.buffer(1);
         final int typeId = obj.bfc.get() & 0xFF;
         String name = null;
-        if(typeId >= 0 && typeId < PICTURE_TYPE.length) 
+        if(typeId >= 0 && typeId < PICTURE_TYPE.length)
           name = PICTURE_TYPE[typeId];
 
         // skip the picture description

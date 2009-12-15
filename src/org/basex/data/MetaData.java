@@ -53,7 +53,7 @@ public final class MetaData {
   /** Flag for creating a path summary. */
   public boolean pathindex = true;
 
-  /** Flag for fuzzy indexing. */
+  /** Flag for wildcard indexing. */
   public boolean wildcards;
   /** Flag for full-text stemming. */
   public boolean stemming;

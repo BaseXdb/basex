@@ -143,7 +143,7 @@ public final class DBExample {
      * Use XQuery update to ....
      * *TODO* [MSe]
      */
-    private static void updateExample(){
+    private static void updateExample() {
       // *TODO*
     }
     /** Private constructor to avoid class creation.*/
@@ -156,10 +156,10 @@ public final class DBExample {
    * @author michael
    * Topics covered: <br />
    * Index creation & maintenance: 
-   * {@link MaintenanceExamples#createIndices} 
+   * {@link MaintenanceExamples#createIndexes} 
    * <br /> <br />
    * Index creation & maintenance: 
-   * {@link MaintenanceExamples#createIndices} 
+   * {@link MaintenanceExamples#createIndexes} 
    */
   static final class MaintenanceExamples {
     /**
@@ -167,7 +167,7 @@ public final class DBExample {
      * @throws BaseXException on error.
      */
     static void run() throws BaseXException {
-      createIndices();
+      createIndexes();
       optimizeDB();
     }
     /**
@@ -179,10 +179,10 @@ public final class DBExample {
       
     }
     /**
-     * This method shows operations to create and drop indices.
+     * This method shows operations to create and drop indexes.
      * @throws BaseXException on error.
      */
-    private static void createIndices() throws BaseXException{
+    private static void createIndexes() throws BaseXException {
       // I Index Creation & Maintenance
       new CreateIndex("fulltext").exec(CONTEXT, System.out);
 
@@ -192,7 +192,7 @@ public final class DBExample {
      * Information on the currently open database.
      * @throws BaseXException *TODO*
      */
-    private static void info() throws BaseXException{
+    private static void info() throws BaseXException {
       System.out.println("\n=== III information on the specified "
           + "database context.");
       // Dumps information on the specified database context

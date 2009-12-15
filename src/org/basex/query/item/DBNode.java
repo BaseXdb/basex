@@ -21,7 +21,7 @@ import org.basex.util.Atts;
  */
 public class DBNode extends Nod {
   /** Node Types. */
-  private static final Type[] TYPES = {
+  public static final Type[] TYPES = {
     Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
   };
   /** Data reference. */
