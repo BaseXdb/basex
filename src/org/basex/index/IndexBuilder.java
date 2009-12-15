@@ -16,7 +16,7 @@ public abstract class IndexBuilder extends Progress {
   /** Data reference. */
   protected final Data data;
   /** Total parsing value. */
-  protected final int total;
+  protected final int size;
   /** Current parsing value. */
   protected int pre;
 
@@ -33,7 +33,7 @@ public abstract class IndexBuilder extends Progress {
    */
   public IndexBuilder(final Data d) {
     data = d;
-    total = data.meta.size;
+    size = data.meta.size;
   }
 
   @Override
@@ -43,6 +43,6 @@ public abstract class IndexBuilder extends Progress {
 
   @Override
   public final double prog() {
-    return (double) pre / total;
+    return (double) pre / size;
   }
 }

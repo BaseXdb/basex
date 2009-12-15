@@ -82,8 +82,7 @@ public final class DataAccess {
   }
 
   /**
-   * Reads an integer value from the specified position
-   * (without cursor correction).
+   * Reads an integer value.
    * @return integer value
    */
   public synchronized int read4() {
@@ -101,12 +100,20 @@ public final class DataAccess {
   }
 
   /**
-   * Reads an 5-byte value from the specified file offset.
+   * Reads a 5-byte value from the specified file offset.
    * @param p position
    * @return long value
    */
   public synchronized long read5(final long p) {
     cursor(p);
+    return read5();
+  }
+
+  /**
+   * Reads a 5-byte value.
+   * @return long value
+   */
+  public synchronized long read5() {
     return ((long) read() << 32) + ((long) read() << 24) +
       (read() << 16) + (read() << 8) + read();
   }

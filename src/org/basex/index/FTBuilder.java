@@ -84,7 +84,7 @@ public abstract class FTBuilder extends IndexBuilder {
   protected final void index() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
 
-    for(pre = 0; pre < total; pre++) {
+    for(pre = 0; pre < size; pre++) {
       final int k = data.kind(pre);
       if(k != Data.TEXT) {
         if(scm == 1 && k == Data.DOC) unit.add(pre);

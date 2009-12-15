@@ -16,13 +16,13 @@ import org.basex.util.TokenList;
  */
 class ValueTree {
   /** Compressed pre values. */
-  public final TokenList pres = new TokenList(1.1);
+  public final TokenList pres = new TokenList(1.2);
   /** Tree structure [left, right, parent]. */
-  public final IntList tree = new IntList(1.1);
+  public final IntList tree = new IntList(1.2);
   /** Tokens saved in the tree. */
-  public TokenList tokens = new TokenList(1.1);
+  public final TokenList tokens = new TokenList(1.2);
   /** Flag if a node has been modified. */
-  public BoolList mod = new BoolList();
+  public final BoolList mod = new BoolList();
   /** Tree root node. */
   private int root = -1;
 
@@ -84,8 +84,6 @@ class ValueTree {
   void init() {
     cn = root;
     if(cn != -1) while(l(cn) != -1) cn = l(cn);
-    tokens = null;
-    mod = null;
   }
 
   /**

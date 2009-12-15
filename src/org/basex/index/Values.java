@@ -117,7 +117,7 @@ public final class Values implements Index {
   /**
    * Iterator method.
    * @param s number of pre values
-   * @param ps offest
+   * @param ps offset
    * @return iterator
    */
   private IndexIterator iter(final int s, final long ps) {
