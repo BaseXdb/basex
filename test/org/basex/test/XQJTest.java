@@ -41,7 +41,7 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public class XQJTest extends TestCase {
+public final class XQJTest extends TestCase {
   /** Test file. */
   private static final String INPUT = "doc('input.xml')";
   /** Driver reference. */
