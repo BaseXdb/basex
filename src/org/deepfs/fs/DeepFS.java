@@ -41,6 +41,10 @@ public final class DeepFS implements DataText {
   private DeepStat rootStat;
 
   /** Index References. */
+  private int fsmlID;
+  /** Index References. */
+  private int deepfsID;
+  /** Index References. */
   private int fileID;
   /** Index References. */
   private int dirID;
@@ -85,7 +89,7 @@ public final class DeepFS implements DataText {
   public DeepFS(final String dbname, final String mountpoint) {
     ctx = new Context();
     if(!new Open(dbname).execute(ctx))
-      new CreateDB("<" + string(DEEPFS) + " " + "mountpoint=\""
+      new CreateDB("<" + S_DEEPFS + " " + "mountpoint=\""
           + mountpoint + "\"/>", dbname).execute(ctx);
     data = ctx.data;
     initNames();
@@ -118,7 +122,8 @@ public final class DeepFS implements DataText {
    */
   private void initNames() {
     // initialize tags and attribute names
-    data.tags.index(DEEPFS, null, false);
+    fsmlID         = data.tags.index(FSML,         null, false);
+    deepfsID       = data.tags.index(DEEPFS,       null, false);
     dirID          = data.tags.index(DIR,          null, false);
     fileID         = data.tags.index(FILE,         null, false);
     contentID      = data.tags.index(CONTENT,      null, false);
@@ -438,7 +443,16 @@ public final class DeepFS implements DataText {
    * @return true if this node is a file, false otherwise
    */
   public boolean isFile(final int pre) {
-    return data.kind(pre) == Data.ELEM && data.name(pre) == fileID;
+    int k = data.kind(pre);
+    if(k != Data.ELEM || data.name(pre) != fileID) return false;
+    int par = data.parent(pre, k);
+    // a regular xml file may contain a <file> node...
+    while(par >= 0 && k != Data.DOC) {
+      if(!isFSnode(par)) return false;
+      par = data.parent(par, data.kind(par));
+      k = data.kind(par);
+    }
+    return true;
   }
 
   /**
@@ -458,9 +472,7 @@ public final class DeepFS implements DataText {
   public boolean isFSnode(final int pre) {
     final int name = data.name(pre);
     return data.kind(pre) == Data.ELEM  &&
-      (data.name(pre) == fileID || data.name(pre) == dirID ||
-        name == data.tags.id(DataText.FSML) ||
-        name == data.tags.id(DataText.DEEPFS));
+      (name == fileID || name == dirID || name == fsmlID || name == deepfsID);
   }
 
   /**
@@ -593,6 +605,7 @@ public final class DeepFS implements DataText {
     int k = data.kind(p);
     final IntList il = new IntList();
     while(p >= 0 && k != Data.DOC) {
+      if(!isFSnode(p)) return EMPTY;
       il.add(p);
       p = data.parent(p, k);
       k = data.kind(p);

@@ -93,15 +93,18 @@ final class TableData {
    */
   void init(final Data data) {
     roots = new TokenList();
-    // sort keys by occurrence
-    for(final byte[] k : data.path.desc(Token.EMPTY, data, true, true)) {
-      int c = 0;
-      for(final byte[] kk : data.path.desc(k, data, true, false)) {
-        final Names nm = startsWith(kk, '@') ? data.atts : data.tags;
-        if(nm.stat(nm.id(delete(kk, '@'))).leaf) c++;
+    if(data.fs != null) roots.add(DataText.FILE);
+    else {
+      // sort keys by occurrence
+      for(final byte[] k : data.path.desc(Token.EMPTY, data, true, true)) {
+        int c = 0;
+        for(final byte[] kk : data.path.desc(k, data, true, false)) {
+          final Names nm = startsWith(kk, '@') ? data.atts : data.tags;
+          if(nm.stat(nm.id(delete(kk, '@'))).leaf) c++;
+        }
+        // add keys with a minimum of three columns
+        if(c > 2) roots.add(k);
       }
-      // add keys with a minimum of three columns
-      if(c > 2) roots.add(k);
     }
     init(data, -1);
   }
@@ -118,7 +121,7 @@ final class TableData {
     last = "";
     rowH = 1;
 
-    if(data.fs != null && root == -1) {
+    if(data.fs != null) {
       root = data.tags.id(DataText.FILE);
       addCol(DataText.SUFFIX, false);
       addCol(DataText.NAME, false);
@@ -186,6 +189,7 @@ final class TableData {
   void createRows() {
     final Data data = context.data;
     final int[] n = context.current.nodes;
+    final boolean fs = data.fs != null;
 
     rows = new IntList();
     for(int p : n) {
@@ -198,7 +202,9 @@ final class TableData {
       // parse whole document and collect root tags
       while(p < s) {
         final int k = data.kind(p);
-        if(k == Data.ELEM && data.name(p) == root) rows.add(p);
+        if(fs) {
+          if(data.fs.isFile(p)) rows.add(p);
+        } else if(k == Data.ELEM && data.name(p) == root) rows.add(p);
         p += data.attSize(p, k);
       }
     }

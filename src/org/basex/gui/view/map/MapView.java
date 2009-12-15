@@ -124,6 +124,7 @@ public final class MapView extends View implements Runnable {
     final int f = gui.context.focused;
     if(f == -1) focused = null;
 
+    if(mainRects == null) return; // [CG] BL: mainRects is sometimes null 
     final int ms = mainRects.size;
     for(int mi = 0; mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
@@ -624,8 +625,9 @@ public final class MapView extends View implements Runnable {
       if(data.fs != null) {
         if(data.fs.isFSnode(pre)) {
           if(data.fs.isFile(pre)) {
-            textLen[pre] = Token.toInt(ViewData.attValue(data, data.sizeID,
-                pre));
+            final byte[] attVal = ViewData.attValue(data, data.sizeID, pre);
+            if(attVal == null) continue;
+            textLen[pre] = Token.toInt(attVal);
             textLen[parStack[l - 1]] += textLen[pre];
             pre += data.size(pre, kind) - 1; // skip file content
             assert pre == size - 1 || data.fs.isFSnode(pre + 1);
