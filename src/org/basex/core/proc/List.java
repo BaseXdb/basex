@@ -35,9 +35,9 @@ public final class List extends Proc {
     final Table table = new Table();
     table.desc = DATABASES;
 
-    final boolean admin = context.user.perm(User.CREATE);
+    final boolean create = context.user.perm(User.CREATE);
     table.header.add(INFODBNAME);
-    if(admin) table.header.add(INFODOC);
+    if(create) table.header.add(INFODOC);
 
     for(final String name : list(context)) {
       DataInput in = null;
@@ -55,7 +55,7 @@ public final class List extends Proc {
       if(file != null) {
         final TokenList sl = new TokenList();
         sl.add(name);
-        if(admin) sl.add(file);
+        if(create) sl.add(file);
         table.contents.add(sl);
       }
     }
