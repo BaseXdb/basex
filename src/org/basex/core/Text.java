@@ -281,7 +281,7 @@ public interface Text {
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
-    LI + CmdShow.USERS + ": " + lang("ch_show24")
+    LI + CmdShow.USERS + " (" + ON + " [db]): " + lang("ch_show24")
   };
   /** Command help. */
   String[] HELPGRANT = {

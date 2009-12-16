@@ -28,7 +28,6 @@ import org.basex.core.proc.Exit;
 import org.basex.core.proc.Export;
 import org.basex.core.proc.Find;
 import org.basex.core.proc.Grant;
-import org.basex.core.proc.InfoUsers;
 import org.basex.core.proc.Help;
 import org.basex.core.proc.Info;
 import org.basex.core.proc.InfoDB;
@@ -155,8 +154,6 @@ public final class CommandParser extends InputParser {
             final String arg2 = arg1 != null ? number(null) : null;
             if(arg1 == null) arg1 = xquery(null);
             return new InfoTable(arg1, arg2);
-          case USERS:
-            return new InfoUsers();
         }
         break;
       case CLOSE:
@@ -213,8 +210,10 @@ public final class CommandParser extends InputParser {
         switch(show) {
           case DATABASES:
           case SESSIONS:
-          case USERS:
             return new Show(show);
+          case USERS:
+            final String db = key(ON, null) ? name(cmd) : null;
+            return new Show(show, db);
           default:
         }
         break;

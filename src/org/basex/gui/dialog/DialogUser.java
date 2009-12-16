@@ -19,13 +19,10 @@ import org.basex.core.Session;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.proc.AlterUser;
-import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.DropUser;
 import org.basex.core.proc.Grant;
-import org.basex.core.proc.InfoUsers;
 import org.basex.core.proc.List;
-import org.basex.core.proc.Open;
 import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Show;
 import org.basex.gui.layout.BaseXBack;
@@ -216,6 +213,8 @@ public final class DialogUser extends BaseXBack {
   public void action(final Object cmp) {
     String msg = null;
     try {
+      final Object di = databases.getSelectedItem();
+      final String db = di == null ? null : di.toString();
       if(cmp == change) {
         for(final Proc p : permps) {
           if(!sess.execute(p)) {
@@ -227,7 +226,7 @@ public final class DialogUser extends BaseXBack {
         if(global) {
           setData();
         } else {
-          setDataL();
+          setDataL(db);
         }
       } else if(cmp == create) {
         final String u = user.getText();
@@ -249,14 +248,12 @@ public final class DialogUser extends BaseXBack {
         setData();
       } else if(cmp == remove) {
         final String u = removeUser.getSelectedItem().toString();
-        final String db = databases.getSelectedItem().toString();
         if(!sess.execute(new DropUser(u, db))) msg = sess.info();
-        setDataL();
+        setDataL(db);
       } else if(cmp == add) {
         final String value = addUser.getSelectedItem().toString();
         for(final StringList l : tempP) {
           if(l.get(0).equals(value)) {
-            final String db = databases.getSelectedItem().toString();
             for(int i = 1; i <= 2; i++) {
               final String o = l.get(i);
               final Object val = o.equals("") ? Boolean.FALSE : o.equals("X") ?
@@ -270,9 +267,7 @@ public final class DialogUser extends BaseXBack {
         action(change);
       } else if(cmp == databases) {
         try {
-          sess.execute(new Close());
-          sess.execute(new Open(databases.getSelectedItem().toString()));
-          setDataL();
+          setDataL(databases.getSelectedItem().toString());
         } catch(final IOException e1) {
           addUser.removeAllItems();
           removeUser.removeAllItems();
@@ -345,11 +340,12 @@ public final class DialogUser extends BaseXBack {
 
   /**
    * Sets local data.
+   * @param db database to be opened
    * @throws IOException I/O Exception
    */
-  void setDataL() throws IOException {
+  void setDataL(final String db) throws IOException {
     CachedOutput out = new CachedOutput();
-    if(!sess.execute(new InfoUsers(), out))
+    if(!sess.execute(new Show(CmdShow.USERS, db), out))
       throw new IOException(sess.info());
     final String users = out.toString();
     out = new CachedOutput();
