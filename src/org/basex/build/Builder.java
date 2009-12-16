@@ -38,6 +38,10 @@ public abstract class Builder extends Progress {
   protected final Namespaces ns = new Namespaces();
   /** Tree structure. */
   protected final PathSummary path = new PathSummary();
+  /** Number of cached size values. */
+  protected int ssize;
+  /** Currently stored size value. */
+  protected int spos;
 
   /** Parent stack. */
   private final int[] preStack = new int[IO.MAXHEIGHT];

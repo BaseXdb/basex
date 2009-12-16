@@ -27,7 +27,9 @@ public final class ValueBuilder extends IndexBuilder {
   /** Temporary value tree. */
   private ValueTree index = new ValueTree();
   /** Index type (attributes/texts). */
-  final boolean text;
+  private final boolean text;
+  /** Number of cached index structures. */
+  private int csize;
 
   /**
    * Constructor.
@@ -48,7 +50,6 @@ public final class ValueBuilder extends IndexBuilder {
     final long maxMem = (long) (rt.maxMemory() * 0.9);
 
     final int type = text ? Data.TEXT : Data.ATTR;
-    int cf = 0;
     int cc = 0;
 
     for(pre = 0; pre < size; pre++) {
@@ -59,11 +60,12 @@ public final class ValueBuilder extends IndexBuilder {
           // safely abort if index caching is done too often
           if(cc >= 0) throw new IOException(PROCOUTMEM);
 
-          write(f + cf);
+          write(f + csize);
           index = new ValueTree();
           Performance.gc(1);
           cc = 50;
-          cf++;
+          merge = true;
+          csize++;
         } else {
           cc--;
         }
@@ -75,14 +77,15 @@ public final class ValueBuilder extends IndexBuilder {
       if(tok.length <= MAXLEN && !ws(tok)) index.index(tok, pre);
     }
 
-    if(cf == 0) {
+    if(csize == 0) {
       writeSingle(f);
     } else {
-      write(f + cf);
+      write(f + csize);
       index = null;
-      cf++;
+      Performance.gc(1);
+      csize++;
 
-      final int sz = merge(cf);
+      final int sz = merge();
       final DataAccess da = new DataAccess(data.meta.file(f + 'l'));
       da.writeInt(sz);
       da.close();
@@ -98,70 +101,71 @@ public final class ValueBuilder extends IndexBuilder {
 
   /**
    * Merges cached index files.
-   * @param cf number of value files
    * @return returns number of indexed tokens
    * @throws IOException I/O exception
    */
-  private int merge(final int cf) throws IOException {
+  private int merge() throws IOException {
     final String f = text ? DATATXT : DATAATV;
     final DataOutput outl = new DataOutput(data.meta.file(f + 'l'));
     final DataOutput outr = new DataOutput(data.meta.file(f + 'r'));
     outl.writeInt(0);
 
-    final ValueMerge[] mv = new ValueMerge[cf];
-    for(int i = 0; i < cf; i++) mv[i] = new ValueMerge(data, text, i);
+    final ValueMerge[] vm = new ValueMerge[csize];
+    for(int i = 0; i < csize; i++) vm[i] = new ValueMerge(data, text, i);
 
     int min;
     int sz = 0;
-    final IntList merge = new IntList();
-    while(check(mv)) {
+    final IntList ml = new IntList();
+    while(check(vm)) {
+      checkStop();
+
       sz++;
       outr.write5(outl.size());
       min = 0;
-      merge.reset();
-      for(int i = 0; i < cf; i++) {
-        if(min == i || mv[i].t.length == 0) continue;
-        final int d = diff(mv[min].t, mv[i].t);
-        if(d > 0 || mv[min].t.length == 0) {
+      ml.reset();
+      for(int i = 0; i < csize; i++) {
+        if(min == i || vm[i].t.length == 0) continue;
+        final int d = diff(vm[min].t, vm[i].t);
+        if(d > 0 || vm[min].t.length == 0) {
           min = i;
-          merge.reset();
-        } else if(d == 0 && mv[i].t.length > 0) {
-          if(merge.size() == 0) merge.add(min);
-          merge.add(i);
+          ml.reset();
+        } else if(d == 0 && vm[i].t.length > 0) {
+          if(ml.size() == 0) ml.add(min);
+          ml.add(i);
         }
       }
 
-      if(merge.size() == 0) {
-        writeWithNum(outl, mv[min].p);
-        mv[min].next();
+      if(ml.size() == 0) {
+        writeWithNum(outl, vm[min].p);
+        vm[min].next();
       } else {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(new byte[4]);
         int npre = 0;
         int opre = 0;
-        for(int j = 0; j < merge.size(); j++) {
-          final int m = merge.get(j);
+        for(int j = 0; j < ml.size(); j++) {
+          final int m = ml.get(j);
           if(j == 0) {
             int l = 4;
-            while(l < mv[m].p.length) {
-              final int diff = Num.read(mv[m].p, l);
+            while(l < vm[m].p.length) {
+              final int diff = Num.read(vm[m].p, l);
               opre += diff;
               l += Num.len(diff);
             }
-            tb.add(substring(mv[m].p, 4));
+            tb.add(substring(vm[m].p, 4));
           } else {
-            npre = Num.read(mv[m].p, 4);
+            npre = Num.read(vm[m].p, 4);
             tb.add(Num.num(npre - opre));
             int l = 4 + Num.len(npre);
-            tb.add(substring(mv[m].p, l));
+            tb.add(substring(vm[m].p, l));
             opre = npre;
-            while(l < mv[m].p.length) {
-              final int diff = Num.read(mv[m].p, l);
+            while(l < vm[m].p.length) {
+              final int diff = Num.read(vm[m].p, l);
               opre += diff;
               l += Num.len(diff);
             }
           }
-          mv[m].next();
+          vm[m].next();
         }
         final byte[] tmp = tb.finish();
         Num.size(tmp, tmp.length);

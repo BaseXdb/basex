@@ -19,6 +19,8 @@ public abstract class IndexBuilder extends Progress {
   protected final int size;
   /** Current parsing value. */
   protected int pre;
+  /** Merge flag. */
+  protected boolean merge;
 
   /**
    * Builds the index structure and returns an index instance.
@@ -43,6 +45,6 @@ public abstract class IndexBuilder extends Progress {
 
   @Override
   public final double prog() {
-    return (double) pre / size;
+    return (double) pre / (size + (merge  ? size / 50 : 0));
   }
 }

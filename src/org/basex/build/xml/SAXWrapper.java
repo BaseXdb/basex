@@ -119,7 +119,7 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public double prog() {
-    return length == 0 ? sax == null ? 0 : sax.nodes / 1000000d % 1 :
+    return length == 0 ? sax == null ? 0 : sax.nodes / 3000000d % 1 :
       (double) counter / length;
   }
 }

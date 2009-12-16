@@ -13,6 +13,9 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXMem;
+import org.basex.gui.layout.TableLayout;
+import org.basex.util.Performance;
 
 /**
  * Dialog window for displaying the progress of a process.
@@ -25,6 +28,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
   private final Timer timer = new Timer(100, this);
   /** Information label. */
   private final BaseXLabel info;
+  /** Memory usage. */
+  private final BaseXMem mem;
   /** Progress reference. */
   private final Progress prog;
   /** Progress bar. */
@@ -49,7 +54,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
     set(info, BorderLayout.NORTH);
 
     if(!pb) {
-      BaseXLayout.setWidth(info, 600);
+      BaseXLayout.setWidth(info, 500);
     } else {
       ww = 320;
       bar = new JProgressBar(0, ww);
@@ -57,15 +62,24 @@ public final class DialogProgress extends Dialog implements ActionListener {
       set(bar, BorderLayout.CENTER);
     }
 
-    final BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout());
-    p.setBorder(10, 0, 0, 0);
-    if(cnc) p.add(new BaseXButton(BUTTONCANCEL, this),
-        BorderLayout.EAST);
-    set(p, BorderLayout.SOUTH);
+    final BaseXBack south = new BaseXBack();
+    south.setLayout(new BorderLayout());
+    south.setBorder(10, 0, 0, 0);
+
+    final BaseXBack m = new BaseXBack();
+    m.setLayout(new TableLayout(1, 2, 5, 0));
+    m.setBorder(0, 0, 0, 0);
+    mem = new BaseXMem(this, false);
+    m.add(new BaseXLabel(MEMUSED));
+    m.add(mem);
+    south.add(m, BorderLayout.WEST);
+
+    if(cnc) south.add(new BaseXButton(BUTTONCANCEL, this), BorderLayout.EAST);
+    set(south, BorderLayout.SOUTH);
     finish(null);
 
     prog = prg;
+    Performance.gc(1);
     timer.start();
   }
 
@@ -89,6 +103,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
   public void actionPerformed(final ActionEvent e) {
     setTitle(prog.title());
     info.setText(prog.detail());
+    mem.repaint();
+    //mem.setText("Memory: " + Performance.getMem());
     if(bar != null) bar.setValue((int) (prog.progress() * ww));
   }
 }

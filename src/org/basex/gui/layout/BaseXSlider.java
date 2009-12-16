@@ -86,7 +86,7 @@ public final class BaseXSlider extends BaseXPanel {
 
     if(!(w instanceof Dialog)) return;
     dl = (Dialog) w;
-}
+  }
 
   /**
    * Returns the current value.
@@ -94,6 +94,28 @@ public final class BaseXSlider extends BaseXPanel {
    */
   public int value() {
     return curr;
+  }
+
+  @Override
+  public void paintComponent(final Graphics g) {
+    super.paintComponent(g);
+
+    final int w = getWidth();
+    final int h = getHeight();
+    final int hh = h / 2;
+
+    g.setColor(hasFocus() ? Color.white : GUIConstants.COLORCELL);
+    g.fillRect(0, hh - 2, w, 4);
+    g.setColor(Color.black);
+    g.drawLine(0, hh - 2, w, hh - 2);
+    g.drawLine(0, hh - 2, 0, hh + 2);
+    g.setColor(GUIConstants.COLORBUTTON);
+    g.drawLine(w - 1, hh - 2, w - 1, hh + 2);
+    g.drawLine(0, hh + 2, w, hh + 2);
+
+    final double x = (curr - min) * (w - SLIDERW) / (max - min);
+    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 5, hh + 5,
+        oldCurr != -1);
   }
 
   @Override
@@ -155,27 +177,5 @@ public final class BaseXSlider extends BaseXPanel {
       else al.actionPerformed(null);
       repaint();
     }
-  }
-
-  @Override
-  public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
-
-    final int w = getWidth();
-    final int h = getHeight();
-    final int hh = h / 2;
-
-    g.setColor(hasFocus() ? Color.white : GUIConstants.COLORCELL);
-    g.fillRect(0, hh - 2, w, 4);
-    g.setColor(Color.black);
-    g.drawLine(0, hh - 2, w, hh - 2);
-    g.drawLine(0, hh - 2, 0, hh + 2);
-    g.setColor(GUIConstants.COLORBUTTON);
-    g.drawLine(w - 1, hh - 2, w - 1, hh + 2);
-    g.drawLine(0, hh + 2, w, hh + 2);
-
-    final double x = (curr - min) * (w - SLIDERW) / (max - min);
-    BaseXLayout.drawCell(g, (int) x, (int) (x + SLIDERW), hh - 5, hh + 5,
-        oldCurr != -1);
   }
 }

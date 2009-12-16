@@ -38,8 +38,6 @@ public final class DiskBuilder extends Builder {
 
   /** Database size stream (temporary). */
   private DataOutput sout;
-  /** Database size stream (counter). */
-  private int ssize;
 
   /**
    * Constructor.
@@ -75,9 +73,7 @@ public final class DiskBuilder extends Builder {
     // copy temporary values into database table
     final TableAccess ta = new TableDiskAccess(meta, DATATBL);
     final DataInput in = new DataInput(meta.file(DATATMP));
-    for(int pre = 0; pre < ssize; pre++) {
-      ta.write4(in.readNum(), 8, in.readNum());
-    }
+    for(; spos < ssize; spos++) ta.write4(in.readNum(), 8, in.readNum());
     ta.close();
     in.close();
     meta.file(DATATMP).delete();

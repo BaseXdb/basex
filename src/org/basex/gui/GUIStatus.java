@@ -1,15 +1,13 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
-import static org.basex.gui.GUIConstants.*;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
-import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXMem;
 import org.basex.gui.layout.BaseXPanel;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -20,18 +18,12 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class GUIStatus extends BaseXPanel {
-  /** Width of the memory status box. */
-  private static final int MEMW = 70;
+  /** Memory usage. */
+  private final BaseXMem mem;
   /** Current status text. */
   private String status = STATUSOK;
   /** Current path. */
   private String oldStatus = STATUSOK;
-  /** Current focus on memory. */
-  private boolean memfocus;
-  /** Maximum memory. */
-  private long max = 1;
-  /** Used memory. */
-  private long used;
 
   /**
    * Constructor.
@@ -40,9 +32,12 @@ public final class GUIStatus extends BaseXPanel {
   GUIStatus(final GUI main) {
     super(main);
     BaseXLayout.setHeight(this, getFont().getSize() + 6);
-    addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
+
+    setLayout(new BorderLayout());
+    mem = new BaseXMem(main, true);
+    add(mem, BorderLayout.EAST);
   }
 
   /**
@@ -60,10 +55,6 @@ public final class GUIStatus extends BaseXPanel {
   private void refresh(final String txt) {
     status = txt;
     oldStatus = status;
-
-    final Runtime rt = Runtime.getRuntime();
-    max = rt.maxMemory();
-    used = rt.totalMemory() - rt.freeMemory();
     repaint();
   }
 
@@ -80,73 +71,19 @@ public final class GUIStatus extends BaseXPanel {
   public void paintComponent(final Graphics g) {
     super.paintComponent(g);
 
-    final int ww = getWidth() - MEMW;
-    final int hh = getHeight();
-
-    // draw memory box
-    final int xe = ww + MEMW - 3;
-    final int ye = hh - 2;
-    g.setColor(Color.white);
-    g.fillRect(ww, 0, MEMW - 1, hh - 2);
-    g.setColor(COLORBUTTON);
-    g.drawLine(ww, 0, xe, 0);
-    g.drawLine(ww, 0, ww, ye);
-
-    // show current memory usage
-    final boolean full = used * 6 / 5 > max;
-    g.setColor(full ? colormark4 : color4);
-    g.fillRect(ww + 2, 2, (int) (used * (MEMW - 7) / max), hh - 5);
-
-    // print current memory usage
-    final FontMetrics fm = g.getFontMetrics();
-    final String mem = Performance.format(used, true);
-    int fw = ww + (MEMW - 4 - fm.stringWidth(mem)) / 2;
-    final int h = fm.getHeight() - 2;
-    g.setColor(full ? colormark3 : color6);
-    g.drawString(mem, fw, h);
-
     // chop and print status text
     g.setColor(Color.black);
+    final FontMetrics fm = g.getFontMetrics();
+    int fw = getWidth() - mem.getWidth() - 30;
     final StringBuilder sb = new StringBuilder(status);
-    if(fm.stringWidth(status) + 32 > fw) {
+    if(fm.stringWidth(status) > fw) {
       sb.setLength(0);
-      for(int s = 0; s < status.length() && fw > 48; s++) {
+      for(int s = 0; s < status.length() && fw > 0; s++) {
         sb.append(status.charAt(s));
         fw -= fm.charWidth(sb.charAt(s));
       }
       sb.append("...");
     }
     g.drawString(sb.toString(), 4, getFont().getSize());
-  }
-
-  @Override
-  public void mousePressed(final MouseEvent e) {
-    if(memfocus) {
-      Performance.gc(4);
-      repaint();
-
-      final Runtime rt = Runtime.getRuntime();
-      final long occ = rt.totalMemory();
-      max = rt.maxMemory();
-      used = occ - rt.freeMemory();
-
-      final String inf = MEMTOTAL + Performance.format(max, true) + NL
-          + MEMRESERVED + Performance.format(occ, true) + NL + MEMUSED
-          + Performance.format(used, true) + NL + NL + MEMHELP;
-
-      Dialog.info(gui, inf);
-    }
-  }
-
-  @Override
-  public void mouseMoved(final MouseEvent e) {
-    memfocus = e.getX() > getWidth() - MEMW;
-    gui.cursor(memfocus ? CURSORHAND : CURSORARROW);
-  }
-
-  @Override
-  public void mouseExited(final MouseEvent e) {
-    memfocus = false;
-    gui.cursor(CURSORARROW);
   }
 }
