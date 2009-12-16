@@ -272,7 +272,9 @@ public final class DialogUser extends BaseXBack {
           addUser.removeAllItems();
           removeUser.removeAllItems();
           data = new Table();
+          if(databases.getSelectedIndex() > 0) {
           msg = e1.getMessage();
+          }
           ((TableModel) table.getModel()).fireTableChanged(null);
         }
       }
@@ -301,12 +303,12 @@ public final class DialogUser extends BaseXBack {
     info.setError(msg, warn);
 
     alter.setEnabled(np && newpass.getPassword().length != 0
-        && alterUser.getSelectedIndex() != -1);
+        && alterUser.getSelectedIndex() > 0);
     create.setEnabled(n && p && na
         && !user.getText().isEmpty() && pass.getPassword().length != 0);
-    drop.setEnabled(dropUser.getSelectedIndex() != -1);
-    remove.setEnabled(removeUser.getSelectedIndex() != -1);
-    add.setEnabled(addUser.getSelectedIndex() != -1);
+    drop.setEnabled(dropUser.getSelectedIndex() > 0);
+    remove.setEnabled(removeUser.getSelectedIndex() > 0);
+    add.setEnabled(addUser.getSelectedIndex() > 0);
     change.setEnabled(false);
   }
 
@@ -323,6 +325,8 @@ public final class DialogUser extends BaseXBack {
     dropUser.removeAllItems();
     alterUser.removeAllItems();
     TokenList tmp = null;
+    dropUser.addItem(numberof(USERS, data.contents.size() - 1));
+    alterUser.addItem(numberof(USERS, data.contents.size()));
     for(final TokenList o : data.contents) {
       final String check = Token.string(o.get(0));
       if(!check.equals(ADMIN)) {
@@ -332,8 +336,8 @@ public final class DialogUser extends BaseXBack {
       }
       alterUser.addItem(check);
     }
-    dropUser.setSelectedIndex(-1);
-    alterUser.setSelectedIndex(-1);
+    dropUser.setSelectedIndex(0);
+    alterUser.setSelectedIndex(0);
     data.contents.remove(tmp);
     ((TableModel) table.getModel()).fireTableChanged(null);
   }
@@ -362,11 +366,12 @@ public final class DialogUser extends BaseXBack {
     for(final TokenList l : data.contents) tmp1.add(Token.string(l.get(0)));
     final StringList tmp2 = new StringList();
     for(final TokenList l : data2.contents) tmp2.add(Token.string(l.get(0)));
-
+    final StringList tmp3 = new StringList();
+    final StringList tmp4 = new StringList();
     for(final String s : tmp2) {
       if(s.equals(ADMIN)) continue;
       if(!tmp1.contains(s)) {
-        addUser.addItem(s);
+        tmp3.add(s);
         for(final TokenList l : data2.contents) {
           if(Token.string(l.get(0)).equals(s)) {
             final StringList tmp = new StringList();
@@ -377,11 +382,19 @@ public final class DialogUser extends BaseXBack {
           }
         }
       } else {
-        removeUser.addItem(s);
+        tmp4.add(s);
       }
     }
-    removeUser.setSelectedIndex(-1);
-    addUser.setSelectedIndex(-1);
+    addUser.addItem(numberof(USERS, tmp3.size()));
+    removeUser.addItem(numberof(USERS, tmp4.size()));
+    for(final String s : tmp3) {
+      addUser.addItem(s);
+    }
+    for(final String s : tmp4) {
+      removeUser.addItem(s);
+    }
+    removeUser.setSelectedIndex(0);
+    addUser.setSelectedIndex(0);
     ((TableModel) table.getModel()).fireTableChanged(null);
   }
 
@@ -399,11 +412,22 @@ public final class DialogUser extends BaseXBack {
       sess.execute(new List(), out);
       final Table dbs = new Table(out.toString());
       databases.removeAllItems();
+      databases.addItem(numberof(DATABASES, dbs.contents.size()));
       for(final TokenList l : dbs.contents) {
         databases.addItem(Token.string(l.get(0)));
       }
-      databases.setSelectedIndex(-1);
+      databases.setSelectedIndex(0);
     }
+  }
+  
+  /**
+   * Returns the first entry of comboboxes.
+   * @param w what
+   * @param n number
+   * @return String
+   */
+  private String numberof(final String w, final int n) {
+    return "(" + n + " " + w + ")";
   }
 
   /**
