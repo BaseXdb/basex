@@ -1,7 +1,9 @@
 package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.QueryException;
+import org.basex.query.item.Nod;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -15,26 +17,39 @@ import org.basex.util.TokenSet;
  * @author Lukas Kircher
  */
 final class FragPrimitives extends Primitives {
+  
+  @Override
+  protected void add(UpdatePrimitive p) throws QueryException {
+    add(p.node.id(), p);
+  }
+  
   @Override
   protected void check() throws QueryException {
     super.check();
 
-    // [LK] revise data structures ... lots of useless access
     // check fn:put constraints ... duplicate uri
     final TokenSet uris = new TokenSet();
-    for(final UpdatePrimitive[] ups : op.values()) {
-      final Put put = (Put) ups[PrimitiveType.PUT.ordinal()];
-      if(put == null) continue;
+    for(final int i : putIds.finish()) {
+      final Put put = (Put) findPrimitive(PrimitiveType.PUT, op.get(i));
       if(uris.add(put.path()) < 0) Err.or(UPURIDUP, put.path());
     }
   }
 
   @Override
   protected void apply() throws QueryException {
-    for(final UpdatePrimitive[] ups : op.values()) {
-      final Put put = (Put) ups[PrimitiveType.PUT.ordinal()];
-      if(put == null) continue;
+    for(final int i : putIds.finish()) {
+      final Put put = (Put) findPrimitive(PrimitiveType.PUT, op.get(i));
       put.apply(0);
     }
+  }
+  
+  @Override
+  protected boolean parentDeleted(final int n) {
+    return false;
+  }
+
+  @Override
+  protected int getId(Nod n) {
+    return n == null ? -1 : n.id();
   }
 }

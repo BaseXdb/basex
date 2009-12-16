@@ -1,9 +1,12 @@
 package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.up.primitives.PrimitiveType.*;
 
 import org.basex.data.Data;
 import org.basex.query.QueryException;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.up.primitives.NodeCopy;
@@ -28,6 +31,11 @@ final class DBPrimitives extends Primitives {
    */
   DBPrimitives(final Data data) {
     d = data;
+  }
+  
+  @Override
+  protected final void add(UpdatePrimitive p) throws QueryException {
+    add(((DBNode) p.node).pre, p);
   }
 
   @Override
@@ -100,35 +108,38 @@ final class DBPrimitives extends Primitives {
     // apply updates backwards, starting with the highest pre value -> no id's
     // and less table alterations needed
     for(int i = nodes.size() - 1; i >= 0; i--) {
-      // In case a node has been replaced or deleted an eventual fn-put operation 
-      // cannot be applied on this node. -> FODC0002
-      boolean idGone = false;
+      final UpdatePrimitive[] upd = op.get(nodes.get(i));
+      UpdatePrimitive p;
+      int j = 0;
       int add = 0;
-      // apply all updates for current database node
-      for(final UpdatePrimitive pp : op.get(nodes.get(i))) {
-        if(pp == null) continue;
-        if(idGone) break;
-        final PrimitiveType t = pp.type(); 
-
-        // An 'insert before' update moves the currently updated db node
-        // further down, hence increases its pre value by the number of
-        // inserted nodes.
-        if(t == PrimitiveType.INSERTBEFORE) {
-          add = ((NodeCopy) pp).md.meta.size;
-        }
-       
-        pp.apply(add);
-        // updates cannot be applied to a node which has been replaced
-        idGone = t == PrimitiveType.REPLACENODE || t == PrimitiveType.DELETE;
+      while(j < upd.length) {
+        p = upd[j++];
+        final PrimitiveType t = p.type();
+        p.apply(add);
+        if(t == INSERTBEFORE) add = ((NodeCopy) p).md.meta.size;
+        if(t == REPLACENODE) break;
       }
-      // if fn:put is applied on a previously deleted or replaced node,  
-      final UpdatePrimitive put = 
-        op.get(nodes.get(i))[PrimitiveType.PUT.ordinal()];
-      if(idGone && put != null)
-        // [LK] change error message - is there a specific one?
-        Err.or(UPFOEMPT, put);
     }
     
     d.flush();
+  }
+  
+  @Override
+  protected boolean parentDeleted(final int n) {
+    final UpdatePrimitive[] up = op.get(n);
+    
+    if(up != null) 
+      for(final UpdatePrimitive pr : up) if(pr.type() == REPLACENODE ||
+        pr.type() == DELETE) return true;
+
+    final int p = d.parent(n, d.kind(n));
+    if(p == -1) return false;
+    return parentDeleted(p);
+  }
+
+  @Override
+  protected int getId(Nod n) {
+    if(n == null) return -1;
+    return ((DBNode) n).pre;
   }
 }
