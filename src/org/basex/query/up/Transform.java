@@ -30,8 +30,6 @@ public final class Transform extends Arr {
   /** Variable bindings created by copy clause. */
   private final Let[] copies;
 
-  // [LK] modified a little. still work in progress, though.
-
   /**
    * Constructor.
    * @param c copy expressions

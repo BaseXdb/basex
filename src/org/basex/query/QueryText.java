@@ -139,6 +139,8 @@ public interface QueryText {
 
   /** FOUP0001: Evaluation exception. */
   Object[] UPFOTYPE = { FOUP, 1, "Document or element expected, % found." };
+  /** FOUP0001: Evaluation exception. */
+  Object[] UPFOEMPT = { FOUP, 1, "Node expected: %." };
   /** FOUP0002: Evaluation exception. */
   Object[] UPFOURI = { FOUP, 2, "No valid URI: '%'." };
   /** FOUP0002: Evaluation exception. */

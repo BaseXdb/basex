@@ -29,7 +29,6 @@ public final class InsertAfter extends NodeCopy {
     final int p = n.pre + add;
     final Data d = n.data;
     final int k = Nod.kind(node.type);
-    // [LK] check if parent null?
     d.insert(p + d.size(p, k), d.parent(p, k), md);
     if(!mergeTexts(d, p - 1, p)) {
       final int s = md.meta.size;

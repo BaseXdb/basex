@@ -29,9 +29,6 @@ public final class InsertBefore extends NodeCopy {
     final Data d = n.data;
     final int pre = n.pre;
     d.insert(pre, d.parent(pre, Nod.kind(node.type)), md);
-//    final int s = m.meta.size;
-//    if(!mergeTextNodes(d, pos + s - 1, pos + s))
-//      mergeTextNodes(d, pos - 1, pos);
   }
 
   @Override

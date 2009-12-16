@@ -1,6 +1,7 @@
 package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
@@ -99,22 +100,35 @@ final class DBPrimitives extends Primitives {
     // apply updates backwards, starting with the highest pre value -> no id's
     // and less table alterations needed
     for(int i = nodes.size() - 1; i >= 0; i--) {
+      // In case a node has been replaced or deleted an eventual fn-put operation 
+      // cannot be applied on this node. -> FODC0002
+      boolean idGone = false;
       int add = 0;
       // apply all updates for current database node
       for(final UpdatePrimitive pp : op.get(nodes.get(i))) {
         if(pp == null) continue;
+        if(idGone) break;
+        final PrimitiveType t = pp.type(); 
 
         // An 'insert before' update moves the currently updated db node
         // further down, hence increases its pre value by the number of
         // inserted nodes.
-        if(pp.type() == PrimitiveType.INSERTBEFORE) {
+        if(t == PrimitiveType.INSERTBEFORE) {
           add = ((NodeCopy) pp).md.meta.size;
         }
+       
         pp.apply(add);
-        // operations cannot be applied to a node which has been replaced
-        if(pp.type() == PrimitiveType.REPLACENODE) break;
+        // updates cannot be applied to a node which has been replaced
+        idGone = t == PrimitiveType.REPLACENODE || t == PrimitiveType.DELETE;
       }
+      // if fn:put is applied on a previously deleted or replaced node,  
+      final UpdatePrimitive put = 
+        op.get(nodes.get(i))[PrimitiveType.PUT.ordinal()];
+      if(idGone && put != null)
+        // [LK] change error message - is there a specific one?
+        Err.or(UPFOEMPT, put);
     }
+    
     d.flush();
   }
 }
