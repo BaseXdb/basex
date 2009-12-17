@@ -47,7 +47,6 @@ public final class DirParser extends Parser {
     b.meta.filesize = 0;
     parse(b, io);
     b.meta.file = root;
-    if(Prop.debug) Main.err(Prop.NL);
   }
 
   /**

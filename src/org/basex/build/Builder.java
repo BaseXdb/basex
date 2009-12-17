@@ -12,6 +12,7 @@ import org.basex.data.Namespaces;
 import org.basex.data.PathSummary;
 import org.basex.index.Names;
 import org.basex.util.Atts;
+import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.io.IO;
 
@@ -79,6 +80,9 @@ public abstract class Builder extends Progress {
    * @throws IOException I/O exception
    */
   protected final void parse(final String db) throws IOException {
+    Performance perf = Prop.debug ? new Performance() : null;
+    Main.debug("Database: ");
+
     // add document node and parse document
     parser.parse(this);
     if(lvl != 0) error(DOCOPEN, parser.det(), tags.key(tagStack[lvl]));
@@ -90,6 +94,8 @@ public abstract class Builder extends Progress {
       endDoc();
       setSize(0, meta.size);
     }
+
+    Main.gc(perf);
   }
 
   /**
@@ -340,11 +346,7 @@ public abstract class Builder extends Progress {
     }
     if(meta.size != 1) inDoc = true;
 
-    if(Prop.debug) {
-      if((c % 0x3FFFF) == 0) Main.err("!");
-      else if((c % 0xFFFF) == 0) Main.err(".");
-      c++;
-    }
+    if(Prop.debug && (c++ % 0x7FFFF) == 0) Main.err(".");
 
     // check if data ranges exceed database limits,
     // based on the storage details in {@link Data}.

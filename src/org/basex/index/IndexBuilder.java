@@ -35,19 +35,16 @@ public abstract class IndexBuilder extends Progress {
   /**
    * Checks if the command was interrupted, and prints some debug output.
    */
-  public void check() {
+  protected void check() {
     checkStop();
-    if(Prop.debug) {
-      if((pre & 0xFFFFF) == 0) Main.err("!");
-      else if((pre & 0x3FFFF) == 0) Main.err(".");
-    }
+    if(Prop.debug && (pre & 0x1FFFFF) == 0) Main.err(".");
   }
 
   /**
    * Constructor.
    * @param d reference
    */
-  public IndexBuilder(final Data d) {
+  protected IndexBuilder(final Data d) {
     data = d;
     size = data.meta.size;
   }

@@ -43,15 +43,10 @@ public final class ValueBuilder extends IndexBuilder {
 
   @Override
   public Values build() throws IOException {
-    Performance perf = null;
-    if(Prop.debug) {
-      perf = Prop.debug ? new Performance() : null;
-      Main.debug((text ? "Texts" : "Attributes") + ": ");
-    }
-
+    final Performance perf = Prop.debug ? new Performance() : null;
+    Main.debug((text ? "Texts" : "Attributes") + ": ");
 
     final String f = text ? DATATXT : DATAATV;
-
     final Runtime rt = Runtime.getRuntime();
     final long maxMem = (long) (rt.maxMemory() * 0.9);
 
@@ -97,13 +92,10 @@ public final class ValueBuilder extends IndexBuilder {
       da.close();
     }
 
-    if(perf != null) {
-      Performance.gc(4);
-      Main.debug(" " + perf + " (" + Performance.getMem() + ")");
-    }
-
     if(text) data.meta.txtindex = true;
     else data.meta.atvindex = true;
+
+    Main.gc(perf);
     return new Values(data, text);
   }
 
@@ -184,7 +176,7 @@ public final class ValueBuilder extends IndexBuilder {
     outl.close();
     return sz;
   }
-  
+
   /**
    * Writes pre values to disk with number (number of byte values) as
    * first value.

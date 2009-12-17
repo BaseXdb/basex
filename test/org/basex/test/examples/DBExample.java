@@ -146,7 +146,6 @@ public final class DBExample {
   }
    
    /**
-   * @author BaseX Team
    * This class shows you the usage of the BaseX Collection functions.
    * Collections provide Access to several XML Documents inside one Database.
    * Collections may be created by importing a folder.
@@ -157,13 +156,11 @@ public final class DBExample {
    }
    
   /**
-   * @author BaseX Team
-   * This class shows you how to work with XQuery Update
+   * This class shows you how to work with XQuery Update.
    */
   static final class UpdateExamples {
-    
-    
   }
+
   /**
    * Examples on Database maintenance.
    * @author BaseXTeam

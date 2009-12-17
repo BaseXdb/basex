@@ -83,8 +83,11 @@ public abstract class FTBuilder extends IndexBuilder {
    */
   protected final void index() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
+    Main.debug("Full-texts:");
 
     for(pre = 0; pre < size; pre++) {
+      if((pre & 0xFFFF) == 0) check();
+
       final int k = data.kind(pre);
       if(k != Data.TEXT) {
         if(scm == 1 && k == Data.DOC) unit.add(pre);
@@ -92,7 +95,6 @@ public abstract class FTBuilder extends IndexBuilder {
       }
       if(scm == 2) unit.add(pre);
 
-      checkStop();
       wp.init(data.text(pre, true));
       while(wp.more()) {
         final byte[] tok = wp.get();
@@ -111,17 +113,14 @@ public abstract class FTBuilder extends IndexBuilder {
     token = 0;
     write();
 
-    if(perf != null) {
-      Performance.gc(4);
-      Main.debug("Full-texts: " + perf + " (" + Performance.getMem() + ")");
-    }
-
     if(scm > 0) {
       data.meta.ftscmax = max;
       data.meta.ftscmin = min;
     }
     data.meta.ftxindex = true;
     data.meta.dirty = true;
+
+    Main.gc(perf);
   }
 
   /**

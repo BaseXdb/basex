@@ -12,6 +12,7 @@ import org.basex.core.proc.Password;
 import org.basex.core.proc.Set;
 import org.basex.query.QueryException;
 import org.basex.server.LoginException;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -313,6 +314,17 @@ public abstract class Main {
    */
   public static void debug(final Object str, final Object... ext) {
     if(Prop.debug) errln(str, ext);
+  }
+
+  /**
+   * Global method for garbage collecting and printing performance information
+   * if the {@link Prop#debug} flag is set.
+   * @param perf performance reference
+   */
+  public static void gc(final Performance perf) {
+    if(!Prop.debug) return;
+    Performance.gc(4);
+    errln(" " + perf + " (" + Performance.getMem() + ")");
   }
 
   /**

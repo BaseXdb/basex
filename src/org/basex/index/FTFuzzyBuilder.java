@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
-import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -51,8 +50,6 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   public FTIndex build() throws IOException {
-    Performance.gc(4);
-    System.out.println("- Start: " + Performance.getMem());
     index();
     return new FTFuzzy(data);
   }
