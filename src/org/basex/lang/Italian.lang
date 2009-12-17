@@ -466,6 +466,8 @@ info_on=ON
 info_off=OFF
 info_error=Errore
 info_entries=% registrazioni
+info_servok=Server successfully started.
+info_servdw=Server successfully stopped.
 
 # Command Help
 ch_nohelp=Spiacente, nessun aiuto disponibile.

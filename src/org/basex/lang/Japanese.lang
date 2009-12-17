@@ -465,6 +465,8 @@ info_on=ON
 info_off=OFF
 info_error=エラー
 info_entries=% entries
+info_servok=Server successfully started.
+info_servdw=Server successfully stopped.
 
 # Command Help
 ch_nohelp=ヘルプがありません。

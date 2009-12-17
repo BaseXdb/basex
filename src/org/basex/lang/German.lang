@@ -465,6 +465,8 @@ info_on=AN
 info_off=AUS
 info_error=Fehler
 info_entries=% Einträge
+info_servok=Server Start erfolgreich.
+info_servdw=Server Stop erfolgreich.
 
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.

@@ -647,6 +647,10 @@ public interface Text {
   String INFOERROR = lang("info_error") + COLS;
   /** Error info. */
   String INFOENTRIES = "(" + lang("info_entries") + ")";
+  /** Server start ok info. */
+  String INFOSERVOK = lang("info_servok");
+  /** Server went down. */
+  String INFOSERVDW = lang("info_servdw");
 
   // MENU ENTRIES =============================================================
 

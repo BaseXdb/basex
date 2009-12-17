@@ -2,17 +2,21 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
+
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.basex.BaseXServer;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.ShowDatabases;
 import org.basex.core.proc.ShowSessions;
@@ -181,10 +185,17 @@ public final class DialogServer extends Dialog {
     p21.add(disconnect);
     p2.add(p21);
 
-    conn.add(new BaseXLabel(LOCALSERVER + COLS, false, true));
+    //conn.add(new BaseXLabel(LOCALSERVER + COLS, false, true));
     conn.add(p1);
-    conn.add(new BaseXLabel(LOGIN + COLS, false, true));
+    TitledBorder b = new TitledBorder(LOCALSERVER + COLS);
+    b.setTitleColor(Color.black);
+    p1.setBorder(b);
+    //conn.add(new BaseXLabel(LOGIN + COLS, false, true));
     conn.add(p2);
+    TitledBorder b2 = new TitledBorder(LOGIN +
+        " to local or remote Server" + COLS);
+    b2.setTitleColor(Color.black);
+    p2.setBorder(b2);
     conn.add(info);
 
     // Session panel
@@ -278,7 +289,7 @@ public final class DialogServer extends Dialog {
   public void action(final Object cmp) {
     String msg = null;
     String msg2 = null;
-
+    String gmsg = null;
     try {
       if(cmp == start) {
         final int p = Integer.parseInt(ports.getText());
@@ -299,11 +310,16 @@ public final class DialogServer extends Dialog {
           if(running) break;
           Performance.sleep(500);
         }
-        if(!running) msg = SERVERBIND;
+        if(!running) {
+          msg = SERVERBIND;
+        } else {
+          gmsg = INFOSERVOK;
+        }
       } else if(cmp == stop) {
         BaseXServer.stop(gui.context);
         running = ping(true);
         connected = connected && ping(false);
+        if(!connected) gmsg = INFOSERVDW;
       } else if(cmp == connect) {
         gui.prop.set(GUIProp.SERVERUSER, loguser.getText());
         gui.prop.set(GUIProp.SERVERPASS, new String(logpass.getPassword()));
@@ -318,6 +334,7 @@ public final class DialogServer extends Dialog {
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
+        logpass.setText("");
       } else if(cmp == refreshSess) {
         refreshSess();
       } else if(cmp == refreshLog) {
@@ -354,7 +371,16 @@ public final class DialogServer extends Dialog {
       Main.debug(ex);
       if(ex instanceof BindException) msg = SERVERBIND;
       else if(ex instanceof LoginException) msg = SERVERLOGIN;
-      else msg = ex.getMessage(); //SERVERERR;
+      else {
+        msg = ex.getMessage(); //SERVERERR;
+        if(msg.equals(Main.info(PERMNO, CmdPerm.values()[3]))) {
+          try {
+            cs.execute(new Exit());
+          } catch(IOException e) {
+            e.printStackTrace();
+          }
+        }
+      }
     }
 
     final boolean valp = portc.getText().matches("[\\d]+") &&
@@ -374,6 +400,10 @@ public final class DialogServer extends Dialog {
     }
     info.setError(msg, warn);
     info2.setError(msg2, warn);
+    if(gmsg != null) {
+      info.setText(gmsg);
+      info.setIcon(BaseXLayout.icon("ok"));
+    }
     ports.setEnabled(!running);
     start.setEnabled(!running && valpl);
     stop.setEnabled(running);
@@ -387,9 +417,11 @@ public final class DialogServer extends Dialog {
     tabs.setEnabledAt(1, connected);
     tabs.setEnabledAt(2, connected);
     tabs.setEnabledAt(3, connected);
+    tabs.setEnabledAt(4, running || logc.getItemCount() > 0);
     refreshLog.setEnabled(logc.getSelectedIndex() != -1);
     delete.setEnabled(logc.getSelectedIndex() != -1);
     deleteAll.setEnabled(logc.getItemCount() > 0);
+    if (loguser.hasFocus()) logpass.setText("");
     ctx.prop.write();
   }
 

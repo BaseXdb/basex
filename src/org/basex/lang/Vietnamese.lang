@@ -464,6 +464,8 @@ info_on=Bật
 info_off=Tắt
 info_error=Lỗi
 info_entries=% mục
+info_servok=Server successfully started.
+info_servdw=Server successfully stopped.
 
 # Command Help
 ch_nohelp=Xin lỗi, không thấy hướng dẫn nào.
