@@ -9,7 +9,6 @@ import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
-import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -25,6 +24,7 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
+import org.deepfs.fs.DeepFS;
 
 /**
  * Project specific functions.
@@ -131,8 +131,10 @@ public final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Item fspath(final QueryContext ctx) throws QueryException {
-    final DBNode node = (DBNode) expr[0].atomic(ctx); 
-    return node == null ? null : Str.get(ViewData.path(ctx.data(), node.pre));
+    final DBNode node = (DBNode) expr[0].atomic(ctx);
+    final DeepFS fs = ctx.data().fs;
+    return (node == null ||  fs == null) ? Str.ZERO :
+      Str.get(fs.path(node.pre, false));
   }
 
   /**
