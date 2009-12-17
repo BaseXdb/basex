@@ -9,6 +9,7 @@ import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.Data.Type;
+import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -48,6 +49,7 @@ public final class FNBaseX extends Fun {
       case RANDOM: return random();
       case RUN:    return run(ctx);
       case DB:     return db(ctx);
+      case FSPATH: return fspath(ctx);
       default:     return super.atomic(ctx);
     }
   }
@@ -120,6 +122,17 @@ public final class FNBaseX extends Fun {
       Err.or(NODOC, ex.getMessage());
       return null;
     }
+  }
+
+  /**
+   * Returns the filesystem path for this node.
+   * @param ctx query context
+   * @return filesystem path
+   * @throws QueryException query exception
+   */
+  private Item fspath(final QueryContext ctx) throws QueryException {
+    final DBNode node = (DBNode) expr[0].atomic(ctx); 
+    return node == null ? null : Str.get(ViewData.path(ctx.data(), node.pre));
   }
 
   /**

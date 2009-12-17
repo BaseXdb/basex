@@ -297,7 +297,9 @@ public enum FunDef {
   /** Project specific function - evaluated the specified query file. */
   RUN(BXURI, FNBaseX.class, 1, 1, "run(string)", SEQ),
   /** Project specific function - opens a database instance. */
-  DB(BXURI, FNBaseX.class, 1, 2, "db(string, pre?)", NOD);
+  DB(BXURI, FNBaseX.class, 1, 2, "db(string, pre?)", NOD),
+  /** Project specific function - returns a filesystem path. */
+  FSPATH(BXURI, FNBaseX.class, 1, 1, "fspath(item)", STR);
 
   /** Function classes. */
   Class<? extends Fun> func;
