@@ -111,16 +111,17 @@ public abstract class FTBuilder extends IndexBuilder {
     token = 0;
     write();
 
-    if(scm > 0) {
-      data.meta.ftscmax = max;
-      data.meta.ftscmin = min;
-      data.meta.dirty = true;
-    }
-
     if(perf != null) {
       Performance.gc(4);
       Main.debug("Full-texts: " + perf + " (" + Performance.getMem() + ")");
     }
+
+    if(scm > 0) {
+      data.meta.ftscmax = max;
+      data.meta.ftscmin = min;
+    }
+    data.meta.ftxindex = true;
+    data.meta.dirty = true;
   }
 
   /**

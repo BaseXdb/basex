@@ -148,6 +148,7 @@ public final class DiskData extends Data {
       case TXT: if(txtindex != null) txtindex.close(); break;
       case ATV: if(atvindex != null) atvindex.close(); break;
       case FTX: if(ftxindex != null) ftxindex.close(); break;
+      case PTH: if(ftxindex != null) path.close(); break;
       default: break;
     }
   }
@@ -158,6 +159,7 @@ public final class DiskData extends Data {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
       case FTX: if(meta.ftxindex) ftxindex = index; break;
+      case PTH: if(meta.pathindex) path = (PathSummary) index; break;
       default: break;
     }
   }

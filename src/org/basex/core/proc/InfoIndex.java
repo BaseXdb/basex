@@ -49,7 +49,7 @@ public final class InfoIndex extends AInfo {
     }
     if(data.meta.pathindex) {
       out.println(INFOPATHINDEX);
-      out.println(data.path.info(data));
+      out.println(data.info(Type.PTH));
     }
     return true;
   }

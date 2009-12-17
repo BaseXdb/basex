@@ -53,8 +53,8 @@ public final class CreateIndex extends ACreate {
           index = Type.FTX;
           break;
         case PATH:
-          data.path.build(data);
-          return true;
+          index = Type.PTH;
+          break;
         default:
           return false;
       }

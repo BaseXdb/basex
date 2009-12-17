@@ -17,14 +17,13 @@ import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Session;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.core.Commands.CmdShow;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.DropUser;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Revoke;
-import org.basex.core.proc.Show;
+import org.basex.core.proc.ShowUsers;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -317,11 +316,10 @@ public final class DialogUser extends BaseXBack {
    * @throws IOException I/O Exception
    */
   public void setData() throws IOException {
-    final CachedOutput out = new CachedOutput();
-    if(!sess.execute(new Show(CmdShow.USERS), out))
-      throw new IOException(sess.info());
+    final CachedOutput co = new CachedOutput();
+    if(!sess.execute(new ShowUsers(), co)) throw new IOException(sess.info());
 
-    data = new Table(out.toString());
+    data = new Table(co.toString());
     dropUser.removeAllItems();
     alterUser.removeAllItems();
     TokenList tmp = null;
@@ -348,20 +346,18 @@ public final class DialogUser extends BaseXBack {
    * @throws IOException I/O Exception
    */
   void setDataL(final String db) throws IOException {
-    CachedOutput out = new CachedOutput();
-    if(!sess.execute(new Show(CmdShow.USERS, db), out))
-      throw new IOException(sess.info());
-    final String users = out.toString();
-    out = new CachedOutput();
-    if(!sess.execute(new Show(CmdShow.USERS), out))
-      throw new IOException(sess.info());
+    CachedOutput co = new CachedOutput();
+    if(!sess.execute(new ShowUsers(db), co)) throw new IOException(sess.info());
+    final String users = co.toString();
+    co = new CachedOutput();
+    if(!sess.execute(new ShowUsers(), co)) throw new IOException(sess.info());
 
     data = new Table(users);
     removeUser.removeAllItems();
     addUser.removeAllItems();
     tempP.clear();
 
-    final Table data2 = new Table(out.toString());
+    final Table data2 = new Table(co.toString());
     final StringList tmp1 = new StringList();
     for(final TokenList l : data.contents) tmp1.add(Token.string(l.get(0)));
     final StringList tmp2 = new StringList();

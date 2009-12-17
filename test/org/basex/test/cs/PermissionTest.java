@@ -31,7 +31,7 @@ import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Password;
 import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Set;
-import org.basex.core.proc.Show;
+import org.basex.core.proc.ShowUsers;
 import org.basex.core.proc.XQuery;
 import org.basex.io.NullOutput;
 import org.basex.server.ClientSession;
@@ -113,7 +113,7 @@ public final class PermissionTest {
     no(new DropUser("test"), testSession);
     no(new Export("c:/test"), testSession);
     no(new Kill("dada"), testSession);
-    no(new Show("Users"), testSession);
+    no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
@@ -143,7 +143,7 @@ public final class PermissionTest {
     no(new DropUser("test"), testSession);
     no(new Export(".", export), testSession);
     no(new Kill("dada"), testSession);
-    no(new Show("Users"), testSession);
+    no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
@@ -171,7 +171,7 @@ public final class PermissionTest {
     no(new DropUser("test"), testSession);
     no(new Export(".", export), testSession);
     no(new Kill("dada"), testSession);
-    no(new Show("Users"), testSession);
+    no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
@@ -192,7 +192,7 @@ public final class PermissionTest {
     no(new DropUser("test"), testSession);
     no(new Export(".", export), testSession);
     no(new Kill("dada"), testSession);
-    no(new Show("Users"), testSession);
+    no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
     no(new Revoke("read", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
@@ -205,7 +205,7 @@ public final class PermissionTest {
     ok(new CreateUser("test2", "test"), testSession);
     ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
     ok(new Export(".", export), testSession);
-    ok(new Show("Users"), testSession);
+    ok(new ShowUsers("Users"), testSession);
     ok(new Grant("admin", "test2"), testSession);
     ok(new Revoke("admin", "test2"), testSession);
     ok(new AlterUser("test", "test"), testSession);

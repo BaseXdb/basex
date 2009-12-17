@@ -2,7 +2,10 @@ package org.basex.index;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.Main;
 import org.basex.core.Progress;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 
 /**
@@ -28,6 +31,17 @@ public abstract class IndexBuilder extends Progress {
    * @throws IOException IO Exception
    */
   public abstract Index build() throws IOException;
+
+  /**
+   * Checks if the command was interrupted, and prints some debug output.
+   */
+  public void check() {
+    checkStop();
+    if(Prop.debug) {
+      if((pre & 0xFFFFF) == 0) Main.err("!");
+      else if((pre & 0x3FFFF) == 0) Main.err(".");
+    }
+  }
 
   /**
    * Constructor.

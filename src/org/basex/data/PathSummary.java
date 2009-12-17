@@ -4,6 +4,10 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import org.basex.core.Main;
+import org.basex.index.Index;
+import org.basex.index.IndexIterator;
+import org.basex.index.IndexToken;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -17,7 +21,7 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  */
-public final class PathSummary {
+public final class PathSummary implements Index {
   /** Parent stack. */
   private PathNode[] stack;
   /** Root node. */
@@ -50,36 +54,6 @@ public final class PathSummary {
 
   // Path Summary creation ====================================================
 
-  /**
-   * Builds the whole path summary.
-   * @param data data reference
-   */
-  public void build(final Data data) {
-    final int[] parStack = new int[IO.MAXHEIGHT];
-    int h = 0, l = 0;
-    init();
-    for(int pre = 0; pre < data.meta.size; pre++) {
-      final byte kind = (byte) data.kind(pre);
-      final int par = data.parent(pre, kind);
-      while(l > 0 && parStack[l - 1] > par) --l;
-
-      if(kind == Data.DOC) {
-        parStack[l++] = pre;
-        add(0, l, kind);
-      } else if(kind == Data.ELEM) {
-        add(data.name(pre), l, kind);
-        parStack[l++] = pre;
-      } else if(kind == Data.ATTR) {
-        add(data.name(pre), l, kind);
-      } else {
-        add(0, l, kind);
-      }
-      if(h < l) h = l;
-    }
-    data.meta.pathindex = true;
-    data.flush();
-  }
-  
   /**
    * Opens an element.
    * @param n name reference
@@ -234,7 +208,7 @@ public final class PathSummary {
    * @param data data reference
    * @return info
    */
-  public byte[] info(final Data data) {
+  byte[] info(final Data data) {
     return chop(root.info(data, 0), 1 << 13);
   }
 
@@ -248,5 +222,25 @@ public final class PathSummary {
     ser.openElement(PATH);
     root.plan(data, ser);
     ser.closeElement();
+  }
+
+  @Override
+  public IndexIterator ids(final IndexToken tok) {
+    Main.notexpected();
+    return null;
+  }
+
+  @Override
+  public int nrIDs(final IndexToken tok) {
+    Main.notexpected();
+    return 0;
+  }
+
+  @Override
+  public void close() { }
+
+  @Override
+  public byte[] info() {
+    return EMPTY;
   }
 }

@@ -341,9 +341,9 @@ public abstract class Builder extends Progress {
     if(meta.size != 1) inDoc = true;
 
     if(Prop.debug) {
-      if(++c % 500000 == 0) Main.err(" " + c + Prop.NL);
-      else if(c % 50000 == 0) Main.err("!");
-      else if(c % 10000 == 0) Main.err(".");
+      if((c % 0x3FFFF) == 0) Main.err("!");
+      else if((c % 0xFFFF) == 0) Main.err(".");
+      c++;
     }
 
     // check if data ranges exceed database limits,

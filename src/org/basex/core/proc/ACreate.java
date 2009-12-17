@@ -14,6 +14,7 @@ import org.basex.data.MemData;
 import org.basex.data.Data.Type;
 import org.basex.index.FTBuilder;
 import org.basex.index.IndexBuilder;
+import org.basex.index.PathBuilder;
 import org.basex.index.ValueBuilder;
 import org.basex.util.Token;
 
@@ -94,6 +95,7 @@ abstract class ACreate extends Proc {
       case TXT: b = new ValueBuilder(d, true); break;
       case ATV: b = new ValueBuilder(d, false); break;
       case FTX: b = FTBuilder.get(d, d.meta.wildcards); break;
+      case PTH: b = new PathBuilder(d); break;
       default: break;
     }
     d.closeIndex(i);

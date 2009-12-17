@@ -130,7 +130,7 @@ public final class DialogInfo extends Dialog {
     }
 
     panels[0].add(north, BorderLayout.NORTH);
-    panels[0].add(text(meta.pathindex ? data.path.info(data) :
+    panels[0].add(text(val[0] ? data.info(Type.PTH) :
       Token.token(PATHINDEXINFO)), BorderLayout.CENTER);
     tab3.add(panels[0]);
 

@@ -82,6 +82,7 @@ public abstract class Data {
     /** Text index.      */ TXT,
     /** Attribute index. */ ATV,
     /** Full-text index. */ FTX,
+    /** Path index. */      PTH
   };
 
   /** Meta data. */
@@ -209,6 +210,7 @@ public abstract class Data {
       case TXT: return txtindex.info();
       case ATV: return atvindex.info();
       case FTX: return ftxindex.info();
+      case PTH: return path.info(this);
       default: return EMPTY;
     }
   }

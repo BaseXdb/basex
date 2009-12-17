@@ -43,7 +43,13 @@ public final class ValueBuilder extends IndexBuilder {
 
   @Override
   public Values build() throws IOException {
-    final Performance perf = Prop.debug ? new Performance() : null;
+    Performance perf = null;
+    if(Prop.debug) {
+      perf = Prop.debug ? new Performance() : null;
+      Main.debug((text ? "Texts" : "Attributes") + ": ");
+    }
+
+
     final String f = text ? DATATXT : DATAATV;
 
     final Runtime rt = Runtime.getRuntime();
@@ -54,7 +60,7 @@ public final class ValueBuilder extends IndexBuilder {
 
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) {
-        checkStop();
+        check();
         // check if main memory is exhausted
         if(rt.totalMemory() - rt.freeMemory() > maxMem) {
           // safely abort if index caching is done too often
@@ -93,9 +99,11 @@ public final class ValueBuilder extends IndexBuilder {
 
     if(perf != null) {
       Performance.gc(4);
-      Main.debug((text ? "Texts" : "Attributes") + ": " + perf + " (" +
-          Performance.getMem() + ")");
+      Main.debug(" " + perf + " (" + Performance.getMem() + ")");
     }
+
+    if(text) data.meta.txtindex = true;
+    else data.meta.atvindex = true;
     return new Values(data, text);
   }
 

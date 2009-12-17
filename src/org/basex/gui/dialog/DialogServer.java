@@ -10,12 +10,12 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.basex.BaseXServer;
-import org.basex.core.Commands.CmdShow;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.Exit;
-import org.basex.core.proc.Show;
+import org.basex.core.proc.ShowDatabases;
+import org.basex.core.proc.ShowSessions;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
@@ -32,6 +32,7 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
 import org.basex.server.LoginException;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -292,7 +293,13 @@ public final class DialogServer extends Dialog {
         final String clazz = org.basex.BaseXServer.class.getName();
         new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
             "-p", String.valueOf(p)}).start();
-        running = ping(true);
+        
+        for(int c = 0; c < 3; c++) {
+          running = ping(true);
+          if(running) break;
+          Performance.sleep(500);
+        }
+        if(!running) msg = SERVERBIND;
       } else if(cmp == stop) {
         BaseXServer.stop(gui.context);
         running = ping(true);
@@ -392,10 +399,10 @@ public final class DialogServer extends Dialog {
    */
   void refreshSess() throws IOException {
     CachedOutput out = new CachedOutput();
-    cs.execute(new Show(CmdShow.SESSIONS), out);
+    cs.execute(new ShowSessions(), out);
     sese.setText(out.finish());
     out = new CachedOutput();
-    cs.execute(new Show(CmdShow.DATABASES), out);
+    cs.execute(new ShowDatabases(), out);
     sedb.setText(out.finish());
   }
 

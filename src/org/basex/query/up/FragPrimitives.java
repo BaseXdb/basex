@@ -19,7 +19,7 @@ import org.basex.util.TokenSet;
 final class FragPrimitives extends Primitives {
   
   @Override
-  protected void add(UpdatePrimitive p) throws QueryException {
+  protected void add(final UpdatePrimitive p) throws QueryException {
     add(p.node.id(), p);
   }
   
@@ -49,7 +49,7 @@ final class FragPrimitives extends Primitives {
   }
 
   @Override
-  protected int getId(Nod n) {
+  protected int getId(final Nod n) {
     return n == null ? -1 : n.id();
   }
 }

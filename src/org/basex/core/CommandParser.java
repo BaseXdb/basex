@@ -39,9 +39,11 @@ import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Password;
 import org.basex.core.proc.Revoke;
-import org.basex.core.proc.Show;
+import org.basex.core.proc.ShowSessions;
+import org.basex.core.proc.ShowUsers;
 import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
+import org.basex.core.proc.ShowDatabases;
 import org.basex.core.proc.XQuery;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -112,8 +114,6 @@ public final class CommandParser extends InputParser {
    */
   private Proc parse(final Cmd cmd) throws QueryException {
     switch(cmd) {
-      // user commands
-
       case CREATE: case C:
         switch(consume(CmdCreate.class, cmd)) {
           case DATABASE: case DB:
@@ -201,19 +201,17 @@ public final class CommandParser extends InputParser {
         return new Help(hc);
       case EXIT: case QUIT: case Q:
         return new Exit();
-
-      // admin commands
       case KILL:
         return new Kill(name(cmd));
       case SHOW:
-        final CmdShow show = consume(CmdShow.class, cmd);
-        switch(show) {
+        switch(consume(CmdShow.class, cmd)) {
           case DATABASES:
+            return new ShowDatabases();
           case SESSIONS:
-            return new Show(show);
+            return new ShowSessions();
           case USERS:
             final String db = key(ON, null) ? name(cmd) : null;
-            return new Show(show, db);
+            return new ShowUsers(db);
           default:
         }
         break;

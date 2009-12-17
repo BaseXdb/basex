@@ -34,7 +34,7 @@ final class DBPrimitives extends Primitives {
   }
   
   @Override
-  protected final void add(UpdatePrimitive p) throws QueryException {
+  protected void add(final UpdatePrimitive p) throws QueryException {
     add(((DBNode) p.node).pre, p);
   }
 
@@ -138,7 +138,7 @@ final class DBPrimitives extends Primitives {
   }
 
   @Override
-  protected int getId(Nod n) {
+  protected int getId(final Nod n) {
     if(n == null) return -1;
     return ((DBNode) n).pre;
   }
