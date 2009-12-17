@@ -126,10 +126,10 @@ public final class DialogUser extends BaseXBack {
     BaseXLayout.setWidth(newpass, 100);
     alter = new BaseXButton(BUTTONALTER, dia);
     alterUser = new BaseXCombo(new String[] {}, dia);
-    BaseXLayout.setWidth(alterUser, BaseXCombo.TWIDTH);
+    BaseXLayout.setWidth(alterUser, BaseXCombo.DWIDTH);
     change = new BaseXButton(BUTTONCHANGE, dia);
     dropUser = new BaseXCombo(new String[] {}, dia);
-    BaseXLayout.setWidth(dropUser, BaseXCombo.TWIDTH);
+    BaseXLayout.setWidth(dropUser, BaseXCombo.DWIDTH);
     drop = new BaseXButton(BUTTONDROP, dia);
     info = new BaseXLabel(" ");
 
@@ -164,12 +164,12 @@ public final class DialogUser extends BaseXBack {
     tablePanel.setLayout(new BorderLayout(0, 5));
     add = new BaseXButton(BUTTONADD, dia);
     databases = new BaseXCombo(true, new String[] {}, dia);
-    BaseXLayout.setWidth(databases, 100);
+    //BaseXLayout.setWidth(databases, BaseXCombo.DWIDTH);
     addUser = new BaseXCombo(new String[] {}, dia);
-    BaseXLayout.setWidth(addUser, BaseXCombo.TWIDTH);
+    BaseXLayout.setWidth(addUser, BaseXCombo.DWIDTH);
     removeUser = new BaseXCombo(new String[] {}, dia);
     remove = new BaseXButton(BUTTONREMOVE, dia);
-    BaseXLayout.setWidth(removeUser, BaseXCombo.TWIDTH);
+    BaseXLayout.setWidth(removeUser, BaseXCombo.DWIDTH);
 
     if(!global) {
       final BaseXBack tmp = new BaseXBack();
@@ -190,7 +190,7 @@ public final class DialogUser extends BaseXBack {
     BaseXBack tmp = new BaseXBack();
     tmp.setLayout(new TableLayout(2, 1, 0, 5));
     table = new JTable(new TableModel());
-    table.setPreferredScrollableViewportSize(new Dimension(390, 100));
+    table.setPreferredScrollableViewportSize(new Dimension(490, 100));
     tmp.add(new BaseXLabel(PERMS, false, true));
     tmp.add(new JScrollPane(table));
     tablePanel.add(tmp, BorderLayout.CENTER);

@@ -14,7 +14,7 @@ import org.basex.gui.dialog.Dialog;
  */
 public final class BaseXCombo extends JComboBox {
   /** Default width of combo boxes. */
-  public static final int TWIDTH = 80;
+  public static final int DWIDTH = 100;
 
   /**
    * Constructor.

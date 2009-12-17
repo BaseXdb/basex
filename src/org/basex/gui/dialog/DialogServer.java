@@ -428,4 +428,9 @@ public final class DialogServer extends Dialog {
     }
     super.cancel();
   }
+
+  @Override
+  public void close() {
+    if(ok) super.close();
+  }
 }
