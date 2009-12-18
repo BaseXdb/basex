@@ -285,7 +285,7 @@ c_saveas=Save as
 c_notopened=Impossibile aprire il file.
 c_notsaved=Impossibile salvare il file.
 c_replace=Il file "%" esiste già.\nVuoi sovrascriverlo?
-c_server=Server
+c_server=Server Administration
 c_servertt=Display the server dialog.
 
 ds_localserver=Local Server
@@ -304,6 +304,9 @@ ds_login=Login
 ds_databases=Databases
 ds_sessions=Sessions
 ds_logs=Logs
+ds_srvst=Server started.
+ds_connected=Connected to '%' on '%'.
+ds_disconnected=Disconnected.
 
 # Commands & Processes
 proc_time=Tempo necessario
@@ -466,8 +469,6 @@ info_on=ON
 info_off=OFF
 info_error=Errore
 info_entries=% registrazioni
-info_servok=Server successfully started.
-info_servdw=Server successfully stopped.
 
 # Command Help
 ch_nohelp=Spiacente, nessun aiuto disponibile.

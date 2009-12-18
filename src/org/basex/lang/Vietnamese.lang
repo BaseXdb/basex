@@ -283,7 +283,7 @@ c_saveas=Save as
 c_notopened=Tệp không mở được.
 c_notsaved=Tệp không lưu được.
 c_replace=Tệp "%" đã có.\nBạn muốn thay thế nó không?
-c_server=Server
+c_server=Server Administration
 c_servertt=Display the server dialog.
 
 ds_localserver=Local Server
@@ -302,6 +302,9 @@ ds_login=Login
 ds_databases=Databases
 ds_sessions=Sessions
 ds_logs=Logs
+ds_srvst=Server started.
+ds_connected=Connected to '%' on '%'.
+ds_disconnected=Disconnected.
 
 # Commands & Processes
 proc_time=Thời gian cần
@@ -464,8 +467,6 @@ info_on=Bật
 info_off=Tắt
 info_error=Lỗi
 info_entries=% mục
-info_servok=Server successfully started.
-info_servdw=Server successfully stopped.
 
 # Command Help
 ch_nohelp=Xin lỗi, không thấy hướng dẫn nào.

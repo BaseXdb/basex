@@ -2,14 +2,12 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 
 import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.basex.BaseXServer;
@@ -127,7 +125,7 @@ public final class DialogServer extends Dialog {
     final BaseXBack db = dbsP.getTablePanel();
     db.setBorder(8, 8, 8, 8);
 
-    tabs.add(GUISERVER, conn);
+    tabs.add("Server", conn);
     tabs.add(USERS, user);
     tabs.add(DATABASES, db);
     tabs.add(SESSIONS, sess);
@@ -185,17 +183,11 @@ public final class DialogServer extends Dialog {
     p21.add(disconnect);
     p2.add(p21);
 
-    //conn.add(new BaseXLabel(LOCALSERVER + COLS, false, true));
+    conn.add(new BaseXLabel(LOCALSERVER + COLS, false, true));
     conn.add(p1);
-    TitledBorder b = new TitledBorder(LOCALSERVER + COLS);
-    b.setTitleColor(Color.black);
-    p1.setBorder(b);
-    //conn.add(new BaseXLabel(LOGIN + COLS, false, true));
+    conn.add(new BaseXLabel(LOGIN + " on local or remote server"  +
+        COLS, false, true));
     conn.add(p2);
-    TitledBorder b2 = new TitledBorder(LOGIN +
-        " to local or remote Server" + COLS);
-    b2.setTitleColor(Color.black);
-    p2.setBorder(b2);
     conn.add(info);
 
     // Session panel
@@ -266,6 +258,7 @@ public final class DialogServer extends Dialog {
         if(o == logs) refreshLog();
       }
     });
+    refreshLog();
     action(null);
     setResizable(true);
     finish(null);
@@ -314,13 +307,13 @@ public final class DialogServer extends Dialog {
         if(!running) {
           msg = SERVERBIND;
         } else {
-          gmsg = INFOSERVOK;
+          gmsg = SRVST;
         }
       } else if(cmp == stop) {
         BaseXServer.stop(gui.context);
         running = ping(true);
         connected = connected && ping(false);
-        if(!connected) gmsg = INFOSERVDW;
+        if(!connected) gmsg = SERVERSTOPPED;
       } else if(cmp == connect) {
         gui.prop.set(GUIProp.SERVERUSER, loguser.getText());
         gui.prop.set(GUIProp.SERVERPASS, new String(logpass.getPassword()));
@@ -331,11 +324,13 @@ public final class DialogServer extends Dialog {
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;
+        gmsg = Main.info(CONNECTED, host.getText(), portc.getText());
         refreshSess();
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
         logpass.setText("");
+        gmsg = DISCONNECTED;
       } else if(cmp == refreshSess) {
         refreshSess();
       } else if(cmp == refreshLog) {

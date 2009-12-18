@@ -647,10 +647,6 @@ public interface Text {
   String INFOERROR = lang("info_error") + COLS;
   /** Error info. */
   String INFOENTRIES = "(" + lang("info_entries") + ")";
-  /** Server start ok info. */
-  String INFOSERVOK = lang("info_servok");
-  /** Server went down. */
-  String INFOSERVDW = lang("info_servdw");
 
   // MENU ENTRIES =============================================================
 
@@ -1080,6 +1076,12 @@ public interface Text {
   String SESSIONS = lang("ds_sessions");
   /** Logs. */
   String LOGS = lang("ds_logs");
+  /** Server started. */
+  String SRVST = lang("ds_srvst");
+  /** Connected. */
+  String CONNECTED = lang("ds_connected");
+  /** Disconnected. */
+  String DISCONNECTED = lang("ds_disconnected");
 
   /** Progress text for filesystem import. */
   String CREATEFSPROG = "Traversing filesystem...";
