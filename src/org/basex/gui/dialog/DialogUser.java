@@ -225,7 +225,7 @@ public final class DialogUser extends BaseXBack {
         if(global) {
           setData();
         } else {
-          setDataL(db);
+          setDataL();
         }
       } else if(cmp == create) {
         final String u = user.getText();
@@ -248,7 +248,7 @@ public final class DialogUser extends BaseXBack {
       } else if(cmp == remove) {
         final String u = removeUser.getSelectedItem().toString();
         if(!sess.execute(new DropUser(u, db))) msg = sess.info();
-        setDataL(db);
+        setDataL();
       } else if(cmp == add) {
         final String value = addUser.getSelectedItem().toString();
         for(final StringList l : tempP) {
@@ -266,7 +266,7 @@ public final class DialogUser extends BaseXBack {
         action(change);
       } else if(cmp == databases) {
         try {
-          setDataL(databases.getSelectedItem().toString());
+          setDataL();
         } catch(final IOException e1) {
           addUser.removeAllItems();
           removeUser.removeAllItems();
@@ -342,10 +342,17 @@ public final class DialogUser extends BaseXBack {
 
   /**
    * Sets local data.
-   * @param db database to be opened
    * @throws IOException I/O Exception
    */
-  void setDataL(final String db) throws IOException {
+  void setDataL() throws IOException {
+    removeUser.removeAllItems();
+    addUser.removeAllItems();
+    tempP.clear();
+
+    final int i = databases.getSelectedIndex();
+    final String db = i > 0 ? databases.getSelectedItem().toString() : null;
+    if(db == null) return;
+    
     CachedOutput co = new CachedOutput();
     if(!sess.execute(new ShowUsers(db), co)) throw new IOException(sess.info());
     final String users = co.toString();
@@ -353,10 +360,6 @@ public final class DialogUser extends BaseXBack {
     if(!sess.execute(new ShowUsers(), co)) throw new IOException(sess.info());
 
     data = new Table(users);
-    removeUser.removeAllItems();
-    addUser.removeAllItems();
-    tempP.clear();
-
     final Table data2 = new Table(co.toString());
     final StringList tmp1 = new StringList();
     for(final TokenList l : data.contents) tmp1.add(Token.string(l.get(0)));

@@ -308,13 +308,11 @@ public final class MapView extends View implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data;
-    if(data == null || mainRects == null) return;
+    if(data == null) return;
     
-    final GUIProp gprop = gui.prop;
-
-    if(mainRects.size == 0 || mainRects.get(0).w == 0) {
+    if(mainRects == null || mainRects.size == 0 || mainRects.get(0).w == 0) {
       super.paintComponent(g);
-      if(mainRects.size != 0) refreshInit();
+      if(mainRects == null || mainRects.size != 0) refreshInit();
       return;
     }
 
@@ -342,6 +340,7 @@ public final class MapView extends View implements Runnable {
       if(f == null || !f.thumb) return;
     }
 
+    final GUIProp gprop = gui.prop;
     if(gprop.num(GUIProp.MAPOFFSETS) == 0) {
       g.setColor(COLORS[32]);
       int pre = mainRects.size;
