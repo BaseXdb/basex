@@ -286,7 +286,7 @@ c_notopened=Impossibile aprire il file.
 c_notsaved=Impossibile salvare il file.
 c_replace=Il file "%" esiste già.\nVuoi sovrascriverlo?
 c_server=Server Administration
-c_servertt=Display the server dialog.
+c_servertt=Display the server administration for user management and log tracing.
 
 ds_localserver=Local Server
 ds_users=Users

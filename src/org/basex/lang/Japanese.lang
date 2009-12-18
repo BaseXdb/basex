@@ -285,7 +285,7 @@ c_notopened=ファイルが開けませんでした。
 c_notsaved=ファイルを保存できませんでした。
 c_replace=ファイル "%" は既に存在します。\n置換してよろしいですか。
 c_server=Server Administration
-c_servertt=Display the server dialog.
+c_servertt=Display the server administration for user management and log tracing.
 
 ds_localserver=Local Server
 ds_users=Users

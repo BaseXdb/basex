@@ -284,7 +284,7 @@ c_notopened=Tệp không mở được.
 c_notsaved=Tệp không lưu được.
 c_replace=Tệp "%" đã có.\nBạn muốn thay thế nó không?
 c_server=Server Administration
-c_servertt=Display the server dialog.
+c_servertt=Display the server administration for user management and log tracing.
 
 ds_localserver=Local Server
 ds_users=Users

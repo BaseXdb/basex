@@ -285,7 +285,7 @@ c_notopened=Die Datei konnte nicht geöffnet werden.
 c_notsaved=Die Datei konnte nicht gespeichert werden.
 c_replace=% besteht bereits.\nMöchten Sie sie ersetzen?
 c_server=Server Administration
-c_servertt=Zeigt den Server-Dialog an.
+c_servertt=Zeigt die Server Administration an für User Management und Log Ueberwachung.
 
 ds_localserver=Lokaler Server
 ds_users=Benutzer
