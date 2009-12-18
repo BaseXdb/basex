@@ -421,7 +421,10 @@ public final class DialogServer extends Dialog {
     refreshLog.setEnabled(logc.getSelectedIndex() != -1);
     delete.setEnabled(logc.getSelectedIndex() != -1);
     deleteAll.setEnabled(logc.getItemCount() > 0);
-    if (loguser.hasFocus()) logpass.setText("");
+    if (loguser.hasFocus()) {
+      logpass.setText("");
+      connect.setEnabled(false);
+    }
     ctx.prop.write();
   }
 

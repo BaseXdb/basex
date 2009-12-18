@@ -168,7 +168,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Server Dialog. */
-  SERVER(GUISERVER + DOTS, null, GUISERVERTT, false, false) {
+  SERVER("Manage " + GUISERVER + DOTS, null, GUISERVERTT, false, false) {
     @Override
     public void execute(final GUI gui) {
       // open file chooser for XML creation
