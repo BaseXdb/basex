@@ -101,6 +101,7 @@ abstract class Primitives {
    * @return original array minus null value fields
    */
   private UpdatePrimitive[] shrink(final UpdatePrimitive[] up) {
+    // [LK] kick null checks
     int l = 0;
     for(int i = 0; i < up.length; i++) if(up[i] != null) l++;
     final UpdatePrimitive[] t = new UpdatePrimitive[l];

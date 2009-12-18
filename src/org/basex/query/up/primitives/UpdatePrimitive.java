@@ -108,7 +108,7 @@ public abstract class UpdatePrimitive {
    * @param b node pre value
    * @return true if nodes have been merged
    */
-  protected static boolean mergeTexts(final Data d, final int a, final int b) {
+  public static boolean mergeTexts(final Data d, final int a, final int b) {
     // some pre value checks to prevent databases errors
     final int s = d.meta.size;
     if(a >= s || b >= s) return false;

@@ -26,7 +26,7 @@ public final class DeletePrimitive extends UpdatePrimitive {
     final Data d = n.data;
     final int p = n.pre + add;
     d.delete(p);
-    mergeTexts(d, p - 1, p);
+//    mergeTexts(d, p - 1, p);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package org.basex.query.up.primitives;
 
+//[LK] edit comment!
 /**
  * Update primitive type enumeration.
  *

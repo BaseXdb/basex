@@ -78,11 +78,8 @@ final class DBPrimitives extends Primitives {
 
     for(final int pre : pres) {
       final UpdatePrimitive[] ups = op.get(pre);
-      if(ups != null) {
-        for(final UpdatePrimitive up : ups) {
-          if(up != null) up.update(pool);
-        }
-      }
+      if(ups != null)
+        for(final UpdatePrimitive up : ups) up.update(pool);
 
       // pre values consists exclusively of element and attribute nodes
       if(d.kind(pre) == Data.ATTR) {
@@ -107,8 +104,15 @@ final class DBPrimitives extends Primitives {
   protected void apply() throws QueryException {
     // apply updates backwards, starting with the highest pre value -> no id's
     // and less table alterations needed
+    int par = -2;
     for(int i = nodes.size() - 1; i >= 0; i--) {
-      final UpdatePrimitive[] upd = op.get(nodes.get(i));
+      final int pre = nodes.get(i);
+      final int parT = d.parent(pre, d.kind(pre));
+      if(parT != par) {
+        mergeTexts(par);
+        par = parT;
+      }
+      final UpdatePrimitive[] upd = op.get(pre);
       UpdatePrimitive p;
       int j = 0;
       int add = 0;
@@ -120,8 +124,26 @@ final class DBPrimitives extends Primitives {
         if(t == REPLACENODE) break;
       }
     }
-    
+    mergeTexts(par);
+//    System.out.println(Token.string(InfoTable.table(d, 0, d.meta.size - 1)));
     d.flush();
+  }
+  
+  /**
+   * Merges any adjacent child text nodes for the given node. 
+   * @param par pre value of parent node.
+   */
+  private void mergeTexts(final int par) {
+    if(par < 0) return;
+    int l = par + d.size(par, d.kind(par));
+    int p = par + 1;
+    while(p < l) {
+      final int k = d.kind(p);
+      if(k == Data.ELEM) p += d.size(p, k);
+      else if(p < l - 1 && k == Data.TEXT && 
+          UpdatePrimitive.mergeTexts(d, p, p + 1)) l--;
+      else p++;
+    }
   }
   
   @Override
