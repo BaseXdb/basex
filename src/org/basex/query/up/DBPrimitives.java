@@ -105,11 +105,16 @@ final class DBPrimitives extends Primitives {
     // apply updates backwards, starting with the highest pre value -> no id's
     // and less table alterations needed
     int par = -2;
+    boolean check = false;
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.get(i);
       final int parT = d.parent(pre, d.kind(pre));
       if(parT != par) {
-        mergeTexts(par);
+        // Adjacent text nodes are merged. Merges can only be applied directly
+        // after the update if no lower pre values are effected. This is not
+        // the case for 'replace node', 'delete' and 'insert before' operations.
+        if(check) mergeTexts(par);
+        check = false;
         par = parT;
       }
       final UpdatePrimitive[] upd = op.get(pre);
@@ -120,12 +125,12 @@ final class DBPrimitives extends Primitives {
         p = upd[j++];
         final PrimitiveType t = p.type();
         p.apply(add);
+        check = t == INSERTBEFORE || t == REPLACENODE || t == DELETE;
         if(t == INSERTBEFORE) add = ((NodeCopy) p).md.meta.size;
         if(t == REPLACENODE) break;
       }
     }
-    mergeTexts(par);
-//    System.out.println(Token.string(InfoTable.table(d, 0, d.meta.size - 1)));
+    if(check) mergeTexts(par);
     d.flush();
   }
   
