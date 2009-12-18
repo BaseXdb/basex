@@ -267,6 +267,7 @@ public final class DialogServer extends Dialog {
       }
     });
     action(null);
+    setResizable(true);
     finish(null);
   }
 

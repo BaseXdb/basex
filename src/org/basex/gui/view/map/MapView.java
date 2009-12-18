@@ -160,8 +160,8 @@ public final class MapView extends View implements Runnable {
     if(painter == null) return;
 
     // calculate map
-    final int w = getWidth(), h = getHeight();
-    calc(new MapRect(0, 0, w, h, 0, 0), gui.context.current, mainMap);
+    calc(new MapRect(0, 0, getWidth(), getHeight(), 0, 0),
+        gui.context.current, mainMap);
     repaint();
   }
 
@@ -308,11 +308,13 @@ public final class MapView extends View implements Runnable {
   @Override
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data;
+    if(data == null || mainRects == null) return;
+    
     final GUIProp gprop = gui.prop;
 
-    if(data == null || mainRects == null || mainRects.size == 0) {
+    if(mainRects.size == 0 || mainRects.get(0).w == 0) {
       super.paintComponent(g);
-      refreshInit();
+      if(mainRects.size != 0) refreshInit();
       return;
     }
 
@@ -334,16 +336,16 @@ public final class MapView extends View implements Runnable {
     if(focused != null && focused.pre >= data.meta.size) focused = null;
 
     // skip node path view
-    if(focused == null || mainRects.size == 1 && focused == mainRects.get(0)) {
+    final MapRect f = focused;
+    if(f == null || mainRects.size == 1 && f == mainRects.get(0)) {
       gui.painting = false;
-      // return;
-      if(focused == null || !focused.thumb) return;
+      if(f == null || !f.thumb) return;
     }
 
     if(gprop.num(GUIProp.MAPOFFSETS) == 0) {
       g.setColor(COLORS[32]);
       int pre = mainRects.size;
-      int par = ViewData.parent(data, focused.pre);
+      int par = ViewData.parent(data, f.pre);
       while(--pre >= 0) {
         final MapRect rect = mainRects.get(pre);
         if(rect.pre == par) {
@@ -364,10 +366,10 @@ public final class MapView extends View implements Runnable {
       g.drawRect(selBox.x - 1, selBox.y - 1, selBox.w + 2, selBox.h + 2);
     } else {
       // paint focused rectangle
-      final int x = focused.x;
-      final int y = focused.y;
-      final int w = focused.w;
-      final int h = focused.h;
+      final int x = f.x;
+      final int y = f.y;
+      final int w = f.w;
+      final int h = f.h;
       g.setColor(color6);
       g.drawRect(x, y, w, h);
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
@@ -375,23 +377,23 @@ public final class MapView extends View implements Runnable {
       // draw tag label
       g.setFont(font);
       smooth(g);
-      if(data.kind(focused.pre) == Data.ELEM) {
-        String tt = Token.string(ViewData.tag(gprop, data, focused.pre));
+      if(data.kind(f.pre) == Data.ELEM) {
+        String tt = Token.string(ViewData.tag(gprop, data, f.pre));
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
-        BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), focused.level + 5);
+        BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), f.level + 5);
       }
 
-      if(focused.thumb) {
-        focused.x += 3;
-        focused.w -= 3;
-        final byte[] text = ViewData.content(data, focused.pre, false);
-        final TokenList tl = MapRenderer.calculateToolTip(focused,
+      if(f.thumb) {
+        f.x += 3;
+        f.w -= 3;
+        final byte[] text = ViewData.content(data, f.pre, false);
+        final TokenList tl = MapRenderer.calculateToolTip(f,
             Tokenizer.getInfo(text), mouseX, mouseY, getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
         MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl,
             gprop.num(GUIProp.FONTSIZE));
-        focused.x -= 3;
-        focused.w += 3;
+        f.x -= 3;
+        f.w += 3;
       }
     }
     gui.painting = false;

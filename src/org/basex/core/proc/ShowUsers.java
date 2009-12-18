@@ -13,7 +13,7 @@ import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 
 /**
- * Evaluates the 'show' command and shows server information.
+ * Evaluates the 'show users' command and shows existing users.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
