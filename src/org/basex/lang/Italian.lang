@@ -289,6 +289,7 @@ c_server=Server Administration
 c_servertt=Display the server administration for user management and log tracing.
 
 ds_localserver=Local Server
+ds_connect=Connection
 ds_users=Users
 ds_host=Host
 ds_port=Port
@@ -300,13 +301,14 @@ ds_drquestion=User '%' will be dropped.\nAre you sure?
 ds_alterpw=Alter Password
 ds_newpw=New Password
 ds_invalid=% non valido
-ds_login=Login
+ds_adlogin=Administrator Login (local or remote)
 ds_databases=Databases
 ds_sessions=Sessions
 ds_logs=Logs
-ds_srvst=Server started.
-ds_connected=Connected to '%' on '%'.
+ds_connected=Connected to %:%.
 ds_disconnected=Disconnected.
+ds_info1=This dialog is only intended to administer the client/server architecture.
+ds_info2=It will not affect any other GUI features.
 
 # Commands & Processes
 proc_time=Tempo necessario
@@ -369,8 +371,8 @@ srv_login=Access denied.
 srv_connect=Impossibile comunicare col Server.
 srv_timeout=Your process reached the timeout.
 srv_bind=Il server sta lavorando o il permesso è stato negato.
-srv_start=Attendo richieste
-srv_stop=Server fermato.
+srv_start=Server was started.
+srv_stop=Server was stopped.
 srv_user=Username
 srv_pw=Password
 

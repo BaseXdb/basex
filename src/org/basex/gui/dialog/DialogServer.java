@@ -19,6 +19,7 @@ import org.basex.core.proc.Exit;
 import org.basex.core.proc.ShowDatabases;
 import org.basex.core.proc.ShowSessions;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -119,16 +120,15 @@ public final class DialogServer extends Dialog {
     final BaseXBack db = dbsP.getTablePanel();
     db.setBorder(8, 8, 8, 8);
     tabs = new BaseXTabs(this);
-    tabs.add("Server", conn);
+    tabs.add(CONNECT, conn);
     tabs.add(USERS, user);
     tabs.add(DATABASES, db);
     tabs.add(SESSIONS, sess);
     tabs.add(LOGS, logs);
 
     // Server Tab
-    conn.setLayout(new TableLayout(6, 1, 0, 4));
+    conn.setLayout(new BorderLayout(0, 32));
     conn.setBorder(8, 8, 8, 8);
-    conn.add(new BaseXLabel(LOCALSERVER + COLS, false, true));
 
     start = new BaseXButton(BUTTONSTART, this);
     stop = new BaseXButton(BUTTONSTOP, this);
@@ -149,57 +149,62 @@ public final class DialogServer extends Dialog {
     infoC = new BaseXLabel(" ");
     infoC.setBorder(8, 0, 0, 0);
 
-    // Local server panel.
     BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 2, 8, 2));
-    p.setBorder(0, 0, 0, 0);
-    p.add(new BaseXLabel(PORT + COLS));
-    p.add(ports);
-    p.add(new BaseXLabel(" "));
-    BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(1, 2, 2, 2));
-    pp.add(start);
-    pp.add(stop);
-    p.add(pp);
-    conn.add(p);
+    p.setLayout(new TableLayout(6, 1, 0, 0));
 
-    conn.add(new BaseXLabel(" "));
-    conn.add(new BaseXLabel("Administrator " + LOGIN + 
-        " (local or remote)" + COLS, false, true));
+    // Local server panel.
+    p.add(new BaseXLabel(LOCALSERVER + COLS, true, true));
+
+    BaseXBack pp = new BaseXBack();
+    pp.setLayout(new TableLayout(2, 2, 8, 2));
+    pp.setBorder(0, 0, 0, 0);
+    pp.add(new BaseXLabel(PORT + COLS));
+    pp.add(ports);
+    pp.add(new BaseXLabel(" "));
+    BaseXBack ppp = new BaseXBack();
+    ppp.setLayout(new TableLayout(1, 2, 2, 2));
+    ppp.add(start);
+    ppp.add(stop);
+    pp.add(ppp);
+    p.add(pp);
+
+    p.add(new BaseXLabel(" ", true, true));
+    p.add(new BaseXLabel(ADMINLOGIN + COLS, true, true));
 
     // Login panel.
-    p = new BaseXBack();
-    p.setLayout(new TableLayout(5, 2, 8, 2));
-    p.add(new BaseXLabel(SERVERUSER + COLS));
-    p.add(loguser);
-    p.add(new BaseXLabel(SERVERPW + COLS));
-    p.add(logpass);
-    p.add(new BaseXLabel(HOST + COLS));
-    p.add(host);
-    p.add(new BaseXLabel(PORT + COLS));
-    p.add(portc);
-    p.add(new BaseXLabel(" "));
     pp = new BaseXBack();
-    pp.setLayout(new TableLayout(1, 2, 2, 2));
-    pp.add(connect);
-    pp.add(disconnect);
+    pp.setLayout(new TableLayout(5, 2, 8, 2));
+    pp.add(new BaseXLabel(SERVERUSER + COLS));
+    pp.add(loguser);
+    pp.add(new BaseXLabel(SERVERPW + COLS));
+    pp.add(logpass);
+    pp.add(new BaseXLabel(HOST + COLS));
+    pp.add(host);
+    pp.add(new BaseXLabel(PORT + COLS));
+    pp.add(portc);
+    pp.add(new BaseXLabel(" "));
+    ppp = new BaseXBack();
+    ppp.setLayout(new TableLayout(1, 2, 2, 2));
+    ppp.add(connect);
+    ppp.add(disconnect);
+    pp.add(ppp);
     p.add(pp);
-    conn.add(p);
-    conn.add(infoC);
+    p.add(infoC);
+
+    conn.add(p, BorderLayout.CENTER);
+
+    p = new BaseXBack();
+    p.setLayout(new TableLayout(2, 1));
+    BaseXLabel l = new BaseXLabel(SERVERINFO1);
+    l.setForeground(GUIConstants.COLORDARK);
+    p.add(l);
+    l = new BaseXLabel(SERVERINFO2);
+    l.setForeground(GUIConstants.COLORDARK);
+    p.add(l);
+    conn.add(p, BorderLayout.SOUTH);
 
     // Session Tab
     sess.setLayout(new BorderLayout());
-    /*
-    conn.add(new BaseXLabel(LOCALSERVER + COLS, false, true));
-    conn.add(p1);
-    conn.add(new BaseXLabel(LOGIN + " on local or remote server"  +
-        COLS, false, true));
-    conn.add(p2);
-    conn.add(info);
-
-    // Session panel
-    sess.setLayout(new TableLayout(4, 1, 2, 2));
-    */
     sess.setBorder(8, 8, 8, 8);
     sese = new BaseXText(false, this);
     sese.setFont(getFont());
@@ -230,7 +235,7 @@ public final class DialogServer extends Dialog {
     p.add(refreshSess, BorderLayout.EAST);
     sess.add(p, BorderLayout.SOUTH);
 
-    
+
     // Logging Tab
     logs.setLayout(new BorderLayout());
     logs.setBorder(8, 8, 8, 8);
@@ -313,7 +318,7 @@ public final class DialogServer extends Dialog {
         final String clazz = org.basex.BaseXServer.class.getName();
         new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
             "-p", String.valueOf(p)}).start();
-        
+
         for(int c = 0; c < 3; c++) {
           running = ping(true);
           if(running) break;
@@ -322,7 +327,7 @@ public final class DialogServer extends Dialog {
         if(!running) {
           msg = SERVERBIND;
         } else {
-          gmsg = SRVST;
+          gmsg = SERVERSTART;
         }
       } else if(cmp == stop) {
         BaseXServer.stop(gui.context);
@@ -387,7 +392,7 @@ public final class DialogServer extends Dialog {
         if(msg.equals(Main.info(PERMNO, CmdPerm.values()[3]))) {
           try {
             cs.execute(new Exit());
-          } catch(IOException e) {
+          } catch(final IOException e) {
             e.printStackTrace();
           }
         }
@@ -432,7 +437,7 @@ public final class DialogServer extends Dialog {
     refreshLog.setEnabled(logc.getSelectedIndex() != -1);
     delete.setEnabled(logc.getSelectedIndex() != -1);
     deleteAll.setEnabled(logc.getItemCount() > 0);
-    if (loguser.hasFocus()) {
+    if(loguser.hasFocus()) {
       logpass.setText("");
       connect.setEnabled(false);
     }

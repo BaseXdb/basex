@@ -2,13 +2,11 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.net.BindException;
 import java.util.ArrayList;
-import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -111,7 +109,7 @@ public final class DialogUser extends BaseXBack {
     global = g;
     dia = d;
 
-    setLayout(new TableLayout(8, 1, 0, 4));
+    setLayout(new TableLayout(7, 1, 0, 4));
     setBorder(8, 8, 8, 8);
 
     user = new BaseXTextField("", dia);
@@ -134,37 +132,37 @@ public final class DialogUser extends BaseXBack {
     info = new BaseXLabel(" ");
 
     add(new BaseXLabel(CREATEU + COLS, false, true));
-    final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new TableLayout(1, 5, 6, 0));
-    p1.setBorder(0, 0, 5, 0);
-    p1.add(new BaseXLabel(SERVERUSER + COLS));
-    p1.add(user);
-    p1.add(new BaseXLabel(SERVERPW + COLS));
-    p1.add(pass);
-    p1.add(create);
-    add(p1);
+    BaseXBack p = new BaseXBack();
+    p.setLayout(new TableLayout(1, 5, 6, 0));
+    p.setBorder(0, 0, 5, 0);
+    p.add(new BaseXLabel(SERVERUSER + COLS));
+    p.add(user);
+    p.add(new BaseXLabel(SERVERPW + COLS));
+    p.add(pass);
+    p.add(create);
+    add(p);
 
     add(new BaseXLabel(ALTERPW + COLS, false, true));
-    final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new TableLayout(1, 4, 6, 0));
-    p2.add(alterUser);
-    p2.add(new BaseXLabel(NEWPW));
-    p2.add(newpass);
-    p2.add(alter);
-    add(p2);
+    p = new BaseXBack();
+    p.setLayout(new TableLayout(1, 4, 6, 0));
+    p.add(alterUser);
+    p.add(new BaseXLabel(NEWPW));
+    p.add(newpass);
+    p.add(alter);
+    add(p);
 
     add(new BaseXLabel(DROPU + COLS, false, true));
-    final BaseXBack p4 = new BaseXBack();
-    p4.setLayout(new TableLayout(1, 2, 6, 0));
-    p4.add(dropUser);
-    p4.add(drop);
-    add(p4);
+    p = new BaseXBack();
+    p.setLayout(new TableLayout(1, 2, 6, 0));
+    p.add(dropUser);
+    p.add(drop);
+    add(p);
 
     tablePanel = new BaseXBack();
     tablePanel.setLayout(new BorderLayout(0, 5));
+
     add = new BaseXButton(BUTTONADD, dia);
     databases = new BaseXCombo(true, new String[] {}, dia);
-    //BaseXLayout.setWidth(databases, BaseXCombo.DWIDTH);
     addUser = new BaseXCombo(new String[] {}, dia);
     BaseXLayout.setWidth(addUser, BaseXCombo.DWIDTH);
     removeUser = new BaseXCombo(new String[] {}, dia);
@@ -172,36 +170,39 @@ public final class DialogUser extends BaseXBack {
     BaseXLayout.setWidth(removeUser, BaseXCombo.DWIDTH);
 
     if(!global) {
-      final BaseXBack tmp = new BaseXBack();
-      tmp.setLayout(new TableLayout(2, 5, 8, 2));
-      tmp.add(new BaseXLabel(DATABASES + COL, false, true));
-      tmp.add(new BaseXLabel(BUTTONADD + COL, false, true));
-      tmp.add(new BaseXLabel(""));
-      tmp.add(new BaseXLabel(BUTTONREMOVE + COL, false, true));
-      tmp.add(new BaseXLabel(""));
-      tmp.add(databases);
-      tmp.add(addUser);
-      tmp.add(add);
-      tmp.add(removeUser);
-      tmp.add(remove);
-      tablePanel.add(tmp, BorderLayout.NORTH);
+      p = new BaseXBack();
+      p.setLayout(new TableLayout(2, 5, 8, 2));
+      p.add(new BaseXLabel(DATABASES + COL, false, true));
+      p.add(new BaseXLabel(BUTTONADD + COL, false, true));
+      p.add(new BaseXLabel(""));
+      p.add(new BaseXLabel(BUTTONREMOVE + COL, false, true));
+      p.add(new BaseXLabel(""));
+      p.add(databases);
+      p.add(addUser);
+      p.add(add);
+      p.add(removeUser);
+      p.add(remove);
+      tablePanel.add(p, BorderLayout.NORTH);
     }
 
-    BaseXBack tmp = new BaseXBack();
-    tmp.setLayout(new TableLayout(2, 1, 0, 5));
+    p = new BaseXBack();
+    p.setLayout(new TableLayout(2, 1, 0, 5));
+    p.add(new BaseXLabel(PERMS, false, true));
     table = new JTable(new TableModel());
-    table.setPreferredScrollableViewportSize(new Dimension(490, 100));
-    tmp.add(new BaseXLabel(PERMS, false, true));
-    tmp.add(new JScrollPane(table));
-    tablePanel.add(tmp, BorderLayout.CENTER);
-    tmp = new BaseXBack();
-    tmp.setLayout(new BorderLayout());
-    tmp.add(change, BorderLayout.EAST);
-    tmp.add(info, BorderLayout.WEST);
-    tablePanel.add(tmp, BorderLayout.SOUTH);
+    table.setCellSelectionEnabled(false);
+    table.setFocusable(false);
+    final JScrollPane sp = new JScrollPane(table);
+    BaseXLayout.setHeight(sp, 130);
+    p.add(sp);
+    tablePanel.add(p, BorderLayout.CENTER);
+
+    p = new BaseXBack();
+    p.setLayout(new BorderLayout());
+    p.add(change, BorderLayout.EAST);
+    p.add(info, BorderLayout.WEST);
+    tablePanel.add(p, BorderLayout.SOUTH);
     add(tablePanel);
 
-    add(Box.createVerticalStrut(20));
     action(null);
   }
 

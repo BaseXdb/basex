@@ -105,7 +105,7 @@ public interface Text {
   // SERVER ===================================================================
 
   /** Server start. */
-  String SERVERSTART = lang("srv_start") + DOTS;
+  String SERVERSTART = lang("srv_start");
   /** Server stop. */
   String SERVERSTOPPED = lang("srv_stop");
   /** Server started. */
@@ -1047,6 +1047,8 @@ public interface Text {
   /** Server. */
   String LOCALSERVER = lang("ds_localserver");
   /** Users. */
+  String CONNECT = lang("ds_connect");
+  /** Users. */
   String USERS = lang("ds_users");
   /** Host. */
   String HOST = lang("ds_host");
@@ -1069,19 +1071,21 @@ public interface Text {
   /** Invalid. */
   String INVALID = lang("ds_invalid") + DOT;
   /** Login. */
-  String LOGIN = lang("ds_login");
+  String ADMINLOGIN = lang("ds_adlogin");
   /** Databases. */
   String DATABASES = lang("ds_databases");
   /** Sessions. */
   String SESSIONS = lang("ds_sessions");
   /** Logs. */
   String LOGS = lang("ds_logs");
-  /** Server started. */
-  String SRVST = lang("ds_srvst");
   /** Connected. */
   String CONNECTED = lang("ds_connected");
   /** Disconnected. */
   String DISCONNECTED = lang("ds_disconnected");
+  /** Server Information. */
+  String SERVERINFO1 = lang("ds_info1");
+  /** Server Information. */
+  String SERVERINFO2 = lang("ds_info2");
 
   /** Progress text for filesystem import. */
   String CREATEFSPROG = "Traversing filesystem...";
