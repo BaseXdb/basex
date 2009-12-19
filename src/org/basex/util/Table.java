@@ -66,16 +66,57 @@ public final class Table {
    * Sorts the table by the first column.
    */
   public void sort() {
-    for(int i = 0; i < contents.size() - 2; i++) {
-      final byte[] s = lc(contents.get(i).get(0));
+    for(int i = 0; i < contents.size() - 1; i++) {
       for(int j = i + 1; j < contents.size(); j++) {
-        if(diff(s, lc(contents.get(j).get(0))) > 0) {
+        if(diff(lc(contents.get(i).get(0)), lc(contents.get(j).get(0))) > 0) {
           final TokenList tmp = contents.get(i);
           contents.set(i, contents.get(j));
           contents.set(j, tmp);
         }
       }
     }
+  }
+
+  /**
+   * Returns the value for the specified table position.
+   * @param r row
+   * @param c column
+   * @return value
+   */
+  public String value(final int r, final int c) {
+    return Token.string(contents.get(r).get(c));
+  }
+
+  /**
+   * Returns the number of rows.
+   * @return number of rows
+   */
+  public int rows() {
+    return contents.size();
+  }
+
+  /**
+   * Returns the number of columns.
+   * @return number of columns
+   */
+  public int cols() {
+    return header.size();
+  }
+
+  /**
+   * Moves the specified string to top.
+   * @param top entry to be moved to the top
+   */
+  public void toTop(final byte[] top) {
+    TokenList tl = null;
+    int i = -1;
+    while(++i < contents.size()) {
+      tl = contents.get(i);
+      if(eq(top, lc(tl.get(0)))) break;
+    }
+    if(i == contents.size()) return;
+    while(--i >= 0) contents.set(i + 1, contents.get(i));
+    contents.set(0, tl);
   }
 
   /**

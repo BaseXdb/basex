@@ -103,7 +103,7 @@ public final class BaseXLayout {
    * @param hlp help text
    * @param win parent window
    */
-  static void addInteraction(final Component comp, final byte[] hlp,
+  public static void addInteraction(final Component comp, final byte[] hlp,
         final Window win) {
 
     comp.addMouseListener(new MouseAdapter() {

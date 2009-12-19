@@ -1,22 +1,23 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
-import org.basex.gui.GUIConstants;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.IO;
 import org.basex.util.StringList;
 
 /**
- * Open database dialog.
+ * Rename database dialog.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
@@ -35,56 +36,50 @@ public final class DialogRename extends Dialog {
 
   /**
    * Default constructor.
-   * @param main reference to the main window
    * @param dbname name of database
+   * @param main reference to the main window
    */
-  public DialogRename(final GUI main, final String dbname) {
+  public DialogRename(final String dbname, final GUI main) {
     super(main, RENAMETITLE);
     old = dbname;
     db = List.list(main.context);
-
-    info = new BaseXLabel(" ");
-    info.setForeground(GUIConstants.COLORERROR);
 
     name = new BaseXTextField(dbname, this);
     name.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        action(null);
+        if(!modifier(e)) action(pressed(ENTER, e) ? e.getSource() : null);
       }
     });
-
-    set(name, BorderLayout.NORTH);
-    set(info, BorderLayout.CENTER);
+    info = new BaseXLabel(" ");
 
     final BaseXBack p = new BaseXBack();
-    p.setLayout(new BorderLayout());
+    p.setLayout(new BorderLayout(0, 8));
+    p.add(name, BorderLayout.NORTH);
+    p.add(info, BorderLayout.CENTER);
+    set(p, BorderLayout.CENTER);
 
-    buttons = okCancel(this);
-    p.add(buttons, BorderLayout.EAST);
-    set(p, BorderLayout.SOUTH);
-
+    buttons = newButtons(this, new Object[] { BUTTONOK, BUTTONCANCEL });
+    set(buttons, BorderLayout.SOUTH);
+    action(null);
     finish(null);
   }
 
   @Override
   public void action(final Object cmp) {
-    final String nm = name.getText().trim();
+    final String nm = name.getText();
     ok = !db.contains(nm) || nm.equals(old);
-    String inf = ok ? "" : RENAMEEXISTS;
+    String msg = ok ? null : RENAMEEXISTS;
     if(ok) {
       ok = !nm.isEmpty() && IO.valid(nm);
-      if(!ok && !nm.isEmpty()) inf = Main.info(INVALID, EDITNAME);
+      if(!nm.isEmpty() && !ok) msg = Main.info(INVALID, EDITNAME);
     }
-    info.setText(inf);
-    enableOK(buttons, BUTTONOK, ok);
+    info.setText(msg, Icon.ERR);
+    enableOK(buttons, BUTTONOK, ok && !nm.isEmpty());
   }
 
   @Override
   public void close() {
-    if(!ok) return;
-    super.close();
-    final Prop prop = gui.context.prop;
-    prop.dbpath(old).renameTo(prop.dbpath(name.getText().trim()));
+    if(ok) super.close();
   }
 }

@@ -202,7 +202,7 @@ public final class FolderView extends View {
     while(it.more()) {
       final int kind = data.kind(it.pre);
       final boolean elem = kind == Data.ELEM || kind == Data.DOC;
-      final int x = 8 + it.level * (lineH >> 2) + (elem ? lineH : boxW);
+      final int x = 8 + it.level * (lineH >> 1) + (elem ? lineH : boxW);
       drawString(g, it.pre, x, it.y + boxW);
     }
     gui.painting = false;

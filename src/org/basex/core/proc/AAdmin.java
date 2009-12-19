@@ -79,6 +79,6 @@ public abstract class AAdmin extends Proc {
         return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
       }
     }
-    return info(set ? PERMADD : PERMDEL);
+    return info(PERMUP);
   }
 }

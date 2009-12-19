@@ -288,6 +288,8 @@ public final class MapView extends View implements Runnable {
       final BufferedImage map) {
 
     // calculate new main rectangles
+    gui.cursor(CURSORWAIT);
+
     initLen();
     layout = new MapLayout(nodes.data, textLen, gui.prop);
     layout.makeMap(rect, new MapList(nodes.nodes.clone()),
@@ -303,6 +305,7 @@ public final class MapView extends View implements Runnable {
      * ImageIO.write(mainMap, "png", file); } catch(IOException ex) {
      * ex.printStackTrace(); }
      */
+    gui.cursor(CURSORARROW, true);
   }
 
   @Override

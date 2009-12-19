@@ -4,8 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import javax.swing.border.EmptyBorder;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -22,6 +20,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.IO;
 import org.basex.util.StringList;
 
@@ -104,12 +103,7 @@ public final class DialogCreateFS extends Dialog {
     p.add(button);
 
     path = new BaseXTextField(gprop.get(GUIProp.FSBACKING), this);
-    path.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        action(null);
-      }
-    });
+    path.addKeyListener(keys);
     p.add(path);
 
     all = new BaseXCheckBox(IMPORTALL, gprop.is(GUIProp.FSALL), this);
@@ -128,12 +122,7 @@ public final class DialogCreateFS extends Dialog {
     p.add(new BaseXLabel(""));
 
     dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), this);
-    dbname.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        action(null);
-      }
-    });
+    dbname.addKeyListener(keys);
     p.add(dbname);
     p1.add(p);
 
@@ -276,17 +265,17 @@ public final class DialogCreateFS extends Dialog {
       if(!cNam) inf = DBWHICH;
     }
 
-    boolean warn = false;
+    Icon icon = Icon.ERR;
     if(ok) {
       ok = IO.valid(nm);
       if(!ok) {
         inf = Main.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
         inf = prop.is(Prop.FUSE) ? RENAMEOVERBACKING : RENAMEOVER;
-        warn = true;
+        icon = Icon.WARN;
       }
     }
-    info.setError(inf, warn);
+    info.setText(inf, icon);
     enableOK(buttons, BUTTONOK, ok);
   }
 

@@ -160,8 +160,6 @@ public final class GUIProp extends AProp {
 
   /** Server user. */
   public static final Object[] SERVERUSER = { "SERVERUSER", "admin" };
-  /** Server password. */
-  public static final Object[] SERVERPASS = { "SERVERPASS", "" };
 
   /** Shows real file contents in the treemap. */
   public static final Object[] MAPFS = { "MAPFS", true };

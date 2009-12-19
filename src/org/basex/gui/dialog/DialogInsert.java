@@ -17,6 +17,7 @@ import org.basex.gui.layout.BaseXRadio;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.XMLToken;
@@ -126,15 +127,20 @@ public final class DialogInsert extends Dialog {
     BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 200);
 
     back.removeAll();
-    back.setLayout(new TableLayout(
-        n == Data.ATTR || n == Data.PI ? 4 : 2, 1, 0, 8));
+    back.setLayout(new BorderLayout(0, 4));
     if(n != Data.TEXT && n != Data.COMM) {
-      back.add(label1);
-      back.add(input1);
+      final BaseXBack b = new BaseXBack();
+      b.setLayout(new BorderLayout(0, 4));
+      b.add(label1, BorderLayout.NORTH);
+      b.add(input1, BorderLayout.CENTER);
+      back.add(b, BorderLayout.NORTH);
     }
     if(n != Data.ELEM) {
-      back.add(label2);
-      back.add(input2);
+      final BaseXBack b = new BaseXBack();
+      b.setLayout(new BorderLayout(0, 4));
+      b.add(label2, BorderLayout.NORTH);
+      b.add(input2, BorderLayout.CENTER);
+      back.add(b, BorderLayout.CENTER);
     }
     pack();
   }
@@ -150,7 +156,7 @@ public final class DialogInsert extends Dialog {
       ok = XMLToken.isQName(token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Main.info(INVALID, EDITNAME);
     }
-    info.setError(msg, true);
+    info.setText(msg, Icon.WARN);
     enableOK(buttons, BUTTONOK, ok);
   }
 

@@ -6,7 +6,8 @@ import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
-import javax.swing.JPasswordField;
+import java.net.ConnectException;
+
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -16,6 +17,7 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.proc.Exit;
+import org.basex.core.proc.Set;
 import org.basex.core.proc.ShowDatabases;
 import org.basex.core.proc.ShowSessions;
 import org.basex.gui.GUI;
@@ -25,11 +27,12 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.layout.BaseXPassword;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -93,7 +96,7 @@ public final class DialogServer extends Dialog {
   /** Username textfield. */
   private final BaseXTextField loguser;
   /** Password textfield. */
-  private final JPasswordField logpass;
+  private final BaseXPassword logpass;
   /** Info label. */
   private final BaseXLabel infoC;
   /** Info label. */
@@ -143,9 +146,8 @@ public final class DialogServer extends Dialog {
     portc.addKeyListener(keys);
     loguser = new BaseXTextField(gui.prop.get(GUIProp.SERVERUSER), this);
     loguser.addKeyListener(keys);
-    logpass = new JPasswordField(gui.prop.get(GUIProp.SERVERPASS));
+    logpass = new BaseXPassword(main);
     logpass.addKeyListener(keys);
-    BaseXLayout.setWidth(logpass, BaseXTextField.TWIDTH);
     infoC = new BaseXLabel(" ");
     infoC.setBorder(8, 0, 0, 0);
 
@@ -156,13 +158,13 @@ public final class DialogServer extends Dialog {
     p.add(new BaseXLabel(LOCALSERVER + COLS, true, true));
 
     BaseXBack pp = new BaseXBack();
-    pp.setLayout(new TableLayout(2, 2, 8, 2));
+    pp.setLayout(new TableLayout(2, 2, 8, 4));
     pp.setBorder(0, 0, 0, 0);
     pp.add(new BaseXLabel(PORT + COLS));
     pp.add(ports);
     pp.add(new BaseXLabel(" "));
     BaseXBack ppp = new BaseXBack();
-    ppp.setLayout(new TableLayout(1, 2, 2, 2));
+    ppp.setLayout(new TableLayout(1, 2, 5, 0));
     ppp.add(start);
     ppp.add(stop);
     pp.add(ppp);
@@ -173,7 +175,7 @@ public final class DialogServer extends Dialog {
 
     // Login panel.
     pp = new BaseXBack();
-    pp.setLayout(new TableLayout(5, 2, 8, 2));
+    pp.setLayout(new TableLayout(5, 2, 8, 4));
     pp.add(new BaseXLabel(SERVERUSER + COLS));
     pp.add(loguser);
     pp.add(new BaseXLabel(SERVERPW + COLS));
@@ -184,7 +186,7 @@ public final class DialogServer extends Dialog {
     pp.add(portc);
     pp.add(new BaseXLabel(" "));
     ppp = new BaseXBack();
-    ppp.setLayout(new TableLayout(1, 2, 2, 2));
+    ppp.setLayout(new TableLayout(1, 2, 5, 0));
     ppp.add(connect);
     ppp.add(disconnect);
     pp.add(ppp);
@@ -207,10 +209,10 @@ public final class DialogServer extends Dialog {
     sess.setLayout(new BorderLayout());
     sess.setBorder(8, 8, 8, 8);
     sese = new BaseXText(false, this);
-    sese.setFont(getFont());
+    sese.setFont(start.getFont());
     sese.setBorder(new EmptyBorder(5, 5, 5, 5));
     sedb = new BaseXText(false, this);
-    sedb.setFont(getFont());
+    sedb.setFont(start.getFont());
     sedb.setBorder(new EmptyBorder(5, 5, 5, 5));
     refreshSess = new BaseXButton(BUTTONREFRESH, this);
 
@@ -243,7 +245,8 @@ public final class DialogServer extends Dialog {
     deleteAll = new BaseXButton(BUTTONDELALL, this);
     logc = new BaseXCombo(true, new String[] {}, this);
     logt = new BaseXText(false, this);
-    logt.setFont(getFont());
+    logt.setFont(start.getFont());
+
     logt.setBorder(new EmptyBorder(5, 5, 5, 5));
     infoL = new BaseXLabel(" ");
     infoL.setBorder(8, 0, 0, 0);
@@ -301,11 +304,12 @@ public final class DialogServer extends Dialog {
 
   @Override
   public void action(final Object cmp) {
+    Icon icon = Icon.OK;
     String msg = null;
     String msg2 = null;
-    String gmsg = null;
+
     try {
-      if(cmp == start) {
+      if(cmp == start || cmp == ports) {
         final int p = Integer.parseInt(ports.getText());
         ctx.prop.set(Prop.SERVERPORT, p);
         if(host.getText().equals("localhost")) {
@@ -324,33 +328,32 @@ public final class DialogServer extends Dialog {
           if(running) break;
           Performance.sleep(500);
         }
-        if(!running) {
-          msg = SERVERBIND;
-        } else {
-          gmsg = SERVERSTART;
-        }
+        msg = running ? SERVERSTART : SERVERBIND;
+        if(!running) icon = Icon.ERR;
       } else if(cmp == stop) {
         BaseXServer.stop(gui.context);
         running = ping(true);
         connected = connected && ping(false);
-        if(!connected) gmsg = SERVERSTOPPED;
-      } else if(cmp == connect) {
+        if(!connected) msg = SERVERSTOPPED;
+        if(host.getText().equals("localhost")) logpass.setText("");
+      } else if(cmp == connect || cmp == loguser || cmp == logpass ||
+          cmp == host || cmp == portc) {
         gui.prop.set(GUIProp.SERVERUSER, loguser.getText());
-        gui.prop.set(GUIProp.SERVERPASS, new String(logpass.getPassword()));
+        final String pw = new String(logpass.getPassword());
         ctx.prop.set(Prop.HOST, host.getText());
         ctx.prop.set(Prop.PORT, Integer.parseInt(portc.getText()));
-        cs = new ClientSession(ctx, gui.prop.get(GUIProp.SERVERUSER),
-            gui.prop.get(GUIProp.SERVERPASS));
+        cs = new ClientSession(ctx, gui.prop.get(GUIProp.SERVERUSER), pw);
+        cs.execute(new Set(Prop.INFO, true));
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;
-        gmsg = Main.info(CONNECTED, host.getText(), portc.getText());
+        msg = Main.info(CONNECTED, host.getText(), portc.getText());
         refreshSess();
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
         logpass.setText("");
-        gmsg = DISCONNECTED;
+        msg = DISCONNECTED;
       } else if(cmp == refreshSess) {
         refreshSess();
       } else if(cmp == refreshLog) {
@@ -366,12 +369,14 @@ public final class DialogServer extends Dialog {
           refreshLog();
         } else {
           msg2 = Main.info(DBNOTDELETED, f.getName());
+          icon = Icon.ERR;
         }
       } else if(cmp == deleteAll) {
         for(int i = 0; i < logc.getItemCount(); i++) {
           final File f = new File(logdir + logc.getItemAt(i).toString());
           if(!f.delete()) {
             msg2 = Main.info(DBNOTDELETED, f.getName());
+            icon = Icon.ERR;
             break;
           }
         }
@@ -385,16 +390,16 @@ public final class DialogServer extends Dialog {
       }
     } catch(final IOException ex) {
       Main.debug(ex);
+      icon = Icon.ERR;
       if(ex instanceof BindException) msg = SERVERBIND;
       else if(ex instanceof LoginException) msg = SERVERLOGIN;
-      else {
-        msg = ex.getMessage(); //SERVERERR;
-        if(msg.equals(Main.info(PERMNO, CmdPerm.values()[3]))) {
-          try {
-            cs.execute(new Exit());
-          } catch(final IOException e) {
-            e.printStackTrace();
-          }
+      else if(ex instanceof ConnectException) msg = SERVERERR;
+      else msg = ex.getMessage();
+      if(msg.equals(Main.info(PERMNO, CmdPerm.values()[3]))) {
+        try {
+          cs.execute(new Exit());
+        } catch(final IOException e) {
+          e.printStackTrace();
         }
       }
     }
@@ -407,19 +412,15 @@ public final class DialogServer extends Dialog {
     final boolean vallp = new String(logpass.getPassword()).matches("[\\w]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
-    boolean warn = true;
-    if(msg != null || msg2 != null) {
-      warn = false;
-    } else if(!(valpl && valh && valp && vallu && vallp)) {
+    if(msg == null && msg2 == null &&
+        !(valpl && valh && valp && vallu && vallp)) {
       msg = Main.info(INVALID, !valpl ? LOCALPORT : !valh ? HOST :
         !valp ? PORT : !vallu ? SERVERUSER : SERVERPW);
+      icon = Icon.WARN;
     }
-    infoC.setError(msg, warn);
-    infoL.setError(msg2, warn);
-    if(gmsg != null) {
-      infoC.setText(gmsg);
-      infoC.setIcon(BaseXLayout.icon("ok"));
-    }
+    infoC.setText(msg, icon);
+    infoL.setText(msg2, icon);
+
     ports.setEnabled(!running);
     start.setEnabled(!running && valpl);
     stop.setEnabled(running);

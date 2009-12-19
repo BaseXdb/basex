@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.io.IOException;
 
 import javax.swing.border.CompoundBorder;
@@ -12,6 +13,7 @@ import javax.swing.border.EtchedBorder;
 
 import org.basex.core.Context;
 import org.basex.core.Main;
+import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.InfoDB;
@@ -65,23 +67,24 @@ public final class DialogOpen extends Dialog {
 
     choice = new BaseXListChooser(db.finish(), this);
     set(choice, BorderLayout.CENTER);
-    choice.setSize(130, 420);
+    choice.setSize(130, 400);
 
     final BaseXBack info = new BaseXBack();
     info.setLayout(new BorderLayout());
     info.setBorder(new CompoundBorder(new EtchedBorder(),
         new EmptyBorder(10, 10, 10, 10)));
 
+    final Font f = choice.getFont();
     doc = new BaseXLabel(DIALOGINFO);
-    doc.setFont(getFont().deriveFont(18f));
+    doc.setFont(f.deriveFont(f.getSize2D() + 7f));
     doc.setBorder(0, 0, 5, 0);
     info.add(doc, BorderLayout.NORTH);
 
     detail = new BaseXText(false, this);
-    detail.setFont(getFont());
+    detail.setFont(f);
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-    BaseXLayout.setWidth(detail, 420);
+    BaseXLayout.setWidth(detail, 360);
     info.add(detail, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack();
@@ -95,7 +98,7 @@ public final class DialogOpen extends Dialog {
 
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
-    drop = new BaseXButton(BUTTONDROP, this);
+    drop = new BaseXButton(BUTTONDROP + DOTS, this);
     if(dr) {
       buttons = newButtons(this, new Object[] { drop, BUTTONCANCEL });
     } else {
@@ -133,8 +136,13 @@ public final class DialogOpen extends Dialog {
     final Context ctx = gui.context;
 
     if(cmp == rename) {
-      new DialogRename(gui, choice.getValue());
-      choice.setData(List.list(ctx).finish());
+      final String old = choice.getValue();
+      final DialogRename dr = new DialogRename(old, gui);
+      if(dr.ok()) {
+        final Prop prop = gui.context.prop;
+        prop.dbpath(old).renameTo(prop.dbpath(dr.name.getText()));
+        choice.setData(List.list(ctx).finish());
+      }
     } else if(cmp == open) {
       close();
     } else if(cmp == drop) {
@@ -152,7 +160,7 @@ public final class DialogOpen extends Dialog {
     } else {
       final String db = choice.getValue().trim();
       ok = !db.isEmpty() && ctx.prop.dbexists(db);
-      enableOK(buttons, BUTTONDROP, ok);
+      enableOK(buttons, BUTTONDROP + DOTS, ok);
 
       if(ok) {
         doc.setText(db);

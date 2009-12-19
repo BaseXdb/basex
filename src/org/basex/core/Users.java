@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Table;
-import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
@@ -127,7 +126,7 @@ public final class Users extends ArrayList<User> {
   private void read(final DataInput in) throws IOException {
     final int s = in.readNum();
     for(int u = 0; u < s; u++) {
-      final User user = new User(Token.string(in.readBytes()),
+      final User user = new User(string(in.readBytes()),
         in.readBytes(), in.readNum());
       add(user);
     }
@@ -184,6 +183,7 @@ public final class Users extends ArrayList<User> {
       table.contents.add(entry);
     }
     table.sort();
+    table.toTop(token(ADMIN));
     return table.finish();
   }
 }

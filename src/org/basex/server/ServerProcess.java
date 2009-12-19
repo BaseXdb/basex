@@ -83,7 +83,7 @@ public final class ServerProcess extends Thread {
 
   @Override
   public void run() {
-    log.write(this, "LOGIN " + context.user.name, "successful");
+    log.write(this, "LOGIN " + context.user.name, "OK");
     String input = null;
     try {
       while(true) {
@@ -129,9 +129,10 @@ public final class ServerProcess extends Thread {
         send(ok);
         stopTimer();
         sem.after(up);
-        log.write(this, proc, perf, ok ? "OK" : INFOERROR + inf);
+        final String pr = proc.toString().replaceAll("\\r|\\n", " ");
+        log.write(this, pr, ok ? "OK" : INFOERROR + inf, perf);
       }
-      log.write(this, "LOGOUT " + context.user.name);
+      log.write(this, "LOGOUT " + context.user.name, "OK");
     } catch(final IOException ex) {
       log.write(this, input, INFOERROR + ex.getMessage());
       Main.error(ex, false);

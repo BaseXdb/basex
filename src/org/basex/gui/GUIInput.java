@@ -214,13 +214,10 @@ public final class GUIInput extends BaseXTextField {
    */
   private void createCombo(final StringList sl) {
     if(sl == null || sl.size() == 0) {
-      //box.setSelectedItem(null);
       pop.setVisible(false);
       return;
     }
-
     if(comboChanged(sl)) {
-      //box.setSelectedItem(null);
       box.setModel(new DefaultComboBoxModel(sl.finish()));
       box.setSelectedIndex(-1);
       pop = new ComboPopup(box);

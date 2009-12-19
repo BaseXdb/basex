@@ -141,7 +141,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    */
   private void font(final Font f) {
     font = f;
-    off = f.getSize() >> 2;
+    off = (f.getSize() + 1) >> 2;
     fontH = f.getSize() + off;
     fwidth = GUIConstants.fontWidths(f);
   }

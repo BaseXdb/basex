@@ -152,27 +152,21 @@ public final class PlotView extends View {
     xCombo = new BaseXCombo(new String[] {}, gui);
     xCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(plotData.xAxis.setAxis((String) xCombo.getSelectedItem())) {
-          plotChanged = true;
-          markingChanged = true;
-          repaint();
-        }
+        setAxis(plotData.xAxis, xCombo);
       }
     });
     yCombo = new BaseXCombo(new String[] {}, gui);
     yCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
-        if(plotData.yAxis.setAxis((String) yCombo.getSelectedItem())) {
-          plotChanged = true;
-          markingChanged = true;
-          repaint();
-        }
+        setAxis(plotData.yAxis, yCombo);
       }
     });
     itemCombo = new BaseXCombo(new String[] {}, gui);
     itemCombo.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final String item = (String) itemCombo.getSelectedItem();
+        plotData.xAxis.log = gui.prop.is(GUIProp.PLOTXLOG);
+        plotData.yAxis.log = gui.prop.is(GUIProp.PLOTYLOG);
         if(plotData.setItem(item)) {
           plotChanged = true;
           markingChanged = true;
@@ -225,6 +219,26 @@ public final class PlotView extends View {
   }
 
   /**
+   * Changes the axis assignment.
+   * @param ax plot axis
+   * @param cb combo box
+   */
+  void setAxis(final PlotAxis ax, final BaseXCombo cb) {
+    final String cs = (String) cb.getSelectedItem();
+    if(!ax.setAxis(cs)) return;
+    plotChanged = true;
+    markingChanged = true;
+    repaint();
+
+    // prevent both combo boxes to show the same category
+    final BaseXCombo ocb = cb == xCombo ? yCombo : xCombo;
+    if(cs.equals(ocb.getSelectedItem())) {
+      final int i = ocb.getSelectedIndex();
+      ocb.setSelectedIndex(i > 0 ? i - 1 : i + 1);
+    }
+  }
+  
+  /**
    * Creates a buffered image for items.
    * @param focus create image of focused item if true
    * @param marked create image of marked item
@@ -264,23 +278,11 @@ public final class PlotView extends View {
 
     // overdraw plot background
     /*g.setColor(color1);
-    g.fillRect(MARGIN[1] + sz, MARGIN[0], plotWidth - sz,
-        plotHeight - sz);*/
+    g.fillRect(MARGIN[1] + sz, MARGIN[0], plotWidth - sz, plotHeight - sz);*/
 
     // draw axis and grid
-      drawAxis(g, true);
-      drawAxis(g, false);
-
-    // draw dark plot bounder
-    /*g.setColor(color6);
-    final int w = getWidth();
-    final int h = getHeight();
-    g.drawLine(MARGIN[1] + sz, MARGIN[0], w - MARGIN[3], MARGIN[0]);
-    g.drawLine(MARGIN[1] + sz, h - MARGIN[2] - sz, w - MARGIN[3],
-        h - MARGIN[2] - sz);
-    g.drawLine(MARGIN[1] + sz, MARGIN[0], MARGIN[1] + sz,
-        h - MARGIN[2] - sz);
-    g.drawLine(w - MARGIN[3], MARGIN[0], w - MARGIN[3], h - MARGIN[2] - sz);*/
+    drawAxis(g, true);
+    drawAxis(g, false);
 
     // draw items
     g.setColor(color6);
@@ -328,7 +330,7 @@ public final class PlotView extends View {
     final int f = plotData.findPre(gui.context.focused);
     if(f > -1) {
       // determine number of overlapping nodes (plotting second)
-      final int ol = getOverlappingNodes(f).length;
+      final int ol = overlappingNodes(f).length;
       if(!dragging) {
         final double x1 = plotData.xAxis.co[f];
         final double y1 = plotData.yAxis.co[f];
@@ -399,7 +401,7 @@ public final class PlotView extends View {
     smooth(gi);
 
     final Nodes marked = gui.context.marked;
-    if(marked.size() <= 0) return;
+    if(marked.size() == 0) return;
     final int[] m = Arrays.copyOf(marked.nodes, marked.nodes.length);
     int i = 0;
 
@@ -688,7 +690,7 @@ public final class PlotView extends View {
   private void drawCaptionAndGrid(final Graphics g, final boolean drawX,
       final String caption, final double d) {
     String cap = caption;
- // if label is too long, it is is chopped to the first characters
+    // if label is too long, it is is chopped to the first characters
     if(cap.length() > maxL) cap = cap.substring(0, cutOff) + "..";
 
     final int pos = calcCoordinate(drawX, d);
@@ -946,7 +948,7 @@ public final class PlotView extends View {
    * @param pre position of pre value in the sorted array of plotted nodes
    * @return nodes
    */
-  private int[] getOverlappingNodes(final int pre) {
+  private int[] overlappingNodes(final int pre) {
     final IntList il = new IntList();
     // get coordinates for focused item
     final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
@@ -1110,7 +1112,7 @@ public final class PlotView extends View {
     // node marking if item focused. if more than one icon is in focus range
     // all of these are marked. focus range means exact same x AND y coordinate.
     final int pre = plotData.findPre(gui.context.focused);
-    final int[] il = getOverlappingNodes(pre);
+    final int[] il = overlappingNodes(pre);
     // right mouse or shift down
     if(e.isShiftDown()) {
       final Nodes marked = gui.context.marked;

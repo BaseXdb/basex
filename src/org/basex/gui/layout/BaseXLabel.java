@@ -1,5 +1,6 @@
 package org.basex.gui.layout;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 
@@ -10,6 +11,13 @@ import javax.swing.border.EmptyBorder;
  * @author Christian Gruen
  */
 public final class BaseXLabel extends JLabel {
+  /** Icon type. */
+  public enum Icon {
+    /** Warning icon. */ WARN,
+    /** Error icon. */ ERR,
+    /** Success icon. */ OK
+  };
+  
   /**
    * Constructor.
    * @param txt label text
@@ -27,8 +35,7 @@ public final class BaseXLabel extends JLabel {
   public BaseXLabel(final String txt, final boolean dist, final boolean bold) {
     super(txt);
     if(dist) setBorder(0, 0, 8, 0);
-    final int s = bold ? 1 : 0;
-    if(getFont().getStyle() != s) setFont(getFont().deriveFont(s));
+    setFont(getFont().deriveFont(bold ? 1 : 0));
   }
 
   /**
@@ -43,13 +50,19 @@ public final class BaseXLabel extends JLabel {
   }
 
   /**
-   * Shows an error text, preceded by an error/warning icon.
+   * Shows an text, preceded by a state icon.
    * If the text is <code>null</code>, no text and icon is shown.
    * @param text warning text
-   * @param warning flag for displaying a warning or error icon
+   * @param icon flag for displaying a warning or error icon
    */
-  public void setError(final String text, final boolean warning) {
-    setIcon(text == null ? null : BaseXLayout.icon(warning ? "warn" : "error"));
+  public void setText(final String text, final Icon icon) {
+    ImageIcon ic = null;
+    switch(icon) {
+      case WARN: ic = BaseXLayout.icon("warn");  break;
+      case ERR : ic = BaseXLayout.icon("error"); break;
+      case OK  : ic = BaseXLayout.icon("ok");    break;
+    }
+    setIcon(text == null ? null : ic);
     setText(text == null ? " " : text);
   }
 

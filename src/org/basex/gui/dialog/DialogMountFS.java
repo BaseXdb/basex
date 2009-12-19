@@ -3,10 +3,9 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -26,6 +25,7 @@ import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.DataInput;
 import org.basex.io.IO;
 import org.basex.util.StringList;
@@ -76,13 +76,14 @@ public final class DialogMountFS extends Dialog {
     info.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(10,
         10, 10, 10)));
 
+    final Font f = choice.getFont();
     doc = new BaseXLabel(DIALOGINFO);
-    doc.setFont(getFont().deriveFont(16f));
+    doc.setFont(f.deriveFont(f.getSize2D() + 7f));
     doc.setBorder(0, 0, 2, 0);
     info.add(doc, BorderLayout.NORTH);
 
     detail = new BaseXText(false, this);
-    detail.setFont(getFont().deriveFont(10f));
+    detail.setFont(f);
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
     BaseXLayout.setWidth(detail, 420);
     info.add(detail, BorderLayout.CENTER);
@@ -97,12 +98,7 @@ public final class DialogMountFS extends Dialog {
     m.add(lab);
     m.add(new BaseXLabel(""));
     mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT), this);
-    mountpoint.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        action(null);
-      }
-    });
+    mountpoint.addKeyListener(keys);
     BaseXLayout.setWidth(mountpoint, 300);
     m.add(mountpoint);
     browse = new BaseXButton(BUTTONBROWSE, this);
@@ -176,7 +172,7 @@ public final class DialogMountFS extends Dialog {
       close();
     } else {
       ok = !db.isEmpty() && ctx.prop.dbexists(db);
-      warn.setError(null, false);
+      warn.setText(null, null);
       if(ok) {
         doc.setText(BUTTONMOUNT + " " + db + COL);
         DataInput in = null;
@@ -190,7 +186,7 @@ public final class DialogMountFS extends Dialog {
           final IO file = IO.get(mp);
           final boolean mpok = !mp.isEmpty() && file.exists() &&
             file.isDir();
-          if(!mpok) warn.setError(NOVALIDMOUNT, false);
+          if(!mpok) warn.setText(NOVALIDMOUNT, Icon.ERR);
           ok &= mpok;
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));

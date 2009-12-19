@@ -4,8 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import org.basex.core.Lang;
 import org.basex.core.Prop;
 import org.basex.data.Data;
@@ -67,12 +65,7 @@ public final class DialogPrefs extends Dialog {
     final Prop prop = gui.context.prop;
     final GUIProp gprop = gui.prop;
     path = new BaseXTextField(prop.get(Prop.DBPATH), this);
-    path.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) {
-        action(null);
-      }
-    });
+    path.addKeyListener(keys);
 
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, this);
     button.addActionListener(new ActionListener() {

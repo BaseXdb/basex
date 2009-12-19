@@ -4,8 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.nio.charset.Charset;
 import java.util.SortedMap;
 import org.basex.core.Prop;
@@ -19,6 +17,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.IO;
 
 /**
@@ -67,10 +66,7 @@ public final class DialogExport extends Dialog {
     IO io = gui.context.data.meta.file;
     final String fn = file ? io.path() : io.getDir();
     path = new BaseXTextField(fn, this);
-    path.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) { action(null); }
-    });
+    path.addKeyListener(keys);
     p.add(path);
 
     final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
@@ -98,11 +94,8 @@ public final class DialogExport extends Dialog {
       for(final String s : encodings) f |= s.equals(enc);
     }
     encoding.setSelectedItem(f ? enc : prop.get(Prop.XMLENCODING));
-    encoding.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) { action(null); }
-    });
-    BaseXLayout.setWidth(encoding, BaseXTextField.TWIDTH);
+    encoding.addKeyListener(keys);
+    BaseXLayout.setWidth(encoding, BaseXTextField.DWIDTH);
     p.add(encoding);
     pp.add(p);
 
@@ -158,8 +151,8 @@ public final class DialogExport extends Dialog {
     ok = !empty && (file && (!exists || !io.isDir()) ||
         !file && (!exists || io.isDir()));
 
-    info.setError(ok && file && exists ? OVERFILE : !ok && !empty ?
-        INVPATH : null, ok);
+    info.setText(ok && file && exists ? OVERFILE : !ok && !empty ?
+        INVPATH : null, ok ? null : Icon.ERR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

@@ -1,5 +1,6 @@
 package org.basex.gui.dialog;
 
+import static org.basex.gui.layout.BaseXKeys.*;
 import static javax.swing.JOptionPane.*;
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
@@ -38,7 +39,7 @@ public abstract class Dialog extends JDialog {
   protected final KeyAdapter keys = new KeyAdapter() {
     @Override
     public void keyReleased(final KeyEvent e) {
-      action(null);
+      if(!modifier(e)) action(pressed(ENTER, e) ? e.getSource() : null);
     }
   };
 

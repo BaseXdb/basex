@@ -2,6 +2,7 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -64,8 +65,9 @@ public final class DialogInfo extends Dialog {
     final Data data = gui.context.data;
     final MetaData meta = data.meta;
 
+    final Font f = tab1.getFont();
     final BaseXLabel doc = new BaseXLabel(meta.name);
-    doc.setFont(getFont().deriveFont(18f));
+    doc.setFont(f.deriveFont(f.getSize2D() + 7f));
     doc.setBorder(0, 0, 5, 0);
     tab1.add(doc, BorderLayout.NORTH);
 
@@ -76,7 +78,7 @@ public final class DialogInfo extends Dialog {
     }
 
     final BaseXText text = text(info.finish());
-    text.setFont(getFont());
+    text.setFont(f);
     BaseXLayout.setHeight(text, 350);
     tab1.add(text, BorderLayout.CENTER);
 

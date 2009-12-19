@@ -4,8 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
@@ -20,6 +18,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.IO;
 import org.basex.util.StringList;
 
@@ -84,10 +83,7 @@ public final class DialogCreate extends Dialog {
     p.add(new BaseXLabel(""));
 
     path = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
-    path.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) { action(null); }
-    });
+    path.addKeyListener(keys);
     p.add(path);
 
     final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
@@ -104,10 +100,7 @@ public final class DialogCreate extends Dialog {
 
     dbname = new BaseXTextField(this);
     dbname.setText(IO.get(gprop.get(GUIProp.OPENPATH)).dbname());
-    dbname.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyReleased(final KeyEvent e) { action(null); }
-    });
+    dbname.addKeyListener(keys);
     p.add(dbname);
 
     filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
@@ -236,17 +229,17 @@ public final class DialogCreate extends Dialog {
     ok = exists && !nm.isEmpty();
 
     String inf = !exists ? PATHWHICH : !ok ? DBWHICH : null;
-    boolean warn = false;
+    Icon icon = Icon.ERR;
     if(ok) {
       ok = IO.valid(nm);
       if(!ok) {
         inf = Main.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
         inf = RENAMEOVER;
-        warn = true;
+        icon = Icon.WARN;
       }
     }
-    info.setError(inf, warn);
+    info.setText(inf, icon);
     filter.setEnabled(exists && file.isDir());
     enableOK(buttons, BUTTONOK, ok);
   }

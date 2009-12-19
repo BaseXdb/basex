@@ -523,10 +523,8 @@ public interface Text {
   String PERMNO = lang("ad_permno");
   /** Invalid permissions. */
   String PERMINV = lang("ad_perminv");
-  /** Permission granted. */
-  String PERMDEL = lang("ad_permdel");
   /** Permission revoked. */
-  String PERMADD = lang("ad_permadd");
+  String PERMUP = lang("ad_permup");
   /** User not found. */
   String USERNO = lang("ad_userno");
   /** User dropped. */
@@ -886,11 +884,9 @@ public interface Text {
   /** Button text for canceling actions. */
   String BUTTONCANCEL = lang("b_cancel");
   /** Button text for deleting files. */
-  String BUTTONDROP = lang("b_drop") + DOTS;
+  String BUTTONDROP = lang("b_drop");
   /** Button text for browsing files/directories. */
   String BUTTONBROWSE = lang("b_browse") + DOTS;
-  /** Button text for changing things. */
-  String BUTTONCHANGE = lang("b_change");
   /** Button text for creating things. */
   String BUTTONCREATE = lang("b_create");
   /** Button text for alter password. */
@@ -905,8 +901,6 @@ public interface Text {
   String BUTTONDISCONNECT = lang("b_disconnect");
   /** Button for refreshing. */
   String BUTTONREFRESH = lang("b_refresh");
-  /** Button for removing. */
-  String BUTTONREMOVE = lang("b_remove");
   /** Button for deleting. */
   String BUTTONDELETE = lang("b_delete");
   /** Button for deleting all. */
@@ -1058,16 +1052,12 @@ public interface Text {
   String LOCALPORT = lang("ds_localport");
   /** Create User. */
   String CREATEU = lang("ds_createu");
-  /** Drop User. */
-  String DROPU = lang("ds_dropu");
   /** Permissions. */
   String PERMS = lang("ds_perms") + COLS;
   /** Question for dropping user. */
   String DRQUESTION = lang("ds_drquestion");
   /** Alter password. */
   String ALTERPW = lang("ds_alterpw");
-  /** New password. */
-  String NEWPW = lang("ds_newpw") + COLS;
   /** Invalid. */
   String INVALID = lang("ds_invalid") + DOT;
   /** Login. */

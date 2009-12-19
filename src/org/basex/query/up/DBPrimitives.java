@@ -118,11 +118,8 @@ final class DBPrimitives extends Primitives {
         par = parT;
       }
       final UpdatePrimitive[] upd = op.get(pre);
-      UpdatePrimitive p;
-      int j = 0;
-      int add = 0;
-      while(j < upd.length) {
-        p = upd[j++];
+      for(int j = 0, add = 0; j < upd.length; j++) {
+        final UpdatePrimitive p = upd[j];
         final PrimitiveType t = p.type();
         p.apply(add);
         check = t == INSERTBEFORE || t == REPLACENODE || t == DELETE;

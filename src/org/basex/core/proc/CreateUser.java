@@ -9,7 +9,7 @@ import org.basex.io.PrintOutput;
  * Evaluates the 'create user' command and creates a new user.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class CreateUser extends AAdmin {
   /**

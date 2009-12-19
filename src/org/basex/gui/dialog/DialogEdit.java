@@ -13,7 +13,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.util.StringList;
 import org.basex.util.XMLToken;
 
@@ -83,24 +83,24 @@ public final class DialogEdit extends Dialog {
       old3 = data.atom(pre);
     }
     final BaseXBack b = new BaseXBack();
-    b.setLayout(new TableLayout(2, 1, 0, 4));
+    b.setLayout(new BorderLayout(0, 4));
     if(old1 != null) {
       input1 = new BaseXTextField(old1, this);
       input1.addKeyListener(keys);
       BaseXLayout.setWidth(input1, 320);
-      b.add(input1);
+      b.add(input1, BorderLayout.NORTH);
     }
     if(old2 != null) {
       input2 = new BaseXTextField(old2, this);
       input2.addKeyListener(keys);
-      b.add(input2);
+      b.add(input2, BorderLayout.CENTER);
     }
     if(old3 != null) {
       input3 = new BaseXText(true, this);
       input3.setText(old3);
       input3.addKeyListener(keys);
       input3.setPreferredSize(new Dimension(320, 200));
-      b.add(input3);
+      b.add(input3, BorderLayout.CENTER);
       setResizable(true);
     }
     pp.add(b, BorderLayout.CENTER);
@@ -128,7 +128,7 @@ public final class DialogEdit extends Dialog {
       ok = XMLToken.isQName(token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Main.info(INVALID, EDITNAME);
     }
-    info.setError(msg, true);
+    info.setText(msg, Icon.WARN);
     enableOK(buttons, BUTTONOK, ok);
   }
 
