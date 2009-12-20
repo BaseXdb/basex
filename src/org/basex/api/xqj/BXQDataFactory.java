@@ -208,7 +208,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       final LSOutput output = impl.createLSOutput();
       output.setByteStream(ba);
       impl.createLSSerializer().write(v, output);
-    } catch(Exception e) {
+    } catch(final Exception e) {
       e.printStackTrace();
     }
     return new BXQItem(createDB(new IOContent(ba.toByteArray())), this);
