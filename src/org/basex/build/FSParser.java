@@ -2,11 +2,8 @@ package org.basex.build;
 
 import java.io.File;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Text;
-import org.basex.core.proc.CreateDB;
-import org.deepfs.fs.DeepFS;
 import org.deepfs.util.FSImporter;
 import org.deepfs.util.FSTraversal;
 import org.deepfs.util.FSWalker;
@@ -26,16 +23,12 @@ public final class FSParser extends Progress {
    * Constructor.
    * @param path import root
    * @param ctx the database context to use
-   * @param dbname the name of the database to create
+   * @param dbname name of the database
    */
   public FSParser(final String path, final Context ctx, final String dbname) {
-    final CreateDB c = new CreateDB("<" + DeepFS.S_FSML + "/>", dbname);
-    if(!c.execute(ctx)) Main.notexpected(
-        "Failed to create file system database (%).", c.info());
-
     fsi = new FSImporter(ctx);
     roots = path.equals("/") ? File.listRoots() : new File[] { new File(path) };
-    ctx.data.meta.deepfs = true;
+    fsi.createDB(dbname);
   }
 
   /** Recursively parses the given path. */

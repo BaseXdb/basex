@@ -7,9 +7,11 @@ import java.nio.ByteBuffer;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.CreateDB;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.ParserException;
@@ -63,6 +65,17 @@ public final class FSImporter implements FSTraversal {
       return;
     }
     spotlight = null;
+  }
+  
+  /**
+   * Creates a fsml database.
+   * @param dbname name of the database
+   */
+  public void createDB(final String dbname) {
+    final CreateDB c = new CreateDB("<" + DeepFS.S_FSML + "/>", dbname);
+    if(!c.execute(ctx)) Main.notexpected(
+        "Failed to create file system database (%).", c.info());
+    ctx.data.meta.deepfs = true;
   }
 
   /**

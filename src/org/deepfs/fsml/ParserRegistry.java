@@ -3,6 +3,7 @@ package org.deepfs.fsml;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.basex.core.Main;
 import org.deepfs.fsml.parsers.IFileParser;
 import org.deepfs.fsml.parsers.TXTParser;
@@ -122,5 +123,20 @@ public final class ParserRegistry {
       }
     }
     return fallbackParserInstance;
+  }
+  
+  /**
+   * Returns all available parsers.
+   * @return all available parsers
+   */
+  public String[][] availableParsers() {
+    final String[][] parsers = new String[REGISTRY.size()][];
+    int i = 0;
+    for(Entry<String, Class<? extends IFileParser>> parser :
+      REGISTRY.entrySet()) {
+      parsers[i++] = new String[] { parser.getKey(),
+          parser.getValue().getName()};
+    }
+    return parsers;
   }
 }

@@ -368,7 +368,6 @@ public final class PlotView extends View {
         final int ww = getWidth();
 
         final byte[] nm = ViewData.attValue(data, data.nameID, focused);
-        if(nm != null) System.out.println(string(nm));
         String name = nm != null ? string(nm) : "";
         if(name.length() > 0 && plotData.xAxis.attrID != data.nameID &&
             plotData.yAxis.attrID != data.nameID) {
