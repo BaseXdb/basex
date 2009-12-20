@@ -239,7 +239,7 @@ public class AxisPath extends Path {
    */
   private ArrayList<PathNode> pathNodes(final Data data, final int l) {
     // convert single descendant step to child steps
-    if(!data.meta.pathindex || !data.meta.uptodate || data.ns.size() != 0)
+    if(!data.meta.pthindex || !data.meta.uptodate || data.ns.size() != 0)
       return null;
 
     ArrayList<PathNode> in = data.path.root();
@@ -441,7 +441,7 @@ public class AxisPath extends Path {
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
 
-    if(data != null && !data.meta.pathindex && data.meta.uptodate &&
+    if(data != null && data.meta.pthindex && data.meta.uptodate &&
         data.ns.size() == 0) {
 
       ArrayList<PathNode> nodes = data.path.root();

@@ -46,6 +46,7 @@ public final class Optimize extends ACreate {
     data.path.init();
     data.tags.init();
     data.atts.init();
+    data.meta.dirty = true;
 
     final int[] parStack = new int[IO.MAXHEIGHT];
     final int[] tagStack = new int[IO.MAXHEIGHT];
@@ -83,7 +84,7 @@ public final class Optimize extends ACreate {
     data.meta.uptodate = true;
 
     try {
-      data.meta.pathindex |= prop.is(Prop.PATHINDEX);
+      data.meta.pthindex |= prop.is(Prop.PATHINDEX);
       data.meta.txtindex |= prop.is(Prop.TEXTINDEX);
       data.meta.atvindex |= prop.is(Prop.ATTRINDEX);
       data.meta.ftxindex |= prop.is(Prop.FTINDEX);

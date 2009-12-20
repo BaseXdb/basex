@@ -22,14 +22,12 @@ public interface Commands {
   /** Show command definitions. */
   enum CmdPerm { READ, WRITE, CREATE, ADMIN, ALL }
   /** Set command definitions. */
-  enum CmdSet {
-    INFO, DEBUG, SERIALIZE, CHOP, ENTITY, TEXTINDEX, ATTRINDEX, FTINDEX,
-    PATHINDEX, DBPATH
-  }
-  /** Node types. Must have same order as node kinds defined in {@link Data}. */
-  enum CmdUpdate { FRAGMENT, ELEMENT, TEXT, ATTRIBUTE, COMMENT, PI }
+  enum CmdSet { INFO, DEBUG, SERIALIZE, CHOP, ENTITY, TEXTINDEX, ATTRINDEX,
+    FTINDEX, PATHINDEX, DBPATH }
   /** Index types. */
   enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, PATH }
+  /** Index types. */
+  enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
 
   /** Command flag: command which will not be shown in the help. */
   int HID = 1;
@@ -47,8 +45,8 @@ public interface Commands {
     HQ(HID, HELPQ), XQUERY(HELPXQUERY), X(HID), FIND(HELPFIND),
     RUN(HELPRUN), CS(HELPCS),
     // Admin commands
-    HA(HID, HELPA), KILL(HELPKILL), SHOW(HELPSHOW),
-    GRANT(HELPGRANT), REVOKE(HELPREVOKE), ALTER(HELPALTER),
+    HA(HID, HELPA), SHOW(HELPSHOW), GRANT(HELPGRANT), REVOKE(HELPREVOKE),
+    ALTER(HELPALTER), KILL(HELPKILL),
     // General commands
     HG(HID, HELPG), SET(HELPSET), PASSWORD(HELPPASSWORD),
     HELP(HELPHELP), EXIT(HELPEXIT), Q(HID), QUIT(HID);

@@ -4,8 +4,7 @@ import static org.basex.data.DataText.*;
 import java.io.File;
 import java.io.IOException;
 import org.basex.core.Prop;
-import org.basex.index.FTFuzzy;
-import org.basex.index.FTTrie;
+import org.basex.index.FTIndex;
 import org.basex.index.Index;
 import org.basex.index.Names;
 import org.basex.index.Values;
@@ -58,8 +57,7 @@ public final class DiskData extends Data {
       init();
       if(meta.txtindex) txtindex = new Values(this, true);
       if(meta.atvindex) atvindex = new Values(this, false);
-      if(meta.ftxindex) ftxindex = meta.wildcards ?
-          new FTTrie(this) : new FTFuzzy(this);
+      if(meta.ftxindex) ftxindex = FTIndex.get(this, meta.wildcards);
     } catch(final IOException ex) {
       throw ex;
     } finally {
@@ -159,7 +157,7 @@ public final class DiskData extends Data {
       case TXT: if(meta.txtindex) txtindex = index; break;
       case ATV: if(meta.atvindex) atvindex = index; break;
       case FTX: if(meta.ftxindex) ftxindex = index; break;
-      case PTH: if(meta.pathindex) path = (PathSummary) index; break;
+      case PTH: if(meta.pthindex) path = (PathSummary) index; break;
       default: break;
     }
   }

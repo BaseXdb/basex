@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.BuildException;
@@ -78,7 +77,7 @@ public final class CreateDB extends ACreate {
    */
   public static Data xml(final Context ctx, final IO io, final String name)
       throws IOException {
-    
+
     if(!ctx.user.perm(User.CREATE))
       throw new IOException(Main.info(PERMNO, CmdPerm.READ));
     if(!io.exists()) throw new BuildException(FILEWHICH, io);

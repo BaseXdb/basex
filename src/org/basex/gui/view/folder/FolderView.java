@@ -3,7 +3,6 @@ package org.basex.gui.view.folder;
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 import static org.basex.gui.layout.BaseXKeys.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -18,9 +17,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
-
 import javax.swing.SwingUtilities;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIFS;
@@ -435,7 +432,7 @@ public final class FolderView extends View {
     if(getCursor() == CURSORHAND && data.fs != null) {
       try {
         data.fs.launch(gui.context.focused);
-      } catch (IOException ex) {
+      } catch (final IOException ex) {
         Dialog.info(this, NODEFAULTAPP);
       }
     }

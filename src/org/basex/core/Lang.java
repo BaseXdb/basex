@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
 import org.basex.BaseX;
 import org.basex.io.IOFile;
 import org.basex.util.StringList;

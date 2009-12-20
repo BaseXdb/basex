@@ -2,7 +2,6 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
-
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -69,7 +68,7 @@ public final class DialogPass extends Dialog {
     if(!ok) return;
     super.close();
   }
-  
+
   /**
    * Returns the password.
    * @return password

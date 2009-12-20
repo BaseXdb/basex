@@ -41,7 +41,7 @@ final class TreeCaching implements TreeViewOptions {
   private void cacheNodes(final Data data) {
 
     nodesPerLevel = null;
-    ArrayList<int[]> nL = new ArrayList<int[]>();
+    final ArrayList<int[]> nL = new ArrayList<int[]>();
 
     int[] parentList = { 0};
     int level = 0;
@@ -140,7 +140,7 @@ final class TreeCaching implements TreeViewOptions {
 
     for(int r = 0; r < rc; r++) {
 
-      int root = roots[r];
+      final int root = roots[r];
 
       if(root > 0) {
 //        generateLevelBorders(d, root);
@@ -150,9 +150,9 @@ final class TreeCaching implements TreeViewOptions {
       bigRectangle = new boolean[maxLevel];
 
       for(int i = 0; i < maxLevel; i++) {
-        int[] currLine = nodesPerLevel.get(i);
-        int lS = currLine.length;
-        double w = width / lS;
+        final int[] currLine = nodesPerLevel.get(i);
+        final int lS = currLine.length;
+        final double w = width / lS;
 
         if(w < 2) {
           bigRectangle[i] = true;
@@ -173,7 +173,7 @@ final class TreeCaching implements TreeViewOptions {
    */
   private RectangleCache[] bigRectangle(final double w) {
     final RectangleCache bigRect = new RectangleCache(0, (int) w);
-    RectangleCache[] rL = { bigRect};
+    final RectangleCache[] rL = { bigRect};
     return rL;
   }
 
@@ -200,7 +200,7 @@ final class TreeCaching implements TreeViewOptions {
       final double boxMiddle = xx + ww / 2f;
 
       if(SLIM_TO_TEXT) {
-        String st = getText(d, getPrePerLevelAndIndex(l, i));
+        final String st = getText(d, getPrePerLevelAndIndex(l, i));
         int o = calcOptimalRectWidth(g, st) + 10;
         if(o < MIN_SPACE) o = MIN_SPACE;
 
@@ -226,8 +226,8 @@ final class TreeCaching implements TreeViewOptions {
    * @return TreeRect array
    */
   TreeRect[] getTreeRectsPerLevel(final int l) {
-    int s = isBigRectangle(l) ? 1 : getSizePerLevel(l);
-    TreeRect[] tr = new TreeRect[s];
+    final int s = isBigRectangle(l) ? 1 : getSizePerLevel(l);
+    final TreeRect[] tr = new TreeRect[s];
 
     for(int i = 0; i < s; i++) {
       tr[i] = getTreeRect(l, i);
@@ -291,7 +291,7 @@ final class TreeCaching implements TreeViewOptions {
    */
   TreeRect searchRect(final int lv, final int pre) {
 
-    int[] pres = nodesPerLevel.get(lv);
+    final int[] pres = nodesPerLevel.get(lv);
     TreeRect rect = null;
     int l = 0;
     int r = pres.length - 1;
@@ -337,7 +337,7 @@ final class TreeCaching implements TreeViewOptions {
    * @return TreeRect
    */
   private TreeRect getTreeRect(final int l, final int i) {
-    TreeRect r = new TreeRect(rectsPerLevel.get(l)[i]);
+    final TreeRect r = new TreeRect(rectsPerLevel.get(l)[i]);
     r.pre = isBigRectangle(l) ? -1 : nodesPerLevel.get(l)[i];
     return r;
   }
@@ -350,7 +350,7 @@ final class TreeCaching implements TreeViewOptions {
    */
   String getText(final Data data, final int pre) {
     final int k = data.kind(pre);
-    TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
 
     if(data.meta.deepfs) {
       if(data.fs.isFile(pre)) tb.add(data.fs.name(pre));

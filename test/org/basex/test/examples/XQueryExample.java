@@ -28,10 +28,10 @@ public final class XQueryExample {
    */
   public static void main(final String[] args) throws Exception {
     // Creates a database context
-    Context context = new Context();
+    final Context context = new Context();
 
     // Creates a print output
-    PrintOutput out = new PrintOutput(System.out);
+    final PrintOutput out = new PrintOutput(System.out);
     // Alternative: write results to disk
     // PrintOutput out = new PrintOutput("result.txt");
 
@@ -45,12 +45,12 @@ public final class XQueryExample {
     // Creates a query instance
     QueryProcessor processor = new QueryProcessor(QUERY, context);
     // Returns a query iterator
-    Iter iter = processor.iter();
+    final Iter iter = processor.iter();
     // Creates a result serializer
     XMLSerializer xml = new XMLSerializer(out);
     // Uses an iterator to serialize the result
     while(true) {
-      Item item = iter.next();
+      final Item item = iter.next();
       if(item == null) break;
       item.serialize(xml);
     }
@@ -64,7 +64,7 @@ public final class XQueryExample {
     // Creates a query instance
     processor = new QueryProcessor(QUERY, context);
     // Executes the query.
-    Result result = processor.query();
+    final Result result = processor.query();
     // Creates a result serializer
     xml = new XMLSerializer(out);
     // Serializes the result

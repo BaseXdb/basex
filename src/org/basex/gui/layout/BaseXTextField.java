@@ -79,7 +79,7 @@ public class BaseXTextField extends JTextField {
         if(pressed(ESCAPE, e) || enter && text.isEmpty()) {
           area.requestFocusInWindow();
         } else if(enter || pressed(FINDNEXT, e) || pressed(FINDPREV, e)) {
-          area.find(text, pressed(FINDPREV, e));
+          area.find(text, pressed(FINDPREV, e) || e.isShiftDown());
         }
       }
       @Override

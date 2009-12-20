@@ -92,7 +92,7 @@ final class MapFSImages extends Thread {
 
   @Override
   public void run() {
-    while(loaderC > 0) {
+    while(loaderC > 0 && view.visible()) {
       final int id = idCache[--loaderC];
       int ww = wCache[loaderC];
       int hh = hCache[loaderC];
@@ -159,6 +159,7 @@ final class MapFSImages extends Thread {
       }
     }
     paint();
+    loaderC = 0;
     thread = null;
   }
 

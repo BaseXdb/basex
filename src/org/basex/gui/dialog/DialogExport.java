@@ -63,7 +63,7 @@ public final class DialogExport extends Dialog {
 
     file = gui.context.doc().length == 1;
 
-    IO io = gui.context.data.meta.file;
+    final IO io = gui.context.data.meta.file;
     final String fn = file ? io.path() : io.getDir();
     path = new BaseXTextField(fn, this);
     path.addKeyListener(keys);
@@ -152,7 +152,7 @@ public final class DialogExport extends Dialog {
         !file && (!exists || io.isDir()));
 
     info.setText(ok && file && exists ? OVERFILE : !ok && !empty ?
-        INVPATH : null, ok ? null : Icon.ERR);
+        INVPATH : null, ok ? Icon.WARN : Icon.ERR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

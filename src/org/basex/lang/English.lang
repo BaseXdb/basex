@@ -23,8 +23,8 @@ m_layout=Layout
 b_ok=OK
 b_opt=Optimize
 b_rename=Rename
-b_open= Open
-b_mount= Mount
+b_open=Open
+b_mount=Mount
 b_cancel=Cancel
 b_drop=Drop
 b_cmd=Command
@@ -127,7 +127,7 @@ dq_question=Save changes to %?
 dx_outfile=Output file
 dx_outdir=Output directory
 dx_overfile=File will be overwritten.
-dx_indent=Indent with withespaces
+dx_indent=Indent with whitespaces
 dx_invpath=Invalid path.
 
 dp_title=Preferences
@@ -187,6 +187,28 @@ da_dev=Main Developer
 da_cont1=Team
 da_cont2=and others
 da_translation=Translation
+
+ds_localserver=Local Server
+ds_connect=Connection
+ds_users=Users
+ds_host=Host
+ds_port=Port
+ds_localport=Local Port
+ds_createu=Create User
+ds_perms=Permissions
+ds_drquestion=% User(s) will be dropped.\nAre you sure?
+ds_alterpw=Alter Password
+ds_invalid=% is invalid
+ds_adlogin=Administrator Login (local or remote)
+ds_databases=Databases
+ds_sessions=Sessions
+ds_logs=Logs
+ds_connected=Connected to %:%.
+ds_disconnected=Disconnected.
+ds_info1=This dialog is only intended to administer the client/server environment.
+ds_info2=It will not influence any other features of the GUI.
+
+# GUI Commands
 
 c_about=About %
 c_abouttt=Displays general information on the project.
@@ -285,26 +307,6 @@ c_replace=% already exists.\nDo you want to replace it?
 c_server=Server Administration
 c_servertt=Display the server administration for user management and log tracing.
 
-ds_localserver=Local Server
-ds_connect=Connection
-ds_users=Users
-ds_host=Host
-ds_port=Port
-ds_localport=Local Port
-ds_createu=Create User
-ds_perms=Permissions
-ds_drquestion=% User(s) will be dropped.\nAre you sure?
-ds_alterpw=Alter Password
-ds_invalid=% is invalid
-ds_adlogin=Administrator Login (local or remote)
-ds_databases=Databases
-ds_sessions=Sessions
-ds_logs=Logs
-ds_connected=Connected to %:%.
-ds_disconnected=Disconnected.
-ds_info1=This dialog is only intended to administer the client/server environment.
-ds_info2=It will not influence any other features of the GUI.
-
 # Commands & Processes
 proc_time=Time Needed
 proc_syntax=Syntax
@@ -317,7 +319,7 @@ cmd_no=Expecting command.
 cmd_unknown=Unknown command '%'
 cmd_similar=did you mean '%'?
 
-# Help Commands
+# Help Command
 help_short=try "%"
 help_intro=Try "%" to get some information.
 help_long=Try "% [...]" to get info on a specific command.

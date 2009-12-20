@@ -1,6 +1,6 @@
 package org.deepfs;
 
-import static org.basex.data.DataText.*;
+import static org.deepfs.fs.DeepFS.*;
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
 import java.io.File;
@@ -227,7 +227,7 @@ public final class DeepShell {
       System.err.printf("listing failed.\n");
       return;
     }
-    for(byte[] de : dents) Main.out(">> " + string(de));
+    for(final byte[] de : dents) Main.out(">> " + string(de));
   }
 
   /**

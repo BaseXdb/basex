@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import java.io.IOException;
 import org.basex.build.FSParser;
+import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -38,20 +39,21 @@ public final class CreateFS extends ACreate {
       final File f = new File(args[0]).getCanonicalFile();
       if(!f.exists()) return error(FILEWHICH, f.getAbsolutePath());
       path = f.getCanonicalPath();
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       return error(ex.getMessage());
     }
-    final String db = args[1];
 
-    FSParser parser = new FSParser(path, context, db);
+    final String db = args[1];
+    final FSParser parser = new FSParser(path, context, db);
     progress(parser);
     parser.parse();
 
     final Optimize opt = new Optimize();
     progress(opt);
-    opt.execute(context);
-    new Open(db).execute(context);
-    return info(DBCREATED, db, perf);
+    if(!opt.execute(context)) return error(opt.info());
+
+    final Proc pr = new Open(db);
+    return pr.execute(context) ? info(DBCREATED, db, perf) : error(pr.info());
   }
 
   @Override

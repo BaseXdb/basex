@@ -2,15 +2,12 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.IOException;
-
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -46,11 +43,11 @@ public final class DialogOpen extends Dialog {
   /** Buttons. */
   private BaseXBack buttons;
   /** Rename button. */
-  private Object rename;
+  private final Object rename;
   /** Drop button. */
-  private Object drop;
+  private final Object drop;
   /** Open button. */
-  private Object open;
+  private final Object open;
 
   /**
    * Default constructor.

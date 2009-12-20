@@ -9,7 +9,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.Box;
-import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import org.basex.core.Main;
@@ -25,6 +24,7 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
+import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
@@ -36,11 +36,6 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class XQueryView extends View {
-  /** Ok icon. */
-  private static final ImageIcon OKICON = BaseXLayout.icon("ok");
-  /** Error icon. */
-  private static final ImageIcon ERRICON = BaseXLayout.icon("error");
-
   /** Header string. */
   final BaseXLabel header;
   /** Scroll Pane. */
@@ -120,8 +115,7 @@ public final class XQueryView extends View {
 
     info = new BaseXLabel(" ");
     info.setCursor(GUIConstants.CURSORHAND);
-    info.setText(STATUSOK);
-    info.setIcon(OKICON);
+    info.setText(STATUSOK, Icon.OK);
     info.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
@@ -238,8 +232,8 @@ public final class XQueryView extends View {
   public void info(final String inf, final boolean ok) {
     final int error = text.error(inf, ok);
     info.setName(error != -1 ? Integer.toString(error) : null);
-    info.setText(ok ? STATUSOK : inf.replaceAll(STOPPED + ".*\\r?\\n", ""));
-    info.setIcon(ok ? OKICON : ERRICON);
+    info.setText(ok ? STATUSOK : inf.replaceAll(STOPPED + ".*\\r?\\n", ""),
+        ok ? Icon.OK : Icon.ERR);
     info.setToolTipText(ok ? null : inf);
     stop.setEnabled(false);
   }

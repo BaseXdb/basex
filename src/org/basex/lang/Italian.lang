@@ -23,8 +23,8 @@ m_layout=Layout
 b_ok=OK
 b_opt=Ottimizza
 b_rename=Rinomina
-b_open= Apri
-b_mount= Mount
+b_open=Apri
+b_mount=Mount
 b_cancel=Annulla
 b_drop=Cancella
 b_cmd=Comando
@@ -127,7 +127,7 @@ dq_question=Save changes to %?
 dx_outfile=Output file
 dx_outdir=Output directory
 dx_overfile=File will be overwritten.
-dx_indent=Indent with withespaces
+dx_indent=Indent with whitespaces
 dx_invpath=Invalid path.
 
 dp_title=Preferenze
@@ -163,7 +163,6 @@ dy_green=Verde
 dy_blue=Blu
 
 dm_title=Map Layout
-# ADDED
 dm_atts=Mostra attributi
 dm_choice1=No Titolo, no Bordo
 dm_choice2=No Titolo, Bordo piccolo
@@ -188,6 +187,28 @@ da_dev=Sviluppatore principale
 da_cont1=Team
 da_cont2=ed altri
 da_translation=Traduzione
+
+ds_localserver=Local Server
+ds_connect=Connection
+ds_users=Users
+ds_host=Host
+ds_port=Port
+ds_localport=Local Port
+ds_createu=Create User
+ds_perms=Permissions
+ds_drquestion=% User(s) will be dropped.\nAre you sure?
+ds_alterpw=Alter Password
+ds_invalid=% non valido
+ds_adlogin=Administrator Login (local or remote)
+ds_databases=Databases
+ds_sessions=Sessions
+ds_logs=Logs
+ds_connected=Connected to %:%.
+ds_disconnected=Disconnected.
+ds_info1=This dialog is only intended to administer the client/server environment.
+ds_info2=It will not affect any other GUI features.
+
+# GUI Commands
 
 c_about=Su %
 c_abouttt=Mostra le informazioni generali sul progetto.
@@ -285,26 +306,6 @@ c_notsaved=Impossibile salvare il file.
 c_replace=Il file "%" esiste già.\nVuoi sovrascriverlo?
 c_server=Server Administration
 c_servertt=Display the server administration for user management and log tracing.
-
-ds_localserver=Local Server
-ds_connect=Connection
-ds_users=Users
-ds_host=Host
-ds_port=Port
-ds_localport=Local Port
-ds_createu=Create User
-ds_perms=Permissions
-ds_drquestion=% User(s) will be dropped.\nAre you sure?
-ds_alterpw=Alter Password
-ds_invalid=% non valido
-ds_adlogin=Administrator Login (local or remote)
-ds_databases=Databases
-ds_sessions=Sessions
-ds_logs=Logs
-ds_connected=Connected to %:%.
-ds_disconnected=Disconnected.
-ds_info1=This dialog is only intended to administer the client/server environment.
-ds_info2=It will not affect any other GUI features.
 
 # Commands & Processes
 proc_time=Tempo necessario

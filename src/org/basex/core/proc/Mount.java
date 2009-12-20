@@ -31,33 +31,25 @@ public final class Mount extends AAdmin {
     new Open(db).execute(context, out);
 
     final Data data = context.data;
-    if(data.fs == null) {
-      Main.err("No DeepFS instance");
-      return false;
-    }
+    if(data.fs == null) return error("No DeepFS instance");
+
+    if(!LibraryLoader.load(LibraryLoader.JFUSELIBNAME))
+      return error("Missing native fuse support.");
 
     final DeepFS fs = new DeepFS(context);
-
-    if(LibraryLoader.load(LibraryLoader.JFUSELIBNAME)) {
-      new Thread() {
-        @Override
-        public void run() {
-          try {
-            // DeepFSImpl.mount(mp, fs);
-            Class<?> cls = Class.forName("org.deepfs.DeepFSImpl");
-            Class<?>[] signature = new Class[2];
-            signature[0] = String.class;
-            signature[1] = DeepFS.class;
-            cls.getMethod("mount", signature).invoke(null, mp, fs);
-          } catch (Exception e) {
-            Main.err("Cannot mount: ", e);
-          }
+    new Thread() {
+      @Override
+      public void run() {
+        try {
+          // DeepFSImpl.mount(mp, fs);
+          final Class<?> cls = Class.forName("org.deepfs.DeepFSImpl");
+          cls.getMethod("mount", new Class[] { String.class, DeepFS.class }).
+            invoke(null, mp, fs);
+        } catch (final Exception e) {
+          Main.err("Cannot mount: ", e);
         }
-      }.start();
-    } else {
-      Main.err("Missing native fuse support.");
-      return false;
-    }
+      }
+    }.start();
     return true;
   }
 }

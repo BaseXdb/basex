@@ -124,7 +124,7 @@ public final class MapView extends View implements Runnable {
     final int f = gui.context.focused;
     if(f == -1) focused = null;
 
-    if(mainRects == null) return; // [CG] BL: mainRects is sometimes null 
+    if(mainRects == null) return;
     final int ms = mainRects.size;
     for(int mi = 0; mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
@@ -312,7 +312,7 @@ public final class MapView extends View implements Runnable {
   public void paintComponent(final Graphics g) {
     final Data data = gui.context.data;
     if(data == null) return;
-    
+
     if(mainRects == null || mainRects.size == 0 || mainRects.get(0).w == 0) {
       super.paintComponent(g);
       if(mainRects == null || mainRects.size != 0) refreshInit();

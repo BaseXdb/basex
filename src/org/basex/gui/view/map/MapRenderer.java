@@ -729,7 +729,7 @@ final class MapRenderer {
     wl = 0;
     final int is = tl.size();
     for(int i = 0; i < is; i++) {
-      int l = len.get(i);
+      final int l = len.get(i);
       if(wl + l + sw >= wi) {
         yy += fs + 1;
         wl = 0;

@@ -33,7 +33,7 @@ public final class FNGen extends Fun {
         return data(ctx.iter(expr[0]));
       case COLLECT:
         if(expr.length == 0) return ctx.coll(null);
-        Iter iter = ctx.iter(expr[0]);
+        final Iter iter = ctx.iter(expr[0]);
         Item it = iter.next();
         if(it == null) Err.empty(this);
         return ctx.coll(checkStr(it));

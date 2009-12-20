@@ -4,7 +4,6 @@ import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.io.PrintOutput;
 import org.basex.query.path.Axis;
 import org.basex.util.BoolList;
@@ -12,6 +11,7 @@ import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
+import org.deepfs.fs.DeepFS;
 import static org.basex.util.Token.*;
 
 /**
@@ -121,14 +121,14 @@ public final class Find extends AQuery {
       // check prefix
       char op = qu.charAt(0);
       if(op == '>') {
-        pred = DataText.S_SIZE;
+        pred = DeepFS.S_SIZE;
       } else if(op == '<') {
-        pred = DataText.S_SIZE;
+        pred = DeepFS.S_SIZE;
       } else if(op == '.') {
-        pred = DataText.S_SUFFIX;
+        pred = DeepFS.S_SUFFIX;
         op = '=';
       } else {
-        pred = DataText.S_NAME;
+        pred = DeepFS.S_NAME;
         exact = op == '=';
       }
 
@@ -140,14 +140,14 @@ public final class Find extends AQuery {
       final int i = qu.indexOf(' ');
       String t = qu.substring(0, i);
 
-      if(pred == DataText.S_SIZE) {
+      if(pred == DeepFS.S_SIZE) {
         t = Long.toString(calcNum(token(t)));
         if(!name.isEmpty()) name = "file";
       } else {
         // if dot is found inside the current term, add suffix check
         final int d = t.lastIndexOf(".");
         if(d != -1) {
-          xquery.add("[@" + DataText.S_SUFFIX + " = \"" +
+          xquery.add("[@" + DeepFS.S_SUFFIX + " = \"" +
               t.substring(d + 1) + "\"]");
         }
         t = "\"" + t + "\"";

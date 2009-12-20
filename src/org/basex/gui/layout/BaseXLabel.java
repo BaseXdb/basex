@@ -17,7 +17,7 @@ public final class BaseXLabel extends JLabel {
     /** Error icon. */ ERR,
     /** Success icon. */ OK
   };
-  
+
   /**
    * Constructor.
    * @param txt label text

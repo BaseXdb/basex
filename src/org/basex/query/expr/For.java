@@ -46,12 +46,11 @@ public final class For extends ForLet {
     expr = checkUp(expr, ctx).comp(ctx);
 
     // bind variable if single value is returned and if no variables are used
-    if(pos == null && score == null && expr.returned(ctx).single &&
-        !expr.uses(Use.VAR, ctx)) {
+    final Return ret = expr.returned(ctx);
+    if(pos == null && score == null && ret.single && !expr.uses(Use.VAR, ctx)) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
-      final Return ret = expr.returned(ctx);
       if     (ret == Return.NUMSEQ)   var.ret = Return.NUM;
       else if(ret == Return.NONUMSEQ) var.ret = Return.NONUM;
       else if(ret == Return.NODSEQ)   var.ret = Return.NOD;

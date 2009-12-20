@@ -2,7 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
-
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -32,7 +31,7 @@ final class DBPrimitives extends Primitives {
   DBPrimitives(final Data data) {
     d = data;
   }
-  
+
   @Override
   protected void add(final UpdatePrimitive p) throws QueryException {
     add(((DBNode) p.node).pre, p);
@@ -130,10 +129,10 @@ final class DBPrimitives extends Primitives {
     if(check) mergeTexts(par);
     d.flush();
   }
-  
+
   /**
-   * Merges any adjacent child text nodes for the given node. 
-   * @param par pre value of parent node.
+   * Merges any adjacent child text nodes for the given node.
+   * @param par pre value of parent node
    */
   private void mergeTexts(final int par) {
     if(par < 0) return;
@@ -142,17 +141,17 @@ final class DBPrimitives extends Primitives {
     while(p < l) {
       final int k = d.kind(p);
       if(k == Data.ELEM) p += d.size(p, k);
-      else if(p < l - 1 && k == Data.TEXT && 
+      else if(p < l - 1 && k == Data.TEXT &&
           UpdatePrimitive.mergeTexts(d, p, p + 1)) l--;
       else p++;
     }
   }
-  
+
   @Override
   protected boolean parentDeleted(final int n) {
     final UpdatePrimitive[] up = op.get(n);
-    
-    if(up != null) 
+
+    if(up != null)
       for(final UpdatePrimitive pr : up) if(pr.type() == REPLACENODE ||
         pr.type() == DELETE) return true;
 

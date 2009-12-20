@@ -31,6 +31,6 @@ public final class CreateColl extends ACreate {
 
   @Override
   public String toString() {
-    return Cmd.CREATE + " " + CmdCreate.DB + args();
+    return Cmd.CREATE + " " + CmdCreate.COLL + args();
   }
 }

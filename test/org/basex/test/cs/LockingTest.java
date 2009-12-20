@@ -210,8 +210,8 @@ public final class LockingTest {
           final String res = checkRes(new XQuery(QUERY), session2);
           if(!res.equals("192000")) err("test failed: " + res);
         } else {
-          String result = process(new XQuery("delete nodes //aa"), session2);
-          if(result != null) err("test failed: " + result);
+          final String res = process(new XQuery("delete nodes //aa"), session2);
+          if(res != null) err("test failed: " + res);
         }
         done = true;
       }

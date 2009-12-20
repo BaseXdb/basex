@@ -23,7 +23,7 @@ public final class DirParser extends Parser {
   /** Element counter. */
   private int c;
   /** Initial file path. */
-  private IO root;
+  private final IO root;
 
   /**
    * Constructor.

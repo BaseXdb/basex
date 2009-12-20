@@ -44,7 +44,7 @@ public final class FTTrie extends FTIndex {
    * @param d data reference
    * @throws IOException IO Exception
    */
-  public FTTrie(final Data d) throws IOException {
+  protected FTTrie(final Data d) throws IOException {
     super(d);
     inN = new DataAccess(d.meta.file(DATAFTX + 'a'));
     inD = new DataAccess(d.meta.file(DATAFTX + 'b'));
@@ -60,7 +60,7 @@ public final class FTTrie extends FTIndex {
     tb.add("- %: %" + NL, CREATEDC, AInfo.flag(data.meta.diacritics));
     final long l = inN.length() + inD.length() + inS.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
-    final IndexStats stats = new IndexStats();
+    final IndexStats stats = new IndexStats(data);
     addOccs(0, stats, EMPTY);
     stats.print(tb);
     return tb.finish();

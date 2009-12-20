@@ -1,13 +1,12 @@
 package org.deepfs.fsml.ser;
 
-import static org.basex.data.DataText.*;
+import static org.deepfs.fs.DeepFS.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Map.Entry;
-import org.basex.data.DataText;
 import org.basex.util.Atts;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.DeepFile;
@@ -81,8 +80,8 @@ public final class FSMLSerializer {
     final FSMLSerializer ser = new FSMLSerializer();
     final Atts atts = DeepFS.atts(file, root);
     final String name;
-    if(file.isDirectory()) name = root ? DataText.S_DEEPFS : DataText.S_DIR;
-    else name = DataText.S_FILE;
+    if(file.isDirectory()) name = root ? S_DEEPFS : S_DIR;
+    else name = S_FILE;
     ser.startElem(name, convAtts(atts), true);
     return ser.toString();
   }
@@ -117,10 +116,10 @@ public final class FSMLSerializer {
       final boolean close) {
     xml.append('<').append(e);
     if(atts != null) {
-      for(int i = 0; i < atts.length; i++) {
-        xml.append(' ').append(atts[i][0]);
+      for(final String[] att : atts) {
+        xml.append(' ').append(att[0]);
         xml.append('=').append('"');
-        text(atts[i][1]);
+        text(att[1]);
         xml.append('"');
       }
     }
@@ -207,10 +206,10 @@ public final class FSMLSerializer {
       if(subfile) { // content section
         atts.add(OFFSET, token(d.getOffset()));
         atts.add(SIZE, token(d.getSize()));
-        startElem(DataText.S_CONTENT, convAtts(atts));
+        startElem(S_CONTENT, convAtts(atts));
       } else { // regular file
         final Atts a = d.getFSAtts();
-        startElem(DataText.S_FILE, convAtts(a));
+        startElem(S_FILE, convAtts(a));
       }
 
       // serialize metadata
@@ -228,9 +227,9 @@ public final class FSMLSerializer {
           atts.reset();
           atts.add(OFFSET, token(t.getOffset()));
           atts.add(SIZE, token(t.getSize()));
-          startElem(DataText.S_TEXT_CONTENT, convAtts(atts));
+          startElem(S_TEXT_CONTENT, convAtts(atts));
           text(t.getContent());
-          endElem(DataText.S_TEXT_CONTENT);
+          endElem(S_TEXT_CONTENT);
         }
       }
 
@@ -241,15 +240,15 @@ public final class FSMLSerializer {
           atts.reset();
           atts.add(OFFSET, token(x.getOffset()));
           atts.add(SIZE, token(x.getSize()));
-          startElem(DataText.S_XML_CONTENT, convAtts(atts));
+          startElem(S_XML_CONTENT, convAtts(atts));
           xml(x.getContent());
-          endElem(DataText.S_XML_CONTENT);
+          endElem(S_XML_CONTENT);
         }
       }
 
       // process all content sections
       serializeDeepFiles(true, d.getContent());
-      endElem(subfile ? DataText.S_CONTENT : DataText.S_FILE);
+      endElem(subfile ? S_CONTENT : S_FILE);
     }
   }
 

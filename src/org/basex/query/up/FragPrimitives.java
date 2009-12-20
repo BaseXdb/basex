@@ -1,7 +1,6 @@
 package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
 import org.basex.query.up.primitives.PrimitiveType;
@@ -17,12 +16,12 @@ import org.basex.util.TokenSet;
  * @author Lukas Kircher
  */
 final class FragPrimitives extends Primitives {
-  
+
   @Override
   protected void add(final UpdatePrimitive p) throws QueryException {
     add(p.node.id(), p);
   }
-  
+
   @Override
   protected void check() throws QueryException {
     super.check();
@@ -42,7 +41,7 @@ final class FragPrimitives extends Primitives {
       put.apply(0);
     }
   }
-  
+
   @Override
   protected boolean parentDeleted(final int n) {
     return false;

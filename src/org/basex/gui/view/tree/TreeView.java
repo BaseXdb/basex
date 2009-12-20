@@ -181,11 +181,10 @@ public final class TreeView extends View implements TreeViewOptions {
     cache.generateRects(tIg, gui.context, getWidth());
 
     for(int i = 0; i < cache.maxLevel; i++) {
-      TreeRect[] lr = cache.getTreeRectsPerLevel(i);
-      int y = getYperLevel(i);
+      final TreeRect[] lr = cache.getTreeRectsPerLevel(i);
+      final int y = getYperLevel(i);
 
-      for(int z = 0; z < lr.length; z++) {
-        TreeRect r = lr[z];
+      for(final TreeRect r : lr) {
         drawRectangle(tIg, i, r.x, y, r.w, nodeHeight, BORDER_RECTANGLES,
             FILL_RECTANGLES, DRAW_RECTANGLE);
       }
@@ -238,7 +237,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @return draw color
    */
   private Color getColorPerLevel(final int l, final boolean fill) {
-    int till = l < CHANGE_COLOR_TILL ? l : CHANGE_COLOR_TILL;
+    final int till = l < CHANGE_COLOR_TILL ? l : CHANGE_COLOR_TILL;
     return fill ? COLORS[till] : COLORS[till + 2];
   }
 
@@ -493,10 +492,10 @@ public final class TreeView extends View implements TreeViewOptions {
 
         while(chIt.more()) {
 
-          TreeRect sRect = cache.searchRect(lv, chIt.next());
+          final TreeRect sRect = cache.searchRect(lv, chIt.next());
 
           g.setColor(new Color(0x38323D4F, true));
-          int parX = multiPreX == -1 ? (2 * r.x + r.w) / 2 : multiPreX;
+          final int parX = multiPreX == -1 ? (2 * r.x + r.w) / 2 : multiPreX;
           g.fillPolygon(new int[] { parX, sRect.x, sRect.x + sRect.w, sRect.x,
               sRect.x + sRect.w}, new int[] { getYperLevel(l) + nodeHeight,
               getYperLevel(lv) - 1, getYperLevel(lv) - 1,
@@ -509,7 +508,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(!(showParent && showChildren)) return;
 
-    String s = cache.getText(data, pre);
+    final String s = cache.getText(data, pre);
 
     final int w = BaseXLayout.width(g, s);
 
@@ -569,8 +568,8 @@ public final class TreeView extends View implements TreeViewOptions {
 
       final TreeRect[] rL = cache.getTreeRectsPerLevel(level);
 
-      for(int i = 0; i < rL.length; i++) {
-        final TreeRect r = rL[i];
+      for(final TreeRect element : rL) {
+        final TreeRect r = element;
 
         if(r.contains(mousePosX)) {
 

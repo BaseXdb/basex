@@ -79,7 +79,7 @@ final class MapDefault extends MapPainter {
       if(r.w > 3 && r.h >= prop.num(GUIProp.FONTSIZE)) drawRectangle(g, r);
     }
   }
-  
+
   @Override
   boolean drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;

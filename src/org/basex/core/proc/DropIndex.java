@@ -32,6 +32,7 @@ public final class DropIndex extends ACreate {
   @Override
   protected boolean exec(final PrintOutput out) {
     final Data data = context.data;
+    if(data instanceof MemData) return error(PROCMM);
 
     switch(getOption(CmdIndex.class)) {
       case TEXT:
@@ -44,8 +45,8 @@ public final class DropIndex extends ACreate {
         data.meta.ftxindex = false;
         return drop(Type.FTX, DATAFTX);
       case PATH:
-        if(data.meta.pathindex) {
-          data.meta.pathindex = false;
+        if(data.meta.pthindex) {
+          data.meta.pthindex = false;
           data.path.root = null;
           data.flush();
         }
@@ -64,7 +65,6 @@ public final class DropIndex extends ACreate {
   private boolean drop(final Type index, final String pat) {
     try {
       final Data data = context.data;
-      if(data instanceof MemData) return error(PROCMM);
       data.flush();
       data.closeIndex(index);
       return DropDB.delete(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?

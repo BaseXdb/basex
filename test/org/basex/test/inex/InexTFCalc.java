@@ -37,16 +37,16 @@ public final class InexTFCalc {
 
   /** Database context. */
   private final Context ctx = new Context();
+  /** Databases. */
+  private final StringList databases;
+  /** Container for qtimes and results. */
+  private final PrintOutput res = new PrintOutput(WORDSF);
   /** Session. */
   private ClientSession session;
   /** Queries. */
   private StringList words;
-  /** Databases. */
-  private StringList databases;
   /** Frequency of each word. */
   private int[] freq;
-  /** Container for qtimes and results. */
-  private PrintOutput res = new PrintOutput(WORDSF);
 
   /**
    * Main test method.

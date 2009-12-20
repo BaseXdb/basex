@@ -47,7 +47,7 @@ public class ValueMerge {
     id = i;
     next();
   }
-  
+
   /**
    * Jumps to the next text.
    * @throws IOException I/O exception

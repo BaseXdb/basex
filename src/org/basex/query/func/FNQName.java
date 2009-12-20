@@ -96,7 +96,7 @@ final class FNQName extends Fun {
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
-    byte[] uri = ((Nod) check(it, Type.ELM)).uri(pref, ctx);
+    final byte[] uri = ((Nod) check(it, Type.ELM)).uri(pref, ctx);
     if(uri == null && pref.length != 0) Err.or(NSDECL, pref);
     // [CG] XQuery/QName: check if uri can be null
     nm.uri = Uri.uri(uri);

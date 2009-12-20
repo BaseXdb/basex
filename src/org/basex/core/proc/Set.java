@@ -63,7 +63,7 @@ public final class Set extends Proc {
       } else {
         Main.notexpected();
       }
-      CmdSet[] cs = CmdSet.values();
+      final CmdSet[] cs = CmdSet.values();
       for(int c = 0; c < cs.length; c++) if(cs[c] == s) key = STRINGS[c];
       return info(key + ": " + val);
     } catch(final Exception ex) {

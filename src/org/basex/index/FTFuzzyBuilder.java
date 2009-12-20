@@ -117,48 +117,14 @@ public final class FTFuzzyBuilder extends FTBuilder {
         dr = outz.size();
         tr = (int) outy.size();
       }
-      //tree[j] = null;
+      tree[j] = null;
     }
-    //tree = null;
+    tree = null;
 
     outx.write(j);
     outx.writeInt(tr);
     outx.close();
     outy.close();
     outz.close();
-
-/*
-diffMem("All", false);
-for(int i = 0; i < tree.length; i++) if(tree[i] != null) tree[i].pre = null;
-diffMem("Pre", true);
-for(int i = 0; i < tree.length; i++) if(tree[i] != null) tree[i].pos = null;
-diffMem("Pos", true);
-for(int i = 0; i < tree.length; i++) if(tree[i] != null) tree[i].ns = null;
-diffMem("NS", true);
-for(int i = 0; i < tree.length; i++) if(tree[i] != null) tree[i].keys = null;
-diffMem("Keys", true);
-for(int i = 0; i < tree.length; i++) if(tree[i] != null) tree[i].next = null;
-diffMem("Next", true);
-for(int i = 0; i < tree.length; i++) if(tree[i] != null) tree[i].bucket = null;
-diffMem("Bucket", true);
-tree = null;
-diffMem("Tree", true);
-*/
   }
-
-  /* Old memory consumption.
-  private long oldMem;
-  
-  /*
-   * Shows the current memory consumption/difference.
-   * @param desc description
-   * @param diff difference flag
-  private void diffMem(final String desc, final boolean diff) {
-    Performance.gc(4);
-    final Runtime rt = Runtime.getRuntime();
-    final long mem = rt.totalMemory() - rt.freeMemory();
-    System.out.println("- " + desc + ": " +
-      Performance.format(diff ? oldMem - mem : mem));
-    oldMem = mem;
-  }*/
 }

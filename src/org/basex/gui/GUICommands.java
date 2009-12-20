@@ -105,7 +105,7 @@ public enum GUICommands implements GUICommand {
           progress(gui, INFOOPT, new Proc[] { new Optimize() });
         } else {
           Proc[] proc = new Proc[0];
-          if(ind[0] != d.meta.pathindex)
+          if(ind[0] != d.meta.pthindex)
             proc = Array.add(proc, cmd(ind[0], CmdIndex.PATH));
           if(ind[1] != d.meta.txtindex)
             proc = Array.add(proc, cmd(ind[1], CmdIndex.TEXT));
@@ -138,7 +138,7 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
 
       final IO io = IO.get(dialog.path());
-      if(io.exists() && !Dialog.confirm(gui,
+      if(io.exists() && !io.isDir() && !Dialog.confirm(gui,
           Main.info(FILEREPLACE, io))) return;
 
       String path = io.path();

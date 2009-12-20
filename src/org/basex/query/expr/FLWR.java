@@ -38,7 +38,13 @@ public final class FLWR extends FLWOR {
           ctx.compInfo(OPTWHERE);
           final Expr w = where.remove(f.var);
           if(f.expr instanceof AxisPath) {
-            f.expr = ((AxisPath) f.expr).addPred(w);
+            AxisPath ap = (AxisPath) f.expr;
+            if(w instanceof And) {
+              for(final Expr e : ((And) w).expr) ap = ap.addPred(e);
+            } else {
+              ap = ap.addPred(w);
+            }
+            f.expr = ap;
           } else {
             fl[fl.length - 1].expr = new Pred(f.expr, w);
           }

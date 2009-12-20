@@ -17,16 +17,15 @@ import java.util.Arrays;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXCombo;
+import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.layout.BaseXSlider;
@@ -35,6 +34,7 @@ import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.gui.view.ViewRect;
 import org.basex.util.IntList;
+import org.deepfs.fs.DeepFS;
 
 /**
  * A scatter plot visualization of the database.
@@ -179,7 +179,7 @@ public final class PlotView extends View {
             // choose size category as default for vertical axis
             int y = 0;
             for(int k = 0; k < keys.length; k++) {
-              if(keys[k].endsWith(DataText.S_SIZE)) {
+              if(keys[k].endsWith(DeepFS.S_SIZE)) {
                 y = k;
                 break;
               }
@@ -187,7 +187,7 @@ public final class PlotView extends View {
             // choose name category as default for horizontal axis
             int x = y == 0 ? Math.min(1, keys.length) : 0;
             for(int k = 0; k < keys.length; k++) {
-              if(keys[k].endsWith(DataText.S_NAME)) {
+              if(keys[k].endsWith(DeepFS.S_NAME)) {
                 x = k;
                 break;
               }
@@ -203,11 +203,11 @@ public final class PlotView extends View {
     });
     box.add(yCombo);
     box.add(Box.createHorizontalStrut(3));
-    box.add(new JLabel("Y"));
+    box.add(new BaseXLabel("Y"));
     box.add(Box.createHorizontalGlue());
     box.add(itemCombo);
     box.add(Box.createHorizontalGlue());
-    box.add(new JLabel("X"));
+    box.add(new BaseXLabel("X"));
     box.add(Box.createHorizontalStrut(3));
     box.add(xCombo);
     panel.add(box, BorderLayout.SOUTH);
@@ -237,7 +237,7 @@ public final class PlotView extends View {
       ocb.setSelectedIndex(i > 0 ? i - 1 : i + 1);
     }
   }
-  
+
   /**
    * Creates a buffered image for items.
    * @param focus create image of focused item if true
@@ -310,7 +310,7 @@ public final class PlotView extends View {
     g.setFont(font);
     g.setColor(Color.black);
     final Data data = gui.context.data;
-    final boolean nd = data == null || !data.meta.pathindex;
+    final boolean nd = data == null || !data.meta.pthindex;
     if(nd || plotWidth - sz < 0 || plotHeight - sz < 0) {
       BaseXLayout.drawCenter(g, nd ? NODATA : NOSPACE, w, h / 2 - MARGIN[0]);
       return;
@@ -993,10 +993,10 @@ public final class PlotView extends View {
    */
   private String formatString(final double value, final boolean drawX) {
     final String attr = (String) (drawX ? xCombo : yCombo).getSelectedItem();
-    return BaseXLayout.value(value, attr.equals("@" + DataText.S_SIZE),
-        attr.equals("@" + DataText.S_MTIME) ||
-        attr.equals("@" + DataText.S_CTIME) ||
-        attr.equals("@" + DataText.S_ATIME));
+    return BaseXLayout.value(value, attr.equals("@" + DeepFS.S_SIZE),
+        attr.equals("@" + DeepFS.S_MTIME) ||
+        attr.equals("@" + DeepFS.S_CTIME) ||
+        attr.equals("@" + DeepFS.S_ATIME));
   }
 
   @Override

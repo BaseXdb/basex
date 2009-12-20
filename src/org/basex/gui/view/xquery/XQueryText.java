@@ -125,29 +125,27 @@ final class XQueryText extends BaseXText {
    * @return error position in text
    */
   int error(final String inf, final boolean ok) {
-    if(ok) {
-      error = -1;
-    } else {
-      error = last.length;
-
+    error = -1;
+    if(!ok) {
       final Matcher m = ERRPATTERN.matcher(inf);
       int el = 0;
       int ec = 0;
       if(m.matches()) {
         el = Integer.parseInt(m.group(1));
         ec = Integer.parseInt(m.group(2));
-      }
+        error = last.length;
 
-      // find approximate error position
-      final int ll = error;
-      for(int i = 0, l = 1, c = 1; i < ll; c++, i++) {
-        if(l > el || l == el && c == ec) {
-          error = i;
-          break;
-        }
-        if(last[i] == '\n') {
-          l++;
-          c = 0;
+        // find approximate error position
+        final int ll = error;
+        for(int i = 0, l = 1, c = 1; i < ll; c++, i++) {
+          if(l > el || l == el && c == ec) {
+            error = i;
+            break;
+          }
+          if(last[i] == '\n') {
+            l++;
+            c = 0;
+          }
         }
       }
     }

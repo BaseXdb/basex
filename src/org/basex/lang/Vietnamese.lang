@@ -1,5 +1,6 @@
 # LANGUAGE FILE, TRANSLATED BY
 # Xuan Khanh Le, lxkhanh@yahoo.com
+#
 # The '%' character serves as placeholder for texts to be inserted
 
 # Start
@@ -23,7 +24,7 @@ b_ok=OK
 b_opt=Tối ưu
 b_rename=Đổi tên
 b_open=Mở
-b_mount= Mount
+b_mount=Mount
 b_cancel=Hủy
 b_drop=Xóa
 b_cmd=Lệnh
@@ -126,7 +127,7 @@ dq_question=Save changes to %?
 dx_outfile=Output file
 dx_outdir=Output directory
 dx_overfile=File will be overwritten.
-dx_indent=Indent with withespaces
+dx_indent=Indent with whitespaces
 dx_invpath=Invalid path.
 
 dp_title=Những ưu tiên
@@ -186,6 +187,28 @@ da_dev=Người phát triển chính
 da_cont1=Nhóm
 da_cont2=và những người/nhóm khác
 da_translation=Dịch
+
+ds_localserver=Local Server
+ds_connect=Connection
+ds_users=Users
+ds_host=Host
+ds_port=Port
+ds_localport=Local Port
+ds_createu=Create User
+ds_perms=Permissions
+ds_drquestion=% User(s) will be dropped.\nAre you sure?
+ds_alterpw=Alter Password
+ds_invalid=% is invalid
+ds_adlogin=Administrator Login (local or remote)
+ds_databases=Databases
+ds_sessions=Sessions
+ds_logs=Logs
+ds_connected=Connected to %:%.
+ds_disconnected=Disconnected.
+ds_info1=This dialog is only intended to administer the client/server environment.
+ds_info2=It will not affect any other GUI features.
+
+# GUI Commands
 
 c_about=Về %
 c_abouttt=Hiển thị thông tin chung trên dự án.
@@ -284,26 +307,6 @@ c_replace=Tệp "%" đã có.\nBạn muốn thay thế nó không?
 c_server=Server Administration
 c_servertt=Display the server administration for user management and log tracing.
 
-ds_localserver=Local Server
-ds_connect=Connection
-ds_users=Users
-ds_host=Host
-ds_port=Port
-ds_localport=Local Port
-ds_createu=Create User
-ds_perms=Permissions
-ds_drquestion=% User(s) will be dropped.\nAre you sure?
-ds_alterpw=Alter Password
-ds_invalid=% is invalid
-ds_adlogin=Administrator Login (local or remote)
-ds_databases=Databases
-ds_sessions=Sessions
-ds_logs=Logs
-ds_connected=Connected to %:%.
-ds_disconnected=Disconnected.
-ds_info1=This dialog is only intended to administer the client/server environment.
-ds_info2=It will not affect any other GUI features.
-
 # Commands & Processes
 proc_time=Thời gian cần
 proc_syntax=Cú pháp
@@ -327,7 +330,7 @@ pc_index=Đang tạo Indexes
 pc_update=Định dạng cơ sở dữ liệu đã bị đổi; xin tạo cơ sở dữ liệu mới.
 pc_indupdate=Định dạng index đã bị đổi; xin tạo index mới.
 pc_cancel=Việc tạo cơ sở dữ liệu đã bị hủy.
-pc_indextxt= Đang index văn bản
+pc_indextxt=Đang index văn bản
 pc_indexatt=Đang index thuộc tính
 pc_indexftx=Đang index nội dung
 pc_parse="%" (% Nodes parsed)

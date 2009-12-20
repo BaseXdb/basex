@@ -1,6 +1,6 @@
 package org.deepfs.fsml;
 
-import static org.basex.data.DataText.*;
+import static org.deepfs.fs.DeepFS.*;
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
 import java.io.ByteArrayOutputStream;

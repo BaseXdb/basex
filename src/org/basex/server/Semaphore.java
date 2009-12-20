@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 public final class Semaphore {
   /** List of monitors for waiting writers. */
-  private ArrayList<Object> waitingW = new ArrayList<Object>();
+  private final ArrayList<Object> waitingW = new ArrayList<Object>();
   /** Number of waiting readers. */
   private int waitingR;
   /** Number of active writers. */

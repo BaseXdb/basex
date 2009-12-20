@@ -154,7 +154,7 @@ public final class DialogCreate extends Dialog {
 
     // create checkboxes
     final BaseXBack p4 = new BaseXBack();
-    
+
     p4.setLayout(new TableLayout(2, 1, 0, 0));
     p4.setBorder(8, 8, 8, 8);
 

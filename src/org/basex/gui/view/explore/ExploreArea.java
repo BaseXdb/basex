@@ -12,7 +12,6 @@ import java.awt.event.KeyEvent;
 import org.basex.core.Main;
 import org.basex.core.proc.Find;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.data.StatsKey;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -30,6 +29,7 @@ import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.deepfs.fs.DeepFS;
 
 /**
  * This is a simple user search panel.
@@ -104,7 +104,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final Data data = gui.context.data;
     if(!main.visible() || data == null) return;
 
-    final boolean pi = data.meta.pathindex;
+    final boolean pi = data.meta.pthindex;
     if(panel.getComponentCount() != 0) {
       if(!pi) init();
       return;
@@ -144,7 +144,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final TokenList sl = new TokenList();
     final int cs = panel.getComponentCount();
     final boolean fs = data.fs != null;
-    if(fs) sl.add(Token.token(DataText.S_FILE));
+    if(fs) sl.add(Token.token(DeepFS.S_FILE));
     else {
       for(int c = 0; c < cs; c += 2) {
         final BaseXCombo combo = (BaseXCombo) panel.getComponent(c);
@@ -184,8 +184,8 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    * @param max maximum value
    * @param pos position
    * @param kb kilobyte flag
-   * @param itr integer flag
    * @param date date flag
+   * @param itr integer flag
    */
   private void addSlider(final double min, final double max, final int pos,
       final boolean kb, final boolean date, final boolean itr) {
@@ -224,10 +224,10 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
           switch(stat.kind) {
             case INT:
               addSlider(stat.min, stat.max, cp + 1,
-                  item.equals("@" + DataText.S_SIZE),
-                  item.equals("@" + DataText.S_MTIME) ||
-                  item.equals("@" + DataText.S_CTIME) ||
-                  item.equals("@" + DataText.S_ATIME), true);
+                  item.equals("@" + DeepFS.S_SIZE),
+                  item.equals("@" + DeepFS.S_MTIME) ||
+                  item.equals("@" + DeepFS.S_CTIME) ||
+                  item.equals("@" + DeepFS.S_ATIME), true);
               break;
             case DBL:
               addSlider(stat.min, stat.max, cp + 1, false, false, false);
@@ -305,7 +305,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
         }
       }
 
-      if(data.fs != null) if(tb.size() == 0) tb.add("//%", DataText.S_FILE);
+      if(data.fs != null) if(tb.size() == 0) tb.add("//%", DeepFS.S_FILE);
       if(attr) {
         if(tb.size() == 0) tb.add("//*");
         if(pattern.isEmpty()) pattern = PATSIMPLE;

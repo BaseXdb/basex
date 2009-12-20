@@ -80,7 +80,7 @@ public final class BaseXFileChooser {
       fd.setMode(mode == Mode.FSAVE || mode == Mode.DSAVE ?
           FileDialog.SAVE : FileDialog.LOAD);
       fd.setVisible(true);
-      String f = fd.getFile();
+      final String f = fd.getFile();
       if(f == null) return null;
 
       final String dir = fd.getDirectory();

@@ -1,5 +1,6 @@
 package org.deepfs.util;
 
+import static org.deepfs.fs.DeepFS.*;
 import static org.basex.util.Token.string;
 import java.io.File;
 import java.io.IOException;
@@ -7,7 +8,6 @@ import java.nio.ByteBuffer;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.data.DataText;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -34,7 +34,7 @@ public final class FSImporter implements FSTraversal {
   /** Database context. */
   private final Context ctx;
   /** Insertion target. */
-  private String targetNode = "/" + DataText.S_FSML;
+  private String targetNode = "/" + S_FSML;
 
   /** The name of the current file. */
   private String currentFile;
@@ -150,8 +150,8 @@ public final class FSImporter implements FSTraversal {
 
   @Override
   public void preTraversalVisit(final File d) {
-    if(d.isDirectory()) targetNode += "/" + DataText.S_DEEPFS + "[@"
-    + string(DataText.BACKINGSTORE) + " = \"" + insert(d, true) + "\"]";
+    if(d.isDirectory()) targetNode += "/" + S_DEEPFS + "[@"
+    + string(BACKINGSTORE) + " = \"" + insert(d, true) + "\"]";
     else {
       preTraversalVisit(d.getParentFile());
       insert(d, false);
@@ -166,8 +166,8 @@ public final class FSImporter implements FSTraversal {
 
   @Override
   public void preDirectoryVisit(final File d) {
-    targetNode += "/" + DataText.S_DIR + "[@" + DataText.S_NAME + " = \""
-        + insert(d, false) + "\"]";
+    targetNode += "/" + S_DIR + "[@" + S_NAME + " = \""
+      + insert(d, false) + "\"]";
   }
 
   @Override

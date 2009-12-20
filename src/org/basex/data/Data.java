@@ -3,7 +3,6 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.basex.core.proc.InfoTable;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
@@ -690,7 +689,7 @@ public abstract class Data {
    * @param s number of table entries
    */
   public final void buffer(final int s) {
-    int bs = s << IO.NODEPOWER;
+    final int bs = s << IO.NODEPOWER;
     if(b.length != bs) b = new byte[bs];
   }
 

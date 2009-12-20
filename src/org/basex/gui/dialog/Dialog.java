@@ -173,9 +173,9 @@ public abstract class Dialog extends JDialog {
     final BaseXBack panel = new BaseXBack();
     panel.setBorder(12, 0, 0, 0);
     panel.setLayout(new TableLayout(1, texts.length, 8, 0));
-    for(int i = 0; i < texts.length; i++) {
-      panel.add(texts[i] instanceof Component ?
-        (Component) texts[i] : new BaseXButton(texts[i].toString(), dialog));
+    for(final Object text : texts) {
+      panel.add(text instanceof Component ?
+        (Component) text : new BaseXButton(text.toString(), dialog));
     }
 
     final BaseXBack buttons = new BaseXBack();

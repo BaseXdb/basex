@@ -6,6 +6,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdIndex;
+import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
@@ -148,7 +149,7 @@ public final class CommandParser extends InputParser {
           case DATABASE: case DB:
             return new InfoDB();
           case INDEX:
-            return new InfoIndex();
+            return new InfoIndex(consume(CmdIndexInfo.class, null));
           case TABLE:
             String arg1 = number(null);
             final String arg2 = arg1 != null ? number(null) : null;

@@ -48,9 +48,9 @@ final class DialogFT extends BaseXBack {
     add(new BaseXLabel(FTINDEXINFO, true, false));
 
     final String sw = prop.get(Prop.STOPWORDS);
-    String[] cb = {
+    final String[] cb = {
         CREATEWC, CREATESTEM, CREATECS, CREATEDC, CREATESCT, CREATESW };
-    String[] desc = {
+    final String[] desc = {
         WCINDEXINFO, FTSTEMINFO, FTCSINFO, FTDCINFO, FTSCINFO, FTSWINFO };
     final boolean[] val = {
         prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING), prop.is(Prop.CASESENS),
@@ -80,7 +80,8 @@ final class DialogFT extends BaseXBack {
     add(check[5]);
     final BaseXBack b2 = new BaseXBack();
     b2.setLayout(new TableLayout(1, 2, 6, 0));
-    swpath = new BaseXTextField(sw, d);
+    swpath = new BaseXTextField(sw.isEmpty() ?
+        d.gui.prop.get(GUIProp.STOPPATH) : sw, d);
     b2.add(swpath);
 
     swbrowse = new BaseXButton(BUTTONBROWSE, d);
@@ -98,9 +99,12 @@ final class DialogFT extends BaseXBack {
   void chooseStop() {
     final GUIProp gprop = dialog.gui.prop;
     final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
-        gprop.get(GUIProp.OPENPATH), dialog.gui);
+        gprop.get(GUIProp.STOPPATH), dialog.gui);
     final IO file = fc.select(BaseXFileChooser.Mode.FOPEN);
-    if(file != null) swpath.setText(file.path());
+    if(file != null) {
+      swpath.setText(file.path());
+      gprop.set(GUIProp.STOPPATH, file.path());
+    }
   }
 
   /**
@@ -114,7 +118,11 @@ final class DialogFT extends BaseXBack {
     }
     scoring.setEnabled(ftx && check[4].isSelected());
     swbrowse.setEnabled(ftx && check[5].isSelected());
-    swbrowse.setEnabled(ftx && check[5].isSelected());
+    swpath.setEnabled(ftx && check[5].isSelected());
+    final String sw = swpath.getText().trim();
+    final IO file = IO.get(sw);
+    final boolean exists = !sw.isEmpty() && file.exists();
+    if(exists) dialog.gui.prop.set(GUIProp.STOPPATH, sw);
   }
 
   /**

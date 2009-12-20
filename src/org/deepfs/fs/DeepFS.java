@@ -22,6 +22,7 @@ import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.deepfs.DeepShell;
+import org.deepfs.fsml.DeepNS;
 import org.deepfs.jfuse.DeepStat;
 
 /**
@@ -31,6 +32,75 @@ import org.deepfs.jfuse.DeepStat;
  * @author Alexander Holupirek, Christian Gruen, Hannes Schwarz, Bastian Lemke
  */
 public final class DeepFS implements DataText {
+  // DEEPFS STRINGS ===========================================================
+
+  /** Name of the root node for a fsml document. */
+  public static final String S_FSML = DeepNS.DEEPURL.tag("fsml");
+  /** Name of the root node for a file system. */
+  public static final String S_DEEPFS = DeepNS.DEEPURL.tag("deepfs");
+  /** File tag in fs namespace. */
+  public static final String S_FILE = DeepNS.DEEPURL.tag("file");
+  /** Directory tag in fs namespace. */
+  public static final String S_DIR = DeepNS.DEEPURL.tag("dir");
+  /** XML content tag in fs namespace. */
+  public static final String S_XML_CONTENT = DeepNS.DEEPURL.tag("xml");
+  /** Text content tag in fs namespace. */
+  public static final String S_TEXT_CONTENT = DeepNS.DEEPURL.tag("text");
+  /** Content tag in fs namespace. */
+  public static final String S_CONTENT = DeepNS.DEEPURL.tag("content");
+
+  /** file/dir name. */
+  public static final String S_NAME = "name";
+  /** File suffix. */
+  public static final String S_SUFFIX = "suffix";
+  /** file/dir size. */
+  public static final String S_SIZE = "size";
+  /** Time of last access. */
+  public static final String S_ATIME = "atime";
+  /** Time of creation. */
+  public static final String S_CTIME = "ctime";
+  /** Time of last modification. */
+  public static final String S_MTIME = "mtime";
+
+  /** FSML token. */
+  public static final byte[] FSML = token(S_FSML);
+  /** DeepFS token. */
+  public static final byte[] DEEPFS = token(S_DEEPFS);
+  /** Directory token. */
+  public static final byte[] DIR = token(S_DIR);
+  /** File token. */
+  public static final byte[] FILE = token(S_FILE);
+  /** Content token. */
+  public static final byte[] CONTENT = token(S_CONTENT);
+
+  /** Name attribute token. */
+  public static final byte[] NAME = token(S_NAME);
+  /** Size attribute token. */
+  public static final byte[] SIZE = token(S_SIZE);
+  /** Time of last modification token. */
+  public static final byte[] MTIME = token(S_MTIME);
+  /** Suffix attribute. */
+  public static final byte[] SUFFIX = token(S_SUFFIX);
+  /** Time of last access token. */
+  public static final byte[] ATIME = token(S_ATIME);
+  /** Time of creation token. */
+  public static final byte[] CTIME = token(S_CTIME);
+  /** Number of links token. */
+  public static final byte[] NLINK = token("nlink");
+  /** User ID token. */
+  public static final byte[] UID = token("uid");
+  /** Group ID token. */
+  public static final byte[] GID = token("gid");
+  /** Offset attribute. */
+  public static final byte[] OFFSET = token("offset");
+  /** File mode attribute. */
+  public static final byte[] MODE = token("mode");
+  /** Mount point attribute. */
+  public static final byte[] MOUNTPOINT = token("mountpoint");
+  /** Backing store attribute. */
+  public static final byte[] BACKINGSTORE = token("backingstore");
+  /** Negative mount point attribute. */
+  public static final byte[] NOTMOUNTED = token("(not mounted)");
 
   /** Context instance. */
   private Context ctx;
@@ -41,23 +111,23 @@ public final class DeepFS implements DataText {
   private DeepStat rootStat;
 
   /** Index References. */
-  private int fsmlID;
+  public int fsmlID;
   /** Index References. */
-  private int deepfsID;
+  public int deepfsID;
   /** Index References. */
-  private int fileID;
+  public int fileID;
   /** Index References. */
-  private int dirID;
+  public int dirID;
   /** Index References. */
-  private int modeID;
+  public int modeID;
   /** Index mount point. */
-  private int mountpointID;
+  public int mountpointID;
   /** Index backing store. */
-  private int backingstoreID;
+  public int backingstoreID;
   /** Index References. */
-  private int sizeID;
+  public int sizeID;
   /** Index References. */
-  private int nameID;
+  public int nameID;
 
   /** Index References. */
   public int suffixID;

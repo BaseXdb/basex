@@ -9,7 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.io.IOException;
-
 import javax.swing.SwingUtilities;
 import org.basex.core.Context;
 import org.basex.data.Data;
@@ -71,7 +70,7 @@ public final class TableView extends View implements Runnable {
     tdata.rows = null;
 
     final Data data = gui.context.data;
-    if(!visible() || data == null || !data.meta.pathindex) return;
+    if(!visible() || data == null || !data.meta.pthindex) return;
     tdata.init(data);
     refreshContext(true, false);
   }
@@ -283,7 +282,7 @@ public final class TableView extends View implements Runnable {
     if(data.fs != null && tdata.mouseX < 20) {
       try {
         data.fs.launch(ViewData.parent(data, gui.context.focused));
-      } catch (IOException ex) {
+      } catch (final IOException ex) {
         Dialog.info(this, NODEFAULTAPP);
       }
     }

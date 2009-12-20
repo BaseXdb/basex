@@ -2453,7 +2453,7 @@ public class QueryParser extends InputParser {
         if(opt.is(FTOpt.WC)) error(FTFZWC);
         opt.set(FTOpt.FZ, using);
       } else {
-        error(FTMATCH);
+        error(FTMATCH, consume());
         return false;
       }
     }

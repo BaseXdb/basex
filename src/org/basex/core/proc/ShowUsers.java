@@ -1,10 +1,8 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
 import java.util.ArrayList;
-
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;

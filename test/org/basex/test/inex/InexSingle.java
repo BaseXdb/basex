@@ -34,7 +34,7 @@ public final class InexSingle {
   /** Database context. */
   private final Context ctx = new Context();
   /** Session. */
-  private LocalSession session = new LocalSession(ctx);
+  private final LocalSession session = new LocalSession(ctx);
   /** Maximum number of queries. */
   private int quindex = -1;
   /** Quiet flag (suppress output). */
@@ -58,7 +58,7 @@ public final class InexSingle {
    */
   public static void convert(final String subfile) throws Exception {
     String l;
-    HashMap<String, String> hs = new HashMap<String, String>();
+    final HashMap<String, String> hs = new HashMap<String, String>();
 
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
     while((l = br.readLine()) != null) {

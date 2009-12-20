@@ -64,7 +64,7 @@ public final class FTFuzzy extends FTIndex {
    * @param d data reference
    * @throws IOException IO Exception
    */
-  public FTFuzzy(final Data d) throws IOException {
+  protected FTFuzzy(final Data d) throws IOException {
     super(d);
 
     // cache token length index
@@ -90,7 +90,7 @@ public final class FTFuzzy extends FTIndex {
     final long l = li.length() + ti.length() + dat.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
 
-    final IndexStats stats = new IndexStats();
+    final IndexStats stats = new IndexStats(data);
     addOccs(stats);
     stats.print(tb);
     return tb.finish();
@@ -102,7 +102,7 @@ public final class FTFuzzy extends FTIndex {
     final Tokenizer fto = (Tokenizer) ind;
     if(fto.fz || fto.wc) return 1;
 
-    byte[] tok = fto.get();
+    final byte[] tok = fto.get();
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
 

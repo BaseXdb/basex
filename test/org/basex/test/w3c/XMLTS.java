@@ -31,6 +31,7 @@ public final class XMLTS {
     //"xmltest/xmltest.xml";
   /** Path to the XQuery Test Suite. */
   private static final String PATH = FILE.replaceAll("[^/]+$", "");
+
   /** Verbose flag. */
   private boolean verbose;
   /** Data reference. */

@@ -2,10 +2,8 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
 import org.basex.query.up.primitives.PrimitiveType;
@@ -35,14 +33,14 @@ abstract class Primitives {
    * @throws QueryException query exception
    */
   protected abstract void add(final UpdatePrimitive p) throws QueryException;
-  
+
   /**
    * Adds the primitive to the set.
    * @param i id key
    * @param p update primitive
    * @throws QueryException query exception
    */
-  protected final void add(final int i, final UpdatePrimitive p) 
+  protected final void add(final int i, final UpdatePrimitive p)
   throws QueryException {
     if(p instanceof Put) putIds.add(i);
     UpdatePrimitive[] l = op.get(i);
@@ -57,7 +55,7 @@ abstract class Primitives {
       l[pos].merge(p);
     }
   }
-  
+
   /**
    * Finds an update primitive of the given type in an array.
    * @param t type
@@ -65,7 +63,7 @@ abstract class Primitives {
    * @return update primitive of type t or null if up contains no element of
    * type t
    */
-  protected UpdatePrimitive findPrimitive(final PrimitiveType t, 
+  protected UpdatePrimitive findPrimitive(final PrimitiveType t,
       final UpdatePrimitive[] up) {
     for(final UpdatePrimitive p : up) if(p.type() == t) return p;
     return null;
@@ -86,15 +84,15 @@ abstract class Primitives {
       op.put(nodes.get(i), shrink(op.get(nodes.get(i))));
       for(final UpdatePrimitive p : op.get(nodes.get(i))) {
         p.prepare();
-        // Check if the identity of all target nodes of fn:put operations is 
-        // still available after the execution of updates. That includes parent 
+        // Check if the identity of all target nodes of fn:put operations is
+        // still available after the execution of updates. That includes parent
         // nodes.
         if(p.type() == PUT && parentDeleted(nodes.get(i)))
           Err.or(UPFOEMPT, p);
       }
     }
   };
-  
+
   /**
    * Removes null values from given array.
    * @param up array to shrink
@@ -103,21 +101,23 @@ abstract class Primitives {
   private UpdatePrimitive[] shrink(final UpdatePrimitive[] up) {
     // [LK] kick null checks
     int l = 0;
-    for(int i = 0; i < up.length; i++) if(up[i] != null) l++;
+    for(final UpdatePrimitive element : up)
+      if(element != null) l++;
     final UpdatePrimitive[] t = new UpdatePrimitive[l];
     int m = 0;
-    for(int i = 0; i < up.length; i++) if(up[i] != null) t[m++] = up[i];
+    for(final UpdatePrimitive element : up)
+      if(element != null) t[m++] = element;
     return t;
   }
-  
+
   /**
-   * Checks recursively if n itself or a parent node is replaced or 
+   * Checks recursively if n itself or a parent node is replaced or
    * deleted.
    * @param n node
    * @return true if parent deleted or replaced
    */
   protected abstract boolean parentDeleted(final int n);
-  
+
   /**
    * Returns the key of a given node. For database nodes this would be the pre
    * value. For fragments the id is returned.
@@ -125,7 +125,7 @@ abstract class Primitives {
    * @return id, -1 if n is null
    */
   protected abstract int getId(final Nod n);
-  
+
   /**
    * Checks constraints and applies all updates to the databases.
    * @throws QueryException query exception

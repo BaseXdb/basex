@@ -36,7 +36,7 @@ public final class BaseXTable extends JTable {
     setModel(model);
     getTableHeader().setReorderingAllowed(false);
     getTableHeader().setResizingAllowed(false);
-    
+
     BaseXLayout.addInteraction(this, null, d);
 
     getSelectionModel().addListSelectionListener(new ListSelectionListener() {

@@ -51,7 +51,7 @@ public final class MetaData {
   /** Flag for creating a full-text index. */
   public boolean ftxindex;
   /** Flag for creating a path summary. */
-  public boolean pathindex = true;
+  public boolean pthindex = true;
 
   /** Flag for wildcard indexing. */
   public boolean wildcards;
@@ -96,7 +96,7 @@ public final class MetaData {
     prop = pr;
     chop = prop.is(Prop.CHOP);
     entity = prop.is(Prop.ENTITY);
-    pathindex = prop.is(Prop.PATHINDEX);
+    pthindex = prop.is(Prop.PATHINDEX);
     txtindex = prop.is(Prop.TEXTINDEX);
     atvindex = prop.is(Prop.ATTRINDEX);
     ftxindex = prop.is(Prop.FTINDEX);
@@ -205,7 +205,7 @@ public final class MetaData {
       else if(k.equals(DBHGHT))   height     = Token.toInt(v);
       else if(k.equals(DBCHOP))   chop       = toBool(v);
       else if(k.equals(DBENTITY)) entity     = toBool(v);
-      else if(k.equals(DBPTHIDX)) pathindex  = toBool(v);
+      else if(k.equals(DBPTHIDX)) pthindex  = toBool(v);
       else if(k.equals(DBTXTIDX)) txtindex   = toBool(v);
       else if(k.equals(DBATVIDX)) atvindex   = toBool(v);
       else if(k.equals(DBFTXIDX)) ftxindex   = toBool(v);
@@ -255,7 +255,7 @@ public final class MetaData {
     writeInfo(out, DBSIZE,   size);
     writeInfo(out, DBCHOP,   chop);
     writeInfo(out, DBENTITY, entity);
-    writeInfo(out, DBPTHIDX, pathindex);
+    writeInfo(out, DBPTHIDX, pthindex);
     writeInfo(out, DBTXTIDX, txtindex);
     writeInfo(out, DBATVIDX, atvindex);
     writeInfo(out, DBFTXIDX, ftxindex);

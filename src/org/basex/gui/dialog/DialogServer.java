@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ConnectException;
-
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -323,7 +322,7 @@ public final class DialogServer extends Dialog {
         new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
             "-p", String.valueOf(p)}).start();
 
-        for(int c = 0; c < 3; c++) {
+        for(int c = 0; c < 6; c++) {
           running = ping(true);
           if(running) break;
           Performance.sleep(500);

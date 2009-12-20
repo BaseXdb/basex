@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
-import org.deepfs.fsml.DeepNS;
 
 /**
  * This class assembles texts which are used in the data classes.
@@ -84,94 +83,6 @@ public interface DataText {
   /** Tags. */
   String DBNS = "NS";
 
-  // DEEPFS STRINGS ===========================================================
-
-  /** Name of the root node for a fsml document. */
-  String S_FSML = DeepNS.DEEPURL.tag("fsml");
-  /** Name of the root node for a file system. */
-  String S_DEEPFS = DeepNS.DEEPURL.tag("deepfs");
-  /** File tag in fs namespace. */
-  String S_FILE = DeepNS.DEEPURL.tag("file");
-  /** Directory tag in fs namespace. */
-  String S_DIR = DeepNS.DEEPURL.tag("dir");
-  /** XML content tag in fs namespace. */
-  String S_XML_CONTENT = DeepNS.DEEPURL.tag("xml");
-  /** Text content tag in fs namespace. */
-  String S_TEXT_CONTENT = DeepNS.DEEPURL.tag("text");
-  /** Content tag in fs namespace. */
-  String S_CONTENT = DeepNS.DEEPURL.tag("content");
-
-  // attributes
-  /** file/dir name. */
-  String S_NAME = "name";
-  /** File suffix. */
-  String S_SUFFIX = "suffix";
-  /** file/dir size. */
-  String S_SIZE = "size";
-  /** Time of last access. */
-  String S_ATIME = "atime";
-  /** Time of creation. */
-  String S_CTIME = "ctime";
-  /** Time of last modification. */
-  String S_MTIME = "mtime";
-
-  /** Number of links token. */
-  String S_NLINK = "nlink";
-  /** User ID token. */
-  String S_UID = "uid";
-  /** Group ID token. */
-  String S_GID = "gid";
-  /** Offset attribute. */
-  String S_OFFSET = "offset";
-  /** File mode attribute. */
-  String S_MODE = "mode";
-  /** Mount point attribute. */
-  String S_MOUNTPOINT = "mountpoint";
-  /** Backing store attribute. */
-  String S_BACKINGSTORE = "backingstore";
-  /** Negative mount point attribute. */
-  String S_NOTMOUNTED = "(not mounted)";
-
-  /** FSML token. */
-  byte[] FSML = token(S_FSML);
-  /** DeepFS token. */
-  byte[] DEEPFS = token(S_DEEPFS);
-  /** Directory token. */
-  byte[] DIR = token(S_DIR);
-  /** File token. */
-  byte[] FILE = token(S_FILE);
-  /** Content token. */
-  byte[] CONTENT = token(S_CONTENT);
-
-  /** Name attribute token. */
-  byte[] NAME = token(S_NAME);
-  /** Size attribute token. */
-  byte[] SIZE = token(S_SIZE);
-  /** Time of last modification token. */
-  byte[] MTIME = token(S_MTIME);
-  /** Suffix attribute. */
-  byte[] SUFFIX = token(S_SUFFIX);
-  /** Time of last access token. */
-  byte[] ATIME = token(S_ATIME);
-  /** Time of creation token. */
-  byte[] CTIME = token(S_CTIME);
-  /** Number of links token. */
-  byte[] NLINK = token(S_NLINK);
-  /** User ID token. */
-  byte[] UID = token(S_UID);
-  /** Group ID token. */
-  byte[] GID = token(S_GID);
-  /** Offset attribute. */
-  byte[] OFFSET = token(S_OFFSET);
-  /** File mode attribute. */
-  byte[] MODE = token(S_MODE);
-  /** Mount point attribute. */
-  byte[] MOUNTPOINT = token(S_MOUNTPOINT);
-  /** Backing store attribute. */
-  byte[] BACKINGSTORE = token(S_BACKINGSTORE);
-  /** Negative mount point attribute. */
-  byte[] NOTMOUNTED = token(S_NOTMOUNTED);
-
   // XML SERIALIZATION ========================================================
 
   /** Ampersand Entity. */
@@ -195,12 +106,16 @@ public interface DataText {
   byte[] RESULT = token("result");
   /** Path tag. */
   byte[] PATH = token("path");
+  /** Name tag. */
+  byte[] NAME = token("name");
   /** Node tag. */
   byte[] NODE = token("node");
   /** Kind attribute. */
   byte[] KIND = token("kind");
   /** Count attribute. */
   byte[] COUNT = token("count");
+  /** Size tag. */
+  byte[] SIZE = token("size");
 
   /** Document declaration. */
   byte[] DOCDECL = token("xml version='1.0' encoding='");

@@ -23,8 +23,8 @@ m_layout=レイアウト
 b_ok=OK
 b_opt=最適化
 b_rename=名前の変更
-b_open= 開く
-b_mount= Mount
+b_open=開く
+b_mount=Mount
 b_cancel=中止
 b_drop=削除
 b_cmd=コマンド
@@ -127,7 +127,7 @@ dq_question=Save changes to %?
 dx_outfile=Output file
 dx_outdir=Output directory
 dx_overfile=File will be overwritten.
-dx_indent=Indent with withespaces
+dx_indent=Indent with whitespaces
 dx_invpath=Invalid path.
 
 dp_title=設定
@@ -187,6 +187,28 @@ da_dev=メイン開発者
 da_cont1=チーム
 da_cont2=その他の貢献者
 da_translation=翻訳
+
+ds_localserver=Local Server
+ds_connect=Connection
+ds_users=Users
+ds_host=Host
+ds_port=Port
+ds_localport=Local Port
+ds_createu=Create User
+ds_perms=Permissions
+ds_drquestion=% User(s) will be dropped.\nAre you sure?
+ds_alterpw=Alter Password
+ds_invalid=% is invalid
+ds_adlogin=Administrator Login (local or remote)
+ds_databases=Databases
+ds_sessions=Sessions
+ds_logs=Logs
+ds_connected=Connected to %:%.
+ds_disconnected=Disconnected.
+ds_info1=This dialog is only intended to administer the client/server environment.
+ds_info2=It will not affect any other GUI features.
+
+# GUI Commands
 
 c_about=%について
 c_abouttt=このプロジェクトについての概要を表示します。
@@ -284,26 +306,6 @@ c_notsaved=ファイルを保存できませんでした。
 c_replace=ファイル "%" は既に存在します。\n置換してよろしいですか。
 c_server=Server Administration
 c_servertt=Display the server administration for user management and log tracing.
-
-ds_localserver=Local Server
-ds_connect=Connection
-ds_users=Users
-ds_host=Host
-ds_port=Port
-ds_localport=Local Port
-ds_createu=Create User
-ds_perms=Permissions
-ds_drquestion=% User(s) will be dropped.\nAre you sure?
-ds_alterpw=Alter Password
-ds_invalid=% is invalid
-ds_adlogin=Administrator Login (local or remote)
-ds_databases=Databases
-ds_sessions=Sessions
-ds_logs=Logs
-ds_connected=Connected to %:%.
-ds_disconnected=Disconnected.
-ds_info1=This dialog is only intended to administer the client/server environment.
-ds_info2=It will not affect any other GUI features.
 
 # Commands & Processes
 proc_time=所要時間

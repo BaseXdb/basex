@@ -61,15 +61,15 @@ public final class InexSubmit {
   private static final String[] QUERY = new String[] {"automatic", "manual"};
 
   /** Database context. */
-  private Context ctx = new Context();
+  private final Context ctx = new Context();
   /** Session. */
   private ClientSession session;
   /** Queries. */
-  private StringList queries;
+  private final StringList queries;
   /** Databases. */
   private StringList databases;
   /** Topic ids of the queries. */
-  private StringList tid;
+  private final StringList tid;
 
   /** PrintOutput for the submission file. */
   private PrintOutput sub;
@@ -77,15 +77,15 @@ public final class InexSubmit {
   private XMLSerializer xml;
 
   /** Collection for query result sizes. */
-  private int[] qressizes;
+  private final int[] qressizes;
   /** Keeps the single query times. */
-  private double[] qt;
+  private final double[] qt;
   /** Collection for query times. */
-  private double[] qtimes;
+  private final double[] qtimes;
   /** Results of the queries. */
-  private SeqIter[] results;
+  private final SeqIter[] results;
   /** Number of queries. */
-  private int nqueries;
+  private final int nqueries;
   /** Number of query times. */
   private int c;
 

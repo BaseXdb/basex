@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import org.basex.core.Context;
 import org.basex.core.proc.Find;
 import org.basex.data.Data;
-import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;
 import org.basex.gui.GUIProp;
@@ -15,6 +14,7 @@ import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
+import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.MetaElem;
 
 /**
@@ -93,7 +93,7 @@ final class TableData {
    */
   void init(final Data data) {
     roots = new TokenList();
-    if(data.fs != null) roots.add(DataText.FILE);
+    if(data.fs != null) roots.add(DeepFS.FILE);
     else {
       // sort keys by occurrence
       for(final byte[] k : data.path.desc(Token.EMPTY, data, true, true)) {
@@ -122,17 +122,18 @@ final class TableData {
     rowH = 1;
 
     if(data.fs != null) {
-      root = data.tags.id(DataText.FILE);
-      addCol(DataText.SUFFIX, false);
-      addCol(DataText.NAME, false);
-      addCol(DataText.SIZE, false);
-      addCol(DataText.MTIME, false);
+      root = data.fs.fileID;
+      addCol(DeepFS.SUFFIX, false);
+      addCol(DeepFS.NAME, false);
+      addCol(DeepFS.SIZE, false);
+      addCol(DeepFS.MTIME, false);
       addCol(MetaElem.TITLE.tok(), true);
       addCol(MetaElem.SENDER_NAME.tok(), true);
       addCol(MetaElem.RECEIVER_NAME.tok(), true);
       addCol(MetaElem.ARTIST.tok(), true);
-//      addCol(MetaElem.PIXEL_WIDTH.tok(), true);
-//      addCol(MetaElem.PIXEL_HEIGHT.tok(), true);
+      addCol(MetaElem.PIXEL_WIDTH.tok(), true);
+      addCol(MetaElem.PIXEL_HEIGHT.tok(), true);
+      addCol(MetaElem.ARTIST.tok(), true);
       addCol(MetaElem.ALBUM.tok(), true);
     } else {
       if(r == -1 && roots.size() == 0) return;
@@ -275,6 +276,7 @@ final class TableData {
     final Data data = context.data;
     final Names index = e ? data.tags : data.atts;
     final Kind kind = index.stat(c).kind;
+    System.out.println(kind);
     final boolean num = kind == Kind.INT || kind == Kind.DBL;
 
     final byte[][] tokens = new byte[rows.size()][];

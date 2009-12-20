@@ -127,6 +127,8 @@ public final class GUIProp extends AProp {
   public static final Object[] SAVEPATH = { "SAVEPATH", Prop.WORK };
   /** Path for XQuery files. */
   public static final Object[] XQPATH = { "XQPATH", Prop.WORK };
+  /** Path for stopwords. */
+  public static final Object[] STOPPATH = { "STOPPATH", Prop.WORK };
 
   /** Path to mapped file hierarchy. */
   public static final Object[] FSBACKING = { "FSBACKING", Prop.HOME };

@@ -47,7 +47,7 @@ public final class DialogInfo extends Dialog {
   /** Optimize flag. */
   public boolean opt;
   /** Optimize button. */
-  private Object optimize;
+  private final Object optimize;
 
   /**
    * Default constructor.
@@ -89,11 +89,12 @@ public final class DialogInfo extends Dialog {
     tab2.add(addIndex(true, data));
     tab2.add(addIndex(false, data));
 
-    String[] cb = { INFOPATHINDEX, INFOTEXTINDEX, INFOATTRINDEX, INFOFTINDEX };
-    boolean[] val = { data.meta.pathindex, data.meta.txtindex,
+    final String[] cb = {
+        INFOPATHINDEX, INFOTEXTINDEX, INFOATTRINDEX, INFOFTINDEX };
+    final boolean[] val = { data.meta.pthindex, data.meta.txtindex,
         data.meta.atvindex, data.meta.ftxindex };
-    
-    BaseXBack[] panels = new BaseXBack[indexes.length];
+
+    final BaseXBack[] panels = new BaseXBack[indexes.length];
     for(int i = 0; i < indexes.length; i++) {
       indexes[i] = new BaseXCheckBox(cb[i], val[i], 0, this);
       indexes[i].setEnabled(data instanceof DiskData);

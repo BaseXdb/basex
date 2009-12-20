@@ -264,7 +264,7 @@ public abstract class Serializer {
     // loop through all table entries
     final int s = pre + data.size(pre, data.kind(p));
     while(p < s && !finished()) {
-      int k = data.kind(p);
+      final int k = data.kind(p);
       final int r = data.parent(p, k);
 
       // close opened elements...

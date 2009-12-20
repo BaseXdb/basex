@@ -30,6 +30,8 @@ public class CmdTest {
   private static final String FILE = "input.xml";
   /** Test name. */
   private static final String NAME = "input";
+  /** Test name. */
+  private static final String USER = "cmdtest";
   /** Socket reference. */
   static Session session;
 
@@ -51,6 +53,16 @@ public class CmdTest {
   @After
   public final void setUp() {
     process(new DropDB(NAME));
+    process(new DropUser(NAME));
+  }
+
+  /** Command Test. */
+  @Test
+  public final void add() {
+    no(new Add(FILE));
+    ok(new CreateColl(NAME));
+    ok(new Add(FILE));
+    no(new Add(FILE));
   }
 
   /** Command test. */
@@ -60,6 +72,14 @@ public class CmdTest {
     ok(new CreateDB(FILE));
     ok(new Close());
     no(new InfoDB());
+  }
+
+  /** Command Test. */
+  @Test
+  public final void createColl() {
+    ok(new CreateColl(NAME));
+    ok(new CreateColl(NAME));
+    ok(new DropDB(NAME));
   }
 
   /** Command Test. */
@@ -75,13 +95,15 @@ public class CmdTest {
   /** Command Test. */
   @Test
   public final void createFS() {
-    ok(new CreateFS("test", "test"));
+    no(new CreateFS(".s", "test"));
+    ok(new CreateFS(".settings", "test"));
     ok(new DropDB("test"));
   }
 
   /** Command Test. */
   @Test
   public final void createIndex() {
+    no(new CreateIndex(null));
     for(final CmdIndex cmd : CmdIndex.values()) no(new CreateIndex(cmd));
     ok(new CreateDB(FILE));
     for(final CmdIndex cmd : CmdIndex.values()) ok(new CreateIndex(cmd));
@@ -96,6 +118,14 @@ public class CmdTest {
 
   /** Command Test. */
   @Test
+  public final void createUser() {
+    ok(new CreateUser(USER, "test"));
+    no(new CreateUser(USER, "test"));
+    ok(new DropUser(USER));
+  }
+
+  /** Command Test. */
+  @Test
   public final void cs() {
     no(new Cs("//li"));
     ok(new CreateDB(FILE));
@@ -105,6 +135,17 @@ public class CmdTest {
     ok(CONTEXT.current, 2);
     ok(new Cs("/"));
     ok(CONTEXT.current, 1);
+  }
+
+  /** Command Test. */
+  @Test
+  public final void delete() {
+    no(new Delete(FILE));
+    ok(new CreateColl(NAME));
+    no(new Delete(FILE));
+    ok(new Add(FILE));
+    ok(new Delete(FILE));
+    no(new Delete(FILE));
   }
 
   /** Command Test. */
@@ -127,6 +168,14 @@ public class CmdTest {
 
   /** Command Test. */
   @Test
+  public final void dropUser() {
+    ok(new CreateUser(USER, "test"));
+    ok(new DropUser(USER));
+    no(new DropUser(USER));
+  }
+
+  /** Command Test. */
+  @Test
   public final void export() {
     final IO io = IO.get("export.xml");
     no(new Export(io.path()));
@@ -142,6 +191,15 @@ public class CmdTest {
     no(new Find("1"));
     ok(new CreateDB(FILE));
     ok(new Find("1"));
+  }
+
+  /** Command Test. */
+  @Test
+  public final void grant() {
+    ok(new CreateUser(USER, "test"));
+    no(new Grant("something", USER));
+    ok(new Grant("all", USER));
+    ok(new DropUser(USER));
   }
 
   /** Command Test. */
@@ -185,6 +243,13 @@ public class CmdTest {
 
   /** Command Test. */
   @Test
+  public final void kill() {
+    ok(new Kill("hans"));
+    no(new Kill("admin"));
+  }
+
+  /** Command Test. */
+  @Test
   public final void list() {
     ok(new List());
     ok(new CreateDB(FILE));
@@ -197,6 +262,7 @@ public class CmdTest {
     no(new Open(NAME));
     ok(new CreateDB(FILE));
     ok(new Open(NAME));
+    ok(new Open(NAME));
   }
 
   /** Command Test. */
@@ -205,6 +271,22 @@ public class CmdTest {
     no(new Optimize());
     ok(new CreateDB(FILE));
     ok(new Optimize());
+  }
+
+  /** Command Test. */
+  @Test
+  public final void password() {
+    ok(new Password("admin"));
+    no(new Password(""));
+  }
+
+  /** Command Test. */
+  @Test
+  public final void revoke() {
+    ok(new CreateUser(USER, "test"));
+    no(new Revoke("something", USER));
+    ok(new Revoke("all", USER));
+    ok(new DropUser(USER));
   }
 
   /** Command Test. */
@@ -231,6 +313,7 @@ public class CmdTest {
     ok(new Set(CmdSet.CHOP, true));
     ok(new Set("runs", 1));
     no(new Set("runs", true));
+    no(new Set(USER, USER));
   }
 
   /** Command Test. */

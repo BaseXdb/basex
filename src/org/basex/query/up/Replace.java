@@ -50,7 +50,7 @@ public final class Replace extends Update {
     if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
 
     final Iter t = expr[0].iter(ctx);
-    Item i = t.next();
+    final Item i = t.next();
     // check target constraints
     if(i == null) Err.or(UPSEQEMP, Main.name(this));
     final Type type = i.type;

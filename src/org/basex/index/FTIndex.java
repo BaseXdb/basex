@@ -1,5 +1,6 @@
 package org.basex.index;
 
+import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
 import org.basex.io.DataAccess;
@@ -21,6 +22,18 @@ public abstract class FTIndex implements Index {
   final double max;
   /** Minimum scoring value. */
   final double min;
+
+  /**
+   * Returns a new full-text index instance.
+   * @param d data reference
+   * @param wild wildcard index
+   * @return index instance
+   * @throws IOException IOException
+   */
+  public static FTIndex get(final Data d, final boolean wild)
+      throws IOException {
+    return wild ? new FTTrie(d) : new FTFuzzy(d);
+  }
 
   /**
    * Constructor.

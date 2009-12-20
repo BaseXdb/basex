@@ -25,12 +25,13 @@ public final class CreateIndex extends ACreate {
    * @param type index type, defined in {@link CmdIndex}
    */
   public CreateIndex(final Object type) {
-    super(DATAREF | User.WRITE, type.toString());
+    super(DATAREF | User.WRITE, type != null ? type.toString() : null);
   }
 
   @Override
   protected boolean exec(final PrintOutput out) {
     final Data data = context.data;
+    if(data instanceof MemData) return error(PROCMM);
 
     try {
       Type index = null;
@@ -58,7 +59,6 @@ public final class CreateIndex extends ACreate {
         default:
           return false;
       }
-      if(data instanceof MemData) return error(PROCMM);
 
       index(index, data);
       data.flush();

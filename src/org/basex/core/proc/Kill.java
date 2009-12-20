@@ -26,7 +26,7 @@ public final class Kill extends AAdmin {
     if(user.equals(context.user.name)) return error(USERKILLSELF, user);
 
     final Sessions ss = context.sessions;
-    int s = ss.size();
+    final int s = ss.size();
     for(int i = 0; i < ss.size(); i++) {
       if(user.equals(ss.get(i).context.user.name)) ss.get(i--).exit();
     }

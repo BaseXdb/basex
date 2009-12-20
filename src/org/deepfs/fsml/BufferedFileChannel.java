@@ -104,7 +104,7 @@ public final class BufferedFileChannel {
    * @param buffer the {@link ByteBuffer} to use
    * @param bytesToRead the maximum number of bytes to read from the FileChannel
    *          (including the already buffered bytes)
-   * @param p the parent channel.
+   * @param p the parent channel
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}
    */
@@ -484,7 +484,7 @@ public final class BufferedFileChannel {
 
   /**
    * Checks if the channel is locked.
-   * @throws IOException if the channel is locked.
+   * @throws IOException if the channel is locked
    */
   private void checkLock() throws IOException {
     if(locked) throw new IOException(
@@ -494,7 +494,7 @@ public final class BufferedFileChannel {
   /**
    * Reads a line of text. A line is considered to be terminated by any one of a
    * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
-   * immediately by a linefeed.
+   * immediately by a line feed.
    * @param inputEncoding the input encoding
    * @return A (UTF-8-)String containing the contents of the line, not including
    *         any line-termination characters, or null if the end of the stream

@@ -21,9 +21,9 @@ public final class UpdateExample {
    */
   public static void main(final String[] args) throws Exception {
     // Creates a new context
-    Context context = new Context();
+    final Context context = new Context();
     // Creates a standard output stream
-    PrintOutput out = new PrintOutput(System.out);
+    final PrintOutput out = new PrintOutput(System.out);
 
     out.println("\n=== Create a database:");
 

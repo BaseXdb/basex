@@ -172,7 +172,6 @@ public class DBNode extends Nod {
     final int p = data.parent(pre, data.kind(pre));
     if(p == -1) return null;
 
-    // check if parent constructor exists; if not, include document root node
     final DBNode node = copy();
     node.set(p, data.kind(p));
     node.score(Scoring.step(node.score));

@@ -1,7 +1,6 @@
 package org.basex.test.examples;
 
 import java.io.IOException;
-
 import org.basex.core.*;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.proc.*;
@@ -41,19 +40,19 @@ public final class DBExample {
     // Creates a database from the specified file.
    new CreateDB("input.xml", "Example1").exec(CONTEXT, System.out);
     // Do some database stuff
-   
+
    MaintenanceExamples.run();
-   
+
    // Runs some example Queries
    QueryExample.run();
-    
-    
+
+
   }
 
   /**
    * Some Examples in XQuery Evaluation.
    * This class contains several variants of XQuery Processing in BaseX.
-   * For further information on BaseX Client-Side abilities in 
+   * For further information on BaseX Client-Side abilities in
    * XQuery Processing please see:
    * @see XQueryExample#main(String[])
    */
@@ -91,14 +90,14 @@ public final class DBExample {
 
     /**
      * This method exexcutes an XQuery Process for the given database context.
-     * The results are automatically serialized and 
+     * The results are automatically serialized and
      * printed to an arbitrary OutputStream.
      * @throws BaseXException
      * in case your *TODO*
      */
     private static void directOutputExample() throws BaseXException {
       new XQuery("for $x in .//body//li return $x").exec(CONTEXT, System.out);
-      
+
     }
 
     /**
@@ -106,33 +105,33 @@ public final class DBExample {
      * using the {@link QueryProcessor} class.
      * This is especially useful if you happen to have very big results,
      * as you will not have to process all resulting nodes at once.
-     * Please note the use of {@link XMLSerializer} to generate 
+     * Please note the use of {@link XMLSerializer} to generate
      * valid XML output.
-     * 
+     *
      * @throws BaseXException
      *  in case something went wrong.
      * @throws QueryException
-     *  in case your query was wrong. 
+     *  in case your query was wrong.
      */
-    private static void iterateExample() 
+    private static void iterateExample()
       throws BaseXException, QueryException {
-      QueryProcessor qp = new QueryProcessor("for $x in .//body//li return $x",
-          CONTEXT);
+      final QueryProcessor qp = new QueryProcessor(
+          "for $x in .//body//li return $x", CONTEXT);
       // Returns a query iterator
-      Iter iter = qp.iter();
+      final Iter iter = qp.iter();
       Item item;
       try {
         while(null != (item = iter.next())) {
-          // 
+          //
           item.serialize(xmlSer);
         }
-      } catch(IOException e) {
+      } catch(final IOException e) {
         e.printStackTrace();
         return;
       }// Closes the serializer
       // Closes the query processor
     }
-    
+
     /**
      * Use XQuery update to ....
      * *TODO* [MSe]
@@ -144,7 +143,7 @@ public final class DBExample {
     private QueryExample() { }
 
   }
-   
+
    /**
    * This class shows you the usage of the BaseX Collection functions.
    * Collections provide Access to several XML Documents inside one Database.
@@ -154,7 +153,7 @@ public final class DBExample {
      /** Private constructor to avoid class creation. */
     private CollectionExamples() { }
    }
-   
+
   /**
    * This class shows you how to work with XQuery Update.
    */
@@ -165,11 +164,11 @@ public final class DBExample {
    * Examples on Database maintenance.
    * @author BaseXTeam
    * Topics covered: <br />
-   * Index creation & maintenance: 
-   * {@link MaintenanceExamples#createIndexes} 
+   * Index creation & maintenance:
+   * {@link MaintenanceExamples#createIndexes}
    * <br /> <br />
-   * Index creation & maintenance: 
-   * {@link MaintenanceExamples#createIndexes} 
+   * Index creation & maintenance:
+   * {@link MaintenanceExamples#createIndexes}
    */
   static final class MaintenanceExamples {
     /**
@@ -191,7 +190,7 @@ public final class DBExample {
       // close the PrintOutput.
       out.close();
     }
-    
+
     /**
      * This method creates a new Database.
      * It then closes the databases and reopens it.
@@ -202,25 +201,25 @@ public final class DBExample {
 //    // You may also create Databases from a collection of files.
       //
           System.out.println("=== Create Database.");
-      
+
           // Creates a database
-          new CreateDB("input.xml", "Example1").execute(CONTEXT, out); 
-          // Closes the database. 
+          new CreateDB("input.xml", "Example1").execute(CONTEXT, out);
+          // Closes the database.
           System.out.println("=== Close Database.");
-          new Close().execute(CONTEXT, out); 
+          new Close().execute(CONTEXT, out);
           System.out.println("=== Reopen Database.");
           new Open("Example1").execute(CONTEXT);
-          
+
     }
 
     /**
-     * Method that shows how to invoke the optimization of the index structure. 
+     * Method that shows how to invoke the optimization of the index structure.
      * @throws BaseXException
      * In case of failing.
      */
     private static void optimizeDB() throws BaseXException {
       new Optimize().exec(CONTEXT, System.out);
-      
+
     }
     /**
      * This method shows operations to create and drop indexes.
@@ -232,7 +231,7 @@ public final class DBExample {
       new CreateIndex("fulltext").exec(CONTEXT, System.out);
 
     }
-    
+
     /**
      * Information on the currently open database.
      * @throws BaseXException
@@ -251,8 +250,6 @@ public final class DBExample {
      * when it fails.
      */
     private static void creationAndDropping() throws BaseXException {
-
-      
       // Closes the database.
       new Close().exec(CONTEXT, System.out);
       // new DropDB("Example1").exec(context, System.out);

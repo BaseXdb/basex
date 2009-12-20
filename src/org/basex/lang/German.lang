@@ -24,7 +24,7 @@ b_ok=OK
 b_opt=Optimieren
 b_rename=Umbenennen
 b_open=Öffnen
-b_mount= Mount
+b_mount=Mount
 b_cancel=Abbrechen
 b_drop=Entfernen
 b_browse=Auswahl
@@ -188,6 +188,28 @@ da_cont1=Team
 da_cont2=und andere
 da_translation=Übersetzung
 
+ds_localserver=Lokaler Server
+ds_connect=Verbindung
+ds_users=Benutzer
+ds_host=Host
+ds_port=Port
+ds_localport=Lokaler Port
+ds_createu=Benutzer anlegen
+ds_perms=Rechte
+ds_drquestion=% Benutzer werden entfernt.\nSind Sie sicher?
+ds_alterpw=Passwort ändern
+ds_invalid=% ist ungültig
+ds_adlogin=Administrator-Login (lokal oder remote)
+ds_databases=Datenbanken
+ds_sessions=Verbindungen
+ds_logs=Logs
+ds_connected=Verbunden mit %:%.
+ds_disconnected=Verbindung wurde getrennt.
+ds_info1=Dieser Dialog ist nur zur Administration der Client-/Server-Umgebung gedacht.
+ds_info2=Er hat keine Auswirkungen auf die anderen GUI-Features.
+
+# GUI Commands
+
 c_about=Über %
 c_abouttt=Zeigt allgemeine Projektinfos an.
 c_all=Alles markieren
@@ -285,26 +307,6 @@ c_replace=% besteht bereits.\nMöchten Sie sie ersetzen?
 c_server=Server-Administration
 c_servertt=Zeigt die Server-Administration zur Verwaltung von Benutzern und Log-Files an.
 
-ds_localserver=Lokaler Server
-ds_connect=Verbindung
-ds_users=Benutzer
-ds_host=Host
-ds_port=Port
-ds_localport=Lokaler Port
-ds_createu=Benutzer anlegen
-ds_perms=Rechte
-ds_drquestion=% Benutzer werden entfernt.\nSind Sie sicher?
-ds_alterpw=Passwort ändern
-ds_invalid=% ist ungültig
-ds_adlogin=Administrator-Login (lokal oder remote)
-ds_databases=Datenbanken
-ds_sessions=Verbindungen
-ds_logs=Logs
-ds_connected=Verbunden mit %:%.
-ds_disconnected=Verbindung wurde getrennt.
-ds_info1=Dieser Dialog ist nur zur Administration der Client-/Server-Umgebung gedacht.
-ds_info2=Er hat keine Auswirkungen auf die anderen GUI-Features.
-
 # Commands & Processes
 proc_time=Benötigte Zeit
 proc_syntax=Syntax
@@ -317,7 +319,7 @@ cmd_no=Befehl erwartet.
 cmd_unknown=Unbekannter Befehl "%"
 cmd_similar=Alternative: "%"
 
-# Help Commands
+# Help Command
 help_short="%" hilft weiter
 help_intro="%" zeigt die verfügbaren Befehle an.
 help_long=Detaillierte Infos: "% [command]".
