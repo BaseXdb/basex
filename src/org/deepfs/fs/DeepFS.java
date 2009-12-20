@@ -51,6 +51,8 @@ public final class DeepFS implements DataText {
 
   /** file/dir name. */
   public static final String S_NAME = "name";
+  /** backingstore path. */
+  public static final String S_BACKINGSTORE = "backingstore";
   /** File suffix. */
   public static final String S_SUFFIX = "suffix";
   /** file/dir size. */
@@ -72,6 +74,8 @@ public final class DeepFS implements DataText {
   public static final byte[] FILE = token(S_FILE);
   /** Content token. */
   public static final byte[] CONTENT = token(S_CONTENT);
+  /** Text content token. */
+  public static final byte[] TEXT_CONTENT = token(S_TEXT_CONTENT);
 
   /** Name attribute token. */
   public static final byte[] NAME = token(S_NAME);
@@ -98,7 +102,7 @@ public final class DeepFS implements DataText {
   /** Mount point attribute. */
   public static final byte[] MOUNTPOINT = token("mountpoint");
   /** Backing store attribute. */
-  public static final byte[] BACKINGSTORE = token("backingstore");
+  public static final byte[] BACKINGSTORE = token(S_BACKINGSTORE);
   /** Negative mount point attribute. */
   public static final byte[] NOTMOUNTED = token("(not mounted)");
 
@@ -513,16 +517,7 @@ public final class DeepFS implements DataText {
    * @return true if this node is a file, false otherwise
    */
   public boolean isFile(final int pre) {
-    int k = data.kind(pre);
-    if(k != Data.ELEM || data.name(pre) != fileID) return false;
-    int par = data.parent(pre, k);
-    // a regular xml file may contain a <file> node...
-    while(par >= 0 && k != Data.DOC) {
-      if(!isFSnode(par)) return false;
-      par = data.parent(par, data.kind(par));
-      k = data.kind(par);
-    }
-    return true;
+    return isValidNode(pre, fileID) ? hasValidParents(pre) : false;
   }
 
   /**
@@ -531,7 +526,7 @@ public final class DeepFS implements DataText {
    * @return true if this node is a directory, false otherwise
    */
   public boolean isDir(final int pre) {
-    return data.kind(pre) == Data.ELEM && data.name(pre) == dirID;
+    return isValidNode(pre, dirID) ? hasValidParents(pre) : false;
   }
 
   /**
@@ -540,9 +535,40 @@ public final class DeepFS implements DataText {
    * @return true if this node is a deepfs node, false otherwise
    */
   public boolean isFSnode(final int pre) {
-    final int name = data.name(pre);
-    return data.kind(pre) == Data.ELEM  &&
-      (name == fileID || name == dirID || name == fsmlID || name == deepfsID);
+    return isValidNode(pre, fileID, dirID, fsmlID, deepfsID) ?
+        hasValidParents(pre) : false;
+  }
+
+  /**
+   * Checks if this node is a valid filesystem node with one of the given type
+   * (file/dir/deepfs/fsml).
+   * @param pre pre value
+   * @param acceptedNames type of the filesystem node
+   * @return true if this node is valid
+   */
+  private boolean isValidNode(final int pre, final int... acceptedNames) {
+    final int k = data.kind(pre);
+    if(k != Data.ELEM) return false;
+    final int n = data.name(pre);
+    for(final int i : acceptedNames) if(n == i) return true;
+    return false;
+  }
+  
+  /**
+   * Checks if all parent nodes of this node are valid.
+   * @param pre pre value
+   * @return true if all parent nodes are valid fsml nodes.
+   */
+  private boolean hasValidParents(final int pre) {
+    int par = data.parent(pre, data.kind(pre));
+    int k = data.kind(par);
+    // a regular xml file may contain a <file> node...
+    while(par >= 0 && k != Data.DOC) {
+      if(!isValidNode(par, dirID, fsmlID, deepfsID)) return false;
+      par = data.parent(par, data.kind(par));
+      k = data.kind(par);
+    }
+    return true;
   }
 
   /**
@@ -673,6 +699,13 @@ public final class DeepFS implements DataText {
   public byte[] path(final int pre, final boolean backing) {
     int p = pre;
     int k = data.kind(p);
+    
+    // select parent file/dir/fsml/deepfs node
+    while(p > 0 && !isValidNode(p, fileID, dirID, deepfsID, fsmlID)) {
+      p = data.parent(p, k);
+      k = data.kind(p);
+    }
+    
     final IntList il = new IntList();
     while(p >= 0 && k != Data.DOC) {
       if(!isFSnode(p)) return EMPTY;

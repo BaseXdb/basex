@@ -326,8 +326,27 @@ public final class PlotView extends View {
     if(plotData.pres.length < 1) return;
 
     gui.painting = true;
+
+    /*
+     * Possibly, the focused node is not shown in this view (if it was focused
+     * in another view). In this case, the ancestor with the smallest distance
+     * to the focused node is selected.
+     */
+    int focused = gui.context.focused;
+    if(focused != -1) {
+      final Data d = gui.context.data;
+      int itmID = d.tags.id(plotData.item);
+      int k = d.kind(focused);
+      int name = d.name(focused);
+      while(focused > 0 && itmID != name) {
+        focused = d.parent(focused, k);
+        k = d.kind(focused);
+        name = d.name(focused);
+      }
+    }
+    
     // draw focused item
-    final int f = plotData.findPre(gui.context.focused);
+    final int f = plotData.findPre(focused);
     if(f > -1) {
       // determine number of overlapping nodes (plotting second)
       final int ol = overlappingNodes(f).length;
@@ -339,8 +358,8 @@ public final class PlotView extends View {
         g.setFont(font);
         final int textH = g.getFontMetrics().getHeight();
 
-        final String x = formatString(true);
-        final String y = formatString(false);
+        final String x = formatString(true, focused);
+        final String y = formatString(false, focused);
         String label = x.length() > 16 ? x.substring(0, 14) + ".." : x;
         if(!x.isEmpty() && !y.isEmpty()) label += " | ";
         label += y.length() > 16 ? y.substring(0, 14) + ".." : y;
@@ -348,8 +367,8 @@ public final class PlotView extends View {
         int ya = calcCoordinate(false, y1) + gui.prop.num(GUIProp.PLOTDOTS);
         final int ww = getWidth();
 
-        final byte[] nm = ViewData.attValue(data, data.nameID,
-            gui.context.focused);
+        final byte[] nm = ViewData.attValue(data, data.nameID, focused);
+        if(nm != null) System.out.println(string(nm));
         String name = nm != null ? string(nm) : "";
         if(name.length() > 0 && plotData.xAxis.attrID != data.nameID &&
             plotData.yAxis.attrID != data.nameID) {
@@ -975,11 +994,12 @@ public final class PlotView extends View {
   /**
    * Formats an axis caption.
    * @param drawX x/y axis flag
+   * @param focused pre value of the focused node
    * @return formatted string
    */
-  private String formatString(final boolean drawX) {
+  private String formatString(final boolean drawX, final int focused) {
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
-    final byte[] val = axis.getValue(gui.context.focused);
+    final byte[] val = axis.getValue(focused);
     if(val.length == 0) return "";
     return axis.type == Kind.TEXT || axis.type == Kind.CAT ? string(val) :
       formatString(toDouble(val), drawX);

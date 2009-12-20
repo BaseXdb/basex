@@ -81,7 +81,7 @@ public final class DeepFile {
   // ----- constructors. -------------------------------------------------------
   // ---------------------------------------------------------------------------
 
-  /*
+  /**
    * <p>
    * Constructor.
    * </p>
@@ -98,11 +98,12 @@ public final class DeepFile {
    * @param file the name of the associated file in the file system
    * @throws IOException if any I/O error occurs
    * @see IFileParser#extract(DeepFile)
+   */
   public DeepFile(final String file) throws IOException {
     this(new File(file));
   }
 
-  /*
+  /**
    * <p>
    * Constructor.
    * </p>
@@ -119,12 +120,12 @@ public final class DeepFile {
    * @param file the associated file in the file system
    * @throws IOException if any I/O error occurs
    * @see IFileParser#extract(DeepFile)
+   */
   public DeepFile(final File file) throws IOException {
     this(file.isDirectory() ? null : new BufferedFileChannel(file));
   }
-   */
 
-  /*
+  /**
    * <p>
    * Constructor.
    * </p>
@@ -140,6 +141,7 @@ public final class DeepFile {
    * </p>
    * @param f the {@link BufferedFileChannel}
    * @throws IOException if any error occurs
+   */
   public DeepFile(final BufferedFileChannel f) throws IOException {
     this(new ParserRegistry(), f, new Context(), 0, f.size());
     final Prop p = context.prop;
@@ -147,7 +149,6 @@ public final class DeepFile {
     p.set(Prop.FSCONT, true);
     p.set(Prop.FSXML, true);
   }
-   */
 
   /**
    * <p>
@@ -717,7 +718,7 @@ public final class DeepFile {
     val.add(MimeType.UNKNOWN.toString());
     metaElements.put(MetaElem.FORMAT, val);
     val.clear();
-    val.add(FileType.UNKNOWN.toString());
+    val.add(FileType.UNKNOWN_TYPE.toString());
     metaElements.put(MetaElem.TYPE, val);
   }
 

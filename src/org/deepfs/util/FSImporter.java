@@ -1,7 +1,6 @@
 package org.deepfs.util;
 
 import static org.deepfs.fs.DeepFS.*;
-import static org.basex.util.Token.string;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -99,7 +98,7 @@ public final class FSImporter implements FSTraversal {
     currentFile = f.toString();
     String xmlFragment = null;
     if(f.isDirectory()) {
-      xmlFragment = FSMLSerializer.serializeFile(f, root);
+      xmlFragment = FSMLSerializer.serialize(f, root);
     } else {
       try {
         final BufferedFileChannel bfc = new BufferedFileChannel(f, buffer);
@@ -125,7 +124,7 @@ public final class FSImporter implements FSTraversal {
             f.getAbsolutePath(), e);
       }
       if(xmlFragment == null)
-        xmlFragment = FSMLSerializer.serializeFile(f, false);
+        xmlFragment = FSMLSerializer.serialize(f, false);
     }
 
     if(xmlFragment != null) {
@@ -151,7 +150,7 @@ public final class FSImporter implements FSTraversal {
   @Override
   public void preTraversalVisit(final File d) {
     if(d.isDirectory()) targetNode += "/" + S_DEEPFS + "[@"
-    + string(BACKINGSTORE) + " = \"" + insert(d, true) + "\"]";
+    + S_BACKINGSTORE + " = \"" + insert(d, true) + "\"]";
     else {
       preTraversalVisit(d.getParentFile());
       insert(d, false);

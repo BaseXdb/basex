@@ -28,7 +28,7 @@ public final class FSMLSerializer {
    * Constructor.
    * @param df the DeepFile
    */
-  public FSMLSerializer(final DeepFile df) {
+  private FSMLSerializer(final DeepFile df) {
     deepFile = df;
     xml = new StringBuilder();
   }
@@ -47,9 +47,7 @@ public final class FSMLSerializer {
    * @throws IOException if any error occurs
    */
   public static String serialize(final DeepFile deepFile) throws IOException {
-    final FSMLSerializer ser = new FSMLSerializer(deepFile);
-    ser.serialize();
-    return ser.toString();
+    return new FSMLSerializer(deepFile).serialize();
   }
 
   /**
@@ -75,15 +73,14 @@ public final class FSMLSerializer {
    *          directory
    * @return the xml data as string
    */
-  public static String serializeFile(final File file,
-      final boolean root) {
+  public static String serialize(final File file, final boolean root) {
     final FSMLSerializer ser = new FSMLSerializer();
     final Atts atts = DeepFS.atts(file, root);
     final String name;
     if(file.isDirectory()) name = root ? S_DEEPFS : S_DIR;
     else name = S_FILE;
     ser.startElem(name, convAtts(atts), true);
-    return ser.toString();
+    return ser.xml.toString();
   }
 
   /**
@@ -91,7 +88,7 @@ public final class FSMLSerializer {
    * @return the serialized deep file
    * @throws IOException if any error occurs
    */
-  public String serialize() throws IOException {
+  private String serialize() throws IOException {
     serializeDeepFiles(false, deepFile);
     return xml.toString();
   }
@@ -250,10 +247,5 @@ public final class FSMLSerializer {
       serializeDeepFiles(true, d.getContent());
       endElem(subfile ? S_CONTENT : S_FILE);
     }
-  }
-
-  @Override
-  public String toString() {
-    return xml.toString();
   }
 }

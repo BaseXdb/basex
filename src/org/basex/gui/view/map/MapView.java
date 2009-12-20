@@ -128,7 +128,7 @@ public final class MapView extends View implements Runnable {
     final int ms = mainRects.size;
     for(int mi = 0; mi < ms; mi++) {
       final MapRect rect = mainRects.get(mi);
-      if(f == rect.pre || mi + 1 < ms && f < mainRects.get(mi + 1).pre) {
+      if(f == rect.pre || mi + 1 == ms || f < mainRects.get(mi + 1).pre) {
         focused = rect;
         repaint();
         break;

@@ -63,7 +63,7 @@ public final class TXTParser implements IFileParser {
       final String s = name.substring(name.lastIndexOf('.') + 1).toLowerCase();
       final MimeType mime = SUFFIXES.get(s);
       if(mime == null) {
-        deepFile.setFileType(valid ? FileType.TEXT : FileType.UNKNOWN);
+        deepFile.setFileType(valid ? FileType.TEXT : FileType.UNKNOWN_TYPE);
         deepFile.setFileFormat(MimeType.UNKNOWN);
       } else {
         for(final FileType ft : mime.getMetaTypes())

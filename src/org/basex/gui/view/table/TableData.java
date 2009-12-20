@@ -133,7 +133,6 @@ final class TableData {
       addCol(MetaElem.ARTIST.tok(), true);
       addCol(MetaElem.PIXEL_WIDTH.tok(), true);
       addCol(MetaElem.PIXEL_HEIGHT.tok(), true);
-      addCol(MetaElem.ARTIST.tok(), true);
       addCol(MetaElem.ALBUM.tok(), true);
     } else {
       if(r == -1 && roots.size() == 0) return;
@@ -194,6 +193,7 @@ final class TableData {
 
     rows = new IntList();
     for(int p : n) {
+      final int pre = p;
       final int s = p + data.size(p, data.kind(p));
       // find first root tag
       do {
@@ -204,7 +204,11 @@ final class TableData {
       while(p < s) {
         final int k = data.kind(p);
         if(fs) {
-          if(data.fs.isFile(p)) rows.add(p);
+          if(data.fs.isFile(p) || pre == p) {
+            rows.add(p);
+            p += data.size(p, k); // file nodes must not be nested
+            continue;
+          }
         } else if(k == Data.ELEM && data.name(p) == root) rows.add(p);
         p += data.attSize(p, k);
       }
@@ -276,7 +280,6 @@ final class TableData {
     final Data data = context.data;
     final Names index = e ? data.tags : data.atts;
     final Kind kind = index.stat(c).kind;
-    System.out.println(kind);
     final boolean num = kind == Kind.INT || kind == Kind.DBL;
 
     final byte[][] tokens = new byte[rows.size()][];

@@ -65,7 +65,7 @@ public enum MimeType {
   /** Plaintext. */
   TXT("text/plain", "txt", FileType.TEXT),
   /** Unknown media. */
-  UNKNOWN("unkown", "", FileType.UNKNOWN),
+  UNKNOWN("unkown format", "", FileType.UNKNOWN_TYPE),
   /** Vcard. */
   VCARD("text/x-vcard", "vcf", FileType.CONTACT),
   /** XLS. */
