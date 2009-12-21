@@ -67,6 +67,8 @@ public final class DeepFile {
   /** All xml contents that are extracted from the file as string. */
   private final ArrayList<Content> xmlContents;
 
+  /** Default database context. */
+  private static final Context DEFAULT_CONTEXT = new Context();
   /** The database context. */
   private final Context context;
 
@@ -76,6 +78,13 @@ public final class DeepFile {
   private final long offset;
   /** Size of the deep file in bytes (-1 means unknown size). */
   private long size;
+  
+  static {
+    final Prop p = DEFAULT_CONTEXT.prop;
+    p.set(Prop.FSMETA, true);
+    p.set(Prop.FSCONT, true);
+    p.set(Prop.FSXML, true);
+  }
 
   // ---------------------------------------------------------------------------
   // ----- constructors. -------------------------------------------------------
@@ -122,7 +131,7 @@ public final class DeepFile {
    * @see IFileParser#extract(DeepFile)
    */
   public DeepFile(final File file) throws IOException {
-    this(file.isDirectory() ? null : new BufferedFileChannel(file));
+    this(file.isFile() ? new BufferedFileChannel(file) : null);
   }
 
   /**
@@ -143,11 +152,7 @@ public final class DeepFile {
    * @throws IOException if any error occurs
    */
   public DeepFile(final BufferedFileChannel f) throws IOException {
-    this(new ParserRegistry(), f, new Context(), 0, f.size());
-    final Prop p = context.prop;
-    p.set(Prop.FSMETA, true);
-    p.set(Prop.FSCONT, true);
-    p.set(Prop.FSXML, true);
+    this(new ParserRegistry(), f, DEFAULT_CONTEXT, 0, f.size());
   }
 
   /**

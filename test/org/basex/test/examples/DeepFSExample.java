@@ -43,14 +43,14 @@ public final class DeepFSExample {
     // -------------------------------------------------------------------------
     
     System.out.println(
-        "=== Serialize a single file (without metadata and contents");
+        "=== Serialize a single file (without metadata and contents)");
     xml = FSMLSerializer.serialize(FILE, false);
     System.out.println(xml);
     
     // -------------------------------------------------------------------------
     
     System.out.println(
-        "\n=== Serialize a single file (with metadata and text/xml contents");
+        "\n=== Serialize a single file (with metadata and text/xml contents)");
     DeepFile deepFile = new DeepFile(FILE);
     // Extracts metadata and text/xml contents
     deepFile.extract();    

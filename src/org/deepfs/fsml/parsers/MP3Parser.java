@@ -179,8 +179,9 @@ public final class MP3Parser implements IFileParser {
   DeepFile deepFile;
 
   @Override
-  public boolean check(final BufferedFileChannel f) throws IOException {
-    bfc = f;
+  public boolean check(final DeepFile df) throws IOException {
+    bfc = df.getBufferedFileChannel();
+    deepFile = df;
     return checkID3v2() || checkID3v1();
   }
 

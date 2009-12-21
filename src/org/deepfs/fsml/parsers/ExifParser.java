@@ -1023,16 +1023,13 @@ public final class ExifParser {
 
   /**
    * Checks if the Exif IFD is valid.
-   * @param f the {@link BufferedFileChannel} to read from
+   * @param df the {@link DeepFile} to read from
    * @return true if the IFD is valid, false otherwise
    * @throws IOException if any error occurs while reading from the channel
    */
-  boolean check(final BufferedFileChannel f) throws IOException {
-    try {
-      f.buffer(4);
-    } catch(final EOFException e) {
-      return false;
-    }
+  boolean check(final DeepFile df) throws IOException {
+    final BufferedFileChannel f = df.getBufferedFileChannel();
+    try { bfc.buffer(8); } catch(final EOFException e) { return false; }
     if(checkEndianness(f) && f.getShort() == 0x2A) return true;
     f.setByteOrder(ByteOrder.BIG_ENDIAN);
     return false;
@@ -1045,14 +1042,10 @@ public final class ExifParser {
    */
   public void extract(final DeepFile df)
       throws IOException {
+    if(!check(df)) return;
+    
     deepFile = df;
     bfc = df.getBufferedFileChannel();
-    try {
-      bfc.buffer(8);
-    } catch(final EOFException e) {
-      return;
-    }
-    if(!check(bfc)) return;
 
     final int ifdOffset = bfc.getInt();
     /*

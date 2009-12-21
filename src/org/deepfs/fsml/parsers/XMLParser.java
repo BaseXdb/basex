@@ -37,7 +37,8 @@ public final class XMLParser implements IFileParser {
   }
 
   @Override
-  public boolean check(final BufferedFileChannel f) throws IOException {
+  public boolean check(final DeepFile df) throws IOException {
+    final BufferedFileChannel f = df.getBufferedFileChannel();
     return parse(f, new Prop(false)) != null ? true : false;
   }
 

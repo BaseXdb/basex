@@ -28,15 +28,11 @@ public final class GIFParser implements IFileParser {
     ParserRegistry.register("gif", GIFParser.class);
   }
 
-  /**
-   * Checks if the gif header is valid.
-   * @param f the file channel to read from
-   * @return true if the header is valid, false otherwise
-   * @throws IOException if any error occurs while reading from the channel
-   */
-  public boolean check(final BufferedFileChannel f) throws IOException {
+  public boolean check(final DeepFile deepFile) throws IOException {
     final int len = HEADERGIF87.length;
+    final BufferedFileChannel f = deepFile.getBufferedFileChannel();
     if(f.size() < len) return false;
+    try { f.buffer(10); } catch(final EOFException e) { return false; }
     final byte[] header = f.get(new byte[len]);
     return eq(header, HEADERGIF87) || eq(header, HEADERGIF89);
   }
@@ -45,12 +41,7 @@ public final class GIFParser implements IFileParser {
   public void extract(final DeepFile deepFile) throws IOException {
     final BufferedFileChannel f = deepFile.getBufferedFileChannel();
     if(deepFile.extractMeta()) {
-      try {
-        f.buffer(10);
-      } catch(final EOFException e) {
-        return;
-      }
-      if(!check(f)) return;
+      if(!check(deepFile)) return;
 
       deepFile.setFileType(FileType.PICTURE);
       deepFile.setFileFormat(MimeType.GIF);

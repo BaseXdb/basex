@@ -3,7 +3,6 @@ package org.deepfs.fsml.parsers;
 import java.io.IOException;
 import java.util.TreeMap;
 import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.util.Token;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
@@ -35,12 +34,11 @@ public final class TXTParser implements IFileParser {
     ParserRegistry.registerFallback(TXTParser.class);
   }
 
-  /** {@inheritDoc} */
   @Override
-  public boolean check(final BufferedFileChannel bfc) {
+  public boolean check(final DeepFile deepFile) {
     try {
-      // [BL] check fstextmax property
-      final int len = (int) Math.min(bfc.size(), (Integer) Prop.FSTEXTMAX[1]);
+      final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
+      final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
       return Token.isValidUTF8(bfc.get(new byte[len]));
     } catch(final Exception e) {
       return false;

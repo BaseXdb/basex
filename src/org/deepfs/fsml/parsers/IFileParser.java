@@ -1,7 +1,6 @@
 package org.deepfs.fsml.parsers;
 
 import java.io.IOException;
-import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 
 /**
@@ -16,11 +15,11 @@ public interface IFileParser {
    * Checks if there is a File in correct format and can be read by the parser.
    * Checks e.g. header bytes.
    * </p>
-   * @param bfc the {@link BufferedFileChannel} to read from
+   * @param deepFile the {@link DeepFile} to read from
    * @return true if the file is supported
    * @throws IOException if an error occurs while reading from the file
    */
-  boolean check(final BufferedFileChannel bfc)
+  boolean check(final DeepFile deepFile)
       throws IOException;
 
   /**

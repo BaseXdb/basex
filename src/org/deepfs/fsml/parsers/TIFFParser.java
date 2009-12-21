@@ -2,7 +2,6 @@ package org.deepfs.fsml.parsers;
 
 import java.io.IOException;
 import org.basex.core.Main;
-import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.FileType;
 import org.deepfs.fsml.MimeType;
@@ -25,8 +24,8 @@ public final class TIFFParser implements IFileParser {
   private final ExifParser exifParser = new ExifParser();
 
   @Override
-  public boolean check(final BufferedFileChannel f) throws IOException {
-    return exifParser.check(f);
+  public boolean check(final DeepFile df) throws IOException {
+    return exifParser.check(df);
   }
 
   @Override

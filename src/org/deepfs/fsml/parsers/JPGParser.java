@@ -46,14 +46,9 @@ public final class JPGParser implements IFileParser {
   /** The {@link BufferedFileChannel} to read from. */
   private BufferedFileChannel bfc;
 
-  /**
-   * Checks if the JPG header is valid.
-   * @param f the file channel to read from
-   * @return true if the header is valid, false otherwise
-   * @throws IOException if any error occurs while reading from the channel
-   */
   @Override
-  public boolean check(final BufferedFileChannel f) throws IOException {
+  public boolean check(final DeepFile df) throws IOException {
+    final BufferedFileChannel f = df.getBufferedFileChannel();
     try {
       f.buffer(6);
     } catch(final EOFException e) {
@@ -69,10 +64,12 @@ public final class JPGParser implements IFileParser {
   public void extract(final DeepFile df) throws IOException {
     if(df.extractMeta()) {
       deepFile = df;
-      bfc = deepFile.getBufferedFileChannel();
-      if(!check(bfc)) return;
+      if(!check(deepFile)) return;
+      
       deepFile.setFileType(FileType.PICTURE);
       deepFile.setFileFormat(MimeType.JPG);
+      
+      bfc = deepFile.getBufferedFileChannel();
       bfc.skip(-2);
       while(bfc.get() == 0xFF) {
         final int b = bfc.get(); // segment marker

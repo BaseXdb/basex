@@ -217,7 +217,7 @@ public final class EMLParser implements IFileParser {
   DeepFile deepFile;
 
   @Override
-  public boolean check(final BufferedFileChannel f) throws IOException {
+  public boolean check(final DeepFile df) throws IOException {
     while(readLine())
       if(mCurrLine.startsWith("From:") && MAILPATTERN.matcher(mCurrLine).find())
         return true;

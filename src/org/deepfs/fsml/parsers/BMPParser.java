@@ -26,26 +26,20 @@ public final class BMPParser implements IFileParser {
     ParserRegistry.register("bmp", BMPParser.class);
   }
 
-  /**
-   * Checks the header bytes.
-   * @param f the {@link BufferedFileChannel} to read from
-   * @return true if the header is valid
-   * @throws IOException if any error occurs while reading from the channel
-   */
   @Override
-  public boolean check(final BufferedFileChannel f) throws IOException {
-    if(f.size() < 2) return false;
-    final byte[] header = f.get(new byte[2]);
+  public boolean check(final DeepFile deepFile) throws IOException {
+    final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
+    if(bfc.size() < 2) return false;
+    final byte[] header = bfc.get(new byte[2]);
     return eq(header, HEADERBMP);
   }
 
   @Override
   public void extract(final DeepFile deepFile) throws IOException {
     if(!deepFile.extractMeta()) return; // no content to extract
+    if(!check(deepFile)) return;
 
     final BufferedFileChannel f = deepFile.getBufferedFileChannel();
-    if(!check(f)) return;
-
     f.skip(16);
     try {
       f.buffer(8);

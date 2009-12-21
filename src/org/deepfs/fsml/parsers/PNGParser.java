@@ -28,7 +28,8 @@ public final class PNGParser implements IFileParser {
   private static final int HEADER_LENGTH = HEADER.length + 8;
 
   @Override
-  public boolean check(final BufferedFileChannel bfc) throws IOException {
+  public boolean check(final DeepFile df) throws IOException {
+    final BufferedFileChannel bfc = df.getBufferedFileChannel();
     return bfc.size() >= HEADER_LENGTH
         && eq(bfc.get(new byte[HEADER.length]), HEADER);
   }
@@ -36,10 +37,12 @@ public final class PNGParser implements IFileParser {
   @Override
   public void extract(final DeepFile deepFile) throws IOException {
     if(deepFile.extractMeta()) {
-      final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
-      if(!check(bfc)) return;
+      if(!check(deepFile)) return;
+      
       deepFile.setFileType(FileType.PICTURE);
       deepFile.setFileFormat(MimeType.PNG);
+
+      final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
       deepFile.addMeta(MetaElem.PIXEL_WIDTH, bfc.getInt());
       deepFile.addMeta(MetaElem.PIXEL_HEIGHT, bfc.getInt());
     }

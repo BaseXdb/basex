@@ -6,7 +6,6 @@ import java.util.StringTokenizer;
 import java.util.Map.Entry;
 import org.basex.core.Main;
 import org.basex.util.Token;
-import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.FileType;
 import org.deepfs.fsml.MetaElem;
@@ -592,7 +591,7 @@ public final class SpotlightExtractor implements IFileParser {
   }
 
   @Override
-  public boolean check(final BufferedFileChannel bfc) {
+  public boolean check(final DeepFile deepFile) {
     return true;
   }
 
