@@ -223,6 +223,25 @@ public final class DataAccess {
   }
 
   /**
+   * Reads the next compressed number and returns it.
+   * @return next integer
+   */
+  public synchronized byte[] readNumCompressed() {
+    final byte v = (byte) read();
+    switch(v & 0xC0) {
+    case 0:
+      return new byte[]{v};
+    case 0x40:
+      return new byte[]{v , (byte) read()};
+    case 0x80:
+      return new byte[]{v , (byte) read(), (byte) read()};
+    default:
+      return new byte[]{v , (byte) read(), (byte) read(), (byte) read()};
+    }
+  }
+
+  
+  /**
    * Writes the specified block to disk.
    * @param bf buffer to write
    * @throws IOException I/O exception

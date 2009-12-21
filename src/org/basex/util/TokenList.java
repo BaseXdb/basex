@@ -16,7 +16,7 @@ public final class TokenList implements Iterable<byte[]> {
   /** Resize factor for extending the the byte arrays. */
   double factor = 2;
   /** Value array. */
-  byte[][] list;
+  public byte[][] list;
   /** Current array size. */
   int size;
 

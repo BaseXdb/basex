@@ -16,46 +16,70 @@ import org.basex.util.TokenList;
  */
 class ValueTree {
   /** Compressed pre values. */
-  public final TokenList pres = new TokenList(1.2);
+  public TokenList pres = new TokenList(1.2);
   /** Tree structure [left, right, parent]. */
-  public final IntList tree = new IntList(1.2);
+  public  IntList tree = new IntList(1.2);
   /** Tokens saved in the tree. */
-  public final TokenList tokens = new TokenList(1.2);
+  public  TokenList tokens = new TokenList(1.2);
   /** Flag if a node has been modified. */
-  public final BoolList mod = new BoolList();
+  public  BoolList mod = new BoolList();
   /** Tree root node. */
-  private int root = -1;
+  protected int root = -1;
+  /** Mapping for usage of existing tree. */ 
+  public IntList map = new IntList(1.1);
 
   /** Current iterator node. */
-  private int cn;
+  protected int cn;
   /** Last iterator node. */
   private int ln;
+
 
   /**
    * Check if specified token was already indexed; if yes, its pre
    * value is added to the existing values. otherwise, create new index entry.
    * @param tok token to be indexed
    * @param pre pre value for the token
+   * @return int node
    */
-  void index(final byte[] tok, final int pre) {
+  int index(final byte[] tok, final int pre) {
+    return index(tok, pre, true);
+  }
+  
+  /**
+   * Check if specified token was already indexed; if yes, its pre
+   * value is added to the existing values. otherwise, create new index entry.
+   * @param tok token to be indexed
+   * @param pre pre value for the token
+   * @param f flag for usage of existing index
+   * @return int node
+   */
+  int index(final byte[] tok, final int pre, final boolean f) {
     // index is empty.. create root node
     if(root == -1) {
-      root = n(tok, pre, -1);
-      return;
+      root = n(tok, pre, -1, f);
+      return root;
     }
 
     int n = root;
     while(true) {
       final int c = Token.diff(tok, tokens.get(n));
       if(c == 0) {
-        pres.set(Num.add(pres.get(n), pre), n);
-        return;
+        if (f) pres.set(Num.add(pres.get(n), pre), n);
+        else {
+          final int i = map.containsAtPos(n);
+          if (i < 0) {
+            map.add(n);
+            pres.add(Num.newNum(pre));
+          } else pres.set(Num.add(pres.get(i), pre), i);
+//          return i;
+        }
+        return n;
       }
       int ch = c < 0 ? l(n) : r(n);
       if(ch != -1) {
         n = ch;
       } else {
-        ch = n(tok, pre, n);
+        ch = n(tok, pre, n, f);
         if(c < 0) {
           l(n, ch);
           a(l(n));
@@ -63,7 +87,7 @@ class ValueTree {
           r(n, ch);
           a(r(n));
         }
-        return;
+        return ch;
       }
     }
   }
@@ -94,8 +118,20 @@ class ValueTree {
     return cn != -1;
   }
 
+  
+//  /**
+//   * Returns the next pre values.
+//   * @return next iterator token
+//   */
+//  int next() {
+//    ln = nextPoi();
+//    final byte[] pp = pres.get(ln);
+//    pres.set(null, ln);
+//    return pp;  
+//  }
+  
   /**
-   * Returns the next pre values.
+   * Returns the next pointer.
    * @return next iterator token
    */
   int next() {
@@ -121,16 +157,19 @@ class ValueTree {
    * @param tok token of the node
    * @param pre pre value of the node
    * @param pa pointer on parent node
+   * @param f flag for usage of existing tree
    * @return pointer of the new node
    */
-  private int n(final byte[] tok, final int pre, final int pa) {
+  private int n(final byte[] tok, final int pre, final int pa, 
+      final boolean f) {
     tree.add(-1); // left node
     tree.add(-1); // right node
     tree.add(pa); // parent node
     mod.add(false);
     tokens.add(tok);
     pres.add(Num.newNum(pre));
-    return pres.size() - 1;
+    if (!f) map.add(tokens.size() - 1);    
+    return mod.size() - 1;
   }
 
   /**
@@ -138,7 +177,7 @@ class ValueTree {
    * @param nd current node
    * @return left node
    */
-  private int l(final int nd) {
+  protected int l(final int nd) {
     return tree.get(nd * 3);
   }
 
@@ -147,7 +186,7 @@ class ValueTree {
    * @param nd current node
    * @return right node
    */
-  private int r(final int nd) {
+  protected int r(final int nd) {
     return tree.get(nd * 3 + 1);
   }
 

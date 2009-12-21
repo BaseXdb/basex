@@ -55,7 +55,7 @@ public final class Num {
     size(tmp, pos + len);
     return tmp;
   }
-
+  
   /**
    * Reads and decompresses an integer value from the specified byte array.
    * @param array array

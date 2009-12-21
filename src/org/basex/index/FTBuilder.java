@@ -185,6 +185,7 @@ public abstract class FTBuilder extends IndexBuilder {
           lp = p;
         }
       }
+
       // fulltext data is stored here, with -scoreU, pre1, pos1, ...,
       // -scoreU, preU, posU
       for(final int l = np + Num.len(vpre, np); np < l; np++)
@@ -192,14 +193,15 @@ public abstract class FTBuilder extends IndexBuilder {
       for(final int l = pp + Num.len(vpos, pp); pp < l; pp++)
         out.write(vpos[pp]);
     }
-    token++;
+    token++;    
   }
 
   /**
    * Indexes a single token.
    * @param tok token to be indexed
+   * @throws IOException IOException
    */
-  abstract void index(final byte[] tok);
+  abstract void index(final byte[] tok) throws IOException;
 
   /**
    * Returns the number of disjunct tokens.
