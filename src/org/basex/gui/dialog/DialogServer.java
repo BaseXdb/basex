@@ -7,6 +7,11 @@ import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ConnectException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -464,9 +469,13 @@ public final class DialogServer extends Dialog {
     logc.removeAllItems();
     final File f = new File(logdir);
     final String[] files = f.list();
+    final List<String> list = new ArrayList<String>();
     if(files != null) {
-      for(final String s : files) if(s.endsWith(".log")) logc.addItem(s);
+      for(final String s : files) if(s.endsWith(".log")) list.add(s);
     }
+    Comparator<String> comparator = Collections.<String>reverseOrder();
+    Collections.sort(list, comparator);
+    for(final String s : list) logc.addItem(s);
     action(refreshLog);
   }
 
