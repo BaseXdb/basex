@@ -198,6 +198,7 @@ ds_createu=Benutzer anlegen
 ds_globperm=Globale Rechte
 ds_locperm=Lokale Rechte
 ds_drquestion=% Benutzer werden entfernt.\nSind Sie sicher?
+ds_dbrevoke=Recht wird vom eingeloggten Benutzer entfernt.\nSind Sie sicher?
 ds_alterpw=Passwort ändern
 ds_invalid=% ist ungültig
 ds_adlogin=Administrator-Login (lokal oder remote)

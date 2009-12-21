@@ -1057,6 +1057,8 @@ public interface Text {
   String LOCPERM = lang("ds_locperm") + COLS;
   /** Question for dropping user. */
   String DRQUESTION = lang("ds_drquestion");
+  /** Question for revoking right from logged in user. */
+  String DBREVOKE = lang("ds_dbrevoke");
   /** Alter password. */
   String ALTERPW = lang("ds_alterpw");
   /** Invalid. */

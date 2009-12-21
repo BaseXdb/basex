@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.BindException;
 import javax.swing.JScrollPane;
 import org.basex.core.Main;
+import org.basex.core.Proc;
 import org.basex.core.Session;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.proc.AlterUser;
@@ -68,7 +69,7 @@ public final class DialogUser extends BaseXBack {
   /** Flag global/local. */
   final boolean global;
   /** Dialog. */
-  final Dialog dia;
+  final DialogServer dia;
   /** Table panel. */
   final BaseXBack tablePanel;
 
@@ -77,7 +78,7 @@ public final class DialogUser extends BaseXBack {
    * @param g global/local flag
    * @param d dialog window
    */
-  public DialogUser(final boolean g, final Dialog d) {
+  public DialogUser(final boolean g, final DialogServer d) {
     global = g;
     dia = d;
 
@@ -168,10 +169,19 @@ public final class DialogUser extends BaseXBack {
         final CmdPerm perm = CmdPerm.values()[((Integer) o[2]) - 1];
         final String uname = table.getModel().getValueAt(
             (Integer) o[1], 0).toString();
-        ok = sess.execute(o[0] == Boolean.TRUE ?
-            new Grant(perm, uname, db) : new Revoke(perm, uname, db));
+
+        final boolean grant = o[0] == Boolean.TRUE;
+        final Proc proc = grant ? new Grant(perm, uname, db) :
+          new Revoke(perm, uname, db);
+
+        final boolean confirm = !grant && perm == CmdPerm.READ &&
+          uname.equals(dia.loguser.getText());
+        if(confirm && !Dialog.confirm(this, Main.info(DBREVOKE))) return;
+
+        ok = sess.execute(proc);
         msg = sess.info();
-        setData();
+        if(confirm) setSess(sess);
+        else setData();
       } else if(cmp == databases) {
         setData();
       } else if(cmp == create || cmp == user || cmp == pass) {
@@ -268,6 +278,7 @@ public final class DialogUser extends BaseXBack {
       addUser.removeAllItems();
 
       final int i = databases.getSelectedIndex();
+      if(i == 0) table.update(new Table());
       if(i <= 0) return;
 
       final Table data = table(databases.getSelectedItem().toString());
@@ -308,9 +319,7 @@ public final class DialogUser extends BaseXBack {
    */
   public void setSess(final Session s) throws IOException {
     sess = s;
-    if(global) {
-      setData();
-    } else {
+    if(!global) {
       final CachedOutput out = new CachedOutput();
       sess.execute(new List(), out);
       final Table dbs = new Table(out.toString());
@@ -321,6 +330,7 @@ public final class DialogUser extends BaseXBack {
       }
       databases.setSelectedIndex(0);
     }
+    setData();
   }
 
   /**

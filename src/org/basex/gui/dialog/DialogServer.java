@@ -65,6 +65,8 @@ public final class DialogServer extends Dialog {
   final BaseXBack sess = new BaseXBack();
   /** Log panel. */
   final BaseXBack logs = new BaseXBack();
+  /** Username textfield. */
+  final BaseXTextField loguser;
   /** Stop button. */
   private final BaseXButton stop;
   /** Start button. */
@@ -93,8 +95,6 @@ public final class DialogServer extends Dialog {
   private final BaseXText sedb;
   /** Log text. */
   private final BaseXText logt;
-  /** Username textfield. */
-  private final BaseXTextField loguser;
   /** Password textfield. */
   private final BaseXPassword logpass;
   /** Info label. */

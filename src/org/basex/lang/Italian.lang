@@ -198,6 +198,7 @@ ds_createu=Create User
 ds_globperm=Global Permissions
 ds_locperm=Local Permissions
 ds_drquestion=% User(s) will be dropped.\nAre you sure?
+ds_dbrevoke=Permission will be revoked from logged in user.\nAre you sure?
 ds_alterpw=Alter Password
 ds_invalid=% non valido
 ds_adlogin=Administrator Login (local or remote)
