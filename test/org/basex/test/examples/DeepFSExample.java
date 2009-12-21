@@ -29,6 +29,13 @@ public final class DeepFSExample {
   /** Test directory. */
   private static final File DIRECTORY = new File(CONTEXT.prop.get(Prop.DBPATH));
   
+  /** Example queries. */
+  private static final String[][] QUERIES = new String[][] {
+    {"All directories which contain more than 10 mp3 files",
+      "//dir[count(file[type=\"audio\"]) > 10]"
+    }
+  };
+  
   /** Private constructor. */
   private DeepFSExample() { }
 
@@ -83,6 +90,14 @@ public final class DeepFSExample {
     for(String[] parser : registry.availableParsers()) {
       System.out.println(parser[0] + (parser[0].length() > 7 ? "" : "\t") +
           "\t  " + parser[1]);
+    }
+    
+    // -------------------------------------------------------------------------
+    
+    System.out.println("\n=== Example queries ====================");
+    for(String[] query : QUERIES) {
+      System.out.println("\n=== " + query[0]);
+      new XQuery(query[1]).exec(CONTEXT, System.out);
     }
   }
 }
