@@ -64,12 +64,14 @@ public final class StringList implements Iterable<String> {
   /**
    * Sorts the strings.
    * @param cs respect case sensitivity
+   * @param asc ascending/descending flag
    */
-  public void sort(final boolean cs) {
+  public void sort(final boolean cs, final boolean asc) {
     Arrays.sort(list, 0, size, new Comparator<String>() {
       public int compare(final String s1, final String s2) {
-        return cs ? s1.compareTo(s2) :
+        final int c = cs ? s1.compareTo(s2) :
           s1.toLowerCase().compareTo(s2.toLowerCase());
+        return asc ? c : -c;
       }
     });
   }

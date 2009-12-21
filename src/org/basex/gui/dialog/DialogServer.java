@@ -7,11 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.ConnectException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -43,6 +38,7 @@ import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
 import org.basex.server.LoginException;
 import org.basex.util.Performance;
+import org.basex.util.StringList;
 import org.basex.util.Token;
 
 /**
@@ -360,12 +356,13 @@ public final class DialogServer extends Dialog {
         msg = DISCONNECTED;
       } else if(cmp == refreshSess) {
         refreshSess();
-      } else if(cmp == refreshLog) {
+      } else if(cmp == refreshLog || cmp == logc) {
         byte[] cont = Token.EMPTY;
         if(logc.getSelectedIndex() != -1) {
           cont = IO.get(logdir + logc.getSelectedItem().toString()).content();
         }
         logt.setText(cont);
+        logt.scrollToEnd();
       } else if(cmp == delete) {
         final File f = new File(logdir + logc.getSelectedItem().toString());
         if(f.delete()) {
@@ -386,8 +383,6 @@ public final class DialogServer extends Dialog {
         }
         logc.setSelectedIndex(-1);
         refreshLog();
-      } else if(cmp == logc) {
-        action(refreshLog);
       } else if(connected) {
         if(tab == 1) user.action(cmp);
         if(tab == 2) dbsP.action(cmp);
@@ -469,13 +464,12 @@ public final class DialogServer extends Dialog {
     logc.removeAllItems();
     final File f = new File(logdir);
     final String[] files = f.list();
-    final List<String> list = new ArrayList<String>();
+    final StringList sl = new StringList();
     if(files != null) {
-      for(final String s : files) if(s.endsWith(".log")) list.add(s);
+      for(final String s : files) if(s.endsWith(".log")) sl.add(s);
     }
-    Comparator<String> comparator = Collections.<String>reverseOrder();
-    Collections.sort(list, comparator);
-    for(final String s : list) logc.addItem(s);
+    sl.sort(true, false);
+    for(final String s : sl.finish()) logc.addItem(s);
     action(refreshLog);
   }
 

@@ -128,12 +128,12 @@ public final class CommandParser extends InputParser {
           case MAB:
             return new CreateMAB(string(cmd), name(null));
           case USER:
-            return new CreateUser(name(cmd), name(null));
+            return new CreateUser(name(cmd), string(null));
         }
         break;
       case ALTER:
         key(USER, cmd);
-        return new AlterUser(name(cmd), name(null));
+        return new AlterUser(name(cmd), string(null));
       case OPEN: case O:
         return new Open(name(cmd));
       case CHECK:
@@ -192,7 +192,7 @@ public final class CommandParser extends InputParser {
         if(type == null) help(null, cmd);
         return new Set(opt, val);
       case PASSWORD:
-        return new Password(name(null));
+        return new Password(string(null));
       case HELP:
         String hc = name(null);
         if(hc != null) {

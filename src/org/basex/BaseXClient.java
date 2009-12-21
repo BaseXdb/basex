@@ -12,7 +12,7 @@ import org.basex.server.ClientSession;
  * Add the '-h' option to get a list on all available command-line arguments.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class BaseXClient extends BaseX {
   /**

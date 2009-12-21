@@ -31,6 +31,7 @@ import org.basex.util.Tokenizer;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
+ * @author Joerg Hauser
  * @author Bastian Lemke
  */
 public final class MapView extends View implements Runnable {

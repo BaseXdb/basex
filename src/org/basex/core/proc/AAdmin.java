@@ -12,7 +12,7 @@ import org.basex.data.Data;
  * Evaluates the 'create user' command and creates a new user.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public abstract class AAdmin extends Proc {
   /**

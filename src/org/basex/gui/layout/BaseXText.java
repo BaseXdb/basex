@@ -191,6 +191,20 @@ public class BaseXText extends BaseXPanel {
   }
 
   /**
+   * Jumps to the end of the text.
+   */
+  public final void scrollToEnd() {
+    SwingUtilities.invokeLater(new Thread() {
+      @Override
+      public void run() {
+        text.pos(text.size());
+        text.setCaret();
+        showCursor(2);
+      }
+    });
+  }
+
+  /**
    * Returns the output text.
    * @return output text
    */
@@ -617,7 +631,7 @@ public class BaseXText extends BaseXPanel {
    * Returns the clipboard text.
    * @return text
    */
-  public final String clip() {
+  final String clip() {
     // copy selection to clipboard
     final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
     final Transferable t = clip.getContents(null);

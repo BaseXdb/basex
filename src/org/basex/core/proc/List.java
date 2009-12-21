@@ -80,7 +80,7 @@ public final class List extends Proc {
       if(f.name().startsWith(".")) continue;
       if(f.isDir()) db.add(f.name());
     }
-    db.sort(false);
+    db.sort(false, true);
     return db;
   }
 

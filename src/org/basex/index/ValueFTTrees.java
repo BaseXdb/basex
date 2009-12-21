@@ -117,7 +117,8 @@ public class ValueFTTrees {
 //  public void info() {
 //    int sum = 0; 
 //    for (int i = 0; i < sizes.size(); i++) {
-//      System.out.println("length: " + sizes.get(i) + " count:" + trees[i].tokens.size());
+//      System.out.println("length: " + sizes.get(i) + " count:" 
+//      trees[i].tokens.size());
 //      sum += trees[i].tokens.size();
 //    }
 //    System.out.println("sum:" + sum);
@@ -168,7 +169,7 @@ public class ValueFTTrees {
   }
   
   /**
-   * Returns next pos values
+   * Returns next pos values.
    * @return compressed pos values
    */
   public byte[] nextPos() {

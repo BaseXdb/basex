@@ -346,7 +346,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final StringList sl = new StringList();
     sl.add(Main.info(INFOENTRIES, key.length));
     for(final byte[] k : key) sl.add(Token.string(k));
-    sl.sort(true);
+    sl.sort(true, true);
     return sl.finish();
   }
 }

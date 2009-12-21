@@ -57,7 +57,7 @@ public final class DialogPass extends Dialog {
   @Override
   public void action(final Object cmp) {
     final String nm = new String(pass.getPassword());
-    ok = !nm.isEmpty() && nm.matches("[\\w]*");
+    ok = !nm.isEmpty() && nm.matches("[^ ;'\\\"]*");
     info.setText(ok || nm.isEmpty() ? null :
       Main.info(INVALID, SERVERPW), Icon.ERR);
     enableOK(buttons, BUTTONOK, ok);

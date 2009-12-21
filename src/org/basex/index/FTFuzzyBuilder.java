@@ -50,7 +50,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
   /** Maximal memory. */
   final long maxMem;
   /** Current file id. */
-  int cf = 0;
+  int cf;
   
   /**
    * Constructor.
@@ -71,7 +71,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
   }
 
   @Override
-  void index(final byte[] tok) throws IOException{
+  void index(final byte[] tok) throws IOException {
     // currently no frequency support for tfidf based scoring
     if((ntok & 0xFFFF) == 0 && scm == 0 &&
         rt.totalMemory() - rt.freeMemory() > maxMem) {
@@ -201,11 +201,11 @@ public final class FTFuzzyBuilder extends FTBuilder {
   }
   
   /**
-   * Retuns next token.
+   * Returns next token.
    * @param v FTFuzzy Array
    * @param m pointer on current FTFuzzy
    * @return next token
-   * @throws IOException
+   * @throws IOException I/O exception
    */
   private byte[] nextToken(final FTFuzzy[] v, final int m) throws IOException {
     if (v[m] == null) return EMPTY;
@@ -217,17 +217,17 @@ public final class FTFuzzyBuilder extends FTBuilder {
   }
   
   /**
-   * Write tokenlength index to disk.
+   * Write token length index to disk.
    * @param outx Output
-   * @param ind IntList with token lenght and offset
+   * @param ind IntList with token length and offset
    * @param ls last token length 
    * @param lp last offset
-   * @throws IOException
+   * @throws IOException I/O exception
    */
   private void writeInd(final DataOutput outx, final IntList ind, 
       final int ls, final int lp) throws IOException {
-    outx.write(ind.size() / 2);
-    for (int i = 0; i < ind.size(); i+=2) {
+    outx.write(ind.size() >> 1);
+    for(int i = 0; i < ind.size(); i += 2) {
       outx.write(ind.get(i));
       outx.writeInt(ind.get(i + 1));
     }
@@ -248,7 +248,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
   /**
    * Write index to disk.
-   * @throws IOException
+   * @throws IOException I/O exception
    */
   void writeIndex() throws IOException {
     tree.init();

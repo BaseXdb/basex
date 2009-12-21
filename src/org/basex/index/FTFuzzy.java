@@ -165,11 +165,11 @@ public final class FTFuzzy extends FTIndex {
     dat.close();
   }
   /** Pointer on current token length. */
-  int ctl = 0;
+  int ctl;
   /** Pointer on next token length. */
-  int ntl = 0;
+  int ntl;
   /** Number of written bytes for tokens. */
-  int ptok = 0;
+  int ptok;
   /** Pointer on full-text data. */
   long pftd;
   /** Next number of pre values. */

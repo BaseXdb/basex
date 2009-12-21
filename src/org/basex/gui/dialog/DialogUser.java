@@ -1,6 +1,8 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+
+import java.awt.BorderLayout;
 import java.io.IOException;
 import java.net.BindException;
 import javax.swing.JScrollPane;
@@ -105,12 +107,13 @@ public final class DialogUser extends BaseXBack {
     add(p);
 
     tablePanel = new BaseXBack();
-    tablePanel.setLayout(new TableLayout(3, 2, 8, 5));
+    tablePanel.setLayout(new BorderLayout(0, 5));
 
     databases = new BaseXCombo(true, new String[] {}, dia);
+    BaseXLayout.setWidth(databases, 210);
     addUser = new BaseXCombo(new String[] {}, dia);
     add = new BaseXButton(BUTTONADD, dia);
-    BaseXLayout.setWidth(addUser, 120);
+    BaseXLayout.setWidth(addUser, 131);
 
     if(!global) {
       p = new BaseXBack();
@@ -121,29 +124,28 @@ public final class DialogUser extends BaseXBack {
       p.add(databases);
       p.add(addUser);
       p.add(add);
-      tablePanel.add(p);
-      tablePanel.add(new BaseXLabel(" "));
+      tablePanel.add(p, BorderLayout.NORTH);
     }
 
     p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 1, 0, 5));
-    p.add(new BaseXLabel(PERMS, false, true));
+    p.setLayout(new TableLayout(2, 2, 8, 5));
+    p.add(new BaseXLabel(global ? GLOBPERM : LOCPERM, false, true));
+    p.add(new BaseXLabel(" "));
+
     table = new BaseXTable(users, dia);
     final JScrollPane sp = new JScrollPane(table);
     BaseXLayout.setHeight(sp, 220);
     BaseXLayout.setWidth(sp, 350);
     p.add(sp);
-    tablePanel.add(p);
 
-    p = new BaseXBack();
-    p.setLayout(new TableLayout(3, 1, 0, 5));
-    p.setBorder(25, 0, 0, 0);
-    if(global) p.add(alter);
-    p.add(drop);
-    tablePanel.add(p);
+    final BaseXBack pp = new BaseXBack();
+    pp.setLayout(new TableLayout(2, 1, 0, 5));
+    if(global) pp.add(alter);
+    pp.add(drop);
+    p.add(pp);
+    tablePanel.add(p, BorderLayout.CENTER);
 
-    tablePanel.add(info);
-    tablePanel.add(new BaseXLabel(" "));
+    tablePanel.add(info, BorderLayout.SOUTH);
     add(tablePanel);
 
     action(null);
@@ -222,10 +224,12 @@ public final class DialogUser extends BaseXBack {
       if(ex instanceof BindException) msg = SERVERBIND;
       else if(ex instanceof LoginException) msg = SERVERLOGIN;
       else msg = ex.getMessage(); // SERVERERR;
+      ok = false;
     }
 
     final boolean valname = user.getText().matches("[\\w]*");
-    final boolean valpass = new String(pass.getPassword()).matches("[\\w]*");
+    final boolean valpass = new String(
+        pass.getPassword()).matches("[^ ;'\\\"]*");
     boolean newname = true;
     for(int r = 0; r < users.contents.size(); r++)
       newname &= !users.value(r, 0).equals(user.getText());

@@ -32,7 +32,7 @@ public final class ServerExample {
     }.start();
 
     // Wait for the thread to be started.
-    Thread.sleep(100);
+    Thread.sleep(1000);
 
     // Create client session, specifying a server name and port
     session = new ClientSession("localhost", 1984, "admin", "admin");

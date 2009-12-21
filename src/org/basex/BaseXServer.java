@@ -23,8 +23,8 @@ import org.basex.util.Token;
  * arguments.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
  * @author Christian Gruen
+ * @author Andreas Weiler
  */
 public final class BaseXServer extends Main implements Runnable {
   /** Semaphore for managing processes. */

@@ -9,7 +9,7 @@ import org.basex.io.PrintOutput;
  * Evaluates the 'alter user' command and alters the password of a user.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class AlterUser extends AAdmin {
   /**

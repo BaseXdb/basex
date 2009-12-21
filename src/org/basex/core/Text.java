@@ -11,7 +11,6 @@ import static org.basex.util.Token.*;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
- * @author Andreas Weiler
  */
 public interface Text {
 
@@ -1052,8 +1051,10 @@ public interface Text {
   String LOCALPORT = lang("ds_localport");
   /** Create User. */
   String CREATEU = lang("ds_createu");
-  /** Permissions. */
-  String PERMS = lang("ds_perms") + COLS;
+  /** Global permissions. */
+  String GLOBPERM = lang("ds_globperm") + COLS;
+  /** Local permissions. */
+  String LOCPERM = lang("ds_locperm") + COLS;
   /** Question for dropping user. */
   String DRQUESTION = lang("ds_drquestion");
   /** Alter password. */

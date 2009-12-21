@@ -15,7 +15,7 @@ import org.basex.util.TokenList;
 
 public class ValueFTTree extends ValueTree{
   /** Factor for resize. */
-  final protected double factor = 1.25;
+  protected final double factor = 1.25;
   /** File ids. */
 //  TokenList cfs = new TokenList(factor);
   /** Compressed pre values. */
@@ -87,7 +87,7 @@ public class ValueFTTree extends ValueTree{
   
   /**
    * Checks for more tokens.
-   * @param currcf
+   * @param currcf current file
    * @return boolean more
    */
   public boolean more(final int currcf) {
@@ -108,7 +108,7 @@ public class ValueFTTree extends ValueTree{
    * Returns next token.
    * @return byte[] next token
    */
-  public byte[] nextTok(){
+  public byte[] nextTok() {
 //    final int tmp = lcn;
 //    lcn = map.size() > 0 ? map.containsAtPos(lcn) : lcn;
 //    return tokens.get(tmp);

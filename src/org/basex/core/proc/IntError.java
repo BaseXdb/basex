@@ -4,10 +4,10 @@ import org.basex.core.Proc;
 import org.basex.io.PrintOutput;
 
 /**
- * Evaluates the 'info users' command and returns user information.
+ * Returns an error message.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
- * @author Andreas Weiler
+ * @author Christian Gruen
  */
 public final class IntError extends Proc {
   /**
