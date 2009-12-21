@@ -42,7 +42,9 @@ public final class BaseXTable extends JTable {
     getSelectionModel().addListSelectionListener(new ListSelectionListener() {
       @Override
       public void valueChanged(final ListSelectionEvent e) {
-        if(!e.getValueIsAdjusting()) dialog.action(e.getSource());
+        if(!e.getValueIsAdjusting() && getSelectedColumn() != -1) {
+          dialog.action(e.getSource());
+        }
       }
     });
   }

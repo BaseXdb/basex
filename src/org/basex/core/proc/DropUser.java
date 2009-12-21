@@ -39,15 +39,14 @@ public final class DropUser extends AAdmin {
     final String usern = args[0];
     if(usern.equals(ADMIN)) return error(USERADMIN);
 
-    for(final ServerProcess s : context.sessions) {
-      if(s.context.user.name.equals(usern)) return error(USERLOG, usern);
-    }
-
     final User user = context.users.get(usern);
     if(user == null) return error(USERNO, usern);
 
     final String db = args[1];
     if(db == null) {
+      for(final ServerProcess s : context.sessions) {
+        if(s.context.user.name.equals(usern)) return error(USERLOG, usern);
+      }
       context.users.drop(user);
     } else {
       try {

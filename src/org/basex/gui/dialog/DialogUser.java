@@ -172,6 +172,8 @@ public final class DialogUser extends BaseXBack {
             new Grant(perm, uname, db) : new Revoke(perm, uname, db));
         msg = sess.info();
         setData();
+      } else if(cmp == databases) {
+        setData();
       } else if(cmp == create || cmp == user || cmp == pass) {
         final String u = user.getText();
         final String p = new String(pass.getPassword());
@@ -216,8 +218,6 @@ public final class DialogUser extends BaseXBack {
         }
         setData();
         addUser.requestFocusInWindow();
-      } else if(cmp == databases) {
-        setData();
       }
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -271,6 +271,8 @@ public final class DialogUser extends BaseXBack {
       if(i <= 0) return;
 
       final Table data = table(databases.getSelectedItem().toString());
+      table.update(data);
+
       final StringList added = new StringList();
       for(final TokenList l : data.contents) added.add(Token.string(l.get(0)));
 
@@ -282,7 +284,6 @@ public final class DialogUser extends BaseXBack {
       addUser.addItem(numberof(USERS, adding.size()));
       for(final String s : adding) addUser.addItem(s);
 
-      table.update(data);
       addUser.setSelectedIndex(0);
     }
   }
