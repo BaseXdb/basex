@@ -96,7 +96,7 @@ public final class DialogServer extends Dialog {
   /** Log text. */
   private final BaseXText logt;
   /** Password textfield. */
-  private final BaseXPassword logpass;
+  public final BaseXPassword logpass;
   /** Info label. */
   private final BaseXLabel infoC;
   /** Info label. */
@@ -109,7 +109,7 @@ public final class DialogServer extends Dialog {
   /** Boolean for check is server is running. */
   private boolean running;
   /** Boolean for check if client is connected. */
-  private boolean connected;
+  public boolean connected;
   /** Int which tab is activated. */
   int tab;
 
