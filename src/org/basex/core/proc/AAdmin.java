@@ -1,12 +1,14 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
+import org.basex.server.ServerProcess;
 
 /**
  * Evaluates the 'create user' command and creates a new user.
@@ -54,6 +56,10 @@ public abstract class AAdmin extends Proc {
     if(user == null) return error(USERNO, args[1]);
 
     if(db == null) {
+      // check if user is logged in
+      for(final ServerProcess s : context.sessions) {
+        if(s.context.user.name.equals(args[1])) return error(USERLOG, args[1]);
+      }
       // global permissions
       user.perm(set, perm);
       context.users.write();
