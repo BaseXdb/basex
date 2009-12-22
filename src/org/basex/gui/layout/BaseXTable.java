@@ -1,9 +1,15 @@
 package org.basex.gui.layout;
 
+import java.awt.Color;
+import java.awt.Component;
+
+import javax.swing.JCheckBox;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Table;
@@ -33,10 +39,10 @@ public final class BaseXTable extends JTable {
     data = t;
     dialog = d;
     model = new TableModel();
+    setDefaultRenderer(Boolean.class, new CellRenderer());
     setModel(model);
     getTableHeader().setReorderingAllowed(false);
     getTableHeader().setResizingAllowed(false);
-
     BaseXLayout.addInteraction(this, null, d);
 
     getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -98,6 +104,30 @@ public final class BaseXTable extends JTable {
     @Override
     public void setValueAt(final Object value, final int row, final int col) {
       dialog.action(new Object[] { value, row, col });
+    }
+  }
+  
+  /**
+    * Own Renderer for cells.
+    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+    * @author Andreas Weiler
+   */
+  public class CellRenderer extends DefaultTableCellRenderer {
+
+    @Override
+    public Component getTableCellRendererComponent(final JTable table,
+        final Object value, final boolean flag, final boolean flag1,
+        final int row, final int column) {
+      if (value instanceof Boolean) {
+        final JCheckBox box = new JCheckBox();
+        box.setHorizontalAlignment(SwingConstants.CENTER);
+        box.setSelected(((Boolean) value).booleanValue());
+        if(row == 0) box.setEnabled(false);
+        box.setBackground(Color.WHITE);
+        return box;
+    }
+      return super.getTableCellRendererComponent(table, 
+          value, flag, flag1, row, column);
     }
   }
 }

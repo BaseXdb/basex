@@ -67,7 +67,7 @@ public final class PermissionTest {
     }.start();
 
     // wait for server to be started
-    Performance.sleep(200);
+    Performance.sleep(400);
 
     try {
       adminSession = new ClientSession(server.context, ADMIN, ADMIN);
@@ -125,7 +125,6 @@ public final class PermissionTest {
     ok(new Grant("read", "test"), adminSession);
     ok(new Open("test"), testSession);
     ok(new InfoDB(), testSession);
-    ok(new InfoIndex(), testSession);
     ok(new InfoTable("1", "2"), testSession);
     // XQuery read
     ok(new XQuery("//xml"), testSession);
@@ -161,6 +160,7 @@ public final class PermissionTest {
     for(final CmdIndex cmd : CmdIndex.values()) {
     ok(new CreateIndex(cmd), testSession);
     }
+    ok(new InfoIndex(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
     ok(new DropIndex(cmd), testSession);
     }
@@ -202,10 +202,13 @@ public final class PermissionTest {
   @Test
   public void adminPermsNeeded() {
     ok(new Grant("admin", "test"), adminSession);
+    if(server.context.users.get("test2") != null) {
+      ok(new DropUser("test2"), testSession);
+    }
     ok(new CreateUser("test2", "test"), testSession);
     ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
     ok(new Export(".", export), testSession);
-    ok(new ShowUsers("Users"), testSession);
+    ok(new ShowUsers(), testSession);
     ok(new Grant("admin", "test2"), testSession);
     ok(new Revoke("admin", "test2"), testSession);
     ok(new AlterUser("test", "test"), testSession);
