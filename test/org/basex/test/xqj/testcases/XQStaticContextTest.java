@@ -74,12 +74,12 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-3.2: declareNamespace() failed with message: " + e.getMessage());
     }
     String[] prefixes = xqsc.getNamespacePrefixes();
-	boolean found = false;
-	for (int i = 0; i<prefixes.length && !found; i++) {
-	  found = "p".equals(prefixes[i]);
-	}
-	assertTrue("A-XQSC-3.2: Successfully declare a namespace.", found);
-	assertEquals("A-XQSC-3.2: Successfully declare a namespace.", "http://www.xqj.org", xqsc.getNamespaceURI("p"));
+  boolean found = false;
+  for (int i = 0; i<prefixes.length && !found; i++) {
+    found = "p".equals(prefixes[i]);
+  }
+  assertTrue("A-XQSC-3.2: Successfully declare a namespace.", found);
+  assertEquals("A-XQSC-3.2: Successfully declare a namespace.", "http://www.xqj.org", xqsc.getNamespaceURI("p"));
 
     try {
       xqsc.declareNamespace("p", "");
@@ -87,11 +87,11 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-3.3: declareNamespace() failed with message: " + e.getMessage());
     }
     prefixes = xqsc.getNamespacePrefixes();
-	found = false;
-	for (int i = 0; i<prefixes.length && !found; i++) {
-	  found = "p".equals(prefixes[i]);
-	}
-	assertFalse("A-XQSC-3.2: Successfully undeclare a namespace.", found);
+  found = false;
+  for (int i = 0; i<prefixes.length && !found; i++) {
+    found = "p".equals(prefixes[i]);
+  }
+  assertFalse("A-XQSC-3.2: Successfully undeclare a namespace.", found);
     try {
       xqsc.getNamespaceURI("p");
       fail("A-XQSC-3.2: Successfully undeclare a namespace.");
@@ -132,7 +132,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-5.2: setDefaultElementTypeNamespace() failed with message: " + e.getMessage());
     }
     String uri = xqsc.getDefaultElementTypeNamespace();
-	assertEquals("A-XQSC-5.2: Successfully declare the default element/type namespace.", "http://www.xqj.org", uri);
+  assertEquals("A-XQSC-5.2: Successfully declare the default element/type namespace.", "http://www.xqj.org", uri);
 
     try {
       xqsc.setDefaultElementTypeNamespace("");
@@ -140,7 +140,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-5.3: setDefaultElementTypeNamespace() failed with message: " + e.getMessage());
     }
     uri = xqsc.getDefaultElementTypeNamespace();
-	assertEquals("A-XQSC-5.3: Successfully undeclare the default element/type namespace.", "", uri);
+  assertEquals("A-XQSC-5.3: Successfully undeclare the default element/type namespace.", "", uri);
   }
 
   public void testGetDefaultFunctionNamespace() throws XQException {
@@ -175,7 +175,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-7.3: setDefaultFunctionNamespace() failed with message: " + e.getMessage());
     }
     String uri = xqsc.getDefaultFunctionNamespace();
-	assertEquals("A-XQSC-7.3: Successfully undeclare the default element/type namespace.", "", uri);
+  assertEquals("A-XQSC-7.3: Successfully undeclare the default element/type namespace.", "", uri);
 
     try {
       xqsc.setDefaultFunctionNamespace("http://www.xqj.org");
@@ -183,7 +183,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-7.2: setDefaultFunctionNamespace() failed with message: " + e.getMessage());
     }
     uri = xqsc.getDefaultFunctionNamespace();
-	assertEquals("A-XQSC-7.2: Successfully declare the default function namespace.", "http://www.xqj.org", uri);
+  assertEquals("A-XQSC-7.2: Successfully declare the default function namespace.", "http://www.xqj.org", uri);
   }
 
   public void testGetContextItemStaticType() throws XQException {
@@ -255,7 +255,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-11.2: setDefaultCollation() failed with message: " + e.getMessage());
     }
     String uri = xqsc.getDefaultCollation();
-	assertEquals("A-XQSC-11.2: Successfully set the default collation.", "http://www.w3.org/2005/xpath-functions/collation/codepoint", uri);
+  assertEquals("A-XQSC-11.2: Successfully set the default collation.", "http://www.w3.org/2005/xpath-functions/collation/codepoint", uri);
   }
 
   public void testGetConstructionMode() throws XQException {
@@ -290,7 +290,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-13.2: setConstructionMode() failed with message: " + e.getMessage());
     }
     int mode = xqsc.getConstructionMode();
-	assertEquals("A-XQSC-13.2: Successfully set the construction mode.",XQConstants.CONSTRUCTION_MODE_PRESERVE, mode);
+  assertEquals("A-XQSC-13.2: Successfully set the construction mode.",XQConstants.CONSTRUCTION_MODE_PRESERVE, mode);
   }
 
   public void testGetOrderingMode() throws XQException {
@@ -325,7 +325,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-15.2: setOrderingMode() failed with message: " + e.getMessage());
     }
     int mode = xqsc.getOrderingMode();
-	assertEquals("A-XQSC-15.2: Successfully set the ordering mode.",XQConstants.ORDERING_MODE_ORDERED, mode);
+  assertEquals("A-XQSC-15.2: Successfully set the ordering mode.",XQConstants.ORDERING_MODE_ORDERED, mode);
   }
 
   public void testGetDefaultOrderForEmptySequences() throws XQException {
@@ -360,7 +360,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-17.2: setDefaultOrderForEmptySequences() failed with message: " + e.getMessage());
     }
     int mode = xqsc.getDefaultOrderForEmptySequences();
-	assertEquals("A-XQSC-17.2: Successfully set the default order for empty sequences.",XQConstants.DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST, mode);
+  assertEquals("A-XQSC-17.2: Successfully set the default order for empty sequences.",XQConstants.DEFAULT_ORDER_FOR_EMPTY_SEQUENCES_GREATEST, mode);
   }
 
   public void testGetBoundarySpacePolicy() throws XQException {
@@ -395,7 +395,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-19.2: setBoundarySpacePolicy() failed with message: " + e.getMessage());
     }
     int policy = xqsc.getBoundarySpacePolicy();
-	assertEquals("A-XQSC-19.2: Successfully set the boundary space policy.",XQConstants.BOUNDARY_SPACE_PRESERVE, policy);
+  assertEquals("A-XQSC-19.2: Successfully set the boundary space policy.",XQConstants.BOUNDARY_SPACE_PRESERVE, policy);
   }
 
   public void testGetCopyNamespacesModePreserve() throws XQException {
@@ -430,7 +430,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-21.2: setCopyNamespacesModePreserve() failed with message: " + e.getMessage());
     }
     int mode = xqsc.getCopyNamespacesModePreserve();
-	assertEquals("A-XQSC-21.2: Successfully set the (no)preserve copy namespace mode.",XQConstants.COPY_NAMESPACES_MODE_PRESERVE, mode);
+  assertEquals("A-XQSC-21.2: Successfully set the (no)preserve copy namespace mode.",XQConstants.COPY_NAMESPACES_MODE_PRESERVE, mode);
   }
 
   public void testGetCopyNamespacesModeInherit() throws XQException {
@@ -465,7 +465,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-23.2: setCopyNamespacesModeInherit() failed with message: " + e.getMessage());
     }
     int mode = xqsc.getCopyNamespacesModeInherit();
-	assertEquals("A-XQSC-23.2: Successfully set the (no)inherit copy namespace mode.",XQConstants.COPY_NAMESPACES_MODE_INHERIT, mode);
+  assertEquals("A-XQSC-23.2: Successfully set the (no)inherit copy namespace mode.",XQConstants.COPY_NAMESPACES_MODE_INHERIT, mode);
   }
 
   public void testGetBaseURI() throws XQException {
@@ -535,7 +535,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-27.2: setBindingMode() failed with message: " + e.getMessage());
     }
     int mode = xqsc.getBindingMode();
-	assertEquals("A-XQSC-27.2: Successfully set the binding mode.",XQConstants.BINDING_MODE_DEFERRED, mode);
+  assertEquals("A-XQSC-27.2: Successfully set the binding mode.",XQConstants.BINDING_MODE_DEFERRED, mode);
 
     try {
       xqsc.setBindingMode(XQConstants.BINDING_MODE_IMMEDIATE);
@@ -543,7 +543,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-27.2: setBindingMode() failed with message: " + e.getMessage());
     }
     mode = xqsc.getBindingMode();
-	assertEquals("A-XQSC-27.2: Successfully set the binding mode.",XQConstants.BINDING_MODE_IMMEDIATE, mode);	
+  assertEquals("A-XQSC-27.2: Successfully set the binding mode.",XQConstants.BINDING_MODE_IMMEDIATE, mode);
   }
 
   public void testGetHoldability() throws XQException {
@@ -578,7 +578,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-29.2: setHoldability() failed with message: " + e.getMessage());
     }
     int mode = xqsc.getHoldability();
-	assertEquals("A-XQSC-29.2: Successfully set the holdability.",XQConstants.HOLDTYPE_HOLD_CURSORS_OVER_COMMIT, mode);
+  assertEquals("A-XQSC-29.2: Successfully set the holdability.",XQConstants.HOLDTYPE_HOLD_CURSORS_OVER_COMMIT, mode);
   }
 
   public void testGetQueryLanguageTypeAndVersion() throws XQException {
@@ -613,17 +613,17 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-31.2: setQueryLanguageTypeAndVersion() failed with message: " + e.getMessage());
     }
     int lang = xqsc.getQueryLanguageTypeAndVersion();
-	assertEquals("A-XQSC-31.2: Successfully set the query language.",XQConstants.LANGTYPE_XQUERY, lang);
-	
-	if (xqc.getMetaData().isXQueryXSupported()) {
-	    try {
-	      xqsc.setQueryLanguageTypeAndVersion(XQConstants.LANGTYPE_XQUERYX);
-	    } catch (XQException e) {
-	      fail("A-XQSC-31.2: setQueryLanguageTypeAndVersion() failed with message: " + e.getMessage());
-	    }
-	    lang = xqsc.getQueryLanguageTypeAndVersion();
-		assertEquals("A-XQSC-31.2: Successfully set the query language.",XQConstants.LANGTYPE_XQUERYX, lang);	
-	}
+  assertEquals("A-XQSC-31.2: Successfully set the query language.",XQConstants.LANGTYPE_XQUERY, lang);
+
+  if (xqc.getMetaData().isXQueryXSupported()) {
+      try {
+        xqsc.setQueryLanguageTypeAndVersion(XQConstants.LANGTYPE_XQUERYX);
+      } catch (XQException e) {
+        fail("A-XQSC-31.2: setQueryLanguageTypeAndVersion() failed with message: " + e.getMessage());
+      }
+      lang = xqsc.getQueryLanguageTypeAndVersion();
+    assertEquals("A-XQSC-31.2: Successfully set the query language.",XQConstants.LANGTYPE_XQUERYX, lang);
+  }
   }
 
   public void testGetScrollability() throws XQException {
@@ -658,7 +658,7 @@ public class XQStaticContextTest extends XQJTestCase {
       fail("A-XQSC-33.2: setScrollability() failed with message: " + e.getMessage());
     }
     int mode = xqsc.getScrollability();
-	assertEquals("A-XQSC-33.2: Successfully set the scrollability.",XQConstants.SCROLLTYPE_SCROLLABLE, mode);
+  assertEquals("A-XQSC-33.2: Successfully set the scrollability.",XQConstants.SCROLLTYPE_SCROLLABLE, mode);
   }
 
   public void testGetQueryTimeout() throws XQException {
@@ -697,6 +697,6 @@ public class XQStaticContextTest extends XQJTestCase {
     int timeout = xqsc.getQueryTimeout();
     // expect to get back 10 seconds, or
     // the implementation's default if it doesn't support timeout and decided to ignore the request
-	assertTrue("A-XQSC-35.2: Successfully set the timeout.",timeout == 10 ||timeout == originalTimeout);
+    assertTrue("A-XQSC-35.2: Successfully set the timeout.",timeout == 10 ||timeout == originalTimeout);
   }
 }

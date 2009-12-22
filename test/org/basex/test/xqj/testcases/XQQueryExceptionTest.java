@@ -72,7 +72,6 @@ public class XQQueryExceptionTest extends XQJTestCase {
       assertEquals("A-XQQEX-1.1: XQQueryException successfully created", "moduleuri", ex.getModuleURI());
       assertTrue("A-XQQEX-1.1: XQQueryException successfully created", xqs == ex.getErrorObject());
       assertTrue("A-XQQEX-1.1: XQQueryException successfully created", null == ex.getQueryStackTrace());
-
     } catch (Exception e) {
       fail("A-XQQEX-1.1: Creating XQQueryException faild with message: " + e.getMessage());
     }

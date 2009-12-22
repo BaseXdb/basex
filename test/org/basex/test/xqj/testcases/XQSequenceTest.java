@@ -626,7 +626,6 @@ public class XQSequenceTest extends XQJTestCase {
       fail("A-XQS-23.2: getSequenceAsString failed with message: " + e.getMessage());
     }
     xqe.close();
-
   }
 
   public void testIsAfterLast() throws XQException {

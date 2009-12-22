@@ -12,7 +12,6 @@ import java.util.Properties;
  * registered with a JNDI based naming service.
  */
 public interface ConnectionPoolXQDataSource {
-	
   /**
    * Attempts to establish a physical connection to an XML datasource
    * that can be used as a pooled connection.

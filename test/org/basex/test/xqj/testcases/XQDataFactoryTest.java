@@ -373,7 +373,6 @@ public class XQDataFactoryTest extends XQJTestCase {
     }
     String result = xqi.getItemAsString(null);
     assertTrue("A-XQDF-1.5: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
-
   }
 
   public void testCreateItemFromObject() throws XQException {

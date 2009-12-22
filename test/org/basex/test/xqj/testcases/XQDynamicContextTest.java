@@ -609,7 +609,6 @@ public class XQDynamicContextTest extends XQJTestCase {
     String result = xqpe.executeQuery().getSequenceAsString(null);
     assertTrue("A-XQDC-1.7: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
     xqpe.close();
-
   }
 
   public void testSetImplicitTimeZone() throws XQException {

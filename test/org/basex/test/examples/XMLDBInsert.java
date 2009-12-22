@@ -47,7 +47,6 @@ public final class XMLDBInsert {
       res.setContent(doc);
       // Store the resource into the database.
       col.storeResource(res);
-
     } catch(XMLDBException ex) {
       System.err.println("XML:DB Exception occured " + ex.errorCode);
       ex.printStackTrace();

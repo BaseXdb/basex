@@ -20,7 +20,6 @@ import java.util.EventObject;
  */
 
 public class XQConnectionEvent extends EventObject {
-	
   /**
    * The <code>XQException</code> that will be thrown to the
    * application when an error occurs and the pooled connection is no
