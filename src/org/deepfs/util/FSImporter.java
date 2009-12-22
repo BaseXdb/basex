@@ -66,7 +66,7 @@ public final class FSImporter implements FSTraversal {
     }
     spotlight = null;
   }
-  
+
   /**
    * Creates a fsml database.
    * @param dbname name of the database

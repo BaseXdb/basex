@@ -45,7 +45,7 @@ public final class DeepFSExample {
     },
     {
       "All files whose file name is equal to its title",
-      "basex:fspath(//file[@name ftcontains {title}])"
+      "basex:fspath(//file[@name contains text {title}])"
     },
     {
       "All files that match the pattern '^[0-9]{2} - .*\\.mp3$'",

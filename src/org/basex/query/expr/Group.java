@@ -122,7 +122,6 @@ public final class Group extends Expr {
    */
   public void add(final QueryContext ctx) throws QueryException {
     for(final Grp g : grp) g.add(ctx);
-
   }
 
   @Override

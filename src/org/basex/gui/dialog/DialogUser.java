@@ -1,13 +1,11 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
-
 import java.awt.BorderLayout;
 import java.io.IOException;
 import java.net.BindException;
 import javax.swing.JScrollPane;
 import org.basex.core.Main;
-import org.basex.core.Proc;
 import org.basex.core.Session;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.proc.AlterUser;
@@ -171,14 +169,12 @@ public final class DialogUser extends BaseXBack {
             (Integer) o[1], 0).toString();
 
         final boolean grant = o[0] == Boolean.TRUE;
-        final Proc proc = grant ? new Grant(perm, uname, db) :
-          new Revoke(perm, uname, db);
-
         final boolean confirm = !grant && perm == CmdPerm.READ &&
           uname.equals(dia.loguser.getText());
         if(confirm && !Dialog.confirm(this, Main.info(DBREVOKE))) return;
 
-        ok = sess.execute(proc);
+       ok = sess.execute(grant ? new Grant(perm, uname, db) :
+         new Revoke(perm, uname, db));
         msg = sess.info();
         if(confirm) setSess(sess);
         else setData();

@@ -38,7 +38,7 @@ public final class PNGParser implements IFileParser {
   public void extract(final DeepFile deepFile) throws IOException {
     if(deepFile.extractMeta()) {
       if(!check(deepFile)) return;
-      
+
       deepFile.setFileType(FileType.PICTURE);
       deepFile.setFileFormat(MimeType.PNG);
 

@@ -154,7 +154,6 @@ final class FTArray {
           }
           return insertNodeSorted(cnn[p], r2, s, offset);
         }
-
       } else {
         if(r2 == null) {
           // char1 != null && char2 == null

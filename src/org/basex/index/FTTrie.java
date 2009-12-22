@@ -32,7 +32,7 @@ public final class FTTrie extends FTIndex {
   private final DataAccess inN;
   // ftdata is stored here, with pre1, ..., preu, pos1, ..., posu
   /** FTData on disk. */
-  public final DataAccess inD;
+  private final DataAccess inD;
   // each node entries size is stored here
   /** FTData sizes on disk. */
   private final DataAccess inS;

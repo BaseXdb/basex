@@ -344,7 +344,7 @@ public final class PlotView extends View {
         name = d.name(focused);
       }
     }
-    
+
     // draw focused item
     final int f = plotData.findPre(focused);
     if(f > -1) {
@@ -791,7 +791,6 @@ public final class PlotView extends View {
         g.drawImage(img, MARGIN[1] - imgW - fs / 2, pos - fs, this);
         g.drawLine(MARGIN[1], pos, w - MARGIN[3], pos);
       }
-
     } else {
       if(drawX) {
         g.drawLine(pos, MARGIN[0], pos, h - MARGIN[2] - sf);

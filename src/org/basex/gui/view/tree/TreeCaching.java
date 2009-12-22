@@ -249,7 +249,6 @@ final class TreeCaching implements TreeViewOptions {
       pos = searchPreArrayPosition(l, pre);
 
       if(pos > -1) break;
-
     }
 
     return pos > -1 ? new int[] { l, pos} : null;

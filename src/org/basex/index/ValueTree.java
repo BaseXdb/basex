@@ -15,24 +15,25 @@ import org.basex.util.TokenList;
  * @author Sebastian Gath
  */
 class ValueTree {
-  /** Compressed pre values. */
-  public TokenList pres = new TokenList(1.2);
+  /** Factor for resize. */
+  static final double FACTOR = 1.2;
   /** Tree structure [left, right, parent]. */
-  public  IntList tree = new IntList(1.2);
+  final IntList tree = new IntList(FACTOR);
   /** Tokens saved in the tree. */
-  public  TokenList tokens = new TokenList(1.2);
+  final TokenList tokens = new TokenList(FACTOR);
   /** Flag if a node has been modified. */
-  public  BoolList mod = new BoolList();
+  final BoolList mod = new BoolList();
+  /** Compressed pre values. */
+  TokenList pres = new TokenList(FACTOR);
   /** Tree root node. */
-  protected int root = -1;
-  /** Mapping for usage of existing tree. */ 
-  public IntList map = new IntList(1.1);
+  int root = -1;
+  /** Mapping for usage of existing tree. */
+  IntList map = new IntList(FACTOR);
 
   /** Current iterator node. */
-  protected int cn;
+  int cn;
   /** Last iterator node. */
-  private int ln;
-
+  int ln;
 
   /**
    * Check if specified token was already indexed; if yes, its pre
@@ -44,7 +45,7 @@ class ValueTree {
   int index(final byte[] tok, final int pre) {
     return index(tok, pre, true);
   }
-  
+
   /**
    * Check if specified token was already indexed; if yes, its pre
    * value is added to the existing values. otherwise, create new index entry.
@@ -64,14 +65,15 @@ class ValueTree {
     while(true) {
       final int c = Token.diff(tok, tokens.get(n));
       if(c == 0) {
-        if (f) pres.set(Num.add(pres.get(n), pre), n);
+        if(f) pres.set(Num.add(pres.get(n), pre), n);
         else {
-          final int i = map.containsAtPos(n);
-          if (i < 0) {
+          final int i = map.indexOf(n);
+          if(i < 0) {
             map.add(n);
             pres.add(Num.newNum(pre));
-          } else pres.set(Num.add(pres.get(i), pre), i);
-//          return i;
+          } else {
+            pres.set(Num.add(pres.get(i), pre), i);
+          }
         }
         return n;
       }
@@ -118,18 +120,6 @@ class ValueTree {
     return cn != -1;
   }
 
-  
-//  /**
-//   * Returns the next pre values.
-//   * @return next iterator token
-//   */
-//  int next() {
-//    ln = nextPoi();
-//    final byte[] pp = pres.get(ln);
-//    pres.set(null, ln);
-//    return pp;  
-//  }
-  
   /**
    * Returns the next pointer.
    * @return next iterator token
@@ -160,7 +150,7 @@ class ValueTree {
    * @param f flag for usage of existing tree
    * @return pointer of the new node
    */
-  private int n(final byte[] tok, final int pre, final int pa, 
+  private int n(final byte[] tok, final int pre, final int pa,
       final boolean f) {
     tree.add(-1); // left node
     tree.add(-1); // right node
@@ -168,7 +158,7 @@ class ValueTree {
     mod.add(false);
     tokens.add(tok);
     pres.add(Num.newNum(pre));
-    if (!f) map.add(tokens.size() - 1);    
+    if(!f) map.add(tokens.size() - 1);
     return mod.size() - 1;
   }
 
@@ -282,7 +272,7 @@ class ValueTree {
     if(l(r) != -1) p(l(r), n);
     p(r, p(n));
     if(p(n) == -1) root = r;
-    else if (l(p(n)) == n) l(p(n), r);
+    else if(l(p(n)) == n) l(p(n), r);
     else r(p(n), r);
     l(r, n);
     p(n, r);
@@ -295,9 +285,9 @@ class ValueTree {
   private void rr(final int n) {
     final int l = l(n);
     l(n, r(l));
-    if (r(l) != -1) p(r(l), n);
+    if(r(l) != -1) p(r(l), n);
     p(l, p(n));
-    if (p(n) == -1) root = l;
+    if(p(n) == -1) root = l;
     else if(r(p(n)) == n) r(p(n), l);
     else l(p(n), l);
     r(l, n);

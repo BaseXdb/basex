@@ -1043,7 +1043,7 @@ public final class ExifParser {
   public void extract(final DeepFile df)
       throws IOException {
     if(!check(df)) return;
-    
+
     deepFile = df;
     bfc = df.getBufferedFileChannel();
 

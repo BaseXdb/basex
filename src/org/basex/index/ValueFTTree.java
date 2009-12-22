@@ -11,28 +11,21 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath
-*/
-
-public class ValueFTTree extends ValueTree{
-  /** Factor for resize. */
-  protected final double factor = 1.25;
-  /** File ids. */
-//  TokenList cfs = new TokenList(factor);
+ */
+final class ValueFTTree extends ValueTree {
   /** Compressed pre values. */
-  TokenList poss = new TokenList(factor);
+  private TokenList poss = new TokenList(FACTOR);
   /** Tree structure [left, right, parent]. */
-  IntList numpre = new IntList(factor);
+  private IntList numpre = new IntList(FACTOR);
   /** Current pointer on token in the index. */
   private int lcn;
   /** Current pointer on ft data in the index. */
   private int pft;
-  /** Currenct file id. */
-  int ccf; 
-  
-  
+
   /**
-   * Check if specified token was already indexed; if yes, its pre
-   * value is added to the existing values. otherwise, create new index entry.
+   * Checks if the specified token was already indexed; if yes, its pre
+   * value is added to the existing values. otherwise, a new index entry
+   * is created.
    * @param tok token to be indexed
    * @param pre pre value for the token
    * @param pos pos value of the token
@@ -41,108 +34,80 @@ public class ValueFTTree extends ValueTree{
   void index(final byte[] tok, final int pre, final int pos, final int cf) {
     final int os = tokens.size();
     final int n = index(tok, pre, cf == 0);
-//    boolean cadd = true;
-    if (os == tokens.size()) {
-//      int i = map.size() > 0 ? map.containsAtPos(n) : n;
-      int i = cf > 0 ? map.containsAtPos(n) : n;
-      /*final byte[] c = cfs.get(n);
-      if (c[c.length - 1] < cf) {
-        final byte[] t = new byte[c.length + 1];
-        System.arraycopy(c, 0, t, 0, c.length);
-        t[c.length] = cf;
-        cfs.set(t, n);        
-        cadd = false;
-      }
-      */
-      if (poss.size() > i && poss.get(i) != null) {
+    if(os == tokens.size()) {
+      final int i = cf > 0 ? map.indexOf(n) : n;
+      if(poss.size() > i && poss.get(i) != null) {
         poss.set(Num.add(poss.get(i), pos), i);
         numpre.set(numpre.get(i) + 1, i);
         return;
       }
-
-    } 
-
+    }
     poss.add(Num.newNum(pos));
     numpre.add(1);
-//    if (cadd) cfs.add(new byte[]{cf});    
   }
-  
-  /** 
-   * Init iterator.
+
+  /**
+   * Initializes the iterator.
    */
-  public void initIter() {
+  void initIter() {
     cn = root;
     if(cn != -1) while(l(cn) != -1) cn = l(cn);
   }
-  
+
   /**
-   * Init Tree for new full-text values.
+   * Initializes the tree for new full-text values.
    */
-  public void initTree() {
-    poss = new TokenList(factor);    
-    pres = new TokenList(factor);
-    numpre = new IntList(factor);
-    map = new IntList(factor);
+  void initTree() {
+    poss = new TokenList(FACTOR);
+    pres = new TokenList(FACTOR);
+    numpre = new IntList(FACTOR);
+    map = new IntList(FACTOR);
   }
-  
+
   /**
    * Checks for more tokens.
-   * @param currcf current file
+   * @param cf current file
    * @return boolean more
    */
-  public boolean more(final int currcf) {
-    ccf = currcf;
-    while (more()) {
-            lcn = cn;
-            pft = lcn;
-            if (currcf > 0)
-              pft = map.containsAtPos(lcn);
-            if (pft > -1) return true;
-//      for (byte b : cfs.get(lcn)) if (b == currcf) return true;      
+  boolean more(final int cf) {
+    while(more()) {
+      lcn = cn;
+      pft = cf > 0 ? map.indexOf(lcn) : lcn;
+      if(pft > -1) return true;
       next();
-    } 
+    }
     return false;
   }
-  
+
   /**
-   * Returns next token.
+   * Returns the next token.
    * @return byte[] next token
    */
-  public byte[] nextTok() {
-//    final int tmp = lcn;
-//    lcn = map.size() > 0 ? map.containsAtPos(lcn) : lcn;
-//    return tokens.get(tmp);
+  byte[] nextTok() {
     return tokens.get(lcn);
   }
-  
+
   /**
    * Returns the next pre values.
    * @return byte[] compressed pre values
    */
-  public byte[] nextPres() {
-//    final byte[] pp = pres.get(lcn);
-    final byte[] pp = pres.get(pft);
-    //pres.set(null, lcn);
-    return pp;    
+  byte[] nextPres() {
+    return pres.get(pft);
   }
 
   /**
    * Returns the next pos values.
    * @return byte[] compressed pos values
    */
-  public byte[] nextPos() {
-//    final byte[] pp = poss.get(lcn);
-    final byte[] pp = poss.get(pft);
-    //poss.set(null, lcn);
-    return pp;  
+  byte[] nextPos() {
+    return poss.get(pft);
   }
 
   /**
    * Returns the next number of pre values.
    * @return number of pre values
    */
-  public int nextNumPre() {
+  int nextNumPre() {
     return numpre.get(pft);
-//    return numpre.get(lcn);
   }
 }

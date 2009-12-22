@@ -553,7 +553,7 @@ public final class DeepFS implements DataText {
     for(final int i : acceptedNames) if(n == i) return true;
     return false;
   }
-  
+
   /**
    * Checks if all parent nodes of this node are valid.
    * @param pre pre value
@@ -699,13 +699,13 @@ public final class DeepFS implements DataText {
   public byte[] path(final int pre, final boolean backing) {
     int p = pre;
     int k = data.kind(p);
-    
+
     // select parent file/dir/fsml/deepfs node
     while(p > 0 && !isValidNode(p, fileID, dirID, deepfsID, fsmlID)) {
       p = data.parent(p, k);
       k = data.kind(p);
     }
-    
+
     final IntList il = new IntList();
     while(p >= 0 && k != Data.DOC) {
       if(!isFSnode(p)) return EMPTY;

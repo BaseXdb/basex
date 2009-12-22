@@ -34,7 +34,7 @@ public final class Export extends Proc {
    * @param name optional name of output file
    */
   public Export(final String path, final String name) {
-    super(DATAREF | User.READ | User.ADMIN, path, name);
+    super(DATAREF | User.READ | User.CREATE, path, name);
   }
 
   @Override

@@ -40,22 +40,14 @@ public enum FileType {
   WEBSITE,
   /** XML(-based) resource. */
   XML;
-  
+
   /** The textual representation for this file type. */
   private final String n;
-  
+
   /** Constructor. */
   private FileType() {
     n = name().toLowerCase().replace("_", " ");
   }
-  
-//  /**
-//   * Constructor.
-//   * @param name textual representation for this file type.
-//   */
-//  private FileType(final String name) {
-//    n = name;
-//  }
 
   @Override
   public String toString() {

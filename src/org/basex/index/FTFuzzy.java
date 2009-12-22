@@ -65,19 +65,7 @@ public final class FTFuzzy extends FTIndex {
    * @throws IOException IO Exception
    */
   protected FTFuzzy(final Data d) throws IOException {
-    super(d);
-
-    // cache token length index
-    ti = new DataAccess(d.meta.file(DATAFTX + 'y'));
-    dat = new DataAccess(d.meta.file(DATAFTX + 'z'));
-    li = new DataAccess(d.meta.file(DATAFTX + 'x'));
-    for(int i = 0; i < tp.length; i++) tp[i] = -1;
-    int is = li.read1();
-    while(--is >= 0) {
-      final int p = li.read1();
-      tp[p] = li.read4();
-    }
-    tp[tp.length - 1] = (int) ti.length();
+    this(d, "");
   }
 
   /**
@@ -86,13 +74,23 @@ public final class FTFuzzy extends FTIndex {
    * @param cf current file
    * @throws IOException IO Exception
    */
-  public FTFuzzy(final Data d, final byte cf) throws IOException {
+  protected FTFuzzy(final Data d, final int cf) throws IOException {
+    this(d, Integer.toString(cf));
+  }
+
+  /**
+   * Private constructor.
+   * @param d data reference
+   * @param s prefix
+   * @throws IOException IO Exception
+   */
+  private FTFuzzy(final Data d, final String s) throws IOException {
     super(d);
 
     // cache token length index
-    ti = new DataAccess(d.meta.file(DATAFTX + cf + 'y'));
-    dat = new DataAccess(d.meta.file(DATAFTX + cf + 'z'));
-    li = new DataAccess(d.meta.file(DATAFTX + cf + 'x'));
+    ti = new DataAccess(d.meta.file(DATAFTX + s + 'y'));
+    dat = new DataAccess(d.meta.file(DATAFTX + s + 'z'));
+    li = new DataAccess(d.meta.file(DATAFTX + s + 'x'));
     for(int i = 0; i < tp.length; i++) tp[i] = -1;
     int is = li.read1();
     while(--is >= 0) {
@@ -101,7 +99,7 @@ public final class FTFuzzy extends FTIndex {
     }
     tp[tp.length - 1] = (int) ti.length();
   }
-    
+
 
   @Override
   public byte[] info() {
@@ -164,59 +162,62 @@ public final class FTFuzzy extends FTIndex {
     ti.close();
     dat.close();
   }
+
   /** Pointer on current token length. */
-  int ctl;
+  private int ctl;
   /** Pointer on next token length. */
-  int ntl;
+  private int ntl;
   /** Number of written bytes for tokens. */
-  int ptok;
+  private int ptok;
+  /** Next number of pre values. */
+  private int fts;
   /** Pointer on full-text data. */
   long pftd;
-  /** Next number of pre values. */
-  int fts;
-  
+
   /**
    * Returns next Token.
    * @return byte[] token
    */
-  public byte[] nextTok() {
-    if(tp[tp.length - 1] == ptok) return new byte[]{};   
-    if (tp[ntl] == ptok || ntl == 0) {
+  byte[] nextTok() {
+    if(tp[tp.length - 1] == ptok) return EMPTY;
+    if(tp[ntl] == ptok || ntl == 0) {
       ctl++;
-      while (tp[ctl] == -1) ctl++;
+      while(tp[ctl] == -1) ctl++;
       ntl = ctl + 1;
-      while (tp[ntl] == -1) ntl++;
+      while(tp[ntl] == -1) ntl++;
     }
-        
-    if (ctl == tp.length) return new byte[]{};
+    if(ctl == tp.length) return EMPTY;
+
     final byte[] tok = ti.readBytes(ptok, ptok + ctl);
+    // [SG] never read?
     pftd = ti.read5(ti.pos());
     fts = ti.read4();
+    // [SG] safe cast to int?
     ptok = (int) ti.pos();
-//    if (tp[ctl + 1] == ptok) ctl++; 
     return tok;
   }
-  
+
   /**
    * Returns next number of pre-values.
-   * @return int number of pre-values
+   * @return number of pre-values
    */
-  public int nextFTDataSize() {
+  int nextFTDataSize() {
     return fts;
   }
-  /** Next pre values. */   
+
+  /** Next pre values. */
   int[] prv;
   /** Next pos values. */
   int[] pov;
+
   /**
    * Returns next pre values.
    * @return int[] pre values
    */
-  public int[] nextPreValues() {
-//    dat.cursor(pftd);
+  int[] nextPreValues() {
     prv = new int[fts];
     pov = new int[fts];
-    for (int j = 0; j < fts; j++) {
+    for(int j = 0; j < fts; j++) {
       prv[j] = dat.readNum();
       pov[j] = dat.readNum();
     }
@@ -227,11 +228,10 @@ public final class FTFuzzy extends FTIndex {
    * Returns next pos values.
    * @return int[] pos values
    */
-  public int[] nextPosValues() {
+  int[] nextPosValues() {
     return pov;
   }
 
-  
   /**
    * Determines the pointer on a token.
    * @param tok token looking for

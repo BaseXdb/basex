@@ -50,7 +50,7 @@ public final class Values implements Index {
    * @param pre file prefix
    * @throws IOException IO Exception
    */
-  public Values(final Data d, final boolean txt, final String pre)
+  Values(final Data d, final boolean txt, final String pre)
       throws IOException {
     data = d;
     text = txt;
@@ -80,8 +80,7 @@ public final class Values implements Index {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
 
     final int id = cache.id(tok.get());
-    if (id > 0)
-      return iter(cache.getSize(id), cache.getPointer(id));
+    if(id > 0) return iter(cache.getSize(id), cache.getPointer(id));
 
     final long pos = get(tok.get());
     if(pos == 0) return IndexIterator.EMPTY;
@@ -96,7 +95,7 @@ public final class Values implements Index {
     if(id > 0) return cache.getSize(id);
 
     final long pos = get(tok);
-    if (pos == 0) return 0;
+    if(pos == 0) return 0;
     final int numPre =  idxl.readNum(pos);
     cache.add(it.get(), numPre, pos + Num.len(numPre));
 
@@ -191,7 +190,6 @@ public final class Values implements Index {
       public int next() { return ids.get(p); }
       @Override
       public double score() { return -1; }
-
     };
   }
 

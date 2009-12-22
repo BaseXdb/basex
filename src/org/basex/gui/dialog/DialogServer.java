@@ -408,7 +408,8 @@ public final class DialogServer extends Dialog {
     final boolean valpl = ports.getText().matches("[\\d]+") &&
       Integer.parseInt(ports.getText()) <= 65535;
     final boolean vallu = loguser.getText().matches("[\\w]*");
-    final boolean vallp = new String(logpass.getPassword()).matches("[\\w]*");
+    final boolean vallp = new String(
+        logpass.getPassword()).matches("[^ ;'\\\"]*");
     final boolean valh = host.getText().matches("([\\w]+://)?[\\w.-]+");
 
     if(msg == null && msg2 == null &&

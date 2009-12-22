@@ -2,10 +2,7 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
-
-import java.io.File;
 import java.io.IOException;
-
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
@@ -30,7 +27,6 @@ import org.basex.util.TokenBuilder;
  *                           of the token (byte[l]); z is the pointer on
  *                           the data entries of the token (int) and s is
  *                           the number of pre values, saved in data (int)
- *
  * b)
  *    fill DataOutput(db, f + 'z') looks like:
  *    [pre0, ..., pres, pos0, pos1, ..., poss] where pre and pos are the
@@ -42,16 +38,16 @@ import org.basex.util.TokenBuilder;
  */
 public final class FTFuzzyBuilder extends FTBuilder {
   /** Word parser. */
-  private ValueFTTrees tree = new ValueFTTrees();
+  private final ValueFTTrees tree = new ValueFTTrees();
   /** Number of indexed tokens. */
   private long ntok;
   /** Runtime for memory consumption. */
-  private final Runtime rt;
+  private final Runtime rt = Runtime.getRuntime();
   /** Maximal memory. */
-  final long maxMem;
+  final long maxMem = (long) (rt.maxMemory() * 0.9);
   /** Current file id. */
   int cf;
-  
+
   /**
    * Constructor.
    * @param d data reference
@@ -59,9 +55,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
    */
   protected FTFuzzyBuilder(final Data d) throws IOException {
     super(d);
-    rt = Runtime.getRuntime();
-    Performance.gc(2);
-    maxMem = (long) (rt.maxMemory() * 0.8);
+    Performance.gc(1);
   }
 
   @Override
@@ -75,10 +69,10 @@ public final class FTFuzzyBuilder extends FTBuilder {
     // currently no frequency support for tfidf based scoring
     if((ntok & 0xFFFF) == 0 && scm == 0 &&
         rt.totalMemory() - rt.freeMemory() > maxMem) {
-      writeIndex();
-      Performance.gc(2);
-      cf++;      
-    }    
+      writeIndex(Integer.toString(cf));
+      Performance.gc(1);
+      cf++;
+    }
     tree.index(tok, pre, wp.pos, cf);
     ntok++;
   }
@@ -86,7 +80,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
   @Override
   int nrTokens() {
     int l = 0;
-    for (int i = 0; i < tree.sizes.size(); i++) { 
+    for(int i = 0; i < tree.sizes.size(); i++) {
       final ValueFTTree t = tree.trees[i];
       l += t.size();
     }
@@ -96,51 +90,39 @@ public final class FTFuzzyBuilder extends FTBuilder {
   @Override
   void getFreq() {
     tree.init();
-    while(tree.more((byte) 0)) {
+    while(tree.more(0)) {
       tree.nextPoi();
       getFreq(tree.nextPres());
     }
   }
 
-  /**
-   * Rename single index files.
-   */
-  public void single() {
-    File f = data.meta.file(DATAFTX + 0 + 'x');
-    f.renameTo(data.meta.file(DATAFTX + 'x').getAbsoluteFile());
-    f = data.meta.file(DATAFTX + 0 + 'y');
-    f.renameTo(data.meta.file(DATAFTX + 'y').getAbsoluteFile());
-    f = data.meta.file(DATAFTX + 0 + 'z');
-    f.renameTo(data.meta.file(DATAFTX + 'z').getAbsoluteFile());
-  }
-  
   @Override
   public void write() throws IOException {
-    writeIndex();
-    if (cf == 0) {      
-      single();
+    if(cf == 0) {
+      writeIndex("");
       return;
     }
-    
+
+    writeIndex(Integer.toString(cf));
     cf++;
 
     final DataOutput outx = new DataOutput(data.meta.file(DATAFTX + 'x'));
     final DataOutput outy = new DataOutput(data.meta.file(DATAFTX + 'y'));
     final DataOutput outz = new DataOutput(data.meta.file(DATAFTX + 'z'));
-    
+
     final byte[][] tok = new byte[cf][];
     final int[][] pres = new int[cf][];
     final int[][] pos = new int[cf][];
     final IntList ind = new IntList();
-    
+
     final FTFuzzy[] v = new FTFuzzy[cf];
-    for (byte b = 0; b < cf; b++) {
+    for(int b = 0; b < cf; b++) {
       v[b] = new FTFuzzy(data, b);
       tok[b] = v[b].nextTok();
       pres[b] = v[b].nextPreValues();
       pos[b] = v[b].nextPosValues();
     }
-    
+
     int min;
     final IntList mer = new IntList();
     while(check(tok)) {
@@ -156,15 +138,14 @@ public final class FTFuzzyBuilder extends FTBuilder {
           mer.reset();
           mer.add(min);
         } else if(d == 0 && tok[i].length > 0) {
-//          if(merge.size() == 0) merge.add(min);
           mer.add(i);
         }
       }
-      
-      if (ind.size() == 0 || ind.get(ind.size() - 2) < tok[min].length) {
+
+      if(ind.size() == 0 || ind.get(ind.size() - 2) < tok[min].length) {
         ind.add(tok[min].length);
         ind.add((int) outy.size());
-      } 
+      }
 
       outy.write(tok[min]);
       outy.write5(outz.size());
@@ -175,8 +156,8 @@ public final class FTFuzzyBuilder extends FTBuilder {
       tbo.add(new byte[4]);
       for(int j = 0; j < mer.size(); j++) {
         final int m = mer.get(j);
-        for (int p : pres[m]) tbp.add(Num.num(p));
-        for (int p : pos[m]) tbo.add(Num.num(p));
+        for(final int p : pres[m]) tbp.add(Num.num(p));
+        for(final int p : pos[m]) tbo.add(Num.num(p));
         s += v[m].nextFTDataSize();
         tok[m] = nextToken(v, m);
         pres[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[]{};
@@ -185,21 +166,21 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
       outy.writeInt(s);
       // write compressed pre and pos arrays
-      final byte[] p = tbp.finish();      
+      final byte[] p = tbp.finish();
       Num.size(p, p.length);
       final byte[] o = tbo.finish();
       Num.size(o, o.length);
       writeFTData(outz, p, o);
     }
     writeInd(outx, ind, ind.get(ind.size() - 2) + 1, (int) outy.size());
-    
+
     outx.close();
     outy.close();
     outz.close();
     DropDB.delete(data.meta.name, DATAFTX + "\\d+." + IO.BASEXSUFFIX,
         data.meta.prop);
   }
-  
+
   /**
    * Returns next token.
    * @param v FTFuzzy Array
@@ -208,23 +189,23 @@ public final class FTFuzzyBuilder extends FTBuilder {
    * @throws IOException I/O exception
    */
   private byte[] nextToken(final FTFuzzy[] v, final int m) throws IOException {
-    if (v[m] == null) return EMPTY;
-    final byte[] tok = v[m].nextTok();    
-    if (tok.length > 0) return tok;
+    if(v[m] == null) return EMPTY;
+    final byte[] tok = v[m].nextTok();
+    if(tok.length > 0) return tok;
     v[m].close();
     v[m] = null;
-    return EMPTY;    
+    return EMPTY;
   }
-  
+
   /**
-   * Write token length index to disk.
+   * Writes the token length index to disk.
    * @param outx Output
    * @param ind IntList with token length and offset
-   * @param ls last token length 
+   * @param ls last token length
    * @param lp last offset
    * @throws IOException I/O exception
    */
-  private void writeInd(final DataOutput outx, final IntList ind, 
+  private void writeInd(final DataOutput outx, final IntList ind,
       final int ls, final int lp) throws IOException {
     outx.write(ind.size() >> 1);
     for(int i = 0; i < ind.size(); i += 2) {
@@ -233,46 +214,42 @@ public final class FTFuzzyBuilder extends FTBuilder {
     }
     outx.write(ls);
     outx.writeInt(lp);
-
   }
-  
+
   /**
    * Checks if any unprocessed pre values are remaining.
    * @param tok byte[][] tokens
    * @return boolean
    */
   private boolean check(final byte[][] tok) {
-    for(final byte[] b : tok) if (b.length > 0) return true;
+    for(final byte[] b : tok) if(b.length > 0) return true;
     return false;
   }
 
   /**
-   * Write index to disk.
+   * Writes the index to disk.
+   * @param s current file pointer
    * @throws IOException I/O exception
    */
-  void writeIndex() throws IOException {
-    tree.init();
-    
-    final DataOutput outx = new DataOutput(data.meta.file(DATAFTX + cf + 'x'));
-    final DataOutput outy = new DataOutput(data.meta.file(DATAFTX + cf + 'y'));
-    final DataOutput outz = new DataOutput(data.meta.file(DATAFTX + cf + 'z'));
+  void writeIndex(final String s) throws IOException {
+    final DataOutput outx = new DataOutput(data.meta.file(DATAFTX + s + 'x'));
+    final DataOutput outy = new DataOutput(data.meta.file(DATAFTX + s + 'y'));
+    final DataOutput outz = new DataOutput(data.meta.file(DATAFTX + s + 'z'));
 
     final IntList ind = new IntList();
     long dr = 0;
     int tr = 0;
-    byte j = 0;
-    int c = 0; 
+    int j = 0;
+    tree.init();
     while(tree.more(cf)) {
-      c++;
       tree.nextPoi();
-      final byte[] key = tree.nextTok();      
-      if (j < key.length) {
-        j = (byte) key.length;
+      final byte[] key = tree.nextTok();
+      if(j < key.length) {
+        j = key.length;
         // write index and pointer on first token
         ind.add(j);
         ind.add(tr);
       }
-      
       for(int i = 0; i < j; i++) outy.write(key[i]);
 
       // write pointer on data and data size
@@ -289,6 +266,6 @@ public final class FTFuzzyBuilder extends FTBuilder {
     outx.close();
     outy.close();
     outz.close();
-    tree.initTrees(); 
+    tree.initTrees();
   }
 }

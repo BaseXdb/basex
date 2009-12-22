@@ -193,7 +193,7 @@ public abstract class FTBuilder extends IndexBuilder {
       for(final int l = pp + Num.len(vpos, pp); pp < l; pp++)
         out.write(vpos[pp]);
     }
-    token++;    
+    token++;
   }
 
   /**

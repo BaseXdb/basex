@@ -124,7 +124,7 @@ public final class ParserRegistry {
     }
     return fallbackParserInstance;
   }
-  
+
   /**
    * Returns all available parsers.
    * @return all available parsers

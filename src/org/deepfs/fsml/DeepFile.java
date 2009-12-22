@@ -78,7 +78,7 @@ public final class DeepFile {
   private final long offset;
   /** Size of the deep file in bytes (-1 means unknown size). */
   private long size;
-  
+
   static {
     final Prop p = DEFAULT_CONTEXT.prop;
     p.set(Prop.FSMETA, true);

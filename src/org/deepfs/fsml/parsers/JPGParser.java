@@ -65,10 +65,10 @@ public final class JPGParser implements IFileParser {
     if(df.extractMeta()) {
       deepFile = df;
       if(!check(deepFile)) return;
-      
+
       deepFile.setFileType(FileType.PICTURE);
       deepFile.setFileFormat(MimeType.JPG);
-      
+
       bfc = deepFile.getBufferedFileChannel();
       bfc.skip(-2);
       while(bfc.get() == 0xFF) {

@@ -11,7 +11,7 @@ import org.basex.core.Main;
  */
 public class IntList {
   /** Resize factor for extending the the byte arrays. */
-  double factor = 2;
+  protected double factor = 2;
   /** Value array. */
   protected int[] list;
   /** Number of entries. */
@@ -77,8 +77,7 @@ public class IntList {
   public final int maxSize() {
     return list.length;
   }
-  
-  
+
   /**
    * Returns the specified value.
    * @param p position
@@ -110,17 +109,15 @@ public class IntList {
   }
 
   /**
-   * Checks if the specified value is found in the list and retuns its index.
+   * Checks if the specified value is found in the list and returns its index.
    * @param v value to be added
    * @return true if value is found
    */
-  public final int containsAtPos(final int v) {
-    if (size == -1) return -1;
+  public final int indexOf(final int v) {
     for(int i = 0; i < size; i++) if(list[i] == v) return i;
     return -1;
   }
 
-  
   /**
      * Searches for the specified value via binary search.
      * Note that the values must be sorted.

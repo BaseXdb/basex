@@ -393,7 +393,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Filters the currently marked nodes. */
-  FILTER(GUIFILTER, "% ENTER", GUIFILTERTT, true, false) {
+  FILTER(GUIFILTER, "", GUIFILTERTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       final Context ctx = gui.context;

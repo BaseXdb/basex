@@ -276,7 +276,6 @@ public final class BlockAccessTest {
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 3);
     assertEntrysEqual(4, 7, size - 4);
-
   }
 
   /**
