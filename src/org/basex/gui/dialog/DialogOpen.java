@@ -48,6 +48,8 @@ public final class DialogOpen extends Dialog {
   private final Object drop;
   /** Open button. */
   private final Object open;
+  /** File system flag. */
+  private final boolean fsInstance;
 
   /**
    * Default constructor.
@@ -61,6 +63,7 @@ public final class DialogOpen extends Dialog {
     // create database chooser
     final StringList db = fs ? List.listFS(main.context) :
       List.list(main.context);
+    fsInstance = fs;
 
     choice = new BaseXListChooser(db.finish(), this);
     set(choice, BorderLayout.CENTER);
@@ -134,11 +137,12 @@ public final class DialogOpen extends Dialog {
 
     if(cmp == rename) {
       final String old = choice.getValue();
-      final DialogRename dr = new DialogRename(old, gui);
+      final DialogRename dr = new DialogRename(old, gui, fsInstance);
       if(dr.ok()) {
         final Prop prop = gui.context.prop;
         prop.dbpath(old).renameTo(prop.dbpath(dr.name.getText()));
-        choice.setData(List.list(ctx).finish());
+        choice.setData(fsInstance ? List.listFS(ctx).finish() :
+          List.list(ctx).finish());
       }
     } else if(cmp == open) {
       close();

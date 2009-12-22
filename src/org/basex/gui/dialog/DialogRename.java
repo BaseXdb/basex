@@ -37,11 +37,12 @@ public final class DialogRename extends Dialog {
    * Default constructor.
    * @param dbname name of database
    * @param main reference to the main window
+   * @param fs file system flag
    */
-  public DialogRename(final String dbname, final GUI main) {
+  public DialogRename(final String dbname, final GUI main, final boolean fs) {
     super(main, RENAMETITLE);
     old = dbname;
-    db = List.list(main.context);
+    db = fs ? List.listFS(main.context) : List.list(main.context);
 
     name = new BaseXTextField(dbname, this);
     name.addKeyListener(new KeyAdapter() {
