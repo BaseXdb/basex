@@ -12,6 +12,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
 import org.deepfs.fs.DeepFS;
+import org.deepfs.util.FSImporter;
 import static org.basex.util.Token.*;
 
 /**
@@ -178,15 +179,18 @@ public final class Find extends AQuery {
    * @param elem element flag
    * @param tag root tag
    * @param root root flag
+   * @param fs file system flag
    * @return query
    */
   public static String findTable(final StringList filter, final TokenList cols,
-      final BoolList elem, final byte[] tag, final boolean root) {
+      final BoolList elem, final byte[] tag, final boolean root,
+      final boolean fs) {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();
     for(int i = 0; i < is; i++) {
-      final String[] spl = split(filter.get(i));
+      final String[] spl = fs ? new String[] { 
+          FSImporter.escape(filter.get(i)) } : split(filter.get(i));
       for(final String s : spl) {
         byte[] term = token(s);
         if(contains(term, '"')) term = replace(term, '\"', ' ');

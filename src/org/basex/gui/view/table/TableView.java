@@ -21,9 +21,11 @@ import org.basex.gui.layout.BaseXPopup;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewData;
 import org.basex.gui.view.ViewNotifier;
+import org.basex.gui.view.table.TableData.TableCol;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.deepfs.fs.DeepFS;
 
 /**
  * This view creates a flat table view on the database contents.
@@ -234,16 +236,22 @@ public final class TableView extends View implements Runnable {
     super.mousePressed(e);
     final Context context = gui.context;
     final Data data = context.data;
-    if(tdata.rows == null || data.fs != null && tdata.mouseX < 20) return;
+    final boolean fs = data.fs != null;
+    if(tdata.rows == null || fs && tdata.mouseX < 20) return;
 
     if(e.getY() < header.getHeight()) return;
 
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {
-        final String str = content.focusedString;
+        final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
+        final TableCol col = tdata.cols[c];
+        final String str;
+        if(fs && (Token.eq(col.name, DeepFS.SIZE) ||
+            Token.eq(col.name, DeepFS.MTIME)))
+          str = Token.string(data.text(pre, false));
+        else str = content.focusedString;
         if(str == null || str.length() > Token.MAXLEN) return;
         if(!e.isShiftDown()) tdata.resetFilter();
-        final int c = tdata.column(getWidth() - BaseXBar.SIZE, e.getX());
         tdata.cols[c].filter = str;
         query();
         //repaint();
