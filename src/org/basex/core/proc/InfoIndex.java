@@ -29,7 +29,7 @@ public final class InfoIndex extends AInfo {
    * @param type optional index type, defined in {@link CmdIndexInfo}
    */
   public InfoIndex(final Object type) {
-    super(DATAREF | User.WRITE, type != null && type != CmdIndexInfo.NULL ?
+    super(DATAREF | User.READ, type != null && type != CmdIndexInfo.NULL ?
         type.toString() : null);
   }
 

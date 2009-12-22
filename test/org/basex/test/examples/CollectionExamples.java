@@ -10,8 +10,8 @@ import org.basex.core.proc.InfoDB;
 import org.basex.io.PrintOutput;
 
 /**
- * This class shows you the basic usage of the BaseX Collection functions. 
- * Collections provide Access to several XML Documents inside one Database.
+ * This class shows the basic usage of the BaseX Collection functions.
+ * Collections provide access to several XML documents inside one database.
  * Collections may be created by importing a folder or adding files.
  * For more XQuery examples in a collection context
  * see {@link CollectionExamplesQuery}
@@ -82,7 +82,7 @@ public class CollectionExamples {
    * context. Once the database has been created
    * @param verbose output the InfoDB if true.
    */
-  protected void createColl(boolean verbose) {
+  protected void createColl(final boolean verbose) {
     new CreateColl(DBNAME).execute(CONTEXT);
 
     // -------------------------------------------------------------------------

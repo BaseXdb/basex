@@ -143,7 +143,7 @@ final class DBPrimitives extends Primitives {
     if(par < 0) return;
     int l = par + d.size(par, d.kind(par));
     // 'first-1' could be a text node
-    int p = first == - 1 ? par + 1 : first - 1;
+    int p = first == -1 ? par + 1 : first - 1;
     while(p < l) {
       final int k = d.kind(p);
       if(k == Data.ELEM) p += d.size(p, k);

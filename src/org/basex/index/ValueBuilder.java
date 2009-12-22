@@ -47,28 +47,16 @@ public final class ValueBuilder extends IndexBuilder {
     Main.debug((text ? "Texts" : "Attributes") + ": ");
 
     final String f = text ? DATATXT : DATAATV;
-    final Runtime rt = Runtime.getRuntime();
-    final long maxMem = (long) (rt.maxMemory() * 0.9);
-
     final int type = text ? Data.TEXT : Data.ATTR;
-    int cc = 0;
 
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) {
         check();
         // check if main memory is exhausted
-        if(rt.totalMemory() - rt.freeMemory() > maxMem) {
-          // safely abort if index caching is done too often
-          if(cc >= 0) throw new IOException(PROCOUTMEM);
-
-          write(f + csize);
+        if(memFull()) {
+          write(f + csize++);
           index = new ValueTree();
           Performance.gc(1);
-          cc = 50;
-          merge = true;
-          csize++;
-        } else {
-          cc--;
         }
       }
       if(data.kind(pre) != type) continue;

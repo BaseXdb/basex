@@ -1,6 +1,8 @@
 package org.basex.test.examples;
 
 import java.io.IOException;
+import java.io.OutputStream;
+
 import org.basex.core.*;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.proc.*;
@@ -23,7 +25,7 @@ public final class DBExample {
   static final Context CONTEXT = new Context();
 
   /** Private constructor. */
-  private DBExample() {}
+  private DBExample() { }
 
   /**
    * Main method of the example class.
@@ -48,7 +50,6 @@ public final class DBExample {
 
   }
 
-
   /**
    * This class shows you how to work with XQuery Update.
    */
@@ -64,12 +65,15 @@ public final class DBExample {
    *         {@link MaintenanceExamples#createIndexes}
    */
   static final class MaintenanceExamples {
+    /** Private constructor. */
+    private MaintenanceExamples() { }
+
     /**
      * PrintOutput Context. Point the PrintOutput to whatever file you like to
      * store the serializing results in a file. You may as well point it to
      * System.out.
      */
-    static PrintOutput out = new PrintOutput(System.out);
+    static OutputStream out = System.out;
 
     /**
      * Runs the exmaples.
@@ -90,17 +94,17 @@ public final class DBExample {
      */
     private static void createDatabase() throws BaseXException {
       // // You may also create Databases from a collection of files.
-      //
       System.out.println("=== Create Database.");
 
       // Creates a database
-      new CreateDB("input.xml", "Example1").execute(CONTEXT, out);
+      new CreateDB("input.xml", "Example1").exec(CONTEXT, out);
       // Closes the database.
       System.out.println("=== Close Database.");
-      new Close().execute(CONTEXT, out);
-      System.out.println("=== Reopen Database.");
-      new Open("Example1").execute(CONTEXT);
 
+      new Close().exec(CONTEXT, out);
+      System.out.println("=== Reopen Database.");
+
+      new Open("Example1").exec(CONTEXT, out);
     }
 
     /**
@@ -162,8 +166,5 @@ public final class DBExample {
       // new Close().exec(context, System.out);
 
     }
-
-    /** Private constructor. */
-    private MaintenanceExamples() {}
   }
 }

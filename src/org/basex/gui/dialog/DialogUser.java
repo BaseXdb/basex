@@ -11,7 +11,6 @@ import org.basex.core.Commands.CmdPerm;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.DropUser;
-import org.basex.core.proc.Exit;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Revoke;
@@ -173,17 +172,19 @@ public final class DialogUser extends BaseXBack {
         final boolean confirm = !grant && uname.equals(dia.loguser.getText());
         if(confirm && !Dialog.confirm(this, Main.info(DBREVOKE))) return;
 
-       ok = sess.execute(grant ? new Grant(perm, uname, db) :
-         new Revoke(perm, uname, db));
+        ok = sess.execute(grant ? new Grant(perm, uname, db) :
+          new Revoke(perm, uname, db));
         msg = sess.info();
         if(confirm) {
-          if(perm.equals(CmdPerm.ADMIN)) {
-            sess.execute(new Exit());
+          if(perm == CmdPerm.ADMIN) {
             dia.tabs.setSelectedIndex(0);
-            dia.connected = false;
-            dia.logpass.setText("");
-          } else setSess(sess);
-        } else setData();
+            dia.action(dia.disconnect);
+          } else {
+            setSess(sess);
+          }
+        } else {
+          setData();
+        }
       } else if(cmp == databases) {
         setData();
       } else if(cmp == create || cmp == user || cmp == pass) {

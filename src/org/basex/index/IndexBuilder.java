@@ -1,6 +1,7 @@
 package org.basex.index;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Progress;
@@ -24,6 +25,13 @@ public abstract class IndexBuilder extends Progress {
   /** Merge flag. */
   protected boolean merge;
 
+  /** Runtime for memory consumption. */
+  private final Runtime rt = Runtime.getRuntime();
+  /** Maximum memory to consume. */
+  private final long maxMem = (long) (rt.maxMemory() * 0.9);
+  /** Free memory threshold. */
+  private int cc;
+
   /**
    * Builds the index structure and returns an index instance.
    * @return index instance
@@ -37,6 +45,23 @@ public abstract class IndexBuilder extends Progress {
   protected void check() {
     checkStop();
     if(Prop.debug && (pre & 0x1FFFFF) == 0) Main.err(".");
+  }
+
+  /**
+   * Checks if enough memory is left to continue index building.
+   * @return result of check
+   * @throws IOException I/O exception
+   */
+  protected boolean memFull() throws IOException {
+    final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
+    if(full) {
+      if(cc >= 0) throw new IOException(PROCOUTMEM);
+      merge = true;
+      cc = 50;
+    } else {
+      cc--;
+    }
+    return full;
   }
 
   /**

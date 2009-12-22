@@ -4,10 +4,10 @@ import org.basex.core.BaseXException;
 import org.basex.core.proc.XQuery;
 
 /**
+ * This class provides some examples for navigating and querying collections.
  * @author BaseXTeam
- * This class provides you with some examples to navigate and query collections.
  */
-public class CollectionExamplesQuery extends CollectionExamples {
+public final class CollectionExamplesQuery extends CollectionExamples {
   /** The base-uri() function returns a filename. */
   private static final String FIND_FILE_QUERY = " for $doc in collection(\""
       + CollectionExamples.DBNAME 

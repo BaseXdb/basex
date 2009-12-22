@@ -66,14 +66,14 @@ public final class DialogServer extends Dialog {
   final BaseXBack logs = new BaseXBack();
   /** Username textfield. */
   final BaseXTextField loguser;
+  /** Disconnect button. */
+  final BaseXButton disconnect;
   /** Stop button. */
   private final BaseXButton stop;
   /** Start button. */
   private final BaseXButton start;
   /** Connect button. */
   private final BaseXButton connect;
-  /** Disconnect button. */
-  private final BaseXButton disconnect;
   /** Refresh button. */
   final BaseXButton refreshSess;
   /** Updates log file. */
