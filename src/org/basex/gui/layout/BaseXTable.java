@@ -33,13 +33,14 @@ public final class BaseXTable extends JTable {
    * Default constructor.
    * @param t table input
    * @param d dialog reference
+   * @param g global/local
    */
-  public BaseXTable(final Table t, final Dialog d) {
+  public BaseXTable(final Table t, final Dialog d, final boolean g) {
     super();
     data = t;
     dialog = d;
     model = new TableModel();
-    setDefaultRenderer(Boolean.class, new CellRenderer());
+    if(g) setDefaultRenderer(Boolean.class, new CellRenderer());
     setModel(model);
     getTableHeader().setReorderingAllowed(false);
     getTableHeader().setResizingAllowed(false);

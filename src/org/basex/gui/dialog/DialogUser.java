@@ -132,7 +132,7 @@ public final class DialogUser extends BaseXBack {
     p.add(new BaseXLabel(global ? GLOBPERM : LOCPERM, false, true));
     p.add(new BaseXLabel(" "));
 
-    table = new BaseXTable(users, dia);
+    table = new BaseXTable(users, dia, global);
     final JScrollPane sp = new JScrollPane(table);
     BaseXLayout.setHeight(sp, 220);
     BaseXLayout.setWidth(sp, 350);
@@ -298,6 +298,17 @@ public final class DialogUser extends BaseXBack {
       for(final String s : adding) addUser.addItem(s);
 
       addUser.setSelectedIndex(0);
+    }
+  }
+  
+  /**
+   * Refreshs the panel.
+   */
+  public void refresh() {
+    try {
+      setData();
+    } catch(IOException e) {
+      e.printStackTrace();
     }
   }
 

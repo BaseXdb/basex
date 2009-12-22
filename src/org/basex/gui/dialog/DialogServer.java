@@ -52,15 +52,14 @@ public final class DialogServer extends Dialog {
   final Context ctx = gui.context;
   /** ClientSession. */
   ClientSession cs;
-
   /** Tabulators. */
   final BaseXTabs tabs;
   /** Server panel. */
   final BaseXBack conn = new BaseXBack();
   /** User panel. */
-  final DialogUser user = new DialogUser(true, this);
+  DialogUser user = new DialogUser(true, this);
   /** Databases panel. */
-  final DialogUser dbsP = new DialogUser(false, this);
+  DialogUser dbsP = new DialogUser(false, this);
   /** Sessions/Databases panel. */
   final BaseXBack sess = new BaseXBack();
   /** Log panel. */
@@ -76,7 +75,7 @@ public final class DialogServer extends Dialog {
   /** Disconnect button. */
   private final BaseXButton disconnect;
   /** Refresh button. */
-  private final BaseXButton refreshSess;
+  final BaseXButton refreshSess;
   /** Updates log file. */
   final BaseXButton refreshLog;
   /** Deletes log file. */
@@ -119,7 +118,6 @@ public final class DialogServer extends Dialog {
    */
   public DialogServer(final GUI main) {
     super(main, GUISERVER);
-
     final BaseXBack db = dbsP.getTablePanel();
     db.setBorder(8, 8, 8, 8);
     tabs = new BaseXTabs(this);
@@ -279,6 +277,9 @@ public final class DialogServer extends Dialog {
         tab = pane.getSelectedIndex();
         final Object o = pane.getSelectedComponent();
         if(o == logs) refreshLog();
+        if(o == user) user.refresh();
+        if(o == dbsP) dbsP.refresh();
+        if(o == sess) action(refreshSess);
       }
     });
     refreshLog();
