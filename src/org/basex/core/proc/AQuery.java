@@ -98,6 +98,7 @@ abstract class AQuery extends Proc {
       evalInfo(out, s, runs);
 
       if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) out.println();
+      out.flush();
       return true;
     } catch(final QueryException ex) {
       Main.debug(ex);
