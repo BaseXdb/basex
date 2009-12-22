@@ -348,12 +348,15 @@ public final class DialogServer extends Dialog {
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;
+        super.setTitle(GUISERVER + LI + loguser.getText() + "@" + host.getText()
+            + COL + portc.getText());
         msg = Main.info(CONNECTED, host.getText(), portc.getText());
         refreshSess();
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
         connected = false;
         logpass.setText("");
+        super.setTitle(GUISERVER);
         msg = DISCONNECTED;
       } else if(cmp == refreshSess) {
         refreshSess();
