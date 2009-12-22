@@ -105,6 +105,9 @@ final class DBPrimitives extends Primitives {
     // and less table alterations needed
     int par = -2;
     boolean check = false;
+    // first is the first node of par which is updated. So 'first-1' is the
+    // lowest pre value where adjacent text nodes can exist.
+    int first = -1;
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.get(i);
       final int parT = d.parent(pre, d.kind(pre));
@@ -112,10 +115,11 @@ final class DBPrimitives extends Primitives {
         // Adjacent text nodes are merged. Merges can only be applied directly
         // after the update if no lower pre values are effected. This is not
         // the case for 'replace node', 'delete' and 'insert before' operations.
-        if(check) mergeTexts(par);
+        if(check) mergeTexts(par, first);
         check = false;
         par = parT;
       }
+      first = pre;
       final UpdatePrimitive[] upd = op.get(pre);
       for(int j = 0, add = 0; j < upd.length; j++) {
         final UpdatePrimitive p = upd[j];
@@ -126,18 +130,20 @@ final class DBPrimitives extends Primitives {
         if(t == REPLACENODE) break;
       }
     }
-    if(check) mergeTexts(par);
+    if(check) mergeTexts(par, first);
     d.flush();
   }
 
   /**
    * Merges any adjacent child text nodes for the given node.
    * @param par pre value of parent node
+   * @param first first node to check
    */
-  private void mergeTexts(final int par) {
+  private void mergeTexts(final int par, final int first) {
     if(par < 0) return;
     int l = par + d.size(par, d.kind(par));
-    int p = par + 1;
+    // 'first-1' could be a text node
+    int p = first == - 1 ? par + 1 : first - 1;
     while(p < l) {
       final int k = d.kind(p);
       if(k == Data.ELEM) p += d.size(p, k);
