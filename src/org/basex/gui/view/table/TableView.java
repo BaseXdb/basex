@@ -229,6 +229,8 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void mousePressed(final MouseEvent e) {
+    final int pre = gui.context.focused;
+    if(pre == -1) return;
     super.mousePressed(e);
     final Context context = gui.context;
     final Data data = context.data;
@@ -236,7 +238,6 @@ public final class TableView extends View implements Runnable {
 
     if(e.getY() < header.getHeight()) return;
 
-    final int pre = gui.context.focused;
     if(SwingUtilities.isLeftMouseButton(e)) {
       if(e.getClickCount() == 1) {
         final String str = content.focusedString;
@@ -278,6 +279,7 @@ public final class TableView extends View implements Runnable {
 
   @Override
   public void mouseClicked(final MouseEvent e) {
+    if(gui.context.focused == -1) return;
     final Data data = gui.context.data;
     if(data.fs != null && tdata.mouseX < 20) {
       try {
