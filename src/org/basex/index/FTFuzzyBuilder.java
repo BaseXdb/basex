@@ -62,9 +62,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   void index(final byte[] tok) throws IOException {
-    if(ntok % 3 == 0) {
-      merge = true;
-//    if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
+    if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
       // currently no frequency support for tfidf based scoring
       writeIndex(csize++);
       Performance.gc(1);
