@@ -277,8 +277,8 @@ public final class DialogServer extends Dialog {
         tab = pane.getSelectedIndex();
         final Object o = pane.getSelectedComponent();
         if(o == logs) refreshLog();
-        if(o == user) user.refresh();
-        if(o == dbsP) dbsP.refresh();
+        if(o == user) user.refresh(cs);
+        if(o == dbsP) dbsP.refresh(cs);
         if(o == sess) action(refreshSess);
       }
     });

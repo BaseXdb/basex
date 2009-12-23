@@ -304,10 +304,11 @@ public final class DialogUser extends BaseXBack {
   
   /**
    * Refreshs the panel.
+   * @param s Session
    */
-  public void refresh() {
+  public void refresh(final Session s) {
     try {
-      setData();
+      setSess(s);
     } catch(IOException e) {
       e.printStackTrace();
     }
