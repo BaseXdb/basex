@@ -557,10 +557,9 @@ public class AxisPath extends Path {
   @Override
   public final Expr addText(final QueryContext ctx) throws QueryException {
     final Step s = step[step.length - 1];
-    if(s.pred.length != 0 || !s.axis.down || s.test.kind != Test.Kind.NAME ||
-        s.test.kind != Test.Kind.STD || s.test.type == Type.ATT) {
-      if(s.test.kind == null) return this;
-    }
+
+    if(s.pred.length != 0 || !s.axis.down || s.test.type == Type.ATT ||
+        s.test.kind != Kind.NAME && s.test.kind != Kind.STD) return this;
 
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;

@@ -92,6 +92,7 @@ public final class Find extends AQuery {
       }
     }
     if(pre.isEmpty() && preds.isEmpty()) return root ? "/" : ".";
+
     return pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds;
   }
 

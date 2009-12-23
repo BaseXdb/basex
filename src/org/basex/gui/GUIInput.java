@@ -191,7 +191,7 @@ public final class GUIInput extends BaseXTextField {
    */
   private void queryPopup(final String query) {
     final Data data = gui.context.data;
-    if(data == null || !data.meta.uptodate) return;
+    if(data == null || !data.meta.pthindex) return;
 
     StringList sl = null;
     try {
