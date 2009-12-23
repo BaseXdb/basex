@@ -10,18 +10,18 @@ public class TestContentHandler extends DefaultHandler {
 
   public StringBuffer buffer = new StringBuffer();
 
-  public void characters(char[] ch, int start, int length) throws SAXException {
+  public void characters(final char[] ch, final int start, final int length) throws SAXException {
     for (int i = 0; i<length; i++)
       buffer.append(ch[start+i]);
   }
 
-  public void endElement(String namespaceURI, String localName, String qName) throws SAXException {
+  public void endElement(final String namespaceURI, final String localName, final String qName) throws SAXException {
     buffer.append("</");
     buffer.append(localName);
     buffer.append(">");
   }
 
-  public void startElement(String namespaceURI, String localName, String qName, Attributes atts) throws SAXException {
+  public void startElement(final String namespaceURI, final String localName, final String qName, final Attributes atts) throws SAXException {
     buffer.append("<");
     buffer.append(localName);
     buffer.append(">");

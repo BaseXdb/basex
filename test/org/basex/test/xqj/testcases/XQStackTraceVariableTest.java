@@ -9,28 +9,28 @@ public class XQStackTraceVariableTest extends XQJTestCase {
 
   public void testConstructor() {
     try {
-      XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");
+      final XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");
       assertEquals("A-XQSTV-1.1: XQStackTraceVariable successfully created", new QName("v"), xqstv.getQName());
       assertEquals("A-XQSTV-1.1: XQStackTraceVariable successfully created", "abc", xqstv.getValue());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       fail("A-XQSTV-1.1: Creating XQStackTraceVariable faild with message: " + e.getMessage());
     }
   }
 
   public void testGetQName() {
     try {
-      XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");
+      final XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");
       assertEquals("A-XQSTV-2.1: Retrieve the QName from an XQStackTraceVariable", new QName("v"), xqstv.getQName());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       fail("A-XQSTV-2.1: Retrieve QName from an XQStackTraceVariable failed with message: " + e.getMessage());
     }
   }
 
   public void testGetValue() {
     try {
-      XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");
+      final XQStackTraceVariable xqstv = new XQStackTraceVariable(new QName("v"), "abc");
       assertEquals("A-XQSTV-3.1: Retrieve the value from an XQStackTraceVariable", "abc", xqstv.getValue());
-    } catch (Exception e) {
+    } catch (final Exception e) {
       fail("A-XQSTV-3.1: Retrieve value from an XQStackTraceVariable failed with message: " + e.getMessage());
     }
   }

@@ -26,8 +26,8 @@ public final class XMLDBCreate {
    */
   public static void main(final String[] args) throws Exception {
     try {
-      Class<?> c = Class.forName(DRIVER);
-      Database db = (Database) c.newInstance();
+      final Class<?> c = Class.forName(DRIVER);
+      final Database db = (Database) c.newInstance();
       // Register the database.
       DatabaseManager.registerDatabase(db);
 
@@ -42,7 +42,7 @@ public final class XMLDBCreate {
 
       // Close the connection
       coll.close();
-    } catch(XMLDBException ex) {
+    } catch(final XMLDBException ex) {
       System.err.println("XML:DB Exception occured " + ex.errorCode);
     }
   }

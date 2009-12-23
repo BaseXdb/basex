@@ -16,9 +16,9 @@ import java.io.Serializable;
  */
 public class XQStackTraceVariable implements Serializable {
   /** Variable name. */
-  private QName qname;
+  private final QName qname;
   /** Variable value. */
-  private String value;
+  private final String value;
 
   /**
    * Construct a stack trace variable object.
@@ -27,7 +27,7 @@ public class XQStackTraceVariable implements Serializable {
    * @param value          a vendor specific short string representation
    *                       of the value of the variable in the error stack
    */
-  public XQStackTraceVariable(QName qname, String value) {
+  public XQStackTraceVariable(final QName qname, final String value) {
     this.qname = qname;
     this.value = value;
   }

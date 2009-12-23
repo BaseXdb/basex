@@ -28,26 +28,26 @@ public final class XMLDBInsert {
   public static void main(final String[] args) throws Exception {
     Collection col = null;
     try {
-      Class<?> c = Class.forName(DRIVER);
+      final Class<?> c = Class.forName(DRIVER);
 
-      Database db = (Database) c.newInstance();
+      final Database db = (Database) c.newInstance();
       // Register the database.
       DatabaseManager.registerDatabase(db);
       // Receive the collection.
       col = DatabaseManager.getCollection(DBNAME);
 
       // ID for the new document.
-      String id = "SecondDoc";
+      final String id = "SecondDoc";
       // Content of the new document.
-      String doc = "<xml>This is the second document.</xml>";
+      final String doc = "<xml>This is the second document.</xml>";
       // Create a new XML resource with the specified ID.
-      XMLResource res = (XMLResource) col.createResource(id,
+      final XMLResource res = (XMLResource) col.createResource(id,
           XMLResource.RESOURCE_TYPE);
       // Set the content of the XML resource as the document.
       res.setContent(doc);
       // Store the resource into the database.
       col.storeResource(res);
-    } catch(XMLDBException ex) {
+    } catch(final XMLDBException ex) {
       System.err.println("XML:DB Exception occured " + ex.errorCode);
       ex.printStackTrace();
     } finally {

@@ -59,7 +59,7 @@ public class XQQueryException extends XQException {
    * @param message        the description of the error. <code>null</code> indicates
    *                       that the message string is non existant
    */
-  public XQQueryException(String message)
+  public XQQueryException(final String message)
   {
     super(message);
   }
@@ -79,7 +79,7 @@ public class XQQueryException extends XQException {
    *                       and its associated specifications; implementation-defined
    *                       errors may be raised.</li>
    */
-  public XQQueryException(String message, QName errorCode)
+  public XQQueryException(final String message, final QName errorCode)
   {
     super(message);
     this.errorCode = errorCode;
@@ -106,8 +106,8 @@ public class XQQueryException extends XQException {
    * @param position       the position in the query string where the error occured. This
    *                       is a <code>0</code> based position. <code>-1</code> if unknown
    */
-  public XQQueryException(String message, QName errorCode,
-                          int line, int column, int position)
+  public XQQueryException(final String message, final QName errorCode,
+                          final int line, final int column, final int position)
   {
     super(message);
     this.errorCode = errorCode;
@@ -140,8 +140,8 @@ public class XQQueryException extends XQException {
    * @param position       the position in the query string where the error occured. This
    *                       is a <code>0</code> based position. <code>-1</code> if unknown
    */
-  public XQQueryException(String message, String vendorCode, QName errorCode,
-                          int line, int column, int position)
+  public XQQueryException(final String message, final String vendorCode, final QName errorCode,
+                          final int line, final int column, final int position)
   {
     super(message, vendorCode);
     this.errorCode = errorCode;
@@ -184,9 +184,9 @@ public class XQQueryException extends XQException {
    * @param stackTrace     the XQuery stack trace where the error occurred. <code>null</code>
    *                       if not available
    */
-  public XQQueryException(String message, String vendorCode, QName errorCode,
-                          int line, int column, int position,
-                          String moduleURI, XQSequence errorObject, XQStackTraceElement[] stackTrace)
+  public XQQueryException(final String message, final String vendorCode, final QName errorCode,
+                          final int line, final int column, final int position,
+                          final String moduleURI, final XQSequence errorObject, final XQStackTraceElement[] stackTrace)
   {
     super(message, vendorCode);
     this.errorCode = errorCode;

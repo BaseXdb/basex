@@ -35,7 +35,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getBoolean();
       fail("A-XQIA-1.1: conversion to boolean should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -45,7 +45,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getBoolean();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -57,7 +57,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getBoolean();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -69,7 +69,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getBoolean();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -79,7 +79,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getBoolean on xs:boolean failed", true, xqs.getBoolean());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getBoolean on xs:boolean failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -95,7 +95,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getByte();
       fail("A-XQIA-1.1: conversion to byte should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -105,7 +105,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getByte();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -117,7 +117,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getByte();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -129,7 +129,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getByte();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -140,7 +140,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getByte();
       fail("A-XQIA-1.5: getByte on xs:decimal out of value space of byte should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -150,13 +150,13 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getByte on xs:byte failed", 1, xqs.getByte());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getByte on xs:byte failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getByte on xs:decimal failed", 10, xqs.getByte());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getByte on xs:decimal failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -172,7 +172,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getDouble();
       fail("A-XQIA-1.1: conversion to double should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -182,7 +182,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getDouble();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -194,7 +194,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getDouble();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -206,7 +206,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getDouble();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -216,7 +216,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getDouble on xs:double failed", 1E0, xqs.getDouble(),0);
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6:  getDouble on xs:double failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -232,7 +232,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getFloat();
       fail("A-XQIA-1.1: conversion to float should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -242,7 +242,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getFloat();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -254,7 +254,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getFloat();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -266,7 +266,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getFloat();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -276,7 +276,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getFloat on xs:float failed", 1E0, xqs.getFloat(),0);
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getFloat on xs:float failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -292,7 +292,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getInt();
       fail("A-XQIA-1.1: conversion to int should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -302,7 +302,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getInt();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -314,7 +314,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getInt();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -326,7 +326,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getInt();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -337,7 +337,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getInt();
       fail("A-XQIA-1.5: getInt on xs:decimal out of value space of int should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -347,13 +347,13 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getInt on xs:int failed", 1, xqs.getInt());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getInt on xs:int failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getInt on xs:decimal failed", 10, xqs.getInt());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getInt on xs:decimal failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -369,7 +369,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemType();
       fail("A-XQIA-6.1: getItemType() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -381,7 +381,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemType();
       fail("A-XQIA-6.2: closed item accessor supports getItemType()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -394,7 +394,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       assertNotNull("A-XQIA-6.3: getItemType() failed", xqtype);
       assertEquals("A-XQIA-6.3: getItemType() failed", XQItemType.XQITEMKIND_ATOMIC, xqtype.getItemKind());
       assertEquals("A-XQIA-6.3: getItemType() failed", XQItemType.XQBASETYPE_STRING, xqtype.getBaseType());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-6.3: getItemType() failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -405,7 +405,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.getItem();
     try {
       xqs.getItemType();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-6.4: getItemType() failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -420,7 +420,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getAtomicValue();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -432,7 +432,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getAtomicValue();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -444,7 +444,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getAtomicValue();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -454,13 +454,13 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-2.1: getAtomicValue on xs:string failed", "1", xqs.getAtomicValue());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-2.1: getAtomicValue on xs:string failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
       assertEquals("A-XQIA-2.1: getAtomicValue on xs:decimal failed", "1.1", xqs.getAtomicValue());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-2.1: getAtomicValue on xs:decimal failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -476,7 +476,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getLong();
       fail("A-XQIA-1.1: conversion to long should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -486,7 +486,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getLong();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -498,7 +498,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getLong();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -510,7 +510,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getLong();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -521,7 +521,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getLong();
       fail("A-XQIA-1.5: getLong on xs:decimal out of value space of long should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -531,13 +531,13 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getLong on xs:long failed", 1, xqs.getLong());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getLong on xs:long failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getLong on xs:decimal failed", 10, xqs.getLong());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getLong on xs:decimal failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -554,7 +554,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getNode();
       fail("A-XQIA-1.1: conversion to org.w3c.dom.Node should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -564,7 +564,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getNode();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -576,7 +576,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getNode();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -588,7 +588,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getNode();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -598,7 +598,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       node = xqs.getNode();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-3.1: getNode on element() failed with message: " + e.getMessage());
     }
     assertEquals("A-XQIA-3.1: getNode on element() failed", true, node instanceof org.w3c.dom.Element);
@@ -606,7 +606,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       node = xqs.getNode();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-3.1: getNode on attribute() failed with message: " + e.getMessage());
     }
     assertEquals("A-XQIA-3.1: getNode on attribute() failed", true, node instanceof org.w3c.dom.Attr);
@@ -624,7 +624,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getNodeUri();
       fail("A-XQIA-5.1: getNodeUri() should fail if current item is not a node");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -634,7 +634,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getNodeUri();
       fail("A-XQIA-5.2: getNodeUri() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -646,7 +646,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getNodeUri();
       fail("A-XQIA-5.3: closed item accessor supports getNodeUri()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -656,7 +656,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       xqs.getNodeUri(); // returned value is implementation defined
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-5.4: getNodeUri() failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -667,7 +667,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.getItem();
     try {
       xqs.getNodeUri(); // returned value is implementation defined
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-5.5: getNodeUri() failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -683,7 +683,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getObject();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -695,7 +695,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getObject();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -707,7 +707,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getObject();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -717,7 +717,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       object = xqs.getObject();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-4.1: getObject on element() failed with message: " + e.getMessage());
     }
     assertEquals("A-XQIA-4.1: getObject on element() failed", true, object instanceof org.w3c.dom.Element);
@@ -725,7 +725,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       object = xqs.getObject();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-4.1: getObject on xs:string failed with message: " + e.getMessage());
     }
     assertEquals("A-XQIA-4.1: getObject on xs:string failed", true, object instanceof String);
@@ -793,11 +793,11 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xmlGregorianCalendar = Class.forName("javax.xml.datatype.XMLGregorianCalendar");
       duration = Class.forName("javax.xml.datatype.Duration");
-    } catch (Exception e) {
+    } catch (final Exception e) {
       // assume JDK 1.4
     }
     try {
-      String msg = "A-XQIA-4.1: getObject implements casting rules of '14.4 Mapping an XQuery Atomic Value to a Java Object Type' ";
+      final String msg = "A-XQIA-4.1: getObject implements casting rules of '14.4 Mapping an XQuery Atomic Value to a Java Object Type' ";
       xqs.next();
       assertTrue(msg + "for xs:anyURI", xqs.getObject() instanceof String);
       xqs.next();
@@ -894,7 +894,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       assertTrue(msg + "for processing instruction", xqs.getObject() instanceof org.w3c.dom.ProcessingInstruction);
       xqs.next();
       assertTrue(msg + "for text", xqs.getObject() instanceof org.w3c.dom.Text);
-      } catch (XQException e) {
+      } catch (final XQException e) {
         e.printStackTrace();
        fail("A-XQIA-4.1: getObject on element() failed with message: " + e.getMessage());
     }
@@ -910,7 +910,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemAsStream();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -922,7 +922,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemAsStream();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -934,7 +934,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemAsStream();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -947,9 +947,9 @@ public class XQItemAccessorTest extends XQJTestCase {
       while (xmlReader.hasNext())
         xmlReader.next();
       fail("A-XQIA-8.1: serialization process fails when sequence contains a top-level attribute");
-    } catch (XQException xq) {
+    } catch (final XQException xq) {
       // Expect an XQException or XMLStreamException
-    } catch (XMLStreamException xml) {
+    } catch (final XMLStreamException xml) {
       // Expect an XQException or XMLStreamException
     }
     xqe.close();
@@ -959,7 +959,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       xmlReader = xqs.getItemAsStream();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-9.1: getItemAsStream failed with message: " + e.getMessage());
     }
     try {
@@ -969,7 +969,7 @@ public class XQItemAccessorTest extends XQJTestCase {
       assertEquals("A-XQIA-9.1: unexpected third event returned by XMLStreamReader", XMLStreamReader.CHARACTERS, xmlReader.next());
       assertEquals("A-XQIA-9.1: unexpected fourth event returned by XMLStreamReader", XMLStreamReader.END_ELEMENT, xmlReader.next());
       assertEquals("A-XQIA-9.1: unexpected fifth event returned by XMLStreamReader", XMLStreamReader.END_DOCUMENT, xmlReader.next());
-    } catch (XMLStreamException e) {
+    } catch (final XMLStreamException e) {
       fail("A-XQIA-9.1: XMLStreamReader.next() failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -984,7 +984,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemAsString(new Properties());
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -996,7 +996,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemAsString(new Properties());
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1008,7 +1008,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemAsString(new Properties());
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1019,7 +1019,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getItemAsString(new Properties());
       fail("A-XQIA-8.1: serialization process fails when sequence contains a top-level attribute");
-    } catch (XQException xq) {
+    } catch (final XQException xq) {
       // Expect an XQException
     }
     xqe.close();
@@ -1030,7 +1030,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     String result = null;
     try {
       result = xqs.getItemAsString(new Properties());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-10.1: getItemAsString failed with message: " + e.getMessage());
     }
     assertTrue("A-XQIA-10.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result + "'", result.indexOf("<e>Hello world!</e>") != -1);
@@ -1041,7 +1041,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-10.2: null properties argument is equivalent to empty properties argument", result, xqs.getItemAsString(null));
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-10.2: getItemAsString failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -1057,7 +1057,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getShort();
       fail("A-XQIA-1.1: conversion to short should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1067,7 +1067,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getShort();
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1079,7 +1079,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getShort();
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1091,7 +1091,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getShort();
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1102,7 +1102,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.getShort();
       fail("A-XQIA-1.5: getShort on xs:decimal out of value space of short should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1112,13 +1112,13 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getShort on xs:short failed", 1, xqs.getShort());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getShort on xs:short failed with message: " + e.getMessage());
     }
     xqs.next();
     try {
       assertEquals("A-XQIA-1.6: getShort on xs:decimal failed", 10, xqs.getShort());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-1.6: getShort on xs:decimal failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -1138,7 +1138,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.instanceOf(xqstringtype);
       fail("A-XQIA-7.1: instanceOf() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1150,7 +1150,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.instanceOf(xqstringtype);
       fail("A-XQIA-7.2: closed item accessor supports instanceOf()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1160,12 +1160,12 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqs.next();
     try {
       assertEquals("A-XQIA-7.3: instanceOf failed", true, xqs.instanceOf(xqstringtype));
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-7.3: instanceOf() failed with message: " + e.getMessage());
     }
     try {
       assertEquals("A-XQIA-7.4: instanceOf failed", false, xqs.instanceOf(xqinttype));
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-7.4: instanceOf() failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -1179,7 +1179,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     XQExpression xqe;
     XQSequence xqs;
 
-    Properties prop = new Properties();
+    final Properties prop = new Properties();
     prop.setProperty("encoding", "UTF-8");
 
     xqe = xqc.createExpression();
@@ -1187,7 +1187,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem(new ByteArrayOutputStream(), prop);
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1199,7 +1199,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem(new ByteArrayOutputStream(), prop);
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1211,7 +1211,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem(new ByteArrayOutputStream(), prop);
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1222,7 +1222,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem(new ByteArrayOutputStream(), prop);
       fail("A-XQIA-8.1: serialization process fails when sequence contains a top-level attribute");
-    } catch (XQException xq) {
+    } catch (final XQException xq) {
       // Expect an XQException
     }
     xqe.close();
@@ -1233,7 +1233,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem((OutputStream)null, prop);
       fail("A-XQIA-11.3: writeItem accepts a null buffer as first argument");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1241,10 +1241,10 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
-    ByteArrayOutputStream result = new ByteArrayOutputStream();
+    final ByteArrayOutputStream result = new ByteArrayOutputStream();
     try {
       xqs.writeItem(result, prop);
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-11.1: writeItem failed with message: " + e.getMessage());
     }
     assertTrue("A-XQIA-11.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString("UTF-8") + "'", result.toString("UTF-8").indexOf("<e>Hello world!</e>") != -1);
@@ -1253,10 +1253,10 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
-    ByteArrayOutputStream otherResult = new ByteArrayOutputStream();
+    final ByteArrayOutputStream otherResult = new ByteArrayOutputStream();
     try {
       xqs.writeItem(otherResult, prop);
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-11.2: writeItem failed with message: " + e.getMessage());
     }
     assertEquals("A-XQIA-11.2: null properties argument is equivalent to empty properties argument", result.toString("UTF-8"), otherResult.toString("UTF-8"));
@@ -1272,7 +1272,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem(new StringWriter(), new Properties());
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1284,7 +1284,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem(new StringWriter(), new Properties());
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1296,7 +1296,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem(new StringWriter(), new Properties());
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1307,7 +1307,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem(new StringWriter(), new Properties());
       fail("A-XQIA-8.1: serialization process fails when sequence contains a top-level attribute");
-    } catch (XQException xq) {
+    } catch (final XQException xq) {
       // Expect an XQException
     }
     xqe.close();
@@ -1318,7 +1318,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItem((Writer)null, new Properties());
       fail("A-XQIA-11.3: writeItem accepts a null buffer as first argument");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1326,10 +1326,10 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
-    StringWriter result = new StringWriter();
+    final StringWriter result = new StringWriter();
     try {
       xqs.writeItem(result, new Properties());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-11.1: writeItem failed with message: " + e.getMessage());
     }
     assertTrue("A-XQIA-11.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString() + "'", result.toString().indexOf("<e>Hello world!</e>") != -1);
@@ -1338,10 +1338,10 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
-    StringWriter otherResult = new StringWriter();
+    final StringWriter otherResult = new StringWriter();
     try {
       xqs.writeItem(otherResult, new Properties());
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-11.2: writeItem failed with message: " + e.getMessage());
     }
     assertEquals("A-XQIA-11.2: null properties argument is equivalent to empty properties argument", result.toString(), otherResult.toString());
@@ -1357,7 +1357,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToSAX(new DefaultHandler());
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1369,7 +1369,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToSAX(new DefaultHandler());
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1381,7 +1381,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToSAX(new DefaultHandler());
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1392,7 +1392,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToSAX(new DefaultHandler());
       fail("A-XQIA-8.1: serialization process fails when sequence contains a top-level attribute");
-    } catch (XQException xq) {
+    } catch (final XQException xq) {
       // Expect an XQException
     }
     xqe.close();
@@ -1403,7 +1403,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToSAX((ContentHandler)null);
       fail("A-XQIA-11.3: writeItem accepts a null buffer as first argument");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1411,10 +1411,10 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
-    TestContentHandler result = new TestContentHandler();
+    final TestContentHandler result = new TestContentHandler();
     try {
       xqs.writeItemToSAX(result);
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-11.1: writeItem failed with message: " + e.getMessage());
     }
     assertTrue("A-XQIA-11.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.buffer.toString() + "'", result.buffer.toString().indexOf("<e>Hello world!</e>") != -1);
@@ -1430,7 +1430,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToResult(new StreamResult(new StringWriter()));
       fail("A-XQIA-1.2: getXXX() should fail when not positioned on an item");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1442,7 +1442,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToResult(new StreamResult(new StringWriter()));
       fail("A-XQIA-1.3: closed item accessor supports getXXX()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1454,7 +1454,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToResult(new StreamResult(new StringWriter()));
       fail("A-XQIA-1.4: SCROLLTYPE_FORWARD_ONLY sequence supports getting item twice()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1479,7 +1479,7 @@ public class XQItemAccessorTest extends XQJTestCase {
     try {
       xqs.writeItemToResult((Result)null);
       fail("A-XQIA-11.3: writeItemToResult accepts a null buffer as first argument");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -1487,10 +1487,10 @@ public class XQItemAccessorTest extends XQJTestCase {
     xqe = xqc.createExpression();
     xqs = xqe.executeQuery("<e>Hello world!</e>");
     xqs.next();
-    StringWriter result = new StringWriter();
+    final StringWriter result = new StringWriter();
     try {
       xqs.writeItemToResult(new StreamResult(result));
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQIA-11.1: writeItemToResult failed with message: " + e.getMessage());
     }
     assertTrue("A-XQIA-11.1: Expects serialized result contains '<e>Hello world!</e>', but it is '" + result.toString() + "'", result.toString().indexOf("<e>Hello world!</e>") != -1);

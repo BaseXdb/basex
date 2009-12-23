@@ -18,7 +18,7 @@ public class XQItemTest extends XQJTestCase {
     try {
       xqi.close();
       xqi.close();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQE-2.1: closing item failed with message: " + e.getMessage());
     }
     xqe.close();

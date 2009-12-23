@@ -17,7 +17,7 @@ public class XQExpressionTest extends XQJTestCase {
     xqe = xqc.createExpression();
     try {
       xqe.cancel();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQE-1.1: cancellation of expression failed with message: " + e.getMessage());
     }
 
@@ -25,7 +25,7 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.cancel();
       fail("A-XQE-1.2: closed expression supports cancel()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
   }
@@ -50,7 +50,7 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.close();
       xqe.close();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQE-3.1: closing expression failed with message: " + e.getMessage());
     }
 
@@ -72,7 +72,7 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery("'Hello world!");
       fail("A-XQE-5.1: executeQuery() should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -82,7 +82,7 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery("'Hello world!'");
       fail("A-XQE-5.2: closed expression supports executeQuery()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
 
@@ -91,16 +91,16 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery((String)null);
       fail("A-XQE-5.3: expression supports executeQuery() with null argument");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQE-5.3: executeQuery() with null argument doesn't throw XQException");
     }
 
     xqe = xqc.createExpression();
     try {
       xqe.executeQuery("'Hello world!'");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQE-5.4: executing expression failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -113,7 +113,7 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery(new StringReader("'Hello world!"));
       fail("A-XQE-5.1: executeQuery() should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -123,7 +123,7 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery(new StringReader("'Hello world!'"));
       fail("A-XQE-5.2: closed expression supports executeQuery()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
 
@@ -132,16 +132,16 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery((Reader)null);
       fail("A-XQE-5.3: expression supports executeQuery() with null argument");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQE-5.3: expression supports executeQuery() with null argument doesn't throw XQException");
     }
 
     xqe = xqc.createExpression();
     try {
       xqe.executeQuery(new StringReader("'Hello world!'"));
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQE-5.4: executing expression failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -154,7 +154,7 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery(new ByteArrayInputStream("'Hello world!".getBytes("UTF-8")));
       fail("A-XQE-5.1: executeQuery() should fail");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -164,7 +164,7 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery(new ByteArrayInputStream("'Hello world!'".getBytes("UTF-8")));
       fail("A-XQE-5.2: closed expression supports executeQuery()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
 
@@ -173,16 +173,16 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.executeQuery((InputStream)null);
       fail("A-XQE-5.3: expression supports executeQuery() with null argument");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQE-5.3: expression supports executeQuery() with null argument doesn't throw XQException");
     }
 
     xqe = xqc.createExpression();
     try {
       xqe.executeQuery(new ByteArrayInputStream("'Hello world!'".getBytes("UTF-8")));
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQE-5.4: executing expression failed with message: " + e.getMessage());
     }
     xqe.close();
@@ -197,14 +197,14 @@ public class XQExpressionTest extends XQJTestCase {
     try {
       xqe.getStaticContext();
       fail("A-XQE-6.1: closed expression supports getStaticContext()");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
 
     xqe = xqc.createExpression();
     try {
       xqsc = xqe.getStaticContext();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQE-6.2: getting static context failed with message: " + e.getMessage());
     }
     assertNotNull("A-XQPE-6.2: getting static context failed", xqsc);

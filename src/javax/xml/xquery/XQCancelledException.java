@@ -49,9 +49,9 @@ public class XQCancelledException extends XQQueryException {
    * @param stackTrace     the XQuery stack trace where the error occurred. <code>null</code>
    *                       if not available
    */
-  public XQCancelledException(String message, String vendorCode, QName errorCode,
-                          int line, int column, int position,
-                          String moduleURI, XQSequence errorObject, XQStackTraceElement[] stackTrace)
+  public XQCancelledException(final String message, final String vendorCode, final QName errorCode,
+                          final int line, final int column, final int position,
+                          final String moduleURI, final XQSequence errorObject, final XQStackTraceElement[] stackTrace)
   {
     super(message, vendorCode, errorCode, line, column, position, moduleURI, errorObject, stackTrace);
   }

@@ -17,7 +17,7 @@ public class XQDataSourceTest extends XQJTestCase {
     try {
       my_xqc = xqds.getConnection();
       my_xqc.close();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQDS-1.1: Creating an XQConnection failed with message: " + e.getMessage());
     }
   }
@@ -39,7 +39,7 @@ public class XQDataSourceTest extends XQJTestCase {
     try {
       uid = xqds.getProperty("user");
       pwd = xqds.getProperty("password");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       testIt = false;
     }
 
@@ -47,7 +47,7 @@ public class XQDataSourceTest extends XQJTestCase {
       try {
         my_xqc = xqds.getConnection(uid, pwd);
         my_xqc.close();
-      } catch (XQException e) {
+      } catch (final XQException e) {
         fail("A-XQDS-3.1: Creating an XQConnection specifying a uid/pwd failed with message: " + e.getMessage());
       }
     }
@@ -56,25 +56,25 @@ public class XQDataSourceTest extends XQJTestCase {
   public void testGetLoginTimeout() throws XQException {
     try {
       xqds.getLoginTimeout();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQDS-4.1: Retrieving the login timeout failed with message: " + e.getMessage());
     }
   }
 
   public void testGetLogWriter() throws XQException {
     try {
-      Writer log = xqds.getLogWriter();
+      final Writer log = xqds.getLogWriter();
       assertNull("A-XQDS-5.2: The default log writer is null", log);
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQDS-5.1: Retrieving the log writer failed with message: " + e.getMessage());
     }
   }
 
   public void testGetSupportedPropertyNames() throws XQException {
     try {
-      String propertyNames[] = xqds.getSupportedPropertyNames();
+      final String propertyNames[] = xqds.getSupportedPropertyNames();
       assertNotNull("A-XQDS-6.2: getSupportedPropertyNames returns a non null array of String objects", propertyNames);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       fail("A-XQDS-6.1: Retrieving the supported property names failed with message: " + e.getMessage());
     }
   }
@@ -84,9 +84,9 @@ public class XQDataSourceTest extends XQJTestCase {
     try {
       xqds.setProperty(null, "foo");
       fail("A-XQDS-7.1: setProperty() throws an XQException when a null value is specified for the name parameter.");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQDS-7.1: setProperty() throws an XQException when a null value is specified for the name parameter.");
     }
 
@@ -95,9 +95,9 @@ public class XQDataSourceTest extends XQJTestCase {
       // But, let's get reasonable... Use a hard coded name.
       xqds.setProperty("the_property_that_not_known_to_any_implementation", "foo");
       fail("A-XQDS-7.2: setProperty() throws an XQException when an invalid property name is specified.");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQDS-7.2: setProperty() throws an XQException when an invalid property name is specified.");
     }
   }
@@ -107,9 +107,9 @@ public class XQDataSourceTest extends XQJTestCase {
     try {
       xqds.getProperty(null);
       fail("A-XQDS-8.1: getProperty() throws an XQException when a null value is specified for the name parameter.");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQDS-8.1: getProperty() throws an XQException when a null value is specified for the name parameter.");
     }
 
@@ -118,19 +118,19 @@ public class XQDataSourceTest extends XQJTestCase {
       // But, let's get reasonable... Use a hard coded name.
       xqds.getProperty("the_property_that_not_known_to_any_implementation");
       fail("A-XQDS-8.2: getProperty() throws an XQException when an invalid property name is specified.");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQDS-8.2: getProperty() throws an XQException when an invalid property name is specified.");
     }
 
-    String propertyNames[] = xqds.getSupportedPropertyNames();
+    final String propertyNames[] = xqds.getSupportedPropertyNames();
 
-    for(int i = 0; i < propertyNames.length; i++) {
+    for(final String propertyName : propertyNames) {
       try {
-        xqds.getProperty(propertyNames[i]);
-      } catch (XQException e) {
-        fail("A-XQDS-8.3: getProperty() failed for property '" + propertyNames[i] + "' with message: " + e.getMessage());
+        xqds.getProperty(propertyName);
+      } catch (final XQException e) {
+        fail("A-XQDS-8.3: getProperty() failed for property '" + propertyName + "' with message: " + e.getMessage());
       }
     }
   }
@@ -140,31 +140,31 @@ public class XQDataSourceTest extends XQJTestCase {
     try {
       xqds.setProperties(null);
       fail("A-XQDS-9.1: setProperties() throws an XQException when a null value is specified for the properties.");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQDS-9.1: setProperties() throws an XQException when a null value is specified for the propertiesr.");
     }
 
     try {
       // OK, we could check the supported properties to make sure we're using an unknown property.
       // But, let's get reasonable... Use a hard coded name.
-      Properties p = new Properties();
+      final Properties p = new Properties();
       p.put("the_property_that_not_known_to_any_implementation", "foo");
       xqds.setProperties(p);
       fail("A-XQDS-9.2: setProperties() throws an XQException when an invalid property name is specified.");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
-    } catch (Exception other_e) {
+    } catch (final Exception other_e) {
       fail("A-XQDS-9.2: setProperties() throws an XQException when an invalid property name is specified.");
     }
   }
 
   public void testSetLoginTimeout() throws XQException {
     try {
-      int timeout = xqds.getLoginTimeout();
+      final int timeout = xqds.getLoginTimeout();
       xqds.setLoginTimeout(timeout);
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQDS-10.1: setting the login timeout failed with message: " + e.getMessage());
     }
   }
@@ -172,9 +172,9 @@ public class XQDataSourceTest extends XQJTestCase {
   public void testSetLogWriter() throws XQException {
     try {
       xqds.setLogWriter(new PrintWriter(new StringWriter()));
-      Writer log = xqds.getLogWriter();
+      final Writer log = xqds.getLogWriter();
       assertNotNull("A-XQDS-11.1: Successfully set the log writer.", log);
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQDS-11.1: Setting the log writer failed with message: " + e.getMessage());
     }
   }

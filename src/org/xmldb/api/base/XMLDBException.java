@@ -78,7 +78,7 @@ public final class XMLDBException extends Exception
     * XMLDBException
     * @param errorCode error code
     */
-   public XMLDBException (int errorCode) {
+   public XMLDBException (final int errorCode) {
       this(errorCode, 0, "");
    }
 
@@ -87,7 +87,7 @@ public final class XMLDBException extends Exception
     * @param errorCode error code
     * @param message error message
     */
-   public XMLDBException (int errorCode, String message) {
+   public XMLDBException (final int errorCode, final String message) {
       this(errorCode, 0, message);
    }
 
@@ -96,7 +96,7 @@ public final class XMLDBException extends Exception
     * @param errorCode error code
     * @param vendorErrorCode vendor's error code
     */
-   public XMLDBException (int errorCode, int vendorErrorCode) {
+   public XMLDBException (final int errorCode, final int vendorErrorCode) {
       this(errorCode, vendorErrorCode, "");
    }
 
@@ -106,7 +106,7 @@ public final class XMLDBException extends Exception
     * @param vendorErrorCode vendor's error code
     * @param message error message
     */
-   public XMLDBException (int errorCode, int vendorErrorCode, String message) {
+   public XMLDBException (final int errorCode, final int vendorErrorCode, final String message) {
       super(message);
       this.errorCode = errorCode;
       this.vendorErrorCode = vendorErrorCode;

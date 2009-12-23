@@ -14,8 +14,8 @@ import java.util.TreeSet;
 @SuppressWarnings("all")
 public class SignatureTest extends XQJTestCase {
 
-  private static String logClass(StringBuffer sb, String name) throws Exception {
-    Class c = Class.forName("javax.xml.xquery." + name);
+  private static String logClass(final StringBuffer sb, final String name) throws Exception {
+    final Class c = Class.forName("javax.xml.xquery." + name);
 
     // not all java VMs return information in the same order through the reflection API
     // make sure we get information always in the same order.
@@ -30,11 +30,11 @@ public class SignatureTest extends XQJTestCase {
       sb.append(" extends ");
       sb.append(c.getSuperclass().getName());
     }
-    Class[] interfaces = c.getInterfaces();
+    final Class[] interfaces = c.getInterfaces();
     set = new TreeSet();
     if (interfaces != null && interfaces.length > 0) {
-      for (int i = 0; i < interfaces.length; i++) {
-        set.add(interfaces[i].getName());
+      for(final Class interface1 : interfaces) {
+        set.add(interface1.getName());
       }
       sb.append(" implements ");
       it = set.iterator();
@@ -47,10 +47,10 @@ public class SignatureTest extends XQJTestCase {
 
     // fields
     set = new TreeSet();
-    Field[] fields = c.getFields();
+    final Field[] fields = c.getFields();
     for (int i = 0; i < fields.length; i++) {
       if (!fields[i].getDeclaringClass().equals(c)) continue;
-      StringBuffer tmp = new StringBuffer();
+      final StringBuffer tmp = new StringBuffer();
       tmp.append(Modifier.toString(fields[i].getModifiers()));
       tmp.append(" ");
       tmp.append(fields[i].getType().getName());
@@ -66,20 +66,20 @@ public class SignatureTest extends XQJTestCase {
 
     // constructors
     set = new TreeSet();
-    Constructor[] constructors = c.getConstructors();
-    for (int i = 0; i < constructors.length; i++) {
-      StringBuffer tmp = new StringBuffer();
-      tmp.append(Modifier.toString(constructors[i].getModifiers()));
+    final Constructor[] constructors = c.getConstructors();
+    for(final Constructor constructor : constructors) {
+      final StringBuffer tmp = new StringBuffer();
+      tmp.append(Modifier.toString(constructor.getModifiers()));
       tmp.append(" ");
       tmp.append(c.getName());
       tmp.append(" (");
-      Class[] parameters = constructors[i].getParameterTypes();
+      final Class[] parameters = constructor.getParameterTypes();
       for (int j = 0; j < parameters.length; j++) {
         tmp.append(parameters[j].getName());
         if (j != parameters.length-1) tmp.append(",");
       }
       tmp.append(")");
-      Class[] exceptions = constructors[i].getExceptionTypes();
+      final Class[] exceptions = constructor.getExceptionTypes();
       if (exceptions != null && exceptions.length > 0) {
         tmp.append(" throws ");
         for (int j = 0; j < exceptions.length; j++) {
@@ -97,9 +97,9 @@ public class SignatureTest extends XQJTestCase {
 
     // methods
     set = new TreeSet();
-    Method[] methods = c.getMethods();
+    final Method[] methods = c.getMethods();
     for (int i = 0; i < methods.length; i++) {
-      StringBuffer tmp = new StringBuffer();
+      final StringBuffer tmp = new StringBuffer();
       if (!methods[i].getDeclaringClass().equals(c)) continue;
       tmp.append(Modifier.toString(methods[i].getModifiers()));
       tmp.append(" ");
@@ -107,13 +107,13 @@ public class SignatureTest extends XQJTestCase {
       tmp.append(" ");
       tmp.append(methods[i].getName());
       tmp.append(" (");
-      Class[] parameters = methods[i].getParameterTypes();
+      final Class[] parameters = methods[i].getParameterTypes();
       for (int j = 0; j < parameters.length; j++) {
         tmp.append(parameters[j].getName());
         if (j != parameters.length-1) tmp.append(",");
       }
       tmp.append(")");
-      Class[] exceptions = methods[i].getExceptionTypes();
+      final Class[] exceptions = methods[i].getExceptionTypes();
       if (exceptions != null && exceptions.length > 0) {
         tmp.append(" throws ");
         for (int j = 0; j < exceptions.length; j++) {
@@ -137,7 +137,7 @@ public class SignatureTest extends XQJTestCase {
   public static final String signatureFile__ = "xqj.sig";
 
   public void testSignatures() throws Exception {
-    StringBuffer sb = new StringBuffer();
+    final StringBuffer sb = new StringBuffer();
 
     logClass(sb, "ConnectionPoolXQDataSource");
     logClass(sb, "PooledXQConnection");
@@ -165,13 +165,13 @@ public class SignatureTest extends XQJTestCase {
     logClass(sb, "XQStackTraceVariable");
     logClass(sb, "XQStaticContext");
 
-    InputStream signatureStream = getClass().getResourceAsStream(signatureFile__);
+    final InputStream signatureStream = getClass().getResourceAsStream(signatureFile__);
     assertNotNull("Signature file '" + signatureFile__ + "' not found in classpath.", signatureStream);
 
-    java.io.InputStreamReader signatureReader = new java.io.InputStreamReader(signatureStream, "UTF-8");
-    Reader in = new BufferedReader(signatureReader);
+    final java.io.InputStreamReader signatureReader = new java.io.InputStreamReader(signatureStream, "UTF-8");
+    final Reader in = new BufferedReader(signatureReader);
     int ch;
-    StringBuffer expected = new StringBuffer();
+    final StringBuffer expected = new StringBuffer();
     while ((ch = in.read()) > -1) {
       expected.append((char)ch);
     }

@@ -17,7 +17,7 @@ public class XQResultSequenceTest extends XQJTestCase {
     try {
       xqs.getConnection();
       fail("A-XQRS-1.1: Getting the connection on a closed result sequence fails.");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -26,7 +26,7 @@ public class XQResultSequenceTest extends XQJTestCase {
     xqs = xqe.executeQuery("1,2,3,4");
     try {
       returned_xqc = xqs.getConnection();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQRS-1.2: getConnection() failed with message: " + e.getMessage());
     }
     assertSame("A-XQRS-1.2: Successfully get the connection of a result sequence.", xqc, returned_xqc);

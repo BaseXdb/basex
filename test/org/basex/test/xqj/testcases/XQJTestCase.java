@@ -16,17 +16,17 @@ public class XQJTestCase extends TestCase {
     //System.setProperty("com.oracle.xqj.tck.datasource", "saxonxq.properties");
 
     // Get the file name of the properties file
-    String fileName = System.getProperty("com.oracle.xqj.tck.datasource");
+    final String fileName = System.getProperty("com.oracle.xqj.tck.datasource");
     if (fileName == null)
       throw new Exception("The property 'com.oracle.xqj.tck.datasource' must be set.");
     // load the properties file
-    Properties p = new Properties();
-    FileInputStream fis = new FileInputStream(fileName);
+    final Properties p = new Properties();
+    final FileInputStream fis = new FileInputStream(fileName);
     p.load(fis);
     fis.close();
     // create an XQDataSource instance using reflection
-    String xqdsClassName = p.getProperty("XQDataSourceClassName");
-    Class xqdsClass = Class.forName(xqdsClassName);
+    final String xqdsClassName = p.getProperty("XQDataSourceClassName");
+    final Class xqdsClass = Class.forName(xqdsClassName);
     // create the XQDataSource instance
     xqds = (XQDataSource)xqdsClass.newInstance();
     // remove the XQDataSourceClassName property

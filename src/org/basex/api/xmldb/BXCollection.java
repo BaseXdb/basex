@@ -251,7 +251,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
 
       if(k instanceof Boolean) {
         final boolean b = val == null ? !((Boolean) k).booleanValue() :
-          val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
+          val.equalsIgnoreCase(ON);
         f.setBoolean(md, b);
       } else if(k instanceof Integer) {
         f.setInt(md, Integer.parseInt(val));

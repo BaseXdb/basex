@@ -18,7 +18,7 @@ public class AllTests {
    * Main method
    * @param args (ignored) command-line arguments
    */
-  public static void main(String[] args) {
+  public static void main(final String[] args) {
     TestRunner.run(suite());
   }
 
@@ -27,7 +27,7 @@ public class AllTests {
    * @return test instance
    */
   public static Test suite() {
-    TestSuite suite = new TestSuite("JSR 225 (XQJ) Technology Compatibility Kit");
+    final TestSuite suite = new TestSuite("JSR 225 (XQJ) Technology Compatibility Kit");
     suite.addTestSuite(SignatureTest.class);
     suite.addTestSuite(XQConnectionTest.class);
     suite.addTestSuite(XQDataFactoryTest.class);

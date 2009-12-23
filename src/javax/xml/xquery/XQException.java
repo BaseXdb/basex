@@ -66,7 +66,7 @@ public  class XQException extends Exception
    * @param message     the description of the error. <code>null</code> indicates
    *                    that the message string is non existant
    */
-  public XQException(String message)
+  public XQException(final String message)
   {
      super(message);
   }
@@ -83,7 +83,7 @@ public  class XQException extends Exception
    *                    <code>null</code> indicates there is no vendor
    *                    code or it is unknown
    */
-  public XQException(String message, String vendorCode)
+  public XQException(final String message, final String vendorCode)
   {
      super(message);
      this.vendorCode = vendorCode;
@@ -117,7 +117,7 @@ public  class XQException extends Exception
   * @param next     the next exception to be added to the chain
   *                 of exceptions
   */
-  public void setNextException(XQException next) {
+  public void setNextException(final XQException next) {
     nextException = next;
   }
 }

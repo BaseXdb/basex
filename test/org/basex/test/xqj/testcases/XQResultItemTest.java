@@ -23,7 +23,7 @@ public class XQResultItemTest extends XQJTestCase {
     try {
       xqri.getConnection();
       fail("A-XQRI-1.1: Getting the connection on a closed result item fails.");
-    } catch (XQException e) {
+    } catch (final XQException e) {
       // Expect an XQException
     }
     xqe.close();
@@ -36,7 +36,7 @@ public class XQResultItemTest extends XQJTestCase {
     xqri = (XQResultItem)xqi;
     try {
       returned_xqc = xqri.getConnection();
-    } catch (XQException e) {
+    } catch (final XQException e) {
       fail("A-XQRI-1.2: getConnection() failed with message: " + e.getMessage());
     }
     assertSame("A-XQRI-1.2: Successfully get the connection of a result item.", xqc, returned_xqc);

@@ -16,7 +16,7 @@ import javax.xml.namespace.QName;
  */
 public class XQStackTraceElement implements Serializable {
   /** Module. */
-  private String module;
+  private final String module;
   /** Line. */
   private int line = -1;
   /** Column. */
@@ -24,9 +24,9 @@ public class XQStackTraceElement implements Serializable {
   /** Position. */
   private int position = -1;
   /** Function name. */
-  private QName function;
+  private final QName function;
   /** Stack trace variables. */
-  private XQStackTraceVariable[] variables;
+  private final XQStackTraceVariable[] variables;
 
  /**
   * Construct an <code>XQStackTraceElement</code> object representing
@@ -46,8 +46,8 @@ public class XQStackTraceElement implements Serializable {
   * @param variables          the variables in scope at this execution point,
   *                           or <code>null</code> if no variable value retrieval is possible
   */
-  public XQStackTraceElement(String moduleURI, int line, int column, int position,
-                     QName function, XQStackTraceVariable[] variables) {
+  public XQStackTraceElement(final String moduleURI, final int line, final int column, final int position,
+                     final QName function, final XQStackTraceVariable[] variables) {
     this.module = moduleURI;
     this.line = line;
     this.column = column;

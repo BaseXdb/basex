@@ -83,8 +83,8 @@ public class DatabaseManager
     *  instances exist then an empty array is returned.
     */
    public static Database[] getDatabases () {
-      Enumeration e = databases.elements();
-      Database[] result = new Database[databases.size()];
+      final Enumeration e = databases.elements();
+      final Database[] result = new Database[databases.size()];
 
       int i = 0;
       while (e.hasMoreElements()) {
@@ -106,7 +106,7 @@ public class DatabaseManager
     *  <code>ErrorCodes.INVALID_DATABASE</code> if the provided <code>Database
     *  </code> instance is invalid.
     */
-   public static void registerDatabase (Database database) throws XMLDBException {
+   public static void registerDatabase (final Database database) throws XMLDBException {
       if ((database.getName() == null) || (database.getName().equals(""))) {
          throw new XMLDBException(ErrorCodes.INVALID_DATABASE);
       }
@@ -124,7 +124,7 @@ public class DatabaseManager
     *  <code>ErrorCodes.VENDOR_ERROR</code> for any vendor
     *  specific errors that occur.
     */
-   public static void deregisterDatabase (Database database)
+   public static void deregisterDatabase (final Database database)
          throws XMLDBException {
       databases.remove(database.getName());
    }
@@ -154,7 +154,7 @@ public class DatabaseManager
     *  <code>ErrroCodes.NO_SUCH_DATABASE</code> If a <code>Database</code>
     *    instance could not be found to handle the provided URI.
     */
-   public static org.xmldb.api.base.Collection getCollection (String uri)
+   public static org.xmldb.api.base.Collection getCollection (final String uri)
          throws XMLDBException {
       return getCollection(uri, null, null);
    }
@@ -187,12 +187,12 @@ public class DatabaseManager
     *  <code>ErrroCodes.PERMISSION_DENIED</code> If the <code>username</code>
     *    and <code>password</code> were not accepted by the database.
     */
-   public static org.xmldb.api.base.Collection getCollection (String uri,
-         String username, String password) throws XMLDBException {
-      Database db = getDatabase(uri);
+   public static org.xmldb.api.base.Collection getCollection (final String uri,
+         final String username, final String password) throws XMLDBException {
+      final Database db = getDatabase(uri);
 
       //uri = stripURIPrefix(uri);
-      String tmp = stripURIPrefix(uri);
+      final String tmp = stripURIPrefix(uri);
 
       return db.getCollection(tmp, username, password);
    }
@@ -211,8 +211,8 @@ public class DatabaseManager
     *  <code>ErrroCodes.NO_SUCH_DATABASE</code> If a <code>Database</code>
     *    instance could not be found to handle the provided URI.
     */
-   public static String getConformanceLevel (String uri) throws XMLDBException {
-      Database database = getDatabase(uri);
+   public static String getConformanceLevel (final String uri) throws XMLDBException {
+      final Database database = getDatabase(uri);
       return database.getConformanceLevel();
    }
 
@@ -222,7 +222,7 @@ public class DatabaseManager
     * @param name The property name
     * @return The property value
     */
-   public static String getProperty (String name) {
+   public static String getProperty (final String name) {
       return properties.getProperty(name);
    }
 
@@ -232,7 +232,7 @@ public class DatabaseManager
     * @param name The property name
     * @param value The value to set.
     */
-   public static void setProperty (String name, String value) {
+   public static void setProperty (final String name, final String value) {
       properties.put(name, value);
    }
 
@@ -244,19 +244,19 @@ public class DatabaseManager
     * @return the requested <code>Database</code> instance.
     * @throws XMLDBException exception
     */
-   protected static Database getDatabase(String uri) throws XMLDBException {
+   protected static Database getDatabase(final String uri) throws XMLDBException {
       if (!uri.startsWith(URI_PREFIX)) {
          throw new XMLDBException(ErrorCodes.INVALID_URI);
       }
 
-      int end = uri.indexOf(":", URI_PREFIX.length());
+      final int end = uri.indexOf(":", URI_PREFIX.length());
       if (end == -1) {
          throw new XMLDBException(ErrorCodes.INVALID_URI);
       }
 
-      String databaseName = uri.substring(URI_PREFIX.length(), end);
+      final String databaseName = uri.substring(URI_PREFIX.length(), end);
 
-      Database db = databases.get(databaseName);
+      final Database db = databases.get(databaseName);
       if (db == null) {
          throw new XMLDBException(ErrorCodes.NO_SUCH_DATABASE);
       }
@@ -272,12 +272,12 @@ public class DatabaseManager
     * @return The database specific portion of the URI.
     * @throws XMLDBException exception
     */
-   protected static String stripURIPrefix(String uri) throws XMLDBException {
+   protected static String stripURIPrefix(final String uri) throws XMLDBException {
       if (!uri.startsWith(URI_PREFIX)) {
          throw new XMLDBException(ErrorCodes.INVALID_URI);
       }
 
-      String dbURI = uri.substring(URI_PREFIX.length(), uri.length());
+      final String dbURI = uri.substring(URI_PREFIX.length(), uri.length());
       return dbURI;
    }
 }
