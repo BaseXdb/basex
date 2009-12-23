@@ -75,8 +75,6 @@ public interface QueryTokens {
   /** Parser token. */
   String DIV = "div";
   /** Parser token. */
-  String DOC = "doc";
-  /** Parser token. */
   String DOCUMENT = "document";
   /** Parser token. */
   String ELEMENT = "element";
@@ -393,8 +391,6 @@ public interface QueryTokens {
 
   /** Query Plan. */
   String ARG = "arg";
-  /** Query Plan. */
-  byte[] NS = token("timer");
   /** Query Plan. */
   byte[] POS = token("pos");
   /** Query Plan. */

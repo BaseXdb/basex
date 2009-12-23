@@ -568,9 +568,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
       final TreeRect[] rL = cache.getTreeRectsPerLevel(level);
 
-      for(final TreeRect element : rL) {
-        final TreeRect r = element;
-
+      for(final TreeRect r : rL) {
         if(r.contains(mousePosX)) {
 
           focusedRect = r;

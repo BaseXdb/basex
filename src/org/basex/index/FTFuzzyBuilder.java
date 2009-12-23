@@ -73,8 +73,8 @@ public final class FTFuzzyBuilder extends FTBuilder {
   @Override
   int nrTokens() {
     int l = 0;
-    for(int i = 0, is = tree.trees.length; i < is; i++) {
-      if(tree.trees[i] != null) l += tree.trees[i].size();
+    for(final ValueFTTree tree2 : tree.trees) {
+      if(tree2 != null) l += tree2.size();
     }
     return l;
   }
@@ -134,7 +134,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
         ind.add(tok[min].length);
         ind.add((int) outy.size());
       }
-      
+
       outy.write(tok[min]);
       outy.write5(outz.size());
       int s = 0;
@@ -148,8 +148,8 @@ public final class FTFuzzyBuilder extends FTBuilder {
         for(final int p : pos[m]) tbo.add(Num.num(p));
         s += v[m].nextFTDataSize();
         tok[m] = nextToken(v, m);
-        pres[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[]{};
-        pos[m] = tok[m].length > 0 ? v[m].nextPosValues() : new int[]{};
+        pres[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[] {};
+        pos[m] = tok[m].length > 0 ? v[m].nextPosValues() : new int[] {};
       }
 
       outy.writeInt(s);
@@ -234,7 +234,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
       final ValueFTTree t = tree.nextTree();
       t.next();
       final byte[] key = t.nextTok();
-      
+
       if(j < key.length) {
         j = key.length;
         // write index and pointer on first token

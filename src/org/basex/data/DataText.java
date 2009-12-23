@@ -112,8 +112,6 @@ public interface DataText {
   byte[] NODE = token("node");
   /** Kind attribute. */
   byte[] KIND = token("kind");
-  /** Count attribute. */
-  byte[] COUNT = token("count");
   /** Size tag. */
   byte[] SIZE = token("size");
 

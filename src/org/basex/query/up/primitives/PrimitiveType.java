@@ -1,6 +1,5 @@
 package org.basex.query.up.primitives;
 
-//[LK] edit comment!
 /**
  * Update primitive type enumeration.
  *
@@ -8,6 +7,8 @@ package org.basex.query.up.primitives;
  * @author Lukas Kircher
  */
 public enum PrimitiveType {
+  // Order is essential - don't change..
+
   /** Type Insert attribute. */ INSERTATTR,
   /** Type Replace value. */ REPLACEVALUE,
   /** Type Rename. */ RENAME,

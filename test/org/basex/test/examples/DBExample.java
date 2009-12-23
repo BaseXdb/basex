@@ -2,7 +2,6 @@ package org.basex.test.examples;
 
 import java.io.IOException;
 import java.io.OutputStream;
-
 import org.basex.core.*;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.proc.*;
@@ -15,7 +14,7 @@ import org.basex.query.iter.Iter;
 
 /**
  * This class demonstrates how new databases are created, deleted and queried.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author BaseX Team
  */
@@ -38,10 +37,10 @@ public final class DBExample {
 
     // Creates a database from the specified file.
     new CreateDB("input.xml", "Example1").exec(CONTEXT, System.out);
-    
+
     // Collection Examples
    // CollectionExamples.run();
-    
+
     // Do some database stuff
     MaintenanceExamples.run();
 

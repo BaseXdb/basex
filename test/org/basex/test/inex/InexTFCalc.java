@@ -41,6 +41,7 @@ public final class InexTFCalc {
   private final StringList databases;
   /** Container for qtimes and results. */
   private final PrintOutput res = new PrintOutput(WORDSF);
+
   /** Session. */
   private ClientSession session;
   /** Queries. */

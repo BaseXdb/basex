@@ -43,13 +43,13 @@ public final class InexTest {
 
   /** Database context. */
   private final Context ctx = new Context();
+
   /** Session. */
   private ClientSession session;
   /** Queries. */
   private StringList queries;
   /** Databases. */
   private StringList databases;
-
   /** Maximum number of databases. */
   private int dbindex = -1;
   /** Maximum number of queries. */

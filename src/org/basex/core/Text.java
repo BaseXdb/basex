@@ -28,10 +28,6 @@ public interface Text {
   String DOTS = "...";
   /** List. */
   String LI = "- ";
-  /** On flag. */
-  String TRUE = "TRUE";
-  /** Off flag. */
-  String FALSE = "FALSE";
   /** All flag. */
   String ALL = "ALL";
 
@@ -131,39 +127,19 @@ public interface Text {
   // COMMANDS =================================================================
 
   /** Command help. */
-  String FRAGMENT = "fragment";
-  /** Command help. */
-  String SOURCE = "source";
-  /** Command help. */
-  String TARGET = "target";
-  /** Command help. */
   String QUERY = "query";
   /** Command help. */
-  String VAL = "value";
-  /** Command help. */
-  String FILE = "file";
-  /** Command help. */
   String PATH = "path";
-  /** Command help. */
-  String TEXT = "text";
   /** Command help. */
   String NAM = "name";
   /** Command help. */
   String PW = "password";
-  /** Command help. */
-  String POS = "pos";
-  /** Command help. */
-  String INTO = "INTO";
-  /** Command help. */
-  String AT = "AT";
   /** Command help. */
   String FROM = "FROM";
   /** Command help. */
   String TO = "TO";
   /** Command help. */
   String ON = "ON";
-  /** Command help. */
-  String OFF = "OFF";
   /** Command help. */
   String USER = "USER";
 

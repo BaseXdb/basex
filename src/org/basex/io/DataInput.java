@@ -102,14 +102,4 @@ public final class DataInput extends BufferInput {
       return (read() << 24) + (read() << 16) + (read() << 8) + read();
     }
   }
-
-  /**
-   * Reads an integer value from the input stream.
-   * @return integer value
-   * @throws IOException IO Exception
-   */
-  public long read5() throws IOException {
-    return ((long) read() << 32) + ((long) read() << 24) +
-      (read() << 16) + (read() << 8) + read();
-  }
 }

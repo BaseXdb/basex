@@ -135,14 +135,14 @@ public final class FNBaseX extends Fun {
     if(fs == null) return Str.ZERO;
     final Iter iter = ctx.iter(expr[0]);
     Item it;
-    TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     boolean first = true;
     while((it = iter.next()) != null) {
       if(first) first = false;
       else tb.add('\n');
       tb.add(fs.path(((DBNode) it.atomic(ctx)).pre, false));
     }
-    return tb.size() == 0 ? Str.ZERO : Str.get(tb.finish());  
+    return tb.size() == 0 ? Str.ZERO : Str.get(tb.finish());
   }
 
   /**

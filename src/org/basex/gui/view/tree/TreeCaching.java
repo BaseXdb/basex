@@ -416,15 +416,6 @@ final class TreeCaching implements TreeViewOptions {
 
     /**
      * Initializes TreeRect.
-     * @param xx x position
-     * @param ww width
-     */
-    TreeRect(final int xx, final int ww) {
-      super(xx, ww);
-    }
-
-    /**
-     * Initializes TreeRect.
      * @param c RectangleCache
      */
     TreeRect(final RectangleCache c) {

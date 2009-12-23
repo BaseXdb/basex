@@ -27,18 +27,18 @@ public class CollectionExamples {
 
   /** The file you want to add to your collection. */
   protected static final String XMLFILE = "input.xml";
-  
+
   /** The database name. **/
   protected static final String DBNAME = "MyFileCollection";
 
-  
+
 
   /**
    * PrintOutput Context. Point the PrintOutput to whatever file you like to
    * store the serializing results in a file. You may as well point it to
    * System.out.
    */
-  private PrintOutput out;
+  private final PrintOutput out;
 
   /**
    * Sets up the example class.
@@ -51,10 +51,10 @@ public class CollectionExamples {
     // CONTEXT.prop.set("CREATEFILTER", "*.kml");
     // -------------------------------------------------------------------------
 
-    CollectionExamples collectionExamples = new CollectionExamples();
+    final CollectionExamples collectionExamples = new CollectionExamples();
     System.out.println("=== Creating a collection.");
     collectionExamples.createColl(true);
-        
+
     System.out.println("=== Remove an document from the collection.");
     collectionExamples.deleteDocumentFromColl();
 
@@ -69,7 +69,7 @@ public class CollectionExamples {
     new Close().execute(CONTEXT);
     new DropDB(DBNAME).execute(CONTEXT);
   }
-  
+
   /** Sets up the Output stream. */
   protected CollectionExamples() {
     out = new PrintOutput(System.out);
@@ -95,8 +95,8 @@ public class CollectionExamples {
     // -------------------------------------------------------------------------
     // Optimize the database structures
     new Optimize().execute(CONTEXT);
-    
-    
+
+
     /**
      * Output some information on your newly created database you may as well
      * run Queries on your collection, see the examples provided in
@@ -104,13 +104,13 @@ public class CollectionExamples {
      */
     if(verbose) try {
       new InfoDB().exec(CONTEXT, out);
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
-  
-  
+
+
   /**
    * This command removes a single document from your collection.
    */
@@ -118,7 +118,7 @@ public class CollectionExamples {
     // -------------------------------------------------------------------------
     // Delete a file:
     new Delete(XMLFILE).execute(CONTEXT);
-    
+
     // -------------------------------------------------------------------------
     // Optimize the database structures
     new Optimize().execute(CONTEXT);
@@ -127,7 +127,7 @@ public class CollectionExamples {
     // Output some information on your altered collection
      try {
       new InfoDB().exec(CONTEXT, out);
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }

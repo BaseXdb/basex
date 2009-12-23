@@ -5,7 +5,6 @@ import static org.basex.query.up.primitives.PrimitiveType.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -87,8 +86,7 @@ abstract class Primitives {
         // Check if the identity of all target nodes of fn:put operations is
         // still available after the execution of updates. That includes parent
         // nodes.
-        if(p.type() == PUT && parentDeleted(nodes.get(i)))
-          Err.or(UPFOEMPT, p);
+        if(p.type() == PUT && parentDeleted(nodes.get(i))) Err.or(UPFOEMPT, p);
       }
     }
   };
@@ -99,14 +97,11 @@ abstract class Primitives {
    * @return original array minus null value fields
    */
   private UpdatePrimitive[] shrink(final UpdatePrimitive[] up) {
-    // [LK] kick null checks
     int l = 0;
-    for(final UpdatePrimitive element : up)
-      if(element != null) l++;
+    for(final UpdatePrimitive u : up) if(u != null) l++;
     final UpdatePrimitive[] t = new UpdatePrimitive[l];
     int m = 0;
-    for(final UpdatePrimitive element : up)
-      if(element != null) t[m++] = element;
+    for(final UpdatePrimitive u : up) if(u != null) t[m++] = u;
     return t;
   }
 
@@ -117,14 +112,6 @@ abstract class Primitives {
    * @return true if parent deleted or replaced
    */
   protected abstract boolean parentDeleted(final int n);
-
-  /**
-   * Returns the key of a given node. For database nodes this would be the pre
-   * value. For fragments the id is returned.
-   * @param n node
-   * @return id, -1 if n is null
-   */
-  protected abstract int getId(final Nod n);
 
   /**
    * Checks constraints and applies all updates to the databases.

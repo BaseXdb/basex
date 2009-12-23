@@ -2,7 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryException;
-import org.basex.query.item.Nod;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -45,10 +44,5 @@ final class FragPrimitives extends Primitives {
   @Override
   protected boolean parentDeleted(final int n) {
     return false;
-  }
-
-  @Override
-  protected int getId(final Nod n) {
-    return n == null ? -1 : n.id();
   }
 }

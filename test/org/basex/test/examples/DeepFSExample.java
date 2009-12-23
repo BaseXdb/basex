@@ -22,7 +22,7 @@ import org.deepfs.util.FSWalker;
  * @author BaseX Team
  */
 public final class DeepFSExample {
-  
+
   /** The current database Context. */
   static final Context CONTEXT = new Context();
   /** Names of the test databases. */
@@ -31,12 +31,12 @@ public final class DeepFSExample {
   private static final File FILE = new File(".").listFiles()[0];
   /** Test directories. */
   private static final File[] DIR;
-  
+
   static {
     final File[] f = findFiles();
     DIR = new File[] {new File(CONTEXT.prop.get(Prop.DBPATH)), f[0], f[1]};
   }
-  
+
   /** Example queries. */
   private static final String[][] QUERIES = new String[][] {
     {
@@ -58,7 +58,7 @@ public final class DeepFSExample {
     {
       "All pictures that are more than twice as large as the average",
       "basex:fspath(" +
-      " let $pictures   := //file[type=\"picture\"]" + 
+      " let $pictures   := //file[type=\"picture\"]" +
       " let $avgHeight  := avg($pictures/pixelHeight)" +
       " let $avgWidth   := avg($pictures/pixelWidth)" +
       " for $pic in //file[type=\"picture\"]" +
@@ -80,7 +80,7 @@ public final class DeepFSExample {
   };
   /** Query - DB mapping. */
   private static final int[] INDEX = new int[] {1, 1, 1, 2, 2, 1};
-  
+
   /** Private constructor. */
   private DeepFSExample() { }
 
@@ -91,27 +91,27 @@ public final class DeepFSExample {
    */
   public static void main(final String[] args) throws Exception {
     String xml;
-    
+
     // -------------------------------------------------------------------------
-    
+
     System.out.println(
         "=== Serialize a single file (without metadata and contents)");
     xml = FSMLSerializer.serialize(FILE, false);
     System.out.println(xml);
-    
+
     // -------------------------------------------------------------------------
-    
+
     System.out.println(
         "\n=== Serialize a single file (with metadata and text/xml contents)");
-    DeepFile deepFile = new DeepFile(FILE);
+    final DeepFile deepFile = new DeepFile(FILE);
     // Extracts metadata and text/xml contents
-    deepFile.extract();    
+    deepFile.extract();
     // Serializes the deep file
     xml = FSMLSerializer.serialize(deepFile);
     System.out.println(xml);
 
     // -------------------------------------------------------------------------
-    
+
     System.out.println("\n\n=== Traverse a file system hierarchy (method 1)");
     // Creates the file system database
     new CreateFS(DIR[0].getAbsolutePath(), DB[0]).exec(CONTEXT, System.out);
@@ -119,12 +119,12 @@ public final class DeepFSExample {
     new XQuery("/").exec(CONTEXT, System.out);
     // Closes the database
     new Close().exec(CONTEXT, System.out);
-    
+
     // -------------------------------------------------------------------------
-    
+
     System.out.println("\n\n=== Traverse a file system hierarchy (method 2)");
     // Initializes the file system importer
-    FSImporter importer = new FSImporter(CONTEXT);
+    final FSImporter importer = new FSImporter(CONTEXT);
     // Creates the database
     importer.createDB(DB[0]);
     // Traverses the directory, extracts the metadata and text/xml contents and
@@ -136,20 +136,20 @@ public final class DeepFSExample {
     new XQuery("/").exec(CONTEXT, System.out);
     // Closes the database
     new Close().exec(CONTEXT, System.out);
-    
+
     // -------------------------------------------------------------------------
-    
+
     System.out.println("\n\n=== List available parsers");
     System.out.println("file suffix\t| \t java class");
     System.out.println("-----------------------------------------------------");
-    ParserRegistry registry = new ParserRegistry();
-    for(String[] parser : registry.availableParsers()) {
+    final ParserRegistry registry = new ParserRegistry();
+    for(final String[] parser : registry.availableParsers()) {
       System.out.println(parser[0] + (parser[0].length() > 7 ? "" : "\t") +
           "\t  " + parser[1]);
     }
-    
+
     // -------------------------------------------------------------------------
-    
+
     System.out.println("\n=== Example queries ====================");
     if(DIR[1] != null) {
       System.out.println("\tcreating mp3 database...");
@@ -169,7 +169,7 @@ public final class DeepFSExample {
       new Close().exec(CONTEXT, System.out);
     }
   }
-  
+
   // ---------------------------------------------------------------------------
 
   /**
@@ -179,14 +179,14 @@ public final class DeepFSExample {
   static File[] findFiles() {
     System.out.println(
         "\nsearching for mp3 and jpg files (needed for example queries) ");
-    FileFinder ff = new FileFinder();
-    FSWalker walker = new FSWalker(ff);
+    final FileFinder ff = new FileFinder();
+    final FSWalker walker = new FSWalker(ff);
     File mp3Directory = null;
     File jpgDirectory = null;
     try {
-      for(File f : File.listRoots())
+      for(final File f : File.listRoots())
         walker.traverse(f);
-    } catch(RuntimeException e) {
+    } catch(final RuntimeException e) {
       if(ff.mp3Dir != null)
         mp3Directory = new File(ff.mp3Dir).getParentFile().getParentFile();
       if(ff.jpgDir != null)
@@ -200,7 +200,7 @@ public final class DeepFSExample {
     }
     return new File[] { mp3Directory, jpgDirectory};
   }
-  
+
   /** Class to find a folder that contains mp3 files. */
   static class FileFinder implements FSTraversal {
     /** Directory, containing mp3 files. */

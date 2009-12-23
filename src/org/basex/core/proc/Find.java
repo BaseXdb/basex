@@ -190,7 +190,7 @@ public final class Find extends AQuery {
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();
     for(int i = 0; i < is; i++) {
-      final String[] spl = fs ? new String[] { 
+      final String[] spl = fs ? new String[] {
           FSImporter.escape(filter.get(i)) } : split(filter.get(i));
       for(final String s : spl) {
         byte[] term = token(s);

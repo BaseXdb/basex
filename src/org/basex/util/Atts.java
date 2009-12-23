@@ -18,18 +18,6 @@ public final class Atts {
   public int size;
 
   /**
-   * Sets the specified value.
-   * @param k key to be added
-   * @param v value to be added
-   * @return self reference
-   */
-  public Atts set(final byte[] k, final byte[] v) {
-    size = 0;
-    add(k, v);
-    return this;
-  }
-
-  /**
    * Adds next value.
    * @param k key to be added
    * @param v value to be added

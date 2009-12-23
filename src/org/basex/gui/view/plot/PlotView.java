@@ -335,7 +335,7 @@ public final class PlotView extends View {
     int focused = gui.context.focused;
     if(focused != -1) {
       final Data d = gui.context.data;
-      int itmID = d.tags.id(plotData.item);
+      final int itmID = d.tags.id(plotData.item);
       int k = d.kind(focused);
       int name = d.name(focused);
       while(focused > 0 && itmID != name) {

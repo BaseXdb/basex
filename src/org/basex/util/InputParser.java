@@ -16,8 +16,6 @@ public abstract class InputParser {
   /** Parsing exception. */
   private static final String INVENTITY = "Invalid entity \"%\".";
 
-  /** Temporary token constructions. */
-  protected TokenBuilder tk = new TokenBuilder();
   /** Optional reference to query input. */
   public IO file;
   /** Input query. */

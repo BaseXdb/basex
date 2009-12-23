@@ -132,7 +132,7 @@ public final class ParserRegistry {
   public String[][] availableParsers() {
     final String[][] parsers = new String[REGISTRY.size()][];
     int i = 0;
-    for(Entry<String, Class<? extends IFileParser>> parser :
+    for(final Entry<String, Class<? extends IFileParser>> parser :
       REGISTRY.entrySet()) {
       parsers[i++] = new String[] { parser.getKey(),
           parser.getValue().getName()};

@@ -104,7 +104,7 @@ public final class BaseXTable extends JTable {
       dialog.action(new Object[] { value, row, col });
     }
   }
-  
+
   /**
    * Own Renderer for cells.
    */

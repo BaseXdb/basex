@@ -17,13 +17,6 @@ public final class IntArrayList implements Iterable<int[]> {
   int size;
 
   /**
-   * Default constructor.
-   */
-  public IntArrayList() {
-    this(8);
-  }
-
-  /**
    * Constructor.
    * @param is initial size of the list
    */

@@ -70,6 +70,7 @@ final class NSNode {
       final int d = n.pre - ch[s].pre;
       if(d > 0) break;
       if(d <= 0) continue;
+      // [CG] XQUP: check if this is called at all
       for(int v = 0; v < n.vals.length; v += 2) {
         ch[s].add(n.vals[v], n.vals[v + 1]);
       }

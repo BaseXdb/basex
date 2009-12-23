@@ -71,14 +71,6 @@ public class IntList {
   }
 
   /**
-   * Returns the number of entries.
-   * @return number of entries
-   */
-  public final int maxSize() {
-    return list.length;
-  }
-
-  /**
    * Returns the specified value.
    * @param p position
    * @return value
@@ -106,16 +98,6 @@ public class IntList {
   public final boolean contains(final int v) {
     for(int i = 0; i < size; i++) if(list[i] == v) return true;
     return false;
-  }
-
-  /**
-   * Checks if the specified value is found in the list and returns its index.
-   * @param v value to be added
-   * @return true if value is found
-   */
-  public final int indexOf(final int v) {
-    for(int i = 0; i < size; i++) if(list[i] == v) return i;
-    return -1;
   }
 
   /**

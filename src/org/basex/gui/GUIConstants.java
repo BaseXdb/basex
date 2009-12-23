@@ -62,8 +62,6 @@ public final class GUIConstants {
   public static final String INFOVIEW = "info";
   /** Internal name of the Explore View. */
   public static final String EXPLOREVIEW = "explore";
-  /** Internal name of the Help View. */
-  public static final String HELPVIEW = "help";
   /** Internal name of the Plot View. */
   public static final String PLOTVIEW = "plot";
   /** Internal name of the Tree View. */

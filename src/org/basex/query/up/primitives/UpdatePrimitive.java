@@ -181,8 +181,9 @@ public abstract class UpdatePrimitive {
         return pre + 1;
       default:
         q = nd.qname();
-        ne = false;
-        if(par == 0) {
+        // [CG] XQUP: check temporary namespace copy
+        ne = false; // nd.ns().size != 0;
+        if(par == 0) { // ne
           final Atts ns = FElem.ns(nd);
           for(int a = 0; a < ns.size; a++) {
             m.ns.add(ms, -1, ns.key[a], ns.val[a]);

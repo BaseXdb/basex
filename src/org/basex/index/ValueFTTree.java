@@ -48,14 +48,6 @@ final class ValueFTTree extends ValueTree {
   }
 
   /**
-   * Initializes the iterator.
-   */
-  void initIter() {
-    cn = root;
-    if(cn != -1) while(l(cn) != -1) cn = l(cn);
-  }
-
-  /**
    * Initializes the tree for new full-text values.
    */
   void initTree() {

@@ -23,7 +23,7 @@ public interface Commands {
   enum CmdPerm { READ, WRITE, CREATE, ADMIN, ALL }
   /** Set command definitions. */
   enum CmdSet { INFO, DEBUG, SERIALIZE, CHOP, ENTITY, TEXTINDEX, ATTRINDEX,
-    FTINDEX, PATHINDEX, DBPATH }
+    FTINDEX, PATHINDEX }
   /** Index types. */
   enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, PATH }
   /** Index types. */

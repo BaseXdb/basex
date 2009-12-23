@@ -219,7 +219,7 @@ public final class TableView extends View implements Runnable {
       gui.notify.focus(-1, this);
       content.repaint();
     }
-    
+
     final String str = content.focusedString;
     gui.cursor(valid && (str != null &&
       str.length() <= Token.MAXLEN ||

@@ -62,10 +62,10 @@ public final class InexSubmit {
 
   /** Database context. */
   private final Context ctx = new Context();
-  /** Session. */
-  private ClientSession session;
   /** Queries. */
   private final StringList queries;
+  /** Session. */
+  private ClientSession session;
   /** Databases. */
   private StringList databases;
   /** Topic ids of the queries. */

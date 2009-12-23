@@ -1,7 +1,6 @@
 package org.basex.test.examples;
 
 import java.io.IOException;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.proc.Close;
@@ -28,11 +27,11 @@ public final class QueryExample {
 
   /** The query to evaluate. */
   private static final String QUERY = "for $x in //body//li return $x";
-  
+
   /** insert a node into the last li Element. */
   private static final String UPDATE = "insert node <b>I am new</b>" +
     " into /html/body//li[position()=last()]";
-  
+
   /**
    * PrintOutput Context. Point the PrintOutput to whatever file you like to
    * store the serializing results in a file. You may as well point it to
@@ -48,16 +47,16 @@ public final class QueryExample {
    * @param args not used.
    */
   public static void main(final String[] args) {
-    QueryExample queryExample = new QueryExample();
+    final QueryExample queryExample = new QueryExample();
     try {
       queryExample.run();
-    } catch(IOException e) {
+    } catch(final IOException e) {
       e.printStackTrace();
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       System.err.println(e.getMessage());
     }
   }
-  
+
   /**
    * Sets up the example XMLSerializer instance.
    */
@@ -65,7 +64,7 @@ public final class QueryExample {
     try {
       out = new PrintOutput(System.out);
       xmlSer = new XMLSerializer(out);
-    } catch(IOException e) {
+    } catch(final IOException e) {
       System.err.println("Could not initiate the XMLSerializer.");
     }
   }
@@ -86,7 +85,7 @@ public final class QueryExample {
       directOutputExample();
       // uncomment the following line to see error handling.
       // errorExample();
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       System.err.println(e.getMessage());
     }
 
@@ -94,7 +93,7 @@ public final class QueryExample {
     // Process the result with an iterator:
     try {
       iterateExample();
-    } catch(Exception e) {
+    } catch(final Exception e) {
       System.err.println(e.getMessage());
     }
 
@@ -102,12 +101,12 @@ public final class QueryExample {
     // Processing the whole result instance at once:
     try {
       resultInstance();
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
       System.err.println(e.getMessage());
     }
     try {
       updateExample();
-    }catch(BaseXException e) {
+    }catch(final BaseXException e) {
       System.err.println(e.getMessage());
     }
     // -------------------------------------------------------------------------
@@ -152,7 +151,7 @@ public final class QueryExample {
    * to have very big results, as you will not have to process all resulting
    * nodes at once. Please note the use of {@link XMLSerializer} to generate
    * valid XML output.
-   * 
+   *
    * @throws QueryException in case your query was wrong.
    * @throws IOException for {@link XMLSerializer}.
    */
@@ -185,11 +184,11 @@ public final class QueryExample {
   private void resultInstance() throws QueryException, IOException {
     System.out.println("\n=== Serializing a complete result instance.");
     // Creates and executes a query
-    QueryProcessor processor = new QueryProcessor(QUERY, CONTEXT);
+    final QueryProcessor processor = new QueryProcessor(QUERY, CONTEXT);
 
     // -------------------------------------------------------------------------
     // Executes the query.
-    Result result = processor.query();
+    final Result result = processor.query();
 
     // Serializes the result
     result.serialize(xmlSer);
@@ -216,6 +215,6 @@ public final class QueryExample {
   }
 
 
-  
+
 
 }

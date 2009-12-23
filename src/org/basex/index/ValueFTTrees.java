@@ -34,7 +34,8 @@ class ValueFTTrees {
    * Initializes all trees for iterative traversal.
    */
   void init() {
-    for(int j = 0; j < trees.length; j++) if(trees[j] != null) trees[j].init();
+    for(final ValueFTTree tree : trees)
+      if(tree != null) tree.init();
     nsize = -1;
   }
 
@@ -42,8 +43,8 @@ class ValueFTTrees {
    * Initializes all trees and removes full-text data.
    */
   void initTrees() {
-    for(int j = 0; j < trees.length; j++)
-      if(trees[j] != null) trees[j].initTree();
+    for(final ValueFTTree tree : trees)
+      if(tree != null) tree.initTree();
   }
 
   /**

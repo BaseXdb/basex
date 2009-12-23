@@ -5,7 +5,6 @@ import static org.basex.query.up.primitives.PrimitiveType.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.up.primitives.NodeCopy;
@@ -164,11 +163,5 @@ final class DBPrimitives extends Primitives {
     final int p = d.parent(n, d.kind(n));
     if(p == -1) return false;
     return parentDeleted(p);
-  }
-
-  @Override
-  protected int getId(final Nod n) {
-    if(n == null) return -1;
-    return ((DBNode) n).pre;
   }
 }

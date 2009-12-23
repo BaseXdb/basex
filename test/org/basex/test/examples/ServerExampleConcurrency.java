@@ -35,7 +35,7 @@ public final class ServerExampleConcurrency {
    * Runs the Client-Server Example.
    * @throws Exception on error.
    */
-  public void run() throws Exception{
+  public void run() throws Exception {
     // Start server on standard port 1984 in a new thread.
     new Thread() {
       @Override

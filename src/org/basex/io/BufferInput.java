@@ -41,11 +41,6 @@ public class BufferInput {
   private CharsetDecoder csd;
 
   /**
-   * Empty constructor.
-   */
-  protected BufferInput() { }
-
-  /**
    * Fills the specified array with the beginning of the specified file.
    * @param file the file to be read
    * @param cont byte array
