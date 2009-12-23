@@ -36,8 +36,7 @@ final class ValueFTTree extends ValueTree {
     final int os = tokens.size();
     final int n = index(tok, pre, cf == 0);
     if(os == tokens.size()) {
-//      final int i = cf > 0 ? map.indexOf(n) : n;
-      final int i = cf > 0 ? maps.getNN(Num.num(n)) : n;
+      final int i = cf > 0 ? maps.get(Num.num(n)) : n;
       if(poss.size() > i && poss.get(i) != null) {
         poss.set(Num.add(poss.get(i), pos), i);
         numpre.set(numpre.get(i) + 1, i);
@@ -74,8 +73,7 @@ final class ValueFTTree extends ValueTree {
   boolean more(final int cf) {
     while(more()) {
       lcn = cn;
-//      pft = cf > 0 ? map.indexOf(lcn) : lcn;
-      pft = cf > 0 ? maps.getNN(Num.num(lcn)) : lcn;
+      pft = cf > 0 ? maps.get(Num.num(lcn)) : lcn;
       if(pft > -1) return true;
       next();
     }

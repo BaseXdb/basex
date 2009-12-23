@@ -2,12 +2,14 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.util.Token;
 
 /**
  * Management of logging.
@@ -29,7 +31,7 @@ public final class Log {
   /** Start date of log. */
   private Date start;
   /** File writer. */
-  private FileWriter fw;
+  private OutputStreamWriter fw;
 
   /**
    * Constructor.
@@ -85,7 +87,8 @@ public final class Log {
     final String file = dir + DATE.format(d) + ".log";
     start = d;
     try {
-      fw = new FileWriter(file, true);
+      fw = new OutputStreamWriter(
+          new FileOutputStream(file, true), Token.UTF8);
     } catch(final IOException ex) {
       ex.printStackTrace();
     }

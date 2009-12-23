@@ -7,6 +7,7 @@ import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.Data;
+import org.basex.util.Performance;
 
 /**
  * This interface defines the functions which are needed for building
@@ -56,8 +57,9 @@ public abstract class IndexBuilder extends Progress {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
       if(cc >= 0) throw new IOException(PROCOUTMEM);
+      if(Prop.debug) Main.err("!");
       merge = true;
-      cc = 50;
+      cc = 30;
     } else {
       cc--;
     }
@@ -71,6 +73,8 @@ public abstract class IndexBuilder extends Progress {
   protected IndexBuilder(final Data d) {
     data = d;
     size = data.meta.size;
+    if(rt.totalMemory() - rt.freeMemory() >= rt.maxMemory() / 2)
+      Performance.gc(2);
   }
 
   @Override

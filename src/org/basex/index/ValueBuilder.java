@@ -56,17 +56,14 @@ public final class ValueBuilder extends IndexBuilder {
         if(memFull()) {
           write(f + csize++);
           index = new ValueTree();
-          Performance.gc(1);
+          Performance.gc(2);
         }
       }
       if(data.kind(pre) != type) continue;
 
       // skip too long and pure whitespace tokens
       final byte[] tok = data.text(pre, text);
-      if(tok.length <= MAXLEN && !ws(tok)) {
-        System.out.println(new String(tok) + ":" + pre);
-        index.index(tok, pre);
-      }
+      if(tok.length <= MAXLEN && !ws(tok)) index.index(tok, pre);
     }
 
     if(csize == 0) {

@@ -51,7 +51,6 @@ public final class FTFuzzyBuilder extends FTBuilder {
    */
   protected FTFuzzyBuilder(final Data d) throws IOException {
     super(d);
-    Performance.gc(1);
   }
 
   @Override
@@ -65,7 +64,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
     if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
       // currently no frequency support for tfidf based scoring
       writeIndex(csize++);
-      Performance.gc(1);
+      Performance.gc(2);
     }
     tree.index(tok, pre, wp.pos, csize);
     ntok++;

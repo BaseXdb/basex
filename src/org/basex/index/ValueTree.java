@@ -68,9 +68,9 @@ class ValueTree {
       if(c == 0) {
         if(f) pres.set(Num.add(pres.get(n), pre), n);
         else {
-          final int i = maps.getNN(Num.num(n));
+          final int i = maps.get(Num.num(n));
           if(i < 0) {
-            maps.addNN(Num.num(n), pres.size());
+            maps.add(Num.num(n), pres.size());
             pres.add(Num.newNum(pre));
           } else {
             pres.set(Num.add(pres.get(i), pre), i);
@@ -159,10 +159,7 @@ class ValueTree {
     mod.add(false);
     tokens.add(tok);
     pres.add(Num.newNum(pre));
-    if(!f) {
-//      map.add(tokens.size() - 1);
-      maps.addNN(Num.num(tokens.size() - 1), pres.size() - 1);
-    }
+    if(!f) maps.add(Num.num(tokens.size() - 1), pres.size() - 1);
     return mod.size() - 1;
   }
 
