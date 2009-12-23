@@ -131,7 +131,7 @@ public final class DialogUser extends BaseXBack {
     p.add(new BaseXLabel(global ? GLOBPERM : LOCPERM, false, true));
     p.add(new BaseXLabel(" "));
 
-    table = new BaseXTable(users, dia, global);
+    table = new BaseXTable(users, dia);
     final JScrollPane sp = new JScrollPane(table);
     BaseXLayout.setHeight(sp, 220);
     BaseXLayout.setWidth(sp, 350);
@@ -185,6 +185,8 @@ public final class DialogUser extends BaseXBack {
         } else {
           setData();
         }
+      } else if(cmp == this) {
+        setSess(sess);
       } else if(cmp == databases) {
         setData();
       } else if(cmp == create || cmp == user || cmp == pass) {
@@ -299,18 +301,6 @@ public final class DialogUser extends BaseXBack {
       for(final String s : adding) addUser.addItem(s);
 
       addUser.setSelectedIndex(0);
-    }
-  }
-  
-  /**
-   * Refreshs the panel.
-   * @param s Session
-   */
-  public void refresh(final Session s) {
-    try {
-      setSess(s);
-    } catch(IOException e) {
-      e.printStackTrace();
     }
   }
 

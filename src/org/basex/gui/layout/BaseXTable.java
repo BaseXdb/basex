@@ -1,8 +1,6 @@
 package org.basex.gui.layout;
 
-import java.awt.Color;
 import java.awt.Component;
-
 import javax.swing.JCheckBox;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -33,14 +31,13 @@ public final class BaseXTable extends JTable {
    * Default constructor.
    * @param t table input
    * @param d dialog reference
-   * @param g global/local
    */
-  public BaseXTable(final Table t, final Dialog d, final boolean g) {
+  public BaseXTable(final Table t, final Dialog d) {
     super();
     data = t;
     dialog = d;
     model = new TableModel();
-    if(g) setDefaultRenderer(Boolean.class, new CellRenderer());
+    setDefaultRenderer(Boolean.class, new CellRenderer());
     setModel(model);
     getTableHeader().setReorderingAllowed(false);
     getTableHeader().setResizingAllowed(false);
@@ -109,26 +106,23 @@ public final class BaseXTable extends JTable {
   }
   
   /**
-    * Own Renderer for cells.
-    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
-    * @author Andreas Weiler
+   * Own Renderer for cells.
    */
-  public class CellRenderer extends DefaultTableCellRenderer {
-
+  final class CellRenderer extends DefaultTableCellRenderer {
     @Override
-    public Component getTableCellRendererComponent(final JTable table,
-        final Object value, final boolean flag, final boolean flag1,
-        final int row, final int column) {
-      if (value instanceof Boolean) {
+    public Component getTableCellRendererComponent(final JTable tab,
+        final Object val, final boolean sel, final boolean foc,
+        final int row, final int col) {
+
+      if(val instanceof Boolean) {
         final JCheckBox box = new JCheckBox();
         box.setHorizontalAlignment(SwingConstants.CENTER);
-        box.setSelected(((Boolean) value).booleanValue());
-        if(row == 0) box.setEnabled(false);
-        box.setBackground(Color.WHITE);
+        box.setSelected(((Boolean) val).booleanValue());
+        box.setEnabled(isCellEditable(row, col));
+        box.setOpaque(false);
         return box;
-    }
-      return super.getTableCellRendererComponent(table, 
-          value, flag, flag1, row, column);
+      }
+      return super.getTableCellRendererComponent(tab, val, sel, foc, row, col);
     }
   }
 }

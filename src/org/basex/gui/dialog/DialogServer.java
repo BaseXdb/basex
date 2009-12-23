@@ -50,16 +50,16 @@ import org.basex.util.Token;
 public final class DialogServer extends Dialog {
   /** Context. */
   final Context ctx = gui.context;
-  /** ClientSession. */
-  ClientSession cs;
   /** Tabulators. */
   final BaseXTabs tabs;
   /** Server panel. */
   final BaseXBack conn = new BaseXBack();
   /** User panel. */
-  DialogUser user = new DialogUser(true, this);
+  final DialogUser user = new DialogUser(true, this);
   /** Databases panel. */
-  DialogUser dbsP = new DialogUser(false, this);
+  final DialogUser dbsP = new DialogUser(false, this);
+  /** Databases panel. */
+  final BaseXBack databases = dbsP.getTablePanel();
   /** Sessions/Databases panel. */
   final BaseXBack sess = new BaseXBack();
   /** Log panel. */
@@ -68,16 +68,17 @@ public final class DialogServer extends Dialog {
   final BaseXTextField loguser;
   /** Disconnect button. */
   final BaseXButton disconnect;
+  /** Refresh button. */
+  final BaseXButton refreshSess;
+  /** Updates log file. */
+  final BaseXButton refreshLog;
+
   /** Stop button. */
   private final BaseXButton stop;
   /** Start button. */
   private final BaseXButton start;
   /** Connect button. */
   private final BaseXButton connect;
-  /** Refresh button. */
-  final BaseXButton refreshSess;
-  /** Updates log file. */
-  final BaseXButton refreshLog;
   /** Deletes log file. */
   private final BaseXButton delete;
   /** Deletes all log files. */
@@ -105,12 +106,15 @@ public final class DialogServer extends Dialog {
   /** String for log dir. */
   private final String logdir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
 
+  /** ClientSession. */
+  ClientSession cs;
+  /** Int which tab is activated. */
+  int tab;
+
   /** Boolean for check is server is running. */
   private boolean running;
   /** Boolean for check if client is connected. */
-  public boolean connected;
-  /** Int which tab is activated. */
-  int tab;
+  private boolean connected;
 
   /**
    * Default constructor.
@@ -118,12 +122,11 @@ public final class DialogServer extends Dialog {
    */
   public DialogServer(final GUI main) {
     super(main, GUISERVER);
-    final BaseXBack db = dbsP.getTablePanel();
-    db.setBorder(8, 8, 8, 8);
+    databases.setBorder(8, 8, 8, 8);
     tabs = new BaseXTabs(this);
     tabs.add(CONNECT, conn);
     tabs.add(USERS, user);
-    tabs.add(DATABASES, db);
+    tabs.add(DATABASES, databases);
     tabs.add(SESSIONS, sess);
     tabs.add(LOGS, logs);
 
@@ -277,8 +280,8 @@ public final class DialogServer extends Dialog {
         tab = pane.getSelectedIndex();
         final Object o = pane.getSelectedComponent();
         if(o == logs) refreshLog();
-        if(o == user) user.refresh(cs);
-        if(o == dbsP) dbsP.refresh(cs);
+        if(o == user) action(user);
+        if(o == databases) action(dbsP);
         if(o == sess) action(refreshSess);
       }
     });

@@ -87,7 +87,7 @@ public final class TableView extends View implements Runnable {
 
     if(quick) {
       scroll.height(tdata.rows.size() * tdata.rowH(1));
-      findFocus();
+      focus();
       repaint();
     } else {
       if(!more) tdata.resetFilter();
@@ -155,7 +155,7 @@ public final class TableView extends View implements Runnable {
       Performance.sleep(25);
     }
     gui.updating = false;
-    findFocus();
+    focus();
   }
 
   /**
@@ -191,13 +191,13 @@ public final class TableView extends View implements Runnable {
 
     tdata.mouseX = e.getX();
     tdata.mouseY = e.getY();
-    findFocus();
+    focus();
   }
 
   /**
    * Finds the current focus.
    */
-  private void findFocus() {
+  private void focus() {
     final int y = tdata.mouseY - header.getHeight() + scroll.pos();
     final int l = y / tdata.rowH;
     final boolean valid = y >= 0 && l < tdata.rows.size();
@@ -215,11 +215,15 @@ public final class TableView extends View implements Runnable {
           break;
         }
       }
+    } else {
+      gui.notify.focus(-1, this);
+      content.repaint();
     }
+    
     final String str = content.focusedString;
-    final Data data = gui.context.data;
     gui.cursor(valid && (str != null &&
-      str.length() <= Token.MAXLEN || data.fs != null && tdata.mouseX < 20) ?
+      str.length() <= Token.MAXLEN ||
+      gui.context.data.fs != null && tdata.mouseX < 20) ?
       GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
