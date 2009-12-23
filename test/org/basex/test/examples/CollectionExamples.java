@@ -6,7 +6,9 @@ import org.basex.core.proc.Add;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateColl;
 import org.basex.core.proc.Delete;
+import org.basex.core.proc.DropDB;
 import org.basex.core.proc.InfoDB;
+import org.basex.core.proc.Optimize;
 import org.basex.io.PrintOutput;
 
 /**
@@ -24,7 +26,7 @@ public class CollectionExamples {
   private static final String PATH = "./etc/";
 
   /** The file you want to add to your collection. */
-  private static final String XMLFILE = "input.xml";
+  protected static final String XMLFILE = "input.xml";
   
   /** The database name. **/
   protected static final String DBNAME = "MyFileCollection";
@@ -65,7 +67,7 @@ public class CollectionExamples {
    */
   private void cleanup() {
     new Close().execute(CONTEXT);
-   // new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DBNAME).execute(CONTEXT);
   }
   
   /** Sets up the Output stream. */
@@ -91,6 +93,10 @@ public class CollectionExamples {
     new Add(PATH).execute(CONTEXT);
 
     // -------------------------------------------------------------------------
+    // Optimize the database structures
+    new Optimize().execute(CONTEXT);
+    
+    
     /**
      * Output some information on your newly created database you may as well
      * run Queries on your collection, see the examples provided in

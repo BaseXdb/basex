@@ -29,6 +29,10 @@ public final class QueryExample {
   /** The query to evaluate. */
   private static final String QUERY = "for $x in //body//li return $x";
   
+  /** insert a node into the last li Element. */
+  private static final String UPDATE = "insert node <b>I am new</b>" +
+    " into /html/body//li[position()=last()]";
+  
   /**
    * PrintOutput Context. Point the PrintOutput to whatever file you like to
    * store the serializing results in a file. You may as well point it to
@@ -64,6 +68,58 @@ public final class QueryExample {
     } catch(IOException e) {
       System.err.println("Could not initiate the XMLSerializer.");
     }
+  }
+  /**
+   * Runs the Example Queries.
+   * @throws IOException for XMLSerializer and PrintOutput errors.
+   * @throws BaseXException if database creation fails for any reason.
+   */
+  private void run() throws IOException, BaseXException {
+    // Creates a new database context, referencing the database.
+    System.out.println("\n=== Create a database from a file.");
+    // Creates a database from the specified file.
+    new CreateDB("input.xml", "Example1").exec(CONTEXT, System.out);
+
+    // -------------------------------------------------------------------------
+    // Evaluate XQuery directly to System.out
+    try {
+      directOutputExample();
+      // uncomment the following line to see error handling.
+      // errorExample();
+    } catch(BaseXException e) {
+      System.err.println(e.getMessage());
+    }
+
+    // -------------------------------------------------------------------------
+    // Process the result with an iterator:
+    try {
+      iterateExample();
+    } catch(Exception e) {
+      System.err.println(e.getMessage());
+    }
+
+    // -------------------------------------------------------------------------
+    // Processing the whole result instance at once:
+    try {
+      resultInstance();
+    } catch(QueryException e) {
+      System.err.println(e.getMessage());
+    }
+    try {
+      updateExample();
+    }catch(BaseXException e) {
+      System.err.println(e.getMessage());
+    }
+    // -------------------------------------------------------------------------
+    // Close the serializer and the PrintOutput stream
+    xmlSer.close();
+    out.close();
+
+    // -------------------------------------------------------------------------
+    // Close and drop the Database.
+    new Close().execute(CONTEXT);
+    new DropDB("Example1");
+
   }
 
   /**
@@ -145,60 +201,21 @@ public final class QueryExample {
   }
 
   /**
-   * Runs the Example Queries.
-   * @throws IOException for XMLSerializer and PrintOutput errors.
-   * @throws BaseXException if database creation fails for any reason.
-   */
-  private void run() throws IOException, BaseXException {
-    // Creates a new database context, referencing the database.
-    System.out.println("\n=== Create a database from a file.");
-    // Creates a database from the specified file.
-    new CreateDB("input.xml", "Example1").exec(CONTEXT, System.out);
-
-    // -------------------------------------------------------------------------
-    // Evaluate XQuery directly to System.out
-    try {
-      directOutputExample();
-      // uncomment the following line to see error handling.
-      // errorExample();
-    } catch(BaseXException e) {
-      System.err.println(e.getMessage());
-    }
-
-    // -------------------------------------------------------------------------
-    // Process the result with an iterator:
-    try {
-      iterateExample();
-    } catch(Exception e) {
-      System.err.println(e.getMessage());
-    }
-
-    // -------------------------------------------------------------------------
-    // Processing the whole result instance at once:
-    try {
-      resultInstance();
-    } catch(QueryException e) {
-      System.err.println(e.getMessage());
-    }
-
-    // -------------------------------------------------------------------------
-    // Close the serializer and the PrintOutput stream
-    xmlSer.close();
-    out.close();
-
-    // -------------------------------------------------------------------------
-    // Close and drop the Database.
-    new Close().execute(CONTEXT);
-    new DropDB("Example1");
-
-  }
-
-  /**
    * Use XQuery update to .... *TODO* [MSe]
+   * @throws BaseXException in case contains errors.
    */
-  @SuppressWarnings("unused")
-  private void updateExample() {
-  // *TODO*
+  private void updateExample() throws BaseXException {
+
+    System.out.print("\n\n=== Updating the instance.");
+    new XQuery(UPDATE).exec(CONTEXT, System.out);
+
+    // -------------------------------------------------------------------------
+    // Show the newly inserted node.
+    System.out.println("\n=>> Update result:.");
+    new XQuery(QUERY).exec(CONTEXT, System.out);
   }
+
+
+  
 
 }
