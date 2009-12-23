@@ -62,7 +62,9 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   void index(final byte[] tok) throws IOException {
-    if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
+    if(ntok % 3 == 0) {
+      merge = true;
+//    if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
       // currently no frequency support for tfidf based scoring
       writeIndex(csize++);
       Performance.gc(1);
@@ -135,7 +137,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
         ind.add(tok[min].length);
         ind.add((int) outy.size());
       }
-
+      
       outy.write(tok[min]);
       outy.write5(outz.size());
       int s = 0;
@@ -235,6 +237,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
       final ValueFTTree t = tree.nextTree();
       t.next();
       final byte[] key = t.nextTok();
+      
       if(j < key.length) {
         j = key.length;
         // write index and pointer on first token
@@ -242,7 +245,6 @@ public final class FTFuzzyBuilder extends FTBuilder {
         ind.add(tr);
       }
       for(int i = 0; i < j; i++) outy.write(key[i]);
-
       // write pointer on data and data size
       outy.write5(dr);
       outy.writeInt(t.nextNumPre());
