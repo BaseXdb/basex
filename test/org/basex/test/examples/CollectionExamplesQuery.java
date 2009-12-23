@@ -21,7 +21,7 @@ public final class CollectionExamplesQuery extends CollectionExamples {
   private static final String FIND_BY_NAME = "for $x in "
       + "collection(\"MyFileCollection\")" 
         + "let $fileName := base-uri($x)"
-        + "where $fileName contains text '" + XMLFILE + "'"
+        + "where ends-with($fileName,'" + XMLFILE + "')"
       + "return <file>{$fileName}</file>";
 
 
@@ -36,6 +36,7 @@ public final class CollectionExamplesQuery extends CollectionExamples {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+    queryExamples.cleanup();
     
   }
   /**

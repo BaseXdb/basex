@@ -65,7 +65,7 @@ public class CollectionExamples {
   /**
    * Cleans up afterwards.
    */
-  private void cleanup() {
+  protected void cleanup() {
     new Close().execute(CONTEXT);
     new DropDB(DBNAME).execute(CONTEXT);
   }
@@ -119,6 +119,10 @@ public class CollectionExamples {
     // Delete a file:
     new Delete(XMLFILE).execute(CONTEXT);
     
+    // -------------------------------------------------------------------------
+    // Optimize the database structures
+    new Optimize().execute(CONTEXT);
+
     // -------------------------------------------------------------------------
     // Output some information on your altered collection
      try {
