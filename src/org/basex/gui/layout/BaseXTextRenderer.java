@@ -1,6 +1,7 @@
 package org.basex.gui.layout;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
@@ -144,6 +145,20 @@ public final class BaseXTextRenderer extends BaseXBack {
     off = (f.getSize() + 1) >> 2;
     fontH = f.getSize() + off;
     fwidth = GUIConstants.fontWidths(f);
+  }
+
+  @Override
+  public Dimension getPreferredSize() {
+    final Graphics g = getGraphics();
+    w = Integer.MAX_VALUE;
+    h = Integer.MAX_VALUE;
+    init(g, 0);
+    int max = 0;
+    while(more(g)) {
+      if(text.curr() == 0x0A) max = Math.max(x, max);
+      next();
+    }
+    return new Dimension(Math.max(x, max) + fwidth[' '], y + fwidth[' ']);
   }
 
   @Override

@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.BindException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.Random;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
@@ -81,7 +83,7 @@ public abstract class Main {
       process(new Exit(), true);
       out.close();
     } catch(final IOException ex) {
-      error(ex, true);
+      errln(server(ex));
     }
   }
 
@@ -274,25 +276,17 @@ public abstract class Main {
   }
 
   /**
-   * Prints a server error message.
+   * Returns a server error message.
    * @param ex exception reference
-   * @param msg message flag
+   * @return error message
    */
-  public static void error(final Exception ex, final boolean msg) {
-    if(msg) {
-      debug(ex);
-      if(ex instanceof BindException) {
-        errln(SERVERBIND);
-      } else if(ex instanceof LoginException) {
-        errln(SERVERLOGIN);
-      } else if(ex instanceof IOException) {
-        errln(SERVERERR);
-      } else {
-        errln(ex.getMessage());
-      }
-    } else {
-      ex.printStackTrace();
-    }
+  public static String server(final Exception ex) {
+    debug(ex);
+    if(ex instanceof BindException) return SERVERBIND;
+    else if(ex instanceof LoginException) return SERVERLOGIN;
+    else if(ex instanceof ConnectException) return SERVERERR;
+    else if(ex instanceof SocketTimeoutException) return SERVERTIME;
+    return ex.getMessage();
   }
 
   /**

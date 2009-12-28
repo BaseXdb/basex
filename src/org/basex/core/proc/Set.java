@@ -44,7 +44,7 @@ public final class Set extends Proc {
 
       if(type instanceof Boolean) {
         final boolean b = val == null ? !((Boolean) type).booleanValue() :
-          val.equalsIgnoreCase(ON);
+          val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
         prop.set(key, b);
 
         final boolean all = ALL.equalsIgnoreCase(val);

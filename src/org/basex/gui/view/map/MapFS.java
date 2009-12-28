@@ -330,7 +330,7 @@ final class MapFS extends MapPainter {
       try {
         fs.launch(view.gui.context.focused);
       } catch (final IOException ex) {
-        Dialog.info(view, NODEFAULTAPP);;
+        Dialog.warn(view.gui, NODEFAULTAPP);;
       }
     }
     return active;

@@ -19,7 +19,7 @@ public final class User {
   /** User name. */
   public String name;
   /** Password. */
-  byte[] pw;
+  public byte[] pw;
   /** Permission. */
   int perm;
 

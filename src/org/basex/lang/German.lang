@@ -428,9 +428,7 @@ gc_seterr=Fehler beim Setzen der Eigenschaft '%' auf '%'.
 
 # Info Strings
 info_index=Indizes
-info_build=Erstelle Indizes
 info_opt=Optimiere Datenbank
-info_optim=Optimierung beendet.
 info_stats=Erstelle Statistiken
 info_dbname=Name
 info_ndocs=Anz./Dokumente

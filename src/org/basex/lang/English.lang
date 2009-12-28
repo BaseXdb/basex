@@ -327,7 +327,7 @@ help_intro=Try "%" to get some information.
 help_long=Try "% [...]" to get info on a specific command.
 
 # Create Command
-pc_create=Database is created
+pc_create=Creating Database
 pc_index=Creating Indexes
 pc_update=The database format has changed; please create a new database.
 pc_indupdate=The index format has changed; please create new indexes.
@@ -368,7 +368,7 @@ in_notdropped=Index could not be dropped.
 # Server Info
 srv_login=Access denied.
 srv_connect=Can't communicate with the server.
-srv_timeout=Your process reached the timeout.
+srv_timeout=Timeout exceeded.
 srv_bind=Server is running or permission was denied.
 srv_start=Server was started.
 srv_stop=Server was stopped.
@@ -428,9 +428,7 @@ gc_seterr=Could not set property '%' to '%'.
 
 # Info Strings
 info_index=Indexes
-info_build=Building Indexes
 info_opt=Optimizing Database
-info_optim=Optimization finished.
 info_stats=Create statistics
 info_dbname=Name
 info_ndocs=Documents

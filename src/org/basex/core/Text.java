@@ -40,7 +40,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-  String VERSION = "6.0 RC1";
+  String VERSION = "6.0 RC2";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -140,6 +140,8 @@ public interface Text {
   String TO = "TO";
   /** Command help. */
   String ON = "ON";
+  /** Command help. */
+  String TRUE = "TRUE";
   /** Command help. */
   String USER = "USER";
 
@@ -532,12 +534,8 @@ public interface Text {
   String INFOWAIT = lang("wait") + DOTS;
   /** Index information. */
   String INFOINDEX = lang("info_index");
-  /** Index information. */
-  String INFOBUILD = lang("info_build") + DOTS;
   /** Optimize information. */
   String INFOOPT = lang("info_opt") + DOTS;
-  /** Optimize information. */
-  String INFOOPTIM = lang("info_optim");
   /** Statistics information. */
   String INFOSTATS = lang("info_stats") + DOTS;
 
@@ -914,6 +912,8 @@ public interface Text {
 
   /** Open dialog - No database. */
   String DIALOGINFO = lang("d_info");
+  /** Error info. */
+  String DIALOGERR = lang("info_error");
   /** Dialog title for choosing a directory. */
   String DIALOGFC = lang("d_fctitle");
 

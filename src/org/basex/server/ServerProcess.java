@@ -1,6 +1,7 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.net.Socket;
 import org.basex.BaseXServer;
@@ -56,26 +57,32 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Initializes the session.
+   * Initializes the session via cram-md5 authentication.
    * @return success flag
    */
   public boolean init() {
     try {
-      in = new BufferInput(socket.getInputStream());
+      final String ts = Long.toString(System.nanoTime());
+
+      // send timestamp (cram-md5)
       out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
+      out.print(ts);
+      send(true);
 
       // evaluate login data
+      in = new BufferInput(socket.getInputStream());
       final String us = in.readString();
       final String pw = in.readString();
-      context.user = context.users.get(us, pw);
-      final boolean ok = context.user != null;
+      context.user = context.users.get(us);
+      boolean ok = context.user != null &&
+        md5(string(context.user.pw) + ts).equals(pw);
       send(ok);
 
       if(ok) start();
       else if(us.length() != 0) log.write(this, "LOGIN " + us, "failed");
       return ok;
     } catch(final IOException ex) {
-      Main.error(ex, false);
+      ex.printStackTrace();
       log.write(ex.getMessage());
       return false;
     }
@@ -135,7 +142,7 @@ public final class ServerProcess extends Thread {
       log.write(this, "LOGOUT " + context.user.name, "OK");
     } catch(final IOException ex) {
       log.write(this, input, INFOERROR + ex.getMessage());
-      Main.error(ex, false);
+      ex.printStackTrace();
     }
   }
 
@@ -187,7 +194,7 @@ public final class ServerProcess extends Thread {
       socket.close();
     } catch(final IOException ex) {
       log.write(ex.getMessage());
-      Main.error(ex, false);
+      ex.printStackTrace();
     }
   }
 

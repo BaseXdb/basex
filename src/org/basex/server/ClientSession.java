@@ -3,6 +3,7 @@ package org.basex.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import org.basex.core.Session;
 import org.basex.core.Context;
@@ -67,15 +68,23 @@ public final class ClientSession extends Session {
    */
   public ClientSession(final String host, final int port,
       final String user, final String pw) throws IOException {
-    final Socket socket = new Socket(host, port);
-    in = socket.getInputStream();
-    out = new PrintOutput(socket.getOutputStream());
 
-    // send user name and password
+    final Socket socket = new Socket();
+    socket.connect(new InetSocketAddress(host, port), 5000);
+    in = socket.getInputStream();
+
+    // receive timestamp
+    final String ts = new BufferInput(in).readString();
+
+    // send user name and hashed password/timestamp
+    out = new PrintOutput(socket.getOutputStream());
     out.print(user);
     out.write(0);
-    out.print(Token.md5(pw));
+    out.print(Token.md5(Token.md5(pw) + ts));
     out.write(0);
+    out.flush();
+
+    // receive success flag
     if(in.read() != 0) throw new LoginException();
   }
 

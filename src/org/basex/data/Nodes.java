@@ -35,7 +35,7 @@ public final class Nodes implements Result {
    * @param d data reference
    */
   public Nodes(final Data d) {
-    this(new int[] {}, d);
+    this(new int[0], d);
   }
 
   /**

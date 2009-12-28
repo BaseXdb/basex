@@ -429,9 +429,7 @@ gc_seterr=プロパティ '%' を '%' に変更する事が出来ませんでし
 
 # Info Strings
 info_index=インデックス
-info_build=インデックスを構築中
 info_opt=データベースを最適化中
-info_optim=最適化を完了しました。
 info_stats=統計の作成
 info_dbname=データベース名
 info_ndocs=No/Documents

@@ -8,11 +8,10 @@ import java.awt.event.KeyEvent;
 import org.basex.core.Main;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXTextField;
-import org.basex.gui.layout.BaseXLabel.Icon;
-import org.basex.io.IO;
 import org.basex.util.StringList;
 
 /**
@@ -59,7 +58,7 @@ public final class DialogRename extends Dialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(this, new Object[] { BUTTONOK, BUTTONCANCEL });
+    buttons = newButtons(this, BUTTONOK, BUTTONCANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);
@@ -71,10 +70,10 @@ public final class DialogRename extends Dialog {
     ok = !db.contains(nm) || nm.equals(old);
     String msg = ok ? null : RENAMEEXISTS;
     if(ok) {
-      ok = !nm.isEmpty() && IO.valid(nm);
+      ok = !nm.isEmpty() && DialogCreate.dbValid(nm);
       if(!nm.isEmpty() && !ok) msg = Main.info(INVALID, EDITNAME);
     }
-    info.setText(msg, Icon.ERR);
+    info.setText(msg, Msg.ERR);
     enableOK(buttons, BUTTONOK, ok && !nm.isEmpty());
   }
 

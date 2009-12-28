@@ -428,9 +428,7 @@ gc_seterr=Could not set property '%' to '%'.
 
 # Info Strings
 info_index=Indici
-info_build=Creazione indici
 info_opt=Ottimizzando Database
-info_optim=Ottimizzazione terminata.
 info_stats=Crea statistiche
 info_dbname=Nome
 info_ndocs=Documenti

@@ -27,7 +27,7 @@ final class NSNode {
    * @param p pre value
    */
   NSNode(final int p) {
-    vals = new int[] {};
+    vals = new int[0];
     ch = new NSNode[0];
     pre = p;
   }

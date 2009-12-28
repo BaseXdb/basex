@@ -114,7 +114,7 @@ public enum GUICommands implements GUICommand {
           if(ind[3] != d.meta.ftxindex)
             proc = Array.add(proc, cmd(ind[3], CmdIndex.FULLTEXT));
 
-          if(proc.length != 0) progress(gui, INFOBUILD, proc);
+          if(proc.length != 0) progress(gui, PROGINDEX, proc);
         }
       }
     }
@@ -155,7 +155,7 @@ public enum GUICommands implements GUICommand {
   DROP(GUIDROP + DOTS, null, GUIDROPTT, false, false) {
     @Override
     public void execute(final GUI gui) {
-      if(new DialogOpen(gui, true, false).nodb()) Dialog.info(gui, INFONODB);
+      if(new DialogOpen(gui, true, false).nodb()) Dialog.warn(gui, INFONODB);
     }
   },
 
@@ -923,7 +923,6 @@ public enum GUICommands implements GUICommand {
           // return user information
           if(ok) {
             gui.status.setText(Main.info(PROCTIME, perf));
-            if(op) Dialog.info(gui, INFOOPTIM);
           } else {
             final String info = p.info();
             Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);

@@ -79,7 +79,7 @@ public class BaseX extends Main {
       }
       quit(u);
     } catch(final IOException ex) {
-      error(ex, true);
+      errln(server(ex));
     }
   }
 
@@ -188,7 +188,7 @@ public class BaseX extends Main {
       console = file == null && commands == null;
       if(!success) outln(sa() ? LOCALINFO : CLIENTINFO);
     } catch(final IOException ex) {
-      error(ex, true);
+      errln(server(ex));
       success = false;
     }
   }

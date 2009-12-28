@@ -29,9 +29,6 @@ public abstract class IO {
   /** GZIP Suffix. */
   public static final String GZSUFFIX = ".gz";
 
-  /** Invalid file characters. */
-  private static final String INVALID = " \"*./:<>?";
-
   /** Disk block/page size. */
   public static final int BLOCKSIZE = 1 << 12;
   /** Table NodeSize Power. */
@@ -267,21 +264,5 @@ public abstract class IO {
     bis.close();
     cont = tb.finish();
     return cont;
-  }
-
-  // STATIC METHODS ===========================================================
-
-  /**
-   * Checks if the specified filename is valid; allows only letters,
-   * digits and some special characters.
-   * @param fn filename
-   * @return result of check
-   */
-  public static boolean valid(final String fn) {
-    for(int i = 0; i < fn.length(); i++) {
-      final char c = fn.charAt(i);
-      if(!Token.ftChar(c) && INVALID.indexOf(c) != -1) return false;
-    }
-    return true;
   }
 }

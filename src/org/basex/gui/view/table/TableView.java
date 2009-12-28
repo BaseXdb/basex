@@ -297,7 +297,7 @@ public final class TableView extends View implements Runnable {
       try {
         data.fs.launch(ViewData.parent(data, gui.context.focused));
       } catch (final IOException ex) {
-        Dialog.info(this, NODEFAULTAPP);
+        Dialog.warn(gui, NODEFAULTAPP);
       }
     }
   }

@@ -6,8 +6,10 @@ import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
+import javax.swing.Icon;
 import javax.swing.UIManager;
 import org.basex.core.Text;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
 import org.basex.io.IO;
 
@@ -138,6 +140,31 @@ public final class GUIConstants {
   public static final Cursor CURSORTEXT = new Cursor(Cursor.TEXT_CURSOR);
   /** Move cursor. */
   public static final Cursor CURSORMOVE = new Cursor(Cursor.MOVE_CURSOR);
+
+  /** Icon type. */
+  public enum Msg {
+    /** Warning icon. */
+    WARN("warn", "warning"),
+    /** Error icon. */
+    ERR("error", "error"),
+    /** Success icon. */
+    OK("ok", "information");
+
+    /** Small icon. */
+    public final Icon small;
+    /** Large icon. */
+    public final Icon large;
+
+    /**
+     * Constructor.
+     * @param s small icon
+     * @param l large icon
+     */
+    private Msg(final String s, final String l) {
+      small = BaseXLayout.icon(s);
+      large = UIManager.getIcon("OptionPane." + l + "Icon");
+    }
+  };
 
   /** Background fill options. */
   public static enum Fill {

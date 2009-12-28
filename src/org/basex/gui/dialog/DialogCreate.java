@@ -9,6 +9,7 @@ import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -18,7 +19,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.IO;
 import org.basex.util.StringList;
 
@@ -99,7 +99,8 @@ public final class DialogCreate extends Dialog {
     p.add(new BaseXLabel(CREATEFILT + COL, false, true));
 
     dbname = new BaseXTextField(this);
-    dbname.setText(IO.get(gprop.get(GUIProp.OPENPATH)).dbname());
+    final String dbn = IO.get(gprop.get(GUIProp.OPENPATH)).dbname();
+    dbname.setText(dbn.replaceAll("[^\\w.-]", ""));
     dbname.addKeyListener(keys);
     p.add(dbname);
 
@@ -193,7 +194,7 @@ public final class DialogCreate extends Dialog {
     final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
     if(file != null) {
       path.setText(file.path());
-      dbname.setText(file.dbname());
+      dbname.setText(file.dbname().replaceAll("[^\\w.-]", ""));
       gprop.set(GUIProp.OPENPATH, file.getDir());
     }
   }
@@ -229,14 +230,14 @@ public final class DialogCreate extends Dialog {
     ok = exists && !nm.isEmpty();
 
     String inf = !exists ? PATHWHICH : !ok ? DBWHICH : null;
-    Icon icon = Icon.ERR;
+    Msg icon = Msg.ERR;
     if(ok) {
-      ok = IO.valid(nm);
+      ok = dbValid(nm);
       if(!ok) {
         inf = Main.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
         inf = RENAMEOVER;
-        icon = Icon.WARN;
+        icon = Msg.WARN;
       }
     }
     info.setText(inf, icon);
@@ -259,5 +260,15 @@ public final class DialogCreate extends Dialog {
     prop.set(Prop.FTINDEX, ftxindex.isSelected());
     prop.set(Prop.INTPARSE, intparse.isSelected());
     ft.close();
+  }
+
+  /**
+   * Checks if the specified filename is valid; allows only letters,
+   * digits and some special characters.
+   * @param fn filename
+   * @return result of check
+   */
+  public static boolean dbValid(final String fn) {
+    return fn.matches("[\\w.-]+");
   }
 }

@@ -99,11 +99,8 @@ public final class DialogOpen extends Dialog {
     rename = new BaseXButton(BUTTONRENAME, this);
     open = new BaseXButton(BUTTONOPEN, this);
     drop = new BaseXButton(BUTTONDROP + DOTS, this);
-    if(dr) {
-      buttons = newButtons(this, new Object[] { drop, BUTTONCANCEL });
-    } else {
-      buttons = newButtons(this, new Object[] { rename, open, BUTTONCANCEL });
-    }
+    buttons = dr ? newButtons(this, drop, BUTTONCANCEL) :
+      newButtons(this, rename, open, BUTTONCANCEL);
     p.add(buttons, BorderLayout.EAST);
     pp.add(p, BorderLayout.SOUTH);
 

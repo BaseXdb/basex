@@ -148,8 +148,8 @@ public final class FTFuzzyBuilder extends FTBuilder {
         for(final int p : pos[m]) tbo.add(Num.num(p));
         s += v[m].nextFTDataSize();
         tok[m] = nextToken(v, m);
-        pres[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[] {};
-        pos[m] = tok[m].length > 0 ? v[m].nextPosValues() : new int[] {};
+        pres[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[0];
+        pos[m] = tok[m].length > 0 ? v[m].nextPosValues() : new int[0];
       }
 
       outy.writeInt(s);

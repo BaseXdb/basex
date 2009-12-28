@@ -1,8 +1,8 @@
 package org.basex.gui.layout;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
+import org.basex.gui.GUIConstants.Msg;
 
 /**
  * Project specific Label implementation.
@@ -11,13 +11,6 @@ import javax.swing.border.EmptyBorder;
  * @author Christian Gruen
  */
 public final class BaseXLabel extends JLabel {
-  /** Icon type. */
-  public enum Icon {
-    /** Warning icon. */ WARN,
-    /** Error icon. */ ERR,
-    /** Success icon. */ OK
-  };
-
   /**
    * Constructor.
    * @param txt label text
@@ -55,14 +48,8 @@ public final class BaseXLabel extends JLabel {
    * @param text warning text
    * @param icon flag for displaying a warning or error icon
    */
-  public void setText(final String text, final Icon icon) {
-    ImageIcon ic = null;
-    switch(icon) {
-      case WARN: ic = BaseXLayout.icon("warn");  break;
-      case ERR : ic = BaseXLayout.icon("error"); break;
-      case OK  : ic = BaseXLayout.icon("ok");    break;
-    }
-    setIcon(text == null ? null : ic);
+  public void setText(final String text, final Msg icon) {
+    setIcon(text == null ? null : icon.small);
     setText(text == null ? " " : text);
   }
 

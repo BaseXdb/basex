@@ -3,7 +3,6 @@ package org.basex.gui.dialog;
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.io.IOException;
-import java.net.BindException;
 import javax.swing.JScrollPane;
 import org.basex.core.Main;
 import org.basex.core.Session;
@@ -15,6 +14,7 @@ import org.basex.core.proc.Grant;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Revoke;
 import org.basex.core.proc.ShowUsers;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
@@ -24,9 +24,7 @@ import org.basex.gui.layout.BaseXPassword;
 import org.basex.gui.layout.BaseXTable;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.CachedOutput;
-import org.basex.server.LoginException;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.Token;
@@ -235,10 +233,7 @@ public final class DialogUser extends BaseXBack {
         addUser.requestFocusInWindow();
       }
     } catch(final IOException ex) {
-      Main.debug(ex);
-      if(ex instanceof BindException) msg = SERVERBIND;
-      else if(ex instanceof LoginException) msg = SERVERLOGIN;
-      else msg = ex.getMessage(); // SERVERERR;
+      msg = Main.server(ex);
       ok = false;
     }
 
@@ -261,11 +256,11 @@ public final class DialogUser extends BaseXBack {
     drop.setEnabled(valdrop && table.getSelectedRows().length > 0);
     valdrop |= table.getSelectedRows().length == 1;
 
-    Icon icon = ok ? Icon.OK : Icon.ERR;
+    Msg icon = ok ? Msg.OK : Msg.ERR;
     if(msg == null && !(valname && valpass && newname && valdrop)) {
       msg = !newname ? Main.info(USERKNOWN, user.getText()) : !valdrop ?
           USERADMIN : Main.info(INVALID, !valname ? SERVERUSER : SERVERPW);
-      icon = Icon.WARN;
+      icon = Msg.WARN;
     }
     info.setText(msg, icon);
   }

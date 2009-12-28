@@ -15,6 +15,8 @@ import java.awt.event.WindowEvent;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants.Fill;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.TableLayout;
@@ -157,31 +159,31 @@ public abstract class Dialog extends JDialog {
    * @return button list
    */
   protected static BaseXBack okCancel(final Dialog dialog) {
-    return newButtons(dialog, new String[] { BUTTONOK, BUTTONCANCEL});
+    return newButtons(dialog, BUTTONOK, BUTTONCANCEL);
   }
 
   /**
    * Creates a new button list.
    * @param dialog reference to the component, reacting on button clicks
-   * @param texts button names
+   * @param buttons button names or objects
    * @return button list
    */
   protected static BaseXBack newButtons(final Dialog dialog,
-      final Object[] texts) {
+      final Object... buttons) {
 
     // horizontal/vertical layout
-    final BaseXBack panel = new BaseXBack();
+    final BaseXBack panel = new BaseXBack(Fill.NONE);
     panel.setBorder(12, 0, 0, 0);
-    panel.setLayout(new TableLayout(1, texts.length, 8, 0));
-    for(final Object text : texts) {
-      panel.add(text instanceof Component ?
-        (Component) text : new BaseXButton(text.toString(), dialog));
+    panel.setLayout(new TableLayout(1, buttons.length, 8, 0));
+    for(final Object b : buttons) {
+      panel.add(b instanceof Component ?
+        (Component) b : new BaseXButton(b.toString(), dialog));
     }
 
-    final BaseXBack buttons = new BaseXBack();
-    buttons.setLayout(new BorderLayout());
-    buttons.add(panel, BorderLayout.EAST);
-    return buttons;
+    final BaseXBack but = new BaseXBack(Fill.NONE);
+    but.setLayout(new BorderLayout());
+    but.add(panel, BorderLayout.EAST);
+    return but;
   }
 
   /**
@@ -216,20 +218,29 @@ public abstract class Dialog extends JDialog {
   }
 
   /**
-   * Static error dialog.
-   * @param comp parent reference
+   * Static information dialog.
+   * @param gui parent reference
    * @param text text
    */
-  public static void error(final Component comp, final String text) {
-    showMessageDialog(comp, text, DIALOGINFO, ERROR_MESSAGE);
+  public static void info(final GUI gui, final String text) {
+    new DialogMessage(gui, text.trim(), Msg.OK);
   }
 
   /**
    * Static information dialog.
-   * @param comp parent reference
+   * @param gui parent reference
    * @param text text
    */
-  public static void info(final Component comp, final String text) {
-    showMessageDialog(comp, text, DIALOGINFO, INFORMATION_MESSAGE);
+  public static void warn(final GUI gui, final String text) {
+    new DialogMessage(gui, text.trim(), Msg.WARN);
+  }
+
+  /**
+   * Static error dialog.
+   * @param gui parent reference
+   * @param text text
+   */
+  public static void error(final GUI gui, final String text) {
+    new DialogMessage(gui, text.trim(), Msg.ERR);
   }
 }

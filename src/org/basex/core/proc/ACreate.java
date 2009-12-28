@@ -63,10 +63,13 @@ abstract class ACreate extends Proc {
         index(context.data);
       }
       return info(DBCREATED, db, perf);
-    } catch(final IOException ex) {
+    } catch(final Exception ex) {
+      // Known exceptions:
+      // - IllegalArgumentException (UTF8, zip files)
       Main.debug(ex);
       abort();
-      final String msg = ex.getMessage();
+      final String msg = ex instanceof IOException ?
+          ex.getMessage() : Main.info(PARSEERR, p.io);
       return error(msg != null ? msg : args[0]);
     }
   }

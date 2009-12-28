@@ -66,7 +66,7 @@ public final class BaseXServer extends Main implements Runnable {
       if(console) quit(console());
     } catch(final Exception ex) {
       log.write(ex.getMessage());
-      error(ex, true);
+      errln(server(ex));
     }
   }
 
@@ -102,7 +102,7 @@ public final class BaseXServer extends Main implements Runnable {
       server.close();
     } catch(final IOException ex) {
       log.write(ex.getMessage());
-      error(ex, false);
+      ex.printStackTrace();
     }
 
     console = false;
@@ -158,7 +158,7 @@ public final class BaseXServer extends Main implements Runnable {
       new Socket("localhost", ctx.prop.num(Prop.SERVERPORT));
       outln(SERVERSTOPPED);
     } catch(final IOException ex) {
-      error(ex, true);
+      errln(server(ex));
     }
     return;
   }

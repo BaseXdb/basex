@@ -10,6 +10,7 @@ import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
@@ -17,7 +18,6 @@ import org.basex.gui.layout.BaseXRadio;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.XMLToken;
@@ -156,7 +156,7 @@ public final class DialogInsert extends Dialog {
       ok = XMLToken.isQName(token(input1.getText()));
       if(!ok && !input1.getText().isEmpty()) msg = Main.info(INVALID, EDITNAME);
     }
-    info.setText(msg, Icon.WARN);
+    info.setText(msg, Msg.WARN);
     enableOK(buttons, BUTTONOK, ok);
   }
 

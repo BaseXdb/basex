@@ -2,6 +2,7 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -23,7 +24,6 @@ import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXText;
 import org.basex.io.IO;
@@ -79,13 +79,12 @@ public final class DialogInfo extends Dialog {
 
     final BaseXText text = text(info.finish());
     text.setFont(f);
-    BaseXLayout.setHeight(text, 350);
     tab1.add(text, BorderLayout.CENTER);
 
     // second tab
     final BaseXBack tab2 = new BaseXBack();
     tab2.setLayout(new GridLayout(2, 1, 0, 8));
-    tab2.setBorder(8, 8, 0, 8);
+    tab2.setBorder(8, 8, 8, 8);
     tab2.add(addIndex(true, data));
     tab2.add(addIndex(false, data));
 
@@ -140,7 +139,7 @@ public final class DialogInfo extends Dialog {
     // fourth tab
     final BaseXBack tab4 = new BaseXBack();
     tab4.setLayout(new GridLayout(2, 1));
-    tab4.setBorder(8, 8, 0, 8);
+    tab4.setBorder(8, 8, 8, 8);
 
     panels[1].add(indexes[1], BorderLayout.NORTH);
     panels[1].add(text(val[1] ? data.info(Type.TXT) :
@@ -173,8 +172,7 @@ public final class DialogInfo extends Dialog {
     set(tabs, BorderLayout.CENTER);
 
     optimize = new BaseXButton(BUTTONOPT, this);
-    buttons = newButtons(this,
-        new Object[] { optimize, BUTTONOK, BUTTONCANCEL });
+    buttons = newButtons(this, optimize, BUTTONOK, BUTTONCANCEL);
     set(buttons, BorderLayout.SOUTH);
 
     action(null);
@@ -207,9 +205,8 @@ public final class DialogInfo extends Dialog {
    */
   private BaseXText text(final byte[] txt) {
     final BaseXText text = new BaseXText(false, this);
-    text.setBorder(new EmptyBorder(5, 5, 5, 5));
     text.setText(txt);
-    BaseXLayout.setWidth(text, 550);
+    text.setPreferredSize(new Dimension(550, 160));
     return text;
   }
 

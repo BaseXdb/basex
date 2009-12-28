@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.SortedMap;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -17,7 +18,6 @@ import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.IO;
 
 /**
@@ -152,7 +152,7 @@ public final class DialogExport extends Dialog {
         !file && (!exists || io.isDir()));
 
     info.setText(ok && file && exists ? OVERFILE : !ok && !empty ?
-        INVPATH : null, ok ? Icon.WARN : Icon.ERR);
+        INVPATH : null, ok ? Msg.WARN : Msg.ERR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

@@ -16,6 +16,7 @@ import org.basex.core.proc.List;
 import org.basex.data.MetaData;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXFileChooser;
@@ -25,7 +26,6 @@ import org.basex.gui.layout.BaseXListChooser;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.DataInput;
 import org.basex.io.IO;
 import org.basex.util.StringList;
@@ -122,7 +122,7 @@ public final class DialogMountFS extends Dialog {
 
     // create buttons
     mount = new BaseXButton(BUTTONMOUNT, this);
-    buttons = newButtons(this, new Object[] { mount, BUTTONCANCEL});
+    buttons = newButtons(this, mount, BUTTONCANCEL);
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());
     p.add(buttons, BorderLayout.EAST);
@@ -186,7 +186,7 @@ public final class DialogMountFS extends Dialog {
           final IO file = IO.get(mp);
           final boolean mpok = !mp.isEmpty() && file.exists() &&
             file.isDir();
-          if(!mpok) warn.setText(NOVALIDMOUNT, Icon.ERR);
+          if(!mpok) warn.setText(NOVALIDMOUNT, Msg.ERR);
           ok &= mpok;
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));

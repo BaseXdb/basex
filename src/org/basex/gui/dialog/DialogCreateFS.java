@@ -10,6 +10,7 @@ import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
@@ -20,7 +21,6 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.IO;
 import org.basex.util.StringList;
 
@@ -38,7 +38,7 @@ public final class DialogCreateFS extends Dialog {
   /** Parsing complete filesystem. */
   private final BaseXCheckBox all;
   /** Browse button. */
-  private final BaseXButton button;
+  private final BaseXButton browse;
   /** ID3 parsing. */
   private final BaseXCheckBox meta;
   /** Context inclusion. */
@@ -89,18 +89,18 @@ public final class DialogCreateFS extends Dialog {
     lab.setBorder(new EmptyBorder(4, 4, 0, 0));
     p.add(lab);
 
-    button = new BaseXButton(BUTTONBROWSE, this);
-    button.addActionListener(new ActionListener() {
+    browse = new BaseXButton(BUTTONBROWSE, this);
+    browse.addActionListener(new ActionListener() {
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, path.getText(),
             main).select(BaseXFileChooser.Mode.DOPEN);
         if(file != null) {
           path.setText(file.path());
-          dbname.setText(file.dbname());
+          dbname.setText(file.dbname().replaceAll("[^\\w.-]", ""));
         }
       }
     });
-    p.add(button);
+    p.add(browse);
 
     path = new BaseXTextField(gprop.get(GUIProp.FSBACKING), this);
     path.addKeyListener(keys);
@@ -235,7 +235,7 @@ public final class DialogCreateFS extends Dialog {
 
     final boolean sel = !all.isSelected();
     path.setEnabled(sel);
-    button.setEnabled(sel);
+    browse.setEnabled(sel);
     maxsize.setEnabled(cont.isSelected());
 
     boolean cAll; // import all is chosen?
@@ -265,14 +265,14 @@ public final class DialogCreateFS extends Dialog {
       if(!cNam) inf = DBWHICH;
     }
 
-    Icon icon = Icon.ERR;
+    Msg icon = Msg.ERR;
     if(ok) {
-      ok = IO.valid(nm);
+      ok = DialogCreate.dbValid(nm);
       if(!ok) {
         inf = Main.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
         inf = prop.is(Prop.FUSE) ? RENAMEOVERBACKING : RENAMEOVER;
-        icon = Icon.WARN;
+        icon = Msg.WARN;
       }
     }
     info.setText(inf, icon);

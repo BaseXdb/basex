@@ -428,9 +428,7 @@ gc_seterr=Could not set property '%' to '%'.
 
 # Info Strings
 info_index=Indexes
-info_build=Đang tạo Indexes
 info_opt=Đang tối ưu cơ sở dữ liệu
-info_optim=Tối ưu hoàn tất.
 info_stats=Tạo thống kê
 info_dbname=Tên
 info_ndocs=Những văn bản

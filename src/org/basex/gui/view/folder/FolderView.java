@@ -433,7 +433,7 @@ public final class FolderView extends View {
       try {
         data.fs.launch(gui.context.focused);
       } catch (final IOException ex) {
-        Dialog.info(this, NODEFAULTAPP);
+        Dialog.warn(gui, NODEFAULTAPP);
       }
     }
   }

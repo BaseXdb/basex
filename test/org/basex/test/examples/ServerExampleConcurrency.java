@@ -2,7 +2,6 @@ package org.basex.test.examples;
 
 import java.io.OutputStream;
 import java.util.Random;
-
 import org.basex.BaseXServer;
 import org.basex.io.BufferedOutput;
 import org.basex.server.ClientSession;
@@ -12,7 +11,7 @@ import org.basex.util.Performance;
  * This class demonstrates how multiple clients connect to one server instance.
  * It sets up 3 clients with RW access to the database.
  * Database information will be shown before and after the clients have run.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
  * @author BaseX Team
  */
@@ -55,12 +54,12 @@ public final class ServerExampleConcurrency {
     // -------------------------------------------------------------------------
     // Set an option: shows command info output.
     launch("set info true");
-    
+
     // -------------------------------------------------------------------------
     // Create a database from the specified file.
     System.out.println("\n=== Create a database:");
     launch("create db \"input.xml\" input");
- 
+
     System.out.println("\n=== Run a query:");
     launch("xquery //li", true);
 
@@ -77,7 +76,7 @@ public final class ServerExampleConcurrency {
     Client writer = new Client("insert node <li>One more </li> " +
         "as last into /html/body//ul",
          false);
-    
+
     Client writer2 = new Client("insert node <strong>One more </strong>" +
         " as last into /html/body",
           false);
@@ -113,7 +112,7 @@ public final class ServerExampleConcurrency {
     new BaseXServer("stop");
 
   }
-  
+
   /**
    * Processes the specified command on the server and returns the output
    * or command info.
@@ -142,16 +141,16 @@ public final class ServerExampleConcurrency {
    * query is scheduled to launch after max 500ms.
    * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
    * @author BaseX Team
-   * 
+   *
    */
   public class Client implements Runnable {
-    
+
     /** Set to false to stop the Client from running.*/
     private boolean running = true;
-    
+
     /** Query to execute. */
     private String query;
-    
+
     /** Verbose output. */
     private boolean verbose;
 
@@ -172,7 +171,7 @@ public final class ServerExampleConcurrency {
         Performance.sleep(r.nextInt(500));
       }
     }
-    
+
     /**
      * Public constructor starts the Client thread.
      * @param q Query for the client.

@@ -7,10 +7,10 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.basex.core.Main;
 import org.basex.gui.GUI;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXPassword;
-import org.basex.gui.layout.BaseXLabel.Icon;
 
 /**
  * Open database dialog.
@@ -48,7 +48,7 @@ public final class DialogPass extends Dialog {
     p.add(info, BorderLayout.CENTER);
     set(p, BorderLayout.CENTER);
 
-    buttons = newButtons(this, new Object[] { BUTTONOK, BUTTONCANCEL });
+    buttons = newButtons(this, BUTTONOK, BUTTONCANCEL);
     set(buttons, BorderLayout.SOUTH);
     action(null);
     finish(null);
@@ -59,7 +59,7 @@ public final class DialogPass extends Dialog {
     final String nm = new String(pass.getPassword());
     ok = !nm.isEmpty() && nm.matches("[^ ;'\\\"]*");
     info.setText(ok || nm.isEmpty() ? null :
-      Main.info(INVALID, SERVERPW), Icon.ERR);
+      Main.info(INVALID, SERVERPW), Msg.ERR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

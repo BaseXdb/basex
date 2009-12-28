@@ -5,8 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.io.File;
 import java.io.IOException;
-import java.net.BindException;
-import java.net.ConnectException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -22,16 +20,17 @@ import org.basex.core.proc.ShowSessions;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCombo;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXPassword;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.gui.layout.BaseXLabel.Icon;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -211,10 +210,8 @@ public final class DialogServer extends Dialog {
     sess.setBorder(8, 8, 8, 8);
     sese = new BaseXText(false, this);
     sese.setFont(start.getFont());
-    sese.setBorder(new EmptyBorder(5, 5, 5, 5));
     sedb = new BaseXText(false, this);
     sedb.setFont(start.getFont());
-    sedb.setBorder(new EmptyBorder(5, 5, 5, 5));
     refreshSess = new BaseXButton(BUTTONREFRESH, this);
 
     p = new BaseXBack();
@@ -247,6 +244,7 @@ public final class DialogServer extends Dialog {
     logc = new BaseXCombo(true, new String[] {}, this);
     logt = new BaseXText(false, this);
     logt.setFont(start.getFont());
+    BaseXLayout.setHeight(logt, 100);
 
     logt.setBorder(new EmptyBorder(5, 5, 5, 5));
     infoL = new BaseXLabel(" ");
@@ -308,7 +306,7 @@ public final class DialogServer extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    Icon icon = Icon.OK;
+    Msg icon = Msg.OK;
     String msg = null;
     String msg2 = null;
 
@@ -333,13 +331,14 @@ public final class DialogServer extends Dialog {
           Performance.sleep(500);
         }
         msg = running ? SERVERSTART : SERVERBIND;
-        if(!running) icon = Icon.ERR;
+        if(!running) icon = Msg.ERR;
       } else if(cmp == stop) {
-        BaseXServer.stop(gui.context);
+        if(running) BaseXServer.stop(gui.context);
         running = ping(true);
-        connected = connected && ping(false);
+        connected &= ping(false);
         if(!connected) msg = SERVERSTOPPED;
         if(host.getText().equals("localhost")) logpass.setText("");
+        if(!connected) super.setTitle(GUISERVER);
       } else if(cmp == connect || cmp == loguser || cmp == logpass ||
           cmp == host || cmp == portc) {
         gui.prop.set(GUIProp.SERVERUSER, loguser.getText());
@@ -377,14 +376,14 @@ public final class DialogServer extends Dialog {
           refreshLog();
         } else {
           msg2 = Main.info(DBNOTDELETED, f.getName());
-          icon = Icon.ERR;
+          icon = Msg.ERR;
         }
       } else if(cmp == deleteAll) {
         for(int i = 0; i < logc.getItemCount(); i++) {
           final File f = new File(logdir + logc.getItemAt(i).toString());
           if(!f.delete()) {
             msg2 = Main.info(DBNOTDELETED, f.getName());
-            icon = Icon.ERR;
+            icon = Msg.ERR;
             break;
           }
         }
@@ -395,12 +394,8 @@ public final class DialogServer extends Dialog {
         if(tab == 2) dbsP.action(cmp);
       }
     } catch(final IOException ex) {
-      Main.debug(ex);
-      icon = Icon.ERR;
-      if(ex instanceof BindException) msg = SERVERBIND;
-      else if(ex instanceof LoginException) msg = SERVERLOGIN;
-      else if(ex instanceof ConnectException) msg = SERVERERR;
-      else msg = ex.getMessage();
+      icon = Msg.ERR;
+      msg = Main.server(ex);
       if(msg.equals(Main.info(PERMNO, CmdPerm.values()[3]))) {
         try {
           cs.execute(new Exit());
@@ -423,7 +418,7 @@ public final class DialogServer extends Dialog {
         !(valpl && valh && valp && vallu && vallp)) {
       msg = Main.info(INVALID, !valpl ? LOCALPORT : !valh ? HOST :
         !valp ? PORT : !vallu ? SERVERUSER : SERVERPW);
-      icon = Icon.WARN;
+      icon = Msg.WARN;
     }
     infoC.setText(msg, icon);
     infoL.setText(msg2, icon);

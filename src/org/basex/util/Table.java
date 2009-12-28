@@ -35,6 +35,8 @@ public final class Table {
    * @param in textual table input
    */
   public Table(final String in) {
+    if(in.length() == 0) return;
+
     // parse table header
     final Scanner scan = new Scanner(in);
     String line = scan.nextLine();
