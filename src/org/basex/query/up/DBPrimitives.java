@@ -114,7 +114,7 @@ final class DBPrimitives extends Primitives {
         // Adjacent text nodes are merged. Merges can only be applied directly
         // after the update if no lower pre values are effected. This is not
         // the case for 'replace node', 'delete' and 'insert before' operations.
-        if(check) mergeTexts(par, first);
+        if(check && parT < par) mergeTexts(par, first);
         check = false;
         par = parT;
       }
