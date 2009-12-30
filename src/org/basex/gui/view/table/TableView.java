@@ -202,6 +202,7 @@ public final class TableView extends View implements Runnable {
     final int l = y / tdata.rowH;
     final boolean valid = y >= 0 && l < tdata.rows.size();
 
+    int focused = -1;
     if(valid) {
       final int pre = tdata.rows.get(l);
       final Context context = gui.context;
@@ -210,20 +211,18 @@ public final class TableView extends View implements Runnable {
       it.init(pre);
       while(it.more()) {
         if(it.col == c) {
-          gui.notify.focus(it.pre, this);
-          content.repaint();
+          focused = it.pre; 
           break;
         }
       }
-    } else {
-      gui.notify.focus(-1, this);
-      content.repaint();
     }
+    gui.notify.focus(focused, this);
+    content.repaint();
 
     final String str = content.focusedString;
     gui.cursor(valid && (str != null &&
-      str.length() <= Token.MAXLEN ||
-      gui.context.data.fs != null && tdata.mouseX < 20) ?
+        str.length() <= Token.MAXLEN ||
+        gui.context.data.fs != null && tdata.mouseX < 20) ?
       GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
   }
 
