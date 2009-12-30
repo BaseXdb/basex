@@ -2,12 +2,14 @@ package org.basex.gui.view.tree;
 
 /**
  * This interface contains options for the tree view.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller
  */
 public interface TreeViewOptions {
   // Options
+  /** Use ChildIterator to cache nodes. */
+  boolean USE_CHILDITERATOR = false;
   /** Draw only element nodes. */
   boolean ONLY_ELEMENT_NODES = false;
   /** Show ancestor nodes. */
