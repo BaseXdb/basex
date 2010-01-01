@@ -420,7 +420,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param i index
    * @return pre value
    */
-  int getPrePerLevelAndIndex(final int l, final int i) {
+  private int getPrePerLevelAndIndex(final int l, final int i) {
     return nodes[l][i];
   }
 

@@ -19,7 +19,7 @@ public interface TreeViewOptions {
   /** Draw rectangle border. */
   boolean BORDER_RECTANGLES = true;
   /** Fill rectangles. */
-  boolean FILL_RECTANGLES = false;
+  boolean FILL_RECTANGLES = true;
   /** Slim rectangles to text length. */
   boolean SLIM_TO_TEXT = true;
   /** Border padding value. */

@@ -278,7 +278,7 @@ public final class TreeView extends View implements TreeViewOptions {
           if(ePrePos >= s) ePrePos = s - 1;
 
           for(int j = sPrePos; j < ePrePos; j++) {
-            list.add(cache.getPrePerLevelAndIndex(s, j));
+            list.add(cache.getPrePerIndex(0, s, j));
           }
 
           gui.notify.mark(new Nodes(list.finish(), gui.context.data), this);
@@ -329,10 +329,12 @@ public final class TreeView extends View implements TreeViewOptions {
     markedImage = createImage();
     final Graphics mIg = markedImage.getGraphics();
 
-    final int size = gui.context.marked.size();
-    if(size < 1) return;
+    if(gui.context.marked == null)
+      return;
+    
+    final int size = gui.context.marked.size();   
 
-    final int[] marked = Arrays.copyOf(gui.context.marked.sorted, size);
+    final int[] marked = Arrays.copyOf(gui.context.marked.nodes, size);
 
     final int rn = 0;
 
@@ -595,7 +597,7 @@ public final class TreeView extends View implements TreeViewOptions {
           if(cache.isBigRectangle(rn, lv)) {
             final double ratio = mousePosX / (double) r.w;
             final int index = (int) (cache.getLevelSize(0, lv) * ratio);
-            pre = cache.getPrePerLevelAndIndex(lv, index);
+            pre = cache.getPrePerIndex(0, lv, index);
           }
 
           gui.notify.focus(pre, this);
