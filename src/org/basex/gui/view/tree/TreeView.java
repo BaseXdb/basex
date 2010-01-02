@@ -263,7 +263,7 @@ public final class TreeView extends View implements TreeViewOptions {
     for(int i = 0; i < size; i++) {
       final int yL = getYperLevel(i);
 
-      if((yL >= f || yL + nodeHeight >= f) && 
+      if((yL >= f || yL + nodeHeight >= f) &&
           (yL <= t || yL + nodeHeight <= t)) {
 
         final TreeRect[] rl = cache.getTreeRectsPerLevel(rn, i);
@@ -331,8 +331,8 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(gui.context.marked == null)
       return;
-    
-    final int size = gui.context.marked.size();   
+
+    final int size = gui.context.marked.size();
 
     final int[] marked = Arrays.copyOf(gui.context.marked.nodes, size);
 
@@ -423,7 +423,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(childX > -1) {
       g.drawLine(childX, getYperLevel(l + 1) - 1,
-          multiPreX == -1 ? (2 * r.x + r.w) / 2 : 
+          multiPreX == -1 ? (2 * r.x + r.w) / 2 :
             multiPreX, y + nodeHeight + 1);
     }
 
