@@ -135,7 +135,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param c context
    * @param sw screen width
    */
-  void generateBordersAndRects(final Graphics g, 
+  void generateBordersAndRects(final Graphics g,
       final Context c, final int sw) {
 
     final Data d = c.current.data;
