@@ -211,7 +211,7 @@ public final class TableView extends View implements Runnable {
       it.init(pre);
       while(it.more()) {
         if(it.col == c) {
-          focused = it.pre; 
+          focused = it.pre;
           break;
         }
       }
