@@ -1,7 +1,6 @@
 package org.basex.server;
 
 import java.util.ArrayList;
-
 import org.basex.core.Context;
 import org.basex.core.Proc;
 import org.basex.core.User;
