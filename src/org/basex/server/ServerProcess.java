@@ -10,7 +10,6 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Prop;
-import org.basex.core.User;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.data.Data;
@@ -32,7 +31,7 @@ public final class ServerProcess extends Thread {
   /** Socket reference. */
   private final Socket socket;
   /** Server reference. */
-  private final Semaphore sem;
+  private final Semaphore sema;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -51,7 +50,7 @@ public final class ServerProcess extends Thread {
    */
   public ServerProcess(final Socket s, final BaseXServer b) {
     context = new Context(b.context);
-    sem = b.sem;
+    sema = b.sem;
     log = b.log;
     socket = s;
   }
@@ -125,9 +124,8 @@ public final class ServerProcess extends Thread {
 
         // process command and send results
         startTimer(proc);
-        final boolean up = proc.updating(context) ||
-          (proc.flags & User.CREATE) != 0;
-        sem.before(up);
+        final boolean w = sema.writing(proc, context);
+        sema.before(w);
         final boolean ok = proc.execute(context, out);
         out.write(0);
         final String inf = proc.info();
@@ -135,7 +133,7 @@ public final class ServerProcess extends Thread {
         out.write(0);
         send(ok);
         stopTimer();
-        sem.after(up);
+        sema.after(w);
         final String pr = proc.toString().replaceAll("\\r|\\n", " ");
         log.write(this, pr, ok ? "OK" : INFOERROR + inf, perf);
       }

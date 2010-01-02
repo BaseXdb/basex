@@ -21,11 +21,8 @@ import org.basex.util.Performance;
  * @author Andreas Weiler
  */
 public final class LockingTest {
-  /** Server reference. */
-  static BaseXServer server;
   /** Test file. */
   private static final String FILE = "etc/xml/factbook.xml";
-  // private static final String FILE = "f:/xml/xmark/111mb.zip";
   /** Test name. */
   private static final String NAME = "factbook";
   /** Test query. */
@@ -36,20 +33,19 @@ public final class LockingTest {
   private static final String QUERYN = "for $c in doc('factbook')" +
     "//country for $n in doc('factbook')//city where $c/@id =" +
     " $n/@country and $n/name = 'Tirane' return $n/population/text()";
-  /** Test query 3.
-  private static final String QUERY3 = "for $c in doc('factbook')//node()" +
-      "where contains($c/text(), 'a') return $c";
-  */
+  /** Number of tests. */
+  private static final int TESTS = 5;
+
+  /** Server reference. */
+  BaseXServer server;
   /** Socket reference. */
-  static Session session1;
+  Session session1;
   /** Socket reference. */
-  static Session session2;
+  Session session2;
   /** Status of test. */
   boolean done;
-  /** Number of done eff tests. */
+  /** Number of done tests. */
   int tdone;
-  /** Number of eff tests. */
-  int tests = 5;
 
   /**
    * Main method, launching the test.
@@ -64,7 +60,7 @@ public final class LockingTest {
    */
   private LockingTest() {
     start();
-    // drops factbook for clean test
+    // drops database for clean test
     process(new DropDB("factbook"), session1);
     // concurrent create test
     conCreate();
@@ -72,7 +68,7 @@ public final class LockingTest {
     if(server.context.pool.pins("factbook") == 2) {
       Main.outln("--> Test 1 successful, Test 2 started...");
     } else {
-      err("test failed conCreate");
+      Main.errln("test failed conCreate");
     }
 
     // read read test
@@ -83,7 +79,7 @@ public final class LockingTest {
     // write write test
     runTest(false, false);
     if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
-      err("test failed write write");
+      Main.errln("test failed write write");
     } else {
       Main.outln("--> Test 3 successful, Test 4 started...");
     }
@@ -99,28 +95,28 @@ public final class LockingTest {
     Main.outln("--> Test 5 successful, last check...");
 
     if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
-      err("test failed write read / read write");
+      Main.errln("test failed write read / read write");
     } else {
       Main.outln("--> All Locking Tests done...," +
         " efficiency test started...");
     }
-    for(int i = 0; i < tests; i++) {
+    for(int i = 0; i < TESTS; i++) {
       startQueryT(createSession());
     }
-    while(tdone < tests) Performance.sleep(200);
+    while(tdone < TESTS) Performance.sleep(200);
     stop();
   }
 
   /**
-   * Starts a xquery thread.
-   * @param s Session
+   * Starts a query thread.
+   * @param s session
    */
   private void startQueryT(final ClientSession s) {
     new Thread() {
       @Override
       public void run() {
         if(!checkRes(new XQuery(QUERYN), s).equals("192000"))
-          err("efficiency test failed");
+          Main.errln("efficiency test failed");
         closeSession(s);
         tdone++;
       }
@@ -144,8 +140,8 @@ public final class LockingTest {
   }
 
   /**
-   * Creates a Clientsession.
-   * @return ClientSession
+   * Creates a client session.
+   * @return client session
    */
   ClientSession createSession() {
     try {
@@ -157,8 +153,8 @@ public final class LockingTest {
   }
 
   /**
-   * Closes a Clientsession.
-   * @param s Session
+   * Closes a client session.
+   * @param s session to be closed
    */
   void closeSession(final Session s) {
     try {
@@ -186,7 +182,7 @@ public final class LockingTest {
       public void run() {
         Performance.sleep(300);
         final String result = process(new CreateDB(FILE), session2);
-        if(result == null) err("test failed conCreate");
+        if(result == null) Main.errln("test failed conCreate");
         else Main.outln("Message: " + result);
       }
     }.start();
@@ -198,8 +194,8 @@ public final class LockingTest {
 
   /**
    * Runs the tests.
-   * @param test1 boolean
-   * @param test2 boolean
+   * @param test1 first test flag
+   * @param test2 second test flag
    */
   private void runTest(final boolean test1, final boolean test2) {
     new Thread() {
@@ -208,17 +204,18 @@ public final class LockingTest {
         Performance.sleep(300);
         if(test2) {
           final String res = checkRes(new XQuery(QUERY), session2);
-          if(!res.equals("192000")) err("test failed: " + res);
+          if(!res.equals("192000")) Main.errln("test failed: " + res);
         } else {
           final String res = process(new XQuery("delete nodes //aa"), session2);
-          if(res != null) err("test failed: " + res);
+          if(res != null) Main.errln("test failed: " + res);
         }
         done = true;
       }
     }.start();
+
     if(test1) {
       final String res = checkRes(new XQuery(QUERY), session1);
-      if(!res.equals("192000")) err("test failed: " + res);
+      if(!res.equals("192000")) Main.errln("test failed: " + res);
     } else {
       process(new XQuery(
           "for $i in //members return insert node <aa/> into $i"), session1);
@@ -242,14 +239,6 @@ public final class LockingTest {
       ex.printStackTrace();
     }
     return out.toString();
-  }
-
-  /**
-   * Prints the error message.
-   * @param e String
-   */
-  void err(final String e) {
-    System.err.println(e);
   }
 
   /**

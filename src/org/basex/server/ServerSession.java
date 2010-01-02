@@ -4,7 +4,6 @@ import java.io.OutputStream;
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
 import org.basex.core.Proc;
-import org.basex.core.User;
 
 /**
  * This wrapper executes server commands locally.
@@ -14,7 +13,7 @@ import org.basex.core.User;
  */
 public final class ServerSession extends LocalSession {
   /** Server reference. */
-  private final Semaphore sem;
+  private final Semaphore sema;
 
   /**
    * Constructor.
@@ -23,15 +22,15 @@ public final class ServerSession extends LocalSession {
    */
   public ServerSession(final Context context, final Semaphore s) {
     super(context);
-    sem = s;
+    sema = s;
   }
 
   @Override
   public boolean execute(final Proc pr, final OutputStream out) {
-    final boolean up = pr.updating(ctx) || (pr.flags & User.CREATE) != 0;
-    sem.before(up);
+    final boolean w = sema.writing(pr, ctx);
+    sema.before(w);
     final boolean ok = super.execute(pr, out);
-    sem.after(up);
+    sema.after(w);
     return ok;
   }
 }

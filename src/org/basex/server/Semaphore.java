@@ -2,6 +2,10 @@ package org.basex.server;
 
 import java.util.ArrayList;
 
+import org.basex.core.Context;
+import org.basex.core.Proc;
+import org.basex.core.User;
+
 /**
  * Management of executing read/write processes.
  *
@@ -19,22 +23,32 @@ public final class Semaphore {
   private int activeR;
 
   /**
-   * Modifications before executing a process.
-   * @param up updating flag
+   * Checks if the specified process is a writer.
+   * @param pr process
+   * @param ctx database context
+   * @return result of check
    */
-  public void before(final boolean up) {
-    if(up) {
-      final Object monitor = new Object();
-      synchronized(monitor) {
+  public boolean writing(final Proc pr, final Context ctx) {
+    return (pr.flags & (User.CREATE | User.WRITE)) != 0 || pr.updating(ctx);
+  }
+
+  /**
+   * Modifications before executing a process.
+   * @param w writing flag
+   */
+  public void before(final boolean w) {
+    if(w) {
+      final Object o = new Object();
+      synchronized(o) {
         synchronized(this) {
           if(waitingW.size() == 0 && activeR == 0 && !activeW) {
             activeW = true;
             return;
           }
-          waitingW.add(monitor);
+          waitingW.add(o);
         }
         try {
-          monitor.wait();
+          o.wait();
         } catch(final InterruptedException ex) {
           ex.printStackTrace();
         }
@@ -57,10 +71,10 @@ public final class Semaphore {
 
   /**
    * Modifications after executing a process.
-   * @param up updating flag
+   * @param w writing flag
    */
-  public synchronized void after(final boolean up) {
-    if(up) {
+  public synchronized void after(final boolean w) {
+    if(w) {
       activeW = false;
       if(waitingR > 0) notifyReaders();
       else notifyWriter();
