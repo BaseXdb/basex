@@ -13,7 +13,7 @@ import org.basex.util.Token;
 /**
  * Java XQuery API - Expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 final class BXQExpression extends BXQDynamicContext implements XQExpression {

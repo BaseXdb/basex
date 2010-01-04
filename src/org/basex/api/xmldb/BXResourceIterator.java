@@ -10,7 +10,7 @@ import org.xmldb.api.base.XMLDBException;
 /**
  * Implementation of the ResourceIterator Interface for the XMLDB:API.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  * @author Christian Gruen
  */

@@ -16,7 +16,7 @@ import org.basex.test.xqj.AllTests;
 /**
  * Runs all Non-JUnit tests.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class RunTests {

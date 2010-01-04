@@ -33,7 +33,7 @@ import org.xml.sax.XMLReader;
 /**
  * Java XQuery API - Abstract objects.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 abstract class BXQAbstract {

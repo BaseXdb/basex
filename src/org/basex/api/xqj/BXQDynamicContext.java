@@ -41,7 +41,7 @@ import org.w3c.dom.Node;
 /**
  * Java XQuery API - Dynamic Context.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 abstract class BXQDynamicContext extends BXQAbstract

@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 /**
  * This class tests the XMLDB/API XMLResource implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
