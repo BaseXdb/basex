@@ -13,7 +13,8 @@ import org.deepfs.fsml.ParserRegistry;
 
 /**
  * Parser for BMP files.
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
  */

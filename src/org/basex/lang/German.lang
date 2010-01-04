@@ -525,8 +525,6 @@ ch_show23=zeigt aktuelle Datenbankverbindungen.
 ch_show24=zeigt registrierte Benutzer (einer Datenbank).
 ch_grant1=Zuweisung von Benutzerrechten.
 ch_grant2=Weist einem Benutzer (für eine Datenbank) Rechte zu.
-ch_revoke1=Entziehen von Benutzerrechten.
-ch_revoke2=Entzieht einem Benutzer (für eine Datenbank) Rechte.
 ch_helpgeneral0=Allgemeine Befehle:
 ch_set1=Setzen von allgemeinen Optionen (aktuelle Werte via '%').
 ch_set2=Verfügbare Optionen [%] mit [%] = on/off:

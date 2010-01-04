@@ -39,7 +39,6 @@ import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Password;
-import org.basex.core.proc.Revoke;
 import org.basex.core.proc.ShowSessions;
 import org.basex.core.proc.ShowUsers;
 import org.basex.core.proc.Run;
@@ -59,7 +58,7 @@ import org.basex.util.TokenBuilder;
  * This is a parser for command strings, creating {@link Proc} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class CommandParser extends InputParser {
@@ -217,19 +216,12 @@ public final class CommandParser extends InputParser {
         }
         break;
       case GRANT:
-        CmdPerm perm = consume(CmdPerm.class, cmd);
+        final CmdPerm perm = consume(CmdPerm.class, cmd);
         if(perm == null) help(null, cmd);
-        String db = key(ON, null) ? name(cmd) : null;
+        final String db = key(ON, null) ? name(cmd) : null;
         key(TO, cmd);
         return db == null ? new Grant(perm, name(cmd)) :
           new Grant(perm, name(cmd), db);
-      case REVOKE:
-        perm = consume(CmdPerm.class, cmd);
-        if(perm == null) help(null, cmd);
-        db = key(ON, null) ? name(cmd) : null;
-        key(FROM, cmd);
-        return db == null ? new Revoke(perm, name(cmd)) :
-          new Revoke(perm, name(cmd), db);
       default:
     }
     return null;

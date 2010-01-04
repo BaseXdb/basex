@@ -14,7 +14,7 @@ import org.basex.util.Token;
 /**
  * Dialog window for messages.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class DialogMessage extends Dialog {

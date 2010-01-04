@@ -20,7 +20,7 @@ import static org.basex.util.Token.*;
 /**
  * This class tests the database commands.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class CmdTest {
@@ -53,7 +53,7 @@ public class CmdTest {
   @After
   public final void setUp() {
     process(new DropDB(NAME));
-    process(new DropUser(NAME));
+    process(new DropUser(USER));
   }
 
   /** Command Test. */
@@ -198,7 +198,8 @@ public class CmdTest {
   public final void grant() {
     ok(new CreateUser(USER, "test"));
     no(new Grant("something", USER));
-    ok(new Grant("all", USER));
+    ok(new Grant("none", USER));
+    no(new Grant("all", USER));
     ok(new DropUser(USER));
   }
 
@@ -278,15 +279,6 @@ public class CmdTest {
   public final void password() {
     ok(new Password("admin"));
     no(new Password(""));
-  }
-
-  /** Command Test. */
-  @Test
-  public final void revoke() {
-    ok(new CreateUser(USER, "test"));
-    no(new Revoke("something", USER));
-    ok(new Revoke("all", USER));
-    ok(new DropUser(USER));
   }
 
   /** Command Test. */

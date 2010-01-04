@@ -59,7 +59,7 @@ import org.basex.util.Token;
  * This class is the main window of the GUI. It is the central instance
  * for user interactions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class GUI extends JFrame {

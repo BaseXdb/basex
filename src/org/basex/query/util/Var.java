@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Variable.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Var extends Expr {

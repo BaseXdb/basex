@@ -6,7 +6,7 @@ import java.io.IOException;
  * This interface defines the methods which have to be implemented
  * by an index structure.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public interface Index {

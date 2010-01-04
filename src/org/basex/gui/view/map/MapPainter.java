@@ -9,7 +9,7 @@ import org.basex.gui.GUIProp;
 /**
  * Provides an interface for data specific TreeMap visualizations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 abstract class MapPainter {

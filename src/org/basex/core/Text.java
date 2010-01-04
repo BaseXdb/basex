@@ -9,7 +9,7 @@ import static org.basex.util.Token.*;
  * throughout the project. If this class is called first, the Strings
  * are initialized by the {@link org.basex.core.Lang} class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public interface Text {
@@ -262,18 +262,11 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPGRANT = {
-    "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" + CmdPerm.CREATE + "|" +
-    CmdPerm.ADMIN + "|" + CmdPerm.ALL + "] (" + ON + " [db]) " + TO + " [user]",
+    "[" + CmdPerm.NONE + "|" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" +
+    CmdPerm.CREATE + "|" + CmdPerm.ADMIN + "] (" + ON + " [db]) " + TO +
+    " [user]",
     lang("ch_grant1"),
     lang("ch_grant2")
-  };
-  /** Command help. */
-  String[] HELPREVOKE = {
-    "[" + CmdPerm.READ + "|" + CmdPerm.WRITE + "|" + CmdPerm.CREATE + "|" +
-    CmdPerm.ADMIN + "|" + CmdPerm.ALL + "] (" + ON + " [db]) " +
-    FROM + " [user]",
-    lang("ch_revoke1"),
-    lang("ch_revoke2")
   };
   /** Command help. */
   String[] HELPALTER = {
@@ -500,7 +493,7 @@ public interface Text {
   String PERMNO = lang("ad_permno");
   /** Invalid permissions. */
   String PERMINV = lang("ad_perminv");
-  /** Permission revoked. */
+  /** Permission updated. */
   String PERMUP = lang("ad_permup");
   /** User not found. */
   String USERNO = lang("ad_userno");
@@ -1210,7 +1203,7 @@ public interface Text {
   /** About text. */
   String ABOUTTITLE = lang("da_title", NAME);
   /** Copyright info. */
-  String COPYRIGHT = "©2005-09 " + COMPANY;
+  String COPYRIGHT = "©2005-10 " + COMPANY;
   /** License info. */
   String LICENSE = lang("da_license");
   /** Developer info. */

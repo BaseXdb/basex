@@ -6,22 +6,22 @@ import java.util.regex.Pattern;
 /**
  * This class defines the available command-line commands.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 @SuppressWarnings("all")
 public interface Commands {
-  /** Create command definitions. */
+  /** Create commands. */
   enum CmdCreate { DATABASE, DB, COLLECTION, COLL, MAB, FS, INDEX, USER }
-  /** Info command definitions. */
+  /** Info commands. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
-  /** Drop command definitions. */
+  /** Drop commands. */
   enum CmdDrop { DATABASE, DB, INDEX, USER }
-  /** Show command definitions. */
+  /** Show commands. */
   enum CmdShow { DATABASES, SESSIONS, USERS }
-  /** Show command definitions. */
-  enum CmdPerm { READ, WRITE, CREATE, ADMIN, ALL }
-  /** Set command definitions. */
+  /** Permission commands. */
+  enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
+  /** Set commands. */
   enum CmdSet { INFO, DEBUG, SERIALIZE, CHOP, ENTITY, TEXTINDEX, ATTRINDEX,
     FTINDEX, PATHINDEX }
   /** Index types. */
@@ -45,7 +45,7 @@ public interface Commands {
     HQ(HID, HELPQ), XQUERY(HELPXQUERY), X(HID), FIND(HELPFIND),
     RUN(HELPRUN), CS(HELPCS),
     // Admin commands
-    HA(HID, HELPA), SHOW(HELPSHOW), GRANT(HELPGRANT), REVOKE(HELPREVOKE),
+    HA(HID, HELPA), SHOW(HELPSHOW), GRANT(HELPGRANT),
     ALTER(HELPALTER), KILL(HELPKILL),
     // General commands
     HG(HID, HELPG), SET(HELPSET), PASSWORD(HELPPASSWORD),

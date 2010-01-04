@@ -11,7 +11,7 @@ import org.basex.server.ClientSession;
  * It sends all commands to the server instance.
  * Add the '-h' option to get a list on all available command-line arguments.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class BaseXClient extends BaseX {

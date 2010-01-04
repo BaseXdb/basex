@@ -11,7 +11,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Text fragment.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class CText extends CFrag {

@@ -12,7 +12,7 @@ import org.xml.sax.InputSource;
  * Abstract file representation, pointing to a local or remote file or
  * a byte array.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class IO {

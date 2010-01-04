@@ -39,7 +39,7 @@ import org.basex.util.Tokenizer;
  *    [pre0, ..., pres, pos0, pos1, ..., poss] where pre and pos are the
  *                          ft data [int[]]
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
 public final class FTFuzzy extends FTIndex {

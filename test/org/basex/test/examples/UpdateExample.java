@@ -7,7 +7,7 @@ import org.basex.io.*;
 /**
  * This class demonstrates how updates can be performed on a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
 public final class UpdateExample {

@@ -4,7 +4,8 @@ import org.basex.core.Main;
 
 /**
  * Available MIME types.
- * @author Workgroup DBIS, University of Konstanz 2009, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Bastian Lemke
  */
 public enum MimeType {

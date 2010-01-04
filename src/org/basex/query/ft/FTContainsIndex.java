@@ -15,7 +15,7 @@ import org.basex.util.Tokenizer;
 /**
  * Sequential FTContains expression with index access.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
 public final class FTContainsIndex extends FTContains {

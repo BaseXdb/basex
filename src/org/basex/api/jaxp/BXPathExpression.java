@@ -22,7 +22,7 @@ import org.xml.sax.InputSource;
 /**
  * This class provides an API for standalone XPath processing.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class BXPathExpression implements XPathExpression {

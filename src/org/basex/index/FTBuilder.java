@@ -17,7 +17,7 @@ import org.basex.util.Tokenizer;
 /**
  * This class provides a skeleton for full-text index builders.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class FTBuilder extends IndexBuilder {

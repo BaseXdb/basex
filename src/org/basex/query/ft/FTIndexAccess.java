@@ -15,7 +15,7 @@ import org.basex.query.iter.Iter;
 /**
  * FTContains expression with index access.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class FTIndexAccess extends Simple {

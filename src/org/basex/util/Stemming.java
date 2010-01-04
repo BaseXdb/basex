@@ -7,7 +7,7 @@ import java.util.Arrays;
  * Simple stemming algorithm, based on
  * "Porter [1980], An algorithm for suffix stripping".
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 final class Stemming {

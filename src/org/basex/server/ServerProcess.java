@@ -22,7 +22,7 @@ import org.basex.util.Performance;
 /**
  * Single session for a client-server connection.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class ServerProcess extends Thread {
@@ -73,7 +73,7 @@ public final class ServerProcess extends Thread {
       final String us = in.readString();
       final String pw = in.readString();
       context.user = context.users.get(us);
-      boolean ok = context.user != null &&
+      final boolean ok = context.user != null &&
         md5(string(context.user.pw) + ts).equals(pw);
       send(ok);
 

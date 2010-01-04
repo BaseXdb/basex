@@ -15,7 +15,7 @@ import org.basex.query.util.Var;
 /**
  * Single group expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
 public final class Grp extends Expr {

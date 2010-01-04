@@ -9,7 +9,7 @@ import static org.junit.Assert.*;
 /**
  * This class tests the update features of the Data class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Tim Petrowsky
  */
 public final class UpdateTestAttributes extends UpdateTest {

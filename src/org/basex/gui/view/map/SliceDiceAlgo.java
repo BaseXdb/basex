@@ -3,7 +3,7 @@ package org.basex.gui.view.map;
 /**
  * Slice-and-Dice layout algorithm.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Joerg Hauser
  */
 final class SliceDiceAlgo extends MapAlgo {

@@ -15,7 +15,7 @@ import org.basex.util.TokenBuilder;
  * This class assembles properties which are used all around the project. They
  * are initially read from and finally written to disk.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class AProp {

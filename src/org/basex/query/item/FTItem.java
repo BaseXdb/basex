@@ -7,7 +7,7 @@ import org.basex.query.ft.Scoring;
 /**
  * XQuery item representing a full-text Node.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
 public final class FTItem extends DBNode {

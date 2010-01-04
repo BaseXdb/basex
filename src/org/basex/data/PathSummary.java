@@ -18,7 +18,7 @@ import org.basex.util.TokenList;
  * This class stores the path summary of a document.
  * It contains all unique location paths of the document.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class PathSummary implements Index {

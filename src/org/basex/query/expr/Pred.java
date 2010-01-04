@@ -17,7 +17,7 @@ import org.basex.query.util.Var;
 /**
  * Predicate expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class Pred extends Preds {

@@ -3,7 +3,7 @@ package org.basex.data;
 /**
  * Single full-text string match.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class FTStringMatch implements Comparable<FTStringMatch> {

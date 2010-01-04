@@ -9,7 +9,7 @@ import org.basex.io.DataOutput;
  * This is a simple hash set, storing keys in byte arrays.
  * The {@link TokenMap} class extends it to a hash map.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class TokenSet {

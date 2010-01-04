@@ -11,7 +11,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Evaluates the 'info' command and returns general database information.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Info extends AInfo {

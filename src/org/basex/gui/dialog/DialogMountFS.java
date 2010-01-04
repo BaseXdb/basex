@@ -34,7 +34,7 @@ import org.basex.util.Token;
 /**
  * Open database dialog.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Alexander Holupirek
  */
 public final class DialogMountFS extends Dialog {

@@ -14,7 +14,7 @@ import org.basex.query.util.Err;
 /**
  * Path expression. Mustn't be called with more than one predicate.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class IterStep extends Step {

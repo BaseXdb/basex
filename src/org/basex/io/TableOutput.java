@@ -8,7 +8,7 @@ import org.basex.util.IntList;
 /**
  * This class allows a blockwise output of the database table.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Tim Petrowsky
  */

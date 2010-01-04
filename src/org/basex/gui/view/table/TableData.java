@@ -20,7 +20,7 @@ import org.deepfs.fsml.MetaElem;
 /**
  * This is a container for the table data.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 final class TableData {

@@ -15,7 +15,7 @@ import org.basex.query.iter.Iter;
 /**
  * This class demonstrates how new databases are created, deleted and queried.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
 @SuppressWarnings("unused")

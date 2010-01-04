@@ -22,7 +22,7 @@ import org.basex.io.IO;
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class Builder extends Progress {

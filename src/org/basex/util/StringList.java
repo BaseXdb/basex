@@ -8,7 +8,7 @@ import org.basex.core.Main;
 /**
  * This is a simple container for string values.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class StringList implements Iterable<String> {

@@ -22,7 +22,7 @@ import org.basex.query.util.Err;
  * Holds all update operations and primitives a snapshot contains, checks
  * constraints and finally executes the updates.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
 public final class Updates {
@@ -82,7 +82,7 @@ public final class Updates {
     Primitives prim = primitives.get(d);
     if(prim == null) {
       // check permissions
-      if(!t && !frag && ctx.context.perm(User.WRITE, d.meta) != -1)
+      if(!t && !frag && !ctx.context.perm(User.WRITE, d.meta))
         throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
 
       prim = frag ? new FragPrimitives() : new DBPrimitives(d);

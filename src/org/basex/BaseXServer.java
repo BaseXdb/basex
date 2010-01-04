@@ -22,7 +22,7 @@ import org.basex.util.Token;
  * Add the '-h' option to get a list on all available command-line
  * arguments.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Andreas Weiler
  */

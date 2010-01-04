@@ -12,7 +12,7 @@ import org.basex.query.item.Seq;
 /**
  * Sequence iterator.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class SeqIter extends Iter implements Result {

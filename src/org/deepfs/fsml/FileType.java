@@ -2,7 +2,8 @@ package org.deepfs.fsml;
 
 /**
  * Available file types.
- * @author Workgroup DBIS, University of Konstanz 2009, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Bastian Lemke
  */
 public enum FileType {

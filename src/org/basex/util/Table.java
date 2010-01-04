@@ -10,7 +10,7 @@ import java.util.Scanner;
  * It should be guaranteed that the {@link #header} object has the
  * same number of entries as all {@link #contents} string arrays.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Table {

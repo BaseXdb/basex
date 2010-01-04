@@ -7,7 +7,7 @@ import org.basex.core.Main;
 /**
  * This is a simple container for native int array values.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class IntArrayList implements Iterable<int[]> {

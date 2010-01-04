@@ -8,7 +8,7 @@ import org.basex.data.MetaData;
 /**
  * This class allows main memory access to the database table representation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class TableMemAccess extends TableAccess {

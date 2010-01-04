@@ -3,7 +3,7 @@ package org.basex.query.up.primitives;
 /**
  * Update primitive type enumeration.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
 public enum PrimitiveType {

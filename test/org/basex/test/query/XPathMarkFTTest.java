@@ -5,7 +5,7 @@ import org.basex.core.AProp;
 /**
  * XPathMark functional tests.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class XPathMarkFTTest extends AbstractTest {

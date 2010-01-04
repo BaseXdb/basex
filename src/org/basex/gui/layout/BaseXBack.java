@@ -14,7 +14,7 @@ import org.basex.gui.GUIConstants.Fill;
 /**
  * Panel background, extending the {@link JPanel}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class BaseXBack extends JPanel {

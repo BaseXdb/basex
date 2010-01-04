@@ -7,7 +7,7 @@ import java.io.OutputStream;
  * This class allows a generic process execution.
  * It is implemented both by the local as well as the client/server model.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class Session {

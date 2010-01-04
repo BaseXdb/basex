@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
  * Evaluates the 'info database' command and returns information on the
  * currently opened database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class InfoDB extends AInfo {

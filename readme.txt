@@ -1,14 +1,14 @@
  
  BASEX ================================================================
  
- Welcome to the source files of BaseX!
+ Welcome to the source code of BaseX.
  
- To get BaseX running as smooth as possible, please consider the
+ To get the project running as smooth as possible, please consider the
  following notes:
  
  COMPILING BASEX ------------------------------------------------------
  
- Beside JDK 1.5, JUnit is currently needed to compile the complete
+ JDK 1.6 and JUnit is currently needed to compile the complete
  BaseX sources. If you are using another environment than Eclipse or
  don't have JUnit installed, just delete the 'test' package inside
  the project and rebuild the project.
@@ -55,10 +55,11 @@
  
  ----------------------------------------------------------------------
  
- Any kind of feedback is welcome; just tell us if you run into any
- troubles while installing and running BaseX: basex@inf.uni-konstanz.de
+ Any kind of feedback is welcome; please tell us if you run into any
+ troubles while installing and running BaseX: 
+ basex-talk@mailman.uni-konstanz.de
  
  Have a nice day,
- BaseX team 2009
+ BaseX team 2010
  
  =================================== DBIS Group, University of Konstanz

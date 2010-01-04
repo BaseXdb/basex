@@ -19,7 +19,7 @@ import org.basex.util.TokenList;
 /**
  * Evaluates the 'list' command and shows all available databases.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class List extends Proc {
@@ -46,7 +46,7 @@ public final class List extends Proc {
       try {
         in = new DataInput(meta.file(DATAINFO));
         meta.read(in);
-        if(context.perm(User.READ, meta) == -1) file = meta.file.toString();
+        if(context.perm(User.READ, meta)) file = meta.file.toString();
       } catch(final IOException ex) {
         file = INFODBERR;
       } finally {

@@ -21,7 +21,8 @@ import org.deepfs.fsml.ser.FSMLSerializer;
 
 /**
  * Build a FSML database while traversing a directory hierarchy.
- * @author Workgroup DBIS, University of Konstanz 2009, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
  */

@@ -6,7 +6,7 @@ import org.basex.io.PrintOutput;
 /**
  * Evaluates the 'exit' command and quits the console.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Exit extends Proc {

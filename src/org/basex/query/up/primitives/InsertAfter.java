@@ -8,7 +8,7 @@ import org.basex.query.iter.NodIter;
 /**
  * Insert after primitive.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
 public final class InsertAfter extends NodeCopy {

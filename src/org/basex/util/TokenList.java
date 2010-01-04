@@ -9,7 +9,7 @@ import org.basex.core.Main;
 /**
  * This is a simple container for tokens (byte arrays).
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class TokenList implements Iterable<byte[]> {

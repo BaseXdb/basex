@@ -8,7 +8,7 @@ import org.w3c.dom.DocumentType;
 /**
  * DOM - implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class BXDomImpl implements DOMImplementation {

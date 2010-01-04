@@ -17,7 +17,7 @@ import org.basex.util.TokenSet;
 /**
  * Simple stop words set for full-text requests.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class StopWords extends TokenSet {

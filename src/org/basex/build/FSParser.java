@@ -10,7 +10,8 @@ import org.deepfs.util.FSWalker;
 
 /**
  * Creates a database that maps a file system hierarchy.
- * @author Workgroup DBIS, University of Konstanz 2009, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Bastian Lemke
  */
 public final class FSParser extends Progress {

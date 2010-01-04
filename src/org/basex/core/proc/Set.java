@@ -10,7 +10,7 @@ import org.basex.io.PrintOutput;
 /**
  * Evaluates the 'set' command and modifies database properties.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Set extends Proc {

@@ -12,7 +12,7 @@ import org.basex.core.Main;
 /**
  * Checks all project interfaces for potentially obsolete texts.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class ObsoleteTexts {

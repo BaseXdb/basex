@@ -7,7 +7,7 @@ import org.basex.core.Main;
  * This class contains full-text positions.
  * For each position, a pointer is stored.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class FTPos {

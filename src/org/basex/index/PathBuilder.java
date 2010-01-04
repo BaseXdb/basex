@@ -8,7 +8,7 @@ import org.basex.io.IO;
  * This interface defines the functions which are needed for building
  * new index structures.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class PathBuilder extends IndexBuilder {

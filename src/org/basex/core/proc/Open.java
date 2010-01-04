@@ -14,7 +14,7 @@ import org.basex.io.PrintOutput;
 /**
  * Evaluates the 'open' command and opens a database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Open extends Proc {
@@ -62,12 +62,10 @@ public final class Open extends Proc {
       data = new DiskData(db, ctx.prop);
       ctx.pin(data);
     }
-
     // check permissions
-    if(ctx.perm(User.READ, data.meta) != -1) {
-      Close.close(ctx, data);
-      throw new IOException(Main.info(PERMNO, CmdPerm.READ));
-    }
-    return data;
+    if(ctx.perm(User.READ, data.meta)) return data;
+
+    Close.close(ctx, data);
+    throw new IOException(Main.info(PERMNO, CmdPerm.READ));
   }
 }

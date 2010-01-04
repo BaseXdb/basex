@@ -8,7 +8,7 @@ import org.basex.io.PrintOutput;
 /**
  * Evaluates the 'cs' command and sets a new initial context set.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Cs extends AQuery {

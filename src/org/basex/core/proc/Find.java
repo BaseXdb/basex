@@ -18,7 +18,7 @@ import static org.basex.util.Token.*;
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Find extends AQuery {

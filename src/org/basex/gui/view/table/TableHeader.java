@@ -30,7 +30,7 @@ import org.basex.gui.view.table.TableData.TableCol;
 /**
  * This is the header of the table view.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 final class TableHeader extends BaseXPanel {

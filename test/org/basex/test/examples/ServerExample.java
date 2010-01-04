@@ -7,7 +7,7 @@ import org.basex.server.ClientSession;
  * This class demonstrates how the database can be accessed via the
  * client/server architecture.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
 public final class ServerExample {

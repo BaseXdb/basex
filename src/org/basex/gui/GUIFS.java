@@ -10,7 +10,7 @@ import org.basex.util.Token;
 /**
  * This class organizes icons and data types for common file types.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class GUIFS {

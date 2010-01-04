@@ -8,7 +8,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Abstract class for database info.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class AInfo extends Proc {

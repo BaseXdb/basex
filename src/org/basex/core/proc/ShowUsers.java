@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.core.Main;
+import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
@@ -13,10 +14,10 @@ import org.basex.io.PrintOutput;
 /**
  * Evaluates the 'show users' command and shows existing users.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class ShowUsers extends AAdmin {
+public final class ShowUsers extends Proc {
   /**
    * Default constructor.
    */
@@ -29,7 +30,7 @@ public final class ShowUsers extends AAdmin {
    * @param db database (for showing users)
    */
   public ShowUsers(final String db) {
-    super(db);
+    super(User.ADMIN, db);
   }
 
   @Override

@@ -14,16 +14,16 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
 
 /**
- * Project specific Slider implementation.
+ * Project specific slider implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class BaseXSlider extends BaseXPanel {
   /** Slider width. */
   private static final double SLIDERW = 20;
   /** Listener. */
-  private Dialog dl;
+  private final Dialog dl;
   /** Listener. */
   private ActionListener al;
 
@@ -64,6 +64,7 @@ public final class BaseXSlider extends BaseXPanel {
     min = mn;
     max = mx;
     curr = i;
+    dl = w instanceof Dialog ? (Dialog) w : null;
     setFocusable(true);
     setMode(Fill.NONE);
 
@@ -79,13 +80,9 @@ public final class BaseXSlider extends BaseXPanel {
         repaint();
       }
     });
-
     addKeyListener(this);
     addMouseListener(this);
     addMouseMotionListener(this);
-
-    if(!(w instanceof Dialog)) return;
-    dl = (Dialog) w;
   }
 
   /**

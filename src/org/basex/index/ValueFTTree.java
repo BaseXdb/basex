@@ -9,7 +9,7 @@ import org.basex.util.TokenList;
  * This class indexes all the XML Tokens in a balanced binary tree.
  * Additional all pre and pos values are stored.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

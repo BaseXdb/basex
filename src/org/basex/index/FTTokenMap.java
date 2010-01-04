@@ -6,7 +6,7 @@ import org.basex.util.TokenSet;
 /**
  * This class caches sizes and pointers from full-text results.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
 final class FTTokenMap extends TokenSet {

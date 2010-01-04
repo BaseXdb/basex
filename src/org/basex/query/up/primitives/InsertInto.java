@@ -9,7 +9,7 @@ import org.basex.query.iter.NodIter;
 /**
  * Insert into as last primitive.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
 public final class InsertInto extends NodeCopy {

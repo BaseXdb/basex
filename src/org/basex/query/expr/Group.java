@@ -14,7 +14,7 @@ import org.basex.query.util.Var;
 /**
  * Implementation of the group by clause.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
 public final class Group extends Expr {

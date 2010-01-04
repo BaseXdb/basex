@@ -1,22 +1,25 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+
+import org.basex.core.Proc;
+import org.basex.core.User;
 import org.basex.io.PrintOutput;
 import org.basex.server.Sessions;
 
 /**
  * Evaluates the 'kill' command and stops user sessions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Kill extends AAdmin {
+public final class Kill extends Proc {
   /**
    * Default constructor.
    * @param user user to kill
    */
   public Kill(final String user) {
-    super(user);
+    super(User.ADMIN, user);
   }
 
   @Override

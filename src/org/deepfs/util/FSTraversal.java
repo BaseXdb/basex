@@ -8,7 +8,7 @@ import java.io.File;
  * #{@link FSWalker} descends into a directory hierarchy and notifies
  * registered visitors about the events assembled in this interface.
  *
- * @author Workgroup DBIS, University of Konstanz 2009, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Alexander Holupirek
  */
 public interface FSTraversal {

@@ -29,7 +29,7 @@ import org.basex.util.Tokenizer;
 /**
  * This view is a TreeMap implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Joerg Hauser
  * @author Bastian Lemke

@@ -16,7 +16,7 @@ import org.basex.util.TokenBuilder;
  * the database. A variety of hierarchical parsers (XPath, XQuery, etc..)
  * can be implemented on top of this class.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Progress {

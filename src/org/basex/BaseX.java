@@ -20,7 +20,7 @@ import org.basex.util.Token;
  * throughout the project.
  * Add the '-h' option to get a list on all available command-line arguments.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class BaseX extends Main {

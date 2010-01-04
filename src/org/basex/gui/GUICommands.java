@@ -56,7 +56,7 @@ import org.deepfs.util.LibraryLoader;
  * This enumeration encapsulates all commands that are triggered by
  * GUI operations.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public enum GUICommands implements GUICommand {

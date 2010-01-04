@@ -43,7 +43,7 @@ import org.basex.util.Token;
 /**
  * Dialog window for displaying information about the server.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class DialogServer extends Dialog {
@@ -396,7 +396,7 @@ public final class DialogServer extends Dialog {
     } catch(final IOException ex) {
       icon = Msg.ERR;
       msg = Main.server(ex);
-      if(msg.equals(Main.info(PERMNO, CmdPerm.values()[3]))) {
+      if(msg.equals(Main.info(PERMNO, CmdPerm.values()[4]))) {
         try {
           cs.execute(new Exit());
         } catch(final IOException e) {

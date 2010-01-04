@@ -13,12 +13,10 @@ import org.basex.util.TokenList;
 /**
  * This class organizes all users.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class Users extends ArrayList<User> {
-  /** Default permissions for new users. */
-  private static final int PERM = User.READ | User.WRITE;
   /** Filename; set to null for local user permissions. */
   private File file;
 
@@ -36,8 +34,7 @@ public final class Users extends ArrayList<User> {
           in.close();
         } else {
           // create initial admin user with all rights
-          add(new User(ADMIN, token(md5(ADMIN)),
-              User.READ | User.WRITE | User.CREATE | User.ADMIN));
+          add(new User(ADMIN, token(md5(ADMIN)), User.ADMIN));
           write();
         }
       } catch(final IOException ex) {
@@ -65,7 +62,7 @@ public final class Users extends ArrayList<User> {
     // check if user exists already
     if(get(usern) != null) return false;
 
-    final User user = new User(usern, token(md5(pass)), PERM);
+    final User user = new User(usern, token(md5(pass)), User.WRITE);
     add(user);
     write();
     return true;

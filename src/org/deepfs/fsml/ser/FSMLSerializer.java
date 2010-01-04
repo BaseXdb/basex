@@ -15,7 +15,8 @@ import org.deepfs.fsml.DeepFile.Content;
 
 /**
  * DeepFile Serializer. Serializes DeepFiles in XML.
- * @author Workgroup DBIS, University of Konstanz 2009, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Bastian Lemke
  */
 public final class FSMLSerializer {

@@ -11,7 +11,7 @@ import org.basex.util.Token;
 /**
  * Evaluates the 'delete' command and deletes a document from a collection.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Delete extends ACreate {

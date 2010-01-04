@@ -57,7 +57,7 @@ import org.deepfs.fs.DeepFS;
  * - Byte 12-15:  UNID: Unique Node ID
  * </pre>
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class Data {

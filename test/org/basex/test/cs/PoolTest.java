@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * This class tests transaction and locking cases.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class PoolTest {

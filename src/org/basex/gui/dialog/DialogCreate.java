@@ -25,7 +25,7 @@ import org.basex.util.StringList;
 /**
  * Dialog window for specifying options for creating a new database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class DialogCreate extends Dialog {

@@ -12,7 +12,6 @@ import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.DropUser;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.List;
-import org.basex.core.proc.Revoke;
 import org.basex.core.proc.ShowUsers;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
@@ -33,7 +32,7 @@ import org.basex.util.TokenList;
 /**
  * Panel for displaying information about global/local users.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class DialogUser extends BaseXBack {
@@ -162,16 +161,15 @@ public final class DialogUser extends BaseXBack {
 
       if(cmp instanceof Object[]) {
         final Object[] o = (Object[]) cmp;
-        final CmdPerm perm = CmdPerm.values()[((Integer) o[2]) - 1];
+        final boolean g = o[0] == Boolean.TRUE;
+        final CmdPerm perm = CmdPerm.values()[(Integer) o[2] - (g ? 0 : 1)];
         final String uname = table.getModel().getValueAt(
             (Integer) o[1], 0).toString();
 
-        final boolean grant = o[0] == Boolean.TRUE;
-        final boolean confirm = !grant && uname.equals(dia.loguser.getText());
+        final boolean confirm = !g && uname.equals(dia.loguser.getText());
         if(confirm && !Dialog.confirm(this, Main.info(DBREVOKE))) return;
 
-        ok = sess.execute(grant ? new Grant(perm, uname, db) :
-          new Revoke(perm, uname, db));
+        ok = sess.execute(new Grant(perm, uname, db));
         msg = sess.info();
         if(confirm) {
           if(perm == CmdPerm.ADMIN) {
@@ -220,14 +218,12 @@ public final class DialogUser extends BaseXBack {
         final String us = addUser.getSelectedItem().toString();
         for(int r = 0; r < users.contents.size(); r++) {
           if(!users.value(r, 0).equals(us)) continue;
-          for(int c = 1; c <= 2; c++) {
-            final String o = users.value(r, c);
-            final String right = CmdPerm.values()[c - 1].toString();
-            ok = sess.execute(o.equals("X") ? new Grant(right, us, db) :
-              new Revoke(right, us, db));
-            msg = sess.info();
-            if(!ok) break;
-          }
+          int c = 3;
+          while(--c >= 0 && users.value(r, c).isEmpty());
+          final String perm = CmdPerm.values()[c].toString();
+          ok = sess.execute(new Grant(perm, us, db));
+          msg = sess.info();
+          if(!ok) break;
         }
         setData();
         addUser.requestFocusInWindow();

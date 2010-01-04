@@ -5,7 +5,7 @@ import org.basex.data.Data.Type;
 /**
  * This class defines access to index tokens.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public interface IndexToken {

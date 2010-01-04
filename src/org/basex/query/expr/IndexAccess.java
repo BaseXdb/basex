@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This index class retrieves texts and attribute values from the index.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class IndexAccess extends Single {

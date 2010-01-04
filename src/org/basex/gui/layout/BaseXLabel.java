@@ -7,7 +7,7 @@ import org.basex.gui.GUIConstants.Msg;
 /**
  * Project specific Label implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class BaseXLabel extends JLabel {

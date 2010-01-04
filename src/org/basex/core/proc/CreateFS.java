@@ -14,7 +14,8 @@ import org.basex.io.PrintOutput;
 /**
  * Evaluates the 'create fs' command and creates a new filesystem mapping from
  * an existing file hierarchy.
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Alexander Holupirek
  * @author Bastian Lemke

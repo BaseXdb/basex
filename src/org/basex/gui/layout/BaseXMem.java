@@ -13,7 +13,7 @@ import org.basex.util.Performance;
 /**
  * This component visualizes the current memory consumption.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class BaseXMem extends BaseXPanel {

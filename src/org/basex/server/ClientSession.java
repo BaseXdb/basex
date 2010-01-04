@@ -33,7 +33,7 @@ import org.basex.util.Token;
  * command to the server.</li>
  * </ul>
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class ClientSession extends Session {

@@ -9,7 +9,7 @@ import org.w3c.dom.DOMException;
 /**
  * DOM - Character data implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class BXChar extends BXNode implements CharacterData {

@@ -6,7 +6,7 @@ import org.basex.util.Token;
  * This class indexes all the XML Tokens in a balanced binary tree.
  * The iterator returns all compressed pre values in a sorted manner.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Sebastian Gath
  */

@@ -18,7 +18,8 @@ import org.deepfs.fsml.util.ParserUtil;
 /**
  * Parser for Exif data. This is not a standalone parser. Only used for parsing
  * Exif data that is embedded in e.g. a TIFF file.
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Bastian Lemke
  */

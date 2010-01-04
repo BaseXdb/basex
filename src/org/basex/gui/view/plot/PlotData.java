@@ -13,7 +13,7 @@ import org.basex.util.TokenList;
 /**
  * An additional layer which prepares the data for the scatter plot.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
 public final class PlotData {

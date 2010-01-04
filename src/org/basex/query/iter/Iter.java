@@ -8,7 +8,7 @@ import org.basex.query.item.Seq;
 /**
  * Iterator interface.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class Iter {

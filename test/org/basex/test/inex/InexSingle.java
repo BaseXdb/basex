@@ -21,7 +21,7 @@ import org.basex.util.TokenBuilder;
 /**
  * Simple INEX Database test.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class InexSingle {

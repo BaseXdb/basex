@@ -12,7 +12,7 @@ import org.basex.util.Performance;
  * It sets up 3 clients with RW access to the database.
  * Database information will be shown before and after the clients have run.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
 public final class ServerExampleConcurrency {
@@ -139,7 +139,7 @@ public final class ServerExampleConcurrency {
    * Simulates a database client. In this example the client(s) share a
    * ClientSession in the static variable ({@link ServerExample#session}). The
    * query is scheduled to launch after max 500ms.
-   * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
    * @author BaseX Team
    *
    */

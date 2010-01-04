@@ -6,7 +6,7 @@ import java.util.Arrays;
  * This class provides convenience methods for handling arrays
  * and serves as an extension to the {@link Arrays} class of Java.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Array {

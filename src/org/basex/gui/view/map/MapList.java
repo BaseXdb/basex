@@ -9,7 +9,7 @@ import org.basex.util.Token;
 /**
  * Stores an integer array of pre values and their corresponding weights.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Joerg Hauser
  */
 final class MapList extends IntList {

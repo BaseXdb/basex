@@ -1,6 +1,8 @@
 package org.basex.core.proc;
 
 import org.basex.core.Main;
+import org.basex.core.Proc;
+import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.PrintOutput;
 import org.deepfs.fs.DeepFS;
@@ -9,17 +11,17 @@ import org.deepfs.util.LibraryLoader;
 /**
  * Evaluates the 'mount' command and mounts a DeepFS database as FUSE.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Alexander Holupirek
  */
-public final class Mount extends AAdmin {
+public final class Mount extends Proc {
   /**
    * Default constructor.
    * @param name name of database
    * @param mountpoint filesystem path
    */
   public Mount(final String name, final String mountpoint) {
-    super(name, mountpoint);
+    super(User.ADMIN, name, mountpoint);
   }
 
   @Override

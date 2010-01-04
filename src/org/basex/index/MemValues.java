@@ -9,7 +9,7 @@ import org.basex.util.Token;
  * This class provides a main-memory access to attribute values and
  * text contents.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class MemValues extends TokenSet implements Index {

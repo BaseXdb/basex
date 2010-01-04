@@ -29,7 +29,6 @@ import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 import org.basex.core.proc.Password;
-import org.basex.core.proc.Revoke;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.ShowUsers;
 import org.basex.core.proc.XQuery;
@@ -43,7 +42,7 @@ import org.junit.Test;
 /**
  * This class tests user permissions.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class PermissionTest {
@@ -86,7 +85,7 @@ public final class PermissionTest {
   public void noPermsNeeded() {
     ok(new CreateDB("<xml>This is a test</xml>", "test"), adminSession);
     ok(new Close(), adminSession);
-    ok(new Revoke("all", "test"), adminSession);
+    ok(new Grant("none", "test"), adminSession);
 
     ok(new Set(CmdSet.INFO, false), testSession);
     ok(new Password("test"), testSession);
@@ -115,7 +114,7 @@ public final class PermissionTest {
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
-    no(new Revoke("read", "test"), testSession);
+    no(new Grant("none", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
   }
 
@@ -144,7 +143,7 @@ public final class PermissionTest {
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
-    no(new Revoke("read", "test"), testSession);
+    no(new Grant("none", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
   }
 
@@ -158,11 +157,11 @@ public final class PermissionTest {
         " node $item as 'null'"), testSession);
     ok(new Optimize(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
-    ok(new CreateIndex(cmd), testSession);
+      ok(new CreateIndex(cmd), testSession);
     }
     ok(new InfoIndex(), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
-    ok(new DropIndex(cmd), testSession);
+      ok(new DropIndex(cmd), testSession);
     }
     no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
     no(new CreateFS("c:/test", "test"), testSession);
@@ -173,7 +172,7 @@ public final class PermissionTest {
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
-    no(new Revoke("read", "test"), testSession);
+    no(new Grant("none", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
   }
 
@@ -194,7 +193,7 @@ public final class PermissionTest {
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
-    no(new Revoke("read", "test"), testSession);
+    no(new Grant("none", "test"), testSession);
     no(new AlterUser("test", "test"), testSession);
   }
 
@@ -210,7 +209,7 @@ public final class PermissionTest {
     ok(new Export(".", export), testSession);
     ok(new ShowUsers(), testSession);
     ok(new Grant("admin", "test2"), testSession);
-    ok(new Revoke("admin", "test2"), testSession);
+    ok(new Grant("create", "test2"), testSession);
     ok(new AlterUser("test", "test"), testSession);
     ok(new DropUser("test2"), testSession);
     ok(new Close(), testSession);

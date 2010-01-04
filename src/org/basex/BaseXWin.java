@@ -18,7 +18,7 @@ import org.basex.io.IO;
 /**
  * This is the starter class for the graphical frontend.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class BaseXWin {

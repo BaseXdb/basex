@@ -14,7 +14,7 @@ import org.basex.util.Token;
 /**
  * Management of logging.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class Log {

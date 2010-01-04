@@ -5,9 +5,10 @@ import org.basex.core.proc.XQuery;
 
 /**
  * This class provides some examples for navigating and querying collections.
- * Querying is done via the {@link XQuery} Proc class.
+ * Querying is done via the {@link XQuery} class.
  * You may as well use the other query methods described in
  * {@link QueryExample}.
+ *
  * @author BaseXTeam
  */
 public final class CollectionExamplesQuery extends CollectionExamples {

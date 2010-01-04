@@ -13,7 +13,7 @@ import org.basex.server.Sessions;
  * It references the currently opened database. Moreover, it provides
  * references to the currently used, marked and copied node sets.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Context {
@@ -171,19 +171,14 @@ public final class Context {
   }
 
   /**
-   * Checks if the current user has the specified permissions.
-   * @param p requested permissions
-   * @param m optional meta data reference
-   * @return result of check (-1: ok, other: failure)
+   * Checks if the current user has the specified permission.
+   * @param p requested permission
+   * @param md optional meta data reference
+   * @return result of check
    */
-  public int perm(final int p, final MetaData m) {
-    int up = user.perm;
-    if(m != null) {
-      final User us = m.users.get(user.name);
-      if(us != null) up = up & ~(User.READ | User.WRITE) | us.perm;
-    }
-    int i = 4;
-    while(--i >= 0 && (1 << i & p) == 0 || (1 << i & up) != 0);
-    return i;
+  public boolean perm(final int p, final MetaData md) {
+    final User us = md == null || p == User.CREATE || p == User.ADMIN ? null :
+        md.users.get(user.name);
+    return (us == null ? user : us).perm(p);
   }
 }

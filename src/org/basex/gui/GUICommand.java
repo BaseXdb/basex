@@ -5,7 +5,7 @@ import javax.swing.AbstractButton;
 /**
  * This interface defines GUI command methods.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public interface GUICommand {

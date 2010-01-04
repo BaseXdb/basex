@@ -6,7 +6,7 @@ import org.basex.core.Main;
 /**
  * This is a simple container for native int values.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class IntList {

@@ -13,7 +13,7 @@ import org.basex.query.util.Err;
  * Iterative path expression for location paths which return sorted and
  * duplicate-free results.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Dennis Stratmann
  * @author Christian Gruen
  */

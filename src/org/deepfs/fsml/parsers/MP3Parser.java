@@ -25,7 +25,7 @@ import org.deepfs.fsml.util.ParserUtil;
  * <li>extended tag (before ID3v1 tag)</li>
  * </ul>
  * </p>
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Alexander Holupirek
  * @author Bastian Lemke
  * @see <a href="http://www.id3.org/id3v2.4.0-structure">ID3v2.4.0 structure</a>

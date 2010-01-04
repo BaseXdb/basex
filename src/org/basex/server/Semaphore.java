@@ -8,7 +8,7 @@ import org.basex.core.User;
 /**
  * Management of executing read/write processes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class Semaphore {

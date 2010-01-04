@@ -9,7 +9,7 @@ import org.basex.gui.dialog.Dialog;
 /**
  * Project specific password field implementation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class BaseXPassword extends JPasswordField {

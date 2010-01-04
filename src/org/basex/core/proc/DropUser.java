@@ -3,6 +3,7 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
+import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
@@ -13,10 +14,10 @@ import org.basex.server.ServerProcess;
 /**
  * Evaluates the 'drop user' command and drops a user.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class DropUser extends AAdmin {
+public final class DropUser extends Proc {
   /**
    * Default constructor.
    * @param name name of user
@@ -31,7 +32,7 @@ public final class DropUser extends AAdmin {
    * @param db database
    */
   public DropUser(final String name, final String db) {
-    super(name, db);
+    super(User.ADMIN, name, db);
   }
 
   @Override

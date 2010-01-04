@@ -31,7 +31,7 @@ import org.basex.io.IO;
 /**
  * This view allows the input and evaluation of XQuery queries.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class XQueryView extends View {

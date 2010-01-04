@@ -3,25 +3,27 @@ package org.basex.core;
 /**
  * This class contains information on a single user.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class User {
-  /** Flag for read permissions. */
+  /** No permissions. */
+  public static final int NONE = 0;
+  /** Read permission (local+global). */
   public static final int READ = 1;
-  /** Flag for write permissions. */
+  /** Write permission (local+global). */
   public static final int WRITE = 2;
-  /** Flag for create permissions. Only used for global permissions. */
+  /** Create permission (global). */
   public static final int CREATE = 4;
-  /** Flag for admin permissions. Only used for global permissions. */
+  /** Admin permission (global). */
   public static final int ADMIN = 8;
 
   /** User name. */
-  public String name;
+  public final String name;
   /** Password. */
   public byte[] pw;
   /** Permission. */
-  int perm;
+  public int perm;
 
   /**
    * Constructor.
@@ -41,24 +43,14 @@ public final class User {
    * @return result of check
    */
   public boolean perm(final int flag) {
-    return (perm & flag) != 0;
+    return perm >= flag;
   }
 
   /**
-   * Changes the permission flag.
-   * @param set set/remove flag
-   * @param p permission to be set/removed
-   */
-  public void perm(final boolean set, final int p) {
-    if(set) perm |= p;
-    else perm &= ~p;
-  }
-
-  /**
-   * Returns a copy of this user.
+   * Returns a local copy of this user.
    * @return user copy
    */
   public User copy() {
-    return new User(name, pw, perm);
+    return new User(name, pw, Math.min(perm, WRITE));
   }
 }

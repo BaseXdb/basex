@@ -12,7 +12,8 @@ import org.deepfs.fsml.ParserRegistry;
 
 /**
  * Text parser that tries to extract textual content from files.
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Bastian Lemke
  */
 public final class TXTParser implements IFileParser {

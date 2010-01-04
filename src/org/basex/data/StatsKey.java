@@ -10,7 +10,7 @@ import org.basex.util.TokenSet;
  * This class provides statistics for a tag or attribute name
  * and its contents.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class StatsKey {

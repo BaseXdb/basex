@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
  * implementations. It evaluates queries that are sent by the GUI, the client or
  * the standalone version.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class Proc extends Progress {
@@ -92,8 +92,13 @@ public abstract class Proc extends Progress {
     final Data data = context.data;
     if(data == null && (flags & DATAREF) != 0) return error(PROCNODB);
     // check permissions
-    final int i = context.perm(flags & 0xFF, data != null ? data.meta : null);
-    if(i != -1) return error(PERMNO, CmdPerm.values()[i]);
+    if(!context.perm(flags & 0xFF, data != null ? data.meta : null)) {
+      final CmdPerm[] perms = CmdPerm.values();
+      int i = perms.length;
+      final int f = flags & 0xFF;
+      while(--i >= 0 && (1 << i & f) == 0);
+      return error(PERMNO, perms[i]);
+    }
 
     boolean ok = false;
     try {

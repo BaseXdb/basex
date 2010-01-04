@@ -23,6 +23,7 @@ import org.basex.util.Token;
 
 /**
  * This class offers a real tree view.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller
  */

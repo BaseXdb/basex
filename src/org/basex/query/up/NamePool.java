@@ -10,7 +10,7 @@ import org.basex.util.Atts;
 /**
  * This class serves as a container for updated names.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class NamePool {

@@ -26,7 +26,7 @@ import org.basex.io.PrintOutput;
 /**
  * Evaluates the 'create db' command and creates a new database.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class CreateDB extends ACreate {
@@ -79,7 +79,7 @@ public final class CreateDB extends ACreate {
       throws IOException {
 
     if(!ctx.user.perm(User.CREATE))
-      throw new IOException(Main.info(PERMNO, CmdPerm.READ));
+      throw new IOException(Main.info(PERMNO, CmdPerm.CREATE));
     if(!io.exists()) throw new BuildException(FILEWHICH, io);
     return xml(ctx, new DirParser(io, ctx.prop), name);
   }

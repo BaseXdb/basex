@@ -11,7 +11,7 @@ import org.basex.io.IO;
 /**
  * This class provides data for merging temporary value indexes.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class ValueMerge {

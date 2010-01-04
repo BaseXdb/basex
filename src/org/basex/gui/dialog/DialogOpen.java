@@ -30,7 +30,7 @@ import org.basex.util.Token;
 /**
  * Open database dialog.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class DialogOpen extends Dialog {
@@ -41,7 +41,7 @@ public final class DialogOpen extends Dialog {
   /** Information panel. */
   private final BaseXText detail;
   /** Buttons. */
-  private BaseXBack buttons;
+  private final BaseXBack buttons;
   /** Rename button. */
   private final Object rename;
   /** Drop button. */

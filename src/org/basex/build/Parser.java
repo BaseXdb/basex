@@ -12,7 +12,7 @@ import org.basex.util.Atts;
 /**
  * This class defines a parser for creating databases from various sources.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class Parser extends Progress {

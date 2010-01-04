@@ -15,7 +15,7 @@ import org.basex.util.Token;
 /**
  * This is an cache for images which have been retrieved from the file system.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 final class MapFSImages extends Thread {

@@ -7,7 +7,7 @@ import org.xml.sax.InputSource;
 /**
  * URL reference, wrapped into an IO representation.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class IOUrl extends IO {

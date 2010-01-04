@@ -22,7 +22,7 @@ import org.basex.util.Token;
  * This class loads language specific texts when the {@link #lang}
  * method is called for the first time.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Andreas Weiler
  */

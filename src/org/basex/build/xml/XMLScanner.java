@@ -19,7 +19,7 @@ import org.basex.util.TokenMap;
 /**
  * This class scans an XML document and creates atomic tokens.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  * @author Andreas Weiler
  */
