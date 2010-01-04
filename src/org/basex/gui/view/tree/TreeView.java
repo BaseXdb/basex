@@ -244,7 +244,7 @@ public final class TreeView extends View implements TreeViewOptions {
    */
   private void markSelektedNodes(final Graphics g) {
 
-    // TODO
+    // [WM]
 
     final int x = selectRect.w < 0 ? selectRect.x + selectRect.w : selectRect.x;
     final int y = selectRect.h < 0 ? selectRect.y + selectRect.h : selectRect.y;
@@ -438,7 +438,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
         if(cache.isBigRectangle(rn, lv)) {
           // final TreeRect mPreRect = rList[0];
-          // TODO [W M] mPreRect.pre = par;
+          // [WM] mPreRect.pre = par;
 
           // highlightNode(g, mPreRect, lv, multiPreX == -1 ? (2 * r.x + r.w) /
           // 2
@@ -467,7 +467,7 @@ public final class TreeView extends View implements TreeViewOptions {
       // TreeBorder[] sBo = cache.generateSubtreeBorders(d, pre);
 
       if(cache.isBigRectangle(rn, l + 1)) {
-        // TODO [WM]
+        // [WM]
         // TreeRect cRect = rList.get(0);
         //
         // int firstChildPre = chIt.pre;
@@ -737,7 +737,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(data.meta.deepfs) {
 
-      // TODO [WM]
+      // [WM]
       if(data.fs.isFile(pre)) s = Token.string(data.fs.name(pre));
       else s = "hi";
 

@@ -587,7 +587,7 @@ final class MapRenderer {
           l = 0;
           for(int n = 0; n < tok.length; n += cl(tok[n]))
             l += BaseXLayout.width(g, cw, cp(tok, n));
-          if(si > i && ll + l + sp >= w / 2) break;
+          if(si > i && ll + l + sp >= w / 2d) break;
           ll += l + sp;
 
           tl.add(tok);

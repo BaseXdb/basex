@@ -36,7 +36,7 @@ final class MapFS extends MapPainter {
   /** Image cache. */
   private static MapFSImages images;
   /** Data FS reference. */
-  private static DeepFS fs;
+  private DeepFS fs;
   /** Flag for error message. */
   private boolean error;
 

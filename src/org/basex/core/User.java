@@ -8,15 +8,15 @@ package org.basex.core;
  */
 public final class User {
   /** No permissions. */
-  public static final int NONE = 0;
+  public static final byte NONE = 0;
   /** Read permission (local+global). */
-  public static final int READ = 1;
+  public static final byte READ = 1;
   /** Write permission (local+global). */
-  public static final int WRITE = 2;
+  public static final byte WRITE = 2;
   /** Create permission (global). */
-  public static final int CREATE = 4;
+  public static final byte CREATE = 4;
   /** Admin permission (global). */
-  public static final int ADMIN = 8;
+  public static final byte ADMIN = 8;
 
   /** User name. */
   public final String name;

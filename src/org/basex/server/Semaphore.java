@@ -97,9 +97,7 @@ public final class Semaphore {
   private synchronized void notifyWriter() {
     if(waitingW.size() > 0) {
       final Object eldest = waitingW.remove(0);
-      synchronized(eldest) {
-        eldest.notify();
-      }
+      synchronized(eldest) { eldest.notify(); }
       activeW = true;
     }
   }

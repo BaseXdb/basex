@@ -226,7 +226,7 @@ public class QueryParser extends InputParser {
       for(final byte e : enc) v &= ftChar(e) || e == '-';
       if(!v) error(XQUERYENC2, enc);
     }
-    ctx.encoding = enc;
+    //ctx.encoding = enc;
     skipWS();
     check(';');
     if(!ver.equals(ONEZERO)) error(XQUERYVER, ver);

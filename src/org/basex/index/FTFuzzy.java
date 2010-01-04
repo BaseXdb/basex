@@ -189,7 +189,7 @@ public final class FTFuzzy extends FTIndex {
     if(ctl == tp.length) return EMPTY;
 
     final byte[] tok = ti.readBytes(ptok, ptok + ctl);
-    // [SG] never read?
+    // [SG] pftd is never read?..
     pftd = ti.read5(ti.pos());
     fts = ti.read4();
     // [SG] safe cast to int?

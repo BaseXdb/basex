@@ -43,16 +43,17 @@ import org.deepfs.fs.DeepFS;
  * @author Lukas Kircher
  */
 public final class PlotView extends View {
+  /** Whitespace between captions. */
+  static final int CAPTIONWHITESPACE = 10;
   /** Rotate factor. */
   private static final double ROTATE = Math.sin(30);
   /** Plot margin: top, left, bottom, right margin. */
   private static final int[] MARGIN = new int[4];
-  /** Whitespace between captions. */
-  static final int CAPTIONWHITESPACE = 10;
   /** Maximum length of axis caption text. */
-  private final int maxL = 11;
-  /** Position where overlength text is cut off. */
-  private final int cutOff = 10;
+  private static final int MAXL = 11;
+  /** Position where over-length text is cut off. */
+  private static final int CUTOFF = 10;
+
   /** Data reference. */
   PlotData plotData;
   /** Item image. */
@@ -709,7 +710,7 @@ public final class PlotView extends View {
       final String caption, final double d) {
     String cap = caption;
     // if label is too long, it is is chopped to the first characters
-    if(cap.length() > maxL) cap = cap.substring(0, cutOff) + "..";
+    if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";
 
     final int pos = calcCoordinate(drawX, d);
     final int h = getHeight();
@@ -779,7 +780,7 @@ public final class PlotView extends View {
     g.setColor(back);
 
     if(cap != null) {
-      if(cap.length() > maxL) cap = cap.substring(0, cutOff) + "..";
+      if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";
       final int textH = g.getFontMetrics().getHeight();
       final int imgW = BaseXLayout.width(g, cap) + fs;
       final BufferedImage img = createCaptionImage(g, cap, true, imgW);

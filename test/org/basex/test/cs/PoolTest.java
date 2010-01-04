@@ -22,13 +22,13 @@ import org.junit.Test;
  * @author Andreas Weiler
  */
 public final class PoolTest {
-  /** Server reference. */
-  static BaseXServer server;
-
   /** Test file. */
   private static final String FILE = "input.xml";
   /** Test name. */
   private static final String NAME = "input";
+
+  /** Server reference. */
+  static BaseXServer server;
   /** Socket reference. */
   static Session session1;
   /** Socket reference. */

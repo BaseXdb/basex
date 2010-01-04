@@ -19,7 +19,6 @@ public final class ServerExampleConcurrency {
   /** The Client Session to talk to the server. */
   protected static ClientSession session;
 
-
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
@@ -110,7 +109,6 @@ public final class ServerExampleConcurrency {
 
     // Stop server instance.
     new BaseXServer("stop");
-
   }
 
   /**
@@ -125,6 +123,7 @@ public final class ServerExampleConcurrency {
     OutputStream out = verbose ? System.out : new BufferedOutput(System.out);
     session.execute(cmd, out);
   }
+
   /**
    * Processes the specified command on the server and returns the output
    * or command info verbosely by default.
@@ -139,12 +138,8 @@ public final class ServerExampleConcurrency {
    * Simulates a database client. In this example the client(s) share a
    * ClientSession in the static variable ({@link ServerExample#session}). The
    * query is scheduled to launch after max 500ms.
-   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
-   * @author BaseX Team
-   *
    */
-  public class Client implements Runnable {
-
+  public final class Client implements Runnable {
     /** Set to false to stop the Client from running.*/
     private boolean running = true;
 
@@ -182,6 +177,7 @@ public final class ServerExampleConcurrency {
       this.verbose = v;
       new Thread(this).start();
     }
+
     /**
      * Quits the Client thread.
      */

@@ -210,7 +210,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param sw screen width
    */
   private void generateRects(final Graphics g, final int rn, final Data d,
-      final TreeBorder[] bo, final int sw) {
+      final TreeBorder[] bo, final double sw) {
 
     final int h = bo.length;
     rects[rn] = new TreeRect[h][];

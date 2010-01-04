@@ -46,14 +46,14 @@ import org.junit.Test;
  * @author Andreas Weiler
  */
 public final class PermissionTest {
+  /** Export file. */
+  private static final String EXPORT = "export.xml";
   /** Server reference. */
   static BaseXServer server;
   /** Socket reference. */
   static Session adminSession;
   /** Socket reference. */
   static Session testSession;
-  /** Export file. */
-  final String export = "export.xml";
 
   /** Starts the server. */
   @BeforeClass
@@ -139,7 +139,7 @@ public final class PermissionTest {
     no(new DropIndex("SUMMARY"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export(".", export), testSession);
+    no(new Export(".", EXPORT), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
@@ -168,7 +168,7 @@ public final class PermissionTest {
     no(new DropDB("test"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export(".", export), testSession);
+    no(new Export(".", EXPORT), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
@@ -189,7 +189,7 @@ public final class PermissionTest {
     ok(new DropDB("test"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export(".", export), testSession);
+    no(new Export(".", EXPORT), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
@@ -206,7 +206,7 @@ public final class PermissionTest {
     }
     ok(new CreateUser("test2", "test"), testSession);
     ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
-    ok(new Export(".", export), testSession);
+    ok(new Export(".", EXPORT), testSession);
     ok(new ShowUsers(), testSession);
     ok(new Grant("admin", "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);

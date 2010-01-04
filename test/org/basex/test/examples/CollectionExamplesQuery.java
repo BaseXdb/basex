@@ -34,7 +34,6 @@ public final class CollectionExamplesQuery extends CollectionExamples {
     try {
       queryExamples.findFiles();
     } catch(final BaseXException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
     queryExamples.cleanup();

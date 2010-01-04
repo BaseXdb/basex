@@ -136,7 +136,7 @@ public final class QueryExample {
 
   /**
    * This method throws an BaseXException.
-   * @throws BaseXException in case your *TODO*
+   * @throws BaseXException in case your command was not successful
    */
   @SuppressWarnings("unused")
   private void errorExample() throws BaseXException {
@@ -200,7 +200,7 @@ public final class QueryExample {
   }
 
   /**
-   * Use XQuery update to .... *TODO* [MSe]
+   * [MS] Use XQuery update to ....
    * @throws BaseXException in case contains errors.
    */
   private void updateExample() throws BaseXException {

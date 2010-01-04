@@ -335,7 +335,7 @@ public final class DialogServer extends Dialog {
       } else if(cmp == stop) {
         if(running) BaseXServer.stop(gui.context);
         running = ping(true);
-        connected &= ping(false);
+        connected = connected && ping(false);
         if(!connected) msg = SERVERSTOPPED;
         if(host.getText().equals("localhost")) logpass.setText("");
         if(!connected) super.setTitle(GUISERVER);

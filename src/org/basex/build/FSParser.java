@@ -57,7 +57,7 @@ public final class FSParser extends Progress {
    * Used to stop the importer.
    * @author Bastian Lemke
    */
-  private class FSImporterProgress implements FSTraversal {
+  private static class FSImporterProgress implements FSTraversal {
     /** The progress. */
     final Progress p;
 

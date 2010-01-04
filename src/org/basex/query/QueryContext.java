@@ -126,8 +126,6 @@ public final class QueryContext extends Progress {
   public boolean construct;
   /** Revalidation Mode. */
   public int revalidate;
-  /** Default encoding. */
-  byte[] encoding = token(Prop.ENCODING);
 
   /** String container for query background information. */
   final TokenBuilder info = new TokenBuilder();

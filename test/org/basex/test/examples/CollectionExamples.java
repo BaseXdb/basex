@@ -105,11 +105,9 @@ public class CollectionExamples {
     if(verbose) try {
       new InfoDB().exec(CONTEXT, out);
     } catch(final BaseXException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
-
 
   /**
    * This command removes a single document from your collection.
@@ -128,10 +126,7 @@ public class CollectionExamples {
      try {
       new InfoDB().exec(CONTEXT, out);
     } catch(final BaseXException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
-
   }
-
 }
