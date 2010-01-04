@@ -1,8 +1,0 @@
-<?xml version="1.0"?>
-<!-- Here is a sample XML file -->
-<page>
-  <title>Test Page</title>
-  <content>
-    <paragraph>What you see is what you get!</paragraph>
-  </content>
-</page>
