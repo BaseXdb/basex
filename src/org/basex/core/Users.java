@@ -94,18 +94,6 @@ public final class Users extends ArrayList<User> {
   }
 
   /**
-   * Returns a user reference if the name/password combination is correct.
-   * @param usern user name
-   * @param pw password
-   * @return success of operation
-   */
-  public User get(final String usern, final String pw) {
-    final User u = get(usern);
-    return u != null && (eq(token(pw), u.pw) || eq(token(md5(pw)), u.pw)) ?
-        u : null;
-  }
-
-  /**
    * Returns a user reference with the specified name.
    * @param usern user name
    * @return success of operation

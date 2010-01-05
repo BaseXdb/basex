@@ -135,8 +135,6 @@ public interface Text {
   /** Command help. */
   String PW = "password";
   /** Command help. */
-  String FROM = "FROM";
-  /** Command help. */
   String TO = "TO";
   /** Command help. */
   String ON = "ON";

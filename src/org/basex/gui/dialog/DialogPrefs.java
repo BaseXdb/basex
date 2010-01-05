@@ -128,7 +128,7 @@ public final class DialogPrefs extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    creds.setText("Translated by " + creds(lang.getSelectedItem().toString()));
+    creds.setText("Translation: " + creds(lang.getSelectedItem().toString()));
     gui.notify.layout();
   }
 

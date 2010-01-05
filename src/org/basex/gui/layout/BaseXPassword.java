@@ -14,7 +14,7 @@ import org.basex.gui.dialog.Dialog;
  */
 public class BaseXPassword extends JPasswordField {
   /** Default width of text fields. */
-  public static final int DWIDTH = 240;
+  public static final int DWIDTH = 260;
 
   /**
    * Constructor.
