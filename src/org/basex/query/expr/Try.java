@@ -34,7 +34,7 @@ public final class Try extends Single {
       ctch[c] = ((Catch) checkUp(ctch[c], ctx)).comp(ctx);
     }
     checkUp(expr, ctx);
-    return super.comp(ctx);
+    return this;
   }
 
   @Override
