@@ -24,7 +24,6 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
-import org.deepfs.fs.DeepFS;
 
 /**
  * Project specific functions.
@@ -131,8 +130,9 @@ public final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Item fspath(final QueryContext ctx) throws QueryException {
-    final DeepFS fs = ctx.data().fs;
-    if(fs == null) return Str.ZERO;
+    final Data data = ctx.data();
+    if(data == null || data.fs == null) return Str.ZERO;
+
     final Iter iter = ctx.iter(expr[0]);
     Item it;
     final TokenBuilder tb = new TokenBuilder();
@@ -140,7 +140,7 @@ public final class FNBaseX extends Fun {
     while((it = iter.next()) != null) {
       if(first) first = false;
       else tb.add('\n');
-      tb.add(fs.path(((DBNode) it.atomic(ctx)).pre, false));
+      tb.add(data.fs.path(((DBNode) it.atomic(ctx)).pre, false));
     }
     return tb.size() == 0 ? Str.ZERO : Str.get(tb.finish());
   }

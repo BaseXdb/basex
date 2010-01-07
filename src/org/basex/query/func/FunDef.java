@@ -289,7 +289,7 @@ public enum FunDef {
   /** Project specific function - evaluates the specified query. */
   EVAL(BXURI, FNBaseX.class, 1, 1, "eval(string)", SEQ),
   /** Project specific function - returns a random number. */
-  RANDOM(BXURI, FNBaseX.class, 1, 1, "random()", NUM),
+  RANDOM(BXURI, FNBaseX.class, 0, 0, "random()", NUM),
   /** Project specific function - accesses an index. */
   INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", BLN),
   /** Project specific function - opens and returns file contents. */

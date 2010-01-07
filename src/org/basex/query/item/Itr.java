@@ -1,6 +1,5 @@
 package org.basex.query.item;
 
-import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
@@ -38,6 +37,15 @@ public class Itr extends Item {
   public Itr(final long v, final Type t) {
     super(t);
     val = v;
+  }
+
+  /**
+   * Constructor.
+   * @param d date time
+   */
+  public Itr(final Date d) {
+    this(0, Type.LNG);
+    val = d.xc.toGregorianCalendar().getTimeInMillis();
   }
 
   /**
@@ -123,7 +131,7 @@ public class Itr extends Item {
    */
   static long parse(final byte[] val) throws QueryException {
     try {
-      final String v = string(trim(val));
+      final String v = Token.string(Token.trim(val));
       return Long.parseLong(v.startsWith("+") ? v.substring(1) : v);
     } catch(final NumberFormatException ex) {
       ZERO.castErr(val);

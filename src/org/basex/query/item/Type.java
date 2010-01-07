@@ -256,7 +256,7 @@ public enum Type {
   LNG("long", ITR, XSURI, true, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+      return it instanceof Date ? new Itr((Date) it) : e(it);
     }
     @Override
     public Itr e(final Object o) throws QueryException {
