@@ -46,7 +46,6 @@ public final class DBExample {
 
     // Runs some example Queries
     QueryExample.main(args);
-
   }
 
   /**
@@ -75,7 +74,7 @@ public final class DBExample {
     static OutputStream out = System.out;
 
     /**
-     * Runs the exmaples.
+     * Runs the examples.
      * @throws Exception on error.
      */
     static void run() throws Exception {
