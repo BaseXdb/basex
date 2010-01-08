@@ -98,8 +98,8 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     if(content == null) {
       try {
         // serialize and cache content
-        final CachedOutput out = new CachedOutput();
-        final XMLSerializer xml = new XMLSerializer(out, false, false);
+        final CachedOutput co = new CachedOutput();
+        final XMLSerializer xml = new XMLSerializer(co, false, false);
         if(data != null) {
           new DBNode(data, pre).serialize(xml);
         } else if(result != null) {
@@ -107,7 +107,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         } else {
           return null;
         }
-        content = out.finish();
+        content = co.finish();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
       }
@@ -184,7 +184,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     /** HashMap. */
     final HashMap<String, String> ns = new HashMap<String, String>();
     /** Cached output. */
-    final CachedOutput out = new CachedOutput();
+    final CachedOutput co = new CachedOutput();
     /** Serializer. */
     final XMLSerializer xml;
     /** XMLResource. */
@@ -196,7 +196,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
      * @throws IOException I/O exception
      */
     BXSAXContentHandler(final BXXMLResource r) throws IOException {
-      xml = new XMLSerializer(out, false, false);
+      xml = new XMLSerializer(co, false, false);
       res = r;
     }
 
@@ -214,7 +214,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
     @Override
     public void endDocument() {
-      res.content = out.finish();
+      res.content = co.finish();
     }
 
     @Override

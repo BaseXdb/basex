@@ -180,9 +180,9 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     if(it != null && !next) throw new BXQException(TWICE);
     if(!next && !next()) return "";
 
-    final CachedOutput out = new CachedOutput();
+    final CachedOutput co = new CachedOutput();
     try {
-      final XMLSerializer xml = new XMLSerializer(out);
+      final XMLSerializer xml = new XMLSerializer(co);
       do {
         final BXQItem item = item();
         item.serialize(item.it, qctx, xml);
@@ -191,7 +191,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
-    return out.toString();
+    return co.toString();
   }
 
   public short getShort() throws XQException {

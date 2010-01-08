@@ -53,18 +53,18 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
   }
 
   public Resource getMembersAsResource() throws XMLDBException {
-    final CachedOutput out = new CachedOutput();
+    final CachedOutput co = new CachedOutput();
     try {
-      final XMLSerializer xml = new XMLSerializer(out);
+      final XMLSerializer xml = new XMLSerializer(co);
       for(final Resource r : getIterator()) {
         xml.openResult();
-        out.print(r.getContent().toString());
+        co.print(r.getContent().toString());
         xml.closeResult();
       }
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
-    return new BXXMLResource(out.finish(), coll);
+    return new BXXMLResource(co.finish(), coll);
   }
 
   public long getSize() {

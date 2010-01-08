@@ -19,7 +19,6 @@ import org.basex.core.Main;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
@@ -202,9 +201,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
    */
   private void serialize(final OutputStream os) throws XQException {
     try {
-      final PrintOutput out = new PrintOutput(os);
-      serialize(it, qctx, new XMLSerializer(out));
-      out.close();
+      serialize(it, qctx, new XMLSerializer(os));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -218,11 +215,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   private String serialize() throws XQException {
     opened();
     final CachedOutput co = new CachedOutput();
-    try {
-      serialize(it, qctx, new XMLSerializer(co));
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
-    }
+    serialize(co);
     return co.toString();
   }
 

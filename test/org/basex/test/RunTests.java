@@ -63,8 +63,8 @@ public final class RunTests {
     Main.outln();
 
     Main.outln("Additionally run the remaining JUnit tests.");
-    new DropDB(XMLDBCreate.COLL).execute(ctx);
-    new DropDB("input").execute(ctx);
+    new DropDB(XMLDBCreate.COLL).exec(ctx);
+    new DropDB("input").exec(ctx);
     ctx.close();
   }
 }
