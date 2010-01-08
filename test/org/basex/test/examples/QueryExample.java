@@ -28,10 +28,6 @@ public final class QueryExample {
   /** The query to evaluate. */
   private static final String QUERY = "for $x in //body//li return $x";
 
-  /** insert a node into the last li Element. */
-  private static final String UPDATE = "insert node <b>I am new</b>" +
-    " into /html/body//li[position()=last()]";
-
   /**
    * PrintOutput Context. Point the PrintOutput to whatever file you like to
    * store the serializing results in a file. You may as well point it to
@@ -104,20 +100,16 @@ public final class QueryExample {
     } catch(final QueryException e) {
       System.err.println(e.getMessage());
     }
-    try {
-      updateExample();
-    }catch(final BaseXException e) {
-      System.err.println(e.getMessage());
-    }
-    // -------------------------------------------------------------------------
-    // Close the serializer and the PrintOutput stream
-    xmlSer.close();
-    out.close();
 
     // -------------------------------------------------------------------------
     // Close and drop the Database.
     new Close().execute(CONTEXT);
     new DropDB("Example1");
+
+    // -------------------------------------------------------------------------
+    // Close the serializer and the PrintOutput stream
+    xmlSer.close();
+    out.close();
 
   }
 
@@ -198,23 +190,4 @@ public final class QueryExample {
     processor.close();
 
   }
-
-  /**
-   * [MS] Use XQuery update to ....
-   * @throws BaseXException in case contains errors.
-   */
-  private void updateExample() throws BaseXException {
-
-    System.out.print("\n\n=== Updating the instance.");
-    new XQuery(UPDATE).exec(CONTEXT, System.out);
-
-    // -------------------------------------------------------------------------
-    // Show the newly inserted node.
-    System.out.println("\n=>> Update result:.");
-    new XQuery(QUERY).exec(CONTEXT, System.out);
-  }
-
-
-
-
 }
