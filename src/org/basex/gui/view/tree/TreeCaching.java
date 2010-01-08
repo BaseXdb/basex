@@ -97,9 +97,9 @@ public class TreeCaching implements TreeViewOptions {
       while(iterator.more()) {
         final int pre = iterator.next();
 
-        if(data.kind(pre) == Data.ELEM || !ONLY_ELEMENT_NODES) {
-          temp.add(pre);
-        }
+        // if(data.kind(pre) == Data.ELEM || !ONLY_ELEMENT_NODES) {
+        temp.add(pre);
+        // }
       }
     }
     return temp.finish();
@@ -134,7 +134,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param c context
    * @param sw screen width
    */
-  void generateBordersAndRects(final Graphics g,
+  void generateBordersAndRects(final Graphics g, 
       final Context c, final int sw) {
 
     final Data d = c.current.data;
@@ -172,6 +172,8 @@ public class TreeCaching implements TreeViewOptions {
 
     // level pair
     bo[rl] = new TreeBorder(rl, ri, 1);
+
+    // System.out.println("rootl: " + rl);
 
     int np = pre + d.size(pre, d.kind(pre));
     int h = 1;
@@ -341,7 +343,7 @@ public class TreeCaching implements TreeViewOptions {
    */
   int getPreIndex(final int rn, final int lv, final int pre) {
     final TreeBorder bo = getTreeBorder(rn, lv);
-    return searchPreIndex(bo.level, pre, pre, bo.start, bo.size) - bo.start;
+    return searchPreIndex(bo.level, pre, pre, bo.start, bo.size - 1) - bo.start;
   }
 
   /**
@@ -407,6 +409,9 @@ public class TreeCaching implements TreeViewOptions {
     final TreeBorder bo = getTreeBorder(rn, lv);
 
     int i = searchPreArrayPos(bo.level, pre);
+
+    // System.out.println("i " + i + " b " + (i - bo.start) + " l " +
+    // rects[rn][lv].length);
 
     return i == -1 ? null : rects[rn][lv][i - bo.start];
   }
