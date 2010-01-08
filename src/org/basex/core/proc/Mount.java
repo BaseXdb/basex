@@ -29,8 +29,8 @@ public final class Mount extends Proc {
     final String db = args[0];
     final String mp = args[1];
 
-    new Close().execute(context, out);
-    new Open(db).execute(context, out);
+    new Close().exec(context);
+    new Open(db).exec(context);
 
     final Data data = context.data;
     if(data.fs == null) return error("No DeepFS instance");

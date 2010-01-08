@@ -145,14 +145,10 @@ public final class TextView extends View implements ActionListener {
     ns = n;
     if(!visible()) return;
     try {
-      final CachedOutput out = new CachedOutput(
+      final CachedOutput co = new CachedOutput(
           gui.context.prop.num(Prop.MAXTEXT));
-      if(n != null) {
-        final XMLSerializer xml = new XMLSerializer(out);
-        n.serialize(xml);
-        xml.close();
-      }
-      setText(out, null);
+      if(n != null) n.serialize(new XMLSerializer(co));
+      setText(co, null);
       refresh = false;
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -161,15 +157,15 @@ public final class TextView extends View implements ActionListener {
 
   /**
    * Sets the output text.
-   * @param out output cache
+   * @param co cached output
    * @param p process
    */
-  public void setText(final CachedOutput out, final Proc p) {
-    area.setText(out.buffer(), out.size());
-    header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
+  public void setText(final CachedOutput co, final Proc p) {
+    area.setText(co.buffer(), co.size());
+    header.setText(TEXTTIT + (co.finished() ? RESULTCHOP : ""));
     home.setEnabled(gui.context.data != null);
     refresh = true;
-    if(!out.finished()) {
+    if(!co.finished()) {
       proc = null;
       ns = null;
     } else {
@@ -187,7 +183,7 @@ public final class TextView extends View implements ActionListener {
     try {
       final PrintOutput out = new PrintOutput(file.toString());
       if(proc != null) {
-        proc.execute(gui.context, out);
+        proc.exec(gui.context, out);
       } else if(ns != null) {
         ns.serialize(new XMLSerializer(out));
       } else {

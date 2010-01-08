@@ -30,17 +30,18 @@ public final class CollectionExamplesQuery extends CollectionExamples {
   public static void main(final String[] args) {
     final CollectionExamplesQuery queryExamples = new CollectionExamplesQuery();
 
-    System.out.println("=== Silently create a collection.");
-    queryExamples.createColl(false);
     try {
+      System.out.println("=== Silently create a collection.");
+      queryExamples.createColl(false);
       queryExamples.findFiles();
+      queryExamples.cleanup();
     } catch(final BaseXException e) {
       e.printStackTrace();
     }
-    queryExamples.cleanup();
   }
+
   /**
-   * This method exexcutes an XQuery Process for the given database context. The
+   * This method executes an XQuery Process for the given database context. The
    * results are automatically serialized and printed to an arbitrary
    * OutputStream.
    * @throws BaseXException in case your query contains errors.
@@ -48,11 +49,11 @@ public final class CollectionExamplesQuery extends CollectionExamples {
   private void findFiles() throws BaseXException {
     System.out.println("\n=== II Evaluating queries.");
     System.out.println("===== Find all files in collection:");
-    new XQuery(FIND_FILE_QUERY).exec(CONTEXT, System.out);
+    new XQuery(FIND_FILE_QUERY).execute(CONTEXT, System.out);
 
     // -------------------------------------------------------------------------
     System.out.println("\n\n===== Find all filenames containing 'text':");
-    new XQuery(FIND_BY_NAME).exec(CONTEXT, System.out);
+    new XQuery(FIND_BY_NAME).execute(CONTEXT, System.out);
 
   }
 

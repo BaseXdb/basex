@@ -47,14 +47,14 @@ public final class UpdateExample {
   /**
    * Runs the examples.
    * @throws IOException if an error occurs while serializing the results
-   * @throws BaseXException if a database command fails for any reason
+   * @throws BaseXException if a database command fails
    */
   private void run() throws IOException, BaseXException {
     // ----------------------------------------------------------------------
     // Create and open a new database from a remote XML document.
     System.out.println("\n=== Create a database from a file via http.");
     new CreateDB("http://en.wikipedia.org/wiki/Wikipedia", "XMLWIKI").
-      exec(context, out);
+      execute(context, out);
     
     // ----------------------------------------------------------------------
     // XQuery Update is used here to modify the database.
@@ -92,8 +92,8 @@ public final class UpdateExample {
 
     // ----------------------------------------------------------------------
     // Close and drop the database
-    new Close().exec(context, out);
-    new DropDB("XMLWIKI").exec(context, out);
+    new Close().execute(context, out);
+    new DropDB("XMLWIKI").execute(context, out);
 
     // ----------------------------------------------------------------------
     // Close the output stream
@@ -106,9 +106,9 @@ public final class UpdateExample {
    * output stream.
    *
    * @param query query to be evaluated
-   * @throws BaseXException if a database command fails for any reason
+   * @throws BaseXException if a database command fails
    */
   private void query(final String query) throws BaseXException {
-    new XQuery(query).exec(context, out);
+    new XQuery(query).execute(context, out);
   }
 }

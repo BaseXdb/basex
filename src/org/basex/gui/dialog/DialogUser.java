@@ -316,9 +316,9 @@ public final class DialogUser extends BaseXBack {
   public void setSess(final Session s) throws IOException {
     sess = s;
     if(!global) {
-      final CachedOutput out = new CachedOutput();
-      sess.execute(new List(), out);
-      final Table dbs = new Table(out.toString());
+      final CachedOutput co = new CachedOutput();
+      sess.execute(new List(), co);
+      final Table dbs = new Table(co.toString());
       databases.removeAllItems();
       databases.addItem(numberof(DATABASES, dbs.contents.size()));
       for(final TokenList l : dbs.contents) {

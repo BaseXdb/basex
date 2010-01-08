@@ -462,8 +462,6 @@ public final class TreeView extends View implements TreeViewOptions {
       // @SuppressWarnings("unused")
       // final TreeRect[] rL = cache.getTreeRectsPerLevel(rn, lv);
 
-      // System.out.println(pre);
-
       // TreeBorder[] sBo = cache.generateSubtreeBorders(d, pre);
 
       if(cache.isBigRectangle(rn, l + 1)) {

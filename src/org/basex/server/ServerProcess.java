@@ -126,7 +126,7 @@ public final class ServerProcess extends Thread {
         startTimer(proc);
         final boolean w = sema.writing(proc, context);
         sema.before(w);
-        final boolean ok = proc.execute(context, out);
+        final boolean ok = proc.exec(context, out);
         out.write(0);
         final String inf = proc.info();
         out.print(inf.equals(PROGERR) ? SERVERTIME : inf);
@@ -183,7 +183,7 @@ public final class ServerProcess extends Thread {
    * Exits the session.
    */
   public void exit() {
-    new Close().execute(context);
+    new Close().exec(context);
     if(proc != null) proc.stop();
     stopTimer();
     context.delete(this);

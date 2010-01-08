@@ -422,10 +422,10 @@ public final class GUI extends JFrame {
       proc = pr;
 
       // execute command and cache result
-      final CachedOutput out = new CachedOutput(context.prop.num(Prop.MAXTEXT));
+      final CachedOutput co = new CachedOutput(context.prop.num(Prop.MAXTEXT));
       final boolean up = pr.updating(context);
       updating = up;
-      final boolean ok = pr.execute(context, out);
+      final boolean ok = pr.exec(context, co);
       final String inf = pr.info();
       updating = false;
 
@@ -455,10 +455,10 @@ public final class GUI extends JFrame {
         final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
         // treat text view different to other views
-        if(ok && out.size() != 0 && nodes == null) {
+        if(ok && co.size() != 0 && nodes == null) {
           // display text view
           if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
-          text.setText(out, pr);
+          text.setText(co, pr);
         }
 
         final Data ndata = context.data;

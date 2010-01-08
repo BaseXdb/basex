@@ -82,7 +82,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, false);
       if(dialog.ok()) {
-        if(new Close().execute(gui.context)) gui.notify.init();
+        if(new Close().exec(gui.context)) gui.notify.init();
         gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODBQUESTION)) CREATE.execute(gui);
@@ -716,7 +716,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, true);
       if(dialog.ok()) {
-        if(new Close().execute(gui.context)) gui.notify.init();
+        if(new Close().exec(gui.context)) gui.notify.init();
         gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
@@ -730,7 +730,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogMountFS dialog = new DialogMountFS(gui);
       if(dialog.ok()) {
-        if(new Close().execute(gui.context)) gui.notify.init();
+        if(new Close().exec(gui.context)) gui.notify.init();
         gui.execute(new Mount(dialog.db(), dialog.mp()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
@@ -910,14 +910,14 @@ public enum GUICommands implements GUICommand {
           final boolean op = p instanceof Optimize;
 
           if(!ci && !di && !op) {
-            new Close().execute(gui.context);
+            new Close().exec(gui.context);
             gui.notify.init();
           }
 
           // execute process
           final DialogProgress wait = new DialogProgress(gui, t, !fs, !op, p);
           final Performance perf = new Performance();
-          final boolean ok = p.execute(gui.context);
+          final boolean ok = p.exec(gui.context);
           wait.dispose();
 
           // return user information

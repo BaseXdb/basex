@@ -10,7 +10,6 @@ import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
-import org.basex.io.NullOutput;
 import org.basex.util.Performance;
 
 /**
@@ -103,14 +102,14 @@ public final class QueryTest {
     final String name = Main.name(test);
     final boolean up = test instanceof XQUPTest;
     Proc proc = new CreateDB(file, name);
-    boolean ok = proc.execute(context);
+    boolean ok = proc.exec(context);
 
     if(ok) {
       for(final Object[] qu : test.queries) {
         // added to renew document after each update test
         if(up && ((String) qu[0]).startsWith("xxx")) {
           proc = new CreateDB(file, name);
-          ok = proc.execute(context);
+          ok = proc.exec(context);
         }
 
         final boolean correct = qu.length == 3;
@@ -122,7 +121,7 @@ public final class QueryTest {
         proc = new XQuery(query);
         counter++;
 
-        if(proc.execute(context, new NullOutput())) {
+        if(proc.exec(context)) {
           final Result val = proc.result();
           final Result cmp = correct ? (Result) qu[1] : null;
           if(val instanceof Nodes && cmp instanceof Nodes) {
@@ -147,7 +146,7 @@ public final class QueryTest {
       wrong++;
     }
 
-    new DropDB(name).execute(context);
+    new DropDB(name).exec(context);
     return ok;
   }
 

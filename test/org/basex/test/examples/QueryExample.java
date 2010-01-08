@@ -1,6 +1,7 @@
 package org.basex.test.examples;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.proc.Close;
@@ -9,7 +10,6 @@ import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -25,7 +25,7 @@ public final class QueryExample {
   /** The database context. */
   private Context context;
   /** Output stream, initialized by the constructor. */
-  private PrintOutput out;
+  private OutputStream out;
 
   /**
    * Runs the example class.
@@ -46,20 +46,18 @@ public final class QueryExample {
    */
   private QueryExample() {
     context = new Context();
-    out = new PrintOutput(System.out);
-    // Alternative: write results to disk
-    // out = new PrintOutput("result.txt");
+    out = System.out;
   }
 
   /**
    * Runs the examples.
    * @throws IOException if an error occurs while serializing the results
-   * @throws BaseXException if a database command fails for any reason
+   * @throws BaseXException if a database command fails
    */
   private void run() throws IOException, BaseXException {
     // Create a database from the specified file.
     System.out.println("\n=== I Create a database from a file.");
-    new CreateDB("input.xml", "Example1").exec(context, out);
+    new CreateDB("input.xml", "Example1").execute(context, out);
 
     // ----------------------------------------------------------------------
     // Evaluate the specified query
@@ -98,8 +96,8 @@ public final class QueryExample {
 
     // ----------------------------------------------------------------------
     // Close and drop the database
-    new Close().exec(context, out);
-    new DropDB("Example1").exec(context, out);
+    new Close().execute(context, out);
+    new DropDB("Example1").execute(context, out);
 
     // ----------------------------------------------------------------------
     // Close the output stream
@@ -112,10 +110,10 @@ public final class QueryExample {
    * output stream.
    *
    * @param query query to be evaluated
-   * @throws BaseXException if a database command fails for any reason
+   * @throws BaseXException if a database command fails
    */
   private void query(final String query) throws BaseXException {
-    new XQuery(query).exec(context, out);
+    new XQuery(query).execute(context, out);
   }
 
   /**

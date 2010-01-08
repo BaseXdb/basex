@@ -3,6 +3,8 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+import java.io.OutputStream;
+
 import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
@@ -37,7 +39,7 @@ public final class XMLSerializer extends Serializer {
    * @param o output stream reference
    * @throws IOException I/O exception
    */
-  public XMLSerializer(final PrintOutput o) throws IOException {
+  public XMLSerializer(final OutputStream o) throws IOException {
     this(o, false, true);
   }
 
@@ -48,9 +50,9 @@ public final class XMLSerializer extends Serializer {
    * @param p pretty print the result
    * @throws IOException I/O exception
    */
-  public XMLSerializer(final PrintOutput o, final boolean x, final boolean p)
+  public XMLSerializer(final OutputStream o, final boolean x, final boolean p)
       throws IOException {
-    out = o;
+    out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
     xml = x;
     pretty = p;
     if(xml) openElement(RESULTS);

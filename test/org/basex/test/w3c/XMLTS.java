@@ -69,7 +69,7 @@ public final class XMLTS {
     context.prop.set(Prop.ATTRINDEX, false);
     //context.prop.set(MAINMEM, true);
 
-    new CreateDB(FILE).execute(context);
+    new CreateDB(FILE).exec(context);
     data = context.data;
 
     int ok = 0;
@@ -86,7 +86,7 @@ public final class XMLTS {
 
       context.prop.set(Prop.INTPARSE, true);
       Proc proc = new CreateDB(PATH + uri);
-      final boolean success = proc.execute(context);
+      final boolean success = proc.exec(context);
       final boolean correct = valid == success;
 
       if(verbose || !correct) {
@@ -96,9 +96,9 @@ public final class XMLTS {
           String inf = proc.info();
           if(!inf.isEmpty()) Main.outln("[BASEX ] " + inf);
           context.prop.set(Prop.INTPARSE, false);
-          new Close().execute(context);
+          new Close().exec(context);
           proc = new CreateDB(PATH + uri);
-          proc.execute(context);
+          proc.exec(context);
           inf = proc.info();
           if(!inf.isEmpty()) Main.outln("[XERCES] " + inf);
         }
@@ -106,7 +106,7 @@ public final class XMLTS {
       if(correct) ok++;
       else wrong++;
 
-      new Close().execute(context);
+      new Close().exec(context);
     }
 
     Main.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");

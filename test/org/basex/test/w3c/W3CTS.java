@@ -26,7 +26,6 @@ import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -208,7 +207,7 @@ public abstract class W3CTS {
     context.prop.set(Prop.TABLEMEM, false);
     context.prop.set(Prop.CHOP, false);
 
-    new CreateDB(path + input).execute(context);
+    new CreateDB(path + input).exec(context);
     data = context.data;
 
     final Nodes root = new Nodes(0, data);
@@ -343,7 +342,7 @@ public abstract class W3CTS {
       boolean doc = true;
 
       final TokenBuilder files = new TokenBuilder();
-      final CachedOutput out = new CachedOutput();
+      final CachedOutput co = new CachedOutput();
 
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
@@ -377,7 +376,7 @@ public abstract class W3CTS {
         }
 
         // evaluate and serialize query
-        final XMLSerializer xml = new XMLSerializer(out, false,
+        final XMLSerializer xml = new XMLSerializer(co, false,
             context.prop.is(Prop.CHOP));
         iter = SeqIter.get(xq.iter());
         Item it;
@@ -460,7 +459,7 @@ public abstract class W3CTS {
           inspect |= s < cmpFiles.nodes.length &&
             eq(data.atom(cmpFiles.nodes[s]), INSPECT);
 
-          if(result.get(s).equals(out.toString())) break;
+          if(result.get(s).equals(co.toString())) break;
 
           if(xml || frag) {
             iter.reset();
@@ -483,8 +482,7 @@ public abstract class W3CTS {
               if(!eq && debug) {
                 iter.reset();
                 si.reset();
-                final XMLSerializer ser = new XMLSerializer(
-                    new PrintOutput(System.out));
+                final XMLSerializer ser = new XMLSerializer(System.out);
                 Item it;
                 Main.outln(NL + "=== " + testid + " ===");
                 while((it = si.next()) != null) it.serialize(ser);
@@ -507,11 +505,11 @@ public abstract class W3CTS {
             logErr.append(norm(result.get(0)));
             logErr.append(NL);
             logErr.append("[Wrong] ");
-            logErr.append(norm(out.toString()));
+            logErr.append(norm(co.toString()));
             logErr.append(NL);
             logErr.append(NL);
             addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
-                out.toString());
+                co.toString());
           }
           correct = false;
           err++;
@@ -519,11 +517,11 @@ public abstract class W3CTS {
           if(print) {
             logOK.append(logStr);
             logOK.append("[Right] ");
-            logOK.append(norm(out.toString()));
+            logOK.append(norm(co.toString()));
             logOK.append(NL);
             logOK.append(NL);
             addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
-                out.toString());
+                co.toString());
           }
           ok++;
         }

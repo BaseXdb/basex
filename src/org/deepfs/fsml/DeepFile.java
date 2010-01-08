@@ -3,7 +3,6 @@ package org.deepfs.fsml;
 import static org.deepfs.fs.DeepFS.*;
 import static org.basex.util.Token.*;
 import static org.deepfs.jfuse.JFUSEAdapter.*;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
-import org.basex.io.PrintOutput;
+import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Type;
@@ -681,18 +680,16 @@ public final class DeepFile {
    */
   public void addXML(final long position, final int byteCount,
       final Data data) throws IOException {
-    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    final PrintOutput po = new PrintOutput(baos);
-    final XMLSerializer ser = new XMLSerializer(po);
+    final CachedOutput co = new CachedOutput();
+    final XMLSerializer ser = new XMLSerializer(co);
     final Context ctx = new Context();
     ctx.openDB(data);
     final QueryProcessor qp = new QueryProcessor("/", ctx);
     try {
       final Result res = qp.query();
       res.serialize(ser);
-      final String xml = baos.toString();
+      final String xml = co.toString();
       ser.close();
-      po.close();
       addXML(position, byteCount, xml);
     } catch(final QueryException e) { return; }
   }

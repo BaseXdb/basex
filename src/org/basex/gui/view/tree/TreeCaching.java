@@ -77,7 +77,6 @@ public class TreeCaching implements TreeViewOptions {
       for(int i = 1; i < maxLevel; i++)
         nodes[i] = li[i].finish();
     }
-    // System.out.println(System.currentTimeMillis() - time);
   }
 
   /**
@@ -173,8 +172,6 @@ public class TreeCaching implements TreeViewOptions {
 
     // level pair
     bo[rl] = new TreeBorder(rl, ri, 1);
-
-    // System.out.println("rootl: " + rl);
 
     int np = pre + d.size(pre, d.kind(pre));
     int h = 1;

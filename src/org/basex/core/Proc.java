@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 import org.basex.data.Result;
+import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -54,28 +55,26 @@ public abstract class Proc extends Progress {
   }
 
   /**
-   * Convenience method for executing a process and printing textual results.
-   * If an exception occurs, a {@link BaseXException} is thrown.
+   * Executes the process and serializes textual results to the specified output
+   * stream. If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
    * @param out output stream reference
-   * @throws BaseXException exception
+   * @throws BaseXException process exception
    */
-  public void exec(final Context ctx, final OutputStream out)
+  public void execute(final Context ctx, final OutputStream out)
       throws BaseXException {
-    if(!execute(ctx, out instanceof PrintOutput ? (PrintOutput) out :
-      new PrintOutput(out))) throw new BaseXException(info());
+    if(!exec(ctx, out)) throw new BaseXException(info());
   }
 
   /**
-   * Executes a process, passing on <code>null</code> as output stream.
-   * This method must only be used if a command does not generate
-   * any textual results.
+   * Executes the process. {@link #execute(Context, OutputStream)} should be
+   * called if textual results are expected.
+   * If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
-   * @return success flag. The {@link #info()} method gives information on a
-   * potential error
+   * @throws BaseXException process exception
    */
-  public final boolean execute(final Context ctx) {
-    return execute(ctx, null);
+  public void execute(final Context ctx) throws BaseXException {
+    if(!exec(ctx)) throw new BaseXException(info());
   }
 
   /**
@@ -83,10 +82,13 @@ public abstract class Proc extends Progress {
    * and returns a success flag.
    * @param ctx database context
    * @param out output stream
-   * @return success flag. The {@link #info()} method gives information on a
-   * potential error
+   * @return success flag. The {@link #info()} method returns information
+   * on a potential exception
    */
-  public final boolean execute(final Context ctx, final PrintOutput out) {
+  public final boolean exec(final Context ctx, final OutputStream out) {
+    final PrintOutput po = out instanceof PrintOutput ? (PrintOutput) out :
+      new PrintOutput(out);
+
     perf = new Performance();
     context = ctx;
     prop = ctx.prop;
@@ -105,7 +107,7 @@ public abstract class Proc extends Progress {
 
     boolean ok = false;
     try {
-      ok = exec(out);
+      ok = exec(po);
     } catch(final ProgressException ex) {
       abort();
       return error(PROGERR);
@@ -123,6 +125,18 @@ public abstract class Proc extends Progress {
       return error(Main.bug(obj));
     }
     return ok;
+  }
+
+  /**
+   * Executes the process and returns a success flag.
+   * {@link #exec(Context, OutputStream)} should be called to retrieve textual
+   * results.
+   * @param ctx database context
+   * @return success flag. The {@link #info()} method returns information
+   * on a potential exception
+   */
+  public final boolean exec(final Context ctx) {
+    return exec(ctx, new NullOutput());
   }
 
   /**

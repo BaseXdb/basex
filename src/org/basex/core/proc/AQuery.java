@@ -162,20 +162,20 @@ abstract class AQuery extends Proc {
     // show dot plan
     try {
       if(prop.is(Prop.DOTPLAN)) {
-        final CachedOutput out = new CachedOutput();
-        final DOTSerializer ser = new DOTSerializer(out);
+        final CachedOutput co = new CachedOutput();
+        final DOTSerializer ser = new DOTSerializer(co);
         qu.plan(ser);
         ser.close();
         final String dot = "plan.dot";
-        IO.get(dot).write(out.finish());
+        IO.get(dot).write(co.finish());
         new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();
       }
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {
-        final CachedOutput out = new CachedOutput();
-        qu.plan(new XMLSerializer(out));
+        final CachedOutput co = new CachedOutput();
+        qu.plan(new XMLSerializer(co));
         info(QUERYPLAN);
-        info.add(out.toString());
+        info.add(co.finish());
         info.add(NL);
       }
     } catch(final Exception ex) {

@@ -22,7 +22,6 @@ import org.deepfs.util.FSWalker;
  * @author BaseX Team
  */
 public final class DeepFSExample {
-
   /** The current database Context. */
   static final Context CONTEXT = new Context();
   /** Names of the test databases. */
@@ -34,7 +33,7 @@ public final class DeepFSExample {
 
   static {
     final File[] f = findFiles();
-    DIR = new File[] {new File(CONTEXT.prop.get(Prop.DBPATH)), f[0], f[1]};
+    DIR = new File[] { new File(CONTEXT.prop.get(Prop.DBPATH)), f[0], f[1] };
   }
 
   /** Example queries. */
@@ -79,7 +78,7 @@ public final class DeepFSExample {
     }
   };
   /** Query - DB mapping. */
-  private static final int[] INDEX = new int[] {1, 1, 1, 2, 2, 1};
+  private static final int[] INDEX = new int[] { 1, 1, 1, 2, 2, 1 };
 
   /** Private constructor. */
   private DeepFSExample() { }
@@ -114,11 +113,11 @@ public final class DeepFSExample {
 
     System.out.println("\n\n=== Traverse a file system hierarchy (method 1)");
     // Creates the file system database
-    new CreateFS(DIR[0].getAbsolutePath(), DB[0]).exec(CONTEXT, System.out);
+    new CreateFS(DIR[0].getAbsolutePath(), DB[0]).execute(CONTEXT, System.out);
     // Serializes the database
-    new XQuery("/").exec(CONTEXT, System.out);
+    new XQuery("/").execute(CONTEXT, System.out);
     // Closes the database
-    new Close().exec(CONTEXT, System.out);
+    new Close().execute(CONTEXT, System.out);
 
     // -------------------------------------------------------------------------
 
@@ -131,11 +130,11 @@ public final class DeepFSExample {
     // inserts everything into the database
     new FSWalker(importer).traverse(DIR[0]);
     // Creates indexes
-    new Optimize().exec(CONTEXT, System.out);
+    new Optimize().execute(CONTEXT, System.out);
     // Serializes the database
-    new XQuery("/").exec(CONTEXT, System.out);
+    new XQuery("/").execute(CONTEXT, System.out);
     // Closes the database
-    new Close().exec(CONTEXT, System.out);
+    new Close().execute(CONTEXT, System.out);
 
     // -------------------------------------------------------------------------
 
@@ -153,20 +152,22 @@ public final class DeepFSExample {
     System.out.println("\n=== Example queries ====================");
     if(DIR[1] != null) {
       System.out.println("\tcreating mp3 database...");
-      new CreateFS(DIR[1].getAbsolutePath(), DB[1]).exec(CONTEXT, System.out);
-      new Close().exec(CONTEXT, System.out);
+      new CreateFS(DIR[1].getAbsolutePath(), DB[1]).
+        execute(CONTEXT, System.out);
+      new Close().execute(CONTEXT, System.out);
     }
     if(DIR[2] != null) {
       System.out.println("\tcreating jpg database...");
-      new CreateFS(DIR[2].getAbsolutePath(), DB[2]).exec(CONTEXT, System.out);
-      new Close().exec(CONTEXT, System.out);
+      new CreateFS(DIR[2].getAbsolutePath(), DB[2]).
+        execute(CONTEXT, System.out);
+      new Close().execute(CONTEXT, System.out);
     }
     for(int i = 0; i < QUERIES.length; i++) {
       if(DIR[INDEX[i]] == null) continue;
       System.out.println("\n\n=== " + QUERIES[i][0]);
-      new Open(DB[INDEX[i]]).exec(CONTEXT, System.out);
-      new XQuery(QUERIES[i][1]).exec(CONTEXT, System.out);
-      new Close().exec(CONTEXT, System.out);
+      new Open(DB[INDEX[i]]).execute(CONTEXT, System.out);
+      new XQuery(QUERIES[i][1]).execute(CONTEXT, System.out);
+      new Close().execute(CONTEXT, System.out);
     }
   }
 

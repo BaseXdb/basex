@@ -37,9 +37,7 @@ public final class Put extends UpdatePrimitive {
     PrintOutput out = null;
     try {
       out = new PrintOutput(Token.string(path()));
-      final XMLSerializer ser = new XMLSerializer(out);
-      node.serialize(ser);
-      ser.close();
+      node.serialize(new XMLSerializer(out));
     } catch(final IOException ex) {
       Err.or(UPPUTERR, path());
     } finally {

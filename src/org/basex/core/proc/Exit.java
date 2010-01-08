@@ -17,6 +17,6 @@ public final class Exit extends Proc {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    return new Close().execute(context, out);
+    return new Close().exec(context);
   }
 }

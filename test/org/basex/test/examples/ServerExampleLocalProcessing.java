@@ -8,7 +8,6 @@ import org.basex.core.proc.DropDB;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
 import org.basex.server.ClientSession;
 
@@ -48,7 +47,7 @@ public final class ServerExampleLocalProcessing {
   public static void main(final String[] args) throws Exception {
     
     //set up serializer
-    ser = new XMLSerializer(new PrintOutput(System.out));
+    ser = new XMLSerializer(System.out);
     // Start server on port 16387 in a new thread.
     new Thread() {
       @Override
@@ -68,11 +67,9 @@ public final class ServerExampleLocalProcessing {
     CachedOutput result = new CachedOutput();
     launch("xquery for $x in doc('input') return $x", result);
 
-
     // -------------------------------------------------------------------------
     // Create a new LOCAL database from the XML result string:    
-    new CreateDB(result.toString(), LOCALDB).
-                                           exec(CONTEXT, System.out);
+    new CreateDB(result.toString(), LOCALDB).execute(CONTEXT, System.out);
     // -------------------------------------------------------------------------
     // 2) Query the newly created database:
     QueryProcessor qp = new QueryProcessor("//text()", CONTEXT);
@@ -80,7 +77,6 @@ public final class ServerExampleLocalProcessing {
 
     // Output all textual contents:
     ns.serialize(ser);
-
     
     // -------------------------------------------------------------------------
     System.out.println("\n\n=== Stop the server:");
@@ -93,7 +89,6 @@ public final class ServerExampleLocalProcessing {
     // close & drop the LOCAL database
     new Close().execute(CONTEXT);
     new DropDB(LOCALDB).execute(CONTEXT);
-
   }
   
   /**

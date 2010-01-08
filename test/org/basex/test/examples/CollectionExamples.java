@@ -1,5 +1,6 @@
 package org.basex.test.examples;
 
+import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.proc.Add;
@@ -9,7 +10,6 @@ import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.Optimize;
-import org.basex.io.PrintOutput;
 
 /**
  * This class shows the basic usage of the BaseX Collection functions.
@@ -34,20 +34,19 @@ public class CollectionExamples {
   /** The database name. **/
   protected static final String DBNAME = "MyFileCollection";
 
-
-
   /**
    * PrintOutput Context. Point the PrintOutput to whatever file you like to
    * store the serializing results in a file. You may as well point it to
    * System.out.
    */
-  private final PrintOutput out;
+  private final OutputStream out = System.out;
 
   /**
    * Sets up the example class.
    * @param args not used.
+   * @throws BaseXException if a database command fails
    */
-  public static void main(final String[] args) {
+  public static void main(final String[] args) throws BaseXException {
     // -------------------------------------------------------------------------
     // To import XML files with suffixes other than XML, for example KML use
     // this Property:
@@ -67,16 +66,11 @@ public class CollectionExamples {
 
   /**
    * Cleans up afterwards.
+   * @throws BaseXException if a database command fails
    */
-  protected void cleanup() {
+  protected void cleanup() throws BaseXException {
     new Close().execute(CONTEXT);
     new DropDB(DBNAME).execute(CONTEXT);
-  }
-
-  /** Sets up the Output stream. */
-  protected CollectionExamples() {
-    out = new PrintOutput(System.out);
-
   }
 
   /**
@@ -86,8 +80,9 @@ public class CollectionExamples {
    * {@link Add#Add(String)} to any database that is opened in the current
    * context. Once the database has been created
    * @param verbose output the InfoDB if true.
+   * @throws BaseXException if a database command fails
    */
-  protected void createColl(final boolean verbose) {
+  protected void createColl(final boolean verbose) throws BaseXException {
     new CreateColl(DBNAME).execute(CONTEXT);
 
     // -------------------------------------------------------------------------
@@ -99,23 +94,19 @@ public class CollectionExamples {
     // Optimize the database structures
     new Optimize().execute(CONTEXT);
 
-
     /**
      * Output some information on your newly created database you may as well
      * run Queries on your collection, see the examples provided in
      * {@link QueryExample}.
      */
-    if(verbose) try {
-      new InfoDB().exec(CONTEXT, out);
-    } catch(final BaseXException e) {
-      e.printStackTrace();
-    }
+    if(verbose) new InfoDB().execute(CONTEXT, out);
   }
 
   /**
    * This command removes a single document from your collection.
+   * @throws BaseXException if a database command fails
    */
-  private void deleteDocumentFromColl() {
+  private void deleteDocumentFromColl() throws BaseXException {
     // -------------------------------------------------------------------------
     // Delete a file:
     new Delete(XMLFILE).execute(CONTEXT);
@@ -127,7 +118,7 @@ public class CollectionExamples {
     // -------------------------------------------------------------------------
     // Output some information on your altered collection
      try {
-      new InfoDB().exec(CONTEXT, out);
+      new InfoDB().execute(CONTEXT, out);
     } catch(final BaseXException e) {
       e.printStackTrace();
     }

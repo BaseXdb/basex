@@ -28,7 +28,7 @@ public final class Open extends Proc {
 
   @Override
   protected boolean exec(final PrintOutput out) {
-    new Close().execute(context, out);
+    new Close().exec(context);
 
     final String db = args[0];
     try {

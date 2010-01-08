@@ -36,7 +36,7 @@ public final class DBExample {
     System.out.println("\n=== Create a database from a file.");
 
     // Creates a database from the specified file.
-    new CreateDB("input.xml", "Example1").exec(CONTEXT, System.out);
+    new CreateDB("input.xml", "Example1").execute(CONTEXT, System.out);
 
     // Collection Examples
    // CollectionExamples.run();
@@ -95,14 +95,14 @@ public final class DBExample {
       System.out.println("=== Create Database.");
 
       // Creates a database
-      new CreateDB("input.xml", "Example1").exec(CONTEXT, out);
+      new CreateDB("input.xml", "Example1").execute(CONTEXT, out);
       // Closes the database.
       System.out.println("=== Close Database.");
 
-      new Close().exec(CONTEXT, out);
+      new Close().execute(CONTEXT, out);
       System.out.println("=== Reopen Database.");
 
-      new Open("Example1").exec(CONTEXT, out);
+      new Open("Example1").execute(CONTEXT, out);
     }
 
     /**
@@ -110,7 +110,7 @@ public final class DBExample {
      * @throws BaseXException In case of failing.
      */
     private static void optimizeDB() throws BaseXException {
-      new Optimize().exec(CONTEXT, System.out);
+      new Optimize().execute(CONTEXT, out);
 
     }
 
@@ -120,7 +120,7 @@ public final class DBExample {
      */
     private static void createIndexes() throws BaseXException {
       // I Index Creation & Maintenance
-      new CreateIndex("fulltext").exec(CONTEXT, System.out);
+      new CreateIndex("fulltext").execute(CONTEXT, out);
 
     }
 
@@ -132,7 +132,7 @@ public final class DBExample {
       System.out.println("\n=== III information on the specified "
           + "database context.");
       // Dumps information on the specified database context
-      new InfoDB().exec(CONTEXT, System.out);
+      new InfoDB().execute(CONTEXT, System.out);
 
     }
 
@@ -142,26 +142,26 @@ public final class DBExample {
      */
     private static void creationAndDropping() throws BaseXException {
       // Closes the database.
-      new Close().exec(CONTEXT, System.out);
-      // new DropDB("Example1").exec(context, System.out);
+      new Close().execute(CONTEXT);
+      // new DropDB("Example1").execute(context);
 
       // System.out.println("\n=== Create a database from an input string.");
       //
       // // XML string.
       // String xml = "<xml>This is a test</xml>";
       // // Creates a database for the specified input.
-      // new CreateDB(xml, "Example2").exec(context, System.out);
+      // new CreateDB(xml, "Example2").execute(context);
       // // Closes the database.
-      // new Close().exec(context, System.out);
+      // new Close().execute(context);
 
       // System.out.println("\n=== Open a database and show database info:");
       //
       // // Opens an existing database
-      // new Open("Example1").exec(context, System.out);
+      // new Open("Example1").execute(context);
       // // Dumps information on the specified database context
-      // new InfoDB().exec(context, System.out);
+      // new InfoDB().execute(context, out);
       // // Closes the database.
-      // new Close().exec(context, System.out);
+      // new Close().execute(context);
 
     }
   }

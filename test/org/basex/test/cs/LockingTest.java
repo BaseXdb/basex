@@ -232,13 +232,13 @@ public final class LockingTest {
    * @return String result
    */
   String checkRes(final Proc pr, final Session session) {
-    final CachedOutput out = new CachedOutput();
+    final CachedOutput co = new CachedOutput();
     try {
-      session.execute(pr, out);
+      session.execute(pr, co);
     } catch(final IOException ex) {
       ex.printStackTrace();
     }
-    return out.toString();
+    return co.toString();
   }
 
   /**

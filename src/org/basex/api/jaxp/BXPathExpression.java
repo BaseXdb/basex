@@ -56,7 +56,7 @@ public final class BXPathExpression implements XPathExpression {
       throws XPathExpressionException {
 
     final Proc check = new CreateDB(is.getSystemId());
-    if(check.execute(context)) return finish(eval(), res);
+    if(check.exec(context)) return finish(eval(), res);
     throw new XPathExpressionException(check.info());
   }
 
@@ -95,9 +95,9 @@ public final class BXPathExpression implements XPathExpression {
     }
 
     try {
-      final CachedOutput out = new CachedOutput();
-      item.serialize(new XMLSerializer(out));
-      final String val = out.toString();
+      final CachedOutput co = new CachedOutput();
+      item.serialize(new XMLSerializer(co));
+      final String val = co.toString();
       if(res == XPathConstants.NUMBER) return Double.valueOf(val);
       if(res == XPathConstants.STRING) return val;
       if(res == XPathConstants.BOOLEAN) return Boolean.valueOf(val);

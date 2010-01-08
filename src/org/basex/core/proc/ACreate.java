@@ -44,7 +44,7 @@ abstract class ACreate extends Proc {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
-    new Close().execute(context);
+    new Close().exec(context);
 
     final boolean mem = prop.is(Prop.MAINMEM);
     if(!mem && context.pinned(db)) return error(DBLOCKED, db);
@@ -59,7 +59,7 @@ abstract class ACreate extends Proc {
       } else {
         d.close();
         final Proc pr = new Open(db);
-        if(!pr.execute(context)) return error(pr.info());
+        if(!pr.exec(context)) return error(pr.info());
         index(context.data);
       }
       return info(DBCREATED, db, perf);

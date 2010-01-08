@@ -452,12 +452,12 @@ public final class DialogServer extends Dialog {
    * @throws IOException Exception
    */
   void refreshSess() throws IOException {
-    CachedOutput out = new CachedOutput();
-    cs.execute(new ShowSessions(), out);
-    sese.setText(out.finish());
-    out = new CachedOutput();
-    cs.execute(new ShowDatabases(), out);
-    sedb.setText(out.finish());
+    CachedOutput co = new CachedOutput();
+    cs.execute(new ShowSessions(), co);
+    sese.setText(co.finish());
+    co = new CachedOutput();
+    cs.execute(new ShowDatabases(), co);
+    sedb.setText(co.finish());
   }
 
   /**

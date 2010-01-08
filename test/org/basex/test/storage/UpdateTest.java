@@ -125,7 +125,7 @@ public abstract class UpdateTest {
    * @param proc process instance
    */
   private void exec(final Proc proc) {
-    if(!proc.execute(CONTEXT)) {
+    if(!proc.exec(CONTEXT)) {
       Main.errln(proc + ": " + proc.info());
       System.exit(1);
     }

@@ -18,7 +18,6 @@ import org.basex.core.Text;
 import org.basex.core.proc.InfoTable;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryProcessor;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.jfuse.DeepStat;
@@ -241,12 +240,7 @@ public final class DeepShell {
       help(new String[] { "help", "info"});
       return;
     }
-    try {
-      new InfoTable(null, null).execute(fs.getContext(),
-          new PrintOutput(System.out));
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-    }
+    new InfoTable(null, null).exec(fs.getContext(), System.out);
   }
 
   /**
@@ -288,11 +282,7 @@ public final class DeepShell {
   public void serialize(@SuppressWarnings("unused") final String[] args) {
     try {
       final Nodes n = new QueryProcessor("/", fs.getContext()).queryNodes();
-      final PrintOutput out = new PrintOutput(System.out);
-      final XMLSerializer xml = new XMLSerializer(out);
-      n.serialize(xml);
-      out.flush();
-      xml.close();
+      n.serialize(new XMLSerializer(System.out));
     } catch(final Exception ex) {
       ex.printStackTrace();
     }
