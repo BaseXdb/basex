@@ -67,10 +67,12 @@ public abstract class Proc extends Progress {
   }
 
   /**
-   * Executes a process. This method must only be used if a command
-   * does not generate textual results.
+   * Executes a process, passing on <code>null</code> as output stream.
+   * This method must only be used if a command does not generate
+   * any textual results.
    * @param ctx database context
-   * @return success flag
+   * @return success flag. The {@link #info()} method gives information on a
+   * potential error
    */
   public final boolean execute(final Context ctx) {
     return execute(ctx, null);
@@ -81,7 +83,8 @@ public abstract class Proc extends Progress {
    * and returns a success flag.
    * @param ctx database context
    * @param out output stream
-   * @return success flag
+   * @return success flag. The {@link #info()} method gives information on a
+   * potential error
    */
   public final boolean execute(final Context ctx, final PrintOutput out) {
     perf = new Performance();

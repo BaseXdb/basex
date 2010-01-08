@@ -2,7 +2,6 @@ package org.basex.test.examples;
 
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.proc.CreateDB;
 import org.basex.data.Result;
 import org.basex.data.SAXSerializer;
 import org.basex.query.QueryProcessor;
@@ -18,10 +17,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author BaseX Team
  */
 public final class SAXExample extends DefaultHandler {
-  /** Input XML file. */
-  private static final String XMLFILE = "input.xml";
   /** Sample query. */
-  private static final String QUERY = "<xml>This is a test</xml>/text()";
+  private static final String QUERY = "doc('input.xml')//title";
 
   /**
    * Main method of the example class.
@@ -39,18 +36,15 @@ public final class SAXExample extends DefaultHandler {
    */
   public SAXExample() throws Exception {
     // create database context
-    final Context ctx = new Context();
-
-    // create a database
-    new CreateDB(XMLFILE).execute(ctx);
+    Context ctx = new Context();
 
     // create query instance
-    final QueryProcessor query = new QueryProcessor(QUERY, ctx);
+    QueryProcessor query = new QueryProcessor(QUERY, ctx);
     // execute query
-    final Result result = query.query();
+    Result result = query.query();
 
     // create XML reader
-    final XMLReader reader = new SAXSerializer(result);
+    XMLReader reader = new SAXSerializer(result);
     // set this class as content handler
     reader.setContentHandler(this);
     // start parser

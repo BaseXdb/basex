@@ -16,6 +16,9 @@ import org.basex.io.PrintOutput;
  * scenarios for XQuery Processing in BaseX. For further information on BaseX
  * Client-Side abilities in XQuery Processing please see:
  * @see XQueryExample#main(String[])
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team
  */
 public final class QueryExampleTwo {
   /** The current database Context. */

@@ -182,7 +182,7 @@ public final class FNBaseX extends Fun {
    * Performs the random function.
    * @return iterator
    */
-  private Item random() {
+  private Dbl random() {
     return Dbl.get(Math.random());
   }
 

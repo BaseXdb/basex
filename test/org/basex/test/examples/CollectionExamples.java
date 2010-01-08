@@ -17,6 +17,9 @@ import org.basex.io.PrintOutput;
  * Collections may be created by importing a folder or adding files.
  * For more XQuery examples in a collection context
  * see {@link CollectionExamplesQuery}
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseXTeam
  */
 public class CollectionExamples {
   /** The current database Context. */

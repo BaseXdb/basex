@@ -9,7 +9,8 @@ import org.basex.core.proc.XQuery;
  * You may as well use the other query methods described in
  * {@link QueryExample}.
  *
- * @author BaseXTeam
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team
  */
 public final class CollectionExamplesQuery extends CollectionExamples {
   /** The base-uri() function returns a filename. */

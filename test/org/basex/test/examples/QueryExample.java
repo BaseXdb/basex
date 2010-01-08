@@ -16,36 +16,27 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 
 /**
- * Some Examples in XQuery Evaluation. This class contains several variants of
- * XQuery Processing in BaseX. For further information on BaseX Client-Side
+ * This class contains several variants of XQuery processing in BaseX.
+ * For further information on BaseX Client-Side
  * abilities in XQuery Processing please see:
  * @see XQueryExample#main(String[])
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author BaseX Team
  */
 public final class QueryExample {
-  /** The current database Context. */
-  static final Context CONTEXT = new Context();
-
-  /** The query to evaluate. */
-  private static final String QUERY = "for $x in //body//li return $x";
-
-  /**
-   * PrintOutput Context. Point the PrintOutput to whatever file you like to
-   * store the serializing results in a file. You may as well point it to
-   * System.out.
-   */
+  /** The database context. */
+  private Context context;
+  /** Output stream, initialized by the constructor. */
   private PrintOutput out;
 
-  /** Setup and point the serializer to System.out. */
-  private XMLSerializer xmlSer;
-
   /**
-   * Starts the QueryExample from the Commandline.
-   * @param args not used.
+   * Starts the QueryExample from the command line.
+   * @param args (ignored) command-line arguments
    */
   public static void main(final String[] args) {
-    final QueryExample queryExample = new QueryExample();
     try {
-      queryExample.run();
+      new QueryExample().run();
     } catch(final IOException e) {
       e.printStackTrace();
     } catch(final BaseXException e) {
@@ -54,106 +45,98 @@ public final class QueryExample {
   }
 
   /**
-   * Sets up the example XMLSerializer instance.
+   * Constructor, initializing the database context and the output stream.
    */
   private QueryExample() {
-    try {
-      out = new PrintOutput(System.out);
-      xmlSer = new XMLSerializer(out);
-    } catch(final IOException e) {
-      System.err.println("Could not initiate the XMLSerializer.");
-    }
+    context = new Context();
+    out = new PrintOutput(System.out);
+    // Alternative: write results to disk
+    // out = new PrintOutput("result.txt");
   }
+
   /**
-   * Runs the Example Queries.
-   * @throws IOException for XMLSerializer and PrintOutput errors.
-   * @throws BaseXException if database creation fails for any reason.
+   * Runs the example queries.
+   * @throws IOException if an error occurs while serializing the results
+   * @throws BaseXException if a database command fails for any reason
    */
   private void run() throws IOException, BaseXException {
-    // Creates a new database context, referencing the database.
-    System.out.println("\n=== Create a database from a file.");
-    // Creates a database from the specified file.
-    new CreateDB("input.xml", "Example1").exec(CONTEXT, System.out);
+    // Create a database from the specified file.
+    System.out.println("\n=== I Create a database from a file.");
+    new CreateDB("input.xml", "Example1").exec(context, out);
 
     // -------------------------------------------------------------------------
-    // Evaluate XQuery directly to System.out
+    // Evaluate the specified query
+    System.out.println("\n=== II Evaluating queries.");
+    String query = "for $x in //body//li return $x";
+
+    // -------------------------------------------------------------------------
+    // Process the query by a simple call of the query command
     try {
-      directOutputExample();
+      System.out.println("===== XQuery Proc: direct output.");
+      queryExample(query);
+
       // uncomment the following line to see error handling.
-      // errorExample();
-    } catch(final BaseXException e) {
-      System.err.println(e.getMessage());
-    }
-
-    // -------------------------------------------------------------------------
-    // Process the result with an iterator:
-    try {
-      iterateExample();
+      // queryExample("for error s$x in . return $x");
     } catch(final Exception e) {
       System.err.println(e.getMessage());
     }
 
     // -------------------------------------------------------------------------
-    // Processing the whole result instance at once:
+    // Iterate through all single results
     try {
-      resultInstance();
-    } catch(final QueryException e) {
+      System.out.println("\n===== XQuery Node Iteration and XML Serializing.");
+      iterateExample(query);
+    } catch(final Exception e) {
       System.err.println(e.getMessage());
     }
 
     // -------------------------------------------------------------------------
-    // Close and drop the Database.
-    new Close().execute(CONTEXT);
-    new DropDB("Example1");
+    // Process the whole result instance at once
+    try {
+      System.out.println("\n=== Serializing a complete result instance.");
+      resultExample(query);
+    } catch(final Exception e) {
+      System.err.println(e.getMessage());
+    }
 
     // -------------------------------------------------------------------------
-    // Close the serializer and the PrintOutput stream
-    xmlSer.close();
+    // Close and drop the database
+    new Close().exec(context, out);
+    new DropDB("Example1").exec(context, out);
+
+    // -------------------------------------------------------------------------
+    // Close the output stream
     out.close();
-
   }
 
   /**
-   * This method exexcutes an XQuery Process for the given database context. The
-   * results are automatically serialized and printed to an arbitrary
-   * OutputStream.
-   * @throws BaseXException in case your query contains errors.
+   * This method executes an XQuery process for the given database context.
+   * The results are automatically serialized and printed to a specified
+   * output stream.
+   *
+   * @param query query to be evaluated
+   * @throws BaseXException if a database command fails for any reason
    */
-  private void directOutputExample() throws BaseXException {
-    System.out.println("\n=== II Evaluating queries.");
-    System.out.println("===== XQuery Proc: direct output.");
-    new XQuery(QUERY).exec(CONTEXT, System.out);
-
+  private void queryExample(final String query) throws BaseXException {
+    new XQuery(query).exec(context, out);
   }
 
   /**
-   * This method throws an BaseXException.
-   * @throws BaseXException in case your command was not successful
-   */
-  @SuppressWarnings("unused")
-  private void errorExample() throws BaseXException {
-    System.out.println("\n===== The following query contains an error:");
-    new XQuery("for error s$x in . return $x").exec(CONTEXT, System.out);
-
-  }
-
-  /**
-   * Shows how Results can be iterated and serialized one after another using
+   * Shows how results can be iterated and serialized one after another using
    * the {@link QueryProcessor} class. This is especially useful if you happen
    * to have very big results, as you will not have to process all resulting
-   * nodes at once. Please note the use of {@link XMLSerializer} to generate
-   * valid XML output.
+   * nodes at once.
    *
-   * @throws QueryException in case your query was wrong.
-   * @throws IOException for {@link XMLSerializer}.
+   * @param query query to be evaluated
+   * @throws QueryException if an error occurs while evaluating the query
+   * @throws IOException if an error occurs while serializing the results
    */
-  private void iterateExample() throws QueryException, IOException {
-    System.out.println("\n\n===== XQuery Node Iteration and XML Serializing.");
-    System.out.println("==== Iterator result:");
+  private void iterateExample(final String query)
+      throws QueryException, IOException {
 
     // -------------------------------------------------------------------------
     // Create a QueryProcessor
-    final QueryProcessor qp = new QueryProcessor(QUERY, CONTEXT);
+    final QueryProcessor qp = new QueryProcessor(query, context);
 
     // -------------------------------------------------------------------------
     // Store the pointer to the result in an iterator:
@@ -161,33 +144,49 @@ public final class QueryExample {
     Item item;
 
     // -------------------------------------------------------------------------
-    // Iterate through all items and
-    // serialze their contents to System.out
+    // Create an XML serializer
+    XMLSerializer serializer = new XMLSerializer(out);
+    
+    // -------------------------------------------------------------------------
+    // Iterate through all items and serialize contents
     while(null != (item = iter.next())) {
-      item.serialize(xmlSer);
+      item.serialize(serializer);
     }
+
+    // -------------------------------------------------------------------------
+    // Close the serializer
+    serializer.close();
   }
 
   /**
-   * This method uses the QueryProcessor.
-   * @throws QueryException on Query error.
-   * @throws IOException on Serializer error.
+   * This method uses the {@link QueryProcessor} to evaluate a query.
+   * @param query query to be evaluated
+   * @throws QueryException if an error occurs while evaluating the query
+   * @throws IOException if an error occurs while serializing the results
    */
-  private void resultInstance() throws QueryException, IOException {
-    System.out.println("\n=== Serializing a complete result instance.");
-    // Creates and executes a query
-    final QueryProcessor processor = new QueryProcessor(QUERY, CONTEXT);
+  private void resultExample(final String query)
+      throws QueryException, IOException {
+
+    // Create and execute a query
+    final QueryProcessor processor = new QueryProcessor(query, context);
 
     // -------------------------------------------------------------------------
-    // Executes the query.
+    // Execute the query.
     final Result result = processor.query();
 
-    // Serializes the result
-    result.serialize(xmlSer);
+    // -------------------------------------------------------------------------
+    // Create an XML serializer
+    XMLSerializer serializer = new XMLSerializer(out);
+    
+    // Serialize all results
+    result.serialize(serializer);
 
     // -------------------------------------------------------------------------
-    // Closes the query processor
-    processor.close();
+    // Close the serializer
+    serializer.close();
 
+    // -------------------------------------------------------------------------
+    // Close the query processor
+    processor.close();
   }
 }
