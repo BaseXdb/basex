@@ -1,10 +1,10 @@
 package org.basex.test.examples;
 
 import java.io.OutputStream;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.proc.Add;
-import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateColl;
 import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropDB;
@@ -23,13 +23,10 @@ import org.basex.core.proc.Optimize;
  */
 public class CollectionExamples {
   /** The current database Context. */
-  static final Context CONTEXT = new Context();
+  final Context ctx;
 
   /** The path you want to add to your collection. */
   private static final String PATH = "./etc/";
-
-  /** The file you want to add to your collection. */
-  protected static final String XMLFILE = "input.xml";
 
   /** The database name. **/
   protected static final String DBNAME = "MyFileCollection";
@@ -39,88 +36,120 @@ public class CollectionExamples {
    * store the serializing results in a file. You may as well point it to
    * System.out.
    */
-  private final OutputStream out = System.out;
+  private final OutputStream out;
+
+  /** Flag to show verbose output. */
+  private boolean verbose;
 
   /**
-   * Sets up the example class.
+   * Runs the examples.
    * @param args not used.
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
-    // -------------------------------------------------------------------------
-    // To import XML files with suffixes other than XML, for example KML use
-    // this Property:
-    // CONTEXT.prop.set("CREATEFILTER", "*.kml");
-    // -------------------------------------------------------------------------
-
-    final CollectionExamples collectionExamples = new CollectionExamples();
+    new CollectionExamples().run();
+  }
+  /**
+   * Constructor initializes the Database Context.
+   * Points 'out' to System.out.
+   * Sets verbosity (on or off).
+   */
+  public CollectionExamples() {
+    ctx = new Context();
+    out  = System.out;
+    verbose = false;
+  }
+  
+  /**
+   * Runs the examples.
+   * @throws BaseXException on error.
+   */
+  private void run() throws BaseXException {
     System.out.println("=== Creating a collection.");
-    collectionExamples.createColl(true);
+    createColl();
+
+    System.out.println("=== Add an document to the collection.");
+    addFile("input.xml");
 
     System.out.println("=== Remove an document from the collection.");
-    collectionExamples.deleteDocumentFromColl();
+    deleteDocumentFromColl("input.xml");
 
     System.out.println("=== Closing & Dropping the collection.");
-    collectionExamples.cleanup();
-  }
+    cleanup();
 
+  }
   /**
    * Cleans up afterwards.
+   * Close is implicitly called when executing DropDB.
    * @throws BaseXException if a database command fails
    */
   protected void cleanup() throws BaseXException {
-    new Close().execute(CONTEXT);
-    new DropDB(DBNAME).execute(CONTEXT);
+    new DropDB(DBNAME).execute(ctx);
   }
 
   /**
    * This method creates a database using a Collection of XML files. The method
    * {@link CreateColl#CreateColl(String)} is used to create an
-   * <strong>empty</strong> collection. You may add documents via
-   * {@link Add#Add(String)} to any database that is opened in the current
-   * context. Once the database has been created
-   * @param verbose output the InfoDB if true.
+   * <strong>empty</strong> collection. 
+   * Once the database has been created it is optimized.
    * @throws BaseXException if a database command fails
    */
-  protected void createColl(final boolean verbose) throws BaseXException {
-    new CreateColl(DBNAME).execute(CONTEXT);
+  protected void createColl() throws BaseXException {
+    // -------------------------------------------------------------------------
+    // To import XML files with suffixes other than XML, for example KML use
+    // this Property:
+    // ctx.prop.set("CREATEFILTER", "*.kml");
+    // -------------------------------------------------------------------------
 
     // -------------------------------------------------------------------------
-    // Add some files and folders:
-    new Add(XMLFILE).execute(CONTEXT);
-    new Add(PATH).execute(CONTEXT);
+    // Create an empty collection:
+    new CreateColl(DBNAME).execute(ctx);
+
+    new Add(PATH).execute(ctx);
 
     // -------------------------------------------------------------------------
     // Optimize the database structures
-    new Optimize().execute(CONTEXT);
-
+    new Optimize().execute(ctx);
+    
     /**
      * Output some information on your newly created database you may as well
      * run Queries on your collection, see the examples provided in
      * {@link QueryExample}.
      */
-    if(verbose) new InfoDB().execute(CONTEXT, out);
+    if(verbose) new InfoDB().execute(ctx, out);
   }
-
+  
+  /**
+   * Adds a single file to the collection.
+   * You may add documents and folders via
+   * {@link Add#Add(String)} to any database that is opened in the current
+   * context.
+   * @param xmlfile the file to add.
+   * @throws BaseXException on fail.
+   */
+  private void addFile(final String xmlfile) throws BaseXException {
+    // -------------------------------------------------------------------------
+    // Adds a single file:
+    new Add(xmlfile).execute(ctx);
+  }
+  
   /**
    * This command removes a single document from your collection.
+   * @param xmlfile the file to delete.
    * @throws BaseXException if a database command fails
    */
-  private void deleteDocumentFromColl() throws BaseXException {
+  private void deleteDocumentFromColl(final String xmlfile) 
+    throws BaseXException {
     // -------------------------------------------------------------------------
     // Delete a file:
-    new Delete(XMLFILE).execute(CONTEXT);
+    new Delete(xmlfile).execute(ctx);
 
     // -------------------------------------------------------------------------
     // Optimize the database structures
-    new Optimize().execute(CONTEXT);
+    new Optimize().execute(ctx);
 
     // -------------------------------------------------------------------------
     // Output some information on your altered collection
-     try {
-      new InfoDB().execute(CONTEXT, out);
-    } catch(final BaseXException e) {
-      e.printStackTrace();
-    }
+    if(verbose) new InfoDB().execute(ctx, out);
   }
 }

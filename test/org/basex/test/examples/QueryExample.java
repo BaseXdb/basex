@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
@@ -24,6 +23,7 @@ import org.basex.query.iter.Iter;
 public final class QueryExample {
   /** The database context. */
   private Context context;
+  
   /** Output stream, initialized by the constructor. */
   private OutputStream out;
 
@@ -96,7 +96,6 @@ public final class QueryExample {
 
     // ----------------------------------------------------------------------
     // Close and drop the database
-    new Close().execute(context, out);
     new DropDB("Example1").execute(context, out);
 
     // ----------------------------------------------------------------------

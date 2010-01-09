@@ -27,7 +27,7 @@ public final class ServerExampleLocalProcessing {
   private ServerExampleLocalProcessing() { }
 
   /** The current LOCAL database Context. */
-  static final Context CONTEXT = new Context();
+  static final Context CTX = new Context();
   
   /** Local database to process intermediate results. */
   private static final String LOCALDB = "ServerLocalProcessingExample1";
@@ -69,10 +69,10 @@ public final class ServerExampleLocalProcessing {
 
     // -------------------------------------------------------------------------
     // Create a new LOCAL database from the XML result string:    
-    new CreateDB(result.toString(), LOCALDB).execute(CONTEXT, System.out);
+    new CreateDB(result.toString(), LOCALDB).execute(CTX, System.out);
     // -------------------------------------------------------------------------
     // 2) Query the newly created database:
-    QueryProcessor qp = new QueryProcessor("//text()", CONTEXT);
+    QueryProcessor qp = new QueryProcessor("//text()", CTX);
     Nodes ns = qp.queryNodes(); 
 
     // Output all textual contents:
@@ -87,8 +87,8 @@ public final class ServerExampleLocalProcessing {
     
     // -------------------------------------------------------------------------
     // close & drop the LOCAL database
-    new Close().execute(CONTEXT);
-    new DropDB(LOCALDB).execute(CONTEXT);
+    new Close().execute(CTX);
+    new DropDB(LOCALDB).execute(CTX);
   }
   
   /**
