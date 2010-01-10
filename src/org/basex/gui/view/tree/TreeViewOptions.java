@@ -2,8 +2,8 @@ package org.basex.gui.view.tree;
 
 /**
  * This interface contains options for the tree view.
- *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
 public interface TreeViewOptions {
@@ -19,15 +19,13 @@ public interface TreeViewOptions {
   /** Draw rectangle border. */
   boolean BORDER_RECTANGLES = true;
   /** Fill rectangles. */
-  boolean FILL_RECTANGLES = false;
+  boolean FILL_RECTANGLES = true;
   /** Slim rectangles to text length. */
   boolean SLIM_TO_TEXT = true;
   /** Show extra node information. */
-  boolean SHOW_EXTRA_INFO = true;
+  boolean SHOW_EXTRA_INFO = false;
   /** Border padding value. */
   int BORDER_PADDING = 2;
-  /** Filling padding value. */
-  int FILL_PADDING = 1;
   /** Margin to top. */
   int TOP_MARGIN = 2;
   /** Changes Color until given level. */
@@ -36,11 +34,13 @@ public interface TreeViewOptions {
   /** Minimum space in rectangles needed for tags. */
   int MIN_SPACE = 25;
   /** Minimum space between the levels. */
-  int MINIMUM_LEVEL_DISTANCE = 8;
+  int MIN_LEVEL_DISTANCE = 8;
   /** Maximum level distance. */
-  int MAXIMUM_LEVEL_DISTANCE = 40;
+  int MAX_LEVEL_DISTANCE = 40;
   /** Minimum node height. */
-  int MINIMUM_NODE_HEIGHT = 1;
+  int MIN_NODE_HEIGHT = 1;
+
+ 
 
   /** Draw kind rectangle. */
   byte DRAW_RECTANGLE = 0x00;

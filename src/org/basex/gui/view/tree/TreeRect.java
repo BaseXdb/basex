@@ -3,7 +3,7 @@ package org.basex.gui.view.tree;
 
 /**
  * This is class is used to handle rectangles.
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
 public class TreeRect {

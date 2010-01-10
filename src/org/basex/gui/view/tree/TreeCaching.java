@@ -10,7 +10,7 @@ import org.basex.util.TokenBuilder;
 /**
  * This class determines nodes per level and caches them.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
 public class TreeCaching implements TreeViewOptions {

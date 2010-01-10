@@ -24,8 +24,8 @@ import org.basex.util.Token;
 
 /**
  * This class offers a real tree view.
- *
- * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
+ * 
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
 public final class TreeView extends View implements TreeViewOptions {
@@ -133,9 +133,8 @@ public final class TreeView extends View implements TreeViewOptions {
     // perf.initTimer();
 
     // initializes sizes
-    nodeHeight = fontHeight = g.getFontMetrics().getHeight();
-
-    setLevelDistance();
+    nodeHeight = 20;
+    fontHeight = g.getFontMetrics().getHeight();
 
     if(windowSizeChanged()) {
 
@@ -146,8 +145,9 @@ public final class TreeView extends View implements TreeViewOptions {
 
       focusedRect = null;
       cache.generateBordersAndRects(g, gui.context, getWidth());
+      setLevelDistance();
       createNewMainImage();
-    }
+    } else setLevelDistance();
 
     g.drawImage(treeImage, 0, 0, getWidth(), getHeight(), this);
 
@@ -191,18 +191,40 @@ public final class TreeView extends View implements TreeViewOptions {
    */
   private void createNewMainImage() {
     treeImage = createImage();
-    final Graphics tIg = treeImage.getGraphics();
+    final Graphics tg = treeImage.getGraphics();
 
     final int rn = 0;
 
     for(int i = 0; i < cache.getHeight(rn); i++) {
 
+      final boolean br = cache.isBigRectangle(rn, i);
+
       final TreeRect[] lr = cache.getTreeRectsPerLevel(rn, i);
 
       for(final TreeRect r : lr) {
-        drawRectangle(tIg, i, r.x, r.w, nodeHeight, BORDER_RECTANGLES,
-            FILL_RECTANGLES, DRAW_RECTANGLE);
+        drawRectangle(tg, i, r.x, r.w, nodeHeight, BORDER_RECTANGLES,
+            FILL_RECTANGLES, DRAW_RECTANGLE, br);
       }
+
+      if(br) {
+        final TreeRect r = lr[0];
+        int nh = nodeHeight;
+        final int w = r.w;
+        int x = r.x;
+        final int y = getYperLevel(i);
+
+        tg.setColor(GUIConstants.back);
+        while(nh > 0) {
+          nh = nh - 3;
+          tg.drawLine(x, y + nh, w, y + nh);
+        }
+
+        while(x < w) {
+          x = x + 3;
+          tg.drawLine(x, y, x, y + nodeHeight);
+        }
+      }
+
     }
   }
 
@@ -216,10 +238,11 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param border draw rectangle border
    * @param fill fill rectangle
    * @param type use type
+   * @param br big rectangle
    */
   private void drawRectangle(final Graphics g, final int l, final int x,
       final int w, final int h, final boolean border, final boolean fill,
-      final byte type) {
+      final byte type, final boolean br) {
 
     final int y = getYperLevel(l);
 
@@ -236,13 +259,15 @@ public final class TreeView extends View implements TreeViewOptions {
         fillColor = GUIConstants.colormark2;
     }
     if(border) {
+      final int xx = br ? 0 : x + BORDER_PADDING;
       g.setColor(borderColor);
-      g.drawRect(x + BORDER_PADDING, y, w - BORDER_PADDING, h);
+      g.drawRect(xx, y, w - BORDER_PADDING, h);
     }
 
     if(fill) {
+      final int xx = br ? 0 : x + BORDER_PADDING + 1;
       g.setColor(fillColor);
-      g.fillRect(x + FILL_PADDING, y, w - FILL_PADDING, h);
+      g.fillRect(xx, y + 1, w - (BORDER_PADDING + 1), h - 1);
     }
   }
 
@@ -283,8 +308,8 @@ public final class TreeView extends View implements TreeViewOptions {
     for(int i = 0; i < size; i++) {
       final int yL = getYperLevel(i);
 
-      if((yL >= f || yL + nodeHeight >= f) && (yL <= t ||
-          yL + nodeHeight <= t)) {
+      if((yL >= f || yL + nodeHeight >= f) && 
+          (yL <= t || yL + nodeHeight <= t)) {
 
         final TreeRect[] rl = cache.getTreeRectsPerLevel(rn, i);
         final int s = cache.getLevelSize(rn, i);
@@ -372,7 +397,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
           if(index > -1) {
 
-            final int x = (int) (getWidth() * index /
+            final int x = (int) (getWidth() * index / 
                 (double) cache.getLevelSize(
                 rn, i));
 
@@ -421,6 +446,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     final int y = getYperLevel(l);
     final int h = nodeHeight;
+    final boolean br = cache.isBigRectangle(rn, l);
 
     final Data d = gui.context.data;
     final int kind = d.kind(pre);
@@ -428,12 +454,12 @@ public final class TreeView extends View implements TreeViewOptions {
     int multiPreX = -1;
 
     if(fillNodes) {
-      drawRectangle(g, l, r.x, r.w, h, false, true, DRAW_HIGHLIGHT);
+      drawRectangle(g, l, r.x, r.w, h, false, true, DRAW_HIGHLIGHT, br);
     } else {
-      drawRectangle(g, l, r.x, r.w, h, true, false, DRAW_HIGHLIGHT);
+      drawRectangle(g, l, r.x, r.w, h, true, false, DRAW_HIGHLIGHT, br);
     }
 
-    if(cache.isBigRectangle(rn, l)) {
+    if(br) {
       final int index = cache.getPreIndex(rn, l, pre);
       final double ratio = index / (double) (cache.getLevelSize(rn, l) - 1);
       multiPreX = (int) (r.w * ratio);
@@ -659,16 +685,16 @@ public final class TreeView extends View implements TreeViewOptions {
    */
   private void setLevelDistance() {
     final int h = getHeight() - 5;
-    final int lvs = gui.context.current.data.meta.height + 1;
-    int lD = 0;
+    final int lvs = cache.getHeight(0);
+    int lD;
     while((lD = (int) ((h - lvs * nodeHeight) /
-        (double) (lvs - 1))) < MINIMUM_LEVEL_DISTANCE
-        && nodeHeight > MINIMUM_NODE_HEIGHT)
+        (double) (lvs - 1))) < MIN_LEVEL_DISTANCE
+        && nodeHeight > MIN_NODE_HEIGHT)
       nodeHeight--;
-    levelDistance = lD < MINIMUM_LEVEL_DISTANCE ? MINIMUM_LEVEL_DISTANCE
-        : lD > MAXIMUM_LEVEL_DISTANCE ? MAXIMUM_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance *
-        (lvs - 1) + lvs * nodeHeight)) / 2d);
+    levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
+        : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
+    final int ih = (int) ((h - (levelDistance * (lvs - 1) + 
+        lvs * nodeHeight)) / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }
 
