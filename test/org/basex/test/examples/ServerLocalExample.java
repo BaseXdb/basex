@@ -69,7 +69,7 @@ public final class ServerLocalExample {
     new CreateDB(result.toString(), "LocalDB").execute(CONTEXT, System.out);
 
     // -------------------------------------------------------------------------
-    // Locally cache the result of a server-side query
+    // Run a query on the locally cached results
     System.out.println("\n* Run a local query:");
 
     new XQuery("//title").execute(CONTEXT, System.out);
@@ -94,8 +94,9 @@ public final class ServerLocalExample {
   }
 
   /**
-   * Processes the specified command on the server and returns the output
-   * or command info verbosely by default.
+   * Processes the specified command on the server and writes the
+   * response to out.
+   * Command info is printed to System.out by default.
    * @param command command to be executed
    * @param out OutputStream to write to
    * @throws IOException I/O exception

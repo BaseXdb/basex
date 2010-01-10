@@ -7,7 +7,7 @@ import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 
 /**
- * This class let multiple clients connect to one server instance.
+ * This class connects multiple clients to one server instance.
  * It sets up three clients with read/write access to the database.
  * Database information will be shown before and after the
  * clients have been run.
@@ -72,7 +72,7 @@ public final class ServerConcurrencyExample {
         "<new>One more</new> as last into /html/body");
 
     // -------------------------------------------------------------------------
-    // Let the clients run the query several times:
+    // Let the clients run their query several times:
     Performance.sleep(2000);
 
     // ------------------------------------------------------------------------

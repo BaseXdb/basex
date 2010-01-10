@@ -54,7 +54,7 @@ public final class WikiExample {
     ).execute(CONTEXT, OUT);
 
     // ----------------------------------------------------------------------
-    // Match all paragraphs text contents against
+    // Match all paragraphs' textual contents against
     // 'edit.*' AND ('article' or 'page').
     System.out.println("\n* Perform a full-text query:");
 

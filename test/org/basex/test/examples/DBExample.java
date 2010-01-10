@@ -14,7 +14,7 @@ import org.basex.core.proc.Open;
 import org.basex.core.proc.Optimize;
 
 /**
- * This class demonstrates how databases are created and dropped.
+ * This class demonstrates database creation and dropping.
  * It then shows how to add indexes to the database and retrieve
  * some information on the database structures.
  *
@@ -40,7 +40,7 @@ public final class DBExample {
     System.out.println("=== DBExample ===");
 
     // ----------------------------------------------------------------------
-    // Create a database from a remote XML document
+    // Create a database from a local or remote XML document or XML String.
     System.out.println("\n* Create a database.");
 
     new CreateDB("input.xml", "DBExample").execute(CONTEXT);

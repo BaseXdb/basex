@@ -55,7 +55,7 @@ public class AdministrationExample {
     new Grant("NONE", "testuser").execute(CONTEXT);
 
     // ------------------------------------------------------------------------
-    // Grant local user rights
+    // Grant local user rights on database »input«
     System.out.println("\n* Grant local user rights.");
 
     new Grant("WRITE", "testuser", "input").execute(CONTEXT);

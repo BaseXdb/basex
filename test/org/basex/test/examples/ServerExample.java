@@ -5,7 +5,7 @@ import org.basex.BaseXServer;
 import org.basex.server.ClientSession;
 
 /**
- * This class demonstrates how the database can be accessed via the
+ * This class demonstrates database access via the
  * client/server architecture.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License

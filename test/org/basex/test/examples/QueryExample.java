@@ -100,7 +100,7 @@ public final class QueryExample {
     final Result result = processor.query();
 
     // ------------------------------------------------------------------------
-    // Serialize all results, using the specified serializer
+    // Serialize all results to OUT, using the specified serializer
     result.serialize(new XMLSerializer(OUT));
 
     // ------------------------------------------------------------------------

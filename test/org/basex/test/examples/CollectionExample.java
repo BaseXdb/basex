@@ -45,14 +45,15 @@ public final class CollectionExample {
     // files with suffixes other than XML (for example KML):
     new Set("CREATEFILTER", "*.xml").execute(CONTEXT);
 
-    // ------------------------------------------------------------------------
+    // Variant 1 --------------------------------------------------------------
     // Create a collection and add all documents within the specified path
     System.out.println("\n* Create a collection.");
 
     new CreateDB("etc/", "Collection").execute(CONTEXT);
-
-    // ------------------------------------------------------------------------
-    // Create an empty collection, add documents in a second pass
+    new DropDB("Collection").execute(CONTEXT);
+    
+    // Variant 2 --------------------------------------------------------------
+    // Or: Create an empty collection, add documents in a second pass
     // and optimize the database to refresh the index structures
     System.out.println("\n* Create an empty collection and add documents.");
 

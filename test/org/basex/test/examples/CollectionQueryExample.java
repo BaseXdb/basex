@@ -8,8 +8,8 @@ import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 
 /**
- * This class demonstrates two variants how to create collections, i.e.,
- * databases for several XML documents.
+ * This class demonstrates collection relevant queries.
+ * It shows how to find and query specific documents. 
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
@@ -36,7 +36,7 @@ public final class CollectionQueryExample {
     // Create a collection from all XML documents in the 'etc' directory
     System.out.println("\n* Create a collection.");
 
-    new CreateDB("etc", "Collection").execute(CONTEXT);
+    new CreateDB("etc/", "Collection").execute(CONTEXT);
 
     // ------------------------------------------------------------------------
     // List all documents in the database
@@ -52,7 +52,7 @@ public final class CollectionQueryExample {
     // Evaluate a query on a single document
     System.out.println("\n\n* Evaluate a query on a single document:");
 
-    // If the name of the database is omit in the collection() function,
+    // If the name of the database is omitted in the collection() function,
     // the currently opened database will be referenced
     new XQuery(
         "for $doc in collection()" +
