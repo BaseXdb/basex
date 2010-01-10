@@ -46,7 +46,7 @@ public final class CollectionQueryExample {
     new XQuery(
         "for $doc in collection('Collection')" +
         "return <doc path='{ base-uri($doc) }'/>"
-    ).execute(CONTEXT, System.out);
+    ).execute(CONTEXT, OUT);
 
     // ------------------------------------------------------------------------
     // Evaluate a query on a single document
@@ -59,7 +59,7 @@ public final class CollectionQueryExample {
         "let $file-path := base-uri($doc)" +
         "where ends-with($file-path, 'factbook.xml')" +
         "return concat($file-path, ' has ', count($doc//*), ' elements')"
-    ).execute(CONTEXT, System.out);
+    ).execute(CONTEXT, OUT);
 
     // ------------------------------------------------------------------------
     // Drop the database

@@ -18,14 +18,14 @@ import org.basex.core.proc.ShowUsers;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public class AdministrationExample {
+public class UserExample {
   /** Database context. */
   static final Context CONTEXT = new Context();
   /** Output stream. */
   static final OutputStream OUT = System.out;
 
   /** Default constructor. */
-  protected AdministrationExample() { }
+  protected UserExample() { }
 
   /**
    * Runs the example code.
@@ -55,7 +55,7 @@ public class AdministrationExample {
     new Grant("NONE", "testuser").execute(CONTEXT);
 
     // ------------------------------------------------------------------------
-    // Grant local user rights on database »input«
+    // Grant local user rights on database 'input'
     System.out.println("\n* Grant local user rights.");
 
     new Grant("WRITE", "testuser", "input").execute(CONTEXT);

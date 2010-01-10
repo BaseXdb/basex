@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
 import org.basex.server.ClientSession;
-import org.basex.util.Performance;
 
 /**
  * This class connects multiple clients to one server instance.
@@ -73,7 +72,7 @@ public final class ServerConcurrencyExample {
 
     // -------------------------------------------------------------------------
     // Let the clients run their query several times:
-    Performance.sleep(2000);
+    Thread.sleep(2000);
 
     // ------------------------------------------------------------------------
     // Stop the clients
@@ -83,7 +82,7 @@ public final class ServerConcurrencyExample {
     writer1.stop();
     writer2.stop();
 
-    Performance.sleep(1000);
+    Thread.sleep(1000);
 
     // -------------------------------------------------------------------------
     // Show modified database contents
