@@ -64,17 +64,8 @@ public final class InexSubmit {
   private final Context ctx = new Context();
   /** Queries. */
   private final StringList queries;
-  /** Session. */
-  private ClientSession session;
-  /** Databases. */
-  private StringList databases;
   /** Topic ids of the queries. */
   private final StringList tid;
-
-  /** PrintOutput for the submission file. */
-  private PrintOutput sub;
-  /** XMLSerializer for the submission file. */
-  private XMLSerializer xml;
 
   /** Collection for query result sizes. */
   private final int[] qressizes;
@@ -86,6 +77,15 @@ public final class InexSubmit {
   private final SeqIter[] results;
   /** Number of queries. */
   private final int nqueries;
+
+  /** Session. */
+  private ClientSession session;
+  /** Databases. */
+  private StringList databases;
+  /** PrintOutput for the submission file. */
+  private PrintOutput sub;
+  /** XMLSerializer for the submission file. */
+  private XMLSerializer xml;
   /** Number of query times. */
   private int c;
 
@@ -417,8 +417,7 @@ public final class InexSubmit {
       }
     }
 
-    final BufferedReader br =
-      new BufferedReader(new FileReader(SUBMISSION));
+    final BufferedReader br = new BufferedReader(new FileReader(SUBMISSION));
     final PrintOutput o = new PrintOutput(SUBMISSIONU);
     i = 0;
     while((l = br.readLine()) != null) {

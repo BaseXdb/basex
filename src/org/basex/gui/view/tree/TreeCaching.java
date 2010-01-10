@@ -53,12 +53,12 @@ public class TreeCaching implements TreeViewOptions {
       }
     } else {
 
-      IntList[] li = new IntList[maxLevel];
+      final IntList[] li = new IntList[maxLevel];
       for(int i = 0; i < maxLevel; i++)
         li[i] = new IntList();
 
       final int ts = data.meta.size;
-      int[] lvlPre = new int[maxLevel];
+      final int[] lvlPre = new int[maxLevel];
       lvlPre[0] = 0;
 
       for(int p = 1; p < ts; p++) {
@@ -113,8 +113,8 @@ public class TreeCaching implements TreeViewOptions {
    * @return index
    */
   private int getMinIndex(final int lv, final int lp, final int rp) {
-    int l = 0;
-    int r = nodes[lv].length - 1;
+    final int l = 0;
+    final int r = nodes[lv].length - 1;
 
     int min = searchPreIndex(lv, lp, rp, l, r);
 
@@ -134,13 +134,13 @@ public class TreeCaching implements TreeViewOptions {
    * @param c context
    * @param sw screen width
    */
-  void generateBordersAndRects(final Graphics g, 
+  void generateBordersAndRects(final Graphics g,
       final Context c, final int sw) {
 
     final Data d = c.current.data;
-    int[] roots = c.current.nodes;
+    final int[] roots = c.current.nodes;
     final int rl = roots.length;
-    TreeBorder[][] bo = new TreeBorder[rl][];
+    final TreeBorder[][] bo = new TreeBorder[rl][];
     rects = new TreeRect[rl][][];
 
     for(int i = 0; i < rl; i++) {
@@ -158,7 +158,7 @@ public class TreeCaching implements TreeViewOptions {
    */
   TreeBorder[] generateSubtreeBorders(final Data d, final int pre) {
 
-    TreeBorder[] bo = new TreeBorder[maxLevel];
+    final TreeBorder[] bo = new TreeBorder[maxLevel];
     if(pre == 0) {
       for(int i = 0; i < maxLevel; i++)
         bo[i] = new TreeBorder(i, 0, nodes[i].length);
@@ -173,14 +173,12 @@ public class TreeCaching implements TreeViewOptions {
     // level pair
     bo[rl] = new TreeBorder(rl, ri, 1);
 
-    // System.out.println("rootl: " + rl);
-
-    int np = pre + d.size(pre, d.kind(pre));
+    final int np = pre + d.size(pre, d.kind(pre));
     int h = 1;
 
     for(int i = rl + 1; i < maxLevel; i++) {
 
-      int min = getMinIndex(i, pre, np);
+      final int min = getMinIndex(i, pre, np);
 
       if(min == -1) break;
 
@@ -194,7 +192,7 @@ public class TreeCaching implements TreeViewOptions {
       ++h;
     }
 
-    TreeBorder[] bon = new TreeBorder[h];
+    final TreeBorder[] bon = new TreeBorder[h];
     System.arraycopy(bo, rl, bon, 0, h);
 
     return bon;
@@ -216,7 +214,7 @@ public class TreeCaching implements TreeViewOptions {
 
     for(int i = 0; i < h; i++) {
 
-      double w = sw / bo[i].size;
+      final double w = sw / bo[i].size;
 
       if(w < 2) {
         bigRectangle(rn, i, sw);
@@ -408,7 +406,7 @@ public class TreeCaching implements TreeViewOptions {
   TreeRect searchRect(final int rn, final int lv, final int pre) {
     final TreeBorder bo = getTreeBorder(rn, lv);
 
-    int i = searchPreArrayPos(bo.level, pre);
+    final int i = searchPreArrayPos(bo.level, pre);
 
     // System.out.println("i " + i + " b " + (i - bo.start) + " l " +
     // rects[rn][lv].length);

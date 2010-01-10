@@ -24,7 +24,7 @@ import org.basex.util.Token;
 
 /**
  * This class offers a real tree view.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller
  */
@@ -197,10 +197,9 @@ public final class TreeView extends View implements TreeViewOptions {
 
     for(int i = 0; i < cache.getHeight(rn); i++) {
 
-      TreeRect[] lr = cache.getTreeRectsPerLevel(rn, i);
+      final TreeRect[] lr = cache.getTreeRectsPerLevel(rn, i);
 
-      for(int z = 0; z < lr.length; z++) {
-        TreeRect r = lr[z];
+      for(final TreeRect r : lr) {
         drawRectangle(tIg, i, r.x, r.w, nodeHeight, BORDER_RECTANGLES,
             FILL_RECTANGLES, DRAW_RECTANGLE);
       }
@@ -222,7 +221,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final int w, final int h, final boolean border, final boolean fill,
       final byte type) {
 
-    int y = getYperLevel(l);
+    final int y = getYperLevel(l);
 
     Color borderColor = null;
     Color fillColor = null;
@@ -284,7 +283,7 @@ public final class TreeView extends View implements TreeViewOptions {
     for(int i = 0; i < size; i++) {
       final int yL = getYperLevel(i);
 
-      if((yL >= f || yL + nodeHeight >= f) && (yL <= t || 
+      if((yL >= f || yL + nodeHeight >= f) && (yL <= t ||
           yL + nodeHeight <= t)) {
 
         final TreeRect[] rl = cache.getTreeRectsPerLevel(rn, i);
@@ -373,7 +372,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
           if(index > -1) {
 
-            final int x = (int) (getWidth() * index / 
+            final int x = (int) (getWidth() * index /
                 (double) cache.getLevelSize(
                 rn, i));
 
@@ -443,7 +442,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(childX > -1) {
       g.drawLine(childX, getYperLevel(l + 1) - 1,
-          multiPreX == -1 ? (2 * r.x + r.w) / 2 : 
+          multiPreX == -1 ? (2 * r.x + r.w) / 2 :
             multiPreX, y + nodeHeight + 1);
     }
 
@@ -517,10 +516,10 @@ public final class TreeView extends View implements TreeViewOptions {
         //
         // if(gui.context.current.nodes[0] > 0)
         // System.out.println(gui.context.current.nodes[0]);
-        //        
+        //
         // for(int i = 1; i < sBo.length; i++) {
         // TreeBorder sub = sBo[i];
-        //          
+        //
         // for(int j = sub.start; j < sub.start + sub.size; j++) {
         //
         // int pi = cache.getPrePerIndex(rn, lv, j);
@@ -571,7 +570,7 @@ public final class TreeView extends View implements TreeViewOptions {
     if(refreshedFocus) {
       final int pre = gui.context.focused;
 
-      int rn = 0;
+      final int rn = 0;
 
       for(int i = 0; i < cache.getHeight(rn); i++) {
 
@@ -662,13 +661,13 @@ public final class TreeView extends View implements TreeViewOptions {
     final int h = getHeight() - 5;
     final int lvs = gui.context.current.data.meta.height + 1;
     int lD = 0;
-    while((lD = (int) ((h - lvs * nodeHeight) / 
+    while((lD = (int) ((h - lvs * nodeHeight) /
         (double) (lvs - 1))) < MINIMUM_LEVEL_DISTANCE
         && nodeHeight > MINIMUM_NODE_HEIGHT)
-      nodeHeight--;    
+      nodeHeight--;
     levelDistance = lD < MINIMUM_LEVEL_DISTANCE ? MINIMUM_LEVEL_DISTANCE
         : lD > MAXIMUM_LEVEL_DISTANCE ? MAXIMUM_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * 
+    final int ih = (int) ((h - (levelDistance *
         (lvs - 1) + lvs * nodeHeight)) / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }

@@ -34,7 +34,6 @@ public final class CreateDB extends ACreate {
    * Default constructor.
    * @param input input XML file or XML string
    * @param name name of database
-   * (special characters are stripped before the name is applied)
    */
   public CreateDB(final String input, final String name) {
     super(User.CREATE, input, IO.get(name == null ? input : name).dbname());

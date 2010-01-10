@@ -180,8 +180,9 @@ public final class TextView extends View implements ActionListener {
     if(file == null) return;
     gui.prop.set(GUIProp.SAVEPATH, file.path());
 
+    PrintOutput out = null;
     try {
-      final PrintOutput out = new PrintOutput(file.toString());
+      out = new PrintOutput(file.toString());
       if(proc != null) {
         proc.exec(gui.context, out);
       } else if(ns != null) {
@@ -191,9 +192,10 @@ public final class TextView extends View implements ActionListener {
         for(final byte t : txt) if(t < 0 || t > ' ' || Token.ws(t))
           out.write(t);
       }
-      out.close();
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);
+    } finally {
+      try { if(out != null) out.close(); } catch(final IOException ex) { }
     }
   }
 }

@@ -1,7 +1,6 @@
 package org.basex.test.examples;
 
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.data.Result;
 import org.basex.data.SAXSerializer;
 import org.basex.query.QueryProcessor;
@@ -17,53 +16,55 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author BaseX Team
  */
 public final class SAXExample extends DefaultHandler {
-  /** Sample query. */
-  private static final String QUERY = "doc('input.xml')//title";
-
   /**
    * Main method of the example class.
-   * @param args an optional query can be specified on the command line
-   * @throws Exception exception
+   * @param args (ignored) command-line arguments
+   * @throws Exception passes on any exception
    */
   public static void main(final String[] args) throws Exception {
-    // evaluate query
-    new SAXExample();
+    new SAXExample().run();
   }
 
   /**
-   * Constructor.
+   * Runs the example code.
    * @throws Exception exception
    */
-  public SAXExample() throws Exception {
-    // create database context
-    Context ctx = new Context();
+  private void run() throws Exception {
 
-    // create query instance
-    QueryProcessor query = new QueryProcessor(QUERY, ctx);
-    // execute query
-    Result result = query.query();
+    System.out.println("=== SAXExample ===\n");
 
-    // create XML reader
-    XMLReader reader = new SAXSerializer(result);
-    // set this class as content handler
+    // Create database context
+    final Context ctx = new Context();
+
+    // ----------------------------------------------------------------------
+    // Evaluate the query
+    final QueryProcessor query =
+      new QueryProcessor("doc('input.xml')//title", ctx);
+    final Result result = query.query();
+
+    // ----------------------------------------------------------------------
+    // Create an XML reader, set the content handler and start parsing
+    final XMLReader reader = new SAXSerializer(result);
     reader.setContentHandler(this);
-    // start parser
     reader.parse("");
   }
 
   @Override
   public void startElement(final String uri, final String ln, final String qn,
       final Attributes at) {
-    Main.outln("Start Element: " + qn);
+    // Print opening tags
+    System.out.println("* Start Element: " + qn);
   }
 
   @Override
   public void endElement(final String uri, final String ln, final String qn) {
-    Main.outln("End Element: " + qn);
+    // Print closing tags
+    System.out.println("* End Element: " + qn);
   }
 
   @Override
   public void characters(final char[] ch, final int s, final int l) {
-    Main.outln("Characters: " + new String(ch, s, l));
+    // Print text nodes
+    System.out.println("* Characters: " + new String(ch, s, l));
   }
 }

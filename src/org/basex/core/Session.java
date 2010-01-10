@@ -2,6 +2,7 @@ package org.basex.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import org.basex.io.NullOutput;
 
 /**
  * This class allows a generic process execution.
@@ -32,14 +33,25 @@ public abstract class Session {
     throws IOException;
 
   /**
-   * Executes a process. This method should only be used if a command
-   * does not return textual results.
+   * Executes a process. {@link #execute(Proc, OutputStream)} should be
+   * called if textual results are expected.
    * @param pr process to be executed
    * @throws IOException I/O exception
    * @return success of operation
    */
   public final boolean execute(final Proc pr) throws IOException {
-    return execute(pr, null);
+    return execute(pr, new NullOutput());
+  }
+
+  /**
+   * Executes a command. {@link #execute(String, OutputStream)} should be
+   * called if textual results are expected.
+   * @param pr process to be executed
+   * @throws IOException I/O exception
+   * @return success of operation
+   */
+  public final boolean execute(final String pr) throws IOException {
+    return execute(pr, new NullOutput());
   }
 
   /**

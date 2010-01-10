@@ -27,6 +27,10 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   private LexicalHandler lexical;
   /** Content handler reference. */
   private final Result result;
+  /** Caches a tag name. */
+  private String tag;
+  /** Caches attributes. */
+  private AttributesImpl atts;
 
   /**
    * Constructor.
@@ -120,11 +124,6 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void setProperty(final String name, final Object value) {
     Main.notimplemented();
   }
-
-  /** Caches a tag name. */
-  private String tag;
-  /** Caches attributes. */
-  private AttributesImpl atts;
 
   @Override
   public void openResult() throws IOException {

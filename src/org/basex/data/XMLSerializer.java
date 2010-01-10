@@ -4,14 +4,13 @@ import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import java.io.OutputStream;
-
 import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 
 /**
- * This is an interface for serializing XML results.
+ * This class serializes XML results.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -291,7 +290,7 @@ public final class XMLSerializer extends Serializer {
           out.write(le ? ch >>> 8 : ch & 0xFF);
         }
       } else {
-        out.print(s.getBytes(enc));
+        out.write(s.getBytes(enc));
       }
     }
   }

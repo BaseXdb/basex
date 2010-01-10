@@ -26,7 +26,6 @@ public final class Delete extends ACreate {
   @Override
   protected boolean exec(final PrintOutput out) {
     final IO io = IO.get(args[0]);
-    if(!io.exists()) return error(FILEWHICH, io);
 
     final int pre = findDoc(Token.token(io.name()));
     if(pre == -1) return error(DBNODOC, args[0]);

@@ -415,19 +415,19 @@ public final class DeepFile {
    * Adds a metadata key-value pair for the current file.
    * @param e metadata element (the key)
    * @param value the value to add
-   * @param dataType the xml data type to set for this metadata element or
+   * @param type the xml data type to set for this metadata element or
    *          <code>null</code> if the default data type should be used
    */
-  private void addMeta(final MetaElem e, final String value,
-      final Type dataType) {
-    if(metaFinished || value.length() == 0) return;
+  private void addMeta(final MetaElem e, final String value, final Type type) {
+    if(metaFinished || value.isEmpty()) return;
+
     if(e.equals(MetaElem.TYPE) || e.equals(MetaElem.FORMAT)) {
       Main.debug("The metadata attributes " + MetaElem.TYPE + " and "
           + MetaElem.FORMAT + " must not be set by an addMetaElem() method."
           + " Use setMetaType() and setFormat() instead.");
       return;
     }
-    if(dataType != null) e.refineDataType(dataType);
+    if(type != null) e.refineDataType(type);
     else e.reset();
     addMeta0(e, value);
   }
@@ -439,7 +439,8 @@ public final class DeepFile {
    */
   private void addMeta0(final MetaElem e, final String value) {
     final String s = value.trim();
-    if(s.length() == 0) return;
+    if(s.isEmpty()) return;
+
     final ArrayList<String> vals;
     if(metaElements.containsKey(e)) {
       if(!e.isMultiVal()) {

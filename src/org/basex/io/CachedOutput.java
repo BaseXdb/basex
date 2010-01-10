@@ -20,8 +20,7 @@ public final class CachedOutput extends PrintOutput {
   /**
    * Default constructor.
    */
-  public CachedOutput() {
-  }
+  public CachedOutput() { }
 
   /**
    * Constructor, specifying the maximum number of bytes to write.
@@ -56,9 +55,9 @@ public final class CachedOutput extends PrintOutput {
    * @return buffer
    */
   public byte[] buffer() {
-    if(finished()) {
+    final byte[] chop = Token.token(DOTS);
+    if(finished() && size >= chop.length) {
       // add dots at the end of the output
-      final byte[] chop = Token.token(DOTS);
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
     return buf;

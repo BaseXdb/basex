@@ -8,8 +8,6 @@ import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
-import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -140,7 +138,7 @@ public abstract class Proc extends Progress {
   }
 
   /**
-   * Returns the query information as a string.
+   * Returns process information or error message.
    * @return info string
    */
   public final String info() {
@@ -157,7 +155,7 @@ public abstract class Proc extends Progress {
   }
 
   /**
-   * Returns if the command performs updates.
+   * Returns if the process performs updates.
    * @param ctx context reference
    * @return result of check
    */
@@ -200,18 +198,6 @@ public abstract class Proc extends Progress {
       info.add(Prop.NL);
     }
     return true;
-  }
-
-  /**
-   * Performs the first argument as XQuery and returns a node set.
-   */
-  protected final void queryNodes() {
-    try {
-      result = new QueryProcessor(args[0], context).queryNodes();
-    } catch(final QueryException ex) {
-      Main.debug(ex);
-      error(ex.getMessage());
-    }
   }
 
   /**

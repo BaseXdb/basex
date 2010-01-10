@@ -1,5 +1,6 @@
 package org.basex.test.examples;
 
+import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.server.ClientSession;
 
@@ -11,19 +12,24 @@ import org.basex.server.ClientSession;
  * @author BaseX Team
  */
 public final class ServerExample {
-  /** Session. */
+  /** Reference to the client session. */
   static ClientSession session;
 
   /** Private constructor. */
   private ServerExample() { }
 
   /**
-   * Main method of the example class.
+   * Runs the example code.
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    // Start server on port 16387 in a new thread.
+
+    System.out.println("=== ServerExample ===");
+
+    // ------------------------------------------------------------------------
+    // Start server on default port 1984 in a new thread.
+    // In a usual scenario, the server will only be run once
     new Thread() {
       @Override
       public void run() {
@@ -31,55 +37,62 @@ public final class ServerExample {
       }
     }.start();
 
-    // Wait for the thread to be started.
+    // ------------------------------------------------------------------------
+    // Wait some time for the server to be initialized
     Thread.sleep(1000);
 
-    // Create client session, specifying a server name and port
+    // ------------------------------------------------------------------------
+    // Create a client session with host name, port, user name and password
+    System.out.println("\n* Create a client session.");
+
     session = new ClientSession("localhost", 1984, "admin", "admin");
 
-    System.out.println("\n=== Create a database:");
+    // ------------------------------------------------------------------------
+    // Create a database
+    System.out.println("\n* Create a database.");
 
-    // Set an option: shows command info output.
-    launch("set info true");
-    // Create a database from the specified file.
-    launch("create db \"input.xml\" input");
+    // Set an option: turn verbose processing information on
+    send("SET INFO true");
+    send("CREATE DB \"input.xml\" input");
 
-    System.out.println("\n=== Run a query:");
+    // ------------------------------------------------------------------------
+    // Run a query
+    System.out.println("\n* Run a query:");
 
-    // Create a database for the specified input.
-    launch("xquery //li");
+    send("XQUERY //li");
 
-    System.out.println("\n=== Show database information:");
+    // ------------------------------------------------------------------------
+    // Drop the database
+    System.out.println("\n* Close and drop the database:");
 
-    // Create a database for the specified input.
-    launch("info db");
+    send("DROP DB input");
 
-    System.out.println("\n=== Close and drop the database:");
+    // ------------------------------------------------------------------------
+    // Close the client session
+    System.out.println("\n* Close the client session.");
 
-    // Close the database.
-    launch("close");
-    // Drop the database.
-    launch("drop db input");
-
-    System.out.println("\n=== Stop the server:");
-
-    // Close the session.
     session.close();
 
-    // Stop server instance.
-    new BaseXServer("stop");
+    // ------------------------------------------------------------------------
+    // Stop the server
+    System.out.println("\n* Stop the server:");
+
+    new BaseXServer("STOP");
   }
 
   /**
-   * Processes the specified command on the server and returns the output
-   * or command info.
-   * @param cmd command to be executed
-   * @throws Exception exception
+   * Sends the specified command to the server and
+   * returns the output or command info.
+   * @param command command to be executed
+   * @throws IOException I/O exception
    */
-  private static void launch(final String cmd) throws Exception {
-    // Execute the process.
-    session.execute(cmd, System.out);
-    // Show optional process information.
+  static void send(final String command) throws IOException {
+    // ------------------------------------------------------------------------
+    // Execute the process
+    session.execute(command, System.out);
+
+    // ------------------------------------------------------------------------
+    // If available, print process information or error output
     System.out.print(session.info());
   }
 }

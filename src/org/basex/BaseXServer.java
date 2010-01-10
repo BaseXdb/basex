@@ -139,7 +139,7 @@ public final class BaseXServer extends Main implements Runnable {
         }
       } else {
         success = false;
-        if(arg.string().equals("stop")) {
+        if(arg.string().equalsIgnoreCase("stop")) {
           stop(context);
           return;
         }

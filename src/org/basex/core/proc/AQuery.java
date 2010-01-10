@@ -115,7 +115,7 @@ abstract class AQuery extends Proc {
   }
 
   /**
-   * Checks if the specified query is updating.
+   * Checks if the query performs updates.
    * @param ctx context reference
    * @param qu query
    * @return result of check
@@ -127,6 +127,18 @@ abstract class AQuery extends Proc {
       return proc.ctx.updating;
     } catch(final QueryException ex) {
       return true;
+    }
+  }
+
+  /**
+   * Performs the first argument as XQuery and returns a node set.
+   */
+  protected final void queryNodes() {
+    try {
+      result = new QueryProcessor(args[0], context).queryNodes();
+    } catch(final QueryException ex) {
+      Main.debug(ex);
+      error(ex.getMessage());
     }
   }
 

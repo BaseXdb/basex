@@ -233,7 +233,7 @@ public abstract class Builder extends Progress {
     return parser.prog();
   }
 
-  // Abstract Methods ==========================================================
+  // ABSTRACT METHODS =========================================================
 
   /**
    * Builds the database by running the specified parser.
@@ -299,7 +299,7 @@ public abstract class Builder extends Progress {
    */
   protected abstract void setSize(int pre, int val) throws IOException;
 
-  // Private Methods ===========================================================
+  // PRIVATE METHODS ==========================================================
 
   /**
    * Adds an element node to the storage.

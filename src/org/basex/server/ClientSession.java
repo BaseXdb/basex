@@ -16,17 +16,15 @@ import org.basex.util.Token;
 
 /**
  * This wrapper sends commands to the server instance over a socket
- * connection. It extends the {@link Session} class.
+ * connection. It extends the {@link Session} class:
  *
- * The following steps show how to talk to the server instance with any
- * other programming language:
  * <ul>
  * <li> A socket instance is created by the constructor.</li>
  * <li> The {@link #execute} method sends database commands to the server.
- * All strings are encoded as UTF8 and concluded by a zero byte.</li>
- * <li> If the command was successfully processed,
- * the query string is sent.</li>
- * <li> Next, the processing info string is sent.</li>
+ * All strings are encoded as UTF8 and suffixed by a zero byte.</li>
+ * <li> If the command has been successfully processed,
+ * the result string is read.</li>
+ * <li> Next, the processing info string is read.</li>
  * <li> A last byte is next sent to indicate if command execution
  * was successful (0) or not (1).</li>
  * <li> {@link #close} closes the session by sending the {@link Cmd#EXIT}

@@ -25,11 +25,11 @@ public final class DeepFSExample {
   /** The current database Context. */
   static final Context CONTEXT = new Context();
   /** Names of the test databases. */
-  private static final String[] DB = {"testdb", "testdb-mp3", "testdb-jpg"};
+  static final String[] DB = { "testdb", "testdb-mp3", "testdb-jpg" };
   /** Test file. */
-  private static final File FILE = new File(".").listFiles()[0];
+  static final File FILE = new File(".").listFiles()[0];
   /** Test directories. */
-  private static final File[] DIR;
+  static final File[] DIR;
 
   static {
     final File[] f = findFiles();
@@ -37,7 +37,7 @@ public final class DeepFSExample {
   }
 
   /** Example queries. */
-  private static final String[][] QUERIES = new String[][] {
+  static final String[][] QUERIES = new String[][] {
     {
       "All directories that contain more than 10 files of type 'audio'",
       "basex:fspath(//dir[count(file[type=\"audio\"]) > 10])"
@@ -77,8 +77,9 @@ public final class DeepFSExample {
       "\")"
     }
   };
+
   /** Query - DB mapping. */
-  private static final int[] INDEX = new int[] { 1, 1, 1, 2, 2, 1 };
+  static final int[] INDEX = new int[] { 1, 1, 1, 2, 2, 1 };
 
   /** Private constructor. */
   private DeepFSExample() { }
@@ -94,14 +95,14 @@ public final class DeepFSExample {
     // -------------------------------------------------------------------------
 
     System.out.println(
-        "=== Serialize a single file (without metadata and contents)");
+        "* Serialize a single file (without metadata and contents)");
     xml = FSMLSerializer.serialize(FILE, false);
     System.out.println(xml);
 
     // -------------------------------------------------------------------------
 
     System.out.println(
-        "\n=== Serialize a single file (with metadata and text/xml contents)");
+        "\n* Serialize a single file (with metadata and text/xml contents)");
     final DeepFile deepFile = new DeepFile(FILE);
     // Extracts metadata and text/xml contents
     deepFile.extract();
@@ -111,7 +112,7 @@ public final class DeepFSExample {
 
     // -------------------------------------------------------------------------
 
-    System.out.println("\n\n=== Traverse a file system hierarchy (method 1)");
+    System.out.println("\n\n* Traverse a file system hierarchy (method 1)");
     // Creates the file system database
     new CreateFS(DIR[0].getAbsolutePath(), DB[0]).execute(CONTEXT, System.out);
     // Serializes the database
@@ -121,7 +122,7 @@ public final class DeepFSExample {
 
     // -------------------------------------------------------------------------
 
-    System.out.println("\n\n=== Traverse a file system hierarchy (method 2)");
+    System.out.println("\n\n* Traverse a file system hierarchy (method 2)");
     // Initializes the file system importer
     final FSImporter importer = new FSImporter(CONTEXT);
     // Creates the database
@@ -138,7 +139,7 @@ public final class DeepFSExample {
 
     // -------------------------------------------------------------------------
 
-    System.out.println("\n\n=== List available parsers");
+    System.out.println("\n\n* List available parsers");
     System.out.println("file suffix\t| \t java class");
     System.out.println("-----------------------------------------------------");
     final ParserRegistry registry = new ParserRegistry();
@@ -149,7 +150,7 @@ public final class DeepFSExample {
 
     // -------------------------------------------------------------------------
 
-    System.out.println("\n=== Example queries ====================");
+    System.out.println("\n* Example queries ====================");
     if(DIR[1] != null) {
       System.out.println("\tcreating mp3 database...");
       new CreateFS(DIR[1].getAbsolutePath(), DB[1]).
@@ -164,7 +165,7 @@ public final class DeepFSExample {
     }
     for(int i = 0; i < QUERIES.length; i++) {
       if(DIR[INDEX[i]] == null) continue;
-      System.out.println("\n\n=== " + QUERIES[i][0]);
+      System.out.println("\n\n* " + QUERIES[i][0]);
       new Open(DB[INDEX[i]]).execute(CONTEXT, System.out);
       new XQuery(QUERIES[i][1]).execute(CONTEXT, System.out);
       new Close().execute(CONTEXT, System.out);

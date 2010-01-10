@@ -216,7 +216,7 @@ public final class ViewNotifier {
       hist < maxhist ? queries[hist + 1] : null;
   }
 
-  // Private Methods ==========================================================
+  // PRIVATE METHODS ==========================================================
 
   /**
    * Initializes the current context and marked node set.

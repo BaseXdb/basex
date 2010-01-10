@@ -80,7 +80,7 @@ public final class Try extends Single {
     }
     throw ex;
   }
-  
+
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     for(final Catch c : ctch) if(c.uses(u, ctx)) return true;

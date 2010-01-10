@@ -78,7 +78,7 @@ public final class ServerProcess extends Thread {
       send(ok);
 
       if(ok) start();
-      else if(us.length() != 0) log.write(this, "LOGIN " + us, "failed");
+      else if(!us.isEmpty()) log.write(this, "LOGIN " + us, "failed");
       return ok;
     } catch(final IOException ex) {
       ex.printStackTrace();

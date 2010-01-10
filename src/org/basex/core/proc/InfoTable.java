@@ -21,7 +21,7 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class InfoTable extends AInfo {
+public final class InfoTable extends AQuery {
   /**
    * Default constructor.
    * @param arg optional arguments
