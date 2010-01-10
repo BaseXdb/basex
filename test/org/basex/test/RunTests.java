@@ -3,9 +3,6 @@ package org.basex.test;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.proc.DropDB;
-import org.basex.test.examples.DBExample;
-import org.basex.test.examples.QueryExample;
-import org.basex.test.examples.UpdateExample;
 import org.basex.test.examples.XMLDBCreate;
 import org.basex.test.examples.XMLDBInsert;
 import org.basex.test.examples.XMLDBQuery;
@@ -47,12 +44,6 @@ public final class RunTests {
     XMLDBCreate.main(args);
     XMLDBInsert.main(args);
     XMLDBQuery.main(args);
-    Main.outln();
-
-    Main.outln("=============  BaseX Examples =============");
-    DBExample.main(args);
-    QueryExample.main(args);
-    UpdateExample.main(args);
     Main.outln();
 
     Main.outln("=============  XQuery Tests =============");
