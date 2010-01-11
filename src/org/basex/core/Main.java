@@ -20,6 +20,8 @@ import org.basex.util.TokenBuilder;
 
 /**
  * This is the abstract main class for all starter classes.
+ * Moreover, it offers some utility methods which are used
+ * throughout the project.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

@@ -16,8 +16,6 @@ import org.basex.util.Token;
 /**
  * This is the starter class for the stand-alone console mode.
  * It executes all commands locally.
- * Next, the class offers some utility methods which are used
- * throughout the project.
  * Add the '-h' option to get a list on all available command-line arguments.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
