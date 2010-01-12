@@ -1,14 +1,11 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
-
 import java.awt.Image;
-import java.io.File;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-
-import javax.imageio.ImageIO;
+import org.basex.gui.layout.BaseXLayout;
 
 /**
  * Sets some Mac OS X specific interface options.
@@ -94,11 +91,7 @@ public class GUIMacOSX {
    * @throws Exception if any error occurs.
    */
   private void addDockIcon() throws Exception {
-    final File imgFile = new File("./etc/images/BaseX_128px.png");
-    if(imgFile.exists()) {
-      Image img = ImageIO.read(imgFile);
-      invoke("setDockIconImage", Image.class, img);
-    }
+    invoke("setDockIconImage", Image.class, BaseXLayout.image("dock_icon"));
   }
 
   /**
