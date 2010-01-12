@@ -1,6 +1,5 @@
 package org.basex;
 
-import static org.basex.core.Text.*;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.util.Enumeration;
@@ -8,10 +7,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIMacOSX;
 import org.basex.gui.GUIProp;
 import org.basex.io.IO;
 
@@ -31,15 +32,25 @@ public final class BaseXWin {
     new BaseXWin(args);
   }
 
+  /** Mac OS X GUI optimizations. */
+  final GUIMacOSX osxGUI;
+
   /**
    * Constructor.
    * @param args command-line arguments
    */
   public BaseXWin(final String[] args) {
-    // some mac issues
-    System.setProperty("apple.laf.useScreenMenuBar", "true");
-    System.setProperty("com.apple.mrj.application.apple.menu.about.name", NAME);
 
+    GUIMacOSX g = null;
+    if(Prop.MAC) {
+      try {
+        g = new GUIMacOSX();
+      } catch(Exception e) {
+        Main.notexpected("Failed to initialize nativ Mac OS X interface", e);
+      }
+    }
+    osxGUI = g == null ? null : g;
+    
     // read properties
     final Context ctx = new Context();
     ctx.prop.set(Prop.CACHEQUERY, true);
@@ -54,6 +65,7 @@ public final class BaseXWin {
         init(gprop);
         // open main window
         final GUI gui = new GUI(ctx, gprop);
+        if(osxGUI != null) osxGUI.init(gui);
 
         // open specified document or database
         if(args.length != 0) {

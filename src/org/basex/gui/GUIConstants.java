@@ -8,6 +8,7 @@ import java.awt.Cursor;
 import java.awt.Font;
 import javax.swing.Icon;
 import javax.swing.UIManager;
+import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.View;
@@ -97,26 +98,32 @@ public final class GUIConstants {
   public static final String[] MENUBAR = {
       Text.MENUFILE, Text.MENUEDIT, Text.MENUVIEW, Text.MENUOPTIONS,
       Text.MENUDEEPFS, Text.MENUHELP };
+  
+  /** Separator. */
+  static final String SEPARATOR = "-";
 
   /** Two-dimensional Menu entries, containing the menu item commands. */
   public static final Object[][] MENUITEMS = { {
-    MENUDB, CREATE, OPEN, INFO, EXPORT, DROP, CLOSE, null,
-    XQOPEN, XQSAVE, XQSAVEAS, null, SERVER, null, EXIT
+    MENUDB, CREATE, OPEN, INFO, EXPORT, DROP, CLOSE, SEPARATOR,
+    XQOPEN, XQSAVE, XQSAVEAS, SEPARATOR,
+    SERVER, Prop.MAC ? null : SEPARATOR,
+    Prop.MAC ? null : EXIT
   }, {
-    COPY, PASTE, DELETE, INSERT, EDIT, null,
-    SHOWXQUERY, SHOWINFO, null, COPYPATH, FILTER
+    COPY, PASTE, DELETE, INSERT, EDIT, SEPARATOR,
+    SHOWXQUERY, SHOWINFO, SEPARATOR,
+    COPYPATH, FILTER
   }, {
-    MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, null,
+    MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, SEPARATOR,
     MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWFOLDER, SHOWTABLE, SHOWPLOT,
-    SHOWEXPLORE, null, FULL
+    SHOWEXPLORE, SEPARATOR, FULL
   }, {
-    MENUINTER, RTEXEC, RTFILTER, null,
+    MENUINTER, RTEXEC, RTFILTER, SEPARATOR,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT,
-    null, PREFS
+    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : PREFS
   }, {
-    CREATEFS, null, DQE, MOUNTFS
+    CREATEFS, SEPARATOR, DQE, MOUNTFS
   }, {
-    SHOWHELP, null, ABOUT
+    SHOWHELP, Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : ABOUT
   }};
 
   /** Context menu entries. */

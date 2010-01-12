@@ -598,7 +598,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Fullscreen mode. */
-  FULL(GUIFULL, "F11", GUIFULLTT, false, true) {
+  FULL(GUIFULL, Prop.MAC ? "% shift F" : "F11", GUIFULLTT, false, true) {
     @Override
     public void execute(final GUI gui) {
       gui.fullscreen();

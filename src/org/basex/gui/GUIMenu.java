@@ -55,7 +55,8 @@ public final class GUIMenu extends JMenuBar {
       for(int j = 0; j < MENUITEMS[i].length; j++) {
         // add a separator
         final Object subEntry = MENUITEMS[i][j];
-        if(subEntry == null) {
+        if(subEntry == null) continue;
+        if(subEntry.equals(SEPARATOR)) {
           menu.addSeparator();
         } else {
           JComponent comp = null;
