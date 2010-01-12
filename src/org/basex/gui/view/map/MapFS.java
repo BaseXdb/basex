@@ -1,17 +1,13 @@
 package org.basex.gui.view.map;
 
-import static org.basex.gui.GUIConstants.*;
-//import static org.basex.build.BuildText.*;
 import static org.basex.core.Text.*;
+import static org.basex.gui.GUIConstants.*;
 import static org.basex.util.Token.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIFS;
@@ -19,10 +15,12 @@ import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.view.ViewData;
-import org.basex.io.BufferInput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
+import org.deepfs.fsml.FileType;
+import org.deepfs.fsml.MetaElem;
+import org.deepfs.fsml.MimeType;
 
 /**
  * Paint filesystem specific TreeMap rectangles.
@@ -37,8 +35,6 @@ final class MapFS extends MapPainter {
   private static MapFSImages images;
   /** Data FS reference. */
   private final DeepFS fs;
-  /** Flag for error message. */
-  private boolean error;
 
   /**
    * Constructor.
@@ -133,7 +129,7 @@ final class MapFS extends MapPainter {
         r.x -= 4;
         r.w += 8;
         g.setFont(mfont);
-        MapRenderer.drawText(g, r, tb.finish(), fsz);
+        MapFSRenderer.drawText(g, r, tb.finish(), fsz);
       }
     }
   }
@@ -147,7 +143,6 @@ final class MapFS extends MapPainter {
     final int kind = data.kind(pre);
     final boolean tag = kind == Data.ELEM || kind == Data.DOC;
     final boolean file = fs.isFile(pre);
-    final boolean dir = !file && fs.isDir(pre);
 
     // show full path in top rectangle
     final Nodes current = context.current;
@@ -223,8 +218,27 @@ final class MapFS extends MapPainter {
             rect.y, rect.w - off - 3, fsz);
 
         final long size = toLong(fs.size(pre));
-        final String info = GUIFS.desc(text, dir) + ", " +
-          Performance.format(size, true);
+        
+        String type = "";
+        String format = "";
+        final int nodeSize = data.size(pre, Data.ELEM) + pre;
+        final byte[] typeElem = MetaElem.TYPE.tok();
+        final byte[] formatElem = MetaElem.FORMAT.tok();
+        for(int node = pre; node < nodeSize; ++node) {
+          final int k = data.kind(node);
+          if(k != Data.ELEM) continue;
+          final byte[] nodeName = data.name(node, k);
+          if(eq(nodeName, typeElem))
+            type = string(ViewData.content(data, node + 1, false));
+          else if(eq(nodeName, formatElem))
+            format = string(ViewData.content(data, node + 1, false));
+          if(!type.isEmpty() && !format.isEmpty()) break;
+        }
+        if(type.isEmpty()) type = FileType.UNKNOWN_TYPE.toString();
+        if(format.isEmpty()) format = MimeType.UNKNOWN.toString();
+        
+        final String info = type + " (" + format + ")" + ", "
+            + Performance.format(size, true); 
 
         rect.w -= 10;
         final int sw = BaseXLayout.width(g, info);
@@ -243,7 +257,7 @@ final class MapFS extends MapPainter {
         rect.w -= 24;
         rect.h -= 24;
         g.setColor(Color.black);
-        MapRenderer.drawText(g, rect, data.text(pre, true),
+        MapFSRenderer.drawText(g, rect, data.text(pre, true),
             prop.num(GUIProp.FONTSIZE));
       }
     }
@@ -252,53 +266,30 @@ final class MapFS extends MapPainter {
     rect.y += fsz >> 1;
     rect.h -= fsz >> 1;
 
-    // prepare content display; read in first bytes
-    long s = 0;
-    final byte[] path = ViewData.path(data, pre);
-    byte[] fileBuf = null;
-    try {
-      boolean binary = GUIFS.mime(name) == GUIFS.Type.IMAGE;
-
-      if(!binary) {
-        // approximate number of bytes that will be displayed
-        s = Math.max(0, rect.h * rect.w / fsz * 4 / mfwidth['A']);
-
-        // minimize buffer size
-        final File f = new File(string(path));
-        s = Math.min(s, f.length());
-
-        // read file contents
-        fileBuf = new byte[(int) s];
-        BufferInput.read(f, fileBuf);
-
-        // check if file contains mainly ASCII characters
-        int n = 0;
-        for(final byte b : fileBuf) if(b >= ' ' || ws(b)) n++;
-        binary = (n << 3) + n < s << 3;
+    rect.pos = null;
+    // prepare content display
+    byte[] fileBuf = EMPTY;
+    if(file) {
+      if(!(GUIFS.mime(name) == GUIFS.Type.IMAGE)) {
+        final byte[] textElem = DeepFS.TEXT_CONTENT;
+        final int size = data.size(pre, Data.ELEM) + pre;
+        out: for(int node = pre; node < size; ++node) {
+          final byte[] nodeName = data.name(node, data.kind(node));
+          if(eq(nodeName, textElem)) {
+            int textNodeSize = data.size(node, data.kind(node));
+            while(--textNodeSize > 0) {
+              if(data.kind(++node) == Data.TEXT) {
+                rect.pos = view.gui.context.marked.ftpos.get(node);
+                fileBuf = ViewData.content(data, node, false);
+                break out;
+              }
+            }
+          }
+        }
       }
 
       // set binary string for images and binary files
-      if(binary) {
-        fileBuf = MAPBINARY;
-        s = fileBuf.length;
-      }
-    } catch(final IOException ex) {
-      if(!error) Main.debug(PARSEERR, path);
-      Main.debug(ex);
-      error = true;
-      return true;
-    }
-
-    // draw file contents or binary information
-    if(s < fileBuf.length) fileBuf = Arrays.copyOf(fileBuf, (int) s);
-
-    final int size = data.size(pre, Data.ELEM);
-    rect.pos = null;
-    for(int i = pre; i < pre + size; i++) {
-      if(data.kind(i) == Data.ELEM && data.name(i) == fs.contentID) {
-        rect.pos = view.gui.context.marked.ftpos.get(i + 1);
-        break;
-      }
+      if(fileBuf.length == 0) fileBuf = MAPBINARY;
     }
 
     g.setColor(Color.black);
@@ -306,11 +297,11 @@ final class MapFS extends MapPainter {
 
     try {
       // check if text fits in rectangle
-      rect.thumb = MapRenderer.calcHeight(g, rect, fileBuf, fsz) >= rect.h;
+      rect.thumb = MapFSRenderer.calcHeight(g, rect, fileBuf, fsz) >= rect.h;
       if(rect.thumb) {
         MapRenderer.drawThumbnails(g, rect, fileBuf, fsz);
       } else {
-        MapRenderer.drawText(g, rect, fileBuf, fsz);
+        MapFSRenderer.drawText(g, rect, fileBuf, fsz);
       }
     } catch(final Exception ex) {
       // ignore errors for binary files which have been interpreted as texts
