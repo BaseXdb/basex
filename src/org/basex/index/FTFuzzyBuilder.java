@@ -2,6 +2,7 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
@@ -39,10 +40,6 @@ import org.basex.util.TokenBuilder;
 public final class FTFuzzyBuilder extends FTBuilder {
   /** Word parser. */
   private final ValueFTTrees tree = new ValueFTTrees();
-  /** Number of indexed tokens. */
-  private long ntok;
-  /** Number of cached index structures. */
-  private int csize;
 
   /**
    * Constructor.
@@ -170,22 +167,6 @@ public final class FTFuzzyBuilder extends FTBuilder {
   }
 
   /**
-   * Returns next token.
-   * @param v FTFuzzy Array
-   * @param m pointer on current FTFuzzy
-   * @return next token
-   * @throws IOException I/O exception
-   */
-  private byte[] nextToken(final FTFuzzy[] v, final int m) throws IOException {
-    if(v[m] == null) return EMPTY;
-    final byte[] tok = v[m].nextTok();
-    if(tok.length > 0) return tok;
-    v[m].close();
-    v[m] = null;
-    return EMPTY;
-  }
-
-  /**
    * Writes the token length index to disk.
    * @param outx Output
    * @param ind IntList with token length and offset
@@ -205,15 +186,21 @@ public final class FTFuzzyBuilder extends FTBuilder {
   }
 
   /**
-   * Checks if any unprocessed pre values are remaining.
-   * @param tok byte[][] tokens
-   * @return boolean
+   * Returns next token.
+   * @param v FTFuzzy Array
+   * @param m pointer on current FTFuzzy
+   * @return next token
+   * @throws IOException I/O exception
    */
-  private boolean check(final byte[][] tok) {
-    for(final byte[] b : tok) if(b.length > 0) return true;
-    return false;
+  protected byte[] nextToken(final FTFuzzy[] v, final int m) throws IOException {
+    if(v[m] == null) return EMPTY;
+    final byte[] tok = v[m].nextTok();
+    if(tok.length > 0) return tok;
+    v[m].close();
+    v[m] = null;
+    return EMPTY;
   }
-
+  
   /**
    * Writes the index to disk.
    * @param cs current file pointer

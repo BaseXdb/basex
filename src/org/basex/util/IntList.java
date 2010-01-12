@@ -126,6 +126,14 @@ public class IntList {
   }
 
   /**
+   * Init new list.
+   */
+  public void init() {
+    size = 0;
+    list = new int[8];
+  }
+  
+  /**
    * Sorts the data.
    */
   public void sort() {

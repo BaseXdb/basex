@@ -11,11 +11,20 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public final class IntArrayList implements Iterable<int[]> {
+  /** Resize factor for extending the the byte arrays. */
+  protected double factor = 2;
   /** Value array. */
   int[][] list;
   /** Current array size. */
   int size;
 
+  /**
+   * Default constructor.
+   */
+  public IntArrayList() {
+    this(8);
+  }
+  
   /**
    * Constructor.
    * @param is initial size of the list
@@ -23,13 +32,25 @@ public final class IntArrayList implements Iterable<int[]> {
   public IntArrayList(final int is) {
     list = new int[is][];
   }
+  
+  /**
+   * Constructor.
+   * @param f resize factor
+   */
+  public IntArrayList(final double f) {
+    this();
+    factor = f;
+  }
+
 
   /**
    * Adds next value.
    * @param v value to be added
    */
   public void add(final int[] v) {
-    if(size == list.length) list = Arrays.copyOf(list, size << 1);
+    if(size == list.length) {
+      list = Arrays.copyOf(list, Math.max(size + 1, (int) (size * factor)));
+    }
     list[size++] = v;
   }
 

@@ -28,7 +28,7 @@ public abstract class IndexBuilder extends Progress {
   /** Runtime for memory consumption. */
   private final Runtime rt = Runtime.getRuntime();
   /** Maximum memory to consume. */
-  private final long maxMem = (long) (rt.maxMemory() * 0.9);
+  protected long maxMem = (long) (rt.maxMemory() * 0.9);
   /** Free memory threshold. */
   private int cc;
 

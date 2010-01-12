@@ -2,6 +2,7 @@ package org.basex.index;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -25,6 +26,11 @@ public abstract class FTBuilder extends IndexBuilder {
   protected final Tokenizer wp;
   /** Scoring mode; see {@link Prop#SCORING}. */
   protected final int scm;
+  /** Number of indexed tokens. */
+  protected long ntok;
+  /** Number of cached index structures. */
+  protected int csize;
+
 
   /** Document units (all document or text nodes in a document). */
   private final IntList unit = new IntList();
@@ -196,6 +202,16 @@ public abstract class FTBuilder extends IndexBuilder {
     token++;
   }
 
+  /**
+   * Checks if any unprocessed pre values are remaining.
+   * @param tok byte[][] tokens
+   * @return boolean
+   */
+  protected boolean check(final byte[][] tok) {
+    for(final byte[] b : tok) if(b.length > 0) return true;
+    return false;
+  }
+  
   /**
    * Indexes a single token.
    * @param tok token to be indexed

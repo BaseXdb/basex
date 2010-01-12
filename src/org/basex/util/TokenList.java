@@ -142,6 +142,14 @@ public final class TokenList implements Iterable<byte[]> {
   }
 
   /**
+   * Init new list.
+   */
+  public void init() {
+    size = 0;
+    list = new byte[8][];
+  }
+  
+  /**
    * Resets the integer list.
    */
   public void reset() {
