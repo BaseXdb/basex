@@ -16,6 +16,8 @@ public interface TreeViewOptions {
   boolean SHOW_ANCESTORS = true;
   /** Show descendant nodes. */
   boolean SHOW_DESCENDANTS = true;
+  /** Show descendant connection. */
+  boolean SHOW_DESCENDANTS_CONN = false;
   /** Draw rectangle border. */
   boolean BORDER_RECTANGLES = true;
   /** Fill rectangles. */
@@ -24,26 +26,30 @@ public interface TreeViewOptions {
   boolean SLIM_TO_TEXT = true;
   /** Show extra node information. */
   boolean SHOW_EXTRA_INFO = false;
+  /** Draw node text. */
+  boolean DRAW_NODE_TEXT = true;
   /** Border padding value. */
   int BORDER_PADDING = 2;
   /** Margin to top. */
   int TOP_MARGIN = 2;
   /** Changes Color until given level. */
-  int CHANGE_COLOR_TILL = 7;
+  int CHANGE_COLOR_TILL = 4;
 
-  /** Minimum space in rectangles needed for tags. */
-  int MIN_SPACE = 25;
+  /** Minimum rectangle space for text. */
+  int MIN_TXT_SPACE = 25;
   /** Minimum space between the levels. */
-  int MIN_LEVEL_DISTANCE = 8;
+  int MIN_LEVEL_DISTANCE = 4;
   /** Maximum level distance. */
   int MAX_LEVEL_DISTANCE = 40;
   /** Minimum node height. */
   int MIN_NODE_HEIGHT = 1;
-
- 
+  /** Maximum node height. */
+  int MAX_NODE_HEIGHT = 20;
 
   /** Draw kind rectangle. */
   byte DRAW_RECTANGLE = 0x00;
   /** Draw kind highlighting. */
   byte DRAW_HIGHLIGHT = 0x01;
+  /** Draw mark. */
+  byte DRAW_MARK = 0x02;
 }

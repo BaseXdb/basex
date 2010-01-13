@@ -3,13 +3,14 @@ package org.basex.gui.view.tree;
 import java.awt.Graphics;
 import org.basex.core.Context;
 import org.basex.data.Data;
+import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXLayout;
+import org.basex.gui.view.ViewData;
 import org.basex.util.IntList;
-import org.basex.util.TokenBuilder;
 
 /**
  * This class determines nodes per level and caches them.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -22,12 +23,16 @@ public class TreeCaching implements TreeViewOptions {
   public TreeRect[][][] rects;
   /** Subtree borders. */
   private TreeBorder[][] border;
+  /** Window properties. */
+  private GUIProp prop;
 
   /**
    * This constructor invokes methods to cache all document nodes.
    * @param data data reference
+   * @param gp window properties
    */
-  TreeCaching(final Data data) {
+  TreeCaching(final Data data, final GUIProp gp) {
+    prop = gp;
     if(data == null) return;
     maxLevel = data.meta.height + 1;
     cacheNodes(data);
@@ -97,9 +102,9 @@ public class TreeCaching implements TreeViewOptions {
       while(iterator.more()) {
         final int pre = iterator.next();
 
-        // if(data.kind(pre) == Data.ELEM || !ONLY_ELEMENT_NODES) {
-        temp.add(pre);
-        // }
+        if(data.kind(pre) == Data.ELEM || !ONLY_ELEMENT_NODES) {
+          temp.add(pre);
+        }
       }
     }
     return temp.finish();
@@ -134,18 +139,18 @@ public class TreeCaching implements TreeViewOptions {
    * @param c context
    * @param sw screen width
    */
-  void generateBordersAndRects(final Graphics g,
-      final Context c, final int sw) {
-
+  void generateBordersAndRects(final Graphics g, final Context c, 
+      final int sw) {
     final Data d = c.current.data;
     final int[] roots = c.current.nodes;
     final int rl = roots.length;
     final TreeBorder[][] bo = new TreeBorder[rl][];
+    final int w = sw / rl;
     rects = new TreeRect[rl][][];
 
     for(int i = 0; i < rl; i++) {
       bo[i] = generateSubtreeBorders(d, roots[i]);
-      generateRects(g, i, d, bo[i], sw - rl);
+      generateRects(g, i, c, bo[i], w);
     }
     border = bo;
   }
@@ -202,11 +207,11 @@ public class TreeCaching implements TreeViewOptions {
    * Generates cached rectangles.
    * @param g graphics reference
    * @param rn root number
-   * @param d data
+   * @param c context
    * @param bo TreeBorder
    * @param sw screen width
    */
-  private void generateRects(final Graphics g, final int rn, final Data d,
+  private void generateRects(final Graphics g, final int rn, final Context c,
       final TreeBorder[] bo, final double sw) {
 
     final int h = bo.length;
@@ -219,7 +224,7 @@ public class TreeCaching implements TreeViewOptions {
       if(w < 2) {
         bigRectangle(rn, i, sw);
       } else {
-        normalRectangle(g, rn, i, d, w, bo[i]);
+        normalRectangle(g, rn, i, c, w, bo[i]);
       }
     }
   }
@@ -232,7 +237,7 @@ public class TreeCaching implements TreeViewOptions {
    */
   private void bigRectangle(final int rn, final int lv, final double w) {
     rects[rn][lv] = new TreeRect[1];
-    rects[rn][lv][0] = new TreeRect(0, (int) w);
+    rects[rn][lv][0] = new TreeRect((int) w * rn, (int) w);
   }
 
   /**
@@ -240,14 +245,14 @@ public class TreeCaching implements TreeViewOptions {
    * @param g graphics reference
    * @param rn root
    * @param lv level
-   * @param d data reference
+   * @param c context
    * @param w width
    * @param bo TreeBorder
    */
   private void normalRectangle(final Graphics g, final int rn, final int lv,
-      final Data d, final double w, final TreeBorder bo) {
+      final Context c, final double w, final TreeBorder bo) {
 
-    double xx = 0;
+    double xx = rn * w;
     double ww = w;
 
     // new array, to be filled with the rectangles of the current level
@@ -258,10 +263,9 @@ public class TreeCaching implements TreeViewOptions {
       final double boxMiddle = xx + ww / 2f;
 
       if(SLIM_TO_TEXT) {
-        final String st = getText(d, getPrePerLevelAndIndex(bo.level, i));
-        int o = calcOptimalRectWidth(g, st) + 10;
-        if(o < MIN_SPACE) o = MIN_SPACE;
-
+        final byte[] b = getText(c, rn, nodes[bo.level][i]);
+        int o = calcOptimalRectWidth(g, b) + 10;
+        if(o < MIN_TXT_SPACE) o = MIN_TXT_SPACE;
         if(w > o) {
           xx = boxMiddle - o / 2d;
           ww = o;
@@ -284,22 +288,28 @@ public class TreeCaching implements TreeViewOptions {
   }
 
   /**
+   * Returns TreeRect at given index position.
+   * @param rn root number
+   * @param lv level
+   * @param ix index
+   * @return TreeRect array
+   */
+  TreeRect getTreeRectPerIndex(final int rn, final int lv, final int ix) {
+    return rects[rn][lv][ix];
+  }
+
+  /**
    * Finds pre value in cached nodes and returns level and index position.
    * @param pre pre value
    * @return level and position pair
    */
   private int[] findPre(final int pre) {
-
     int pos = -1;
     int l;
-
     for(l = 0; l < maxLevel; l++) {
-
       pos = searchPreArrayPos(l, pre);
-
       if(pos > -1) break;
     }
-
     return pos > -1 ? new int[] { l, pos} : null;
   }
 
@@ -352,7 +362,16 @@ public class TreeCaching implements TreeViewOptions {
    * @return pre
    */
   int getPrePerIndex(final int rn, final int lv, final int ix) {
-    final TreeBorder bo = getTreeBorder(rn, lv);
+    return getPrePerIndex(getTreeBorder(rn, lv), ix);
+  }
+
+  /**
+   * Returns pre by given index.
+   * @param bo border
+   * @param ix index
+   * @return pre
+   */
+  int getPrePerIndex(final TreeBorder bo, final int ix) {
     return nodes[bo.level][bo.start + ix];
   }
 
@@ -362,7 +381,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param lv level
    * @return TreeBorder
    */
-  private TreeBorder getTreeBorder(final int rn, final int lv) {
+  TreeBorder getTreeBorder(final int rn, final int lv) {
     return border[rn][lv];
   }
 
@@ -404,8 +423,19 @@ public class TreeCaching implements TreeViewOptions {
    * @return the rectangle containing the given pre value, null else
    */
   TreeRect searchRect(final int rn, final int lv, final int pre) {
-    final TreeBorder bo = getTreeBorder(rn, lv);
+    return searchRect(rn, lv, getTreeBorder(rn, lv), pre);
+  }
 
+  /**
+   * Uses binary search to find the rectangle with given pre value.
+   * @param rn root number
+   * @param lv level
+   * @param bo border
+   * @param pre the pre value to be found
+   * @return the rectangle containing the given pre value, null else
+   */
+  TreeRect searchRect(final int rn, final int lv, final TreeBorder bo,
+      final int pre) {
     final int i = searchPreArrayPos(bo.level, pre);
 
     // System.out.println("i " + i + " b " + (i - bo.start) + " l " +
@@ -420,41 +450,33 @@ public class TreeCaching implements TreeViewOptions {
    * @param i index
    * @return pre value
    */
+  @SuppressWarnings("unused")
   private int getPrePerLevelAndIndex(final int l, final int i) {
     return nodes[l][i];
   }
 
   /**
-   * returns the node text.
-   * @param data data reference
-   * @param pre the pre value
-   * @return String with node text
+   * Returns node text.
+   * @param c context
+   * @param rn root
+   * @param pre pre
+   * @return text
    */
-  String getText(final Data data, final int pre) {
-    final int k = data.kind(pre);
-    final TokenBuilder tb = new TokenBuilder();
-
-    if(data.meta.deepfs) {
-      if(data.fs.isFile(pre)) tb.add(data.fs.name(pre));
-      else tb.add(data.text(pre + 1, false));
-    } else {
-      if(k == Data.ELEM) {
-        tb.add(data.name(pre, k));
-      } else {
-        tb.add(data.text(pre, true));
-      }
-    }
-    return tb.toString();
+  byte[] getText(final Context c, final int rn, final int pre) {
+    final Data d = c.data;
+    if(pre == c.current.nodes[rn]) return ViewData.path(d, pre);
+    if(d.fs != null) return ViewData.tag(prop, d, pre);
+    return ViewData.content(d, pre, false);
   }
 
   /**
    * Calculates optimal rectangle width.
    * @param g the graphics reference
-   * @param s given string
+   * @param b byte array
    * @return optimal rectangle width
    */
-  private int calcOptimalRectWidth(final Graphics g, final String s) {
-    return BaseXLayout.width(g, s);
+  private int calcOptimalRectWidth(final Graphics g, final byte[] b) {
+    return BaseXLayout.width(g, b);
   }
 
   /**
