@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
+
 import java.util.Arrays;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -55,6 +56,8 @@ public final class Tokenizer implements IndexToken {
   public boolean fz;
   /** Fast evaluation flag. */
   public boolean fast;
+  /** Flag for a paragraph. */
+  public boolean pa;
 
   /** Current sentence. */
   public int sent;
@@ -69,7 +72,10 @@ public final class Tokenizer implements IndexToken {
   public int p;
   /** Last punctuation mark. */
   public int pm;
-
+  /** Last character position. */
+  public int lp; 
+  
+  
   /** Character start position. */
   private int s;
   /** Number of tokens. */
@@ -145,7 +151,7 @@ public final class Tokenizer implements IndexToken {
     pos = -1;
     p = 0;
   }
-
+  
   /**
    * Checks if more tokens are to be returned.
    * @return result of check
@@ -154,9 +160,10 @@ public final class Tokenizer implements IndexToken {
     final int l = text.length;
     pos++;
 
+    lp = p;
     // parse whitespaces
     boolean sn = false;
-    boolean pa = false;
+    pa = false;
     boolean bs = false;
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
@@ -212,7 +219,7 @@ public final class Tokenizer implements IndexToken {
   public byte[] get() {
     return get(orig());
   }
-
+  
   /**
    * Returns a normalized version of the specified token.
    * @param tok input token
@@ -227,7 +234,7 @@ public final class Tokenizer implements IndexToken {
     if(st) n = sd == null ? stem.stem(n) : sd.stem(n);
     return n;
   }
-
+  
   /**
    * Returns the original token.
    * @return original token
@@ -249,6 +256,65 @@ public final class Tokenizer implements IndexToken {
     return count;
   }
 
+  
+  /**
+   * Checks if more tokens are to be returned.
+   * @return result of check
+   */
+  public boolean moreSC() {
+    final int l = text.length;
+    // parse whitespaces
+    pa = false;
+
+    lp = p;
+    for(; p < l; p += cl(text[p])) {
+      final int c = cp(text, p);
+      if(c == '\n') {
+        pa = true;
+        p += cl((byte) ' ');
+        break;
+      } else if(ftChar(c)) {
+        break;
+      }
+    }
+    
+    // special chars found
+    if (lp < p) return true;
+    pos++;
+    
+    // end of text...
+    s = p;
+    if(p == l) return false;
+
+    // parse token
+    for(; p < l; p += cl(text[p])) {
+      int c = cp(text, p);
+      if(!ftChar(c)) {
+        s = p - 1;
+        break;
+      }      
+    }
+    return true;
+  }
+
+  /**
+   * Returns true if the current token is a special char.
+   * @return boolean
+   */
+  public boolean isSC() {
+    return lp < p;
+  }
+  
+  /**
+   * Get next token.
+   * @return next token
+   */
+  public byte[] nextSC() {
+    return (lp < p) ? Arrays.copyOfRange(text, lp, p) 
+        : Arrays.copyOfRange(text, p, s);
+  }  
+  
+  
   /**
    * Calculates a position value, dependent on the specified unit.
    * Once calculated values are cached.

@@ -129,7 +129,7 @@ final class MapFS extends MapPainter {
         r.x -= 4;
         r.w += 8;
         g.setFont(mfont);
-        MapFSRenderer.drawText(g, r, tb.finish(), fsz);
+        MapRenderer.drawText(g, r, tb.finish(), fsz);
       }
     }
   }
@@ -257,7 +257,7 @@ final class MapFS extends MapPainter {
         rect.w -= 24;
         rect.h -= 24;
         g.setColor(Color.black);
-        MapFSRenderer.drawText(g, rect, data.text(pre, true),
+        MapRenderer.drawText(g, rect, data.text(pre, true),
             prop.num(GUIProp.FONTSIZE));
       }
     }
@@ -297,11 +297,11 @@ final class MapFS extends MapPainter {
 
     try {
       // check if text fits in rectangle
-      rect.thumb = MapFSRenderer.calcHeight(g, rect, fileBuf, fsz) >= rect.h;
+      rect.thumb = MapRenderer.calcHeight(g, rect, fileBuf, fsz) >= rect.h;
       if(rect.thumb) {
         MapRenderer.drawThumbnails(g, rect, fileBuf, fsz);
       } else {
-        MapFSRenderer.drawText(g, rect, fileBuf, fsz);
+        MapRenderer.drawText(g, rect, fileBuf, fsz);
       }
     } catch(final Exception ex) {
       // ignore errors for binary files which have been interpreted as texts

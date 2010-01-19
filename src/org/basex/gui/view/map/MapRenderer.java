@@ -78,24 +78,9 @@ final class MapRenderer {
     final Tokenizer ftt = new Tokenizer(s, null);
 
     // get index on first pre value
-    int count = 0;
     int ll = 0;
-    int ls = 0;
-    while(ftt.more()) {
-      if(ls < ftt.sent) {
-        ls++;
-        if(xx + ll + BaseXLayout.width(g, cw, ftt.pm) > ww) {
-          xx = r.x;
-          yy += fh;
-          ll = 0;
-        }
-        if(draw) {
-          g.drawString(String.valueOf((char) ftt.pm),
-              xx + ll - Math.max(xx, ws), yy);
-        }
-      }
-
-      byte[] tok = ftt.orig();
+    while(ftt.moreSC()) {
+      byte[] tok = ftt.nextSC();
       int wl = 0;
 
       for(int n = 0; n < tok.length; n += cl(tok[n]))
@@ -124,11 +109,15 @@ final class MapRenderer {
       }
 
       if(draw) {
-        g.setColor(r.pos != null && r.pos.contains(count) ? COLORFT : textc);
+        g.setColor(r.pos != null && r.pos.contains(ftt.pos) ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);
-        count++;
       }
-      ll += wl + ws;
+      ll += wl + (ftt.isSC() ? 0 : ws);
+      if (ftt.pa) {
+        // new paragraph
+        ll = 0;
+        yy += fh;
+      }
     }
     return yy - r.y;
   }
