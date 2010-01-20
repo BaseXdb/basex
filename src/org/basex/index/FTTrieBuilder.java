@@ -18,7 +18,6 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
-
 /**
  * This class builds an index for text contents in a compressed trie.
  *
@@ -32,7 +31,7 @@ public final class FTTrieBuilder extends FTBuilder {
   /** Hash structure for temporarily saving the tokens. */
   private FTHash hash = new FTHash();
   /** Offset for joining subtrees. */
-  private int o = 0;
+  private int o;
 
   /**
    * Constructor.
@@ -71,14 +70,14 @@ public final class FTTrieBuilder extends FTBuilder {
     hash.init();
     while(hash.more()) getFreq(hash.pre[hash.next()]);
   }
-  
+
   @Override
   public void write() throws IOException {
     if(!merge) {
       writeCompleteTrie();
       return;
     }
-    
+
     writeSortedList(csize++);
     final DataOutput outb = new DataOutput(data.meta.file(DATAFTX + 'b'));
     final DataOutput outt = new DataOutput(data.meta.file(DATAFTX + 't'));
@@ -87,7 +86,7 @@ public final class FTTrieBuilder extends FTBuilder {
     final byte[][] tok = new byte[csize][];
     final int[][] pres = new int[csize][];
     final int[][] pos = new int[csize][];
-    
+
     final FTSortedList[] v = new FTSortedList[csize];
     for(int b = 0; b < csize; b++) {
       v[b] = new FTSortedList(data, b);
@@ -98,7 +97,7 @@ public final class FTTrieBuilder extends FTBuilder {
 
     int min;
     final IntList mert = new IntList();
-    
+
     while(check(tok)) {
       min = 0;
       mert.reset();
@@ -114,14 +113,12 @@ public final class FTTrieBuilder extends FTBuilder {
           mert.add(i);
         }
       }
-      
-      if (root.size() == 0 || root.get(root.size() - 1) != tok[min][0]) 
+
+      if (root.size() == 0 || root.get(root.size() - 1) != tok[min][0])
         root.add(tok[min][0]);
       outt.write(tok[min].length);
       outt.write(tok[min]);
-//      tokens.add(tok[min]);
-//      offsets.add(outb.size());
-      
+
       int s = 0;
       final TokenBuilder tbp = new TokenBuilder();
       final TokenBuilder tbo = new TokenBuilder();
@@ -136,7 +133,7 @@ public final class FTTrieBuilder extends FTBuilder {
         pres[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[0];
         pos[m] = tok[m].length > 0 ? v[m].nextPosValues() : new int[0];
       }
-      
+
       outt.writeInt(s);
       outt.write5(outb.size());
 
@@ -150,7 +147,7 @@ public final class FTTrieBuilder extends FTBuilder {
     outt.write(0);
     outt.close();
     outb.close();
-    writeSplittedTrie(root);
+    writeSplitTrie(root);
   }
 
   /**
@@ -160,22 +157,25 @@ public final class FTTrieBuilder extends FTBuilder {
    * @return next token
    * @throws IOException I/O exception
    */
-  protected byte[] nextToken(final FTSortedList[] v, final int m) throws IOException {
-    if(v[m] == null) return EMPTY;
-    final byte[] tok = v[m].nextTok();
-    if(tok.length > 0) return tok;
-    v[m].close();
-    v[m] = null;
+  protected byte[] nextToken(final FTSortedList[] v, final int m)
+      throws IOException {
+
+    if(v[m] != null) {
+      final byte[] tok = v[m].nextTok();
+      if(tok.length > 0) return tok;
+      v[m].close();
+      v[m] = null;
+    }
     return EMPTY;
   }
 
   /**
    * Write trie structure to disk.
    * @param roots root nodes
-   * @throws IOException
+   * @throws IOException I/O exception
    */
-  void writeSplittedTrie(final IntList roots) throws IOException {
-    DataAccess t = new DataAccess(data.meta.file(DATAFTX + 't'));
+  void writeSplitTrie(final IntList roots) throws IOException {
+    final DataAccess t = new DataAccess(data.meta.file(DATAFTX + 't'));
     // save each node: l, t1, ..., tl, n1, v1, ..., nu, vu, s, p
     // l = length of the token t1, ..., tl
     // u = number of next nodes n1, ..., nu
@@ -188,7 +188,7 @@ public final class FTTrieBuilder extends FTBuilder {
     final DataOutput outS = new DataOutput(data.meta.file(DATAFTX + 'c'));
     final int[] root = new int[roots.size()];
     int rp = 0;
-    
+
     // write tmp root node first
     outN.write((byte) 1);
     outN.write((byte) -1);
@@ -201,24 +201,24 @@ public final class FTTrieBuilder extends FTBuilder {
     outN.write5(-1); // pointer on data - root has no data
     outS.writeInt(0);
     int siz = (int) (2L + roots.size() * 5L + 9L);
-    
+
     byte tl = t.read1();
     while (tl > 0) {
       final long pos = t.pos();
       final byte[] tok = t.readBytes(pos, pos + tl);
       final int s = t.read4();
-      final long off = t.read5();      
+      final long off = t.read5();
       if (rp < roots.size() && tok[0] != roots.get(rp)) {
         // write subtree to disk
         siz = writeSubTree(root, outN, outS, rp, siz);
         rp++;
         index = new FTArray(128);
       }
-      
-      index.insertSorted(tok, s, off);      
+
+      index.insertSorted(tok, s, off);
       tl = t.read1();
     }
-    
+
     writeSubTree(root, outN, outS, rp, siz);
 
     t.close();
@@ -226,18 +226,18 @@ public final class FTTrieBuilder extends FTBuilder {
     outS.close();
 
     // update root node
-    final RandomAccessFile a = 
-      new RandomAccessFile(data.meta.file(DATAFTX + 'a'),"rw");
+    final RandomAccessFile a =
+      new RandomAccessFile(data.meta.file(DATAFTX + 'a'), "rw");
     a.seek(2);
-    for(int i = 0; i < root.length; i++) {
-      a.writeInt(root[i]);
+    for(final int element : root) {
+      a.writeInt(element);
       a.seek(a.getFilePointer() + 1);
     }
     a.close();
     DropDB.delete(data.meta.name, DATAFTX + "\\d+." + IO.BASEXSUFFIX,
     data.meta.prop);
   }
-  
+
   /**
    * Writes subtree to disk.
    * @param root Array with root offsets
@@ -246,17 +246,16 @@ public final class FTTrieBuilder extends FTBuilder {
    * @param rp pointer on root offsets
    * @param siz size
    * @return new size
-   * @throws IOException
+   * @throws IOException I/O exception
    */
-  private int writeSubTree(final int[] root, final DataOutput outN, 
+  private int writeSubTree(final int[] root, final DataOutput outN,
       final DataOutput outS, final int rp, final int siz) throws IOException {
     int s = siz;
     // write subtree to disk
     final TokenList tokens = index.tokens;
     final IntArrayList next = index.next;
     if (root != null) root[rp] = next.get(0)[1] + o;
-//    rp++;
-    
+
     final int il = next.size();
     for(int i = 1; i < il; i++) {
       final int[] nxt = next.get(i);
@@ -286,20 +285,17 @@ public final class FTTrieBuilder extends FTBuilder {
         }
       }
       outS.writeInt(s);
-      s += 1L + tokens.get(nxt[0]).length * 1L + 
-          (nxt.length - 3 + lp) * 5L + 9L;
-      }
-
-//    outS.writeInt(s);
-//    System.out.println(s);
+      s += 1L + tokens.get(nxt[0]).length * 1L +
+        (nxt.length - 3 + lp) * 5L + 9L;
+    }
     o += next.size() - 1;
 
     return s;
   }
-  
+
   /**
    * Write trie structure to disk.
-   * @throws IOException
+   * @throws IOException I/O exception
    */
   void writeCompleteTrie() throws IOException {
     if(scm == 0) hash.init();
@@ -316,7 +312,7 @@ public final class FTTrieBuilder extends FTBuilder {
     }
     outb.close();
     hash = null;
-    
+
     final TokenList tokens = index.tokens;
     final IntArrayList next = index.next;
 
@@ -360,37 +356,36 @@ public final class FTTrieBuilder extends FTBuilder {
       siz = writeSubTree(null, outN, outS, 0, siz);
       outN.close();
       outS.close();
-    }    
+    }
     DropDB.delete(data.meta.name, DATAFTX + "\\d+." + IO.BASEXSUFFIX,
     data.meta.prop);
   }
-  
+
   /**
    * Write data as sorted list on disk.
    * The data is stored in two files:
    * 'a': length|byte|,token|byte[length]|, size|int|, offset|long|, ...
    * 'b': used method writeFTData
    * @param cs current file
-   * @throws IOException
+   * @throws IOException I/O exception
    */
   void writeSortedList(final int cs) throws IOException {
     final String s = DATAFTX + (merge ? Integer.toString(cs) : "");
-    final DataOutput outa = new DataOutput(data.meta.file(s +'a'));
-    final DataOutput outb = new DataOutput(data.meta.file(s +'b'));
+    final DataOutput outa = new DataOutput(data.meta.file(s + 'a'));
+    final DataOutput outb = new DataOutput(data.meta.file(s + 'b'));
 
     if(scm == 0) hash.init();
     else hash.initIter();
-//    outa.writeInt(hash.size());
     while(hash.more()) {
       final int p = hash.next();
       final byte[] tok = hash.key();
-      final int ds = hash.ns[p];      
+      final int ds = hash.ns[p];
       // write compressed pre and pos arrays
       writeFTData(outb, hash.pre[p], hash.pos[p]);
       outa.write1(tok.length);
       outa.write(tok);
       outa.writeInt(ds);
-      outa.write5(outb.size());      
+      outa.write5(outb.size());
     }
 
     outa.write1(0);

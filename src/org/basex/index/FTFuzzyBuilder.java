@@ -192,7 +192,9 @@ public final class FTFuzzyBuilder extends FTBuilder {
    * @return next token
    * @throws IOException I/O exception
    */
-  protected byte[] nextToken(final FTFuzzy[] v, final int m) throws IOException {
+  protected byte[] nextToken(final FTFuzzy[] v, final int m)
+      throws IOException {
+
     if(v[m] == null) return EMPTY;
     final byte[] tok = v[m].nextTok();
     if(tok.length > 0) return tok;

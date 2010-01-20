@@ -81,7 +81,7 @@ public final class Tokenizer implements IndexToken {
   /** Number of tokens. */
   private int count;
   /** Flag indicating a new sentence. */
-  private boolean sc = false;
+  private boolean sc;
 
   /**
    * Empty constructor.
@@ -258,7 +258,6 @@ public final class Tokenizer implements IndexToken {
     return count;
   }
 
-  
   /**
    * Checks if more tokens are to be returned.
    * @return result of check
@@ -273,18 +272,17 @@ public final class Tokenizer implements IndexToken {
       final int c = cp(text, p);
       if(c == '\n') {
         pa = true;
-        p += cl((byte) ' ');
+        p++;
         sc = true;
         break;
       } else if(ftChar(c)) {
-//        p -= cl(text[p]);
         break;
       }
       sc = true;
     }
     
     // special chars found
-    if (lp < p) return true;
+    if(lp < p) return true;
     pos++;
     
     // end of text...

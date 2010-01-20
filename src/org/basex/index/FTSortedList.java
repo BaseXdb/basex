@@ -45,7 +45,7 @@ public final class FTSortedList {
 
   /**
    * Closes files.
-   * @throws IOException
+   * @throws IOException I/O exception
    */
   public void close() throws IOException {
     a.close();

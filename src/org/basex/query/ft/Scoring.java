@@ -8,7 +8,7 @@ package org.basex.query.ft;
  */
 public final class Scoring {
   /** Scoring multiplier to store values as integers. */
-  public static final int MP = 1000;
+  private static final int MP = 1000;
   /** Logarithmic base for calculating the score value. */
   private static final double LOG = Math.E - 1;
   /** Scoring step. */

@@ -60,6 +60,7 @@ public final class NamePool {
   boolean nsOK() {
     final Atts at = new Atts();
     for(int i = 0; i < size; i++) {
+      if(occ[i] <= 0) continue;
       final QNm nm = names[i];
       final byte[] pref = nm.pref();
       final byte[] uri = nm.uri.str();

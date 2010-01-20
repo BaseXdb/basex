@@ -1,6 +1,5 @@
 package org.basex.query.up.primitives;
 
-import org.basex.data.Data;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.up.NamePool;
@@ -23,10 +22,7 @@ public final class DeletePrimitive extends UpdatePrimitive {
   @Override
   public void apply(final int add) {
     final DBNode n = (DBNode) node;
-    final Data d = n.data;
-    final int p = n.pre + add;
-    d.delete(p);
-//    mergeTexts(d, p - 1, p);
+    n.data.delete(n.pre + add);
   }
 
   @Override

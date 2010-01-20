@@ -142,15 +142,17 @@ public final class Find extends AQuery {
       final int i = qu.indexOf(' ');
       String t = qu.substring(0, i);
 
+      if(!name.isEmpty()) name = "file";
       if(pred == DeepFS.S_SIZE) {
         t = Long.toString(calcNum(token(t)));
-        if(!name.isEmpty()) name = "file";
       } else {
         // if dot is found inside the current term, add suffix check
         final int d = t.lastIndexOf(".");
         if(d != -1) {
-          xquery.add("[@" + DeepFS.S_SUFFIX + " = \"" +
+          xquery.add(name + "[@" + DeepFS.S_SUFFIX + " = \"" +
               t.substring(d + 1) + "\"]");
+          t = t.substring(0, d);
+          name = "";
         }
         t = "\"" + t + "\"";
       }
@@ -162,13 +164,18 @@ public final class Find extends AQuery {
       name = "";
     } while(qu.indexOf(' ') > -1);
 
-    boolean f = true;
+    final TokenBuilder ft = new TokenBuilder();
     for(final String t : split(query)) {
       if(Character.isLetterOrDigit(t.charAt(0))) {
-        if(f) xquery.add(" | " + (r ? "/" : "") + Axis.DESCORSELF + "::file");
-        xquery.add("[" + Axis.DESC + "::text() " + CT + " \"" + t + "\"]");
-        f = false;
+        if(ft.size() != 0) ft.add(" ftand");
+        ft.add(" \"" + t + "\"");
       }
+    }
+    if(ft.size() != 0) {
+      xquery.add(" | " + (r ? "/" : "") + Axis.DESCORSELF + "::file");
+      xquery.add("[" + Axis.DESC + "::text() " + CT);
+      xquery.add(ft.finish());
+      xquery.add("]");
     }
     return xquery.toString();
   }
