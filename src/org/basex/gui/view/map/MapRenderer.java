@@ -109,7 +109,8 @@ final class MapRenderer {
       }
 
       if(draw) {
-        g.setColor(r.pos != null && r.pos.contains(ftt.pos) ? COLORFT : textc);
+        g.setColor(r.pos != null && r.pos.contains(ftt.pos) && !ftt.isSC() 
+            ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);
       }
       ll += wl + (ftt.isSC() ? 0 : ws);
@@ -223,7 +224,7 @@ final class MapRenderer {
 
     final double sum = data[3].length;
     final int nl = (int) ((r.h - 2.0) / lhmi);
-    final double fnew = (nl * (r.w - 3) - data[4].length) / sum;
+    final double fnew = ((nl * (r.w - 3) - data[4].length) / sum) * 0.97;
     r.thumbf = fnew;
     r.thumbfh = fhmi;
     r.thumblh = lhmi;

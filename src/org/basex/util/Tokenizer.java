@@ -80,6 +80,8 @@ public final class Tokenizer implements IndexToken {
   private int s;
   /** Number of tokens. */
   private int count;
+  /** Flag indicating a new sentence. */
+  private boolean sc = false;
 
   /**
    * Empty constructor.
@@ -265,17 +267,20 @@ public final class Tokenizer implements IndexToken {
     final int l = text.length;
     // parse whitespaces
     pa = false;
-
+    sc = false;
     lp = p;
     for(; p < l; p += cl(text[p])) {
       final int c = cp(text, p);
       if(c == '\n') {
         pa = true;
         p += cl((byte) ' ');
+        sc = true;
         break;
       } else if(ftChar(c)) {
+//        p -= cl(text[p]);
         break;
       }
+      sc = true;
     }
     
     // special chars found
@@ -290,7 +295,7 @@ public final class Tokenizer implements IndexToken {
     for(; p < l; p += cl(text[p])) {
       int c = cp(text, p);
       if(!ftChar(c)) {
-        s = p - 1;
+        s = p - cl(text[p]);
         break;
       }      
     }
@@ -302,7 +307,7 @@ public final class Tokenizer implements IndexToken {
    * @return boolean
    */
   public boolean isSC() {
-    return lp < p;
+    return sc;
   }
   
   /**
