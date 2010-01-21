@@ -67,19 +67,6 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
   }
 
   /**
-   * Copy thumbnail data to the specified MapRect.
-   * @param mr MapRect
-   */
-  void copyThumbData(final MapRect mr) {
-    mr.thumb = thumb;
-    mr.thumbal = thumbal;
-    mr.thumbfh = thumbfh;
-    mr.thumblh = thumblh;
-    mr.thumbf = thumbf;
-    mr.thumbsw = thumbsw;    
-  }
-  
-  /**
    * Copies the rectangle.
    * @return rectangle
    */
@@ -87,13 +74,12 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
     final MapRect rect = new MapRect(x, y, w, h, pre, level);
     rect.pos = pos;
     rect.type = type;
-    copyThumbData(rect);
-//    rect.thumb = thumb;
-//    rect.thumbal = thumbal;
-//    rect.thumbfh = thumbfh;
-//    rect.thumblh = thumblh;
-//    rect.thumbf = thumbf;
-//    rect.thumbsw = thumbsw;
+    rect.thumb = thumb;
+    rect.thumbal = thumbal;
+    rect.thumbfh = thumbfh;
+    rect.thumblh = thumblh;
+    rect.thumbf = thumbf;
+    rect.thumbsw = thumbsw;
     rect.isLeaf = isLeaf;
     return rect;
   }

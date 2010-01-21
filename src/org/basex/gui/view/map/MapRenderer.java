@@ -88,8 +88,8 @@ final class MapRenderer {
       if(ll + wl >= ww) {
         xx = r.x;
         if(ll != 0) yy += fh;
-        if (yy + fh > r.y + r.h) {
-          g.drawString("...", xx + ll, yy);
+        if(yy + fh > r.y + r.h) {
+          if(draw) g.drawString("...", xx + ll, yy);
           return r.h;
         }
 
@@ -113,17 +113,17 @@ final class MapRenderer {
       }
 
       if(draw) {
-        g.setColor(r.pos != null && r.pos.contains(ftt.pos) && !ftt.isSC() 
+        g.setColor(r.pos != null && r.pos.contains(ftt.pos) && !ftt.isSC()
             ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);
-      }      
+      }
       ll += wl;
-      if (ftt.pa) {
+      if(ftt.pa) {
         // new paragraph
         ll = 0;
         yy += fh;
-        if (yy + fh > r.y + r.h) {
-          g.drawString("...", xx + ll, yy);
+        if(yy + fh > r.y + r.h) {
+          if(draw) g.drawString("...", xx + ll, yy);
           return r.h;
         }
       }
@@ -230,22 +230,14 @@ final class MapRenderer {
       }
     }
 
-    final double sum = data[3].length + data[4].length; // total number of bytes 
+    final double sum = data[3].length + data[4].length; // total number of bytes
     final double nl = (int) (r.h - 3.0) / lhmi;
-//    final double fnew = ((nl * (r.w - 3) - data[4].length) / sum) * 0.97;
-    final double fnew = ((nl * (r.w - 3)- data[4].length) / sum);
+    final double fnew = (nl * (r.w - 3) - data[4].length) / sum;
     r.thumbf = fnew;
     r.thumbfh = fhmi;
     r.thumblh = lhmi;
     r.thumbsw = Math.max(1, fnew);
-    
     drawSentence(g, r, data, true, r.h);
-    
-//    if(h <= r.h) {      
-//      drawSentence(g, r, data, true);
-//    } else {
-//      r.thumbf = 0; // used to suppress tooltip
-//    }
   }
 
   /**
@@ -272,7 +264,7 @@ final class MapRenderer {
     final double r = d - i >= 0.5 ? i + 1 : i;
     return r / 100000;
   }
-  
+
   /**
    * Draws a text using thumbnail visualization.
    * @param g graphics reference
@@ -338,7 +330,7 @@ final class MapRenderer {
           wl -= ww - ll;
           ll = 0;
           yy += r.thumblh;
-          if (yy + r.thumblh >= r.y + mh) {
+          if(yy + r.thumblh >= r.y + mh) {
             // height to big
             return r.h;
           }
@@ -356,10 +348,8 @@ final class MapRenderer {
             wltmp -= ww - ll;
             ll = 0;
             yy += r.thumblh;
-            if (yy + r.thumblh >= r.y + mh) {
-              // height to big
-              return r.h;
-            }
+            // skip rest if no space is left
+            if(yy + r.thumblh >= r.y + mh) return r.h;
           }
           if(draw) g.fillRect(xx + ll, yy, wltmp, r.thumbfh);
           ll += wltmp;
@@ -373,10 +363,8 @@ final class MapRenderer {
         if(ll + r.thumbsw >= ww) {
           yy += r.thumblh;
           ll = 0;
-          if (yy + r.thumblh >= r.y + mh) {
-            // height to big
-            return r.h;
-          }
+          // skip rest if no space is left
+          if(yy + r.thumblh >= r.y + mh) return r.h;
         }
 
         if(draw) {
@@ -397,10 +385,8 @@ final class MapRenderer {
           yy += r.thumblh;
           wl = 0;
           ll = 0;
-          if (yy + r.thumblh >= r.y + mh) {
-            // height to big
-            return r.h;
-          }
+          // skip rest if no space is left
+          if(yy + r.thumblh >= r.y + mh) return r.h;
         }
       }
     }

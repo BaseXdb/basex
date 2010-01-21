@@ -97,6 +97,8 @@ public final class BaseXKeys {
   public static final int[] DELNEXT = { 0, VK_DELETE };
   /** Enter. */
   public static final int[] ENTER = { 0, VK_ENTER };
+  /** Execute. */
+  public static final int[] EXEC = { SC, VK_ENTER };
   /** Escape. */
   public static final int[] ESCAPE = { 0, VK_ESCAPE };
   /** Increment size. */

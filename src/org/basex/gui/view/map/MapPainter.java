@@ -7,6 +7,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
+import org.basex.gui.view.ViewData;
 
 /**
  * Provides an interface for data specific TreeMap visualizations.
@@ -87,13 +88,14 @@ abstract class MapPainter {
   void init(final MapRects rects) { }
 
   /**
-   * 
-   * @param data Data reference
-   * @param pre pre value
-   * @param mr MapRect
+   * Returns the content for the specified pre value. 
+   * @param data data reference
+   * @param mr map rectangle
    * @return byte[] content
    */
-  abstract byte[] content(final Data data, final int pre, final MapRect mr);
+  byte[] content(final Data data, final MapRect mr) {
+    return ViewData.content(data, mr.pre, false);
+  }
   
   /**
    * Resets the painter.

@@ -1,5 +1,7 @@
 package org.basex.gui.view.xquery;
 
+import static org.basex.gui.layout.BaseXKeys.*;
+
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,19 +59,13 @@ final class XQueryText extends BaseXText {
   @Override
   public void keyReleased(final KeyEvent e) {
     super.keyReleased(e);
-    parse();
-  }
 
-  /**
-   * Parses a query.
-   */
-  void parse() {
     final byte[] qu = getText();
     final boolean module = isModule(qu);
     final boolean mod = !Token.eq(qu, last);
     view.modified(view.modified || mod, false);
 
-    if(gui.prop.is(GUIProp.EXECRT) && !module && mod) {
+    if(pressed(EXEC, e) || gui.prop.is(GUIProp.EXECRT) && !module && mod) {
       query(qu, true);
     } else {
       try {
@@ -97,7 +93,7 @@ final class XQueryText extends BaseXText {
    * @param query to be processed
    * @param force perform query, even if it has not changed
    */
-  void query(final byte[] query, final boolean force) {
+  private void query(final byte[] query, final boolean force) {
     if(force) {
       last = query;
       if(isModule(query)) return;

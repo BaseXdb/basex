@@ -47,8 +47,6 @@ public final class InexSingle {
    */
   public static void main(final String[] args) throws Exception {
     new InexSingle(args);
-//    if (args.length != 1) System.out.println("submission file needed.");
-//    else convert(args[0]);
   }
 
   /**

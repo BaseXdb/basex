@@ -389,7 +389,7 @@ public final class MapView extends View implements Runnable {
       if(f.thumb) {
         f.x += 3;
         f.w -= 3;
-        final byte[] text = painter.content(data, f.pre, f);
+        final byte[] text = painter.content(data, f);
         final TokenList tl = MapRenderer.calculateToolTip(f,
             Tokenizer.getInfo(text), mouseX, mouseY, getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
