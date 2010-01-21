@@ -148,14 +148,19 @@ public final class TreeView extends View implements TreeViewOptions {
         refreshedMark = true;
       }
       focusedRect = null;
-      if((treedist = 
-        cache.generateBordersAndRects(g, gui.context, getWidth())) == -1) 
-        return;
+      if((treedist = cache.generateBordersAndRects(g, gui.context, getWidth())) 
+          == -1) return;
       setLevelDistance();
       createNewMainImage();
     } else setLevelDistance();
 
     g.drawImage(treeImage, 0, 0, getWidth(), getHeight(), this);
+    
+    // highlights marked nodes
+    if(refreshedMark) markNodes();
+
+    if(markedImage != null) g.drawImage(markedImage, 0, 0, getWidth(),
+        getHeight(), this);
 
     if(focus()) {
       final int focused = gui.context.focused;
@@ -179,11 +184,7 @@ public final class TreeView extends View implements TreeViewOptions {
       }
     }
 
-    // highlights marked nodes
-    if(refreshedMark) markNodes();
 
-    if(markedImage != null) g.drawImage(markedImage, 0, 0, getWidth(),
-        getHeight(), this);
 
     // highlights the focused node
 
@@ -355,37 +356,50 @@ public final class TreeView extends View implements TreeViewOptions {
       final int parc) {
 
     final int pary = getYperLevel(lv - 1) + nodeHeight;
-    final int prey = getYperLevel(lv) - 1;
+    final int prey = getYperLevel(lv);
     final int boRight = r.x + r.w + BORDER_PADDING - 2;
     final int boLeft = r.x + BORDER_PADDING;
     final int boBottom = prey + nodeHeight + 1;
     final int boTop = prey + 1;
     final int parmx = r.x + (int) ((boRight - boLeft) / 2d);
+    final int alpha = 0x22000000;
+    final int rgb = COLORS[7].getRGB() ^ 0xFF000000;
+    final Color c = new Color(rgb + alpha, true);
 
     if(SHOW_3D_CONN) {
-      g.setColor(new Color(0x444444, false));
+      final int dis = 0x111111;
+      final Color ca = new Color(rgb + alpha - dis, false);
+      final Color cb = new Color(rgb + alpha + dis, false);
+      // g.setColor(new Color(0x444444, false));
+     
+      
+      g.setColor(cb);
+      // g.setColor(new Color(0x666666, false));
+      g.drawPolygon(new int[] { parc, boRight, boRight}, new int[] { pary,
+          boBottom, boTop}, 3);
+
+      // g.setColor(new Color(0x666666, false));
+      g.drawPolygon(new int[] { parc, boLeft, boLeft}, new int[] { pary,
+          boBottom, boTop}, 3);
+
+      g.setColor(c);
+      // g.setColor(new Color(0x555555, false));
+      g.drawPolygon(new int[] { parc, boLeft, boRight}, new int[] { pary,
+          boTop, boTop}, 3);
+      
+      g.setColor(Color.BLACK);
 
       if(parmx < parc) g.drawLine(boRight, boBottom, parc, pary);
       else if(parmx > parc) g.drawLine(boLeft, boBottom, parc, pary);
 
-      g.setColor(new Color(0x666666, false));
-      g.fillPolygon(new int[] { parc, boRight, boRight}, new int[] { pary,
-          boBottom, boTop}, 3);
+ 
 
-      g.setColor(new Color(0x666666, false));
-      g.fillPolygon(new int[] { parc, boLeft, boLeft}, new int[] { pary,
-          boBottom, boTop}, 3);
-
-      g.setColor(new Color(0x555555, false));
-      g.fillPolygon(new int[] { parc, boLeft, boRight}, new int[] { pary,
-          boTop, boTop}, 3);
-
-      g.setColor(new Color(0x666666, false));
-      g.drawLine(boRight, boTop, parc, pary);
-      g.drawLine(boLeft, boTop, parc, pary);
+//      g.setColor(cb);
+//      // g.setColor(new Color(0x666666, false));
+//      g.drawLine(boRight, boTop, parc, pary);
+//      g.drawLine(boLeft, boTop, parc, pary);
     } else {
-      g.setColor(COLORS[7]);
-
+      g.setColor(c);
       if(boRight - boLeft > 2) {
         g.fillPolygon(new int[] { parc, boRight, boLeft}, new int[] { pary,
             boTop, boTop}, 3);
@@ -427,7 +441,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
       drawDescConn(g, lvv, new TreeRect(df, ww), cen);
       cen = (2 * df + ww) / 2;
-      g.setColor(new Color(0xAAAAAAAA, true));
+      g.setColor(COLORS[7]);
       g.fillRect(df, getYperLevel(lvv), ww, nodeHeight);
       lvv++;
     }
@@ -673,7 +687,6 @@ public final class TreeView extends View implements TreeViewOptions {
     if(!(showPar && showDesc) || root) return;
 
     final String s = Token.string(cache.getText(gui.context, rn, pre));
-
     final int w = BaseXLayout.width(g, s);
 
     g.setColor(COLORS[l + 5]);
@@ -789,8 +802,8 @@ public final class TreeView extends View implements TreeViewOptions {
       nodeHeight--;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * 
-        (lvs - 1) + lvs * nodeHeight)) / 2d);
+    final int ih = (int) ((h - (levelDistance * (lvs - 1) + 
+        lvs * nodeHeight)) / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }
 

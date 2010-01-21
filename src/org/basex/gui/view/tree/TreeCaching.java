@@ -243,17 +243,16 @@ public class TreeCaching implements TreeViewOptions {
   private void normalRectangle(final Graphics g, final int rn, final int lv,
       final Context c, final double w, final TreeBorder bo) {
 
-    double xx = rn * w;
-    double ww = w;
-
-    // new array, to be filled with the rectangles of the current level
+ // new array, to be filled with the rectangles of the current level
     rects[rn][lv] = new TreeRect[bo.size];
+    
+    double xx = rn * w * bo.size;
+    double ww = w;
 
     for(int i = bo.start; i < bo.start + bo.size; i++) {
 
-      final double boxMiddle = xx + ww / 2f;
-
       if(SLIM_TO_TEXT) {
+        final double boxMiddle = xx + ww / 2f;
         final byte[] b = getText(c, rn, nodes[bo.level].get(i));
         int o = calcOptimalRectWidth(g, b) + 10;
         if(o < MIN_TXT_SPACE) o = MIN_TXT_SPACE;
