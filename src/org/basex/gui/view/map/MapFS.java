@@ -102,8 +102,8 @@ final class MapFS extends MapPainter {
 
       // skip drawing of string when left space is too small
       if(r.w < min || r.h < min) continue;
-
-      if(drawRectangle(g, r.copy())) {
+      final MapRect copy = r.copy();
+      if(drawRectangle(g, copy)) {
         r.x += 4;
         r.w -= 8;
 
@@ -131,6 +131,7 @@ final class MapFS extends MapPainter {
         g.setFont(mfont);
         MapRenderer.drawText(g, r, tb.finish(), fsz);
       }
+      copy.copyThumbData(r);
     }
   }
 
@@ -271,21 +272,22 @@ final class MapFS extends MapPainter {
     byte[] fileBuf = EMPTY;
     if(file) {
       if(!(GUIFS.mime(name) == GUIFS.Type.IMAGE)) {
-        final byte[] textElem = DeepFS.TEXT_CONTENT;
-        final int size = data.size(pre, Data.ELEM) + pre;
-        out: for(int node = pre; node < size; ++node) {
-          final byte[] nodeName = data.name(node, data.kind(node));
-          if(eq(nodeName, textElem)) {
-            int textNodeSize = data.size(node, data.kind(node));
-            while(--textNodeSize > 0) {
-              if(data.kind(++node) == Data.TEXT) {
-                rect.pos = view.gui.context.marked.ftpos.get(node);
-                fileBuf = ViewData.content(data, node, false);
-                break out;
-              }
-            }
-          }
-        }
+        fileBuf = content(data, pre, rect);        
+//        final byte[] textElem = DeepFS.TEXT_CONTENT;
+//        final int size = data.size(pre, Data.ELEM) + pre;
+//        out: for(int node = pre; node < size; ++node) {
+//          final byte[] nodeName = data.name(node, data.kind(node));
+//          if(eq(nodeName, textElem)) {
+//            int textNodeSize = data.size(node, data.kind(node));
+//            while(--textNodeSize > 0) {
+//              if(data.kind(++node) == Data.TEXT) {
+//                rect.pos = view.gui.context.marked.ftpos.get(node);
+//                fileBuf = ViewData.content(data, node, false);
+//                break out;
+//              }
+//            }
+//          }
+//        }
       }
 
       // set binary string for images and binary files
@@ -296,19 +298,42 @@ final class MapFS extends MapPainter {
     g.setFont(mfont);
 
     try {
+      MapRenderer.drawText(g, rect, fileBuf, fsz);
+      // [CG] Thumbnails deactivated, becaouse of too many bugs :) 
       // check if text fits in rectangle
-      rect.thumb = MapRenderer.calcHeight(g, rect, fileBuf, fsz) >= rect.h;
-      if(rect.thumb) {
-        MapRenderer.drawThumbnails(g, rect, fileBuf, fsz);
-      } else {
-        MapRenderer.drawText(g, rect, fileBuf, fsz);
-      }
+//      rect.thumb = MapRenderer.calcHeight(g, rect, fileBuf, fsz) >= rect.h;
+//      if(rect.thumb) {
+//        MapRenderer.drawThumbnails(g, rect, fileBuf, fsz);
+//      } else {
+//        MapRenderer.drawText(g, rect, fileBuf, fsz);
+//      }
     } catch(final Exception ex) {
       // ignore errors for binary files which have been interpreted as texts
     }
     return false;
   }
 
+  @Override
+  byte[] content(final Data data, final int pre, final MapRect rect) {
+    byte[] fileBuf = EMPTY;
+    final byte[] textElem = DeepFS.TEXT_CONTENT;
+    final int size = data.size(pre, Data.ELEM) + pre;
+    out: for(int node = pre; node < size; ++node) {
+      final byte[] nodeName = data.name(node, data.kind(node));
+      if(eq(nodeName, textElem)) {
+        int textNodeSize = data.size(node, data.kind(node));
+        while(--textNodeSize > 0) {
+          if(data.kind(++node) == Data.TEXT) {
+            rect.pos = view.gui.context.marked.ftpos.get(node);
+            fileBuf = ViewData.content(data, node, false);
+            break out;
+          }
+        }
+      }
+    }
+    return fileBuf;
+  }
+  
   @Override
   boolean mouse(final MapRect r, final int mx, final int my,
       final boolean click) {

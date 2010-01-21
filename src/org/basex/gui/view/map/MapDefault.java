@@ -81,6 +81,12 @@ final class MapDefault extends MapPainter {
   }
 
   @Override
+  byte[] content(final Data data, final int pre, final MapRect mr) {
+    return ViewData.content(data, pre, false);
+  }
+
+  
+  @Override
   boolean drawRectangle(final Graphics g, final MapRect rect) {
     rect.x += 3;
     rect.w -= 3;

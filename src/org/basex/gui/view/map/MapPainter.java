@@ -2,6 +2,8 @@ package org.basex.gui.view.map;
 
 import java.awt.Color;
 import java.awt.Graphics;
+
+import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -84,6 +86,15 @@ abstract class MapPainter {
   @SuppressWarnings("unused")
   void init(final MapRects rects) { }
 
+  /**
+   * 
+   * @param data Data reference
+   * @param pre pre value
+   * @param mr MapRect
+   * @return byte[] content
+   */
+  abstract byte[] content(final Data data, final int pre, final MapRect mr);
+  
   /**
    * Resets the painter.
    */
