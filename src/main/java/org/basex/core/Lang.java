@@ -130,7 +130,7 @@ public final class Lang {
 
     try {
       // supported protocols: jar and file
-      final URL url = BaseX.class.getResource(SUFFIX);
+      final URL url = BaseX.class.getResource("/" + SUFFIX);
       if(url.getProtocol().equals("jar")) {
         final JarURLConnection conn = (JarURLConnection) url.openConnection();
         final String pre = conn.getEntryName();
