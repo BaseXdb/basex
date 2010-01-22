@@ -26,6 +26,7 @@ class ValueFTTrees {
    */
   void index(final byte[] tok, final int pre, final int pos, final int cf) {
     final int tl = tok.length;
+    if (tl > trees.length) return;
     if(trees[tl] == null) trees[tl] = new ValueFTTree();
     trees[tl].index(tok, pre, pos, cf);
   }
