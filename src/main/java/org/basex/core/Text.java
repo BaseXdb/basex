@@ -4,8 +4,6 @@ import static org.basex.core.Commands.*;
 import static org.basex.core.Lang.*;
 import static org.basex.util.Token.*;
 
-import org.basex.util.ReadVersion;
-
 /**
  * This class contains internationalized text strings, which are used
  * throughout the project. If this class is called first, the Strings
@@ -42,7 +40,8 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-  String VERSION = ReadVersion.read();
+//  String VERSION = ReadVersion.read();
+  String VERSION = "6.01";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
