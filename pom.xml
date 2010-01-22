@@ -508,9 +508,18 @@ org.eclipse.jdt.ui.ondemandthreshold=99
 org.eclipse.jdt.ui.staticondemandthreshold=1
               ]]></content>
             </file>
+                        <file>
+              <name>.settings/org.eclipse.core.resource.prefs</name>
+              <content>
+<![CDATA[
+#Fri Jan 22 16:39:48 CET 2010
+eclipse.preferences.version=1
+encoding/<project>=UTF-8
+      ]]></content></file>      
           </additionalConfig>
         </configuration>
       </plugin>
+      
 <!-- here -->
 
 		</plugins>
