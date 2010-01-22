@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <fileset-config file-format-version="1.2.0" simple-config="true">
-  <local-check-config name="basex checkstyle" location=".settings/checkstyle.xml" type="project" description="">
-    <additional-data name="protect-config-file" value="false"/>
+  <local-check-config name="BaseX Checkstyle" location="src/main/resources/checkstyle-basex.xml" type="project" description="">
+    <additional-data name="protect-config-file" value="true"/>
   </local-check-config>
-  <fileset name="all" enabled="true" check-config-name="basex checkstyle" local="true">
+  <fileset name="all" enabled="true" check-config-name="BaseX Checkstyle" local="true">
     <file-match-pattern match-pattern="." include-pattern="true"/>
   </fileset>
 </fileset-config>

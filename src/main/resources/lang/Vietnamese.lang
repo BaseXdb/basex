@@ -1,0 +1,565 @@
+# LANGUAGE FILE, TRANSLATED BY
+# Xuan Khanh Le, lxkhanh@yahoo.com
+#
+# The '%' character serves as placeholder for texts to be inserted
+
+# Start
+wait=Xin đợi tí
+version=Phiên bản %
+
+# Menu Commands
+m_file=Tệp
+m_edit=Soạn thảo
+m_view=Xem nhìn
+m_options=Lựa chọn
+m_help=Giúp đỡ
+m_db=Cơ sở dữ liệu
+m_main=Cửa sổ chính
+m_views=Xem nhìn
+m_inter=Tương tác
+m_layout=Nền
+
+# Buttons
+b_ok=OK
+b_opt=Tối ưu
+b_rename=Đổi tên
+b_open=Mở
+b_mount=Mount
+b_cancel=Hủy
+b_drop=Xóa
+b_cmd=Lệnh
+b_xquery=XQuery
+b_browse=Trình duyệt
+b_search=Tìm kiếm
+b_create=Create
+b_alter=Alter
+b_start=Start
+b_stop=Stop
+b_connect=Connect
+b_disconnect=Disconnect
+b_refresh=Refresh
+b_delete=Delete
+b_delall=Delete All
+b_add=Add
+
+# Visualizations
+no_data=No data available
+no_space=Thiếu chỗ
+map_binary=Tệp nhị phân
+info_title=Thông tin câu hỏi
+help_title=Giúp đỡ
+text_title=Văn bản
+explore_title=Khảo sát
+
+# Dialog Windows
+d_info=Thông tin
+d_fctitle=Chọn thư mục
+
+dc_choose=Nhập vào tệp hoặc thư mục
+dc_filter=Bộ lọc
+dc_name=Tện cơ sở dữ liệu
+dc_xmldesc=Văn bản XML
+dc_zipdesc=Văn bản XML nén Zip
+dc_gzdesc=Văn bản XML nén GZip
+dc_xqdesc=Những tệp XQuery
+dc_advtitle=Tạo cơ sở dữ liệu
+dc_chop=Cắt hết khoảng trống
+dc_intparse=Sử dụng bộ phân tích XML nội bộ
+dc_entities=Phân tích Entities
+dc_dtd=Phân tích DTDs
+dc_wcindex=Support Wildcards
+dc_ftstem=Nhét đầy
+dc_ftdc=Dấu phụ phân biệt
+dc_ftcs=Trường hợp nhạy cảm
+dc_ftsw=Stopword List
+dc_ftsct=TF/IDF Scoring
+dc_ftsct1=Documents
+dc_ftsct2=Text Nodes
+dc_chopinfo=Lựa chọn này xóa hết khoảng trắng giữa tags và nội dung
+dc_intparseinfo=Mở lựa chọn này để sử dụng bộ phân tích XML được xây dựng bên trong
+dc_pathinfo=A path summary speeds up path resolutions
+dc_txtinfo=This index speeds up text comparisons in predicates
+dc_attinfo=This index speeds up attribute comparisons in predicates
+dc_ftxinfo=A full-text index speeds up full-text queries
+dc_wcinfo=This option speeds up wildcard searches
+dc_ftsteminfo=Terms are stemmed before they are indexed
+dc_ftcsinfo=Case sensitivity is retained in the index
+dc_ftdcinfo=Diacritics are retained in the index
+dc_ftscinfo=Scoring values are calculated and stored in the index
+dc_ftswinfo=Choose a stopword list to skip frequent terms
+dc_general=Chung
+dc_parse=Đang phân tích
+dc_names=Tên
+dc_index=Indexes
+dc_meta=Metadata
+dc_ft=Nội dung
+
+do_title=Mở cơ sở dữ liệu
+do_nodbquestion=Bạn muốn tạo một cái mới không?
+
+dqe_title=Open DeepFS instance
+
+dmnt_title=Mount DeepFS instance
+dmnt_nomountpath=No valid mount point
+
+dfs_newtitle=Create new DeepFS Database
+dfs_all=Nhập tất cả
+dfs_allinfo=Nhập toàn bộ hệ thống tệp
+dfs_text=Thư mục để nhập vào
+dfs_text1=Thông tin tệp va metadata
+dfs_text2=Nội dung tệp
+dfs_cont=Bao gồm nội dung tệp chứa text
+dfs_xml=Include xml contents
+dfs_meta=Bao gồm metadata
+dfs_nodefaultapp=No default application is registered to open this file type
+
+dr_title=Đổi tên cơ sở dữ liệu
+dr_exists=Cơ sở dữ liệu đã có rồi
+dr_over=Cơ sở dữ liệu cũ sẽ bị ghi đè
+dr_overbacking=Cơ sở dữ liệu cũ và dự phòng sẽ bị ghi đè
+
+dd_title=Xóa bỏ cơ sở dữ liệu
+dd_question=Cơ sở dữ liệu '%' sẽ bị xóa bỏ.\nBạn chắc không?
+
+dx_question=Bạn thực sự muốn xóa?
+dq_question=Save changes to %?
+
+dx_outfile=Output file
+dx_outdir=Output directory
+dx_overfile=File will be overwritten.
+dx_indent=Indent with whitespaces
+dx_invpath=Invalid path.
+
+dp_title=Những ưu tiên
+dp_dbpath=Đường dẫn tới cơ sở dữ liệu ( cơ sở dữ liệu phải chuyển bằng tay)
+dp_inter=Giao diện & Tương tác
+dp_lf=Xài cách nhìn & cảm giác Java
+dp_focus=Tiêu diểm chuột thời gian thực
+dp_simplefd=Xài bộ chọn tệp đơn giản
+dp_names=Thay tags với thuộc tính @name
+dp_lang=Ngôn ngữ
+dp_restart=cần khởi động lại
+
+dn_title=Nhập dữ liệu mới
+de_title=Soạn thảo dữ liệu
+de_name=Tên
+de_value=Giá trị
+de_text=Soạn thảo %
+de_kind1=Văn bản
+de_kind2=Element
+de_kind3=Text
+de_kind4=Thuộc tính
+de_kind5=Chú thích
+de_kind6=PI
+
+df_title=Chon phông chữ
+df_type1=Chuần
+df_type2=Tô đậm
+df_type3=Nghiên
+
+dy_title=Sơ đồ màu
+dy_red=Đỏ
+dy_green=Xanh lá cây
+dy_blue=Xanh da trời
+
+dm_title=Nền bản đồ
+dm_atts=Cho xem thuộc tính
+dm_choice1=Không tựa, không viền
+dm_choice2=Không tựa, viền nhỏ
+dm_choice3=Có tựa, không viền
+dm_choice4=Có tựa, viền nhỏ
+dm_choice5=Có tựa, viền lớn
+dm_offset=Nhánh (Offset)
+dm_size=Kích cỡ được xác định bởi
+dm_size_children=số con cái
+dm_size_fssize=kích cỡ tệp
+dm_size_textsize=độ dài văn bản
+dm_size_both=không/con cái và độ dài văn bản
+
+dz_total=Tổng bộ nhớ
+dz_reserved=Bộ nhớ đặt trước
+dz_used=Bộ nhớ đã sử dụng
+dz_help=Nếu ít bộ nhớ, xin chạy \nBasex với cờ Java -Xmx<size>
+
+da_title=Về %
+da_license=BSD giấy phép (ISC)
+da_dev=Người phát triển chính
+da_cont1=Nhóm
+da_cont2=và những người/nhóm khác
+da_translation=Dịch
+
+ds_localserver=Local Server
+ds_connect=Connection
+ds_users=Users
+ds_host=Host
+ds_port=Port
+ds_localport=Local Port
+ds_createu=Create User
+ds_globperm=Global Permissions
+ds_locperm=Local Permissions
+ds_drquestion=% User(s) will be dropped.\nAre you sure?
+ds_dbrevoke=Permission will be revoked from logged in user.\nAre you sure?
+ds_alterpw=Alter Password
+ds_invalid=% is invalid
+ds_adlogin=Administrator Login (local or remote)
+ds_databases=Databases
+ds_sessions=Sessions
+ds_logs=Logs
+ds_connected=Connected to %:%.
+ds_disconnected=Disconnected.
+ds_info1=This dialog is only intended to administer the client/server environment.
+ds_info2=It will not affect any other GUI features.
+
+# GUI Commands
+
+c_about=Về %
+c_abouttt=Hiển thị thông tin chung trên dự án.
+c_all=Chọn tất cả
+c_close=Đóng
+c_closett=Đóng cơ sở dữ liệu hiện thời.
+c_color=Màu sắc
+c_colortt=Cho phép thay đổi màu sắc chương trình.
+c_cut=Cắt
+c_copy=Chép
+c_copytt=Chép nút XML hiện thời được chọn.
+c_cppath=Chép đường dẫn
+c_cppathtt=Chép đường dẫn tới nút XML được chọn.
+c_create=Mới
+c_creatett=Tạo cơ sở dữ liệu từ văn bản XML được chọn.
+c_delete=Xóa
+c_deletett=Xóa nút XML.
+c_drop=Xóa
+c_droptt=Xóa một cơ sở dữ liệu.
+c_edit=Soạn thảo
+c_edittt=Soạn thảo nút XML.
+c_exit=Thoát
+c_exittt=Thoát khỏi chương trình.
+c_export=Xuất khẩu
+c_exporttt=Xuấtkhẩu cơ sở dữ liệu hiện thời ra văn bản XML.
+c_filter=Bộ lọc được chọn
+c_filtertt=Lọc những nút được chọn.
+c_fonts=Phông chữ
+c_fontstt=Cho phép đổi phông chữ đã xài.
+c_full=Toàn màn hình
+c_fulltt=Đổi qua toàn màn hình.
+c_goback=Quay lại
+c_goforward=Tiến lên
+c_goup=Đi lên
+c_gouptt=Chuyển lên một cấp.
+c_createfs=Create DeepFS mapping
+c_createfstt=Creates a DeepFS filesystem representation starting from a given directory. The resulting database may later be used to start BaseX as a Desktop Query Engine or to mount the database as filesystem in userspace.
+c_dqe=Desktop Query Engine
+c_dqett=Open DeepFS database and use it as Desktop Search/Query Engine
+c_mountfs=Mount DB as FUSE
+c_mountfstt=Mount DeepFS database instance as filesystem in userspace (needs native operating system support and may thus be unavailable).
+c_props=Thông tin
+c_propstt=Hiển thị thông tin trên cơ sở dữ liệu đang mở.
+c_insert=Mới
+c_inserttt=Tạo một nút XML mới.
+c_maplayout=Bố cục bản đồ
+c_maplayouttt=Đổi bố cục bản đồ.
+c_open=Mở
+c_opentt=Mở một cơ sở dữ liệu.
+c_paste=Dán
+c_pastett=Dán nút đã chép trước đây.
+c_prefs=Ưu tiên
+c_prefstt=Hiển thị những ưu tiên chung chương trình.
+c_redo=Làm lại
+c_root=Về nhà
+c_roottt=Nhảy tới nút gốc.
+c_rtexec=Sự tiến hành ở thời gian thực
+c_rtexectt=Bật lựa chọn này, những lệnh hỏi sẽ chạy sau mỗi lần nhấp phím.
+c_rtfilter=Sực lọc ở thời gian thực
+c_rtfiltertt=Bật lựa chọn này, kết quả những lệnh hỏi sẽ tự động được lọc.
+c_showbuttons=Nút
+c_showbuttonstt=Bật tắt thanh nút
+c_showexplore=Bộ thông dò
+c_showexplorett=Hiển thị thanh thông dò.
+c_showhelp=Giúp đỡ
+c_showhelptt=Hiển thị phần giúp đỡ đưa thông tin về bộ phận đang tụ vào.
+c_showfolder=Thư mục
+c_showfoldertt=Hiển thị phác họa thư mục.
+c_showinfo=Thông tin lệnh hỏi
+c_showinfott=Hiển thị thanh thông tin lệnh hỏi.
+c_showinput=Vùng nhập vào
+c_showinputtt=Bật tắc vùng nhập vào.
+c_showmap=Bản đồ
+c_showmaptt=Hiển thị phác họa bản đồ
+c_showmenu=Thực đơn
+c_showmenutt=Bật tắt thực đơn.
+c_showstatus=Thanh trang thái
+c_showstatustt=Bật tắt thanh trạng thái.
+c_showtable=Bản
+c_showtablett=Hiển thị phác họa bản.
+c_showplot=Mảnh
+c_showplottt=Hiển thị phác họa mảng phân tán.
+c_showtext=Văn bản
+c_showtexttt=Hiển thị xem văn bản.
+c_showxquery=Soạn thảo lệnh hỏi
+c_showxquerytt=Hiển thị soạn thảo lệnh hỏi.
+c_undo=Làm lại
+c_xqopen=Mở XQuery
+c_xqopentt=Mở tệp lệnh hỏi
+c_save=Lưu
+c_savett=Lưu tệp lệnh hỏi
+c_saveas=Save as
+c_notopened=Tệp không mở được.
+c_notsaved=Tệp không lưu được.
+c_replace=Tệp "%" đã có.\nBạn muốn thay thế nó không?
+c_server=Server Administration
+c_servertt=Display the server administration for user management and log tracing.
+
+# Commands & Processes
+proc_time=Thời gian cần
+proc_syntax=Cú pháp
+proc_err=Không thể chạy %
+proc_nodb=Không cơ sở dữ liệu được mở.
+proc_mm=Lệnh không có trong chế độ bộ nhớ chính.
+proc_outmem=Hết bộ nhớ.\nHướng dẫn sau đây có thể giúp bạn:\n- tăng kích cỡ Java's heap với cờ -Xmx<size>\n- chọn bộ phân tích nội bộ trong giao diện hoặc qua 'thiết đặt intparse '\n- tắt văn bản và thuộc tính indexes
+
+cmd_no=Đợi lệnh.
+cmd_unknown=Lệnh không hiểu '%'
+cmd_similar=Ý bạn là '%'?
+
+# Help Commands
+help_short=thử "%"
+help_intro=thử "%" để có nhiều thông tin hơn.
+help_long=thử "% [...]" để có nhiều thông tin hơn cho một lệnh đặt biệt.
+
+# Create Command
+pc_create=Cơ sở dữ liệu đã được tạo
+pc_index=Đang tạo Indexes
+pc_update=Định dạng cơ sở dữ liệu đã bị đổi; xin tạo cơ sở dữ liệu mới.
+pc_indupdate=Định dạng index đã bị đổi; xin tạo index mới.
+pc_cancel=Việc tạo cơ sở dữ liệu đã bị hủy.
+pc_indextxt=Đang index văn bản
+pc_indexatt=Đang index thuộc tính
+pc_indexftx=Đang index nội dung
+pc_parse="%" (% Nodes parsed)
+pc_created=Cơ sở dữ liệu '%' đã được tạo trong %.
+pc_added=Document '%' added in %.
+pc_deleted=Document '%' deleted in %.
+pc_filenf=Tệp và thư mục "%" không tìm thấy.
+pc_pathnf=Tệp hay thư mục không tìm thấy.
+pc_dbnf=Xin nhập vào tên cơ sở dữ liệu.
+pc_err="%" không thể phân tích.
+pc_pos="%" (Dòng %)
+
+# Database commands
+db_no=Cơ sở dữ liệu '%' không tìm thấy.
+db_locked=Database '%' is currently locked.
+db_closed=Cơ sở dữ liệu '%' đã được đóng.
+db_closeerr=Cơ sở dữ liệu không đóng được.
+db_optimized=Cơ sở dữ liệu tối ưu trong %.
+db_dropped=Cơ sở dữ liệu '%' đã được xóa bỏ.
+db_notdropped=Cơ sở dữ liệu không xóa bỏ được.
+db_notopened=Cơ sở dữ liệu '%' không mở được.
+db_opened=Cơ sở dữ liệu '%' được mở ở %.
+db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
+db_notdeleted=File '%' could not be deleted.
+db_doc=Document '%' exists already.
+db_nodoc=Document '%' not found.
+
+# Index commands
+in_created=Index được tạo ở %.
+in_dropped=Index được xóa ở %.
+in_notdropped=Index không xóa được.
+
+# Server Info
+srv_login=Access denied.
+srv_connect=Không liên lạc được với máy chủ.
+srv_timeout=Lệnh hỏi của bạn đã hết giới hạn thời gian.
+srv_bind=Máy chủ đang chạy hay không được phép.
+srv_start=Server was started.
+srv_stop=Server was stopped.
+srv_user=Username
+srv_pw=Password
+
+# Bye
+bye1=Chúc một ngày vui.
+bye2=Hẹn gặp lại.
+bye3=Chúc vui vẻ.
+bye4=Chúc hạnh phúc nha.
+
+# Query Commands
+qu_query=Hỏi
+qu_comp=Đang dịch
+qu_eval=Đang đánh giá
+qu_time=Đang tính giờ
+qu_result=Kết quả
+qu_plan=Kết hoạch hỏi
+qu_hits=Hết(s)
+
+# Query Commands.. the following strings must have the same length
+qu_tabquery=Hỏi
+qu_tabpars=Phân tích
+qu_tabcomp=Dịch
+qu_tabeval=Đáng giá
+qu_tabprint=In ra
+qu_tabtotal=Thời gian
+qu_tabmem=Bộ nhớ
+qu_tabprinted=Đã in
+qu_tabhits=Kết quả
+qu_nodeserr==Lệnh hỏi phải lấy một tập nút.
+qu_stopped=Stopped at
+qu_line=line %
+qu_col=column %
+qu_file=in %
+
+# Admin Commands
+ad_databases=% opened database(s)
+ad_sessions=% session(s)
+ad_permno=% permission needed.
+ad_perminv=Invalid permissions specified.
+ad_permup=Permissions updated.
+ad_userno=User '%' is unknown.
+ad_userknown=User '%' exists already.
+ad_usercreate=User '%' created.
+ad_useralter=Password of user '%' changed.
+ad_userdrop=User '%' dropped.
+ad_userlog=User '%' is currently logged in.
+ad_passno=No password specified.
+ad_admin=Admin user cannot be modified.
+ad_kill=% sessions killed.
+ad_killself='%' cannot kill itself.
+
+# General Commands
+gc_seterr=Could not set property '%' to '%'.
+
+# Info Strings
+info_index=Indexes
+info_opt=Đang tối ưu cơ sở dữ liệu
+info_stats=Tạo thống kê
+info_dbname=Tên
+info_ndocs=Những văn bản
+info_docsize=Kích cỡ nhập vào
+info_dbsize=Kích cỡ
+info_doc=Đường dẫn nguồn
+info_time=Dấu thời gian
+info_mem=Bộ nhớ đã dùng
+info_nodes=Những nút bản
+info_height=Chiều cao
+info_encoding=Đang mã hóa
+info_dbpath=Đường dẫn cơ sở dữ liệu
+info_nodb=Không có cơ sở dữ liệu nào được tìm thấy.
+info_nodeepfs=No DeepFS database found
+info_dberror=không mở được.
+info_info=Thông tin quy trình
+info_all=Đầy đủ
+info_debug=Chế độ chỉnh lỗi
+info_chop=Cắt khỏng trắng
+info_entities=Phân tích Entity
+info_serialize=Ghi ra(Serialize)
+info_tags=Tags
+info_atts=Thuộc tình
+info_ns=Namespaces
+info_pathindex=Path Summary
+info_txtindex=Mục lục (index) văn bản
+info_atvindex=Mục lục (index) văn bản thuộc tính
+info_ftindex=Mục lục (index) nội dung
+info_wcindex=wildcards
+info_outofdated=hết hạn
+info_db=Thông tin cơ sở dữ liệu
+info_create=Tạo cơ sở dữ liệu
+info_general=Thông tin chung
+info_resultchop=được cắt
+info_on=Bật
+info_off=Tắt
+info_error=Lỗi
+info_entries=% mục
+
+# Command Help
+ch_nohelp=Xin lỗi, không thấy hướng dẫn nào.
+ch_helpdatabase0=Cậu lệnh cơ sở dữ liệu:
+ch_create1=Tạo cơ sở dữ liệu hay index.
+ch_create2=Creates a new database, index or user:
+ch_create3=creates the database [%] for the file or directory [%]
+ch_create4=creates an empty database [%]
+ch_create5=creates the specified index
+ch_create6=creates filesystem database [%] for [%]
+ch_create7=(using [%] and [%] if FUSE is activated)
+ch_create8=creates the specified user
+ch_add1=Add document.
+ch_add2=Adds a document to the current database.
+ch_delete1=Delete document.
+ch_delete2=Deletes a document from the current database.
+ch_open1=Mở cơ sở dữ liệu.
+ch_open2=Mở_đặc_biệt [%].
+ch_info1=Hiển thị thông tin trên cơ sở dữ liệu hiện tại.
+ch_info21=Hiển thị thông tin trên cơ sở dữ liệu được mở hiện tại:
+ch_info22=không tham số: hiển thị thông tin bao quát
+ch_info23=hiển thị thông tin cơ sở dữ liệu
+ch_info24=hiển thị thông tin index
+ch_info25=hiển thị bản XML
+ch_close1=Đóng cơ sở dữ liệu hiện tại.
+ch_close2=Đóng cơ sở dữ liệu hiện tại.
+ch_list1=Liệt kê tất cả cơ sở dữ liệu.
+ch_list2=Liệt kê tất cả cơ sở dữ liệu.
+ch_drop1=Xóa bỏ cơ sở dữ liệu hoặc index.
+ch_drop2=Drops a database, index or user:
+ch_drop21=drops cơ_sở_dữ_liệu
+ch_drop22=drops index_đặc_biệt
+ch_drop3=drops the specified user
+ch_alter1=Alter user password.
+ch_alter2=Alters the password of a user.
+ch_optimize1=Tối ưu cơ sở dữ liệu.
+ch_optimize2=Tối ưu cấu trúc cơ sở dữ liệu hiện tại.
+ch_export1=Xuất khẩu cơ sở dữ liệu ra kiểu XML.
+ch_export2=Xuất khẩu thiết lập hiện tại ra XML [%].
+ch_helpquery0=Lệnh hỏi:
+ch_xquery1=Đánh giá lệnh hỏi XQuery.
+ch_xquery2=Đánh giá lệnh hỏi XQuery và in ra kết quả.
+ch_run1=Evaluate file as XQuery.
+ch_run2=Evaluates an XQuery from [%] and prints the result.
+ch_find1=Đánh giá lệnh hỏi từ khóa.
+ch_find2=Những từ bổ nghỉa sau được dùng:\n =  : tìm chính xác những nút văn bản"\n @= : tìm chính xác những thuộc tính\n @  : tìm những thuộc tính
+ch_cs1=Đánh giá lệnh hỏi XQuery và gán kết quả theo tập hợp ngữ cảnh mới.
+ch_cs2=Đánh giá lệnh hỏi XQuery cụ thể và gán kết quả\ntheo tập hợp ngữ cảnh mới.
+ch_helpadmin0=Admin Commands:
+ch_kill1=Kill user sessions.
+ch_kill2=Kills all sessions of the specified user.
+ch_show1=Show server information.
+ch_show21=Shows server information:
+ch_show22=shows currently opened databases.
+ch_show23=shows current database sessions.
+ch_show24=shows users (on a database).
+ch_grant1=Grant user permissions.
+ch_grant2=Grants permissions (on a database) to a user.
+ch_helpgeneral0=Những câu lệnh chung:
+ch_set1=Gán lựa chọn toàn cục (current values: try '%').
+ch_set2=Có [%] với [%] = on/off:
+ch_set21=Hiển thị (tất cả) thông tin quy trình
+ch_set22=Hiển thị thông tin chỉnh lỗi
+ch_set23=Ghi ra kết quả lệnh hỏi
+ch_set26=Chặt hết khoảng trắng
+ch_set27=Phân tích các XML thực thể
+ch_set28=Index văn bản
+ch_set29=Index giá trị thuộc tính
+ch_set31=Index nội dung
+ch_set32=Path indexing
+ch_password1=Change password.
+ch_password2=Changes the user's password.
+ch_help1=Nhờ giúp đỡ % những câu lệnh.
+ch_help2=Nếu [%] cụ thể, thông tin trên câu lệnh\n cụ thể sẽ được in ra; nếu không, liệt kê tất cả lệnh.
+ch_exit1=Exit application.
+ch_exit2=Exits %.
+
+# Help Texts
+h_hist=Hiển thị lich sử thông tin nhập.
+h_save=Saves the result.
+h_go=Chạy lệnh hỏi.
+h_stop=Dừng qua trình hiện hành.
+h_recent=Những tệp vừa được mở
+h_cmd=Bạn có thể nhập lệnh BaseX vào đây. Thử 'Giúp đỡ' để xem tất cả các câu lệnh.\n\nBạn có thể lấy lại các thông tin nhập với phím LÊN hoặc XUỐNG.
+h_searchxml=Gõ cái gì đó vào miền văn bản để tìm nó trong cơ sở dữ liệu. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tags và văn bản\n=...   Tìm thấy chính xác nút văn bản\n@ ...  Tìm thấy thuộc tính và giá trị thuộc tính\n@=   Tìm thấy chính xác giá trị thuộc tính\n/...     Đánh giá dữ liệu nhập theo XQuery
+h_searchfs=Gõ cái gì đó vào miền văn bản để tìm nó trong hệ thống tệp. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tệp hay thư mục\n= ...  Tìm thấy chính xác tên\n. ..     Tìm thấy đuôi tệp\n< ...  Tìm thấy tệp kích cỡ nhỏ hơn tệp trên\n> ...  Tìm thấy tệp kích cỡ lớn hơn tệp trên\n\nbạn có thể nhập câu lệnh BaseX bằng cách thêm vào trước dữ liệu nhập 1 dấu chấm than.
+h_xpath=Chế độ XQuery cho phép dữ liệu nhập là những câu hỏi XQuery đơn giản.
+h_map=Cách vẽ này được gọi là bản đồ cây (TreeMap). Tất cả nút của văn bản XML được vẽ thành một hình chữ nhật, lấp đầy diện tích. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
+h_plot=Cách vẽ này được gọi mảnh phân tán (Scatterplot). Tất cả nút XML được hiển thị trên một mảnh. Những nút sẽ nổi lên khi được nhấp đơn (single clicks) và được lọc khi nhấp đôi (double clicks). Thực đơn xòe ra khi nhấp chuột phải lên phần tử.
+h_folder=Cách vẽ này hiển thị tất cả nut XML trong thư mục hiển thị. Nút có thể mở ra hay đóng khi nhấp lên mũi tên. Mặc dù chúng sẽ nổi lên khi được nhấp đơn hay zoom vào khi nhấp đôi. Đây là cách hiệu quả để soi văn bản XML. Một thực đơn xòe ra khi nhấp chuột phải lên phần tử.
+h_table=Cách vẽ này hiển thị tất cả nut XML trong một bản(table). Nếu bạn nhấp lên văn bản, Tất cả nút có cùng văn bản(text) sẽ nổi lên. Nhấp đôi lên văn bản, kết quả lệnh hỏi sẽ được lọc. Một thực đơn xòe ra khi nhấp chuột phải lên phần tử.
+h_text=Thanh này hiển thị kết quả lệnh hỏi hay văn bản dữ liệu xuất ra khác.\n\nPhím tắt: Nhấn '-' và '+' để đổi kích cỡ phông của tất cả thanh. Gõ vào khung xòe ra để chạy một tìm kiếm tiếp. Nó là cách đơn giản để tìm một điểm văn bản cụ thể.
+h_info=Thanh này hiển thị thông tin dịch và đánh giá lệnh hỏi  XQuery, bao gồm vài tiểu sử đơn giản.
+h_explore=Chế độ tìm kiếm đơn giản cho phép hỏi đơn giản trong văn bản XML.
+h_xquery=Trong vùng văn bản này, ban có thể nhập lệnh hỏi XQuery 1.0. Dữ liệu nhập được đánh giá sau mỗi lần nhấn phím.\n\n Ví dụ sau cho thấy tất cả tựa sách với chủ đề 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_mover=Bạn có thể đổi vị trí hiển thị khi kéo thanh trên cùng của tất cả thanh hiển thị đến chỗ khác trong cửa sổ chính.\n Nếu bạn dời hiển thị ra ngoài cửa sổ chính, nó sẽ đóng.
