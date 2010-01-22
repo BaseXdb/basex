@@ -89,7 +89,7 @@ final class BXQMetaData extends BXQAbstract implements XQMetaData {
 
   public boolean isReadOnly() throws XQException {
     opened();
-    return true;
+    return false;
   }
 
   public boolean isSchemaImportFeatureSupported() throws XQException {

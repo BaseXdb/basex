@@ -17,6 +17,8 @@ interface BXQText {
   /** Error message. */
   String WRONG = "Wrong data type; % expected, % found.";
   /** Error message. */
+  String TRANS = "No manual transaction support.";
+  /** Error message. */
   String ATOM = "Atomic value expected.";
   /** Error message. */
   String CONV = "No mapping known for '%'.";

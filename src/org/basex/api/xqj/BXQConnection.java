@@ -1,5 +1,7 @@
 package org.basex.api.xqj;
 
+import static org.basex.api.xqj.BXQText.*;
+
 import java.io.InputStream;
 import java.io.Reader;
 import javax.xml.xquery.XQConnection;
@@ -19,11 +21,10 @@ import org.basex.util.Token;
 final class BXQConnection extends BXQDataFactory implements XQConnection {
   /** Database meta data. */
   private final BXQMetaData meta = new BXQMetaData(this);
-  /** Boolean value if auto commit is enabled. */
-  private boolean autoCommit = true;
 
   public void commit() throws XQException {
     opened();
+    throw new BXQException(TRANS);
   }
 
   public XQExpression createExpression() throws XQException {
@@ -38,7 +39,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
   }
 
   public boolean getAutoCommit() {
-    return autoCommit;
+    return true;
   }
 
   public XQMetaData getMetaData() throws XQException {
@@ -87,11 +88,12 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
 
   public void rollback() throws XQException {
     opened();
+    throw new BXQException(TRANS);
   }
 
   public void setAutoCommit(final boolean ac) throws XQException {
     opened();
-    autoCommit = ac;
+    if(!ac) throw new BXQException(TRANS);
   }
 
   public void setStaticContext(final XQStaticContext sc) throws XQException {
