@@ -463,4 +463,22 @@ public final class XQJTest extends TestCase {
         XQItemType.XQBASETYPE_STRING);
     expr.bindAtomicValue(new QName("v"), "A", type);
   }
+
+
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  @Test
+  public void testExec() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+    try {
+      expr.executeCommand("info db");
+    } catch(final XQException ex) {
+    }
+    expr.executeCommand("open input");
+    expr.executeCommand("info db");
+    expr.executeCommand("close");
+  }
 }
