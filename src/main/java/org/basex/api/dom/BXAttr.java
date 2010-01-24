@@ -46,6 +46,12 @@ public final class BXAttr extends BXNode implements Attr {
   }
 
   @Override
+  public String getNamespaceURI() {
+    final byte[] uri = node.qname().uri.str();
+    return uri.length == 0 ? null : Token.string(uri);
+  }
+
+  @Override
   public Node getNextSibling() {
     return null;
   }

@@ -112,7 +112,7 @@ public abstract class BXNode implements Node {
     return finish(n);
   }
 
-  public final String getNamespaceURI() {
+  public String getNamespaceURI() {
     return null;
   }
 
