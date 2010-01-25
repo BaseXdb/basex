@@ -102,7 +102,7 @@
           </archive>
         </configuration>
       </plugin>
-      <!-- ECLIPSE SPECIFIC SETTINGS -->
+<!-- ECLIPSE SPECIFIC SETTINGS -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
@@ -539,7 +539,7 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
           </additionalConfig>
         </configuration>
       </plugin>
-      <!-- OSX disk image bundler -->
+<!-- OSX disk image bundler -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>osxappbundle-maven-plugin</artifactId>
@@ -560,8 +560,8 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
           </execution>
         </executions>
       </plugin>
-      <!-- ::OSX disk image bundler -->
-      <!--  EXE creation -->
+<!-- ::OSX disk image bundler -->
+<!--  EXE creation -->
       <plugin>
         <groupId>com.akathist.maven.plugins.launch4j</groupId>
         <artifactId>launch4j-maven-plugin</artifactId>
@@ -572,12 +572,40 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
             <goals>
               <goal>launch4j</goal>
             </goals>
-            <configuration><headerType>console</headerType><outfile>target/${name}-${version}.exe</outfile><jar>target/${name}-${version}.jar</jar>+
-              <icon>src/main/resources/etc/build/BaseX.ico</icon><errTitle>encc</errTitle><classPath><mainClass>org.basex.BaseXWin</mainClass><addDependencies>false</addDependencies><preCp>anything</preCp></classPath><jre><minVersion>1.6.0</minVersion><maxVersion/><jdkPreference>preferJre</jdkPreference><maxHeapSize>1024</maxHeapSize></jre><versionInfo><fileVersion>6.0.0.0</fileVersion><txtFileVersion>BaseX 6.0</txtFileVersion><fileDescription>Native XML Database and XQuery Processor</fileDescription><copyright>(c) University of Konstanz, 2010</copyright><productVersion>6.0.0.0</productVersion><txtProductVersion>BaseX 6.0</txtProductVersion><productName>BaseX</productName><companyName>University of Konstanz</companyName><internalName>BaseX</internalName><originalFilename>BaseX6.exe</originalFilename></versionInfo></configuration>
+            <configuration>
+              <headerType>console</headerType>
+              <outfile>target/${name}-${version}.exe</outfile>
+              <jar>target/${name}-${version}.jar</jar>
+              <icon>src/main/resources/etc/build/BaseX.ico</icon>
+              <errTitle>encc</errTitle>
+              <classPath>
+                <mainClass>org.basex.BaseXWin</mainClass>
+                <addDependencies>false</addDependencies>
+                <preCp>anything</preCp>
+              </classPath>
+              <jre>
+                <minVersion>1.6.0</minVersion>
+                <maxVersion/>
+                <jdkPreference>preferJre</jdkPreference>
+                <maxHeapSize>1024</maxHeapSize>
+              </jre>
+              <versionInfo>
+                <fileVersion>6.0.0.0</fileVersion>
+                <txtFileVersion>BaseX 6.0</txtFileVersion>
+                <fileDescription>Native XML Database and XQuery Processor</fileDescription>
+                <copyright>(c) University of Konstanz, 2010</copyright>
+                <productVersion>6.0.0.0</productVersion>
+                <txtProductVersion>BaseX 6.0</txtProductVersion>
+                <productName>BaseX</productName>
+                <companyName>University of Konstanz</companyName>
+                <internalName>BaseX</internalName>
+                <originalFilename>BaseX6.exe</originalFilename>
+              </versionInfo>
+            </configuration>
           </execution>
         </executions>
       </plugin>
-      <!-- end exe -->
+<!-- end exe -->
     </plugins>
   </build>
   <reporting>
