@@ -500,7 +500,7 @@ final class MapRenderer {
   }
 
   /**
-   * Calculates a text using thumbnail visualization.
+   * Calculates a the tooltip text for the thumbnail visualization.
    * @param r rectangle
    * @param data full-text to be drawn
    * @param x mouseX
@@ -531,8 +531,10 @@ final class MapRenderer {
     for(int i = 0; i < data[0].length; i++) {
       boolean ir = false;
       double wl = data[0][i] * r.thumbf;
+      // sum up error, caused by int cast
       error += data[0][i] * r.thumbf - wl;
       if(error >= 1) {
+        // adjust word length
         wl += error;
         error -= (int) error;
       }
@@ -540,9 +542,10 @@ final class MapRenderer {
       pl += data[0][i];
       sl += data[0][i];
       cc += data[0][i];
-
-      if(ll + wl + (ds &&
-          psl < data[1].length && data[1][psl] == sl ? r.thumbsw : 0) >= ww) {
+      
+      // find hovered thumbnail and corresponding text
+      if(ll + wl + (ds && psl < data[1].length && 
+          data[1][psl] == sl ? r.thumbsw : 0) >= ww) {
         if(ds) {
           // do not split token
           yy += r.thumblh;
@@ -550,7 +553,7 @@ final class MapRenderer {
           ll = wl + (psl < data[1].length && data[1][psl] == sl ?
               r.thumbsw : r.thumbf);
         } else {
-          // split token
+          // split token to safe space
           ir = inRect(r.x + (int) ll, yy, ww - (int) ll, r.thumbfh, x, y);
           yy += r.thumblh;
           wl -= ww - ll;
@@ -564,6 +567,7 @@ final class MapRenderer {
       }
 
       if(ir) {
+        // go back and forward through the text, centralize the hovered token
         final int si = i;
         final int[] cw = fontWidths(g.getFont());
         final int sp = BaseXLayout.width(g, cw, ' ');
@@ -694,7 +698,7 @@ final class MapRenderer {
   }
 
   /**
-   * Draws a tooltip.
+   * Draws precalculated tooltip.
    * @param g graphics reference
    * @param x x-value
    * @param y y-value
@@ -730,6 +734,7 @@ final class MapRenderer {
     }
 
     final int ww = nl == 1 && wl < wi ? wl : wi;
+    // find optimal position for the tooltip
     final int xx = x + 10 + ww >= mr.x + mr.w ? mr.x + mr.w - ww - 2 : x + 10;
     int yy = y + 28 + fs * nl + 4 < mr.y + mr.h ? y + 28 :
       y - mr.y - 4 > fs * nl ? y - fs * nl : mr.y + mr.h - 4 - fs * nl;
