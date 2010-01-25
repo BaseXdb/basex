@@ -11,7 +11,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
-
   <licenses>
     <license>
       <name>ISC License</name>
@@ -24,20 +23,18 @@
       <url>http://repository.codehaus.org/</url>
     </repository>
     <repository>
-        <id>akathist-repository</id>
-        <name>Akathist Repository</name>
-        <url>http://www.9stmaryrd.com/maven</url>
+      <id>akathist-repository</id>
+      <name>Akathist Repository</name>
+      <url>http://www.9stmaryrd.com/maven</url>
     </repository>
-    
   </repositories>
   <pluginRepositories>
-      <pluginRepository>
-          <id>akathist-repository</id>
-          <name>Akathist Repository</name>
-          <url>http://www.9stmaryrd.com/maven</url>
-      </pluginRepository>
+    <pluginRepository>
+      <id>akathist-repository</id>
+      <name>Akathist Repository</name>
+      <url>http://www.9stmaryrd.com/maven</url>
+    </pluginRepository>
   </pluginRepositories>
-  
   <organization>
     <name>Chair for Database and Information Systems, U Konstanz</name>
     <url>http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis</url>
@@ -113,6 +110,14 @@
           <downloadSources>true</downloadSources>
           <downloadJavadocs>true</downloadJavadocs>
           <additionalConfig>
+            <file>
+              <name>.settings/org.eclipse.core.resources.prefs</name>
+              <content><![CDATA[
+#Mon Jan 25 14:00:49 CET 2010
+eclipse.preferences.version=1
+encoding/<project>=UTF-8
+              ]]></content>
+            </file>
             <file>
               <name>.settings/org.eclipse.jdt.core.prefs</name>
               <content><![CDATA[
@@ -572,42 +577,14 @@ encoding/<project>=UTF-8
           <execution>
             <id>l4j-clui</id>
             <phase>package</phase>
-            <goals><goal>launch4j</goal></goals>
-            <configuration>
-              <headerType>console</headerType>
-              <outfile>target/${name}-${version}.exe</outfile>
-              <jar>target/${name}-${version}.jar</jar>+
-              <icon>src/main/resources/etc/build/BaseX.ico</icon>
-              
-              <errTitle>encc</errTitle>
-              <classPath>
-                <mainClass>org.basex.BaseXWin</mainClass>
-                <addDependencies>false</addDependencies>
-                <preCp>anything</preCp>
-              </classPath>
-              <jre>
-                <minVersion>1.6.0</minVersion>
-                <maxVersion></maxVersion>
-                <jdkPreference>preferJre</jdkPreference>
-                <maxHeapSize>1024</maxHeapSize>
-              </jre>
-              <versionInfo>
-                <fileVersion>6.0.0.0</fileVersion>
-                <txtFileVersion>BaseX 6.0</txtFileVersion>
-                <fileDescription>Native XML Database and XQuery Processor</fileDescription>
-                <copyright>(c) University of Konstanz, 2010</copyright>
-                <productVersion>6.0.0.0</productVersion>
-                <txtProductVersion>BaseX 6.0</txtProductVersion>
-                <productName>BaseX</productName>
-                <companyName>University of Konstanz</companyName>
-                <internalName>BaseX</internalName>
-                <originalFilename>BaseX6.exe</originalFilename>
-              </versionInfo>
-            </configuration>
+            <goals>
+              <goal>launch4j</goal>
+            </goals>
+            <configuration><headerType>console</headerType><outfile>target/${name}-${version}.exe</outfile><jar>target/${name}-${version}.jar</jar>+
+              <icon>src/main/resources/etc/build/BaseX.ico</icon><errTitle>encc</errTitle><classPath><mainClass>org.basex.BaseXWin</mainClass><addDependencies>false</addDependencies><preCp>anything</preCp></classPath><jre><minVersion>1.6.0</minVersion><maxVersion/><jdkPreference>preferJre</jdkPreference><maxHeapSize>1024</maxHeapSize></jre><versionInfo><fileVersion>6.0.0.0</fileVersion><txtFileVersion>BaseX 6.0</txtFileVersion><fileDescription>Native XML Database and XQuery Processor</fileDescription><copyright>(c) University of Konstanz, 2010</copyright><productVersion>6.0.0.0</productVersion><txtProductVersion>BaseX 6.0</txtProductVersion><productName>BaseX</productName><companyName>University of Konstanz</companyName><internalName>BaseX</internalName><originalFilename>BaseX6.exe</originalFilename></versionInfo></configuration>
           </execution>
         </executions>
       </plugin>
-      
       <!-- end exe -->
     </plugins>
   </build>
