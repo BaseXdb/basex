@@ -13,7 +13,6 @@ import org.basex.util.TokenList;
 final class FTArray {
   /** counts all nodes in the trie. */
   int count;
-  /** THE LISTS ARE USED TO CREATE THE STRUCTURE. */
   /** List saving the token values. */
   TokenList tokens;
   /** List saving the structure: [t, n1, ..., nk, s, p0, p1]
@@ -55,7 +54,8 @@ final class FTArray {
   }
 
   /**
-   * Inserts a token into the trie. The tokens have to be sorted!!
+   * Bulk loader: Inserts a token into the trie, but the tokens have to be 
+   * sorted first!!
    * @param v value, which is to be inserted
    * @param s size of the data the node will have
    * @param offset file offset where to read the data

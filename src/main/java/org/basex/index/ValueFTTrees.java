@@ -5,6 +5,7 @@ import org.basex.util.Token;
 /**
  * This class indexes all the XML Tokens in a balanced binary tree.
  * The iterator returns all compressed pre values in a sorted manner.
+ * For each token length is one ValueFTTree created.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -17,8 +18,8 @@ class ValueFTTrees {
   int nsize;
 
   /**
-   * Check if specified token was already indexed; if yes, its pre
-   * value is added to the existing values. otherwise, create new index entry.
+   * Indexes a token with it full text data.
+   * 
    * @param tok token to be indexed
    * @param pre pre value for the token
    * @param pos pos value of the token
@@ -26,6 +27,7 @@ class ValueFTTrees {
    */
   void index(final byte[] tok, final int pre, final int pos, final int cf) {
     final int tl = tok.length;
+    // token longer than Token.MAXLEN are ignored
     if (tl > trees.length) return;
     if(trees[tl] == null) trees[tl] = new ValueFTTree();
     trees[tl].index(tok, pre, pos, cf);

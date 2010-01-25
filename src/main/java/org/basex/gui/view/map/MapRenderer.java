@@ -89,6 +89,7 @@ final class MapRenderer {
         xx = r.x;
         if(ll != 0) yy += fh;
         if(yy + fh > r.y + r.h) {
+          // text to high, skip drawing 
           if(draw) g.drawString("...", xx + ll, yy);
           return r.h;
         }
@@ -113,6 +114,7 @@ final class MapRenderer {
       }
 
       if(draw) {
+        // colour each full text hit
         g.setColor(r.pos != null && r.pos.contains(ftt.pos) && !ftt.isSC()
             ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);
@@ -123,6 +125,7 @@ final class MapRenderer {
         ll = 0;
         yy += fh;
         if(yy + fh > r.y + r.h) {
+          // text to high, skip drawing
           if(draw) g.drawString("...", xx + ll, yy);
           return r.h;
         }
@@ -168,6 +171,7 @@ final class MapRenderer {
 
     boolean l = false;
     while(r.thumbal < 2) {
+      // find parameter setting for the available space
       ff = round(fftmax, fftmin);
       r.thumbf = ff * fs;
       ffh = round(ffhtmax, ffhtmin);
@@ -187,7 +191,7 @@ final class MapRenderer {
 
       if(h >= r.h || le(ffmax, ff) || le(ffhmax, ffh) || le(flhmax, flh)) {
         if(l) {
-          // use last setup to draw
+          // use last setup to draw 
           r.thumbf = bff * fs;
           r.thumbfh = (byte) Math.max(1, bffh * fs);
           r.thumblh = (byte) Math.max(1, (bflh + bffh) * fs);
@@ -229,10 +233,14 @@ final class MapRenderer {
         flhtmin = flh;
       }
     }
-
-    final double sum = data[3].length + data[4].length; // total number of bytes
-    final double nl = (int) (r.h - 3.0) / lhmi;
-    final double fnew = (nl * (r.w - 3) - data[4].length) / sum;
+    
+    // calculate parameter setting 
+    // total number of bytes
+    final double sum = data[3].length + data[4].length; 
+    // number of lines printable
+    final double nl = (int) (r.h - 3.0) / lhmi; 
+    // factor for the width of a thumbnail
+    final double fnew = (nl * (r.w - 3) - data[4].length) / sum; 
     r.thumbf = fnew;
     r.thumbfh = fhmi;
     r.thumblh = lhmi;
@@ -266,7 +274,8 @@ final class MapRenderer {
   }
 
   /**
-   * Draws a text using thumbnail visualization.
+   * Draws a text using thumbnail visualization, that represents a sentence  
+   * through a thumbnail. Sentences are separated through black thumbnails.
    * @param g graphics reference
    * @param r rectangle
    * @param data full-text to be drawn
@@ -394,7 +403,8 @@ final class MapRenderer {
   }
 
   /**
-   * Draws a text using thumbnail visualization.
+   * Draws a text using thumbnail visualization, that represents a token  
+   * through a thumbnail.
    * @param g graphics reference
    * @param r rectangle
    * @param data full-text to be drawn

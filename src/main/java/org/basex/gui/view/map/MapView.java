@@ -385,14 +385,18 @@ public final class MapView extends View implements Runnable {
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), f.level + 5);
       }
-
+ 
       if(f.thumb) {
+        // draw tooltip for thumbnail
         f.x += 3;
         f.w -= 3;
+        // read content from disk
         final byte[] text = painter.content(data, f);
+        // calculate tooltip
         final TokenList tl = MapRenderer.calculateToolTip(f,
             Tokenizer.getInfo(text), mouseX, mouseY, getWidth(), g);
         final MapRect mr = new MapRect(getX(), getY(), getWidth(), getHeight());
+        // draw calculated tooltip
         MapRenderer.drawToolTip(g, mouseX, mouseY, mr, tl,
             gprop.num(GUIProp.FONTSIZE));
         f.x -= 3;

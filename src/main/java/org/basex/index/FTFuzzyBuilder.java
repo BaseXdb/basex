@@ -17,22 +17,29 @@ import org.basex.util.TokenBuilder;
  * This class builds an index for text contents, optimized for fuzzy search,
  * in an ordered table.
  *
+ *  - (1) the tokens are collected in main memory (red-black tree)
+ *  - (2) if main memory, the data is written to disk, (1)
+ *  - (3) merge disk data into the final format:
+ *
  * The building process is divided in 2 steps:
  * a)
  *    fill DataOutput(db, f + 'x') looks like:
- *    [l, p] ... where l is the length of a token an p the pointer of
- *                the first token with length l; there's an entry for
- *                each token length [byte, int]
+ *    [l, p] ... 
+ *      - l is the length [byte] of a token 
+ *      - p the pointer [int] of the first token with length l
+ *      there's an entry for each token length
+ *    
  *    fill DataOutput(db, f + 'y') looks like:
- *    [t0, t1, ... tl, z, s] ... where t0, t1, ... tl are the byte values
- *                           of the token (byte[l]); z is the pointer on
- *                           the data entries of the token (int) and s is
- *                           the number of pre values, saved in data (int)
+ *    [t0, t1, ... tl, z, s] 
+ *      - t0, t1, ... tl-1 is the token [byte[l]]
+ *      - z is the pointer on the data entries of the token [long] 
+ *      - s is the number of pre values, saved in data [int]
  * b)
- *    fill DataOutput(db, f + 'z') looks like:
- *    [pre0, ..., pres, pos0, pos1, ..., poss] where pre and pos are the
- *                          ft data [int[]]
- *
+ *    fill DataOutput(db, f + 'z') looks like: stores the full text data; the pre values
+ *      are ordered but not distinct
+ *      [pre1, pos1, pre2, pos2, pre3, pos3, ...] as Nums 
+ *      
+ *      
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen
@@ -58,6 +65,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   void index(final byte[] tok) throws IOException {
+    // until there's enough free main memory
     if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
       // currently no frequency support for tfidf based scoring
       writeIndex(csize++);
@@ -91,6 +99,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
     writeIndex(csize++);
     if(!merge) return;
 
+    // merges temporarily indexes to the final index
     final DataOutput outx = new DataOutput(data.meta.file(DATAFTX + 'x'));
     final DataOutput outy = new DataOutput(data.meta.file(DATAFTX + 'y'));
     final DataOutput outz = new DataOutput(data.meta.file(DATAFTX + 'z'));
@@ -100,6 +109,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
     final int[][] pos = new int[csize][];
     final IntList ind = new IntList();
 
+    // open all temp indexes
     final FTFuzzy[] v = new FTFuzzy[csize];
     for(int b = 0; b < csize; b++) {
       v[b] = new FTFuzzy(data, b);
@@ -114,6 +124,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
       min = 0;
       mer.reset();
       mer.add(min);
+      // find next token to write on disk
       for(int i = 0; i < csize; i++) {
         if(min == i || tok[i].length == 0) continue;
         final int l = tok[i].length - tok[min].length;
@@ -132,13 +143,16 @@ public final class FTFuzzyBuilder extends FTBuilder {
         ind.add((int) outy.size());
       }
 
+      // write token
       outy.write(tok[min]);
+      // pointer on full text data
       outy.write5(outz.size());
       int s = 0;
       final TokenBuilder tbp = new TokenBuilder();
       final TokenBuilder tbo = new TokenBuilder();
       tbp.add(new byte[4]);
       tbo.add(new byte[4]);
+      // merge full text data of all temp indexes with the same token
       for(int j = 0; j < mer.size(); j++) {
         final int m = mer.get(j);
         for(final int p : pres[m]) tbp.add(Num.num(p));
@@ -204,7 +218,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
   }
   
   /**
-   * Writes the index to disk.
+   * Writes the main memory index to disk - temporarily.
    * @param cs current file pointer
    * @throws IOException I/O exception
    */
@@ -231,8 +245,9 @@ public final class FTFuzzyBuilder extends FTBuilder {
         ind.add(tr);
       }
       for(int i = 0; i < j; i++) outy.write(key[i]);
-      // write pointer on data and data size
+      // write pointer on full text data
       outy.write5(dr);
+      // write full text data size (number of pre values)
       outy.writeInt(t.nextNumPre());
       // write compressed pre and pos arrays
       writeFTData(outz, t.nextPres(), t.nextPos());

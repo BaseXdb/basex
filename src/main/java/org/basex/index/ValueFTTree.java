@@ -25,7 +25,7 @@ final class ValueFTTree extends ValueTree {
 
   /**
    * Checks if the specified token was already indexed; if yes, its pre
-   * value is added to the existing values. otherwise, a new index entry
+   * value is added to the existing values, otherwise a new index entry
    * is created.
    * @param tok token to be indexed
    * @param pre pre value for the token
