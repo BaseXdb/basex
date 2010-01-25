@@ -549,7 +549,7 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
           <dictionaryFile>${basedir}/src/main/resources/OSXBundle/Info.plist</dictionaryFile>
           <iconFile>${basedir}/src/main/resources/OSXBundle/BaseX.icns</iconFile>
           <javaApplicationStub>${basedir}/src/main/resources/OSXBundle/JavaApplicationStub</javaApplicationStub>
-          <jvmVersion>1.5+</jvmVersion>
+          <jvmVersion>1.6</jvmVersion>
         </configuration>
         <executions>
           <execution>
@@ -573,7 +573,7 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
               <goal>launch4j</goal>
             </goals>
             <configuration>
-              <headerType>console</headerType>
+              <headerType>gui</headerType>
               <outfile>target/${name}-${version}.exe</outfile>
               <jar>target/${name}-${version}.jar</jar>
               <icon>src/main/resources/etc/build/BaseX.ico</icon>
@@ -591,15 +591,15 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
               </jre>
               <versionInfo>
                 <fileVersion>6.0.0.0</fileVersion>
-                <txtFileVersion>BaseX 6.0</txtFileVersion>
+                <txtFileVersion>${name} ${version}</txtFileVersion>
                 <fileDescription>Native XML Database and XQuery Processor</fileDescription>
                 <copyright>(c) University of Konstanz, 2010</copyright>
                 <productVersion>6.0.0.0</productVersion>
-                <txtProductVersion>BaseX 6.0</txtProductVersion>
-                <productName>BaseX</productName>
+                <txtProductVersion>${name} ${version}</txtProductVersion>
+                <productName>${name}</productName>
                 <companyName>University of Konstanz</companyName>
-                <internalName>BaseX</internalName>
-                <originalFilename>BaseX6.exe</originalFilename>
+                <internalName>${name}</internalName>
+                <originalFilename>${name}-${version}.exe</originalFilename>
               </versionInfo>
             </configuration>
           </execution>
