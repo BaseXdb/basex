@@ -1,86 +1,111 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.basex</groupId>
-	<artifactId>basex</artifactId>
-	<packaging>jar</packaging>
-	<version>6.01</version>
-	<name>basex</name>
-	<url>http://basex.org</url>
-	<licenses>
-		<license>
-			<name>ISC License</name>
-			<url>http://www.isc.org/software/license</url>
-		</license>
-	</licenses>
-	<organization>
-		<name>Chair for Database and Information Systems, U Konstanz</name>
-		<url>http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis</url>
-	</organization>
-	<developers>
-		<developer>
-			<id>cg</id>
-			<name>Christian Gr&#xFC;n</name>
-			<email>christian.gruen@basex.org</email>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-	</developers>
-	<mailingLists>
-		<mailingList>
-			<name>BaseX Talk</name>
-			<post>basex-talk@mailman.uni-konstanz.de</post>
-			<archive>https://mailman.uni-konstanz.de/mailman/listinfo/basex-talk</archive>
-		</mailingList>
-	</mailingLists>
-	<scm>
-		<connection>scm:svn:https://svn.uni-konstanz.de/dbis/basex/trunk/basex</connection>
-		<developerConnection>scm:svn:https://svn.uni-konstanz.de/dbis/basex/trunk/basex</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://svn.uni-konstanz.de/dbis/basex/trunk/basex</url>
-	</scm>
-	<issueManagement>
-		<system>Sourceforge Tracker</system>
-		<url>http://sourceforge.net/tracker/?group_id=192179</url>
-	</issueManagement>
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.5</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>org.basex.BaseXWin</mainClass>
-							<packageName>org.basex</packageName>
-						</manifest>
-						<manifestEntries>
-							<url>${pom.url}</url>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<!-- ECLIPSE SPECIFIC SETTINGS -->
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.basex</groupId>
+  <artifactId>basex</artifactId>
+  <packaging>jar</packaging>
+  <version>6.01</version>
+  <name>BaseX</name>
+  <url>http://basex.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+
+  <licenses>
+    <license>
+      <name>ISC License</name>
+      <url>http://www.isc.org/software/license</url>
+    </license>
+  </licenses>
+  <repositories>
+    <repository>
+      <id>Codehaus</id>
+      <url>http://repository.codehaus.org/</url>
+    </repository>
+    <repository>
+        <id>akathist-repository</id>
+        <name>Akathist Repository</name>
+        <url>http://www.9stmaryrd.com/maven</url>
+    </repository>
+    
+  </repositories>
+  <pluginRepositories>
+      <pluginRepository>
+          <id>akathist-repository</id>
+          <name>Akathist Repository</name>
+          <url>http://www.9stmaryrd.com/maven</url>
+      </pluginRepository>
+  </pluginRepositories>
+  
+  <organization>
+    <name>Chair for Database and Information Systems, U Konstanz</name>
+    <url>http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis</url>
+  </organization>
+  <developers>
+    <developer>
+      <id>cg</id>
+      <name>Christian Gr&#xFC;n</name>
+      <email>christian.gruen@basex.org</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  <mailingLists>
+    <mailingList>
+      <name>BaseX Talk</name>
+      <post>basex-talk@mailman.uni-konstanz.de</post>
+      <archive>https://mailman.uni-konstanz.de/mailman/listinfo/basex-talk</archive>
+    </mailingList>
+  </mailingLists>
+  <scm>
+    <connection>scm:svn:https://svn.uni-konstanz.de/dbis/basex/trunk/basex</connection>
+    <developerConnection>scm:svn:https://svn.uni-konstanz.de/dbis/basex/trunk/basex</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://svn.uni-konstanz.de/dbis/basex/trunk/basex</url>
+  </scm>
+  <issueManagement>
+    <system>Sourceforge Tracker</system>
+    <url>https://sourceforge.net/tracker/?group_id=192179&amp;atid=940354</url>
+  </issueManagement>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.basex.BaseXWin</mainClass>
+              <packageName>org.basex</packageName>
+            </manifest>
+            <manifestEntries>
+              <url>${pom.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <!-- ECLIPSE SPECIFIC SETTINGS -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
@@ -90,8 +115,7 @@
           <additionalConfig>
             <file>
               <name>.settings/org.eclipse.jdt.core.prefs</name>
-              <content>
-<![CDATA[
+              <content><![CDATA[
 eclipse.preferences.version=1
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
 org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6
@@ -444,8 +468,7 @@ org.eclipse.jdt.core.formatter.wrap_before_binary_operator=true
             </file>
             <file>
               <name>.settings/org.eclipse.jdt.ui.prefs</name>
-              <content>
-<![CDATA[
+              <content><![CDATA[
 #Sat Dec 13 20:52:08 CET 2008
 cleanup.add_default_serial_version_id=true
 cleanup.add_generated_serial_version_id=false
@@ -508,37 +531,97 @@ org.eclipse.jdt.ui.ondemandthreshold=99
 org.eclipse.jdt.ui.staticondemandthreshold=1
               ]]></content>
             </file>
-                        <file>
+            <file>
               <name>.settings/org.eclipse.core.resource.prefs</name>
-              <content>
-<![CDATA[
+              <content><![CDATA[
 #Fri Jan 22 16:39:48 CET 2010
 eclipse.preferences.version=1
 encoding/<project>=UTF-8
-      ]]></content></file>      
+      ]]></content>
+            </file>
           </additionalConfig>
         </configuration>
       </plugin>
+      <!-- OSX disk image bundler -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>osxappbundle-maven-plugin</artifactId>
+        <version>1.0-alpha-2</version>
+        <configuration>
+          <mainClass>org.basex.BaseXWin</mainClass>
+          <dictionaryFile>${basedir}/src/main/resources/OSXBundle/Info.plist</dictionaryFile>
+          <iconFile>${basedir}/src/main/resources/OSXBundle/BaseX.icns</iconFile>
+          <javaApplicationStub>${basedir}/src/main/resources/OSXBundle/JavaApplicationStub</javaApplicationStub>
+          <jvmVersion>1.5+</jvmVersion>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>bundle</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- ::OSX disk image bundler -->
+      <!--  EXE creation -->
+      <plugin>
+        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+        <artifactId>launch4j-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>l4j-clui</id>
+            <phase>package</phase>
+            <goals><goal>launch4j</goal></goals>
+            <configuration>
+              <headerType>console</headerType>
+              <outfile>target/${name}-${version}.exe</outfile>
+              <jar>target/${name}-${version}.jar</jar>+
+              <icon>src/main/resources/etc/build/BaseX.ico</icon>
+              
+              <errTitle>encc</errTitle>
+              <classPath>
+                <mainClass>org.basex.BaseXWin</mainClass>
+                <addDependencies>false</addDependencies>
+                <preCp>anything</preCp>
+              </classPath>
+              <jre>
+                <minVersion>1.6.0</minVersion>
+                <maxVersion></maxVersion>
+                <jdkPreference>preferJre</jdkPreference>
+                <maxHeapSize>1024</maxHeapSize>
+              </jre>
+              <versionInfo>
+                <fileVersion>6.0.0.0</fileVersion>
+                <txtFileVersion>BaseX 6.0</txtFileVersion>
+                <fileDescription>Native XML Database and XQuery Processor</fileDescription>
+                <copyright>(c) University of Konstanz, 2010</copyright>
+                <productVersion>6.0.0.0</productVersion>
+                <txtProductVersion>BaseX 6.0</txtProductVersion>
+                <productName>BaseX</productName>
+                <companyName>University of Konstanz</companyName>
+                <internalName>BaseX</internalName>
+                <originalFilename>BaseX6.exe</originalFilename>
+              </versionInfo>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       
-<!-- here -->
-
-		</plugins>
-	</build>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-	</properties>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<linkXRef>false</linkXRef>
-					<configLocation>src/main/resources/checkstyle-basex.xml</configLocation>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
+      <!-- end exe -->
+    </plugins>
+  </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <linkXRef>false</linkXRef>
+          <configLocation>src/main/resources/checkstyle-basex.xml</configLocation>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>
