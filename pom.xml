@@ -549,9 +549,9 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
         <version>1.0-alpha-2</version>
         <configuration>
           <mainClass>org.basex.BaseXWin</mainClass>
-          <dictionaryFile>${basedir}/src/main/resources/OSXBundle/Info.plist</dictionaryFile>
-          <iconFile>${basedir}/src/main/resources/OSXBundle/BaseX.icns</iconFile>
-          <javaApplicationStub>${basedir}/src/main/resources/OSXBundle/JavaApplicationStub</javaApplicationStub>
+          <dictionaryFile>${basedir}/etc/build/OSXBundle/Info.plist</dictionaryFile>
+          <iconFile>${basedir}/etc/build/OSXBundle/BaseX.icns</iconFile>
+          <javaApplicationStub>${basedir}/etc/build/OSXBundle/JavaApplicationStub</javaApplicationStub>
           <jvmVersion>1.6</jvmVersion>
         </configuration>
         <executions>
@@ -580,7 +580,7 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
               <headerType>gui</headerType>
               <outfile>target/${project.name}-${project.version}.exe</outfile>
               <jar>target/${project.name}-${project.version}.jar</jar>
-              <icon>src/main/resources/etc/build/BaseX.ico</icon>
+              <icon>${basedir}/etc/build/BaseX.ico</icon>
               <errTitle>encc</errTitle>
               <classPath>
                 <mainClass>org.basex.BaseXWin</mainClass>

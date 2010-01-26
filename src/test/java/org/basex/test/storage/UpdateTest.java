@@ -24,7 +24,7 @@ import org.junit.Test;
  */
 public abstract class UpdateTest {
   /** Test file we do updates with. */
-  private static final String TESTFILE = "src/main/resources/etc/xml/test.xml";
+  private static final String TESTFILE = "/etc/xml/test.xml";
   /** Test database name. */
   private static final String DBNAME = UpdateTest.class.getSimpleName();
   /** Main memory flag. */

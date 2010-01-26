@@ -27,7 +27,7 @@ public class CmdTest {
   /** Database context. */
   protected static final Context CONTEXT = new Context();
   /** Test file. */
-  private static final String FILE = "src/main/resources/input.xml";
+  private static final String FILE = "etc/build/input.xml";
   /** Test name. */
   private static final String NAME = "input";
   /** Test name. */
