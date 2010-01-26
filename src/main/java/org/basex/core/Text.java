@@ -37,6 +37,8 @@ public interface Text {
   String NAMELC = NAME.toLowerCase();
   /** URL. */
   String URL = "http://www." + NAMELC + ".org";
+  /** URL of the community page. */
+  String COMMUNITY_URL = URL + "/community";
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
@@ -610,6 +612,8 @@ public interface Text {
   String INFOERROR = lang("info_error") + COLS;
   /** Error info. */
   String INFOENTRIES = "(" + lang("info_entries") + ")";
+  /** Error info. */
+  String INFOCOMMUNITYERROR = lang("info_browsererror", COMMUNITY_URL);
 
   // MENU ENTRIES =============================================================
 
@@ -779,6 +783,10 @@ public interface Text {
   String GUISHOWHELP = lang("c_showhelp");
   /** Command info. */
   String GUISHOWHELPTT = lang("c_showhelptt");
+  /** Command info. */
+  String GUISHOWCOMMUNITY = lang("c_community");
+  /** Command info. */
+  String GUISHOWCOMMUNITYTT = lang("c_communitytt");
   /** Command info. */
   String GUISHOWINFO = lang("c_showinfo");
   /** Command info. */

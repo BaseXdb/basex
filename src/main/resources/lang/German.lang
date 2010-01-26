@@ -279,6 +279,8 @@ c_showfolder=Verzeichnis
 c_showfoldertt=Zeigt die Verzeichnisansicht an.
 c_showhelp=Hilfe
 c_showhelptt=Zeigt die Hilfsansicht an. Diese Ansicht bietet interaktive Informationen über die derzeit ausgewählten Komponenten.
+c_community=Community
+c_communitytt=Zeigt die Community-Webseite (öffnet den Standard-Browser).
 c_showinfo=Anfrage-Info
 c_showinfott=Zeigt Informationen über die Anfrageausführung an.
 c_showinput=Eingabefeld
@@ -467,6 +469,7 @@ info_on=AN
 info_off=AUS
 info_error=Fehler
 info_entries=% Einträge
+info_browsererror=Browser konnte nicht geöffnet werden. Bitte die URL von Hand im Browser öffnen:\n\n%
 
 # Command Help
 ch_nohelp=Keine Hilfe verfügbar.

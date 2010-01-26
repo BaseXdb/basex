@@ -277,6 +277,8 @@ c_showexplore=Bộ thông dò
 c_showexplorett=Hiển thị thanh thông dò.
 c_showhelp=Giúp đỡ
 c_showhelptt=Hiển thị phần giúp đỡ đưa thông tin về bộ phận đang tụ vào.
+c_community=Community
+c_communitytt=Show the community web page (opens your default browser).
 c_showfolder=Thư mục
 c_showfoldertt=Hiển thị phác họa thư mục.
 c_showinfo=Thông tin lệnh hỏi
@@ -467,6 +469,7 @@ info_on=Bật
 info_off=Tắt
 info_error=Lỗi
 info_entries=% mục
+info_browsererror=Failed to open a browser. Please manually open the URL in your favorite browser:\n\n%
 
 # Command Help
 ch_nohelp=Xin lỗi, không thấy hướng dẫn nào.

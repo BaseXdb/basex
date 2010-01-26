@@ -2,10 +2,13 @@ package org.basex.gui;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.swing.AbstractButton;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -763,6 +766,20 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
       select(b, gui.prop.is(GUIProp.SHOWHELP));
+    }
+  },
+  
+  /** Opens the community webpage. */
+  SHOWCOMMUNITY(GUISHOWCOMMUNITY, null, GUISHOWCOMMUNITYTT, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      try {
+        Desktop.getDesktop().browse(new URI(COMMUNITY_URL));
+      } catch(IOException e) {
+        Dialog.error(gui, INFOCOMMUNITYERROR);
+      } catch(URISyntaxException e) {
+        Dialog.error(gui, INFOCOMMUNITYERROR);
+      }
     }
   },
 

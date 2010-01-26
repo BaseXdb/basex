@@ -279,6 +279,8 @@ c_showfolder=ツリー
 c_showfoldertt=ツリービューを表示します。
 c_showhelp=ヘルプ
 c_showhelptt=ヘルプビューを表示します。現在フォーカスが当たっているコンポーネントに関するヘルプを表示します。
+c_community=Community
+c_communitytt=Show the community web page (opens your default browser).
 c_showinfo=クエリー情報
 c_showinfott=クエリー情報パネルを表示します。
 c_showinput=入力フィールド
@@ -467,6 +469,7 @@ info_on=ON
 info_off=OFF
 info_error=エラー
 info_entries=% 個のエントリー
+info_browsererror=Failed to open a browser. Please manually open the URL in your favorite browser:\n\n%
 
 # Command Help
 ch_nohelp=ヘルプがありません。

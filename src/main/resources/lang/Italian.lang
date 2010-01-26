@@ -277,6 +277,8 @@ c_showexplore=Esploratore
 c_showexplorett=Mostra l'esploratore.
 c_showhelp=Aiuto
 c_showhelptt=Mostra la schermata d'aiuto, che fornisce informazioni sui componenti selezionati.
+c_community=Community
+c_communitytt=Show the community web page (opens your default browser).
 c_showfolder=Cartella
 c_showfoldertt=Mostra la visualizzazione tipo cartelle.
 c_showinfo=Info sull'interrogazione
@@ -467,6 +469,7 @@ info_on=ON
 info_off=OFF
 info_error=Errore
 info_entries=% occorrenze
+info_browsererror=Failed to open a browser. Please manually open the URL in your favorite browser:\n\n%
 
 # Command Help
 ch_nohelp=Ci spiace, nessun aiuto disponibile.
