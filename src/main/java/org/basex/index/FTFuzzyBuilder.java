@@ -35,8 +35,8 @@ import org.basex.util.TokenBuilder;
  *      - z is the pointer on the data entries of the token [long] 
  *      - s is the number of pre values, saved in data [int]
  * b)
- *    fill DataOutput(db, f + 'z') looks like: stores the full text data; the pre values
- *      are ordered but not distinct
+ *    fill DataOutput(db, f + 'z') looks like: stores the full text data;
+ *      the pre values are ordered but not distinct
  *      [pre1, pos1, pre2, pos2, pre3, pos3, ...] as Nums 
  *      
  *      

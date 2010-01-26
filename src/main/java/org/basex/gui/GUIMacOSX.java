@@ -37,8 +37,8 @@ public class GUIMacOSX {
   /** Empty object array. */
   private static final Object[] EO = new Object[0];
 
-  /** Reference to the basex gui. */
-  GUI basexGUI;
+  /** Reference to the main gui. */
+  GUI main;
   /** Reference to the loaded 'Application' class. */
   private final Class<?> appClass;
   /** Instance of the 'Application' class. */
@@ -78,16 +78,16 @@ public class GUIMacOSX {
   }
 
   /**
-   * Initializes this mac gui with the main basex gui. Has to be called
+   * Initializes this mac gui with the main gui. Has to be called
    * immediately after creating the gui.
-   * @param gui the basex gui.
+   * @param gui main gui reference
    */
   public void init(final GUI gui) {
-    basexGUI = gui;
+    main = gui;
   }
 
   /**
-   * Adds the basex icon to the dock.
+   * Adds the project icon to the dock.
    * @throws Exception if any error occurs.
    */
   private void addDockIcon() throws Exception {
@@ -134,7 +134,7 @@ public class GUIMacOSX {
     
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
-      GUICommands.ABOUT.execute(basexGUI);
+      GUICommands.ABOUT.execute(main);
     }
 
     /**
@@ -155,7 +155,7 @@ public class GUIMacOSX {
 
     /** Called when the Preference item in the application menu is selected. */
     public void handlePreferences() {
-      GUICommands.PREFS.execute(basexGUI);
+      GUICommands.PREFS.execute(main);
     }
 
     /**
@@ -166,7 +166,7 @@ public class GUIMacOSX {
 
     /** Called when the application is sent the Quit event. */
     public void handleQuit() {
-      GUICommands.EXIT.execute(basexGUI);
+      GUICommands.EXIT.execute(main);
     }
 
     /**
@@ -174,7 +174,7 @@ public class GUIMacOSX {
      * Finder or another application.
      */
     public void handleReOpenApplication() {
-      basexGUI.setVisible(true);
+      main.setVisible(true);
     }
   }
   
@@ -257,8 +257,8 @@ public class GUIMacOSX {
   static Object invoke(final Object obj,
       final String method, final Class<?> argClass, final Object argObject)
       throws Exception {
-    final Class<?>[] argClasses = new Class[] { argClass};
-    final Object[] argObjects = new Object[] { argObject};
+    final Class<?>[] argClasses = new Class[] { argClass };
+    final Object[] argObjects = new Object[] { argObject };
     return invoke(obj.getClass(), obj, method, argClasses, argObjects);
   }
 

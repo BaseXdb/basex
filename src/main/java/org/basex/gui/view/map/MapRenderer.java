@@ -698,7 +698,7 @@ final class MapRenderer {
   }
 
   /**
-   * Draws precalculated tooltip.
+   * Draws pre-calculated tooltip.
    * @param g graphics reference
    * @param x x-value
    * @param y y-value

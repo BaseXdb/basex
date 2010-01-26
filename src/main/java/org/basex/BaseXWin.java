@@ -33,7 +33,7 @@ public final class BaseXWin {
   }
 
   /** Mac OS X GUI optimizations. */
-  final GUIMacOSX osxGUI;
+  GUIMacOSX osxGUI;
 
   /**
    * Constructor.
@@ -41,15 +41,13 @@ public final class BaseXWin {
    */
   public BaseXWin(final String[] args) {
 
-    GUIMacOSX g = null;
     if(Prop.MAC) {
       try {
-        g = new GUIMacOSX();
+        osxGUI = new GUIMacOSX();
       } catch(Exception e) {
-        Main.notexpected("Failed to initialize nativ Mac OS X interface", e);
+        Main.notexpected("Failed to initialize native Mac OS X interface", e);
       }
     }
-    osxGUI = g == null ? null : g;
     
     // read properties
     final Context ctx = new Context();

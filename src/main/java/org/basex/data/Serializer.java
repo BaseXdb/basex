@@ -254,7 +254,7 @@ public abstract class Serializer {
       throws IOException {
 
     final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
-    final int[] parent = new int[IO.MAXHEIGHT];
+    final int[] parStack = new int[IO.MAXHEIGHT];
     final byte[][] names = new byte[IO.MAXHEIGHT][];
     names[0] = dn;
 
@@ -268,7 +268,7 @@ public abstract class Serializer {
       final int r = data.parent(p, k);
 
       // close opened elements...
-      while(l > 0 && parent[l - 1] >= r) {
+      while(l > 0 && parStack[l - 1] >= r) {
         closeElement();
         l--;
       }
@@ -330,7 +330,7 @@ public abstract class Serializer {
         while(++p != as) {
           attribute(data.name(p, Data.ATTR), data.text(p, false));
         }
-        parent[l++] = r;
+        parStack[l++] = r;
         names[l] = empty;
       }
     }

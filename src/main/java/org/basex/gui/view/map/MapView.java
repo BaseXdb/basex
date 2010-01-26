@@ -629,7 +629,6 @@ public final class MapView extends View implements Runnable {
         --l;
       }
       if(l > 0 && ll != l) textLen[parStack[l - 1]] += textLen[parStack[l]];
-
       parStack[l] = pre;
 
       if(data.fs != null) {
@@ -640,17 +639,15 @@ public final class MapView extends View implements Runnable {
             textLen[pre] = Token.toInt(attVal);
             textLen[parStack[l - 1]] += textLen[pre];
             pre += data.size(pre, kind) - 1; // skip file content
-            assert pre == size - 1 || data.fs.isFSnode(pre + 1);
           } else {
-            l++;
+            parStack[++l] = 0;
           }
         }
       } else {
-        if(kind == Data.TEXT || kind == Data.COMM || kind == Data.PI ||
-            kind == Data.ATTR) {
+        if(kind == Data.DOC || kind == Data.ELEM) {
+          parStack[++l] = 0;
+        } else {
           textLen[pre] = data.textLen(pre, kind != Data.ATTR);
-        } else if(kind == Data.ELEM || kind == Data.DOC) {
-          l++;
         }
       }
     }
