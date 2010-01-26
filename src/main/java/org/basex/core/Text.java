@@ -1202,11 +1202,11 @@ public interface Text {
   /** About text. */
   String ABOUTTITLE = lang("da_title", NAME);
   /** Copyright info. */
-  String COPYRIGHT = "© 2005-10 " + COMPANY;
+  String COPYRIGHT = "\u00A9 2005-10 " + COMPANY;
   /** License info. */
   String LICENSE = lang("da_license");
   /** Developer info. */
-  String DEVELOPER = lang("da_dev") + ": Christian Grün";
+  String DEVELOPER = lang("da_dev") + ": Christian Gr\u00FCn";
   /** Contributors info. */
   String CONTRIBUTE1 = lang("da_cont1") + ": Sebastian Gath, Lukas Kircher,";
   /** Developer names. */

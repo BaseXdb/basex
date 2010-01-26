@@ -20,6 +20,7 @@
   <repositories>
     <repository>
       <id>Codehaus</id>
+      <name>Codehaus Repository</name>
       <url>http://repository.codehaus.org/</url>
     </repository>
     <repository>
@@ -77,6 +78,7 @@
     </dependency>
   </dependencies>
   <build>
+    <finalName>${project.name}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -89,7 +91,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
         <configuration>
           <archive>
             <manifest>
@@ -97,15 +99,16 @@
               <packageName>org.basex</packageName>
             </manifest>
             <manifestEntries>
-              <url>${pom.url}</url>
+              <url>${project.url}</url>
             </manifestEntries>
           </archive>
         </configuration>
       </plugin>
-<!-- ECLIPSE SPECIFIC SETTINGS -->
+      <!-- ECLIPSE SPECIFIC SETTINGS -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.7</version>
         <configuration>
           <downloadSources>true</downloadSources>
           <downloadJavadocs>true</downloadJavadocs>
@@ -539,7 +542,7 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
           </additionalConfig>
         </configuration>
       </plugin>
-<!-- OSX disk image bundler -->
+      <!-- OSX disk image bundler -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>osxappbundle-maven-plugin</artifactId>
@@ -560,11 +563,12 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
           </execution>
         </executions>
       </plugin>
-<!-- ::OSX disk image bundler -->
-<!--  EXE creation -->
+      <!-- ::OSX disk image bundler -->
+      <!--  EXE creation -->
       <plugin>
         <groupId>com.akathist.maven.plugins.launch4j</groupId>
         <artifactId>launch4j-maven-plugin</artifactId>
+        <version>1.3</version>
         <executions>
           <execution>
             <id>l4j-clui</id>
@@ -574,8 +578,8 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
             </goals>
             <configuration>
               <headerType>gui</headerType>
-              <outfile>target/${name}-${version}.exe</outfile>
-              <jar>target/${name}-${version}.jar</jar>
+              <outfile>target/${project.name}-${project.version}.exe</outfile>
+              <jar>target/${project.name}-${project.version}.jar</jar>
               <icon>src/main/resources/etc/build/BaseX.ico</icon>
               <errTitle>encc</errTitle>
               <classPath>
@@ -591,21 +595,38 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
               </jre>
               <versionInfo>
                 <fileVersion>6.0.0.0</fileVersion>
-                <txtFileVersion>${name} ${version}</txtFileVersion>
+                <txtFileVersion>${project.name} ${project.version}</txtFileVersion>
                 <fileDescription>Native XML Database and XQuery Processor</fileDescription>
                 <copyright>(c) University of Konstanz, 2010</copyright>
                 <productVersion>6.0.0.0</productVersion>
-                <txtProductVersion>${name} ${version}</txtProductVersion>
-                <productName>${name}</productName>
+                <txtProductVersion>${project.name} ${project.version}</txtProductVersion>
+                <productName>${project.name}</productName>
                 <companyName>University of Konstanz</companyName>
-                <internalName>${name}</internalName>
-                <originalFilename>${name}-${version}.exe</originalFilename>
+                <internalName>${project.name}</internalName>
+                <originalFilename>${project.name}-${project.version}.exe</originalFilename>
               </versionInfo>
             </configuration>
           </execution>
         </executions>
       </plugin>
-<!-- end exe -->
+      <!-- end exe -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <outputDirectory>target</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <reporting>
