@@ -42,6 +42,8 @@ public final class ServerProcess extends Thread {
   private Thread timeout;
   /** Log. */
   private final Log log;
+  /** Boolean for semaphore. */
+  private boolean w;
 
   /**
    * Constructor.
@@ -124,7 +126,7 @@ public final class ServerProcess extends Thread {
 
         // process command and send results
         startTimer(proc);
-        final boolean w = sema.writing(proc, context);
+        w = sema.writing(proc, context);
         sema.before(w);
         final boolean ok = proc.exec(context, out);
         out.write(0);
@@ -141,6 +143,8 @@ public final class ServerProcess extends Thread {
     } catch(final IOException ex) {
       log.write(this, input, INFOERROR + ex.getMessage());
       ex.printStackTrace();
+      sema.after(w);
+      exit();
     }
   }
 
