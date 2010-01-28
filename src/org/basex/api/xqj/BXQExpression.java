@@ -29,6 +29,7 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
 
   public void cancel() throws XQException {
     opened();
+    query.ctx.stop();
   }
 
   public void executeCommand(final String cmd) throws XQException {
