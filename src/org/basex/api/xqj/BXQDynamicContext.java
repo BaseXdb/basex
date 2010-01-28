@@ -10,6 +10,7 @@ import java.util.TimeZone;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
+import javax.xml.xquery.XQCancelledException;
 import javax.xml.xquery.XQDynamicContext;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
@@ -232,7 +233,8 @@ abstract class BXQDynamicContext extends BXQAbstract
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
           ex.line(), ex.col(), -1);
     } catch(final ProgressException ex) {
-      throw new BXQException(TIMEOUT);
+      throw new XQCancelledException(TIMEOUT, null, null, -1, -1, -1,
+          null, null, null);
     }
   }
 
