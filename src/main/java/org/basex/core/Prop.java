@@ -88,6 +88,8 @@ public final class Prop extends AProp {
 
   /** Caches the query results. */
   public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
+  /** Writes original files back after updates. */
+  public static final Object[] WRITEBACK = { "WRITEBACK", false };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };

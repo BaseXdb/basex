@@ -4,6 +4,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
@@ -115,7 +117,8 @@ abstract class Primitives {
 
   /**
    * Checks constraints and applies all updates to the databases.
+   * @param ctx query context
    * @throws QueryException query exception
    */
-  protected abstract void apply() throws QueryException;
+  protected abstract void apply(final QueryContext ctx) throws QueryException;
 }

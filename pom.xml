@@ -549,7 +549,6 @@ org.eclipse.jdt.ui.staticondemandthreshold=1
         <version>1.0-alpha-2</version>
         <configuration>
           <mainClass>org.basex.BaseXWin</mainClass>
-          <dictionaryFile>${basedir}/etc/build/OSXBundle/Info.plist</dictionaryFile>
           <iconFile>${basedir}/etc/build/OSXBundle/BaseX.icns</iconFile>
           <javaApplicationStub>${basedir}/etc/build/OSXBundle/JavaApplicationStub</javaApplicationStub>
           <jvmVersion>1.6</jvmVersion>

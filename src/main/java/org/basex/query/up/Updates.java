@@ -95,12 +95,13 @@ public final class Updates {
    * Checks constraints and applies all update primitives to the databases if
    * no constraints are hurt.
    * XQueryUP specification 3.2.2
+   * @param ctx query context
    * @throws QueryException query exception
    */
-  public synchronized void apply() throws QueryException {
+  public synchronized void apply(final QueryContext ctx) throws QueryException {
     // Constraints are checked first. No updates are applied if any problems
     // are found.
     for(final Primitives p : primitives.values()) p.check();
-    for(final Primitives p : primitives.values()) p.apply();
+    for(final Primitives p : primitives.values()) p.apply(ctx);
   }
 }

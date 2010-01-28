@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Prop;
@@ -41,24 +43,48 @@ public final class Export extends Proc {
   protected boolean exec(final PrintOutput out) {
     try {
       final Data data = context.data;
-      final int[] docs = context.doc();
-      final IO io = IO.get(args[0]);
-      if(docs.length != 1) io.md();
-      for(final int pre : docs) {
-        final IO file = io.merge(docs.length == 1 && args[1] != null ?
-            args[1] : Token.string(data.text(pre, true)));
-
-        final PrintOutput po = new PrintOutput(file.path());
-        final XMLSerializer xml = new XMLSerializer(po, false,
-            context.prop.is(Prop.XMLFORMAT));
-        xml.encoding(context.prop.get(Prop.XMLENCODING));
-        xml.node(data, pre);
-        po.close();
-      }
+      export(context.prop, data, args[0], args[1]);
       return info(DBEXPORTED, data.meta.name, perf);
     } catch(final IOException ex) {
       Main.debug(ex);
       return error(ex.getMessage());
+    }
+  }
+  
+  /**
+   * Exports the specified database.
+   * @param context context
+   * @param data data reference
+   * @throws IOException I/O exception
+   */
+  public static void export(final Context context, final Data data)
+      throws IOException {
+    export(context.prop, data, data.meta.file.path(), null);
+  }
+  
+  /**
+   * Exports the current database to the specified path and file.
+   * @param prop property
+   * @param data data reference
+   * @param path file path
+   * @param name file name
+   * @throws IOException I/O exception
+   */
+  public static void export(final Prop prop, final Data data,
+      final String path, final String name) throws IOException {
+
+    final int[] docs = data.doc();
+    final IO io = IO.get(path);
+    if(docs.length != 1) io.md();
+    for(final int pre : docs) {
+      final IO file = io.merge(docs.length == 1 && name != null ?
+          name : Token.string(data.text(pre, true)));
+      final PrintOutput po = new PrintOutput(file.path());
+      final XMLSerializer xml = new XMLSerializer(po, false,
+          prop.is(Prop.XMLFORMAT));
+      xml.encoding(prop.get(Prop.XMLENCODING));
+      xml.node(data, pre);
+      po.close();
     }
   }
 }

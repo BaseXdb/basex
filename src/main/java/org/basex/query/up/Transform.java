@@ -78,7 +78,7 @@ public final class Transform extends Arr {
     final Updates tmp = ctx.updates;
     ctx.updates = pu;
     ctx.iter(expr[0]).finish();
-    ctx.updates.apply();
+    ctx.updates.apply(ctx);
     ctx.updates = tmp;
 
     final Item im = expr[1].iter(ctx).finish();

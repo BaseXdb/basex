@@ -1,6 +1,8 @@
 package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
+
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
@@ -34,7 +36,7 @@ final class FragPrimitives extends Primitives {
   }
 
   @Override
-  protected void apply() throws QueryException {
+  protected void apply(final QueryContext ctx) throws QueryException {
     for(final int i : putIds.finish()) {
       final Put put = (Put) findPrimitive(PrimitiveType.PUT, op.get(i));
       put.apply(0);

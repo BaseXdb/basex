@@ -2,7 +2,13 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
+
+import java.io.IOException;
+
+import org.basex.core.Prop;
+import org.basex.core.proc.Export;
 import org.basex.data.Data;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.QNm;
@@ -99,7 +105,7 @@ final class DBPrimitives extends Primitives {
   }
 
   @Override
-  protected void apply() throws QueryException {
+  protected void apply(final QueryContext ctx) throws QueryException {
     // apply updates backwards, starting with the highest pre value -> no id's
     // and less table alterations needed
     int par = -2;
@@ -131,6 +137,14 @@ final class DBPrimitives extends Primitives {
     }
     if(check) mergeTexts(par, first);
     d.flush();
+    
+    if(d.meta.prop.is(Prop.WRITEBACK)) {
+      try {
+        Export.export(ctx.context, d);
+      } catch(final IOException ex) {
+        Err.or(UPPUTERR, d.meta.file);
+      }
+    }
   }
 
   /**
