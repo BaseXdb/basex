@@ -333,7 +333,7 @@ public class TreeCaching implements TreeViewOptions {
    * @return height
    */
   int getHeight(final int rn) {
-    return border[rn].length;
+    return border.length > rn ? border[rn].length : -1;
   }
 
   /**

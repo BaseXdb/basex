@@ -67,8 +67,8 @@ public final class TreeView extends View implements TreeViewOptions {
   private double treedist;
   /** Focused root number. */
   private int frn;
-
-  // private int fix;
+  /** Focused index. */
+  private int fix;
 
   /**
    * Default Constructor.
@@ -148,14 +148,14 @@ public final class TreeView extends View implements TreeViewOptions {
         refreshedMark = true;
       }
       focusedRect = null;
-      if((treedist = cache.generateBordersAndRects(g, gui.context, getWidth())) 
+      if((treedist = cache.generateBordersAndRects(g, gui.context, getWidth()))
           == -1) return;
       setLevelDistance();
       createNewMainImage();
     } else setLevelDistance();
 
     g.drawImage(treeImage, 0, 0, getWidth(), getHeight(), this);
-    
+
     // highlights marked nodes
     if(refreshedMark) markNodes();
 
@@ -183,8 +183,6 @@ public final class TreeView extends View implements TreeViewOptions {
             + focused, 2, getHeight() - 6);
       }
     }
-
-
 
     // highlights the focused node
 
@@ -371,8 +369,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final Color ca = new Color(rgb + alpha - dis, false);
       final Color cb = new Color(rgb + alpha + dis, false);
       // g.setColor(new Color(0x444444, false));
-     
-      
+
       g.setColor(cb);
       // g.setColor(new Color(0x666666, false));
       g.drawPolygon(new int[] { parc, boRight, boRight}, new int[] { pary,
@@ -386,18 +383,16 @@ public final class TreeView extends View implements TreeViewOptions {
       // g.setColor(new Color(0x555555, false));
       g.drawPolygon(new int[] { parc, boLeft, boRight}, new int[] { pary,
           boTop, boTop}, 3);
-      
+
       g.setColor(Color.BLACK);
 
       if(parmx < parc) g.drawLine(boRight, boBottom, parc, pary);
       else if(parmx > parc) g.drawLine(boLeft, boBottom, parc, pary);
 
- 
-
-//      g.setColor(cb);
-//      // g.setColor(new Color(0x666666, false));
-//      g.drawLine(boRight, boTop, parc, pary);
-//      g.drawLine(boLeft, boTop, parc, pary);
+      // g.setColor(cb);
+      // // g.setColor(new Color(0x666666, false));
+      // g.drawLine(boRight, boTop, parc, pary);
+      // g.drawLine(boLeft, boTop, parc, pary);
     } else {
       g.setColor(c);
       if(boRight - boLeft > 2) {
@@ -548,40 +543,44 @@ public final class TreeView extends View implements TreeViewOptions {
 
     final int[] marked = Arrays.copyOf(gui.context.marked.nodes, size);
 
-    final int rn = 0;
+    final int rl = gui.context.current.nodes.length;
+    
+    for(int rn = 0; rn < rl; rn++) {
 
-    for(int i = 0; i < cache.getHeight(rn); i++) {
+      for(int i = 0; i < cache.getHeight(rn); i++) {
 
-      final int y = getYperLevel(i);
+        final int y = getYperLevel(i);
 
-      if(cache.isBigRectangle(rn, i)) {
+        if(cache.isBigRectangle(rn, i)) {
 
-        for(int j = 0; j < size; j++) {
-          final int pre = marked[j];
+          for(int j = 0; j < size; j++) {
+            final int pre = marked[j];
 
-          if(pre == -1) continue;
+            if(pre == -1) continue;
 
-          final int ix = cache.getPreIndex(rn, i, pre);
+            final int ix = cache.getPreIndex(rn, i, pre);
 
-          if(ix > -1) {
-            final int x = (int) (getWidth() * ix / (double) cache.getLevelSize(
-                rn, i));
+            if(ix > -1) {
+              final int x = (int) (getWidth() * ix / (double) 
+                  cache.getLevelSize(
+                  rn, i));
 
-            mg.setColor(Color.RED);
-            mg.drawLine(x, y, x, y + nodeHeight);
-            marked[j] = -1;
+              mg.setColor(Color.RED);
+              mg.drawLine(x, y, x, y + nodeHeight);
+              marked[j] = -1;
+            }
           }
-        }
-      } else {
+        } else {
 
-        for(int j = 0; j < size; j++) {
-          final int pre = marked[j];
+          for(int j = 0; j < size; j++) {
+            final int pre = marked[j];
 
-          final TreeRect rect = cache.searchRect(rn, i, pre);
+            final TreeRect rect = cache.searchRect(rn, i, pre);
 
-          if(rect != null) {
-            drawRectangle(mg, rn, i, rect, pre, DRAW_MARK);
-            marked[j] = -1;
+            if(rect != null) {
+              drawRectangle(mg, rn, i, rect, pre, DRAW_MARK);
+              marked[j] = -1;
+            }
           }
         }
       }
@@ -622,7 +621,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
     if(br) {
       final int index = cache.getPreIndex(rn, l, pre);
-      // if(t == DRAW_HIGHLIGHT) fix = index;
+      if(t == DRAW_HIGHLIGHT) fix = index;
       final double ratio = index / (double) (cache.getLevelSize(rn, l) - 1);
       brx = (int) (r.w * ratio);
       g.setColor(Color.BLACK);
@@ -732,7 +731,8 @@ public final class TreeView extends View implements TreeViewOptions {
       final int rn = frn = getTreePerX(mousePosX);
       final int lv = getLevelPerY(mousePosY);
 
-      if(lv < 0 || lv >= cache.getHeight(rn)) return false;
+      if(lv < 0 || cache.getHeight(rn) == -1 || lv >= cache.getHeight(rn)) 
+        return false;
 
       final TreeRect[] rL = cache.getTreeRectsPerLevel(rn, lv);
 
@@ -802,8 +802,8 @@ public final class TreeView extends View implements TreeViewOptions {
       nodeHeight--;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * (lvs - 1) + 
-        lvs * nodeHeight)) / 2d);
+    final int ih = (int) ((h - (levelDistance * 
+        (lvs - 1) + lvs * nodeHeight)) / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }
 
@@ -837,21 +837,21 @@ public final class TreeView extends View implements TreeViewOptions {
     if(!right && !left || focusedRect == null) return;
 
     if(left) {
-      // if(cache.isBigRectangle(frn, focusedRectLevel)) {
-      // final Nodes ns = new Nodes(gui.context.data);
-      // final int sum = (int) ((cache.getLevelSize(frn, focusedRectLevel) - 1)
-      // / (double) focusedRect.w);
-      // int[] m = new int[sum];
-      // for(int i = 0; i < sum; i++) {
-      // System.out.println(m[i] = cache.getPrePerIndex(frn, focusedRectLevel,
-      // i + fix));
-      // }
-      // ns.union(m);
-      // gui.notify.mark(ns, this);
-      //
-      // } else {
+       if(cache.isBigRectangle(frn, focusedRectLevel)) {
+       final Nodes ns = new Nodes(gui.context.data);
+       final int sum = (int) ((cache.getLevelSize(frn, focusedRectLevel) - 1)
+       / (double) focusedRect.w);
+       int[] m = new int[sum];
+       for(int i = 0; i < sum; i++) {
+       m[i] = cache.getPrePerIndex(frn, focusedRectLevel,
+       i + fix);
+       }
+       ns.union(m);
+       gui.notify.mark(ns, this);
+      
+       } else {
       gui.notify.mark(0, null);
-      // }
+      }
       if(e.getClickCount() > 1) {
         gui.notify.context(gui.context.marked, false, this);
         refreshContext(false, false);
