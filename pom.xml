@@ -1,3 +1,149 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.basex</groupId>
+  <artifactId>basex-api</artifactId>
+  <packaging>jar</packaging>
+  <version>6.01</version>
+  <name>BaseX Api</name>
+  <url>http://basex.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  <licenses>
+    <license>
+      <name>ISC License</name>
+      <url>http://www.isc.org/software/license</url>
+    </license>
+  </licenses>
+  <repositories>
+    <repository>
+      <id>Codehaus</id>
+      <name>Codehaus Repository</name>
+      <url>http://repository.codehaus.org/</url>
+    </repository>
+    <repository>
+      <id>akathist-repository</id>
+      <name>Akathist Repository</name>
+      <url>http://www.9stmaryrd.com/maven</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>akathist-repository</id>
+      <name>Akathist Repository</name>
+      <url>http://www.9stmaryrd.com/maven</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <organization>
+    <name>Chair for Database and Information Systems, U Konstanz</name>
+    <url>http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis</url>
+  </organization>
+  <developers>
+    <developer>
+      <id>cg</id>
+      <name>Christian Gr&#xFC;n</name>
+      <email>christian.gruen@basex.org</email>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  <mailingLists>
+    <mailingList>
+      <name>BaseX Talk</name>
+      <post>basex-talk@mailman.uni-konstanz.de</post>
+      <archive>https://mailman.uni-konstanz.de/mailman/listinfo/basex-talk</archive>
+    </mailingList>
+  </mailingLists>
+  <scm>
+    <connection>scm:svn:https://svn.uni-konstanz.de/dbis/basex/trunk/basex</connection>
+    <developerConnection>scm:svn:https://svn.uni-konstanz.de/dbis/basex/trunk/basex</developerConnection>
+    <tag>HEAD</tag>
+    <url>https://svn.uni-konstanz.de/dbis/basex/trunk/basex</url>
+  </scm>
+  <issueManagement>
+    <system>Sourceforge Tracker</system>
+    <url>https://sourceforge.net/tracker/?group_id=192179&amp;atid=940354</url>
+  </issueManagement>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>xmldb</groupId>
+      <artifactId>xmldb-api</artifactId>
+      <version>1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.basex</groupId>
+      <artifactId>basex</artifactId>
+      <version>6.01</version>
+    </dependency>
+    <dependency>
+      <!-- to have this dependency ready please run
+          * xqj-artifact.sh  [Linux, OSX]
+          * xqj-artifact.bat [Win]
+          first
+      -->
+      <groupId>xqj</groupId>
+      <artifactId>xqj-api</artifactId>
+      <version>1</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <finalName>${project.name}-${project.version}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.basex.BaseXWin</mainClass>
+              <packageName>org.basex</packageName>
+            </manifest>
+            <manifestEntries>
+              <url>${project.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+<!-- ECLIPSE SPECIFIC SETTINGS -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <downloadSources>true</downloadSources>
+          <downloadJavadocs>true</downloadJavadocs>
+          <additionalConfig>
+            <file>
+              <name>.settings/org.eclipse.core.resources.prefs</name>
+              <content><![CDATA[
+#Mon Jan 25 14:00:49 CET 2010
+eclipse.preferences.version=1
+encoding/<project>=UTF-8
+              ]]></content>
+            </file>
+            <file>
+              <name>.settings/org.eclipse.jdt.core.prefs</name>
+              <content><![CDATA[
 eclipse.preferences.version=1
 org.eclipse.jdt.core.compiler.codegen.inlineJsrBytecode=enabled
 org.eclipse.jdt.core.compiler.codegen.targetPlatform=1.6
@@ -346,3 +492,110 @@ org.eclipse.jdt.core.formatter.tabulation.char=space
 org.eclipse.jdt.core.formatter.tabulation.size=2
 org.eclipse.jdt.core.formatter.use_tabs_only_for_leading_indentations=false
 org.eclipse.jdt.core.formatter.wrap_before_binary_operator=true
+              ]]></content>
+            </file>
+            <file>
+              <name>.settings/org.eclipse.jdt.ui.prefs</name>
+              <content><![CDATA[
+#Sat Dec 13 20:52:08 CET 2008
+cleanup.add_default_serial_version_id=true
+cleanup.add_generated_serial_version_id=false
+cleanup.add_missing_annotations=true
+cleanup.add_missing_deprecated_annotations=true
+cleanup.add_missing_methods=false
+cleanup.add_missing_nls_tags=false
+cleanup.add_missing_override_annotations=true
+cleanup.add_serial_version_id=false
+cleanup.always_use_blocks=true
+cleanup.always_use_parentheses_in_expressions=false
+cleanup.always_use_this_for_non_static_field_access=false
+cleanup.always_use_this_for_non_static_method_access=false
+cleanup.convert_to_enhanced_for_loop=true
+cleanup.correct_indentation=false
+cleanup.format_source_code=false
+cleanup.format_source_code_changes_only=false
+cleanup.make_local_variable_final=true
+cleanup.make_parameters_final=true
+cleanup.make_private_fields_final=true
+cleanup.make_type_abstract_if_missing_method=false
+cleanup.make_variable_declarations_final=true
+cleanup.never_use_blocks=false
+cleanup.never_use_parentheses_in_expressions=true
+cleanup.organize_imports=false
+cleanup.qualify_static_field_accesses_with_declaring_class=false
+cleanup.qualify_static_member_accesses_through_instances_with_declaring_class=true
+cleanup.qualify_static_member_accesses_through_subtypes_with_declaring_class=true
+cleanup.qualify_static_member_accesses_with_declaring_class=true
+cleanup.qualify_static_method_accesses_with_declaring_class=false
+cleanup.remove_private_constructors=true
+cleanup.remove_trailing_whitespaces=false
+cleanup.remove_trailing_whitespaces_all=true
+cleanup.remove_trailing_whitespaces_ignore_empty=false
+cleanup.remove_unnecessary_casts=true
+cleanup.remove_unnecessary_nls_tags=true
+cleanup.remove_unused_imports=true
+cleanup.remove_unused_local_variables=false
+cleanup.remove_unused_private_fields=true
+cleanup.remove_unused_private_members=false
+cleanup.remove_unused_private_methods=true
+cleanup.remove_unused_private_types=true
+cleanup.sort_members=false
+cleanup.sort_members_all=false
+cleanup.use_blocks=false
+cleanup.use_blocks_only_for_return_and_throw=false
+cleanup.use_parentheses_in_expressions=true
+cleanup.use_this_for_non_static_field_access=false
+cleanup.use_this_for_non_static_field_access_only_if_necessary=true
+cleanup.use_this_for_non_static_method_access=false
+cleanup.use_this_for_non_static_method_access_only_if_necessary=true
+cleanup_profile=_EclipseModified
+cleanup_settings_version=2
+eclipse.preferences.version=1
+formatter_profile=_BaseX Formatter Profile
+formatter_settings_version=11
+org.eclipse.jdt.ui.ignorelowercasenames=true
+org.eclipse.jdt.ui.importorder=java;javax;org;com;
+org.eclipse.jdt.ui.ondemandthreshold=99
+org.eclipse.jdt.ui.staticondemandthreshold=1
+              ]]></content>
+            </file>
+          </additionalConfig>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.1</version>
+        <configuration>
+          <outputDirectory>target</outputDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <!-- place your configuration here -->
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </reporting>
+</project>
