@@ -68,7 +68,7 @@ public class XMLResourceTest extends TestCase {
 
   @Test
   public void testGetContent() throws Exception {
-    compare(AllTests.DOC1, res);
+    compare(AllTests.DOCPATH + AllTests.DOC1, res);
   }
 
   @Test
@@ -97,7 +97,7 @@ public class XMLResourceTest extends TestCase {
     // overwrite document with DOM contents
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
-    final Document doc = builder.parse(new File(AllTests.DOC2));
+    final Document doc = builder.parse(new File(AllTests.DOCPATH + AllTests.DOC2));
     xml.setContentAsDOM(doc);
     coll.storeResource(xml);
     assertEquals("Wrong number of documents.", 2, coll.getResourceCount());
@@ -129,16 +129,16 @@ public class XMLResourceTest extends TestCase {
 
     final XMLReader reader = XMLReaderFactory.createXMLReader();
     reader.setContentHandler(doc3.setContentAsSAX());
-    reader.parse(new InputSource(AllTests.DOC3));
+    reader.parse(new InputSource(AllTests.DOCPATH + AllTests.DOC3));
 
     coll.storeResource(doc3);
     assertEquals("Wrong number of documents.", 3, coll.getResourceCount());
 
     final Resource doc1 = coll.getResource(AllTests.DOC1);
     final Resource doc2 = coll.getResource(AllTests.DOC2);
-    compare(AllTests.DOC1, doc1);
-    compare(AllTests.DOC2, doc2);
-    compare(AllTests.DOC3, doc3);
+    compare(AllTests.DOCPATH + AllTests.DOC1, doc1);
+    compare(AllTests.DOCPATH + AllTests.DOC2, doc2);
+    compare(AllTests.DOCPATH + AllTests.DOC3, doc3);
     coll.removeResource(doc3);
     coll.removeResource(doc2);
     assertEquals("Wrong number of documents.", 1, coll.getResourceCount());

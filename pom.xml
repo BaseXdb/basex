@@ -23,6 +23,12 @@
       <name>Codehaus Repository</name>
       <url>http://repository.codehaus.org/</url>
     </repository>
+        <repository>
+      <id>dbis-ukn</id>
+      <name>DBIS Maven Repository</name>
+      <url>http://www.inf.uni-konstanz.de/dbis/basex/maven</url>
+    </repository>
+
     <repository>
       <id>akathist-repository</id>
       <name>Akathist Repository</name>

@@ -106,7 +106,7 @@ public class XPathQueryServiceTest extends TestCase {
     // add second document
     final Resource res = coll.createResource(AllTests.DOC2,
         XMLResource.RESOURCE_TYPE);
-    res.setContent(AllTests.read(AllTests.DOC2));
+    res.setContent(AllTests.read(AllTests.DOCPATH + AllTests.DOC2));
     coll.storeResource(res);
     assertEquals("Wrong result size", 6, serv.query("//node()").getSize());
 

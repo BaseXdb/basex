@@ -35,6 +35,8 @@ public final class AllTests {
   static final String PW = ADMIN;
 
   /** Test document. */
+  static final String DOCPATH = "etc/xml/";
+  /** Test document. */
   static final String DOC1 = "first.xml";
   /** Test document. */
   static final String DOC2 = "second.xml";
@@ -83,7 +85,7 @@ public final class AllTests {
     final Context ctx = new Context();
     coll = new BXCollection(COLL, false, ctx);
     final Resource res = coll.createResource(DOC1, XMLResource.RESOURCE_TYPE);
-    res.setContent(read(DOC1));
+    res.setContent(read(DOCPATH + DOC1));
     coll.storeResource(res);
     coll.close();
 

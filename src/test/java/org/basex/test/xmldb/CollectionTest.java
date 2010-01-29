@@ -217,7 +217,7 @@ public class CollectionTest extends TestCase {
         AllTests.DOC2, XMLResource.RESOURCE_TYPE);
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
-    final Node node = builder.parse(new File(AllTests.DOC2));
+    final Node node = builder.parse(new File(AllTests.DOCPATH + AllTests.DOC2));
     xml1.setContentAsDOM(node);
     coll.storeResource(xml1);
 
@@ -226,7 +226,7 @@ public class CollectionTest extends TestCase {
         AllTests.DOC3, XMLResource.RESOURCE_TYPE);
     final XMLReader reader = XMLReaderFactory.createXMLReader();
     reader.setContentHandler(xml2.setContentAsSAX());
-    reader.parse(new InputSource(AllTests.DOC3));
+    reader.parse(new InputSource(AllTests.DOCPATH + AllTests.DOC3));
     coll.storeResource(xml2);
     // check number of documents
     assertEquals("Wrong number of documents.", 4, coll.getResourceCount());
