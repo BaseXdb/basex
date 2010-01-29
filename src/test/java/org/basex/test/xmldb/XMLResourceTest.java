@@ -97,7 +97,8 @@ public class XMLResourceTest extends TestCase {
     // overwrite document with DOM contents
     final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     final DocumentBuilder builder = factory.newDocumentBuilder();
-    final Document doc = builder.parse(new File(AllTests.DOCPATH + AllTests.DOC2));
+    final Document doc = builder.parse(
+        new File(AllTests.DOCPATH + AllTests.DOC2));
     xml.setContentAsDOM(doc);
     coll.storeResource(xml);
     assertEquals("Wrong number of documents.", 2, coll.getResourceCount());

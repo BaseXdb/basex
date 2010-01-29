@@ -58,12 +58,14 @@
     <module name="IllegalInstantiation"/>
     <module name="MagicNumber">
       <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="RedundantThrows"/>
     <module name="SimplifyBooleanExpression"/>
     <module name="SimplifyBooleanReturn"/>
     <module name="DesignForExtension">
       <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="FinalClass"/>
     <module name="HideUtilityClassConstructor"/>
@@ -78,6 +80,7 @@
     <module name="FinalLocalVariable">
       <property name="severity" value="ignore"/>
       <property name="tokens" value="PARAMETER_DEF,VARIABLE_DEF"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="IllegalThrows">
       <property name="illegalClassNames" value="java.lang.Error, java.lang.RuntimeException"/>
@@ -85,6 +88,7 @@
     <module name="MultipleStringLiterals">
       <property name="severity" value="ignore"/>
       <property name="allowedDuplicates" value="9"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="ParameterAssignment"/>
     <module name="StringLiteralEquality"/>
@@ -92,11 +96,9 @@
     <module name="SuperClone"/>
     <module name="UnnecessaryParentheses"/>
     <module name="EmptyForInitializerPad"/>
-    <module name="ThrowsCount">
-      <property name="max" value="2"/>
-    </module>
     <module name="MutableException">
       <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="JUnitTestCase"/>
     <module name="NoClone"/>
@@ -109,6 +111,7 @@
   <module name="StrictDuplicateCode">
     <property name="severity" value="ignore"/>
     <property name="min" value="20"/>
+    <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
   </module>
   <module name="FileTabCharacter"/>
 </module>
