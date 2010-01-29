@@ -264,6 +264,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     return new BXQItemType(Type.ELM, qn, it);
   }
 
+  @SuppressWarnings("unchecked")
   public BXQSequence createSequence(final Iterator it) throws XQException {
     opened();
     valid(it, Iterator.class);
