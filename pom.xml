@@ -130,6 +130,18 @@
           </archive>
         </configuration>
       </plugin>
+      
+            <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <includes>
+            <include>**/AllTests.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+
 <!-- ECLIPSE SPECIFIC SETTINGS -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
