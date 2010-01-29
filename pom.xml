@@ -23,19 +23,19 @@
       <name>Codehaus Repository</name>
       <url>http://repository.codehaus.org/</url>
     </repository>
-    <repository>
+    <!--<repository>
       <id>akathist-repository</id>
       <name>Akathist Repository</name>
       <url>http://www.9stmaryrd.com/maven</url>
-    </repository>
+    </repository>-->
   </repositories>
-  <pluginRepositories>
+  <!--<pluginRepositories>
     <pluginRepository>
       <id>akathist-repository</id>
       <name>Akathist Repository</name>
       <url>http://www.9stmaryrd.com/maven</url>
     </pluginRepository>
-  </pluginRepositories>
+  </pluginRepositories>-->
   <organization>
     <name>Chair for Database and Information Systems, U Konstanz</name>
     <url>http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis</url>
@@ -44,7 +44,7 @@
     <developer>
       <id>cg</id>
       <name>Christian Gr&#xFC;n</name>
-      <email>christian.gruen@basex.org</email>
+      <email>christian.gruen@uni-konstanz.de</email>
       <roles>
         <role>architect</role>
         <role>developer</role>
@@ -104,6 +104,7 @@
           </archive>
         </configuration>
       </plugin>
+
       <!-- ECLIPSE SPECIFIC SETTINGS
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -114,7 +115,8 @@
           <downloadJavadocs>true</downloadJavadocs>
         </configuration>
       </plugin> -->
-      <!-- OSX disk image bundler -->
+
+      <!-- OSX disk image bundler
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>osxappbundle-maven-plugin</artifactId>
@@ -134,8 +136,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- ::OSX disk image bundler -->
-      <!--  EXE creation -->
       <plugin>
         <groupId>com.akathist.maven.plugins.launch4j</groupId>
         <artifactId>launch4j-maven-plugin</artifactId>
@@ -179,8 +179,8 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <!-- end exe -->
+      </plugin> -->
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -202,6 +202,18 @@
   </build>
   <reporting>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <!-- place your configuration here -->
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
