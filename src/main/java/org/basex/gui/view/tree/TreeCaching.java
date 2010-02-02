@@ -228,7 +228,7 @@ public class TreeCaching implements TreeViewOptions {
    */
   private void bigRectangle(final int rn, final int lv, final double w) {
     rects[rn][lv] = new TreeRect[1];
-    rects[rn][lv][0] = new TreeRect((int) w * rn, (int) w);
+    rects[rn][lv][0] = new TreeRect((int) (w * rn), (int) w);
   }
 
   /**

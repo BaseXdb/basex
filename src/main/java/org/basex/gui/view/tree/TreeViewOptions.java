@@ -34,6 +34,8 @@ public interface TreeViewOptions {
   int BORDER_PADDING = 2;
   /** Margin to top. */
   int TOP_MARGIN = 2;
+  /** Margin to bottom. */
+  int BOTTOM_MARGIN = 5;
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
 
@@ -41,14 +43,18 @@ public interface TreeViewOptions {
   int MIN_TXT_SPACE = 25;
   /** Minimum space between the levels. */
   int MIN_LEVEL_DISTANCE = 4;
+  /** Optimal space between the levels. */
+  int BEST_LEVEL_DISTANCE = 20;
   /** Maximum level distance. */
-  int MAX_LEVEL_DISTANCE = 40;
+  int MAX_LEVEL_DISTANCE = 150;
+  /** Change node height till this value is reached. */
+  int CHANGE_NODE_HEIGHT_TILL = 12;
   /** Minimum node height. */
   int MIN_NODE_HEIGHT = 1;
   /** Maximum node height. */
   int MAX_NODE_HEIGHT = 20;
   /** Minimum node distance to draw node connections. */
-  int MIN_NODE_DIST_CONN = 10;
+  int MIN_NODE_DIST_CONN = 14;
   /** Draw kind rectangle. */
   byte DRAW_RECTANGLE = 0x00;
   /** Draw kind highlighting. */
