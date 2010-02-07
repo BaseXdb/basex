@@ -5,7 +5,7 @@
  * @author Andreas Weiler
  */ """
 
-import hashlib, socket, sys, getopt
+import hashlib, socket, sys, getopt, atexit
 
 class BaseXClient6(object):
     def __init__(self,host,port):
@@ -22,7 +22,7 @@ class BaseXClient6(object):
     
     # login of user at the server
     def login(self):
-        ts = self.receive()[:-1]
+        ts = self.receive()
         user = raw_input('Username: ');
         pw = raw_input('Password: ');
         pwmd5 = hashlib.md5(pw).hexdigest()
@@ -31,23 +31,25 @@ class BaseXClient6(object):
         m.update(ts)
         complete = m.hexdigest()
         self.sendCommand(user)
-        self.sendNullbyte()
         self.sendCommand(complete)
-        self.sendNullbyte()
-        data = self.receive()
+        data = self.s.recv(1)
         return "\0" == data
     
     # sends command to the server        
     def sendCommand(self,com):
         self.s.send(str.encode(com))
-    
-    # sends nullbyte to the server, end of command    
-    def sendNullbyte(self):
-        self.s.send("\0")
+        self.s.send("\0")        
     
     # receives data    
     def receive(self):
-        return self.s.recv(1024)
+        com = ""
+        while True:
+            data = self.s.recv(1)
+            if(data == "\0"):
+                return com
+                break
+            else:
+                com += data
     
     # reads commands from the console    
     def readCommand(self):
@@ -57,14 +59,22 @@ class BaseXClient6(object):
     # runs the console
     def console(self):
         if self.connect() == True:
-            while self.readCommand() != 'exit':
+            self.sendCommand("SET INFO ON")
+            self.s.recv(1024)
+            while self.readCommand() != "exit":
                 self.sendCommand(self.com)
-                self.sendNullbyte()
-                print self.receive()
-            self.sendCommand("exit")
-            print 'See you.'
+                data = self.receive()
+                if data != "":
+                    print data
+                else:
+                    print self.receive()#str(self.s.recv(10000000)).replace("\0", "")
+            try: 
+                self.sendCommand("exit")
+            except:
+                self.close()
+            print "See you."
         else:
-            print 'Access denied.'
+            print "Access denied."
             self.close()
     
     # closes the connection        
@@ -92,4 +102,9 @@ def opts():
 if __name__ == '__main__':
     opts()
     bxc = BaseXClient6(host,port)
-    bxc.console()
+    try: 
+        bxc.console()
+        atexit.register(self.sendCommand("exit"))
+    except:
+        print "Can't communicate with the server."
+        sys.exit()
