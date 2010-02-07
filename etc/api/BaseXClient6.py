@@ -67,7 +67,7 @@ class BaseXClient6(object):
                 if data != "":
                     print data
                 else:
-                    print self.receive()#str(self.s.recv(10000000)).replace("\0", "")
+                    print self.receive()
             try: 
                 self.sendCommand("exit")
             except:
@@ -104,7 +104,6 @@ if __name__ == '__main__':
     bxc = BaseXClient6(host,port)
     try: 
         bxc.console()
-        atexit.register(self.sendCommand("exit"))
     except:
         print "Can't communicate with the server."
         sys.exit()
