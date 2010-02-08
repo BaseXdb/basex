@@ -7,7 +7,7 @@
  * @author Andeas Weiler
  */"""
  
-import ClientSession, getopt, sys
+import ClientSession, getopt, sys, getpass
 
 class BaseXClient(object):
     # Initializes the client.
@@ -20,7 +20,7 @@ class BaseXClient(object):
     # Creates a session.   
     def session(self):
         user = raw_input('Username: ');
-        pw = raw_input('Password: ');
+        pw = getpass.getpass('Password: ');
         global session
         session = ClientSession.ClientSession(self.host, self.port, user, pw)
         return session.connect()
