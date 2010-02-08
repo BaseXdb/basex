@@ -30,7 +30,7 @@ class BaseXClient(object):
         self.com = raw_input('> ')
         if self.com == "":
             self.readCommand()
-        return self.com
+        return self.com.strip()
     
     # Runs the console.
     def console(self):
