@@ -76,6 +76,11 @@ class ClientSession(object):
             recv = part2
         return recv
     
+    # Sends command and receives answer.
+    def execute(self, com):
+        self.sendCommand(com)
+        return self.receive()
+    
     # Closes the connection.       
     def close(self):
         self.s.close()

@@ -27,20 +27,22 @@ class BaseXClient(object):
     
     # Reads commands from the console.    
     def readCommand(self):
-        self.com = raw_input('> ')
-        if self.com == "":
+        com = raw_input('> ')
+        if com == "":
             self.readCommand()
-        return self.com.strip()
+        return com.strip()
     
     # Runs the console.
     def console(self):
         if self.session() == True:
             session.sendCommand("SET INFO ON")
             session.s.recv(1024)
-            while self.readCommand() != "exit":
-                session.sendCommand(self.com)
-                data = session.receive()
-                print data
+            while True:
+                com = self.readCommand()
+                if com == "exit":
+                    session.sendCommand("exit")
+                    break
+                print session.execute(com)
             try: 
                 session.sendCommand("exit")
             except:
