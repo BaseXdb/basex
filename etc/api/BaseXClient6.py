@@ -5,7 +5,7 @@
  * @author Andreas Weiler
  */ """
 
-import hashlib, socket, sys, getopt, atexit
+import hashlib, socket, sys, getopt
 
 class BaseXClient6(object):
     def __init__(self,host,port):
@@ -22,7 +22,7 @@ class BaseXClient6(object):
     
     # login of user at the server
     def login(self):
-        ts = self.receive()
+        ts = self.getIt()
         user = raw_input('Username: ');
         pw = raw_input('Password: ');
         pwmd5 = hashlib.md5(pw).hexdigest()
@@ -38,18 +38,28 @@ class BaseXClient6(object):
     # sends command to the server        
     def sendCommand(self,com):
         self.s.send(str.encode(com))
-        self.s.send("\0")        
-    
-    # receives data    
-    def receive(self):
+        self.s.send("\0")
+        
+    def getIt(self):
         com = ""
         while True:
             data = self.s.recv(1)
             if(data == "\0"):
                 return com
-                break
             else:
                 com += data
+                      
+    # receives data    
+    def receive(self):
+        part1 = self.getIt()
+        part2 = self.getIt()
+        part3 = self.s.recv(1)
+        recv = ""
+        if part1 != "\0":
+            recv += part1 + part2
+        else:
+            recv = part2
+        return recv      
     
     # reads commands from the console    
     def readCommand(self):
@@ -64,10 +74,7 @@ class BaseXClient6(object):
             while self.readCommand() != "exit":
                 self.sendCommand(self.com)
                 data = self.receive()
-                if data != "":
-                    print data
-                else:
-                    print self.receive()
+                print data
             try: 
                 self.sendCommand("exit")
             except:
