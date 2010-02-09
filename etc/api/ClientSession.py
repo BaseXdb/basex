@@ -38,7 +38,7 @@ class ClientSession(object):
     
     # Login of user at the server.
     def login(self):
-        ts = self.getIt()
+        ts = self.readInput()
         pwmd5 = hashlib.md5(self.pw).hexdigest()
         m = hashlib.md5()
         m.update(pwmd5)

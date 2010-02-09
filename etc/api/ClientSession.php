@@ -1,6 +1,6 @@
 <?php
 
-function connect($host, $port) {
+function connect($host, $port, $user, $pw) {
 	global $socket;
 	$socket = socket_create(AF_INET, SOCK_STREAM, 0);
 	$result = socket_connect($socket, $host, $port); 
@@ -8,7 +8,7 @@ function connect($host, $port) {
      	echo "Can't communicate with the server.";
     }
     else {
-    return login();
+    return login($user, $pw);
     }
 }
 
@@ -17,12 +17,12 @@ function execute($com) {
     return receive();
 }
 
-function login() {
-    $ts = getIt();
-    $pw = hash("md5", "admin");
+function login($user, $pw) {
+    $ts = readInput();
+    $pw = hash("md5", $pw);
     $all = $pw.$ts;
     $end = hash("md5", $all);
-    sendCommand("admin");
+    sendCommand($user);
     sendCommand($end);
     $data = read1byte();
     return $data == "\x00";
