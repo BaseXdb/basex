@@ -46,19 +46,23 @@ class ClientSession(object):
         complete = m.hexdigest()
         self.sendCommand(self.user)
         self.sendCommand(complete)
-        data = self.s.recv(1)
+        data = self.read1byte()
         return "\0" == data
     
-    # sends command to the server        
+    # Sends command to the server        
     def sendCommand(self,com):
         self.s.send(str.encode(com))
         self.s.send("\0")
+        
+    # Reads 1 byte from the input stream.
+    def read1byte(self):
+        return self.s.recv(1)
     
-    # Gets the parts of the answer.    
-    def getIt(self):
+    # Reads the input stream.    
+    def readInput(self):
         com = ""
         while True:
-            data = self.s.recv(1)
+            data = self.read1byte()
             if(data == "\0"):
                 return com
             else:
@@ -66,9 +70,9 @@ class ClientSession(object):
                       
     # Receives data.    
     def receive(self):
-        part1 = self.getIt()
-        part2 = self.getIt()
-        part3 = self.s.recv(1)
+        part1 = self.readInput()
+        part2 = self.readInput()
+        part3 = self.read1byte()
         recv = ""
         if part1 != "\0":
             recv += part1 + part2

@@ -5,8 +5,7 @@ function connect($host, $port) {
 	$socket = socket_create(AF_INET, SOCK_STREAM, 0);
 	$result = socket_connect($socket, $host, $port); 
     if (!$socket) {
-      $result = "Can't communicate with the server.";
-      echo $result;
+     	echo "Can't communicate with the server.";
     }
     else {
     return login();
@@ -40,7 +39,7 @@ function read1byte() {
 	return socket_read($socket, 1);
 }
 
-function getIt() {
+function readInput() {
     $com = "";
     while (($data = read1byte()) != "\x00") {
     $com = $com.$data;
@@ -49,8 +48,8 @@ function getIt() {
 }
 
 function receive() {
-	$part1 = getIt();
-    $part2 = getIt();
+	$part1 = readInput();
+    $part2 = readInput();
     $part3 = read1byte();
     $recv = "";
     if ($part1 != "\x00") {
