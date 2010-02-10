@@ -16,6 +16,9 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 final class BXQItemType implements XQItemType {
+  /** Default item type. */
+  static final BXQItemType DEFAULT = new BXQItemType(
+      Type.ITEM, null, -1, XQSequenceType.OCC_ZERO_OR_MORE);
   /** Existing base types. */
   private static final Type[] BASE = {
       null    , null    , null    , null    , Type.AAT, Type.ATM, Type.DTD, //0
@@ -27,9 +30,6 @@ final class BXQItemType implements XQItemType {
       Type.LAN, Type.NAM, Type.NCN, Type.NMT, Type.ID , Type.IDR, Type.ENT, //42
       null, null, null // 49
   };
-  /** Default item type. */
-  static final BXQItemType DEFAULT = new BXQItemType(
-      Type.ITEM, null, -1, XQSequenceType.OCC_ZERO_OR_MORE);
   /** Name. */
   private final QName name;
   /** Base type. */

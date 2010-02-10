@@ -42,8 +42,6 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class XQJTest extends TestCase {
-  /** Test file. */
-  private static final String INPUT = "doc('input.xml')";
   /** Driver reference. */
   protected String drv;
 
@@ -70,7 +68,8 @@ public final class XQJTest extends TestCase {
   @Test
   public void test1() throws Exception {
     final XQConnection conn = conn(drv);
-    final XQPreparedExpression expr = conn.prepareExpression(INPUT + "//li");
+    final XQPreparedExpression expr = conn.prepareExpression(
+        "doc('etc/xml/input.xml')//li");
 
     // query execution
     final XQResultSequence result = expr.executeQuery();
@@ -222,7 +221,7 @@ public final class XQJTest extends TestCase {
     sc.setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
     final XQExpression ex = conn.createExpression();
-    final String query = "doc('input.xml')//title";
+    final String query = "doc('etc/xml/input.xml')//title";
     //String query = "1,2";
     final XQResultSequence seq = ex.executeQuery(query);
     final XMLStreamReader xsr = seq.getSequenceAsStream();

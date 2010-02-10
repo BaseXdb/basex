@@ -39,10 +39,10 @@ final class IterStreamReader implements XMLStreamReader {
   private final NSLocal ns = new NSLocal();
   /** Current state. */
   protected int kind = START_DOCUMENT;
-  /** Result iterator. */
-  private final Iter result;
   /** Current item. */
   protected Item item;
+  /** Result iterator. */
+  private final Iter result;
   /** Next flag. */
   private boolean next;
   /** Node iterator. */

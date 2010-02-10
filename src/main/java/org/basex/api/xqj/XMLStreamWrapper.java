@@ -25,9 +25,9 @@ import org.basex.util.TokenBuilder;
  */
 final class XMLStreamWrapper extends Parser {
   /** Element counter. */
-  int nodes;
+  private int nodes;
   /** XML stream reader. */
-  XMLStreamReader reader;
+  private XMLStreamReader reader;
 
   /**
    * Constructor.

@@ -14,7 +14,7 @@ import javax.xml.xquery.XQException;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BXQDataSource implements XQDataSource {
+final class BXQDataSource implements XQDataSource {
   /** Log output (currently ignored). */
   private PrintWriter log;
   /** Timeout. */
