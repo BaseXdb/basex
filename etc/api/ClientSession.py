@@ -44,14 +44,14 @@ class ClientSession(object):
         m.update(pwmd5)
         m.update(ts)
         complete = m.hexdigest()
-        self.sendCommand(self.user)
-        self.sendCommand(complete)
+        self.send(self.user)
+        self.send(complete)
         data = self.read1byte()
         return "\0" == data
     
     # Sends command to the server        
-    def sendCommand(self,com):
-        self.s.send(str.encode(com))
+    def send(self,com):
+        self.s.send(com.encode('utf-8'))
         self.s.send("\0")
         
     # Reads 1 byte from the input stream.
@@ -82,7 +82,7 @@ class ClientSession(object):
     
     # Sends command and receives answer.
     def execute(self, com):
-        self.sendCommand(com)
+        self.send(com)
         return self.receive()
     
     # Closes the connection.       

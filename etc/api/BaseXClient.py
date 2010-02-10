@@ -25,26 +25,19 @@ class BaseXClient(object):
         session = ClientSession.ClientSession(self.host, self.port, user, pw)
         return session.connect()
     
-    # Reads commands from the console.    
-    def readCommand(self):
-        com = raw_input('> ')
-        if com == "":
-            self.readCommand()
-        return com.strip()
-    
     # Runs the console.
     def console(self):
-        if self.session() == True:
-            session.sendCommand("SET INFO ON")
-            session.s.recv(1024)
+        if self.session():
+            session.send("SET INFO ON")
+            session.receive()
             while True:
-                com = self.readCommand()
+                com = raw_input('> ').strip()
                 if com == "exit":
-                    session.sendCommand("exit")
                     break
-                print session.execute(com)
-            try: 
-                session.sendCommand("exit")
+                if com:
+                    print session.execute(com)
+            try:
+                session.send("exit")
             except:
                 session.close()
             print "See you."
@@ -57,7 +50,7 @@ def opts():
         try:
             opts, args = getopt.getopt(sys.argv[1:], "-p:-h", ["port", "host"])
         except getopt.GetoptError, err:
-            print str(err)
+            print err
             sys.exit()
         global host
         global port

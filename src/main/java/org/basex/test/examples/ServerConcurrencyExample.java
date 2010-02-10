@@ -58,7 +58,7 @@ public final class ServerConcurrencyExample {
 
     // Set an option: turn verbose processing information on
     send("SET INFO true", session);
-    send("CREATE DB \"input.xml\" input", session);
+    send("CREATE DB \"etc/xml/input.xml\" input", session);
 
     // ------------------------------------------------------------------------
     // Setup some clients that simultaneously read and write from the database

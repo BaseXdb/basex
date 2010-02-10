@@ -39,7 +39,7 @@ public final class SAXExample extends DefaultHandler {
     // ----------------------------------------------------------------------
     // Evaluate the query
     final QueryProcessor query =
-      new QueryProcessor("doc('input.xml')//title", ctx);
+      new QueryProcessor("doc('etc/xml/input.xml')//title", ctx);
     final Result result = query.query();
 
     // ----------------------------------------------------------------------

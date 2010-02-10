@@ -994,13 +994,13 @@ public class QueryParser extends InputParser {
   private Expr ftContains() throws QueryException {
     final Expr e = range();
 
-    if(!consumeWS(FTCONTAINS)) {
+    //if(!consumeWS(FTCONTAINS)) {
       final int p = qp;
       if(!consumeWS(CONTAINS) || !consumeWS(TEXT)) {
         qp = p;
         return e;
       }
-    }
+    //}
 
     // [CG] XQuery/FTIgnoreOption
     final FTExpr select = ftSelection(false);

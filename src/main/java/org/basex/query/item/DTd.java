@@ -61,7 +61,7 @@ public final class DTd extends Dur {
 
     this(it);
     if(f != f) Err.or(DATECALC, info(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, info(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, info());
     sc = sc.multiply(BigDecimal.valueOf(m ? f : 1 / f));
     if(Math.abs(sc.doubleValue()) < 1E-13) sc = BigDecimal.valueOf(0);
   }

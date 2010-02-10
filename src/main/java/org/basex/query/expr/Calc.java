@@ -153,16 +153,18 @@ public enum Calc {
     public Item ev(final Item a, final Item b) throws QueryException {
       if(a.type == b.type) {
         if(a.type == Type.YMD) {
+          final BigDecimal bd = BigDecimal.valueOf(((YMd) b).ymd());
+          if(bd.equals(BigDecimal.ZERO)) Err.or(DATEZERO, info());
           return Dec.get(BigDecimal.valueOf(((YMd) a).ymd()).divide(
-              BigDecimal.valueOf(((YMd) b).ymd()), 20,
-              BigDecimal.ROUND_HALF_EVEN));
+              bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(a.type == Type.DTD) {
-          return Dec.get(((DTd) a).dtd().divide(((DTd) b).dtd(), 20,
+          final BigDecimal bd = ((DTd) b).dtd();
+          if(bd.equals(BigDecimal.ZERO)) Err.or(DATEZERO, info());
+          return Dec.get(((DTd) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
       }
-
       if(a.type == Type.YMD) {
         if(!b.n()) errNum(b);
         return new YMd((Dur) a, b.dbl(), false);

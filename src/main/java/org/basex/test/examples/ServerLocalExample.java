@@ -60,7 +60,7 @@ public final class ServerLocalExample {
     System.out.println("\n* Cache server-side query results.");
 
     final CachedOutput result = new CachedOutput();
-    send("XQUERY for $x in doc('input.xml') return $x", result);
+    send("XQUERY for $x in doc('etc/xml/input.xml') return $x", result);
 
     // -------------------------------------------------------------------------
     // Create a local database from the XML result string

@@ -53,7 +53,7 @@ public final class ServerExample {
 
     // Set an option: turn verbose processing information on
     send("SET INFO true");
-    send("CREATE DB \"input.xml\" input");
+    send("CREATE DB \"etc/xml/input.xml\" input");
 
     // ------------------------------------------------------------------------
     // Run a query

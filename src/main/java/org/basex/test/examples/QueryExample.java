@@ -42,7 +42,7 @@ public final class QueryExample {
 
     // ------------------------------------------------------------------------
     // Evaluate the specified XQuery
-    final String query = "for $x in doc('input.xml')//li return $x";
+    final String query = "for $x in doc('etc/xml/input.xml')//li return $x";
 
     // ------------------------------------------------------------------------
     // Process the query by using the database command

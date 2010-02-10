@@ -51,7 +51,7 @@ public final class YMd extends Dur {
 
     this(it);
     if(f != f) Err.or(DATECALC, info(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, info(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, info());
     mon = (int) Math.round(m ? mon * f : mon / f);
   }
 

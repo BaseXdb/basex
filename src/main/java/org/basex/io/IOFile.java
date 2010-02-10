@@ -45,6 +45,10 @@ public final class IOFile extends IO {
   public IOFile(final File f) {
     file = f;
     path = file.getAbsolutePath().replace('\\', '/');
+    /*try {
+      path = file.getCanonicalPath().replace('\\', '/');
+    } catch(final IOException ex) {
+    }*/
   }
 
   @Override

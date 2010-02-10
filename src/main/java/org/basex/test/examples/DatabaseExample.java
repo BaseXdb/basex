@@ -43,7 +43,7 @@ public final class DatabaseExample {
     // Create a database from a local or remote XML document or XML String.
     System.out.println("\n* Create a database.");
 
-    new CreateDB("input.xml", "DBExample").execute(CONTEXT);
+    new CreateDB("etc/xml/input.xml", "DBExample").execute(CONTEXT);
 
     // ------------------------------------------------------------------------
     // Close and reopen the database
