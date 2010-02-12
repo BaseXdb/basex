@@ -185,11 +185,11 @@ public abstract class Builder extends Progress {
     if(meta.chop) t.chop();
 
     // check if text appears before or after root node
-    if((meta.chop && t.size() != 0 || !t.wsp()) && (!inDoc || lvl == 1))
+    final boolean ignore = !inDoc || lvl == 1;
+    if((meta.chop && t.size() != 0 || !t.wsp()) && ignore)
       error(inDoc ? AFTERROOT : BEFOREROOT, parser.det());
 
-    if(t.size() == 0) return;
-    addText(t, Data.TEXT);
+    if(t.size() != 0 && !ignore) addText(t, Data.TEXT);
   }
 
   /**

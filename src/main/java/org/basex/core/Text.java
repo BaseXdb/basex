@@ -42,8 +42,7 @@ public interface Text {
   /** Mail. */
   String MAIL = "info@" + NAMELC + ".org";
   /** Code version. */
-//  String VERSION = ReadVersion.read();
-  String VERSION = "6.01";
+  String VERSION = "6.02";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
