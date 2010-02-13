@@ -69,14 +69,14 @@
       <version>6.01</version>
     </dependency>
     <dependency>
-      <groupId>xmldb</groupId>
+      <groupId>org.xmldb</groupId>
       <artifactId>xmldb-api</artifactId>
-      <version>11112001</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>xqj</groupId>
+      <groupId>javax.xml.xquery</groupId>
       <artifactId>xqj-api</artifactId>
-      <version>1</version>
+      <version>1.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
