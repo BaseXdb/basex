@@ -126,7 +126,10 @@ public final class For extends ForLet {
 
   @Override
   public String toString() {
-    return FOR + " " + var + " " + IN + " " + expr;
+    final StringBuilder sb = new StringBuilder(FOR + " " + var + " ");
+    if(pos != null) sb.append(AT + " " + pos + " ");
+    if(score != null) sb.append(SCORE + " " + score + " ");
+    return sb.append(IN + " " + expr).toString();
   }
 
   @Override

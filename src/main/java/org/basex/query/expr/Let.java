@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -110,6 +111,7 @@ public final class Let extends ForLet {
 
   @Override
   public String toString() {
-    return LET + " " + var + " " + ASSIGN + " " + expr;
+    return LET + " " + (score ? SCORE + " " : "") +
+      var + " " + ASSIGN + " " + expr;
   }
 }
