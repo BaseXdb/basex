@@ -1,6 +1,7 @@
 package org.basex.api.xmldb;
 
 import static org.basex.util.Token.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
+import org.basex.io.IOFile;
 import org.basex.query.item.DBNode;
 import org.basex.util.TokenBuilder;
 import org.w3c.dom.Document;
@@ -99,7 +101,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
       try {
         // serialize and cache content
         final CachedOutput co = new CachedOutput();
-        final XMLSerializer xml = new XMLSerializer(co, false, false);
+        final XMLSerializer xml = new XMLSerializer(co);
         if(data != null) {
           new DBNode(data, pre).serialize(xml);
         } else if(result != null) {
@@ -116,10 +118,21 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   }
 
   public void setContent(final Object value) throws XMLDBException {
-    // allow only strings and byte arrays
-    if(value instanceof byte[]) content = value;
-    else if(value instanceof String) content = token(value.toString());
-    else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_CONT);
+    // allow only strings, byte arrays and {@link File} instances
+    if(value instanceof byte[]) {
+      content = value;
+    } else if(value instanceof String) {
+      content = token(value.toString());
+    } else if(value instanceof File) {
+      try {
+        content = new IOFile((File) value).content();
+      } catch(final IOException ex) {
+        throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_CONT +
+            "\n" + ex.getMessage());
+      }
+    } else {
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_CONT);
+    }
   }
 
   public String getDocumentId() throws XMLDBException {

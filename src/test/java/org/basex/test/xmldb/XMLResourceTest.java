@@ -156,9 +156,8 @@ public class XMLResourceTest extends TestCase {
       throws XMLDBException, IOException {
 
     // compare serialized node with input file
-    final String cont = r.getContent().toString();
-    final byte[] buffer = AllTests.read(file);
-    assertEquals("File content differs.", new String(buffer).trim(),
-        cont.trim());
+    final String cont = r.getContent().toString().replaceAll("\\r?\\n *", "");
+    final String buffer = new String(AllTests.read(file)).trim();
+    assertEquals("File content differs.", buffer, cont.trim());
   }
 }

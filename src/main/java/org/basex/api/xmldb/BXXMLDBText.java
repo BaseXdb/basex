@@ -36,7 +36,7 @@ interface BXXMLDBText {
   /** Error message. */
   String ERR_UNKNOWN = "Unknown Resource: ";
   /** Error message. */
-  String ERR_CONT = "Invalid content; string expected.";
+  String ERR_CONT = "Content cannot be set.";
   /** Error message. */
   String ERR_NSURI = "Namespace URI is empty: ";
   /** Error message. */
