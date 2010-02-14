@@ -10,6 +10,7 @@ import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.Open;
+import org.basex.util.Performance;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -24,7 +25,7 @@ import org.junit.Test;
  */
 public abstract class UpdateTest {
   /** Test file we do updates with. */
-  private static final String TESTFILE = "/etc/xml/test.xml";
+  private static final String TESTFILE = "etc/xml/test.xml";
   /** Test database name. */
   private static final String DBNAME = UpdateTest.class.getSimpleName();
   /** Main memory flag. */
@@ -126,7 +127,8 @@ public abstract class UpdateTest {
    */
   private void exec(final Proc proc) {
     if(!proc.exec(CONTEXT)) {
-      Main.errln(proc + ": " + proc.info());
+      Main.errln(proc.info());
+      Performance.stack();
       System.exit(1);
     }
   }
