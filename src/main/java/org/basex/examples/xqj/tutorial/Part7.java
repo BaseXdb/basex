@@ -11,7 +11,8 @@ import javax.xml.xquery.XQSequenceType;
 /**
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
- * http://www.xquery.com/tutorials/xqj_tutorial</a>.
+ * http://www.xquery.com/tutorials/xqj_tutorial</a>
+ * from Marc van Cappellen.
  * 
  * Part 7: XQuery Type System.
  * (c) Progress Software Corporation

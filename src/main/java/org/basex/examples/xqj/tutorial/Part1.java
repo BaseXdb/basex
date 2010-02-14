@@ -9,7 +9,8 @@ import org.basex.api.xqj.BXQDataSource;
 /**
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
- * http://www.xquery.com/tutorials/xqj_tutorial</a>.
+ * http://www.xquery.com/tutorials/xqj_tutorial</a>
+ * from Marc van Cappellen.
  * 
  * Part 1: An XQJ Introduction.
  * (c) Progress Software Corporation

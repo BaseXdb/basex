@@ -13,7 +13,8 @@ import org.xml.sax.helpers.DefaultHandler;
 /**
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
- * http://www.xquery.com/tutorials/xqj_tutorial</a>.
+ * http://www.xquery.com/tutorials/xqj_tutorial</a>
+ * from Marc van Cappellen.
  * 
  * Part 4: Processing Results.
  * (c) Progress Software Corporation

@@ -1,19 +1,17 @@
-package org.basex.examples.xqj.tutorial;
+package org.basex.examples.xqj.cfoster;
 
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQSequence;
-
 import org.basex.api.xqj.BXQDataSource;
 
 /**
- * XQJ Examples, derived from the XQJ Tutorial
- * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
- * http://www.xquery.com/tutorials/xqj_tutorial</a>
- * from Marc van Cappellen.
+ * XQJ Example, derived from the XQJ Tutorial
+ * <a href="http://www.cfoster.net/articles/xqj-tutorial">
+ * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
  * 
- * (c) Progress Software Corporation
+ * (c) Charles Foster
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
@@ -27,7 +25,7 @@ public abstract class Main {
    * @param info info
    */
   static void init(final String info) {
-    System.out.println("=== XQJ Tutorial/xquery.com ===");
+    System.out.println("=== XQJ Tutorial/cfoster.net ===");
     System.out.println("Part " + info + "");
   }
 
