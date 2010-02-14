@@ -19,14 +19,11 @@ import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
-import org.basex.io.IOContent;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.FunJava;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -112,10 +109,13 @@ abstract class BXQAbstract {
         valid = t.num && t != Type.DBL && t != Type.FLT; break;
       case STR:
         valid = t.str; break;
+      case ATM:
+        valid = true;
+        break;
       default:
         break;
     }
-    if(!valid) throw new BXQException(WRONG, e, t);
+    if(!valid) throw new BXQException(WRONG, tar, e);
     return t;
   }
 
@@ -199,13 +199,15 @@ abstract class BXQAbstract {
 
     valid(s, Source.class);
     check(Type.DOC, it);
-    if(s instanceof StreamSource) {
+    if(s instanceof SAXSource) {
+      return createDB((SAXSource) s);
+    } else if(s instanceof StreamSource) {
       final StreamSource ss = (StreamSource) s;
       final InputStream is = ss.getInputStream();
       if(is != null) return createDB(is);
       final Reader r = ss.getReader();
       if(r != null) return createDB(r);
-      return createDB(new IOContent(Token.token(ss.getSystemId())));
+      return createDB(IO.get(ss.getSystemId()));
     }
     Main.notimplemented();
     return null;
@@ -218,14 +220,8 @@ abstract class BXQAbstract {
    * @throws XQException exception
    */
   protected final DBNode createDB(final InputStream is) throws XQException {
-    opened();
     valid(is, InputStream.class);
-    try {
-      return checkDB(CreateDB.xml(new SAXSource(new InputSource(is)),
-          ctx.context.prop));
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
-    }
+    return createDB(new SAXSource(new InputSource(is)));
   }
 
   /**
@@ -235,14 +231,8 @@ abstract class BXQAbstract {
    * @throws XQException exception
    */
   protected final DBNode createDB(final Reader r) throws XQException {
-    opened();
     valid(r, Reader.class);
-    try {
-      return checkDB(CreateDB.xml(new SAXSource(new InputSource(r)),
-          ctx.context.prop));
-    } catch(final IOException ex) {
-      throw new BXQException(ex);
-    }
+    return createDB(new SAXSource(new InputSource(r)));
   }
 
   /**
@@ -252,10 +242,20 @@ abstract class BXQAbstract {
    * @throws XQException exception
    */
   protected final DBNode createDB(final XMLReader r) throws XQException {
-    opened();
     valid(r, XMLReader.class);
+    return createDB(new SAXSource(r, null));
+  }
+
+  /**
+   * Creates a database instance from the specified byte array.
+   * @param s SAX source
+   * @return document node
+   * @throws XQException exception
+   */
+  private DBNode createDB(final SAXSource s) throws XQException {
+    opened();
     try {
-      return checkDB(CreateDB.xml(new SAXSource(r, null), ctx.context.prop));
+      return checkDB(CreateDB.xml(s, ctx.context.prop));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -294,16 +294,15 @@ abstract class BXQAbstract {
   /**
    * Serializes an item to the specified serializer.
    * @param it item
-   * @param qctx query context
    * @param ser serializer
    * @throws XQException exception
    */
-  protected void serialize(final Item it, final QueryContext qctx,
-      final Serializer ser) throws XQException {
+  protected void serialize(final Item it, final Serializer ser)
+      throws XQException {
     opened();
     try {
       if(it.type == Type.ATT) throw new BXQException(ATTR);
-      qctx.serialize(ser, it);
+      it.serialize(ser);
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

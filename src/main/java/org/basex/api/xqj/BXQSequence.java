@@ -20,7 +20,6 @@ import org.basex.core.Main;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
@@ -37,8 +36,6 @@ import org.xml.sax.ContentHandler;
 final class BXQSequence extends BXQAbstract implements XQResultSequence {
   /** Result iterator. */
   final Iter result;
-  /** Query context. */
-  private final QueryContext qctx;
   /** Current result. */
   private BXQItem it;
   /** Iterator position. */
@@ -57,22 +54,20 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @throws XQException xquery exception
    */
   BXQSequence(final Iter item, final BXQDataFactory c) throws XQException {
-    this(item, new QueryContext(c.ctx.context), c, null);
+    this(item, c, null);
   }
 
   /**
    * Constructor.
    * @param item result item
-   * @param context query context
    * @param c closer
    * @param cn connection
    * @throws XQException xquery exception
    */
-  BXQSequence(final Iter item, final QueryContext context,
-      final BXQAbstract c, final BXQConnection cn) throws XQException {
+  BXQSequence(final Iter item, final BXQAbstract c,
+      final BXQConnection cn) throws XQException {
     super(c);
     result = item;
-    qctx = context;
     conn = cn;
     scrollable = cn == null || cn.getStaticContext().
       getScrollability() == XQConstants.SCROLLTYPE_SCROLLABLE;
@@ -185,7 +180,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       final XMLSerializer xml = new XMLSerializer(co);
       do {
         final BXQItem item = item();
-        item.serialize(item.it, qctx, xml);
+        item.serialize(item.it, xml);
       } while(next());
       xml.close();
     } catch(final IOException ex) {
@@ -245,7 +240,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       final Item i = result.next();
       next = i != null;
       pos++;
-      it = new BXQItem(i, this, qctx, conn);
+      it = new BXQItem(i, this, conn);
       if(!next) pos = -1;
       return next;
     } catch(final QueryException ex) {
@@ -298,14 +293,16 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     // evaluate different result types...
     if(res instanceof StreamResult) {
       // StreamResult.. directly write result as string
-      writeSequence(((StreamResult) res).getWriter(), null);
+      final StreamResult sr = (StreamResult) res;
+      if(sr.getWriter() != null) writeSequence(sr.getWriter(), null);
+      else writeSequence(sr.getOutputStream(), null);
     } else if(res instanceof SAXResult) {
       // SAXResult.. serialize result to underlying parser
       final SAXSerializer ser = new SAXSerializer(null);
       final SAXResult sax = (SAXResult) res;
       ser.setContentHandler(sax.getHandler());
       ser.setLexicalHandler(sax.getLexicalHandler());
-      while(next()) serialize(item().it, qctx, ser);
+      while(next()) serialize(item().it, ser);
     } else {
       Main.notimplemented();
     }

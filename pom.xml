@@ -4,7 +4,7 @@
   <groupId>org.basex</groupId>
   <artifactId>basex-api</artifactId>
   <packaging>jar</packaging>
-  <version>6.01</version>
+  <version>6.02</version>
   <name>BaseX API</name>
   <url>http://basex.org</url>
   <properties>
@@ -23,7 +23,7 @@
       <name>Codehaus Repository</name>
       <url>http://repository.codehaus.org/</url>
     </repository>
-        <repository>
+    <repository>
       <id>dbis-ukn</id>
       <name>DBIS Maven Repository</name>
       <url>http://www.inf.uni-konstanz.de/dbis/basex/maven</url>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex</artifactId>
-      <version>6.01</version>
+      <version>6.02</version>
     </dependency>
     <dependency>
       <groupId>org.xmldb</groupId>

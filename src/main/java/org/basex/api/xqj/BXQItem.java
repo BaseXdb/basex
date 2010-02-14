@@ -19,7 +19,6 @@ import org.basex.core.Main;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
@@ -41,33 +40,29 @@ import org.xml.sax.ContentHandler;
 final class BXQItem extends BXQAbstract implements XQResultItem {
   /** Connection. */
   private final BXQConnection conn;
-  /** Query context. */
-  private final QueryContext qctx;
   /** Item. */
   Item it;
 
   /**
    * Constructor.
-   * @param c close reference
    * @param item item
+   * @throws XQException exception
    */
-  BXQItem(final Item item, final BXQDataFactory c) {
-    this(item, c, new QueryContext(c.ctx.context), null);
+  BXQItem(final Item item) throws XQException {
+    this(item, new BXQDataFactory(), null);
   }
 
   /**
    * Constructor.
    * @param item item
    * @param c close reference
-   * @param context query context
    * @param connection connection reference
    */
-  BXQItem(final Item item, final BXQAbstract c, final QueryContext context,
+  BXQItem(final Item item, final BXQAbstract c,
       final BXQConnection connection) {
 
     super(c);
     conn = connection;
-    qctx = context;
     it = item;
   }
 
@@ -172,7 +167,6 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   }
 
   public void writeItemToResult(final Result result) throws XQException {
-    opened();
     valid(result, Result.class);
 
     // evaluate different result types...
@@ -184,7 +178,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
         // SAXResult.. serialize result to underlying parser
         final SAXSerializer ser = new SAXSerializer(null);
         ser.setContentHandler(((SAXResult) result).getHandler());
-        serialize(it, qctx, ser);
+        serialize(it, ser);
         ser.close();
       } catch(final IOException ex) {
         throw new BXQException(ex);
@@ -201,7 +195,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
    */
   private void serialize(final OutputStream os) throws XQException {
     try {
-      serialize(it, qctx, new XMLSerializer(os));
+      serialize(it, new XMLSerializer(os));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }

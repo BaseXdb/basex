@@ -3,10 +3,6 @@ package org.basex.test;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.proc.DropDB;
-import org.basex.test.examples.XMLDBCreate;
-import org.basex.test.examples.XMLDBInsert;
-import org.basex.test.examples.XMLDBQuery;
-import org.basex.test.examples.XQJQuery;
 import org.basex.test.query.QueryTest;
 import org.basex.test.xqj.AllTests;
 
@@ -35,7 +31,7 @@ public final class RunTests {
     Main.outln("============= XMLDB Tests =============");
     org.basex.test.xmldb.AllTests.main(args);
 
-    Main.outln("============= XQJ Examples =============");
+    /*Main.outln("============= XQJ Examples =============");
     XQJQuery.main(args);
     Main.outln();
 
@@ -45,6 +41,7 @@ public final class RunTests {
     XMLDBInsert.main(args);
     XMLDBQuery.main(args);
     Main.outln();
+    */
 
     Main.outln("=============  XQuery Tests =============");
     QueryTest.main(args);
@@ -54,7 +51,6 @@ public final class RunTests {
     Main.outln();
 
     Main.outln("Additionally run the remaining JUnit tests.");
-    new DropDB(XMLDBCreate.COLL).exec(ctx);
     new DropDB("input").exec(ctx);
     ctx.close();
   }

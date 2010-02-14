@@ -3,6 +3,7 @@ package org.basex.api.xqj;
 import static javax.xml.xquery.XQConstants.*;
 import static org.basex.api.xqj.BXQText.*;
 import static org.basex.util.Token.*;
+
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;
@@ -21,9 +22,9 @@ import org.basex.util.Atts;
  */
 final class BXQStaticContext implements XQStaticContext {
   /** Database context. */
-  final Context context = new Context();
+  final Context context;
   /** Query context. */
-  QueryContext ctx = new QueryContext(context);
+  final QueryContext ctx;
   /** Context item type. */
   XQItemType type;
   /** Forward flag. */
@@ -37,6 +38,25 @@ final class BXQStaticContext implements XQStaticContext {
   /** Timeout. */
   int timeout;
 
+  /**
+   * Constructor, specifying a user name and password.
+   * @param name user name
+   * @param pw password
+   * @throws XQException if authentication fails
+   */
+  protected BXQStaticContext(final String name, final String pw)
+      throws XQException {
+    
+    context = new Context();
+    if(name != null) {
+      context.user = context.users.get(name);
+      if(context.user == null || !string(context.user.pw).equals(md5(pw)))
+        throw new BXQException(DENIED, name);
+    }
+    ctx = new QueryContext(context);
+  }
+
+  
   public void declareNamespace(final String prefix, final String uri)
       throws XQException {
     try {
@@ -113,7 +133,8 @@ final class BXQStaticContext implements XQStaticContext {
     BXQAbstract.valid(prefix, String.class);
     final byte[] uri = ctx.ns.find(token(prefix));
     if(uri != null) return string(uri);
-    throw new BXQException(PRE, prefix);  }
+    throw new BXQException(PRE, prefix);
+  }
 
   public int getOrderingMode() {
     return ctx.ordered ? ORDERING_MODE_ORDERED : ORDERING_MODE_UNORDERED;

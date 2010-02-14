@@ -39,10 +39,22 @@ import org.w3c.dom.ls.LSOutput;
 class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   /**
    * Constructor.
+   * @throws XQException if authentication fails
    */
-  protected BXQDataFactory() {
+  protected BXQDataFactory() throws XQException {
+    this(null, null);
+  }
+
+  /**
+   * Constructor, specifying a user name and password.
+   * @param name user name
+   * @param pw password
+   * @throws XQException if authentication fails
+   */
+  protected BXQDataFactory(final String name, final String pw)
+      throws XQException {
     super(null);
-    ctx = new BXQStaticContext();
+    ctx = new BXQStaticContext(name, pw);
   }
 
   public BXQItemType createAtomicType(final int b, final QName qn,
@@ -113,7 +125,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(v, XQItem.class);
     try {
       final Type type = ((BXQItemType) v.getItemType()).getType();
-      return new BXQItem(type.e(((BXQItem) v).it, null), this);
+      return new BXQItem(type.e(((BXQItem) v).it, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -124,7 +136,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(it, XQItemType.class);
     try {
       final Str val = Str.get(valid(v, String.class));
-      return new BXQItem(check(Type.STR, it).e(val, null), this);
+      return new BXQItem(check(Type.STR, it).e(val, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -133,7 +145,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQItem createItemFromBoolean(final boolean v, final XQItemType it)
       throws XQException {
     check(Type.BLN, it);
-    return new BXQItem(Bln.get(v), this);
+    return new BXQItem(Bln.get(v));
   }
 
   public BXQItem createItemFromByte(final byte v, final XQItemType it)
@@ -144,43 +156,43 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQItem createItemFromDocument(final InputStream is,
       final String base, final XQItemType it) throws XQException {
     check(Type.DOC, it);
-    return new BXQItem(createDB(is), this);
+    return new BXQItem(createDB(is));
   }
 
   public BXQItem createItemFromDocument(final Reader r, final String base,
       final XQItemType it) throws XQException {
     check(Type.DOC, it);
-    return new BXQItem(createDB(r), this);
+    return new BXQItem(createDB(r));
   }
 
   public BXQItem createItemFromDocument(final Source s, final XQItemType it)
       throws XQException {
-    return new BXQItem(createDB(s, it), this);
+    return new BXQItem(createDB(s, it));
   }
 
   public BXQItem createItemFromDocument(final String v, final String base,
       final XQItemType it) throws XQException {
     valid(v, String.class);
     check(Type.DOC, it);
-    return new BXQItem(createDB(new IOContent(Token.token(v))), this);
+    return new BXQItem(createDB(new IOContent(Token.token(v))));
   }
 
   public BXQItem createItemFromDocument(final XMLStreamReader sr,
       final XQItemType it) throws XQException {
     check(Type.DOC, it);
-    return new BXQItem(createDB(sr), this);
+    return new BXQItem(createDB(sr));
   }
 
   public BXQItem createItemFromDouble(final double v, final XQItemType it)
       throws XQException {
     check(Type.DBL, it);
-    return new BXQItem(Dbl.get(v), this);
+    return new BXQItem(Dbl.get(v));
   }
 
   public BXQItem createItemFromFloat(final float v, final XQItemType it)
       throws XQException {
     check(Type.FLT, it);
-    return new BXQItem(Flt.get(v), this);
+    return new BXQItem(Flt.get(v));
   }
 
   public BXQItem createItemFromInt(final int v, final XQItemType it)
@@ -211,12 +223,12 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     } catch(final Exception e) {
       e.printStackTrace();
     }
-    return new BXQItem(createDB(new IOContent(ba.toByteArray())), this);
+    return new BXQItem(createDB(new IOContent(ba.toByteArray())));
   }
 
   public BXQItem createItemFromObject(final Object v, final XQItemType t)
       throws XQException {
-    return new BXQItem(create(v, t), this);
+    return new BXQItem(create(v, t));
   }
 
   public BXQItem createItemFromShort(final short v, final XQItemType it)
@@ -228,7 +240,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     try {
       final Str val = Str.get(valid(v, String.class));
-      return new BXQItem(check(Type.STR, it).e(val, null), this);
+      return new BXQItem(check(Type.STR, it).e(val, null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -327,7 +339,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   private BXQItem itr(final long v, final Type e, final XQItemType t)
       throws XQException {
     try {
-      return new BXQItem(check(e, t).e(Itr.get(v), null), this);
+      return new BXQItem(check(e, t).e(Itr.get(v), null));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

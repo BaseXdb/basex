@@ -4,7 +4,6 @@ import static org.basex.api.xqj.BXQText.*;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.Properties;
-import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
 
@@ -14,22 +13,23 @@ import javax.xml.xquery.XQException;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class BXQDataSource implements XQDataSource {
+public final class BXQDataSource implements XQDataSource {
   /** Log output (currently ignored). */
   private PrintWriter log;
   /** Timeout. */
   private int timeout;
 
-  public BXQConnection getConnection() {
-    return new BXQConnection();
+  public BXQConnection getConnection() throws XQException {
+    return getConnection(null, null);
   }
 
-  public XQConnection getConnection(final Connection c) throws XQException {
+  public BXQConnection getConnection(final Connection c) throws XQException {
     throw new BXQException(SQL);
   }
 
-  public XQConnection getConnection(final String name, final String pw) {
-    return getConnection();
+  public BXQConnection getConnection(final String name, final String pw)
+      throws XQException {
+    return new BXQConnection(name, pw);
   }
 
   public int getLoginTimeout() {

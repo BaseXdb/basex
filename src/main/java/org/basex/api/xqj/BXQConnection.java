@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-
 import java.io.InputStream;
 import java.io.Reader;
 import javax.xml.xquery.XQConnection;
@@ -22,6 +21,16 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
   /** Database meta data. */
   private final BXQMetaData meta = new BXQMetaData(this);
 
+  /**
+   * Default constructor.
+   * @param name user name
+   * @param pw password
+   * @throws XQException if authentication fails
+   */
+  BXQConnection(final String name, final String pw) throws XQException {
+    super(name, pw);
+  }
+  
   public void commit() throws XQException {
     opened();
     throw new BXQException(TRANS);

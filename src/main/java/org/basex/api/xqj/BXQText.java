@@ -13,7 +13,7 @@ interface BXQText {
   /** Error message. */
   String CLOSED = " has been closed.";
   /** Error message. */
-  String NULL = "% argument mustn't be null.";
+  String NULL = "% argument must not be null.";
   /** Error message. */
   String WRONG = "Wrong data type; % expected, % found.";
   /** Error message. */
@@ -54,6 +54,8 @@ interface BXQText {
   String OCCINV = "Invalid occurrence indicator.";
   /** Error message. */
   String PRE = "Unknown namespace prefix '%'.";
+  /** Error message. */
+  String DENIED = "Access denied for user '%'.";
   /** Error message. */
   String ARG = "Wrong argument for %.";
   /** Error message. */

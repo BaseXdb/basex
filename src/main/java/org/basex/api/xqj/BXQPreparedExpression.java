@@ -33,6 +33,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
    */
   BXQPreparedExpression(final String input, final BXQStaticContext s,
       final BXQConnection c) throws XQQueryException {
+
     super(input, s, c);
 
     try {
@@ -49,6 +50,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
   }
 
   public XQResultSequence executeQuery() throws XQException {
+    query.reset();
     return execute();
   }
 

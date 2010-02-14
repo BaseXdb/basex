@@ -11,6 +11,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.xquery.XQCancelledException;
+import javax.xml.xquery.XQConstants;
 import javax.xml.xquery.XQDynamicContext;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
@@ -23,6 +24,7 @@ import org.basex.io.IOContent;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.query.item.Atm;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
@@ -51,7 +53,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   /** Context. */
   protected final BXQStaticContext sc;
   /** Query processor. */
-  protected final QueryProcessor query;
+  protected QueryProcessor query;
   /** Time zone. */
   private TimeZone zone;
 
@@ -66,11 +68,13 @@ abstract class BXQDynamicContext extends BXQAbstract
     super(c);
     sc = s;
     query = new QueryProcessor(qu, s.context);
+    query.ctx.copy(sc.ctx);
   }
 
   public void bindAtomicValue(final QName qn, final String v,
       final XQItemType t) throws XQException {
-    bind(qn, Str.get(valid(v, String.class)), t);
+    valid(t, XQItemType.class);
+    bind(qn, new Atm(Token.token(valid(v, String.class).toString())), t);
   }
 
   public void bindBoolean(final QName qn, final boolean v, final XQItemType it)
@@ -185,22 +189,36 @@ abstract class BXQDynamicContext extends BXQAbstract
   private void bind(final QName var, final Item it, final XQItemType t)
       throws XQException {
     opened();
+    
     valid(var, QName.class);
 
-    final QNm name = new QNm(Token.token(var.getLocalPart()));
-    Var v = new Var(name, true);
-    if(this instanceof BXQPreparedExpression) {
-      v = query.ctx.vars.get(v);
-      if(v == null) throw new BXQException(VAR, var);
-    } else {
-      query.ctx.vars.addGlobal(v);
+    final Type tt = check(it.type, t);
+    Item i = it;
+    if(tt != it.type) {
+      try {
+        i = tt.e(it, null);
+      } catch(final QueryException ex) {
+        throw new BXQException(ex);
+      }
     }
 
-    try {
-      final Type tt = check(it.type, t);
-      v.bind(tt == it.type ? it : tt.e(it, null), null);
-    } catch(final QueryException ex) {
-      throw new BXQException(ex);
+    if(var == XQConstants.CONTEXT_ITEM) {
+      query.ctx.item = i;
+    } else {
+      final QNm name = new QNm(Token.token(var.getLocalPart()));
+      Var v = new Var(name, true);
+      if(this instanceof BXQPreparedExpression) {
+        v = query.ctx.vars.get(v);
+        if(v == null) throw new BXQException(VAR, var);
+      } else {
+        query.ctx.vars.addGlobal(v);
+      }
+  
+      try {
+        v.bind(i, null);
+      } catch(final QueryException ex) {
+        throw new BXQException(ex);
+      }
     }
   }
 
@@ -228,7 +246,7 @@ abstract class BXQDynamicContext extends BXQAbstract
       qctx.compile();
       Iter iter = qctx.iter();
       if(sc.scrollable) iter = SeqIter.get(iter);
-      return new BXQSequence(iter, qctx, this, (BXQConnection) par);
+      return new BXQSequence(iter, this, (BXQConnection) par);
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
           ex.line(), ex.col(), -1);
