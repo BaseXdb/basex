@@ -38,28 +38,27 @@ class ClientSession(object):
     
     # Login of user at the server.
     def login(self):
-        ts = self.readInput()
+        ts = self.result()
         pwmd5 = hashlib.md5(self.pw).hexdigest()
         m = hashlib.md5()
         m.update(pwmd5)
         m.update(ts)
         complete = m.hexdigest()
-        self.send(self.user)
-        self.send(complete)
+        self.s.send(str.encode(self.user))
+        self.s.send("\0")
+        self.s.send(str.encode(complete))
+        self.s.send("\0")
         data = self.read1byte()
         return "\0" == data
     
-    # Sends command to the server        
-    def send(self,com):
-        self.s.send(com.encode('utf-8'))
+     # Sends command to the server        
+    def execute(self,com):
+        self.s.send(str.encode(com))
         self.s.send("\0")
-        
-    # Reads 1 byte from the input stream.
-    def read1byte(self):
-        return self.s.recv(1)
+        return self.read1byte()
     
-    # Reads the input stream.    
-    def readInput(self):
+    # Returns the result.    
+    def result(self):
         com = ""
         while True:
             data = self.read1byte()
@@ -67,23 +66,20 @@ class ClientSession(object):
                 return com
             else:
                 com += data
-                      
-    # Receives data.    
-    def receive(self):
-        part1 = self.readInput()
-        part2 = self.readInput()
-        part3 = self.read1byte()
-        recv = ""
-        if part1 != "\0":
-            recv += part1 + part2
-        else:
-            recv = part2
-        return recv
     
-    # Sends command and receives answer.
-    def execute(self, com):
-        self.send(com)
-        return self.receive()
+    # Returns the info.    
+    def info(self):
+        com = ""
+        while True:
+            data = self.read1byte()
+            if(data == "\0"):
+                return com
+            else:
+                com += data
+    
+    # Reads 1 byte from the input stream.
+    def read1byte(self):
+        return self.s.recv(1)
     
     # Closes the connection.       
     def close(self):

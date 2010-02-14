@@ -14,7 +14,8 @@ class BaseXClient(object):
     def __init__(self,host,port):
         self.host = host
         self.port = port
-        print 'BaseX Client'
+        print 'BaseX 6.01 [Client]'
+        print 'Try "help" to get some information.'           
     
     # Creates a session.   
     def session(self):
@@ -24,19 +25,35 @@ class BaseXClient(object):
         session = ClientSession.ClientSession(self.host, self.port, user, pw)
         return session.connect()
     
+    # Reads commands from the console.    
+    def readCommand(self):
+        com = raw_input('> ')
+        if com == "":
+            self.readCommand()
+        return com.strip()
+    
     # Runs the console.
     def console(self):
-        if self.session():
-            session.send("SET INFO ON")
-            session.receive()
+        if self.session() == True:
+            session.execute("SET INFO ON")
+            session.result()
             while True:
-                com = raw_input('> ').strip()
+                com = self.readCommand()
                 if com == "exit":
+                    session.execute("exit")
                     break
-                if com:
-                    print session.execute(com)
-            try:
-                session.send("exit")
+                if session.execute(com) == "\0":
+                    res = session.result()
+                    if res != "":
+                        print res
+                    inf = session.info()
+                    if inf != "":
+                        print inf                    
+                else:
+                    session.result()
+                    print session.info()
+            try: 
+                session.execute("exit")
             except:
                 session.close()
             print "See you."
@@ -49,7 +66,7 @@ def opts():
         try:
             opts, args = getopt.getopt(sys.argv[1:], "-p:-h", ["port", "host"])
         except getopt.GetoptError, err:
-            print err
+            print str(err)
             sys.exit()
         global host
         global port
@@ -67,4 +84,3 @@ if __name__ == '__main__':
     opts()
     bxc = BaseXClient(host,port)
     bxc.console()
-     
