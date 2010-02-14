@@ -1,8 +1,10 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
+
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.util.Map;
 import java.util.Properties;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
@@ -57,11 +59,15 @@ public final class BXQDataSource implements XQDataSource {
   }
 
   public void setProperties(final Properties prop) throws XQException {
-    throw new BXQException(PROPS);
+    if(prop == null) throw new BXQException(NULL,
+        Properties.class.getSimpleName());
+    for(final Map.Entry<?, ?> o : prop.entrySet()) {
+      setProperty(o.getKey().toString(), o.getValue().toString());
+    }
   }
 
   public void setProperty(final String key, final String val)
       throws XQException {
-    throw new BXQException(PROPS);
+    throw new BXQException(PROPS, key);
   }
 }

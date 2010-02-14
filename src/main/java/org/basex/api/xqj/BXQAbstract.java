@@ -101,21 +101,8 @@ abstract class BXQAbstract {
     if(tar == null) return e;
 
     final Type t = ((BXQItemType) tar).getType();
-    if(e == t) return e;
-
-    boolean valid = false;
-    switch(e) {
-      case BYT: case INT: case LNG: case SHR: case DEC: case ITR:
-        valid = t.num && t != Type.DBL && t != Type.FLT; break;
-      case STR:
-        valid = t.str; break;
-      case ATM:
-        valid = true;
-        break;
-      default:
-        break;
-    }
-    if(!valid) throw new BXQException(WRONG, tar, e);
+    if(e != t && e != Type.ATM && (e.node() || t.node()))
+      throw new BXQException(WRONG, tar, e);
     return t;
   }
 

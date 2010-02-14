@@ -463,6 +463,24 @@ public final class XQJTest extends TestCase {
     expr.bindAtomicValue(new QName("v"), "A", type);
   }
 
+  /**
+   * Test.
+   * @throws Exception exception
+   */
+  public void testContextItem() throws Exception {
+    final XQConnection conn = conn(drv);
+    conn.getStaticContext().setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
+
+    XQExpression xqe = conn.createExpression();
+    XQSequence xqs = xqe.executeQuery("basex:db('input')");
+    xqs.first();
+    XQItem xqi = xqs.getItem();
+
+    xqe = conn.createExpression();
+    xqe.bindItem(new QName("v"), xqi);
+    xqs = xqe.executeQuery("declare variable $v external; $v");
+  }
+
 
   /**
    * Test.

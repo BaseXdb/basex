@@ -25,7 +25,7 @@ interface BXQText {
   /** Error message. */
   String SQL = "SQL sources not supported.";
   /** Error message. */
-  String PROPS = "No property support.";
+  String PROPS = "Unknown property '%'.";
   /** Error message. */
   String NODE = "Current item is not a node.";
   /** Error message. */
