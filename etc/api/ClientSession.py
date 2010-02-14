@@ -25,62 +25,54 @@ class ClientSession(object):
     
     # Initializes the ClientSession.
     def __init__(self,host,port,user,pw):
-        self.host = host
-        self.port = port
-        self.user = user
-        self.pw = pw
+        global s
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.connect((host, port))
+        except:
+            print "Can't communicate with the server."
         
-    # Connects to the server.    
-    def connect(self):
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.s.connect((self.host,self.port)) 
-        return self.login()
-    
-    # Login of user at the server.
-    def login(self):
-        ts = self.result()
-        pwmd5 = hashlib.md5(self.pw).hexdigest()
+        # receive timestamp
+        ts = self.readString()
+        pwmd5 = hashlib.md5(pw).hexdigest()
         m = hashlib.md5()
         m.update(pwmd5)
         m.update(ts)
         complete = m.hexdigest()
-        self.s.send(str.encode(self.user))
-        self.s.send("\0")
-        self.s.send(str.encode(complete))
-        self.s.send("\0")
-        data = self.read1byte()
-        return "\0" == data
+        
+        # send user name and hashed password/timestamp
+        s.send(str.encode(user))
+        s.send("\0")
+        s.send(str.encode(complete))
+        s.send("\0")
+        
+        # receives success flag
+        if "\0" != s.recv(1):
+            raise NameError()
     
-     # Sends command to the server        
-    def execute(self,com):
-        self.s.send(str.encode(com))
-        self.s.send("\0")
-        return self.read1byte()
-    
-    # Returns the result.    
-    def result(self):
-        com = ""
-        while True:
-            data = self.read1byte()
-            if(data == "\0"):
-                return com
-            else:
-                com += data
-    
-    # Returns the info.    
+    # Executes a command.
+    def execute(self,com,out):
+        s.send(str.encode(com))
+        s.send("\0")
+        out.write(self.readString())
+        self.info = self.readString()
+        return s.recv(1)
+               
+    # Returns the info string.
     def info(self):
+        return self.info
+    
+    # Closes the socket.
+    def close(self):
+        s.send(str.encode("exit"))
+        s.close()
+     
+    # Reads strings from the input.    
+    def readString(self):
         com = ""
         while True:
-            data = self.read1byte()
+            data = s.recv(1)
             if(data == "\0"):
                 return com
             else:
                 com += data
-    
-    # Reads 1 byte from the input stream.
-    def read1byte(self):
-        return self.s.recv(1)
-    
-    # Closes the connection.       
-    def close(self):
-        self.s.close()

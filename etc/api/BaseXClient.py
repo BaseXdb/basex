@@ -21,9 +21,12 @@ class BaseXClient(object):
     def session(self):
         user = raw_input('Username: ');
         pw = getpass.getpass('Password: ');
-        global session
-        session = ClientSession.ClientSession(self.host, self.port, user, pw)
-        return session.connect()
+        try:
+            global session
+            session = ClientSession.ClientSession(self.host, self.port, user, pw)
+            self.console()
+        except NameError:
+            print "Access denied."
     
     # Reads commands from the console.    
     def readCommand(self):
@@ -34,32 +37,19 @@ class BaseXClient(object):
     
     # Runs the console.
     def console(self):
-        if self.session() == True:
-            session.execute("SET INFO ON")
-            session.result()
-            while True:
-                com = self.readCommand()
-                if com == "exit":
-                    session.execute("exit")
-                    break
-                if session.execute(com) == "\0":
-                    res = session.result()
-                    if res != "":
-                        print res
-                    inf = session.info()
-                    if inf != "":
-                        print inf                    
-                else:
-                    session.result()
-                    print session.info()
-            try: 
-                session.execute("exit")
-            except:
-                session.close()
-            print "See you."
-        else:
-            print "Access denied."
+        out = sys.stdout
+        session.execute("SET INFO ON", out)
+        while True:
+            com = self.readCommand()
+            if com == "exit":
+                break 
+            session.execute(com,out)
+        try: 
             session.close()
+        except:
+            print "See you."
+            sys.exit()
+        print "See you."
 
 # Reads arguments -p and -h.
 def opts():
@@ -83,4 +73,4 @@ def opts():
 if __name__ == '__main__':
     opts()
     bxc = BaseXClient(host,port)
-    bxc.console()
+    bxc.session()
