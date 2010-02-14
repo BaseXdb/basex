@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
@@ -16,8 +15,6 @@ import org.basex.query.item.Seq;
  * @author Christian Gruen
  */
 public final class SeqIter extends Iter implements Result {
-  /** Query context. */
-  private QueryContext ctx;
   /** Items. */
   public Item[] item;
   /** Size. */
@@ -38,15 +35,6 @@ public final class SeqIter extends Iter implements Result {
    */
   public SeqIter(final int c) {
     item = new Item[c];
-  }
-
-  /**
-   * Constructor, specifying the query context.
-   * @param c query context
-   */
-  public SeqIter(final QueryContext c) {
-    this();
-    ctx = c;
   }
 
   /**
@@ -114,7 +102,7 @@ public final class SeqIter extends Iter implements Result {
 
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ctx.serialize(ser, item[n]);
+    item[n].serialize(ser);
     ser.closeResult();
   }
 

@@ -119,6 +119,15 @@ public final class QueryProcessor extends Progress {
    */
   public void setQuery(final String qu) {
     query = qu;
+    reset();
+  }
+
+  /**
+   * Resets the processor.
+   */
+  public void reset() {
+    parsed = false;
+    compiled = false;
   }
 
   /**

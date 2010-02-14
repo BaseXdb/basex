@@ -253,7 +253,7 @@ public final class QueryContext extends Progress {
   protected Result eval() throws QueryException {
     // evaluates the query
     final Iter it = iter();
-    final SeqIter ir = new SeqIter(this);
+    final SeqIter ir = new SeqIter();
     Item i;
 
     // check if all results belong to the database of the input context
@@ -308,16 +308,6 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Serializes the specified item.
-   * @param ser serializer
-   * @param i item to serialize
-   * @throws IOException I/O exception
-   */
-  public void serialize(final Serializer ser, final Item i) throws IOException {
-    i.serialize(ser);
-  }
-
-  /**
    * Recursively serializes the query plan.
    * @param ser serializer
    * @throws Exception exception
@@ -344,6 +334,23 @@ public final class QueryContext extends Progress {
    */
   void close() throws IOException {
     for(int d = rootDocs; d < docs; d++) Close.close(context, doc[d].data);
+  }
+
+  /**
+   * Copies properties of the specified context.
+   * @param ctx context
+   */
+  public void copy(final QueryContext ctx) {
+    baseURI = ctx.baseURI;
+    spaces = ctx.spaces;
+    construct = ctx.construct;
+    nsInherit = ctx.nsInherit;
+    nsPreserve = ctx.nsPreserve;
+    collation = ctx.collation;
+    nsElem = ctx.nsElem;
+    nsFunc = ctx.nsFunc;
+    orderGreatest = ctx.orderGreatest;
+    ordered = ctx.ordered;
   }
 
   /**

@@ -4,7 +4,7 @@
   <groupId>org.basex</groupId>
   <artifactId>basex</artifactId>
   <packaging>jar</packaging>
-  <version>6.01</version>
+  <version>6.02</version>
   <name>BaseX</name>
   <url>http://basex.org</url>
   <properties>
@@ -79,7 +79,7 @@
     <!--<dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex-api</artifactId>
-      <version>6.01</version>
+      <version>6.02</version>
     </dependency>-->
   </dependencies>
   <build>

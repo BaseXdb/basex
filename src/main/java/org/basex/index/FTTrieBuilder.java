@@ -45,8 +45,6 @@ import org.basex.util.TokenList;
  *  [size0, size1, size2, ..., sizeN]
  *  size is an int value
  *
- * 
- *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen

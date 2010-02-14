@@ -14,8 +14,7 @@ class BaseXClient(object):
     def __init__(self,host,port):
         self.host = host
         self.port = port
-        print 'BaseX 6.01 [Client]'
-        print 'Try "help" to get some information.'           
+        print 'BaseX Client'
     
     # Creates a session.   
     def session(self):
