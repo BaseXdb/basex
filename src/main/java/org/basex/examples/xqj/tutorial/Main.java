@@ -12,8 +12,6 @@ import org.basex.api.xqj.BXQDataSource;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
- * (c) Progress Software Corporation
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

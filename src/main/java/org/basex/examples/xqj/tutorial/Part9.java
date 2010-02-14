@@ -16,7 +16,6 @@ import javax.xml.xquery.XQSequence;
  * from Marc van Cappellen.
  * 
  * Part 9: Creating XDM Instances.
- * (c) Progress Software Corporation
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

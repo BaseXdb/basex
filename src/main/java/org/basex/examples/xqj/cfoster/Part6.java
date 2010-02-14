@@ -14,7 +14,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
  * 
  * Part 6: Streaming XQuery results.
- * (c) Charles Foster
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

@@ -24,7 +24,6 @@ import org.w3c.dom.Node;
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
  * 
  * Part 4: XDM Model within XQJ.
- * (c) Charles Foster
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

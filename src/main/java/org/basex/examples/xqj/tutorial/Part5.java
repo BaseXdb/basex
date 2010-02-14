@@ -14,7 +14,6 @@ import javax.xml.xquery.XQSequence;
  * from Marc van Cappellen.
  * 
  * Part 5: Serializing Results.
- * (c) Progress Software Corporation
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

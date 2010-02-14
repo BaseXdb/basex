@@ -10,7 +10,6 @@ import org.basex.api.xqj.BXQDataSource;
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
  * 
  * Part 1: Setting up your environment.
- * (c) Charles Foster
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

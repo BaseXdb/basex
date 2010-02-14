@@ -15,7 +15,6 @@ import javax.xml.xquery.XQSequenceType;
  * from Marc van Cappellen.
  * 
  * Part 7: XQuery Type System.
- * (c) Progress Software Corporation
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

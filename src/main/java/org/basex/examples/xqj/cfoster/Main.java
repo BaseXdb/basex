@@ -2,16 +2,12 @@ package org.basex.examples.xqj.cfoster;
 
 import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
-import javax.xml.xquery.XQPreparedExpression;
-import javax.xml.xquery.XQSequence;
 import org.basex.api.xqj.BXQDataSource;
 
 /**
- * XQJ Example, derived from the XQJ Tutorial
+ * XQJ Examples, derived from the XQJ Tutorial
  * <a href="http://www.cfoster.net/articles/xqj-tutorial">
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
- * 
- * (c) Charles Foster
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
@@ -53,34 +49,5 @@ public abstract class Main {
    */
   static void info(final String info) {
     System.out.println("\n* " + info);
-  }
-  
-  /**
-   * Prints the entries of a sequence.
-   * @param info query information
-   * @param xqs sequence
-   * @throws XQException query exception
-   */
-  static void print(final String info, final XQSequence xqs)
-      throws XQException {
-
-    info(info);
-    xqs.writeSequence(System.out, null);
-    System.out.println();
-  }
-
-  /**
-   * Prints the result of an expression.
-   * @param info query info
-   * @param xqp prepared query expression
-   */
-  static void print(final String info, final XQPreparedExpression xqp) {
-    info(info);
-    try {
-      xqp.executeQuery().writeSequence(System.out, null);
-    } catch(final XQException ex) {
-      System.out.println(ex);
-    }
-    System.out.println();
   }
 }

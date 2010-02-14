@@ -14,7 +14,6 @@ import javax.xml.xquery.XQStaticContext;
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
  * 
  * Part 5: Stream massive amounts of XML to XQuery expressions.
- * (c) Charles Foster
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

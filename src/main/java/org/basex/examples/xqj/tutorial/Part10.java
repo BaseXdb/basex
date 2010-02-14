@@ -20,7 +20,6 @@ import org.xml.sax.XMLFilter;
  * from Marc van Cappellen.
  * 
  * Part 10: XML Pipelines.
- * (c) Progress Software Corporation
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

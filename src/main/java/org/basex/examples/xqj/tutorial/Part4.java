@@ -17,7 +17,6 @@ import org.xml.sax.helpers.DefaultHandler;
  * from Marc van Cappellen.
  * 
  * Part 4: Processing Results.
- * (c) Progress Software Corporation
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

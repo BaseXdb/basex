@@ -14,7 +14,6 @@ import javax.xml.xquery.XQResultSequence;
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
  * 
  * Part 3: Binding Java variables to XQuery.
- * (c) Charles Foster
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
