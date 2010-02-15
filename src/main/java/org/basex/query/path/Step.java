@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.PathNode;
+import org.basex.index.Names;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -70,9 +71,9 @@ public class Step extends Preds {
     ctx.leaf = false;
     if(data != null && test.kind == Kind.NAME) {
       final byte[] ln = ((NameTest) test).ln;
-      final boolean att = test.type == Type.ATT;
+      final Names names = test.type == Type.ATT ? data.atts : data.tags;
       ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
-        data.tags.stat((att ? data.atts : data.tags).id(ln)).leaf;
+        names.stat(names.id(ln)).leaf;
     }
     final Expr e = super.comp(ctx);
     ctx.leaf = false;
