@@ -9,12 +9,22 @@
       <name>DBIS Maven Repository</name>
       <url>http://www.inf.uni-konstanz.de/dbis/basex/maven</url>
     </repository>
+    <repository>
+      <id>central</id>
+      <name>Central Maven Repository</name>
+      <url>http://repo2.maven.org/maven2/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex-api</artifactId>
       <version>6.02</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ccil.cowan.tagsoup</groupId>
+      <artifactId>tagsoup</artifactId>
+      <version>1.2</version>
     </dependency>
   </dependencies>
 </project>
