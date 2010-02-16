@@ -88,7 +88,7 @@ abstract class MapPainter {
   void init(final MapRects rects) { }
 
   /**
-   * Returns the content for the specified pre value. 
+   * Returns the content for the specified pre value.
    * @param data data reference
    * @param mr map rectangle
    * @return byte[] content
@@ -96,7 +96,7 @@ abstract class MapPainter {
   byte[] content(final Data data, final MapRect mr) {
     return ViewData.content(data, mr.pre, false);
   }
-  
+
   /**
    * Resets the painter.
    */

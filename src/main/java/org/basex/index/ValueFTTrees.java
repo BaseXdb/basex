@@ -19,7 +19,7 @@ class ValueFTTrees {
 
   /**
    * Indexes a token with it full text data.
-   * 
+   *
    * @param tok token to be indexed
    * @param pre pre value for the token
    * @param pos pos value of the token

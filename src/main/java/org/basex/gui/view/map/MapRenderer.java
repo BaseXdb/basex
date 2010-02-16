@@ -89,7 +89,7 @@ final class MapRenderer {
         xx = r.x;
         if(ll != 0) yy += fh;
         if(yy + fh > r.y + r.h) {
-          // text to high, skip drawing 
+          // text to high, skip drawing
           if(draw) g.drawString("...", xx + ll, yy);
           return r.h;
         }
@@ -191,7 +191,7 @@ final class MapRenderer {
 
       if(h >= r.h || le(ffmax, ff) || le(ffhmax, ffh) || le(flhmax, flh)) {
         if(l) {
-          // use last setup to draw 
+          // use last setup to draw
           r.thumbf = bff * fs;
           r.thumbfh = (byte) Math.max(1, bffh * fs);
           r.thumblh = (byte) Math.max(1, (bflh + bffh) * fs);
@@ -233,14 +233,14 @@ final class MapRenderer {
         flhtmin = flh;
       }
     }
-    
-    // calculate parameter setting 
+
+    // calculate parameter setting
     // total number of bytes
-    final double sum = data[3].length + data[4].length; 
+    final double sum = data[3].length + data[4].length;
     // number of lines printable
-    final double nl = (int) (r.h - 3.0) / lhmi; 
+    final double nl = (int) (r.h - 3.0) / lhmi;
     // factor for the width of a thumbnail
-    final double fnew = (nl * (r.w - 3) - data[4].length) / sum; 
+    final double fnew = (nl * (r.w - 3) - data[4].length) / sum;
     r.thumbf = fnew;
     r.thumbfh = fhmi;
     r.thumblh = lhmi;
@@ -274,7 +274,7 @@ final class MapRenderer {
   }
 
   /**
-   * Draws a text using thumbnail visualization, that represents a sentence  
+   * Draws a text using thumbnail visualization, that represents a sentence
    * through a thumbnail. Sentences are separated through black thumbnails.
    * @param g graphics reference
    * @param r rectangle
@@ -403,7 +403,7 @@ final class MapRenderer {
   }
 
   /**
-   * Draws a text using thumbnail visualization, that represents a token  
+   * Draws a text using thumbnail visualization, that represents a token
    * through a thumbnail.
    * @param g graphics reference
    * @param r rectangle
@@ -542,9 +542,9 @@ final class MapRenderer {
       pl += data[0][i];
       sl += data[0][i];
       cc += data[0][i];
-      
+
       // find hovered thumbnail and corresponding text
-      if(ll + wl + (ds && psl < data[1].length && 
+      if(ll + wl + (ds && psl < data[1].length &&
           data[1][psl] == sl ? r.thumbsw : 0) >= ww) {
         if(ds) {
           // do not split token

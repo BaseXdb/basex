@@ -132,7 +132,7 @@ public class IntList {
     size = 0;
     list = new int[8];
   }
-  
+
   /**
    * Sorts the data.
    */

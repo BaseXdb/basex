@@ -48,7 +48,7 @@ public final class BaseXWin {
         Main.notexpected("Failed to initialize native Mac OS X interface", e);
       }
     }
-    
+
     // read properties
     final Context ctx = new Context();
     ctx.prop.set(Prop.CACHEQUERY, true);

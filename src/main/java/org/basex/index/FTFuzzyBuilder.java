@@ -24,22 +24,22 @@ import org.basex.util.TokenBuilder;
  * The building process is divided in 2 steps:
  * a)
  *    fill DataOutput(db, f + 'x') looks like:
- *    [l, p] ... 
- *      - l is the length [byte] of a token 
+ *    [l, p] ...
+ *      - l is the length [byte] of a token
  *      - p the pointer [int] of the first token with length l
  *      there's an entry for each token length
- *    
+ *
  *    fill DataOutput(db, f + 'y') looks like:
- *    [t0, t1, ... tl, z, s] 
+ *    [t0, t1, ... tl, z, s]
  *      - t0, t1, ... tl-1 is the token [byte[l]]
- *      - z is the pointer on the data entries of the token [long] 
+ *      - z is the pointer on the data entries of the token [long]
  *      - s is the number of pre values, saved in data [int]
  * b)
  *    fill DataOutput(db, f + 'z') looks like: stores the full text data;
  *      the pre values are ordered but not distinct
- *      [pre1, pos1, pre2, pos2, pre3, pos3, ...] as Nums 
- *      
- *      
+ *      [pre1, pos1, pre2, pos2, pre3, pos3, ...] as Nums
+ *
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  * @author Christian Gruen
@@ -216,7 +216,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
     v[m] = null;
     return EMPTY;
   }
-  
+
   /**
    * Writes the main memory index to disk - temporarily.
    * @param cs current file pointer

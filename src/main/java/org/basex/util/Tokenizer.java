@@ -1,11 +1,10 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-
 import java.util.Arrays;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
 import org.basex.query.ft.StemDir;
@@ -73,9 +72,9 @@ public final class Tokenizer implements IndexToken {
   /** Last punctuation mark. */
   public int pm;
   /** Last character position. */
-  public int lp; 
-  
-  
+  public int lp;
+
+
   /** Character start position. */
   private int s;
   /** Number of tokens. */
@@ -105,8 +104,8 @@ public final class Tokenizer implements IndexToken {
     }
   }
 
-  public Type type() {
-    return Type.FTX;
+  public IndexType type() {
+    return IndexType.FTX;
   }
 
   /**
@@ -153,7 +152,7 @@ public final class Tokenizer implements IndexToken {
     pos = -1;
     p = 0;
   }
-  
+
   /**
    * Checks if more tokens are to be returned.
    * @return result of check
@@ -221,7 +220,7 @@ public final class Tokenizer implements IndexToken {
   public byte[] get() {
     return get(orig());
   }
-  
+
   /**
    * Returns a normalized version of the specified token.
    * @param tok input token
@@ -236,7 +235,7 @@ public final class Tokenizer implements IndexToken {
     if(st) n = sd == null ? stem.stem(n) : sd.stem(n);
     return n;
   }
-  
+
   /**
    * Returns the original token.
    * @return original token
@@ -280,11 +279,11 @@ public final class Tokenizer implements IndexToken {
       }
       sc = true;
     }
-    
+
     // special chars found
     if(lp < p) return true;
     pos++;
-    
+
     // end of text...
     s = p;
     if(p == l) return false;
@@ -295,7 +294,7 @@ public final class Tokenizer implements IndexToken {
       if(!ftChar(c)) {
         s = p - cl(text[p]);
         break;
-      }      
+      }
     }
     return true;
   }
@@ -307,17 +306,17 @@ public final class Tokenizer implements IndexToken {
   public boolean isSC() {
     return sc;
   }
-  
+
   /**
    * Get next token.
    * @return next token
    */
   public byte[] nextSC() {
-    return (lp < p) ? Arrays.copyOfRange(text, lp, p) 
+    return (lp < p) ? Arrays.copyOfRange(text, lp, p)
         : Arrays.copyOfRange(text, p, s);
-  }  
-  
-  
+  }
+
+
   /**
    * Calculates a position value, dependent on the specified unit.
    * Once calculated values are cached.

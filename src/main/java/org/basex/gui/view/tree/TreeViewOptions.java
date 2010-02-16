@@ -2,7 +2,7 @@ package org.basex.gui.view.tree;
 
 /**
  * This interface contains options for the tree view.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */

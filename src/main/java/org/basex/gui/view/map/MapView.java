@@ -385,7 +385,7 @@ public final class MapView extends View implements Runnable {
         if(tt.length() > 32) tt = tt.substring(0, 30) + DOTS;
         BaseXLayout.drawTooltip(g, tt, x, y, getWidth(), f.level + 5);
       }
- 
+
       if(f.thumb) {
         // draw tooltip for thumbnail
         f.x += 3;

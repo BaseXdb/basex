@@ -98,7 +98,7 @@ public final class GUIConstants {
   public static final String[] MENUBAR = {
       Text.MENUFILE, Text.MENUEDIT, Text.MENUVIEW, Text.MENUOPTIONS,
       Text.MENUDEEPFS, Text.MENUHELP };
-  
+
   /** Separator. */
   static final String SEPARATOR = "-";
 

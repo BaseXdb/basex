@@ -218,7 +218,7 @@ final class MapFS extends MapPainter {
             rect.y, rect.w - off - 3, fsz);
 
         final long size = toLong(fs.size(pre));
-        
+
         String type = "";
         String format = "";
         final int nodeSize = data.size(pre, Data.ELEM) + pre;
@@ -236,9 +236,9 @@ final class MapFS extends MapPainter {
         }
         if(type.isEmpty()) type = FileType.UNKNOWN_TYPE.toString();
         if(format.isEmpty()) format = MimeType.UNKNOWN.toString();
-        
+
         final String info = type + " (" + format + ")" + ", "
-            + Performance.format(size, true); 
+            + Performance.format(size, true);
 
         rect.w -= 10;
         final int sw = BaseXLayout.width(g, info);
@@ -298,7 +298,7 @@ final class MapFS extends MapPainter {
     }
     return EMPTY;
   }
-  
+
   @Override
   boolean mouse(final MapRect r, final int mx, final int my,
       final boolean click) {

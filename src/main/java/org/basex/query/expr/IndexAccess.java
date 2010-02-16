@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.index.IndexIterator;
 import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
@@ -25,7 +25,7 @@ public final class IndexAccess extends Single {
   /** Index context. */
   final IndexContext ictx;
   /** Access type. */
-  final Type type;
+  final IndexType type;
 
   /**
    * Constructor.
@@ -33,7 +33,7 @@ public final class IndexAccess extends Single {
    * @param t access type
    * @param ic index context
    */
-  public IndexAccess(final Expr e, final Type t, final IndexContext ic) {
+  public IndexAccess(final Expr e, final IndexType t, final IndexContext ic) {
     super(e);
     type = t;
     ictx = ic;

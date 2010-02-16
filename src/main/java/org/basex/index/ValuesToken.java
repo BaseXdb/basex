@@ -1,6 +1,6 @@
 package org.basex.index;
 
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.util.Token;
 
 /**
@@ -13,19 +13,19 @@ public final class ValuesToken implements IndexToken {
   /** Text. */
   private byte[] text = Token.EMPTY;
   /** Index type. */
-  private final Type type;
+  private final IndexType type;
 
   /**
    * Constructor.
    * @param t index type
    * @param tok token
    */
-  public ValuesToken(final Type t, final byte[] tok) {
+  public ValuesToken(final IndexType t, final byte[] tok) {
     type = t;
     text = tok;
   }
 
-  public Type type() {
+  public IndexType type() {
     return type;
   }
 

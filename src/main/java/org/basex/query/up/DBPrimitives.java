@@ -137,7 +137,7 @@ final class DBPrimitives extends Primitives {
     }
     if(check) mergeTexts(par, first);
     d.flush();
-    
+
     if(d.meta.prop.is(Prop.WRITEBACK)) {
       try {
         Export.export(ctx.context, d);

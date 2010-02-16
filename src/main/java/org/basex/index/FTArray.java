@@ -54,7 +54,7 @@ final class FTArray {
   }
 
   /**
-   * Bulk loader: Inserts a token into the trie, but the tokens have to be 
+   * Bulk loader: Inserts a token into the trie, but the tokens have to be
    * sorted first!!
    * @param v value, which is to be inserted
    * @param s size of the data the node will have

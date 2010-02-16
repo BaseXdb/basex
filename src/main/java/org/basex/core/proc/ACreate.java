@@ -11,7 +11,7 @@ import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.index.FTBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.PathBuilder;
@@ -80,9 +80,9 @@ abstract class ACreate extends Proc {
    * @throws IOException I/O exception
    */
   protected void index(final Data data) throws IOException {
-    if(data.meta.txtindex) index(Type.TXT, data);
-    if(data.meta.atvindex) index(Type.ATV, data);
-    if(data.meta.ftxindex) index(Type.FTX, data);
+    if(data.meta.txtindex) index(IndexType.TXT, data);
+    if(data.meta.atvindex) index(IndexType.ATV, data);
+    if(data.meta.ftxindex) index(IndexType.FTX, data);
   }
 
   /**
@@ -91,7 +91,7 @@ abstract class ACreate extends Proc {
    * @param d data reference
    * @throws IOException I/O exception
    */
-  protected void index(final Type i, final Data d) throws IOException {
+  protected void index(final IndexType i, final Data d) throws IOException {
     if(d instanceof MemData) return;
     IndexBuilder b = null;
     switch(i) {

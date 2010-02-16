@@ -6,7 +6,8 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
-import org.basex.data.Data.Type;
+import org.basex.data.Data;
+import org.basex.data.Data.IndexType;
 import org.basex.io.PrintOutput;
 
 /**
@@ -55,30 +56,32 @@ public final class InfoIndex extends AInfo {
    */
   private boolean info(final CmdIndexInfo idx, final PrintOutput out)
       throws IOException {
+    
+    final Data data = context.data;
     switch(idx) {
       case TAG:
         out.println(INFOTAGS);
-        out.println(context.data.info(Type.TAG));
+        out.println(data.info(IndexType.TAG));
         return true;
       case ATTNAME:
         out.println(INFOATTS);
-        out.println(context.data.info(Type.ATN));
+        out.println(data.info(IndexType.ATN));
         return true;
       case TEXT:
         out.println(INFOTEXTINDEX);
-        if(context.data.meta.txtindex) out.println(context.data.info(Type.TXT));
+        if(data.meta.txtindex) out.println(data.info(IndexType.TXT));
         return true;
       case ATTRIBUTE:
         out.println(INFOATTRINDEX);
-        if(context.data.meta.atvindex) out.println(context.data.info(Type.ATV));
+        if(data.meta.atvindex) out.println(data.info(IndexType.ATV));
         return true;
       case FULLTEXT:
         out.println(INFOFTINDEX);
-        if(context.data.meta.ftxindex) out.println(context.data.info(Type.FTX));
+        if(data.meta.ftxindex) out.println(data.info(IndexType.FTX));
         return true;
       case PATH:
         out.println(INFOPATHINDEX);
-        if(context.data.meta.pthindex) out.println(context.data.info(Type.PTH));
+        if(data.meta.pthindex) out.println(data.info(IndexType.PTH));
         return true;
       default:
         return false;

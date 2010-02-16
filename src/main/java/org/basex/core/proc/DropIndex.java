@@ -9,7 +9,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
@@ -37,13 +37,13 @@ public final class DropIndex extends ACreate {
     switch(getOption(CmdIndex.class)) {
       case TEXT:
         data.meta.txtindex = false;
-        return drop(Type.TXT, DATATXT);
+        return drop(IndexType.TXT, DATATXT);
       case ATTRIBUTE:
         data.meta.atvindex = false;
-        return drop(Type.ATV, DATAATV);
+        return drop(IndexType.ATV, DATAATV);
       case FULLTEXT:
         data.meta.ftxindex = false;
-        return drop(Type.FTX, DATAFTX);
+        return drop(IndexType.FTX, DATAFTX);
       case PATH:
         if(data.meta.pthindex) {
           data.meta.pthindex = false;
@@ -62,7 +62,7 @@ public final class DropIndex extends ACreate {
    * @param pat pattern
    * @return success of operation
    */
-  private boolean drop(final Type index, final String pat) {
+  private boolean drop(final IndexType index, final String pat) {
     try {
       final Data data = context.data;
       data.flush();

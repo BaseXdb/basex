@@ -17,7 +17,7 @@ import org.basex.data.Data;
 import org.basex.data.DiskData;
 import org.basex.data.MetaData;
 import org.basex.data.XMLSerializer;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.layout.BaseXBack;
@@ -132,7 +132,7 @@ public final class DialogInfo extends Dialog {
     }
 
     panels[0].add(north, BorderLayout.NORTH);
-    panels[0].add(text(val[0] ? data.info(Type.PTH) :
+    panels[0].add(text(val[0] ? data.info(IndexType.PTH) :
       Token.token(PATHINDEXINFO)), BorderLayout.CENTER);
     tab3.add(panels[0]);
 
@@ -142,12 +142,12 @@ public final class DialogInfo extends Dialog {
     tab4.setBorder(8, 8, 8, 8);
 
     panels[1].add(indexes[1], BorderLayout.NORTH);
-    panels[1].add(text(val[1] ? data.info(Type.TXT) :
+    panels[1].add(text(val[1] ? data.info(IndexType.TXT) :
       Token.token(TXTINDEXINFO)), BorderLayout.CENTER);
     tab4.add(panels[1]);
 
     panels[2].add(indexes[2], BorderLayout.NORTH);
-    panels[2].add(text(val[2] ? data.info(Type.ATV) :
+    panels[2].add(text(val[2] ? data.info(IndexType.ATV) :
       Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
     tab4.add(panels[2]);
 
@@ -158,7 +158,7 @@ public final class DialogInfo extends Dialog {
 
     panels[3].add(indexes[3], BorderLayout.NORTH);
     if(!val[3]) ft = new DialogFT(this, false);
-    panels[3].add(val[3] ? text(data.info(Type.FTX)) : ft,
+    panels[3].add(val[3] ? text(data.info(IndexType.FTX)) : ft,
         BorderLayout.CENTER);
     tab5.add(panels[3]);
 
@@ -193,7 +193,7 @@ public final class DialogInfo extends Dialog {
     String lbl = tag ? INFOTAGS : INFOATTS;
     if(!data.meta.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
-    final Type index = tag ? Type.TAG : Type.ATN;
+    final IndexType index = tag ? IndexType.TAG : IndexType.ATN;
     p.add(text(data.info(index)), BorderLayout.CENTER);
     return p;
   }

@@ -75,7 +75,7 @@ public abstract class Data {
   public static final byte PI = 0x05;
 
   /** Index types. */
-  public enum Type {
+  public enum IndexType {
     /** Attribute index. */ ATN,
     /** Tag index.       */ TAG,
     /** Text index.      */ TXT,
@@ -147,14 +147,14 @@ public abstract class Data {
    * @param index index to be closed
    * @throws IOException I/O exception
    */
-  public abstract void closeIndex(Type index) throws IOException;
+  public abstract void closeIndex(IndexType index) throws IOException;
 
   /**
    * Assigns the specified index.
    * @param type index to be opened
    * @param ind index instance
    */
-  public abstract void setIndex(Type type, Index ind);
+  public abstract void setIndex(IndexType type, Index ind);
 
   /**
    * Returns the indexed id references for the specified token.
@@ -202,7 +202,7 @@ public abstract class Data {
    * @param type index type
    * @return info
    */
-  public final byte[] info(final Type type) {
+  public final byte[] info(final IndexType type) {
     switch(type) {
       case TAG: return tags.info();
       case ATN: return atts.info();

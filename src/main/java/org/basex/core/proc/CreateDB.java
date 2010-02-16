@@ -17,7 +17,7 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.index.FTBuilder;
 import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
@@ -100,11 +100,11 @@ public final class CreateDB extends ACreate {
     final Builder builder = new DiskBuilder(p);
     try {
       final Data data = builder.build(db);
-      if(data.meta.txtindex) data.setIndex(Type.TXT,
+      if(data.meta.txtindex) data.setIndex(IndexType.TXT,
         new ValueBuilder(data, true).build());
-      if(data.meta.atvindex) data.setIndex(Type.ATV,
+      if(data.meta.atvindex) data.setIndex(IndexType.ATV,
         new ValueBuilder(data, false).build());
-      if(data.meta.ftxindex) data.setIndex(Type.FTX,
+      if(data.meta.ftxindex) data.setIndex(IndexType.FTX,
         FTBuilder.get(data, data.meta.wildcards).build());
       data.close();
     } catch(final IOException ex) {

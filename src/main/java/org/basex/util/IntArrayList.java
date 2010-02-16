@@ -24,7 +24,7 @@ public final class IntArrayList implements Iterable<int[]> {
   public IntArrayList() {
     this(8);
   }
-  
+
   /**
    * Constructor.
    * @param is initial size of the list
@@ -32,7 +32,7 @@ public final class IntArrayList implements Iterable<int[]> {
   public IntArrayList(final int is) {
     list = new int[is][];
   }
-  
+
   /**
    * Constructor.
    * @param f resize factor

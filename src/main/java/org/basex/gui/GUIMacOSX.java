@@ -9,7 +9,7 @@ import org.basex.gui.layout.BaseXLayout;
 
 /**
  * Sets some Mac OS X specific interface options.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Bastian Lemke
  */
@@ -32,7 +32,7 @@ public class GUIMacOSX {
   private static final String P_SCREEN_MENU_BAR =
     "apple.laf.useScreenMenuBar";
 
-  /** Empty class array. */ 
+  /** Empty class array. */
   private static final Class<?>[] EC = new Class[0];
   /** Empty object array. */
   private static final Object[] EO = new Object[0];
@@ -46,14 +46,14 @@ public class GUIMacOSX {
   /** Reference to the loaded 'ApplicationEvent' class. */
   final Class<?> appEvent;
 
-  /** 
-   * Constructor. 
+  /**
+   * Constructor.
    * @throws Exception if any error occurs.
    */
   public GUIMacOSX() throws Exception {
     // Name for the dock icon and the application menu
     System.setProperty(P_ABOUT_NAME, NAME);
-    // Show menu in the screen menu instead of inside the application window 
+    // Show menu in the screen menu instead of inside the application window
     System.setProperty(P_SCREEN_MENU_BAR, "true");
 
     // load native java classes ...
@@ -131,7 +131,7 @@ public class GUIMacOSX {
       GUIMacOSX.invoke(obj, "setHandled", true);
       return null;
     }
-    
+
     /** Called when the user selects the About item in the application menu. */
     public void handleAbout() {
       GUICommands.ABOUT.execute(main);
@@ -177,7 +177,7 @@ public class GUIMacOSX {
       main.setVisible(true);
     }
   }
-  
+
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
   // ---------------------------------------------------------------------------
@@ -218,7 +218,7 @@ public class GUIMacOSX {
       final Object argObject) throws Exception {
     return invoke(appObj, method, argClass, argObject);
   }
-  
+
   /**
    * Invokes a method without arguments on the given object.
    * @param obj object on which the method should be invoked.

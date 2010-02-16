@@ -8,7 +8,7 @@ import org.basex.build.xml.XMLInput;
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.io.IO;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -207,11 +207,11 @@ public final class FNBaseX extends Fun {
     }
     if(type.equals(TEXT)) {
       if(!data.meta.txtindex) Err.or(NOIDX, TEXT);
-      return new IndexAccess(expr[0], Type.TXT, ic).iter(ctx);
+      return new IndexAccess(expr[0], IndexType.TXT, ic).iter(ctx);
     }
     if(type.equals(ATTRIBUTE)) {
       if(!data.meta.atvindex) Err.or(NOIDX, ATTRIBUTE);
-      return new IndexAccess(expr[0], Type.ATV, ic).iter(ctx);
+      return new IndexAccess(expr[0], IndexType.ATV, ic).iter(ctx);
     }
 
     Err.or(WHICHIDX, type);

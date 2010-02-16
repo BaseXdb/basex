@@ -10,7 +10,7 @@ import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.io.PrintOutput;
 
 /**
@@ -34,15 +34,15 @@ public final class CreateIndex extends ACreate {
     if(data instanceof MemData) return error(PROCMM);
 
     try {
-      Type index = null;
+      IndexType index = null;
       switch(getOption(CmdIndex.class)) {
         case TEXT:
           data.meta.txtindex = true;
-          index = Type.TXT;
+          index = IndexType.TXT;
           break;
         case ATTRIBUTE:
           data.meta.atvindex = true;
-          index = Type.ATV;
+          index = IndexType.ATV;
           break;
         case FULLTEXT:
           data.meta.ftxindex = true;
@@ -51,10 +51,10 @@ public final class CreateIndex extends ACreate {
           data.meta.casesens = prop.is(Prop.CASESENS);
           data.meta.diacritics = prop.is(Prop.DIACRITICS);
           data.meta.scoring = prop.num(Prop.SCORING);
-          index = Type.FTX;
+          index = IndexType.FTX;
           break;
         case PATH:
-          index = Type.PTH;
+          index = IndexType.PTH;
           break;
         default:
           return false;

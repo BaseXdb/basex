@@ -21,7 +21,7 @@ public final class FTSortedList {
   private int size;
   /** Pointer on full-text data. */
   long p;
-  
+
   /**
    * Constructor, initializing the index structure.
    * @param d data reference
@@ -60,7 +60,7 @@ public final class FTSortedList {
     final byte tl = a.read1();
     if (tl == 0) return EMPTY;
     final long pos = a.pos();
-    final byte[] tok = a.readBytes(pos, pos + tl);    
+    final byte[] tok = a.readBytes(pos, pos + tl);
     size = a.read4();
     p = a.read5();
     return tok;

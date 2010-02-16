@@ -43,8 +43,8 @@ public abstract class NodeCopy extends UpdatePrimitive {
     }
     // Text nodes still need to be merged. Two adjacent iterators in c may
     // lead to two adjacent text nodes.
-    
-    md = node instanceof DBNode ? 
+
+    md = node instanceof DBNode ?
         buildDB(mergeText(seq), new MemData(((DBNode) node).data)) : null;
   }
 

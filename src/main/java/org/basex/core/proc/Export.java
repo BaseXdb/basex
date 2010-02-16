@@ -50,7 +50,7 @@ public final class Export extends Proc {
       return error(ex.getMessage());
     }
   }
-  
+
   /**
    * Exports the specified database.
    * @param context context
@@ -61,7 +61,7 @@ public final class Export extends Proc {
       throws IOException {
     export(context.prop, data, data.meta.file.path(), null);
   }
-  
+
   /**
    * Exports the current database to the specified path and file.
    * @param prop property

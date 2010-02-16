@@ -22,25 +22,25 @@ import org.basex.util.TokenList;
  * This class builds an index for text contents in a compressed trie.
  *  - (1) the tokens are collected in main memory (hash map)
  *  - (2) if main memory is full, the data is written as sorted list to disk(1)
- *  - (3) merge disk data trough reading sorted lists 
+ *  - (3) merge disk data trough reading sorted lists
  *  - (4) write sorted list (merged) to disk
- *  - (5) create final trie structure out of it (4) with the following final 
+ *  - (5) create final trie structure out of it (4) with the following final
  *        format:
- * 
+ *
  * The data is stored on disk with the following format:
- * 
+ *
  * data.meta.file(DATAFTX + 'b'): stores the full text data; the pre values
  *  are ordered but not distinct
  *  [pre1, pos1, pre2, pos2, pre3, pos3, ...] as Nums
- *  
+ *
  * data.meta.file(DATAFTX + 't'): stores the trie structure, each node has
  *  the following format:
- *  [l, t1, ..., tl, n1, v1, ..., nu, vu, s, p] 
+ *  [l, t1, ..., tl, n1, v1, ..., nu, vu, s, p]
  *    l = length of the token t1, ..., tl [byte]
- *    u = number of next nodes n1, ..., nu 
+ *    u = number of next nodes n1, ..., nu
  *    v1= the first byte of each token n1 points, ... [byte]
  *    s = size of pre values [int] saved at pointer p [long]
- * 
+ *
  * data.meta.file(DATAFTX + 'c'): stores the size of each trie node
  *  [size0, size1, size2, ..., sizeN]
  *  size is an int value
@@ -106,7 +106,7 @@ public final class FTTrieBuilder extends FTBuilder {
     }
 
     // the temporarily stored data has to be merged
-    // first merge all sorted list to one sorted list 
+    // first merge all sorted list to one sorted list
     // write full text data to disk
     // create trie index structure
     writeSortedList(csize++);

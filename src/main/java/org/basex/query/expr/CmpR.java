@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.data.MemData;
 import org.basex.data.StatsKey;
+import org.basex.data.Data.IndexType;
 import org.basex.index.RangeToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -152,7 +153,7 @@ public final class CmpR extends Single {
     final AxisPath path = orig.invertPath(root, ic.step);
 
     ic.ctx.compInfo(OPTRNGINDEX);
-    if(rt.type() == org.basex.data.Data.Type.ATV) {
+    if(rt.type() == IndexType.ATV) {
       // add attribute step
       final Step step = orig.step[0];
       Step[] steps = { Step.get(Axis.SELF, step.test) };

@@ -321,7 +321,7 @@ public final class DialogServer extends Dialog {
         final String path = IOFile.file(getClass().getProtectionDomain().
             getCodeSource().getLocation().toString());
         final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
-        final String clazz = org.basex.BaseXServer.class.getName();
+        final String clazz = BaseXServer.class.getName();
         new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
             "-p", String.valueOf(p)}).start();
 

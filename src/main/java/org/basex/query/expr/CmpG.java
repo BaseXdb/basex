@@ -4,7 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -16,6 +16,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.path.Axis;
@@ -237,11 +238,10 @@ public final class CmpG extends Arr {
     if(s == null || cmp != Comp.EQ || !(expr[1].i() ||
         expr[1] instanceof Seq)) return false;
 
-    final boolean text = ic.data.meta.txtindex &&
-      s.test.type == org.basex.query.item.Type.TXT;
+    final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
       s.simple(Axis.ATTR, true);
-
+    
     // no text or attribute index applicable
     if(!text && !attr) return false;
 
@@ -254,7 +254,7 @@ public final class CmpG extends Arr {
       final boolean str = it instanceof Str;
       if(!str || it.str().length > Token.MAXLEN) return false;
 
-      final Type type = text ? Type.TXT : Type.ATV;
+      final IndexType type = text ? IndexType.TXT : IndexType.ATV;
       ic.is += ic.data.nrIDs(new ValuesToken(type, it.str()));
       iacc = Array.add(iacc, new IndexAccess(it, type, ic));
     }
@@ -269,7 +269,7 @@ public final class CmpG extends Arr {
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
 
-    if(iacc[0].type == Type.TXT) {
+    if(iacc[0].type == IndexType.TXT) {
       ic.ctx.compInfo(OPTTXTINDEX);
     } else {
       ic.ctx.compInfo(OPTATVINDEX);

@@ -1,6 +1,6 @@
 package org.basex.index;
 
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 
 /**
  * This class defines access to index tokens.
@@ -13,7 +13,7 @@ public interface IndexToken {
    * Returns the index type.
    * @return type
    */
-  Type type();
+  IndexType type();
 
   /**
    * Returns the current token.

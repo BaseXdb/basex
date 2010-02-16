@@ -211,7 +211,7 @@ public abstract class FTBuilder extends IndexBuilder {
     for(final byte[] b : tok) if(b.length > 0) return true;
     return false;
   }
-  
+
   /**
    * Indexes a single token.
    * @param tok token to be indexed

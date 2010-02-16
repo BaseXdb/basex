@@ -768,7 +768,7 @@ public enum GUICommands implements GUICommand {
       select(b, gui.prop.is(GUIProp.SHOWHELP));
     }
   },
-  
+
   /** Opens the community webpage. */
   SHOWCOMMUNITY(GUISHOWCOMMUNITY, null, GUISHOWCOMMUNITYTT, false, false) {
     @Override

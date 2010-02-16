@@ -1,6 +1,6 @@
 package org.basex.index;
 
-import org.basex.data.Data.Type;
+import org.basex.data.Data.IndexType;
 import org.basex.util.Token;
 
 /**
@@ -11,7 +11,7 @@ import org.basex.util.Token;
  */
 public final class RangeToken implements IndexToken {
   /** Index type. */
-  private final Type type;
+  private final IndexType type;
   /** Minimum value. */
   public double min;
   /** Maximum value. */
@@ -24,12 +24,12 @@ public final class RangeToken implements IndexToken {
    * @param mx maximum value
    */
   public RangeToken(final boolean t, final double mn, final double mx) {
-    type = t ? Type.TXT : Type.ATV;
+    type = t ? IndexType.TXT : IndexType.ATV;
     min = mn;
     max = mx;
   }
 
-  public Type type() {
+  public IndexType type() {
     return type;
   }
 

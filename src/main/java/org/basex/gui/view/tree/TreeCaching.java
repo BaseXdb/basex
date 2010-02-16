@@ -10,7 +10,7 @@ import org.basex.util.IntList;
 
 /**
  * This class determines nodes per level and caches them.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -127,7 +127,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param sw screen width
    * @return tree distance
    */
-  double generateBordersAndRects(final Graphics g, 
+  double generateBordersAndRects(final Graphics g,
       final Context c, final int sw) {
     final Data d = c.current.data;
     final int[] roots = c.current.nodes;
@@ -245,7 +245,7 @@ public class TreeCaching implements TreeViewOptions {
 
  // new array, to be filled with the rectangles of the current level
     rects[rn][lv] = new TreeRect[bo.size];
-    
+
     double xx = rn * w * bo.size;
     double ww = w;
 
@@ -470,7 +470,7 @@ public class TreeCaching implements TreeViewOptions {
   byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data;
     if(pre == c.current.nodes[rn]) return ViewData.path(d, pre);
-    if(d.fs != null && d.kind(pre) != Data.TEXT || 
+    if(d.fs != null && d.kind(pre) != Data.TEXT ||
         d.kind(pre) == Data.ELEM) return ViewData.tag(
         prop, d, pre);
     return ViewData.content(d, pre, false);
