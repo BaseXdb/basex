@@ -1029,10 +1029,11 @@ public final class ExifParser {
    * @throws IOException if any error occurs while reading from the channel
    */
   boolean check(final DeepFile df) throws IOException {
-    final BufferedFileChannel f = df.getBufferedFileChannel();
+    deepFile = df;
+    bfc = df.getBufferedFileChannel();
     try { bfc.buffer(8); } catch(final EOFException e) { return false; }
-    if(checkEndianness(f) && f.getShort() == 0x2A) return true;
-    f.setByteOrder(ByteOrder.BIG_ENDIAN);
+    if(checkEndianness(bfc) && bfc.getShort() == 0x2A) return true;
+    bfc.setByteOrder(ByteOrder.BIG_ENDIAN);
     return false;
   }
 
@@ -1044,9 +1045,6 @@ public final class ExifParser {
   public void extract(final DeepFile df)
       throws IOException {
     if(!check(df)) return;
-
-    deepFile = df;
-    bfc = df.getBufferedFileChannel();
 
     final int ifdOffset = bfc.getInt();
     /*
