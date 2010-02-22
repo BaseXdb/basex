@@ -1,8 +1,10 @@
 <?php
 include("ClientSession.php");
-if (connect("localhost", 1920) == True) {
-	//execute("SET INFO ON");
-	echo execute("help");
-	//execute("exit");
-};
+try {
+	connect("localhost", 1920, "admin", "admin");	
+} catch (Exception $e) {
+	echo $e->getMessage();
+}
+execute("help");
+closeSocket();
 ?>

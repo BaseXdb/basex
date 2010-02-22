@@ -1,68 +1,63 @@
 <?php
 
+// Initializes the ClientSession.
 function connect($host, $port, $user, $pw) {
 	global $socket;
 	$socket = socket_create(AF_INET, SOCK_STREAM, 0);
 	$result = socket_connect($socket, $host, $port); 
-    if (!$socket) {
-     	echo "Can't communicate with the server.";
+    if (!$result) {
+     	throw new Exception("Can't communicate with the server.");
     }
     else {
-    return login($user, $pw);
-    }
-}
-
-function execute($com) {
-    sendCommand($com);
-    return receive();
-}
-
-function login($user, $pw) {
-    $ts = readInput();
+    // receive timestamp
+   	$ts = readString();
     $pw = hash("md5", $pw);
     $all = $pw.$ts;
     $end = hash("md5", $all);
-    sendCommand($user);
-    sendCommand($end);
-    $data = read1byte();
-    return $data == "\x00";
-}
-
-function sendCommand($com) {
-	global $socket;
-    socket_write($socket, $com);
+    
+    // send username and hashed password/timestamp
+    socket_write($socket, $user);
     socket_write($socket, "\x00");
+    socket_write($socket, $all);
+    socket_write($socket, "\x00");
+    
+    // receives success flag
+    if (socket_read($socket, 1) != "\x00") {
+    	throw new Exception("Access denied.");
+    }	
+  }
 }
 
-function read1byte() {
+// Executes a command.
+function execute($com) {
 	global $socket;
-	return socket_read($socket, 1);
+	global $info;
+	socket_write($socket, $com);
+    socket_write($socket, "\x00");
+    $output = readString();
+    $info = readString();
+    return socket_read($socket, 1);
 }
 
-function readInput() {
-    $com = "";
-    while (($data = read1byte()) != "\x00") {
-    $com = $com.$data;
-    }
-    return $com;
+// Returns the info string.
+function info() {
+	global $info;
+	return $info;
 }
 
-function receive() {
-	$part1 = readInput();
-    $part2 = readInput();
-    $part3 = read1byte();
-    $recv = "";
-    if ($part1 != "\x00") {
-       $recv = $part1.$part2;
-    }
-    else {
-    $recv = $part2;
-    }
-    return $recv;
-}
-
+// Closes the socket.
 function closeSocket() {
 	global $socket;
     socket_close($socket);
+}
+
+// Reads string from the input.
+function readString() {
+	global $socket;
+    $com = "";
+    while (($data = socket_read($socket, 1)) != "\x00") {
+    $com = $com.$data;
+    }
+    return $com;
 }
 ?>
