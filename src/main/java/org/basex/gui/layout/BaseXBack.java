@@ -8,6 +8,8 @@ import java.awt.Toolkit;
 import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import org.basex.core.Main;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
 
@@ -21,6 +23,8 @@ public class BaseXBack extends JPanel {
   /** Desktop hints. */
   private static final Map<?, ?> HINTS = (Map<?, ?>)
     (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
+  /** Flag for adding rendering hints. */
+  private static boolean hints = true;
   /** Fill mode. */
   private Fill mode;
 
@@ -59,7 +63,16 @@ public class BaseXBack extends JPanel {
     } else {
       super.paintComponent(g);
     }
-    ((Graphics2D) g).addRenderingHints(HINTS);
+
+    // rendering hints are not supported by all platforms...
+    if(hints) {
+      try {
+        ((Graphics2D) g).addRenderingHints(HINTS);
+      } catch(final Exception ex) {
+        Main.debug(ex);
+        hints = false;
+      }
+    }
   }
 
   /**

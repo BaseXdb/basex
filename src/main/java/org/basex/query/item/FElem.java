@@ -236,16 +236,16 @@ public final class FElem extends FNode {
   }
 
   @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.emptyElement(this, NAM, name.str());
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
     sb.append(string(name.str()));
     if(atts.size() != 0 || ns.size != 0 || children.size() != 0)
       sb.append(" ...");
     return sb.append("/>").toString();
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.str());
   }
 }
