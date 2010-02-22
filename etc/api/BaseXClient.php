@@ -5,6 +5,6 @@ try {
 } catch (Exception $e) {
 	echo $e->getMessage();
 }
-execute("help");
+execute("help", "php://stdout");
 closeSocket();
 ?>

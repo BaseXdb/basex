@@ -29,12 +29,13 @@ function connect($host, $port, $user, $pw) {
 }
 
 // Executes a command.
-function execute($com) {
+function execute($com, $stream) {
 	global $socket;
 	global $info;
 	socket_write($socket, $com);
     socket_write($socket, "\x00");
-    $output = readString();
+    fopen($stream, 'w');
+    fwrite($stream, readString());
     $info = readString();
     return socket_read($socket, 1);
 }
