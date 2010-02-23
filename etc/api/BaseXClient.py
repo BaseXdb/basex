@@ -30,10 +30,11 @@ class BaseXClient(object):
     
     # Reads commands from the console.    
     def readCommand(self):
-        com = raw_input('> ')
-        if com == "":
-            self.readCommand()
-        return com.strip()
+        com = ""
+        while com == "":
+            com = raw_input('\n> ')
+            com = str(com).strip()
+        return com
     
     # Runs the console.
     def console(self):

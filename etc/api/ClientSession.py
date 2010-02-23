@@ -33,7 +33,13 @@ class ClientSession(object):
             print "Can't communicate with the server."
         
         # receive timestamp
-        ts = self.readString()
+        ts = ""
+        while True:
+            data = s.recv(1)
+            if(data != "\0"):
+                ts += data
+            else:
+                break
         pwmd5 = hashlib.md5(pw).hexdigest()
         m = hashlib.md5()
         m.update(pwmd5)
@@ -41,9 +47,9 @@ class ClientSession(object):
         complete = m.hexdigest()
         
         # send user name and hashed password/timestamp
-        s.send(str.encode(user))
+        s.send(user)
         s.send("\0")
-        s.send(str.encode(complete))
+        s.send(complete)
         s.send("\0")
         
         # receives success flag
@@ -52,27 +58,21 @@ class ClientSession(object):
     
     # Executes a command.
     def execute(self,com,out):
-        s.send(str.encode(com))
+        s.send(com)
         s.send("\0")
-        out.write(self.readString())
-        self.info = self.readString()
+        count = 0
+        while True:
+            data = s.recv(1)
+            if(data != "\0"):
+                out.write(data)
+            else:
+                if count != 0:
+                    break
+                else:
+                    count += 1
         return s.recv(1)
-               
-    # Returns the info string.
-    def info(self):
-        return self.info
     
     # Closes the socket.
     def close(self):
-        s.send(str.encode("exit"))
+        s.send("exit")
         s.close()
-     
-    # Reads strings from the input.    
-    def readString(self):
-        com = ""
-        while True:
-            data = s.recv(1)
-            if(data == "\0"):
-                return com
-            else:
-                com += data
