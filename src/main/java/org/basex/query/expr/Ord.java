@@ -13,6 +13,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
+import static org.basex.util.Token.token;
 
 /**
  * Single order specifier.
@@ -106,7 +107,13 @@ public final class Ord extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
+    ser.openElement(ORDER_BY);
+    ser.attribute(DIR, token(desc ? DESCENDING : ASCENDING));
+    ser.attribute(token(EMPTYORD),
+    token(lst ? LEAST : GREATEST));
+    ser.finished();
     expr.plan(ser);
+    ser.closeElement();
   }
 
   @Override
