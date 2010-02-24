@@ -30,4 +30,13 @@ public class TreeRect {
   public boolean contains(final int xx) {
     return xx >= x && xx <= x + w || xx >= x + w && xx <= x;
   }
+  /**
+   * Verifies if the specified coordinates are inside the rectangle.
+   * @param xx x position
+   * @param ww width
+   * @return result of comparison
+   */
+  public boolean contains(final int xx, final int ww) {
+    return xx <= x && xx + ww >= x || xx <= x + w && xx + ww >= x;
+  }
 }

@@ -134,7 +134,7 @@ public class TreeCaching implements TreeViewOptions {
     final int rl = roots.length;
     if(rl == 0) return -1;
     final TreeBorder[][] bo = new TreeBorder[rl][];
-    final double w = sw / (double) rl;
+    final double w = sw / (double) rl - 2 * LEFT_RIGHT_MARGIN;
     if(w == 0) return -1;
     rects = new TreeRect[rl][][];
 
@@ -228,7 +228,8 @@ public class TreeCaching implements TreeViewOptions {
    */
   private void bigRectangle(final int rn, final int lv, final double w) {
     rects[rn][lv] = new TreeRect[1];
-    rects[rn][lv][0] = new TreeRect((int) (w * rn), (int) w);
+    rects[rn][lv][0] = new TreeRect((int) 
+        (w * rn) + LEFT_RIGHT_MARGIN, (int) w);
   }
 
   /**
@@ -245,8 +246,8 @@ public class TreeCaching implements TreeViewOptions {
 
  // new array, to be filled with the rectangles of the current level
     rects[rn][lv] = new TreeRect[bo.size];
-
-    double xx = rn * w * bo.size;
+    
+    double xx = rn * w * bo.size + LEFT_RIGHT_MARGIN;
     double ww = w;
 
     for(int i = bo.start; i < bo.start + bo.size; i++) {
@@ -284,7 +285,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param ix index
    * @return TreeRect rectanlge
    */
-  TreeRect getTreeRectPerIndex(final int rn, final int lv, final int ix) {
+  TreeRect getTreeRectPerIndex(final int rn, final int lv, final int ix) {   
     return rects[rn][lv][ix];
   }
 
