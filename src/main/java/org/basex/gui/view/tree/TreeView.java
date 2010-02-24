@@ -662,7 +662,7 @@ public final class TreeView extends View implements TreeViewOptions {
           final int pre = cache.getPrePerIndex(rn, lvv, j);
           final int k = d.kind(pre);
           final int s = d.size(pre, k) - d.attSize(pre, k);
-          if(s > 0) highlightDescendants(g, rn, pre, r, lvv, -1,
+          if(s > 0) highlightDescendants(g, rn, pre, r, lvv, cen,
               t == DRAW_HIGHLIGHT || t == DRAW_DESCENDANTS ? DRAW_DESCENDANTS
                   : DRAW_CONN);
         }
