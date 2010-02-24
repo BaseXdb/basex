@@ -1,7 +1,10 @@
-# This example shows how database commands can be performed via the Python API.
+#
+# This example shows how database commands can be performed
+# via the Python BaseX API.
+#
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  
-import ClientSession, sys, time
+import BaseX, sys, time
 
 # initialize timer
 start = time.clock()
@@ -12,10 +15,12 @@ out = open('result.tmp', 'w')
 
 # command to be performed
 cmd = "xquery doc('11MB')//item"
-#cmd = "xquery 1";
+#cmd = "xquery 1+'a'";
 
-cs = ClientSession.ClientSession('localhost', 1984, 'admin', 'admin')
-cs.execute(cmd, out)
+cs = BaseX.Session('localhost', 1984, 'admin', 'admin')
+if not cs.execute(cmd, out):
+  print cs.info()
 cs.close()
 
+print
 print (time.clock() - start) * 1000, "ms"
