@@ -1,6 +1,15 @@
 #
-# [AW] Description for Session and Client class, incl. example(s)
-#
+# This Python Module provides two classes for connecting to the 
+# BaseX Server.
+# The Client-Class is a standard client which initiates the connection
+# to the server, listens to user input and shows the server output.
+# The Session-Class manages the communication between the server and the client.
+# This class has to be used for creating your own client (see Example.py).
+# The Constructor of the Session-Class needs a hostname, port, username and
+# password for the connection. The socket connection will then be established via
+# the hostname and the port.
+# For the execution of commands you need to specify an output stream to pass it
+# to the execution method.
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  
 import hashlib, socket, array, getopt, sys, getpass
@@ -12,7 +21,7 @@ class Session():
     global s
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, port))
-
+    
     # allocate 4kb buffer
     self.__buf = array.array('B', '\0' * 0x1000)
     self.__init()
