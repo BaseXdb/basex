@@ -1,9 +1,9 @@
 #
 # This example shows how database commands can be performed
 # via the Python BaseX API.
-# Here the outputstream is a file and the result of the query against
-# the '11MB' document will be saved into the file. After all the execution
-# time of the query will be printed.
+# The outputstream in this example is a file (result.tmp).
+# The result of the query against the '11MB' document will be saved into the file.
+# After all, the execution time of the query will be printed.
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  
 import BaseX, sys, time
