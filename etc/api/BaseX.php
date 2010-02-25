@@ -5,24 +5,28 @@ class Session {
 	function __construct($h, $p, $user, $pw) {
 		global $socket;
 		$socket = socket_create(AF_INET, SOCK_STREAM, 0);
-		socket_connect($socket, $h, $p);
-		
-		// receive timestamp
-		$ts = $this->readString();
-		$pw = hash("md5", $pw);
-    	$pwts = $pw.$ts;
-    	$complete = hash("md5", $pwts);
-    	
-    	// send username and hashed password/timestamp
-    	socket_write($socket, $user);
-    	socket_write($socket, "\x00");
-    	socket_write($socket, $complete);
-    	socket_write($socket, "\x00");
-    	
+		$result = socket_connect($socket, $h, $p); 
+    	if (!$result) {
+     		throw new Exception("Can't communicate with the server.");
+    	}
+    	else {
+    		// receive timestamp
+   			$ts = $this->readString();
+    		$pw = hash("md5", $pw);
+    		$all = $pw.$ts;
+    		$end = hash("md5", $all);
+    
+    		// send username and hashed password/timestamp
+    		socket_write($socket, $user);
+    		socket_write($socket, "\x00");
+    		socket_write($socket, $end);
+    		socket_write($socket, "\x00");
+    
     	// receives success flag
     	if (socket_read($socket, 1) != "\x00") {
     		throw new Exception("Access denied.");
-    	}		
+    	}	
+	  }		
 	}
 	
 	// Executes a command.
@@ -31,11 +35,10 @@ class Session {
 		global $info;
 		
 		socket_write($socket, $com);
-		socket_write($socket, "\x00");
+		socket_write("\x00", 1);
 		fwrite($out, $this->readString());
 		$info = $this->readString();
-		
-		return $this->read();
+		return socket_read($socket, 1);
 	}
 	
 	// Returns the info string.
@@ -44,15 +47,25 @@ class Session {
 		return $info;
 	}
 	
+	// Initiates the incoming message.
+	private function init() {
+		global $message;
+		global $pos;
+		$message = "";
+		$pos = 0;
+	}
+	
 	// Receives a string from the socket.
 	private function readString() {
-	}
-	
-	// Returns the next byte
-	private function read() {
 		global $socket;
+    	$com = "";
+    	while (($data = socket_read($socket, 1)) != "\x00") {
+    		$com = $com.$data;
+    	}
+    	return $com;
 	}
 	
+	// Closes the socket.
 	public function closeSocket() {
 		global $socket;
 		socket_close($socket);
@@ -76,7 +89,7 @@ class Client {
 		$username = "admin";
 		$password = "admin";
 		try {
-			new Session($host, $port, $username, $password);
+			$session = new Session($host, $port, $username, $password);
 		} catch (Exception $e) {
 			echo $e->getMessage();
 		}
@@ -84,9 +97,9 @@ class Client {
 }
 
 $host = "localhost";
-$port = 1984;
+$port = 1920;
 $client = new Client($host, $port);
-$client -> session();
+$client->session();
 ?>
 
 
