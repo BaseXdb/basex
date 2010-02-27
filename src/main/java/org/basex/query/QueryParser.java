@@ -38,7 +38,7 @@ import org.basex.query.expr.InterSect;
 import org.basex.query.expr.Let;
 import org.basex.query.expr.List;
 import org.basex.query.expr.Or;
-import org.basex.query.expr.Ord;
+import org.basex.query.expr.OrderBy;
 import org.basex.query.expr.Order;
 import org.basex.query.expr.Pred;
 import org.basex.query.expr.Range;
@@ -743,7 +743,7 @@ public class QueryParser extends InputParser {
       alter = GRPBY;
     }
 
-    Ord[] order = null;
+    OrderBy[] order = null;
     final boolean stable = consumeWS(STABLE);
     if(stable) check(EMPTYORDER);
 
@@ -751,7 +751,7 @@ public class QueryParser extends InputParser {
       check(BY);
       ap = qp;
       do order = orderSpec(order); while(consumeWS2(COMMA));
-      if(order != null) order = Array.add(order, new Ord());
+      if(order != null) order = Array.add(order, new OrderBy());
       alter = ORDERBY;
     }
 
@@ -827,7 +827,7 @@ public class QueryParser extends InputParser {
    * @return new order array
    * @throws QueryException query exception
    */
-  private Ord[] orderSpec(final Ord[] order) throws QueryException {
+  private OrderBy[] orderSpec(final OrderBy[] order) throws QueryException {
     final Expr e = check(single(), ORDERBY);
 
     boolean desc = false;
@@ -842,8 +842,8 @@ public class QueryParser extends InputParser {
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
     if(e.e()) return order;
-    final Ord ord = new Ord(e, desc, least);
-    return order == null ? new Ord[] { ord } : Array.add(order, ord);
+    final OrderBy ord = new OrderBy(e, desc, least);
+    return order == null ? new OrderBy[] { ord } : Array.add(order, ord);
   }
 
   /**

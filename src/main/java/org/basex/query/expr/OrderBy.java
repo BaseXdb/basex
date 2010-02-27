@@ -21,7 +21,7 @@ import static org.basex.util.Token.token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Ord extends Expr {
+public final class OrderBy extends Expr {
   /** Order expression. */
   private SeqIter seq;
   /** Order expression. */
@@ -34,7 +34,7 @@ public final class Ord extends Expr {
   /**
    * Empty constructor for stable sorting.
    */
-  public Ord() { }
+  public OrderBy() { }
 
   /**
    * Constructor.
@@ -42,7 +42,7 @@ public final class Ord extends Expr {
    * @param d descending order
    * @param l least empty order
    */
-  public Ord(final Expr e, final boolean d, final boolean l) {
+  public OrderBy(final Expr e, final boolean d, final boolean l) {
     seq = new SeqIter();
     expr = e;
     desc = d;
@@ -95,7 +95,7 @@ public final class Ord extends Expr {
   }
 
   @Override
-  public Ord remove(final Var v) {
+  public OrderBy remove(final Var v) {
     if(expr != null) expr = expr.remove(v);
     return this;
   }
@@ -107,11 +107,8 @@ public final class Ord extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(ORDER_BY);
-    ser.attribute(DIR, token(desc ? DESCENDING : ASCENDING));
-    ser.attribute(token(EMPTYORD),
-    token(lst ? LEAST : GREATEST));
-    ser.finished();
+    ser.openElement(this, DIR, token(desc ? DESCENDING : ASCENDING),
+        token(EMPTYORD), token(lst ? LEAST : GREATEST));
     expr.plan(ser);
     ser.closeElement();
   }

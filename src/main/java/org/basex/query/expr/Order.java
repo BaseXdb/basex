@@ -20,19 +20,19 @@ public final class Order extends Expr {
   /** Sequence to be sorted. */
   SeqIter sq;
   /** Sort list. */
-  Ord[] ord;
+  OrderBy[] ord;
 
  /**
    * Constructor.
    * @param e expressions
    */
-  public Order(final Ord[] e) {
+  public Order(final OrderBy[] e) {
     ord = e;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(final Ord o : ord) o.comp(ctx);
+    for(final OrderBy o : ord) o.comp(ctx);
     return this;
   }
 
@@ -51,7 +51,7 @@ public final class Order extends Expr {
           order = new int[e];
           for(int i = 0; i < e; i++) order[i] = i;
           sort(order, 0, e);
-          for(final Ord o : ord) o.finish();
+          for(final OrderBy o : ord) o.finish();
         }
 
         while(true) {
@@ -74,12 +74,12 @@ public final class Order extends Expr {
    * @throws QueryException query exception
    */
   public void add(final QueryContext ctx) throws QueryException {
-    for(final Ord o : ord) o.add(ctx);
+    for(final OrderBy o : ord) o.add(ctx);
   }
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    for(final Ord o : ord) if(o.uses(u, ctx)) return true;
+    for(final OrderBy o : ord) if(o.uses(u, ctx)) return true;
     return false;
   }
 
@@ -163,7 +163,7 @@ public final class Order extends Expr {
       throws QueryException {
 
     for(int k = 0; k < ord.length; k++) {
-      final Ord or = ord[k];
+      final OrderBy or = ord[k];
       final Item m = or.item(o[a]);
       final Item n = it[k];
       final boolean x = m == null;
@@ -186,7 +186,7 @@ public final class Order extends Expr {
   private int d(final int[] o, final int a, final int b)
       throws QueryException {
 
-    for(final Ord l : ord) {
+    for(final OrderBy l : ord) {
       final Item m = l.item(o[a]);
       final Item n = l.item(o[b]);
       final boolean x = m == null;
@@ -238,7 +238,7 @@ public final class Order extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(ORDER);
+    ser.openElement(this);
     for(int o = 0; o != ord.length - 1; o++) ord[o].plan(ser);
     ser.closeElement();
   }

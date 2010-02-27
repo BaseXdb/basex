@@ -68,7 +68,7 @@ public final class Unary extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NEGATE, Token.token(minus));
+    ser.openElement(this, VAL, Token.token(minus));
     expr.plan(ser);
     ser.closeElement();
   }

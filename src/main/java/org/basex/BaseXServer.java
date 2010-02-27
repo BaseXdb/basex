@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import org.basex.core.Context;
 import org.basex.core.Session;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -140,7 +139,7 @@ public final class BaseXServer extends Main implements Runnable {
       } else {
         success = false;
         if(arg.string().equalsIgnoreCase("stop")) {
-          stop(context);
+          stop(context.prop.num(Prop.SERVERPORT));
           return;
         }
       }
@@ -150,12 +149,12 @@ public final class BaseXServer extends Main implements Runnable {
 
   /**
    * Stops the server.
-   * @param ctx context reference
+   * @param port server port
    */
-  public static void stop(final Context ctx) {
+  public static void stop(final int port) {
     try {
       STOP.write(Token.EMPTY);
-      new Socket("localhost", ctx.prop.num(Prop.SERVERPORT));
+      new Socket("localhost", port);
       outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       errln(server(ex));

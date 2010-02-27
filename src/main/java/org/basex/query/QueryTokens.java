@@ -412,15 +412,7 @@ public interface QueryTokens {
   /** Query Plan. */
   byte[] RET = token("Return");
   /** Query Plan. */
-  byte[] ORDER = token("Order");
-  /** Query Plan. */
-  byte[] ORDER_BY = token("By");
-  /** Query Plan. */
   byte[] DIR = token("dir");
-  /** Query Plan Group. */
-  byte[] GROUPBY = token("Group");
-  /** Query Plan. */
-  byte[] NEGATE = token("Negate");
   /** Query Plan. */
   byte[] PRE = token("pre");
   /** Query Plan. */

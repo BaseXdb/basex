@@ -97,9 +97,7 @@ class Client {
 }
 
 $host = "localhost";
-$port = 1920;
+$port = 1984;
 $client = new Client($host, $port);
 $client->session();
 ?>
-
-
