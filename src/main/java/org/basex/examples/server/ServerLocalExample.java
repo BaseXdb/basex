@@ -1,4 +1,4 @@
-package org.basex.examples;
+package org.basex.examples.server;
 
 import java.io.IOException;
 import org.basex.BaseXServer;
@@ -6,6 +6,7 @@ import org.basex.core.Context;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
+import org.basex.examples.query.QueryExample;
 import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
 

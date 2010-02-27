@@ -1,4 +1,4 @@
-package org.basex.examples;
+package org.basex.examples.query;
 
 import java.io.IOException;
 import java.io.OutputStream;

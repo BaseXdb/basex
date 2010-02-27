@@ -1,4 +1,4 @@
-package org.basex.examples;
+package org.basex.examples.server;
 
 import java.io.IOException;
 import org.basex.BaseXServer;
