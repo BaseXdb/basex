@@ -1,9 +1,11 @@
 package org.basex.examples.server;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
 import org.basex.server.ClientSession;
+import org.basex.util.Performance;
 
 /**
  * This class performs a small stress tests with multiple clients.
@@ -17,16 +19,14 @@ public final class StressTest {
   /** Number of runs per client. */
   static final int NRUNS = 30;
 
-  /** Random generator. */
-  static Random generator = new Random();
+  /** Main session. */
+  static ClientSession client;
+  /** Random number generator. */
+  static Random rnd = new Random();
   /** Result counter. */
   static int counter;
   /** Finished counter. */
   static int finished;
-
-
-  /** Server reference. */
-  static BaseXServer server;
 
   /** Private constructor. */
   private StressTest() { }
@@ -34,74 +34,86 @@ public final class StressTest {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
-   * @throws Exception exception
+   * @throws IOException exception
    */
-  public static void main(final String[] args) throws Exception {
-    System.out.println("=== ServerTest ===");
+  public static void main(final String[] args) throws IOException {
+    System.out.println("=== StressTest ===");
 
     // run server instance
     new Thread() {
       @Override
       public void run() {
-        server = new BaseXServer();
+        new BaseXServer();
       }
     }.start();
-    Thread.sleep(1000);
+    Performance.sleep(1000);
 
     // create test database
-    ClientSession session =
-      new ClientSession("localhost", 1984, "admin", "admin");
-    session.execute("set info on");
-
-    session.execute("create db etc/xml/factbook.xml");
-    System.out.println(session.info());
-    session.close();
+    client = newSession();
+    client.execute("set info on");
+    client.execute("create db etc/xml/factbook.xml");
+    System.out.println(client.info());
 
     // run clients
     for(int i = 0; i < NTHREADS; i++) {
-      new ClientTest().start();
+      new Client().start();
     }
   }
 
   /**
-   * Single client.
+   * Stops the server.
+   * @throws IOException exception
    */
-  static class ClientTest extends Thread {
+  static void stopServer() throws IOException {
+    // drop database and stop server
+    client.execute("drop db factbook");
+    client.close();
+    new BaseXServer("stop");
+  }
+
+  /**
+   * Returns a session instance.
+   * @return session
+   * @throws IOException exception
+   */
+  static ClientSession newSession() throws IOException {
+    return new ClientSession("localhost", 1984, "admin", "admin");
+  }
+  
+  /** Single client. */
+  static class Client extends Thread {
     /** Client session. */
     private ClientSession session;
 
     @Override
     public void run() {
       try {
-        session = new ClientSession("localhost", 1984, "admin", "admin");
+        session = newSession();
 
+        // perform some queries
         for(int i = 0; i < NRUNS; i++) {
-          Thread.sleep((long) (50 * generator.nextDouble()));
+          Performance.sleep((long) (50 * rnd.nextDouble()));
     
           // return nth text of the database
-          int n = (generator.nextInt() & 0xFF) + 1;
-          String query = "xquery basex:db('factbook')/descendant::text()" +
+          final int n = (rnd.nextInt() & 0xFF) + 1;
+          final String qu = "xquery basex:db('factbook')/descendant::text()" +
             "[position() = " + n + "]";
 
-          ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-          String result = session.execute(query, buffer) ?
+          final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+          final String result = session.execute(qu, buffer) ?
               buffer.toString() : session.info();
 
           System.out.println("[" + counter + "] Thread " + getId() +
               ", Pos " + n + ": " + result);
           counter++;
         }
-
         session.close();
 
-        // Server is stopped by last session
-        if(++finished == StressTest.NTHREADS) {
-          new BaseXServer("stop");
-        }
+        // server is stopped by last session
+        if(++finished == StressTest.NTHREADS) stopServer();
 
-      } catch(Exception e) {
-        System.out.printf("\n******************* Exception: %s\n\n",
-            e.getMessage());
+      } catch(final IOException ex) {
+        ex.printStackTrace();
       }
     }
   }
