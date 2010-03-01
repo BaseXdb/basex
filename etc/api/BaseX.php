@@ -35,7 +35,7 @@ class Session {
 		global $info;
 		
 		socket_write($socket, $com);
-		socket_write("\x00", 1);
+		socket_write($socket, "\x00");
 		fwrite($out, $this->readString());
 		$info = $this->readString();
 		return socket_read($socket, 1);
