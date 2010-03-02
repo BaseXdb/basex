@@ -32,7 +32,8 @@ class Session():
 
     # receive timestamp
     ts = self.__readString()
-
+    
+    # code password and timestamp in md5
     pwmd5 = hashlib.md5(pw).hexdigest()
     m = hashlib.md5()
     m.update(pwmd5)
