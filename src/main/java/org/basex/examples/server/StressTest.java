@@ -8,16 +8,17 @@ import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 
 /**
- * This class performs a small stress tests with multiple clients.
+ * This class performs a client/server stress tests with a specified
+ * number of threads and queries.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
 public final class StressTest {
   /** Number of clients. */
-  static final int NTHREADS = 30;
+  static final int NCLIENTS = 30;
   /** Number of runs per client. */
-  static final int NRUNS = 30;
+  static final int NQUERIES = 30;
 
   /** Main session. */
   static ClientSession client;
@@ -37,9 +38,10 @@ public final class StressTest {
    * @throws IOException exception
    */
   public static void main(final String[] args) throws IOException {
-    System.out.println("=== StressTest ===");
+    System.out.println("=== Server StressTest ===");
 
     // run server instance
+    System.out.println("\n* Start server.");
     new Thread() {
       @Override
       public void run() {
@@ -49,13 +51,16 @@ public final class StressTest {
     Performance.sleep(1000);
 
     // create test database
+    System.out.println("\n* Create test database.");
+
     client = newSession();
     client.execute("set info on");
     client.execute("create db etc/xml/factbook.xml");
     System.out.println(client.info());
 
     // run clients
-    for(int i = 0; i < NTHREADS; i++) {
+    System.out.println("\n* Run " + NCLIENTS + " client threads.");
+    for(int i = 0; i < NCLIENTS; i++) {
       new Client().start();
     }
   }
@@ -66,6 +71,8 @@ public final class StressTest {
    */
   static void stopServer() throws IOException {
     // drop database and stop server
+    System.out.println("\n* Stop server and drop test database.");
+
     client.execute("drop db factbook");
     client.close();
     new BaseXServer("stop");
@@ -91,7 +98,7 @@ public final class StressTest {
         session = newSession();
 
         // perform some queries
-        for(int i = 0; i < NRUNS; i++) {
+        for(int i = 0; i < NQUERIES; i++) {
           Performance.sleep((long) (50 * rnd.nextDouble()));
     
           // return nth text of the database
@@ -109,8 +116,8 @@ public final class StressTest {
         }
         session.close();
 
-        // server is stopped by last session
-        if(++finished == StressTest.NTHREADS) stopServer();
+        // server is stopped after last client has finished
+        if(++finished == StressTest.NCLIENTS) stopServer();
 
       } catch(final IOException ex) {
         ex.printStackTrace();
