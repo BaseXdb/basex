@@ -10,7 +10,8 @@ import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 
 /**
- * Evaluates the 'open' command and opens a database.
+ * Evaluates the 'checks' command, opens an existing database or
+ * creates a new one.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -45,7 +46,7 @@ public final class Check extends Proc {
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static Data check(final Context ctx, final String path)
+  public static synchronized Data check(final Context ctx, final String path)
       throws IOException {
 
     final IO f = IO.get(path);

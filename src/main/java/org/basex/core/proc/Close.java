@@ -42,7 +42,7 @@ public final class Close extends Proc {
    * @param data data reference
    * @throws IOException I/O exception
    */
-  public static void close(final Context ctx, final Data data)
+  public static synchronized void close(final Context ctx, final Data data)
       throws IOException {
     if(ctx.unpin(data)) data.close();
   }

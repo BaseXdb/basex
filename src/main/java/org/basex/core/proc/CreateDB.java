@@ -74,8 +74,8 @@ public final class CreateDB extends ACreate {
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static Data xml(final Context ctx, final IO io, final String name)
-      throws IOException {
+  public static synchronized Data xml(final Context ctx, final IO io,
+      final String name) throws IOException {
 
     if(!ctx.user.perm(User.CREATE))
       throw new IOException(Main.info(PERMNO, CmdPerm.CREATE));
@@ -91,8 +91,8 @@ public final class CreateDB extends ACreate {
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static Data xml(final Context ctx, final Parser p, final String db)
-      throws IOException {
+  private static synchronized Data xml(final Context ctx, final Parser p,
+      final String db) throws IOException {
 
     if(ctx.prop.is(Prop.MAINMEM)) return new MemBuilder(p).build(db);
     if(ctx.pinned(db)) throw new IOException(Main.info(DBLOCKED, db));
@@ -124,7 +124,7 @@ public final class CreateDB extends ACreate {
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static Data xml(final Parser p) throws IOException {
+  public static synchronized Data xml(final Parser p) throws IOException {
     return new MemBuilder(p).build();
   }
 
@@ -135,7 +135,8 @@ public final class CreateDB extends ACreate {
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static Data xml(final IO io, final Prop pr) throws IOException {
+  public static synchronized Data xml(final IO io, final Prop pr)
+      throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
     return xml(new DirParser(io, pr));
   }
@@ -147,7 +148,8 @@ public final class CreateDB extends ACreate {
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static Data xml(final SAXSource s, final Prop pr) throws IOException {
+  public static synchronized Data xml(final SAXSource s, final Prop pr)
+      throws IOException {
     return xml(new SAXWrapper(s, pr));
   }
 

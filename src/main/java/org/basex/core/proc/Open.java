@@ -50,7 +50,7 @@ public final class Open extends Proc {
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static Data open(final Context ctx, final String db)
+  public static synchronized Data open(final Context ctx, final String db)
       throws IOException {
 
     Data data = ctx.pin(db);
