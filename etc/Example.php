@@ -19,7 +19,7 @@ $out = "php://output";
 
 // command to be performed
 //$cmd = "xquery doc('11MB')//item";
-$cmd = "xquery 1 to 100";
+$cmd = "xquery 1 to 10";
 
 try {
   // create session
@@ -33,7 +33,7 @@ try {
 	}
 
   // print time needed
-  print "\n".((microtime(true) - $start) * 1000)." ms";
+  print "\n".((microtime(true) - $start) * 1000)." ms\n";
 
   // close session
   $session->close();
