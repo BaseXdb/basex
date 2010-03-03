@@ -35,6 +35,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class ClientSession extends Session {
+  /** Socket reference. */
+  final Socket socket;
   /** Output stream. */
   private final PrintOutput out;
   /** Input stream. */
@@ -67,7 +69,7 @@ public final class ClientSession extends Session {
   public ClientSession(final String host, final int port,
       final String user, final String pw) throws IOException {
 
-    final Socket socket = new Socket();
+    socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
     in = socket.getInputStream();
 
@@ -76,10 +78,8 @@ public final class ClientSession extends Session {
 
     // send user name and hashed password/timestamp
     out = new PrintOutput(socket.getOutputStream());
-    out.print(user);
-    out.write(0);
-    out.print(Token.md5(Token.md5(pw) + ts));
-    out.write(0);
+    send(user);
+    send(Token.md5(Token.md5(pw) + ts));
     out.flush();
 
     // receive success flag
@@ -90,8 +90,7 @@ public final class ClientSession extends Session {
   public boolean execute(final String cmd, final OutputStream o)
       throws IOException {
 
-    out.print(cmd);
-    out.write(0);
+    send(cmd);
     final BufferInput bi = new BufferInput(in);
     int l;
     while((l = bi.read()) != 0) o.write(l);
@@ -112,6 +111,17 @@ public final class ClientSession extends Session {
 
   @Override
   public void close() throws IOException {
-    execute(Cmd.EXIT.toString(), null);
+    send(Cmd.EXIT.toString());
+    socket.close();
+  }
+
+  /**
+   * Sends a string to the server.
+   * @param s string to be sent
+   * @throws IOException I/O exception
+   */
+  private void send(final String s) throws IOException {
+    out.print(s);
+    out.write(0);
   }
 }

@@ -86,6 +86,7 @@ abstract class AQuery extends Proc {
           s = 0;
           Item it;
           while((it = ir.next()) != null) {
+            checkStop();
             it.serialize(xml);
             s++;
           }
