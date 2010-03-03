@@ -1,4 +1,4 @@
-# This Python Module provides two classes for connecting to the
+# This Python module provides two classes for connecting to the
 # BaseX Server.
 #
 # The Session class manages the communication between server and client.
@@ -22,45 +22,47 @@ class Session():
 
   # Constructor.
   def __init__(self, host, port, user, pw):
-    global s
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
-
     # allocate 4kb buffer
     self.__buf = array.array('B', '\0' * 0x1000)
     self.__init()
+
+    # create server connection
+    global s
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((host, port))
 
     # receive timestamp
     ts = self.__readString()
     
     # code password and timestamp in md5
-    pwmd5 = hashlib.md5(pw).hexdigest()
-    m = hashlib.md5()
-    m.update(pwmd5)
-    m.update(ts)
-    complete = m.hexdigest()
-
     # send user name and hashed password/timestamp
-    s.send(user)
-    s.send('\0')
-    s.send(complete)
-    s.send('\0')
+    m = hashlib.md5()
+    m.update(hashlib.md5(pw).hexdigest())
+    m.update(ts)
+
+    s.send(user + '\0')
+    s.send(m.hexdigest() + '\0')
 
     # receives success flag
     if s.recv(1) != '\0':
       raise IOError("Access Denied.")
 
   # Executes a command.
-  def execute(self, com, out):
+  def execute(self, com, out=False):
     # send command to server
-    s.send(com)
-    s.send('\0')
+    s.send(com + '\0')
 
     # receive result
     self.__init()
-    out.write(self.__readString())
+    self.__result = self.__readString()
+    if(out):
+      out.write(self.__result)
     self.__info = self.__readString()
     return self.__read() == 0
+
+  # Returns the result.
+  def result(self):
+    return self.__result
 
   # Returns the info string.
   def info(self):
@@ -86,7 +88,7 @@ class Session():
       else:
         return bf.tostring()
 
-  # Returns the next byte
+  # Returns the next byte.
   def __read(self):
     # Cache next bytes
     if self.__bpos == self.__bsize:
@@ -99,7 +101,7 @@ class Session():
     return b
 
 
-# This class offers an interactive BaseX console
+# This class offers an interactive BaseX console.
 class Client(object):
   # Initializes the client.
   def __init__(self, host, port):

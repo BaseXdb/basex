@@ -1,6 +1,6 @@
-#
 # This example shows how database commands can be performed
 # via the Python BaseX API.
+#
 # The outputstream in this example is a file (result.tmp).
 # The result of the query against the '11MB' document will be saved into the file.
 # After all, the execution time of the query will be printed.
@@ -26,7 +26,7 @@ try:
 
   # perform command; show info if something went wrong
   if not cs.execute(cmd, out):
-    print cs.info()
+    sys.stdout.write(cs.info())
 
   # print time needed
   print "\n", (time.clock() - start) * 1000, "ms."

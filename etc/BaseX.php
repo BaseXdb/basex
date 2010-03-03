@@ -16,76 +16,87 @@
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 class Session {
+  /* Class variables.*/
+  var $socket, $result, $info, $buffer, $bpos, $bsize;
 
-  // Constructor.
+  /* Constructor. */
   function __construct($h, $p, $user, $pw) {
-    global $socket;
-    $socket = socket_create(AF_INET, SOCK_STREAM, 0);
-    $result = socket_connect($socket, $h, $p);
+    // create server connection
+    $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+    if(!socket_connect($this->socket, $h, $p)) {
+      throw new Exception("Can't communicate with server.");
+    }
 
-    if (!$result) {
-      throw new Exception("Can't communicate with the server.");
-    } else {
-      // receive timestamp
-      $ts = $this->readString();
-      $pw = hash("md5", $pw);
-      $md5 = hash("md5", $pw.$ts);
+    // receive timestamp
+    $ts = $this->readString();
 
-      // send username and hashed password/timestamp
-      socket_write($socket, "$user\x00$md5\x00");
+    // send username and hashed password/timestamp
+    $md5 = hash("md5", hash("md5", $pw).$ts);
+    socket_write($this->socket, "$user\0$md5\0");
 
-      // receives success flag
-      if(socket_read($socket, 1) != "\x00") {
-        throw new Exception("Access denied.");
-      }
+    // receives success flag
+    if(socket_read($this->socket, 1) != "\0") {
+      throw new Exception("Access denied.");
     }
   }
 
-  // Executes a command.
-  public function execute($com, $out) {
-    global $socket;
-    global $info;
-
+  /* Executes a command and writes the result to the specified stream. */
+  public function execute($com, $out = null) {
     // send command to server
-    socket_write($socket, "$com\x00");
-
-    // wrap output reference to resource
-    if(!is_resource($out)) $out = fopen($out, "w");
+    socket_write($this->socket, "$com\0");
 
     // receive result
-    fwrite($out, $this->readString());
-    $info = $this->readString();
-    return socket_read($socket, 1) == "\x00";
+    $this->init();
+    $this->result = $this->readString();
+    $this->info = $this->readString();
+
+    // send output, if stream was specified
+    if($out) {
+      // wrap output reference to resource
+      if(!is_resource($out)) $out = fopen($out, "w");
+      fwrite($out, $this->result);
+    }
+    return $this->read() == "\0";
   }
 
-  // Returns the info string.
+  /* Returns the result. */
+  public function result() {
+    return $this->result;
+  }
+
+  /* Returns the info string. */
   public function info() {
-    global $info;
-    return $info;
+    return $this->info;
   }
 
-  // Closes the socket.
+  /* Closes the socket. */
   public function close() {
-    global $socket;
-    socket_close($socket);
+    socket_write($this->socket, "exit\0");
+    socket_close($this->socket);
   }
 
-  // Initiates the incoming message.
+  /* Initiates the incoming message. */
   private function init() {
-    global $message;
-    global $pos;
-    $message = "";
-    $pos = 0;
+    $this->bpos = 0;
+    $this->bsize = 0;
   }
 
-  // Receives a string from the socket.
+  /* Receives a string from the socket. */
   private function readString() {
-    global $socket;
-      $com = "";
-      while (($data = socket_read($socket, 1)) != "\x00") {
-        $com .= $data;
-      }
-      return $com;
+    $com = "";
+    while(($d = $this->read()) != "\0") {
+      $com .= $d;
+    }
+    return $com;
+  }
+
+  /* Returns the next byte. */
+  private function read() {
+    if($this->bpos == $this->bsize) {
+      $this->bsize = socket_recv($this->socket, $this->buffer, 4096, 0);
+      $this->bpos = 0;
+    }
+    return $this->buffer[$this->bpos++];
   }
 }
 ?>

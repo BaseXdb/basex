@@ -2,6 +2,7 @@
 /*
  * This example shows how database commands can be performed
  * via the PHP BaseX API.
+ *
  * The outputstream in this example is the standard output.
  * The result of the query will be written to this output.
  *
@@ -17,17 +18,19 @@ $start = microtime(true);
 $out = "php://output";
 
 // command to be performed
-// $cmd = "xquery doc('11MB')//item"
-$cmd = "xquery 1 to 10";
+//$cmd = "xquery doc('11MB')//item";
+$cmd = "xquery 1 to 100";
 
 try {
   // create session
 	$session = new Session("localhost", 1984, "admin", "admin");
 
   // perform command; show info if something went wrong
-  if(!$session->execute($cmd, $out)) {
+  if(!$session->execute($cmd)) {
     print $session->info();
-  }
+  } else {
+    print $session->result();
+	}
 
   // print time needed
   print "\n".((microtime(true) - $start) * 1000)." ms";
@@ -36,6 +39,6 @@ try {
   $session->close();
 
 } catch (Exception $e) {
-	echo $e->getMessage();
+	print $e->getMessage();
 }
 ?>
