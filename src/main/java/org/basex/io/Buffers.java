@@ -25,7 +25,7 @@ final class Buffers {
    * Returns all buffers.
    * @return buffers
    */
-  Buffer[] all() {
+  synchronized Buffer[] all() {
     return buf;
   }
 
@@ -33,7 +33,7 @@ final class Buffers {
    * Returns the current buffer.
    * @return current buffer
    */
-  Buffer curr() {
+  synchronized Buffer curr() {
     return buf[c];
   }
 
@@ -42,7 +42,7 @@ final class Buffers {
    * @param p buffer pointer
    * @return true if cursor has changed
    */
-  boolean cursor(final long p) {
+  synchronized boolean cursor(final long p) {
     final int o = c;
     do {
       if(buf[c].pos == p) return false;

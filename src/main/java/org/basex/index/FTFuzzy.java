@@ -118,7 +118,7 @@ public final class FTFuzzy extends FTIndex {
   }
 
   @Override
-  public int nrIDs(final IndexToken ind) {
+  public synchronized int nrIDs(final IndexToken ind) {
     // skip result count for queries which stretch over multiple index entries
     final Tokenizer fto = (Tokenizer) ind;
     if(fto.fz || fto.wc) return 1;
@@ -139,7 +139,7 @@ public final class FTFuzzy extends FTIndex {
   }
 
   @Override
-  public IndexIterator ids(final IndexToken ind) {
+  public synchronized IndexIterator ids(final IndexToken ind) {
     final Tokenizer ft = (Tokenizer) ind;
     final byte[] tok = ft.get();
 
@@ -157,79 +157,10 @@ public final class FTFuzzy extends FTIndex {
   }
 
   @Override
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
     li.close();
     ti.close();
     dat.close();
-  }
-
-  /** Pointer on current token length. */
-  private int ctl;
-  /** Pointer on next token length. */
-  private int ntl;
-  /** Number of written bytes for tokens. */
-  private int ptok;
-  /** Next number of pre values. */
-  private int fts;
-  /** Pointer on full-text data. */
-  long pftd;
-
-  /**
-   * Returns next Token.
-   * @return byte[] token
-   */
-  byte[] nextTok() {
-    if(tp[tp.length - 1] == ptok) return EMPTY;
-    if(tp[ntl] == ptok || ntl == 0) {
-      ctl++;
-      while(tp[ctl] == -1) ctl++;
-      ntl = ctl + 1;
-      while(tp[ntl] == -1) ntl++;
-    }
-    if(ctl == tp.length) return EMPTY;
-
-    final byte[] tok = ti.readBytes(ptok, ptok + ctl);
-    // [SG] pftd is never read?..
-    pftd = ti.read5(ti.pos());
-    fts = ti.read4();
-    // [SG] safe cast to int?
-    ptok = (int) ti.pos();
-    return tok;
-  }
-
-  /**
-   * Returns next number of pre-values.
-   * @return number of pre-values
-   */
-  int nextFTDataSize() {
-    return fts;
-  }
-
-  /** Next pre values. */
-  int[] prv;
-  /** Next pos values. */
-  int[] pov;
-
-  /**
-   * Returns next pre values.
-   * @return int[] pre values
-   */
-  int[] nextPreValues() {
-    prv = new int[fts];
-    pov = new int[fts];
-    for(int j = 0; j < fts; j++) {
-      prv[j] = dat.readNum();
-      pov[j] = dat.readNum();
-    }
-    return prv;
-  }
-
-  /**
-   * Returns next pos values.
-   * @return int[] pos values
-   */
-  int[] nextPosValues() {
-    return pov;
   }
 
   /**
@@ -311,9 +242,10 @@ public final class FTFuzzy extends FTIndex {
    * @param f fast evaluation
    * @return int[][] data
    */
-  private IndexIterator fuzzy(final byte[] tok, final int k, final boolean f) {
-    FTIndexIterator it = FTIndexIterator.EMP;
+  private synchronized IndexIterator fuzzy(final byte[] tok, final int k,
+      final boolean f) {
 
+    FTIndexIterator it = FTIndexIterator.EMP;
     final int tl = tok.length;
     final int e = Math.min(tp.length, tl + k);
     int s = Math.max(1, tl - k) - 1;
@@ -342,9 +274,80 @@ public final class FTFuzzy extends FTIndex {
    * @param f fast evaluation
    * @return iterator
    */
-  private FTIndexIterator get(final byte[] tok, final boolean f) {
+  private synchronized FTIndexIterator get(final byte[] tok, final boolean f) {
     final int p = token(tok);
     return p > -1 ? iter(pointer(p, tok.length),
         size(p, tok.length), dat, f) : FTIndexIterator.EMP;
+  }
+
+  // Methods for index construction
+
+  /** Pointer on current token length. */
+  private int ctl;
+  /** Pointer on next token length. */
+  private int ntl;
+  /** Number of written bytes for tokens. */
+  private int ptok;
+  /** Next number of pre values. */
+  private int fts;
+  /** Pointer on full-text data. */
+  long pftd;
+
+  /**
+   * Returns the next token.
+   * @return byte[] token
+   */
+  byte[] nextTok() {
+    if(tp[tp.length - 1] == ptok) return EMPTY;
+    if(tp[ntl] == ptok || ntl == 0) {
+      ctl++;
+      while(tp[ctl] == -1) ctl++;
+      ntl = ctl + 1;
+      while(tp[ntl] == -1) ntl++;
+    }
+    if(ctl == tp.length) return EMPTY;
+
+    final byte[] tok = ti.readBytes(ptok, ptok + ctl);
+    // [SG] pftd is never read?..
+    pftd = ti.read5(ti.pos());
+    fts = ti.read4();
+    // [SG] safe cast to int?
+    ptok = (int) ti.pos();
+    return tok;
+  }
+
+  /**
+   * Returns next number of pre-values.
+   * @return number of pre-values
+   */
+  int nextFTDataSize() {
+    return fts;
+  }
+
+  /** Next pre values. */
+  int[] prv;
+  /** Next pos values. */
+  int[] pov;
+
+  /**
+   * Returns next pre values.
+   * @return int[] pre values
+   */
+  int[] nextPreValues() {
+    prv = new int[fts];
+    pov = new int[fts];
+    for(int j = 0; j < fts; j++) {
+      prv[j] = dat.readNum();
+      pov[j] = dat.readNum();
+    }
+    return prv;
+  }
+
+  /**
+   * Returns next pos values.
+   * @return int[] pos values
+   */
+  int[] nextPosValues() {
+    return pov;
   }
 }

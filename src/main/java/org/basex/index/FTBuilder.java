@@ -31,7 +31,6 @@ public abstract class FTBuilder extends IndexBuilder {
   /** Number of cached index structures. */
   protected int csize;
 
-
   /** Document units (all document or text nodes in a document). */
   private final IntList unit = new IntList();
   /** Container for all frequencies. TF: freq(i, j). */

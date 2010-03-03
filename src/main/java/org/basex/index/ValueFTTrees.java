@@ -13,7 +13,7 @@ import org.basex.util.Token;
  */
 class ValueFTTrees {
   /** For each token length a tree is created. */
-  final ValueFTTree[] trees = new ValueFTTree[Token.MAXLEN];
+  final ValueFTTree[] trees = new ValueFTTree[Token.MAXLEN + 1];
   /** Pointer on current tree. */
   int nsize;
 

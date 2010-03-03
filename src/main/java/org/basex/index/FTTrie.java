@@ -67,7 +67,7 @@ public final class FTTrie extends FTIndex {
   }
 
   @Override
-  public int nrIDs(final IndexToken ind) {
+  public synchronized int nrIDs(final IndexToken ind) {
     // skip result count for queries which stretch over multiple index entries
     final Tokenizer fto = (Tokenizer) ind;
     if(fto.fz || fto.wc) return 1;
@@ -88,7 +88,7 @@ public final class FTTrie extends FTIndex {
   }
 
   @Override
-  public IndexIterator ids(final IndexToken ind) {
+  public synchronized IndexIterator ids(final IndexToken ind) {
     final Tokenizer ft = (Tokenizer) ind;
     final byte[] tok = ft.get();
 
@@ -126,10 +126,9 @@ public final class FTTrie extends FTIndex {
    * @return int[][] array with pre-values and corresponding positions
    * for each pre-value
    */
-  private FTIndexIterator get(final int id, final byte[] searchNode,
-      final boolean f) {
-    if(searchNode == null || searchNode.length == 0)
-      return FTIndexIterator.EMP;
+  private synchronized FTIndexIterator get(final int id,
+      final byte[] searchNode, final boolean f) {
+    if(searchNode == null || searchNode.length == 0) return FTIndexIterator.EMP;
 
     final int[] ne = nodeId(id, searchNode);
     return ne == null ? FTIndexIterator.EMP :
@@ -143,7 +142,7 @@ public final class FTTrie extends FTIndex {
    * @param sn search nodes value
    * @return int id on node saving the data
    */
-  private int[] nodeId(final int id, final byte[] sn) {
+  private synchronized int[] nodeId(final int id, final byte[] sn) {
     byte[] vsn = sn;
 
     // read data entry from disk
@@ -174,7 +173,8 @@ public final class FTTrie extends FTIndex {
    * @param st statistics reference
    * @param tok current token
    */
-  private void addOccs(final int cn, final IndexStats st, final byte[] tok) {
+  private synchronized void addOccs(final int cn, final IndexStats st,
+      final byte[] tok) {
     final int[] ne = entry(cn);
     byte[] nt = tok;
     if(cn > 0) {
@@ -194,7 +194,7 @@ public final class FTTrie extends FTIndex {
    * @param id on node array (in main memory)
    * @return node entry from disk
    */
-  private int[] entry(final long id) {
+  private synchronized int[] entry(final long id) {
     int sp = inS.read4(id * 4);
     final int ep = inS.read4((id + 1) * 4);
     final IntList il = new IntList();
@@ -220,7 +220,7 @@ public final class FTTrie extends FTIndex {
    * @param ne current node entry
    * @return boolean leaf node or inner node
    */
-  private boolean hasNextNodes(final int[] ne) {
+  private synchronized boolean hasNextNodes(final int[] ne) {
     return ne[0] + 1 < ne.length - 1;
   }
 
@@ -235,7 +235,7 @@ public final class FTTrie extends FTIndex {
    * @param ins byte looking for
    * @return inserting position
    */
-  private int insPos(final int[] cne, final byte ins) {
+  private synchronized int insPos(final int[] cne, final byte ins) {
     int i = cne[0] + 1;
     final int s = cne.length - 1;
     while(i < s && diff((byte) cne[i + 1], ins) < 0) i += 2;
@@ -265,8 +265,9 @@ public final class FTTrie extends FTIndex {
    * @param pointerEnding pointer on value ending
    * @param f fast evaluation
    */
-  private void wc(final int node, final byte[] ending, final boolean lastFound,
-      final int pointerNode, final int pointerEnding, final boolean f) {
+  private synchronized void wc(final int node, final byte[] ending,
+      final boolean lastFound, final int pointerNode, final int pointerEnding,
+      final boolean f) {
 
     int j = pointerEnding;
     int i = pointerNode;
@@ -389,7 +390,8 @@ public final class FTTrie extends FTIndex {
    * @param f fast evaluation
    * @return data int[][]
    */
-  private FTIndexIterator wc(final byte[] sn, final int pos, final boolean f) {
+  private synchronized FTIndexIterator wc(final byte[] sn, final int pos,
+      final boolean f) {
     // init counter
     counter = new int[2];
     return wc(0, sn, pos, false, f);
@@ -406,7 +408,7 @@ public final class FTTrie extends FTIndex {
    * @param f fast evaluation
    * @return data result ids
    */
-  private FTIndexIterator wc(final int cn, final byte[] sn,
+  private synchronized FTIndexIterator wc(final int cn, final byte[] sn,
       final int posw, final boolean recCall, final boolean f) {
 
     final byte[] vsn = sn;
@@ -589,7 +591,7 @@ public final class FTTrie extends FTIndex {
    * @param sn int
    * @return id int last touched node
    */
-  private int wc(final int cn, final byte[] sn) {
+  private synchronized int wc(final int cn, final byte[] sn) {
     byte[]vsn = sn;
     final int[] cne = entry(cn);
     if(cn != 0) {
@@ -644,7 +646,7 @@ public final class FTTrie extends FTIndex {
    * @param f fast evaluation
    * @return int[][]
    */
-  private FTIndexIterator fuzzy(final int cn, final int[] crne,
+  private synchronized FTIndexIterator fuzzy(final int cn, final int[] crne,
       final long crdid, final byte[] sn, final int d, final int p,
       final int r, final int c, final boolean f) {
     byte[] vsn = sn;

@@ -59,7 +59,6 @@ public final class Values implements Index {
     size = idxl.read4();
   }
 
-
   @Override
   public byte[] info() {
     final TokenBuilder tb = new TokenBuilder();
@@ -76,19 +75,18 @@ public final class Values implements Index {
   }
 
   @Override
-  public IndexIterator ids(final IndexToken tok) {
+  public synchronized IndexIterator ids(final IndexToken tok) {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
 
     final int id = cache.id(tok.get());
     if(id > 0) return iter(cache.getSize(id), cache.getPointer(id));
 
     final long pos = get(tok.get());
-    if(pos == 0) return IndexIterator.EMPTY;
-    return iter(idxl.readNum(pos), idxl.pos());
+    return pos == 0 ? IndexIterator.EMPTY : iter(idxl.readNum(pos), idxl.pos());
   }
 
   @Override
-  public int nrIDs(final IndexToken it) {
+  public synchronized int nrIDs(final IndexToken it) {
     if(it instanceof RangeToken) return idRange((RangeToken) it).size();
     final byte[] tok = it.get();
     final int id = cache.id(tok);
@@ -106,7 +104,7 @@ public final class Values implements Index {
    * Returns next pre values.
    * @return compressed pre values
    */
-  public byte[] nextPres() {
+  public synchronized byte[] nextPres() {
     if(idxr.pos() >= idxr.length()) return EMPTY;
     final int s = idxl.read4();
     final long v = idxr.read5(idxr.pos());
@@ -119,30 +117,15 @@ public final class Values implements Index {
    * @param ps offset
    * @return iterator
    */
-  private IndexIterator iter(final int s, final long ps) {
-    return new IndexIterator() {
-      /** Last index position. */
-      long p = ps;
-      /** Current position. */
-      int c = -1;
-      /** Last pre value. */
-      int v;
-
-      @Override
-      public boolean more() {
-        return ++c < s;
-      }
-
-      @Override
-      public int next() {
-        v += idxl.readNum(p);
-        p = idxl.pos();
-        return v;
-      }
-
-      @Override
-      public double score() { return -1; }
-    };
+  private synchronized IndexIterator iter(final int s, final long ps) {
+    final IntList ids = new IntList(s);
+    long p = ps;
+    for(int l = 0, v = 0; l < s; l++) {
+      v += idxl.readNum(p);
+      p = idxl.pos();
+      ids.add(v);
+    }    
+    return iter(ids);
   }
 
   /**
@@ -150,7 +133,7 @@ public final class Values implements Index {
    * @param tok index term
    * @return results
    */
-  private IndexIterator idRange(final RangeToken tok) {
+  private synchronized IndexIterator idRange(final RangeToken tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -181,9 +164,18 @@ public final class Values implements Index {
       for(int d = 0; d < ds - 1; d++) ids.add(pre += idxl.readNum());
     }
     ids.sort();
+    return iter(ids);
+  }
 
+  /**
+   * Return iterator for the specified id list.
+   * @param ids id list
+   * @return iterator
+   */
+  private synchronized IndexIterator iter(final IntList ids) {
     return new IndexIterator() {
       int p = -1;
+
       @Override
       public boolean more() { return ++p < ids.size(); }
       @Override
@@ -199,7 +191,7 @@ public final class Values implements Index {
    * @param key token to be found
    * @return id offset
    */
-  private long get(final byte[] key) {
+  private synchronized long get(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
       final int m = l + h >>> 1;
@@ -216,7 +208,7 @@ public final class Values implements Index {
   }
 
   @Override
-  public void close() throws IOException {
+  public synchronized void close() throws IOException {
     idxl.close();
     idxr.close();
   }
