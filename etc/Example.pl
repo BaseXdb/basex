@@ -1,3 +1,4 @@
-use Session;
+use BaseX;
 
-$basex = new Session("localhost", 1984, "admin", "admin");
+$session = new BaseX("localhost", 1984, "admin", "admin");
+$session->execute($session, "help");

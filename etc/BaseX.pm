@@ -1,7 +1,7 @@
 use IO::Socket;
 use Digest::MD5;
 
-package Session;
+package BaseX;
 	
 	# Konstruktor.
 	sub new
@@ -16,11 +16,10 @@ package Session;
 			PeerPort => $port,
 			Proto => "tcp",);
 		die "Can't communicate with the server." unless $sock;
-		$self->{sock} = $sock;
-		$self->read;
-		
+		$self{sock} = $sock;
+
 		# receive timestamp
-		$ts = substr($self->{text}, 0, length($self->{text} - 1));
+		$ts = substr($self->read, 0, length($self->{text} - 1));
 		
 		# code password and timestamp in md5
 		$ctx = Digest::MD5->new;
@@ -41,33 +40,63 @@ package Session;
 		if($text != "\x00") {
 			print "Access denied";
 		}
-		$sock->send("exit");
 	}
 	
-	# Executes a command.
+	# Executes a command and writes the result to the specified stream.
 	sub execute {
 		$self = shift;
 		$com = shift;
-		$out = shift;
+		#$out = shift;
+		# send command to server
+		$self{sock}->send($com);
+		$self{sock}->send("\x00");
+		$self->init;
+		$self{result} = $self->readString;
+		$self{info} = $self->readString;
+		
+		return $self->read == "\x00";
 	}
 	
-	# Reads 4096 bytes from the stream.
+	# Returns the result.
+	sub result {
+		return $self{result};
+	}
+	
+	# Returns the info.
+	sub info {
+		return $self{info};	
+	}
+	
+	# Closes the socket.
+	sub close {
+		close($self->{sock});
+	}
+	
+	# Initiates the incoming message.
+	sub init {
+		$self{bpos} = 0;
+		$self{bsize} = 0;	
+	}
+	
+	# Returns the next byte.
 	sub read
 	{
-		my $self = shift;
-		$self->{sock}->recv($self->{text}, 4096);
+		if ($self{bpos} == $self{bsize}) {
+			$self{bsize} = length($self{sock}->recv($self{$buffer}, 4096));
+			$self{bpos} = 0;
+		}
+		return $self{buffer}[$self{bpos}++];
 	}
 	
 	# Receives a string from the socket.
 	sub readString
 	{	
 		my $self = shift;
-		$self->read;
 		$complete = "";
-		while (length($self->{text}) > 4095) {
-			$complete = $complete.$self->{text};
+		while ($d = $self->read != "\x00") {
+			$complete = $complete.$d;
 			$self->read;
 		}
-		$self->{complete} = $complete;
+		return $complete;
 	}
 1;
