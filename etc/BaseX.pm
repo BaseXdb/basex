@@ -1,12 +1,13 @@
 use IO::Socket;
 use Digest::MD5;
+use Encode;
 
 package BaseX;
 	
 	# Konstruktor.
 	sub new
 	{
-		my $self = shift;
+		$self = shift;
 		$host = shift;
 		$port = shift;
 		$user = shift;
@@ -19,7 +20,8 @@ package BaseX;
 		$self{sock} = $sock;
 
 		# receive timestamp
-		$ts = substr($self->read, 0, length($self->{text} - 1));
+		$tmp = $self->readString;
+		$ts = substr($tmp, 0, length($tmp - 1));
 		
 		# code password and timestamp in md5
 		$ctx = Digest::MD5->new;
@@ -32,14 +34,15 @@ package BaseX;
 		
 		# send username and password
 		$sock->send($user);
-		$sock->send("\x00");
+		$sock->send("\0");
 		$sock->send($complete);
-		$sock->send("\x00");
+		$sock->send("\0");
 		
 		$sock->recv($text, 1);
-		if($text != "\x00") {
+		if($text != "\0") {
 			print "Access denied";
 		}
+		return $self;
 	}
 	
 	# Executes a command and writes the result to the specified stream.
@@ -49,12 +52,12 @@ package BaseX;
 		#$out = shift;
 		# send command to server
 		$self{sock}->send($com);
-		$self{sock}->send("\x00");
+		$self{sock}->send("\0");
 		$self->init;
 		$self{result} = $self->readString;
 		$self{info} = $self->readString;
 		
-		return $self->read == "\x00";
+		return $self->read == "\0";
 	}
 	
 	# Returns the result.
@@ -82,20 +85,20 @@ package BaseX;
 	sub read
 	{
 		if ($self{bpos} == $self{bsize}) {
-			$self{bsize} = length($self{sock}->recv($self{$buffer}, 4096));
+			$self{bsize} = length($self{sock}->recv($buffer, 4096));
 			$self{bpos} = 0;
+			@array = split("", $buffer);
 		}
-		return $self{buffer}[$self{bpos}++];
+		return @array[$self{bpos}];
 	}
 	
 	# Receives a string from the socket.
 	sub readString
 	{	
-		my $self = shift;
 		$complete = "";
-		while ($d = $self->read != "\x00") {
+		while (($d = $self->read) != "\0") {
 			$complete = $complete.$d;
-			$self->read;
+			$self{bpos} += 1;
 		}
 		return $complete;
 	}
