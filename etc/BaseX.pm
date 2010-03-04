@@ -96,7 +96,7 @@ package BaseX;
 	sub readString
 	{	
 		$complete = "";
-		while (($d = $self->read) != "\0") {
+		while (ord($d = $self->read) != 0) {
 			$complete = $complete.$d;
 			$self{bpos} += 1;
 		}
