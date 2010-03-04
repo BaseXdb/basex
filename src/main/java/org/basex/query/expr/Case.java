@@ -98,7 +98,7 @@ public final class Case extends Single {
 
   @Override
   public String toString() {
-    return (var.type == null ? DEFAULT : CASE + ' ' + var) +
-        ' ' + RETURN + ' ' + expr;
+    return (var.type == null ? DEFAULT : CASE) + ' ' + var + ' ' +
+      RETURN + ' ' + expr;
   }
 }

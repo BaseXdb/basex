@@ -22,6 +22,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Return;
 import org.basex.query.util.Err;
+import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -876,6 +877,13 @@ public enum Type {
 
   @Override
   public String toString() {
-    return name;
+    final TokenBuilder tb = new TokenBuilder();
+    if(uri == XSURI) {
+      tb.add(XS);
+      tb.add(':');
+    }
+    tb.add(name);
+    if(uri != XSURI) tb.add("()");
+    return tb.toString();
   }
 };
