@@ -16,6 +16,7 @@ our @array = ();
 	sub new
 	{
 		my $self = shift;
+		my $class = {};
 		my $host = shift;
 		my $port = shift;
 		my $user = shift;
@@ -48,6 +49,7 @@ our @array = ();
 		if(ord($text) != 0) {
 			print "Access denied";
 		}
+		bless ($class,$self);
 		return $self;
 	}
 	
@@ -61,7 +63,7 @@ our @array = ();
 		$sock->send("\0");
 		$self->init;
 		$result = $self->readString;
-		#$info = $self->readString;
+		$info = $self->readString;
 		
 		return ord($self->read) == 0;
 	}
@@ -91,12 +93,13 @@ our @array = ();
 	# Returns the next byte.
 	sub read
 	{
-		if ($bpos == $bsize) {
-			$bsize = length($sock->recv(my $buffer, 4096)) - 1;
-			$bpos = -1;
-			@array = split("", $buffer);
-		}
-		return $array[$bpos += 1];
+		#if ($bpos == $bsize) {
+		#	$bsize = length($sock->recv(my $buffer, 4096)) - 1;
+		#	$bpos = -1;
+		#	@array = split("", $buffer);
+		#}
+		$sock->recv(my $text, 1);
+		return $text;
 	}
 	
 	# Receives a string from the socket.
