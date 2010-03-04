@@ -1,36 +1,42 @@
 use IO::Socket;
 use Digest::MD5;
-use Encode;
+use strict;
+use warnings;
 
 package BaseX;
+
+our $sock;
+our $bpos = 0;
+our $bsize = 0;
+our $result = "";
+our $info = "";
+our @array = ();
 	
 	# Konstruktor.
 	sub new
 	{
-		$self = shift;
-		$host = shift;
-		$port = shift;
-		$user = shift;
-		$pw = shift;
+		my $self = shift;
+		my $host = shift;
+		my $port = shift;
+		my $user = shift;
+		my $pw = shift;
 		$sock = new IO::Socket::INET (
 			PeerAddr => $host,
 			PeerPort => $port,
 			Proto => "tcp",);
 		die "Can't communicate with the server." unless $sock;
-		$self{sock} = $sock;
 
 		# receive timestamp
-		$tmp = $self->readString;
-		$ts = substr($tmp, 0, length($tmp - 1));
+		my $ts = $self->readString;
 		
 		# code password and timestamp in md5
-		$ctx = Digest::MD5->new;
+		my $ctx = Digest::MD5->new;
 		$ctx->add($pw);
-		$pwmd5 = $ctx->hexdigest;
+		my $pwmd5 = $ctx->hexdigest;
 		$ctx = Digest::MD5->new;
-		$tmp = $pwmd5.$ts;
+		my $tmp = $pwmd5.$ts;
 		$ctx->add($tmp);
-		$complete = $ctx->hexdigest;
+		my $complete = $ctx->hexdigest;
 		
 		# send username and password
 		$sock->send($user);
@@ -38,8 +44,8 @@ package BaseX;
 		$sock->send($complete);
 		$sock->send("\0");
 		
-		$sock->recv($text, 1);
-		if($text != "\0") {
+		$sock->recv(my $text, 1);
+		if(ord($text) != 0) {
 			print "Access denied";
 		}
 		return $self;
@@ -47,58 +53,59 @@ package BaseX;
 	
 	# Executes a command and writes the result to the specified stream.
 	sub execute {
-		$self = shift;
-		$com = shift;
+		my $self = shift;
+		my $com = shift;
 		#$out = shift;
 		# send command to server
-		$self{sock}->send($com);
-		$self{sock}->send("\0");
+		$sock->send($com);
+		$sock->send("\0");
 		$self->init;
-		$self{result} = $self->readString;
-		$self{info} = $self->readString;
+		$result = $self->readString;
+		#$info = $self->readString;
 		
-		return $self->read == "\0";
+		return ord($self->read) == 0;
 	}
 	
 	# Returns the result.
 	sub result {
-		return $self{result};
+		return $result;
 	}
 	
 	# Returns the info.
 	sub info {
-		return $self{info};	
+		return $info;	
 	}
 	
 	# Closes the socket.
 	sub close {
-		close($self->{sock});
+		$sock->send("exit");
+		close($sock);
 	}
 	
 	# Initiates the incoming message.
 	sub init {
-		$self{bpos} = 0;
-		$self{bsize} = 0;	
+		$bpos = 0;
+		$bsize = 0;	
 	}
 	
 	# Returns the next byte.
 	sub read
 	{
-		if ($self{bpos} == $self{bsize}) {
-			$self{bsize} = length($self{sock}->recv($buffer, 4096));
-			$self{bpos} = 0;
+		if ($bpos == $bsize) {
+			$bsize = length($sock->recv(my $buffer, 4096)) - 1;
+			$bpos = -1;
 			@array = split("", $buffer);
 		}
-		return @array[$self{bpos}];
+		return $array[$bpos += 1];
 	}
 	
 	# Receives a string from the socket.
 	sub readString
 	{	
-		$complete = "";
-		while (ord($d = $self->read) != 0) {
+		my $self = shift;
+		my $complete = "";
+		while(ord(my $d = $self->read) != 0) {
 			$complete = $complete.$d;
-			$self{bpos} += 1;
 		}
 		return $complete;
 	}
