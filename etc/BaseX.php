@@ -10,8 +10,28 @@
  * password for the connection. The socket connection will then be established
  * via the hostname and the port.
  *
- * For the execution of commands, you need to specify an output stream, which
- * is passed on to the execute method.
+ * For the execution of commands you need to call the execute method with the command
+ * as argument. The result and the info will then be written to the corresponding string.
+ * These strings can be fetched with the methods result() and info().
+ *
+ * Example:
+ * 
+ * include("BaseX.php");
+ * 
+ * try {
+ * 	// create session
+ *	$session = new Session("localhost", 1984, "admin", "admin");
+ *	// perform command; show info if something went wrong
+ * 	if(!$session->execute("xquery 1 + 2")) {
+ *   	print $session->info();
+ * 	} else {
+ *   	print $session->result();
+ *	}
+ *	// close session
+ *	$session->close();
+ *	} catch (Exception $e) {
+ *	  	print $e->getMessage();
+ *	}
  *
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
@@ -40,8 +60,9 @@ class Session {
     }
   }
 
-  /* Executes a command and writes the result to the specified stream. */
-  public function execute($com, $out = null) {
+  /* Executes a command and writes the result and the info to the
+   * corresponding strings. */
+  public function execute($com) {
     // send command to server
     socket_write($this->socket, "$com\0");
 
@@ -49,13 +70,7 @@ class Session {
     $this->init();
     $this->result = $this->readString();
     $this->info = $this->readString();
-
-    // send output, if stream was specified
-    if($out) {
-      // wrap output reference to resource
-      if(!is_resource($out)) $out = fopen($out, "w");
-      fwrite($out, $this->result);
-    }
+    
     return $this->read() == "\0";
   }
 

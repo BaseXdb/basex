@@ -11,8 +11,25 @@
 # The Client class is a console client which allows to interactively input
 # commands.
 #
-# For the execution of commands you need to specify an output stream, which
-# is passed on to the execute method.
+# For the execution of commands you need to call the execute method with the command
+# as argument. The result and the info will then be written to the corresponding string.
+# These strings can be fetched with the methods result() and info().
+#
+# Example:
+# 
+# import BaseX
+# try:
+# # create session
+# cs = BaseX.Session('localhost', 1984, 'admin', 'admin')
+# # perform command; show info if something went wrong
+# if not cs.execute("xquery 1 + 2):
+#    print cs.info()
+#  else:
+#    print cs.result()
+# # close session
+# cs.close()
+# except IOError as e:
+#  print e
 #
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
 
@@ -48,15 +65,13 @@ class Session():
       raise IOError("Access Denied.")
 
   # Executes a command.
-  def execute(self, com, out=False):
+  def execute(self, com):
     # send command to server
     s.send(com + '\0')
 
     # receive result
     self.__init()
     self.__result = self.__readString()
-    if(out):
-      out.write(self.__result)
     self.__info = self.__readString()
     return self.__read() == 0
 
@@ -125,14 +140,13 @@ class Client(object):
 
   # Runs the console.
   def __console(self):
-    out = sys.stdout
-    session.execute("SET INFO ON", out)
+    session.execute("SET INFO ON")
     while True:
       com = str(raw_input('> ')).strip()
       if com == 'exit':
         break
       if com:
-        session.execute(com, out)
+        session.execute(com)
         print session.info()
 
 # Reads arguments -p and -h.

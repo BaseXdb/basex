@@ -1,8 +1,20 @@
+# This example shows how database commands can be performed
+# via the Perl BaseX API.
+# After all, the execution time of the query will be printed.
+#
+# (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
 use BaseX;
+use Time::HiRes;
 
+my $start = [ Time::HiRes::gettimeofday( ) ];
+$cmd = "xquery 1 to 10";
 $session = new BaseX("localhost", 1984, "admin", "admin");
-$session->execute("set info on");
-$session->execute("xquery 1 + 2");
-print $session->result();
-print $session->info();
+if ($session->execute($cmd)) {
+	print $session->result();
+} else {
+	print $session->info();
+}
+my $diff = Time::HiRes::tv_interval($start) * 1000;
+print "\n\n".$diff." ms";
+
 $session->close();
