@@ -1,45 +1,53 @@
 <?php
-/*
- * This PHP module provides all methods to connect and communicate with the
+/* ----------------------------------------------------------------------------
+ *
+ * This PHP module provides methods to connect to and communicate with the
  * BaseX Server.
  *
- * The session class manages the communication between server and client.
- * This class has to be called by your client code (see Example.php).
+ * The Constructor of the class expects a hostname, port, username and password
+ * for the connection. The socket connection will then be established via the
+ * hostname and the port.
  *
- * The Constructor of the Session class expects a hostname, port, username and
- * password for the connection. The socket connection will then be established
- * via the hostname and the port.
+ * For the execution of commands you need to call the execute() method with the
+ * database command as argument. The method returns a boolean, indicating if
+ * the command was successful. The result can be requested with the result()
+ * method, and the info() method returns additional processing information
+ * or error output.
  *
- * For the execution of commands you need to call the execute method with the command
- * as argument. The result and the info will then be written to the corresponding string.
- * These strings can be fetched with the methods result() and info().
+ * ----------------------------------------------------------------------------
  *
  * Example:
- * 
- * include("BaseX.php");
- * 
- * try {
- * 	// create session
- *	$session = new Session("localhost", 1984, "admin", "admin");
- *	// perform command; show info if something went wrong
- * 	if(!$session->execute("xquery 1 + 2")) {
- *   	print $session->info();
- * 	} else {
- *   	print $session->result();
- *	}
- *	// close session
- *	$session->close();
- *	} catch (Exception $e) {
- *	  	print $e->getMessage();
- *	}
  *
+ * include("BaseX.php");
+ *
+ * try {
+ *   // create session
+ *   $session = new BaseX("localhost", 1984, "admin", "admin");
+ *
+ *   // perform command and show result or error output
+ *   if($session->execute("xquery 1 to 10")) {
+ *     print $session->result();
+ *   } else {
+ *     print $session->info();
+ *   }
+ *
+ *  // close session
+ *  $session->close();
+ *
+ * } catch (Exception $e) {
+ *   // print exception
+ *   print $e->getMessage();
+ * }
+ *
+ * ----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * ----------------------------------------------------------------------------
  */
-class Session {
+class BaseX {
   /* Class variables.*/
   var $socket, $result, $info, $buffer, $bpos, $bsize;
 
-  /* Constructor. */
+  /* Constructor, creating a new socket connection. */
   function __construct($h, $p, $user, $pw) {
     // create server connection
     $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -60,8 +68,7 @@ class Session {
     }
   }
 
-  /* Executes a command and writes the result and the info to the
-   * corresponding strings. */
+  /* Executes the specified command. */
   public function execute($com) {
     // send command to server
     socket_write($this->socket, "$com\0");
@@ -70,7 +77,7 @@ class Session {
     $this->init();
     $this->result = $this->readString();
     $this->info = $this->readString();
-    
+
     return $this->read() == "\0";
   }
 
@@ -79,18 +86,18 @@ class Session {
     return $this->result;
   }
 
-  /* Returns the info string. */
+  /* Returns processing information. */
   public function info() {
     return $this->info;
   }
 
-  /* Closes the socket. */
+  /* Closes the connection. */
   public function close() {
     socket_write($this->socket, "exit\0");
     socket_close($this->socket);
   }
 
-  /* Initiates the incoming message. */
+  /* Initializes the byte transfer */
   private function init() {
     $this->bpos = 0;
     $this->bsize = 0;
@@ -105,7 +112,7 @@ class Session {
     return $com;
   }
 
-  /* Returns the next byte. */
+  /* Returns a single byte from the socket. */
   private function read() {
     if($this->bpos == $this->bsize) {
       $this->bsize = socket_recv($this->socket, $this->buffer, 4096, 0);

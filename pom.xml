@@ -4,7 +4,7 @@
   <groupId>org.basex</groupId>
   <artifactId>basex-api</artifactId>
   <packaging>jar</packaging>
-  <version>6.02</version>
+  <version>6.03</version>
   <name>BaseX API</name>
   <url>http://basex.org</url>
   <properties>
@@ -66,7 +66,7 @@
     <dependency>
       <groupId>org.basex</groupId>
       <artifactId>basex</artifactId>
-      <version>6.02</version>
+      <version>6.03</version>
     </dependency>
     <dependency>
       <groupId>org.xmldb</groupId>
@@ -86,7 +86,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>${project.name}-${project.version}</finalName>
+    <finalName>${project.artifactId}-${project.version}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -99,31 +99,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.3</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>org.basex.BaseXWin</mainClass>
-              <packageName>org.basex</packageName>
-            </manifest>
-            <manifestEntries>
-              <url>${project.url}</url>
-            </manifestEntries>
-          </archive>
-        </configuration>
       </plugin>
-      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
         <configuration>
           <includes>
             <include>**/AllTests.java</include>
           </includes>
         </configuration>
       </plugin>
-
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
