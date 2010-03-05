@@ -1,9 +1,9 @@
 <?php
 /*
- * This PHP Module provides two classes for connecting to the
+ * This PHP module provides all methods to connect and communicate with the
  * BaseX Server.
  *
- * The Session class manages the communication between server and client.
+ * The session class manages the communication between server and client.
  * This class has to be called by your client code (see Example.php).
  *
  * The Constructor of the Session class expects a hostname, port, username and

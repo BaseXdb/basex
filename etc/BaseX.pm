@@ -59,14 +59,12 @@ package BaseX;
 		my $complete = $ctx->hexdigest;
 		
 		# send username and password
-		$self->{sock}->send($user);
-		$self->{sock}->send("\0");
-		$self->{sock}->send($complete);
-		$self->{sock}->send("\0");
+		$self->{sock}->send($user."\0");
+		$self->{sock}->send($complete."\0");
 		
 		$self->{sock}->recv(my $text, 1);
 		if(ord($text) != 0) {
-			print "Access denied";
+			die "Access denied";
 		}
 		return $self; 
 	}
@@ -76,8 +74,7 @@ package BaseX;
 		my $self = shift;
 		my $com = shift;
 		# send command to server
-		$self->{sock}->send($com);
-		$self->{sock}->send("\0");
+		$self->{sock}->send($com."\0");
 		$self->{result} = $self->readString;
 		$self->{info} = $self->readString;
 		
@@ -99,7 +96,7 @@ package BaseX;
 	# Closes the socket.
 	sub close {
 		my $self = shift;
-		$self->{sock}->send("exit");
+		$self->{sock}->send("exit \0");
 		close($self->{sock});
 	}
 	

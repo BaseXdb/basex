@@ -1,4 +1,4 @@
-# This Python module provides two classes for connecting to the
+# This Python module all methods to connect and communicate with the
 # BaseX Server.
 #
 # The Session class manages the communication between server and client.
@@ -62,7 +62,7 @@ class Session():
 
     # receives success flag
     if s.recv(1) != '\0':
-      raise IOError("Access Denied.")
+      raise IOError('Access Denied.')
 
   # Executes a command.
   def execute(self, com):
@@ -85,7 +85,7 @@ class Session():
 
   # Closes the socket.
   def close(self):
-    s.send('exit')
+    s.send('exit \0')
     s.close()
 
   # Initializes the byte transfer
@@ -134,13 +134,13 @@ class Client(object):
       session = Session(self.__host, self.__port, user, pw)
       self.__console()
       session.close()
-      print "See you."
+      print 'See you.'
     except IOError as e:
       print e
 
   # Runs the console.
   def __console(self):
-    session.execute("SET INFO ON")
+    session.execute('SET INFO ON')
     while True:
       com = str(raw_input('> ')).strip()
       if com == 'exit':
@@ -152,19 +152,19 @@ class Client(object):
 # Reads arguments -p and -h.
 def opts():
     try:
-      opts, args = getopt.getopt(sys.argv[1:], "-p:-h", ["port", "host"])
+      opts, args = getopt.getopt(sys.argv[1:], '-p:-h', ['port', 'host'])
     except getopt.GetoptError, err:
       print str(err)
       sys.exit()
     global host
     global port
-    host = "localhost"
+    host = 'localhost'
     port = 1984
 
     for o, a in opts:
-      if o == "-p":
+      if o == '-p':
         port = int(a)
-      if o == "-h":
+      if o == '-h':
         host = a
 
 # Main method.
