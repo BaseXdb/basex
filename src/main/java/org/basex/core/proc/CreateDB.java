@@ -91,7 +91,7 @@ public final class CreateDB extends ACreate {
    * @return database instance
    * @throws IOException I/O exception
    */
-  private static synchronized Data xml(final Context ctx, final Parser p,
+  public static synchronized Data xml(final Context ctx, final Parser p,
       final String db) throws IOException {
 
     if(ctx.prop.is(Prop.MAINMEM)) return new MemBuilder(p).build(db);
