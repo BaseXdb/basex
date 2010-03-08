@@ -282,6 +282,7 @@ public class BaseXREST implements IGet, IPost, IDelete, IPut {
         if(max != -1 && var == max) break;
         var++;
       }
+      queryProc.close();
     } catch(final QueryException exce) {
       throw new WebApplicationException(exce);
     } catch(final IOException exce) {
