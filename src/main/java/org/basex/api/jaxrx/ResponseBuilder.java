@@ -12,6 +12,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import org.jaxrx.constants.URLConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -38,7 +40,7 @@ public final class ResponseBuilder {
    * @return The created {@link Document} instance.
    * @throws ParserConfigurationException The exception occurred.
    */
-  public static Document createSurroundingXMLResp()
+  static Document createSurroundingXMLResp()
       throws ParserConfigurationException {
     return DocumentBuilderFactory.newInstance().
       newDocumentBuilder().newDocument();
@@ -50,10 +52,10 @@ public final class ResponseBuilder {
    * @param document The {@link Document} instance for the response.
    * @return The created XML {@link Element}.
    */
-  public static Element createResultElement(final Document document) {
-    final Element response = document.createElementNS("http://jaxrx.org/",
+  static Element createResultElement(final Document document) {
+    final Element response = document.createElementNS(URLConstants.URL,
         "result");
-    response.setPrefix("jaxrx");
+    response.setPrefix(URLConstants.JAXRX);
     return response;
   }
 
@@ -67,7 +69,7 @@ public final class ResponseBuilder {
    * @return The list of available resources/collections packed in a list of
    *         elements.
    */
-  public static List<Element> createCollectionOrResourceEl(
+  static List<Element> createCollectionOrResourceEl(
       final Map<String, String> pathResource, final Document document) {
 
     final List<Element> collections = new ArrayList<Element>();
@@ -100,7 +102,7 @@ public final class ResponseBuilder {
   public static StreamingOutput buildResponse(
       final Map<String, String> availableResources) {
 
-    final StreamingOutput sOutput = new StreamingOutput() {
+    return new StreamingOutput() {
       @Override
       public void write(final OutputStream output) {
         Document document;
@@ -127,7 +129,5 @@ public final class ResponseBuilder {
         }
       }
     };
-
-    return sOutput;
   }
 }
