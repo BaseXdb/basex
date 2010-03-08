@@ -4,30 +4,25 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
  * This utility class builds the XML response for listing existing available
  * resources or collections to a given URL path.
- * 
- * @author Lukas Lewandowski, University of Konstanz.
- * 
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author Lukas Lewandowski
  */
-public class ResponseBuilder {
+public final class ResponseBuilder {
 
   /**
    * The private empty constructor.
@@ -45,8 +40,8 @@ public class ResponseBuilder {
    */
   public static Document createSurroundingXMLResp()
       throws ParserConfigurationException {
-    final Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
-    return document;
+    return DocumentBuilderFactory.newInstance().
+      newDocumentBuilder().newDocument();
   }
 
   /**
@@ -74,6 +69,7 @@ public class ResponseBuilder {
    */
   public static List<Element> createCollectionOrResourceEl(
       final Map<String, String> pathResource, final Document document) {
+
     final List<Element> collections = new ArrayList<Element>();
     if(pathResource != null) {
       for(final Map.Entry<String, String> entry : pathResource.entrySet()) {
@@ -103,34 +99,30 @@ public class ResponseBuilder {
    */
   public static StreamingOutput buildResponse(
       final Map<String, String> availableResources) {
-    final StreamingOutput sOutput = new StreamingOutput() {
 
+    final StreamingOutput sOutput = new StreamingOutput() {
       @Override
-      public void write(final OutputStream output)
-          throws WebApplicationException {
+      public void write(final OutputStream output) {
         Document document;
         try {
           document = createSurroundingXMLResp();
-          final Element resElement = ResponseBuilder.createResultElement(document);
+          final Element resElement =
+            ResponseBuilder.createResultElement(document);
 
-          final List<Element> collOrRes = ResponseBuilder.createCollectionOrResourceEl(
-              availableResources, document);
+          final List<Element> collOrRes =
+            ResponseBuilder.createCollectionOrResourceEl(
+                availableResources, document);
           for(final Element resource : collOrRes) {
             resElement.appendChild(resource);
           }
           document.appendChild(resElement);
           final DOMSource domSource = new DOMSource(document);
           final StreamResult streamResult = new StreamResult(output);
-          final Transformer transformer = TransformerFactory.newInstance().newTransformer();
+          final Transformer transformer =
+            TransformerFactory.newInstance().newTransformer();
           transformer.transform(domSource, streamResult);
-
-        } catch(final ParserConfigurationException exce) {
-          throw new WebApplicationException(exce);
-        } catch(final TransformerConfigurationException exce) {
-          throw new WebApplicationException(exce);
-        } catch(final TransformerFactoryConfigurationError exce) {
-          throw new WebApplicationException(exce);
-        } catch(final TransformerException exce) {
+        } catch(final Exception exce) {
+          // catch all kind of exceptions to get sure an exception is returned 
           throw new WebApplicationException(exce);
         }
       }
