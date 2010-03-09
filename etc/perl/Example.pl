@@ -34,7 +34,7 @@ eval {
 
   # print time needed
   my $time = Time::HiRes::tv_interval($start) * 1000;
-  print "\n$time ms\n";
+  print "\n$time ms.\n";
 };
 
 # print exception

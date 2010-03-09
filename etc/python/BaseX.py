@@ -92,7 +92,7 @@ class BaseX():
     s.send('exit\0')
     s.close()
 
-  # Initializes the byte transfer
+  # Initializes the byte transfer.
   def __init(self):
     self.__bpos = 0
     self.__bsize = 0
