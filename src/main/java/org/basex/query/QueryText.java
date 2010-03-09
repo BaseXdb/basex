@@ -506,8 +506,6 @@ public interface QueryText {
   /** XUDY0017: XQuery Update dynamic exception. */
   Object[] UPMULTREPV = { XUDY, 17, "Multiple replaces on %." };
   /** XUDY0021: XQuery Update dynamic exception. */
-  Object[] UPNOPAR2 = { XUDY, 20, "Target % has no parent." };
-  /** XUDY0021: XQuery Update dynamic exception. */
   Object[] UPATTDUPL = { XUDY, 21, "Duplicate attribute %." };
   /** XUDY0023: XQuery Update dynamic exception. */
   Object[] UPNSCONFL = { XUDY, 23, "Conflicts with existing namespaces." };
