@@ -1,9 +1,6 @@
-package org.basex.server;
+package org.basex.core;
 
 import java.util.ArrayList;
-import org.basex.core.Context;
-import org.basex.core.Proc;
-import org.basex.core.User;
 
 /**
  * Management of executing read/write processes.

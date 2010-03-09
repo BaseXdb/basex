@@ -4,14 +4,14 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import org.basex.core.LocalSession;
+import org.basex.core.Semaphore;
 import org.basex.core.Session;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.server.Log;
-import org.basex.server.Semaphore;
 import org.basex.server.ServerProcess;
-import org.basex.server.ServerSession;
 import org.basex.util.Args;
 import org.basex.util.Token;
 
@@ -110,7 +110,7 @@ public final class BaseXServer extends Main implements Runnable {
 
   @Override
   protected Session session() {
-    if(session == null) session = new ServerSession(context, sem);
+    if(session == null) session = new LocalSession(context, sem);
     return session;
   }
 

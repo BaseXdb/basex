@@ -10,6 +10,7 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Prop;
+import org.basex.core.Semaphore;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.data.Data;
