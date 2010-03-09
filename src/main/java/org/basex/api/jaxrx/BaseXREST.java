@@ -218,11 +218,11 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
       props.setProperty("wrap-prefix", JAXRX);
       props.setProperty("wrap-uri", URL);
     }
-    // missing... feedback for incorrect parameters
+    // missing... feedback on incorrect parameters
     if(serialize != null) {
       for(final String ser : serialize.split(",")) {
-        final String[] sprop = ser.split(":");
-        props.setProperty(sprop[0], sprop[1]);
+        final String[] sprop = ser.split("=");
+        if(sprop.length == 2) props.setProperty(sprop[0], sprop[1]);
       }
     }
 
