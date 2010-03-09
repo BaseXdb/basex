@@ -4,6 +4,8 @@ import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Properties;
+
 import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
@@ -18,19 +20,25 @@ import org.basex.util.Tokenizer;
 public final class XMLSerializer extends Serializer {
   /** Indentation. */
   private static final byte[] INDENT = { ' ', ' ' };
-  /** Encoding. */
+  /** New line. */
   private static final byte[] NL = token(Prop.NL);
-  /** Encoding. */
-  private String enc = UTF8;
+  /** Colon. */
+  private static final byte[] COL = { ':' };
+
   /** Output stream. */
   private final PrintOutput out;
-  /** Pretty printing flag. */
-  private final boolean pretty;
-  /** XML output flag. */
-  private final boolean xml;
-  /** Indent flag. */
-  private boolean indent;
-  /** Item flag. */
+  /** Indentation flag. */
+  private boolean indent = true;
+  /** URI for wrapped results. */
+  private byte[] wrapUri;
+  /** Prefix for wrapped results. */
+  private byte[] wrapPre;
+  /** Encoding. */
+  private String enc = UTF8;
+
+  /** Temporary indentation flag. */
+  private boolean ind;
+  /** Temporary item flag. */
   private boolean item;
 
   /**
@@ -39,38 +47,53 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   public XMLSerializer(final OutputStream o) throws IOException {
-    this(o, false, true);
+    this(o, null);
   }
 
   /**
    * Constructor.
    * @param o output stream reference
-   * @param x serialize result as well-formed xml
-   * @param p pretty print the result
+   * @param p serialization properties
    * @throws IOException I/O exception
    */
-  public XMLSerializer(final OutputStream o, final boolean x, final boolean p)
+  public XMLSerializer(final OutputStream o, final Properties p)
       throws IOException {
-    out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
-    xml = x;
-    pretty = p;
-    if(xml) openElement(RESULTS);
-  }
 
-  /**
-   * Sets the encoding and prints a document declaration.
-   * Must be called at the beginning of a serialization.
-   * @param e encoding
-   * @throws IOException I/O exception
-   */
-  public void encoding(final String e) throws IOException {
-    enc = enc(e);
-    print(PI1);
-    print(DOCDECL);
-    print(enc);
-    print('\'');
-    print(PI2);
-    print(NL);
+    out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
+
+    boolean omit = true;
+    if(p != null) {
+      // parse indent
+      String val = p.getProperty("indent");
+      if(val != null) indent = Boolean.parseBoolean(val);
+      // parse encoding
+      val = p.getProperty("encoding");
+      omit = val == null;
+      if(!omit) enc = enc(val);
+      // parse omit-xml-declaration 
+      val = p.getProperty("omit-xml-declaration");
+      if(val != null) omit = Boolean.parseBoolean(val);
+      // hidden setting: set wrapping prefix
+      val = p.getProperty("wrap-prefix");
+      if(val != null) wrapPre = token(val);
+      // hidden setting: set wrapping prefix
+      val = p.getProperty("wrap-uri");
+      if(val != null) wrapUri = token(val);
+    }
+
+    if(!omit) {
+      print(PI1);
+      print(DOCDECL);
+      print(enc);
+      print('\'');
+      print(PI2);
+      print(NL);
+    }
+
+    if(wrapPre != null) {
+      openElement(concat(wrapPre, COL, RESULTS));
+      attribute(concat(XMLNSC, wrapPre), wrapUri);
+    }
   }
 
   /**
@@ -93,17 +116,17 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void cls() throws IOException {
-    if(xml) closeElement();
+    if(wrapPre != null) closeElement();
   }
 
   @Override
   public void openResult() throws IOException {
-    if(xml) openElement(RESULT);
+    if(wrapPre != null) openElement(concat(wrapPre, COL, RESULT));;
   }
 
   @Override
   public void closeResult() throws IOException {
-    if(xml) closeElement();
+    if(wrapPre != null) closeElement();
   }
 
   @Override
@@ -127,7 +150,7 @@ public final class XMLSerializer extends Serializer {
   public void text(final byte[] b) throws IOException {
     finishElement();
     for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));
-    indent = false;
+    ind = false;
   }
 
   @Override
@@ -149,13 +172,13 @@ public final class XMLSerializer extends Serializer {
       ch(cp(b, wl));
       wl += cl(b[wl]);
     }
-    indent = false;
+    ind = false;
   }
 
   @Override
   public void comment(final byte[] n) throws IOException {
     finishElement();
-    if(indent) indent(true);
+    if(ind) indent(true);
     print(COM1);
     print(n);
     print(COM2);
@@ -164,7 +187,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
     finishElement();
-    if(indent) indent(true);
+    if(ind) indent(true);
     print(PI1);
     print(n);
     print(' ');
@@ -175,9 +198,9 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void item(final byte[] b) throws IOException {
     finishElement();
-    if(indent) print(' ');
+    if(ind) print(' ');
     for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));
-    indent = true;
+    ind = true;
     item = true;
   }
 
@@ -203,10 +226,10 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   protected void start(final byte[] t) throws IOException {
-    if(indent) indent(false);
+    if(ind) indent(false);
     print(ELEM1);
     print(t);
-    indent = pretty;
+    ind = indent;
   }
 
   @Override
@@ -221,11 +244,11 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   protected void close(final byte[] t) throws IOException {
-    if(indent) indent(true);
+    if(ind) indent(true);
     print(ELEM3);
     print(t);
     print(ELEM2);
-    indent = pretty;
+    ind = indent;
   }
 
   /**

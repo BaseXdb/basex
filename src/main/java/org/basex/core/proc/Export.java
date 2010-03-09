@@ -2,6 +2,7 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.Properties;
 
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -79,11 +80,17 @@ public final class Export extends Proc {
     for(final int pre : docs) {
       final IO file = io.merge(docs.length == 1 && name != null ?
           name : Token.string(data.text(pre, true)));
+
+      // define serialization parameters
+      final Properties props = new Properties();
+      props.setProperty("indent", Boolean.toString(prop.is(Prop.XMLFORMAT)));
+      props.setProperty("encoding", prop.get(Prop.XMLENCODING));
+
+      // serialize nodes
       final PrintOutput po = new PrintOutput(file.path());
-      final XMLSerializer xml = new XMLSerializer(po, false,
-          prop.is(Prop.XMLFORMAT));
-      xml.encoding(prop.get(Prop.XMLENCODING));
+      final XMLSerializer xml = new XMLSerializer(po, props);
       xml.node(data, pre);
+      xml.close();
       po.close();
     }
   }

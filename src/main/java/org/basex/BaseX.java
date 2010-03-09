@@ -167,9 +167,9 @@ public class BaseX extends Main {
           } else if(c == 'V') {
             // show all process info
             success = set(Prop.INFO, ALL);
-          } else if(c == 'x') {
+          } else if(c == 'w') {
             // activate well-formed XML output
-            success = set(Prop.XMLOUTPUT, true);
+            success = set(Prop.WRAPOUTPUT, true);
           } else if(c == 'X') {
             // hidden option: show xml query plan
             success = set(Prop.XMLPLAN, true);

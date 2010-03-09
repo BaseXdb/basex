@@ -71,8 +71,8 @@ public final class Prop extends AProp {
   public static final Object[] ALLINFO = { "ALLINFO", false };
   /** Flag for serializing query results. */
   public static final Object[] SERIALIZE = { "SERIALIZE", true };
-  /** Flag for serialization as XML. */
-  public static final Object[] XMLOUTPUT = { "XMLOUTPUT", false };
+  /** Flag for wrapping result nodes. */
+  public static final Object[] WRAPOUTPUT = { "WRAPOUTPUT", false };
   /** Format output. */
   public static final Object[] XMLFORMAT = { "XMLFORMAT", true };
   /** Format output. */

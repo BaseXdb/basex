@@ -84,7 +84,7 @@ public interface Text {
     "  -P<pass>   user password" + NL +
     "  -U<name>   user name" + NL +
     "  -v/V       show (all) process info" + NL +
-    "  -x         wrap query result to xml" + NL +
+    "  -w         wrap query result to xml" + NL +
     "  -z         skip query output";
 
   /** Start information. */
@@ -96,7 +96,7 @@ public interface Text {
     "  -i<file>   XML input" + NL +
     "  -o<file>   output file" + NL +
     "  -v/V       show (all) process info" + NL +
-    "  -x         wrap query result to xml" + NL +
+    "  -w         wrap query result to xml" + NL +
     "  -z         skip query output";
 
   // SERVER ===================================================================
