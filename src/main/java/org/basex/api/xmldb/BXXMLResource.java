@@ -209,7 +209,8 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
      * @throws IOException I/O exception
      */
     BXSAXContentHandler(final BXXMLResource r) throws IOException {
-      xml = new XMLSerializer(co, false, false);
+      // new XMLSerializer(co, false);
+      xml = new XMLSerializer(co);
       res = r;
     }
 

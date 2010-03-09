@@ -1,5 +1,7 @@
 package org.basex.api.jaxrx;
 
+import static org.basex.util.Token.*;
+import static org.jaxrx.constants.URLConstants.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -43,7 +46,7 @@ import org.xml.sax.InputSource;
  * @author Lukas Lewandowski
  */
 public final class BaseXREST implements IGet, IPost, IDelete, IPut {
-
+ 
   // /**
   // * This field the begin result element of a XQuery or XPath expression.
   // */
@@ -58,8 +61,8 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
   @Override
   public Set<EURLParameter> getAvailableParams() {
     final Set<EURLParameter> params = new HashSet<EURLParameter>();
+    //params.add(EURLParameter.COMMAND);
     params.add(EURLParameter.COUNT);
-    params.add(EURLParameter.COMMAND);
     params.add(EURLParameter.OUTPUT);
     params.add(EURLParameter.QUERY);
     params.add(EURLParameter.START);
@@ -73,11 +76,12 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
 
     return new StreamingOutput() {
       @Override
-      public void write(final OutputStream output) {
+      public void write(final OutputStream out) {
         final Context ctx = new Context();
         if(new Open(resource).exec(ctx)) {
-          query(params.get(EURLParameter.QUERY), output, ctx,
+          query(params.get(EURLParameter.QUERY), out, ctx,
                 params.get(EURLParameter.WRAP),
+                params.get(EURLParameter.OUTPUT),
                 params.get(EURLParameter.START),
                 params.get(EURLParameter.COUNT));
         }
@@ -88,15 +92,33 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
 
   @Override
   public StreamingOutput getResourcesNames() {
-    final Map<String, String> resources = new HashMap<String, String>();
-    final Context ctx = new Context();
-    for(final String db : List.list(ctx)) {
-      if(new Open(db).exec(ctx)) {
-        resources.put(db, ctx.current.size() > 1 ? "collection" : "resource");
+    return new StreamingOutput() {
+      @Override
+      public void write(final OutputStream out) {
+        final Context ctx = new Context();
+        try {
+          final XMLSerializer xml = new XMLSerializer(out);
+          xml.openElement(token(JAXRX + ":results"));
+          xml.namespace(token(JAXRX), token(URL));
+
+          for(final String db : List.list(ctx)) {
+            if(new Open(db).exec(ctx)) {
+              xml.emptyElement(token(JAXRX + ":" +
+                  (ctx.current.size() > 1 ? "collection" : "resource")),
+                  token("name"), token(db));
+            }
+          }
+          xml.closeElement();
+          xml.close();
+        } catch(final Exception ex) {
+          // catch all kind of exceptions to get sure an exception is returned 
+          throw new WebApplicationException(ex);
+        } finally {
+          // always close context
+          try { ctx.close(); } catch(final Exception ex) { }
+        }
       }
-    }
-    ctx.close();
-    return ResponseBuilder.buildResponse(resources);
+    };
   }
 
   @Override
@@ -108,8 +130,7 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
       final Document pvDoc = (Document) input;
       so = new StreamingOutput() {
         @Override
-        public void write(final OutputStream output) {
-          final OutputStream out = output;
+        public void write(final OutputStream out) {
           final Context ctx = new Context();
           if(!new Open(resource).exec(ctx))
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -117,6 +138,7 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
           final Map<String, String> params = getParams(pvDoc);
           query(params.get("query"), out, ctx,
                 params.get("wrap"),
+                params.get("output"),
                 params.get("start"),
                 params.get("count"));
           ctx.close();
@@ -174,24 +196,39 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
    * @param query The XQuery expression as {@link String}
    * @param out The {@link OutputStream} that writes the result of the query
    * @param ctx The context
-   * @param sur The optional surrounding result element (needed for a
+   * @param wrap The optional surrounding result element (needed for a
    *          XML fragment)
-   * @param sta The start value
-   * @param cnt The maximum value of results
+   * @param serialize serialization parameters
+   * @param start The start value
+   * @param count The maximum value of results
    * @throws WebApplicationException The exception occurred
    */
   protected void query(final String query, final OutputStream out,
-      final Context ctx, final String sur, final String sta, final String cnt) {
+      final Context ctx, final String wrap, final String serialize,
+      final String start, final String count) {
 
-    final int s = sta != null ? Integer.valueOf(sta) : 0;
-    final int m = cnt != null ? Integer.valueOf(cnt) : Integer.MAX_VALUE - s;
-    final boolean surround = sur != null && Boolean.parseBoolean(sur);
     final String xquery = query != null ? query : ".";
-    
-    XMLSerializer xml = null;
+    final int s = start != null ? Integer.valueOf(start) : 0;
+    final int m = count != null ? Integer.valueOf(count) :
+      Integer.MAX_VALUE - s;
+
+    // set serialization parameters
+    final Properties props = new Properties();
+    if(wrap != null && Boolean.parseBoolean(wrap)) {
+      props.setProperty("wrap-prefix", JAXRX);
+      props.setProperty("wrap-uri", URL);
+    }
+    // missing... feedback for incorrect parameters
+    if(serialize != null) {
+      for(final String ser : serialize.split(",")) {
+        final String[] sprop = ser.split(":");
+        props.setProperty(sprop[0], sprop[1]);
+      }
+    }
+
     QueryProcessor proc = null;
     try {
-      xml = new XMLSerializer(out, surround, true);
+      XMLSerializer xml = new XMLSerializer(out, props);
       proc = new QueryProcessor(xquery, ctx);
 
       final Iter iter = proc.iter();
@@ -203,12 +240,12 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
         it.serialize(xml);
         xml.closeResult();
       }
+      xml.close();
     } catch(final Exception ex) {
       // catch all kind of exceptions to get sure an exception is returned 
       throw new WebApplicationException(ex);
     } finally {
       // always close open references
-      try { if(xml != null) xml.close(); } catch(final Exception ex) { }
       try { if(proc != null) proc.close(); } catch(final Exception ex) { }
     }
   }
