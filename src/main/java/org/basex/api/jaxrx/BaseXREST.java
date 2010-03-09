@@ -186,12 +186,13 @@ public final class BaseXREST implements IGet, IPost, IDelete, IPut {
     final int s = sta != null ? Integer.valueOf(sta) : 0;
     final int m = cnt != null ? Integer.valueOf(cnt) : Integer.MAX_VALUE - s;
     final boolean surround = sur != null && Boolean.parseBoolean(sur);
+    final String xquery = query != null ? query : ".";
     
     XMLSerializer xml = null;
     QueryProcessor proc = null;
     try {
       xml = new XMLSerializer(out, surround, true);
-      proc = new QueryProcessor(query, ctx);
+      proc = new QueryProcessor(xquery, ctx);
 
       final Iter iter = proc.iter();
       for(int c = 0; c < s + m; c++) {
