@@ -14,6 +14,7 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -376,8 +377,10 @@ public abstract class W3CTS {
         }
 
         // evaluate and serialize query
-        final XMLSerializer xml = new XMLSerializer(co, false,
-            context.prop.is(Prop.CHOP));
+        Properties props = new Properties();
+        if(!context.prop.is(Prop.CHOP)) props.setProperty("indent", "false");
+        final XMLSerializer xml = new XMLSerializer(co, props);
+
         iter = SeqIter.get(xq.iter());
         Item it;
         while((it = iter.next()) != null) {
