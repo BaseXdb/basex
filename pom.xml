@@ -24,9 +24,9 @@
       <url>http://repository.codehaus.org/</url>
     </repository>
     <repository>
-      <id>dbis-ukn</id>
-      <name>DBIS Maven Repository</name>
-      <url>http://www.inf.uni-konstanz.de/dbis/basex/maven</url>
+      <id>disy-ukn</id>
+      <name>DISY Maven Repository</name>
+      <url>http://xen5.disy.inf.uni-konstanz.de/repo/repository</url>
     </repository>
   </repositories>
   <organization>
@@ -79,9 +79,9 @@
       <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>org.jaxrx</groupId>
+      <groupId>jaxrx</groupId>
       <artifactId>jaxrx</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
