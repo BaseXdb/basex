@@ -14,7 +14,6 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -25,6 +24,7 @@ import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
+import org.basex.gui.SerializeProp;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
@@ -377,8 +377,8 @@ public abstract class W3CTS {
         }
 
         // evaluate and serialize query
-        Properties props = new Properties();
-        if(!context.prop.is(Prop.CHOP)) props.setProperty("indent", "false");
+        final SerializeProp props = new SerializeProp();
+        props.set(SerializeProp.INDENT, context.prop.is(Prop.CHOP));
         final XMLSerializer xml = new XMLSerializer(co, props);
 
         iter = SeqIter.get(xq.iter());
