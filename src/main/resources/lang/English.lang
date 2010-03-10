@@ -426,7 +426,8 @@ ad_kill=% sessions killed.
 ad_killself='%' cannot kill itself.
 
 # General Commands
-gc_seterr=Could not set property '%' to '%'.
+gc_setkey=Could not set '%'.
+gc_setval=Could not set '%' to '%'.
 
 # Info Strings
 info_index=Indexes

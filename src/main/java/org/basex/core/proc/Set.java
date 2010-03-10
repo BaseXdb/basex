@@ -15,7 +15,7 @@ import org.basex.io.PrintOutput;
  */
 public final class Set extends Proc {
   /** Info strings (same order as options defined in {@link CmdSet}). */
-  private static final String[] STRINGS = {
+  static final String[] STRINGS = {
     INFOINFO, INFODEBUG, INFOSERIALIZE, INFOCHOP, INFOENTITY, INFOTEXTINDEX,
     INFOATTRINDEX, INFOFTINDEX, INFOPATHINDEX, INFODBPATH
   };
@@ -41,6 +41,7 @@ public final class Set extends Proc {
 
     try {
       final Object type = prop.object(key);
+      if(type == null) return error(SETKEY, key);
 
       if(type instanceof Boolean) {
         final boolean b = val == null ? !((Boolean) type).booleanValue() :
@@ -68,7 +69,7 @@ public final class Set extends Proc {
       return info(key + ": " + val);
     } catch(final Exception ex) {
       Main.debug(ex);
-      return error(SETERR, key, val);
+      return error(SETVAL, key, val);
     }
   }
 }

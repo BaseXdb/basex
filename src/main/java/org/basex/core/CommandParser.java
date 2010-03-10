@@ -28,6 +28,7 @@ import org.basex.core.proc.DropUser;
 import org.basex.core.proc.Exit;
 import org.basex.core.proc.Export;
 import org.basex.core.proc.Find;
+import org.basex.core.proc.Get;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.Help;
 import org.basex.core.proc.Info;
@@ -184,12 +185,10 @@ public final class CommandParser extends InputParser {
         return new Find(string(cmd));
       case CS:
         return new Cs(xquery(cmd));
+      case GET:
+        return new Get(name(cmd));
       case SET:
-        final String opt = name(cmd);
-        final String val = string(null);
-        final Object type = ctx.prop.object(opt.toUpperCase());
-        if(type == null) help(null, cmd);
-        return new Set(opt, val);
+        return new Set(name(cmd), string(null));
       case PASSWORD:
         return new Password(string(null));
       case HELP:

@@ -426,7 +426,8 @@ ad_kill=% sessione chiusa.
 ad_killself='%' non può chiudere se stessa.
 
 # General Commands
-gc_seterr=Non è possibile impostare la proprietà '%' a '%'.
+gc_setkey=Non è possibile impostare '%'.
+gc_setval=Non è possibile impostare '%' a '%'.
 
 # Info Strings
 info_index=Indici

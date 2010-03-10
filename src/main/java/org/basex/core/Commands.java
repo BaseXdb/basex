@@ -48,7 +48,7 @@ public interface Commands {
     HA(HID, HELPA), SHOW(HELPSHOW), GRANT(HELPGRANT),
     ALTER(HELPALTER), KILL(HELPKILL),
     // General commands
-    HG(HID, HELPG), SET(HELPSET), PASSWORD(HELPPASSWORD),
+    HG(HID, HELPG), GET(HID), SET(HELPSET), PASSWORD(HELPPASSWORD),
     HELP(HELPHELP), EXIT(HELPEXIT), Q(HID), QUIT(HID);
 
     /** Flags for controlling command parsing. */

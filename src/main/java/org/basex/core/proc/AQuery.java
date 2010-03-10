@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import java.util.Properties;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Proc;
@@ -10,6 +9,7 @@ import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
 import org.basex.data.XMLSerializer;
+import org.basex.gui.SerializeProp;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.io.NullOutput;
@@ -58,10 +58,10 @@ abstract class AQuery extends Proc {
     String err = null;
     try {
       // define serialization parameters
-      final Properties props = new Properties();
+      final SerializeProp props = new SerializeProp(prop.get(Prop.SERIALIZER));
       if(prop.is(Prop.WRAPOUTPUT)) {
-        props.setProperty("wrap-prefix", NAMELC);
-        props.setProperty("wrap-uri", URL);
+        props.set(SerializeProp.WRAP_PRE, NAMELC);
+        props.set(SerializeProp.WRAP_URI, URL);
       }
 
       final boolean ser = prop.is(Prop.SERIALIZE);

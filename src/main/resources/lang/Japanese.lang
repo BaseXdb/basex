@@ -427,7 +427,8 @@ ad_kill=% セッションが切断されました。
 ad_killself='%' 自身のセッションを切断する事は出来ません。
 
 # General Commands
-gc_seterr=プロパティ '%' を '%' に変更する事が出来ませんでした。
+gc_setkey=Could not set '%'.
+gc_setval=プロパティ '%' を '%' に変更する事が出来ませんでした。
 
 # Info Strings
 info_index=インデックス

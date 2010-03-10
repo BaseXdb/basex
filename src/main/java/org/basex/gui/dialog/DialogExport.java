@@ -8,6 +8,7 @@ import java.nio.charset.Charset;
 import java.util.SortedMap;
 import org.basex.core.Prop;
 import org.basex.gui.GUI;
+import org.basex.gui.SerializeProp;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -81,6 +82,8 @@ public final class DialogExport extends Dialog {
     p.add(new BaseXLabel(INFOENCODING + COL, false, true));
 
     final Prop prop = gui.context.prop;
+    final SerializeProp props = new SerializeProp(prop.get(Prop.SERIALIZER));
+
     if(encodings == null) {
       final SortedMap<String, Charset> cs = Charset.availableCharsets();
       encodings = cs.keySet().toArray(new String[cs.size()]);
@@ -93,13 +96,13 @@ public final class DialogExport extends Dialog {
       enc = enc.toUpperCase();
       for(final String s : encodings) f |= s.equals(enc);
     }
-    encoding.setSelectedItem(f ? enc : prop.get(Prop.XMLENCODING));
+    encoding.setSelectedItem(f ? enc : props.get(SerializeProp.ENCODING));
     encoding.addKeyListener(keys);
     BaseXLayout.setWidth(encoding, BaseXTextField.DWIDTH);
     p.add(encoding);
     pp.add(p);
 
-    format = new BaseXCheckBox(INDENT, prop.is(Prop.XMLFORMAT), 0, this);
+    format = new BaseXCheckBox(INDENT, prop.is(SerializeProp.INDENT), 0, this);
     pp.add(format);
     set(pp, BorderLayout.CENTER);
 
@@ -160,8 +163,8 @@ public final class DialogExport extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
-    final Prop prop = gui.context.prop;
-    prop.set(Prop.XMLFORMAT, format.isSelected());
-    prop.set(Prop.XMLENCODING, encoding.getSelectedItem().toString());
+    gui.context.prop.set(Prop.SERIALIZER,
+      "indent=" + (format.isSelected() ? SerializeProp.YES : SerializeProp.NO) +
+      ",encoding=" + encoding.getSelectedItem().toString());
   }
 }

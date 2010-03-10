@@ -426,7 +426,8 @@ ad_kill=% Verbindungen beendet.
 ad_killself='%' kann sich nicht selbst beenden.
 
 # General Commands
-gc_seterr=Fehler beim Setzen der Eigenschaft '%' auf '%'.
+gc_setkey=Fehler beim Setzen von '%'.
+gc_setval=Fehler beim Setzen von '%' auf '%'.
 
 # Info Strings
 info_index=Indizes

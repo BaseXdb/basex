@@ -73,10 +73,8 @@ public final class Prop extends AProp {
   public static final Object[] SERIALIZE = { "SERIALIZE", true };
   /** Flag for wrapping result nodes. */
   public static final Object[] WRAPOUTPUT = { "WRAPOUTPUT", false };
-  /** Format output. */
-  public static final Object[] XMLFORMAT = { "XMLFORMAT", true };
-  /** Format output. */
-  public static final Object[] XMLENCODING = { "XMLENCODING", "UTF-8" };
+  /** Serialization parameters, separated by commas. */
+  public static final Object[] SERIALIZER = { "SERIALIZER", "encoding=UTF-8" };
   /** Dots the query plan. */
   public static final Object[] DOTPLAN = { "DOTPLAN", false };
   /** Path to dotty. */

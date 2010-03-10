@@ -518,8 +518,10 @@ public interface Text {
 
   // GENERAL COMMANDS =========================================================
 
-  /** Insert query info. */
-  String SETERR = lang("gc_seterr");
+  /** Invalid key. */
+  String SETKEY = lang("gc_setkey");
+  /** Invalid value. */
+  String SETVAL = lang("gc_setval");
 
   // INFO STRINGS =============================================================
 

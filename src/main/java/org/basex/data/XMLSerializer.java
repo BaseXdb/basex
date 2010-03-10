@@ -4,9 +4,8 @@ import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Properties;
-
 import org.basex.core.Prop;
+import org.basex.gui.SerializeProp;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
@@ -19,7 +18,7 @@ import org.basex.util.Tokenizer;
  */
 public final class XMLSerializer extends Serializer {
   /** Indentation. */
-  private static final byte[] INDENT = { ' ', ' ' };
+  private static final byte[] SPACES = { ' ', ' ' };
   /** New line. */
   private static final byte[] NL = token(Prop.NL);
   /** Colon. */
@@ -30,9 +29,11 @@ public final class XMLSerializer extends Serializer {
   /** Indentation flag. */
   private boolean indent = true;
   /** URI for wrapped results. */
-  private byte[] wrapUri;
+  private byte[] wrapUri = {};
   /** Prefix for wrapped results. */
-  private byte[] wrapPre;
+  private byte[] wrapPre = {};
+  /** Wrapper flag. */
+  private boolean wrap;
   /** Encoding. */
   private String enc = UTF8;
 
@@ -47,38 +48,39 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   public XMLSerializer(final OutputStream o) throws IOException {
-    this(o, null);
+    this(o, (SerializeProp) null);
   }
-
+  
   /**
-   * Constructor.
+   * Constructor, specifying serialization options in a string.
    * @param o output stream reference
    * @param p serialization properties
    * @throws IOException I/O exception
    */
-  public XMLSerializer(final OutputStream o, final Properties p)
+  public XMLSerializer(final OutputStream o, final String p)
+      throws IOException {
+    this(o, new SerializeProp(p));
+  }
+  
+  /**
+   * Constructor, specifying serialization options.
+   * @param o output stream reference
+   * @param p serialization properties
+   * @throws IOException I/O exception
+   */
+  public XMLSerializer(final OutputStream o, final SerializeProp p)
       throws IOException {
 
     out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
 
     boolean omit = true;
     if(p != null) {
-      // parse indent
-      String val = p.getProperty("indent");
-      if(val != null) indent = Boolean.parseBoolean(val);
-      // parse encoding
-      val = p.getProperty("encoding");
-      omit = val == null;
-      if(!omit) enc = enc(val);
-      // parse omit-xml-declaration 
-      val = p.getProperty("omit-xml-declaration");
-      if(val != null) omit = Boolean.parseBoolean(val);
-      // hidden setting: set wrapping prefix
-      val = p.getProperty("wrap-prefix");
-      if(val != null) wrapPre = token(val);
-      // hidden setting: set wrapping prefix
-      val = p.getProperty("wrap-uri");
-      if(val != null) wrapUri = token(val);
+      indent = p.is(SerializeProp.INDENT);
+      enc = enc(p.get(SerializeProp.ENCODING));
+      omit = p.is(SerializeProp.OMIT_XML_DECLARATION);
+      wrapPre = token(p.get(SerializeProp.WRAP_PRE));
+      wrapUri = token(p.get(SerializeProp.WRAP_URI));
+      wrap = wrapPre.length != 0;
     }
 
     if(!omit) {
@@ -90,12 +92,12 @@ public final class XMLSerializer extends Serializer {
       print(NL);
     }
 
-    if(wrapPre != null) {
+    if(wrap) {
       openElement(concat(wrapPre, COL, RESULTS));
-      attribute(concat(XMLNSC, wrapPre), wrapUri);
+      namespace(wrapPre, wrapUri);
     }
   }
-
+  
   /**
    * Doctype declaration.
    * @param t document root element tag
@@ -116,17 +118,17 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void cls() throws IOException {
-    if(wrapPre != null) closeElement();
+    if(wrap) closeElement();
   }
 
   @Override
   public void openResult() throws IOException {
-    if(wrapPre != null) openElement(concat(wrapPre, COL, RESULT));;
+    if(wrap) openElement(concat(wrapPre, COL, RESULT));;
   }
 
   @Override
   public void closeResult() throws IOException {
-    if(wrapPre != null) closeElement();
+    if(wrap) closeElement();
   }
 
   @Override
@@ -263,7 +265,7 @@ public final class XMLSerializer extends Serializer {
     }
     print(NL);
     final int s = level() + (close ? 1 : 0);
-    for(int l = 1; l < s; l++) print(INDENT);
+    for(int l = 1; l < s; l++) print(SPACES);
   }
 
   /**
