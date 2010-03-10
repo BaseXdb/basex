@@ -82,7 +82,7 @@ public final class DialogExport extends Dialog {
     p.add(new BaseXLabel(INFOENCODING + COL, false, true));
 
     final Prop prop = gui.context.prop;
-    final SerializeProp props = new SerializeProp(prop.get(Prop.SERIALIZER));
+    final SerializeProp sprop = new SerializeProp(prop.get(Prop.SERIALIZER));
 
     if(encodings == null) {
       final SortedMap<String, Charset> cs = Charset.availableCharsets();
@@ -96,13 +96,13 @@ public final class DialogExport extends Dialog {
       enc = enc.toUpperCase();
       for(final String s : encodings) f |= s.equals(enc);
     }
-    encoding.setSelectedItem(f ? enc : props.get(SerializeProp.ENCODING));
+    encoding.setSelectedItem(f ? enc : sprop.get(SerializeProp.ENCODING));
     encoding.addKeyListener(keys);
     BaseXLayout.setWidth(encoding, BaseXTextField.DWIDTH);
     p.add(encoding);
     pp.add(p);
 
-    format = new BaseXCheckBox(INDENT, prop.is(SerializeProp.INDENT), 0, this);
+    format = new BaseXCheckBox(INDENT, sprop.is(SerializeProp.INDENT), 0, this);
     pp.add(format);
     set(pp, BorderLayout.CENTER);
 
@@ -165,6 +165,7 @@ public final class DialogExport extends Dialog {
     super.close();
     gui.context.prop.set(Prop.SERIALIZER,
       "indent=" + (format.isSelected() ? SerializeProp.YES : SerializeProp.NO) +
-      ",encoding=" + encoding.getSelectedItem().toString());
+      ",encoding=" + encoding.getSelectedItem() +
+      ",omit-xml-declaration=no");
   }
 }
