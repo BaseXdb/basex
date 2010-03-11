@@ -8,8 +8,8 @@ import org.basex.core.Proc;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
+import org.basex.data.SerializeProp;
 import org.basex.data.XMLSerializer;
-import org.basex.gui.SerializeProp;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.io.NullOutput;
@@ -58,8 +58,8 @@ abstract class AQuery extends Proc {
       // define serialization parameters
       final SerializeProp sprop = new SerializeProp(prop.get(Prop.SERIALIZER));
       if(prop.is(Prop.WRAPOUTPUT)) {
-        sprop.set(SerializeProp.WRAP_PRE, NAMELC);
-        sprop.set(SerializeProp.WRAP_URI, URL);
+        sprop.set(SerializeProp.S_WRAP_PRE, NAMELC);
+        sprop.set(SerializeProp.S_WRAP_URI, URL);
       }
 
       final boolean ser = prop.is(Prop.SERIALIZE);

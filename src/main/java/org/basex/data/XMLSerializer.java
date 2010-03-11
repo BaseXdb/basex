@@ -1,14 +1,14 @@
 package org.basex.data;
 
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
+import static org.basex.data.SerializeProp.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.gui.SerializeProp;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -32,14 +32,14 @@ public final class XMLSerializer extends Serializer {
   private final PrintOutput out;
   /** CData elements. */
   private final TokenList cdata = new TokenList();
+  /** XML version. */
+  private String version = "1.0";
   /** Indentation flag. */
   private boolean indent = true;
   /** URI for wrapped results. */
   private byte[] wrapUri = {};
   /** Prefix for wrapped results. */
   private byte[] wrapPre = {};
-  /** XML version. */
-  private String version = "1.0";
   /** Wrapper flag. */
   private boolean wrap;
   /** Encoding. */
@@ -82,30 +82,24 @@ public final class XMLSerializer extends Serializer {
     out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
 
     boolean omit = true;
-    String sa = SerializeProp.OMIT;
+    String sa = OMIT;
     if(p != null) {
-      indent = p.is(SerializeProp.INDENT);
-
-      enc = enc(p.get(SerializeProp.ENCODING));
-      if(!Charset.isSupported(enc)) error(SERENCODING, enc);
-
-      // [CG] check version details
-      version = p.get(SerializeProp.VERSION);
-      if(!version.equals("1.0") && !version.equals("1.1")) error(SERVERSION);
-
-      final String s = p.get(SerializeProp.CDATA_SECTION_ELEMENTS).trim();
-      if(s.length() != 0) {
-        for(final String c : s.split(" ")) cdata.add(token(c));
+      for(final String c : p.get(S_CDATA_SECTION_ELEMENTS).split("\\s+")) {
+        if(c.length() != 0) cdata.add(token(c));
       }
+      enc     = enc(p.get(S_ENCODING));
+      indent  = check(p, S_INDENT, YES, NO).equals(YES);
+      omit    = check(p, S_OMIT_XML_DECLARATION, YES, NO).equals(YES);
+      sa      = check(p, S_STANDALONE, YES, NO, OMIT);
+      version = check(p, S_VERSION, "1.0", "1.1");
 
-      omit = p.is(SerializeProp.OMIT_XML_DECLARATION);
-      sa = p.get(SerializeProp.STANDALONE);
-      if(omit && !sa.equals(SerializeProp.OMIT)) error(SERSTAND);
-
-      wrapPre = token(p.get(SerializeProp.WRAP_PRE));
-      wrapUri = token(p.get(SerializeProp.WRAP_URI));
-      wrap = wrapPre.length != 0;
+      wrapPre = token(p.get(S_WRAP_PRE));
+      wrapUri = token(p.get(S_WRAP_URI));
+      wrap    = wrapPre.length != 0;
     }
+
+    if(!Charset.isSupported(enc)) error(SERENCODING, enc);
+    if(omit && !sa.equals(OMIT)) error(SERSTAND);
 
     if(!omit) {
       print(PI1);
@@ -113,6 +107,10 @@ public final class XMLSerializer extends Serializer {
       print(version);
       print(DOCDECL2);
       print(enc);
+      if(!sa.equals(OMIT)) {
+        print(DOCDECL3);
+        print(sa);
+      }
       print('\'');
       print(PI2);
       ind = indent;
@@ -125,24 +123,13 @@ public final class XMLSerializer extends Serializer {
   }
   
   /**
-   * Global method, replacing all % characters
-   * (see {@link TokenBuilder#add(Object, Object...)} for details.
-   * @param str string to be extended
-   * @param ext text text extensions
-   * @throws IOException I/O exception
-   */
-  public static void error(final Object str, final Object... ext)
-      throws IOException {
-    throw new IOException(Main.info(str, ext));
-  }
-  
-  /**
    * Doctype declaration.
    * @param t document root element tag
    * @param te external subset
    * @param ti internal subset
    * @throws IOException IOException
-   */
+   * [CG] to be moved to constructor.
+   */ 
   public void doctype(final byte[] t, final byte[] te,
       final byte[] ti) throws IOException {
     print(DOCTYPE);
@@ -152,6 +139,35 @@ public final class XMLSerializer extends Serializer {
     if(ti != null) print(" \"" + string(ti) + "\"");
     print(ELEM2);
     print(NL);
+  }
+  
+  /**
+   * Retrieves a value from the specified property and checks allowed values.
+   * @param p properties
+   * @param key property key
+   * @param allowed allowed values
+   * @return value
+   * @throws IOException I/O exception
+   */
+  public static String check(final SerializeProp p, final Object[] key,
+      final String... allowed) throws IOException {
+
+    final String val = p.get(key);
+    for(final String a : allowed) if(a.equals(val)) return val;
+    error(SETVAL, key[0], val);
+    return val;
+  }
+  
+  /**
+   * Global method, replacing all % characters
+   * (see {@link TokenBuilder#add(Object, Object...)} for details.
+   * @param str string to be extended
+   * @param ext text text extensions
+   * @throws IOException I/O exception
+   */
+  public static void error(final Object str, final Object... ext)
+      throws IOException {
+    throw new IOException(Main.info(str, ext));
   }
 
   @Override
@@ -194,7 +210,7 @@ public final class XMLSerializer extends Serializer {
       print("<![CDATA[");
       int c = 0;
       for(int k = 0; k < b.length; k += cl(b[k])) {
-        int ch = cp(b, k);
+        final int ch = cp(b, k);
         if(ch == ']') {
           c++;
         } else {

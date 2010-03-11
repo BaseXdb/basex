@@ -1,6 +1,7 @@
 package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
+import static org.basex.data.SerializeProp.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -8,8 +9,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.SortedMap;
 import org.basex.core.Prop;
+import org.basex.data.SerializeProp;
 import org.basex.gui.GUI;
-import org.basex.gui.SerializeProp;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -102,13 +103,14 @@ public final class DialogExport extends Dialog {
       enc = enc.toUpperCase();
       for(final String s : encodings) f |= s.equals(enc);
     }
-    encoding.setSelectedItem(f ? enc : sprop.get(SerializeProp.ENCODING));
+    encoding.setSelectedItem(f ? enc : sprop.get(S_ENCODING));
     encoding.addKeyListener(keys);
     BaseXLayout.setWidth(encoding, BaseXTextField.DWIDTH);
     p.add(encoding);
     pp.add(p);
 
-    format = new BaseXCheckBox(INDENT, sprop.is(SerializeProp.INDENT), 0, this);
+    format = new BaseXCheckBox(OUTINDENT,
+        sprop.get(S_INDENT).equals(YES), 0, this);
     pp.add(format);
     set(pp, BorderLayout.CENTER);
 
@@ -170,8 +172,8 @@ public final class DialogExport extends Dialog {
     if(!ok) return;
     super.close();
     gui.context.prop.set(Prop.EXPORTER,
-      "indent=" + (format.isSelected() ? SerializeProp.YES : SerializeProp.NO) +
-      ",encoding=" + encoding.getSelectedItem() +
-      ",omit-xml-declaration=no");
+      "," + S_INDENT[0] + "=" + (format.isSelected() ? YES : NO) +
+      "," + S_ENCODING[0] + "=" + encoding.getSelectedItem() +
+      "," + S_OMIT_XML_DECLARATION[0] + "=" + NO);
   }
 }

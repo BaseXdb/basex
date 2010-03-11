@@ -119,6 +119,8 @@ public interface DataText {
   byte[] DOCDECL1 = token("xml version='");
   /** Document declaration. */
   byte[] DOCDECL2 = token("' encoding='");
+  /** Document declaration. */
+  byte[] DOCDECL3 = token("' standalone='");
   /** Doctype output. */
   byte[] DOCTYPE = token("<!DOCTYPE");
   /** Doctype system keyword. */
@@ -159,8 +161,8 @@ public interface DataText {
   String SERENCODING = "[SESU0007] Unknown encoding: '%'";
   /** Serialization error SEPOM0009. */
   String SERSTAND = "[SEPM0009] Invalid combination with 'standalone'.";
-  /** Serialization error SESU0013. */
-  String SERVERSION = "[SESU0013] XML Version must be '1.0' or '1.1'.";
+  /** Serialization error SESU0013.
+  String SERVERSION = "[SESU0013] XML Version must be '1.0' or '1.1'."; */
 
   // TABLE SERIALIZATION ======================================================
 

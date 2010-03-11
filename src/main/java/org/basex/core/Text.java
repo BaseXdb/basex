@@ -1140,7 +1140,7 @@ public interface Text {
   /** Dialog title for exporting nodes. */
   String OVERFILE = lang("dx_overfile");
   /** Dialog title for exporting nodes. */
-  String INDENT = lang("dx_indent");
+  String OUTINDENT = lang("dx_indent");
   /** Dialog title for exporting nodes. */
   String INVPATH = lang("dx_invpath");
 
