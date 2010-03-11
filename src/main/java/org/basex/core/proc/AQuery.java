@@ -58,10 +58,10 @@ abstract class AQuery extends Proc {
     String err = null;
     try {
       // define serialization parameters
-      final SerializeProp props = new SerializeProp(prop.get(Prop.SERIALIZER));
+      final SerializeProp sprop = new SerializeProp(prop.get(Prop.SERIALIZER));
       if(prop.is(Prop.WRAPOUTPUT)) {
-        props.set(SerializeProp.WRAP_PRE, NAMELC);
-        props.set(SerializeProp.WRAP_URI, URL);
+        sprop.set(SerializeProp.WRAP_PRE, NAMELC);
+        sprop.set(SerializeProp.WRAP_URI, URL);
       }
 
       final boolean ser = prop.is(Prop.SERIALIZE);
@@ -80,7 +80,7 @@ abstract class AQuery extends Proc {
         if(i == 0) plan(qp, true);
 
         final XMLSerializer xml = new XMLSerializer(
-            i == 0 && ser ? out : new NullOutput(!ser), props);
+            i == 0 && ser ? out : new NullOutput(!ser), sprop);
 
         if(context.prop.is(Prop.CACHEQUERY)) {
           result = qp.query();
@@ -94,7 +94,9 @@ abstract class AQuery extends Proc {
           Item it;
           while((it = ir.next()) != null) {
             checkStop();
+            xml.openResult();
             it.serialize(xml);
+            xml.closeResult();
             s++;
           }
         }
@@ -118,7 +120,7 @@ abstract class AQuery extends Proc {
       err = PROGERR;
     }
     // close processor after exceptions
-    try { qp.close(); } catch(final IOException ex) { /* ignored */ }
+    try { if(qp != null) qp.close(); } catch(final IOException ex) { }
     return error(err);
   }
 

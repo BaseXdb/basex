@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.SortedMap;
 import org.basex.core.Prop;
@@ -82,7 +83,12 @@ public final class DialogExport extends Dialog {
     p.add(new BaseXLabel(INFOENCODING + COL, false, true));
 
     final Prop prop = gui.context.prop;
-    final SerializeProp sprop = new SerializeProp(prop.get(Prop.SERIALIZER));
+    SerializeProp sprop = null;
+    try {
+      sprop = new SerializeProp(prop.get(Prop.EXPORTER));
+    } catch(final IOException ex) {
+      // ignore invalid serialization parameters
+    }
 
     if(encodings == null) {
       final SortedMap<String, Charset> cs = Charset.availableCharsets();
@@ -163,7 +169,7 @@ public final class DialogExport extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
-    gui.context.prop.set(Prop.SERIALIZER,
+    gui.context.prop.set(Prop.EXPORTER,
       "indent=" + (format.isSelected() ? SerializeProp.YES : SerializeProp.NO) +
       ",encoding=" + encoding.getSelectedItem() +
       ",omit-xml-declaration=no");

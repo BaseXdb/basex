@@ -10,9 +10,13 @@ import org.basex.core.Session;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
+import org.basex.server.ClientSession;
 import org.basex.server.Log;
+import org.basex.server.LoginException;
 import org.basex.server.ServerProcess;
 import org.basex.util.Args;
+import org.basex.util.Performance;
 import org.basex.util.Token;
 
 /**
@@ -37,7 +41,7 @@ public final class BaseXServer extends Main implements Runnable {
   /** Server socket. */
   private ServerSocket server;
   /** Flag for server activity. */
-  private boolean running = true;
+  private boolean running;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -60,6 +64,7 @@ public final class BaseXServer extends Main implements Runnable {
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
       new Thread(this).start();
+      while(!running) Performance.sleep(100);
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
       if(console) quit(console());
@@ -73,6 +78,7 @@ public final class BaseXServer extends Main implements Runnable {
    * Server thread.
    */
   public void run() {
+    running = true;
     while(running) {
       try {
         final ServerProcess s = new ServerProcess(server.accept(), this);
@@ -147,6 +153,46 @@ public final class BaseXServer extends Main implements Runnable {
     if(!success) outln(SERVERINFO);
   }
 
+  /**
+   * Starts the server in a separate process.
+   * @param port server port
+   * @return true if start was successful
+   */
+  public static boolean start(final int port) {
+    final String path = IOFile.file(BaseXServer.class.getProtectionDomain().
+        getCodeSource().getLocation().toString());
+    final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
+    final String clazz = BaseXServer.class.getName();
+    try {
+      new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
+          "-p", String.valueOf(port) }).start();
+
+      for(int c = 0; c < 6; c++) {
+        if(ping("localhost", port)) return true;
+        Performance.sleep(500);
+      }
+    } catch(final IOException ex) {
+      Main.debug(ex);
+    }
+    return false;
+  }
+
+  /**
+   * Checks if a server is running.
+   * @param host host
+   * @param port port
+   * @return boolean success
+   */
+  public static boolean ping(final String host, final int port) {
+    try {
+      new ClientSession(host, port, "", "");
+    } catch(final IOException e) {
+      if(e instanceof LoginException) return true;
+    }
+    return false;
+  }
+
+  
   /**
    * Stops the server.
    * @param port server port

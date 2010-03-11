@@ -33,10 +33,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
-import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
-import org.basex.server.LoginException;
-import org.basex.util.Performance;
 import org.basex.util.StringList;
 import org.basex.util.Token;
 
@@ -295,13 +292,8 @@ public final class DialogServer extends Dialog {
    * @return boolean success
    */
   private boolean ping(final boolean local) {
-    try {
-      new ClientSession(local ? "localhost" : ctx.prop.get(Prop.HOST),
-          ctx.prop.num(local ? Prop.SERVERPORT : Prop.PORT), "", "");
-    } catch(final IOException e) {
-      if(e instanceof LoginException) return true;
-    }
-    return false;
+    return BaseXServer.ping(local ? "localhost" : ctx.prop.get(Prop.HOST),
+        ctx.prop.num(local ? Prop.SERVERPORT : Prop.PORT));
   }
 
   @Override
@@ -318,18 +310,7 @@ public final class DialogServer extends Dialog {
           ctx.prop.set(Prop.PORT, p);
           portc.setText(ports.getText());
         }
-        final String path = IOFile.file(getClass().getProtectionDomain().
-            getCodeSource().getLocation().toString());
-        final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
-        final String clazz = BaseXServer.class.getName();
-        new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
-            "-p", String.valueOf(p)}).start();
-
-        for(int c = 0; c < 6; c++) {
-          running = ping(true);
-          if(running) break;
-          Performance.sleep(500);
-        }
+        running = BaseXServer.start(p);
         msg = running ? SERVERSTART : SERVERBIND;
         if(!running) icon = Msg.ERR;
       } else if(cmp == stop) {

@@ -1,8 +1,9 @@
 package org.basex.gui;
 
 import static org.basex.core.Text.*;
+import java.io.IOException;
 import org.basex.core.AProp;
-import org.basex.util.TokenBuilder;
+import org.basex.core.Main;
 
 /**
  * This class contains serialization properties.
@@ -59,52 +60,43 @@ public final class SerializeProp extends AProp {
   public static final Object[] WRAP_PRE = { "wrap-pre", "" };
   /** Hidden serialization parameter. */
   public static final Object[] WRAP_URI = { "wrap-uri", "" };
-
-  /** Info log. */
-  private final TokenBuilder log = new TokenBuilder();
   
   /**
    * Constructor.
+   * @throws IOException I/O exception
    */
-  public SerializeProp() {
-    this("");
+  public SerializeProp() throws IOException {
+    this(null);
   }
   
   /**
    * Constructor, specifying initial properties.
    * @param s property string. Properties are separated with commas,
    * key/values with equality.
+   * @throws IOException I/O exception
    */
-  public SerializeProp(final String s) {
+  public SerializeProp(final String s) throws IOException {
     super(null);
     if(s == null) return;
     
-    for(final String ser : s.split(",")) {
+    for(final String ser : s.trim().split(",")) {
+      if(ser.length() == 0) continue;
       final String[] sprop = ser.split("=");
       final String key = sprop[0].trim();
       final Object obj = object(key);
-      if(sprop.length != 2 || obj == null) {
-        log.add(SETKEY + NL, key);
+
+      if(sprop.length != 2 || obj == null)
+        throw new IOException(Main.info(SETKEY, key));
+
+      final Object val = sprop[1].trim();
+      if(obj instanceof Boolean) {
+        if(!val.equals(YES) && !val.equals(NO))
+          throw new IOException(Main.info(SETVAL, key, val));
+
+        set(key, val.equals(YES));
       } else {
-        final Object val = sprop[1].trim();
-        if(obj instanceof Boolean) {
-          if(!val.equals(YES) && !val.equals(NO)) {
-            log.add(SETVAL + NL, key, val);
-          } else {
-            set(key, val.equals(YES));
-          }
-        } else {
-          set(key, val);
-        }
+        set(key, val);
       }
     }
-  }
-  
-  /**
-   * Returns logging information.
-   * @return logging string
-   */
-  public String log() {
-    return log.toString();
   }
 }

@@ -334,6 +334,7 @@ public final class QueryContext extends Progress {
    */
   void close() throws IOException {
     for(int d = rootDocs; d < docs; d++) Close.close(context, doc[d].data);
+    docs = 0;
   }
 
   /**

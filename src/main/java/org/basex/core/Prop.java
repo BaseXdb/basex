@@ -74,7 +74,9 @@ public final class Prop extends AProp {
   /** Flag for wrapping result nodes. */
   public static final Object[] WRAPOUTPUT = { "WRAPOUTPUT", false };
   /** Serialization parameters, separated by commas. */
-  public static final Object[] SERIALIZER = { "SERIALIZER", "encoding=UTF-8" };
+  public static final Object[] SERIALIZER = { "SERIALIZER", "" };
+  /** Exporter serialization parameters. */
+  public static final Object[] EXPORTER = { "EXPORTER", "" };
   /** Dots the query plan. */
   public static final Object[] DOTPLAN = { "DOTPLAN", false };
   /** Path to dotty. */

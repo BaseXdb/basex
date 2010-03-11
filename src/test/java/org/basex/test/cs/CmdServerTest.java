@@ -2,7 +2,6 @@ package org.basex.test.cs;
 
 import static org.basex.core.Text.*;
 import org.basex.BaseXServer;
-import org.basex.util.Performance;
 import org.basex.server.ClientSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -15,19 +14,10 @@ import org.junit.BeforeClass;
  * @author Christian Gruen
  */
 public final class CmdServerTest extends CmdTest {
-  /** Server reference. */
-  static BaseXServer server;
-
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    new Thread() {
-      @Override
-      public void run() {
-        server = new BaseXServer();
-      }
-    }.start();
-    Performance.sleep(500);
+    new BaseXServer();
 
     try {
       session = new ClientSession(CONTEXT, ADMIN, ADMIN);

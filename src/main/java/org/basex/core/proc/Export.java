@@ -81,8 +81,7 @@ public final class Export extends Proc {
 
       // serialize nodes
       final PrintOutput po = new PrintOutput(file.path());
-      final XMLSerializer xml = new XMLSerializer(po,
-          prop.get(Prop.SERIALIZER));
+      final XMLSerializer xml = new XMLSerializer(po, prop.get(Prop.EXPORTER));
       xml.node(data, pre);
       xml.close();
       po.close();

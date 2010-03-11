@@ -155,6 +155,11 @@ public class BaseX extends Main {
           } else if(c == 'q') {
             // specify password
             query = arg.remaining();
+          } else if(c == 's') {
+            // set/add serialization parameter
+            String s = context.prop.get(Prop.SERIALIZER);
+            if(s.length() != 0) s += ",";
+            context.prop.set(Prop.SERIALIZER, s + arg.string());
           } else if(c == 'r') {
             // hidden option: parse number of runs
             success = set(Prop.RUNS, arg.string());

@@ -34,7 +34,6 @@ import org.basex.core.proc.ShowUsers;
 import org.basex.core.proc.XQuery;
 import org.basex.io.NullOutput;
 import org.basex.server.ClientSession;
-import org.basex.util.Performance;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -58,15 +57,7 @@ public final class PermissionTest {
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    new Thread() {
-      @Override
-      public void run() {
-        server = new BaseXServer();
-      }
-    }.start();
-
-    // wait for server to be started
-    Performance.sleep(400);
+    server = new BaseXServer();
 
     try {
       adminSession = new ClientSession(server.context, ADMIN, ADMIN);

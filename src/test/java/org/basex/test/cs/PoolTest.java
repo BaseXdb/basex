@@ -10,7 +10,6 @@ import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.Open;
 import org.basex.server.ClientSession;
-import org.basex.util.Performance;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,16 +36,7 @@ public final class PoolTest {
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    new Thread() {
-      @Override
-      public void run() {
-        server = new BaseXServer();
-      }
-    }.start();
-
-    // wait for server to be started
-    Performance.sleep(500);
-
+    server = new BaseXServer();
     try {
       session1 = new ClientSession(server.context, ADMIN, ADMIN);
       session2 = new ClientSession(server.context, ADMIN, ADMIN);
