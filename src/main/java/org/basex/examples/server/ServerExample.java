@@ -28,18 +28,9 @@ public final class ServerExample {
     System.out.println("=== ServerExample ===");
 
     // ------------------------------------------------------------------------
-    // Start server on default port 1984 in a new thread.
+    // Start server on default port 1984.
     // In a usual scenario, the server will only be run once
-    new Thread() {
-      @Override
-      public void run() {
-        new BaseXServer();
-      }
-    }.start();
-
-    // ------------------------------------------------------------------------
-    // Wait some time for the server to be initialized
-    Thread.sleep(1000);
+    new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password

@@ -42,13 +42,7 @@ public final class StressTest {
 
     // run server instance
     System.out.println("\n* Start server.");
-    new Thread() {
-      @Override
-      public void run() {
-        new BaseXServer();
-      }
-    }.start();
-    Performance.sleep(1000);
+    new BaseXServer();
 
     // create test database
     System.out.println("\n* Create test database.");
@@ -56,7 +50,7 @@ public final class StressTest {
     client = newSession();
     client.execute("set info on");
     client.execute("create db etc/xml/factbook.xml");
-    System.out.println(client.info());
+    System.out.print(client.info());
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");

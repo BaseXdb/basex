@@ -125,16 +125,7 @@ public final class LockingTest {
 
   /** Starts the server. */
   private void start() {
-    new Thread() {
-      @Override
-      public void run() {
-        server = new BaseXServer();
-      }
-    }.start();
-
-    // wait for server to be started
-    Performance.sleep(1000);
-
+    server = new BaseXServer();
     session1 = createSession();
     session2 = createSession();
   }

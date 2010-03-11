@@ -33,17 +33,8 @@ public final class ServerConcurrencyExample {
     System.out.println("=== ServerConcurrencyExample ===");
 
     // ------------------------------------------------------------------------
-    // Start server in a new thread
-    new Thread() {
-      @Override
-      public void run() {
-        new BaseXServer();
-      }
-    }.start();
-
-    // ------------------------------------------------------------------------
-    // Wait some time for the server to be initialized
-    Thread.sleep(1000);
+    // Start server instance
+    new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
