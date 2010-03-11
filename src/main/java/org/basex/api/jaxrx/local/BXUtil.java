@@ -11,8 +11,8 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Text;
 import org.basex.core.proc.Open;
+import org.basex.data.SerializeProp;
 import org.basex.data.XMLSerializer;
-import org.basex.gui.SerializeProp;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -58,8 +58,8 @@ public final class BXUtil {
       props = new SerializeProp(serialize);
       if(wrap != null) {
         if(wrap.equals(SerializeProp.YES)) {
-          props.set(SerializeProp.WRAP_PRE, JAXRX);
-          props.set(SerializeProp.WRAP_URI, URL);
+          props.set(SerializeProp.S_WRAP_PRE, JAXRX);
+          props.set(SerializeProp.S_WRAP_URI, URL);
         } else if(!wrap.equals(SerializeProp.NO)) {
           badRequest(Main.info(
               Text.SETVAL + Text.NL, EURLParameter.WRAP, wrap));

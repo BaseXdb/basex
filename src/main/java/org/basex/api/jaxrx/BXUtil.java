@@ -17,7 +17,7 @@ import org.basex.core.Text;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
-import org.basex.gui.SerializeProp;
+import org.basex.data.SerializeProp;
 import org.basex.server.ClientSession;
 import org.jaxrx.constants.EURLParameter;
 
@@ -109,8 +109,8 @@ public final class BXUtil {
         String ser = serialize != null ? serialize : "";
         if(wrap != null) {
           if(wrap.equals(SerializeProp.YES)) {
-            ser += "," + SerializeProp.WRAP_PRE[0] + "=" + JAXRX +
-                   "," + SerializeProp.WRAP_URI[0] + "=" + URL;
+            ser += "," + SerializeProp.S_WRAP_PRE[0] + "=" + JAXRX +
+                   "," + SerializeProp.S_WRAP_URI[0] + "=" + URL;
           } else if(!wrap.equals(SerializeProp.NO)) {
             badRequest(Main.info(Text.SETVAL + Text.NL,
                 EURLParameter.WRAP, wrap));
