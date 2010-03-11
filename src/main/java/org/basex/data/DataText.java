@@ -116,7 +116,9 @@ public interface DataText {
   byte[] SIZE = token("size");
 
   /** Document declaration. */
-  byte[] DOCDECL = token("xml version='1.0' encoding='");
+  byte[] DOCDECL1 = token("xml version='");
+  /** Document declaration. */
+  byte[] DOCDECL2 = token("' encoding='");
   /** Doctype output. */
   byte[] DOCTYPE = token("<!DOCTYPE");
   /** Doctype system keyword. */
@@ -152,6 +154,11 @@ public interface DataText {
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
   byte[] ATT = { '@' };
+
+  /** Version error. */
+  String SERVERSION = "XML Version must be '1.0' or '1.1'.";
+  /** Version error. */
+  String SERENCODING = "Unknown encoding: '%'";
 
   // TABLE SERIALIZATION ======================================================
 

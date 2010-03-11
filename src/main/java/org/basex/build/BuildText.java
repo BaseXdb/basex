@@ -61,7 +61,7 @@ public interface BuildText {
   /** Scanner Error. */
   String PIRES = "'<?xml' is reserved for document declaration.";
   /** Scanner Error. */
-  String DECLVERSION = "Declaration must start with 'version=\"1.0\"'.";
+  String DECLVERSION = "XML version must be '1.0' or '1.1'.";
   /** Scanner Error. */
   String DECLSTART = "Document declaration must start with 'version'.";
   /** Scanner Error. */

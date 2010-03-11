@@ -4,10 +4,14 @@ import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+
+import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.gui.SerializeProp;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
 
 /**
@@ -26,12 +30,16 @@ public final class XMLSerializer extends Serializer {
 
   /** Output stream. */
   private final PrintOutput out;
+  /** CData elements. */
+  private final TokenList cdata = new TokenList();
   /** Indentation flag. */
   private boolean indent = true;
   /** URI for wrapped results. */
   private byte[] wrapUri = {};
   /** Prefix for wrapped results. */
   private byte[] wrapPre = {};
+  /** XML version. */
+  private String version = "1.0";
   /** Wrapper flag. */
   private boolean wrap;
   /** Encoding. */
@@ -76,8 +84,21 @@ public final class XMLSerializer extends Serializer {
     boolean omit = true;
     if(p != null) {
       indent = p.is(SerializeProp.INDENT);
+
       enc = enc(p.get(SerializeProp.ENCODING));
+      if(!Charset.isSupported(enc)) error(SERENCODING, enc);
+
+      // [CG] check version details
+      version = p.get(SerializeProp.VERSION);
+      if(!version.equals("1.0") && !version.equals("1.1")) error(SERVERSION);
+
+      final String s = p.get(SerializeProp.CDATA_SECTION_ELEMENTS).trim();
+      if(s.length() != 0) {
+        for(final String c : s.split(" ")) cdata.add(token(c));
+      }
+
       omit = p.is(SerializeProp.OMIT_XML_DECLARATION);
+
       wrapPre = token(p.get(SerializeProp.WRAP_PRE));
       wrapUri = token(p.get(SerializeProp.WRAP_URI));
       wrap = wrapPre.length != 0;
@@ -85,17 +106,31 @@ public final class XMLSerializer extends Serializer {
 
     if(!omit) {
       print(PI1);
-      print(DOCDECL);
+      print(DOCDECL1);
+      print(version);
+      print(DOCDECL2);
       print(enc);
       print('\'');
       print(PI2);
-      print(NL);
+      ind = indent;
     }
 
     if(wrap) {
       openElement(concat(wrapPre, COL, RESULTS));
       namespace(wrapPre, wrapUri);
     }
+  }
+  
+  /**
+   * Global method, replacing all % characters
+   * (see {@link TokenBuilder#add(Object, Object...)} for details.
+   * @param str string to be extended
+   * @param ext text text extensions
+   * @throws IOException I/O exception
+   */
+  public static void error(final Object str, final Object... ext)
+      throws IOException {
+    throw new IOException(Main.info(str, ext));
   }
   
   /**
@@ -151,7 +186,14 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void text(final byte[] b) throws IOException {
     finishElement();
-    for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));
+
+    if(cdata.size() != 0 && cdata.contains(tags.get(tags.size() - 1))) {
+      print("<![CDATA[");
+      for(int k = 0; k < b.length; k += cl(b[k])) print(cp(b, k));
+      print("]]>");
+    } else {
+      for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));
+    }
     ind = false;
   }
 

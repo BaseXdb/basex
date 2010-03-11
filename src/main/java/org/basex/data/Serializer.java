@@ -22,7 +22,7 @@ public abstract class Serializer {
   public byte[] dn = EMPTY;
 
   /** Opened tags. */
-  private final TokenList tags = new TokenList();
+  public final TokenList tags = new TokenList();
   /** Namespace levels. */
   private final IntList nsl = new IntList();
   /** Flag for opened tag. */
