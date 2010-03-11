@@ -74,7 +74,7 @@ public interface Text {
 
   /** Start information. */
   String CLIENTINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + CLIENTMODE + " [-npPU] [-dovVxz] [query] [-c]" + NL +
+    "Usage: " + NAME + CLIENTMODE + " [-npPU] [-doqvVxz] [query] [-c]" + NL +
     "  [query]    query file" + NL +
     "  -c<cmd>    database commands" + NL +
     "  -d         debug mode" + NL +
@@ -82,6 +82,7 @@ public interface Text {
     "  -o<file>   output file" + NL +
     "  -p<port>   server port" + NL +
     "  -P<pass>   user password" + NL +
+    "  -q<expr>   query expression" + NL +
     "  -U<name>   user name" + NL +
     "  -v/V       show (all) process info" + NL +
     "  -w         wrap query result to xml" + NL +
@@ -89,12 +90,14 @@ public interface Text {
 
   /** Start information. */
   String LOCALINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + " [-diovVxz] [query] [-c]" + NL +
+    "Usage: " + NAME + " [-dioqsvVxz] [query] [-c]" + NL +
     "  [query]    query file" + NL +
     "  -c<cmd>    database commands" + NL +
     "  -d         debug mode" + NL +
     "  -i<file>   XML input" + NL +
     "  -o<file>   output file" + NL +
+    "  -q<expr>   query expression" + NL +
+    "  -s<pars>   serialization parameters" + NL +
     "  -v/V       show (all) process info" + NL +
     "  -w         wrap query result to xml" + NL +
     "  -z         skip query output";
