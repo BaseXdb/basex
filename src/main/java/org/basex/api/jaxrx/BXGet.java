@@ -71,9 +71,9 @@ public final class BXGet implements IGet {
             final Table table = new Table(co.toString());
             // loop through all databases
             for(final TokenList l : table.contents) {
-              // [CG] check if database is a resource or collection
               xml.emptyElement(token(JAXRX + ":" + "resource"),
-                  token("name"), l.get(0));
+                  token("name"), l.get(0), token("documents"), l.get(1),
+                  token("size"), l.get(2));
             }
             xml.closeElement();
             xml.close();

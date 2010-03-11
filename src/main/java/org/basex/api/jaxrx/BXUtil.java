@@ -106,7 +106,7 @@ public final class BXUtil {
       @Override
       public void run() throws IOException {
         // compose serialization parameters
-        String ser = serialize;
+        String ser = serialize != null ? serialize : "";
         if(wrap != null) {
           if(wrap.equals(SerializeProp.YES)) {
             ser += "," + SerializeProp.WRAP_PRE[0] + "=" + JAXRX +
