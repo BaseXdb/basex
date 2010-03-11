@@ -29,6 +29,8 @@ public abstract class Proc extends Progress {
   protected String[] args;
   /** Database context. */
   protected Context context;
+  /** Output stream. */
+  protected PrintOutput out;
   /** Database properties. */
   protected Prop prop;
 
@@ -56,18 +58,19 @@ public abstract class Proc extends Progress {
    * Executes the process and serializes textual results to the specified output
    * stream. If an exception occurs, a {@link BaseXException} is thrown.
    * @param ctx database context
-   * @param out output stream reference
+   * @param os output stream reference
    * @throws BaseXException process exception
    */
-  public void execute(final Context ctx, final OutputStream out)
+  public void execute(final Context ctx, final OutputStream os)
       throws BaseXException {
-    if(!exec(ctx, out)) throw new BaseXException(info());
+    if(!exec(ctx, os)) throw new BaseXException(info());
   }
 
   /**
-   * Executes the process. {@link #execute(Context, OutputStream)} should be
-   * called if textual results are expected.
-   * If an exception occurs, a {@link BaseXException} is thrown.
+   * Executes the process.
+   * {@link #execute(Context, OutputStream)} should be called
+   * to retrieve textual results. If an exception occurs,
+   * a {@link BaseXException} is thrown.
    * @param ctx database context
    * @throws BaseXException process exception
    */
@@ -79,23 +82,17 @@ public abstract class Proc extends Progress {
    * Executes the process, prints the result to the specified output stream
    * and returns a success flag.
    * @param ctx database context
-   * @param out output stream
+   * @param os output stream
    * @return success flag. The {@link #info()} method returns information
    * on a potential exception
    */
-  public final boolean exec(final Context ctx, final OutputStream out) {
-    final PrintOutput po = out instanceof PrintOutput ? (PrintOutput) out :
-      new PrintOutput(out);
-
-    perf = new Performance();
-    context = ctx;
-    prop = ctx.prop;
-
-    // check data reference
-    final Data data = context.data;
+  public final boolean exec(final Context ctx, final OutputStream os) {
+    // check if data reference is available
+    final Data data = ctx.data;
     if(data == null && (flags & DATAREF) != 0) return error(PROCNODB);
+
     // check permissions
-    if(!context.perm(flags & 0xFF, data != null ? data.meta : null)) {
+    if(!ctx.perm(flags & 0xFF, data != null ? data.meta : null)) {
       final CmdPerm[] perms = CmdPerm.values();
       int i = perms.length;
       final int f = flags & 0xFF;
@@ -103,9 +100,42 @@ public abstract class Proc extends Progress {
       return error(PERMNO, perms[i]);
     }
 
+    // check concurrency of processes
     boolean ok = false;
+    final boolean writing =
+      (flags & (User.CREATE | User.WRITE)) != 0 || updating(ctx);
+    ctx.sema.before(writing);
+    ok = run(ctx, os);
+    ctx.sema.after(writing);
+    return ok;
+  }
+
+  /**
+   * Executes the process and returns a success flag.
+   * {@link #run(Context, OutputStream)} should be called
+   * to retrieve textual results.
+   * @param ctx database context
+   * @return success flag. The {@link #info()} method returns information
+   * on a potential exception
+   */
+  public final boolean exec(final Context ctx) {
+    return exec(ctx, null);
+  }
+
+  /**
+   * Runs the process without permission, data and concurrency checks.
+   * @param ctx query context
+   * @param os output stream
+   * @return result of check
+   */
+  protected boolean run(final Context ctx, final OutputStream os) {
     try {
-      ok = exec(po);
+      perf = new Performance();
+      context = ctx;
+      prop = ctx.prop;
+      out = os == null ? new NullOutput() : os instanceof PrintOutput ?
+          (PrintOutput) os : new PrintOutput(os);
+      return run();
     } catch(final ProgressException ex) {
       abort();
       return error(PROGERR);
@@ -113,7 +143,6 @@ public abstract class Proc extends Progress {
       Performance.gc(2);
       Main.debug(ex);
       abort();
-
       if(ex instanceof OutOfMemoryError) return error(PROCOUTMEM);
 
       final Object[] st = ex.getStackTrace();
@@ -122,21 +151,17 @@ public abstract class Proc extends Progress {
       System.arraycopy(st, 0, obj, 1, st.length);
       return error(Main.bug(obj));
     }
-    return ok;
   }
 
   /**
-   * Executes the process and returns a success flag.
-   * {@link #exec(Context, OutputStream)} should be called to retrieve textual
-   * results.
-   * @param ctx database context
-   * @return success flag. The {@link #info()} method returns information
-   * on a potential exception
+   * Runs the process without permission, data and concurrency checks.
+   * @param ctx query context
+   * @return result of check
    */
-  public final boolean exec(final Context ctx) {
-    return exec(ctx, new NullOutput());
+  public boolean run(final Context ctx) {
+    return run(ctx, null);
   }
-
+  
   /**
    * Returns process information or error message.
    * @return info string
@@ -167,12 +192,11 @@ public abstract class Proc extends Progress {
   // PROTECTED METHODS ========================================================
 
   /**
-   * Executes a process and serializes the result.
-   * @param out output stream
+   * Executes the process and serializes the result.
    * @return success of operation
    * @throws IOException I/O exception
    */
-  protected abstract boolean exec(final PrintOutput out) throws IOException;
+  protected abstract boolean run() throws IOException;
 
   /**
    * Adds the error message to the message buffer {@link #info}.

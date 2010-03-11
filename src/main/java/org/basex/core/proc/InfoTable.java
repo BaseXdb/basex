@@ -9,7 +9,6 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
-import org.basex.io.PrintOutput;
 import org.basex.util.Table;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
@@ -31,7 +30,7 @@ public final class InfoTable extends AQuery {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
+  protected boolean run() throws IOException {
     // evaluate input as number range or xquery
     if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
       queryNodes();

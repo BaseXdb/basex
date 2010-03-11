@@ -13,7 +13,6 @@ import org.basex.gui.SerializeProp;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.io.NullOutput;
-import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -50,10 +49,9 @@ abstract class AQuery extends Proc {
   /**
    * Returns a new query instance.
    * @param query query
-   * @param out output reference
    * @return query instance
    */
-  protected final boolean query(final String query, final PrintOutput out) {
+  protected final boolean query(final String query) {
     final int runs = Math.max(1, prop.num(Prop.RUNS));
     String err = null;
     try {
@@ -105,7 +103,7 @@ abstract class AQuery extends Proc {
         prnt += per.getTime();
       }
       // dump some query info
-      evalInfo(out, s, runs);
+      evalInfo(s, runs);
 
       if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) out.println();
       out.flush();
@@ -154,12 +152,10 @@ abstract class AQuery extends Proc {
 
   /**
    * Adds evaluation information to the information string.
-   * @param out output stream
    * @param hits information
    * @param runs number of runs
    */
-  private void evalInfo(final PrintOutput out, final long hits,
-      final int runs) {
+  private void evalInfo(final long hits, final int runs) {
     if(!prop.is(Prop.INFO)) return;
     final String opt = qp.info(prop.is(Prop.ALLINFO));
     if(!opt.isEmpty()) info(opt);

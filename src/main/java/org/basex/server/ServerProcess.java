@@ -10,7 +10,6 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Prop;
-import org.basex.core.Semaphore;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.data.Data;
@@ -31,8 +30,6 @@ public final class ServerProcess extends Thread {
   public final Context context;
   /** Socket reference. */
   private final Socket socket;
-  /** Server reference. */
-  private final Semaphore sema;
   /** Input stream. */
   private BufferInput in;
   /** Output stream. */
@@ -43,8 +40,6 @@ public final class ServerProcess extends Thread {
   private Thread timeout;
   /** Log. */
   private final Log log;
-  /** Boolean for semaphore. */
-  private boolean w;
 
   /**
    * Constructor.
@@ -53,7 +48,6 @@ public final class ServerProcess extends Thread {
    */
   public ServerProcess(final Socket s, final BaseXServer b) {
     context = new Context(b.context);
-    sema = b.sem;
     log = b.log;
     socket = s;
   }
@@ -127,8 +121,6 @@ public final class ServerProcess extends Thread {
 
         // process command and send results
         startTimer(proc);
-        w = sema.writing(proc, context);
-        sema.before(w);
         final boolean ok = proc.exec(context, out);
         out.write(0);
         final String inf = proc.info();
@@ -136,7 +128,6 @@ public final class ServerProcess extends Thread {
         out.write(0);
         send(ok);
         stopTimer();
-        sema.after(w);
         final String pr = proc.toString().replaceAll("\\r|\\n", " ");
         log.write(this, pr, ok ? "OK" : INFOERROR + inf, perf);
       }
@@ -144,7 +135,6 @@ public final class ServerProcess extends Thread {
     } catch(final IOException ex) {
       log.write(this, input, INFOERROR + ex.getMessage());
       ex.printStackTrace();
-      sema.after(w);
       exit();
     }
   }

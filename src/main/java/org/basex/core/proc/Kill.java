@@ -3,7 +3,6 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import org.basex.core.Proc;
 import org.basex.core.User;
-import org.basex.io.PrintOutput;
 import org.basex.server.Sessions;
 
 /**
@@ -22,7 +21,7 @@ public final class Kill extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final String user = args[0];
     if(user.equals(ADMIN)) return error(USERADMIN);
     if(user.equals(context.user.name)) return error(USERKILLSELF, user);

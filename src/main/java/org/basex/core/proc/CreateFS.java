@@ -4,12 +4,10 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import java.io.IOException;
 import org.basex.build.FSParser;
-import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'create fs' command and creates a new filesystem mapping from
@@ -31,7 +29,7 @@ public final class CreateFS extends ACreate {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
 
@@ -51,15 +49,15 @@ public final class CreateFS extends ACreate {
 
     final Optimize opt = new Optimize();
     progress(opt);
-    if(!opt.exec(context)) return error(opt.info());
+    if(!opt.run(context)) return error(opt.info());
 
-    final Proc pr = new Open(db);
-    return pr.exec(context) ? info(DBCREATED, db, perf) : error(pr.info());
+    final Open pr = new Open(db);
+    return pr.run(context) ? info(DBCREATED, db, perf) : error(pr.info());
   }
 
   @Override
   public void abort() {
-    new Open(args[1]).exec(context);
+    new Open(args[1]).run(context);
   }
 
   @Override

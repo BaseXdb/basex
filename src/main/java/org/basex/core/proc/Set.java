@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Prop;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'set' command and modifies database properties.
@@ -32,7 +31,7 @@ public final class Set extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     String key = args[0].toUpperCase();
     String val = args[1];
 

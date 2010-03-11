@@ -11,7 +11,6 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.IndexType;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'create db' command and creates a new index.
@@ -29,7 +28,7 @@ public final class CreateIndex extends ACreate {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final Data data = context.data;
     if(data instanceof MemData) return error(PROCMM);
 

@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import org.basex.core.Context;
 import org.basex.core.Commands.Cmd;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'xquery' command and processes an XQuery request.
@@ -20,8 +19,8 @@ public final class XQuery extends AQuery {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
-    return query(args[0], out);
+  protected boolean run() {
+    return query(args[0]);
   }
 
   @Override

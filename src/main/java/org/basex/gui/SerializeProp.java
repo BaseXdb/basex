@@ -16,6 +16,8 @@ public final class SerializeProp extends AProp {
   public static final String YES = "yes";
   /** No flag. */
   public static final String NO = "no";
+  /** Omit flag. */
+  public static final String OMIT = "omit";
 
   /** Serialization parameter. */
   public static final Object[] BYTE_ORDER_MARK = { "byte-order-mark", "" };
@@ -47,7 +49,7 @@ public final class SerializeProp extends AProp {
   public static final Object[] OMIT_XML_DECLARATION = {
     "omit-xml-declaration", true };
   /** Serialization parameter. */
-  public static final Object[] STANDALONE = { "standalone", false };
+  public static final Object[] STANDALONE = { "standalone", "omit" };
   /** Serialization parameter. */
   public static final Object[] UNDECLARE_PREFIXES = {
     "undeclare-prefixes", true };

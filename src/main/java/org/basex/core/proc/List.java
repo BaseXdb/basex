@@ -11,7 +11,6 @@ import org.basex.core.User;
 import org.basex.data.MetaData;
 import org.basex.io.DataInput;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
@@ -31,7 +30,7 @@ public final class List extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
+  protected boolean run() throws IOException {
     final Table table = new Table();
     table.desc = DATABASES;
 

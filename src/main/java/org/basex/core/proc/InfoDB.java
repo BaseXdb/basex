@@ -8,7 +8,6 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.MetaData;
-import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -32,7 +31,7 @@ public final class InfoDB extends AInfo {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
+  protected boolean run() throws IOException {
     final boolean create = context.user.perm(User.CREATE);
     out.print(db(context.data.meta, false, true, create));
     return true;

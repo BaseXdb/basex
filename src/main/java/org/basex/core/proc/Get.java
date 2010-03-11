@@ -3,7 +3,6 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Proc;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'get' command and return the value of a database property.
@@ -22,7 +21,7 @@ public final class Get extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
+  protected boolean run() throws IOException {
     final String key = args[0].toUpperCase();
     final Object type = prop.object(key);
     if(type == null) return error(SETKEY, key);

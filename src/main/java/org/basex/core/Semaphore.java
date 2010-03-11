@@ -1,32 +1,23 @@
 package org.basex.core;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Management of executing read/write processes.
+ * Multiple readers, single writers.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
 public final class Semaphore {
   /** List of monitors for waiting writers. */
-  private final ArrayList<Object> waitingW = new ArrayList<Object>();
+  private final LinkedList<Object> waitingW = new LinkedList<Object>();
   /** Number of waiting readers. */
   private int waitingR;
   /** Number of active writers. */
   private boolean activeW;
   /** Number of active readers. */
   private int activeR;
-
-  /**
-   * Checks if the specified process is a writer.
-   * @param pr process
-   * @param ctx database context
-   * @return result of check
-   */
-  public boolean writing(final Proc pr, final Context ctx) {
-    return (pr.flags & (User.CREATE | User.WRITE)) != 0 || pr.updating(ctx);
-  }
 
   /**
    * Modifications before executing a process.

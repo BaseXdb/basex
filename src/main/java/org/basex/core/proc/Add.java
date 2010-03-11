@@ -10,7 +10,6 @@ import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
 /**
@@ -29,7 +28,7 @@ public final class Add extends ACreate {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final IO io = IO.get(args[0]);
     if(!io.exists()) return error(FILEWHICH, io);
 

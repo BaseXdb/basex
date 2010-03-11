@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.core.User;
-import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
@@ -23,7 +22,7 @@ public final class Info extends AInfo {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
+  protected boolean run() throws IOException {
     Performance.gc(1);
 
     final TokenBuilder tb = new TokenBuilder();

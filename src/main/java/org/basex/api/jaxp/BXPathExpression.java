@@ -55,9 +55,9 @@ public final class BXPathExpression implements XPathExpression {
   public Object evaluate(final InputSource is, final QName res)
       throws XPathExpressionException {
 
-    final Proc check = new CreateDB(is.getSystemId());
-    if(check.exec(context)) return finish(eval(), res);
-    throw new XPathExpressionException(check.info());
+    final Proc proc = new CreateDB(is.getSystemId());
+    if(proc.exec(context)) return finish(eval(), res);
+    throw new XPathExpressionException(proc.info());
   }
 
   /**

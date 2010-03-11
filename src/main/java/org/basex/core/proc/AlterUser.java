@@ -5,7 +5,6 @@ import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'alter user' command and alters the password of a user.
@@ -24,7 +23,7 @@ public final class AlterUser extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final String user = args[0];
     final String pass = args[1];
     return pass == null || pass.isEmpty() ? error(PASSNO, user) :

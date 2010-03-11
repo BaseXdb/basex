@@ -11,8 +11,6 @@ import org.basex.query.QueryException;
  * @author Christian Gruen
  */
 public class LocalSession extends Session {
-  /** Server reference. */
-  private final Semaphore sema;
   /** Database Context. */
   protected final Context ctx;
   /** Process reference. */
@@ -23,17 +21,7 @@ public class LocalSession extends Session {
    * @param context context
    */
   public LocalSession(final Context context) {
-    this(context, new Semaphore());
-  }
-
-  /**
-   * Constructor.
-   * @param context context
-   * @param semaphore instance
-   */
-  public LocalSession(final Context context, final Semaphore semaphore) {
     ctx = context;
-    sema = semaphore;
   }
 
   @Override
@@ -50,11 +38,7 @@ public class LocalSession extends Session {
   @Override
   public boolean execute(final Proc pr, final OutputStream out) {
     proc = pr;
-    final boolean w = sema.writing(pr, ctx);
-    sema.before(w);
-    final boolean ok = pr.exec(ctx, out);
-    sema.after(w);
-    return ok;
+    return pr.exec(ctx, out);
   }
 
   @Override

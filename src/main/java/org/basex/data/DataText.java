@@ -155,10 +155,12 @@ public interface DataText {
   /** Attribute output. */
   byte[] ATT = { '@' };
 
-  /** Version error. */
-  String SERVERSION = "XML Version must be '1.0' or '1.1'.";
-  /** Version error. */
-  String SERENCODING = "Unknown encoding: '%'";
+  /** Serialization error SESU0007. */
+  String SERENCODING = "[SESU0007] Unknown encoding: '%'";
+  /** Serialization error SEPOM0009. */
+  String SERSTAND = "[SEPM0009] Invalid combination with 'standalone'.";
+  /** Serialization error SESU0013. */
+  String SERVERSION = "[SESU0013] XML Version must be '1.0' or '1.1'.";
 
   // TABLE SERIALIZATION ======================================================
 

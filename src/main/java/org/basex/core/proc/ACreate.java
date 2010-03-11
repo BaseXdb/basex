@@ -44,22 +44,21 @@ abstract class ACreate extends Proc {
    * @return success of operation
    */
   protected final boolean build(final Parser p, final String db) {
-    new Close().exec(context);
-
-    final boolean mem = prop.is(Prop.MAINMEM);
-    if(!mem && context.pinned(db)) return error(DBLOCKED, db);
-
-    builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
-    progress(builder);
-
+    new Close().run(context);
     try {
+      final boolean mem = prop.is(Prop.MAINMEM);
+      if(!mem && context.pinned(db)) return error(DBLOCKED, db);
+
+      builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
+      progress(builder);
+
       final Data d = builder.build(db);
       if(mem) {
         context.openDB(d);
       } else {
         d.close();
-        final Proc pr = new Open(db);
-        if(!pr.exec(context)) return error(pr.info());
+        final Open pr = new Open(db);
+        if(!pr.run(context)) return error(pr.info());
         index(context.data);
       }
       return info(DBCREATED, db, perf);

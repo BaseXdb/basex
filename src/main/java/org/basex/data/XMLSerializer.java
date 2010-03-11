@@ -82,6 +82,7 @@ public final class XMLSerializer extends Serializer {
     out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
 
     boolean omit = true;
+    String sa = SerializeProp.OMIT;
     if(p != null) {
       indent = p.is(SerializeProp.INDENT);
 
@@ -98,6 +99,8 @@ public final class XMLSerializer extends Serializer {
       }
 
       omit = p.is(SerializeProp.OMIT_XML_DECLARATION);
+      sa = p.get(SerializeProp.STANDALONE);
+      if(omit && !sa.equals(SerializeProp.OMIT)) error(SERSTAND);
 
       wrapPre = token(p.get(SerializeProp.WRAP_PRE));
       wrapUri = token(p.get(SerializeProp.WRAP_URI));
@@ -189,7 +192,17 @@ public final class XMLSerializer extends Serializer {
 
     if(cdata.size() != 0 && cdata.contains(tags.get(tags.size() - 1))) {
       print("<![CDATA[");
-      for(int k = 0; k < b.length; k += cl(b[k])) print(cp(b, k));
+      int c = 0;
+      for(int k = 0; k < b.length; k += cl(b[k])) {
+        int ch = cp(b, k);
+        if(ch == ']') {
+          c++;
+        } else {
+          if(c > 1 && ch == '>') print("]]><![CDATA[");
+          c = 0;
+        }
+        print(ch);
+      }
       print("]]>");
     } else {
       for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));

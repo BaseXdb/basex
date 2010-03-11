@@ -39,7 +39,7 @@ public final class Export extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     try {
       final Data data = context.data;
       export(context.prop, data, args[0], args[1]);

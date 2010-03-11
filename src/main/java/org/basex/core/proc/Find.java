@@ -4,7 +4,6 @@ import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
-import org.basex.io.PrintOutput;
 import org.basex.query.path.Axis;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
@@ -34,8 +33,8 @@ public final class Find extends AQuery {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
-    return query(find(args[0], context, false), out);
+  protected boolean run() {
+    return query(find(args[0], context, false));
   }
 
   /**

@@ -7,7 +7,6 @@ import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'checks' command, opens an existing database or
@@ -26,14 +25,14 @@ public final class Check extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
-    new Close().exec(context);
+  protected boolean run() {
+    new Close().run(context);
 
     final String path = args[0];
     final String db = IO.get(path).dbname();
     final Proc p = MetaData.found(path, db, context.prop) ?
       new Open(db) : new CreateDB(path);
-    final boolean ok = p.exec(context);
+    final boolean ok = p.run(context);
     info(p.info());
     return ok;
   }

@@ -4,7 +4,6 @@ import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Proc;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'help' command and returns help on the database commands.
@@ -22,7 +21,7 @@ public final class Help extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
+  protected boolean run() throws IOException {
     try {
       final Cmd cmd = Cmd.valueOf(args[0]);
       out.print(cmd.help(true));

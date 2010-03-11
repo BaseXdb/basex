@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import org.basex.core.Proc;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'exit' command and quits the console.
@@ -16,7 +15,7 @@ public final class Exit extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
-    return new Close().exec(context);
+  protected boolean run() {
+    return new Close().run(context);
   }
 }

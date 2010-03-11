@@ -116,6 +116,7 @@ public class BaseX extends Main {
 
   @Override
   protected final void parseArguments(final String[] args) {
+    String serial = "";
     try {
       final Args arg = new Args(args);
       success = true;
@@ -157,9 +158,9 @@ public class BaseX extends Main {
             query = arg.remaining();
           } else if(c == 's') {
             // set/add serialization parameter
-            String s = context.prop.get(Prop.SERIALIZER);
-            if(s.length() != 0) s += ",";
-            context.prop.set(Prop.SERIALIZER, s + arg.string());
+            if(serial.length() != 0) serial += ",";
+            serial += arg.string();
+            success = set(Prop.SERIALIZER, serial);
           } else if(c == 'r') {
             // hidden option: parse number of runs
             success = set(Prop.RUNS, arg.string());

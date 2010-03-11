@@ -2,7 +2,6 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import org.basex.core.Proc;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'password' command and alters the user's password.
@@ -20,7 +19,7 @@ public final class Password extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final String user = context.user.name;
     final String pass = args[0];
     return pass != null && !pass.isEmpty() && context.users.alter(user, pass) ?

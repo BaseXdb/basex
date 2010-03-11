@@ -11,7 +11,6 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.IndexType;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'drop index' command and deletes indexes in the currently
@@ -30,7 +29,7 @@ public final class DropIndex extends ACreate {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final Data data = context.data;
     if(data instanceof MemData) return error(PROCMM);
 

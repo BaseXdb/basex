@@ -4,7 +4,6 @@ import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.io.PrintOutput;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.util.LibraryLoader;
 
@@ -25,12 +24,12 @@ public final class Mount extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final String db = args[0];
     final String mp = args[1];
 
-    new Close().exec(context);
-    new Open(db).exec(context);
+    new Close().run(context);
+    new Open(db).run(context);
 
     final Data data = context.data;
     if(data.fs == null) return error("No DeepFS instance");

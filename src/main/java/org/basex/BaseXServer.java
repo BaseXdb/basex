@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import org.basex.core.LocalSession;
-import org.basex.core.Semaphore;
 import org.basex.core.Session;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -30,8 +29,6 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  */
 public final class BaseXServer extends Main implements Runnable {
-  /** Semaphore for managing processes. */
-  public final Semaphore sem = new Semaphore();
   /** Log. */
   public Log log;
   /** Quiet mode (no logging). */
@@ -64,7 +61,7 @@ public final class BaseXServer extends Main implements Runnable {
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
       new Thread(this).start();
-      while(!running) Performance.sleep(100);
+      do Performance.sleep(100); while(!running);
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
       if(console) quit(console());
@@ -116,7 +113,7 @@ public final class BaseXServer extends Main implements Runnable {
 
   @Override
   protected Session session() {
-    if(session == null) session = new LocalSession(context, sem);
+    if(session == null) session = new LocalSession(context);
     return session;
   }
 

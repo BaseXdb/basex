@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.io.IO;
-import org.basex.io.PrintOutput;
 import org.basex.util.Token;
 
 /**
@@ -23,11 +22,11 @@ public final class Run extends AQuery {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
+  protected boolean run() throws IOException {
     final IO io = IO.get(args[0]);
     if(!io.exists()) return error(FILEWHICH, io);
     context.query = io;
-    return query(Token.string(io.content()), out);
+    return query(Token.string(io.content()));
   }
 
   @Override

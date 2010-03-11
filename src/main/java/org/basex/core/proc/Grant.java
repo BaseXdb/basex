@@ -8,7 +8,6 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'grant' command and grants permissions to users.
@@ -37,7 +36,7 @@ public final class Grant extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final String name = args[1];
     final String db = args[2];
     if(name.equals(ADMIN)) return error(USERADMIN);

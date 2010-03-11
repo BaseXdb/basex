@@ -5,7 +5,6 @@ import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'show databases' command and shows opened databases.
@@ -22,7 +21,7 @@ public final class ShowDatabases extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) throws IOException {
+  protected boolean run() throws IOException {
     out.println(context.pool.info());
     return true;
   }

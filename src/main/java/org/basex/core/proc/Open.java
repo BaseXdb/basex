@@ -9,7 +9,6 @@ import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
-import org.basex.io.PrintOutput;
 
 /**
  * Evaluates the 'open' command and opens a database.
@@ -27,10 +26,10 @@ public final class Open extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
-    new Close().exec(context);
-
+  protected boolean run() {
+    new Close().run(context);
     final String db = args[0];
+
     try {
       final Data data = open(context, db);
       context.openDB(data);

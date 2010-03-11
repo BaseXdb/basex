@@ -8,7 +8,6 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.data.Data;
-import org.basex.io.PrintOutput;
 import org.basex.server.ServerProcess;
 
 /**
@@ -36,7 +35,7 @@ public final class DropUser extends Proc {
   }
 
   @Override
-  protected boolean exec(final PrintOutput out) {
+  protected boolean run() {
     final String usern = args[0];
     if(usern.equals(ADMIN)) return error(USERADMIN);
 
