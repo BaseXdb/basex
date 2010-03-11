@@ -45,10 +45,9 @@ final class BXCollectionManagementService implements
   }
 
   public void removeCollection(final String name) throws XMLDBException {
-    final DropDB drop = new DropDB(name);
-    if(!drop.exec(coll.ctx)) {
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, drop.info());
-    }
+    final DropDB proc = new DropDB(name);
+    if(!proc.exec(coll.ctx))
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, proc.info());
   }
 
   public String getName() {
