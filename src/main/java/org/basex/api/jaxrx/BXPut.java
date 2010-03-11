@@ -1,14 +1,13 @@
 package org.basex.api.jaxrx;
 
+import static org.basex.api.jaxrx.BXUtil.*;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.xml.transform.sax.SAXSource;
-import org.basex.build.Parser;
-import org.basex.build.xml.SAXWrapper;
-import org.basex.core.Context;
+
 import org.basex.core.proc.CreateDB;
+import org.basex.server.ClientSession;
 import org.jaxrx.interfaces.IPut;
-import org.xml.sax.InputSource;
 
 /**
  * This class offers an implementation of the JAX-RX 'put' operation.
@@ -20,16 +19,18 @@ import org.xml.sax.InputSource;
 public final class BXPut implements IPut {
   @Override
   public boolean createResource(final String resource, final InputStream in) {
-    final Context ctx = new Context();
-    final SAXSource source = new SAXSource(new InputSource(in));
-    final Parser parser = new SAXWrapper(source, ctx.prop);
-    try {
-      CreateDB.xml(ctx, parser, resource);
-    } catch(final IOException ex) {
-      BXUtil.error(ex);
-    } finally {
-      ctx.close();
-    }
+    final ClientSession cs = session();
+    run(cs, new Code() {
+      @Override
+      public void run() throws IOException {
+        // create database from cached file
+        final File file = cache(in);
+        final boolean ok = cs.execute(new CreateDB(file.toString(), resource));
+        file.delete();
+        // return exception if process failed
+        if(!ok) badRequest(cs.info());
+      }
+    });
     return true;
   }
 }

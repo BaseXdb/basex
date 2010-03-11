@@ -1,9 +1,8 @@
-package org.basex.api.jaxrx;
+package org.basex.api.jaxrx.local;
 
-import static org.basex.api.jaxrx.BXUtil.*;
-import java.io.IOException;
+import org.basex.core.BaseXException;
+import org.basex.core.Context;
 import org.basex.core.proc.DropDB;
-import org.basex.server.ClientSession;
 import org.jaxrx.interfaces.IDelete;
 
 /**
@@ -16,13 +15,13 @@ import org.jaxrx.interfaces.IDelete;
 public final class BXDelete implements IDelete {
   @Override
   public boolean deleteResource(final String resource) {
-    final ClientSession cs = session();
-    run(cs, new Code() {
-      @Override
-      public void run() throws IOException {
-        if(!cs.execute(new DropDB(resource))) notFound(cs.info());
-      }
-    });
+    final Context ctx = new Context();
+    try {
+      new DropDB(resource).execute(ctx);
+    } catch(final BaseXException ex) {
+      BXUtil.notFound(ex.getMessage());
+    }
+    ctx.close();
     return true;
   }
 }

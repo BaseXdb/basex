@@ -1,23 +1,27 @@
-package org.basex.api.jaxrx;
+package org.basex.api.jaxrx.local;
 
-import static org.basex.api.jaxrx.BXUtil.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
-import org.basex.core.proc.Add;
+import javax.xml.transform.sax.SAXSource;
+import org.basex.build.MemBuilder;
+import org.basex.build.Parser;
+import org.basex.build.xml.SAXWrapper;
+import org.basex.core.BaseXException;
+import org.basex.core.Context;
 import org.basex.core.proc.Open;
-import org.basex.server.ClientSession;
+import org.basex.data.MemData;
 import org.jaxrx.interfaces.IPost;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * This class offers an implementation of the JAX-RX 'post' operation.
@@ -49,20 +53,23 @@ public final class BXPost implements IPost {
    * @param in input stream
    */
   public void postResource(final String resource, final InputStream in) {
-    final ClientSession cs = session();
-    run(cs, new Code() {
-      @Override
-      public void run() throws IOException {
-        // open database
-        if(!cs.execute(new Open(resource))) notFound(cs.info());
-        // add cached file to the database
-        final File file = cache(in);
-        final boolean ok = cs.execute(new Add(file.toString()));
-        file.delete();
-        // return exception if process failed
-        if(!ok) badRequest(cs.info());
-      }
-    });
+    final Context ctx = new Context();
+    try {
+      new Open(resource).execute(ctx);
+    } catch(BaseXException ex) {
+      BXUtil.notFound(ex.getMessage());
+    }
+
+    try {
+      final SAXSource saxSource = new SAXSource(new InputSource(in));
+      final Parser parser = new SAXWrapper(saxSource, ctx.prop);
+      final MemData data = new MemBuilder(parser).build(new Date() + ".xml");
+      ctx.data.insert(ctx.data.meta.size, -1, data);
+    } catch(final IOException ex) {
+      BXUtil.error(ex);
+    } finally {
+      ctx.close();
+    }
   }
 
   /**
@@ -77,9 +84,13 @@ public final class BXPost implements IPost {
     return new StreamingOutput() {
       @Override
       public void write(final OutputStream out) {
-        final Map<String, String> p = getParams(doc);
-        query(resource, out, p.get("query"), p.get("wrap"),
-            p.get("output"), p.get("start"), p.get("count"));
+        final Map<String, String> params = getParams(doc);
+        BXUtil.query(resource, out,
+            params.get("query"),
+            params.get("wrap"),
+            params.get("output"),
+            params.get("start"),
+            params.get("count"));
       }
     };
   }
