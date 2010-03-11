@@ -58,8 +58,10 @@ public final class Set extends Proc {
           }
         }
       } else if(type instanceof Integer) {
+        if(val == null) val = "0";
         prop.set(key, Integer.parseInt(val));
       } else if(type instanceof String) {
+        if(val == null) val = "";
         prop.set(key, val);
       } else {
         Main.notexpected();

@@ -146,6 +146,17 @@ public final class MetaData {
   }
 
   /**
+   * Returns the size of the database.
+   * @return database size
+   */
+  public long dbsize() {
+    final File dir = prop.dbpath(name);
+    long len = 0;
+    if(dir.exists()) for(final File f : dir.listFiles()) len += f.length();
+    return len;
+  }
+
+  /**
    * Adds the database suffix to the specified filename and creates
    * a file instance.
    * @param fn filename
@@ -156,8 +167,7 @@ public final class MetaData {
   }
 
   /**
-   * Adds the database suffix to the specified filename and creates
-   * a file instance.
+   * Creates a database file instance.
    * @param db name of the database
    * @param fn filename
    * @param pr database properties

@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,16 +49,12 @@ public final class InfoDB extends AInfo {
   public static byte[] db(final MetaData meta, final boolean bold,
       final boolean index, final boolean create) {
 
-    final File dir = meta.prop.dbpath(meta.name);
-    long len = 0;
-    if(dir.exists()) for(final File f : dir.listFiles()) len += f.length();
-
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ?
         new TokenBuilder().high().add("%").norm().toString() : "%") + NL;
     tb.add(header, INFODB);
     format(tb, INFODBNAME, meta.name);
-    format(tb, INFODBSIZE, Performance.format(len));
+    format(tb, INFODBSIZE, Performance.format(meta.dbsize()));
     format(tb, INFONODES, Integer.toString(meta.size));
     format(tb, INFOHEIGHT, Integer.toString(meta.height));
 

@@ -548,7 +548,7 @@ public interface Text {
   String INFODOCSIZE = lang("info_docsize");
   /** Document encoding. */
   String INFOENCODING = lang("info_encoding");
-  /** Info on database table size. */
+  /** Info on number of nodes. */
   String INFONODES = lang("info_nodes");
   /** Maximum tree height. */
   String INFOHEIGHT = lang("info_height");

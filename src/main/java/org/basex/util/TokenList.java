@@ -59,7 +59,7 @@ public final class TokenList implements Iterable<byte[]> {
    * Adds next value.
    * @param v value to be added
    */
-  public void add(final int v) {
+  public void add(final long v) {
     add(token(v));
   }
 
@@ -70,14 +70,6 @@ public final class TokenList implements Iterable<byte[]> {
   public void add(final String v) {
     add(Token.token(v));
   }
-
-  /**
-   * Adds next value.
-   * @param v value to be added
-  public void add(final String v) {
-    add(token(v));
-  }
-   */
 
   /**
    * Returns the number of entries.

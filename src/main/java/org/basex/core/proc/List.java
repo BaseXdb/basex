@@ -37,15 +37,21 @@ public final class List extends Proc {
 
     final boolean create = context.user.perm(User.CREATE);
     table.header.add(INFODBNAME);
+    table.header.add(INFONDOCS);
+    table.header.add(INFODBSIZE);
     if(create) table.header.add(INFODOC);
 
     for(final String name : list(context)) {
       DataInput in = null;
       String file = null;
+      long size = 0;
+      int ndocs = 0;
       final MetaData meta = new MetaData(name, prop);
       try {
         in = new DataInput(meta.file(DATAINFO));
         meta.read(in);
+        size = meta.dbsize();
+        ndocs = meta.ndocs;
         if(context.perm(User.READ, meta)) file = meta.file.toString();
       } catch(final IOException ex) {
         file = INFODBERR;
@@ -55,6 +61,8 @@ public final class List extends Proc {
       if(file != null) {
         final TokenList sl = new TokenList();
         sl.add(name);
+        sl.add(ndocs);
+        sl.add(size);
         if(create) sl.add(file);
         table.contents.add(sl);
       }

@@ -163,7 +163,7 @@ public abstract class AProp {
   }
 
   /**
-   * Returns the requested object.
+   * Returns the requested value.
    * @param key key to be found
    * @return value
    */
