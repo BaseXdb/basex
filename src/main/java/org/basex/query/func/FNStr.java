@@ -24,12 +24,6 @@ import org.basex.util.XMLToken;
 final class FNStr extends Fun {
   /** Normalization types. */
   private static final String[] NORMS = { "NFC", "NFD", "NFKC", "NFKD", "" };
-  /** Hex codes. */
-  private static final byte[] HEX = token("0123456789ABCDEF");
-  /** Reserved characters. */
-  private static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
-  /** Reserved characters. */
-  private static final byte[] RES = token("-._~");
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
@@ -79,7 +73,7 @@ final class FNStr extends Fun {
       case IRIURI:
         return Str.get(uri(checkStr(e, ctx), true));
       case ESCURI:
-        return Str.get(esc(checkStr(e, ctx)));
+        return Str.get(escape(checkStr(e, ctx)));
       case CONCAT:
         return concat(ctx);
       case CONTAINS:
@@ -319,49 +313,5 @@ final class FNStr extends Fun {
       if(it != null) tb.add(it.str());
     }
     return Str.get(tb.finish());
-  }
-
-  /**
-   * Returns a URI encoded token.
-   * @param tok token
-   * @param iri input
-   * @return encoded token
-   */
-  private static byte[] uri(final byte[] tok, final boolean iri) {
-    final int tl = tok.length;
-    final TokenBuilder tb = new TokenBuilder();
-    for(int t = 0; t < tl; t++) {
-      final byte b = tok[t];
-      if(letterOrDigit(b) || contains(iri ? IRIRES : RES, b)) tb.add(b);
-      else hex(tb, b);
-    }
-    return tb.finish();
-  }
-
-  /**
-   * Escapes the specified token.
-   * @param tok token
-   * @return escaped token
-   */
-  private static byte[] esc(final byte[] tok) {
-    final int tl = tok.length;
-    final TokenBuilder tb = new TokenBuilder();
-    for(int t = 0; t < tl; t++) {
-      final byte b = tok[t];
-      if(b >= 32 && b <= 126) tb.add(b);
-      else hex(tb, b);
-    }
-    return tb.finish();
-  }
-
-  /**
-   * Adds the specified byte in hex code.
-   * @param tb token builder
-   * @param b byte to be added
-   */
-  private static void hex(final TokenBuilder tb, final byte b) {
-    tb.add('%');
-    tb.add(HEX[(b & 0xFF) >> 4]);
-    tb.add(HEX[b & 0xFF & 15]);
   }
 }

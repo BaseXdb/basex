@@ -160,14 +160,31 @@ public interface DataText {
   /** Attribute output. */
   byte[] ATT = { '@' };
 
+  /** HTML: head element. */
+  byte[] HEAD = token("head");
+  /** HTML: meta element. */
+  byte[] META = token("meta");
+  /** HTML: http-equiv attribute. */
+  byte[] HTTPEQUIV = token("http-equiv");
+  /** HTML: text/html attribute value. */
+  byte[] TEXTHTML = token("text/html");
+  /** HTML: charset attribute. */
+  byte[] CHARSET = token("charset");
+
+  /** Serialization error. */
+  String SERKEY = "Parameter '%' is unknown.";
+  /** Serialization error. */
+  String SERVAL = "Parameter '%' must be set to '%'";
+  /** Serialization error. */
+  String SERMAPS = "Character map '%' is not defined.";
+  /** Serialization error. */
+  String SERVAL2 = " or '%'";
   /** Serialization error SESU0007. */
   String SERENCODING = "[SESU0007] Unknown encoding: '%'";
   /** Serialization error SEPOM0009. */
   String SERSTAND = "[SEPM0009] Invalid combination of 'omit-xml-declaration'.";
   /** Serialization error SEPM0010. */
   String SERUNDECL = "[SEPM0010] XML 1.0: undeclaring prefixes not allowed.";
-  /** Serialization error SESU0013.
-  String SERVERSION = "[SESU0013] XML Version must be '1.0' or '1.1'."; */
   /** Serialization error SERE0014. */
   String SERILL = "[SERE0014] Illegal HTML character found: #x%";
   /** Serialization error SERE0015. */

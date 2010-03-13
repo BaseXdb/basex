@@ -1,10 +1,11 @@
 package org.basex.data;
 
-import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.AProp;
 import org.basex.core.Main;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class contains serialization properties.
@@ -54,11 +55,20 @@ public final class SerializeProp extends AProp {
   public static final Object[] S_ENCODING = {
     "encoding", Token.UTF8 };
   /** Serialization parameter: yes/no. */
+  public static final Object[] S_ESCAPE_URI_ATTRIBUTES = {
+    "escape-uri-attributes", YES };
+  /** Serialization parameter: yes/no. */
+  public static final Object[] S_INCLUDE_CONTENT_TYPE = {
+    "include-content-type", YES };
+  /** Serialization parameter: yes/no. */
   public static final Object[] S_INDENT = {
     "indent", YES };
   /** Serialization parameter. */
   public static final Object[] S_MEDIA_TYPE = {
     "media-type", "text/xml" };
+  /** Serialization parameter: xml/xhtml/html/text. */
+  public static final Object[] S_METHOD = {
+    "method", "xml" };
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
   public static final Object[] S_NORMALIZATION_FORM = {
     "normalization-form", "NFC" };
@@ -71,9 +81,12 @@ public final class SerializeProp extends AProp {
   /** Serialization parameter: yes/no. */
   public static final Object[] S_UNDECLARE_PREFIXES = {
     "undeclare-prefixes", NO };
+  /** Serialization parameter. */
+  public static final Object[] S_USE_CHARACTER_MAPS = {
+    "use-character-maps", "" };
   /** Serialization parameter: 1.0/1.1. */
   public static final Object[] S_VERSION = {
-    "version", V10 };
+    "version", "" };
 
   /** Hidden serialization parameter. */
   public static final Object[] S_WRAP_PRE = {
@@ -81,21 +94,6 @@ public final class SerializeProp extends AProp {
   /** Hidden serialization parameter. */
   public static final Object[] S_WRAP_URI = {
     "wrap-uri", "" };
-
-  // NOT SUPPORTED PARAMETERS =================================================
-  
-  /** Serialization parameter: yes/no. */
-  public static final Object[] S_ESCAPE_URI_ATTRIBUTES = {
-    "escape-uri-attributes", YES };
-  /** Serialization parameter: yes/no. */
-  public static final Object[] S_INCLUDE_CONTENT_TYPE = {
-    "include-content-type", YES };
-  /** Serialization parameter: xml/xhtml/html/text. */
-  public static final Object[] S_METHOD = {
-    "method", "xml" };
-  /** Serialization parameter. */
-  public static final Object[] S_USE_CHARACTER_MAPS = {
-    "use-character-maps", YES };
 
   /**
    * Constructor.
@@ -116,11 +114,39 @@ public final class SerializeProp extends AProp {
 
     for(final String ser : s.trim().split(",")) {
       if(ser.length() == 0) continue;
-      final String[] sprop = ser.split("=");
+      final String[] sprop = ser.split("=", 2);
       final String key = sprop[0].trim();
-      final Object obj = object(key);
-      if(sprop.length == 2 && obj != null) set(key, sprop[1].trim());
-      else throw new IOException(Main.info(SETKEY, key));
+      final String val = sprop.length < 2 ? "" : sprop[1].trim();
+      if(object(key) != null) set(key, val);
+      else throw new IOException(Main.info(SERKEY, key));
     }
+  }
+  
+  /**
+   * Retrieves a value from the specified property and checks allowed values.
+   * @param key property key
+   * @param allowed allowed values
+   * @return value
+   * @throws IOException I/O exception
+   */
+  public String check(final Object[] key, final String... allowed)
+      throws IOException {
+
+    final String val = get(key);
+    for(final String a : allowed) if(a.equals(val)) return val;
+    throw new IOException(error(key[0].toString(), allowed));
+  }
+  
+  /**
+   * Returns an exception string for a wrong key.
+   * @param key property key
+   * @param allowed allowed values
+   * @return string
+   */
+  public static String error(final String key, final String... allowed) {
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add(SERVAL, key, allowed[0]);
+    for(int a = 1; a < allowed.length; a++) tb.add(SERVAL2, allowed[a]);
+    return tb.toString();
   }
 }

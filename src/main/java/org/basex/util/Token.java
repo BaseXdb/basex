@@ -1069,6 +1069,57 @@ public final class Token {
     }
   }
 
+  /** Hex codes. */
+  private static final byte[] HEX = token("0123456789ABCDEF");
+  /** Reserved characters. */
+  private static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
+  /** Reserved characters. */
+  private static final byte[] RES = token("-._~");
+
+  /**
+   * Returns a URI encoded token.
+   * @param tok token
+   * @param iri input
+   * @return encoded token
+   */
+  public static byte[] uri(final byte[] tok, final boolean iri) {
+    final int tl = tok.length;
+    final TokenBuilder tb = new TokenBuilder();
+    for(int t = 0; t < tl; t++) {
+      final byte b = tok[t];
+      if(letterOrDigit(b) || contains(iri ? IRIRES : RES, b)) tb.add(b);
+      else hex(tb, b);
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Escapes the specified token.
+   * @param tok token
+   * @return escaped token
+   */
+  public static byte[] escape(final byte[] tok) {
+    final int tl = tok.length;
+    final TokenBuilder tb = new TokenBuilder();
+    for(int t = 0; t < tl; t++) {
+      final byte b = tok[t];
+      if(b >= 32 && b <= 126) tb.add(b);
+      else hex(tb, b);
+    }
+    return tb.finish();
+  }
+
+  /**
+   * Adds the specified byte in hex code.
+   * @param tb token builder
+   * @param b byte to be added
+   */
+  private static void hex(final TokenBuilder tb, final byte b) {
+    tb.add('%');
+    tb.add(HEX[(b & 0xFF) >> 4]);
+    tb.add(HEX[b & 0xFF & 15]);
+  }
+
   /**
    * Returns the local name of the specified name.
    * @param name name

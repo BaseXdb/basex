@@ -1,6 +1,5 @@
 package org.basex.data;
 
-import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import static org.basex.data.SerializeProp.*;
@@ -30,35 +29,43 @@ public final class XMLSerializer extends Serializer {
   private static final byte[] NL = token(Prop.NL);
   /** Colon. */
   private static final byte[] COL = { ':' };
-  /** Elements with an empty content model. */
-  private static final TokenList EMPTY = new TokenList();
-  /** Script elements. */
-  private static final TokenList SCRIPTS = new TokenList();
-  /** Boolean elements. */
-  private static final TokenSet BOOLEAN = new TokenSet();
 
+  /** HTML: elements with an empty content model. */
+  private static final TokenList EMPTY = new TokenList();
+  /** HTML: script elements. */
+  private static final TokenList SCRIPTS = new TokenList();
+  /** HTML: boolean attributes. */
+  private static final TokenSet BOOLEAN = new TokenSet();
+  /** HTML: URI attributes. */
+  private static final TokenSet URIS = new TokenSet();
+  
   /** Output stream. */
   private final PrintOutput out;
   /** CData elements. */
   private final TokenList cdata = new TokenList();
-  /** XML version. */
-  private String version = V10;
   /** Indentation flag. */
-  private boolean indent = true;
+  private final boolean indent;
+  /** URI escape flag. */
+  private final boolean escape;
+  /** Include content type flag. */
+  private final boolean content;
   /** URI for wrapped results. */
-  private byte[] wrapUri = {};
+  private final byte[] wrapUri;
   /** Prefix for wrapped results. */
-  private byte[] wrapPre = {};
+  private final byte[] wrapPre;
   /** Wrapper flag. */
-  private boolean wrap;
+  private final boolean wrap;
+  /** Serialization method. */
+  private final String method;
   /** Encoding. */
-  private String enc = UTF8;
+  private final String enc;
+
+  /** XML version. */
+  private String version;
   /** System document type. */
   private String docsys = "";
   /** Public document type. */
   private String docpub = "";
-  /** Serialization method. */
-  private String method;
 
   /** Temporary indentation flag. */
   private boolean ind;
@@ -87,27 +94,32 @@ public final class XMLSerializer extends Serializer {
 
     out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
 
+    final String m = p.check(S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT);
+    method  = m.equals(M_XML) ? M_XML : m.equals(M_XHTML) ?
+        M_XHTML : m.equals(M_HTML) ? M_HTML : M_TEXT;
+
+    version = p.get(S_VERSION).length() == 0 ? method == M_HTML ? V40 : V10 :
+      method == M_HTML ? p.check(S_VERSION, V40, V401) :
+      method != M_TEXT ? p.check(S_VERSION, V10, V11) : p.get(S_VERSION);
+    
     for(final String c : p.get(S_CDATA_SECTION_ELEMENTS).split("\\s+"))
       if(c.length() != 0) cdata.add(token(c));
 
-    boolean docdecl = check(p, S_OMIT_XML_DECLARATION, YES, NO).equals(NO);
-    boolean bom     = check(p, S_BYTE_ORDER_MARK, YES, NO).equals(YES);
-    String  sa      = check(p, S_STANDALONE, YES, NO, OMIT);
-    check(p, S_NORMALIZATION_FORM, "NFC", "none");
+    boolean docdecl = p.check(S_OMIT_XML_DECLARATION, YES, NO).equals(NO);
+    boolean bom     = p.check(S_BYTE_ORDER_MARK, YES, NO).equals(YES);
+    String  sa      = p.check(S_STANDALONE, YES, NO, OMIT);
+    p.check(S_NORMALIZATION_FORM, "NFC", "none");
 
-    final String m = check(p, S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT);
-    method  = m.equals(M_XML) ? M_XML : m.equals(M_XHTML) ?
-        M_XHTML : m.equals(M_HTML) ? M_HTML : M_TEXT;
-    version = method == M_HTML ? V40 : V10;
+    final String maps = p.get(S_USE_CHARACTER_MAPS);
+    if(maps.length() != 0) error(SERMAPS, maps);
     
     enc     = enc(p.get(S_ENCODING));
-    indent  = check(p, S_INDENT, YES, NO).equals(YES);
-    version = method == M_TEXT ? p.get(S_VERSION) :
-      method == M_HTML ? check(p, S_VERSION, V40, V401) :
-      check(p, S_VERSION, V10, V11);
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
-    undecl  = check(p, S_UNDECLARE_PREFIXES, YES, NO).equals(YES);
+    indent  = p.check(S_INDENT, YES, NO).equals(YES);
+    undecl  = p.check(S_UNDECLARE_PREFIXES, YES, NO).equals(YES);
+    escape  = p.check(S_ESCAPE_URI_ATTRIBUTES, YES, NO).equals(YES);
+    content = p.check(S_INCLUDE_CONTENT_TYPE, YES, NO).equals(YES);
     wrapPre = token(p.get(S_WRAP_PRE));
     wrapUri = token(p.get(S_WRAP_URI));
     wrap    = wrapPre.length != 0;
@@ -116,6 +128,7 @@ public final class XMLSerializer extends Serializer {
       docsys = null;
       docpub = null;
     }
+
     if(!Charset.isSupported(enc)) error(SERENCODING, enc);
     if(undecl && version.equals(V10)) error(SERUNDECL);
 
@@ -153,23 +166,6 @@ public final class XMLSerializer extends Serializer {
   }
   
   /**
-   * Retrieves a value from the specified property and checks allowed values.
-   * @param p properties
-   * @param key property key
-   * @param allowed allowed values
-   * @return value
-   * @throws IOException I/O exception
-   */
-  public static String check(final SerializeProp p, final Object[] key,
-      final String... allowed) throws IOException {
-
-    final String val = p.get(key);
-    for(final String a : allowed) if(a.equals(val)) return val;
-    error(SETVAL, key[0], val);
-    return val;
-  }
-  
-  /**
    * Global method, replacing all % characters
    * (see {@link TokenBuilder#add(Object, Object...)} for details.
    * @param str string to be extended
@@ -202,14 +198,19 @@ public final class XMLSerializer extends Serializer {
 
     print(' ');
     print(n);
-    if(method == M_HTML && BOOLEAN.id(concat(lc(tags.get(tags.size() - 1)),
-        COL, lc(n))) != 0) return;
+
+    final byte[] tagatt = concat(lc(tags.get(tags.size() - 1)), COL, lc(n));
+    // don't append value for boolean attributes
+    if(method == M_HTML && BOOLEAN.id(tagatt) != 0) return;
+    // escape URI attributes
+    final byte[] val = escape && (method == M_HTML || method == M_XHTML) &&
+        URIS.id(tagatt) != 0 ? escape(v) : v;
     
     print(ATT1);
-    for(int k = 0; k < v.length; k += cl(v[k])) {
-      final int ch = cp(v, k);
+    for(int k = 0; k < val.length; k += cl(val[k])) {
+      final int ch = cp(val, k);
       if(method == M_HTML && (ch == '<' ||
-          ch == '&' && v[Math.min(k + 1, v.length - 1)] == '{')) {
+          ch == '&' && val[Math.min(k + 1, val.length - 1)] == '{')) {
         print(ch);
       } else {
         switch(ch) {
@@ -329,6 +330,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   protected void start(final byte[] t) throws IOException {
     if(method == M_TEXT) return;
+
     if(tags.size() == 1 && docsys != null) {
       if(ind) indent(false);
       print(DOCTYPE);
@@ -344,12 +346,17 @@ public final class XMLSerializer extends Serializer {
       print(NL);
       docsys = null;
     }
+
     if(ind) indent(false);
     print(ELEM1);
     print(t);
     ind = indent;
     
     if(method == M_HTML) script = SCRIPTS.contains(lc(t));
+
+    // subsequent content type elements are currently ignored
+    if(content && (method == M_HTML || method == M_XHTML) && eq(lc(t), HEAD))
+      emptyElement(META, HTTPEQUIV, TEXTHTML, CHARSET, token(enc));
   }
 
   @Override
@@ -492,6 +499,43 @@ public final class XMLSerializer extends Serializer {
     BOOLEAN.add(token("textarea:disabled"));
     BOOLEAN.add(token("textarea:readonly"));
     BOOLEAN.add(token("th:nowrap"));
-    BOOLEAN.add(token("ul:compact")); 
+    BOOLEAN.add(token("ul:compact"));
+    URIS.add(token("a:href"));
+    URIS.add(token("a:name"));
+    URIS.add(token("applet:codebase"));
+    URIS.add(token("area:href"));
+    URIS.add(token("base:href"));
+    URIS.add(token("blockquote:cite"));
+    URIS.add(token("body:background"));
+    URIS.add(token("button:datasrc"));
+    URIS.add(token("del:cite"));
+    URIS.add(token("div:datasrc"));
+    URIS.add(token("form:action"));
+    URIS.add(token("frame:longdesc"));
+    URIS.add(token("frame:src"));
+    URIS.add(token("head:profile"));
+    URIS.add(token("iframe:longdesc"));
+    URIS.add(token("iframe:src"));
+    URIS.add(token("img:longdesc"));
+    URIS.add(token("img:src"));
+    URIS.add(token("img:usemap"));
+    URIS.add(token("input:datasrc"));
+    URIS.add(token("input:src"));
+    URIS.add(token("input:usemap"));
+    URIS.add(token("ins:cite"));
+    URIS.add(token("link:href"));
+    URIS.add(token("object:archive"));
+    URIS.add(token("object:classid"));
+    URIS.add(token("object:codebase"));
+    URIS.add(token("object:data"));
+    URIS.add(token("object:datasrc"));
+    URIS.add(token("object:usemap"));
+    URIS.add(token("q:cite"));
+    URIS.add(token("script:for"));
+    URIS.add(token("script:src"));
+    URIS.add(token("select:datasrc"));
+    URIS.add(token("span:datasrc"));
+    URIS.add(token("table:datasrc"));
+    URIS.add(token("textarea:datasrc"));
   }
 }
