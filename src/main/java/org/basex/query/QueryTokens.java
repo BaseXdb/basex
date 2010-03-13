@@ -376,7 +376,7 @@ public interface QueryTokens {
   byte[] IDREF = token("idref");
   /** FN token. */
   byte[] FN = token("fn");
-  /** Database token. */
+  /** BaseX token. */
   byte[] BASEX = token("basex");
   /** XS token. */
   byte[] XS = token("xs");

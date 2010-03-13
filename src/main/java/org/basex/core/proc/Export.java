@@ -8,6 +8,7 @@ import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.data.SerializeProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
@@ -81,7 +82,8 @@ public final class Export extends Proc {
 
       // serialize nodes
       final PrintOutput po = new PrintOutput(file.path());
-      final XMLSerializer xml = new XMLSerializer(po, prop.get(Prop.EXPORTER));
+      final SerializeProp sprop = new SerializeProp(prop.get(Prop.EXPORTER));
+      final XMLSerializer xml = new XMLSerializer(po, sprop);
       xml.node(data, pre);
       xml.close();
       po.close();

@@ -116,15 +116,18 @@ public interface DataText {
   byte[] SIZE = token("size");
 
   /** Document declaration. */
-  byte[] DOCDECL1 = token("xml version='");
+  String DOCDECL1 = "xml version='";
   /** Document declaration. */
-  byte[] DOCDECL2 = token("' encoding='");
+  String DOCDECL2 = "' encoding='";
   /** Document declaration. */
-  byte[] DOCDECL3 = token("' standalone='");
+  String DOCDECL3 = "' standalone='";
   /** Doctype output. */
-  byte[] DOCTYPE = token("<!DOCTYPE");
+  String DOCTYPE = "<!DOCTYPE ";
   /** Doctype system keyword. */
-  byte[] SYSTEM = token("SYSTEM");
+  String SYSTEM = "SYSTEM";
+  /** Doctype public keyword. */
+  String PUBLIC = "PUBLIC";
+
   /** Comment output. */
   byte[] COM1 = token("<!--");
   /** Comment output. */
@@ -160,9 +163,15 @@ public interface DataText {
   /** Serialization error SESU0007. */
   String SERENCODING = "[SESU0007] Unknown encoding: '%'";
   /** Serialization error SEPOM0009. */
-  String SERSTAND = "[SEPM0009] Invalid combination with 'standalone'.";
+  String SERSTAND = "[SEPM0009] Invalid combination of 'omit-xml-declaration'.";
+  /** Serialization error SEPM0010. */
+  String SERUNDECL = "[SEPM0010] XML 1.0: undeclaring prefixes not allowed.";
   /** Serialization error SESU0013.
   String SERVERSION = "[SESU0013] XML Version must be '1.0' or '1.1'."; */
+  /** Serialization error SERE0014. */
+  String SERILL = "[SERE0014] Illegal HTML character found: #x%";
+  /** Serialization error SERE0015. */
+  String SERPI = "[SERE0015] Processing construction contains '>'";
 
   // TABLE SERIALIZATION ======================================================
 

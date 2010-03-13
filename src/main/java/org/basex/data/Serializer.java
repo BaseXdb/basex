@@ -3,8 +3,6 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.IO;
-import org.basex.query.ExprInfo;
-import org.basex.query.expr.Expr;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
 import org.basex.util.TokenList;
@@ -22,7 +20,10 @@ public abstract class Serializer {
   public byte[] dn = EMPTY;
 
   /** Opened tags. */
-  public final TokenList tags = new TokenList();
+  protected final TokenList tags = new TokenList();
+  /** Declare namespaces flag. */
+  protected boolean undecl;
+
   /** Namespace levels. */
   private final IntList nsl = new IntList();
   /** Flag for opened tag. */
@@ -161,6 +162,8 @@ public abstract class Serializer {
    */
   public final void namespace(final byte[] n, final byte[] v)
       throws IOException {
+
+    if(!undecl && n.length != 0 && v.length == 0) return;
     attribute(n.length == 0 ? XMLNS : concat(XMLNSC, n), v);
     ns.add(n, v);
   }
@@ -184,7 +187,7 @@ public abstract class Serializer {
    * @param a attributes
    * @throws IOException I/O exception
    */
-  public final void emptyElement(final Expr expr, final byte[]... a)
+  public final void emptyElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
     emptyElement(name(expr), a);
   }

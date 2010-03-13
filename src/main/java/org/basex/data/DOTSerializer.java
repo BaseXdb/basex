@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
-import org.basex.query.ExprInfo;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 

@@ -250,7 +250,7 @@ public enum FunDef {
   CODEPNT(FNURI, FNStr.class, 2, 2, "codepoint-equal(string, string)",
       NONUMSEQ),
   /** XQuery function. */
-  CODESTR(FNURI, FNStr.class, 1, 1, "codepoints-to-string(string)", STR),
+  CODESTR(FNURI, FNStr.class, 1, 1, "codepoints-to-string(num*)", STR),
   /** XQuery function. */
   COMPARE(FNURI, FNStr.class, 2, 3, "compare(first, second, coll)", NUMSEQ),
   /** XQuery function. */

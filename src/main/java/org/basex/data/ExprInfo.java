@@ -1,8 +1,7 @@
-package org.basex.query;
+package org.basex.data;
 
 import java.io.IOException;
 import org.basex.core.Main;
-import org.basex.data.Serializer;
 
 /**
  * Expression information.

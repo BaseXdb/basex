@@ -12,6 +12,7 @@ import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.basex.util.TokenSet;
 import org.basex.util.Tokenizer;
 
 /**
@@ -21,19 +22,27 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  */
 public final class XMLSerializer extends Serializer {
+  /** Default serialization parameters. */
+  private static final SerializeProp PROPS = new SerializeProp();
   /** Indentation. */
   private static final byte[] SPACES = { ' ', ' ' };
   /** New line. */
   private static final byte[] NL = token(Prop.NL);
   /** Colon. */
   private static final byte[] COL = { ':' };
+  /** Elements with an empty content model. */
+  private static final TokenList EMPTY = new TokenList();
+  /** Script elements. */
+  private static final TokenList SCRIPTS = new TokenList();
+  /** Boolean elements. */
+  private static final TokenSet BOOLEAN = new TokenSet();
 
   /** Output stream. */
   private final PrintOutput out;
   /** CData elements. */
   private final TokenList cdata = new TokenList();
   /** XML version. */
-  private String version = "1.0";
+  private String version = V10;
   /** Indentation flag. */
   private boolean indent = true;
   /** URI for wrapped results. */
@@ -44,30 +53,27 @@ public final class XMLSerializer extends Serializer {
   private boolean wrap;
   /** Encoding. */
   private String enc = UTF8;
+  /** System document type. */
+  private String docsys = "";
+  /** Public document type. */
+  private String docpub = "";
+  /** Serialization method. */
+  private String method;
 
   /** Temporary indentation flag. */
   private boolean ind;
   /** Temporary item flag. */
   private boolean item;
-
+  /** Script flag. */
+  private boolean script;
+  
   /**
    * Constructor.
    * @param o output stream reference
    * @throws IOException I/O exception
    */
   public XMLSerializer(final OutputStream o) throws IOException {
-    this(o, (SerializeProp) null);
-  }
-  
-  /**
-   * Constructor, specifying serialization options in a string.
-   * @param o output stream reference
-   * @param p serialization properties
-   * @throws IOException I/O exception
-   */
-  public XMLSerializer(final OutputStream o, final String p)
-      throws IOException {
-    this(o, new SerializeProp(p));
+    this(o, PROPS);
   }
   
   /**
@@ -81,32 +87,54 @@ public final class XMLSerializer extends Serializer {
 
     out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
 
-    boolean omit = true;
-    String sa = OMIT;
-    if(p != null) {
-      for(final String c : p.get(S_CDATA_SECTION_ELEMENTS).split("\\s+")) {
-        if(c.length() != 0) cdata.add(token(c));
-      }
-      enc     = enc(p.get(S_ENCODING));
-      indent  = check(p, S_INDENT, YES, NO).equals(YES);
-      omit    = check(p, S_OMIT_XML_DECLARATION, YES, NO).equals(YES);
-      sa      = check(p, S_STANDALONE, YES, NO, OMIT);
-      version = check(p, S_VERSION, "1.0", "1.1");
+    for(final String c : p.get(S_CDATA_SECTION_ELEMENTS).split("\\s+"))
+      if(c.length() != 0) cdata.add(token(c));
 
-      wrapPre = token(p.get(S_WRAP_PRE));
-      wrapUri = token(p.get(S_WRAP_URI));
-      wrap    = wrapPre.length != 0;
+    boolean docdecl = check(p, S_OMIT_XML_DECLARATION, YES, NO).equals(NO);
+    boolean bom     = check(p, S_BYTE_ORDER_MARK, YES, NO).equals(YES);
+    String  sa      = check(p, S_STANDALONE, YES, NO, OMIT);
+    check(p, S_NORMALIZATION_FORM, "NFC", "none");
+
+    final String m = check(p, S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT);
+    method  = m.equals(M_XML) ? M_XML : m.equals(M_XHTML) ?
+        M_XHTML : m.equals(M_HTML) ? M_HTML : M_TEXT;
+    version = method == M_HTML ? V40 : V10;
+    
+    enc     = enc(p.get(S_ENCODING));
+    indent  = check(p, S_INDENT, YES, NO).equals(YES);
+    version = method == M_TEXT ? p.get(S_VERSION) :
+      method == M_HTML ? check(p, S_VERSION, V40, V401) :
+      check(p, S_VERSION, V10, V11);
+    docsys  = p.get(S_DOCTYPE_SYSTEM);
+    docpub  = p.get(S_DOCTYPE_PUBLIC);
+    undecl  = check(p, S_UNDECLARE_PREFIXES, YES, NO).equals(YES);
+    wrapPre = token(p.get(S_WRAP_PRE));
+    wrapUri = token(p.get(S_WRAP_URI));
+    wrap    = wrapPre.length != 0;
+
+    if(docsys.length() == 0) {
+      docsys = null;
+      docpub = null;
     }
-
     if(!Charset.isSupported(enc)) error(SERENCODING, enc);
-    if(omit && !sa.equals(OMIT)) error(SERSTAND);
+    if(undecl && version.equals(V10)) error(SERUNDECL);
 
-    if(!omit) {
+    if(bom) {
+      if(enc == UTF8) {
+        out.write(0xEF); out.write(0xBB); out.write(0xBF);
+      } else if(enc == UTF16LE) {
+        out.write(0xFF); out.write(0xFE);
+      } else if(enc == UTF16BE) {
+        out.write(0xFE); out.write(0xFF);
+      }
+    }
+    
+    if(docdecl && method != M_HTML && method != M_TEXT) {
       print(PI1);
       print(DOCDECL1);
       print(version);
       print(DOCDECL2);
-      print(enc);
+      print(p.get(S_ENCODING));
       if(!sa.equals(OMIT)) {
         print(DOCDECL3);
         print(sa);
@@ -114,31 +142,14 @@ public final class XMLSerializer extends Serializer {
       print('\'');
       print(PI2);
       ind = indent;
+    } else if(!sa.equals(OMIT) || version.equals(V11) && docsys != null) {
+      error(SERSTAND);
     }
 
     if(wrap) {
       openElement(concat(wrapPre, COL, RESULTS));
       namespace(wrapPre, wrapUri);
     }
-  }
-  
-  /**
-   * Doctype declaration.
-   * @param t document root element tag
-   * @param te external subset
-   * @param ti internal subset
-   * @throws IOException IOException
-   * [CG] to be moved to constructor.
-   */ 
-  public void doctype(final byte[] t, final byte[] te,
-      final byte[] ti) throws IOException {
-    print(DOCTYPE);
-    print(' ');
-    print(t);
-    if(te != null) print(" " + string(SYSTEM) + " \"" + string(te) + "\"");
-    if(ti != null) print(" \"" + string(ti) + "\"");
-    print(ELEM2);
-    print(NL);
   }
   
   /**
@@ -187,16 +198,26 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) throws IOException {
+    if(method == M_TEXT) return;
+
     print(' ');
     print(n);
+    if(method == M_HTML && BOOLEAN.id(concat(lc(tags.get(tags.size() - 1)),
+        COL, lc(n))) != 0) return;
+    
     print(ATT1);
     for(int k = 0; k < v.length; k += cl(v[k])) {
       final int ch = cp(v, k);
-      switch(ch) {
-        case '"': print(E_QU);  break;
-        case 0x9: print(E_TAB); break;
-        case 0xA: print(E_NL); break;
-        default:  ch(ch);
+      if(method == M_HTML && (ch == '<' ||
+          ch == '&' && v[Math.min(k + 1, v.length - 1)] == '{')) {
+        print(ch);
+      } else {
+        switch(ch) {
+          case '"': print(E_QU);  break;
+          case 0x9: print(E_TAB); break;
+          case 0xA: print(E_NL); break;
+          default:  ch(ch);
+        }
       }
     }
     print(ATT2);
@@ -206,7 +227,8 @@ public final class XMLSerializer extends Serializer {
   public void text(final byte[] b) throws IOException {
     finishElement();
 
-    if(cdata.size() != 0 && cdata.contains(tags.get(tags.size() - 1))) {
+    if(cdata.size() != 0 && cdata.contains(tags.get(tags.size() - 1)) &&
+        method != M_HTML && method != M_TEXT) {
       print("<![CDATA[");
       int c = 0;
       for(int k = 0; k < b.length; k += cl(b[k])) {
@@ -250,6 +272,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void comment(final byte[] n) throws IOException {
+    if(method == M_TEXT) return;
     finishElement();
     if(ind) indent(true);
     print(COM1);
@@ -259,13 +282,15 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
+    if(method == M_TEXT) return;
     finishElement();
     if(ind) indent(true);
+    if(method == M_HTML && contains(v, '>')) error(SERPI);
     print(PI1);
     print(n);
     print(' ');
     print(v);
-    print(PI2);
+    print(method == M_HTML ? ELEM2 : PI2);
   }
 
   @Override
@@ -283,12 +308,16 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void ch(final int ch) throws IOException {
-    switch(ch) {
-      case '&': print(E_AMP); break;
-      case '>': print(E_GT); break;
-      case '<': print(E_LT); break;
-      case 0xD: print(E_CR); break;
-      default : print(ch);
+    if(script && method == M_HTML) {
+      print(ch);
+    } else {
+      switch(ch) {
+        case '&': print(E_AMP); break;
+        case '>': print(E_GT); break;
+        case '<': print(E_LT); break;
+        case 0xD: print(E_CR); break;
+        default : print(ch);
+      }
     }
   }
 
@@ -299,29 +328,59 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   protected void start(final byte[] t) throws IOException {
+    if(method == M_TEXT) return;
+    if(tags.size() == 1 && docsys != null) {
+      if(ind) indent(false);
+      print(DOCTYPE);
+      if(method == M_TEXT) print(t);
+      else print(M_HTML);
+      if(docpub != null) {
+        print(" " + PUBLIC + " \"" + docpub + "\"");
+      } else {
+        print(" " + SYSTEM);
+      }
+      print(" \"" + docsys + "\"");
+      print(ELEM2);
+      print(NL);
+      docsys = null;
+    }
     if(ind) indent(false);
     print(ELEM1);
     print(t);
     ind = indent;
+    
+    if(method == M_HTML) script = SCRIPTS.contains(lc(t));
   }
 
   @Override
   protected void empty() throws IOException {
-    print(ELEM4);
+    if(method == M_TEXT) return;
+    if(method == M_XML) {
+      print(ELEM4);
+    } else {
+      print(ELEM2);
+      final byte[] tag = tags.get(tags.size());
+      if(method == M_HTML && EMPTY.contains(lc(tag))) return;
+      ind = false;
+      close(tag);
+    }
   }
 
   @Override
   protected void finish() throws IOException {
+    if(method == M_TEXT) return;
     print(ELEM2);
   }
 
   @Override
   protected void close(final byte[] t) throws IOException {
+    if(method == M_TEXT) return;
     if(ind) indent(true);
     print(ELEM3);
     print(t);
     print(ELEM2);
     ind = indent;
+    if(method == M_HTML) script &= !SCRIPTS.contains(lc(t));
   }
 
   /**
@@ -361,6 +420,8 @@ public final class XMLSerializer extends Serializer {
   private void print(final int ch) throws IOException {
     if(ch < 0x80) {
       out.write(ch);
+    } else if(ch < 0xA0 && method == M_HTML) {
+      error(SERILL, Integer.toHexString(ch));
     } else if(ch < 0xFFFF) {
       print(String.valueOf((char) ch));
     } else {
@@ -376,7 +437,7 @@ public final class XMLSerializer extends Serializer {
   private void print(final String s) throws IOException {
     // comparison by reference
     if(enc == UTF8) {
-      out.write(token(s));
+      for(final byte b : token(s)) out.write(b);
     } else {
       final boolean le = enc == UTF16LE;
       if(enc == UTF16BE || le) {
@@ -389,5 +450,48 @@ public final class XMLSerializer extends Serializer {
         out.write(s.getBytes(enc));
       }
     }
+  }
+
+  // HTML Serializer: cache elements
+  static {
+    EMPTY.add(token("area"));
+    EMPTY.add(token("base"));
+    EMPTY.add(token("br"));
+    EMPTY.add(token("col"));
+    EMPTY.add(token("hr"));
+    EMPTY.add(token("img"));
+    EMPTY.add(token("input"));
+    EMPTY.add(token("link"));
+    EMPTY.add(token("meta"));
+    EMPTY.add(token("basefont"));
+    EMPTY.add(token("frame"));
+    EMPTY.add(token("isindex"));
+    EMPTY.add(token("param"));
+    SCRIPTS.add(token("script"));
+    SCRIPTS.add(token("style"));
+    BOOLEAN.add(token("area:nohref"));
+    BOOLEAN.add(token("button:disabled"));
+    BOOLEAN.add(token("dir:compact"));
+    BOOLEAN.add(token("dl:compact"));
+    BOOLEAN.add(token("frame:noresize"));
+    BOOLEAN.add(token("hr:noshade"));
+    BOOLEAN.add(token("img:ismap"));
+    BOOLEAN.add(token("input:checked"));
+    BOOLEAN.add(token("input:disabled"));
+    BOOLEAN.add(token("input:readonly"));
+    BOOLEAN.add(token("menu:compact"));
+    BOOLEAN.add(token("object:declare"));
+    BOOLEAN.add(token("ol:compact"));
+    BOOLEAN.add(token("optgroup:disabled"));
+    BOOLEAN.add(token("option:selected"));
+    BOOLEAN.add(token("option:disabled"));
+    BOOLEAN.add(token("script:defer"));
+    BOOLEAN.add(token("select:multiple"));
+    BOOLEAN.add(token("select:disabled"));
+    BOOLEAN.add(token("td:nowrap"));
+    BOOLEAN.add(token("textarea:disabled"));
+    BOOLEAN.add(token("textarea:readonly"));
+    BOOLEAN.add(token("th:nowrap"));
+    BOOLEAN.add(token("ul:compact")); 
   }
 }

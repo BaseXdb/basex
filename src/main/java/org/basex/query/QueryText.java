@@ -448,7 +448,7 @@ public interface QueryText {
   Object[] VARMISSING = { XQST, 54, "Expecting variable declaration." };
   /** XQST0055: Parsing exception. */
   Object[] DUPLCOPYNS = { XQST, 55, "Duplicate 'copy-namespace' declaration." };
-  /** XQST0085: Parsing exception. */
+  /** XQST0057: Parsing exception. */
   Object[] NSEMPTY = { XQST, 57, "Namespace URI can't be empty." };
   /** XQST0059: Parsing exception. */
   Object[] NOMODULE = { XQST, 59, "Unknown module for namespace \"%\"." };

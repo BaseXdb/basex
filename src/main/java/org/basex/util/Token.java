@@ -65,10 +65,10 @@ public final class Token {
   public static final String UTF82 = "UTF8";
   /** UTF16 encoding string. */
   public static final String UTF16 = "UTF-16";
+  /** UTF16BE (=UTF16) encoding string. */
+  public static final String UTF16BE = "UTF-16BE";
   /** UTF16 encoding string. */
   public static final String UTF16LE = "UTF-16LE";
-  /** UTF16 encoding string. */
-  public static final String UTF16BE = "UTF-16BE";
 
   /** Hidden Constructor. */
   private Token() { }
