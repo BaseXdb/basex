@@ -14,9 +14,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.Response.Status;
-import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.Text;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Set;
@@ -232,7 +230,8 @@ public final class BXUtil {
       ser += "," + SerializeProp.S_WRAP_PRE[0] + "=" + JAXRX +
              "," + SerializeProp.S_WRAP_URI[0] + "=" + URL;
     } else if(!wrap.equals(SerializeProp.NO)) {
-      badRequest(Main.info(Text.SETVAL + Text.NL, EURLParameter.WRAP, wrap));
+      badRequest(SerializeProp.error(EURLParameter.WRAP.toString(),
+          SerializeProp.YES, SerializeProp.NO));
     }
     return ser;
   }
