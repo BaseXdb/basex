@@ -378,7 +378,8 @@ public abstract class W3CTS {
 
         // evaluate and serialize query
         final SerializeProp props = new SerializeProp();
-        props.set(SerializeProp.S_INDENT, context.prop.is(Prop.CHOP));
+        props.set(SerializeProp.S_INDENT, context.prop.is(Prop.CHOP) ?
+            SerializeProp.YES : SerializeProp.NO);
         final XMLSerializer xml = new XMLSerializer(co, props);
 
         iter = SeqIter.get(xq.iter());

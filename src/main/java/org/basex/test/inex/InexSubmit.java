@@ -20,6 +20,7 @@ import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
+import org.basex.data.SerializeProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
@@ -302,9 +303,9 @@ public final class InexSubmit {
   private void openSubFile() throws Exception {
     sub = new PrintOutput(SUBMISSION);
 
-    xml = new XMLSerializer(sub);
-    xml.doctype(token("efficiency-submission"),
-        token("efficiency-submission.dtd"), null);
+    final SerializeProp sprop = new SerializeProp();
+    sprop.set(SerializeProp.S_DOCTYPE_SYSTEM, "efficiency-submission.dtd");
+    xml = new XMLSerializer(sub, sprop);
 
     // print header in output file
     xml.openElement(token("efficiency-submission"),
