@@ -20,12 +20,13 @@ public final class StartJAXRX {
    * @param args (ignored) command-line parameters.
    */
   public static void main(final String[] args) {
+    // start database server (if not done yet)
+    new BaseXServer();
+
     // database server properties
     System.setProperty("org.jaxrx.port", "1984");
     System.setProperty("org.jaxrx.user", "admin");
     System.setProperty("org.jaxrx.password", "admin");
-    // start database server
-    new BaseXServer();
 
     // path to implementation package
     System.setProperty("org.jaxrx.implementation", "org.basex.api.jaxrx");
@@ -33,6 +34,7 @@ public final class StartJAXRX {
     System.setProperty("org.jaxrx.systemName", "basex");
     // port of web server
     System.setProperty("org.jaxrx.serverport", "8984");
+
     // start Jetty web server
     StartJettyServer.main(null);
   }

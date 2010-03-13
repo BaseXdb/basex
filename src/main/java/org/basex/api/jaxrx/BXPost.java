@@ -4,16 +4,14 @@ import static org.basex.api.jaxrx.BXUtil.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-
 import org.basex.core.proc.Add;
 import org.basex.core.proc.Open;
 import org.basex.server.ClientSession;
+import org.jaxrx.constants.EURLParameter;
 import org.jaxrx.interfaces.IPost;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -73,36 +71,34 @@ public final class BXPost implements IPost {
    */
   public StreamingOutput postResource(final String resource,
       final Document doc) {
-
-    return new StreamingOutput() {
-      @Override
-      public void write(final OutputStream out) {
-        final Map<String, String> p = getParams(doc);
-        query(resource, out, p.get("query"), p.get("wrap"),
-            p.get("output"), p.get("start"), p.get("count"));
-      }
-    };
+    return query(resource, getParams(doc));
   }
   
   /**
    * This method extracts and returns query parameters from a document.
    * @param doc The XML {@link Document} containing the XQuery XML post
    *          request.
-   * @return The XQuery expression as {@link String} and optional properties.
-   * @throws WebApplicationException The exception occurred.
+   * @return The parameters as {@link Map}.
    */
-  protected Map<String, String> getParams(final Document doc) {
-    final Map<String, String> params = new HashMap<String, String>();
+  protected Map<EURLParameter, String> getParams(final Document doc) {
+    final Map<EURLParameter, String> params =
+      new HashMap<EURLParameter, String>();
 
-    params.put("query",
+    params.put(EURLParameter.QUERY,
+        doc.getElementsByTagName("text").item(0).getTextContent());
+    params.put(EURLParameter.COMMAND,
         doc.getElementsByTagName("text").item(0).getTextContent());
 
     final NodeList props = doc.getElementsByTagName("property");
     for(int i = 0; i < props.getLength(); i++) {
-      final Node prop = props.item(i);
-      params.put(
-          prop.getAttributes().getNamedItem("name").getTextContent(),
-          prop.getAttributes().getNamedItem("value").getTextContent());
+      final Node nl = props.item(i);
+      final String key = nl.getAttributes().getNamedItem("name").getNodeValue();
+      try {
+        final EURLParameter ep = EURLParameter.valueOf(key.toUpperCase());
+        params.put(ep, nl.getAttributes().getNamedItem("value").getNodeValue());
+      } catch(IllegalArgumentException ex) {
+        badRequest(ex.getMessage());
+      }
     }
     return params;
   }
