@@ -9,7 +9,7 @@ import javax.xml.xquery.XQDataSource;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 2: Configuring XQJ Connections.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -23,7 +23,7 @@ public final class Part2 extends Main {
    */
   public static void main(final String[] args) throws Exception {
     init("2: Configuring XQJ Connections");
-    
+
     // Set data source via property
     info("Set data source via property");
     Properties p = new Properties();

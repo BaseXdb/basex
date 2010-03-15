@@ -10,7 +10,7 @@ import javax.xml.xquery.XQStaticContext;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 6: Manipulating Static Context.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License

@@ -13,7 +13,7 @@ import javax.xml.xquery.XQSequenceType;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 7: XQuery Type System.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -77,7 +77,7 @@ public final class Part7 extends Main {
     for(int i = 0; i < variables.length; i++) {
       xqst = xqp.getStaticVariableType(variables[i]);
       System.out.println("Variable $" + variables[i] + ": " + xqst);
-    }  
+    }
 
     // Close the connection
     close(xqc);

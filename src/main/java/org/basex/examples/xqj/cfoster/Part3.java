@@ -12,7 +12,7 @@ import javax.xml.xquery.XQResultSequence;
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.cfoster.net/articles/xqj-tutorial">
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
- * 
+ *
  * Part 3: Binding Java variables to XQuery.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -29,10 +29,10 @@ public final class Part3 extends Main {
    */
   public static void main(final String[] args) throws Exception {
     init("3: Binding Java variables to XQuery");
-    
+
     // Create the connection
     XQConnection conn = connect();
-    
+
     // Lookup specific ISBN
     String isbnID = args.length > 0 ? args[0] : DEFAULT_ISBN;
     info("Lookup books by ISBN '" + isbnID + "'");
@@ -52,7 +52,7 @@ public final class Part3 extends Main {
     while(rs.next())
       System.out.println(rs.getItemAsString(null));
 
-    
+
     // Lookup by date range
     info("Lookup books by date range");
 

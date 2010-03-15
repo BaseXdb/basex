@@ -12,7 +12,7 @@ import javax.xml.xquery.XQStaticContext;
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.cfoster.net/articles/xqj-tutorial">
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
- * 
+ *
  * Part 5: Stream massive amounts of XML to XQuery expressions.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -26,10 +26,10 @@ public final class Part5 extends Main {
    */
   public static void main(final String[] args) throws Exception {
     init("5: Stream massive amounts of XML to XQuery expressions");
-    
+
     // Create the connection
     XQConnection conn = connect();
-    
+
     // Enable deferred binding
     info("Enable deferred binding");
 

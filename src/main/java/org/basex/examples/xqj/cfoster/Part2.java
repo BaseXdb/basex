@@ -8,7 +8,7 @@ import javax.xml.xquery.XQResultSequence;
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.cfoster.net/articles/xqj-tutorial">
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
- * 
+ *
  * Part 2: Executing XQuery in Java.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -22,11 +22,11 @@ public final class Part2 extends Main {
    */
   public static void main(final String[] args) throws Exception {
     init("2: Executing XQuery in Java");
-    
+
     // Create the connection
     XQConnection conn = connect();
-    
-    // Return book titles from 'books.xml' 
+
+    // Return book titles from 'books.xml'
     info("Return book titles from 'books.xml'");
 
     String xqueryString =
@@ -37,9 +37,10 @@ public final class Part2 extends Main {
     while(rs.next())
       System.out.println(rs.getItemAsString(null));
 
+
     // Get book prices
     info("Get book prices");
-    
+
     xqueryString =
       "for $x in doc('etc/xml/books.xml')//book return xs:float($x/price)";
 

@@ -13,7 +13,7 @@ import javax.xml.xquery.XQStaticContext;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 11: Processing Large Inputs.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -55,16 +55,16 @@ public final class Part11 extends Main {
 
     // Stream large inputs
     info("Stream large inputs");
-    
+
     xqe = xqc.createExpression();
     xqe.bindDocument(XQConstants.CONTEXT_ITEM,
         new StreamSource("etc/xml/orders.xml"), null);
 
-    xqs = xqe.executeQuery("/orders/order");    
+    xqs = xqe.executeQuery("/orders/order");
     xqs.writeSequence(System.out, null);
-    
+
     System.out.println();
-    
+
     // Close the connection
     close(xqc);
   }

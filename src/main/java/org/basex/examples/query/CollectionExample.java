@@ -51,7 +51,7 @@ public final class CollectionExample {
 
     new CreateDB("etc/", "Collection").execute(CONTEXT);
     new DropDB("Collection").execute(CONTEXT);
-    
+
     // Variant 2 --------------------------------------------------------------
     // Or: Create an empty collection, add documents in a second pass
     // and optimize the database to refresh the index structures

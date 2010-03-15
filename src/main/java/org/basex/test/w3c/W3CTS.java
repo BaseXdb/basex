@@ -22,8 +22,9 @@ import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.CreateDB;
 import org.basex.data.Data;
+import org.basex.data.DataText;
 import org.basex.data.Nodes;
-import org.basex.data.SerializeProp;
+import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
@@ -377,10 +378,10 @@ public abstract class W3CTS {
         }
 
         // evaluate and serialize query
-        final SerializeProp props = new SerializeProp();
-        props.set(SerializeProp.S_INDENT, context.prop.is(Prop.CHOP) ?
-            SerializeProp.YES : SerializeProp.NO);
-        final XMLSerializer xml = new XMLSerializer(co, props);
+        final SerializerProp sp = new SerializerProp();
+        sp.set(SerializerProp.S_INDENT, context.prop.is(Prop.CHOP) ?
+            DataText.YES : DataText.NO);
+        final XMLSerializer xml = new XMLSerializer(co, sp);
 
         iter = SeqIter.get(xq.iter());
         Item it;

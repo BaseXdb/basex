@@ -12,7 +12,7 @@ import javax.xml.xquery.XQSequence;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 5: Serializing Results.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -42,11 +42,11 @@ public final class Part5 extends Main {
 
     /* Remaining examples from the tutorial are skipped, as
      * serialization in BaseX uses defaults. */
-    
+
     // Delete result file
     info("Delete result file");
-    new File("result.xml").delete();    
-    
+    new File("result.xml").delete();
+
     // Close the connection
     close(xqc);
   }

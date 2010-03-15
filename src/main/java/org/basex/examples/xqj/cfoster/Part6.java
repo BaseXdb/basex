@@ -12,7 +12,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.cfoster.net/articles/xqj-tutorial">
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
- * 
+ *
  * Part 6: Streaming XQuery results.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -26,10 +26,10 @@ public final class Part6 extends Main {
    */
   public static void main(final String[] args) throws Exception {
     init("6: Streaming XQuery results");
-    
+
     // Create the connection
     XQConnection conn = connect();
-    
+
     // Stream XQuery Result Sequences with StAX
     info("Stream XQuery Result Sequences with StAX");
 
@@ -45,17 +45,17 @@ public final class Part6 extends Main {
     // Print tailing END_DOCUMENT event too
     System.out.println(getEventString(reader));
 
-    
+
     // Streaming XQuery Result Sequences with SAX
     info("Stream XQuery Result Sequences with SAX");
-    
+
     rs = xqe.executeQuery("doc('etc/xml/books.xml')//book");
-    rs.writeSequenceToSAX(new MySAXHandler()); 
+    rs.writeSequenceToSAX(new MySAXHandler());
 
     // Closing connection to the Database.
     close(conn);
   }
-  
+
   /**
    * Returns the correspondent event string.
    * @param reader stream reader
@@ -76,7 +76,7 @@ public final class Part6 extends Main {
     }
     return "";
   }
-  
+
   /**
    * SAX Handler.
    */

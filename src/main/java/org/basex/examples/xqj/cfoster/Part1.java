@@ -8,7 +8,7 @@ import org.basex.api.xqj.BXQDataSource;
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.cfoster.net/articles/xqj-tutorial">
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
- * 
+ *
  * Part 1: Setting up your environment.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -22,7 +22,7 @@ public final class Part1 extends Main {
    */
   public static void main(final String[] args) throws Exception {
     init("1: Setting up your environment");
-    
+
     // Connect and disconnect
     info("Connect and disconnect");
 

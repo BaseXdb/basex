@@ -9,7 +9,7 @@ import org.xmldb.api.*;
  * <a href="http://exist.sourceforge.net/devguide_xmldb.html">
  * http://exist.sourceforge.net/devguide_xmldb.html</a>
  * from Wolfgang M. Meier
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
@@ -31,7 +31,7 @@ public final class QueryExample extends Main {
     // Get query service
     XPathQueryService service = (XPathQueryService)
       col.getService("XPathQueryService", "1.0");
-            
+
     // Run query
     ResourceSet result = service.query("//*[text()]");
     ResourceIterator i = result.getIterator();

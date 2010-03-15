@@ -9,7 +9,7 @@ import org.basex.core.proc.XQuery;
 
 /**
  * This class demonstrates collection relevant queries.
- * It shows how to find and query specific documents. 
+ * It shows how to find and query specific documents.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

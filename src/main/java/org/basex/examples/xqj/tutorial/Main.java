@@ -54,7 +54,7 @@ public abstract class Main {
   static void info(final String info) {
     System.out.println("\n* " + info);
   }
-  
+
   /**
    * Prints the entries of a sequence.
    * @param info query information

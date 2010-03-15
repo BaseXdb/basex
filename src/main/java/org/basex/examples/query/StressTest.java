@@ -70,7 +70,7 @@ public final class StressTest {
     System.out.println("\n* Drop test database.");
     new DropDB("factbook").execute(context);
   }
-  
+
   /** Single client. */
   static class Client extends Thread {
     @Override
@@ -79,7 +79,7 @@ public final class StressTest {
         // perform some queries
         for(int i = 0; i < NQUERIES; i++) {
           Performance.sleep((long) (50 * rnd.nextDouble()));
-    
+
           // return nth text of the database
           final int n = (rnd.nextInt() & 0xFF) + 1;
           final String qu = "descendant::text()[position() = " + n + "]";

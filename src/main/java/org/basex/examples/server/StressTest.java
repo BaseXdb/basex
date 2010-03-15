@@ -80,7 +80,7 @@ public final class StressTest {
   static ClientSession newSession() throws IOException {
     return new ClientSession("localhost", 1984, "admin", "admin");
   }
-  
+
   /** Single client. */
   static class Client extends Thread {
     /** Client session. */
@@ -94,7 +94,7 @@ public final class StressTest {
         // perform some queries
         for(int i = 0; i < NQUERIES; i++) {
           Performance.sleep((long) (50 * rnd.nextDouble()));
-    
+
           // return nth text of the database
           final int n = (rnd.nextInt() & 0xFF) + 1;
           final String qu = "xquery basex:db('factbook')/descendant::text()" +

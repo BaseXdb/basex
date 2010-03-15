@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 8: Binding External Variables.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -57,7 +57,7 @@ public final class Part8 extends Main {
     xqp.bindObject(new QName("v1"), new Integer(174), null);
     xqp.bindObject(new QName("v2"), new Integer(174), xsinteger);
     print("Bind integers to external variables", xqp);
-    
+
     // Bind atomic values
     xqp = xqc.prepareExpression(
         "declare variable $v1 external; " +
@@ -80,7 +80,7 @@ public final class Part8 extends Main {
     } catch(final XQException ex) {
       System.out.println(ex.getMessage());
     }
-    
+
     // Invalid item type
     info("Invalid item type:");
     xqp = xqc.prepareExpression("declare variable $e external; $e");
@@ -92,7 +92,7 @@ public final class Part8 extends Main {
 
     // Bind specific types
     xqp = xqc.prepareExpression("declare variable $v external; $v");
-    xqp.bindInt(new QName("v"), 123, 
+    xqp.bindInt(new QName("v"), 123,
         xqc.createAtomicType(XQItemType.XQBASETYPE_INTEGER));
     print("Bind specific types", xqp);
 
@@ -104,7 +104,7 @@ public final class Part8 extends Main {
     xqp = xqc.prepareExpression("declare variable $e external; $e");
     xqp.bindNode(new QName("e"), domDocument, null);
     print("Bind via DOM", xqp);
-    
+
     // Bind via StAX
     XMLInputFactory xif = XMLInputFactory.newInstance();
     FileInputStream fis = new FileInputStream("etc/xml/orders.xml");
@@ -121,7 +121,7 @@ public final class Part8 extends Main {
     xqp.bindDocument(new QName("e"), fis, null, null);
     fis.close();
     print("Bind via input stream", xqp);
-    
+
     // Close the connection
     close(xqc);
   }

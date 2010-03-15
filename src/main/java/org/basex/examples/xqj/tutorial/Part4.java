@@ -15,7 +15,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 4: Processing Results.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -96,7 +96,7 @@ public final class Part4 extends Main {
         break;
       }
     }
-    
+
     // Close the connection
     close(xqc);
   }

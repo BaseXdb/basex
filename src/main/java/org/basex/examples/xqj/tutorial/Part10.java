@@ -18,7 +18,7 @@ import org.xml.sax.XMLFilter;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 10: XML Pipelines.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -52,7 +52,7 @@ public final class Part10 extends Main {
     xqe2.close();
     xqe.close();
 
-    
+
     // Passing XSLT results to XQuery
     info("Passing XSLT results to XQuery");
 
@@ -60,11 +60,11 @@ public final class Part10 extends Main {
     SAXTransformerFactory stf = (SAXTransformerFactory)
       TransformerFactory.newInstance();
     XMLFilter xmlf = stf.newXMLFilter(new StreamSource("etc/xml/orders.xsl"));
-     
+
     // Create a SAX source, the input for the XSLT transformation
     SAXSource saxSource = new SAXSource(xmlf,
         new InputSource("etc/xml/orders.xml"));
-     
+
     // Create an XQuery expression
     XQPreparedExpression xqp = xqc.prepareExpression(
         "declare variable $var external; <result>{ $var }</result>");
@@ -77,7 +77,7 @@ public final class Part10 extends Main {
     xqs.writeSequenceToResult(new StreamResult(System.out));
     System.out.println();
 
-    
+
     /* Passing XQuery results to XSLT
      * [CG] to be checked
     info("Passing XQuery results to XSLT");
@@ -87,7 +87,7 @@ public final class Part10 extends Main {
     // Create an XQJFilter
     XQJFilter xqjf = new XQJFilter(xqp);
 
-    // Create an XMLFilter for the XSLT transformation, the 2nd stage 
+    // Create an XMLFilter for the XSLT transformation, the 2nd stage
     stf = (SAXTransformerFactory) TransformerFactory.newInstance();
     xmlf = stf.newXMLFilter(new StreamSource("etc/xml/orders.xsl"));
     xmlf.setParent(xqjf);
@@ -97,7 +97,7 @@ public final class Part10 extends Main {
     // Activate the pipeline
     xmlf.parse(new InputSource());
     */
-    
+
     // Close the connection
     close(xqc);
   }
@@ -107,7 +107,7 @@ public final class Part10 extends Main {
   private static class XQJFilter extends XMLFilterImpl {
     /** Prepared expression.
     final XQPreparedExpression expression;
-   
+
     /**
      * Constructor.
      * @param xqp prepared expression

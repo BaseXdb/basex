@@ -11,7 +11,7 @@ import org.basex.api.xqj.BXQDataSource;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 1: An XQJ Introduction.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -25,7 +25,7 @@ public final class Part1 extends Main {
    */
   public static void main(final String[] args) throws Exception {
     init("1: An XQJ Introduction");
-    
+
     // Print 'Hello World!'
     info("Print 'Hello World'");
 

@@ -48,7 +48,6 @@ public final class DOMTest {
     System.out.println(jv.getNamespaceURI());
   }
 
-  
   /**
    * Performs the specified query and returns the first result node.
    * @param qu query

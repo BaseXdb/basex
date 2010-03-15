@@ -19,7 +19,7 @@ import org.xml.sax.InputSource;
 
 /**
  * Test class for the use of the TagSoup HTML parser with BaseX.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Leo Woerteler
  */
@@ -130,7 +130,7 @@ public final class TagSoupExample {
         String[] parts = enc.split(";\\s*charset\\s*=");
         if(parts.length > 1) {
           enc = parts[1].trim();
-          if(!enc.equals("")) is.setEncoding(enc);
+          if(!enc.isEmpty()) is.setEncoding(enc);
         }
       }
     }

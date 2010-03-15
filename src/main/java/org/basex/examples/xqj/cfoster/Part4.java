@@ -22,7 +22,7 @@ import org.w3c.dom.Node;
  * XQJ Example, derived from the XQJ Tutorial
  * <a href="http://www.cfoster.net/articles/xqj-tutorial">
  * http://www.cfoster.net/articles/xqj-tutorial</a> from Charles Foster.
- * 
+ *
  * Part 4: XDM Model within XQJ.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -36,10 +36,10 @@ public final class Part4 extends Main {
    */
   public static void main(final String[] args) throws Exception {
     init("4: XDM Model within XQJ");
-    
+
     // Create the connection
     XQConnection conn = connect();
-    
+
     // Create XQuery items from int values
     info("Create XQuery items from int values");
     XQItem[] items = new XQItem[7];
@@ -83,7 +83,7 @@ public final class Part4 extends Main {
     }
     System.out.println();
 
-    
+
     // Create items from atomic values
     info("Create items from atomic values");
 
@@ -101,7 +101,7 @@ public final class Part4 extends Main {
     binaryData.writeItem(System.out, null);
     System.out.println();
 
-    
+
     // Create items from Java objects
     info("Create items from atomic values");
     items = new XQItem[3];
@@ -119,7 +119,7 @@ public final class Part4 extends Main {
       if(it != null) System.out.println(it.getAtomicValue());
     }
 
-    
+
     // Create and bind XQuery sequences
     info("Create and bind XQuery sequences");
 
@@ -144,7 +144,7 @@ public final class Part4 extends Main {
     while(rs.next())
       System.out.println(rs.getItemAsString(null) + ", " + rs.getItemType());
 
-    
+
     // Bind XQResultSequences to XQuery Expressions
     info("Bind XQResultSequences to XQuery Expressions");
 
@@ -165,10 +165,10 @@ public final class Part4 extends Main {
       System.out.println(rs.getItemAsString(null));
     }
 
-    
+
     // Retrieve XML nodes
     info("Retrieve XML nodes");
-    
+
     expr = conn.createExpression();
     xqueryString = "doc('etc/xml/books.xml')//book";
     rs = expr.executeQuery(xqueryString);
@@ -195,7 +195,7 @@ public final class Part4 extends Main {
     System.out.println(item1.getItemType());
     System.out.println(items2.getItemType());
 
-    
+
     // Retrieve date values
     info("Retrieve date values");
 

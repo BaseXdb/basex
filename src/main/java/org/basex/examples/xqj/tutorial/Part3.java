@@ -17,7 +17,7 @@ import org.w3c.dom.Document;
  * <a href="http://www.xquery.com/tutorials/xqj_tutorial">
  * http://www.xquery.com/tutorials/xqj_tutorial</a>
  * from Marc van Cappellen.
- * 
+ *
  * Part 3: Querying Data from XML Files or Java XML APIs.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -40,7 +40,7 @@ public final class Part3 extends Main {
     String query = "doc('etc/xml/orders.xml')//order[id='174']";
     XQSequence xqs = xqe.executeQuery(query);
     print("Query: " + query, xqs);
-    
+
     // Create and execute a second expression
     query = "doc('etc/xml/orders.xml')//order[id='267']";
     xqs = xqe.executeQuery(query);
@@ -65,7 +65,7 @@ public final class Part3 extends Main {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder = factory.newDocumentBuilder();
     Document dom = builder.parse("etc/xml/orders.xml");
-    
+
     // Bind document to context item
     xqe = xqc.createExpression();
     xqe.bindNode(XQConstants.CONTEXT_ITEM, dom, null);
@@ -80,7 +80,7 @@ public final class Part3 extends Main {
     xqs = xqe.executeQuery(is);
     is.close();
     print("Query from input stream", xqs);
-    
+
     // Close the connection
     close(xqc);
   }
