@@ -11,7 +11,7 @@ import org.jaxrx.interfaces.IPut;
 import org.jaxrx.util.JAXRXException;
 
 /**
- * This class offers an implementation of the JAX-RX 'put' operation.
+ * This class offers an JAX-RX implementation to answer PUT requests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Lewandowski
@@ -29,7 +29,7 @@ public final class BXPut implements IPut {
         final boolean ok = cs.execute(new CreateDB(file.toString(), resource));
         file.delete();
         // return exception if process failed
-        if(!ok) throw JAXRXException.badRequest(cs.info());
+        if(!ok) throw new JAXRXException(400, cs.info());
       }
     });
   }

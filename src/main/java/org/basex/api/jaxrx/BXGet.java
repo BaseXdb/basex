@@ -9,7 +9,7 @@ import org.jaxrx.constants.EURLParameter;
 import org.jaxrx.interfaces.IGet;
 
 /**
- * This class offers an implementation of the JAX-RX 'get' operation.
+ * This class offers an JAX-RX implementation to answer GET requests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Lewandowski

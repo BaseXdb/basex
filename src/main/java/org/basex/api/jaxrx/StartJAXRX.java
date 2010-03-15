@@ -23,24 +23,26 @@ public final class StartJAXRX {
    */
   public static void main(final String[] args) {
     // start database server (if not done yet)
-    final BaseXServer server = new BaseXServer();
-    final Prop prop = server.context.prop;
+    new BaseXServer();
 
-    // database user
-    System.setProperty("org.jaxrx.user", "admin");
-    // database password
-    System.setProperty("org.jaxrx.password", "admin");
+    // read database properties
+    final Prop prop = new Prop(true);
 
-    // database server port
+    // set database server port
     System.setProperty("org.jaxrx.serverport",
         Integer.toString(prop.num(Prop.SERVERPORT)));
-    // path to web directory (needed by the 'run' parameter)
+    // set path to web directory (needed by the 'run' parameter)
     System.setProperty("org.jaxrx.webpath", prop.get(Prop.WEBPATH));
 
-    // name of implementation(s)
+    // set database user
+    System.setProperty("org.jaxrx.user", "admin");
+    // set database password
+    System.setProperty("org.jaxrx.password", "admin");
+
+    // set name of implementation(s)
     System.setProperty("org.jaxrx.systemName", Text.NAMELC);
-    // path to implementation package(s)
-    System.setProperty("org.jaxrx.implementation", 
+    // set path to implementation package(s)
+    System.setProperty("org.jaxrx.systemPath",
         StartJAXRX.class.getPackage().getName());
 
     // start Jetty web server

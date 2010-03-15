@@ -8,7 +8,7 @@ import org.jaxrx.interfaces.IDelete;
 import org.jaxrx.util.JAXRXException;
 
 /**
- * This class offers an implementation of the JAX-RX 'delete' operation.
+ * This class offers an JAX-RX implementation to answer DELETE requests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Lewandowski
@@ -22,7 +22,7 @@ public final class BXDelete implements IDelete {
       @Override
       public void run() throws IOException {
         if(!cs.execute(new DropDB(resource)))
-          throw JAXRXException.notFound(cs.info());
+          throw new JAXRXException(404, cs.info());
       }
     });
   }

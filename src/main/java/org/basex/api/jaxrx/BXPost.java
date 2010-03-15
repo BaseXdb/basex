@@ -14,7 +14,7 @@ import org.jaxrx.interfaces.IPost;
 import org.jaxrx.util.JAXRXException;
 
 /**
- * This class offers an implementation of the JAX-RX 'post' operation.
+ * This class offers an JAX-RX implementation to answer POST requests.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Lewandowski
@@ -30,7 +30,7 @@ public final class BXPost implements IPost {
       public void run() throws IOException {
         // open database
         if(!cs.execute(new Open(resource))) 
-          throw JAXRXException.notFound(cs.info());
+          throw new JAXRXException(404, cs.info());
 
         // add cached file to the database
         final File file = cache(in);
@@ -38,7 +38,7 @@ public final class BXPost implements IPost {
         file.delete();
 
         // return exception if process failed
-        if(!ok) throw JAXRXException.badRequest(cs.info());
+        if(!ok) throw new JAXRXException(400, cs.info());
       }
     });
   }

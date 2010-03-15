@@ -29,8 +29,8 @@ import org.jaxrx.constants.EURLParameter;
 import org.jaxrx.util.JAXRXException;
 
 /**
- * This class contains utility methods which are used by several JAX-RX
- * implementations.
+ * This class contains utility methods which are needed by the JAX-RX
+ * interface implementations.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Lewandowski
@@ -60,7 +60,7 @@ public final class BXUtil {
           System.getProperty("org.jaxrx.user"),
           System.getProperty("org.jaxrx.password"));
     } catch(final IOException ex) {
-      throw JAXRXException.serverError(ex);
+      throw new JAXRXException(ex);
     }
   }
 
@@ -74,7 +74,7 @@ public final class BXUtil {
     try {
       code.run();
     } catch(final IOException ex) {
-      throw JAXRXException.serverError(ex);
+      throw new JAXRXException(ex);
     } finally {
       try { if(cs != null) cs.close(); } catch(final Exception ex) { }
     }
@@ -98,12 +98,12 @@ public final class BXUtil {
           public void run() throws IOException {
             // open database
             if(db != null && !cs.execute(new Open(db))) 
-              throw JAXRXException.notFound(cs.info());
+              throw new JAXRXException(404, cs.info());
 
             // set serialization parameters
             final String par = params(p);
             if(!cs.execute(new Set(Prop.SERIALIZER, par)))
-              throw JAXRXException.badRequest(cs.info());
+              throw new JAXRXException(400, cs.info());
 
             // run command, query or show databases
             if(p.get(EURLParameter.COMMAND) != null) {
@@ -136,7 +136,7 @@ public final class BXUtil {
     if(!file.endsWith(".xq")) file += ".xq";
 
     final IO io = IO.get(file);
-    if(!io.exists()) throw JAXRXException.notFound(
+    if(!io.exists()) throw new JAXRXException(404,
         "Not found: " + par.get(EURLParameter.RUN));
 
     try {
@@ -144,7 +144,7 @@ public final class BXUtil {
       par.put(EURLParameter.QUERY, query);
       query(cs, out, par);
     } catch(final IOException ex) {
-      throw JAXRXException.badRequest(ex.getMessage());
+      throw new JAXRXException(400, ex.getMessage());
     }
   }
 
@@ -169,7 +169,7 @@ public final class BXUtil {
       ")[position() = " + s + " to " + (s + m - 1) + "]";
 
     if(!cs.execute(new XQuery(xquery), out)) 
-      throw JAXRXException.badRequest(cs.info());
+      throw new JAXRXException(400, cs.info());
   }
 
   /**
@@ -184,7 +184,7 @@ public final class BXUtil {
 
     // retrieve list of databases
     final CachedOutput co = new CachedOutput();
-    if(!cs.execute(new List(), co)) throw JAXRXException.badRequest(cs.info());
+    if(!cs.execute(new List(), co)) throw new JAXRXException(400, cs.info());
     final Table table = new Table(co.toString());
 
     final XMLSerializer xml =
@@ -210,7 +210,7 @@ public final class BXUtil {
     // perform command and serialize output
     final CachedOutput co = new CachedOutput();
     final String cmd = par.get(EURLParameter.COMMAND);
-    if(!cs.execute(cmd, co)) throw JAXRXException.badRequest(cs.info());
+    if(!cs.execute(cmd, co)) throw new JAXRXException(400, cs.info());
 
     final XMLSerializer xml =
       new XMLSerializer(out, new SerializerProp(params(par)));
@@ -240,7 +240,7 @@ public final class BXUtil {
       bos.close();
 
       if(file.length() == 0)
-        throw JAXRXException.badRequest("XML input missing.");
+        throw new JAXRXException(400, "XML input missing.");
       
       return file;
     } catch(final IOException ex) {
@@ -266,7 +266,7 @@ public final class BXUtil {
       ser += "," + SerializerProp.S_WRAP_PRE[0] + "=" + JAXRX +
              "," + SerializerProp.S_WRAP_URI[0] + "=" + URL;
     } else if(!wrap.equals(DataText.NO)) {
-      throw JAXRXException.badRequest(SerializerProp.error(
+      throw new JAXRXException(400, SerializerProp.error(
           EURLParameter.WRAP.toString(), DataText.YES, DataText.NO));
     }
     return ser;
