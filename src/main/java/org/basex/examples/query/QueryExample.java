@@ -13,7 +13,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 
 /**
- * This example demonstrates three variants how XQuery requests can be
+ * This example demonstrates three variants how XQuery expressions can be
  * evaluated with BaseX.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
