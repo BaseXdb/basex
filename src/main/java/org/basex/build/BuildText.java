@@ -118,9 +118,9 @@ public interface BuildText {
   /** XML Document Standalone flag. */
   byte[] STANDALONE = token("standalone");
   /** XML Document Standalone flag. */
-  byte[] STANDYES = token("yes");
+  byte[] YES = token("yes");
   /** XML Document Standalone flag. */
-  byte[] STANDNO = token("no");
+  byte[] NO = token("no");
 
   /** DTD: XML. */
   byte[] DOCDECL = token("<?xml");

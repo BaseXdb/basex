@@ -124,7 +124,7 @@ public final class Values implements Index {
       v += idxl.readNum(p);
       p = idxl.pos();
       ids.add(v);
-    }    
+    }
     return iter(ids);
   }
 

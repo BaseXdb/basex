@@ -4,12 +4,12 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.build.xml.XMLInput;
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.Data.IndexType;
 import org.basex.io.IO;
+import org.basex.io.XMLInput;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -110,12 +110,7 @@ public final class FNBaseX extends Fun {
   private Item read(final QueryContext ctx) throws QueryException {
     final IO io = file(ctx);
     try {
-      final XMLInput in = new XMLInput(io);
-      final int len = (int) in.length();
-      final TokenBuilder tb = new TokenBuilder(len);
-      while(in.pos() < len) tb.addUTF(in.next());
-      in.finish();
-      return Str.get(tb.finish());
+      return Str.get(new XMLInput(io).content().finish());
     } catch(final IOException ex) {
       Main.debug(ex);
       Err.or(NODOC, ex.getMessage());

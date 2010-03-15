@@ -65,6 +65,8 @@ public final class Token {
   public static final String UTF82 = "UTF8";
   /** UTF16 encoding string. */
   public static final String UTF16 = "UTF-16";
+  /** UTF16 encoding string. */
+  public static final String UTF162 = "UTF16";
   /** UTF16BE (=UTF16) encoding string. */
   public static final String UTF16BE = "UTF-16BE";
   /** UTF16 encoding string. */
@@ -239,7 +241,7 @@ public final class Token {
   public static String enc(final String enc) {
     final String e = enc.toUpperCase();
     if(e.equals(UTF8) || e.equals(UTF82)) return UTF8;
-    if(e.equals(UTF16BE) || e.equals(UTF16)) return UTF16BE;
+    if(e.equals(UTF16BE) || e.equals(UTF16) || e.equals(UTF162)) return UTF16BE;
     if(e.equals(UTF16LE)) return UTF16LE;
     return enc;
   }
@@ -1070,11 +1072,11 @@ public final class Token {
   }
 
   /** Hex codes. */
-  private static final byte[] HEX = token("0123456789ABCDEF");
+  public static final byte[] HEX = token("0123456789ABCDEF");
   /** Reserved characters. */
-  private static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
+  public static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
   /** Reserved characters. */
-  private static final byte[] RES = token("-._~");
+  public static final byte[] RES = token("-._~");
 
   /**
    * Returns a URI encoded token.

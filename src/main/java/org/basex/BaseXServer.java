@@ -189,7 +189,6 @@ public final class BaseXServer extends Main implements Runnable {
     return false;
   }
 
-  
   /**
    * Stops the server.
    * @param port server port

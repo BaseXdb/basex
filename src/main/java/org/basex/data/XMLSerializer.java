@@ -2,7 +2,7 @@ package org.basex.data;
 
 import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
-import static org.basex.data.SerializeProp.*;
+import static org.basex.data.SerializerProp.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -22,9 +22,7 @@ import org.basex.util.Tokenizer;
  */
 public final class XMLSerializer extends Serializer {
   /** Default serialization parameters. */
-  private static final SerializeProp PROPS = new SerializeProp();
-  /** Indentation. */
-  private static final byte[] SPACES = { ' ', ' ' };
+  private static final SerializerProp PROPS = new SerializerProp();
   /** New line. */
   private static final byte[] NL = token(Prop.NL);
   /** Colon. */
@@ -38,7 +36,7 @@ public final class XMLSerializer extends Serializer {
   private static final TokenSet BOOLEAN = new TokenSet();
   /** HTML: URI attributes. */
   private static final TokenSet URIS = new TokenSet();
-  
+
   /** Output stream. */
   private final PrintOutput out;
   /** CData elements. */
@@ -55,13 +53,17 @@ public final class XMLSerializer extends Serializer {
   private final byte[] wrapPre;
   /** Wrapper flag. */
   private final boolean wrap;
-  /** Serialization method. */
-  private final String method;
+  /** Number of spaces to indent. */
+  private final int spaces;
   /** Encoding. */
   private final String enc;
-
   /** XML version. */
-  private String version;
+  private final String version;
+  /** Media type. */
+  private final String media;
+  /** Serialization method. */
+  private final String mth;
+
   /** System document type. */
   private String docsys = "";
   /** Public document type. */
@@ -73,7 +75,7 @@ public final class XMLSerializer extends Serializer {
   private boolean item;
   /** Script flag. */
   private boolean script;
-  
+
   /**
    * Constructor.
    * @param o output stream reference
@@ -82,49 +84,51 @@ public final class XMLSerializer extends Serializer {
   public XMLSerializer(final OutputStream o) throws IOException {
     this(o, PROPS);
   }
-  
+
   /**
    * Constructor, specifying serialization options.
    * @param o output stream reference
    * @param p serialization properties
    * @throws IOException I/O exception
    */
-  public XMLSerializer(final OutputStream o, final SerializeProp p)
+  public XMLSerializer(final OutputStream o, final SerializerProp p)
       throws IOException {
 
     out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
 
     final String m = p.check(S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT);
-    method  = m.equals(M_XML) ? M_XML : m.equals(M_XHTML) ?
+    mth = m.equals(M_XML) ? M_XML : m.equals(M_XHTML) ?
         M_XHTML : m.equals(M_HTML) ? M_HTML : M_TEXT;
 
-    version = p.get(S_VERSION).length() == 0 ? method == M_HTML ? V40 : V10 :
-      method == M_HTML ? p.check(S_VERSION, V40, V401) :
-      method != M_TEXT ? p.check(S_VERSION, V10, V11) : p.get(S_VERSION);
-    
-    for(final String c : p.get(S_CDATA_SECTION_ELEMENTS).split("\\s+"))
-      if(c.length() != 0) cdata.add(token(c));
+    version = p.get(S_VERSION).isEmpty() ? mth == M_HTML ? V40 : V10 :
+      mth == M_HTML ? p.check(S_VERSION, V40, V401) :
+      mth != M_TEXT ? p.check(S_VERSION, V10, V11) : p.get(S_VERSION);
 
-    boolean docdecl = p.check(S_OMIT_XML_DECLARATION, YES, NO).equals(NO);
-    boolean bom     = p.check(S_BYTE_ORDER_MARK, YES, NO).equals(YES);
-    String  sa      = p.check(S_STANDALONE, YES, NO, OMIT);
-    p.check(S_NORMALIZATION_FORM, "NFC", "none");
+    for(final String c : p.get(S_CDATA_SECTION_ELEMENTS).split("\\s+"))
+      if(!c.isEmpty()) cdata.add(token(c));
+
+    final boolean decl = p.check(S_OMIT_XML_DECLARATION, YES, NO).equals(NO);
+    final boolean bom  = p.check(S_BYTE_ORDER_MARK, YES, NO).equals(YES);
+    final String  sa   = p.check(S_STANDALONE, YES, NO, OMIT);
+    p.check(S_NORMALIZATION_FORM, NFC, NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);
-    if(maps.length() != 0) error(SERMAPS, maps);
-    
+    if(!maps.isEmpty()) error(SERMAPS, maps);
+
     enc     = enc(p.get(S_ENCODING));
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
+    media   = p.get(S_MEDIA_TYPE);
     indent  = p.check(S_INDENT, YES, NO).equals(YES);
     undecl  = p.check(S_UNDECLARE_PREFIXES, YES, NO).equals(YES);
     escape  = p.check(S_ESCAPE_URI_ATTRIBUTES, YES, NO).equals(YES);
     content = p.check(S_INCLUDE_CONTENT_TYPE, YES, NO).equals(YES);
+    spaces  = Math.max(0, toInt(p.get(S_INDENT_SPACES)));
     wrapPre = token(p.get(S_WRAP_PRE));
     wrapUri = token(p.get(S_WRAP_URI));
     wrap    = wrapPre.length != 0;
 
-    if(docsys.length() == 0) {
+    if(docsys.isEmpty()) {
       docsys = null;
       docpub = null;
     }
@@ -132,6 +136,7 @@ public final class XMLSerializer extends Serializer {
     if(!Charset.isSupported(enc)) error(SERENCODING, enc);
     if(undecl && version.equals(V10)) error(SERUNDECL);
 
+    // print byte-order-mark
     if(bom) {
       if(enc == UTF8) {
         out.write(0xEF); out.write(0xBB); out.write(0xBF);
@@ -141,8 +146,9 @@ public final class XMLSerializer extends Serializer {
         out.write(0xFE); out.write(0xFF);
       }
     }
-    
-    if(docdecl && method != M_HTML && method != M_TEXT) {
+
+    // print document declaration
+    if(decl && mth != M_HTML && mth != M_TEXT) {
       print(PI1);
       print(DOCDECL1);
       print(version);
@@ -152,19 +158,20 @@ public final class XMLSerializer extends Serializer {
         print(DOCDECL3);
         print(sa);
       }
-      print('\'');
+      print(ATT2);
       print(PI2);
       ind = indent;
     } else if(!sa.equals(OMIT) || version.equals(V11) && docsys != null) {
       error(SERSTAND);
     }
 
+    // open results element
     if(wrap) {
       openElement(concat(wrapPre, COL, RESULTS));
       namespace(wrapPre, wrapUri);
     }
   }
-  
+
   /**
    * Global method, replacing all % characters
    * (see {@link TokenBuilder#add(Object, Object...)} for details.
@@ -194,29 +201,29 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) throws IOException {
-    if(method == M_TEXT) return;
+    if(mth == M_TEXT) return;
 
     print(' ');
     print(n);
 
     final byte[] tagatt = concat(lc(tags.get(tags.size() - 1)), COL, lc(n));
     // don't append value for boolean attributes
-    if(method == M_HTML && BOOLEAN.id(tagatt) != 0) return;
+    if(mth == M_HTML && BOOLEAN.id(tagatt) != 0) return;
     // escape URI attributes
-    final byte[] val = escape && (method == M_HTML || method == M_XHTML) &&
+    final byte[] val = escape && (mth == M_HTML || mth == M_XHTML) &&
         URIS.id(tagatt) != 0 ? escape(v) : v;
-    
+
     print(ATT1);
     for(int k = 0; k < val.length; k += cl(val[k])) {
       final int ch = cp(val, k);
-      if(method == M_HTML && (ch == '<' ||
-          ch == '&' && val[Math.min(k + 1, val.length - 1)] == '{')) {
+      if(mth == M_HTML && (ch == '<' || ch == '&' &&
+          val[Math.min(k + 1, val.length - 1)] == '{')) {
         print(ch);
       } else {
         switch(ch) {
           case '"': print(E_QU);  break;
-          case 0x9: print(E_TAB); break;
-          case 0xA: print(E_NL); break;
+          case 0x9:
+          case 0xA: hex(ch); break;
           default:  ch(ch);
         }
       }
@@ -229,20 +236,23 @@ public final class XMLSerializer extends Serializer {
     finishElement();
 
     if(cdata.size() != 0 && cdata.contains(tags.get(tags.size() - 1)) &&
-        method != M_HTML && method != M_TEXT) {
-      print("<![CDATA[");
+        mth != M_HTML && mth != M_TEXT) {
+      print(CDATA1);
       int c = 0;
       for(int k = 0; k < b.length; k += cl(b[k])) {
         final int ch = cp(b, k);
         if(ch == ']') {
           c++;
         } else {
-          if(c > 1 && ch == '>') print("]]><![CDATA[");
+          if(c > 1 && ch == '>') {
+            print(CDATA2);
+            print(CDATA1);
+          }
           c = 0;
         }
         print(ch);
       }
-      print("]]>");
+      print(CDATA2);
     } else {
       for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));
     }
@@ -273,7 +283,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void comment(final byte[] n) throws IOException {
-    if(method == M_TEXT) return;
+    if(mth == M_TEXT) return;
     finishElement();
     if(ind) indent(true);
     print(COM1);
@@ -283,15 +293,15 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void pi(final byte[] n, final byte[] v) throws IOException {
-    if(method == M_TEXT) return;
+    if(mth == M_TEXT) return;
     finishElement();
     if(ind) indent(true);
-    if(method == M_HTML && contains(v, '>')) error(SERPI);
+    if(mth == M_HTML && contains(v, '>')) error(SERPI);
     print(PI1);
     print(n);
     print(' ');
     print(v);
-    print(method == M_HTML ? ELEM2 : PI2);
+    print(mth == M_HTML ? ELEM2 : PI2);
   }
 
   @Override
@@ -309,15 +319,21 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void ch(final int ch) throws IOException {
-    if(script && method == M_HTML) {
+    if(script && mth == M_HTML) {
       print(ch);
+    } else if(ch > 0x7F && ch < 0xA0) {
+      if(mth == M_HTML) error(SERILL, Integer.toHexString(ch));
+      hex(ch);
+    } else if(ch < 0x20 && ch != 0x9 && ch != 0xA && ch != 0xD) {
+      if(mth != M_HTML) hex(ch);
     } else {
       switch(ch) {
-        case '&': print(E_AMP); break;
-        case '>': print(E_GT); break;
-        case '<': print(E_LT); break;
-        case 0xD: print(E_CR); break;
-        default : print(ch);
+        case '&' : print(E_AMP); break;
+        case '>' : print(E_GT); break;
+        case '<' : print(E_LT); break;
+        case 0x0D: hex(ch); break;
+        case 0xA0: if(mth == M_HTML) print(E_NBSP); else print(ch); break;
+        default  : print(ch);
       }
     }
   }
@@ -329,12 +345,12 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   protected void start(final byte[] t) throws IOException {
-    if(method == M_TEXT) return;
+    if(mth == M_TEXT) return;
 
     if(tags.size() == 1 && docsys != null) {
       if(ind) indent(false);
       print(DOCTYPE);
-      if(method == M_TEXT) print(t);
+      if(mth == M_TEXT) print(t);
       else print(M_HTML);
       if(docpub != null) {
         print(" " + PUBLIC + " \"" + docpub + "\"");
@@ -351,43 +367,51 @@ public final class XMLSerializer extends Serializer {
     print(ELEM1);
     print(t);
     ind = indent;
-    
-    if(method == M_HTML) script = SCRIPTS.contains(lc(t));
+
+    if(mth == M_HTML) script = SCRIPTS.contains(lc(t));
 
     // subsequent content type elements are currently ignored
-    if(content && (method == M_HTML || method == M_XHTML) && eq(lc(t), HEAD))
-      emptyElement(META, HTTPEQUIV, TEXTHTML, CHARSET, token(enc));
+    if(content && (mth == M_HTML || mth == M_XHTML) && eq(lc(t), HEAD)) {
+      emptyElement(META, HTTPEQUIV, CONTTYPE, CONTENT,
+          concat(token(media), CHARSET, token(enc)));
+    }
   }
 
   @Override
   protected void empty() throws IOException {
-    if(method == M_TEXT) return;
-    if(method == M_XML) {
+    if(mth == M_TEXT) return;
+    if(mth == M_XML) {
       print(ELEM4);
     } else {
-      print(ELEM2);
       final byte[] tag = tags.get(tags.size());
-      if(method == M_HTML && EMPTY.contains(lc(tag))) return;
-      ind = false;
-      close(tag);
+      final boolean empty = EMPTY.contains(lc(tag));
+      if(mth == M_XHTML && empty) {
+        print(' ');
+        print(ELEM4);
+      } else {
+        print(ELEM2);
+        if(mth == M_HTML && empty) return;
+        ind = false;
+        close(tag);
+      }
     }
   }
 
   @Override
   protected void finish() throws IOException {
-    if(method == M_TEXT) return;
+    if(mth == M_TEXT) return;
     print(ELEM2);
   }
 
   @Override
   protected void close(final byte[] t) throws IOException {
-    if(method == M_TEXT) return;
+    if(mth == M_TEXT) return;
     if(ind) indent(true);
     print(ELEM3);
     print(t);
     print(ELEM2);
     ind = indent;
-    if(method == M_HTML) script &= !SCRIPTS.contains(lc(t));
+    if(mth == M_HTML) script &= !SCRIPTS.contains(lc(t));
   }
 
   /**
@@ -398,11 +422,23 @@ public final class XMLSerializer extends Serializer {
   private void indent(final boolean close) throws IOException {
     if(item) {
       item = false;
-      return;
+    } else {
+      print(NL);
+      for(int l = 0, ls = (level() - (close ? 0 : 1)) * spaces; l < ls; l++)
+        print(' ');
     }
-    print(NL);
-    final int s = level() + (close ? 1 : 0);
-    for(int l = 1; l < s; l++) print(SPACES);
+  }
+
+  /**
+   * Returns a hex entity for the specified character.
+   * @param ch character
+   * @throws IOException I/O exception
+   */
+  private void hex(final int ch) throws IOException {
+    print("&#x");
+    print(HEX[ch >> 4]);
+    print(HEX[ch & 15]);
+    print(";");
   }
 
   /**
@@ -413,7 +449,7 @@ public final class XMLSerializer extends Serializer {
   private void print(final byte[] token) throws IOException {
     // comparison by reference
     if(enc == UTF8) {
-      out.write(token);
+      for(final byte b : token) out.write(b);
     } else {
       print(string(token));
     }
@@ -425,10 +461,8 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void print(final int ch) throws IOException {
-    if(ch < 0x80) {
+    if(ch < 0x80 && enc == UTF8) {
       out.write(ch);
-    } else if(ch < 0xA0 && method == M_HTML) {
-      error(SERILL, Integer.toHexString(ch));
     } else if(ch < 0xFFFF) {
       print(String.valueOf((char) ch));
     } else {
@@ -444,7 +478,7 @@ public final class XMLSerializer extends Serializer {
   private void print(final String s) throws IOException {
     // comparison by reference
     if(enc == UTF8) {
-      for(final byte b : token(s)) out.write(b);
+      print(token(s));
     } else {
       final boolean le = enc == UTF16LE;
       if(enc == UTF16BE || le) {

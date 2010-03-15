@@ -112,7 +112,7 @@ public final class BufferedFileChannel {
       final FileChannel fileChannel, final ByteBuffer buffer,
       final long bytesToRead, final BufferedFileChannel p) throws IOException {
     f = file;
-    name = subfilename.equals("") ? f.getAbsolutePath() : f.getAbsolutePath()
+    name = subfilename.isEmpty() ? f.getAbsolutePath() : f.getAbsolutePath()
         + Prop.SEP + subfilename;
     fc = fileChannel;
     buf = buffer;

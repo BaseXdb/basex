@@ -85,6 +85,33 @@ public interface DataText {
 
   // XML SERIALIZATION ========================================================
 
+  /** Yes flag. */
+  String YES = "yes";
+  /** No flag. */
+  String NO = "no";
+  /** Omit flag. */
+  String OMIT = "omit";
+  /** Version. */
+  String V10 = "1.0";
+  /** Version. */
+  String V11 = "1.1";
+  /** Version. */
+  String V40 = "4.0";
+  /** Version. */
+  String V401 = "4.01";
+  /** Method. */
+  String M_XML = "xml";
+  /** Method. */
+  String M_XHTML = "xhtml";
+  /** Method. */
+  String M_HTML = "html";
+  /** Method. */
+  String M_TEXT = "text";
+  /** Normalization. */
+  String NFC = "nfc";
+  /** Normalization. */
+  String NONE = "none";
+
   /** Ampersand Entity. */
   byte[] E_AMP = token("&amp;");
   /** Quote Entity. */
@@ -93,12 +120,8 @@ public interface DataText {
   byte[] E_GT = token("&gt;");
   /** LessThan Entity. */
   byte[] E_LT = token("&lt;");
-  /** Tab Entity. */
-  byte[] E_TAB = token("&#x9;");
-  /** NewLine Entity. */
-  byte[] E_NL = token("&#xA;");
-  /** CarriageReturn Entity. */
-  byte[] E_CR = token("&#xD;");
+  /** HTML: Non-breaking space Entity. */
+  byte[] E_NBSP = token("&nbsp;");
 
   /** Results tag. */
   byte[] RESULTS = token("results");
@@ -116,11 +139,11 @@ public interface DataText {
   byte[] SIZE = token("size");
 
   /** Document declaration. */
-  String DOCDECL1 = "xml version='";
+  String DOCDECL1 = "xml version=\"";
   /** Document declaration. */
-  String DOCDECL2 = "' encoding='";
+  String DOCDECL2 = "\" encoding=\"";
   /** Document declaration. */
-  String DOCDECL3 = "' standalone='";
+  String DOCDECL3 = "\" standalone=\"";
   /** Doctype output. */
   String DOCTYPE = "<!DOCTYPE ";
   /** Doctype system keyword. */
@@ -149,16 +172,20 @@ public interface DataText {
   byte[] ATT1 = token("=\"");
   /** Attribute output. */
   byte[] ATT2 = token("\"");
-  /** Document. */
+  /** Document output. */
   byte[] DOC = token("doc()");
-  /** Text. */
+  /** Text output. */
   byte[] TEXT = token("text()");
-  /** Comment. */
+  /** Comment output. */
   byte[] COMM = token("comment()");
-  /** Processing instruction. */
+  /** Processing instruction output. */
   byte[] PI = token("processing-instruction()");
   /** Attribute output. */
   byte[] ATT = { '@' };
+  /** CDATA output. */
+  byte[] CDATA1 = token("<![CDATA[");
+  /** CDATA output. */
+  byte[] CDATA2 = token("]]>");
 
   /** HTML: head element. */
   byte[] HEAD = token("head");
@@ -166,19 +193,15 @@ public interface DataText {
   byte[] META = token("meta");
   /** HTML: http-equiv attribute. */
   byte[] HTTPEQUIV = token("http-equiv");
-  /** HTML: text/html attribute value. */
-  byte[] TEXTHTML = token("text/html");
-  /** HTML: charset attribute. */
-  byte[] CHARSET = token("charset");
+  /** HTML: Content-Type attribute value. */
+  byte[] CONTTYPE = token("Content-Type");
+  /** HTML: content attribute. */
+  byte[] CONTENT = token("content");
+  /** HTML: charset attribute value. */
+  byte[] CHARSET = token("; charset=");
 
   /** Serialization error. */
-  String SERKEY = "Parameter '%' is unknown.";
-  /** Serialization error. */
-  String SERVAL = "Parameter '%' must be set to '%'";
-  /** Serialization error. */
   String SERMAPS = "Character map '%' is not defined.";
-  /** Serialization error. */
-  String SERVAL2 = " or '%'";
   /** Serialization error SESU0007. */
   String SERENCODING = "[SESU0007] Unknown encoding: '%'";
   /** Serialization error SEPOM0009. */
@@ -189,6 +212,12 @@ public interface DataText {
   String SERILL = "[SERE0014] Illegal HTML character found: #x%";
   /** Serialization error SERE0015. */
   String SERPI = "[SERE0015] Processing construction contains '>'";
+  /** Serialization error. */
+  String SERVAL = "[SEPM0016] Parameter '%' must be set to '%'";
+  /** Serialization error. */
+  String SERVAL2 = " or '%'";
+  /** Serialization error. */
+  String SERKEY = "Parameter '%' is unknown.";
 
   // TABLE SERIALIZATION ======================================================
 

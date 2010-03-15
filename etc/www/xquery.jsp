@@ -11,7 +11,7 @@
 String ROOT = "webapps/ROOT/";
 
 String file = request.getParameter("page");
-if(file == null || file.length() == 0) file = "index";
+if(file == null || file.isEmpty()) file = "index";
 final String fn = ROOT + file + ".xq";
 final String query = Token.string(IOConstants.read(fn));
 

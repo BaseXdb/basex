@@ -13,6 +13,7 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.io.XMLInput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
@@ -694,7 +695,7 @@ public final class XMLScanner extends Progress {
 
         final XMLInput tin = input;
         try {
-          final IO file = input.file.merge(name);
+          final IO file = input.io().merge(name);
           cont = file.content();
           input = new XMLInput(new IOContent(cont, name));
         } catch(final IOException ex) {
@@ -998,11 +999,11 @@ public final class XMLScanner extends Progress {
     if(!consume(STANDALONE)) return null;
     s(); check('='); s();
     final int d = qu();
-    final boolean yes = consume(STANDYES);
-    final boolean no = !yes && consume(STANDNO);
+    final boolean yes = consume(YES);
+    final boolean no = !yes && consume(NO);
     check((char) d);
     if(!yes && !no) error(DECLSTANDALONE);
-    return yes ? STANDYES : STANDNO;
+    return yes ? YES : NO;
   }
 
   /**
@@ -1017,7 +1018,7 @@ public final class XMLScanner extends Progress {
 
   @Override
   public String det() {
-    return Main.info(SCANPOS, input.file.name(), input.line);
+    return Main.info(SCANPOS, input.io().name(), input.io());
   }
 
   @Override

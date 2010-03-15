@@ -43,7 +43,8 @@ public final class Prop extends AProp {
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Database path. */
-  public static final Object[] DBPATH = { "DBPATH", HOME + Text.NAME + "Data" };
+  public static final Object[] DBPATH = {
+    "DBPATH", HOME + Text.NAME + "Data" };
 
   /** Language Name (currently: English or German). */
   public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
@@ -56,6 +57,12 @@ public final class Prop extends AProp {
   public static final Object[] PORT = { "PORT", 1984 };
   /** Client/server communication: server port. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
+
+  /** JAX-RX interface: web port. */
+  public static final Object[] WEBPORT = { "WEBPORT", 8984 };
+  /** JAX-RX interface: web directory. */
+  public static final Object[] WEBPATH = {
+    "WEBPATH", HOME + Text.NAME + "Web" };
 
   // TRANSIENT OPTIONS ========================================================
 

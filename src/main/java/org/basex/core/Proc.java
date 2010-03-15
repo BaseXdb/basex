@@ -161,7 +161,7 @@ public abstract class Proc extends Progress {
   public boolean run(final Context ctx) {
     return run(ctx, null);
   }
-  
+
   /**
    * Returns process information or error message.
    * @return info string

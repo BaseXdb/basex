@@ -1,11 +1,9 @@
-package org.basex.build.xml;
+package org.basex.io;
 
 import java.io.IOException;
 import java.util.Arrays;
-import org.basex.io.IO;
-import org.basex.io.BufferInput;
-import org.basex.io.CachedInput;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * This class provides a convenient access to the XML input.
@@ -51,6 +49,27 @@ public final class XMLInput {
    */
   public void encoding(final String e) throws IOException {
     in[0].encoding(e);
+  }
+
+  /**
+   * Returns the file contents, considering the file encoding.
+   * @return file contents
+   * @throws IOException I/O exception
+   */
+  public TokenBuilder content() throws IOException {
+    final int len = (int) length();
+    final TokenBuilder tb = new TokenBuilder(len);
+    while(pos() < len) tb.addUTF(next());
+    finish();
+    return tb;
+  }
+
+  /**
+   * Returns the IO reference.
+   * @return file reference
+   */
+  public IO io() {
+    return file;
   }
 
   /**

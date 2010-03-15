@@ -30,7 +30,7 @@ public interface TreeViewOptions {
   boolean DRAW_NODE_TEXT = true;
   /** Show 3d descendant connection. */
   boolean SHOW_3D_CONN = false;
-  /** Show connections in main image. **/ 
+  /** Show connections in main image. **/
   boolean SHOW_CONN_MI = true;
   /** Border padding value. */
   int BORDER_PADDING = 2;
@@ -40,7 +40,7 @@ public interface TreeViewOptions {
   int BOTTOM_MARGIN = 5;
   /** Margin left and right. */
   int LEFT_RIGHT_MARGIN = 0;
-  /** Changes Color until given level. */  
+  /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
 
   /** Minimum rectangle space for text. */

@@ -13,32 +13,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class SerializeProp extends AProp {
-  /** Yes flag. */
-  public static final String YES = "yes";
-  /** No flag. */
-  public static final String NO = "no";
-  /** Omit flag. */
-  public static final String OMIT = "omit";
-  /** Version 1.0. */
-  public static final String V10 = "1.0";
-  /** Version 1.1. */
-  public static final String V11 = "1.1";
-  /** Version 4.0. */
-  public static final String V40 = "4.0";
-  /** Version 4.01. */
-  public static final String V401 = "4.01";
-  /** Method. */
-  public static final String M_XML = "xml";
-  /** Method. */
-  public static final String M_XHTML = "xhtml";
-  /** Method. */
-  public static final String M_HTML = "html";
-  /** Method. */
-  public static final String M_TEXT = "text";
-
-  // SUPPORTED PARAMETERS =====================================================
-  
+public final class SerializerProp extends AProp {
   /** Serialization parameter: yes/no. */
   public static final Object[] S_BYTE_ORDER_MARK = {
     "byte-order-mark", NO };
@@ -65,19 +40,19 @@ public final class SerializeProp extends AProp {
     "indent", YES };
   /** Serialization parameter. */
   public static final Object[] S_MEDIA_TYPE = {
-    "media-type", "text/xml" };
+    "media-type", "text/html" };
   /** Serialization parameter: xml/xhtml/html/text. */
   public static final Object[] S_METHOD = {
-    "method", "xml" };
+    "method", M_XML };
   /** Serialization parameter: NFC/NFD/NFKC/NKFD/fully-normalized/none. */
   public static final Object[] S_NORMALIZATION_FORM = {
-    "normalization-form", "NFC" };
+    "normalization-form", NFC };
   /** Serialization parameter: yes/no. */
   public static final Object[] S_OMIT_XML_DECLARATION = {
     "omit-xml-declaration", YES };
   /** Serialization parameter: yes/no/omit. */
   public static final Object[] S_STANDALONE = {
-    "standalone", "omit" };
+    "standalone", OMIT };
   /** Serialization parameter: yes/no. */
   public static final Object[] S_UNDECLARE_PREFIXES = {
     "undeclare-prefixes", NO };
@@ -88,17 +63,20 @@ public final class SerializeProp extends AProp {
   public static final Object[] S_VERSION = {
     "version", "" };
 
-  /** Hidden serialization parameter. */
+  /** Specific serialization parameter: number of spaces to indent. */
+  public static final Object[] S_INDENT_SPACES = {
+    "indent-spaces", "2" };
+  /** Specific serialization parameter: prefix of result wrapper. */
   public static final Object[] S_WRAP_PRE = {
     "wrap-pre", "" };
-  /** Hidden serialization parameter. */
+  /** Specific serialization parameter: URI of result wrapper. */
   public static final Object[] S_WRAP_URI = {
     "wrap-uri", "" };
 
   /**
    * Constructor.
    */
-  public SerializeProp() {
+  public SerializerProp() {
     super(null);
   }
 
@@ -108,12 +86,12 @@ public final class SerializeProp extends AProp {
    * key/values with equality.
    * @throws IOException I/O exception
    */
-  public SerializeProp(final String s) throws IOException {
+  public SerializerProp(final String s) throws IOException {
     this();
     if(s == null) return;
 
     for(final String ser : s.trim().split(",")) {
-      if(ser.length() == 0) continue;
+      if(ser.isEmpty()) continue;
       final String[] sprop = ser.split("=", 2);
       final String key = sprop[0].trim();
       final String val = sprop.length < 2 ? "" : sprop[1].trim();
@@ -121,7 +99,7 @@ public final class SerializeProp extends AProp {
       else throw new IOException(Main.info(SERKEY, key));
     }
   }
-  
+
   /**
    * Retrieves a value from the specified property and checks allowed values.
    * @param key property key
@@ -136,7 +114,7 @@ public final class SerializeProp extends AProp {
     for(final String a : allowed) if(a.equals(val)) return val;
     throw new IOException(error(key[0].toString(), allowed));
   }
-  
+
   /**
    * Returns an exception string for a wrong key.
    * @param key property key

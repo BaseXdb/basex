@@ -660,7 +660,7 @@ public final class DeepFile {
       final String text) {
     if(!extractText()) return;
     final String s = text.trim();
-    if(s.equals("")) return;
+    if(s.isEmpty()) return;
     for(int i = 0; i < s.length(); i++)
       if(!XMLToken.valid(s.charAt(i))) {
         unknown();
@@ -702,7 +702,7 @@ public final class DeepFile {
    * @param xml the xml document/fragment
    */
   public void addXML(final long pos, final int byteCount, final String xml) {
-    if(!extractXML() || xml.equals("")) return;
+    if(!extractXML() || xml.isEmpty()) return;
     if(xml.length() > context.prop.num(Prop.FSTEXTMAX))
       addText(pos, byteCount, xml);
     else {

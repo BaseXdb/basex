@@ -26,7 +26,7 @@ public class XQuery extends HttpServlet {
     
     PrintWriter out = response.getWriter();
     String file = request.getParameter("page");
-    if(file == null || file.length() == 0) file = "index";
+    if(file == null || file.isEmpty()) file = "index";
     final String fn = ROOT + file + ".xq";
     final String query = Token.string(IOConstants.read(ROOT + file + ".xq"));
 

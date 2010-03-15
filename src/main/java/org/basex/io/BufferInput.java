@@ -119,12 +119,15 @@ public class BufferInput {
     final byte c = length > 2 ? buffer[2] : 0;
     final byte d = length > 3 ? buffer[3] : 0;
     if(a == -1 && b == -2 || a == '<' && b == 0 && c == '?' && d == 0) {
+      // BOM: ff fe
       enc = UTF16LE;
       if(a == -1) pos = 2;
     } else if(a == -2 && b == -1 || a == 0 && b == '<' && c == 0 && d == '?') {
+      // BOM: fe ff
       enc = UTF16BE;
       if(a == -2) pos = 2;
     } else if(a == -0x11 && b == -0x45 && c == -0x41) {
+      // BOM: ef bb bf
       pos = 3;
     }
   }

@@ -40,7 +40,7 @@ public final class BXDomImpl implements DOMImplementation {
   }
 
   public boolean hasFeature(final String f, final String v) {
-    return "XML".equalsIgnoreCase(f) && (v == null || v.equals("") ||
-        v.equals("1.0") || v.equals("1.0") || v.equals("3.0"));
+    return "XML".equalsIgnoreCase(f) && (v == null || v.isEmpty() ||
+        v.equals("1.0") || v.equals("2.0") || v.equals("3.0"));
   }
 }

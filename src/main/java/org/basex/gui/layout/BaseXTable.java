@@ -86,7 +86,7 @@ public final class BaseXTable extends JTable {
 
     public Object getValueAt(final int row, final int col) {
       final String o = data.value(row, col);
-      return o.equals("") ? Boolean.FALSE : o.equals("X") ? Boolean.TRUE : o;
+      return o.isEmpty() ? Boolean.FALSE : o.equals("X") ? Boolean.TRUE : o;
     }
 
     @Override

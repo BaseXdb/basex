@@ -8,11 +8,12 @@ import org.basex.core.Proc;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
-import org.basex.data.SerializeProp;
+import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.io.NullOutput;
+import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -56,10 +57,10 @@ abstract class AQuery extends Proc {
     String err = null;
     try {
       // define serialization parameters
-      final SerializeProp sprop = new SerializeProp(prop.get(Prop.SERIALIZER));
+      final SerializerProp sp = new SerializerProp(prop.get(Prop.SERIALIZER));
       if(prop.is(Prop.WRAPOUTPUT)) {
-        sprop.set(SerializeProp.S_WRAP_PRE, NAMELC);
-        sprop.set(SerializeProp.S_WRAP_URI, URL);
+        sp.set(SerializerProp.S_WRAP_PRE, NAMELC);
+        sp.set(SerializerProp.S_WRAP_URI, URL);
       }
 
       final boolean ser = prop.is(Prop.SERIALIZE);
@@ -77,24 +78,27 @@ abstract class AQuery extends Proc {
         comp += per.getTime();
         if(i == 0) plan(qp, true);
 
-        final XMLSerializer xml = new XMLSerializer(
-            i == 0 && ser ? out : new NullOutput(!ser), sprop);
+        final PrintOutput po = i == 0 && ser ? out : new NullOutput(!ser);
+        XMLSerializer xml;
 
         if(context.prop.is(Prop.CACHEQUERY)) {
           result = qp.query();
           eval += per.getTime();
+          xml = new XMLSerializer(po, sp);
           result.serialize(xml);
           s = result.size();
         } else {
           final Iter ir = qp.iter();
           eval += per.getTime();
           s = 0;
-          Item it;
-          while((it = ir.next()) != null) {
+          Item it = ir.next();
+          xml = new XMLSerializer(po, sp);
+          while(it != null) {
             checkStop();
             xml.openResult();
             it.serialize(xml);
             xml.closeResult();
+            it = ir.next();
             s++;
           }
         }

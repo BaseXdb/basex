@@ -10,8 +10,8 @@ import org.basex.core.proc.Check;
 import org.basex.core.proc.XQuery;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
+import org.basex.io.XMLInput;
 import org.basex.util.Args;
-import org.basex.util.Token;
 
 /**
  * This is the starter class for the stand-alone console mode.
@@ -91,7 +91,7 @@ public class BaseX extends Main {
       errln(FILEWHICH, file);
     } else {
       try {
-        return Token.string(io.content()).trim();
+        return new XMLInput(io).content().toString().trim();
       } catch(final IOException ex) {
         error(ex, ex.getMessage());
       }
@@ -158,8 +158,7 @@ public class BaseX extends Main {
             query = arg.remaining();
           } else if(c == 's') {
             // set/add serialization parameter
-            if(serial.length() != 0) serial += ",";
-            serial += arg.string();
+            serial += "," + arg.string();
             success = set(Prop.SERIALIZER, serial);
           } else if(c == 'r') {
             // hidden option: parse number of runs
