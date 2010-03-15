@@ -10,10 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Map;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.core.Response.Status;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
@@ -29,6 +26,7 @@ import org.basex.server.ClientSession;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
 import org.jaxrx.constants.EURLParameter;
+import org.jaxrx.util.JAXRXException;
 
 /**
  * This class contains utility methods which are used by several JAX-RX
@@ -62,8 +60,7 @@ public final class BXUtil {
           System.getProperty("org.jaxrx.user"),
           System.getProperty("org.jaxrx.password"));
     } catch(final IOException ex) {
-      error(ex);
-      return null;
+      throw JAXRXException.serverError(ex);
     }
   }
 
@@ -77,7 +74,7 @@ public final class BXUtil {
     try {
       code.run();
     } catch(final IOException ex) {
-      error(ex);
+      throw JAXRXException.serverError(ex);
     } finally {
       try { if(cs != null) cs.close(); } catch(final Exception ex) { }
     }
@@ -100,12 +97,13 @@ public final class BXUtil {
           @Override
           public void run() throws IOException {
             // open database
-            if(db != null && !cs.execute(new Open(db))) notFound(cs.info());
+            if(db != null && !cs.execute(new Open(db))) 
+              throw JAXRXException.notFound(cs.info());
 
             // set serialization parameters
             final String par = params(p);
             if(!cs.execute(new Set(Prop.SERIALIZER, par)))
-              badRequest(cs.info());
+              throw JAXRXException.badRequest(cs.info());
 
             // run command, query or show databases
             if(p.get(EURLParameter.COMMAND) != null) {
@@ -138,14 +136,15 @@ public final class BXUtil {
     if(!file.endsWith(".xq")) file += ".xq";
 
     final IO io = IO.get(file);
-    if(!io.exists()) notFound("Not found: " + file);
+    if(!io.exists()) throw JAXRXException.notFound(
+        "Not found: " + par.get(EURLParameter.RUN));
 
     try {
       final String query = new XMLInput(io).content().toString().trim();
       par.put(EURLParameter.QUERY, query);
       query(cs, out, par);
     } catch(final IOException ex) {
-      badRequest(ex.getMessage());
+      throw JAXRXException.badRequest(ex.getMessage());
     }
   }
 
@@ -168,7 +167,9 @@ public final class BXUtil {
       Integer.MAX_VALUE - s;
     final String xquery = "(" + (query != null ? query : ".") +
       ")[position() = " + s + " to " + (s + m - 1) + "]";
-    if(!cs.execute(new XQuery(xquery), out)) badRequest(cs.info());
+
+    if(!cs.execute(new XQuery(xquery), out)) 
+      throw JAXRXException.badRequest(cs.info());
   }
 
   /**
@@ -183,7 +184,7 @@ public final class BXUtil {
 
     // retrieve list of databases
     final CachedOutput co = new CachedOutput();
-    if(!cs.execute(new List(), co)) badRequest(cs.info());
+    if(!cs.execute(new List(), co)) throw JAXRXException.badRequest(cs.info());
     final Table table = new Table(co.toString());
 
     final XMLSerializer xml =
@@ -209,7 +210,7 @@ public final class BXUtil {
     // perform command and serialize output
     final CachedOutput co = new CachedOutput();
     final String cmd = par.get(EURLParameter.COMMAND);
-    if(!cs.execute(cmd, co)) badRequest(cs.info());
+    if(!cs.execute(cmd, co)) throw JAXRXException.badRequest(cs.info());
 
     final XMLSerializer xml =
       new XMLSerializer(out, new SerializerProp(params(par)));
@@ -237,6 +238,10 @@ public final class BXUtil {
         bos.write(b);
       }
       bos.close();
+
+      if(file.length() == 0)
+        throw JAXRXException.badRequest("XML input missing.");
+      
       return file;
     } catch(final IOException ex) {
       // try to delete temporary file before returning the exception
@@ -247,7 +252,7 @@ public final class BXUtil {
   }
 
   /**
-   * Returns serialization parameters, specified in the map, in a string.
+   * Returns serialization parameters, specified in the map, as a string.
    * @param p map with parameters
    * @return string with serialization parameters
    */
@@ -261,35 +266,9 @@ public final class BXUtil {
       ser += "," + SerializerProp.S_WRAP_PRE[0] + "=" + JAXRX +
              "," + SerializerProp.S_WRAP_URI[0] + "=" + URL;
     } else if(!wrap.equals(DataText.NO)) {
-      badRequest(SerializerProp.error(EURLParameter.WRAP.toString(),
-          DataText.YES, DataText.NO));
+      throw JAXRXException.badRequest(SerializerProp.error(
+          EURLParameter.WRAP.toString(), DataText.YES, DataText.NO));
     }
     return ser;
-  }
-
-  /**
-   * Returns a {@link Status#NOT_FOUND} exception.
-   * @param info info string
-   */
-  static void notFound(final String info) {
-    throw new WebApplicationException(
-        Response.status(Status.NOT_FOUND).entity(info).build());
-  }
-
-  /**
-   * Returns a {@link Status#BAD_REQUEST} exception.
-   * @param info info string
-   */
-  static void badRequest(final String info) {
-    throw new WebApplicationException(
-        Response.status(Status.BAD_REQUEST).entity(info).build());
-  }
-
-  /**
-   * Returns an {@link Status#INTERNAL_SERVER_ERROR} exception.
-   * @param ex exception
-   */
-  static void error(final Exception ex) {
-    throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
   }
 }

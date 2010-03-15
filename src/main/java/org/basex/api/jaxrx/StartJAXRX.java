@@ -3,7 +3,7 @@ package org.basex.api.jaxrx;
 import org.basex.BaseXServer;
 import org.basex.core.Prop;
 import org.basex.core.Text;
-import org.jaxrx.StartJettyServer;
+import org.jaxrx.StartJetty;
 
 /**
  * This class is responsible to start the database server and the
@@ -34,19 +34,16 @@ public final class StartJAXRX {
     // database server port
     System.setProperty("org.jaxrx.serverport",
         Integer.toString(prop.num(Prop.SERVERPORT)));
-    // port of web server
-    System.setProperty("org.jaxrx.webport",
-        Integer.toString(prop.num(Prop.WEBPORT)));
-    // path to web directory
+    // path to web directory (needed by the 'run' parameter)
     System.setProperty("org.jaxrx.webpath", prop.get(Prop.WEBPATH));
 
-    // name of implementation
+    // name of implementation(s)
     System.setProperty("org.jaxrx.systemName", Text.NAMELC);
-    // path to implementation package
+    // path to implementation package(s)
     System.setProperty("org.jaxrx.implementation", 
         StartJAXRX.class.getPackage().getName());
 
     // start Jetty web server
-    StartJettyServer.main(null);
+    new StartJetty(prop.num(Prop.WEBPORT));
   }
 }

@@ -11,6 +11,7 @@ import org.basex.core.proc.Open;
 import org.basex.server.ClientSession;
 import org.jaxrx.constants.EURLParameter;
 import org.jaxrx.interfaces.IPost;
+import org.jaxrx.util.JAXRXException;
 
 /**
  * This class offers an implementation of the JAX-RX 'post' operation.
@@ -28,19 +29,22 @@ public final class BXPost implements IPost {
       @Override
       public void run() throws IOException {
         // open database
-        if(!cs.execute(new Open(resource))) notFound(cs.info());
+        if(!cs.execute(new Open(resource))) 
+          throw JAXRXException.notFound(cs.info());
+
         // add cached file to the database
         final File file = cache(in);
         final boolean ok = cs.execute(new Add(file.toString()));
         file.delete();
+
         // return exception if process failed
-        if(!ok) badRequest(cs.info());
+        if(!ok) throw JAXRXException.badRequest(cs.info());
       }
     });
   }
 
   @Override
-  public StreamingOutput postResource(final String resource,
+  public StreamingOutput postQuery(final String resource,
       final Map<EURLParameter, String> queryParams) {
     return query(resource, queryParams);
   }

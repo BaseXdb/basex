@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.core.proc.DropDB;
 import org.basex.server.ClientSession;
 import org.jaxrx.interfaces.IDelete;
+import org.jaxrx.util.JAXRXException;
 
 /**
  * This class offers an implementation of the JAX-RX 'delete' operation.
@@ -15,14 +16,14 @@ import org.jaxrx.interfaces.IDelete;
  */
 public final class BXDelete implements IDelete {
   @Override
-  public boolean deleteResource(final String resource) {
+  public void deleteResource(final String resource) {
     final ClientSession cs = session();
     run(cs, new Code() {
       @Override
       public void run() throws IOException {
-        if(!cs.execute(new DropDB(resource))) notFound(cs.info());
+        if(!cs.execute(new DropDB(resource)))
+          throw JAXRXException.notFound(cs.info());
       }
     });
-    return true;
   }
 }

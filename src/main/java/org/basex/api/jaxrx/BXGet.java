@@ -20,11 +20,16 @@ public final class BXGet implements IGet {
   public Set<EURLParameter> getAvailableParams() {
     final Set<EURLParameter> p = new HashSet<EURLParameter>();
     p.add(EURLParameter.COMMAND);
+    p.add(EURLParameter.QUERY);
+    p.add(EURLParameter.RUN);
     p.add(EURLParameter.COUNT);
     p.add(EURLParameter.OUTPUT);
-    p.add(EURLParameter.QUERY);
     p.add(EURLParameter.START);
     p.add(EURLParameter.WRAP);
+    /* currently not supported:
+    p.add(EURLParameter.XSL);
+    p.add(EURLParameter.REVISION);
+    */
     return p;
   }
 

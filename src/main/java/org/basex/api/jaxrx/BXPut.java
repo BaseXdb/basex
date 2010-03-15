@@ -8,6 +8,7 @@ import java.io.InputStream;
 import org.basex.core.proc.CreateDB;
 import org.basex.server.ClientSession;
 import org.jaxrx.interfaces.IPut;
+import org.jaxrx.util.JAXRXException;
 
 /**
  * This class offers an implementation of the JAX-RX 'put' operation.
@@ -18,7 +19,7 @@ import org.jaxrx.interfaces.IPut;
  */
 public final class BXPut implements IPut {
   @Override
-  public boolean createResource(final String resource, final InputStream in) {
+  public void putResource(final String resource, final InputStream in) {
     final ClientSession cs = session();
     run(cs, new Code() {
       @Override
@@ -28,9 +29,8 @@ public final class BXPut implements IPut {
         final boolean ok = cs.execute(new CreateDB(file.toString(), resource));
         file.delete();
         // return exception if process failed
-        if(!ok) badRequest(cs.info());
+        if(!ok) throw JAXRXException.badRequest(cs.info());
       }
     });
-    return true;
   }
 }
