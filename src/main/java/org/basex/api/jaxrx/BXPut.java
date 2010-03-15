@@ -11,7 +11,7 @@ import org.jaxrx.interfaces.IPut;
 
 /**
  * This class offers an implementation of the JAX-RX 'put' operation.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Lewandowski
  * @author Christian Gruen

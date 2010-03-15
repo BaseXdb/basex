@@ -41,54 +41,54 @@ require 'digest/md5'
 # Constructor, creating a new socket connection.
 class Session
   def initialize(host, port, username, pw)
-  
+
     # create server connection
     @socket = TCPSocket.open(host, port)
-    
+
     # receive timestamp
     ts = readString
     hash = Digest::MD5.new
     hash.update(hash.hexdigest(pw))
     hash.update(ts)
-    
+
     # send username and hashed password/timestamp
     @socket.write(username + "\0")
     @socket.write(hash.hexdigest() + "\0")
-    
+
     # evaluate success flag
     if read != "\0"
       raise "Access denied."
     end
-    
+
   end
-  
+
   # Executes the specified command.
   def execute(com)
     # send command to server
     @socket.write(com + "\0")
-    
+
     # send command to server and receive result
     @result = readString
     @info = readString
     return read
   end
-  
+
   # Returns the result.
   def result()
     return @result
   end
-  
+
   # Returns processing information.
   def info()
     return @info
   end
-  
+
   # Closes the connection.
   def close()
     @socket.write("exit \0")
     @socket.close
   end
-  
+
   # Receives a string from the socket.
   def readString()
     complete = ""
@@ -97,7 +97,7 @@ class Session
     end
     return complete
   end
-  
+
   # Returns a single byte from the socket.
   def read()
     return @socket.read(1)

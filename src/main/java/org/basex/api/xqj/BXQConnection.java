@@ -30,7 +30,7 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
   BXQConnection(final String name, final String pw) throws XQException {
     super(name, pw);
   }
-  
+
   public void commit() throws XQException {
     opened();
     throw new BXQException(TRANS);

@@ -46,7 +46,7 @@ final class BXQStaticContext implements XQStaticContext {
    */
   protected BXQStaticContext(final String name, final String pw)
       throws XQException {
-    
+
     context = new Context();
     if(name != null) {
       context.user = context.users.get(name);
@@ -56,7 +56,6 @@ final class BXQStaticContext implements XQStaticContext {
     ctx = new QueryContext(context);
   }
 
-  
   public void declareNamespace(final String prefix, final String uri)
       throws XQException {
     try {

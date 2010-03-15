@@ -189,7 +189,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   private void bind(final QName var, final Item it, final XQItemType t)
       throws XQException {
     opened();
-    
+
     valid(var, QName.class);
 
     final Type tt = check(it.type, t);
@@ -213,7 +213,7 @@ abstract class BXQDynamicContext extends BXQAbstract
       } else {
         query.ctx.vars.addGlobal(v);
       }
-  
+
       try {
         v.bind(i, null);
       } catch(final QueryException ex) {

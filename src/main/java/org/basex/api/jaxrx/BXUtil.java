@@ -19,9 +19,12 @@ import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
-import org.basex.data.SerializeProp;
+import org.basex.data.DataText;
+import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
+import org.basex.io.IO;
+import org.basex.io.XMLInput;
 import org.basex.server.ClientSession;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
@@ -55,7 +58,7 @@ public final class BXUtil {
   static ClientSession session() {
     try {
       return new ClientSession("localhost",
-          Integer.parseInt(System.getProperty("org.jaxrx.port")),
+          Integer.parseInt(System.getProperty("org.jaxrx.serverport")),
           System.getProperty("org.jaxrx.user"),
           System.getProperty("org.jaxrx.password"));
     } catch(final IOException ex) {
@@ -79,7 +82,7 @@ public final class BXUtil {
       try { if(cs != null) cs.close(); } catch(final Exception ex) { }
     }
   }
-  
+
   /**
    * This method runs a query or command on the database.
    * @param db An optional database reference
@@ -107,6 +110,8 @@ public final class BXUtil {
             // run command, query or show databases
             if(p.get(EURLParameter.COMMAND) != null) {
               command(cs, out, p);
+            } else if(p.get(EURLParameter.RUN) != null) {
+              file(cs, out, p);
             } else if(p.get(EURLParameter.QUERY) != null || db != null) {
               query(cs, out, p);
             } else {
@@ -116,6 +121,32 @@ public final class BXUtil {
         });
       }
     };
+  }
+
+  /**
+   * Runs a query file.
+   * @param cs client session
+   * @param out output stream
+   * @param par query parameters
+   */
+  static void file(final ClientSession cs, final OutputStream out,
+      final Map<EURLParameter, String> par) {
+
+    // wrap start and counter around query expression
+    final String root = System.getProperty("org.jaxrx.webpath") + "/";
+    String file = root + par.get(EURLParameter.RUN);
+    if(!file.endsWith(".xq")) file += ".xq";
+
+    final IO io = IO.get(file);
+    if(!io.exists()) notFound("Not found: " + file);
+
+    try {
+      final String query = new XMLInput(io).content().toString().trim();
+      par.put(EURLParameter.QUERY, query);
+      query(cs, out, par);
+    } catch(final IOException ex) {
+      badRequest(ex.getMessage());
+    }
   }
 
   /**
@@ -156,7 +187,7 @@ public final class BXUtil {
     final Table table = new Table(co.toString());
 
     final XMLSerializer xml =
-      new XMLSerializer(out, new SerializeProp(params(par)));
+      new XMLSerializer(out, new SerializerProp(params(par)));
     for(final TokenList l : table.contents) {
       xml.emptyElement(token(JAXRX + ":" + "resource"),
           token("name"), l.get(0), token("documents"), l.get(1),
@@ -181,11 +212,11 @@ public final class BXUtil {
     if(!cs.execute(cmd, co)) badRequest(cs.info());
 
     final XMLSerializer xml =
-      new XMLSerializer(out, new SerializeProp(params(par)));
+      new XMLSerializer(out, new SerializerProp(params(par)));
     xml.text(delete(co.finish(), '\r'));
     xml.close();
   }
-  
+
   /**
    * Caches the input stream contents to a temporary file on disk.
    * @param in input stream
@@ -223,19 +254,19 @@ public final class BXUtil {
   static String params(final Map<EURLParameter, String> p) {
     String ser = p.get(EURLParameter.OUTPUT);
     if(ser == null) ser = "";
-    
+
     final String wrap = p.get(EURLParameter.WRAP);
     // wrap results by default
-    if(wrap == null || wrap.equals(SerializeProp.YES)) {
-      ser += "," + SerializeProp.S_WRAP_PRE[0] + "=" + JAXRX +
-             "," + SerializeProp.S_WRAP_URI[0] + "=" + URL;
-    } else if(!wrap.equals(SerializeProp.NO)) {
-      badRequest(SerializeProp.error(EURLParameter.WRAP.toString(),
-          SerializeProp.YES, SerializeProp.NO));
+    if(wrap == null || wrap.equals(DataText.YES)) {
+      ser += "," + SerializerProp.S_WRAP_PRE[0] + "=" + JAXRX +
+             "," + SerializerProp.S_WRAP_URI[0] + "=" + URL;
+    } else if(!wrap.equals(DataText.NO)) {
+      badRequest(SerializerProp.error(EURLParameter.WRAP.toString(),
+          DataText.YES, DataText.NO));
     }
     return ser;
   }
-  
+
   /**
    * Returns a {@link Status#NOT_FOUND} exception.
    * @param info info string

@@ -18,21 +18,21 @@ com = "xquery 1 to 10"
 begin
   # create session
   session = Session.new("localhost", 1984, "admin", "admin")
-  
+
   # perform command and show result or error output
   if session.execute(com) == "\0"
     puts session.result
   else
    puts session.info
   end
-  
+
   # close session
   session.close
-  
+
   # print time needed
   time = (Time.now - start_time) * 1000
-  puts "#{time} ms." 
-  
+  puts "#{time} ms."
+
 rescue Exception => e
   # print exception
   puts e
