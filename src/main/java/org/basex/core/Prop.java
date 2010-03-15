@@ -51,11 +51,11 @@ public final class Prop extends AProp {
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };
 
-  /** Client/server communication: host. */
+  /** Client/server communication: host, used for connecting new clients. */
   public static final Object[] HOST = { "HOST", "localhost" };
-  /** Client/server communication: client port. */
+  /** Client/server communication: port, used for connecting new clients. */
   public static final Object[] PORT = { "PORT", 1984 };
-  /** Client/server communication: server port. */
+  /** Client/server communication: port, used for starting the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
 
   /** JAX-RX interface: web port. */
