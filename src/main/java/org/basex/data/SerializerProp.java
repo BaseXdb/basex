@@ -31,10 +31,10 @@ public final class SerializerProp extends AProp {
     "encoding", Token.UTF8 };
   /** Serialization parameter: yes/no. */
   public static final Object[] S_ESCAPE_URI_ATTRIBUTES = {
-    "escape-uri-attributes", YES };
+    "escape-uri-attributes", NO };
   /** Serialization parameter: yes/no. */
   public static final Object[] S_INCLUDE_CONTENT_TYPE = {
-    "include-content-type", YES };
+    "include-content-type", NO };
   /** Serialization parameter: yes/no. */
   public static final Object[] S_INDENT = {
     "indent", YES };

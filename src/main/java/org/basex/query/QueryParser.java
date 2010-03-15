@@ -542,8 +542,7 @@ public class QueryParser extends InputParser {
         }
         if(!found) error(NOMODULE, uri);
       }
-      final int ns = fl.size();
-      for(int n = 0; n < ns; n++) {
+      for(int n = 0; n < fl.size(); n++) {
         module(string(fl.get(n)), name.uri);
         modLoaded.add(uri);
       }
