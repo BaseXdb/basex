@@ -25,27 +25,30 @@ public final class StartJAXRX {
     // start database server (if not done yet)
     new BaseXServer();
 
-    // read database properties
+    // read default database properties from user home directory
     final Prop prop = new Prop(true);
 
     // set database server port
     System.setProperty("org.jaxrx.serverport",
         Integer.toString(prop.num(Prop.SERVERPORT)));
     // set path to web directory (needed by the 'run' parameter)
-    System.setProperty("org.jaxrx.webpath", prop.get(Prop.WEBPATH));
+    System.setProperty("org.jaxrx.httppath", prop.get(Prop.HTTPPATH));
 
     // set database user
     System.setProperty("org.jaxrx.user", "admin");
     // set database password
     System.setProperty("org.jaxrx.password", "admin");
 
+    // optional: set default serialization parameter
+    System.setProperty("org.jaxrx.parameter.output", "omit-xml-declaration=no");
+    
     // set name of implementation(s)
     System.setProperty("org.jaxrx.systemName", Text.NAMELC);
     // set path to implementation package(s)
     System.setProperty("org.jaxrx.systemPath",
         StartJAXRX.class.getPackage().getName());
 
-    // start Jetty web server
-    new StartJetty(prop.num(Prop.WEBPORT));
+    // start Jetty server
+    new StartJetty(prop.num(Prop.HTTPPORT));
   }
 }

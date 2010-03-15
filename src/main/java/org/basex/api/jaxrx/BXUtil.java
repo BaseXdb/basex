@@ -14,6 +14,7 @@ import javax.ws.rs.core.StreamingOutput;
 import org.basex.core.Prop;
 import org.basex.core.proc.List;
 import org.basex.core.proc.Open;
+import org.basex.core.proc.Run;
 import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
 import org.basex.data.DataText;
@@ -21,7 +22,6 @@ import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
 import org.basex.io.IO;
-import org.basex.io.XMLInput;
 import org.basex.server.ClientSession;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
@@ -126,26 +126,20 @@ public final class BXUtil {
    * @param cs client session
    * @param out output stream
    * @param par query parameters
+   * @throws IOException I/O exception
    */
   static void file(final ClientSession cs, final OutputStream out,
-      final Map<EURLParameter, String> par) {
+      final Map<EURLParameter, String> par) throws IOException {
 
-    // wrap start and counter around query expression
-    final String root = System.getProperty("org.jaxrx.webpath") + "/";
+    final String root = System.getProperty("org.jaxrx.httppath") + "/";
     String file = root + par.get(EURLParameter.RUN);
     if(!file.endsWith(".xq")) file += ".xq";
 
     final IO io = IO.get(file);
-    if(!io.exists()) throw new JAXRXException(404,
-        "Not found: " + par.get(EURLParameter.RUN));
+    if(!io.exists()) throw new JAXRXException(404, "Not found: " + io);
 
-    try {
-      final String query = new XMLInput(io).content().toString().trim();
-      par.put(EURLParameter.QUERY, query);
-      query(cs, out, par);
-    } catch(final IOException ex) {
-      throw new JAXRXException(400, ex.getMessage());
-    }
+    if(!cs.execute(new Run(io.path()), out))
+      throw new JAXRXException(400, cs.info());
   }
 
   /**
@@ -160,14 +154,16 @@ public final class BXUtil {
 
     // wrap start and counter around query expression
     final String query = par.get(EURLParameter.QUERY);
-    final String start = par.get(EURLParameter.START);
-    final String count = par.get(EURLParameter.COUNT);
-    final int s = start != null ? Integer.valueOf(start) : 1;
-    final int m = count != null ? Integer.valueOf(count) :
-      Integer.MAX_VALUE - s;
-    final String xquery = "(" + (query != null ? query : ".") +
-      ")[position() = " + s + " to " + (s + m - 1) + "]";
+    final String st = par.get(EURLParameter.START);
+    final String ct = par.get(EURLParameter.COUNT);
+    String xquery = query != null ? query : ".";
 
+    if(st != null || ct != null) {
+      final int s = st != null ? Integer.valueOf(st) : 1;
+      final int m = ct != null ? Integer.valueOf(ct) : Integer.MAX_VALUE - s;
+      xquery = "(" + query + ")[position() = " + s + " to " + (s + m - 1) + "]";
+    }
+    
     if(!cs.execute(new XQuery(xquery), out)) 
       throw new JAXRXException(400, cs.info());
   }
