@@ -14,8 +14,10 @@ import org.basex.data.XMLSerializer;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.ccil.cowan.tagsoup.*;
+import org.ccil.cowan.tagsoup.Parser;
+import org.ccil.cowan.tagsoup.XMLWriter;
 import org.xml.sax.InputSource;
+import org.xml.sax.XMLReader;
 
 /**
  * Test class for the use of the TagSoup HTML parser with BaseX.
@@ -60,7 +62,7 @@ public final class TagSoupExample {
   public static void useBaseXString(final String addr, final String name,
       final String query) throws Exception {
 
-    Parser parser = getParser();
+    XMLReader parser = getParser();
     InputSource is = getInputSource(addr, null);
     StringWriter sw = new StringWriter();
     parser.setContentHandler(new XMLWriter(sw));
@@ -82,7 +84,7 @@ public final class TagSoupExample {
       throws Exception {
 
     // create database instance
-    Parser parser = getParser();
+    XMLReader parser = getParser();
     InputSource is = getInputSource(addr, null);
     CONTEXT.openDB(CreateDB.xml(new SAXSource(parser, is), CONTEXT.prop));
 
@@ -101,8 +103,8 @@ public final class TagSoupExample {
    * @return the parser
    * @throws Exception toy example...
    */
-  private static Parser getParser() throws Exception {
-    Parser parser = new Parser();
+  private static XMLReader getParser() throws Exception {
+    XMLReader parser = new Parser();
     parser.setFeature("http://xml.org/sax/features/namespaces", false);
     return parser;
   }
