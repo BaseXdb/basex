@@ -148,23 +148,25 @@ public final class XMLSerializer extends Serializer {
     }
 
     // print document declaration
-    if(decl && mth != M_HTML && mth != M_TEXT) {
-      print(PI1);
-      print(DOCDECL1);
-      print(version);
-      print(DOCDECL2);
-      print(p.get(S_ENCODING));
-      if(!sa.equals(OMIT)) {
-        print(DOCDECL3);
-        print(sa);
+    if(mth != M_HTML && mth != M_TEXT) {
+      if(decl) {
+        print(PI1);
+        print(DOCDECL1);
+        print(version);
+        print(DOCDECL2);
+        print(p.get(S_ENCODING));
+        if(!sa.equals(OMIT)) {
+          print(DOCDECL3);
+          print(sa);
+        }
+        print(ATT2);
+        print(PI2);
+        ind = indent;
+      } else if(!sa.equals(OMIT) || version.equals(V11) && docsys != null) {
+        error(SERSTAND);
       }
-      print(ATT2);
-      print(PI2);
-      ind = indent;
-    } else if(!sa.equals(OMIT) || version.equals(V11) && docsys != null) {
-      error(SERSTAND);
     }
-
+    
     // open results element
     if(wrap) {
       openElement(concat(wrapPre, COL, RESULTS));

@@ -118,8 +118,9 @@ public class DBNode extends Nod {
     final boolean ns = name.ns();
     if(ns || data.ns.size() != 0) {
       final int n = ns ? data.ns.uri(nm, pre) : data.uri(pre, data.kind(pre));
-      name.uri = Uri.uri(n > 0 ? data.ns.uri(n) : ns ?
-          NSGlobal.uri(pref(nm)) : EMPTY);
+      final byte[] uri = n > 0 ? data.ns.uri(n) : ns ?
+          NSGlobal.uri(pref(nm)) : EMPTY;
+      name.uri = uri.length == 0 ? Uri.EMPTY : new Uri(uri);
     }
     return name;
   }

@@ -17,7 +17,7 @@ public final class Uri extends Str {
    * Constructor.
    * @param v value
    */
-  private Uri(final byte[] v) {
+  public Uri(final byte[] v) {
     super(v, Type.URI);
   }
 

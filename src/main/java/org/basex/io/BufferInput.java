@@ -105,15 +105,16 @@ public class BufferInput {
    * Empty constructor.
    * @param buf buffer
    */
-  public BufferInput(final byte[] buf) {
+  protected BufferInput(final byte[] buf) {
     buffer = buf;
     length = buf.length;
   }
 
   /**
    * Determines the file encoding.
+   * @return guessed encoding
    */
-  public final void encoding() {
+  public final String encoding() {
     final byte a = length > 0 ? buffer[0] : 0;
     final byte b = length > 1 ? buffer[1] : 0;
     final byte c = length > 2 ? buffer[2] : 0;
@@ -130,6 +131,7 @@ public class BufferInput {
       // BOM: ef bb bf
       pos = 3;
     }
+    return enc;
   }
 
   /**
@@ -174,10 +176,19 @@ public class BufferInput {
    * @throws IOException IO Exception
    */
   public String readString() throws IOException {
+    return content().toString();
+  }
+
+  /**
+   * Returns all input stream contents.
+   * @return token builder
+   * @throws IOException IO Exception
+   */
+  public TokenBuilder content() throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     byte l;
     while((l = readByte()) != 0) tb.add(l);
-    return tb.toString();
+    return tb;
   }
 
   /**

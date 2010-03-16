@@ -11,6 +11,11 @@ import org.basex.util.Atts;
 
 /**
  * This class defines a parser for creating databases from various sources.
+ * If TagSoup is found in the classpath, HTML files are automatically converted
+ * to well-formed XML.
+ * 
+ * TagSoup was written by John Cowan and licensed under Apache 2.0
+ * http://home.ccil.org/~cowan/XML/tagsoup/
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -18,6 +23,8 @@ import org.basex.util.Atts;
 public abstract class Parser extends Progress {
   /** Temporary attribute array. */
   protected final Atts atts = new Atts();
+  /** Optional HTML parser. */
+  private static HTMLParser html;
   /** Document flag; if true, a document node is added. */
   public boolean doc = true;
   /** Database properties. */
@@ -25,6 +32,11 @@ public abstract class Parser extends Progress {
   /** Input file. */
   public IO io;
 
+  // Check for existence of TagSoup.
+  static {
+    try { html = new HTMLParser(); } catch(final Exception ex) { }
+  }
+  
   /**
    * Constructor.
    * @param f file reference
@@ -37,14 +49,16 @@ public abstract class Parser extends Progress {
 
   /**
    * Returns an XML parser instance.
-   * @param io io reference
+   * @param in input
    * @param prop database properties
    * @return xml parser
    * @throws IOException I/O exception
    */
-  public static Parser xmlParser(final IO io, final Prop prop)
+  public static Parser xmlParser(final IO in, final Prop prop)
       throws IOException {
 
+    // optionally convert HTML input to well-formed xml
+    final IO io = html != null ? html.toXML(in) : in;
     // use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(io, prop);
     // use default parser
