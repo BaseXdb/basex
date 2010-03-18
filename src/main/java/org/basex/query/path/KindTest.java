@@ -37,6 +37,6 @@ public final class KindTest extends Test {
 
   @Override
   public String toString() {
-    return type + "()";
+    return type.toString(); // + "()"; [MS] removed to avoid        <SimpleIterStep axis="child" test="text()()"/>
   }
 }
