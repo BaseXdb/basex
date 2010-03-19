@@ -10,19 +10,19 @@ import org.basex.util.IntList;
 
 /**
  * This class determines nodes per level and caches them.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
 public class TreeCaching implements TreeViewOptions {
   /** Document depth. */
-  public int maxLevel = -1;
+  int maxLevel = -1;
   /** All nodes document nodes per level. */
-  private IntList[] nodes;
+  IntList[] nodes;
   /** Saved rectangles. */
-  public TreeRect[][][] rects;
+  TreeRect[][][] rects;
   /** Subtree borders. */
-  private TreeBorder[][] border;
+  TreeBorder[][] border;
   /** Window properties. */
   private GUIProp prop;
 
@@ -65,7 +65,7 @@ public class TreeCaching implements TreeViewOptions {
       lvlPre[0] = 0;
       for(int p = 1; p < ts; p++) {
         final int k = data.kind(p);
-        if(k == Data.ATTR) continue;
+        if(!SHOW_ATTR && k == Data.ATTR) continue;
         int lv = 0;
         final int par = data.parent(p, k);
         while(par != lvlPre[lv])
@@ -127,14 +127,14 @@ public class TreeCaching implements TreeViewOptions {
    * @param sw screen width
    * @return tree distance
    */
-  double generateBordersAndRects(final Graphics g,
-      final Context c, final int sw) {
+  double generateBordersAndRects(final Graphics g, 
+  final Context c, final int sw) {
     final Data d = c.current.data;
     final int[] roots = c.current.nodes;
     final int rl = roots.length;
     if(rl == 0) return -1;
     final TreeBorder[][] bo = new TreeBorder[rl][];
-    final double w = sw / (double) rl - 2 * LEFT_RIGHT_MARGIN;
+    final double w = (sw - BORDER_PADDING) / (double) rl;
     if(w == 0) return -1;
     rects = new TreeRect[rl][][];
 
@@ -228,8 +228,8 @@ public class TreeCaching implements TreeViewOptions {
    */
   private void bigRectangle(final int rn, final int lv, final double w) {
     rects[rn][lv] = new TreeRect[1];
-    rects[rn][lv][0] = new TreeRect((int)
-        (w * rn) + LEFT_RIGHT_MARGIN, (int) w);
+    rects[rn][lv][0] = new TreeRect((int) (w * rn) + BORDER_PADDING, (int) w
+        - BORDER_PADDING);
   }
 
   /**
@@ -244,10 +244,10 @@ public class TreeCaching implements TreeViewOptions {
   private void normalRectangle(final Graphics g, final int rn, final int lv,
       final Context c, final double w, final TreeBorder bo) {
 
- // new array, to be filled with the rectangles of the current level
+    // new array, to be filled with the rectangles of the current level
     rects[rn][lv] = new TreeRect[bo.size];
 
-    double xx = rn * w * bo.size + LEFT_RIGHT_MARGIN;
+    double xx = rn * w * bo.size;
     double ww = w;
 
     for(int i = bo.start; i < bo.start + bo.size; i++) {
@@ -262,7 +262,8 @@ public class TreeCaching implements TreeViewOptions {
           ww = o;
         }
       }
-      rects[rn][lv][i - bo.start] = new TreeRect((int) xx, (int) ww);
+      rects[rn][lv][i - bo.start] = new TreeRect((int) xx + BORDER_PADDING,
+          (int) ww - BORDER_PADDING);
 
       xx += w;
     }
@@ -356,7 +357,8 @@ public class TreeCaching implements TreeViewOptions {
    */
   int getPreIndex(final int rn, final int lv, final int pre) {
     final TreeBorder bo = getTreeBorder(rn, lv);
-    return searchPreIndex(bo.level, pre, pre, bo.start, bo.size - 1) - bo.start;
+    return searchPreIndex(bo.level, pre, pre, bo.start, bo.start + bo.size - 1)
+        - bo.start;
   }
 
   /**
@@ -471,8 +473,8 @@ public class TreeCaching implements TreeViewOptions {
   byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data;
     if(pre == c.current.nodes[rn]) return ViewData.path(d, pre);
-    if(d.fs != null && d.kind(pre) != Data.TEXT ||
-        d.kind(pre) == Data.ELEM) return ViewData.tag(
+    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM) 
+      return ViewData.tag(
         prop, d, pre);
     return ViewData.content(d, pre, false);
   }
@@ -494,6 +496,21 @@ public class TreeCaching implements TreeViewOptions {
    * @return boolean
    */
   boolean isBigRectangle(final int rn, final int lv) {
-    return getTreeBorder(rn, lv).size > rects[rn][lv].length;
+    return !(getTreeBorder(rn, lv).size == rects[rn][lv].length);
+  }
+
+  /**
+   * Returns pre value for given x position of a big rectangle.
+   * @param rn root
+   * @param lv level
+   * @param x x position
+   * @return pre value
+   */
+  int getPrePerXPos(final int rn, final int lv, final int x) {
+    final TreeBorder bo = getTreeBorder(rn, lv);
+    final TreeRect r = getTreeRectsPerLevel(rn, lv)[0];
+    final double ratio = (x - r.x) / (double) r.w;
+    final int idx = (int) (ratio * getLevelSize(rn, lv));
+    return getPrePerIndex(bo, idx);
   }
 }

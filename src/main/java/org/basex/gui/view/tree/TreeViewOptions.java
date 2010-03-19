@@ -9,13 +9,15 @@ package org.basex.gui.view.tree;
 public interface TreeViewOptions {
   // Options
   /** Use ChildIterator to cache nodes. */
-  boolean USE_CHILDITERATOR = false;
+  boolean USE_CHILDITERATOR = true;
   /** Draw only element nodes. */
-  boolean ONLY_ELEMENT_NODES = true;
+  boolean ONLY_ELEMENT_NODES = false;
+  /** Show Attributes. */
+  boolean SHOW_ATTR = false;
   /** Show ancestor nodes. */
   boolean SHOW_ANCESTORS = true;
   /** Show descendant nodes. */
-  boolean SHOW_DESCENDANTS = true;
+  boolean SHOW_DESCENDANTS = false;
   /** Show descendant connection. */
   boolean SHOW_DESCENDANTS_CONN = true;
   /** Draw rectangle border. */
@@ -25,22 +27,22 @@ public interface TreeViewOptions {
   /** Slim rectangles to text length. */
   boolean SLIM_TO_TEXT = true;
   /** Show extra node information. */
-  boolean SHOW_EXTRA_INFO = false;
+  boolean SHOW_EXTRA_INFO = true;
   /** Draw node text. */
   boolean DRAW_NODE_TEXT = true;
   /** Show 3d descendant connection. */
   boolean SHOW_3D_CONN = false;
-  /** Show connections in main image. **/
+  /** Show connections in main image. **/ 
   boolean SHOW_CONN_MI = true;
   /** Border padding value. */
   int BORDER_PADDING = 2;
   /** Margin to top. */
   int TOP_MARGIN = 2;
+  /** Margin left and right. */
+  int LEFT_AND_RIGHT_MARGIN = 4;
   /** Margin to bottom. */
   int BOTTOM_MARGIN = 5;
-  /** Margin left and right. */
-  int LEFT_RIGHT_MARGIN = 0;
-  /** Changes Color until given level. */
+  /** Changes Color until given level. */  
   int CHANGE_COLOR_TILL = 4;
 
   /** Minimum rectangle space for text. */
