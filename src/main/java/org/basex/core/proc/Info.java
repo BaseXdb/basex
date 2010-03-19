@@ -18,17 +18,18 @@ public final class Info extends AInfo {
    * Default constructor.
    */
   public Info() {
-    super(User.CREATE);
+    super(User.READ);
   }
 
   @Override
   protected boolean run() throws IOException {
-    Performance.gc(1);
-
     final TokenBuilder tb = new TokenBuilder();
     tb.add(INFOGENERAL + NL);
-    format(tb, INFODBPATH, prop.get(Prop.DBPATH));
-    format(tb, INFOMEM, Performance.getMem());
+    if(context.user.perm(User.CREATE)) {
+      Performance.gc(1);
+      format(tb, INFODBPATH, prop.get(Prop.DBPATH));
+      format(tb, INFOMEM, Performance.getMem());
+    }
     format(tb, INFOINFO, flag(prop.is(Prop.INFO)) +
         (prop.is(Prop.ALLINFO) ? " (" + INFOALL + ")" : ""));
 

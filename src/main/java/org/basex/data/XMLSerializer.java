@@ -15,7 +15,7 @@ import org.basex.util.TokenSet;
 import org.basex.util.Tokenizer;
 
 /**
- * This class serializes XML results.
+ * This class serializes trees as XML.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -29,7 +29,7 @@ public final class XMLSerializer extends Serializer {
   private static final byte[] COL = { ':' };
 
   /** HTML: elements with an empty content model. */
-  private static final TokenList EMPTY = new TokenList();
+  private static final TokenList EMPTIES = new TokenList();
   /** HTML: script elements. */
   private static final TokenList SCRIPTS = new TokenList();
   /** HTML: boolean attributes. */
@@ -166,7 +166,7 @@ public final class XMLSerializer extends Serializer {
         error(SERSTAND);
       }
     }
-    
+
     // open results element
     if(wrap) {
       openElement(concat(wrapPre, COL, RESULTS));
@@ -208,7 +208,9 @@ public final class XMLSerializer extends Serializer {
     print(' ');
     print(n);
 
-    final byte[] tagatt = concat(lc(tags.get(tags.size() - 1)), COL, lc(n));
+    final byte[] tagatt = mth == M_XML || tags.size() > 0 ? EMPTY :
+      concat(lc(tags.get(tags.size() - 1)), COL, lc(n));
+
     // don't append value for boolean attributes
     if(mth == M_HTML && BOOLEAN.id(tagatt) != 0) return;
     // escape URI attributes
@@ -386,7 +388,7 @@ public final class XMLSerializer extends Serializer {
       print(ELEM4);
     } else {
       final byte[] tag = tags.get(tags.size());
-      final boolean empty = EMPTY.contains(lc(tag));
+      final boolean empty = EMPTIES.contains(lc(tag));
       if(mth == M_XHTML && empty) {
         print(' ');
         print(ELEM4);
@@ -497,19 +499,19 @@ public final class XMLSerializer extends Serializer {
 
   // HTML Serializer: cache elements
   static {
-    EMPTY.add(token("area"));
-    EMPTY.add(token("base"));
-    EMPTY.add(token("br"));
-    EMPTY.add(token("col"));
-    EMPTY.add(token("hr"));
-    EMPTY.add(token("img"));
-    EMPTY.add(token("input"));
-    EMPTY.add(token("link"));
-    EMPTY.add(token("meta"));
-    EMPTY.add(token("basefont"));
-    EMPTY.add(token("frame"));
-    EMPTY.add(token("isindex"));
-    EMPTY.add(token("param"));
+    EMPTIES.add(token("area"));
+    EMPTIES.add(token("base"));
+    EMPTIES.add(token("br"));
+    EMPTIES.add(token("col"));
+    EMPTIES.add(token("hr"));
+    EMPTIES.add(token("img"));
+    EMPTIES.add(token("input"));
+    EMPTIES.add(token("link"));
+    EMPTIES.add(token("meta"));
+    EMPTIES.add(token("basefont"));
+    EMPTIES.add(token("frame"));
+    EMPTIES.add(token("isindex"));
+    EMPTIES.add(token("param"));
     SCRIPTS.add(token("script"));
     SCRIPTS.add(token("style"));
     BOOLEAN.add(token("area:nohref"));

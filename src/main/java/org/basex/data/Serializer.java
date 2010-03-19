@@ -8,7 +8,7 @@ import org.basex.util.IntList;
 import org.basex.util.TokenList;
 
 /**
- * This is an interface for serializing different kinds of query results.
+ * This is an interface for serializing trees.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

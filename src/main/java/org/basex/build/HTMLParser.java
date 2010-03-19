@@ -48,14 +48,14 @@ final class HTMLParser {
    */
   IO toXML(final IO io) {
     if(!io.path().endsWith(".htm") && !io.path().endsWith(".html")) return io;
-    
+
     try {
       // tries to extract the encoding from the input
       byte[] content = io.content();
       final BufferInput bi = new CachedInput(content);
       String enc = bi.encoding();
       content = bi.content().finish();
-      
+
       // looks for a charset definition
       byte[] encoding = token("charset=");
       int cs = indexOf(content, encoding);

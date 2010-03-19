@@ -10,7 +10,7 @@ import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
 
 /**
- * This class allows to output XML results via SAX.
+ * This class serializes trees in the DOT syntax.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

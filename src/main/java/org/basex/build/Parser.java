@@ -13,7 +13,7 @@ import org.basex.util.Atts;
  * This class defines a parser for creating databases from various sources.
  * If TagSoup is found in the classpath, HTML files are automatically converted
  * to well-formed XML.
- * 
+ *
  * TagSoup was written by John Cowan and licensed under Apache 2.0
  * http://home.ccil.org/~cowan/XML/tagsoup/
  *
@@ -36,7 +36,7 @@ public abstract class Parser extends Progress {
   static {
     try { html = new HTMLParser(); } catch(final Exception ex) { }
   }
-  
+
   /**
    * Constructor.
    * @param f file reference
