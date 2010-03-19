@@ -13,9 +13,9 @@ import org.jaxrx.StartJetty;
  * @author Lukas Lewandowski
  * @author Christian Gruen
  */
-public final class StartJAXRX {
+public final class StartJaxRx {
   /** Private constructor. */
-  private StartJAXRX() { }
+  private StartJaxRx() { }
 
   /**
    * This main method starts the JAXRX implementation.
@@ -29,24 +29,23 @@ public final class StartJAXRX {
     final Prop prop = new Prop(true);
 
     // set database server port
-    System.setProperty("org.jaxrx.serverport",
+    System.setProperty("org.basex.serverport",
         Integer.toString(prop.num(Prop.SERVERPORT)));
     // set path to web directory (needed by the 'run' parameter)
-    System.setProperty("org.jaxrx.httppath", prop.get(Prop.HTTPPATH));
+    System.setProperty("org.basex.httppath", prop.get(Prop.HTTPPATH));
 
     // set database user
-    System.setProperty("org.jaxrx.user", "admin");
+    System.setProperty("org.basex.user", "user");
     // set database password
-    System.setProperty("org.jaxrx.password", "admin");
+    System.setProperty("org.basex.password", "user");
 
-    // optional: set default serialization parameter
-    System.setProperty("org.jaxrx.parameter.output", "omit-xml-declaration=no");
-    
+    // optional: set default query parameters
+    System.setProperty("org.jaxrx.parameter.output",
+        "omit-xml-declaration=yes");
     // set name of implementation(s)
     System.setProperty("org.jaxrx.systemName", Text.NAMELC);
     // set path to implementation package(s)
-    System.setProperty("org.jaxrx.systemPath",
-        StartJAXRX.class.getPackage().getName());
+    System.setProperty("org.jaxrx.systemPath", BXJaxRx.class.getName());
 
     // start Jetty server
     new StartJetty(prop.num(Prop.HTTPPORT));
