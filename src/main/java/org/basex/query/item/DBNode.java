@@ -314,7 +314,7 @@ public class DBNode extends Nod {
       case ELM:
         return type + " " + string(nname()) + " { ... }";
       case DOC:
-        return type + " { \"" + string(base()) + "\" }";
+        return type + " { \"" + string(data.text(pre, true)) + "\" }";
       default:
         return type + " { \"" + Err.chop(str()) + "\" }";
     }
