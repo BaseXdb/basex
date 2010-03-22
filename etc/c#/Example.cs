@@ -23,12 +23,13 @@ namespace BaseX
 			
 			// command to be performed
 			string com = "xquery 1 to 10";
+			
 			try {
 				// create session
 				Session session = new Session("localhost", 1984, "admin", "admin");
 				
 				// perform command and show result or error output
-				if ((session.execute(com)) == "\0") {
+				if (session.execute(com)) {
 					Console.WriteLine(session.res());
 				} else {
 					Console.WriteLine(session.inf());
@@ -40,7 +41,6 @@ namespace BaseX
 				// print time needed
 				watch.Stop();
 				Console.WriteLine(watch.ElapsedMilliseconds + " ms.");
-				
 			} catch (Exception e) {
 				Console.WriteLine(e.Message);
 			}

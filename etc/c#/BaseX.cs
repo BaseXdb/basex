@@ -48,6 +48,7 @@ using System;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
+using System.Collections.Generic;
 
 namespace BaseX
 {
@@ -55,33 +56,36 @@ namespace BaseX
 	{
 		public NetworkStream stream = null;
 		public TcpClient socket = null;
-		public byte[] outStream = null;
-		public byte[] inStream = null;
 		public string result = "";
 		public string info = "";
+		public int bpos = 0;
+		public int bsize = 0;
+		public byte[] inStream = new byte[4096];
 		
 		/** Constructor, creating a new socket connection. */
 		public Session(string host, int port, string username, string pw) 
 		{
 			socket = new TcpClient(host, port);
 			stream = socket.GetStream();
+			init();
 			string ts = readString();
 			string h = md5(pw);
 			string hts = h + ts;
 			string end = md5(hts);
 			send(username + "\0");
 			send(end + "\0");
-			if (read() != "\0") {
+			if (stream.ReadByte() != 0) {
 			 	throw new Exception("Access denied.");
 			}
 		}
 		
 		/** Executes the specified command. */
-		public string execute(string com) {
+		public bool execute(string com) {
 			send(com + "\0");
+			init();
 			result = readString();
 			info = readString();
-			return read();
+			return read() == 0;
 		}
 		
 		/** Returns the result. */
@@ -96,45 +100,56 @@ namespace BaseX
 		
 		/** Closes the connection. */
 		public void close() {
-			send("exit");
+			send("exit \0");
 			socket.Close();
 		}
 		
-		/** Receives a single byte from the socket. */
-		private string read() {
-			inStream = new byte[1];
-			stream.Read(inStream, 0, 1);
-			string test = System.Text.Encoding.ASCII.GetString(inStream);
-            return test;
+		/** Initializes the byte transfer. */
+		private void init() {
+			bpos = 0;
+			bsize = 0;
 		}
 		
-		/** Returns the received string. */
-		private string readString() {
-			string complete = "";
-			string t = "";
-			while ((t = read()) != "\0") {
-				complete += t;
+		/** Returns a single byte from the socket. */
+		private byte read() {
+			if (bpos == bsize) {
+				bsize = stream.Read(inStream, 0, 4096);
+				bpos = 0;
 			}
-			return complete;
+			byte b = inStream[bpos];
+			bpos += 1;
+			return b;
+		}
+		
+		/** Receives a string from the socket. */
+		private string readString() {
+			List<byte> list = new List<byte>();
+			while (true) {
+				byte b = read();
+				if (b != 0) {
+					list.Add(b);
+				} else {
+					return System.Text.Encoding.UTF8.GetString(list.ToArray());;
+				}
+			}
 		}
 		
 		/** Sends strings to server. */
 		private void send(string message) {
-			outStream = System.Text.Encoding.ASCII.GetBytes(message);
+			byte[] outStream = System.Text.Encoding.UTF8.GetBytes(message);
 			stream.Write(outStream, 0, outStream.Length);
             stream.Flush();
 		}
 		
 		/** Returns the md5 hash of a string. */
 		private string md5(string input) {
-		var MD5 = new MD5CryptoServiceProvider();
-		var hashValue = new Byte[1];
-        byte[] bytes = Encoding.ASCII.GetBytes(input);
-        hashValue = MD5.ComputeHash(bytes);
-        var sb = new StringBuilder();
+			var MD5 = new MD5CryptoServiceProvider();
+			var hashValue = new Byte[1];
+        	byte[] bytes = Encoding.UTF8.GetBytes(input);
+        	hashValue = MD5.ComputeHash(bytes);
+        	var sb = new StringBuilder();
 
-		for (var i = 0; i <= hashValue.Length - 1; i++)
-            {
+			for (var i = 0; i <= hashValue.Length - 1; i++) {
                 sb.Append(hashValue[i].ToString("x2"));
             }
             return sb.ToString();
