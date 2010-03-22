@@ -49,6 +49,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 using System.Collections.Generic;
+using System.IO;
 
 namespace BaseX
 {
@@ -56,7 +57,7 @@ namespace BaseX
 	{
 		public NetworkStream stream = null;
 		public TcpClient socket = null;
-		public string result = "";
+		public MemoryStream result = null;
 		public string info = "";
 		public int bpos = 0;
 		public int bsize = 0;
@@ -80,17 +81,23 @@ namespace BaseX
 		}
 		
 		/** Executes the specified command. */
-		public bool execute(string com) {
+		public bool execute(string com, MemoryStream ms) {
 			send(com + "\0");
 			init();
-			result = readString();
+			readString(ms);
 			info = readString();
 			return read() == 0;
 		}
 		
+		/** Executes the specified command. */
+		public bool execute(string com) {
+			result = new MemoryStream();
+			return execute(com, result);
+		}
+		
 		/** Returns the result. */
 		public string res() {
-			return result;
+			return System.Text.Encoding.UTF8.GetString(result.GetBuffer());
 		}
 		
 		/** Returns the processing information. */
@@ -122,6 +129,18 @@ namespace BaseX
 		}
 		
 		/** Receives a string from the socket. */
+		private void readString(MemoryStream ms) {
+			while (true) {
+				byte b = read();
+				if (b != 0) {
+					ms.WriteByte(b);
+				} else {
+					break;
+				}
+			}
+		}
+		
+		/** Receives a string from the socket. */
 		private string readString() {
 			List<byte> list = new List<byte>();
 			while (true) {
@@ -129,7 +148,7 @@ namespace BaseX
 				if (b != 0) {
 					list.Add(b);
 				} else {
-					return System.Text.Encoding.UTF8.GetString(list.ToArray());;
+					return System.Text.Encoding.UTF8.GetString(list.ToArray());
 				}
 			}
 		}

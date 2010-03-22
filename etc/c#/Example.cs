@@ -41,6 +41,7 @@ namespace BaseX
 				// print time needed
 				watch.Stop();
 				Console.WriteLine(watch.ElapsedMilliseconds + " ms.");
+				Console.ReadLine();
 			} catch (Exception e) {
 				Console.WriteLine(e.Message);
 			}
