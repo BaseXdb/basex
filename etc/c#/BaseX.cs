@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ----------------------------------------------------------------------------- 
  * 
  * This C# module provides methods to connect to and communicate with the
@@ -143,11 +143,11 @@ namespace BaseX
 		
 		/** Returns the md5 hash of a string. */
 		private string md5(string input) {
-			var MD5 = new MD5CryptoServiceProvider();
-			var hashValue = new Byte[1];
+			MD5CryptoServiceProvider MD5 = new MD5CryptoServiceProvider();
+			byte[] hashValue = new byte[1];
         	byte[] bytes = Encoding.UTF8.GetBytes(input);
         	hashValue = MD5.ComputeHash(bytes);
-        	var sb = new StringBuilder();
+        	StringBuilder sb = new StringBuilder();
 
 			for (var i = 0; i <= hashValue.Length - 1; i++) {
                 sb.Append(hashValue[i].ToString("x2"));
