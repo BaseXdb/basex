@@ -69,7 +69,7 @@ abstract class BXCode {
    * @return root resource
    */
   String root(final ResourcePath path) {
-    if(path.depth() == 1) return path.getResource();
+    if(path.getDepth() == 1) return path.getResourcePath();
     throw new JaxRxException(404, "Resource '" + path + "' was not found.");
   }
 
@@ -112,10 +112,10 @@ abstract class BXCode {
    * @return string with serialization parameters
    */
   String params(final ResourcePath path) {
-    String ser = path.get(QueryParameter.OUTPUT);
+    String ser = path.getValue(QueryParameter.OUTPUT);
     if(ser == null) ser = "";
 
-    final String wrap = path.get(QueryParameter.WRAP);
+    final String wrap = path.getValue(QueryParameter.WRAP);
     // wrap results by default
     if(wrap == null || wrap.equals(DataText.YES)) {
       ser += "," + SerializerProp.S_WRAP_PRE[0] + "=" + JAXRX +

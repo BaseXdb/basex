@@ -33,7 +33,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
     out = os;
     if(path != null) {
       // open database if a single resource was specified
-      if(path.depth() != 0 && !cs.execute(new Open(root(path)))) 
+      if(path.getDepth() != 0 && !cs.execute(new Open(root(path)))) 
         throw new JaxRxException(404, cs.info());
 
       // set serialization parameters

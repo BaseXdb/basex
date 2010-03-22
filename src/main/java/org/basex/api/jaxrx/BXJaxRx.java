@@ -51,7 +51,7 @@ public final class BXJaxRx implements JaxRx {
 
   @Override
   public StreamingOutput get(final ResourcePath rp) {
-    if(rp.depth() != 0) return query(".", rp);
+    if(rp.getDepth() != 0) return query(".", rp);
 
     return new BXOutput(null) {
       @Override
@@ -81,8 +81,8 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() throws IOException {
         // wrap start and counter around query expression
-        final String st = path.get(QueryParameter.START);
-        final String ct = path.get(QueryParameter.COUNT);
+        final String st = path.getValue(QueryParameter.START);
+        final String ct = path.getValue(QueryParameter.COUNT);
         String xquery = query != null ? query : ".";
 
         if(st != null || ct != null) {
