@@ -193,7 +193,10 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   public void openResult() throws IOException {
-    if(wrap) openElement(concat(wrapPre, COL, RESULT));;
+    if(wrap) {
+      openElement(concat(wrapPre, COL, RESULT));;
+      ind = false;
+    }
   }
 
   @Override
