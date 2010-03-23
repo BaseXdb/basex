@@ -24,7 +24,7 @@
       <url>http://repository.codehaus.org/</url>
     </repository>
     <repository>
-      <id>disy-ukn</id>
+      <id>disy-ukn-snap</id>
       <name>DISY Maven Snapshot Repository</name>
       <url>http://xen5.disy.inf.uni-konstanz.de/repo/snapshotRepository</url>
     </repository>
