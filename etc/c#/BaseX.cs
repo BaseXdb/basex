@@ -62,6 +62,7 @@ namespace BaseX
 		public int bpos = 0;
 		public int bsize = 0;
 		public byte[] inStream = new byte[4096];
+		public int l = 0;
 		
 		/** Constructor, creating a new socket connection. */
 		public Session(string host, int port, string username, string pw) 
@@ -97,7 +98,8 @@ namespace BaseX
 		
 		/** Returns the result. */
 		public string res() {
-			return System.Text.Encoding.UTF8.GetString(result.GetBuffer());
+			string t = System.Text.Encoding.UTF8.GetString(result.GetBuffer());
+			return t.Remove(l, t.Length - l);
 		}
 		
 		/** Returns the processing information. */
@@ -135,6 +137,7 @@ namespace BaseX
 				if (b != 0) {
 					ms.WriteByte(b);
 				} else {
+					l = (int)ms.Length;
 					break;
 				}
 			}
