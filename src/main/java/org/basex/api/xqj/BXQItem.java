@@ -97,7 +97,8 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   }
 
   public String getItemAsString(final Properties props) throws XQException {
-    return serialize();
+    return it.node() && it.type != Type.TXT ? serialize() :
+      Token.string(it.str());
   }
 
   public XQItemType getItemType() throws XQException {
