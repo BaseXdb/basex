@@ -20,7 +20,10 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
+import org.basex.query.item.Itr;
+import org.basex.query.item.Nod;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
@@ -48,6 +51,7 @@ public final class FNBaseX extends Fun {
       case RANDOM: return random();
       case RUN:    return run(ctx);
       case DB:     return db(ctx);
+      case DBID:   return id(ctx);
       case FSPATH: return fspath(ctx);
       default:     return super.atomic(ctx);
     }
@@ -159,18 +163,31 @@ public final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item db(final QueryContext ctx) throws QueryException {
+  private DBNode db(final QueryContext ctx) throws QueryException {
     DBNode node = ctx.doc(checkStr(expr[0], ctx), false, true);
 
     if(expr.length == 2) {
       final Item it = expr[1].atomic(ctx);
       if(it == null) Err.empty(expr[1]);
       if(!it.u() && !it.n()) Err.num(info(), it);
-      final long pre = it.itr();
+      final int pre = node.data.pre((int) it.itr());
       if(pre < 0 || pre >= node.data.meta.size) Err.or(NOPRE, pre);
-      node = new DBNode(node.data, (int) pre);
+      node = new DBNode(node.data, pre);
     }
     return node;
+  }
+
+  /**
+   * Performs the db function.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Itr id(final QueryContext ctx) throws QueryException {
+    Nod node = checkNode(expr[0].atomic(ctx));
+    if(!(node instanceof DBNode)) Err.type(info(), Type.NOD, node);
+    final DBNode dbnode = (DBNode) node;
+    return Itr.get(dbnode.data.id(dbnode.pre));
   }
 
   /**
