@@ -57,12 +57,11 @@ namespace BaseX
 	{
 		public NetworkStream stream = null;
 		public TcpClient socket = null;
-		public MemoryStream result = null;
+		public Stream result = new MemoryStream();
 		public string info = "";
 		public int bpos = 0;
 		public int bsize = 0;
 		public byte[] inStream = new byte[4096];
-		public int l = 0;
 		
 		/** Constructor, creating a new socket connection. */
 		public Session(string host, int port, string username, string pw) 
@@ -70,7 +69,8 @@ namespace BaseX
 			socket = new TcpClient(host, port);
 			stream = socket.GetStream();
 			init();
-			string ts = readString();
+			readString();
+			string ts = res();
 			string h = md5(pw);
 			string hts = h + ts;
 			string end = md5(hts);
@@ -82,24 +82,24 @@ namespace BaseX
 		}
 		
 		/** Executes the specified command. */
-		public bool execute(string com, MemoryStream ms) {
+		public bool execute(string com, Stream s) {
+			result = s;
 			send(com + "\0");
 			init();
-			readString(ms);
-			info = readString();
+			readString();
+			info = readInfo();
 			return read() == 0;
 		}
 		
 		/** Executes the specified command. */
 		public bool execute(string com) {
-			result = new MemoryStream();
-			return execute(com, result);
+			return execute(com, new MemoryStream());
 		}
 		
 		/** Returns the result. */
 		public string res() {
-			string t = System.Text.Encoding.UTF8.GetString(result.GetBuffer());
-			return t.Remove(l, t.Length - l);
+			byte[] t = ((MemoryStream) result).ToArray();
+			return System.Text.Encoding.UTF8.GetString(t);
 		}
 		
 		/** Returns the processing information. */
@@ -131,27 +131,26 @@ namespace BaseX
 		}
 		
 		/** Receives a string from the socket. */
-		private void readString(MemoryStream ms) {
+		private void readString() {
 			while (true) {
 				byte b = read();
 				if (b != 0) {
-					ms.WriteByte(b);
+					result.WriteByte(b);
 				} else {
-					l = (int)ms.Length;
 					break;
 				}
 			}
 		}
 		
-		/** Receives a string from the socket. */
-		private string readString() {
-			List<byte> list = new List<byte>();
+		/** Receives an info string from the socket. */
+		private string readInfo() {
+			MemoryStream ms = new MemoryStream();
 			while (true) {
 				byte b = read();
 				if (b != 0) {
-					list.Add(b);
+					ms.WriteByte(b);
 				} else {
-					return System.Text.Encoding.UTF8.GetString(list.ToArray());
+					return System.Text.Encoding.UTF8.GetString(ms.ToArray());
 				}
 			}
 		}

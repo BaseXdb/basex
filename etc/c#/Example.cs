@@ -22,25 +22,31 @@ namespace BaseX
 			watch.Start();
 			
 			// command to be performed
-			string com = "xquery 1 to 10";
+			string com = "xquery doc('mediothek')";
 			
 			try {
 				// create session
 				Session session = new Session("localhost", 1984, "admin", "admin");
 				
-				// perform command and show result or error output
-				if (session.execute(com)) {
-					Console.WriteLine(session.res());
-				} else {
+				// perform command and write result to the specified output stream
+				if (!session.execute(com, Console.OpenStandardOutput())) {
 					Console.WriteLine(session.inf());
 				}
+				
+				// perform command and show result or error output
+				//if (session.execute(com)) {
+				//	Console.WriteLine(session.res());
+				//} else {
+				//	Console.WriteLine(session.inf());
+				//}
 				
 				// close session
 				session.close();
 				
 				// print time needed
 				watch.Stop();
-				Console.WriteLine(watch.ElapsedMilliseconds + " ms.");
+				Console.WriteLine("\n" + watch.ElapsedMilliseconds + " ms.");
+				Console.ReadLine();
 				
 			} catch (Exception e) {
 				Console.WriteLine(e.Message);
