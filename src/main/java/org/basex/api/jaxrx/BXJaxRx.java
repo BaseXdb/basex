@@ -81,22 +81,38 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() throws IOException {
         // wrap start and counter around query expression
-        final String st = path.getValue(QueryParameter.START);
-        final String ct = path.getValue(QueryParameter.COUNT);
-        String xquery = query != null ? query : ".";
+        final int s = num(rp, QueryParameter.START, 1);
+        final int m = num(rp, QueryParameter.COUNT, Integer.MAX_VALUE - s);
+        String xq = query != null ? query : ".";
 
-        if(st != null || ct != null) {
-          final int s = st != null ? Integer.valueOf(st) : 1;
-          final int m = ct != null ? Integer.valueOf(ct) :
-            Integer.MAX_VALUE - s;
-          xquery = "(" + query + ")[position() = " + s + " to " +
-            (s + m - 1) + "]";
-        }
-        exec(new XQuery(xquery), out);
+        if(s != 1 || m != Integer.MAX_VALUE - s)
+          xq = "(" + query + ")[position() = " + s + " to " + (s + m - 1) + "]";
+        exec(new XQuery(xq), out);
       }
     };
   }
 
+  /**
+   * Converts the specified query parameter to a positive integer.
+   * Throws an exception if the string is smaller than 1 or cannot be converted.
+   * @param rp resource path
+   * @param qp query parameter
+   * @param def default value
+   * @return integer
+   */
+  int num(final ResourcePath rp, final QueryParameter qp, final int def) {
+    final String val = rp.getValue(qp);
+    if(val == null) return def;
+
+    try {
+      final int i = Integer.parseInt(val);
+      if(i > 0) return i;
+    } catch(final NumberFormatException ex) {
+    }
+    throw new JaxRxException(400, "Parameter '" + qp +
+        "' is no valid integer: " + val);
+  }
+  
   @Override
   public StreamingOutput run(final String file, final ResourcePath rp) {
     return new BXOutput(rp) {
@@ -148,7 +164,7 @@ public final class BXJaxRx implements JaxRx {
   }
 
   @Override
-  public void create(final InputStream input, final ResourcePath rp) {
+  public void update(final InputStream input, final ResourcePath rp) {
     new BXCode() {
       @Override
       void code() throws IOException {
