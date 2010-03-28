@@ -199,7 +199,7 @@ public final class FNBaseX extends Fun {
   }
 
   /**
-   * Performs the contains lower case function.
+   * Performs the index function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
@@ -219,11 +219,11 @@ public final class FNBaseX extends Fun {
     }
     if(type.equals(TEXT)) {
       if(!data.meta.txtindex) Err.or(NOIDX, TEXT);
-      return new IndexAccess(expr[0], IndexType.TXT, ic).iter(ctx);
+      return new IndexAccess(Str.get(word), IndexType.TXT, ic).iter(ctx);
     }
     if(type.equals(ATTRIBUTE)) {
       if(!data.meta.atvindex) Err.or(NOIDX, ATTRIBUTE);
-      return new IndexAccess(expr[0], IndexType.ATV, ic).iter(ctx);
+      return new IndexAccess(Str.get(word), IndexType.ATV, ic).iter(ctx);
     }
 
     Err.or(WHICHIDX, type);
