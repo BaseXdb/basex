@@ -18,7 +18,7 @@ public abstract class Test {
     @Override
     public boolean eval(final Nod node) { return true; }
     @Override
-    public String toString() { return Type.NOD + "()"; }
+    public String toString() { return Type.NOD.toString(); }
   };
 
   /** Test types. */
