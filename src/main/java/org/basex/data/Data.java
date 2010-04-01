@@ -565,12 +565,12 @@ public abstract class Data {
         case ELEM:
           // add element
           final boolean ne = md.nsFlag(mpre);
-          byte[] nm = md.name(mpre, mk);
           if(ne) {
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
           }
           ns.open();
+          byte[] nm = md.name(mpre, mk);
           elem(dis, tags.index(nm, null, false), md.attSize(mpre, mk),
               md.size(mpre, mk), ns.uri(nm, true), ne);
           preStack[l++] = pre;
@@ -594,6 +594,7 @@ public abstract class Data {
           break;
       }
     }
+    
     while(l > 0) ns.close(preStack[--l]);
 
     if(bp != 0) insert(ipre + (mpre - 1) - (mpre - 1) % buf);

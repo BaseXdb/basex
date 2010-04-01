@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.util.Token.*;
+
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
@@ -108,7 +109,7 @@ public abstract class UpdatePrimitive {
    * @return true if nodes have been merged
    */
   public static boolean mergeTexts(final Data d, final int a, final int b) {
-    // some pre value checks to prevent databases errors
+    // some pre value checks to prevent database errors
     final int s = d.meta.size;
     if(a >= s || b >= s) return false;
     if(d.kind(a) != Data.TEXT || d.kind(b) != Data.TEXT) return false;
@@ -145,8 +146,9 @@ public abstract class UpdatePrimitive {
    * @throws QueryException query exception
    */
   private static int addNode(final Nod nd, final MemData m,
-      final int pre, final int par) throws QueryException {
-
+      final int pre, final int par) 
+  throws QueryException {
+    
     final int k = Nod.kind(nd.type);
     final int ms = m.meta.size;
     switch(k) {
@@ -193,6 +195,7 @@ public abstract class UpdatePrimitive {
         uri = q.uri.str();
         u = uri.length != 0 ? Math.abs(m.ns.addURI(uri)) : 0;
         final int tn = m.tags.index(q.str(), null, false);
+        m.ns.open();
         m.elem(pre - par, tn, size(nd, true), size(nd, false), u, ne);
         m.insert(ms);
         ir = nd.attr();

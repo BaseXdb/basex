@@ -152,7 +152,8 @@ final class NSNode {
   }
 
   /**
-   * Adds a child at the specified position.
+   * Finds a specific pre value in the child array utilizing binary search 
+   * and returns its position.
    * @param p pre value
    * @return node
    */

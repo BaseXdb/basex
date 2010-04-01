@@ -74,6 +74,7 @@ public final class Namespaces {
    * @param pre pre value
    */
   public void add(final byte[] p, final byte[] u, final int pre) {
+    // after open() -call, newns==false
     if(!newns) {
       root = root.add(new NSNode(pre));
       newns = true;

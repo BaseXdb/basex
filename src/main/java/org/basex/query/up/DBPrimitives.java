@@ -13,6 +13,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
+import org.basex.query.item.Uri;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -85,13 +86,16 @@ final class DBPrimitives extends Primitives {
       if(ups != null)
         for(final UpdatePrimitive up : ups) up.update(pool);
 
-      // pre values consists exclusively of element and attribute nodes
+      // pre values consist exclusively of element and attribute nodes
       if(d.kind(pre) == Data.ATTR) {
         il.add(pre);
       } else {
         final int ps = pre + d.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; p++) {
-          if(!il.contains(p)) pool.add(new QNm(d.name(p, Data.ATTR)), Type.ATT);
+          final byte[] nm = d.name(p, Data.ATTR);
+          // use Uri(name, uri) constructor for attributes with namespaces
+          if(!il.contains(p)) pool.add(new QNm(nm, 
+              new Uri((d.ns.uri(d.ns.uri(nm, p))))), Type.ATT);
         }
       }
     }
