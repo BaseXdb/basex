@@ -9,6 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.Token;
 
 /**
  * Some/Every satisfier clause.
@@ -110,7 +111,7 @@ public final class Satisfy extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
+    ser.openElement(this, TYPE, Token.token(every ? EVERY : SOME));
     for(final Expr f : fl) f.plan(ser);
     sat.plan(ser);
     ser.closeElement();
