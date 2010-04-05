@@ -24,6 +24,11 @@
       <url>http://repository.codehaus.org/</url>
     </repository>
     <repository>
+      <id>dbis-ukn</id>
+      <name>DBIS Maven Repository</name>
+      <url>http://www.inf.uni-konstanz.de/dbis/basex/maven</url>
+    </repository>
+    <repository>
       <id>disy-ukn-snap</id>
       <name>DISY Maven Snapshot Repository</name>
       <url>http://xen5.disy.inf.uni-konstanz.de/repo/snapshotRepository</url>
