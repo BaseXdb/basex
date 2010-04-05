@@ -36,7 +36,7 @@ import org.basex.util.Token;
  */
 public final class ClientSession extends Session {
   /** Socket reference. */
-  final Socket socket;
+  private final Socket socket;
   /** Output stream. */
   private final PrintOutput out;
   /** Input stream. */

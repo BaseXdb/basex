@@ -839,7 +839,7 @@ public enum Type {
    * null is returned by default.
    * @return result of check
    */
-  public Return returned() {
+  protected Return returned() {
     return num ? Return.NUM : node() ? Return.NOD :
       this == Type.STR ? Return.STR : Return.NONUM;
   }

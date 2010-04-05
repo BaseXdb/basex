@@ -37,14 +37,14 @@ public final class FTWords extends FTExpr {
   byte[] txt;
   /** Fast evaluation. */
   boolean fast;
-  /** Expression list. */
-  Expr query;
 
   /** All matches. */
   FTMatches all = new FTMatches((byte) 0);
   /** Flag for first evaluation. */
   boolean first;
 
+  /** Expression list. */
+  private Expr query;
   /** Minimum and maximum occurrences. */
   private Expr[] occ;
   /** Search mode. */

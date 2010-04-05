@@ -18,15 +18,15 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class SAXHandler extends DefaultHandler implements LexicalHandler {
+final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /** Temporary attribute array. */
-  final Atts atts = new Atts();
+  private final Atts atts = new Atts();
   /** Builder reference. */
-  final Builder builder;
+  private final Builder builder;
   /** Document name. */
-  final String name;
+  private final String name;
   /** DTD flag. */
-  boolean dtd;
+  private boolean dtd;
   /** Element counter. */
   int nodes;
   /** Document flag; if true, a document node is added. */
@@ -44,7 +44,7 @@ public final class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @param build builder reference
    * @param xml document name
    */
-  public SAXHandler(final Builder build, final String xml) {
+  SAXHandler(final Builder build, final String xml) {
     builder = build;
     name = xml;
   }

@@ -18,7 +18,7 @@ public final class BaseXBar extends BaseXPanel {
   /** Scrollbar size. */
   public static final int SIZE = 16;
   /** Maximum scrolling speed.  */
-  static final int MAXSTEP = 15;
+  private static final int MAXSTEP = 15;
   /** Animated scrollbar zooming steps. */
   static final int[] STEPS = { -MAXSTEP, -14, -11, -8, -6, -4, -3,
       -2, -1, -1, 0, 0, 1, 1, 2, 3, 4, 6, 8, 11, 14, MAXSTEP };
@@ -168,7 +168,7 @@ public final class BaseXBar extends BaseXPanel {
    * @param y vertical start value
    * @param focus focus flag
    */
-  void drawButton(final Graphics g, final int[][] pol, final int y,
+  private void drawButton(final Graphics g, final int[][] pol, final int y,
       final boolean focus) {
     BaseXLayout.drawCell(g, 0, ww, y, y + ww, focus);
     for(int i = 0; i < pol[0].length; i++) {

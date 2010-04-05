@@ -21,17 +21,17 @@ import org.basex.util.TokenBuilder;
  */
 public final class Values implements Index {
   /** Number of hash entries. */
-  int size;
+  private int size;
   /** ID references. */
-  final DataAccess idxr;
+  private final DataAccess idxr;
   /** ID lists. */
-  final DataAccess idxl;
+  private final DataAccess idxl;
   /** Value type (texts/attributes). */
-  final boolean text;
+  private final boolean text;
   /** Values file. */
-  final Data data;
+  private final Data data;
   /** Cache tokens. */
-  final FTTokenMap cache = new FTTokenMap();
+  private final FTTokenMap cache = new FTTokenMap();
 
   /**
    * Constructor, initializing the index structure.
@@ -104,7 +104,7 @@ public final class Values implements Index {
    * Returns next pre values.
    * @return compressed pre values
    */
-  public synchronized byte[] nextPres() {
+  synchronized byte[] nextPres() {
     if(idxr.pos() >= idxr.length()) return EMPTY;
     final int s = idxl.read4();
     final long v = idxr.read5(idxr.pos());

@@ -13,13 +13,13 @@ import org.basex.gui.GUIConstants;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BaseXSplitSep extends BaseXBack {
+final class BaseXSplitSep extends BaseXBack {
   /** Size of splitter. */
-  public static final int SIZE = 6;
+  static final int SIZE = 6;
   /** Color foreground. */
-  public static Color fore;
+  private static Color fore;
   /** Color background. */
-  public static Color back;
+  private static Color back;
   /** Layout: horizontal = true, vertical = false. */
   private final boolean l;
 
@@ -27,7 +27,7 @@ public final class BaseXSplitSep extends BaseXBack {
    * Constructor.
    * @param lay layout: horizontal = true, vertical = false
    */
-  public BaseXSplitSep(final boolean lay) {
+  BaseXSplitSep(final boolean lay) {
     setCursor(lay ? GUIConstants.CURSORMOVEH : GUIConstants.CURSORMOVEV);
     fore = getBackground();
     back = fore.darker();
@@ -64,7 +64,7 @@ public final class BaseXSplitSep extends BaseXBack {
    * @param e mouse event
    * @return absolute cursor position
    */
-  protected double pos(final MouseEvent e) {
+  double pos(final MouseEvent e) {
     final Point p = getLocationOnScreen();
     return l ? p.x + e.getX() : p.y + e.getY();
   }

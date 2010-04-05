@@ -17,15 +17,14 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class DialogMessage extends Dialog {
-
+final class DialogMessage extends Dialog {
   /**
    * Default constructor.
    * @param main reference to the main window
    * @param txt message text
    * @param ic message type
    */
-  public DialogMessage(final GUI main, final String txt, final Msg ic) {
+  DialogMessage(final GUI main, final String txt, final Msg ic) {
     super(main, ic == Msg.ERR ? DIALOGERR : DIALOGINFO, true);
 
     final BaseXBack p = new BaseXBack();

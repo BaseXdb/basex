@@ -18,23 +18,23 @@ import org.basex.util.TokenList;
 class ValueTree {
   /** Factor for resize. */
   static final double FACTOR = 1.2;
-  /** Tree structure [left, right, parent]. */
-  final IntList tree = new IntList(FACTOR);
   /** Tokens saved in the tree. */
   final TokenList tokens = new TokenList(FACTOR);
-  /** Flag if a node has been modified. */
-  final BoolList mod = new BoolList();
   /** Compressed pre values. */
   TokenList pres = new TokenList(FACTOR);
-  /** Tree root node. */
-  int root = -1;
   /** Mapping for usage of existing tree. */
   IntMap maps = new IntMap();
-
   /** Current iterator node. */
   int cn;
+
+  /** Tree structure [left, right, parent]. */
+  private final IntList tree = new IntList(FACTOR);
+  /** Flag if a node has been modified. */
+  private final BoolList mod = new BoolList();
+  /** Tree root node. */
+  private int root = -1;
   /** Last iterator node. */
-  int ln;
+  private int ln;
 
   /**
    * Check if specified token was already indexed; if yes, its pre
@@ -168,7 +168,7 @@ class ValueTree {
    * @param nd current node
    * @return left node
    */
-  protected int l(final int nd) {
+  private int l(final int nd) {
     return tree.get(nd * 3);
   }
 
@@ -177,7 +177,7 @@ class ValueTree {
    * @param nd current node
    * @return right node
    */
-  protected int r(final int nd) {
+  private int r(final int nd) {
     return tree.get(nd * 3 + 1);
   }
 

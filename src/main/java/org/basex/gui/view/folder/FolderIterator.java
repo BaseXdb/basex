@@ -91,7 +91,7 @@ final class FolderIterator {
    * Checks if there are more context nodes to check.
    * @return true for more data
    */
-  boolean moreCS() {
+  private boolean moreCS() {
     final Nodes current = view.gui.context.current;
     if(current == null || ++cp >= current.size()) return false;
     par = current.nodes[cp];
@@ -107,7 +107,7 @@ final class FolderIterator {
    * @param data data reference
    * @return true for more data
    */
-  boolean moreData(final Data data) {
+  private boolean moreData(final Data data) {
     level = ll;
     int kind = data.kind(pre);
     final boolean fs = data.fs != null;

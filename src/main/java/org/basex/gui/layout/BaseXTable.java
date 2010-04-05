@@ -22,10 +22,10 @@ import org.basex.util.Token;
 public final class BaseXTable extends JTable {
   /** Table data. */
   public Table data;
-  /** Table model. */
-  final TableModel model;
   /** Dialog instance. */
   final Dialog dialog;
+  /** Table model. */
+  private final TableModel model;
 
   /**
    * Default constructor.

@@ -13,20 +13,17 @@ import org.basex.util.TokenSet;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
-public final class PlotAxis {
+final class PlotAxis {
   /** Text length limit for text to number transformation. */
   private static final int TEXTLENGTH = 11;
   /** Plot data reference. */
   private final PlotData plotData;
   /** Tag reference to selected attribute. */
   int attrID;
-  /** True if attribute is a tag, false if attribute. */
-  boolean tag;
   /** Number of different categories for x attribute. */
   int nrCats;
   /** Data type. */
   Kind type;
-
   /** Coordinates of items. */
   double[] co = {};
   /** First label to be drawn after minimum label. */
@@ -47,10 +44,13 @@ public final class PlotAxis {
   double max;
   /** Axis uses logarithmic scale. */
   boolean log;
+
+  /** True if attribute is a tag, false if attribute. */
+  private boolean tag;
   /** Ln of min. */
-  double logMin;
+  private double logMin;
   /** Ln of max. */
-  double logMax;
+  private double logMax;
 
   /**
    * Constructor.
@@ -192,7 +192,7 @@ public final class PlotAxis {
    * @param value item value
    * @return relative x or y value of the item
    */
-  double calcPosition(final byte[] value) {
+  private double calcPosition(final byte[] value) {
     if(value.length == 0) {
       return -1;
     }

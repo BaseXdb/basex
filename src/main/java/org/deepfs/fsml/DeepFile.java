@@ -701,7 +701,7 @@ public final class DeepFile {
    * @param byteCount number of bytes of the xml document/fragment
    * @param xml the xml document/fragment
    */
-  public void addXML(final long pos, final int byteCount, final String xml) {
+  private void addXML(final long pos, final int byteCount, final String xml) {
     if(!extractXML() || xml.isEmpty()) return;
     if(xml.length() > context.prop.num(Prop.FSTEXTMAX))
       addText(pos, byteCount, xml);
@@ -936,7 +936,7 @@ public final class DeepFile {
    * @return the xml representation as string
    * @throws IOException if any error occurs
    */
-  public String toXML() throws IOException {
+  private String toXML() throws IOException {
     return FSMLSerializer.serialize(this);
   }
 
@@ -970,11 +970,11 @@ public final class DeepFile {
    */
   public static final class Content {
     /** offset inside the regular file. */
-    final long o;
+    private final long o;
     /** size of the text section. */
-    final int s;
+    private final int s;
     /** the content. */
-    final String t;
+    private final String t;
 
     /**
      * Constructor.

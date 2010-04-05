@@ -42,7 +42,7 @@ public final class Case extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Case comp(final QueryContext ctx, final Item it)
+  Case comp(final QueryContext ctx, final Item it)
       throws QueryException {
     if(var.name == null) {
       super.comp(ctx);

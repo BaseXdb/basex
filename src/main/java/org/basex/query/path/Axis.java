@@ -119,7 +119,7 @@ public enum Axis {
    * @param n axis string
    * @param d descendant flag
    */
-  Axis(final String n, final boolean d) {
+  private Axis(final String n, final boolean d) {
     name = n;
     down = d;
   }

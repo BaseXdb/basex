@@ -18,19 +18,19 @@ import org.basex.gui.layout.BaseXPassword;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class DialogPass extends Dialog {
+final class DialogPass extends Dialog {
   /** New password. */
-  final BaseXPassword pass;
+  private final BaseXPassword pass;
   /** Buttons. */
-  final BaseXBack buttons;
+  private final BaseXBack buttons;
   /** Info label. */
-  final BaseXLabel info;
+  private final BaseXLabel info;
 
   /**
    * Default constructor.
    * @param main reference to the main window
    */
-  public DialogPass(final GUI main) {
+  DialogPass(final GUI main) {
     super(main, ALTERPW);
 
     pass = new BaseXPassword(this);
@@ -73,7 +73,7 @@ public final class DialogPass extends Dialog {
    * Returns the password.
    * @return password
    */
-  public String pass() {
+  String pass() {
     return new String(pass.getPassword());
   }
 }

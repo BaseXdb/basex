@@ -25,16 +25,17 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 public final class SAXWrapper extends Parser {
+  /** File counter. */
+  long counter;
+  /** Current line. */
+  int line = 1;
+
   /** SAX Handler reference. */
   private SAXHandler sax;
   /** Optional XML reader. */
   private final SAXSource source;
   /** File length. */
   private long length;
-  /** File counter. */
-  long counter;
-  /** Current line. */
-  int line = 1;
 
   /**
    * Constructor.

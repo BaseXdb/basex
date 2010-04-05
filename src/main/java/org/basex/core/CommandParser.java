@@ -331,7 +331,7 @@ public final class CommandParser extends InputParser {
    * @return index
    * @throws QueryException query exception
    */
-  protected <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par)
+  private <E extends Enum<E>> E consume(final Class<E> cmp, final Cmd par)
       throws QueryException {
 
     final String token = name(null);
@@ -374,7 +374,7 @@ public final class CommandParser extends InputParser {
    * @param cmd input completions
    * @throws QueryException query exception
    */
-  protected void help(final StringList alt, final Cmd cmd)
+  private void help(final StringList alt, final Cmd cmd)
       throws QueryException {
     error(alt, PROCSYNTAX, cmd.help(true));
   }
@@ -414,7 +414,7 @@ public final class CommandParser extends InputParser {
    * @param e extension
    * @throws QueryException query exception
    */
-  public void error(final StringList comp, final String m, final Object... e)
+  private void error(final StringList comp, final String m, final Object... e)
       throws QueryException {
     final QueryException qe = new QueryException(m, e);
     qe.complete(this, comp);
@@ -426,7 +426,7 @@ public final class CommandParser extends InputParser {
    * @param comp input completions
    * @return string list
    */
-  public StringList list(final Enum<?>[] comp) {
+  private StringList list(final Enum<?>[] comp) {
     final StringList list = new StringList();
     for(final Enum<?> c : comp) list.add(c.name().toLowerCase());
     return list;

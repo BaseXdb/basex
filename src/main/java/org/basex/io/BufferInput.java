@@ -48,7 +48,7 @@ public class BufferInput {
    */
   public static void read(final File file, final byte[] cont)
       throws IOException {
-    new BufferInput(file, cont).close();
+    new BufferInput(new FileInputStream(file), cont).close();
   }
 
   /**
@@ -81,21 +81,11 @@ public class BufferInput {
 
   /**
    * Initializes the file reader.
-   * @param file the file to be read
-   * @param buf input buffer
-   * @throws IOException IO Exception
-   */
-  public BufferInput(final File file, final byte[] buf) throws IOException {
-    this(new FileInputStream(file), buf);
-  }
-
-  /**
-   * Initializes the file reader.
    * @param is input stream
    * @param b input buffer
    * @throws IOException IO Exception
    */
-  public BufferInput(final InputStream is, final byte[] b) throws IOException {
+  private BufferInput(final InputStream is, final byte[] b) throws IOException {
     this(b);
     in = is;
     next();
@@ -195,7 +185,7 @@ public class BufferInput {
    * Reads the next buffer entry.
    * @throws IOException I/O exception
    */
-  protected final void next() throws IOException {
+  private void next() throws IOException {
     pos = 0;
     len += size;
     size = in.read(buffer);

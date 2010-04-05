@@ -114,14 +114,14 @@ public class QueryParser extends InputParser {
   private final TokenBuilder tok = new TokenBuilder();
 
   /** List of loaded modules. */
-  public TokenList modLoaded = new TokenList();
+  private TokenList modLoaded = new TokenList();
   /** Module name. */
   private QNm module;
 
   /** Alternative error output. */
-  protected Object[] alter;
+  private Object[] alter;
   /** Alternative position. */
-  protected int ap;
+  private int ap;
 
   /** Declaration flag. */
   private boolean declElem;
@@ -369,9 +369,7 @@ public class QueryParser extends InputParser {
    */
   private void revalidationDecl() throws QueryException {
     if(declReval) error(DUPLREVAL);
-    ctx.revalidate = consumeWS2(STRICT) ? 0 : consumeWS2(LAX) ? 1 :
-        consumeWS2(SKIP) ? 2 : -1;
-    declReval = true;
+    declReval = consumeWS2(STRICT) || consumeWS2(LAX) || consumeWS2(SKIP);
     error(NOREVAL);
   }
 
@@ -678,7 +676,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  protected final Expr expr() throws QueryException {
+  private Expr expr() throws QueryException {
     final Expr e = single();
     if(e == null) {
       if(more()) return null;
@@ -1223,7 +1221,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  public final Expr path() throws QueryException {
+  private Expr path() throws QueryException {
     checkInit();
     final int s = consume('/') ? consume('/') ? 2 : 1 : 0;
     if(s > 0) checkAxis(s == 2 ? Axis.DESC : Axis.CHILD);
@@ -1277,7 +1275,7 @@ public class QueryParser extends InputParser {
    * Returns a standard descendant-or-self::node() step.
    * @return step
    */
-  protected final Step descOrSelf() {
+  private Step descOrSelf() {
     return Step.get(Axis.DESCORSELF, Test.NODE);
   }
 
@@ -1315,7 +1313,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  protected final Expr step() throws QueryException {
+  private Expr step() throws QueryException {
     final Expr e = filter();
     return e != null ? e : axis();
   }
@@ -1325,7 +1323,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  final Step axis() throws QueryException {
+  private Step axis() throws QueryException {
     Axis ax = null;
     Test test = null;
     if(consumeWS2(DOT2)) {
@@ -2663,7 +2661,7 @@ public class QueryParser extends InputParser {
    * @param tb token builder
    * @throws QueryException query exception
    */
-  final void entity(final TokenBuilder tb) throws QueryException {
+  private void entity(final TokenBuilder tb) throws QueryException {
     final String ent = ent(tb);
     if(ent != null) error(ENTINVALID, ent);
   }
@@ -2675,7 +2673,7 @@ public class QueryParser extends InputParser {
    * @return expression
    * @throws QueryException query exception
    */
-  protected final Expr check(final Expr expr, final Object[] err)
+  private Expr check(final Expr expr, final Object[] err)
       throws QueryException {
     if(expr == null) error(err);
     return expr;
@@ -2697,7 +2695,7 @@ public class QueryParser extends InputParser {
    * @param s string to be found
    * @throws QueryException query exception
    */
-  protected final void check(final String s) throws QueryException {
+  private void check(final String s) throws QueryException {
     if(!consumeWS2(s)) error(WRONGCHAR, s, found());
   }
 
@@ -2740,7 +2738,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    * @throws QueryException query exception
    */
-  protected final boolean consumeWS(final String s1, final String s2,
+  private boolean consumeWS(final String s1, final String s2,
       final Object[] expr) throws QueryException {
     final int p = qp;
     if(!consumeWS(s1)) return false;
@@ -2758,7 +2756,7 @@ public class QueryParser extends InputParser {
    * @return true if string was found
    * @throws QueryException query exception
    */
-  protected final boolean consumeWS2(final String str) throws QueryException {
+  private boolean consumeWS2(final String str) throws QueryException {
     skipWS();
     return consume(str);
   }
@@ -2816,7 +2814,7 @@ public class QueryParser extends InputParser {
    * Throws the alternative error message.
    * @throws QueryException query exception
    */
-  final void error() throws QueryException {
+  private void error() throws QueryException {
     qp = ap;
     if(alter.length != 1) error(alter);
     ctx.fun.funError((QNm) alter[0]);
@@ -2840,9 +2838,7 @@ public class QueryParser extends InputParser {
    * @return new array
    * @throws QueryException query exception
    */
-  protected final Expr[] add(final Expr[] ar, final Expr e)
-      throws QueryException {
-
+  private Expr[] add(final Expr[] ar, final Expr e) throws QueryException {
     if(e == null) error(INCOMPLETE);
     final int a = ar.length;
     final Expr[] tmp = new Expr[a + 1];

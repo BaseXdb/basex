@@ -23,7 +23,7 @@ public final class TypeSwitch extends Expr {
   /** Typeswitch expression. */
   private Expr ts;
   /** Expression list. */
-  public Case[] cs;
+  private Case[] cs;
 
   /**
    * Constructor.

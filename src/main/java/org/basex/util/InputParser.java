@@ -208,7 +208,7 @@ public abstract class InputParser {
    * @param p start position
    * @return entity
    */
-  protected final String invalidEnt(final int p) {
+  private String invalidEnt(final int p) {
     final String sub = qu.substring(p, Math.min(p + 20, ql));
     final int sc = sub.indexOf(';');
     final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;

@@ -49,16 +49,14 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
   private static final String PATNUM = "[% >= % and % <= %]";
   /** Simple search pattern. */
   private static final String PATSIMPLE = "[%]";
-
   /** Main panel. */
-  final ExploreView main;
-
+  private final ExploreView main;
   /** Main panel. */
-  final BaseXBack panel;
+  private final BaseXBack panel;
   /** Query field. */
-  final BaseXTextField all;
+  private final BaseXTextField all;
   /** Last Query. */
-  String last = "";
+  private String last = "";
 
   /**
    * Default constructor.

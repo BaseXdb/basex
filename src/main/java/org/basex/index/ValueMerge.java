@@ -14,18 +14,18 @@ import org.basex.io.IO;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class ValueMerge {
+final class ValueMerge {
   /** Data reference. */
   private final Data data;
   /** Text flag. */
   private final boolean text;
 
   /** Data input reference. */
-  final DataInput di;
+  private final DataInput di;
   /** Index instance. */
-  final Values v;
+  private final Values v;
   /** Index id. */
-  final int id;
+  private final int id;
   /** Current text. */
   byte[] t;
   /** Current pre values. */

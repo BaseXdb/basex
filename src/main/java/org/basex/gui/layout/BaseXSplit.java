@@ -48,7 +48,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
    * Starts split pane dragging.
    * @param p position
    */
-  public void startDrag(final double p) {
+  void startDrag(final double p) {
     d = p;
     t = s.clone();
   }
@@ -58,7 +58,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
    * @param sep separator
    * @param p current position
    */
-  public void drag(final BaseXSplitSep sep, final double p) {
+  void drag(final BaseXSplitSep sep, final double p) {
     final Component[] m = getComponents();
     final int r = s.length;
     int q = 0;

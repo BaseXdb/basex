@@ -49,7 +49,7 @@ import org.basex.util.TokenList;
  * @author Sebastian Gath
  * @author Christian Gruen
  */
-public final class FTTrieBuilder extends FTBuilder {
+final class FTTrieBuilder extends FTBuilder {
   /** Trie index. */
   private FTArray index = new FTArray(128);
   /** Hash structure for temporarily saving the tokens. */
@@ -198,7 +198,7 @@ public final class FTTrieBuilder extends FTBuilder {
    * @return next token
    * @throws IOException I/O exception
    */
-  protected byte[] nextToken(final FTSortedList[] v, final int m)
+  private byte[] nextToken(final FTSortedList[] v, final int m)
       throws IOException {
 
     if(v[m] != null) {
@@ -215,7 +215,7 @@ public final class FTTrieBuilder extends FTBuilder {
    * @param roots root nodes
    * @throws IOException I/O exception
    */
-  void writeSplitTrie(final IntList roots) throws IOException {
+  private void writeSplitTrie(final IntList roots) throws IOException {
     final DataAccess t = new DataAccess(data.meta.file(DATAFTX + 't'));
     final DataOutput outN = new DataOutput(data.meta.file(DATAFTX + 'a'));
     final DataOutput outS = new DataOutput(data.meta.file(DATAFTX + 'c'));
@@ -332,7 +332,7 @@ public final class FTTrieBuilder extends FTBuilder {
    * Write trie structure to disk.
    * @throws IOException I/O exception
    */
-  void writeCompleteTrie() throws IOException {
+  private void writeCompleteTrie() throws IOException {
     if(scm == 0) hash.init();
     else hash.initIter();
     final DataOutput outb = new DataOutput(data.meta.file(DATAFTX + 'b'));
@@ -393,7 +393,7 @@ public final class FTTrieBuilder extends FTBuilder {
    * @param cs current file
    * @throws IOException I/O exception
    */
-  void writeSortedList(final int cs) throws IOException {
+  private void writeSortedList(final int cs) throws IOException {
     final String s = DATAFTX + (merge ? Integer.toString(cs) : "");
     final DataOutput outa = new DataOutput(data.meta.file(s + 'a'));
     final DataOutput outb = new DataOutput(data.meta.file(s + 'b'));

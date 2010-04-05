@@ -325,7 +325,7 @@ public enum FunDef {
    * @param dsc description
    * @param rt return value
    */
-  FunDef(final byte[] ur, final Class<? extends Fun> fun, final int mn,
+  private FunDef(final byte[] ur, final Class<? extends Fun> fun, final int mn,
       final int mx, final String dsc, final Return rt) {
     uri = ur;
     func = fun;

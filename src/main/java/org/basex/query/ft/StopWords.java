@@ -44,7 +44,7 @@ public final class StopWords extends TokenSet {
    * Compiles the full-text options.
    * @param ctx query context
    */
-  public void comp(final QueryContext ctx) {
+  void comp(final QueryContext ctx) {
     // stop words have already been defined..
     if(size() != 0 || !(ctx.item instanceof DBNode)) return;
     // try to parse the stop words file of the current database

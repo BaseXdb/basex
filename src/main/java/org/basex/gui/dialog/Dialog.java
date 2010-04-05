@@ -50,7 +50,7 @@ public abstract class Dialog extends JDialog {
    * @param main reference to main window
    * @param title dialog title
    */
-  public Dialog(final GUI main, final String title) {
+  protected Dialog(final GUI main, final String title) {
     this(main, title, true);
   }
 
@@ -60,7 +60,7 @@ public abstract class Dialog extends JDialog {
    * @param title dialog title
    * @param modal modal flag
    */
-  public Dialog(final GUI main, final String title, final boolean modal) {
+  protected Dialog(final GUI main, final String title, final boolean modal) {
     super(main, title, modal);
     gui = main;
     panel = new BaseXBack();

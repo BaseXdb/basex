@@ -22,7 +22,7 @@ public final class Names extends TokenSet {
   /** Statistic information. */
   private StatsKey[] stat;
   /** total number of entries. */
-  public int tn;
+  private int tn;
 
   /**
    * Default constructor.

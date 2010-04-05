@@ -94,8 +94,9 @@ final class DBPrimitives extends Primitives {
         for(int p = pre + 1; p < ps; p++) {
           final byte[] nm = d.name(p, Data.ATTR);
           // use Uri(name, uri) constructor for attributes with namespaces
+          // [LK] seems to cause some NullPointerExceptions...
           if(!il.contains(p)) pool.add(new QNm(nm, 
-              new Uri((d.ns.uri(d.ns.uri(nm, p))))), Type.ATT);
+              new Uri(d.ns.uri(d.ns.uri(nm, p)))), Type.ATT);
         }
       }
     }

@@ -122,7 +122,7 @@ public final class BaseXFileChooser {
   /**
    * Defines a file filter for XML documents.
    */
-  static class Filter extends FileFilter {
+  private static class Filter extends FileFilter {
     /** Suffix. */
     private final String suf;
     /** Description. */

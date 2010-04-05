@@ -14,7 +14,7 @@ import org.basex.core.Prop;
  */
 public final class Set extends Proc {
   /** Info strings (same order as options defined in {@link CmdSet}). */
-  static final String[] STRINGS = {
+  private static final String[] STRINGS = {
     INFOINFO, INFODEBUG, INFOSERIALIZE, INFOCHOP, INFOENTITY, INFOTEXTINDEX,
     INFOATTRINDEX, INFOFTINDEX, INFOPATHINDEX, INFODBPATH
   };

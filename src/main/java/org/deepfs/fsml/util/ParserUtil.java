@@ -122,7 +122,7 @@ public final class ParserUtil {
    * @param gc the calendar value to convert
    * @return the calendar
    */
-  public static XMLGregorianCalendar convertDateTime(
+  private static XMLGregorianCalendar convertDateTime(
       final GregorianCalendar gc) {
     final XMLGregorianCalendar xgc = factory == null ? null
         : factory.newXMLGregorianCalendar(gc);

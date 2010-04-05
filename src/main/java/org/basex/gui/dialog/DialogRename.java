@@ -20,17 +20,17 @@ import org.basex.util.StringList;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class DialogRename extends Dialog {
-  /** Old name. */
-  final String old;
+final class DialogRename extends Dialog {
   /** New name. */
   final BaseXTextField name;
+  /** Old name. */
+  private final String old;
   /** Buttons. */
-  final BaseXBack buttons;
+  private final BaseXBack buttons;
   /** Info label. */
-  final BaseXLabel info;
+  private final BaseXLabel info;
   /** Available databases. */
-  final StringList db;
+  private final StringList db;
 
   /**
    * Default constructor.
@@ -38,7 +38,7 @@ public final class DialogRename extends Dialog {
    * @param main reference to the main window
    * @param fs file system flag
    */
-  public DialogRename(final String dbname, final GUI main, final boolean fs) {
+  DialogRename(final String dbname, final GUI main, final boolean fs) {
     super(main, RENAMETITLE);
     old = dbname;
     db = fs ? List.listFS(main.context) : List.list(main.context);

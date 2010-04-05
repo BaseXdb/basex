@@ -94,7 +94,7 @@ public enum MimeType {
    * @param defaultSuffix the default file suffix for the MIME type
    * @param mt the associated meta types
    */
-  MimeType(final String value, final String defaultSuffix,
+  private MimeType(final String value, final String defaultSuffix,
       final FileType... mt) {
     val = value;
     suf = defaultSuffix;

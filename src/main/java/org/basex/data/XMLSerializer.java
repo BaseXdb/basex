@@ -183,7 +183,7 @@ public final class XMLSerializer extends Serializer {
    * @param ext text text extensions
    * @throws IOException I/O exception
    */
-  public static void error(final Object str, final Object... ext)
+  private static void error(final Object str, final Object... ext)
       throws IOException {
     throw new IOException(Main.info(str, ext));
   }

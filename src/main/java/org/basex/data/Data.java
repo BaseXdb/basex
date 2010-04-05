@@ -293,7 +293,7 @@ public abstract class Data {
    * @param k node kind
    * @return distance
    */
-  protected final int dist(final int pre, final int k) {
+  private int dist(final int pre, final int k) {
     switch(k) {
       case ELEM: return table.read4(pre, 4);
       case TEXT:

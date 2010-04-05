@@ -33,7 +33,7 @@ public final class FComm extends FNode {
    * @param node DOM node
    * @param parent parent reference
    */
-  public FComm(final Node node, final Nod parent) {
+  FComm(final Node node, final Nod parent) {
     this(Token.token(node.getNodeValue()), parent);
   }
 

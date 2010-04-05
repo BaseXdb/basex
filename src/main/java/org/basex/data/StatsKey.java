@@ -30,12 +30,12 @@ public final class StatsKey {
   public double min;
   /** Maximum value. */
   public double max;
-  /** Average text-length. */
-  public double len;
   /** Number of occurrences. */
   public int counter;
   /** Leaf node flag. */
   public boolean leaf;
+  /** Average text-length. */
+  private double len;
 
   /**
    * Default constructor.

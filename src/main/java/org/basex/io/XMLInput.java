@@ -13,16 +13,15 @@ import org.basex.util.TokenBuilder;
  */
 public final class XMLInput {
   /** Input stream reference. */
-  BufferInput[] in = new BufferInput[1];
-
+  private BufferInput[] in = new BufferInput[1];
   /** Input pointer. */
-  int ip;
+  private int ip;
   /** Input file. */
-  IO file;
+  private IO file;
   /** Current line. */
-  int line = 1;
+  private int line = 1;
   /** Current column. */
-  int col = 1;
+  private int col = 1;
 
   /** Buffer with most current characters. */
   private final int[] last = new int[16];

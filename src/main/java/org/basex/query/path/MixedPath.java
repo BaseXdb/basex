@@ -83,7 +83,7 @@ public final class MixedPath extends Path {
    * @return resulting item
    * @throws QueryException query exception
    */
-  protected Item eval(final QueryContext ctx) throws QueryException {
+  private Item eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...
     Item it = ctx.item;
     for(final Expr s : step) {

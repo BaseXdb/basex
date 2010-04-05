@@ -35,7 +35,7 @@ import org.deepfs.fs.DeepFS;
  */
 public final class TableView extends View implements Runnable {
   /** Zoom table. */
-  static final double[] ZOOM = {
+  private static final double[] ZOOM = {
     1, .99, .98, .97, 1, 1.03, 1.05, .9, .8, .6, .35, .18, .13, .09, .05, .03
   };
   /** Current zoom step. */

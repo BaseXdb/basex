@@ -38,6 +38,9 @@ import org.basex.util.Token;
  * @author Alexander Holupirek
  */
 public final class DialogMountFS extends Dialog {
+  /** Mountpoint path. */
+  final BaseXTextField mountpoint;
+
   /** List of currently available databases. */
   private final BaseXListChooser choice;
   /** Information panel. */
@@ -52,8 +55,6 @@ public final class DialogMountFS extends Dialog {
   private final BaseXLabel warn;
   /** Buttons. */
   private final BaseXBack buttons;
-  /** Mountpoint path. */
-  final BaseXTextField mountpoint;
 
   /**
    * Default constructor.

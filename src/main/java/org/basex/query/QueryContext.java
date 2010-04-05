@@ -58,8 +58,6 @@ public final class QueryContext extends Progress {
   public HashMap<String, String> stop;
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
-  /** Query string. */
-  public String query;
 
   /** Namespaces. */
   public NSLocal ns = new NSLocal();
@@ -124,15 +122,13 @@ public final class QueryContext extends Progress {
   public boolean ordered;
   /** Construction mode. */
   public boolean construct;
-  /** Revalidation Mode. */
-  public int revalidate;
 
   /** String container for query background information. */
-  final TokenBuilder info = new TokenBuilder();
+  private final TokenBuilder info = new TokenBuilder();
   /** Optimization flag. */
-  boolean firstOpt = true;
+  private boolean firstOpt = true;
   /** Evaluation flag. */
-  boolean firstEval = true;
+  private boolean firstEval = true;
 
   /** List of modules. */
   StringList modules = new StringList();
@@ -178,7 +174,6 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void parse(final String q) throws QueryException {
-    query = q;
     root = new QueryParser(this).parse(q, file(), null);
   }
 
@@ -188,7 +183,6 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void module(final String q) throws QueryException {
-    query = q;
     new QueryParser(this).parse(q, file(), Uri.EMPTY);
   }
 
@@ -443,7 +437,7 @@ public final class QueryContext extends Progress {
    * Adds a document to the document array.
    * @param node node to be added
    */
-  public void addDoc(final DBNode node) {
+  private void addDoc(final DBNode node) {
     if(docs == doc.length) doc = Arrays.copyOf(doc, docs << 1);
     doc[docs++] = node;
   }
@@ -547,7 +541,7 @@ public final class QueryContext extends Progress {
    * Returns an IO representation of the base uri.
    * @return IO reference
    */
-  public IO file() {
+  IO file() {
     return baseURI != Uri.EMPTY ? IO.get(string(baseURI.str())) : null;
   }
 
@@ -555,7 +549,7 @@ public final class QueryContext extends Progress {
    * Returns query background information.
    * @return warning
    */
-  public String info() {
+  String info() {
     return info.toString();
   }
 

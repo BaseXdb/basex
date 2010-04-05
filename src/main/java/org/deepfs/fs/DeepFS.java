@@ -147,8 +147,6 @@ public final class DeepFS implements DataText {
   public int uidID;
   /** Index References. */
   public int gidID;
-  /** Index References. */
-  public int contentID;
 
   /** OS user id. */
   private long sUID;
@@ -200,7 +198,6 @@ public final class DeepFS implements DataText {
     deepfsID       = data.tags.index(DEEPFS,       null, false);
     dirID          = data.tags.index(DIR,          null, false);
     fileID         = data.tags.index(FILE,         null, false);
-    contentID      = data.tags.index(CONTENT,      null, false);
     backingstoreID = data.atts.index(BACKINGSTORE, null, false);
     mountpointID   = data.atts.index(MOUNTPOINT,   null, false);
     nameID         = data.atts.index(NAME,         null, false);

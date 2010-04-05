@@ -14,15 +14,15 @@ import org.basex.util.IntList;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
-public class TreeCaching implements TreeViewOptions {
+final class TreeCaching implements TreeViewOptions {
   /** Document depth. */
   int maxLevel = -1;
   /** All nodes document nodes per level. */
-  IntList[] nodes;
+  private IntList[] nodes;
   /** Saved rectangles. */
-  TreeRect[][][] rects;
+  private TreeRect[][][] rects;
   /** Subtree borders. */
-  TreeBorder[][] border;
+  private TreeBorder[][] border;
   /** Window properties. */
   private GUIProp prop;
 
@@ -441,7 +441,7 @@ public class TreeCaching implements TreeViewOptions {
    * @param pre the pre value to be found
    * @return the rectangle containing the given pre value, null else
    */
-  TreeRect searchRect(final int rn, final int lv, final TreeBorder bo,
+  private TreeRect searchRect(final int rn, final int lv, final TreeBorder bo,
       final int pre) {
     final int i = searchPreArrayPos(bo, pre);
 

@@ -16,7 +16,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class Path extends Expr {
+abstract class Path extends Expr {
   /** Top expression. */
   public Expr root;
 
@@ -24,7 +24,7 @@ public abstract class Path extends Expr {
    * Constructor.
    * @param r root expression; can be null
    */
-  public Path(final Expr r) {
+  protected Path(final Expr r) {
     root = r;
   }
 
@@ -94,7 +94,7 @@ public abstract class Path extends Expr {
    * @param step step array
    * @return string representation
    */
-  public final String toString(final Expr[] step) {
+  protected final String toString(final Expr[] step) {
     final StringBuilder sb = new StringBuilder();
     if(root != null) sb.append(root);
     for(final Expr s : step) sb.append((sb.length() != 0 ? "/" : "") + s);

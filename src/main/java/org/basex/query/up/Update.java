@@ -10,7 +10,7 @@ import org.basex.query.expr.Expr;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class Update extends Arr {
+abstract class Update extends Arr {
   /**
    * Constructor.
    * @param e expressions

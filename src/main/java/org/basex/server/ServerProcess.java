@@ -195,7 +195,7 @@ public final class ServerProcess extends Thread {
    * Returns session information.
    * @return database information
    */
-  public String info() {
+  String info() {
     final Data data = context.data;
     return this + (data != null ? ": " + data.meta.name : "");
   }

@@ -1,4 +1,3 @@
-
 package org.basex.gui.view.tree;
 
 import org.basex.data.Data;
@@ -12,11 +11,11 @@ import org.basex.data.Data;
  */
 final class ChildIterator {
   /** Data reference. */
-  final Data data;
+  private final Data data;
   /** Maximum size. */
-  int size;
+  private int size;
   /** Current pre value. */
-  int pre;
+  private int pre;
 
   /***
    * Default constructor.
@@ -32,7 +31,7 @@ final class ChildIterator {
    * Initializes the iterator.
    * @param p root pre value
    */
-  void init(final int p) {
+  private void init(final int p) {
     final int k = data.kind(p);
     size = p + data.size(p, k);
     pre = p + data.attSize(p, k);

@@ -15,7 +15,7 @@ import org.w3c.dom.Node;
  */
 public final class FPI extends FNode {
   /** PI name. */
-  public final QNm name;
+  private final QNm name;
   /** PI value. */
   private final byte[] val;
 
@@ -38,7 +38,7 @@ public final class FPI extends FNode {
    * @param node DOM node
    * @param parent parent reference
    */
-  public FPI(final Node node, final Nod parent) {
+  FPI(final Node node, final Nod parent) {
     this(new QNm(Token.token(node.getNodeName())),
         Token.token(node.getNodeValue()), parent);
   }

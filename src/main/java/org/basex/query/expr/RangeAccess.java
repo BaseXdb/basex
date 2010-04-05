@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class RangeAccess extends Simple {
+final class RangeAccess extends Simple {
   /** Index type. */
   final IndexToken ind;
   /** Index context. */
@@ -31,7 +31,7 @@ public final class RangeAccess extends Simple {
    * @param i index reference
    * @param ic index context
    */
-  public RangeAccess(final IndexToken i, final IndexContext ic) {
+  RangeAccess(final IndexToken i, final IndexContext ic) {
     ind = i;
     ictx = ic;
   }

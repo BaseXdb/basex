@@ -181,9 +181,9 @@ public final class Prop extends AProp {
   public static boolean debug;
 
   /** Language (applied after restart). */
-  public static String language = LANGUAGE[1].toString();
+  static String language = LANGUAGE[1].toString();
   /** Flag for showing language keys. */
-  public static boolean langkeys;
+  static boolean langkeys;
 
   /**
    * Constructor.

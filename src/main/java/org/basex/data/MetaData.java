@@ -81,8 +81,6 @@ public final class MetaData {
 
   /** DeepFS mount point. */
   public String mount = "";
-  /** DeepFS backing path. */
-  public String backing = "";
   /** Flag for DeepFS instance. */
   public boolean deepfs;
 
@@ -230,7 +228,6 @@ public final class MetaData {
       else if(k.equals(DBUTD))    uptodate   = toBool(v);
       else if(k.equals(DBLID))    lastid     = Token.toInt(v);
       else if(k.equals(DBMNT))    mount      = v;
-      else if(k.equals(DBBCK))    backing    = v;
       else if(k.equals(DBDEEPFS)) deepfs     = toBool(v);
     }
     if(!storage.equals(STORAGE)) throw new BuildException(DBUPDATE, storage);
@@ -279,7 +276,6 @@ public final class MetaData {
     writeInfo(out, DBTIME,   time);
     writeInfo(out, DBUTD,    uptodate);
     writeInfo(out, DBLID,    lastid);
-    writeInfo(out, DBBCK,    backing);
     writeInfo(out, DBMNT,    mount);
     writeInfo(out, DBDEEPFS, deepfs);
     out.writeString(DBPERM);

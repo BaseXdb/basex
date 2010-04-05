@@ -35,7 +35,7 @@ import org.basex.util.Token;
  */
 public class Step extends Preds {
   /** Axis. */
-  public Axis axis;
+  Axis axis;
   /** Node test. */
   public Test test;
 

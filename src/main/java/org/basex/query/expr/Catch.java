@@ -49,7 +49,7 @@ public final class Catch extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Iter iter(final QueryContext ctx, final QueryException ex)
+  Iter iter(final QueryContext ctx, final QueryException ex)
       throws QueryException {
 
     final String cd = ex.code();

@@ -70,7 +70,7 @@ public final class Export extends Proc {
    * @param name file name
    * @throws IOException I/O exception
    */
-  public static void export(final Prop prop, final Data data,
+  private static void export(final Prop prop, final Data data,
       final String path, final String name) throws IOException {
 
     final int[] docs = data.doc();

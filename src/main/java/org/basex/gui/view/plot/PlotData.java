@@ -16,7 +16,7 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
-public final class PlotData {
+final class PlotData {
   /** Context reference. */
   final Context context;
   /** The x axis of the plot. */
@@ -34,7 +34,7 @@ public final class PlotData {
    * Default constructor.
    * @param ctx context reference
    */
-  public PlotData(final Context ctx) {
+  PlotData(final Context ctx) {
     xAxis = new PlotAxis(this);
     yAxis = new PlotAxis(this);
     pres = new int[0];

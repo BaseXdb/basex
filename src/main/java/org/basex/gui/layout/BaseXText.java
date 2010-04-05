@@ -51,8 +51,6 @@ public class BaseXText extends BaseXPanel {
 
   /** Scrollbar reference. */
   protected final BaseXBar scroll;
-  /** Popup Menu. */
-  protected final BaseXPopup popup;
 
   /**
    * Default constructor.
@@ -100,7 +98,7 @@ public class BaseXText extends BaseXPanel {
       setMode(Fill.NONE);
     }
 
-    popup = new BaseXPopup(this, edit ?
+    new BaseXPopup(this, edit ?
       new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
         new CopyCmd(), new PasteCmd(), new DelCmd(), null, new AllCmd() } :
       new GUICommand[] { new CopyCmd(), null, new AllCmd() });
@@ -129,7 +127,7 @@ public class BaseXText extends BaseXPanel {
    * @param t output text
    * @param b backward browsing
    */
-  public final void find(final String t, final boolean b) {
+  final void find(final String t, final boolean b) {
     find(rend.find(t, b));
   }
 
@@ -137,7 +135,7 @@ public class BaseXText extends BaseXPanel {
    * Displays the search term.
    * @param y vertical position
    */
-  public final void find(final int y) {
+  final void find(final int y) {
     // updates the visible area
     final int p = scroll.pos();
     final int m = y + rend.fontH() * 3 - getHeight();
@@ -240,7 +238,7 @@ public class BaseXText extends BaseXPanel {
   /**
    * Selects the whole text.
    */
-  public final void selectAll() {
+  final void selectAll() {
     text.pos(0);
     text.startMark();
     text.pos(text.size());
@@ -485,7 +483,7 @@ public class BaseXText extends BaseXPanel {
    * Displays the currently edited text area.
    * @param align vertical alignment
    */
-  public final void showCursor(final int align) {
+  final void showCursor(final int align) {
     // updates the visible area
     final int p = scroll.pos();
     final int y = rend.cursorY();
@@ -678,7 +676,7 @@ public class BaseXText extends BaseXPanel {
   }
 
   /** Calculation counter. */
-  final Thread calc = new Thread() {
+  private final Thread calc = new Thread() {
     @Override
     public void run() {
       rend.calc();

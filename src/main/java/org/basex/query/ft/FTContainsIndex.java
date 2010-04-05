@@ -18,9 +18,9 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
-public final class FTContainsIndex extends FTContains {
+final class FTContainsIndex extends FTContains {
   /** Index context. */
-  final IndexContext ictx;
+  private final IndexContext ictx;
   /** Current node item. */
   private FTItem ftn;
   /** Node iterator. */
@@ -32,7 +32,7 @@ public final class FTContainsIndex extends FTContains {
    * @param f full-text expression
    * @param ic index context
    */
-  public FTContainsIndex(final Expr e, final FTExpr f, final IndexContext ic) {
+  FTContainsIndex(final Expr e, final FTExpr f, final IndexContext ic) {
     super(e, f);
     ictx = ic;
   }

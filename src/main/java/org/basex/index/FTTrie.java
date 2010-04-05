@@ -20,7 +20,7 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  * @author Sebastian Gath
  */
-public final class FTTrie extends FTIndex {
+final class FTTrie extends FTIndex {
   // save each node: l, t1, ..., tl, n1, v1, ..., nu, vu, s, p
   // l = length of the token t1, ..., tl
   // u = number of next nodes n1, ..., nu

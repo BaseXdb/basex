@@ -83,7 +83,7 @@ public final class QueryException extends Exception {
    * Sets the error position.
    * @param parser parser
    */
-  public void pos(final InputParser parser) {
+  void pos(final InputParser parser) {
     if(line != 0 || parser == null) return;
     file = parser.file;
     line = 1;

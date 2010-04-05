@@ -35,22 +35,23 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class XQueryView extends View {
-  /** Header string. */
-  final BaseXLabel header;
-  /** Scroll Pane. */
-  final BaseXBack south;
-  /** Text Area. */
-  final XQueryText text;
-  /** Info label. */
-  final BaseXLabel info;
-  /** Execute button. */
-  final BaseXButton go;
   /** Execute Button. */
   final BaseXButton stop;
-  /** Filter button. */
-  final BaseXButton filter;
+  /** Info label. */
+  final BaseXLabel info;
+  /** Text Area. */
+  final XQueryText text;
   /** Modified flag. */
   boolean modified;
+
+  /** Header string. */
+  private final BaseXLabel header;
+  /** Scroll Pane. */
+  private final BaseXBack south;
+  /** Execute button. */
+  private final BaseXButton go;
+  /** Filter button. */
+  private final BaseXButton filter;
 
   /**
    * Default constructor.

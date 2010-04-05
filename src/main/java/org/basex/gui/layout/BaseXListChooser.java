@@ -24,10 +24,10 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class BaseXListChooser extends BaseXBack {
+  /** Scroll pane. */
+  private final JScrollPane scroll;
   /** Text field. */
   final BaseXTextField text;
-  /** Scroll pane. */
-  final JScrollPane scroll;
   /** List. */
   final JList list;
   /** List Values. */

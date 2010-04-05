@@ -107,8 +107,6 @@ public interface QueryTokens {
   /** Parser token. */
   String FTAND = "ftand";
   /** Parser token. */
-  String FTCONTAINS = "ftcontains";
-  /** Parser token. */
   String FTNOT = "ftnot";
   /** Parser token. */
   String FTOR = "ftor";

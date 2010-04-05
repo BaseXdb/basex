@@ -18,11 +18,11 @@ import org.deepfs.fsml.util.Loader;
 public final class ParserRegistry {
 
   /** Registry for MetadataAdapter implementations. */
-  static final Map<String, Class<? extends IFileParser>> REGISTRY =
+  private static final Map<String, Class<? extends IFileParser>> REGISTRY =
       new HashMap<String, Class<? extends IFileParser>>();
 
   /** Fallback parser for file suffixes that are not registered. */
-  static Class<? extends IFileParser> fallbackParser;
+  private static Class<? extends IFileParser> fallbackParser;
 
   /**
    * Registers a parser implementation with the fs parser.
@@ -78,7 +78,7 @@ public final class ParserRegistry {
    *         is available
    * @throws ParserException if the parser could not be loaded
    */
-  public IFileParser getParser(final String suffix) throws ParserException {
+  IFileParser getParser(final String suffix) throws ParserException {
     IFileParser instance = parserInstances.get(suffix);
     if(instance == null) {
       final Class<? extends IFileParser> clazz = REGISTRY.get(suffix);

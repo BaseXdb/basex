@@ -516,7 +516,7 @@ public final class GUI extends JFrame {
   /**
    * Sets the border of the content area.
    */
-  void setContentBorder() {
+  private void setContentBorder() {
     final int n = control.getComponentCount();
     final int n2 = top.getComponentCount();
 
@@ -593,7 +593,7 @@ public final class GUI extends JFrame {
   /**
    * Refreshes the input mode.
    */
-  protected void refreshMode() {
+  private void refreshMode() {
     final Data data = context.data;
     final boolean db = data != null;
     final int t = mode.getSelectedIndex();
@@ -627,7 +627,7 @@ public final class GUI extends JFrame {
   /**
    * Turns fullscreen mode on/off.
    */
-  public void fullscreen() {
+  void fullscreen() {
     fullscreen ^= true;
     fullscreen(fullscreen);
   }

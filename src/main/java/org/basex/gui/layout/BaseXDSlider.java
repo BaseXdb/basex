@@ -20,7 +20,7 @@ import org.basex.gui.GUI;
  */
 public final class BaseXDSlider extends BaseXPanel {
   /** Slider width. */
-  public static final int ARROW = 17;
+  private static final int ARROW = 17;
   /** Label space. */
   public static final int LABELW = 300;
 
@@ -38,8 +38,6 @@ public final class BaseXDSlider extends BaseXPanel {
   public boolean date;
   /** Integer flag. */
   public boolean itr;
-  /** Logarithmic scale. */
-  public boolean log;
 
   /** Listener. */
   private final ActionListener listener;
@@ -55,6 +53,8 @@ public final class BaseXDSlider extends BaseXPanel {
   private boolean right;
   /** Right button flag. */
   private boolean center;
+  /** Logarithmic scale. */
+  private boolean log;
 
   /**
    * Constructor.
@@ -101,7 +101,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param size value to be formatted
    * @return formatted size value
    */
-  public String value(final double size) {
+  private String value(final double size) {
     return BaseXLayout.value(size, kb, date);
   }
 
@@ -287,7 +287,7 @@ public final class BaseXDSlider extends BaseXPanel {
    * @param v value to be normalized
    * @return new value
    */
-  double decode(final double v) {
+  private double decode(final double v) {
     return log ? Math.exp(v) - 1 : v;
   }
 
@@ -303,7 +303,7 @@ public final class BaseXDSlider extends BaseXPanel {
   }
 
   /** Range class. */
-  class Range {
+  private class Range {
     /** Range distance. */ double dist;
     /** Start position. */ int xs;
     /** End position.   */ int xe;

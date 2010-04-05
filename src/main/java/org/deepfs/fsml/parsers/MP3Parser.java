@@ -38,25 +38,25 @@ public final class MP3Parser implements IFileParser {
   // ---------------------------------------------------------------------------
 
   /** ID3v2 header lenght. */
-  static final int HEADER_LENGTH = 10;
+  private static final int HEADER_LENGTH = 10;
   /**
    * ID3v2 frame header length.
    * @see "ID3v2.4.0 structure"
    */
-  static final int FRAME_HEADER_LENGTH = 10;
+  private static final int FRAME_HEADER_LENGTH = 10;
   /**
    * A tag MUST contain at least one frame. A frame must be at least 1 byte big,
    * excluding the header.)
    * @see "ID3v2.4.0 structure"
    */
-  static final int MINIMAL_FRAME_SIZE = FRAME_HEADER_LENGTH + 1;
+  private static final int MINIMAL_FRAME_SIZE = FRAME_HEADER_LENGTH + 1;
   /**
    * All available ID3v1.1 genres. Order is important! ID3v1.1 genres are stored
    * as a one byte value (as last byte in the ID3v1.1 tag). The position in the
    * array represents the "code" of the genre, the textual representation of the
    * genre X is stored at GENRES[X].
    */
-  static final byte[][] GENRES = new byte[][] {
+  private static final byte[][] GENRES = new byte[][] {
     token("Blues"), token("Classic Rock"), token("Country"), token("Dance"),
     token("Disco"), token("Funk"), token("Grunge"), token("Hip-Hop"),
     token("Jazz"), token("Metal"), token("New Age"), token("Oldies"),

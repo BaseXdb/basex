@@ -33,7 +33,7 @@ public final class FTxt extends FNode {
    * @param node DOM node
    * @param parent parent reference
    */
-  public FTxt(final Node node, final Nod parent) {
+  FTxt(final Node node, final Nod parent) {
     this(Token.token(node.getNodeValue()), parent);
   }
 

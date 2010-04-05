@@ -8,21 +8,7 @@ package org.basex.util;
  */
 public final class Performance {
   /** Performance Timer, based on nano seconds. */
-  private long time;
-
-  /**
-   * Constructor, initializing the performance timer.
-   */
-  public Performance() {
-    initTimer();
-  }
-
-  /**
-   * Initializes the timer.
-   */
-  public void initTimer() {
-    time = System.nanoTime();
-  }
+  private long time = System.nanoTime();
 
   /**
    * Returns the measured execution time in nanoseconds.

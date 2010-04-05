@@ -95,7 +95,7 @@ public final class CmpV extends Arr {
      * Constructor.
      * @param n string representation
      */
-    Comp(final String n) { name = n; }
+    private Comp(final String n) { name = n; }
 
     /**
      * Evaluates the expression.
@@ -117,7 +117,7 @@ public final class CmpV extends Arr {
   }
 
   /** Comparator. */
-  public Comp cmp;
+  Comp cmp;
 
   /**
    * Constructor.

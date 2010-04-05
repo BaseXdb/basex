@@ -22,15 +22,15 @@ import org.basex.gui.layout.TableLayout;
  */
 public final class DialogMapLayout extends Dialog {
   /** Map layouts. */
-  final BaseXListChooser algo;
+  private final BaseXListChooser algo;
   /** Layout slider. */
-  final BaseXSlider sizeSlider;
+  private final BaseXSlider sizeSlider;
   /** Show attributes. */
-  final BaseXCheckBox atts;
+  private final BaseXCheckBox atts;
   /** Select layout algorithm. */
-  final BaseXCombo border;
+  private final BaseXCombo border;
   /** Size slider label. */
-  final BaseXLabel sizeLabel;
+  private final BaseXLabel sizeLabel;
 
   /**
    * Default constructor.

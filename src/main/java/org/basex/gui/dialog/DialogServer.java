@@ -44,12 +44,11 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  */
 public final class DialogServer extends Dialog {
-  /** Context. */
-  final Context ctx = gui.context;
+  /** Password textfield. */
+  public final BaseXPassword logpass;
+
   /** Tabulators. */
   final BaseXTabs tabs;
-  /** Server panel. */
-  final BaseXBack conn = new BaseXBack();
   /** User panel. */
   final DialogUser user = new DialogUser(true, this);
   /** Databases panel. */
@@ -66,9 +65,15 @@ public final class DialogServer extends Dialog {
   final BaseXButton disconnect;
   /** Refresh button. */
   final BaseXButton refreshSess;
-  /** Updates log file. */
-  final BaseXButton refreshLog;
+  /** Indicates which tab is activated. */
+  int tab;
 
+  /** Context. */
+  private final Context ctx = gui.context;
+  /** Updates log file. */
+  private final BaseXButton refreshLog;
+  /** Server panel. */
+  private final BaseXBack conn = new BaseXBack();
   /** Stop button. */
   private final BaseXButton stop;
   /** Start button. */
@@ -91,8 +96,6 @@ public final class DialogServer extends Dialog {
   private final BaseXText sedb;
   /** Log text. */
   private final BaseXText logt;
-  /** Password textfield. */
-  public final BaseXPassword logpass;
   /** Info label. */
   private final BaseXLabel infoC;
   /** Info label. */
@@ -101,12 +104,8 @@ public final class DialogServer extends Dialog {
   private final BaseXCombo logc;
   /** String for log dir. */
   private final String logdir = ctx.prop.get(Prop.DBPATH) + "/.logs/";
-
   /** ClientSession. */
-  ClientSession cs;
-  /** Int which tab is activated. */
-  int tab;
-
+  private ClientSession cs;
   /** Boolean for check is server is running. */
   private boolean running;
   /** Boolean for check if client is connected. */
@@ -432,7 +431,7 @@ public final class DialogServer extends Dialog {
    * Fills sessions/databases panel.
    * @throws IOException Exception
    */
-  void refreshSess() throws IOException {
+  private void refreshSess() throws IOException {
     CachedOutput co = new CachedOutput();
     cs.execute(new ShowSessions(), co);
     sese.setText(co.finish());

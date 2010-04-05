@@ -11,7 +11,7 @@ import java.awt.Color;
  */
 public abstract class BaseXSyntax {
   /** Simple Syntax. */
-  public static final BaseXSyntax SIMPLE = new BaseXSyntax() {
+  static final BaseXSyntax SIMPLE = new BaseXSyntax() {
     @Override
     public void init() { }
     @Override

@@ -51,7 +51,7 @@ public final class BaseXLayout {
    * @param cont input container
    * @param help help text
    */
-  public static void focus(final Component cont, final byte[] help) {
+  static void focus(final Component cont, final byte[] help) {
     final GUI gui = gui(cont);
     if(gui == null) return;
     if(gui.prop.is(GUIProp.MOUSEFOCUS)) cont.requestFocusInWindow();
@@ -103,7 +103,7 @@ public final class BaseXLayout {
    * @param hlp help text
    * @param win parent window
    */
-  public static void addInteraction(final Component comp, final byte[] hlp,
+  static void addInteraction(final Component comp, final byte[] hlp,
         final Window win) {
 
     comp.addMouseListener(new MouseAdapter() {

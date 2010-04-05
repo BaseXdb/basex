@@ -48,7 +48,7 @@ public final class PathSummary implements Index {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public PathSummary(final DataInput in) throws IOException {
+  PathSummary(final DataInput in) throws IOException {
     if(in.readBool()) root = new PathNode(in, null);
   }
 
@@ -74,7 +74,7 @@ public final class PathSummary implements Index {
    * @param out output stream
    * @throws IOException I/O exception
    */
-  public void write(final DataOutput out) throws IOException {
+  void write(final DataOutput out) throws IOException {
     out.writeBool(root != null);
     if(root != null) root.finish(out);
   }

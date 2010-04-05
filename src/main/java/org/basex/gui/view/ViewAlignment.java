@@ -51,7 +51,7 @@ final class ViewAlignment implements ViewLayout {
    * Removes a single object.
    * @param o index
    */
-  void remove(final int o) {
+  private void remove(final int o) {
     comp = Array.delete(comp, o);
   }
 

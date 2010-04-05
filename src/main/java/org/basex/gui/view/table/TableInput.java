@@ -16,14 +16,14 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 final class TableInput implements Runnable {
-  /** Panel reference. */
-  final BaseXPanel panel;
-  /** Flashing cursor. */
-  boolean flashing;
   /** Input text. */
   String text;
+  /** Panel reference. */
+  private final BaseXPanel panel;
   /** Flashing cursor. */
-  int pos;
+  private boolean flashing;
+  /** Flashing cursor. */
+  private int pos;
 
   /**
    * Constructor.

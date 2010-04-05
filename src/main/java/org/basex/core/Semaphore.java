@@ -9,7 +9,7 @@ import java.util.LinkedList;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
-public final class Semaphore {
+final class Semaphore {
   /** List of monitors for waiting writers. */
   private final LinkedList<Object> waitingW = new LinkedList<Object>();
   /** Number of waiting readers. */
@@ -23,7 +23,7 @@ public final class Semaphore {
    * Modifications before executing a process.
    * @param w writing flag
    */
-  public void before(final boolean w) {
+  void before(final boolean w) {
     if(w) {
       final Object o = new Object();
       synchronized(o) {
@@ -60,7 +60,7 @@ public final class Semaphore {
    * Modifications after executing a process.
    * @param w writing flag
    */
-  public synchronized void after(final boolean w) {
+  synchronized void after(final boolean w) {
     if(w) {
       activeW = false;
       if(waitingR > 0) notifyReaders();

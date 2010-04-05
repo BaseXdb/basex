@@ -6,7 +6,7 @@ package org.basex.gui.view.tree;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
-public interface TreeViewOptions {
+interface TreeViewOptions {
   // Options
   /** Use ChildIterator to cache nodes. */
   boolean USE_CHILDITERATOR = true;
@@ -14,10 +14,6 @@ public interface TreeViewOptions {
   boolean ONLY_ELEMENT_NODES = false;
   /** Show Attributes. */
   boolean SHOW_ATTR = false;
-  /** Show ancestor nodes. */
-  boolean SHOW_ANCESTORS = true;
-  /** Show descendant nodes. */
-  boolean SHOW_DESCENDANTS = false;
   /** Show descendant connection. */
   boolean SHOW_DESCENDANTS_CONN = true;
   /** Draw rectangle border. */
@@ -38,8 +34,6 @@ public interface TreeViewOptions {
   int BORDER_PADDING = 2;
   /** Margin to top. */
   int TOP_MARGIN = 2;
-  /** Margin left and right. */
-  int LEFT_AND_RIGHT_MARGIN = 4;
   /** Margin to bottom. */
   int BOTTOM_MARGIN = 5;
   /** Changes Color until given level. */  

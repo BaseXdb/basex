@@ -84,7 +84,7 @@ public final class Log {
    * Creates a log file.
    * @param d Date
    */
-  void create(final Date d) {
+  private void create(final Date d) {
     new File(dir).mkdirs();
     final String file = dir + DATE.format(d) + ".log";
     start = d;

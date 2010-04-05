@@ -27,7 +27,7 @@ public final class ThesQuery {
    * Merges two thesaurus definitions.
    * @param th second thesaurus
    */
-  public void merge(final ThesQuery th) {
+  void merge(final ThesQuery th) {
     for(final Thesaurus t : th.thes) {
       boolean f = false;
       for(final Thesaurus tt : thes) f |= tt.eq(t);
@@ -41,7 +41,7 @@ public final class ThesQuery {
    * @return result list
    * @throws QueryException query exception
    */
-  public byte[][] find(final Tokenizer ft) throws QueryException {
+  byte[][] find(final Tokenizer ft) throws QueryException {
     final TokenList tl = new TokenList();
     for(final Thesaurus th : thes) th.find(tl, ft);
     return tl.finish();

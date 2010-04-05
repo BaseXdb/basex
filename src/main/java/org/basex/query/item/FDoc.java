@@ -36,7 +36,7 @@ public final class FDoc extends FNode {
    * @param node DOM node
    * @param b base uri
    */
-  public FDoc(final Node node, final byte[] b) {
+  FDoc(final Node node, final byte[] b) {
     this(new NodIter(), b);
     final NodeList nl = node.getChildNodes();
     if(nl.getLength() != 0) children.add(new FElem(nl.item(0), this));

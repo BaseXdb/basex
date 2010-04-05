@@ -23,9 +23,11 @@ import org.basex.util.TokenBuilder;
  */
 final class FNPat extends Fun {
   /** From-To Pattern. */
-  static final Pattern CLS = Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
+  private static final Pattern CLS =
+    Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
   /** From-To Pattern. */
-  static final Pattern CLSEX = Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\]");
+  private static final Pattern CLSEX =
+    Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\]");
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {

@@ -24,19 +24,6 @@ import org.deepfs.fsml.util.ParserUtil;
  * @author Bastian Lemke
  */
 public final class ExifParser {
-
-  /**
-   * Converts strings to byte arrays.
-   * @param str string array
-   * @return byte array
-   */
-  static byte[][] bytes(final String... str) {
-    final byte[][] val = new byte[str.length][];
-    for(int v = 0; v < val.length; v++)
-      val[v] = Token.token(str[v]);
-    return val;
-  }
-
   /**
    * Format of an IFD field.
    * @author Bastian Lemke
@@ -1042,7 +1029,7 @@ public final class ExifParser {
    * @param df the DeepFile to store metadata and file content
    * @throws IOException if any error occurs while reading from the channel
    */
-  public void extract(final DeepFile df)
+  protected void extract(final DeepFile df)
       throws IOException {
     if(!check(df)) return;
 

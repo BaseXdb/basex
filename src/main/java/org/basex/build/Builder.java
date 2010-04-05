@@ -26,11 +26,11 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public abstract class Builder extends Progress {
-  /** Parser instance. */
-  public final Parser parser;
   /** Meta data on built database. */
   public MetaData meta;
 
+  /** Parser instance. */
+  protected final Parser parser;
   /** Tag name index. */
   protected final Names tags = new Names();
   /** Attribute name index. */

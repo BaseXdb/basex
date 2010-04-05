@@ -54,7 +54,7 @@ public final class ItemSet {
   /**
    * Resizes the hash table.
    */
-  protected void rehash() {
+  private void rehash() {
     final int s = size << 1;
     final int[] tmp = new int[s];
 

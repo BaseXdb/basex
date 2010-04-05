@@ -95,7 +95,7 @@ public final class FTOpt extends ExprInfo {
    * Compiles the full-text options.
    * @param ctx query context
    */
-  public void comp(final QueryContext ctx) {
+  void comp(final QueryContext ctx) {
     if(sw != null) sw.comp(ctx);
   }
 

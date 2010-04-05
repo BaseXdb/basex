@@ -31,33 +31,6 @@ public class Dur extends Item {
 
   /**
    * Constructor.
-   * @param t data type
-   */
-  protected Dur(final Type t) {
-    super(t);
-  }
-
-  /**
-   * Constructor.
-   * @param d duration
-   * @param t data type
-   */
-  public Dur(final Dur d, final Type t) {
-    this(t);
-    mon = d.mon;
-    sc = d.sc == null ? BigDecimal.valueOf(0) : d.sc;
-  }
-
-  /**
-   * Constructor.
-   * @param d duration
-   */
-  public Dur(final Dur d) {
-    this(d, Type.DUR);
-  }
-
-  /**
-   * Constructor.
    * @param v value
    * @throws QueryException query exception
    */
@@ -67,11 +40,38 @@ public class Dur extends Item {
 
   /**
    * Constructor.
+   * @param t data type
+   */
+  protected Dur(final Type t) {
+    super(t);
+  }
+
+  /**
+   * Constructor.
+   * @param d duration
+   */
+  protected Dur(final Dur d) {
+    this(d, Type.DUR);
+  }
+
+  /**
+   * Constructor.
+   * @param d duration
+   * @param t data type
+   */
+  private Dur(final Dur d, final Type t) {
+    this(t);
+    mon = d.mon;
+    sc = d.sc == null ? BigDecimal.valueOf(0) : d.sc;
+  }
+
+  /**
+   * Constructor.
    * @param v value
    * @param t data type
    * @throws QueryException query exception
    */
-  public Dur(final byte[] v, final Type t) throws QueryException {
+  private Dur(final byte[] v, final Type t) throws QueryException {
     this(t);
 
     final String val = string(v).trim();
@@ -122,7 +122,7 @@ public class Dur extends Item {
    * Returns the time.
    * @return time
    */
-  public final long tim() {
+  private long tim() {
     return sc.longValue() % DAYSECONDS;
   }
 

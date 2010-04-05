@@ -90,7 +90,7 @@ public final class Lang {
    * @param key key
    * @return string
    */
-  public static synchronized String lang(final String key) {
+  static synchronized String lang(final String key) {
     if(key == null) {
       if(CHECK && check.size() != 0) {
         final Iterator<String> it = check.keySet().iterator();
@@ -116,7 +116,7 @@ public final class Lang {
    * @param e text text extensions
    * @return string
    */
-  public static synchronized String lang(final String key, final Object... e) {
+  static synchronized String lang(final String key, final Object... e) {
     return Main.info(lang(key), e);
   }
 

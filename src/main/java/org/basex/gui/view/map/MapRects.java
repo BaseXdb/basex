@@ -90,7 +90,7 @@ final class MapRects implements Iterable<MapRect> {
    * Creates a sorted array. If the original array is already sorted,
    * the same reference is used.
    */
-  void sort() {
+  private void sort() {
     int i = Integer.MIN_VALUE;
     for(final MapRect r : this) {
       if(i > r.pre) {

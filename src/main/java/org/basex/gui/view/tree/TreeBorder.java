@@ -5,13 +5,13 @@ package org.basex.gui.view.tree;
  * @author Workgroup DBIS, University of Konstanz 2005-08, ISC License
  * @author Wolfgang Miller
  */
-public class TreeBorder {
+final class TreeBorder {
   /** Real Level. */
-  public int level;
+  int level;
   /** Start index. */
-  public int start;
+  int start;
   /** Size. */
-  public int size;
+  int size;
 
   /**
    * Stores subtree borders.
@@ -19,7 +19,7 @@ public class TreeBorder {
    * @param st start
    * @param si size
    */
-  public TreeBorder(final int lv, final int st, final int si) {
+  TreeBorder(final int lv, final int st, final int si) {
     level = lv;
     start = st;
     size = si;

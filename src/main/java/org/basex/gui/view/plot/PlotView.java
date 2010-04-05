@@ -56,6 +56,21 @@ public final class PlotView extends View {
 
   /** Data reference. */
   PlotData plotData;
+  /** Keeps track of changes in the plot. */
+  boolean plotChanged;
+  /** X axis selector. */
+  BaseXCombo xCombo;
+  /** Y axis selector. */
+  BaseXCombo yCombo;
+  /** Item selector combo. */
+  BaseXCombo itemCombo;
+  /** Dot size in plot view. */
+  BaseXSlider dots;
+  /** Indicates if global marked nodes should be drawn. */
+  boolean drawSubNodes;
+  /** Indicates if the buffered image for marked nodes has to be redrawn. */
+  boolean markingChanged;
+
   /** Item image. */
   private BufferedImage itemImg;
   /** Marked item image. */
@@ -72,34 +87,20 @@ public final class PlotView extends View {
   private int mouseX;
   /** Y coordinate of mouse pointer. */
   private int mouseY;
-  /** Keeps track of changes in the plot. */
-  boolean plotChanged;
   /** Current plot height. */
   private int plotHeight;
   /** Current plot width. */
   private int plotWidth;
-  /** X axis selector. */
-  BaseXCombo xCombo;
-  /** Y axis selector. */
-  BaseXCombo yCombo;
-  /** Item selector combo. */
-  BaseXCombo itemCombo;
   /** Logarithmic display. */
-  BaseXCheckBox xLog;
+  private BaseXCheckBox xLog;
   /** Logarithmic display. */
-  BaseXCheckBox yLog;
-  /** Dot size in plot view. */
-  BaseXSlider dots;
+  private BaseXCheckBox yLog;
 
   /** Flag for mouse dragging actions. */
   private boolean dragging;
-  /** Indicates if global marked nodes should be drawn. */
-  boolean drawSubNodes;
-  /** Indicates if the buffered image for marked nodes has to be redrawn. */
-  boolean markingChanged;
   /** Indicates if a filter operation is self implied or was triggered by
    * another view. */
-  boolean rightClick;
+  private boolean rightClick;
   /** Context which is displayed in the plot after a context change which was
    * triggered by the plot itself. */
   private Nodes nextContext;

@@ -23,9 +23,8 @@ import org.basex.util.TokenBuilder;
  * @author Bastian Lemke
  */
 public final class BufferedFileChannel {
-
   /** The default buffer size. */
-  public static final int DEFAULT_BUFFER_SIZE = 1 << 12;
+  private static final int DEFAULT_BUFFER_SIZE = 1 << 12;
 
   /** The file we are reading from. */
   private final File f;
@@ -67,7 +66,7 @@ public final class BufferedFileChannel {
    * @throws IOException if any error occurs while creating the
    *           {@link BufferedFileChannel}
    */
-  public BufferedFileChannel(final File file, final int bufferSize)
+  private BufferedFileChannel(final File file, final int bufferSize)
       throws IOException {
     this(file, ByteBuffer.allocate(bufferSize));
   }

@@ -47,7 +47,7 @@ public final class ViewNotifier {
    * Adds a new view.
    * @param v view to be added
    */
-  public void add(final View v) {
+  void add(final View v) {
     view = Array.add(view, v);
   }
 

@@ -32,9 +32,9 @@ public final class Constr {
   public byte[] duplAtt;
 
   /** Text cache. */
-  final TokenBuilder text = new TokenBuilder();
+  private final TokenBuilder text = new TokenBuilder();
   /** Space separator flag. */
-  boolean more;
+  private boolean more;
   /** Base URI. */
   byte[] base = EMPTY;
 

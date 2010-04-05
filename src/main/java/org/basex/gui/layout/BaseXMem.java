@@ -18,7 +18,7 @@ import org.basex.util.Performance;
  */
 public final class BaseXMem extends BaseXPanel {
   /** Default width of the memory status box. */
-  public static final int DWIDTH = 70;
+  private static final int DWIDTH = 70;
 
   /**
    * Constructor.

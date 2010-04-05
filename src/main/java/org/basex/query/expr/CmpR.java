@@ -25,7 +25,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class CmpR extends Single {
+final class CmpR extends Single {
   /** Minimum. */
   private final double min;
   /** Include minimum value. */

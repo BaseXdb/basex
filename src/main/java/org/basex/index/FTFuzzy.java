@@ -42,7 +42,7 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
-public final class FTFuzzy extends FTIndex {
+final class FTFuzzy extends FTIndex {
   /** Entry size. */
   private static final int ENTRY = 9;
   /** Levenshtein reference. */
@@ -325,9 +325,9 @@ public final class FTFuzzy extends FTIndex {
   }
 
   /** Next pre values. */
-  int[] prv;
+  private int[] prv;
   /** Next pos values. */
-  int[] pov;
+  private int[] pov;
 
   /**
    * Returns next pre values.

@@ -17,13 +17,13 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class SimpleIterStep extends Step {
+final class SimpleIterStep extends Step {
   /**
    * Constructor.
    * @param a axis
    * @param t node test
    */
-  public SimpleIterStep(final Axis a, final Test t) {
+  SimpleIterStep(final Axis a, final Test t) {
     super(a, t);
   }
 

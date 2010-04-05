@@ -25,9 +25,9 @@ public final class ExploreView extends View {
   /** Header string. */
   private final BaseXLabel header;
   /** Current search panel. */
-  final ExploreArea search;
+  private final ExploreArea search;
   /** Filter button. */
-  final BaseXButton filter;
+  private final BaseXButton filter;
 
   /**
    * Default constructor.

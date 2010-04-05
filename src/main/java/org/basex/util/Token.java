@@ -59,6 +59,13 @@ public final class Token {
   /** LessThan Entity. */
   public static final byte[] LT = token("<");
 
+  /** Hex codes. */
+  public static final byte[] HEX = token("0123456789ABCDEF");
+  /** Reserved characters. */
+  private static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
+  /** Reserved characters. */
+  private static final byte[] RES = token("-._~");
+
   /** UTF8 encoding string. */
   public static final String UTF8 = "UTF-8";
   /** UTF8 encoding string (variant). */
@@ -380,7 +387,7 @@ public final class Token {
   }
 
   /** US charset. */
-  public static final java.text.DecimalFormatSymbols LOC =
+  private static final java.text.DecimalFormatSymbols LOC =
     new java.text.DecimalFormatSymbols(java.util.Locale.US);
   /** Scientific double output. */
   private static final java.text.DecimalFormat SD =
@@ -1070,13 +1077,6 @@ public final class Token {
       return pw;
     }
   }
-
-  /** Hex codes. */
-  public static final byte[] HEX = token("0123456789ABCDEF");
-  /** Reserved characters. */
-  public static final byte[] IRIRES = token("!#$%&*'()+,-./:;=?@[]~_");
-  /** Reserved characters. */
-  public static final byte[] RES = token("-._~");
 
   /**
    * Returns a URI encoded token.

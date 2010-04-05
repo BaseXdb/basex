@@ -32,7 +32,7 @@ public final class BaseXServer extends Main implements Runnable {
   /** Log. */
   public Log log;
   /** Quiet mode (no logging). */
-  public boolean quiet;
+  private boolean quiet;
   /** Stop file. */
   private static final IO STOP = IO.get(Prop.TMP + "bxs");
   /** Server socket. */

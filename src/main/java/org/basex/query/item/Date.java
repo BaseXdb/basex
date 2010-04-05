@@ -25,7 +25,7 @@ public abstract class Date extends Item {
   protected static final byte[] DAYS = {
     31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
   /** Date pattern. */
-  protected static final Pattern DAT = Pattern.compile(
+  private static final Pattern DAT = Pattern.compile(
       "(-?)([0-9]{4})-([0-9]{2})-([0-9]{2})" + ZONE);
   /** Time pattern. */
   private static final Pattern TIM = Pattern.compile(
@@ -173,7 +173,7 @@ public abstract class Date extends Item {
    * Returns the date in seconds.
    * @return seconds
    */
-  public final BigDecimal seconds() {
+  protected final BigDecimal seconds() {
     final int h = xc.getHour() == UNDEF ? 0 : xc.getHour();
     final int m = xc.getMinute() == UNDEF ? 0 : xc.getMinute();
     final int s = xc.getSecond() == UNDEF ? 0 : xc.getSecond();
@@ -187,7 +187,7 @@ public abstract class Date extends Item {
    * Returns the days.
    * @return seconds
    */
-  public final long days() {
+  protected final long days() {
     final int y = xc.getYear() == UNDEF ? 0 : xc.getYear();
     final int m = xc.getMonth() == UNDEF ? 0 : xc.getMonth() - 1;
     final int d = xc.getDay() == UNDEF ? 0 : xc.getDay() - 1;

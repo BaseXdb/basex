@@ -14,7 +14,7 @@ import org.basex.gui.GUIConstants;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BaseXTextRenderer extends BaseXBack {
+final class BaseXTextRenderer extends BaseXBack {
   /** Vertical start position. */
   private final BaseXBar bar;
 
@@ -220,7 +220,7 @@ public final class BaseXTextRenderer extends BaseXBack {
    * @param g graphics reference
    * @param pos current text position
    */
-  void write(final Graphics g, final int pos) {
+  private void write(final Graphics g, final int pos) {
     init(g, pos);
     while(more(g)) write(g);
     if(cursor && text.cursor() == text.size()) cursor(g, x);

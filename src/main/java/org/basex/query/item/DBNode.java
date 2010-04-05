@@ -26,12 +26,13 @@ public class DBNode extends Nod {
   };
   /** Data reference. */
   public final Data data;
-  /** Root node (constructor). */
-  public Nod root;
-  /** Namespaces. */
-  private Atts nsp;
   /** Pre value. */
   public int pre;
+
+  /** Root node (constructor). */
+  private Nod root;
+  /** Namespaces. */
+  private Atts nsp;
 
   /**
    * Constructor.
@@ -67,7 +68,7 @@ public class DBNode extends Nod {
    * @param r parent reference
    * @param t node type
    */
-  public DBNode(final Data d, final int p, final Nod r, final Type t) {
+  protected DBNode(final Data d, final int p, final Nod r, final Type t) {
     super(t);
     data = d;
     pre = p;

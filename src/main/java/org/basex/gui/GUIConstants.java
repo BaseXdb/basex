@@ -86,7 +86,7 @@ public final class GUIConstants {
   // TOOLBAR ==================================================================
 
   /** Toolbar entries, containing the button commands. */
-  public static final GUICommand[] TOOLBAR = {
+  static final GUICommand[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, GOHOME, null, CREATE, OPEN, INFO, null,
       SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
       SHOWTABLE, SHOWPLOT, SHOWEXPLORE, null, SHOWHELP
@@ -95,7 +95,7 @@ public final class GUIConstants {
   // MENUBARS =================================================================
 
   /** Top menu entries. */
-  public static final String[] MENUBAR = {
+  static final String[] MENUBAR = {
       Text.MENUFILE, Text.MENUEDIT, Text.MENUVIEW, Text.MENUOPTIONS,
       Text.MENUDEEPFS, Text.MENUHELP };
 
@@ -103,7 +103,7 @@ public final class GUIConstants {
   static final String SEPARATOR = "-";
 
   /** Two-dimensional Menu entries, containing the menu item commands. */
-  public static final Object[][] MENUITEMS = { {
+  static final Object[][] MENUITEMS = { {
     MENUDB, CREATE, OPEN, INFO, EXPORT, DROP, CLOSE, SEPARATOR,
     XQOPEN, XQSAVE, XQSAVEAS, SEPARATOR,
     SERVER, Prop.MAC ? null : SEPARATOR,
@@ -237,25 +237,25 @@ public final class GUIConstants {
 
   /** Default monospace font. */
   public static Font dfont;
-  /** Default monospace font widths. */
-  public static int[] dwidth;
-
   /** Large font. */
   public static Font lfont;
-  /** Character large character widths. */
-  public static int[] lwidth;
   /** Font. */
   public static Font font;
-  /** Character widths. */
-  public static int[] fwidth;
   /** Monospace font. */
   public static Font mfont;
   /** Monospace character widths. */
   public static int[] mfwidth;
   /** Bold Font. */
   public static Font bfont;
+
+  /** Default monospace font widths. */
+  private static int[] dwidth;
+  /** Character large character widths. */
+  private static int[] lwidth;
+  /** Character widths. */
+  private static int[] fwidth;
   /** Bold character widths. */
-  public static int[] bwidth;
+  private static int[] bwidth;
 
   /** Private constructor, preventing class instantiation. */
   private GUIConstants() { }

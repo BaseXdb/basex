@@ -174,7 +174,7 @@ public final class FolderView extends View {
   /**
    * Refreshes tree height.
    */
-  void refreshHeight() {
+  private void refreshHeight() {
     if(opened == null) return;
 
     treeH = new FolderIterator(this).height();
@@ -212,7 +212,8 @@ public final class FolderView extends View {
    * @param x horizontal coordinate
    * @param y vertical coordinate
    */
-  void drawString(final Graphics g, final int pre, final int x, final int y) {
+  private void drawString(final Graphics g, final int pre, final int x,
+      final int y) {
     final Data data = gui.context.data;
     final Nodes marked = gui.context.marked;
 
@@ -315,7 +316,7 @@ public final class FolderView extends View {
    * @param pre pre value to be found
    * @param open opened folder
    */
-  void jumpTo(final int pre, final boolean open) {
+  private void jumpTo(final int pre, final boolean open) {
     if(getWidth() == 0 || !visible()) return;
 
     if(open) {

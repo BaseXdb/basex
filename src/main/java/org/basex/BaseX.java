@@ -54,7 +54,7 @@ public class BaseX extends Main {
   /**
    * Constructor.
    */
-  protected final void run() {
+  private void run() {
     try {
       boolean u = false;
       if(input != null) process(new Check(input), true);

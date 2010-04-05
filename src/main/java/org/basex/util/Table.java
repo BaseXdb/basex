@@ -14,10 +14,11 @@ import java.util.Scanner;
  * @author Christian Gruen
  */
 public final class Table {
+  /** Distance between table columns. */
+  private static final int DIST = 2;
+
   /** Table header. */
   public TokenList header = new TokenList();
-  /** Distance between table columns. */
-  public static final int DIST = 2;
   /** Alignment (false: left, true: right alignment). */
   public BoolList align = new BoolList();
   /** Data (usually strings). */

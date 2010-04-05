@@ -33,8 +33,6 @@ final class TableData {
 
   /** Context reference. */
   final Context context;
-  /** Window properties. */
-  final GUIProp gprop;
   /** Root nodes. */
   TokenList roots;
   /** Rows of the main table. */
@@ -55,11 +53,13 @@ final class TableData {
   int mouseX;
   /** Mouse Y position. */
   int mouseY;
-
   /** ID of the table root tag. */
   int root;
+
+  /** Window properties. */
+  private final GUIProp gprop;
   /** Last query. */
-  String last = "";
+  private String last = "";
 
   /** Table Column. */
   static final class TableCol {
@@ -186,7 +186,7 @@ final class TableData {
   /**
    * Creates the row list for the specified nodes.
    */
-  void createRows() {
+  private void createRows() {
     final Data data = context.data;
     final int[] n = context.current.nodes;
     final boolean fs = data.fs != null;
@@ -219,7 +219,7 @@ final class TableData {
   /**
    * Calculates the column widths, based on the contents.
    */
-  void calcWidths() {
+  private void calcWidths() {
     if(cols.length == 0) return;
 
     final Data data = context.data;

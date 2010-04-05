@@ -73,7 +73,7 @@ public final class Order extends Expr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public void add(final QueryContext ctx) throws QueryException {
+  void add(final QueryContext ctx) throws QueryException {
     for(final OrderBy o : ord) o.add(ctx);
   }
 
@@ -97,7 +97,7 @@ public final class Order extends Expr {
    * @param e end position
    * @throws QueryException query exception
    */
-  protected void sort(final int[] o, final int s, final int e)
+  void sort(final int[] o, final int s, final int e)
       throws QueryException {
 
     if(e < 7) {

@@ -15,7 +15,7 @@ public abstract class CFrag extends Arr {
    * Constructor.
    * @param n name
    */
-  public CFrag(final Expr... n) {
+  protected CFrag(final Expr... n) {
     super(n);
   }
 

@@ -58,10 +58,6 @@ public final class Tokenizer implements IndexToken {
   /** Flag for a paragraph. */
   public boolean pa;
 
-  /** Current sentence. */
-  public int sent;
-  /** Current paragraph. */
-  public int para;
   /** Current token. */
   public int pos;
 
@@ -69,10 +65,15 @@ public final class Tokenizer implements IndexToken {
   public byte[] text;
   /** Current character position. */
   public int p;
+
+  /** Current sentence. */
+  private int sent;
+  /** Current paragraph. */
+  private int para;
   /** Last punctuation mark. */
-  public int pm;
+  private int pm;
   /** Last character position. */
-  public int lp;
+  private int lp;
 
 
   /** Character start position. */
@@ -226,7 +227,7 @@ public final class Tokenizer implements IndexToken {
    * @param tok input token
    * @return result
    */
-  public byte[] get(final byte[] tok) {
+  private byte[] get(final byte[] tok) {
     byte[] n = tok;
     final boolean a = ascii(n);
     if(!dc) n = dia(n, a);
@@ -240,7 +241,7 @@ public final class Tokenizer implements IndexToken {
    * Returns the original token.
    * @return original token
    */
-  public byte[] orig() {
+  private byte[] orig() {
     return Arrays.copyOfRange(text, s, p);
   }
 

@@ -23,7 +23,7 @@ public abstract class TableAccess {
    * @param md meta data
    * @param pf file prefix
    */
-  public TableAccess(final MetaData md, final String pf) {
+  protected TableAccess(final MetaData md, final String pf) {
     meta = md;
     pref = pf;
   }

@@ -413,7 +413,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    * @param name name of the view
    * @return found view container
    */
-  public ViewPanel getView(final String name) {
+  private ViewPanel getView(final String name) {
     for(final ViewPanel view : views) {
       if(view.toString().equals(name)) return view;
     }

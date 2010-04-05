@@ -31,7 +31,7 @@ public final class User {
    * @param p password
    * @param r rights
    */
-  public User(final String n, final byte[] p, final int r) {
+  User(final String n, final byte[] p, final int r) {
     name = n;
     pw = p;
     perm = r;

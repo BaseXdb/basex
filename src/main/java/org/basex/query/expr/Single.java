@@ -12,7 +12,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class Single extends Expr {
+abstract class Single extends Expr {
   /** Expression list. */
   public Expr expr;
 

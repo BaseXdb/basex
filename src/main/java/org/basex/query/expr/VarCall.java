@@ -20,7 +20,7 @@ import org.basex.query.util.Var;
  */
 public final class VarCall extends Expr {
   /** Variable name. */
-  public Var var;
+  Var var;
 
   /**
    * Constructor.

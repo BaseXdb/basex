@@ -38,7 +38,7 @@ public final class FAttr extends FNode {
    * @param node DOM node
    * @param p parent reference
    */
-  public FAttr(final Node node, final Nod p) {
+  FAttr(final Node node, final Nod p) {
     this(new QNm(Token.token(node.getNodeName())),
         Token.token(node.getNodeValue()), p);
   }

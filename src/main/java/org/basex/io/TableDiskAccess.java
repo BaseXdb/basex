@@ -26,7 +26,7 @@ public final class TableDiskAccess extends TableAccess {
   private Buffer bf;
 
   /** File storing all blocks. */
-  public final RandomAccessFile data;
+  private final RandomAccessFile data;
 
   /** Index array storing the FirstPre values. this one is sorted ascending. */
   private int[] firstPres;

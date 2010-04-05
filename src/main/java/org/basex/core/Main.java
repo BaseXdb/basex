@@ -221,7 +221,7 @@ public abstract class Main {
    * @param o object
    * @return class name
    */
-  public static String name(final Class<?> o) {
+  private static String name(final Class<?> o) {
     return o.getSimpleName();
   }
 

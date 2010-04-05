@@ -31,13 +31,13 @@ import org.basex.query.util.Err;
  */
 public final class Insert extends Update {
   /** First flag. */
-  final boolean first;
+  private final boolean first;
   /** Last flag. */
-  final boolean last;
-  /** After flag. */
-  final boolean before;
+  private final boolean last;
   /** Before flag. */
-  final boolean after;
+  private final boolean before;
+  /** After flag. */
+  private final boolean after;
 
   /**
    * Constructor.

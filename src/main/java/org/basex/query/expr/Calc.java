@@ -228,13 +228,13 @@ public enum Calc {
   };
 
   /** Name of operation. */
-  public final String name;
+  final String name;
 
   /**
    * Constructor.
    * @param n name
    */
-  Calc(final String n) {
+  private Calc(final String n) {
     name = n;
   }
 
@@ -266,7 +266,7 @@ public enum Calc {
    * @param it item
    * @throws QueryException query exception
    */
-  protected final void errType(final Type t, final Item it)
+  void errType(final Type t, final Item it)
       throws QueryException {
     Err.type(info(), t, it);
   }
@@ -276,7 +276,7 @@ public enum Calc {
    * @param it item
    * @throws QueryException query exception
    */
-  protected final void errNum(final Item it) throws QueryException {
+  void errNum(final Item it) throws QueryException {
     Err.num(info(), it);
   }
 
@@ -286,7 +286,7 @@ public enum Calc {
    * @return duration
    * @throws QueryException query exception
    */
-  protected final Dur checkDur(final Item it) throws QueryException {
+  Dur checkDur(final Item it) throws QueryException {
     if(!it.d()) Err.or(XPDUR, info(), it.type);
     return (Dur) it;
   }
@@ -297,7 +297,7 @@ public enum Calc {
    * @param b second item
    * @throws QueryException query exception
    */
-  protected final void checkNum(final Item a, final Item b)
+  final void checkNum(final Item a, final Item b)
       throws QueryException {
     if(!a.u() && !a.n()) errNum(a);
     if(!b.u() && !b.n()) errNum(b);
@@ -308,18 +308,20 @@ public enum Calc {
    * @param d value to be checked
    * @throws QueryException query exception
    */
-  protected void checkRange(final double d) throws QueryException {
+  void checkRange(final double d) throws QueryException {
     if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(RANGE, d);
   }
-
-  @Override
-  public String toString() { return name; }
 
   /**
    * Returns a string representation of the operator.
    * @return string
    */
-  public String info() {
+  String info() {
     return "'" + name + "' operator";
+  }
+
+  @Override
+  public String toString() {
+    return name;
   }
 }

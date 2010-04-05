@@ -17,21 +17,21 @@ public final class Hex extends Item {
 
   /**
    * Constructor.
-   * @param b base64 data
-   */
-  public Hex(final B64 b) {
-    super(Type.HEX);
-    val = b.val;
-  }
-
-  /**
-   * Constructor.
    * @param v value
    * @throws QueryException query exception
    */
   public Hex(final byte[] v) throws QueryException {
     super(Type.HEX);
     h2b(Token.trim(v));
+  }
+
+  /**
+   * Constructor.
+   * @param b base64 data
+   */
+  Hex(final B64 b) {
+    super(Type.HEX);
+    val = b.val;
   }
 
   @Override

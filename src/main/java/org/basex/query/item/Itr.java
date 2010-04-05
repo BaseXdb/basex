@@ -19,7 +19,7 @@ public class Itr extends Item {
     new Itr(3), new Itr(4), new Itr(5), new Itr(6), new Itr(7),
     new Itr(8), new Itr(9) };
   /** Integer value. */
-  protected long val;
+  private long val;
 
   /**
    * Constructor.
@@ -43,7 +43,7 @@ public class Itr extends Item {
    * Constructor.
    * @param d date time
    */
-  public Itr(final Date d) {
+  Itr(final Date d) {
     this(0, Type.LNG);
     val = d.xc.toGregorianCalendar().getTimeInMillis();
   }

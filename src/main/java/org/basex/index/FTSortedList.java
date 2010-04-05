@@ -12,7 +12,7 @@ import org.basex.io.DataAccess;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Sebastian Gath
  */
-public final class FTSortedList {
+final class FTSortedList {
   /** Indexed tokens. */
   private final DataAccess a;
   /** Storing pre and pos values for each token. */
@@ -20,6 +20,7 @@ public final class FTSortedList {
   /** Current FTData size. */
   private int size;
   /** Pointer on full-text data. */
+  // [CG] not needed?
   long p;
 
   /**
@@ -47,7 +48,7 @@ public final class FTSortedList {
    * Closes files.
    * @throws IOException I/O exception
    */
-  public void close() throws IOException {
+  void close() throws IOException {
     a.close();
     b.close();
   }
@@ -75,9 +76,9 @@ public final class FTSortedList {
   }
 
   /** Next pre values. */
-  int[] prv;
+  private int[] prv;
   /** Next pos values. */
-  int[] pov;
+  private int[] pov;
 
   /**
    * Returns next pre values.

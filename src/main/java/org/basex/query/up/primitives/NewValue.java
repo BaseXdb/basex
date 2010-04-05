@@ -10,7 +10,7 @@ import org.basex.query.item.QNm;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
-public abstract class NewValue extends UpdatePrimitive {
+abstract class NewValue extends UpdatePrimitive {
   /** New name. */
   final QNm name;
 
@@ -19,7 +19,7 @@ public abstract class NewValue extends UpdatePrimitive {
    * @param n target node
    * @param newName new name
    */
-  public NewValue(final Nod n, final QNm newName) {
+  protected NewValue(final Nod n, final QNm newName) {
     super(n);
     name = newName;
   }

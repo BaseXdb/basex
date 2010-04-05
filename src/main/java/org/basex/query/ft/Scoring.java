@@ -21,7 +21,7 @@ public final class Scoring {
    * @param l complete length
    * @return result
    */
-  public double word(final int tl, final double l) {
+  double word(final int tl, final double l) {
     return Math.min(1, Math.log(1 + LOG * tl / l));
   }
 
@@ -50,7 +50,7 @@ public final class Scoring {
    * @param d scoring value
    * @return inverse scoring value
    */
-  public double not(final double d) {
+  double not(final double d) {
     return 1 - d;
   }
 

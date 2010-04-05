@@ -63,7 +63,7 @@ public final class FElem extends FNode {
    * @param node DOM node
    * @param p parent reference
    */
-  public FElem(final Node node, final Nod p) {
+  FElem(final Node node, final Nod p) {
     super(Type.ELM);
     final int s = node.getChildNodes().getLength();
     final Nod[] childArr = new Nod[s];

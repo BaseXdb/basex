@@ -15,12 +15,12 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {
-  /** The OutputStream we operate on. */
-  protected OutputStream os;
   /** Maximum numbers of bytes to write. */
-  protected int max = Integer.MAX_VALUE;
+  int max = Integer.MAX_VALUE;
   /** Number of bytes written. */
-  protected int size;
+  int size;
+  /** The OutputStream we operate on. */
+  private OutputStream os;
 
   /** Protected default constructor. */
   protected PrintOutput() { }

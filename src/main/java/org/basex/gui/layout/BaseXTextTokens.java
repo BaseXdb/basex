@@ -14,7 +14,7 @@ public final class BaseXTextTokens {
   /** Tab width. */
   static final int TAB = 2;
   /** Text array to be written. */
-  public byte[] text = EMPTY;
+  byte[] text = EMPTY;
 
   /** Text length. */
   private int size;
@@ -289,7 +289,7 @@ public final class BaseXTextTokens {
    * @param max maximum/minimum flag
    * @return true if mark was reset
    */
-  boolean noMark(final boolean mark, final boolean max) {
+  private boolean noMark(final boolean mark, final boolean max) {
     final boolean rs = !mark && ms != -1;
     if(rs) {
       ps = (max ^ ms < me) ? ms : me;
@@ -423,7 +423,7 @@ public final class BaseXTextTokens {
    * Returns the text size.
    * @return text size
    */
-  public int size() {
+  int size() {
     return size;
   }
 

@@ -11,7 +11,7 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Dennis Stratmann
  */
-public final class IterPred extends Pred {
+final class IterPred extends Pred {
   /** Flag is set to true if predicate has last function. */
   final boolean last;
   /** Optional position predicate. */
@@ -24,7 +24,7 @@ public final class IterPred extends Pred {
    * @param ps position predicate; may equal the first predicate
    * @param l true if predicate has a last function
    */
-  public IterPred(final Expr r, final Expr[] p, final Pos ps, final boolean l) {
+  IterPred(final Expr r, final Expr[] p, final Pos ps, final boolean l) {
     super(r, p);
     last = l;
     pos = ps;

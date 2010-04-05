@@ -69,8 +69,6 @@ public interface DataText {
   String DBMNT = "MOUNT";
   /** Permissions. */
   String DBPERM = "PERM";
-  /** FS Backing store. */
-  String DBBCK = "BACKING";
   /** DeepFS instance. */
   String DBDEEPFS = "DEEPFS";
 

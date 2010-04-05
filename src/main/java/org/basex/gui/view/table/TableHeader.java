@@ -193,7 +193,7 @@ final class TableHeader extends BaseXPanel {
    * @param mx mouse position
    * @return column
    */
-  int colSep(final int w, final int mx) {
+  private int colSep(final int w, final int mx) {
     double x = 0;
     for(int i = 0; i < tdata.cols.length; i++) {
       if(i > 0 && Math.abs(mx - x) < 3) return i;

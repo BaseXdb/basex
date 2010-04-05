@@ -18,12 +18,12 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Satisfy extends Expr {
-  /** Expression list. */
-  public Expr sat;
   /** For/Let expressions. */
   private final For[] fl;
   /** Every flag. */
   private final boolean every;
+  /** Expression list. */
+  private Expr sat;
 
   /**
    * Constructor.

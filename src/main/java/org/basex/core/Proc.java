@@ -42,7 +42,7 @@ public abstract class Proc extends Progress {
   protected Result result;
 
   /** Flags for controlling process evaluation. */
-  public final int flags;
+  private final int flags;
 
   /**
    * Constructor.
@@ -128,7 +128,7 @@ public abstract class Proc extends Progress {
    * @param os output stream
    * @return result of check
    */
-  protected boolean run(final Context ctx, final OutputStream os) {
+  private boolean run(final Context ctx, final OutputStream os) {
     try {
       perf = new Performance();
       context = ctx;

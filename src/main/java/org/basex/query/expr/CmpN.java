@@ -54,7 +54,9 @@ public final class CmpN extends Arr {
      * Constructor.
      * @param n string representation
      */
-    Comp(final String n) { name = n; }
+    private Comp(final String n) {
+      name = n;
+    }
 
     /**
      * Evaluates the expression.
@@ -66,7 +68,9 @@ public final class CmpN extends Arr {
     public abstract boolean e(Item a, Item b) throws QueryException;
 
     @Override
-    public String toString() { return name; }
+    public String toString() {
+      return name;
+    }
   }
 
   /** Comparator. */

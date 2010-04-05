@@ -40,26 +40,31 @@ public final class CmpG extends Arr {
       @Override
       public Comp invert() { return Comp.GE; }
     },
+
     /** General Comparison: less. */
     LT("<", CmpV.Comp.LT) {
       @Override
       public Comp invert() { return Comp.GT; }
     },
+
     /** General Comparison: greater of equal. */
     GE(">=", CmpV.Comp.GE) {
       @Override
       public Comp invert() { return Comp.LE; }
     },
+
     /** General Comparison: greater. */
     GT(">", CmpV.Comp.GT) {
       @Override
       public Comp invert() { return Comp.LT; }
     },
+
     /** General Comparison: equal. */
     EQ("=", CmpV.Comp.EQ) {
       @Override
       public Comp invert() { return Comp.EQ; }
     },
+
     /** General Comparison: not equal. */
     NE("!=", CmpV.Comp.NE) {
       @Override
@@ -69,14 +74,14 @@ public final class CmpG extends Arr {
     /** String representation. */
     public final String name;
     /** Comparator. */
-    public final CmpV.Comp cmp;
+    final CmpV.Comp cmp;
 
     /**
      * Constructor.
      * @param n string representation
      * @param c comparator
      */
-    Comp(final String n, final CmpV.Comp c) {
+    private Comp(final String n, final CmpV.Comp c) {
       name = n;
       cmp = c;
     }
@@ -92,7 +97,7 @@ public final class CmpG extends Arr {
   };
 
   /** Comparator. */
-  public Comp cmp;
+  Comp cmp;
   /** Index expression. */
   private IndexAccess[] iacc = {};
 

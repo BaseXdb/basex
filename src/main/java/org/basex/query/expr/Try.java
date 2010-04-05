@@ -15,10 +15,10 @@ import org.basex.query.util.Var;
  * @author Christian Gruen
  */
 public final class Try extends Single {
-  /** Catches. */
-  final Catch[] ctch;
   /** Query exception. */
   QueryException qe;
+  /** Catches. */
+  private final Catch[] ctch;
 
   /**
    * Constructor.

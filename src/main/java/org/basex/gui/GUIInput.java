@@ -35,13 +35,13 @@ public final class GUIInput extends BaseXTextField {
   /** JComboBox. */
   BaseXCombo box;
   /** String for temporary input. */
-  String pre = "";
+  private String pre = "";
 
   /**
    * Default constructor.
    * @param main main window reference
    */
-  public GUIInput(final GUI main) {
+  GUIInput(final GUI main) {
     super(main);
     gui = main;
 
@@ -132,7 +132,7 @@ public final class GUIInput extends BaseXTextField {
    * Checks if the query is a command.
    * @return result of check
    */
-  protected boolean cmdMode() {
+  boolean cmdMode() {
     return gui.prop.num(GUIProp.SEARCHMODE) == 2 ||
       gui.context.data == null || getText().startsWith("!");
   }
@@ -140,7 +140,7 @@ public final class GUIInput extends BaseXTextField {
   /**
    * Completes the input with the current combobox choice.
    */
-  protected void completeInput() {
+  void completeInput() {
     final Object sel = box.getSelectedItem();
     if(sel == null) return;
     final String suf = sel.toString();
@@ -155,7 +155,7 @@ public final class GUIInput extends BaseXTextField {
   /**
    * Shows the command popup menu.
    */
-  protected void showPopup() {
+  void showPopup() {
     final String query = getText();
     final int mode = gui.prop.num(GUIProp.SEARCHMODE);
     if(cmdMode()) {

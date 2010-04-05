@@ -268,7 +268,7 @@ public final class DialogCreate extends Dialog {
    * @param fn filename
    * @return result of check
    */
-  public static boolean dbValid(final String fn) {
+  static boolean dbValid(final String fn) {
     return fn.matches("[\\w.-]+");
   }
 }

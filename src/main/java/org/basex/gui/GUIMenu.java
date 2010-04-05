@@ -23,7 +23,7 @@ import static org.basex.gui.GUIConstants.*;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class GUIMenu extends JMenuBar {
+final class GUIMenu extends JMenuBar {
   /** Referenced menu items. */
   private final JMenuItem[] items;
   /** Reference to main window. */
@@ -33,7 +33,7 @@ public final class GUIMenu extends JMenuBar {
    * Initializes the menu bar.
    * @param main reference to the main window
    */
-  public GUIMenu(final GUI main) {
+  GUIMenu(final GUI main) {
     gui = main;
 
     final String sm = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() ==
@@ -95,7 +95,7 @@ public final class GUIMenu extends JMenuBar {
   /**
    * Refreshes the menu items.
    */
-  public void refresh() {
+  void refresh() {
     int c = 0;
     for(int i = 0; i < MENUBAR.length; i++) {
       for(int j = 0; j < MENUITEMS[i].length; j++) {

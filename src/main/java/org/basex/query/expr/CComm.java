@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class CComm extends CFrag {
   /** Two Dashes. */
-  public static final byte[] DASHES = { '-', '-' };
+  private static final byte[] DASHES = { '-', '-' };
 
   /**
    * Constructor.

@@ -19,6 +19,9 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public final class IOFile extends IO {
+  /** Zip entry. */
+  ZipEntry zip;
+
   /** File prefix. */
   private static final String PREFILE = "file:";
   /** Input stream reference. */
@@ -27,8 +30,6 @@ public final class IOFile extends IO {
   private final File file;
   /** File length. */
   private long len = -1;
-  /** Zip entry. */
-  ZipEntry zip;
 
   /**
    * Constructor.

@@ -20,15 +20,6 @@ public final class B64 extends Item {
 
   /**
    * Constructor.
-   * @param h hex item
-   */
-  public B64(final Hex h) {
-    super(Type.B6B);
-    val = h.val;
-  }
-
-  /**
-   * Constructor.
    * @param d data
    * @throws QueryException query exception
    */
@@ -37,6 +28,15 @@ public final class B64 extends Item {
     final TokenBuilder tb = new TokenBuilder();
     for(final byte c : d) if(c < 0 || c > ' ') tb.add(c);
     b2h(tb.finish());
+  }
+
+  /**
+   * Constructor.
+   * @param h hex item
+   */
+  B64(final Hex h) {
+    super(Type.B6B);
+    val = h.val;
   }
 
   @Override

@@ -26,7 +26,7 @@ public final class PathNode {
   /** Parent. */
   public PathNode par;
   /** Children. */
-  public PathNode[] ch;
+  PathNode[] ch;
 
   /**
    * Default constructor.
@@ -98,7 +98,7 @@ public final class PathNode {
    * Recursively adds the node and its descendants to the specified list.
    * @param nodes node list
    */
-  public void addDesc(final ArrayList<PathNode> nodes) {
+  void addDesc(final ArrayList<PathNode> nodes) {
     nodes.add(this);
     for(final PathNode n : ch) n.addDesc(nodes);
   }
@@ -162,7 +162,7 @@ public final class PathNode {
    * @param ser serializer
    * @throws IOException I/O exception
    */
-  public void plan(final Data data, final Serializer ser) throws IOException {
+  void plan(final Data data, final Serializer ser) throws IOException {
     ser.openElement(NODE, KIND, TABLEKINDS[kind]);
     if(kind == Data.ELEM) {
       ser.attribute(NAME, data.tags.key(name));

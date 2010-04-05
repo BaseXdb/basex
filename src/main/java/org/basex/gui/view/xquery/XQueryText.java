@@ -20,19 +20,18 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 final class XQueryText extends BaseXText {
-  /** Error pattern. */
-  private static final Pattern ERRPATTERN = Pattern.compile(
-      ".* line ([0-9]+), column ([0-9]+).*", Pattern.DOTALL);
-
-  /** View reference. */
-  private final XQueryView view;
-  /** Last Query. */
-  private byte[] last = Token.EMPTY;
-
   /** Last error position. */
   int error = -1;
   /** Thread counter. */
   int threadID;
+
+  /** Error pattern. */
+  private static final Pattern ERRPATTERN = Pattern.compile(
+      ".* line ([0-9]+), column ([0-9]+).*", Pattern.DOTALL);
+  /** View reference. */
+  private final XQueryView view;
+  /** Last Query. */
+  private byte[] last = Token.EMPTY;
 
   /**
    * Constructor.

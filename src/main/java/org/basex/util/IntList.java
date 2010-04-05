@@ -11,7 +11,7 @@ import org.basex.core.Main;
  */
 public class IntList {
   /** Resize factor for extending the the byte arrays. */
-  protected double factor = 2;
+  private double factor = 2;
   /** Value array. */
   protected int[] list;
   /** Number of entries. */
@@ -123,14 +123,6 @@ public class IntList {
    */
   public final void reset() {
     size = 0;
-  }
-
-  /**
-   * Init new list.
-   */
-  public void init() {
-    size = 0;
-    list = new int[8];
   }
 
   /**

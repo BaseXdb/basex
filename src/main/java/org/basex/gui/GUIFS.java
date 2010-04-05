@@ -315,16 +315,6 @@ public final class GUIFS {
   }
 
   /**
-   * Returns the description for the specified file.
-   * @param name file name
-   * @param dir directory
-   * @return description
-   */
-  public static String desc(final byte[] name, final boolean dir) {
-    return dir ? "folder" : desc[type(name)];
-  }
-
-  /**
    * Finds the specified token and returns its unique id.
    * @param tok token to be found
    * @param s start position

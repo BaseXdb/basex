@@ -465,7 +465,8 @@ public final class MapView extends View implements Runnable {
    * @param rects calculated rectangles
    * @param sc scale the rectangles
    */
-  void drawMap(final BufferedImage map, final MapRects rects, final float sc) {
+  private void drawMap(final BufferedImage map, final MapRects rects,
+      final float sc) {
     final Graphics g = map.getGraphics();
     smooth(g);
     painter.drawRectangles(g, rects, sc);

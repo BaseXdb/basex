@@ -24,7 +24,7 @@ public final class FLWR extends FLWOR {
    * @param r return expression
    */
   public FLWR(final ForLet[] f, final Expr w, final Expr r) {
-    super(f, w, null, r);
+    super(f, w, null, null, r);
   }
 
   @Override

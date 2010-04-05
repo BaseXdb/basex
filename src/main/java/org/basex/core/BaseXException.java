@@ -12,7 +12,7 @@ public final class BaseXException extends Exception {
    * @param s message
    * @param e message extension
    */
-  public BaseXException(final String s, final Object... e) {
+  BaseXException(final String s, final Object... e) {
     super(Main.info(s, e));
   }
 }

@@ -25,27 +25,27 @@ final class MapFSImages extends Thread {
   private static int err;
 
   /** Reference to the treemap panel. */
-  final MapView view;
+  private final MapView view;
   /** Image cache. */
-  final BufferedImage[] imgs = new BufferedImage[MAXNR];
+  private final BufferedImage[] imgs = new BufferedImage[MAXNR];
   /** Maximum image size. */
-  final boolean[] imgmax = new boolean[MAXNR];
+  private final boolean[] imgmax = new boolean[MAXNR];
   /** Image id cache. */
-  final int[] imgid = new int[MAXNR];
+  private final int[] imgid = new int[MAXNR];
   /** Pointer to next cached image. */
-  int imgc;
+  private int imgc;
 
   /** Image id cache. */
-  final int[] idCache = new int[MAXNR];
+  private final int[] idCache = new int[MAXNR];
   /** Image width cache. */
-  final int[] wCache = new int[MAXNR];
+  private final int[] wCache = new int[MAXNR];
   /** Image height cache. */
-  final int[] hCache = new int[MAXNR];
+  private final int[] hCache = new int[MAXNR];
   /** Cache counter. */
-  int loaderC;
+  private int loaderC;
 
   /** Thread reference. */
-  Thread thread;
+  private Thread thread;
 
   /**
    * Default constructor.
@@ -166,7 +166,7 @@ final class MapFSImages extends Thread {
   /**
    * Refreshes the map.
    */
-  void paint() {
+  private void paint() {
     // determine maximum cache size, depending on window size
     final Dimension size = view.gui.getSize();
     final Runtime rt = Runtime.getRuntime();

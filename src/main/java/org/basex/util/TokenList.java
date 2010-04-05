@@ -14,9 +14,9 @@ import org.basex.core.Main;
  */
 public final class TokenList implements Iterable<byte[]> {
   /** Resize factor for extending the the byte arrays. */
-  double factor = 2;
+  private double factor = 2;
   /** Value array. */
-  public byte[][] list;
+  byte[][] list;
   /** Current array size. */
   int size;
 
@@ -140,14 +140,6 @@ public final class TokenList implements Iterable<byte[]> {
     final String[] items = new String[size];
     for(int i = 0; i < items.length; i++) items[i] = string(list[i]);
     return items;
-  }
-
-  /**
-   * Init new list.
-   */
-  public void init() {
-    size = 0;
-    list = new byte[8][];
   }
 
   /**

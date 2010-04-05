@@ -26,26 +26,12 @@ public class FLWOR extends Expr {
   /** Where Expression. */
   protected Expr where;
   /** Order Expressions. */
-  protected Order order;
-
+  private Order order;
   /** Group by Expression. */
-  protected Group group;
-  /**
-   * Constructor.
-   * @param f variable inputs
-   * @param w where clause
-   * @param o order expressions
-   * @param r return expression
-   */
-  public FLWOR(final ForLet[] f, final Expr w, final Order o, final Expr r) {
-    ret = r;
-    fl = f;
-    group = null;
-    where = w;
-    order = o;
-  }
+  private Group group;
 
-  /** FLWOR initialization.
+  /**
+   * FLWOR initialization.
    * @param f variable inputs
    * @param w where clause
    * @param o order expression

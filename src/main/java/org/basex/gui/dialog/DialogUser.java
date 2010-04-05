@@ -35,11 +35,11 @@ import org.basex.util.TokenList;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
-public final class DialogUser extends BaseXBack {
+final class DialogUser extends BaseXBack {
   /** Session. */
-  Session sess;
+  private Session sess;
   /** Global user table. */
-  Table users = new Table();
+  private Table users = new Table();
 
   /** Create button. */
   private final BaseXButton create;
@@ -54,26 +54,26 @@ public final class DialogUser extends BaseXBack {
   /** Password textfield. */
   private final BaseXPassword pass;
   /** User columns. */
-  final BaseXCombo addUser;
+  private final BaseXCombo addUser;
   /** Databases. */
-  final BaseXCombo databases;
+  private final BaseXCombo databases;
   /** User table. */
-  final BaseXTable table;
+  private final BaseXTable table;
   /** Info label. */
-  final BaseXLabel info;
+  private final BaseXLabel info;
   /** Flag global/local. */
-  final boolean global;
+  private final boolean global;
   /** Dialog. */
-  final DialogServer dia;
+  private final DialogServer dia;
   /** Table panel. */
-  final BaseXBack tablePanel;
+  private final BaseXBack tablePanel;
 
   /**
    * Constructor.
    * @param g global/local flag
    * @param d dialog window
    */
-  public DialogUser(final boolean g, final DialogServer d) {
+  DialogUser(final boolean g, final DialogServer d) {
     global = g;
     dia = d;
 
@@ -151,7 +151,7 @@ public final class DialogUser extends BaseXBack {
    * Reacts on user input.
    * @param cmp calling component
    */
-  public void action(final Object cmp) {
+  void action(final Object cmp) {
     boolean ok = true;
     String msg = null;
 

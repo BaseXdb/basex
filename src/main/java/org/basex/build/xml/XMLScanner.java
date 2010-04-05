@@ -24,7 +24,7 @@ import org.basex.util.TokenMap;
  * @author Christian Gruen
  * @author Andreas Weiler
  */
-public final class XMLScanner extends Progress {
+final class XMLScanner extends Progress {
   /** PublicID characters. */
   private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
   /** Quote Entity. */
@@ -82,7 +82,7 @@ public final class XMLScanner extends Progress {
    * @param pr database properties
    * @throws IOException I/O exception
    */
-  public XMLScanner(final IO f, final Prop pr) throws IOException {
+  XMLScanner(final IO f, final Prop pr) throws IOException {
     input = new XMLInput(f);
     ents = new TokenMap();
     ents.add(E_AMP, AMP);

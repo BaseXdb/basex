@@ -55,7 +55,7 @@ public final class Updates {
    * Adds a data reference to the reference list.
    * @param d data reference to add
    */
-  public void addDataReference(final Data d) {
+  void addDataReference(final Data d) {
     refs.add(d);
   }
 

@@ -17,7 +17,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class IterStep extends Step {
+final class IterStep extends Step {
   /** Flag is set to true if predicate has last function. */
   final boolean last;
   /** Optional position predicate. */
@@ -31,7 +31,7 @@ public final class IterStep extends Step {
    * @param ps position predicate
    * @param l lastFlag is true if predicate has a last function
    */
-  public IterStep(final Axis a, final Test t, final Expr[] p,
+  IterStep(final Axis a, final Test t, final Expr[] p,
       final Pos ps, final boolean l) {
     super(a, t, p);
     last = l;

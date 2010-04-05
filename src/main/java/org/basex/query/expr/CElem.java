@@ -23,9 +23,9 @@ import org.basex.util.Atts;
  */
 public final class CElem extends CFrag {
   /** Namespaces. */
-  final Atts nsp;
+  private final Atts nsp;
   /** Tag name. */
-  Expr tag;
+  private Expr tag;
 
   /**
    * Constructor.
@@ -54,7 +54,7 @@ public final class CElem extends CFrag {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  void addNS(final QueryContext ctx) throws QueryException {
+  private void addNS(final QueryContext ctx) throws QueryException {
     for(int n = nsp.size - 1; n >= 0; n--) {
       ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), Uri.uri(nsp.val[n])));
     }

@@ -43,7 +43,7 @@ import org.basex.util.TokenBuilder;
  * @author Sebastian Gath
  * @author Christian Gruen
  */
-public final class FTFuzzyBuilder extends FTBuilder {
+final class FTFuzzyBuilder extends FTBuilder {
   /** Word parser. */
   private final ValueFTTrees tree = new ValueFTTrees();
 
@@ -205,7 +205,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
    * @return next token
    * @throws IOException I/O exception
    */
-  protected byte[] nextToken(final FTFuzzy[] v, final int m)
+  private byte[] nextToken(final FTFuzzy[] v, final int m)
       throws IOException {
 
     if(v[m] == null) return EMPTY;
@@ -221,7 +221,7 @@ public final class FTFuzzyBuilder extends FTBuilder {
    * @param cs current file pointer
    * @throws IOException I/O exception
    */
-  void writeIndex(final int cs) throws IOException {
+  private void writeIndex(final int cs) throws IOException {
     final String s = DATAFTX + (merge ? Integer.toString(cs) : "");
     final DataOutput outx = new DataOutput(data.meta.file(s + 'x'));
     final DataOutput outy = new DataOutput(data.meta.file(s + 'y'));

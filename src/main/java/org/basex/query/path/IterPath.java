@@ -17,13 +17,13 @@ import org.basex.query.util.Err;
  * @author Dennis Stratmann
  * @author Christian Gruen
  */
-public final class IterPath extends AxisPath {
+final class IterPath extends AxisPath {
   /**
    * Constructor.
    * @param r root expression
    * @param s location steps
    */
-  public IterPath(final Expr r, final Step[] s) {
+  IterPath(final Expr r, final Step[] s) {
     super(r, s);
   }
 

@@ -12,9 +12,9 @@ import org.basex.query.QueryException;
  */
 public class LocalSession extends Session {
   /** Database Context. */
-  protected final Context ctx;
+  private final Context ctx;
   /** Process reference. */
-  protected Proc proc;
+  private Proc proc;
 
   /**
    * Constructor.
