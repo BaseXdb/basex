@@ -207,18 +207,25 @@ public final class DeepFSExample {
   static class FileFinder implements FSTraversal {
     /** Directory, containing mp3 files. */
     String mp3Dir;
+
     /** Directory, containing jpg files. */
     String jpgDir;
+
     @Override
     public void levelUpdate(final int l) { /* NOT_USED */ }
+
     @Override
     public void postDirectoryVisit(final File d) { /* NOT_USED */ }
+
     @Override
     public void postTraversalVisit(final File d) { /* NOT_USED */ }
+
     @Override
     public void preDirectoryVisit(final File d) { /* NOT_USED */ }
+
     @Override
     public void preTraversalVisit(final File d) { /* NOT_USED */ }
+
     @Override
     public void regularFileVisit(final File f) {
       final String name = f.getName();
@@ -230,6 +237,7 @@ public final class DeepFSExample {
         if(mp3Dir != null) throw new RuntimeException();
       }
     }
+
     @Override
     public void symLinkVisit(final File f) { /* NOT_USED */ }
   }

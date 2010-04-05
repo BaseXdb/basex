@@ -9,7 +9,7 @@ package org.basex.examples.xmldb.eXist;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public abstract class Main {
+abstract class Main {
   /** Database Driver. */
   static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Database URL. */

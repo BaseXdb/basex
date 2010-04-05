@@ -118,7 +118,7 @@ public final class ServerConcurrencyExample {
    * This class simulates a database client.
    * Within a thread, a query is run several times until the thread is stopped.
    */
-  final class ClientExample {
+  private final class ClientExample {
     /** Set to false to stop the Client from running.*/
     boolean running = true;
     /** Random sleep time generator.*/
@@ -165,7 +165,7 @@ public final class ServerConcurrencyExample {
     /**
      * Quits the client thread.
      */
-    public void stop() {
+    void stop() {
       running = false;
     }
   }

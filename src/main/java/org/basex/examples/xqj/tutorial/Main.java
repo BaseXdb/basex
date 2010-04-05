@@ -16,7 +16,7 @@ import org.basex.api.xqj.BXQDataSource;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public abstract class Main {
+abstract class Main {
   /** Private constructor. */
   protected Main() { }
 
