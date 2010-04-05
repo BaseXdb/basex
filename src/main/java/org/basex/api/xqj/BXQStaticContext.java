@@ -25,18 +25,19 @@ final class BXQStaticContext implements XQStaticContext {
   final Context context;
   /** Query context. */
   final QueryContext ctx;
-  /** Context item type. */
-  XQItemType type;
   /** Forward flag. */
   boolean scrollable;
-  /** Binding mode (immediate). */
-  boolean binding = true;
-  /** Holdability. */
-  boolean holdability = true;
-  /** Language mode. */
-  boolean xqueryx = true;
   /** Timeout. */
   int timeout;
+
+  /** Context item type. */
+  private XQItemType type;
+  /** Binding mode (immediate). */
+  private boolean binding = true;
+  /** Holdability. */
+  private boolean holdability = true;
+  /** Language mode. */
+  private boolean xqueryx = true;
 
   /**
    * Constructor, specifying a user name and password.

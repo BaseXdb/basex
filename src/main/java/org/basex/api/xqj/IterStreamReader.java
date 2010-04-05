@@ -38,9 +38,9 @@ final class IterStreamReader implements XMLStreamReader {
   /** Namespaces references. */
   private final NSLocal ns = new NSLocal();
   /** Current state. */
-  protected int kind = START_DOCUMENT;
+  int kind = START_DOCUMENT;
   /** Current item. */
-  protected Item item;
+  Item item;
   /** Result iterator. */
   private final Iter result;
   /** Next flag. */
@@ -417,7 +417,7 @@ final class IterStreamReader implements XMLStreamReader {
   }
 
   /** Reader for traversing {@link DBNode} instances. */
-  final class DNodeReader extends NodeReader {
+  private final class DNodeReader extends NodeReader {
     /** Node reference. */
     private final DBNode node;
     /** Data size. */
@@ -488,7 +488,7 @@ final class IterStreamReader implements XMLStreamReader {
   }
 
   /** Reader for traversing {@link FNode} instances. */
-  final class FNodeReader extends NodeReader {
+  private final class FNodeReader extends NodeReader {
     /** Iterator. */
     private final NodeIter[] iter = new NodeIter[IO.MAXHEIGHT];
     /** Iterator. */

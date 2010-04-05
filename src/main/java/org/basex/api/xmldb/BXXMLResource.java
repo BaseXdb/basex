@@ -39,10 +39,10 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   private final Collection coll;
   /** String id. */
   private String id;
+  /** Query result. */
+  private Result result;
   /** Cached content. */
   Object content;
-  /** Query result. */
-  Result result;
   /** Data reference. */
   Data data;
   /** Pre value or result position. */
@@ -193,15 +193,15 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
   }
 
   /** SAX Parser. */
-  static final class BXSAXContentHandler extends DefaultHandler {
+  private static final class BXSAXContentHandler extends DefaultHandler {
     /** HashMap. */
-    final HashMap<String, String> ns = new HashMap<String, String>();
+    private final HashMap<String, String> ns = new HashMap<String, String>();
     /** Cached output. */
-    final CachedOutput co = new CachedOutput();
+    private final CachedOutput co = new CachedOutput();
     /** Serializer. */
-    final XMLSerializer xml;
+    private final XMLSerializer xml;
     /** XMLResource. */
-    BXXMLResource res;
+    private BXXMLResource res;
 
     /**
      * Standard Constructor.

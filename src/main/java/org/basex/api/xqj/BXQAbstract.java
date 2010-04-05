@@ -223,17 +223,6 @@ abstract class BXQAbstract {
   }
 
   /**
-   * Creates a database instance from the specified xml reader.
-   * @param r xml reader
-   * @return document node
-   * @throws XQException exception
-   */
-  protected final DBNode createDB(final XMLReader r) throws XQException {
-    valid(r, XMLReader.class);
-    return createDB(new SAXSource(r, null));
-  }
-
-  /**
    * Creates a database instance from the specified byte array.
    * @param s SAX source
    * @return document node
