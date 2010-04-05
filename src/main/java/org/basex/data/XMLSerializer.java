@@ -65,9 +65,9 @@ public final class XMLSerializer extends Serializer {
   private final String mth;
 
   /** System document type. */
-  private String docsys = "";
+  private String docsys;
   /** Public document type. */
-  private String docpub = "";
+  private String docpub;
 
   /** Temporary indentation flag. */
   private boolean ind;
@@ -359,8 +359,8 @@ public final class XMLSerializer extends Serializer {
     if(tags.size() == 1 && docsys != null) {
       if(ind) indent(false);
       print(DOCTYPE);
-      if(mth == M_TEXT) print(t);
-      else print(M_HTML);
+      if(mth == M_HTML) print(M_HTML);
+      else print(t);
       if(docpub != null) {
         print(" " + PUBLIC + " \"" + docpub + "\"");
       } else {
