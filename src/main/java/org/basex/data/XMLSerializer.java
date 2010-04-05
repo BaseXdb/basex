@@ -131,6 +131,8 @@ public final class XMLSerializer extends Serializer {
     if(docsys.isEmpty()) {
       docsys = null;
       docpub = null;
+    } else if(docpub.isEmpty()) {
+      docpub = null;
     }
 
     if(!Charset.isSupported(enc)) error(SERENCODING, enc);
