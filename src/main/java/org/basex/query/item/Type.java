@@ -841,7 +841,7 @@ public enum Type {
    */
   protected Return returned() {
     return num ? Return.NUM : node() ? Return.NOD :
-      this == Type.STR ? Return.STR : Return.NONUM;
+      this == BLN ? Return.BLN : Return.STR;
   }
 
   /**

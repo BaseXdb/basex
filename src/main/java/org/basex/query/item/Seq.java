@@ -129,7 +129,12 @@ public class Seq extends Item {
 
   @Override
   public final Return returned(final QueryContext ctx) {
-    return Return.SEQ;
+    if(size == 0 || size > 16) return Return.SEQ;
+    final Return ret = val[0].returned(ctx);
+    for(int s = 1; s < size; s++) {
+      if(ret != val[s].returned(ctx)) return Return.SEQ;
+    }
+    return ret.seq();
   }
 
   @Override

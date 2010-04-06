@@ -8,6 +8,7 @@ import org.basex.core.Commands.CmdPerm;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.Return;
 import org.basex.query.item.Atm;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -122,5 +123,15 @@ public final class FNGen extends Fun {
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.UPD ? func == FunDef.PUT : super.uses(u, ctx);
+  }
+
+  @Override
+  public Return returned(final QueryContext ctx) {
+    if(func == FunDef.DATA) {
+      final Return ret = expr[0].returned(ctx);
+      return ret == Return.NOD ? Return.STR :
+        ret == Return.NODSEQ ? Return.STRSEQ : ret;
+    }
+    return super.returned(ctx);
   }
 }

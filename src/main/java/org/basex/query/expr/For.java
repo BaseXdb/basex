@@ -51,9 +51,7 @@ public final class For extends ForLet {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
-      if     (ret == Return.NUMSEQ)   var.ret = Return.NUM;
-      else if(ret == Return.NONUMSEQ) var.ret = Return.NONUM;
-      else if(ret == Return.NODSEQ)   var.ret = Return.NOD;
+      var.ret = ret.single();
     }
     ctx.vars.add(var);
 

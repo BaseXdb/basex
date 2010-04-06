@@ -1,7 +1,9 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.data.Data;
 import org.basex.data.Serializer;
 import org.basex.data.Data.IndexType;
 import org.basex.index.IndexIterator;
@@ -12,7 +14,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.util.Token;
+import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -41,17 +43,46 @@ public final class IndexAccess extends Single {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return new Iter() {
-      final ValuesToken ind = new ValuesToken(type, expr.atomic(ctx).str());
-      final IndexIterator it = ictx.data.ids(ind);
+    Iter[] iter = {};
+    final Iter ir = expr.iter(ctx);
+    Item it;
+    while((it = ir.next()) != null) iter = Array.add(iter, index(it.str()));
+
+    return iter.length == 0 ? Iter.EMPTY : iter.length == 1 ? iter[0] :
+      new Union(new Expr[] { expr }).eval(iter);
+  }
+
+  /**
+   * Returns an index iterator.
+   * @param term term to be found
+   * @return iterator
+   */
+  private Iter index(final byte[] term) {
+    final Data data = ictx.data;
+    return term.length <= MAXLEN ? new Iter() {
+      final IndexIterator ii = data.ids(new ValuesToken(type, term));
 
       @Override
       public Item next() {
-        return it.more() ? new DBNode(ictx.data, it.next()) : null;
+        return ii.more() ? new DBNode(data, ii.next()) : null;
+      }
+    } : new Iter() {
+      // just in case: parse complete data if string is too long
+      final boolean text = type == IndexType.TXT;
+      int pre = -1;
+
+      @Override
+      public Item next() {
+        while(++pre != data.meta.size) {
+          final int k = data.kind(pre);
+          if((text ? k == Data.TEXT : k == Data.ATTR) &&
+              eq(data.text(pre, text), term)) return new DBNode(data, pre);
+        }
+        return null;
       }
     };
   }
-
+  
   @Override
   public Return returned(final QueryContext ctx) {
     return Return.NODSEQ;
@@ -74,7 +105,7 @@ public final class IndexAccess extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(type.toString()));
+    ser.openElement(this, TYPE, token(type.toString()));
     expr.plan(ser);
     ser.closeElement();
   }

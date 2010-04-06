@@ -210,20 +210,19 @@ public final class FNBaseX extends Fun {
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
     final String type = string(checkStr(expr[1], ctx)).toLowerCase();
-    final byte[] word = checkStr(expr[0], ctx);
 
     if(type.equals(FULLTEXT)) {
       if(!data.meta.ftxindex) Err.or(NOIDX, FULLTEXT);
       return new FTIndexAccess(new FTWords(
-          data, word, ctx.ftpos == null), ic).iter(ctx);
+          data, checkStr(expr[0], ctx), ctx.ftpos == null), ic).iter(ctx);
     }
     if(type.equals(TEXT)) {
       if(!data.meta.txtindex) Err.or(NOIDX, TEXT);
-      return new IndexAccess(Str.get(word), IndexType.TXT, ic).iter(ctx);
+      return new IndexAccess(expr[0], IndexType.TXT, ic).iter(ctx);
     }
     if(type.equals(ATTRIBUTE)) {
       if(!data.meta.atvindex) Err.or(NOIDX, ATTRIBUTE);
-      return new IndexAccess(Str.get(word), IndexType.ATV, ic).iter(ctx);
+      return new IndexAccess(expr[0], IndexType.ATV, ic).iter(ctx);
     }
 
     Err.or(WHICHIDX, type);

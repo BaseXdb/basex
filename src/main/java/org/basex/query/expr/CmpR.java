@@ -55,20 +55,6 @@ final class CmpR extends Single {
   }
 
   /**
-   * Returns a range or an optimized expression.
-   * @param e expression
-   * @param mn minimum value
-   * @param in include minimum value
-   * @param mx maximum value
-   * @param ix include maximum value
-   * @return expression
-   */
-  private static Expr get(final CmpR e, final double mn, final boolean in,
-      final double mx, final boolean ix) {
-    return mn > mx ? Bln.FALSE : new CmpR(e.expr, mn, in, mx, ix);
-  }
-
-  /**
    * Creates an intersection of the existing and the specified expressions.
    * @param ex expression
    * @return resulting expression
@@ -77,7 +63,7 @@ final class CmpR extends Single {
   static Expr get(final Expr ex) throws QueryException {
     if(ex instanceof CmpG || ex instanceof CmpV) {
       final Arr c = (Arr) ex;
-      if(!c.standard(true)) return null;
+      if(!c.pathAndItem(true)) return null;
       final Expr e = c.expr[0];
       final double d = ((Item) c.expr[1]).dbl();
       switch(c instanceof CmpG ? ((CmpG) c).cmp.cmp : ((CmpV) c).cmp) {
@@ -116,8 +102,10 @@ final class CmpR extends Single {
    */
   Expr intersect(final CmpR c) {
     if(c == null || !c.expr.sameAs(expr)) return null;
-    return get(c, Math.max(min, c.min), mni && c.mni, Math.min(max, c.max),
-        mxi && c.mxi);
+    final double mn = Math.max(min, c.min);
+    final double mx = Math.min(max, c.max);
+    return mn > mx ? Bln.FALSE :
+      new CmpR(c, mn, mni && c.mni, mx, mxi && c.mxi);
   }
 
   @Override
@@ -141,7 +129,7 @@ final class CmpR extends Single {
 
     // estimate costs for range access; all values out of range: no results
     ic.is = rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
-      ic.data.meta.size / 5;
+      Math.max(1, ic.data.meta.size / 5);
     return true;
   }
 

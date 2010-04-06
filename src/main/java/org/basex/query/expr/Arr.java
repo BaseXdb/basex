@@ -60,11 +60,11 @@ public abstract class Arr extends Expr {
   }
 
   /**
-   * Checks if this expression has a path and an item as arguments.
-   * @param num number flag
+   * Checks if this expression has an axis path and an item as arguments.
+   * @param num item must be numeric
    * @return result of check
    */
-  final boolean standard(final boolean num) {
+  protected final boolean pathAndItem(final boolean num) {
     return expr.length == 2 && expr[0] instanceof AxisPath && expr[1].i() &&
       (num ? ((Item) expr[1]).n() : expr[1] instanceof Str);
   }

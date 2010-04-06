@@ -55,7 +55,7 @@ public final class Union extends Arr {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private NodeIter eval(final Iter[] iter) throws QueryException {
+  public NodeIter eval(final Iter[] iter) throws QueryException {
     final NodIter ni = new NodIter(true);
     for(final Iter ir : iter) {
       Item it;

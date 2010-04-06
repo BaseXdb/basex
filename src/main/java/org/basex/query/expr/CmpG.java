@@ -15,7 +15,6 @@ import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
-import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -164,7 +163,7 @@ public final class CmpG extends Arr {
           }
         }
       }
-    } else if(standard(true)) {
+    } else if(pathAndItem(true)) {
       // rewrite path CMP number
       e = CmpR.get(this);
       if(e == null) e = this;
@@ -240,8 +239,7 @@ public final class CmpG extends Arr {
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr[0]);
-    if(s == null || cmp != Comp.EQ || !(expr[1].i() ||
-        expr[1] instanceof Seq)) return false;
+    if(s == null || cmp != Comp.EQ) return false;
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
@@ -249,17 +247,28 @@ public final class CmpG extends Arr {
 
     // no text or attribute index applicable
     if(!text && !attr) return false;
+    final IndexType type = text ? IndexType.TXT : IndexType.ATV;
 
-    // loop through all strings
-    final Iter ir = expr[1].iter(ic.ctx);
+    // support expressions
+    final Expr arg = expr[1];
+    if(!(arg.i() || arg instanceof Seq)) {
+      final Return ret = arg.returned(ic.ctx);
+      if(ret != Return.STR && ret != Return.STRSEQ &&
+         ret != Return.NOD && ret != Return.NODSEQ) return false;
+
+      ic.is += Math.max(1, ic.data.meta.size / 10);
+      iacc = Array.add(iacc, new IndexAccess(arg, type, ic));
+      return true;
+    }
+    
+    // loop through all items
+    final Iter ir = arg.iter(ic.ctx);
     Item it;
     ic.is = 0;
     while((it = ir.next()) != null) {
-      // allow arbitrary expressions here? it.returned(ctx) == Return.STR...
-      final boolean str = it instanceof Str;
-      if(!str || it.str().length > Token.MAXLEN) return false;
+      final Return ret = it.returned(ic.ctx);
+      if(ret != Return.STR && ret != Return.NOD) return false;
 
-      final IndexType type = text ? IndexType.TXT : IndexType.ATV;
       ic.is += ic.data.nrIDs(new ValuesToken(type, it.str()));
       iacc = Array.add(iacc, new IndexAccess(it, type, ic));
     }

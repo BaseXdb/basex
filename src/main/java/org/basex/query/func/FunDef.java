@@ -56,7 +56,7 @@ public enum FunDef {
   /** XQuery function. */
   COLLAT(FNURI, FNContext.class, 0, 0, "default-collation()", STR),
   /** XQuery function. */
-  STBASEURI(FNURI, FNContext.class, 0, 0, "static-base-uri()", NONUMSEQ),
+  STBASEURI(FNURI, FNContext.class, 0, 0, "static-base-uri()", STRSEQ),
 
   /* FNDate functions. */
 
@@ -139,9 +139,9 @@ public enum FunDef {
   /* FNNode functions. */
 
   /** XQuery function. */
-  DOCURI(FNURI, FNNode.class, 1, 1, "document-uri(node)", NONUMSEQ),
+  DOCURI(FNURI, FNNode.class, 1, 1, "document-uri(node)", STRSEQ),
   /** XQuery function. */
-  NILLED(FNURI, FNNode.class, 1, 1, "nilled(node)", NONUMSEQ),
+  NILLED(FNURI, FNNode.class, 1, 1, "nilled(node)", BLNSEQ),
   /** XQuery function. */
   NODENAME(FNURI, FNNode.class, 1, 1, "node-name(node)", NONUMSEQ),
   /** XQuery function. */
@@ -153,7 +153,7 @@ public enum FunDef {
   /** XQuery function. */
   ROOT(FNURI, FNNode.class, 0, 1, "root(node?)", NODSEQ),
   /** XQuery function. */
-  BASEURI(FNURI, FNNode.class, 0, 1, "base-uri(node?)", NONUMSEQ),
+  BASEURI(FNURI, FNNode.class, 0, 1, "base-uri(node?)", STRSEQ),
 
   /* FNNum functions. */
 
@@ -183,26 +183,26 @@ public enum FunDef {
   REPLACE(FNURI, FNPat.class, 3, 4, "replace(item, pattern, replace, mod?)",
       STR),
   /** XQuery function. */
-  TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", NONUMSEQ),
+  TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", STRSEQ),
 
   /* FNQName functions. */
 
   /** XQuery function. */
-  INSCOPE(FNURI, FNQName.class, 1, 1, "in-scope-prefixes(elem)", NONUMSEQ),
+  INSCOPE(FNURI, FNQName.class, 1, 1, "in-scope-prefixes(elem)", STRSEQ),
   /** XQuery function. */
   LOCNAMEQNAME(FNURI, FNQName.class, 1, 1, "local-name-from-QName(qname)",
-      NONUMSEQ),
+      STRSEQ),
   /** XQuery function. */
   NSURIPRE(FNURI, FNQName.class, 2, 2, "namespace-uri-for-prefix(pre, elem)",
-      NONUMSEQ),
+      STRSEQ),
   /** XQuery function. */
   QNAME(FNURI, FNQName.class, 2, 2, "QName(uri, name)", NONUM),
   /** XQuery function. */
-  PREQNAME(FNURI, FNQName.class, 1, 1, "prefix-from-QName(qname)", NONUMSEQ),
+  PREQNAME(FNURI, FNQName.class, 1, 1, "prefix-from-QName(qname)", STRSEQ),
   /** XQuery function. */
   RESQNAME(FNURI, FNQName.class, 2, 2, "resolve-QName(item, base)", NONUMSEQ),
   /** XQuery function. */
-  RESURI(FNURI, FNQName.class, 1, 2, "resolve-uri(name, elem?)", NONUMSEQ),
+  RESURI(FNURI, FNQName.class, 1, 2, "resolve-uri(name, elem?)", STRSEQ),
 
   /* FNSeq functions. */
 
@@ -247,8 +247,7 @@ public enum FunDef {
   /* FNStr functions. */
 
   /** XQuery function. */
-  CODEPNT(FNURI, FNStr.class, 2, 2, "codepoint-equal(string, string)",
-      NONUMSEQ),
+  CODEPNT(FNURI, FNStr.class, 2, 2, "codepoint-equal(string, string)", BLNSEQ),
   /** XQuery function. */
   CODESTR(FNURI, FNStr.class, 1, 1, "codepoints-to-string(num*)", STR),
   /** XQuery function. */

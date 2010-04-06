@@ -34,7 +34,7 @@ public final class StatsKey {
   public int counter;
   /** Leaf node flag. */
   public boolean leaf;
-  /** Average text-length. */
+  /** Maximum text length. */
   private double len;
 
   /**
@@ -101,7 +101,7 @@ public final class StatsKey {
    */
   public void add(final byte[] val) {
     final int vl = val.length;
-    len = counter == 0 ? vl : (len * (counter - 1) + vl) / counter;
+    if(vl > len) len = vl;
 
     if(vl == 0 || kind == Kind.TEXT || ws(val)) return;
 
@@ -157,8 +157,7 @@ public final class StatsKey {
       default:
         break;
     }
-    final double avg = (int) (len * 100) / 100d;
-    if(len != 0) sb.append(", " + avg + " avg. chars");
+    if(len != 0) sb.append(", " + len + " max. length");
     if(leaf) sb.append(", leaf");
     return sb.toString();
   }

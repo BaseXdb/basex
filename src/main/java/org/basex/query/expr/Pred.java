@@ -127,6 +127,12 @@ public class Pred extends Preds {
   }
 
   @Override
+  public final Return returned(final QueryContext ctx) {
+    final Return ret = root.returned(ctx);
+    return ret.single ? super.returned(ctx) : ret;
+  }
+
+  @Override
   public final void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     root.plan(ser);

@@ -142,8 +142,7 @@ public final class SeqType {
    */
   public Return returned() {
     final Return r = type.returned();
-    return occ == 0 ? r : r == Return.NUM ? Return.NUMSEQ :
-      r == Return.NOD ? Return.NODSEQ : Return.NONUMSEQ;
+    return occ == 0 ? r : r.seq();
   }
 
   @Override

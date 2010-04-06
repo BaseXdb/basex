@@ -108,13 +108,13 @@ import org.basex.util.Tokenizer.FTUnit;
  * @author Christian Gruen
  */
 public class QueryParser extends InputParser {
-  /** Resulting XQuery expression. */
-  private final QueryContext ctx;
   /** Temporary token builder. */
   private final TokenBuilder tok = new TokenBuilder();
+  /** Query context. */
+  private final QueryContext ctx;
 
   /** List of loaded modules. */
-  private TokenList modLoaded = new TokenList();
+  private final TokenList modLoaded = new TokenList();
   /** Module name. */
   private QNm module;
 
@@ -1376,7 +1376,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  protected final Test test(final boolean att) throws QueryException {
+  private Test test(final boolean att) throws QueryException {
     final int p = qp;
     final char ch = curr();
     if(XMLToken.isXMLLetter(ch)) {

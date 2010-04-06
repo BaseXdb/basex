@@ -53,7 +53,7 @@ public class AxisPath extends Path {
 
   /**
    * Constructor.
-   * @param r root expression; can be null
+   * @param r root expression; can be a {@code null} reference
    * @param s location steps; will at least have one entry
    */
   protected AxisPath(final Expr r, final Step... s) {
@@ -63,14 +63,11 @@ public class AxisPath extends Path {
 
   /**
    * Constructor.
-   * @param r root expression; can be null
+   * @param r root expression; can be a {@code null} reference
    * @param st location steps; will at least have one entry
    * @return class instance
    */
   public static final AxisPath get(final Expr r, final Step... st) {
-    // check if steps have predicates
-    boolean pred = false;
-    for(final Step s : st) pred |= s.pred.length != 0;
     return new AxisPath(r, st).iterator(null);
   }
 
@@ -124,7 +121,6 @@ public class AxisPath extends Path {
 
     final Item ci = ctx.item;
     ctx.item = root(ctx);
-
     final Expr e = c(ctx);
     ctx.item = ci;
     return e;
@@ -145,15 +141,6 @@ public class AxisPath extends Path {
     }
     mergeDesc(ctx);
 
-    // check if steps have predicates
-    boolean pos = false;
-    for(final Step s : step) {
-      // variable found - skip optimizations
-      if(s.uses(Use.VAR, ctx)) return this;
-      // position found
-      pos = pos || s.uses(Use.POS, ctx);
-    }
-
     // check if context is set to document nodes
     final Data data = ctx.data();
     // [CG] XQuery/Index: check if optimization is limited to paths with roots
@@ -164,23 +151,22 @@ public class AxisPath extends Path {
           ((Seq) item).val != ctx.doc) {
         final Iter iter = item.iter();
         Item it;
-        while((it = iter.next()) != null) doc &= it.type == Type.DOC;
+        while((it = iter.next()) != null) doc = doc && it.type == Type.DOC;
       }
 
       if(doc) {
-        // check if no position is used
-        if(!pos && root != null) {
-          // check index access
-          final Expr e = index(ctx, data);
-          if(e != this) return e;
-        }
+        Expr e = this;
+        // check index access
+        if(root != null && !uses(Use.POS, ctx)) e = index(ctx, data);
         // check children path rewriting
-        final Expr e = children(ctx, data);
-        if(e != this) return e;
+        if(e == this) e = children(ctx, data);
+        // return optimized expression
+        if(e != this) return e.comp(ctx);
       }
     }
+
     // analyze if result set can be cached - no predicates/variables...
-    cache = root != null && !root.uses(Use.VAR, ctx);
+    cache = root != null && !uses(Use.VAR, ctx);
 
     // if applicable, return iterator
     return iterator(ctx);
@@ -371,7 +357,7 @@ public class AxisPath extends Path {
       for(int s = ms + 1; s < step.length; s++) {
         result.step = Array.add(result.step, step[s]);
       }
-      return result.comp(ctx);
+      return result;
     }
     return this;
   }
@@ -486,9 +472,9 @@ public class AxisPath extends Path {
     if(ll > 0) {
       final Step s = step[0];
       if(root instanceof DBNode && ((DBNode) root).type == Type.DOC &&
-          (s.axis == ATTR || s.axis == PARENT || s.axis == SELF
-              && s.test != NODE)
-          || root instanceof CAttr && s.axis == CHILD) warning(s);
+        (s.axis == ATTR || s.axis == PARENT || s.axis == SELF &&
+         s.test != NODE) || root instanceof CAttr && s.axis == CHILD)
+        warning(s);
     }
 
     for(int l = 1; l < ll; l++) {
