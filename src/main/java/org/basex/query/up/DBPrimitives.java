@@ -13,7 +13,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
-import org.basex.query.item.Uri;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -44,7 +43,7 @@ final class DBPrimitives extends Primitives {
   }
 
   @Override
-  protected void check() throws QueryException {
+  protected void check(final QueryContext ctx) throws QueryException {
     super.check();
 
     // check attribute duplicates
@@ -64,9 +63,9 @@ final class DBPrimitives extends Primitives {
           p--;
         }
         if(par != -1) il.add(par);
-        checkNames(il.finish());
+        checkNames(ctx, il.finish());
       } else {
-        if(k == Data.ELEM) checkNames(pre);
+        if(k == Data.ELEM) checkNames(ctx, pre);
         p--;
       }
     }
@@ -74,10 +73,12 @@ final class DBPrimitives extends Primitives {
 
   /**
    * Checks nodes for duplicate attributes.
+   * @param ctx query context reference
    * @param pres pre values of nodes to check (in descending order)
    * @throws QueryException query exception
    */
-  private void checkNames(final int... pres) throws QueryException {
+  private void checkNames(final QueryContext ctx, final int... pres) 
+    throws QueryException {
     final NamePool pool = new NamePool();
     final IntList il = new IntList();
 
@@ -94,9 +95,8 @@ final class DBPrimitives extends Primitives {
         for(int p = pre + 1; p < ps; p++) {
           final byte[] nm = d.name(p, Data.ATTR);
           // use Uri(name, uri) constructor for attributes with namespaces
-          // [LK] seems to cause some NullPointerExceptions...
-          if(!il.contains(p)) pool.add(new QNm(nm, 
-              new Uri(d.ns.uri(d.ns.uri(nm, p)))), Type.ATT);
+          // [LK] run some more tests
+          if(!il.contains(p)) pool.add(new QNm(nm, ctx), Type.ATT);
         }
       }
     }

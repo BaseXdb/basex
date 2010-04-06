@@ -24,7 +24,7 @@ final class FragPrimitives extends Primitives {
   }
 
   @Override
-  protected void check() throws QueryException {
+  protected void check(final QueryContext ctx) throws QueryException {
     super.check();
 
     // check fn:put constraints ... duplicate uri

@@ -92,6 +92,13 @@ abstract class Primitives {
       }
     }
   };
+  
+  /**
+   * Checks updates for violations.
+   * @param ctx query context reference
+   * @throws QueryException query exception
+   */
+  protected abstract void check(final QueryContext ctx) throws QueryException;
 
   /**
    * Removes null values from given array.

@@ -101,7 +101,7 @@ public final class Updates {
   public synchronized void apply(final QueryContext ctx) throws QueryException {
     // Constraints are checked first. No updates are applied if any problems
     // are found.
-    for(final Primitives p : primitives.values()) p.check();
+    for(final Primitives p : primitives.values()) p.check(ctx);
     for(final Primitives p : primitives.values()) p.apply(ctx);
   }
 }
