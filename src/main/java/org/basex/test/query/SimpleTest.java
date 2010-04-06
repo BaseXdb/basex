@@ -82,6 +82,7 @@ public final class SimpleTest extends AbstractTest {
       { "Pred 5", nodes(20), "//ul/li[text() = 'Exercise 1']" },
       { "Pred 6", nodes(20), "/html/body/div/ul/li[text() = 'Exercise 1']" },
       { "Pred 7", nodes(8), "//*[@* = '#FFFFFF']" },
+      { "Pred 8", nodes(8), "//*[@id = 1]" },
       { "Pred Error 1", "/[/]" },
       { "Pred Error 2", "/*[]" },
       { "Pred Error 3", "/*[//]" },
