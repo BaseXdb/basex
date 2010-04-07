@@ -93,7 +93,8 @@ public final class FTWindow extends FTFilter {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(QueryTokens.WINDOW), token(win + " " + unit));
+    ser.openElement(this, token(QueryTokens.WINDOW), token(unit.toString()));
+    win.plan(ser);
     super.plan(ser);
   }
 
