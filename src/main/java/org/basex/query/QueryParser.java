@@ -25,6 +25,7 @@ import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Except;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.Extension;
 import org.basex.query.expr.FLWOR;
 import org.basex.query.expr.FLWR;
 import org.basex.query.expr.For;
@@ -40,10 +41,12 @@ import org.basex.query.expr.List;
 import org.basex.query.expr.Or;
 import org.basex.query.expr.OrderBy;
 import org.basex.query.expr.Order;
+import org.basex.query.expr.Pragma;
 import org.basex.query.expr.Pred;
 import org.basex.query.expr.Range;
 import org.basex.query.expr.Root;
 import org.basex.query.expr.Satisfy;
+import org.basex.query.expr.Scored;
 import org.basex.query.expr.Treat;
 import org.basex.query.expr.Try;
 import org.basex.query.expr.TypeSwitch;
@@ -53,6 +56,7 @@ import org.basex.query.expr.VarCall;
 import org.basex.query.ft.FTAnd;
 import org.basex.query.ft.FTContains;
 import org.basex.query.ft.FTContent;
+import org.basex.query.ft.FTExtensionSelection;
 import org.basex.query.ft.FTScope;
 import org.basex.query.ft.FTDistance;
 import org.basex.query.ft.FTExpr;
@@ -1134,10 +1138,23 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr cast() throws QueryException {
-    final Expr e = unary();
+    final Expr e = scored();
     if(!consumeWS(CAST)) return e;
     check(AS);
     return new Cast(e, simpleType());
+  }
+  
+  /**
+   * Parses a ScoredExpr.
+   * This is a proprietary extension to XQuery FT for adding full-text scores
+   * to non-FT expressions.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr scored() throws QueryException {
+    final Expr e = unary();
+    if(!consumeWS(SCORED)) return e;
+    return new Scored(e, single());
   }
 
   /**
@@ -1164,7 +1181,6 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 59] Parses a ValueExpr.
-   * [ 65] Parses an ExtensionExpr.
    * @return query expression
    * @throws QueryException query exception
    */
@@ -1173,7 +1189,18 @@ public class QueryParser extends InputParser {
     if(lax || consumeWS(VALIDATE, STRICT, NOVALIDATE)) validate();
 
     final Expr e = path();
-    return e != null ? e : pragma() ? enclosed(NOPRAGMA) : null;
+    return e != null ? e : extension();
+  }
+
+  /**
+   * [ 65] Parses an ExtensionExpr.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr extension() throws QueryException {
+    Expr[] pragmas = pragma();
+    return pragmas.length == 0 ? null
+        : new Extension(pragmas, enclosed(NOPRAGMA));
   }
 
   /**
@@ -1190,14 +1217,12 @@ public class QueryParser extends InputParser {
 
   /**
    * [ 66] Parses a Pragma.
-   * @return true if pragma was found
+   * @return array of pragmas
    * @throws QueryException query exception
    */
-  private boolean pragma() throws QueryException {
-    if(!consumeWS2(PRAGMA)) return false;
-
-    do {
-      // ignore all pragmas...
+  private Expr[] pragma() throws QueryException {
+    Expr[] pragmas = { };
+    while(consumeWS(PRAGMA)) {
       final QNm name = new QNm(qName(PRAGMAINCOMPLETE), ctx);
       if(!name.ns()) error(NSMISS, name);
       char c = curr();
@@ -1209,10 +1234,11 @@ public class QueryParser extends InputParser {
         tok.add(consume());
         c = curr();
       }
-      tok.finish();
+      tok.chop();
+      pragmas = add(pragmas, new Pragma(name, tok.finish()));
       qp += 2;
-    } while(consumeWS(PRAGMA));
-    return true;
+    }
+    return pragmas;
   }
 
   /**
@@ -2279,12 +2305,12 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private FTExpr ftPrimary(final boolean prg) throws QueryException {
-    if(pragma()) {
-      while(pragma());
+    Expr[] pragmas = pragma();
+    if(pragmas.length > 0) {
       check(BRACE1);
       final FTExpr e = ftSelection(true);
       check(BRACE2);
-      return e;
+      return new FTExtensionSelection(pragmas, e);
     }
 
     if(consumeWS(PAR1)) {

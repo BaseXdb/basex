@@ -216,6 +216,8 @@ public interface QueryTokens {
   /** Parser token. */
   String SCORE = "score";
   /** Parser token. */
+  String SCORED = "scored";
+  /** Parser token. */
   String SENSITIVE = "sensitive";
   /** Parser token. */
   String SENTENCE = "sentence";
@@ -329,6 +331,8 @@ public interface QueryTokens {
   String PIPE = "|";
   /** Parser token. */
   String PRAGMA = "(#";
+  /** Parser token. */
+  String PRAGMA2 = "#)";
 
   // URIS =====================================================================
 
@@ -410,6 +414,8 @@ public interface QueryTokens {
   byte[] RET = token("Return");
   /** Query Plan. */
   byte[] DIR = token("dir");
+  /** Query Plan. */
+  byte[] NS = token("ns");
   /** Query Plan. */
   byte[] PRE = token("pre");
   /** Query Plan. */
