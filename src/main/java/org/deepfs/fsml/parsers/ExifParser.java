@@ -936,8 +936,7 @@ public final class ExifParser {
      * @return the ASCII value as byte array
      * @throws IOException if any error occurs while reading from the channel
      */
-    byte[] readAscii(final BufferedFileChannel b)
-        throws IOException {
+    byte[] readAscii(final BufferedFileChannel b) throws IOException {
       return b.get(new byte[count]);
     }
 
@@ -1029,8 +1028,7 @@ public final class ExifParser {
    * @param df the DeepFile to store metadata and file content
    * @throws IOException if any error occurs while reading from the channel
    */
-  protected void extract(final DeepFile df)
-      throws IOException {
+  protected void extract(final DeepFile df) throws IOException {
     if(!check(df)) return;
 
     final int ifdOffset = bfc.getInt();

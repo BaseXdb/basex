@@ -8,9 +8,9 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
@@ -55,7 +55,7 @@ public abstract class Fun extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public SeqType returned(final QueryContext ctx) {
     return func.ret;
   }
 

@@ -1,8 +1,8 @@
 package org.basex.query.func;
 
+import static org.basex.query.item.SeqType.*;
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.expr.Return.*;
-import org.basex.query.expr.Return;
+import org.basex.query.item.SeqType;
 
 /**
  * Definitions of all XQuery functions.
@@ -15,165 +15,164 @@ public enum FunDef {
   /* FNAcc functions. */
 
   /** XQuery function. */
-  POS(FNURI, FNAcc.class, 0, 0, "position()", NUM),
+  POS(FNURI, FNAcc.class, 0, 0, "position()", ITR),
   /** XQuery function. */
-  LAST(FNURI, FNAcc.class, 0, 0, "last()", NUM),
+  LAST(FNURI, FNAcc.class, 0, 0, "last()", ITR),
   /** XQuery function. */
   STRING(FNURI, FNAcc.class, 0, 1, "string(item?)", STR),
   /** XQuery function. */
-  NUMBER(FNURI, FNAcc.class, 0, 1, "number(item?)", NUM),
+  NUMBER(FNURI, FNAcc.class, 0, 1, "number(item?)", ITR),
   /** XQuery function. */
-  STRLEN(FNURI, FNAcc.class, 0, 1, "string-length(item?)", NUM),
+  STRLEN(FNURI, FNAcc.class, 0, 1, "string-length(item?)", ITR),
   /** XQuery function. */
   NORM(FNURI, FNAcc.class, 0, 1, "normalize-space(string?)", STR),
   /** XQuery function. */
-  URIQNAME(FNURI, FNAcc.class, 1, 1, "namespace-uri-from-QName(qname)",
-      NONUMSEQ),
+  URIQNAME(FNURI, FNAcc.class, 1, 1, "namespace-uri-from-QName(qname)", URI_01),
 
   /* FNAggr functions. */
 
   /** XQuery function. */
-  AVG(FNURI, FNAggr.class, 1, 1, "avg(item)", SEQ),
+  AVG(FNURI, FNAggr.class, 1, 1, "avg(item)", ITEM),
   /** XQuery function. */
-  COUNT(FNURI, FNAggr.class, 1, 1, "count(item)", NUM),
+  COUNT(FNURI, FNAggr.class, 1, 1, "count(item)", ITR),
   /** XQuery function. */
-  MAX(FNURI, FNAggr.class, 1, 2, "max(item)", SEQ),
+  MAX(FNURI, FNAggr.class, 1, 2, "max(item)", ITEM),
   /** XQuery function. */
-  MIN(FNURI, FNAggr.class, 1, 2, "min(item)", SEQ),
+  MIN(FNURI, FNAggr.class, 1, 2, "min(item)", ITEM),
   /** XQuery function. */
-  SUM(FNURI, FNAggr.class, 1, 2, "sum(item, zero)", SEQ),
+  SUM(FNURI, FNAggr.class, 1, 2, "sum(item, zero)", ITEM),
 
   /* FNContext functions. */
 
   /** XQuery function. */
-  CURRDATE(FNURI, FNContext.class, 0, 0, "current-date()", NONUM),
+  CURRDATE(FNURI, FNContext.class, 0, 0, "current-date()", DAT),
   /** XQuery function. */
-  CURRDTM(FNURI, FNContext.class, 0, 0, "current-dateTime()", NONUM),
+  CURRDTM(FNURI, FNContext.class, 0, 0, "current-dateTime()", DAT),
   /** XQuery function. */
-  CURRTIME(FNURI, FNContext.class, 0, 0, "current-time()", NONUM),
+  CURRTIME(FNURI, FNContext.class, 0, 0, "current-time()", DAT),
   /** XQuery function. */
-  IMPLZONE(FNURI, FNContext.class, 0, 0, "implicit-timezone()", NONUM),
+  IMPLZONE(FNURI, FNContext.class, 0, 0, "implicit-timezone()", DAT),
   /** XQuery function. */
   COLLAT(FNURI, FNContext.class, 0, 0, "default-collation()", STR),
   /** XQuery function. */
-  STBASEURI(FNURI, FNContext.class, 0, 0, "static-base-uri()", STRSEQ),
+  STBASEURI(FNURI, FNContext.class, 0, 0, "static-base-uri()", URI_01),
 
   /* FNDate functions. */
 
   /** XQuery function. */
-  DAYDAT(FNURI, FNDate.class, 1, 1, "day-from-date(item)", NUMSEQ),
+  DAYDAT(FNURI, FNDate.class, 1, 1, "day-from-date(item)", ITR_01),
   /** XQuery function. */
-  DAYDTM(FNURI, FNDate.class, 1, 1, "day-from-dateTime(datetime)", NUMSEQ),
+  DAYDTM(FNURI, FNDate.class, 1, 1, "day-from-dateTime(datetime)", ITR_01),
   /** XQuery function. */
-  DAYDUR(FNURI, FNDate.class, 1, 1, "days-from-duration(dur)", NUMSEQ),
+  DAYDUR(FNURI, FNDate.class, 1, 1, "days-from-duration(dur)", ITR_01),
   /** XQuery function. */
-  HOUDTM(FNURI, FNDate.class, 1, 1, "hours-from-dateTime(datetime)", NUMSEQ),
+  HOUDTM(FNURI, FNDate.class, 1, 1, "hours-from-dateTime(datetime)", ITR_01),
   /** XQuery function. */
-  HOUDUR(FNURI, FNDate.class, 1, 1, "hours-from-duration(dur)", NUMSEQ),
+  HOUDUR(FNURI, FNDate.class, 1, 1, "hours-from-duration(dur)", ITR_01),
   /** XQuery function. */
-  HOUTIM(FNURI, FNDate.class, 1, 1, "hours-from-time(item)", NUMSEQ),
+  HOUTIM(FNURI, FNDate.class, 1, 1, "hours-from-time(item)", ITR_01),
   /** XQuery function. */
-  MINDTM(FNURI, FNDate.class, 1, 1, "minutes-from-dateTime(datetime)", NUMSEQ),
+  MINDTM(FNURI, FNDate.class, 1, 1, "minutes-from-dateTime(datetime)", ITR_01),
   /** XQuery function. */
-  MINDUR(FNURI, FNDate.class, 1, 1, "minutes-from-duration(dur)", NUMSEQ),
+  MINDUR(FNURI, FNDate.class, 1, 1, "minutes-from-duration(dur)", ITR_01),
   /** XQuery function. */
-  MINTIM(FNURI, FNDate.class, 1, 1, "minutes-from-time(item)", NUMSEQ),
+  MINTIM(FNURI, FNDate.class, 1, 1, "minutes-from-time(item)", ITR_01),
   /** XQuery function. */
-  MONDAT(FNURI, FNDate.class, 1, 1, "month-from-date(item)", NUMSEQ),
+  MONDAT(FNURI, FNDate.class, 1, 1, "month-from-date(item)", ITR_01),
   /** XQuery function. */
-  MONDTM(FNURI, FNDate.class, 1, 1, "month-from-dateTime(datetime)", NUMSEQ),
+  MONDTM(FNURI, FNDate.class, 1, 1, "month-from-dateTime(datetime)", ITR_01),
   /** XQuery function. */
-  MONDUR(FNURI, FNDate.class, 1, 1, "months-from-duration(dur)", NUMSEQ),
+  MONDUR(FNURI, FNDate.class, 1, 1, "months-from-duration(dur)", ITR_01),
   /** XQuery function. */
-  SECDTM(FNURI, FNDate.class, 1, 1, "seconds-from-dateTime(datetime)", NUMSEQ),
+  SECDTM(FNURI, FNDate.class, 1, 1, "seconds-from-dateTime(datetime)", ITR_01),
   /** XQuery function. */
-  SECDUR(FNURI, FNDate.class, 1, 1, "seconds-from-duration(dur)", NUMSEQ),
+  SECDUR(FNURI, FNDate.class, 1, 1, "seconds-from-duration(dur)", ITR_01),
   /** XQuery function. */
-  SECTIM(FNURI, FNDate.class, 1, 1, "seconds-from-time(item)", NUMSEQ),
+  SECTIM(FNURI, FNDate.class, 1, 1, "seconds-from-time(item)", ITR_01),
   /** XQuery function. */
-  ZONDAT(FNURI, FNDate.class, 1, 1, "timezone-from-date(item)", NONUMSEQ),
+  ZONDAT(FNURI, FNDate.class, 1, 1, "timezone-from-date(item)", DAT_01),
   /** XQuery function. */
-  ZONDTM(FNURI, FNDate.class, 1, 1, "timezone-from-dateTime(item)", NONUMSEQ),
+  ZONDTM(FNURI, FNDate.class, 1, 1, "timezone-from-dateTime(item)", DAT_01),
   /** XQuery function. */
-  ZONTIM(FNURI, FNDate.class, 1, 1, "timezone-from-time(item)", NONUMSEQ),
+  ZONTIM(FNURI, FNDate.class, 1, 1, "timezone-from-time(item)", DAT_01),
   /** XQuery function. */
-  YEADAT(FNURI, FNDate.class, 1, 1, "year-from-date(item)", NUMSEQ),
+  YEADAT(FNURI, FNDate.class, 1, 1, "year-from-date(item)", ITR_01),
   /** XQuery function. */
-  YEADTM(FNURI, FNDate.class, 1, 1, "year-from-dateTime(datetime)", NUMSEQ),
+  YEADTM(FNURI, FNDate.class, 1, 1, "year-from-dateTime(datetime)", ITR_01),
   /** XQuery function. */
-  YEADUR(FNURI, FNDate.class, 1, 1, "years-from-duration(dur)", NUMSEQ),
+  YEADUR(FNURI, FNDate.class, 1, 1, "years-from-duration(dur)", ITR_01),
   /** XQuery function. */
   DATZON(FNURI, FNDate.class, 1, 2, "adjust-date-to-timezone(date, zone?)",
-      NONUMSEQ),
+      DAT_01),
   /** XQuery function. */
   DTMZON(FNURI, FNDate.class, 1, 2, "adjust-dateTime-to-timezone(date, zone?)",
-      NONUMSEQ),
+      DAT_01),
   /** XQuery function. */
   TIMZON(FNURI, FNDate.class, 1, 2, "adjust-time-to-timezone(date, zone?)",
-      NONUMSEQ),
+      DAT_01),
   /** XQuery function. */
-  DATETIME(FNURI, FNDate.class, 2, 2, "dateTime(date, time)", NONUMSEQ),
+  DATETIME(FNURI, FNDate.class, 2, 2, "dateTime(date, time)", DAT_01),
 
   /* FNGen functions. */
 
   /** XQuery function. */
-  DATA(FNURI, FNGen.class, 1, 1, "data(item)", SEQ),
+  DATA(FNURI, FNGen.class, 1, 1, "data(item)", ITEM_0M),
   /** XQuery function. */
-  COLLECT(FNURI, FNGen.class, 0, 1, "collection(item)", NODSEQ),
+  COLLECTION(FNURI, FNGen.class, 0, 1, "collection(item)", NOD_0M),
   /** XQuery function. */
-  DOCAVAIL(FNURI, FNGen.class, 1, 1, "doc-available(item)", BLN),
+  DOC(FNURI, FNGen.class, 1, 1, "doc(item)", NOD_01),
   /** XQuery function. */
-  DOC(FNURI, FNGen.class, 1, 1, "doc(item)", NODSEQ),
+  DOCAVAILABLE(FNURI, FNGen.class, 1, 1, "doc-available(item)", BLN),
   /** XQuery function. */
-  PUT(FNURI, FNGen.class, 2, 2, "put(node, string)", NONUMSEQ),
+  PUT(FNURI, FNGen.class, 2, 2, "put(node, string)", ITEM),
 
   /* FNId functions. */
 
   /** XQuery function. */
-  ID(FNURI, FNId.class, 1, 2, "id(string, item?)", NODSEQ),
+  ID(FNURI, FNId.class, 1, 2, "id(string, item?)", NOD_0M),
   /** XQuery function. */
-  IDREF(FNURI, FNId.class, 1, 2, "idref(string, item?)", NODSEQ),
+  IDREF(FNURI, FNId.class, 1, 2, "idref(string, item?)", NOD_0M),
   /** XQuery function. */
   LANG(FNURI, FNId.class, 1, 2, "lang(string, item?)", BLN),
 
   /* FNNode functions. */
 
   /** XQuery function. */
-  DOCURI(FNURI, FNNode.class, 1, 1, "document-uri(node)", STRSEQ),
+  DOCURI(FNURI, FNNode.class, 1, 1, "document-uri(node)", URI_01),
   /** XQuery function. */
-  NILLED(FNURI, FNNode.class, 1, 1, "nilled(node)", BLNSEQ),
+  NILLED(FNURI, FNNode.class, 1, 1, "nilled(node)", BLN_01),
   /** XQuery function. */
-  NODENAME(FNURI, FNNode.class, 1, 1, "node-name(node)", NONUMSEQ),
+  NODENAME(FNURI, FNNode.class, 1, 1, "node-name(node)", QNM_01),
   /** XQuery function. */
   LOCNAME(FNURI, FNNode.class, 0, 1, "local-name(node?)", STR),
   /** XQuery function. */
   NAME(FNURI, FNNode.class, 0, 1, "name(node?)", STR),
   /** XQuery function. */
-  NSURI(FNURI, FNNode.class, 0, 1, "namespace-uri(node?)", NONUM),
+  NSURI(FNURI, FNNode.class, 0, 1, "namespace-uri(node?)", URI),
   /** XQuery function. */
-  ROOT(FNURI, FNNode.class, 0, 1, "root(node?)", NODSEQ),
+  ROOT(FNURI, FNNode.class, 0, 1, "root(node?)", NOD_01),
   /** XQuery function. */
-  BASEURI(FNURI, FNNode.class, 0, 1, "base-uri(node?)", STRSEQ),
+  BASEURI(FNURI, FNNode.class, 0, 1, "base-uri(node?)", URI_01),
 
   /* FNNum functions. */
 
   /** XQuery function. */
-  ABS(FNURI, FNNum.class, 1, 1, "abs(num)", NUMSEQ),
+  ABS(FNURI, FNNum.class, 1, 1, "abs(num)", ITR_01),
   /** XQuery function. */
-  CEIL(FNURI, FNNum.class, 1, 1, "ceiling(num)", NUMSEQ),
+  CEIL(FNURI, FNNum.class, 1, 1, "ceiling(num)", ITR_01),
   /** XQuery function. */
-  FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", NUMSEQ),
+  FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", ITR_01),
   /** XQuery function. */
-  RND(FNURI, FNNum.class, 1, 1, "round(num)", NUMSEQ),
+  RND(FNURI, FNNum.class, 1, 1, "round(num)", ITR_01),
   /** XQuery function. */
-  RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num, prec?)", NUMSEQ),
+  RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num, prec?)", ITR_01),
 
   /* FNOut functions. */
 
   /** XQuery function. */
-  ERROR(FNURI, FNOut.class, 0, 3, "error(code?, desc?, object?)", NONUMSEQ),
+  ERROR(FNURI, FNOut.class, 0, 3, "error(code?, desc?, object?)", ITEM),
   /** XQuery function. */
-  TRACE(FNURI, FNOut.class, 2, 2, "trace(item, message)", NONUMSEQ),
+  TRACE(FNURI, FNOut.class, 2, 2, "trace(item, message)", ITEM_0M),
 
   /* FNPat functions. */
 
@@ -183,41 +182,41 @@ public enum FunDef {
   REPLACE(FNURI, FNPat.class, 3, 4, "replace(item, pattern, replace, mod?)",
       STR),
   /** XQuery function. */
-  TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", STRSEQ),
+  TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", STR_0M),
 
   /* FNQName functions. */
 
   /** XQuery function. */
-  INSCOPE(FNURI, FNQName.class, 1, 1, "in-scope-prefixes(elem)", STRSEQ),
+  INSCOPE(FNURI, FNQName.class, 1, 1, "in-scope-prefixes(elem)", STR_0M),
   /** XQuery function. */
   LOCNAMEQNAME(FNURI, FNQName.class, 1, 1, "local-name-from-QName(qname)",
-      STRSEQ),
+      STR_01),
   /** XQuery function. */
   NSURIPRE(FNURI, FNQName.class, 2, 2, "namespace-uri-for-prefix(pre, elem)",
-      STRSEQ),
+      URI_01),
   /** XQuery function. */
-  QNAME(FNURI, FNQName.class, 2, 2, "QName(uri, name)", NONUM),
+  QNAME(FNURI, FNQName.class, 2, 2, "QName(uri, name)", QNM),
   /** XQuery function. */
-  PREQNAME(FNURI, FNQName.class, 1, 1, "prefix-from-QName(qname)", STRSEQ),
+  PREQNAME(FNURI, FNQName.class, 1, 1, "prefix-from-QName(qname)", STR_01),
   /** XQuery function. */
-  RESQNAME(FNURI, FNQName.class, 2, 2, "resolve-QName(item, base)", NONUMSEQ),
+  RESQNAME(FNURI, FNQName.class, 2, 2, "resolve-QName(item, base)", QNM_01),
   /** XQuery function. */
-  RESURI(FNURI, FNQName.class, 1, 2, "resolve-uri(name, elem?)", STRSEQ),
+  RESURI(FNURI, FNQName.class, 1, 2, "resolve-uri(name, elem?)", URI_01),
 
   /* FNSeq functions. */
 
   /** XQuery function. */
-  DISTINCT(FNURI, FNSeq.class, 1, 2, "distinct-values(item, coll?)", SEQ),
+  DISTINCT(FNURI, FNSeq.class, 1, 2, "distinct-values(item, coll?)", ITEM_0M),
   /** XQuery function. */
-  INDEXOF(FNURI, FNSeq.class, 2, 3, "index-of(seq, item, coll?)", NUMSEQ),
+  INDEXOF(FNURI, FNSeq.class, 2, 3, "index-of(seq, item, coll?)", ITR_0M),
   /** XQuery function. */
-  INSBEF(FNURI, FNSeq.class, 3, 3, "insert-before(seq1, pos, seq2)", SEQ),
+  INSBEF(FNURI, FNSeq.class, 3, 3, "insert-before(seq1, pos, seq2)", ITEM_0M),
   /** XQuery function. */
-  REMOVE(FNURI, FNSeq.class, 2, 2, "remove(source, position)", SEQ),
+  REMOVE(FNURI, FNSeq.class, 2, 2, "remove(source, position)", ITEM_0M),
   /** XQuery function. */
-  REVERSE(FNURI, FNSeq.class, 1, 1, "reverse(item)", SEQ),
+  REVERSE(FNURI, FNSeq.class, 1, 1, "reverse(item)", ITEM_0M),
   /** XQuery function. */
-  SUBSEQ(FNURI, FNSeq.class, 2, 3, "subsequence(item, start, len?)", SEQ),
+  SUBSEQ(FNURI, FNSeq.class, 2, 3, "subsequence(item, start, len?)", ITEM_0M),
   /** XQuery function. */
   DEEPEQ(FNURI, FNSeq.class, 2, 3, "deep-equal(item, item, coll?)", BLN),
 
@@ -228,7 +227,7 @@ public enum FunDef {
   /** XQuery function. */
   TRUE(FNURI, FNSimple.class, 0, 0, "true()", BLN),
   /** XQuery function. */
-  BOOL(FNURI, FNSimple.class, 1, 1, "boolean(item)", BLN),
+  BOOLEAN(FNURI, FNSimple.class, 1, 1, "boolean(item)", BLN),
   /** XQuery function. */
   NOT(FNURI, FNSimple.class, 1, 1, "not(item)", BLN),
   /** XQuery function. */
@@ -236,22 +235,22 @@ public enum FunDef {
   /** XQuery function. */
   EXISTS(FNURI, FNSimple.class, 1, 1, "exists(item)", BLN),
   /** XQuery function. */
-  UNORDER(FNURI, FNSimple.class, 1, 1, "unordered(item)", SEQ),
+  UNORDER(FNURI, FNSimple.class, 1, 1, "unordered(item)", ITEM_0M),
   /** XQuery function. */
-  ZEROONE(FNURI, FNSimple.class, 1, 1, "zero-or-one(item)", SEQ),
+  ZEROORONE(FNURI, FNSimple.class, 1, 1, "zero-or-one(item)", ITEM_0M),
   /** XQuery function. */
-  EXONE(FNURI, FNSimple.class, 1, 1, "exactly-one(item)", NUM),
+  EXACTLYONE(FNURI, FNSimple.class, 1, 1, "exactly-one(item)", ITEM_0M),
   /** XQuery function. */
-  ONEMORE(FNURI, FNSimple.class, 1, 1, "one-or-more(item)", SEQ),
+  ONEORMORE(FNURI, FNSimple.class, 1, 1, "one-or-more(item)", ITEM_0M),
 
   /* FNStr functions. */
 
   /** XQuery function. */
-  CODEPNT(FNURI, FNStr.class, 2, 2, "codepoint-equal(string, string)", BLNSEQ),
+  CODEPNT(FNURI, FNStr.class, 2, 2, "codepoint-equal(string, string)", BLN_01),
   /** XQuery function. */
   CODESTR(FNURI, FNStr.class, 1, 1, "codepoints-to-string(num*)", STR),
   /** XQuery function. */
-  COMPARE(FNURI, FNStr.class, 2, 3, "compare(first, second, coll)", NUMSEQ),
+  COMPARE(FNURI, FNStr.class, 2, 3, "compare(first, second, coll)", ITR_01),
   /** XQuery function. */
   CONCAT(FNURI, FNStr.class, 2, 0, "concat(item, item+)", STR),
   /** XQuery function. */
@@ -273,32 +272,33 @@ public enum FunDef {
   /** XQuery function. */
   STRJOIN(FNURI, FNStr.class, 2, 2, "string-join(item, sep)", STR),
   /** XQuery function. */
-  STCODE(FNURI, FNStr.class, 1, 1, "string-to-codepoints(string)", NUMSEQ),
+  STCODE(FNURI, FNStr.class, 1, 1, "string-to-codepoints(string)", ITR_0M),
   /** XQuery function. */
   SUBSTR(FNURI, FNStr.class, 2, 3, "substring(item, start, len?)", STR),
   /** XQuery function. */
   SUBAFTER(FNURI, FNStr.class, 2, 3, "substring-after(item, sub, coll)", STR),
   /** XQuery function. */
-  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll)", STR),
+  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll)",
+      STR),
   /** XQuery function. */
   TRANS(FNURI, FNStr.class, 3, 3, "translate(arg, map, trans)", STR),
   /** XQuery function. */
   UPPER(FNURI, FNStr.class, 1, 1, "upper-case(item)", STR),
 
   /** Project specific function - evaluates the specified query. */
-  EVAL(BXURI, FNBaseX.class, 1, 1, "eval(string)", SEQ),
+  EVAL(BXURI, FNBaseX.class, 1, 1, "eval(string)", ITEM_0M),
   /** Project specific function - returns a random number. */
-  RANDOM(BXURI, FNBaseX.class, 0, 0, "random()", NUM),
+  RANDOM(BXURI, FNBaseX.class, 0, 0, "random()", ITR),
   /** Project specific function - accesses an index. */
-  INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", BLN),
+  INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", NOD_0M),
   /** Project specific function - opens and returns file contents. */
   READ(BXURI, FNBaseX.class, 1, 1, "read(string)", STR),
-  /** Project specific function - evaluated the specified query file. */
-  RUN(BXURI, FNBaseX.class, 1, 1, "run(string)", SEQ),
-  /** Project specific function - opens a database instance. */
+  /** Project specific function - evaluates the specified query file. */
+  RUN(BXURI, FNBaseX.class, 1, 1, "run(string)", ITEM_0M),
+  /** Project specific function - opens a database node. */
   DB(BXURI, FNBaseX.class, 1, 2, "db(string, id?)", NOD),
   /** Project specific function - returns the id of a node. */
-  DBID(BXURI, FNBaseX.class, 1, 1, "node-id(item)", NUM),
+  DBID(BXURI, FNBaseX.class, 1, 1, "node-id(item)", ITR),
   /** Project specific function - returns a filesystem path. */
   FSPATH(BXURI, FNBaseX.class, 1, 1, "fspath(item)", STR);
 
@@ -313,7 +313,7 @@ public enum FunDef {
   /** Maximum number of arguments. */
   int max;
   /** Return type. */
-  Return ret;
+  SeqType ret;
 
   /**
    * Constructor.
@@ -325,7 +325,7 @@ public enum FunDef {
    * @param rt return value
    */
   private FunDef(final byte[] ur, final Class<? extends Fun> fun, final int mn,
-      final int mx, final String dsc, final Return rt) {
+      final int mx, final String dsc, final SeqType rt) {
     uri = ur;
     func = fun;
     min = mn;

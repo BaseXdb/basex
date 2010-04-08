@@ -374,8 +374,7 @@ public final class CommandParser extends InputParser {
    * @param cmd input completions
    * @throws QueryException query exception
    */
-  private void help(final StringList alt, final Cmd cmd)
-      throws QueryException {
+  private void help(final StringList alt, final Cmd cmd) throws QueryException {
     error(alt, PROCSYNTAX, cmd.help(true));
   }
 

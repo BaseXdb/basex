@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -9,7 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV.Comp;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.util.Err;
+import org.basex.query.item.SeqType;
 import org.basex.util.Token;
 
 /**
@@ -78,7 +77,7 @@ public final class Pos extends Simple {
 
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {
-    if(ctx.item == null) Err.or(XPNOCTX, this);
+    checkCtx(ctx);
     return Bln.get(ctx.pos >= min && ctx.pos <= max);
   }
 
@@ -116,8 +115,8 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.BLN;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.BLN;
   }
 
   @Override

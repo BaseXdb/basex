@@ -8,11 +8,11 @@ import org.basex.core.Commands.CmdPerm;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Return;
 import org.basex.query.item.Atm;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
@@ -32,7 +32,7 @@ public final class FNGen extends Fun {
     switch(func) {
       case DATA:
         return data(ctx.iter(expr[0]));
-      case COLLECT:
+      case COLLECTION:
         if(expr.length == 0) return ctx.coll(null);
         final Iter iter = ctx.iter(expr[0]);
         Item it = iter.next();
@@ -66,7 +66,7 @@ public final class FNGen extends Fun {
         Item it = iter.next();
         return it == null ? null : it.type == Type.DOC ? it :
           ctx.doc(checkStr(it), false, false);
-      case DOCAVAIL:
+      case DOCAVAILABLE:
         it = iter.next();
         if(it != null) {
           final byte[] file = checkStr(it);
@@ -87,7 +87,7 @@ public final class FNGen extends Fun {
       if(!expr[0].i()) return this;
       final Item it = (Item) expr[0];
       return it.type == Type.DOC ? it : ctx.doc(checkStr(it), false, false);
-    } else if(func == FunDef.COLLECT) {
+    } else if(func == FunDef.COLLECTION) {
       if(expr.length == 0 || !expr[0].i()) return this;
       final Item it = (Item) expr[0];
       return it.type == Type.STR ? ctx.coll(checkStr(it)).finish() : this;
@@ -126,11 +126,10 @@ public final class FNGen extends Fun {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public SeqType returned(final QueryContext ctx) {
     if(func == FunDef.DATA) {
-      final Return ret = expr[0].returned(ctx);
-      return ret == Return.NOD ? Return.STR :
-        ret == Return.NODSEQ ? Return.STRSEQ : ret;
+      final SeqType ret = expr[0].returned(ctx);
+      return ret.type.node() ? new SeqType(Type.ATM, ret.occ) : ret;
     }
     return super.returned(ctx);
   }

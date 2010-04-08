@@ -54,8 +54,8 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return seq.returned();
+  public SeqType returned(final QueryContext ctx) {
+    return seq;
   }
 
   @Override

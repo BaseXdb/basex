@@ -1,12 +1,14 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryTokens;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
+import org.basex.query.item.Type;
 import org.basex.util.Array;
 
 /**
@@ -68,8 +70,10 @@ public final class And extends Arr {
     expr = ex;
     if(ps != null) expr = Array.add(expr, ps);
     if(cr != null) expr = Array.add(expr, cr);
-    return expr.length == 1 && expr[0].returned(ctx) == Return.BLN ?
-        expr[0] : this;
+
+    if(expr.length != 1) return this;
+    final SeqType ret = expr[0].returned(ctx);
+    return ret.type == Type.BLN && ret.occ == SeqType.OCC_1 ? expr[0] : this;
   }
 
   @Override
@@ -85,8 +89,8 @@ public final class And extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.BLN;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.BLN;
   }
 
   @Override
@@ -126,6 +130,6 @@ public final class And extends Arr {
 
   @Override
   public String toString() {
-    return toString(" " + AND + " ");
+    return toString(" " + QueryTokens.AND + " ");
   }
 }

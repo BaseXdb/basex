@@ -9,7 +9,6 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public interface QueryTokens {
-
   // FULL-TEXT TOKENS =========================================================
 
   /** Parser token. */

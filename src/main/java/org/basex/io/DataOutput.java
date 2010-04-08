@@ -45,8 +45,7 @@ public final class DataOutput extends OutputStream {
    * @param bufs size of the buffer to use
    * @throws IOException I/O exception
    */
-  public DataOutput(final File db, final int bufs)
-      throws IOException {
+  public DataOutput(final File db, final int bufs) throws IOException {
     os = new BufferedOutput(new FileOutputStream(db), bufs);
   }
 

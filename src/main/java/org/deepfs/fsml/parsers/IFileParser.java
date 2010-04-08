@@ -20,8 +20,7 @@ public interface IFileParser {
    * @return true if the file is supported
    * @throws IOException if an error occurs while reading from the file
    */
-  boolean check(final DeepFile deepFile)
-      throws IOException;
+  boolean check(final DeepFile deepFile) throws IOException;
 
   /**
    * Extracts metadata and file contents.

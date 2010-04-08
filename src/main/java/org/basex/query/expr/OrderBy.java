@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -101,8 +102,8 @@ public final class OrderBy extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return expr == null ? Return.SEQ : expr.returned(ctx);
+  public SeqType returned(final QueryContext ctx) {
+    return expr == null ? SeqType.ITEM_0M : expr.returned(ctx);
   }
 
   @Override

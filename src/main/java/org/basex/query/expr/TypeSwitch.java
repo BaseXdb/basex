@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
@@ -93,10 +94,10 @@ public final class TypeSwitch extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    final Return t = cs[0].returned(ctx);
+  public SeqType returned(final QueryContext ctx) {
+    final SeqType t = cs[0].returned(ctx);
     for(int l = 1; l < cs.length; l++) {
-      if(t != cs[l].returned(ctx)) return Return.SEQ;
+      if(!t.eq(cs[l].returned(ctx))) return SeqType.ITEM_0M;
     }
     return t;
   }

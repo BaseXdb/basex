@@ -142,8 +142,8 @@ public final class BufferedFileChannel {
    * @throws IOException if any error occurs while creating the channel
    */
   public BufferedFileChannel subChannel(final String subfilename,
-      final int bytesToRead)
-      throws IOException {
+      final int bytesToRead) throws IOException {
+
     if(remaining() < bytesToRead) throw new EOFException(
         "Requested number of bytes to read is too large.");
     locked = true;

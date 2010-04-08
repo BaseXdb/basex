@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
+import org.basex.query.item.SeqType;
 
 /**
  * Fragment constructor.
@@ -28,8 +29,8 @@ public abstract class CFrag extends Arr {
   }
 
   @Override
-  public final Return returned(final QueryContext ctx) {
-    return Return.NOD;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.NOD;
   }
 
   /**

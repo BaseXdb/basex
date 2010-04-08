@@ -10,6 +10,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
@@ -111,8 +112,8 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.BLN;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.BLN;
   }
 
   @Override

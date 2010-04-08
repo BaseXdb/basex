@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.util.Token;
 
 /**
@@ -59,8 +60,9 @@ public final class Clc extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NUM;
+  public SeqType returned(final QueryContext ctx) {
+    return expr[0].returned(ctx).num() && expr[1].returned(ctx).num() ?
+        SeqType.ITR : SeqType.ITEM;
   }
 
   @Override
@@ -70,6 +72,6 @@ public final class Clc extends Arr {
 
   @Override
   public String toString() {
-    return toString(" " + calc.name + " ");
+    return toString(' ' + calc.name + ' ');
   }
 }

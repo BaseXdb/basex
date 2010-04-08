@@ -10,6 +10,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
@@ -79,7 +80,7 @@ final class CmpR extends Single {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx) throws QueryException {
     final Iter ir = ctx.iter(expr);
 
     // evaluate iterator
@@ -176,8 +177,8 @@ final class CmpR extends Single {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.BLN;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.BLN;
   }
 
   @Override

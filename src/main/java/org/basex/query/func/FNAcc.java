@@ -8,6 +8,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -56,9 +57,12 @@ final class FNAcc extends Fun {
 
     switch(func) {
       case STRING:
-        return it != null ? atomic(ctx) : this;
       case NUMBER:
+      case STRLEN:
+      case NORM:
         return expr[0].e() || it != null ? atomic(ctx) : this;
+      case URIQNAME:
+        return expr[0].e() ? Seq.EMPTY : it != null ? atomic(ctx) : this;
       default:
         return this;
     }

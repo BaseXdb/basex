@@ -266,8 +266,7 @@ public enum Calc {
    * @param it item
    * @throws QueryException query exception
    */
-  void errType(final Type t, final Item it)
-      throws QueryException {
+  void errType(final Type t, final Item it) throws QueryException {
     Err.type(info(), t, it);
   }
 
@@ -297,8 +296,7 @@ public enum Calc {
    * @param b second item
    * @throws QueryException query exception
    */
-  final void checkNum(final Item a, final Item b)
-      throws QueryException {
+  final void checkNum(final Item a, final Item b) throws QueryException {
     if(!a.u() && !a.n()) errNum(a);
     if(!b.u() && !b.n()) errNum(b);
   }

@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
+import org.basex.query.item.SeqType;
 import org.basex.query.util.Var;
 
 /**
@@ -46,8 +47,8 @@ public abstract class ForLet extends Single {
   }
 
   @Override
-  public final Return returned(final QueryContext ctx) {
-    return Return.BLN;
+  public final SeqType returned(final QueryContext ctx) {
+    return SeqType.BLN_0M;
   }
 
   /**

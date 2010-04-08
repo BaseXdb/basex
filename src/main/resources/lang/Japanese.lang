@@ -392,8 +392,6 @@ qu_time=タイミング
 qu_result=結果
 qu_plan=Query plan
 qu_hits=ヒット
-
-# Query Commands.. the following strings must have the same length
 qu_tabquery=クエリー　　
 qu_tabpars=パース中　　
 qu_tabcomp=コンパイル中

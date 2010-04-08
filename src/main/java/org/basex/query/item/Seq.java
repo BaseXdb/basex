@@ -7,7 +7,6 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Return;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
@@ -31,7 +30,9 @@ public class Seq extends Item {
     @Override
     public Item test(final QueryContext ctx) { return null; }
     @Override
-    public final boolean e() { return true; }
+    public SeqType returned(final QueryContext ctx) {
+      return SeqType.ITEM;
+    }
   };
 
   /** Item array. */
@@ -47,12 +48,12 @@ public class Seq extends Item {
   }
 
   /**
-   * Constructor.
+   * Returns a sequence for the specified items.
    * @param v value
    * @param s size
    * @return resulting item or sequence
    */
-  public static Item get(final Item[] v, final int s) {
+  public static final Item get(final Item[] v, final int s) {
     return s == 0 ? EMPTY : s == 1 ? v[0] : new Seq(v, s);
   }
 
@@ -78,7 +79,7 @@ public class Seq extends Item {
   }
 
   @Override
-  public Object java() {
+  public final Object java() {
     final Object[] obj = new Object[size];
     for(int s = 0; s < size; s++) obj[s] = val[s].java();
     return obj;
@@ -128,13 +129,12 @@ public class Seq extends Item {
   }
 
   @Override
-  public final Return returned(final QueryContext ctx) {
-    if(size == 0 || size > 16) return Return.SEQ;
-    final Return ret = val[0].returned(ctx);
-    for(int s = 1; s < size; s++) {
-      if(ret != val[s].returned(ctx)) return Return.SEQ;
+  public SeqType returned(final QueryContext ctx) {
+    Type t = size > 16 ? Type.ITEM : val[0].type;
+    for(int s = 1; s < size && t != Type.ITEM; s++) {
+      if(t != val[s].type) t = Type.ITEM;
     }
-    return ret.seq();
+    return new SeqType(t, SeqType.OCC_1M);
   }
 
   @Override
@@ -144,7 +144,7 @@ public class Seq extends Item {
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token("sequence"), SIZE, Token.token(size));
+    ser.openElement(Token.token(Type.SEQ.name), SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); v++) val[v].plan(ser);
     ser.closeElement();
   }

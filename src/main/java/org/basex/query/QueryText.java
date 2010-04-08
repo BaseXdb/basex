@@ -104,11 +104,11 @@ public interface QueryText {
   Object[] URIINV = { FORG, 2, "Invalid URI: %" };
 
   /** FORG0003: Evaluation exception. */
-  Object[] ZEROONE = { FORG, 3, "Zero or one value expected." };
+  Object[] EXP01 = { FORG, 3, "Zero or one value expected." };
   /** FORG0004: Evaluation exception. */
-  Object[] ONEMORE = { FORG, 4, "One or more values expected." };
+  Object[] EXP1M = { FORG, 4, "One or more values expected." };
   /** FORG0005: Evaluation exception. */
-  Object[] EXONE = { FORG, 5, "Exactly one value expected." };
+  Object[] EXP1 = { FORG, 5, "Exactly one value expected." };
   /** FORG0006: Evaluation exception. */
   Object[] FUNCMP = { FORG, 6, "%: % expected, % found." };
   /** FORG0006: Evaluation exception. */
@@ -568,43 +568,43 @@ public interface QueryText {
   // OPTIMIZATIONS
 
   /** Optimization info. */
-  String OPTDESC = "Merging descendant-or-self step(s)";
+  String OPTDESC = "merging descendant-or-self step(s)";
   /** Optimization info. */
-  String OPTPRE = "Pre-evaluating %";
+  String OPTPRE = "pre-evaluating %";
   /** Optimization info. */
-  String OPTWRITE = "Rewriting %";
+  String OPTWRITE = "Rrewriting %";
   /** Optimization info. */
-  String OPTFALSE = "Removing always false expression: %";
+  String OPTFALSE = "removing always false expression: %";
   /** Optimization info. */
-  String OPTTRUE = "Removing always true expression: %";
+  String OPTTRUE = "removing always true expression: %";
   /** Optimization info. */
-  String OPTTEXT = "Adding text() step";
+  String OPTTEXT = "adding text() step";
   /** Optimization info. */
-  String OPTSIMPLE = "Simplifying: % => %";
+  String OPTSIMPLE = "simplifying: % => %";
   /** Optimization info. */
-  String OPTFLWOR = "Simplifying FLWOR expression";
+  String OPTFLWOR = "simplifying FLWOR expression";
   /** Optimization info. */
-  String OPTWHERE = "Converting where clause to predicate";
+  String OPTWHERE = "converting where clause to predicate";
   /** Optimization info. */
-  String OPTVAR = "Removing variable %";
+  String OPTVAR = "removing variable %";
   /** Optimization info. */
-  String OPTRED = "Merging redundant location paths";
+  String OPTRED = "merging redundant location paths";
   /** Optimization info. */
-  String OPTNAME = "Removing unknown tag/attribute \"%\"";
+  String OPTNAME = "removing unknown tag/attribute \"%\"";
   /** Optimization info. */
-  String OPTTXTINDEX = "Applying text index";
+  String OPTTXTINDEX = "applying text index";
   /** Optimization info. */
-  String OPTATVINDEX = "Applying attribute index";
+  String OPTATVINDEX = "applying attribute index";
   /** Optimization info. */
-  String OPTFTXINDEX = "Applying full-text index";
+  String OPTFTXINDEX = "applying full-text index";
   /** Optimization info. */
-  String OPTRNGINDEX = "Applying range index";
+  String OPTRNGINDEX = "applying range index";
   /** Optimization info. */
-  String OPTEMPTY = "Removing empty sequences.";
+  String OPTEMPTY = "removing empty sequences.";
   /** Optimization info. */
-  String OPTNOINDEX = "Removing path with no index results";
+  String OPTNOINDEX = "removing path with no index results";
   /** Optimization info. */
-  String OPTBIND = "Bind static variable %";
+  String OPTBIND = "binding static variable %";
   /** Optimization info. */
-  String OPTCHILD = "Converting % to child steps";
+  String OPTCHILD = "converting % to child steps";
 }

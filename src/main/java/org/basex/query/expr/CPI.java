@@ -79,6 +79,6 @@ public final class CPI extends CFrag {
 
   @Override
   public String toString() {
-    return Type.PI + " " + expr[0];
+    return toString(Type.PI.name);
   }
 }

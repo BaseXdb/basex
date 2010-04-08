@@ -10,6 +10,7 @@ import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
@@ -65,7 +66,7 @@ public class Pred extends Preds {
         return new IterPred(root, pred, pos, last);
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
-    counter = pred.length == 1 && p.returned(ctx) == Return.NUM &&
+    counter = pred.length == 1 && p.returned(ctx).num() &&
       !p.uses(Use.CTX, ctx);
     return this;
   }
@@ -127,9 +128,9 @@ public class Pred extends Preds {
   }
 
   @Override
-  public final Return returned(final QueryContext ctx) {
-    final Return ret = root.returned(ctx);
-    return ret.single ? super.returned(ctx) : ret;
+  public final SeqType returned(final QueryContext ctx) {
+    final SeqType ret = root.returned(ctx);
+    return ret.single() ? super.returned(ctx) : ret;
   }
 
   @Override

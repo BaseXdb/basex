@@ -17,13 +17,13 @@ import org.basex.query.expr.CAttr;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Pred;
-import org.basex.query.expr.Return;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -576,8 +576,8 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final Return returned(final QueryContext ctx) {
-    return size(ctx) == 1 ? Return.NOD : Return.NODSEQ;
+  public final SeqType returned(final QueryContext ctx) {
+    return size(ctx) == 1 ? SeqType.NOD : SeqType.NOD_0M;
   }
 
   @Override

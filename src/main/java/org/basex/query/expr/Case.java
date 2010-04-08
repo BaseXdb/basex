@@ -6,6 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
@@ -42,8 +43,7 @@ public final class Case extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  Case comp(final QueryContext ctx, final Item it)
-      throws QueryException {
+  Case comp(final QueryContext ctx, final Item it) throws QueryException {
     if(var.name == null) {
       super.comp(ctx);
     } else {
@@ -85,7 +85,7 @@ public final class Case extends Single {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public SeqType returned(final QueryContext ctx) {
     return expr.returned(ctx);
   }
 

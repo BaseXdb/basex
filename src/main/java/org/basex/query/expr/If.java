@@ -6,6 +6,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 
 /**
@@ -48,9 +49,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    final Return ret = expr[1].returned(ctx);
-    return ret == expr[2].returned(ctx) ? ret : Return.SEQ;
+  public SeqType returned(final QueryContext ctx) {
+    final SeqType ret = expr[1].returned(ctx);
+    return ret.eq(expr[2].returned(ctx)) ? ret : SeqType.ITEM_0M;
   }
 
   @Override

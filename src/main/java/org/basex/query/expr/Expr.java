@@ -8,6 +8,8 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -113,8 +115,8 @@ public abstract class Expr extends ExprInfo {
    * Returns if this is an empty sequence.
    * @return result of check
    */
-  public boolean e() {
-    return false;
+  public final boolean e() {
+    return this == Seq.EMPTY;
   }
 
   /**
@@ -133,7 +135,7 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public long size(final QueryContext ctx) throws QueryException {
-    return -1;
+    return returned(ctx).occ == SeqType.OCC_1 ? 1 : -1;
   }
 
   /**
@@ -175,8 +177,8 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public Return returned(final QueryContext ctx) {
-    return Return.SEQ;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.ITEM_0M;
   }
 
   /**
@@ -186,7 +188,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean duplicates(final QueryContext ctx) {
-    return !returned(ctx).single;
+    return !returned(ctx).single();
   }
 
   /**
@@ -228,7 +230,7 @@ public abstract class Expr extends ExprInfo {
    * Checks if the specified expressions is no updating expression.
    * @param e expression
    * @param ctx query context
-   * @return expression
+   * @return the specified expression
    * @throws QueryException query exception
    */
   protected Expr checkUp(final Expr e, final QueryContext ctx)

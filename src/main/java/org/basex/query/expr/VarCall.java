@@ -7,6 +7,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.NSLocal;
@@ -63,7 +64,7 @@ public final class VarCall extends Expr {
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || (u == Use.POS ? var.returned(ctx).num :
+    return u == Use.VAR || (u == Use.POS ? var.returned(ctx).mayBeNum() :
         u != Use.CTX && var.expr != null && var.expr.uses(u, ctx));
   }
 
@@ -78,7 +79,7 @@ public final class VarCall extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public SeqType returned(final QueryContext ctx) {
     return var.returned(ctx);
   }
 

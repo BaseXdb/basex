@@ -5,6 +5,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -51,8 +52,8 @@ public final class Root extends Simple {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NOD;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.NOD_0M;
   }
 
   @Override

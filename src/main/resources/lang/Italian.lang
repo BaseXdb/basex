@@ -391,8 +391,6 @@ qu_time=Cronometraggio
 qu_result=Risultato
 qu_plan=Piano dell'interrogazione
 qu_hits=Trovati
-
-# Query Commands.. the following strings must have the same length
 qu_tabquery=Interrogazione
 qu_tabpars=Parsing
 qu_tabcomp=Compilando

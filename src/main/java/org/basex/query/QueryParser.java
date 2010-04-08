@@ -1963,7 +1963,8 @@ public class QueryParser extends InputParser {
     final QNm type = new QNm(qName(TYPEINVALID));
     ctx.ns.uri(type);
     skipWS();
-    final SeqType seq = new SeqType(type, consume('?') ? 1 : 0, false);
+    final byte occ = consume('?') ? SeqType.OCC_01 : SeqType.OCC_1;
+    final SeqType seq = new SeqType(type, occ, false);
 
     if(seq.type == null) {
       final byte[] uri = type.uri.str();
@@ -1993,8 +1994,8 @@ public class QueryParser extends InputParser {
       }
     }
     skipWS();
-    final int mode = consume('?') ? 1 : consume('+') ? 2 :
-      consume('*') ? 3 : 0;
+    final byte mode = consume('?') ? SeqType.OCC_01 : consume('+') ?
+        SeqType.OCC_1M : consume('*') ? SeqType.OCC_0M : SeqType.OCC_1;
     if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pref(), false));
 
     final byte[] ext = tok.finish();

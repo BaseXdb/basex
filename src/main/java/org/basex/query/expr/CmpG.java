@@ -15,6 +15,7 @@ import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -252,9 +253,8 @@ public final class CmpG extends Arr {
     // support expressions
     final Expr arg = expr[1];
     if(!(arg.i() || arg instanceof Seq)) {
-      final Return ret = arg.returned(ic.ctx);
-      if(ret != Return.STR && ret != Return.STRSEQ &&
-         ret != Return.NOD && ret != Return.NODSEQ) return false;
+      final SeqType ret = arg.returned(ic.ctx);
+      if(!ret.type.str && !ret.type.node()) return false;
 
       ic.is += Math.max(1, ic.data.meta.size / 10);
       iacc = Array.add(iacc, new IndexAccess(arg, type, ic));
@@ -266,8 +266,8 @@ public final class CmpG extends Arr {
     Item it;
     ic.is = 0;
     while((it = ir.next()) != null) {
-      final Return ret = it.returned(ic.ctx);
-      if(ret != Return.STR && ret != Return.NOD) return false;
+      final SeqType ret = it.returned(ic.ctx);
+      if(!ret.type.str && !ret.type.node()) return false;
 
       ic.is += ic.data.nrIDs(new ValuesToken(type, it.str()));
       iacc = Array.add(iacc, new IndexAccess(it, type, ic));
@@ -314,8 +314,8 @@ public final class CmpG extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.BLN;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.BLN;
   }
 
   @Override

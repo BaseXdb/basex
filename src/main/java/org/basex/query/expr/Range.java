@@ -1,12 +1,13 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryTokens;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.RangeIter;
 
@@ -84,12 +85,12 @@ public final class Range extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NUMSEQ;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.ITR_0M;
   }
 
   @Override
   public String toString() {
-    return name() + "(" + toString(" " + TO + " ") + ")";
+    return name() + "(" + toString(" " + QueryTokens.TO + " ") + ")";
   }
 }

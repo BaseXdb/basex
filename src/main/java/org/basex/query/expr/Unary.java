@@ -11,6 +11,7 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -62,8 +63,8 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NUM;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.ITR;
   }
 
   @Override

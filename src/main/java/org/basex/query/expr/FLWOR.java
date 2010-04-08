@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
@@ -163,8 +164,8 @@ public class FLWOR extends Expr {
   }
 
   @Override
-  public final Return returned(final QueryContext ctx) {
-    return Return.SEQ;
+  public final SeqType returned(final QueryContext ctx) {
+    return SeqType.ITEM_0M;
   }
 
   @Override

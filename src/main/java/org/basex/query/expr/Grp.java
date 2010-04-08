@@ -6,6 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -85,7 +86,7 @@ public final class Grp extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public SeqType returned(final QueryContext ctx) {
     return expr.returned(ctx);
   }
 

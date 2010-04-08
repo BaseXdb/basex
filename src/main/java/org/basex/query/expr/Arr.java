@@ -90,7 +90,8 @@ public abstract class Arr extends Expr {
   protected final String toString(final Object sep) {
     final StringBuilder sb = new StringBuilder();
     for(int e = 0; e != expr.length; e++) {
-      sb.append((e != 0 ? sep.toString() : "") + expr[e]);
+      if(e != 0) sb.append(sep);
+      sb.append(expr[e]);
     }
     return sb.toString();
   }

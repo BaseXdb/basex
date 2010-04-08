@@ -9,7 +9,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Return;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
@@ -263,8 +262,8 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return type.returned();
+  public SeqType returned(final QueryContext ctx) {
+    return new SeqType(type, SeqType.OCC_1);
   }
 
   @Override

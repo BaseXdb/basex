@@ -7,6 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.Array;
 
@@ -108,8 +109,8 @@ public final class Or extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.BLN;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.BLN;
   }
 
   @Override

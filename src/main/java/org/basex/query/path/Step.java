@@ -12,12 +12,12 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Pos;
 import org.basex.query.expr.Preds;
-import org.basex.query.expr.Return;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -197,8 +197,8 @@ public class Step extends Preds {
   }
 
   @Override
-  public final Return returned(final QueryContext ctx) {
-    return Return.NODSEQ;
+  public final SeqType returned(final QueryContext ctx) {
+    return SeqType.NOD_0M;
   }
 
   @Override

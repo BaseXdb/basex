@@ -33,7 +33,7 @@ public final class FLWR extends FLWOR {
     if(where != null) {
       final ForLet f = fl[fl.length - 1];
       if(f instanceof For && f.standard() && where.removable(f.var, ctx)) {
-        if(!where.returned(ctx).num) {
+        if(!where.returned(ctx).mayBeNum()) {
           // converting where clauses to predicates
           ctx.compInfo(OPTWHERE);
           final Expr w = where.remove(f.var);

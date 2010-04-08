@@ -10,9 +10,9 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * This index class retrieves range values from the index.
@@ -49,8 +49,8 @@ final class RangeAccess extends Simple {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return Return.NODSEQ;
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.NOD_0M;
   }
 
   @Override
@@ -79,10 +79,7 @@ final class RangeAccess extends Simple {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(name());
-    tb.add("(" + ind.type() + ", ");
     final RangeToken rt = (RangeToken) ind;
-    tb.add(rt.min + "-" + rt.max);
-    return tb.add(")").toString();
+    return name() + "(" + rt.min + "-" + rt.max + ", " + ind.type() + ")";
   }
 }

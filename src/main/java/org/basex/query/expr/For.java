@@ -11,6 +11,7 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Seq;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
@@ -46,22 +47,23 @@ public final class For extends ForLet {
     expr = checkUp(expr, ctx).comp(ctx);
 
     // bind variable if single value is returned and if no variables are used
-    final Return ret = expr.returned(ctx);
-    if(pos == null && score == null && ret.single && !expr.uses(Use.VAR, ctx)) {
+    final SeqType ret = expr.returned(ctx);
+    if(pos == null && score == null && ret.single() &&
+        !expr.uses(Use.VAR, ctx)) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
-      var.ret = ret.single();
+      var.ret = new SeqType(ret.type, SeqType.OCC_1);
     }
     ctx.vars.add(var);
 
     if(pos != null) {
       ctx.vars.add(pos);
-      pos.ret = Return.NUM;
+      pos.ret = SeqType.ITR;
     }
     if(score != null) {
       ctx.vars.add(score);
-      score.ret = Return.NUM;
+      score.ret = SeqType.ITR;
     }
     return expr.e() ? Seq.EMPTY : this;
   }

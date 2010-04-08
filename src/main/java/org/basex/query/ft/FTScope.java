@@ -1,12 +1,12 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryTokens;
 import org.basex.util.BoolList;
 import org.basex.util.Tokenizer;
 import org.basex.util.Tokenizer.FTUnit;
@@ -58,14 +58,13 @@ public final class FTScope extends FTFilter {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, token(same ? QueryTokens.SAME :
-      QueryTokens.DIFFERENT), token(unit.toString()));
+    ser.openElement(this, token(same ? SAME : DIFFERENT),
+        token(unit.toString()));
     super.plan(ser);
   }
 
   @Override
   public String toString() {
-    return super.toString() + (same ? QueryTokens.SAME :
-      QueryTokens.DIFFERENT) + " " + unit;
+    return super.toString() + (same ? SAME : DIFFERENT) + " " + unit;
   }
 }

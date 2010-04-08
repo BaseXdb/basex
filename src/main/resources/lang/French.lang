@@ -1,0 +1,567 @@
+# LANGUAGE FILE, TRANSLATED BY
+# Maud Ingarao
+#
+# The '%' character serves as placeholder for texts to be inserted
+
+# Lancement
+wait=Veuillez patienter
+version=Version %
+
+# Commandes menu
+m_file=Fichier
+m_edit=Edition
+m_view=Vue
+m_options=Options
+m_help=Aide
+m_db=Base de données
+m_main=Fenêtre principale
+m_views=Vues
+m_inter=Interaction
+m_layout=Disposition
+
+# Boutons
+b_ok=OK
+b_opt=Optimiser
+b_rename=Renommer
+b_open=Ouvrir
+b_mount=Monter
+b_cancel=Annuler
+b_drop=Effacer
+b_cmd=Commande
+b_xquery=XQuery
+b_browse=Parcourir
+b_search=Rechercher
+b_create=Créer
+b_alter=Modifier
+b_start=Démarrer
+b_stop=Arrêter
+b_connect=Connecter
+b_disconnect=Déconnecter
+b_refresh=Raffraîchir
+b_delete=Supprimer
+b_delall=Supprimer tout
+b_add=Ajouter
+
+# Visualisations
+no_data=Aucune donnée disponible
+no_space=Espace insuffisant
+map_binary=Fichier binaire
+info_title=Info requête
+help_title=Aide
+text_title=Texte
+explore_title=Explorer
+
+# Fenêtres de dialogue
+d_info=Information
+d_fctitle=Choisir dossier
+
+dc_choose=Fichier ou dossier source
+dc_filter=Filtre
+dc_name=Nom de la base de données
+dc_xmldesc=Documents XML
+dc_zipdesc=Documents XML zippés
+dc_gzdesc=Documents XML GZippés
+dc_xqdesc=Fichiers XQuery 
+dc_advtitle=Créer base de données
+dc_chop=Supprimer les espaces
+dc_intparse=Utiliser le parseur XML interne
+dc_entities=Parser les entités
+dc_dtd=Parser les DTD
+dc_wcindex=Accepter les jockers
+dc_ftstem=(English) Stemming
+dc_ftdc=Diacritiques
+dc_ftcs=Casse
+dc_ftsw=Liste des mots vides
+dc_ftsct=Score TF/IDF
+dc_ftsct1=Documents
+dc_ftsct2=Noeuds texte
+dc_chopinfo=Cette option supprime les espaces entre balises et contenus
+dc_intparseinfo=Activer cette option pour utiliser le parseur XML interne
+dc_pathinfo=Définir un Path summary accélère les résolutions de chemins
+dc_txtinfo=Cet index accélère les comparaisons de texte dans les predicats
+dc_attinfo=Cet index accélère les comparaisons d'attributs dans les predicats
+dc_ftxinfo=Un index plein texte accélère les requêtes plein texte
+dc_wcinfo=Cette option accélère les recherches avec jockers
+dc_ftsteminfo=Les termes sont stemmés avant d'être indexés
+dc_ftcsinfo=La casse est conservée dans l'index
+dc_ftdcinfo=Les signes diacritiques sont conservés dans l'index
+dc_ftscinfo=Les scores sont calculés et enregistrés dans l'index
+dc_ftswinfo=Choisir une liste de mots vides pour ignorer les termes fréquents
+dc_general=General
+dc_parse=Parsages
+dc_names=Noms
+dc_index=Index
+dc_meta=Métadonnées
+dc_ft=Plein texte
+
+do_title=Ouvrir une base de données
+do_nodbquestion=Voulez-vous en créer une nouvelle ?
+
+dqe_title=Ouvrir une instance DeepFS
+
+dmnt_title=Monter une instance DeepFS
+dmnt_nomountpath=Aucun point de montage valide
+
+dfs_newtitle=Créer une nouvelle base de données DeepFS
+dfs_all=Complet
+dfs_allinfo=Cartographie complète du système de fichier (C:, D: etc. sur Windows, '/' on UNIX)
+dfs_text=Représenter le dossier comme structure XML DeepFS
+dfs_text1=Fichier Information & métadonnées
+dfs_text2=Fichier Contenus
+dfs_cont=Inclure contenus des fichiers texte
+dfs_xml=Inclure contenus xml
+dfs_meta=Inclure métadonnées
+dfs_nodefaultapp=Aucune application par défaut définie pour ouvrir ce type de fichier
+
+dr_title=Renommer la base de données
+dr_exists=La base de données existe déjà
+dr_over=La base de données existante va être remplacée
+dr_overbacking=La base de données existante et la sauvegarde vont être remplacées
+
+dd_title=Effacer la base de données
+dd_question=La base de données '%' va être effacée.\nConfirmer ?
+
+dx_question=Voulez-vous vraiment supprimer?
+dq_question=Enregistrer les modifications à % ?
+
+dx_outfile=Fichier de sortie
+dx_outdir=Dossier de sortie
+dx_overfile=Le fichier va être remplacé.
+dx_indent=Indenter par des espaces
+dx_invpath=Chemin invalide.
+
+dp_title=Préférences
+dp_dbpath=Emplacement de la base de données (les bases de données doivent être déplacées manuellement)
+dp_inter=GUI & Interactions
+dp_lf=Utiliser apparence Java
+dp_focus=Focus souris temps réel
+dp_simplefd=Utiliser sélecteur de fichiers simple
+dp_names=Remplacer balises par des attributes @name 
+dp_lang=Langue
+dp_restart=Nécessite de redémarrer
+
+dn_title=Insérer nouvelles données
+de_title=Editer les données
+de_name=Nom
+de_value=Valeur
+de_text=Editer %
+de_kind1=Document
+de_kind2=Elément
+de_kind3=Texte
+de_kind4=Attribut
+de_kind5=Commentaire
+de_kind6=PI
+
+df_title=Choisir police
+df_type1=Standard
+df_type2=Gras
+df_type3=Italique
+
+dy_title=Code couleurs
+dy_red=Rouge
+dy_green=Vert
+dy_blue=Bleu
+
+dm_title=Disposition carte
+dm_atts=Show Attributs
+dm_choice1=Pas de titre, pas de bordure
+dm_choice2=Pas de titre, petite bordure
+dm_choice3=Title, pas de bordure
+dm_choice4=Title, petite bordure
+dm_choice5=Title, bordure large
+dm_offset=Offsets
+dm_size=Ratio :
+dm_size_children=nombre de noeuds fils
+dm_size_fssize=taille du fichier
+dm_size_textsize=longueur du texte
+dm_size_both=noeuds fils/longueur du texte
+
+dz_total=Mémoire totale
+dz_reserved=Mémoire réservée
+dz_used=Mémoire utilisée
+dz_help=Si la mémoire est insuffisante, lancez\nBaseX avec le paramètre Java -Xmx<size>
+
+da_title=A propos de %
+da_license=License BSD (ISC)
+da_dev=Developpeur principal
+da_cont1=Equipe
+da_cont2=et d'autres
+da_translation=Traduction
+
+ds_localserver=Serveur local
+ds_connect=Connexion
+ds_users=Utilisateurs
+ds_host=Hôte
+ds_port=Port
+ds_localport=Port local
+ds_createu=Créer utilisateur
+ds_globperm=Permissions globales
+ds_locperm=Permissions locales
+ds_drquestion=% utilisateur(s) va (vont) être effacé(s).\nConfirmer ?
+ds_dbrevoke=La permission va être supprimée pour l'utilisateur logué.\nConfirmer ?
+ds_alterpw=Modifier mot de passe
+ds_invalid=% est invalide
+ds_adlogin=Login administrateur (local ou distant)
+ds_databases=Base de données
+ds_sessions=Sessions
+ds_logs=Logs
+ds_connected=Connecté à %:%.
+ds_disconnected=Déconnecté.
+ds_info1=Cette fenêtre de dialogue ne sert qu'à l'administration de l'environement client/serveur.
+ds_info2=Cela n'a aucune incidence sur les autres fonctionalités de la GUI.
+
+# Commandes GUI
+
+c_about=A propos de %
+c_abouttt=Affiche général information on the project.
+c_all=Sélectionner tout
+c_close=Fermer
+c_closett=Ferme la base de données courante.
+c_color=Couleurs
+c_colortt=Autorise le changement des couleurs de l'application.
+c_cut=Couper
+c_copy=Copier
+c_copytt=Copie les noeuds XML sélectionnés.
+c_cppath=Copier le chemin
+c_cppathtt=Copie le chemin aux noeuds XML sélectionné.
+c_create=Nouveau
+c_creatett=Crée une nouvelle base de données.
+c_delete=Supprimer
+c_deletett=Supprime noeuds XML.
+c_drop=Effacer
+c_droptt=Efface une base de données.
+c_edit=Editer
+c_edittt=Edite les noeuds XML.
+c_exit=Quitter
+c_exittt=Quitte l'application.
+c_export=Exporter XML
+c_exporttt=Exporte la base de données courante dans un fichier XML.
+c_filter=Filtre sélectionné
+c_filtertt=Filtre les noeuds sélectionné .
+c_fonts=Polices
+c_fontstt=Autorise le changement des polices utilisées.
+c_full=Plein écran
+c_fulltt=Passe en mode plein écran.
+c_goback=En arrière
+c_goforward=En avant
+c_goup=Vers le haut
+c_gouptt=Remonter d'un niveau.
+c_createfs=Créer un mapping DeepFS
+c_createfstt=Crée une représentation DeepFS du système de fichier à partir d'un dossier donné. La base de données obtenue peut ensuite être utilisée pour lancer BaseX en tant que moteur de recherche de bureau, ou pour monter la base de données comme système de fichier dans l'espace utilisateur.
+c_dqe=Moteur de recherche de bureau
+c_dqett=Ouvrir une base de données DeepFS et l'utiliser comme moteur de recherche/de requêtes de bureau
+c_mountfs=Monter DB comme FUSE
+c_mountfstt=Monter une instance de  base de données DeepFS comme système de fichier dans l'espace utilisateur (requiert un support natif par le système d'exploitation et peut donc ne pas être disponible).
+c_props=Propriétés
+c_propstt=Montrer les informations de la base de données actuellement ouverte.
+c_insert=Nouveau
+c_inserttt=Crée un nouveau noeud XML.
+c_maplayout=Disposition de la carte
+c_maplayouttt=Modifie la disposition de la carte.
+c_open=Ouvrir
+c_opentt=Ouvrirs une base de données.
+c_paste=Coller
+c_pastett=Colle les noeuds précédemment copiés.
+c_prefs=Préferences
+c_prefstt=Affiche les préférences générales de l'application.
+c_redo=Refaire
+c_root=Aller à l'accueil
+c_roottt=Aller au noeud racine.
+c_rtexec=Execution en temps réel
+c_rtexectt=Si cette option est activée, les requêtes sont executées après chaque saisie clavier
+c_rtfilter=Filtrage en temps réel
+c_rtfiltertt=Si cette option est activée, les results des requêtes sont filtrés automatiquement.
+c_showbuttons=Boutons
+c_showbuttonstt=Activer/désactiver la barre des boutons
+c_showexplore=Explorer
+c_showexplorett=Afficher le panneau d'exploration.
+c_showhelp=Aide
+c_showhelptt=Afficher la vue d'aide. qui donne des informations sur le composant qui a actuellement le focus.
+c_community=Community
+c_communitytt=Afficher la community web page (opens your default browser).
+c_showfolder=Dossier
+c_showfoldertt=Afficher la visualisation par dossiers.
+c_showinfo=Info requête
+c_showinfott=Afficher le panneau d'info requête.
+c_showinput=Champ de saisie
+c_showinputtt=Activer/désactiver le champ de saisie.
+c_showmap=Carte
+c_showmaptt=Afficher la visualisation par carte.
+c_showmenu=Menu
+c_showmenutt=Activer/désactiver le menu
+c_showstatus=Barre d'état
+c_showstatustt=Activer/désactiver la barre d'état
+c_showtable=Tableau
+c_showtablett=Afficher la visualisation par tableau.
+c_showplot=Diagramme
+c_showplottt=Afficher la visualisation par diagramme de dispersion.
+c_showtext=Texte
+c_showtexttt=Afficher la visualisation par texte
+c_showxquery=Editeur de requêtes
+c_showxquerytt=Afficher l'éditeur de requêtes
+c_undo=Annuler
+c_xqopen=Ouvrir XQuery
+c_xqopentt=Ouvre un fichier XQuery
+c_save=Enregistrer
+c_savett=Enregistre le fichier
+c_saveas=Enregistrer sous
+c_notopened=Echec à l'ouverture du fichier.
+c_notsaved=Echec à l'enregistrement du fichier.
+c_replace=% existe déjà.\nVoulez-vous le remplacer ?
+c_server=Administration Serveur
+c_servertt=Afficher le panneau d'administration du serveur pour la gestion des utilisateurs des logs.
+
+# Commandes & Processus
+proc_time=Temps d'exécution
+proc_syntax=Syntaxe
+proc_err=Impossible d'exécuter %
+proc_nodb=Aucune base de données ouverte.
+proc_mm=Cette commande n'et pas disponible en mode mémoire principale.
+proc_outmem=Dépassement de mémoire principale.\nVoici quelques suggestions qui peuvent vous aider :\n- augmenter la mémoire maximum allouée à Java avec le paramètre -Xmx<size>\n- Choisir le parseur XML interne via la GUI ou via 'set intparse on'\n- Désactiver les index du texte et des attributs
+
+cmd_no=Commande attendue.
+cmd_unknown=Commande '%' inconnue
+cmd_similar=Voulez-vous dire '%' ?
+
+# Commande Help (Aide)
+help_short=Essayez "%"
+help_intro=Essayez "%" pour obtenir des informations.
+help_long=Essayez "% [...]"  pour obtenir des informations sur une commande specifique
+
+#  Commande Create (Créer)
+pc_create=Création base de données en cours
+pc_index=Création index en cours
+pc_update=Le format de base de données a changé ; Veuillez créer une nouvelle base de données.
+pc_indupdate=Le format des index a changé ;  Veuillez créer de nouveaux indexes.
+pc_cancel=La création de la base de données a été annulée.
+pc_indextxt=Indexation du texte en cours
+pc_indexatt=Indexation des attributs en cours
+pc_indexftx=Indexation plein texte en cours
+pc_parse="%" (% Noeuds parsés)
+pc_created=Base de données '%' créée dans %.
+pc_added=Document '%' ajouté dans %.
+pc_deleted=Document '%' supprimé dans %.
+pc_filenf=Fichier ou dossier "%" introuvable.
+pc_pathnf=Fichier ou dossier introuvable.
+pc_dbnf=Entrer un nom de base de données.
+pc_err="%" n'a pu être parsé.
+pc_pos="%" (ligne %)
+
+# Commandes Database (Base de données)
+db_no=La base de données '%' est introuvable.
+db_locked=La base de données '%' est actuellement verrouillée.
+db_closed=La base de données '%' a été fermée.
+db_closeerr=Impossible de fermer la base de données.
+db_optimized=Base de données optimisée dans %.
+db_dropped=La base de données '%' a été effacée.
+db_notdropped=Impossible d'effacer la base de données.
+db_notopened=Impossible d'ouvrir la base de données '%'.
+db_opened=Base de données '%' ouverte dans %.
+db_exported=Base de données '%' exportée dans %.
+db_notdeleted=Impossible de supprimer le fichier '%'.
+db_doc=Le document '%' existe déjà.
+db_nodoc=Document '%' introuvable.
+
+# Index commands
+in_created=Index créé dans %.
+in_dropped=Index effacé dans %.
+in_notdropped=Impossible d'effacer l'index.
+
+# Info serveur
+srv_login=Accès refusé.
+srv_connect=Pas de communication avec le serveur.
+srv_timeout=Délai expiré.
+srv_bind=Serveur déjà démarré ou permission refusée.
+srv_start=Serveur démarré.
+srv_stop=Serveur arrêté.
+srv_user=Nom d'utilisateur
+srv_pw=Mot de passe
+
+# Bye
+bye1=Bonne journée.
+bye2=Au revoir.
+bye3=Amusez-vous bien.
+bye4=Carpe diem.
+
+# Commandes de requêtes
+qu_query=Requête
+qu_comp=Compilation
+qu_eval=Evaluation
+qu_time=Timing
+qu_result=Resultat
+qu_plan=Plan de requête
+qu_hits=Hit(s)
+qu_tabquery=Query
+qu_tabpars=Parsing
+qu_tabcomp=Compiling
+qu_tabeval=Evaluating
+qu_tabprint=Printing
+qu_tabtotal=Total Time
+qu_tabmem=Memory
+qu_tabprinted=Printed
+qu_tabhits=Results
+qu_nodeserr=Query must yield a nodeset.
+qu_stopped=Stopped at
+qu_line=line %
+qu_col=column %
+qu_file=in %
+
+# Commandes Admin
+ad_databases=% base(s) de données ouverte(s)
+ad_sessions=% session(s)
+ad_permno=Permission % requise.
+ad_perminv=Les permissions specifiées sont invalides.
+ad_permup=Permissions mises à jour.
+ad_userno=Utilisateur '%' inconnu.
+ad_userknown=L'utilisateur '%' existe déjà.
+ad_usercreate=Utilisateur '%' créé.
+ad_useralter=Mot de passe modifié pour l'utilisateur '%'.
+ad_userdrop=Utilisateur '%' effacé.
+ad_userlog=L'utilisateur '%' est actuellement logué.
+ad_passno=Aucun mot de passe specifié.
+ad_admin=L'utilisateur Admin ne peut être modifié.
+ad_kill=% sessions interrompues.
+ad_killself='%' ne peut pas s'auto-interrompre.
+
+# Commandes générales
+gc_setkey=Impossible de modifier la propriété.
+gc_setval=Impossible de donner à la propriété '%' la valeur '%'.
+
+# Info Strings
+info_index=Index
+info_opt=Optimisation de la base de données en cours
+info_stats=Créer statistiques
+info_dbname=Nom
+info_ndocs=Documents
+info_docsize=Taille en entrée
+info_dbsize=Taille
+info_doc=Chemin source
+info_time=Horodateur
+info_mem=Mémoire principale utilisée
+info_nodes=Noeuds
+info_height=Hauteur
+info_encoding=Encodage
+info_dbpath=Chemin de la base de données
+info_nodb=Aucune base de données trouvée
+info_nodeepfs=Aucune base de données DeepFS trouvée
+info_dberror=Ouverture impossible.
+info_info=Info processus
+info_all=Mode verbeux
+info_debug=Mode débug
+info_chop=Suppression des espaces
+info_entities=Parsage entité
+info_serialize=Sérialiser
+info_tags=Balises
+info_atts=Attributs
+info_ns=Espaces de noms
+info_pathindex=Path summary
+info_txtindex=Index texte
+info_atvindex=Index attributs
+info_ftindex=Index plein texte
+info_wcindex=jockers
+info_outofdated=périmé
+info_db=Propriétés de la base de données
+info_create=Creation de la base de données
+info_general=Informations Générales
+info_resultchop=Réduit
+info_on=ON
+info_off=OFF
+info_error=Erreur
+info_entries=% entrées
+info_browsererror=Failed to open a browser. Please manually open the URL in your favorite browser:\n\n%
+
+# Commande Aide
+ch_nohelp=Pas d'aide disponible.
+ch_helpdatabase0=Commandes base de données :
+ch_create1=Créer base de données, index ou utilisateur.
+ch_create2=Crée nouvelle base de données, nouvel index ou nouvel utilisateur:
+ch_create3=crée la base de données [%] pour le fichier ou dossier [%]
+ch_create4=crée une base de données [%] vide
+ch_create5=crée l'index specifié
+ch_create6=crée une base de données du système de fichier [%] pour [%]
+ch_create7=(utilise [%] et [%] si FUSE est activé)
+ch_create8=crée l'utilisateur specifié
+ch_add1=Ajouter document.
+ch_add2=Ajoute un document à la base de données courante.
+ch_delete1=Supprimer document.
+ch_delete2=Supprime un document de la base de données courante.
+ch_open1=Ouvrir base de données.
+ch_open2=Ouvre la base de données [%] spécifiée.
+ch_info1=Affiche les informations de la base de données courante.
+ch_info21=Affiche les informations de la base de données actuellement ouverte.
+ch_info22=aucun argument: voir informations globales
+ch_info23=Affiche les informations de la base de données
+ch_info24=Affiche les informations de l'index
+ch_info25=Afficher la table interne de la base de données
+ch_close1=Fermer la base de données.
+ch_close2=Ferme the current base de données.
+ch_list1=List disponible base de donnéess.
+ch_list2=Lists all disponible base de donnéess.
+ch_drop1=Drop base de données, index ou utilisateur.
+ch_drop2=Drops a base de données, index ou utilisateur:
+ch_drop21=drops the base de données
+ch_drop22=drops the spécifié index
+ch_drop3=drops the spécifié utilisateur
+ch_alter1=Modifier utilisateur mot de passe.
+ch_alter2=Modifiers the mot de passe of a utilisateur.
+ch_optimize1=Optimize the base de données.
+ch_optimize2=Optimizes the current base de données structures.
+ch_export1=Export base de données to XML.
+ch_export2=Exporte la base de données vers [%].
+ch_helpquery0=Commandes de requêtes :
+ch_xquery1=Evalue l'expression XQuery.
+ch_xquery2=Evalue la requête specifiée et imprime le résultat.
+ch_run1=Evalue le fichier comme expression XQuery.
+ch_run2=Evalue une requête de [%] et imprime le résultat.
+ch_find1=Evaluer une requête par mot-clé.
+ch_find2=Les modificateurs suivants peuvent être utilisés :\n =  : Rechercher exactement ce texte dans les noeuds texte"\n @= : Rechercher exactement ces atributs\n @  : Rechercher les attributs
+ch_cs1=Evalue l'expression XQuery et définit le resultat comme nouveau contexte.
+ch_cs2=Evalue la requête et définit le resultat comme nouveau contexte.
+ch_helpadmin0=Commandes Admin :
+ch_kill1=Terminer les sessions de l'utilisateur.
+ch_kill2=Termine toutes les sessions de l'utilisateur spécifié.
+ch_show1=Montrer les informations du serveur.
+ch_show21=Montre les informations du serveur :
+ch_show22=montre les bases de données actullement ouvertes.
+ch_show23=montre les sessions de base de données courante.
+ch_show24=montre les utilisateurs (sur une base de données).
+ch_grant1=Octroyer les permissions utilisateur.
+ch_grant2=Octroie les permissions à un utilisateur (sur une base de données).
+ch_helpgeneral0=Commandes générales :
+ch_set1=Définir les options globales (Valeurs courantes : essayer '%').
+ch_set2=Options [%] disponibles avec une valeur de [%] = marche/arrêt:
+ch_set21=Affichage des infos relatives au processus (tout)
+ch_set22=Affichage des infos de débug
+ch_set23=Sérialisation des resultats de la requête
+ch_set26=Supprimer les espaces XML
+ch_set27=Parsing des entités XML
+ch_set28=Indexation texte
+ch_set29=Indexation des valeurs d'attribut
+ch_set31=Indexation plein texte
+ch_set32=Indexation chemin
+ch_password1=Changer le mot de passe.
+ch_password2=Change le mot de passe de l'utilisateur.
+ch_help1=Obtenir de l'aide sur les commandes %
+ch_help2=Si [%] est spécifié, l'information relative à la \ncommande est imprimée; sinon, toutes les commandes sont listées.
+ch_exit1=Quitter l'application.
+ch_exit2=Quitter %.
+
+# Aide Texts
+h_hist=Afficher l'historique des saisies.
+h_save=Enregistre le resultat.
+h_go=Execute la requête.
+h_stop=Stoppe le processus en cours.
+h_recent=Fichiers récemment ouverts
+h_cmd=Saisir ici vos commandes BaseX. Afficher l'aide pour avoir un aperçu de toutes les commandes disponibles. \n\nVous pouvez rappeler vos précédentes saisies en utilisant les touches HAUT et BAS.
+h_searchxml=Entrez du texte dans le champ texte pour lancer une recherche dans votre document XML. Syntaxe acceptée :\n...      Rechercher balises ou textes\n=...   Rechercher exactement ce texte\n@ ...  Rechercher attributs et valeurs d'attributs\n@=   Rechercher exactement cette valeur d'attribut\n/...     Evaluer la saisie comme requête XQuery
+h_searchfs=Entrez du texte dans le champ texte pour lancer une recherche dans votre système de fichiers. Syntaxe acceptée :\n...      Rechercher fichiers ou dossiers\n= ...  Rechercher exactement ce nom de fichier\n. ..     Rechercher extensions de fichiers\n< ...  Rechercher fichiers de taille inférieure à la taille spécifiée\n> ...  Rechercher fichiers de taille supérieure à la taille spécifiée\n\nVous pouvez entrer des commandes BaseX en insérant un point d'exclamation devant votre requête.
+h_xpath=Le mode XQuery permet d'entrer des requêtes XQuery simples.
+h_map=Cette visualisation est appelée TreeMap. Tous les noeuds du document XML sont représentés par des rectangles qui recouvrent complètement la surface du panneau. Les noeuds peuvent être mis en évidence par un simpe clic et filtrés par un double-clic. Un clic-droit sur un élément affiche un menu popup.
+h_plot=Cette visualisation est appelée diagramme de dispersion (ou nuage de points). Tous les noeuds XML sont affichés dans un diagramme. Les noeuds peuvent être mis en évidence par un simpe clic et filtrés par un double-clic.  Un clic-droit sur un élément affiche un menu popup.
+h_folder=Cette visualisation affiche tous les noeuds XML sous forme de dossiers. Les noeuds peuvent être dépliés ou repliés en cliquant sur les flèches. De même cliquer sur un dossier le met en évidence, double-cliquer sur un dossier permet de zoomer dessus. C'est une manière efficace d'explorer le document XML. Un clic-droit sur un élément affiche un menu popup.
+h_table=Cette visualisation affiche les noeuds XML en tableau. Si vous cliquez sur un texte, tous les noeuds comportant le même texte sont mis en évidence. Double-cliquer sur un texte filtre les résultats de la requête. Un clic-droit sur un élément affiche un menu popup.
+h_text=Ce panneau affiche les résultats d'une requête et toute autre sortie texte. \n\n Utiliser les touches '-' et '+' pour changer la taille de police de tous les panneaux. Entrer du texte dans la fenêtre popup de recherche pour lancer une recherche incrémentale sur ce texte. C'est un moyen simple de trouver des portions de texte spécifiques.
+h_info=Ce panneau affiche les informations relatives à la compilation et à l'évaluation d'une requête XQuery, y compris des informations de profilage.
+h_explore=Le mode recherche simple permet des requêtes simples dans le document XML.
+h_xquery=Vous pouvez saisir dans ce champ texte n'importe quelle requête XQuery 1.0. La requête est évaluée après chaque frappe au clavier. \n\n L'exemple suivant renverrait tous les titres de livres dont le sujet est 'BaseX' : \n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_mover=Pour déplacer une vue, glisser-déposer la barre de menu du panneau correspondant jusqu'à l'endroit souhaité de la fenêtre principale. \n Si vous glissez-déposez une vue hors de la fenêtre principale, cette vue sera fermée.

@@ -97,9 +97,7 @@ public final class Order extends Expr {
    * @param e end position
    * @throws QueryException query exception
    */
-  void sort(final int[] o, final int s, final int e)
-      throws QueryException {
-
+  void sort(final int[] o, final int s, final int e) throws QueryException {
     if(e < 7) {
       for(int i = s; i < e + s; i++)
         for(int j = i; j > s && d(o, j - 1, j) > 0; j--) s(o, j, j - 1);
@@ -183,9 +181,7 @@ public final class Order extends Expr {
    * @return result
    * @throws QueryException query exception
    */
-  private int d(final int[] o, final int a, final int b)
-      throws QueryException {
-
+  private int d(final int[] o, final int a, final int b) throws QueryException {
     for(final OrderBy l : ord) {
       final Item m = l.item(o[a]);
       final Item n = l.item(o[b]);

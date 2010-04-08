@@ -129,6 +129,7 @@ public abstract class UpdatePrimitive {
    */
   public static MemData buildDB(final NodIter ch, final MemData md)
       throws QueryException {
+
     int pre = 1;
     Nod n;
     while((n = ch.next()) != null) pre = addNode(n, md, pre, 0);
@@ -146,9 +147,8 @@ public abstract class UpdatePrimitive {
    * @throws QueryException query exception
    */
   private static int addNode(final Nod nd, final MemData m,
-      final int pre, final int par) 
-  throws QueryException {
-    
+      final int pre, final int par) throws QueryException {
+
     final int k = Nod.kind(nd.type);
     final int ms = m.meta.size;
     switch(k) {

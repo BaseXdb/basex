@@ -65,7 +65,8 @@ public abstract class Preds extends Expr {
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     for(final Expr p : pred) {
-      if(u == Use.POS && p.returned(ctx).num || p.uses(u, ctx)) return true;
+      if(u == Use.POS && p.returned(ctx).mayBeNum() || p.uses(u, ctx))
+        return true;
     }
     return false;
   }

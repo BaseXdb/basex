@@ -4,6 +4,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.TokenBuilder;
@@ -36,6 +37,7 @@ public final class CText extends CFrag {
       tb.add(it.str());
       more = true;
     } while((it = iter.next()) != null);
+
     return new FTxt(tb.finish(), null);
   }
 
@@ -57,12 +59,17 @@ public final class CText extends CFrag {
   }
 
   @Override
+  public SeqType returned(final QueryContext ctx) {
+    return SeqType.NOD_01;
+  }
+
+  @Override
   public String info() {
     return "text constructor";
   }
 
   @Override
   public String toString() {
-    return toString(Type.TXT);
+    return toString(Type.TXT.name);
   }
 }

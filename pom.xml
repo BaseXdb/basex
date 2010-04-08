@@ -4,7 +4,7 @@
   <groupId>org.basex</groupId>
   <artifactId>basex</artifactId>
   <packaging>jar</packaging>
-  <version>6.0.6</version>
+  <version>6.0.7</version>
   <name>BaseX</name>
   <url>http://basex.org</url>
   <properties>
@@ -100,82 +100,6 @@
           </archive>
         </configuration>
       </plugin>
-
-      <!-- ECLIPSE SPECIFIC SETTINGS
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <version>2.7</version>
-        <configuration>
-          <downloadSources>true</downloadSources>
-          <downloadJavadocs>true</downloadJavadocs>
-        </configuration>
-      </plugin> -->
-
-      <!-- OSX disk image bundler
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>osxappbundle-maven-plugin</artifactId>
-        <version>1.0-alpha-2</version>
-        <configuration>
-          <mainClass>org.basex.BaseXWin</mainClass>
-          <iconFile>${basedir}/etc/build/OSXBundle/BaseX.icns</iconFile>
-          <javaApplicationStub>${basedir}/etc/build/OSXBundle/JavaApplicationStub</javaApplicationStub>
-          <jvmVersion>1.6</jvmVersion>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>bundle</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>com.akathist.maven.plugins.launch4j</groupId>
-        <artifactId>launch4j-maven-plugin</artifactId>
-        <version>1.3</version>
-        <executions>
-          <execution>
-            <id>l4j-clui</id>
-            <phase>package</phase>
-            <goals>
-              <goal>launch4j</goal>
-            </goals>
-            <configuration>
-              <headerType>gui</headerType>
-              <outfile>target/${project.name}-${project.version}.exe</outfile>
-              <jar>target/${project.name}-${project.version}.jar</jar>
-              <icon>${basedir}/etc/build/BaseX.ico</icon>
-              <errTitle>encc</errTitle>
-              <classPath>
-                <mainClass>org.basex.BaseXWin</mainClass>
-                <addDependencies>false</addDependencies>
-                <preCp>anything</preCp>
-              </classPath>
-              <jre>
-                <minVersion>1.6.0</minVersion>
-                <maxVersion/>
-                <jdkPreference>preferJre</jdkPreference>
-                <maxHeapSize>1024</maxHeapSize>
-              </jre>
-              <versionInfo>
-                <fileVersion>6.0.0.0</fileVersion>
-                <txtFileVersion>${project.name} ${project.version}</txtFileVersion>
-                <fileDescription>Native XML Database and XQuery Processor</fileDescription>
-                <copyright>(c) University of Konstanz, 2010</copyright>
-                <productVersion>6.0.0.0</productVersion>
-                <txtProductVersion>${project.name} ${project.version}</txtProductVersion>
-                <productName>${project.name}</productName>
-                <companyName>University of Konstanz</companyName>
-                <internalName>${project.name}</internalName>
-                <originalFilename>${project.name}-${project.version}.exe</originalFilename>
-              </versionInfo>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin> -->
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

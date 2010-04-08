@@ -7,9 +7,9 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -65,7 +65,7 @@ public final class MixedPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item it = root != null ? ctx.iter(root).finish() : ctx.item;
+    final Item it = root != null ? ctx.iter(root).finish() : checkCtx(ctx);
     final Item c = ctx.item;
     final long cs = ctx.size;
     final long cp = ctx.pos;
@@ -135,8 +135,9 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return step[step.length - 1].returned(ctx);
+  public SeqType returned(final QueryContext ctx) {
+    final SeqType ret = step[step.length - 1].returned(ctx);
+    return new SeqType(ret.type, SeqType.OCC_0M);
   }
 
   @Override

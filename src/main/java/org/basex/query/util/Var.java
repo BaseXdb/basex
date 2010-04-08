@@ -7,7 +7,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Return;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
@@ -24,7 +23,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class Var extends Expr {
   /** Return type. */
-  public Return ret = Return.SEQ;
+  public SeqType ret = SeqType.ITEM_0M;
   /** Global flag. */
   public final boolean global;
   /** Variable name. */
@@ -150,7 +149,7 @@ public final class Var extends Expr {
     if(type == null) return it;
 
     if(!global) {
-      if(type.occ < 2 && !it.type.instance(type.type))
+      if(type.single() && !it.type.instance(type.type))
         Err.or(XPINVCAST, it.type, type, it);
     }
 
@@ -175,9 +174,8 @@ public final class Var extends Expr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
-    return type != null ? type.returned() :
-        expr != null ? expr.returned(ctx) : ret;
+  public SeqType returned(final QueryContext ctx) {
+    return type != null ? type : expr != null ? expr.returned(ctx) : ret;
   }
 
   @Override

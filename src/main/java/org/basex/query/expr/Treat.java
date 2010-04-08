@@ -46,10 +46,10 @@ public final class Treat extends Single {
     final Iter iter = ctx.iter(expr);
     final Item it = iter.next();
     if(it == null) {
-      if(seq.type == Type.EMP || seq.occ % 2 != 0) return Iter.EMPTY;
+      if(seq.type == Type.EMP || seq.mayBeZero()) return Iter.EMPTY;
       Err.empty(this);
     }
-    if(seq.occ < 2) {
+    if(seq.single()) {
       if(iter.next() != null) Err.or(NOTREATS, info(), seq);
       if(!it.type.instance(seq.type)) Err.or(NOTREAT, info(), seq, it.type);
       return it.iter();

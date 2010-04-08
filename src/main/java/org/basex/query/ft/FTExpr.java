@@ -6,8 +6,8 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Return;
 import org.basex.query.item.FTItem;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.FTIter;
 import org.basex.query.util.Var;
 
@@ -73,8 +73,8 @@ public abstract class FTExpr extends Expr {
   }
 
   @Override
-  public final Return returned(final QueryContext ctx) {
-    return Return.BLN;
+  public final SeqType returned(final QueryContext ctx) {
+    return SeqType.BLN;
   }
 
   @Override

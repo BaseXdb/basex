@@ -391,8 +391,6 @@ qu_time=Đang tính giờ
 qu_result=Kết quả
 qu_plan=Kết hoạch hỏi
 qu_hits=Hết(s)
-
-# Query Commands.. the following strings must have the same length
 qu_tabquery=Hỏi
 qu_tabpars=Phân tích
 qu_tabcomp=Dịch

@@ -62,6 +62,6 @@ public final class CComm extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.COM);
+    return toString(Type.COM.name);
   }
 }

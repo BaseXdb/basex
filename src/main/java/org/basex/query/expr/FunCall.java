@@ -6,6 +6,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.util.Token;
 
@@ -52,7 +53,7 @@ public final class FunCall extends Arr {
   }
 
   @Override
-  public Return returned(final QueryContext ctx) {
+  public SeqType returned(final QueryContext ctx) {
     return func.returned(ctx);
   }
 
