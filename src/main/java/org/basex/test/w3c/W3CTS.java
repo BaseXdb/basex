@@ -839,8 +839,7 @@ public abstract class W3CTS {
    * @throws Exception exception
    */
   @SuppressWarnings("unused")
-  void parse(final QueryContext qctx, final Nodes root)
-    throws Exception { }
+  void parse(final QueryContext qctx, final Nodes root) throws Exception { }
 
   /**
    * Returns all query states.
