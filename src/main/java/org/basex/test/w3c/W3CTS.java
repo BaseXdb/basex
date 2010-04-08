@@ -34,7 +34,7 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FNBaseX;
 import org.basex.query.func.FNGen;
-import org.basex.query.func.FNSeq;
+import org.basex.query.func.FNSimple;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.DBNode;
@@ -112,6 +112,8 @@ public abstract class W3CTS {
   private boolean debug;
   /** Minimum conformance. */
   private boolean minimum;
+  /** Print compilation steps. */
+  private boolean compile;
 
   /** Cached source files. */
   private final HashMap<String, String> srcs = new HashMap<String, String>();
@@ -166,6 +168,8 @@ public abstract class W3CTS {
         if(c == 'r') {
           reporting = true;
           currTime = true;
+        } else if(c == 'c') {
+          compile = true;
         } else if(c == 'd') {
           debug = true;
         } else if(c == 'm') {
@@ -186,6 +190,7 @@ public abstract class W3CTS {
     if(!o) {
       Main.outln(NL + Main.name(this) + " Test Suite [pat]" + NL +
           " [pat] perform only tests with the specified pattern" + NL +
+          " -c print compilation steps" + NL +
           " -d show debugging info" + NL +
           " -h show this help" + NL +
           " -m minimum conformance" + NL +
@@ -355,8 +360,10 @@ public abstract class W3CTS {
         curr.doc = true;
       }
 
+      context.prop.set(Prop.ALLINFO, compile);
       final QueryProcessor xq = new QueryProcessor(in, curr, context);
       final QueryContext qctx = xq.ctx;
+      context.prop.set(Prop.ALLINFO, false);
 
       try {
         files.add(file(nodes("*:input-file", state),
@@ -402,6 +409,13 @@ public abstract class W3CTS {
         error = ex.getMessage() != null ? ex.getMessage() : ex.toString();
         System.err.print("\n" + inname + ": ");
         ex.printStackTrace();
+      }
+
+      // print compilation steps
+      if(compile) {
+        Main.errln("---------------------------------------------------------");
+        Main.err(xq.info(false));
+        Main.errln(in);
       }
 
       final Nodes outFiles = nodes("*:output-file/text()", state);
@@ -483,7 +497,7 @@ public abstract class W3CTS {
                 pre += rdata.size(pre, rdata.kind(pre));
               }
 
-              final boolean eq = FNSeq.deep(iter, si);
+              final boolean eq = FNSimple.deep(iter, si);
               if(!eq && debug) {
                 iter.reset();
                 si.reset();
