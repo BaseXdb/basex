@@ -58,5 +58,4 @@ public class FTExtensionSelection extends FTExpr {
       sb.append(p).append(' ');
     return sb.append(BRACE1 + ' ' + expr[0] + ' ' + BRACE2).toString();
   }
-
 }

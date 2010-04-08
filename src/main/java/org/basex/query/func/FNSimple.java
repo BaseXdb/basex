@@ -3,14 +3,18 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
  * Simple functions.
@@ -43,6 +47,8 @@ public final class FNSimple extends Fun {
       case EXISTS:  return Bln.get(e.i() || e.iter(ctx).next() != null);
       case BOOLEAN: return Bln.get(e.ebv(ctx).bool());
       case NOT:     return Bln.get(!e.ebv(ctx).bool());
+      case DEEPEQUAL:
+        return Bln.get(deep(ctx));
       case ZEROORONE:
         Iter iter = e.iter(ctx);
         Item it = iter.next();
@@ -96,6 +102,85 @@ public final class FNSimple extends Fun {
       default:
         return this;
     }
+  }
+
+  /**
+   * Checks items for deep equality.
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean deep(final QueryContext ctx) throws QueryException {
+    if(expr.length == 3) checkColl(expr[2], ctx);
+    return deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
+  }
+
+  /**
+   * Checks items for deep equality.
+   * @param iter1 first iterator
+   * @param iter2 second iterator
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public static boolean deep(final Iter iter1, final Iter iter2)
+      throws QueryException {
+
+    Item it1 = null;
+    Item it2 = null;
+    // explicit non-short-circuit..
+    while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
+      if(it1.n() && it2.n() && Double.isNaN(it1.dbl()) &&
+          Double.isNaN(it2.dbl())) continue;
+
+      if(!CmpV.valCheck(it1, it2) || CmpV.Comp.NE.e(it1, it2)) return false;
+      if(!it1.node() && !it2.node()) continue;
+
+      // comparing nodes
+      if(!(it1.node() && it2.node())) return false;
+      final NodeIter niter1 = ((Nod) it1).descOrSelf();
+      final NodeIter niter2 = ((Nod) it2).descOrSelf();
+
+      Nod n1 = null, n2 = null;
+      while(true) {
+        n1 = niter1.next();
+        n2 = niter2.next();
+        if(n1 == null && n2 == null || n1 == null ^ n2 == null) break;
+        if(n1.type != n2.type) return false;
+
+        final Item qn1 = n1.qname();
+        if(qn1 != null && !qn1.eq(n2.qname())) return false;
+
+        if(n1.type == Type.ATT || n1.type == Type.PI || n1.type == Type.COM ||
+            n1.type == Type.TXT) {
+          if(!Token.eq(n1.str(), n2.str())) return false;
+          continue;
+        }
+
+        NodeIter att1 = n1.attr();
+        int s1 = 0;
+        while(att1.next() != null) s1++;
+        NodeIter att2 = n2.attr();
+        int s2 = 0;
+        while(att2.next() != null) s2++;
+        if(s1 != s2) return false;
+
+        Nod a1 = null, a2 = null;
+        att1 = n1.attr();
+        while((a1 = att1.next()) != null) {
+          att2 = n2.attr();
+          boolean found = false;
+          while((a2 = att2.next()) != null) {
+            if(a1.qname().eq(a2.qname())) {
+              found = Token.eq(a1.str(), a2.str());
+              break;
+            }
+          }
+          if(!found) return false;
+        }
+      }
+      if(n1 != n2) return false;
+    }
+    return it1 == it2;
   }
 
   @Override

@@ -109,6 +109,6 @@ public final class CElem extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.ELM.name + " { " + tag + " } ");
+    return toString(Type.ELM.name + " { " + tag + " }");
   }
 }

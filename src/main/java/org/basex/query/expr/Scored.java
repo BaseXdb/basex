@@ -47,7 +47,6 @@ public class Scored extends Arr {
 
   @Override
   public String toString() {
-    return expr[0] + " " + SCORED + " " + expr[1];
+    return toString(SCORED);
   }
-
 }

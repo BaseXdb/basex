@@ -62,8 +62,8 @@ public abstract class Iter {
   }
 
   /**
-   * Reverses the iterator and returns true. Note: false is returned if the
-   * iterator cannot be reset, so the returned value has to be checked.
+   * Reverses the iterator and returns true if operation was successful.
+   * False is returned if the iterator cannot be reversed.
    * @return true if operator could be reversed
    */
   public boolean reverse() {

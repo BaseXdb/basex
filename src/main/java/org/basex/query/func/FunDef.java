@@ -210,15 +210,13 @@ public enum FunDef {
   /** XQuery function. */
   INDEXOF(FNURI, FNSeq.class, 2, 3, "index-of(seq, item, coll?)", ITR_0M),
   /** XQuery function. */
-  INSBEF(FNURI, FNSeq.class, 3, 3, "insert-before(seq1, pos, seq2)", ITEM_0M),
+  INSBEF(FNURI, FNSeq.class, 3, 3, "insert-before(seq, pos, seq2)", ITEM_0M),
   /** XQuery function. */
-  REMOVE(FNURI, FNSeq.class, 2, 2, "remove(source, position)", ITEM_0M),
+  REMOVE(FNURI, FNSeq.class, 2, 2, "remove(seq, position)", ITEM_0M),
   /** XQuery function. */
-  REVERSE(FNURI, FNSeq.class, 1, 1, "reverse(item)", ITEM_0M),
+  REVERSE(FNURI, FNSeq.class, 1, 1, "reverse(seq)", ITEM_0M),
   /** XQuery function. */
-  SUBSEQ(FNURI, FNSeq.class, 2, 3, "subsequence(item, start, len?)", ITEM_0M),
-  /** XQuery function. */
-  DEEPEQ(FNURI, FNSeq.class, 2, 3, "deep-equal(item, item, coll?)", BLN),
+  SUBSEQ(FNURI, FNSeq.class, 2, 3, "subsequence(seq, start, len?)", ITEM_0M),
 
   /* FNSimple functions. */
 
@@ -242,6 +240,8 @@ public enum FunDef {
   EXACTLYONE(FNURI, FNSimple.class, 1, 1, "exactly-one(item)", ITEM_0M),
   /** XQuery function. */
   ONEORMORE(FNURI, FNSimple.class, 1, 1, "one-or-more(item)", ITEM_0M),
+  /** XQuery function. */
+  DEEPEQUAL(FNURI, FNSimple.class, 2, 3, "deep-equal(item, item, coll?)", BLN),
 
   /* FNStr functions. */
 

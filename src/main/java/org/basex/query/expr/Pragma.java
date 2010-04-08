@@ -42,7 +42,7 @@ public class Pragma extends Simple {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(PRAGMA + ' ' + qName + ' ');
+    final StringBuilder sb = new StringBuilder(PRAGMA + ' ' + qName + ' ');
     if (pContent.length > 0) sb.append(Token.string(pContent) + ' ');
     return sb.append(PRAGMA2).toString();
   }

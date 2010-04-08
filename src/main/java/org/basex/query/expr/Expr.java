@@ -171,8 +171,6 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Indicates the return type of an expression.
-   * Called by the compiler to check if expressions can be reformulated.
-   * null is returned by default.
    * @param ctx query context
    * @return result of check
    */
