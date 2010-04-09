@@ -195,7 +195,8 @@ public final class ViewNotifier {
     hist = 0;
     maxhist = 0;
     final Context context = gui.context;
-    context.marked = new Nodes(new int[0], context.data, context.marked.ftpos);
+    context.marked = context.marked == null ? null : 
+      new Nodes(new int[0], context.data, context.marked.ftpos);
     for(final View v : view) if(v.visible()) v.refreshUpdate();
     gui.refreshControls();
   }

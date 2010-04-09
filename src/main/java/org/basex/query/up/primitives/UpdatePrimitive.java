@@ -183,7 +183,7 @@ public abstract class UpdatePrimitive {
         return pre + 1;
       default:
         q = nd.qname();
-        // [CG] XQUP: check temporary namespace copy
+        // [LK] XQUP: check temporary namespace copy
         ne = false; // nd.ns().size != 0;
         if(par == 0) { // ne
           final Atts ns = FElem.ns(nd);
@@ -192,6 +192,7 @@ public abstract class UpdatePrimitive {
             ne = true;
           }
         }
+
         uri = q.uri.str();
         u = uri.length != 0 ? Math.abs(m.ns.addURI(uri)) : 0;
         final int tn = m.tags.index(q.str(), null, false);

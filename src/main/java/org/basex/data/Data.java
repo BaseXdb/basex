@@ -570,6 +570,12 @@ public abstract class Data {
           }
           ns.open();
           byte[] nm = md.name(mpre, mk);
+          // [LK] testing things...
+          /* 
+           * WTF: mprens doesn't contain all namespaces mytest,src.xml: only
+           * the second one is contained. -> *check memdata *check md.ns(mpre) 
+           */
+//          final Atts mprens = md.ns(mpre);
           elem(dis, tags.index(nm, null, false), md.attSize(mpre, mk),
               md.size(mpre, mk), ns.uri(nm, true), ne);
           preStack[l++] = pre;
