@@ -198,7 +198,6 @@ public final class ViewNotifier {
     final boolean noData = context.data == null || context.marked == null;
     context.marked = noData ? null : 
       new Nodes(new int[0], context.data, context.marked.ftpos);
-//    context.marked = new Nodes(new int[0], context.data, context.marked.ftpos);
     for(final View v : view) if(v.visible()) v.refreshUpdate();
     gui.refreshControls();
   }
