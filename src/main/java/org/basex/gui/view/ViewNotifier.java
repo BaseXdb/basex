@@ -192,12 +192,11 @@ public final class ViewNotifier {
    * Notifies all views of updates in the data structure.
    */
   public void update() {
+    final Context context = gui.context;
+    if(context.data == null) return;
     hist = 0;
     maxhist = 0;
-    final Context context = gui.context;
-    final boolean noData = context.data == null || context.marked == null;
-    context.marked = noData ? null : 
-      new Nodes(new int[0], context.data, context.marked.ftpos);
+    context.marked = new Nodes(new int[0], context.data);
     for(final View v : view) if(v.visible()) v.refreshUpdate();
     gui.refreshControls();
   }

@@ -179,14 +179,17 @@ public class AxisPath extends Path {
    * @return path
    */
   private AxisPath children(final QueryContext ctx, final Data data) {
-    for(int i = 0; i < step.length; i++) {
-      if(step[i].axis != Axis.DESC || step[i].uses(Use.POS, ctx)) continue;
+    for(int s = 0; s < step.length; s++) {
+      // don't allow predicates in preceding location steps
+      if(s > 0 && step[s - 1].pred.length != 0) break;
+      
+      if(step[s].axis != Axis.DESC) continue;
 
       // check if child steps can be retrieved for current step
-      ArrayList<PathNode> nodes = pathNodes(data, i);
+      ArrayList<PathNode> nodes = pathNodes(data, s);
       if(nodes == null) continue;
 
-      ctx.compInfo(OPTCHILD, step[i]);
+      ctx.compInfo(OPTCHILD, step[s]);
 
       // cache child steps
       final TokenList tl = new TokenList();
@@ -201,15 +204,15 @@ public class AxisPath extends Path {
 
       // build new steps
       int ts = tl.size();
-      final Step[] steps = new Step[ts + step.length - i - 1];
-      for(int t = 0; t <= ts - 1; t++) {
-        final Expr[] preds = t == ts - 1 ? step[i].pred : new Expr[] {};
+      final Step[] steps = new Step[ts + step.length - s - 1];
+      for(int t = 0; t < ts; t++) {
+        final Expr[] preds = t == ts - 1 ? step[s].pred : new Expr[] {};
         final byte[] n = tl.get(ts - t - 1);
         final NameTest nt = n == null ? new NameTest(false) :
           new NameTest(new QNm(n), Kind.NAME, false);
         steps[t] = Step.get(Axis.CHILD, nt, preds);
       }
-      while(++i < step.length) steps[ts++] = step[i];
+      while(++s < step.length) steps[ts++] = step[s];
 
       return get(root, steps).children(ctx, data);
     }
