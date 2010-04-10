@@ -12,7 +12,7 @@ import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
 
 /**
- * XQuery Full-text Test Suite wrapper.
+ * XQuery Full Text Test Suite wrapper.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
