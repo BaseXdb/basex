@@ -71,13 +71,17 @@ public final class FLWR extends FLWOR {
       return where != null ? new If(where, ret, Seq.EMPTY) : ret;
     }
 
-    // simplify simple return expression
+    // simplify basic flwor expression (for $i in E return $i -> E)
     if(where == null && fl.length == 1 && fl[0].standard() &&
         ret instanceof VarCall) {
       final Var v = ((VarCall) ret).var;
       if(v.type == null && fl[0].var.eq(v)) {
         ctx.compInfo(OPTFLWOR);
-        return fl[0].expr.comp(ctx);
+        Expr e = fl[0].expr.comp(ctx);
+        if(e != fl[0].expr) {
+          System.out.println(e + " => " + fl[0].expr);
+        }
+        return e;
       }
     }
     return this;

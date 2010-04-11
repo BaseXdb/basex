@@ -256,8 +256,8 @@ public abstract class IO {
    */
   protected final byte[] cache(final InputStream i) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
-    final InputStream bis = i instanceof BufferedInputStream ? i
-        : new BufferedInputStream(i);
+    final InputStream bis = i instanceof BufferedInputStream ? i :
+      new BufferedInputStream(i);
     int b;
     while((b = bis.read()) != -1)
       tb.add((byte) b);
