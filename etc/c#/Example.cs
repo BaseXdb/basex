@@ -10,47 +10,54 @@
  */
 using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace BaseX
 {
-	public class Example
-	{	
-		public static void Main(string[] args)
-		{	
-			// initialize timer
-			Stopwatch watch = new Stopwatch();
-			watch.Start();
-			
-			// command to be performed
-			string com = "xquery doc('mediothek')";
-			
-			try {
-				// create session
-				Session session = new Session("localhost", 1984, "admin", "admin");
-				
-				// perform command and write result to the specified output stream
-				if (!session.execute(com, Console.OpenStandardOutput())) {
-					Console.WriteLine(session.inf());
-				}
-				
-				// perform command and show result or error output
-				//if (session.execute(com)) {
-				//	Console.WriteLine(session.res());
-				//} else {
-				//	Console.WriteLine(session.inf());
-				//}
-				
-				// close session
-				session.close();
-				
-				// print time needed
-				watch.Stop();
-				Console.WriteLine("\n" + watch.ElapsedMilliseconds + " ms.");
-				Console.ReadLine();
-				
-			} catch (Exception e) {
-				Console.WriteLine(e.Message);
-			}
-		}
-	}
+  public class Example
+  {
+    public static void Main(string[] args)
+    {
+      // initialize timer
+      Stopwatch watch = new Stopwatch();
+      watch.Start();
+      
+      // command to be performed
+      string cmd = "xquery 1 to 10";
+      
+      try
+      {
+        // create session
+        BaseX session = new BaseX("localhost", 1984, "admin", "admin");
+
+        // Version 1: perform command and show result or error output
+        if (session.Execute(cmd))
+        {
+        	Console.WriteLine(session.Result);
+        }
+        else
+        {
+          Console.WriteLine(session.Info);
+        }
+        
+        // Version 2 (faster): send result to the specified output stream
+        Stream stream = Console.OpenStandardOutput();
+        if (!session.Execute(cmd, stream))
+        {
+          Console.WriteLine(session.Info);
+        }
+
+        // close session
+        session.Close();
+        
+        // print time needed
+        Console.WriteLine("\n" + watch.ElapsedMilliseconds + " ms.");
+      }
+      catch (IOException e)
+      {
+        // print exception
+        Console.WriteLine(e.Message);
+      }
+    }
+  }
 }

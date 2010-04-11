@@ -1,5 +1,5 @@
 /*
- * ----------------------------------------------------------------------------- 
+ * -----------------------------------------------------------------------------
  * 
  * This C# module provides methods to connect to and communicate with the
  * BaseX Server.
@@ -8,12 +8,16 @@
  * for the connection. The socket connection will then be established via the
  * hostname and the port.
  *
- * For the execution of commands you need to call the execute() method with the
+ * For the execution of commands you need to call the Execute() method with the
  * database command as argument. The method returns a boolean, indicating if
- * the command was successful. The result can be requested with the result()
- * method, and the info() method returns additional processing information
- * or error output.
+ * the command was successful. The result is stored in the Result property,
+ * and the Info property returns additional processing information or error
+ * output.
  *
+ * An even faster approach is to call Execute() with the database command and
+ * an output stream. The result will directly be printed and does not have to
+ * be cached.
+ * 
  * -----------------------------------------------------------------------------
  * Example:
  * 
@@ -22,23 +26,37 @@
  * namespace BaseX
  *	{
  *	public class Example
- *	{	
+ *	{
  *		public static void Main(string[] args)
- *		{	
- *			try {
+ *		{
+ *			try
+ *      {
  *				Session session = new Session("localhost", 1984, "admin", "admin");
- *				if ((session.execute("xquery 1 to 10")) == "\0") {
- *					Console.WriteLine(s.res());
- * 				} else {
- *					Console.WriteLine(s.inf());
+ * 
+ *        // Version 1: perform command and show result or error output
+ *				if (session.Execute("xquery 1 to 10"))
+ *        {
+ *					Console.WriteLine(session.Result);
+ * 				}
+ *        else
+ *        {
+ *					Console.WriteLine(session.Info);
  *				}
- *				session.close();
+ *
+ *        // Version 2 (faster): send result to the specified output stream
+ *        Stream stream = Console.OpenStandardOutput();
+ *        if (!session.Execute("xquery 1 to 10", out))
+ *        {
+ *          Console.WriteLine(session.Info);
+ *        }
+ * 
+ *				session.Close();
  *			} catch (Exception e) {
  *				Console.WriteLine(e.Message);
- *		  }
+ *			}
  *		}
- *	  }
- *	} 
+ *		}
+ *	}
  * 
  * -----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -53,127 +71,129 @@ using System.IO;
 
 namespace BaseX
 {
-	class Session
-	{
-		public NetworkStream stream = null;
-		public TcpClient socket = null;
-		public Stream result = new MemoryStream();
-		public string info = "";
-		public int bpos = 0;
-		public int bsize = 0;
-		public byte[] inStream = new byte[4096];
-		
-		/** Constructor, creating a new socket connection. */
-		public Session(string host, int port, string username, string pw) 
-		{
-			socket = new TcpClient(host, port);
-			stream = socket.GetStream();
-			init();
-			readString();
-			string ts = res();
-			string h = md5(pw);
-			string hts = h + ts;
-			string end = md5(hts);
-			send(username + "\0");
-			send(end + "\0");
-			if (stream.ReadByte() != 0) {
-			 	throw new Exception("Access denied.");
-			}
-		}
-		
-		/** Executes the specified command. */
-		public bool execute(string com, Stream s) {
-			result = s;
-			send(com + "\0");
-			init();
-			readString();
-			info = readInfo();
-			return read() == 0;
-		}
-		
-		/** Executes the specified command. */
-		public bool execute(string com) {
-			return execute(com, new MemoryStream());
-		}
-		
-		/** Returns the result. */
-		public string res() {
-			byte[] t = ((MemoryStream) result).ToArray();
-			return System.Text.Encoding.UTF8.GetString(t);
-		}
-		
-		/** Returns the processing information. */
-		public string inf() {
-			return info;
-		}
-		
-		/** Closes the connection. */
-		public void close() {
-			send("exit \0");
-			socket.Close();
-		}
-		
-		/** Initializes the byte transfer. */
-		private void init() {
-			bpos = 0;
-			bsize = 0;
-		}
-		
-		/** Returns a single byte from the socket. */
-		private byte read() {
-			if (bpos == bsize) {
-				bsize = stream.Read(inStream, 0, 4096);
-				bpos = 0;
-			}
-			byte b = inStream[bpos];
-			bpos += 1;
-			return b;
-		}
-		
-		/** Receives a string from the socket. */
-		private void readString() {
-			while (true) {
-				byte b = read();
-				if (b != 0) {
-					result.WriteByte(b);
-				} else {
-					break;
-				}
-			}
-		}
-		
-		/** Receives an info string from the socket. */
-		private string readInfo() {
-			MemoryStream ms = new MemoryStream();
-			while (true) {
-				byte b = read();
-				if (b != 0) {
-					ms.WriteByte(b);
-				} else {
-					return System.Text.Encoding.UTF8.GetString(ms.ToArray());
-				}
-			}
-		}
-		
-		/** Sends strings to server. */
-		private void send(string message) {
-			byte[] outStream = System.Text.Encoding.UTF8.GetBytes(message);
-			stream.Write(outStream, 0, outStream.Length);
-            stream.Flush();
-		}
-		
-		/** Returns the md5 hash of a string. */
-		private string md5(string input) {
-			MD5CryptoServiceProvider MD5 = new MD5CryptoServiceProvider();
-			byte[] hashValue = new byte[1];
-        	byte[] bytes = Encoding.UTF8.GetBytes(input);
-        	hashValue = MD5.ComputeHash(bytes);
-        	StringBuilder sb = new StringBuilder();
+  class BaseX
+  {
+    private MemoryStream result = new MemoryStream();
+    private byte[] cache = new byte[4096];
+    private NetworkStream stream;
+    private TcpClient socket;
+    private string info = "";
+    private int bpos;
+    private int bsize;
 
-			for (var i = 0; i <= hashValue.Length - 1; i++) {
-                sb.Append(hashValue[i].ToString("x2"));
-            }
-            return sb.ToString();
-		}
-	}
+    /** Constructor, creating a new socket connection. */
+    public BaseX(string host, int port, string username, string pw)
+    {
+      socket = new TcpClient(host, port);
+      stream = socket.GetStream();
+      string ts = ReadString();
+      Send(username);
+      Send(MD5(MD5(pw) + ts));
+      if (stream.ReadByte() != 0)
+      {
+        throw new IOException("Access denied.");
+      }
+    }
+    
+    /** Executes the specified command. */
+    public bool Execute(string com, Stream ms)
+    {
+      Send(com);
+      Init();
+      ReadString(ms);
+      info = ReadString();
+      return Read() == 0;
+    }
+    
+    /** Executes the specified command. */
+    public bool Execute(string com)
+    {
+      result = new MemoryStream();
+      return Execute(com, result);
+    }
+    
+    /** Returns the result. */
+    public string Result
+    {
+      get
+      {
+        return System.Text.Encoding.UTF8.GetString(result.ToArray());
+      }
+    }
+    
+    /** Returns the processing information. */
+    public string Info
+    {
+      get
+      {
+        return info;
+      }
+    }
+    
+    /** Closes the connection. */
+    public void Close()
+    {
+      Send("exit");
+      socket.Close();
+    }
+    
+    /** Initializes the byte transfer. */
+    private void Init()
+    {
+      bpos = 0;
+      bsize = 0;
+    }
+    
+    /** Returns a single byte from the socket. */
+    private byte Read()
+    {
+      if (bpos == bsize)
+      {
+        bsize = stream.Read(cache, 0, 4096);
+        bpos = 0;
+      }
+      return cache[bpos++];
+    }
+    
+    /** Receives a string from the socket. */
+    private void ReadString(Stream ms)
+    {
+      while (true)
+      {
+        byte b = Read();
+        if (b == 0) break;
+        ms.WriteByte(b);
+      }
+    }
+    
+    /** Receives a string from the socket. */
+    private string ReadString()
+    {
+      MemoryStream ms = new MemoryStream();
+      ReadString(ms);
+      return System.Text.Encoding.UTF8.GetString(ms.ToArray());
+    }
+    
+    /** Sends strings to server. */
+    private void Send(string message)
+    {
+      byte[] msg = System.Text.Encoding.UTF8.GetBytes(message);
+      stream.Write(msg, 0, msg.Length);
+      stream.WriteByte(0);
+    }
+    
+    /** Returns the md5 hash of a string. */
+    private string MD5(string input)
+    {
+      MD5CryptoServiceProvider MD5 = new MD5CryptoServiceProvider();
+      byte[] hash = MD5.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+      StringBuilder sb = new StringBuilder();
+      foreach (byte h in hash)
+      {
+        sb.Append(h.ToString("x2"));
+      }
+      return sb.ToString();
+    }
+  }
 }
