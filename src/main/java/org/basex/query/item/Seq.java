@@ -154,7 +154,7 @@ public class Seq extends Item {
     final StringBuilder sb = new StringBuilder("(");
     for(int v = 0; v != size; v++) {
       sb.append((v != 0 ? ", " : "") + val[v]);
-      if(sb.length() > 15 && v + 1 != size) {
+      if(sb.length() > 32 && v + 1 != size) {
         sb.append(", ...");
         break;
       }

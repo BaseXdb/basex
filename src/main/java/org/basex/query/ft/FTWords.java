@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.FTMatches;
@@ -9,9 +10,7 @@ import org.basex.index.FTIndexIterator;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
-import org.basex.query.ft.FTOpt.FTMode;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
@@ -31,6 +30,15 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  */
 public final class FTWords extends FTExpr {
+  /** Words mode. */
+  public enum FTMode {
+    /** All option. */       M_ALL,
+    /** All words option. */ M_ALLWORDS,
+    /** Any option. */       M_ANY,
+    /** Any words option. */ M_ANYWORD,
+    /** Phrase search. */    M_PHRASE
+  }
+
   /** Data reference. */
   Data data;
   /** Single word. */
@@ -85,7 +93,7 @@ public final class FTWords extends FTExpr {
     }
     query = query.comp(ctx);
     if(query instanceof Str) txt = ((Str) query).str();
-    simple = mode == FTMode.ANY && txt != null && occ == null;
+    simple = mode == FTMode.M_ANY && txt != null && occ == null;
     fast = ctx.ftfast && occ == null;
     return this;
   }
@@ -152,7 +160,7 @@ public final class FTWords extends FTExpr {
     byte[] it;
 
     switch(mode) {
-      case ALL:
+      case M_ALL:
         while((it = nextStr(iter)) != null) {
           final int oc = opt.contains(it, ctx.fttoken, this);
           if(oc == 0) return 0;
@@ -160,7 +168,7 @@ public final class FTWords extends FTExpr {
           o += oc;
         }
         break;
-      case ALLWORDS:
+      case M_ALLWORDS:
         while((it = nextStr(iter)) != null) {
           for(final byte[] t : Token.split(it, ' ')) {
             final int oc = opt.contains(t, ctx.fttoken, this);
@@ -170,13 +178,13 @@ public final class FTWords extends FTExpr {
           }
         }
         break;
-      case ANY:
+      case M_ANY:
         while((it = nextStr(iter)) != null) {
           o += opt.contains(it, ctx.fttoken, this);
           len += it.length;
         }
         break;
-      case ANYWORD:
+      case M_ANYWORD:
         while((it = nextStr(iter)) != null) {
           for(final byte[] t : Token.split(it, ' ')) {
             o += opt.contains(t, ctx.fttoken, this);
@@ -184,7 +192,7 @@ public final class FTWords extends FTExpr {
           }
         }
         break;
-      case PHRASE:
+      case M_PHRASE:
         final TokenBuilder tb = new TokenBuilder();
         while((it = nextStr(iter)) != null) {
           tb.add(it);
@@ -209,7 +217,8 @@ public final class FTWords extends FTExpr {
    */
   boolean add(final int s, final int e) {
     // [CG] FT: check if this is needed and correct
-    if(!first && (mode == FTMode.ALL || mode == FTMode.ALLWORDS)) all.and(s, e);
+    if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS))
+      all.and(s, e);
     else all.or(s, e);
     return fast;
   }
@@ -240,8 +249,8 @@ public final class FTWords extends FTExpr {
     final MetaData md = ic.data.meta;
     final FTOpt fto = ic.ctx.ftopt;
 
-    if(txt == null || occ != null ||
-        mode != FTMode.ANY && mode != FTMode.ALL && mode != FTMode.PHRASE ||
+    if(txt == null || occ != null || mode != FTMode.M_ANY &&
+        mode != FTMode.M_ALL && mode != FTMode.M_PHRASE ||
         md.casesens != fto.is(FTOpt.CS) || md.diacritics != fto.is(FTOpt.DC) ||
         md.stemming != fto.is(FTOpt.ST)) return false;
 
@@ -263,7 +272,7 @@ public final class FTWords extends FTExpr {
       if(fto.sw != null && fto.sw.id(tok) != 0) continue;
 
       // divide by 4 to favor full text index requests
-      final int s = (ic.data.nrIDs(ft) + 3) >> 2;
+      final int s = ic.data.nrIDs(ft) + 3 >> 2;
       if(ic.is > s || ic.is == 0) ic.is = s;
       if(s == 0) break;
     }
@@ -315,11 +324,18 @@ public final class FTWords extends FTExpr {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     if(!(query instanceof Str)) sb.append("{ ");
-    sb.append(query.toString());
+    sb.append(query);
     if(!(query instanceof Str)) sb.append(" }");
+    switch(mode) {
+      case M_ALL:      sb.append(' ' + ALL); break;
+      case M_ALLWORDS: sb.append(' ' + ALL + ' ' + WORDS); break;
+      case M_ANYWORD:  sb.append(' ' + ANY + ' ' + WORD); break;
+      case M_PHRASE:   sb.append(' ' + PHRASE); break;
+      default:
+    }
+    
     if(occ != null) {
-      sb.append(QueryTokens.OCCURS + " " + occ[0] + " " +
-          QueryTokens.TO + " " + occ[1] + " " + QueryTokens.TIMES);
+      sb.append(OCCURS + " " + occ[0] + " " + TO + " " + occ[1] + " " + TIMES);
     }
     return sb.toString();
   }

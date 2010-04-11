@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
@@ -8,7 +9,6 @@ import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
 import org.basex.query.util.Err;
 import org.basex.util.Levenshtein;
 import org.basex.util.Tokenizer;
@@ -20,14 +20,6 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  */
 public final class FTOpt extends ExprInfo {
-  /** Words mode. */
-  public enum FTMode {
-    /** All option. */       ALL,
-    /** All words option. */ ALLWORDS,
-    /** Any option. */       ANY,
-    /** Any words option. */ ANYWORD,
-    /** Phrase search. */    PHRASE
-  }
   /** Sensitive flag. */
   public static final int CS = 0;
   /** Lowercase flag. */
@@ -268,32 +260,25 @@ public final class FTOpt extends ExprInfo {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    if(is(ST)) ser.attribute(token(QueryTokens.STEMMING)  , TRUE);
-    if(is(WC)) ser.attribute(token(QueryTokens.WILDCARDS) , TRUE);
-    if(is(FZ)) ser.attribute(token(QueryTokens.FUZZY)     , TRUE);
-    if(is(DC)) ser.attribute(token(QueryTokens.DIACRITICS), TRUE);
-    if(is(UC)) ser.attribute(token(QueryTokens.UPPERCASE) , TRUE);
-    if(is(LC)) ser.attribute(token(QueryTokens.LOWERCASE) , TRUE);
+    if(is(WC)) ser.attribute(token(WILDCARDS) , TRUE);
+    if(is(FZ)) ser.attribute(token(FUZZY)     , TRUE);
+    if(is(UC)) ser.attribute(token(UPPERCASE) , TRUE);
+    if(is(LC)) ser.attribute(token(LOWERCASE) , TRUE);
+    if(is(DC)) ser.attribute(token(DIACRITICS), TRUE);
+    if(is(ST)) ser.attribute(token(STEMMING)  , TRUE);
+    if(th != null) ser.attribute(token(THESAURUS) , TRUE);
   }
 
   @Override
   public String toString() {
     final StringBuilder s = new StringBuilder();
-    if(is(ST) || sd != null)
-      s.append(" " + QueryTokens.USING + " " + QueryTokens.STEMMING);
-    if(is(WC))
-      s.append(" " + QueryTokens.USING + " " + QueryTokens.WILDCARDS);
-    if(is(FZ))
-      s.append(" " + QueryTokens.USING + " " + QueryTokens.FUZZY);
-    if(is(DC))
-      s.append(" " + QueryTokens.USING + " " + QueryTokens.DIACRITICS + " " +
-          QueryTokens.SENSITIVE);
-    if(th != null)
-      s.append(" " + QueryTokens.USING + " " + QueryTokens.THESAURUS);
-    if(is(UC))
-      s.append(" " + QueryTokens.USING + " " + QueryTokens.UPPERCASE);
-    if(is(LC))
-      s.append(" " + QueryTokens.USING + " " + QueryTokens.LOWERCASE);
+    if(is(WC)) s.append(' ' + USING + ' ' + WILDCARDS);
+    if(is(FZ)) s.append(' ' + USING + ' ' + FUZZY);
+    if(is(UC)) s.append(' ' + USING + ' ' + UPPERCASE);
+    if(is(LC)) s.append(' ' + USING + ' ' + LOWERCASE);
+    if(is(DC)) s.append(' ' + USING + ' ' + DIACRITICS + " " + SENSITIVE);
+    if(is(ST) || sd != null) s.append(' ' + USING + ' ' + STEMMING);
+    if(th != null) s.append(' ' + USING + ' ' + THESAURUS);
     return s.toString();
   }
 }

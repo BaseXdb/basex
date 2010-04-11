@@ -34,6 +34,15 @@ public abstract class CFrag extends Arr {
   }
 
   /**
+   * Returns a string info for the expression.
+   * @param pre info prefix
+   * @return string
+   */
+  protected final String info(final String pre) {
+    return pre + " constructor";
+  }
+
+  /**
    * Returns a string representation of the expression.
    * @param pre expression prefix
    * @return string

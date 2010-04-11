@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryTokens;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -65,7 +66,7 @@ public final class CText extends CFrag {
 
   @Override
   public String info() {
-    return "text constructor";
+    return info(QueryTokens.TEXT);
   }
 
   @Override

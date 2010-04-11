@@ -117,7 +117,8 @@ public final class CmpG extends Arr {
     super.comp(ctx);
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
-    if(expr[0].i() && !expr[1].i()) {
+    if(expr[0] instanceof AxisPath && expr[1] instanceof AxisPath &&
+        ((AxisPath) expr[0]).root != null || expr[0].i() && !expr[1].i()) {
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;

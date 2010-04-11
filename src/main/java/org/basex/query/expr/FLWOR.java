@@ -165,7 +165,7 @@ public class FLWOR extends Expr {
 
   @Override
   public final SeqType returned(final QueryContext ctx) {
-    return SeqType.ITEM_0M;
+    return new SeqType(ret.returned(ctx).type, SeqType.OCC_0M);
   }
 
   @Override

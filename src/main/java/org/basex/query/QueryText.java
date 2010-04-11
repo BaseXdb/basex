@@ -582,7 +582,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTSIMPLE = "simplifying: % => %";
   /** Optimization info. */
-  String OPTFLWOR = "simplifying FLWOR expression";
+  String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */
   String OPTWHERE = "converting where clause to predicate";
   /** Optimization info. */

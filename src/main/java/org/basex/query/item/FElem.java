@@ -34,7 +34,7 @@ public final class FElem extends FNode {
    * @param p parent
    */
   public FElem(final QNm n, final byte[] b, final Nod p) {
-    this(n, new NodIter(), new NodIter(), b, new Atts(), p);
+    this(n, new NodIter(), new NodIter(), b, null, p);
   }
 
   /**
@@ -73,7 +73,7 @@ public final class FElem extends FNode {
     children = new NodIter(childArr, childArr.length);
     atts = new NodIter(attArr, attArr.length);
     base = EMPTY;
-    ns = new Atts();
+    ns = null;
     par = p;
 
     final NamedNodeMap attsMap = node.getAttributes();
@@ -161,12 +161,14 @@ public final class FElem extends FNode {
         ser.namespace(EMPTY, ser.ns.val[p]);
       }
     } else {
-      for(int p = ns.size - 1; p >= 0; p--) {
-        final byte[] key = ns.key[p];
-        final int i = ser.ns.get(key);
-        if(i == -1 || !Token.eq(ser.ns.val[i], uri)) {
-          ser.namespace(key, ns.val[p]);
-          xmlns |= key.length == 0;
+      if(ns != null) {
+        for(int p = ns.size - 1; p >= 0; p--) {
+          final byte[] key = ns.key[p];
+          final int i = ser.ns.get(key);
+          if(i == -1 || !Token.eq(ser.ns.val[i], uri)) {
+            ser.namespace(key, ns.val[p]);
+            xmlns |= key.length == 0;
+          }
         }
       }
     }
@@ -208,10 +210,12 @@ public final class FElem extends FNode {
     Nod n = node;
     do {
       final Atts nns = n.ns();
-      for(int a = nns.size - 1; a >= 0; a--) {
-        final byte[] key = nns.key[a];
-        if(ns.contains(key)) continue;
-        ns.add(key, nns.val[a]);
+      if(nns != null) {
+        for(int a = nns.size - 1; a >= 0; a--) {
+          final byte[] key = nns.key[a];
+          if(ns.contains(key)) continue;
+          ns.add(key, nns.val[a]);
+        }
       }
       n = n.parent();
     } while(n != null && n.type == Type.ELM);
@@ -244,7 +248,7 @@ public final class FElem extends FNode {
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
     sb.append(string(name.str()));
-    if(atts.size() != 0 || ns.size != 0 || children.size() != 0)
+    if(atts.size() != 0 || (ns != null && ns.size != 0) || children.size() != 0)
       sb.append(" ...");
     return sb.append("/>").toString();
   }

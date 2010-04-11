@@ -311,13 +311,14 @@ public class DBNode extends Nod {
     switch(type) {
       case ATT:
       case PI:
-        return type + " " + string(nname()) + " { \"" + string(str()) + "\" }";
+        return type.name + " " + string(nname()) + " { \"" +
+        string(str()) + "\" }";
       case ELM:
-        return type + " " + string(nname()) + " { ... }";
+        return type.name + " " + string(nname()) + " { ... }";
       case DOC:
-        return type + " { \"" + string(data.text(pre, true)) + "\" }";
+        return type.name + " { \"" + string(data.text(pre, true)) + "\" }";
       default:
-        return type + " { \"" + Err.chop(str()) + "\" }";
+        return type.name + " { \"" + Err.chop(str()) + "\" }";
     }
   }
 }

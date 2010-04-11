@@ -62,7 +62,7 @@ public class AxisPath extends Path {
   }
 
   /**
-   * Constructor.
+   * Returns a new class instance.
    * @param r root expression; can be a {@code null} reference
    * @param st location steps; will at least have one entry
    * @return class instance
@@ -268,7 +268,7 @@ public class AxisPath extends Path {
     IndexContext ics = null;
     int ips = 0;
     int ms = 0;
-
+    
     // check if path can be converted to an index access
     for(int s = 0; s < step.length; s++) {
       // find cheapest index access
@@ -541,6 +541,16 @@ public class AxisPath extends Path {
   public final AxisPath addPred(final Expr pred) {
     step[step.length - 1] = step[step.length - 1].addPred(pred);
     return get(root, step);
+  }
+
+  /**
+   * Returns a copy of the specified path.
+   * @return class instance
+   */
+  public final AxisPath copy() {
+    final Step[] steps = new Step[step.length];
+    for(int s = 0; s < step.length; s++) steps[s] = Step.get(step[s]);
+    return get(root, steps);
   }
 
   @Override

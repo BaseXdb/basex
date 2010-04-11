@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryTokens;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
@@ -110,7 +111,7 @@ public final class CAttr extends CFrag {
 
   @Override
   public String info() {
-    return "attribute constructor";
+    return info(QueryTokens.ATTRIBUTE);
   }
 
   @Override

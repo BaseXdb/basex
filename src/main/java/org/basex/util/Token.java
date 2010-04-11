@@ -17,9 +17,7 @@ import org.basex.core.Main;
  */
 public final class Token {
   /** Maximum length for hash calculation and index terms. */
-  public static final int MAXLEN = 64;
-  /** Maximum number of categories in statistics. */
-  public static final int MAXCATS = 50;
+  public static final int MAXLEN = 96;
 
   /** Empty token. */
   public static final byte[] EMPTY = {};

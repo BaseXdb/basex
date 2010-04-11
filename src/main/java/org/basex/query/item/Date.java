@@ -10,7 +10,6 @@ import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * Date container.
@@ -160,11 +159,6 @@ public abstract class Date extends Item {
   }
 
   @Override
-  public final String toString() {
-    return new TokenBuilder().add('"').add(str()).add('"').toString();
-  }
-
-  @Override
   public final Object java() {
     return xc;
   }
@@ -227,5 +221,10 @@ public abstract class Date extends Item {
     for(int i = 0; i < yy; i++) n += 365 + leap(i);
     for(int i = 0; i < m; i++) n += dpm(y, i);
     return n + d;
+  }
+
+  @Override
+  public final String toString() {
+    return Main.info("\"%\"", str());
   }
 }

@@ -32,6 +32,8 @@ public final class Values implements Index {
   private final Data data;
   /** Cache tokens. */
   private final FTTokenMap cache = new FTTokenMap();
+  /** Cached texts. Increases memory, but speeds up repeated queries. */
+  private final byte[][] ctext;
 
   /**
    * Constructor, initializing the index structure.
@@ -57,6 +59,7 @@ public final class Values implements Index {
     idxl = new DataAccess(d.meta.file(pre + 'l'));
     idxr = new DataAccess(d.meta.file(pre + 'r'));
     size = idxl.read4();
+    ctext = new byte[size][];
   }
 
   @Override
@@ -198,7 +201,11 @@ public final class Values implements Index {
       final long pos = idxr.read5(m * 5L);
       idxl.readNum(pos);
       final int pre = idxl.readNum();
-      final byte[] txt = data.text(pre, text);
+      byte[] txt = ctext[m];
+      if(ctext[m] == null) {
+        txt = data.text(pre, text);
+        ctext[m] = txt;
+      }
       final int d = Token.diff(txt, key);
       if(d == 0) return pos;
       if(d < 0) l = m + 1;

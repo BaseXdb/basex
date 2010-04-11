@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryTokens;
 import org.basex.query.item.FDoc;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
@@ -90,7 +91,7 @@ public final class CDoc extends CFrag {
 
   @Override
   public String info() {
-    return "document constructor";
+    return info(QueryTokens.DOCUMENT);
   }
 
   @Override

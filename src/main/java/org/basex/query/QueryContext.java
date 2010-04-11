@@ -145,7 +145,7 @@ public final class QueryContext extends Progress {
   private int colls;
 
   /** Reference to the root expression. */
-  private Expr root;
+  public Expr root;
   /** Initial number of documents. */
   private int rootDocs;
   /** Info flag. */
@@ -206,7 +206,7 @@ public final class QueryContext extends Progress {
             addDoc(new DBNode(data, nodes.nodes[d], Data.DOC));
           }
         } else {
-          for(final int p : data.doc()) addDoc(new DBNode(data, p));
+          for(final int p : data.doc()) addDoc(new DBNode(data, p, Data.DOC));
         }
         rootDocs = docs;
 
@@ -428,7 +428,7 @@ public final class QueryContext extends Progress {
     }
 
     // add document to array
-    final DBNode node = new DBNode(data, 0);
+    final DBNode node = new DBNode(data, 0, Data.DOC);
     addDoc(node);
     return node;
   }

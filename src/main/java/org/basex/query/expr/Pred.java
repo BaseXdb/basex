@@ -13,6 +13,7 @@ import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 
 /**
@@ -40,8 +41,14 @@ public class Pred extends Preds {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     root = checkUp(root, ctx).comp(ctx);
-    // [CG] XQuery/Pred: re-check consequences of caching the context item
-    //  and remove caching (or add comments)
+
+    // if possible, convert filters to axis paths
+    if(root instanceof AxisPath && !super.uses(Use.POS, ctx)) {
+      AxisPath path = ((AxisPath) root).copy();
+      for(final Expr p : pred) path = path.addPred(p);
+      return path.comp(ctx);
+    }
+    
     final Item tmp = ctx.item;
     ctx.item = null;
     final Expr e = super.comp(ctx);
@@ -62,8 +69,9 @@ public class Pred extends Preds {
     // last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // use iterative evaluation
-    if(pred.length == 1 && (last || pos != null || !uses(Use.POS, ctx)))
-        return new IterPred(root, pred, pos, last);
+    if(pred.length == 1 && (last || pos != null || !uses(Use.POS, ctx))) {
+      return new IterPred(root, pred, pos, last);
+    }
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
     counter = pred.length == 1 && p.returned(ctx).num() &&
@@ -143,8 +151,8 @@ public class Pred extends Preds {
 
   @Override
   public final String toString() {
-    final StringBuilder sb = new StringBuilder(root.toString());
-    sb.append(super.toString());
+    final StringBuilder sb = new StringBuilder("(" + root.toString());
+    sb.append(")" + super.toString());
     return sb.toString();
   }
 }

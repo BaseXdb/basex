@@ -277,8 +277,8 @@ c_showexplore=Explorer
 c_showexplorett=Afficher le panneau d'exploration.
 c_showhelp=Aide
 c_showhelptt=Afficher la vue d'aide. qui donne des informations sur le composant qui a actuellement le focus.
-c_community=Community
-c_communitytt=Afficher la community web page.
+c_community=Communauté
+c_communitytt=Affiche la page web de la communauté (ouvre votre navigateur par défaut).
 c_showfolder=Dossier
 c_showfoldertt=Afficher la visualisation par dossiers.
 c_showinfo=Info requête
@@ -468,7 +468,7 @@ info_on=ON
 info_off=OFF
 info_error=Erreur
 info_entries=% entrées
-info_browsererror=Failed to open a browser. Please manually open the URL in your favorite browser:\n\n%
+info_browsererror=Impossible d'ouvrir un navigateur. Veuillez ouvrir l'URL manuellement dans votre navigateur favori :\n\n%
 
 # Commande Aide
 ch_nohelp=Pas d'aide disponible.

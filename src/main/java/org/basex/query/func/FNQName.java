@@ -65,7 +65,7 @@ final class FNQName extends Fun {
       case NSURIPRE:
         final byte[] pre = checkStr(it);
         final Atts at = ((Nod) check(it2, Type.ELM)).ns();
-        final int i = at.get(pre);
+        final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
         if(it == null) return null;

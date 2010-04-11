@@ -72,7 +72,7 @@ import org.basex.query.ft.FTWords;
 import org.basex.query.ft.StopWords;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
-import org.basex.query.ft.FTOpt.FTMode;
+import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Itr;
@@ -1481,8 +1481,9 @@ public class QueryParser extends InputParser {
     // variables
     final char c = curr();
     if(c == '$') {
-      final Var var = new Var(varName());
-      if(ctx.vars.get(var) == null) error(VARNOTDEFINED, var);
+      final Var v = new Var(varName());
+      final Var var = ctx.vars.get(v);
+      if(var == null) error(VARNOTDEFINED, v);
       return new VarCall(var);
     }
     // parentheses
@@ -2325,13 +2326,13 @@ public class QueryParser extends InputParser {
     if(e == null) error(prg ? NOPRAGMA : NOENCLEXPR);
 
     // FTAnyAllOption
-    FTMode mode = FTMode.ANY;
+    FTMode mode = FTMode.M_ANY;
     if(consumeWS(ALL)) {
-      mode = consumeWS(WORDS) ? FTMode.ALLWORDS : FTMode.ALL;
+      mode = consumeWS(WORDS) ? FTMode.M_ALLWORDS : FTMode.M_ALL;
     } else if(consumeWS(ANY)) {
-      mode = consumeWS(WORD) ? FTMode.ANYWORD : FTMode.ANY;
+      mode = consumeWS(WORD) ? FTMode.M_ANYWORD : FTMode.M_ANY;
     } else if(consumeWS(PHRASE)) {
-      mode = FTMode.PHRASE;
+      mode = FTMode.M_PHRASE;
     }
 
     // FTTimes

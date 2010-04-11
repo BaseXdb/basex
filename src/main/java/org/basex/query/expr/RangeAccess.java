@@ -2,7 +2,10 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+
+import org.basex.data.Data;
 import org.basex.data.Serializer;
+import org.basex.data.Data.IndexType;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.RangeToken;
@@ -38,12 +41,14 @@ final class RangeAccess extends Simple {
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    return new Iter() {
-      final IndexIterator it = ictx.data.ids(ind);
+    final Data data = ictx.data;
+    final byte kind = ind.type() == IndexType.TXT ? Data.TEXT : Data.ATTR;
 
+    return new Iter() {
+      final IndexIterator it = data.ids(ind);
       @Override
       public Item next() {
-        return it.more() ? new DBNode(ictx.data, it.next()) : null;
+        return it.more() ? new DBNode(data, it.next(), kind) : null;
       }
     };
   }

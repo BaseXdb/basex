@@ -14,6 +14,8 @@ import org.basex.util.TokenSet;
  * @author Christian Gruen
  */
 public final class StatsKey {
+  /** Maximum number of categories in statistics. */
+  private static final int MAXCATS = 50;
   /** Kind of Contents. */
   public enum Kind {
     /** Text.     */ TEXT,

@@ -15,7 +15,6 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.util.Array;
 
 /**
  * This index class retrieves texts and attribute values from the index.
@@ -46,8 +45,13 @@ public final class IndexAccess extends Single {
     Iter[] iter = {};
     final Iter ir = expr.iter(ctx);
     Item it;
-    while((it = ir.next()) != null) iter = Array.add(iter, index(it.str()));
-
+    while((it = ir.next()) != null) {
+      final int s = iter.length;
+      final Iter[] t = new Iter[s + 1];
+      System.arraycopy(iter, 0, t, 0, s);
+      iter = t;
+      iter[s] = index(it.str());
+    }
     return iter.length == 0 ? Iter.EMPTY : iter.length == 1 ? iter[0] :
       new Union(new Expr[] { expr }).eval(iter);
   }
@@ -59,24 +63,25 @@ public final class IndexAccess extends Single {
    */
   private Iter index(final byte[] term) {
     final Data data = ictx.data;
+    final boolean text = type == IndexType.TXT;
+    final byte kind = text ? Data.TEXT : Data.ATTR;
+
     return term.length <= MAXLEN ? new Iter() {
       final IndexIterator ii = data.ids(new ValuesToken(type, term));
 
       @Override
       public Item next() {
-        return ii.more() ? new DBNode(data, ii.next()) : null;
+        return ii.more() ? new DBNode(data, ii.next(), kind) : null;
       }
     } : new Iter() {
       // just in case: parse complete data if string is too long
-      final boolean text = type == IndexType.TXT;
       int pre = -1;
 
       @Override
       public Item next() {
         while(++pre != data.meta.size) {
-          final int k = data.kind(pre);
-          if((text ? k == Data.TEXT : k == Data.ATTR) &&
-              eq(data.text(pre, text), term)) return new DBNode(data, pre);
+          if(data.kind(pre) == kind && eq(data.text(pre, text), term))
+            return new DBNode(data, pre);
         }
         return null;
       }
