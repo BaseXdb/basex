@@ -185,12 +185,14 @@ abstract class AQuery extends Proc {
     try {
       if(prop.is(Prop.DOTPLAN)) {
         final CachedOutput co = new CachedOutput();
-        final DOTSerializer ser = new DOTSerializer(co);
-        qu.plan(ser);
-        ser.close();
+        final DOTSerializer d = new DOTSerializer(co, prop.is(Prop.DOTCOMPACT));
+        qu.plan(d);
+        d.close();
         final String dot = "plan.dot";
         IO.get(dot).write(co.finish());
-        new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();
+
+        if(prop.is(Prop.DOTDISPLAY))
+          new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();
       }
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {

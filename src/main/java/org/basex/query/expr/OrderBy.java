@@ -107,6 +107,11 @@ public final class OrderBy extends Expr {
   }
 
   @Override
+  public String color() {
+    return "66FF66";
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, DIR, token(desc ? DESCENDING : ASCENDING),
         token(EMPTYORD), token(lst ? LEAST : GREATEST));

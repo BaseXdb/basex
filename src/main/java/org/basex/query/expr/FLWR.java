@@ -77,11 +77,7 @@ public final class FLWR extends FLWOR {
       final Var v = ((VarCall) ret).var;
       if(v.type == null && fl[0].var.eq(v)) {
         ctx.compInfo(OPTFLWOR);
-        Expr e = fl[0].expr.comp(ctx);
-        if(e != fl[0].expr) {
-          System.out.println(e + " => " + fl[0].expr);
-        }
-        return e;
+        return fl[0].expr;
       }
     }
     return this;

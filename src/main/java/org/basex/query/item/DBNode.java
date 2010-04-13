@@ -297,11 +297,6 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final String color() {
-    return "9999FF";
-  }
-
-  @Override
   public final void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, NAM, token(data.meta.file.name()), PRE, token(pre));
   }

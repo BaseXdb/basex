@@ -175,7 +175,7 @@ public class FLWOR extends Expr {
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, EVAL, ITER);
+    ser.openElement(this);
     for(final ForLet f : fl) f.plan(ser);
     if(where != null) {
       ser.openElement(WHR);

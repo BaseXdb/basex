@@ -21,6 +21,8 @@ public abstract class Test {
     public String toString() { return Type.NOD.toString(); }
   };
 
+  /** Cached QName instance to reduce class instantiation. */
+  final QNm tmpq = new QNm();
   /** Test types. */
   public enum Kind {
     /** Accept all nodes (*).     */ ALL,
@@ -34,8 +36,6 @@ public abstract class Test {
   public Type type;
   /** Name test. */
   public QNm name;
-  /** Temporary QName instance. */
-  final QNm tmpq = new QNm();
 
   /**
    * Optimizes and compiles the expression.

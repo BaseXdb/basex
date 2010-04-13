@@ -68,6 +68,11 @@ public final class Func extends Single {
   }
 
   @Override
+  public String color() {
+    return "CC99FF";
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     ser.attribute(NAM, var.name.str());

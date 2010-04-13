@@ -91,6 +91,11 @@ public final class Grp extends Expr {
   }
 
   @Override
+  public String color() {
+    return "66FF66";
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     expr.plan(ser);
   }

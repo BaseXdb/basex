@@ -33,31 +33,38 @@ public final class DOTSerializer extends Serializer {
   /** Link entry. */
   private static final String COLPI = "FF6666";
 
+  /** Compact representation. */
+  private final boolean compact;
   /** Output stream. */
   private final PrintOutput out;
-  /** Current level. */
-  private int level;
+
   /** Cached children. */
   private final IntList[] children = new IntList[IO.MAXHEIGHT];
-  /** Current color. */
-  private String color;
-  /** Cached nodes. */
-  private final IntList nodes = new IntList();
-  /** Node counter. */
-  private int count;
-  /** Cached tag name. */
-  private byte[] tag;
   /** Cached attributes. */
   private final TokenBuilder tb = new TokenBuilder();
+  /** Cached nodes. */
+  private final IntList nodes = new IntList();
+  /** Cached tag name. */
+  private byte[] tag;
+
+  /** Current color. */
+  private String color;
+  /** Current level. */
+  private int level;
+  /** Node counter. */
+  private int count;
 
   /**
    * Constructor, defining colors for the dot output.
    * @param o output stream
+   * @param c compact representation
    * @throws IOException I/O exception
    */
-  public DOTSerializer(final PrintOutput o) throws IOException {
+  public DOTSerializer(final PrintOutput o, final boolean c)
+      throws IOException {
     for(int i = 0; i < IO.MAXHEIGHT; i++) children[i] = new IntList();
     out = o;
+    compact = c;
 
     out.println("digraph BaseXAlgebra {");
     out.println("node[shape=box,style=filled,width=0,height=0];");
@@ -150,9 +157,14 @@ public final class DOTSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void print(final byte[] t, final String col) throws IOException {
-    final byte[] text = t.length > 60 ? concat(
-        substring(t, 0, 60), token("...")) : t;
-    out.println(Main.info(NODE, count, text, col));
+    String txt = t.length > 60 ? string(t).substring(0, 60) + "..." : string(t);
+    if(compact) {
+      while(txt.matches(".*[A-Z][a-z]+[A-Z].*")) {
+        txt = txt.replaceAll("([A-Z])[a-z]+([A-Z])", "$1$2");
+      }
+      txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
+    }
+    out.println(Main.info(NODE, count, txt, col));
     nodes.set(count, level);
     if(level > 0) children[level - 1].add(count);
     count++;

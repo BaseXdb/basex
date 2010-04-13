@@ -440,7 +440,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private boolean emptyOrderDecl() throws QueryException {
-    if(!consumeWS2(EMPTYORDER)) return false;
+    if(!consumeWS2(ORDER)) return false;
     check(EMPTYORD);
     if(declGreat) error(DUPLORDEMP);
     final boolean order = consumeWS2(GREATEST);
@@ -746,9 +746,9 @@ public class QueryParser extends InputParser {
 
     OrderBy[] order = null;
     final boolean stable = consumeWS(STABLE);
-    if(stable) check(EMPTYORDER);
+    if(stable) check(ORDER);
 
-    if(stable || consumeWS(EMPTYORDER)) {
+    if(stable || consumeWS(ORDER)) {
       check(BY);
       ap = qp;
       do order = orderSpec(order); while(consumeWS2(COMMA));
@@ -1428,14 +1428,12 @@ public class QueryParser extends InputParser {
         // name test "tag"
         if(!consume(':')) {
           skipWS();
-          return att ? new NameTest(new QNm(name), NameTest.Kind.NAME, att) :
-            new NameTest(new QNm(name, Uri.uri(ctx.nsElem)),
-                NameTest.Kind.STD, att);
+          final QNm nm = new QNm(name, Uri.uri(ctx.nsElem));
+          return new NameTest(nm, NameTest.Kind.STD, att);
         }
         // name test "pre:*"
         if(consume('*')) {
-          final QNm nm = new QNm(EMPTY);
-          nm.uri = Uri.uri(ctx.ns.uri(name, false));
+          final QNm nm = new QNm(EMPTY, Uri.uri(ctx.ns.uri(name, false)));
           return new NameTest(nm, NameTest.Kind.NS, att);
         }
       }

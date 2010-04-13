@@ -6,9 +6,9 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.util.Token;
 
 /**
  * Function call.
@@ -21,15 +21,19 @@ public final class FunCall extends Arr {
   private final int id;
   /** Function reference. */
   private Func func;
+  /** Function name. */
+  private QNm name;
 
   /**
    * Function constructor.
+   * @param nm function name
    * @param i function id
    * @param a arguments
    */
-  public FunCall(final int i, final Expr[] a) {
+  public FunCall(final QNm nm, final int i, final Expr[] a) {
     super(a);
     id = i;
+    name = nm;
   }
 
   @Override
@@ -64,8 +68,13 @@ public final class FunCall extends Arr {
   }
 
   @Override
+  public String color() {
+    return "CC99FF";
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, ID, Token.token(id));
+    ser.openElement(this, NAM, name.str());
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }

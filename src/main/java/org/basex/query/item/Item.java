@@ -272,6 +272,11 @@ public abstract class Item extends Expr {
   }
 
   @Override
+  public final String color() {
+    return "9999FF";
+  }
+
+  @Override
   public final String name() {
     return type.name;
   }

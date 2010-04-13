@@ -130,6 +130,11 @@ public abstract class Fun extends Arr {
   }
 
   @Override
+  public String color() {
+    return "CC99FF";
+  }
+
+  @Override
   public final void plan(final Serializer ser) throws IOException {
     if(expr.length == 0) {
       ser.emptyElement(this, NAM, Token.token(func.desc));

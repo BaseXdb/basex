@@ -106,11 +106,11 @@ public final class Functions extends ExprInfo {
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
       if(eq(ln, qn.ln()) && eq(uri, qn.uri.str()) &&
-          args.length == func[l].args.length) return new FunCall(l, args);
+          args.length == func[l].args.length) return new FunCall(qn, l, args);
     }
 
     if(Type.find(name, true) == null) {
-      return new FunCall(add(new Func(new Var(name),
+      return new FunCall(name, add(new Func(new Var(name),
           new Var[args.length], false)), args);
     }
     return null;

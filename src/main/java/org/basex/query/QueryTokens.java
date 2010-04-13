@@ -182,7 +182,7 @@ public interface QueryTokens {
   /** Parser token. */
   String OR = "or";
   /** Parser token. */
-  String EMPTYORDER = "order";
+  String ORDER = "order";
   /** Parser token. */
   String ORDERED = "ordered";
   /** Parser token. */
@@ -399,15 +399,7 @@ public interface QueryTokens {
   /** Query Plan. */
   byte[] TYPE = token("type");
   /** Query Plan. */
-  byte[] NAME = token("Name");
-  /** Query Plan. */
   byte[] NAM = token("name");
-  /** Query Plan. */
-  byte[] VALUE = token("Value");
-  /** Query Plan. */
-  byte[] EVAL = token("eval");
-  /** Query Plan. */
-  byte[] ITER = token("iter");
   /** Query Plan. */
   byte[] WHR = token("Where");
   /** Query Plan. */

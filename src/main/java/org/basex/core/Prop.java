@@ -86,6 +86,10 @@ public final class Prop extends AProp {
   public static final Object[] EXPORTER = { "EXPORTER", "" };
   /** Dots the query plan. */
   public static final Object[] DOTPLAN = { "DOTPLAN", false };
+  /** Compact dot representation. */
+  public static final Object[] DOTCOMPACT = { "DOTCOMPACT", false };
+  /** Display dot graph. */
+  public static final Object[] DOTDISPLAY = { "DOTDISPLAY", true };
   /** Path to dotty. */
   public static final Object[] DOTTY = { "DOTTY", "dotty" };
   /** Prints a XML plan. */

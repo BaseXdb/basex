@@ -33,6 +33,11 @@ public abstract class CFrag extends Arr {
     return SeqType.NOD;
   }
 
+  @Override
+  public String color() {
+    return "FF9999";
+  }
+
   /**
    * Returns a string info for the expression.
    * @param pre info prefix

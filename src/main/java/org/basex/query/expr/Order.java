@@ -233,6 +233,11 @@ public final class Order extends Expr {
   }
 
   @Override
+  public String color() {
+    return "66FF66";
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(int o = 0; o != ord.length - 1; o++) ord[o].plan(ser);
@@ -241,7 +246,7 @@ public final class Order extends Expr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(" " + EMPTYORDER + " " +
+    final StringBuilder sb = new StringBuilder(" " + ORDER + " " +
         BY + " ");
     for(int l = 0; l != ord.length - 1; l++) {
       sb.append((l != 0 ? ", " : "") + ord[l]);

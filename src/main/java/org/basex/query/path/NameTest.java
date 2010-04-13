@@ -50,13 +50,12 @@ public final class NameTest extends Test {
     if(kind == Kind.ALL) return true;
     // namespaces wildcard - check only name
     if(kind == Kind.NAME) return eq(ln, ln(node.nname()));
-
-    final QNm nm = node.qname(tmpq);
-
     // name wildcard - check only namespace
-    if(kind == Kind.NS) return name.uri.eq(nm.uri);
+    if(kind == Kind.NS) return name.uri.eq(node.qname(tmpq).uri);
+    // check attributes
+    if(type == Type.ATT && !name.ns()) return eq(ln, node.nname());
     // check everything
-    return name.eq(nm);
+    return name.eq(node.qname(tmpq));
   }
 
   @Override
