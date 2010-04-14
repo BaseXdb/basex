@@ -60,7 +60,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
       final int u = md.uri(pre, k);
       final QNm qnm = new QNm(md.name(pre, k));
       if(u != 0) qnm.uri = Uri.uri(md.ns.uri(u));
-      pool.add(qnm, DBNode.TYPES[k]);
+      pool.add(qnm, Nod.type(k));
     }
   }
 }

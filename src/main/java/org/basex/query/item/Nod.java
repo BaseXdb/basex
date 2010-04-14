@@ -25,6 +25,10 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public abstract class Nod extends Item {
+  /** Node Types. */
+  private static final Type[] TYPES = {
+    Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
+  };
   /** Static node counter. */
   private static int sid;
   /** Unique node id. */
@@ -424,6 +428,15 @@ public abstract class Nod extends Item {
       case PI : return Data.PI;
       default : Main.notexpected(); return -1;
     }
+  }
+
+  /**
+   * Returns a node type for the specified database kind.
+   * @param k database kind
+   * @return node type
+   */
+  public static Type type(final int k) {
+    return TYPES[k];
   }
 
   @Override

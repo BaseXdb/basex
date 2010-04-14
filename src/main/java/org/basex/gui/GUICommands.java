@@ -48,6 +48,7 @@ import org.basex.gui.dialog.DialogServer;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
+import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.util.Array;
 import org.basex.util.Performance;
@@ -338,21 +339,15 @@ public enum GUICommands implements GUICommand {
       if(!insert.ok()) return;
 
       final StringList sl = insert.result;
-      String item = null;
-      final int k = insert.kind;
-      if(k == Data.ELEM) {
-        item = Type.ELM + " { " + quote(sl.get(0)) + " } { () }";
-      } else if(k == Data.ATTR) {
-        item = Type.ATT + " { " + quote(sl.get(0)) +
-          " } { " + quote(sl.get(1)) + " }";
-      } else if(k == Data.PI) {
-        item = Type.PI + " { " + quote(sl.get(0)) +
-          " } { " + quote(sl.get(1)) + " }";
-      } else if(k == Data.TEXT) {
-        item = Type.TXT + " { " + quote(sl.get(0)) + " }";
-      } else if(k == Data.COMM) {
-        item = Type.COM + " { " + quote(sl.get(0)) + " }";
+      final Type type = Nod.type(insert.kind);
+      String item = type.name + " { " + quote(sl.get(0)) + " }";
+
+      if(type == Type.ATT || type == Type.PI) {
+        item += " { " + quote(sl.get(1)) + " }";        
+      } else if(type == Type.ELM) {
+        item += " { () }";
       }
+
       gui.context.copied = null;
       gui.exec(new XQuery("insert node " + item + " into " + fndb(n, 0)),
           false);

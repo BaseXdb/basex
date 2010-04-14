@@ -20,10 +20,6 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 public class DBNode extends Nod {
-  /** Node Types. */
-  public static final Type[] TYPES = {
-    Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
-  };
   /** Data reference. */
   public final Data data;
   /** Pre value. */
@@ -58,7 +54,7 @@ public class DBNode extends Nod {
    * @param k node kind
    */
   public DBNode(final Data d, final int p, final int k) {
-    this(d, p, null, TYPES[k]);
+    this(d, p, null, type(k));
   }
 
   /**
@@ -81,7 +77,7 @@ public class DBNode extends Nod {
    * @param k node kind
    */
   public final void set(final int p, final int k) {
-    type = TYPES[k];
+    type = type(k);
     par = null;
     pre = p;
   }
