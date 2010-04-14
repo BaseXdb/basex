@@ -565,17 +565,13 @@ public abstract class Data {
           // add element
           final boolean ne = md.nsFlag(mpre);
           if(ne) {
+            // [LK] don't add all namespaces for the first node (pre=1), there 
+            // will be duplicate namespace declarations
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
           }
           ns.open();
           byte[] nm = md.name(mpre, mk);
-          // [LK] testing things...
-          /* 
-           * WTF: mprens doesn't contain all namespaces mytest,src.xml: only
-           * the second one is contained. -> *check memdata *check md.ns(mpre) 
-           */
-//          final Atts mprens = md.ns(mpre);
           elem(dis, tags.index(nm, null, false), md.attSize(mpre, mk),
               md.size(mpre, mk), ns.uri(nm, true), ne);
           preStack[l++] = pre;

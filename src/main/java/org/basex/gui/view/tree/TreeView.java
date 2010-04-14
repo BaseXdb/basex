@@ -157,7 +157,8 @@ public final class TreeView extends View implements TreeViewOptions {
     } else setLevelDistance();
     g.drawImage(treeImage, 0, 0, getWidth(), getHeight(), this);
 
-    if(selection) markSelektedNodes(g);
+    if(selection) markNodes();
+
 
     if(markedImage != null) g.drawImage(markedImage, 0, 0, getWidth(),
         getHeight(), this);
@@ -371,14 +372,17 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param g the graphics reference
    */
   private void markSelektedNodes(final Graphics g) {
+    // [WM] move to paintComponent()...
     final int x = selectRect.w < 0 ? selectRect.x + selectRect.w : selectRect.x;
     final int y = selectRect.h < 0 ? selectRect.y + selectRect.h : selectRect.y;
     final int w = Math.abs(selectRect.w);
     final int h = Math.abs(selectRect.h);
 
     // draw selection
-    g.setColor(Color.RED);
-    g.drawRect(x, y, w, h);
+    if(g != null) {
+      g.setColor(Color.RED);
+      g.drawRect(x, y, w, h);
+    }
 
     final int t = y + h;
     final int size = cache.maxLevel;
@@ -409,10 +413,10 @@ public final class TreeView extends View implements TreeViewOptions {
             if(tr.contains(x, w)) list.add(cache.getPrePerIndex(frn, i, j));
           }
         }
-        gui.notify.mark(new Nodes(list.finish(), gui.context.data), this);
-        markNodes();
       }
     }
+    // [WM] (call only once)
+    gui.notify.mark(new Nodes(list.finish(), gui.context.data), this);
   }
 
   /**
@@ -952,7 +956,8 @@ public final class TreeView extends View implements TreeViewOptions {
       selectRect.w = x - selectRect.x;
       selectRect.h = y - selectRect.y;
     }
-    repaint();
+    markSelektedNodes(null);
+    //repaint();
   }
 
   @Override
