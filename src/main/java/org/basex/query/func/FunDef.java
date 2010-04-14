@@ -278,8 +278,7 @@ public enum FunDef {
   /** XQuery function. */
   SUBAFTER(FNURI, FNStr.class, 2, 3, "substring-after(item, sub, coll)", STR),
   /** XQuery function. */
-  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll)",
-      STR),
+  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll)", STR),
   /** XQuery function. */
   TRANS(FNURI, FNStr.class, 3, 3, "translate(arg, map, trans)", STR),
   /** XQuery function. */
