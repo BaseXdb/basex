@@ -9,7 +9,7 @@
  * -----------------------------------------------------------------------------
  */
 
-namespace BaseX
+namespace BaseXClient
 
 import System
 import System.Diagnostics
@@ -28,7 +28,7 @@ public class Example:
 		
 		try:
 			// create session
-			session = BaseX('localhost', 1984, 'admin', 'admin')
+			session = Session('localhost', 1984, 'admin', 'admin')
 			
 			// Version 1: perform command and show result or error output
 			if session.Execute(cmd):

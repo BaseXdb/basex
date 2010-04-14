@@ -17,11 +17,11 @@
 #
 # Example:
 #
-# use BaseX;
+# use BaseXClient;
 #
 # eval {
 #   # create session
-#   $session = BaseX->new("localhost", 1984, "admin", "admin");
+#   $session = Session->new("localhost", 1984, "admin", "admin");
 #
 #   # perform command and show result or error output
 #   if($session->execute("xquery 1 to 10")) {
@@ -46,7 +46,7 @@ use IO::Socket;
 use warnings;
 use strict;
 
-package BaseX;
+package Session;
 
 # Constructor, creating a new socket connection.
 sub new {

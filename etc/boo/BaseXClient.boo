@@ -20,7 +20,7 @@
  * 
  * -----------------------------------------------------------------------------
  * Example:
- * namespace BaseX
+ * namespace BaseXClient
  * import System
 
  * public class Example:
@@ -47,7 +47,7 @@
  */
 
 
-namespace BaseX
+namespace BaseXClient
 
 import System
 import System.Net.Sockets
@@ -56,25 +56,17 @@ import System.Text
 import System.Collections.Generic
 import System.IO
 
-internal class BaseX:
+internal class Session:
 
 	private result = MemoryStream()
-
 	private cache as (byte) = array(byte, 4096)
-
 	private stream as NetworkStream
-
 	private socket as TcpClient
-
 	private info = ''
-
 	private bpos as int
-
 	private bsize as int
-
 	
 	/** Constructor, creating a new socket connection. */
-	
 	public def constructor(host as string, port as int, username as string, pw as string):
 		socket = TcpClient(host, port)
 		stream = socket.GetStream()
@@ -84,9 +76,7 @@ internal class BaseX:
 		if stream.ReadByte() != 0:
 			raise IOException('Access denied.')
 
-	
 	/** Executes the specified command. */
-	
 	public def Execute(com as string, ms as Stream) as bool:
 		Send(com)
 		Init()
@@ -94,53 +84,39 @@ internal class BaseX:
 		info = ReadString()
 		return (Read() == 0)
 
-	
 	/** Executes the specified command. */
-	
 	public def Execute(com as string) as bool:
 		result = MemoryStream()
 		return Execute(com, result)
 
-	
 	/** Returns the result. */
-	
 	public Result as string:
 		get:
 			return System.Text.Encoding.UTF8.GetString(result.ToArray())
 
-	
 	/** Returns the processing information. */
-	
 	public Info as string:
 		get:
 			return info
 
-	
 	/** Closes the connection. */
-	
 	public def Close():
 		Send('exit')
 		socket.Close()
 
-	
 	/** Initializes the byte transfer. */
-	
 	private def Init():
 		bpos = 0
 		bsize = 0
-
 	
 	/** Returns a single byte from the socket. */
-	
 	private def Read() as byte:
 		if bpos == bsize:
 			bsize = stream.Read(cache, 0, 4096)
 			bpos = 0
 		return cache[(bpos++)]
-
 	
 	/** Receives a string from the socket. */
-	
 	private def ReadString(ms as Stream):
 		while true:
 			b as byte = Read()
@@ -148,29 +124,22 @@ internal class BaseX:
 				break 
 			ms.WriteByte(b)
 
-	
 	/** Receives a string from the socket. */
-	
 	private def ReadString() as string:
 		ms = MemoryStream()
 		ReadString(ms)
 		return System.Text.Encoding.UTF8.GetString(ms.ToArray())
-
 	
 	/** Sends strings to server. */
-	
 	private def Send(message as string):
 		msg as (byte) = System.Text.Encoding.UTF8.GetBytes(message)
 		stream.Write(msg, 0, msg.Length)
 		stream.WriteByte(0)
-
 	
 	/** Returns the md5 hash of a string. */
-	
 	private def MD5(input as string) as string:
 		MD5 = MD5CryptoServiceProvider()
 		hash as (byte) = MD5.ComputeHash(Encoding.UTF8.GetBytes(input))
-		
 		sb = StringBuilder()
 		for h as byte in hash:
 			sb.Append(h.ToString('x2'))

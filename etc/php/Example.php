@@ -8,7 +8,7 @@
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * ----------------------------------------------------------------------------
  */
-include("BaseX.php");
+include("BaseXClient.php");
 
 // initialize timer
 $start = microtime(true);
@@ -18,7 +18,7 @@ $cmd = "xquery 1 to 10";
 
 try {
   // create session
-  $session = new BaseX("localhost", 1984, "admin", "admin");
+  $session = new Session("localhost", 1984, "admin", "admin");
 
   // perform command and show result or error output
   if($session->execute($cmd)) {

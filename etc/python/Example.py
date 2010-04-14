@@ -7,7 +7,7 @@
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
 # -----------------------------------------------------------------------------
 
-import BaseX, time
+import BaseXClient, time
 
 # initialize timer
 start = time.clock()
@@ -17,7 +17,7 @@ cmd = "xquery 1 to 10";
 
 try:
   # create session
-  session = BaseX.BaseX('localhost', 1984, 'admin', 'admin')
+  session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
 
   # perform command and show result or error output
   if session.execute(cmd):

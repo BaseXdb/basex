@@ -23,7 +23,7 @@
 '  
 ' Imports System
 '
-' Namespace BaseX
+' Namespace BaseXClient
 '	Public Class Example
 '		Public Shared Sub Main(args As String())
 '			Try
@@ -62,8 +62,8 @@ Imports System.Text
 Imports System.Collections.Generic
 Imports System.IO
 
-Namespace BaseX
-	Class BaseX
+Namespace BaseXClient
+	Class Session
 		Private m_result As New MemoryStream()
 		Private cache As Byte() = New Byte(4095) {}
 		Private stream As NetworkStream

@@ -12,7 +12,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace BaseX
+namespace BaseXClient
 {
   public class Example
   {
@@ -28,7 +28,7 @@ namespace BaseX
       try
       {
         // create session
-        BaseX session = new BaseX("localhost", 1984, "admin", "admin");
+        Session session = new Session("localhost", 1984, "admin", "admin");
 
         // Version 1: perform command and show result or error output
         if (session.Execute(cmd))

@@ -17,7 +17,7 @@
 #
 # Example:
 #
-# require 'BaseX.rb'
+# require 'BaseXClient.rb'
 #
 # begin
 # session = Session.new("localhost", 1984, "admin", "admin")

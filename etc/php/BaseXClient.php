@@ -18,11 +18,11 @@
  *
  * Example:
  *
- * include("BaseX.php");
+ * include("BaseXClient.php");
  *
  * try {
  *   // create session
- *   $session = new BaseX("localhost", 1984, "admin", "admin");
+ *   $session = new Session("localhost", 1984, "admin", "admin");
  *
  *   // perform command and show result or error output
  *   if($session->execute("xquery 1 to 10")) {
@@ -43,7 +43,7 @@
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * ----------------------------------------------------------------------------
  */
-class BaseX {
+class Session {
   /* Class variables.*/
   var $socket, $result, $info, $buffer, $bpos, $bsize;
 

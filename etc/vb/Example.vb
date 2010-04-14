@@ -13,7 +13,7 @@ Imports System
 Imports System.Diagnostics
 Imports System.IO
 
-Namespace BaseX
+Namespace BaseXClient
 	Public Class Example
 		Public Shared Sub Main(args As String())
 			' initialize timer
@@ -25,7 +25,7 @@ Namespace BaseX
 
 			Try
 				' create session
-				Dim session As New BaseX("localhost", 1984, "admin", "admin")
+				Dim session As New Session("localhost", 1984, "admin", "admin")
 
 				' Version 1: perform command and show result or error output
 				If session.Execute(cmd) Then

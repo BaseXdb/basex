@@ -23,7 +23,7 @@
  * 
  * using System;
  * 
- * namespace BaseX
+ * namespace BaseXClient
  *	{
  *	public class Example
  *	{
@@ -69,9 +69,9 @@ using System.Text;
 using System.Collections.Generic;
 using System.IO;
 
-namespace BaseX
+namespace BaseXClient
 {
-  class BaseX
+  class Session
   {
     private MemoryStream result = new MemoryStream();
     private byte[] cache = new byte[4096];
@@ -82,7 +82,7 @@ namespace BaseX
     private int bsize;
 
     /** Constructor, creating a new socket connection. */
-    public BaseX(string host, int port, string username, string pw)
+    public Session(string host, int port, string username, string pw)
     {
       socket = new TcpClient(host, port);
       stream = socket.GetStream();

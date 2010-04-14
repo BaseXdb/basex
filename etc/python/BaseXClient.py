@@ -17,11 +17,11 @@
 #
 # Example:
 #
-# import BaseX
+# import BaseXClient
 #
 # try:
 #   # create session
-#   session = BaseX.BaseX('localhost', 1984, 'admin', 'admin')
+#   session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
 #
 #   # perform command and show result or error output
 #   if session.execute("xquery 1 to 10"):
@@ -42,7 +42,7 @@
 
 import hashlib, socket, array
 
-class BaseX():
+class Session():
 
   # Constructor, creating a new socket connection.
   def __init__(self, host, port, user, pw):

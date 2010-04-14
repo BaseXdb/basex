@@ -7,7 +7,7 @@
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
 # -----------------------------------------------------------------------------
 
-use BaseX;
+use BaseXClient;
 use Time::HiRes;
 use warnings;
 use strict;
@@ -20,7 +20,7 @@ my $cmd = "xquery 1 to 10";
 
 eval {
   # create session
-  my $session = BaseX->new("localhost", 1984, "admin", "admin");
+  my $session = Session->new("localhost", 1984, "admin", "admin");
 
   # perform command and show result or error output
   if($session->execute($cmd)) {

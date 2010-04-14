@@ -7,7 +7,7 @@
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
 # -----------------------------------------------------------------------------
 
-require 'BaseX.rb'
+require 'BaseXClient.rb'
 
 # initialize timer
 start_time = Time.now
