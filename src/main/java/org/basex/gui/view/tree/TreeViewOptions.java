@@ -28,7 +28,7 @@ interface TreeViewOptions {
   boolean DRAW_NODE_TEXT = true;
   /** Show 3d descendant connection. */
   boolean SHOW_3D_CONN = false;
-  /** Show connections in main image. **/ 
+  /** Show connections in main image. **/
   boolean SHOW_CONN_MI = true;
   /** Border padding value. */
   int BORDER_PADDING = 2;
@@ -36,7 +36,7 @@ interface TreeViewOptions {
   int TOP_MARGIN = 2;
   /** Margin to bottom. */
   int BOTTOM_MARGIN = 5;
-  /** Changes Color until given level. */  
+  /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
 
   /** Minimum rectangle space for text. */
@@ -44,15 +44,15 @@ interface TreeViewOptions {
   /** Minimum space between the levels. */
   int MIN_LEVEL_DISTANCE = 4;
   /** Optimal space between the levels. */
-  int BEST_LEVEL_DISTANCE = 40;
+  int BEST_LEVEL_DISTANCE = 20;
   /** Maximum level distance. */
-  int MAX_LEVEL_DISTANCE = 150;
+  int MAX_LEVEL_DISTANCE = 30;
   /** Change node height till this value is reached. */
   int CHANGE_NODE_HEIGHT_TILL = 8;
   /** Minimum node height. */
   int MIN_NODE_HEIGHT = 1;
   /** Maximum node height. */
-  int MAX_NODE_HEIGHT = 26;
+  int MAX_NODE_HEIGHT = 500;
   /** Minimum node distance to draw node connections. */
   int MIN_NODE_DIST_CONN = 10;
   /** Draw kind rectangle. */

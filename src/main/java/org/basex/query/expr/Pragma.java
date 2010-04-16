@@ -1,9 +1,7 @@
 package org.basex.query.expr;
 
 import java.io.IOException;
-
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.data.Serializer;
 import org.basex.query.item.QNm;
 import org.basex.util.Token;
@@ -15,16 +13,14 @@ import org.basex.util.Token;
  * @author Leo Woerteler
  */
 public class Pragma extends Simple {
-  
   /** QName. */
-  public final QNm qName;
-  
+  private final QNm qName;
   /** PragmaContents. */
-  public final byte[] pContent;
-  
+  private final byte[] pContent;
+
   /**
    * Constructor.
-   * 
+   *
    * @param qn QName
    * @param content PragmaContents
    */
@@ -43,8 +39,7 @@ public class Pragma extends Simple {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(PRAGMA + ' ' + qName + ' ');
-    if (pContent.length > 0) sb.append(Token.string(pContent) + ' ');
+    if(pContent.length > 0) sb.append(Token.string(pContent) + ' ');
     return sb.append(PRAGMA2).toString();
   }
-
 }

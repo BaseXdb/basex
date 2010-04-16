@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
@@ -92,7 +91,7 @@ abstract class Primitives {
       }
     }
   };
-  
+
   /**
    * Checks updates for violations.
    * @param ctx query context reference

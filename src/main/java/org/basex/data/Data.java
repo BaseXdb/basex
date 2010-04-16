@@ -565,7 +565,7 @@ public abstract class Data {
           // add element
           final boolean ne = md.nsFlag(mpre);
           if(ne) {
-            // [LK] don't add all namespaces for the first node (pre=1), there 
+            // [LK] don't add all namespaces for the first node (pre=1), there
             // will be duplicate namespace declarations
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
@@ -595,7 +595,7 @@ public abstract class Data {
           break;
       }
     }
-    
+
     while(l > 0) ns.close(preStack[--l]);
 
     if(bp != 0) insert(ipre + (mpre - 1) - (mpre - 1) % buf);

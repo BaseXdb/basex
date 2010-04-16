@@ -2,9 +2,7 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
-
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.core.proc.Export;
 import org.basex.data.Data;
@@ -77,7 +75,7 @@ final class DBPrimitives extends Primitives {
    * @param pres pre values of nodes to check (in descending order)
    * @throws QueryException query exception
    */
-  private void checkNames(final QueryContext ctx, final int... pres) 
+  private void checkNames(final QueryContext ctx, final int... pres)
     throws QueryException {
     final NamePool pool = new NamePool();
     final IntList il = new IntList();

@@ -333,7 +333,7 @@ public final class FTWords extends FTExpr {
       case M_PHRASE:   sb.append(' ' + PHRASE); break;
       default:
     }
-    
+
     if(occ != null) {
       sb.append(OCCURS + " " + occ[0] + " " + TO + " " + occ[1] + " " + TIMES);
     }

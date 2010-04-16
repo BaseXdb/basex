@@ -261,7 +261,7 @@ public final class CmpG extends Arr {
       iacc = Array.add(iacc, new IndexAccess(arg, type, ic));
       return true;
     }
-    
+
     // loop through all items
     final Iter ir = arg.iter(ic.ctx);
     Item it;

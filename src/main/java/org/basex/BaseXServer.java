@@ -51,7 +51,7 @@ public final class BaseXServer extends Main implements Runnable {
 
   /**
    * Constructor.
-   * @param args command line arguments
+   * @param args command-line arguments
    */
   public BaseXServer(final String... args) {
     super(args);

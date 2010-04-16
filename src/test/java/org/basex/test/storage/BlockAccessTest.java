@@ -44,7 +44,6 @@ public final class BlockAccessTest {
   /** Nodes per block. */
   private int nodes;
 
-  
   // [CG] needs to be checked (tests throw errors just sometimes)
 
   /**

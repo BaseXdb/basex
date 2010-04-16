@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import static org.basex.util.Token.*;
-
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;

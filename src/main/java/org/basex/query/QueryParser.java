@@ -1143,7 +1143,7 @@ public class QueryParser extends InputParser {
     check(AS);
     return new Cast(e, simpleType());
   }
-  
+
   /**
    * Parses a ScoredExpr.
    * This is a proprietary extension to XQuery FT for adding full-text scores

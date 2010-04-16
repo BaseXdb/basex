@@ -27,7 +27,7 @@ public final class BaseXClient extends BaseX {
 
   /**
    * Constructor.
-   * @param args command line arguments
+   * @param args command-line arguments
    */
   public BaseXClient(final String... args) {
     super(args);

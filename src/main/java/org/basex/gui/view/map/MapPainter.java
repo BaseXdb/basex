@@ -2,7 +2,6 @@ package org.basex.gui.view.map;
 
 import java.awt.Color;
 import java.awt.Graphics;
-
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIConstants;

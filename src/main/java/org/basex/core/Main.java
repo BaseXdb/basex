@@ -43,7 +43,7 @@ public abstract class Main {
 
   /**
    * Constructor.
-   * @param args command line arguments
+   * @param args command-line arguments
    */
   protected Main(final String... args) {
     parseArguments(args);

@@ -58,12 +58,6 @@ public final class Prop extends AProp {
   /** Client/server communication: port, used for starting the server. */
   public static final Object[] SERVERPORT = { "SERVERPORT", 1984 };
 
-  /** JAX-RX interface: http port. */
-  public static final Object[] HTTPPORT = { "HTTPPORT", 8984 };
-  /** JAX-RX interface: http directory. */
-  public static final Object[] HTTPPATH = {
-    "HTTPPATH", HOME + Text.NAME + "HTTP" };
-
   // TRANSIENT OPTIONS ========================================================
 
   /** The following options are not saved to disk; don't remove this flag. */

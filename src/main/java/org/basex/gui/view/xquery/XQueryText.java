@@ -1,7 +1,6 @@
 package org.basex.gui.view.xquery;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

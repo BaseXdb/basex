@@ -8,7 +8,6 @@ import java.awt.Toolkit;
 import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
 import org.basex.core.Main;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;

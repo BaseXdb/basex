@@ -68,7 +68,7 @@ public final class FNSimple extends Fun {
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     final SeqType s = expr.length == 1 ? expr[0].returned(ctx) : null;
-    
+
     switch(func) {
       case FALSE:
       case TRUE:

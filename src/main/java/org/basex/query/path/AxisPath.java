@@ -182,7 +182,7 @@ public class AxisPath extends Path {
     for(int s = 0; s < step.length; s++) {
       // don't allow predicates in preceding location steps
       if(s > 0 && step[s - 1].pred.length != 0) break;
-      
+
       if(step[s].axis != Axis.DESC) continue;
 
       // check if child steps can be retrieved for current step
@@ -268,7 +268,7 @@ public class AxisPath extends Path {
     IndexContext ics = null;
     int ips = 0;
     int ms = 0;
-    
+
     // check if path can be converted to an index access
     for(int s = 0; s < step.length; s++) {
       // find cheapest index access

@@ -290,7 +290,7 @@ public final class DeepShell {
 
   /**
    * A file hierarchy stored as XML.
-   * @param args command-line arguments
+   * @param args (ignored) command-line arguments
    */
   public static void main(final String[] args) {
     new DeepShell();

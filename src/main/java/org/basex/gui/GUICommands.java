@@ -343,7 +343,7 @@ public enum GUICommands implements GUICommand {
       String item = type.name + " { " + quote(sl.get(0)) + " }";
 
       if(type == Type.ATT || type == Type.PI) {
-        item += " { " + quote(sl.get(1)) + " }";        
+        item += " { " + quote(sl.get(1)) + " }";
       } else if(type == Type.ELM) {
         item += " { () }";
       }

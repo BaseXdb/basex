@@ -48,7 +48,7 @@ public class Pred extends Preds {
       for(final Expr p : pred) path = path.addPred(p);
       return path.comp(ctx);
     }
-    
+
     final Item tmp = ctx.item;
     ctx.item = null;
     final Expr e = super.comp(ctx);

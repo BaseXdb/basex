@@ -30,7 +30,8 @@ final class TreeRect {
   boolean contains(final int xx) {
     return xx >= x && xx <= x + w;
   }
-  /**  
+
+  /**
    * Verifies if the specified coordinates are inside the rectangle.
    * @param xx x position
    * @param ww width
