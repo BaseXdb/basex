@@ -1,7 +1,6 @@
 package org.basex.api.xqj;
 
 import static org.basex.api.xqj.BXQText.*;
-
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.util.Map;

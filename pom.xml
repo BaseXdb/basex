@@ -29,14 +29,14 @@
       <url>http://www.inf.uni-konstanz.de/dbis/basex/maven</url>
     </repository>
     <repository>
-      <id>disy-ukn-snap</id>
-      <name>DISY Maven Snapshot Repository</name>
-      <url>http://xen5.disy.inf.uni-konstanz.de/repo/snapshotRepository</url>
-    </repository>
-    <repository>
       <id>disy-ukn</id>
       <name>DISY Maven Repository</name>
       <url>http://xen5.disy.inf.uni-konstanz.de/repo/repository</url>
+    </repository>
+    <repository>
+      <id>disy-ukn-snap</id>
+      <name>DISY Maven Snapshot Repository</name>
+      <url>http://xen5.disy.inf.uni-konstanz.de/repo/snapshotRepository</url>
     </repository>
   </repositories>
   <organization>
@@ -91,7 +91,7 @@
     <dependency>
       <groupId>jax-rx</groupId>
       <artifactId>jax-rx</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -143,27 +143,4 @@
       </plugin>
     </plugins>
   </build>
-  <!--<reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.5</version>
-        <configuration/>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <linkXRef>false</linkXRef>
-          <configLocation>src/main/resources/checkstyle-basex.xml</configLocation>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>-->
 </project>

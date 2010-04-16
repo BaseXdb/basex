@@ -1,14 +1,12 @@
 package org.basex.api.jaxrx;
 
 import static org.jaxrx.core.URLConstants.*;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import org.basex.core.Prop;
 import org.basex.data.DataText;
 import org.basex.data.SerializerProp;
@@ -60,7 +58,7 @@ abstract class BXCode {
       try { if(cs != null) cs.close(); } catch(final Exception ex) { }
     }
   }
-  
+
   /**
    * Returns the root resource of the specified path.
    * If the path contains more or less than a single resource,
@@ -96,7 +94,7 @@ abstract class BXCode {
 
       if(file.length() == 0)
         throw new JaxRxException(400, "XML input was missing.");
-      
+
       return file;
     } catch(final IOException ex) {
       // try to delete temporary file before returning the exception

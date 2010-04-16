@@ -3,7 +3,6 @@ package org.basex.api.xqj;
 import static javax.xml.xquery.XQConstants.*;
 import static org.basex.api.xqj.BXQText.*;
 import static org.basex.util.Token.*;
-
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQStaticContext;

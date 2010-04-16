@@ -112,16 +112,16 @@ public final class BXJaxRx implements JaxRx {
     throw new JaxRxException(400, "Parameter '" + qp +
         "' is no valid integer: " + val);
   }
-  
+
   @Override
   public StreamingOutput run(final String file, final ResourcePath rp) {
     return new BXOutput(rp) {
       @Override
       void code() throws IOException {
         // get root directory for files
-        final String root = System.getProperty("org.basex.httppath") + "/";
+        final String root = System.getProperty("org.basex.jaxrxpath") + "/";
         final IO io = IO.get(root + file);
-        exec(new Run(io.path()), out);        
+        exec(new Run(io.path()), out);
       }
     };
   }
@@ -134,7 +134,7 @@ public final class BXJaxRx implements JaxRx {
         // perform command and serialize output
         final CachedOutput co = new CachedOutput();
         exec(cmd, co);
-    
+
         final XMLSerializer xml =
           new XMLSerializer(out, new SerializerProp(params(path)));
         xml.text(Token.delete(co.finish(), '\r'));
@@ -149,7 +149,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() throws IOException {
         // open database
-        if(!cs.execute(new Open(root(rp)))) 
+        if(!cs.execute(new Open(root(rp))))
           throw new JaxRxException(404, cs.info());
 
         // add cached file to the database
