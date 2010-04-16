@@ -60,7 +60,7 @@ public final class InexTFCalc {
 
   /**
    * Default constructor.
-   * @param args arguments
+   * @param args command-line arguments
    * @throws Exception exception
    */
   private InexTFCalc(final String[] args) throws Exception {
@@ -100,7 +100,7 @@ public final class InexTFCalc {
 
   /**
    * Parses the command line arguments.
-   * @param args the command line arguments
+   * @param args command-line arguments
    * @return true if all arguments have been correctly parsed
    */
   private boolean parseArguments(final String[] args) {

@@ -37,7 +37,7 @@ public final class QueryTest {
 
   /**
    * Main method of the test class.
-   * @param args command-line arguments (ignored)
+   * @param args (ignored) command-line arguments
    */
   public static void main(final String[] args) {
     new QueryTest();

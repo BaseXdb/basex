@@ -28,31 +28,42 @@ public final class XMLDBQuery {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
+    // Collection instance.
     Collection coll = null;
-    try {
-      final Class<?> c = Class.forName(DRIVER);
 
-      final Database db = (Database) c.newInstance();
+    try {
       // Register the database.
+      Class<?> c = Class.forName(DRIVER);
+      Database db = (Database) c.newInstance();
       DatabaseManager.registerDatabase(db);
+
       // Receive the database.
       coll = DatabaseManager.getCollection(DBNAME);
+
       // Receive the XPath query service.
-      final XPathQueryService service = (XPathQueryService)
+      XPathQueryService service = (XPathQueryService)
         coll.getService("XPathQueryService", "1.0");
+
       // Execute the query and receives all results.
-      final ResourceSet set = service.query(QUERY);
-      // Create and loop through a result iterator.
-      final ResourceIterator iter = set.getIterator();
+      ResourceSet set = service.query(QUERY);
+
+      // Create a result iterator.
+      ResourceIterator iter = set.getIterator();
+
+      // Loop through all result items.
       while(iter.hasMoreResources()) {
         // Receive the next results.
-        final Resource res = iter.nextResource();
-        // Writing the result to the console.
+        Resource res = iter.nextResource();
+
+        // Write the result to the console.
         System.out.println(res.getContent());
       }
+
     } catch(final XMLDBException ex) {
+      // Handle exceptions.
       System.err.println("XML:DB Exception occured " + ex.errorCode);
     } finally {
+      // Close the collection.
       if(coll != null) coll.close();
     }
   }

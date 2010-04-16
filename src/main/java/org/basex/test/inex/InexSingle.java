@@ -19,7 +19,7 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
 /**
- * Simple INEX Database test.
+ * Simple INEX database test.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -144,7 +144,7 @@ public final class InexSingle {
 
   /**
    * Parses the command-line arguments.
-   * @param args the command-line arguments
+   * @param args command-line arguments
    * @return true if all arguments have been correctly parsed
    */
   private boolean parseArguments(final String[] args) {

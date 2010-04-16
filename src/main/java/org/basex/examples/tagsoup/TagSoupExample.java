@@ -36,8 +36,8 @@ public final class TagSoupExample {
 
   /**
    * Main class.
-   * @param args command line arguments (unused)
-   * @throws Exception toy example...
+   * @param args (ignored) command-line arguments
+   * @throws Exception exceptions
    */
   public static void main(final String[] args) throws Exception {
     // URL to be parsed

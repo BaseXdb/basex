@@ -33,7 +33,7 @@ import org.basex.util.Performance;
 import org.basex.util.StringList;
 
 /**
- * Simple INEX Database test.
+ * Simple INEX database test.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -92,7 +92,7 @@ public final class InexSubmit {
 
   /**
    * Main test method.
-   * @param args command line arguments (ignored)
+   * @param args command-line arguments
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
@@ -259,7 +259,7 @@ public final class InexSubmit {
 
   /**
    * Parses the command line arguments.
-   * @param args the command line arguments
+   * @param args command-line arguments
    * @return true if all arguments have been correctly parsed
    */
   private boolean parseArguments(final String[] args) {

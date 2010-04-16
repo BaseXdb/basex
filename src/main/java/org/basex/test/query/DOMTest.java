@@ -20,7 +20,7 @@ public final class DOMTest {
 
   /**
    * Main method of the test class.
-   * @param args command-line arguments (ignored)
+   * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {

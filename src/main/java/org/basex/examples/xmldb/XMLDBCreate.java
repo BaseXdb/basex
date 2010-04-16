@@ -5,7 +5,7 @@ import org.xmldb.api.base.*;
 import org.xmldb.api.*;
 
 /**
- * This class serves as an example for creating a Database with the XML:DB API.
+ * This class serves as an example for creating a database with the XML:DB API.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
@@ -26,9 +26,9 @@ public final class XMLDBCreate {
    */
   public static void main(final String[] args) throws Exception {
     try {
-      final Class<?> c = Class.forName(DRIVER);
-      final Database db = (Database) c.newInstance();
       // Register the database.
+      Class<?> c = Class.forName(DRIVER);
+      Database db = (Database) c.newInstance();
       DatabaseManager.registerDatabase(db);
 
       // Create a new collection
@@ -42,7 +42,9 @@ public final class XMLDBCreate {
 
       // Close the connection
       coll.close();
+
     } catch(final XMLDBException ex) {
+      // Handle exceptions.
       System.err.println("XML:DB Exception occured " + ex.errorCode);
     }
   }

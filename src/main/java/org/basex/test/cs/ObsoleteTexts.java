@@ -33,7 +33,7 @@ public final class ObsoleteTexts {
 
   /**
    * Test method.
-   * @param args ignored command-line arguments
+   * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {

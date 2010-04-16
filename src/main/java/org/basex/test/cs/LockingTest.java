@@ -49,7 +49,7 @@ public final class LockingTest {
 
   /**
    * Main method, launching the test.
-   * @param args command-line arguments
+   * @param args (ignored) command-line arguments
    */
   public static void main(final String[] args) {
     new LockingTest();

@@ -4,7 +4,6 @@ import javax.xml.xquery.XQConnection;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQPreparedExpression;
 import javax.xml.xquery.XQSequence;
-
 import org.basex.api.xqj.BXQDataSource;
 
 /**
