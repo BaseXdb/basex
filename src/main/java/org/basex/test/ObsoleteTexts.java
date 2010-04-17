@@ -1,4 +1,4 @@
-package org.basex.test.cs;
+package org.basex.test;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -38,7 +38,7 @@ public final class ObsoleteTexts {
    */
   public static void main(final String[] args) throws Exception {
     final HashSet<String> set = new HashSet<String>();
-    read(new File("src"), set);
+    read(new File("../basex/src"), set);
 
     for(final Class<?> c : CLASSES) {
       int i = 0;
