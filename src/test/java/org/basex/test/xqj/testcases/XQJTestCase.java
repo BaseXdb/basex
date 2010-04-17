@@ -42,4 +42,8 @@ public class XQJTestCase extends TestCase {
   protected void tearDown() throws Exception {
    xqc.close();
   }
+  
+  // dummy method to suppress JUnit warning for finding no tests
+  public void testDummy() {
+  }
 }
