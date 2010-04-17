@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 -- |
--- Module      : BaseX.Client
+-- Module      : BaseXClient
 -- Copyright   : (C) Workgroup DBIS, University of Konstanz 2005-10
 -- License     : ISC
 --

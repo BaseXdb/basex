@@ -1,3 +1,18 @@
+-------------------------------------------------------------------------------
+-- |
+-- Module      : Example
+-- Copyright   : (C) Workgroup DBIS, University of Konstanz 2005-10
+-- License     : ISC
+--
+-- Maintainer  : leo@woerteler.de
+-- Stability   : experimental
+-- Portability : portable
+--
+-- This example shows how BaseX commands can be performed via the Haskell API.
+-- The execution time will be printed along with the result of the command.
+--
+-------------------------------------------------------------------------------
+
 module Example where
 
 import BaseXClient
