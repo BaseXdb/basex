@@ -20,7 +20,7 @@ public final class Context {
   /** Client connections. */
   public final Sessions sessions;
   /** Process synchronization. */
-  public final SemaphoreNew sema;
+  public final Semaphore sema;
   /** Database pool. */
   public final DataPool pool;
   /** Users. */
@@ -52,7 +52,7 @@ public final class Context {
     prop = new Prop(true);
     pool = new DataPool();
     sessions = new Sessions();
-    sema = new SemaphoreNew();
+    sema = new Semaphore();
     users = new Users(true);
     user = users.get(ADMIN);
   }

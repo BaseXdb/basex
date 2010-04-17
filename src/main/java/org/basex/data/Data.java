@@ -209,7 +209,7 @@ public abstract class Data {
       case ATV: return atvindex.info();
       case FTX: return ftxindex.info();
       case PTH: return path.info(this);
-      default: return EMPTY;
+      default:  return EMPTY;
     }
   }
 
@@ -598,7 +598,7 @@ public abstract class Data {
 
     while(l > 0) ns.close(preStack[--l]);
 
-    if(bp != 0) insert(ipre + (mpre - 1) - (mpre - 1) % buf);
+    if(bp != 0) insert(ipre + mpre - 1 - (mpre - 1) % buf);
     // reset buffer to old size
     buffer(1);
 

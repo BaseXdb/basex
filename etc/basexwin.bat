@@ -1,13 +1,13 @@
+@setlocal
 @echo off
-setlocal
 
 REM Path to class directory (bin) or BaseX.jar
 set BXPATH=%~dp0\..\bin
 
 REM Java options (virtual memory in MB)
-set JMEM=-Xmx1024m
+set VM=-Xmx1g
 
-REM Run BaseX
-javaw %JMEM% -cp "%BXPATH%" org.basex.BaseXWin %*
+REM Run BaseX GUI
+java -cp "%BXPATH%" %VM% org.basex.BaseXWin %*
 
-endlocal
+@endlocal

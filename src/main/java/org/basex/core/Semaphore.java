@@ -10,11 +10,9 @@ import java.util.LinkedList;
  * @author Andreas Weiler
  */
 final class Semaphore {
-  /** List of monitors for waiting writers. */
-  private final LinkedList<Object> waitingW = new LinkedList<Object>();
-  /** Number of waiting readers. */
-  private int waitingR;
-  /** Number of active writers. */
+  /** List of monitors for locking objects. */
+  private final LinkedList<Lock> waiting = new LinkedList<Lock>();
+  /** Value for an active writer. */
   private boolean activeW;
   /** Number of active readers. */
   private int activeR;
@@ -25,30 +23,37 @@ final class Semaphore {
    */
   void before(final boolean w) {
     if(w) {
-      final Object o = new Object();
-      synchronized(o) {
-        synchronized(this) {
-          if(waitingW.size() == 0 && activeR == 0 && !activeW) {
-            activeW = true;
-            return;
-          }
-          waitingW.add(o);
+      final Lock l = new Lock(true);
+      synchronized(l) {
+        if(waiting.size() == 0 && activeR == 0 && !activeW) {
+          activeW = true;
+          return;
         }
+        waiting.add(l);
         try {
-          o.wait();
+          l.wait();
         } catch(final InterruptedException ex) {
           ex.printStackTrace();
         }
       }
     } else {
-      synchronized(this) {
-        if(!activeW && waitingW.size() == 0) {
-          ++activeR;
+      Lock l = null;
+      boolean add = false;
+      if(waiting.size() > 0 && !waiting.getLast().writer) {
+        l = waiting.getLast();
+        l.number++;
+      } else {
+        l = new Lock(false);
+        add = true;
+      }
+      synchronized(l) {
+        if(!activeW && waiting.size() == 0) {
+          activeR++;
           return;
         }
-        ++waitingR;
+        if(add) waiting.add(l);
         try {
-          wait();
+          l.wait();
         } catch(final InterruptedException ex) {
           ex.printStackTrace();
         }
@@ -63,30 +68,47 @@ final class Semaphore {
   synchronized void after(final boolean w) {
     if(w) {
       activeW = false;
-      if(waitingR > 0) notifyReaders();
-      else notifyWriter();
+      notifyNext();
     } else {
-      if(--activeR == 0) notifyWriter();
+      if(--activeR == 0) notifyNext();
     }
   }
 
   /**
-   * Notifies the readers.
+   * Notifies the next processes in line.
    */
-  private synchronized void notifyReaders() {
-    notifyAll();
-    activeR = waitingR;
-    waitingR = 0;
+  private synchronized void notifyNext() {
+    if(waiting.size() > 0) {
+      final Lock eldest = waiting.remove(0);
+      synchronized(eldest) {
+        eldest.notifyAll();
+      }
+      if(eldest.writer) {
+        activeW = true;
+      } else {
+        activeR = eldest.number;
+      }
+    }
   }
 
   /**
-   * Notifies the writers.
+   * Inner class for a locking object.
+   *
+   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+   * @author Andreas Weiler
    */
-  private synchronized void notifyWriter() {
-    if(waitingW.size() > 0) {
-      final Object eldest = waitingW.remove(0);
-      synchronized(eldest) { eldest.notify(); }
-      activeW = true;
+  private class Lock {
+    /** Writer flag. */
+    boolean writer;
+    /** Number of readers. */
+    int number = 1;
+
+    /**
+     * Standard constructor.
+     * @param w writing flag
+     */
+    Lock(final boolean w) {
+      writer = w;
     }
   }
 }

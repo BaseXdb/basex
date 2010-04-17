@@ -124,6 +124,31 @@ public final class Namespaces {
   // Requesting Namespaces ====================================================
 
   /**
+   * Determines the namespaces for a given node that have not been declared
+   * before.
+   * [LK] to be checked
+   * @param newNs new namespaces
+  public void newNs(final Atts newNs) {
+    NSNode par = root;
+    while(par.pre != -1) {
+      final int[] vals = par.vals;
+
+      for(int i = 0; i < vals.length; i += 2) {
+        final byte[] pf = pref(vals[i]);
+        // contained in newNS
+        final int pos = newNs.get(pf);
+        if(pos != -1) {
+          if(pf.length == 0 && Token.eq(newNs.val[pos], uri(vals[i + 1]))) {
+            newNs.delete(pos);
+          } else newNs.delete(pos);
+        }
+      }
+      par = par.par;
+    }
+  }
+   */
+
+  /**
    * Returns the number of uri references.
    * @return number of uri references
    */

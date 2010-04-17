@@ -97,7 +97,7 @@ public final class ServerProcess extends Thread {
           exit();
           break;
         }
-
+        
         // parse input and create process instance
         final Performance perf = new Performance();
         proc = null;
