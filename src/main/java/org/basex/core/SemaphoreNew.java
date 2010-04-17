@@ -38,22 +38,21 @@ final class SemaphoreNew {
         }
       }
     } else {
-      Lock l = new Lock(false);
+      Lock l = null;
+      boolean add = false;
+      if(waiting.size() > 0 && !waiting.getLast().isWriter()) {
+          l = waiting.getLast();
+          l.inc();
+      } else {
+        l = new Lock(false);
+        add = true;
+      }
       synchronized(l) {
           if(!activeW && waiting.size() == 0) {
             activeR++;
             return;
           }
-          if(waiting.size() > 0) {
-            if(!waiting.getLast().isWriter()) {
-              l = waiting.getLast();
-              l.inc();
-            } else {
-              waiting.add(l);
-            }
-          } else {
-            waiting.add(l);
-          }
+          if(add) waiting.add(l);
         try {
           l.wait();
         } catch(final InterruptedException ex) {

@@ -28,12 +28,35 @@ public class SemaphoreTest {
    */
   void run() {
     System.out.println("=== Semaphore Test ===");
-    final String [] queries = {"xquery for $n in doc('factbook')//city return insert node <test/> into $n",
+    /*final String [] queries1 = {"xquery for $n in doc('factbook')//city return insert node <test/> into $n",
+        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
+        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
+        "xquery for $n in doc('factbook')//city return insert node <test/> into $n"
+        };
+    final String [] queries2 = {"xquery for $n in doc('factbook')//city return insert node <test/> into $n",
         "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
         "xquery for $n in doc('factbook')//city return insert node <test/> into $n",
-        "xquery for $n in 1 to 1000000 where $n = 999999 return $n"};
+        "xquery for $n in 1 to 1000000 where $n = 999999 return $n"
+        };*/
+    final String [] queries3 = {"xquery for $n in doc('factbook')//city return insert node <test/> into $n",
+        "xquery for $n in doc('factbook')//city return insert node <test/> into $n",
+        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
+        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
+        "xquery for $n in doc('factbook')//city return insert node <test/> into $n",
+        "xquery for $n in 1 to 1000000 where $n = 999999 return $n"
+        };
     
-    for (int n = 1; n <= 4; n++) {
+    //runClients(queries1);
+    //runClients(queries2);
+    runClients(queries3);
+  }
+  
+  /**
+   * Runs the different tests.
+   * @param q array of queries
+   */
+  private void runClients(final String[] q) {
+    for (int n = 1; n <= 6; n++) {
       final int j = n;
       try {
         Thread.sleep(2000);
@@ -45,7 +68,7 @@ public class SemaphoreTest {
         public void run() {
           try {
             ClientSession session = new ClientSession("localhost", 1984, "admin", "admin");
-            session.execute(queries[j - 1]);
+            session.execute(q[j - 1]);
             System.out.println("=== Client Done: " + j + " ===");
           } catch(IOException e) {
             e.printStackTrace();
