@@ -183,7 +183,7 @@ public abstract class UpdatePrimitive {
       default:
         q = nd.qname();
         // [LK] XQUP: check temporary namespace copy
-        System.out.println(par + " / " + nd.ns().size);
+        //System.out.println(par + " / " + nd.ns().size);
         ne = nd.ns().size != 0; // false;
         if(ne) { //if(par == 0) { // ne
           final Atts ns = FElem.ns(nd);
