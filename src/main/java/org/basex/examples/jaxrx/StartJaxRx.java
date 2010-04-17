@@ -9,7 +9,7 @@ import org.jaxrx.StartJetty;
  * JAX-RX implementation.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Christian Gruen, University of Konstanz
+ * @author Christian Gruen
  */
 public final class StartJaxRx {
   /** Private constructor. */

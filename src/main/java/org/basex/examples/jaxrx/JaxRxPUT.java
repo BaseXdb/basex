@@ -14,7 +14,7 @@ import java.net.URL;
  * It shows the function of the HTTP PUT method.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Lukas Lewandowski, University of Konstanz
+ * @author Lukas Lewandowski
  */
 public final class JaxRxPUT {
 
