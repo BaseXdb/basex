@@ -183,13 +183,11 @@ public abstract class UpdatePrimitive {
       default:
         q = nd.qname();
         // [LK] XQUP: check temporary namespace copy
-        ne = false; // nd.ns().size != 0;
-        if(par == 0) { // ne
-          final Atts ns = FElem.ns(nd);
-          for(int a = 0; a < ns.size; a++) {
-            m.ns.add(ms, -1, ns.key[a], ns.val[a]);
-            ne = true;
-          }
+        ne = false;
+        final Atts ns = FElem.ns(nd, par == 0);
+        for(int a = 0; a < ns.size; a++) {
+          m.ns.add(ms, -1, ns.key[a], ns.val[a]);
+          ne = true;
         }
         uri = q.uri.str();
         u = uri.length != 0 ? Math.abs(m.ns.addURI(uri)) : 0;

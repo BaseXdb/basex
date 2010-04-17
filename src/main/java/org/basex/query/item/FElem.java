@@ -142,7 +142,7 @@ public final class FElem extends FNode {
 
     // serialize all namespaces at top level...
     if(ser.level() == 1) {
-      final Atts nns = ns(this);
+      final Atts nns = ns(this, true);
       for(int a = 0; a < nns.size; a++) {
         if(nns.key[a].length == 0) {
           xmlns = true;
@@ -203,9 +203,10 @@ public final class FElem extends FNode {
   /**
    * Returns the namespace hierarchy for the specified node.
    * @param node input node
+   * @param root root level
    * @return namespaces
    */
-  public static Atts ns(final Nod node) {
+  public static Atts ns(final Nod node, final boolean root) {
     final Atts ns = new Atts();
     Nod n = node;
     do {
@@ -213,10 +214,10 @@ public final class FElem extends FNode {
       if(nns != null) {
         for(int a = nns.size - 1; a >= 0; a--) {
           final byte[] key = nns.key[a];
-          if(ns.contains(key)) continue;
-          ns.add(key, nns.val[a]);
+          if(!ns.contains(key)) ns.add(key, nns.val[a]);
         }
       }
+      if(!root) return ns;
       n = n.parent();
     } while(n != null && n.type == Type.ELM);
     return ns;
