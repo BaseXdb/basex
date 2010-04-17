@@ -102,7 +102,11 @@ public final class ServerProcess extends Thread {
         final Performance perf = new Performance();
         proc = null;
         try {
-          proc = new CommandParser(input, context, true).parse()[0];
+          final Proc[] procs = new CommandParser(input, context, true).parse();
+          if(procs.length != 1)
+            throw new QueryException(SERVERPROC, procs.length);
+
+          proc = procs[0];
         } catch(final QueryException ex) {
           // invalid command was sent by a client; create error feedback
           log.write(this, input, perf, INFOERROR + ex.extended());

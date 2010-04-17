@@ -61,7 +61,7 @@ public final class BaseXServer extends Main implements Runnable {
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
       new Thread(this).start();
-      do Performance.sleep(100); while(!running);
+      do Performance.sleep(200); while(!running);
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
       if(console) quit(console());
