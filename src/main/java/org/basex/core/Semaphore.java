@@ -37,21 +37,19 @@ final class Semaphore {
         }
       }
     } else {
-      Lock l = null;
-      boolean add = false;
-      if(waiting.size() > 0 && !waiting.getLast().writer) {
-        l = waiting.getLast();
-        l.number++;
-      } else {
-        l = new Lock(false);
-        add = true;
-      }
-      synchronized(l) {
+      synchronized(this) {
         if(!activeW && waiting.size() == 0) {
           activeR++;
           return;
         }
-        if(add) waiting.add(l);
+        Lock l = null;
+        if(waiting.size() > 0 && !waiting.getLast().writer) {
+          l = waiting.getLast();
+          l.waitingReaders++;
+        } else {
+          l = new Lock(false);
+          waiting.add(l);
+        }
         try {
           l.wait();
         } catch(final InterruptedException ex) {
@@ -86,7 +84,7 @@ final class Semaphore {
       if(eldest.writer) {
         activeW = true;
       } else {
-        activeR = eldest.number;
+        activeR = eldest.waitingReaders;
       }
     }
   }
@@ -101,7 +99,7 @@ final class Semaphore {
     /** Writer flag. */
     boolean writer;
     /** Number of readers. */
-    int number = 1;
+    int waitingReaders = 1;
 
     /**
      * Standard constructor.
