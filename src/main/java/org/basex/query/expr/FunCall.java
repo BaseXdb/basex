@@ -22,7 +22,7 @@ public final class FunCall extends Arr {
   /** Function reference. */
   private Func func;
   /** Function name. */
-  private QNm name;
+  private final QNm name;
 
   /**
    * Function constructor.

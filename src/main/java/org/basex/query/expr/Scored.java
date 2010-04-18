@@ -11,7 +11,7 @@ import org.basex.query.iter.Iter;
  * Scored expression. This is a proprietary extension to XQuery FT introduced by
  * Stefan Klinger.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Leo Woerteler
  */
 public class Scored extends Arr {

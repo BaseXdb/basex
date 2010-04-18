@@ -126,7 +126,7 @@ public final class TableMemAccess extends TableAccess {
   public synchronized void write1(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
-    final long d = ((o < 8 ? 7 : 15) - o) << 3;
+    final long d = (o < 8 ? 7 : 15) - o << 3;
     buf[p] = buf[p] & ~(0xFFL << d) | (long) v << d;
   }
 
@@ -134,7 +134,7 @@ public final class TableMemAccess extends TableAccess {
   public synchronized void write2(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
-    final long d = ((o < 8 ? 6 : 14) - o) << 3;
+    final long d = (o < 8 ? 6 : 14) - o << 3;
     buf[p] = buf[p] & ~(0xFFFFL << d) | (long) v << d;
   }
 
@@ -142,7 +142,7 @@ public final class TableMemAccess extends TableAccess {
   public synchronized void write4(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
-    final long d = ((o < 8 ? 4 : 12) - o) << 3;
+    final long d = (o < 8 ? 4 : 12) - o << 3;
     buf[p] = buf[p] & ~(0xFFFFFFFFL << d) | (long) v << d;
   }
 
@@ -150,7 +150,7 @@ public final class TableMemAccess extends TableAccess {
   public synchronized void write5(final int p, final int o, final long v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
-    final long d = ((o < 8 ? 3 : 11) - o) << 3;
+    final long d = (o < 8 ? 3 : 11) - o << 3;
     buf[p] = buf[p] & ~(0xFFFFFFFFFFL << d) | v << d;
   }
 
@@ -205,10 +205,10 @@ public final class TableMemAccess extends TableAccess {
    * @return long value
    */
   private long getLong(final byte[] v, final int i) {
-    return ((v[i] & 0xFFL) << 56) | ((v[i + 1] & 0xFFL) << 48) |
-       ((v[i + 2] & 0xFFL) << 40) | ((v[i + 3] & 0xFFL) << 32) |
-       ((v[i + 4] & 0xFFL) << 24) | ((v[i + 5] & 0xFFL) << 16) |
-       ((v[i + 6] & 0xFFL) <<  8) | (v[i + 7] & 0xFFL);
+    return (v[i] & 0xFFL) << 56 | (v[i + 1] & 0xFFL) << 48 |
+       (v[i + 2] & 0xFFL) << 40 | (v[i + 3] & 0xFFL) << 32 |
+       (v[i + 4] & 0xFFL) << 24 | (v[i + 5] & 0xFFL) << 16 |
+       (v[i + 6] & 0xFFL) <<  8 | v[i + 7] & 0xFFL;
   }
 
   /**

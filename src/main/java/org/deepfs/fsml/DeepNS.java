@@ -1,6 +1,11 @@
 package org.deepfs.fsml;
 
-/** All namespaces used in the DeepFile. */
+/**
+ * All namespaces used in the DeepFile.
+ *
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author Bastian Lemke
+ */
 public enum DeepNS {
   /** DeepFS filesystem namespace. */
   DEEPURL("", "http://www.deepfs.org/fs/1.0/"),

@@ -292,7 +292,7 @@ public final class BaseXTextTokens {
   private boolean noMark(final boolean mark, final boolean max) {
     final boolean rs = !mark && ms != -1;
     if(rs) {
-      ps = (max ^ ms < me) ? ms : me;
+      ps = max ^ ms < me ? ms : me;
       noMark();
     }
     return rs;

@@ -32,9 +32,9 @@ public final class DialogPrefs extends Dialog {
   /** Directory path. */
   BaseXTextField path;
   /** Language label. */
-  private BaseXLabel creds;
+  private final BaseXLabel creds;
   /** Language Combo Box. */
-  private BaseXCombo lang;
+  private final BaseXCombo lang;
 
   /** Focus checkbox. */
   private final BaseXCheckBox focus;

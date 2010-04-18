@@ -123,7 +123,7 @@ public class GUIMacOSX {
        */
       try {
         GUIMacOSX.invoke(this, method.getName(), Object.class, obj);
-      } catch(NoSuchMethodException e) {
+      } catch(final NoSuchMethodException e) {
         GUIMacOSX.invoke(this, method.getName());
       }
       // mark the current event as 'handled'

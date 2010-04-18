@@ -184,7 +184,7 @@ public final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Itr id(final QueryContext ctx) throws QueryException {
-    Nod node = checkNode(expr[0].atomic(ctx));
+    final Nod node = checkNode(expr[0].atomic(ctx));
     if(!(node instanceof DBNode)) Err.type(info(), Type.NOD, node);
     final DBNode dbnode = (DBNode) node;
     return Itr.get(dbnode.data.id(dbnode.pre));

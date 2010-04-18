@@ -1196,7 +1196,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr extension() throws QueryException {
-    Expr[] pragmas = pragma();
+    final Expr[] pragmas = pragma();
     return pragmas.length == 0 ? null
         : new Extension(pragmas, enclosed(NOPRAGMA));
   }
@@ -2302,7 +2302,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private FTExpr ftPrimary(final boolean prg) throws QueryException {
-    Expr[] pragmas = pragma();
+    final Expr[] pragmas = pragma();
     if(pragmas.length > 0) {
       check(BRACE1);
       final FTExpr e = ftSelection(true);

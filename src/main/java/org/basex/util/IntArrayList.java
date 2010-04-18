@@ -12,7 +12,7 @@ import org.basex.core.Main;
  */
 public final class IntArrayList implements Iterable<int[]> {
   /** Resize factor for extending the the byte arrays. */
-  private double factor = 2;
+  private final double factor = 2;
   /** Value array. */
   int[][] list;
   /** Current array size. */

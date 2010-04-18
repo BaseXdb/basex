@@ -66,7 +66,7 @@ public abstract class FTIndex implements Index {
         lp = da.readNum();
         vals.add(lp);
       }
-      int pr = lp;
+      final int pr = lp;
       vals.add(da.readNum());
       while(++c < s) {
         lp = da.readNum();

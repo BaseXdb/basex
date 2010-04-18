@@ -57,7 +57,7 @@ final class HTMLParser {
       content = bi.content().finish();
 
       // looks for a charset definition
-      byte[] encoding = token("charset=");
+      final byte[] encoding = token("charset=");
       int cs = indexOf(content, encoding);
       if(cs > 0) {
         // extracts the encoding string

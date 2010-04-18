@@ -17,7 +17,7 @@ public final class XMLInput {
   /** Input pointer. */
   private int ip;
   /** Input file. */
-  private IO file;
+  private final IO file;
   /** Current line. */
   private int line = 1;
   /** Current column. */

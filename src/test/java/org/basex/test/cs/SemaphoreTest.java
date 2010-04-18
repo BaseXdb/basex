@@ -34,7 +34,7 @@ public class SemaphoreTest {
   void run() {
     System.out.println("=== Semaphore Test ===");
 
-    final String [] queries = {"xquery for $n in doc('factbook')//city "+
+    final String [] queries = {"xquery for $n in doc('factbook')//city " +
         "return insert node <test/> into $n",
         "xquery for $n in 1 to 1000000 where $n = 999999 return $n"
     };
@@ -51,19 +51,20 @@ public class SemaphoreTest {
       final int j = n;
       try {
         Thread.sleep(2000);
-      } catch(InterruptedException e1) {
+      } catch(final InterruptedException e1) {
         e1.printStackTrace();
       }
       new Thread() {
         @Override
         public void run() {
           try {
-            ClientSession session =
+            final ClientSession session =
               new ClientSession("localhost", 1984, "admin", "admin");
             int t = rand.nextInt(2);
             session.execute(q[t]);
-            System.out.println("=== Client " + j + " with query " + t + " done ===");
-          } catch(IOException e) {
+            System.out.println("=== Client " + j + " with query " + t +
+                " done ===");
+          } catch(final IOException e) {
             e.printStackTrace();
           }
         }

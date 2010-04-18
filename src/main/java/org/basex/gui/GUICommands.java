@@ -206,7 +206,6 @@ public enum GUICommands implements GUICommand {
       } else {
         try {
           file.write(gui.query.getQuery());
-          gui.query.setQuery(file);
         } catch(final IOException ex) {
           Dialog.error(gui, NOTSAVED);
         }
@@ -770,9 +769,9 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       try {
         Desktop.getDesktop().browse(new URI(COMMUNITY_URL));
-      } catch(IOException e) {
+      } catch(final IOException e) {
         Dialog.error(gui, INFOCOMMUNITYERROR);
-      } catch(URISyntaxException e) {
+      } catch(final URISyntaxException e) {
         Dialog.error(gui, INFOCOMMUNITYERROR);
       }
     }

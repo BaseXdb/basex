@@ -21,7 +21,7 @@ import org.basex.gui.GUIConstants.Fill;
 public class BaseXBack extends JPanel {
   /** Desktop hints. */
   private static final Map<?, ?> HINTS = (Map<?, ?>)
-    (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
+    Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints");
   /** Flag for adding rendering hints. */
   private static boolean hints = true;
   /** Fill mode. */

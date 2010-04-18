@@ -339,7 +339,7 @@ public final class CommandParser extends InputParser {
       // return command reference; allow empty strings as input ("NULL")
       final String t = token == null ? "NULL" : token.toUpperCase();
       final E cmd = Enum.valueOf(cmp, t);
-      if(!(Cmd.class.isInstance(cmd))) return cmd;
+      if(!Cmd.class.isInstance(cmd)) return cmd;
       final Cmd c = Cmd.class.cast(cmd);
       if(!c.help() && (internal || !c.internal())) return cmd;
     } catch(final IllegalArgumentException ex) { }

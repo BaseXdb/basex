@@ -45,15 +45,15 @@ final class Semaphore {
           return;
         }
       }
-        Lock l = null;
-        if(waiting.size() > 0 && !waiting.getLast().writer) {
-          l = waiting.getLast();
-          l.waitingReaders++;
-        } else {
-          l = new Lock(false);
-          waiting.add(l);
-        }
-        synchronized(l) {
+      Lock l = null;
+      if(waiting.size() > 0 && !waiting.getLast().writer) {
+        l = waiting.getLast();
+        l.waitingReaders++;
+      } else {
+        l = new Lock(false);
+        waiting.add(l);
+      }
+      synchronized(l) {
         try {
           l.wait();
         } catch(final InterruptedException ex) {

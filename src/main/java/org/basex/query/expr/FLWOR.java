@@ -29,7 +29,7 @@ public class FLWOR extends Expr {
   /** Order Expressions. */
   private Order order;
   /** Group by Expression. */
-  private Group group;
+  private final Group group;
 
   /**
    * FLWOR initialization.

@@ -118,7 +118,7 @@ public abstract class FNode extends Nod {
         if(node != null) {
           final NodeMore ch = node.child();
           if(ch.more()) {
-            if(l + 1 == it.length) it = Arrays.copyOf(it, (l + 1) << 1);
+            if(l + 1 == it.length) it = Arrays.copyOf(it, l + 1 << 1);
             it[++l] = ch;
           } else {
             while(!it[l].more()) if(l-- <= 0) break;

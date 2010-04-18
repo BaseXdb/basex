@@ -24,7 +24,7 @@ final class TreeCaching implements TreeViewOptions {
   /** Subtree borders. */
   private TreeBorder[][] border;
   /** Window properties. */
-  private GUIProp prop;
+  private final GUIProp prop;
 
   /**
    * This constructor invokes methods to cache all document nodes.

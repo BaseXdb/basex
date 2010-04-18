@@ -172,7 +172,7 @@ public final class DiskData extends Data {
   @Override
   public double textNum(final int pre, final boolean text) {
     final long o = textOff(pre);
-    return num(o) ? o & (IO.NUMOFF - 1) :
+    return num(o) ? o & IO.NUMOFF - 1 :
       Token.toDouble((text ? texts : values).readToken(o));
   }
 

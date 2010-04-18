@@ -10,9 +10,9 @@ import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 
 /**
- * FTExtensionSelection.
+ * FTExtensionSelection expression.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Leo Woerteler
  */
 public class FTExtensionSelection extends FTExpr {
@@ -50,8 +50,8 @@ public class FTExtensionSelection extends FTExpr {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (Expr p : pragmas)
+    final StringBuilder sb = new StringBuilder();
+    for (final Expr p : pragmas)
       sb.append(p).append(' ');
     return sb.append(BRACE1 + ' ' + expr[0] + ' ' + BRACE2).toString();
   }

@@ -291,7 +291,7 @@ public final class Tokenizer implements IndexToken {
 
     // parse token
     for(; p < l; p += cl(text[p])) {
-      int c = cp(text, p);
+      final int c = cp(text, p);
       if(!ftChar(c)) {
         s = p - cl(text[p]);
         break;
@@ -313,7 +313,7 @@ public final class Tokenizer implements IndexToken {
    * @return next token
    */
   public byte[] nextSC() {
-    return (lp < p) ? Arrays.copyOfRange(text, lp, p)
+    return lp < p ? Arrays.copyOfRange(text, lp, p)
         : Arrays.copyOfRange(text, p, s);
   }
 

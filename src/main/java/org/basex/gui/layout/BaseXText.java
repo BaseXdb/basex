@@ -423,7 +423,7 @@ public class BaseXText extends BaseXPanel {
     }
 
     final byte[] txt = text.text;
-    if(marking) {
+    if(marking && !pressed(DELNEXT, e) && !pressed(DELPREV, e)) {
       // refresh scroll position
       text.endMark();
       text.checkMark();

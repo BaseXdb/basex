@@ -300,7 +300,7 @@ public final class Token {
    */
   private static int cl2(final byte v) {
     final int i = v & 0xFF;
-    return (i == 0xC0 || i == 0xC1 || i > 0xF4) ? -1 : CHLEN2[i >> 4];
+    return i == 0xC0 || i == 0xC1 || i > 0xF4 ? -1 : CHLEN2[i >> 4];
   }
 
   /*** Character lengths. */
@@ -1149,7 +1149,7 @@ public final class Token {
     for(int n = 0; n < norm.length; n++) norm[n] = (char) n;
     for(int n = 0; n < NC.length; n++) norm[NC[n][0]] = NC[n][1];
   }
-  
+
   /** Normed characters. */
   private static char[] norm;
 

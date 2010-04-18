@@ -21,7 +21,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class Values implements Index {
   /** Number of hash entries. */
-  private int size;
+  private final int size;
   /** ID references. */
   private final DataAccess idxr;
   /** ID lists. */

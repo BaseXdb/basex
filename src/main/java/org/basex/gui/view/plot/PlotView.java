@@ -92,9 +92,9 @@ public final class PlotView extends View {
   /** Current plot width. */
   private int plotWidth;
   /** Logarithmic display. */
-  private BaseXCheckBox xLog;
+  private final BaseXCheckBox xLog;
   /** Logarithmic display. */
-  private BaseXCheckBox yLog;
+  private final BaseXCheckBox yLog;
 
   /** Flag for mouse dragging actions. */
   private boolean dragging;

@@ -146,7 +146,7 @@ public final class BaseXKeys {
    */
   public static boolean ignoreTyped(final KeyEvent e) {
     // Mac offers special characters via ALT, Windows/Linux don't..
-    return (!MAC && e.isAltDown()) || (SC & e.getModifiers()) == SC;
+    return !MAC && e.isAltDown() || (SC & e.getModifiers()) == SC;
   }
 
   /**

@@ -198,7 +198,7 @@ public final class XQueryView extends View {
   }
 
   /**
-   * Sets a new XQuery.
+   * Sets a new query file.
    * @param file query file
    */
   public void setQuery(final IO file) {
