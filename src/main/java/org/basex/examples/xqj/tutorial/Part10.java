@@ -79,7 +79,7 @@ public final class Part10 extends Main {
 
 
     /* Passing XQuery results to XSLT
-     * [CG] to be checked
+     * [CG] XQJ: to be checked
     info("Passing XQuery results to XSLT");
 
     // Create an XQuery expression

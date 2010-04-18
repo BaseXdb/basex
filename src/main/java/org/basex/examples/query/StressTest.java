@@ -14,12 +14,6 @@ import org.basex.util.Performance;
  * This class performs a client/server stress tests with a specified
  * number of threads and queries.
  *
- * Note that local concurrent queries are not ACID safe, i.e. you have to
- * make sure that the database is not modified while other queries are running.
- * To perform parallel safe reading and writing, you can as well use the
- * client/server architecture, as e.g. shown in a second
- * {@link org.basex.examples.server.StressTest} example.
- *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */

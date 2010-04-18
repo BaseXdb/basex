@@ -4,10 +4,10 @@ import org.basex.BaseXServer;
 import org.jaxrx.StartJetty;
 
 /**
- * This class demonstrates how the database server and the Jetty server is
- * launched. The Jetty server listens for HTTP requests, which are sent to the
- * JAX-RX implementation.
- *
+ * This class demonstrates how the REST interface JaxRx can be used. A database
+ * server and the Jetty server is launched. The Jetty server listens for HTTP
+ * requests, which are sent to the JAX-RX implementation.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -17,7 +17,7 @@ public final class StartJaxRx {
 
   /**
    * This main method starts the JAXRX implementation.
-   * @param args (ignored) command-line parameters.
+   * @param args (ignored) command-line parameters
    */
   public static void main(final String[] args) {
     // Start database server (if not done yet).

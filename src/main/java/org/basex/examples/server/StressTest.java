@@ -20,8 +20,6 @@ public final class StressTest {
   /** Number of runs per client. */
   static final int NQUERIES = 30;
 
-  /** Main session. */
-  static ClientSession client;
   /** Random number generator. */
   static Random rnd = new Random();
   /** Result counter. */
@@ -47,10 +45,11 @@ public final class StressTest {
     // create test database
     System.out.println("\n* Create test database.");
 
-    client = newSession();
-    client.execute("set info on");
-    client.execute("create db etc/xml/factbook.xml");
-    System.out.print(client.info());
+    final ClientSession cs = newSession();
+    cs.execute("set info on");
+    cs.execute("create db etc/xml/factbook.xml");
+    System.out.print(cs.info());
+    cs.close();
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
@@ -67,8 +66,10 @@ public final class StressTest {
     // drop database and stop server
     System.out.println("\n* Stop server and drop test database.");
 
-    client.execute("drop db factbook");
-    client.close();
+    final ClientSession cs = newSession();
+    cs.execute("drop db factbook");
+    System.out.print(cs.info());
+    cs.close();
     new BaseXServer("stop");
   }
 

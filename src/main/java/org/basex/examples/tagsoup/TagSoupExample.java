@@ -20,7 +20,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
 /**
- * Test class for the use of the TagSoup HTML parser with BaseX.
+ * Test class for the use of the TagSoup HTML parser.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Leo Woerteler
@@ -45,9 +45,9 @@ public final class TagSoupExample {
     // Query to be evaluated
     String query = "(//div[@class eq 'spTopThema']/h3)[1]//text()";
 
-    useBaseXString(url, "Spiegel", query);
+    useString(url, "Spiegel", query);
     System.out.println();
-    useBaseXSax(url, query);
+    useSAX(url, query);
     System.out.println();
   }
 
@@ -57,9 +57,9 @@ public final class TagSoupExample {
    * @param addr URL of the web page
    * @param name name of the database
    * @param query query to be evaluated
-   * @throws Exception toy example...
+   * @throws Exception exception
    */
-  public static void useBaseXString(final String addr, final String name,
+  public static void useString(final String addr, final String name,
       final String query) throws Exception {
 
     XMLReader parser = getParser();
@@ -74,13 +74,13 @@ public final class TagSoupExample {
   }
 
   /**
-   * Creates a memory-based BaseX DB using the SAX events from TagSoup. This is
+   * Creates a main-memory database using the SAX events from TagSoup. This is
    * the direct approach.
    * @param addr address of the web page
    * @param query query to be evaluated
    * @throws Exception exception
    */
-  public static void useBaseXSax(final String addr, final String query)
+  public static void useSAX(final String addr, final String query)
       throws Exception {
 
     // create database instance
@@ -99,9 +99,9 @@ public final class TagSoupExample {
   }
 
   /**
-   * Creates a new TagSoup parser that isn't namespace-aware.
+   * Creates a new parser instance that isn't namespace-aware.
    * @return the parser
-   * @throws Exception toy example...
+   * @throws Exception exception
    */
   private static XMLReader getParser() throws Exception {
     XMLReader parser = new Parser();
@@ -111,11 +111,11 @@ public final class TagSoupExample {
 
   /**
    * Creates a new InputSource for the address, using the given encoding or
-   * guessing it, if it is <tt>null</tt>.
+   * guessing it, if it is {@code null}.
    * @param addr URL of the web page
    * @param encoding encoding of the web page, or null
-   * @return the new InputSource for <tt>addr</tt>
-   * @throws IOException toy example...
+   * @return the new InputSource for {@code addr}
+   * @throws IOException I/O exception
    */
   private static InputSource getInputSource(final String addr,
       final String encoding) throws IOException {
