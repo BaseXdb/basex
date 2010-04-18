@@ -44,6 +44,7 @@ final class Semaphore {
           activeR++;
           return;
         }
+      }
         Lock l = null;
         if(waiting.size() > 0 && !waiting.getLast().writer) {
           l = waiting.getLast();
@@ -52,6 +53,7 @@ final class Semaphore {
           l = new Lock(false);
           waiting.add(l);
         }
+        synchronized(l) {
         try {
           l.wait();
         } catch(final InterruptedException ex) {

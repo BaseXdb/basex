@@ -1,6 +1,8 @@
 package org.basex.test.cs;
 
 import java.io.IOException;
+import java.util.Random;
+
 import org.basex.server.ClientSession;
 
 /**
@@ -15,6 +17,9 @@ import org.basex.server.ClientSession;
  */
 public class SemaphoreTest {
 
+  /** Create random number. */
+  static Random rand = new Random();
+  
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
@@ -29,35 +34,12 @@ public class SemaphoreTest {
   void run() {
     System.out.println("=== Semaphore Test ===");
 
-    /*final String [] queries1 = {"xquery for $n in doc('factbook')//city "+
-        "return insert node <test/> into $n",
-        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
-        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
-        "xquery for $n in doc('factbook')//city " +
-        "return insert node <test/> into $n"
-    };
-    final String [] queries2 = {"xquery for $n in doc('factbook')//city " +
-        "return insert node <test/> into $n",
-        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
-        "xquery for $n in doc('factbook')//city " +
-        "return insert node <test/> into $n",
-        "xquery for $n in 1 to 1000000 where $n = 999999 return $n"
-    };*/
-    final String [] queries3 = {
-        "xquery for $n in doc('factbook')//city " +
-        "return insert node <test/> into $n",
-        "xquery for $n in doc('factbook')//city " +
-        "return insert node <test/> into $n",
-        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
-        "xquery for $n in 1 to 1000000 where $n = 999999 return $n",
-        "xquery for $n in doc('factbook')//city " +
+    final String [] queries = {"xquery for $n in doc('factbook')//city "+
         "return insert node <test/> into $n",
         "xquery for $n in 1 to 1000000 where $n = 999999 return $n"
     };
 
-    //runClients(queries1);
-    //runClients(queries2);
-    runClients(queries3);
+    runClients(queries);
   }
 
   /**
@@ -65,7 +47,7 @@ public class SemaphoreTest {
    * @param q array of queries
    */
   private void runClients(final String[] q) {
-    for (int n = 1; n <= 6; n++) {
+    for (int n = 1; n <= 10; n++) {
       final int j = n;
       try {
         Thread.sleep(2000);
@@ -78,8 +60,9 @@ public class SemaphoreTest {
           try {
             ClientSession session =
               new ClientSession("localhost", 1984, "admin", "admin");
-            session.execute(q[j - 1]);
-            System.out.println("=== Client Done: " + j + " ===");
+            int t = rand.nextInt(2);
+            session.execute(q[t]);
+            System.out.println("=== Client " + j + " with query " + t + " done ===");
           } catch(IOException e) {
             e.printStackTrace();
           }
