@@ -1,7 +1,6 @@
 package org.basex.gui.view.xquery;
 
 import static org.basex.gui.layout.BaseXKeys.*;
-
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,7 +58,7 @@ final class XQueryText extends BaseXText {
   public void keyReleased(final KeyEvent e) {
     super.keyReleased(e);
     if(e.isActionKey() || modifier(e)) return;
-    
+
     final byte[] qu = getText();
     final boolean module = isModule(qu);
     final boolean mod = !Token.eq(qu, last);

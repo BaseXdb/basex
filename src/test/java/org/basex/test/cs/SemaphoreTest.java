@@ -2,7 +2,6 @@ package org.basex.test.cs;
 
 import java.io.IOException;
 import java.util.Random;
-
 import org.basex.server.ClientSession;
 
 /**
@@ -15,11 +14,10 @@ import org.basex.server.ClientSession;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
-public class SemaphoreTest {
-
+public final class SemaphoreTest {
   /** Create random number. */
   static Random rand = new Random();
-  
+
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
@@ -60,7 +58,7 @@ public class SemaphoreTest {
           try {
             final ClientSession session =
               new ClientSession("localhost", 1984, "admin", "admin");
-            int t = rand.nextInt(2);
+            final int t = rand.nextInt(2);
             session.execute(q[t]);
             System.out.println("=== Client " + j + " with query " + t +
                 " done ===");
