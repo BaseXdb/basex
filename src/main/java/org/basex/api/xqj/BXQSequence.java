@@ -45,7 +45,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
   /** Next flag. */
   private boolean next;
   /** Forward flag. */
-  private boolean scrollable;
+  private final boolean scrollable;
 
   /**
    * Constructor.

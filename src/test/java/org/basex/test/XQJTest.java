@@ -474,7 +474,7 @@ public final class XQJTest extends TestCase {
     XQExpression xqe = conn.createExpression();
     XQSequence xqs = xqe.executeQuery("basex:db('input')");
     xqs.first();
-    XQItem xqi = xqs.getItem();
+    final XQItem xqi = xqs.getItem();
 
     xqe = conn.createExpression();
     xqe.bindItem(new QName("v"), xqi);

@@ -201,7 +201,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     /** Serializer. */
     private final XMLSerializer xml;
     /** XMLResource. */
-    private BXXMLResource res;
+    private final BXXMLResource res;
 
     /**
      * Standard Constructor.

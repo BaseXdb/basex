@@ -27,7 +27,7 @@ final class XMLStreamWrapper extends Parser {
   /** Element counter. */
   private int nodes;
   /** XML stream reader. */
-  private XMLStreamReader reader;
+  private final XMLStreamReader reader;
 
   /**
    * Constructor.
