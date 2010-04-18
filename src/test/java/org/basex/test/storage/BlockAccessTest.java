@@ -44,8 +44,6 @@ public final class BlockAccessTest {
   /** Nodes per block. */
   private int nodes;
 
-  // [CG] needs to be checked (tests throw errors just sometimes)
-
   /**
    * Initializes the test class.
    */
@@ -227,6 +225,7 @@ public final class BlockAccessTest {
 
   /**
    * Deletes the second block with some surrounding nodes.
+   * [CG] DATA: causes exception if meta data is not correctly closed
   @Test
   public void testDeleteSecondBlockAndSurroundingNodes() {
     tba.delete(nodes - 1, nodes + 2);

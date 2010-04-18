@@ -46,7 +46,7 @@ public class BaseXText extends BaseXPanel {
   protected final BaseXTextRenderer rend;
   /** Search field. */
   protected BaseXTextField find;
-  /** Undo history; if set to <code>null</code>, text is read-only. */
+  /** Undo history; if set to {@code null}, text is read-only. */
   protected Undo undo;
 
   /** Scrollbar reference. */

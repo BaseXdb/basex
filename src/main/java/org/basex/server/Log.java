@@ -60,7 +60,7 @@ public final class Log {
    * Writes into the log file.
    * @param str strings to be written
    */
-  public void write(final Object... str) {
+  public synchronized void write(final Object... str) {
     if(quiet) return;
 
     final Date now = new Date();
@@ -84,7 +84,7 @@ public final class Log {
    * Creates a log file.
    * @param d Date
    */
-  private void create(final Date d) {
+  private synchronized void create(final Date d) {
     new File(dir).mkdirs();
     final String file = dir + DATE.format(d) + ".log";
     start = d;
@@ -99,7 +99,7 @@ public final class Log {
   /**
    * Closes the log file.
    */
-  void close() {
+  synchronized void close() {
     try {
       fw.close();
     } catch(final IOException ex) {

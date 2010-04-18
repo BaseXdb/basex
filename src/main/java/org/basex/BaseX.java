@@ -35,7 +35,7 @@ public class BaseX extends Main {
 
   /**
    * Main method, launching the standalone console mode.
-   * Use <code>-h</code> to get a list of optional command-line arguments.
+   * Use {@code -h} to get a list of optional command-line arguments.
    * @param args command-line arguments
    */
   public static void main(final String... args) {

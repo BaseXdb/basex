@@ -96,11 +96,10 @@ public class GUIMacOSX {
 
   /**
    * Sets a value for the badge in the dock.
-   * @param value string value.
-   * @throws Exception if any error occurs.
+   * @param value string value
+   * @throws Exception if any error occurs
    */
   public void setBadge(final String value) throws Exception {
-    // [BL] set name of currently opened database as icon badge
     invoke("setDockIconBadge", String.class, value);
   }
 
@@ -184,8 +183,8 @@ public class GUIMacOSX {
 
   /**
    * Invokes a method without arguments on the application object.
-   * @param method name of the method to invoke.
-   * @return return value of the method.
+   * @param method name of the method to invoke
+   * @return return value of the method
    * @throws Exception if any error occurs.
    */
   private Object invoke(final String method) throws Exception {
@@ -195,9 +194,9 @@ public class GUIMacOSX {
   /**
    * Invokes a method on the application object that expects a single boolean
    * value as argument.
-   * @param method name of the method to invoke.
-   * @param arg boolean value that is passed as argument.
-   * @return return value of the method.
+   * @param method name of the method to invoke
+   * @param arg boolean value that is passed as argument
+   * @return return value of the method
    * @throws Exception if any error occurs.
    */
   private Object invoke(final String method, final boolean arg)
@@ -208,10 +207,10 @@ public class GUIMacOSX {
   /**
    * Invokes a method on the application object that expects a single object as
    * argument.
-   * @param method name of the method to invoke.
-   * @param argClass "type" of the argument.
-   * @param argObject argument value.
-   * @return return value of the method.
+   * @param method name of the method to invoke
+   * @param argClass "type" of the argument
+   * @param argObject argument value
+   * @return return value of the method
    * @throws Exception if any error occurs.
    */
   private Object invoke(final String method, final Class<?> argClass,
@@ -221,9 +220,9 @@ public class GUIMacOSX {
 
   /**
    * Invokes a method without arguments on the given object.
-   * @param obj object on which the method should be invoked.
-   * @param method name of the method to invoke.
-   * @return return value of the method.
+   * @param obj object on which the method should be invoked
+   * @param method name of the method to invoke
+   * @return return value of the method
    * @throws Exception if any error occurs.
    */
   static Object invoke(final Object obj, final String method)
@@ -234,10 +233,10 @@ public class GUIMacOSX {
   /**
    * Invokes a method on the given object that expects a single boolean value as
    * argument.
-   * @param obj object on which the method should be invoked.
-   * @param method name of the method to invoke.
-   * @param arg boolean value that is passed as argument.
-   * @return return value of the method.
+   * @param obj object on which the method should be invoked
+   * @param method name of the method to invoke
+   * @param arg boolean value that is passed as argument
+   * @return return value of the method
    * @throws Exception if any error occurs.
    */
   static Object invoke(final Object obj, final String method, final boolean arg)
@@ -247,12 +246,12 @@ public class GUIMacOSX {
 
   /**
    * Invokes a method on the given object that expects a single argument.
-   * @param obj object on which the method should be invoked.
-   * @param method name of the method to invoke.
-   * @param argClass "type" of the argument.
-   * @param argObject argument value.
-   * @return return value of the method.
-   * @throws Exception if any error occurs.
+   * @param obj object on which the method should be invoked
+   * @param method name of the method to invoke
+   * @param argClass "type" of the argument
+   * @param argObject argument value
+   * @return return value of the method
+   * @throws Exception if any error occurs
    */
   static Object invoke(final Object obj,
       final String method, final Class<?> argClass, final Object argObject)
@@ -264,14 +263,14 @@ public class GUIMacOSX {
 
   /**
    * Invokes a method on the given object that expects multiple arguments.
-   * @param clazz class object to get the method from.
+   * @param clazz class object to get the method from
    * @param obj object on which the method should be invoked. Can be
-   *          <code>null</code> for static methods.
-   * @param method name of the method to invoke.
-   * @param argClasses "types" of the arguments.
-   * @param argObjects argument values.
-   * @return return value of the method.
-   * @throws Exception if any error occurs.
+   *          {@code null} for static methods
+   * @param method name of the method to invoke
+   * @param argClasses "types" of the arguments
+   * @param argObjects argument values
+   * @return return value of the method
+   * @throws Exception if any error occurs
    */
   private static Object invoke(final Class<?> clazz, final Object obj,
       final String method, final Class<?>[] argClasses,

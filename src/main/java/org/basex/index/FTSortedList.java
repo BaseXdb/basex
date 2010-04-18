@@ -19,9 +19,6 @@ final class FTSortedList {
   private final DataAccess b;
   /** Current FTData size. */
   private int size;
-  /** Pointer on full-text data. */
-  // [CG] not needed?
-  long p;
 
   /**
    * Constructor, initializing the index structure.
@@ -54,16 +51,15 @@ final class FTSortedList {
   }
 
   /**
-   * Returns next Token.
+   * Returns next token.
    * @return byte[] token
    */
   byte[] nextTok() {
     final byte tl = a.read1();
-    if (tl == 0) return EMPTY;
+    if(tl == 0) return EMPTY;
     final long pos = a.pos();
     final byte[] tok = a.readBytes(pos, pos + tl);
     size = a.read4();
-    p = a.read5();
     return tok;
   }
 

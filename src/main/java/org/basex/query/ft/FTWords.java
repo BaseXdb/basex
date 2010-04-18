@@ -216,7 +216,7 @@ public final class FTWords extends FTExpr {
    * @return fast fast evaluation
    */
   boolean add(final int s, final int e) {
-    // [CG] FT: check if this is needed and correct
+    // [CG] XQFT: check if this is needed and correct
     if(!first && (mode == FTMode.M_ALL || mode == FTMode.M_ALLWORDS))
       all.and(s, e);
     else all.or(s, e);

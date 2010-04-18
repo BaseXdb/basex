@@ -152,7 +152,7 @@ public final class IOFile extends IO {
 
   @Override
   public IO merge(final String f) {
-    return new IOFile(new File(dir(), f));
+    return f.contains(":") ? IO.get(f) : new IOFile(new File(dir(), f));
   }
 
   @Override

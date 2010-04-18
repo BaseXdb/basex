@@ -24,7 +24,7 @@ import org.basex.io.IO;
  * (the implementation of the existing views might help you):
  *
  * <ul>
- *  <li> define a unique name for your view (e.g. <code>map</code>)</li>
+ *  <li> define a unique name for your view (e.g. {@code map})</li>
  *  <li> add a string for your view, as shown below</li>
  *  <li> add the string in the {@link #LAYOUT} string below</li>
  *  <li> create your view implementation in a new sub package
@@ -41,7 +41,7 @@ import org.basex.io.IO;
  *    {@link Text} class (e.g. {@link Text#GUISHOWMAP} an
  *    {@link Text#GUISHOWMAPTT}).
  *  <li> optionally add localized translations in the .lang files
- *    (e.g. <code>c_showmap</code> and <code>c_showmaptt</code>)
+ *    (e.g. {@code c_showmap} and {@code c_showmaptt})
  *  <li> add a corresponding command in the {@link GUICommands} class
  *   (e.g. {@link GUICommands#SHOWMAP})and add a reference in the
  *   {@link #MENUITEMS} menu structure</li>

@@ -129,6 +129,26 @@ public abstract class Nod extends Item {
   }
 
   /**
+   * Returns the namespace hierarchy.
+   * @return namespaces
+   */
+  public Atts nsScope() {
+    final Atts ns = new Atts();
+    Nod n = this;
+    do {
+      final Atts nns = n.ns();
+      if(nns != null) {
+        for(int a = nns.size - 1; a >= 0; a--) {
+          final byte[] key = nns.key[a];
+          if(!ns.contains(key)) ns.add(key, nns.val[a]);
+        }
+      }
+      n = n.parent();
+    } while(n != null && n.type == Type.ELM);
+    return ns;
+  }
+
+  /**
    * Returns the uri for the specified prefix.
    * @param pref prefix
    * @param ctx query context

@@ -42,7 +42,7 @@ public final class BaseXServer extends Main implements Runnable {
 
   /**
    * Main method, launching the server process. Command-line arguments can be
-   * listed with the <code>-h</code> argument.
+   * listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String... args) {

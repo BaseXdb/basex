@@ -124,9 +124,10 @@ public final class Namespaces {
   // Requesting Namespaces ====================================================
 
   /**
+   * [LK] might not be necessary if namespaces are correctly copied in advance
+   *
    * Determines the namespaces for a given node that have not been declared
    * before.
-   * [LK] to be checked
    * @param newNs new namespaces
   public void newNs(final Atts newNs) {
     NSNode par = root;
@@ -241,7 +242,6 @@ public final class Namespaces {
     final NSNode nd = root.find(par);
     final NSNode t = new NSNode(pre);
 
-    // [CG] Namespaces: check...
     final int k = addPref(p);
     final int v = addURI(u);
     if(nd.pre == pre) {

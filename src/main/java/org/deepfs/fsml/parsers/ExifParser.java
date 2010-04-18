@@ -242,7 +242,7 @@ public final class ExifParser {
     h8769(1, null, Format.LONG) {
       @Override
       void parse(final ExifParser o, final ByteBuffer buf) {
-        if(!check(o, buf));
+        check(o, buf);
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
@@ -373,7 +373,6 @@ public final class ExifParser {
     h920a(1, MetaElem.FOCAL_LENGTH, Format.RATIONAL),
     /** User comment. */
     h9286(MetaElem.COMMENT, Format.ASCII),
-    // [BL] parse subsecond data
     // /** Subsecond data - fractions of seconds for the original datetime. */
     // h9291(null, Format.ASCII),
     // /**

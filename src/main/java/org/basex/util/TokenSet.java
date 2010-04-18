@@ -21,7 +21,7 @@ public class TokenSet {
   protected int[] next;
   /** Hash table buckets. */
   protected int[] bucket;
-  /** Hash entries. Actual hash size is <code>size - 1</code>. */
+  /** Hash entries. Actual hash size is {@code size - 1}. */
   protected int size = 1;
 
   /**

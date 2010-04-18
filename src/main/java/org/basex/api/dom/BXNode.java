@@ -10,10 +10,7 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.w3c.dom.DOMException;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.UserDataHandler;
 
 /**
@@ -70,16 +67,16 @@ public abstract class BXNode implements Node {
     return null;
   }
 
-  public final Node cloneNode(final boolean deep) {
+  public final BXNode cloneNode(final boolean deep) {
     return node.copy().java();
   }
 
   public final short compareDocumentPosition(final Node other) {
-    final int d = node.diff((Nod) other);
+    final int d = node.diff(((BXNode) other).node);
     return (short) (d < 0 ? -1 : d > 0 ? 1 : 0);
   }
 
-  public NamedNodeMap getAttributes() {
+  public BXNNode getAttributes() {
     return null;
   }
 
@@ -87,11 +84,11 @@ public abstract class BXNode implements Node {
     return IO.get(string(node.base())).url();
   }
 
-  public NodeList getChildNodes() {
+  public BXNList getChildNodes() {
     return new BXNList(finish(node.child()));
   }
 
-  public Node getFirstChild() {
+  public BXNode getFirstChild() {
     try {
       return finish(node.child().next());
     } catch(final QueryException ex) {
@@ -100,7 +97,7 @@ public abstract class BXNode implements Node {
     }
   }
 
-  public final Node getLastChild() {
+  public final BXNode getLastChild() {
     Nod n = null;
     try {
       final NodeIter it = node.child();
@@ -116,7 +113,7 @@ public abstract class BXNode implements Node {
     return null;
   }
 
-  public Node getNextSibling() {
+  public BXNode getNextSibling() {
     try {
       return finish(node.follSibl().next());
     } catch(final QueryException ex) {
@@ -125,7 +122,7 @@ public abstract class BXNode implements Node {
     }
   }
 
-  public Node getPreviousSibling() {
+  public BXNode getPreviousSibling() {
     try {
       return finish(node.precSibl().next());
     } catch(final QueryException ex) {
@@ -134,7 +131,7 @@ public abstract class BXNode implements Node {
     }
   }
 
-  public Node getParentNode() {
+  public BXNode getParentNode() {
     return finish(node.parent());
   }
 
@@ -143,7 +140,7 @@ public abstract class BXNode implements Node {
    * @param n node instance
    * @return resulting node
    */
-  protected Node finish(final Nod n) {
+  protected BXNode finish(final Nod n) {
     return n != null ? n.java() : null;
   }
 
@@ -155,11 +152,11 @@ public abstract class BXNode implements Node {
     return this == other;
   }
 
-  public Document getOwnerDocument() {
+  public BXDoc getOwnerDocument() {
     Nod n = node;
     Nod p;
     while((p = n.parent()) != null) n = p;
-    return n.type == Type.DOC ? (Document) n.java() : null;
+    return n.type == Type.DOC ? (BXDoc) n.java() : null;
   }
 
   public final boolean hasAttributes() {
@@ -178,7 +175,7 @@ public abstract class BXNode implements Node {
     return string(node.str());
   }
 
-  public final Node appendChild(final Node newChild) {
+  public final BXNode appendChild(final Node newChild) {
     error();
     return null;
   }
@@ -191,7 +188,7 @@ public abstract class BXNode implements Node {
     return false;
   }
 
-  public final Node insertBefore(final Node newChild, final Node refChild) {
+  public final BXNode insertBefore(final Node newChild, final Node refChild) {
     error();
     return null;
   }
@@ -220,12 +217,12 @@ public abstract class BXNode implements Node {
     error();
   }
 
-  public final Node removeChild(final Node oldChild) {
+  public final BXNode removeChild(final Node oldChild) {
     error();
     return null;
   }
 
-  public final Node replaceChild(final Node newChild, final Node oldChild) {
+  public final BXNode replaceChild(final Node newChild, final Node oldChild) {
     error();
     return null;
   }
@@ -258,7 +255,7 @@ public abstract class BXNode implements Node {
    * @param tag tag name
    * @return nodes
    */
-  protected final NodeList getElements(final String tag) {
+  protected final BXNList getElements(final String tag) {
     final NodIter nb = new NodIter();
     final NodeIter iter = node.desc();
     final byte[] nm = tag.equals("*") ? null : token(tag);

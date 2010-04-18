@@ -161,7 +161,7 @@ public abstract class Data {
    * @param token index token reference
    * @return id array
    */
-  public final IndexIterator ids(final IndexToken token) {
+  public final synchronized IndexIterator ids(final IndexToken token) {
     switch(token.type()) {
       case TXT: return txtindex.ids(token);
       case ATV: return atvindex.ids(token);
@@ -175,7 +175,7 @@ public abstract class Data {
    * @param token text to be found
    * @return id array
    */
-  public final int nrIDs(final IndexToken token) {
+  public final synchronized int nrIDs(final IndexToken token) {
     // token too long.. no results can be expected
     if(token.get().length > MAXLEN) return Integer.MAX_VALUE;
     switch(token.type()) {
@@ -201,7 +201,7 @@ public abstract class Data {
    * @param type index type
    * @return info
    */
-  public final byte[] info(final IndexType type) {
+  public final synchronized byte[] info(final IndexType type) {
     switch(type) {
       case TAG: return tags.info();
       case ATN: return atts.info();
@@ -567,6 +567,7 @@ public abstract class Data {
           if(ne) {
             // [LK] don't add all namespaces for the first node (pre=1), there
             // will be duplicate namespace declarations
+            // CG: if there is an example, please add it to NamespaceTest class
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
           }

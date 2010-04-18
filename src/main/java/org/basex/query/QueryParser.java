@@ -159,7 +159,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the specified query.
-   * If <code>uri != null</code>, the query is treated as a module
+   * If {@code u != null}, the query is treated as a module
    * @param q input query
    * @param f optional input file
    * @param u module uri
@@ -178,7 +178,7 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses the specified query.
-   * If <code>uri != null</code>, the query is treated as a module
+   * If {@code u != null}, the query is treated as a module
    * [  1] Parses a Module.
    * @param u module uri
    * @param end if true, input must be completely evaluated
@@ -995,15 +995,13 @@ public class QueryParser extends InputParser {
   private Expr ftContains() throws QueryException {
     final Expr e = range();
 
-    //if(!consumeWS(FTCONTAINS)) {
-      final int p = qp;
-      if(!consumeWS(CONTAINS) || !consumeWS(TEXT)) {
-        qp = p;
-        return e;
-      }
-    //}
+    final int p = qp;
+    if(!consumeWS(CONTAINS) || !consumeWS(TEXT)) {
+      qp = p;
+      return e;
+    }
 
-    // [CG] XQuery/FTIgnoreOption
+    // [CG] XQFT: FTIgnoreOption
     final FTExpr select = ftSelection(false);
     //Expr ignore = null;
     if(consumeWS2(WITHOUT)) {

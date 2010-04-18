@@ -577,7 +577,7 @@ public final class FTTest extends QueryTest {
       super.test();
     }
   }
-  
+
   @Override
   protected String details() {
     final Prop prop = context.prop;

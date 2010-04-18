@@ -23,7 +23,7 @@ public final class Loader extends ClassLoader {
   private Loader() { /* */}
 
   /**
-   * Returns the {@link URL} for the package <code>pkg</code>.
+   * Returns the {@link URL} for the package {@code pkg}.
    * @param pkg the name of the package to get the URL for
    * @return the URL
    */
@@ -35,14 +35,14 @@ public final class Loader extends ClassLoader {
 
   /**
    * <p>
-   * Loads all subclasses of <code>superClass</code> from the package
-   * <code>pkg</code>. The classes may either be in a directory or inside a java
+   * Loads all subclasses of {@code superClass} from the package
+   * {@code pkg}. The classes may either be in a directory or inside a java
    * archive file. If one of the classes is already loaded, nothing is done (but
    * the class will be included in the results).
    * </p>
    * <p>
-   * <code>superClass</code> may be an abstract class, an interface or a regular
-   * class. Every class inside the package <code>pkg</code> that implements the
+   * {@code superClass} may be an abstract class, an interface or a regular
+   * class. Every class inside the package {@code pkg} that implements the
    * interface or extends the class is loaded.
    * </p>
    * <p>

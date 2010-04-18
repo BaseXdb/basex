@@ -87,7 +87,7 @@ public final class FTAnd extends FTExpr {
         // merge all matches
         final FTItem item = it[0];
         for(int i = 1; i < it.length; i++) {
-          // [CG] FT: item.all = FTMatches.not(it[i].all, 0);
+          // [CG] XQFT: item.all = FTMatches.not(it[i].all, 0);
           if(neg[i]) continue;
           and(ctx, item, it[i]);
           it[i] = ir[i].next();

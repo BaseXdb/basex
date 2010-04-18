@@ -1137,14 +1137,19 @@ public final class Token {
    * @return normalized character
    */
   public static int norm(final int ch) {
-    if(norm == null) {
-      norm = new char[1 << 16];
-      for(int n = 0; n < norm.length; n++) norm[n] = (char) n;
-      for(int n = 0; n < NC.length; n++) norm[NC[n][0]] = NC[n][1];
-    }
+    if(norm == null) initNorm();
     return ch < 0x80 ? ch : norm[ch];
   }
 
+  /**
+   * Initializes the array of normalized characters.
+   */
+  private static synchronized void initNorm() {
+    norm = new char[1 << 16];
+    for(int n = 0; n < norm.length; n++) norm[n] = (char) n;
+    for(int n = 0; n < NC.length; n++) norm[NC[n][0]] = NC[n][1];
+  }
+  
   /** Normed characters. */
   private static char[] norm;
 

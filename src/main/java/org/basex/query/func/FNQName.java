@@ -98,7 +98,6 @@ final class FNQName extends Fun {
     final byte[] pref = nm.pref();
     final byte[] uri = ((Nod) check(it, Type.ELM)).uri(pref, ctx);
     if(uri == null && pref.length != 0) Err.or(NSDECL, pref);
-    // [CG] XQuery/QName: check if uri can be null
     nm.uri = Uri.uri(uri);
     return nm;
   }

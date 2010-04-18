@@ -42,8 +42,8 @@ public final class BufferedFileChannel {
   private boolean locked;
   /**
    * Maximum number of bytes that can be read from the FileChannel. The value
-   * may be negative. In this case, the rightmost <code>-rem</code> bytes of the
-   * buffer <code>buf</code> must not be read.
+   * may be negative. In this case, the rightmost {@code -rem} bytes of the
+   * buffer {@code buf} must not be read.
    */
   private long rem;
 
@@ -128,13 +128,13 @@ public final class BufferedFileChannel {
    * <p>
    * The content of the new channel will start at this channel's current
    * position and it's size depends on the given parameter
-   * <code>bytesToRead</code>.
+   * {@code bytesToRead}.
    * </p>
    * <p>
    * <b> The original channel must not be used before {@link #finish()} has been
    * called on the {@link BufferedFileChannel} created by this method.</b> After
    * finishing the subChannel, the original channel's position is incremented by
-   * <code>bytesToRead</code>.
+   * {@code bytesToRead}.
    *</p>
    * @param subfilename the name of the subfile
    * @param bytesToRead the maximum number of bytes to read
@@ -159,7 +159,7 @@ public final class BufferedFileChannel {
   }
 
   /**
-   * Skips <code>n</code> bytes in the ByteBuffer.
+   * Skips {@code n} bytes in the ByteBuffer.
    * @param n number of bytes to skip. May be negative
    * @throws IOException if any error occurs while reading the file
    */
@@ -271,10 +271,10 @@ public final class BufferedFileChannel {
   }
 
   /**
-   * Reads <code>dst.length</code> bytes from the {@link BufferedFileChannel}.
+   * Reads {@code dst.length} bytes from the {@link BufferedFileChannel}.
    * @param dst the arrray to write the data to
    * @return the filled byte array
-   * @throws IOException if there are less than <code>dst.length</code> bytes
+   * @throws IOException if there are less than {@code dst.length} bytes
    *           available or any error occurs while reading from the channel
    */
   public byte[] get(final byte[] dst) throws IOException {
@@ -298,7 +298,7 @@ public final class BufferedFileChannel {
 
   /**
    * <p>
-   * Reads <code>length</code> bytes from the {@link BufferedFileChannel}.
+   * Reads {@code length} bytes from the {@link BufferedFileChannel}.
    * </p>
    * <p>
    * <b> Assure that that the buffer is large enough and that enough bytes are
@@ -414,12 +414,12 @@ public final class BufferedFileChannel {
 
   /**
    * <p>
-   * Buffers <code>n</code> bytes, if the underlying buffer is large enough.
+   * Buffers {@code n} bytes, if the underlying buffer is large enough.
    * Does nothing, if the buffer is too small.
    * </p>
    * @param n the number of bytes to buffer
    * @return <b>true</b> if the buffer is large enough to contain all
-   *         <code>n</code> bytes, <b>false</b> if it is too small
+   *         {@code n} bytes, <b>false</b> if it is too small
    * @throws IOException if any error occurs while reading the file
    */
   public boolean buffer(final int n) throws IOException {

@@ -554,7 +554,7 @@ public final class DeepFS implements DataText {
   /**
    * Checks if all parent nodes of this node are valid.
    * @param pre pre value
-   * @return true if all parent nodes are valid fsml nodes.
+   * @return true if all parent nodes are valid fsml nodes
    */
   private boolean hasValidParents(final int pre) {
     int par = data.parent(pre, data.kind(pre));

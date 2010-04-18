@@ -59,7 +59,7 @@ public final class ParserUtil {
   /**
    * Converts a duration value in milliseconds to an {@link Duration} instance.
    * @param milliseconds the number of milliseconds to convert
-   * @return the {@link Duration} instance or <code>null</code> if the
+   * @return the {@link Duration} instance or {@code null} if the
    *         conversion fails
    */
   public static Duration convertMsDuration(final int milliseconds) {
@@ -67,10 +67,10 @@ public final class ParserUtil {
   }
 
   /**
-   * Checks if the value is of the form <code>mm:ss</code> or if it is a
+   * Checks if the value is of the form {@code mm:ss} or if it is a
    * milliseconds value and returns a {@link Duration} instance.
    * @param value the byte array to convert
-   * @return the {@link Duration} instance or <code>null</code> if the
+   * @return the {@link Duration} instance or {@code null} if the
    *         conversion fails
    */
   public static Duration convertDuration(final byte[] value) {
@@ -79,10 +79,10 @@ public final class ParserUtil {
   }
 
   /**
-   * Converts a duration value of the form <code>mm:ss</code> to an
+   * Converts a duration value of the form {@code mm:ss} to an
    * {@link Duration} instance.
    * @param minSec the byte array containing the duration value
-   * @return the {@link Duration} instance or <code>null</code> if the
+   * @return the {@link Duration} instance or {@code null} if the
    *         conversion fails
    */
   private static Duration convertMinSecDuration(final byte[] minSec) {

@@ -107,8 +107,7 @@ public final class FSMLSerializer {
    * Starts an xml element.
    * @param e the name of the element
    * @param atts the xml attributes
-   * @param close flag if the attribute should be closed (
-   *          <code>&lt;element/&gt;</code>)
+   * @param close flag if the attribute should be closed {@code <element/>})
    */
   private void startElem(final String e, final String[][] atts,
       final boolean close) {

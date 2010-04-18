@@ -113,40 +113,39 @@ final class FTTrieBuilder extends FTBuilder {
     final IntList root = new IntList();
 
     final byte[][] tok = new byte[csize][];
-    final int[][] pres = new int[csize][];
+    final int[][] prs = new int[csize][];
     final int[][] pos = new int[csize][];
 
-    // open all temp sorted lists
+    // open all temporary sorted lists
     final FTSortedList[] v = new FTSortedList[csize];
     for(int b = 0; b < csize; b++) {
       v[b] = new FTSortedList(data, b);
       tok[b] = v[b].nextTok();
-      pres[b] = v[b].nextPreValues();
+      prs[b] = v[b].nextPreValues();
       pos[b] = v[b].nextPosValues();
     }
 
     int min;
-    final IntList mert = new IntList();
-
+    final IntList mer = new IntList();
     while(check(tok)) {
       min = 0;
-      mert.reset();
-      mert.add(min);
+      mer.reset();
+      mer.add(min);
       // find next token to write on disk
       for(int i = 0; i < csize; i++) {
         if(min == i || tok[i].length == 0) continue;
         final int d = diff(tok[min], tok[i]);
         if(d > 0 || tok[min].length == 0) {
           min = i;
-          mert.reset();
-          mert.add(min);
+          mer.reset();
+          mer.add(min);
         } else if(d == 0 && tok[i].length > 0) {
-          mert.add(i);
+          mer.add(i);
         }
       }
 
       // collect each child of the root node
-      if (root.size() == 0 || root.get(root.size() - 1) != tok[min][0])
+      if(root.size() == 0 || root.get(root.size() - 1) != tok[min][0])
         root.add(tok[min][0]);
       // write token length to disk
       outt.write(tok[min].length);
@@ -159,13 +158,13 @@ final class FTTrieBuilder extends FTBuilder {
       tbp.add(new byte[4]);
       tbo.add(new byte[4]);
       // merge full text data of all sorted lists with the same token
-      for(int j = 0; j < mert.size(); j++) {
-        final int m = mert.get(j);
-        for(final int p : pres[m]) tbp.add(Num.num(p));
+      for(int j = 0; j < mer.size(); j++) {
+        final int m = mer.get(j);
+        for(final int p : prs[m]) tbp.add(Num.num(p));
         for(final int p : pos[m]) tbo.add(Num.num(p));
         s += v[m].nextFTDataSize();
         tok[m] = nextToken(v, m);
-        pres[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[0];
+        prs[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[0];
         pos[m] = tok[m].length > 0 ? v[m].nextPosValues() : new int[0];
       }
 
@@ -175,12 +174,12 @@ final class FTTrieBuilder extends FTBuilder {
       outt.write5(outb.size());
 
       // write compressed pre and pos arrays
-      final byte[] p = tbp.finish();
-      Num.size(p, p.length);
-      final byte[] op = tbo.finish();
-      Num.size(op, op.length);
+      final byte[] pr = tbp.finish();
+      Num.size(pr, pr.length);
+      final byte[] po = tbo.finish();
+      Num.size(po, po.length);
       // write full text data
-      writeFTData(outb, p, op);
+      writeFTData(outb, pr, po);
     }
     outt.write(0);
     outt.close();
@@ -375,7 +374,7 @@ final class FTTrieBuilder extends FTBuilder {
       outS.writeInt(siz);
       siz += 2L + (next.get(0).length - 3) * 5L + 9L;
       // all other nodes
-      siz = writeSubTree(null, outN, outS, 0, siz);
+      writeSubTree(null, outN, outS, 0, siz);
       outN.close();
       outS.close();
     }

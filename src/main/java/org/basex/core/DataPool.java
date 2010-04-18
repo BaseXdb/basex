@@ -28,7 +28,7 @@ public final class DataPool {
    * @param db name of the database
    * @return data reference
    */
-  synchronized Data pin(final String db) {
+  Data pin(final String db) {
     for(int i = 0; i < size; i++) {
       if(data[i].meta.name.equals(db)) {
         pins[i]++;
@@ -43,7 +43,7 @@ public final class DataPool {
    * @param d data reference
    * @return true if reference was removed from the pool
    */
-  synchronized boolean unpin(final Data d) {
+  boolean unpin(final Data d) {
     // ignore main memory database instances
     if(d instanceof MemData) return false;
 
@@ -75,7 +75,7 @@ public final class DataPool {
    * Adds a data reference to the pool.
    * @param d data reference
    */
-  synchronized void add(final Data d) {
+  void add(final Data d) {
     // ignore main memory database instances
     if(d instanceof MemData) return;
 
@@ -105,7 +105,7 @@ public final class DataPool {
   /**
    * Closes all data references.
    */
-  synchronized void close() {
+  void close() {
     try {
       for(int i = 0; i < size; i++) data[i].close();
     } catch(final IOException ex) {

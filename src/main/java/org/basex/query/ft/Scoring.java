@@ -68,9 +68,9 @@ public final class Scoring {
    * Returns a tf-idf for the specified values.
    * Used definition: freq(i, j) / max(l, freq(l, j)) * log(1 + N / n(i)).
    * The result is multiplied with the {@link #MP} constant to yield
-   * integer values. The value <code>2</code> is used as minimum score,
+   * integer values. The value {@code 2} is used as minimum score,
    * as the total minimum value will be subtracted by 1 to avoid eventual
-   * <code>0</code> scores.
+   * {@code 0} scores.
    *
    * @param freq frequency of the token. TF: freq(i, j)
    * @param mfreq maximum occurrence of a token. TF: max(l, freq(l, j))

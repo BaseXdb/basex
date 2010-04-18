@@ -89,6 +89,7 @@ public final class DialogExport extends Dialog {
       sp = new SerializerProp(prop.get(Prop.EXPORTER));
     } catch(final IOException ex) {
       // ignore invalid serialization parameters
+      sp = new SerializerProp();
     }
 
     if(encodings == null) {

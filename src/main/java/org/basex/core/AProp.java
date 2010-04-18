@@ -28,7 +28,7 @@ public abstract class AProp {
    * Constructor.
    * Reads the configuration file and initializes the project properties. The
    * file is located in the user's home directory.
-   * If the <code>prop</code> argument is set to null, reading is omitted.
+   * If the {@code prop} argument is set to null, reading is omitted.
    * @param prop property file extension
    */
   public AProp(final String prop) {

@@ -129,7 +129,7 @@ public final class EMLParser implements IFileParser {
      * @param obj the {@link EMLParser} to fire events from
      * @return flag if a new line has to be read afterwards. If true, a new line
      *         must be read, if false, a new line is already stored to
-     *         <code>mCurrLine</code>
+     *         {@code mCurrLine}
      * @throws IOException if any error occurs while reading from the file
      */
     abstract boolean parse(final EMLParser obj) throws IOException;
@@ -411,7 +411,6 @@ public final class EMLParser implements IFileParser {
         if(mime != null) {
           for(final FileType mt : mime.getMetaTypes()) {
             contentMeta.setFileType(mt);
-            // [BL] handle mail attachments that are not plaintext
             if(mt == FileType.TEXT) plaintext = true;
           }
           contentMeta.setFileFormat(mime);
@@ -428,7 +427,6 @@ public final class EMLParser implements IFileParser {
    * @throws IOException if any I/O error occurs
    */
   void multipartRelated() throws IOException {
-    // [BL] test multipart mails
     readLine();
     getBoundary();
     readLine();

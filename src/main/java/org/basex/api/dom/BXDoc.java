@@ -12,19 +12,12 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
-import org.w3c.dom.Attr;
-import org.w3c.dom.CDATASection;
-import org.w3c.dom.Comment;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.DocumentType;
-import org.w3c.dom.Element;
 import org.w3c.dom.EntityReference;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Text;
 
 /**
  * DOM - Document implementation.
@@ -42,43 +35,43 @@ public final class BXDoc extends BXNode implements Document {
   }
 
   @Override
-  public Document getOwnerDocument() {
+  public BXDoc getOwnerDocument() {
     return null;
   }
 
-  public Node adoptNode(final Node source) {
+  public BXNode adoptNode(final Node source) {
     error();
     return null;
   }
 
-  public Attr createAttribute(final String nm) {
+  public BXAttr createAttribute(final String nm) {
     final QNm name = new QNm(token(nm));
     return new BXAttr(new FAttr(name, EMPTY, null));
   }
 
-  public Attr createAttributeNS(final String uri, final String qn) {
+  public BXAttr createAttributeNS(final String uri, final String qn) {
     final QNm name = new QNm(token(qn), Uri.uri(token(uri)));
     return new BXAttr(new FAttr(name, EMPTY, null));
   }
 
-  public CDATASection createCDATASection(final String dat) {
+  public BXCData createCDATASection(final String dat) {
     return new BXCData(new FTxt(token(dat), null));
   }
 
-  public Comment createComment(final String dat) {
+  public BXComm createComment(final String dat) {
     return new BXComm(new FComm(token(dat), null));
   }
 
-  public DocumentFragment createDocumentFragment() {
+  public BXDocFrag createDocumentFragment() {
     return new BXDocFrag(new FDoc(new NodIter(), node.base()));
   }
 
-  public Element createElement(final String nm) {
+  public BXElem createElement(final String nm) {
     final QNm name = new QNm(token(nm));
     return new BXElem(new FElem(name, node.base(), null));
   }
 
-  public Element createElementNS(final String uri, final String qn) {
+  public BXElem createElementNS(final String uri, final String qn) {
     final QNm name = new QNm(token(qn), Uri.uri(token(uri)));
     return new BXElem(new FElem(name, node.base(), null));
   }
@@ -92,7 +85,7 @@ public final class BXDoc extends BXNode implements Document {
     return new BXPI(new FPI(new QNm(token(t)), token(dat), null));
   }
 
-  public Text createTextNode(final String dat) {
+  public BXText createTextNode(final String dat) {
     return new BXText(new FTxt(token(dat), null));
   }
 
@@ -100,11 +93,11 @@ public final class BXDoc extends BXNode implements Document {
     return null;
   }
 
-  public Element getDocumentElement() {
-    final NodeList list = getChildNodes();
+  public BXElem getDocumentElement() {
+    final BXNList list = getChildNodes();
     for(int l = 0; l < list.getLength(); l++) {
-      final Node n = list.item(l);
-      if(n.getNodeType() == Node.ELEMENT_NODE) return (Element) n;
+      final BXNode n = list.item(l);
+      if(n.getNodeType() == Node.ELEMENT_NODE) return (BXElem) n;
     }
     Main.notexpected();
     return null;
@@ -119,16 +112,16 @@ public final class BXDoc extends BXNode implements Document {
     return null;
   }
 
-  public Element getElementById(final String elementId) {
+  public BXElem getElementById(final String elementId) {
     Main.notimplemented();
     return null;
   }
 
-  public NodeList getElementsByTagName(final String name) {
+  public BXNList getElementsByTagName(final String name) {
     return getElements(name);
   }
 
-  public NodeList getElementsByTagNameNS(final String namespaceURI,
+  public BXNList getElementsByTagNameNS(final String namespaceURI,
       final String localName) {
     Main.notimplemented();
     return null;
@@ -159,7 +152,7 @@ public final class BXDoc extends BXNode implements Document {
     return "1.0";
   }
 
-  public Node importNode(final Node importedNode, final boolean deep) {
+  public BXNode importNode(final Node importedNode, final boolean deep) {
     Main.notimplemented();
     return null;
   }
@@ -168,7 +161,7 @@ public final class BXDoc extends BXNode implements Document {
     error();
   }
 
-  public Node renameNode(final Node n, final String namespaceURI,
+  public BXNode renameNode(final Node n, final String namespaceURI,
       final String qualifiedName) {
     error();
     return null;

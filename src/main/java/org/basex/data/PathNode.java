@@ -99,7 +99,7 @@ public final class PathNode {
    * @param nodes node list
    */
   void addDesc(final ArrayList<PathNode> nodes) {
-    // [CG] Check for duplicates?
+    // [CG] DATA: check for duplicates?
     // if(!nodes.contains(nodes)) nodes.add(this);
     nodes.add(this);
     for(final PathNode n : ch) n.addDesc(nodes);

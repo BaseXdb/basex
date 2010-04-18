@@ -106,8 +106,7 @@ public final class Group extends Expr {
             if(++p == hashes.length) return null;
             final int witness = groups.get(hashes[p])[0];
 
-            // [MS] fill witness with all of its
-            // fellow group members children
+            // [MS] fill witness with all of its fellow group members children
             ir = sq.item[witness].iter();
           }
         }

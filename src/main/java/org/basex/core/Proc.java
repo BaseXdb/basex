@@ -104,6 +104,7 @@ public abstract class Proc extends Progress {
     boolean ok = false;
     final boolean writing =
       (flags & (User.CREATE | User.WRITE)) != 0 || updating(ctx);
+    
     ctx.sema.before(writing);
     ok = run(ctx, os);
     ctx.sema.after(writing);

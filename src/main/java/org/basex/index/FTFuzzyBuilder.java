@@ -104,7 +104,7 @@ final class FTFuzzyBuilder extends FTBuilder {
     final DataOutput outz = new DataOutput(data.meta.file(DATAFTX + 'z'));
 
     final byte[][] tok = new byte[csize][];
-    final int[][] pres = new int[csize][];
+    final int[][] prs = new int[csize][];
     final int[][] pos = new int[csize][];
     final IntList ind = new IntList();
 
@@ -113,7 +113,7 @@ final class FTFuzzyBuilder extends FTBuilder {
     for(int b = 0; b < csize; b++) {
       v[b] = new FTFuzzy(data, b);
       tok[b] = v[b].nextTok();
-      pres[b] = v[b].nextPreValues();
+      prs[b] = v[b].nextPreValues();
       pos[b] = v[b].nextPosValues();
     }
 
@@ -146,29 +146,33 @@ final class FTFuzzyBuilder extends FTBuilder {
       outy.write(tok[min]);
       // pointer on full text data
       outy.write5(outz.size());
+
       int s = 0;
       final TokenBuilder tbp = new TokenBuilder();
       final TokenBuilder tbo = new TokenBuilder();
       tbp.add(new byte[4]);
       tbo.add(new byte[4]);
-      // merge full text data of all temp indexes with the same token
+      // merge full text data of all sorted indexes with the same token
       for(int j = 0; j < mer.size(); j++) {
         final int m = mer.get(j);
-        for(final int p : pres[m]) tbp.add(Num.num(p));
+        for(final int p : prs[m]) tbp.add(Num.num(p));
         for(final int p : pos[m]) tbo.add(Num.num(p));
         s += v[m].nextFTDataSize();
         tok[m] = nextToken(v, m);
-        pres[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[0];
+        prs[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[0];
         pos[m] = tok[m].length > 0 ? v[m].nextPosValues() : new int[0];
       }
 
+      // write out data size
       outy.writeInt(s);
+
       // write compressed pre and pos arrays
-      final byte[] p = tbp.finish();
-      Num.size(p, p.length);
-      final byte[] o = tbo.finish();
-      Num.size(o, o.length);
-      writeFTData(outz, p, o);
+      final byte[] pr = tbp.finish();
+      Num.size(pr, pr.length);
+      final byte[] po = tbo.finish();
+      Num.size(po, po.length);
+      // write full text data
+      writeFTData(outz, pr, po);
     }
     writeInd(outx, ind, ind.get(ind.size() - 2) + 1, (int) outy.size());
 

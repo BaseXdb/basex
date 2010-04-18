@@ -4,7 +4,6 @@ import org.basex.data.Nodes;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
@@ -36,7 +35,7 @@ public class BXNList implements NodeList {
     nodes = n;
   }
 
-  public Node item(final int i) {
+  public BXNode item(final int i) {
     Nod n = null;
     if(xquery != null) {
       if(i < xquery.size()) n = xquery.get(i);

@@ -539,7 +539,7 @@ public final class SpotlightExtractor implements IFileParser {
     /**
      * Returns the long value for an object.
      * @param o the object to parse
-     * @return the long value or <code>null</code> if the object can't be
+     * @return the long value or {@code null} if the object can't be
      *         parsed
      */
     private Long long0(final Object o) {
@@ -623,7 +623,7 @@ public final class SpotlightExtractor implements IFileParser {
   /**
    * Native method for retrieving all available metadata for a file.
    * @param filename the path to the file
-   * @return map containing the queried metadata attributes or <code>null</code>
+   * @return map containing the queried metadata attributes or {@code null}
    *         if any error occurs
    */
   private native Map<String, Object> getMetadata(final String filename);

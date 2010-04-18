@@ -21,15 +21,61 @@ import org.junit.Test;
  * @author Christian Gruen
  */
 public class NamespaceTest {
+  /** Database context. */
+  private static Context context;
+
   /** Test documents. */
   private static String[][] docs = {
       { "d1", "<x/>" },
-      { "d2", "<x xmlns='a'/>" },
-      { "d3", "<a:x xmlns:a='a'/>" },
+      { "d2", "<x xmlns='xx'/>" },
+      { "d3", "<a:x xmlns:a='aa'><b:y xmlns:b='bb'/></a:x>" },
+      { "d4", "<a:x xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
   };
 
-  /** Database context. */
-  private static Context context;
+  /** Test query. */
+  @Test
+  public final void copy1() {
+    query(
+        "copy $c := <x:a xmlns:x='xx'><b/></x:a>/b modify () return $c",
+        "<b xmlns:x='xx'/>");
+  }
+
+  /** Test query.
+   * [LK] this one causes troubles (-> wrong ref's due to UpdatePrimitive?)
+  @Test
+  public final void copy2() {
+    query(
+        "declare namespace a='aa'; copy $c:=doc('d4') modify () return $c//a:y",
+        "<b xmlns:x='xx'/>");
+  }
+   */
+
+  /** Test query. */
+  @Test
+  public final void insertD2intoD1() {
+    query(
+        "insert node doc('d2') into doc('d1')/x",
+        "doc('d1')",
+        "<x><x xmlns='xx'/></x>");
+  }
+
+  /** Test query. */
+  @Test
+  public final void insertD3intoD1() {
+    query(
+        "insert node doc('d3') into doc('d1')/x",
+        "doc('d1')/x/*",
+        "<a:x xmlns:a='aa'><b:y xmlns:b='bb'/></a:x>");
+  }
+
+  /** Test query. */
+  @Test
+  public final void insertD3intoD1b() {
+    query(
+        "insert node doc('d3') into doc('d1')/x",
+        "doc('d1')/x/*/*",
+        "<b:y xmlns:b='bb' xmlns:a='aa'/>");
+  }
 
   /** Creates the database context. */
   @BeforeClass
@@ -53,25 +99,7 @@ public class NamespaceTest {
     for(final String[] doc : docs) exec(new DropDB(doc[0]), null);
     context.close();
   }
-  
-  /** Test query. */
-  @Test
-  public final void query0() {
-    query(
-        "insert node doc('d2') into doc('d1')/x",
-        "doc('d1')",
-        "<x><x xmlns='a'/></x>"
-    );
-  }
-  
-  /** Test query. */
-  @Test
-  public final void query1() {
-    query(
-        "copy $c := <x:a xmlns:x='A'><b/></x:a>/b modify () return $c",
-        "<b xmlns:x='A'/>"
-    );
-  }
+
 
   /**
    * Runs a query and matches the result against the expected output.
@@ -95,13 +123,13 @@ public class NamespaceTest {
     if(first != null) exec(new XQuery(first));
     final CachedOutput co = new CachedOutput();
     exec(new XQuery(second), co);
-    
-    final String result = co.toString().replaceAll("\\\"", "'");
-    if(!expected.equals(result)) {
-      fail("\n" + co + "\n" + expected + " expected");
-    }
+
+    // quotes are replaced by apostrophes to simplify comparison
+    final String res = co.toString().replaceAll("\\\"", "'");
+    final String exp = expected.replaceAll("\\\"", "'");
+    if(!exp.equals(res)) fail("\n" + res + "\n" + exp + " expected");
   }
-  
+
   /**
    * Runs a command.
    * @param proc process to be run
@@ -109,7 +137,7 @@ public class NamespaceTest {
   private static void exec(final Proc proc) {
     if(!proc.exec(context)) fail(proc.info());
   }
-  
+
   /**
    * Runs a command and cached the output.
    * @param proc process to be run

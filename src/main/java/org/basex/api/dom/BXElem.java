@@ -7,8 +7,6 @@ import org.basex.query.iter.NodeIter;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 
 /**
@@ -37,7 +35,7 @@ public final class BXElem extends BXNode implements Element {
   }
 
   @Override
-  public NamedNodeMap getAttributes() {
+  public BXNNode getAttributes() {
     return new BXNNode(finish(node.attr()));
   }
 
@@ -57,21 +55,21 @@ public final class BXElem extends BXNode implements Element {
     return null;
   }
 
-  public Attr getAttributeNode(final String name) {
+  public BXAttr getAttributeNode(final String name) {
     final Nod n = attribute(name);
-    return n != null ? (Attr) n.java() : null;
+    return n != null ? (BXAttr) n.java() : null;
   }
 
-  public Attr getAttributeNodeNS(final String uri, final String ln) {
+  public BXAttr getAttributeNodeNS(final String uri, final String ln) {
     Main.notimplemented();
     return null;
   }
 
-  public NodeList getElementsByTagName(final String name) {
+  public BXNList getElementsByTagName(final String name) {
     return getElements(name);
   }
 
-  public NodeList getElementsByTagNameNS(final String uri, final String ln) {
+  public BXNList getElementsByTagNameNS(final String uri, final String ln) {
     Main.notimplemented();
     return null;
   }
@@ -102,7 +100,7 @@ public final class BXElem extends BXNode implements Element {
     error();
   }
 
-  public Attr removeAttributeNode(final Attr oldAttr) {
+  public BXAttr removeAttributeNode(final Attr oldAttr) {
     error();
     return null;
   }
@@ -116,12 +114,12 @@ public final class BXElem extends BXNode implements Element {
     error();
   }
 
-  public Attr setAttributeNode(final Attr at) {
+  public BXAttr setAttributeNode(final Attr at) {
     error();
     return null;
   }
 
-  public Attr setAttributeNodeNS(final Attr at) {
+  public BXAttr setAttributeNodeNS(final Attr at) {
     error();
     return null;
   }

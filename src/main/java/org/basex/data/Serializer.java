@@ -62,8 +62,7 @@ public abstract class Serializer {
   /**
    * Serializes a text.
    * @param b text bytes
-   * @param ftp full-text positions, used for adding visualization
-   * highlighting.
+   * @param ftp full-text positions, used for visualization highlighting
    * @throws IOException I/O exception
    */
   public abstract void text(final byte[] b, final FTPos ftp) throws IOException;

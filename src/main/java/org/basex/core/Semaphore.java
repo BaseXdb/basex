@@ -12,7 +12,7 @@ import java.util.LinkedList;
 final class Semaphore {
   /** List of monitors for locking objects. */
   private final LinkedList<Lock> waiting = new LinkedList<Lock>();
-  /** Value for an active writer. */
+  /** Flag for an active writer. */
   private boolean activeW;
   /** Number of active readers. */
   private int activeR;
@@ -25,11 +25,13 @@ final class Semaphore {
     if(w) {
       final Lock l = new Lock(true);
       synchronized(l) {
-        if(waiting.size() == 0 && activeR == 0 && !activeW) {
-          activeW = true;
-          return;
+        synchronized(this) {
+          if(waiting.size() == 0 && activeR == 0 && !activeW) {
+            activeW = true;
+            return;
+          }
+          waiting.add(l);
         }
-        waiting.add(l);
         try {
           l.wait();
         } catch(final InterruptedException ex) {
@@ -95,7 +97,7 @@ final class Semaphore {
    * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
    * @author Andreas Weiler
    */
-  private class Lock {
+  private static class Lock {
     /** Writer flag. */
     boolean writer;
     /** Number of readers. */

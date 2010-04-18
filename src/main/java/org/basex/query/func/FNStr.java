@@ -293,10 +293,8 @@ final class FNStr extends Fun {
       final String n = string(uc(trim(checkStr(is))));
       for(final String nrm : NORMS) if(nrm.equals(n)) nr = nrm;
       if(nr == null) Err.or(NORMUNI, n);
-    } else {
-      nr = NORMS[0];
     }
-    // [CG] XQuery/normalize-unicode()
+    // [CG] XQuery: normalize-unicode()
     return Str.get(str);
   }
 

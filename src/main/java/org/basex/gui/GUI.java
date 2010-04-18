@@ -402,7 +402,7 @@ public final class GUI extends JFrame {
    * @param main call from the main input field
    * @return success flag
    */
-  // [CG] GUI: check/merge exec/execute/... references
+  // [CG] GUI: check or merge exec/execute/... references
   boolean exec(final Proc pr, final boolean main) {
     final int thread = ++threadID;
 

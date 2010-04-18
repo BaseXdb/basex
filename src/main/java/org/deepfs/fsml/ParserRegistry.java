@@ -74,7 +74,7 @@ public final class ParserRegistry {
   /**
    * Gets a parser implementation for given file suffix.
    * @param suffix the file suffix to get the parser for
-   * @return the parser implementation or <code>null</code> if no implementation
+   * @return the parser implementation or {@code null} if no implementation
    *         is available
    * @throws ParserException if the parser could not be loaded
    */
@@ -105,7 +105,7 @@ public final class ParserRegistry {
 
   /**
    * Gets the fallback parser implementation.
-   * @return the fallback parser implementation or <code>null</code> if no
+   * @return the fallback parser implementation or {@code null} if no
    *         fallback parser is available
    * @throws ParserException if the parser could not be loaded
    */

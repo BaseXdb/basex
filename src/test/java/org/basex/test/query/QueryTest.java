@@ -80,7 +80,7 @@ public abstract class QueryTest {
 
     new DropDB(name).exec(context);
   }
-  
+
   /**
    * Runs a command.
    * @param proc process to be run
@@ -88,7 +88,7 @@ public abstract class QueryTest {
   private static void exec(final Proc proc) {
     if(!proc.exec(context)) fail(proc.info());
   }
-  
+
   /**
    * Returns property details.
    * @return details

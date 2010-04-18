@@ -120,7 +120,7 @@ public enum MimeType {
   /**
    * Tries to find the MimeType item for the given MIME type string.
    * @param name the MIME type string to find
-   * @return the {@link MimeType} item or <code>null</code> if the item was not
+   * @return the {@link MimeType} item or {@code null} if the item was not
    *         found
    */
   public static MimeType getItem(final String name) {

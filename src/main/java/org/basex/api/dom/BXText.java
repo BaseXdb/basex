@@ -27,12 +27,12 @@ public class BXText extends BXChar implements Text {
     return Token.ws(node.str());
   }
 
-  public Text replaceWholeText(final String content) {
+  public BXText replaceWholeText(final String content) {
     error();
     return null;
   }
 
-  public Text splitText(final int off) {
+  public BXText splitText(final int off) {
     error();
     return null;
   }

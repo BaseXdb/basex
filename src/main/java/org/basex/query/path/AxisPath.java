@@ -143,7 +143,7 @@ public class AxisPath extends Path {
 
     // check if context is set to document nodes
     final Data data = ctx.data();
-    // [CG] XQuery/Index: check if optimization is limited to paths with roots
+    // [CG] XQuery: check if optimization is limited to paths with roots
     if(data != null) {
       boolean doc = true;
       final Item item = ctx.item;

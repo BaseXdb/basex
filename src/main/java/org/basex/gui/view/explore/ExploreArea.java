@@ -218,7 +218,6 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
           final Names names = att ? data.atts : data.tags;
           final byte[] key = Token.token(att ? item.substring(1) : item);
           final StatsKey stat = names.stat(names.id(key));
-          // [BL] detect xml duration/dateTime values and add sliders
           switch(stat.kind) {
             case INT:
               addSlider(stat.min, stat.max, cp + 1,

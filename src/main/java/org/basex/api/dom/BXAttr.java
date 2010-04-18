@@ -6,9 +6,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.TypeInfo;
 
 /**
@@ -52,22 +49,22 @@ public final class BXAttr extends BXNode implements Attr {
   }
 
   @Override
-  public Node getNextSibling() {
+  public BXNode getNextSibling() {
     return null;
   }
 
   @Override
-  public Node getPreviousSibling() {
+  public BXNode getPreviousSibling() {
     return null;
   }
 
   @Override
-  public Node getParentNode() {
+  public BXElem getParentNode() {
     return null;
   }
 
-  public Element getOwnerElement() {
-    return (Element) getParentNode();
+  public BXElem getOwnerElement() {
+    return getParentNode();
   }
 
   public String getValue() {
@@ -92,12 +89,12 @@ public final class BXAttr extends BXNode implements Attr {
   }
 
   @Override
-  public Node getFirstChild() {
+  public BXText getFirstChild() {
     return new BXText(new FTxt(node.str(), node));
   }
 
   @Override
-  public NodeList getChildNodes() {
+  public BXNList getChildNodes() {
     final NodIter nb = new NodIter();
     nb.add(new FTxt(node.str(), node));
     return new BXNList(nb);

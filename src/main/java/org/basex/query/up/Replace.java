@@ -75,13 +75,7 @@ public final class Replace extends Update {
       if(type == Type.ATT) {
         // replace attribute node
         if(list.size() > 0) Err.or(UPWRATTR, i);
-
-        for(int a = 0; a < aList.size(); a++) {
-          final QNm name = aList.get(a).qname();
-          final byte[] uri = par.uri(name.pref(), ctx);
-          if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
-        }
-        list = aList;
+        list = checkNS(aList, par, ctx);
       } else {
         // replace non-attribute node
         if(aList.size() > 0) Err.or(UPWRELM, i);

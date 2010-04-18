@@ -32,7 +32,7 @@ final class FNNode extends Fun {
         if(empty) return null;
         final byte[] uri = checkNode(it).base();
         return uri.length == 0 ? null : Uri.uri(uri);
-      case NILLED: // [CG] XQuery/nilled flag
+      case NILLED: // [CG] XQuery: nilled flag
         if(empty) return null;
         checkNode(it);
         return it.type != Type.ELM ? null : Bln.FALSE;

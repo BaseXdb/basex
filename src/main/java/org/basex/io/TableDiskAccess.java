@@ -56,15 +56,15 @@ public final class TableDiskAccess extends TableAccess {
 
     super(md, pf);
 
-    // READ INFO FILE AND INDEX
+    // read meta and index data
     final DataInput in = new DataInput(meta.file(pf + 'i'));
-    allBlocks = in.readNum();
-    blocks = in.readNum();
-    firstPres = in.readNums();
+    allBlocks  = in.readNum();
+    blocks     = in.readNum();
+    firstPres  = in.readNums();
     blockIndex = in.readNums();
     in.close();
 
-    // INITIALIZE DATA FILE
+    // initialize data file
     data = new RandomAccessFile(meta.file(pf), "rw");
     readBlock(0, 0, blocks > 1 ? firstPres[1] : md.size);
   }
@@ -73,15 +73,14 @@ public final class TableDiskAccess extends TableAccess {
   public synchronized void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
 
-    if(dirty) {
-      final DataOutput out = new DataOutput(meta.file(pref + 'i'));
-      out.writeNum(allBlocks);
-      out.writeNum(blocks);
-      out.writeNums(firstPres);
-      out.writeNums(blockIndex);
-      out.close();
-      dirty = false;
-    }
+    if(!dirty) return;
+    final DataOutput out = new DataOutput(meta.file(pref + 'i'));
+    out.writeNum(allBlocks);
+    out.writeNum(blocks);
+    out.writeNums(firstPres);
+    out.writeNums(blockIndex);
+    out.close();
+    dirty = false;
   }
 
   @Override
@@ -423,7 +422,7 @@ public final class TableDiskAccess extends TableAccess {
    * Returns the number of entries; needed for JUnit tests.
    * @return number of used blocks
    */
-  public synchronized int size() {
+  public int size() {
     return meta.size;
   }
 
@@ -431,7 +430,7 @@ public final class TableDiskAccess extends TableAccess {
    * Returns the number of used blocks; needed for JUnit tests.
    * @return number of used blocks
    */
-  public synchronized int blocks() {
+  public int blocks() {
     return blocks;
   }
 }

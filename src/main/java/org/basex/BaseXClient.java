@@ -18,7 +18,7 @@ public final class BaseXClient extends BaseX {
   /**
    * Main method of the database client, launching a local
    * client instance that sends all commands to a server instance.
-   * Use <code>-h</code> to get a list command-line arguments.
+   * Use {@code -h} to get a list command-line arguments.
    * @param args command-line arguments
    */
   public static void main(final String... args) {

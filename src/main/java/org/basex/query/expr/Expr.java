@@ -56,7 +56,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting item or
-   * a <code>null</code> reference.
+   * a {@code null} reference.
    * If this method is not overwritten, {@link #iter} must be implemented.
    * @param ctx query context
    * @return iterator
@@ -141,7 +141,7 @@ public abstract class Expr extends ExprInfo {
   /**
    * Indicates if an expression uses the specified type.
    * Called by the compiler to perform certain optimizations.
-   * <code>true</code> is returned by default and thus assumed as "worst-case".
+   * {@code true} is returned by default and thus assumed as "worst-case".
    * @param u use type to be checked
    * @param ctx query context
    * @return result of check

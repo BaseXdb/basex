@@ -78,7 +78,7 @@ public final class Values implements Index {
   }
 
   @Override
-  public synchronized IndexIterator ids(final IndexToken tok) {
+  public IndexIterator ids(final IndexToken tok) {
     if(tok instanceof RangeToken) return idRange((RangeToken) tok);
 
     final int id = cache.id(tok.get());
@@ -89,7 +89,7 @@ public final class Values implements Index {
   }
 
   @Override
-  public synchronized int nrIDs(final IndexToken it) {
+  public int nrIDs(final IndexToken it) {
     if(it instanceof RangeToken) return idRange((RangeToken) it).size();
     final byte[] tok = it.get();
     final int id = cache.id(tok);
@@ -107,7 +107,7 @@ public final class Values implements Index {
    * Returns next pre values.
    * @return compressed pre values
    */
-  synchronized byte[] nextPres() {
+  byte[] nextPres() {
     if(idxr.pos() >= idxr.length()) return EMPTY;
     final int s = idxl.read4();
     final long v = idxr.read5(idxr.pos());
@@ -120,7 +120,7 @@ public final class Values implements Index {
    * @param ps offset
    * @return iterator
    */
-  private synchronized IndexIterator iter(final int s, final long ps) {
+  private IndexIterator iter(final int s, final long ps) {
     final IntList ids = new IntList(s);
     long p = ps;
     for(int l = 0, v = 0; l < s; l++) {
@@ -136,7 +136,7 @@ public final class Values implements Index {
    * @param tok index term
    * @return results
    */
-  private synchronized IndexIterator idRange(final RangeToken tok) {
+  private IndexIterator idRange(final RangeToken tok) {
     final double min = tok.min;
     final double max = tok.max;
 
@@ -175,7 +175,7 @@ public final class Values implements Index {
    * @param ids id list
    * @return iterator
    */
-  private synchronized IndexIterator iter(final IntList ids) {
+  private IndexIterator iter(final IntList ids) {
     return new IndexIterator() {
       int p = -1;
 
@@ -194,7 +194,7 @@ public final class Values implements Index {
    * @param key token to be found
    * @return id offset
    */
-  private synchronized long get(final byte[] key) {
+  private long get(final byte[] key) {
     int l = 0, h = size - 1;
     while(l <= h) {
       final int m = l + h >>> 1;
@@ -215,7 +215,7 @@ public final class Values implements Index {
   }
 
   @Override
-  public synchronized void close() throws IOException {
+  public void close() throws IOException {
     idxl.close();
     idxr.close();
   }

@@ -44,7 +44,7 @@ public final class BaseXLabel extends JLabel {
 
   /**
    * Shows an text, preceded by a state icon.
-   * If the text is <code>null</code>, no text and icon is shown.
+   * If the text is {@code null}, no text and icon is shown.
    * @param text warning text
    * @param icon flag for displaying a warning or error icon
    */

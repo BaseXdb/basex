@@ -290,8 +290,6 @@ final class FTFuzzy extends FTIndex {
   private int ptok;
   /** Next number of pre values. */
   private int fts;
-  /** Pointer on full-text data. */
-  long pftd;
 
   /**
    * Returns the next token.
@@ -308,10 +306,9 @@ final class FTFuzzy extends FTIndex {
     if(ctl == tp.length) return EMPTY;
 
     final byte[] tok = ti.readBytes(ptok, ptok + ctl);
-    // [SG] pftd is never read?..
-    pftd = ti.read5(ti.pos());
-    fts = ti.read4();
-    // [SG] safe cast to int?
+    // skip pointer
+    fts = ti.read4(ti.pos() + 5);
+    // position will always fit in an integer...
     ptok = (int) ti.pos();
     return tok;
   }

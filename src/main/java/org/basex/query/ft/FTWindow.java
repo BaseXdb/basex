@@ -85,7 +85,7 @@ public final class FTWindow extends FTFilter {
     return super.remove(v);
   }
 
-  /* [CG] FT: check sequential scan with NOT combinations
+  /* [CG] XQFT: check sequential scan with NOT combinations
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     return false;

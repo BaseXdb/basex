@@ -22,7 +22,7 @@ public final class ItemSet {
   private int[] bucket = new int[CAP];
   /** Items. */
   private Item[] values = new Item[CAP];
-  /** Hash entries. Actual hash size is <code>size - 1</code>. */
+  /** Hash entries. Actual hash size is {@code size - 1}. */
   private int size = 1;
 
   /**

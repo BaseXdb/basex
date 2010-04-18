@@ -41,9 +41,6 @@ import org.deepfs.fsml.ser.FSMLSerializer;
  * @author Bastian Lemke
  */
 public final class DeepFile {
-
-  // [BL] always set default file type
-
   /**
    * A reference to the parser registry that can be used to parse file
    * fragments.
@@ -166,11 +163,11 @@ public final class DeepFile {
    * </p>
    * <p>
    * The properties can be set as follows:<br />
-   * <code>ctx.prop.set(Prop.FSMETA, true); // extract metadata</code><br/>
-   * <code>ctx.prop.set(Prop.FSCONT, true); // extract text content</code> <br/>
-   * <code>ctx.prop.set(Prop.FSXML, true); // extract xml content</code> <br/>
-   * <code>ctx.prop.set(Prop.FSTEXTMAX, 10240); // amount of text/xml content to
-   * extract (in bytes)</code>
+   * {@code ctx.prop.set(Prop.FSMETA, true); // extract metadata}<br/>
+   * {@code ctx.prop.set(Prop.FSCONT, true); // extract text content}<br/>
+   * {@code ctx.prop.set(Prop.FSXML, true); // extract xml content}<br/>
+   * {@code ctx.prop.set(Prop.FSTEXTMAX, 10240); // amount of text/xml content
+   * to extract (in bytes)}
    * <br/>
    * </p>
    * @param parserRegistry a reference to the parser registry that can be used
@@ -333,7 +330,7 @@ public final class DeepFile {
   /**
    * Returns the file system attributes for the deep file. The file system
    * attributes are extracted after finishing the metadata extraction.
-   * @return the file system attributes or <code>null</code> if the metadata
+   * @return the file system attributes or {@code null} if the metadata
    *         extraction was not finished yet
    * @see #finishMetaExtraction()
    */
@@ -342,7 +339,7 @@ public final class DeepFile {
   }
 
   /**
-   * Returns all metadata key-value pairs or <code>null</code> if metadata
+   * Returns all metadata key-value pairs or {@code null} if metadata
    * extraction is disabled.
    * @return the metadata
    */
@@ -359,7 +356,7 @@ public final class DeepFile {
   }
 
   /**
-   * Returns all text sections or <code>null</code> if no text content
+   * Returns all text sections or {@code null} if no text content
    * extraction is disabled.
    * @return all text sections
    */
@@ -369,7 +366,7 @@ public final class DeepFile {
   }
 
   /**
-   * Returns all xml sections or <code>null</code> if xml extraction is
+   * Returns all xml sections or {@code null} if xml extraction is
    * disabled.
    * @return all xml sections
    */
@@ -416,7 +413,7 @@ public final class DeepFile {
    * @param e metadata element (the key)
    * @param value the value to add
    * @param type the xml data type to set for this metadata element or
-   *          <code>null</code> if the default data type should be used
+   *          {@code null} if the default data type should be used
    */
   private void addMeta(final MetaElem e, final String value, final Type type) {
     if(metaFinished || value.isEmpty()) return;
@@ -646,7 +643,7 @@ public final class DeepFile {
 
   /**
    * <p>
-   * Adds a text section. <b><code>text</code> MUST contain only valid UTF-8
+   * Adds a text section. <b>{@code text} MUST contain only valid UTF-8
    * characters!</b> Otherwise the generated XML document may be not
    * well-formed.
    * </p>

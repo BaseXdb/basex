@@ -135,7 +135,7 @@ public final class LockingTest {
       fail("Not all nodes have been deleted.");
     }
   }
-  
+
   /** Efficiency test. */
   @Test
   public void efficiencyTest() {

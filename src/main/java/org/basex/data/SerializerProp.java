@@ -83,7 +83,7 @@ public final class SerializerProp extends AProp {
   /**
    * Constructor, specifying initial properties.
    * @param s property string. Properties are separated with commas,
-   * key/values with equality.
+   * key/values with equality
    * @throws IOException I/O exception
    */
   public SerializerProp(final String s) throws IOException {

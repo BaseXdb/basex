@@ -291,7 +291,7 @@ public final class MP3Parser implements IFileParser {
 
   /**
    * Reads the ID3v1 metadata from the file. {@link #checkID3v1()} must be
-   * called before (and must return <code>true</code>).
+   * called before (and must return {@code true}).
    * @throws IOException if any error occurs while reading from the file
    */
   private void readMetaID3v1() throws IOException {
@@ -410,8 +410,7 @@ public final class MP3Parser implements IFileParser {
   // ---------------------------------------------------------------------------
 
   /**
-   * Returns the textual representation of the genre with the code
-   * <code>b</code>.
+   * Returns the textual representation of the genre with the code {@code b}.
    * @param b the "code" of the genre
    * @return the textual representation of the genre
    */
@@ -460,7 +459,7 @@ public final class MP3Parser implements IFileParser {
    * Reads the text encoding of the following frame from the file channel.
    * Assure that at least one byte is buffered before calling this method.
    * @return a string with the name of the encoding that was detected or
-   *         <code>null</code> if an invalid or unsupported encoding was
+   *         {@code null} if an invalid or unsupported encoding was
    *         detected. If no encoding is set, an empty string is returned
    * @throws IOException if any error occurs while reading from the file
    */
@@ -484,7 +483,7 @@ public final class MP3Parser implements IFileParser {
   }
 
   /**
-   * Reads and parses text from the file. Assure that at least <code>s</code>
+   * Reads and parses text from the file. Assure that at least {@code s}
    * bytes are buffered before calling this method.
    * @param s number of bytes to read
    * @return byte array with the text
@@ -496,7 +495,7 @@ public final class MP3Parser implements IFileParser {
 
   /**
    * Reads and parses text with the given encoding from the file. Assure that at
-   * least <code>s</code> bytes are buffered before calling this method.
+   * least {@code s} bytes are buffered before calling this method.
    * @param s number of bytes to read
    * @param encoding the encoding of the text
    * @return byte array with the text
@@ -540,7 +539,7 @@ public final class MP3Parser implements IFileParser {
 
   /**
    * Removes all illegal chars from the byte array. ID3 track numbers may be of
-   * the form <code>X/Y</code> (X is the track number, Y represents the number
+   * the form {@code X/Y} (X is the track number, Y represents the number
    * of tracks in the whole set). Everything after '/' is deleted.
    * @param s number of bytes to read
    * @return a byte array that contains only ASCII bytes that are valid integer
@@ -719,7 +718,6 @@ public final class MP3Parser implements IFileParser {
     TDRC {
       @Override
       public void parse(final MP3Parser obj, final int size) {
-          // [BL] different elements for gYear, gYearMonth, ...
       }
     },
 
@@ -727,7 +725,6 @@ public final class MP3Parser implements IFileParser {
     TDTG {
       @Override
       public void parse(final MP3Parser obj, final int size) {
-          // [BL] different elements for gYear, gYearMonth, ...
       }
     },
 
@@ -744,7 +741,6 @@ public final class MP3Parser implements IFileParser {
     TFLT {
       @Override
       public void parse(final MP3Parser obj, final int size) {
-          // [BL] parse file type
 
       // TFLT
       // The 'File type' frame indicates which type of audio this tag defines.
@@ -815,7 +811,6 @@ public final class MP3Parser implements IFileParser {
     TMED {
       @Override
       public void parse(final MP3Parser obj, final int size) {
-          // [BL] parse media type
 
       // TMED
       // The 'Media type' frame describes from which media the sound
@@ -914,8 +909,6 @@ public final class MP3Parser implements IFileParser {
         obj.deepFile.addMeta(MetaElem.ORIGINAL_ARTIST, obj.readText(size));
       }
     },
-
-    // [BL] distinguish between different TPE fields
 
     /** Lead performer(s)/Soloist(s) */
     TPE1 {

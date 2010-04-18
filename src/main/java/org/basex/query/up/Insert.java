@@ -2,7 +2,6 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-import static org.basex.util.Token.*;
 import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -10,7 +9,6 @@ import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -87,12 +85,7 @@ public final class Insert extends Update {
       if(targ.type != Type.ELM)
         Err.or(before || after ? UPATTELM : UPATTELM2, this);
 
-      for(int a = 0; a < aList.size(); a++) {
-        final QNm name = aList.get(a).qname();
-        final byte[] uri = targ.uri(name.pref(), ctx);
-        if(uri != null && !eq(name.uri.str(), uri)) Err.or(UPNSCONFL);
-      }
-      up = new InsertAttribute(targ, aList);
+      up = new InsertAttribute(targ, checkNS(aList, targ, ctx));
       ctx.updates.add(up, ctx);
     }
 

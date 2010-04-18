@@ -109,11 +109,11 @@ public final class JPGParser implements IFileParser {
 
   /**
    * <p>
-   * Reads <code>a.length</code> bytes from the {@link BufferedFileChannel} and
+   * Reads {@code a.length} bytes from the {@link BufferedFileChannel} and
    * checks if they are equals to the array content.
    * </p>
    * <p>
-   * <b>Assure that at least <code>a.length</code> bytes are buffered, before
+   * <b>Assure that at least {@code a.length} bytes are buffered, before
    * calling this method.</b>
    * <p>
    * @param a the array content to check
