@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 -- |
--- Module      : Example
+-- Module      : Main
 -- Copyright   : (C) Workgroup DBIS, University of Konstanz 2005-10
 -- License     : ISC
 --
@@ -13,7 +13,7 @@
 --
 -------------------------------------------------------------------------------
 
-module Example where
+module Main where
 
 import BaseXClient
 import Network ( withSocketsDo )
@@ -30,8 +30,9 @@ main = withSocketsDo $ do
     -- connect to the server
     (Just session) <- connect "localhost" 1984 "admin" "admin"
     -- execute and print the query
-    putStrLn . either id content <$> execute session query
+    execute session query >>= putStrLn . either id content
     -- close the session
     close session
     -- print time difference
     (diffUTCTime <$> getCurrentTime <*> pure start) >>= print
+    
