@@ -16,7 +16,7 @@ import org.basex.server.ClientSession;
  * For more information on server functionalities, see {@link ServerExample}
  * For more information on local query processing, see {@link QueryExample}.
  *
- * @author Workgroup DBIS, University of Konstanz 2005-09, ISC License
+ * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
 public final class ServerLocalExample {
@@ -51,7 +51,7 @@ public final class ServerLocalExample {
     // Locally cache the result of a server-side query
     System.out.println("\n* Cache server-side query results.");
 
-    final CachedOutput result = new CachedOutput();
+    CachedOutput result = new CachedOutput();
     send("XQUERY for $x in doc('etc/xml/input.xml') return $x", result);
 
     // -------------------------------------------------------------------------

@@ -75,10 +75,10 @@ public final class StressTest {
           Performance.sleep((long) (50 * rnd.nextDouble()));
 
           // return nth text of the database
-          final int n = (rnd.nextInt() & 0xFF) + 1;
-          final String qu = "descendant::text()[position() = " + n + "]";
+          int n = (rnd.nextInt() & 0xFF) + 1;
+          String qu = "descendant::text()[position() = " + n + "]";
 
-          final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+          ByteArrayOutputStream buffer = new ByteArrayOutputStream();
           new XQuery(qu).execute(context, buffer);
 
           System.out.print("[" + counter + "] Thread " + getId() +

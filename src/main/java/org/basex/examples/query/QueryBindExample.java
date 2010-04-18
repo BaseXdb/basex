@@ -42,19 +42,19 @@ public final class QueryBindExample {
 
     // ------------------------------------------------------------------------
     // Evaluate the specified XQuery
-    final String query = "declare variable $var external; $var";
+    String query = "declare variable $var external; $var";
 
     // ------------------------------------------------------------------------
     // Create a query processor
-    final QueryProcessor processor = new QueryProcessor(query, CONTEXT);
+    QueryProcessor processor = new QueryProcessor(query, CONTEXT);
 
     // ------------------------------------------------------------------------
     // Create the item to be bound
-    final Item string = Str.get("Hello World!\n");
+    Item string = Str.get("Hello World!\n");
 
     // ------------------------------------------------------------------------
     // Create a variable
-    final Var var = new Var(new QNm(Token.token("var")), true);
+    Var var = new Var(new QNm(Token.token("var")), true);
 
     // ------------------------------------------------------------------------
     // Bind the item to the variable
@@ -66,7 +66,7 @@ public final class QueryBindExample {
 
     // ------------------------------------------------------------------------
     // Execute the query
-    final Result result = processor.query();
+    Result result = processor.query();
 
     // ------------------------------------------------------------------------
     // Serialize all results to OUT, using the specified serializer

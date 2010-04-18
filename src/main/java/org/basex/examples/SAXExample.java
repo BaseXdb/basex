@@ -34,17 +34,17 @@ public final class SAXExample extends DefaultHandler {
     System.out.println("=== SAXExample ===\n");
 
     // Create database context
-    final Context ctx = new Context();
+    Context ctx = new Context();
 
     // ----------------------------------------------------------------------
     // Evaluate the query
-    final QueryProcessor query =
+    QueryProcessor query =
       new QueryProcessor("doc('etc/xml/input.xml')//title", ctx);
-    final Result result = query.query();
+    Result result = query.query();
 
     // ----------------------------------------------------------------------
     // Create an XML reader, set the content handler and start parsing
-    final XMLReader reader = new SAXSerializer(result);
+    XMLReader reader = new SAXSerializer(result);
     reader.setContentHandler(this);
     reader.parse("");
   }

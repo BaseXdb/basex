@@ -119,6 +119,7 @@ public final class TagSoupExample {
    */
   private static InputSource getInputSource(final String addr,
       final String encoding) throws IOException {
+
     InputSource is;
     if(encoding != null) {
       is = new InputSource(addr);

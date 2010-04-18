@@ -45,7 +45,7 @@ public final class StressTest {
     // create test database
     System.out.println("\n* Create test database.");
 
-    final ClientSession cs = newSession();
+    ClientSession cs = newSession();
     cs.execute("set info on");
     cs.execute("create db etc/xml/factbook.xml");
     System.out.print(cs.info());
@@ -66,7 +66,7 @@ public final class StressTest {
     // drop database and stop server
     System.out.println("\n* Stop server and drop test database.");
 
-    final ClientSession cs = newSession();
+    ClientSession cs = newSession();
     cs.execute("drop db factbook");
     System.out.print(cs.info());
     cs.close();
@@ -97,12 +97,12 @@ public final class StressTest {
           Performance.sleep((long) (50 * rnd.nextDouble()));
 
           // return nth text of the database
-          final int n = (rnd.nextInt() & 0xFF) + 1;
-          final String qu = "xquery basex:db('factbook')/descendant::text()" +
+          int n = (rnd.nextInt() & 0xFF) + 1;
+          String qu = "xquery basex:db('factbook')/descendant::text()" +
             "[position() = " + n + "]";
 
-          final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-          final String result = session.execute(qu, buffer) ?
+          ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+          String result = session.execute(qu, buffer) ?
               buffer.toString() : session.info();
 
           System.out.println("[" + counter + "] Thread " + getId() +

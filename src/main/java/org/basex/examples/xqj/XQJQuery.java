@@ -28,14 +28,14 @@ public final class XQJQuery {
    */
   public static void main(final String[] args) throws Exception {
     // Build a connection to the specified driver.
-    final XQConnection conn = ((XQDataSource) Class.forName(DRIVER).
+    XQConnection conn = ((XQDataSource) Class.forName(DRIVER).
         newInstance()).getConnection();
 
     // Prepare the expression with the document and the query.
-    final XQPreparedExpression expr = conn.prepareExpression(QUERY);
+    XQPreparedExpression expr = conn.prepareExpression(QUERY);
 
     // Execute the query.
-    final XQResultSequence result = expr.executeQuery();
+    XQResultSequence result = expr.executeQuery();
 
     // Get all results of the execution.
     while(result.next()) {

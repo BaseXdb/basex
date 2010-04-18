@@ -35,7 +35,7 @@ public final class JaxRxPOSTQuery {
     System.out.println("\n* URL: " + url);
 
     // Query to be sent to the server.
-    final String request =
+    String request =
       "<query xmlns:jax-rx='http://jax-rx.sourceforge.net'>\n" +
       "  <text>//city/name</text>\n" +
       "  <parameter name='wrap' value='yes'/>\n" +
@@ -44,7 +44,7 @@ public final class JaxRxPOSTQuery {
     System.out.println("\n* Query:\n" + request);
 
     // Establish the connection to the URL.
-    final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
     // Set an output connection.
     conn.setDoOutput(true);
     // Set as PUT request.

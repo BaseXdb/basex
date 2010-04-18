@@ -42,7 +42,7 @@ public final class QueryExample {
 
     // ------------------------------------------------------------------------
     // Evaluate the specified XQuery
-    final String query = "for $x in doc('etc/xml/input.xml')//li return $x";
+    String query = "for $x in doc('etc/xml/input.xml')//li return $x";
 
     // ------------------------------------------------------------------------
     // Process the query by using the database command
@@ -93,11 +93,11 @@ public final class QueryExample {
   static void process(final String query) throws QueryException, IOException {
     // ------------------------------------------------------------------------
     // Create a query processor
-    final QueryProcessor processor = new QueryProcessor(query, CONTEXT);
+    QueryProcessor processor = new QueryProcessor(query, CONTEXT);
 
     // ------------------------------------------------------------------------
     // Execute the query
-    final Result result = processor.query();
+    Result result = processor.query();
 
     // ------------------------------------------------------------------------
     // Serialize all results to OUT, using the specified serializer
@@ -121,15 +121,15 @@ public final class QueryExample {
   static void iterate(final String query) throws QueryException, IOException {
     // ------------------------------------------------------------------------
     // Create a query processor
-    final QueryProcessor processor = new QueryProcessor(query, CONTEXT);
+    QueryProcessor processor = new QueryProcessor(query, CONTEXT);
 
     // ------------------------------------------------------------------------
     // Store the pointer to the result in an iterator:
-    final Iter iter = processor.iter();
+    Iter iter = processor.iter();
 
     // ------------------------------------------------------------------------
     // Create an XML serializer
-    final XMLSerializer serializer = new XMLSerializer(OUT);
+    XMLSerializer serializer = new XMLSerializer(OUT);
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents

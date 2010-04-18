@@ -40,7 +40,7 @@ public final class ServerConcurrencyExample {
     // Create a client session with host name, port, user name and password
     System.out.println("\n* Create a client session.");
 
-    final ClientSession session =
+    ClientSession session =
       new ClientSession("localhost", 1984, "admin", "admin");
 
     // ------------------------------------------------------------------------
@@ -55,10 +55,10 @@ public final class ServerConcurrencyExample {
     // Setup some clients that simultaneously read and write from the database
     System.out.println("\n* Run one reader and two writers threads.");
 
-    final ClientExample reader1 = new ClientExample("//li");
-    final ClientExample writer1 = new ClientExample("insert node " +
+    ClientExample reader1 = new ClientExample("//li");
+    ClientExample writer1 = new ClientExample("insert node " +
         "<li>new node</li> as last into /html/body//ul");
-    final ClientExample writer2 = new ClientExample("insert node " +
+    ClientExample writer2 = new ClientExample("insert node " +
         "<new>One more</new> as last into /html/body");
 
     // -------------------------------------------------------------------------
@@ -122,7 +122,7 @@ public final class ServerConcurrencyExample {
     /** Set to false to stop the Client from running.*/
     boolean running = true;
     /** Random sleep time generator.*/
-    final Random r = new Random();
+    Random r = new Random();
 
     /**
      * Constructor.

@@ -4,10 +4,10 @@ import org.basex.BaseXServer;
 import org.jaxrx.StartJetty;
 
 /**
- * This class demonstrates how the REST interface JaxRx can be used. A database
- * server and the Jetty server is launched. The Jetty server listens for HTTP
- * requests, which are sent to the JAX-RX implementation.
- * 
+ * This class demonstrates how the REST implementation, based on JAX-RX, can be
+ * used. A database server and the Jetty server is launched. The Jetty server
+ * listens for HTTP requests, which are then sent to JAX-RX.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
