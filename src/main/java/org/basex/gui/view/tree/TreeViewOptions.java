@@ -11,7 +11,7 @@ import java.awt.Color;
 interface TreeViewOptions {
   // Options
   /** Use ChildIterator to cache nodes. */
-  boolean USE_CHILDITERATOR = true;
+  boolean USE_CHILDITERATOR = false;
   /** Draw only element nodes. */
   boolean ONLY_ELEMENT_NODES = false;
   /** Show Attributes. */
@@ -41,7 +41,7 @@ interface TreeViewOptions {
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
   /** Highlight Color small space. */
-  Color SMALL_SPACE_COLOR = Color.WHITE;
+  Color SMALL_SPACE_COLOR = Color.GREEN;
 
   /** Minimum rectangle space for text. */
   int MIN_TXT_SPACE = 4;

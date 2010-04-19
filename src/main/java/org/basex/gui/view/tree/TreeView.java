@@ -221,7 +221,6 @@ public final class TreeView extends View implements TreeViewOptions {
     tg.setFont(font);
     smooth(tg);
     final int[] roots = gui.context.current.nodes;
-    numRoots = roots.length;
 
     for(int rn = 0; rn < numRoots; rn++) {
 
@@ -328,9 +327,10 @@ public final class TreeView extends View implements TreeViewOptions {
         fillColor = COLORS[6];
         textColor = Color.WHITE;
         fill = !br;
-        if(h < 4 || r.w < 4) {
-          borderColor = COLORS[6];
-          border = false;
+        if(h < 4) {
+          fillColor = SMALL_SPACE_COLOR;
+          borderColor = fillColor;
+          border = !br;
           txt = false;
         }
         break;
@@ -484,7 +484,7 @@ public final class TreeView extends View implements TreeViewOptions {
               final int x = (int) (rect.w * ix / (double) cache.getLevelSize(
                   rn, i));
               mg.setColor(colormark1);
-              mg.fillRect(rect.x + x, y, 2, nodeHeight);
+              mg.fillRect(rect.x + x, y, 2, nodeHeight + 1);
             }
           }
         } else {
@@ -654,7 +654,6 @@ public final class TreeView extends View implements TreeViewOptions {
   private void drawBigRectDescendants(final Graphics g, final int rn,
       final int lv, final TreeBorder[] subt, final int parc, final byte t) {
 
-//    final int h = cache.getHeight(rn);
     int lvv = lv;
     int cen = parc;
     int i;
@@ -680,8 +679,6 @@ public final class TreeView extends View implements TreeViewOptions {
         case DRAW_CONN:
           break;
         default:
-          // g.setColor(COLORS[1]);
-          // g.drawRect(df, getYperLevel(lvv), ww, nodeHeight);
           final int rgb = COLORS[7].getRGB();
           final int alpha = 0x33000000;
           g.setColor(nodeHeight < 4 ? SMALL_SPACE_COLOR : new Color(
@@ -689,17 +686,19 @@ public final class TreeView extends View implements TreeViewOptions {
           g.fillRect(df, getYperLevel(lvv), ww, nodeHeight + 1);
       }
 
-      // if(lvv + 1 < h && !cache.isBigRectangle(rn, lvv + 1)) {
-      // final Data d = gui.context.current.data;
-      // for(int j = subt[i].start; j < subt[i].start + subt[i].size; j++) {
-      // final int pre = cache.getPrePerIndex(rn, lvv, j);
-      // final int k = d.kind(pre);
-      // final int s = d.size(pre, k) - d.attSize(pre, k);
-      // if(s > 1) highlightDescendants(g, rn, pre, r, lvv, cen,
-      // t == DRAW_HIGHLIGHT || t == DRAW_DESCENDANTS ? DRAW_DESCENDANTS
-      // : DRAW_CONN);
-      // }
-      // }
+      
+//       if(lvv + 1 < cache.getHeight(rn) && !cache.isBigRectangle(rn, 
+//      lvv + 1)) {
+//       final Data d = gui.context.current.data;
+//       for(int j = subt[i].start; j < subt[i].start + subt[i].size; j++) {
+//       final int pre = cache.getPrePerIndex(rn, lvv, j);
+//       final int k = d.kind(pre);
+//       final int s = d.size(pre, k) - d.attSize(pre, k);
+//       if(s > 1) highlightDescendants(g, rn, pre, r, lvv, cen,
+//       t == DRAW_HIGHLIGHT || t == DRAW_DESCENDANTS ? DRAW_DESCENDANTS
+//       : DRAW_CONN);
+//       }
+//       }
       lvv++;
     }
   }
@@ -880,9 +879,10 @@ public final class TreeView extends View implements TreeViewOptions {
    */
   private void setLevelDistance() {
     final int h = getHeight() - BOTTOM_MARGIN;
-    final int rl = gui.context.current.nodes.length;
+    final int[] roots = gui.context.current.nodes;
+    numRoots = roots.length;
     int lvs = 0;
-    for(int i = 0; i < rl; i++) {
+    for(int i = 0; i < numRoots; i++) {
       final int th = cache.getHeight(i);
       if(th > lvs) lvs = th;
     }
