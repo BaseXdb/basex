@@ -364,7 +364,7 @@ public final class TreeView extends View implements TreeViewOptions {
   private void drawRectangleText(final Graphics g, final int rn, final int lv,
       final TreeRect r, final int pre) {
 
-    String s = Token.string(cache.getText(gui.context, rn, pre));
+    String s = Token.string(cache.getText(gui.context, rn, pre)).trim();
     if(r.w < BaseXLayout.width(g, s)
         && r.w < BaseXLayout.width(g, "..".concat(s.substring(s.length() - 1)))
             + MIN_TXT_SPACE) return;
@@ -379,7 +379,7 @@ public final class TreeView extends View implements TreeViewOptions {
       s = s.concat("..");
       while((tw = BaseXLayout.width(g, s)) + MIN_TXT_SPACE > r.w
           && s.length() > 3) {
-        s = s.substring(1);
+        s = s.substring(s.length() / 2);
       }
     }
 
