@@ -9,7 +9,7 @@ package org.basex.gui.view.tree;
 interface TreeViewOptions {
   // Options
   /** Use ChildIterator to cache nodes. */
-  boolean USE_CHILDITERATOR = true;
+  boolean USE_CHILDITERATOR = false;
   /** Draw only element nodes. */
   boolean ONLY_ELEMENT_NODES = false;
   /** Show Attributes. */
@@ -23,7 +23,7 @@ interface TreeViewOptions {
   /** Slim rectangles to text length. */
   boolean SLIM_TO_TEXT = true;
   /** Show extra node information. */
-  boolean SHOW_EXTRA_INFO = true;
+  boolean SHOW_EXTRA_INFO = false;
   /** Draw node text. */
   boolean DRAW_NODE_TEXT = true;
   /** Show 3d descendant connection. */
@@ -40,19 +40,19 @@ interface TreeViewOptions {
   int CHANGE_COLOR_TILL = 4;
 
   /** Minimum rectangle space for text. */
-  int MIN_TXT_SPACE = 25;
+  int MIN_TXT_SPACE = 4;
   /** Minimum space between the levels. */
-  int MIN_LEVEL_DISTANCE = 4;
+  int MIN_LEVEL_DISTANCE = 1;
   /** Optimal space between the levels. */
-  int BEST_LEVEL_DISTANCE = 20;
+   int BEST_LEVEL_DISTANCE = 30;
   /** Maximum level distance. */
-  int MAX_LEVEL_DISTANCE = 30;
-  /** Change node height till this value is reached. */
-  int CHANGE_NODE_HEIGHT_TILL = 8;
+  int MAX_LEVEL_DISTANCE = 100;
+  /** Best node height. */
+  int BEST_NODE_HEIGHT = 8;
   /** Minimum node height. */
   int MIN_NODE_HEIGHT = 1;
   /** Maximum node height. */
-  int MAX_NODE_HEIGHT = 500;
+  int MAX_NODE_HEIGHT = 24;
   /** Minimum node distance to draw node connections. */
   int MIN_NODE_DIST_CONN = 10;
   /** Draw kind rectangle. */

@@ -33,7 +33,6 @@ final class TreeCaching implements TreeViewOptions {
    */
   TreeCaching(final Data data, final GUIProp gp) {
     prop = gp;
-    if(data == null) return;
     maxLevel = data.meta.height + 1;
     cacheNodes(data);
   }
@@ -60,18 +59,20 @@ final class TreeCaching implements TreeViewOptions {
       for(int i = 0; i < maxLevel; i++)
         li[i] = new IntList();
       final int ts = data.meta.size;
-      final int[] lvlPre = new int[maxLevel];
-      li[0].add(0);
-      lvlPre[0] = 0;
-      for(int p = 1; p < ts; p++) {
-        final int k = data.kind(p);
-        if(!SHOW_ATTR && k == Data.ATTR) continue;
-        int lv = 0;
-        final int par = data.parent(p, k);
-        while(par != lvlPre[lv])
-          lv++;
-        lvlPre[lv + 1] = p;
-        li[lv + 1].add(p);
+      final int[] roots = data.doc();
+      for(int i = 0; i < roots.length; i++) {
+        final int root = roots[i];
+        li[0].add(root);
+        final int sh = i + 1 == roots.length ? ts : roots[i + 1];
+        for(int p = root + 1; p < sh; p++) {
+          final int k = data.kind(p);
+          if(!SHOW_ATTR && k == Data.ATTR) continue;
+          int lv = 0;
+          final int par = data.parent(p, k);
+          while(par != li[lv].get(li[lv].size() - 1))
+            lv++;
+          li[lv + 1].add(p);
+        }
       }
       nodes = li;
     }
@@ -155,7 +156,7 @@ final class TreeCaching implements TreeViewOptions {
   TreeBorder[] generateSubtreeBorders(final Data d, final int pre) {
 
     final TreeBorder[] bo = new TreeBorder[maxLevel];
-    if(pre == 0) {
+    if(pre == 0 && d.meta.ndocs == 1) {
       for(int i = 0; i < maxLevel; i++)
         bo[i] = new TreeBorder(i, 0, nodes[i].size());
 
@@ -473,8 +474,8 @@ final class TreeCaching implements TreeViewOptions {
   byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data;
     if(pre == c.current.nodes[rn]) return ViewData.path(d, pre);
-    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM)
-      return ViewData.tag(
+    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM) 
+    return ViewData.tag(
         prop, d, pre);
     return ViewData.content(d, pre, false);
   }
