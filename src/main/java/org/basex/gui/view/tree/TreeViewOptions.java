@@ -1,8 +1,10 @@
 package org.basex.gui.view.tree;
 
+import java.awt.Color;
+
 /**
  * This interface contains options for the tree view.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -38,13 +40,15 @@ interface TreeViewOptions {
   int BOTTOM_MARGIN = 5;
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
+  /** Highlight Color small space. */
+  Color SMALL_SPACE_COLOR = Color.white;
 
   /** Minimum rectangle space for text. */
   int MIN_TXT_SPACE = 4;
   /** Minimum space between the levels. */
   int MIN_LEVEL_DISTANCE = 1;
   /** Optimal space between the levels. */
-   int BEST_LEVEL_DISTANCE = 30;
+  int BEST_LEVEL_DISTANCE = 30;
   /** Maximum level distance. */
   int MAX_LEVEL_DISTANCE = 100;
   /** Best node height. */
