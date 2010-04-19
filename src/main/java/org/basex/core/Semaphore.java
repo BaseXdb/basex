@@ -12,8 +12,8 @@ import java.util.LinkedList;
 final class Semaphore {
   /** List of monitors for locking objects. */
   private final LinkedList<Lock> waiting = new LinkedList<Lock>();
-  /** Flag for an active writer. */
-  private boolean activeW;
+  /** Lock object: 0 = free, 1 = readlocked, 2 = writelocked. */
+  private int lock = 0;
   /** Number of active readers. */
   private int activeR;
 
@@ -26,8 +26,8 @@ final class Semaphore {
       final Lock l = new Lock(true);
       synchronized(l) {
         synchronized(this) {
-          if(waiting.size() == 0 && activeR == 0 && !activeW) {
-            activeW = true;
+          if(lock == 0) {
+            lock = 2;
             return;
           }
           waiting.add(l);
@@ -40,7 +40,8 @@ final class Semaphore {
       }
     } else {
       synchronized(this) {
-        if(!activeW && waiting.size() == 0) {
+        if(lock < 2 && waiting.size() == 0) {
+          lock = 1;
           activeR++;
           return;
         }
@@ -69,10 +70,13 @@ final class Semaphore {
    */
   synchronized void after(final boolean w) {
     if(w) {
-      activeW = false;
+      lock = 0;
       notifyNext();
     } else {
-      if(--activeR == 0) notifyNext();
+      if(--activeR == 0) {
+        lock = 0;
+        notifyNext();
+      }
     }
   }
 
@@ -86,8 +90,9 @@ final class Semaphore {
         eldest.notifyAll();
       }
       if(eldest.writer) {
-        activeW = true;
+        lock = 2;
       } else {
+        lock = 1;
         activeR = eldest.waitingReaders;
       }
     }
