@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
+import org.basex.core.Commands.CmdImport;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
@@ -177,6 +178,20 @@ public final class CommandParser extends InputParser {
         return new Optimize();
       case EXPORT:
         return new Export(string(cmd), string(null));
+      case IMPORT:
+        String name;
+        String xml;
+        switch(consume(CmdImport.class, cmd)) {
+          case DATABASE: case DB:
+            name = name(null);
+            xml = leftover(cmd);
+            return new CreateDB(xml, name);
+          case COLLECTION: case COLL:
+            name = name(null);
+            xml = leftover(cmd);
+            return new Add(xml);
+        }
+        break;        
       case XQUERY: case X:
         return new XQuery(xquery(cmd));
       case RUN:
@@ -241,6 +256,23 @@ public final class CommandParser extends InputParser {
       if(!q && (c <= ' ' || c == ';')) break;
       if(c == '"') q ^= true;
       else tb.add(c);
+      consume();
+    }
+    return finish(cmd, tb);
+  }
+  
+  /**
+   * Parses and returns the whole leftover of the string.
+   * @param cmd referring command; if specified, the result must not be empty
+   * @return xml string
+   * @throws QueryException query exception
+   */
+  private String leftover(final Cmd cmd) throws QueryException {
+    consumeWS();
+    final TokenBuilder tb = new TokenBuilder();
+    while(more()) {
+      final char c = curr();
+      tb.add(c);
       consume();
     }
     return finish(cmd, tb);

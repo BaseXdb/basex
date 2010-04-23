@@ -226,10 +226,14 @@ public interface Text {
     lang("ch_export2", PATH + "/" + NAM + "?")
   };
   /** Command help. */
+  String[] HELPIMPORT = {
+    "DB | COLL [" + NAM + "?] [" + PATH + "]", lang("ch_import1"),
+    lang("ch_import2", PATH)
+  };
+  /** Command help. */
   String[] HELPOPTIMIZE = {
     "", lang("ch_optimize1"), lang("ch_optimize2")
   };
-
   /** Command help. */
   String[] HELPQ = { lang("ch_helpquery0") };
   /** Command help. */

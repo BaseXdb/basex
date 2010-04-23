@@ -28,6 +28,8 @@ public interface Commands {
   enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, PATH }
   /** Index types. */
   enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
+  /** Import types. */
+  enum CmdImport { DATABASE, DB, COLLECTION, COLL }
 
   /** Command flag: command which will not be shown in the help. */
   int HID = 1;
@@ -40,7 +42,7 @@ public interface Commands {
     HD(HID, HELPDB), CREATE(HELPCREATE), C(HID), OPEN(HELPOPEN), O(HID),
     CHECK(HID), ADD(HELPADD), DELETE(HELPDELETE), INFO(HELPINFO), I(HID),
     CLOSE(HELPCLOSE), LIST(HELPLIST), DROP(HELPDROP), EXPORT(HELPEXPORT),
-    OPTIMIZE(HELPOPTIMIZE),
+    OPTIMIZE(HELPOPTIMIZE), IMPORT(HELPIMPORT),
     // Query commands
     HQ(HID, HELPQ), XQUERY(HELPXQUERY), X(HID), FIND(HELPFIND),
     RUN(HELPRUN), CS(HELPCS),
