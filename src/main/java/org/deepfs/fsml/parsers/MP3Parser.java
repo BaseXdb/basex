@@ -687,6 +687,16 @@ public final class MP3Parser implements IFileParser {
             Integer.parseInt(string(obj.readText(size))));
       }
     },
+    
+    /** iTunes Compilation flag. */
+    TCMP {
+      @Override
+      public void parse(final MP3Parser obj, final int size)
+          throws IOException {
+        obj.deepFile.addMeta(MetaElem.ITUNES_COMPILATION,
+            Integer.parseInt(string(obj.readText(size - 1))));
+      }
+    },
 
     /** Composer. */
     TCOM {

@@ -53,6 +53,8 @@ public enum MetaElem {
   BEATS_PER_MINUTE(DeepNS.FSMETA, "beatsPerMinute", Type.INT, false),
   /** Bitrate. */
   BITRATE_KBIT(DeepNS.FSMETA, "bitrateKBitS", Type.INT, false),
+  /** iTunes compilation flag. */
+  ITUNES_COMPILATION(DeepNS.FSMETA, "iTunesCompilation", Type.INT, false),
   /** ISO speed ratings. */
   ISO_SPEED_RATINGS(DeepNS.FSMETA, "isoSpeedRatings", Type.INT, false),
   /** Focal length in 35mm film. */
