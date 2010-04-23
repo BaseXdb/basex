@@ -25,12 +25,24 @@ try:
   else:
     print session.info()
 
-  # close session
-  session.close()
-
   # print time needed
   time = (time.clock() - start) * 1000
   print time, "ms."
+  
+  # import example
+  if session.loadDoc('example.xml', None, 'python'):
+      print session.result()
+  else:
+      print session.info()
+      
+  # import example collection
+  #if session.loadDoc('example.xml', None, None):
+  #    print session.result()
+  #else:
+  #    print session.info()
+  
+  # close session
+  session.close()
 
 except IOError as e:
   # print exception

@@ -79,6 +79,16 @@ class Session():
     self.__info = self.__readString()
     return self.__read() == 0
 
+  # Loads a document or string into a new database or existing collection.
+  def loadDoc(self, file, xml, dbname):
+      if file:
+        f = open(file, 'r')
+        xml = f.read()
+      if dbname:
+        return self.execute('import db ' + dbname + ' ' + xml)
+      else:
+        return self.execute('import coll ' + xml)
+
   # Returns the result.
   def result(self):
     return self.__result
