@@ -227,8 +227,8 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPIMPORT = {
-    "DB | COLL [" + NAM + "?] [" + PATH + "]", lang("ch_import1"),
-    lang("ch_import2", PATH)
+    "DB | COLL [" + NAM + "?] [xml string]", lang("ch_import1"),
+    lang("ch_import2", "xml string")
   };
   /** Command help. */
   String[] HELPOPTIMIZE = {
