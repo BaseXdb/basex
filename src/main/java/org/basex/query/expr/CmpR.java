@@ -1,7 +1,10 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
+import java.io.IOException;
 import org.basex.data.MemData;
+import org.basex.data.Serializer;
 import org.basex.data.StatsKey;
 import org.basex.data.Data.IndexType;
 import org.basex.index.RangeToken;
@@ -19,6 +22,7 @@ import org.basex.query.path.NameTest;
 import org.basex.query.path.Step;
 import org.basex.query.path.Test.Kind;
 import org.basex.util.Array;
+import org.basex.util.Token;
 
 /**
  * Range comparison expression.
@@ -106,7 +110,7 @@ final class CmpR extends Single {
     final double mn = Math.max(min, c.min);
     final double mx = Math.min(max, c.max);
     return mn > mx ? Bln.FALSE :
-      new CmpR(c, mn, mni && c.mni, mx, mxi && c.mxi);
+      new CmpR(c.expr, mn, mni && c.mni, mx, mxi && c.mxi);
   }
 
   @Override
@@ -179,6 +183,13 @@ final class CmpR extends Single {
   @Override
   public SeqType returned(final QueryContext ctx) {
     return SeqType.BLN;
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, MIN, Token.token(min), MAX, Token.token(max));
+    expr.plan(ser);
+    ser.closeElement();
   }
 
   @Override

@@ -268,8 +268,8 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       final int k = com.getSelectedIndex();
       if(k <= 0) continue;
       String key = com.getSelectedItem().toString();
-      if(!key.contains(":")) key = "*:" + key;
       final boolean attr = key.startsWith("@");
+      if(!key.contains(":") && !attr) key = "*:" + key;
 
       final Component comp = panel.getComponent(c + 1);
       String pattern = "";

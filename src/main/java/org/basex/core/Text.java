@@ -74,7 +74,7 @@ public interface Text {
 
   /** Start information. */
   String CLIENTINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + CLIENTMODE + " [-npPU] [-doqvVxz] [query] [-c]" + NL +
+    "Usage: " + NAME + CLIENTMODE + " [-npPU] [-doqvVwz] [query] [-c]" + NL +
     "  [query]    query file" + NL +
     "  -c<cmd>    database commands" + NL +
     "  -d         debug mode" + NL +
@@ -90,7 +90,7 @@ public interface Text {
 
   /** Start information. */
   String LOCALINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + " [-dioqsvVxz] [query] [-c]" + NL +
+    "Usage: " + NAME + " [-dioqsvVwz] [query] [-c]" + NL +
     "  [query]    query file" + NL +
     "  -c<cmd>    database commands" + NL +
     "  -d         debug mode" + NL +
