@@ -68,8 +68,7 @@ final class HTMLParser {
       }
 
       // define input
-      final ByteArrayInputStream bais = new ByteArrayInputStream(content);
-      final InputSource is = new InputSource(bais);
+      final InputSource is = new InputSource(new ByteArrayInputStream(content));
       is.setEncoding(Charset.isSupported(enc) ? enc(enc) : UTF8);
       // define output
       final StringWriter sw = new StringWriter();

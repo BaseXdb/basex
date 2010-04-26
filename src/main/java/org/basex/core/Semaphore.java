@@ -12,8 +12,8 @@ import java.util.LinkedList;
 final class Semaphore {
   /** List of monitors for locking objects. */
   private final LinkedList<Lock> waiting = new LinkedList<Lock>();
-  /** Lock object: 0 = free, 1 = readlocked, 2 = writelocked. */
-  private int lock = 0;
+  /** Lock object: 0 = free, 1 = read lock, 2 = write lock. */
+  private int lock;
   /** Number of active readers. */
   private int activeR;
 
