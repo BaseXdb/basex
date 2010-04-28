@@ -65,8 +65,7 @@ public final class Prop extends AProp {
 
   /** Debug mode. */
   public static final Object[] DEBUG = { "DEBUG", false };
-  /** Quiet flag for logging. */
-  public static final Object[] QUIET = { "QUIET", false };
+
   /** Short processing info. */
   public static final Object[] INFO = { "INFO", false };
   /** Detailed processing info. */

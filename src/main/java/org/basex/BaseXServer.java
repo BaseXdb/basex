@@ -11,6 +11,7 @@ import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
+import org.basex.server.Log;
 import org.basex.server.LoginException;
 import org.basex.server.ServerProcess;
 import org.basex.util.Args;
@@ -28,6 +29,10 @@ import org.basex.util.Token;
  * @author Andreas Weiler
  */
 public final class BaseXServer extends Main implements Runnable {
+  /** Log. */
+  public Log log;
+  /** Quiet mode (no logging). */
+  private boolean quiet;
   /** Stop file. */
   private static final IO STOP = IO.get(Prop.TMP + "bxs");
   /** Server socket. */
@@ -51,6 +56,7 @@ public final class BaseXServer extends Main implements Runnable {
   public BaseXServer(final String... args) {
     super(args);
     if(!success) return;
+    log = new Log(context, quiet);
 
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
@@ -60,7 +66,7 @@ public final class BaseXServer extends Main implements Runnable {
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
       if(console) quit(console());
     } catch(final Exception ex) {
-      context.log.write(ex.getMessage());
+      log.write(ex.getMessage());
       errln(server(ex));
     }
   }
@@ -97,7 +103,7 @@ public final class BaseXServer extends Main implements Runnable {
       if(console) System.in.close();
       server.close();
     } catch(final IOException ex) {
-      context.log.write(ex.getMessage());
+      log.write(ex.getMessage());
       ex.printStackTrace();
     }
 
@@ -129,7 +135,7 @@ public final class BaseXServer extends Main implements Runnable {
           context.prop.set(Prop.SERVERPORT, arg.num());
         } else if(c == 'z') {
           // suppress logging
-          context.prop.set(Prop.QUIET, true);
+          quiet = true;
         } else {
           success = false;
         }
