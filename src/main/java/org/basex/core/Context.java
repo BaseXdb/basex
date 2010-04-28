@@ -5,6 +5,7 @@ import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
+import org.basex.server.Log;
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
 
@@ -17,6 +18,8 @@ import org.basex.server.Sessions;
  * @author Christian Gruen
  */
 public final class Context {
+  /** Log. */
+  public Log log;
   /** Client connections. */
   public final Sessions sessions;
   /** Process synchronization. */
@@ -55,6 +58,7 @@ public final class Context {
     sema = new Semaphore();
     users = new Users(true);
     user = users.get(ADMIN);
+    log = new Log(this, prop.is(Prop.QUIET));
   }
 
   /**
@@ -67,6 +71,7 @@ public final class Context {
     sessions = ctx.sessions;
     sema = ctx.sema;
     users = ctx.users;
+    log = ctx.log;
   }
 
   /**

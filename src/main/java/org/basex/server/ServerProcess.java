@@ -48,7 +48,7 @@ public final class ServerProcess extends Thread {
    */
   public ServerProcess(final Socket s, final BaseXServer b) {
     context = new Context(b.context);
-    log = b.log;
+    log = context.log;
     socket = s;
   }
 
