@@ -42,13 +42,14 @@ public class NamespaceTest {
 
   /** Test query.
    * [LK] this one causes troubles (-> wrong ref's due to UpdatePrimitive?)
+   *
   @Test
   public final void copy2() {
     query(
         "declare namespace a='aa'; copy $c:=doc('d4') modify () return $c//a:y",
         "<b xmlns:x='xx'/>");
   }
-   */
+  */
 
   /** Test query. */
   @Test
@@ -76,6 +77,19 @@ public class NamespaceTest {
         "doc('d1')/x/*/*",
         "<b:y xmlns:b='bb' xmlns:a='aa'/>");
   }
+  
+  /** Test query.
+   * [LK] this one causes troubles (prefix declaration not copied)
+   *
+  @Test
+  public final void insertD4intoD1() {
+    query(
+        "declare namespace a='aa'; insert node doc('d4')/a:x/a:y " +
+        "into doc('d1')/x",
+        "doc('d1')/x",
+        "<x><a:y xmlns:a='aa' xmlns:b='bb'/></x>");
+  }
+  */
 
   /** Creates the database context. */
   @BeforeClass
