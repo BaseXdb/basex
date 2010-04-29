@@ -1,15 +1,25 @@
 package org.basex.test.cs;
 
+import static org.junit.Assert.*;
+import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Random;
+
+import org.basex.BaseXServer;
+import org.basex.core.Session;
+import org.basex.core.Proc;
+import org.basex.core.proc.CreateDB;
+import org.basex.core.proc.DropDB;
+import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
+import org.basex.util.Performance;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
- * Testing the semaphore.
- *
- * Prerequisites:
- * Run BaseXServer...
- * Create Factbook DB...
+ * This class tests the order of incoming processes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
@@ -17,38 +27,64 @@ import org.basex.server.ClientSession;
 public final class SemaphoreTest {
   /** Create random number. */
   static Random rand = new Random();
+  /** Test file. */
+  private static final String FILE = "etc/xml/factbook.xml";
+  /** Test queries. */
+  final String [] q = {"xquery for $n in doc('factbook')//province " +
+      "return insert node <test/> into $n",
+      "xquery for $n in 1 to 100000 where $n = 0 return $n"
+  };
+  /** Number of performance tests. */
+  private static final int TESTS = 5;
+  /** List to adminstrate the clients. */
+  final static LinkedList<ClientSession> sessions = new LinkedList<ClientSession>();
 
-  /**
-   * Main method of the example class.
-   * @param args (ignored) command-line arguments
-   */
-  public static void main(final String[] args) {
-    new SemaphoreTest().run();
+  /** Server reference. */
+  static BaseXServer server;
+  /** Socket reference. */
+  static Session sess;
+
+  /** Number of done tests. */
+  static int tdone;
+
+  /** Starts the server. */
+  @BeforeClass
+  public static void start() {
+    server = new BaseXServer();
+    sess = createSession();
   }
 
-  /**
-   * Runs the test.
-   */
-  void run() {
-    System.out.println("=== Semaphore Test ===");
-
-    final String [] queries = {"xquery for $n in doc('factbook')//city " +
-        "return insert node <test/> into $n",
-        "xquery for $n in 1 to 1000000 where $n = 999999 return $n"
-    };
-
-    runClients(queries);
+  /** Stops the server. */
+  @AfterClass
+  public static void stop() {
+    closeSession(sess);
+    for(ClientSession s : sessions) {
+      closeSession(s);
+    }
+    // Stop server instance.
+    new BaseXServer("stop");
   }
 
-  /**
-   * Runs the different tests.
-   * @param q array of queries
-   */
-  private void runClients(final String[] q) {
-    for (int n = 1; n <= 10; n++) {
+  /** Runs a test for concurrent database creations. */
+  @Test
+  public void createTest() {
+    // drops database for clean test
+    exec(new DropDB("factbook"), sess);
+    // create database for clean test
+    exec(new CreateDB(FILE), sess);
+    for(int i = 0; i < TESTS; i++) {
+      sessions.add(createSession());
+    }
+    Performance.sleep(700);
+  }
+
+  /** Efficiency test. */
+  @Test
+  public void runClients() {
+    for (int n = 0; n < TESTS; n++) {
       final int j = n;
       try {
-        Thread.sleep(2000);
+        Thread.sleep(500);
       } catch(final InterruptedException e1) {
         e1.printStackTrace();
       }
@@ -56,17 +92,75 @@ public final class SemaphoreTest {
         @Override
         public void run() {
           try {
-            final ClientSession session =
-              new ClientSession("localhost", 1984, "admin", "admin");
             final int t = rand.nextInt(2);
-            session.execute(q[t]);
-            System.out.println("=== Client " + j + " with query " + t +
-                " done ===");
+            sessions.get(j).execute(q[t]);
+            String w = "write";
+            if(t == 1) w = "read";
+            System.out.println("=== Client " + j + " with " + w + " query done ===");
+            tdone++;
           } catch(final IOException e) {
             e.printStackTrace();
           }
         }
       }.start();
+    }
+
+    // wait until all test have been finished
+    while(tdone < TESTS) Performance.sleep(200);
+  }
+
+  /**
+   * Creates a client session.
+   * @return client session
+   */
+  static ClientSession createSession() {
+    try {
+      return new ClientSession(server.context, ADMIN, ADMIN);
+    } catch(final IOException ex) {
+      fail(ex.toString());
+    }
+    return null;
+  }
+
+  /**
+   * Closes a client session.
+   * @param s session to be closed
+   */
+  static void closeSession(final Session s) {
+    try {
+      s.close();
+    } catch(final IOException ex) {
+      fail(ex.toString());
+    }
+  }
+
+  /**
+   * Returns query result.
+   * @param pr process reference
+   * @param session session
+   * @return String result
+   */
+  String checkRes(final Proc pr, final Session session) {
+    final CachedOutput co = new CachedOutput();
+    try {
+      session.execute(pr, co);
+    } catch(final IOException ex) {
+      fail(ex.toString());
+    }
+    return co.toString();
+  }
+
+  /**
+   * Runs the specified process.
+   * @param pr process reference
+   * @param session Session
+   * @return success flag
+   */
+  String exec(final Proc pr, final Session session) {
+    try {
+      return session.execute(pr) ? null : session.info();
+    } catch(final IOException ex) {
+      return ex.toString();
     }
   }
 }
