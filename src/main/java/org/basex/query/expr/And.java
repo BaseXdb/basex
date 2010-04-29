@@ -58,8 +58,11 @@ public final class And extends Arr {
       } else if(e instanceof CmpR) {
         // merge comparisons
         tmp = cr == null ? e : cr.intersect((CmpR) e);
-        if(!(tmp instanceof CmpR)) return tmp;
-        cr = (CmpR) tmp;
+        if(tmp instanceof CmpR) {
+          cr = (CmpR) tmp;
+        } else if(tmp != null) {
+          return tmp;
+        }
       }
       if(tmp == null) ex = Array.add(ex, e);
     }

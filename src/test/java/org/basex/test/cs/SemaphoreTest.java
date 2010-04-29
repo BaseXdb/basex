@@ -30,14 +30,15 @@ public final class SemaphoreTest {
   /** Test file. */
   private static final String FILE = "etc/xml/factbook.xml";
   /** Test queries. */
-  final String [] q = {"xquery for $n in doc('factbook')//province " +
-      "return insert node <test/> into $n",
+  final String [] q = {
+      "xquery for $n in (doc('factbook')//province)[position() < 100] " +
+      "       return insert node <test/> into $n",
       "xquery for $n in 1 to 100000 where $n = 0 return $n"
   };
   /** Number of performance tests. */
-  private static final int TESTS = 5;
-  /** List to adminstrate the clients. */
-  final static LinkedList<ClientSession> sessions = new LinkedList<ClientSession>();
+  private static final int TESTS = 10;
+  /** List to adminster the clients. */
+  static LinkedList<ClientSession> sessions = new LinkedList<ClientSession>();
 
   /** Server reference. */
   static BaseXServer server;
@@ -58,7 +59,7 @@ public final class SemaphoreTest {
   @AfterClass
   public static void stop() {
     closeSession(sess);
-    for(ClientSession s : sessions) {
+    for(final ClientSession s : sessions) {
       closeSession(s);
     }
     // Stop server instance.
@@ -75,31 +76,23 @@ public final class SemaphoreTest {
     for(int i = 0; i < TESTS; i++) {
       sessions.add(createSession());
     }
-    Performance.sleep(700);
   }
 
   /** Efficiency test. */
   @Test
   public void runClients() {
-    for (int n = 0; n < TESTS; n++) {
+    for(int n = 0; n < TESTS; n++) {
       final int j = n;
-      try {
-        Thread.sleep(500);
-      } catch(final InterruptedException e1) {
-        e1.printStackTrace();
-      }
+      Performance.sleep(rand.nextInt(500));
       new Thread() {
         @Override
         public void run() {
           try {
             final int t = rand.nextInt(2);
             sessions.get(j).execute(q[t]);
-            String w = "write";
-            if(t == 1) w = "read";
-            System.out.println("=== Client " + j + " with " + w + " query done ===");
             tdone++;
-          } catch(final IOException e) {
-            e.printStackTrace();
+          } catch(final IOException ex) {
+            fail(ex.toString());
           }
         }
       }.start();
