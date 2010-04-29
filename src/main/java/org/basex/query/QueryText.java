@@ -572,7 +572,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTPRE = "pre-evaluating %";
   /** Optimization info. */
-  String OPTWRITE = "Rrewriting %";
+  String OPTWRITE = "rewriting %";
   /** Optimization info. */
   String OPTFALSE = "removing always false expression: %";
   /** Optimization info. */

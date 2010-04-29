@@ -213,7 +213,7 @@ public final class MetaData {
       else if(k.equals(DBHGHT))   height     = Token.toInt(v);
       else if(k.equals(DBCHOP))   chop       = toBool(v);
       else if(k.equals(DBENTITY)) entity     = toBool(v);
-      else if(k.equals(DBPTHIDX)) pthindex  = toBool(v);
+      else if(k.equals(DBPTHIDX)) pthindex   = toBool(v);
       else if(k.equals(DBTXTIDX)) txtindex   = toBool(v);
       else if(k.equals(DBATVIDX)) atvindex   = toBool(v);
       else if(k.equals(DBFTXIDX)) ftxindex   = toBool(v);

@@ -30,7 +30,7 @@ public final class BlockAccessTest {
   /** Test file we do updates with. */
   private static final Prop PROP = new Prop(true);
   /** BlockStorage. */
-  private TableDiskAccess tba;
+  private TableDiskAccess tda;
   /** Data reference. */
   private Data data;
   /** Test file size. */
@@ -63,7 +63,7 @@ public final class BlockAccessTest {
       data = new DiskBuilder(parser).build(DBNAME);
       size = data.meta.size;
       data.close();
-      tba = new TableDiskAccess(data.meta, DATATBL);
+      tda = new TableDiskAccess(data.meta, DATATBL);
     } catch(final Exception ex) {
       ex.printStackTrace();
     }
@@ -71,7 +71,7 @@ public final class BlockAccessTest {
     final int bytecount = size * (1 << IO.NODEPOWER);
     storage = new byte[bytecount];
     for(int i = 0; i < bytecount; i++) {
-      storage[i] = (byte) tba.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
+      storage[i] = (byte) tda.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
     entries = IO.BLOCKSIZE >>> IO.NODEPOWER;
     blocks = (int) Math.ceil(size / Math.floor(entries * IO.BLOCKFILL));
@@ -84,7 +84,7 @@ public final class BlockAccessTest {
   @After
   public void tearDown() {
     try {
-      tba.close();
+      tda.close();
       DropDB.drop(DBNAME, PROP);
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -96,8 +96,8 @@ public final class BlockAccessTest {
    */
   private void closeAndReload() {
     try {
-      tba.close();
-      tba = new TableDiskAccess(data.meta, DATATBL);
+      tda.close();
+      tda = new TableDiskAccess(data.meta, DATATBL);
     } catch(final IOException ex) {
       fail();
     }
@@ -117,7 +117,7 @@ public final class BlockAccessTest {
       final int startByteNum = startOffset + i;
       final int currentByteNum = currentOffset + i;
       final byte startByte = storage[startByteNum];
-      final byte currentByte = (byte) tba.read1(currentByteNum >> IO.NODEPOWER,
+      final byte currentByte = (byte) tda.read1(currentByteNum >> IO.NODEPOWER,
         currentByteNum % (1 << IO.NODEPOWER));
       assertEquals("Old entry " + (startByteNum >> IO.NODEPOWER)
           + " (byte " + startByteNum % (1 << IO.NODEPOWER)
@@ -132,13 +132,13 @@ public final class BlockAccessTest {
    */
   @Test
   public void testSize() {
-    assertEquals("Testfile size changed!", size, tba.size());
+    assertEquals("Testfile size changed!", size, tda.size());
     assertTrue("Need at least 3 blocks for testing!", blocks > 2);
-    assertEquals("Unexpected number of blocks!", blocks, tba.blocks());
+    assertEquals("Unexpected number of blocks!", blocks, tda.blocks());
     closeAndReload();
-    assertEquals("Testfile size changed!", size, tba.size());
+    assertEquals("Testfile size changed!", size, tda.size());
     assertTrue("Need at least 3 blocks for testing!", blocks > 2);
-    assertEquals("Unexpected number of blocks!", blocks, tba.blocks());
+    assertEquals("Unexpected number of blocks!", blocks, tda.blocks());
   }
 
   /**
@@ -146,12 +146,12 @@ public final class BlockAccessTest {
    */
   @Test
   public void testDeleteOneNode() {
-    tba.delete(3, 1);
-    assertEquals("One node deleted => size-1", size - 1, tba.size());
+    tda.delete(3, 1);
+    assertEquals("One node deleted => size-1", size - 1, tda.size());
     assertEntrysEqual(0, 0, 3);
     assertEntrysEqual(4, 3, size - 4);
     closeAndReload();
-    assertEquals("One node deleted => size-1", size - 1, tba.size());
+    assertEquals("One node deleted => size-1", size - 1, tda.size());
     assertEntrysEqual(0, 0, 3);
     assertEntrysEqual(4, 3, size - 4);
   }
@@ -161,11 +161,11 @@ public final class BlockAccessTest {
    */
   @Test
   public void testDeleteAtBeginning() {
-    tba.delete(0, 3);
-    assertEquals("Three nodes deleted => size-3", size - 3, tba.size());
+    tda.delete(0, 3);
+    assertEquals("Three nodes deleted => size-3", size - 3, tda.size());
     assertEntrysEqual(3, 0, size - 3);
     closeAndReload();
-    assertEquals("Three nodes deleted => size-3", size - 3, tba.size());
+    assertEquals("Three nodes deleted => size-3", size - 3, tda.size());
     assertEntrysEqual(3, 0, size - 3);
   }
 
@@ -174,11 +174,11 @@ public final class BlockAccessTest {
    */
   @Test
   public void testDeleteAtEnd() {
-    tba.delete(size - 3, 3);
-    assertEquals("Three nodes deleted => size-3", size - 3, tba.size());
+    tda.delete(size - 3, 3);
+    assertEquals("Three nodes deleted => size-3", size - 3, tda.size());
     assertEntrysEqual(0, 0, size - 3);
     closeAndReload();
-    assertEquals("Three nodes deleted => size-3", size - 3, tba.size());
+    assertEquals("Three nodes deleted => size-3", size - 3, tda.size());
     assertEntrysEqual(0, 0, size - 3);
   }
 
@@ -187,11 +187,11 @@ public final class BlockAccessTest {
    */
   @Test
   public void testDeleteFirstBlock() {
-    tba.delete(0, nodes);
-    assertEquals(blocks - 1, tba.blocks());
+    tda.delete(0, nodes);
+    assertEquals(blocks - 1, tda.blocks());
     assertEntrysEqual(nodes, 0, size - nodes);
     closeAndReload();
-    assertEquals(blocks - 1, tba.blocks());
+    assertEquals(blocks - 1, tda.blocks());
     assertEntrysEqual(nodes, 0, size - nodes);
   }
 
@@ -200,12 +200,12 @@ public final class BlockAccessTest {
    */
   @Test
   public void testDeleteSecondBlock() {
-    tba.delete(nodes, nodes);
-    assertEquals(blocks - 1, tba.blocks());
+    tda.delete(nodes, nodes);
+    assertEquals(blocks - 1, tda.blocks());
     assertEntrysEqual(0, 0, nodes);
     assertEntrysEqual(2 * nodes, nodes, size - 2 * nodes);
     closeAndReload();
-    assertEquals(blocks - 1, tba.blocks());
+    assertEquals(blocks - 1, tda.blocks());
     assertEntrysEqual(0, 0, nodes);
     assertEntrysEqual(2 * nodes, nodes, size - 2 * nodes);
   }
@@ -215,11 +215,11 @@ public final class BlockAccessTest {
    */
   @Test
   public void testDeleteLastBlock() {
-    tba.delete(size / nodes * nodes, size % nodes);
-    assertEquals(blocks - 1, tba.blocks());
+    tda.delete(size / nodes * nodes, size % nodes);
+    assertEquals(blocks - 1, tda.blocks());
     assertEntrysEqual(0, 0, nodes - size % nodes);
     closeAndReload();
-    assertEquals(blocks - 1, tba.blocks());
+    assertEquals(blocks - 1, tda.blocks());
     assertEntrysEqual(0, 0, nodes - size % nodes);
   }
 
@@ -246,13 +246,13 @@ public final class BlockAccessTest {
    */
   @Test
   public void testSimpleInsert() {
-    tba.insert(4, getTestEntries(1));
-    assertEquals(size + 1, tba.size());
+    tda.insert(4, getTestEntries(1));
+    assertEquals(size + 1, tda.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 1);
     assertEntrysEqual(4, 5, size - 4);
     closeAndReload();
-    assertEquals(size + 1, tba.size());
+    assertEquals(size + 1, tda.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 1);
     assertEntrysEqual(4, 5, size - 4);
@@ -263,13 +263,13 @@ public final class BlockAccessTest {
    */
   @Test
   public void testInsertMultiple() {
-    tba.insert(4, getTestEntries(3));
-    assertEquals(size + 3, tba.size());
+    tda.insert(4, getTestEntries(3));
+    assertEquals(size + 3, tda.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 3);
     assertEntrysEqual(4, 7, size - 4);
     closeAndReload();
-    assertEquals(size + 3, tba.size());
+    assertEquals(size + 3, tda.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, 3);
     assertEntrysEqual(4, 7, size - 4);
@@ -280,13 +280,13 @@ public final class BlockAccessTest {
    */
   @Test
   public void testInsertMany() {
-    tba.insert(4, getTestEntries(entries - 1));
-    assertEquals(size + entries - 1, tba.size());
+    tda.insert(4, getTestEntries(entries - 1));
+    assertEquals(size + entries - 1, tda.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, entries - 1);
     assertEntrysEqual(4, 4 + entries - 1, size - 4);
     closeAndReload();
-    assertEquals(size + entries - 1, tba.size());
+    assertEquals(size + entries - 1, tda.size());
     assertEntrysEqual(0, 0, 4);
     assertAreInserted(4, entries - 1);
     assertEntrysEqual(4, 4 + entries - 1, size - 4);
@@ -297,15 +297,15 @@ public final class BlockAccessTest {
    */
   @Test
   public void testInsertAtBlockBoundary() {
-    tba.insert(nodes, getTestEntries(nodes));
-    assertEquals(size + nodes, tba.size());
-    assertEquals(blocks + 1, tba.blocks());
+    tda.insert(nodes, getTestEntries(nodes));
+    assertEquals(size + nodes, tda.size());
+    assertEquals(blocks + 1, tda.blocks());
     assertEntrysEqual(0, 0, nodes);
     assertAreInserted(nodes, nodes);
     assertEntrysEqual(nodes, 2 * nodes, size - nodes);
     closeAndReload();
-    assertEquals(size + nodes, tba.size());
-    assertEquals(blocks + 1, tba.blocks());
+    assertEquals(size + nodes, tda.size());
+    assertEquals(blocks + 1, tda.blocks());
     assertEntrysEqual(0, 0, nodes);
     assertAreInserted(nodes, nodes);
     assertEntrysEqual(nodes, 2 * nodes, size - nodes);
@@ -319,7 +319,7 @@ public final class BlockAccessTest {
   private void assertAreInserted(final int startNum, final int count) {
     for(int i = 0; i < count; i++)
       for(int j = 0; j < 1 << IO.NODEPOWER; j++)
-        assertEquals(5, tba.read1(startNum + i, j));
+        assertEquals(5, tda.read1(startNum + i, j));
   }
 
   /**

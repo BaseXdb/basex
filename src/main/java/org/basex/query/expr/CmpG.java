@@ -126,7 +126,7 @@ public final class CmpG extends Arr {
     }
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-
+    
     Expr e = this;
     if(e1.i() && e2.i()) {
       e = Bln.get(eval((Item) e1, (Item) e2));
@@ -255,7 +255,10 @@ public final class CmpG extends Arr {
     final Expr arg = expr[1];
     if(!(arg.i() || arg instanceof Seq)) {
       final SeqType ret = arg.returned(ic.ctx);
-      if(!ret.type.str && !ret.type.node()) return false;
+      // index access not possible if returned type is no string or node,
+      // and if expression is dependent on context
+      if(!ret.type.str && !ret.type.node() || arg.uses(Use.CTX, ic.ctx))
+        return false;
 
       ic.is += Math.max(1, ic.data.meta.size / 10);
       iacc = Array.add(iacc, new IndexAccess(arg, type, ic));
