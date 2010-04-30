@@ -100,18 +100,6 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <skipTests>true</skipTests>
-        </configuration>
-      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -140,13 +128,11 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
+        <artifactId>maven-surefire-plugin</artifactId>
         <version>2.5</version>
-
         <configuration>
-          <skipTests>true</skipTests>
+		<forkMode>always</forkMode>
         </configuration>
-
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
