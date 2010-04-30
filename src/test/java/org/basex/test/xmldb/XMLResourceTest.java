@@ -111,10 +111,12 @@ public class XMLResourceTest extends TestCase {
   public void testGetContentAsSAX() throws Exception {
     final DefaultHandler ch = new DefaultHandler() {
       int count;
+      @Override
       public void startElement(final String u, final String ln, final String qn,
           final Attributes a) {
         count++;
       }
+      @Override
       public void endDocument() {
         assertEquals("Wrong number of elements.", 2, count);
       }

@@ -121,7 +121,9 @@
         <configuration>
           <includes>
             <include>**/AllTests.java</include>
+            <include>**/XQJTest*.java</include>
           </includes>
+          <forkMode>always</forkMode>
         </configuration>
       </plugin>
       <plugin>
