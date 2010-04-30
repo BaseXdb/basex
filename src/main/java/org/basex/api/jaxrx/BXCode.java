@@ -35,6 +35,7 @@ abstract class BXCode {
           System.getProperty("org.basex.user"),
           System.getProperty("org.basex.password"));
     } catch(final Exception ex) {
+      ex.printStackTrace();
       throw new JaxRxException(ex);
     }
   }
