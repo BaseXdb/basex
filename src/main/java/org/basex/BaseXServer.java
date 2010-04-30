@@ -201,6 +201,5 @@ public final class BaseXServer extends Main implements Runnable {
     } catch(final IOException ex) {
       errln(server(ex));
     }
-    return;
   }
 }

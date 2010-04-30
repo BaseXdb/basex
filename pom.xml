@@ -23,19 +23,7 @@
       <name>Codehaus Repository</name>
       <url>http://repository.codehaus.org/</url>
     </repository>
-    <!--<repository>
-      <id>akathist-repository</id>
-      <name>Akathist Repository</name>
-      <url>http://www.9stmaryrd.com/maven</url>
-    </repository>-->
   </repositories>
-  <!--<pluginRepositories>
-    <pluginRepository>
-      <id>akathist-repository</id>
-      <name>Akathist Repository</name>
-      <url>http://www.9stmaryrd.com/maven</url>
-    </pluginRepository>
-  </pluginRepositories>-->
   <organization>
     <name>Chair for Database and Information Systems, U Konstanz</name>
     <url>http://www.informatik.uni-konstanz.de/arbeitsgruppen/dbis</url>
@@ -100,7 +88,14 @@
           </archive>
         </configuration>
       </plugin>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <forkMode>always</forkMode>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -120,29 +115,4 @@
       </plugin>
     </plugins>
   </build>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-		<forkMode>always</forkMode>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <linkXRef>false</linkXRef>
-          <configLocation>src/main/resources/checkstyle-basex.xml</configLocation>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>

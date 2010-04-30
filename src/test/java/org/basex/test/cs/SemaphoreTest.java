@@ -5,7 +5,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
-
 import org.basex.BaseXServer;
 import org.basex.core.Session;
 import org.basex.core.Proc;

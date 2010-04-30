@@ -17,6 +17,7 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.Token;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -40,6 +41,13 @@ public abstract class QueryTest {
   public static void startTest() {
     context = new Context();
     context.prop.set(Prop.CACHEQUERY, true);
+  }
+
+  /** Finish test. */
+  @AfterClass
+  public static void stopTest() {
+    new DropDB(Main.name(QueryTest.class)).exec(context);
+    context.close();
   }
 
   /**
@@ -77,8 +85,6 @@ public abstract class QueryTest {
         fail(qu[0] + ": " + proc.info() + details());
       }
     }
-
-    new DropDB(name).exec(context);
   }
 
   /**
