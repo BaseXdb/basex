@@ -97,9 +97,8 @@ public final class SemaphoreTest {
         }
       }.start();
     }
-
     // wait until all test have been finished
-    while(tdone < TESTS) Performance.sleep(200);
+    while(tdone < sessions.size()) Performance.sleep(200);
   }
 
   /**

@@ -10,16 +10,10 @@ import java.util.LinkedList;
  * @author Andreas Weiler
  */
 final class Semaphore {
-  /** List of waiting processes for writers or reading groups. */
+  /** List of monitors for locking objects. */
   private final LinkedList<Lock> waiting = new LinkedList<Lock>();
-  /** Locking states. */
-  private static enum State {
-    /** Idle state.   */ IDLE,
-    /** Read state.   */ READ,
-    /** Write state.  */ WRITE
-  }
-  /** State of the lock. */
-  private State state = State.IDLE;
+  /** State of the semaphore: 0 = idle, 1 = read lock, 2 = write lock. */
+  private int state;
   /** Number of active readers. */
   private int activeR;
 
@@ -27,49 +21,38 @@ final class Semaphore {
    * Modifications before executing a process.
    * @param w writing flag
    */
-  @SuppressWarnings("fallthrough")
   void before(final boolean w) {
     if(w) {
-      final Lock p = new Lock(true);
-      synchronized(p) {
+      final Lock l = new Lock(true);
+      synchronized(l) {
         synchronized(this) {
-          switch(state) {
-            case IDLE:
-              state = State.WRITE;
-              return;
-            default:
-              waiting.add(p);
-              break;
+          if(state == 0) {
+            state = 2;
+            return;
           }
+          waiting.add(l);
         }
         try {
-          p.wait();
+          l.wait();
         } catch(final InterruptedException ex) {
           ex.printStackTrace();
         }
       }
     } else {
-      Lock l = null;
       synchronized(this) {
-        switch(state) {
-          case IDLE:
-            activeR++;
-            return;
-          case READ:
-            if(waiting.size() == 0) {
-              activeR++;
-              return;
-            }
-          default:
-          if(waiting.size() > 0 && !waiting.getLast().writer) {
-            l = waiting.getLast();
-            l.waitingReaders++;
-          } else {
-            l = new Lock(false);
-            waiting.add(l);
-          }
-          break;
+        if(state < 2 && waiting.size() == 0) {
+          state = 1;
+          activeR++;
+          return;
         }
+      }
+      Lock l = null;
+      if(waiting.size() > 0 && !waiting.getLast().writer) {
+        l = waiting.getLast();
+        l.waitingReaders++;
+      } else {
+        l = new Lock(false);
+        waiting.add(l);
       }
       synchronized(l) {
         try {
@@ -87,11 +70,11 @@ final class Semaphore {
    */
   synchronized void after(final boolean w) {
     if(w) {
-      state = State.IDLE;
+      state = 0;
       notifyNext();
     } else {
       if(--activeR == 0) {
-        state = State.IDLE;
+        state = 0;
         notifyNext();
       }
     }
@@ -107,9 +90,9 @@ final class Semaphore {
         eldest.notifyAll();
       }
       if(eldest.writer) {
-        state = State.WRITE;
+        state = 2;
       } else {
-        state = State.READ;
+        state = 1;
         activeR = eldest.waitingReaders;
       }
     }
