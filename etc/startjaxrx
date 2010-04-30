@@ -10,7 +10,7 @@ BXPATH=$PWD/BaseX61.jar
 
 # Classpath
 LIB=$PWD/lib
-CP=$PWD/BaseX61-jaxrx.jar:$BXPATH:$LIB/jetty-6.1.21.jar:$LIB/jetty-util-6.1.21.jar:$LIB/jsr311-api-1.0.jar:$LIB/servlet-api-2.5-20081211.jar:$LIB/jersey-server-1.0.1.jar
+CP=$PWD/BaseX61-jaxrx.jar:$BXPATH:$LIB/jetty-6.1.21.jar:$LIB/jetty-util-6.1.21.jar:$LIB/jsr311-api-1.0.jar:$LIB/servlet-api-2.5-20081211.jar:$LIB/jersey-server-1.0.1.jar:$LIB/jersey-core-1.0.1.jar:$LIB/asm-3.1.jar
 
 # Assign more memory
 VM=-Xmx1g
