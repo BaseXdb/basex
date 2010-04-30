@@ -30,6 +30,9 @@ public class NamespaceTest {
       { "d2", "<x xmlns='xx'/>" },
       { "d3", "<a:x xmlns:a='aa'><b:y xmlns:b='bb'/></a:x>" },
       { "d4", "<a:x xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
+      { "d5", "<a:x xmlns:a='aa'/>" },
+      { "d6", "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
+      { "d7", "<x xmlns='xx'><y/></x>" },
   };
 
   /** Test query. */
@@ -41,15 +44,26 @@ public class NamespaceTest {
   }
 
   /** Test query.
-   * [LK] this one causes troubles (-> wrong ref's due to UpdatePrimitive?)
-   *
+   * [LK] 
+   * Detects corrupt namespace hierarchy.
+   */
   @Test
   public final void copy2() {
     query(
         "declare namespace a='aa'; copy $c:=doc('d4') modify () return $c//a:y",
-        "<b xmlns:x='xx'/>");
+        "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
-  */
+  
+  /** Test query.
+   * Detects missing prefix declaration.
+   */
+  @Test
+  public final void copy3() {
+    query(
+        "declare namespace a='aa'; copy $c:=doc('d4')//a:y " +
+        "modify () return $c",
+        "<a:y xmlns:b='bb' xmlns:a='aa'/>");
+  }
 
   /** Test query. */
   @Test
@@ -79,8 +93,8 @@ public class NamespaceTest {
   }
   
   /** Test query.
-   * [LK] this one causes troubles (prefix declaration not copied)
-   *
+   * Detects missing prefix declaration.
+   */
   @Test
   public final void insertD4intoD1() {
     query(
@@ -89,8 +103,58 @@ public class NamespaceTest {
         "doc('d1')/x",
         "<x><a:y xmlns:a='aa' xmlns:b='bb'/></x>");
   }
-  */
-
+  
+  /** Test query. 
+   * Detects duplicate prefix declaration at pre=0 in MemData instance after
+   * insert.
+   * [LK] though result correct, prefix
+   * a is declared twice. -> Solution?
+   */
+  @Test
+  public final void insertD4intoD5() {
+    query(
+        "declare namespace a='aa';insert node doc('d4')//a:y " +
+        "into doc('d5')/a:x",
+        "declare namespace a='aa';doc('d5')//a:y",
+        "<a:y xmlns:a='aa' xmlns:b='bb'/>");
+  }
+  
+  /** Test query. 
+   * Detects duplicate prefix declarations among the insertion nodes (MemData)
+   * and the target node's data instance.
+   * [LK] duplicates are generated in Data.insert(...   MemData correct!
+   *
+  @Test
+  public final void insertD4intoD3() {
+    query(
+        "declare namespace b='bb';insert node doc('d4') into doc('d3')//b:y",
+        "declare namespace a='aa';doc('d3')/a:x",
+        "<a:x xmlns:a='aa'><b:y xmlns:b='bb'><a:x><a:y/></a:x></b:y></a:x>");
+  }*/
+  
+  /** Test query. 
+   * Detects duplicate namespace declarations in MemData instance.
+   */
+  @Test
+  public final void insertD7intoD1() {
+    query(
+        "declare namespace x='xx';insert node doc('d7')/x:x into doc('d1')/x",
+        "doc('d1')/x",
+        "<x><x xmlns='xx'><y/></x></x>");
+  }
+  
+  /** Test query. 
+   * Detects duplicate namespace declarations after insert.
+   *
+  @Test
+  public final void insertD2intoD6() {
+    query(
+        "declare namespace ns='xx';declare namespace a='aa';" +
+        "insert node doc('d2')/ns:x into doc('d6')/a:x",
+        "declare namespace a='aa';doc('d6')/a:x",
+        "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/><x/></a:x>");
+  }*/
+  
   /** Creates the database context. */
   @BeforeClass
   public static void start() {

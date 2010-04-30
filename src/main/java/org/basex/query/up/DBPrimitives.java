@@ -92,8 +92,6 @@ final class DBPrimitives extends Primitives {
         final int ps = pre + d.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; p++) {
           final byte[] nm = d.name(p, Data.ATTR);
-          // use Uri(name, uri) constructor for attributes with namespaces
-          // [LK] run some more tests
           if(!il.contains(p)) pool.add(new QNm(nm, ctx), Type.ATT);
         }
       }

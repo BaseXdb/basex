@@ -565,9 +565,9 @@ public abstract class Data {
           // add element
           final boolean ne = md.nsFlag(mpre);
           if(ne) {
-            // [LK] don't add all namespaces for the first node (pre=1), there
-            // will be duplicate namespace declarations
-            // CG: if there is an example, please add it to NamespaceTest class
+            // [LK] duplicate namespace declarations here?
+            // -> check this data instance for ns declarations on ancestor axis
+            // of mpre
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
           }

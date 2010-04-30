@@ -185,15 +185,15 @@ public abstract class UpdatePrimitive {
         // [LK] recursively copying namespaces?
         q = nd.qname();
         ne = false;
+        m.ns.open();
         final Atts ns = par == 0 ? nd.nsScope() : nd.ns();
         for(int a = 0; a < ns.size; a++) {
-          m.ns.add(ms, -1, ns.key[a], ns.val[a]);
+          m.ns.add(ns.key[a], ns.val[a], ms);
           ne = true;
         }
         uri = q.uri.str();
         u = uri.length != 0 ? m.ns.addURI(uri) : 0;
         final int tn = m.tags.index(q.str(), null, false);
-        //m.ns.open();
         m.elem(pre - par, tn, size(nd, true), size(nd, false), u, ne);
         m.insert(ms);
         ir = nd.attr();
@@ -201,7 +201,7 @@ public abstract class UpdatePrimitive {
         while((i = ir.next()) != null) p = addNode(i, m, p, pre);
         ir = nd.child();
         while((i = ir.next()) != null) p = addNode(i, m, p, pre);
-        //m.ns.close(ms);
+        m.ns.close(ms);
         return p;
     }
   }
