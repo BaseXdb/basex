@@ -105,23 +105,23 @@ public abstract class FNode extends Nod {
   private NodeIter desc(final boolean self) {
     return new NodeIter() {
       /** Iterator. */
-      private NodeMore[] it = new NodeMore[1];
+      private NodeMore[] nm = new NodeMore[1];
       /** Iterator Level. */
       private int l;
 
       @Override
       public Nod next() throws QueryException {
-        if(it[0] == null) it[0] = self ? self() : child();
+        if(nm[0] == null) nm[0] = self ? self() : child();
         if(l < 0) return null;
 
-        final Nod node = it[l].next();
+        final Nod node = nm[l].next();
         if(node != null) {
           final NodeMore ch = node.child();
           if(ch.more()) {
-            if(l + 1 == it.length) it = Arrays.copyOf(it, l + 1 << 1);
-            it[++l] = ch;
+            if(l + 1 == nm.length) nm = Arrays.copyOf(nm, l + 1 << 1);
+            nm[++l] = ch;
           } else {
-            while(!it[l].more()) if(l-- <= 0) break;
+            while(!nm[l].more()) if(l-- <= 0) break;
           }
         }
         return node;

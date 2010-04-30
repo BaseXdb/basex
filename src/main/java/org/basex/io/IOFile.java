@@ -10,6 +10,8 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.basex.core.Prop;
+import org.basex.util.StringList;
+import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
 
 /**
@@ -45,13 +47,9 @@ public final class IOFile extends IO {
    */
   public IOFile(final File f) {
     file = f;
-    path = file.getAbsolutePath().replace('\\', '/');
-    /*try {
-      path = file.getCanonicalPath().replace('\\', '/');
-    } catch(final IOException ex) {
-    }*/
+    path = new PathList().create(file.getAbsolutePath());
   }
-
+  
   @Override
   public void cache() throws IOException {
     cont = new byte[(int) file.length()];
@@ -217,5 +215,46 @@ public final class IOFile extends IO {
         file.substring(PREFILE.length()) : file;
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
+  }
+
+  /**
+   * Path constructor. Resolves parent and self references and normalizes the
+   * path.
+   */
+  static class PathList extends StringList {
+    /**
+     * Creates a path.
+     * @param path input path
+     * @return path
+     */
+    String create(final String path) {
+      final TokenBuilder tb = new TokenBuilder();
+      final int l = path.length(); 
+      for(int i = 0; i < l; i++) {
+        final char ch = path.charAt(i);
+        if(ch == '\\' || ch == '/') add(tb);
+        else tb.add(ch);
+      }
+      add(tb);
+      for(int s = 0; s < size; s++) {
+        if(s != 0 || path.startsWith("/")) tb.add('/');
+        tb.add(list[s]);
+      }
+      return tb.toString();
+    }
+
+    /**
+     * Adds a directory/file to the path list.
+     * @param sb entry
+     */
+    private void add(final TokenBuilder sb) {
+      final String s = sb.toString();
+      if(s.equals("..") && size > 0) {
+        if(!list[0].contains(":")) delete(size - 1);
+      } else if(!s.equals(".") && !s.isEmpty()) {
+        add(s.toString());
+      }
+      sb.reset();
+    }
   }
 }

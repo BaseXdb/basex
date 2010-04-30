@@ -187,11 +187,12 @@ final class FNStr extends Fun {
     // normalize positions
     final double ds = checkDbl(expr[1], ctx);
     final byte[] str = checkStr(expr[0], ctx);
+    if(ds != ds) return Str.ZERO;
+
     final boolean end = expr.length == 3;
     int l = len(str);
-    if(ds != ds) return Str.ZERO;
-    int s = (int) Math.floor(ds - .5);
-    int e = end ? (int) Math.floor(checkDbl(expr[2], ctx) + .5) : l;
+    int s = subPos(ds);
+    int e = end ? subPos(checkDbl(expr[2], ctx) + 1) : l;
     if(s < 0) {
       e += s;
       s = 0;
@@ -199,7 +200,6 @@ final class FNStr extends Fun {
     e = Math.min(l, end ? s + e : Integer.MAX_VALUE);
     if(s >= e) return Str.ZERO;
     if(ascii(str)) return Str.get(substring(str, s, e));
-    if(s == 0 && e == str.length) return Str.get(str);
 
     int ss = s;
     int ee = e;
@@ -212,6 +212,16 @@ final class FNStr extends Fun {
     return Str.get(Arrays.copyOfRange(str, ss, ee));
   }
 
+  /**
+   * Returns the specified substring position.
+   * @param d double value
+   * @return substring position
+   */
+  private int subPos(final double d) {
+    final int i = (int) d;
+    return d == i ? i - 1 : (int) Math.floor(d - .5);
+  }
+  
   /**
    * Returns a translated string.
    * @param ctx query context

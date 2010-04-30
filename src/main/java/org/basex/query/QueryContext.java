@@ -438,7 +438,11 @@ public final class QueryContext extends Progress {
    * @param node node to be added
    */
   private void addDoc(final DBNode node) {
-    if(docs == doc.length) doc = Arrays.copyOf(doc, docs << 1);
+    if(docs == doc.length) {
+      final DBNode[] tmp = new DBNode[docs << 1];
+      System.arraycopy(doc, 0, tmp, 0, docs);
+      doc = tmp;
+    }
     doc[docs++] = node;
   }
 

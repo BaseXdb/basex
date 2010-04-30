@@ -11,11 +11,11 @@ import org.basex.core.Main;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class StringList implements Iterable<String> {
+public class StringList implements Iterable<String> {
   /** Current string array. */
-  String[] list = new String[8];
+  protected String[] list = new String[8];
   /** Number of strings. */
-  int size;
+  protected int size;
 
   /**
    * Adds a string to the array.
@@ -51,6 +51,14 @@ public final class StringList implements Iterable<String> {
   public boolean contains(final String v) {
     for(int i = 0; i < size; i++) if(list[i].equals(v)) return true;
     return false;
+  }
+
+  /**
+   * Deletes the specified entry.
+   * @param i entry to be deleted
+   */
+  public void delete(final int i) {
+    Array.move(list, i + 1, -1, --size - i);
   }
 
   /**

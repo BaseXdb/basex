@@ -297,4 +297,16 @@ public abstract class Item extends Expr {
   public String toString() {
     return Token.string(str());
   }
+  
+  /**
+   * Returns an item array with double the size of the input array. 
+   * @param it item array
+   * @return resulting array
+   */
+  public static Item[] extend(final Item[] it) {
+    final int s = it.length;
+    final Item[] tmp = new Item[s << 1];
+    System.arraycopy(it, 0, tmp, 0, s);
+    return tmp;
+  }
 }

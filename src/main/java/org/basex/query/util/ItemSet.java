@@ -72,6 +72,6 @@ public final class ItemSet {
     bucket = tmp;
     next = Arrays.copyOf(next, s);
     keys = Arrays.copyOf(keys, s);
-    values = Arrays.copyOf(values, s);
+    values = Item.extend(values);
   }
 }

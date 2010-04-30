@@ -1,7 +1,6 @@
 package org.basex.query.iter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
@@ -76,7 +75,7 @@ public final class SeqIter extends Iter implements Result {
    * @param it item to be added
    */
   public void add(final Item it) {
-    if(size == item.length) item = Arrays.copyOf(item, size << 1);
+    if(size == item.length) item = Item.extend(item);
     item[size++] = it;
   }
 
