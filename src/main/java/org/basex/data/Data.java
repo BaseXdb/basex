@@ -33,28 +33,25 @@ import org.deepfs.fs.DeepFS;
  *
  * <pre>
  * COMMON ATTRIBUTES:
- * - Byte     0:  KIND: Node kind (2-0)
+ * - Byte     0:  KIND: Node kind (bits: 2-0)
+ * - Byte 12-15:  UNID: Unique Node ID
  * ELEMENT NODES:
- * - Byte     0:  ATTS: Number of attributes (7-3)
- * - Byte   1-2:  NAME: Namespace Flag (15), Name (14-0)
+ * - Byte     0:  ATTS: Number of attributes (bits: 7-3)
+ * - Byte   1-2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte     3:  NURI: Namespace URI
  * - Byte  4- 7:  DIST: Distance to parent node
  * - Byte  8-11:  SIZE: Number of descendants
- * - Byte 12-15:  UNID: Unique Node ID
  * DOCUMENT NODES:
  * - Byte  3- 7:  TEXT: Text reference
  * - Byte  8-11:  SIZE: Number of descendants
- * - Byte 12-15:  UNID: Unique Node ID
  * TEXT, COMMENT, PI NODES:
  * - Byte  3- 7:  TEXT: Text reference
  * - Byte  8-11:  DIST: Distance to parent node
- * - Byte 12-15:  UNID: Unique Node ID
  * ATTRIBUTE NODES:
- * - Byte     0:  DIST: Distance to parent node (7-3)
- * - Byte   1-2:  NAME: Namespace Flag (15), Name (14-0)
+ * - Byte     0:  DIST: Distance to parent node (bits: 7-3)
+ * - Byte   1-2:  NAME: Namespace Flag (bit: 15), Name (bits: 14-0)
  * - Byte  3- 7:  TEXT: Attribute value reference
- * - Byte    11:  NURI: Namespace (7-3)
- * - Byte 12-15:  UNID: Unique Node ID
+ * - Byte    11:  NURI: Namespace (bits: 7-3)
  * </pre>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
