@@ -35,6 +35,16 @@ public class NamespaceTest {
       { "d7", "<x xmlns='xx'><y/></x>" },
   };
 
+//  /** Test query. */
+//  @Test
+//  public final void simpleDataDuplicate() {
+//    query(
+//        "declare namespace a='aa'; insert node <a:y xmlns:a='aa'/> " +
+//        "into doc('d5')/a:x",
+//        "declare namespace a='aa';doc('d5')/a:x",
+//        "<a:x xlmns:a='aa'><a:y/></a:x>");
+//  }
+
   /** Test query. */
   @Test
   public final void copy1() {
@@ -119,18 +129,18 @@ public class NamespaceTest {
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
   
-  /** Test query. 
-   * Detects duplicate prefix declarations among the insertion nodes (MemData)
-   * and the target node's data instance.
-   * [LK] duplicates are generated in Data.insert(...   MemData correct!
-   *
-  @Test
-  public final void insertD4intoD3() {
-    query(
-        "declare namespace b='bb';insert node doc('d4') into doc('d3')//b:y",
-        "declare namespace a='aa';doc('d3')/a:x",
-        "<a:x xmlns:a='aa'><b:y xmlns:b='bb'><a:x><a:y/></a:x></b:y></a:x>");
-  }*/
+//  /** Test query. 
+//   * Detects duplicate prefix declarations among the insertion nodes (MemData)
+//   * and the target node's data instance.
+//   * [LK] duplicates are generated in Data.insert(...   MemData correct!
+//   */
+//  @Test
+//  public final void insertD4intoD3() {
+//    query(
+//        "declare namespace b='bb';insert node doc('d4') into doc('d3')//b:y",
+//        "declare namespace a='aa';doc('d3')/a:x",
+//        "<a:x xmlns:a='aa'><b:y xmlns:b='bb'><a:x><a:y/></a:x></b:y></a:x>");
+//  }
   
   /** Test query. 
    * Detects duplicate namespace declarations in MemData instance.
@@ -143,17 +153,30 @@ public class NamespaceTest {
         "<x><x xmlns='xx'><y/></x></x>");
   }
   
-  /** Test query. 
-   * Detects duplicate namespace declarations after insert.
-   *
+//  /** Test query. 
+//   * Detects duplicate namespace declarations after insert.
+//   */
+//  @Test
+//  public final void insertD2intoD6() {
+//    query(
+//        "declare namespace ns='xx';declare namespace a='aa';" +
+//        "insert node doc('d2')/ns:x into doc('d6')/a:x",
+//        "declare namespace a='aa';doc('d6')/a:x",
+//        "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/><x/></a:x>");
+//  }
+  
+  /** Test query.
+   * Detects general problems with namespace references.
+   */
   @Test
-  public final void insertD2intoD6() {
+  public final void insertD6intoD4() {
     query(
-        "declare namespace ns='xx';declare namespace a='aa';" +
-        "insert node doc('d2')/ns:x into doc('d6')/a:x",
-        "declare namespace a='aa';doc('d6')/a:x",
-        "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/><x/></a:x>");
-  }*/
+        "declare namespace a='aa';insert node doc('d6') into doc('d4')/a:x",
+        "declare namespace a='aa';doc('d4')/a:x/a:y",
+        "<a:y xmlns:b='bb' xmlns:a='aa'/>");
+  }
+  
+  // [LK] add test for duplicate prefix for same uri
   
   /** Creates the database context. */
   @BeforeClass

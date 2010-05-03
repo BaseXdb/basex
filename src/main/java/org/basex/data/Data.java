@@ -561,6 +561,9 @@ public abstract class Data {
         case ELEM:
           // add element
           final boolean ne = md.nsFlag(mpre);
+          // [LK] setRoot(par) ... par correct?
+          if(mpre == 0) ns.setRoot(ns.findAncestor(par));
+          ns.open();
           if(ne) {
             // [LK] duplicate namespace declarations here?
             // -> check this data instance for ns declarations on ancestor axis
@@ -568,7 +571,6 @@ public abstract class Data {
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
           }
-          ns.open();
           byte[] nm = md.name(mpre, mk);
           elem(dis, tags.index(nm, null, false), md.attSize(mpre, mk),
               md.size(mpre, mk), ns.uri(nm, true), ne);

@@ -205,7 +205,8 @@ public final class Namespaces {
   }
 
   /**
-   * Adds a namespace for the specified pre value.
+   * Adds a namespace for the specified pre value. Used to add attribute
+   * information.
    * @param pre pre value
    * @param par parent
    * @param p prefix
@@ -243,6 +244,26 @@ public final class Namespaces {
    */
   private int addPref(final byte[] p) {
     return Math.abs(pref.add(p));
+  }
+  
+
+  /**
+   * Finds the nearest namespace node on the ancestor axis for the given pre 
+   * value. This is only called when a MemData instance is inserted. Make sure
+   * the root node is pre==-1, hence the actual root of the namespace hierarchy.
+   * @param pre pre value to find nearest namespace node for 
+   * @return the nearest namespace node
+   */
+  protected NSNode findAncestor(final int pre) {
+    return root.find(pre);
+  }
+  
+  /**
+   * Setter for namespaces root node.
+   * @param n new root
+   */
+  protected void setRoot(final NSNode n) {
+    root = n;
   }
 
   // Printing Namespaces ======================================================
