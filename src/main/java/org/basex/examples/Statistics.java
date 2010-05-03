@@ -7,7 +7,8 @@ import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Proc;
-import org.basex.core.proc.CreateDB;
+import org.basex.core.Prop;
+import org.basex.core.proc.Check;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
@@ -37,6 +38,10 @@ public final class Statistics extends DefaultHandler {
   private final Table table = new Table();
   /** Input document. */
   private static String doc;
+  /** Drop databases after analysis. */
+  private boolean drop;
+  /** Tabular output. */
+  private boolean tab;
   /** Maximum length. */
   private long max = Long.MAX_VALUE;
   /** Minimum length. */
@@ -56,25 +61,40 @@ public final class Statistics extends DefaultHandler {
    */
   private Statistics(final String[] args) {
     if(!parseArguments(args)) return;
+
+    ctx.prop.set(Prop.INTPARSE, true);
+    ctx.prop.set(Prop.TEXTINDEX, false);
+    ctx.prop.set(Prop.ATTRINDEX, false);
+    ctx.prop.set(Prop.PATHINDEX, false);
     
-    final TokenList list = new TokenList();
-    list.add("Document");
-    list.add("Length");
-    list.add("Pre");
-    list.add("Attsize");
-    list.add("Content(t)");
-    list.add("Content(a)");
-    list.add("Name(e)");
-    list.add("Name(a)");
-    list.add("Namespaces");
-    table.header = list;
+    final TokenList tl = new TokenList();
+    tl.add("Document");
+    tl.add("Length");
+    tl.add("Pre");
+    tl.add("Attsize");
+    tl.add("Content(t)");
+    tl.add("Content(a)");
+    tl.add("Name(e)");
+    tl.add("Name(a)");
+    tl.add("URI");
+    tl.add("Depth");
+    table.header = tl;
     
+    if(tab) {
+      for(final byte[] b : tl) {
+        Main.out(b);
+        Main.out('\t');
+      }
+      Main.outln();
+    }
+
     if(doc == null) {
       parse(new File("."));
     } else {
       analyze(doc);
     }
-    System.out.print(Token.string(table.finish()));
+
+    if(!tab) out.print(Token.string(table.finish()));
   }
 
   
@@ -105,8 +125,7 @@ public final class Statistics extends DefaultHandler {
    */
   private void analyze(final String input) {
     try {
-      System.out.println("- " + input);
-      exec(new CreateDB(input));
+      exec(new Check(input));
 
       final Data data = ctx.data;
       final TokenList tl = new TokenList();
@@ -128,12 +147,23 @@ public final class Statistics extends DefaultHandler {
       add(tl, "count(distinct-values(for $d in //@* return name($d)))");
       // total number of namespace URIs
       tl.add(data.ns.size());
-      table.contents.add(tl);
+      // document height
+      tl.add(data.meta.height);
 
-      exec(new DropDB(data.meta.name));
+      if(tab) {
+        for(int u = 0; u < tl.size(); u++) {
+          Main.out(tl.get(u));
+          Main.out('\t');
+        }
+        Main.outln();
+      } else {
+        table.contents.add(tl);
+      }
 
+      if(drop) exec(new DropDB(data.meta.name));
+    
     } catch(BaseXException ex) {
-      err.println("- " + ex.getMessage());
+      err.println("- " + input + ": " + ex.getMessage());
     }
   }
 
@@ -145,7 +175,7 @@ public final class Statistics extends DefaultHandler {
    */
   private void add(final TokenList tl, final String qu) throws BaseXException {
     tl.add(query(qu));
-    //tl.add(Integer.toHexString(Integer.parseInt(query(qu))));
+    //tl.add(Long.toHexString(Long.parseLong(query(qu))));
   }
 
   /**
@@ -186,8 +216,14 @@ public final class Statistics extends DefaultHandler {
             min = arg.num();
           } else if(c == ']') {
             max = arg.num();
+          } else if(c == 'd') {
+            drop = true;
           } else if(c == 'e') {
             excl.add(arg.string());
+          } else if(c == 't') {
+            tab = true;
+          } else {
+            ok = false;
           }
         } else {
           doc = arg.string();
@@ -198,9 +234,11 @@ public final class Statistics extends DefaultHandler {
     }
     if(!ok) {
       Main.outln("Usage: " + Main.name(this) + " [options] doc" + NL +
+          "  -d       drop databases after analysis" + NL +
           "  -e<dir>  exclude directory from parsing" + NL +
           "  -[<nr>   minimum file length" + NL +
           "  -]<nr>   maximum file length" + NL +
+          "  -t       tabular output" + NL +
           "  doc      document to be parsed");
     }
     return ok;
