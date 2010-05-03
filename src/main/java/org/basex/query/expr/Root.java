@@ -57,6 +57,11 @@ public final class Root extends Simple {
   }
 
   @Override
+  public boolean duplicates(final QueryContext ctx) {
+    return false;
+  }
+
+  @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof Root;
   }

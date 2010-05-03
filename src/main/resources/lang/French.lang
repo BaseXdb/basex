@@ -213,7 +213,7 @@ ds_info2=Cela n'a aucune incidence sur les autres fonctionalités de la GUI.
 # Commandes GUI
 
 c_about=A propos de %
-c_abouttt=Affiche général information on the project.
+c_abouttt=Affiche les informations générales sur le projet.
 c_all=Sélectionner tout
 c_close=Fermer
 c_closett=Ferme la base de données courante.
@@ -259,7 +259,7 @@ c_inserttt=Crée un nouveau noeud XML.
 c_maplayout=Disposition de la carte
 c_maplayouttt=Modifie la disposition de la carte.
 c_open=Ouvrir
-c_opentt=Ouvrirs une base de données.
+c_opentt=Ouvre une base de données.
 c_paste=Coller
 c_pastett=Colle les noeuds précédemment copiés.
 c_prefs=Préferences
