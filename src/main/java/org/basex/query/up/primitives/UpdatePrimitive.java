@@ -130,14 +130,14 @@ public abstract class UpdatePrimitive {
 
     int pre = 1;
     Nod n;
-    while((n = ch.next()) != null) pre = addNode(n, md, pre, 0);
-    //System.out.println(md);
+    while((n = ch.next()) != null) pre = addNode(null, n, md, pre, 0);
     return md;
   }
 
   /**
    * Adds a fragment to a database instance.
    * Document nodes are ignored.
+   * @param ndPar parent of node to be added, needed for namespace information
    * @param nd node to be added
    * @param m data reference
    * @param pre node position
@@ -145,7 +145,7 @@ public abstract class UpdatePrimitive {
    * @return pre value of next node
    * @throws QueryException query exception
    */
-  private static int addNode(final Nod nd, final MemData m,
+  private static int addNode(final Nod ndPar, final Nod nd, final MemData m,
       final int pre, final int par) throws QueryException {
 
     final int k = Nod.kind(nd.type);
@@ -157,7 +157,7 @@ public abstract class UpdatePrimitive {
         int p = pre + 1;
         NodeIter ir = nd.child();
         Nod i;
-        while((i = ir.next()) != null) p = addNode(i, m, p, pre);
+        while((i = ir.next()) != null) p = addNode(null, i, m, p, pre);
         return p;
       case Data.ATTR:
         QNm q = nd.qname();
@@ -182,15 +182,23 @@ public abstract class UpdatePrimitive {
         m.insert(ms);
         return pre + 1;
       default:
-        // [LK] recursively copying namespaces?
         q = nd.qname();
-        ne = false;
         m.ns.open();
         final Atts ns = par == 0 ? nd.nsScope() : nd.ns();
+        ne = ns.size > 0;
+        if(ndPar != null) {
+          final Atts nsPar = ndPar.ns();
+          if(nsPar != null)
+            for(int j = 0; j < nsPar.size; j++) {
+              final byte[] key = nsPar.key[j];
+              final int ki = ns.get(key);
+              if(ki > -1) ns.delete(ki);
+            }
+        }
         for(int a = 0; a < ns.size; a++) {
           m.ns.add(ns.key[a], ns.val[a], ms);
-          ne = true;
         }
+        
         uri = q.uri.str();
         u = uri.length != 0 ? m.ns.addURI(uri) : 0;
         final int tn = m.tags.index(q.str(), null, false);
@@ -198,9 +206,9 @@ public abstract class UpdatePrimitive {
         m.insert(ms);
         ir = nd.attr();
         p = pre + 1;
-        while((i = ir.next()) != null) p = addNode(i, m, p, pre);
+        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre);
         ir = nd.child();
-        while((i = ir.next()) != null) p = addNode(i, m, p, pre);
+        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre);
         m.ns.close(ms);
         return p;
     }

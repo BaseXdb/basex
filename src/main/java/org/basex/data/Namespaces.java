@@ -29,7 +29,7 @@ public final class Namespaces {
   /** URIs. */
   private final TokenSet uri;
   /** Root node. */
-  private NSNode root;
+  protected NSNode root;
   /** New namespace flag. */
   private boolean newns;
 
@@ -205,8 +205,7 @@ public final class Namespaces {
   }
 
   /**
-   * Adds a namespace for the specified pre value. Used to add attribute
-   * information.
+   * Adds a namespace for the specified pre value.
    * @param pre pre value
    * @param par parent
    * @param p prefix

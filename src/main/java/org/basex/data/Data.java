@@ -540,6 +540,7 @@ public abstract class Data {
 
     // loop through all entries
     int mpre = -1;
+    final NSNode t = ns.root;
     while(++mpre != ms) {
       if(mpre != 0 && mpre % buf == 0) insert(ipre + mpre - buf);
 
@@ -548,6 +549,7 @@ public abstract class Data {
       final int pre = ipre + mpre;
       final int dis = mpar >= 0 ? mpre - mpar : pre - ipar;
       final int par = pre - dis;
+      if(mpre == 0) ns.setRoot(ns.findAncestor(par));
       while(l > 0 && preStack[l - 1] > par) ns.close(preStack[--l]);
 
       switch(mk) {
@@ -561,8 +563,6 @@ public abstract class Data {
         case ELEM:
           // add element
           final boolean ne = md.nsFlag(mpre);
-          // [LK] setRoot(par) ... par correct?
-          if(mpre == 0) ns.setRoot(ns.findAncestor(par));
           ns.open();
           if(ne) {
             // [LK] duplicate namespace declarations here?
@@ -597,6 +597,7 @@ public abstract class Data {
     }
 
     while(l > 0) ns.close(preStack[--l]);
+    ns.setRoot(t);
 
     if(bp != 0) insert(ipre + mpre - 1 - (mpre - 1) % buf);
     // reset buffer to old size

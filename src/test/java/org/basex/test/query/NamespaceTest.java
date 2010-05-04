@@ -15,7 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This class tests the database commands.
+ * This class tests namespaces.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -37,13 +37,40 @@ public class NamespaceTest {
 
 //  /** Test query. */
 //  @Test
-//  public final void simpleDataDuplicate() {
+//  public final void simpleNsDuplicate() {
 //    query(
-//        "declare namespace a='aa'; insert node <a:y xmlns:a='aa'/> " +
+//        "declare namespace a='aa'; insert node <a:y xmlns:a='aa'/>" +
 //        "into doc('d5')/a:x",
 //        "declare namespace a='aa';doc('d5')/a:x",
 //        "<a:x xlmns:a='aa'><a:y/></a:x>");
 //  }
+//  
+//  /** Test query. */
+//  @Test
+//  public final void simpleNsDuplicate2() {
+//    query(
+//        "declare namespace a='aa'; insert node <a:y xmlns:a='aa'><a:b/></a:y> " +
+//        "into doc('d5')/a:x",
+//        "declare namespace a='aa';doc('d5')/a:x",
+//        "<a:x xlmns:a='aa'><a:y><a:b/></a:y></a:x>");
+//  }
+//  
+//  /** Test query. */
+//  @Test
+//  public final void copy4() {
+//    query(
+//        "copy $c := <a:y xmlns:a='aa'><a:b/></a:y> modify () return $c",
+//        "<a:y xmlns:a='aa'><a:b/></a:y>");
+//  }
+  
+  /** Test query. */
+  @Test
+  public final void copy5() {
+    query(
+        "copy $c := <n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n> " +
+        "modify () return $c",
+        "<n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n>");
+  }
 
   /** Test query. */
   @Test
@@ -176,7 +203,9 @@ public class NamespaceTest {
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
   
-  // [LK] add test for duplicate prefix for same uri
+  // [LK] add test for duplicate uri for same prefix
+  // add test (copy), check memdata 
+  // ... <n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n>
   
   /** Creates the database context. */
   @BeforeClass
