@@ -29,28 +29,30 @@ public class Add extends ACreate {
   
   /**
    * Default constructor.
-   * @param input input XML file or XML string
    * @param name name of database
+   * @param input input XML file or XML string
    */
-  public Add(final String input, final String name) {
-    super(DATAREF | User.WRITE, input, name);
+  public Add(final String name, final String input) {
+    super(DATAREF | User.WRITE, name, input);
   }
 
   @Override
   protected boolean run() {
-    final IO io = IO.get(args[0]);
-    if(!io.exists()) return error(FILEWHICH, io);
+    IO io;
     String name;
     String dbname;
-    if(io.name().isEmpty()) {
-      name = args[1];
+    if(args.length == 2) {
+      io = IO.get(args[1]);
+      name = args[0];
       dbname = name;
     } else {
+      io = IO.get(args[0]);
       name = io.name();
       dbname = io.dbname();
     }
+    if(!io.exists()) return error(FILEWHICH, io);
     final int pre = findDoc(Token.token(name));
-    if(pre != -1) return error(DBDOC, args[0]);
+    if(pre != -1) return error(DBDOC, name);
 
     final DirParser p = new DirParser(io, context.prop);
     MemData d = null;
@@ -59,7 +61,7 @@ public class Add extends ACreate {
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();
-      return error(msg != null ? msg : args[0]);
+      return error(msg != null ? msg : name);
     }
     final Data data = context.data;
     data.insert(data.meta.size, -1, d);

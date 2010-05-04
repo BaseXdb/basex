@@ -18,11 +18,11 @@ public class ImportColl extends Add {
    * @param input input XML string
    */
   public ImportColl(final String name, final String input) {
-      super(input, name);
+      super(name, input);
   }
   
   @Override
   public String toString() {
-    return Cmd.IMPORT + " " + CmdImport.COLL + " " + args[1] + " " + args[0];
+    return Cmd.IMPORT + " " + CmdImport.COLL + args();
   }
 }
