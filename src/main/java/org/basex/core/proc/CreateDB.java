@@ -28,7 +28,7 @@ import org.basex.io.IO;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class CreateDB extends ACreate {
+public class CreateDB extends ACreate {
   /**
    * Default constructor.
    * @param input input XML file or XML string

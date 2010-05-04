@@ -18,7 +18,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Add extends ACreate {
+public class Add extends ACreate {
   /**
    * Default constructor.
    * @param input input XML file or XML string
