@@ -32,6 +32,7 @@ import org.basex.core.proc.Find;
 import org.basex.core.proc.Get;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.Help;
+import org.basex.core.proc.ImportColl;
 import org.basex.core.proc.ImportDB;
 import org.basex.core.proc.Info;
 import org.basex.core.proc.InfoDB;
@@ -180,20 +181,11 @@ public final class CommandParser extends InputParser {
       case EXPORT:
         return new Export(string(cmd), string(null));
       case IMPORT:
-        String name;
-        String xml;
         switch(consume(CmdImport.class, cmd)) {
           case DATABASE: case DB:
-            name = name(cmd);
-            System.out.println("NAME: " + name);
-            xml = leftover(null);
-            System.out.println("XML: " + xml);
-            return new ImportDB(xml, name);
-            //return new CreateDB(xml, name);
+            return new ImportDB(name(cmd), leftover(null));
           case COLLECTION: case COLL:
-            name = name(null);
-            xml = leftover(cmd);
-            return new Add(xml);
+            return new ImportColl(name(cmd), leftover(null));
         }
         break;        
       case XQUERY: case X:

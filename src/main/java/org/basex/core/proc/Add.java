@@ -31,7 +31,7 @@ public class Add extends ACreate {
   protected boolean run() {
     final IO io = IO.get(args[0]);
     if(!io.exists()) return error(FILEWHICH, io);
-
+    
     final int pre = findDoc(Token.token(io.name()));
     if(pre != -1) return error(DBDOC, args[0]);
 

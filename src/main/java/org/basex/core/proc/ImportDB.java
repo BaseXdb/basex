@@ -14,10 +14,10 @@ public class ImportDB extends CreateDB {
   
   /**
    * Default constructor.
-   * @param input input XML string
    * @param name name of database
+   * @param input input XML string
    */
-  public ImportDB(final String input, final String name) {
+  public ImportDB(final String name, final String input) {
     super(input, name);
   }
   
