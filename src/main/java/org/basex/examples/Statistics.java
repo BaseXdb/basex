@@ -72,12 +72,13 @@ public final class Statistics extends DefaultHandler {
     tl.add("Length");
     tl.add("Pre");
     tl.add("Attsize");
-    tl.add("Content(t)");
-    tl.add("Content(a)");
     tl.add("Name(e)");
     tl.add("Name(a)");
     tl.add("URI");
+    tl.add("Content(t)");
+    tl.add("Content(a)");
     tl.add("Depth");
+    tl.add("Docs");
     table.header = tl;
     
     if(tab) {
@@ -137,18 +138,20 @@ public final class Statistics extends DefaultHandler {
       tl.add(data.meta.size);
       // maximum number of attributes
       add(tl, "max(for $d in //* return count($d/@*))");
-      // total string length of text nodes
-      add(tl, "sum(for $d in //text() return string-length($d) + 1)");
-      // total string length of attribute values
-      add(tl, "sum(for $d in //@* return string-length($d) + 1)");
       // total number of element names
       add(tl, "count(distinct-values(for $d in //* return name($d)))");
       // total number of attribute names
       add(tl, "count(distinct-values(for $d in //@* return name($d)))");
       // total number of namespace URIs
       tl.add(data.ns.size());
+      // total string length of text nodes
+      add(tl, "sum(for $d in //text() return string-length($d) + 1)");
+      // total string length of attribute values
+      add(tl, "sum(for $d in //@* return string-length($d) + 1)");
       // document height
       tl.add(data.meta.height);
+      // number of documents
+      tl.add(data.meta.ndocs);
 
       if(tab) {
         for(int u = 0; u < tl.size(); u++) {
