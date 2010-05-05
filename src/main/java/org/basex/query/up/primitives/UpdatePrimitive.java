@@ -185,7 +185,8 @@ public abstract class UpdatePrimitive {
         q = nd.qname();
         m.ns.open();
         final Atts ns = par == 0 ? nd.nsScope() : nd.ns();
-        ne = ns.size > 0;
+        // [LK] I'm positive there's a better way to come by this duplicate
+        // thing ...
         if(ndPar != null) {
           final Atts nsPar = ndPar.ns();
           if(nsPar != null)
@@ -195,6 +196,7 @@ public abstract class UpdatePrimitive {
               if(ki > -1) ns.delete(ki);
             }
         }
+        ne = ns.size > 0;
         for(int a = 0; a < ns.size; a++) {
           m.ns.add(ns.key[a], ns.val[a], ms);
         }
