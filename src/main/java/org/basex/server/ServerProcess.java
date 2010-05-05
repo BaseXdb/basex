@@ -13,10 +13,14 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.data.Data;
+import org.basex.data.XMLSerializer;
 import org.basex.io.BufferInput;
 import org.basex.io.BufferedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
+import org.basex.query.item.Item;
+import org.basex.query.iter.Iter;
 import org.basex.util.Performance;
 
 /**
@@ -91,7 +95,12 @@ public final class ServerProcess extends Thread {
     try {
       while(true) {
         try {
-          input = in.readString();
+          byte b = in.readByte();
+          if(b == 0) {
+            iterate();
+            return;
+          }
+          input = in.readString(b);
         } catch(final IOException ex) {
           // this exception is thrown for each session if the server is stopped
           exit();
@@ -141,6 +150,29 @@ public final class ServerProcess extends Thread {
       ex.printStackTrace();
       exit();
     }
+  }
+  
+  
+  /**
+   * Query is executed in iterate mode.
+   * @throws IOException Exception
+   */
+  private void iterate() throws IOException {
+    QueryProcessor processor = new QueryProcessor(in.readString(), context);
+    try {
+      Iter iter = processor.iter();
+      XMLSerializer serializer = new XMLSerializer(out);
+      Item item;
+      while((item = iter.next()) != null) {
+          item.serialize(serializer);
+      }
+      out.write(0);
+      out.flush();
+      serializer.close();
+      processor.close();
+    } catch(QueryException e) {
+      e.printStackTrace();
+    } 
   }
 
   /**
