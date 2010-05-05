@@ -13,6 +13,7 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.up.NamePool;
 import org.basex.util.Atts;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -193,7 +194,10 @@ public abstract class UpdatePrimitive {
             for(int j = 0; j < nsPar.size; j++) {
               final byte[] key = nsPar.key[j];
               final int ki = ns.get(key);
-              if(ki > -1) ns.delete(ki);
+              // check if prefix (or empty prefix) is already indexed and if so
+              // check for different URIs. If the URIs are different the
+              // prefix must be added to the index.
+              if(ki > -1 && Token.eq(nsPar.val[j], ns.val[ki])) ns.delete(ki);
             }
         }
         ne = ns.size > 0;
