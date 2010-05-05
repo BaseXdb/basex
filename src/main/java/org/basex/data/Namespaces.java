@@ -253,7 +253,7 @@ public final class Namespaces {
    * @param pre pre value to find nearest namespace node for 
    * @return the nearest namespace node
    */
-  protected NSNode findAncestor(final int pre) {
+  NSNode findAncestor(final int pre) {
     return root.find(pre);
   }
   

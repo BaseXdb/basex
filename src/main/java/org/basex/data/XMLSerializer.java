@@ -115,7 +115,7 @@ public final class XMLSerializer extends Serializer {
     final String maps = p.get(S_USE_CHARACTER_MAPS);
     if(!maps.isEmpty()) error(SERMAPS, maps);
 
-    enc     = enc(p.get(S_ENCODING));
+    enc     = enc(p.get(S_ENCODING), null);
     docsys  = p.get(S_DOCTYPE_SYSTEM);
     docpub  = p.get(S_DOCTYPE_PUBLIC);
     media   = p.get(S_MEDIA_TYPE);

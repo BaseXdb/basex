@@ -49,10 +49,10 @@ public class NamespaceTest {
 //  @Test
 //  public final void simpleNsDuplicate2() {
 //    query(
-//        "declare namespace a='aa'; insert node <a:y xmlns:a='aa'><a:b/></a:y> " +
-//        "into doc('d5')/a:x",
-//        "declare namespace a='aa';doc('d5')/a:x",
-//        "<a:x xlmns:a='aa'><a:y><a:b/></a:y></a:x>");
+//      "declare namespace a='aa'; insert node <a:y xmlns:a='aa'><a:b/></a:y> "+
+//      "into doc('d5')/a:x",
+//      "declare namespace a='aa';doc('d5')/a:x",
+//      "<a:x xlmns:a='aa'><a:y><a:b/></a:y></a:x>");
 //  }
 //  
 //  /** Test query. */

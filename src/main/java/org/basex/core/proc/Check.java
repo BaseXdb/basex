@@ -33,8 +33,8 @@ public final class Check extends Proc {
     final Proc p = MetaData.found(path, db, context.prop) ?
       new Open(db) : new CreateDB(path);
     final boolean ok = p.run(context);
-    info(p.info().trim());
-    return ok;
+    final String msg = p.info().trim();
+    return ok ? info(msg) : error(msg);
   }
 
   /**

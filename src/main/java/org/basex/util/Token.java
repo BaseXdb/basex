@@ -241,13 +241,16 @@ public final class Token {
   /**
    * Returns a unified representation of the specified encoding.
    * @param enc input encoding
+   * @param old (optional) old encoding
    * @return encoding
    */
-  public static String enc(final String enc) {
+  public static String enc(final String enc, final String old) {
     final String e = enc.toUpperCase();
     if(e.equals(UTF8) || e.equals(UTF82)) return UTF8;
-    if(e.equals(UTF16BE) || e.equals(UTF16) || e.equals(UTF162)) return UTF16BE;
+    if(e.equals(UTF16BE)) return UTF16BE;
     if(e.equals(UTF16LE)) return UTF16LE;
+    if(e.equals(UTF16) || e.equals(UTF162))
+      return old == UTF16BE || old == UTF16LE ? old : UTF16BE;
     return enc;
   }
 
