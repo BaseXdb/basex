@@ -31,23 +31,26 @@ final class Semaphore {
    */
   void before(final boolean w) {
     if(w) {
-      final Lock p = new Lock(true);
-      synchronized(p) {
+      // exclusive lock
+      final Lock lx = new Lock(true);
+      synchronized(lx) {
         synchronized(this) {
           if(state == State.IDLE) {
             state = State.WRITE;
             return;
           }
-          waiting.add(p);
+          waiting.add(lx);
         }
         try {
-          p.wait();
+          lx.wait();
+          state = State.WRITE;
         } catch(final InterruptedException ex) {
           ex.printStackTrace();
         }
       }
     } else {
-      Lock l = null;
+      // shared lock
+      Lock ls = null;
       synchronized(this) {
         if(state == State.IDLE) {
           state = State.READ;
@@ -58,16 +61,20 @@ final class Semaphore {
             return;
         }
         if(waiting.size() > 0 && !waiting.getLast().writer) {
-            l = waiting.getLast();
-            l.waitingReaders++;
+            ls = waiting.getLast();
+            ls.waitingReaders++;
           } else {
-            l = new Lock(false);
-            waiting.add(l);  
+            ls = new Lock(false);
+            waiting.add(ls);  
         }
       }
-      synchronized(l) {
+      synchronized(ls) {
         try {
-          l.wait();
+          ls.wait();
+          if(activeR == 0) {
+            state = State.READ;
+            activeR = ls.waitingReaders;
+          }
         } catch(final InterruptedException ex) {
           ex.printStackTrace();
         }
@@ -81,18 +88,10 @@ final class Semaphore {
    */
   synchronized void after(final boolean w) {
     if(w) {
-      if(waiting.size() > 0) {
-        notifyNext();
-      } else {
-        state = State.IDLE;
-      }
+      notifyNext();
     } else {
       if(--activeR == 0) {
-        if(waiting.size() > 0) {
           notifyNext();
-        } else {
-          state = State.IDLE;
-        }
       }
     }
   }
@@ -101,15 +100,13 @@ final class Semaphore {
    * Notifies the next processes in line.
    */
   private synchronized void notifyNext() {
+    if(waiting.size() > 0) {
     final Lock eldest = waiting.remove(0);
     synchronized(eldest) {
       eldest.notifyAll();
-    }
-    if(eldest.writer) {
-      state = State.WRITE;
+      }
     } else {
-      state = State.READ;
-      activeR = eldest.waitingReaders;
+      state = State.IDLE;
     }
   }
 
