@@ -158,7 +158,8 @@ public final class ServerProcess extends Thread {
    * @throws IOException Exception
    */
   private void iterate() throws IOException {
-    QueryProcessor processor = new QueryProcessor(in.readString(), context);
+    String input = in.readString();
+    QueryProcessor processor = new QueryProcessor(input, context);
     try {
       Iter iter = processor.iter();
       XMLSerializer serializer = new XMLSerializer(out);
@@ -167,11 +168,18 @@ public final class ServerProcess extends Thread {
           item.serialize(serializer);
       }
       out.write(0);
-      out.flush();
+      out.print("DONE");
+      out.write(0);
+      send(true);
       serializer.close();
       processor.close();
-    } catch(QueryException e) {
-      e.printStackTrace();
+    } catch(QueryException ex) {
+   // invalid command was sent by a client; create error feedback
+      log.write(this, input, INFOERROR + ex.extended());
+      out.write(0);
+      out.print(ex.extended());
+      out.write(0);
+      send(false);
     } 
   }
 
