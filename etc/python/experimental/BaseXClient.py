@@ -117,21 +117,18 @@ class Session():
     self.__bpos += 1
     return b
     
-  # Sends command for iterate mode.  
-  def send(self, query):
-  	s.send('\0' + query + '\0')
-  
-  def read(self):
-  	self.__init()
-  	return self.__readString()
-    
 class Query():
 	def __init__(self, session):
 		self.__session = session
 	
 	def run(self, query):
-		self.__session.send(query)
-		return self.__session.read()
+		return self.__session.execute('\0' + query)
+		
+	def result(self):
+		return self.__session.result()
+	
+	def info(self):
+		return self.__session.info()
 	
 		
 	

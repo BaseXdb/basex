@@ -13,14 +13,17 @@ import BaseXClient, time
 start = time.clock()
 
 # command to be performed
-cmd = "1 to 10";
+cmd = "1 to 2";
 
 try:
   # create session
   session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
   
   query = BaseXClient.Query(session)
-  print query.run(cmd)
+  if query.run(cmd):
+  	print query.result()
+  else:
+  	print query.info()
 
   # close session
   session.close()
