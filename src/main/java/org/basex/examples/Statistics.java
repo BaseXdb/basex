@@ -2,6 +2,7 @@ package org.basex.examples;
 
 import static java.lang.System.*;
 import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 import java.io.File;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -10,10 +11,10 @@ import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.DropDB;
-import org.basex.core.proc.XQuery;
 import org.basex.data.Data;
 import org.basex.io.CachedOutput;
 import org.basex.util.Args;
+import org.basex.util.Performance;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.Token;
@@ -77,6 +78,7 @@ public final class Statistics extends DefaultHandler {
     tl.add("URI");
     tl.add("Content(t)");
     tl.add("Content(a)");
+    tl.add("DBSize");
     tl.add("Depth");
     tl.add("Docs");
     table.header = tl;
@@ -133,21 +135,28 @@ public final class Statistics extends DefaultHandler {
       // relative document path
       tl.add(data.meta.file.toString().replace(abs, ""));
       // file size
-      tl.add(data.meta.filesize);
+      tl.add(Performance.format(data.meta.filesize));
       // number of nodes
       tl.add(data.meta.size);
       // maximum number of attributes
-      add(tl, "max(for $d in //* return count($d/@*))");
+      //add(tl, "max(for $d in //* return count($d/@*))");
+      tl.add("");
       // total number of element names
-      add(tl, "count(distinct-values(for $d in //* return name($d)))");
+      tl.add(data.tags.size());
+      //add(tl, "count(distinct-values(for $d in //* return name($d)))");
       // total number of attribute names
-      add(tl, "count(distinct-values(for $d in //@* return name($d)))");
+      tl.add(data.atts.size());
+      //add(tl, "count(distinct-values(for $d in //@* return name($d)))");
       // total number of namespace URIs
       tl.add(data.ns.size());
       // total string length of text nodes
-      add(tl, "sum(for $d in //text() return string-length($d) + 1)");
+      tl.add(ctx.data.meta.file(DATATXT).length());
+      //add(tl, "sum(for $d in //text() return string-length($d) + 1)");
       // total string length of attribute values
-      add(tl, "sum(for $d in //@* return string-length($d) + 1)");
+      tl.add(ctx.data.meta.file(DATAATV).length());
+      //add(tl, "sum(for $d in //@* return string-length($d) + 1)");
+      // database size
+      tl.add(Performance.format(data.meta.dbsize()));
       // document height
       tl.add(data.meta.height);
       // number of documents
@@ -175,21 +184,21 @@ public final class Statistics extends DefaultHandler {
    * @param tl token list
    * @param qu query
    * @throws BaseXException exception
-   */
   private void add(final TokenList tl, final String qu) throws BaseXException {
     tl.add(query(qu));
     //tl.add(Long.toHexString(Long.parseLong(query(qu))));
   }
+   */
 
   /**
    * Performs the specified query.
    * @param qu query
    * @return string result
    * @throws BaseXException exception
-   */
   private String query(final String qu) throws BaseXException {
     return exec(new XQuery(qu)).trim();
   }
+   */
 
   /**
    * Executes the specified command and returns the result as string.
