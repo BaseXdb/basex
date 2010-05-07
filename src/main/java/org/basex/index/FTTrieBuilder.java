@@ -368,16 +368,16 @@ final class FTTrieBuilder extends FTBuilder {
         // first char of next node
         outN.write(tokens.get(next.get(next.get(0)[j])[0])[0]);
       }
-
       outN.writeInt(next.get(0)[j]); // data size
       outN.write5(-1); // pointer on data - root has no data
       outS.writeInt(siz);
+
       siz += 2L + (next.get(0).length - 3) * 5L + 9L;
       // all other nodes
       writeSubTree(null, outN, outS, 0, siz);
-      outN.close();
-      outS.close();
     }
+    outN.close();
+    outS.close();
     DropDB.delete(data.meta.name, DATAFTX + "\\d+." + IO.BASEXSUFFIX,
     data.meta.prop);
   }

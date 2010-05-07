@@ -133,8 +133,8 @@ public final class Prop extends AProp {
   public static final Object[] CASESENS = { "CASESENS", false };
   /** Flag for full-text diacritics sensitivity. */
   public static final Object[] DIACRITICS = { "DIACRITICS", false };
-  /** Flag for full-text scoring algorithm. */
-  /** Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
+  /** Flag for full-text scoring algorithm.
+      Scoring mode: 0 = none, 1 = document nodes, 2 = text nodes. */
   public static final Object[] SCORING = { "SCORING", 0 };
   /** Path to full-text stopword list. */
   public static final Object[] STOPWORDS = { "STOPWORDS", "" };
