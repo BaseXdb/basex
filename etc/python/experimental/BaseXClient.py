@@ -48,7 +48,7 @@ class Session():
   def __init__(self, host, port, user, pw):
     # allocate buffer for speeding up communication
     self.__buf = array.array('B', '\0' * 0x1000)
-    self.__init()
+    self.init()
 
     # create server connection
     global s
@@ -56,7 +56,7 @@ class Session():
     s.connect((host, port))
 
     # receive timestamp
-    ts = self.__readString()
+    ts = self.readString()
 
     # send username and hashed password/timestamp
     m = hashlib.md5()
@@ -74,10 +74,13 @@ class Session():
     s.send(com + '\0')
 
     # send command to server and receive result
-    self.__init()
-    self.__result = self.__readString()
-    self.__info = self.__readString()
-    return self.__read() == 0
+    self.init()
+    self.__result = self.readString()
+    self.__info = self.readString()
+    return self.read() == 0
+    
+  def query(self, q):
+  	return Query(self, q)
 
   # Returns the result.
   def result(self):
@@ -93,22 +96,22 @@ class Session():
     s.close()
 
   # Initializes the byte transfer.
-  def __init(self):
+  def init(self):
     self.__bpos = 0
     self.__bsize = 0
 
   # Receives a string from the socket.
-  def __readString(self):
+  def readString(self):
     bf = array.array('B')
     while True:
-      b = self.__read()
+      b = self.read()
       if b:
         bf.append(b)
       else:
         return bf.tostring()
 
   # Returns a single byte from the socket.
-  def __read(self):
+  def read(self):
     # Cache next bytes
     if self.__bpos == self.__bsize:
       self.__bsize = s.recv_into(self.__buf)
@@ -116,19 +119,53 @@ class Session():
     b = self.__buf[self.__bpos]
     self.__bpos += 1
     return b
-    
+  
+  # Executes the iterative mode of a query.
+  def executeIter(self, com):
+  	s.send('\0' + com + '\0');
+  	return s.recv(1) == '\0'
+  
+  # Sends the defined sign.	
+  def send(self, sign):
+  	s.send(sign)
+  
+  # Checks the next byte for null or 1.	
+  def check(self):
+   	return s.recv(1) == '\0'
+   
+  # Returns the received string. 	
+  def res(self):
+  	self.init()
+  	return self.readString()
+     
+   
 class Query():
-	def __init__(self, session):
+	# Constructor, creating a new query object.
+	def __init__(self, session, q):
 		self.__session = session
+		self.__query = q
 	
-	def run(self, query):
-		return self.__session.execute('\0' + query)
-		
-	def result(self):
-		return self.__session.result()
+	# Runs the query and returns the success flag.
+	def run(self):
+		return self.__session.executeIter(self.__query)
 	
+	# Checks for more parts of the result.	
+	def more(self):
+		self.__session.send('\0')
+		if self.__session.check():
+			self.__part = self.__session.res()
+			return True
+		else:
+			return False
+	
+	# Returns the next part of the result.
+	def next(self):
+		return self.__part		
+	
+	# Cancels the iterative execution.	
+	def abort(self):
+		self.__session.send('\1')
+	
+	# Returns the error info.	
 	def info(self):
-		return self.__session.info()
-	
-		
-	
+		return self.__session.res()

@@ -13,18 +13,23 @@ import BaseXClient, time
 start = time.clock()
 
 # command to be performed
-cmd = "1 to 2";
+cmd = "for $x in doc('input')//li return $x";
 
 try:
   # create session
   session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
   
-  query = BaseXClient.Query(session)
-  if query.run(cmd):
-  	print query.result()
+  # create query
+  query = session.query(cmd)
+  # runs the query
+  if query.run():
+  	# prints the results
+  	while query.more():
+  		print query.next()
+  # prints the error info
   else:
   	print query.info()
-
+  	
   # close session
   session.close()
 
