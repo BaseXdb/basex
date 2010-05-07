@@ -258,45 +258,6 @@ public final class InexSubmit {
   }
 
   /**
-   * Parses the command line arguments.
-   * @param args command-line arguments
-   * @return true if all arguments have been correctly parsed
-   */
-  private boolean parseArguments(final String[] args) {
-    final Args arg = new Args(args);
-    boolean ok = true;
-    try {
-      while(arg.more() && ok) {
-        if(arg.dash()) {
-          final char ca = arg.next();
-          if(ca == 'u') {
-            updateTimes(Arrays.copyOfRange(args, 1, args.length));
-            return false;
-          } else if(ca == 'x') {
-            convertTopics();
-            return false;
-          }
-          ok = false;
-        }
-      }
-      if(ok) {
-        session = new ClientSession(ctx, ADMIN, ADMIN);
-        session.execute(new Set(Prop.INFO, true));
-      } else {
-        Main.outln("Usage: " + Main.name(this) + " [options]" + NL +
-          "  -u[...] update submission times" + NL +
-          "  -x      convert queries");
-      }
-    } catch(final Exception ex) {
-      ok = false;
-      Main.errln("Please run BaseXServer for using server mode.");
-      ex.printStackTrace();
-    }
-
-    return ok;
-  }
-
-  /**
    * Creates and prints the submission file.
    * @throws Exception Exception
    */
@@ -521,5 +482,39 @@ public final class InexSubmit {
       }
     }
     br.close();
+  }
+
+  /**
+   * Parses the command line arguments.
+   * @param args command-line arguments
+   * @return true if all arguments have been correctly parsed
+   */
+  private boolean parseArguments(final String[] args) {
+    final Args arg = new Args(args, this, " [-ux]" + NL +
+        "  -u[...] update submission times" + NL +
+        "  -x      convert queries");
+    try {
+      while(arg.more()) {
+        if(arg.dash()) {
+          final char ca = arg.next();
+          if(ca == 'u') {
+            updateTimes(Arrays.copyOfRange(args, 1, args.length));
+            return false;
+          } else if(ca == 'x') {
+            convertTopics();
+            return false;
+          }
+        }
+      }
+      if(!arg.finish()) return false;
+
+      session = new ClientSession(ctx, ADMIN, ADMIN);
+      session.execute(new Set(Prop.INFO, true));
+      return true;
+    } catch(final Exception ex) {
+      Main.errln("Please run BaseXServer for using server mode.");
+      ex.printStackTrace();
+      return false;
+    }
   }
 }

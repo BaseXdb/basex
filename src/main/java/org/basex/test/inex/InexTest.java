@@ -193,45 +193,43 @@ public final class InexTest {
    * @return true if all arguments have been correctly parsed
    */
   private boolean parseArguments(final String[] args) {
-    final Args arg = new Args(args);
-    boolean ok = true;
-    try {
-      while(arg.more() && ok) {
-        if(arg.dash()) {
-          final char c = arg.next();
-          if(c == 'd') {
-            dbindex = arg.num();
-          } else if(c == 'q') {
-            quindex = arg.num();
-          } else if(c == 'r') {
-            runs = arg.num();
-          } else if(c == 'v') {
-            info = true;
-          } else if(c == 'b') {
-            budget = arg.num();
-          } else {
-            ok = false;
-          }
-        } else {
-          ok = false;
-        }
-      }
-
-      session = new ClientSession(ctx, ADMIN, ADMIN);
-      session.execute(new Set(Prop.INFO, true));
-      session.execute(new Set(Prop.ALLINFO, info));
-    } catch(final Exception ex) {
-      ex.printStackTrace();
-      ok = false;
-    }
-
-    if(!ok) {
-      Main.outln("Usage: " + Main.name(this) + " [options]" + NL +
+    final Args arg = new Args(args, this,
+        " [options]" + NL +
         "  -d<no>  use specified database (0-9)" + NL +
         "  -q<no>  perform specified query (1-#queries)" + NL +
         "  -r<no>  number of runs" + NL +
         "  -v      show process info");
+
+    while(arg.more()) {
+      if(arg.dash()) {
+        final char c = arg.next();
+        if(c == 'd') {
+          dbindex = arg.num();
+        } else if(c == 'q') {
+          quindex = arg.num();
+        } else if(c == 'r') {
+          runs = arg.num();
+        } else if(c == 'v') {
+          info = true;
+        } else if(c == 'b') {
+          budget = arg.num();
+        } else {
+          arg.check(false);
+        }
+      } else {
+        arg.check(false);
+      }
     }
-    return ok;
+    if(!arg.finish()) return false;
+    
+    try {
+      session = new ClientSession(ctx, ADMIN, ADMIN);
+      session.execute(new Set(Prop.INFO, true));
+      session.execute(new Set(Prop.ALLINFO, info));
+      return true;
+    } catch(final Exception ex) {
+      ex.printStackTrace();
+      return false;
+    }
   }
 }

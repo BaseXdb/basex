@@ -104,32 +104,30 @@ public final class InexTFCalc {
    * @return true if all arguments have been correctly parsed
    */
   private boolean parseArguments(final String[] args) {
-    final Args arg = new Args(args);
-    boolean ok = true;
-    try {
-      while(arg.more() && ok) {
-        if(arg.dash()) {
-          final char ca = arg.next();
-          if(ca == 'd') {
-            databases.add(arg.string());
-          } else ok = false;
+    final Args arg = new Args(args, this, " [options]" + NL +
+      "  -d database");
+    while(arg.more()) {
+      if(arg.dash()) {
+        final char ca = arg.next();
+        if(ca == 'd') {
+          databases.add(arg.string());
+        } else {
+          arg.check(false);
         }
       }
-      if(ok) {
-        session = new ClientSession(ctx, ADMIN, ADMIN);
-        session.execute(new Set(Prop.INFO, true));
-        session.execute(new Set(Prop.ALLINFO, false));
-      } else {
-        Main.outln("Usage: " + Main.name(this) + " [options]" + NL +
-          "  -d database");
-      }
-    } catch(final Exception ex) {
-      ok = false;
-      Main.errln("Please run BaseXServer for using server mode.");
-      ex.printStackTrace();
     }
+    if(!arg.finish()) return false;
 
-    return ok;
+    try {
+      session = new ClientSession(ctx, ADMIN, ADMIN);
+      session.execute(new Set(Prop.INFO, true));
+      session.execute(new Set(Prop.ALLINFO, false));
+      return true;
+    } catch(final Exception ex) {
+      Main.outln("Please run BaseXServer for using server mode.");
+      ex.printStackTrace();
+      return false;
+    }
   }
 
   /**

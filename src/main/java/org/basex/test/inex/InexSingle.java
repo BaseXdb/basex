@@ -148,28 +148,28 @@ public final class InexSingle {
    * @return true if all arguments have been correctly parsed
    */
   private boolean parseArguments(final String[] args) {
-    final Args arg = new Args(args);
-    boolean ok = true;
+    final Args arg = new Args(args, this,
+        " [options] query" + NL +
+        "  -q     quiet mode (suppress output)" + NL +
+        "  query  perform specified query (1-#queries)");
     try {
-      while(arg.more() && ok) {
+      while(arg.more()) {
         if(arg.dash()) {
           final char c = arg.next();
           if(c == 'q') {
             quiet = true;
           } else {
-            ok = false;
+            arg.check(false);
           }
         } else {
           quindex = arg.num();
         }
       }
     } catch(final Exception ex) {
-      ok = false;
+      arg.check(false);
     }
-    if(!ok || quindex == -1)
-      Main.outln("Usage: " + Main.name(this) + " [options] query" + NL +
-          "  -q     quiet mode (suppress output)" + NL +
-          "  query  perform specified query (1-#queries)");
-    return ok;
+    if(quindex == -1) arg.check(false);
+    
+    return arg.finish();
   }
 }

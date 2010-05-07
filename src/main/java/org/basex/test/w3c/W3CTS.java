@@ -155,14 +155,23 @@ public abstract class W3CTS {
   }
 
   /**
-   * Initializes the code.
+   * Runs the test suite.
    * @param args command-line arguments
    * @throws Exception exception
    */
-  void init(final String[] args) throws Exception {
-    final Args arg = new Args(args);
-    boolean o = true;
-    while(arg.more() && o) {
+  void run(final String[] args) throws Exception {
+    final Args arg = new Args(args, this,
+        " Test Suite [options] [pat]" + NL +
+        " [pat] perform only tests with the specified pattern" + NL +
+        " -c print compilation steps" + NL +
+        " -d show debugging info" + NL +
+        " -h show this help" + NL +
+        " -m minimum conformance" + NL +
+        " -p change path" + NL +
+        " -r create report" + NL +
+        " -v verbose output");
+
+    while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
         if(c == 'r') {
@@ -179,26 +188,14 @@ public abstract class W3CTS {
         } else if(c == 'v') {
           verbose = true;
         } else {
-          o = false;
+          arg.check(false);
         }
       } else {
         single = arg.string();
         maxout = Integer.MAX_VALUE;
       }
     }
-
-    if(!o) {
-      Main.outln(NL + Main.name(this) + " Test Suite [pat]" + NL +
-          " [pat] perform only tests with the specified pattern" + NL +
-          " -c print compilation steps" + NL +
-          " -d show debugging info" + NL +
-          " -h show this help" + NL +
-          " -m minimum conformance" + NL +
-          " -p change path" + NL +
-          " -r create report" + NL +
-          " -v verbose output");
-      return;
-    }
+    if(!arg.finish()) return;
 
     queries = path + "Queries/XQuery/";
     expected = path + "ExpectedTestResults/";

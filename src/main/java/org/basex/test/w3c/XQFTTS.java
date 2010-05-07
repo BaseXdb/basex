@@ -35,7 +35,7 @@ public final class XQFTTS extends W3CTS {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new XQFTTS().init(args);
+    new XQFTTS().run(args);
   }
 
   /**
