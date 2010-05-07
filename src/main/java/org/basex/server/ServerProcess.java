@@ -3,6 +3,7 @@ package org.basex.server;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 import org.basex.BaseXServer;
 import org.basex.core.CommandParser;
@@ -159,27 +160,31 @@ public final class ServerProcess extends Thread {
    */
   private void iterate() throws IOException {
     String input = in.readString();
+    OutputStream o = socket.getOutputStream();
     QueryProcessor processor = new QueryProcessor(input, context);
     try {
       Iter iter = processor.iter();
-      XMLSerializer serializer = new XMLSerializer(out);
+      XMLSerializer serializer = new XMLSerializer(o);
+      o.write(0);
       Item item;
-      while((item = iter.next()) != null) {
+      while(in.read() == 0) {
+        if((item = iter.next()) != null) {
+          o.write(0);
           item.serialize(serializer);
+          o.write(0);
+        } else {
+          o.write(1);
+        }
       }
-      out.write(0);
-      out.print("DONE");
-      out.write(0);
-      send(true);
       serializer.close();
       processor.close();
     } catch(QueryException ex) {
-   // invalid command was sent by a client; create error feedback
+      // invalid command was sent by a client; create error feedback
       log.write(this, input, INFOERROR + ex.extended());
-      out.write(0);
+      o.write(1);
       out.print(ex.extended());
-      out.write(0);
-      send(false);
+      out.flush();
+      o.write(0);
     } 
   }
 
