@@ -78,7 +78,8 @@ class Session():
     self.__result = self.readString()
     self.__info = self.readString()
     return self.read() == 0
-    
+  
+  # Returns a query object.  
   def query(self, q):
   	return Query(self, q)
 
@@ -123,7 +124,7 @@ class Session():
   # Executes the iterative mode of a query.
   def executeIter(self, com):
   	s.send('\0' + com + '\0');
-  	return s.recv(1) == '\0'
+  	return self.check()
   
   # Sends the defined sign.	
   def send(self, sign):
