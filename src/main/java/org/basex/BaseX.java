@@ -115,12 +115,11 @@ public class BaseX extends Main {
   }
 
   @Override
-  protected final void parseArguments(final String[] args) {
+  protected final boolean parseArguments(final String[] args) {
     String serial = "";
     try {
-      final Args arg = new Args(args);
-      success = true;
-      while(arg.more() && success) {
+      final Args arg = new Args(args, this, sa() ? LOCALINFO : CLIENTINFO);
+      while(arg.more()) {
         if(arg.dash()) {
           final char c = arg.next();
           if(c == 'c') {
@@ -131,16 +130,16 @@ public class BaseX extends Main {
             context.prop.set(Prop.DEBUG, true);
           } else if(c == 'D' && sa()) {
             // hidden option: show dot query graph
-            success = set(Prop.DOTPLAN, true);
+            arg.check(set(Prop.DOTPLAN, true));
           } else if(c == 'i' && sa()) {
             // hidden option: show dot query graph
             input = arg.string();
           } else if(c == 'm') {
             // hidden option: activate table main memory mode
-            success = set(Prop.TABLEMEM, true);
+            arg.check(set(Prop.TABLEMEM, true));
           } else if(c == 'M') {
             // hidden option: activate main memory mode
-            success = set(Prop.MAINMEM, true);
+            arg.check(set(Prop.MAINMEM, true));
           } else if(c == 'n' && !sa()) {
             // parse server name
             context.prop.set(Prop.HOST, arg.string());
@@ -159,40 +158,40 @@ public class BaseX extends Main {
           } else if(c == 's') {
             // set/add serialization parameter
             serial += "," + arg.string();
-            success = set(Prop.SERIALIZER, serial);
+            arg.check(set(Prop.SERIALIZER, serial));
           } else if(c == 'r') {
             // hidden option: parse number of runs
-            success = set(Prop.RUNS, arg.string());
+            arg.check(set(Prop.RUNS, arg.string()));
           } else if(c == 'U' && !sa()) {
             // specify user name
             user = arg.string();
           } else if(c == 'v') {
             // show process info
-            success = set(Prop.INFO, true);
+            arg.check(set(Prop.INFO, true));
           } else if(c == 'V') {
             // show all process info
-            success = set(Prop.INFO, ALL);
+            arg.check(set(Prop.INFO, ALL));
           } else if(c == 'w') {
             // activate well-formed XML output
-            success = set(Prop.WRAPOUTPUT, true);
+            arg.check(set(Prop.WRAPOUTPUT, true));
           } else if(c == 'X') {
             // hidden option: show xml query plan
-            success = set(Prop.XMLPLAN, true);
+            arg.check(set(Prop.XMLPLAN, true));
           } else if(c == 'z') {
             // turn off result serialization
-            success = set(Prop.SERIALIZE, false);
+            arg.check(set(Prop.SERIALIZE, false));
           } else {
-            success = false;
+            arg.check(false);
           }
         } else {
           file = file == null ? arg.string() : file + " " + arg.string();
         }
       }
       console = file == null && commands == null;
-      if(!success) outln(sa() ? LOCALINFO : CLIENTINFO);
+      return arg.finish();
     } catch(final IOException ex) {
       errln(server(ex));
-      success = false;
+      return false;
     }
   }
 }

@@ -166,4 +166,21 @@ public final class Table {
     if(desc != null) tb.add(NL + contents.size() + ' ' + desc + DOT);
     return tb.finish();
   }
+  
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder();
+    for(final byte[] b : header) {
+      tb.add(b);
+      tb.add('\t');
+    }
+    tb.add(NL);
+    for(final TokenList e : contents) {
+      for(final byte[] b : e) {
+        tb.add(b);
+        tb.add('\t');
+      }
+    }
+    return tb.toString();
+  }
 }

@@ -73,8 +73,8 @@ public interface Text {
   String SERVERMODE = "Server";
 
   /** Start information. */
-  String CLIENTINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + CLIENTMODE + " [-npPU] [-doqvVwz] [query] [-c]" + NL +
+  String CLIENTINFO =
+    " [-npPU] [-doqvVwz] [query] [-c]" + NL +
     "  [query]    query file" + NL +
     "  -c<cmd>    database commands" + NL +
     "  -d         debug mode" + NL +
@@ -89,8 +89,8 @@ public interface Text {
     "  -z         skip query output";
 
   /** Start information. */
-  String LOCALINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + " [-dioqsvVwz] [query] [-c]" + NL +
+  String LOCALINFO =
+    " [-dioqsvVwz] [query] [-c]" + NL +
     "  [query]    query file" + NL +
     "  -c<cmd>    database commands" + NL +
     "  -d         debug mode" + NL +
@@ -124,8 +124,8 @@ public interface Text {
   String SERVERPROC = "% instead of 1 commands received.";
 
   /** Start information. */
-  String SERVERINFO = CONSOLEINFO + NL +
-    "Usage: " + NAME + SERVERMODE + " [-dpz] [stop]" + NL +
+  String SERVERINFO =
+    " [-dpz] [stop]" + NL +
     " stop     stop server" + NL +
     " -d       debug mode" + NL +
     " -p<port> server port" + NL +

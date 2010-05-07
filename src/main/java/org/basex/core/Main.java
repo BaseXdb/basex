@@ -30,7 +30,7 @@ public abstract class Main {
   /** Database Context. */
   public final Context context = new Context();
   /** Successful command line parsing. */
-  protected boolean success;
+  protected final boolean success;
   /** Output file for queries. */
   protected OutputStream out = System.out;
   /** Input file for queries. */
@@ -46,7 +46,7 @@ public abstract class Main {
    * @param args command-line arguments
    */
   protected Main(final String... args) {
-    parseArguments(args);
+    success = parseArguments(args);
     if(!success) return;
 
     // guarantee correct shutdown...
@@ -176,8 +176,9 @@ public abstract class Main {
   /**
    * Parses the command-line arguments, specified by the user.
    * @param args command-line arguments
+   * @return success flag
    */
-  protected abstract void parseArguments(final String[] args);
+  protected abstract boolean parseArguments(final String[] args);
 
   // GLOBAL STATIC METHODS ====================================================
 

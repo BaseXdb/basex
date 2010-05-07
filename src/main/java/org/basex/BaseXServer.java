@@ -118,10 +118,9 @@ public final class BaseXServer extends Main implements Runnable {
   }
 
   @Override
-  protected void parseArguments(final String[] args) {
-    final Args arg = new Args(args);
-    success = true;
-    while(arg.more() && success) {
+  protected boolean parseArguments(final String[] args) {
+    final Args arg = new Args(args, this, SERVERINFO);
+    while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
         if(c == 'd') {
@@ -137,17 +136,17 @@ public final class BaseXServer extends Main implements Runnable {
           // suppress logging
           quiet = true;
         } else {
-          success = false;
+          arg.check(false);
         }
       } else {
-        success = false;
+        arg.check(false);
         if(arg.string().equalsIgnoreCase("stop")) {
           stop(context.prop.num(Prop.SERVERPORT));
-          return;
+          return false;
         }
       }
     }
-    if(!success) outln(SERVERINFO);
+    return arg.finish();
   }
 
   /**

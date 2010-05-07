@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import org.basex.core.Main;
+
 /**
  * This class parses command-line arguments.
  *
@@ -7,19 +9,29 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class Args {
+  /** Calling object. */
+  private final Object obj;
+  /** Usage info. */
+  private final String usage;
   /** Command-line arguments. */
   private String args = "";
   /** Dash flag. */
   private boolean dash;
   /** Current argument. */
   private int c;
+  /** OK flag. */
+  private boolean ok = true;
 
   /**
    * Default constructor.
    * @param a arguments
+   * @param o calling object
+   * @param u usage info
    */
-  public Args(final String[] a) {
+  public Args(final String[] a, final Object o, final String u) {
     for(final String s : a) args += s + ' ';
+    usage = u;
+    obj = o;
   }
 
   /**
@@ -27,7 +39,7 @@ public final class Args {
    * @return result of check
    */
   public boolean more() {
-    while(c < args.length()) {
+    while(ok && c < args.length()) {
       final char ch = args.charAt(c);
       if(ch == ' ') {
         if(dash) dash = false;
@@ -74,7 +86,9 @@ public final class Args {
    * @return number as int value
    */
   public int num() {
-    return Integer.parseInt(string());
+    final int i = Token.toInt(string());
+    ok = i != Integer.MIN_VALUE;
+    return i;
   }
 
   /**
@@ -86,5 +100,22 @@ public final class Args {
     final String s = args.substring(c);
     c = args.length();
     return s.trim();
+  }
+
+  /**
+   * Set ok flag.
+   * @param o ok flag
+   */
+  public void check(final boolean o) {
+    ok = o;
+  }
+
+  /**
+   * Return success flag; if false, print usage message.
+   * @return success flag
+   */
+  public boolean finish() {
+    if(!ok) Main.outln("Usage: " + Main.name(obj) + usage);
+    return ok;
   }
 }
