@@ -127,7 +127,7 @@ class Session {
   
   public function executeIter($cmd) {
   	// send command to server
-    socket_write($this->socket, "\0$com\0");
+    socket_write($this->socket, "\0$cmd\0");
     return $this->check();
   }
   
@@ -155,13 +155,13 @@ class Query {
 	}
 	
 	public function run() {
-		return $session->executerIter($query);
+		return $this->session->executeIter($this->query);
 	}
 	
 	public function more() {
-		$session->send("\0");
-		if ($session->check()) {
-			$this->part = $session->res();
+		$this->session->send("\0");
+		if ($this->session->check()) {
+			$this->part = $this->session->res();
 			return True;
 		} else {
 			return False;
@@ -169,15 +169,15 @@ class Query {
 	}
 	
 	public function next() {
-		return $part;
+		return $this->part;
 	}
 	
 	public function abort() {
-		$session->send("\1");
+		$this->session->send("\1");
 	}
 	
 	public function info() {
-		return $session->res();
+		return $this->session->res();
 	}	
 }
 ?>

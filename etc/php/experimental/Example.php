@@ -18,7 +18,7 @@ $cmd = "1 to 5";
 
 try {
   // create session
-  $session = new Session("phobos101.inf.uni-konstanz.de", 1950, "admin", "admin");
+  $session = new Session("localhost", 1984, "admin", "admin");
   
   $query = $session->query($cmd);
   if($query->run()) {
