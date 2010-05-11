@@ -72,7 +72,7 @@ public final class InexSingle {
     System.out.println("........ Creating: " + subfileN);
     final BufferedWriter out = new BufferedWriter(new FileWriter(subfileN));
     while((l = in.readLine()) != null) {
-      if (l.contains("<topic topic-id=")) {
+      if(l.contains("<topic topic-id=")) {
         final int i1 = l.indexOf("\"");
         final int i2 = l.indexOf("\"", i1 + 1);
         final String key = l.substring(i1 + 1, i2);

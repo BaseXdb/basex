@@ -81,7 +81,7 @@ public final class InexTFCalc {
     freq = new int[words.size()];
 
     // cache database names
-    if (databases.size() == 0)
+    if(databases.size() == 0)
       for(final String s : List.list(ctx))
         if(s.startsWith(DBPREFIX)) databases.add(s);
 
@@ -91,7 +91,7 @@ public final class InexTFCalc {
     // run test
     test();
 
-    for (int i = 0; i < freq.length; i++)
+    for(int i = 0; i < freq.length; i++)
       res.println(words.get(i) + ";" + freq[i]);
     res.close();
 
@@ -164,7 +164,7 @@ public final class InexTFCalc {
       Main.outln("Query % on %: % items",
           qu + 1, databases.get(db), items);
       final int n = Integer.parseInt(items);
-      if (n > 0) freq[qu] += n;
+      if(n > 0) freq[qu] += n;
     } else {
       Main.outln(session.info());
     }

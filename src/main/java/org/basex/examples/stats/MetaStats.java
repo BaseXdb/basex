@@ -3,7 +3,6 @@ package org.basex.examples.stats;
 import static org.basex.data.DataText.*;
 import org.basex.core.Prop;
 import org.basex.data.Data;
-import org.basex.util.Performance;
 import org.basex.util.TokenList;
 
 /**
@@ -41,7 +40,7 @@ public final class MetaStats extends Statistics {
   void analyze(final TokenList tl) {
     final Data data = ctx.data;
     // file size
-    tl.add(Performance.format(data.meta.filesize));
+    tl.add(format(data.meta.filesize));
     // number of nodes
     tl.add(data.meta.size);
     // maximum number of attributes per element
@@ -62,31 +61,10 @@ public final class MetaStats extends Statistics {
     tl.add(ctx.data.meta.file(DATAATV).length());
     //add(tl, "sum(for $d in //@* return string-length($d) + 1)");
     // database size
-    tl.add(Performance.format(data.meta.dbsize()));
+    tl.add(format(data.meta.dbsize()));
     // document height
     tl.add(data.meta.height);
     // number of documents
     tl.add(data.meta.ndocs);
   }
-
-  /*
-   * Adds the query result to the table.
-   * @param tl token list
-   * @param qu query
-   * @throws BaseXException exception
-  private void add(final TokenList tl, final String qu) throws BaseXException {
-    tl.add(query(qu));
-    //tl.add(Long.toHexString(Long.parseLong(query(qu))));
-  }
-   */
-
-  /*
-   * Performs the specified query.
-   * @param qu query
-   * @return string result
-   * @throws BaseXException exception
-  private String query(final String qu) throws BaseXException {
-    return exec(new XQuery(qu)).trim();
-  }
-   */
 }

@@ -136,4 +136,17 @@ public abstract class Statistics {
     }
     return arg.finish();
   }
+
+  /**
+   * Formats a file size according to the binary size orders (KB, MB, ...),
+   * adding the specified offset to the orders of magnitude.
+   * @param size file size
+   * @return formatted size value
+   */
+  static String format(final long size) {
+    if(size < 10000L) return size + " B";
+    if(size < 10000000L) return (size + (1L <<  9) >> 10) + " KB";
+    if(size < 10000000000L) return (size + (1L <<  19) >> 20) + " MB";
+    return (size + (1L << 29) >> 30) + " GB";
+  }
 }
