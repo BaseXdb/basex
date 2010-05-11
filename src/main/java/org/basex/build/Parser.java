@@ -32,6 +32,9 @@ public abstract class Parser extends Progress {
   /** Input file. */
   public IO io;
 
+  /** Explicit set root dir for the current file. */
+  protected final String target;
+
   // Check for existence of TagSoup.
   static {
     try { html = new HTMLParser(); } catch(final Exception ex) { }
@@ -40,31 +43,43 @@ public abstract class Parser extends Progress {
   /**
    * Constructor.
    * @param f file reference
-   * @param p database properties
+   * @param pr database properties
    */
-  protected Parser(final IO f, final Prop p) {
+  protected Parser(final IO f, final Prop pr) {
+    this(f, pr, "");
+  }
+
+  /**
+   * Constructor.
+   * @param f file reference
+   * @param pr database properties
+   * @param t target path
+   */
+  public Parser(final IO f, final Prop pr, final String t) {
     io = f;
-    prop = p;
+    prop = pr;
+    target = t;
   }
 
   /**
    * Returns an XML parser instance.
    * @param in input
    * @param prop database properties
+   * @param target relative path reference
    * @return xml parser
    * @throws IOException I/O exception
    */
-  public static Parser xmlParser(final IO in, final Prop prop)
-      throws IOException {
-
+  public static Parser xmlParser(final IO in, final Prop prop,
+      final String target) throws IOException {
     // optionally convert HTML input to well-formed xml
     final IO io = html != null ? html.toXML(in) : in;
+
     // use internal parser
-    if(prop.is(Prop.INTPARSE)) return new XMLParser(io, prop);
+    if(prop.is(Prop.INTPARSE)) return new XMLParser(io, prop, target);
     // use default parser
     final SAXSource s = new SAXSource(io.inputSource());
     if(s.getSystemId() == null) s.setSystemId(io.name());
-    return new SAXWrapper(s, prop);
+    return new SAXWrapper(s, prop, target);
   }
 
   /**

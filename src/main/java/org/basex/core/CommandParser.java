@@ -142,7 +142,16 @@ public final class CommandParser extends InputParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        return new Add(string(cmd));
+        final String str1 = string(cmd); // Document Name
+        String str2 = null;
+        if(key(INTO, null)) {
+          str2 = string(cmd); // Optional target
+        }
+        // final String str3 = leftover(cmd); // optional xml contents *TODO*
+        // Andi?
+                                           // :-)
+        if(null != str2) return new Add(str1, str2, true);
+        return new Add(str1);
       case DELETE:
         return new Delete(string(cmd));
       case INFO: case I:

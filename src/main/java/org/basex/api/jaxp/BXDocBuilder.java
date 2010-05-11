@@ -73,7 +73,7 @@ public final class BXDocBuilder extends DocumentBuilder {
     final SAXSource source = new SAXSource(parser, is);
     final String id = is.getSystemId();
     final Data data = new MemBuilder(
-        new SAXWrapper(source, ctx.prop)).build(id == null ? "" : id);
+        new SAXWrapper(source, ctx.prop, "")).build(id == null ? "" : id);
     return new BXDoc(new DBNode(data, 0));
   }
 

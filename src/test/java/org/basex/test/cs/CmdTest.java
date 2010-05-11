@@ -28,6 +28,11 @@ public class CmdTest {
   protected static final Context CONTEXT = new Context();
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
+  /** Test folder. */
+  private static final String FLDR = "etc/xml";
+  /** Test Url. */
+  private static final String URL = "http://www.inf.uni-konstanz.de/"
+      + "dbis/basex/dl/xmark.xml";
   /** Test name. */
   private static final String NAME = "input";
   /** Test name. */
@@ -62,7 +67,23 @@ public class CmdTest {
     no(new Add(FILE));
     ok(new CreateColl(NAME));
     ok(new Add(FILE));
-    no(new Add(FILE));
+    ok(new Add(FILE)); //[MS] duplicates allowed by now.
+  }
+  /** Command Test. */
+  @Test
+  public final void addUrl() {
+    no(new Add(URL));
+    ok(new CreateColl(NAME));
+    ok(new Add(URL));
+    ok(new Delete(URL));
+  }
+  /** Command Test. */
+  @Test
+  public final void addFolder() {
+    no(new Add(FLDR));
+    ok(new CreateColl(NAME));
+    ok(new Add(FLDR));
+    ok(new Delete(FILE));
   }
 
   /** Command test. */

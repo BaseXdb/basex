@@ -16,7 +16,7 @@ import org.basex.index.FTBuilder;
 import org.basex.index.IndexBuilder;
 import org.basex.index.PathBuilder;
 import org.basex.index.ValueBuilder;
-import org.basex.util.Token;
+import static org.basex.util.Token.*;
 
 /**
  * Abstract class for database creation.
@@ -108,13 +108,24 @@ abstract class ACreate extends Proc {
 
   /**
    * Finds the specified document in the current database.
+   * Alternatively returns all documents whose path is 
+   * prefixed by nm + "/" for recursive deletion.
    * @param nm document name
    * @return pre value or -1
    */
   protected int findDoc(final byte[] nm) {
     for(final int p : context.doc()) {
-      if(Token.eq(nm, context.data.text(p, true))) return p;
+      final byte[] docName = context.data.text(p, true);
+      if((eq(docName, nm))
+          || startsWith(docName, concat(nm, token("/"))))
+        return p;
+      
     }
     return -1;
   }
+  /**
+   * Finds the specified document in the current database.
+   * @param nm document name
+   * @return pre value or -1
+   */
 }

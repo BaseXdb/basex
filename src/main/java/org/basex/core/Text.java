@@ -144,6 +144,8 @@ public interface Text {
   /** Command help. */
   String TO = "TO";
   /** Command help. */
+  String INTO = "INTO";
+  /** Command help. */
   String ON = "ON";
   /** Command help. */
   String TRUE = "TRUE";
@@ -368,7 +370,7 @@ public interface Text {
   String DBCREATED = lang("pc_created");
   /** Document added. */
   String DOCADDED = lang("pc_added");
-  /** Document added. */
+  /** Document deleted. */
   String DOCDELETED = lang("pc_deleted");
   /** Parse error. */
   String PARSEERR = lang("pc_err");
@@ -404,7 +406,7 @@ public interface Text {
   String DBNOTDELETED = lang("db_notdeleted");
   /** Document found. */
   String DBDOC = lang("db_doc");
-  /** Document found. */
+  /** Document not found. */
   String DBNODOC = lang("db_nodoc");
 
   /** Database optimized. */

@@ -149,7 +149,7 @@ public class CreateDB extends ACreate {
    */
   public static synchronized Data xml(final SAXSource s, final Prop pr)
       throws IOException {
-    return xml(new SAXWrapper(s, pr));
+    return xml(new SAXWrapper(s, pr, ""));
   }
 
   @Override

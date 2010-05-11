@@ -9,11 +9,12 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.util.Token;
 
 /**
- * This class parses the tokens that are delivered by the
- * {@link XMLScanner} and sends them to the specified database builder.
- *
+ * This class parses the tokens that are delivered by the {@link XMLScanner} and
+ * sends them to the specified database builder.
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -22,6 +23,9 @@ public final class XMLParser extends Parser {
   private final XMLScanner scanner;
   /** Builder reference. */
   private Builder builder;
+
+  /** Length of the root path prefix. */
+  private String target = "";
 
   /**
    * Constructor.
@@ -34,10 +38,28 @@ public final class XMLParser extends Parser {
     scanner = new XMLScanner(f, pr);
   }
 
+  /**
+   * Creates a new XMLParser instance for collection creation.
+   * The length of the rootPath is passed in to correctly chop
+   * the relative path inside the collection.
+   * @param f file reference
+   * @param pr database properties
+   * @param tar target for collection adding.
+   * @throws IOException I/O exception
+   */
+  public XMLParser(final IO f, final Prop pr,
+      final String tar) throws IOException {
+    super(f, pr);
+    this.target = tar;
+    scanner = new XMLScanner(f, pr);
+  }
+
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
-    if(doc) builder.startDoc(token(io.name()));
+    final byte[] sp = Token.concat(Token.token(target),
+        Token.token(io.name()));
+    if(doc) builder.startDoc(sp);
 
     // loop until all tokens have been processed
     scanner.more();
@@ -139,8 +161,8 @@ public final class XMLParser extends Parser {
   }
 
   /**
-   * Returns the token for the specified token type. If the current token
-   * type is wrong, a null reference is returned.
+   * Returns the token for the specified token type. If the current token type
+   * is wrong, a null reference is returned.
    * @param t token type
    * @return token or null if the token type is wrong
    * @throws IOException I/O exception
