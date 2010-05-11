@@ -17,7 +17,6 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQQueryException;
-import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
 import org.basex.core.ProgressException;
 import org.basex.io.IOContent;
@@ -227,7 +226,7 @@ abstract class BXQDynamicContext extends BXQAbstract
    * @return result sequence
    * @throws XQException exception
    */
-  protected XQResultSequence execute() throws XQException {
+  protected BXQSequence execute() throws XQException {
     opened();
     final QueryContext qctx = query.ctx;
     qctx.ns = sc.ctx.ns;
