@@ -13,7 +13,7 @@ import BaseXClient, time
 start = time.clock()
 
 # command to be performed
-cmd = "1 to y";
+cmd = "1 to 10";
 
 try:
   # create session
