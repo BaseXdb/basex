@@ -34,17 +34,19 @@ import org.basex.util.Tokenizer;
  *                           the data entries of the token (int) and s is
  *                           the number of pre values, saved in data (int)
  *
- *
  * The structure of dat:
  *    [pre0, ..., pres, pos0, pos1, ..., poss] where pre and pos are the
  *                          ft data [int[]]
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * @author Christian Gruen
  * @author Sebastian Gath
  */
 final class FTFuzzy extends FTIndex {
   /** Entry size. */
   private static final int ENTRY = 9;
+  /** Token positions. */
+  private final int[] tp = new int[MAXLEN + 3];
   /** Levenshtein reference. */
   private final Levenshtein ls = new Levenshtein();
 
@@ -56,8 +58,6 @@ final class FTFuzzy extends FTIndex {
   private final DataAccess ti;
   /** Storing pre and pos values for each token. */
   private final DataAccess dat;
-  /** Token positions. */
-  private final int[] tp = new int[MAXLEN + 3];
 
   /**
    * Constructor, initializing the index structure.
@@ -65,32 +65,12 @@ final class FTFuzzy extends FTIndex {
    * @throws IOException IO Exception
    */
   protected FTFuzzy(final Data d) throws IOException {
-    this(d, "");
-  }
-
-  /**
-   * Constructor, initializing the index structure.
-   * @param d data reference
-   * @param cf current file
-   * @throws IOException IO Exception
-   */
-  protected FTFuzzy(final Data d, final int cf) throws IOException {
-    this(d, Integer.toString(cf));
-  }
-
-  /**
-   * Private constructor.
-   * @param d data reference
-   * @param s prefix
-   * @throws IOException IO Exception
-   */
-  private FTFuzzy(final Data d, final String s) throws IOException {
     super(d);
 
     // cache token length index
-    ti = new DataAccess(d.meta.file(DATAFTX + s + 'y'));
-    dat = new DataAccess(d.meta.file(DATAFTX + s + 'z'));
-    li = new DataAccess(d.meta.file(DATAFTX + s + 'x'));
+    ti = new DataAccess(d.meta.file(DATAFTX + 'y'));
+    dat = new DataAccess(d.meta.file(DATAFTX + 'z'));
+    li = new DataAccess(d.meta.file(DATAFTX + 'x'));
     for(int i = 0; i < tp.length; i++) tp[i] = -1;
     int is = li.read1();
     while(--is >= 0) {
@@ -99,7 +79,6 @@ final class FTFuzzy extends FTIndex {
     }
     tp[tp.length - 1] = (int) ti.length();
   }
-
 
   @Override
   public byte[] info() {
@@ -127,15 +106,15 @@ final class FTFuzzy extends FTIndex {
     final int id = cache.id(tok);
     if(id > 0) return cache.getSize(id);
 
-    int size = 0;
+    int s = 0;
     long poi = 0;
     final long p = token(tok);
     if(p > -1) {
-      size = size(p, tok.length);
+      s = size(p, tok.length);
       poi = pointer(p, tok.length);
     }
-    cache.add(tok, size, poi);
-    return size;
+    cache.add(tok, s, poi);
+    return s;
   }
 
   @Override
@@ -183,14 +162,14 @@ final class FTFuzzy extends FTIndex {
     // binary search
     final int o = tl + ENTRY;
     while(l < r) {
-      final int m = l + (r - l) / 2 / o * o;
-      final int c = diff(ti.readBytes(m, m + tl), tok);
+      final int m = l + (r - l >> 1) / o * o;
+      final int c = diff(ti.readBytes(m, tl), tok);
       if(c == 0) return m;
       if(c < 0) l = m + o;
       else r = m - o;
     }
     // accept entry if pointer is inside relevant tokens
-    return r != x && l == r && eq(ti.readBytes(l, l + tl), tok) ? l : -1;
+    return r != x && l == r && eq(ti.readBytes(l, tl), tok) ? l : -1;
   }
 
   /**
@@ -205,7 +184,7 @@ final class FTFuzzy extends FTIndex {
     while(j < tp.length && tp[j] == -1) j++;
 
     while(p < tp[tp.length - 1]) {
-      if(stats.adding(size(p, i))) stats.add(ti.readBytes(p, p + i));
+      if(stats.adding(size(p, i))) stats.add(ti.readBytes(p, i));
       p += i + ENTRY;
       if(p == tp[j]) {
         i = j;
@@ -221,7 +200,7 @@ final class FTFuzzy extends FTIndex {
    * @return int pointer on ftdata
    */
   private long pointer(final long pt, final int lt) {
-    return ti.read5(pt + lt * 1L);
+    return ti.read5(pt + lt);
   }
 
   /**
@@ -258,7 +237,7 @@ final class FTFuzzy extends FTIndex {
       int r = -1;
       do r = tp[i++]; while(r == -1);
       while(p < r) {
-        if(ls.similar(ti.readBytes(p, p + s), tok, err)) {
+        if(ls.similar(ti.readBytes(p, s), tok, err)) {
           it = FTIndexIterator.union(
               iter(pointer(p, s), size(p, s), dat, f), it);
         }
@@ -278,73 +257,5 @@ final class FTFuzzy extends FTIndex {
     final int p = token(tok);
     return p > -1 ? iter(pointer(p, tok.length),
         size(p, tok.length), dat, f) : FTIndexIterator.EMP;
-  }
-
-  // Methods for index construction
-
-  /** Pointer on current token length. */
-  private int ctl;
-  /** Pointer on next token length. */
-  private int ntl;
-  /** Number of written bytes for tokens. */
-  private int ptok;
-  /** Next number of pre values. */
-  private int fts;
-
-  /**
-   * Returns the next token.
-   * @return byte[] token
-   */
-  byte[] nextTok() {
-    if(tp[tp.length - 1] == ptok) return EMPTY;
-    if(tp[ntl] == ptok || ntl == 0) {
-      ctl++;
-      while(tp[ctl] == -1) ctl++;
-      ntl = ctl + 1;
-      while(tp[ntl] == -1) ntl++;
-    }
-    if(ctl == tp.length) return EMPTY;
-
-    final byte[] tok = ti.readBytes(ptok, ptok + ctl);
-    // skip pointer
-    fts = ti.read4(ti.pos() + 5);
-    // position will always fit in an integer...
-    ptok = (int) ti.pos();
-    return tok;
-  }
-
-  /**
-   * Returns next number of pre-values.
-   * @return number of pre-values
-   */
-  int nextFTDataSize() {
-    return fts;
-  }
-
-  /** Next pre values. */
-  private int[] prv;
-  /** Next pos values. */
-  private int[] pov;
-
-  /**
-   * Returns next pre values.
-   * @return int[] pre values
-   */
-  int[] nextPreValues() {
-    prv = new int[fts];
-    pov = new int[fts];
-    for(int j = 0; j < fts; j++) {
-      prv[j] = dat.readNum();
-      pov[j] = dat.readNum();
-    }
-    return prv;
-  }
-
-  /**
-   * Returns next pos values.
-   * @return int[] pos values
-   */
-  int[] nextPosValues() {
-    return pov;
   }
 }

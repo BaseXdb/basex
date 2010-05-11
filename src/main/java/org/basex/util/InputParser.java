@@ -126,7 +126,6 @@ public abstract class InputParser {
       qp++;
     }
     qm = qp - 1;
-    return;
   }
 
   /**

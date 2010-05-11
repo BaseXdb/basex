@@ -58,9 +58,11 @@ public final class DiskBuilder extends Builder {
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
 
-    // calculate output buffer sizes: (1 << BLOCKPOWER) < bs < (1 << 22)
-    int bs = IO.BLOCKSIZE;
-    while(bs < meta.filesize && bs < 1 << 22) bs <<= 1;
+    // calculate optimized output buffer sizes to reduce disk fragmentation
+    final Runtime rt = Runtime.getRuntime();
+    int bs = (int) Math.min(meta.filesize, Math.min(1 << 22,
+        rt.maxMemory() - rt.freeMemory() >> 2));
+    bs = Math.max(IO.BLOCKSIZE, bs - bs % IO.BLOCKSIZE);
 
     tout = new DataOutput(new TableOutput(meta, DATATBL));
     xout = new DataOutput(meta.file(DATATXT), bs);

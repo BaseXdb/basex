@@ -169,7 +169,7 @@ class ValueTree {
    * @return left node
    */
   private int l(final int nd) {
-    return tree.get(nd * 3);
+    return tree.get((nd << 1) + nd);
   }
 
   /**
@@ -178,7 +178,7 @@ class ValueTree {
    * @return right node
    */
   private int r(final int nd) {
-    return tree.get(nd * 3 + 1);
+    return tree.get((nd << 1) + nd + 1);
   }
 
   /**
@@ -187,7 +187,7 @@ class ValueTree {
    * @return parent node
    */
   private int p(final int nd) {
-    return tree.get(nd * 3 + 2);
+    return tree.get((nd << 1) + nd + 2);
   }
 
   /**
@@ -196,7 +196,7 @@ class ValueTree {
    * @param val left node
    */
   private void l(final int nd, final int val) {
-    tree.set(val, nd * 3);
+    tree.set(val, (nd << 1) + nd);
   }
 
   /**
@@ -205,7 +205,7 @@ class ValueTree {
    * @param val right node
    */
   private void r(final int nd, final int val) {
-    tree.set(val, nd * 3 + 1);
+    tree.set(val, (nd << 1) + nd + 1);
   }
 
   /**
@@ -214,7 +214,7 @@ class ValueTree {
    * @param val parent node
    */
   private void p(final int nd, final int val) {
-    tree.set(val, nd * 3 + 2);
+    tree.set(val, (nd << 1) + nd + 2);
   }
 
   /**

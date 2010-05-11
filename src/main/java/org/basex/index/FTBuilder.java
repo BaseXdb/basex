@@ -205,9 +205,27 @@ public abstract class FTBuilder extends IndexBuilder {
    * @param tok byte[][] tokens
    * @return boolean
    */
-  protected boolean check(final byte[][] tok) {
+  protected final boolean check(final byte[][] tok) {
     for(final byte[] b : tok) if(b.length > 0) return true;
     return false;
+  }
+
+  /**
+   * Returns next token.
+   * @param v sorted lists
+   * @param m pointer on current list
+   * @return next token
+   * @throws IOException I/O exception
+   */
+  protected final byte[] nextToken(final FTList[] v, final int m)
+      throws IOException {
+    if(v[m] != null) {
+      final byte[] tok = v[m].next();
+      if(tok.length != 0) return tok;
+      v[m].close();
+      v[m] = null;
+    }
+    return EMPTY;
   }
 
   /**

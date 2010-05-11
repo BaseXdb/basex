@@ -159,15 +159,15 @@ public final class DataAccess {
 
   /**
    * Reads a number of bytes in range from -> to and returns them as array.
-   * @param from starting position for reading
-   * @param to ending position for reading
+   * @param s starting position
+   * @param l length
    * @return byte array
    */
-  public synchronized byte[] readBytes(final long from, final long to) {
-    final byte[] array = new byte[(int) (to - from)];
-    cursor(from);
-    for(int i = 0; i < array.length; i++) array[i] = (byte) read();
-    return array;
+  public synchronized byte[] readBytes(final long s, final int l) {
+    final byte[] b = new byte[l];
+    cursor(s);
+    for(int i = 0; i < b.length; i++) b[i] = (byte) read();
+    return b;
   }
 
   /**

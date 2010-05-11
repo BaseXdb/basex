@@ -92,7 +92,7 @@ public final class JFUSEAdapter { //implements FileModeFlags {
    * @return true if mode is regular file
    */
   public static boolean isReg(final int mode) {
-//    if (loadJFUSELibrary())
+//    if(loadJFUSELibrary())
 //      return (mode & S_IFMT) == S_IFREG;
     return (mode & DFS_S_IFMT) == DFS_S_IFREG;
   }

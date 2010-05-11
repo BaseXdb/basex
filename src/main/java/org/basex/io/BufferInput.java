@@ -85,7 +85,8 @@ public class BufferInput {
    * @param b input buffer
    * @throws IOException IO Exception
    */
-  private BufferInput(final InputStream is, final byte[] b) throws IOException {
+  protected BufferInput(final InputStream is, final byte[] b)
+      throws IOException {
     this(b);
     in = is;
     next();

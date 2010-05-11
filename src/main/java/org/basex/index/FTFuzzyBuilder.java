@@ -108,19 +108,18 @@ final class FTFuzzyBuilder extends FTBuilder {
     final int[][] pos = new int[csize][];
     final IntList ind = new IntList();
 
-    // open all temp indexes
-    final FTFuzzy[] v = new FTFuzzy[csize];
+    // open all temporary sorted lists
+    final FTList[] v = new FTList[csize];
     for(int b = 0; b < csize; b++) {
-      v[b] = new FTFuzzy(data, b);
-      tok[b] = v[b].nextTok();
-      prs[b] = v[b].nextPreValues();
-      pos[b] = v[b].nextPosValues();
+      v[b] = new FTFuzzyList(data, b);
+      tok[b] = v[b].next();
+      prs[b] = v[b].pres();
+      pos[b] = v[b].poss();
     }
 
-    int min;
     final IntList mer = new IntList();
     while(check(tok)) {
-      min = 0;
+      int min = 0;
       mer.reset();
       mer.add(min);
       // find next token to write on disk
@@ -157,10 +156,10 @@ final class FTFuzzyBuilder extends FTBuilder {
         final int m = mer.get(j);
         for(final int p : prs[m]) tbp.add(Num.num(p));
         for(final int p : pos[m]) tbo.add(Num.num(p));
-        s += v[m].nextFTDataSize();
+        s += v[m].size();
         tok[m] = nextToken(v, m);
-        prs[m] = tok[m].length > 0 ? v[m].nextPreValues() : new int[0];
-        pos[m] = tok[m].length > 0 ? v[m].nextPosValues() : new int[0];
+        prs[m] = tok[m].length > 0 ? v[m].pres() : new int[0];
+        pos[m] = tok[m].length > 0 ? v[m].poss() : new int[0];
       }
 
       // write out data size
@@ -200,22 +199,6 @@ final class FTFuzzyBuilder extends FTBuilder {
     }
     outx.write(ls);
     outx.writeInt(lp);
-  }
-
-  /**
-   * Returns next token.
-   * @param v FTFuzzy Array
-   * @param m pointer on current FTFuzzy
-   * @return next token
-   * @throws IOException I/O exception
-   */
-  private byte[] nextToken(final FTFuzzy[] v, final int m) throws IOException {
-    if(v[m] == null) return EMPTY;
-    final byte[] tok = v[m].nextTok();
-    if(tok.length > 0) return tok;
-    v[m].close();
-    v[m] = null;
-    return EMPTY;
   }
 
   /**

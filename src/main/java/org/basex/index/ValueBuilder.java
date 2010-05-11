@@ -59,11 +59,12 @@ public final class ValueBuilder extends IndexBuilder {
           Performance.gc(2);
         }
       }
-      if(data.kind(pre) != type) continue;
+      // skip too long tokens
+      if(data.kind(pre) != type || data.textLen(pre, text) > MAXLEN) continue;
 
-      // skip too long and pure whitespace tokens
+      // skip pure whitespace tokens
       final byte[] tok = data.text(pre, text);
-      if(tok.length <= MAXLEN && !ws(tok)) index.index(tok, pre);
+      if(!ws(tok)) index.index(tok, pre);
     }
 
     if(csize == 0) {

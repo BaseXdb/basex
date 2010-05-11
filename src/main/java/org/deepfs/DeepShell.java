@@ -200,14 +200,13 @@ public final class DeepShell {
     }
     if(args.length == 2) {
       final File d = new File(args[1]);
-      if (d.isDirectory()) {
+      if(d.isDirectory()) {
         new FSWalker(new TreePrinter()).traverse(d);
         return;
       }
       System.err.println("No such directory " + d.getAbsolutePath());
     }
     help(new String[] { "help", "tree"});
-    return;
   }
 
   /**

@@ -72,7 +72,7 @@ public abstract class IndexBuilder extends Progress {
   protected IndexBuilder(final Data d) {
     data = d;
     size = data.meta.size;
-    if(rt.totalMemory() - rt.freeMemory() >= rt.maxMemory() / 2)
+    if(rt.totalMemory() - rt.freeMemory() >= rt.maxMemory() >> 1)
       Performance.gc(2);
   }
 

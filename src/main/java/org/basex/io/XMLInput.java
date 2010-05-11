@@ -142,6 +142,14 @@ public final class XMLInput {
   }
 
   /**
+   * Returns the current line.
+   * @return line
+   */
+  public int line() {
+    return line;
+  }
+
+  /**
    * Returns the file length.
    * @return file position
    */

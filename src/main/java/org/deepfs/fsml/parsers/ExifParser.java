@@ -648,7 +648,7 @@ public final class ExifParser {
       for(final Format f : aFormats) {
         if(f.equals(format)) {
           final long c = buf.getInt() & 0xFFFFFFFFL; // read count value
-          if (c > Integer.MAX_VALUE || c < 1) {
+          if(c > Integer.MAX_VALUE || c < 1) {
             err(o.deepFile, "Invalid item count (" + c + ")");
             return false;
           }
@@ -683,7 +683,7 @@ public final class ExifParser {
       sb.append(aFormats[i++]);
       for(final int max = numFormats - 1; i < max; i++)
         sb.append(", ").append(aFormats[i]);
-      if (i < numFormats) sb.append(" or ").append(aFormats[i]);
+      if(i < numFormats) sb.append(" or ").append(aFormats[i]);
       sb.append(", found: ").append(format).append(")");
       err(o.deepFile, sb.toString());
       return false;

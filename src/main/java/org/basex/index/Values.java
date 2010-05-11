@@ -111,7 +111,7 @@ public final class Values implements Index {
     if(idxr.pos() >= idxr.length()) return EMPTY;
     final int s = idxl.read4();
     final long v = idxr.read5(idxr.pos());
-    return idxl.readBytes(v, v + s);
+    return idxl.readBytes(v, s);
   }
 
   /**
