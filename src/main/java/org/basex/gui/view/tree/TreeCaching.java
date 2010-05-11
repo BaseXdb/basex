@@ -474,7 +474,7 @@ final class TreeCaching implements TreeViewOptions {
   byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data;
     if(pre == c.current.nodes[rn]) return ViewData.path(d, pre);
-    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM) 
+    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM)
     return ViewData.tag(
         prop, d, pre);
     return ViewData.content(d, pre, false);

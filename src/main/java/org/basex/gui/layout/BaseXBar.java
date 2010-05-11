@@ -70,7 +70,7 @@ public final class BaseXBar extends BaseXPanel {
   }
 
   /**
-   * Default Constructor, allowing to modify the scrollbar visibility.
+   * Default constructor, allowing to modify the scrollbar visibility.
    * @param cmp reference to the scrolled component
    * @param vis states if scrollbar is always visible or hidden when
    * the displayed content needs no scrollbar

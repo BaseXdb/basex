@@ -166,7 +166,7 @@ public final class Table {
     if(desc != null) tb.add(NL + contents.size() + ' ' + desc + DOT);
     return tb.finish();
   }
-  
+
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder();

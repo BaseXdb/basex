@@ -49,7 +49,7 @@ public final class IOFile extends IO {
     super(new PathList().create(f.getAbsolutePath()));
     file = f;
   }
-  
+
   @Override
   public void cache() throws IOException {
     cont = new byte[(int) file.length()];
@@ -229,7 +229,7 @@ public final class IOFile extends IO {
      */
     String create(final String path) {
       final TokenBuilder tb = new TokenBuilder();
-      final int l = path.length(); 
+      final int l = path.length();
       for(int i = 0; i < l; i++) {
         final char ch = path.charAt(i);
         if(ch == '\\' || ch == '/') add(tb);

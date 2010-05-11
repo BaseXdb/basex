@@ -22,7 +22,7 @@ import org.basex.util.TokenSet;
  */
 public final class StopWords extends TokenSet {
   /**
-   * Default Constructor.
+   * Default constructor.
    */
   public StopWords() { }
 

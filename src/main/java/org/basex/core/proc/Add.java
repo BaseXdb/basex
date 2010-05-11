@@ -13,7 +13,7 @@ import org.basex.io.IO;
 
 /**
  * Evaluates the 'add' command and adds a single document to a collection.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */

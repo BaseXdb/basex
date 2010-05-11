@@ -140,7 +140,7 @@ public final class Users extends ArrayList<User> {
     out.writeNum(size());
     for(final User user : this) {
       out.writeString(user.name);
-      out.writeBytes(user.pw);
+      out.writeToken(user.pw);
       out.writeNum(user.perm);
     }
   }

@@ -126,7 +126,7 @@ public final class CmpG extends Arr {
     }
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    
+
     Expr e = this;
     if(e1.i() && e2.i()) {
       e = Bln.get(eval((Item) e1, (Item) e2));

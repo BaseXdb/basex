@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.basex.build.DiskBuilder;
-import org.basex.build.xml.XMLParser;
+import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
@@ -59,7 +59,7 @@ public final class BlockAccessTest {
   @Before
   public void setUp() {
     try {
-      final XMLParser parser = new XMLParser(IO.get(TESTFILE), PROP);
+      final Parser parser = Parser.xmlParser(IO.get(TESTFILE), PROP, "");
       data = new DiskBuilder(parser).build(DBNAME);
       size = data.meta.size;
       data.close();

@@ -5,7 +5,7 @@ import java.util.LinkedList;
 /**
  * Management of executing read/write processes. Multiple readers, single
  * writers.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
@@ -15,9 +15,9 @@ final class Semaphore {
 
   /** States of locking. */
   private static enum State {
-    /** Idle state. */ IDLE, 
-    /** Read state. */ READ, 
-    /** Write state. */ WRITE 
+    /** Idle state. */ IDLE,
+    /** Read state. */ READ,
+    /** Write state. */ WRITE
   }
 
   /** State of the lock. */
@@ -65,7 +65,7 @@ final class Semaphore {
             ls.waitingReaders++;
           } else {
             ls = new Lock(false);
-            waiting.add(ls);  
+            waiting.add(ls);
         }
       }
       synchronized(ls) {
@@ -112,7 +112,7 @@ final class Semaphore {
 
   /**
    * Inner class for a locking object.
-   * 
+   *
    * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
    * @author Andreas Weiler
    */

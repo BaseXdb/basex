@@ -2,6 +2,7 @@ package org.basex.index;
 
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
+import java.io.File;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
@@ -13,6 +14,8 @@ import org.basex.io.DataAccess;
  * @author Sebastian Gath
  */
 final class FTFuzzyList extends FTList {
+  /** Size file. */
+  private final File sizes;
   /** Token positions. */
   private final int[] tp = new int[MAXLEN + 3];
   /** Pointer on current token length. */
@@ -31,7 +34,8 @@ final class FTFuzzyList extends FTList {
   protected FTFuzzyList(final Data d, final int cf) throws IOException {
     super(d, cf, 'y', 'z');
     for(int i = 0; i < tp.length; i++) tp[i] = -1;
-    final DataAccess li = new DataAccess(d.meta.file(DATAFTX + cf + 'x'));
+    sizes = d.meta.file(DATAFTX + cf + 'x');
+    final DataAccess li = new DataAccess(sizes);
     int is = li.read1();
     while(--is >= 0) {
       final int p = li.read1();
@@ -39,10 +43,17 @@ final class FTFuzzyList extends FTList {
     }
     tp[tp.length - 1] = (int) str.length();
     li.close();
+    next();
   }
 
   @Override
-  byte[] next() {
+  void close() throws IOException {
+    super.close();
+    sizes.delete();
+  }
+
+  @Override
+  protected byte[] token() {
     if(tp[tp.length - 1] == ptok) return EMPTY;
     if(tp[ntl] == ptok || ntl == 0) {
       ctl++;
@@ -52,11 +63,11 @@ final class FTFuzzyList extends FTList {
     }
     if(ctl == tp.length) return EMPTY;
 
-    final byte[] tok = str.readBytes(ptok, ctl);
+    final byte[] t = str.readBytes(ptok, ctl);
     // skip pointer
     size = str.read4(str.pos() + 5);
     // position will always fit in an integer...
     ptok = (int) str.pos();
-    return tok;
+    return t;
   }
 }

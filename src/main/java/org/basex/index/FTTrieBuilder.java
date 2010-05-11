@@ -11,9 +11,7 @@ import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.IntArrayList;
 import org.basex.util.IntList;
-import org.basex.util.Num;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 
 /**
@@ -56,7 +54,7 @@ final class FTTrieBuilder extends FTBuilder {
   /** Hash structure for temporarily saving the tokens. */
   private FTHash hash = new FTHash();
   /** Offset for joining subtrees. */
-  private int o;
+  private int offset;
 
   /**
    * Constructor.
@@ -80,7 +78,7 @@ final class FTTrieBuilder extends FTBuilder {
     if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
       // currently no frequency support for tfidf based scoring
       // write data temporarily as sorted list
-      writeList(csize++);
+      writeIndex(csize++);
       Performance.gc(2);
     }
     hash.index(tok, pre, wp.pos);
@@ -105,88 +103,54 @@ final class FTTrieBuilder extends FTBuilder {
       return;
     }
 
-    // the temporarily stored data has to be merged
-    // first merge all sorted list to one sorted list
-    // write full text data to disk
-    // create trie index structure
-    writeList(csize++);
+    // merges temporary index files
+    writeIndex(csize++);
     final DataOutput outb = new DataOutput(data.meta.file(DATAFTX + 'b'));
-    final DataOutput outt = new DataOutput(data.meta.file(DATAFTX + 't'));
-    final IntList root = new IntList();
-
-    final byte[][] tok = new byte[csize][];
-    final int[][] prs = new int[csize][];
-    final int[][] pos = new int[csize][];
+    final DataOutput tmp  = new DataOutput(data.meta.file(DATAFTX + 't'));
+    final IntList ind = new IntList();
 
     // open all temporary sorted lists
     final FTList[] v = new FTList[csize];
-    for(int b = 0; b < csize; b++) {
-      v[b] = new FTTrieList(data, b);
-      tok[b] = v[b].next();
-      prs[b] = v[b].pres();
-      pos[b] = v[b].poss();
-    }
+    for(int b = 0; b < csize; b++) v[b] = new FTTrieList(data, b);
 
-    final IntList mer = new IntList();
-    while(check(tok)) {
+    final IntList il = new IntList();
+    while(check(v)) {
       int min = 0;
-      mer.reset();
-      mer.add(min);
+      il.reset();
+      il.add(min);
       // find next token to write on disk
       for(int i = 0; i < csize; i++) {
-        if(min == i || tok[i].length == 0) continue;
-        final int d = diff(tok[min], tok[i]);
-        if(d > 0 || tok[min].length == 0) {
+        if(min == i || v[i].tok.length == 0) continue;
+        final int d = diff(v[min].tok, v[i].tok);
+        if(d > 0 || v[min].tok.length == 0) {
           min = i;
-          mer.reset();
-          mer.add(min);
-        } else if(d == 0 && tok[i].length > 0) {
-          mer.add(i);
+          il.reset();
+          il.add(min);
+        } else if(d == 0 && v[i].tok.length > 0) {
+          il.add(i);
         }
       }
 
       // collect each child of the root node
-      if(root.size() == 0 || root.get(root.size() - 1) != tok[min][0])
-        root.add(tok[min][0]);
-      // write token length to disk
-      outt.write(tok[min].length);
-      // write token to disk
-      outt.write(tok[min]);
-
-      int s = 0;
-      final TokenBuilder tbp = new TokenBuilder();
-      final TokenBuilder tbo = new TokenBuilder();
-      tbp.add(new byte[4]);
-      tbo.add(new byte[4]);
-      // merge full text data of all sorted lists with the same token
-      for(int j = 0; j < mer.size(); j++) {
-        final int m = mer.get(j);
-        for(final int p : prs[m]) tbp.add(Num.num(p));
-        for(final int p : pos[m]) tbo.add(Num.num(p));
-        s += v[m].size();
-        tok[m] = nextToken(v, m);
-        prs[m] = tok[m].length > 0 ? v[m].pres() : new int[0];
-        pos[m] = tok[m].length > 0 ? v[m].poss() : new int[0];
+      if(ind.size() == 0 || ind.get(ind.size() - 1) != v[min].tok[0]) {
+        ind.add(v[min].tok[0]);
       }
 
-      // write out data size
-      outt.writeInt(s);
-      // write out pointer on full text data
-      outt.write5(outb.size());
+      // write token to disk
+      tmp.writeToken(v[min].tok);
 
-      // write compressed pre and pos arrays
-      final byte[] pr = tbp.finish();
-      Num.size(pr, pr.length);
-      final byte[] po = tbo.finish();
-      Num.size(po, po.length);
-      // write full text data
-      writeFTData(outb, pr, po);
+      // merge and write out data size
+      int s = merge(outb, il, v);
+      tmp.write4(s);
+      // write out pointer on full-text data
+      tmp.write5(outb.size());
     }
-    outt.write(0);
-    outt.close();
+
+    tmp.writeToken(EMPTY);
+    tmp.close();
     outb.close();
     // write trie index structure to disk, split in subtrees
-    writeSplitTrie(root);
+    writeSplitTrie(ind);
   }
 
   /**
@@ -218,22 +182,22 @@ final class FTTrieBuilder extends FTBuilder {
 
     // first root node
     // write token size as byte
-    outa.write((byte) 1);
+    outa.write1(1);
     // write token
-    outa.write((byte) -1);
+    outa.write1(-1);
     // write next pointer
     int j = 1;
     final int js = next.get(0).length - 2;
     for(; j < js; j++) {
       // pointer
-      final int p = next.get(0)[j]; 
-      outa.writeInt(p);
+      final int p = next.get(0)[j];
+      outa.write4(p);
       // first char of next node
-      outa.write(tokens.get(next.get(p)[0])[0]);
+      outa.write1(tokens.get(next.get(p)[0])[0]);
     }
-    outa.writeInt(next.get(0)[j]); // data size
+    outa.write4(next.get(0)[j]); // data size
     outa.write5(-1); // pointer on data - root has no data
-    outc.writeInt(0);
+    outc.write4(0);
 
     final int siz = (next.get(0).length - 3) * 5 + 11;
     // all other nodes
@@ -241,8 +205,6 @@ final class FTTrieBuilder extends FTBuilder {
 
     outa.close();
     outc.close();
-    DropDB.delete(data.meta.name, DATAFTX + "\\d+." + IO.BASEXSUFFIX,
-    data.meta.prop);
   }
 
   /**
@@ -251,31 +213,30 @@ final class FTTrieBuilder extends FTBuilder {
    * @throws IOException I/O exception
    */
   private void writeSplitTrie(final IntList roots) throws IOException {
-    final DataAccess outt = new DataAccess(data.meta.file(DATAFTX + 't'));
     final DataOutput outa = new DataOutput(data.meta.file(DATAFTX + 'a'));
     final DataOutput outc = new DataOutput(data.meta.file(DATAFTX + 'c'));
+    final DataAccess tmp  = new DataAccess(data.meta.file(DATAFTX + 't'));
     final int[] root = new int[roots.size()];
     int rp = 0;
 
     // write tmp root node first
-    outa.write((byte) 1);
-    outa.write((byte) -1);
+    outa.write1(1);
+    outa.write1(-1);
     // write tmp next pointer
     for(int j = 0; j < roots.size(); j++) {
-     outa.writeInt(0); // dummy pointer
-     outa.write(roots.get(j)); // first char of next node
+     outa.write4(0); // dummy pointer
+     outa.write1(roots.get(j)); // first char of next node
     }
-    outa.writeInt(0); // data size
+    outa.write4(0); // data size
     outa.write5(-1); // pointer on data - root has no data
-    outc.writeInt(0);
+    outc.write4(0);
     int siz = (int) (2L + roots.size() * 5L + 9L);
 
-    byte tl = outt.read1();
-    while(tl > 0) {
-      final long pos = outt.pos();
-      final byte[] tok = outt.readBytes(pos, tl);
-      final int s = outt.read4();
-      final long off = outt.read5();
+    while(true) {
+      final byte[] tok = tmp.readToken();
+      if(tok.length == 0) break;
+      final int s = tmp.read4();
+      final long off = tmp.read5();
       if(rp < roots.size() && tok[0] != roots.get(rp)) {
         // write subtree to disk
         siz = writeSubTree(root, outa, outc, rp, siz);
@@ -283,13 +244,12 @@ final class FTTrieBuilder extends FTBuilder {
         index = new FTArray(128);
       }
       index.insertSorted(tok, s, off);
-      tl = outt.read1();
     }
 
     // write subtree to disk
     writeSubTree(root, outa, outc, rp, siz);
 
-    outt.close();
+    tmp.close();
     outa.close();
     outc.close();
 
@@ -297,13 +257,13 @@ final class FTTrieBuilder extends FTBuilder {
     final RandomAccessFile a =
       new RandomAccessFile(data.meta.file(DATAFTX + 'a'), "rw");
     a.seek(2);
-    for(final int element : root) {
-      a.writeInt(element);
+    for(final int r : root) {
+      a.writeInt(r);
       a.seek(a.getFilePointer() + 1);
     }
     a.close();
-    DropDB.delete(data.meta.name, DATAFTX + "\\d+." + IO.BASEXSUFFIX,
-    data.meta.prop);
+    DropDB.delete(data.meta.name, DATAFTX + 't' + IO.BASEXSUFFIX,
+        data.meta.prop);
   }
 
   /**
@@ -319,11 +279,11 @@ final class FTTrieBuilder extends FTBuilder {
   private int writeSubTree(final int[] root, final DataOutput outa,
       final DataOutput outc, final int rp, final int siz) throws IOException {
 
-    // indexed full text tokens
+    // indexed full-text tokens
     final TokenList tokens = index.tokens;
     // trie index structure
     final IntArrayList next = index.next;
-    if(root != null) root[rp] = next.get(0)[1] + o;
+    if(root != null) root[rp] = next.get(0)[1] + offset;
 
     int s = siz;
     final int il = next.size();
@@ -331,42 +291,33 @@ final class FTTrieBuilder extends FTBuilder {
     for(int i = 1; i < il; i++) {
       final int[] nxt = next.get(i);
       // check pointer on data needs 1 or 2 ints
-      final int lp = nxt[nxt.length - 1] > -1 ? 0 : -1;
+      final int lp = nxt[nxt.length - 1] >= 0 ? 0 : -1;
       // write token size as byte
-      outa.write((byte) tokens.get(nxt[0]).length);
+      outa.write1(tokens.get(nxt[0]).length);
       // write token
-      outa.write(tokens.get(nxt[0]));
+      outa.writeBytes(tokens.get(nxt[0]));
       // write next pointer
       int j = 1;
       for(; j < nxt.length - 2 + lp; j++) {
-        outa.writeInt(nxt[j] + o); // pointer
+        outa.write4(nxt[j] + offset); // pointer
         // first char of next node
-        outa.write(tokens.get(next.get(nxt[j])[0])[0]);
+        outa.write1(tokens.get(next.get(nxt[j])[0])[0]);
       }
-      outa.writeInt(nxt[j]); // data size
+      outa.write4(nxt[j]); // data size
       if(nxt[j] == 0 && nxt[j + 1] == 0 || lp == 0) {
         // node has no data
         outa.write5(nxt[j + 1]);
       } else {
         // write pointer on data
-        outa.write5(toLong(nxt, nxt.length - 2));
+        int n = nxt.length - 2;
+        outa.write5((long) nxt[n] << 16 + (-nxt[n + 1] & 0xFFFF));
       }
-      outc.writeInt(s);
+      outc.write4(s);
       s += tokens.get(nxt[0]).length + (nxt.length - 3 + lp) * 5 + 10;
     }
-    o += next.size() - 1;
+    offset += next.size() - 1;
 
     return s;
-  }
-
-  /**
-   * Converts long values split with toArray back.
-   * @param ar int[] with values
-   * @param p pointer where the first value is found
-   * @return long l
-   */
-  private static long toLong(final int[] ar, final int p) {
-    return (long) ar[p] << 16 + (-ar[p + 1] & 0xFFFF);
   }
 
   /**
@@ -377,7 +328,8 @@ final class FTTrieBuilder extends FTBuilder {
    * @param cs current file
    * @throws IOException I/O exception
    */
-  private void writeList(final int cs) throws IOException {
+  @Override
+  protected void writeIndex(final int cs) throws IOException {
     final String s = DATAFTX + (merge ? Integer.toString(cs) : "");
     final DataOutput outa = new DataOutput(data.meta.file(s + 'a'));
     final DataOutput outb = new DataOutput(data.meta.file(s + 'b'));
@@ -393,16 +345,16 @@ final class FTTrieBuilder extends FTBuilder {
       // write token length
       outa.write1(tok.length);
       // write token
-      outa.write(tok);
-      // write number of full text data size
-      outa.writeInt(ds);
-      // write pointer on full text data
+      outa.writeBytes(tok);
+      // write number of full-text data size
+      outa.write4(ds);
+      // write pointer on full-text data
       outa.write5(outb.size());
     }
 
     outa.write1(0);
-    hash = new FTHash();
-    outb.close();
     outa.close();
+    outb.close();
+    hash = new FTHash();
   }
 }

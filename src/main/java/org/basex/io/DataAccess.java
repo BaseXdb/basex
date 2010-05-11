@@ -135,15 +135,21 @@ public final class DataAccess {
    */
   public synchronized byte[] readToken(final long p) {
     cursor(p);
-    int l = readNum();
+    return readToken();
+  }
 
-    final byte[] b = new byte[l];
+  /**
+   * Reads the next token from disk.
+   * @return text as byte array
+   */
+  public synchronized byte[] readToken() {
+    int l = readNum();
     int ll = IO.BLOCKSIZE - off;
+    final byte[] b = new byte[l];
     Buffer bf = bm.curr();
-    if(l <= ll) {
-      System.arraycopy(bf.buf, off, b, 0, l);
-    } else {
-      System.arraycopy(bf.buf, off, b, 0, ll);
+
+    System.arraycopy(bf.buf, off, b, 0, Math.min(l, ll));
+    if(l > ll) {
       l -= ll;
       while(l > IO.BLOCKSIZE) {
         bf = next();
@@ -154,18 +160,28 @@ public final class DataAccess {
       bf = next();
       System.arraycopy(bf.buf, 0, b, ll, l);
     }
+    off += l;
     return b;
   }
 
   /**
-   * Reads a number of bytes in range from -> to and returns them as array.
-   * @param s starting position
+   * Reads a number of bytes from the specified offset.
+   * @param p position
    * @param l length
    * @return byte array
    */
-  public synchronized byte[] readBytes(final long s, final int l) {
+  public synchronized byte[] readBytes(final long p, final int l) {
+    cursor(p);
+    return readBytes(l);
+  }
+
+  /**
+   * Reads a number of bytes.
+   * @param l length
+   * @return byte array
+   */
+  public synchronized byte[] readBytes(final int l) {
     final byte[] b = new byte[l];
-    cursor(s);
     for(int i = 0; i < b.length; i++) b[i] = (byte) read();
     return b;
   }

@@ -18,7 +18,7 @@ class ValueFTTrees {
   private int nsize;
 
   /**
-   * Indexes a token with it full text data.
+   * Indexes a token with full-text data.
    *
    * @param tok token to be indexed
    * @param pre pre value for the token

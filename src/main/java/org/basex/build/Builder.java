@@ -2,9 +2,7 @@ package org.basex.build;
 
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -57,7 +55,6 @@ public abstract class Builder extends Progress {
   /** Element counter. */
   private int c;
 
-  
   /**
    * Constructor.
    * @param p parser
@@ -85,7 +82,7 @@ public abstract class Builder extends Progress {
   protected final void parse(final String db) throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
     Main.debug("Database: ");
-    
+
     // add document node and parse document
     parser.parse(this);
     if(lvl != 0) error(DOCOPEN, parser.det(), tags.key(tagStack[lvl]));

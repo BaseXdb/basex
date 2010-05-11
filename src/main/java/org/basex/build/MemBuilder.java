@@ -31,7 +31,7 @@ public final class MemBuilder extends Builder {
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;
-    meta.file = parser.io;
+    meta.file = parser.file;
 
     parse(db);
     data.init();

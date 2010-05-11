@@ -187,7 +187,7 @@ public final class CommandParser extends InputParser {
           case COLLECTION: case COLL:
             return new ImportColl(name(cmd), leftover(null));
         }
-        break;        
+        break;
       case XQUERY: case X:
         return new XQuery(xquery(cmd));
       case RUN:
@@ -256,7 +256,7 @@ public final class CommandParser extends InputParser {
     }
     return finish(cmd, tb);
   }
-  
+
   /**
    * Parses and returns the whole leftover of the string.
    * @param cmd referring command; if specified, the result must not be empty

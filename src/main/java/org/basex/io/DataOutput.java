@@ -56,6 +56,15 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
+   * Writes the specified bytes to the output stream.
+   * @param bytes array to be written
+   * @throws IOException I/O exception
+   */
+  public void writeBytes(final byte[] bytes) throws IOException {
+    for(final byte b : bytes) write(b);
+  }
+
+  /**
    * Writes a boolean value to the output stream.
    * @param b boolean value
    * @throws IOException I/O exception
@@ -70,44 +79,44 @@ public final class DataOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public void writeString(final String s) throws IOException {
-    writeBytes(Token.token(s));
+    writeToken(Token.token(s));
   }
 
   /**
-   * Writes the specified array to the output stream.
-   * @param text array to be written
+   * Writes the specified token to the output stream.
+   * @param tok array to be written
    * @return number of written bytes
    * @throws IOException I/O exception
    */
-  public int writeBytes(final byte[] text) throws IOException {
-    final int s = writeNum(text.length);
-    for(final byte t : text) write(t);
-    return s + text.length;
+  public int writeToken(final byte[] tok) throws IOException {
+    final int s = writeNum(tok.length);
+    writeBytes(tok);
+    return s + tok.length;
   }
 
   /**
-   * Writes the specified array to the output stream.
+   * Writes the specified double to the output stream.
    * @param num array to be written
    * @return number of written bytes
    * @throws IOException I/O exception
    */
   public int writeDouble(final double num) throws IOException {
-    return writeBytes(Token.token(num));
+    return writeToken(Token.token(num));
   }
 
   /**
-   * Writes the specified array to the output stream; null references
+   * Writes the specified tokens to the output stream; null references
    * are replaced with an empty array.
    * @param array array to be written
    * @throws IOException I/O exception
    */
-  public void writeBytesArray(final byte[][] array) throws IOException {
+  public void writeTokens(final byte[][] array) throws IOException {
     writeNum(array.length);
-    for(final byte[] a : array) writeBytes(a != null ? a : Token.EMPTY);
+    for(final byte[] a : array) writeToken(a != null ? a : Token.EMPTY);
   }
 
   /**
-   * Writes the specified array to the output stream.
+   * Writes the specified nums to the output stream.
    * @param array array to be written
    * @throws IOException I/O exception
    */
@@ -145,7 +154,7 @@ public final class DataOutput extends OutputStream {
    * @param v value to be written
    * @throws IOException I/O exception
    */
-  public void writeInt(final int v) throws IOException {
+  public void write4(final int v) throws IOException {
     write(v >>> 24);
     write(v >>> 16);
     write(v >>>  8);
@@ -153,7 +162,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes an integer value to the specified output stream.
+   * Writes a byte value to the specified output stream.
    * @param v value to be written
    * @throws IOException I/O exception
    */
@@ -162,7 +171,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes an integer value to the specified output stream.
+   * Writes a short value to the specified output stream.
    * @param v value to be written
    * @throws IOException I/O exception
    */
@@ -172,7 +181,7 @@ public final class DataOutput extends OutputStream {
   }
 
   /**
-   * Writes an integer value to the specified output stream.
+   * Writes an long value to the specified output stream.
    * @param v value to be written
    * @throws IOException I/O exception
    */

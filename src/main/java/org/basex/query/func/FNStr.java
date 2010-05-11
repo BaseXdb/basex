@@ -221,7 +221,7 @@ final class FNStr extends Fun {
     final int i = (int) d;
     return d == i ? i - 1 : (int) Math.floor(d - .5);
   }
-  
+
   /**
    * Returns a translated string.
    * @param ctx query context

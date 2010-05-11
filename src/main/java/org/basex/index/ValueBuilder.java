@@ -97,7 +97,7 @@ public final class ValueBuilder extends IndexBuilder {
     final String f = text ? DATATXT : DATAATV;
     final DataOutput outl = new DataOutput(data.meta.file(f + 'l'));
     final DataOutput outr = new DataOutput(data.meta.file(f + 'r'));
-    outl.writeInt(0);
+    outl.write4(0);
 
     final ValueMerge[] vm = new ValueMerge[csize];
     for(int i = 0; i < csize; i++) vm[i] = new ValueMerge(data, text, i);
@@ -202,7 +202,7 @@ public final class ValueBuilder extends IndexBuilder {
     // write positions and references
     final DataOutput outl = new DataOutput(data.meta.file(n + 'l'));
     final DataOutput outr = new DataOutput(data.meta.file(n + 'r'));
-    outl.writeInt(index.size());
+    outl.write4(index.size());
     index.init();
     while(index.more()) {
       outr.write5(outl.size());
@@ -225,7 +225,7 @@ public final class ValueBuilder extends IndexBuilder {
     // write texts
     final DataOutput outt = new DataOutput(data.meta.file(n + 't'));
     index.init();
-    while(index.more()) outt.writeBytes(index.tokens.get(index.next()));
+    while(index.more()) outt.writeToken(index.tokens.get(index.next()));
     outt.close();
   }
 
@@ -237,7 +237,7 @@ public final class ValueBuilder extends IndexBuilder {
   private void writeSingle(final String n) throws IOException {
     final DataOutput outl = new DataOutput(data.meta.file(n + 'l'));
     final DataOutput outr = new DataOutput(data.meta.file(n + 'r'));
-    outl.writeInt(index.size());
+    outl.write4(index.size());
     index.init();
     while(index.more()) {
       outr.write5(outl.size());

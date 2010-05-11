@@ -11,7 +11,6 @@ import org.basex.core.Commands.CmdImport;
  * @author Christian Gruen
  */
 public class ImportDB extends CreateDB {
-  
   /**
    * Default constructor.
    * @param name name of database
@@ -20,7 +19,7 @@ public class ImportDB extends CreateDB {
   public ImportDB(final String name, final String input) {
     super(input, name);
   }
-  
+
   @Override
   public String toString() {
     return Cmd.IMPORT + " " + CmdImport.DB + " " + args[1] + " " + args[0];

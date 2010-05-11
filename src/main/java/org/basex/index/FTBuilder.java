@@ -12,6 +12,7 @@ import org.basex.query.ft.StopWords;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 
 /**
@@ -158,6 +159,48 @@ public abstract class FTBuilder extends IndexBuilder {
   }
 
   /**
+   * Writes the current index to disk.
+   * @param cs current file pointer
+   * @throws IOException I/O exception
+   */
+  protected abstract void writeIndex(final int cs) throws IOException;
+
+  /**
+   * Merges temporary indexes for the current token.
+   * @param out full-text data
+   * @param il array mapping
+   * @param v full-text list
+   * @return written size
+   * @throws IOException I/O exception
+   */
+  protected int merge(final DataOutput out, final IntList il, final FTList[] v)
+      throws IOException {
+
+    int s = 0;
+    final TokenBuilder tbp = new TokenBuilder();
+    final TokenBuilder tbo = new TokenBuilder();
+    tbp.add(new byte[4]);
+    tbo.add(new byte[4]);
+    // merge full-text data of all sorted lists with the same token
+    for(int j = 0; j < il.size(); j++) {
+      final int m = il.get(j);
+      for(final int p : v[m].prv) tbp.add(Num.num(p));
+      for(final int p : v[m].pov) tbo.add(Num.num(p));
+      s += v[m].size;
+      v[m].next();
+    }
+    // write compressed pre and pos arrays
+    final byte[] pr = tbp.finish();
+    Num.size(pr, pr.length);
+    final byte[] po = tbo.finish();
+    Num.size(po, po.length);
+
+    // write full-text data
+    writeFTData(out, pr, po);
+    return s;
+  }
+
+  /**
    * Writes full-text data for a single token to disk.
    * @param out DataOutput for disk access
    * @param vpre compressed pre values
@@ -183,7 +226,7 @@ public abstract class FTBuilder extends IndexBuilder {
             if(max < s) max = s;
             if(min > s) min = s;
             if(np != 4) out.write(0);
-            out.write(Num.num(s));
+            out.writeBytes(Num.num(s));
             lu = u;
           }
           lp = p;
@@ -211,21 +254,13 @@ public abstract class FTBuilder extends IndexBuilder {
   }
 
   /**
-   * Returns next token.
-   * @param v sorted lists
-   * @param m pointer on current list
-   * @return next token
-   * @throws IOException I/O exception
+   * Checks if any unprocessed pre values are remaining.
+   * @param lists lists
+   * @return boolean
    */
-  protected final byte[] nextToken(final FTList[] v, final int m)
-      throws IOException {
-    if(v[m] != null) {
-      final byte[] tok = v[m].next();
-      if(tok.length != 0) return tok;
-      v[m].close();
-      v[m] = null;
-    }
-    return EMPTY;
+  protected final boolean check(final FTList[] lists) {
+    for(final FTList l : lists) if(l.tok.length > 0) return true;
+    return false;
   }
 
   /**

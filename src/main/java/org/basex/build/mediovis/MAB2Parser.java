@@ -119,7 +119,7 @@ public final class MAB2Parser extends Parser {
     b.encoding(ENCODING);
 
     // read in indexes
-    final String dir = io.getDir();
+    final String dir = file.getDir();
     index(mediatypes, dir + "/mediatypes.dat");
     index(subjects, dir + "/subjects.dat");
     index(languages, dir + "/lang.dat");
@@ -136,7 +136,7 @@ public final class MAB2Parser extends Parser {
     }
 
     // create input reference
-    input = new DataAccess(new File(io.path()));
+    input = new DataAccess(new File(file.path()));
 
     // check beginning of input file
     if(input.read1() != '#' || input.read1() != '#' ||
@@ -145,7 +145,7 @@ public final class MAB2Parser extends Parser {
     }
 
     builder = b;
-    builder.startDoc(token(io.name()));
+    builder.startDoc(token(file.name()));
     builder.startElem(LIBRARY, atts.reset());
 
     // find file offsets of all titles

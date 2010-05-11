@@ -11,7 +11,6 @@ import org.basex.core.Commands.CmdImport;
  * @author Christian Gruen
  */
 public class ImportColl extends Add {
-  
   /**
    * Default constructor.
    * @param name of the document
@@ -21,7 +20,7 @@ public class ImportColl extends Add {
     // [AW] to be revised... 'import coll' is expected to work on open database
     super(name, input);
   }
-  
+
   @Override
   public String toString() {
     return Cmd.IMPORT + " " + CmdImport.COLL + args();

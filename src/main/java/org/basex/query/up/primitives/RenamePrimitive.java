@@ -32,7 +32,7 @@ public final class RenamePrimitive extends NewValue {
     final int pre = n.pre;
     // [LK] namespaces rename: if nm.uri not empty and differs from current
     /* ... add flag cause already checked in Expr Rename.java
-     * ... then update Namespaces: 
+     * ... then update Namespaces:
      * - find NSNode ancestor A of renamed node N.
      * - add N as a child of A
      * - NSNode descendant of A which is also descendant of N is added

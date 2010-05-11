@@ -151,8 +151,8 @@ public final class ServerProcess extends Thread {
       exit();
     }
   }
-  
-  
+
+
   /**
    * Query is executed in iterate mode.
    * @throws IOException Exception
@@ -182,7 +182,7 @@ public final class ServerProcess extends Thread {
       send(false);
       out.print(ex.extended());
       send(true);
-    } 
+    }
   }
 
   /**

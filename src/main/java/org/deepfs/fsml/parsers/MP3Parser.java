@@ -687,7 +687,7 @@ public final class MP3Parser implements IFileParser {
             Integer.parseInt(string(obj.readText(size))));
       }
     },
-    
+
     /** iTunes Compilation flag. */
     TCMP {
       @Override

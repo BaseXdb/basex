@@ -3,14 +3,10 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
-import org.basex.io.IO;
 import org.basex.util.IntList;
-import org.basex.util.Num;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
 
 /**
  * This class builds an index for text contents, optimized for fuzzy search,
@@ -20,7 +16,7 @@ import org.basex.util.TokenBuilder;
  *  - (2) if main memory, the data is written to disk, (1)
  *  - (3) merge disk data into the final format:
  *
- * The building process is divided in 2 steps:
+ * The building process is divided in two steps:
  * a)
  *    fill DataOutput(db, f + 'x') looks like:
  *    [l, p] ...
@@ -34,7 +30,7 @@ import org.basex.util.TokenBuilder;
  *      - z is the pointer on the data entries of the token [long]
  *      - s is the number of pre values, saved in data [int]
  * b)
- *    fill DataOutput(db, f + 'z') looks like: stores the full text data;
+ *    fill DataOutput(db, f + 'z') looks like: stores the full-text data;
  *      the pre values are ordered but not distinct
  *      [pre1, pos1, pre2, pos2, pre3, pos3, ...] as Nums
  *
@@ -98,115 +94,78 @@ final class FTFuzzyBuilder extends FTBuilder {
     writeIndex(csize++);
     if(!merge) return;
 
-    // merges temporarily indexes to the final index
+    // merges temporary index files
     final DataOutput outx = new DataOutput(data.meta.file(DATAFTX + 'x'));
     final DataOutput outy = new DataOutput(data.meta.file(DATAFTX + 'y'));
     final DataOutput outz = new DataOutput(data.meta.file(DATAFTX + 'z'));
-
-    final byte[][] tok = new byte[csize][];
-    final int[][] prs = new int[csize][];
-    final int[][] pos = new int[csize][];
     final IntList ind = new IntList();
 
     // open all temporary sorted lists
     final FTList[] v = new FTList[csize];
-    for(int b = 0; b < csize; b++) {
-      v[b] = new FTFuzzyList(data, b);
-      tok[b] = v[b].next();
-      prs[b] = v[b].pres();
-      pos[b] = v[b].poss();
-    }
+    for(int b = 0; b < csize; b++) v[b] = new FTFuzzyList(data, b);
 
-    final IntList mer = new IntList();
-    while(check(tok)) {
+    final IntList il = new IntList();
+    while(check(v)) {
       int min = 0;
-      mer.reset();
-      mer.add(min);
+      il.reset();
+      il.add(min);
       // find next token to write on disk
       for(int i = 0; i < csize; i++) {
-        if(min == i || tok[i].length == 0) continue;
-        final int l = tok[i].length - tok[min].length;
-        final int d = diff(tok[min], tok[i]);
-        if(l < 0 || l == 0 && d > 0 || tok[min].length == 0) {
+        if(min == i || v[i].tok.length == 0) continue;
+        final int l = v[i].tok.length - v[min].tok.length;
+        final int d = diff(v[min].tok, v[i].tok);
+        if(l < 0 || l == 0 && d > 0 || v[min].tok.length == 0) {
           min = i;
-          mer.reset();
-          mer.add(min);
-        } else if(d == 0 && tok[i].length > 0) {
-          mer.add(i);
+          il.reset();
+          il.add(min);
+        } else if(d == 0 && v[i].tok.length > 0) {
+          il.add(i);
         }
       }
 
-      if(ind.size() == 0 || ind.get(ind.size() - 2) < tok[min].length) {
-        ind.add(tok[min].length);
+      if(ind.size() == 0 || ind.get(ind.size() - 2) < v[min].tok.length) {
+        ind.add(v[min].tok.length);
         ind.add((int) outy.size());
       }
 
       // write token
-      outy.write(tok[min]);
-      // pointer on full text data
+      outy.writeBytes(v[min].tok);
+      // pointer on full-text data
       outy.write5(outz.size());
 
-      int s = 0;
-      final TokenBuilder tbp = new TokenBuilder();
-      final TokenBuilder tbo = new TokenBuilder();
-      tbp.add(new byte[4]);
-      tbo.add(new byte[4]);
-      // merge full text data of all sorted indexes with the same token
-      for(int j = 0; j < mer.size(); j++) {
-        final int m = mer.get(j);
-        for(final int p : prs[m]) tbp.add(Num.num(p));
-        for(final int p : pos[m]) tbo.add(Num.num(p));
-        s += v[m].size();
-        tok[m] = nextToken(v, m);
-        prs[m] = tok[m].length > 0 ? v[m].pres() : new int[0];
-        pos[m] = tok[m].length > 0 ? v[m].poss() : new int[0];
-      }
-
-      // write out data size
-      outy.writeInt(s);
-
-      // write compressed pre and pos arrays
-      final byte[] pr = tbp.finish();
-      Num.size(pr, pr.length);
-      final byte[] po = tbo.finish();
-      Num.size(po, po.length);
-      // write full text data
-      writeFTData(outz, pr, po);
+      // merge and write out data size
+      int s = merge(outz, il, v);
+      outy.write4(s);
     }
     writeInd(outx, ind, ind.get(ind.size() - 2) + 1, (int) outy.size());
 
     outx.close();
     outy.close();
     outz.close();
-    DropDB.delete(data.meta.name, DATAFTX + "\\d+." + IO.BASEXSUFFIX,
-        data.meta.prop);
   }
 
   /**
    * Writes the token length index to disk.
    * @param outx Output
-   * @param ind IntList with token length and offset
+   * @param il IntList with token length and offset
    * @param ls last token length
    * @param lp last offset
    * @throws IOException I/O exception
    */
-  private void writeInd(final DataOutput outx, final IntList ind,
+  private void writeInd(final DataOutput outx, final IntList il,
       final int ls, final int lp) throws IOException {
-    outx.write(ind.size() >> 1);
-    for(int i = 0; i < ind.size(); i += 2) {
-      outx.write(ind.get(i));
-      outx.writeInt(ind.get(i + 1));
+
+    outx.write1(il.size() >> 1);
+    for(int i = 0; i < il.size(); i += 2) {
+      outx.write1(il.get(i));
+      outx.write4(il.get(i + 1));
     }
-    outx.write(ls);
-    outx.writeInt(lp);
+    outx.write1(ls);
+    outx.write4(lp);
   }
 
-  /**
-   * Writes the main memory index to disk - temporarily.
-   * @param cs current file pointer
-   * @throws IOException I/O exception
-   */
-  private void writeIndex(final int cs) throws IOException {
+  @Override
+  protected void writeIndex(final int cs) throws IOException {
     final String s = DATAFTX + (merge ? Integer.toString(cs) : "");
     final DataOutput outx = new DataOutput(data.meta.file(s + 'x'));
     final DataOutput outy = new DataOutput(data.meta.file(s + 'y'));
@@ -228,11 +187,11 @@ final class FTFuzzyBuilder extends FTBuilder {
         ind.add(j);
         ind.add(tr);
       }
-      for(int i = 0; i < j; i++) outy.write(key[i]);
-      // write pointer on full text data
+      for(int i = 0; i < j; i++) outy.write1(key[i]);
+      // write pointer on full-text data
       outy.write5(dr);
-      // write full text data size (number of pre values)
-      outy.writeInt(t.nextNumPre());
+      // write full-text data size (number of pre values)
+      outy.write4(t.nextNumPre());
       // write compressed pre and pos arrays
       writeFTData(outz, t.nextPres(), t.nextPos());
 

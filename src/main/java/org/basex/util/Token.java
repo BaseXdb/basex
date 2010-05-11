@@ -17,7 +17,7 @@ import org.basex.core.Main;
  */
 public final class Token {
   /** Maximum length for hash calculation and index terms. */
-  public static final int MAXLEN = 96;
+  public static final byte MAXLEN = 96;
 
   /** Empty token. */
   public static final byte[] EMPTY = {};
@@ -77,7 +77,7 @@ public final class Token {
   /** UTF16 encoding string. */
   public static final String UTF16LE = "UTF-16LE";
 
-  /** Hidden Constructor. */
+  /** Hidden constructor. */
   private Token() { }
 
   /**

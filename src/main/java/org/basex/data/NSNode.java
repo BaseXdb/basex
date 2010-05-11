@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.TokenBuilder;

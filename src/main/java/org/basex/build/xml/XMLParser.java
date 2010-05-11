@@ -13,7 +13,7 @@ import org.basex.io.IO;
 /**
  * This class parses the tokens that are delivered by the {@link XMLScanner} and
  * sends them to the specified database builder.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -42,7 +42,7 @@ public final class XMLParser extends Parser {
   public void parse(final Builder build) throws IOException {
     builder = build;
     if(doc) builder.startDoc(token(target + file.name()));
-    
+
     // loop until all tokens have been processed
     scanner.more();
     while(true) {

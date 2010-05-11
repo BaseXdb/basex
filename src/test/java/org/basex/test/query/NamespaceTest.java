@@ -44,7 +44,7 @@ public class NamespaceTest {
 //        "declare namespace a='aa';doc('d5')/a:x",
 //        "<a:x xlmns:a='aa'><a:y/></a:x>");
 //  }
-//  
+//
 //  /** Test query. */
 //  @Test
 //  public final void simpleNsDuplicate2() {
@@ -54,7 +54,7 @@ public class NamespaceTest {
 //      "declare namespace a='aa';doc('d5')/a:x",
 //      "<a:x xlmns:a='aa'><a:y><a:b/></a:y></a:x>");
 //  }
-//  
+//
 //  /** Test query. */
 //  @Test
 //  public final void copy4() {
@@ -62,7 +62,7 @@ public class NamespaceTest {
 //        "copy $c := <a:y xmlns:a='aa'><a:b/></a:y> modify () return $c",
 //        "<a:y xmlns:a='aa'><a:b/></a:y>");
 //  }
-  
+
   /** Test query. */
   @Test
   public final void copy5() {
@@ -81,7 +81,7 @@ public class NamespaceTest {
   }
 
   /** Test query.
-   * [LK] 
+   * [LK]
    * Detects corrupt namespace hierarchy.
    */
   @Test
@@ -90,7 +90,7 @@ public class NamespaceTest {
         "declare namespace a='aa'; copy $c:=doc('d4') modify () return $c//a:y",
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
-  
+
   /** Test query.
    * Detects missing prefix declaration.
    */
@@ -128,7 +128,7 @@ public class NamespaceTest {
         "doc('d1')/x/*/*",
         "<b:y xmlns:b='bb' xmlns:a='aa'/>");
   }
-  
+
   /** Test query.
    * Detects missing prefix declaration.
    */
@@ -140,8 +140,8 @@ public class NamespaceTest {
         "doc('d1')/x",
         "<x><a:y xmlns:a='aa' xmlns:b='bb'/></x>");
   }
-  
-  /** Test query. 
+
+  /** Test query.
    * Detects duplicate prefix declaration at pre=0 in MemData instance after
    * insert.
    * [LK] though result correct, prefix
@@ -155,8 +155,8 @@ public class NamespaceTest {
         "declare namespace a='aa';doc('d5')//a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
-  
-//  /** Test query. 
+
+//  /** Test query.
 //   * Detects duplicate prefix declarations among the insertion nodes (MemData)
 //   * and the target node's data instance.
 //   * [LK] duplicates are generated in Data.insert(...   MemData correct!
@@ -168,8 +168,8 @@ public class NamespaceTest {
 //        "declare namespace a='aa';doc('d3')/a:x",
 //        "<a:x xmlns:a='aa'><b:y xmlns:b='bb'><a:x><a:y/></a:x></b:y></a:x>");
 //  }
-  
-  /** Test query. 
+
+  /** Test query.
    * Detects duplicate namespace declarations in MemData instance.
    */
   @Test
@@ -179,8 +179,8 @@ public class NamespaceTest {
         "doc('d1')/x",
         "<x><x xmlns='xx'><y/></x></x>");
   }
-  
-//  /** Test query. 
+
+//  /** Test query.
 //   * Detects duplicate namespace declarations after insert.
 //   */
 //  @Test
@@ -191,7 +191,7 @@ public class NamespaceTest {
 //        "declare namespace a='aa';doc('d6')/a:x",
 //        "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/><x/></a:x>");
 //  }
-  
+
   /** Test query.
    * Detects general problems with namespace references.
    */
@@ -202,11 +202,11 @@ public class NamespaceTest {
         "declare namespace a='aa';doc('d4')/a:x/a:y",
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
-  
+
   // [LK] add test for duplicate uri for same prefix
-  // add test (copy), check memdata 
+  // add test (copy), check memdata
   // ... <n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n>
-  
+
   /** Creates the database context. */
   @BeforeClass
   public static void start() {

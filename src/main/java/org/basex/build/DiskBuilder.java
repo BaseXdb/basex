@@ -54,7 +54,7 @@ public final class DiskBuilder extends Builder {
     pr.dbpath(db).mkdirs();
 
     meta = new MetaData(db, pr);
-    meta.file = parser.io;
+    meta.file = parser.file;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
 
@@ -109,45 +109,45 @@ public final class DiskBuilder extends Builder {
 
   @Override
   protected void addDoc(final byte[] txt) throws IOException {
-    tout.write(Data.DOC);
+    tout.write1(Data.DOC);
     tout.write2(0);
     tout.write5(inline(txt, true));
-    tout.writeInt(0);
-    tout.writeInt(meta.size++);
+    tout.write4(0);
+    tout.write4(meta.size++);
   }
 
   @Override
   protected void addElem(final int dis, final int n, final int as, final int u,
       final boolean ne) throws IOException {
 
-    tout.write(as << 3 | Data.ELEM);
+    tout.write1(as << 3 | Data.ELEM);
     tout.write2((ne ? 1 << 15 : 0) | n);
-    tout.write(u);
-    tout.writeInt(dis);
-    tout.writeInt(as);
-    tout.writeInt(meta.size++);
+    tout.write1(u);
+    tout.write4(dis);
+    tout.write4(as);
+    tout.write4(meta.size++);
   }
 
   @Override
   protected void addAttr(final int n, final byte[] v, final int dis,
       final int u) throws IOException {
 
-    tout.write(dis << 3 | Data.ATTR);
+    tout.write1(dis << 3 | Data.ATTR);
     tout.write2(n);
     tout.write5(inline(v, false));
-    tout.writeInt(u);
-    tout.writeInt(meta.size++);
+    tout.write4(u);
+    tout.write4(meta.size++);
   }
 
   @Override
   protected void addText(final byte[] txt, final int dis, final byte kind)
       throws IOException {
 
-    tout.write(kind);
+    tout.write1(kind);
     tout.write2(0);
     tout.write5(inline(txt, true));
-    tout.writeInt(dis);
-    tout.writeInt(meta.size++);
+    tout.write4(dis);
+    tout.write4(meta.size++);
   }
 
   @Override
@@ -171,10 +171,10 @@ public final class DiskBuilder extends Builder {
       v |= IO.NUMOFF;
     } else if(txt) {
       v = txtlen;
-      txtlen += xout.writeBytes(val);
+      txtlen += xout.writeToken(val);
     } else {
       v = vallen;
-      vallen += vout.writeBytes(val);
+      vallen += vout.writeToken(val);
     }
     return v;
   }

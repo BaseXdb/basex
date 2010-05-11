@@ -1,6 +1,5 @@
 package org.basex.index;
 
-import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Data;
 
@@ -19,15 +18,13 @@ final class FTTrieList extends FTList {
    */
   FTTrieList(final Data d, final int cf) throws IOException {
     super(d, cf, 'a', 'b');
+    next();
   }
 
   @Override
-  byte[] next() {
-    final byte tl = str.read1();
-    if(tl == 0) return EMPTY;
-    final long pos = str.pos();
-    final byte[] tok = str.readBytes(pos, tl);
-    size = str.read4();
-    return tok;
+  protected byte[] token() {
+    final byte[] t = str.readToken();
+    if(t.length != 0) size = str.read4();
+    return t;
   }
 }

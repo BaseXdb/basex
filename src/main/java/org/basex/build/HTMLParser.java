@@ -47,7 +47,8 @@ final class HTMLParser {
    * @return parser
    */
   IO toXML(final IO io) {
-    if(!io.path().endsWith(".htm") && !io.path().endsWith(".html")) return io;
+    final String path = io.path();
+    if(!path.endsWith(".htm") && !path.endsWith(".html")) return io;
 
     try {
       // tries to extract the encoding from the input
@@ -77,7 +78,7 @@ final class HTMLParser {
           Class.forName("org.ccil.cowan.tagsoup.XMLWriter").getConstructor(
               new Class[] { Writer.class }).newInstance(sw));
       parser.parse(is);
-      return new IOContent(token(sw.toString()));
+      return new IOContent(token(sw.toString()), io.name());
     } catch(final Exception ex) {
       Main.debug(ex);
       return io;

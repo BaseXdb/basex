@@ -4,7 +4,7 @@ import java.io.File;
 
 /**
  * Produces tree(1)-like output of a directory hierarchy.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Alexander Holupirek
  */
@@ -18,7 +18,7 @@ public final class TreePrinter implements FSTraversal {
 
   /**
    * Prints indentation prefix.
-   * 
+   *
    * For each level a separate indentation string is stored in
    * {@link #indentStrings}. This methods prints an indentation string by
    * concatenating all prior indent strings.
@@ -32,15 +32,15 @@ public final class TreePrinter implements FSTraversal {
   /**
    * Prints a line for tree(1)-like output of a file node. During a filesystem
    * traversal this method is invoked whenever a file node has to be printed.
-   * 
+   *
    * It first prints an according indentation string for each level using (
    * {@link #printIndent(int)}.
-   * 
+   *
    * Secondly it determines if it is the sole child of its parent directory or
    * if it is the last child in the list of children of the parent directory. In
    * this case it stores the empty indentation string in {@link #indentStrings}
    * and prints its name prefixed with "`--".
-   * 
+   *
    * Otherwise it stores "|   " as indentation string for the subsequent file
    * nodes and prints its name prefixed with "|-- ".
    * @param f the currently visited file node

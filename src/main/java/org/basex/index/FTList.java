@@ -1,6 +1,7 @@
 package org.basex.index;
 
 import static org.basex.data.DataText.*;
+import java.io.File;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
@@ -12,16 +13,26 @@ import org.basex.io.DataAccess;
  * @author Sebastian Gath
  */
 abstract class FTList {
+  /** Empty integer array. */
+  protected static final int[] NOINTS = {};
   /** Indexed tokens. */
   protected final DataAccess str;
   /** Storing pre and pos values for each token. */
   protected final DataAccess dat;
+  /** Structure file. */
+  private final File files;
+  /** Data file. */
+  private final File filed;
+  /** Wasted flag. */
+  boolean wasted;
   /** Current data size. */
-  protected int size;
+  int size;
+  /** Next token. */
+  byte[] tok;
   /** Next pre values. */
-  private int[] prv;
+  int[] prv;
   /** Next pos values. */
-  private int[] pov;
+  int[] pov;
 
   /**
    * Constructor, initializing the index structure.
@@ -33,52 +44,49 @@ abstract class FTList {
    */
   protected FTList(final Data d, final int p, final char ss, final char ds)
       throws IOException {
-    str = new DataAccess(d.meta.file(DATAFTX + p + ss));
-    dat = new DataAccess(d.meta.file(DATAFTX + p + ds));
+    files = d.meta.file(DATAFTX + p + ss);
+    filed = d.meta.file(DATAFTX + p + ds);
+    str = new DataAccess(files);
+    dat = new DataAccess(filed);
   }
 
   /**
-   * Closes files.
+   * Checks if more tokens are found.
    * @throws IOException I/O exception
    */
-  final void close() throws IOException {
+  void next() throws IOException {
+    if(wasted) return;
+
+    tok = token();
+    if(tok.length == 0) {
+      wasted = true;
+      prv = NOINTS;
+      pov = NOINTS;
+      close();
+    } else {
+      prv = new int[size];
+      pov = new int[size];
+      for(int j = 0; j < size; j++) {
+        prv[j] = dat.readNum();
+        pov[j] = dat.readNum();
+      }
+    }
+  }
+
+  /**
+   * Closes and deletes the input files.
+   * @throws IOException I/O exception
+   */
+  void close() throws IOException {
     str.close();
     dat.close();
+    files.delete();
+    filed.delete();
   }
 
   /**
    * Returns next token.
    * @return byte[] token
    */
-  abstract byte[] next();
-
-  /**
-   * Returns next number of pre-values.
-   * @return number of pre-values
-   */
-  final int size() {
-    return size;
-  }
-
-  /**
-   * Returns next pre values.
-   * @return int[] pre values
-   */
-  final int[] pres() {
-    prv = new int[size];
-    pov = new int[size];
-    for(int j = 0; j < size; j++) {
-      prv[j] = dat.readNum();
-      pov[j] = dat.readNum();
-    }
-    return prv;
-  }
-
-  /**
-   * Returns next pos values.
-   * @return int[] pos values
-   */
-  final int[] poss() {
-    return pov;
-  }
+  protected abstract byte[] token();
 }

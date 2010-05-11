@@ -10,7 +10,7 @@ import static org.basex.util.Token.*;
  * @author Christian Gruen
  */
 public final class XMLToken {
-  /** Hidden Constructor. */
+  /** Hidden constructor. */
   private XMLToken() { }
 
   /**

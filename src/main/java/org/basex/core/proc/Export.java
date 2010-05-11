@@ -75,7 +75,7 @@ public final class Export extends Proc {
 
     final int[] docs = data.doc();
     final IO root = IO.get(target);
-    
+
     for(final int pre : docs) {
       // create file path
       final IO file = docs.length == 1 && name != null ? root.merge(name) :

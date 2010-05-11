@@ -24,7 +24,7 @@ import org.basex.util.Token;
 
 /**
  * This class offers a real tree view.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -73,7 +73,7 @@ public final class TreeView extends View implements TreeViewOptions {
   private boolean newInit;
 
   /**
-   * Default Constructor.
+   * Default constructor.
    * @param man view manager
    */
   public TreeView(final ViewNotifier man) {
@@ -159,7 +159,7 @@ public final class TreeView extends View implements TreeViewOptions {
         markedImage = null;
       }
       focusedRect = null;
-      if((treedist = cache.generateBordersAndRects(g, 
+      if((treedist = cache.generateBordersAndRects(g,
           gui.context, getWidth())) == -1) return;
       setLevelDistance();
       createNewMainImage();
@@ -602,7 +602,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param t highlight type
    */
   private void highlightDescendants(final Graphics g, final int rn,
-      final int pre, final TreeRect r, final int l, 
+      final int pre, final TreeRect r, final int l,
       final int px, final byte t) {
 
     final Data d = gui.context.current.data;
@@ -686,8 +686,8 @@ public final class TreeView extends View implements TreeViewOptions {
           g.fillRect(df, getYperLevel(lvv), ww, nodeHeight + 1);
       }
 
-      
-//       if(lvv + 1 < cache.getHeight(rn) && !cache.isBigRectangle(rn, 
+
+//       if(lvv + 1 < cache.getHeight(rn) && !cache.isBigRectangle(rn,
 //      lvv + 1)) {
 //       final Data d = gui.context.current.data;
 //       for(int j = subt[i].start; j < subt[i].start + subt[i].size; j++) {
@@ -816,7 +816,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final int rn = frn = getTreePerX(mousePosX);
       final int lv = getLevelPerY(mousePosY);
 
-      if(lv < 0 || cache.getHeight(rn) < 0 
+      if(lv < 0 || cache.getHeight(rn) < 0
           || lv >= cache.getHeight(rn)) return false;
 
       final TreeRect[] rL = cache.getTreeRectsPerLevel(rn, lv);
@@ -888,14 +888,14 @@ public final class TreeView extends View implements TreeViewOptions {
     }
     nodeHeight = MAX_NODE_HEIGHT;
     int lD;
-    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) < 
+    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) <
         (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
         : BEST_LEVEL_DISTANCE)
         && nodeHeight >= MIN_NODE_HEIGHT)
       nodeHeight--;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * 
+    final int ih = (int) ((h - (levelDistance *
         (lvs - 1) + lvs * nodeHeight)) / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }

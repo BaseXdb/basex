@@ -60,7 +60,7 @@ public class TokenSet {
    * @throws IOException I/O exception
    */
   public void write(final DataOutput out) throws IOException {
-    out.writeBytesArray(keys);
+    out.writeTokens(keys);
     out.writeNums(next);
     out.writeNums(bucket);
     out.writeNum(size);

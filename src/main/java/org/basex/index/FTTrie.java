@@ -5,7 +5,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
-
 import org.basex.core.Prop;
 import org.basex.core.proc.AInfo;
 import org.basex.data.Data;
@@ -16,7 +15,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 
 /**
- * This class indexes full text tokens in a compressed trie on disk.
+ * This class indexes full-text tokens in a compressed trie on disk.
  * Details on the index structure are described in {@link FTTrieBuilder}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -314,7 +313,7 @@ final class FTTrie extends FTIndex {
       skippedChars = 0;
       return;
     }
-    
+
     if(j == ending.length && i == ne[0] + 1) {
       // all chars form node and all chars from ending done
       idata = FTIndexIterator.union(
@@ -332,7 +331,7 @@ final class FTTrie extends FTIndex {
       }
       return;
     }
-    
+
     if(j < ending.length && i < ne[0] + 1) {
       // still chars from node and still chars from ending left, pointer = 0 and
       // restart searching
@@ -345,7 +344,7 @@ final class FTTrie extends FTIndex {
       wc(node, ending, false, i + 1, 0, f);
       return;
     }
-    
+
     if(j < ending.length && i == ne[0] + 1) {
       // all chars form node processed, but not all chars from processed
 

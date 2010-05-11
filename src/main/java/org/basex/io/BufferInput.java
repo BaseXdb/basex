@@ -181,7 +181,7 @@ public class BufferInput {
     while((l = readByte()) != 0) tb.add(l);
     return tb;
   }
-  
+
   /**
    * Reads a string from the input stream.
    * @param b byte starting byte

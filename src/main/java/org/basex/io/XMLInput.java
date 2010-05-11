@@ -20,8 +20,6 @@ public final class XMLInput {
   private final IO file;
   /** Current line. */
   private int line = 1;
-  /** Current column. */
-  private int col = 1;
 
   /** Buffer with most current characters. */
   private final int[] last = new int[16];
@@ -92,13 +90,7 @@ public final class XMLInput {
     while(ch == 0 && ip != 0) ch = in[--ip].readChar();
     last[lp++] = ch;
     lp &= 0x0F;
-    if(ip == 0) {
-      if(ch == '\n') {
-        line++;
-        col = 0;
-      }
-      col++;
-    }
+    if(ip == 0 && ch == '\n') line++;
     return ch;
   }
 

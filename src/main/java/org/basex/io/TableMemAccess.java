@@ -91,7 +91,7 @@ public final class TableMemAccess extends TableAccess {
           copy(buf1[a], data, p);
           copy(buf2[a], data, p + 8);
         }
-        out.write(data);
+        out.writeBytes(data);
       }
       out.close();
       dirty = false;

@@ -204,7 +204,7 @@ public abstract class UpdatePrimitive {
         for(int a = 0; a < ns.size; a++) {
           m.ns.add(ns.key[a], ns.val[a], ms);
         }
-        
+
         uri = q.uri.str();
         u = uri.length != 0 ? m.ns.addURI(uri) : 0;
         final int tn = m.tags.index(q.str(), null, false);

@@ -21,7 +21,7 @@ public final class NameTest extends Test {
   public final byte[] ln;
 
   /**
-   * Empty Constructor ('*').
+   * Empty constructor ('*').
    * @param att attribute flag
    */
   public NameTest(final boolean att) {
