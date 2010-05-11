@@ -14,29 +14,6 @@
 # or error output.
 #
 # -----------------------------------------------------------------------------
-#
-# Example:
-#
-# import BaseXClient
-#
-# try:
-#   # create session
-#   session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
-#
-#   # perform command and show result or error output
-#   if session.execute("xquery 1 to 10"):
-#     print session.result()
-#   else:
-#     print session.info()
-#
-#   # close session
-#   session.close()
-#
-# except IOError as e:
-#   # print exception
-#   print e
-#
-# -----------------------------------------------------------------------------
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
 # -----------------------------------------------------------------------------
 
@@ -157,14 +134,15 @@ class Query():
 			self.__part = self.__session.res()
 			return True
 		else:
+			self.close()
 			return False
 	
 	# Returns the next part of the result.
 	def next(self):
 		return self.__part		
 	
-	# Cancels the iterative execution.	
-	def abort(self):
+	# Closes the iterative execution.	
+	def close(self):
 		self.__session.send('\1')
 	
 	# Returns the error info.	

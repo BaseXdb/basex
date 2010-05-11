@@ -15,31 +15,6 @@
  * or error output.
  *
  * ----------------------------------------------------------------------------
- *
- * Example:
- *
- * include("BaseXClient.php");
- *
- * try {
- *   // create session
- *   $session = new Session("localhost", 1984, "admin", "admin");
- *
- *   // perform command and show result or error output
- *   if($session->execute("xquery 1 to 10")) {
- *     print $session->result();
- *   } else {
- *     print $session->info();
- *   }
- *
- *  // close session
- *  $session->close();
- *
- * } catch (Exception $e) {
- *   // print exception
- *   print $e->getMessage();
- * }
- *
- * ----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * ----------------------------------------------------------------------------
  */
@@ -121,24 +96,29 @@ class Session {
     return $this->buffer[$this->bpos++];
   }
   
+  /* Returns the query object.*/
   public function query($q) {
   	return new Query($this, $q);
   }
   
+  /* Executes the query. */
   public function executeIter($cmd) {
   	// send command to server
     socket_write($this->socket, "\0$cmd\0");
     return $this->check();
   }
   
+  /* Sends the sign. */
   public function send($sign) {
   	socket_write($this->socket, $sign);
   }
   
+  /* Checks the next byte. */
   public function check() {
   	return socket_read($this->socket, 1) == "\0";
   }
   
+  /* Returns the result. */
   public function res() {
   	$this->init();
   	return $this->readString();
@@ -154,28 +134,34 @@ class Query {
 		$this->query = $q;
 	}
 	
+	/* Starts the query execution. */
 	public function run() {
 		return $this->session->executeIter($this->query);
 	}
 	
+	/* Checks for next item in line. */
 	public function more() {
 		$this->session->send("\0");
 		if ($this->session->check()) {
 			$this->part = $this->session->res();
 			return True;
 		} else {
+			$this-> close();
 			return False;
 		}
 	}
 	
+	/* Returns next item. */
 	public function next() {
 		return $this->part;
 	}
 	
-	public function abort() {
+	/* Closes the query. */
+	public function close() {
 		$this->session->send("\1");
 	}
 	
+	/* Returns the info string. */
 	public function info() {
 		return $this->session->res();
 	}	

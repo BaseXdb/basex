@@ -13,12 +13,11 @@ include("BaseXClient.php");
 $createDB = "create db <countries><c>Brasil</c><c>Italy</c><c>Germany</c><c>Uruguay</c><c>Argentina</c><c>England</c><c>France</c></countries> wm";
 
 // command to be performed
-$cmd = "doc('factbook')//country";
+$cmd = "doc('wm')//c";
 
 try {
   // create session
   $session = new Session("localhost", 1984, "admin", "admin");
-  
   
   $session->execute($createDB);
   echo "<table border='0' cellspacing='2' cellpadding='4' width='20%'>
@@ -43,7 +42,7 @@ try {
   	print $query->info();
   }
   echo "</table>";
-
+  $query->close();
   // close session
   $session->close();
 

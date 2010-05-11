@@ -14,7 +14,7 @@ include("BaseXClient.php");
 $start = microtime(true);
 
 // command to be performed
-$cmd = "1 to 5";
+$cmd = "1 to 20000";
 
 try {
   // create session
@@ -28,6 +28,7 @@ try {
   } else {
   	print $query->info();
   }
+  $query->close();
 
   // close session
   $session->close();

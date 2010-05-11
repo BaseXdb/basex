@@ -13,7 +13,7 @@ import BaseXClient, time
 start = time.clock()
 
 # command to be performed
-cmd = "for $x in doc('input')//li return $x";
+cmd = "1 to y";
 
 try:
   # create session
@@ -25,10 +25,11 @@ try:
   if query.run():
   	# prints the results
   	while query.more():
-  		print query.next()
+   		print query.next()
   # prints the error info
   else:
   	print query.info()
+  query.close()
   	
   # close session
   session.close()
