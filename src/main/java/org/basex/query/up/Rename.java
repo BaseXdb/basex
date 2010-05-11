@@ -65,7 +65,6 @@ public final class Rename extends Update {
 
     if(test != null) {
       final byte[] uri = test.uri(rename.pref(), ctx);
-      // [LK] add flag to RenamePrimitive for new namespace
       if(uri != null && !eq(rename.uri.str(), uri)) Err.or(UPNSCONFL);
     }
     ctx.updates.add(new RenamePrimitive(targ, rename), ctx);

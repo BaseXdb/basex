@@ -273,7 +273,7 @@ public final class Namespaces {
    * @return namespaces
    */
   public byte[] table(final int s, final int e) {
-    if(root.ch.size() == 0) return Token.EMPTY;
+    if(root.size == 0) return Token.EMPTY;
 
     final Table t = new Table();
     t.header.add(TABLEID);

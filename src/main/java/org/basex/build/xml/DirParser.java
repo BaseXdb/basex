@@ -82,7 +82,7 @@ public final class DirParser extends Parser {
         parser.doc = doc;
         parser.parse(b);
 
-        if(Prop.debug && ++c % 100 == 0) Main.err(";");
+        if(Prop.debug && ++c % 1000 == 0) Main.err(";");
       }
     }
   }

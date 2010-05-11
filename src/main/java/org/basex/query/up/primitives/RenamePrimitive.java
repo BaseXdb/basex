@@ -30,16 +30,6 @@ public final class RenamePrimitive extends NewValue {
     final DBNode n = (DBNode) node;
     final Data data = n.data;
     final int pre = n.pre;
-    // [LK] namespaces rename: if nm.uri not empty and differs from current
-    /* ... add flag cause already checked in Expr Rename.java
-     * ... then update Namespaces:
-     * - find NSNode ancestor A of renamed node N.
-     * - add N as a child of A
-     * - NSNode descendant of A which is also descendant of N is added
-     * as child of N
-     * - all descendant nodes of N that don't declare a must be updated
-     * (Namespace URI id in table)
-    */
     data.rename(pre, data.kind(pre), name.str(), name.uri.str());
   }
 
