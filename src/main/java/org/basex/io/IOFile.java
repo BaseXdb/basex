@@ -46,8 +46,8 @@ public final class IOFile extends IO {
    * @param f file reference
    */
   public IOFile(final File f) {
+    super(new PathList().create(f.getAbsolutePath()));
     file = f;
-    path = new PathList().create(file.getAbsolutePath());
   }
   
   @Override
@@ -94,7 +94,7 @@ public final class IOFile extends IO {
         zip = ((ZipInputStream) is).getNextEntry();
         if(zip == null) break;
         len = zip.getSize();
-        path = zip.getName();
+        init(zip.getName());
         if(len > 0 && path.toLowerCase().endsWith(XMLSUFFIX) &&
             !zip.isDirectory()) return true;
       }

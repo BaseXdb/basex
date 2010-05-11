@@ -24,19 +24,19 @@ import org.basex.util.Token;
 public final class Export extends Proc {
   /**
    * Default constructor.
-   * @param path export path
+   * @param target export target
    */
-  public Export(final String path) {
-    this(path, null);
+  public Export(final String target) {
+    this(target, null);
   }
 
   /**
    * Default constructor, specifying an optional output filename.
-   * @param path export path
+   * @param target export path
    * @param name optional name of output file
    */
-  public Export(final String path, final String name) {
-    super(DATAREF | User.READ | User.CREATE, path, name);
+  public Export(final String target, final String name) {
+    super(DATAREF | User.READ | User.CREATE, target, name);
   }
 
   @Override
@@ -66,19 +66,24 @@ public final class Export extends Proc {
    * Exports the current database to the specified path and file.
    * @param prop property
    * @param data data reference
-   * @param path file path
-   * @param name file name
+   * @param target file path
+   * @param name optional file name
    * @throws IOException I/O exception
    */
   private static void export(final Prop prop, final Data data,
-      final String path, final String name) throws IOException {
+      final String target, final String name) throws IOException {
 
     final int[] docs = data.doc();
-    final IO io = IO.get(path);
-    if(docs.length != 1) io.md();
+    final IO root = IO.get(target);
+    
     for(final int pre : docs) {
-      final IO file = io.merge(docs.length == 1 && name != null ?
-          name : Token.string(data.text(pre, true)));
+      // create file path
+      final IO file = docs.length == 1 && name != null ? root.merge(name) :
+        IO.get(root + "/" + Token.string(data.text(pre, true)));
+
+      // create dir if necessary
+      final IO dir = IO.get(file.dir());
+      if(!dir.exists()) dir.md();
 
       // serialize nodes
       final PrintOutput po = new PrintOutput(file.path());

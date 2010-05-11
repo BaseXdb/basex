@@ -9,7 +9,6 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.util.Token;
 
 /**
  * This class parses the tokens that are delivered by the {@link XMLScanner} and
@@ -24,18 +23,6 @@ public final class XMLParser extends Parser {
   /** Builder reference. */
   private Builder builder;
 
-
-  /**
-   * Constructor.
-   * @param f file reference
-   * @param pr database properties
-   * @throws IOException I/O exception
-   */
-  public XMLParser(final IO f, final Prop pr) throws IOException {
-    super(f, pr);
-    scanner = new XMLScanner(f, pr);
-  }
-
   /**
    * Creates a new XMLParser instance for collection creation.
    * The length of the rootPath is passed in to correctly chop
@@ -45,8 +32,8 @@ public final class XMLParser extends Parser {
    * @param tar target for collection adding.
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO f, final Prop pr,
-      final String tar) throws IOException {
+  public XMLParser(final IO f, final Prop pr, final String tar)
+      throws IOException {
     super(f, pr, tar);
     scanner = new XMLScanner(f, pr);
   }
@@ -54,7 +41,7 @@ public final class XMLParser extends Parser {
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
-    if(doc) builder.startDoc(token(target + io.name()));
+    if(doc) builder.startDoc(token(target + file.name()));
     
     // loop until all tokens have been processed
     scanner.more();

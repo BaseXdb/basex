@@ -163,10 +163,10 @@ public class CmdTest {
   public final void delete() {
     no(new Delete(FILE));
     ok(new CreateColl(NAME));
-    no(new Delete(FILE));
+    ok(new Delete(FILE));
     ok(new Add(FILE));
     ok(new Delete(FILE));
-    no(new Delete(FILE));
+    ok(new Delete(FILE));
   }
 
   /** Command Test. */

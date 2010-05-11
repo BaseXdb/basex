@@ -16,7 +16,7 @@ public final class IOUrl extends IO {
    * @param u url
    */
   public IOUrl(final String u) {
-    path = u;
+    super(u);
   }
 
   @Override

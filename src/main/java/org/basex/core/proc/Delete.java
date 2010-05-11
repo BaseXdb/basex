@@ -1,11 +1,10 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.io.IO;
-import org.basex.util.Token;
 
 /**
  * Evaluates the 'delete' command and deletes a document from a collection.
@@ -16,34 +15,37 @@ import org.basex.util.Token;
 public final class Delete extends ACreate {
   /**
    * Default constructor.
-   * @param input input XML file or XML string
+   * @param target target to delete
    */
-  public Delete(final String input) {
-    super(DATAREF | User.WRITE, input);
+  public Delete(final String target) {
+    super(DATAREF | User.WRITE, target);
   }
 
   @Override
   protected boolean run() {
-    // if arg references real file delete the filename
-    // add etc/xml/input.xml > delete etc/xml/input.xml
-    final byte[] del = IO.get(args[0]).exists() ?
-        Token.token(IO.get(args[0]).name())
-        : Token.token(args[0]);
+    final String target = path(args[0]);
+    final byte[] exact = token(target);
+    final byte[] pref = token(target + "/");
 
-    int pre = -1, count = -1;
+    int c = 0;
+    final Data data = context.data;
+    final int[] docs = context.doc();
 
-    do {
-      pre = findDoc(del);
-      count++;
-      if(pre == -1) break;
-      final Data data = context.data;
+    // loop through all documents in reverse order
+    for(int d = docs.length - 1; d >= 0; d--) {
+      final int pre = docs[d];
+      final byte[] name = context.data.text(pre, true);
+      // delete all exact matches and all sub directories
+      if(!eq(name, exact) && !startsWith(name, pref)) continue;
       data.delete(pre);
+      c++;
+    }
+    // data was changed: update context
+    if(c != 0) {
       data.flush();
       context.update();
-    }while(true);
-    
-    //[MS] Add number of deleted documents to info
-    return (count == 0) ? error(DBNODOC, args[0]) : info(DOCDELETED, del, perf);
+    }
+    return info(PATHDELETED, c, perf);
   }
 
   @Override

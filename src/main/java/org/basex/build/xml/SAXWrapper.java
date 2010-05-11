@@ -1,8 +1,6 @@
 package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
@@ -14,7 +12,6 @@ import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
-import org.basex.util.Token;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
@@ -40,17 +37,13 @@ public final class SAXWrapper extends Parser {
   /** File length. */
   private long length;
 
-//  /** Length of the root part. */
-//  private String target;
-
   /**
    * Constructor.
    * @param s sax source
    * @param pr database properties
    * @param ta Target to insert into.
    */
-  public SAXWrapper(final SAXSource s, 
-      final Prop pr, final String ta) {
+  public SAXWrapper(final SAXSource s, final Prop pr, final String ta) {
     super(IO.get(s.getSystemId()), pr, ta);
     source = s;
   }
@@ -67,10 +60,7 @@ public final class SAXWrapper extends Parser {
         r = f.newSAXParser().getXMLReader();
       }
 
-      final byte[] sp = Token.concat(Token.token(target),
-          Token.token(io.name()));
-
-      sax = new SAXHandler(build, string(sp));
+      sax = new SAXHandler(build, target + file.name());
       sax.doc = doc;
       r.setDTDHandler(sax);
       r.setContentHandler(sax);
@@ -102,10 +92,10 @@ public final class SAXWrapper extends Parser {
    * @throws IOException I/O exception
    */
   private InputSource wrap(final InputSource is) throws IOException {
-    if(!(io instanceof IOFile) || is == null || is.getByteStream() != null
+    if(!(file instanceof IOFile) || is == null || is.getByteStream() != null
         || is.getSystemId() == null || is.getSystemId().isEmpty()) return is;
 
-    final InputSource in = new InputSource(new FileInputStream(io.path()) {
+    final InputSource in = new InputSource(new FileInputStream(file.path()) {
       @Override
       public int read(final byte[] b, final int off, final int len)
           throws IOException {
@@ -118,7 +108,7 @@ public final class SAXWrapper extends Parser {
     });
     source.setInputSource(in);
     source.setSystemId(is.getSystemId());
-    length = io.length();
+    length = file.length();
     return in;
   }
 
@@ -129,7 +119,7 @@ public final class SAXWrapper extends Parser {
 
   @Override
   public String det() {
-    return length == 0 ? super.det() : Main.info(SCANPOS, io.name(), line);
+    return length == 0 ? super.det() : Main.info(SCANPOS, file.name(), line);
   }
 
   @Override

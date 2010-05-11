@@ -25,8 +25,8 @@ public final class IOContent extends IO {
    * @param p content path
    */
   public IOContent(final byte[] c, final String p) {
+    super(p);
     cont = c;
-    path = p;
   }
 
   @Override

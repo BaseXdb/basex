@@ -18,7 +18,8 @@ public class ImportColl extends Add {
    * @param input input XML string
    */
   public ImportColl(final String name, final String input) {
-      super(name, input);
+    // [AW] to be revised... 'import coll' is expected to work on open database
+    super(name, input);
   }
   
   @Override

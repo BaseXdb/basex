@@ -41,15 +41,32 @@ public abstract class IO {
   public static final long NUMOFF = 0x8000000000L;
 
   /** File path and name. */
-  protected String path = "";
+  protected String path;
+  /** File name. */
+  protected String name;
   /** File contents. */
   protected byte[] cont;
-
   /** First call. */
   protected boolean more;
 
-  /** Empty Constructor. */
-  protected IO() { }
+  /**
+   * Protected constructor.
+   * @param p path
+   */
+  protected IO(final String p) {
+    init(p);
+  }
+
+  /**
+   * Sets the file path and name.
+   * @param p file path
+   */
+  protected void init(final String p) {
+    path = p;
+    // use timer if no name is given
+    final String n = path.substring(path.lastIndexOf('/') + 1);
+    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) : n;
+  }
 
   /**
    * Constructor.
@@ -161,24 +178,22 @@ public abstract class IO {
 
   /**
    * Chops the path and the XML suffix of the specified filename
-   * and returns the database name. If no name can be extracted, "database"
-   * will be used as default name.
+   * and returns the database name.
    * @return database name
    */
   public final String dbname() {
     final String n = name();
     final int i = n.lastIndexOf(".");
-    final String nm = i != -1 ? n.substring(0, i) : n;
-    // [CG] IO: default database name
-    return nm.isEmpty() ? "database" : nm.replaceAll("[^\\w.-]", "");
+    return (i != -1 ? n.substring(0, i) : n).replaceAll("[^\\w.-]", "");
   }
 
   /**
-   * Chops the path of the specified filename.
+   * Chops the path of the specified filename. If no name can be extracted,
+   * the current number of milliseconds is used as name.
    * @return file name
    */
   public final String name() {
-    return path.substring(path.lastIndexOf('/') + 1);
+    return name;
   }
 
   /**

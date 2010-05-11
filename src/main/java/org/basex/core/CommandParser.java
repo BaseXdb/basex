@@ -142,16 +142,7 @@ public final class CommandParser extends InputParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        final String str1 = string(cmd); // Document Name
-        String str2 = null;
-        if(key(INTO, null)) {
-          str2 = string(cmd); // Optional target
-        }
-        // final String str3 = leftover(cmd); // optional xml contents *TODO*
-        // Andi?
-                                           // :-)
-        if(null != str2) return new Add(str1, str2, true);
-        return new Add(str1);
+        return new Add(string(cmd), key(INTO, null) ? string(cmd) : null);
       case DELETE:
         return new Delete(string(cmd));
       case INFO: case I:
@@ -164,7 +155,7 @@ public final class CommandParser extends InputParser {
             return new InfoIndex(consume(CmdIndexInfo.class, null));
           case TABLE:
             String arg1 = number(null);
-            final String arg2 = arg1 != null ? number(null) : null;
+            String arg2 = arg1 != null ? number(null) : null;
             if(arg1 == null) arg1 = xquery(null);
             return new InfoTable(arg1, arg2);
         }

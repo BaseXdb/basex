@@ -18,65 +18,39 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public class Add extends ACreate {
-
-  /** Target path for collections. */
-  private String target;
-
   /**
    * Default constructor.
    * @param input input XML file or XML string
    */
   public Add(final String input) {
-    super(DATAREF | User.WRITE, input);
-    this.target = "";
+    this(input, null);
   }
 
   /**
-   * Default constructor.
-   * @param name name of database
+   * Constructor, specifying a target.
    * @param input input XML file or XML string
-   */
-  public Add(final String name, final String input) {
-    super(DATAREF | User.WRITE, name, input);
-    this.target = "";
-  }
-
-  /**
-   * ADD <code>doc</code> INTO <code>targetPath</code>.
-   * @param input doc
    * @param ta target
-   * @param a add to collection: allow coexsitence with
-   *          {@link #Add(String, String)}.
    */
-  public Add(final String input, final String ta,
-      @SuppressWarnings("unused") final boolean a) {
-    super(DATAREF | User.WRITE, input);
-    String tr = ta + "/";
-    tr = tr.replaceAll("//+", "/");
-    this.target = tr.startsWith("/") ? tr.substring(1) : tr;
+  public Add(final String input, final String ta) {
+    super(DATAREF | User.WRITE, input, ta == null ? "" : ta);
   }
 
   @Override
   protected boolean run() {
-    IO io;
-    String name;
-    String dbname;
+    final IO io = IO.get(args[0]);
+    if(!io.exists()) return error(FILEWHICH, io);
+
+    final String name = io.name();
+    final String dbname = io.dbname();
+
+    /* [AW] to be revised
     if(args.length == 2) {
       io = IO.get(args[1]);
       name = args[0];
       dbname = name;
-    } else {
-      io = IO.get(args[0]);
-      name = io.name();
-      dbname = io.dbname();
-    }
-    if(!io.exists()) return error(FILEWHICH, io);
-    
-//    final int pre = findDoc(Token.token(target + io.name()));
-//    if(pre != -1) return error(DBDOC, args[0]); // checks only
-    
-    final DirParser p = new DirParser(io, context.prop, target);
+    }*/
 
+    final DirParser p = new DirParser(io, context.prop, path(args[1]));
     MemData d = null;
     try {
       d = new MemBuilder(p).build(dbname);
@@ -85,11 +59,12 @@ public class Add extends ACreate {
       final String msg = ex.getMessage();
       return error(msg != null ? msg : name);
     }
+
     final Data data = context.data;
     data.insert(data.meta.size, -1, d);
     data.flush();
     context.update();
-    return info(DOCADDED, name, perf);
+    return info(PATHADDED, name, perf);
   }
 
   @Override

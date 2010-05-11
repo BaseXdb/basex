@@ -15,25 +15,25 @@ import org.basex.util.Atts;
  * to well-formed XML.
  *
  * TagSoup was written by John Cowan and licensed under Apache 2.0
- * http://home.ccil.org/~cowan/XML/tagsoup/
+ * {@code http://home.ccil.org/~cowan/XML/tagsoup/}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class Parser extends Progress {
-  /** Temporary attribute array. */
-  protected final Atts atts = new Atts();
-  /** Optional HTML parser. */
-  private static HTMLParser html;
   /** Document flag; if true, a document node is added. */
   public boolean doc = true;
   /** Database properties. */
   public Prop prop;
   /** Input file. */
-  public IO io;
+  public IO file;
 
-  /** Explicit set root dir for the current file. */
+  /** Temporary attribute array. */
+  protected final Atts atts = new Atts();
+  /** Target path. */
   protected final String target;
+  /** Optional HTML parser. */
+  private static HTMLParser html;
 
   // Check for existence of TagSoup.
   static {
@@ -56,7 +56,7 @@ public abstract class Parser extends Progress {
    * @param t target path
    */
   public Parser(final IO f, final Prop pr, final String t) {
-    io = f;
+    file = f;
     prop = pr;
     target = t;
   }
@@ -73,7 +73,6 @@ public abstract class Parser extends Progress {
       final String target) throws IOException {
     // optionally convert HTML input to well-formed xml
     final IO io = html != null ? html.toXML(in) : in;
-
     // use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(io, prop, target);
     // use default parser

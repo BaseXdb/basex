@@ -1,9 +1,7 @@
 package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
-
 import java.io.IOException;
-
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Main;
@@ -25,7 +23,7 @@ public final class DirParser extends Parser {
   /** Element counter. */
   private int c;
   /** Initial file path. */
-  private final IO root;
+  private String root;
 
   /**
    * Constructor.
@@ -35,25 +33,18 @@ public final class DirParser extends Parser {
   public DirParser(final IO f, final Prop pr) {
     this(f, pr, "");
   }
+
   /**
-   * Constructor with a explicit root directory set.
-   * This method is currently only used by {@link org.basex.core.proc.Add}
-   * to keep relative path information associated with the document node.
+   * Constructor, specifying a target path.
    * @param f file reference
    * @param pr database properties
-   * @param t Explicit target directory for collection handling.
+   * @param t target path
    */
   public DirParser(final IO f, final Prop pr, final String t) {
     super(f, pr, t);
-    root = IO.get(f.path());
-    checkFilter(f, pr);    
-  }
-  /**
-   * Checks filter parameters.
-   * @param f file
-   * @param pr properties
-   */
-  private void checkFilter(final IO f, final Prop pr) {
+    root = f.getDir();
+    if(!root.endsWith("/")) root += "/";
+
     if(f.isDir()) {
       filter = pr.get(Prop.CREATEFILTER).replaceAll("\\*", ".*");
       if(!filter.contains(".")) filter = ".*" + filter + ".*";
@@ -65,12 +56,12 @@ public final class DirParser extends Parser {
   @Override
   public void parse(final Builder b) throws IOException {
     b.meta.filesize = 0;
-    parse(b, io);
-    b.meta.file = root;
+    b.meta.file = IO.get(file.path());
+    parse(b, file);
   }
 
   /**
-   * Parses the specified file or parser its children.
+   * Parses the specified file or its children.
    * @param b builder
    * @param path file path
    * @throws IOException I/O exception
@@ -79,42 +70,21 @@ public final class DirParser extends Parser {
     if(path.isDir()) {
       for(final IO f : path.children()) parse(b, f);
     } else {
-      io = path;
+      file = path;
       while(path.more()) {
         if(!path.name().matches(filter)) continue;
-        b.meta.filesize += io.length();
+        b.meta.filesize += file.length();
 
-        // check for relative pathdelet / collections:
-        // if relative part is found the document is added with relative
-        // path information.
-        // Else: the document is added "flat".
-        //target.f
-        
-        // check for: HTTP/IOURL ok, ZIP ok, <XML/>, ...
-        final String t2 = buildTargetPath();
-        parser = Parser.xmlParser(io, prop, t2);
+        // extract target path
+        final String trg = (target + '/' + file.path().replaceAll(
+            "^" + root + "|" + file.name() + "$", "")).replaceAll("^/", "");
+        parser = Parser.xmlParser(file, prop, trg);
         parser.doc = doc;
         parser.parse(b);
+
         if(Prop.debug && ++c % 100 == 0) Main.err(";");
       }
     }
-  }
-  /**
-   * This method returns the path prefix for document nodes.
-   * Files/Urls are either added:
-   *  flat, if a single file has to be added
-   *  or with the prepended target{@link #target} if it is not empty.
-   * 
-   * In case of adding folders the relative path information is
-   * appended to an optionally set target. 
-   * @return the target path for adding.
-   */
-  private String buildTargetPath() {
-    final String rd = root.getDir().endsWith("/") ? root.getDir()
-        : root.getDir() + "/";
-    final String t2 = target
-        + io.path().replace(rd, "").replace(io.name(), "");
-    return t2.startsWith("/") ? t2.substring(1) : t2;
   }
 
   @Override
