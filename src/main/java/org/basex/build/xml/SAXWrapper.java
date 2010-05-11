@@ -40,8 +40,8 @@ public final class SAXWrapper extends Parser {
   /** File length. */
   private long length;
 
-  /** Length of the root part. */
-  private String target;
+//  /** Length of the root part. */
+//  private String target;
 
   /**
    * Constructor.
@@ -51,8 +51,7 @@ public final class SAXWrapper extends Parser {
    */
   public SAXWrapper(final SAXSource s, 
       final Prop pr, final String ta) {
-    super(IO.get(s.getSystemId()), pr);
-    target = ta;
+    super(IO.get(s.getSystemId()), pr, ta);
     source = s;
   }
 

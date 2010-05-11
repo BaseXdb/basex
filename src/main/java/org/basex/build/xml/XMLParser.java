@@ -24,8 +24,6 @@ public final class XMLParser extends Parser {
   /** Builder reference. */
   private Builder builder;
 
-  /** Length of the root path prefix. */
-  private String target = "";
 
   /**
    * Constructor.
@@ -49,18 +47,15 @@ public final class XMLParser extends Parser {
    */
   public XMLParser(final IO f, final Prop pr,
       final String tar) throws IOException {
-    super(f, pr);
-    this.target = tar;
+    super(f, pr, tar);
     scanner = new XMLScanner(f, pr);
   }
 
   @Override
   public void parse(final Builder build) throws IOException {
     builder = build;
-    final byte[] sp = Token.concat(Token.token(target),
-        Token.token(io.name()));
-    if(doc) builder.startDoc(sp);
-
+    if(doc) builder.startDoc(token(target + io.name()));
+    
     // loop until all tokens have been processed
     scanner.more();
     while(true) {
