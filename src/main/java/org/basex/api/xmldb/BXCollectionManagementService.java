@@ -27,7 +27,7 @@ final class BXCollectionManagementService implements
   private BXCollection coll;
 
   /**
-   * Standard Constructor.
+   * Default constructor.
    * @param c Collection reference
    */
   BXCollectionManagementService(final BXCollection c) {

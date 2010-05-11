@@ -204,7 +204,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     private final BXXMLResource res;
 
     /**
-     * Standard Constructor.
+     * Default constructor.
      * @param r resource
      * @throws IOException I/O exception
      */

@@ -42,7 +42,7 @@ final class XMLStreamWrapper extends Parser {
   @Override
   public void parse(final Builder builder) throws IOException {
     try {
-      builder.startDoc(token(io.name()));
+      builder.startDoc(token(file.name()));
       while(reader.hasNext()) {
         final int kind = reader.next();
         switch(kind) {
@@ -98,7 +98,7 @@ final class XMLStreamWrapper extends Parser {
 
   @Override
   public String det() {
-    return Main.info(NODESPARSED, io.name(), nodes);
+    return Main.info(NODESPARSED, file.name(), nodes);
   }
 
   @Override

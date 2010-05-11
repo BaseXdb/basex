@@ -25,7 +25,7 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
   private final Collection coll;
 
   /**
-   * Standard Constructor with result.
+   * Default constructor with result.
    * @param r result
    * @param c collection
    */
