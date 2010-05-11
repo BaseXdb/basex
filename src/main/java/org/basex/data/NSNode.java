@@ -1,7 +1,11 @@
 package org.basex.data;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.TokenBuilder;
@@ -14,7 +18,7 @@ import org.basex.util.TokenBuilder;
  */
 final class NSNode {
   /** Children. */
-  NSNode[] ch;
+  List<NSNode> ch;
   /** Parent node. */
   NSNode par;
   /** References to Prefix/URI pairs. */
@@ -28,7 +32,7 @@ final class NSNode {
    */
   NSNode(final int p) {
     vals = new int[0];
-    ch = new NSNode[0];
+    ch = new ArrayList<NSNode>();
     pre = p;
   }
 
@@ -43,8 +47,8 @@ final class NSNode {
     pre = in.readNum();
     vals = in.readNums();
     final int cl = in.readNum();
-    ch = new NSNode[cl];
-    for(int c = 0; c < cl; c++) ch[c] = new NSNode(in, this);
+    ch = new LinkedList<NSNode>();
+    for(int c = 0; c < cl; c++) ch.add(new NSNode(in, this));
   }
 
   /**
@@ -55,7 +59,7 @@ final class NSNode {
   void write(final DataOutput out) throws IOException {
     out.writeNum(pre);
     out.writeNums(vals);
-    out.writeNum(ch.length);
+    out.writeNum(ch.size());
     for(final NSNode c : ch) c.write(out);
   }
 
@@ -65,22 +69,18 @@ final class NSNode {
    * @return node
    */
   NSNode add(final NSNode n) {
-    int s = ch.length;
+    int s = ch.size();
     while(--s >= 0) {
-      final int d = n.pre - ch[s].pre;
+      final int d = n.pre - ch.get(s).pre;
       if(d > 0) break;
       if(d <= 0) continue;
       // [CG] XQUP: check if this is called at all
-      for(int v = 0; v < n.vals.length; v += 2) {
-        ch[s].add(n.vals[v], n.vals[v + 1]);
-      }
-      return this;
+//      for(int v = 0; v < n.vals.length; v += 2) {
+//        ch.get(s).add(n.vals[v], n.vals[v + 1]);
+//      }
+//      return this;
     }
-    final NSNode[] tmp = new NSNode[ch.length + 1];
-    tmp[++s] = n;
-    System.arraycopy(ch, 0, tmp, 0, s);
-    System.arraycopy(ch, s, tmp, s + 1, ch.length - s);
-    ch = tmp;
+    ch.add(++s, n);
     n.par = this;
     return n;
   }
@@ -106,7 +106,7 @@ final class NSNode {
    */
   NSNode find(final int p) {
     final int s = fnd(p);
-    return s == -1 ? this : ch[s].pre == p ? ch[s] : ch[s].find(p);
+    return s == -1 ? this : ch.get(s).pre == p ? ch.get(s) : ch.get(s).find(p);
   }
 
   /**
@@ -127,15 +127,9 @@ final class NSNode {
    */
   void delete(final int p, final int sz) {
     int s = fnd(p);
-    if(s == -1 || ch[s].pre != p) s++;
-    int e = s;
-    while(e < ch.length && p + sz > ch[e].pre) e++;
-    if(s != e) {
-      final NSNode[] nd = new NSNode[ch.length - e + s];
-      System.arraycopy(ch, 0, nd, 0, s);
-      System.arraycopy(ch, e, nd, s, ch.length - e);
-      ch = nd;
-    }
+    if(s == -1 || ch.get(s).pre != p) s++;
+    int c = sz;
+    while(c-- > 0 && ch.size() > s) ch.remove(s);
     update(s, -sz);
   }
 
@@ -145,9 +139,9 @@ final class NSNode {
    * @param o offset
    */
   private void update(final int s, final int o) {
-    for(int c = s; c < ch.length; c++) {
-      ch[c].pre += o;
-      ch[c].update(0, o);
+    for(int c = s; c < ch.size(); c++) {
+      ch.get(c).pre += o;
+      ch.get(c).update(0, o);
     }
   }
 
@@ -158,10 +152,10 @@ final class NSNode {
    * @return node
    */
   private int fnd(final int p) {
-    int l = 0, h = ch.length - 1;
+    int l = 0, h = ch.size() - 1;
     while(l <= h) { // binary search
       final int m = l + h >>> 1;
-      final int v = ch[m].pre;
+      final int v = ch.get(m).pre;
       if(v == p) return m;
       if(v < p) l = m + 1;
       else h = m - 1;
