@@ -31,7 +31,7 @@ public final class TagSoupExample {
   /** Output stream. */
   static final OutputStream OUT = System.out;
 
-  /** Private Constructor. */
+  /** Private constructor. */
   private TagSoupExample() { }
 
   /**

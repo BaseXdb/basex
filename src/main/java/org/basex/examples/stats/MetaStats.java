@@ -19,7 +19,7 @@ public final class MetaStats extends Statistics {
   public static void main(final String[] args) {
     new MetaStats(args);
   }
-  
+
   /**
    * Constructor.
    * @param args command-line arguments

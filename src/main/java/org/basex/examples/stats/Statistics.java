@@ -91,7 +91,7 @@ public abstract class Statistics {
    * @throws BaseXException exception
    */
   abstract void analyze(final TokenList tl) throws BaseXException;
-  
+
   /**
    * Executes the specified command and returns the result as string.
    * @param cmd command
@@ -104,7 +104,7 @@ public abstract class Statistics {
     cmd.execute(ctx, co);
     return co.toString();
   }
-  
+
   /**
    * Parses the command-line arguments.
    * @param args command-line arguments

@@ -1,10 +1,8 @@
 package org.basex.examples.stats;
 
 import static org.basex.data.DataText.*;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
@@ -24,7 +22,7 @@ import org.basex.util.TokenList;
 public final class IndexStats extends Statistics {
   /** Index pattern. */
   private static final Pattern INDEX = Pattern.compile("Entries: (\\d+)");
-  
+
   /**
    * Main method of the example class.
    * @param args command-line arguments
@@ -32,7 +30,7 @@ public final class IndexStats extends Statistics {
   public static void main(final String[] args) {
     new IndexStats(args);
   }
-  
+
   /**
    * Constructor.
    * @param args command-line arguments
@@ -94,7 +92,7 @@ public final class IndexStats extends Statistics {
     String inf = exec(new InfoIndex(index));
     final Matcher m = INDEX.matcher(inf);
     String entries = m.find() ? m.group(1) : "xxx";
-    
+
     exec(new DropIndex(index));
     return new String[] { format(l), entries };
   }

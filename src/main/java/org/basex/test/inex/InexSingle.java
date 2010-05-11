@@ -169,7 +169,7 @@ public final class InexSingle {
       arg.check(false);
     }
     if(quindex == -1) arg.check(false);
-    
+
     return arg.finish();
   }
 }

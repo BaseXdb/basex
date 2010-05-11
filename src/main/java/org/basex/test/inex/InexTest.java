@@ -221,7 +221,7 @@ public final class InexTest {
       }
     }
     if(!arg.finish()) return false;
-    
+
     try {
       session = new ClientSession(ctx, ADMIN, ADMIN);
       session.execute(new Set(Prop.INFO, true));
