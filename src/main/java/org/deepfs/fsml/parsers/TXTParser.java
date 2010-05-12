@@ -40,7 +40,7 @@ public final class TXTParser implements IFileParser {
     try {
       final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
       final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
-      return Token.isValidUTF8(bfc.get(new byte[len]));
+      return Token.valid(bfc.get(new byte[len]));
     } catch(final Exception e) {
       return false;
     }
@@ -52,7 +52,7 @@ public final class TXTParser implements IFileParser {
 
     final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
     final byte[] text = bfc.get(new byte[len]);
-    final boolean valid = Token.isValidUTF8(text);
+    final boolean valid = Token.valid(text);
 
     if(deepFile.extractText() && valid)
       deepFile.addText(0, len, Token.string(text));

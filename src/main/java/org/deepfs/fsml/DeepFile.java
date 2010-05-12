@@ -22,7 +22,6 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Type;
 import org.basex.util.Atts;
-import org.basex.util.Token;
 import org.basex.util.XMLToken;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.parsers.IFileParser;
@@ -463,7 +462,7 @@ public final class DeepFile {
     if(value == null) return;
     if(!Type.STR.instance(elem.getType()))
       metaDebug(elem, "string - as byte array");
-    else addMeta(elem, string(removeNonUTF8(value, true)), null);
+    else addMeta(elem, string(clean(value, true)), null);
   }
 
   /**
@@ -474,7 +473,7 @@ public final class DeepFile {
   public void addMeta(final MetaElem elem, final String value) {
     if(value == null) return;
     if(!checkType(elem, Type.STR)) return;
-    addMeta(elem, string(removeNonUTF8(Token.token(value), true)), null);
+    addMeta(elem, string(clean(token(value), true)), null);
   }
 
   /**

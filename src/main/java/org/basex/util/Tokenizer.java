@@ -88,7 +88,7 @@ public final class Tokenizer implements IndexToken {
    * @param pr (optional) database properties
    */
   public Tokenizer(final Prop pr) {
-    this(Token.EMPTY, pr);
+    this(EMPTY, pr);
   }
 
   /**
@@ -342,19 +342,28 @@ public final class Tokenizer implements IndexToken {
 
   /**
    * Removes diacritics from the specified token.
-   * Note that this method does only support the conversion of the standard
-   * character set.
+   * This method supports all latin1 characters, including supplements.
    * @param t token to be converted
    * @param a ascii flag
    * @return converted token
    */
   private static byte[] dia(final byte[] t, final boolean a) {
     if(a) return t;
-    final String s = utf8(t, 0, t.length);
-    final TokenBuilder sb = new TokenBuilder();
-    final int jl = s.length();
-    for(int j = 0; j < jl; j++) sb.addUTF(Token.norm(s.charAt(j)));
-    return sb.finish();
+
+    // find first character to be normalized
+    final int tl = t.length;
+    for(int i = 0; i < tl; i += cl(t[i])) {
+      int c = cp(t, i);
+      // normalized character found; run conversion
+      if(c != norm(c)) {
+        final TokenBuilder tb = new TokenBuilder();
+        tb.add(t, 0, i);
+        for(int j = i; j < tl; j += cl(t[j])) tb.addUTF(norm(cp(t, j)));
+        return tb.finish();
+      }
+    }
+    // return original character
+    return t;
   }
 
   /**

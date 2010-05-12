@@ -70,7 +70,7 @@ final class HTMLParser {
 
       // define input
       final InputSource is = new InputSource(new ByteArrayInputStream(content));
-      is.setEncoding(Charset.isSupported(enc) ? enc(enc, null) : UTF8);
+      is.setEncoding(Charset.isSupported(enc) ? code(enc, null) : UTF8);
       // define output
       final StringWriter sw = new StringWriter();
       final XMLReader parser = getHTMLReader();
