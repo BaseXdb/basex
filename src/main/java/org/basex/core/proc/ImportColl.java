@@ -13,12 +13,10 @@ import org.basex.core.Commands.CmdImport;
 public class ImportColl extends Add {
   /**
    * Default constructor.
-   * @param name of the document
    * @param input input XML string
    */
-  public ImportColl(final String name, final String input) {
-    // [AW] to be revised... 'import coll' is expected to work on open database
-    super(name, input);
+  public ImportColl(final String input) {
+    super(input);
   }
 
   @Override

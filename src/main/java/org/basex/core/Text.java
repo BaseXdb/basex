@@ -227,11 +227,17 @@ public interface Text {
     "[" + PATH + "] [" + NAM + "?]", lang("ch_export1"),
     lang("ch_export2", PATH + "/" + NAM + "?")
   };
-  /** Command help. */
-  String[] HELPIMPORT = {
-    "DB | COLL [" + NAM + "] [xml string]", lang("ch_import1"),
-    lang("ch_import2", "xml string")
-  };
+  
+  /** Import help. */
+  String[] HELPIMPORT = {"[" + CmdCreate.DB + "|"
+      + CmdCreate.COLL + "] [" + NAM + "?] [...]",
+  lang("ch_import1"),
+  lang("ch_import2") + NL +
+  LI + CmdCreate.DB + " [" + NAM + "] [XML]:" + NL +
+    "  " + lang("ch_import3", NAM) + NL +
+  LI + CmdCreate.COLL + " [XML]:" + NL +
+    "  " + lang("ch_import4")};
+
   /** Command help. */
   String[] HELPOPTIMIZE = {
     "", lang("ch_optimize1"), lang("ch_optimize2")

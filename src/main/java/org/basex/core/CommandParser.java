@@ -185,7 +185,7 @@ public final class CommandParser extends InputParser {
           case DATABASE: case DB:
             return new ImportDB(name(cmd), leftover(null));
           case COLLECTION: case COLL:
-            return new ImportColl(name(cmd), leftover(null));
+            return new ImportColl(leftover(null));
         }
         break;
       case XQUERY: case X:

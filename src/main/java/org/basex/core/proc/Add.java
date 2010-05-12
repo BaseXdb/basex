@@ -43,13 +43,6 @@ public class Add extends ACreate {
     final String name = io.name();
     final String dbname = io.dbname();
 
-    /* [AW] to be revised
-    if(args.length == 2) {
-      io = IO.get(args[1]);
-      name = args[0];
-      dbname = name;
-    }*/
-
     final DirParser p = new DirParser(io, context.prop, path(args[1]));
     MemData d = null;
     try {
