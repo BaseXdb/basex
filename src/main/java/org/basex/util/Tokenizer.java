@@ -75,7 +75,6 @@ public final class Tokenizer implements IndexToken {
   /** Last character position. */
   private int lp;
 
-
   /** Character start position. */
   private int s;
   /** Number of tokens. */
@@ -174,6 +173,7 @@ public final class Tokenizer implements IndexToken {
         if(bs) continue;
         if(c == '.') break;
       }
+      // [CG] XQFT: support other languages (Jap./Chin.: U+3002, etc.)
       if(!sn && (c == '.' || c == '!' || c == '?')) {
         sn = true;
         sent++;
@@ -317,7 +317,6 @@ public final class Tokenizer implements IndexToken {
         : Arrays.copyOfRange(text, p, s);
   }
 
-
   /**
    * Calculates a position value, dependent on the specified unit.
    * Once calculated values are cached.
@@ -373,9 +372,14 @@ public final class Tokenizer implements IndexToken {
    * @return the converted token
    */
   private static byte[] upper(final byte[] t, final boolean a) {
-    if(!a) return token(string(t).toUpperCase());
-    for(int i = 0; i < t.length; i++) t[i] = (byte) uc(t[i]);
-    return t;
+    final int tl = t.length;
+    if(a) {
+      for(int i = 0; i < tl; i++) t[i] = (byte) uc(t[i]);
+      return t;
+    }
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = 0; i < tl; i += cl(t[i])) tb.addUTF(uc(cp(t, i)));
+    return tb.finish();
   }
 
   /**
@@ -385,9 +389,14 @@ public final class Tokenizer implements IndexToken {
    * @return the converted token
    */
   private static byte[] lower(final byte[] t, final boolean a) {
-    if(!a) return token(string(t).toLowerCase());
-    for(int i = 0; i < t.length; i++) t[i] = (byte) lc(t[i]);
-    return t;
+    final int tl = t.length;
+    if(a) {
+      for(int i = 0; i < tl; i++) t[i] = (byte) lc(t[i]);
+      return t;
+    }
+    final TokenBuilder tb = new TokenBuilder();
+    for(int i = 0; i < tl; i += cl(t[i])) tb.addUTF(lc(cp(t, i)));
+    return tb.finish();
   }
 
   /**

@@ -231,7 +231,6 @@ public final class DialogServer extends Dialog {
     p.add(refreshSess, BorderLayout.EAST);
     sess.add(p, BorderLayout.SOUTH);
 
-
     // Logging Tab
     logs.setLayout(new BorderLayout());
     logs.setBorder(8, 8, 8, 8);

@@ -686,7 +686,6 @@ public final class TreeView extends View implements TreeViewOptions {
           g.fillRect(df, getYperLevel(lvv), ww, nodeHeight + 1);
       }
 
-
 //       if(lvv + 1 < cache.getHeight(rn) && !cache.isBigRectangle(rn,
 //      lvv + 1)) {
 //       final Data d = gui.context.current.data;

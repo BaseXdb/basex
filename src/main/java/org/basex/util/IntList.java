@@ -41,7 +41,6 @@ public class IntList {
     factor = f;
   }
 
-
   /**
    * Constructor, specifying an initial array.
    * @param v initial list values

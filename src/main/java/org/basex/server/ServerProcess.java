@@ -152,7 +152,6 @@ public final class ServerProcess extends Thread {
     }
   }
 
-
   /**
    * Query is executed in iterate mode.
    * @throws IOException Exception

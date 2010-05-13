@@ -230,7 +230,6 @@ public class NamespaceTest {
     context.close();
   }
 
-
   /**
    * Runs a query and matches the result against the expected output.
    * @param query query

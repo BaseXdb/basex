@@ -1,6 +1,5 @@
 package org.basex.gui.view.tree;
 
-
 /**
  * This is class is used to handle rectangles.
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License

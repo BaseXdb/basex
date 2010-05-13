@@ -994,7 +994,7 @@ public final class Token {
    * @return result of check
    */
   public static boolean ftChar(final int ch) {
-    return ch >= '0' && (ch < 128 ? LOD[ch - '0'] :
+    return ch >= '0' && (ch < 0x80 ? LOD[ch - '0'] :
       Character.isLetterOrDigit(ch));
   }
 
@@ -1032,7 +1032,7 @@ public final class Token {
    * @return resulting character
    */
   public static int uc(final int ch) {
-    return ch >= 'a' && ch <= 'z' ? ch - 32 :
+    return ch >= 'a' && ch <= 'z' ? ch - 0x20 :
       ch > 0x7F ? Character.toUpperCase(ch) : ch;
   }
 
@@ -1107,7 +1107,7 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder();
     for(int t = 0; t < tl; t++) {
       final byte b = token[t];
-      if(b >= 32 && b <= 126) tb.add(b);
+      if(b >= 0x20 && b <= 0x7e) tb.add(b);
       else hex(tb, b);
     }
     return tb.finish();
@@ -1154,7 +1154,6 @@ public final class Token {
    * @return resulting character
    */
   public static int norm(final int ch) {
-    // [CG] Unicode: check when characters get too large
     return ch < 0x80 || ch >= 0x200 ? ch : ch()[ch];
   }
 
