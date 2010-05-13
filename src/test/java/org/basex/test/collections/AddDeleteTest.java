@@ -22,7 +22,7 @@ import org.junit.Test;
 public class AddDeleteTest {
   /** Database context. */
   private static final Context CTX = new Context();
-  
+
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
   /** Test folder. */
@@ -31,12 +31,12 @@ public class AddDeleteTest {
   private static final String URL = "http://www.inf.uni-konstanz.de/"
       + "dbis/basex/dl/xmark.xml";
   /** Test Zipfile, same as etc/xml. */
-  private static final String ZIPFILE = "etc/xml.zip";
+  private static final String ZIPFILE = "etc/xml/xml.zip";
   /** Test GZIPfile. */
-  private static final String GZIPFILE = "etc/build.xml.gz";
+  private static final String GZIPFILE = "etc/xml/build.xml.gz";
   /** Test DB name. */
   private static final String NAME = "CollectionUnitTest";
-  
+
   /** Number of XML files for folder. */
   static final int FCNT;
   static {
@@ -44,7 +44,7 @@ public class AddDeleteTest {
     for(IO c : IO.get(FLDR).children()) {
       if(c.name().endsWith(".xml")) fc++;
     }
-    FCNT = fc;
+    FCNT = fc + 4; // +4 for the zipfile
   }
 
   /**
@@ -90,14 +90,15 @@ public class AddDeleteTest {
   @Test
   public void testAddZip() throws Exception {
     new Add(ZIPFILE, "target").execute(CTX);
-    assertEquals(FCNT, CTX.doc().length);
+    assertEquals(4, CTX.doc().length);
   }
 
   /**
    * Add / Delete URL.
+   * Disabled to allow "offline" execution.
    * @throws Exception ex.
    */
-  @Test
+  // @Test 
   public void testAddUrl() throws Exception {
     new Add(URL).execute(CTX);
     new Add(URL, "bar").execute(CTX);
@@ -118,7 +119,7 @@ public class AddDeleteTest {
   }
 
   /**
-   *Add Folder. 
+   * Add Folder. As etc/xml contains a zipfile it is added as well.
    * @throws Exception ex
    */
   @Test
