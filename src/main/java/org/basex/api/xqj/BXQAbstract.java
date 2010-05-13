@@ -1,6 +1,5 @@
 package org.basex.api.xqj;
 
-
 import static org.basex.api.xqj.BXQText.*;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;

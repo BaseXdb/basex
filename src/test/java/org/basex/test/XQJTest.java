@@ -481,7 +481,6 @@ public final class XQJTest extends TestCase {
     xqs = xqe.executeQuery("declare variable $v external; $v");
   }
 
-
   /**
    * Test.
    * @throws Exception exception
