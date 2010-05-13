@@ -83,7 +83,6 @@ public final class Part4 extends Main {
     }
     System.out.println();
 
-
     // Create items from atomic values
     info("Create items from atomic values");
 
@@ -101,7 +100,6 @@ public final class Part4 extends Main {
     binaryData.writeItem(System.out, null);
     System.out.println();
 
-
     // Create items from Java objects
     info("Create items from atomic values");
     items = new XQItem[3];
@@ -118,7 +116,6 @@ public final class Part4 extends Main {
     for(XQItem it : items) {
       if(it != null) System.out.println(it.getAtomicValue());
     }
-
 
     // Create and bind XQuery sequences
     info("Create and bind XQuery sequences");
@@ -144,7 +141,6 @@ public final class Part4 extends Main {
     while(rs.next())
       System.out.println(rs.getItemAsString(null) + ", " + rs.getItemType());
 
-
     // Bind XQResultSequences to XQuery Expressions
     info("Bind XQResultSequences to XQuery Expressions");
 
@@ -164,7 +160,6 @@ public final class Part4 extends Main {
     while(rs.next()) {
       System.out.println(rs.getItemAsString(null));
     }
-
 
     // Retrieve XML nodes
     info("Retrieve XML nodes");
@@ -194,7 +189,6 @@ public final class Part4 extends Main {
 
     System.out.println(item1.getItemType());
     System.out.println(items2.getItemType());
-
 
     // Retrieve date values
     info("Retrieve date values");

@@ -52,7 +52,6 @@ public final class Part10 extends Main {
     xqe2.close();
     xqe.close();
 
-
     // Passing XSLT results to XQuery
     info("Passing XSLT results to XQuery");
 
@@ -76,7 +75,6 @@ public final class Part10 extends Main {
     xqs = xqp.executeQuery();
     xqs.writeSequenceToResult(new StreamResult(System.out));
     System.out.println();
-
 
     /* Passing XQuery results to XSLT
      * [CG] XQJ: to be checked

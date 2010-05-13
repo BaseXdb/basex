@@ -37,7 +37,6 @@ public final class Part2 extends Main {
     while(rs.next())
       System.out.println(rs.getItemAsString(null));
 
-
     // Get book prices
     info("Get book prices");
 

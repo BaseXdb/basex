@@ -45,7 +45,6 @@ public final class Part6 extends Main {
     // Print tailing END_DOCUMENT event too
     System.out.println(getEventString(reader));
 
-
     // Streaming XQuery Result Sequences with SAX
     info("Stream XQuery Result Sequences with SAX");
 

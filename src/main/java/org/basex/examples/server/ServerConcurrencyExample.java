@@ -113,7 +113,6 @@ public final class ServerConcurrencyExample {
     cs.execute(cmd, System.out);
   }
 
-
   /**
    * This class simulates a database client.
    * Within a thread, a query is run several times until the thread is stopped.

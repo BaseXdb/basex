@@ -52,7 +52,6 @@ public final class Part3 extends Main {
     while(rs.next())
       System.out.println(rs.getItemAsString(null));
 
-
     // Lookup by date range
     info("Lookup books by date range");
 
