@@ -1,13 +1,14 @@
 package org.basex.test.collections;
 
 import static org.junit.Assert.*;
-
+import org.basex.core.BaseXException;
 import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.proc.Add;
 import org.basex.core.proc.CreateColl;
 import org.basex.core.proc.CreateIndex;
 import org.basex.core.proc.DropDB;
+import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
 import org.junit.AfterClass;
@@ -15,10 +16,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * Tests some Queries on collections.
+ * Tests some queries on collections.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
- * 
  */
 public class QueryTest {
   /** Database context. */
@@ -29,16 +30,15 @@ public class QueryTest {
       "etc/xml/factbook.xml", "etc/xml/test.xml"};
   /** Test ZIP. */
   private static final String ZIP = "etc/xml/xml.zip";
-
   /** Test DB name. */
   private static final String NAME = "CollectionQueryUnitTest";
 
   /**
-   * Creates initial database.
-   * @throws Exception e
+   * Creates an initial database.
+   * @throws BaseXException exception
    */
   @BeforeClass
-  public static void before() throws Exception {
+  public static void before() throws BaseXException {
     new CreateColl(NAME).execute(CTX);
     for(String file : FILES)
       new Add(file, "etc/xml").execute(CTX);
@@ -48,19 +48,19 @@ public class QueryTest {
 
   /**
    * Drops the initial collection.
-   * @throws Exception e
+   * @throws BaseXException exception
    */
   @AfterClass
-  public static void after() throws Exception {
+  public static void after() throws BaseXException {
     new DropDB(NAME).execute(CTX);
   }
 
   /**
    * Finds single doc.
-   * @throws Exception ex.
+   * @throws QueryException query exception
    */
   @Test
-  public void testFindDoc() throws Exception {
+  public void testFindDoc() throws QueryException {
     final String find = "for $x in ."
         + " where $x[ends-with(document-uri(.), '" + FILES[1] + "')]"
         + " and $x//religions/text() contains text 'Catholic' "
@@ -71,11 +71,11 @@ public class QueryTest {
   }
 
   /**
-   * Finds docs in path.
-   * @throws Exception ex.
+   * Finds documents in path.
+   * @throws QueryException query exception
    */
   @Test
-  public void testFindDocs() throws Exception {
+  public void testFindDocs() throws QueryException {
     final String find = "for $x in ."
         + " where $x[matches(document-uri(.), 'test/zipped/')]"
         + " return base-uri($x)";
@@ -85,11 +85,11 @@ public class QueryTest {
   }
 
   /**
-   * Checks if constructed base-uri matches base-uri of added documents.
-   * @throws Exception e
+   * Checks if the constructed base-uri matches the base-uri of added documents.
+   * @throws QueryException query exception
    */
   @Test
-  public void testBaseUri() throws Exception {
+  public void testBaseUri() throws QueryException {
     final String find = "for $x in ."
         + " where $x[ends-with(document-uri(.), '" + FILES[1] + "')]"
         + " return base-uri($x)";

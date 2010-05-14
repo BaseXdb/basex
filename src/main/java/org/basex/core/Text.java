@@ -227,7 +227,7 @@ public interface Text {
     "[" + PATH + "] [" + NAM + "?]", lang("ch_export1"),
     lang("ch_export2", PATH + "/" + NAM + "?")
   };
-  
+
   /** Import help. */
   String[] HELPIMPORT = {"[" + CmdCreate.DB + "|"
       + CmdCreate.COLL + "] [" + NAM + "?] [...]",

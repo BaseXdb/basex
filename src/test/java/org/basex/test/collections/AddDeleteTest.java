@@ -1,7 +1,6 @@
 package org.basex.test.collections;
 
 import static org.junit.Assert.*;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.proc.Add;
@@ -14,10 +13,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Tests adding files/folders/zipfiles/urls to collections.
+ * Tests adding files/folders/zip files/urls to collections.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
- * 
  */
 public class AddDeleteTest {
   /** Database context. */
@@ -38,7 +37,8 @@ public class AddDeleteTest {
   private static final String NAME = "CollectionUnitTest";
 
   /** Number of XML files for folder. */
-  static final int FCNT;
+  private static final int FCNT;
+
   static {
     int fc = 0;
     for(IO c : IO.get(FLDR).children()) {
@@ -48,25 +48,25 @@ public class AddDeleteTest {
   }
 
   /**
-   * Creates initial database.
-   * @throws Exception e
+   * Creates the initial database.
+   * @throws BaseXException exception
    */
   @Before
-  public void setUp() throws Exception {
+  public void setUp() throws BaseXException {
     new CreateColl(NAME).execute(CTX);
   }
 
   /**
    * Drops the initial collection.
-   * @throws Exception e
+   * @throws BaseXException exception
    */
   @After
-  public void tearDown() throws Exception {
+  public void tearDown() throws BaseXException {
     new DropDB(NAME).execute(CTX);
   }
 
   /**
-   * Adds an <?xml…>-String to the database. *TODO*
+   * Adds an <?xml...>-String to the database. *TODO*
    */
   // @Test
   public final void testAddXMLString() {
@@ -74,32 +74,32 @@ public class AddDeleteTest {
   }
 
   /**
-   * Adds a single file to the databse.
-   * @throws Exception e
+   * Adds a single file to the database.
+   * @throws BaseXException exception
    */
   @Test
-  public final void testAddFile() throws Exception {
+  public final void testAddFile() throws BaseXException {
     new Add(FILE).execute(CTX);
     assertEquals(1, CTX.doc().length);
   }
 
   /**
-   * Add Zipfile.
-   * @throws Exception ex
+   * Adds a zip file.
+   * @throws BaseXException exception
    */
   @Test
-  public void testAddZip() throws Exception {
+  public void testAddZip() throws BaseXException {
     new Add(ZIPFILE, "target").execute(CTX);
     assertEquals(4, CTX.doc().length);
   }
 
   /**
-   * Add / Delete URL.
+   * Adds/deletes a URL.
    * Disabled to allow "offline" execution.
-   * @throws Exception ex.
+   * @throws BaseXException exception
    */
-  // @Test 
-  public void testAddUrl() throws Exception {
+  // @Test
+  public void testAddUrl() throws BaseXException {
     new Add(URL).execute(CTX);
     new Add(URL, "bar").execute(CTX);
     new Delete("xmark.xml").execute(CTX);
@@ -107,11 +107,11 @@ public class AddDeleteTest {
   }
 
   /**
-   * Add / Delete GZIP.
-   * @throws Exception ex.
+   * Adds/deletes a GZIP file.
+   * @throws BaseXException exception
    */
   @Test
-  public void testAddGzip() throws Exception {
+  public void testAddGzip() throws BaseXException {
     new Add(GZIPFILE).execute(CTX);
     new Add(GZIPFILE, "bar").execute(CTX);
     new Delete("bar").execute(CTX);
@@ -119,21 +119,21 @@ public class AddDeleteTest {
   }
 
   /**
-   * Add Folder. As etc/xml contains a zipfile it is added as well.
-   * @throws Exception ex
+   * Adds a folder. As etc/xml contains a zip file, it is added as well.
+   * @throws BaseXException exception
    */
   @Test
-  public void testAddFolder() throws Exception {
+  public void testAddFolder() throws BaseXException {
     new Add(FLDR).execute(CTX);
     assertEquals(FCNT, CTX.doc().length);
   }
 
   /**
-   * Adding / Deletion with target.
-   * @throws Exception ex
+   * Adds/deletes with target.
+   * @throws BaseXException exception
    */
   @Test
-  public void deletePath() throws Exception {
+  public void deletePath() throws BaseXException {
     new Add(FLDR, "foo/pub").execute(CTX);
     new Add(FILE, "foo/bar").execute(CTX);
     new Add(FLDR, "foobar").execute(CTX);
@@ -143,11 +143,11 @@ public class AddDeleteTest {
   }
 
   /**
-   * Add / Delete file/folder.
-   * @throws Exception ex
+   * Adds/deletes a file/folder.
+   * @throws BaseXException exception
    */
   @Test
-  public void addFoldersDeleteFiles() throws Exception {
+  public void addFoldersDeleteFiles() throws BaseXException {
     new Add(FLDR, "folder").execute(CTX);
     new Add(FILE).execute(CTX);
     new Delete("input.xml").execute(CTX);
@@ -156,12 +156,11 @@ public class AddDeleteTest {
   }
 
   /**
-   * Add non existent file.
-   * @throws Exception expected.
+   * Adds a non-existent file.
+   * @throws BaseXException expected.
    */
   @Test(expected = BaseXException.class)
-  public final void testAddFileFail() throws Exception {
+  public final void testAddFileFail() throws BaseXException {
     new Add(FILE + "/doesnotexist").execute(CTX);
   }
-
 }

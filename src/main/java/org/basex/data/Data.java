@@ -223,20 +223,29 @@ public abstract class Data {
       case ATTR:
         return text(pre, false);
       case PI:
-        final byte[] txt = text(pre, true);
+        byte[] txt = text(pre, true);
         final int i = indexOf(txt, ' ');
         return i == -1 ? EMPTY : substring(txt, i + 1);
       default:
         // create atomized text node
-        final TokenBuilder tb = new TokenBuilder();
+        TokenBuilder tb = null;
+        byte[] t = EMPTY;
         int p = pre;
         final int s = p + size(p, kind(p));
         while(p != s) {
           final int k = kind(p);
-          if(k == TEXT) tb.add(text(p, true));
+          if(k == TEXT) {
+            txt = text(p, true);
+            if(t == EMPTY) {
+              t = txt;
+            } else {
+              if(tb == null) tb = new TokenBuilder(t);
+              tb.add(txt);
+            }
+          }
           p += attSize(p, k);
         }
-        return tb.finish();
+        return tb == null ? t : tb.finish();
     }
   }
 
