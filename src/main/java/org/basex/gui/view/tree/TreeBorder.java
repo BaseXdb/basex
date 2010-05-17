@@ -24,6 +24,13 @@ final class TreeBorder {
     level = lv;
     start = st;
     size = si;
-
+  }
+  
+  /**
+   * Returns end index.
+   * @return end
+   */
+  int getEnd() {
+    return start + size - 1;
   }
 }

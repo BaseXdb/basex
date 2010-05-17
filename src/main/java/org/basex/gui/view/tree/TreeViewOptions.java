@@ -48,7 +48,7 @@ interface TreeViewOptions {
   /** Minimum space between the levels. */
   int MIN_LEVEL_DISTANCE = 1;
   /** Optimal space between the levels. */
-  int BEST_LEVEL_DISTANCE = 30;
+  int BEST_LEVEL_DISTANCE = 26;
   /** Maximum level distance. */
   int MAX_LEVEL_DISTANCE = 100;
   /** Best node height. */
@@ -59,16 +59,22 @@ interface TreeViewOptions {
   int MAX_NODE_HEIGHT = 24;
   /** Minimum node distance to draw node connections. */
   int MIN_NODE_DIST_CONN = 10;
+  /** New initialization. */
+  byte PAINT_NEW_INIT = 0;
+  /** New context. */
+  byte PAINT_NEW_CONTEXT = 1;
+  /** New window-size. */
+  byte PAINT_NEW_WINDOW_SIZE = 2;
   /** Draw kind rectangle. */
-  byte DRAW_RECTANGLE = 0x00;
+  byte DRAW_RECTANGLE = 0;
   /** Draw kind highlighting. */
-  byte DRAW_HIGHLIGHT = 0x01;
+  byte DRAW_HIGHLIGHT = 1;
   /** Draw mark. */
-  byte DRAW_MARK = 0x02;
+  byte DRAW_MARK = 2;
   /** Draw kind descendants highlighting. */
-  byte DRAW_DESCENDANTS = 0x03;
+  byte DRAW_DESCENDANTS = 3;
   /** Draw kind parent highlighting. */
-  byte DRAW_PARENT = 0x04;
+  byte DRAW_PARENT = 4;
   /** Draw kind connection. */
-  byte DRAW_CONN = 0x05;
+  byte DRAW_CONN = 5;
 }
