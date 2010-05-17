@@ -215,7 +215,6 @@ public final class TreeView extends View implements TreeViewOptions {
             getHeight() - 6);
       }
     }
-    if(roots[0] > 0) System.out.println();
     paintType = -1;
     gui.painting = false;
   }
@@ -393,7 +392,7 @@ public final class TreeView extends View implements TreeViewOptions {
       s = s.concat("..");
       while((tw = BaseXLayout.width(g, s)) + MIN_TXT_SPACE > r.w
           && s.length() > 3) {
-        s = s.substring(s.length() / 2);
+        s = s.substring(0, (s.length() - 2) / 2).concat("..");
       }
     }
 
@@ -603,8 +602,6 @@ public final class TreeView extends View implements TreeViewOptions {
       rc = getRectCenter(r);
     }
 
-    System.out.println(rc);
-
     // draw parent node connection
     if(px > -1) drawParentConnection(g, lv, r, px, rc);
 
@@ -618,8 +615,8 @@ public final class TreeView extends View implements TreeViewOptions {
     }
 
     // if there are descendants draw them
-    if((t == DRAW_CONN || t == DRAW_HIGHLIGHT) && size > 
-    1 && lv + 1 < height) highlightDescendants(
+    if((t == DRAW_CONN || t == DRAW_HIGHLIGHT) && size > 1 && 
+        lv + 1 < height) highlightDescendants(
         g, rn, lv, r, pre, rc, t);
 
     // draws node text
@@ -644,12 +641,18 @@ public final class TreeView extends View implements TreeViewOptions {
     final String s = Token.string(tr.getText(gui.context, rn, pre));
     final int w = BaseXLayout.width(g, s);
 
+    g.setColor(COLORS[8]);
+
     if(isRoot) {
-      g.fillRect(x, y + h + 2, w + 2, fontHeight);
+      g.fillRect(x, y + h , w + 2, fontHeight + 2);
+      g.setColor(COLORS[6]);
+      g.drawRect(x - 1, y + h + 1, w + 3, fontHeight + 1);
       g.setColor(Color.WHITE);
       g.drawString(s, r.x + 1, (int) (y + h + (float) fontHeight) - 2);
     } else {
       g.fillRect(r.x, y - fontHeight, w + 2, fontHeight);
+      g.setColor(COLORS[6]);
+      g.drawRect(r.x - 1, y - fontHeight - 1, w + 3, fontHeight + 1);
       g.setColor(Color.WHITE);
       g.drawString(s, r.x + 1, (int) (y - h / (float) fontHeight) - 2);
     }
@@ -1011,15 +1014,16 @@ public final class TreeView extends View implements TreeViewOptions {
     }
     nodeHeight = MAX_NODE_HEIGHT;
     int lD;
-    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) 
-        < (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
+    while((lD = (int) ((h - lvs * nodeHeight) / 
+        (double) (lvs - 1))) < (nodeHeight <= 
+          BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
         : BEST_LEVEL_DISTANCE)
         && nodeHeight >= MIN_NODE_HEIGHT)
       nodeHeight--;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * 
-        nodeHeight)) / 2d);
+    final int ih = (int) ((h - (levelDistance * 
+        (lvs - 1) + lvs * nodeHeight)) / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }
 
