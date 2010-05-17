@@ -10,7 +10,6 @@ import org.basex.core.Context;
 import org.basex.core.Proc;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
-import org.basex.core.proc.Exit;
 import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -101,7 +100,6 @@ public final class ClientSession extends Session {
   @Override
   public boolean execute(final Proc pr, final OutputStream o)
       throws IOException {
-    if(pr instanceof Exit) return true;
     return execute(pr.toString(), o);
   }
 
