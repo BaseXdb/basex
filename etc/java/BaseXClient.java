@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

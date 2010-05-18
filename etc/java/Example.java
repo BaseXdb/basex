@@ -1,4 +1,4 @@
-package org.basex.test;
+package org.basex;
 
 import java.io.IOException;
 
@@ -33,23 +33,24 @@ public final class Example {
     String cmd = "xquery 1 to 10";
     
     try {
-      BaseXClient bxc = new BaseXClient("localhost", 1984, "admin", "admin");
+      BaseXClient session = new BaseXClient("localhost", 1984,
+          "admin", "admin");
       
       System.out.println("=== 1st version with output stream ===");
       
-      if(!bxc.execute(cmd, System.out)) {
-        System.out.println(bxc.info());
+      if(!session.execute(cmd, System.out)) {
+        System.out.println(session.info());
       }
       
       System.out.println(nl + nl + "=== 2nd version without output stream ===");
       
-      if(bxc.execute(cmd)) {
-        System.out.println(bxc.result());
+      if(session.execute(cmd)) {
+        System.out.println(session.result());
       } else {
-        System.out.println(bxc.info());
+        System.out.println(session.info());
       }
       
-      bxc.close();
+      session.close();
       long endTime = System.nanoTime() - startTime;
       System.out.println(nl + endTime / 10000 / 100d + " ms");
     } catch(IOException e) {
