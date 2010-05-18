@@ -17,7 +17,7 @@
 -- 
 -- Example:
 -- 
--- module Main where
+-- module Example where
 
 -- import BaseXClient
 -- import Network ( withSocketsDo )

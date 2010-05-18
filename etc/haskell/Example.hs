@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 -- |
--- Module      : Main
+-- Module      : Example
 -- Copyright   : (C) Workgroup DBIS, University of Konstanz 2005-10
 -- License     : ISC
 --
@@ -13,7 +13,7 @@
 --
 -------------------------------------------------------------------------------
 
-module Main where
+module Example where
 
 import BaseXClient
 import Network ( withSocketsDo )
