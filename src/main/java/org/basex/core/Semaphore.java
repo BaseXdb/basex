@@ -52,13 +52,10 @@ final class Semaphore {
       // shared lock
       Lock ls = null;
       synchronized(this) {
-        if(state == State.IDLE) {
+        if(state != State.WRITE && waiting.size() == 0) {
           state = State.READ;
           activeR++;
           return;
-        } else if(state == State.READ && waiting.size() == 0) {
-            activeR++;
-            return;
         }
         if(waiting.size() > 0 && !waiting.getLast().writer) {
             ls = waiting.getLast();
