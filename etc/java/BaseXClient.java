@@ -19,20 +19,19 @@ import java.security.MessageDigest;
  * for the connection. The socket connection will then be established via the
  * hostname and the port.
  *
- * For the execution of commands you need to call the Execute() method with the
+ * For the execution of commands you need to call the execute() method with the
  * database command as argument. The method returns a boolean, indicating if
  * the command was successful. The result is stored in the Result property,
  * and the Info property returns additional processing information or error
  * output.
  *
- * An even faster approach is to call Execute() with the database command and
+ * An even faster approach is to call execute() with the database command and
  * an output stream. The result will directly be printed and does not have to
  * be cached.
  * 
  * -----------------------------------------------------------------------------
  * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Andreas Weiler
  */
 public class BaseXClient {
   

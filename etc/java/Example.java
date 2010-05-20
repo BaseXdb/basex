@@ -9,7 +9,6 @@ import java.io.IOException;
  * The execution time will be printed along with the result of the command.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Andreas Weiler
  */
 public final class Example {
   
