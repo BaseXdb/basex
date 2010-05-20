@@ -30,51 +30,43 @@ final class Semaphore {
    * @param w writing flag
    */
   void before(final boolean w) {
-    if(w) {
+    if(w) {       
+      if(state == State.IDLE) {
+          state = State.WRITE;
+          return;
+      }
       // exclusive lock
       final Lock lx = new Lock(true);
       synchronized(lx) {
-        synchronized(this) {
-          if(state == State.IDLE) {
-            state = State.WRITE;
-            return;
+        waiting.add(lx);
+        while(!lx.valid) {
+          try {
+            lx.wait();
+          } catch(InterruptedException e) {
+            e.printStackTrace();
           }
-          waiting.add(lx);
         }
-        try {
-          lx.wait();
-          state = State.WRITE;
-        } catch(final InterruptedException ex) {
-          ex.printStackTrace();
+        state = State.WRITE;
         }
-      }
     } else {
-      // shared lock
-      Lock ls = null;
-      synchronized(this) {
-        if(state != State.WRITE && waiting.size() == 0) {
+      if(state != State.WRITE && waiting.size() == 0) {
           state = State.READ;
           activeR++;
           return;
         }
-        if(waiting.size() > 0 && !waiting.getLast().writer) {
-            ls = waiting.getLast();
-            ls.waitingReaders++;
-          } else {
-            ls = new Lock(false);
-            waiting.add(ls);
-        }
-      }
+      // shared lock
+      final Lock ls = new Lock(false);
       synchronized(ls) {
-        try {
-          ls.wait();
-          if(activeR == 0) {
-            state = State.READ;
-            activeR = ls.waitingReaders;
+        waiting.add(ls);
+        while(!ls.valid) {
+          try {
+            ls.wait();
+          } catch(final InterruptedException ex) {
+            ex.printStackTrace();
           }
-        } catch(final InterruptedException ex) {
-          ex.printStackTrace();
         }
+        activeR++;
+        state = State.READ;
       }
     }
   }
@@ -85,22 +77,41 @@ final class Semaphore {
    */
   synchronized void after(final boolean w) {
     if(w) {
-      notifyNext();
+      if(waiting.size() > 0 && !waiting.getFirst().writer) {
+        notifyReaders();
+      } else {
+        notifyWriter();
+      }
     } else {
       if(--activeR == 0) {
-          notifyNext();
+          notifyWriter();
       }
     }
   }
-
+  
   /**
-   * Notifies the next processes in line.
+   * Notify readers.
    */
-  private synchronized void notifyNext() {
+  protected synchronized void notifyReaders() {
+    while(waiting.size() > 0) {
+      if(waiting.getFirst().writer) break;
+      Lock l = waiting.removeFirst();
+      synchronized(l) {
+        l.valid = true;
+        l.notify();
+      }
+    }
+  }
+  
+  /**
+   * Notify writers.
+   */
+  protected synchronized void notifyWriter() {
     if(waiting.size() > 0) {
-    final Lock eldest = waiting.remove(0);
-    synchronized(eldest) {
-      eldest.notifyAll();
+      Lock l = waiting.removeFirst();
+      synchronized(l) {
+        l.valid = true;
+        l.notify();
       }
     } else {
       state = State.IDLE;
@@ -116,8 +127,8 @@ final class Semaphore {
   private static class Lock {
     /** Writer flag. */
     boolean writer;
-    /** Number of readers. */
-    int waitingReaders = 1;
+    /** Flag if lock can start. */
+    boolean valid;
 
     /**
      * Standard constructor.
