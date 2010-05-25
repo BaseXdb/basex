@@ -109,7 +109,7 @@ abstract class AQuery extends Proc {
       // dump some query info
       evalInfo(s, runs);
 
-      if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) out.println();
+      if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) out.println("");
       out.flush();
       return true;
     } catch(final QueryException ex) {

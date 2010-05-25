@@ -203,7 +203,7 @@ public final class MAB2Parser extends Parser {
     final PrintOutput out = new PrintOutput(dir + "/mvids.dat");
     for(i = 1; i <= mvids.size(); i++) {
       out.print(mvids.key(i));
-      out.print('\t');
+      out.write('\t');
       out.println(mvids.value(i));
     }
     out.close();

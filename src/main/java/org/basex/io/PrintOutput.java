@@ -48,15 +48,6 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Writes a character to the output stream.
-   * @param ch string to be written
-   * @throws IOException I/O exception
-   */
-  public final void print(final char ch) throws IOException {
-    write((byte) ch);
-  }
-
-  /**
    * Writes a string to the output stream.
    * @param str string to be written
    * @throws IOException I/O exception
@@ -72,14 +63,6 @@ public class PrintOutput extends OutputStream {
    */
   public final void println(final String str) throws IOException {
     print(str);
-    print(Prop.NL);
-  }
-
-  /**
-   * Writes a newline to the output stream.
-   * @throws IOException I/O exception
-   */
-  public final void println() throws IOException {
     print(Prop.NL);
   }
 

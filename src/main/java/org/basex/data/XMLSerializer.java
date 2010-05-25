@@ -140,6 +140,7 @@ public final class XMLSerializer extends Serializer {
 
     // print byte-order-mark
     if(bom) {
+      // comparison by reference
       if(enc == UTF8) {
         out.write(0xEF); out.write(0xBB); out.write(0xBF);
       } else if(enc == UTF16LE) {
@@ -328,21 +329,27 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void ch(final int ch) throws IOException {
-    if(script && mth == M_HTML) {
-      print(ch);
-    } else if(ch > 0x7F && ch < 0xA0) {
-      if(mth == M_HTML) error(SERILL, Integer.toHexString(ch));
+    if(mth == M_HTML) {
+      if(script) {
+        print(ch);
+        return;
+      }
+      if(ch < 0x20 && ch != 0x09 && ch != 0x0A && ch != 0x0D) return;
+      if(ch > 0x7F && ch < 0xA0) error(SERILL, Integer.toHexString(ch));
+      if(ch == 0xA0) {
+        print(E_NBSP);
+        return;
+      }
+    }
+    
+    if(ch < 0x20 && ch != 0x09 && ch != 0x0A || ch > 0x7F && ch < 0xA0) {
       hex(ch);
-    } else if(ch < 0x20 && ch != 0x9 && ch != 0xA && ch != 0xD) {
-      if(mth != M_HTML) hex(ch);
     } else {
       switch(ch) {
-        case '&' : print(E_AMP); break;
-        case '>' : print(E_GT); break;
-        case '<' : print(E_LT); break;
-        case 0x0D: hex(ch); break;
-        case 0xA0: if(mth == M_HTML) print(E_NBSP); else print(ch); break;
-        default  : print(ch);
+        case '&': print(E_AMP); break;
+        case '>': print(E_GT); break;
+        case '<': print(E_LT); break;
+        default : print(ch);
       }
     }
   }
@@ -408,8 +415,7 @@ public final class XMLSerializer extends Serializer {
 
   @Override
   protected void finish() throws IOException {
-    if(mth == M_TEXT) return;
-    print(ELEM2);
+    if(mth != M_TEXT) print(ELEM2);
   }
 
   @Override
@@ -447,7 +453,7 @@ public final class XMLSerializer extends Serializer {
     print("&#x");
     print(HEX[ch >> 4]);
     print(HEX[ch & 15]);
-    print(";");
+    print(';');
   }
 
   /**
@@ -470,10 +476,23 @@ public final class XMLSerializer extends Serializer {
    * @throws IOException I/O exception
    */
   private void print(final int ch) throws IOException {
-    if(ch < 0x80 && enc == UTF8) {
-      out.write(ch);
-    } else if(ch < 0xFFFF) {
-      print(String.valueOf((char) ch));
+    // comparison by reference
+    if(enc == UTF8) {
+      if(ch <= 0x7F) {
+        out.write(ch);
+      } else if(ch <= 0x7FF) {
+        out.write(ch >>  6 & 0x1F | 0xC0);
+        out.write(ch >>  0 & 0x3F | 0x80);
+      } else if(ch <= 0xFFFF) {
+        out.write(ch >> 12 & 0x0F | 0xE0);
+        out.write(ch >>  6 & 0x3F | 0x80);
+        out.write(ch >>  0 & 0x3F | 0x80);
+      } else {
+        out.write(ch >> 18 & 0x07 | 0xF0);
+        out.write(ch >> 12 & 0x3F | 0x80);
+        out.write(ch >>  6 & 0x3F | 0x80);
+        out.write(ch >>  0 & 0x3F | 0x80);
+      }
     } else {
       print(new TokenBuilder().addUTF(ch).toString());
     }
@@ -488,17 +507,15 @@ public final class XMLSerializer extends Serializer {
     // comparison by reference
     if(enc == UTF8) {
       print(token(s));
-    } else {
-      final boolean le = enc == UTF16LE;
-      if(enc == UTF16BE || le) {
-        for(int i = 0; i < s.length(); i++) {
-          final char ch = s.charAt(i);
-          out.write(le ? ch & 0xFF : ch >>> 8);
-          out.write(le ? ch >>> 8 : ch & 0xFF);
-        }
-      } else {
-        out.write(s.getBytes(enc));
+    } else if(enc == UTF16BE || enc == UTF16LE) {
+      final boolean l = enc == UTF16LE;
+      for(int i = 0; i < s.length(); i++) {
+        final char ch = s.charAt(i);
+        out.write(l ? ch & 0xFF : ch >>> 8);
+        out.write(l ? ch >>> 8 : ch & 0xFF);
       }
+    } else {
+      out.write(s.getBytes(enc));
     }
   }
 

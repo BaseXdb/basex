@@ -200,8 +200,8 @@ public abstract class UpdatePrimitive {
               if(ki > -1 && Token.eq(nsPar.val[j], ns.val[ki])) ns.delete(ki);
             }
         }
-        ne = ns.size > 0;
-        for(int a = 0; a < ns.size; a++) {
+        ne = ns != null && ns.size > 0;
+        for(int a = 0; ne && a < ns.size; a++) {
           m.ns.add(ns.key[a], ns.val[a], ms);
         }
 

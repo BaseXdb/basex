@@ -65,9 +65,14 @@ public final class FElem extends FNode {
    */
   FElem(final Node node, final Nod p) {
     super(Type.ELM);
-    final int s = node.getChildNodes().getLength();
+
+    final NodeList ch = node.getChildNodes();
+    final int s = ch.getLength();
     final Nod[] childArr = new Nod[s];
-    final Nod[] attArr = new Nod[s];
+
+    final NamedNodeMap at = node.getAttributes();
+    final int as = at.getLength();
+    final Nod[] attArr = new Nod[as];
 
     name = new QNm(Token.token(node.getNodeName()));
     children = new NodIter(childArr, childArr.length);
@@ -76,14 +81,12 @@ public final class FElem extends FNode {
     ns = null;
     par = p;
 
-    final NamedNodeMap attsMap = node.getAttributes();
-    for(int i = 0; i < attsMap.getLength(); i++) {
-      attArr[i] = new FAttr(attsMap.item(i), this);
+    for(int i = 0; i < at.getLength(); i++) {
+      attArr[i] = new FAttr(at.item(i), this);
     }
-
-    final NodeList childNodeList = node.getChildNodes();
-    for(int i = 0; i < childNodeList.getLength(); i++) {
-      final Node child = childNodeList.item(i);
+    
+    for(int i = 0; i < ch.getLength(); i++) {
+      final Node child = ch.item(i);
 
       switch(child.getNodeType()) {
         case Node.TEXT_NODE:

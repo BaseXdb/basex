@@ -127,24 +127,24 @@ public final class TokenBuilder {
 
   /**
    * Adds the specified UTF8 character.
-   * @param c the character to be added
+   * @param ch the character to be added
    * @return self reference
    */
-  public TokenBuilder addUTF(final int c) {
-    if(c <= 0x7F) {
-      add((byte) c);
-    } else if(c <= 0x7FF) {
-      add((byte) (c >>  6 & 0x1F | 0xC0));
-      add((byte) (c >>  0 & 0x3F | 0x80));
-    } else if(c <= 0xFFFF) {
-      add((byte) (c >> 12 & 0x0F | 0xE0));
-      add((byte) (c >>  6 & 0x3F | 0x80));
-      add((byte) (c >>  0 & 0x3F | 0x80));
+  public TokenBuilder addUTF(final int ch) {
+    if(ch <= 0x7F) {
+      add((byte) ch);
+    } else if(ch <= 0x7FF) {
+      add((byte) (ch >>  6 & 0x1F | 0xC0));
+      add((byte) (ch >>  0 & 0x3F | 0x80));
+    } else if(ch <= 0xFFFF) {
+      add((byte) (ch >> 12 & 0x0F | 0xE0));
+      add((byte) (ch >>  6 & 0x3F | 0x80));
+      add((byte) (ch >>  0 & 0x3F | 0x80));
     } else {
-      add((byte) (c >> 18 & 0x07 | 0xF0));
-      add((byte) (c >> 12 & 0x3F | 0x80));
-      add((byte) (c >>  6 & 0x3F | 0x80));
-      add((byte) (c >>  0 & 0x3F | 0x80));
+      add((byte) (ch >> 18 & 0x07 | 0xF0));
+      add((byte) (ch >> 12 & 0x3F | 0x80));
+      add((byte) (ch >>  6 & 0x3F | 0x80));
+      add((byte) (ch >>  0 & 0x3F | 0x80));
     }
     return this;
   }
