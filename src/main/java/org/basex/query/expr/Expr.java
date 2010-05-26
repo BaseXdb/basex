@@ -1,7 +1,11 @@
 package org.basex.query.expr;
 
+import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
+
 import org.basex.core.Main;
+import org.basex.core.User;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.data.ExprInfo;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -290,6 +294,8 @@ public abstract class Expr extends ExprInfo {
    */
   public final Item checkCtx(final QueryContext ctx) throws QueryException {
     final Item it = ctx.item;
+    if (!ctx.context.perm(User.READ, ctx.context.data.meta))
+      throw new QueryException(Main.info(PERMNO, CmdPerm.READ));
     if(it == null) Err.or(XPNOCTX, this);
     return it;
   }
