@@ -11,6 +11,7 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
@@ -289,14 +290,16 @@ public abstract class Expr extends ExprInfo {
   /**
    * Throws an exception if the context item is not set.
    * @param ctx query context
-   * @return item if everything is ok
+   * @return result of check
    * @throws QueryException query exception
    */
   public final Item checkCtx(final QueryContext ctx) throws QueryException {
     final Item it = ctx.item;
-    if (!ctx.context.perm(User.READ, ctx.context.data.meta))
-      throw new QueryException(Main.info(PERMNO, CmdPerm.READ));
     if(it == null) Err.or(XPNOCTX, this);
+    if(it instanceof DBNode) {
+      if(!ctx.context.perm(User.READ, ((DBNode) it).data.meta))
+        throw new QueryException(PERMNO, CmdPerm.READ);
+    }
     return it;
   }
 

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
@@ -83,7 +82,7 @@ public final class Updates {
     if(prim == null) {
       // check permissions
       if(!t && !frag && !ctx.context.perm(User.WRITE, d.meta))
-        throw new QueryException(Main.info(PERMNO, CmdPerm.WRITE));
+        throw new QueryException(PERMNO, CmdPerm.WRITE);
 
       prim = frag ? new FragPrimitives() : new DBPrimitives(d);
       primitives.put(d, prim);

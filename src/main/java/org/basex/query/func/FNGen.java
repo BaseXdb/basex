@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
-import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.query.QueryContext;
@@ -40,7 +39,7 @@ public final class FNGen extends Fun {
         return ctx.coll(checkStr(it));
       case PUT:
         if(!ctx.context.user.perm(User.ADMIN))
-          throw new QueryException(Main.info(PERMNO, CmdPerm.ADMIN));
+          throw new QueryException(PERMNO, CmdPerm.ADMIN);
         final byte[] file = checkStr(expr[1], ctx);
         it = expr[0].atomic(ctx);
 
