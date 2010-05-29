@@ -197,7 +197,10 @@ public final class TreeView extends View implements TreeViewOptions {
     // highlights the focused node
 
     if(focus()) {
-      final int focused = gui.context.focused;
+      int focused = gui.context.focused;
+
+      if(tr.isBigRectangle(sub, frn, flv)) focused = getMostSizedNode(data,
+          frn, flv, frect, focused);
 
       highlightNode(g, frn, flv, frect, focused, -1, DRAW_HIGHLIGHT);
 
@@ -615,8 +618,8 @@ public final class TreeView extends View implements TreeViewOptions {
     }
 
     // if there are descendants draw them
-    if((t == DRAW_CONN || t == DRAW_HIGHLIGHT) && size > 1 && 
-        lv + 1 < height) highlightDescendants(
+    if((t == DRAW_CONN || t == DRAW_HIGHLIGHT) && size > 1 && lv + 1 < height) 
+      highlightDescendants(
         g, rn, lv, r, pre, rc, t);
 
     // draws node text
@@ -644,7 +647,7 @@ public final class TreeView extends View implements TreeViewOptions {
     g.setColor(COLORS[8]);
 
     if(isRoot) {
-      g.fillRect(x, y + h , w + 2, fontHeight + 2);
+      g.fillRect(x, y + h, w + 2, fontHeight + 2);
       g.setColor(COLORS[6]);
       g.drawRect(x - 1, y + h + 1, w + 3, fontHeight + 1);
       g.setColor(Color.WHITE);
@@ -811,21 +814,20 @@ public final class TreeView extends View implements TreeViewOptions {
               rgb + alpha, false));
           g.fillRect(df, getYperLevel(lvv), ww, nodeHeight + 1);
       }
-
-      // if(lvv + 1 < sub.getSubtreeHeight(rn)
-      // && !tr.isBigRectangle(sub, rn, lvv + 1)) {
-      // final Data d = gui.context.current.data;
-      // for(int j = bos.start; j < bos.size; j++) {
-      // final int pre = sub.getPrePerIndex(rn, lvv, j);
-      // final int k = d.kind(pre);
-      // final int s = d.size(pre, k);
-      //
-      // if(s > 1) highlightDescendants(g, rn, lvv, r, pre, cen,
-      // t == DRAW_HIGHLIGHT || t == DRAW_DESCENDANTS ? DRAW_DESCENDANTS
-      // : DRAW_CONN);
-      //
-      // }
-      // }
+      
+      if(lvv + 1 < sub.getSubtreeHeight(rn)
+          && !tr.isBigRectangle(sub, rn, lvv + 1)) {
+        final Data d = gui.context.current.data;
+        for(int j = start; j < start + bo.size; j++) {
+          final int pre = sub.getPrePerIndex(rn, lvv, j);
+          final int pos = getBigRectPosition(rn, lvv, pre, r);
+          final int k = d.kind(pre);
+          final int s = d.size(pre, k);
+          if(s > 1) highlightDescendants(g, rn, lvv, r, pre, pos,
+              t == DRAW_HIGHLIGHT || t == DRAW_DESCENDANTS ? DRAW_DESCENDANTS
+                  : DRAW_CONN);
+        }
+      }
       lvv++;
     }
   }
@@ -1014,16 +1016,15 @@ public final class TreeView extends View implements TreeViewOptions {
     }
     nodeHeight = MAX_NODE_HEIGHT;
     int lD;
-    while((lD = (int) ((h - lvs * nodeHeight) / 
-        (double) (lvs - 1))) < (nodeHeight <= 
-          BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
+    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) < 
+        (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
         : BEST_LEVEL_DISTANCE)
         && nodeHeight >= MIN_NODE_HEIGHT)
       nodeHeight--;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * 
-        (lvs - 1) + lvs * nodeHeight)) / 2d);
+    final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight))
+        / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }
 
@@ -1037,6 +1038,48 @@ public final class TreeView extends View implements TreeViewOptions {
     wheight = getHeight();
     wwidth = getWidth();
     return true;
+  }
+
+  /**
+   * Returns number of hit nodes.
+   * @param rn root
+   * @param lv level
+   * @param r rectangle
+   * @return size
+   */
+  private int getHitBigRectNodesNum(final int rn, final int lv,
+      final TreeRect r) {
+    final int w = r.w;
+    final int ls = sub.getLevelSize(rn, lv);
+    return Math.max(ls / Math.max(w, 1), 1);
+  }
+
+  /**
+   * Return most sized Node.
+   * @param d the data reference
+   * @param rn root
+   * @param lv level
+   * @param r rectangle
+   * @param p pre
+   * @return deepest node pre
+   */
+  private int getMostSizedNode(final Data d, final int rn, final int lv,
+      final TreeRect r, final int p) {
+    final int size = getHitBigRectNodesNum(rn, lv, r);
+    final int idx = sub.getPreIndex(rn, lv, p);
+    int dpre = -1;
+    int si = 0;
+
+    for(int i = 0; i < size; i++) {
+      final int pre = sub.getPrePerIndex(rn, lv, i + idx);
+      final int k = d.kind(pre);
+      final int s = d.size(pre, k);
+      if(s > si) {
+        si = s;
+        dpre = pre;
+      }
+    }
+    return dpre;
   }
 
   @Override
@@ -1061,9 +1104,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
       if(tr.isBigRectangle(sub, frn, flv)) {
         final Nodes ns = new Nodes(gui.context.data);
-        final int w = frect.w;
-        final int ls = sub.getLevelSize(frn, flv);
-        final int sum = (int) Math.max(ls / (double) w, 1);
+        final int sum = getHitBigRectNodesNum(frn, flv, frect);
         final int[] m = new int[sum];
         for(int i = 0; i < sum; i++) {
           m[i] = sub.getPrePerIndex(frn, flv, i + fix);

@@ -40,9 +40,12 @@ final class TreeRects implements TreeViewOptions {
       final Context c, final int sw) {
     final int[] roots = c.current.nodes;
     final int rl = roots.length;
-    if(rl == 0) return -1;
+    if(rl == 0) return 0;
     final double w = (sw - BORDER_PADDING) / (double) rl;
-    if(w == 0) return -1;
+    if(w < 2) { 
+      return -1;
+    }
+
     rects = new TreeRect[rl][][];
 
     for(int i = 0; i < rl; i++) {
@@ -161,8 +164,8 @@ final class TreeRects implements TreeViewOptions {
   byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data;
     if(pre == c.current.nodes[rn]) return ViewData.path(d, pre);
-    if(d.fs != null && d.kind(pre) != Data.TEXT || 
-        d.kind(pre) == Data.ELEM) return ViewData.tag(
+    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM) 
+      return ViewData.tag(
         prop, d, pre);
     return ViewData.content(d, pre, false);
   }
