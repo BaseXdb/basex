@@ -87,8 +87,8 @@ public class FLWOR extends Expr {
     }
 
     for(int f = 0; f != fl.length; f++) {
-      // remove FLWOR clause if it the first, or a FOR clause is empty
-      if(fl[f].expr.e() && (f == 0 || fl[f] instanceof For)) {
+      // remove FLWOR clause if it the FOR clause is empty
+      if(fl[f].expr.e() && fl[f] instanceof For) {
         ctx.compInfo(OPTFLWOR);
         return Seq.EMPTY;
       }
