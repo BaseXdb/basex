@@ -57,8 +57,7 @@ public class FLWOR extends Expr {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
       ctx.ftfast = ctx.ftfast && fl[f].standard();
-      final Expr e = fl[f].comp(ctx);
-      fl[f] = e == Seq.EMPTY ? null : (ForLet) e;
+      fl[f] = fl[f].comp(ctx);
       ctx.ftfast = fast;
     }
 
@@ -86,8 +85,10 @@ public class FLWOR extends Expr {
       ctx.compInfo(OPTFALSE, where);
       return Seq.EMPTY;
     }
-    for(final ForLet e : fl) {
-      if(e == null) {
+
+    for(int f = 0; f != fl.length; f++) {
+      // remove FLWOR clause if it the first, or a FOR clause is empty
+      if(fl[f].expr.e() && (f == 0 || fl[f] instanceof For)) {
         ctx.compInfo(OPTFLWOR);
         return Seq.EMPTY;
       }

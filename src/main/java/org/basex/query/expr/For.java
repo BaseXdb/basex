@@ -10,7 +10,6 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -42,7 +41,7 @@ public final class For extends ForLet {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public ForLet comp(final QueryContext ctx) throws QueryException {
     // empty sequence - empty loop
     expr = checkUp(expr, ctx).comp(ctx);
 
@@ -65,7 +64,7 @@ public final class For extends ForLet {
       ctx.vars.add(score);
       score.ret = SeqType.ITR;
     }
-    return expr.e() ? Seq.EMPTY : this;
+    return this;
   }
 
   @Override

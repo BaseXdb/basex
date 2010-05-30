@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Var;
 
@@ -23,6 +24,9 @@ public abstract class ForLet extends Single {
     super(e);
     var = v;
   }
+
+  @Override
+  public abstract ForLet comp(final QueryContext ctx) throws QueryException;
 
   /**
    * Checks if clause has no scoring and position.

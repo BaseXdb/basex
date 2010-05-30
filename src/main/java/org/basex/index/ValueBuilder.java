@@ -60,11 +60,8 @@ public final class ValueBuilder extends IndexBuilder {
         }
       }
       // skip too long tokens
-      if(data.kind(pre) != type || data.textLen(pre, text) > MAXLEN) continue;
-
-      // skip pure whitespace tokens
-      final byte[] tok = data.text(pre, text);
-      if(!ws(tok)) index.index(tok, pre);
+      if(data.kind(pre) == type && data.textLen(pre, text) <= MAXLEN)
+        index.index(data.text(pre, text), pre);
     }
 
     if(csize == 0) {
