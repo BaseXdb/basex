@@ -97,7 +97,7 @@ public abstract class Proc extends Progress {
       int i = perms.length;
       final int f = flags & 0xFF;
       while(--i >= 0 && (1 << i & f) == 0);
-      return error(PERMNO, perms[i]);
+      return error(PERMNO, perms[i + 1]);
     }
 
     // check concurrency of processes
