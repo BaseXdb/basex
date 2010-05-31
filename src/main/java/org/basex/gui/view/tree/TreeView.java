@@ -71,8 +71,8 @@ public final class TreeView extends View implements TreeViewOptions {
   private int flv = -1;
   /** Focused root number. */
   private int frn;
-  /** Focused index. */
-  private int fix;
+  /** Focused pre. */
+  private int fpre;
   /** Number of roots. */
   private int numRoots;
   /** New tree initialization. */
@@ -283,10 +283,10 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param lv level
    * @param r rectangle
    * @param pre pre
-   * @param type use type
+   * @param t type
    */
   private void drawRectangle(final Graphics g, final int rn, final int lv,
-      final TreeRect r, final int pre, final byte type) {
+      final TreeRect r, final int pre, final byte t) {
 
     final int y = getYperLevel(lv);
     final int h = nodeHeight;
@@ -299,7 +299,7 @@ public final class TreeView extends View implements TreeViewOptions {
     Color fillColor = null;
     Color textColor = Color.BLACK;
 
-    switch(type) {
+    switch(t) {
       case DRAW_RECTANGLE:
         borderColor = getColorPerLevel(lv, false);
         fillColor = getColorPerLevel(lv, true);
@@ -533,8 +533,8 @@ public final class TreeView extends View implements TreeViewOptions {
    */
   private int getBigRectPosition(final int rn, final int lv, final int pre,
       final TreeRect r) {
-    fix = sub.getPreIndex(rn, lv, pre);
-    final double ratio = fix / (double) (sub.getLevelSize(rn, lv));
+    final int idx = sub.getPreIndex(rn, lv, pre);
+    final double ratio = idx / (double) (sub.getLevelSize(rn, lv));
     return r.x + (int) Math.round((r.w - 1) * ratio) + 1;
   }
 
@@ -965,6 +965,7 @@ public final class TreeView extends View implements TreeViewOptions {
           } else {
             pre = sub.getPrePerIndex(rn, lv, i);
           }
+          fpre = pre;
           gui.notify.focus(pre, this);
           refreshedFocus = false;
           return true;
@@ -1105,6 +1106,7 @@ public final class TreeView extends View implements TreeViewOptions {
       if(tr.isBigRectangle(sub, frn, flv)) {
         final Nodes ns = new Nodes(gui.context.data);
         final int sum = getHitBigRectNodesNum(frn, flv, frect);
+        final int fix = sub.getPreIndex(frn, flv, fpre);
         final int[] m = new int[sum];
         for(int i = 0; i < sum; i++) {
           m[i] = sub.getPrePerIndex(frn, flv, i + fix);

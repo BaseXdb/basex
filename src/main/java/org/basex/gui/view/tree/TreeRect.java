@@ -27,7 +27,7 @@ final class TreeRect {
    * @return result of comparison
    */
   boolean contains(final int xx) {
-    return xx >= x && xx <= x + w;
+    return xx >= x && xx < x + w;
   }
 
   /**
