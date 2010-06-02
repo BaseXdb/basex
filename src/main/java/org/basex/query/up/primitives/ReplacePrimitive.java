@@ -28,6 +28,10 @@ public final class ReplacePrimitive extends NodeCopy {
 
   @Override
   public void apply(final int add) {
+    // [LK] fix replace bug: doc root node n: replace node n with something
+    // else -> namespace hierarchy corrupt.
+    // solution: change order of insert/delete atomics
+    // order insert, delete important for consistency?
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;

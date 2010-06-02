@@ -81,7 +81,7 @@ final class DBPrimitives extends Primitives {
     final IntList il = new IntList();
 
     for(final int pre : pres) {
-      final UpdatePrimitive[] ups = op.get(pre);
+      final NodePrimitives ups = op.get(pre);
       if(ups != null)
         for(final UpdatePrimitive up : ups) up.update(pool);
 
@@ -126,9 +126,8 @@ final class DBPrimitives extends Primitives {
         par = parT;
       }
       first = pre;
-      final UpdatePrimitive[] upd = op.get(pre);
-      for(int j = 0, add = 0; j < upd.length; j++) {
-        final UpdatePrimitive p = upd[j];
+      int add = 0;
+      for(final UpdatePrimitive p : op.get(pre)) {
         final PrimitiveType t = p.type();
         p.apply(add);
         check = t == INSERTBEFORE || t == REPLACENODE || t == DELETE;
@@ -169,7 +168,7 @@ final class DBPrimitives extends Primitives {
 
   @Override
   protected boolean parentDeleted(final int n) {
-    final UpdatePrimitive[] up = op.get(n);
+    final NodePrimitives up = op.get(n);
 
     if(up != null)
       for(final UpdatePrimitive pr : up) if(pr.type() == REPLACENODE ||
