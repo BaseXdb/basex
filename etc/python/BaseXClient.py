@@ -122,6 +122,7 @@ class Query():
 	def __init__(self, session, q):
 		self.__session = session
 		self.__query = q
+		self.__open = True
 	
 	# Runs the query and returns the success flag.
 	def run(self):
@@ -130,11 +131,12 @@ class Query():
 	
 	# Checks for more parts of the result.	
 	def more(self):
-		self.__session.send('\1' + self.__id + '\0')
+		self.__session.send('\1' + self.__id + '\0' + '\0')
 		if self.__session.check():
 			self.__part = self.__session.res()
 			return True
 		else:
+			self.__open = False
 			return False
 	
 	# Returns the next part of the result.
@@ -143,7 +145,8 @@ class Query():
 	
 	# Closes the iterative execution.	
 	def close(self):
-		self.__session.send('\1' + self.__id + '\1')
+		if self.__open:
+			self.__session.send('\1' + self.__id + '\0' + '\1')
 	
 	# Returns the error info.	
 	def info(self):

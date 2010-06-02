@@ -21,21 +21,28 @@ try:
   
   # create query
   query = session.query(cmd)
-  # runs the query
+  
+  # runs the first query
   if query.run():
-  	if query.more():
+  	# gets all results of query
+  	while query.more():
   		print 'Result Query 1: ', query.next()
   
   query2 = session.query("11 to 12")
+  
+  # runs the second query
   if query2.run():
+  	# gets first result of query2
   	if query2.more():
   		print 'Result Query 2: ', query2.next()
-  		
-  if query.more():
-  	print 'Result Query 1: ', query.next()
-  	
+  
+  # gets next result of query2	
   if query2.more():
   	print 'Result Query 2: ', query2.next()
+  
+  # closes both query objects	
+  query.close()
+  query2.close()
   	
   # close session
   session.close()
