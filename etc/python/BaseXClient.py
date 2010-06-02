@@ -14,29 +14,6 @@
 # or error output.
 #
 # -----------------------------------------------------------------------------
-#
-# Example:
-#
-# import BaseXClient
-#
-# try:
-#   # create session
-#   session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
-#
-#   # perform command and show result or error output
-#   if session.execute("xquery 1 to 10"):
-#     print session.result()
-#   else:
-#     print session.info()
-#
-#   # close session
-#   session.close()
-#
-# except IOError as e:
-#   # print exception
-#   print e
-#
-# -----------------------------------------------------------------------------
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
 # -----------------------------------------------------------------------------
 
@@ -48,7 +25,7 @@ class Session():
   def __init__(self, host, port, user, pw):
     # allocate buffer for speeding up communication
     self.__buf = array.array('B', '\0' * 0x1000)
-    self.__init()
+    self.init()
 
     # create server connection
     global s
@@ -56,7 +33,7 @@ class Session():
     s.connect((host, port))
 
     # receive timestamp
-    ts = self.__readString()
+    ts = self.readString()
 
     # send username and hashed password/timestamp
     m = hashlib.md5()
@@ -74,10 +51,14 @@ class Session():
     s.send(com + '\0')
 
     # send command to server and receive result
-    self.__init()
-    self.__result = self.__readString()
-    self.__info = self.__readString()
-    return self.__read() == 0
+    self.init()
+    self.__result = self.readString()
+    self.__info = self.readString()
+    return self.read() == 0
+  
+  # Returns a query object.  
+  def query(self, q):
+  	return Query(self, q)
 
   # Returns the result.
   def result(self):
@@ -93,27 +74,77 @@ class Session():
     s.close()
 
   # Initializes the byte transfer.
-  def __init(self):
+  def init(self):
     self.__bpos = 0
     self.__bsize = 0
 
   # Receives a string from the socket.
-  def __readString(self):
+  def readString(self):
     bf = array.array('B')
     while True:
-      b = self.__read()
+      b = self.read()
       if b:
         bf.append(b)
       else:
         return bf.tostring()
 
   # Returns a single byte from the socket.
-  def __read(self):
+  def read(self):
     # Cache next bytes
     if self.__bpos == self.__bsize:
       self.__bsize = s.recv_into(self.__buf)
       self.__bpos = 0
-
     b = self.__buf[self.__bpos]
     self.__bpos += 1
     return b
+  
+  # Executes the iterative mode of a query.
+  def executeIter(self, com):
+  	s.send('\0' + com + '\0');
+  	return self.res()
+  
+  # Sends the defined sign.	
+  def send(self, sign):
+  	s.send(sign)
+  
+  # Checks the next byte for null or 1.	
+  def check(self):
+   	return s.recv(1) == '\0'
+   
+  # Returns the received string. 	
+  def res(self):
+  	self.init()
+  	return self.readString()
+     
+   
+class Query():
+	# Constructor, creating a new query object.
+	def __init__(self, session, q):
+		self.__session = session
+		self.__query = q
+	
+	# Runs the query and returns the success flag.
+	def run(self):
+		self.__id = self.__session.executeIter(self.__query)
+		return self.__id > 0
+	
+	# Checks for more parts of the result.	
+	def more(self):
+		self.__session.send('\1' + self.__id + '\0')
+		if self.__session.check():
+			self.__part = self.__session.res()
+			return True
+		else:
+			return False
+	
+	# Returns the next part of the result.
+	def next(self):
+		return self.__part		
+	
+	# Closes the iterative execution.	
+	def close(self):
+		self.__session.send('\1' + self.__id + '\1')
+	
+	# Returns the error info.	
+	def info(self):
+		return self.__session.res()

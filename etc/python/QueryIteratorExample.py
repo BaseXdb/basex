@@ -23,13 +23,19 @@ try:
   query = session.query(cmd)
   # runs the query
   if query.run():
-  	# prints the results
-  	while query.more():
-   		print query.next()
-  # prints the error info
-  else:
-  	print query.info()
-  query.close()
+  	if query.more():
+  		print 'Result Query 1: ', query.next()
+  
+  query2 = session.query("11 to 12")
+  if query2.run():
+  	if query2.more():
+  		print 'Result Query 2: ', query2.next()
+  		
+  if query.more():
+  	print 'Result Query 1: ', query.next()
+  	
+  if query2.more():
+  	print 'Result Query 2: ', query2.next()
   	
   # close session
   session.close()
