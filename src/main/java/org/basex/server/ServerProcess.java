@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+
 import org.basex.BaseXServer;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
@@ -13,14 +15,10 @@ import org.basex.core.Prop;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Exit;
 import org.basex.data.Data;
-import org.basex.data.XMLSerializer;
 import org.basex.io.BufferInput;
 import org.basex.io.BufferedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
-import org.basex.query.item.Item;
-import org.basex.query.iter.Iter;
 import org.basex.util.Performance;
 
 /**
@@ -44,6 +42,10 @@ public final class ServerProcess extends Thread {
   private Thread timeout;
   /** Log. */
   private final Log log;
+  /** List for active queries. */
+  private ArrayList<QueryProcess> queries = new ArrayList<QueryProcess>();
+  /** Id for queries. */
+  private int id;
 
   /**
    * Constructor.
@@ -54,6 +56,7 @@ public final class ServerProcess extends Thread {
     context = new Context(b.context);
     log = b.log;
     socket = s;
+    id = 0;
   }
 
   /**
@@ -97,8 +100,30 @@ public final class ServerProcess extends Thread {
         try {
           byte b = in.readByte();
           if(b == 0) {
-            iterate();
-            return;
+            id++;
+            QueryProcess query = new QueryProcess(id, out, log);
+            queries.add(query);
+            query.start(in.readString(), context);
+            continue;
+          } else if(b == 1) {
+            QueryProcess tmp = null;
+            byte bid = in.readByte();
+            for(QueryProcess q : queries) {
+              if(q.id + 48 == bid) {
+                tmp = q;
+                break;
+              }
+            }
+            if(in.readByte() == 1) {
+              tmp.close();
+            } else {
+            try {
+              tmp.more();
+            } catch(QueryException e) {
+              e.printStackTrace();
+              }
+            }
+            continue;
           }
           input = in.readString(b);
         } catch(final IOException ex) {
@@ -149,38 +174,6 @@ public final class ServerProcess extends Thread {
       log.write(this, input, INFOERROR + ex.getMessage());
       ex.printStackTrace();
       exit();
-    }
-  }
-
-  /**
-   * Query is executed in iterate mode.
-   * @throws IOException Exception
-   */
-  private void iterate() throws IOException {
-    String input = in.readString();
-    QueryProcessor processor = new QueryProcessor(input, context);
-    try {
-      Iter iter = processor.iter();
-      XMLSerializer serializer = new XMLSerializer(out);
-      send(true);
-      Item item;
-      while(in.read() == 0) {
-        if((item = iter.next()) != null) {
-          send(true);
-          item.serialize(serializer);
-          send(true);
-        } else {
-          send(false);
-        }
-      }
-      serializer.close();
-      processor.close();
-    } catch(QueryException ex) {
-      // invalid command was sent by a client; create error feedback
-      log.write(this, input, INFOERROR + ex.extended());
-      send(false);
-      out.print(ex.extended());
-      send(true);
     }
   }
 
