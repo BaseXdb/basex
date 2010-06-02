@@ -28,21 +28,17 @@ public final class ReplacePrimitive extends NodeCopy {
 
   @Override
   public void apply(final int add) {
-    // [LK] fix replace bug: doc root node n: replace node n with something
-    // else -> namespace hierarchy corrupt.
-    // solution: change order of insert/delete atomics
-    // order insert, delete important for consistency?
     final DBNode n = (DBNode) node;
     final int pre = n.pre + add;
     final Data d = n.data;
     final int par = d.parent(pre, Nod.kind(n.type));
-    if(n.type == Type.ATT) {
-      d.insertAttr(pre, par, md);
-    } else {
-      d.insert(pre, par, md);
-    }
-    d.delete(pre + md.meta.size);
-    mergeTexts(d, pre, pre + 1);
+    
+    //new
+    d.delete(pre);
+    
+    if(n.type == Type.ATT) d.insertAttr(pre, par, md);
+    else d.insert(pre, par, md);
+    if(Nod.kind(n.type) == Data.TEXT) mergeTexts(d, pre, pre + 1);
   }
 
   @Override
