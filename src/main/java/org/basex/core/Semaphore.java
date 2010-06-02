@@ -9,7 +9,7 @@ import java.util.LinkedList;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
-final class Semaphore {
+public final class Semaphore {
   /** List of waiting processes for writers or reading groups. */
   private final LinkedList<Lock> waiting = new LinkedList<Lock>();
 
@@ -29,7 +29,7 @@ final class Semaphore {
    * Modifications before executing a process.
    * @param w writing flag
    */
-  void before(final boolean w) {
+  public void before(final boolean w) {
     if(w) {       
       if(state == State.IDLE) {
           state = State.WRITE;
@@ -75,7 +75,7 @@ final class Semaphore {
    * Modifications after executing a process.
    * @param w writing flag
    */
-  synchronized void after(final boolean w) {
+  public synchronized void after(final boolean w) {
     if(w) {
       if(waiting.size() > 0 && !waiting.getFirst().writer) {
         notifyReaders();

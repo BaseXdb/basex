@@ -31,37 +31,46 @@ public class QueryProcess {
   /** Serializer. */
   private XMLSerializer serializer;
   /** Log. */
-  private Log log;
+  private ServerProcess serverProc;
+  /** Update flag. */
+  private boolean updating;
+  /** Context. */
+  private Context ctx;
   
   /**
    * Constructor.
    * @param i id
    * @param o output
-   * @param l log
+   * @param sp serverProcess
    */
-  public QueryProcess(final int i, final PrintOutput o, final Log l) {
+  public QueryProcess(final int i, final PrintOutput o,
+      final ServerProcess sp) {
     this.id = i;
     this.out = o;
-    this.log = l;
+    this.serverProc = sp;
   }
   
   /**
    * Starts the query process.
    * @param s input string
-   * @param ctx context
+   * @param c context
    * @throws IOException Exception
    */
-  public void start(final String s, final Context ctx) throws IOException {
+  public void start(final String s, final Context c) throws IOException {
+    ctx = c;
     processor = new QueryProcessor(s, ctx);
+    updating = processor.ctx.updating;
+    ctx.sema.before(updating);
     try {
     iter = processor.iter();
     serializer = new XMLSerializer(out);
     } catch(QueryException ex) {
       // invalid command was sent by a client; create error feedback
-      log.write(this, s, INFOERROR + ex.extended());
+      serverProc.log.write(this, s, INFOERROR + ex.extended());
       send(false);
       out.print(ex.extended());
       send(true);
+      close();
     }
     out.print(String.valueOf(id));
     send(true);
@@ -69,11 +78,10 @@ public class QueryProcess {
   
   /**
    * Returns the next item to the client.
-   * @throws IOException Exception
-   * @throws QueryException Exception
    */
-  public void more() throws IOException, QueryException {
+  public void more() {
     Item item;
+    try {
     if((item = iter.next()) != null) {
       send(true);
       item.serialize(serializer);
@@ -82,24 +90,35 @@ public class QueryProcess {
       send(false);
       close();
     }
+    } catch(Exception ex) {
+      send(false);
+      close();
+    }
   }
   
   /**
    * Closes the query process.
-   * @throws IOException Exception
    */
-  public void close() throws IOException {
-    serializer.close();
-    processor.close();
+  public void close() {
+    ctx.sema.after(updating);
+    try {
+      serializer.close();
+      processor.close();
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+    serverProc.queries.remove(this);
   }
   
   /**
    * Sends the success flag to the client.
    * @param ok success flag
-   * @throws IOException I/O exception
    */
-  private void send(final boolean ok) throws IOException {
-    out.write(ok ? 0 : 1);
-    out.flush();
+  private void send(final boolean ok) {
+    try {
+      serverProc.send(ok);
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
   }
 }

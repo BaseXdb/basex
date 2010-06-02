@@ -41,9 +41,9 @@ public final class ServerProcess extends Thread {
   /** Timeout thread. */
   private Thread timeout;
   /** Log. */
-  private final Log log;
+  final Log log;
   /** List for active queries. */
-  private ArrayList<QueryProcess> queries = new ArrayList<QueryProcess>();
+  public ArrayList<QueryProcess> queries = new ArrayList<QueryProcess>();
   /** Id for queries. */
   private int id;
 
@@ -100,16 +100,15 @@ public final class ServerProcess extends Thread {
         try {
           byte b = in.readByte();
           if(b == 0) {
-            id++;
-            QueryProcess query = new QueryProcess(id, out, log);
+            QueryProcess query = new QueryProcess(id++, out, this);
             queries.add(query);
             query.start(in.readString(), context);
             continue;
           } else if(b == 1) {
             QueryProcess tmp = null;
-            byte bid = in.readByte();
+            int t = Integer.valueOf(in.readString());
             for(QueryProcess q : queries) {
-              if(q.id + 48 == bid) {
+              if(q.id == t) {
                 tmp = q;
                 break;
               }
@@ -117,11 +116,7 @@ public final class ServerProcess extends Thread {
             if(in.readByte() == 1) {
               tmp.close();
             } else {
-            try {
               tmp.more();
-            } catch(QueryException e) {
-              e.printStackTrace();
-              }
             }
             continue;
           }
@@ -182,7 +177,7 @@ public final class ServerProcess extends Thread {
    * @param ok success flag
    * @throws IOException I/O exception
    */
-  private void send(final boolean ok) throws IOException {
+  public void send(final boolean ok) throws IOException {
     out.write(ok ? 0 : 1);
     out.flush();
   }
