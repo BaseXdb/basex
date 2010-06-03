@@ -23,7 +23,7 @@ import org.basex.util.Performance;
 
 /**
  * Single session for a client-server connection.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
@@ -77,8 +77,8 @@ public final class ServerProcess extends Thread {
       final String us = in.readString();
       final String pw = in.readString();
       context.user = context.users.get(us);
-      final boolean ok = context.user != null &&
-        md5(string(context.user.pw) + ts).equals(pw);
+      final boolean ok = context.user != null
+          && md5(string(context.user.pw) + ts).equals(pw);
       send(ok);
 
       if(ok) start();
@@ -100,24 +100,10 @@ public final class ServerProcess extends Thread {
         try {
           byte b = in.readByte();
           if(b == 0) {
-            QueryProcess query = new QueryProcess(id++, out, this);
-            queries.add(query);
-            query.start(in.readString(), context);
+            startIterate();
             continue;
           } else if(b == 1) {
-            QueryProcess tmp = null;
-            int t = Integer.valueOf(in.readString());
-            for(QueryProcess q : queries) {
-              if(q.id == t) {
-                tmp = q;
-                break;
-              }
-            }
-            if(in.readByte() == 1) {
-              tmp.close();
-            } else {
-              tmp.more();
-            }
+            getNext();
             continue;
           }
           input = in.readString(b);
@@ -132,8 +118,8 @@ public final class ServerProcess extends Thread {
         proc = null;
         try {
           final Proc[] procs = new CommandParser(input, context, true).parse();
-          if(procs.length != 1)
-            throw new QueryException(SERVERPROC, procs.length);
+          if(procs.length != 1) throw new QueryException(SERVERPROC,
+              procs.length);
 
           proc = procs[0];
         } catch(final QueryException ex) {
@@ -169,6 +155,41 @@ public final class ServerProcess extends Thread {
       log.write(this, input, INFOERROR + ex.getMessage());
       ex.printStackTrace();
       exit();
+    }
+  }
+
+  /**
+   * Starts the queryProcess for iterate query mode.
+   * @throws IOException Exception
+   */
+  private void startIterate() throws IOException {
+    id++;
+    QueryProcess query = new QueryProcess(id, out, this);
+    queries.add(query);
+    query.start(in.readString(), context);
+  }
+
+  /**
+   * Gets next result item.
+   * @throws IOException Exception
+   */
+  private void getNext() throws IOException {
+    QueryProcess tmp = null;
+    int t = Integer.valueOf(in.readString());
+    for(QueryProcess q : queries) {
+      if(q.id == t) {
+        tmp = q;
+        break;
+      }
+    }
+    if(tmp == null) {
+      send(false);
+    } else {
+      if(in.readByte() == 1) {
+        tmp.close();
+      } else {
+        tmp.more();
+      }
     }
   }
 

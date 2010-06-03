@@ -64,22 +64,23 @@ public class QueryProcess {
     try {
     iter = processor.iter();
     serializer = new XMLSerializer(out);
+    out.print(String.valueOf(id));
+    send(true);
     } catch(QueryException ex) {
       // invalid command was sent by a client; create error feedback
       serverProc.log.write(this, s, INFOERROR + ex.extended());
-      send(false);
+      out.print(String.valueOf(0));
+      send(true);
       out.print(ex.extended());
       send(true);
-      close();
     }
-    out.print(String.valueOf(id));
-    send(true);
   }
   
   /**
    * Returns the next item to the client.
+   * @throws IOException Exception
    */
-  public void more() {
+  public void more() throws IOException {
     Item item;
     try {
     if((item = iter.next()) != null) {
@@ -98,27 +99,21 @@ public class QueryProcess {
   
   /**
    * Closes the query process.
+   * @throws IOException Exception
    */
-  public void close() {
+  public void close() throws IOException {
     ctx.sema.after(updating);
-    try {
-      serializer.close();
-      processor.close();
-    } catch(IOException e) {
-      e.printStackTrace();
-    }
+    serializer.close();
+    processor.close();
     serverProc.queries.remove(this);
   }
   
   /**
    * Sends the success flag to the client.
    * @param ok success flag
+   * @throws IOException Exception
    */
-  private void send(final boolean ok) {
-    try {
+  private void send(final boolean ok) throws IOException {
       serverProc.send(ok);
-    } catch(IOException e) {
-      e.printStackTrace();
-    }
   }
 }
