@@ -15,31 +15,6 @@
  * or error output.
  *
  * ----------------------------------------------------------------------------
- *
- * Example:
- *
- * include("BaseXClient.php");
- *
- * try {
- *   // create session
- *   $session = new Session("localhost", 1984, "admin", "admin");
- *
- *   // perform command and show result or error output
- *   if($session->execute("xquery 1 to 10")) {
- *     print $session->result();
- *   } else {
- *     print $session->info();
- *   }
- *
- *  // close session
- *  $session->close();
- *
- * } catch (Exception $e) {
- *   // print exception
- *   print $e->getMessage();
- * }
- *
- * ----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * ----------------------------------------------------------------------------
  */
@@ -120,5 +95,86 @@ class Session {
     }
     return $this->buffer[$this->bpos++];
   }
+  
+  /* Returns the query object.*/
+  public function query($q) {
+  	return new Query($this, $q);
+  }
+  
+  /* Executes the query. */
+  public function executeIter($cmd) {
+  	// send command to server
+    socket_write($this->socket, "\0$cmd\0");
+    return $this->res();
+  }
+  
+  /* Sends the sign. */
+  public function send($sign) {
+  	socket_write($this->socket, $sign);
+  }
+  
+  /* Checks the next byte. */
+  public function check() {
+  	return socket_read($this->socket, 1) == "\0";
+  }
+  
+  /* Returns the result. */
+  public function res() {
+  	$this->init();
+  	return $this->readString();
+  }
+}
+
+class Query {
+	/* Class variables.*/
+ 	var $session, $query, $part, $open, $id;
+ 	
+	function __construct($s, $q) {
+		$this->session = $s;
+		$this->query = $q;
+		$this->open = True;
+	}
+	
+	/* Starts the query execution. */
+	public function run() {
+	    $this->id = $this->session->executeIter($this->query);
+	    if ($this->id != "0") {
+	       return True;
+         } else {
+           $this->open = False;
+           return False;  
+         }
+	}
+	
+	/* Checks for next item in line. */
+	public function more() {
+	    if ($this->open) {
+            $this->session->send("\1$this->id\0\0");
+            if ($this->session->check()) {
+			$this->part = $this->session->res();
+			return True; 
+            } else {
+			$this->open = False;
+			return False;
+		  }
+        }
+	}
+	
+	/* Returns next item. */
+	public function next() {
+		return $this->part;
+	}
+	
+	/* Closes the query. */
+	public function close() {
+	   if ($this->open) {
+        $this->session->send("\1$this->id\0\1");   
+        }
+	}
+	
+	/* Returns the info string. */
+	public function info() {
+		return $this->session->res();
+	}	
 }
 ?>
