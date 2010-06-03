@@ -35,13 +35,15 @@ try:
   	# gets first result of query2
   	if query2.more():
   		print 'Result Query 2: ', query2.next()
+  else:
+  	print query2.info()
   
   # gets next result of query2	
   if query2.more():
   	print 'Result Query 2: ', query2.next()
   
   # closes both query objects	
-  query.close()
+  #query.close()
   query2.close()
   	
   # close session

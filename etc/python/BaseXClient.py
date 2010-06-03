@@ -127,17 +127,22 @@ class Query():
 	# Runs the query and returns the success flag.
 	def run(self):
 		self.__id = self.__session.executeIter(self.__query)
-		return self.__id > 0
-	
-	# Checks for more parts of the result.	
-	def more(self):
-		self.__session.send('\1' + self.__id + '\0' + '\0')
-		if self.__session.check():
-			self.__part = self.__session.res()
+		if self.__id != '0':
 			return True
 		else:
 			self.__open = False
 			return False
+	
+	# Checks for more parts of the result.	
+	def more(self):
+		if self.__open:
+			self.__session.send('\1' + self.__id + '\0' + '\0')
+			if self.__session.check():
+				self.__part = self.__session.res()
+				return True
+			else:
+				self.__open = False
+				return False
 	
 	# Returns the next part of the result.
 	def next(self):
