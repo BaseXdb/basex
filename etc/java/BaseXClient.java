@@ -11,7 +11,7 @@ import java.security.MessageDigest;
 
 /**
  * -----------------------------------------------------------------------------
- * 
+ *
  * This Java module provides methods to connect to and communicate with the
  * BaseX Server.
  *
@@ -28,13 +28,12 @@ import java.security.MessageDigest;
  * An even faster approach is to call execute() with the database command and
  * an output stream. The result will directly be printed and does not have to
  * be cached.
- * 
+ *
  * -----------------------------------------------------------------------------
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 public class BaseXClient {
-  
   /** Socket. */
   private Socket socket;
   /** Output stream. */
@@ -51,7 +50,7 @@ public class BaseXClient {
   private int bpos;
   /** Cache size. */
   private int bsize;
-  
+
   /**
    * Constructor.
    * @param host server name
@@ -65,7 +64,7 @@ public class BaseXClient {
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
     in = socket.getInputStream();
-    
+
     // receive timestamp
     final String ts = readString();
 
@@ -78,7 +77,7 @@ public class BaseXClient {
     // receive success flag
     if(in.read() != 0) throw new IOException();
   }
-  
+
   /**
    * Executes the command.
    * @param cmd command
@@ -94,7 +93,7 @@ public class BaseXClient {
     info = readString();
     return read() == 0;
   }
-  
+
   /**
    * Executes the command.
    * @param cmd command
@@ -108,7 +107,7 @@ public class BaseXClient {
     info = readString();
     return read() == 0;
   }
-  
+
   /**
    * Initializes the input read.
    */
@@ -116,7 +115,7 @@ public class BaseXClient {
     bpos = 0;
     bsize = 0;
   }
-  
+
   /**
    * Reads input stream.
    * @return byte 1 byte
@@ -129,7 +128,7 @@ public class BaseXClient {
     }
     return cache[bpos++];
   }
-  
+
   /**
    * Reads string from buffer.
    * @param o output stream
@@ -142,19 +141,19 @@ public class BaseXClient {
       o.write(b);
     }
   }
-  
+
   /**
    * Reads string from buffer.
    * @throws IOException Exception
    * @return String result or info
    */
   private String readString() throws IOException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
     DataOutputStream dos = new DataOutputStream(baos);
     readString(dos);
     return baos.toString();
   }
-  
+
   /**
    * Sends a string to the server.
    * @param s string to be sent
@@ -165,7 +164,7 @@ public class BaseXClient {
     for(final byte t : sb) out.write(t);
     out.write(0);
   }
-  
+
   /**
    * Returns the info string.
    * @return string info
@@ -173,7 +172,7 @@ public class BaseXClient {
   public String info() {
     return info;
   }
-  
+
   /**
    * Returns the result string.
    * @return string result
@@ -181,7 +180,7 @@ public class BaseXClient {
   public String result() {
     return result;
   }
-  
+
   /**
    * Returns a md5 hash.
    * @param pw String
@@ -191,7 +190,7 @@ public class BaseXClient {
     try {
       final MessageDigest md = MessageDigest.getInstance("MD5");
       md.update(pw.getBytes());
-      ByteArrayOutputStream baos = new ByteArrayOutputStream(); 
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
       DataOutputStream dos = new DataOutputStream(baos);
       for(final byte b : md.digest()) {
         final int h = b >> 4 & 0x0F;
@@ -204,7 +203,7 @@ public class BaseXClient {
       return pw;
     }
   }
-  
+
   /**
    * Closes the session.
    * @throws IOException Exception
