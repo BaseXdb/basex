@@ -9,9 +9,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 import java.util.ListIterator;
-
 import javax.swing.SwingUtilities;
-
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -28,7 +26,7 @@ import org.basex.util.Token;
 
 /**
  * This class offers a real tree view.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -159,7 +157,7 @@ public final class TreeView extends View implements TreeViewOptions {
       sub = new TreeSubtree(data);
       tr = new TreeRects(gui.prop);
     }
-    if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT) 
+    if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT)
       numRoots = sub.generateBorders(c);
 
     if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT
@@ -618,7 +616,7 @@ public final class TreeView extends View implements TreeViewOptions {
     }
 
     // if there are descendants draw them
-    if((t == DRAW_CONN || t == DRAW_HIGHLIGHT) && size > 1 && lv + 1 < height) 
+    if((t == DRAW_CONN || t == DRAW_HIGHLIGHT) && size > 1 && lv + 1 < height)
       highlightDescendants(
         g, rn, lv, r, pre, rc, t);
 
@@ -672,7 +670,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param t highlight type
    */
   private void highlightDescendants(final Graphics g, final int rn,
-      final int lv, final TreeRect r, final int pre, final int px, 
+      final int lv, final TreeRect r, final int pre, final int px,
       final byte t) {
 
     // System.out.println(rn + " " + pre +" " + lv + " ");
@@ -707,7 +705,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
           final TreeRect dr = tr.getTreeRectPerIndex(rn, lvd, j + start);
 
-          if(SHOW_DESCENDANTS_CONN && levelDistance >= MIN_NODE_DIST_CONN) 
+          if(SHOW_DESCENDANTS_CONN && levelDistance >= MIN_NODE_DIST_CONN)
             drawDescendantsConn(
               g, lvd, dr, px, t);
 
@@ -814,7 +812,7 @@ public final class TreeView extends View implements TreeViewOptions {
               rgb + alpha, false));
           g.fillRect(df, getYperLevel(lvv), ww, nodeHeight + 1);
       }
-      
+
       if(lvv + 1 < sub.getSubtreeHeight(rn)
           && !tr.isBigRectangle(sub, rn, lvv + 1)) {
         final Data d = gui.context.current.data;
@@ -1017,7 +1015,7 @@ public final class TreeView extends View implements TreeViewOptions {
     }
     nodeHeight = MAX_NODE_HEIGHT;
     int lD;
-    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) < 
+    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) <
         (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
         : BEST_LEVEL_DISTANCE)
         && nodeHeight >= MIN_NODE_HEIGHT)

@@ -1126,13 +1126,13 @@ public final class Token {
 
   /**
    * Returns a md5 hash.
-   * @param pw password string
+   * @param string string to be hashed
    * @return hash
    */
-  public static String md5(final String pw) {
+  public static String md5(final String string) {
     try {
       final MessageDigest md = MessageDigest.getInstance("MD5");
-      md.update(Token.token(pw));
+      md.update(Token.token(string));
       final TokenBuilder tb = new TokenBuilder();
       for(final byte b : md.digest()) {
         final int h = b >> 4 & 0x0F;
@@ -1143,7 +1143,7 @@ public final class Token {
       return tb.toString();
     } catch(final Exception ex) {
       Main.notexpected(ex);
-      return pw;
+      return null;
     }
   }
 

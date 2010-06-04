@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
-
 import org.basex.BaseXServer;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
@@ -23,7 +22,7 @@ import org.basex.util.Performance;
 
 /**
  * Single session for a client-server connection.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
@@ -98,7 +97,7 @@ public final class ServerProcess extends Thread {
     try {
       while(true) {
         try {
-          byte b = in.readByte();
+          final byte b = in.readByte();
           if(b == 0) {
             startIterate();
             continue;
@@ -164,7 +163,7 @@ public final class ServerProcess extends Thread {
    */
   private void startIterate() throws IOException {
     id++;
-    QueryProcess query = new QueryProcess(id, out, this);
+    final QueryProcess query = new QueryProcess(id, out, this);
     queries.add(query);
     query.start(in.readString(), context);
   }
@@ -175,8 +174,8 @@ public final class ServerProcess extends Thread {
    */
   private void getNext() throws IOException {
     QueryProcess tmp = null;
-    int t = Integer.valueOf(in.readString());
-    for(QueryProcess q : queries) {
+    final int t = Integer.valueOf(in.readString());
+    for(final QueryProcess q : queries) {
       if(q.id == t) {
         tmp = q;
         break;

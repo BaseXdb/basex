@@ -84,7 +84,7 @@ public final class FElem extends FNode {
     for(int i = 0; i < at.getLength(); i++) {
       attArr[i] = new FAttr(at.item(i), this);
     }
-    
+
     for(int i = 0; i < ch.getLength(); i++) {
       final Node child = ch.item(i);
 

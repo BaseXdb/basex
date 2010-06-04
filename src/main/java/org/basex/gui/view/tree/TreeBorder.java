@@ -8,11 +8,11 @@ package org.basex.gui.view.tree;
  */
 final class TreeBorder {
   /** Real Level. */
-  int level;
+  final int level;
   /** Start index. */
-  int start;
+  final int start;
   /** Size. */
-  int size;
+  final int size;
 
   /**
    * Stores subtree borders.
@@ -25,7 +25,7 @@ final class TreeBorder {
     start = st;
     size = si;
   }
-  
+
   /**
    * Returns end index.
    * @return end

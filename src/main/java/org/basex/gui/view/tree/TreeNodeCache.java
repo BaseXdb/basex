@@ -5,7 +5,7 @@ import org.basex.util.IntList;
 
 /**
  * This class determines nodes per level and caches them.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -31,7 +31,7 @@ final class TreeNodeCache implements TreeViewOptions {
   private void cacheNodes(final Data data) {
 
     // long time = System.currentTimeMillis();
-    
+
     if(USE_CHILDITERATOR) {
       IntList parList = new IntList(1);
       parList.add(0);
@@ -80,7 +80,7 @@ final class TreeNodeCache implements TreeViewOptions {
       final ChildIterator iterator = new ChildIterator(data, p);
       while(iterator.more()) {
         final int pre = iterator.next();
-        if(data.kind(pre) == Data.ELEM || 
+        if(data.kind(pre) == Data.ELEM ||
             !ONLY_ELEMENT_NODES) line.add(pre);
       }
     }

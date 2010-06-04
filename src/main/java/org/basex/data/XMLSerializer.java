@@ -341,7 +341,7 @@ public final class XMLSerializer extends Serializer {
         return;
       }
     }
-    
+
     if(ch < 0x20 && ch != 0x09 && ch != 0x0A || ch > 0x7F && ch < 0xA0) {
       hex(ch);
     } else {

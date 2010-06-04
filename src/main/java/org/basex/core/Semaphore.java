@@ -30,7 +30,7 @@ public final class Semaphore {
    * @param w writing flag
    */
   public void before(final boolean w) {
-    if(w) {       
+    if(w) {
       if(state == State.IDLE) {
           state = State.WRITE;
           return;
@@ -88,7 +88,7 @@ public final class Semaphore {
       }
     }
   }
-  
+
   /**
    * Notify readers.
    */
@@ -102,7 +102,7 @@ public final class Semaphore {
       }
     }
   }
-  
+
   /**
    * Notify writers.
    */

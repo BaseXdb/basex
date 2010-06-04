@@ -21,11 +21,13 @@ import org.basex.util.Performance;
  * @author Andreas Weiler
  */
 public class QueryProcess {
-
+  /** Flag for timeout. */
+  boolean running = true;
   /** Id. */
-  public int id;
+  int id;
+
   /** Output. */
-  PrintOutput out;
+  private PrintOutput out;
   /** Processor. */
   private QueryProcessor processor;
   /** Iterator. */
@@ -33,15 +35,13 @@ public class QueryProcess {
   /** Serializer. */
   private XMLSerializer serializer;
   /** Log. */
-  private ServerProcess serverProc;
+  private final ServerProcess serverProc;
   /** Update flag. */
   private boolean updating;
   /** Context. */
   private Context ctx;
   /** Timeout thread. */
   private Thread timeout;
-  /** Flag for timeout. */
-  boolean running = true;
 
   /**
    * Constructor.
@@ -51,9 +51,9 @@ public class QueryProcess {
    */
   public QueryProcess(final int i, final PrintOutput o,
       final ServerProcess sp) {
-    this.id = i;
-    this.out = o;
-    this.serverProc = sp;
+    id = i;
+    out = o;
+    serverProc = sp;
   }
 
   /**
@@ -73,7 +73,7 @@ public class QueryProcess {
       out.print(String.valueOf(id));
       send(true);
       startTimer();
-    } catch(QueryException ex) {
+    } catch(final QueryException ex) {
       // invalid command was sent by a client; create error feedback
       serverProc.log.write(this, s, INFOERROR + ex.extended());
       out.print(String.valueOf(0));
@@ -107,7 +107,7 @@ public class QueryProcess {
           close();
         }
       }
-    } catch(Exception ex) {
+    } catch(final Exception ex) {
       send(false);
       send(false);
       close();

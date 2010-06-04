@@ -1,7 +1,6 @@
 package org.basex.gui.view.tree;
 
 import java.awt.Graphics;
-
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.gui.GUIProp;
@@ -10,7 +9,7 @@ import org.basex.gui.view.ViewData;
 
 /**
  * This class stores the rectangles.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -42,7 +41,7 @@ final class TreeRects implements TreeViewOptions {
     final int rl = roots.length;
     if(rl == 0) return 0;
     final double w = (sw - BORDER_PADDING) / (double) rl;
-    if(w < 2) { 
+    if(w < 2) {
       return -1;
     }
 
@@ -164,7 +163,7 @@ final class TreeRects implements TreeViewOptions {
   byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data;
     if(pre == c.current.nodes[rn]) return ViewData.path(d, pre);
-    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM) 
+    if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM)
       return ViewData.tag(
         prop, d, pre);
     return ViewData.content(d, pre, false);

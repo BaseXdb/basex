@@ -1,7 +1,6 @@
 package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;

@@ -2,10 +2,8 @@ package org.basex.query.up;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.Put;
@@ -41,13 +39,15 @@ abstract class Primitives {
    * @param p update primitive
    * @throws QueryException query exception
    */
-  protected final void add(final int i, final UpdatePrimitive p) throws QueryException {
+  protected final void add(final int i, final UpdatePrimitive p)
+      throws QueryException {
+
     if(p instanceof Put) putIds.add(i);
     NodePrimitives l = op.get(i);
     if(l == null) {
       l = new NodePrimitivesContainer();
       op.put(i, l);
-    } 
+    }
     l.add(p);
   }
 
