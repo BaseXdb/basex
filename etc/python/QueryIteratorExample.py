@@ -21,12 +21,15 @@ try:
   
   # create query
   query = session.query(cmd)
+  query2 = session.query(cmd)
   
   # runs the first query
   if query.run():
   	# gets all results of query
   	while query.more():
   		print 'Result Query 1: ', query.next()
+  else:
+  	print query.info()
   
   query2 = session.query("11 to 12")
   
@@ -37,13 +40,17 @@ try:
   		print 'Result Query 2: ', query2.next()
   else:
   	print query2.info()
-  
+  	
+  i = 0
+  while i < 10000000:
+  	i += 1
+  	
   # gets next result of query2	
   if query2.more():
   	print 'Result Query 2: ', query2.next()
   
   # closes both query objects	
-  #query.close()
+  query.close()
   query2.close()
   	
   # close session

@@ -123,6 +123,7 @@ class Query():
 		self.__session = session
 		self.__query = q
 		self.__open = True
+		self.__info = ''
 	
 	# Runs the query and returns the success flag.
 	def run(self):
@@ -131,6 +132,7 @@ class Query():
 			return True
 		else:
 			self.__open = False
+			self.__info = self.__session.res()
 			return False
 	
 	# Checks for more parts of the result.	
@@ -141,6 +143,8 @@ class Query():
 				self.__part = self.__session.res()
 				return True
 			else:
+				if self.__session.check():
+					print 'Query ', self.__id, ':', self.__session.res()
 				self.__open = False
 				return False
 	
@@ -155,4 +159,4 @@ class Query():
 	
 	# Returns the error info.	
 	def info(self):
-		return self.__session.res()
+		return self.__info
