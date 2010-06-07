@@ -37,7 +37,7 @@ public class QueryProcess {
   /** Log. */
   private final ServerProcess serverProc;
   /** Update flag. */
-  private boolean updating;
+  boolean updating;
   /** Context. */
   private Context ctx;
   /** Timeout thread. */
@@ -140,12 +140,12 @@ public class QueryProcess {
    */
   private void startTimer() {
     final long to = ctx.prop.num(Prop.TIMEOUT);
-    if(to == 0) return;
+    if(to == 0 || updating) return;
 
     timeout = new Thread() {
       @Override
       public void run() {
-        Performance.sleep(10);
+        Performance.sleep(to * 1000);
         running = false;
       }
     };
