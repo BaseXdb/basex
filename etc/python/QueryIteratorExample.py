@@ -21,7 +21,6 @@ try:
   
   # create query
   query = session.query(cmd)
-  query2 = session.query(cmd)
   
   # runs the first query
   if query.run():
@@ -40,10 +39,6 @@ try:
   		print 'Result Query 2: ', query2.next()
   else:
   	print query2.info()
-  	
-  i = 0
-  while i < 10000000:
-  	i += 1
   	
   # gets next result of query2	
   if query2.more():

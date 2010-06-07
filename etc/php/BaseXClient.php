@@ -127,12 +127,13 @@ class Session {
 
 class Query {
 	/* Class variables.*/
- 	var $session, $query, $part, $open, $id;
+ 	var $session, $query, $part, $open, $id, $info;
  	
 	function __construct($s, $q) {
 		$this->session = $s;
 		$this->query = $q;
 		$this->open = True;
+		$this->info = "";
 	}
 	
 	/* Starts the query execution. */
@@ -142,6 +143,7 @@ class Query {
 	       return True;
          } else {
            $this->open = False;
+           $this->info = $this->session->res(); 
            return False;  
          }
 	}
@@ -154,8 +156,12 @@ class Query {
 			$this->part = $this->session->res();
 			return True; 
             } else {
-			$this->open = False;
-			return False;
+            if($this->session->check()) {
+              print "Query ".$this->id.": ".$this->session->res();  
+            } else {
+              $this->open = False;
+			  return False;  
+            }
 		  }
         }
 	}
@@ -174,7 +180,7 @@ class Query {
 	
 	/* Returns the info string. */
 	public function info() {
-		return $this->session->res();
+		return $this->info;
 	}	
 }
 ?>
