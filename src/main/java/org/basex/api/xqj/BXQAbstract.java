@@ -230,7 +230,7 @@ abstract class BXQAbstract {
   private DBNode createDB(final SAXSource s) throws XQException {
     opened();
     try {
-      return checkDB(CreateDB.xml(s, ctx.context.prop));
+      return checkDB(CreateDB.xml(s, ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -246,7 +246,7 @@ abstract class BXQAbstract {
     opened();
     valid(sr, XMLStreamReader.class);
     try {
-      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr), ctx.context.prop));
+      return checkDB(CreateDB.xml(new XMLStreamWrapper(sr), ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
@@ -260,7 +260,7 @@ abstract class BXQAbstract {
    */
   protected final DBNode createDB(final IO io) throws BXQException {
     try {
-      return checkDB(CreateDB.xml(io, ctx.context.prop));
+      return checkDB(CreateDB.xml(io, ctx.context));
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
