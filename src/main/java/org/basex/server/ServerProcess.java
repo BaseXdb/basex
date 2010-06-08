@@ -99,7 +99,10 @@ public final class ServerProcess extends Thread {
         try {
           final byte b = in.readByte();
           if(b == 0) {
-            startIterate();
+            id++;
+            QueryProcess query = new QueryProcess(id, in.readString(),
+                out, this);
+            queries.add(query);
             continue;
           } else if(b == 1) {
             getNext();
@@ -155,17 +158,6 @@ public final class ServerProcess extends Thread {
       ex.printStackTrace();
       exit();
     }
-  }
-
-  /**
-   * Starts the queryProcess for iterate query mode.
-   * @throws IOException Exception
-   */
-  private void startIterate() throws IOException {
-    id++;
-    final QueryProcess query = new QueryProcess(id, out, this);
-    queries.add(query);
-    query.start(in.readString(), context);
   }
 
   /**

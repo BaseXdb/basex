@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 
 import java.io.IOException;
 
-import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
@@ -23,10 +22,10 @@ import org.basex.util.Performance;
 public class QueryProcess {
   /** Flag for timeout. */
   boolean running = true;
+  /** Output. */
+  PrintOutput out;
   /** Id. */
   int id;
-  /** Output. */
-  private PrintOutput out;
   /** Processor. */
   private QueryProcessor processor;
   /** Iterator. */
@@ -34,53 +33,43 @@ public class QueryProcess {
   /** Serializer. */
   private XMLSerializer serializer;
   /** Log. */
-  private final ServerProcess serverProc;
+  private final ServerProcess sp;
   /** Update flag. */
   boolean updating;
-  /** Context. */
-  private Context ctx;
   /** Timeout thread. */
   private Thread timeout;
 
   /**
    * Constructor.
    * @param i id
+   * @param q query string
    * @param o output
-   * @param sp serverProcess
-   */
-  public QueryProcess(final int i, final PrintOutput o,
-      final ServerProcess sp) {
-    id = i;
-    out = o;
-    serverProc = sp;
-  }
-
-  /**
-   * Starts the query process.
-   * @param s input string
-   * @param c context
+   * @param s serverProcess
    * @throws IOException Exception
    */
-  public void start(final String s, final Context c) throws IOException {
-    ctx = c;
-    processor = new QueryProcessor(s, ctx);
+  public QueryProcess(final int i, final String q, final PrintOutput o,
+      final ServerProcess s) throws IOException {
+    id = i;
+    sp = s;
+    out = o;
+    processor = new QueryProcessor(q, sp.context);
     serializer = new XMLSerializer(out);
     updating = processor.ctx.updating;
-    ctx.sema.before(updating);
+    sp.context.sema.before(updating);
     try {
       iter = processor.iter();
       out.print(String.valueOf(id));
       send(true);
       startTimer();
     } catch(final QueryException ex) {
-      ctx.sema.after(updating);
+      sp.context.sema.after(updating);
       // invalid command was sent by a client; create error feedback
-      serverProc.log.write(this, s, INFOERROR + ex.extended());
+      sp.log.write(this, s, INFOERROR + ex.extended());
       out.print(String.valueOf(0));
       send(true);
       out.print(ex.extended());
       send(true);
-      serverProc.queries.remove(this);
+      sp.queries.remove(this);
     }
   }
 
@@ -121,7 +110,7 @@ public class QueryProcess {
    * Closes the query process.
    */
   public void close() {
-    ctx.sema.after(updating);
+    sp.context.sema.after(updating);
     try {
       serializer.close();
       processor.close();
@@ -129,7 +118,7 @@ public class QueryProcess {
       e.printStackTrace();
     }
     stopTimer();
-    serverProc.queries.remove(this);
+    sp.queries.remove(this);
   }
 
   /**
@@ -138,14 +127,14 @@ public class QueryProcess {
    * @throws IOException Exception
    */
   void send(final boolean ok) throws IOException {
-    serverProc.send(ok);
+    sp.send(ok);
   }
 
   /**
    * Starts a timeout thread for the specified process.
    */
   private void startTimer() {
-    final long to = ctx.prop.num(Prop.TIMEOUT);
+    final long to = sp.context.prop.num(Prop.TIMEOUT);
     if(to == 0 || updating) return;
 
     timeout = new Thread() {
