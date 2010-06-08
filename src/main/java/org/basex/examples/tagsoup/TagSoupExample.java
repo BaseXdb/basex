@@ -86,7 +86,7 @@ public final class TagSoupExample {
     // create database instance
     XMLReader parser = getParser();
     InputSource is = getInputSource(addr, null);
-    CONTEXT.openDB(CreateDB.xml(new SAXSource(parser, is), CONTEXT.prop));
+    CONTEXT.openDB(CreateDB.xml(new SAXSource(parser, is), CONTEXT));
 
     // iterate through and serialize result
     QueryProcessor qp = new QueryProcessor(query, CONTEXT);

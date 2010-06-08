@@ -12,8 +12,8 @@ import org.basex.core.Main;
 import org.deepfs.fs.DeepFS;
 
 /**
- * This class parses files in the LST format and creates an XML representation,
- * which resembles the DeepFS markup.
+ * This class parses files in the LST format
+ * and sends events to the specified database builder.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

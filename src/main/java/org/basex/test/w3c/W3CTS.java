@@ -487,7 +487,7 @@ public abstract class W3CTS {
             }
 
             try {
-              final Data rdata = CreateDB.xml(IO.get(ri), context.prop);
+              final Data rdata = CreateDB.xml(IO.get(ri), context);
               final SeqIter si = new SeqIter();
               for(int pre = doc ? 0 : 2; pre < rdata.meta.size;) {
                 si.add(new DBNode(rdata, pre));

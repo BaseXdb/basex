@@ -7,15 +7,15 @@ import org.basex.core.proc.DropDB;
 import org.basex.core.proc.XQuery;
 
 /**
- * This example demonstrates how to import a filesystem structure
+ * This example demonstrates how to import a file in the CSV format
  * into the database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class SimpleFSExample {
+public final class CSVExample {
   /** Private constructor. */
-  private SimpleFSExample() { }
+  private CSVExample() { }
 
   /**
    * Main test method.
@@ -24,34 +24,34 @@ public final class SimpleFSExample {
    */
   public static void main(final String[] args) throws BaseXException {
 
-    System.out.println("=== SimpleFSExample ===");
+    System.out.println("=== CSVExample ===");
 
     // ------------------------------------------------------------------------
     // Create database context
-    final Context context = new Context();
+    final Context ctx = new Context();
 
-    // input path and name of database
-    final String path = ".";
-    final String name = "fsexample";
+    // input file and name of database
+    final String file = "etc/example.csv";
+    final String name = "csvexample";
 
     // ------------------------------------------------------------------------
-    // Import a directory as database
-    System.out.println("\n* Import a directory.");
+    // Import file in the CSV format
+    System.out.println("\n* Import a CSV file.");
 
-    new Create(new SimpleFSParser(path), name).execute(context);
+    new Create(new CSVParser(file), name).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query
     System.out.println("\n* Number of created elements:");
 
-    new XQuery("count(//*)").execute(context, System.out);
+    //new XQuery("count(//*)").execute(ctx, System.out);
+    new XQuery("/").execute(ctx, System.out);
 
     // ------------------------------------------------------------------------
     // Drop database and close context
     System.out.println("\n\n* Drop database.");
 
-    new DropDB(name).execute(context);
-
-    context.close();
+    new DropDB(name).execute(ctx);
+    ctx.close();
   }
 }
