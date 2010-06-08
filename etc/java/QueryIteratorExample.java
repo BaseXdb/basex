@@ -1,7 +1,4 @@
-package org.basex;
-
 import java.io.IOException;
-import org.basex.server.BaseXClient.Query;
 
 /**
  * -----------------------------------------------------------------------------
@@ -12,11 +9,8 @@ import org.basex.server.BaseXClient.Query;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 public final class QueryIteratorExample {
-  /** New line string. */
-  private String nl = System.getProperty("line.separator");
-
   /**
-   * Main method, launching the standalone console mode.
+   * Main method.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
@@ -27,31 +21,37 @@ public final class QueryIteratorExample {
    * Constructor.
    */
   private QueryIteratorExample() {
-    long startTime = System.nanoTime();
-
-    String cmd = "1 to zs";
+    long time = System.nanoTime();
 
     try {
-      BaseXClient session = new BaseXClient("localhost", 1984,
-          "admin", "admin");
+      // create session
+      BaseXClient session =
+        new BaseXClient("localhost", 1984, "admin", "admin");
 
-      System.out.println("=== Query Iterator Version ===");
-      
+      // run query iterator
       try {
-      Query query = session.query(cmd);
-      while(query.hasNext()) {
-        System.out.println("Query Result: " + query.next());
-      }
-      query.close();
-      } catch(IOException e) {
-        System.out.println(e.getMessage());
+        // perform command and output result
+        String result = session.execute("xquery 1 to 3");
+        System.out.println(result);
+
+        BaseXClient.Query query = session.query("4 to 6");
+        while(query.more()) {
+          System.out.println("- " + query.next());
+        }
+        query.close();
+      } catch(IOException ex) {
+        ex.printStackTrace();
       }
 
+      // close session
       session.close();
-      long endTime = System.nanoTime() - startTime;
-      System.out.println(nl + endTime / 10000 / 100d + " ms");
-    } catch(IOException e) {
-      e.printStackTrace();
+
+      // print time needed
+      double ms = (System.nanoTime() - time) / 1000000d;
+      System.out.println("\n" + ms + " ms");
+
+    } catch(IOException ex) {
+      ex.printStackTrace();
     }
   };
 }

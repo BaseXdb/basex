@@ -1,13 +1,11 @@
-package org.basex;
-
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * -----------------------------------------------------------------------------
@@ -34,22 +32,14 @@ import java.security.MessageDigest;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 public class BaseXClient {
-  /** Socket. */
-  private Socket socket;
   /** Output stream. */
   final OutputStream out;
-  /** Result string. */
-  String result;
-  /** Input stream. */
-  private final InputStream in;
+  /** Socket. */
+  private final Socket socket;
+  /** Cache. */
+  private final BufferedInputStream in;
   /** Process info. */
   private String info;
-  /** Cache. */
-  private byte[] cache = new byte[4096];
-  /** Position in cache. */
-  private int bpos;
-  /** Cache size. */
-  private int bsize;
 
   /**
    * Constructor.
@@ -61,51 +51,51 @@ public class BaseXClient {
    */
   public BaseXClient(final String host, final int port, final String usern,
       final String pw) throws IOException {
+
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
-    in = socket.getInputStream();
+    in = new BufferedInputStream(socket.getInputStream());
 
     // receive timestamp
-    final String ts = readString();
+    final String ts = receive();
 
     // send user name and hashed password/timestamp
     out = socket.getOutputStream();
     send(usern);
     send(md5(md5(pw) + ts));
-    out.flush();
 
     // receive success flag
-    if(in.read() != 0) throw new IOException();
+    if(!ok()) throw new IOException();
   }
 
   /**
-   * Executes the command.
+   * Executes a command and serializes the result to the specified stream.
    * @param cmd command
    * @param o output stream
    * @return boolean success flag
    * @throws IOException Exception
    */
   public boolean execute(final String cmd, final OutputStream o)
-  throws IOException {
+      throws IOException {
+
     send(cmd);
-    init();
-    readString(o);
-    info = readString();
-    return read() == 0;
+    receive(o);
+    info = receive();
+    return ok();
   }
 
   /**
-   * Executes the command.
+   * Executes a command and returns the result.
    * @param cmd command
-   * @return boolean success flag
+   * @return result
    * @throws IOException Exception
    */
-  public boolean execute(final String cmd) throws IOException {
+  public String execute(final String cmd) throws IOException {
     send(cmd);
-    init();
-    result = readString();
-    info = readString();
-    return read() == 0;
+    final String s = receive();
+    info = receive();
+    if(!ok()) throw new IOException(info);
+    return s;
   }
   
   /**
@@ -115,129 +105,15 @@ public class BaseXClient {
    * @throws IOException Exception
    */
   public Query query(final String query) throws IOException {
-    return new Query(this, query);
+    return new Query(query);
   }
 
   /**
-   * Initializes the input read.
-   */
-  private void init() {
-    bpos = 0;
-    bsize = 0;
-  }
-
-  /**
-   * Reads input stream.
-   * @return byte 1 byte
-   * @throws IOException Exception
-   */
-  private byte read() throws IOException {
-    if(bpos == bsize) {
-      bsize = in.read(cache);
-      bpos = 0;
-    }
-    return cache[bpos++];
-  }
-
-  /**
-   * Reads string from buffer.
-   * @param o output stream
-   * @throws IOException Exception
-   */
-  private void readString(final OutputStream o) throws IOException {
-    while(true) {
-      byte b = read();
-      if(b == 0) break;
-      o.write(b);
-    }
-  }
-
-  /**
-   * Reads string from buffer.
-   * @throws IOException Exception
-   * @return String result or info
-   */
-  String readString() throws IOException {
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    DataOutputStream dos = new DataOutputStream(baos);
-    readString(dos);
-    return baos.toString();
-  }
-
-  /**
-   * Sends a string to the server.
-   * @param s string to be sent
-   * @throws IOException I/O exception
-   */
-  void send(final String s) throws IOException {
-    byte[] sb = s.getBytes();
-    for(final byte t : sb) out.write(t);
-    out.write(0);
-  }
-
-  /**
-   * Returns the info string.
+   * Returns process information.
    * @return string info
    */
   public String info() {
     return info;
-  }
-
-  /**
-   * Returns the result string.
-   * @return string result
-   */
-  public String result() {
-    return result;
-  }
-
-  /**
-   * Returns a md5 hash.
-   * @param pw String
-   * @return String
-   */
-  public static String md5(final String pw) {
-    try {
-      final MessageDigest md = MessageDigest.getInstance("MD5");
-      md.update(pw.getBytes());
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      DataOutputStream dos = new DataOutputStream(baos);
-      for(final byte b : md.digest()) {
-        final int h = b >> 4 & 0x0F;
-        dos.write((byte) (h + (h > 9 ? 0x57 : 0x30)));
-        final int l = b & 0x0F;
-        dos.write((byte) (l + (l > 9 ? 0x57 : 0x30)));
-      }
-      return baos.toString();
-    } catch(final Exception ex) {
-      return pw;
-    }
-  }
-  
-  /**
-   * Executes the iterative mode.
-   * @param q query string
-   * @return result
-   */
-  String executeIter(final String q) {
-    try {
-      out.write(0);
-      send(q);
-      String tmp = readString();
-      return tmp;
-    } catch(IOException e) {
-      e.printStackTrace();
-    }
-    return null;
-  }
-  
-  /**
-   * Checks next byte.
-   * @return value of check
-   * @throws IOException Exception
-   */
-  boolean check() throws IOException {
-    return in.read() == 0;
   }
 
   /**
@@ -250,78 +126,118 @@ public class BaseXClient {
   }
   
   /**
+   * Checks the next success flag.
+   * @return value of check
+   * @throws IOException Exception
+   */
+  boolean ok() throws IOException {
+    return in.read() == 0;
+  }
+
+  /**
+   * Returns the next received string.
+   * @return String result or info
+   * @throws IOException I/O exception
+   */
+  String receive() throws IOException {
+    final OutputStream os = new ByteArrayOutputStream();
+    receive(os);
+    return os.toString();
+  }
+
+  /**
+   * Sends a string to the server.
+   * @param s string to be sent
+   * @throws IOException I/O exception
+   */
+  void send(final String s) throws IOException {
+    for(final byte t : s.getBytes()) out.write(t);
+    out.write(0);
+  }
+  
+  /**
+   * Receives a string and writes it to the specified output stream.
+   * @param o output stream
+   * @throws IOException I/O exception
+   */
+  private void receive(final OutputStream o) throws IOException {
+    while(true) {
+      final int b = in.read();
+      if(b == 0) break;
+      o.write(b);
+    }
+  }
+
+  /**
+   * Returns an MD5 hash.
+   * @param pw String
+   * @return String
+   */
+  private static String md5(final String pw) {
+    final StringBuilder sb = new StringBuilder();
+    try {
+      final MessageDigest md = MessageDigest.getInstance("MD5");
+      md.update(pw.getBytes());
+      for(final byte b : md.digest()) {
+        final String s = Integer.toHexString(b & 0xFF);
+        if(s.length() == 1) sb.append('0');
+        sb.append(s);
+      }
+    } catch(final NoSuchAlgorithmException ex) {
+      // should not occur
+      ex.printStackTrace();
+    }
+    return sb.toString();
+  }
+  
+  /**
    * Inner class for iterative query execution.
    */
   class Query {
-    
-    /** BaseXClient. */
-    private BaseXClient client;
-    /** Query Id. */
+    /** Query id. */
     private final String id;
     /** Next result item. */
     private String next;
-    /** Boolea if query is open. */
-    private boolean open;
     
     /**
      * Standard constructor.
-     * @param bxc BaseXClient
      * @param query query string
-     * @throws IOException Exception
+     * @throws IOException I/O exception
      */
-    public Query(final BaseXClient bxc, final String query) throws IOException {
-      client = bxc;
-      id = client.executeIter(query);
-      next = "";
-      if(!id.equals("0")) {
-        open = true;
-      } else {
-        throw new IOException(client.readString());
-      }
+    public Query(final String query) throws IOException {
+      out.write(0);
+      send(query);
+      id = receive();
     }
     
     /**
-     * Checks for next item.
+     * Checks for the next item.
      * @return value of check
-     * @throws IOException Exception
+     * @throws IOException I/O exception
      */
-    public boolean hasNext() throws IOException {
-      if(open) {
-        out.write(1);
-        client.send(id);
-        out.write(0);
-        if(client.check()) {
-          next = client.readString();
-          return true;
-        }
-        if(client.check()) {
-          System.out.println(client.readString());
-        }
-        open = false;
-        return false;
-      }
-      return true;
+    public boolean more() throws IOException {
+      out.write(1);
+      send(id);
+      next = receive();
+      if(!ok()) throw new IOException(receive());
+      return next.length() != 0;
     }
     
     /**
-     * Returns next item.
+     * Returns the next item.
      * @return item string
      */
     public String next() {
       return next;
     }
-    
+
     /**
      * Closes the query.
-     * @throws IOException Exception
+     * @throws IOException I/O exception
      */
     public void close() throws IOException {
-      if(open) {
-        out.write(1);
-        client.send(id);
-        out.write(0);
-        out.write(1);
-      }
+      out.write(2);
+      send(id);
     }
   }
 }
