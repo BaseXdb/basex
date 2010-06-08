@@ -61,7 +61,7 @@ public final class BaseXServer extends Main implements Runnable {
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
       new Thread(this).start();
-      do Performance.sleep(200); while(!running);
+      do Performance.sleep(50); while(!running);
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
       if(console) quit(console());
@@ -106,9 +106,9 @@ public final class BaseXServer extends Main implements Runnable {
       log.write(ex.getMessage());
       ex.printStackTrace();
     }
-
     console = false;
     context.close();
+    Performance.sleep(50);
   }
 
   @Override

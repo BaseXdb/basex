@@ -40,7 +40,7 @@ public final class BaseXWin {
    * @param args command-line arguments
    */
   public BaseXWin(final String[] args) {
-
+    // set mac specific properties
     if(Prop.MAC) {
       try {
         osxGUI = new GUIMacOSX();

@@ -5,7 +5,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.build.MemBuilder;
-import org.basex.build.xml.DirParser;
+import org.basex.build.Parser;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -113,7 +113,8 @@ public final class Thesaurus {
    */
   private boolean init() throws QueryException {
     try {
-      final Data data = new MemBuilder(new DirParser(file, ctx.prop)).build();
+      final Data data = new MemBuilder(
+          Parser.xmlParser(file, ctx.prop, ""), ctx.prop).build();
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); n++) {
         build(new Nodes(result.nodes[n], data));

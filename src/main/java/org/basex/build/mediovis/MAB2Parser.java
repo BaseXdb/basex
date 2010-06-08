@@ -11,7 +11,6 @@ import org.basex.build.Parser;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.DataAccess;
-import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.ObjectMap;
 import org.basex.util.TokenMap;
@@ -45,8 +44,6 @@ public final class MAB2Parser extends Parser {
   private final TokenMap posters = new TokenMap();
   /** Genre assignments. */
   private final TokenMap genres = new TokenMap();
-  /** Flat database creation. */
-  private final boolean flat;
   /** Database builder. */
   private Builder builder;
   /** MAB2 input. */
@@ -103,14 +100,15 @@ public final class MAB2Parser extends Parser {
   /** Maximum mediovis id. */
   private int maxid;
 
+  /** Flat database creation. */
+  public boolean flat;
+
   /**
    * Constructor.
-   * @param fn filename of the XML document
-   * @param pr database properties
+   * @param path file path
    */
-  public MAB2Parser(final IO fn, final Prop pr) {
-    super(fn, pr);
-    flat = prop.is(Prop.MAB2FLAT);
+  public MAB2Parser(final String path) {
+    super(path);
   }
 
   @Override

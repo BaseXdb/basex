@@ -1,9 +1,7 @@
 package org.basex.core.proc;
 
-import static org.basex.core.Text.*;
 import org.basex.build.mediovis.MAB2Parser;
 import org.basex.core.Prop;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.io.IO;
@@ -21,22 +19,19 @@ public final class CreateMAB extends ACreate {
    * @param name database name
    */
   public CreateMAB(final String input, final String name) {
-    super(User.CREATE, input, name == null ? IO.get(input).dbname() : name);
+    super(new MAB2Parser(input), name == null ? IO.get(input).dbname() : name);
   }
 
   @Override
   protected boolean run() {
-    // check if file exists
-    final IO file = IO.get(args[0]);
-    if(!file.exists()) return error(FILEWHICH, file);
-
     prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
     prop.set(Prop.PATHINDEX, true);
     prop.set(Prop.TEXTINDEX, true);
     prop.set(Prop.ATTRINDEX, true);
     prop.set(Prop.FTINDEX, true);
-    return build(new MAB2Parser(file, prop), args[1]);
+    ((MAB2Parser) parser).flat = prop.is(Prop.MAB2FLAT);
+    return super.run();
   }
 
   @Override

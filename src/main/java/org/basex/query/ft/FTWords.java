@@ -254,8 +254,15 @@ public final class FTWords extends FTExpr {
         md.casesens != fto.is(FTOpt.CS) || md.diacritics != fto.is(FTOpt.DC) ||
         md.stemming != fto.is(FTOpt.ST)) return false;
 
+    // no index results
+    if(txt.length == 0) {
+      ic.is = 0;
+      return true;
+    }
+    
     // limit index access to trie version and simple wildcard patterns
     if(fto.is(FTOpt.WC)) {
+      // don't use index if term starts with a wildcard
       if(!md.wildcards || txt[0] == '.') return false;
       int d = 0;
       for(final byte w : txt) {
@@ -271,7 +278,7 @@ public final class FTWords extends FTExpr {
       if(tok.length > Token.MAXLEN) return false;
       if(fto.sw != null && fto.sw.id(tok) != 0) continue;
 
-      // divide by 4 to favor full text index requests
+      // reduce number of expected results to favor full text index requests
       final int s = ic.data.nrIDs(ft) + 3 >> 2;
       if(ic.is > s || ic.is == 0) ic.is = s;
       if(s == 0) break;

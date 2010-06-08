@@ -31,6 +31,9 @@ public abstract class Builder extends Progress {
 
   /** Parser instance. */
   protected final Parser parser;
+  /** Property instance. */
+  protected final Prop prop;
+
   /** Tag name index. */
   protected final Names tags = new Names();
   /** Attribute name index. */
@@ -58,21 +61,14 @@ public abstract class Builder extends Progress {
   /**
    * Constructor.
    * @param p parser
+   * @param pr properties
    */
-  protected Builder(final Parser p) {
+  protected Builder(final Parser p, final Prop pr) {
     parser = p;
+    prop = pr;
   }
 
   // Public Methods ============================================================
-
-  /**
-   * Builds the database by running the specified parser.
-   * @return data database instance
-   * @throws IOException I/O exception
-   */
-  public final Data build() throws IOException {
-    return build("");
-  }
 
   /**
    * Builds the database.

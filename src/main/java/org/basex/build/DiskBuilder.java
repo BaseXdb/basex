@@ -42,14 +42,15 @@ public final class DiskBuilder extends Builder {
   /**
    * Constructor.
    * @param p parser
+   * @param pr properties
    */
-  public DiskBuilder(final Parser p) {
-    super(p);
+  public DiskBuilder(final Parser p, final Prop pr) {
+    super(p, pr);
   }
 
   @Override
   public DiskData build(final String db) throws IOException {
-    final Prop pr = parser.prop;
+    final Prop pr = prop;
     DropDB.drop(db, pr);
     pr.dbpath(db).mkdirs();
 

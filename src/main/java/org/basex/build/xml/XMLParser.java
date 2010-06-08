@@ -34,7 +34,7 @@ public final class XMLParser extends Parser {
    */
   public XMLParser(final IO f, final Prop pr, final String tar)
       throws IOException {
-    super(f, pr, tar);
+    super(f, tar);
     scanner = new XMLScanner(f, pr);
   }
 

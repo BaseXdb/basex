@@ -1,6 +1,7 @@
 package org.basex.build;
 
 import java.io.IOException;
+import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 
@@ -19,15 +20,33 @@ public final class MemBuilder extends Builder {
    * @param p parser
    */
   public MemBuilder(final Parser p) {
-    super(p);
+    super(p, new Prop(false));
+  }
+
+  /**
+   * Constructor.
+   * @param p parser
+   * @param pr properties
+   */
+  public MemBuilder(final Parser p, final Prop pr) {
+    super(p, pr);
+  }
+
+  /**
+   * Builds the main-memory database instance without database name.
+   * @return data database instance
+   * @throws IOException I/O exception
+   */
+  public Data build() throws IOException {
+    return build("");
   }
 
   @Override
   public MemData build(final String db) throws IOException {
-    // index values are always indexed in main memory mode
-    data = new MemData(tags, atts, ns, path, parser.prop);
+    data = new MemData(tags, atts, ns, path, prop);
     meta = data.meta;
     meta.name = db;
+    // all contents will be indexed in main memory mode
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;

@@ -9,6 +9,7 @@ import org.basex.build.Parser;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.Prop;
+import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.data.Data.IndexType;
@@ -23,12 +24,22 @@ import org.basex.index.ValueBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-abstract class ACreate extends Proc {
+public class ACreate extends Proc {
   /** Builder instance. */
   private Builder builder;
+  /** Parser instance. */
+  protected Parser parser;
 
   /**
-   * Protected constructor.
+   * Protected constructor, specifying command arguments.
+   * @param a arguments
+   */
+  protected ACreate(final String... a) {
+    this(User.CREATE, a);
+  }
+
+  /**
+   * Protected constructor, specifying command flags and arguments.
    * @param p command properties
    * @param a arguments
    */
@@ -36,6 +47,28 @@ abstract class ACreate extends Proc {
     super(p, a);
   }
 
+  /**
+   * Convenience constructor for specifying a parser, input path and
+   * database name.
+   * @param p parser instance
+   * @param name name of database
+   */
+  public ACreate(final Parser p, final String name) {
+    this(name);
+    parser = p;
+  }
+
+  /*
+   * This methods needs to be overwritten by the subclass if no parser
+   * has been specified by the constructor.
+   */
+  @Override
+  protected boolean run() {
+    // check if file exists
+    if(!parser.file.exists()) return error(FILEWHICH, parser.file);
+    return build(parser, args[0]);
+  }
+  
   /**
    * Builds and creates a new database instance.
    * @param p parser instance
@@ -48,7 +81,7 @@ abstract class ACreate extends Proc {
       final boolean mem = prop.is(Prop.MAINMEM);
       if(!mem && context.pinned(db)) return error(DBLOCKED, db);
 
-      builder = mem ? new MemBuilder(p) : new DiskBuilder(p);
+      builder = mem ? new MemBuilder(p, prop) : new DiskBuilder(p, prop);
       progress(builder);
 
       final Data d = builder.build(db);

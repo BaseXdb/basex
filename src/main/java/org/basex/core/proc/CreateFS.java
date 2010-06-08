@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import org.basex.build.FSParser;
 import org.basex.core.Prop;
-import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
 
@@ -25,7 +24,7 @@ public final class CreateFS extends ACreate {
    * @param name name of database
    */
   public CreateFS(final String path, final String name) {
-    super(User.CREATE, path, name);
+    super(path, name);
   }
 
   @Override
@@ -43,9 +42,9 @@ public final class CreateFS extends ACreate {
     }
 
     final String db = args[1];
-    final FSParser parser = new FSParser(path, context, db);
-    progress(parser);
-    parser.parse();
+    final FSParser fs = new FSParser(path, context, db);
+    progress(fs);
+    fs.parse();
 
     final Optimize opt = new Optimize();
     progress(opt);

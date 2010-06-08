@@ -23,8 +23,6 @@ import org.basex.util.Atts;
 public abstract class Parser extends Progress {
   /** Document flag; if true, a document node is added. */
   public boolean doc = true;
-  /** Database properties. */
-  public Prop prop;
   /** Input file. */
   public IO file;
 
@@ -43,21 +41,18 @@ public abstract class Parser extends Progress {
   /**
    * Constructor.
    * @param f file reference
-   * @param pr database properties
    */
-  protected Parser(final IO f, final Prop pr) {
-    this(f, pr, "");
+  protected Parser(final String f) {
+    this(IO.get(f), "");
   }
 
   /**
    * Constructor.
    * @param f file reference
-   * @param pr database properties
    * @param t target path
    */
-  public Parser(final IO f, final Prop pr, final String t) {
+  public Parser(final IO f, final String t) {
     file = f;
-    prop = pr;
     target = t;
   }
 
@@ -78,17 +73,16 @@ public abstract class Parser extends Progress {
     // use default parser
     final SAXSource s = new SAXSource(io.inputSource());
     if(s.getSystemId() == null) s.setSystemId(io.name());
-    return new SAXWrapper(s, prop, target);
+    return new SAXWrapper(s, target);
   }
 
   /**
    * Returns a parser instance for creating empty databases.
-   * @param io io reference
-   * @param pr database properties
+   * @param f file reference
    * @return parser
    */
-  public static Parser emptyParser(final IO io, final Prop pr) {
-    return new Parser(io, pr) {
+  public static Parser emptyParser(final String f) {
+    return new Parser(f) {
       @Override
       public void parse(final Builder build) { /* empty */ }
     };

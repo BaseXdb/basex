@@ -35,7 +35,7 @@ public class CreateDB extends ACreate {
    * @param name name of database
    */
   public CreateDB(final String input, final String name) {
-    super(User.CREATE, input, IO.get(name == null ? input : name).dbname());
+    super(input, IO.get(name == null ? input : name).dbname());
   }
 
   /**
@@ -62,7 +62,7 @@ public class CreateDB extends ACreate {
    */
   public static Data empty(final Context ctx, final String name)
       throws IOException {
-    return xml(ctx, Parser.emptyParser(IO.get(name), ctx.prop), name);
+    return xml(ctx, Parser.emptyParser(name), name);
   }
 
   /**
@@ -93,10 +93,10 @@ public class CreateDB extends ACreate {
   public static synchronized Data xml(final Context ctx, final Parser p,
       final String db) throws IOException {
 
-    if(ctx.prop.is(Prop.MAINMEM)) return new MemBuilder(p).build(db);
+    if(ctx.prop.is(Prop.MAINMEM)) return new MemBuilder(p, ctx.prop).build(db);
     if(ctx.pinned(db)) throw new IOException(Main.info(DBLOCKED, db));
 
-    final Builder builder = new DiskBuilder(p);
+    final Builder builder = new DiskBuilder(p, ctx.prop);
     try {
       final Data data = builder.build(db);
       if(data.meta.txtindex) data.setIndex(IndexType.TXT,
@@ -120,11 +120,13 @@ public class CreateDB extends ACreate {
   /**
    * Creates a main memory database for the specified parser.
    * @param p xml parser
+   * @param pr database properties
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final Parser p) throws IOException {
-    return new MemBuilder(p).build();
+  public static synchronized Data xml(final Parser p, final Prop pr)
+      throws IOException {
+    return new MemBuilder(p, pr).build();
   }
 
   /**
@@ -137,7 +139,7 @@ public class CreateDB extends ACreate {
   public static synchronized Data xml(final IO io, final Prop pr)
       throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
-    return xml(new DirParser(io, pr));
+    return xml(new DirParser(io, pr), pr);
   }
 
   /**
@@ -149,7 +151,7 @@ public class CreateDB extends ACreate {
    */
   public static synchronized Data xml(final SAXSource s, final Prop pr)
       throws IOException {
-    return xml(new SAXWrapper(s, pr, ""));
+    return xml(new SAXWrapper(s, "") , pr);
   }
 
   @Override

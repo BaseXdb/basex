@@ -26,7 +26,7 @@ import org.basex.util.Performance;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-abstract class AQuery extends Proc {
+public abstract class AQuery extends Proc {
   /** Query processor. */
   private QueryProcessor qp;
   /** Parsing time. */

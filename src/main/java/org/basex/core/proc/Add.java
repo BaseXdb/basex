@@ -44,18 +44,17 @@ public class Add extends ACreate {
     final String dbname = io.dbname();
 
     final DirParser p = new DirParser(io, context.prop, path(args[1]));
-    MemData d = null;
     try {
-      d = new MemBuilder(p).build(dbname);
+      final MemData d = new MemBuilder(p, context.prop).build(dbname);
+      final Data data = context.data;
+      data.insert(data.meta.size, -1, d);
+      data.flush();
     } catch(final IOException ex) {
       Main.debug(ex);
       final String msg = ex.getMessage();
       return error(msg != null ? msg : name);
     }
 
-    final Data data = context.data;
-    data.insert(data.meta.size, -1, d);
-    data.flush();
     context.update();
     return info(PATHADDED, name, perf);
   }

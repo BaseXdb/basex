@@ -7,8 +7,6 @@ import java.util.Stack;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Main;
-import org.basex.core.Prop;
-import org.basex.io.IO;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.w3c.dom.Comment;
@@ -40,10 +38,9 @@ public final class DOCWrapper extends Parser {
    * Constructor.
    * @param d document instance
    * @param fn filename
-   * @param pr database properties
    */
-  public DOCWrapper(final Document d, final String fn, final Prop pr) {
-    super(IO.get(fn), pr);
+  public DOCWrapper(final Document d, final String fn) {
+    super(fn);
     root = d;
     filename = fn;
   }

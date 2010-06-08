@@ -245,16 +245,16 @@ public final class IOFile extends IO {
 
     /**
      * Adds a directory/file to the path list.
-     * @param sb entry
+     * @param tb entry
      */
-    private void add(final TokenBuilder sb) {
-      final String s = sb.toString();
+    private void add(final TokenBuilder tb) {
+      final String s = tb.toString();
       if(s.equals("..") && size > 0) {
-        if(!list[0].contains(":")) delete(size - 1);
+        if(!list[size - 1].contains(":")) delete(size - 1);
       } else if(!s.equals(".") && !s.isEmpty()) {
         add(s.toString());
       }
-      sb.reset();
+      tb.reset();
     }
   }
 }
