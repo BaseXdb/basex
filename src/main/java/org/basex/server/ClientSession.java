@@ -89,6 +89,7 @@ public final class ClientSession extends Session {
   @Override
   public boolean execute(final String cmd, final OutputStream o)
       throws IOException {
+
     send(cmd);
     final BufferInput bi = new BufferInput(in);
     int l;

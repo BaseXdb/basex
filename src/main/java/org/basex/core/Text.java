@@ -111,7 +111,7 @@ public interface Text {
   /** Server started. */
   String SERVERBIND = lang("srv_bind");
   /** Timeout error. */
-  String SERVERTIME = lang("srv_timeout");
+  String SERVERTIMEOUT = lang("srv_timeout");
   /** Connection error. */
   String SERVERERR = lang("srv_connect");
   /** Login error. */

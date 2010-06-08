@@ -162,7 +162,7 @@ public class BufferInput {
   }
 
   /**
-   * Reads a string from the input stream.
+   * Reads a string from the input stream, suffixed by a 0 byte.
    * @return string
    * @throws IOException IO Exception
    */
@@ -171,36 +171,12 @@ public class BufferInput {
   }
 
   /**
-   * Returns all input stream contents.
+   * Reads a token from the input stream, suffixed by a 0 byte.
    * @return token builder
    * @throws IOException IO Exception
    */
   public TokenBuilder content() throws IOException {
     final TokenBuilder tb = new TokenBuilder();
-    byte l;
-    while((l = readByte()) != 0) tb.add(l);
-    return tb;
-  }
-
-  /**
-   * Reads a string from the input stream.
-   * @param b byte starting byte
-   * @return string
-   * @throws IOException IO Exception
-   */
-  public String readString(final byte b) throws IOException {
-    return content(b).toString();
-  }
-
-  /**
-   * Returns all input stream contents.
-   * @param b byte starting byte
-   * @return token builder
-   * @throws IOException IO Exception
-   */
-  public TokenBuilder content(final byte b) throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
-    tb.add(b);
     byte l;
     while((l = readByte()) != 0) tb.add(l);
     return tb;

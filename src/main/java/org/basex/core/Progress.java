@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import static org.basex.core.Text.*;
+import org.basex.util.Performance;
 
 /**
  * This class is implemented by all kinds of processes.
@@ -12,7 +13,9 @@ import static org.basex.core.Text.*;
  */
 public abstract class Progress {
   /** Stopped flag. */
-  private boolean stopped;
+  protected boolean stopped;
+  /** Timeout thread. */
+  private Thread timeout;
   /** Sub progress. */
   private Progress sub;
 
@@ -82,6 +85,7 @@ public abstract class Progress {
   public final void stop() {
     if(sub != null) sub.stop();
     stopped = true;
+    stopTimeout();
   }
 
   /**
@@ -96,5 +100,32 @@ public abstract class Progress {
    */
   public void abort() {
     if(sub != null) sub.abort();
+  }
+
+  /**
+   * Starts a timeout thread.
+   * @param time time to wait
+   */
+  public void startTimeout(final long time) {
+    if(time == 0) return;
+
+    timeout = new Thread() {
+      @Override
+      public void run() {
+        Performance.sleep(time * 1000);
+        Progress.this.stop();
+      }
+    };
+    timeout.start();
+  }
+
+  /**
+   * Stops the timeout thread.
+   */
+  public void stopTimeout() {
+    if(timeout != null) {
+      timeout.interrupt();
+      timeout = null;
+    }
   }
 }

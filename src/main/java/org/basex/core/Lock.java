@@ -4,14 +4,14 @@ import java.util.LinkedList;
 
 /**
  * Management of executing read/write processes. Multiple readers, single
- * writers.
+ * writers (readers/writer lock).
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */
-public final class Semaphore {
+public final class Lock {
   /** List of waiting processes for writers or reading groups. */
-  private final LinkedList<Lock> waiting = new LinkedList<Lock>();
+  private final LinkedList<Resource> waiting = new LinkedList<Resource>();
 
   /** States of locking. */
   private static enum State {
@@ -36,7 +36,7 @@ public final class Semaphore {
           return;
       }
       // exclusive lock
-      final Lock lx = new Lock(true);
+      final Resource lx = new Resource(true);
       synchronized(lx) {
         waiting.add(lx);
         while(!lx.valid) {
@@ -55,7 +55,7 @@ public final class Semaphore {
           return;
         }
       // shared lock
-      final Lock ls = new Lock(false);
+      final Resource ls = new Resource(false);
       synchronized(ls) {
         waiting.add(ls);
         while(!ls.valid) {
@@ -84,7 +84,7 @@ public final class Semaphore {
       }
     } else {
       if(--activeR == 0) {
-          notifyWriter();
+        notifyWriter();
       }
     }
   }
@@ -95,7 +95,7 @@ public final class Semaphore {
   protected synchronized void notifyReaders() {
     while(waiting.size() > 0) {
       if(waiting.getFirst().writer) break;
-      Lock l = waiting.removeFirst();
+      Resource l = waiting.removeFirst();
       synchronized(l) {
         l.valid = true;
         l.notify();
@@ -108,7 +108,7 @@ public final class Semaphore {
    */
   protected synchronized void notifyWriter() {
     if(waiting.size() > 0) {
-      Lock l = waiting.removeFirst();
+      Resource l = waiting.removeFirst();
       synchronized(l) {
         l.valid = true;
         l.notify();
@@ -124,7 +124,7 @@ public final class Semaphore {
    * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
    * @author Andreas Weiler
    */
-  private static class Lock {
+  private static class Resource {
     /** Writer flag. */
     boolean writer;
     /** Flag if lock can start. */
@@ -134,7 +134,7 @@ public final class Semaphore {
      * Standard constructor.
      * @param w writing flag
      */
-    Lock(final boolean w) {
+    Resource(final boolean w) {
       writer = w;
     }
   }

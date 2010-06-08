@@ -1125,7 +1125,7 @@ public final class Token {
   }
 
   /**
-   * Returns a md5 hash.
+   * Returns an MD5 hash.
    * @param string string to be hashed
    * @return hash
    */

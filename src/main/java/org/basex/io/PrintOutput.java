@@ -48,7 +48,17 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Writes a string to the output stream.
+   * Writes a string to the output stream, suffixed by a 0 byte.
+   * @param str string to be written
+   * @throws IOException I/O exception
+   */
+  public void writeString(final String str) throws IOException {
+    print(Token.token(str));
+    write(0);
+  }
+
+  /**
+   * Prints a string to the output stream.
    * @param str string to be written
    * @throws IOException I/O exception
    */
@@ -57,7 +67,7 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Writes a string and newline to the output stream.
+   * Prints a string and newline to the output stream.
    * @param str string to be written
    * @throws IOException I/O exception
    */
@@ -67,7 +77,7 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Writes a token to the output stream.
+   * Prints a token to the output stream.
    * @param token token to be written
    * @throws IOException I/O exception
    */
@@ -76,7 +86,7 @@ public class PrintOutput extends OutputStream {
   }
 
   /**
-   * Writes a token to the output stream.
+   * Prints a token to the output stream.
    * @param token token to be written
    * @throws IOException I/O exception
    */

@@ -25,7 +25,7 @@ public final class QueryProcessor extends Progress {
   /** Expression context. */
   public final QueryContext ctx;
   /** Query. */
-  private String query;
+  public String query;
   /** Parsed flag. */
   private boolean parsed;
   /** Compilation flag. */

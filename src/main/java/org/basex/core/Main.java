@@ -288,7 +288,7 @@ public abstract class Main {
     if(ex instanceof BindException) return SERVERBIND;
     else if(ex instanceof LoginException) return SERVERLOGIN;
     else if(ex instanceof ConnectException) return SERVERERR;
-    else if(ex instanceof SocketTimeoutException) return SERVERTIME;
+    else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
     return ex.getMessage();
   }
 

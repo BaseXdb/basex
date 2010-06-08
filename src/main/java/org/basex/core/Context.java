@@ -19,8 +19,8 @@ import org.basex.server.Sessions;
 public final class Context {
   /** Client connections. */
   public final Sessions sessions;
-  /** Process synchronization. */
-  public final Semaphore sema;
+  /** Process locking. */
+  public final Lock lock;
   /** Database pool. */
   public final DataPool pool;
   /** Users. */
@@ -52,7 +52,7 @@ public final class Context {
     prop = new Prop(true);
     pool = new DataPool();
     sessions = new Sessions();
-    sema = new Semaphore();
+    lock = new Lock();
     users = new Users(true);
     user = users.get(ADMIN);
   }
@@ -65,7 +65,7 @@ public final class Context {
     prop = new Prop(true);
     pool = ctx.pool;
     sessions = ctx.sessions;
-    sema = ctx.sema;
+    lock = ctx.lock;
     users = ctx.users;
   }
 
