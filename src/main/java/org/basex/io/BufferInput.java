@@ -255,6 +255,23 @@ public class BufferInput {
   }
 
   /**
+   * Reads a string.
+   * @param tb token builder
+   * @return true if more lines are found
+   * @throws IOException IO Exception
+   */
+  public boolean readLine(final TokenBuilder tb) throws IOException {
+    tb.reset();
+    while(true) {
+      final int ch = readChar();
+      if(ch == 0x0D) continue;
+      if(ch == 0) return tb.size() != 0;
+      if(ch == 0x0A) return true;;
+      tb.addUTF(ch);
+    }
+  }
+
+  /**
    * Closes the input stream.
    * @throws IOException IO Exception
    */
