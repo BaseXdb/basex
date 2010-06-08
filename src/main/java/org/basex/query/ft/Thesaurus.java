@@ -114,7 +114,7 @@ public final class Thesaurus {
   private boolean init() throws QueryException {
     try {
       final Data data = new MemBuilder(
-          Parser.xmlParser(file, ctx.prop, ""), ctx.prop).build();
+          Parser.fileParser(file, ctx.prop, ""), ctx.prop).build();
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); n++) {
         build(new Nodes(result.nodes[n], data));

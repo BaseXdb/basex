@@ -1,11 +1,14 @@
-package org.basex.build;
+package org.basex.build.file;
 
 import static org.basex.util.Token.*;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
+import org.basex.build.xml.XMLParser;
 import org.basex.core.Main;
+import org.basex.core.Prop;
 import org.basex.io.BufferInput;
 import org.basex.io.CachedInput;
 import org.basex.io.IO;
@@ -22,33 +25,39 @@ import org.xml.sax.XMLReader;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class HTMLParser {
+public final class HTMLParser extends XMLParser {
+  /** HTML reader. */
+  private static XMLReader reader;
+
+  /* Check is TagSoup is found. */
+  static {
+    try {
+      reader = (XMLReader) Class.forName(
+          "org.ccil.cowan.tagsoup.Parser").newInstance();
+    } catch(final Exception ex) {
+    }
+  }
+    
   /**
    * Constructor.
-   * @throws Exception if the parser could not be initialized
+   * @param f file reference
+   * @param tar target for collection adding.
+   * @param pr database properties
+   * @throws IOException I/O exception
    */
-  HTMLParser() throws Exception {
-    getHTMLReader();
+  public HTMLParser(final IO f, final String tar, final Prop pr)
+      throws IOException {
+    super(toXML(f), tar, pr);
   }
 
   /**
-   * Creates a new TagSoup parser that isn't namespace-aware.
-   * @return the parser
-   * @throws Exception exception
-   */
-  private static XMLReader getHTMLReader() throws Exception {
-    return (XMLReader)
-      Class.forName("org.ccil.cowan.tagsoup.Parser").newInstance();
-  }
-
-  /**
-   * Converts an HTML document to XML, if TagSoup is found in the classpath.
+   * Converts an HTML document to XML.
    * @param io io reference
    * @return parser
    */
-  IO toXML(final IO io) {
-    final String path = io.path();
-    if(!path.endsWith(".htm") && !path.endsWith(".html")) return io;
+  private static IO toXML(final IO io) {
+    // reader could not be initialized; fall back to XML
+    if(reader == null) return io;
 
     try {
       // tries to extract the encoding from the input
@@ -73,11 +82,10 @@ final class HTMLParser {
       is.setEncoding(Charset.isSupported(enc) ? code(enc, null) : UTF8);
       // define output
       final StringWriter sw = new StringWriter();
-      final XMLReader parser = getHTMLReader();
-      parser.setContentHandler((ContentHandler)
+      reader.setContentHandler((ContentHandler)
           Class.forName("org.ccil.cowan.tagsoup.XMLWriter").getConstructor(
               new Class[] { Writer.class }).newInstance(sw));
-      parser.parse(is);
+      reader.parse(is);
       return new IOContent(token(sw.toString()), io.name());
     } catch(final Exception ex) {
       Main.debug(ex);

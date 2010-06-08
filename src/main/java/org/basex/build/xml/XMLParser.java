@@ -5,8 +5,8 @@ import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.BuildException;
-import org.basex.build.Builder;
-import org.basex.build.Parser;
+import org.basex.build.FileParser;
+import org.basex.build.BuildText.Type;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 
@@ -17,32 +17,27 @@ import org.basex.io.IO;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class XMLParser extends Parser {
+public class XMLParser extends FileParser {
   /** Scanner reference. */
   private final XMLScanner scanner;
-  /** Builder reference. */
-  private Builder builder;
 
   /**
    * Creates a new XMLParser instance for collection creation.
    * The length of the rootPath is passed in to correctly chop
    * the relative path inside the collection.
    * @param f file reference
-   * @param pr database properties
    * @param tar target for collection adding.
+   * @param pr database properties
    * @throws IOException I/O exception
    */
-  public XMLParser(final IO f, final Prop pr, final String tar)
+  public XMLParser(final IO f, final String tar, final Prop pr)
       throws IOException {
     super(f, tar);
     scanner = new XMLScanner(f, pr);
   }
 
   @Override
-  public void parse(final Builder build) throws IOException {
-    builder = build;
-    if(doc) builder.startDoc(token(target + file.name()));
-
+  public void parse() throws IOException {
     // loop until all tokens have been processed
     scanner.more();
     while(true) {
@@ -63,7 +58,6 @@ public final class XMLParser extends Parser {
     scanner.finish();
 
     builder.encoding(scanner.encoding);
-    if(doc) builder.endDoc();
   }
 
   /**

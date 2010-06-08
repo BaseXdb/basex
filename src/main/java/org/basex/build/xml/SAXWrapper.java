@@ -5,8 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-import org.basex.build.Builder;
-import org.basex.build.Parser;
+import org.basex.build.FileParser;
 import org.basex.core.Main;
 import org.basex.core.ProgressException;
 import org.basex.io.IO;
@@ -23,7 +22,7 @@ import org.xml.sax.XMLReader;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class SAXWrapper extends Parser {
+public final class SAXWrapper extends FileParser {
   /** File counter. */
   long counter;
   /** Current line. */
@@ -47,7 +46,7 @@ public final class SAXWrapper extends Parser {
   }
 
   @Override
-  public void parse(final Builder build) throws IOException {
+  public void parse() throws IOException {
     final InputSource is = wrap(source.getInputSource());
     try {
       XMLReader r = source.getXMLReader();
@@ -58,7 +57,7 @@ public final class SAXWrapper extends Parser {
         r = f.newSAXParser().getXMLReader();
       }
 
-      sax = new SAXHandler(build, target + file.name());
+      sax = new SAXHandler(builder);
       sax.doc = doc;
       r.setDTDHandler(sax);
       r.setContentHandler(sax);

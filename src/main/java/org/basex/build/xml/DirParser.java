@@ -81,7 +81,7 @@ public final class DirParser extends Parser {
         // extract target path
         final String trg = (target + '/' + file.path().replaceAll(
             "^" + root + "|" + file.name() + "$", "")).replaceAll("^/", "");
-        parser = Parser.xmlParser(file, prop, trg);
+        parser = Parser.fileParser(file, prop, trg);
         parser.doc = doc;
         parser.parse(b);
 

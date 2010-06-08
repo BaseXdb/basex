@@ -59,7 +59,7 @@ public final class BlockAccessTest {
   @Before
   public void setUp() {
     try {
-      final Parser parser = Parser.xmlParser(IO.get(TESTFILE), PROP, "");
+      final Parser parser = Parser.fileParser(IO.get(TESTFILE), PROP, "");
       data = new DiskBuilder(parser, PROP).build(DBNAME);
       size = data.meta.size;
       data.close();

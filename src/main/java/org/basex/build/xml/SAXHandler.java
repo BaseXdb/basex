@@ -1,7 +1,6 @@
 package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
-import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.Builder;
 import org.basex.util.Atts;
@@ -23,8 +22,6 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   private final Atts atts = new Atts();
   /** Builder reference. */
   private final Builder builder;
-  /** Document name. */
-  private final String name;
   /** DTD flag. */
   private boolean dtd;
   /** Element counter. */
@@ -42,11 +39,9 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /**
    * Constructor.
    * @param build builder reference
-   * @param xml document name
    */
-  SAXHandler(final Builder build, final String xml) {
+  SAXHandler(final Builder build) {
     builder = build;
-    name = xml;
   }
 
   @Override
@@ -149,24 +144,6 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   // ContentHandler
   /*public void setDocumentLocator(final Locator locator) { } */
-
-  @Override
-  public void startDocument() throws SAXException {
-    try {
-      if(doc) builder.startDoc(token(name));
-    } catch(final IOException ex) {
-      error(ex);
-    }
-  }
-
-  @Override
-  public void endDocument() throws SAXException {
-    try {
-      if(doc) builder.endDoc();
-    } catch(final IOException ex) {
-      error(ex);
-    }
-  }
 
   @Override
   public void startPrefixMapping(final String prefix, final String uri) {

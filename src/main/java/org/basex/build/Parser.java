@@ -2,6 +2,9 @@ package org.basex.build;
 
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
+
+import org.basex.build.file.CSVParser;
+import org.basex.build.file.HTMLParser;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.build.xml.XMLParser;
 import org.basex.core.Progress;
@@ -31,13 +34,6 @@ public abstract class Parser extends Progress {
   protected final Atts atts = new Atts();
   /** Target path. */
   protected final String target;
-  /** Optional HTML parser. */
-  private static HTMLParser html;
-
-  // Check for existence of TagSoup.
-  static {
-    try { html = new HTMLParser(); } catch(final Exception ex) { }
-  }
 
   /**
    * Constructor.
@@ -59,18 +55,25 @@ public abstract class Parser extends Progress {
 
   /**
    * Returns an XML parser instance.
-   * @param in input
+   * @param io input
    * @param prop database properties
    * @param target relative path reference
    * @return xml parser
    * @throws IOException I/O exception
    */
-  public static Parser xmlParser(final IO in, final Prop prop,
+  public static FileParser fileParser(final IO io, final Prop prop,
       final String target) throws IOException {
-    // optionally convert HTML input to well-formed xml
-    final IO io = html != null ? html.toXML(in) : in;
+
+    // use file specific parser; should better be solved via importer property
+    final String parser = prop.get(Prop.PARSER);
+    if(parser.equals("html"))
+      return new HTMLParser(io, target, prop);
+    if(parser.equals("csv"))
+      return new CSVParser(io, target);
+    
     // use internal parser
-    if(prop.is(Prop.INTPARSE)) return new XMLParser(io, prop, target);
+    if(prop.is(Prop.INTPARSE)) return new XMLParser(io, target, prop);
+
     // use default parser
     final SAXSource s = new SAXSource(io.inputSource());
     if(s.getSystemId() == null) s.setSystemId(io.name());
