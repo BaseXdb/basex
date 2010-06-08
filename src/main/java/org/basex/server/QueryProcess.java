@@ -64,11 +64,11 @@ public class QueryProcess {
   public void start(final String s, final Context c) throws IOException {
     ctx = c;
     processor = new QueryProcessor(s, ctx);
+    serializer = new XMLSerializer(out);
     updating = processor.ctx.updating;
     ctx.sema.before(updating);
     try {
       iter = processor.iter();
-      serializer = new XMLSerializer(out);
       out.print(String.valueOf(id));
       send(true);
       startTimer();
