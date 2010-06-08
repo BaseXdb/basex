@@ -1,13 +1,13 @@
 package org.basex.examples.create;
 
 import static org.basex.util.Token.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import org.basex.build.FileParser;
 import org.basex.core.Main;
+import org.basex.io.BufferInput;
+import org.basex.util.TokenBuilder;
 import org.deepfs.fs.DeepFS;
 
 /**
@@ -34,42 +34,45 @@ public final class LSTParser extends FileParser {
   public void parse() throws IOException {
     builder.startElem(DeepFS.FSML, atts.reset());
 
-    final BufferedReader br = new BufferedReader(new FileReader(file.path()));
-    String line = br.readLine().replace('\\', '/');
-    atts.add(DeepFS.BACKINGSTORE, token(line));
+    final BufferInput bi = new BufferInput(file.path()); 
+
+    //new FileReader(file.path()));
+    final TokenBuilder tb = new TokenBuilder();
+    bi.readLine(tb);
+    atts.add(DeepFS.BACKINGSTORE, replace(tb.finish(), '\\', '/'));
     builder.startElem(DeepFS.DEEPFS, atts);
 
-    String[] old = {};
+    byte[][] old = {};
     while(true) {
-      line = br.readLine();
-      if(line == null) break;
-      line = line.replace('\\', '/');
-      
-      final String[] entries = line.split("\\t");
-      String name = entries[0];
+      bi.readLine(tb);
+      if(tb.size() == 0) break;
+
+      final byte[][] entries = split(replace(tb.finish(), '\\', '/'), '\t');
+      byte[] name = entries[0];
 
       byte[] mtime = {};
       try {
-        mtime = token(DATE.parse(entries[2] + " " + entries[3]).getTime());
+        final String time = string(entries[2]) + ' ' + string(entries[3]);
+        mtime = token(DATE.parse(time).getTime());
       } catch(final ParseException ex) {
         Main.debug(ex);
       }
       
-      if(name.indexOf('/') != -1) {
+      if(indexOf(name, '/') != -1) {
         // Directory
-        name = name.replaceAll("/$", "");
-        final String[] path = name.split("/");
+        name = substring(name, 0, name.length - 1);
+        final byte[][] path = split(name, '/');
 
         int i = -1;
         while(++i < Math.min(old.length, path.length)) {
-          if(!old[i].equals(path[i])) break;
+          if(!eq(old[i], path[i])) break;
         }
         for(int j = i; j < old.length; j++) {
           builder.endElem(DeepFS.DIR);
         }
         for(int j = i; j < path.length; j++) {
           atts.reset();
-          atts.add(DeepFS.NAME, token(path[i]));
+          atts.add(DeepFS.NAME, path[i]);
           atts.add(DeepFS.MTIME, mtime);
           builder.startElem(DeepFS.DIR, atts);
         }
@@ -77,13 +80,13 @@ public final class LSTParser extends FileParser {
       } else {
         // File
         atts.reset();
-        atts.add(DeepFS.NAME, token(name));
-        atts.add(DeepFS.SIZE, token(entries[1]));
+        atts.add(DeepFS.NAME, name);
+        atts.add(DeepFS.SIZE, entries[1]);
         atts.add(DeepFS.MTIME, mtime);
         builder.emptyElem(DeepFS.FILE, atts);
       }
     }
-    br.close();
+    bi.close();
     for(int j = old.length; j > 0; j--) builder.endElem(DeepFS.DIR);
 
     builder.endElem(DeepFS.DEEPFS);

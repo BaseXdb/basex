@@ -30,7 +30,7 @@ public final class LSTExample {
     // Create database context
     final Context ctx = new Context();
 
-    // input file and name of database
+    // encoding, input file and name of database
     final String file = "etc/example.lst";
     final String name = "lstexample";
 
