@@ -2,8 +2,10 @@ package org.basex.examples.create;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.Create;
+import org.basex.core.Prop;
+import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
+import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
 
 /**
@@ -35,17 +37,17 @@ public final class CSVExample {
     final String name = "csvexample";
 
     // ------------------------------------------------------------------------
-    // Import file in the CSV format
-    System.out.println("\n* Import a CSV file.");
+    // Import the specified file
+    System.out.println("\n* Import '" + file + "'.");
 
-    new Create(new CSVParser(file), name).execute(ctx);
+    new Set(Prop.PARSER, "csv").execute(ctx);
+    new CreateDB(file, name).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query
-    System.out.println("\n* Number of created elements:");
+    System.out.println("\n* Number of records:");
 
-    //new XQuery("count(//*)").execute(ctx, System.out);
-    new XQuery("/").execute(ctx, System.out);
+    new XQuery("count(//record)").execute(ctx, System.out);
 
     // ------------------------------------------------------------------------
     // Drop database and close context

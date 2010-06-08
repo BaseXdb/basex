@@ -6,8 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import org.basex.build.Builder;
-import org.basex.build.Parser;
+import org.basex.build.FileParser;
 import org.basex.core.Main;
 import org.deepfs.fs.DeepFS;
 
@@ -18,7 +17,7 @@ import org.deepfs.fs.DeepFS;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class LSTParser extends Parser {
+public final class LSTParser extends FileParser {
   /** Date Format. */
   private static final SimpleDateFormat DATE =
     new SimpleDateFormat("yyyy.MM.dd hh:mm.ss");
@@ -32,14 +31,13 @@ public final class LSTParser extends Parser {
   }
   
   @Override
-  public void parse(final Builder b) throws IOException {
-    b.startDoc(token(file.name()));
-    b.startElem(DeepFS.FSML, atts.reset());
+  public void parse() throws IOException {
+    builder.startElem(DeepFS.FSML, atts.reset());
 
     final BufferedReader br = new BufferedReader(new FileReader(file.path()));
     String line = br.readLine().replace('\\', '/');
     atts.add(DeepFS.BACKINGSTORE, token(line));
-    b.startElem(DeepFS.DEEPFS, atts);
+    builder.startElem(DeepFS.DEEPFS, atts);
 
     String[] old = {};
     while(true) {
@@ -67,13 +65,13 @@ public final class LSTParser extends Parser {
           if(!old[i].equals(path[i])) break;
         }
         for(int j = i; j < old.length; j++) {
-          b.endElem(DeepFS.DIR);
+          builder.endElem(DeepFS.DIR);
         }
         for(int j = i; j < path.length; j++) {
           atts.reset();
           atts.add(DeepFS.NAME, token(path[i]));
           atts.add(DeepFS.MTIME, mtime);
-          b.startElem(DeepFS.DIR, atts);
+          builder.startElem(DeepFS.DIR, atts);
         }
         old = path;
       } else {
@@ -82,15 +80,14 @@ public final class LSTParser extends Parser {
         atts.add(DeepFS.NAME, token(name));
         atts.add(DeepFS.SIZE, token(entries[1]));
         atts.add(DeepFS.MTIME, mtime);
-        b.emptyElem(DeepFS.FILE, atts);
+        builder.emptyElem(DeepFS.FILE, atts);
       }
     }
     br.close();
-    for(int j = old.length; j > 0; j--) b.endElem(DeepFS.DIR);
+    for(int j = old.length; j > 0; j--) builder.endElem(DeepFS.DIR);
 
-    b.endElem(DeepFS.DEEPFS);
-    b.endElem(DeepFS.FSML);
-    b.endDoc();
-    b.meta.deepfs = true;
+    builder.endElem(DeepFS.DEEPFS);
+    builder.endElem(DeepFS.FSML);
+    builder.meta.deepfs = true;
   }
 }

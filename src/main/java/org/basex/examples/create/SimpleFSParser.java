@@ -3,8 +3,7 @@ package org.basex.examples.create;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
-import org.basex.build.Builder;
-import org.basex.build.Parser;
+import org.basex.build.FileParser;
 import org.deepfs.fs.DeepFS;
 
 /**
@@ -15,7 +14,7 @@ import org.deepfs.fs.DeepFS;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class SimpleFSParser extends Parser {
+public final class SimpleFSParser extends FileParser {
   /**
    * Constructor.
    * @param path file path
@@ -25,32 +24,29 @@ public final class SimpleFSParser extends Parser {
   }
 
   @Override
-  public void parse(final Builder b) throws IOException {
-    b.startDoc(token(file.name()));
-    b.startElem(DeepFS.FSML, atts.reset());
+  public void parse() throws IOException {
+    builder.startElem(DeepFS.FSML, atts.reset());
     atts.add(DeepFS.BACKINGSTORE, token(file.toString()));
-    b.startElem(DeepFS.DEEPFS, atts);
-    parse(new File(file.path()), b);
-    b.endElem(DeepFS.DEEPFS);
-    b.endElem(DeepFS.FSML);
-    b.endDoc();
-    b.meta.deepfs = true;
+    builder.startElem(DeepFS.DEEPFS, atts);
+    parse(new File(file.path()));
+    builder.endElem(DeepFS.DEEPFS);
+    builder.endElem(DeepFS.FSML);
+    builder.meta.deepfs = true;
   }
 
   /**
    * Recursively parses the specified directory.
    * @param dir directory to be parsed
-   * @param b builder instance
    * @throws IOException I/O exception
    */
-  private void parse(final File dir, final Builder b) throws IOException {
+  private void parse(final File dir) throws IOException {
     atts.reset();
     atts.add(DeepFS.NAME, token(dir.getName()));
     atts.add(DeepFS.MTIME, token(dir.lastModified()));
-    b.startElem(DeepFS.DIR, atts);
+    builder.startElem(DeepFS.DIR, atts);
     for(final File f : dir.listFiles()) {
       if(f.isDirectory()) {
-        parse(f, b);
+        parse(f);
       } else {
         atts.reset();
         final String name = f.getName();
@@ -59,9 +55,9 @@ public final class SimpleFSParser extends Parser {
         atts.add(DeepFS.MTIME, token(f.lastModified()));
         int i = name.lastIndexOf('.');
         if(i != -1) atts.add(DeepFS.SUFFIX, token(name.substring(i + 1)));
-        b.emptyElem(DeepFS.FILE, atts);
+        builder.emptyElem(DeepFS.FILE, atts);
       }
     }
-    b.endElem(DeepFS.DIR);
+    builder.endElem(DeepFS.DIR);
   }
 }

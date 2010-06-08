@@ -2,20 +2,23 @@ package org.basex.examples.create;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.Create;
+import org.basex.core.Prop;
+import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
+import org.basex.core.proc.Set;
 import org.basex.core.proc.XQuery;
 
 /**
- * This example demonstrates how to import a filesystem structure
- * into the database.
+ * This example demonstrates how to import a file in the HTML format
+ * into the database. The specified input file will be converted to XML
+ * if TagSoup is found in the classpath.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class SimpleFSExample {
+public final class HTMLExample {
   /** Private constructor. */
-  private SimpleFSExample() { }
+  private HTMLExample() { }
 
   /**
    * Main test method.
@@ -24,34 +27,34 @@ public final class SimpleFSExample {
    */
   public static void main(final String[] args) throws BaseXException {
 
-    System.out.println("=== SimpleFSExample ===");
+    System.out.println("=== HTMLExample ===");
 
     // ------------------------------------------------------------------------
     // Create database context
-    final Context context = new Context();
+    final Context ctx = new Context();
 
-    // input path and name of database
-    final String path = ".";
-    final String name = "fsexample";
+    // input file and name of database
+    final String file = "http://www.google.com/index.html";
+    final String name = "htmlexample";
 
     // ------------------------------------------------------------------------
-    // Import a directory as database
-    System.out.println("\n* Import '" + path + "'.");
+    // Import the specified file
+    System.out.println("\n* Import '" + file + "'.");
 
-    new Create(new SimpleFSParser(path), name).execute(context);
+    new Set(Prop.PARSER, "html").execute(ctx);
+    new CreateDB(file, name).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query
-    System.out.println("\n* Number of files:");
+    System.out.println("\n* <a/> elements:");
 
-    new XQuery("count(//file)").execute(context, System.out);
+    new XQuery("//*:a").execute(ctx, System.out);
 
     // ------------------------------------------------------------------------
     // Drop database and close context
     System.out.println("\n\n* Drop database.");
 
-    new DropDB(name).execute(context);
-
-    context.close();
+    new DropDB(name).execute(ctx);
+    ctx.close();
   }
 }

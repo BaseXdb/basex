@@ -35,16 +35,16 @@ public final class LSTExample {
     final String name = "lstexample";
 
     // ------------------------------------------------------------------------
-    // Import file in the LST format
-    System.out.println("\n* Import an LST file.");
+    // Import the specified file
+    System.out.println("\n* Import '" + file + "'.");
 
     new Create(new LSTParser(file), name).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query
-    System.out.println("\n* Number of created elements:");
+    System.out.println("\n* Number of files:");
 
-    new XQuery("count(//*)").execute(ctx, System.out);
+    new XQuery("count(//file)").execute(ctx, System.out);
 
     // ------------------------------------------------------------------------
     // Drop database and close context
