@@ -25,7 +25,6 @@ public class QueryProcess {
   boolean running = true;
   /** Id. */
   int id;
-
   /** Output. */
   private PrintOutput out;
   /** Processor. */
@@ -74,12 +73,14 @@ public class QueryProcess {
       send(true);
       startTimer();
     } catch(final QueryException ex) {
+      ctx.sema.after(updating);
       // invalid command was sent by a client; create error feedback
       serverProc.log.write(this, s, INFOERROR + ex.extended());
       out.print(String.valueOf(0));
       send(true);
       out.print(ex.extended());
       send(true);
+      serverProc.queries.remove(this);
     }
   }
 
@@ -107,21 +108,26 @@ public class QueryProcess {
           close();
         }
       }
-    } catch(final Exception ex) {
+    } catch(final QueryException ex) {
       send(false);
-      send(false);
+      send(true);
+      out.print(ex.extended());
+      send(true);
       close();
     }
   }
 
   /**
    * Closes the query process.
-   * @throws IOException Exception
    */
-  public void close() throws IOException {
+  public void close() {
     ctx.sema.after(updating);
-    serializer.close();
-    processor.close();
+    try {
+      serializer.close();
+      processor.close();
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
     stopTimer();
     serverProc.queries.remove(this);
   }

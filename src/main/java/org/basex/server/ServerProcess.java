@@ -231,6 +231,7 @@ public final class ServerProcess extends Thread {
    * Exits the session.
    */
   public void exit() {
+    for(final QueryProcess q : queries) q.close();
     new Close().exec(context);
     if(proc != null) proc.stop();
     stopTimer();
