@@ -107,6 +107,16 @@ public class BaseXClient {
     info = readString();
     return read() == 0;
   }
+  
+  /**
+   * Creates a query object.
+   * @param query query string
+   * @return query
+   * @throws IOException Exception
+   */
+  public Query query(final String query) throws IOException {
+    return new Query(this, query);
+  }
 
   /**
    * Initializes the input read.
@@ -147,7 +157,7 @@ public class BaseXClient {
    * @throws IOException Exception
    * @return String result or info
    */
-  private String readString() throws IOException {
+  String readString() throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     DataOutputStream dos = new DataOutputStream(baos);
     readString(dos);
@@ -159,7 +169,7 @@ public class BaseXClient {
    * @param s string to be sent
    * @throws IOException I/O exception
    */
-  private void send(final String s) throws IOException {
+  void send(final String s) throws IOException {
     byte[] sb = s.getBytes();
     for(final byte t : sb) out.write(t);
     out.write(0);
@@ -203,6 +213,32 @@ public class BaseXClient {
       return pw;
     }
   }
+  
+  /**
+   * Executes the iterative mode.
+   * @param q query string
+   * @return result
+   */
+  String executeIter(final String q) {
+    try {
+      out.write(0);
+      send(q);
+      String tmp = readString();
+      return tmp;
+    } catch(IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * Checks next byte.
+   * @return value of check
+   * @throws IOException Exception
+   */
+  boolean check() throws IOException {
+    return in.read() == 0;
+  }
 
   /**
    * Closes the session.
@@ -211,5 +247,81 @@ public class BaseXClient {
   public void close() throws IOException {
     send("exit");
     socket.close();
+  }
+  
+  /**
+   * Inner class for iterative query execution.
+   */
+  class Query {
+    
+    /** BaseXClient. */
+    private BaseXClient client;
+    /** Query Id. */
+    private final String id;
+    /** Next result item. */
+    private String next;
+    /** Boolea if query is open. */
+    private boolean open;
+    
+    /**
+     * Standard constructor.
+     * @param bxc BaseXClient
+     * @param query query string
+     * @throws IOException Exception
+     */
+    public Query(final BaseXClient bxc, final String query) throws IOException {
+      client = bxc;
+      id = client.executeIter(query);
+      next = "";
+      if(!id.equals("0")) {
+        open = true;
+      } else {
+        throw new IOException(client.readString());
+      }
+    }
+    
+    /**
+     * Checks for next item.
+     * @return value of check
+     * @throws IOException Exception
+     */
+    public boolean hasNext() throws IOException {
+      if(open) {
+        out.write(1);
+        client.send(id);
+        out.write(0);
+        if(client.check()) {
+          next = client.readString();
+          return true;
+        }
+        if(client.check()) {
+          System.out.println(client.readString());
+        }
+        open = false;
+        return false;
+      }
+      return true;
+    }
+    
+    /**
+     * Returns next item.
+     * @return item string
+     */
+    public String next() {
+      return next;
+    }
+    
+    /**
+     * Closes the query.
+     * @throws IOException Exception
+     */
+    public void close() throws IOException {
+      if(open) {
+        out.write(1);
+        client.send(id);
+        out.write(0);
+        out.write(1);
+      }
+    }
   }
 }
