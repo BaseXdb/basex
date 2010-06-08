@@ -12,8 +12,8 @@ import org.basex.util.Performance;
  * This class builds an index for text contents, optimized for fuzzy search,
  * in an ordered table.
  *
- *  - (1) the tokens are collected in main memory (red-black tree)
- *  - (2) if main memory, the data is written to disk, (1)
+ *  - (1) the tokens are collected in main-memory (red-black tree)
+ *  - (2) if main-memory, the data is written to disk, (1)
  *  - (3) merge disk data into the final format:
  *
  * The building process is divided in two steps:
@@ -60,7 +60,7 @@ final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   void index(final byte[] tok) throws IOException {
-    // until there's enough free main memory
+    // until there's enough free main-memory
     if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
       // currently no frequency support for tfidf based scoring
       writeIndex(csize++);

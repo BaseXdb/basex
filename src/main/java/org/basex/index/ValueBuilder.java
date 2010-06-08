@@ -52,7 +52,7 @@ public final class ValueBuilder extends IndexBuilder {
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) {
         check();
-        // check if main memory is exhausted
+        // check if main-memory is exhausted
         if(memFull()) {
           write(f + csize++);
           index = new ValueTree();

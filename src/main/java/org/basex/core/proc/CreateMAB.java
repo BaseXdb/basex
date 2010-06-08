@@ -12,7 +12,7 @@ import org.basex.io.IO;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class CreateMAB extends ACreate {
+public final class CreateMAB extends Create {
   /**
    * Default constructor.
    * @param input input MAB2 file

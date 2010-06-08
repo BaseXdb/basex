@@ -26,7 +26,8 @@ public abstract class Parser extends Progress {
   /** Input file. */
   public IO file;
 
-  /** Temporary attribute array. */
+  /** Temporary attribute array.
+      To speed up processing, the same instance is used over and over. */
   protected final Atts atts = new Atts();
   /** Target path. */
   protected final String target;

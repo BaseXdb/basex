@@ -46,7 +46,7 @@ public final class MemBuilder extends Builder {
     data = new MemData(tags, atts, ns, path, prop);
     meta = data.meta;
     meta.name = db;
-    // all contents will be indexed in main memory mode
+    // all contents will be indexed in main-memory mode
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;

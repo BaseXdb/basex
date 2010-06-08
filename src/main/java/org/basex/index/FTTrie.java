@@ -114,7 +114,7 @@ final class FTTrie extends FTIndex {
 
   /**
    * Traverses the trie and returns a result iterator.
-   * @param id on node array (in main memory)
+   * @param id on node array (in -memory)
    * @param sn search nodes value
    * @param f fast evaluation
    * @return pre-values and corresponding positions
@@ -132,7 +132,7 @@ final class FTTrie extends FTIndex {
   /**
    * Traverses the trie and returns a found node for the searched value.
    * Returns data from node or null.
-   * @param id on node array (in main memory)
+   * @param id on node array (in main-memory)
    * @param sn search nodes value
    * @return int id on node saving the data
    */
@@ -183,7 +183,7 @@ final class FTTrie extends FTIndex {
 
   /**
    * Reads a node entry from disk.
-   * @param id on node array (in main memory)
+   * @param id on node array (in main-memory)
    * @return node entry from disk
    */
   private synchronized int[] entry(final long id) {

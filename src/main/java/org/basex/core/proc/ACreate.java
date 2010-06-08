@@ -24,11 +24,9 @@ import org.basex.index.ValueBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class ACreate extends Proc {
+public abstract class ACreate extends Proc {
   /** Builder instance. */
   private Builder builder;
-  /** Parser instance. */
-  protected Parser parser;
 
   /**
    * Protected constructor, specifying command arguments.
@@ -45,28 +43,6 @@ public class ACreate extends Proc {
    */
   protected ACreate(final int p, final String... a) {
     super(p, a);
-  }
-
-  /**
-   * Convenience constructor for specifying a parser, input path and
-   * database name.
-   * @param p parser instance
-   * @param name name of database
-   */
-  public ACreate(final Parser p, final String name) {
-    this(name);
-    parser = p;
-  }
-
-  /*
-   * This methods needs to be overwritten by the subclass if no parser
-   * has been specified by the constructor.
-   */
-  @Override
-  protected boolean run() {
-    // check if file exists
-    if(!parser.file.exists()) return error(FILEWHICH, parser.file);
-    return build(parser, args[0]);
   }
   
   /**

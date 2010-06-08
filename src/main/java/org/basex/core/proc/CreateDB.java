@@ -62,7 +62,7 @@ public class CreateDB extends ACreate {
    */
   public static Data empty(final Context ctx, final String name)
       throws IOException {
-    return xml(ctx, Parser.emptyParser(name), name);
+    return xml(Parser.emptyParser(name), name, ctx);
   }
 
   /**
@@ -79,19 +79,19 @@ public class CreateDB extends ACreate {
     if(!ctx.user.perm(User.CREATE))
       throw new IOException(Main.info(PERMNO, CmdPerm.CREATE));
     if(!io.exists()) throw new BuildException(FILEWHICH, io);
-    return xml(ctx, new DirParser(io, ctx.prop), name);
+    return xml(new DirParser(io, ctx.prop), name, ctx);
   }
 
   /**
    * Creates a database instance from the specified parser.
-   * @param ctx database context
    * @param p xml parser
    * @param db name of the database
+   * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final Context ctx, final Parser p,
-      final String db) throws IOException {
+  public static synchronized Data xml(final Parser p, final String db,
+      final Context ctx) throws IOException {
 
     if(ctx.prop.is(Prop.MAINMEM)) return new MemBuilder(p, ctx.prop).build(db);
     if(ctx.pinned(db)) throw new IOException(Main.info(DBLOCKED, db));
@@ -118,40 +118,40 @@ public class CreateDB extends ACreate {
   }
 
   /**
-   * Creates a main memory database for the specified parser.
+   * Creates a main-memory database for the specified parser.
    * @param p xml parser
-   * @param pr database properties
+   * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final Parser p, final Prop pr)
+  public static synchronized Data xml(final Parser p, final Context ctx)
       throws IOException {
-    return new MemBuilder(p, pr).build();
+    return new MemBuilder(p, ctx.prop).build();
   }
 
   /**
-   * Creates a main memory database from the specified input reference.
-   * @param io file reference
-   * @param pr database properties
+   * Creates a main-memory database from the specified input reference.
+   * @param io input reference
+   * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final IO io, final Prop pr)
+  public static synchronized Data xml(final IO io, final Context ctx)
       throws IOException {
     if(!io.exists()) throw new BuildException(FILEWHICH, io.path());
-    return xml(new DirParser(io, pr), pr);
+    return xml(new DirParser(io, ctx.prop), ctx);
   }
 
   /**
-   * Creates a main memory database from the specified SAX source.
+   * Creates a main-memory database from the specified SAX source.
    * @param s sax source
-   * @param pr database properties
+   * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final SAXSource s, final Prop pr)
+  public static synchronized Data xml(final SAXSource s, final Context ctx)
       throws IOException {
-    return xml(new SAXWrapper(s, "") , pr);
+    return xml(new SAXWrapper(s, "") , ctx);
   }
 
   @Override

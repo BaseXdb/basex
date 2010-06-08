@@ -44,7 +44,7 @@ public final class DataPool {
    * @return true if reference was removed from the pool
    */
   boolean unpin(final Data d) {
-    // ignore main memory database instances
+    // ignore main-memory database instances
     if(d instanceof MemData) return false;
 
     for(int i = 0; i < size; i++) {
@@ -76,7 +76,7 @@ public final class DataPool {
    * @param d data reference
    */
   void add(final Data d) {
-    // ignore main memory database instances
+    // ignore main-memory database instances
     if(d instanceof MemData) return;
 
     if(size == data.length) {

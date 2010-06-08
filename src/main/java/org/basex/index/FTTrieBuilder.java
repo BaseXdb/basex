@@ -17,8 +17,8 @@ import org.basex.util.TokenList;
 /**
  * This class builds an index for text contents in a compressed trie.
  * <ol>
- * <li> the tokens are collected in main memory (hash map)</li>
- * <li> if main memory is full, data is written as sorted list to disk (1)</li>
+ * <li> the tokens are collected in main-memory (hash map)</li>
+ * <li> if main-memory is full, data is written as sorted list to disk (1)</li>
  * <li> merge disk data trough reading sorted lists</li>
  * <li> write sorted list (merged) to disk</li>
  * <li> create final trie structure out of it (4) with the following final
@@ -74,7 +74,7 @@ final class FTTrieBuilder extends FTBuilder {
 
   @Override
   void index(final byte[] tok) throws IOException {
-    // until there's enough free main memory
+    // until there's enough free main-memory
     if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
       // currently no frequency support for tfidf based scoring
       // write data temporarily as sorted list

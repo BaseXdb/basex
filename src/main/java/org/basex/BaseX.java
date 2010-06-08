@@ -135,10 +135,10 @@ public class BaseX extends Main {
             // hidden option: show dot query graph
             input = arg.string();
           } else if(c == 'm') {
-            // hidden option: activate table main memory mode
+            // hidden option: activate table main-memory mode
             arg.check(set(Prop.TABLEMEM, true));
           } else if(c == 'M') {
-            // hidden option: activate main memory mode
+            // hidden option: activate main-memory mode
             arg.check(set(Prop.MAINMEM, true));
           } else if(c == 'n' && !sa()) {
             // parse server name

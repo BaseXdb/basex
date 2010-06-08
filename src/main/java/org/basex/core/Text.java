@@ -330,7 +330,7 @@ public interface Text {
   String PROCERR = lang("proc_err") + COL + NL + "%";
   /** No database error. */
   String PROCNODB = lang("proc_nodb");
-  /** Main memory error. */
+  /** Main-memory error. */
   String PROCMM = lang("proc_mm");
   /** Out of memory error. */
   String PROCOUTMEM = lang("proc_outmem");
@@ -570,7 +570,7 @@ public interface Text {
   /** Maximum tree height. */
   String INFOHEIGHT = lang("info_height");
 
-  /** Info on used main memory. */
+  /** Info on used main-memory. */
   String INFOMEM = lang("info_mem");
 
   /** No document opened. */
