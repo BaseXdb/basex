@@ -127,48 +127,39 @@ class Session {
 
 class Query {
 	/* Class variables.*/
- 	var $session, $query, $part, $open, $id, $info;
+ 	var $session, $id, $open, $next;
  	
 	function __construct($s, $q) {
 		$this->session = $s;
-		$this->query = $q;
-		$this->open = True;
-		$this->info = "";
-	}
-	
-	/* Starts the query execution. */
-	public function run() {
-	    $this->id = $this->session->executeIter($this->query);
+		$this->next = "";
+		$this->id = $this->session->executeIter($q);
 	    if ($this->id != "0") {
-	       return True;
+	       $this->open = True;
          } else {
-           $this->open = False;
-           $this->info = $this->session->res(); 
-           return False;  
+           throw new Exception($this->session->res());
          }
 	}
 	
 	/* Checks for next item in line. */
-	public function more() {
+	public function hasNext() {
 	    if ($this->open) {
             $this->session->send("\1$this->id\0\0");
             if ($this->session->check()) {
-			$this->part = $this->session->res();
+			$this->next = $this->session->res();
 			return True; 
             } else {
             if($this->session->check()) {
-              print "Query ".$this->id.": ".$this->session->res();  
-            } else {
-              $this->open = False;
-			  return False;  
+              throw new Exception($this->session->res());  
             }
+            $this->open = False;
+			return False;
 		  }
         }
 	}
 	
 	/* Returns next item. */
 	public function next() {
-		return $this->part;
+		return $this->next;
 	}
 	
 	/* Closes the query. */
@@ -176,11 +167,6 @@ class Query {
 	   if ($this->open) {
         $this->session->send("\1$this->id\0\1");   
         }
-	}
-	
-	/* Returns the info string. */
-	public function info() {
-		return $this->info;
 	}	
 }
 ?>

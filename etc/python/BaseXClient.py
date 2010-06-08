@@ -121,42 +121,31 @@ class Query():
 	# Constructor, creating a new query object.
 	def __init__(self, session, q):
 		self.__session = session
-		self.__query = q
-		self.__open = True
-		self.__info = ''
-	
-	# Runs the query and returns the success flag.
-	def run(self):
-		self.__id = self.__session.executeIter(self.__query)
+		self.__id = self.__session.executeIter(q)
+		self.__next = ''
 		if self.__id != '0':
-			return True
+			self.__open = True
 		else:
-			self.__open = False
-			self.__info = self.__session.res()
-			return False
+			raise IOError(self.__session.res())
 	
 	# Checks for more parts of the result.	
-	def more(self):
+	def hasNext(self):
 		if self.__open:
-			self.__session.send('\1' + self.__id + '\0' + '\0')
+			self.__session.send('\1' + self.__id + '\0' + '\0')		
 			if self.__session.check():
-				self.__part = self.__session.res()
+				self.__next = self.__session.res()
 				return True
 			else:
 				if self.__session.check():
-					print 'Query ', self.__id, ':', self.__session.res()
+					raise IOError(self.__session.res())
 				self.__open = False
 				return False
-	
+		
 	# Returns the next part of the result.
 	def next(self):
-		return self.__part		
+		return self.__next
 	
 	# Closes the iterative execution.	
 	def close(self):
 		if self.__open:
 			self.__session.send('\1' + self.__id + '\0' + '\1')
-	
-	# Returns the error info.	
-	def info(self):
-		return self.__info

@@ -20,26 +20,24 @@ try {
   // create session
   $session = new Session("localhost", 1984, "admin", "admin");
   
+  try {
   $query = $session->query($cmd);
-  if($query->run()) {
-  	while($query->more()) {
+  while($query->hasNext()) {
   	 	print "Result Query 1: ".$query->next()."<br />";
-  	}
-  } else {
-  	print $query->info();
   }
   
   $query2 = $session->query("11 to 12");
-  if($query2->run()) {
-  	while($query2->more()) {
+  while($query2->hasNext()) {
   	 	print "Result Query 2: ".$query2->next()."<br />";
-  	}
-  } else {
-  	print $query2->info();
   }
   
   $query->close();
   $query2->close();
+  
+  } catch (Exception $e) {
+  // print exception
+  print $e->getMessage();
+  }
 
   // close session
   $session->close();
