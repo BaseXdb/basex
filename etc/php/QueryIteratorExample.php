@@ -1,7 +1,8 @@
 <?php
 /* ----------------------------------------------------------------------------
  *
- * This example shows how BaseX commands can be performed via the PHP API.
+ * This example shows how results from a query can be received in an iterative
+ * mode via the PHP API.
  * The execution time will be printed along with the result of the command.
  *
  * ----------------------------------------------------------------------------
@@ -21,16 +22,17 @@ try {
   $session = new Session("localhost", 1984, "admin", "admin");
   
   try {
-  $query = $session->query($cmd);
-  while($query->more()) {
-  	 	print "- ".$query->next()."<br />";
+    // create and execute the query
+    $query = $session->query($cmd);
+    // receive the results
+    while($query->more()) {
+  	  print "- ".$query->next()."<br />";
   }
-  
-  $query->close();
-  
+    // close query
+    $query->close();
   } catch (Exception $e) {
-  // print exception
-  print $e->getMessage();
+    // print exception
+    print $e->getMessage();
   }
 
   // close session

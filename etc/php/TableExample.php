@@ -1,8 +1,8 @@
 <?php
 /* ----------------------------------------------------------------------------
  *
- * This example shows how BaseX commands can be performed via the PHP API.
- * The execution time will be printed along with the result of the command.
+ * This example shows how results from a query can be received in an iterative
+ * mode and illustrated in a table via the PHP API.
  *
  * ----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -10,7 +10,7 @@
  */
 include("BaseXClient.php");
 
-// command to be performed
+// commands to be performed
 $cmd = 'for $node in doc("factbook")//country order by xs:int($node/@population) return data($node/@name)';
 $cmd2 = 'for $node in doc("factbook")//country order by xs:int($node/@population) return data($node/@population)';
 
@@ -24,29 +24,29 @@ try {
   echo "<td style='text-align:center;background-color:#D7D7D7;border:#ffffff 1px solid;font-size:12pt;'>Country</td>";
   echo "<td style='text-align:center;background-color:#D7D7D7;border:#ffffff 1px solid;font-size:12pt;'>Population</td>";
   try {
-  $query = $session->query($cmd);
-  $query2 = $session->query($cmd2);
-  $count = 0;
-  while($query->more()) {
-  		$next = $query->next();
-  		$query2->more();
-  		$next2 = $query2->next();
-  		$count += 1;
-  		if($count%2) {
-  		echo "<tr style='text-align:center;'>
+    $query = $session->query($cmd);
+    $query2 = $session->query($cmd2);
+    $count = 0;
+    while($query->more()) {
+  	  $next = $query->next();
+  	  $query2->more();
+  	  $next2 = $query2->next();
+  	  $count += 1;
+  	  if($count%2) {
+  	    echo "<tr style='text-align:center;'>
   		<td style='text-align:center;'>$count</td><td style='text-align:center;'>$next</td>
-          <td style='text-align:center;'>$next2</td></tr>";
+        <td style='text-align:center;'>$next2</td></tr>";
   		} else {
   		echo "<tr style='text-align:center; background-color:#eeeeee;'>
   		<td style='text-align:center;'>$count</td><td style='text-align:center;'>$next</td>
-          <td style='text-align:center;'>$next2</td></tr>";
+        <td style='text-align:center;'>$next2</td></tr>";
   		}
-  	}
-  $query->close();
-  $query2->close();
+  	  }
+    $query->close();
+    $query2->close();
   } catch (Exception $e) {
-  // print exception
-  print $e->getMessage();
+    // print exception
+    print $e->getMessage();
   }	
   echo "</table>";
   $query->close();
