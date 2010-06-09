@@ -19,13 +19,9 @@ $cmd = "xquery 1 to 10";
 try {
   // create session
   $session = new Session("localhost", 1984, "admin", "admin");
-
+  
   // perform command and show result or error output
-  if($session->execute($cmd)) {
-    print $session->result();
-  } else {
-    print $session->info();
-  }
+  print $session->execute($cmd);
 
   // close session
   $session->close();

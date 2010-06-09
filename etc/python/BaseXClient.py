@@ -8,10 +8,11 @@
 # hostname and the port.
 #
 # For the execution of commands you need to call the execute() method with the
-# database command as argument. The method returns a boolean, indicating if
-# the command was successful. The result can be requested with the result()
-# method, and the info() method returns additional processing information
-# or error output.
+# database command as argument. The method returns the result or throws
+# an exception with the received error message.
+# For the execution of the iterative version of a query you need to call
+# the query() method. The results will then be returned via the more() and
+# the next() methods. If an error occurs an exception will be thrown.
 #
 # -----------------------------------------------------------------------------
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -51,18 +52,15 @@ class Session():
     self.send(com)
 
     # send command to server and receive result
-    self.init()
-    self.__result = self.readString()
+    result = self.receive()
     self.__info = self.readString()
-    return self.read() == 0
+    if not self.ok():
+      raise IOError(self.__info)
+    return result
   
   # Returns a query object.  
   def query(self, q):
   	return Query(self, q)
-
-  # Returns the result.
-  def result(self):
-    return self.__result
 
   # Returns processing information.
   def info(self):
@@ -115,24 +113,24 @@ class Session():
 class Query():
 	# Constructor, creating a new query object.
 	def __init__(self, session, q):
-		self.__session = session
-		self.__session.send('\0' + q)
-		self.__id = self.__session.receive()
-		if not self.__session.ok():
-			raise IOError(self.__session.readString())
+	  self.__session = session
+	  self.__session.send('\0' + q)
+	  self.__id = self.__session.receive()
+	  if not self.__session.ok():
+	    raise IOError(self.__session.readString())
 	
 	# Checks for more parts of the result.
 	def more(self):
-		self.__session.send('\1' + self.__id)
-		self.__next = self.__session.receive()
-		if not self.__session.ok():
-			raise IOError(self.__session.readString())	
-		return len(self.__next) != 0	
+	  self.__session.send('\1' + self.__id)
+	  self.__next = self.__session.receive()
+	  if not self.__session.ok():
+	    raise IOError(self.__session.readString())	
+	  return len(self.__next) != 0	
 		
 	# Returns the next part of the result.
 	def next(self):
-		return self.__next
+	  return self.__next
 	
 	# Closes the iterative execution.	
 	def close(self):
-		self.__session.send('\2' + self.__id);
+	  self.__session.send('\2' + self.__id);

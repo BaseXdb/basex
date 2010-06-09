@@ -1,6 +1,7 @@
 # -----------------------------------------------------------------------------
 #
-# This example shows how BaseX commands can be performed via the Python API.
+# This example shows how results from a query can be received in an iterative
+# mode via the Python API.
 # The execution time will be printed along with the result of the command.
 #
 # -----------------------------------------------------------------------------

@@ -9,10 +9,11 @@
  * hostname and the port.
  *
  * For the execution of commands you need to call the execute() method with the
- * database command as argument. The method returns a boolean, indicating if
- * the command was successful. The result can be requested with the result()
- * method, and the info() method returns additional processing information
- * or error output.
+ * database command as argument. The method returns the result or throws
+ * an exception with the received error message.
+ * For the execution of the iterative version of a query you need to call
+ * the query() method. The results will then be returned via the more() and
+ * the next() methods. If an error occurs an exception will be thrown.
  *
  * ----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -20,7 +21,7 @@
  */
 class Session {
   /* Class variables.*/
-  var $socket, $result, $info, $buffer, $bpos, $bsize;
+  var $socket, $info, $buffer, $bpos, $bsize;
 
   /* Constructor, creating a new socket connection. */
   function __construct($h, $p, $user, $pw) {
@@ -49,16 +50,12 @@ class Session {
     socket_write($this->socket, "$com\0");
 
     // receive result
-    $this->init();
-    $this->result = $this->readString();
+    $result = $this->receive();
     $this->info = $this->readString();
-
-    return $this->read() == "\0";
-  }
-
-  /* Returns the result. */
-  public function result() {
-    return $this->result;
+	if($this->ok() != True) {
+	  throw new Exception($this->info);
+	}
+	return $result;
   }
 
   /* Returns processing information. */
@@ -119,36 +116,37 @@ class Session {
 }
 
 class Query {
-	/* Class variables.*/
- 	var $session, $id, $open, $next;
- 	
-	function __construct($s, $q) {
-		$this->session = $s;
-		$this->session->send("\0$q");
-		$this->id = $this->session->receive();
-		if($this->session->ok() != True) {
-          throw new Exception($this->session->readString());
-        }
-	}
+  /* Class variables.*/
+  var $session, $id, $open, $next;
+ 
+  /* Constructor, creating a new query object. */	
+  function __construct($s, $q) {
+    $this->session = $s;
+	$this->session->send("\0$q");
+	$this->id = $this->session->receive();
+	if($this->session->ok() != True) {
+      throw new Exception($this->session->readString());
+    }
+  }
 	
-	/* Checks for next item in line. */
-	public function more() {
-        $this->session->send("\1$this->id");
-        $this->next = $this->session->receive();
-        if($this->session->ok() != True) {
-          throw new Exception($this->session->readString());
-        }
-        return strlen($this->next) > 0; 
-	}
+  /* Checks for next item in line. */
+  public function more() {
+    $this->session->send("\1$this->id");
+    $this->next = $this->session->receive();
+    if($this->session->ok() != True) {
+      throw new Exception($this->session->readString());
+    }
+    return strlen($this->next) > 0; 
+  }
 	
-	/* Returns next item. */
-	public function next() {
-		return $this->next;
-	}
+  /* Returns next item. */
+  public function next() {
+    return $this->next;
+  }
 	
-	/* Closes the query. */
-	public function close() {
-        $this->session->send("\2$this->id");   
-	}	
+  /* Closes the query. */
+  public function close() {
+    $this->session->send("\2$this->id");   
+  }	
 }
 ?>
