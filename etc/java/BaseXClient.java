@@ -131,8 +131,7 @@ public class BaseXClient {
    * @throws IOException Exception
    */
   boolean ok() throws IOException {
-    int test = in.read();
-    return test == 0;
+    return in.read() == 0;
   }
 
   /**
@@ -165,7 +164,6 @@ public class BaseXClient {
     while(true) {
       final int b = in.read();
       if(b == 0) break;
-      if(b == 1) continue;
       o.write(b);
     }
   }
@@ -210,6 +208,7 @@ public class BaseXClient {
       out.write(0);
       send(query);
       id = receive();
+      if(!ok()) throw new IOException(receive());
     }
     
     /**
