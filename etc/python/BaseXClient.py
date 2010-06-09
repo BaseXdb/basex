@@ -39,7 +39,7 @@ class Session():
     m = hashlib.md5()
     m.update(hashlib.md5(pw).hexdigest())
     m.update(ts)
-    s.send(user + '\0' + m.hexdigest() + '\0')
+    self.send(user + '\0' + m.hexdigest())
 
     # evaluate success flag
     if s.recv(1) != '\0':
@@ -48,7 +48,7 @@ class Session():
   # Executes the specified command.
   def execute(self, com):
     # send command to server
-    s.send(com + '\0')
+    self.send(com)
 
     # send command to server and receive result
     self.init()
@@ -70,7 +70,7 @@ class Session():
 
   # Closes the connection.
   def close(self):
-    s.send('exit\0')
+    self.send('exit')
     s.close()
 
   # Initializes the byte transfer.
@@ -97,22 +97,17 @@ class Session():
     b = self.__buf[self.__bpos]
     self.__bpos += 1
     return b
-  
-  # Executes the iterative mode of a query.
-  def executeIter(self, com):
-  	s.send('\0' + com + '\0');
-  	return self.res()
-  
-  # Sends the defined sign.	
-  def send(self, sign):
-  	s.send(sign)
+    
+  # Sends the defined str.	
+  def send(self, str):
+  	s.send(str + '\0')
   
   # Checks the next byte for null or 1.	
-  def check(self):
-   	return s.recv(1) == '\0'
+  def ok(self):
+   	return self.read() == 0
    
   # Returns the received string. 	
-  def res(self):
+  def receive(self):
   	self.init()
   	return self.readString()
      
@@ -121,25 +116,18 @@ class Query():
 	# Constructor, creating a new query object.
 	def __init__(self, session, q):
 		self.__session = session
-		self.__id = self.__session.executeIter(q)
-		self.__next = ''
-		if self.__id != '0':
-			self.__open = True
-		else:
-			raise IOError(self.__session.res())
+		self.__session.send('\0' + q)
+		self.__id = self.__session.receive()
+		if not self.__session.ok():
+			raise IOError(self.__session.readString())
 	
-	# Checks for more parts of the result.	
-	def hasNext(self):
-		if self.__open:
-			self.__session.send('\1' + self.__id + '\0' + '\0')		
-			if self.__session.check():
-				self.__next = self.__session.res()
-				return True
-			else:
-				if self.__session.check():
-					raise IOError(self.__session.res())
-				self.__open = False
-				return False
+	# Checks for more parts of the result.
+	def more(self):
+		self.__session.send('\1' + self.__id)
+		self.__next = self.__session.receive()
+		if not self.__session.ok():
+			raise IOError(self.__session.readString())	
+		return len(self.__next) != 0	
 		
 	# Returns the next part of the result.
 	def next(self):
@@ -147,5 +135,4 @@ class Query():
 	
 	# Closes the iterative execution.	
 	def close(self):
-		if self.__open:
-			self.__session.send('\1' + self.__id + '\0' + '\1')
+		self.__session.send('\2' + self.__id);

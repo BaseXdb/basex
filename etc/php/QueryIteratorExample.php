@@ -22,17 +22,11 @@ try {
   
   try {
   $query = $session->query($cmd);
-  while($query->hasNext()) {
-  	 	print "Result Query 1: ".$query->next()."<br />";
-  }
-  
-  $query2 = $session->query("11 to 12");
-  while($query2->hasNext()) {
-  	 	print "Result Query 2: ".$query2->next()."<br />";
+  while($query->more()) {
+  	 	print "- ".$query->next()."<br />";
   }
   
   $query->close();
-  $query2->close();
   
   } catch (Exception $e) {
   // print exception

@@ -79,7 +79,7 @@ class Session {
   }
 
   /* Receives a string from the socket. */
-  private function readString() {
+  public function readString() {
     $com = "";
     while(($d = $this->read()) != "\0") {
       $com .= $d;
@@ -101,25 +101,18 @@ class Session {
   	return new Query($this, $q);
   }
   
-  /* Executes the query. */
-  public function executeIter($cmd) {
-  	// send command to server
-    socket_write($this->socket, "\0$cmd\0");
-    return $this->res();
-  }
-  
-  /* Sends the sign. */
-  public function send($sign) {
-  	socket_write($this->socket, $sign);
+  /* Sends the str. */
+  public function send($str) {
+  	socket_write($this->socket, "$str\0");
   }
   
   /* Checks the next byte. */
-  public function check() {
-  	return socket_read($this->socket, 1) == "\0";
+  public function ok() {
+  	return $this->read() == "\0";
   }
   
   /* Returns the result. */
-  public function res() {
+  public function receive() {
   	$this->init();
   	return $this->readString();
   }
@@ -131,30 +124,21 @@ class Query {
  	
 	function __construct($s, $q) {
 		$this->session = $s;
-		$this->next = "";
-		$this->id = $this->session->executeIter($q);
-	    if ($this->id != "0") {
-	       $this->open = True;
-         } else {
-           throw new Exception($this->session->res());
-         }
+		$this->session->send("\0$q");
+		$this->id = $this->session->receive();
+		if($this->session->ok() != True) {
+          throw new Exception($this->session->readString());
+        }
 	}
 	
 	/* Checks for next item in line. */
-	public function hasNext() {
-	    if ($this->open) {
-            $this->session->send("\1$this->id\0\0");
-            if ($this->session->check()) {
-			$this->next = $this->session->res();
-			return True; 
-            } else {
-            if($this->session->check()) {
-              throw new Exception($this->session->res());  
-            }
-            $this->open = False;
-			return False;
-		  }
+	public function more() {
+        $this->session->send("\1$this->id");
+        $this->next = $this->session->receive();
+        if($this->session->ok() != True) {
+          throw new Exception($this->session->readString());
         }
+        return strlen($this->next) > 0; 
 	}
 	
 	/* Returns next item. */
@@ -164,9 +148,7 @@ class Query {
 	
 	/* Closes the query. */
 	public function close() {
-	   if ($this->open) {
-        $this->session->send("\1$this->id\0\1");   
-        }
+        $this->session->send("\2$this->id");   
 	}	
 }
 ?>

@@ -20,19 +20,14 @@ try:
   session = BaseXClient.Session('localhost', 1984, 'admin', 'admin')
   
   try:
+  
   	# create and run query
   	query = session.query(cmd)
-  	while query.hasNext():
-  		print 'Result Query 1: ', query.next()
-  		
-  	# create and run query
-  	query2 = session.query("11 to 15")
-  	while query2.hasNext():
-  		print 'Result Query 2: ', query2.next()
+  	while query.more():
+  		print '- ', query.next()
   
   	# closes both query objects	
   	query.close()
-  	query2.close()
   
   except IOError as e:
   	# print exception
