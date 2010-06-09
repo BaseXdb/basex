@@ -196,6 +196,7 @@ public final class ServerProcess extends Thread {
         if(qp != null) qp.init();
         // send {ID}0 and 0 as success flag
         out.writeString(arg);
+        out.write(0);
       } else if(c == 1) {
         // c = 1: request next item
         if(qp != null) qp.next();
