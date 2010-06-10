@@ -1,6 +1,7 @@
 # -----------------------------------------------------------------------------
 #
-# This example shows how BaseX commands can be performed via the Ruby API.
+# This example shows how results from a query can be received in an iterative
+# mode via the Ruby API.
 # The execution time will be printed along with the result of the command.
 #
 # -----------------------------------------------------------------------------
@@ -13,14 +14,24 @@ require 'BaseXClient.rb'
 start_time = Time.now
 
 # command to be performed
-com = "xquery 1 to 10"
+cmd = "1 to 10"
 
 begin
   # create session
   session = Session.new("localhost", 1984, "admin", "admin")
-
-  # perform command and show result or error output
-  print session.execute(com)
+  # create and run query
+  begin
+  query = session.query(cmd)
+  while query.more do
+    print " - " + query.next
+  end
+  # close query object	
+  query.close()
+  
+  rescue Exception => e
+    # print exception
+    puts e
+  end
 
   # close session
   session.close
@@ -33,4 +44,3 @@ rescue Exception => e
   # print exception
   puts e
 end
-

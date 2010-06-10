@@ -27,7 +27,7 @@ try:
   	while query.more():
   		print '- ', query.next()
   
-  	# closes both query objects	
+  	# close query object	
   	query.close()
   
   except IOError as e:

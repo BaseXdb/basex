@@ -8,28 +8,11 @@
 # hostname and the port.
 #
 # For the execution of commands you need to call the execute() method with the
-# database command as argument. The method returns a boolean, indicating if
-# the command was successful. The result can be requested with the result()
-# method, and the info() method returns additional processing information
-# or error output.
-#
-# -----------------------------------------------------------------------------
-#
-# Example:
-#
-# require 'BaseXClient.rb'
-#
-# begin
-# session = Session.new("localhost", 1984, "admin", "admin")
-# if session.execute("xquery 1 to 10") == "\0"
-#   puts session.result
-# else
-#  puts session.info
-# end
-# session.close
-# rescue Exception => e
-#   puts e
-# end
+# database command as argument. The method returns the result or throws
+# an exception with the received error message.
+# For the execution of the iterative version of a query you need to call
+# the query() method. The results will then be returned via the more() and
+# the next() methods. If an error occurs an exception will be thrown.
 #
 # -----------------------------------------------------------------------------
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -52,8 +35,8 @@ class Session
     hash.update(ts)
 
     # send username and hashed password/timestamp
-    @socket.write(username + "\0")
-    @socket.write(hash.hexdigest() + "\0")
+    send(username)
+    send(hash.hexdigest())
 
     # evaluate success flag
     if read != "\0"
@@ -65,17 +48,20 @@ class Session
   # Executes the specified command.
   def execute(com)
     # send command to server
-    @socket.write(com + "\0")
+    send(com)
 
-    # send command to server and receive result
-    @result = readString
+    # receive result
+    result = readString
     @info = readString
-    return read
+    if ok != true
+      raise @info
+    end
+    return result
   end
-
-  # Returns the result.
-  def result()
-    return @result
+  
+  # Returns a query object.
+  def query(cmd)
+    return Query.new(self, cmd)
   end
 
   # Returns processing information.
@@ -85,7 +71,7 @@ class Session
 
   # Closes the connection.
   def close()
-    @socket.write("exit \0")
+    send("exit")
     @socket.close
   end
 
@@ -97,9 +83,51 @@ class Session
     end
     return complete
   end
+  
+  # Sends the defined str.
+  def send(str)
+    @socket.write(str + "\0")
+  end
 
   # Returns a single byte from the socket.
   def read()
     return @socket.read(1)
+  end
+  
+  # Returns success check. 
+  def ok()
+    return read == "\0"
+  end
+end
+
+class Query
+  # Constructor, creating a new query object.
+  def initialize(s, q)
+    @session = s
+    @session.send("\0" + q)
+    @id = @session.readString
+    if @session.ok != true
+      raise @session.readString
+    end
+  end
+  
+  # Checks for more parts of the result.  
+  def more()
+    @session.send("\1" + @id)
+    @next = @session.readString
+    if @session.ok != true
+      raise @session.readString
+    end
+    return @next.length != 0
+  end
+  
+  # Returns the next part of the result.
+  def next()
+    return @next
+  end
+  
+  # Closes the iterative execution.
+  def close()
+    @session.send("\2" + @id)
   end
 end

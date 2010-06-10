@@ -103,7 +103,7 @@ class Session {
   	socket_write($this->socket, "$str\0");
   }
   
-  /* Checks the next byte. */
+  /* Returns success check. */
   public function ok() {
   	return $this->read() == "\0";
   }

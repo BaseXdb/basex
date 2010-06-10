@@ -51,7 +51,7 @@ class Session():
     # send command to server
     self.send(com)
 
-    # send command to server and receive result
+    # receive result
     result = self.receive()
     self.__info = self.readString()
     if not self.ok():
@@ -100,7 +100,7 @@ class Session():
   def send(self, str):
   	s.send(str + '\0')
   
-  # Checks the next byte for null or 1.	
+  # Returns success check.	
   def ok(self):
    	return self.read() == 0
    
