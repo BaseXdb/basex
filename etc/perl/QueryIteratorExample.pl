@@ -1,6 +1,7 @@
 # -----------------------------------------------------------------------------
 #
-# This example shows how BaseX commands can be performed via the Perl API.
+# This example shows how results from a query can be received in an iterative
+# mode via the Perl API.
 # The execution time will be printed along with the result of the command.
 #
 # -----------------------------------------------------------------------------
@@ -16,14 +17,19 @@ use strict;
 my $start = [ Time::HiRes::gettimeofday( ) ];
 
 # command to be performed
-my $cmd = "xquery 1 to 10";
+my $cmd = "1 to 10";
 
 eval {
   # create session
   my $session = Session->new("localhost", 1984, "admin", "admin");
 
-  # perform command and show result
-  print $session->execute($cmd);
+  # create and run query
+  my $query = $session->query($cmd);
+  while ($query->more()) {
+    print " - " , $query->next();
+  }
+  # close query object
+  $query->close();
 
   # close session
   $session->close();

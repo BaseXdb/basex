@@ -8,34 +8,11 @@
 # hostname and the port.
 #
 # For the execution of commands you need to call the execute() method with the
-# database command as argument. The method returns a boolean, indicating if
-# the command was successful. The result can be requested with the result()
-# method, and the info() method returns additional processing information
-# or error output.
-#
-# -----------------------------------------------------------------------------
-#
-# Example:
-#
-# use BaseXClient;
-#
-# eval {
-#   # create session
-#   $session = Session->new("localhost", 1984, "admin", "admin");
-#
-#   # perform command and show result or error output
-#   if($session->execute("xquery 1 to 10")) {
-#     print $session->result();
-#   } else {
-#     print $session->info();
-#   }
-#
-#   # close session
-#   $session->close();
-# };
-#
-# # print exception
-# print $@ if $@;
+# database command as argument. The method returns the result or throws
+# an exception with the received error message.
+# For the execution of the iterative version of a query you need to call
+# the query() method. The results will then be returned via the more() and
+# the next() methods. If an error occurs an exception will be thrown.
 #
 # -----------------------------------------------------------------------------
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -68,7 +45,7 @@ sub new {
   # send username and hashed password/timestamp
   my $pwmd5 = Digest::MD5->new()->add($pw)->hexdigest();
   my $complete = Digest::MD5->new()->add($pwmd5.$ts)->hexdigest();
-  $self->{sock}->send("$user\0$complete\0");
+  $self->send("$user\0$complete");
 
   # evaluate success flag
   return $self if !$self->_read() or die "Access denied.";
@@ -80,16 +57,20 @@ sub execute {
   my $cmd = shift;
 
   # send command to server and receive result
-  $self->{sock}->send("$cmd\0");
+  $self->send("$cmd\0");
   $self->{result} = $self->_readString();
   $self->{info} = $self->_readString();
-  return !$self->_read();
+  if (!$self->ok()) {
+    die $self->{info};
+  }
+  return $self->{result};
 }
 
-# Returns the result.
-sub result {
+# Returns a query object.
+sub query {
   my $self = shift;
-  return $self->{result};
+  my $cmd = shift;
+  return Query->new($self, $cmd);
 }
 
 # Returns processing information.
@@ -101,7 +82,7 @@ sub info {
 # Closes the connection.
 sub close {
   my $self = shift;
-  $self->{sock}->send("exit\0");
+  $self->send("exit\0");
   close($self->{sock});
 }
 
@@ -118,6 +99,58 @@ sub _read {
   my $self = shift;
   $self->{sock}->recv($_, 1);
   return ord();
+}
+
+# Returns success check.
+sub ok {
+  my $self = shift;
+  return !$self->_read();
+}
+
+# Sends the defined str.
+sub send {
+  my $self = shift;
+  my $str = shift;
+  $self->{sock}->send("$str\0");
+}
+
+1;
+
+
+package Query;
+
+our $session;
+our $id;
+our $next;
+
+sub new {
+  my $class = shift;
+  $session = shift;
+  my $cmd = shift;
+  my $self = bless({}, $class);
+  $session->send("\0$cmd");
+  $id = $session->_readString();
+  if (!$session->ok()) {
+    die $session->_readString();
+  }
+  return $self;
+}
+
+sub more {
+  $session->send("\1$id");
+  $next = $session->_readString();
+  if (!$session->ok()) {
+    die $session->_readString();
+  }
+  return length($next) != 0;
+}
+
+sub next {
+  return $next;
+}
+
+sub close {
+  $session->send("\2$id");
 }
 
 1;
