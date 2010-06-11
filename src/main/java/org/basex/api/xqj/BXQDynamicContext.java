@@ -83,7 +83,7 @@ abstract class BXQDynamicContext extends BXQAbstract
 
   public void bindByte(final QName qn, final byte v, final XQItemType t)
       throws XQException {
-    bind(qn, new Itr(v, Type.BYT), t);
+    bind(qn, Itr.get(v, Type.BYT), t);
   }
 
   public void bindDocument(final QName qn, final InputStream is,
@@ -160,7 +160,7 @@ abstract class BXQDynamicContext extends BXQAbstract
 
   public void bindShort(final QName qn, final short v, final XQItemType t)
       throws XQException {
-    bind(qn, new Itr(v, Type.SHR), t);
+    bind(qn, Itr.get(v, Type.SHR), t);
   }
 
   public void bindString(final QName qn, final String v, final XQItemType t)

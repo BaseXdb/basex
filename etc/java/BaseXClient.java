@@ -97,7 +97,7 @@ public class BaseXClient {
     if(!ok()) throw new IOException(info);
     return s;
   }
-  
+
   /**
    * Creates a query object.
    * @param query query string
@@ -124,7 +124,7 @@ public class BaseXClient {
     send("exit");
     socket.close();
   }
-  
+
   /**
    * Checks the next success flag.
    * @return value of check
@@ -154,7 +154,7 @@ public class BaseXClient {
     for(final byte t : s.getBytes()) out.write(t);
     out.write(0);
   }
-  
+
   /**
    * Receives a string and writes it to the specified output stream.
    * @param o output stream
@@ -189,7 +189,7 @@ public class BaseXClient {
     }
     return sb.toString();
   }
-  
+
   /**
    * Inner class for iterative query execution.
    */
@@ -198,7 +198,7 @@ public class BaseXClient {
     private final String id;
     /** Next result item. */
     private String next;
-    
+
     /**
      * Standard constructor.
      * @param query query string
@@ -210,7 +210,7 @@ public class BaseXClient {
       id = receive();
       if(!ok()) throw new IOException(receive());
     }
-    
+
     /**
      * Checks for the next item.
      * @return value of check
@@ -223,7 +223,7 @@ public class BaseXClient {
       if(!ok()) throw new IOException(receive());
       return next.length() != 0;
     }
-    
+
     /**
      * Returns the next item.
      * @return item string

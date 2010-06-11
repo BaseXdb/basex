@@ -11,7 +11,7 @@ import java.io.IOException;
 public final class Example {
   /** Privator constructor. */
   private Example() { }
-  
+
   /**
    * Main method, launching the standalone console mode.
    * @param args command-line arguments
