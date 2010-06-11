@@ -51,7 +51,7 @@ public final class If extends Arr {
   @Override
   public SeqType returned(final QueryContext ctx) {
     final SeqType ret = expr[1].returned(ctx);
-    return ret.eq(expr[2].returned(ctx)) ? ret : SeqType.ITEM_0M;
+    return ret.eq(expr[2].returned(ctx)) ? ret : SeqType.ITEM_ZM;
   }
 
   @Override

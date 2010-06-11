@@ -73,7 +73,7 @@ public final class And extends Arr {
 
     if(expr.length != 1) return this;
     final SeqType ret = expr[0].returned(ctx);
-    return ret.type == Type.BLN && ret.occ == SeqType.OCC_1 ? expr[0] : this;
+    return ret.type == Type.BLN && ret.one() ? expr[0] : this;
   }
 
   @Override

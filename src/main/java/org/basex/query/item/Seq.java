@@ -30,9 +30,7 @@ public class Seq extends Item {
     @Override
     public Item test(final QueryContext ctx) { return null; }
     @Override
-    public SeqType returned(final QueryContext ctx) {
-      return SeqType.ITEM;
-    }
+    public SeqType returned(final QueryContext ctx) { return SeqType.ITEM_Z; }
   };
 
   /** Item array. */
@@ -130,11 +128,11 @@ public class Seq extends Item {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
-    Type t = size > 16 ? Type.ITEM : val[0].type;
+    Type t = size > 32 ? Type.ITEM : val[0].type;
     for(int s = 1; s < size && t != Type.ITEM; s++) {
       if(t != val[s].type) t = Type.ITEM;
     }
-    return new SeqType(t, SeqType.OCC_1M);
+    return new SeqType(t, SeqType.Occ.OM);
   }
 
   @Override

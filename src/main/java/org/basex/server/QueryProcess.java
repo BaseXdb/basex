@@ -13,7 +13,7 @@ import org.basex.query.iter.Iter;
 
 /**
  * Container for processes executing a query with iterative results.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  * @author Christian Gruen
@@ -78,7 +78,7 @@ final class QueryProcess extends Progress {
       close();
     }
   }
-  
+
   /**
    * Closes the query process.
    * @throws IOException I/O exception

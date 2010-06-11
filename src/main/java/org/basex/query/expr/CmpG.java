@@ -100,6 +100,8 @@ public final class CmpG extends Arr {
   Comp cmp;
   /** Index expression. */
   private IndexAccess[] iacc = {};
+  /** Flag for atomic evaluation. */
+  private boolean atom;
 
   /**
    * Constructor.
@@ -170,12 +172,17 @@ public final class CmpG extends Arr {
       e = CmpR.get(this);
       if(e == null) e = this;
       else ctx.compInfo(OPTWRITE, this);
+    } else {
+      atom = expr[0].returned(ctx).one() && expr[1].returned(ctx).one();
     }
     return e;
   }
 
   @Override
   public Bln atomic(final QueryContext ctx) throws QueryException {
+    // atomic evaluation of arguments (faster)
+    if(atom) return Bln.get(eval(expr[0].atomic(ctx), expr[1].atomic(ctx)));
+
     final Iter ir1 = ctx.iter(expr[0]);
     final int is1 = ir1.size();
 

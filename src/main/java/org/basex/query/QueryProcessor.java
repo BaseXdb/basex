@@ -1,5 +1,6 @@
 package org.basex.query;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
@@ -148,6 +149,30 @@ public final class QueryProcessor extends Progress {
     if(all) tb.add(QUERYSTRING + query);
     return tb.toString();
   }
+
+  /**
+   * Checks if the specified query performs updates.
+   * @param ctx context reference
+   * @param qu query
+   * @return result of check
+   */
+  public static boolean updating(final Context ctx, final String qu) {
+    // quick check for update keywords
+    for(final String s : UPDATES) {
+      if(qu.indexOf(s) != -1) {
+        // keyword found; parse query to get sure
+        try {
+          final QueryProcessor qp = new QueryProcessor(qu, ctx);
+          qp.parse();
+          return qp.ctx.updating;
+        } catch(final QueryException ex) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
 
   /**
    * Returns the query plan in the dot notation.

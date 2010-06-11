@@ -79,6 +79,7 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
@@ -1986,8 +1987,8 @@ public class QueryParser extends InputParser {
     final QNm type = new QNm(qName(TYPEINVALID));
     ctx.ns.uri(type);
     skipWS();
-    final byte occ = consume('?') ? SeqType.OCC_01 : SeqType.OCC_1;
-    final SeqType seq = new SeqType(type, occ, false);
+    final Occ occ = consume('?') ? Occ.ZO : Occ.O;
+    final SeqType seq = new SeqType(Type.find(type, false), occ);
 
     if(seq.type == null) {
       final byte[] uri = type.uri.str();
@@ -2017,14 +2018,15 @@ public class QueryParser extends InputParser {
       }
     }
     skipWS();
-    final byte mode = consume('?') ? SeqType.OCC_01 : consume('+') ?
-        SeqType.OCC_1M : consume('*') ? SeqType.OCC_0M : SeqType.OCC_1;
+    final Occ occ = consume('?') ? Occ.ZO : consume('+') ?
+        Occ.OM : consume('*') ? Occ.ZM : Occ.O;
     if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pref(), false));
 
     final byte[] ext = tok.finish();
-    final SeqType seq = new SeqType(type, mode, true);
-    if(seq.type == null) error(par ? NOTYPE : TYPEUNKNOWN, type, par);
-    if(seq.type == Type.EMP && mode != 0) error(EMPTYSEQOCC, seq.type);
+    final SeqType seq = new SeqType(Type.find(type, true), occ);
+    if(seq.type == null || seq.type == Type.SEQ || seq.type == Type.JAVA)
+      error(par ? NOTYPE : TYPEUNKNOWN, type, par);
+    if(seq.type == Type.EMP && occ != Occ.O) error(EMPTYSEQOCC, seq.type);
     seq.ext = checkTest(seq.type, ext);
     skipWS();
     return seq;

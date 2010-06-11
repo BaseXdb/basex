@@ -61,8 +61,10 @@ public final class Clc extends Arr {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
-    return expr[0].returned(ctx).num() && expr[1].returned(ctx).num() ?
-        SeqType.ITR : SeqType.ITEM;
+    final SeqType s0 = expr[0].returned(ctx);
+    final SeqType s1 = expr[1].returned(ctx);
+    return s0.num() && s1.num() ? SeqType.ITR :
+      s0.one() && s1.one() ? SeqType.ITEM : SeqType.ITEM_ZO;
   }
 
   @Override

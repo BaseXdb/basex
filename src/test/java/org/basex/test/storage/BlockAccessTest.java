@@ -225,21 +225,20 @@ public final class BlockAccessTest {
 
   /**
    * Deletes the second block with some surrounding nodes.
-   * [CG] DATA: causes exception if meta data is not correctly closed
+   */
   @Test
   public void testDeleteSecondBlockAndSurroundingNodes() {
-    tba.delete(nodes - 1, nodes + 2);
-    assertEquals(size - 2 - nodes, tba.size());
-    assertEquals(blocks - 1, tba.blocks());
+    tda.delete(nodes - 1, nodes + 2);
+    assertEquals(size - 2 - nodes, tda.size());
+    assertEquals(blocks - 1, tda.blocks());
     assertEntrysEqual(0, 0, nodes - 1);
     assertEntrysEqual(2 * nodes + 1, nodes - 1, size - 2 * nodes - 1);
     closeAndReload();
-    assertEquals(size - 2 - nodes, tba.size());
-    assertEquals(blocks - 1, tba.blocks());
+    assertEquals(size - 2 - nodes, tda.size());
+    assertEquals(blocks - 1, tda.blocks());
     assertEntrysEqual(0, 0, nodes - 1);
     assertEntrysEqual(2 * nodes + 1, nodes - 1, size - 2 * nodes - 1);
   }
-   */
 
   /**
    * Tests basic insertion.

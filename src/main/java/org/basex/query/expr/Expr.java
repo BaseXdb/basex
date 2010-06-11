@@ -1,16 +1,12 @@
 package org.basex.query.expr;
 
-import static org.basex.core.Text.*;
 import static org.basex.query.QueryText.*;
 import org.basex.core.Main;
-import org.basex.core.User;
-import org.basex.core.Commands.CmdPerm;
 import org.basex.data.ExprInfo;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
-import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
@@ -139,7 +135,7 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public long size(final QueryContext ctx) throws QueryException {
-    return returned(ctx).occ == SeqType.OCC_1 ? 1 : -1;
+    return returned(ctx).one() ? 1 : -1;
   }
 
   /**
@@ -180,7 +176,7 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public SeqType returned(final QueryContext ctx) {
-    return SeqType.ITEM_0M;
+    return SeqType.ITEM_ZM;
   }
 
   /**
@@ -190,7 +186,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean duplicates(final QueryContext ctx) {
-    return !returned(ctx).single();
+    return !returned(ctx).zeroOrOne();
   }
 
   /**
@@ -295,10 +291,6 @@ public abstract class Expr extends ExprInfo {
   public final Item checkCtx(final QueryContext ctx) throws QueryException {
     final Item it = ctx.item;
     if(it == null) Err.or(XPNOCTX, this);
-    if(it instanceof DBNode) {
-      if(!ctx.context.perm(User.READ, ((DBNode) it).data.meta))
-        throw new QueryException(PERMNO, CmdPerm.READ);
-    }
     return it;
   }
 

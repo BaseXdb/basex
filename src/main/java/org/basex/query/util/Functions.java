@@ -61,7 +61,7 @@ public final class Functions extends ExprInfo {
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
-      final SeqType seq = new SeqType(name, SeqType.OCC_01, false);
+      final SeqType seq = new SeqType(Type.find(name, false), SeqType.Occ.ZO);
       if(seq.type == null) typeErr(name);
       if(args.length != 1) Err.or(FUNCTYPE, name.str());
       return new Cast(args[0], seq);

@@ -37,7 +37,7 @@ public final class HTMLParser extends XMLParser {
     } catch(final Exception ex) {
     }
   }
-    
+
   /**
    * Constructor.
    * @param f file reference

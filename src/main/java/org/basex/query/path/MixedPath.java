@@ -137,7 +137,7 @@ public final class MixedPath extends Path {
   @Override
   public SeqType returned(final QueryContext ctx) {
     final SeqType ret = step[step.length - 1].returned(ctx);
-    return new SeqType(ret.type, SeqType.OCC_0M);
+    return new SeqType(ret.type, SeqType.Occ.ZM);
   }
 
   @Override

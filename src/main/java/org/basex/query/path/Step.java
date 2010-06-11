@@ -207,7 +207,7 @@ public class Step extends Preds {
 
   @Override
   public final SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD_0M;
+    return SeqType.NOD_ZM;
   }
 
   @Override

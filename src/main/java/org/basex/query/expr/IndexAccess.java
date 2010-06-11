@@ -90,7 +90,7 @@ public final class IndexAccess extends Single {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD_0M;
+    return SeqType.NOD_ZM;
   }
 
   @Override

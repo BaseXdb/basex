@@ -731,8 +731,8 @@ public enum Type {
   private Type(final String nm, final Type pr, final byte[] ur, final boolean n,
       final boolean u, final boolean s, final boolean d) {
     name = nm;
-    uri = ur;
     par = pr;
+    uri = ur;
     num = n;
     unt = u;
     str = s;
@@ -834,16 +834,16 @@ public enum Type {
   /**
    * Finds and returns the specified data type.
    * @param type type as string
-   * @param nodes flag for including node types
+   * @param root include root types
    * @return type or null
    */
-  public static Type find(final QNm type, final boolean nodes) {
+  public static Type find(final QNm type, final boolean root) {
     final String ln = string(type.ln());
     final byte[] uri = type.uri.str();
 
     for(final Type t : values()) {
-      if(ln.equals(t.name) && eq(uri, t.uri) &&
-          (nodes || t.par != null && t != AAT)) return t;
+      if((root || t.par != null && t != AAT) && ln.equals(t.name) &&
+          eq(uri, t.uri) && t != Type.SEQ && t != Type.JAVA) return t;
     }
     return null;
   }

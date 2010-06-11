@@ -263,7 +263,7 @@ public abstract class Item extends Expr {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
-    return new SeqType(type, SeqType.OCC_1);
+    return new SeqType(type, SeqType.Occ.O);
   }
 
   @Override

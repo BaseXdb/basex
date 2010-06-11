@@ -51,11 +51,13 @@ public final class FNAggr extends Fun {
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case AVG:
-        return expr[0].e() ? Seq.EMPTY : this;
       case COUNT:
         final long c = expr[0].size(ctx);
         return c >= 0 ? Itr.get(c) : this;
+      case MIN:
+      case MAX:
+      case AVG:
+        return expr[0].e() ? Seq.EMPTY : this;
       default:
         return this;
     }

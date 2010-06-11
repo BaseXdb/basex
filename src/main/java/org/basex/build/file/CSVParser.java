@@ -39,7 +39,7 @@ public final class CSVParser extends FileParser {
   public CSVParser(final IO path, final String ta) {
     super(path, ta);
   }
-  
+
   @Override
   public void parse() throws IOException {
     builder.startElem(CSV, atts);
@@ -47,7 +47,7 @@ public final class CSVParser extends FileParser {
     boolean quoted = false;
     boolean nl = true;
     final TokenBuilder tb = new TokenBuilder();
-    
+
     final BufferInput bi = new BufferInput(file.path());
     bi.encoding(encoding);
 
@@ -93,7 +93,7 @@ public final class CSVParser extends FileParser {
     if(!nl) builder.endElem(RECORD);
     builder.endElem(CSV);
   }
-  
+
   /**
    * Adds a record to the database.
    * @param r row
@@ -104,7 +104,7 @@ public final class CSVParser extends FileParser {
     atts.add(ROW, token(r));
     builder.startElem(RECORD, atts);
   }
-  
+
   /**
    * Adds a field to the database.
    * @param tb token builder

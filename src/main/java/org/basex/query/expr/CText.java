@@ -61,7 +61,7 @@ public final class CText extends CFrag {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD_01;
+    return SeqType.NOD_ZO;
   }
 
   @Override

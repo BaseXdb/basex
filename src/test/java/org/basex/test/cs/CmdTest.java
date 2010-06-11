@@ -31,8 +31,8 @@ public class CmdTest {
   /** Test folder. */
   private static final String FLDR = "etc/xml";
   /** Test Url. */
-  private static final String URL = "http://www.inf.uni-konstanz.de/"
-      + "dbis/basex/dl/xmark.xml";
+  private static final String URL =
+    "http://www.inf.uni-konstanz.de/dbis/basex/dl/xml.xml";
   /** Test name. */
   private static final String NAME = "input";
   /** Test name. */
@@ -69,6 +69,7 @@ public class CmdTest {
     ok(new Add(FILE));
     ok(new Add(FILE)); //[MS] duplicates allowed by now.
   }
+
   /** Command Test. */
   @Test
   public final void addUrl() {
@@ -77,6 +78,7 @@ public class CmdTest {
     ok(new Add(URL));
     ok(new Delete(URL));
   }
+
   /** Command Test. */
   @Test
   public final void addFolder() {
@@ -117,7 +119,7 @@ public class CmdTest {
   @Test
   public final void createFS() {
     no(new CreateFS(".s", "test"));
-    ok(new CreateFS("src/test", "test"));
+    ok(new CreateFS(".settings", "test"));
     ok(new DropDB("test"));
   }
 

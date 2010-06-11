@@ -29,14 +29,14 @@ public final class TableDiskAccess extends TableAccess {
   private final RandomAccessFile data;
 
   /** Index array storing the FirstPre values. this one is sorted ascending. */
-  private int[] firstPres;
+  private int[] fpres;
   /** Index array storing the BlockNumbers. */
-  private int[] blockIndex;
+  private int[] pages;
 
-  /** Number of the first entry in the current block. */
-  private int firstPre = -1;
-  /** FirstPre of the next block. */
-  private int nextPre = -1;
+  /** Pre value of the first entry in the current block. */
+  private int fpre = -1;
+  /** First pre value of the next block. */
+  private int npre = -1;
 
   /** Number of blocks in the data file (including unused). */
   private int allBlocks;
@@ -58,15 +58,15 @@ public final class TableDiskAccess extends TableAccess {
 
     // read meta and index data
     final DataInput in = new DataInput(meta.file(pf + 'i'));
-    allBlocks  = in.readNum();
-    blocks     = in.readNum();
-    firstPres  = in.readNums();
-    blockIndex = in.readNums();
+    allBlocks = in.readNum();
+    blocks    = in.readNum();
+    fpres     = in.readNums();
+    pages     = in.readNums();
     in.close();
 
     // initialize data file
     data = new RandomAccessFile(meta.file(pf), "rw");
-    readBlock(0, 0, blocks > 1 ? firstPres[1] : md.size);
+    readBlock(0, 0, blocks > 1 ? fpres[1] : md.size);
   }
 
   @Override
@@ -77,8 +77,8 @@ public final class TableDiskAccess extends TableAccess {
     final DataOutput out = new DataOutput(meta.file(pref + 'i'));
     out.writeNum(allBlocks);
     out.writeNum(blocks);
-    out.writeNums(firstPres);
-    out.writeNums(blockIndex);
+    out.writeNums(fpres);
+    out.writeNums(pages);
     out.close();
     dirty = false;
   }
@@ -168,20 +168,20 @@ public final class TableDiskAccess extends TableAccess {
     cursor(first);
 
     // some useful variables to make code more readable
-    int from = first - firstPre;
+    int from = first - fpre;
     final int last = first + nr;
 
     // check if all entries are in current block => handle and return
-    if(last - 1 < nextPre) {
-      copy(bf.buf, from + nr, bf.buf, from, nextPre - last);
+    if(last - 1 < npre) {
+      copy(bf.buf, from + nr, bf.buf, from, npre - last);
       updatePre(nr);
 
       // if whole block was deleted, remove it from the index
-      if(nextPre == firstPre) {
-        Array.move(firstPres, index + 1, -1, blocks - index - 1);
-        Array.move(blockIndex, index + 1, -1, blocks - index - 1);
-        readBlock(index, firstPre, index + 2 > --blocks ? meta.size :
-          firstPres[index + 1]);
+      if(npre == fpre) {
+        Array.move(fpres, index + 1, -1, blocks - index - 1);
+        Array.move(pages, index + 1, -1, blocks - index - 1);
+        readBlock(index, fpre, index + 2 > --blocks ? meta.size :
+          fpres[index + 1]);
       }
       return;
     }
@@ -190,7 +190,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // first count them
     int unused = 0;
-    while(nextPre < last) {
+    while(npre < last) {
       if(from == 0) unused++;
       nextBlock();
       from = 0;
@@ -198,18 +198,18 @@ public final class TableDiskAccess extends TableAccess {
 
     // now remove them from the index
     if(unused > 0) {
-      Array.move(firstPres, index, -unused, blocks - index);
-      Array.move(blockIndex, index, -unused, blocks - index);
+      Array.move(fpres, index, -unused, blocks - index);
+      Array.move(pages, index, -unused, blocks - index);
       blocks -= unused;
       index -= unused;
     }
 
     // delete entries at beginning of current (last) block
-    copy(bf.buf, last - firstPre, bf.buf, 0, nextPre - last);
+    copy(bf.buf, last - fpre, bf.buf, 0, npre - last);
 
     // update index entry for this block
-    firstPres[index] = first;
-    firstPre = first;
+    fpres[index] = first;
+    fpre = first;
     updatePre(nr);
   }
 
@@ -220,39 +220,39 @@ public final class TableDiskAccess extends TableAccess {
     meta.size += nr;
     cursor(pre - 1);
 
-    final int ins = pre - firstPre;
+    final int ins = pre - fpre;
 
     // all entries fit in current block
-    if(nr < ENTRIES - nextPre + firstPre) {
+    if(nr < ENTRIES - npre + fpre) {
       // shift following entries forward and insert next entries
-      copy(bf.buf, ins, bf.buf, ins + nr, nextPre - pre + 1);
+      copy(bf.buf, ins, bf.buf, ins + nr, npre - pre + 1);
       copy(entries, 0, bf.buf, ins, nr);
 
       // update index entries
-      for(int i = index + 1; i < blocks; i++) firstPres[i] += nr;
-      nextPre += nr;
+      for(int i = index + 1; i < blocks; i++) fpres[i] += nr;
+      npre += nr;
       return;
     }
 
     // we need to reorganize entries
 
     // save entries to be added into new block after inserted blocks
-    final int move = nextPre - pre;
+    final int move = npre - pre;
     final byte[] rest = new byte[move << IO.NODEPOWER];
     copy(bf.buf, ins, rest, 0, move);
 
     // make room in index for new blocks
     int newBlocks = (int) Math.ceil((double) nr / NEWENTRIES) + 1;
     // in case we insert at block boundary
-    if(pre == nextPre) newBlocks--;
+    if(pre == npre) newBlocks--;
 
     // resize the index
     final int s = allBlocks + newBlocks;
-    firstPres = Arrays.copyOf(firstPres, s);
-    blockIndex = Arrays.copyOf(blockIndex, s);
+    fpres = Arrays.copyOf(fpres, s);
+    pages = Arrays.copyOf(pages, s);
 
-    Array.move(firstPres, index + 1, newBlocks, blocks - index - 1);
-    Array.move(blockIndex, index + 1, newBlocks, blocks - index - 1);
+    Array.move(fpres, index + 1, newBlocks, blocks - index - 1);
+    Array.move(pages, index + 1, newBlocks, blocks - index - 1);
 
     // add blocks for new entries
     int remain = nr;
@@ -261,8 +261,8 @@ public final class TableDiskAccess extends TableAccess {
       newBlock();
       copy(entries, pos, bf.buf, 0, Math.min(remain, NEWENTRIES));
 
-      firstPres[++index] = nr - remain + pre;
-      blockIndex[index] = (int) bf.pos;
+      fpres[++index] = nr - remain + pre;
+      pages[index] = (int) bf.pos;
       blocks++;
       remain -= NEWENTRIES;
       pos += NEWENTRIES;
@@ -273,18 +273,18 @@ public final class TableDiskAccess extends TableAccess {
       newBlock();
       copy(rest, 0, bf.buf, 0, move);
 
-      firstPres[++index] = pre + nr;
-      blockIndex[index] = (int) bf.pos;
+      fpres[++index] = pre + nr;
+      pages[index] = (int) bf.pos;
       blocks++;
     }
 
     // update index entries
-    for(int i = index + 1; i < blocks; i++) firstPres[i] += nr;
+    for(int i = index + 1; i < blocks; i++) fpres[i] += nr;
 
     // update cached variables
-    firstPre = pre;
-    if(rest.length > 0) firstPre += nr;
-    nextPre = index + 1 >= blocks ? meta.size : firstPres[index + 1];
+    fpre = pre;
+    if(rest.length > 0) fpre += nr;
+    npre = index + 1 >= blocks ? meta.size : fpres[index + 1];
   }
 
   @Override
@@ -306,8 +306,8 @@ public final class TableDiskAccess extends TableAccess {
    * @return offset of the entry in currentBlock
    */
   private synchronized int cursor(final int pre) {
-    int fp = firstPre;
-    int np = nextPre;
+    int fp = fpre;
+    int np = npre;
 
     if(pre < fp || pre >= np) {
       final int last = blocks - 1;
@@ -319,31 +319,31 @@ public final class TableDiskAccess extends TableAccess {
         else if(pre >= np) l = m + 1;
         else break;
         m = h + l >>> 1;
-        fp = firstPres[m];
-        np = m == last ? fp + ENTRIES : firstPres[m + 1];
+        fp = fpres[m];
+        np = m == last ? fp + ENTRIES : fpres[m + 1];
       }
       if(l > h) Main.notexpected("Invalid Data Access [pre:" + pre +
           ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
 
       readBlock(m, fp, np);
     }
-    return pre - firstPre << IO.NODEPOWER;
+    return pre - fpre << IO.NODEPOWER;
   }
 
   /**
    * Fetches the requested block and update pointers.
-   * @param ind index number of the block to fetch
-   * @param first first entry in that block
-   * @param next first entry in the next block
+   * @param i index number of the block to fetch
+   * @param f first entry in that block
+   * @param n first entry in the next block
    */
-  private synchronized void readBlock(final int ind, final int first,
-      final int next) {
+  private synchronized void readBlock(final int i, final int f,
+      final int n) {
 
-    index = ind;
-    firstPre = first;
-    nextPre = next;
+    index = i;
+    fpre = f;
+    npre = n;
 
-    final int b = blockIndex[ind];
+    final int b = pages[i];
     final boolean ch = bm.cursor(b);
     bf = bm.curr();
     if(ch) {
@@ -373,8 +373,8 @@ public final class TableDiskAccess extends TableAccess {
    * Fetches next block.
    */
   private synchronized void nextBlock() {
-    readBlock(index + 1, nextPre, index + 2 >= blocks ? meta.size :
-      firstPres[index + 2]);
+    readBlock(index + 1, npre, index + 2 >= blocks ? meta.size :
+      fpres[index + 2]);
   }
 
   /**
@@ -383,9 +383,9 @@ public final class TableDiskAccess extends TableAccess {
    */
   private synchronized void updatePre(final int nr) {
     // update index entries for all following blocks and reduce counter
-    for(int i = index + 1; i < blocks; i++) firstPres[i] -= nr;
+    for(int i = index + 1; i < blocks; i++) fpres[i] -= nr;
     meta.size -= nr;
-    nextPre = index + 1 >= blocks ? meta.size : firstPres[index + 1];
+    npre = index + 1 >= blocks ? meta.size : fpres[index + 1];
   }
 
   /**

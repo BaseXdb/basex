@@ -91,12 +91,11 @@ public final class FNSimple extends Fun {
         }
         return this;
       case ZEROORONE:
-        return s.single() ? expr[0] : this;
+        return s.zeroOrOne() ? expr[0] : this;
       case EXACTLYONE:
-        return s.occ == SeqType.OCC_1 ? expr[0] : this;
+        return s.one() ? expr[0] : this;
       case ONEORMORE:
-        return s.occ == SeqType.OCC_1 || s.occ == SeqType.OCC_1M ?
-            expr[0] : this;
+        return !s.mayBeZero() ? expr[0] : this;
       case UNORDER:
         return expr[0];
       default:
@@ -186,9 +185,9 @@ public final class FNSimple extends Fun {
   @Override
   public SeqType returned(final QueryContext ctx) {
     final Type t = expr.length == 1 ? expr[0].returned(ctx).type : null;
-    if(func == FunDef.ZEROORONE)  return new SeqType(t, SeqType.OCC_01);
-    if(func == FunDef.EXACTLYONE) return new SeqType(t, SeqType.OCC_1);
-    if(func == FunDef.ONEORMORE)  return new SeqType(t, SeqType.OCC_1M);
+    if(func == FunDef.ZEROORONE)  return new SeqType(t, SeqType.Occ.ZO);
+    if(func == FunDef.EXACTLYONE) return new SeqType(t, SeqType.Occ.O);
+    if(func == FunDef.ONEORMORE)  return new SeqType(t, SeqType.Occ.OM);
     return super.returned(ctx);
   }
 }

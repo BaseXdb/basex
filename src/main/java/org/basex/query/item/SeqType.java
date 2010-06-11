@@ -15,62 +15,66 @@ import org.basex.query.util.Err;
  * @author Christian Gruen
  */
 public final class SeqType {
-  /** Occurrence: exactly one. */
-  public static final byte OCC_1 = 0;
-  /** Occurrence: zero or one. */
-  public static final byte OCC_01 = 1;
-  /** Occurrence: one or more. */
-  public static final byte OCC_1M = 2;
-  /** Occurrence: zero or more. */
-  public static final byte OCC_0M = 3;
+  /** Number of occurrences (cardinality). */
+  public enum Occ {
+    /** Zero. */         Z,
+    /** Zero or one. */  ZO,
+    /** Exactly one. */  O,
+    /** One or more. */  OM,
+    /** Zero or more. */ ZM,
+  };
 
-  /** Zero or one items. */
-  public static final SeqType ITEM = new SeqType(Type.ITEM, OCC_01);
+  /** Zero items. */
+  public static final SeqType ITEM_Z = new SeqType(Type.ITEM, Occ.Z);
+  /** Single item. */
+  public static final SeqType ITEM = new SeqType(Type.ITEM, Occ.O);
+  /** Zero or one item. */
+  public static final SeqType ITEM_ZO = new SeqType(Type.ITEM, Occ.ZO);
   /** Zero or more items. */
-  public static final SeqType ITEM_0M = new SeqType(Type.ITEM, OCC_0M);
+  public static final SeqType ITEM_ZM = new SeqType(Type.ITEM, Occ.ZM);
   /** One or more items. */
-  public static final SeqType ITEM_1M = new SeqType(Type.ITEM, OCC_1M);
+  public static final SeqType ITEM_OM = new SeqType(Type.ITEM, Occ.OM);
   /** Single boolean. */
-  public static final SeqType BLN = new SeqType(Type.BLN, OCC_1);
+  public static final SeqType BLN = new SeqType(Type.BLN, Occ.O);
   /** Zero or one booleans. */
-  public static final SeqType BLN_01 = new SeqType(Type.BLN, OCC_01);
+  public static final SeqType BLN_ZO = new SeqType(Type.BLN, Occ.ZO);
   /** Zero or more booleans. */
-  public static final SeqType BLN_0M = new SeqType(Type.BLN, OCC_0M);
+  public static final SeqType BLN_ZM = new SeqType(Type.BLN, Occ.ZM);
   /** Single number. */
-  public static final SeqType ITR = new SeqType(Type.ITR, OCC_1);
+  public static final SeqType ITR = new SeqType(Type.ITR, Occ.O);
   /** Zero or one number. */
-  public static final SeqType ITR_01 = new SeqType(Type.ITR, OCC_01);
+  public static final SeqType ITR_ZO = new SeqType(Type.ITR, Occ.ZO);
   /** Zero or more numbers. */
-  public static final SeqType ITR_0M = new SeqType(Type.ITR, OCC_0M);
+  public static final SeqType ITR_ZM = new SeqType(Type.ITR, Occ.ZM);
   /** Single node. */
-  public static final SeqType NOD = new SeqType(Type.NOD, OCC_1);
+  public static final SeqType NOD = new SeqType(Type.NOD, Occ.O);
   /** Zero or one nodes. */
-  public static final SeqType NOD_01 = new SeqType(Type.NOD, OCC_01);
+  public static final SeqType NOD_ZO = new SeqType(Type.NOD, Occ.ZO);
   /** Single QName. */
-  public static final SeqType QNM = new SeqType(Type.QNM, OCC_1);
+  public static final SeqType QNM = new SeqType(Type.QNM, Occ.O);
   /** Zero or one QNames. */
-  public static final SeqType QNM_01 = new SeqType(Type.QNM, OCC_01);
+  public static final SeqType QNM_ZO = new SeqType(Type.QNM, Occ.ZO);
   /** Zero or one URIs. */
-  public static final SeqType URI_01 = new SeqType(Type.URI, OCC_01);
+  public static final SeqType URI_ZO = new SeqType(Type.URI, Occ.ZO);
   /** Single URI. */
-  public static final SeqType URI = new SeqType(Type.URI, OCC_1);
+  public static final SeqType URI = new SeqType(Type.URI, Occ.O);
   /** Zero or more nodes. */
-  public static final SeqType NOD_0M = new SeqType(Type.NOD, OCC_0M);
+  public static final SeqType NOD_ZM = new SeqType(Type.NOD, Occ.ZM);
   /** Single string. */
-  public static final SeqType STR = new SeqType(Type.STR, OCC_1);
+  public static final SeqType STR = new SeqType(Type.STR, Occ.O);
   /** Zero or one strings. */
-  public static final SeqType STR_01 = new SeqType(Type.STR, OCC_01);
+  public static final SeqType STR_ZO = new SeqType(Type.STR, Occ.ZO);
   /** Zero or more strings. */
-  public static final SeqType STR_0M = new SeqType(Type.STR, OCC_0M);
+  public static final SeqType STR_ZM = new SeqType(Type.STR, Occ.ZM);
   /** Single date. */
-  public static final SeqType DAT = new SeqType(Type.DAT, OCC_1);
+  public static final SeqType DAT = new SeqType(Type.DAT, Occ.O);
   /** Zero or more dates. */
-  public static final SeqType DAT_01 = new SeqType(Type.DAT, OCC_01);
+  public static final SeqType DAT_ZM = new SeqType(Type.DAT, Occ.ZO);
 
   /** Sequence type. */
   public final Type type;
   /** Number of occurrences. */
-  public final byte occ;
+  public final Occ occ;
   /** Extended type info. */
   public QNm ext;
 
@@ -79,19 +83,9 @@ public final class SeqType {
    * @param t type
    * @param o occurrences
    */
-  public SeqType(final Type t, final byte o) {
+  public SeqType(final Type t, final Occ o) {
     type = t;
-    occ = o;
-  }
-
-  /**
-   * Constructor.
-   * @param name sequence type
-   * @param o occurrences
-   * @param e extended info
-   */
-  public SeqType(final QNm name, final byte o, final boolean e) {
-    this(Type.find(name, e), o);
+    occ = t == Type.EMP ? Occ.Z : o;
   }
 
   /**
@@ -102,8 +96,8 @@ public final class SeqType {
    */
   public boolean instance(final Iter iter) throws QueryException {
     Item it = iter.next();
-    if(it == null) return type == Type.EMP || mayBeZero();
-    if(single()) return iter.next() == null && it.type.instance(type) &&
+    if(it == null) return mayBeZero();
+    if(zeroOrOne()) return iter.next() == null && it.type.instance(type) &&
       checkInstance(it);
 
     do {
@@ -124,7 +118,7 @@ public final class SeqType {
       throws QueryException {
 
     if(it == null) {
-      if(occ == OCC_1) Err.empty(expr);
+      if(occ == Occ.O) Err.empty(expr);
       return null;
     }
     // test to disallow "xs:QName(xs:string(...))"
@@ -148,7 +142,7 @@ public final class SeqType {
     final Iter iter = item.iter();
     Item it = iter.next();
     if(it == null) {
-      if(type == Type.EMP || mayBeZero()) return Seq.EMPTY;
+      if(mayBeZero()) return Seq.EMPTY;
       Err.cast(type, item);
     }
     if(type == Type.EMP) Err.cast(type, item);
@@ -161,7 +155,7 @@ public final class SeqType {
 
     it = check(ins ? it : type.e(it, ctx));
     Item n = iter.next();
-    if(single() && n != null) Err.cast(type, item);
+    if(zeroOrOne() && n != null) Err.cast(type, item);
 
     final SeqIter si = new SeqIter();
     si.add(it);
@@ -178,8 +172,16 @@ public final class SeqType {
    * Returns if the type may occur at most once.
    * @return result of check
    */
-  public boolean single() {
-    return occ < 2;
+  public boolean zeroOrOne() {
+    return occ != Occ.ZM && occ != Occ.OM;
+  }
+
+  /**
+   * Returns if the type may exactly once.
+   * @return result of check
+   */
+  public boolean one() {
+    return occ == Occ.O;
   }
 
   /**
@@ -187,7 +189,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeZero() {
-    return occ % 2 != 0;
+    return occ != Occ.O && occ != Occ.OM;
   }
 
   /**
@@ -195,11 +197,11 @@ public final class SeqType {
    * @return result of check
    */
   public boolean num() {
-    return type.num && occ == OCC_1;
+    return one() && type.num;
   }
 
   /**
-   * Returns if the type represents no number.
+   * Returns if the type may be numeric.
    * @return result of check
    */
   public boolean mayBeNum() {
@@ -238,7 +240,7 @@ public final class SeqType {
 
   @Override
   public String toString() {
-    return type + (occ == OCC_1 ? "" : occ == OCC_01 ? "?" :
-      occ == OCC_1M ? "+" : "*");
+    return type + (occ == Occ.O || occ == Occ.Z ? "" :
+      occ == Occ.ZM ? "?" : occ == Occ.OM ? "+" : "*");
   }
 }

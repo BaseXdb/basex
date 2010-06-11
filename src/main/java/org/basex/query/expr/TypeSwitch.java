@@ -97,7 +97,7 @@ public final class TypeSwitch extends Expr {
   public SeqType returned(final QueryContext ctx) {
     final SeqType t = cs[0].returned(ctx);
     for(int l = 1; l < cs.length; l++) {
-      if(!t.eq(cs[l].returned(ctx))) return SeqType.ITEM_0M;
+      if(!t.eq(cs[l].returned(ctx))) return SeqType.ITEM_ZM;
     }
     return t;
   }

@@ -23,7 +23,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class Var extends Expr {
   /** Return type. */
-  public SeqType ret = SeqType.ITEM_0M;
+  public SeqType ret = SeqType.ITEM_ZM;
   /** Global flag. */
   public final boolean global;
   /** Variable name. */
@@ -148,10 +148,8 @@ public final class Var extends Expr {
     if(it.type == Type.STR) ((Str) it).direct = false;
     if(type == null) return it;
 
-    if(!global) {
-      if(type.single() && !it.type.instance(type.type))
-        Err.or(XPINVCAST, it.type, type, it);
-    }
+    if(!global && type.zeroOrOne() && !it.type.instance(type.type))
+      Err.or(XPINVCAST, it.type, type, it);
 
     return type.cast(it, ctx);
   }

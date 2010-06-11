@@ -34,7 +34,7 @@ public class Itr extends Item {
    * @param v value
    * @param t data type
    */
-  public Itr(final long v, final Type t) {
+  Itr(final long v, final Type t) {
     super(t);
     val = v;
   }
@@ -55,6 +55,16 @@ public class Itr extends Item {
    */
   public static Itr get(final long v) {
     return v >= 0 && v <= 9 ? NUM[(int) v] : new Itr(v);
+  }
+
+  /**
+   * Returns an instance of this class.
+   * @param v value
+   * @param t data type
+   * @return instance
+   */
+  public static Itr get(final long v, final Type t) {
+    return t == Type.ITR ? get(v) : new Itr(v, t);
   }
 
   @Override
@@ -89,11 +99,15 @@ public class Itr extends Item {
 
   @Override
   public final boolean eq(final Item it) throws QueryException {
-    return val == it.dbl();
+    return it instanceof Itr ? val == ((Itr) it).val : val == it.dbl();
   }
 
   @Override
   public final int diff(final Item it) throws QueryException {
+    if(it instanceof Itr) {
+      final long i = ((Itr) it).val;
+      return val < i ? -1 : val > i ? 1 : 0;
+    }
     final double n = it.dbl();
     return n != n ? UNDEF : val < n ? -1 : val > n ? 1 : 0;
   }

@@ -259,7 +259,7 @@ public final class FTWords extends FTExpr {
       ic.is = 0;
       return true;
     }
-    
+
     // limit index access to trie version and simple wildcard patterns
     if(fto.is(FTOpt.WC)) {
       // don't use index if term starts with a wildcard

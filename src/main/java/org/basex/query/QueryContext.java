@@ -11,6 +11,8 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
+import org.basex.core.User;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.Open;
@@ -198,6 +200,9 @@ public final class QueryContext extends Progress {
       // cache the initial context nodes
       if(nodes != null) {
         final Data data = nodes.data;
+        if(!context.perm(User.READ, data.meta))
+          throw new QueryException(PERMNO, CmdPerm.READ);
+
         if(nodes.doc) {
           // create document nodes
           doc = new DBNode[nodes.size()];

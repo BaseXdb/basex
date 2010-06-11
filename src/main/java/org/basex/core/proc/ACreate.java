@@ -44,7 +44,7 @@ public abstract class ACreate extends Proc {
   protected ACreate(final int p, final String... a) {
     super(p, a);
   }
-  
+
   /**
    * Builds and creates a new database instance.
    * @param p parser instance

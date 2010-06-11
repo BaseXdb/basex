@@ -190,16 +190,14 @@ public enum Calc {
   /** Integer division. */
   IDIV("idiv") {
     @Override
-    public Item ev(final Item a, final Item b) throws QueryException {
+    public Itr ev(final Item a, final Item b) throws QueryException {
       checkNum(a, b);
       final double d1 = a.dbl();
       final double d2 = b.dbl();
       if(d2 == 0) Err.or(DIVZERO, a);
       final double d = d1 / d2;
       if(Double.isNaN(d) || Double.isInfinite(d)) Err.or(DIVFLOW, d1, d2);
-
-      final Type t = type(a, b);
-      return Itr.get(t == Type.ITR ? a.itr() / b.itr() : (long) d);
+      return Itr.get(type(a, b) == Type.ITR ? a.itr() / b.itr() : (long) d);
     }
   },
 

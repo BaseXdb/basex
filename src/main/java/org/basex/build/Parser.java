@@ -2,7 +2,6 @@ package org.basex.build;
 
 import java.io.IOException;
 import javax.xml.transform.sax.SAXSource;
-
 import org.basex.build.file.CSVParser;
 import org.basex.build.file.HTMLParser;
 import org.basex.build.xml.SAXWrapper;
@@ -70,7 +69,7 @@ public abstract class Parser extends Progress {
       return new HTMLParser(io, target, prop);
     if(parser.equals("csv"))
       return new CSVParser(io, target);
-    
+
     // use internal parser
     if(prop.is(Prop.INTPARSE)) return new XMLParser(io, target, prop);
 

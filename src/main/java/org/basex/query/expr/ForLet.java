@@ -52,7 +52,7 @@ public abstract class ForLet extends Single {
 
   @Override
   public final SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN_0M;
+    return SeqType.BLN_ZM;
   }
 
   /**

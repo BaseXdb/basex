@@ -8,7 +8,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
@@ -46,10 +45,10 @@ public final class Treat extends Single {
     final Iter iter = ctx.iter(expr);
     final Item it = iter.next();
     if(it == null) {
-      if(seq.type == Type.EMP || seq.mayBeZero()) return Iter.EMPTY;
+      if(seq.mayBeZero()) return Iter.EMPTY;
       Err.empty(this);
     }
-    if(seq.single()) {
+    if(seq.zeroOrOne()) {
       if(iter.next() != null) Err.or(NOTREATS, info(), seq);
       if(!it.type.instance(seq.type)) Err.or(NOTREAT, info(), seq, it.type);
       return it.iter();

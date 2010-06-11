@@ -169,7 +169,7 @@ public final class ServerProcess extends Thread {
       exit();
     }
   }
-  
+
   /**
    * Process the query iterator.
    * @param c control code (first received byte from client)
@@ -221,7 +221,7 @@ public final class ServerProcess extends Thread {
     }
     out.flush();
   }
-  
+
   /**
    * Sends a success flag (0 = true, 1 = false) to the client.
    * @param ok success flag

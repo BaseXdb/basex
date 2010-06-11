@@ -299,6 +299,9 @@ public interface QueryTokens {
   /** Skip flag for the syntax highlighter. */
   String IGNORE = null;
 
+  /** Updating tokens. */
+  String[] UPDATES = { UPDATING, INSERT, DELETE, RENAME, REPLACE };
+
   /** Parser token. */
   String ASSIGN = ":=";
   /** Parser token. */

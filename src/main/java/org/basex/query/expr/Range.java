@@ -86,7 +86,7 @@ public final class Range extends Arr {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
-    return SeqType.ITR_0M;
+    return SeqType.ITR_ZM;
   }
 
   @Override

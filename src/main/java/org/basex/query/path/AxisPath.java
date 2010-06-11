@@ -590,7 +590,7 @@ public class AxisPath extends Path {
 
   @Override
   public final SeqType returned(final QueryContext ctx) {
-    return size(ctx) == 1 ? SeqType.NOD : SeqType.NOD_0M;
+    return size(ctx) == 1 ? SeqType.NOD : SeqType.NOD_ZM;
   }
 
   @Override

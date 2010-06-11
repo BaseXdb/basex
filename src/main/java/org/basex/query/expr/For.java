@@ -47,12 +47,12 @@ public final class For extends ForLet {
 
     // bind variable if single value is returned and if no variables are used
     final SeqType ret = expr.returned(ctx);
-    if(pos == null && score == null && ret.single() &&
+    if(pos == null && score == null && ret.zeroOrOne() &&
         !expr.uses(Use.VAR, ctx)) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
-      var.ret = new SeqType(ret.type, SeqType.OCC_1);
+      var.ret = new SeqType(ret.type, SeqType.Occ.O);
     }
     ctx.vars.add(var);
 

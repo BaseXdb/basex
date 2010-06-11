@@ -138,7 +138,7 @@ public class Pred extends Preds {
   @Override
   public final SeqType returned(final QueryContext ctx) {
     final SeqType ret = root.returned(ctx);
-    return ret.single() ? super.returned(ctx) : ret;
+    return ret.zeroOrOne() ? super.returned(ctx) : ret;
   }
 
   @Override

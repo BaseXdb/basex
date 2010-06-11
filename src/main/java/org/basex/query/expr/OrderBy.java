@@ -103,7 +103,7 @@ public final class OrderBy extends Expr {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
-    return expr == null ? SeqType.ITEM_0M : expr.returned(ctx);
+    return expr == null ? SeqType.ITEM_ZM : expr.returned(ctx);
   }
 
   @Override

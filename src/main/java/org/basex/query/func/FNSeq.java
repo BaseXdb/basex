@@ -194,6 +194,6 @@ public final class FNSeq extends Fun {
   @Override
   public SeqType returned(final QueryContext ctx) {
     return func == FunDef.INDEXOF || func == FunDef.INSBEF ? super.returned(ctx)
-        : new SeqType(expr[0].returned(ctx).type, SeqType.OCC_0M);
+        : new SeqType(expr[0].returned(ctx).type, SeqType.Occ.ZM);
   }
 }

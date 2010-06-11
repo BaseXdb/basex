@@ -12,7 +12,7 @@ import org.basex.query.QueryContext;
  */
 public abstract class Simple extends Expr {
   @Override
-  public final Expr comp(final QueryContext ctx) {
+  public Expr comp(final QueryContext ctx) {
     return this;
   }
 
