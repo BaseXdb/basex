@@ -29,12 +29,12 @@ public final class LSTParser extends FileParser {
   public LSTParser(final String path) {
     super(path);
   }
-  
+
   @Override
   public void parse() throws IOException {
     builder.startElem(DeepFS.FSML, atts.reset());
 
-    final BufferInput bi = new BufferInput(file.path()); 
+    final BufferInput bi = new BufferInput(file.path());
 
     //new FileReader(file.path()));
     final TokenBuilder tb = new TokenBuilder();
@@ -57,7 +57,7 @@ public final class LSTParser extends FileParser {
       } catch(final ParseException ex) {
         Main.debug(ex);
       }
-      
+
       if(indexOf(name, '/') != -1) {
         // Directory
         name = substring(name, 0, name.length - 1);
