@@ -2,7 +2,6 @@ package org.basex.examples.create;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Prop;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.Set;
@@ -40,7 +39,7 @@ public final class CSVExample {
     // Import the specified file
     System.out.println("\n* Import '" + file + "'.");
 
-    new Set(Prop.PARSER, "csv").execute(ctx);
+    new Set("parser", "csv").execute(ctx);
     new CreateDB(file, name).execute(ctx);
 
     // ------------------------------------------------------------------------
