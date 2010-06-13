@@ -77,9 +77,11 @@ public final class CSVParser extends FileParser {
           field(tb, c++);
         } else if(ch == 0x0A) {
           field(tb, c++);
-          builder.endElem(RECORD);
+          if(!nl) {
+            builder.endElem(RECORD);
+            nl = true;
+          }
           c = 0;
-          nl = true;
         } else if(ch == '"') {
           quoted = true;
         } else if(ch != 0x0D) {

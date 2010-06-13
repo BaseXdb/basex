@@ -61,7 +61,7 @@ public final class XMLParser implements IFileParser {
     try {
       final byte[] data = f.get(new byte[(int) f.size()]);
       final Parser p = Parser.fileParser(new IOContent(data), prop, "");
-      return new MemBuilder(p, prop).build();
+      return MemBuilder.build(p, prop);
     } catch(final IOException ex) {
       // XML parsing exception...
       return null;

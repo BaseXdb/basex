@@ -18,14 +18,6 @@ public final class MemBuilder extends Builder {
   /**
    * Constructor.
    * @param p parser
-   */
-  public MemBuilder(final Parser p) {
-    super(p, new Prop(false));
-  }
-
-  /**
-   * Constructor.
-   * @param p parser
    * @param pr properties
    */
   public MemBuilder(final Parser p, final Prop pr) {
@@ -34,11 +26,26 @@ public final class MemBuilder extends Builder {
 
   /**
    * Builds the main-memory database instance without database name.
+   * @param p parser
+   * @param pr properties
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public Data build() throws IOException {
-    return build("");
+  public static Data build(final Parser p, final Prop pr) throws IOException {
+    return build(p, pr, p.file.name());
+  }
+
+  /**
+   * Builds a main-memory database instance.
+   * @param p parser
+   * @param pr properties
+   * @param db name of database
+   * @return data database instance
+   * @throws IOException I/O exception
+   */
+  public static MemData build(final Parser p, final Prop pr, final String db)
+      throws IOException {
+    return new MemBuilder(p, pr).build(db);
   }
 
   @Override

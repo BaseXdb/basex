@@ -635,7 +635,7 @@ public enum Type {
       if(o instanceof Document) {
         try {
           final DOCWrapper p = new DOCWrapper((Document) o, "");
-          final Data data = new MemBuilder(p, new Prop(false)).build();
+          final Data data = MemBuilder.build(p, new Prop(false));
           return new DBNode(data, 0);
         } catch(final IOException ex) {
           throw new QueryException(UNDOC, ex.getMessage());

@@ -93,7 +93,7 @@ public class CreateDB extends ACreate {
   public static synchronized Data xml(final Parser p, final String db,
       final Context ctx) throws IOException {
 
-    if(ctx.prop.is(Prop.MAINMEM)) return new MemBuilder(p, ctx.prop).build(db);
+    if(ctx.prop.is(Prop.MAINMEM)) return MemBuilder.build(p, ctx.prop, db);
     if(ctx.pinned(db)) throw new IOException(Main.info(DBLOCKED, db));
 
     final Builder builder = new DiskBuilder(p, ctx.prop);
@@ -126,7 +126,7 @@ public class CreateDB extends ACreate {
    */
   public static synchronized Data xml(final Parser p, final Context ctx)
       throws IOException {
-    return new MemBuilder(p, ctx.prop).build();
+    return MemBuilder.build(p, ctx.prop);
   }
 
   /**

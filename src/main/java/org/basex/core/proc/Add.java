@@ -8,7 +8,6 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.io.IO;
 
 /**
@@ -41,13 +40,12 @@ public class Add extends ACreate {
     if(!io.exists()) return error(FILEWHICH, io);
 
     final String name = io.name();
-    final String dbname = io.dbname();
+    final String db = io.dbname();
 
     final DirParser p = new DirParser(io, context.prop, path(args[1]));
     try {
-      final MemData d = new MemBuilder(p, context.prop).build(dbname);
       final Data data = context.data;
-      data.insert(data.meta.size, -1, d);
+      data.insert(data.meta.size, -1, MemBuilder.build(p, context.prop, db));
       data.flush();
     } catch(final IOException ex) {
       Main.debug(ex);
