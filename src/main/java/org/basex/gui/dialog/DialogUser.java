@@ -116,7 +116,7 @@ final class DialogUser extends BaseXBack {
       p.setLayout(new TableLayout(2, 3, 8, 2));
       p.add(new BaseXLabel(DATABASES + COL, false, true));
       p.add(new BaseXLabel(BUTTONADD + COL, false, true));
-      p.add(new BaseXLabel(""));
+      p.add(new BaseXLabel());
       p.add(databases);
       p.add(addUser);
       p.add(add);

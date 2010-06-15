@@ -55,8 +55,8 @@ explore_title=Explore
 d_info=情報
 d_fctitle=ディレクトリの選択
 
-dc_filter=フィルター
 dc_choose=XML文書の保存
+dc_pattern=File patterns (separated by commas)
 dc_name=データベースの名前
 dc_xmldesc=XML文書
 dc_zipdesc=Zip圧縮されたXML文書

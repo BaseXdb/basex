@@ -97,7 +97,7 @@ public final class DialogMountFS extends Dialog {
     final BaseXLabel lab = new BaseXLabel("Using mount point: ", false, true);
     lab.setBorder(new EmptyBorder(5, 5, 5, 0));
     m.add(lab);
-    m.add(new BaseXLabel(""));
+    m.add(new BaseXLabel());
     mountpoint = new BaseXTextField(gprop.get(GUIProp.FSMOUNT), this);
     mountpoint.addKeyListener(keys);
     BaseXLayout.setWidth(mountpoint, 300);

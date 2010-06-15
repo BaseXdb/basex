@@ -119,7 +119,7 @@ public final class DialogCreateFS extends Dialog {
     final BaseXLabel lab1 = new BaseXLabel(CREATENAME, false, true);
     lab1.setBorder(new EmptyBorder(4, 4, 4, 0));
     p.add(lab1);
-    p.add(new BaseXLabel(""));
+    p.add(new BaseXLabel());
 
     dbname = new BaseXTextField(gprop.get(GUIProp.FSDBNAME), this);
     dbname.addKeyListener(keys);

@@ -21,11 +21,11 @@ public final class DirParser extends Parser {
   /** Properties. */
   private final Prop prop;
   /** File filter. */
-  private String filter;
-  /** Element counter. */
-  private int c;
+  private final String filter;
   /** Initial file path. */
   private String root;
+  /** Element counter. */
+  private int c;
 
   /**
    * Constructor.
@@ -38,19 +38,23 @@ public final class DirParser extends Parser {
 
   /**
    * Constructor, specifying a target path.
-   * @param f file reference
+   * @param path file reference
    * @param pr database properties
    * @param t target path
    */
-  public DirParser(final IO f, final Prop pr, final String t) {
-    super(f, t);
+  public DirParser(final IO path, final Prop pr, final String t) {
+    super(path, t);
     prop = pr;
-    root = f.getDir();
+    root = path.getDir();
     if(!root.endsWith("/")) root += "/";
 
-    if(f.isDir()) {
-      filter = pr.get(Prop.CREATEFILTER).replaceAll("\\*", ".*");
-      if(!filter.contains(".")) filter = ".*" + filter + ".*";
+    if(path.isDir()) {
+      final StringBuilder sb = new StringBuilder();
+      for(final String s : pr.get(Prop.CREATEFILTER).
+          replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").split(",")) {
+        sb.append("|" + (s.contains(".") ? s : ".*"));
+      }
+      filter = sb.toString().substring(1);
     } else {
       filter = ".*";
     }

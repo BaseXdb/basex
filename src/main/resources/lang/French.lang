@@ -56,7 +56,7 @@ d_info=Information
 d_fctitle=Choisir dossier
 
 dc_choose=Fichier ou dossier source
-dc_filter=Filtre
+dc_pattern=File patterns (separated by commas)
 dc_name=Nom de la base de données
 dc_xmldesc=Documents XML
 dc_zipdesc=Documents XML zippés

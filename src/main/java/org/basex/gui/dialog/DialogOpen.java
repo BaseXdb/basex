@@ -67,7 +67,7 @@ public final class DialogOpen extends Dialog {
 
     choice = new BaseXListChooser(db.finish(), this);
     set(choice, BorderLayout.CENTER);
-    choice.setSize(130, 400);
+    choice.setSize(130, 440);
 
     final BaseXBack info = new BaseXBack();
     info.setLayout(new BorderLayout());
@@ -84,7 +84,7 @@ public final class DialogOpen extends Dialog {
     detail.setFont(f);
     detail.setBorder(new EmptyBorder(5, 5, 5, 5));
 
-    BaseXLayout.setWidth(detail, 360);
+    BaseXLayout.setWidth(detail, 400);
     info.add(detail, BorderLayout.CENTER);
 
     final BaseXBack pp = new BaseXBack();

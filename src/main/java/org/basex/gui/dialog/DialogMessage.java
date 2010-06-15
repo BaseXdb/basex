@@ -31,7 +31,7 @@ final class DialogMessage extends Dialog {
     p.setLayout(new BorderLayout());
     p.setBorder(0, 0, 0, 16);
     p.setOpaque(false);
-    final BaseXLabel b = new BaseXLabel("");
+    final BaseXLabel b = new BaseXLabel();
     b.setIcon(ic.large);
     p.add(b, BorderLayout.NORTH);
     set(p, BorderLayout.WEST);

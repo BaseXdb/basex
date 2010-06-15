@@ -938,7 +938,7 @@ public interface Text {
   /** Dialog title for choosing a file. */
   String CREATETITLE = lang("dc_choose");
   /** Database creation filter. */
-  String CREATEFILT = lang("dc_filter");
+  String CREATEPATTERN = lang("dc_pattern");
   /** Dialog title for creating a database. */
   String CREATENAME = lang("dc_name") + COLS;
   /** XML file description. */

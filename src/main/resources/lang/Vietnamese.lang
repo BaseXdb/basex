@@ -56,7 +56,7 @@ d_info=Thông tin
 d_fctitle=Chọn thư mục
 
 dc_choose=Nhập vào tệp hoặc thư mục
-dc_filter=Bộ lọc
+dc_pattern=File patterns (separated by commas)
 dc_name=Tện cơ sở dữ liệu
 dc_xmldesc=Văn bản XML
 dc_zipdesc=Văn bản XML nén Zip

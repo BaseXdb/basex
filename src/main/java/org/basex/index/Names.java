@@ -21,8 +21,6 @@ import org.basex.util.TokenBuilder;
 public final class Names extends TokenSet {
   /** Statistic information. */
   private StatsKey[] stat;
-  /** total number of entries. */
-  private int tn;
 
   /**
    * Default constructor.
@@ -37,15 +35,9 @@ public final class Names extends TokenSet {
    * @throws IOException I/O exception
    */
   public Names(final DataInput in) throws IOException {
-    keys = in.readBytesArray();
-    next = in.readNums();
-    bucket = in.readNums();
-    size = in.readNum();
+    super(in);
     stat = new StatsKey[next.length];
-    for(int s = 1; s < size; s++) {
-      stat[s] = new StatsKey(in);
-      tn += stat[s].counter;
-    }
+    for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
   }
 
   /**

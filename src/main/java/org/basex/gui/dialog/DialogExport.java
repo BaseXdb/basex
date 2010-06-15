@@ -62,7 +62,7 @@ public final class DialogExport extends Dialog {
     p.setLayout(new TableLayout(2, 2, 6, 0));
     out = new BaseXLabel("", false, true);
     p.add(out);
-    p.add(new BaseXLabel(""));
+    p.add(new BaseXLabel());
 
     file = gui.context.doc().length == 1;
 

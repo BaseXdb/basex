@@ -15,7 +15,6 @@ import org.basex.gui.layout.BaseXButton;
 import org.basex.gui.layout.BaseXCheckBox;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.layout.BaseXLabel;
-import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
@@ -74,13 +73,13 @@ public final class DialogCreate extends Dialog {
 
     // create panels
     final BaseXBack p1 = new BaseXBack();
-    p1.setLayout(new TableLayout(3, 1, 0, 4));
+    p1.setLayout(new TableLayout(2, 1, 0, 4));
     p1.setBorder(8, 8, 8, 8);
 
     BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 2, 6, 0));
+    p.setLayout(new TableLayout(6, 2, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, false, true));
-    p.add(new BaseXLabel(""));
+    p.add(new BaseXLabel());
 
     path = new BaseXTextField(gprop.get(GUIProp.OPENPATH), this);
     path.addKeyListener(keys);
@@ -91,26 +90,30 @@ public final class DialogCreate extends Dialog {
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
     p.add(browse);
-    p1.add(p);
 
-    p = new BaseXBack();
-    p.setLayout(new TableLayout(2, 2, 6, 0));
-    p.add(new BaseXLabel(CREATENAME, false, true));
-    p.add(new BaseXLabel(CREATEFILT + COL, false, true));
+    BaseXLabel l = new BaseXLabel(CREATEPATTERN + COL, false, true);
+    p.add(l);
+    p.add(new BaseXLabel());
+
+    filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
+    p.add(filter);
+    p.add(new BaseXLabel());
+
+    l = new BaseXLabel(CREATENAME, false, true);
+    l.setBorder(5, 0, 0, 0);
+    p.add(l);
+    p.add(new BaseXLabel());
 
     dbname = new BaseXTextField(this);
     final String dbn = IO.get(gprop.get(GUIProp.OPENPATH)).dbname();
     dbname.setText(dbn.replaceAll("[^\\w.-]", ""));
     dbname.addKeyListener(keys);
     p.add(dbname);
-
-    filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
-    BaseXLayout.setWidth(filter, 54);
-    p.add(filter);
+    p.add(new BaseXLabel());
     p1.add(p);
 
     info = new BaseXLabel(" ");
-    info.setBorder(82, 0, 0, 0);
+    info.setBorder(42, 0, 0, 0);
     p1.add(info);
 
     // create checkboxes

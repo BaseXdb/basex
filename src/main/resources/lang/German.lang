@@ -55,8 +55,8 @@ explore_title=Explore
 d_info=Information
 d_fctitle=Verzeichnis
 
-dc_filter=Filter
 dc_choose=XML-Dokument oder Verzeichnis
+dc_pattern=Dateimuster (getrennt mit Kommas)
 dc_name=Name der Datenbank
 dc_xmldesc=XML-Dokumente
 dc_zipdesc=Gezippte XML-Dokumente

@@ -113,7 +113,7 @@ public final class DialogPrefs extends Dialog {
     lang.setSelectedItem(prop.get(Prop.LANGUAGE));
 
     p.add(lang);
-    creds = new BaseXLabel("");
+    creds = new BaseXLabel();
     p.add(creds);
 
     pp.add(p);

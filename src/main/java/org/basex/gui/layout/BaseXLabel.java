@@ -13,6 +13,13 @@ import org.basex.gui.GUIConstants.Msg;
 public final class BaseXLabel extends JLabel {
   /**
    * Constructor.
+   */
+  public BaseXLabel() {
+    this("", false, false);
+  }
+
+  /**
+   * Constructor, specifying a label text.
    * @param txt label text
    */
   public BaseXLabel(final String txt) {
@@ -20,9 +27,10 @@ public final class BaseXLabel extends JLabel {
   }
 
   /**
-   * Constructor.
+   * Constructor, specifying a label text, vertical distance to the next
+   * component, and a property for printing the label in bold.
    * @param txt label text
-   * @param dist distance to next component
+   * @param dist vertical distance to next component
    * @param bold bold flag
    */
   public BaseXLabel(final String txt, final boolean dist, final boolean bold) {
