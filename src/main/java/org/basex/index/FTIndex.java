@@ -77,7 +77,8 @@ public abstract class FTIndex implements Index {
     }
 
     return new FTIndexIterator() {
-      final FTMatches all = new FTMatches(toknum);
+      final byte tn = toknum;
+      final FTMatches all = new FTMatches(tn);
       int c, pre, lpre;
       double sc = -1;
 
@@ -91,7 +92,7 @@ public abstract class FTIndex implements Index {
         }
         pre = lpre;
 
-        all.reset(toknum);
+        all.reset(tn);
         all.or(vals.get(c++));
 
         while(c < vals.size() && (lpre = vals.get(c++)) == pre) {

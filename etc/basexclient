@@ -3,8 +3,12 @@
 # Path to this script
 PWD=`dirname $0`
 
+# Path to .class files (target/classes) or BaseX.jar
+BXPATH=$PWD/../target/classes
+#BXPATH=BaseX.jar
+
 # Assign more memory
 VM=-Xmx1g
 
-# Run BaseX client
+# Run BaseX
 java -cp "$BXPATH" $VM org.basex.BaseXClient "$@"

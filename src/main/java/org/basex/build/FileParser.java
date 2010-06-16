@@ -35,9 +35,9 @@ public abstract class FileParser extends Parser {
   @Override
   public final void parse(final Builder build) throws IOException {
     builder = build;
-    if(doc) builder.startDoc(token(target + file.name()));
+    builder.startDoc(token(target + file.name()));
     parse();
-    if(doc) builder.endDoc();
+    builder.endDoc();
   }
 
   /**

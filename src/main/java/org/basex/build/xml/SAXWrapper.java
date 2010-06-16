@@ -58,7 +58,6 @@ public final class SAXWrapper extends FileParser {
       }
 
       sax = new SAXHandler(builder);
-      sax.doc = doc;
       r.setDTDHandler(sax);
       r.setContentHandler(sax);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", sax);

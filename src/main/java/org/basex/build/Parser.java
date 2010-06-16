@@ -23,8 +23,6 @@ import org.basex.util.Atts;
  * @author Christian Gruen
  */
 public abstract class Parser extends Progress {
-  /** Document flag; if true, a document node is added. */
-  public boolean doc = true;
   /** Input file. */
   public IO file;
 

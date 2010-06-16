@@ -262,7 +262,7 @@ final class FTTrieBuilder extends FTBuilder {
       a.seek(a.getFilePointer() + 1);
     }
     a.close();
-    DropDB.delete(data.meta.name, DATAFTX + 't' + IO.BASEXSUFFIX,
+    DropDB.drop(data.meta.name, DATAFTX + 't' + IO.BASEXSUFFIX,
         data.meta.prop);
   }
 

@@ -1,9 +1,9 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-import java.io.File;
 import org.basex.core.Context;
 import org.basex.core.Proc;
+import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
@@ -33,18 +33,20 @@ public final class AlterDB extends Proc {
 
     // try to alter database
     return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
-      alter(db, name) ? info(DBALTERED, db, name) : error(DBNOTALTERED, db);
+      alter(db, name, prop) ? info(DBALTERED, db, name) :
+        error(DBNOTALTERED, db);
   }
 
   /**
-   * Alters the database name.
-   * @param db database
-   * @param name new name
-   * @return success of operation
+   * Deletes the specified database.
+   * @param db database name
+   * @param dbnew new database name
+   * @param pr database properties
+   * @return success flag
    */
-  private boolean alter(final String db, final String name) {
-    final File f = prop.dbpath(db);
-    return f.renameTo(new File(f.getParentFile(), name));
+  public static synchronized boolean alter(final String db,
+      final String dbnew, final Prop pr) {
+    return pr.dbpath(db).renameTo(pr.dbpath(dbnew));
   }
 
   @Override

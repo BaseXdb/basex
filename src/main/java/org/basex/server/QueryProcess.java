@@ -62,21 +62,21 @@ final class QueryProcess extends Progress {
   }
 
   /**
-   * Returns the next item to the client.
+   * Serializes the next item and tests if more items can be returned.
+   * @return result of check
    * @throws IOException Exception
    * @throws QueryException query exception
    */
-  void next() throws IOException, QueryException {
+  boolean next() throws IOException, QueryException {
     if(stopped) throw new QueryException(SERVERTIMEOUT);
 
-    if(item != null) {
+    final boolean more = item != null;
+    if(more) {
       // item found: send {ITEM}
       item.serialize(xml);
       item = iter.next();
-    } else {
-      // no item found: empty result indicates end of iterator
-      close();
     }
+    return more;
   }
 
   /**
@@ -87,7 +87,6 @@ final class QueryProcess extends Progress {
     proc.stopTimeout();
     xml.close();
     proc.close();
-    sp.queries.remove(this);
     if(monitored) sp.context.lock.after(proc.ctx.updating);
   }
 }

@@ -62,7 +62,7 @@ final class ValueMerge {
       v.close();
       di.close();
       final String f = (text ? DATATXT : DATAATV) + id + '.' + IO.BASEXSUFFIX;
-      DropDB.delete(data.meta.name, f, data.meta.prop);
+      DropDB.drop(data.meta.name, f, data.meta.prop);
     }
   }
 }

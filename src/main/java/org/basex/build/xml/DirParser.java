@@ -86,7 +86,6 @@ public final class DirParser extends Parser {
         final String trg = (target + '/' + file.path().replaceAll(
             "^" + root + "|" + file.name() + "$", "")).replaceAll("^/", "");
         parser = Parser.fileParser(file, prop, trg);
-        parser.doc = doc;
         parser.parse(b);
 
         if(Prop.debug && ++c % 1000 == 0) Main.err(";");

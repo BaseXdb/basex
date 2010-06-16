@@ -41,17 +41,17 @@ public final class DropDB extends ACreate {
    * @return success flag
    */
   public static synchronized boolean drop(final String db, final Prop pr) {
-    return delete(db, null, pr);
+    return drop(db, null, pr);
   }
 
   /**
-   * Recursively deletes a database directory.
+   * Recursively drops a database directory.
    * @param db database to delete
    * @param pat file pattern
    * @param pr database properties
    * @return success of operation
    */
-  public static synchronized boolean delete(final String db,
+  public static synchronized boolean drop(final String db,
       final String pat, final Prop pr) {
 
     final File path = pr.dbpath(db);

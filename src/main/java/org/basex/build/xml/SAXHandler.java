@@ -26,8 +26,6 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   private boolean dtd;
   /** Element counter. */
   int nodes;
-  /** Document flag; if true, a document node is added. */
-  boolean doc = true;
 
   static {
     // needed for XMLEntityManager: increase entity limit

@@ -190,6 +190,7 @@ public final class ServerProcess extends Thread {
       qp = queries.get(arg);
     }
 
+    boolean close = false;
     try {
       if(c == 0) {
         // c = 0: initialize iterator
@@ -199,17 +200,17 @@ public final class ServerProcess extends Thread {
         out.write(0);
       } else if(c == 1) {
         // c = 1: request next item
-        if(qp != null) qp.next();
+        if(qp != null) close = qp.next();
         // send 0 to mark end of result and 0 as success flag
         out.write(0);
         out.write(0);
       } else if(c == 2) {
         // c = 2: close iterator
-        if(qp != null) qp.close();
+        close = true;
       }
     } catch(final QueryException ex) {
-      // exception may occur during qp.init() or qp.next(): close iterator
-      qp.close();
+      // exception may occur during qp.init() or qp.next()
+      close = true;
 
       // log exception (static or runtime)
       final String msg = ex.extended();
@@ -220,6 +221,12 @@ public final class ServerProcess extends Thread {
       out.writeString(msg);
     }
     out.flush();
+
+    // close query process after last item, close command or exception
+    if(close && qp != null) {
+      qp.close();
+      queries.remove(arg);
+    }
   }
 
   /**
@@ -236,6 +243,7 @@ public final class ServerProcess extends Thread {
    * Exits the session.
    */
   public void exit() {
+    // close remaining query processes
     for(final QueryProcess q : queries.values()) {
       try { q.close(); } catch(final IOException ex) { }
     }

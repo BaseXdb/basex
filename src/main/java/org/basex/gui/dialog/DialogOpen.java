@@ -11,6 +11,7 @@ import javax.swing.border.EtchedBorder;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.AlterDB;
 import org.basex.core.proc.Close;
 import org.basex.core.proc.DropDB;
 import org.basex.core.proc.InfoDB;
@@ -137,7 +138,7 @@ public final class DialogOpen extends Dialog {
       final DialogRename dr = new DialogRename(old, gui, fsInstance);
       if(dr.ok()) {
         final Prop prop = gui.context.prop;
-        prop.dbpath(old).renameTo(prop.dbpath(dr.name.getText()));
+        AlterDB.alter(old, dr.name.getText(), prop);
         choice.setData(fsInstance ? List.listFS(ctx).finish() :
           List.list(ctx).finish());
       }

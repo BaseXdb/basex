@@ -66,7 +66,7 @@ public final class DropIndex extends ACreate {
       final Data data = context.data;
       data.flush();
       data.closeIndex(index);
-      return DropDB.delete(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
+      return DropDB.drop(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
           info(DBDROP, perf) : error(DBDROPERR);
     } catch(final IOException ex) {
       Main.debug(ex);

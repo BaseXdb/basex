@@ -301,7 +301,7 @@ public final class TreeView extends View implements TreeViewOptions {
       case DRAW_RECTANGLE:
         borderColor = getColorPerLevel(lv, false);
         fillColor = getColorPerLevel(lv, true);
-        txt = txt && DRAW_NODE_TEXT;
+        txt = txt & DRAW_NODE_TEXT;
         border = BORDER_RECTANGLES;
         fill = FILL_RECTANGLES;
         break;
@@ -845,8 +845,10 @@ public final class TreeView extends View implements TreeViewOptions {
     final int prey = getYperLevel(lv) - 1;
     final int boRight = r.x + r.w + BORDER_PADDING - 2;
     final int boLeft = r.x + BORDER_PADDING;
+    // [WM] ...not used?
     final int boBottom = prey + nodeHeight + 1;
     final int boTop = prey + 1;
+    // [WM] ...not used?
     final int parmx = r.x + (int) ((boRight - boLeft) / 2d);
     Color c = null;
     int alpha;
