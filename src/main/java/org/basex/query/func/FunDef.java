@@ -154,6 +154,29 @@ public enum FunDef {
   /** XQuery function. */
   BASEURI(FNURI, FNNode.class, 0, 1, "base-uri(node?)", URI_ZO),
 
+  /* FNFile functions */
+
+  /** XQuery function */
+  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(item)", BLN),
+  /** XQuery function */
+  MKDIRS(FILEURI, FNFile.class, 1, 1, "mkdirs(item)", BLN),
+  /** XQuery function */
+  ISDIR(FILEURI, FNFile.class, 1, 1, "is-directory(item)", BLN),
+  /** XQuery function */
+  ISFILE(FILEURI, FNFile.class, 1, 1, "is-file(item)", BLN),
+  /** XQuery function */
+  ISREAD(FILEURI, FNFile.class, 1, 1, "is-readable(item)", BLN),
+  /** XQuery function */
+  ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(item)", BLN),
+  /** XQuery function */
+  FILES(FILEURI, FNFile.class, 1, 1, "files(item)", STR_ZM),
+  /** XQuery function */
+  PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
+  /** XQuery function */
+  DELETE(FILEURI, FNFile.class, 1, 1, "delete(item)", BLN),
+  /** XQuery function */
+  PATHTOFULL(FILEURI, FNFile.class, 1, 1, "path-to-full-path(item)", STR),
+
   /* FNNum functions. */
 
   /** XQuery function. */

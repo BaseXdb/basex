@@ -6,7 +6,7 @@ import org.basex.util.Atts;
 
 /**
  * Global namespaces.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -22,10 +22,11 @@ public final class NSGlobal {
     atts.add(XMLNS, XMLNSURI);
     atts.add(XML, XMLURI);
     atts.add(BASEX, BXURI);
+    atts.add(FILE, FILEURI);
   }
 
   /** Private constructor. */
-  private NSGlobal() { }
+  private NSGlobal() {}
 
   /**
    * Finds the specified namespace uri.

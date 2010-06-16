@@ -353,6 +353,8 @@ public interface QueryTokens {
   byte[] XSIURI = token("http://www.w3.org/2001/XMLSchema-instance");
   /** Database URI. */
   byte[] BXURI = token("http://www.basex.org");
+  /** File module URI. */
+  byte[] FILEURI = token("http://www.basex.org/file");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
@@ -390,6 +392,8 @@ public interface QueryTokens {
   byte[] LOCAL = token("local");
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
+  /** File module token. */
+  byte[] FILE = token("file");
 
   // QUERY PLAN ===============================================================
 
