@@ -62,7 +62,7 @@ public final class InexTest {
   private PrintOutput res;
   /** Budget for a query in ms. */
   private double budget = -1;
-  /** Remaining query time - used for budget queries.  */
+  /** Remaining query time - used for budget queries. */
   private double[] rqt;
 
   /**
