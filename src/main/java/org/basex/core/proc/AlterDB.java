@@ -23,7 +23,7 @@ public final class AlterDB extends Proc {
    * @param name new name
    */
   public AlterDB(final String db, final String name) {
-    super(User.WRITE, db, name);
+    super(User.CREATE, db, name);
   }
 
   @Override
@@ -34,8 +34,7 @@ public final class AlterDB extends Proc {
     if(context.pinned(db)) return error(DBLOCKED, db);
     
     // try to alter database
-    return name == null ? error(DBALTERNON) :
-    !prop.dbexists(db) ? error(DBNOTFOUND, db) :
+    return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
       alter(db, name) ? info(DBALTERED, db, name) : error(DBNOTALTERED, db);
   }
   

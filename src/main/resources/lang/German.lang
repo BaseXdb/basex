@@ -356,7 +356,6 @@ db_optimized=Datenbank optimiert (%).
 db_dropped=Die Datenbank '%' wurde gelöscht.
 db_notdropped=Die Datenbank konnte nicht gelöscht werden.
 db_altered=Die Datenbank '%' wurde umbenannt nach '%'.
-db_alternon=Kein neuer Datenbankname spezifiziert.
 db_notaltered=Die Datenbank '%' konnte nicht umbenannt werden.
 db_notopened=Die Datenbank '%' konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet (%).

@@ -139,7 +139,7 @@ public final class CommandParser extends InputParser {
       case ALTER:
         switch(consume(CmdAlter.class, cmd)) {
           case DATABASE: case DB:
-            return new AlterDB(name(cmd), string(null));
+            return new AlterDB(name(cmd), name(cmd));
           case USER:
             return new AlterUser(name(cmd), string(null));
         }

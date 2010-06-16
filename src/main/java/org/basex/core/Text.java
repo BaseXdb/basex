@@ -411,8 +411,6 @@ public interface Text {
   String DBNOTDROPPED = lang("db_notdropped");
   /** Database altered. */
   String DBALTERED = lang("db_altered");
-  /** Database alter no new name. */
-  String DBALTERNON = lang("db_alternon");
   /** Database not dropped. */
   String DBNOTALTERED = lang("db_notaltered");
   /** Database not opened. */
