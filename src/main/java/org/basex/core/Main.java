@@ -7,6 +7,8 @@ import java.net.BindException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.Random;
+import java.util.Scanner;
+
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Exit;
@@ -68,9 +70,7 @@ public abstract class Main {
 
     while(console) {
       Main.out("> ");
-      final String in = System.console().readLine();
-      if(in == null) break;
-      if(!process(in)) return true;
+      if(!process(input())) return true;
     }
     return false;
   }
@@ -106,7 +106,7 @@ public abstract class Main {
           p.args[1] == null ? 1 : -1;
         if(i != -1) {
           Main.out(SERVERPW + COLS);
-          p.args[i] = new String(System.console().readPassword());
+          p.args[i] = password();
         }
         if(!process(p, true)) break;
       }
@@ -164,6 +164,24 @@ public abstract class Main {
   protected final void error(final Exception ex, final String msg) {
     errln((console ? "" : INFOERROR) + msg.trim());
     debug(ex);
+  }
+
+  /**
+   * Returns a string from standard input.
+   * @return password
+   */
+  protected final String input() {
+    final Scanner sc = new Scanner(System.in);
+    return sc.hasNextLine() ? sc.nextLine() : "";
+  }
+
+  /**
+   * Returns a password from standard input.
+   * @return password
+   */
+  protected final String password() {
+    final char[] pw = System.console().readPassword();
+    return pw != null ? new String(pw) : "";
   }
 
   /**
