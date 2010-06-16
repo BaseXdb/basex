@@ -478,7 +478,7 @@ public final class XQJTest extends TestCase {
 
     xqe = conn.createExpression();
     xqe.bindItem(new QName("v"), xqi);
-    xqs = xqe.executeQuery("declare variable $v external; $v");
+    xqe.executeQuery("declare variable $v external; $v");
   }
 
   /**

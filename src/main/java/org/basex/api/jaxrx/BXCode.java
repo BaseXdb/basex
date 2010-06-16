@@ -56,7 +56,7 @@ abstract class BXCode {
     } catch(final IOException ex) {
       throw new JaxRxException(ex);
     } finally {
-      try { if(cs != null) cs.close(); } catch(final Exception ex) { }
+      try { if(cs != null) cs.close(); } catch(final IOException ex) { }
     }
   }
 
@@ -99,7 +99,7 @@ abstract class BXCode {
       return file;
     } catch(final IOException ex) {
       // try to delete temporary file before returning the exception
-      try { bos.close(); } catch(final Exception e) { }
+      try { bos.close(); } catch(final IOException e) { }
       file.delete();
       throw ex;
     }

@@ -3,7 +3,6 @@ package org.basex.api.xmldb;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Random;
 import org.w3c.dom.Document;
 import org.xmldb.api.base.*;
 import org.xmldb.api.modules.BinaryResource;
@@ -199,7 +198,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   }
 
   /**
-   * Creates a random numeric id and check if it's not already contained in the
+   * Creates a timestamp id and check if it's not already contained in the
    * database. Collisions can still occur, if resources are not immediately
    * stored in the database, so it's advisable in general to specify
    * your own IDs.
@@ -210,7 +209,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     final String[] res = listResources();
     String id = null;
     do {
-      id = Integer.toString(new Random().nextInt() & 0x7FFFFFFF);
+      id = Long.toString(System.currentTimeMillis());
     } while(exists(res, id));
     return id;
   }
