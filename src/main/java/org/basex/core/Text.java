@@ -287,7 +287,14 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    USER + " [" + NAM + "] [" + PW + "?]", lang("ch_alter1"), lang("ch_alter2")
+    "[" + USER + "|" + CmdCreate.DB + "] [" + NAM + "]" +
+    " [" + PW + "?|" + NAM + "]",
+    lang("ch_alter1"),
+    lang("ch_alter2") + NL  +
+    LI + USER  + " [" + NAM + "] [" + PW + "?]:" + NL +
+    lang("ch_alterpw") + NL +
+    LI + CmdCreate.DB + " [" + NAM + "] [" + NAM + "]" + NL +
+    lang("ch_alterdb")
   };
 
   /** Command help. */
@@ -402,6 +409,12 @@ public interface Text {
   String DBDROPPED = lang("db_dropped");
   /** Database not dropped. */
   String DBNOTDROPPED = lang("db_notdropped");
+  /** Database altered. */
+  String DBALTERED = lang("db_altered");
+  /** Database alter no new name. */
+  String DBALTERNON = lang("db_alternon");
+  /** Database not dropped. */
+  String DBNOTALTERED = lang("db_notaltered");
   /** Database not opened. */
   String DBOPENERR = lang("db_notopened");
   /** Database opened. */

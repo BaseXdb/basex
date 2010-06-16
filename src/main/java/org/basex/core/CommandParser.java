@@ -3,6 +3,7 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import org.basex.core.Commands.Cmd;
+import org.basex.core.Commands.CmdAlter;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.core.Commands.CmdImport;
@@ -12,6 +13,7 @@ import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
 import org.basex.core.proc.Add;
+import org.basex.core.proc.AlterDB;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.Check;
 import org.basex.core.proc.CreateColl;
@@ -135,8 +137,13 @@ public final class CommandParser extends InputParser {
         }
         break;
       case ALTER:
-        key(USER, cmd);
-        return new AlterUser(name(cmd), string(null));
+        switch(consume(CmdAlter.class, cmd)) {
+          case DATABASE: case DB:
+            return new AlterDB(name(cmd), string(null));
+          case USER:
+            return new AlterUser(name(cmd), string(null));
+        }
+        break;
       case OPEN: case O:
         return new Open(name(cmd));
       case CHECK:

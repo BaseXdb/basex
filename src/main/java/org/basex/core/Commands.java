@@ -30,6 +30,8 @@ public interface Commands {
   enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
   /** Import types. */
   enum CmdImport { DATABASE, DB, COLLECTION, COLL }
+  /** Alter types. */
+  enum CmdAlter { DATABASE, DB, USER }
 
   /** Command flag: command which will not be shown in the help. */
   int HID = 1;
