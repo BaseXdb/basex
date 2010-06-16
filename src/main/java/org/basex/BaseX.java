@@ -100,8 +100,8 @@ public class BaseX extends Main {
   }
 
   /**
-   * Returns if this is the standalone version.
-   * @return standalone flag
+   * Tests if this client is stand-alone.
+   * @return stand-alone flag
    */
   protected boolean sa() {
     return true;

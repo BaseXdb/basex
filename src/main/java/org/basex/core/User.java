@@ -38,7 +38,7 @@ public final class User {
   }
 
   /**
-   * Returns if the specified permission is set.
+   * Tests if the specified permission is set.
    * @param flag flag to be checked
    * @return result of check
    */

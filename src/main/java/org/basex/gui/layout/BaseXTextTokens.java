@@ -337,7 +337,7 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Returns if the current position is marked.
+   * Tests if the current position is marked.
    * @return result of check
    */
   boolean markStart() {
@@ -346,7 +346,7 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Returns if the current position is marked.
+   * Tests if the current position is marked.
    * @return result of check
    */
   boolean marked() {
@@ -371,7 +371,7 @@ public final class BaseXTextTokens {
   // ERROR MARK ===============================================================
 
   /**
-   * Returns if the current token is erroneous.
+   * Tests if the current token is erroneous.
    * @return result of check
    */
   boolean error() {
@@ -379,7 +379,7 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Returns if the cursor moves over the current token.
+   * Tests if the cursor moves over the current token.
    * @param s start
    */
   void error(final int s) {

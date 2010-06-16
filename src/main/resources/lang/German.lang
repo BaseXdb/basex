@@ -355,7 +355,7 @@ db_closeerr=Die Datenbank konnte nicht geschlossen werden.
 db_optimized=Datenbank optimiert (%).
 db_dropped=Die Datenbank '%' wurde gelöscht.
 db_notdropped=Die Datenbank konnte nicht gelöscht werden.
-db_altered=Die Datenbank '%' wurde umbenannt nach '%'.
+db_altered=Die Datenbank '%' wurde in '%' umbenannt.
 db_notaltered=Die Datenbank '%' konnte nicht umbenannt werden.
 db_notopened=Die Datenbank '%' konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet (%).
@@ -520,7 +520,7 @@ ch_helpquery0=Query-Befehle:
 ch_xquery1=Ausführung einer XQuery-Anfrage.
 ch_xquery2=Führt eine XQuery-Anfrage aus und zeigt das Ergebnis an.
 ch_run1=Ausführung einer Datei als XQuery-Anfrage.
-ch_run2=Führt die XQuery-Anfrage in der Datei [%]\n  aus und zeigt das Ergebnis an.
+ch_run2=Führt die XQuery-Anfrage in der Datei [%]\naus und zeigt das Ergebnis an.
 ch_find1=Ausführung einer Schlüsselwort-Anfrage.
 ch_find2=Die folgenden Modifikatoren sind erlaubt:\n =  : sucht nach exakten Textknoten\n @= : sucht nach exakten Attributen\n @  : sucht nach Attributen
 ch_cs1=Ausführung einer Anfrage und Wechsel zu neuer Kontextmenge.

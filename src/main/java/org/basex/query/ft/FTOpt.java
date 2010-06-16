@@ -102,7 +102,7 @@ public final class FTOpt extends ExprInfo {
   }
 
   /**
-   * Returns if the specified flag has been set.
+   * Tests if the specified flag has been set.
    * @param f flag index
    * @return true if flag has been set
    */

@@ -38,7 +38,7 @@ public final class List extends Arr {
   }
 
   /**
-   * Returns if the specified expressions are updating or vacuous.
+   * Tests if the specified expressions are updating or vacuous.
    * @param ctx query context
    * @param expr expression array
    * @throws QueryException query exception

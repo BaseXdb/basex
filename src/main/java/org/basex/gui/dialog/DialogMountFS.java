@@ -155,7 +155,7 @@ public final class DialogMountFS extends Dialog {
   }
 
   /**
-   * Returns if no databases have been found.
+   * Tests if no databases have been found.
    * @return result of check
    */
   public boolean nodb() {

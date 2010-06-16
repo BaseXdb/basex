@@ -1126,7 +1126,7 @@ public interface Text {
   String RENAMETITLE = lang("dr_title");
   /** Info for renaming a database. */
   String RENAMEEXISTS = lang("dr_exists") + DOT;
-  /** Info for overwriting  a database. */
+  /** Info for overwriting a database. */
   String RENAMEOVER = lang("dr_over") + DOT;
   /** Info for overwriting a database and deleting backing store. */
   String RENAMEOVERBACKING = lang("dr_overbacking") + DOT;
@@ -1200,7 +1200,7 @@ public interface Text {
 
   /** Dialog title for treemap design. */
   String MAPLAYOUTTITLE = lang("dm_title");
-  /** Show attributes.  */
+  /** Show attributes. */
   String MAPATT = lang("dm_atts");
   /** Predefined number of layouts. */
   String[] MAPOFFSET = {

@@ -112,7 +112,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns if this is an empty sequence.
+   * Tests if this is an empty sequence.
    * @return result of check
    */
   public final boolean e() {
@@ -120,7 +120,7 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns if this is a vacuous expression (empty sequence or error function).
+   * Tests if this is a vacuous expression (empty sequence or error function).
    * @return result of check
    */
   public boolean v() {

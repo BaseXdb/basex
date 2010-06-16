@@ -109,7 +109,7 @@ public final class XMLSerializer extends Serializer {
 
     final boolean decl = p.check(S_OMIT_XML_DECLARATION, YES, NO).equals(NO);
     final boolean bom  = p.check(S_BYTE_ORDER_MARK, YES, NO).equals(YES);
-    final String  sa   = p.check(S_STANDALONE, YES, NO, OMIT);
+    final String sa = p.check(S_STANDALONE, YES, NO, OMIT);
     p.check(S_NORMALIZATION_FORM, NFC, NONE);
 
     final String maps = p.get(S_USE_CHARACTER_MAPS);

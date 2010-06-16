@@ -79,7 +79,7 @@ public interface Commands {
     }
 
     /**
-     * Returns if this is a command which will not be shown in the help.
+     * Tests if this is a command which will not be shown in the help.
      * @return result of check
      */
     boolean hidden() {
@@ -87,7 +87,7 @@ public interface Commands {
     }
 
     /**
-     * Returns if this is an internal command which cannot be run by the user.
+     * Tests if this is an internal command which cannot be run by the user.
      * @return result of check
      */
     boolean internal() {
@@ -95,7 +95,7 @@ public interface Commands {
     }
 
     /**
-     * Returns if this is a dummy command for formatting the help.
+     * Tests if this is a dummy command for formatting the help.
      * @return result of check
      */
     boolean help() {

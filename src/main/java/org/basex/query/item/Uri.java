@@ -58,7 +58,7 @@ public final class Uri extends Str {
   }
 
   /**
-   * Returns if this is an absolute URI.
+   * Tests if this is an absolute URI.
    * @return result of check
    */
   public boolean absolute() {

@@ -38,7 +38,7 @@ final class ChildIterator {
   }
 
   /**
-   * Returns if the node offers more children.
+   * Tests if the node offers more children.
    * @return result of check
    */
   boolean more() {

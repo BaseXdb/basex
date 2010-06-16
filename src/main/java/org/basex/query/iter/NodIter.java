@@ -22,7 +22,7 @@ public final class NodIter extends NodeIter {
   private int pos = -1;
   /** Sort flag. */
   private boolean sort;
-  /** Flag for possible duplicates. */
+  /** Flag for potential duplicates. */
   private boolean dupl;
 
   /**
@@ -34,7 +34,7 @@ public final class NodIter extends NodeIter {
 
   /**
    * Constructor.
-   * @param d returns if the iterator might return duplicates
+   * @param d flag indicating potential duplicates
    */
   public NodIter(final boolean d) {
     item = new Nod[1];

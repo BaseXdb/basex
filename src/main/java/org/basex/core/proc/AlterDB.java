@@ -1,9 +1,7 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
-
 import java.io.File;
-
 import org.basex.core.Context;
 import org.basex.core.Proc;
 import org.basex.core.User;
@@ -32,12 +30,12 @@ public final class AlterDB extends Proc {
     final String name = args[1];
     // DB is currently locked
     if(context.pinned(db)) return error(DBLOCKED, db);
-    
+
     // try to alter database
     return !prop.dbexists(db) ? error(DBNOTFOUND, db) :
       alter(db, name) ? info(DBALTERED, db, name) : error(DBNOTALTERED, db);
   }
-  
+
   /**
    * Alters the database name.
    * @param db database
@@ -45,13 +43,10 @@ public final class AlterDB extends Proc {
    * @return success of operation
    */
   private boolean alter(final String db, final String name) {
-    File f = prop.dbpath(db);
-    if(!f.renameTo(new File(f.getParentFile(), name))) {
-      return false;
-    }
-    return true;
+    final File f = prop.dbpath(db);
+    return f.renameTo(new File(f.getParentFile(), name));
   }
-  
+
   @Override
   public boolean updating(final Context ctx) {
     return true;

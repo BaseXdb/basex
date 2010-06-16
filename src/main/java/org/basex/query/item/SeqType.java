@@ -169,7 +169,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns if the type may occur at most once.
+   * Tests if the type may occur at most once.
    * @return result of check
    */
   public boolean zeroOrOne() {
@@ -177,7 +177,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns if the type may exactly once.
+   * Tests if the type may exactly once.
    * @return result of check
    */
   public boolean one() {
@@ -185,7 +185,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns if the type may occur 0 times.
+   * Tests if the type may occur 0 times.
    * @return result of check
    */
   public boolean mayBeZero() {
@@ -193,7 +193,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns if the type represents a single number.
+   * Tests if the type represents a single number.
    * @return result of check
    */
   public boolean num() {
@@ -201,7 +201,7 @@ public final class SeqType {
   }
 
   /**
-   * Returns if the type may be numeric.
+   * Tests if the type may be numeric.
    * @return result of check
    */
   public boolean mayBeNum() {

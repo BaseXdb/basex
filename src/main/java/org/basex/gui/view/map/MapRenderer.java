@@ -20,7 +20,7 @@ import org.basex.util.Tokenizer;
  * @author Sebastian Gath
  */
 final class MapRenderer {
-  /** Color for each tooltip token.  */
+  /** Color for each tooltip token. */
   private static BoolList ttcol;
   /** Index of tooltip token to underline. */
   private static int ul;

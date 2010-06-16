@@ -32,7 +32,7 @@ public final class Put extends UpdatePrimitive {
 
   @Override
   public void apply(final int add) throws QueryException {
-    // [CG] XQuery: put() - node.pre reference might change after update
+    // [LK] (CG) put() - node.pre reference might change after update?
     PrintOutput out = null;
     try {
       out = new PrintOutput(Token.string(path()));

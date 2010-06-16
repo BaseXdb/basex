@@ -69,13 +69,13 @@ public abstract class View extends BaseXPanel {
   public abstract void refreshUpdate();
 
   /**
-   * Returns if this view is currently visible.
+   * Tests if this view is currently visible.
    * @return result of check
    */
   public abstract boolean visible();
 
   /**
-   * Returns if this view needs a database instance.
+   * Tests if this view needs a database instance.
    * @return result of check
    */
   protected abstract boolean db();

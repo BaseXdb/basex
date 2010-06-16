@@ -17,7 +17,7 @@ import org.basex.util.Performance;
 public final class BaseXBar extends BaseXPanel {
   /** Scrollbar size. */
   public static final int SIZE = 16;
-  /** Maximum scrolling speed.  */
+  /** Maximum scrolling speed. */
   private static final int MAXSTEP = 15;
   /** Animated scrollbar zooming steps. */
   static final int[] STEPS = { -MAXSTEP, -14, -11, -8, -6, -4, -3,

@@ -20,10 +20,10 @@ import org.basex.io.IO;
 public final class BaseXFileChooser {
   /** File Dialog Mode. */
   public enum Mode {
-    /** Open file. */ FOPEN,
-    /** Open file or directory.  */ FDOPEN,
-    /** Open directory.  */ DOPEN,
-    /** Save file. */ FSAVE,
+    /** Open file.              */ FOPEN,
+    /** Open file or directory. */ FDOPEN,
+    /** Open directory.         */ DOPEN,
+    /** Save file.              */ FSAVE,
     /** Save file or directory. */ DSAVE,
   }
 

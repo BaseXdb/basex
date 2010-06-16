@@ -98,7 +98,7 @@ public abstract class IO {
   public abstract void cache() throws IOException;
 
   /**
-   * Verifies if the file exists.
+   * Tests if the file exists.
    * @return result of check
    */
   public boolean exists() {
@@ -106,7 +106,7 @@ public abstract class IO {
   }
 
   /**
-   * Returns if this is a directory instance.
+   * Tests if this is a directory instance.
    * @return result of check
    */
   public boolean isDir() {

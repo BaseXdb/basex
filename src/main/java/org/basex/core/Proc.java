@@ -181,7 +181,8 @@ public abstract class Proc extends Progress {
   }
 
   /**
-   * Returns if the process performs updates.
+   * Tests if the process performs updates/write operations, and needs to lock
+   * other processes.
    * @param ctx context reference
    * @return result of check
    */

@@ -81,9 +81,9 @@ public final class GUI extends JFrame {
   /** Search view. */
   public final XQueryView query;
 
-  /** Painting flag. */
+  /** Painting flag; if activated, interactive operations ns are skipped. */
   public boolean painting;
-  /** Working flag. */
+  /** Updating flag; if activated, operations accessing the data are skipped. */
   public boolean updating;
 
   /** Fullscreen flag. */
@@ -116,11 +116,11 @@ public final class GUI extends JFrame {
   private final BaseXLabel hits;
   /** Buttons. */
   private final GUIToolBar toolbar;
+
   /** Menu panel height. */
   private int menuHeight;
   /** Fullscreen Window. */
   private JFrame fullscr;
-
   /** Thread counter. */
   private int threadID;
   /** Current process. */

@@ -24,7 +24,7 @@ public interface GUICommand {
   void refresh(final GUI gui, final AbstractButton button);
 
   /**
-   * Returns if this command includes a menu checkbox.
+   * Tests if this command includes a menu checkbox.
    * @return result of check
    */
   boolean checked();

@@ -40,8 +40,8 @@ final class QueryProcess extends Progress {
    * @param s serverProcess
    * @throws IOException I/O exception
    */
-  QueryProcess(final String q, final PrintOutput o,
-      final ServerProcess s) throws IOException {
+  QueryProcess(final String q, final PrintOutput o, final ServerProcess s)
+      throws IOException {
 
     proc = new QueryProcessor(q, s.context);
     xml = new XMLSerializer(o);
