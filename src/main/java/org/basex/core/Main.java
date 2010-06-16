@@ -180,6 +180,7 @@ public abstract class Main {
    * @return password
    */
   protected final String password() {
+    if(System.console() == null) return input();
     final char[] pw = System.console().readPassword();
     return pw != null ? new String(pw) : "";
   }
