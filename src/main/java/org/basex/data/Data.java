@@ -829,6 +829,7 @@ public abstract class Data {
 
   /**
    * Returns a string representation of the specified table range.
+   * Can be called for debugging.
    * @param s start pre value
    * @param e end pre value
    * @return table

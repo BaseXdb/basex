@@ -2,6 +2,8 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
@@ -23,8 +25,8 @@ final class QueryProcess extends Progress {
   private final QueryProcessor proc;
   /** Serializer. */
   private final XMLSerializer xml;
-  /** Log. */
-  private final ServerProcess sp;
+  /** Database context. */
+  private final Context ctx;
 
   /** Monitored flag. */
   private boolean monitored;
@@ -37,15 +39,15 @@ final class QueryProcess extends Progress {
    * Constructor.
    * @param q query string
    * @param o output
-   * @param s serverProcess
+   * @param c database context
    * @throws IOException I/O exception
    */
-  QueryProcess(final String q, final PrintOutput o, final ServerProcess s)
+  QueryProcess(final String q, final PrintOutput o, final Context c)
       throws IOException {
 
-    proc = new QueryProcessor(q, s.context);
+    proc = new QueryProcessor(q, c);
     xml = new XMLSerializer(o);
-    sp = s;
+    ctx = c;
   }
 
   /**
@@ -53,10 +55,10 @@ final class QueryProcess extends Progress {
    * @throws QueryException query exception
    */
   void init() throws QueryException {
-    startTimeout(sp.context.prop.num(Prop.TIMEOUT));
+    startTimeout(ctx.prop.num(Prop.TIMEOUT));
     proc.parse();
     monitored = true;
-    sp.context.lock.before(proc.ctx.updating);
+    ctx.lock.before(proc.ctx.updating);
     iter = proc.iter();
     item = iter.next();
   }
@@ -87,6 +89,6 @@ final class QueryProcess extends Progress {
     proc.stopTimeout();
     xml.close();
     proc.close();
-    if(monitored) sp.context.lock.after(proc.ctx.updating);
+    if(monitored) ctx.lock.after(proc.ctx.updating);
   }
 }

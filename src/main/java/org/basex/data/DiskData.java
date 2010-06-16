@@ -131,8 +131,7 @@ public final class DiskData extends Data {
 
   @Override
   public void cls() throws IOException {
-    //if(meta.dirty)
-      flush();
+    if(meta.dirty) flush();
     table.close();
     texts.close();
     values.close();

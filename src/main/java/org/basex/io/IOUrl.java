@@ -10,12 +10,12 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class IOUrl extends IO {
+final class IOUrl extends IO {
   /**
    * Constructor.
    * @param u url
    */
-  public IOUrl(final String u) {
+  IOUrl(final String u) {
     super(u);
   }
 

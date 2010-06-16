@@ -13,9 +13,9 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Leo Woerteler
  */
-public class Extension extends Single {
+public final class Extension extends Single {
   /** Pragmas of the ExtensionExpression. */
-  public final Expr[] pragmas;
+  private final Expr[] pragmas;
 
   /**
    * Constructor.

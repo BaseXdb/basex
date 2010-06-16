@@ -9,17 +9,18 @@ import org.w3c.dom.CDATASection;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BXCData extends BXText implements CDATASection {
+final class BXCData extends BXText implements CDATASection {
   /**
    * Constructor.
    * @param n node reference
    */
-  public BXCData(final Nod n) {
+  protected BXCData(final Nod n) {
     super(n);
   }
 
   @Override
   protected int kind() {
+    // type not specified in database
     return 6;
   }
 }

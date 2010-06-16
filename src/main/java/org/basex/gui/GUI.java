@@ -85,15 +85,10 @@ public final class GUI extends JFrame {
   public boolean painting;
   /** Updating flag; if activated, operations accessing the data are skipped. */
   public boolean updating;
-
   /** Fullscreen flag. */
   public boolean fullscreen;
   /** Help dialog. */
   public DialogHelp help;
-  /** Text view. */
-  final TextView text;
-  /** Info view. */
-  final InfoView info;
 
   /** History button. */
   final BaseXButton hist;
@@ -106,6 +101,10 @@ public final class GUI extends JFrame {
   /** Query panel. */
   final BaseXBack nav;
 
+  /** Text view. */
+  private final TextView text;
+  /** Info view. */
+  private final InfoView info;
   /** Top panel. */
   private final BaseXBack top;
   /** Execution Button. */

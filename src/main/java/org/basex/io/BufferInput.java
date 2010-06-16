@@ -259,7 +259,7 @@ public class BufferInput {
    * Number of read bytes.
    * @return read bytes
    */
-  public final int size() {
+  final int size() {
     return len + pos;
   }
 
@@ -267,7 +267,7 @@ public class BufferInput {
    * Length of input.
    * @return read bytes
    */
-  public final long length() {
+  final long length() {
     return length;
   }
 
@@ -275,7 +275,7 @@ public class BufferInput {
    * Sets the input length.
    * @param l input length
    */
-  public final void length(final long l) {
+  final void length(final long l) {
     length = l;
   }
 }

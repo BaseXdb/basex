@@ -50,8 +50,6 @@ public interface Text {
 
   /** Title and version. */
   String TITLE = NAME + " " + VERSION;
-  /** Title, version and company. */
-  String CONSOLEINFO = TITLE + "; " + COMPANY;
 
   // CONSOLE INFO =============================================================
 
@@ -421,10 +419,6 @@ public interface Text {
   String DBEXPORTED = lang("db_exported");
   /** Database not deleted. */
   String DBNOTDELETED = lang("db_notdeleted");
-  /** Document found. */
-  String DBDOC = lang("db_doc");
-  /** Document not found. */
-  String DBNODOC = lang("db_nodoc");
 
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");

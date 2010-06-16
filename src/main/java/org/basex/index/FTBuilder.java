@@ -245,16 +245,6 @@ public abstract class FTBuilder extends IndexBuilder {
 
   /**
    * Checks if any unprocessed pre values are remaining.
-   * @param tok byte[][] tokens
-   * @return boolean
-   */
-  protected final boolean check(final byte[][] tok) {
-    for(final byte[] b : tok) if(b.length > 0) return true;
-    return false;
-  }
-
-  /**
-   * Checks if any unprocessed pre values are remaining.
    * @param lists lists
    * @return boolean
    */

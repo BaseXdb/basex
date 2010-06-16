@@ -361,8 +361,6 @@ db_notopened=Die Datenbank '%' konnte nicht geöffnet werden.
 db_opened=Datenbank '%' geöffnet (%).
 db_exported=Datenbank '%' exportiert (%).
 db_notdeleted=Die Datei '%' konnte nicht gelöscht werden.
-db_doc=Das Dokument '%' existiert schon.
-db_nodoc=Das Dokument '%' wurde nicht gefunden.
 
 # Index commands
 in_created=Index erzeugt (%).

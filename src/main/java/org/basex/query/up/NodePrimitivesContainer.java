@@ -13,7 +13,7 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
-public class NodePrimitivesContainer implements NodePrimitives {
+final class NodePrimitivesContainer implements NodePrimitives {
   /** Container for update primitives. */
   private final List<UpdatePrimitive> primitives =
     new LinkedList<UpdatePrimitive>();

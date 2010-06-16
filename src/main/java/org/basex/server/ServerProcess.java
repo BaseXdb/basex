@@ -29,6 +29,10 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class ServerProcess extends Thread {
+  /** Active queries. */
+  private final HashMap<String, QueryProcess> queries =
+    new HashMap<String, QueryProcess>();
+
   /** Database context. */
   public final Context context;
   /** Socket reference. */
@@ -44,10 +48,6 @@ public final class ServerProcess extends Thread {
   private Proc proc;
   /** Query id counter. */
   private int id;
-
-  /** Active queries. */
-  final HashMap<String, QueryProcess> queries =
-    new HashMap<String, QueryProcess>();
 
   /**
    * Constructor.
@@ -182,7 +182,7 @@ public final class ServerProcess extends Thread {
     QueryProcess qp = null;
     if(c == 0) {
       // c = 0: create new query process
-      qp = new QueryProcess(arg, out, this);
+      qp = new QueryProcess(arg, out, context);
       arg = Integer.toString(id++);
       queries.put(arg, qp);
     } else {

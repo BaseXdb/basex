@@ -15,14 +15,14 @@ import org.basex.util.Array;
 import org.basex.util.TokenList;
 
 /**
- * This class stores the path summary of a document.
- * It contains all unique location paths of the document.
+ * This class stores the path summary of a database.
+ * It contains all unique location paths.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class PathSummary implements Index {
-  /** Parent stack. */
+  /** Parent stack for building the summary. */
   private PathNode[] stack;
   /** Root node. */
   public PathNode root;
@@ -35,8 +35,8 @@ public final class PathSummary implements Index {
   }
 
   /**
-   * Initializes the data structures. This method is called if new statistics
-   * are created.
+   * Initializes the data structures. This method is called if a new path
+   * summary is built.
    */
   public void init() {
     stack = new PathNode[IO.MAXHEIGHT];

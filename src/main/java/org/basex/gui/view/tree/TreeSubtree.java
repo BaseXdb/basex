@@ -9,7 +9,7 @@ import org.basex.data.Data;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
-public class TreeSubtree {
+final class TreeSubtree {
   /** TreeNodeCache Object, contains cached document. */
   private final TreeNodeCache nc;
   /** Subtree borders. */

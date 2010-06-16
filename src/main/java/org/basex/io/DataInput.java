@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import org.basex.util.Token;
 
@@ -19,16 +18,6 @@ public final class DataInput extends BufferInput {
    */
   public DataInput(final File file) throws IOException {
     super(file);
-  }
-
-  /**
-   * Constructor, specifying a buffer size.
-   * @param file the file to be read
-   * @param bs buffer size
-   * @throws IOException IO Exception
-   */
-  public DataInput(final File file, final int bs) throws IOException {
-    super(new FileInputStream(file), new byte[bs]);
   }
 
   /**

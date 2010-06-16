@@ -410,8 +410,6 @@ public interface QueryTokens {
   /** Query Plan. */
   byte[] DIR = token("dir");
   /** Query Plan. */
-  byte[] NS = token("ns");
-  /** Query Plan. */
   byte[] PRE = token("pre");
   /** Query Plan. */
   byte[] VAL = token("value");

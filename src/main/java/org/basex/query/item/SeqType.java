@@ -32,8 +32,6 @@ public final class SeqType {
   public static final SeqType ITEM_ZO = new SeqType(Type.ITEM, Occ.ZO);
   /** Zero or more items. */
   public static final SeqType ITEM_ZM = new SeqType(Type.ITEM, Occ.ZM);
-  /** One or more items. */
-  public static final SeqType ITEM_OM = new SeqType(Type.ITEM, Occ.OM);
   /** Single boolean. */
   public static final SeqType BLN = new SeqType(Type.BLN, Occ.O);
   /** Zero or one booleans. */

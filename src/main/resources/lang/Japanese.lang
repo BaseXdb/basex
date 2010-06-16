@@ -364,8 +364,6 @@ db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。
 db_notdeleted=ファイル '%' を削除できませんでした。
-db_doc=ドキュメント '%' は既に存在します。
-db_nodoc=ドキュメント '%' が見付かりませんでした。
 
 # Index commands
 in_created=% にインデックスが作成されました。

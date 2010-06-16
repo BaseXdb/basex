@@ -12,7 +12,7 @@ import org.w3c.dom.DOMException;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class BXChar extends BXNode implements CharacterData {
+abstract class BXChar extends BXNode implements CharacterData {
   /**
    * Constructor.
    * @param n node reference

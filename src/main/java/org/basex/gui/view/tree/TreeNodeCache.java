@@ -11,7 +11,7 @@ import org.basex.util.IntList;
  */
 final class TreeNodeCache implements TreeViewOptions {
   /** Document depth. */
-  int maxLevel = -1;
+  private int maxLevel = -1;
   /** All nodes document nodes per level. */
   private IntList[] nodes;
 
@@ -190,10 +190,10 @@ final class TreeNodeCache implements TreeViewOptions {
    * @param bo border
    * @param ix index
    * @return pre
-   */
   int getPrePerIndex(final TreeBorder bo, final int ix) {
     return nodes[bo.level].get(bo.start + ix);
   }
+   */
 
   /**
    * Searches for pre value or pre range.

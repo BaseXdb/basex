@@ -111,17 +111,8 @@ public final class TokenList implements Iterable<byte[]> {
    * @return true if value is found
    */
   public boolean contains(final byte[] v) {
-    return indexOf(v) != -1;
-  }
-
-  /**
-   * Finds the index of the specified token in the list.
-   * @param v token to be found
-   * @return index of the token if it is found, {@code -1} otherwise
-   */
-  public int indexOf(final byte[] v) {
-    for(int i = 0; i < size; i++) if(eq(list[i], v)) return i;
-    return -1;
+    for(int i = 0; i < size; i++) if(eq(list[i], v)) return true;
+    return false;
   }
 
   /**

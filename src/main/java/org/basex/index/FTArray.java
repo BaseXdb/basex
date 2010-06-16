@@ -11,8 +11,6 @@ import org.basex.util.TokenList;
  * @author Sebastian Gath
  */
 final class FTArray {
-  /** Counts all nodes in the trie. */
-  int count;
   /** List saving the token values. */
   TokenList tokens;
   /** List saving the structure: [t, n1, ..., nk, s, p0, p1]
@@ -31,7 +29,6 @@ final class FTArray {
     tokens = new TokenList(is);
     // add root node with k, t, s
     next.add(new int[] { -1, 0, 0 });
-    count = 1;
   }
 
   /**
@@ -61,7 +58,6 @@ final class FTArray {
    * @param off file offset where to read the data
    */
   void insertSorted(final byte[] v, final int s, final long off) {
-    count++;
     final int[] a = off <= Integer.MAX_VALUE ? new int[] { (int) off } :
       new int[] { (int) (off >> 16 & 0XFFFFFF), -(int) (off & 0xFFFF) };
     insertNodeSorted(0, v, s, a);

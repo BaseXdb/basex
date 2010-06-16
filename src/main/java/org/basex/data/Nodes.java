@@ -70,8 +70,8 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Node Set constructor (used by test classes).
-   * No data reference is defined by this constructor.
+   * Node Set constructor. Should only used by test classes, as no data
+   * reference will be defined.
    * @param n node set
    */
   public Nodes(final int[] n) {

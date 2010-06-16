@@ -16,8 +16,6 @@ import org.xml.sax.InputSource;
  * @author Christian Gruen
  */
 public abstract class IO {
-  /** Return IO dummy instance. */
-  public static final IO DUMMY = new IOContent(Token.EMPTY);
   /** Database suffix. */
   public static final String BASEXSUFFIX = ".basex";
   /** XQuery Suffix. */
@@ -42,12 +40,12 @@ public abstract class IO {
 
   /** File path and name. */
   protected String path;
-  /** File name. */
-  protected String name;
   /** File contents. */
   protected byte[] cont;
   /** First call. */
   protected boolean more;
+  /** File name. */
+  private String name;
 
   /**
    * Protected constructor.

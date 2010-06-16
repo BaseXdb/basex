@@ -21,14 +21,14 @@ import org.w3c.dom.UserDataHandler;
  */
 public abstract class BXNode implements Node {
   /** Node type mapping (see {@link Data} interface). */
-  static final short[] TYPES = {
+  private static final short[] TYPES = {
     Node.DOCUMENT_NODE, Node.ELEMENT_NODE,
     Node.TEXT_NODE, Node.ATTRIBUTE_NODE,
     Node.COMMENT_NODE, Node.PROCESSING_INSTRUCTION_NODE,
     Node.CDATA_SECTION_NODE, Node.DOCUMENT_FRAGMENT_NODE
   };
   /** Node name mapping (see {@link Data} interface). */
-  static final String[] NAMES = {
+  private static final String[] NAMES = {
     "#document", null, "#text", null, "#comment", null, "#cdata-section",
     "#document-fragment"
   };
@@ -140,7 +140,7 @@ public abstract class BXNode implements Node {
    * @param n node instance
    * @return resulting node
    */
-  protected BXNode finish(final Nod n) {
+  private BXNode finish(final Nod n) {
     return n != null ? n.java() : null;
   }
 
@@ -298,7 +298,7 @@ public abstract class BXNode implements Node {
   /**
    * Throws a DOM modification exception.
    */
-  public final void error() {
+  protected final void error() {
     throw new DOMException(DOMException.NO_MODIFICATION_ALLOWED_ERR,
         "DOM implementation is read-only.");
   }

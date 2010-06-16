@@ -24,7 +24,7 @@ import org.basex.query.iter.Iter;
  */
 public final class IndexAccess extends Single {
   /** Index context. */
-  final IndexContext ictx;
+  private final IndexContext ictx;
   /** Access type. */
   final IndexType type;
 

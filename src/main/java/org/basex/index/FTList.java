@@ -14,17 +14,19 @@ import org.basex.io.DataAccess;
  */
 abstract class FTList {
   /** Empty integer array. */
-  protected static final int[] NOINTS = {};
-  /** Indexed tokens. */
-  protected final DataAccess str;
+  private static final int[] NOINTS = {};
+
   /** Storing pre and pos values for each token. */
-  protected final DataAccess dat;
+  private final DataAccess dat;
   /** Structure file. */
   private final File files;
   /** Data file. */
   private final File filed;
   /** Wasted flag. */
-  boolean wasted;
+  private boolean wasted;
+
+  /** Indexed tokens. */
+  final DataAccess str;
   /** Current data size. */
   int size;
   /** Next token. */

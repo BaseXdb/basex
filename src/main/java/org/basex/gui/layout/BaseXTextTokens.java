@@ -19,9 +19,9 @@ public final class BaseXTextTokens {
   /** Text length. */
   private int size;
   /** Current start position. */
-  int ps;
+  private int ps;
   /** Current end position. */
-  int pe;
+  private int pe;
   /** Current cursor position. */
   private int pc;
   /** Start of a text mark. */

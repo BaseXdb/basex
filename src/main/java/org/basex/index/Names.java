@@ -36,7 +36,7 @@ public final class Names extends TokenSet {
    */
   public Names(final DataInput in) throws IOException {
     super(in);
-    stat = new StatsKey[next.length];
+    stat = new StatsKey[keys.length];
     for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
   }
 

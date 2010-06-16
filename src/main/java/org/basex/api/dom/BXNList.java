@@ -22,7 +22,7 @@ public class BXNList implements NodeList {
    * Constructor.
    * @param nb nodes
    */
-  public BXNList(final NodIter nb) {
+  protected BXNList(final NodIter nb) {
     xquery = nb;
     xquery.sort(true);
   }

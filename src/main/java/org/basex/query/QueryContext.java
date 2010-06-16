@@ -147,7 +147,7 @@ public final class QueryContext extends Progress {
   private int colls;
 
   /** Reference to the root expression. */
-  public Expr root;
+  private Expr root;
   /** Initial number of documents. */
   private int rootDocs;
   /** Info flag. */

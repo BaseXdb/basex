@@ -12,7 +12,7 @@ import org.basex.core.Main;
  */
 final class MapRects implements Iterable<MapRect> {
   /** Value array. */
-  MapRect[] list;
+  MapRect[] list = new MapRect[8];
   /** Sorted values. */
   MapRect[] sorted;
   /** Number of entries. */
@@ -29,7 +29,7 @@ final class MapRects implements Iterable<MapRect> {
    * Constructor, specifying an initial list size.
    * @param is initial size of the list
    */
-  MapRects(final int is) {
+  private MapRects(final int is) {
     list = new MapRect[is];
   }
 

@@ -188,7 +188,7 @@ public class Step extends Preds {
    * @param p predicate to be added
    * @return resulting step instance
    */
-  public final Step addPred(final Expr p) {
+  final Step addPred(final Expr p) {
     pred = Array.add(pred, p);
     return get(axis, test, pred);
   }

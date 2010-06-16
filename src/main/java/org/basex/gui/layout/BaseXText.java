@@ -44,13 +44,13 @@ public class BaseXText extends BaseXPanel {
   protected BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Renderer reference. */
   protected final BaseXTextRenderer rend;
-  /** Search field. */
-  protected BaseXTextField find;
   /** Undo history; if set to {@code null}, text is read-only. */
   protected Undo undo;
 
   /** Scrollbar reference. */
-  protected final BaseXBar scroll;
+  private final BaseXBar scroll;
+  /** Search field. */
+  private BaseXTextField find;
 
   /**
    * Default constructor.

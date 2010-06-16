@@ -27,7 +27,7 @@ import org.xml.sax.XMLReader;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BXDocBuilder extends DocumentBuilder {
+final class BXDocBuilder extends DocumentBuilder {
   /** Database context. */
   private final Context ctx = new Context();
   /** Parser instance. */

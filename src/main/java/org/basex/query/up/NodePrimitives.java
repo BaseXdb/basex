@@ -13,7 +13,7 @@ import org.basex.query.up.primitives.UpdatePrimitive;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Lukas Kircher
  */
-public interface NodePrimitives extends Iterable<UpdatePrimitive> {
+interface NodePrimitives extends Iterable<UpdatePrimitive> {
   /**
    * Adds a primitive to the container.
    * @param p primitive to be added

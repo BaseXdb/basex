@@ -15,14 +15,15 @@ import org.basex.io.DataOutput;
 public class TokenSet {
   /** Initial hash capacity. */
   protected static final int CAP = 1 << 3;
-  /** Hash keys. */
-  protected byte[][] keys;
-  /** Pointers to the next token. */
-  protected int[] next;
-  /** Hash table buckets. */
-  protected int[] bucket;
   /** Hash entries. Actual hash size is {@code size - 1}. */
   protected int size = 1;
+  /** Hash keys. */
+  protected byte[][] keys;
+
+  /** Pointers to the next token. */
+  private int[] next;
+  /** Hash table buckets. */
+  private int[] bucket;
 
   /**
    * Constructor.
