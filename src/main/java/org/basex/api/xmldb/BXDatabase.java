@@ -19,7 +19,7 @@ import org.xmldb.api.base.XMLDBException;
  */
 public final class BXDatabase implements Database, BXXMLDBText {
   /** Context reference. */
-  Context ctx = new Context();
+  private final Context ctx = new Context();
 
   public boolean acceptsURI(final String uri) throws XMLDBException {
     return getCollectionName(uri) != null;
@@ -53,6 +53,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
 
   public void setProperty(final String key, final String value)
       throws XMLDBException {
+
     final Proc proc = new Set(key, value);
     if(!proc.exec(ctx)) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);

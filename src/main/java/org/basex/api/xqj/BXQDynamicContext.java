@@ -52,7 +52,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   /** Context. */
   protected final BXQStaticContext sc;
   /** Query processor. */
-  protected QueryProcessor query;
+  protected final QueryProcessor query;
   /** Time zone. */
   private TimeZone zone;
 
@@ -226,7 +226,7 @@ abstract class BXQDynamicContext extends BXQAbstract
    * @return result sequence
    * @throws XQException exception
    */
-  protected BXQSequence execute() throws XQException {
+  protected final BXQSequence execute() throws XQException {
     opened();
     final QueryContext qctx = query.ctx;
     qctx.ns = sc.ctx.ns;

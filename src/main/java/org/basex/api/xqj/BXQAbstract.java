@@ -34,12 +34,12 @@ import org.xml.sax.XMLReader;
  * @author Christian Gruen
  */
 abstract class BXQAbstract {
+  /** Parent closer. */
+  protected final BXQAbstract par;
   /** Database connection. */
   protected BXQStaticContext ctx;
   /** Closed flag. */
   protected boolean closed;
-  /** Parent closer. */
-  protected BXQAbstract par;
 
   /**
    * Constructor.
@@ -95,7 +95,9 @@ abstract class BXQAbstract {
    * @return target type
    * @throws XQException xquery exception
    */
-  protected Type check(final Type e, final XQItemType tar) throws XQException {
+  protected final Type check(final Type e, final XQItemType tar)
+      throws XQException {
+
     opened();
     if(tar == null) return e;
 
@@ -272,7 +274,7 @@ abstract class BXQAbstract {
    * @param ser serializer
    * @throws XQException exception
    */
-  protected void serialize(final Item it, final Serializer ser)
+  protected final void serialize(final Item it, final Serializer ser)
       throws XQException {
     opened();
     try {

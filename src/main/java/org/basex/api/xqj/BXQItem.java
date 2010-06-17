@@ -41,7 +41,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   /** Connection. */
   private final BXQConnection conn;
   /** Item. */
-  Item it;
+  final Item it;
 
   /**
    * Constructor.

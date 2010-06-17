@@ -50,7 +50,7 @@ abstract class BXCode {
    * Runs the class code and closes the client session.
    * A server exception is thrown if I/O errors occur.
    */
-  void run() {
+  final void run() {
     try {
       code();
     } catch(final IOException ex) {
@@ -67,7 +67,7 @@ abstract class BXCode {
    * @param path path
    * @return root resource
    */
-  String root(final ResourcePath path) {
+  final String root(final ResourcePath path) {
     if(path.getDepth() == 1) return path.getResourcePath();
     throw new JaxRxException(404, "Resource '" + path + "' was not found.");
   }
@@ -78,7 +78,7 @@ abstract class BXCode {
    * @return file reference
    * @throws IOException I/O exception
    */
-  File cache(final InputStream in) throws IOException {
+  final File cache(final InputStream in) throws IOException {
     // use current number of milliseconds as filename
     final File file = new File(Prop.TMP + System.currentTimeMillis());
     final BufferedInputStream bis = new BufferedInputStream(in);
@@ -110,7 +110,7 @@ abstract class BXCode {
    * @param path JAX-RX path
    * @return string with serialization parameters
    */
-  String params(final ResourcePath path) {
+  final String params(final ResourcePath path) {
     String ser = path.getValue(QueryParameter.OUTPUT);
     if(ser == null) ser = "";
 

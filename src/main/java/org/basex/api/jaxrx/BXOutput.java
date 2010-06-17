@@ -51,7 +51,9 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
    * @param os output stream
    * @throws IOException I/O exception
    */
-  void exec(final Object command, final OutputStream os) throws IOException {
+  final void exec(final Object command, final OutputStream os)
+      throws IOException {
+
     if(!cs.execute(command.toString(), os))
       throw new JaxRxException(400, cs.info());
   }
