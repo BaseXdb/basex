@@ -21,7 +21,7 @@ public final class StressTest {
   static final int NQUERIES = 30;
 
   /** Random number generator. */
-  static Random rnd = new Random();
+  static final Random RND = new Random();
   /** Result counter. */
   static int counter;
   /** Finished counter. */
@@ -94,10 +94,10 @@ public final class StressTest {
 
         // perform some queries
         for(int i = 0; i < NQUERIES; i++) {
-          Performance.sleep((long) (50 * rnd.nextDouble()));
+          Performance.sleep((long) (50 * RND.nextDouble()));
 
           // return nth text of the database
-          int n = (rnd.nextInt() & 0xFF) + 1;
+          int n = (RND.nextInt() & 0xFF) + 1;
           String qu = "xquery basex:db('factbook')/descendant::text()" +
             "[position() = " + n + "]";
 

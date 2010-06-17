@@ -41,7 +41,7 @@ public abstract class Statistics {
    * @param args command-line arguments
    * @return success flag
    */
-  boolean init(final String[] args) {
+  final boolean init(final String[] args) {
     return parseArguments(args);
   }
 
@@ -50,10 +50,8 @@ public abstract class Statistics {
    * @param header columns
    */
   final void run(final String... header) {
-    final TokenList tl = new TokenList();
-    tl.add("Document");
-    for(final String h : header) tl.add(h);
-    table.header = tl;
+    table.header.add("Document");
+    for(final String h : header) table.header.add(h);
 
     if(db == null) {
       for(final String d : List.list(ctx)) analyze(d);

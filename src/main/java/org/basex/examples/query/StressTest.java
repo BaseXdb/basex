@@ -24,9 +24,9 @@ public final class StressTest {
   static final int NQUERIES = 30;
 
   /** Global context. */
-  static Context context = new Context();
+  static final Context CONTEXT = new Context();
   /** Random number generator. */
-  static Random rnd = new Random();
+  static final Random RND = new Random();
   /** Result counter. */
   static int counter;
   /** Finished counter. */
@@ -45,8 +45,8 @@ public final class StressTest {
 
     // create test database
     System.out.println("\n* Create test database.");
-    new Set("info", true).execute(context);
-    new CreateDB("etc/xml/factbook.xml").execute(context);
+    new Set("info", true).execute(CONTEXT);
+    new CreateDB("etc/xml/factbook.xml").execute(CONTEXT);
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
@@ -62,7 +62,7 @@ public final class StressTest {
   static void dropDB() throws BaseXException {
     // drop database
     System.out.println("\n* Drop test database.");
-    new DropDB("factbook").execute(context);
+    new DropDB("factbook").execute(CONTEXT);
   }
 
   /** Single client. */
@@ -72,14 +72,14 @@ public final class StressTest {
       try {
         // perform some queries
         for(int i = 0; i < NQUERIES; i++) {
-          Performance.sleep((long) (50 * rnd.nextDouble()));
+          Performance.sleep((long) (50 * RND.nextDouble()));
 
           // return nth text of the database
-          int n = (rnd.nextInt() & 0xFF) + 1;
+          int n = (RND.nextInt() & 0xFF) + 1;
           String qu = "descendant::text()[position() = " + n + "]";
 
           ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-          new XQuery(qu).execute(context, buffer);
+          new XQuery(qu).execute(CONTEXT, buffer);
 
           System.out.print("[" + counter + "] Thread " + getId() +
               ", Pos " + n + ": " + buffer);
