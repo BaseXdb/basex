@@ -163,13 +163,9 @@ public abstract class Fun extends Arr {
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    if(expr.length == 0) {
-      ser.emptyElement(this, NAM, Token.token(func.desc));
-    } else {
-      ser.openElement(this, NAM, Token.token(func.desc));
-      for(final Expr arg : expr) arg.plan(ser);
-      ser.closeElement();
-    }
+    ser.openElement(this, NAM, Token.token(func.desc));
+    for(final Expr arg : expr) arg.plan(ser);
+    ser.closeElement();
   }
 
   @Override

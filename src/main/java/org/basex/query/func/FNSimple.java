@@ -124,6 +124,7 @@ public final class FNSimple extends Fun {
   public static boolean deep(final Iter iter1, final Iter iter2)
       throws QueryException {
 
+    // [CG] check if namespaces references are correctly compared
     Item it1 = null;
     Item it2 = null;
     // explicit non-short-circuit..

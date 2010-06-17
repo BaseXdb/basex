@@ -46,9 +46,14 @@ public final class FunCall extends Arr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     if(func == null) comp(ctx);
 
+    final int al = expr.length;
+    final Item[] args = new Item[al];
+    // evaluate arguments
+    for(int a = 0; a < al; a++) args[a] = ctx.iter(expr[a]).finish();
+    // move variables to stack
     final int s = ctx.vars.size();
-    for(int a = 0; a < expr.length; a++) {
-      ctx.vars.add(func.args[a].bind(ctx.iter(expr[a]).finish(), ctx).copy());
+    for(int a = 0; a < al; a++) {
+      ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
     }
     // evaluate function and reset variable scope
     final Item im = ctx.iter(func).finish();
