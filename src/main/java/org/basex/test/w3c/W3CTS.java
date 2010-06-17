@@ -32,8 +32,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.expr.Expr;
-import org.basex.query.func.FNBaseX;
-import org.basex.query.func.FNGen;
 import org.basex.query.func.FNSimple;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
@@ -655,9 +653,7 @@ public abstract class W3CTS {
           def = FunDef.DB;
           src = IO.get(src).dbname();
         }
-        final Fun fun = first ? new FNGen() : new FNBaseX();
-        fun.init(def, new Expr[] { Str.get(src) });
-        expr = fun;
+        expr = Fun.create(def, Str.get(src));
       }
       if(var != null) {
         final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
