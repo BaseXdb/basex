@@ -57,22 +57,15 @@ public final class FNIndex extends TokenSet {
 
     final int id = id(name);
     if(id != 0) {
-      try {
-        // create function
-        final FunDef fl = funcs[id];
-        if(!eq(fl.uri, uri)) return null;
+      // create function
+      final FunDef fl = funcs[id];
+      if(!eq(fl.uri, uri)) return null;
 
-        final Fun f = fl.func.newInstance();
-        f.init(fl, args);
-        // check number of arguments
-        if(args.length < fl.min || fl.max >= fl.min && args.length > fl.max)
-          Err.or(XPARGS, fl);
-        return f;
-      } catch(final QueryException ex) {
-        throw ex;
-      } catch(final Exception ex) {
-        Main.notexpected("Can't run " + string(name));
-      }
+      final Fun f = Fun.create(fl, args);
+      // check number of arguments
+      if(args.length < fl.min || fl.max >= fl.min && args.length > fl.max)
+        Err.or(XPARGS, fl);
+      return f;
     }
     return null;
   }

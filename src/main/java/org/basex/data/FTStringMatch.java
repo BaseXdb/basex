@@ -39,16 +39,16 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
     return s >= mtc.s && e <= mtc.e;
   }
 
+  public int compareTo(final FTStringMatch sm) {
+    final int st = s - sm.s;
+    return st != 0 ? st : e - sm.e;
+  }
+
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append((n ? "-" : "+") + "[" + q + ": ");
     sb.append(s == e ? "" + s : s + "-" + e);
     return sb.append("]").toString();
-  }
-
-  public int compareTo(final FTStringMatch sm) {
-    final int st = s - sm.s;
-    return st != 0 ? st : e - sm.e;
   }
 }

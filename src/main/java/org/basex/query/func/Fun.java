@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
 
+import org.basex.core.Main;
 import org.basex.core.Text;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
@@ -30,13 +31,22 @@ public abstract class Fun extends Arr {
   public FunDef func;
 
   /**
-   * Initializes the function.
+   * Creates a function with the specified arguments.
    * @param f function description
    * @param e expression array
+   * @return function
    */
-  public final void init(final FunDef f, final Expr[] e) {
-    func = f;
-    expr = e;
+  public static final Fun create(final FunDef f, final Expr... e) {
+    try {
+      final Fun fun = f.func.newInstance();
+      fun.func = f;
+      fun.expr = e;
+      return fun;
+    } catch(final Exception ex) {
+      // not expected to occur at all
+      Main.debug(ex);
+      return null;
+    }
   }
 
   @Override
