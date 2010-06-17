@@ -17,17 +17,17 @@ import org.basex.util.TokenSet;
  * @author Christian Gruen
  */
 public final class FNIndex extends TokenSet {
+  /** Singleton instance. */
+  private static final FNIndex INSTANCE = new FNIndex();
   /** Function classes. */
   private FunDef[] funcs;
-  /** Singleton instance. */
-  private static FNIndex instance = new FNIndex();
 
   /**
    * Gets the function instance.
    * @return instance
    */
   public static FNIndex get() {
-    return instance;
+    return INSTANCE;
   }
 
   /**

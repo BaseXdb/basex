@@ -9,12 +9,12 @@ import org.w3c.dom.CDATASection;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class BXCData extends BXText implements CDATASection {
+public final class BXCData extends BXText implements CDATASection {
   /**
    * Constructor.
    * @param n node reference
    */
-  protected BXCData(final Nod n) {
+  public BXCData(final Nod n) {
     super(n);
   }
 

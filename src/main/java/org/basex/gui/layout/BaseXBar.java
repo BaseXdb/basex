@@ -25,14 +25,15 @@ public final class BaseXBar extends BaseXPanel {
   /** Minimum size for the scrollbar slider. */
   private static final int MINSIZE = 20;
 
+  /** Reference to the scrolled component. */
+  final BaseXPanel comp;
+  /** Scrollbar width. */
+  final int ww;
+
   /** Current scrolling speed. */
   int step = STEPS.length / 2;
   /** Flag reporting if the scrollbar animation is running. */
   boolean animated;
-  /** Reference to the scrolled component. */
-  BaseXPanel comp;
-  /** Scrollbar width. */
-  int ww;
   /** Scrollbar height. */
   int hh;
   /** Scrollbar slider position. */
@@ -55,6 +56,7 @@ public final class BaseXBar extends BaseXPanel {
   int pos;
   /** Current panel height. */
   int height;
+
   /** Scrollbar slider offset. */
   private int barOffset;
   /** Flag for permanent scrollbar visibility. */

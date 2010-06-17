@@ -187,7 +187,7 @@ public final class PathSummary implements Index {
 
     // sort by number of occurrences
     final double[] tmp = new double[in.size()];
-    for(int i = 0; i < in.size(); i++) tmp[i] = in.get(i).count;
+    for(int i = 0; i < in.size(); i++) tmp[i] = in.get(i).size;
     final int[] occ = Array.createOrder(tmp, false);
 
     // remove non-text/attribute nodes

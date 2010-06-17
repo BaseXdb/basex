@@ -12,13 +12,13 @@ import org.basex.util.TokenList;
  */
 final class FTArray {
   /** List saving the token values. */
-  TokenList tokens;
+  final TokenList tokens;
   /** List saving the structure: [t, n1, ..., nk, s, p0, p1]
    * t = pointer on tokens; n1, ..., nk are the children of the node
    * saved as pointer on nextN; s = size of pre values; p = pointer
    * if p is a long value, it is split into 2 ints with p0 < 0
    * on pre/pos where the data is stored. t, s, p are saved for every node. */
-  IntArrayList next;
+  final IntArrayList next;
 
   /**
    * Constructor.

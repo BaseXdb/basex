@@ -1,7 +1,6 @@
 package org.basex.index;
 
 import org.basex.data.Data.IndexType;
-import org.basex.util.Token;
 
 /**
  * This class defines access to index text tokens.
@@ -10,10 +9,10 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class ValuesToken implements IndexToken {
-  /** Text. */
-  private byte[] text = Token.EMPTY;
   /** Index type. */
   private final IndexType type;
+  /** Text. */
+  private final byte[] text;
 
   /**
    * Constructor.

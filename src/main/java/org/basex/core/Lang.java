@@ -36,7 +36,8 @@ public final class Lang {
   private static final String SUFFIX = "lang";
 
   /** Cached source files. */
-  private static HashMap<String, String> texts = new HashMap<String, String>();
+  private static final HashMap<String, String> TETXTS =
+    new HashMap<String, String>();
   /** Checks which strings have been applied. */
   private static HashMap<String, Boolean> check;
 
@@ -71,8 +72,8 @@ public final class Lang {
           String val = line.substring(i + 1);
           if(val.contains("\\n")) val = val.replaceAll("\\\\n", Prop.NL);
           if(Prop.langkeys) val = "[" + key + ": " + val + "]";
-          if(texts.get(key) == null) {
-            texts.put(key, val);
+          if(TETXTS.get(key) == null) {
+            TETXTS.put(key, val);
           } else if(chk) {
             Main.errln("%." + SUFFIX + ": '%' assigned twice", lang, key);
           }
@@ -100,9 +101,9 @@ public final class Lang {
       return null;
     }
 
-    final String val = texts.get(key);
+    final String val = TETXTS.get(key);
     if(val == null) {
-      if(texts.size() != 0) Main.errln("%." + SUFFIX + ": '%' missing",
+      if(TETXTS.size() != 0) Main.errln("%." + SUFFIX + ": '%' missing",
           Prop.language, key);
       return "?????";
     }

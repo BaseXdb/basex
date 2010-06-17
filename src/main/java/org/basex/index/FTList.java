@@ -56,7 +56,7 @@ abstract class FTList {
    * Checks if more tokens are found.
    * @throws IOException I/O exception
    */
-  void next() throws IOException {
+  final void next() throws IOException {
     if(wasted) return;
 
     tok = token();

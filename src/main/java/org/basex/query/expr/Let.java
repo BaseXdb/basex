@@ -21,7 +21,7 @@ import org.basex.util.Token;
  */
 public final class Let extends ForLet {
   /** Scoring flag. */
-  boolean score;
+  final boolean score;
 
   /**
    * Constructor.

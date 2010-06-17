@@ -11,8 +11,6 @@ public enum FileType {
   ARCHIVE,
   /** Audio resource (e.g. MP3 file). */
   AUDIO,
-  /** Binary resource. */
-  BINARY,
   /** Calendar resource (e.g. ICS file). */
   CALENDAR,
   /** Contact resource (e.g. VCF file). */
@@ -29,8 +27,6 @@ public enum FileType {
   PRESENTATION,
   /** Script. */
   SCRIPT,
-  /** Source code. */
-  SOURCE_CODE,
   /** Text(-based) resource (e.g. plain text file). */
   TEXT,
   /** Unknown resource type. */

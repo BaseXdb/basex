@@ -202,7 +202,7 @@ public interface BuildText {
     /** Quoted Text.         */ QUOTE("Quote");
 
     /** String representation of token type. */
-    public String string;
+    public final String string;
 
     /**
      * Enumeration constructor.

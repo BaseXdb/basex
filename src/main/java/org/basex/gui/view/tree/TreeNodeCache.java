@@ -11,9 +11,9 @@ import org.basex.util.IntList;
  */
 final class TreeNodeCache implements TreeViewOptions {
   /** Document depth. */
-  private int maxLevel = -1;
+  private final int maxLevel;
   /** All nodes document nodes per level. */
-  private IntList[] nodes;
+  private final IntList[] nodes;
 
   /**
    * This constructor invokes methods to cache all document nodes.
@@ -21,14 +21,6 @@ final class TreeNodeCache implements TreeViewOptions {
    */
   TreeNodeCache(final Data data) {
     maxLevel = data.meta.height + 1;
-    cacheNodes(data);
-  }
-
-  /**
-   * Determines nodes in each level and caches them.
-   * @param data data reference
-   */
-  private void cacheNodes(final Data data) {
 
     // long time = System.currentTimeMillis();
 

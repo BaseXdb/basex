@@ -35,6 +35,8 @@ final class MapFS extends MapPainter {
   private static MapFSImages images;
   /** Data FS reference. */
   private final DeepFS fs;
+  /** GUI FS reference. */
+  private final GUIFS gfs;
 
   /**
    * Constructor.
@@ -45,6 +47,7 @@ final class MapFS extends MapPainter {
   MapFS(final MapView m, final DeepFS f, final GUIProp pr) {
     super(m, pr);
     fs = f;
+    gfs = GUIFS.get();
     if(images == null) images = new MapFSImages(m);
   }
 
@@ -70,7 +73,8 @@ final class MapFS extends MapPainter {
       // level 1: next context node, set marker pointer to 0
       final int lvl = r.level;
 
-      final boolean isImage = GUIFS.mime(fs.name(r.pre)) == GUIFS.Type.IMAGE;
+      final boolean isImage = GUIFS.get().mime(fs.name(r.pre)) ==
+        GUIFS.Type.IMAGE;
       final boolean full = r.w == ww && r.h == hh;
       Color col = color(rects, ri);
       final boolean mark = col != null;
@@ -151,7 +155,7 @@ final class MapFS extends MapPainter {
           ViewData.path(data, pre) : ViewData.tag(prop, data, pre);
 
     // image display
-    final boolean isImage = GUIFS.mime(name) == GUIFS.Type.IMAGE;
+    final boolean isImage = gfs.mime(name) == GUIFS.Type.IMAGE;
     if(isImage) {
       final Image image = images.get(pre);
       if(image != null) {
@@ -181,7 +185,7 @@ final class MapFS extends MapPainter {
     g.setFont(tag ? fullsize == 1 ? lfont : font : mfont);
 
     // determine icon size
-    final Image icon = file ? GUIFS.images(name, fullsize) : null;
+    final Image icon = file ? gfs.images(name, fullsize) : null;
     final int fh = g.getFontMetrics().getHeight();
 
     if(fullsize == 0) {
@@ -205,7 +209,7 @@ final class MapFS extends MapPainter {
     } else {
       // paint bigger header
       if(tag) {
-        if(GUIFS.mime(name) == GUIFS.Type.IMAGE) return false;
+        if(gfs.mime(name) == GUIFS.Type.IMAGE) return false;
 
         // Fullscreen Mode
         g.setColor(COLORS[rect.level + 2]);
@@ -270,7 +274,7 @@ final class MapFS extends MapPainter {
     // prepare content display
     byte[] fileBuf = EMPTY;
     if(file) {
-      if(GUIFS.mime(name) != GUIFS.Type.IMAGE) fileBuf = content(data, rect);
+      if(gfs.mime(name) != GUIFS.Type.IMAGE) fileBuf = content(data, rect);
       if(fileBuf.length == 0) fileBuf = MAPBINARY;
     }
 
@@ -305,7 +309,7 @@ final class MapFS extends MapPainter {
 
     final boolean active = r.w >= 16 && r.h >= 16 && my - r.y < 16 &&
       mx - r.x < 16 && fs.isFile(r.pre) &&
-      GUIFS.mime(fs.name(r.pre)) != GUIFS.Type.IMAGE;
+      gfs.mime(fs.name(r.pre)) != GUIFS.Type.IMAGE;
 
     if(active && click) {
       try {
@@ -323,8 +327,8 @@ final class MapFS extends MapPainter {
     for(final MapRect r : rects) {
       if(r.w > off && r.h > off && fs.isFile(r.pre)) {
         final byte[] name = fs.name(r.pre);
-        if(r.type == -1) r.type = GUIFS.type(name);
-        if(GUIFS.mime(name) == GUIFS.Type.IMAGE) {
+        if(r.type == -1) r.type = gfs.type(name);
+        if(gfs.mime(name) == GUIFS.Type.IMAGE) {
           final int o = PICOFFSET << 1;
           images.add(r.pre, r.w - o, r.h - o);
         }

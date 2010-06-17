@@ -140,7 +140,7 @@ public enum Axis {
    * Inverts the axis.
    * @return inverted axis
    */
-  Axis invert() {
+  final Axis invert() {
     switch(this) {
       case ANC:        return Axis.DESC;
       case ANCORSELF:  return Axis.DESCORSELF;

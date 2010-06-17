@@ -37,57 +37,57 @@ public final class SpotlightExtractor implements IFileParser {
    * @author Bastian Lemke
    */
   enum SpotlightContentType {
-        /** MP3 file. */
+    /** MP3 file. */
     PUBLIC_MP3(FileType.AUDIO, MimeType.MP3),
-        /** JPEG file. */
+    /** JPEG file. */
     PUBLIC_JPEG(FileType.PICTURE, MimeType.JPG),
-        /** PNG file. */
+    /** PNG file. */
     PUBLIC_PNG(FileType.PICTURE, MimeType.PNG),
-        /** GIF file. */
+    /** GIF file. */
     COM_COMPUSERVE_GIF(FileType.PICTURE, MimeType.GIF),
-        /** BMP file. */
+    /** BMP file. */
     COM_MICROSOFT_BMP(FileType.PICTURE, MimeType.BMP),
-        /** TIFF file. */
+    /** TIFF file. */
     PUBLIC_TIFF(FileType.PICTURE, MimeType.TIFF),
-        /** HTML file. */
+    /** HTML file. */
     PUBLIC_HTML(FileType.WEBSITE, MimeType.HTML),
-        /** Plain text file. */
+    /** Plain text file. */
     PUBLIC_PLAIN_TEXT(FileType.TEXT, MimeType.TXT),
-        /** CSS file. */
+    /** CSS file. */
     COM_APPLE_DASHCODE_CSS(FileType.TEXT, MimeType.CSS),
-        /** Email file. */
+    /** Email file. */
     COM_APPLE_MAIL_EMAIL(FileType.MESSAGE),
-        /** Email file. */
+    /** Email file. */
     COM_APPLE_MAIL_EMLX(FileType.MESSAGE),
-        /** Word file. */
+    /** Word file. */
     COM_MICROSOFT_WORD_DOC(FileType.DOCUMENT, MimeType.DOC),
-        /** PDF file. */
+    /** PDF file. */
     COM_ADOBE_PDF(FileType.DOCUMENT, MimeType.PDF),
-        /** Image. */
+    /** Image. */
     PUBLIC_IMAGE(FileType.PICTURE),
-        /** Audio. */
+    /** Audio. */
     PUBLIC_AUDIO(FileType.AUDIO),
-        /** Audiovisual content. */
+    /** Audio-visual content. */
     PUBLIC_AUDIOVISUAL_CONTENT(FileType.VIDEO),
-        /** Data. */
+    /** Data. */
     PUBLIC_DATA,
-        /** Item. */
+    /** Item. */
     PUBLIC_ITEM,
-        /** Content. */
+    /** Content. */
     PUBLIC_CONTENT,
-        /** E-mail message. */
+    /** E-mail message. */
     PUBLIC_EMAIL_MESSAGE(FileType.MESSAGE),
-        /** Message. */
+    /** Message. */
     PUBLIC_MESSAGE(FileType.MESSAGE),
-        /** Script. */
+    /** Script. */
     PUBLIC_SCRIPT(FileType.SCRIPT),
-        /** Shell script. */
+    /** Shell script. */
     PUBLIC_SHELL_SCRIPT(FileType.SCRIPT),
-        /** Source code. */
+    /** Source code. */
     PUBLIC_SOURCE_CODE,
-        /** Text. */
+    /** Text. */
     PUBLIC_TEXT(FileType.TEXT),
-        /** XML. */
+    /** XML. */
     PUBLIC_XML(FileType.XML, MimeType.XML);
 
     /** The {@link FileType}. */
@@ -142,7 +142,7 @@ public final class SpotlightExtractor implements IFileParser {
    * Registered metadata items and corresponding actions for metadata events.
    */
   enum Item {
-        /** Date and time of the last change made to a metadata attribute. */
+    /** Date and time of the last change made to a metadata attribute. */
     AttributeChangeDate {
       @Override
       void parse(final DeepFile deepFile, final Object o) {
@@ -151,7 +151,8 @@ public final class SpotlightExtractor implements IFileParser {
             ParserUtil.convertDateTime((Date) o));
       }
     },
-        /**
+
+    /**
      * Title for the collection containing this item. This is analogous to a
      * record label or photo album.
      */
@@ -161,14 +162,16 @@ public final class SpotlightExtractor implements IFileParser {
         if(check(o, String.class)) deepFile.addMeta(MetaElem.ALBUM, (String) o);
       }
     },
-        /** Track number of a song or composition when it's part of an album. */
+
+    /** Track number of a song or composition when it's part of an album. */
     AudioTrackNumber {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
         parseInt(deepFile, MetaElem.TRACK, o);
       }
     },
-        /** The author of the contents of the file. */
+
+    /** The author of the contents of the file. */
     Authors {
       @Override
       void parse(final DeepFile deepFile, final Object o) {
@@ -179,7 +182,8 @@ public final class SpotlightExtractor implements IFileParser {
         else deepFile.addMeta(MetaElem.CREATOR_NAME, str);
       }
     },
-        /**
+
+    /**
      * Identifies city of origin according to guidelines established by the
      * provider. For example, "New York", "Cupertino", or "Toronto".
      */
@@ -189,7 +193,8 @@ public final class SpotlightExtractor implements IFileParser {
         if(check(o, String.class)) deepFile.addMeta(MetaElem.CITY, (String) o);
       }
     },
-        /**
+
+    /**
      * A comment related to the file. This comment is not displayed by the
      * Finder.
      */
@@ -200,7 +205,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /** Composer of the song in the audio file. */
+
+    /** Composer of the song in the audio file. */
     Composer {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
@@ -208,7 +214,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /** The date and time that the content was created. */
+
+    /** The date and time that the content was created. */
     ContentCreationDate {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
@@ -216,14 +223,7 @@ public final class SpotlightExtractor implements IFileParser {
             ParserUtil.convertDateTime((Date) o));
       }
     },
-        // /** Date and time when the content of this item was modified. */
-    // ContentModificationDate {
-    // @Override
-    // public void parse(final MetaStore deepFile, final Object o) {
-    // if(check(o, Date.class)) deepFile.add(MetaElem.DATE_CONTENT_MODIFIED,
-    // (String) o);
-    // }
-    // },
+
     /**
      * Uniform Type Identifier of the file. For example, a jpeg image file will
      * have a value of public.jpeg.
@@ -247,7 +247,8 @@ public final class SpotlightExtractor implements IFileParser {
         }
       }
     },
-        /**
+
+    /**
      * Entity responsible for making contributions to the content of the
      * resource. Examples of a contributor include a person, an organization or
      * a service.
@@ -259,7 +260,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /**
+
+    /**
      * The full, publishable name of the country or primary location where the
      * intellectual property of the item was created, according to guidelines of
      * the provider.
@@ -271,7 +273,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /** Description of the kind of item this file represents. */
+
+    /** Description of the kind of item this file represents. */
     Description {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
@@ -279,7 +282,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /**
+
+    /**
      * The duration, in seconds, of the content of the item. A value of 10.5
      * represents media that is 10 and 1/2 seconds long.
      */
@@ -289,7 +293,8 @@ public final class SpotlightExtractor implements IFileParser {
         parseDuration(deepFile, MetaElem.DURATION, o);
       }
     },
-        /** Mac OS X Finder comments for this item. */
+
+    /** Mac OS X Finder comments for this item. */
     FinderComment {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
@@ -297,21 +302,7 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        // /** Date the file contents last changed. */
-    // FSContentChangeDate {
-    // @Override
-    // void parse(final MetaStore deepFile, final Object o) {
-    // if(check(o, Date.class)) deepFile.add(MetaElem.DATE_CONTENT_MODIFIED,
-    // (String) o);
-    // }
-    // },
-    // /** Date that the contents of the file were created. */
-    // FSCreationDate {
-    // @Override
-    // public void parse(final MetaStore deepFile, final Object o) {
-    // obj.dateEvent(DateField.DATE_CREATED, o);
-    // }
-    // },
+
     /** Group ID of the owner of the file. */
     FSOwnerGroupID {
       @Override
@@ -319,14 +310,16 @@ public final class SpotlightExtractor implements IFileParser {
         parseInt(deepFile, MetaElem.FS_OWNER_GROUP_ID, o);
       }
     },
-        /** User ID of the owner of the file. */
+
+    /** User ID of the owner of the file. */
     FSOwnerUserID {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
         parseInt(deepFile, MetaElem.FS_OWNER_USER_ID, o);
       }
     },
-        /**
+
+    /**
      * Publishable entry providing a synopsis of the contents of the item. For
      * example, "Apple Introduces the iPod Photo".
      */
@@ -337,7 +330,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /**
+
+    /**
      * Formal identifier used to reference the resource within a given context.
      * For example, the Message-ID of a mail message.
      */
@@ -348,7 +342,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /**
+
+    /**
      * Keywords associated with this file. For example, "Birthday", "Important",
      * etc.
      */
@@ -359,7 +354,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /**
+
+    /**
      * Indicates the languages used by the item. The recommended best practice
      * for the values of this attribute are defined by RFC 3066.
      */
@@ -370,7 +366,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /**
+
+    /**
      * Date and time that the file was last used. This value is updated
      * automatically by LaunchServices everytime a file is opened by double
      * clicking, or by asking LaunchServices to open a file.
@@ -382,7 +379,8 @@ public final class SpotlightExtractor implements IFileParser {
             ParserUtil.convertDateTime((Date) o));
       }
     },
-        /** Lyricist of the song in the audio file. */
+
+    /** Lyricist of the song in the audio file. */
     Lyricist {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
@@ -390,7 +388,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /**
+
+    /**
      * Musical genre of the song or composition contained in the audio file. For
      * example: "Jazz", "Pop", "Rock", "Classical".
      */
@@ -413,14 +412,16 @@ public final class SpotlightExtractor implements IFileParser {
         }
       }
     },
-        /** Number of pages in the document. */
+
+    /** Number of pages in the document. */
     NumberOfPages {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
         parseInt(deepFile, MetaElem.NUMBER_OF_PAGES, o);
       }
     },
-        /**
+
+    /**
      * Height, in pixels, of the contents. For example, the image height or the
      * video frame height.
      */
@@ -430,7 +431,8 @@ public final class SpotlightExtractor implements IFileParser {
         parseInt(deepFile, MetaElem.PIXEL_HEIGHT, o);
       }
     },
-        /**
+
+    /**
      * Width, in pixels, of the contents. For example, the image width or the
      * video frame width.
      */
@@ -440,7 +442,8 @@ public final class SpotlightExtractor implements IFileParser {
         parseInt(deepFile, MetaElem.PIXEL_WIDTH, o);
       }
     },
-        /**
+
+    /**
      * Publishers of the item. For example, a person, an organization, or a
      * service.
      */
@@ -451,7 +454,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /** Recipients of this item. */
+
+    /** Recipients of this item. */
     Recipients {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {
@@ -462,7 +466,8 @@ public final class SpotlightExtractor implements IFileParser {
         else deepFile.addMeta(MetaElem.RECEIVER_NAME, str);
       }
     },
-        /**
+
+    /**
      * Recording date of the song or composition. This is in contrast to
      * kMDItemContentCreationDate which, could indicate the creation date of an
      * edited or "mastered" version of the original art.
@@ -474,7 +479,8 @@ public final class SpotlightExtractor implements IFileParser {
             (String) o);
       }
     },
-        /**
+
+    /**
      * Title of the item. For example, this could be the title of a document,
      * the name of an song, or the subject of an email message.
      */
@@ -530,7 +536,9 @@ public final class SpotlightExtractor implements IFileParser {
      * @param e the corresponding metadata element for this object
      * @param o the object to convert
      */
-    void parseDuration(final DeepFile ms, final MetaElem e, final Object o) {
+    void parseDuration(final DeepFile ms, final MetaElem e,
+        final Object o) {
+
       final Long value = long0(o);
       if(value != null) ms.addMeta(e,
           ParserUtil.convertMsDuration((int) (value * 1000)));

@@ -15,9 +15,9 @@ public enum DeepNS {
   DCTERMS("", "http://purl.org/dc/terms/");
 
   /** The namespace prefix. */
-  private String prefix;
+  private final String prefix;
   /** The namespace URI. */
-  private String uri;
+  private final String uri;
 
   /**
    * Initializes a namespace instance.

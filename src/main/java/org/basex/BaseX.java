@@ -91,7 +91,7 @@ public class BaseX extends Main {
       errln(FILEWHICH, file);
     } else {
       try {
-        return new XMLInput(io).content().toString().trim();
+        return XMLInput.content(io).toString().trim();
       } catch(final IOException ex) {
         error(ex, ex.getMessage());
       }

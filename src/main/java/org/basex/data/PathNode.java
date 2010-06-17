@@ -21,10 +21,10 @@ public final class PathNode {
   public final short name;
   /** Node kind, defined in the {@link Data} class. */
   public final byte kind;
-  /** Counter. */
-  public int count;
   /** Parent. */
-  public PathNode par;
+  public final PathNode par;
+  /** Counter. */
+  public int size;
   /** Children. */
   PathNode[] ch;
 
@@ -36,7 +36,7 @@ public final class PathNode {
    */
   PathNode(final int t, final byte k, final PathNode p) {
     ch = new PathNode[0];
-    count = 1;
+    size = 1;
     name = (short) t;
     kind = k;
     par = p;
@@ -51,7 +51,7 @@ public final class PathNode {
   PathNode(final DataInput in, final PathNode p) throws IOException {
     name = (short) in.readNum();
     kind = in.readByte();
-    count = in.readNum();
+    size = in.readNum();
     ch = new PathNode[in.readNum()];
     in.readDouble();
     par = p;
@@ -67,7 +67,7 @@ public final class PathNode {
   PathNode get(final int t, final byte k) {
     for(final PathNode c : ch) {
       if(c.kind == k && c.name == t) {
-        c.count++;
+        c.size++;
         return c;
       }
     }
@@ -88,7 +88,7 @@ public final class PathNode {
   void finish(final DataOutput out) throws IOException {
     out.writeNum(name);
     out.write1(kind);
-    out.writeNum(count);
+    out.writeNum(size);
     out.writeNum(ch.length);
     out.writeDouble(0);
     for(final PathNode c : ch) c.finish(out);
@@ -153,7 +153,7 @@ public final class PathNode {
       case Data.COMM: tb.add(COMM); break;
       case Data.PI:   tb.add(PI); break;
     }
-    tb.add(" " + count + "x");
+    tb.add(" " + size + "x");
     for(final PathNode p : ch) tb.add(p.info(data, l + 1));
     return tb.finish();
   }
@@ -171,7 +171,7 @@ public final class PathNode {
     } else if(kind == Data.ATTR) {
       ser.attribute(NAME, Token.concat(ATT, data.atts.key(name)));
     }
-    ser.text(Token.token(count));
+    ser.text(Token.token(size));
     for(final PathNode p : ch) p.plan(data, ser);
     ser.closeElement();
   }

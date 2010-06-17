@@ -25,8 +25,11 @@ public abstract class Proc extends Progress {
   /** Commands flag: data reference needed. */
   public static final int DATAREF = 512;
 
+  /** Container for query information. */
+  protected final TokenBuilder info = new TokenBuilder();
   /** Command arguments. */
-  protected String[] args;
+  protected final String[] args;
+
   /** Database context. */
   protected Context context;
   /** Output stream. */
@@ -34,8 +37,6 @@ public abstract class Proc extends Progress {
   /** Database properties. */
   protected Prop prop;
 
-  /** Container for query information. */
-  protected TokenBuilder info = new TokenBuilder();
   /** Performance measurements. */
   protected Performance perf;
   /** Temporary query result. */
@@ -61,7 +62,7 @@ public abstract class Proc extends Progress {
    * @param os output stream reference
    * @throws BaseXException process exception
    */
-  public void execute(final Context ctx, final OutputStream os)
+  public final void execute(final Context ctx, final OutputStream os)
       throws BaseXException {
     if(!exec(ctx, os)) throw new BaseXException(info());
   }
@@ -74,7 +75,7 @@ public abstract class Proc extends Progress {
    * @param ctx database context
    * @throws BaseXException process exception
    */
-  public void execute(final Context ctx) throws BaseXException {
+  public final void execute(final Context ctx) throws BaseXException {
     if(!exec(ctx)) throw new BaseXException(info());
   }
 
@@ -159,7 +160,7 @@ public abstract class Proc extends Progress {
    * @param ctx query context
    * @return result of check
    */
-  public boolean run(final Context ctx) {
+  public final boolean run(final Context ctx) {
     return run(ctx, null);
   }
 

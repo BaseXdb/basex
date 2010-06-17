@@ -30,10 +30,11 @@ import org.basex.util.StringList;
 public final class GUIInput extends BaseXTextField {
   /** Reference to main window. */
   final GUI gui;
+  /** JComboBox. */
+  final BaseXCombo box;
+
   /** BasicComboPopup Menu. */
   ComboPopup pop;
-  /** JComboBox. */
-  BaseXCombo box;
   /** String for temporary input. */
   private String pre = "";
 

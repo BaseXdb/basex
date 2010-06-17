@@ -253,9 +253,9 @@ public final class FolderView extends View {
       Image box = opened[pre] ? openedBox : closedBox;
       // print file icon
       if(file) {
-        box = GUIFS.images(name, off);
+        box = GUIFS.get().images(name, off);
       } else if(dir) {
-        box = opened[pre] ? GUIFS.folder2[off] : GUIFS.folder1[off];
+        box = opened[pre] ? GUIFS.get().folder2[off] : GUIFS.get().folder1[off];
       }
       g.drawImage(box, xx - lineH, yy, this);
       if(fs && (file || dir)) xx += large ? 12 : 6;

@@ -19,9 +19,9 @@ import org.basex.util.Token;
  */
 public final class Pos extends Simple {
   /** Minimum position. */
-  long min;
+  final long min;
   /** Maximum position. */
-  long max;
+  final long max;
 
   /**
    * Constructor.

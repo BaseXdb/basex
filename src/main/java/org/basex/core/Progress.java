@@ -91,7 +91,7 @@ public abstract class Progress {
   /**
    * Checks if the progress was interrupted; if yes, sends a runtime exception.
    */
-  public void checkStop() {
+  public final void checkStop() {
     if(stopped) throw new ProgressException();
   }
 
@@ -106,7 +106,7 @@ public abstract class Progress {
    * Starts a timeout thread.
    * @param time time to wait
    */
-  public void startTimeout(final long time) {
+  public final void startTimeout(final long time) {
     if(time == 0) return;
 
     timeout = new Thread() {
@@ -122,7 +122,7 @@ public abstract class Progress {
   /**
    * Stops the timeout thread.
    */
-  public void stopTimeout() {
+  public final void stopTimeout() {
     if(timeout != null) {
       timeout.interrupt();
       timeout = null;

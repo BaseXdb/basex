@@ -1,5 +1,6 @@
 package org.deepfs.fsml;
 
+import static org.deepfs.fsml.DeepNS.*;
 import org.basex.core.Main;
 import org.basex.query.item.Type;
 import org.basex.util.Token;
@@ -13,257 +14,230 @@ import org.basex.util.Token;
 public enum MetaElem {
 
   /** Type. */
-  TYPE(DeepNS.DCTERMS, "type", Type.STR, true),
+  TYPE(DCTERMS, "type", Type.STR, true),
   /** Format (MIME type). */
-  FORMAT(DeepNS.DCTERMS, "format", Type.STR, false),
-
-  /** container element "content". */
-  CONTENT(DeepNS.DEEPURL, "content"),
+  FORMAT(DCTERMS, "format", Type.STR, false),
 
   // ----- duration fields ---------------------------------------------------
 
   /** Duration. */
-  DURATION(DeepNS.FSMETA, "duration", Type.DUR, false),
+  DURATION(FSMETA, "duration", Type.DUR, false),
 
   // ----- date fields -------------------------------------------------------
 
-  /** Other date. */
-  DATE(DeepNS.DCTERMS, "date", Type.DAT, false),
-
   /** Date of the last change made to a metadata attribute. */
-  DATETIME_ATTRIBUTE_MODIFIED(DeepNS.FSMETA, "dateTimeAttributeModified",
+  DATETIME_ATTRIBUTE_MODIFIED(FSMETA, "dateTimeAttributeModified",
       Type.DTM, false),
-  /** Date of the last change made to the content. */
-  DATETIME_CONTENT_MODIFIED(DeepNS.FSMETA, "dateTimeContentModified", Type.DTM,
-      false),
   /** Date when the content was created. */
-  DATETIME_CREATED(DeepNS.FSMETA, "dateTimeCreated", Type.DTM, false),
+  DATETIME_CREATED(FSMETA, "dateTimeCreated", Type.DTM, false),
   /** Date when the content was digitized. */
-  DATETIME_DIGITIZED(DeepNS.FSMETA, "dateTimeDigitized", Type.DTM, false),
+  DATETIME_DIGITIZED(FSMETA, "dateTimeDigitized", Type.DTM, false),
   /** Date of the last usage. */
-  DATETIME_LAST_USED(DeepNS.FSMETA, "dateTimeLastUsed", Type.DTM, false),
+  DATETIME_LAST_USED(FSMETA, "dateTimeLastUsed", Type.DTM, false),
   /** Original date. */
-  DATETIME_ORIGINAL(DeepNS.FSMETA, "dateTimeOriginal", Type.DTM, false),
+  DATETIME_ORIGINAL(FSMETA, "dateTimeOriginal", Type.DTM, false),
   /** Year. */
-  YEAR(DeepNS.FSMETA, "year", Type.YEA, false),
+  YEAR(FSMETA, "year", Type.YEA, false),
 
   // ----- integer fields ----------------------------------------------------
 
   /** Beats per minute. */
-  BEATS_PER_MINUTE(DeepNS.FSMETA, "beatsPerMinute", Type.INT, false),
+  BEATS_PER_MINUTE(FSMETA, "beatsPerMinute", Type.INT, false),
   /** Bitrate. */
-  BITRATE_KBIT(DeepNS.FSMETA, "bitrateKBitS", Type.INT, false),
+  BITRATE_KBIT(FSMETA, "bitrateKBitS", Type.INT, false),
   /** iTunes compilation flag. */
-  ITUNES_COMPILATION(DeepNS.FSMETA, "iTunesCompilation", Type.INT, false),
+  ITUNES_COMPILATION(FSMETA, "iTunesCompilation", Type.INT, false),
   /** ISO speed ratings. */
-  ISO_SPEED_RATINGS(DeepNS.FSMETA, "isoSpeedRatings", Type.INT, false),
+  ISO_SPEED_RATINGS(FSMETA, "isoSpeedRatings", Type.INT, false),
   /** Focal length in 35mm film. */
-  FOCAL_LENGTH_IN_35MM_FILM(DeepNS.FSMETA, "focalLengthIn35mmFilm", Type.INT,
-      false),
+  FOCAL_LENGTH_IN_35MM_FILM(FSMETA, "focalLengthIn35mmFilm", Type.INT, false),
   /** Group ID of the owner of the file. */
-  FS_OWNER_GROUP_ID(DeepNS.FSMETA, "fsOwnerGroupId", Type.INT, false),
+  FS_OWNER_GROUP_ID(FSMETA, "fsOwnerGroupId", Type.INT, false),
   /** User ID of the owner of the file. */
-  FS_OWNER_USER_ID(DeepNS.FSMETA, "fsOwnerUserId", Type.INT, false),
-  /** Size of the file in the file system. */
-  FS_SIZE(DeepNS.FSMETA, "fsSize", Type.INT, false),
-  /** Height in millimeters. */
-  MM_HEIGHT(DeepNS.FSMETA, "mmHeight", Type.INT, false),
-  /** Width in millimeters. */
-  MM_WIDTH(DeepNS.FSMETA, "mmWidth", Type.INT, false),
+  FS_OWNER_USER_ID(FSMETA, "fsOwnerUserId", Type.INT, false),
   /** Number of pages. */
-  NUMBER_OF_PAGES(DeepNS.FSMETA, "numberOfPages", Type.INT, false),
+  NUMBER_OF_PAGES(FSMETA, "numberOfPages", Type.INT, false),
   /** Height in pixels. */
-  PIXEL_HEIGHT(DeepNS.FSMETA, "pixelHeight", Type.INT, false),
+  PIXEL_HEIGHT(FSMETA, "pixelHeight", Type.INT, false),
   /** Width in pixels. */
-  PIXEL_WIDTH(DeepNS.FSMETA, "pixelWidth", Type.INT, false),
+  PIXEL_WIDTH(FSMETA, "pixelWidth", Type.INT, false),
   /** Sample rate. */
-  SAMPLE_RATE(DeepNS.FSMETA, "sampleRate", Type.INT, false),
+  SAMPLE_RATE(FSMETA, "sampleRate", Type.INT, false),
   /** Track number. */
-  TRACK(DeepNS.FSMETA, "track", Type.INT, false),
+  TRACK(FSMETA, "track", Type.INT, false),
 
   // ----- double fields -----------------------------------------------------
 
   /** Aperture value. */
-  APERTURE_VALUE(DeepNS.FSMETA, "apertureValue", Type.DBL, false),
+  APERTURE_VALUE(FSMETA, "apertureValue", Type.DBL, false),
   /** Maximum aperture value. */
-  APERTURE_VALUE_MAX(DeepNS.FSMETA, "apertureValueMax", Type.DBL, false),
+  APERTURE_VALUE_MAX(FSMETA, "apertureValueMax", Type.DBL, false),
   /** Brightness value. */
-  BRIGHTNESS_VALUE(DeepNS.FSMETA, "brightnessValue", Type.DBL, false),
+  BRIGHTNESS_VALUE(FSMETA, "brightnessValue", Type.DBL, false),
   /** Compressed bits per pixel. */
-  COMPRESSED_BITS_PER_PIXEL(DeepNS.FSMETA, "compressedBitsPerPixel", Type.DBL,
-      false),
+  COMPRESSED_BITS_PER_PIXEL(FSMETA, "compressedBitsPerPixel", Type.DBL, false),
   /** Digital zoom ratio. */
-  DIGITAL_ZOOM_RATIO(DeepNS.FSMETA, "digitalZoomRatio", Type.DBL, false),
+  DIGITAL_ZOOM_RATIO(FSMETA, "digitalZoomRatio", Type.DBL, false),
   /** Exposure bias value. */
-  EXPOSURE_BIAS_VALUE(DeepNS.FSMETA, "exposureBiasValue", Type.DBL, false),
+  EXPOSURE_BIAS_VALUE(FSMETA, "exposureBiasValue", Type.DBL, false),
   /** Exposure index. */
-  EXPOSURE_INDEX(DeepNS.FSMETA, "exposureIndex", Type.DBL, false),
+  EXPOSURE_INDEX(FSMETA, "exposureIndex", Type.DBL, false),
   /** Exposure time in seconds. */
-  EXPOSURE_TIME_MS(DeepNS.FSMETA, "exposureTimeMs", Type.DBL, false),
+  EXPOSURE_TIME_MS(FSMETA, "exposureTimeMs", Type.DBL, false),
   /** F number. */
-  F_NUMBER(DeepNS.FSMETA, "fNumber", Type.DBL, false),
+  F_NUMBER(FSMETA, "fNumber", Type.DBL, false),
   /** Focal length. */
-  FOCAL_LENGTH(DeepNS.FSMETA, "focalLengthMM", Type.DBL, false),
+  FOCAL_LENGTH(FSMETA, "focalLengthMM", Type.DBL, false),
   /** Focal plane X resolution. */
-  FOCAL_PLANE_X_RESOLUTION(DeepNS.FSMETA, "focalPlaneXresolution", Type.DBL,
-      false),
+  FOCAL_PLANE_X_RESOLUTION(FSMETA, "focalPlaneXresolution", Type.DBL, false),
   /** Focal plane Y resolution. */
-  FOCAL_PLANE_Y_RESOLUTION(DeepNS.FSMETA, "focalPlaneYresolution", Type.DBL,
-      false),
+  FOCAL_PLANE_Y_RESOLUTION(FSMETA, "focalPlaneYresolution", Type.DBL, false),
   /** Shutter speed value. */
-  SHUTTER_SPEED_VALUE(DeepNS.FSMETA, "shutterSpeedValue", Type.DBL, false),
+  SHUTTER_SPEED_VALUE(FSMETA, "shutterSpeedValue", Type.DBL, false),
   /** Subject distance. */
-  SUBJECT_DISTANCE(DeepNS.FSMETA, "subjectDistance", Type.DBL, false),
+  SUBJECT_DISTANCE(FSMETA, "subjectDistance", Type.DBL, false),
   /** X resolution. */
-  X_RESOLUTION(DeepNS.FSMETA, "xResolution", Type.DBL, false),
+  X_RESOLUTION(FSMETA, "xResolution", Type.DBL, false),
   /** Y resolution. */
-  Y_RESOLUTION(DeepNS.FSMETA, "yResolution", Type.DBL, false),
+  Y_RESOLUTION(FSMETA, "yResolution", Type.DBL, false),
 
   // ----- string fields -----------------------------------------------------
 
-  /** Abstract. */
-  ABSTRACT(DeepNS.DCTERMS, "abstract", Type.STR, true),
   /** Album name. */
-  ALBUM(DeepNS.FSMETA, "album", Type.STR, true),
-  /** Alternative title. */
-  ALTERNATIVE(DeepNS.DCTERMS, "alternative", Type.STR, true),
+  ALBUM(FSMETA, "album", Type.STR, true),
   /** Artist. */
-  ARTIST(DeepNS.FSMETA, "artist", Type.STR, true),
+  ARTIST(FSMETA, "artist", Type.STR, true),
   /** City. */
-  CITY(DeepNS.FSMETA, "city", Type.STR, true),
+  CITY(FSMETA, "city", Type.STR, true),
   /** Codec. */
-  CODEC(DeepNS.FSMETA, "codec", Type.STR, false),
+  CODEC(FSMETA, "codec", Type.STR, false),
   /** Color space. */
-  COLOR_SPACE(DeepNS.FSMETA, "colorSpace", Type.STR, false),
+  COLOR_SPACE(FSMETA, "colorSpace", Type.STR, false),
   /** Comment. */
-  COMMENT(DeepNS.FSMETA, "comment", Type.STR, true),
+  COMMENT(FSMETA, "comment", Type.STR, true),
   /** Composer. */
-  COMPOSER(DeepNS.FSMETA, "composer", Type.STR, true),
+  COMPOSER(FSMETA, "composer", Type.STR, true),
   /** Contrast. */
-  CONTRAST(DeepNS.FSMETA, "contrast", Type.STR, false),
+  CONTRAST(FSMETA, "contrast", Type.STR, false),
   /** Contributor. */
-  CONTRIBUTOR(DeepNS.DCTERMS, "contributor", Type.STR, true),
+  CONTRIBUTOR(DCTERMS, "contributor", Type.STR, true),
   /** Carbon copy receiver (name). */
-  COPY_RECEIVER_NAME(DeepNS.FSMETA, "copyReceiverName", Type.STR, true),
+  COPY_RECEIVER_NAME(FSMETA, "copyReceiverName", Type.STR, true),
   /** Carbon copy receiver (email address). */
-  COPY_RECEIVER_EMAIL(DeepNS.FSMETA, "copyReceiverEmail", Type.STR, true),
+  COPY_RECEIVER_EMAIL(FSMETA, "copyReceiverEmail", Type.STR, true),
   /** Country. */
-  COUNTRY(DeepNS.FSMETA, "country", Type.STR, true),
+  COUNTRY(FSMETA, "country", Type.STR, true),
   /** Creator (name). */
-  CREATOR_NAME(DeepNS.FSMETA, "creatorName", Type.STR, true),
+  CREATOR_NAME(FSMETA, "creatorName", Type.STR, true),
   /** Creator (email address). */
-  CREATOR_EMAIL(DeepNS.FSMETA, "creatorEmail", Type.STR, true),
+  CREATOR_EMAIL(FSMETA, "creatorEmail", Type.STR, true),
   /** Custom rendered. */
-  CUSTOM_RENDERED(DeepNS.FSMETA, "customRendered", Type.STR, false),
+  CUSTOM_RENDERED(FSMETA, "customRendered", Type.STR, false),
   /** Description. */
-  DESCRIPTION(DeepNS.DCTERMS, "description", Type.STR, true),
+  DESCRIPTION(DCTERMS, "description", Type.STR, true),
   /** Emphasis. */
-  EMPHASIS(DeepNS.FSMETA, "emphasis", Type.STR, false),
+  EMPHASIS(FSMETA, "emphasis", Type.STR, false),
   /** Encoding software. */
-  ENCODER(DeepNS.FSMETA, "encoder", Type.STR, false),
+  ENCODER(FSMETA, "encoder", Type.STR, false),
   /** Encoding. */
-  ENCODING(DeepNS.FSMETA, "encoding", Type.STR, false),
+  ENCODING(FSMETA, "encoding", Type.STR, false),
   /** Exposure mode. */
-  EXPOSURE_MODE(DeepNS.FSMETA, "exposureMode", Type.STR, false),
+  EXPOSURE_MODE(FSMETA, "exposureMode", Type.STR, false),
   /** Exposure time as string. */
-  EXPOSURE_TIME(DeepNS.FSMETA, "exposureTime", Type.STR, false),
+  EXPOSURE_TIME(FSMETA, "exposureTime", Type.STR, false),
   /** Exposure program. */
-  EXPOSURE_PROGRAM(DeepNS.FSMETA, "exposureProgram", Type.STR, false),
+  EXPOSURE_PROGRAM(FSMETA, "exposureProgram", Type.STR, false),
   /** Flash. */
-  FLASH(DeepNS.FSMETA, "flash", Type.STR, false),
+  FLASH(FSMETA, "flash", Type.STR, false),
   /** Focal plane resolution unit. */
-  FOCAL_PLANE_RESOLUTION_UNIT(DeepNS.FSMETA, "focalPlaneResolutionUnit",
+  FOCAL_PLANE_RESOLUTION_UNIT(FSMETA, "focalPlaneResolutionUnit",
       Type.STR, false),
   /** Gain control. */
-  GAIN_CONTROL(DeepNS.FSMETA, "gainControl", Type.STR, false),
+  GAIN_CONTROL(FSMETA, "gainControl", Type.STR, false),
   /** Genre. */
-  GENRE(DeepNS.FSMETA, "genre", Type.STR, true),
+  GENRE(FSMETA, "genre", Type.STR, true),
   /**
    * Headline. Publishable entry providing a synopsis of the contents of the
    * item.
    */
-  HEADLINE(DeepNS.FSMETA, "headline", Type.STR, false),
+  HEADLINE(FSMETA, "headline", Type.STR, false),
   /** Blind carbon copy receiver (name). */
-  HIDDEN_RECEIVER_NAME(DeepNS.FSMETA, "hiddenReceiverName", Type.STR, true),
+  HIDDEN_RECEIVER_NAME(FSMETA, "hiddenReceiverName", Type.STR, true),
   /** Blind carbon copy receiver (email address). */
-  HIDDEN_RECEIVER_EMAIL(DeepNS.FSMETA, "hiddenReceiverEmail", Type.STR, true),
+  HIDDEN_RECEIVER_EMAIL(FSMETA, "hiddenReceiverEmail", Type.STR, true),
   /** Unique identifier. */
-  IDENTIFIER(DeepNS.DCTERMS, "identifier", Type.STR, false),
+  IDENTIFIER(DCTERMS, "identifier", Type.STR, false),
   /** Keyword. */
-  KEYWORD(DeepNS.FSMETA, "keyword", Type.STR, true),
+  KEYWORD(FSMETA, "keyword", Type.STR, true),
   /**
    * Language.
    * @see <a href="http://www.ietf.org/rfc/rfc4646.txt">RFC 4646</a>
    */
-  LANGUAGE(DeepNS.DCTERMS, "language", Type.STR, false),
+  LANGUAGE(DCTERMS, "language", Type.STR, false),
   /** Light source. */
-  LIGHT_SOURCE(DeepNS.FSMETA, "lightSource", Type.STR, false),
+  LIGHT_SOURCE(FSMETA, "lightSource", Type.STR, false),
   /** Lyrics. */
-  LYRICS(DeepNS.FSMETA, "lyrics", Type.STR, true),
+  LYRICS(FSMETA, "lyrics", Type.STR, true),
   /** Lyricist. */
-  LYRICIST(DeepNS.FSMETA, "lyricist", Type.STR, true),
+  LYRICIST(FSMETA, "lyricist", Type.STR, true),
   /** Make. */
-  MAKE(DeepNS.FSMETA, "make", Type.STR, false),
+  MAKE(FSMETA, "make", Type.STR, false),
   /** Metering mode. */
-  METERING_MODE(DeepNS.FSMETA, "meteringMode", Type.STR, false),
+  METERING_MODE(FSMETA, "meteringMode", Type.STR, false),
   /** Mode. */
-  MODE(DeepNS.FSMETA, "mode", Type.STR, false),
+  MODE(FSMETA, "mode", Type.STR, false),
   /** Model. */
-  MODEL(DeepNS.FSMETA, "model", Type.STR, false),
+  MODEL(FSMETA, "model", Type.STR, false),
   /** Orientation. */
-  ORIENTATION(DeepNS.FSMETA, "orientation", Type.STR, false),
+  ORIENTATION(FSMETA, "orientation", Type.STR, false),
   /** Original artist. */
-  ORIGINAL_ARTIST(DeepNS.FSMETA, "originalArtist", Type.STR, false),
+  ORIGINAL_ARTIST(FSMETA, "originalArtist", Type.STR, false),
   /** Primary chromaticities. */
-  PRIMARY_CHROMATICITIES(DeepNS.FSMETA, "primaryChromaticities", Type.STR,
-      false),
+  PRIMARY_CHROMATICITIES(FSMETA, "primaryChromaticities", Type.STR, false),
   /** Publisher. */
-  PUBLISHER(DeepNS.DCTERMS, "publisher", Type.STR, true),
+  PUBLISHER(DCTERMS, "publisher", Type.STR, true),
   /** Receiver (name). */
-  RECEIVER_NAME(DeepNS.FSMETA, "receiverName", Type.STR, true),
+  RECEIVER_NAME(FSMETA, "receiverName", Type.STR, true),
   /** Receiver (email address). */
-  RECEIVER_EMAIL(DeepNS.FSMETA, "receiverEmail", Type.STR, true),
+  RECEIVER_EMAIL(FSMETA, "receiverEmail", Type.STR, true),
   /** ReferenceBlackWhite. */
-  REFERENCE_BLACK_WHITE(DeepNS.FSMETA, "referenceBlackWhite", Type.STR, false),
+  REFERENCE_BLACK_WHITE(FSMETA, "referenceBlackWhite", Type.STR, false),
   /** Related sound file. */
-  RELATED_SOUND_FILE(DeepNS.FSMETA, "relatedSoundFile", Type.STR, false),
+  RELATED_SOUND_FILE(FSMETA, "relatedSoundFile", Type.STR, false),
   /** Resolution unit. */
-  RESOLUTION_UNIT(DeepNS.FSMETA, "resolutionUnit", Type.STR, false),
+  RESOLUTION_UNIT(FSMETA, "resolutionUnit", Type.STR, false),
   /** Copyright message. */
-  RIGHTS(DeepNS.DCTERMS, "rights", Type.STR, false),
+  RIGHTS(DCTERMS, "rights", Type.STR, false),
   /** Saturation. */
-  SATURATION(DeepNS.FSMETA, "saturation", Type.STR, false),
+  SATURATION(FSMETA, "saturation", Type.STR, false),
   /** Sharpness. */
-  SHARPNESS(DeepNS.FSMETA, "sharpness", Type.STR, false),
+  SHARPNESS(FSMETA, "sharpness", Type.STR, false),
   /** Scene capture type. */
-  SCENE_CAPTURE_TYPE(DeepNS.FSMETA, "sceneCaptureType", Type.STR, false),
+  SCENE_CAPTURE_TYPE(FSMETA, "sceneCaptureType", Type.STR, false),
   /** Sender (name). */
-  SENDER_NAME(DeepNS.FSMETA, "senderName", Type.STR, false),
+  SENDER_NAME(FSMETA, "senderName", Type.STR, false),
   /** Sender (email address). */
-  SENDER_EMAIL(DeepNS.FSMETA, "senderEmail", Type.STR, false),
+  SENDER_EMAIL(FSMETA, "senderEmail", Type.STR, false),
   /** Sensing method. */
-  SENSING_METHOD(DeepNS.FSMETA, "sensingMethod", Type.STR, false),
+  SENSING_METHOD(FSMETA, "sensingMethod", Type.STR, false),
   /** Set. */
-  SET(DeepNS.FSMETA, "set", Type.STR, false),
+  SET(FSMETA, "set", Type.STR, false),
   /** Software. */
-  SOFTWARE(DeepNS.FSMETA, "software", Type.STR, false),
+  SOFTWARE(FSMETA, "software", Type.STR, false),
   /** Message or document subject. */
-  SUBJECT(DeepNS.DCTERMS, "subject", Type.STR, false),
+  SUBJECT(DCTERMS, "subject", Type.STR, false),
   /** Subject distance range. */
-  SUBJECT_DISTANCE_RANGE(DeepNS.FSMETA, "subjectDistanceRange", Type.STR,
-      false),
-  /** Table of contents. */
-  TABLE_OF_CONTENTS(DeepNS.DCTERMS, "tableOfContents", Type.STR, false),
+  SUBJECT_DISTANCE_RANGE(FSMETA, "subjectDistanceRange", Type.STR, false),
   /** Title. */
-  TITLE(DeepNS.DCTERMS, "title", Type.STR, false),
+  TITLE(DCTERMS, "title", Type.STR, false),
   /** White balance. */
-  WHITE_BALANCE(DeepNS.FSMETA, "whiteBalance", Type.STR, false),
+  WHITE_BALANCE(FSMETA, "whiteBalance", Type.STR, false),
   /** White point. */
-  WHITE_POINT(DeepNS.FSMETA, "whitePoint", Type.STR, false),
+  WHITE_POINT(FSMETA, "whitePoint", Type.STR, false),
   /** YCbCrCoefficients. */
-  YCBCR_COEFFICIENTS(DeepNS.FSMETA, "yCbCrCoefficients", Type.STR, false),
+  YCBCR_COEFFICIENTS(FSMETA, "yCbCrCoefficients", Type.STR, false),
   /** YCbCrPositioning. */
-  YCBCR_POSITIONING(DeepNS.FSMETA, "yCbCrPositioning", Type.STR, false);
+  YCBCR_POSITIONING(FSMETA, "yCbCrPositioning", Type.STR, false);
 
   /** Metadata key. */
   private final String n;

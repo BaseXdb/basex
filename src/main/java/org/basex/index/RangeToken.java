@@ -13,9 +13,9 @@ public final class RangeToken implements IndexToken {
   /** Index type. */
   private final IndexType type;
   /** Minimum value. */
-  public double min;
+  public final double min;
   /** Maximum value. */
-  public double max;
+  public final double max;
 
   /**
    * Constructor.

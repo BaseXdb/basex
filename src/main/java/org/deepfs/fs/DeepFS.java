@@ -72,8 +72,6 @@ public final class DeepFS implements DataText {
   public static final byte[] DIR = token(S_DIR);
   /** File token. */
   public static final byte[] FILE = token(S_FILE);
-  /** Content token. */
-  public static final byte[] CONTENT = token(S_CONTENT);
   /** Text content token. */
   public static final byte[] TEXT_CONTENT = token(S_TEXT_CONTENT);
 
@@ -148,26 +146,6 @@ public final class DeepFS implements DataText {
   /** Index References. */
   public int gidID;
 
-  /** OS user id. */
-  private long sUID;
-  /** OS group id. */
-  private long sGID;
-
-  /**
-   * Constructor for {@link DeepShell} and java only test cases (no mount).
-   * @param dbname name of (initially empty) database
-   * @param mountpoint of DeepFS database
-   */
-  public DeepFS(final String dbname, final String mountpoint) {
-    ctx = new Context();
-    if(!new Open(dbname).exec(ctx))
-      new CreateDB("<" + S_DEEPFS + " " + "mountpoint=\""
-          + mountpoint + "\"/>", dbname).exec(ctx);
-    data = ctx.data;
-    initNames();
-    initRootStat();
-  }
-
   /**
    * Constructor.
    * @param d data reference
@@ -183,10 +161,31 @@ public final class DeepFS implements DataText {
    * @param c existing context
    */
   public DeepFS(final Context c) {
+    this(c.data);
     ctx = c;
-    data = ctx.data;
-    initNames();
-    initRootStat();
+  }
+
+  /**
+   * Constructor for {@link DeepShell} and java only test cases (no mount).
+   * @param dbname name of (initially empty) database
+   * @param mp of DeepFS database
+   */
+  public DeepFS(final String dbname, final String mp) {
+    this(initData(dbname, mp));
+  }
+
+  /**
+   * Initializes the data.
+   * @param dbname name of (initially empty) database
+   * @param mp of DeepFS database
+   * @return context
+   */
+  private static Context initData(final String dbname, final String mp) {
+    final Context ctx = new Context();
+    if(!new Open(dbname).exec(ctx))
+      new CreateDB("<" + S_DEEPFS + " " + "mountpoint=\""
+          + mp + "\"/>", dbname).exec(ctx);
+    return ctx;
   }
 
   /**
@@ -218,12 +217,12 @@ public final class DeepFS implements DataText {
   private void initRootStat() {
     rootStat = new DeepStat();
     rootStat.statimespec = System.currentTimeMillis();
-    rootStat.stctimespec = rootStat.statimespec;
-    rootStat.stmtimespec = rootStat.statimespec;
+    //rootStat.stctimespec = rootStat.statimespec;
+    //rootStat.stmtimespec = rootStat.statimespec;
     rootStat.stmode = getSIFDIR() | 0755;
     rootStat.stsize = 0;
-    rootStat.stuid =  sUID;
-    rootStat.stgid =  sGID;
+    rootStat.stuid =  0;
+    rootStat.stgid =  0;
     rootStat.stnlink =  0;
     rootStat.stino = 1;
   }
@@ -607,8 +606,8 @@ public final class DeepFS implements DataText {
     );
     sbuf.stino = pre;
     sbuf.statimespec = Long.parseLong(string(atime));
-    sbuf.stctimespec = Long.parseLong(string(ctime));
-    sbuf.stmtimespec = Long.parseLong(string(mtime));
+    //sbuf.stctimespec = Long.parseLong(string(ctime));
+    //sbuf.stmtimespec = Long.parseLong(string(mtime));
     sbuf.stmode = Long.parseLong(string(mode));
     sbuf.stsize = Long.parseLong(string(size));
     sbuf.stuid = Long.parseLong(string(uid));

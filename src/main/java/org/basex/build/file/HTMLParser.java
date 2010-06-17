@@ -35,6 +35,7 @@ public final class HTMLParser extends XMLParser {
       reader = (XMLReader) Class.forName(
           "org.ccil.cowan.tagsoup.Parser").newInstance();
     } catch(final Exception ex) {
+      reader = null;
     }
   }
 

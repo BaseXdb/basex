@@ -42,7 +42,7 @@ public abstract class IndexBuilder extends Progress {
   /**
    * Checks if the command was interrupted, and prints some debug output.
    */
-  protected void check() {
+  protected final void check() {
     checkStop();
     if(Prop.debug && (pre & 0x1FFFFF) == 0) Main.err(".");
   }
@@ -52,7 +52,7 @@ public abstract class IndexBuilder extends Progress {
    * @return result of check
    * @throws IOException I/O exception
    */
-  protected boolean memFull() throws IOException {
+  protected final boolean memFull() throws IOException {
     final boolean full = rt.totalMemory() - rt.freeMemory() >= maxMem;
     if(full) {
       if(cc >= 0) throw new IOException(PROCOUTMEM);

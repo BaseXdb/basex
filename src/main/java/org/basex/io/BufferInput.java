@@ -166,7 +166,7 @@ public class BufferInput {
    * @return string
    * @throws IOException IO Exception
    */
-  public String readString() throws IOException {
+  public final String readString() throws IOException {
     return content().toString();
   }
 
@@ -175,7 +175,7 @@ public class BufferInput {
    * @return token builder
    * @throws IOException IO Exception
    */
-  public TokenBuilder content() throws IOException {
+  public final TokenBuilder content() throws IOException {
     final TokenBuilder tb = new TokenBuilder();
     byte l;
     while((l = readByte()) != 0) tb.add(l);
@@ -236,7 +236,7 @@ public class BufferInput {
    * @return true if more lines are found
    * @throws IOException IO Exception
    */
-  public boolean readLine(final TokenBuilder tb) throws IOException {
+  public final boolean readLine(final TokenBuilder tb) throws IOException {
     tb.reset();
     while(true) {
       final int ch = readChar();

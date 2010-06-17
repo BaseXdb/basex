@@ -132,7 +132,7 @@ public abstract class AQuery extends Proc {
    * @param qu query
    * @return result of check
    */
-  protected boolean updating(final Context ctx, final String qu) {
+  protected final boolean updating(final Context ctx, final String qu) {
     return QueryProcessor.updating(ctx, qu);
   }
 

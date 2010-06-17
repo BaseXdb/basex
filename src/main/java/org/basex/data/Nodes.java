@@ -17,12 +17,12 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class Nodes implements Result {
+  /** Full-text position data (for visualization). */
+  public final FTPosData ftpos;
   /** Doc flag (all nodes refer to documents). */
   public boolean doc;
   /** Root Node. */
   public Data data;
-  /** Full-text position data (for visualization). */
-  public FTPosData ftpos;
   /** Pre values container. */
   public int[] nodes;
   /** Sorted pre values. */
@@ -77,6 +77,7 @@ public final class Nodes implements Result {
   public Nodes(final int[] n) {
     nodes = n;
     size = nodes.length;
+    ftpos = null;
   }
 
   public int size() {

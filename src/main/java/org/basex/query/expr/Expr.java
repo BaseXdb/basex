@@ -231,7 +231,7 @@ public abstract class Expr extends ExprInfo {
    * @return the specified expression
    * @throws QueryException query exception
    */
-  protected Expr checkUp(final Expr e, final QueryContext ctx)
+  protected final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
     if(e != null && ctx.updating && e.uses(Use.UPD, ctx)) Err.or(UPNOT);
     return e;

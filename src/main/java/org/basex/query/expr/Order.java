@@ -17,10 +17,10 @@ import org.basex.query.util.Var;
  * @author Christian Gruen
  */
 public final class Order extends Expr {
+  /** Sort list. */
+  final OrderBy[] ord;
   /** Sequence to be sorted. */
   SeqIter sq;
-  /** Sort list. */
-  OrderBy[] ord;
 
  /**
    * Constructor.

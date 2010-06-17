@@ -62,8 +62,8 @@ abstract class FTFilter extends FTExpr {
    * @return result of check
    * @throws QueryException query exception
    */
-  boolean filter(final QueryContext ctx, final FTItem item, final Tokenizer ft)
-      throws QueryException {
+  final boolean filter(final QueryContext ctx, final FTItem item,
+      final Tokenizer ft) throws QueryException {
 
     final FTMatches all = item.all;
     for(int a = 0; a < all.size; a++) {

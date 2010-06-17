@@ -19,7 +19,7 @@ import org.basex.query.util.Var;
  */
 public abstract class FTExpr extends Expr {
   /** Expression list. */
-  protected FTExpr[] expr;
+  protected final FTExpr[] expr;
 
   /**
    * Constructor.

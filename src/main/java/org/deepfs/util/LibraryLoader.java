@@ -12,12 +12,13 @@ import org.basex.core.Main;
 public final class LibraryLoader {
   /** Name of spotlight extractor library. */
   public static final String SPOTEXLIBNAME = "deepfs_spotex";
-  /** Name of joint storage library. */
-  public static final String JSDBFSLIBNAME = "deepfs_jsdbfs";
   /** Name of FUSE java bindings library. */
   public static final String JFUSELIBNAME = "jfuse";
   /** Name of DeepFUSE library. */
   public static final String DEEPFUSELIBNAME = "deepfuse";
+  /** Name of joint storage library.
+  public static final String JSDBFSLIBNAME = "deepfs_jsdbfs"; */
+
   /** Map with loaded libraries. */
   private static final HashMap<String, Boolean> LIBS =
     new HashMap<String, Boolean>();

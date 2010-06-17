@@ -68,6 +68,19 @@ final class BaseXTextRenderer extends BaseXBack {
     bar = b;
   }
 
+  @Override
+  public void setFont(final Font f) {
+    dfont = f;
+    bfont = f.deriveFont(Font.BOLD);
+    font(f);
+  }
+
+  @Override
+  public void paintComponent(final Graphics g) {
+    super.paintComponent(g);
+    write(g, bar.pos());
+  }
+
   /**
    * Initializes the constructor.
    * @param t text to be drawn
@@ -94,7 +107,6 @@ final class BaseXTextRenderer extends BaseXBack {
    * Finds the search term.
    * @param b backward browsing
    * @param s string is the same as last time
-   * (>0: new string is longer, 0: string is the same..)
    * @return new position
    */
   int find(final boolean b, final boolean s) {
@@ -161,31 +173,19 @@ final class BaseXTextRenderer extends BaseXBack {
     return new Dimension(Math.max(x, max) + fwidth[' '], y + fwidth[' ']);
   }
 
-  @Override
-  public void setFont(final Font f) {
-    dfont = f;
-    bfont = f.deriveFont(Font.BOLD);
-    font(f);
-  }
-
-  @Override
-  public void paintComponent(final Graphics g) {
-    super.paintComponent(g);
-    write(g, bar.pos());
-  }
-
   /**
    * Initializes the renderer.
    * @param g graphics reference
    * @param pos current text position
    */
   private void init(final Graphics g, final int pos) {
-    if(g != null) g.setFont(font);
+    font = dfont;
     col = Color.black;
     syntax.init();
     text.init();
     x = off;
     y = off + fontH - pos - 2;
+    if(g != null) g.setFont(font);
   }
 
   /**

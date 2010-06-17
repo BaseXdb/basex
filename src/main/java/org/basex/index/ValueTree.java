@@ -43,7 +43,7 @@ class ValueTree {
    * @param pre pre value for the token
    * @return int node
    */
-  int index(final byte[] tok, final int pre) {
+  final int index(final byte[] tok, final int pre) {
     return index(tok, pre, true);
   }
 
@@ -55,7 +55,7 @@ class ValueTree {
    * @param f flag for usage of existing index
    * @return int node
    */
-  int index(final byte[] tok, final int pre, final boolean f) {
+  final int index(final byte[] tok, final int pre, final boolean f) {
     // index is empty.. create root node
     if(root == -1) {
       root = n(tok, pre, -1, f);
@@ -99,7 +99,7 @@ class ValueTree {
    * Returns the number of entries.
    * @return number of entries
    */
-  int size() {
+  final int size() {
     return pres.size();
   }
 
@@ -108,7 +108,7 @@ class ValueTree {
    * Note that the iterator can only be called once; index structures
    * will be removed to save memory.
    */
-  void init() {
+  final void init() {
     cn = root;
     if(cn != -1) while(l(cn) != -1) cn = l(cn);
   }
@@ -117,7 +117,7 @@ class ValueTree {
    * Checks if the iterator returns more tokens.
    * @return true if more tokens exist
    */
-  boolean more() {
+  final boolean more() {
     return cn != -1;
   }
 
@@ -125,7 +125,7 @@ class ValueTree {
    * Returns the next pointer.
    * @return next iterator token
    */
-  int next() {
+  final int next() {
     ln = cn;
     if(r(cn) != -1) {
       cn = r(cn);

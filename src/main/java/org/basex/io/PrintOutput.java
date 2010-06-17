@@ -15,15 +15,17 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {
+  /** The OutputStream we operate on. */
+  private final OutputStream os;
   /** Maximum numbers of bytes to write. */
   int max = Integer.MAX_VALUE;
   /** Number of bytes written. */
   int size;
-  /** The OutputStream we operate on. */
-  private OutputStream os;
 
   /** Protected default constructor. */
-  protected PrintOutput() { }
+  protected PrintOutput() {
+    this((OutputStream) null);
+  }
 
   /**
    * Constructor, given a filename.
@@ -52,7 +54,7 @@ public class PrintOutput extends OutputStream {
    * @param str string to be written
    * @throws IOException I/O exception
    */
-  public void writeString(final String str) throws IOException {
+  public final void writeString(final String str) throws IOException {
     print(Token.token(str));
     write(0);
   }

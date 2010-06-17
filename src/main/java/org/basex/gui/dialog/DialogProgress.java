@@ -33,9 +33,9 @@ public final class DialogProgress extends Dialog implements ActionListener {
   /** Progress reference. */
   private final Progress prog;
   /** Progress bar. */
-  private JProgressBar bar;
+  private final JProgressBar bar;
   /** Current progress length. */
-  private int ww;
+  private final int ww;
 
   /**
    * Default constructor.
@@ -55,6 +55,8 @@ public final class DialogProgress extends Dialog implements ActionListener {
 
     if(!pb) {
       BaseXLayout.setWidth(info, 500);
+      bar = null;
+      ww = 0;
     } else {
       ww = 320;
       bar = new JProgressBar(0, ww);

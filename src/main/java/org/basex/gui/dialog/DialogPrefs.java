@@ -29,13 +29,10 @@ public final class DialogPrefs extends Dialog {
   /** Information on available languages. */
   private static final String[][] LANGS = Lang.parse();
 
-  /** Directory path. */
-  BaseXTextField path;
   /** Language label. */
   private final BaseXLabel creds;
   /** Language Combo Box. */
   private final BaseXCombo lang;
-
   /** Focus checkbox. */
   private final BaseXCheckBox focus;
   /** Show names checkbox. */
@@ -46,6 +43,9 @@ public final class DialogPrefs extends Dialog {
   private final BaseXCheckBox javalook;
   /** Buttons. */
   private final BaseXBack buttons;
+
+  /** Directory path. */
+  final BaseXTextField path;
 
   /**
    * Default constructor.

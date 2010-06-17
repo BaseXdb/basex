@@ -24,13 +24,13 @@ public final class BaseXSlider extends BaseXPanel {
   private static final double SLIDERW = 20;
   /** Listener. */
   private final Dialog dl;
-  /** Listener. */
-  private ActionListener al;
-
   /** Minimum slider value. */
   private final int min;
   /** Maximum slider value. */
   private final int max;
+
+  /** Listener. */
+  private ActionListener al;
   /** Current slider value. */
   private int curr;
   /** Current slider value. */

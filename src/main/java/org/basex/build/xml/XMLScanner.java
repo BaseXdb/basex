@@ -49,7 +49,7 @@ final class XMLScanner extends Progress {
   /** Character buffer for the current token. */
   final TokenBuilder token = new TokenBuilder();
   /** Document encoding. */
-  String encoding = UTF8;
+  final String encoding;
   /** Current token type. */
   Type type;
 
@@ -61,18 +61,17 @@ final class XMLScanner extends Progress {
   private final boolean entity;
   /** DTD flag. */
   private final boolean dtd;
-  /** Parameter entity parsing. */
-  private boolean pe;
 
   /** Current scanner state. */
   private State state = State.CONTENT;
   /** Opening tag found. */
   private boolean prolog = true;
+  /** Parameter entity parsing. */
+  private boolean pe;
   /** Tag flag. */
   private boolean tag;
   /** Current quote character. */
   private int quote;
-
   /** XML Input. */
   private XMLInput input;
 
@@ -94,15 +93,15 @@ final class XMLScanner extends Progress {
     entity = pr.is(Prop.ENTITY);
     dtd = pr.is(Prop.DTD);
 
+    String enc = null;
     if(consume(DOCDECL)) {
       // process document declaration...
       checkS();
       if(!version()) error(DECLSTART);
       boolean s = s();
-      final String enc = encoding();
+      enc = encoding();
       if(enc != null) {
         if(!s) error(WSERROR);
-        encoding = enc;
         s = s();
       }
       if(sddecl() != null && !s) error(WSERROR);
@@ -110,6 +109,8 @@ final class XMLScanner extends Progress {
       final int ch = nextChar();
       if(ch != '?' || nextChar() != '>') error(DECLWRONG);
     }
+    encoding = enc == null ? UTF8 : enc;
+
     if(!s(consume())) prev(1);
   }
 

@@ -44,11 +44,11 @@ public class BaseXText extends BaseXPanel {
   protected BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Renderer reference. */
   protected final BaseXTextRenderer rend;
-  /** Undo history; if set to {@code null}, text is read-only. */
-  protected Undo undo;
-
   /** Scrollbar reference. */
   private final BaseXBar scroll;
+  /** Undo history; if set to {@code null}, text will be read-only. */
+  protected final Undo undo;
+
   /** Search field. */
   private BaseXTextField find;
 
@@ -89,14 +89,15 @@ public class BaseXText extends BaseXPanel {
     add(rend, BorderLayout.CENTER);
     add(scroll, BorderLayout.EAST);
 
+    Undo un = null;
     if(edit) {
       setBackground(Color.white);
       setBorder(new MatteBorder(1, 1, 1, 1, GUIConstants.COLORS[6]));
-      setMode(Fill.PLAIN);
-      undo = new Undo();
+      un = new Undo();
     } else {
       setMode(Fill.NONE);
     }
+    undo = un;
 
     new BaseXPopup(this, edit ?
       new GUICommand[] { new UndoCmd(), new RedoCmd(), null, new CutCmd(),
@@ -554,6 +555,13 @@ public class BaseXText extends BaseXPanel {
     if(undo != null) undo.store(text.finish(), text.cursor());
   }
 
+  /**
+   * Releases a key or mouse. Can be overwritten to react on events.
+   * @param force force querying
+   */
+  @SuppressWarnings("unused")
+  protected void release(final boolean force) { }
+
   // EDITOR COMMANDS ==========================================================
 
   /**
@@ -564,6 +572,7 @@ public class BaseXText extends BaseXPanel {
     text = new BaseXTextTokens(undo.prev());
     rend.setText(text);
     text.pos(undo.cursor());
+    text.setCaret();
   }
 
   /**
@@ -574,6 +583,7 @@ public class BaseXText extends BaseXPanel {
     text = new BaseXTextTokens(undo.next());
     rend.setText(text);
     text.pos(undo.cursor());
+    text.setCaret();
   }
 
   /**
@@ -612,7 +622,6 @@ public class BaseXText extends BaseXPanel {
     if(text.start() != -1) text.delete();
     text.add(txt);
     if(undo != null) undo.store(text.finish(), text.cursor());
-    text.setCaret();
   }
 
   /**
@@ -689,6 +698,13 @@ public class BaseXText extends BaseXPanel {
     public boolean checked() { return false; }
     public String help() { return null; }
     public String key() { return null; }
+    /** Finishes a command. */
+    public void finish() {
+      text.setCaret();
+      rend.calc();
+      showCursor(2);
+      release(true);
+    }
   }
 
   /** Undo Command. */
@@ -696,6 +712,7 @@ public class BaseXText extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       undo();
+      finish();
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
@@ -712,6 +729,7 @@ public class BaseXText extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       redo();
+      finish();
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
@@ -728,8 +746,7 @@ public class BaseXText extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       cut();
-      rend.calc();
-      showCursor(2);
+      finish();
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
@@ -762,8 +779,7 @@ public class BaseXText extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       paste();
-      rend.calc();
-      showCursor(2);
+      finish();
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {
@@ -780,8 +796,7 @@ public class BaseXText extends BaseXPanel {
     @Override
     public void execute(final GUI main) {
       delete();
-      rend.calc();
-      showCursor(2);
+      finish();
     }
     @Override
     public void refresh(final GUI main, final AbstractButton button) {

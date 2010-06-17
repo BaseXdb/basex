@@ -17,14 +17,15 @@ public final class IndexContext {
   public final Data data;
   /** Index Step. */
   public final Step step;
+  /** Flag for potential duplicates. */
+  public final boolean dupl;
+
   /** Number of estimated results. */
   public int is = Integer.MAX_VALUE;
   /** Flag for ftnot expressions. */
   public boolean not;
   /** Flag for sequential processing. */
   public boolean seq;
-  /** Flag for potential duplicates. */
-  public boolean dupl;
 
   /**
    * Constructor.

@@ -23,6 +23,9 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class BaseXWin {
+  /** Mac OS X GUI optimizations. */
+  GUIMacOSX osxGUI;
+
   /**
    * Main method.
    * @param args command-line arguments
@@ -31,9 +34,6 @@ public final class BaseXWin {
   public static void main(final String[] args) {
     new BaseXWin(args);
   }
-
-  /** Mac OS X GUI optimizations. */
-  GUIMacOSX osxGUI;
 
   /**
    * Constructor.

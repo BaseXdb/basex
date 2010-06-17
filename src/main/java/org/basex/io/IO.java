@@ -59,7 +59,7 @@ public abstract class IO {
    * Sets the file path and name.
    * @param p file path
    */
-  protected void init(final String p) {
+  protected final void init(final String p) {
     path = p;
     // use timer if no name is given
     final String n = path.substring(path.lastIndexOf('/') + 1);

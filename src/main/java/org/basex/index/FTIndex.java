@@ -55,7 +55,7 @@ public abstract class FTIndex implements Index {
    * @param fast fast evaluation
    * @return iterator
    */
-  synchronized FTIndexIterator iter(final long p, final int s,
+  final synchronized FTIndexIterator iter(final long p, final int s,
       final DataAccess da, final boolean fast) {
 
     da.cursor(p);

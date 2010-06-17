@@ -21,7 +21,7 @@ public class StringList implements Iterable<String> {
    * Adds a string to the array.
    * @param s string to be added
    */
-  public void add(final String s) {
+  public final void add(final String s) {
     if(size == list.length) {
       final String[] tmp = new String[size << 1];
       System.arraycopy(list, 0, tmp, 0, size);
@@ -34,7 +34,7 @@ public class StringList implements Iterable<String> {
    * Returns the number of entries.
    * @return number of entries
    */
-  public int size() {
+  public final int size() {
     return size;
   }
 
@@ -43,7 +43,7 @@ public class StringList implements Iterable<String> {
    * @param p position
    * @return value
    */
-  public String get(final int p) {
+  public final String get(final int p) {
     return list[p];
   }
 
@@ -52,7 +52,7 @@ public class StringList implements Iterable<String> {
    * @param v string to be checked
    * @return true if value is found
    */
-  public boolean contains(final String v) {
+  public final boolean contains(final String v) {
     for(int i = 0; i < size; i++) if(list[i].equals(v)) return true;
     return false;
   }
@@ -61,7 +61,7 @@ public class StringList implements Iterable<String> {
    * Deletes the specified entry.
    * @param i entry to be deleted
    */
-  public void delete(final int i) {
+  public final void delete(final int i) {
     Array.move(list, i + 1, -1, --size - i);
   }
 
@@ -69,7 +69,7 @@ public class StringList implements Iterable<String> {
    * Returns the string array.
    * @return array
    */
-  public String[] finish() {
+  public final String[] finish() {
     final String[] tmp = new String[size];
     System.arraycopy(list, 0, tmp, 0, size);
     return tmp;
@@ -80,7 +80,7 @@ public class StringList implements Iterable<String> {
    * @param cs respect case sensitivity
    * @param asc ascending/descending flag
    */
-  public void sort(final boolean cs, final boolean asc) {
+  public final void sort(final boolean cs, final boolean asc) {
     Arrays.sort(list, 0, size, new Comparator<String>() {
       public int compare(final String s1, final String s2) {
         final int c = cs ? s1.compareTo(s2) :

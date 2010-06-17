@@ -132,7 +132,7 @@ public abstract class Nod extends Item {
    * Returns the namespace hierarchy.
    * @return namespaces
    */
-  public Atts nsScope() {
+  public final Atts nsScope() {
     final Atts ns = new Atts();
     Nod n = this;
     do {
@@ -156,7 +156,7 @@ public abstract class Nod extends Item {
    * @param ctx query context
    * @return uri
    */
-  public byte[] uri(final byte[] pref, final QueryContext ctx) {
+  public final byte[] uri(final byte[] pref, final QueryContext ctx) {
     final Atts at = ns();
     if(at != null) {
       final int i = at.get(pref);

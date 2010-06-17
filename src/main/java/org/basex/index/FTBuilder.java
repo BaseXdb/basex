@@ -173,8 +173,8 @@ public abstract class FTBuilder extends IndexBuilder {
    * @return written size
    * @throws IOException I/O exception
    */
-  protected int merge(final DataOutput out, final IntList il, final FTList[] v)
-      throws IOException {
+  protected final int merge(final DataOutput out, final IntList il,
+      final FTList[] v) throws IOException {
 
     int s = 0;
     final TokenBuilder tbp = new TokenBuilder();

@@ -11,12 +11,13 @@ import org.basex.query.ft.Scoring;
  * @author Sebastian Gath
  */
 public final class FTItem extends DBNode {
+  /** Length of the full-text token. */
+  private final int tl;
+  /** Total number of indexed results. */
+  private final int is;
+
   /** Full-text matches. */
   public FTMatches all;
-  /** Length of the full-text token. */
-  private int tl;
-  /** Total number of indexed results. */
-  private int is;
 
   /**
    * Constructor, called by the sequential variant.
@@ -24,8 +25,7 @@ public final class FTItem extends DBNode {
    * @param s scoring
    */
   public FTItem(final FTMatches a, final double s) {
-    all = a;
-    score = s;
+    this(a, null, 0, 0, 0, s);
   }
 
   /**

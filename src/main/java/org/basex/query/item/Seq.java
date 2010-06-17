@@ -34,15 +34,17 @@ public class Seq extends Item {
   };
 
   /** Item array. */
-  public Item[] val;
+  public final Item[] val;
   /** Number of entries. */
-  private int size;
+  private final int size;
 
   /**
    * Constructor.
    */
   protected Seq() {
     super(Type.EMP);
+    val = null;
+    size = 0;
   }
 
   /**

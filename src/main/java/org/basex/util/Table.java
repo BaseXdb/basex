@@ -18,11 +18,11 @@ public final class Table {
   private static final int DIST = 2;
 
   /** Table header. */
-  public TokenList header = new TokenList();
+  public final TokenList header = new TokenList();
   /** Alignment (false: left, true: right alignment). */
-  public BoolList align = new BoolList();
+  public final BoolList align = new BoolList();
   /** Data (usually strings). */
-  public ArrayList<TokenList> contents = new ArrayList<TokenList>();
+  public final ArrayList<TokenList> contents = new ArrayList<TokenList>();
   /** Data description. */
   public String desc;
 

@@ -24,14 +24,15 @@ public final class BaseXDSlider extends BaseXPanel {
   /** Label space. */
   public static final int LABELW = 300;
 
+  /** Minimum slider value. */
+  public final double totMin;
+  /** Maximum slider value. */
+  public final double totMax;
+
   /** Current slider value. */
   public double min;
   /** Current slider value. */
   public double max;
-  /** Minimum slider value. */
-  public double totMin;
-  /** Maximum slider value. */
-  public double totMax;
   /** Size representation in kilobytes. */
   public boolean kb;
   /** Size representation as date. */

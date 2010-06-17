@@ -11,10 +11,10 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public final class FTPos {
+  /** Pre value. */
+  public final int pre;
   /** Positions. */
   public int[] pos;
-  /** Pre value. */
-  int pre;
   /** Sorted flag. */
   private boolean sorted = true;
 

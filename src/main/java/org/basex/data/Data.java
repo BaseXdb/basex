@@ -720,7 +720,7 @@ public abstract class Data {
    * @param s node size
    * @param vl document name
    */
-  public void doc(final int pre, final int s, final byte[] vl) {
+  public final void doc(final int pre, final int s, final byte[] vl) {
     final long i = ++meta.lastid;
     final long v = index(vl, pre, true);
     s(DOC); s(0); s(0); s(v >> 32);
@@ -834,7 +834,7 @@ public abstract class Data {
    * @param e end pre value
    * @return table
    */
-  public String toString(final int s, final int e) {
+  public final String toString(final int s, final int e) {
     return string(InfoTable.table(this, s, e));
   }
 

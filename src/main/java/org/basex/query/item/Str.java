@@ -15,7 +15,7 @@ public class Str extends Item {
   /** String data. */
   public static final Str ZERO = new Str(Token.EMPTY);
   /** String data. */
-  protected byte[] val;
+  protected final byte[] val;
   /** Direct parser creation (needed for QName types). */
   public boolean direct;
 

@@ -16,7 +16,7 @@ import org.basex.util.Atts;
  */
 public final class NSLocal {
   /** Namespaces. */
-  public Atts ns = new Atts();
+  public final Atts ns = new Atts();
   /** Number of default namespaces. */
   private int def;
 

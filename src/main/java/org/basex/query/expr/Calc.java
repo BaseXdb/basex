@@ -264,7 +264,7 @@ public enum Calc {
    * @param it item
    * @throws QueryException query exception
    */
-  void errType(final Type t, final Item it) throws QueryException {
+  final void errType(final Type t, final Item it) throws QueryException {
     Err.type(info(), t, it);
   }
 
@@ -273,7 +273,7 @@ public enum Calc {
    * @param it item
    * @throws QueryException query exception
    */
-  void errNum(final Item it) throws QueryException {
+  final void errNum(final Item it) throws QueryException {
     Err.num(info(), it);
   }
 
@@ -283,7 +283,7 @@ public enum Calc {
    * @return duration
    * @throws QueryException query exception
    */
-  Dur checkDur(final Item it) throws QueryException {
+  final Dur checkDur(final Item it) throws QueryException {
     if(!it.d()) Err.or(XPDUR, info(), it.type);
     return (Dur) it;
   }
@@ -304,7 +304,7 @@ public enum Calc {
    * @param d value to be checked
    * @throws QueryException query exception
    */
-  void checkRange(final double d) throws QueryException {
+  final void checkRange(final double d) throws QueryException {
     if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(RANGE, d);
   }
 
@@ -312,7 +312,7 @@ public enum Calc {
    * Returns a string representation of the operator.
    * @return string
    */
-  String info() {
+  final String info() {
     return "'" + name + "' operator";
   }
 

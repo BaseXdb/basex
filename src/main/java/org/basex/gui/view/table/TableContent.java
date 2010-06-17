@@ -153,7 +153,7 @@ final class TableContent extends BaseXBack {
           if(str != null) {
             if(data.fs != null && data.fs.isFile(pre) &&
                 tdata.cols[c].id == data.fs.suffixID) {
-              g.drawImage(GUIFS.images(str, false), (int) x + 2,
+              g.drawImage(GUIFS.get().images(str, false), (int) x + 2,
                   posY - 8 + rowH / 2, this);
               x += 22;
               cw -= 22;

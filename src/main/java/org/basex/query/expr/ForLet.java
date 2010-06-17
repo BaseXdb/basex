@@ -13,7 +13,7 @@ import org.basex.query.util.Var;
  */
 public abstract class ForLet extends Single {
   /** Variable. */
-  public Var var;
+  public final Var var;
 
   /**
    * Constructor.

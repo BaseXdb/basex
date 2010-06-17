@@ -14,13 +14,14 @@ public final class Args {
   /** Usage info. */
   private final String usage;
   /** Command-line arguments. */
-  private String args = "";
+  private final String args;
+
+  /** OK flag. */
+  private boolean ok = true;
   /** Dash flag. */
   private boolean dash;
   /** Current argument. */
   private int c;
-  /** OK flag. */
-  private boolean ok = true;
 
   /**
    * Default constructor.
@@ -29,7 +30,9 @@ public final class Args {
    * @param u usage info
    */
   public Args(final String[] a, final Object o, final String u) {
-    for(final String s : a) args += s + ' ';
+    final StringBuilder sb = new StringBuilder();
+    for(final String s : a) sb.append(s).append(' ');
+    args = sb.toString();
     usage = u;
     obj = o;
   }

@@ -53,7 +53,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
    * which is used for finding duplicate attributes and namespace conflicts.
    * @param pool name pool
    */
-  protected void add(final NamePool pool) {
+  protected final void add(final NamePool pool) {
     for(int pre = 0; pre < md.meta.size; pre++) {
       final int k = md.kind(pre);
       if(k != Data.ATTR && k != Data.ELEM || md.parent(pre, k) > -1) continue;

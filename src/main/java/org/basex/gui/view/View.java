@@ -103,7 +103,7 @@ public abstract class View extends BaseXPanel {
       gui.fullscreen(false);
     } else if(pressed(SPACE, e)) {
       gui.notify.mark(sc(e) ? 2 : e.isShiftDown() ? 1 : 0, null);
-    } else if(pressed(DELPREV, e)) {
+    } else if(pressed(GOBACK2, e)) {
       GUICommands.GOBACK.execute(gui);
     }
   }

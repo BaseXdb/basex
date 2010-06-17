@@ -20,11 +20,12 @@ import org.basex.util.TokenBuilder;
  */
 public final class Func extends Single {
   /** Function name, including return type. */
-  public Var var;
+  public final Var var;
   /** Arguments. */
-  public Var[] args;
+  public final Var[] args;
   /** Declaration flag. */
-  public boolean decl;
+  public final boolean decl;
+
   /** Updating flag. */
   public boolean updating;
 

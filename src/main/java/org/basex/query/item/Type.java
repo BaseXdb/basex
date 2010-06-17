@@ -745,7 +745,7 @@ public enum Type {
    * @return item argument
    * @throws QueryException query exception
    */
-  protected Item checkNum(final Item it) throws QueryException {
+  protected final Item checkNum(final Item it) throws QueryException {
     return it.type == URI || !it.s() && !it.n() && !it.u() &&
       it.type != BLN ? error(it) : it;
   }
@@ -758,8 +758,8 @@ public enum Type {
    * @return integer value
    * @throws QueryException query exception
    */
-  protected long check(final Object o, final long min, final long max)
-      throws QueryException {
+  protected final long check(final Object o, final long min,
+      final long max) throws QueryException {
 
     final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
     checkNum(it);
@@ -795,7 +795,7 @@ public enum Type {
    * @throws QueryException query exception
    * @return name
    */
-  protected byte[] checkName(final Item it) throws QueryException {
+  protected final byte[] checkName(final Item it) throws QueryException {
     final byte[] v = norm(it.str());
     if(!XMLToken.isNCName(v)) error(it);
     return v;
@@ -807,7 +807,7 @@ public enum Type {
    * @return dummy item
    * @throws QueryException query exception
    */
-  protected Item error(final Item it) throws QueryException {
+  protected final Item error(final Item it) throws QueryException {
     Err.cast(this, it);
     return null;
   }
@@ -819,7 +819,7 @@ public enum Type {
    * @param t type to be checked
    * @return result of check
    */
-  public boolean instance(final Type t) {
+  public final boolean instance(final Type t) {
     return this == t || par != null && par.instance(t);
   }
 
@@ -827,7 +827,7 @@ public enum Type {
    * Checks if the type refers to a node.
    * @return result of check
    */
-  public boolean node() {
+  public final boolean node() {
     return this == NOD || par == NOD;
   }
 

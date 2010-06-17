@@ -17,7 +17,7 @@ import org.basex.util.TokenList;
  * @author Andreas Weiler
  */
 public final class Users extends ArrayList<User> {
-  /** Filename; set to null for local user permissions. */
+  /** Filename; will be null for local user permissions. */
   private File file;
 
   /**

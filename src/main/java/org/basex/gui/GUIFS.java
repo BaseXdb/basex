@@ -14,34 +14,12 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class GUIFS {
-  /** Closed folder. */
-  public static Image[] folder1 = new Image[2];
-  /** Opened folder. */
-  public static Image[] folder2 = new Image[2];
-
   /** File Types. */
   public enum Type {
     /** Unknown Content. */ NONE,
     /** Textual Content. */ TEXT,
     /** Image Content.   */ IMAGE;
   }
-  /** File type icons. */
-  private static Image[][] images;
-  /** File types. */
-  private static Type[] type;
-  /** File type description. */
-  private static String[] desc;
-
-  /** Size of hash map. */
-  private static final int MAPSIZE = 255;
-  /** Hash table buckets. */
-  private static int[] bucket;
-  /** Pointers to the next token. */
-  private static int[] next;
-  /** Pointers to the next token. */
-  private static byte[][] token;
-  /** Number of file types. */
-  private static int size;
 
   /**
    * Recognized file types.
@@ -204,11 +182,34 @@ public final class GUIFS {
     { Type.NONE, "zip archive", "zip" },
   };
 
-  /** Preventing class instantiation. */
-  private GUIFS() { }
+  /** Singleton instance. */
+  private static final GUIFS INSTANCE = new GUIFS();
 
-  /** Initializes the file types and references them in a hash map. */
-  static {
+  /** Closed folder. */
+  public final Image[] folder1 = new Image[2];
+  /** Opened folder. */
+  public final Image[] folder2 = new Image[2];
+
+  /** File type icons. */
+  private final Image[][] images;
+  /** File types. */
+  private final Type[] type;
+  /** File type description. */
+  private final String[] desc;
+
+  /** Size of hash map. */
+  private static final int MAPSIZE = 255;
+  /** Hash table buckets. */
+  private final int[] bucket;
+  /** Pointers to the next token. */
+  private final int[] next;
+  /** Pointers to the next token. */
+  private final byte[][] token;
+  /** Number of file types. */
+  private int size;
+
+  /** Preventing class instantiation. */
+  private GUIFS() {
     bucket = new int[MAPSIZE + 1];
     next = new int[MAPSIZE + 1];
 
@@ -246,6 +247,14 @@ public final class GUIFS {
   }
 
   /**
+   * Returns the only instance of this class.
+   * @return instance
+   */
+  public static GUIFS get() {
+    return INSTANCE;
+  }
+
+  /**
    * Returns URL for the specified image.
    * @param name name of image
    * @param tracker media tracker
@@ -253,7 +262,7 @@ public final class GUIFS {
    * @param n tracker id
    * @return image
    */
-  private static Image add(final String name, final MediaTracker tracker,
+  private Image add(final String name, final MediaTracker tracker,
       final Toolkit tk, final int n) {
     final Image img = tk.getImage(BaseXLayout.imageURL("file-" + name));
     tracker.addImage(img, n);
@@ -266,7 +275,7 @@ public final class GUIFS {
    * @param t start position
    * @return token id
    */
-  private static int put(final byte[] tok, final int t) {
+  private int put(final byte[] tok, final int t) {
     final int h = hash(tok, t) & MAPSIZE;
     next[size] = bucket[h];
     bucket[h] = size;
@@ -279,7 +288,7 @@ public final class GUIFS {
    * @param name file name
    * @return type
    */
-  public static short type(final byte[] name) {
+  public short type(final byte[] name) {
     int i = name.length;
     while(--i > 0 && name[i] != '.');
     return (short) (i == 0 ? 0 : get(name, ++i));
@@ -291,7 +300,7 @@ public final class GUIFS {
    * @param n image offset (0/1)
    * @return image
    */
-  public static Image images(final byte[] name, final int n) {
+  public Image images(final byte[] name, final int n) {
     return images[n][type(name)];
   }
 
@@ -301,7 +310,7 @@ public final class GUIFS {
    * @param big small/big image
    * @return image
    */
-  public static Image images(final byte[] name, final boolean big) {
+  public Image images(final byte[] name, final boolean big) {
     return images[big ? 1 : 0][get(name, 0)];
   }
 
@@ -310,7 +319,7 @@ public final class GUIFS {
    * @param name file name
    * @return image
    */
-  public static Type mime(final byte[] name) {
+  public Type mime(final byte[] name) {
     return type[type(name)];
   }
 
@@ -320,7 +329,7 @@ public final class GUIFS {
    * @param s start position
    * @return token id or 0 if token was not found
    */
-  private static int get(final byte[] tok, final int s) {
+  private int get(final byte[] tok, final int s) {
     final int p = hash(tok, s) & MAPSIZE;
     for(int tid = bucket[p]; tid != 0; tid = next[tid]) {
       if(equal(token[tid], tok, s)) return tid;
@@ -335,7 +344,7 @@ public final class GUIFS {
    * @param s start position
    * @return true if the arrays are equal
    */
-  private static boolean equal(final byte[] t1, final byte[] t2, final int s) {
+  private boolean equal(final byte[] t1, final byte[] t2, final int s) {
     final int tl = t1.length;
     if(tl != t2.length - s) return false;
     for(int t = 0; t < tl; t++) {
@@ -350,7 +359,7 @@ public final class GUIFS {
    * @param s start position
    * @return hash code
    */
-  private static int hash(final byte[] tok, final int s) {
+  private int hash(final byte[] tok, final int s) {
     int h = 0;
     for(int t = s; t < tok.length; t++) h = (h << 5) - h + Token.lc(tok[t]);
     return h;

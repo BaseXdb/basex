@@ -8,9 +8,9 @@ package org.basex.data;
  */
 public final class FTStringMatch implements Comparable<FTStringMatch> {
   /** Query position. */
-  public byte q;
+  public final byte q;
   /** Start position. */
-  public int s;
+  public final int s;
   /** End position. */
   public int e;
   /** Include/exclude flag. */

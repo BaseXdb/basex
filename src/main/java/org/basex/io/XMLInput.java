@@ -6,7 +6,8 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * This class provides a convenient access to the XML input.
+ * This class provides a convenient access to XML input.
+ * The encoding will be dynamically adjusted.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -40,25 +41,27 @@ public final class XMLInput {
   }
 
   /**
+   * Returns the contents of the specified file.
+   * @param in input path
+   * @return file contents
+   * @throws IOException I/O exception
+   */
+  public static TokenBuilder content(final IO in) throws IOException {
+    final XMLInput xml = new XMLInput(in);
+    final int len = (int) xml.length();
+    final TokenBuilder tb = new TokenBuilder(len);
+    while(xml.pos() < len) tb.addUTF(xml.next());
+    xml.finish();
+    return tb;
+  }
+
+  /**
    * Sets a new encoding.
    * @param e encoding
    * @throws IOException I/O exception
    */
   public void encoding(final String e) throws IOException {
     in[0].encoding(e);
-  }
-
-  /**
-   * Returns the file contents, considering the file encoding.
-   * @return file contents
-   * @throws IOException I/O exception
-   */
-  public TokenBuilder content() throws IOException {
-    final int len = (int) length();
-    final TokenBuilder tb = new TokenBuilder(len);
-    while(pos() < len) tb.addUTF(next());
-    finish();
-    return tb;
   }
 
   /**

@@ -3,6 +3,10 @@ package org.basex.query.func;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
+
+import org.basex.core.Text;
+import org.basex.core.User;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -122,6 +126,19 @@ public abstract class Fun extends Arr {
     final Item it = e.atomic(ctx);
     if(it == null) Err.empty(this);
     if(!it.s() || !Token.eq(URLCOLL, it.str())) Err.or(IMPLCOL, e);
+  }
+
+  /**
+   * Checks if the current user has admin permissions. If negative, an
+   * exception is thrown.
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  protected final void checkAdmin(final QueryContext ctx)
+      throws QueryException {
+
+    if(!ctx.context.user.perm(User.ADMIN))
+      throw new QueryException(Text.PERMNO, CmdPerm.ADMIN);
   }
 
   @Override

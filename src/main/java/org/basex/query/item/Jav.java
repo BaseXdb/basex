@@ -12,7 +12,7 @@ import org.basex.util.Token;
  */
 public final class Jav extends Item {
   /** Java object. */
-  public Object val;
+  public final Object val;
 
   /**
    * Constructor.

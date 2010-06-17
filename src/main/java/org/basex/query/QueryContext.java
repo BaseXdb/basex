@@ -53,6 +53,13 @@ import org.basex.util.Tokenizer;
  * @author Christian Gruen
  */
 public final class QueryContext extends Progress {
+  /** Functions. */
+  public final Functions fun = new Functions();
+  /** Variables. */
+  public final Variables vars = new Variables();
+  /** Scoring instance. */
+  public final Scoring score = new Scoring();
+
   /** Database context. */
   public final Context context;
 
@@ -63,11 +70,6 @@ public final class QueryContext extends Progress {
 
   /** Namespaces. */
   public NSLocal ns = new NSLocal();
-  /** Functions. */
-  public Functions fun = new Functions();
-  /** Variables. */
-  public Variables vars = new Variables();
-
   /** Current context. */
   public Item item;
   /** Current context position. */
@@ -89,8 +91,6 @@ public final class QueryContext extends Progress {
   /** Fast full-text evaluation (stop after first hit). */
   public boolean ftfast = true;
 
-  /** Scoring instance. */
-  public Scoring score = new Scoring();
   /** Current full-text options. */
   public FTOpt ftopt;
   /** Current full-text token. */
@@ -127,15 +127,17 @@ public final class QueryContext extends Progress {
 
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
+  /** Info flag. */
+  private final boolean inf;
   /** Optimization flag. */
   private boolean firstOpt = true;
   /** Evaluation flag. */
   private boolean firstEval = true;
 
   /** List of modules. */
-  StringList modules = new StringList();
+  final StringList modules = new StringList();
   /** List of loaded modules. */
-  StringList modLoaded = new StringList();
+  final StringList modLoaded = new StringList();
   /** Initial context set (default: null). */
   Nodes nodes;
 
@@ -150,8 +152,6 @@ public final class QueryContext extends Progress {
   private Expr root;
   /** Initial number of documents. */
   private int rootDocs;
-  /** Info flag. */
-  private final boolean inf;
 
   /** Pending updates. */
   public Updates updates = new Updates(false);

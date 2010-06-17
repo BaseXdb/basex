@@ -86,7 +86,7 @@ public abstract class ACreate extends Proc {
    * @param data data reference
    * @throws IOException I/O exception
    */
-  protected void index(final Data data) throws IOException {
+  protected final void index(final Data data) throws IOException {
     if(data.meta.txtindex) index(IndexType.TXT, data);
     if(data.meta.atvindex) index(IndexType.ATV, data);
     if(data.meta.ftxindex) index(IndexType.FTX, data);
@@ -98,7 +98,9 @@ public abstract class ACreate extends Proc {
    * @param d data reference
    * @throws IOException I/O exception
    */
-  protected void index(final IndexType i, final Data d) throws IOException {
+  protected final void index(final IndexType i, final Data d)
+      throws IOException {
+
     if(d instanceof MemData) return;
     IndexBuilder b = null;
     switch(i) {
@@ -120,7 +122,7 @@ public abstract class ACreate extends Proc {
    * @param p input path
    * @return normalized path
    */
-  protected String path(final String p) {
+  protected final String path(final String p) {
     return p.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
   }
 }

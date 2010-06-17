@@ -54,22 +54,30 @@ public final class PlotView extends View {
   /** Position where over-length text is cut off. */
   private static final int CUTOFF = 10;
 
+  /** X axis selector. */
+  final BaseXCombo xCombo;
+  /** Y axis selector. */
+  final BaseXCombo yCombo;
+  /** Item selector combo. */
+  final BaseXCombo itemCombo;
+  /** Dot size in plot view. */
+  final BaseXSlider dots;
+
   /** Data reference. */
   PlotData plotData;
   /** Keeps track of changes in the plot. */
   boolean plotChanged;
-  /** X axis selector. */
-  BaseXCombo xCombo;
-  /** Y axis selector. */
-  BaseXCombo yCombo;
-  /** Item selector combo. */
-  BaseXCombo itemCombo;
-  /** Dot size in plot view. */
-  BaseXSlider dots;
   /** Indicates if global marked nodes should be drawn. */
   boolean drawSubNodes;
   /** Indicates if the buffered image for marked nodes has to be redrawn. */
   boolean markingChanged;
+
+  /** Logarithmic display. */
+  private final BaseXCheckBox xLog;
+  /** Logarithmic display. */
+  private final BaseXCheckBox yLog;
+  /** Bounding box which supports selection of multiple items. */
+  private final ViewRect selectionBox;
 
   /** Item image. */
   private BufferedImage itemImg;
@@ -91,10 +99,6 @@ public final class PlotView extends View {
   private int plotHeight;
   /** Current plot width. */
   private int plotWidth;
-  /** Logarithmic display. */
-  private final BaseXCheckBox xLog;
-  /** Logarithmic display. */
-  private final BaseXCheckBox yLog;
 
   /** Flag for mouse dragging actions. */
   private boolean dragging;
@@ -104,8 +108,6 @@ public final class PlotView extends View {
   /** Context which is displayed in the plot after a context change which was
    * triggered by the plot itself. */
   private Nodes nextContext;
-  /** Bounding box which supports selection of multiple items. */
-  private final ViewRect selectionBox;
 
   /**
    * Default constructor.

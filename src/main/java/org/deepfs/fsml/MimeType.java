@@ -84,9 +84,8 @@ public enum MimeType {
   private final String val;
   /** The default file suffix. */
   private final String suf;
-
   /** The associated meta types. */
-  private FileType[] types;
+  private final FileType[] types;
 
   /**
    * Constructor for initializing an element.

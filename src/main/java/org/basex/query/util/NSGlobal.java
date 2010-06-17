@@ -12,21 +12,21 @@ import org.basex.util.Atts;
  */
 public final class NSGlobal {
   /** Namespaces. */
-  private static Atts atts = new Atts();
+  private static final Atts NS = new Atts();
 
   static {
-    atts.add(LOCAL, LOCALURI);
-    atts.add(XS, XSURI);
-    atts.add(XSI, XSIURI);
-    atts.add(FN, FNURI);
-    atts.add(XMLNS, XMLNSURI);
-    atts.add(XML, XMLURI);
-    atts.add(BASEX, BXURI);
-    atts.add(FILE, FILEURI);
+    NS.add(LOCAL, LOCALURI);
+    NS.add(XS, XSURI);
+    NS.add(XSI, XSIURI);
+    NS.add(FN, FNURI);
+    NS.add(XMLNS, XMLNSURI);
+    NS.add(XML, XMLURI);
+    NS.add(BASEX, BXURI);
+    NS.add(FILE, FILEURI);
   }
 
   /** Private constructor. */
-  private NSGlobal() {}
+  private NSGlobal() { }
 
   /**
    * Finds the specified namespace uri.
@@ -34,8 +34,8 @@ public final class NSGlobal {
    * @return uri
    */
   public static byte[] uri(final byte[] pre) {
-    for(int s = atts.size - 1; s >= 0; s--) {
-      if(eq(atts.key[s], pre)) return atts.val[s];
+    for(int s = NS.size - 1; s >= 0; s--) {
+      if(eq(NS.key[s], pre)) return NS.val[s];
     }
     return EMPTY;
   }
@@ -46,8 +46,8 @@ public final class NSGlobal {
    * @return prefix
    */
   static byte[] prefix(final byte[] uri) {
-    for(int s = atts.size - 1; s >= 0; s--) {
-      if(eq(atts.val[s], uri)) return atts.key[s];
+    for(int s = NS.size - 1; s >= 0; s--) {
+      if(eq(NS.val[s], uri)) return NS.key[s];
     }
     return EMPTY;
   }
@@ -59,8 +59,8 @@ public final class NSGlobal {
    */
   public static boolean standard(final byte[] uri) {
     // 'local' namespace is skipped
-    for(int s = atts.size - 1; s > 0; s--) {
-      if(eq(atts.val[s], uri)) return true;
+    for(int s = NS.size - 1; s > 0; s--) {
+      if(eq(NS.val[s], uri)) return true;
     }
     return false;
   }

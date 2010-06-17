@@ -325,17 +325,17 @@ public enum FunDef {
   FSPATH(BXURI, FNBaseX.class, 1, 1, "fspath(item)", STR);
 
   /** Function classes. */
-  Class<? extends Fun> func;
+  final Class<? extends Fun> func;
   /** Function uri. */
-  byte[] uri;
+  final byte[] uri;
   /** Descriptions. */
-  String desc;
+  final String desc;
   /** Minimum number of arguments. */
-  int min;
+  final int min;
   /** Maximum number of arguments. */
-  int max;
+  final int max;
   /** Return type. */
-  SeqType ret;
+  final SeqType ret;
 
   /**
    * Constructor.

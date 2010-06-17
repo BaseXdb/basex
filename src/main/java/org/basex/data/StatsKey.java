@@ -77,7 +77,11 @@ public final class StatsKey {
    * @throws IOException I/O exception
    */
   public void finish(final DataOutput out) throws IOException {
-    if(cats != null && cats.size() == 0) kind = Kind.NONE;
+    if(cats != null && cats.size() == 0) {
+      // no value was added
+      kind = Kind.NONE;
+      leaf = false;
+    }
 
     out.writeNum(kind.ordinal());
     if(kind == Kind.INT || kind == Kind.DBL) {

@@ -12,9 +12,9 @@ import org.basex.util.Array;
  */
 final class ViewAlignment implements ViewLayout {
   /** Alignment (horizontal/vertical). */
-  boolean horiz;
+  final boolean horiz;
   /** Layout Components. */
-  ViewLayout[] comp = new ViewLayout[0];
+  ViewLayout[] comp = {};
 
   /**
    * Constructor.

@@ -85,7 +85,7 @@ public final class DeepFile {
   // ----- constructors. -------------------------------------------------------
   // ---------------------------------------------------------------------------
 
-  /**
+  /*
    * <p>
    * Constructor.
    * </p>
@@ -102,10 +102,10 @@ public final class DeepFile {
    * @param file the name of the associated file in the file system
    * @throws IOException if any I/O error occurs
    * @see IFileParser#extract(DeepFile)
-   */
   public DeepFile(final String file) throws IOException {
     this(new File(file));
   }
+   */
 
   /**
    * <p>
@@ -608,11 +608,10 @@ public final class DeepFile {
     if(fsAtts == null) fsAtts = extractFSAtts();
   }
 
-  /**
+  /*
    * Returns the string values for the {@link MetaElem}.
    * @param elem the metadata element
    * @return the metadata values as Strings
-   */
   public String[] getValues(final MetaElem elem) {
     final ArrayList<String> vals = metaElements.get(elem);
     if(vals == null) return null;
@@ -620,6 +619,7 @@ public final class DeepFile {
     final String[] strings = new String[max];
     return strings;
   }
+   */
 
   /**
    * Returns true, if a value is set for the given metadata element.

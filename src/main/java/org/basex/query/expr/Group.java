@@ -21,7 +21,7 @@ public final class Group extends Expr {
   /** Sequence to be grouped. */
   SeqIter sq;
   /** Group by specification. */
-  Grp[] grp;
+  final Grp[] grp;
 
   /**
    * Post grouped tuples.

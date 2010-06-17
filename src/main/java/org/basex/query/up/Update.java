@@ -39,7 +39,7 @@ abstract class Update extends Arr {
    * @throws QueryException query exception
    * @return specified node list
    */
-  protected NodIter checkNS(final NodIter list, final Nod targ,
+  protected final NodIter checkNS(final NodIter list, final Nod targ,
       final QueryContext ctx) throws QueryException {
 
     for(int a = 0; a < list.size(); a++) {

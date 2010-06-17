@@ -30,10 +30,10 @@ import org.basex.gui.layout.TableLayout;
 public abstract class Dialog extends JDialog {
   /** Reference to main window. */
   public final GUI gui;
+  /** Reference to the root panel. */
+  protected final BaseXBack panel;
   /** Remembers if the window was correctly closed. */
   protected boolean ok;
-  /** Reference to the root panel. */
-  protected BaseXBack panel;
   /** Dialog position. */
   private int[] loc;
 

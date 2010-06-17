@@ -30,11 +30,11 @@ public final class DialogEdit extends Dialog {
   public final int kind;
   /** Pre value. */
   private final int pre;
-
   /** Button panel. */
   private final BaseXBack buttons;
   /** Info label. */
   private final BaseXLabel info;
+
   /** Text area. */
   private BaseXTextField input1;
   /** Text area. */

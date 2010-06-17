@@ -16,7 +16,7 @@ import org.xml.sax.InputSource;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BXPath implements XPath {
+final class BXPath implements XPath {
   /** Variables. */
   private XPathVariableResolver variables;
   /** Functions. */

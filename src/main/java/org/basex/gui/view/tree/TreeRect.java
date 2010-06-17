@@ -7,9 +7,9 @@ package org.basex.gui.view.tree;
  */
 final class TreeRect {
   /** X position. */
-  int x;
+  final int x;
   /** Width. */
-  int w;
+  final int w;
 
   /**
    * Initializes TreeRect.

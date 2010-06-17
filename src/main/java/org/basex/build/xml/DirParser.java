@@ -16,14 +16,15 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class DirParser extends Parser {
-  /** Parser reference. */
-  private Parser parser;
   /** Properties. */
   private final Prop prop;
   /** File filter. */
   private final String filter;
   /** Initial file path. */
-  private String root;
+  private final String root;
+
+  /** Parser reference. */
+  private Parser parser;
   /** Element counter. */
   private int c;
 
@@ -45,8 +46,8 @@ public final class DirParser extends Parser {
   public DirParser(final IO path, final Prop pr, final String t) {
     super(path, t);
     prop = pr;
-    root = path.getDir();
-    if(!root.endsWith("/")) root += "/";
+    final String dir = path.getDir();
+    root = dir.endsWith("/") ? dir : dir + '/';
 
     if(path.isDir()) {
       final StringBuilder sb = new StringBuilder();

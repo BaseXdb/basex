@@ -439,7 +439,7 @@ public class AxisPath extends Path {
         nodes = s.count(nodes, data);
         if(nodes == null) break;
         res = 0;
-        for(final PathNode sn : nodes) res += sn.count;
+        for(final PathNode sn : nodes) res += sn.size;
       }
     }
     return res;

@@ -39,7 +39,7 @@ public final class Updates {
    * (XUDY0014) if the data reference of the corresponding target node is not
    * part of this set, hence the target node has not been copied.
    */
-  private Set<Data> refs;
+  private final Set<Data> refs;
 
   /**
    * Constructor.
@@ -47,7 +47,7 @@ public final class Updates {
    */
   public Updates(final boolean transform) {
     t = transform;
-    if(t) refs = new HashSet<Data>();
+    refs = t ? new HashSet<Data>() : null;
   }
 
   /**

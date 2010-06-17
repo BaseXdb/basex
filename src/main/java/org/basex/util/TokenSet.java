@@ -48,7 +48,7 @@ public class TokenSet {
    * @param in input stream
    * @throws IOException I/O exception
    */
-  public void read(final DataInput in) throws IOException {
+  public final void read(final DataInput in) throws IOException {
     keys = in.readBytesArray();
     next = in.readNums();
     bucket = in.readNums();

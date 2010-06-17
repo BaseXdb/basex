@@ -44,10 +44,11 @@ public final class DialogInfo extends Dialog {
   private DialogFT ft;
   /** Button panel. */
   private final BaseXBack buttons;
-  /** Optimize flag. */
-  public boolean opt;
   /** Optimize button. */
   private final Object optimize;
+
+  /** Optimize flag. */
+  public boolean opt;
 
   /**
    * Default constructor.

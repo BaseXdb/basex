@@ -10,7 +10,7 @@ import java.io.PrintStream;
  */
 public final class DeepStat {
   /** Device inode resides on. Type: dev_t (4 bytes) */
-  public long stdev;
+  public final long stdev = 0;
   /** Inode's number. Type: ino_t (4 bytes) */
   public long stino;
   /** Inode protection mode. Type: mode_t (2 or 4 bytes) */
@@ -22,26 +22,23 @@ public final class DeepStat {
   /** Group-id of owner. Type: gid_t (4 bytes) */
   public long stgid;
   /** Device type, for special file inode. Type: dev_t (4 bytes) */
-  public long strdev;
+  public final long strdev = 0;
   /** Time of last access. */
-//  public final Timespec st_atimespec = new Timespec();
   public long statimespec;
-  /** Time of last data modification. */
-//  public final Timespec st_mtimespec = new Timespec();
-  public long stmtimespec;
-  /** Time of last file status change. */
-//  public final Timespec st_ctimespec = new Timespec();
-  public long stctimespec;
   /** File size, in bytes. Type: off_t (8 bytes) */
   public long stsize;
   /** Blocks allocated for file. Type: quad_t (8 bytes) */
-  public long stblocks;
+  public final long stblocks = 0;
   /** Optimal file sys I/O ops blocksize. Type: u_long (4 bytes) */
-  public long stblocksize;
+  public final long stblocksize = 1;
   /** User defined flags for file. Type: u_long (4 bytes) */
-  public long stflags;
+  public final long stflags = 1;
   /** File generation number. Type: u_long (4 bytes) */
-  public long stgen;
+  public final long stgen = 1;
+  /* Time of last data modification.
+  public final Timespec st_mtimespec = new Timespec();
+  /** Time of last file status change.
+  public final Timespec st_ctimespec = new Timespec(); */
 
   /**
    * Prints stat fields to the provided stream.

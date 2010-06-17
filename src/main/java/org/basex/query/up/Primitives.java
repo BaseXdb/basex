@@ -55,7 +55,7 @@ abstract class Primitives {
    * Checks updates for violations.
    * @throws QueryException query exception
    */
-  protected void check() throws QueryException {
+  protected final void check() throws QueryException {
     // get and sort keys (pre/id values)
     final int s = op.size();
     nodes = new IntList(s);
