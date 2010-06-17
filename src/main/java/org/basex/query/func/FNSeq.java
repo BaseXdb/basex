@@ -17,7 +17,7 @@ import org.basex.query.util.ItemSet;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FNSeq extends Fun {
+final class FNSeq extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {

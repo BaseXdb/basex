@@ -22,7 +22,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FNAggr extends Fun {
+final class FNAggr extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr[0]);

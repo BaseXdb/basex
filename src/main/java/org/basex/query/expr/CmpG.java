@@ -9,7 +9,6 @@ import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.FNSimple;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
@@ -158,12 +157,9 @@ public final class CmpG extends Arr {
             e = Bln.get(cmp == Comp.GE);
           } else {
             // <=/= 0: empty(), >/!= 0: exist()
-            final Fun f = new FNSimple();
-            f.expr = fun.expr;
-            f.func = cmp == Comp.EQ || cmp == Comp.LE ?
-                FunDef.EMPTY : FunDef.EXISTS;
             ctx.compInfo(OPTWRITE, this);
-            e = f;
+            e = Fun.create(cmp == Comp.EQ || cmp == Comp.LE ?
+                FunDef.EMPTY : FunDef.EXISTS, fun.expr);;
           }
         }
       }
