@@ -23,7 +23,6 @@ import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Expr.Use;
 import org.basex.query.ft.FTOpt;
 import org.basex.query.ft.Scoring;
 import org.basex.query.item.DBNode;
@@ -216,9 +215,7 @@ public final class QueryContext extends Progress {
         rootDocs = docs;
 
         // create initial context items
-        if(nodes.doc || !root.uses(Use.ELM, this)) {
-          // optimization: all items are documents, or all query expressions
-          // start with root node
+        if(nodes.doc) {
           item = Seq.get(doc, docs);
         } else {
           // otherwise, add all context items
