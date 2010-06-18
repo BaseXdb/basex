@@ -39,8 +39,10 @@ public interface Text {
   String URL = "http://www." + NAMELC + ".org";
   /** URL of the community page. */
   String COMMUNITY_URL = URL + "/community";
+  /** URL of the update page. */
+  String UPDATE_URL = URL + "/maven/org/" + NAMELC + "/" + NAMELC;
   /** Mail. */
-  String MAIL = "info@" + NAMELC + ".org";
+  String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
   String VERSION = "6.1.7";
   /** Company info. */
@@ -583,6 +585,9 @@ public interface Text {
   /** Info on database. */
   String INFODBERR = lang("info_dberror");
 
+  /** Error info. */
+  String INFOBROSERERR = lang("info_browsererror");
+
   // The following strings are dynamically bound by the SET command
 
   /** Info on query verbosity. */
@@ -635,8 +640,6 @@ public interface Text {
   String INFOERROR = lang("info_error") + COLS;
   /** Error info. */
   String INFOENTRIES = "(" + lang("info_entries") + ")";
-  /** Error info. */
-  String INFOCOMMUNITYERROR = lang("info_browsererror", COMMUNITY_URL);
 
   // MENU ENTRIES =============================================================
 
@@ -810,6 +813,10 @@ public interface Text {
   String GUISHOWCOMMUNITY = lang("c_community");
   /** Command info. */
   String GUISHOWCOMMUNITYTT = lang("c_communitytt");
+  /** Command info. */
+  String GUISHOWUPDATES = lang("c_updates");
+  /** Command info. */
+  String GUISHOWUPDATESTT = lang("c_updatestt");
   /** Command info. */
   String GUISHOWINFO = lang("c_showinfo");
   /** Command info. */

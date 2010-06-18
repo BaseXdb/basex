@@ -123,8 +123,8 @@ public final class GUIConstants {
   }, {
     CREATEFS, SEPARATOR, DQE, MOUNTFS
   }, {
-    SHOWHELP, SHOWCOMMUNITY, Prop.MAC ? null : SEPARATOR,
-    Prop.MAC ? null : ABOUT
+    SHOWHELP, Prop.MAC ? null : SEPARATOR, SHOWCOMMUNITY, SHOWUPDATES,
+    Prop.MAC ? null : SEPARATOR, Prop.MAC ? null : ABOUT
   }};
 
   /** Context menu entries. */

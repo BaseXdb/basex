@@ -51,7 +51,7 @@ public final class Optimize extends ACreate {
     final int[] tagStack = new int[IO.MAXHEIGHT];
     final boolean path = prop.is(Prop.PATHINDEX);
     int level = 0;
-    int h = 0;
+    int h = 0, d = 0;
 
     size = data.meta.size;
     for(pre = 0; pre < size; pre++) {
@@ -62,6 +62,7 @@ public final class Optimize extends ACreate {
       if(kind == Data.DOC) {
         parStack[level++] = pre;
         if(path) data.path.add(0, level, kind);
+        d++;
       } else if(kind == Data.ELEM) {
         final int id = data.name(pre);
         data.tags.index(data.tags.key(id), null, true);
@@ -80,6 +81,7 @@ public final class Optimize extends ACreate {
       if(h < level) h = level;
     }
     data.meta.height = h;
+    data.meta.ndocs = d;
     data.meta.uptodate = true;
 
     try {

@@ -278,7 +278,9 @@ c_showexplorett=Show the explorer panel.
 c_showhelp=Help
 c_showhelptt=Show the help view. which provides information on the currently focused component.
 c_community=Community
-c_communitytt=Show the community web page (opens your default browser).
+c_communitytt=Show the community web page.
+c_updates=Check for Updates
+c_updatestt=Show the update web page.
 c_showfolder=Folder
 c_showfoldertt=Show the folder visualization.
 c_showinfo=Query Info
@@ -468,7 +470,7 @@ info_on=ON
 info_off=OFF
 info_error=Error
 info_entries=% entries
-info_browsererror=Failed to open a browser. Please manually open the URL in your favorite browser:\n\n%
+info_browsererror=Failed to open a browser.\nPlease manually open the URL:\n\n%
 
 # Command Help
 ch_nohelp=Sorry, no help available.

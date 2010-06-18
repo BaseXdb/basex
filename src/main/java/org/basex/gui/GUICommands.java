@@ -8,7 +8,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import javax.swing.AbstractButton;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -767,12 +766,24 @@ public enum GUICommands implements GUICommand {
   SHOWCOMMUNITY(GUISHOWCOMMUNITY, null, GUISHOWCOMMUNITYTT, false, false) {
     @Override
     public void execute(final GUI gui) {
+      final String url = COMMUNITY_URL;
       try {
-        Desktop.getDesktop().browse(new URI(COMMUNITY_URL));
-      } catch(final IOException e) {
-        Dialog.error(gui, INFOCOMMUNITYERROR);
-      } catch(final URISyntaxException e) {
-        Dialog.error(gui, INFOCOMMUNITYERROR);
+        Desktop.getDesktop().browse(new URI(url));
+      } catch(final Exception ex) {
+        Dialog.error(gui, Main.info(INFOBROSERERR, url));
+      }
+    }
+  },
+
+  /** Opens the update webpage. */
+  SHOWUPDATES(GUISHOWUPDATES, null, GUISHOWUPDATESTT, false, false) {
+    @Override
+    public void execute(final GUI gui) {
+      final String url = UPDATE_URL;
+      try {
+        Desktop.getDesktop().browse(new URI(url));
+      } catch(final Exception ex) {
+        Dialog.error(gui, Main.info(INFOBROSERERR, url));
       }
     }
   },

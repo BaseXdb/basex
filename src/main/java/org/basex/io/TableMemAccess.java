@@ -48,8 +48,8 @@ public final class TableMemAccess extends TableAccess {
     // read blocks
     final RandomAccessFile f = new RandomAccessFile(md.file(pf), "r");
     final byte[] array = new byte[IO.BLOCKSIZE];
-    int np = 0;
-    for(int c = 0, i = 0, l = 0; i != md.size; i++) {
+    int np = 0, c = 0, l = 0;
+    for(int i = 0; i != md.size; i++) {
       while(i == np) {
         f.seek((long) blocks[c++] * IO.BLOCKSIZE);
         f.read(array);
