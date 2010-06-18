@@ -105,7 +105,7 @@ public final class ServerProcess extends Thread {
           final byte b = in.readByte();
           if(b < ' ') {
             // handle control codes
-            query(b);
+            handle(b);
             continue;
           }
           // receive complete command
@@ -169,6 +169,15 @@ public final class ServerProcess extends Thread {
       exit();
     }
   }
+  
+  /**
+   * Handles the control codes. 
+   * @param c control code (first received byte from client)
+   * @throws IOException I/O Exception
+   */
+  private void handle(final byte c) throws IOException {
+    if(c < 3) query(c);
+  }
 
   /**
    * Process the query iterator.
@@ -200,7 +209,9 @@ public final class ServerProcess extends Thread {
         out.write(0);
       } else if(c == 1) {
         // c = 1: request next item
-        if(qp != null) close = qp.next();
+        if(qp != null) {
+          close = qp.next();
+        }
         // send 0 to mark end of result and 0 as success flag
         out.write(0);
         out.write(0);

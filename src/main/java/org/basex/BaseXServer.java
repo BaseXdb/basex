@@ -14,6 +14,7 @@ import org.basex.server.ClientSession;
 import org.basex.server.Log;
 import org.basex.server.LoginException;
 import org.basex.server.ServerProcess;
+import org.basex.server.TriggerPool;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -39,6 +40,8 @@ public final class BaseXServer extends Main implements Runnable {
   private ServerSocket server;
   /** Flag for server activity. */
   private boolean running;
+  /** Pool for triggers. */
+  public TriggerPool triggers;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -57,6 +60,7 @@ public final class BaseXServer extends Main implements Runnable {
     super(args);
     if(!success) return;
     log = new Log(context, quiet);
+    triggers = new TriggerPool();
 
     try {
       server = new ServerSocket(context.prop.num(Prop.SERVERPORT));

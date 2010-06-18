@@ -78,7 +78,7 @@ final class QueryProcess extends Progress {
       item.serialize(xml);
       item = iter.next();
     }
-    return more;
+    return !more;
   }
 
   /**
