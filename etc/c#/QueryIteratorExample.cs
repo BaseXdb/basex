@@ -1,7 +1,8 @@
 ﻿/*
  * -----------------------------------------------------------------------------
  *
- * This example shows how BaseX commands can be performed via the C# API.
+ * This example shows how results from a query can be received in an iterative
+ * mode via the C# API.
  * The execution time will be printed along with the result of the command.
  *
  * -----------------------------------------------------------------------------
@@ -14,7 +15,7 @@ using System.IO;
 
 namespace BaseXClient
 {
-  public class Example
+  public class QueryIteratorExample
   {
     public static void Main(string[] args)
     {
@@ -23,21 +24,27 @@ namespace BaseXClient
       watch.Start();
       
       // command to be performed
-      string cmd = "xquery 1 to 10";
+      string cmd = "1 to 10";
       
       try
       {
         // create session
         Session session = new Session("localhost", 1984, "admin", "admin");
-
-        // Version 1: perform command and show result or error output
-        Console.WriteLine(session.Execute(cmd));
-        
-        // Version 2 (faster): send result to the specified output stream
-        Stream stream = Console.OpenStandardOutput();
-        if (!session.Execute(cmd, stream))
+		
+        try
         {
-          Console.WriteLine(session.Info);
+          // run query iterator
+          Query query = session.query(cmd);
+          while (query.more()) 
+          {
+          	Console.WriteLine(query.next());
+          }
+          query.close();
+        }
+        catch (IOException e)
+        {
+          // print exception
+          Console.WriteLine(e.Message);
         }
 
         // close session

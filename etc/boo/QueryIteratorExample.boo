@@ -1,7 +1,8 @@
 ﻿/*
  * -----------------------------------------------------------------------------
  *
- * This example shows how BaseX commands can be performed via the Boo API.
+ * This example shows how results from a query can be received in an iterative
+ * mode via the Boo API.
  * The execution time will be printed along with the result of the command.
  *
  * -----------------------------------------------------------------------------
@@ -15,31 +16,33 @@ import System
 import System.Diagnostics
 import System.IO
 
-public class Example:
-	[STAThread]
+[module]
+public class QueryIteratorExample:
+
 	public static def Main(args as (string)):
 		// initialize timer
 		watch = Stopwatch()
 		watch.Start()
 		// command to be performed
-		cmd = 'xquery 1 to 10'
+		cmd = '1 to 10'
 		try:
 			// create session
 			session = Session('localhost', 1984, 'admin', 'admin')
-			
-			// Version 1: perform command and show result or error output
-			Console.WriteLine(session.Execute(cmd))
-			
-			// Version 2 (faster): send result to the specified output stream
-			stream as Stream = Console.OpenStandardOutput()
-			if not session.Execute(cmd, stream):
-				Console.WriteLine(session.Info)
+			try:
+				query as Query = session.query(cmd)
+				// run query iterator
+				while query.more():
+					Console.WriteLine(query.next())
+				query.close()
+			except e as IOException:
+				// print exception
+				Console.WriteLine(e.Message)
 				
 			// close session
 			session.Close()
-			
 			// print time needed
 			Console.WriteLine((('\n' + watch.ElapsedMilliseconds) + ' ms.'))
+			
 		except e as IOException:
 			// print exception
 			Console.WriteLine(e.Message)

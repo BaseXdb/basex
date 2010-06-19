@@ -59,7 +59,7 @@ public class BaseXClient {
     // receive timestamp
     final String ts = receive();
 
-    // send user name and hashed password/timestamp
+    // send {Username}0 and hashed {Password/Timestamp}0
     out = socket.getOutputStream();
     send(usern);
     send(md5(md5(pw) + ts));
@@ -77,7 +77,7 @@ public class BaseXClient {
    */
   public boolean execute(final String cmd, final OutputStream o)
       throws IOException {
-
+    // send {Command}0
     send(cmd);
     receive(o);
     info = receive();
@@ -91,6 +91,7 @@ public class BaseXClient {
    * @throws IOException Exception
    */
   public String execute(final String cmd) throws IOException {
+    // send {Command}0
     send(cmd);
     final String s = receive();
     info = receive();
@@ -205,6 +206,7 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public Query(final String query) throws IOException {
+      // send 0 to mark start of query execution, and {Query}0 as query string
       out.write(0);
       send(query);
       id = receive();
@@ -216,7 +218,8 @@ public class BaseXClient {
      * @return value of check
      * @throws IOException I/O exception
      */
-    public boolean more() throws IOException {
+    public boolean more() throws IOException { 
+      // send 1 to get next result item, and {ID}0 for identification
       out.write(1);
       send(id);
       next = receive();
@@ -237,6 +240,7 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public void close() throws IOException {
+      // send 2 to mark end of query execution, and {ID}0 for identification
       out.write(2);
       send(id);
     }

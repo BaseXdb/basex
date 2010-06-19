@@ -27,7 +27,7 @@ public final class Example {
 
       System.out.println("=== 1st version with output stream ===");
 
-      session.execute(cmd, System.out);
+      if(!session.execute(cmd, System.out)) System.out.println(session.info());
 
       System.out.println("\n\n=== 2nd version without output stream ===");
 

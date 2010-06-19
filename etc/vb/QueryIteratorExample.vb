@@ -1,7 +1,8 @@
 ﻿'
 ' * -----------------------------------------------------------------------------
 ' *
-' * This example shows how BaseX commands can be performed via the VB.Net API.
+' * This example shows how results from a query can be received in an iterative
+' * mode via the VB.Net API.
 ' * The execution time will be printed along with the result of the command.
 ' *
 ' * -----------------------------------------------------------------------------
@@ -14,27 +15,30 @@ Imports System.Diagnostics
 Imports System.IO
 
 Namespace BaseXClient
-	Public Class Example
+	Public Class QueryIteratorExample
 		Public Shared Sub Main(args As String())
 			' initialize timer
 			Dim watch As New Stopwatch()
 			watch.Start()
 
 			' command to be performed
-			Dim cmd As String = "xquery 1 to 10"
+			Dim cmd As String = "1 to 10"
 
 			Try
 				' create session
 				Dim session As New Session("localhost", 1984, "admin", "admin")
 
-				' Version 1: perform command and show result or error output
-				Console.WriteLine(session.Execute(cmd))
-
-				' Version 2 (faster): send result to the specified output stream
-				Dim stream As Stream = Console.OpenStandardOutput()
-				If Not session.Execute(cmd, stream) Then
-					Console.WriteLine(session.Info)
-				End If
+				Try
+					' run query iterator
+					Dim query As Query = session.query(cmd)
+					While query.more()
+						Console.WriteLine(query.[next]())
+					End While
+					query.close()
+				Catch e As IOException
+					' print exception
+					Console.WriteLine(e.Message)
+				End Try
 
 				' close session
 				session.Close()

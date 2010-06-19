@@ -8,55 +8,16 @@
  * for the connection. The socket connection will then be established via the
  * hostname and the port.
  *
- * For the execution of commands you need to call the Execute() method with the
- * database command as argument. The method returns a boolean, indicating if
- * the command was successful. The result is stored in the Result property,
- * and the Info property returns additional processing information or error
- * output.
+ * For the execution of commands you need to call the execute() method with the
+ * database command as argument. The method returns the result or throws
+ * an exception with the received error message.
+ * For the execution of the iterative version of a query you need to call
+ * the query() method. The results will then be returned via the more() and
+ * the next() methods. If an error occurs an exception will be thrown.
  *
  * An even faster approach is to call Execute() with the database command and
  * an output stream. The result will directly be printed and does not have to
  * be cached.
- * 
- * -----------------------------------------------------------------------------
- * Example:
- * 
- * using System;
- * 
- * namespace BaseXClient
- *	{
- *	public class Example
- *	{
- *		public static void Main(string[] args)
- *		{
- *			try
- *      {
- *				Session session = new Session("localhost", 1984, "admin", "admin");
- * 
- *        // Version 1: perform command and show result or error output
- *				if (session.Execute("xquery 1 to 10"))
- *        {
- *					Console.WriteLine(session.Result);
- * 				}
- *        else
- *        {
- *					Console.WriteLine(session.Info);
- *				}
- *
- *        // Version 2 (faster): send result to the specified output stream
- *        Stream stream = Console.OpenStandardOutput();
- *        if (!session.Execute("xquery 1 to 10", out))
- *        {
- *          Console.WriteLine(session.Info);
- *        }
- * 
- *				session.Close();
- *			} catch (Exception e) {
- *				Console.WriteLine(e.Message);
- *			}
- *		}
- *		}
- *	}
  * 
  * -----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -73,9 +34,8 @@ namespace BaseXClient
 {
   class Session
   {
-    private MemoryStream result = new MemoryStream();
     private byte[] cache = new byte[4096];
-    private NetworkStream stream;
+    public NetworkStream stream;
     private TcpClient socket;
     private string info = "";
     private int bpos;
@@ -86,7 +46,7 @@ namespace BaseXClient
     {
       socket = new TcpClient(host, port);
       stream = socket.GetStream();
-      string ts = ReadString();
+      string ts = Receive();
       Send(username);
       Send(MD5(MD5(pw) + ts));
       if (stream.ReadByte() != 0)
@@ -100,25 +60,29 @@ namespace BaseXClient
     {
       Send(com);
       Init();
-      ReadString(ms);
-      info = ReadString();
-      return Read() == 0;
+      Receive(ms);
+      info = Receive();
+      return Ok();
     }
     
     /** Executes the specified command. */
-    public bool Execute(string com)
+    public String Execute(string com)
     {
-      result = new MemoryStream();
-      return Execute(com, result);
+      Send(com);
+      Init();
+      String result = Receive();
+      info = Receive();
+      if(!Ok()) 
+      {
+      	throw new IOException(info);
+      }
+      return result;
     }
     
-    /** Returns the result. */
-    public string Result
+    /** Creates a query object. */
+    public Query query(string q) 
     {
-      get
-      {
-        return System.Text.Encoding.UTF8.GetString(result.ToArray());
-      }
+      return new Query(this, q);
     }
     
     /** Returns the processing information. */
@@ -156,7 +120,7 @@ namespace BaseXClient
     }
     
     /** Receives a string from the socket. */
-    private void ReadString(Stream ms)
+    private void Receive(Stream ms)
     {
       while (true)
       {
@@ -167,19 +131,25 @@ namespace BaseXClient
     }
     
     /** Receives a string from the socket. */
-    private string ReadString()
+    public string Receive()
     {
       MemoryStream ms = new MemoryStream();
-      ReadString(ms);
+      Receive(ms);
       return System.Text.Encoding.UTF8.GetString(ms.ToArray());
     }
     
     /** Sends strings to server. */
-    private void Send(string message)
+    public void Send(string message)
     {
       byte[] msg = System.Text.Encoding.UTF8.GetBytes(message);
       stream.Write(msg, 0, msg.Length);
       stream.WriteByte(0);
+    }
+    
+    /** Returns success check. */
+    public bool Ok()
+    {
+      return Read() == 0;
     }
     
     /** Returns the md5 hash of a string. */
@@ -194,6 +164,52 @@ namespace BaseXClient
         sb.Append(h.ToString("x2"));
       }
       return sb.ToString();
+    }
+  }
+  
+  class Query
+  {
+  	private Session session;
+  	private string id;
+  	private string nextItem;
+  	
+  	/** Constructor, creating a new query object. */
+    public Query(Session s, string query)
+    {
+	  session = s;
+	  session.stream.WriteByte(0);
+	  session.Send(query);
+	  id = session.Receive();
+	  if(!session.Ok())
+	  {
+	  	throw new IOException(session.Receive());
+	  }
+    }
+    
+    /** Checks for the next item. */
+    public bool more() 
+    {
+      session.stream.WriteByte(1);
+      session.Send(id);
+      nextItem = session.Receive();
+      if(!session.Ok())
+	  {
+	  	throw new IOException(session.Receive());
+	  }
+      return nextItem.Length != 0;
+    }
+    
+    /** Returns the next item. */
+    public string next()
+    {
+      return nextItem;      
+    }
+    
+    /** Closes the query. */
+    public void close()
+    {
+      session.stream.WriteByte(2);
+      session.Send(id);
     }
   }
 }
