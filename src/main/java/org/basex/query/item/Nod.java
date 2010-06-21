@@ -140,8 +140,6 @@ public abstract class Nod extends Item {
       if(nns != null) {
         for(int a = nns.size - 1; a >= 0; a--) {
           final byte[] key = nns.key[a];
-          // [LK] correct for namespace delcarations without prefix where ...
-          // ... key==Token.EMPTY ?
           if(!ns.contains(key)) ns.add(key, nns.val[a]);
         }
       }

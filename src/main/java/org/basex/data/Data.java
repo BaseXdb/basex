@@ -574,9 +574,6 @@ public abstract class Data {
           final boolean ne = md.nsFlag(mpre);
           ns.open();
           if(ne) {
-            // [LK] duplicate namespace declarations here?
-            // -> check this data instance for ns declarations on ancestor axis
-            // of mpre
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
           }

@@ -186,8 +186,6 @@ public abstract class UpdatePrimitive {
         q = nd.qname();
         m.ns.open();
         final Atts ns = par == 0 ? nd.nsScope() : nd.ns();
-        // [LK] I'm positive there's a better way to come by this duplicate
-        // thing ...
         if(ndPar != null) {
           final Atts nsPar = ndPar.ns();
           if(nsPar != null)

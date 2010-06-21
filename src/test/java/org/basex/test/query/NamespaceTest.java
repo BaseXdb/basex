@@ -81,7 +81,6 @@ public class NamespaceTest {
   }
 
   /** Test query.
-   * [LK]
    * Detects corrupt namespace hierarchy.
    */
   @Test
@@ -144,7 +143,7 @@ public class NamespaceTest {
   /** Test query.
    * Detects duplicate prefix declaration at pre=0 in MemData instance after
    * insert.
-   * [LK] though result correct, prefix
+   * Though result correct, prefix
    * a is declared twice. -> Solution?
    */
   @Test
@@ -159,7 +158,6 @@ public class NamespaceTest {
 //  /** Test query.
 //   * Detects duplicate prefix declarations among the insertion nodes (MemData)
 //   * and the target node's data instance.
-//   * [LK] duplicates are generated in Data.insert(...   MemData correct!
 //   */
 //  @Test
 //  public final void insertD4intoD3() {
@@ -202,10 +200,6 @@ public class NamespaceTest {
         "declare namespace a='aa';doc('d4')/a:x/a:y",
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
-
-  // [LK] add test for duplicate uri for same prefix
-  // add test (copy), check memdata
-  // ... <n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n>
 
   /** Creates the database context. */
   @BeforeClass
