@@ -16,7 +16,8 @@ public enum PrimitiveType {
   /** Type Insert into as first. */ INSERTINTOFI,
   /** Type Insert into AND insert into as last. */ INSERTINTO,
   /** Type Replace element content. */ REPLACEELEMCONT,
-  /** Type Delete. */ PUT,
+  /** Type Delete. */ PUT, // fn:put here to reflect updates of 
+                           // descendant-or-self 
   /** Type Insert before. */ INSERTBEFORE,
   /** Type Replace node. */ REPLACENODE,
   /** Type Delete. */ DELETE

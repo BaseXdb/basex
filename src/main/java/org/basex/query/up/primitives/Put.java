@@ -32,7 +32,9 @@ public final class Put extends UpdatePrimitive {
 
   @Override
   public void apply(final int add) throws QueryException {
-    // [LK] (CG) put() - node.pre reference might change after update?
+    // put() - node.pre reference might change after update?
+    // -> does not change because fn:put is applied like all other updates
+    // for each pre value bottom to top
     PrintOutput out = null;
     try {
       out = new PrintOutput(Token.string(path()));
