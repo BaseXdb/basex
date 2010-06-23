@@ -49,7 +49,7 @@ public final class For extends ForLet {
        and if no variables and no context reference is used. */
     final SeqType ret = expr.returned(ctx);
     if(pos == null && score == null && ret.zeroOrOne() &&
-        !expr.uses(Use.VAR, ctx)) {
+        !expr.uses(Use.VAR, ctx) && !expr.uses(Use.CTX, ctx)) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
