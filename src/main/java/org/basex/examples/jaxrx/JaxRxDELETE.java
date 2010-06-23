@@ -19,7 +19,6 @@ public final class JaxRxDELETE {
   /**
    * This method demonstrates the available DELETE method. In this example, an
    * an XML database is deleted.
-   *
    * @param args (ignored) command-line arguments
    * @throws IOException I/O exception
    */

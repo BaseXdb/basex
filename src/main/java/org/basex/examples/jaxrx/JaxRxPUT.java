@@ -24,7 +24,6 @@ public final class JaxRxPUT {
   /**
    * This method demonstrates the available PUT method. In this example, a new
    * XML database is created for the specified document.
-   *
    * @param args (ignored) command-line arguments
    * @throws IOException I/O exception
    */

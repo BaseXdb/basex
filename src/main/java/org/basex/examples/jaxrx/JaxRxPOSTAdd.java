@@ -24,7 +24,6 @@ public final class JaxRxPOSTAdd {
   /**
    * This method demonstrates the available POST method. In this example, a new
    * XML database is added to a database.
-   *
    * @param args (ignored) command-line arguments
    * @throws IOException I/O exception
    */

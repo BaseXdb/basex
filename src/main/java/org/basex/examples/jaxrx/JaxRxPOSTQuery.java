@@ -22,7 +22,6 @@ public final class JaxRxPOSTQuery {
   /**
    * This method demonstrates the available GET method. In this example,
    * a query on a resource is processed.
-   *
    * @param args (ignored) command-line arguments
    * @throws IOException I/O exception
    */

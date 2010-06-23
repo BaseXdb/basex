@@ -74,7 +74,6 @@ public final class QueryExample {
    * This method evaluates a query by using the database command.
    * The results are automatically serialized and printed to a specified
    * output stream.
-   *
    * @param query query to be evaluated
    * @throws BaseXException if a database command fails
    */
@@ -85,7 +84,6 @@ public final class QueryExample {
   /**
    * This method uses the {@link QueryProcessor} to evaluate a query.
    * The resulting items are passed on to an {@link XMLSerializer} instance.
-   *
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query
    * @throws IOException if an error occurs while serializing the results
@@ -113,7 +111,6 @@ public final class QueryExample {
    * The results are iterated one by one and passed on to an
    * {@link XMLSerializer} instance. This variant is especially
    * efficient if large result sets are expected.
-   *
    * @param query query to be evaluated
    * @throws QueryException if an error occurs while evaluating the query
    * @throws IOException if an error occurs while serializing the results
