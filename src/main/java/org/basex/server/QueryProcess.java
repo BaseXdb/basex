@@ -55,8 +55,8 @@ final class QueryProcess extends Progress {
    * @throws QueryException query exception
    */
   void init() throws QueryException {
-    startTimeout(ctx.prop.num(Prop.TIMEOUT));
     proc.parse();
+    if(!proc.ctx.updating) startTimeout(ctx.prop.num(Prop.TIMEOUT));
     monitored = true;
     ctx.lock.before(proc.ctx.updating);
     iter = proc.iter();
