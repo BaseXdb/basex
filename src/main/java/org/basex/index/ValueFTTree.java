@@ -6,8 +6,9 @@ import org.basex.util.Num;
 import org.basex.util.TokenList;
 
 /**
- * This class indexes all the XML Tokens in a balanced binary tree.
- * Additional all pre and pos values are stored.
+ * This class indexes full-text tokens in a balanced binary tree, including
+ * their pre and pos values. An iterator returns all compressed pre and pos
+ * values in a sorted manner.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -24,8 +25,8 @@ final class ValueFTTree extends ValueTree {
   private int pft;
 
   /**
-   * Checks if the specified token was already indexed; if yes, its pre
-   * value is added to the existing values, otherwise a new index entry
+   * Checks if the specified token was already indexed. If yes, its pre
+   * value is added to the existing values. Otherwise a new index entry
    * is created.
    * @param tok token to be indexed
    * @param pre pre value for the token
@@ -48,9 +49,9 @@ final class ValueFTTree extends ValueTree {
   }
 
   /**
-   * Initializes the tree for new full-text values.
+   * Initializes the tree for adding new full-text data.
    */
-  void initTree() {
+  void initFT() {
     poss = new TokenList(FACTOR);
     pres = new TokenList(FACTOR);
     numpre = new IntList(FACTOR);
@@ -92,7 +93,7 @@ final class ValueFTTree extends ValueTree {
    * Returns the next pos values.
    * @return byte[] compressed pos values
    */
-  byte[] nextPos() {
+  byte[] nextPoss() {
     return poss.get(pft);
   }
 

@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.util.IntList;
-import org.basex.util.Performance;
 
 /**
  * This class builds an index for text contents, optimized for fuzzy search,
@@ -59,33 +58,24 @@ final class FTFuzzyBuilder extends FTBuilder {
   }
 
   @Override
-  void index(final byte[] tok) throws IOException {
-    // until there's enough free main-memory
-    if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
-      // currently no frequency support for tfidf based scoring
-      writeIndex(csize++);
-      Performance.gc(2);
-    }
+  void index(final byte[] tok) {
     tree.index(tok, pre, wp.pos, csize);
-    ntok++;
   }
 
   @Override
   int nrTokens() {
     int l = 0;
-    for(final ValueFTTree tree2 : tree.trees) {
-      if(tree2 != null) l += tree2.size();
-    }
+    for(final ValueFTTree t : tree.trees) if(t != null) l += t.size();
     return l;
   }
 
   @Override
-  void getFreq() {
+  void calcFreq() {
     tree.init();
     while(tree.more(0)) {
       final ValueFTTree t = tree.nextTree();
       t.next();
-      getFreq(t.nextPres());
+      calcFreq(t.nextPres());
     }
   }
 
@@ -146,8 +136,8 @@ final class FTFuzzyBuilder extends FTBuilder {
 
   /**
    * Writes the token length index to disk.
-   * @param outx Output
-   * @param il IntList with token length and offset
+   * @param outx output
+   * @param il token length and offsets
    * @param ls last token length
    * @param lp last offset
    * @throws IOException I/O exception
@@ -155,8 +145,9 @@ final class FTFuzzyBuilder extends FTBuilder {
   private void writeInd(final DataOutput outx, final IntList il,
       final int ls, final int lp) throws IOException {
 
-    outx.write1(il.size() >> 1);
-    for(int i = 0; i < il.size(); i += 2) {
+    final int is = il.size();
+    outx.write1(is >> 1);
+    for(int i = 0; i < is; i += 2) {
       outx.write1(il.get(i));
       outx.write4(il.get(i + 1));
     }
@@ -166,7 +157,7 @@ final class FTFuzzyBuilder extends FTBuilder {
 
   @Override
   protected void writeIndex(final int cs) throws IOException {
-    final String s = DATAFTX + (merge ? Integer.toString(cs) : "");
+    final String s = DATAFTX + (merge ? cs : "");
     final DataOutput outx = new DataOutput(data.meta.file(s + 'x'));
     final DataOutput outy = new DataOutput(data.meta.file(s + 'y'));
     final DataOutput outz = new DataOutput(data.meta.file(s + 'z'));
@@ -193,7 +184,7 @@ final class FTFuzzyBuilder extends FTBuilder {
       // write full-text data size (number of pre values)
       outy.write4(t.nextNumPre());
       // write compressed pre and pos arrays
-      writeFTData(outz, t.nextPres(), t.nextPos());
+      writeFTData(outz, t.nextPres(), t.nextPoss());
 
       dr = outz.size();
       tr = (int) outy.size();
@@ -203,6 +194,6 @@ final class FTFuzzyBuilder extends FTBuilder {
     outx.close();
     outy.close();
     outz.close();
-    tree.initTrees();
+    tree.initFT();
   }
 }

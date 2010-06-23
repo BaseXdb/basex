@@ -29,7 +29,7 @@ public final class HTMLParser extends XMLParser {
   /** HTML reader. */
   private static XMLReader reader;
 
-  /* Check is TagSoup is found. */
+  /* Check is TagSoup is referenced in the classpath. */
   static {
     try {
       reader = (XMLReader) Class.forName(

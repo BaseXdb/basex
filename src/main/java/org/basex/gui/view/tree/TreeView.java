@@ -1056,7 +1056,7 @@ public final class TreeView extends View implements TreeViewOptions {
   }
 
   /**
-   * Return most sized Node.
+   * Returns most sized node.
    * @param d the data reference
    * @param rn root
    * @param lv level

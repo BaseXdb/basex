@@ -129,7 +129,7 @@ final class NSNode {
   }
 
   /**
-   * Recursively modified the pre values by the specified offset.
+   * Recursively modifies the pre values by the specified offset.
    * @param s start position
    * @param o offset
    */

@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import org.basex.core.Main;
-import org.basex.util.Token;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.FileType;
@@ -244,7 +243,7 @@ public final class MP3Parser implements IFileParser {
       bfc.skip(fsize);
       final byte[] vbrh = new byte[4];
       bfc.get(vbrh);
-      if(Token.eq(token("Xing"), vbrh)) {
+      if(eq(token("Xing"), vbrh)) {
         bfc.skip(3);
         bfc.buffer(5);
         if((bfc.get() & 0x01) != 0) {
@@ -259,8 +258,7 @@ public final class MP3Parser implements IFileParser {
 
       if(!deepFile.isMetaSet(MetaElem.DURATION)) deepFile.addMeta(
           MetaElem.DURATION, ParserUtil.convertMsDuration(seconds * 1000));
-      deepFile.addMeta(MetaElem.CODEC, Token.concat(VERSIONS[vers],
-          LAYERS[layr]));
+      deepFile.addMeta(MetaElem.CODEC, concat(VERSIONS[vers], LAYERS[layr]));
       deepFile.addMeta(MetaElem.BITRATE_KBIT, bitrate);
       deepFile.addMeta(MetaElem.SAMPLE_RATE, samples);
       deepFile.addMeta(MetaElem.MODE, MODES[mode]);
@@ -299,15 +297,15 @@ public final class MP3Parser implements IFileParser {
     // tag is already buffered by checkID3v1()
     final byte[] array = new byte[30];
     bfc.get(array, 0, 30);
-    if(!ws(array)) deepFile.addMeta(MetaElem.TITLE, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.TITLE, trim(array));
     bfc.get(array, 0, 30);
-    if(!ws(array)) deepFile.addMeta(MetaElem.CREATOR_NAME, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.CREATOR_NAME, trim(array));
     bfc.get(array, 0, 30);
-    if(!ws(array)) deepFile.addMeta(MetaElem.ALBUM, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.ALBUM, trim(array));
     final byte[] a2 = new byte[4];
     bfc.get(a2, 0, 4);
     if(!ws(a2)) deepFile.addMeta(MetaElem.YEAR,
-        ParserUtil.convertYear(Token.toInt(a2)));
+        ParserUtil.convertYear(toInt(a2)));
     bfc.get(array, 0, 30);
     if(array[28] == 0) { // detect ID3v1.1, last byte represents track
       if(array[29] != 0) {
@@ -315,7 +313,7 @@ public final class MP3Parser implements IFileParser {
         array[29] = 0;
       }
     }
-    if(!ws(array)) deepFile.addMeta(MetaElem.DESCRIPTION, Token.trim(array));
+    if(!ws(array)) deepFile.addMeta(MetaElem.DESCRIPTION, trim(array));
     final int genreId = bfc.get() & 0xFF;
     if(genreId != 0) deepFile.addMeta(MetaElem.GENRE, getGenre(genreId));
     bfc.position(0);
@@ -528,9 +526,9 @@ public final class MP3Parser implements IFileParser {
       id = toInt(value, 1, limit);
     } else id = toInt(value);
     if(id == Integer.MIN_VALUE) {
-      final byte[][] arrays = Token.split(value, ',');
+      final byte[][] arrays = split(value, ',');
       for(final byte[] a : arrays) {
-        deepFile.addMeta(MetaElem.GENRE, Token.trim(a));
+        deepFile.addMeta(MetaElem.GENRE, trim(a));
       }
     } else {
       deepFile.addMeta(MetaElem.GENRE, getGenre(id));
@@ -558,7 +556,7 @@ public final class MP3Parser implements IFileParser {
     while(i < size && value[i] >= '0' && value[i] <= '9')
       i++;
     // number of bytes of the number
-    final int track = Token.toInt(value, start, i);
+    final int track = toInt(value, start, i);
     if(track == Integer.MIN_VALUE) throw new ParserException(
         "Failed to parse track number");
     return track;
@@ -571,24 +569,24 @@ public final class MP3Parser implements IFileParser {
   XMLGregorianCalendar parseDate(final byte[] d) {
     final int len = d.length;
     if(len >= 4) { // yyyy
-      final int year = Token.toInt(d, 0, 4);
+      final int year = toInt(d, 0, 4);
       if(len >= 7) { // yyyy-MM
         if(d[4] != '-') return null;
-        final int month = Token.toInt(d, 5, 7);
+        final int month = toInt(d, 5, 7);
         if(len >= 10) { // yyyy-MM-dd
           if(d[7] != '-') return null;
-          final int day = Token.toInt(d, 8, 10);
+          final int day = toInt(d, 8, 10);
           if(len >= 13) { // yyyy-MM-ddTHH
             if(d[10] != 'T') return null;
             final GregorianCalendar gc = new GregorianCalendar();
             gc.set(year, month, day);
-            gc.set(Calendar.HOUR_OF_DAY, Token.toInt(d, 11, 13));
+            gc.set(Calendar.HOUR_OF_DAY, toInt(d, 11, 13));
             if(len >= 16) {
               if(d[13] != ':') return null;
-              gc.set(Calendar.MINUTE, Token.toInt(d, 14, 16));
+              gc.set(Calendar.MINUTE, toInt(d, 14, 16));
               if(len >= 19) {
                 if(d[16] != ':') return null;
-                gc.set(Calendar.SECOND, Token.toInt(d, 17, 19));
+                gc.set(Calendar.SECOND, toInt(d, 17, 19));
               }
             }
             return ParserUtil.convertDateTime(gc);
@@ -996,7 +994,7 @@ public final class MP3Parser implements IFileParser {
       @Override
       void parse(final MP3Parser obj, final int size) throws IOException {
         obj.deepFile.addMeta(MetaElem.YEAR,
-            ParserUtil.convertYear(Token.toInt(obj.readText(size))));
+            ParserUtil.convertYear(toInt(obj.readText(size))));
       }
     },
 

@@ -63,7 +63,6 @@ public final class Updates {
    * primitives with fragments as target nodes are treated differently,
    * because they don't effect any existing databases. They may not hurt
    * any constraints however.
-   *
    * @param p primitive to add
    * @param ctx query context
    * @throws QueryException query exception

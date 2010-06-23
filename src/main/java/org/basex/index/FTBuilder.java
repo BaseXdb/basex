@@ -1,12 +1,15 @@
 package org.basex.index;
 
 import static org.basex.core.Text.*;
+import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
+import org.basex.core.proc.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
+import org.basex.io.IO;
 import org.basex.query.ft.Scoring;
 import org.basex.query.ft.StopWords;
 import org.basex.util.IntList;
@@ -79,6 +82,8 @@ public abstract class FTBuilder extends IndexBuilder {
 
   @Override
   public void abort() {
+    DropDB.drop(data.meta.name, DATAFTX + ".*" + IO.BASEXSUFFIX,
+        data.meta.prop);
     data.meta.ftxindex = false;
   }
 
@@ -88,8 +93,11 @@ public abstract class FTBuilder extends IndexBuilder {
    */
   protected final void index() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
-    Main.debug("Full-texts:");
+    Main.debug(det() + COL);
 
+    DropDB.drop(data.meta.name, DATAFTX + ".*" + IO.BASEXSUFFIX,
+        data.meta.prop);
+    
     for(pre = 0; pre < size; pre++) {
       if((pre & 0xFFFF) == 0) check();
 
@@ -103,21 +111,32 @@ public abstract class FTBuilder extends IndexBuilder {
       wp.init(data.text(pre, true));
       while(wp.more()) {
         final byte[] tok = wp.get();
-        // skip too long tokens
-        if(tok.length <= MAXLEN && sw.id(tok) == 0) index(tok);
+        // skip too long and stopword tokens
+        if(tok.length <= MAXLEN && (sw.size() == 0 || sw.id(tok) == 0)) {
+          // check if main-memory is exhausted
+          if((ntok++ & 0xFFF) == 0 && scm == 0 && memFull()) {
+            // currently no frequency support for tfidf based scoring
+            writeIndex(csize++);
+            Performance.gc(2);
+          }
+          index(tok);
+        }
       }
     }
+
+    // calculate term frequencies
     if(scm > 0) {
       maxfreq = new int[unit.size() + 1];
       ntoken = new int[nrTokens()];
       token = 0;
-      getFreq();
+      calcFreq();
     }
 
-    // normalization
+    // write tokens
     token = 0;
     write();
 
+    // set meta data
     if(scm > 0) {
       data.meta.ftscmax = max;
       data.meta.ftscmin = min;
@@ -132,7 +151,7 @@ public abstract class FTBuilder extends IndexBuilder {
    * Calculates the tf-idf data for a single token.
    * @param vpre pre values for a token
    */
-  protected final void getFreq(final byte[] vpre) {
+  protected final void calcFreq(final byte[] vpre) {
     int np = 4;
     int nl = Num.len(vpre, np);
     int p = Num.read(vpre, np);
@@ -269,7 +288,7 @@ public abstract class FTBuilder extends IndexBuilder {
   /**
    * Evaluates the maximum frequencies for tfidf.
    */
-  abstract void getFreq();
+  abstract void calcFreq();
 
   /**
    * Writes the index data to disk.

@@ -90,7 +90,7 @@ public final class Lock {
   }
 
   /**
-   * Notify readers.
+   * Notifies all waiting readers.
    */
   private synchronized void notifyReaders() {
     while(waiting.size() > 0) {
@@ -104,7 +104,7 @@ public final class Lock {
   }
 
   /**
-   * Notify writers.
+   * Notifies a waiting writer.
    */
   private synchronized void notifyWriter() {
     if(waiting.size() > 0) {

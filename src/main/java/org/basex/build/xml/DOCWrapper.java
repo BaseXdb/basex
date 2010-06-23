@@ -7,7 +7,6 @@ import java.util.Stack;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Main;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -63,10 +62,10 @@ public final class DOCWrapper extends Parser {
           final int as = at.getLength();
           atts.reset();
           for(int a = 0; a < as; a++) {
-            atts.add(Token.token(at.item(a).getNodeName()),
-                Token.token(at.item(a).getNodeValue()));
+            atts.add(token(at.item(a).getNodeName()),
+                token(at.item(a).getNodeValue()));
           }
-          builder.startElem(Token.token(n.getNodeName()), atts);
+          builder.startElem(token(n.getNodeName()), atts);
         } else if(n instanceof Text) {
           builder.text(new TokenBuilder(n.getNodeValue()));
         } else if(n instanceof Comment) {
@@ -80,7 +79,7 @@ public final class DOCWrapper extends Parser {
       } else {
         stack.pop();
         if(stack.empty()) break;
-        builder.endElem(Token.token(stack.peek().curr().getNodeName()));
+        builder.endElem(token(stack.peek().curr().getNodeName()));
       }
     }
     builder.endDoc();

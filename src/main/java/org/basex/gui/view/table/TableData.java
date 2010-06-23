@@ -12,7 +12,6 @@ import org.basex.util.Array;
 import org.basex.util.BoolList;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.TokenList;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.MetaElem;
@@ -96,7 +95,7 @@ final class TableData {
     if(data.fs != null) roots.add(DeepFS.FILE);
     else {
       // sort keys by occurrence
-      for(final byte[] k : data.path.desc(Token.EMPTY, data, true, true)) {
+      for(final byte[] k : data.path.desc(EMPTY, data, true, true)) {
         int c = 0;
         for(final byte[] kk : data.path.desc(k, data, true, false)) {
           final Names nm = startsWith(kk, '@') ? data.atts : data.tags;

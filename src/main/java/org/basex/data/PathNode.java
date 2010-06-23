@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
-import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.core.Text;
@@ -113,11 +112,11 @@ public final class PathNode {
   public byte[] token(final Data data) {
     switch(kind) {
       case Data.ELEM: return data.tags.key(name);
-      case Data.ATTR: return concat(ATT, data.atts.key(name));
+      case Data.ATTR: return Token.concat(ATT, data.atts.key(name));
       case Data.TEXT: return TEXT;
       case Data.COMM: return COMM;
       case Data.PI:   return PI;
-      default:        return EMPTY;
+      default:        return Token.EMPTY;
     }
   }
 

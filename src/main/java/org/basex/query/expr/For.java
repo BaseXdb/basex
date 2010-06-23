@@ -45,7 +45,8 @@ public final class For extends ForLet {
     // empty sequence - empty loop
     expr = checkUp(expr, ctx).comp(ctx);
 
-    // bind variable if single value is returned and if no variables are used
+    /* bind variable if zero or one values are returned,
+       and if no variables and no context reference is used. */
     final SeqType ret = expr.returned(ctx);
     if(pos == null && score == null && ret.zeroOrOne() &&
         !expr.uses(Use.VAR, ctx)) {

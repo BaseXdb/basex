@@ -9,7 +9,6 @@ import org.basex.io.DataAccess;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -32,7 +31,7 @@ public final class Values implements Index {
   private final Data data;
   /** Cache tokens. */
   private final FTTokenMap cache = new FTTokenMap();
-  /** Cached texts. Increases memory, but speeds up repeated queries. */
+  /** Cached texts. Increases used memory, but speeds up repeated queries. */
   private final byte[][] ctext;
 
   /**
@@ -52,8 +51,7 @@ public final class Values implements Index {
    * @param pre file prefix
    * @throws IOException IO Exception
    */
-  Values(final Data d, final boolean txt, final String pre)
-      throws IOException {
+  Values(final Data d, final boolean txt, final String pre) throws IOException {
     data = d;
     text = txt;
     idxl = new DataAccess(d.meta.file(pre + 'l'));
@@ -171,7 +169,7 @@ public final class Values implements Index {
   }
 
   /**
-   * Return iterator for the specified id list.
+   * Returns an iterator for the specified id list.
    * @param ids id list
    * @return iterator
    */
@@ -189,8 +187,8 @@ public final class Values implements Index {
   }
 
   /**
-   * Returns the id offset for the specified token or
-   * 0 if the token is not found.
+   * Returns the id offset for the specified token,
+   * or {@code 0} if the token is not found.
    * @param key token to be found
    * @return id offset
    */
@@ -206,7 +204,7 @@ public final class Values implements Index {
         txt = data.text(pre, text);
         ctext[m] = txt;
       }
-      final int d = Token.diff(txt, key);
+      final int d = diff(txt, key);
       if(d == 0) return pos;
       if(d < 0) l = m + 1;
       else h = m - 1;

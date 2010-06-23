@@ -24,7 +24,7 @@ final class TreeSubtree {
   }
 
   /**
-   * Generate subtree borders.
+   * Generates subtree borders.
    * @param c context
    * @return root length
    */

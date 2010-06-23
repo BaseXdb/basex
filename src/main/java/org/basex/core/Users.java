@@ -21,7 +21,7 @@ public final class Users extends ArrayList<User> {
   private File file;
 
   /**
-   * Global constructor.
+   * Constructor for global users.
    * @param global global flag
    */
   public Users(final boolean global) {
@@ -44,7 +44,7 @@ public final class Users extends ArrayList<User> {
   }
 
   /**
-   * Local constructor.
+   * Constructor for local users.
    * @param in input stream
    * @throws IOException I/O exception
    */

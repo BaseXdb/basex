@@ -1,5 +1,6 @@
 package org.basex.core.proc;
 
+import static org.basex.util.Token.*;
 import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.core.Commands.Cmd;
@@ -12,7 +13,6 @@ import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.util.FSImporter;
-import static org.basex.util.Token.*;
 
 /**
  * Evaluates the 'find' command and processes a simplified request as XQuery.

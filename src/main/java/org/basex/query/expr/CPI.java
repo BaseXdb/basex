@@ -11,7 +11,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -47,8 +46,8 @@ public final class CPI extends CFrag {
     if(it == null) Err.empty(this);
     if(!it.u() && !it.s() && it.type != Type.QNM) Err.or(CPIWRONG, it.type, it);
 
-    final byte[] nm = Token.trim(it.str());
-    if(Token.eq(Token.lc(nm), Token.XML)) Err.or(CPIXML, nm);
+    final byte[] nm = trim(it.str());
+    if(eq(lc(nm), XML)) Err.or(CPIXML, nm);
     if(!XMLToken.isNCName(nm)) Err.or(CPIINVAL, nm);
 
     final Iter iter = ctx.iter(expr[1]);
@@ -58,7 +57,7 @@ public final class CPI extends CFrag {
 
     int i = -1;
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
-    v = Token.substring(v, i);
+    v = substring(v, i);
     return new FPI(new QNm(nm), check(v), null);
   }
 

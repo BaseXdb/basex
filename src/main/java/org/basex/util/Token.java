@@ -505,7 +505,7 @@ public final class Token {
   }
 
   /**
-   * Converts the specified string into a double value.
+   * Converts the specified token into a double value.
    * {@link Double#NaN} is returned when the input is invalid.
    * @param token token to be converted
    * @return resulting double value
@@ -645,7 +645,7 @@ public final class Token {
   }
 
   /**
-   * Compares two character arrays for equality.
+   * Compares two tokens for equality.
    * @param token1 first token
    * @param token2 token to be compared
    * @return true if the arrays are equal
@@ -658,19 +658,19 @@ public final class Token {
   }
 
   /**
-   * Calculates the difference of two character arrays.
+   * Calculates the difference of two tokens.
    * @param token first token
-   * @param token2 token to be compared
+   * @param compare token to be compared
    * @return 0 if tokens are equal, negative if first token is smaller,
    *   positive if first token is bigger
    */
-  public static int diff(final byte[] token, final byte[] token2) {
-    final int l = Math.min(token.length, token2.length);
+  public static int diff(final byte[] token, final byte[] compare) {
+    final int l = Math.min(token.length, compare.length);
     for(int i = 0; i != l; i++) {
-      final int c = (token[i] & 0xFF) - (token2[i] & 0xFF);
+      final int c = (token[i] & 0xFF) - (compare[i] & 0xFF);
       if(c != 0) return c;
     }
-    return token.length - token2.length;
+    return token.length - compare.length;
   }
 
   /**

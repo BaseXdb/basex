@@ -69,6 +69,8 @@ public final class QueryContext extends Progress {
 
   /** Namespaces. */
   public NSLocal ns = new NSLocal();
+  /** Reference to the root expression. */
+  public Expr root;
   /** Current context. */
   public Item item;
   /** Current context position. */
@@ -147,8 +149,6 @@ public final class QueryContext extends Progress {
   /** Collection counter. */
   private int colls;
 
-  /** Reference to the root expression. */
-  private Expr root;
   /** Initial number of documents. */
   private int rootDocs;
 

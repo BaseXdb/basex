@@ -14,7 +14,6 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.util.Err;
 import org.basex.util.ObjectMap;
-import org.basex.util.Token;
 import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
 
@@ -207,7 +206,7 @@ public final class Thesaurus {
     if(lev > max || node == null) return;
 
     for(int n = 0; n < node.size; n++) {
-      if(rel.length == 0 || Token.eq(node.rs[n], rel)) {
+      if(rel.length == 0 || eq(node.rs[n], rel)) {
         final byte[] term = node.nodes[n].term;
         if(!list.contains(term)) {
           //if(lev >= min) list.add(node.term);
@@ -223,8 +222,8 @@ public final class Thesaurus {
    * @param th instance to be compared
    * @return result of check
    */
-  boolean eq(final Thesaurus th) {
+  boolean sameAs(final Thesaurus th) {
     return file.eq(th.file) && min == th.min && max == th.max &&
-      Token.eq(rel, th.rel);
+      eq(rel, th.rel);
   }
 }

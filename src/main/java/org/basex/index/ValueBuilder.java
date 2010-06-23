@@ -17,8 +17,22 @@ import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 
 /**
- * This main-memory based class builds an index for attribute values and
- * text contents in a tree structure and stores the result to disk.
+ * This class builds an index for attribute values and text contents in a
+ * tree structure and stores the result to disk.<br/>
+ * 
+ * The data is stored on disk in the following format:<br/>
+ * 
+ * <ul>
+ * <li> {@code DATATXT/ATV + 'l'}: contains the index values, which are dense id
+ *   lists to all text nodes/attribute values, stored in the {@link Num} format:
+ *   [size0, pre1, pre2, ...]. The number of index keys is stored in the first 4
+ *   bytes of the file.</li>
+ * <li> {@code DATATXT/ATV + 'r'}: contains 5-byte references to the id lists
+ *   for all keys. To save space, the keys itself are not stored in the index
+ *   structure. Instead, they can be found by following the id references to
+ *   the main table.
+ * </li>
+ * </ul>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -44,30 +58,32 @@ public final class ValueBuilder extends IndexBuilder {
   @Override
   public Values build() throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
-    Main.debug((text ? "Texts" : "Attributes") + ": ");
+    Main.debug(det() + COL);
 
     final String f = text ? DATATXT : DATAATV;
-    final int type = text ? Data.TEXT : Data.ATTR;
+    DropDB.drop(data.meta.name, f + ".*" + IO.BASEXSUFFIX, data.meta.prop);
+
+    final int k = text ? Data.TEXT : Data.ATTR;
 
     for(pre = 0; pre < size; pre++) {
       if((pre & 0x0FFF) == 0) {
         check();
         // check if main-memory is exhausted
         if(memFull()) {
-          write(f + csize++);
+          write(f + csize++, false);
           index = new ValueTree();
           Performance.gc(2);
         }
       }
       // skip too long tokens
-      if(data.kind(pre) == type && data.textLen(pre, text) <= MAXLEN)
+      if(data.kind(pre) == k && data.textLen(pre, text) <= MAXLEN)
         index.index(data.text(pre, text), pre);
     }
 
     if(csize == 0) {
-      writeSingle(f);
+      write(f, true);
     } else {
-      write(f + csize);
+      write(f + csize, false);
       index = null;
       Performance.gc(1);
       csize++;
@@ -110,43 +126,43 @@ public final class ValueBuilder extends IndexBuilder {
       min = 0;
       ml.reset();
       for(int i = 0; i < csize; i++) {
-        if(min == i || vm[i].t.length == 0) continue;
-        final int d = diff(vm[min].t, vm[i].t);
-        if(d > 0 || vm[min].t.length == 0) {
+        if(min == i || vm[i].token.length == 0) continue;
+        final int d = diff(vm[min].token, vm[i].token);
+        if(d > 0 || vm[min].token.length == 0) {
           min = i;
           ml.reset();
-        } else if(d == 0 && vm[i].t.length > 0) {
+        } else if(d == 0 && vm[i].token.length != 0) {
           if(ml.size() == 0) ml.add(min);
           ml.add(i);
         }
       }
 
-      if(ml.size() == 0) {
-        writeWithNum(outl, vm[min].p);
+      final int ms = ml.size();
+      if(ms == 0) {
+        write(outl, vm[min].pre);
         vm[min].next();
       } else {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(new byte[4]);
-        int npre = 0;
-        int opre = 0;
-        for(int j = 0; j < ml.size(); j++) {
+        int opre = 0, npre = 0;
+        for(int j = 0; j < ms; j++) {
           final int m = ml.get(j);
           if(j == 0) {
             int l = 4;
-            while(l < vm[m].p.length) {
-              final int diff = Num.read(vm[m].p, l);
+            while(l < vm[m].pre.length) {
+              final int diff = Num.read(vm[m].pre, l);
               opre += diff;
               l += Num.len(diff);
             }
-            tb.add(substring(vm[m].p, 4));
+            tb.add(substring(vm[m].pre, 4));
           } else {
-            npre = Num.read(vm[m].p, 4);
+            npre = Num.read(vm[m].pre, 4);
             tb.add(Num.num(npre - opre));
             int l = 4 + Num.len(npre);
-            tb.add(substring(vm[m].p, l));
+            tb.add(substring(vm[m].pre, l));
             opre = npre;
-            while(l < vm[m].p.length) {
-              final int diff = Num.read(vm[m].p, l);
+            while(l < vm[m].pre.length) {
+              final int diff = Num.read(vm[m].pre, l);
               opre += diff;
               l += Num.len(diff);
             }
@@ -155,7 +171,7 @@ public final class ValueBuilder extends IndexBuilder {
         }
         final byte[] tmp = tb.finish();
         Num.size(tmp, tmp.length);
-        writeWithNum(outl, tmp);
+        write(outl, tmp);
       }
     }
     outr.close();
@@ -164,13 +180,13 @@ public final class ValueBuilder extends IndexBuilder {
   }
 
   /**
-   * Writes pre values to disk with number (number of byte values) as
-   * first value.
-   * @param outl DataOutput
+   * Writes the compressed pre value array to disk, preceded by the compressed
+   * number of bytes.
+   * @param outl data output
    * @param pres pre values
    * @throws IOException I/O exception
    */
-  private void writeWithNum(final DataOutput outl, final byte[] pres)
+  private void write(final DataOutput outl, final byte[] pres)
       throws IOException {
 
     final int is = Num.size(pres);
@@ -186,79 +202,68 @@ public final class ValueBuilder extends IndexBuilder {
    * @return boolean
    */
   private boolean check(final ValueMerge[] vm) {
-    for(final ValueMerge m : vm) if(m.p.length > 0) return true;
+    for(final ValueMerge m : vm) if(m.pre.length != 0) return true;
     return false;
   }
 
   /**
    * Writes the current value tree to disk.
-   * @param n name
+   * @param name name
+   * @param all writes the complete tree
    * @throws IOException I/O exception
    */
-  private void write(final String n) throws IOException {
+  private void write(final String name, final boolean all) throws IOException {
     // write positions and references
-    final DataOutput outl = new DataOutput(data.meta.file(n + 'l'));
-    final DataOutput outr = new DataOutput(data.meta.file(n + 'r'));
+    final DataOutput outl = new DataOutput(data.meta.file(name + 'l'));
+    final DataOutput outr = new DataOutput(data.meta.file(name + 'r'));
     outl.write4(index.size());
+
     index.init();
     while(index.more()) {
       outr.write5(outl.size());
       final int i = index.next();
       final byte[] pres = index.pres.get(i);
       final int is = Num.size(pres);
-      final byte[] tmp = new byte[4 + is];
-      Num.size(tmp, 4);
 
-      for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {
-        final int p = Num.read(pres, ip);
-        Num.add(tmp, p - o);
-        o = p;
-      }
-      outl.write(tmp, 0, Num.size(tmp));
-    }
-    outl.close();
-    outr.close();
+      if(all) {
+        // write final structure to disk
+        int v = 0;
+        for(int ip = 4; ip < is; ip += Num.len(pres, ip)) v++;
+        outl.writeNum(v);
 
-    // write texts
-    final DataOutput outt = new DataOutput(data.meta.file(n + 't'));
-    index.init();
-    while(index.more()) outt.writeToken(index.tokens.get(index.next()));
-    outt.close();
-  }
-
-  /**
-   * Write single index to disk.
-   * @param n name
-   * @throws IOException IOException
-   */
-  private void writeSingle(final String n) throws IOException {
-    final DataOutput outl = new DataOutput(data.meta.file(n + 'l'));
-    final DataOutput outr = new DataOutput(data.meta.file(n + 'r'));
-    outl.write4(index.size());
-    index.init();
-    while(index.more()) {
-      outr.write5(outl.size());
-      final int i = index.next();
-      final byte[] pres = index.pres.get(i);
-      final int is = Num.size(pres);
-      int v = 0;
-      for(int ip = 4; ip < is; ip += Num.len(pres, ip)) v++;
-      outl.writeNum(v);
-
-      for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {
-        final int p = Num.read(pres, ip);
-        outl.writeNum(p - o);
-        o = p;
+        for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {
+          final int p = Num.read(pres, ip);
+          outl.writeNum(p - o);
+          o = p;
+        }
+      } else {
+        // write integer with number of bytes and compressed pre values to disk
+        final byte[] tmp = new byte[4 + is];
+        Num.size(tmp, 4);
+        for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {
+          final int p = Num.read(pres, ip);
+          Num.add(tmp, p - o);
+          o = p;
+        }
+        outl.write(tmp, 0, Num.size(tmp));
       }
     }
     outl.close();
     outr.close();
+
+    // temporarily write texts
+    if(!all) {
+      final DataOutput outt = new DataOutput(data.meta.file(name + 't'));
+      index.init();
+      while(index.more()) outt.writeToken(index.tokens.get(index.next()));
+      outt.close();
+    }
   }
 
   @Override
   public void abort() {
-    final String f = (text ? DATATXT : DATAATV) + ".*" + IO.BASEXSUFFIX;
-    DropDB.drop(data.meta.name, f, data.meta.prop);
+    final String f = text ? DATATXT : DATAATV;
+    DropDB.drop(data.meta.name, f + ".*" + IO.BASEXSUFFIX, data.meta.prop);
     if(text) data.meta.txtindex = false;
     else data.meta.atvindex = false;
   }

@@ -15,21 +15,19 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 final class ValueMerge {
-  /** Data reference. */
-  private final Data data;
-  /** Text flag. */
-  private final boolean text;
-
   /** Data input reference. */
   private final DataInput di;
+  /** File prefix. */
+  private final String pref;
+  /** Data reference. */
+  private final Data data;
   /** Index instance. */
   private final Values v;
-  /** Index id. */
-  private final int id;
-  /** Current text. */
-  byte[] t;
+
+  /** Current token. */
+  byte[] token;
   /** Current pre values. */
-  byte[] p;
+  byte[] pre;
 
   /**
    * Constructor.
@@ -39,12 +37,10 @@ final class ValueMerge {
    * @throws IOException I/O exception
    */
   ValueMerge(final Data d, final boolean txt, final int i) throws IOException {
-    final String f = txt ? DATATXT : DATAATV;
-    di = new DataInput(d.meta.file(f + i + 't'));
-    v = new Values(d, txt, f + i);
-    text = txt;
+    pref = (txt ? DATATXT : DATAATV) + i;
+    di = new DataInput(d.meta.file(pref + 't'));
+    v = new Values(d, txt, pref);
     data = d;
-    id = i;
     next();
   }
 
@@ -53,16 +49,14 @@ final class ValueMerge {
    * @throws IOException I/O exception
    */
   void next() throws IOException {
-    p = v.nextPres();
-    if(p.length > 0) {
-      //t = data.text(Num.read(p, 4), text);
-      t = di.readBytes();
+    pre = v.nextPres();
+    if(pre.length != 0) {
+      token = di.readBytes();
     } else {
-      t = EMPTY;
+      token = EMPTY;
       v.close();
       di.close();
-      final String f = (text ? DATATXT : DATAATV) + id + '.' + IO.BASEXSUFFIX;
-      DropDB.drop(data.meta.name, f, data.meta.prop);
+      DropDB.drop(data.meta.name, pref + '.' + IO.BASEXSUFFIX, data.meta.prop);
     }
   }
 }

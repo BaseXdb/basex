@@ -19,7 +19,6 @@ public final class Extension extends Single {
 
   /**
    * Constructor.
-   *
    * @param prag pragmas
    * @param e enclosed expression
    */

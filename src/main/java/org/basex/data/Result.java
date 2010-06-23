@@ -16,11 +16,11 @@ public interface Result {
   int size();
 
   /**
-   * Compares values for equality.
-   * @param v value to be compared
-   * @return true if values are equal
+   * Compares results for equality.
+   * @param r result to be compared
+   * @return true if results are equal
    */
-  boolean same(Result v);
+  boolean same(Result r);
 
   /**
    * Serializes the complete result.

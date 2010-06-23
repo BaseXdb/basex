@@ -8,8 +8,8 @@ import org.basex.util.Token;
 import org.basex.util.TokenList;
 
 /**
- * This class indexes all the XML Tokens in a balanced binary tree.
- * The iterator returns all compressed pre values in a sorted manner.
+ * This class indexes tokens in a balanced binary tree, including their pre
+ * values. An iterator returns all compressed pre values in a sorted manner.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -37,8 +37,7 @@ class ValueTree {
   private int ln;
 
   /**
-   * Check if specified token was already indexed; if yes, its pre
-   * value is added to the existing values. otherwise, create new index entry.
+   * Indexes the specified token and pre value.
    * @param tok token to be indexed
    * @param pre pre value for the token
    * @return int node
@@ -48,8 +47,9 @@ class ValueTree {
   }
 
   /**
-   * Check if specified token was already indexed; if yes, its pre
-   * value is added to the existing values. otherwise, create new index entry.
+   * Indexes the specified token and pre value. If the token has already been
+   * indexed, its pre value is added to the existing value array.
+   * Otherwise, a new index entry is created.
    * @param tok token to be indexed
    * @param pre pre value for the token
    * @param f flag for usage of existing index
@@ -66,8 +66,9 @@ class ValueTree {
     while(true) {
       final int c = Token.diff(tok, tokens.get(n));
       if(c == 0) {
-        if(f) pres.set(Num.add(pres.get(n), pre), n);
-        else {
+        if(f) {
+          pres.set(Num.add(pres.get(n), pre), n);
+        } else {
           final int i = maps.get(Num.num(n));
           if(i < 0) {
             maps.add(Num.num(n), pres.size());
@@ -105,7 +106,6 @@ class ValueTree {
 
   /**
    * Initializes the index iterator.
-   * Note that the iterator can only be called once; index structures
    * will be removed to save memory.
    */
   final void init() {
@@ -191,7 +191,7 @@ class ValueTree {
   }
 
   /**
-   * Setter for the left child.
+   * Sets the left child.
    * @param nd current node
    * @param val left node
    */
@@ -200,7 +200,7 @@ class ValueTree {
   }
 
   /**
-   * Setter for the right child.
+   * Sets the right child.
    * @param nd current node
    * @param val right node
    */
@@ -209,7 +209,7 @@ class ValueTree {
   }
 
   /**
-   * Setter for the parent node.
+   * Sets the parent node.
    * @param nd current node
    * @param val parent node
    */

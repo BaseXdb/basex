@@ -11,7 +11,6 @@ import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.IntArrayList;
 import org.basex.util.IntList;
-import org.basex.util.Performance;
 import org.basex.util.TokenList;
 
 /**
@@ -21,12 +20,9 @@ import org.basex.util.TokenList;
  * <li> if main-memory is full, data is written as sorted list to disk (1)</li>
  * <li> merge disk data trough reading sorted lists</li>
  * <li> write sorted list (merged) to disk</li>
- * <li> create final trie structure out of it (4) with the following final
- *        format:<br/>
+ * <li> create final trie structure out of it (4) in the following format:<br/>
  *
- * The data is stored on disk with the following format:<br/>
- *
- * {@code DATAFTX + 'a'}: stores the trie structure in the following format:
+ * {@code DATAFTX + 'a'}: contains the trie structure in the following format:
  * <br/>
  *  [l, t1, ..., tl, n1, v1, ..., nu, vu, s, p]<br/>
  *    l  = length of the token t1, ..., tl [byte]<br/>
@@ -34,11 +30,11 @@ import org.basex.util.TokenList;
  *    v1 = the first byte of each token n1 points, ... [byte]<br/>
  *    s  = size of pre values [int] saved at pointer p [long]<br/>
  *
- * {@code DATAFTX + 'b'}: stores the full-text data; the pre values are ordered,
- *  but not distinct<br/>
+ * {@code DATAFTX + 'b'}: contains the full-text data; the pre values are
+ *  ordered, but not distinct<br/>
  *  [pre1, pos1, pre2, pos2, pre3, pos3, ...] as Nums<br/>
  *
- * {@code DATAFTX + 'c'}: stores the size of each trie node<br/>
+ * {@code DATAFTX + 'c'}: contains the size of each trie node<br/>
  *  [size0, size1, size2, ..., sizeN]<br/>
  *  size is an int value
  * </li>
@@ -67,22 +63,13 @@ final class FTTrieBuilder extends FTBuilder {
 
   @Override
   public FTIndex build() throws IOException {
-    maxMem = (long) (maxMem * 0.9);
     index();
     return new FTTrie(data);
   }
 
   @Override
-  void index(final byte[] tok) throws IOException {
-    // until there's enough free main-memory
-    if((ntok & 0xFFF) == 0 && scm == 0 && memFull()) {
-      // currently no frequency support for tfidf based scoring
-      // write data temporarily as sorted list
-      writeIndex(csize++);
-      Performance.gc(2);
-    }
+  void index(final byte[] tok) {
     hash.index(tok, pre, wp.pos);
-    ntok++;
   }
 
   @Override
@@ -91,9 +78,9 @@ final class FTTrieBuilder extends FTBuilder {
   }
 
   @Override
-  void getFreq() {
+  void calcFreq() {
     hash.init();
-    while(hash.more()) getFreq(hash.pre[hash.next()]);
+    while(hash.more()) calcFreq(hash.pre[hash.next()]);
   }
 
   @Override
@@ -106,7 +93,7 @@ final class FTTrieBuilder extends FTBuilder {
     // merges temporary index files
     writeIndex(csize++);
     final DataOutput outb = new DataOutput(data.meta.file(DATAFTX + 'b'));
-    final DataOutput tmp  = new DataOutput(data.meta.file(DATAFTX + 't'));
+    final DataOutput outt = new DataOutput(data.meta.file(DATAFTX + 't'));
     final IntList ind = new IntList();
 
     // open all temporary sorted lists
@@ -137,24 +124,24 @@ final class FTTrieBuilder extends FTBuilder {
       }
 
       // write token to disk
-      tmp.writeToken(v[min].tok);
+      outt.writeToken(v[min].tok);
 
       // merge and write out data size
       int s = merge(outb, il, v);
-      tmp.write4(s);
+      outt.write4(s);
       // write out pointer on full-text data
-      tmp.write5(outb.size());
+      outt.write5(outb.size());
     }
 
-    tmp.writeToken(EMPTY);
-    tmp.close();
+    outt.writeToken(EMPTY);
+    outt.close();
     outb.close();
     // write trie index structure to disk, split in subtrees
     writeSplitTrie(ind);
   }
 
   /**
-   * Write trie structure to disk.
+   * Writes the trie structure to disk.
    * @throws IOException I/O exception
    */
   private void writeAll() throws IOException {
@@ -208,7 +195,7 @@ final class FTTrieBuilder extends FTBuilder {
   }
 
   /**
-   * Write trie structure to disk, split in subtrees to save memory.
+   * Writes the trie structure to disk, split in subtrees to save memory.
    * @param roots root nodes
    * @throws IOException I/O exception
    */
@@ -321,7 +308,7 @@ final class FTTrieBuilder extends FTBuilder {
   }
 
   /**
-   * Write data as sorted list on disk.
+   * Writes the data as sorted list to disk.
    * The data is stored in two files:
    * 'a': length|byte|,token|byte[length]|, size|int|, offset|long|, ...
    * 'b': used method writeFTData
@@ -330,7 +317,7 @@ final class FTTrieBuilder extends FTBuilder {
    */
   @Override
   protected void writeIndex(final int cs) throws IOException {
-    final String s = DATAFTX + (merge ? Integer.toString(cs) : "");
+    final String s = DATAFTX + (merge ? cs : "");
     final DataOutput outa = new DataOutput(data.meta.file(s + 'a'));
     final DataOutput outb = new DataOutput(data.meta.file(s + 'b'));
 

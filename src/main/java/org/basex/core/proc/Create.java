@@ -5,7 +5,7 @@ import org.basex.build.Parser;
 
 /**
  * This class allows developers to define their own parser implementations.
- * The class can be execute like an all other database commands.
+ * The class can be instantiated like all other database commands.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

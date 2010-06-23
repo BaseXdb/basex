@@ -19,7 +19,6 @@ import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.XMLToken;
 
 /**
@@ -165,7 +164,7 @@ public final class DialogInsert extends Dialog {
     super.close();
 
     final String in1 = input1.getText();
-    final String in2 = Token.string(input2.getText());
+    final String in2 = string(input2.getText());
     switch(kind) {
       case Data.ATTR: case Data.PI:
         result.add(in1);

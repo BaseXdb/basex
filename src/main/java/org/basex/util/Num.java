@@ -3,8 +3,21 @@ package org.basex.util;
 import java.util.Arrays;
 
 /**
- * This class provides operations to compress and decompress integer values
- * in byte arrays to save memory.
+ * This class provides operations to compress and decompress 4-byte integer
+ * values in byte arrays to save memory.<br/>
+ * 
+ * The first two bits of a {@code Num} array indicate the range of the
+ * compressed number:
+ * <ul>
+ * <li>{@code 00}: the number (0x00-0x3F) is encoded in the remaining 6 bits of
+ * the current byte</li>
+ * <li>{@code 01}: the number (0x40-0x3FFF) is encoded in 14 bits of the current
+ * and the following byte</li>
+ * <li>{@code 10}: the number (0x4000-0x3FFFFFFF) is encoded in 30 bits of the
+ * current and the following three bytes</li>
+ * <li>{@code 11}: the number (0x40000000-0xFFFFFFFF) is encoded in 32 bits of
+ * the following four bytes</li>
+ * </ul>
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -138,7 +151,7 @@ public final class Num {
   /**
    * Writes the specified length in the first bytes of the specified array.
    * @param array array
-   * @param len new length
+   * @param len length to be written
    */
   public static void size(final byte[] array, final int len) {
     array[0] = (byte) (len >>> 24);

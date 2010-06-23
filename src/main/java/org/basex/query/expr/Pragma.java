@@ -20,9 +20,8 @@ public class Pragma extends Simple {
 
   /**
    * Constructor.
-   *
    * @param qn QName
-   * @param content PragmaContents
+   * @param content pragma contents
    */
   public Pragma(final QNm qn, final byte[] content) {
     qName = qn;

@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.iter.NodIter;
@@ -77,7 +76,7 @@ public final class FElem extends FNode {
     name = new QNm(Token.token(node.getNodeName()));
     children = new NodIter(childArr, childArr.length);
     atts = new NodIter(attArr, attArr.length);
-    base = EMPTY;
+    base = Token.EMPTY;
     ns = null;
     par = p;
 
@@ -161,7 +160,7 @@ public final class FElem extends FNode {
         if(ser.ns.key[p].length != 0) continue;
         xmlns = true;
         ser.dn = ser.ns.val[p];
-        ser.namespace(EMPTY, ser.ns.val[p]);
+        ser.namespace(Token.EMPTY, ser.ns.val[p]);
       }
     } else {
       if(ns != null) {
@@ -177,7 +176,7 @@ public final class FElem extends FNode {
     }
 
     if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn)) {
-      ser.namespace(EMPTY, uri);
+      ser.namespace(Token.EMPTY, uri);
       ser.dn = uri;
     }
 
@@ -228,7 +227,7 @@ public final class FElem extends FNode {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
-    sb.append(string(name.str()));
+    sb.append(Token.string(name.str()));
     if(atts.size() != 0 || ns != null && ns.size != 0 || children.size() != 0)
       sb.append(" ...");
     return sb.append("/>").toString();

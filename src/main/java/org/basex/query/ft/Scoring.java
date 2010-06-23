@@ -71,7 +71,6 @@ public final class Scoring {
    * integer values. The value {@code 2} is used as minimum score,
    * as the total minimum value will be subtracted by 1 to avoid eventual
    * {@code 0} scores.
-   *
    * @param freq frequency of the token. TF: freq(i, j)
    * @param mfreq maximum occurrence of a token. TF: max(l, freq(l, j))
    * @param docs number of documents in the collection. IDF: N

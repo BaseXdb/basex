@@ -178,10 +178,10 @@ public final class XMLSerializer extends Serializer {
   }
 
   /**
-   * Global method, replacing all % characters
-   * (see {@link TokenBuilder#add(Object, Object...)} for details.
+   * Returns an I/O exception. Replaces all % characters in the input string
+   * (see {@link TokenBuilder#add(Object, Object...)} for details).
    * @param str string to be extended
-   * @param ext text text extensions
+   * @param ext extensions
    * @throws IOException I/O exception
    */
   private static void error(final Object str, final Object... ext)

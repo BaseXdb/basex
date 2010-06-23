@@ -200,8 +200,8 @@ public final class TokenBuilder {
    * Replaces all % characters in the input string by the specified extension
    * objects, which can be byte arrays or any other object.
    * If a digit is found after %, it is interpreted as insertion position.
-   * @param str query information
-   * @param ext text text extensions
+   * @param str string to be extended
+   * @param ext extensions
    * @return self reference
    */
   public TokenBuilder add(final Object str, final Object... ext) {

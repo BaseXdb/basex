@@ -18,7 +18,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * This class provides an interface for building database instances.
- * The specified {@link Parser} send events to this class whenever nodes
+ * The specified {@link Parser} sends events to this class whenever nodes
  * are to be added or closed. The builder implementation decides whether
  * the nodes are stored on disk or kept in memory.
  *

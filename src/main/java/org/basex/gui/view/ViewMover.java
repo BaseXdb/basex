@@ -18,7 +18,7 @@ import org.basex.gui.layout.BaseXPanel;
  */
 final class ViewMover extends BaseXPanel {
   /** Size of splitter. */
-  private static final int SIZE = 8;
+  private static final int SIZE = 10;
   /** Flag if current mover is active. */
   private boolean active;
 
@@ -42,7 +42,7 @@ final class ViewMover extends BaseXPanel {
     g.setColor(GUIConstants.COLORS[active ? 4 : 1]);
     g.fillRect(0, 0, w, h);
     g.setColor(GUIConstants.COLORS[active ? 20 : 10]);
-    for(int x = -4; x < w; x += 4) g.drawLine(x + 4, 1, x, h - 2);
+    for(int x = -2; x < w; x += 4) g.drawLine(x + 4, 1, x, h - 2);
     g.drawRect(0, 0, w - 1, h - 1);
   }
 

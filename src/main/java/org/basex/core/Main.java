@@ -8,7 +8,6 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.Random;
 import java.util.Scanner;
-
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Exit;

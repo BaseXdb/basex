@@ -8,7 +8,6 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.core.Main;
-import org.basex.util.Token;
 
 /**
  * Utility methods for file parsers.
@@ -74,7 +73,7 @@ public final class ParserUtil {
    *         conversion fails
    */
   public static Duration convertDuration(final byte[] value) {
-    return Token.contains(value, ':') ? convertMinSecDuration(value)
+    return contains(value, ':') ? convertMinSecDuration(value)
         : convertMsDuration(toInt(value));
   }
 

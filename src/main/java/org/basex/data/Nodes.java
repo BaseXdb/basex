@@ -31,7 +31,7 @@ public final class Nodes implements Result {
   private int size;
 
   /**
-   * Node Set constructor.
+   * Constructor, specifying a database instance.
    * @param d data reference
    */
   public Nodes(final Data d) {
@@ -39,7 +39,7 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Node Set constructor.
+   * Constructor, specifying a single node and a database instance.
    * @param n single node
    * @param d data reference
    */
@@ -48,7 +48,7 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Node Set constructor.
+   * Constructor, specifying a node set and a database instance.
    * @param n node set
    * @param d data reference
    */
@@ -57,7 +57,8 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Node Set constructor.
+   * Constructor, specifying a node set, a database instance, and full-text
+   * positions.
    * @param n node set
    * @param d data reference
    * @param ft ft position data
@@ -70,8 +71,8 @@ public final class Nodes implements Result {
   }
 
   /**
-   * Node Set constructor. Should only used by test classes, as no data
-   * reference will be defined.
+   * Constructor, which should only used by test classes.
+   * No database reference is specified.
    * @param n node set
    */
   public Nodes(final int[] n) {

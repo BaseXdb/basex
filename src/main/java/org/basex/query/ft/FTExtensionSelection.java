@@ -21,7 +21,6 @@ public class FTExtensionSelection extends FTExpr {
 
   /**
    * Constructor.
-   *
    * @param prag pragmas
    * @param e enclosed FTSelection
    */
