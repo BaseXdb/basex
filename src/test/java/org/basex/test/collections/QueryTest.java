@@ -5,7 +5,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Commands;
 import org.basex.core.Context;
 import org.basex.core.proc.Add;
-import org.basex.core.proc.CreateColl;
+import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.CreateIndex;
 import org.basex.core.proc.DropDB;
 import org.basex.query.QueryException;
@@ -39,7 +39,7 @@ public class QueryTest {
    */
   @BeforeClass
   public static void before() throws BaseXException {
-    new CreateColl(NAME).execute(CTX);
+    new CreateDB(NAME).execute(CTX);
     for(String file : FILES)
       new Add(file, "etc/xml").execute(CTX);
     new Add(ZIP, "test/zipped").execute(CTX);

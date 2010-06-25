@@ -77,7 +77,7 @@ public abstract class UpdateTest {
    */
   @Before
   public void setUp() {
-    exec(new CreateDB(TESTFILE, DBNAME));
+    exec(new CreateDB(DBNAME, TESTFILE));
     size = CONTEXT.data.meta.size;
   }
 

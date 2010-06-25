@@ -91,13 +91,13 @@ public final class LockingTest {
       public void run() {
         // wait until first process is running
         Performance.sleep(200);
-        final String result = exec(new CreateDB(FILE), session2);
+        final String result = exec(new CreateDB(NAME, FILE), session2);
         if(result == null) fail(FILE + " should still be locked.");
       }
     }.start();
 
     // first (main) thread
-    exec(new CreateDB(FILE), session1);
+    exec(new CreateDB(NAME, FILE), session1);
     // opens DB in session2 for further tests
     exec(new Open(NAME), session2);
 

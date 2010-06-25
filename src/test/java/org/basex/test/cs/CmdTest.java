@@ -65,7 +65,7 @@ public class CmdTest {
   @Test
   public final void add() {
     no(new Add(FILE));
-    ok(new CreateColl(NAME));
+    ok(new CreateDB(NAME));
     ok(new Add(FILE));
     ok(new Add(FILE)); //[MS] duplicates allowed by now.
   }
@@ -74,7 +74,7 @@ public class CmdTest {
   @Test
   public final void addUrl() {
     no(new Add(URL));
-    ok(new CreateColl(NAME));
+    ok(new CreateDB(NAME));
     ok(new Add(URL));
     ok(new Delete(URL));
   }
@@ -83,7 +83,7 @@ public class CmdTest {
   @Test
   public final void addFolder() {
     no(new Add(FLDR));
-    ok(new CreateColl(NAME));
+    ok(new CreateDB(NAME));
     ok(new Add(FLDR));
     ok(new Delete(FILE));
   }
@@ -92,7 +92,7 @@ public class CmdTest {
   @Test
   public final void close() {
     ok(new Close());
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new Close());
     no(new InfoDB());
   }
@@ -100,26 +100,26 @@ public class CmdTest {
   /** Command Test. */
   @Test
   public final void createColl() {
-    ok(new CreateColl(NAME));
-    ok(new CreateColl(NAME));
+    ok(new CreateDB(NAME));
+    ok(new CreateDB(NAME));
     ok(new DropDB(NAME));
   }
 
   /** Command Test. */
   @Test
   public final void createDB() {
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new InfoDB());
-    ok(new CreateDB(FILE, FILE));
-    no(new CreateDB("abcde"));
-    no(new CreateDB(""));
+    ok(new CreateDB(NAME, FILE));
+    ok(new CreateDB("abcde"));
+    ok(new CreateDB(""));
   }
 
   /** Command Test. */
   @Test
   public final void createFS() {
-    no(new CreateFS(".s", "test"));
-    ok(new CreateFS(".settings", "test"));
+    no(new CreateFS("test", ".s"));
+    ok(new CreateFS("test", ".settings"));
     ok(new DropDB("test"));
   }
 
@@ -128,7 +128,7 @@ public class CmdTest {
   public final void createIndex() {
     no(new CreateIndex(null));
     for(final CmdIndex cmd : CmdIndex.values()) no(new CreateIndex(cmd));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     for(final CmdIndex cmd : CmdIndex.values()) ok(new CreateIndex(cmd));
   }
 
@@ -151,7 +151,7 @@ public class CmdTest {
   @Test
   public final void cs() {
     no(new Cs("//li"));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new Cs("//  li"));
     ok(CONTEXT.current, 2);
     ok(new Cs("."));
@@ -164,7 +164,7 @@ public class CmdTest {
   @Test
   public final void delete() {
     no(new Delete(FILE));
-    ok(new CreateColl(NAME));
+    ok(new CreateDB(NAME));
     ok(new Delete(FILE));
     ok(new Add(FILE));
     ok(new Delete(FILE));
@@ -175,7 +175,7 @@ public class CmdTest {
   @Test
   public final void dropDB() {
     no(new DropDB(NAME));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     no(new DropDB(FILE));
     ok(new DropDB(NAME));
     no(new DropDB(NAME));
@@ -185,7 +185,7 @@ public class CmdTest {
   @Test
   public final void dropIndex() {
     for(final CmdIndex cmd : CmdIndex.values()) no(new DropIndex(cmd));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     for(final CmdIndex cmd : CmdIndex.values()) ok(new DropIndex(cmd));
   }
 
@@ -202,7 +202,7 @@ public class CmdTest {
   public final void export() {
     final IO io = IO.get("export.xml");
     no(new Export(io.path()));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new Export(".", io.name()));
     ok(io.exists());
     ok(io.delete());
@@ -212,7 +212,7 @@ public class CmdTest {
   @Test
   public final void find() {
     no(new Find("1"));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new Find("1"));
   }
 
@@ -243,7 +243,7 @@ public class CmdTest {
   @Test
   public final void infoDB() {
     no(new InfoDB());
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new InfoDB());
   }
 
@@ -251,7 +251,7 @@ public class CmdTest {
   @Test
   public final void infoIndex() {
     no(new InfoIndex());
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new InfoIndex());
   }
 
@@ -259,7 +259,7 @@ public class CmdTest {
   @Test
   public final void infoTable() {
     no(new InfoTable("1", "2"));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new InfoTable("1", "2"));
     ok(new InfoTable("1", null));
     ok(new InfoTable("// li", null));
@@ -276,7 +276,7 @@ public class CmdTest {
   @Test
   public final void list() {
     ok(new List());
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new List());
   }
 
@@ -284,7 +284,7 @@ public class CmdTest {
   @Test
   public final void open() {
     no(new Open(NAME));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new Open(NAME));
     ok(new Open(NAME));
   }
@@ -293,7 +293,7 @@ public class CmdTest {
   @Test
   public final void optimize() {
     no(new Optimize());
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new Optimize());
   }
 
@@ -315,7 +315,7 @@ public class CmdTest {
       fail(ex.toString());
     }
     no(new Run(io.path()));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new Run(io.path()));
     io.delete();
   }
@@ -335,7 +335,7 @@ public class CmdTest {
   @Test
   public final void xQuery() {
     no(new XQuery("/"));
-    ok(new CreateDB(FILE));
+    ok(new CreateDB(NAME, FILE));
     ok(new XQuery("/"));
     ok(new XQuery("1"));
     no(new XQuery("1+"));

@@ -213,7 +213,7 @@ public class NamespaceTest {
   @Before
   public void startTest() {
     // create all test databases
-    for(final String[] doc : docs) exec(new CreateDB(doc[1], doc[0]), null);
+    for(final String[] doc : docs) exec(new CreateDB(doc[0], doc[1]), null);
   }
 
   /** Removes test databases and closes the database context. */

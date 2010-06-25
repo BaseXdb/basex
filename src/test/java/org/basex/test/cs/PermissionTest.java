@@ -74,7 +74,7 @@ public final class PermissionTest {
   /** Tests all commands where no permission is needed. */
   @Test
   public void noPermsNeeded() {
-    ok(new CreateDB("<xml>This is a test</xml>", "test"), adminSession);
+    ok(new CreateDB("test", "<xml>This is a test</xml>"), adminSession);
     ok(new Close(), adminSession);
     ok(new Grant("none", "test"), adminSession);
 
@@ -94,8 +94,8 @@ public final class PermissionTest {
     // XQuery update
     no(new XQuery("for $item in fn:doc('test')//xml return rename" +
     " node $item as 'null'"), testSession);
-    no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
-    no(new CreateFS("c:/test", "test"), testSession);
+    no(new CreateDB("test", "<xml>This is a test</xml>"), testSession);
+    no(new CreateFS("test", "c:/test"), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB("test"), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -123,8 +123,8 @@ public final class PermissionTest {
     no(new XQuery("for $item in fn:doc('test')//xml return rename" +
     " node $item as 'null'"), testSession);
     no(new Optimize(), testSession);
-    no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
-    no(new CreateFS("c:/test", "test"), testSession);
+    no(new CreateDB("test", "<xml>This is a test</xml>"), testSession);
+    no(new CreateFS("test", "c:/test"), testSession);
     no(new CreateIndex("SUMMARY"), testSession);
     no(new DropDB("test"), testSession);
     no(new DropIndex("SUMMARY"), testSession);
@@ -154,8 +154,8 @@ public final class PermissionTest {
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new DropIndex(cmd), testSession);
     }
-    no(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
-    no(new CreateFS("c:/test", "test"), testSession);
+    no(new CreateDB("test", "<xml>This is a test</xml>"), testSession);
+    no(new CreateFS("test", "c:/test"), testSession);
     no(new DropDB("test"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
@@ -172,7 +172,7 @@ public final class PermissionTest {
   public void createPermsNeeded() {
     ok(new Grant("create", "test"), adminSession);
     ok(new Close(), testSession);
-    ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    ok(new CreateDB("test", "<xml>This is a test</xml>"), testSession);
     //ok(new CreateFS("bin", "fs"), testSession);
     for(final CmdIndex cmd : CmdIndex.values()) {
       ok(new CreateIndex(cmd), testSession);
@@ -196,7 +196,7 @@ public final class PermissionTest {
       ok(new DropUser("test2"), testSession);
     }
     ok(new CreateUser("test2", "test"), testSession);
-    ok(new CreateDB("<xml>This is a test</xml>", "test"), testSession);
+    ok(new CreateDB("test", "<xml>This is a test</xml>"), testSession);
     ok(new Export(".", EXPORT), testSession);
     ok(new ShowUsers(), testSession);
     ok(new Grant("admin", "test2"), testSession);

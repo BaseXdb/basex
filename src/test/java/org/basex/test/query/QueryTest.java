@@ -58,12 +58,12 @@ public abstract class QueryTest {
     final String file = doc.replaceAll("\\\"", "\\\\\"");
     final String name = Main.name(this);
     final boolean up = this instanceof XQUPTest;
-    exec(new CreateDB(file, name));
+    exec(new CreateDB(name, file));
 
     for(final Object[] qu : queries) {
       // added to renew document after each update test
       if(up && ((String) qu[0]).startsWith("xxx")) {
-        exec(new CreateDB(file, name));
+        exec(new CreateDB(name, file));
       }
 
       final boolean correct = qu.length == 3;

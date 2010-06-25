@@ -48,13 +48,13 @@ public final class PoolTest {
   /** Create and Drop Tests. */
   @Test
   public void createAndDrop() {
-    ok(new CreateDB(FILE), session1);
+    ok(new CreateDB(NAME, FILE), session1);
     pins(1, NAME);
-    ok(new CreateDB(FILE), session1);
+    ok(new CreateDB(NAME, FILE), session1);
     pins(1, NAME);
-    no(new CreateDB(FILE), session2);
+    no(new CreateDB(NAME, FILE), session2);
     pins(1, NAME);
-    no(new CreateDB(FILE), session2);
+    no(new CreateDB(NAME, FILE), session2);
     pins(1, NAME);
     no(new DropDB(NAME), session2);
     pins(1, NAME);
@@ -65,7 +65,7 @@ public final class PoolTest {
   /** Close and Open Tests. */
   @Test
   public void closeAndOpen() {
-    ok(new CreateDB(FILE), session2);
+    ok(new CreateDB(NAME, FILE), session2);
     pins(1, NAME);
     ok(new Close(), session1);
     pins(1, NAME);

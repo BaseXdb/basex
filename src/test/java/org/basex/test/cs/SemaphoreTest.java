@@ -26,6 +26,8 @@ import org.junit.Test;
 public final class SemaphoreTest {
   /** Create random number. */
   static Random rand = new Random();
+  /** Name. */
+  private static final String NAME = "factbook";
   /** Test file. */
   private static final String FILE = "etc/xml/factbook.xml";
   /** Test queries. */
@@ -69,9 +71,9 @@ public final class SemaphoreTest {
   @Test
   public void createTest() {
     // drops database for clean test
-    exec(new DropDB("factbook"), sess);
+    exec(new DropDB(NAME), sess);
     // create database for clean test
-    exec(new CreateDB(FILE), sess);
+    exec(new CreateDB(NAME, FILE), sess);
     for(int i = 0; i < TESTS; i++) {
       sessions.add(createSession());
     }
