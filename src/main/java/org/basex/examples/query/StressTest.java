@@ -46,7 +46,7 @@ public final class StressTest {
     // create test database
     System.out.println("\n* Create test database.");
     new Set("info", true).execute(CONTEXT);
-    new CreateDB("etc/xml/factbook.xml").execute(CONTEXT);
+    new CreateDB("factbook", "etc/xml/factbook.xml").execute(CONTEXT);
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");

@@ -58,7 +58,7 @@ public final class ServerLocalExample {
     // Create a local database from the XML result string
     System.out.println("\n* Create a local database.");
 
-    new CreateDB(result.toString(), "LocalDB").execute(CONTEXT, System.out);
+    new CreateDB("LocalDB", result.toString()).execute(CONTEXT, System.out);
 
     // -------------------------------------------------------------------------
     // Run a query on the locally cached results

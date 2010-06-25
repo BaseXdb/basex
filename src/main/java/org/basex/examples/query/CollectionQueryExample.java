@@ -36,7 +36,7 @@ public final class CollectionQueryExample {
     // Create a collection from all XML documents in the 'etc' directory
     System.out.println("\n* Create a collection.");
 
-    new CreateDB("etc/", "Collection").execute(CONTEXT);
+    new CreateDB("Collection", "etc/").execute(CONTEXT);
 
     // ------------------------------------------------------------------------
     // List all documents in the database

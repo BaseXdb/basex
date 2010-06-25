@@ -40,7 +40,7 @@ public final class CSVExample {
     System.out.println("\n* Import '" + file + "'.");
 
     new Set("parser", "csv").execute(ctx);
-    new CreateDB(file, name).execute(ctx);
+    new CreateDB(name, file).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query

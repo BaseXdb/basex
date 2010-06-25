@@ -40,7 +40,7 @@ public class UserExample {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    new CreateDB("etc/xml/input.xml", "input").execute(CONTEXT);
+    new CreateDB("input", "etc/xml/input.xml").execute(CONTEXT);
 
     // ------------------------------------------------------------------------
     // Create a new user

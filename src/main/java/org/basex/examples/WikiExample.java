@@ -38,7 +38,7 @@ public final class WikiExample {
     System.out.println("\n* Create a database from a file via http.");
 
     String doc = "http://en.wikipedia.org/wiki/Wikipedia";
-    new CreateDB(doc, "WikiExample").execute(CONTEXT);
+    new CreateDB("WikiExample", doc).execute(CONTEXT);
 
     // -------------------------------------------------------------------------
     // Insert a node before the closing body tag

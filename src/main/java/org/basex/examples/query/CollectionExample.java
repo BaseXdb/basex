@@ -4,7 +4,6 @@ import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.proc.Add;
-import org.basex.core.proc.CreateColl;
 import org.basex.core.proc.CreateDB;
 import org.basex.core.proc.Delete;
 import org.basex.core.proc.DropDB;
@@ -49,7 +48,7 @@ public final class CollectionExample {
     // Create a collection and add all documents within the specified path
     System.out.println("\n* Create a collection.");
 
-    new CreateDB("etc/", "Collection").execute(CONTEXT);
+    new CreateDB("Collection", "etc/").execute(CONTEXT);
     new DropDB("Collection").execute(CONTEXT);
 
     // Variant 2 --------------------------------------------------------------
@@ -57,7 +56,7 @@ public final class CollectionExample {
     // and optimize the database to refresh the index structures
     System.out.println("\n* Create an empty collection and add documents.");
 
-    new CreateColl("Collection").execute(CONTEXT);
+    new CreateDB("Collection").execute(CONTEXT);
     new Add("etc/").execute(CONTEXT);
     new Optimize().execute(CONTEXT);
 
