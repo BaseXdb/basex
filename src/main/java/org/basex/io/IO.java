@@ -193,6 +193,14 @@ public abstract class IO {
   public final String name() {
     return name;
   }
+  
+  /**
+   * Sets the filename.
+   * @param n name
+   */
+  public void setName(final String n) {
+    this.name = n;
+  }
 
   /**
    * Returns the path.

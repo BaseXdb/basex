@@ -178,7 +178,8 @@ public interface Text {
 
   /** Command help. */
   String[] HELPADD = {
-    "[" + PATH  + "]", lang("ch_add1"), lang("ch_add2")
+    "[" + NAM  + "]" + " INTO [target?] [" + PATH + "]",
+    lang("ch_add1"), lang("ch_add2", PATH, NAM, "target")
   };
 
   /** Command help. */

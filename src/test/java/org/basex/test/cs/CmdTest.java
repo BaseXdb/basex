@@ -64,27 +64,27 @@ public class CmdTest {
   /** Command Test. */
   @Test
   public final void add() {
-    no(new Add(FILE));
+    no(new Add("input", FILE));
     ok(new CreateDB(NAME));
-    ok(new Add(FILE));
-    ok(new Add(FILE)); //[MS] duplicates allowed by now.
+    ok(new Add("input", FILE));
+    ok(new Add("input", FILE)); //[MS] duplicates allowed by now.
   }
 
   /** Command Test. */
   @Test
   public final void addUrl() {
-    no(new Add(URL));
+    no(new Add("xml", URL));
     ok(new CreateDB(NAME));
-    ok(new Add(URL));
+    ok(new Add("xml", URL));
     ok(new Delete(URL));
   }
 
   /** Command Test. */
   @Test
   public final void addFolder() {
-    no(new Add(FLDR));
+    no(new Add("xml", FLDR));
     ok(new CreateDB(NAME));
-    ok(new Add(FLDR));
+    ok(new Add("xml", FLDR));
     ok(new Delete(FILE));
   }
 
@@ -166,7 +166,7 @@ public class CmdTest {
     no(new Delete(FILE));
     ok(new CreateDB(NAME));
     ok(new Delete(FILE));
-    ok(new Add(FILE));
+    ok(new Add("input", FILE));
     ok(new Delete(FILE));
     ok(new Delete(FILE));
   }

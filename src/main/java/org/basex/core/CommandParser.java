@@ -143,7 +143,8 @@ public final class CommandParser extends InputParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        return new Add(string(cmd), key(INTO, null) ? string(cmd) : null);
+        return new Add(string(cmd), key(INTO, null) ? string(cmd) : "",
+            leftover(cmd));
       case DELETE:
         return new Delete(string(cmd));
       case INFO: case I:

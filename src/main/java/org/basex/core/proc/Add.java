@@ -17,30 +17,34 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public class Add extends ACreate {
+  
   /**
    * Default constructor.
+   * @param name name of document
+   * @param target target in collection
    * @param input input XML file or XML string
    */
-  public Add(final String input) {
-    this(input, null);
+  public Add(final String name, final String target, final String input) {
+    super(DATAREF | User.WRITE, name, target, input);
   }
-
+  
   /**
-   * Constructor, specifying a target.
+   * Constructor, specifying no target.
+   * @param name name of document
    * @param input input XML file or XML string
-   * @param ta target
    */
-  public Add(final String input, final String ta) {
-    super(DATAREF | User.WRITE, input, ta == null ? "" : ta);
+  public Add(final String name, final String input) {
+    this(name, "", input);
   }
 
   @Override
   protected boolean run() {
-    final IO io = IO.get(args[0]);
+    final IO io = IO.get(args[2]);
     if(!io.exists()) return error(FILEWHICH, io);
 
-    final String name = io.name();
-    final String db = io.dbname();
+    final String name = args[0];
+    final String db = args[0];
+    io.setName(name);
 
     final DirParser p = new DirParser(io, context.prop, path(args[1]));
     try {

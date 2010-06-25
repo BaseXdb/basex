@@ -66,11 +66,13 @@ public class AddDeleteTest {
   }
 
   /**
-   * Adds an <?xml...>-String to the database. *TODO*
+   * Adds an <?xml...>-String to the database.
+   * @throws BaseXException exception
    */
-  // @Test
-  public final void testAddXMLString() {
-    fail("Not yet implemented");
+  @Test
+  public final void testAddXMLString() throws BaseXException {
+    new Add("test", "<xml>test</xml>").execute(CTX);
+    assertEquals(1, CTX.doc().length);
   }
 
   /**
@@ -79,7 +81,7 @@ public class AddDeleteTest {
    */
   @Test
   public final void testAddFile() throws BaseXException {
-    new Add(FILE).execute(CTX);
+    new Add("input", FILE).execute(CTX);
     assertEquals(1, CTX.doc().length);
   }
 
@@ -89,7 +91,7 @@ public class AddDeleteTest {
    */
   @Test
   public void testAddZip() throws BaseXException {
-    new Add(ZIPFILE, "target").execute(CTX);
+    new Add("xml", "target", ZIPFILE).execute(CTX);
     assertEquals(4, CTX.doc().length);
   }
 
@@ -100,8 +102,8 @@ public class AddDeleteTest {
    */
   // @Test
   public void testAddUrl() throws BaseXException {
-    new Add(URL).execute(CTX);
-    new Add(URL, "bar").execute(CTX);
+    new Add("xmark.xml", URL).execute(CTX);
+    new Add("xmark.xml", "bar", URL).execute(CTX);
     new Delete("xmark.xml").execute(CTX);
     assertEquals(1, CTX.doc().length);
   }
@@ -112,8 +114,8 @@ public class AddDeleteTest {
    */
   @Test
   public void testAddGzip() throws BaseXException {
-    new Add(GZIPFILE).execute(CTX);
-    new Add(GZIPFILE, "bar").execute(CTX);
+    new Add("build", "build", GZIPFILE).execute(CTX);
+    new Add("build", "bar", GZIPFILE).execute(CTX);
     new Delete("bar").execute(CTX);
     assertEquals(1, CTX.doc().length);
   }
@@ -124,7 +126,7 @@ public class AddDeleteTest {
    */
   @Test
   public void testAddFolder() throws BaseXException {
-    new Add(FLDR).execute(CTX);
+    new Add("xml", FLDR).execute(CTX);
     assertEquals(FCNT, CTX.doc().length);
   }
 
@@ -134,9 +136,9 @@ public class AddDeleteTest {
    */
   @Test
   public void deletePath() throws BaseXException {
-    new Add(FLDR, "foo/pub").execute(CTX);
-    new Add(FILE, "foo/bar").execute(CTX);
-    new Add(FLDR, "foobar").execute(CTX);
+    new Add("xml", "foo/pub", FLDR).execute(CTX);
+    new Add("input", "foo/bar", FILE).execute(CTX);
+    new Add("xml", "foobar", FLDR).execute(CTX);
     new Delete("foo").execute(CTX);
     assertEquals(FCNT, CTX.doc().length);
 
@@ -148,8 +150,8 @@ public class AddDeleteTest {
    */
   @Test
   public void addFoldersDeleteFiles() throws BaseXException {
-    new Add(FLDR, "folder").execute(CTX);
-    new Add(FILE).execute(CTX);
+    new Add("xml", "folder", FLDR).execute(CTX);
+    new Add("input.xml", FILE).execute(CTX);
     new Delete("input.xml").execute(CTX);
     new Delete("folder/input.xml").execute(CTX);
     assertEquals(FCNT - 1, CTX.doc().length);
@@ -161,6 +163,6 @@ public class AddDeleteTest {
    */
   @Test(expected = BaseXException.class)
   public final void testAddFileFail() throws BaseXException {
-    new Add(FILE + "/doesnotexist").execute(CTX);
+    new Add("input", FILE + "/doesnotexist").execute(CTX);
   }
 }
