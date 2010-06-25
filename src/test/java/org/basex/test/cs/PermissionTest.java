@@ -45,8 +45,6 @@ import org.junit.Test;
  * @author Andreas Weiler
  */
 public final class PermissionTest {
-  /** Export file. */
-  private static final String EXPORT = "export.xml";
   /** Server reference. */
   static BaseXServer server;
   /** Socket reference. */
