@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("all")
 public interface Commands {
   /** Create commands. */
-  enum CmdCreate { DATABASE, DB, COLLECTION, COLL, MAB, FS, INDEX, USER }
+  enum CmdCreate { DATABASE, DB, MAB, FS, INDEX, USER }
   /** Info commands. */
   enum CmdInfo { NULL, DATABASE, DB, INDEX, TABLE }
   /** Drop commands. */
@@ -44,7 +44,7 @@ public interface Commands {
     HD(HID, HELPDB), CREATE(HELPCREATE), C(HID), OPEN(HELPOPEN), O(HID),
     CHECK(HID), ADD(HELPADD), DELETE(HELPDELETE), INFO(HELPINFO), I(HID),
     CLOSE(HELPCLOSE), LIST(HELPLIST), DROP(HELPDROP), EXPORT(HELPEXPORT),
-    OPTIMIZE(HELPOPTIMIZE), IMPORT(HELPIMPORT),
+    OPTIMIZE(HELPOPTIMIZE),
     // Query commands
     HQ(HID, HELPQ), XQUERY(HELPXQUERY), X(HID), FIND(HELPFIND),
     RUN(HELPRUN), CS(HELPCS),

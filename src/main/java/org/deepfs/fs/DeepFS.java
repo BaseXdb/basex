@@ -183,8 +183,8 @@ public final class DeepFS implements DataText {
   private static Context initData(final String dbname, final String mp) {
     final Context ctx = new Context();
     if(!new Open(dbname).exec(ctx))
-      new CreateDB("<" + S_DEEPFS + " " + "mountpoint=\""
-          + mp + "\"/>", dbname).exec(ctx);
+      new CreateDB(dbname, "<" + S_DEEPFS + " " + "mountpoint=\""
+          + mp + "\"/>").exec(ctx);
     return ctx;
   }
 

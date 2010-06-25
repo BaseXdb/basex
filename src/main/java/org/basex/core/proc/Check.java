@@ -31,7 +31,7 @@ public final class Check extends Proc {
     final String path = args[0];
     final String db = IO.get(path).dbname();
     final Proc p = MetaData.found(path, db, context.prop) ?
-      new Open(db) : new CreateDB(path);
+      new Open(db) : new CreateDB(db, path);
     final boolean ok = p.run(context);
     final String msg = p.info().trim();
     return ok ? info(msg) : error(msg);

@@ -159,18 +159,16 @@ public interface Text {
   String[] HELPDB = { lang("ch_helpdatabase0") };
   /** Command help. */
   String[] HELPCREATE = {
-    "[" + CmdCreate.DB + "|" + CmdCreate.COLL + "|" + CmdCreate.FS + "|" +
+    "[" + CmdCreate.DB + "|" + CmdCreate.FS + "|" +
     CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
-    LI + CmdCreate.DB + " [" + PATH + "] [" + NAM + "?]:" + NL +
+    LI + CmdCreate.DB + " [" + NAM + "] [" + PATH + "?]:"  + NL +
       "  " + lang("ch_create3", NAM, PATH) + NL +
-    LI + CmdCreate.COLL + " [" + NAM + "]:" + NL +
-      "  " + lang("ch_create4", NAM) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]: " + NL +
       "  " + lang("ch_create5") + NL +
-    LI + CmdCreate.FS + " [" + PATH + "] [" + NAM +
+    LI + CmdCreate.FS + " [" + NAM + "] [" + PATH +
       "] ([mountpoint] [backingstore]): " + NL +
       "  " + lang("ch_create6", NAM, PATH) + NL +
       "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
@@ -227,16 +225,6 @@ public interface Text {
     "[" + PATH + "] [" + NAM + "?]", lang("ch_export1"),
     lang("ch_export2", PATH + "/" + NAM + "?")
   };
-
-  /** Import help. */
-  String[] HELPIMPORT = {"[" + CmdCreate.DB + "|"
-      + CmdCreate.COLL + "] [" + NAM + "?] [...]",
-  lang("ch_import1"),
-  lang("ch_import2") + NL +
-  LI + CmdCreate.DB + " [" + NAM + "] [XML]:" + NL +
-    "  " + lang("ch_import3", NAM) + NL +
-  LI + CmdCreate.COLL + " [XML]:" + NL +
-    "  " + lang("ch_import4")};
 
   /** Command help. */
   String[] HELPOPTIMIZE = {

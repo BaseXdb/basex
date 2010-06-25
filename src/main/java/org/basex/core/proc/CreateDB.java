@@ -31,25 +31,28 @@ import org.basex.io.IO;
 public class CreateDB extends ACreate {
   /**
    * Default constructor.
-   * @param input input XML file or XML string
    * @param name name of database
+   * @param input input XML file or XML string
    */
-  public CreateDB(final String input, final String name) {
-    super(input, IO.get(name == null ? input : name).dbname());
+  public CreateDB(final String name, final String input) {
+    super(name, input);
   }
 
   /**
-   * Constructor. The file name, excluding the suffix, is used as database name.
-   * @param input input file or XML string
+   * Constructor. The database name.
+   * @param name name of database
    */
-  public CreateDB(final String input) {
-    this(input, null);
+  public CreateDB(final String name) {
+    this(name, null);
   }
 
   @Override
   protected boolean run() {
-    final IO io = IO.get(args[0]);
-    return io.exists() ? build(new DirParser(io, prop), args[1]) :
+    System.out.println(args[1]);
+    System.out.println(args[0]);
+    if(args[1] == null) return build(Parser.emptyParser(args[0]), args[0]);
+    final IO io = IO.get(args[1]);
+    return io.exists() ? build(new DirParser(io, prop), args[0]) :
       error(FILEWHICH, io);
   }
 

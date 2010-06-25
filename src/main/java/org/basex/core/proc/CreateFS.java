@@ -20,11 +20,11 @@ import org.basex.core.Commands.CmdCreate;
 public final class CreateFS extends ACreate {
   /**
    * Default constructor.
-   * @param path filesystem path
    * @param name name of database
+   * @param path filesystem path
    */
-  public CreateFS(final String path, final String name) {
-    super(path, name);
+  public CreateFS(final String name, final String path) {
+    super(name, path);
   }
 
   @Override
@@ -34,14 +34,14 @@ public final class CreateFS extends ACreate {
 
     final String path;
     try {
-      final File f = new File(args[0]).getCanonicalFile();
+      final File f = new File(args[1]).getCanonicalFile();
       if(!f.exists()) return error(FILEWHICH, f.getAbsolutePath());
       path = f.getCanonicalPath();
     } catch(final IOException ex) {
       return error(ex.getMessage());
     }
 
-    final String db = args[1];
+    final String db = args[0];
     final FSParser fs = new FSParser(path, context, db);
     progress(fs);
     fs.parse();
@@ -56,7 +56,7 @@ public final class CreateFS extends ACreate {
 
   @Override
   public void abort() {
-    new Open(args[1]).run(context);
+    new Open(args[0]).run(context);
   }
 
   @Override

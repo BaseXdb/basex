@@ -75,7 +75,7 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = dialog.path();
       final String db = dialog.dbname();
-      progress(gui, PROGCREATE, new Proc[] { new CreateDB(in, db) });
+      progress(gui, PROGCREATE, new Proc[] { new CreateDB(db, in) });
     }
   },
 
@@ -702,7 +702,7 @@ public enum GUICommands implements GUICommand {
       final String p = gprop.is(GUIProp.FSALL) ? "/"
           : gui.prop.get(GUIProp.FSBACKING).replace('\\', '/');
       final String n = gprop.get(GUIProp.FSDBNAME);
-      progress(gui, CREATEFSTITLE, new Proc[] { new CreateFS(p, n) });
+      progress(gui, CREATEFSTITLE, new Proc[] { new CreateFS(n, p) });
     }
   },
 

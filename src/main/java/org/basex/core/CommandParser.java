@@ -6,7 +6,6 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdAlter;
 import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdDrop;
-import org.basex.core.Commands.CmdImport;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
@@ -16,7 +15,6 @@ import org.basex.core.proc.Add;
 import org.basex.core.proc.AlterDB;
 import org.basex.core.proc.AlterUser;
 import org.basex.core.proc.Check;
-import org.basex.core.proc.CreateColl;
 import org.basex.core.proc.CreateUser;
 import org.basex.core.proc.Cs;
 import org.basex.core.proc.Close;
@@ -34,8 +32,6 @@ import org.basex.core.proc.Find;
 import org.basex.core.proc.Get;
 import org.basex.core.proc.Grant;
 import org.basex.core.proc.Help;
-import org.basex.core.proc.ImportColl;
-import org.basex.core.proc.ImportDB;
 import org.basex.core.proc.Info;
 import org.basex.core.proc.InfoDB;
 import org.basex.core.proc.InfoIndex;
@@ -123,13 +119,11 @@ public final class CommandParser extends InputParser {
       case CREATE: case C:
         switch(consume(CmdCreate.class, cmd)) {
           case DATABASE: case DB:
-            return new CreateDB(string(cmd), name(null));
-          case COLLECTION: case COLL:
-            return new CreateColl(name(cmd));
+            return new CreateDB(name(cmd), leftover(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case FS:
-            return new CreateFS(string(cmd), name(cmd));
+            return new CreateFS(name(cmd), string(cmd));
           case MAB:
             return new CreateMAB(string(cmd), name(null));
           case USER:
@@ -187,14 +181,6 @@ public final class CommandParser extends InputParser {
         return new Optimize();
       case EXPORT:
         return new Export(string(cmd), string(null));
-      case IMPORT:
-        switch(consume(CmdImport.class, cmd)) {
-          case DATABASE: case DB:
-            return new ImportDB(name(cmd), leftover(null));
-          case COLLECTION: case COLL:
-            return new ImportColl(leftover(null));
-        }
-        break;
       case XQUERY: case X:
         return new XQuery(xquery(cmd));
       case RUN:
