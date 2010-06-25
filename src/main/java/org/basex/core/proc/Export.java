@@ -27,7 +27,7 @@ public final class Export extends Proc {
    * @param target export path
    */
   public Export(final String target) {
-    super(DATAREF | User.READ | User.CREATE, target);
+    super(DATAREF | User.CREATE, target);
   }
 
   @Override
