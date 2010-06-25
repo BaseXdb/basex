@@ -3,15 +3,15 @@ package org.basex.examples.query;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.CreateIndex;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.DropIndex;
-import org.basex.core.proc.InfoDB;
-import org.basex.core.proc.List;
-import org.basex.core.proc.Open;
-import org.basex.core.proc.Optimize;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.InfoDB;
+import org.basex.core.cmd.List;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Optimize;
 
 /**
  * This class demonstrates database creation and dropping.

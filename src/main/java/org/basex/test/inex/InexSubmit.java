@@ -13,13 +13,13 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.List;
-import org.basex.core.proc.Open;
-import org.basex.core.proc.Set;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.List;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Set;
+import org.basex.core.cmd.XQuery;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
@@ -194,9 +194,9 @@ public final class InexSubmit {
         queries.get(qu) + " order by $s descending " +
         "return (basex:sum-path($i), $s, base-uri($i))";
 
-    final Proc proc = new XQuery(que);
+    final Command cmd = new XQuery(que);
     final CachedOutput res = new CachedOutput();
-    session.execute(proc, res);
+    session.execute(cmd, res);
 
     final SeqIter sq = new SeqIter();
     final StringTokenizer st = new StringTokenizer(res.toString(), " ");

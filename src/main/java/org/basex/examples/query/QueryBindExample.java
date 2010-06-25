@@ -15,7 +15,7 @@ import org.basex.util.Token;
 
 /**
  * This example demonstrates how items can be bound to variables with
- * the BaseX XQuery processor.
+ * the XQuery processor.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

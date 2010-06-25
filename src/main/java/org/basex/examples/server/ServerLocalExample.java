@@ -3,9 +3,9 @@ package org.basex.examples.server;
 import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.Context;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.XQuery;
 import org.basex.examples.query.QueryExample;
 import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
@@ -86,7 +86,7 @@ public final class ServerLocalExample {
   }
 
   /**
-   * Processes the specified command on the server and writes the
+   * Executes the specified command on the server and writes the
    * response to out.
    * Command info is printed to System.out by default.
    * @param command command to be executed
@@ -97,11 +97,11 @@ public final class ServerLocalExample {
       throws IOException {
 
     // ------------------------------------------------------------------------
-    // Execute the process
+    // Execute the command
     session.execute(command, out);
 
     // ------------------------------------------------------------------------
-    // If available, print process information or error output
+    // If available, print command information or error output
     System.out.print(session.info());
   }
 }

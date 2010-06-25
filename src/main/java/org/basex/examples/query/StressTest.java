@@ -4,10 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.util.Random;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.Set;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Set;
+import org.basex.core.cmd.XQuery;
 import org.basex.util.Performance;
 
 /**

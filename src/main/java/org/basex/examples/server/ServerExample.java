@@ -42,7 +42,7 @@ public final class ServerExample {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    // Set an option: turn verbose processing information on
+    // Set an option: turn verbose command information on
     send("SET INFO true");
     send("CREATE DB \"etc/xml/input.xml\" input");
 
@@ -79,11 +79,11 @@ public final class ServerExample {
    */
   static void send(final String command) throws IOException {
     // ------------------------------------------------------------------------
-    // Execute the process
+    // Execute the command
     session.execute(command, System.out);
 
     // ------------------------------------------------------------------------
-    // If available, print process information or error output
+    // If available, print command information or error output
     System.out.print(session.info());
   }
 }

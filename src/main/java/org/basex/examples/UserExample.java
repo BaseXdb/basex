@@ -3,13 +3,13 @@ package org.basex.examples;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.AlterUser;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.CreateUser;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.DropUser;
-import org.basex.core.proc.Grant;
-import org.basex.core.proc.ShowUsers;
+import org.basex.core.cmd.AlterUser;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.CreateUser;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.DropUser;
+import org.basex.core.cmd.Grant;
+import org.basex.core.cmd.ShowUsers;
 
 /**
  * This class presents methods to directly access

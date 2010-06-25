@@ -2,9 +2,9 @@ package org.basex.examples.create;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.Create;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.Create;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.XQuery;
 
 /**
  * This example demonstrates how to import a file in the LST format

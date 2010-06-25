@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.XQuery;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
 import org.basex.query.QueryException;
@@ -14,7 +14,7 @@ import org.basex.query.iter.Iter;
 
 /**
  * This example demonstrates three variants how XQuery expressions can be
- * evaluated with BaseX.
+ * evaluated.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team

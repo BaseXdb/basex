@@ -47,7 +47,7 @@ public final class ServerConcurrencyExample {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    // Set an option: turn verbose processing information on
+    // Set an option: turn verbose command information on
     send("SET INFO true", session);
     send("CREATE DB \"etc/xml/input.xml\" input", session);
 
@@ -94,7 +94,7 @@ public final class ServerConcurrencyExample {
     session.close();
 
     // ------------------------------------------------------------------------
-    // Stop the server.
+    // Stop the server
     System.out.println("\n* Stop the server:");
 
     new BaseXServer("STOP");
@@ -109,7 +109,7 @@ public final class ServerConcurrencyExample {
    */
   void send(final String cmd, final ClientSession cs) throws IOException {
     // ------------------------------------------------------------------------
-    // Execute the process.
+    // Execute the command
     cs.execute(cmd, System.out);
   }
 

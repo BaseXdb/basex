@@ -6,10 +6,10 @@ import java.util.regex.Pattern;
 import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.core.proc.CreateIndex;
-import org.basex.core.proc.DropIndex;
-import org.basex.core.proc.InfoIndex;
-import org.basex.core.proc.Set;
+import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.InfoIndex;
+import org.basex.core.cmd.Set;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
 

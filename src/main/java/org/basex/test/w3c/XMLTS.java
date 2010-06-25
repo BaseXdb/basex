@@ -4,10 +4,10 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.CreateDB;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.query.QueryProcessor;
@@ -85,21 +85,21 @@ public final class XMLTS {
       final boolean valid = text("@TYPE", srcRoot).equals("valid");
 
       context.prop.set(Prop.INTPARSE, true);
-      Proc proc = new CreateDB(uri, PATH + uri);
-      final boolean success = proc.exec(context);
+      Command cmd = new CreateDB(uri, PATH + uri);
+      final boolean success = cmd.exec(context);
       final boolean correct = valid == success;
 
       if(verbose || !correct) {
         Main.outln(uri + " = " + (valid ? "correct" : "wrong") + " -> " +
             (success ? "correct" : "wrong") + (correct ? " (OK)" : " (WRONG)"));
         if(verbose) {
-          String inf = proc.info();
+          String inf = cmd.info();
           if(!inf.isEmpty()) Main.outln("[BASEX ] " + inf);
           context.prop.set(Prop.INTPARSE, false);
           new Close().exec(context);
-          proc = new CreateDB(uri, PATH + uri);
-          proc.exec(context);
-          inf = proc.info();
+          cmd = new CreateDB(uri, PATH + uri);
+          cmd.exec(context);
+          inf = cmd.info();
           if(!inf.isEmpty()) Main.outln("[XERCES] " + inf);
         }
       }

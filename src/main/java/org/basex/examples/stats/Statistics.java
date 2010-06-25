@@ -4,10 +4,10 @@ import static org.basex.core.Text.*;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Proc;
-import org.basex.core.proc.List;
-import org.basex.core.proc.Open;
-import org.basex.core.proc.Set;
+import org.basex.core.Command;
+import org.basex.core.cmd.List;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Set;
 import org.basex.io.CachedOutput;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -96,7 +96,7 @@ public abstract class Statistics {
    * @return string result
    * @throws BaseXException exception
    */
-  final String exec(final Proc cmd) throws BaseXException {
+  final String exec(final Command cmd) throws BaseXException {
     final CachedOutput co = new CachedOutput();
     if(debug) Main.errln("- " + cmd);
     cmd.execute(ctx, co);

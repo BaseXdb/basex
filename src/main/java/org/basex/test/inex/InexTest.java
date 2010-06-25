@@ -8,11 +8,11 @@ import java.util.regex.Pattern;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.List;
-import org.basex.core.proc.Open;
-import org.basex.core.proc.Set;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.List;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Set;
+import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
 import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
@@ -56,7 +56,7 @@ public final class InexTest {
   private int quindex = -1;
   /** Number of runs. */
   private int runs = 1;
-  /** Shows process info. */
+  /** Shows command info. */
   private boolean info;
   /** Container for qtimes and results. */
   private PrintOutput res;
@@ -198,7 +198,7 @@ public final class InexTest {
         "  -d<no>  use specified database (0-9)" + NL +
         "  -q<no>  perform specified query (1-#queries)" + NL +
         "  -r<no>  number of runs" + NL +
-        "  -v      show process info");
+        "  -v      show command info");
 
     while(arg.more()) {
       if(arg.dash()) {

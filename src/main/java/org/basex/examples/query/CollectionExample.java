@@ -3,13 +3,13 @@ package org.basex.examples.query;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.proc.Add;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Delete;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.InfoDB;
-import org.basex.core.proc.Optimize;
-import org.basex.core.proc.Set;
+import org.basex.core.cmd.Add;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.Delete;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.InfoDB;
+import org.basex.core.cmd.Optimize;
+import org.basex.core.cmd.Set;
 
 /**
  * This class shows the basic usage of the BaseX collection commands.
