@@ -313,7 +313,7 @@ c_replace=ファイル "%" は既に存在します。\n置換してよろしい
 c_server=サーバー管理
 c_servertt=ユーザー管理及びログトレースの画面を表示します。
 
-# Commands & Processes
+# Commands
 proc_time=所要時間
 proc_syntax=文法
 proc_err=%を実行できませんでした。

@@ -11,42 +11,42 @@ import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Commands.CmdShow;
-import org.basex.core.proc.Add;
-import org.basex.core.proc.AlterDB;
-import org.basex.core.proc.AlterUser;
-import org.basex.core.proc.Check;
-import org.basex.core.proc.CreateUser;
-import org.basex.core.proc.Cs;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.CreateFS;
-import org.basex.core.proc.CreateIndex;
-import org.basex.core.proc.CreateMAB;
-import org.basex.core.proc.Delete;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.DropIndex;
-import org.basex.core.proc.DropUser;
-import org.basex.core.proc.Exit;
-import org.basex.core.proc.Export;
-import org.basex.core.proc.Find;
-import org.basex.core.proc.Get;
-import org.basex.core.proc.Grant;
-import org.basex.core.proc.Help;
-import org.basex.core.proc.Info;
-import org.basex.core.proc.InfoDB;
-import org.basex.core.proc.InfoIndex;
-import org.basex.core.proc.InfoTable;
-import org.basex.core.proc.Kill;
-import org.basex.core.proc.List;
-import org.basex.core.proc.Open;
-import org.basex.core.proc.Optimize;
-import org.basex.core.proc.Password;
-import org.basex.core.proc.ShowSessions;
-import org.basex.core.proc.ShowUsers;
-import org.basex.core.proc.Run;
-import org.basex.core.proc.Set;
-import org.basex.core.proc.ShowDatabases;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.Add;
+import org.basex.core.cmd.AlterDB;
+import org.basex.core.cmd.AlterUser;
+import org.basex.core.cmd.Check;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.CreateFS;
+import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.CreateMAB;
+import org.basex.core.cmd.CreateUser;
+import org.basex.core.cmd.Cs;
+import org.basex.core.cmd.Delete;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.DropUser;
+import org.basex.core.cmd.Exit;
+import org.basex.core.cmd.Export;
+import org.basex.core.cmd.Find;
+import org.basex.core.cmd.Get;
+import org.basex.core.cmd.Grant;
+import org.basex.core.cmd.Help;
+import org.basex.core.cmd.Info;
+import org.basex.core.cmd.InfoDB;
+import org.basex.core.cmd.InfoIndex;
+import org.basex.core.cmd.InfoTable;
+import org.basex.core.cmd.Kill;
+import org.basex.core.cmd.List;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Optimize;
+import org.basex.core.cmd.Password;
+import org.basex.core.cmd.Run;
+import org.basex.core.cmd.Set;
+import org.basex.core.cmd.ShowDatabases;
+import org.basex.core.cmd.ShowSessions;
+import org.basex.core.cmd.ShowUsers;
+import org.basex.core.cmd.XQuery;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
@@ -57,7 +57,7 @@ import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 
 /**
- * This is a parser for command strings, creating {@link Proc} instances.
+ * This is a parser for command strings, creating {@link Command} instances.
  * Several commands can be formulated in one string and separated by semicolons.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -95,8 +95,8 @@ public final class CommandParser extends InputParser {
    * @return commands
    * @throws QueryException query exception
    */
-  public Proc[] parse() throws QueryException {
-    Proc[] list = new Proc[0];
+  public Command[] parse() throws QueryException {
+    Command[] list = new Command[0];
     if(!more()) return list;
 
     while(true) {
@@ -111,10 +111,10 @@ public final class CommandParser extends InputParser {
   /**
    * Parses a single command.
    * @param cmd command
-   * @return process
+   * @return resulting command
    * @throws QueryException query exception
    */
-  private Proc parse(final Cmd cmd) throws QueryException {
+  private Command parse(final Cmd cmd) throws QueryException {
     switch(cmd) {
       case CREATE: case C:
         switch(consume(CmdCreate.class, cmd)) {

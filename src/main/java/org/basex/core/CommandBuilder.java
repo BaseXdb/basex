@@ -12,15 +12,15 @@ import org.basex.util.TokenBuilder;
 public final class CommandBuilder {
   /** String representation of the database command. */
   private final TokenBuilder tb = new TokenBuilder();
-  /** Process cache. */
-  private final Proc p;
+  /** Command to be output. */
+  private final Command cmd;
 
   /**
    * Constructor.
-   * @param cmd command
+   * @param c command
    */
-  public CommandBuilder(final Proc cmd) {
-    p = cmd;
+  public CommandBuilder(final Command c) {
+    cmd = c;
   }
   
   /**
@@ -28,18 +28,18 @@ public final class CommandBuilder {
    * @return self instance
    */
   public CommandBuilder init() {
-    init(Main.name(p).toUpperCase());
+    init(Main.name(cmd).toUpperCase());
     return this;
   }
   
   /**
    * Initializes the builder with the specified string.
-   * @param cmd command string
+   * @param s command string
    * @return self instance
    */
-  public CommandBuilder init(final String cmd) {
+  public CommandBuilder init(final String s) {
     tb.reset();
-    tb.add(cmd);
+    tb.add(s);
     return this;
   }
 
@@ -48,7 +48,7 @@ public final class CommandBuilder {
    * @return self instance
    */
   public CommandBuilder args() {
-    for(int a = 0; a < p.args.length; a++) arg(a);
+    for(int a = 0; a < cmd.args.length; a++) arg(a);
     return this;
   }
 
@@ -59,7 +59,7 @@ public final class CommandBuilder {
    */
   public CommandBuilder xquery(final int arg) {
     tb.add(' ');
-    tb.add(p.args[arg]);
+    tb.add(cmd.args[arg]);
     return this;
   }
 
@@ -81,7 +81,7 @@ public final class CommandBuilder {
    * @return self instance
    */
   public CommandBuilder arg(final String key, final int arg) {
-    final String a = p.args[arg];
+    final String a = cmd.args[arg];
     if(a != null && !a.isEmpty()) {
       if(key != null) {
         tb.add(' ');

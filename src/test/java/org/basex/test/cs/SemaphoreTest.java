@@ -7,9 +7,9 @@ import java.util.LinkedList;
 import java.util.Random;
 import org.basex.BaseXServer;
 import org.basex.core.Session;
-import org.basex.core.Proc;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
+import org.basex.core.Command;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
@@ -18,7 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * This class tests the order of incoming processes.
+ * This class tests the order of incoming commands.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
@@ -63,7 +63,7 @@ public final class SemaphoreTest {
     for(final ClientSession s : sessions) {
       closeSession(s);
     }
-    // Stop server instance.
+    // stop server instance
     new BaseXServer("stop");
   }
 
@@ -129,14 +129,14 @@ public final class SemaphoreTest {
 
   /**
    * Returns query result.
-   * @param pr process reference
+   * @param cmd command reference
    * @param session session
    * @return String result
    */
-  String checkRes(final Proc pr, final Session session) {
+  String checkRes(final Command cmd, final Session session) {
     final CachedOutput co = new CachedOutput();
     try {
-      session.execute(pr, co);
+      session.execute(cmd, co);
     } catch(final IOException ex) {
       fail(ex.toString());
     }
@@ -144,14 +144,14 @@ public final class SemaphoreTest {
   }
 
   /**
-   * Runs the specified process.
-   * @param pr process reference
+   * Executes the specified command.
+   * @param cmd command reference
    * @param session Session
    * @return success flag
    */
-  String exec(final Proc pr, final Session session) {
+  String exec(final Command cmd, final Session session) {
     try {
-      return session.execute(pr) ? null : session.info();
+      return session.execute(cmd) ? null : session.info();
     } catch(final IOException ex) {
       return ex.toString();
     }

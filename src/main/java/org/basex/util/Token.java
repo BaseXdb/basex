@@ -284,7 +284,7 @@ public final class Token {
       if(b >= 0 && b < ' ' && !ws(b)) { ++i; continue; } // ignore control chars
       t[p++] = token[i++]; // byte is valid .. copy to new array
       for(int j = 1; j < cl; j++) { // process all following bytes
-        // all following bytes must have a codepoint length of zero.
+        // all following bytes must have a codepoint length of zero
         if(cl2(token[i]) != 0) {
           --p; // drop the already added first byte
           i += cl - j; // skip all bytes of this sequence

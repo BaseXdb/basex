@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.Box;
 import org.basex.core.Main;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
@@ -47,8 +47,8 @@ public final class TextView extends View implements ActionListener {
   private final BaseXButton home;
   /** Text Area. */
   private final BaseXText area;
-  /** Result process. */
-  private Proc proc;
+  /** Result command. */
+  private Command cmd;
   /** Result nodes. */
   private Nodes ns;
   /** Refresh flag. */
@@ -158,18 +158,18 @@ public final class TextView extends View implements ActionListener {
   /**
    * Sets the output text.
    * @param co cached output
-   * @param p process
+   * @param c command
    */
-  public void setText(final CachedOutput co, final Proc p) {
+  public void setText(final CachedOutput co, final Command c) {
     area.setText(co.buffer(), co.size());
     header.setText(TEXTTIT + (co.finished() ? RESULTCHOP : ""));
     home.setEnabled(gui.context.data != null);
     refresh = true;
     if(!co.finished()) {
-      proc = null;
+      cmd = null;
       ns = null;
     } else {
-      proc = p;
+      cmd = c;
     }
   }
 
@@ -183,8 +183,8 @@ public final class TextView extends View implements ActionListener {
     PrintOutput out = null;
     try {
       out = new PrintOutput(file.toString());
-      if(proc != null) {
-        proc.exec(gui.context, out);
+      if(cmd != null) {
+        cmd.exec(gui.context, out);
       } else if(ns != null) {
         ns.serialize(new XMLSerializer(out));
       } else {

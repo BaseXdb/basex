@@ -3,35 +3,35 @@ package org.basex.test.cs;
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 import org.basex.BaseXServer;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Session;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.core.Commands.CmdSet;
-import org.basex.core.proc.AlterUser;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.CreateFS;
-import org.basex.core.proc.CreateIndex;
-import org.basex.core.proc.CreateUser;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.DropIndex;
-import org.basex.core.proc.DropUser;
-import org.basex.core.proc.Exit;
-import org.basex.core.proc.Export;
-import org.basex.core.proc.Find;
-import org.basex.core.proc.Grant;
-import org.basex.core.proc.Help;
-import org.basex.core.proc.InfoDB;
-import org.basex.core.proc.InfoIndex;
-import org.basex.core.proc.InfoTable;
-import org.basex.core.proc.Kill;
-import org.basex.core.proc.List;
-import org.basex.core.proc.Open;
-import org.basex.core.proc.Optimize;
-import org.basex.core.proc.Password;
-import org.basex.core.proc.Set;
-import org.basex.core.proc.ShowUsers;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.AlterUser;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.CreateFS;
+import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.CreateUser;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.DropUser;
+import org.basex.core.cmd.Exit;
+import org.basex.core.cmd.Export;
+import org.basex.core.cmd.Find;
+import org.basex.core.cmd.Grant;
+import org.basex.core.cmd.Help;
+import org.basex.core.cmd.InfoDB;
+import org.basex.core.cmd.InfoIndex;
+import org.basex.core.cmd.InfoTable;
+import org.basex.core.cmd.Kill;
+import org.basex.core.cmd.List;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Optimize;
+import org.basex.core.cmd.Password;
+import org.basex.core.cmd.Set;
+import org.basex.core.cmd.ShowUsers;
+import org.basex.core.cmd.XQuery;
 import org.basex.io.NullOutput;
 import org.basex.server.ClientSession;
 import org.junit.AfterClass;
@@ -217,21 +217,21 @@ public final class PermissionTest {
 
   /**
    * Assumes that this command is successful.
-   * @param pr process reference
+   * @param cmd command reference
    * @param s Session
    */
-  static void ok(final Proc pr, final Session s) {
-    final String msg = process(pr, s);
-    if(msg != null) fail(pr + "\n" + msg);
+  static void ok(final Command cmd, final Session s) {
+    final String msg = exec(cmd, s);
+    if(msg != null) fail(cmd + "\n" + msg);
   }
 
   /**
    * Assumes that this command fails.
-   * @param pr process reference
+   * @param cmd command reference
    * @param s Session
    */
-  private void no(final Proc pr, final Session s) {
-    ok(process(pr, s) != null);
+  private void no(final Command cmd, final Session s) {
+    ok(exec(cmd, s) != null);
   }
 
   /**
@@ -243,14 +243,14 @@ public final class PermissionTest {
   }
 
   /**
-   * Runs the specified process.
-   * @param pr process reference
+   * Executes the specified command.
+   * @param cmd command reference
    * @param session Session
    * @return success flag
    */
-  private static String process(final Proc pr, final Session session) {
+  private static String exec(final Command cmd, final Session session) {
     try {
-      return session.execute(pr, new NullOutput()) ? null : session.info();
+      return session.execute(cmd, new NullOutput()) ? null : session.info();
     } catch(final Exception ex) {
       return ex.toString();
     }
@@ -264,8 +264,7 @@ public final class PermissionTest {
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }
-
-    // Stop server instance.
+    // stop server instance
     new BaseXServer("stop");
   }
 }

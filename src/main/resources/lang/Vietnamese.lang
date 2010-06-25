@@ -313,7 +313,7 @@ c_replace=Tệp "%" đã có.\nBạn muốn thay thế nó không?
 c_server=Server Administration
 c_servertt=Display the server administration for user management and log tracing.
 
-# Commands & Processes
+# Commands
 proc_time=Thời gian cần
 proc_syntax=Cú pháp
 proc_err=Không thể chạy %

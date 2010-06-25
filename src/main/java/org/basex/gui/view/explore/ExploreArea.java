@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import org.basex.core.Main;
-import org.basex.core.proc.Find;
+import org.basex.core.cmd.Find;
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
 import org.basex.gui.GUIConstants;

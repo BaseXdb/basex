@@ -7,7 +7,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import org.basex.core.Session;
 import org.basex.core.Context;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.io.BufferInput;
@@ -22,9 +22,9 @@ import org.basex.util.Token;
  * <li> A socket instance is created by the constructor.</li>
  * <li> The {@link #execute} method sends database commands to the server.
  * All strings are encoded as UTF8 and suffixed by a zero byte.</li>
- * <li> If the command has been successfully processed,
+ * <li> If the command has been successfully executed,
  * the result string is read.</li>
- * <li> Next, the processing info string is read.</li>
+ * <li> Next, the command info string is read.</li>
  * <li> A last byte is next sent to indicate if command execution
  * was successful (0) or not (1).</li>
  * <li> {@link #close} closes the session by sending the {@link Cmd#EXIT}
@@ -41,7 +41,7 @@ public final class ClientSession extends Session {
   private final PrintOutput out;
   /** Input stream. */
   private final InputStream in;
-  /** Process info. */
+  /** Command info. */
   private String info;
 
   /**
@@ -99,9 +99,9 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public boolean execute(final Proc pr, final OutputStream o)
+  public boolean execute(final Command cmd, final OutputStream o)
       throws IOException {
-    return execute(pr.toString(), o);
+    return execute(cmd.toString(), o);
   }
 
   @Override

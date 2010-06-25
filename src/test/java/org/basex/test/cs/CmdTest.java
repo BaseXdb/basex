@@ -3,9 +3,9 @@ package org.basex.test.cs;
 import org.basex.core.Session;
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Text;
-import org.basex.core.proc.*;
+import org.basex.core.cmd.*;
 import org.basex.core.Commands.*;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
@@ -57,8 +57,8 @@ public class CmdTest {
    */
   @After
   public final void setUp() {
-    process(new DropDB(NAME));
-    process(new DropUser(USER));
+    exec(new DropDB(NAME));
+    exec(new DropUser(USER));
   }
 
   /** Command test. */
@@ -339,29 +339,29 @@ public class CmdTest {
 
   /**
    * Assumes that this command is successful.
-   * @param pr process reference
+   * @param cmd command reference
    */
-  private void ok(final Proc pr) {
-    final String msg = process(pr);
+  private void ok(final Command cmd) {
+    final String msg = exec(cmd);
     if(msg != null) fail(msg);
   }
 
   /**
    * Assumes that this command fails.
-   * @param pr process reference
+   * @param cmd command reference
    */
-  private void no(final Proc pr) {
-    ok(process(pr) != null);
+  private void no(final Command cmd) {
+    ok(exec(cmd) != null);
   }
 
   /**
-   * Runs the specified process.
-   * @param pr process reference
+   * Executes the specified command.
+   * @param cmd command reference
    * @return success flag
    */
-  private String process(final Proc pr) {
+  private String exec(final Command cmd) {
     try {
-      return session.execute(pr, new NullOutput()) ? null : session.info();
+      return session.execute(cmd, new NullOutput()) ? null : session.info();
     } catch(final Exception ex) {
       return ex.toString();
     }

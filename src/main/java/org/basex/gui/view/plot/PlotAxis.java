@@ -163,8 +163,7 @@ final class PlotAxis {
     firstCat = i < vl ? vals[i] : EMPTY;
     lastCat = i < vl ? vals[vl - 1] : EMPTY;
 
-    // number of current category / position of item value in ordered
-    // text set.
+    // number of current category/position of item value in ordered text set
     int p = 0;
     while(i < vl) {
       // next string category to be tested
@@ -174,7 +173,7 @@ final class PlotAxis {
       // determining highest index of value/category b
       while(l < vl && eq(vals[l], b)) l++;
 
-      // calculating positions for all items with value b in current category.
+      // calculating positions for all items with value b in current category
       while(i < l) {
         // centering items if only a single category exists (.5d)
         final double d = nrCats != 1 ? 1.0d / (nrCats - 1) * p : .5d;

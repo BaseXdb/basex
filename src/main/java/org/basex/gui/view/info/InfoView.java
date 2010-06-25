@@ -117,9 +117,9 @@ public final class InfoView extends View {
   }
 
   /**
-   * Processes the query info.
+   * Displays the specified query information.
    * @param inf info string
-   * @param ok success flag
+   * @param ok flag indicating if command execution was successful
    */
   public void setInfo(final String inf, final boolean ok) {
     final IntList il = new IntList();

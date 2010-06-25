@@ -313,7 +313,7 @@ c_replace=Il documento "%" esiste già.\nVuoi sovrascriverlo?
 c_server=Amministrazione del server
 c_servertt=Mostra l'amministrazione del server per gestire gli utenti e diari
 
-# Commands & Processes
+# Commands
 proc_time=Tempo necessario
 proc_syntax=Sintassi
 proc_err=Impossibile eseguire %

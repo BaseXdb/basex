@@ -6,7 +6,7 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.DropDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;

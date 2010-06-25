@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.CreateDB;
+import org.basex.core.cmd.CreateDB;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;

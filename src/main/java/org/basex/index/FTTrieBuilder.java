@@ -4,7 +4,8 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import org.basex.core.proc.DropDB;
+
+import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.io.DataOutput;

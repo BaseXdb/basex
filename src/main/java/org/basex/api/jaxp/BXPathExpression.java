@@ -7,8 +7,8 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import org.basex.api.dom.BXNList;
 import org.basex.core.Context;
-import org.basex.core.Proc;
-import org.basex.core.proc.CreateDB;
+import org.basex.core.Command;
+import org.basex.core.cmd.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
@@ -55,9 +55,9 @@ final class BXPathExpression implements XPathExpression {
   public Object evaluate(final InputSource is, final QName res)
       throws XPathExpressionException {
 
-    final Proc proc = new CreateDB(is.getSystemId());
-    if(proc.exec(context)) return finish(eval(), res);
-    throw new XPathExpressionException(proc.info());
+    final Command cmd = new CreateDB(is.getSystemId());
+    if(cmd.exec(context)) return finish(eval(), res);
+    throw new XPathExpressionException(cmd.info());
   }
 
   /**

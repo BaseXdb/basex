@@ -4,10 +4,10 @@ import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
 import org.basex.core.Commands;
 import org.basex.core.Context;
-import org.basex.core.proc.Add;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.CreateIndex;
-import org.basex.core.proc.DropDB;
+import org.basex.core.cmd.Add;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.DropDB;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -40,7 +40,7 @@ public class QueryTest {
   @BeforeClass
   public static void before() throws BaseXException {
     new CreateDB(NAME).execute(CTX);
-    for(String file : FILES) new Add(file, null, "etc/xml").execute(CTX);
+    for(final String file : FILES) new Add(file, null, "etc/xml").execute(CTX);
     new Add(ZIP, null, "test/zipped").execute(CTX);
     new CreateIndex(Commands.CmdIndex.FULLTEXT);
   }
@@ -64,7 +64,7 @@ public class QueryTest {
         + " where $x[ends-with(document-uri(.), '" + FILES[1] + "')]"
         + " and $x//religions/text() contains text 'Catholic' "
         + " return base-uri($x)";
-    QueryProcessor qp = new QueryProcessor(find, CTX);
+    final QueryProcessor qp = new QueryProcessor(find, CTX);
     assertEquals(1, qp.query().size());
 
   }
@@ -78,7 +78,7 @@ public class QueryTest {
     final String find = "for $x in ."
         + " where $x[matches(document-uri(.), 'test/zipped/')]"
         + " return base-uri($x)";
-    QueryProcessor qp = new QueryProcessor(find, CTX);
+    final QueryProcessor qp = new QueryProcessor(find, CTX);
     assertEquals(4, qp.query().size());
 
   }

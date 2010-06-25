@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
-import org.basex.core.proc.InfoTable;
+import org.basex.core.cmd.InfoTable;
 import org.basex.data.Nodes;
 import org.basex.data.XMLSerializer;
 import org.basex.query.QueryProcessor;

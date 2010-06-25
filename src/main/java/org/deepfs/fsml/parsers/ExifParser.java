@@ -375,10 +375,7 @@ public final class ExifParser {
     h9286(MetaElem.COMMENT, Format.ASCII),
     // /** Subsecond data - fractions of seconds for the original datetime. */
     // h9291(null, Format.ASCII),
-    // /**
-    // * Subsecond data - fractions of seconds for the date time digitalized
-    // tag.
-    // */
+    // Subsecond data - fractions of seconds for the date time digitalized tag
     // h9292(null, Format.ASCII),
     /** Color space. */
     ha001(1, MetaElem.COLOR_SPACE, Format.SHORT) {

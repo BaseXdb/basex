@@ -116,10 +116,9 @@ final class FTArray {
           // but valueToInset is longer
           final int p = getPointer(cn);
           if(p == 0 ||
-            Token.diff(
-                tokens.get(next.get(cnn[p])[0])[0], r2[0]) != 0) {
+            Token.diff(tokens.get(next.get(cnn[p])[0])[0], r2[0]) != 0) {
             // create new node and append it, because any child from curretnNode
-            // start with the same letter than reamin2.
+            // start with the same letter than reamin2
             int[] e = new int[2 + off.length];
             e[0] = tokens.size();
             tokens.add(r2);

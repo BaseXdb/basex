@@ -4,7 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
 import java.io.IOException;
 import org.basex.core.Prop;
-import org.basex.core.proc.Export;
+import org.basex.core.cmd.Export;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -111,16 +111,16 @@ final class DBPrimitives extends Primitives {
     // and less table alterations needed
     int par = -2;
     boolean check = false;
-    // first is the first node of par which is updated. So 'first-1' is the
-    // lowest pre value where adjacent text nodes can exist.
+    // first is the first node of par which is updated. so 'first-1' is the
+    // lowest pre value where adjacent text nodes can exist
     int first = -1;
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.get(i);
       final int parT = d.parent(pre, d.kind(pre));
       if(parT != par) {
-        // Adjacent text nodes are merged. Merges can only be applied directly
-        // after the update if no lower pre values are effected. This is not
-        // the case for 'replace node', 'delete' and 'insert before' operations.
+        // adjacent text nodes are merged. merges can only be applied directly
+        // after the update if no lower pre values are effected. this is not
+        // the case for 'replace node', 'delete' and 'insert before' operations
         if(check && parT < par) mergeTexts(par, first);
         check = false;
         par = parT;

@@ -2,12 +2,12 @@ package org.basex.test.query;
 
 import static org.junit.Assert.*;
 import org.basex.core.Context;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.Set;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Set;
+import org.basex.core.cmd.XQuery;
 import org.basex.io.CachedOutput;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -255,18 +255,18 @@ public class NamespaceTest {
 
   /**
    * Runs a command.
-   * @param proc process to be run
+   * @param cmd command to be run
    */
-  private static void exec(final Proc proc) {
-    if(!proc.exec(context)) fail(proc.info());
+  private static void exec(final Command cmd) {
+    if(!cmd.exec(context)) fail(cmd.info());
   }
 
   /**
    * Runs a command and cached the output.
-   * @param proc process to be run
+   * @param cmd command to be run
    * @param co cached output
    */
-  private static void exec(final Proc proc, final CachedOutput co) {
-    if(!proc.exec(context, co)) fail(proc.info());
+  private static void exec(final Command cmd, final CachedOutput co) {
+    if(!cmd.exec(context, co)) fail(cmd.info());
   }
 }

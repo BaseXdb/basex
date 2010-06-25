@@ -5,7 +5,7 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
-import org.basex.core.proc.AInfo;
+import org.basex.core.cmd.AInfo;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
 import org.basex.util.Levenshtein;

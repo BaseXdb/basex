@@ -8,11 +8,12 @@ import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.util.Random;
 import java.util.Scanner;
-import org.basex.core.proc.AlterUser;
-import org.basex.core.proc.CreateUser;
-import org.basex.core.proc.Exit;
-import org.basex.core.proc.Password;
-import org.basex.core.proc.Set;
+
+import org.basex.core.cmd.AlterUser;
+import org.basex.core.cmd.CreateUser;
+import org.basex.core.cmd.Exit;
+import org.basex.core.cmd.Password;
+import org.basex.core.cmd.Set;
 import org.basex.query.QueryException;
 import org.basex.server.LoginException;
 import org.basex.util.Performance;
@@ -60,7 +61,7 @@ public abstract class Main {
   }
 
   /**
-   * Launches the console mode, waiting for and processing user input.
+   * Launches the console mode, which reads and executes user input.
    * @return true if exit command was sent
    * @throws IOException I/O exception
    */
@@ -69,7 +70,7 @@ public abstract class Main {
 
     while(console) {
       Main.out("> ");
-      if(!process(input())) return true;
+      if(!execute(input())) return true;
     }
     return false;
   }
@@ -81,7 +82,7 @@ public abstract class Main {
   protected void quit(final boolean user) {
     try {
       if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
-      process(new Exit(), true);
+      execute(new Exit(), true);
       out.close();
     } catch(final IOException ex) {
       errln(server(ex));
@@ -89,25 +90,25 @@ public abstract class Main {
   }
 
   /**
-   * Parses and evaluates the input string.
+   * Parses and executes the input string.
    * @param in input commands
    * @return false if exit command was sent
    * @throws IOException I/O exception
    */
-  protected final boolean process(final String in) throws IOException {
+  protected final boolean execute(final String in) throws IOException {
     try {
-      for(final Proc p : new CommandParser(in, context).parse()) {
-        if(p instanceof Exit) return false;
+      for(final Command cmd : new CommandParser(in, context).parse()) {
+        if(cmd instanceof Exit) return false;
 
         // offer optional password input
-        final int i = p instanceof Password && p.args[0] == null ? 0 :
-          (p instanceof CreateUser || p instanceof AlterUser) &&
-          p.args[1] == null ? 1 : -1;
+        final int i = cmd instanceof Password && cmd.args[0] == null ? 0 :
+          (cmd instanceof CreateUser || cmd instanceof AlterUser) &&
+          cmd.args[1] == null ? 1 : -1;
         if(i != -1) {
           Main.out(SERVERPW + COLS);
-          p.args[i] = password();
+          cmd.args[i] = password();
         }
-        if(!process(p, true)) break;
+        if(!execute(cmd, true)) break;
       }
     } catch(final QueryException ex) {
       error(ex, ex.getMessage());
@@ -116,19 +117,19 @@ public abstract class Main {
   }
 
   /**
-   * Processes the specified command, specifying verbose output.
-   * @param pr process
+   * Executes the specified command and optionally prints some information.
+   * @param cmd command to be run
    * @param v verbose flag
    * @return true if operation was successful
    * @throws IOException I/O exception
    */
-  protected final boolean process(final Proc pr, final boolean v)
+  protected final boolean execute(final Command cmd, final boolean v)
       throws IOException {
 
     final Session ss = session();
     if(ss == null) return false;
-    final boolean ok = ss.execute(pr, out);
-    if(pr instanceof Exit) return true;
+    final boolean ok = ss.execute(cmd, out);
+    if(cmd instanceof Exit) return true;
 
     if(v || !ok) {
       final String inf = ss.info();
@@ -152,7 +153,7 @@ public abstract class Main {
    */
   protected final boolean set(final Object[] opt, final Object arg)
       throws IOException {
-    return process(new Set(opt, arg), false);
+    return execute(new Set(opt, arg), false);
   }
 
   /**

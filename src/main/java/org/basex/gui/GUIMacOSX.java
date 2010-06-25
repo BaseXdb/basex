@@ -56,7 +56,7 @@ public class GUIMacOSX {
     // Show menu in the screen menu instead of inside the application window
     System.setProperty(P_SCREEN_MENU_BAR, "true");
 
-    // load native java classes ...
+    // load native java classes...
     appClass = Class.forName(C_APPLICATION);
     appObj = invoke(appClass, null, "getApplication", EC, EO);
     appEvent = Class.forName(C_APPLICATION_EVENT);

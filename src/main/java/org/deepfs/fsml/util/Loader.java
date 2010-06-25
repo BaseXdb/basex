@@ -108,7 +108,7 @@ public final class Loader extends ClassLoader {
     } catch(final IOException ex) {
       throw ex;
     } catch(final Throwable t) {
-      // catch all exceptions and JVM errors and break after the first error.
+      // catch all exceptions and JVM errors and break after the first error
       Main.errln("Failed to load class: %", t);
     }
     // return only the correctly initialized classes
@@ -130,7 +130,7 @@ public final class Loader extends ClassLoader {
       try {
         Class.forName(c.getName(), true, ClassLoader.getSystemClassLoader());
         counter++;
-      } catch(final Throwable t) { // catch everything and break after an error.
+      } catch(final Throwable t) { // catch everything and break after an error
         Main.errln("Failed to load class (%)", t.getMessage());
         break;
       }

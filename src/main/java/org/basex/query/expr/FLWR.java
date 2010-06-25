@@ -29,7 +29,7 @@ public final class FLWR extends FLWOR {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    // add where clause to last for clause and remove variable calls.
+    // add where clause to last for clause and remove variable calls
     if(where != null) {
       final ForLet f = fl[fl.length - 1];
       if(f instanceof For && f.standard() && where.removable(f.var, ctx)) {

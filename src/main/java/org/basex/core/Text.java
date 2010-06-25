@@ -84,7 +84,7 @@ public interface Text {
     "  -P<pass>   user password" + NL +
     "  -q<expr>   query expression" + NL +
     "  -U<name>   user name" + NL +
-    "  -v/V       show (all) process info" + NL +
+    "  -v/V       show (all) command info" + NL +
     "  -w         wrap query result to xml" + NL +
     "  -z         skip query output";
 
@@ -98,7 +98,7 @@ public interface Text {
     "  -o<file>   output file" + NL +
     "  -q<expr>   query expression" + NL +
     "  -s<pars>   serialization parameters" + NL +
-    "  -v/V       show (all) process info" + NL +
+    "  -v/V       show (all) command info" + NL +
     "  -w         wrap query result to xml" + NL +
     "  -z         skip query output";
 
@@ -319,11 +319,11 @@ public interface Text {
     "", lang("ch_exit1", NAME), lang("ch_exit2", NAME)
   };
 
-  // PROCESS INFOS ============================================================
+  // COMMAND INFOS ============================================================
 
-  /** Process time. */
+  /** Command timing information. */
   String PROCTIME = lang("proc_time") + ": %";
-  /** Command syntax info. */
+  /** Command syntax information. */
   String PROCSYNTAX = lang("proc_syntax") + ": %";
   /** Command execution error. */
   String PROCERR = lang("proc_err") + COL + NL + "%";
@@ -541,7 +541,7 @@ public interface Text {
 
   // INFO STRINGS =============================================================
 
-  /** Process information. */
+  /** Waiting information. */
   String INFOWAIT = lang("wait") + DOTS;
   /** Index information. */
   String INFOINDEX = lang("info_index");

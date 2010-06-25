@@ -3,11 +3,11 @@ package org.basex.test.query;
 import static org.junit.Assert.*;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.query.item.Bln;
@@ -69,9 +69,9 @@ public abstract class QueryTest {
       final String query = qu[correct ? 2 : 1].toString();
       final String cmd = qu[0] + ": " + query;
 
-      final Proc proc = new XQuery(query);
-      if(proc.exec(context)) {
-        final Result val = proc.result();
+      final Command c = new XQuery(query);
+      if(c.exec(context)) {
+        final Result val = c.result();
         final Result cmp = correct ? (Result) qu[1] : null;
         if(val instanceof Nodes && cmp instanceof Nodes) {
           ((Nodes) cmp).data = ((Nodes) val).data;
@@ -81,17 +81,17 @@ public abstract class QueryTest {
               val + "\n" + details());
         }
       } else if(correct) {
-        fail(qu[0] + ": " + proc.info() + details());
+        fail(qu[0] + ": " + c.info() + details());
       }
     }
   }
 
   /**
    * Runs a command.
-   * @param proc process to be run
+   * @param c command to be run
    */
-  private static void exec(final Proc proc) {
-    if(!proc.exec(context)) fail(proc.info());
+  private static void exec(final Command c) {
+    if(!c.exec(context)) fail(c.info());
   }
 
   /**

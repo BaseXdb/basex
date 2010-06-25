@@ -26,7 +26,7 @@ public final class Lock {
   private int activeR;
 
   /**
-   * Modifications before executing a process.
+   * Modifications before executing a command.
    * @param w writing flag
    */
   public void before(final boolean w) {
@@ -72,7 +72,7 @@ public final class Lock {
   }
 
   /**
-   * Modifications after executing a process.
+   * Modifications after executing a command.
    * @param w writing flag
    */
   public synchronized void after(final boolean w) {

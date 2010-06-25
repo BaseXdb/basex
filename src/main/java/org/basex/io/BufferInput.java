@@ -199,7 +199,7 @@ public class BufferInput {
    * @throws IOException I/O exception
    */
   public final int readChar() throws IOException {
-    // support encodings..
+    // handle different encodings
     byte ch = readByte();
     // comparison by references
     if(enc == UTF16LE) return ch & 0xFF | (readByte() & 0xFF) << 8;

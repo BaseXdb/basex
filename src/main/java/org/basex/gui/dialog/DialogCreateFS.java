@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.border.EmptyBorder;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.List;
+import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Msg;

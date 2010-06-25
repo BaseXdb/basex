@@ -2,7 +2,7 @@ package org.basex.gui.view.table;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Context;
-import org.basex.core.proc.Find;
+import org.basex.core.cmd.Find;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.StatsKey.Kind;

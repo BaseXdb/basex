@@ -63,7 +63,7 @@ public class BaseXBack extends JPanel {
       super.paintComponent(g);
     }
 
-    // rendering hints are not supported by all platforms...
+    // rendering hints are not supported by all platforms
     if(hints) {
       try {
         ((Graphics2D) g).addRenderingHints(HINTS);

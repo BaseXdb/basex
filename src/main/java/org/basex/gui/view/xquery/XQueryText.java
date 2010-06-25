@@ -4,7 +4,8 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.core.proc.XQuery;
+
+import org.basex.core.cmd.XQuery;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXText;
 import org.basex.query.QueryContext;

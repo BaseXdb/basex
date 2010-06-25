@@ -6,8 +6,8 @@ import org.basex.core.Session;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.Check;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.Check;
+import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.io.XMLInput;
@@ -57,19 +57,19 @@ public class BaseX extends Main {
   private void run() {
     try {
       boolean u = false;
-      if(input != null) process(new Check(input), true);
+      if(input != null) execute(new Check(input), true);
 
       if(file != null) {
         // query file contents
         context.query = IO.get(file);
         final String qu = content();
-        if(qu != null) process(new XQuery(qu), true);
+        if(qu != null) execute(new XQuery(qu), true);
       } else if(query != null) {
         // query file contents
-        process(new XQuery(query), true);
+        execute(new XQuery(query), true);
       } else if(commands != null) {
-        // process command-line arguments
-        process(commands);
+        // execute command-line arguments
+        execute(commands);
       } else {
         // enter interactive mode
         outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
@@ -166,10 +166,10 @@ public class BaseX extends Main {
             // specify user name
             user = arg.string();
           } else if(c == 'v') {
-            // show process info
+            // show command info
             arg.check(set(Prop.INFO, true));
           } else if(c == 'V') {
-            // show all process info
+            // show all command info
             arg.check(set(Prop.INFO, ALL));
           } else if(c == 'w') {
             // activate well-formed XML output

@@ -28,7 +28,7 @@ import org.basex.util.Token;
  */
 public final class Lang {
   /** Throws an error if this class is loaded. This flag is used to check
-   * if non-verbose processes access the language files. */
+   * if non-printing processes access the language files. */
   private static final boolean DISALLOW = false;
   /** Checks which strings of the language file are not used. */
   private static final boolean CHECK = true;

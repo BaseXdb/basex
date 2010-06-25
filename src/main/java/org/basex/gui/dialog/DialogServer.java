@@ -13,10 +13,10 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdPerm;
-import org.basex.core.proc.Exit;
-import org.basex.core.proc.Set;
-import org.basex.core.proc.ShowDatabases;
-import org.basex.core.proc.ShowSessions;
+import org.basex.core.cmd.Exit;
+import org.basex.core.cmd.Set;
+import org.basex.core.cmd.ShowDatabases;
+import org.basex.core.cmd.ShowSessions;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -150,7 +150,7 @@ public final class DialogServer extends Dialog {
     BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(6, 1, 0, 0));
 
-    // Local server panel.
+    // local server panel
     p.add(new BaseXLabel(LOCALSERVER + COLS, true, true));
 
     BaseXBack pp = new BaseXBack();
@@ -169,7 +169,7 @@ public final class DialogServer extends Dialog {
     p.add(new BaseXLabel(" ", true, true));
     p.add(new BaseXLabel(ADMINLOGIN + COLS, true, true));
 
-    // Login panel.
+    // login panel
     pp = new BaseXBack();
     pp.setLayout(new TableLayout(5, 2, 8, 4));
     pp.add(new BaseXLabel(SERVERUSER + COLS));

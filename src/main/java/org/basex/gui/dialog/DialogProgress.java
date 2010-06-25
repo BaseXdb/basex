@@ -18,7 +18,7 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.util.Performance;
 
 /**
- * Dialog window for displaying the progress of a process.
+ * Dialog window for displaying the progress of a command execution.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

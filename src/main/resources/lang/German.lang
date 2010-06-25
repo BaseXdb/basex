@@ -313,7 +313,7 @@ c_replace=% besteht bereits.\nMöchten Sie sie ersetzen?
 c_server=Server-Administration
 c_servertt=Zeigt die Server-Administration zur Verwaltung von Benutzern und Log-Files an.
 
-# Commands & Processes
+# Commands
 proc_time=Benötigte Zeit
 proc_syntax=Syntax
 proc_err=% konnte nicht ausgeführt werden

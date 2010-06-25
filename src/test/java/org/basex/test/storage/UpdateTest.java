@@ -4,12 +4,12 @@ import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.Open;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Open;
 import org.basex.util.Performance;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -123,11 +123,11 @@ public abstract class UpdateTest {
   /**
    * Executes the specified command. Gives feedback and stops the test
    * if errors occur.
-   * @param proc process instance
+   * @param cmd command reference
    */
-  private void exec(final Proc proc) {
-    if(!proc.exec(CONTEXT)) {
-      Main.errln(proc.info());
+  private void exec(final Command cmd) {
+    if(!cmd.exec(CONTEXT)) {
+      Main.errln(cmd.info());
       Performance.stack();
       System.exit(1);
     }

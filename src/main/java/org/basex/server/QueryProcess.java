@@ -20,8 +20,8 @@ import org.basex.query.iter.Iter;
  * @author Christian Gruen
  */
 final class QueryProcess extends Progress {
-  /** Processor. */
-  private final QueryProcessor proc;
+  /** Query processor. */
+  private final QueryProcessor qp;
   /** Serializer. */
   private final XMLSerializer xml;
   /** Database context. */
@@ -44,7 +44,7 @@ final class QueryProcess extends Progress {
   QueryProcess(final String q, final PrintOutput o, final Context c)
       throws IOException {
 
-    proc = new QueryProcessor(q, c);
+    qp = new QueryProcessor(q, c);
     xml = new XMLSerializer(o);
     ctx = c;
   }
@@ -54,11 +54,11 @@ final class QueryProcess extends Progress {
    * @throws QueryException query exception
    */
   void init() throws QueryException {
-    proc.parse();
-    if(!proc.ctx.updating) startTimeout(ctx.prop.num(Prop.TIMEOUT));
+    qp.parse();
+    if(!qp.ctx.updating) startTimeout(ctx.prop.num(Prop.TIMEOUT));
     monitored = true;
-    ctx.lock.before(proc.ctx.updating);
-    iter = proc.iter();
+    ctx.lock.before(qp.ctx.updating);
+    iter = qp.iter();
     item = iter.next();
   }
 
@@ -85,9 +85,9 @@ final class QueryProcess extends Progress {
    * @throws IOException I/O exception
    */
   void close() throws IOException {
-    proc.stopTimeout();
+    qp.stopTimeout();
     xml.close();
-    proc.close();
-    if(monitored) ctx.lock.after(proc.ctx.updating);
+    qp.close();
+    if(monitored) ctx.lock.after(qp.ctx.updating);
   }
 }

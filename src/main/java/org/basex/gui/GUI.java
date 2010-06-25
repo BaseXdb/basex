@@ -22,11 +22,11 @@ import javax.swing.border.EtchedBorder;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Text;
-import org.basex.core.proc.Find;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.Find;
+import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Namespaces;
 import org.basex.data.Nodes;
@@ -122,8 +122,8 @@ public final class GUI extends JFrame {
   private JFrame fullscr;
   /** Thread counter. */
   private int threadID;
-  /** Current process. */
-  private Proc proc;
+  /** Current command. */
+  private Command cmd;
 
   /**
    * Default constructor.
@@ -323,16 +323,16 @@ public final class GUI extends JFrame {
   protected void execute() {
     final String in = input.getText();
     final boolean db = context.data != null;
-    final boolean cmd = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
+    final boolean cmdmode = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
 
-    if(cmd || in.startsWith("!")) {
+    if(cmdmode || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
-      final int i = cmd ? 0 : 1;
+      final int i = cmdmode ? 0 : 1;
       if(in.length() > i) {
         try {
-          for(final Proc p : new CommandParser(in.substring(i),
+          for(final Command c : new CommandParser(in.substring(i),
               context).parse()) {
-            if(!exec(p, p instanceof XQuery)) break;
+            if(!exec(c, c instanceof XQuery)) break;
           }
         } catch(final QueryException ex) {
           if(!info.visible()) GUICommands.SHOWINFO.execute(this);
@@ -364,50 +364,50 @@ public final class GUI extends JFrame {
   }
 
   /**
-   * Launches the specified process in a thread. The process is ignored
+   * Launches the specified command in a thread. The command is ignored
    * if an update operation takes place.
-   * @param pr process to be launched
+   * @param c command to be launched
    */
-  public void execute(final Proc pr) {
-    execute(pr, false);
+  public void execute(final Command c) {
+    execute(c, false);
   }
 
   /**
-   * Launches the specified process in a thread. The process is ignored
+   * Launches the specified command in a thread. The command is ignored
    * if an update operation takes place.
-   * @param pr process to be launched
+   * @param c command to be launched
    * @param main call from main window
    */
-  private void execute(final Proc pr, final boolean main) {
+  private void execute(final Command c, final boolean main) {
     if(updating) return;
     new Thread() {
       @Override
-      public void run() { exec(pr, main); }
+      public void run() { exec(c, main); }
     }.start();
   }
 
   /**
-   * Stops the current process.
+   * Stops the current command.
    */
   public void stop() {
-    if(proc != null) proc.stop();
+    if(cmd != null) cmd.stop();
     cursor(CURSORARROW, true);
-    proc = null;
+    cmd = null;
   }
 
   /**
-   * Launches the specified process.
-   * @param pr process to be launched
+   * Executes the specified command.
+   * @param c command to be executed
    * @param main call from the main input field
    * @return success flag
    */
   // [CG] GUI: check or merge exec/execute/... references
-  boolean exec(final Proc pr, final boolean main) {
+  boolean exec(final Command c, final boolean main) {
     final int thread = ++threadID;
 
     // wait when command is still running
-    while(proc != null) {
-      proc.stop();
+    while(cmd != null) {
+      cmd.stop();
       Performance.sleep(50);
       if(threadID != thread) return true;
     }
@@ -418,19 +418,19 @@ public final class GUI extends JFrame {
       final Performance perf = new Performance();
       final Nodes current = context.current;
       final Data data = context.data;
-      proc = pr;
+      cmd = c;
 
       // execute command and cache result
       final CachedOutput co = new CachedOutput(context.prop.num(Prop.MAXTEXT));
-      final boolean up = pr.updating(context);
+      final boolean up = c.updating(context);
       updating = up;
-      final boolean ok = pr.exec(context, co);
-      final String inf = pr.info();
+      final boolean ok = c.exec(context, co);
+      final String inf = c.info();
       updating = false;
 
       if(!ok && inf.equals(PROGERR)) {
         // command was interrupted..
-        proc = null;
+        cmd = null;
         return false;
       }
 
@@ -439,25 +439,25 @@ public final class GUI extends JFrame {
 
       // show feedback in query editor
       boolean feedback = main;
-      if(!main && query.visible() && pr instanceof XQuery) {
+      if(!main && query.visible() && c instanceof XQuery) {
         query.info(inf, ok);
         feedback = true;
       }
 
-      // check if query feedback was processed in the query view
+      // check if query feedback was evaluated in the query view
       if(!ok) {
         // display error in info view
         if(!feedback && !info.visible()) GUICommands.SHOWINFO.execute(this);
       } else {
         // get query result
-        final Result result = pr.result();
+        final Result result = c.result();
         final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
         // treat text view different to other views
         if(ok && co.size() != 0 && nodes == null) {
           // display text view
           if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
-          text.setText(co, pr);
+          text.setText(co, c);
         }
 
         final Data ndata = context.data;
@@ -488,7 +488,7 @@ public final class GUI extends JFrame {
             // refresh views
             notify.mark(marked, null);
             if(thread != threadID) {
-              proc = null;
+              cmd = null;
               return true;
             }
           }
@@ -502,13 +502,13 @@ public final class GUI extends JFrame {
     } catch(final Exception ex) {
       // unexpected error
       ex.printStackTrace();
-      Dialog.error(this, Main.info(PROCERR, pr,
+      Dialog.error(this, Main.info(PROCERR, c,
           !ex.toString().isEmpty() ? ex.toString() : ex.getMessage()));
       updating = false;
     }
 
     cursor(CURSORARROW, true);
-    proc = null;
+    cmd = null;
     return true;
   }
 

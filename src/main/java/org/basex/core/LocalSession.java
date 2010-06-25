@@ -13,8 +13,8 @@ import org.basex.query.QueryException;
 public class LocalSession extends Session {
   /** Database context. */
   private final Context ctx;
-  /** Process reference. */
-  private Proc proc;
+  /** Command reference. */
+  private Command cmd;
 
   /**
    * Constructor.
@@ -36,14 +36,14 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public boolean execute(final Proc pr, final OutputStream out) {
-    proc = pr;
-    return pr.exec(ctx, out);
+  public boolean execute(final Command c, final OutputStream out) {
+    cmd = c;
+    return c.exec(ctx, out);
   }
 
   @Override
   public String info() {
-    return proc.info();
+    return cmd.info();
   }
 
   @Override

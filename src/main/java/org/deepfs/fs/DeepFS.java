@@ -9,8 +9,8 @@ import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.Open;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.Open;
 import org.basex.data.Data;
 import org.basex.data.DataText;
 import org.basex.data.MemData;
@@ -665,7 +665,7 @@ public final class DeepFS implements DataText {
     if(data.meta.prop.is(Prop.FUSE)) {
       final String method = "[" + Text.NAME + ".close] ";
       Main.debug(method + "Initiating DeepFS shutdown sequence ");
-      // -- unmount running fuse.
+      // -- unmount running fuse
       for(int i = 3; i > 0; i--) {
         Performance.sleep(1000);
         Main.err(i + " .. ");
@@ -764,7 +764,7 @@ public final class DeepFS implements DataText {
    * @return id of the newly created directory or -1 on failure
    */
   public int mkdir(final String path, final int mode) {
-    // if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR.
+    // if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR
     final String method = "[mkdir] ";
     final int n = createNode(path, getSIFDIR() | mode);
     Main.debug(method + "path: " + path + " mode: "
@@ -779,7 +779,7 @@ public final class DeepFS implements DataText {
    * @return id of the newly created file or -1 on failure
    */
   public int create(final String path, final int mode) {
-    // if(!isFile(mode)) return -1; // Linux does not submit S_IFREG.
+    // if(!isFile(mode)) return -1; // Linux does not submit S_IFREG
     final int n = createNode(path, getSIFREG() | mode);
     return n;
   }

@@ -328,7 +328,7 @@ public final class EMLParser implements IFileParser {
     if(multipart) content = deepFile.newContentSection(bodyStartPos);
     else content = deepFile;
 
-    // if we have a multipart message, extract text only if it is plaintext.
+    // if we have a multipart message, extract text only if it is plaintext
     if(multipart ? readSectionHeader(content) : mContentType == null
         || mContentType.startsWith("text")) {
       final long pos2 = bfc.absolutePosition();
@@ -338,7 +338,7 @@ public final class EMLParser implements IFileParser {
       final boolean utf = mBodyCharset.equalsIgnoreCase(Token.UTF8);
       while(readLine()) {
         if(multipart && mCurrLine.contains(mBoundary)) break;
-        // .emlx files contain a Mac OS X property list after the body data.
+        // .emlx files contain a Mac OS X property list after the body data
         if(emlx && mCurrLine.startsWith("<?xml")) {
           final String oldLine = mCurrLine;
           readLine();

@@ -11,20 +11,20 @@ import java.net.URI;
 import javax.swing.AbstractButton;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.CreateFS;
-import org.basex.core.proc.CreateIndex;
-import org.basex.core.proc.Cs;
-import org.basex.core.proc.DropIndex;
-import org.basex.core.proc.Export;
-import org.basex.core.proc.Mount;
-import org.basex.core.proc.Open;
-import org.basex.core.proc.Optimize;
-import org.basex.core.proc.XQuery;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.CreateFS;
+import org.basex.core.cmd.CreateIndex;
+import org.basex.core.cmd.Cs;
+import org.basex.core.cmd.DropIndex;
+import org.basex.core.cmd.Export;
+import org.basex.core.cmd.Mount;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.Optimize;
+import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.dialog.Dialog;
@@ -75,7 +75,7 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
       final String in = dialog.path();
       final String db = dialog.dbname();
-      progress(gui, PROGCREATE, new Proc[] { new CreateDB(db, in) });
+      progress(gui, PROGCREATE, new Command[] { new CreateDB(db, in) });
     }
   },
 
@@ -105,30 +105,30 @@ public enum GUICommands implements GUICommand {
           d.meta.txtindex = ind[0];
           d.meta.atvindex = ind[1];
           d.meta.ftxindex = ind[2];
-          progress(gui, INFOOPT, new Proc[] { new Optimize() });
+          progress(gui, INFOOPT, new Command[] { new Optimize() });
         } else {
-          Proc[] proc = new Proc[0];
+          Command[] cmd = new Command[0];
           if(ind[0] != d.meta.pthindex)
-            proc = Array.add(proc, cmd(ind[0], CmdIndex.PATH));
+            cmd = Array.add(cmd, cmd(ind[0], CmdIndex.PATH));
           if(ind[1] != d.meta.txtindex)
-            proc = Array.add(proc, cmd(ind[1], CmdIndex.TEXT));
+            cmd = Array.add(cmd, cmd(ind[1], CmdIndex.TEXT));
           if(ind[2] != d.meta.atvindex)
-            proc = Array.add(proc, cmd(ind[2], CmdIndex.ATTRIBUTE));
+            cmd = Array.add(cmd, cmd(ind[2], CmdIndex.ATTRIBUTE));
           if(ind[3] != d.meta.ftxindex)
-            proc = Array.add(proc, cmd(ind[3], CmdIndex.FULLTEXT));
+            cmd = Array.add(cmd, cmd(ind[3], CmdIndex.FULLTEXT));
 
-          if(proc.length != 0) progress(gui, PROGINDEX, proc);
+          if(cmd.length != 0) progress(gui, PROGINDEX, cmd);
         }
       }
     }
 
     /**
-     * Returns a process for creating/dropping the specified index.
+     * Returns a command for creating/dropping the specified index.
      * @param create create flag
      * @param index name of index
-     * @return process reference
+     * @return command instance
      */
-    private Proc cmd(final boolean create, final CmdIndex index) {
+    private Command cmd(final boolean create, final CmdIndex index) {
       return create ? new CreateIndex(index) : new DropIndex(index);
     }
   },
@@ -698,7 +698,7 @@ public enum GUICommands implements GUICommand {
       final String p = gprop.is(GUIProp.FSALL) ? "/"
           : gui.prop.get(GUIProp.FSBACKING).replace('\\', '/');
       final String n = gprop.get(GUIProp.FSDBNAME);
-      progress(gui, CREATEFSTITLE, new Proc[] { new CreateFS(n, p) });
+      progress(gui, CREATEFSTITLE, new Command[] { new CreateFS(n, p) });
     }
   },
 
@@ -731,7 +731,7 @@ public enum GUICommands implements GUICommand {
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
-      // disable mount button, if native library is not available.
+      // disable mount button, if native library is not available
       b.setEnabled(LibraryLoader.load(LibraryLoader.DEEPFUSELIBNAME));
     }
   },
@@ -911,38 +911,38 @@ public enum GUICommands implements GUICommand {
   // STATIC METHODS ===========================================================
 
   /**
-   * Performs a process, showing a progress dialog.
+   * Runs the specified commands, showing a progress dialog.
    * @param gui reference to the main window
    * @param t dialog title
-   * @param procs processes
+   * @param cmds commands to be run
    */
-  static void progress(final GUI gui, final String t, final Proc[] procs) {
+  static void progress(final GUI gui, final String t, final Command[] cmds) {
     // start database creation thread
     new Thread() {
       @Override
       public void run() {
-        for(final Proc p : procs) {
-          final boolean ci = p instanceof CreateIndex;
-          final boolean fs = p instanceof CreateFS;
-          final boolean di = p instanceof DropIndex;
-          final boolean op = p instanceof Optimize;
+        for(final Command cmd : cmds) {
+          final boolean ci = cmd instanceof CreateIndex;
+          final boolean fs = cmd instanceof CreateFS;
+          final boolean di = cmd instanceof DropIndex;
+          final boolean op = cmd instanceof Optimize;
 
           if(!ci && !di && !op) {
             new Close().exec(gui.context);
             gui.notify.init();
           }
 
-          // execute process
-          final DialogProgress wait = new DialogProgress(gui, t, !fs, !op, p);
+          // execute command
+          final DialogProgress wait = new DialogProgress(gui, t, !fs, !op, cmd);
           final Performance perf = new Performance();
-          final boolean ok = p.exec(gui.context);
+          final boolean ok = cmd.exec(gui.context);
           wait.dispose();
 
           // return user information
           if(ok) {
             gui.status.setText(Main.info(PROCTIME, perf));
           } else {
-            final String info = p.info();
+            final String info = cmd.info();
             Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
           }
           // initialize views

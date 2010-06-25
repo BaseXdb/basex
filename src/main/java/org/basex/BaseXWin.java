@@ -9,7 +9,7 @@ import javax.swing.UIManager;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.proc.Check;
+import org.basex.core.cmd.Check;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIMacOSX;

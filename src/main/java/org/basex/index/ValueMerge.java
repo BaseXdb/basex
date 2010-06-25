@@ -3,7 +3,8 @@ package org.basex.index;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.proc.DropDB;
+
+import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataInput;
 import org.basex.io.IO;

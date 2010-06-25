@@ -1046,7 +1046,7 @@ public final class PlotView extends View {
     final int rb = w - MARGIN[3] + th;
     final int tb = MARGIN[0] - th;
     final int bb = h - MARGIN[2] + th;
-    // flag which indicates if mouse pointer is located on the plot inside.
+    // flag which indicates if mouse pointer is located on the plot inside
     final boolean inBox = mouseY > tb && mouseY < bb &&
       mouseX > lb && mouseX < rb;
     if(!dragging && !inBox) return;

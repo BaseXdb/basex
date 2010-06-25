@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.basex.build.DiskBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
-import org.basex.core.proc.DropDB;
+import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;

@@ -3,12 +3,12 @@ package org.basex.test.cs;
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
 import org.basex.BaseXServer;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Session;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.Open;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Open;
 import org.basex.server.ClientSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -90,8 +90,7 @@ public final class PoolTest {
     } catch(final Exception ex) {
       throw new AssertionError(ex.toString());
     }
-
-    // Stop server instance.
+    // stop server instance
     new BaseXServer("stop");
   }
 
@@ -106,21 +105,21 @@ public final class PoolTest {
 
   /**
    * Assumes that this command is successful.
-   * @param pr process reference
+   * @param cmd command reference
    * @param s Session
    */
-  void ok(final Proc pr, final Session s) {
-    final String msg = process(pr, s);
+  void ok(final Command cmd, final Session s) {
+    final String msg = exec(cmd, s);
     if(msg != null) fail(msg);
   }
 
   /**
    * Assumes that this command fails.
-   * @param pr process reference
+   * @param cmd command reference
    * @param s Session
    */
-  private void no(final Proc pr, final Session s) {
-    ok(process(pr, s) != null);
+  private void no(final Command cmd, final Session s) {
+    ok(exec(cmd, s) != null);
   }
 
   /**
@@ -132,14 +131,14 @@ public final class PoolTest {
   }
 
   /**
-   * Runs the specified process.
-   * @param pr process reference
+   * Executes the specified command.
+   * @param cmd command reference
    * @param session Session
    * @return success flag
    */
-  private String process(final Proc pr, final Session session) {
+  private String exec(final Command cmd, final Session session) {
     try {
-      return session.execute(pr) ? null : session.info();
+      return session.execute(cmd) ? null : session.info();
     } catch(final Exception ex) {
       return ex.toString();
     }

@@ -9,10 +9,10 @@ import org.basex.BaseXServer;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.core.Prop;
-import org.basex.core.proc.Close;
-import org.basex.core.proc.Exit;
+import org.basex.core.cmd.Close;
+import org.basex.core.cmd.Exit;
 import org.basex.data.Data;
 import org.basex.io.BufferInput;
 import org.basex.io.BufferedOutput;
@@ -44,8 +44,8 @@ public final class ServerProcess extends Thread {
   private BufferInput in;
   /** Output stream. */
   private PrintOutput out;
-  /** Current process. */
-  private Proc proc;
+  /** Current command. */
+  private Command cmd;
   /** Query id counter. */
   private int id;
 
@@ -116,15 +116,14 @@ public final class ServerProcess extends Thread {
           break;
         }
 
-        // parse input and create process instance
+        // parse input and create command instance
         final Performance perf = new Performance();
-        proc = null;
+        cmd = null;
         try {
-          final Proc[] procs = new CommandParser(input, context, true).parse();
-          if(procs.length != 1)
-            throw new QueryException(SERVERPROC, procs.length);
+          final Command[] c = new CommandParser(input, context, true).parse();
+          if(c.length != 1) throw new QueryException(SERVERPROC, c.length);
 
-          proc = procs[0];
+          cmd = c[0];
         } catch(final QueryException ex) {
           // log invalid command
           final String msg = ex.extended();
@@ -139,17 +138,17 @@ public final class ServerProcess extends Thread {
         }
 
         // stop console
-        if(proc instanceof Exit) {
+        if(cmd instanceof Exit) {
           exit();
           break;
         }
 
         // start timeout
-        proc.startTimeout(context.prop.num(Prop.TIMEOUT));
+        cmd.startTimeout(context.prop.num(Prop.TIMEOUT));
 
-        // process command and send {RESULT}0
-        final boolean ok = proc.exec(context, out);
-        final String inf = proc.info();
+        // execute command and send {RESULT}0
+        final boolean ok = cmd.exec(context, out);
+        final String inf = cmd.info();
         out.write(0);
         // send {INFO}0
         out.writeString(inf.equals(PROGERR) ? SERVERTIMEOUT : inf);
@@ -157,9 +156,9 @@ public final class ServerProcess extends Thread {
         send(ok);
 
         // stop timeout
-        proc.stopTimeout();
+        cmd.stopTimeout();
 
-        final String pr = proc.toString().replace('\r', ' ').replace('\n', ' ');
+        final String pr = cmd.toString().replace('\r', ' ').replace('\n', ' ');
         log.write(this, pr, ok ? "OK" : INFOERROR + inf, perf);
       }
       log.write(this, "LOGOUT " + context.user.name, "OK");
@@ -260,7 +259,7 @@ public final class ServerProcess extends Thread {
     }
 
     new Close().exec(context);
-    if(proc != null) proc.stop();
+    if(cmd != null) cmd.stop();
     context.delete(this);
 
     try {

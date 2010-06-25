@@ -5,11 +5,11 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.Session;
-import org.basex.core.Proc;
-import org.basex.core.proc.CreateDB;
-import org.basex.core.proc.DropDB;
-import org.basex.core.proc.Open;
-import org.basex.core.proc.XQuery;
+import org.basex.core.Command;
+import org.basex.core.cmd.CreateDB;
+import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Open;
+import org.basex.core.cmd.XQuery;
 import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
@@ -75,7 +75,7 @@ public final class LockingTest {
   public static void stop() {
     closeSession(session1);
     closeSession(session2);
-    // Stop server instance.
+    // stop server instance
     new BaseXServer("stop");
   }
 
@@ -89,7 +89,7 @@ public final class LockingTest {
     new Thread() {
       @Override
       public void run() {
-        // wait until first process is running
+        // wait until first command is running
         Performance.sleep(200);
         final String result = exec(new CreateDB(NAME, FILE), session2);
         if(result == null) fail(FILE + " should still be locked.");
@@ -216,14 +216,14 @@ public final class LockingTest {
 
   /**
    * Returns query result.
-   * @param pr process reference
+   * @param cmd command reference
    * @param session session
    * @return String result
    */
-  String checkRes(final Proc pr, final Session session) {
+  String checkRes(final Command cmd, final Session session) {
     final CachedOutput co = new CachedOutput();
     try {
-      session.execute(pr, co);
+      session.execute(cmd, co);
     } catch(final IOException ex) {
       fail(ex.toString());
     }
@@ -231,14 +231,14 @@ public final class LockingTest {
   }
 
   /**
-   * Runs the specified process.
-   * @param pr process reference
+   * Runs the specified command.
+   * @param cmd command reference
    * @param session Session
    * @return success flag
    */
-  String exec(final Proc pr, final Session session) {
+  String exec(final Command cmd, final Session session) {
     try {
-      return session.execute(pr) ? null : session.info();
+      return session.execute(cmd) ? null : session.info();
     } catch(final IOException ex) {
       return ex.toString();
     }
