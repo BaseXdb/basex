@@ -23,11 +23,11 @@ import org.basex.util.Token;
  */
 public final class Export extends Proc {
   /**
-   * Default constructor, specifying an optional output filename.
-   * @param target export path
+   * Default constructor, specifying a target path.
+   * @param path export path
    */
-  public Export(final String target) {
-    super(DATAREF | User.CREATE, target);
+  public Export(final String path) {
+    super(DATAREF | User.CREATE, path);
   }
 
   @Override
@@ -64,22 +64,19 @@ public final class Export extends Proc {
   private static void export(final Prop prop, final Data data,
       final String target) throws IOException {
 
-    final int[] docs = data.doc();
+    final SerializerProp sp = new SerializerProp(prop.get(Prop.EXPORTER));
     final IO root = IO.get(target);
 
-    for(final int pre : docs) {
-      final String dName = data.text(pre, true).length > 0 ?
-          Token.string(data.text(pre, true)) : data.meta.name;
+    for(final int pre : data.doc()) {
       // create file path
-      final IO file = IO.get(root + "/" + dName);
+      final IO file = root.merge(Token.string(data.text(pre, true)));
       // create dir if necessary
       final IO dir = IO.get(file.dir());
       if(!dir.exists()) dir.md();
-      // [MS] still produces unwanted results if one or more files
-      // inside a collection have the same name.
-      // serialize nodes
+
+      // existing files are overwritten
+      // (including files inside a collection that have the same name)
       final PrintOutput po = new PrintOutput(file.path());
-      final SerializerProp sp = new SerializerProp(prop.get(Prop.EXPORTER));
       final XMLSerializer xml = new XMLSerializer(po, sp);
       xml.node(data, pre);
       xml.close();

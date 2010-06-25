@@ -308,7 +308,7 @@ public final class BaseXDSlider extends BaseXPanel {
     /** Range distance. */ double dist;
     /** Start position. */ int xs;
     /** End position.   */ int xe;
-    /** Slider Width.   */ int w;
+    /** Slider width.   */ int w;
 
     /** Constructor. */
     Range() {

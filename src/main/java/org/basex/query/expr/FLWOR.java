@@ -24,11 +24,11 @@ public class FLWOR extends Expr {
   protected Expr ret;
   /** For/Let expressions. */
   protected ForLet[] fl;
-  /** Where Expression. */
+  /** Where expression. */
   protected Expr where;
-  /** Order Expressions. */
+  /** Order expressions. */
   private Order order;
-  /** Group by Expression. */
+  /** Group by expression. */
   private final Group group;
 
   /**

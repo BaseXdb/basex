@@ -13,25 +13,21 @@ import org.basex.util.IntList;
  * @author Tim Petrowsky
  */
 public final class TableOutput extends FileOutputStream {
-  /** Buffer Threshold. */
-  private static final int THRESHOLD = (int) Math.floor(IO.BLOCKFILL
-      * (IO.BLOCKSIZE >>> IO.NODEPOWER)) << IO.NODEPOWER;
-
   /** Buffer. */
-  private final byte[] buffer = new byte[THRESHOLD];
-  /** Index Entries. */
+  private final byte[] buffer = new byte[IO.BLOCKSIZE];
+  /** Index entries. */
   private final IntList firstPres = new IntList();
-  /** Index Entries. */
+  /** Index entries. */
   private final IntList blocks = new IntList();
 
   /** Meta data. */
   private final MetaData meta;
-  /** Current Filename. */
+  /** Current filename. */
   private final String file;
 
   /** Position inside buffer. */
   private int pos;
-  /** Block Count. */
+  /** Block count. */
   private int bcount;
   /** First pre value of current block. */
   private int fpre;
@@ -51,7 +47,7 @@ public final class TableOutput extends FileOutputStream {
 
   @Override
   public void write(final int b) throws IOException {
-    if(pos == THRESHOLD) flush();
+    if(pos == IO.BLOCKSIZE) flush();
     buffer[pos++] = (byte) b;
   }
 

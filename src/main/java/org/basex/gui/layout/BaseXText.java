@@ -693,7 +693,7 @@ public class BaseXText extends BaseXPanel {
     }
   };
 
-  /** Text Command. */
+  /** Text command. */
   abstract class TextCmd implements GUICommand {
     public boolean checked() { return false; }
     public String help() { return null; }
@@ -707,7 +707,7 @@ public class BaseXText extends BaseXPanel {
     }
   }
 
-  /** Undo Command. */
+  /** Undo command. */
   class UndoCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
@@ -724,7 +724,7 @@ public class BaseXText extends BaseXPanel {
     }
   }
 
-  /** Redo Command. */
+  /** Redo command. */
   class RedoCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
@@ -741,7 +741,7 @@ public class BaseXText extends BaseXPanel {
     }
   }
 
-  /** Cut Command. */
+  /** Cut command. */
   class CutCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
@@ -758,7 +758,7 @@ public class BaseXText extends BaseXPanel {
     }
   }
 
-  /** Copy Command. */
+  /** Copy command. */
   class CopyCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
@@ -774,7 +774,7 @@ public class BaseXText extends BaseXPanel {
     }
   }
 
-  /** Paste Command. */
+  /** Paste command. */
   class PasteCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
@@ -791,7 +791,7 @@ public class BaseXText extends BaseXPanel {
     }
   }
 
-  /** Delete Command. */
+  /** Delete command. */
   class DelCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {
@@ -808,7 +808,7 @@ public class BaseXText extends BaseXPanel {
     }
   }
 
-  /** Select all Command. */
+  /** Select all command. */
   class AllCmd extends TextCmd {
     @Override
     public void execute(final GUI main) {

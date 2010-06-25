@@ -303,7 +303,7 @@ public final class SpotlightExtractor implements IFileParser {
       }
     },
 
-    /** Group ID of the owner of the file. */
+    /** Group id of the owner of the file. */
     FSOwnerGroupID {
       @Override
       void parse(final DeepFile deepFile, final Object o) {
@@ -311,7 +311,7 @@ public final class SpotlightExtractor implements IFileParser {
       }
     },
 
-    /** User ID of the owner of the file. */
+    /** User id of the owner of the file. */
     FSOwnerUserID {
       @Override
       public void parse(final DeepFile deepFile, final Object o) {

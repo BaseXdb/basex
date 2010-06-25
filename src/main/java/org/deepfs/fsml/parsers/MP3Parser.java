@@ -153,11 +153,11 @@ public final class MP3Parser implements IFileParser {
   private static final int[][] SPF = new int[][] {
     { 384, 1152, 1152 }, { 384, 1152, 576 }
   };
-  /** MP3 Types. */
+  /** MP3 types. */
   private static final byte[][] VERSIONS = new byte[][] {
     token("MPEG-2.5 "), EMPTY, token("MPEG-2 "), token("MPEG-1 "),
   };
-  /** MP3 Types. */
+  /** MP3 types. */
   private static final byte[][] LAYERS = new byte[][] {
     token("Layer 1"), token("Layer 2"), token("Layer 3"), EMPTY
   };
@@ -174,7 +174,7 @@ public final class MP3Parser implements IFileParser {
 
   /** The {@link BufferedFileChannel} to read from. */
   BufferedFileChannel bfc;
-  /** The DeepFile to store metadata and file contents. */
+  /** File reference to store metadata and file contents. */
   DeepFile deepFile;
 
   @Override

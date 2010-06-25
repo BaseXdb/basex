@@ -2,10 +2,10 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.User;
-import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 
@@ -86,9 +86,7 @@ public final class Grant extends Proc {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Cmd.GRANT + " " + args[0]);
-    if(args[2] != null) sb.append(" " + ON + " " + args[2]);
-    return sb.append(" " + TO + " " + args[1]).toString();
+  public void build(final CommandBuilder cb) {
+    cb.init().arg(0).arg(ON, 2).arg(TO, 1);
   }
 }

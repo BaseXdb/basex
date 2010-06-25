@@ -15,12 +15,12 @@ import org.junit.Test;
 
 /**
  * This class tests the functions of the file library.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
 public final class FNFileTest {
-  /** Database Context. */
+  /** Database context. */
   protected static QueryContext qc;
 
   /** Prepares tests. */
@@ -28,7 +28,7 @@ public final class FNFileTest {
   public static void startTest() {
     qc = new QueryContext(new Context());
   }
-  
+
   /** Test function file:mkdir. */
   @Test
   public void testMkDir() {
@@ -82,7 +82,7 @@ public final class FNFileTest {
   public void testPathToFull() {
     atomic(FunDef.PATHTOFULL, Str.get("test"));
   }
-  
+
   /** Tests the function file:files. */
   @Test
   public void testFiles() {

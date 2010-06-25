@@ -119,7 +119,7 @@ public final class CommandParser extends InputParser {
       case CREATE: case C:
         switch(consume(CmdCreate.class, cmd)) {
           case DATABASE: case DB:
-            return new CreateDB(name(cmd), leftover(null));
+            return new CreateDB(name(cmd), string(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case FS:
@@ -143,8 +143,9 @@ public final class CommandParser extends InputParser {
       case CHECK:
         return new Check(string(cmd));
       case ADD:
-        return new Add(string(cmd), key(INTO, null) ? string(cmd) : "",
-            leftover(cmd));
+        String arg1 = key(AS, null) ? name(cmd) : null;
+        String arg2 = key(TO, null) ? string(cmd) : null;
+        return new Add(string(cmd), arg1, arg2);
       case DELETE:
         return new Delete(string(cmd));
       case INFO: case I:
@@ -156,8 +157,8 @@ public final class CommandParser extends InputParser {
           case INDEX:
             return new InfoIndex(consume(CmdIndexInfo.class, null));
           case TABLE:
-            String arg1 = number(null);
-            String arg2 = arg1 != null ? number(null) : null;
+            arg1 = number(null);
+            arg2 = arg1 != null ? number(null) : null;
             if(arg1 == null) arg1 = xquery(null);
             return new InfoTable(arg1, arg2);
         }
@@ -173,9 +174,7 @@ public final class CommandParser extends InputParser {
           case INDEX:
             return new DropIndex(consume(CmdIndex.class, cmd));
           case USER:
-            final String name = name(cmd);
-            final String db = key(ON, null) ? name(cmd) : null;
-            return new DropUser(name, db);
+            return new DropUser(name(cmd), key(ON, null) ? name(cmd) : null);
         }
         break;
       case OPTIMIZE:
@@ -214,8 +213,7 @@ public final class CommandParser extends InputParser {
           case SESSIONS:
             return new ShowSessions();
           case USERS:
-            final String db = key(ON, null) ? name(cmd) : null;
-            return new ShowUsers(db);
+            return new ShowUsers(key(ON, null) ? name(cmd) : null);
           default:
         }
         break;
@@ -232,7 +230,8 @@ public final class CommandParser extends InputParser {
   }
 
   /**
-   * Parses and returns a string. Quotes can be used to include spaces.
+   * Parses and returns a string, delimited by a space or semicolon.
+   * Quotes can be used to include spaces.
    * @param cmd referring command; if specified, the result must not be empty
    * @return path
    * @throws QueryException query exception
@@ -246,23 +245,6 @@ public final class CommandParser extends InputParser {
       if(!q && (c <= ' ' || c == ';')) break;
       if(c == '"') q ^= true;
       else tb.add(c);
-      consume();
-    }
-    return finish(cmd, tb);
-  }
-
-  /**
-   * Parses and returns the whole leftover of the string.
-   * @param cmd referring command; if specified, the result must not be empty
-   * @return xml string
-   * @throws QueryException query exception
-   */
-  private String leftover(final Cmd cmd) throws QueryException {
-    consumeWS();
-    final TokenBuilder tb = new TokenBuilder();
-    while(more()) {
-      final char c = curr();
-      tb.add(c);
       consume();
     }
     return finish(cmd, tb);
@@ -289,8 +271,8 @@ public final class CommandParser extends InputParser {
   }
 
   /**
-   * Parses and returns a name. A name can include letters, digits, dashes
-   * and periods.
+   * Parses and returns a name. A name is limited to letters, digits,
+   * underscores, dashes, and periods: {@code [A-Za-z0-9_.-]+}.
    * @param cmd referring command; if specified, the result must not be empty
    * @return name
    * @throws QueryException query exception
@@ -305,8 +287,8 @@ public final class CommandParser extends InputParser {
   /**
    * Parses and returns the specified keyword.
    * @param key token to be parsed
-   * @param cmd referring command; if specified, the result must not be empty
-   * @return position
+   * @param cmd referring command; if specified, the keyword is mandatory
+   * @return result of check
    * @throws QueryException query exception
    */
   private boolean key(final String key, final Cmd cmd) throws QueryException {

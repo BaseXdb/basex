@@ -17,8 +17,6 @@ import org.basex.util.Array;
 public final class TableDiskAccess extends TableAccess {
   /** Max entries per block. */
   static final int ENTRIES = IO.BLOCKSIZE >>> IO.NODEPOWER;
-  /** Entries per new block. */
-  private static final int NEWENTRIES = (int) (IO.BLOCKFILL * ENTRIES);
 
   /** Buffer manager. */
   private final Buffers bm = new Buffers();
@@ -242,7 +240,7 @@ public final class TableDiskAccess extends TableAccess {
     copy(bf.buf, ins, rest, 0, move);
 
     // make room in index for new blocks
-    int newBlocks = (int) Math.ceil((double) nr / NEWENTRIES) + 1;
+    int newBlocks = (int) Math.ceil((double) nr / ENTRIES) + 1;
     // in case we insert at block boundary
     if(pre == npre) newBlocks--;
 
@@ -259,13 +257,13 @@ public final class TableDiskAccess extends TableAccess {
     int pos = 0;
     while(remain > 0) {
       newBlock();
-      copy(entries, pos, bf.buf, 0, Math.min(remain, NEWENTRIES));
+      copy(entries, pos, bf.buf, 0, Math.min(remain, ENTRIES));
 
       fpres[++index] = nr - remain + pre;
       pages[index] = (int) bf.pos;
       blocks++;
-      remain -= NEWENTRIES;
-      pos += NEWENTRIES;
+      remain -= ENTRIES;
+      pos += ENTRIES;
     }
 
     // add remaining part of split block

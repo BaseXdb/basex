@@ -36,25 +36,25 @@ public final class DiskBuilder extends Builder {
   /** Attribute value pointer. */
   private long vallen;
 
-  /** Database size stream (temporary). */
+  /** Output stream for temporary values. */
   private DataOutput sout;
 
   /**
    * Constructor.
-   * @param p parser
+   * @param parse parser
    * @param pr properties
    */
-  public DiskBuilder(final Parser p, final Prop pr) {
-    super(p, pr);
+  public DiskBuilder(final Parser parse, final Prop pr) {
+    super(parse, pr);
   }
 
   @Override
-  public DiskData build(final String db) throws IOException {
+  public DiskData build(final String name) throws IOException {
     final Prop pr = prop;
-    DropDB.drop(db, pr);
-    pr.dbpath(db).mkdirs();
+    DropDB.drop(name, pr);
+    pr.dbpath(name).mkdirs();
 
-    meta = new MetaData(db, pr);
+    meta = new MetaData(name, pr);
     meta.file = parser.file;
     meta.filesize = meta.file.length();
     meta.time = meta.file.date();
@@ -70,7 +70,7 @@ public final class DiskBuilder extends Builder {
     vout = new DataOutput(meta.file(DATAATV), bs);
     sout = new DataOutput(meta.file(DATATMP), bs);
 
-    parse(db);
+    parse(name);
     close();
 
     // copy temporary values into database table

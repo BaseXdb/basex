@@ -19,9 +19,9 @@ import org.basex.util.TokenBuilder;
 /**
  * This class builds an index for attribute values and text contents in a
  * tree structure and stores the result to disk.<br/>
- * 
+ *
  * The data is stored on disk in the following format:<br/>
- * 
+ *
  * <ul>
  * <li> {@code DATATXT/ATV + 'l'}: contains the index values, which are dense id
  *   lists to all text nodes/attribute values, stored in the {@link Num} format:

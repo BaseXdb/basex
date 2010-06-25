@@ -1,6 +1,7 @@
 package org.basex.core.proc;
 
 import org.basex.build.mediovis.MAB2Parser;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
@@ -35,7 +36,7 @@ public final class CreateMAB extends Create {
   }
 
   @Override
-  public String toString() {
-    return Cmd.CREATE + " " + CmdCreate.MAB + args();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.CREATE + " " + CmdCreate.MAB).args();
   }
 }

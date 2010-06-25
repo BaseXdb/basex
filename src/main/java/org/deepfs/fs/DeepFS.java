@@ -89,9 +89,9 @@ public final class DeepFS implements DataText {
   public static final byte[] CTIME = token(S_CTIME);
   /** Number of links token. */
   public static final byte[] NLINK = token("nlink");
-  /** User ID token. */
+  /** User id token. */
   public static final byte[] UID = token("uid");
-  /** Group ID token. */
+  /** Group id token. */
   public static final byte[] GID = token("gid");
   /** Offset attribute. */
   public static final byte[] OFFSET = token("offset");
@@ -112,38 +112,38 @@ public final class DeepFS implements DataText {
   /** Stat information for root node. */
   private DeepStat rootStat;
 
-  /** Index References. */
+  /** Index references. */
   public int fsmlID;
-  /** Index References. */
+  /** Index references. */
   public int deepfsID;
-  /** Index References. */
+  /** Index references. */
   public int fileID;
-  /** Index References. */
+  /** Index references. */
   public int dirID;
-  /** Index References. */
+  /** Index references. */
   public int modeID;
   /** Index mount point. */
   public int mountpointID;
   /** Index backing store. */
   public int backingstoreID;
-  /** Index References. */
+  /** Index references. */
   public int sizeID;
-  /** Index References. */
+  /** Index references. */
   public int nameID;
 
-  /** Index References. */
+  /** Index references. */
   public int suffixID;
-  /** Index References. */
+  /** Index references. */
   public int mtimeID;
-  /** Index References. */
+  /** Index references. */
   public int ctimeID;
-  /** Index References. */
+  /** Index references. */
   public int atimeID;
-  /** Index References. */
+  /** Index references. */
   public int nlinkID;
-  /** Index References. */
+  /** Index references. */
   public int uidID;
-  /** Index References. */
+  /** Index references. */
   public int gidID;
 
   /**

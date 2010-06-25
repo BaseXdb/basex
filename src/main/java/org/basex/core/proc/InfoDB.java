@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
@@ -19,7 +21,7 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class InfoDB extends AInfo {
-  /** Date Format. */
+  /** Date format. */
   private static final SimpleDateFormat DATE =
     new SimpleDateFormat("dd.MM.yyyy hh:mm:ss");
 
@@ -84,7 +86,7 @@ public final class InfoDB extends AInfo {
   }
 
   @Override
-  public String toString() {
-    return Cmd.INFO + " " + CmdInfo.DB;
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.INFO + " " + CmdInfo.DB);
   }
 }

@@ -9,7 +9,7 @@ import org.basex.core.Main;
  * @author Bastian Lemke
  */
 public enum MimeType {
-  /** Apple Mail to do. */
+  /** Apple mail to do. */
   APPLE_MAIL_TODO("application/vnd.apple.mail+todo", ""),
   /** BMP. */
   BMP("image/bmp", "bmp", FileType.PICTURE),

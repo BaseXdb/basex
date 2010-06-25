@@ -24,7 +24,7 @@ import org.basex.util.Token;
 public final class CmpV extends Arr {
   /** Comparators. */
   public enum Comp {
-    /** Item Comparison:less or equal. */
+    /** Item comparison:less or equal. */
     LE("le") {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
@@ -35,7 +35,7 @@ public final class CmpV extends Arr {
       public Comp invert() { return GE; }
     },
 
-    /** Item Comparison:less. */
+    /** Item comparison:less. */
     LT("lt") {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
@@ -46,7 +46,7 @@ public final class CmpV extends Arr {
       public Comp invert() { return GT; }
     },
 
-    /** Item Comparison:greater of equal. */
+    /** Item comparison:greater of equal. */
     GE("ge") {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
@@ -57,7 +57,7 @@ public final class CmpV extends Arr {
       public Comp invert() { return LE; }
     },
 
-    /** Item Comparison:greater. */
+    /** Item comparison:greater. */
     GT("gt") {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
@@ -68,7 +68,7 @@ public final class CmpV extends Arr {
       public Comp invert() { return LT; }
     },
 
-    /** Item Comparison:equal. */
+    /** Item comparison:equal. */
     EQ("eq") {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
@@ -78,7 +78,7 @@ public final class CmpV extends Arr {
       public Comp invert() { return EQ; }
     },
 
-    /** Item Comparison:not equal. */
+    /** Item comparison:not equal. */
     NE("ne") {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {

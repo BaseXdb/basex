@@ -11,7 +11,7 @@ public enum DeepNS {
   DEEPURL("", "http://www.deepfs.org/fs/1.0/"),
   /** DeepFS metadata namespace. */
   FSMETA("", "http://www.deepfs.org/fsmeta/1.0/"),
-  /** Dublin Core metadata terms namespace. */
+  /** Dublin core metadata terms namespace. */
   DCTERMS("", "http://purl.org/dc/terms/");
 
   /** The namespace prefix. */

@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -70,7 +72,7 @@ public final class CreateIndex extends ACreate {
   }
 
   @Override
-  public String toString() {
-    return Cmd.CREATE + " " + CmdCreate.INDEX + args();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.CREATE + " " + CmdCreate.INDEX).args();
   }
 }

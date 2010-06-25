@@ -3,8 +3,10 @@ package org.basex.core.proc;
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import java.io.File;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
 
 /**
  * Evaluates the 'drop database' command and deletes a database.
@@ -67,7 +69,7 @@ public final class DropDB extends ACreate {
   }
 
   @Override
-  public String toString() {
-    return Cmd.DROP + " " + CmdDrop.DB + args();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.DROP + " " + CmdDrop.DB).args();
   }
 }

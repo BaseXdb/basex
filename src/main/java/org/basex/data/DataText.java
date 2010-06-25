@@ -65,7 +65,7 @@ public interface DataText {
   String DBUTD = "UPTODATE";
   /** Last (highest) id. */
   String DBLID = "LASTID";
-  /** FS Mount point. */
+  /** FS mount point. */
   String DBMNT = "MOUNT";
   /** Permissions. */
   String DBPERM = "PERM";
@@ -76,7 +76,7 @@ public interface DataText {
   String DBTAGS = "TAGS";
   /** Attributes. */
   String DBATTS = "ATTS";
-  /** Path Summary. */
+  /** Path summary. */
   String DBPATH = "PATH";
   /** Tags. */
   String DBNS = "NS";
@@ -110,15 +110,15 @@ public interface DataText {
   /** Normalization. */
   String NONE = "none";
 
-  /** Ampersand Entity. */
+  /** Ampersand entity. */
   byte[] E_AMP = token("&amp;");
-  /** Quote Entity. */
+  /** Quote entity. */
   byte[] E_QU = token("&quot;");
-  /** GreaterThan Entity. */
+  /** GreaterThan entity. */
   byte[] E_GT = token("&gt;");
-  /** LessThan Entity. */
+  /** LessThan entity. */
   byte[] E_LT = token("&lt;");
-  /** HTML: Non-breaking space Entity. */
+  /** HTML: Non-breaking space entity. */
   byte[] E_NBSP = token("&nbsp;");
 
   /** Results tag. */
@@ -240,7 +240,7 @@ public interface DataText {
   byte[] TABLEPREF = token("PREF");
   /** URI header. */
   byte[] TABLEURI = token("URI");
-  /** Table Kinds. */
+  /** Table kinds. */
   byte[][] TABLEKINDS = {
       { 'D', 'O', 'C', ' ' }, { 'E', 'L', 'E', 'M' },
       { 'T', 'E', 'X', 'T' }, { 'A', 'T', 'T', 'R' },

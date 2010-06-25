@@ -24,7 +24,7 @@ import org.basex.util.Token;
 public final class CmpN extends Arr {
   /** Comparators. */
   public enum Comp {
-    /** Node Comparison: same. */
+    /** Node comparison: same. */
     EQ("is") {
       @Override
       public boolean e(final Item a, final Item b) {
@@ -32,7 +32,7 @@ public final class CmpN extends Arr {
       }
     },
 
-    /** Node Comparison: before. */
+    /** Node comparison: before. */
     ET("<<") {
       @Override
       public boolean e(final Item a, final Item b) {
@@ -40,7 +40,7 @@ public final class CmpN extends Arr {
       }
     },
 
-    /** Node Comparison: after. */
+    /** Node comparison: after. */
     GT(">>") {
       @Override
       public boolean e(final Item a, final Item b) {

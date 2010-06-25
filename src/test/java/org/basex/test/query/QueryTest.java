@@ -32,8 +32,7 @@ public abstract class QueryTest {
   protected static String doc;
   /** Queries. */
   protected static Object[][] queries;
-
-  /** Database Context. */
+  /** Database context. */
   protected static Context context;
 
   /** Prepares tests. */

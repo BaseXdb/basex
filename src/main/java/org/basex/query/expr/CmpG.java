@@ -34,37 +34,37 @@ import org.basex.util.Token;
 public final class CmpG extends Arr {
   /** Comparators. */
   public enum Comp {
-    /** General Comparison: less or equal. */
+    /** General comparison: less or equal. */
     LE("<=", CmpV.Comp.LE) {
       @Override
       public Comp invert() { return Comp.GE; }
     },
 
-    /** General Comparison: less. */
+    /** General comparison: less. */
     LT("<", CmpV.Comp.LT) {
       @Override
       public Comp invert() { return Comp.GT; }
     },
 
-    /** General Comparison: greater of equal. */
+    /** General comparison: greater of equal. */
     GE(">=", CmpV.Comp.GE) {
       @Override
       public Comp invert() { return Comp.LE; }
     },
 
-    /** General Comparison: greater. */
+    /** General comparison: greater. */
     GT(">", CmpV.Comp.GT) {
       @Override
       public Comp invert() { return Comp.LT; }
     },
 
-    /** General Comparison: equal. */
+    /** General comparison: equal. */
     EQ("=", CmpV.Comp.EQ) {
       @Override
       public Comp invert() { return Comp.EQ; }
     },
 
-    /** General Comparison: not equal. */
+    /** General comparison: not equal. */
     NE("!=", CmpV.Comp.NE) {
       @Override
       public Comp invert() { return Comp.NE; }

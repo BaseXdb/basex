@@ -9,13 +9,13 @@ import static org.basex.util.Token.token;
  * @author Christian Gruen
  */
 public interface MAB2 {
-  /** Root Tag. */
+  /** Root tag. */
   byte[] LIBRARY = token("Library");
-  /** Medium Tag. */
+  /** Medium tag. */
   byte[] MEDIUM = token("Medium");
   /** ID Attribute. */
   byte[] MV_ID = token("mv_id");
-  /** ID Attribute. */
+  /** ID attribute. */
   byte[] BIB_ID = token("bib_id");
   /** Subordinate titles attribute. */
   byte[] MAX = token("max");

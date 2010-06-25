@@ -21,7 +21,7 @@ public final class Nodes implements Result {
   public final FTPosData ftpos;
   /** Doc flag (all nodes refer to documents). */
   public boolean doc;
-  /** Root Node. */
+  /** Root node. */
   public Data data;
   /** Pre values container. */
   public int[] nodes;

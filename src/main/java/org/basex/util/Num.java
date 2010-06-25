@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * This class provides operations to compress and decompress 4-byte integer
  * values in byte arrays to save memory.<br/>
- * 
+ *
  * The first two bits of a {@code Num} array indicate the range of the
  * compressed number:
  * <ul>

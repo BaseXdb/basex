@@ -169,9 +169,9 @@ public final class ServerProcess extends Thread {
       exit();
     }
   }
-  
+
   /**
-   * Handles the control codes. 
+   * Handles the control codes.
    * @param c control code (first received byte from client)
    * @throws IOException I/O Exception
    */

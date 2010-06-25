@@ -31,7 +31,7 @@ public final class DialogPrefs extends Dialog {
 
   /** Language label. */
   private final BaseXLabel creds;
-  /** Language Combo Box. */
+  /** Language combobox. */
   private final BaseXCombo lang;
   /** Focus checkbox. */
   private final BaseXCheckBox focus;

@@ -99,7 +99,6 @@ public final class PermissionTest {
     no(new DropIndex("SUMMARY"), testSession);
     no(new CreateUser("test", "test"), testSession);
     no(new DropUser("test"), testSession);
-    no(new Export("c:/test"), testSession);
     no(new Kill("dada"), testSession);
     no(new ShowUsers("Users"), testSession);
     no(new Grant("read", "test"), testSession);
@@ -111,6 +110,7 @@ public final class PermissionTest {
   @Test
   public void readPermsNeeded() {
     ok(new Grant("read", "test"), adminSession);
+
     ok(new Open("test"), testSession);
     ok(new InfoDB(), testSession);
     ok(new InfoTable("1", "2"), testSession);
@@ -169,6 +169,7 @@ public final class PermissionTest {
   @Test
   public void createPermsNeeded() {
     ok(new Grant("create", "test"), adminSession);
+
     ok(new Close(), testSession);
     ok(new CreateDB("test", "<xml>This is a test</xml>"), testSession);
     //ok(new CreateFS("bin", "fs"), testSession);
@@ -195,7 +196,6 @@ public final class PermissionTest {
     }
     ok(new CreateUser("test2", "test"), testSession);
     ok(new CreateDB("test", "<xml>This is a test</xml>"), testSession);
-    ok(new Export("."), testSession);
     ok(new ShowUsers(), testSession);
     ok(new Grant("admin", "test2"), testSession);
     ok(new Grant("create", "test2"), testSession);
@@ -222,7 +222,7 @@ public final class PermissionTest {
    */
   static void ok(final Proc pr, final Session s) {
     final String msg = process(pr, s);
-    if(msg != null) fail(msg);
+    if(msg != null) fail(pr + "\n" + msg);
   }
 
   /**

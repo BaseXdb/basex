@@ -51,9 +51,9 @@ public enum MetaElem {
   ISO_SPEED_RATINGS(FSMETA, "isoSpeedRatings", Type.INT, false),
   /** Focal length in 35mm film. */
   FOCAL_LENGTH_IN_35MM_FILM(FSMETA, "focalLengthIn35mmFilm", Type.INT, false),
-  /** Group ID of the owner of the file. */
+  /** Group id of the owner of the file. */
   FS_OWNER_GROUP_ID(FSMETA, "fsOwnerGroupId", Type.INT, false),
-  /** User ID of the owner of the file. */
+  /** User id of the owner of the file. */
   FS_OWNER_USER_ID(FSMETA, "fsOwnerUserId", Type.INT, false),
   /** Number of pages. */
   NUMBER_OF_PAGES(FSMETA, "numberOfPages", Type.INT, false),

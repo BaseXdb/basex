@@ -40,9 +40,8 @@ public class QueryTest {
   @BeforeClass
   public static void before() throws BaseXException {
     new CreateDB(NAME).execute(CTX);
-    for(String file : FILES)
-      new Add(file, "etc/xml").execute(CTX);
-    new Add(ZIP, "test/zipped").execute(CTX);
+    for(String file : FILES) new Add(file, null, "etc/xml").execute(CTX);
+    new Add(ZIP, null, "test/zipped").execute(CTX);
     new CreateIndex(Commands.CmdIndex.FULLTEXT);
   }
 

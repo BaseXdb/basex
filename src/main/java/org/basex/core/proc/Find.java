@@ -3,7 +3,6 @@ package org.basex.core.proc;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
 import org.basex.core.Context;
-import org.basex.core.Commands.Cmd;
 import org.basex.data.Data;
 import org.basex.query.path.Axis;
 import org.basex.util.BoolList;
@@ -288,10 +287,5 @@ public final class Find extends AQuery {
     }
     if(sb.length() != 0) split[s++] = sb.toString();
     return Arrays.copyOf(split, s);
-  }
-
-  @Override
-  public String toString() {
-    return Cmd.FIND + " " + args[0];
   }
 }

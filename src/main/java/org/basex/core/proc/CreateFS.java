@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import java.io.IOException;
 import org.basex.build.FSParser;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Prop;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdCreate;
@@ -60,7 +61,7 @@ public final class CreateFS extends ACreate {
   }
 
   @Override
-  public String toString() {
-    return Cmd.CREATE + " " + CmdCreate.FS + args();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.CREATE + " " + CmdCreate.FS).args();
   }
 }

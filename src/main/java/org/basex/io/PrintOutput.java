@@ -15,7 +15,7 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public class PrintOutput extends OutputStream {
-  /** The OutputStream we operate on. */
+  /** Output stream reference. */
   private final OutputStream os;
   /** Maximum numbers of bytes to write. */
   int max = Integer.MAX_VALUE;

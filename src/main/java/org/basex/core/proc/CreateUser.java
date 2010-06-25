@@ -1,6 +1,8 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -32,7 +34,7 @@ public final class CreateUser extends Proc {
   }
 
   @Override
-  public String toString() {
-    return Cmd.CREATE + " " + CmdCreate.USER + args();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.CREATE + " " + CmdCreate.USER).args();
   }
 }

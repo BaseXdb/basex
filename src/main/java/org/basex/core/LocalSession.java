@@ -11,7 +11,7 @@ import org.basex.query.QueryException;
  * @author Christian Gruen
  */
 public class LocalSession extends Session {
-  /** Database Context. */
+  /** Database context. */
   private final Context ctx;
   /** Process reference. */
   private Proc proc;

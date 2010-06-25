@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import org.basex.core.User;
-import org.basex.core.Commands.Cmd;
 import org.basex.data.Nodes;
 
 /**
@@ -36,10 +35,5 @@ public final class Cs extends AQuery {
       nodes.doc = true;
     }
     return true;
-  }
-
-  @Override
-  public String toString() {
-    return Cmd.CS + " " + args[0];
   }
 }

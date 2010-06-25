@@ -18,7 +18,7 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public final class BaseXFileChooser {
-  /** File Dialog Mode. */
+  /** File dialog mode. */
   public enum Mode {
     /** Open file.              */ FOPEN,
     /** Open file or directory. */ FDOPEN,

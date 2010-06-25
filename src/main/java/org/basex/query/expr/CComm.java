@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class CComm extends CFrag {
-  /** Two Dashes. */
+  /** Two dashes, marking the start/end of a comment. */
   private static final byte[] DASHES = { '-', '-' };
 
   /**

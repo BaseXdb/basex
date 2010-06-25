@@ -600,7 +600,7 @@ public final class FTTest extends QueryTest {
     return "set " + key[0] + " " + prop.is(key);
   }
 
-  /** TABLE REPRESENTATION
+  /* TABLE REPRESENTATION
   PRE DIS SIZ ATS  NS  KIND  CONTENT
     0   1  46   1   0  DOC   tmp
     1   1  45   1   0  ELEM  fttest

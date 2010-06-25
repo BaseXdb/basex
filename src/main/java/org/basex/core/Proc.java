@@ -243,29 +243,23 @@ public abstract class Proc extends Progress {
   }
 
   /**
-   * Returns the list of arguments.
-   * @return arguments
+   * Builds a string representation from the command. This string must be
+   * correctly built, as commands are sent to the server in their string
+   * representation.
+   * @param cb command builder
    */
-  protected final String args() {
-    final StringBuilder sb = new StringBuilder();
-    for(final String a : args) {
-      if(a == null || a.isEmpty()) continue;
-      sb.append(' ');
-      final boolean s = a.indexOf(' ') != -1;
-      if(s) sb.append('"');
-      sb.append(a);
-      if(s) sb.append('"');
-    }
-    return sb.toString();
+  public void build(final CommandBuilder cb) {
+    cb.init().args();
   }
 
   /**
-   * Returns a string representation of the process. In the client/server
-   * architecture, this string is sent to and reparsed by the server.
+   * Returns a string representation of the command.
    * @return string representation
    */
   @Override
-  public String toString() {
-    return Main.name(this).toUpperCase() + args();
+  public final String toString() {
+    final CommandBuilder cb = new CommandBuilder(this);
+    build(cb);
+    return cb.toString();
   }
 }

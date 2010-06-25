@@ -17,7 +17,7 @@ import org.basex.gui.view.text.XMLSyntax;
  * @author Christian Gruen
  */
 public final class DialogHelp extends Dialog {
-  /** Text Area. */
+  /** Text area. */
   private final BaseXText area;
 
   /**

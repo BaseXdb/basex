@@ -15,7 +15,7 @@ import org.deepfs.util.FSWalker;
  * @author Bastian Lemke
  */
 public final class FSParser extends Progress {
-  /** The FSImporter. */
+  /** Filesystem importer. */
   private final FSImporter fsi;
   /** Root file(s). */
   private final File[] roots;

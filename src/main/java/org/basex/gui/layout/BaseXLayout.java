@@ -39,7 +39,7 @@ public final class BaseXLayout {
   /** Cached images. */
   private static final HashMap<String, ImageIcon> IMAGES =
     new HashMap<String, ImageIcon>();
-  /** Date Format. */
+  /** Date format. */
   private static final SimpleDateFormat DATE =
     new SimpleDateFormat("dd.MM.yyyy HH:mm");
 

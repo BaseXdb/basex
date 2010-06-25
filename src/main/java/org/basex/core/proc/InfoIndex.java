@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdIndexInfo;
@@ -84,9 +86,7 @@ public final class InfoIndex extends AInfo {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Cmd.INFO + " " + CmdInfo.INDEX);
-    if(args[0] != null) sb.append(" " + args[0]);
-    return sb.toString();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.INFO + " " + CmdInfo.INDEX).args();
   }
 }

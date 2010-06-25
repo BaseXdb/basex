@@ -3,6 +3,8 @@ package org.basex.core.proc;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.User;
@@ -59,9 +61,7 @@ public final class ShowUsers extends Proc {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Cmd.SHOW + " " + CmdShow.USERS);
-    if(args[0] != null) sb.append(" " + ON + " " + args[0]);
-    return sb.toString();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.SHOW + " " + CmdShow.USERS).arg(ON, 0);
   }
 }

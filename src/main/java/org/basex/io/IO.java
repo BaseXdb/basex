@@ -9,31 +9,30 @@ import org.basex.util.TokenBuilder;
 import org.xml.sax.InputSource;
 
 /**
- * Abstract file representation, pointing to a local or remote file or
- * a byte array.
+ * Generic representation for inputs and outputs. The underlying source can
+ * be a local file ({@link IOFile}), a URL ({@link IOUrl}) or a byte array
+ * ({@link IOContent}).
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class IO {
-  /** Database suffix. */
+  /** Database file suffix. */
   public static final String BASEXSUFFIX = ".basex";
-  /** XQuery Suffix. */
+  /** XQuery file suffix. */
   public static final String XQSUFFIX = ".xq";
-  /** XML Suffix. */
+  /** XML file suffix. */
   public static final String XMLSUFFIX = ".xml";
-  /** ZIP Suffix. */
+  /** ZIP file suffix. */
   public static final String ZIPSUFFIX = ".zip";
-  /** GZIP Suffix. */
+  /** GZIP file suffix. */
   public static final String GZSUFFIX = ".gz";
 
   /** Disk block/page size. */
   public static final int BLOCKSIZE = 1 << 12;
-  /** Table NodeSize Power. */
+  /** Table node size power. */
   public static final int NODEPOWER = 4;
-  /** Fill Factor (0.0 - 1.0). */
-  public static final double BLOCKFILL = 1;
-  /** Maximum Tree depth. */
+  /** Maximum supported tree height. */
   public static final int MAXHEIGHT = 1 << 8;
   /** Offset for inlining numbers. */
   public static final long NUMOFF = 0x8000000000L;
@@ -152,7 +151,7 @@ public abstract class IO {
   public abstract InputSource inputSource();
 
   /**
-   * Returns a buffered reader for the file.
+   * Returns a buffered reader for the input.
    * @return buffered reader
    * @throws IOException I/O exception
    */
@@ -160,10 +159,10 @@ public abstract class IO {
 
   /**
    * Merges two filenames.
-   * @param f filename of the file
+   * @param fn file name/path to be merged
    * @return contents
    */
-  public abstract IO merge(final String f);
+  public abstract IO merge(final String fn);
 
   /**
    * Creates the directory.
@@ -192,14 +191,6 @@ public abstract class IO {
    */
   public final String name() {
     return name;
-  }
-  
-  /**
-   * Sets the filename.
-   * @param n name
-   */
-  public void setName(final String n) {
-    this.name = n;
   }
 
   /**

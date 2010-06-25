@@ -18,7 +18,7 @@ import javax.swing.JTextField;
 public class BaseXTextField extends JTextField {
   /** Default width of text fields. */
   public static final int DWIDTH = 260;
-  /** Last Input. */
+  /** Last input. */
   String last = "";
   /** Button help. */
   byte[] help;

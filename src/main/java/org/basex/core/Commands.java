@@ -28,8 +28,6 @@ public interface Commands {
   enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, PATH }
   /** Index types. */
   enum CmdIndexInfo { NULL, TEXT, ATTRIBUTE, FULLTEXT, PATH, TAG, ATTNAME }
-  /** Import types. */
-  enum CmdImport { DATABASE, DB, COLLECTION, COLL }
   /** Alter types. */
   enum CmdAlter { DATABASE, DB, USER }
 

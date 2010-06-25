@@ -28,7 +28,7 @@ public final class SAXWrapper extends FileParser {
   /** Current line. */
   int line = 1;
 
-  /** SAX Handler reference. */
+  /** SAX handler reference. */
   private SAXHandler sax;
   /** Optional XML reader. */
   private final SAXSource source;

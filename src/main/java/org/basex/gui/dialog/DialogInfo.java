@@ -38,7 +38,7 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class DialogInfo extends Dialog {
-  /** Index Checkbox. */
+  /** Index checkboxes. */
   private final BaseXCheckBox[] indexes = new BaseXCheckBox[4];
   /** Editable full-text options. */
   private DialogFT ft;

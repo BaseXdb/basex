@@ -21,11 +21,11 @@ public final class Token {
 
   /** Empty token. */
   public static final byte[] EMPTY = {};
-  /** XML Token. */
+  /** XML token. */
   public static final byte[] XML = token("xml");
-  /** XMLNS Token. */
+  /** XMLNS token. */
   public static final byte[] XMLNS = token("xmlns");
-  /** XMLNS Token with colon. */
+  /** XMLNS token with colon. */
   public static final byte[] XMLNSC = token("xmlns:");
   /** True token. */
   public static final byte[] TRUE = token("true");
@@ -46,15 +46,15 @@ public final class Token {
   /** One token. */
   public static final byte[] ONE = { '1' };
 
-  /** Quote Entity. */
+  /** Quote entity. */
   public static final byte[] QU = token("\"");
-  /** Ampersand Entity. */
+  /** Ampersand entity. */
   public static final byte[] AMP = token("&");
-  /** Apostrophe Entity. */
+  /** Apostrophe entity. */
   public static final byte[] APOS = token("'");
-  /** GreaterThan Entity. */
+  /** GreaterThan entity. */
   public static final byte[] GT = token(">");
-  /** LessThan Entity. */
+  /** LessThan entity. */
   public static final byte[] LT = token("<");
 
   /** Hex codes. */

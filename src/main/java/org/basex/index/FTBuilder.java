@@ -97,7 +97,7 @@ public abstract class FTBuilder extends IndexBuilder {
 
     DropDB.drop(data.meta.name, DATAFTX + ".*" + IO.BASEXSUFFIX,
         data.meta.prop);
-    
+
     for(pre = 0; pre < size; pre++) {
       if((pre & 0xFFFF) == 0) check();
 

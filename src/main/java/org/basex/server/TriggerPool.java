@@ -9,24 +9,23 @@ import java.util.HashMap;
  * @author Andreas Weiler
  */
 public final class TriggerPool {
-  
   /** Active triggers. */
   private final HashMap<ServerProcess, Sessions> triggers =
     new HashMap<ServerProcess, Sessions>();
-  
+
   /**
    * Standard constructor.
    */
   public TriggerPool() { }
-  
+
   /**
-   * Adds trigger to pool.
+   * Adds a trigger to the pool.
    * @param trigger server process
    */
   public void add(final ServerProcess trigger) {
     triggers.put(trigger, new Sessions());
   }
-  
+
   /**
    * Attaches the server process to the trigger.
    * @param trigger server process
@@ -41,7 +40,7 @@ public final class TriggerPool {
     }
     return false;
   }
-  
+
   /**
    * Attaches the server process to the trigger.
    * @param trigger trigger
@@ -56,7 +55,7 @@ public final class TriggerPool {
     }
     return false;
   }
-  
+
   /**
    * Removes the trigger from the pool.
    * @param trigger server process

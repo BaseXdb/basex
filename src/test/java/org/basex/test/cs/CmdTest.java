@@ -30,7 +30,7 @@ public class CmdTest {
   private static final String FILE = "etc/xml/input.xml";
   /** Test folder. */
   private static final String FLDR = "etc/xml";
-  /** Test Url. */
+  /** Test url. */
   private static final String URL =
     "http://www.inf.uni-konstanz.de/dbis/basex/dl/xml.xml";
   /** Test name. */
@@ -61,61 +61,37 @@ public class CmdTest {
     process(new DropUser(USER));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void add() {
-    no(new Add("input", FILE));
+    // database must be opened to add files
+    no(new Add(FILE));
     ok(new CreateDB(NAME));
-    ok(new Add("input", FILE));
-    ok(new Add("input", FILE)); //[MS] duplicates allowed by now.
-  }
-
-  /** Command Test. */
-  @Test
-  public final void addUrl() {
-    no(new Add("xml", URL));
-    ok(new CreateDB(NAME));
-    ok(new Add("xml", URL));
-    ok(new Delete(URL));
-  }
-
-  /** Command Test. */
-  @Test
-  public final void addFolder() {
-    no(new Add("xml", FLDR));
-    ok(new CreateDB(NAME));
-    ok(new Add("xml", FLDR));
-    ok(new Delete(FILE));
+    ok(new Add(FILE, "input"));
+    ok(new Add(FILE, "input"));
+    ok(new Add(URL, "xml"));
+    ok(new Add(FLDR, "xml"));
   }
 
   /** Command test. */
   @Test
   public final void close() {
+    // close is successful, even if no database is opened
     ok(new Close());
     ok(new CreateDB(NAME, FILE));
     ok(new Close());
-    no(new InfoDB());
   }
 
-  /** Command Test. */
-  @Test
-  public final void createColl() {
-    ok(new CreateDB(NAME));
-    ok(new CreateDB(NAME));
-    ok(new DropDB(NAME));
-  }
-
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void createDB() {
     ok(new CreateDB(NAME, FILE));
     ok(new InfoDB());
     ok(new CreateDB(NAME, FILE));
     ok(new CreateDB("abcde"));
-    no(new CreateDB(""));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void createFS() {
     no(new CreateFS("test", ".s"));
@@ -123,7 +99,7 @@ public class CmdTest {
     ok(new DropDB("test"));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void createIndex() {
     no(new CreateIndex(null));
@@ -132,14 +108,14 @@ public class CmdTest {
     for(final CmdIndex cmd : CmdIndex.values()) ok(new CreateIndex(cmd));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void createMAB() {
     // no test file available
     no(new CreateMAB("abcde", "abcde"));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void createUser() {
     ok(new CreateUser(USER, "test"));
@@ -147,7 +123,7 @@ public class CmdTest {
     ok(new DropUser(USER));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void cs() {
     no(new Cs("//li"));
@@ -160,18 +136,21 @@ public class CmdTest {
     ok(CONTEXT.current, 1);
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void delete() {
+    // database must be opened to add files
     no(new Delete(FILE));
     ok(new CreateDB(NAME));
+    // target need not exist
     ok(new Delete(FILE));
-    ok(new Add("input", FILE));
+    ok(new Add(FILE));
     ok(new Delete(FILE));
+    // target need not exist
     ok(new Delete(FILE));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void dropDB() {
     no(new DropDB(NAME));
@@ -181,7 +160,7 @@ public class CmdTest {
     no(new DropDB(NAME));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void dropIndex() {
     for(final CmdIndex cmd : CmdIndex.values()) no(new DropIndex(cmd));
@@ -189,7 +168,7 @@ public class CmdTest {
     for(final CmdIndex cmd : CmdIndex.values()) ok(new DropIndex(cmd));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void dropUser() {
     ok(new CreateUser(USER, "test"));
@@ -197,7 +176,7 @@ public class CmdTest {
     no(new DropUser(USER));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void export() {
     final IO io = IO.get("input.xml");
@@ -208,7 +187,7 @@ public class CmdTest {
     ok(io.delete());
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void find() {
     no(new Find("1"));
@@ -216,7 +195,7 @@ public class CmdTest {
     ok(new Find("1"));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void grant() {
     ok(new CreateUser(USER, "test"));
@@ -226,20 +205,20 @@ public class CmdTest {
     ok(new DropUser(USER));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void help() {
     ok(new Help(""));
     ok(new Help(null));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void info() {
     ok(new Info());
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void infoDB() {
     no(new InfoDB());
@@ -247,7 +226,7 @@ public class CmdTest {
     ok(new InfoDB());
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void infoIndex() {
     no(new InfoIndex());
@@ -255,7 +234,7 @@ public class CmdTest {
     ok(new InfoIndex());
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void infoTable() {
     no(new InfoTable("1", "2"));
@@ -265,14 +244,14 @@ public class CmdTest {
     ok(new InfoTable("// li", null));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void kill() {
     ok(new Kill("hans"));
     no(new Kill("admin"));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void list() {
     ok(new List());
@@ -280,7 +259,7 @@ public class CmdTest {
     ok(new List());
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void open() {
     no(new Open(NAME));
@@ -289,7 +268,7 @@ public class CmdTest {
     ok(new Open(NAME));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void optimize() {
     no(new Optimize());
@@ -297,14 +276,14 @@ public class CmdTest {
     ok(new Optimize());
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void password() {
     ok(new Password("admin"));
     no(new Password(""));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void run() {
     final IO io = IO.get("test.xq");
@@ -320,7 +299,7 @@ public class CmdTest {
     io.delete();
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void set() {
     ok(new Set(CmdSet.INFO, Text.ON));
@@ -331,7 +310,7 @@ public class CmdTest {
     no(new Set(USER, USER));
   }
 
-  /** Command Test. */
+  /** Command test. */
   @Test
   public final void xQuery() {
     no(new XQuery("/"));

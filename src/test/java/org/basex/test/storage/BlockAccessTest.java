@@ -37,8 +37,6 @@ public final class BlockAccessTest {
   private int size;
   /** Starting storage. */
   private byte[] storage;
-  /** Max entries per block. */
-  private int entries;
   /** Expected blocks in file. */
   private int blocks;
   /** Nodes per block. */
@@ -73,9 +71,8 @@ public final class BlockAccessTest {
     for(int i = 0; i < bytecount; i++) {
       storage[i] = (byte) tda.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
-    entries = IO.BLOCKSIZE >>> IO.NODEPOWER;
-    blocks = (int) Math.ceil(size / Math.floor(entries * IO.BLOCKFILL));
-    nodes = (int) (entries * IO.BLOCKFILL);
+    nodes = IO.BLOCKSIZE >>> IO.NODEPOWER;
+    blocks = (int) Math.ceil((double) size / nodes);
   }
 
   /**
@@ -279,16 +276,16 @@ public final class BlockAccessTest {
    */
   @Test
   public void testInsertMany() {
-    tda.insert(4, getTestEntries(entries - 1));
-    assertEquals(size + entries - 1, tda.size());
+    tda.insert(4, getTestEntries(nodes - 1));
+    assertEquals(size + nodes - 1, tda.size());
     assertEntrysEqual(0, 0, 4);
-    assertAreInserted(4, entries - 1);
-    assertEntrysEqual(4, 4 + entries - 1, size - 4);
+    assertAreInserted(4, nodes - 1);
+    assertEntrysEqual(4, 4 + nodes - 1, size - 4);
     closeAndReload();
-    assertEquals(size + entries - 1, tda.size());
+    assertEquals(size + nodes - 1, tda.size());
     assertEntrysEqual(0, 0, 4);
-    assertAreInserted(4, entries - 1);
-    assertEntrysEqual(4, 4 + entries - 1, size - 4);
+    assertAreInserted(4, nodes - 1);
+    assertEntrysEqual(4, 4 + nodes - 1, size - 4);
   }
 
   /**

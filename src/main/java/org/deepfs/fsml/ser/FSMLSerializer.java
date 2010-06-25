@@ -20,7 +20,7 @@ import org.deepfs.fsml.DeepFile.Content;
  * @author Bastian Lemke
  */
 public final class FSMLSerializer {
-  /** The DeepFile to serialize. */
+  /** File reference to serialize. */
   private final DeepFile deepFile;
   /** The xml fragment. */
   private final StringBuilder xml;

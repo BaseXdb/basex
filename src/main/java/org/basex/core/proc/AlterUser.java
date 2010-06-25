@@ -1,10 +1,12 @@
 package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Commands.CmdAlter;
 
 /**
  * Evaluates the 'alter user' command and alters the password of a user.
@@ -32,7 +34,7 @@ public final class AlterUser extends Proc {
   }
 
   @Override
-  public String toString() {
-    return Cmd.ALTER + " " + CmdCreate.USER + args();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.ALTER + " " + CmdAlter.USER).args();
   }
 }

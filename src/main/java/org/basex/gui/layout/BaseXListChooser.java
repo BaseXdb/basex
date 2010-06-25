@@ -30,7 +30,7 @@ public final class BaseXListChooser extends BaseXBack {
   final BaseXTextField text;
   /** List. */
   final JList list;
-  /** List Values. */
+  /** List values. */
   String[] values;
   /** Numeric list. */
   boolean num = true;

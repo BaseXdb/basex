@@ -22,7 +22,7 @@ public final class StatsKey {
     /** Category. */ CAT,
     /** Numeric.  */ INT,
     /** Numeric.  */ DBL,
-    /** No Texts. */ NONE
+    /** No texts. */ NONE
   };
   /** Node kind. */
   public Kind kind;

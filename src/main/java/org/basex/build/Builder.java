@@ -51,7 +51,7 @@ public abstract class Builder extends Progress {
   private final int[] preStack = new int[IO.MAXHEIGHT];
   /** Tag stack. */
   private final int[] tagStack = new int[IO.MAXHEIGHT];
-  /** Size Stack. */
+  /** Size stack. */
   private boolean inDoc;
   /** Current tree height. */
   private int lvl;
@@ -60,11 +60,11 @@ public abstract class Builder extends Progress {
 
   /**
    * Constructor.
-   * @param p parser
+   * @param parse parser
    * @param pr properties
    */
-  protected Builder(final Parser p, final Prop pr) {
-    parser = p;
+  protected Builder(final Parser parse, final Prop pr) {
+    parser = parse;
     prop = pr;
   }
 
@@ -72,10 +72,10 @@ public abstract class Builder extends Progress {
 
   /**
    * Builds the database.
-   * @param db name of database
+   * @param name name of database
    * @throws IOException I/O exception
    */
-  protected final void parse(final String db) throws IOException {
+  protected final void parse(final String name) throws IOException {
     final Performance perf = Prop.debug ? new Performance() : null;
     Main.debug("Database: ");
 
@@ -86,7 +86,7 @@ public abstract class Builder extends Progress {
     meta.lastid = meta.size;
     // no nodes inserted: add default document node
     if(meta.size == 0) {
-      startDoc(token(db));
+      startDoc(token(name));
       endDoc();
       setSize(0, meta.size);
     }

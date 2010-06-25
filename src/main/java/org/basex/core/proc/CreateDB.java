@@ -11,10 +11,12 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 import org.basex.data.Data.IndexType;
@@ -32,26 +34,27 @@ public class CreateDB extends ACreate {
   /**
    * Default constructor.
    * @param name name of database
-   * @param input input XML file or XML string
-   */
-  public CreateDB(final String name, final String input) {
-    super(name, input);
-  }
-
-  /**
-   * Constructor. The database name.
-   * @param name name of database
    */
   public CreateDB(final String name) {
     this(name, null);
   }
 
+  /**
+   * Constructor, specifying an input.
+   * @param name name of database
+   * @param input input file path or XML string
+   */
+  public CreateDB(final String name, final String input) {
+    super(name, input);
+  }
+
   @Override
   protected boolean run() {
-    if(args[0].length() == 0) return error(DBWHICH);
-    if(args[1] == null) return build(Parser.emptyParser(args[0]), args[0]);
-    final IO io = IO.get(args[1]);
-    return io.exists() ? build(new DirParser(io, prop), args[0]) :
+    final String name = args[0];
+    final String input = args[1];
+    if(input == null) return build(Parser.emptyParser(name), name);
+    final IO io = IO.get(input);
+    return io.exists() ? build(new DirParser(io, prop), name) :
       error(FILEWHICH, io);
   }
 
@@ -70,7 +73,7 @@ public class CreateDB extends ACreate {
   /**
    * Creates a database for the specified file.
    * @param ctx database context
-   * @param io file reference
+   * @param io input reference
    * @param name name of the database
    * @return database instance
    * @throws IOException I/O exception
@@ -86,19 +89,19 @@ public class CreateDB extends ACreate {
 
   /**
    * Creates a database instance from the specified parser.
-   * @param p xml parser
+   * @param parser input parser
    * @param db name of the database
    * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final Parser p, final String db,
+  public static synchronized Data xml(final Parser parser, final String db,
       final Context ctx) throws IOException {
 
-    if(ctx.prop.is(Prop.MAINMEM)) return MemBuilder.build(p, ctx.prop, db);
+    if(ctx.prop.is(Prop.MAINMEM)) return MemBuilder.build(parser, ctx.prop, db);
     if(ctx.pinned(db)) throw new IOException(Main.info(DBLOCKED, db));
 
-    final Builder builder = new DiskBuilder(p, ctx.prop);
+    final Builder builder = new DiskBuilder(parser, ctx.prop);
     try {
       final Data data = builder.build(db);
       if(data.meta.txtindex) data.setIndex(IndexType.TXT,
@@ -121,14 +124,14 @@ public class CreateDB extends ACreate {
 
   /**
    * Creates a main-memory database for the specified parser.
-   * @param p xml parser
+   * @param parser input parser
    * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final Parser p, final Context ctx)
+  public static synchronized Data xml(final Parser parser, final Context ctx)
       throws IOException {
-    return MemBuilder.build(p, ctx.prop);
+    return MemBuilder.build(parser, ctx.prop);
   }
 
   /**
@@ -146,18 +149,18 @@ public class CreateDB extends ACreate {
 
   /**
    * Creates a main-memory database from the specified SAX source.
-   * @param s sax source
+   * @param sax sax source
    * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final SAXSource s, final Context ctx)
+  public static synchronized Data xml(final SAXSource sax, final Context ctx)
       throws IOException {
-    return xml(new SAXWrapper(s, "") , ctx);
+    return xml(new SAXWrapper(sax, "") , ctx);
   }
 
   @Override
-  public String toString() {
-    return Cmd.CREATE + " " + CmdCreate.DB + args();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.CREATE + " " + CmdCreate.DB).args();
   }
 }

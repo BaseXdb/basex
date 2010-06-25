@@ -28,7 +28,7 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public abstract class Main {
-  /** Database Context. */
+  /** Database context. */
   public final Context context = new Context();
   /** Successful command line parsing. */
   protected final boolean success;

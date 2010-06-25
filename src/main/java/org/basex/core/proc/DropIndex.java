@@ -4,6 +4,8 @@ import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndex;
@@ -75,7 +77,7 @@ public final class DropIndex extends ACreate {
   }
 
   @Override
-  public String toString() {
-    return Cmd.DROP + " " + CmdDrop.INDEX + args();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.DROP + " " + CmdDrop.INDEX).args();
   }
 }

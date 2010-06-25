@@ -35,7 +35,7 @@ public final class Constr {
   private final TokenBuilder text = new TokenBuilder();
   /** Space separator flag. */
   private boolean more;
-  /** Base URI. */
+  /** Base uri. */
   byte[] base = EMPTY;
 
   /**

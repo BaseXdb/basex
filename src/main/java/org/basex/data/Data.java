@@ -89,14 +89,14 @@ public abstract class Data {
   public Names atts;
   /** Namespace index. */
   public Namespaces ns;
-  /** Path Summary. */
+  /** Path summary. */
   public PathSummary path;
 
   /** File system reference. */
   public DeepFS fs;
-  /** Index Reference for name tag. */
+  /** Index reference for a name attribute. */
   public int nameID;
-  /** Index References. */
+  /** Index reference for a size attribute. */
   public int sizeID;
 
   /** Table access file. */

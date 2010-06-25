@@ -393,9 +393,9 @@ public final class ExifParser {
         if(s != null) d.addMeta(elem, s);
       }
     },
-    /** Exif Image Width. */
+    /** Exif image width. */
     ha002(1, MetaElem.PIXEL_WIDTH, true, Format.SHORT, Format.LONG),
-    /** Exif Image Height. */
+    /** Exif image height. */
     ha003(1, MetaElem.PIXEL_HEIGHT, true, Format.SHORT, Format.LONG),
     /** Related sound file. */
     ha004(13, MetaElem.RELATED_SOUND_FILE, Format.ASCII),

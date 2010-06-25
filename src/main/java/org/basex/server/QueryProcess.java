@@ -2,7 +2,6 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;

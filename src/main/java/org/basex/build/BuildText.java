@@ -31,95 +31,95 @@ public interface BuildText {
   String LIMITATT =
     "%: Element has too many different attributes (limit: %).";
 
-  /** Parser Error. */
+  /** Parser error. */
   String PARSEINVALID = "%: % expected, % found.";
-  /** Parser Error. */
+  /** Parser error. */
   String DOCOPEN = "%: Closing tag </%> expected.";
 
   /** Scanner error. */
   String DOCEMPTY = "Document is empty.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String UNCLOSED = "Unclosed tokens found.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String CONTCDATA = "']]>' not allowed in content.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String CDATASEC = "Invalid CDATA section.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String XMLCHAR = "Invalid XML character found: #%";
-  /** Scanner Error. */
+  /** Scanner error. */
   String CHARACTER = "Invalid character found: '%'";
-  /** Scanner Error. */
+  /** Scanner error. */
   String CLOSING = "Tag was not properly closed.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String COMMDASH = "Missing '-' in comment declaration.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String ATTCHAR = "Invalid character '%' in attribute value.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String ATTCLOSE = "Attribute value was not properly closed.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String PITEXT = "Invalid processing instruction.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String PIRES = "'<?xml' is reserved for document declaration.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String DECLVERSION = "XML version must be '1.0' or '1.1'.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String DECLSTART = "Document declaration must start with 'version'.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String TEXTENC = "'encoding' expected in text declaration.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String DECLWRONG = "Invalid document declaration.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String DECLENCODE = "Invalid encoding.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String DECLSTANDALONE = "Invalid standalone attribute in declaration.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String UNKNOWNENTITY = "Unknown entity '&%;'. Try 'set entity off'.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String INVALIDENTITY = "Invalid entity '&%...'. Try 'set entity off'.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String TYPEAFTER = "Misplaced document type definition.";
-  /** Parser Error. */
+  /** Parser error. */
   String SCANQUOTE = "Quote expected, '%' found.";
-  /** Parser Error. */
+  /** Parser error. */
   String PUBID = "Invalid character '%' in public identifier.";
 
-  /** Scanner Error. */
+  /** Scanner error. */
   String NOWS = "Whitespace expected, '%' found.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String WRONGCHAR = "'%' expected, '%' found.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String INVNAME = "Invalid name.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String INVEND = "Unexpected end.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String UNKNOWNPE = "Unknown parameter reference '%'.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String INVPE = "Parameter reference not allowed here.";
-  /** Scanner Error. */
+  /** Scanner error. */
   String RECENT = "Recursive entity definition.";
 
-  /** DTD Whitespace error. */
+  /** DTD whitespace error. */
   String WSERROR = "Missing Whitespace.";
-  /** DTD Error. */
+  /** DTD error. */
   String ERRDT = "Error in DTD.";
 
-  /** Ampersand. */
+  /** Semicolon. */
   byte[] SEMI = token(";");
   /** CDATA token. */
   byte[] CDATA = token("CDATA[");
-  /** XML Document Version. */
+  /** XML document version. */
   byte[] VERS = token("version");
-  /** XML Document Version. */
+  /** XML document version. */
   byte[] VERS10 = token("1.0");
-  /** XML Document Version. */
+  /** XML document version. */
   byte[] VERS11 = token("1.1");
-  /** XML Document Encoding. */
+  /** XML document encoding. */
   byte[] ENCOD = token("encoding");
-  /** XML Document Standalone flag. */
+  /** XML document standalone flag. */
   byte[] STANDALONE = token("standalone");
-  /** XML Document Standalone flag. */
+  /** XML document standalone flag. */
   byte[] YES = token("yes");
-  /** XML Document Standalone flag. */
+  /** XML document standalone flag. */
   byte[] NO = token("no");
 
   /** DTD: XML. */
@@ -185,21 +185,21 @@ public interface BuildText {
 
   /** Token types. */
   enum Type {
-    /** Text Node.           */ TEXT("Text"),
-    /** Comment.             */ COMMENT("Comment"),
-    /** DocType.             */ DTD("Document type"),
-    /** PI.                  */ PI("Processing instruction"),
-    /** Opening Bracket.     */ L_BR("'<'"),
-    /** TagName.             */ TAGNAME("Tag name"),
-    /** AttrName.            */ ATTNAME("Attribute name"),
-    /** Closing Bracket.     */ R_BR("'>'"),
-    /** Whitespace.          */ WS("whitespace"),
-    /** AttrValue.           */ ATTVALUE("Attribute value"),
-    /** Empty Bracket.       */ L_BR_CLOSE("'</'"),
-    /** Closing End Bracket. */ CLOSE_R_BR("'/>'"),
-    /** Equal Sign.          */ EQ("'='"),
-    /** Quoted Text.         */ EOF("End of File"),
-    /** Quoted Text.         */ QUOTE("Quote");
+    /** Text node.              */ TEXT("Text"),
+    /** Comment.                */ COMMENT("Comment"),
+    /** Document type.          */ DTD("Document type"),
+    /** Processing instruction. */ PI("Processing instruction"),
+    /** Opening bracket.        */ L_BR("'<'"),
+    /** Tag name.               */ TAGNAME("Tag name"),
+    /** Attribute name.         */ ATTNAME("Attribute name"),
+    /** Closing bracket.        */ R_BR("'>'"),
+    /** Whitespace.             */ WS("whitespace"),
+    /** Attribute value.        */ ATTVALUE("Attribute value"),
+    /** Empty bracket.          */ L_BR_CLOSE("'</'"),
+    /** Closing end bracket.    */ CLOSE_R_BR("'/>'"),
+    /** Equal sign.             */ EQ("'='"),
+    /** End of file.            */ EOF("End of File"),
+    /** Quote.                  */ QUOTE("Quote");
 
     /** String representation of token type. */
     public final String string;

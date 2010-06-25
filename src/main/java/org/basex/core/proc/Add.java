@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
+import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.User;
@@ -17,39 +18,48 @@ import org.basex.io.IO;
  * @author Christian Gruen
  */
 public class Add extends ACreate {
-  
   /**
    * Default constructor.
-   * @param name name of document
-   * @param target target in collection
    * @param input input XML file or XML string
    */
-  public Add(final String name, final String target, final String input) {
-    super(DATAREF | User.WRITE, name, target, input);
+  public Add(final String input) {
+    this(input, null);
   }
-  
+
   /**
-   * Constructor, specifying no target.
-   * @param name name of document
+   * Constructor, specifying a document name.
    * @param input input XML file or XML string
+   * @param name name of document
    */
-  public Add(final String name, final String input) {
-    this(name, "", input);
+  public Add(final String input, final String name) {
+    this(input, name, null);
+  }
+
+  /**
+   * Constructor, specifying a document name and a target.
+   * @param input input XML file or XML string
+   * @param name name of document. If {@code null}, the name of the input
+   *   will be used
+   * @param target target. If {@code null}, target will be set to root
+   */
+  public Add(final String input, final String name, final String target) {
+    super(DATAREF | User.WRITE, input, name, target == null ? "" : target);
   }
 
   @Override
   protected boolean run() {
-    final IO io = IO.get(args[2]);
+    final String input  = args[0];
+
+    final IO io = IO.get(input);
     if(!io.exists()) return error(FILEWHICH, io);
 
-    final String name = args[0];
-    final String db = args[0];
-    io.setName(name);
+    final String name   = args[1] != null ? args[1] : io.name();
+    final String target = path(args[2]);
 
-    final DirParser p = new DirParser(io, context.prop, path(args[1]));
+    final DirParser p = new DirParser(io, context.prop, target);
     try {
       final Data data = context.data;
-      data.insert(data.meta.size, -1, MemBuilder.build(p, context.prop, db));
+      data.insert(data.meta.size, -1, MemBuilder.build(p, context.prop, name));
       data.flush();
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -64,5 +74,10 @@ public class Add extends ACreate {
   @Override
   public boolean updating(final Context ctx) {
     return true;
+  }
+
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init().arg(AS, 1).arg(TO, 2).arg(0);
   }
 }

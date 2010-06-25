@@ -26,7 +26,7 @@ public final class Prop extends AProp {
   /** System's temporary directory. */
   public static final String TMP = System.getProperty("java.io.tmpdir") + SEP;
 
-  /** OS Flag (should be ignored whenever possible). */
+  /** OS flag (should be ignored whenever possible). */
   private static final String OS = System.getProperty("os.name");
   /** Flag denoting if OS belongs to Mac family. */
   public static final boolean MAC = OS.charAt(0) == 'M';
@@ -46,7 +46,7 @@ public final class Prop extends AProp {
   public static final Object[] DBPATH = {
     "DBPATH", HOME + Text.NAME + "Data" };
 
-  /** Language Name (currently: English or German). */
+  /** Language name (currently: English or German). */
   public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };

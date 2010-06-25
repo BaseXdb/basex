@@ -2,6 +2,8 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Proc;
@@ -199,5 +201,10 @@ public abstract class AQuery extends Proc {
     } catch(final Exception ex) {
       Main.debug(ex);
     }
+  }
+
+  @Override
+  public void build(final CommandBuilder cb) {
+    cb.init().xquery(0);
   }
 }

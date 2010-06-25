@@ -12,7 +12,7 @@ import org.basex.util.Token;
 
 /**
  * Functions on files and directories.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -31,7 +31,7 @@ final class FNFile extends Fun {
   public Item atomic(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
 
-    final File path = expr.length == 0 ? null : 
+    final File path = expr.length == 0 ? null :
       new File(Token.string(checkStr(expr[0].atomic(ctx))));
 
     switch(func) {

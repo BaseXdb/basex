@@ -1,7 +1,6 @@
 package org.basex.core.proc;
 
 import org.basex.core.Context;
-import org.basex.core.Commands.Cmd;
 
 /**
  * Evaluates the 'xquery' command and processes an XQuery request.
@@ -26,10 +25,5 @@ public final class XQuery extends AQuery {
   @Override
   public boolean updating(final Context ctx) {
     return updating(ctx, args[0]);
-  }
-
-  @Override
-  public String toString() {
-    return Cmd.XQUERY + " " + args[0];
   }
 }

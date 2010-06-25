@@ -149,7 +149,7 @@ public final class MAB2Parser extends Parser {
     // find file offsets of all titles
     final Performance p = new Performance();
 
-    /** MAB2 Entries. */
+    // MAB2 entries
     final ObjectMap<MAB2Entry> ids = new ObjectMap<MAB2Entry>();
 
     int i = 0;

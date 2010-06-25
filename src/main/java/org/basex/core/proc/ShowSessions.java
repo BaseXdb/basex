@@ -1,6 +1,8 @@
 package org.basex.core.proc;
 
 import java.io.IOException;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -27,7 +29,7 @@ public final class ShowSessions extends Proc {
   }
 
   @Override
-  public String toString() {
-    return Cmd.SHOW + " " + CmdShow.SESSIONS;
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.SHOW + " " + CmdShow.SESSIONS);
   }
 }

@@ -61,9 +61,9 @@ public final class BaseXKeys {
   public static final int[] REDO = { MAC ? SC | SHF : SC,
       MAC ? VK_Z : VK_Y, 0 };
 
-  /** Word Right. */
+  /** Word right. */
   public static final int[] NEXTWORD = { MAC ? ALT : SC, VK_RIGHT };
-  /** Word Left. */
+  /** Word left. */
   public static final int[] PREVWORD = { MAC ? ALT : SC, VK_LEFT };
   /** Right. */
   public static final int[] NEXT = { 0, VK_RIGHT };
@@ -105,7 +105,7 @@ public final class BaseXKeys {
   public static final int[] DELPREV = { 0, VK_BACK_SPACE };
   /** Delete. */
   public static final int[] DELNEXT = { 0, VK_DELETE };
-  
+
   /** Escape. */
   public static final int[] ESCAPE = { 0, VK_ESCAPE };
   /** Next panel. */

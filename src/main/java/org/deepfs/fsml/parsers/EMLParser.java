@@ -214,7 +214,7 @@ public final class EMLParser implements IFileParser {
   /** The {@link BufferedFileChannel} to read from. */
   BufferedFileChannel bfc;
 
-  /** The DeepFile representing the eml file. */
+  /** File reference, representing the eml file. */
   DeepFile deepFile;
 
   @Override

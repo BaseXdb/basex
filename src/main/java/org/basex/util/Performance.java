@@ -7,7 +7,7 @@ package org.basex.util;
  * @author Christian Gruen
  */
 public final class Performance {
-  /** Performance Timer, based on nano seconds. */
+  /** Performance timer, using nano seconds. */
   private long time = System.nanoTime();
 
   /**

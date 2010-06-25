@@ -17,49 +17,50 @@ public final class MemBuilder extends Builder {
 
   /**
    * Constructor.
-   * @param p parser
+   * @param parse parser
    * @param pr properties
    */
-  public MemBuilder(final Parser p, final Prop pr) {
-    super(p, pr);
+  public MemBuilder(final Parser parse, final Prop pr) {
+    super(parse, pr);
   }
 
   /**
    * Builds the main-memory database instance without database name.
-   * @param p parser
-   * @param pr properties
+   * @param parser parser
+   * @param prop properties
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static Data build(final Parser p, final Prop pr) throws IOException {
-    return build(p, pr, p.file.name());
+  public static Data build(final Parser parser, final Prop prop)
+      throws IOException {
+    return build(parser, prop, parser.file.name());
   }
 
   /**
    * Builds a main-memory database instance.
-   * @param p parser
-   * @param pr properties
-   * @param db name of database
+   * @param parser parser
+   * @param prop properties
+   * @param name name of database
    * @return data database instance
    * @throws IOException I/O exception
    */
-  public static MemData build(final Parser p, final Prop pr, final String db)
-      throws IOException {
-    return new MemBuilder(p, pr).build(db);
+  public static MemData build(final Parser parser, final Prop prop,
+      final String name) throws IOException {
+    return new MemBuilder(parser, prop).build(name);
   }
 
   @Override
-  public MemData build(final String db) throws IOException {
+  public MemData build(final String name) throws IOException {
     data = new MemData(tags, atts, ns, path, prop);
     meta = data.meta;
-    meta.name = db;
+    meta.name = name;
     // all contents will be indexed in main-memory mode
     meta.txtindex = true;
     meta.atvindex = true;
     meta.ftxindex = false;
     meta.file = parser.file;
 
-    parse(db);
+    parse(name);
     data.init();
     return data;
   }

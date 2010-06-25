@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.core.Text;
 import org.basex.core.User;

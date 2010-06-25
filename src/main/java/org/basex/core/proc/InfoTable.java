@@ -4,6 +4,8 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdInfo;
@@ -126,10 +128,12 @@ public final class InfoTable extends AQuery {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(Cmd.INFO + " " + CmdInfo.TABLE);
-    if(args[0] != null) sb.append(' ' + args[0]);
-    if(args[1] != null) sb.append(' ' + args[1]);
-    return sb.toString();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.INFO + " " + CmdInfo.TABLE);
+    if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
+      cb.xquery(0);
+    } else {
+      cb.arg(0).arg(1);
+    }
   }
 }

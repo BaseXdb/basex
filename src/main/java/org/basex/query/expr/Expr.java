@@ -25,7 +25,7 @@ public abstract class Expr extends ExprInfo {
   /** Usage flags. */
   public enum Use {
     /** Context.   */ CTX,
-    /** Root Flag. */ ELM,
+    /** Root flag. */ ELM,
     /** Fragment.  */ FRG,
     /** Position.  */ POS,
     /** Updates.   */ UPD,

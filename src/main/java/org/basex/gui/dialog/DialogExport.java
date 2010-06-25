@@ -38,7 +38,7 @@ public final class DialogExport extends Dialog {
   private final BaseXLabel info;
   /** Output label. */
   private final BaseXLabel out;
-  /** XML Formatting. */
+  /** XML formatting. */
   private final BaseXCheckBox format;
   /** Encoding. */
   private final BaseXCombo encoding;

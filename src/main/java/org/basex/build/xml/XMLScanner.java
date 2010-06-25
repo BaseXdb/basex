@@ -27,15 +27,15 @@ import org.basex.util.TokenMap;
 final class XMLScanner extends Progress {
   /** PublicID characters. */
   private static final byte[] PUBIDTOK = token(" \n'()+,/=?;!*#@$%");
-  /** Quote Entity. */
+  /** Quote entity. */
   private static final byte[] E_QU = token("quot");
-  /** Ampersand Entity. */
+  /** Ampersand entity. */
   private static final byte[] E_AMP = token("amp");
-  /** Apostrophe Entity. */
+  /** Apostrophe entity. */
   private static final byte[] E_APOS = token("apos");
-  /** GreaterThan Entity. */
+  /** GreaterThan entity. */
   private static final byte[] E_GT = token("gt");
-  /** LessThan Entity. */
+  /** LessThan entity. */
   private static final byte[] E_LT = token("lt");
 
   /** Scanning states. */
@@ -72,7 +72,7 @@ final class XMLScanner extends Progress {
   private boolean tag;
   /** Current quote character. */
   private int quote;
-  /** XML Input. */
+  /** XML input. */
   private XMLInput input;
 
   /**

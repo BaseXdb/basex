@@ -2,11 +2,13 @@ package org.basex.core.proc;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+
+import org.basex.core.CommandBuilder;
 import org.basex.core.Main;
 import org.basex.core.Proc;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
-import org.basex.core.Commands.CmdCreate;
+import org.basex.core.Commands.CmdDrop;
 import org.basex.data.Data;
 import org.basex.server.ServerProcess;
 
@@ -64,10 +66,7 @@ public final class DropUser extends Proc {
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder(
-        Cmd.DROP + " " + CmdCreate.USER + " " + args[0]);
-    if(args[1] != null) sb.append(" " + ON + " " + args[1]);
-    return sb.toString();
+  public void build(final CommandBuilder cb) {
+    cb.init(Cmd.DROP + " " + CmdDrop.USER).arg(0).arg(ON, 1);
   }
 }

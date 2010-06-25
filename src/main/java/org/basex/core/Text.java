@@ -138,19 +138,24 @@ public interface Text {
   /** Command help. */
   String PATH = "path";
   /** Command help. */
+  String INPUT = "input";
+  /** Command help. */
   String NAM = "name";
   /** Command help. */
   String PW = "password";
   /** Command help. */
+  String TARGET = "target";
+
+  /** Command keyword. */
+  String AS = "AS";
+  /** Command keyword. */
   String TO = "TO";
-  /** Command help. */
-  String INTO = "INTO";
-  /** Command help. */
+  /** Command keyword. */
   String ON = "ON";
-  /** Command help. */
-  String TRUE = "TRUE";
-  /** Command help. */
+  /** Command keyword. */
   String USER = "USER";
+  /** Command keyword. */
+  String TRUE = "TRUE";
 
   /** Missing help. */
   String NOHELP = lang("ch_nohelp");
@@ -163,8 +168,8 @@ public interface Text {
     CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
-    LI + CmdCreate.DB + " [" + NAM + "] [" + PATH + "?]:"  + NL +
-      "  " + lang("ch_create3", NAM, PATH) + NL +
+    LI + CmdCreate.DB + " [" + NAM + "] ([" + INPUT + "]):"  + NL +
+      "  " + lang("ch_create3", NAM, INPUT) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]: " + NL +
       "  " + lang("ch_create5") + NL +
@@ -172,14 +177,14 @@ public interface Text {
       "] ([mountpoint] [backingstore]): " + NL +
       "  " + lang("ch_create6", NAM, PATH) + NL +
       "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
-    LI + CmdCreate.USER + " [" + NAM + "] [" + PW + "?]: " + NL +
+    LI + CmdCreate.USER + " [" + NAM + "] ([" + PW + "]): " + NL +
       "  " + lang("ch_create8")
   };
 
   /** Command help. */
   String[] HELPADD = {
-    "[" + NAM  + "]" + " INTO [target?] [" + PATH + "]",
-    lang("ch_add1"), lang("ch_add2", PATH, NAM, "target")
+    "(" + AS + " [" + NAM + "]) (" + TO + " [" + TARGET + "]) [" + INPUT + "]",
+    lang("ch_add1"), lang("ch_add2", INPUT, NAM, TARGET)
   };
 
   /** Command help. */
@@ -193,7 +198,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPINFO = {
-    "[" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" + CmdInfo.TABLE + "]?",
+    "([" + CmdInfo.DB + "|" + CmdInfo.INDEX + "|" + CmdInfo.TABLE + "])",
     lang("ch_info1"),
     lang("ch_info21") + NL +
     LI + lang("ch_info22") + NL +
@@ -223,8 +228,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPEXPORT = {
-    "[" + PATH + "] [" + NAM + "?]", lang("ch_export1"),
-    lang("ch_export2", PATH + "/" + NAM + "?")
+    "[" + PATH + "]", lang("ch_export1"), lang("ch_export2", PATH)
   };
 
   /** Command help. */
@@ -276,24 +280,23 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPALTER = {
-    "[" + USER + "|" + CmdCreate.DB + "] [" + NAM + "]" +
-    " [" + PW + "?|" + NAM + "]",
+    "[" + USER + "|" + CmdCreate.DB + "] [...]",
     lang("ch_alter1"),
     lang("ch_alter2") + NL  +
-    LI + USER  + " [" + NAM + "] [" + PW + "?]:" + NL +
-    lang("ch_alterpw") + NL +
-    LI + CmdCreate.DB + " [" + NAM + "] [" + NAM + "]" + NL +
-    lang("ch_alterdb")
+    LI + USER  + " [" + NAM + "] ([" + PW + "]):" + NL +
+    "  " + lang("ch_alterpw") + NL +
+    LI + CmdCreate.DB + " [" + NAM + "] [newname]" + NL +
+    "  " + lang("ch_alterdb")
   };
 
   /** Command help. */
   String[] HELPG = { lang("ch_helpgeneral0") };
   /** Command help. */
   String[] HELPSET = {
-    "[option] [value?]",
+    "[option] ([value])",
     lang("ch_set1", "info"),
     lang("ch_set2", "option", "value") + NL +
-    LI + CmdSet.INFO + " [all?]" + COLS + lang("ch_set21") + NL +
+    LI + CmdSet.INFO + " (ALL)" + COLS + lang("ch_set21") + NL +
     LI + CmdSet.DEBUG     + COLS + lang("ch_set22") + NL +
     LI + CmdSet.SERIALIZE + COLS + lang("ch_set23") + NL +
     LI + CmdSet.CHOP      + COLS + lang("ch_set26") + NL +
@@ -305,11 +308,11 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPPASSWORD = {
-    "[" + PW + "?]", lang("ch_password1"), lang("ch_password2")
+    "([" + PW + "])", lang("ch_password1"), lang("ch_password2")
   };
   /** Command help. */
   String[] HELPHELP = {
-    "[command?]", lang("ch_help1", NAME), lang("ch_help2", "command")
+    "([command])", lang("ch_help1", NAME), lang("ch_help2", "command")
   };
   /** Command help. */
   String[] HELPEXIT = {
@@ -1044,7 +1047,7 @@ public interface Text {
   String PORT = lang("ds_port");
   /** Local. */
   String LOCALPORT = lang("ds_localport");
-  /** Create User. */
+  /** Create user. */
   String CREATEU = lang("ds_createu");
   /** Global permissions. */
   String GLOBPERM = lang("ds_globperm") + COLS;
@@ -1070,9 +1073,9 @@ public interface Text {
   String CONNECTED = lang("ds_connected");
   /** Disconnected. */
   String DISCONNECTED = lang("ds_disconnected");
-  /** Server Information. */
+  /** Server information. */
   String SERVERINFO1 = lang("ds_info1");
-  /** Server Information. */
+  /** Server information. */
   String SERVERINFO2 = lang("ds_info2");
 
   /** Progress text for filesystem import. */
@@ -1254,13 +1257,13 @@ public interface Text {
   byte[] HELPSAVE = token(lang("h_save"));
   /** Help string. */
   byte[] HELPRECENT = token(lang("h_recent"));
-  /** Help Dialog. */
+  /** Help dialog. */
   byte[] HELPCMD = token(lang("h_cmd"));
-  /** Help Dialog. */
+  /** Help dialog. */
   byte[] HELPSEARCHXML = token(lang("h_searchxml"));
-  /** Help Dialog. */
+  /** Help dialog. */
   byte[] HELPSEARCHFS = token(lang("h_searchfs"));
-  /** Help Dialog. */
+  /** Help dialog. */
   byte[] HELPXPATH = token(lang("h_xpath"));
   /** Help string. */
   byte[] HELPMAP = token(lang("h_map"));
