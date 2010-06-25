@@ -10,9 +10,9 @@ package org.basex.examples.xmldb.eXist;
  * @author BaseX Team
  */
 abstract class Main {
-  /** Database Driver. */
+  /** Database driver. */
   static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
-  /** Database URL. */
+  /** Database url. */
   static final String URI = "xmldb:basex://localhost:1984/input";
 
   /** Private constructor. */

@@ -75,24 +75,24 @@ public abstract class W3CTS {
   /** Data reference. */
   protected Data data;
 
-  /** History Path. */
+  /** History path. */
   private final String pathhis;
-  /** Log File. */
+  /** Log file. */
   private final String pathlog;
-  /** Test Suite input. */
+  /** Test suite input. */
   private final String input;
-  /** Test Suite Identifier. */
+  /** Test suite id. */
   private final String testid;
 
-  /** Query Path. */
+  /** Query path. */
   private String queries;
-  /** Expected Results. */
+  /** Expected results. */
   private String expected;
-  /** Reported Results. */
+  /** Reported results. */
   private String results;
   /** Reports. */
   private String report;
-  /** Test Sources. */
+  /** Test sources. */
   private String sources;
 
   /** Maximum length of result output. */

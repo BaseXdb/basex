@@ -18,7 +18,7 @@ import org.deepfs.fs.DeepFS;
  * @author Christian Gruen
  */
 public final class LSTParser extends FileParser {
-  /** Date Format. */
+  /** Date format. */
   private static final SimpleDateFormat DATE =
     new SimpleDateFormat("yyyy.MM.dd hh:mm.ss");
 
