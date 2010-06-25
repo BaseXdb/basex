@@ -37,7 +37,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
     super(input, s, c);
 
     try {
-      query.parse();
+      qp.parse();
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
           ex.line(), ex.col(), -1);
@@ -46,11 +46,11 @@ final class BXQPreparedExpression extends BXQDynamicContext
 
   public void cancel() throws XQException {
     opened();
-    query.ctx.stop();
+    qp.ctx.stop();
   }
 
   public XQResultSequence executeQuery() throws XQException {
-    query.reset();
+    qp.reset();
     return execute();
   }
 
@@ -86,7 +86,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
     opened();
     valid(qn, String.class);
     final QNm nm = new QNm(qn);
-    final Var var = query.ctx.vars.get(new Var(nm, true));
+    final Var var = qp.ctx.vars.get(new Var(nm, true));
     if(var == null) throw new BXQException(VAR, nm);
     return var.type != null ? new BXQItemType(var.type.type) :
       BXQItemType.DEFAULT;
@@ -99,7 +99,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
    */
   private Var[] getVariables() throws XQException {
     opened();
-    final Vars vars = query.ctx.vars.getGlobal();
+    final Vars vars = qp.ctx.vars.getGlobal();
     return Arrays.copyOf(vars.vars, vars.size);
   }
 }

@@ -38,7 +38,7 @@ public class BaseXClient {
   private final Socket socket;
   /** Cache. */
   private final BufferedInputStream in;
-  /** Process info. */
+  /** Command info. */
   private String info;
 
   /**
@@ -110,7 +110,7 @@ public class BaseXClient {
   }
 
   /**
-   * Returns process information.
+   * Returns command information.
    * @return string info
    */
   public String info() {

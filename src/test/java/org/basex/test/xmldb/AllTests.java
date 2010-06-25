@@ -6,7 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import org.basex.api.xmldb.BXCollection;
 import org.basex.core.Context;
-import org.basex.core.proc.DropDB;
+import org.basex.core.cmd.DropDB;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Resource;
 import org.xmldb.api.modules.XMLResource;

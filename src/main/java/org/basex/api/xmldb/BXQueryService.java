@@ -111,14 +111,14 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
     try {
       // creates a query instance
-      final QueryProcessor proc = new QueryProcessor(query, nodes, coll.ctx);
+      final QueryProcessor qp = new QueryProcessor(query, nodes, coll.ctx);
 
       // add default namespaces
       for(final String n : ns.keySet()) {
-        proc.ctx.ns.add(new QNm(token(n), Uri.uri(token(ns.get(n)))));
+        qp.ctx.ns.add(new QNm(token(n), Uri.uri(token(ns.get(n)))));
       }
       // perform query and return result
-      return new BXResourceSet(proc.query(), coll);
+      return new BXResourceSet(qp.query(), coll);
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

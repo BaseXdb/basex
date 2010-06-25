@@ -137,9 +137,9 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   public String getDocumentId() throws XMLDBException {
     // throw exception if resource result from query; does not conform to the
-    // specs, but many query results are not related to a document anymore.
+    // specs, but many query results are not related to a document anymore
     if(result != null)
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
+     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_DOC);
 
     // resource does not result from a query - return normal id
     if(id != null) return id;
@@ -185,7 +185,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
   public ContentHandler setContentAsSAX() throws XMLDBException {
     try {
-      // ..might be replaced by a custom SAX content handler in future.
+      // ..might be replaced by a custom SAX content handler in future
       return new BXSAXContentHandler(this);
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());

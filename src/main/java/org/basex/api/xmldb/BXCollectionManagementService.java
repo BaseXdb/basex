@@ -1,6 +1,7 @@
 package org.basex.api.xmldb;
 
-import org.basex.core.proc.DropDB;
+import org.basex.core.Command;
+import org.basex.core.cmd.DropDB;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
@@ -45,9 +46,9 @@ final class BXCollectionManagementService implements
   }
 
   public void removeCollection(final String name) throws XMLDBException {
-    final DropDB proc = new DropDB(name);
-    if(!proc.exec(coll.ctx))
-      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, proc.info());
+    final Command cmd = new DropDB(name);
+    if(!cmd.exec(coll.ctx))
+      throw new XMLDBException(ErrorCodes.VENDOR_ERROR, cmd.info());
   }
 
   public String getName() {

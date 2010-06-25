@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import javax.ws.rs.core.StreamingOutput;
 import org.basex.core.Prop;
-import org.basex.core.proc.Open;
+import org.basex.core.cmd.Open;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.ResourcePath;
 
@@ -38,7 +38,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
 
       // set serialization parameters
       final String par = params(path);
-      if(!cs.execute(new org.basex.core.proc.Set(Prop.SERIALIZER, par)))
+      if(!cs.execute(new org.basex.core.cmd.Set(Prop.SERIALIZER, par)))
         throw new JaxRxException(400, cs.info());
     }
     run();

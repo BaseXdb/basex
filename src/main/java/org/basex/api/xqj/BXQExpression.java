@@ -7,7 +7,7 @@ import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQStaticContext;
 import org.basex.core.CommandParser;
-import org.basex.core.Proc;
+import org.basex.core.Command;
 import org.basex.query.QueryException;
 import org.basex.util.Token;
 
@@ -29,15 +29,15 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
 
   public void cancel() throws XQException {
     opened();
-    query.ctx.stop();
+    qp.ctx.stop();
   }
 
   public void executeCommand(final String cmd) throws XQException {
     opened();
     try {
-      for(final Proc p : new CommandParser(cmd, sc.context).parse()) {
+      for(final Command c : new CommandParser(cmd, sc.context).parse()) {
         // process output is suppressed, errors are returned as exception
-        if(!p.exec(sc.context)) throw new BXQException(p.info());
+        if(!c.exec(sc.context)) throw new BXQException(c.info());
       }
     } catch(final QueryException ex) {
       throw new BXQException(ex);
@@ -49,7 +49,7 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
   }
 
   public XQResultSequence executeQuery(final String input) throws XQException {
-    query.setQuery(input);
+    qp.setQuery(input);
     return execute();
   }
 

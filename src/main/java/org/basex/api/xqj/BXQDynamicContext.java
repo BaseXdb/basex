@@ -52,7 +52,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   /** Context. */
   protected final BXQStaticContext sc;
   /** Query processor. */
-  protected final QueryProcessor query;
+  protected final QueryProcessor qp;
   /** Time zone. */
   private TimeZone zone;
 
@@ -66,8 +66,8 @@ abstract class BXQDynamicContext extends BXQAbstract
       final BXQConnection c) {
     super(c);
     sc = s;
-    query = new QueryProcessor(qu, s.context);
-    query.ctx.copy(sc.ctx);
+    qp = new QueryProcessor(qu, s.context);
+    qp.ctx.copy(sc.ctx);
   }
 
   public void bindAtomicValue(final QName qn, final String v,
@@ -202,15 +202,15 @@ abstract class BXQDynamicContext extends BXQAbstract
     }
 
     if(var == XQConstants.CONTEXT_ITEM) {
-      query.ctx.item = i;
+      qp.ctx.item = i;
     } else {
       final QNm name = new QNm(Token.token(var.getLocalPart()));
       Var v = new Var(name, true);
       if(this instanceof BXQPreparedExpression) {
-        v = query.ctx.vars.get(v);
+        v = qp.ctx.vars.get(v);
         if(v == null) throw new BXQException(VAR, var);
       } else {
-        query.ctx.vars.addGlobal(v);
+        qp.ctx.vars.addGlobal(v);
       }
 
       try {
@@ -228,7 +228,7 @@ abstract class BXQDynamicContext extends BXQAbstract
    */
   protected final BXQSequence execute() throws XQException {
     opened();
-    final QueryContext qctx = query.ctx;
+    final QueryContext qctx = qp.ctx;
     qctx.ns = sc.ctx.ns;
 
     try {
@@ -241,7 +241,7 @@ abstract class BXQDynamicContext extends BXQAbstract
           }
         }.start();
       }
-      query.parse();
+      qp.parse();
       qctx.compile();
       Iter iter = qctx.iter();
       if(sc.scrollable) iter = SeqIter.get(iter);
@@ -258,7 +258,7 @@ abstract class BXQDynamicContext extends BXQAbstract
   @Override
   public final void close() throws XQException {
     try {
-      if(!closed) query.close();
+      if(!closed) qp.close();
     } catch(final IOException ex) {
       throw new XQQueryException(ex.getMessage());
     }
