@@ -112,7 +112,7 @@ public class CmdTest {
     ok(new InfoDB());
     ok(new CreateDB(NAME, FILE));
     ok(new CreateDB("abcde"));
-    ok(new CreateDB(""));
+    no(new CreateDB(""));
   }
 
   /** Command Test. */
