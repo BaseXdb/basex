@@ -48,8 +48,6 @@ public class CreateDB extends ACreate {
 
   @Override
   protected boolean run() {
-    System.out.println(args[1]);
-    System.out.println(args[0]);
     if(args[1] == null) return build(Parser.emptyParser(args[0]), args[0]);
     final IO io = IO.get(args[1]);
     return io.exists() ? build(new DirParser(io, prop), args[0]) :
