@@ -218,7 +218,7 @@ public class BaseXClient {
      * @return value of check
      * @throws IOException I/O exception
      */
-    public boolean more() throws IOException { 
+    public boolean more() throws IOException {
       // send 1 to get next result item, and {ID}0 for identification
       out.write(1);
       send(id);

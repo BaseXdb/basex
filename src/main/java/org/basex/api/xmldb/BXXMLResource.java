@@ -192,7 +192,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     }
   }
 
-  /** SAX Parser. */
+  /** SAX parser. */
   private static final class BXSAXContentHandler extends DefaultHandler {
     /** HashMap. */
     private final HashMap<String, String> ns = new HashMap<String, String>();

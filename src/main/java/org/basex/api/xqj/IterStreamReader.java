@@ -493,7 +493,7 @@ final class IterStreamReader implements XMLStreamReader {
     private final NodeIter[] iter = new NodeIter[IO.MAXHEIGHT];
     /** Iterator. */
     private final Nod[] node = new Nod[IO.MAXHEIGHT];
-    /** Iterator Level. */
+    /** Iterator level. */
     private int l;
 
     /** Constructor. */
@@ -526,7 +526,7 @@ final class IterStreamReader implements XMLStreamReader {
     void next() { }
   }
 
-  /** Dummy Location Implementation. */
+  /** Dummy location implementation. */
   static final class LocationImpl implements Location {
     public int getCharacterOffset() { return -1; }
     public int getColumnNumber() { return -1; }
