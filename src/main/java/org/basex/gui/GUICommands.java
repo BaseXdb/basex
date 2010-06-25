@@ -141,16 +141,12 @@ public enum GUICommands implements GUICommand {
       if(!dialog.ok()) return;
 
       final IO io = IO.get(dialog.path());
-      if(io.exists() && !io.isDir() && !Dialog.confirm(gui,
+      if(io.exists() && io.isDir() && io.children().length > 0
+          && !Dialog.confirm(gui,
           Main.info(FILEREPLACE, io))) return;
 
       String path = io.path();
-      String name = null;
-      if(dialog.file()) {
-        path = io.dir();
-        name = io.name();
-      }
-      gui.execute(new Export(path, name));
+      gui.execute(new Export(path));
     }
   },
 

@@ -126,7 +126,7 @@ dq_question=Enregistrer les modifications à % ?
 
 dx_outfile=Fichier de sortie
 dx_outdir=Dossier de sortie
-dx_overfile=Le fichier va être remplacé.
+dx_overfile=Dossier n'est pas vide. Fichiers existants vont être remplacé.
 dx_indent=Indenter par des espaces
 dx_invpath=Chemin invalide.
 

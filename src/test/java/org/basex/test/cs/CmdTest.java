@@ -200,10 +200,10 @@ public class CmdTest {
   /** Command Test. */
   @Test
   public final void export() {
-    final IO io = IO.get("export.xml");
+    final IO io = IO.get("input.xml");
     no(new Export(io.path()));
     ok(new CreateDB(NAME, FILE));
-    ok(new Export(".", io.name()));
+    ok(new Export("."));
     ok(io.exists());
     ok(io.delete());
   }

@@ -126,7 +126,7 @@ dq_question=Änderungen speichern in %?
 
 dx_outfile=Ausgabedatei
 dx_outdir=Ausgabeverzeichnis
-dx_overfile=Datei wird überschrieben.
+dx_overfile=Verzeichnis nicht leer. Existierende Dateien werden überschrieben.
 dx_indent=Mit Leerzeichen einrücken
 dx_invpath=Ungültiger Pfad.
 

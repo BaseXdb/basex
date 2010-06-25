@@ -126,7 +126,7 @@ dq_question=Save changes to %?
 
 dx_outfile=Output file
 dx_outdir=Output directory
-dx_overfile=File will be overwritten.
+dx_overfile=Directory not empty. Existing files will be overwritten.
 dx_indent=Indent with whitespaces
 dx_invpath=Invalid path.
 

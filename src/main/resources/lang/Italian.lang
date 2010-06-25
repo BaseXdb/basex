@@ -126,7 +126,7 @@ dq_question=Salva in %?
 
 dx_outfile=Documento di output
 dx_outdir=Cartella di output
-dx_overfile=Il documento verrà sovrascritto.
+dx_overfile=Directory not empty. Existing files will be overwritten.
 dx_indent=Indentare con spazi
 dx_invpath=Percorso non valido.
 

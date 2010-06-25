@@ -23,27 +23,18 @@ import org.basex.util.Token;
  */
 public final class Export extends Proc {
   /**
-   * Default constructor.
-   * @param target export target
-   */
-  public Export(final String target) {
-    this(target, null);
-  }
-
-  /**
    * Default constructor, specifying an optional output filename.
    * @param target export path
-   * @param name optional name of output file
    */
-  public Export(final String target, final String name) {
-    super(DATAREF | User.READ | User.CREATE, target, name);
+  public Export(final String target) {
+    super(DATAREF | User.READ | User.CREATE, target);
   }
 
   @Override
   protected boolean run() {
     try {
       final Data data = context.data;
-      export(context.prop, data, args[0], args[1]);
+      export(context.prop, data, args[0]);
       return info(DBEXPORTED, data.meta.name, perf);
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -59,32 +50,33 @@ public final class Export extends Proc {
    */
   public static void export(final Context context, final Data data)
       throws IOException {
-    export(context.prop, data, data.meta.file.path(), null);
+    export(context.prop, data, data.meta.file.path());
   }
 
   /**
-   * Exports the current database to the specified path and file.
+   * Exports the current database to the specified path.
+   * Files and Folders contained in {@code path} will be possibly overwritten.
    * @param prop property
    * @param data data reference
    * @param target file path
-   * @param name optional file name
    * @throws IOException I/O exception
    */
   private static void export(final Prop prop, final Data data,
-      final String target, final String name) throws IOException {
+      final String target) throws IOException {
 
     final int[] docs = data.doc();
     final IO root = IO.get(target);
 
     for(final int pre : docs) {
+      final String dName = data.text(pre, true).length > 0 ?
+          Token.string(data.text(pre, true)) : data.meta.name;
       // create file path
-      final IO file = docs.length == 1 && name != null ? root.merge(name) :
-        IO.get(root + "/" + Token.string(data.text(pre, true)));
-
+      final IO file = IO.get(root + "/" + dName);
       // create dir if necessary
       final IO dir = IO.get(file.dir());
       if(!dir.exists()) dir.md();
-
+      // [MS] still produces unwanted results if one or more files
+      // inside a collection have the same name.
       // serialize nodes
       final PrintOutput po = new PrintOutput(file.path());
       final SerializerProp sp = new SerializerProp(prop.get(Prop.EXPORTER));

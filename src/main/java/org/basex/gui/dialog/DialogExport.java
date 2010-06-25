@@ -34,8 +34,6 @@ public final class DialogExport extends Dialog {
   private static String[] encodings;
   /** Directory path. */
   private final BaseXTextField path;
-  /** Directory/File flag. */
-  private final boolean file;
   /** Database info. */
   private final BaseXLabel info;
   /** Output label. */
@@ -64,10 +62,8 @@ public final class DialogExport extends Dialog {
     p.add(out);
     p.add(new BaseXLabel());
 
-    file = gui.context.doc().length == 1;
-
     final IO io = gui.context.data.meta.file;
-    final String fn = file ? io.path() : io.getDir();
+    final String fn = io.getDir();
     path = new BaseXTextField(fn, this);
     path.addKeyListener(keys);
     p.add(path);
@@ -133,8 +129,8 @@ public final class DialogExport extends Dialog {
    * Opens a file dialog to choose an XML document or directory.
    */
   void choose() {
-    final IO io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).select(
-        file ? BaseXFileChooser.Mode.FOPEN : BaseXFileChooser.Mode.DOPEN);
+    final IO io = new BaseXFileChooser(DIALOGFC, path.getText(), gui).
+      select(BaseXFileChooser.Mode.DOPEN);
     if(io != null) path.setText(io.path());
   }
 
@@ -146,25 +142,17 @@ public final class DialogExport extends Dialog {
     return path.getText().trim();
   }
 
-  /**
-   * Indicates if the specified path is a file or directory.
-   * @return result of check
-   */
-  public boolean file() {
-    return file;
-  }
 
   @Override
   public void action(final Object cmp) {
-    out.setText((file ? OUTFILE : OUTDIR) + COL);
+    out.setText(OUTDIR + COL);
     final IO io = IO.get(path());
     final boolean empty = path().isEmpty();
     final boolean exists = io.exists();
-    ok = !empty && (file && (!exists || !io.isDir()) ||
-        !file && (!exists || io.isDir()));
+    ok = !empty && ((!exists || !io.isDir()) || (!exists || io.isDir()));
 
-    info.setText(ok && file && exists ? OVERFILE : !ok && !empty ?
-        INVPATH : null, ok ? Msg.WARN : Msg.ERR);
+    info.setText(!ok && !empty ? INVPATH : io.children().length > 0 ? OVERFILE
+        : null, ok ? Msg.WARN : Msg.ERR);
     enableOK(buttons, BUTTONOK, ok);
   }
 
