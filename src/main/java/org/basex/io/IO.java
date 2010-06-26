@@ -44,7 +44,7 @@ public abstract class IO {
   /** First call. */
   protected boolean more;
   /** File name. */
-  private String name;
+  public String name;
 
   /**
    * Protected constructor.
