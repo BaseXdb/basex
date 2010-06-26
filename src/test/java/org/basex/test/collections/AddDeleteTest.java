@@ -1,6 +1,7 @@
 package org.basex.test.collections;
 
 import static org.junit.Assert.*;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.Add;
@@ -33,6 +34,8 @@ public class AddDeleteTest {
   private static final String ZIPFILE = "etc/xml/xml.zip";
   /** Test GZIP file. */
   private static final String GZIPFILE = "etc/xml/build.xml.gz";
+  /** Test XML Fragment */
+  private static final String XMLFRAG = "<xml><foo /><bar>foo</bar></xml>";
   /** Test database name. */
   private static final String NAME = "CollectionUnitTest";
 
@@ -66,11 +69,20 @@ public class AddDeleteTest {
   }
 
   /**
-   * [MS] Adds an <?xml...>-String to the database.
+   * Adds a XML Fragment to the database.
+   * 1) with name and w/o target
+   * 2) with name and target set
+   * 3) w/o name and target set
    */
-  // @Test
+  @Test
   public final void testAddXMLString() {
-    fail("Not yet implemented");
+    new Add(XMLFRAG, "index.xml").exec(CTX);
+    assertEquals(1, CTX.doc().length);
+    new Add(XMLFRAG,"index2.xml", "a/b/c").exec(CTX);
+    assertEquals(2, CTX.doc().length);
+    new Add(XMLFRAG, null, "a/d/c").exec(CTX);
+    assertEquals(3, CTX.doc().length);
+
   }
 
   /**
