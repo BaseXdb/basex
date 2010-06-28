@@ -188,7 +188,7 @@ public final class DeepFSExample {
     try {
       for(File f : File.listRoots())
         walker.traverse(f);
-    } catch(final RuntimeException e) {
+    } catch(final RuntimeException ex) {
       if(ff.mp3Dir != null)
         mp3Directory = new File(ff.mp3Dir).getParentFile().getParentFile();
       if(ff.jpgDir != null)

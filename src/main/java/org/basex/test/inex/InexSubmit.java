@@ -316,7 +316,7 @@ public final class InexSubmit {
     xml.closeElement();
     xml.openElement(token("indexing_description"));
     xml.text(token("The full-text indexes of BaseX support both a " +
-        "quick and sped up evaluation of simple full text queries as well " +
+        "quick and sped up evaluation of simple full-text queries as well " +
         "as the full evaluation of all recommended features of the upcoming " +
         "XQFT Recommendation. " +
         "Positions and pointers on the text nodes are stored in the indexes " +

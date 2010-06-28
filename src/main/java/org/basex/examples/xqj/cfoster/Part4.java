@@ -73,8 +73,8 @@ public final class Part4 extends Main {
     // value 1000 is outside the range of xs:byte (-128 to 127)
     try {
       items[6] = conn.createItemFromInt(1000, xsByte);
-    } catch(final XQException e) {
-      System.out.println(e.getMessage());
+    } catch(final XQException ex) {
+      System.out.println(ex.getMessage());
     }
 
     for(XQItem it : items) {

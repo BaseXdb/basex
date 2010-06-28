@@ -73,8 +73,8 @@ public final class Part3 extends Main {
       // validate against dateType (xs:date)
       xqpe.bindAtomicValue(new QName("fromDate"), "2008-01-32", dateType);
       // There are NOT 32 days in January, so this should fail!
-    } catch(XQException e) {
-      System.out.println(e.getMessage());
+    } catch(XQException ex) {
+      System.out.println(ex.getMessage());
       // Now set a proper date: validate against dateType (xs:date)
       xqpe.bindAtomicValue(new QName("fromDate"), "2008-01-01", dateType);
     }

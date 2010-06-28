@@ -113,7 +113,6 @@ public final class StressTest {
 
         // server is stopped after last client has finished
         if(++finished == StressTest.NCLIENTS) stopServer();
-
       } catch(final IOException ex) {
         ex.printStackTrace();
       }

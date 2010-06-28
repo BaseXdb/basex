@@ -58,7 +58,6 @@ public final class XMLDBQuery {
         // Write the result to the console.
         System.out.println(res.getContent());
       }
-
     } catch(final XMLDBException ex) {
       // Handle exceptions.
       System.err.println("XML:DB Exception occured " + ex.errorCode);

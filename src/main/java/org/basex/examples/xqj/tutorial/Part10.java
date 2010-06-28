@@ -120,8 +120,8 @@ public final class Part10 extends Main {
         SAXResult result = new SAXResult(getContentHandler());
         xqs.writeSequenceToResult(result);
         xqs.close();
-      } catch(XQException e) {
-        throw new SAXException(e);
+      } catch(XQException ex) {
+        throw new SAXException(ex);
       }
     }
   }

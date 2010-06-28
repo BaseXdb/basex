@@ -88,7 +88,6 @@ public final class StressTest {
 
         // database is dropped after last client has finished
         if(++finished == StressTest.NCLIENTS) dropDB();
-
       } catch(final BaseXException ex) {
         ex.printStackTrace();
       }

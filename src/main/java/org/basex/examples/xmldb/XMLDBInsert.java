@@ -53,7 +53,6 @@ public final class XMLDBInsert {
 
       // Store the resource into the database.
       col.storeResource(res);
-
     } catch(final XMLDBException ex) {
       // Handle exceptions.
       System.err.println("XML:DB Exception occured " + ex.errorCode);
