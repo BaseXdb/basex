@@ -99,7 +99,7 @@ abstract class BXCode {
       return file;
     } catch(final IOException ex) {
       // try to delete temporary file before returning the exception
-      try { bos.close(); } catch(final IOException e) { }
+      try { bos.close(); } catch(final IOException exx) { }
       file.delete();
       throw ex;
     }

@@ -472,7 +472,7 @@ public final class XQJTest extends TestCase {
     conn.getStaticContext().setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
     XQExpression xqe = conn.createExpression();
-    XQSequence xqs = xqe.executeQuery("basex:db('input')");
+    final XQSequence xqs = xqe.executeQuery("basex:db('input')");
     xqs.first();
     final XQItem xqi = xqs.getItem();
 

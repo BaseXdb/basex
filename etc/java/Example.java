@@ -39,7 +39,6 @@ public final class Example {
       // print time needed
       double ms = (System.nanoTime() - time) / 1000000d;
       System.out.println("\n" + ms + " ms");
-
     } catch(IOException ex) {
       ex.printStackTrace();
     }

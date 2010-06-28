@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.StreamingOutput;
-
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
