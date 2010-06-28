@@ -103,7 +103,7 @@ public final class Namespaces {
    */
   public void close(final int pre) {
     while(root.pre >= pre && root.par != null) root = root.par;
-    --uriL;
+    uriStack[--uriL] = uriL > 0 ? uriStack[uriL - 1] : 0;
   }
 
   /**
