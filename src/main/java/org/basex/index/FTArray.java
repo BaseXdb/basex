@@ -85,7 +85,7 @@ final class FTArray {
             != 0) {
           // any child has an appropriate value to valueToInsert;
           // create new node and append it; save data
-          int[] e = new int[2 + off.length];
+          final int[] e = new int[2 + off.length];
           e[0] = tokens.size();
           tokens.add(v);
           e[1] = s;
@@ -119,7 +119,7 @@ final class FTArray {
             Token.diff(tokens.get(next.get(cnn[p])[0])[0], r2[0]) != 0) {
             // create new node and append it, because any child from curretnNode
             // start with the same letter than reamin2
-            int[] e = new int[2 + off.length];
+            final int[] e = new int[2 + off.length];
             e[0] = tokens.size();
             tokens.add(r2);
             e[1] = s;

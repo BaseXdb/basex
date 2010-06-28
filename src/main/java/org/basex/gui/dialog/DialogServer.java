@@ -378,8 +378,8 @@ public final class DialogServer extends Dialog {
       if(msg.equals(Main.info(PERMNO, CmdPerm.values()[4]))) {
         try {
           cs.execute(new Exit());
-        } catch(final IOException e) {
-          e.printStackTrace();
+        } catch(final IOException exx) {
+          exx.printStackTrace();
         }
       }
     }

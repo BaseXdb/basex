@@ -532,7 +532,7 @@ public final class TreeView extends View implements TreeViewOptions {
   private int getBigRectPosition(final int rn, final int lv, final int pre,
       final TreeRect r) {
     final int idx = sub.getPreIndex(rn, lv, pre);
-    final double ratio = idx / (double) (sub.getLevelSize(rn, lv));
+    final double ratio = idx / (double) sub.getLevelSize(rn, lv);
     return r.x + (int) Math.round((r.w - 1) * ratio) + 1;
   }
 
@@ -622,7 +622,6 @@ public final class TreeView extends View implements TreeViewOptions {
 
     // draws node text
     if(t == DRAW_HIGHLIGHT) drawThumbnails(g, rn, lv, pre, r, isRoot);
-
   }
 
   /**
@@ -712,7 +711,6 @@ public final class TreeView extends View implements TreeViewOptions {
           highlightDescendants(g, rn, lvd, dr, dp, getRectCenter(dr),
               t == DRAW_CONN ? DRAW_CONN : DRAW_DESCENDANTS);
         }
-
       }
     }
 
@@ -757,7 +755,6 @@ public final class TreeView extends View implements TreeViewOptions {
     // }
     // }
     // }
-
   }
 
   /**
@@ -906,7 +903,6 @@ public final class TreeView extends View implements TreeViewOptions {
         g.drawLine((boRight + boLeft) / 2, boTop, parc, pary);
       }
     }
-
   }
 
   /**
@@ -961,7 +957,6 @@ public final class TreeView extends View implements TreeViewOptions {
           // if multiple pre values, then approximate pre value
           if(tr.isBigRectangle(sub, rn, lv)) {
             pre = tr.getPrePerXPos(sub, rn, lv, mousePosX);
-
           } else {
             pre = sub.getPrePerIndex(rn, lv, i);
           }
@@ -1142,7 +1137,6 @@ public final class TreeView extends View implements TreeViewOptions {
       selectRect.y = e.getY();
       selectRect.h = 1;
       selectRect.w = 1;
-
     } else {
       final int x = e.getX();
       final int y = e.getY();

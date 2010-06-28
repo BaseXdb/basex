@@ -4,7 +4,6 @@ import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-
 import org.basex.core.CommandBuilder;
 import org.basex.core.Main;
 import org.basex.core.User;

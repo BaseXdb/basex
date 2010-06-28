@@ -352,7 +352,7 @@ public final class Tokenizer implements IndexToken {
     // find first character to be normalized
     final int tl = t.length;
     for(int i = 0; i < tl; i += cl(t[i])) {
-      int c = cp(t, i);
+      final int c = cp(t, i);
       // normalized character found; run conversion
       if(c != norm(c)) {
         final TokenBuilder tb = new TokenBuilder();

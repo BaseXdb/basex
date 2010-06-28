@@ -145,7 +145,7 @@ public enum GUICommands implements GUICommand {
           && !Dialog.confirm(gui,
           Main.info(FILEREPLACE, io))) return;
 
-      String path = io.path();
+      final String path = io.path();
       gui.execute(new Export(path));
     }
   },

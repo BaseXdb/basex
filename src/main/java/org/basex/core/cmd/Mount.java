@@ -46,8 +46,8 @@ public final class Mount extends Command {
           final Class<?> cls = Class.forName("org.deepfs.DeepFSImpl");
           cls.getMethod("mount", new Class[] { String.class, DeepFS.class }).
             invoke(null, mp, fs);
-        } catch (final Exception e) {
-          Main.err("Cannot mount: ", e);
+        } catch (final Exception ex) {
+          Main.err("Cannot mount: ", ex);
         }
       }
     }.start();

@@ -119,8 +119,8 @@ final class TreeSubtree {
    */
   int getMaxSubtreeHeight() {
     int h = 0;
-    for(int i = 0; i < border.length; i++) {
-      final int hh = border[i].length;
+    for(final TreeBorder[] b : border) {
+      final int hh = b.length;
       if(hh > h) h = hh;
     }
     return h;

@@ -44,7 +44,7 @@ public final class BMPParser implements IFileParser {
     f.skip(16);
     try {
       f.buffer(8);
-    } catch(final EOFException e) {
+    } catch(final EOFException ex) {
       return;
     }
 

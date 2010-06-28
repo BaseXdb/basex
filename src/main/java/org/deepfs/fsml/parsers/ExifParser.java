@@ -231,8 +231,8 @@ public final class ExifParser {
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
-        } catch(final IOException e) {
-          err(o.deepFile, e);
+        } catch(final IOException ex) {
+          err(o.deepFile, ex);
         }
       }
     },
@@ -246,8 +246,8 @@ public final class ExifParser {
         try {
           o.bfc.position(buf.getInt());
           o.readIFD();
-        } catch(final IOException e) {
-          err(o.deepFile, e);
+        } catch(final IOException ex) {
+          err(o.deepFile, ex);
         }
       }
     },
@@ -664,8 +664,8 @@ public final class ExifParser {
             try { // prepare the byte buffer
               o.bfc.position(buf.getInt());
               o.bfc.buffer(size);
-            } catch(final IOException e) {
-              err(o.deepFile, e);
+            } catch(final IOException ex) {
+              err(o.deepFile, ex);
               return false;
             }
             inlined = false;
@@ -834,8 +834,8 @@ public final class ExifParser {
             d.debug("ExifParser: Unknown or unsupported field type for " +
                 "non-inlined data (%)", format);
         }
-      } catch(final Exception e) {
-        err(d, e.getMessage());
+      } catch(final Exception ex) {
+        err(d, ex.getMessage());
       }
     }
 
@@ -1013,7 +1013,7 @@ public final class ExifParser {
   boolean check(final DeepFile df) throws IOException {
     deepFile = df;
     bfc = df.getBufferedFileChannel();
-    try { bfc.buffer(8); } catch(final EOFException e) { return false; }
+    try { bfc.buffer(8); } catch(final EOFException ex) { return false; }
     if(checkEndianness(bfc) && bfc.getShort() == 0x2A) return true;
     bfc.setByteOrder(ByteOrder.BIG_ENDIAN);
     return false;
@@ -1037,8 +1037,8 @@ public final class ExifParser {
     bfc.position(ifdOffset);
     try {
       readIFD();
-    } catch(final IOException e) {
-      throw e;
+    } catch(final IOException ex) {
+      throw ex;
     } finally {
       bfc.setByteOrder(ByteOrder.BIG_ENDIAN); // set byte order to default value
     }

@@ -278,7 +278,7 @@ public final class FTWords extends FTExpr {
       if(tok.length > Token.MAXLEN) return false;
       if(fto.sw != null && fto.sw.id(tok) != 0) continue;
 
-      // reduce number of expected results to favor full text index requests
+      // reduce number of expected results to favor full-text index requests
       final int s = ic.data.nrIDs(ft) + 3 >> 2;
       if(ic.is > s || ic.is == 0) ic.is = s;
       if(s == 0) break;

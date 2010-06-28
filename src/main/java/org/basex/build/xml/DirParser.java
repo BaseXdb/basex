@@ -71,23 +71,28 @@ public final class DirParser extends Parser {
   /**
    * Parses the specified file or its children.
    * @param b builder
-   * @param path file path
+   * @param io input
    * @throws IOException I/O exception
    */
-  private void parse(final Builder b, final IO path) throws IOException {
-    if(path.isDir()) {
-      for(final IO f : path.children()) parse(b, f);
+  private void parse(final Builder b, final IO io) throws IOException {
+    if(io.isDir()) {
+      for(final IO f : io.children()) parse(b, f);
     } else {
-      file = path;
-      while(path.more()) {
-        if(!path.name().matches(filter)) continue;
+      file = io;
+      while(io.more()) {
+        if(!io.name().matches(filter)) continue;
         b.meta.filesize += file.length();
 
-        // extract target path
-        final String trg = (target + '/' + file.path().replaceAll(
-            "^" + root + "|" + file.name() + "$", "")).replaceAll("^/", "").
-            replaceAll(file.rname + "$", "");
-        parser = Parser.fileParser(file, prop, trg);
+        // use global target as prefix
+        String targ = target.length() != 0 ? target + '/' : "";
+        // add relative path without root (prefix) and file name (suffix)
+        final String path = file.path();
+        final String name = file.name();
+        if(path.endsWith('/' + name)) {
+          targ += path.replaceAll("^" + root, "").replaceAll(name + "$", "");
+        }
+
+        parser = Parser.fileParser(file, prop, targ);
         parser.parse(b);
 
         if(Prop.debug && ++c % 1000 == 0) Main.err(";");

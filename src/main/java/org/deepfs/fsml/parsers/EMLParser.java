@@ -74,8 +74,8 @@ public final class EMLParser implements IFileParser {
         final byte[] text = tb.finish();
         try {
           obj.deepFile.addMeta(MetaElem.SUBJECT, obj.decode(text));
-        } catch(final DecodingException e) {
-          obj.deepFile.debug("EMLParser: Failed to decode subject (%)", e);
+        } catch(final DecodingException ex) {
+          obj.deepFile.debug("EMLParser: Failed to decode subject (%)", ex);
         }
         return false;
       }
@@ -358,8 +358,8 @@ public final class EMLParser implements IFileParser {
         final byte[] data = bodyEnc.decode(text, utf);
         final int size = data.length;
         if(size > 0) deepFile.addText(pos2, text.length, Token.string(data));
-      } catch(final DecodingException e) {
-        deepFile.debug("EMLParser: Failed to decode text (%)", e);
+      } catch(final DecodingException ex) {
+        deepFile.debug("EMLParser: Failed to decode text (%)", ex);
       }
     } else {
       while(readLine()) {
@@ -458,9 +458,9 @@ public final class EMLParser implements IFileParser {
         final byte[] text = chop(Token.token(addresses.substring(pos, end)));
         try {
           deepFile.addMeta(name, chop(decode(text)));
-        } catch(final DecodingException e) {
+        } catch(final DecodingException ex) {
           deepFile.debug("EMLParser: Failed to decode mail address (% - %)",
-              name, e);
+              name, ex);
         }
       }
       pos = m.end() + 2;

@@ -33,7 +33,7 @@ public final class TriggerPool {
    * @return success of operation
    */
   public boolean attach(final ServerProcess trigger, final ServerProcess sp) {
-    Sessions s = triggers.get(trigger);
+    final Sessions s = triggers.get(trigger);
     if(s != null) {
       s.add(sp);
       return true;
@@ -48,7 +48,7 @@ public final class TriggerPool {
    * @return success of operation
    */
   public boolean detach(final ServerProcess trigger, final ServerProcess sp) {
-    Sessions s = triggers.get(trigger);
+    final Sessions s = triggers.get(trigger);
     if(s != null) {
       s.delete(sp);
       return true;

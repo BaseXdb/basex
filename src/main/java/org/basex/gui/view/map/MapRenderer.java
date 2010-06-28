@@ -114,7 +114,7 @@ final class MapRenderer {
       }
 
       if(draw) {
-        // colour each full text hit
+        // colour each full-text hit
         g.setColor(r.pos != null && r.pos.contains(ftt.pos) && !ftt.isSC()
             ? COLORFT : textc);
         g.drawString(string(tok), xx + ll, yy);

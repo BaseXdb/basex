@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
@@ -128,7 +127,7 @@ final class FTTrieBuilder extends FTBuilder {
       outt.writeToken(v[min].tok);
 
       // merge and write out data size
-      int s = merge(outb, il, v);
+      final int s = merge(outb, il, v);
       outt.write4(s);
       // write out pointer on full-text data
       outt.write5(outb.size());
@@ -297,7 +296,7 @@ final class FTTrieBuilder extends FTBuilder {
         outa.write5(nxt[j + 1]);
       } else {
         // write pointer on data
-        int n = nxt.length - 2;
+        final int n = nxt.length - 2;
         outa.write5((long) nxt[n] << 16 + (-nxt[n + 1] & 0xFFFF));
       }
       outc.write4(s);

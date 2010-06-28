@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.basex.core.CommandBuilder;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;

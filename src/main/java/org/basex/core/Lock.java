@@ -32,8 +32,8 @@ public final class Lock {
   public void before(final boolean w) {
     if(w) {
       if(state == State.IDLE) {
-          state = State.WRITE;
-          return;
+        state = State.WRITE;
+        return;
       }
       // exclusive lock
       final Resource lx = new Resource(true);
@@ -42,18 +42,18 @@ public final class Lock {
         while(!lx.valid) {
           try {
             lx.wait();
-          } catch(InterruptedException e) {
-            e.printStackTrace();
+          } catch(final InterruptedException ex) {
+            ex.printStackTrace();
           }
         }
         state = State.WRITE;
-        }
+      }
     } else {
       if(state != State.WRITE && waiting.size() == 0) {
-          state = State.READ;
-          activeR++;
-          return;
-        }
+        state = State.READ;
+        activeR++;
+        return;
+      }
       // shared lock
       final Resource ls = new Resource(false);
       synchronized(ls) {
@@ -95,7 +95,7 @@ public final class Lock {
   private synchronized void notifyReaders() {
     while(waiting.size() > 0) {
       if(waiting.getFirst().writer) break;
-      Resource l = waiting.removeFirst();
+      final Resource l = waiting.removeFirst();
       synchronized(l) {
         l.valid = true;
         l.notify();
@@ -108,7 +108,7 @@ public final class Lock {
    */
   private synchronized void notifyWriter() {
     if(waiting.size() > 0) {
-      Resource l = waiting.removeFirst();
+      final Resource l = waiting.removeFirst();
       synchronized(l) {
         l.valid = true;
         l.notify();

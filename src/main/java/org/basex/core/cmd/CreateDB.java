@@ -23,6 +23,7 @@ import org.basex.data.Data.IndexType;
 import org.basex.index.FTBuilder;
 import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 
 /**
  * Evaluates the 'create db' command and creates a new database.
@@ -54,6 +55,7 @@ public class CreateDB extends ACreate {
     final String input = args[1];
     if(input == null) return build(Parser.emptyParser(name), name);
     final IO io = IO.get(input);
+    if(io instanceof IOContent) io.name(name + IO.XMLSUFFIX);
     return io.exists() ? build(new DirParser(io, prop), name) :
       error(FILEWHICH, io);
   }

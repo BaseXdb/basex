@@ -52,7 +52,7 @@ public final class JPGParser implements IFileParser {
     final BufferedFileChannel f = df.getBufferedFileChannel();
     try {
       f.buffer(6);
-    } catch(final EOFException e) {
+    } catch(final EOFException ex) {
       return false;
     }
     int b;

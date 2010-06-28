@@ -33,7 +33,7 @@ public final class GIFParser implements IFileParser {
     final int len = HEADERGIF87.length;
     final BufferedFileChannel f = deepFile.getBufferedFileChannel();
     if(f.size() < len) return false;
-    try { f.buffer(10); } catch(final EOFException e) { return false; }
+    try { f.buffer(10); } catch(final EOFException ex) { return false; }
     final byte[] header = f.get(new byte[len]);
     return eq(header, HEADERGIF87) || eq(header, HEADERGIF89);
   }

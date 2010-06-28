@@ -57,12 +57,13 @@ public final class ValueBuilder extends IndexBuilder {
 
   @Override
   public Values build() throws IOException {
+    // delete old index
+    abort();
+
     final Performance perf = Prop.debug ? new Performance() : null;
     Main.debug(det() + COL);
 
     final String f = text ? DATATXT : DATAATV;
-    DropDB.drop(data.meta.name, f + ".*" + IO.BASEXSUFFIX, data.meta.prop);
-
     final int k = text ? Data.TEXT : Data.ATTR;
 
     for(pre = 0; pre < size; pre++) {

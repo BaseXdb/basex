@@ -12,7 +12,6 @@ import javax.swing.JComponent;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.core.cmd.InfoDB;
 import org.basex.data.Data;
 import org.basex.data.DiskData;

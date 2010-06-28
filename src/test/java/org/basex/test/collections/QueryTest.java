@@ -8,7 +8,6 @@ import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
-import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
 import org.junit.AfterClass;
@@ -25,13 +24,14 @@ public class QueryTest {
   /** Database context. */
   private static final Context CTX = new Context();
 
+  /** Test database name. */
+  private static final String NAME = QueryTest.class.getSimpleName();
   /** Test files. */
-  private static final String[] FILES = { "etc/xml/input.xml",
-      "etc/xml/factbook.xml", "etc/xml/test.xml"};
+  private static final String[] FILES = {
+    "etc/xml/input.xml", "etc/xml/xmark.xml", "etc/xml/test.xml"
+  };
   /** Test ZIP. */
   private static final String ZIP = "etc/xml/xml.zip";
-  /** Test DB name. */
-  private static final String NAME = "CollectionQueryUnitTest";
 
   /**
    * Creates an initial database.
@@ -52,51 +52,52 @@ public class QueryTest {
   @AfterClass
   public static void after() throws BaseXException {
     new DropDB(NAME).execute(CTX);
+    CTX.close();
   }
 
   /**
    * Finds single doc.
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void testFindDoc() throws QueryException {
+  public void testFindDoc() throws Exception {
     final String find = "for $x in ."
-        + " where $x[ends-with(document-uri(.), '" + FILES[1] + "')]"
-        + " and $x//religions/text() contains text 'Catholic' "
-        + " return base-uri($x)";
+      + " where $x[ends-with(document-uri(.), '" + FILES[1] + "')]"
+      + " and $x//location contains text 'uzbekistan' "
+      + " return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CTX);
     assertEquals(1, qp.query().size());
-
+    qp.close();
   }
 
   /**
    * Finds documents in path.
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void testFindDocs() throws QueryException {
+  public void testFindDocs() throws Exception {
     final String find = "for $x in ."
         + " where $x[matches(document-uri(.), 'test/zipped/')]"
         + " return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CTX);
     assertEquals(4, qp.query().size());
-
+    qp.close();
   }
 
   /**
    * Checks if the constructed base-uri matches the base-uri of added documents.
-   * @throws QueryException query exception
+   * @throws Exception exception
    */
   @Test
-  public void testBaseUri() throws QueryException {
+  public void testBaseUri() throws Exception {
     final String find = "for $x in ."
-        + " where $x[ends-with(document-uri(.), '" + FILES[1] + "')]"
-        + " return base-uri($x)";
+      + " where $x[ends-with(document-uri(.), '" + FILES[1] + "')]"
+      + " return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CTX);
     final Item it = qp.iter().next();
     final String expath = '"' + CTX.data.meta.file.url().replace(NAME, "")
         + FILES[1] + '"';
     assertEquals(expath, it.toString());
-
+    qp.close();
   }
 }

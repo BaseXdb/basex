@@ -41,7 +41,7 @@ public final class TXTParser implements IFileParser {
       final BufferedFileChannel bfc = deepFile.getBufferedFileChannel();
       final int len = (int) Math.min(bfc.size(), deepFile.maxTextSize());
       return Token.valid(bfc.get(new byte[len]));
-    } catch(final Exception e) {
+    } catch(final Exception ex) {
       return false;
     }
   }

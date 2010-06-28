@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 
 /**
- * This class provides a skeleton for full-text index builders.
+ * This class contains common methods for full-text index builders.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -80,23 +80,16 @@ public abstract class FTBuilder extends IndexBuilder {
     sw = new StopWords(d, prop.get(Prop.STOPWORDS));
   }
 
-  @Override
-  public void abort() {
-    DropDB.drop(data.meta.name, DATAFTX + ".*" + IO.BASEXSUFFIX,
-        data.meta.prop);
-    data.meta.ftxindex = false;
-  }
-
   /**
    * Extracts and indexes words from the specified data reference.
    * @throws IOException IO exception
    */
   protected final void index() throws IOException {
+    // delete old index
+    abort();
+
     final Performance perf = Prop.debug ? new Performance() : null;
     Main.debug(det() + COL);
-
-    DropDB.drop(data.meta.name, DATAFTX + ".*" + IO.BASEXSUFFIX,
-        data.meta.prop);
 
     for(pre = 0; pre < size; pre++) {
       if((pre & 0xFFFF) == 0) check();
@@ -252,7 +245,7 @@ public abstract class FTBuilder extends IndexBuilder {
         }
       }
 
-      // fulltext data is stored here, with -scoreU, pre1, pos1, ...,
+      // full-text data is stored here, with -scoreU, pre1, pos1, ...,
       // -scoreU, preU, posU
       for(final int l = np + Num.len(vpre, np); np < l; np++)
         out.write(vpre[np]);
@@ -295,6 +288,13 @@ public abstract class FTBuilder extends IndexBuilder {
    * @throws IOException I/O exception
    */
   abstract void write() throws IOException;
+
+  @Override
+  public final void abort() {
+    DropDB.drop(data.meta.name, DATAFTX + ".*" + IO.BASEXSUFFIX,
+        data.meta.prop);
+    data.meta.ftxindex = false;
+  }
 
   @Override
   public final String det() {

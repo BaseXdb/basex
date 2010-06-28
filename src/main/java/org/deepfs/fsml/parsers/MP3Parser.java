@@ -264,7 +264,7 @@ public final class MP3Parser implements IFileParser {
       deepFile.addMeta(MetaElem.MODE, MODES[mode]);
       deepFile.addMeta(MetaElem.EMPHASIS, EMPH[emph]);
       deepFile.addMeta(MetaElem.ENCODING, ENCODE[encoding]);
-    } catch(final IOException e) { /* end of file ... */ }
+    } catch(final IOException ex) { /* end of file ... */ }
   }
 
   // ---------------------------------------------------------------------------
@@ -974,8 +974,9 @@ public final class MP3Parser implements IFileParser {
       void parse(final MP3Parser obj, final int size) throws IOException {
         try {
           obj.deepFile.addMeta(MetaElem.TRACK, obj.readTrack(size));
-        } catch(final ParserException e) {
-          obj.deepFile.debug("MP3Parser: Failed to parse track number (%).", e);
+        } catch(final ParserException ex) {
+          obj.deepFile.debug("MP3Parser: Failed to parse track number (%).",
+              ex);
         }
       }
     },

@@ -244,8 +244,7 @@ public abstract class Command extends Progress {
 
   /**
    * Builds a string representation from the command. This string must be
-   * correctly built, as commands are sent to the server in their string
-   * representation.
+   * correctly built, as commands are sent to the server as strings.
    * @param cb command builder
    */
   public void build(final CommandBuilder cb) {

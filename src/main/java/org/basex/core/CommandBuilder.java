@@ -22,16 +22,16 @@ public final class CommandBuilder {
   public CommandBuilder(final Command c) {
     cmd = c;
   }
-  
+
   /**
-   * Initializes the builder with the class name of the command in upper case. 
+   * Initializes the builder with the class name of the command in upper case.
    * @return self instance
    */
   public CommandBuilder init() {
     init(Main.name(cmd).toUpperCase());
     return this;
   }
-  
+
   /**
    * Initializes the builder with the specified string.
    * @param s command string
@@ -72,10 +72,10 @@ public final class CommandBuilder {
     arg(null, arg);
     return this;
   }
-  
+
   /**
    * Adds the specified keyword and argument.
-   * Does nothing if the argument is {@code null} or empty. 
+   * Does nothing if the argument is {@code null} or empty.
    * @param key keyword prefix
    * @param arg argument index
    * @return self instance
@@ -95,7 +95,7 @@ public final class CommandBuilder {
     }
     return this;
   }
-  
+
   @Override
   public String toString() {
     return tb.toString();

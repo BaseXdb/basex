@@ -56,7 +56,7 @@ public final class DialogCreateFS extends Dialog {
   private final BaseXCheckBox txtindex;
   /** Attribute value index flag. */
   private final BaseXCheckBox atvindex;
-  /** Fulltext index flag. */
+  /** Full-text index flag. */
   private final BaseXCheckBox ftxindex;
   /** Full-text indexing. */
   private final BaseXCheckBox[] ft = new BaseXCheckBox[4];

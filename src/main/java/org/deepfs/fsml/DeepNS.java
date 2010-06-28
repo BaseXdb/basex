@@ -31,11 +31,11 @@ public enum DeepNS {
 
   /**
    * Adds the corresponding namespace prefix to the element.
-   * @param element the xml element to add the namespace prefix to
+   * @param elem the xml element to add the namespace prefix to
    * @return the element with namespace prefix
    */
-  public String tag(final String element) {
-    return prefix.isEmpty() ? element : prefix + ':' + element;
+  public String tag(final String elem) {
+    return prefix.isEmpty() ? elem : prefix + ':' + elem;
   }
 
   @Override

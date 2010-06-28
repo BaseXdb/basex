@@ -4,7 +4,7 @@
   <groupId>org.basex</groupId>
   <artifactId>basex</artifactId>
   <packaging>jar</packaging>
-  <version>6.1.7</version>
+  <version>6.1.8</version>
   <name>BaseX</name>
   <url>http://basex.org</url>
   <properties>

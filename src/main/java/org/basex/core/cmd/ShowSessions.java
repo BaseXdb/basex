@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import java.io.IOException;
-
 import org.basex.core.CommandBuilder;
 import org.basex.core.Command;
 import org.basex.core.User;

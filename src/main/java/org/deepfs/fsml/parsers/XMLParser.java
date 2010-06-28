@@ -93,10 +93,10 @@ public final class XMLParser implements IFileParser {
     if(deepFile.extractText()) { // if file too big or not well-formed
       try {
         deepFile.fallback();
-      } catch(final ParserException e) {
+      } catch(final ParserException ex) {
         deepFile.debug(
             "XMLParser: Failed to read text content from file with " +
-                "fallback parser (%).", e);
+                "fallback parser (%).", ex);
       }
     }
   }

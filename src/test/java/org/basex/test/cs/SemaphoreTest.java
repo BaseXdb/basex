@@ -29,7 +29,7 @@ public final class SemaphoreTest {
   /** Name. */
   private static final String NAME = "factbook";
   /** Test file. */
-  private static final String FILE = "etc/xml/factbook.xml";
+  private static final String FILE = "etc/xml/factbook.zip";
   /** Test queries. */
   final String [] q = {
       "xquery for $n in (doc('factbook')//province)[position() < 100] " +

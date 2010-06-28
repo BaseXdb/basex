@@ -44,8 +44,8 @@ public final class BaseXWin {
     if(Prop.MAC) {
       try {
         osxGUI = new GUIMacOSX();
-      } catch(final Exception e) {
-        Main.notexpected("Failed to initialize native Mac OS X interface", e);
+      } catch(final Exception ex) {
+        Main.notexpected("Failed to initialize native Mac OS X interface", ex);
       }
     }
 

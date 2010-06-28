@@ -19,7 +19,6 @@ import org.basex.io.IOContent;
  * @author Christian Gruen
  */
 public class Add extends ACreate {
-  
   /**
    * Default constructor.
    * @param input input XML file or XML string
@@ -53,13 +52,16 @@ public class Add extends ACreate {
     final String input = args[0];
     final IO io = IO.get(input);
     if(!io.exists()) return error(FILEWHICH, io);
-    
-    // checks for document name
-    if(args[1] != null) io.name = args[1];
-    if(io instanceof IOContent && args[1] == null)
-      io.name = context.data.meta.name + ".xml";
-    
-    final String name   = args[1] != null ? args[1] : io.name();
+
+    if(args[1] != null) {
+      // set name specified document name
+      io.name(args[1]);
+    } else if(io instanceof IOContent) {
+      // if no name exists, set database name as document name
+      io.name(context.data.meta.name + IO.XMLSUFFIX);
+    }
+
+    final String name   = io.name();
     final String target = path(args[2]);
 
     final DirParser p = new DirParser(io, context.prop, target);

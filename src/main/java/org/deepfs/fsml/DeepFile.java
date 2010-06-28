@@ -546,9 +546,9 @@ public final class DeepFile {
     else {
       try {
         addMeta(elem, xgc.toXMLFormat(), null);
-      } catch(final IllegalStateException e) {
+      } catch(final IllegalStateException ex) {
         Main.debug("DeepFile: Invalid date (file: %, error message: %)",
-            bfc.getFileName(), e.getMessage());
+            bfc.getFileName(), ex.getMessage());
       }
     }
   }
@@ -688,7 +688,7 @@ public final class DeepFile {
       final String xml = co.toString();
       ser.close();
       addXML(position, byteCount, xml);
-    } catch(final QueryException e) { return; }
+    } catch(final QueryException ex) { return; }
   }
 
   /**
@@ -779,13 +779,13 @@ public final class DeepFile {
     for(final String s : suffix) {
       try {
         p = registry.getParser(s.toLowerCase());
-      } catch(final ParserException e) { /* ignore and continue ... */ }
+      } catch(final ParserException ex) { /* ignore and continue ... */ }
       if(p != null) break;
     }
     if(p == null) {
       try {
         p = registry.getFallbackParser();
-      } catch(final ParserException e) { /* ignore and continue ... */ }
+      } catch(final ParserException ex) { /* ignore and continue ... */ }
     }
     if(p != null) p.extract(df);
   }
@@ -940,7 +940,7 @@ public final class DeepFile {
   public String toString() {
     try {
       return toXML();
-    } catch(final IOException e) {
+    } catch(final IOException ex) {
       return bfc.getFileName() + "(" + metaElements.size()
           + " metadata attributes, " + textContents.size() + " text sections, "
           + xmlContents.size() + " xml sections and " + fileFragments.size()

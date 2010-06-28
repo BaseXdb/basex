@@ -124,7 +124,7 @@ final class FTFuzzyBuilder extends FTBuilder {
       outy.write5(outz.size());
 
       // merge and write out data size
-      int s = merge(outz, il, v);
+      final int s = merge(outz, il, v);
       outy.write4(s);
     }
     writeInd(outx, ind, ind.get(ind.size() - 2) + 1, (int) outy.size());

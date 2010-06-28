@@ -149,7 +149,7 @@ public final class DialogExport extends Dialog {
     final IO io = IO.get(path());
     final boolean empty = path().isEmpty();
     final boolean exists = io.exists();
-    ok = !empty && ((!exists || !io.isDir()) || (!exists || io.isDir()));
+    ok = !empty && (!exists || !io.isDir() || !exists || io.isDir());
 
     info.setText(!ok && !empty ? INVPATH : io.children().length > 0 ? OVERFILE
         : null, ok ? Msg.WARN : Msg.ERR);

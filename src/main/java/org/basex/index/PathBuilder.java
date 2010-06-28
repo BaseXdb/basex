@@ -22,6 +22,8 @@ public final class PathBuilder extends IndexBuilder {
 
   @Override
   public Index build() {
+    abort();
+
     final int[] parStack = new int[IO.MAXHEIGHT];
     final PathSummary path = new PathSummary();
     int h = 0, l = 0;

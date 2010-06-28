@@ -1,7 +1,6 @@
 package org.basex.test.collections;
 
 import static org.junit.Assert.*;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.Add;
@@ -23,31 +22,31 @@ public class AddDeleteTest {
   /** Database context. */
   private static final Context CTX = new Context();
 
+  /** Test database name. */
+  private static final String NAME = AddDeleteTest.class.getSimpleName();
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
   /** Test folder. */
-  private static final String FLDR = "etc/xml";
+  private static final String FLDR = "etc/xml/dir";
   /** Test url. */
   private static final String URL = "http://www.inf.uni-konstanz.de/"
       + "dbis/basex/dl/xmark.xml";
   /** Test ZIP file, same as etc/xml. */
   private static final String ZIPFILE = "etc/xml/xml.zip";
   /** Test GZIP file. */
-  private static final String GZIPFILE = "etc/xml/build.xml.gz";
-  /** Test XML Fragment */
-  private static final String XMLFRAG = "<xml><foo /><bar>foo</bar></xml>";
-  /** Test database name. */
-  private static final String NAME = "CollectionUnitTest";
+  private static final String GZIPFILE = "etc/xml/xml.gz";
+  /** Test XML Fragment. */
+  private static final String XMLFRAG = "<xml a='blu'><foo /></xml>";
 
   /** Number of XML files for folder. */
   private static final int FCNT;
 
   static {
     int fc = 0;
-    for(IO c : IO.get(FLDR).children()) {
-      if(c.name().endsWith(".xml")) fc++;
+    for(final IO c : IO.get(FLDR).children()) {
+      if(c.name().endsWith(IO.XMLSUFFIX)) fc++;
     }
-    FCNT = fc + 4; // +4 for the zip file
+    FCNT = fc;
   }
 
   /**
@@ -78,7 +77,7 @@ public class AddDeleteTest {
   public final void testAddXMLString() {
     new Add(XMLFRAG, "index.xml").exec(CTX);
     assertEquals(1, CTX.doc().length);
-    new Add(XMLFRAG,"index2.xml", "a/b/c").exec(CTX);
+    new Add(XMLFRAG, "index2.xml", "a/b/c").exec(CTX);
     assertEquals(2, CTX.doc().length);
     new Add(XMLFRAG, null, "a/d/c").exec(CTX);
     assertEquals(3, CTX.doc().length);
@@ -147,7 +146,7 @@ public class AddDeleteTest {
   @Test
   public void deletePath() throws BaseXException {
     new Add(FLDR, null, "foo/pub").execute(CTX);
-    new Add(FILE, null, "foo/bar").execute(CTX);
+    new Add(FILE, null, "/foo///bar////").execute(CTX);
     new Add(FLDR, null, "foobar").execute(CTX);
     new Delete("foo").execute(CTX);
     assertEquals(FCNT, CTX.doc().length);

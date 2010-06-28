@@ -51,7 +51,7 @@ public final class DialogCreate extends Dialog {
   private final BaseXCheckBox txtindex;
   /** Attribute value index flag. */
   private final BaseXCheckBox atvindex;
-  /** Fulltext index flag. */
+  /** Full-text index flag. */
   private final BaseXCheckBox ftxindex;
   /** Editable full-text options. */
   private final DialogFT ft;
@@ -76,7 +76,7 @@ public final class DialogCreate extends Dialog {
     p1.setLayout(new TableLayout(2, 1, 0, 4));
     p1.setBorder(8, 8, 8, 8);
 
-    BaseXBack p = new BaseXBack();
+    final BaseXBack p = new BaseXBack();
     p.setLayout(new TableLayout(6, 2, 6, 0));
     p.add(new BaseXLabel(CREATETITLE + COL, false, true));
     p.add(new BaseXLabel());

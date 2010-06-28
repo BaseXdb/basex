@@ -98,8 +98,8 @@ public final class FNFileTest {
   private Item atomic(final FunDef def, final Expr... args) {
     try {
       return Fun.create(def, args).atomic(qc);
-    } catch(final QueryException e) {
-      Main.notexpected(e);
+    } catch(final QueryException ex) {
+      Main.notexpected(ex);
       return null;
     }
   }
@@ -113,8 +113,8 @@ public final class FNFileTest {
   private Iter iter(final FunDef def, final Expr... args) {
     try {
       return Fun.create(def, args).iter(qc);
-    } catch(final QueryException e) {
-      Main.notexpected(e);
+    } catch(final QueryException ex) {
+      Main.notexpected(ex);
       return null;
     }
   }

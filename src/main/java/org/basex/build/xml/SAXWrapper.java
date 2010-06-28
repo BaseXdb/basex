@@ -61,10 +61,10 @@ public final class SAXWrapper extends FileParser {
    * @return io
    */
   private static IO io(final SAXSource s, final String n) {
-    IO io = IO.get(s.getSystemId());
-    io.name = n;
+    final IO io = IO.get(s.getSystemId());
+    io.name(n);
     return io;
-  }  
+  }
 
   @Override
   public void parse() throws IOException {

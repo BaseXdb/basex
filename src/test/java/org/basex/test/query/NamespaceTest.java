@@ -26,14 +26,14 @@ public class NamespaceTest {
 
   /** Test documents. */
   private static String[][] docs = {
-      { "d1", "<x/>" },
-      { "d2", "<x xmlns='xx'/>" },
-      { "d3", "<a:x xmlns:a='aa'><b:y xmlns:b='bb'/></a:x>" },
-      { "d4", "<a:x xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
-      { "d5", "<a:x xmlns:a='aa'/>" },
-      { "d6", "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
-      { "d7", "<x xmlns='xx'><y/></x>" },
-      { "d8", "<a><b xmlns='B'/><c/></a>" }
+    { "d1", "<x/>" },
+    { "d2", "<x xmlns='xx'/>" },
+    { "d3", "<a:x xmlns:a='aa'><b:y xmlns:b='bb'/></a:x>" },
+    { "d4", "<a:x xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
+    { "d5", "<a:x xmlns:a='aa'/>" },
+    { "d6", "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
+    { "d7", "<x xmlns='xx'><y/></x>" },
+    { "d8", "<a><b xmlns='B'/><c/></a>" }
   };
 
 //  /** Test query. */
@@ -201,7 +201,7 @@ public class NamespaceTest {
         "declare namespace a='aa';doc('d4')/a:x/a:y",
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
-  
+
   /** Test query.
    * Detects wrong namespace references.
    */

@@ -133,9 +133,9 @@ public final class FSImporter implements FSTraversal {
             bfc.close();
           } catch(final IOException e1) { /* */}
         }
-      } catch(final IOException e) {
+      } catch(final IOException ex) {
         Main.debug("FSImporter: Failed to open the file (% - %)",
-            f.getAbsolutePath(), e);
+            f.getAbsolutePath(), ex);
       }
       if(xmlFragment == null)
         xmlFragment = FSMLSerializer.serialize(f, false);
@@ -154,7 +154,7 @@ public final class FSImporter implements FSTraversal {
       } finally {
         try {
           qp.close();
-        } catch(final IOException e) { /* */ }
+        } catch(final IOException ex) { /* */ }
       }
     }
 

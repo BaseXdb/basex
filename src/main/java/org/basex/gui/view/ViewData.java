@@ -75,7 +75,7 @@ public final class ViewData {
    * @param data data reference
    * @param p pre value
    * @param s if specified, a short representation is returned
-   * (no full text nodes, only attribute names)
+   * (no full-text nodes, only attribute names)
    * @return name
    */
   public static byte[] content(final Data data, final int p, final boolean s) {

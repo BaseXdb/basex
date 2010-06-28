@@ -186,8 +186,8 @@ public final class BaseXServer extends Main implements Runnable {
   public static boolean ping(final String host, final int port) {
     try {
       new ClientSession(host, port, "", "");
-    } catch(final IOException e) {
-      if(e instanceof LoginException) return true;
+    } catch(final IOException ex) {
+      if(ex instanceof LoginException) return true;
     }
     return false;
   }

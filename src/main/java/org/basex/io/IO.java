@@ -44,9 +44,7 @@ public abstract class IO {
   /** First call. */
   protected boolean more;
   /** File name. */
-  public String name;
-  /** Real File name in fs. */
-  public String rname;
+  protected String name;
 
   /**
    * Protected constructor.
@@ -64,8 +62,8 @@ public abstract class IO {
     path = p;
     // use timer if no name is given
     final String n = path.substring(path.lastIndexOf('/') + 1);
-    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) : n;
-    rname = name;
+    name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) +
+        XMLSUFFIX : n;
   }
 
   /**
@@ -188,12 +186,19 @@ public abstract class IO {
   }
 
   /**
-   * Chops the path of the specified filename. If no name can be extracted,
-   * the current number of milliseconds is used as name.
+   * Returns the name of the resource.
    * @return file name
    */
   public final String name() {
     return name;
+  }
+
+  /**
+   * Sets the name of the resource.
+   * @param n file name
+   */
+  public final void name(final String n) {
+    name = n;
   }
 
   /**
