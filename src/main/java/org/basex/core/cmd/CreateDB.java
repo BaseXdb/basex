@@ -156,7 +156,7 @@ public class CreateDB extends ACreate {
    */
   public static synchronized Data xml(final SAXSource sax, final Context ctx)
       throws IOException {
-    return xml(new SAXWrapper(sax, "") , ctx);
+    return xml(new SAXWrapper(sax) , ctx);
   }
 
   @Override

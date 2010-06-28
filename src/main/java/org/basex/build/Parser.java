@@ -73,8 +73,8 @@ public abstract class Parser extends Progress {
 
     // use default parser
     final SAXSource s = new SAXSource(io.inputSource());
-    if(s.getSystemId() == null) s.setSystemId(io.name());
-    return new SAXWrapper(s, target);
+//    if(s.getSystemId() == null) s.setSystemId(io.name);
+    return new SAXWrapper(s, io.name, target);
   }
 
   /**

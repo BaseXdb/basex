@@ -38,12 +38,33 @@ public final class SAXWrapper extends FileParser {
   /**
    * Constructor.
    * @param s sax source
+   */
+  public SAXWrapper(final SAXSource s) {
+    this(s, IO.get(s.getSystemId()).name(), "");
+  }
+
+  /**
+   * Constructor.
+   * @param s sax source
+   * @param n name
    * @param ta target to insert into.
    */
-  public SAXWrapper(final SAXSource s, final String ta) {
-    super(IO.get(s.getSystemId()), ta);
+  public SAXWrapper(final SAXSource s, final String n, final String ta) {
+    super(io(s, n), ta);
     source = s;
   }
+
+  /**
+   * Returns IO reference.
+   * @param s sax source
+   * @param n name
+   * @return io
+   */
+  private static IO io(final SAXSource s, final String n) {
+    IO io = IO.get(s.getSystemId());
+    io.name = n;
+    return io;
+  }  
 
   @Override
   public void parse() throws IOException {

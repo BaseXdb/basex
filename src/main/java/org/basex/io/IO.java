@@ -45,6 +45,8 @@ public abstract class IO {
   protected boolean more;
   /** File name. */
   public String name;
+  /** Real File name in fs. */
+  public String rname;
 
   /**
    * Protected constructor.
@@ -63,6 +65,7 @@ public abstract class IO {
     // use timer if no name is given
     final String n = path.substring(path.lastIndexOf('/') + 1);
     name = n.isEmpty() ? Long.toString(System.currentTimeMillis()) : n;
+    rname = name;
   }
 
   /**
