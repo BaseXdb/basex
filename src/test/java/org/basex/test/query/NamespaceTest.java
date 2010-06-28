@@ -33,6 +33,7 @@ public class NamespaceTest {
       { "d5", "<a:x xmlns:a='aa'/>" },
       { "d6", "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
       { "d7", "<x xmlns='xx'><y/></x>" },
+      { "d8", "<a><b xmlns='B'/><c/></a>" }
   };
 
 //  /** Test query. */
@@ -199,6 +200,16 @@ public class NamespaceTest {
         "declare namespace a='aa';insert node doc('d6') into doc('d4')/a:x",
         "declare namespace a='aa';doc('d4')/a:x/a:y",
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
+  }
+  
+  /** Test query.
+   * Detects wrong namespace references.
+   */
+  @Test
+  public final void uriStack() {
+    query(
+        "doc('d8')",
+        "<a><b xmlns='B'/><c/></a>");
   }
 
   /** Creates the database context. */
