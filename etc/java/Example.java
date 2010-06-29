@@ -3,7 +3,7 @@ import java.io.IOException;
 /**
  * -----------------------------------------------------------------------------
  *
- * This example shows how BaseX commands can be performed via the Java API.
+ * This example shows how BaseX commands can be performed.
  * The execution time will be printed along with the result of the command.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License

@@ -1,7 +1,7 @@
 <?php
 /* ----------------------------------------------------------------------------
  *
- * This example shows how BaseX commands can be performed via the PHP API.
+ * This example shows how BaseX commands can be performed.
  * The execution time will be printed along with the result of the command.
  *
  * ----------------------------------------------------------------------------

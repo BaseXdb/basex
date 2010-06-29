@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 #
-# This Ruby module provides methods to connect to and communicate with the
+# This module provides methods to connect to and communicate with the
 # BaseX Server.
 #
 # The Constructor of the class expects a hostname, port, username and password
@@ -21,7 +21,7 @@
 require 'socket'
 require 'digest/md5'
 
-# Constructor, creating a new socket connection.
+# see readme.txt
 class Session
   def initialize(host, port, username, pw)
 
@@ -45,7 +45,7 @@ class Session
 
   end
 
-  # Executes the specified command.
+  # see readme.txt
   def execute(com)
     # send command to server
     send(com)
@@ -59,17 +59,17 @@ class Session
     return result
   end
   
-  # Returns a query object.
+  # see readme.txt
   def query(cmd)
     return Query.new(self, cmd)
   end
 
-  # Returns processing information.
+  # see readme.txt
   def info()
     return @info
   end
 
-  # Closes the connection.
+  # see readme.txt
   def close()
     send("exit")
     @socket.close
@@ -101,7 +101,7 @@ class Session
 end
 
 class Query
-  # Constructor, creating a new query object.
+  # see readme.txt
   def initialize(s, q)
     @session = s
     @session.send("\0" + q)
@@ -111,7 +111,7 @@ class Query
     end
   end
   
-  # Checks for more parts of the result.  
+  # see readme.txt  
   def more()
     @session.send("\1" + @id)
     @next = @session.readString
@@ -121,12 +121,12 @@ class Query
     return @next.length != 0
   end
   
-  # Returns the next part of the result.
+  # see readme.txt
   def next()
     return @next
   end
   
-  # Closes the iterative execution.
+  # see readme.txt
   def close()
     @session.send("\2" + @id)
   end

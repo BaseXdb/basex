@@ -1,7 +1,7 @@
 ﻿'
 ' * -----------------------------------------------------------------------------
 ' * 
-' * This VB.Net module provides methods to connect to and communicate with the
+' * This module provides methods to connect to and communicate with the
 ' * BaseX Server.
 ' *
 ' * The Constructor of the class expects a hostname, port, username and password
@@ -40,7 +40,7 @@ Namespace BaseXClient
 		Private bpos As Integer
 		Private bsize As Integer
 
-		'* Constructor, creating a new socket connection. 
+		'* see readme.txt
 		Public Sub New(host As String, port As Integer, username As String, pw As String)
 			socket = New TcpClient(host, port)
 			stream = socket.GetStream()
@@ -52,7 +52,7 @@ Namespace BaseXClient
 			End If
 		End Sub
 
-		'* Executes the specified command. 
+		'* see readme.txt
 		Public Function Execute(com As String, ms As Stream) As Boolean
 			Send(com)
 			Init()
@@ -61,7 +61,7 @@ Namespace BaseXClient
 			Return Ok()
 		End Function
 
-		'* Executes the specified command. 
+		'* see readme.txt
 		Public Function Execute(com As String) As [String]
 			Send(com)
 			Init()
@@ -73,19 +73,19 @@ Namespace BaseXClient
 			Return result
 		End Function
 
-		'* Creates a query object. 
+		'* see readme.txt
 		Public Function query(q As String) As Query
 			Return New Query(Me, q)
 		End Function
 
-		'* Returns the processing information. 
+		'* see readme.txt
 		Public ReadOnly Property Info() As String
 			Get
 				Return m_info
 			End Get
 		End Property
 
-		'* Closes the connection. 
+		'* see readme.txt 
 		Public Sub Close()
 			Send("exit")
 			socket.Close()
@@ -154,7 +154,7 @@ Namespace BaseXClient
 		Private id As String
 		Private nextItem As String
 
-		'* Constructor, creating a new query object. 
+		'* see readme.txt
 		Public Sub New(s As Session, query As String)
 			session = s
 			session.stream.WriteByte(0)
@@ -165,7 +165,7 @@ Namespace BaseXClient
 			End If
 		End Sub
 
-		'* Checks for the next item. 
+		'* see readme.txt 
 		Public Function more() As Boolean
 			session.stream.WriteByte(1)
 			session.Send(id)
@@ -176,12 +176,12 @@ Namespace BaseXClient
 			Return nextItem.Length <> 0
 		End Function
 
-		'* Returns the next item. 
+		'* see readme.txt
 		Public Function [next]() As String
 			Return nextItem
 		End Function
 
-		'* Closes the query. 
+		'* see readme.txt 
 		Public Sub close()
 			session.stream.WriteByte(2)
 			session.Send(id)

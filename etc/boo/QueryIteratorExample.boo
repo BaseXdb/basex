@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------------
  *
  * This example shows how results from a query can be received in an iterative
- * mode via the Boo API.
+ * mode.
  * The execution time will be printed along with the result of the command.
  *
  * -----------------------------------------------------------------------------

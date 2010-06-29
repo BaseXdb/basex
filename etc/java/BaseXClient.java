@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * -----------------------------------------------------------------------------
  *
- * This Java module provides methods to connect to and communicate with the
+ * This module provides methods to connect to and communicate with the
  * BaseX Server.
  *
  * The Constructor of the class expects a hostname, port, username and password
@@ -18,10 +18,9 @@ import java.security.NoSuchAlgorithmException;
  * hostname and the port.
  *
  * For the execution of commands you need to call the execute() method with the
- * database command as argument. The method returns a boolean, indicating if
- * the command was successful. The result is stored in the Result property,
- * and the Info property returns additional processing information or error
- * output.
+ * database command as argument. The method returns the result, indicating if
+ * the command was successful. The Info property returns additional processing
+ * information or error output.
  *
  * An even faster approach is to call execute() with the database command and
  * an output stream. The result will directly be printed and does not have to

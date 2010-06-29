@@ -1,6 +1,6 @@
 ; -----------------------------------------------------------------------------
 ;
-; This Lisp module provides methods to connect to and communicate with the
+; This module provides methods to connect to and communicate with the
 ; BaseX Server.
 ;
 ; The Constructor of the class expects a hostname, port, username and password

@@ -1,7 +1,7 @@
 /*
  * -----------------------------------------------------------------------------
  * 
- * This C# module provides methods to connect to and communicate with the
+ * This module provides methods to connect to and communicate with the
  * BaseX Server.
  *
  * The Constructor of the class expects a hostname, port, username and password
@@ -41,7 +41,7 @@ namespace BaseXClient
     private int bpos;
     private int bsize;
 
-    /** Constructor, creating a new socket connection. */
+    /** see readme.txt */
     public Session(string host, int port, string username, string pw)
     {
       socket = new TcpClient(host, port);
@@ -55,7 +55,7 @@ namespace BaseXClient
       }
     }
     
-    /** Executes the specified command. */
+    /** see readme.txt */
     public bool Execute(string com, Stream ms)
     {
       Send(com);
@@ -65,7 +65,7 @@ namespace BaseXClient
       return Ok();
     }
     
-    /** Executes the specified command. */
+    /** see readme.txt */
     public String Execute(string com)
     {
       Send(com);
@@ -79,13 +79,13 @@ namespace BaseXClient
       return result;
     }
     
-    /** Creates a query object. */
+    /** see readme.txt */
     public Query query(string q) 
     {
       return new Query(this, q);
     }
     
-    /** Returns the processing information. */
+    /** see readme.txt */
     public string Info
     {
       get
@@ -94,7 +94,7 @@ namespace BaseXClient
       }
     }
     
-    /** Closes the connection. */
+    /** see readme.txt */
     public void Close()
     {
       Send("exit");
@@ -173,7 +173,7 @@ namespace BaseXClient
   	private string id;
   	private string nextItem;
   	
-  	/** Constructor, creating a new query object. */
+  	/** see readme.txt */
     public Query(Session s, string query)
     {
 	  session = s;
@@ -186,7 +186,7 @@ namespace BaseXClient
 	  }
     }
     
-    /** Checks for the next item. */
+    /** see readme.txt */
     public bool more() 
     {
       session.stream.WriteByte(1);
@@ -199,13 +199,13 @@ namespace BaseXClient
       return nextItem.Length != 0;
     }
     
-    /** Returns the next item. */
+    /** see readme.txt */
     public string next()
     {
       return nextItem;      
     }
     
-    /** Closes the query. */
+    /** see readme.txt */
     public void close()
     {
       session.stream.WriteByte(2);

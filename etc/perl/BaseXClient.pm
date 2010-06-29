@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 #
-# This Perl module provides methods to connect to and communicate with the
+# This module provides methods to connect to and communicate with the
 # BaseX Server.
 #
 # The Constructor of the class expects a hostname, port, username and password
@@ -25,7 +25,7 @@ use strict;
 
 package Session;
 
-# Constructor, creating a new socket connection.
+# see readme.txt
 sub new {
   my $class = shift;
   my $host = shift;
@@ -51,7 +51,7 @@ sub new {
   return $self if !$self->_read() or die "Access denied.";
 }
 
-# Executes the specified command.
+# see readme.txt
 sub execute {
   my $self = shift;
   my $cmd = shift;
@@ -66,20 +66,20 @@ sub execute {
   return $self->{result};
 }
 
-# Returns a query object.
+# see readme.txt
 sub query {
   my $self = shift;
   my $cmd = shift;
   return Query->new($self, $cmd);
 }
 
-# Returns processing information.
+# see readme.txt
 sub info {
   my $self = shift;
   return $self->{info};
 }
 
-# Closes the connection.
+# see readme.txt
 sub close {
   my $self = shift;
   $self->send("exit\0");
@@ -123,6 +123,7 @@ our $session;
 our $id;
 our $next;
 
+# see readme.txt
 sub new {
   my $class = shift;
   $session = shift;
@@ -136,6 +137,7 @@ sub new {
   return $self;
 }
 
+# see readme.txt
 sub more {
   $session->send("\1$id");
   $next = $session->_readString();
@@ -145,10 +147,12 @@ sub more {
   return length($next) != 0;
 }
 
+# see readme.txt
 sub next {
   return $next;
 }
 
+# see readme.txt
 sub close {
   $session->send("\2$id");
 }

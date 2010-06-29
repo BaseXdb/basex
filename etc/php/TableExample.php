@@ -2,7 +2,7 @@
 /* ----------------------------------------------------------------------------
  *
  * This example shows how results from a query can be received in an iterative
- * mode and illustrated in a table via the PHP API.
+ * mode and illustrated in a table.
  *
  * ----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License

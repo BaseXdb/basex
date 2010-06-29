@@ -1,7 +1,7 @@
 <?php
 /* ----------------------------------------------------------------------------
  *
- * This PHP module provides methods to connect to and communicate with the
+ * This module provides methods to connect to and communicate with the
  * BaseX Server.
  *
  * The Constructor of the class expects a hostname, port, username and password
@@ -23,7 +23,7 @@ class Session {
   /* Class variables.*/
   var $socket, $info, $buffer, $bpos, $bsize;
 
-  /* Constructor, creating a new socket connection. */
+  /* see readme.txt */
   function __construct($h, $p, $user, $pw) {
     // create server connection
     $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -44,7 +44,7 @@ class Session {
     }
   }
 
-  /* Executes the specified command. */
+  /* see readme.txt */
   public function execute($com) {
     // send command to server
     socket_write($this->socket, "$com\0");
@@ -58,12 +58,12 @@ class Session {
 	return $result;
   }
 
-  /* Returns processing information. */
+  /* see readme.txt */
   public function info() {
     return $this->info;
   }
 
-  /* Closes the connection. */
+  /* see readme.txt */
   public function close() {
     socket_write($this->socket, "exit\0");
     socket_close($this->socket);
@@ -119,7 +119,7 @@ class Query {
   /* Class variables.*/
   var $session, $id, $open, $next;
  
-  /* Constructor, creating a new query object. */	
+  /* see readme.txt */	
   function __construct($s, $q) {
     $this->session = $s;
 	$this->session->send("\0$q");
@@ -129,7 +129,7 @@ class Query {
     }
   }
 	
-  /* Checks for next item in line. */
+  /* see readme.txt */
   public function more() {
     $this->session->send("\1$this->id");
     $this->next = $this->session->receive();
@@ -139,12 +139,12 @@ class Query {
     return strlen($this->next) > 0; 
   }
 	
-  /* Returns next item. */
+  /* see readme.txt */
   public function next() {
     return $this->next;
   }
 	
-  /* Closes the query. */
+  /* see readme.txt */
   public function close() {
     $this->session->send("\2$this->id");   
   }	

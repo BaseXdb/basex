@@ -1,6 +1,6 @@
 # -----------------------------------------------------------------------------
 #
-# This Python module provides methods to connect to and communicate with the
+# This module provides methods to connect to and communicate with the
 # BaseX Server.
 #
 # The Constructor of the class expects a hostname, port, username and password
@@ -22,7 +22,7 @@ import hashlib, socket, array
 
 class Session():
 
-  # Constructor, creating a new socket connection.
+  # see readme.txt
   def __init__(self, host, port, user, pw):
     # allocate buffer for speeding up communication
     self.__buf = array.array('B', '\0' * 0x1000)
@@ -46,7 +46,7 @@ class Session():
     if s.recv(1) != '\0':
       raise IOError('Access Denied.')
 
-  # Executes the specified command.
+  # see readme.txt
   def execute(self, com):
     # send command to server
     self.send(com)
@@ -58,15 +58,15 @@ class Session():
       raise IOError(self.__info)
     return result
   
-  # Returns a query object.  
+  # see readme.txt
   def query(self, q):
   	return Query(self, q)
 
-  # Returns processing information.
+  # see readme.txt
   def info(self):
     return self.__info
 
-  # Closes the connection.
+  # see readme.txt
   def close(self):
     self.send('exit')
     s.close()
@@ -111,7 +111,7 @@ class Session():
      
    
 class Query():
-	# Constructor, creating a new query object.
+	# see readme.txt
 	def __init__(self, session, q):
 	  self.__session = session
 	  self.__session.send('\0' + q)
@@ -119,7 +119,7 @@ class Query():
 	  if not self.__session.ok():
 	    raise IOError(self.__session.readString())
 	
-	# Checks for more parts of the result.
+	# see readme.txt
 	def more(self):
 	  self.__session.send('\1' + self.__id)
 	  self.__next = self.__session.receive()
@@ -127,10 +127,10 @@ class Query():
 	    raise IOError(self.__session.readString())	
 	  return len(self.__next) != 0	
 		
-	# Returns the next part of the result.
+	# see readme.txt
 	def next(self):
 	  return self.__next
 	
-	# Closes the iterative execution.	
+	# see readme.txt	
 	def close(self):
 	  self.__session.send('\2' + self.__id);

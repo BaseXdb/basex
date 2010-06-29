@@ -1,7 +1,7 @@
 ﻿/*
  * -----------------------------------------------------------------------------
  * 
- * This Boo module provides methods to connect to and communicate with the
+ * This module provides methods to connect to and communicate with the
  * BaseX Server.
  *
  * The Constructor of the class expects a hostname, port, username and password
@@ -42,7 +42,7 @@ internal class Session:
 	private bpos as int
 	private bsize as int
 	
-	/** Constructor, creating a new socket connection. */
+	/** see readme.txt */
 	public def constructor(host as string, port as int, username as string, pw as string):
 		socket = TcpClient(host, port)
 		stream = socket.GetStream()
@@ -52,7 +52,7 @@ internal class Session:
 		if stream.ReadByte() != 0:
 			raise IOException('Access denied.')
 
-	/** Executes the specified command. */
+	/** see readme.txt */
 	public def Execute(com as string, ms as Stream) as bool:
 		Send(com)
 		Init()
@@ -60,7 +60,7 @@ internal class Session:
 		info = Receive()
 		return Ok()
 
-	/** Executes the specified command. */
+	/** see readme.txt */
 	public def Execute(com as string) as String:
 		Send(com)
 		Init()
@@ -70,16 +70,16 @@ internal class Session:
 			raise IOException(info)
 		return result
 	
-	/** Creates a query object. */
+	/** see readme.txt */
 	public def query(q as string) as Query:
 		return Query(self, q)
 
-	/** Returns the processing information. */
+	/** see readme.txt */
 	public Info as string:
 		get:
 			return info
 	
-	/** Closes the connection. */
+	/** see readme.txt */
 	public def Close():
 		Send('exit')
 		socket.Close()
@@ -110,7 +110,7 @@ internal class Session:
 		Receive(ms)
 		return System.Text.Encoding.UTF8.GetString(ms.ToArray())
 
-	/** Sends strings to server. */
+	/** Sends string to server. */
 	public def Send(message as string):
 		msg as (byte) = System.Text.Encoding.UTF8.GetBytes(message)
 		stream.Write(msg, 0, msg.Length)
@@ -136,7 +136,7 @@ internal class Query:
 	private id as string
 	private nextItem as string
 
-	/** Constructor, creating a new query object. */
+	/** see readme.txt */
 	public def constructor(s as Session, query as string):
 		session = s
 		session.stream.WriteByte(0)
@@ -145,7 +145,7 @@ internal class Query:
 		if not session.Ok():
 			raise IOException(session.Receive())
 
-	/** Checks for the next item. */
+	/** see readme.txt */
 	public def more() as bool:
 		session.stream.WriteByte(1)
 		session.Send(id)
@@ -154,11 +154,11 @@ internal class Query:
 			raise IOException(session.Receive())
 		return (nextItem.Length != 0)
 
-	/** Returns the next item. */
+	/** see readme.txt */
 	public def next() as string:
 		return nextItem
 
-	/** Closes the query. */
+	/** see readme.txt */
 	public def close():
 		session.stream.WriteByte(2)
 		session.Send(id)
