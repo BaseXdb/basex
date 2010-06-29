@@ -122,6 +122,8 @@ public interface Text {
   String SERVERPW = lang("srv_pw");
   /** Password. */
   String SERVERPROC = "% instead of 1 commands received.";
+  /** Localhost. */
+  String LOCALHOST = "localhost";
 
   /** Start information. */
   String SERVERINFO =

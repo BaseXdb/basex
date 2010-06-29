@@ -54,7 +54,7 @@ public class Add extends ACreate {
     if(!io.exists()) return error(FILEWHICH, io);
 
     if(args[1] != null) {
-      // set name specified document name
+      // set specified document name
       io.name(args[1]);
     } else if(io instanceof IOContent) {
       // if no name exists, set database name as document name

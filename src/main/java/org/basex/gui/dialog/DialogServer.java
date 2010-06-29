@@ -290,7 +290,7 @@ public final class DialogServer extends Dialog {
    * @return boolean success
    */
   private boolean ping(final boolean local) {
-    return BaseXServer.ping(local ? "localhost" : ctx.prop.get(Prop.HOST),
+    return BaseXServer.ping(local ? LOCALHOST : ctx.prop.get(Prop.HOST),
         ctx.prop.num(local ? Prop.SERVERPORT : Prop.PORT));
   }
 
@@ -304,7 +304,7 @@ public final class DialogServer extends Dialog {
       if(cmp == start || cmp == ports) {
         final int p = Integer.parseInt(ports.getText());
         ctx.prop.set(Prop.SERVERPORT, p);
-        if(host.getText().equals("localhost")) {
+        if(host.getText().equals(LOCALHOST)) {
           ctx.prop.set(Prop.PORT, p);
           portc.setText(ports.getText());
         }
@@ -316,7 +316,7 @@ public final class DialogServer extends Dialog {
         running = ping(true);
         connected = connected && ping(false);
         if(!connected) msg = SERVERSTOPPED;
-        if(host.getText().equals("localhost")) logpass.setText("");
+        if(host.getText().equals(LOCALHOST)) logpass.setText("");
         if(!connected) super.setTitle(GUISERVER);
       } else if(cmp == connect || cmp == loguser || cmp == logpass ||
           cmp == host || cmp == portc) {

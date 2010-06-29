@@ -32,16 +32,17 @@ import org.basex.util.Token;
 public final class BaseXServer extends Main implements Runnable {
   /** Log. */
   public Log log;
+  /** Pool for triggers. */
+  public TriggerPool triggers;
+
   /** Quiet mode (no logging). */
   private boolean quiet;
-  /** Stop file. */
-  private static final IO STOP = IO.get(Prop.TMP + "bxs");
   /** Server socket. */
   private ServerSocket server;
   /** Flag for server activity. */
   private boolean running;
-  /** Pool for triggers. */
-  public TriggerPool triggers;
+  /** Stop file. */
+  private IO stop;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -62,8 +63,11 @@ public final class BaseXServer extends Main implements Runnable {
     log = new Log(context, quiet);
     triggers = new TriggerPool();
 
+    final int port = context.prop.num(Prop.SERVERPORT);
+    stop = stopFile(port);
+
     try {
-      server = new ServerSocket(context.prop.num(Prop.SERVERPORT));
+      server = new ServerSocket(port);
       new Thread(this).start();
       do Performance.sleep(50); while(!running);
 
@@ -76,15 +80,15 @@ public final class BaseXServer extends Main implements Runnable {
   }
 
   /**
-   * Server thread.
+   * Runs the server thread.
    */
   public void run() {
     running = true;
     while(running) {
       try {
         final ServerProcess s = new ServerProcess(server.accept(), this);
-        if(STOP.exists()) {
-          STOP.delete();
+        if(stop.exists()) {
+          if(!stop.delete()) log.write(Main.info(DBNOTDELETED, stop));
           quit(false);
         } else if(s.init()) {
           context.add(s);
@@ -94,6 +98,15 @@ public final class BaseXServer extends Main implements Runnable {
         break;
       }
     }
+  }
+
+  /**
+   * Generates a stop file for the specified port.
+   * @param port server port
+   * @return stop file
+   */
+  private static IO stopFile(final int port) {
+    return IO.get(Prop.TMP + BaseXServer.class.getSimpleName() + port);
   }
 
   @Override
@@ -168,7 +181,7 @@ public final class BaseXServer extends Main implements Runnable {
           "-p", String.valueOf(port) }).start();
 
       for(int c = 0; c < 6; c++) {
-        if(ping("localhost", port)) return true;
+        if(ping(LOCALHOST, port)) return true;
         Performance.sleep(500);
       }
     } catch(final IOException ex) {
@@ -180,7 +193,7 @@ public final class BaseXServer extends Main implements Runnable {
   /**
    * Checks if a server is running.
    * @param host host
-   * @param port port
+   * @param port server port
    * @return boolean success
    */
   public static boolean ping(final String host, final int port) {
@@ -198,8 +211,9 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public static void stop(final int port) {
     try {
-      STOP.write(Token.EMPTY);
-      new Socket("localhost", port);
+      /** Stop file. */
+      stopFile(port).write(Token.EMPTY);
+      new Socket(LOCALHOST, port);
       outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       errln(server(ex));
