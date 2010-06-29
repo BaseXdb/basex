@@ -310,6 +310,7 @@ c_saveas=Save as
 c_notopened=Tệp không mở được.
 c_notsaved=Tệp không lưu được.
 c_replace=Tệp "%" đã có.\nBạn muốn thay thế nó không?
+c_dirreplace=Files will be replaced in %.\nDo you want to continue?
 c_server=Server Administration
 c_servertt=Display the server administration for user management and log tracing.
 
@@ -362,6 +363,7 @@ db_notaltered=Database '%' could not be renamed.
 db_notopened=Cơ sở dữ liệu '%' không mở được.
 db_opened=Cơ sở dữ liệu '%' được mở ở %.
 db_exported=Cơ sở dữ liệu '%' được xuất khẩu ra ở %.
+db_notexported=Database could not be exported to '%'.
 db_notdeleted=File '%' could not be deleted.
 
 # Index commands

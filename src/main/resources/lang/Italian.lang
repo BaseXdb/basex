@@ -310,6 +310,7 @@ c_saveas=Salva come
 c_notopened=Impossibile aprire il documento.
 c_notsaved=Impossibile salvare il documento.
 c_replace=Il documento "%" esiste già.\nVuoi sovrascriverlo?
+c_dirreplace=Files will be replaced in %.\nDo you want to continue?
 c_server=Amministrazione del server
 c_servertt=Mostra l'amministrazione del server per gestire gli utenti e diari
 
@@ -362,6 +363,7 @@ db_notaltered=Database '%' could not be renamed.
 db_notopened=Impossibile aprire la base di dati '%'.
 db_opened=Base di dati '%' aperta in %.
 db_exported=Base di dati '%' esportata in %.
+db_notexported=Impossibile esportare la base di dati in '%'.
 db_notdeleted=Il documento '%' non può essere cancellato.
 
 # Index commands

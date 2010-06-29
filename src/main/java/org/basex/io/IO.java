@@ -231,8 +231,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public IO[] children() {
-    Main.notexpected();
-    return null;
+    return new IO[] {};
   }
 
   /**

@@ -310,6 +310,7 @@ c_saveas=Save as
 c_notopened=File could not be opened.
 c_notsaved=File could not be saved.
 c_replace=% already exists.\nDo you want to replace it?
+c_dirreplace=Files will be replaced in %.\nDo you want to continue?
 c_server=Server Administration
 c_servertt=Display the server administration for user management and log tracing.
 
@@ -362,6 +363,7 @@ db_notaltered=Database '%' could not be renamed.
 db_notopened=Database '%' could not be opened.
 db_opened=Database '%' opened in %.
 db_exported=Database '%' exported in %.
+db_notexported=Database could not be exported to '%'.
 db_notdeleted=File '%' could not be deleted.
 
 # Index commands

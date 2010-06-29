@@ -310,6 +310,7 @@ c_saveas=Enregistrer sous
 c_notopened=Echec à l'ouverture du fichier.
 c_notsaved=Echec à l'enregistrement du fichier.
 c_replace=% existe déjà.\nVoulez-vous le remplacer ?
+c_dirreplace=Files will be replaced in %.\nDo you want to continue?
 c_server=Administration Serveur
 c_servertt=Afficher le panneau d'administration du serveur pour la gestion des utilisateurs des logs.
 
@@ -362,6 +363,7 @@ db_notaltered=Database '%' could not be renamed.
 db_notopened=Impossible d'ouvrir la base de données '%'.
 db_opened=Base de données '%' ouverte dans %.
 db_exported=Base de données '%' exportée dans %.
+db_notexported=Impossible d'exporter la base de données à '%'.
 db_notdeleted=Impossible de supprimer le fichier '%'.
 
 # Index commands

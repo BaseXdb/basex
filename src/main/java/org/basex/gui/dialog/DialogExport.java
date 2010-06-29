@@ -22,6 +22,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 
 /**
  * Dialog window for changing some project's preferences.
@@ -142,16 +143,13 @@ public final class DialogExport extends Dialog {
     return path.getText().trim();
   }
 
-
   @Override
   public void action(final Object cmp) {
     out.setText(OUTDIR + COL);
     final IO io = IO.get(path());
-    final boolean empty = path().isEmpty();
-    final boolean exists = io.exists();
-    ok = !empty && (!exists || !io.isDir() || !exists || io.isDir());
-
-    info.setText(!ok && !empty ? INVPATH : io.children().length > 0 ? OVERFILE
+    final boolean file = io instanceof IOFile;
+    ok = !path().isEmpty() && file;
+    info.setText(!ok && !file ? INVPATH : io.children().length > 0 ? OVERFILE
         : null, ok ? Msg.WARN : Msg.ERR);
     enableOK(buttons, BUTTONOK, ok);
   }

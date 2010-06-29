@@ -140,13 +140,33 @@ public enum GUICommands implements GUICommand {
       final DialogExport dialog = new DialogExport(gui);
       if(!dialog.ok()) return;
 
-      final IO io = IO.get(dialog.path());
-      if(io.exists() && io.isDir() && io.children().length > 0
-          && !Dialog.confirm(gui,
-          Main.info(FILEREPLACE, io))) return;
+      final IO root = IO.get(dialog.path());
 
-      final String path = io.path();
-      gui.execute(new Export(path));
+      // check if existing files will be overwritten
+      if(root.exists()) {
+        IO file = null;
+        boolean overwrite = false;
+        final Data d = gui.context.data;
+        for(final int pre : d.doc()) {
+          file = root.merge(Token.string(d.text(pre, true)));
+          if(file.exists()) {
+            if(overwrite) {
+              // more than one file will be overwritten; check remaining tests
+              file = null;
+              break;
+            }
+            overwrite = true;
+          }
+        }
+        if(overwrite) {
+          // show message for overwriting files or directories
+          final String msg = file == null ? DIRREPLACE : FILEREPLACE;
+          if(file == null) file = root;
+          if(!Dialog.confirm(gui, Main.info(msg, file))) return;
+        }
+      }
+
+      gui.execute(new Export(root.path()));
     }
   },
 

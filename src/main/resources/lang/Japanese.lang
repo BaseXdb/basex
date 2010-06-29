@@ -310,6 +310,7 @@ c_saveas=別名で保存
 c_notopened=ファイルが開けませんでした。
 c_notsaved=ファイルを保存できませんでした。
 c_replace=ファイル "%" は既に存在します。\n置換してよろしいですか。
+c_dirreplace=Files will be replaced in %.\nDo you want to continue?
 c_server=サーバー管理
 c_servertt=ユーザー管理及びログトレースの画面を表示します。
 
@@ -365,6 +366,7 @@ info_nodeepfs=DeepFSデータベースが見付かりませんでした。
 db_notopened=データベースを開けませんでした。
 db_opened=データベース "%" が % を開きました。
 db_exported=データベース "%" が % に出力しました。
+db_notexported=Database could not be exported to '%'.
 db_notdeleted=ファイル '%' を削除できませんでした。
 
 # Index commands

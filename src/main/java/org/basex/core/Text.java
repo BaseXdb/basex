@@ -413,6 +413,8 @@ public interface Text {
   String DBOPENED = lang("db_opened");
   /** Database exported. */
   String DBEXPORTED = lang("db_exported");
+  /** Database not exported. */
+  String DBNOTEXPORTED = lang("db_notexported");
   /** Database not deleted. */
   String DBNOTDELETED = lang("db_notdeleted");
 
@@ -1036,6 +1038,8 @@ public interface Text {
   String NOTSAVED = lang("c_notsaved");
   /** File dialog replace information. */
   String FILEREPLACE = lang("c_replace");
+  /** Dir dialog replace information. */
+  String DIRREPLACE = lang("c_dirreplace");
 
   /** Server. */
   String LOCALSERVER = lang("ds_localserver");
