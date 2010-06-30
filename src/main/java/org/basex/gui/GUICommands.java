@@ -691,7 +691,7 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Map layout. */
-  MAPLAYOUT(GUIMAPLAYOUT, "% L", GUIMAPLAYOUTTT, true, false) {
+  MAPLAYOUT(GUIMAPLAYOUT, null, GUIMAPLAYOUTTT, true, false) {
     @Override
     public void execute(final GUI gui) {
       new DialogMapLayout(gui);

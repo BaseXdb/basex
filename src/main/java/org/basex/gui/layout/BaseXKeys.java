@@ -131,6 +131,10 @@ public final class BaseXKeys {
   public static final int[] DECFONT = { SC, VK_MINUS, 0 };
   /** Standard size. */
   public static final int[] NORMFONT = { SC, VK_0, 0 };
+  /** Jump to input bar. */
+  public static final int[] INPUT1 = { SC, VK_L, 0 };
+  /** Jump to input bar. */
+  public static final int[] INPUT2 = { 0, VK_F6, 0 };
 
   /** Private constructor. */
   private BaseXKeys() { }

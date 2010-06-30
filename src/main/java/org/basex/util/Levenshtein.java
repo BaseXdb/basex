@@ -3,9 +3,10 @@ package org.basex.util;
 import static org.basex.util.Token.*;
 
 /**
- * Levenshtein implementation, based on
- * "Levenshtein [1965], Binary codes capable of correcting spurious insertions
- * and deletions of ones".
+ * Damerau-Levenshtein implementation. Based on the publications from
+ * Levenshtein (1965): Binary codes capable of correcting spurious insertions
+ * and deletions of ones, and Damerau (1964): A technique for computer
+ * detection and correction of spelling errors.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
