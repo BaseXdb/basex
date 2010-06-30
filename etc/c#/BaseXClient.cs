@@ -15,7 +15,7 @@
  * the query() method. The results will then be returned via the more() and
  * the next() methods. If an error occurs an exception will be thrown.
  *
- * An even faster approach is to call Execute() with the database command and
+ * An even faster approach is to call execute() with the database command and
  * an output stream. The result will directly be printed and does not have to
  * be cached.
  * 
@@ -46,7 +46,7 @@ namespace BaseXClient
     {
       socket = new TcpClient(host, port);
       stream = socket.GetStream();
-      string ts = Receive();
+      string ts = receive();
       Send(username);
       Send(MD5(MD5(pw) + ts));
       if (stream.ReadByte() != 0)
@@ -80,7 +80,7 @@ namespace BaseXClient
     }
     
     /** see readme.txt */
-    public Query query(string q) 
+    public Query Query(string q) 
     {
       return new Query(this, q);
     }
@@ -97,7 +97,7 @@ namespace BaseXClient
     /** see readme.txt */
     public void Close()
     {
-      Send("exit");
+      send("exit");
       socket.Close();
     }
     
@@ -187,7 +187,7 @@ namespace BaseXClient
     }
     
     /** see readme.txt */
-    public bool more() 
+    public bool More() 
     {
       session.stream.WriteByte(1);
       session.Send(id);
@@ -200,13 +200,13 @@ namespace BaseXClient
     }
     
     /** see readme.txt */
-    public string next()
+    public string Next()
     {
       return nextItem;      
     }
     
     /** see readme.txt */
-    public void close()
+    public void Close()
     {
       session.stream.WriteByte(2);
       session.Send(id);

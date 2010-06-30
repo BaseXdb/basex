@@ -30,11 +30,11 @@ Namespace BaseXClient
 
 				Try
 					' run query iterator
-					Dim query As Query = session.query(cmd)
-					While query.more()
-						Console.WriteLine(query.[next]())
+					Dim query As Query = session.Query(cmd)
+					While query.More()
+						Console.WriteLine(query.Next())
 					End While
-					query.close()
+					query.Close()
 				Catch e As IOException
 					' print exception
 					Console.WriteLine(e.Message)

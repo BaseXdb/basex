@@ -34,12 +34,12 @@ namespace BaseXClient
         try
         {
           // run query iterator
-          Query query = session.query(cmd);
-          while (query.more()) 
+          Query query = session.Query(cmd);
+          while (query.More()) 
           {
-          	Console.WriteLine(query.next());
+          	Console.WriteLine(query.Next());
           }
-          query.close();
+          query.Close();
         }
         catch (IOException e)
         {

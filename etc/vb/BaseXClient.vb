@@ -8,12 +8,12 @@
 ' * for the connection. The socket connection will then be established via the
 ' * hostname and the port.
 ' *
-' * For the execution of commands you need to call the execute() method with the
+' * For the execution of commands you need to call the Execute() method with the
 ' * database command as argument. The method returns the result or throws
 ' * an exception with the received error message.
 ' * For the execution of the iterative version of a query you need to call
-' * the query() method. The results will then be returned via the more() and
-' * the next() methods. If an error occurs an exception will be thrown.
+' * the Query() method. The results will then be returned via the More() and
+' * the Next() methods. If an error occurs an exception will be thrown.
 ' *
 ' * An even faster approach is to call Execute() with the database command and
 ' * an output stream. The result will directly be printed and does not have to
@@ -74,7 +74,7 @@ Namespace BaseXClient
 		End Function
 
 		'* see readme.txt
-		Public Function query(q As String) As Query
+		Public Function Query(q As String) As Query
 			Return New Query(Me, q)
 		End Function
 
@@ -166,7 +166,7 @@ Namespace BaseXClient
 		End Sub
 
 		'* see readme.txt 
-		Public Function more() As Boolean
+		Public Function More() As Boolean
 			session.stream.WriteByte(1)
 			session.Send(id)
 			nextItem = session.Receive()
@@ -177,12 +177,12 @@ Namespace BaseXClient
 		End Function
 
 		'* see readme.txt
-		Public Function [next]() As String
+		Public Function Next() As String
 			Return nextItem
 		End Function
 
 		'* see readme.txt 
-		Public Sub close()
+		Public Sub Close()
 			session.stream.WriteByte(2)
 			session.Send(id)
 		End Sub

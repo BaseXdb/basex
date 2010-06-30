@@ -29,11 +29,11 @@ public class QueryIteratorExample:
 			// create session
 			session = Session('localhost', 1984, 'admin', 'admin')
 			try:
-				query as Query = session.query(cmd)
+				query as Query = session.Query(cmd)
 				// run query iterator
-				while query.more():
-					Console.WriteLine(query.next())
-				query.close()
+				while query.More():
+					Console.WriteLine(query.Next())
+				query.Close()
 			except e as IOException:
 				// print exception
 				Console.WriteLine(e.Message)

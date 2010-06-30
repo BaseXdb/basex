@@ -8,12 +8,12 @@
  * for the connection. The socket connection will then be established via the
  * hostname and the port.
  *
- * For the execution of commands you need to call the execute() method with the
+ * For the execution of commands you need to call the Execute() method with the
  * database command as argument. The method returns the result or throws
  * an exception with the received error message.
  * For the execution of the iterative version of a query you need to call
- * the query() method. The results will then be returned via the more() and
- * the next() methods. If an error occurs an exception will be thrown.
+ * the Query() method. The results will then be returned via the More() and
+ * the Next() methods. If an error occurs an exception will be thrown.
  *
  * An even faster approach is to call Execute() with the database command and
  * an output stream. The result will directly be printed and does not have to
@@ -43,7 +43,7 @@ internal class Session:
 	private bsize as int
 	
 	/** see readme.txt */
-	public def constructor(host as string, port as int, username as string, pw as string):
+	public def Constructor(host as string, port as int, username as string, pw as string):
 		socket = TcpClient(host, port)
 		stream = socket.GetStream()
 		ts as string = Receive()
@@ -71,7 +71,7 @@ internal class Session:
 		return result
 	
 	/** see readme.txt */
-	public def query(q as string) as Query:
+	public def Query(q as string) as Query:
 		return Query(self, q)
 
 	/** see readme.txt */
@@ -137,7 +137,7 @@ internal class Query:
 	private nextItem as string
 
 	/** see readme.txt */
-	public def constructor(s as Session, query as string):
+	public def Constructor(s as Session, query as string):
 		session = s
 		session.stream.WriteByte(0)
 		session.Send(query)
@@ -146,7 +146,7 @@ internal class Query:
 			raise IOException(session.Receive())
 
 	/** see readme.txt */
-	public def more() as bool:
+	public def More() as bool:
 		session.stream.WriteByte(1)
 		session.Send(id)
 		nextItem = session.Receive()
@@ -155,10 +155,10 @@ internal class Query:
 		return (nextItem.Length != 0)
 
 	/** see readme.txt */
-	public def next() as string:
+	public def Next() as string:
 		return nextItem
 
 	/** see readme.txt */
-	public def close():
+	public def Close():
 		session.stream.WriteByte(2)
 		session.Send(id)

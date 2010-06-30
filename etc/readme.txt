@@ -17,12 +17,15 @@ class Session:
   constructor(String host, int port, String username, String password)
 
   // Executes the specified command and returns the result
+  // @return String
   execute(String command)
 
   // Returns a query object with the specified query
+  // @return Query
   query(String query)
 
   // Returns process information
+  // @return String
   info()
 
   // Closes the session
@@ -34,9 +37,11 @@ class Query:
   contructor(Session s, String query)
 
   // Checks for next part of the result and returns boolean
+  // @return boolean
   more()
 
   // Returns next part of the result
+  // @return String
   next()
 
   // Closes the query object
