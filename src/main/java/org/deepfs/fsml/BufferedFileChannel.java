@@ -46,6 +46,8 @@ public final class BufferedFileChannel {
    * buffer {@code buf} must not be read.
    */
   private long rem;
+  /** Size of the underlying file / file part. */
+  private final long size;
 
   /**
    * Standard constructor for creating a {@link BufferedFileChannel} from a
@@ -93,6 +95,7 @@ public final class BufferedFileChannel {
     rem = fc.size();
     buf = buffer;
     parent = null;
+    size = rem;
   }
 
   /**
@@ -118,6 +121,7 @@ public final class BufferedFileChannel {
     mark = absolutePosition();
     rem = bytesToRead - buf.remaining();
     parent = p;
+    size = fc.position() + rem - mark;
   }
 
   /**
@@ -387,7 +391,10 @@ public final class BufferedFileChannel {
     final long len = remaining();
     skip(len);
     if(parent != null) {
-      parent.rem -= size();
+      // the fc position may have changed, so the 'rem' value of the parent has
+      // to be corrected
+      long deviation = (fc.position() + parent.rem - parent.mark) - parent.size;
+      parent.rem -= deviation;
       parent.locked = false;
     }
   }
