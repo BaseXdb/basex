@@ -69,7 +69,8 @@ public final class Find extends AQuery {
       } else if(term.startsWith("=")) {
         preds += "[text() = \"" + term.substring(1) + "\"]";
       } else if(term.startsWith("~")) {
-        preds += "[text() ~> \"" + term.substring(1) + "\"]";
+        preds += "[text() contains text \"" + term.substring(1) +
+          "\" using fuzzy]";
       } else if(term.startsWith("@")) {
         if(term.length() == 1) continue;
         preds += "[@* " + CT + " \"" + term.substring(1) + "\"]";

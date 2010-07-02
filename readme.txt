@@ -1,12 +1,12 @@
  
- BASEX ================================================================
+BASEX =================================================================
  
  Welcome to the source code of BaseX.
  
  To get the project running as smooth as possible, please consider the
  following notes:
  
- COMPILING BASEX ------------------------------------------------------
+COMPILING BASEX -------------------------------------------------------
  
  JDK 1.6 and JUnit is currently needed to compile the complete
  BaseX sources. If you are using another environment than Eclipse or
@@ -25,13 +25,13 @@
  For example, you can use BaseX to process XPath queries without
  entering the console.
  
- USING ECLIPSE --------------------------------------------------------
+USING ECLIPSE ---------------------------------------------------------
  
  BaseX is being developed with the Eclipse environment. Some style
  guidelines are integrated in the Subversion/CVS version of BaseX;
  they are being embedded as soon as you open the project.
  
- RUNNING BASEX --------------------------------------------------------
+RUNNING BASEX ---------------------------------------------------------
  
  Apply the following steps to start BaseX with Eclipse:
  
@@ -42,7 +42,7 @@
    for the graphical user interface)
  - Launch the project via 'Run'
  
- ADDING CHECKSTYLE ----------------------------------------------------
+ADDING CHECKSTYLE -----------------------------------------------------
  
  Some additional guidelines are defined via the CheckStyle plugin:
  
@@ -53,13 +53,12 @@
    URL http://eclipse-cs.sourceforge.net/update 
  - Follow the installation procedure and restart Eclipse
  
- ----------------------------------------------------------------------
+-----------------------------------------------------------------------
  
  Any kind of feedback is welcome; please tell us if you run into any
  troubles while installing and running BaseX: 
  basex-talk@mailman.uni-konstanz.de
  
- Have a nice day,
- BaseX team 2010
+ BaseX Team, 2010
  
- =================================== DBIS Group, University of Konstanz
+==================================== DBIS Group, University of Konstanz
