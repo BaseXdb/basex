@@ -170,8 +170,7 @@ public final class BXJaxRx implements JaxRx {
       void code() throws IOException {
         // create database from cached file
         final File file = cache(input);
-        final boolean ok = cs.execute(
-            new CreateDB(file.toString(), root(rp)));
+        final boolean ok = cs.execute(new CreateDB(root(rp), file.toString()));
         file.delete();
         // return exception if process failed
         if(!ok) throw new JaxRxException(400, cs.info());
