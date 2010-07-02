@@ -167,23 +167,23 @@ public final class DeepFS implements DataText {
 
   /**
    * Constructor for {@link DeepShell} and java only test cases (no mount).
-   * @param dbname name of (initially empty) database
+   * @param name name of (initially empty) database
    * @param mp of DeepFS database
    */
-  public DeepFS(final String dbname, final String mp) {
-    this(initData(dbname, mp));
+  public DeepFS(final String name, final String mp) {
+    this(initData(name, mp));
   }
 
   /**
    * Initializes the data.
-   * @param dbname name of (initially empty) database
+   * @param name name of (initially empty) database
    * @param mp of DeepFS database
    * @return context
    */
-  private static Context initData(final String dbname, final String mp) {
+  private static Context initData(final String name, final String mp) {
     final Context ctx = new Context();
-    if(!new Open(dbname).exec(ctx))
-      new CreateDB(dbname, "<" + S_DEEPFS + " " + "mountpoint=\""
+    if(!new Open(name).exec(ctx))
+      new CreateDB(name, "<" + S_DEEPFS + " " + "mountpoint=\""
           + mp + "\"/>").exec(ctx);
     return ctx;
   }

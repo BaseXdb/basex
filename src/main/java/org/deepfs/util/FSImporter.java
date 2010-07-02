@@ -70,10 +70,10 @@ public final class FSImporter implements FSTraversal {
 
   /**
    * Creates a fsml database.
-   * @param dbname name of the database
+   * @param name name of the database
    */
-  public void createDB(final String dbname) {
-    final CreateDB c = new CreateDB(dbname, "<" + DeepFS.S_FSML + "/>");
+  public void createDB(final String name) {
+    final CreateDB c = new CreateDB(name, "<" + DeepFS.S_FSML + "/>");
     if(!c.run(ctx)) Main.notexpected(
         "Failed to create file system database (%).", c.info());
     ctx.data.meta.deepfs = true;

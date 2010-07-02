@@ -55,10 +55,10 @@ public final class DeepShell {
   }
 
   /** Constructor.
-   * @param fsdbname DeepFS filesystem/database instance
+   * @param name DeepFS filesystem/database instance
    */
-  DeepShell(final String fsdbname) {
-    fs = new DeepFS(fsdbname, string(NOTMOUNTED));
+  DeepShell(final String name) {
+    fs = new DeepFS(name, string(NOTMOUNTED));
     loop();
     fs.umount();
   }

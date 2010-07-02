@@ -24,12 +24,12 @@ public final class FSParser extends Progress {
    * Constructor.
    * @param path import root
    * @param ctx the database context to use
-   * @param dbname name of the database
+   * @param name name of the database
    */
-  public FSParser(final String path, final Context ctx, final String dbname) {
+  public FSParser(final String path, final Context ctx, final String name) {
     fsi = new FSImporter(ctx);
     roots = path.equals("/") ? File.listRoots() : new File[] { new File(path) };
-    fsi.createDB(dbname);
+    fsi.createDB(name);
   }
 
   /** Recursively parses the given path. */
