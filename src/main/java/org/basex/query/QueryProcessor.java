@@ -140,6 +140,14 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
+   * Returns the number of performed updates.
+   * @return number of updates
+   */
+  public int updates() {
+    return ctx.updates.size();
+  }
+
+  /**
    * Returns query background information.
    * @param all show all information
    * @return background information

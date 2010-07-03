@@ -65,7 +65,8 @@ public abstract class AQuery extends Command {
       }
 
       final boolean ser = prop.is(Prop.SERIALIZE);
-      int s = 0;
+      int hits = 0;
+      int updates = 0;
       for(int i = 0; i < runs; i++) {
         final Performance per = new Performance();
 
@@ -87,11 +88,11 @@ public abstract class AQuery extends Command {
           eval += per.getTime();
           xml = new XMLSerializer(po, sp);
           result.serialize(xml);
-          s = result.size();
+          hits = result.size();
         } else {
           final Iter ir = qp.iter();
           eval += per.getTime();
-          s = 0;
+          hits = 0;
           Item it = ir.next();
           xml = new XMLSerializer(po, sp);
           while(it != null) {
@@ -100,15 +101,16 @@ public abstract class AQuery extends Command {
             it.serialize(xml);
             xml.closeResult();
             it = ir.next();
-            s++;
+            hits++;
           }
         }
+        updates = qp.updates();
         xml.close();
         qp.close();
         prnt += per.getTime();
       }
       // dump some query info
-      evalInfo(s, runs);
+      evalInfo(hits, updates, runs);
 
       if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) out.println("");
       out.flush();
@@ -152,9 +154,10 @@ public abstract class AQuery extends Command {
   /**
    * Adds evaluation information to the information string.
    * @param hits information
+   * @param updates updated items
    * @param runs number of runs
    */
-  private void evalInfo(final long hits, final int runs) {
+  private void evalInfo(final long hits, final long updates, final int runs) {
     if(!prop.is(Prop.INFO)) return;
     final String opt = qp.info(prop.is(Prop.ALLINFO));
     if(!opt.isEmpty()) info(opt);
@@ -164,6 +167,7 @@ public abstract class AQuery extends Command {
     info(QUERYPRINT + Performance.getTimer(prnt, runs));
     info(QUERYTOTAL + perf.getTimer(runs));
     info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS));
+    info(QUERYUPDATED + updates + " " + (updates == 1 ? VALHIT : VALHITS));
     info(QUERYPRINTED + Performance.format(out.size()));
     info(QUERYMEM, Performance.getMem());
   }

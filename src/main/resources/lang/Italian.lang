@@ -402,6 +402,7 @@ qu_tabeval=Eseguendo
 qu_tabprint=Stampando
 qu_tabtotal=Tempo totale
 qu_tabmem=Memoria
+qu_tabupdated=Updated
 qu_tabprinted=Stampato
 qu_tabhits=Risultati
 qu_nodeserr=L'interrogazione deve restituire un insieme di nodi.

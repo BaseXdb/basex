@@ -102,4 +102,14 @@ public final class Updates {
     for(final Primitives p : primitives.values()) p.check(ctx);
     for(final Primitives p : primitives.values()) p.apply(ctx);
   }
+
+  /**
+   * Returns the number of node updates.
+   * @return number of updates
+   */
+  public int size() {
+    int s = 0;
+    for(final Primitives p : primitives.values()) s += p.nodes.size();
+    return s;
+  }
 }

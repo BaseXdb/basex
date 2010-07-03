@@ -402,6 +402,7 @@ qu_tabeval=Evaluating
 qu_tabprint=Printing
 qu_tabtotal=Total Time
 qu_tabmem=Memory
+qu_tabupdated=Updated
 qu_tabprinted=Printed
 qu_tabhits=Results
 qu_nodeserr=Query must yield a nodeset.

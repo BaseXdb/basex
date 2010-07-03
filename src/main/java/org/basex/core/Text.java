@@ -473,6 +473,8 @@ public interface Text {
   String QUERYTOTAL = lang("qu_tabtotal") + COLS;
   /** Query hits. */
   String QUERYHITS = lang("qu_tabhits") + COLS;
+  /** Query info: updated data. */
+  String QUERYUPDATED = lang("qu_tabupdated") + COLS;
   /** Query info: printed data. */
   String QUERYPRINTED = lang("qu_tabprinted") + COLS;
   /** Query info: memory. */
