@@ -35,7 +35,6 @@ final class BXQPreparedExpression extends BXQDynamicContext
       final BXQConnection c) throws XQQueryException {
 
     super(input, s, c);
-
     try {
       qp.parse();
     } catch(final QueryException ex) {
