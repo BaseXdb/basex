@@ -44,7 +44,7 @@ public final class ServerExample {
 
     // Set an option: turn verbose command information on
     send("SET INFO true");
-    send("CREATE DB \"etc/xml/input.xml\" input");
+    send("CREATE DB input etc/xml/input.xml");
 
     // ------------------------------------------------------------------------
     // Run a query
