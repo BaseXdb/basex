@@ -6,6 +6,8 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQStaticContext;
+
+import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Command;
 import org.basex.query.QueryException;
@@ -37,7 +39,11 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
     try {
       for(final Command c : new CommandParser(cmd, sc.context).parse()) {
         // process output is suppressed, errors are returned as exception
-        if(!c.exec(sc.context)) throw new BXQException(c.info());
+        try {
+          c.execute(sc.context);
+        } catch(final BaseXException ex) {
+          throw new BXQException(ex.getMessage());
+        }
       }
     } catch(final QueryException ex) {
       throw new BXQException(ex);

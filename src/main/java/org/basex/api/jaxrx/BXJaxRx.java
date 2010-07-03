@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.StreamingOutput;
+
+import org.basex.core.BaseXException;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
@@ -79,7 +81,7 @@ public final class BXJaxRx implements JaxRx {
   public StreamingOutput query(final String query, final ResourcePath rp) {
     return new BXOutput(rp) {
       @Override
-      void code() throws IOException {
+      void code() {
         // wrap start and counter around query expression
         final int s = num(rp, QueryParameter.START, 1);
         final int m = num(rp, QueryParameter.COUNT, Integer.MAX_VALUE - s);
@@ -117,7 +119,7 @@ public final class BXJaxRx implements JaxRx {
   public StreamingOutput run(final String file, final ResourcePath rp) {
     return new BXOutput(rp) {
       @Override
-      void code() throws IOException {
+      void code() {
         // get root directory for files
         final String root = System.getProperty("org.basex.jaxrxpath") + "/";
         final IO io = IO.get(root + file);
@@ -149,16 +151,21 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() throws IOException {
         // open database
-        if(!cs.execute(new Open(root(rp))))
-          throw new JaxRxException(404, cs.info());
+        try {
+          cs.execute(new Open(root(rp)));
+        } catch(final BaseXException ex) {
+          throw new JaxRxException(404, ex.getMessage());
+        }
 
         // add cached file to the database
         final File file = cache(input);
-        final boolean ok = cs.execute(new Add(file.toString()));
+        try {
+          cs.execute(new Add(file.toString()));
+        } catch(final BaseXException ex) {
+          file.delete();
+          throw new JaxRxException(404, ex.getMessage());
+        }
         file.delete();
-
-        // return exception if process failed
-        if(!ok) throw new JaxRxException(400, cs.info());
       }
     }.run();
   }
@@ -170,10 +177,14 @@ public final class BXJaxRx implements JaxRx {
       void code() throws IOException {
         // create database from cached file
         final File file = cache(input);
-        final boolean ok = cs.execute(new CreateDB(root(rp), file.toString()));
-        file.delete();
-        // return exception if process failed
-        if(!ok) throw new JaxRxException(400, cs.info());
+        try {
+          cs.execute(new CreateDB(root(rp), file.toString()));
+        } catch(final BaseXException ex) {
+          // return exception if process failed
+          throw new JaxRxException(400, ex.getMessage());
+        } finally {
+          file.delete();
+        }
       }
     }.run();
   }
@@ -182,9 +193,13 @@ public final class BXJaxRx implements JaxRx {
   public void delete(final ResourcePath rp) {
     new BXCode() {
       @Override
-      void code() throws IOException {
-        if(!cs.execute(new DropDB(root(rp))))
-          throw new JaxRxException(404, cs.info());
+      void code() {
+        try {
+          cs.execute(new DropDB(root(rp)));
+        } catch(final BaseXException ex) {
+          // return exception if process failed
+          throw new JaxRxException(404, ex.getMessage());
+        }        
       }
     }.run();
   }

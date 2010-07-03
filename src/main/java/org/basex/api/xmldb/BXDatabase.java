@@ -1,9 +1,9 @@
 package org.basex.api.xmldb;
 
 import static org.basex.core.Text.*;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.Command;
 import org.basex.core.cmd.Set;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.Database;
@@ -54,8 +54,9 @@ public final class BXDatabase implements Database, BXXMLDBText {
   public void setProperty(final String key, final String value)
       throws XMLDBException {
 
-    final Command cmd = new Set(key, value);
-    if(!cmd.exec(ctx)) {
+    try {
+      new Set(key, value).execute(ctx);
+    } catch(final BaseXException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + key);
     }
   }
