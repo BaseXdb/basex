@@ -15,6 +15,8 @@ import org.basex.util.Performance;
  * @author BaseX Team
  */
 public final class StressTest {
+  /** Verbose flag. */
+  private static final boolean VERBOSE = false;
   /** Number of clients. */
   static final int NCLIENTS = 30;
   /** Number of runs per client. */
@@ -40,14 +42,14 @@ public final class StressTest {
 
     // run server instance
     System.out.println("\n* Start server.");
-    new BaseXServer();
+    new BaseXServer("-z");
 
     // create test database
     System.out.println("\n* Create test database.");
 
-    ClientSession cs = newSession();
+    final ClientSession cs = newSession();
     cs.execute("set info on");
-    cs.execute("create db etc/xml/factbook.xml");
+    cs.execute("create db factbook etc/xml/factbook.xml");
     System.out.print(cs.info());
     cs.close();
 
@@ -66,7 +68,7 @@ public final class StressTest {
     // drop database and stop server
     System.out.println("\n* Stop server and drop test database.");
 
-    ClientSession cs = newSession();
+    final ClientSession cs = newSession();
     cs.execute("drop db factbook");
     System.out.print(cs.info());
     cs.close();
@@ -97,16 +99,16 @@ public final class StressTest {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
           // return nth text of the database
-          int n = (RND.nextInt() & 0xFF) + 1;
-          String qu = "xquery basex:db('factbook')/descendant::text()" +
+          final int n = (RND.nextInt() & 0xFF) + 1;
+          final String qu = "xquery basex:db('factbook')/descendant::text()" +
             "[position() = " + n + "]";
 
-          ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-          String result = session.execute(qu, buffer) ?
+          final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+          final String result = session.execute(qu, buffer) ?
               buffer.toString() : session.info();
 
-          System.out.println("[" + counter + "] Thread " + getId() +
-              ", Pos " + n + ": " + result);
+          if(VERBOSE) System.out.print("[" + counter + "] Thread " +
+              getId() + ", Pos " + n + ": " + result);
           counter++;
         }
         session.close();

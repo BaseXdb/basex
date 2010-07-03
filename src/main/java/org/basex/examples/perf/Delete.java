@@ -24,9 +24,21 @@ public final class Delete extends Benchmark {
   private Delete(final String... args) throws Exception {
     if(!init(args)) return;
 
+    // delete root node
+    update("delete node /*");
+
+    // delete all nodes
     update("delete node //node()");
 
-    // drop database
-    finish();
+    // delete all elements
+    update("delete node //*");
+
+    // delete all text nodes
+    update("delete node //text()");
+
+    // delete all text nodes in several runs
+    final String qu = query("count(//text())");
+    final int n = Math.min(5000, Integer.parseInt(qu.trim()));
+    update(n, "delete node (//text())[1]");
   }
 }

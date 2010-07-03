@@ -11,13 +11,15 @@ import org.basex.core.cmd.XQuery;
 import org.basex.util.Performance;
 
 /**
- * This class performs a client/server stress tests with a specified
+ * This class performs a local stress tests with a specified
  * number of threads and queries.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
 public final class StressTest {
+  /** Verbose flag. */
+  private static final boolean VERBOSE = false;
   /** Number of clients. */
   static final int NCLIENTS = 30;
   /** Number of runs per client. */
@@ -50,9 +52,7 @@ public final class StressTest {
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
-    for(int i = 0; i < NCLIENTS; i++) {
-      new Client().start();
-    }
+    for(int i = 0; i < NCLIENTS; i++) new Client().start();
   }
 
   /**
@@ -75,14 +75,14 @@ public final class StressTest {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
           // return nth text of the database
-          int n = (RND.nextInt() & 0xFF) + 1;
-          String qu = "descendant::text()[position() = " + n + "]";
+          final int n = (RND.nextInt() & 0xFF) + 1;
+          final String qu = "descendant::text()[position() = " + n + "]";
 
-          ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+          final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
           new XQuery(qu).execute(CONTEXT, buffer);
 
-          System.out.print("[" + counter + "] Thread " + getId() +
-              ", Pos " + n + ": " + buffer);
+          if(VERBOSE) System.out.print("[" + counter + "] Thread " +
+              getId() + ", Pos " + n + ": " + buffer);
           counter++;
         }
 
