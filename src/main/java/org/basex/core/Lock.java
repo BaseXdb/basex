@@ -10,6 +10,8 @@ import java.util.LinkedList;
  * @author Andreas Weiler
  */
 public final class Lock {
+  /** Flag for skipping all locking tests. */
+  private static final boolean SKIP = false;
   /** List of waiting processes for writers or reading groups. */
   private final LinkedList<Resource> waiting = new LinkedList<Resource>();
 
@@ -30,6 +32,8 @@ public final class Lock {
    * @param w writing flag
    */
   public void before(final boolean w) {
+    if(SKIP) return;
+    
     if(w) {
       if(state == State.IDLE) {
         state = State.WRITE;
@@ -76,6 +80,8 @@ public final class Lock {
    * @param w writing flag
    */
   public synchronized void after(final boolean w) {
+    if(SKIP) return;
+
     if(w) {
       if(waiting.size() > 0 && !waiting.getFirst().writer) {
         notifyReaders();
