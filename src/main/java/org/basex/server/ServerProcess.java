@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -144,19 +145,27 @@ public final class ServerProcess extends Thread {
         cmd.startTimeout(context.prop.num(Prop.TIMEOUT));
 
         // execute command and send {RESULT}0
-        final boolean ok = cmd.exec(context, out);
-        final String inf = cmd.info();
-        out.write(0);
-        // send {INFO}0
-        out.writeString(inf.equals(PROGERR) ? SERVERTIMEOUT : inf);
-        // send {OK}
-        send(ok);
-
+        boolean ok = true;
+        String info = null;
+        try {
+          cmd.execute(context, out);
+          info = cmd.info();
+        } catch(final BaseXException ex) {
+          ok = false;
+          info = ex.getMessage();
+          if(info.equals(PROGERR)) info = SERVERTIMEOUT;
+        }
         // stop timeout
         cmd.stopTimeout();
 
+        out.write(0);
+        // send {INFO}0
+        out.writeString(info);
+        // send {OK}
+        send(ok);
+
         final String pr = cmd.toString().replace('\r', ' ').replace('\n', ' ');
-        log.write(this, pr, ok ? "OK" : INFOERROR + inf, perf);
+        log.write(this, pr, ok ? "OK" : INFOERROR + info, perf);
       }
       log.write(this, "LOGOUT " + context.user.name, "OK");
     } catch(final IOException ex) {
@@ -255,13 +264,13 @@ public final class ServerProcess extends Thread {
       try { q.close(); } catch(final IOException ex) { }
     }
 
-    new Close().exec(context);
-    if(cmd != null) cmd.stop();
-    context.delete(this);
-
     try {
+      new Close().execute(context);
+      if(cmd != null) cmd.stop();
+      context.delete(this);
+
       socket.close();
-    } catch(final IOException ex) {
+    } catch(final Exception ex) {
       log.write(ex.getMessage());
       ex.printStackTrace();
     }

@@ -2,6 +2,8 @@ package org.basex.test.storage;
 
 import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Command;
@@ -126,8 +128,10 @@ public abstract class UpdateTest {
    * @param cmd command reference
    */
   private void exec(final Command cmd) {
-    if(!cmd.exec(CONTEXT)) {
-      Main.errln(cmd.info());
+    try {
+      cmd.execute(CONTEXT);
+    } catch(final BaseXException ex) {
+      Main.errln(ex.getMessage());
       Performance.stack();
       System.exit(1);
     }

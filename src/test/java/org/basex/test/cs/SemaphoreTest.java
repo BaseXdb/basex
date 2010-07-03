@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.core.Session;
 import org.basex.core.Command;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
-import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 import org.junit.AfterClass;
@@ -38,7 +38,7 @@ public final class SemaphoreTest {
   };
   /** Number of performance tests. */
   private static final int TESTS = 10;
-  /** List to adminster the clients. */
+  /** List to administer the clients. */
   static LinkedList<ClientSession> sessions = new LinkedList<ClientSession>();
 
   /** Server reference. */
@@ -67,13 +67,16 @@ public final class SemaphoreTest {
     new BaseXServer("stop");
   }
 
-  /** Runs a test for concurrent database creations. */
+  /**
+   * Runs a test for concurrent database creations.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void createTest() {
+  public void createTest() throws BaseXException {
     // drops database for clean test
-    exec(new DropDB(NAME), sess);
+    sess.execute(new DropDB(NAME));
     // create database for clean test
-    exec(new CreateDB(NAME, FILE), sess);
+    sess.execute(new CreateDB(NAME, FILE));
     for(int i = 0; i < TESTS; i++) {
       sessions.add(createSession());
     }
@@ -92,7 +95,7 @@ public final class SemaphoreTest {
             final int t = rand.nextInt(2);
             sessions.get(j).execute(q[t]);
             tdone++;
-          } catch(final IOException ex) {
+          } catch(final BaseXException ex) {
             fail(ex.toString());
           }
         }
@@ -134,26 +137,11 @@ public final class SemaphoreTest {
    * @return String result
    */
   String checkRes(final Command cmd, final Session session) {
-    final CachedOutput co = new CachedOutput();
     try {
-      session.execute(cmd, co);
-    } catch(final IOException ex) {
+      return session.execute(cmd);
+    } catch(final BaseXException ex) {
       fail(ex.toString());
-    }
-    return co.toString();
-  }
-
-  /**
-   * Executes the specified command.
-   * @param cmd command reference
-   * @param session Session
-   * @return success flag
-   */
-  String exec(final Command cmd, final Session session) {
-    try {
-      return session.execute(cmd) ? null : session.info();
-    } catch(final IOException ex) {
-      return ex.toString();
+      return null;
     }
   }
 }

@@ -93,7 +93,7 @@ public abstract class Main {
    * Parses and executes the input string.
    * @param in input commands
    * @return false if exit command was sent
-   * @throws IOException I/O exception
+   * @throws IOException database exception
    */
   protected final boolean execute(final String in) throws IOException {
     try {
@@ -128,20 +128,19 @@ public abstract class Main {
 
     final Session ss = session();
     if(ss == null) return false;
-    final boolean ok = ss.execute(cmd, out);
-    if(cmd instanceof Exit) return true;
+    try {
+      ss.execute(cmd, out);
+      if(cmd instanceof Exit) return true;
 
-    if(v || !ok) {
-      final String inf = ss.info();
-      if(!inf.isEmpty()) {
-        if(!ok) {
-          error(null, inf);
-        } else {
-          out(inf);
-        }
+      if(v) {
+        final String inf = ss.info();
+        if(!inf.isEmpty()) out(inf);
       }
+      return true;
+    } catch(final BaseXException ex) {
+      error(null, ex.getMessage());
+      return false;
     }
-    return ok;
   }
 
   /**
@@ -149,7 +148,7 @@ public abstract class Main {
    * @param opt option to be set
    * @param arg argument
    * @return success flag
-   * @throws IOException I/O exception
+   * @throws IOException database exception
    */
   protected final boolean set(final Object[] opt, final Object arg)
       throws IOException {

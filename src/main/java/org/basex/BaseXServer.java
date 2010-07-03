@@ -60,6 +60,7 @@ public final class BaseXServer extends Main implements Runnable {
   public BaseXServer(final String... args) {
     super(args);
     if(!success) return;
+
     log = new Log(context, quiet);
     triggers = new TriggerPool();
 

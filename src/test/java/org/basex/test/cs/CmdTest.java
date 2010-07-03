@@ -1,5 +1,6 @@
 package org.basex.test.cs;
 
+import org.basex.core.BaseXException;
 import org.basex.core.Session;
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
@@ -9,7 +10,6 @@ import org.basex.core.cmd.*;
 import org.basex.core.Commands.*;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
-import org.basex.io.NullOutput;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -57,8 +57,11 @@ public class CmdTest {
    */
   @After
   public final void setUp() {
-    exec(new DropDB(NAME));
-    exec(new DropUser(USER));
+    try {
+      session.execute(new DropDB(NAME));
+      session.execute(new DropUser(USER));
+    } catch(final BaseXException ex) {
+    }
   }
 
   /** Command test. */
@@ -153,11 +156,11 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void dropDB() {
-    no(new DropDB(NAME));
-    ok(new CreateDB(NAME, FILE));
-    no(new DropDB(FILE));
     ok(new DropDB(NAME));
-    no(new DropDB(NAME));
+    ok(new CreateDB(NAME, FILE));
+    ok(new DropDB(USER));
+    ok(new DropDB(NAME));
+    ok(new DropDB(NAME));
   }
 
   /** Command test. */
@@ -342,8 +345,11 @@ public class CmdTest {
    * @param cmd command reference
    */
   private void ok(final Command cmd) {
-    final String msg = exec(cmd);
-    if(msg != null) fail(msg);
+    try {
+      session.execute(cmd);
+    } catch(final BaseXException ex) {
+      fail(ex.getMessage());
+    }
   }
 
   /**
@@ -351,19 +357,10 @@ public class CmdTest {
    * @param cmd command reference
    */
   private void no(final Command cmd) {
-    ok(exec(cmd) != null);
-  }
-
-  /**
-   * Executes the specified command.
-   * @param cmd command reference
-   * @return success flag
-   */
-  private String exec(final Command cmd) {
     try {
-      return session.execute(cmd, new NullOutput()) ? null : session.info();
-    } catch(final Exception ex) {
-      return ex.toString();
+      session.execute(cmd);
+      fail("\"" + cmd + "\" was supposed to fail.");
+    } catch(final BaseXException ex) {
     }
   }
 }

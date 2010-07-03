@@ -149,7 +149,7 @@ public final class DialogOpen extends Dialog {
       if(db.isEmpty()) return;
       if(Dialog.confirm(this, Main.info(DROPCONF, db))) {
         if(ctx.data != null && ctx.data.meta.name.equals(db)) {
-          new Close().exec(gui.context);
+          new Close().run(gui.context);
           gui.notify.init();
         }
         DropDB.drop(db, ctx.prop);

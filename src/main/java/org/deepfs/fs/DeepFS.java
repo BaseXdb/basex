@@ -5,6 +5,8 @@ import static org.deepfs.jfuse.JFUSEAdapter.*;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -182,9 +184,16 @@ public final class DeepFS implements DataText {
    */
   private static Context initData(final String name, final String mp) {
     final Context ctx = new Context();
-    if(!new Open(name).exec(ctx))
-      new CreateDB(name, "<" + S_DEEPFS + " " + "mountpoint=\""
-          + mp + "\"/>").exec(ctx);
+    try {
+      new Open(name).execute(ctx);
+    } catch(final BaseXException ex) {
+      try {
+        new CreateDB(name, "<" + S_DEEPFS + " " + "mountpoint=\""
+            + mp + "\"/>").execute(ctx);
+      } catch(final BaseXException exx) {
+        Main.notexpected(exx);
+      }
+    }
     return ctx;
   }
 

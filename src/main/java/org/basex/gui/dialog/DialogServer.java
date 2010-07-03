@@ -4,11 +4,11 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.io.File;
-import java.io.IOException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -31,7 +31,6 @@ import org.basex.gui.layout.BaseXTabs;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.io.CachedOutput;
 import org.basex.io.IO;
 import org.basex.server.ClientSession;
 import org.basex.util.StringList;
@@ -372,13 +371,13 @@ public final class DialogServer extends Dialog {
         if(tab == 1) user.action(cmp);
         if(tab == 2) dbsP.action(cmp);
       }
-    } catch(final IOException ex) {
+    } catch(final Exception ex) {
       icon = Msg.ERR;
       msg = Main.server(ex);
       if(msg.equals(Main.info(PERMNO, CmdPerm.values()[4]))) {
         try {
           cs.execute(new Exit());
-        } catch(final IOException exx) {
+        } catch(final BaseXException exx) {
           exx.printStackTrace();
         }
       }
@@ -428,15 +427,11 @@ public final class DialogServer extends Dialog {
 
   /**
    * Fills sessions/databases panel.
-   * @throws IOException Exception
+   * @throws BaseXException Exception
    */
-  private void refreshSess() throws IOException {
-    CachedOutput co = new CachedOutput();
-    cs.execute(new ShowSessions(), co);
-    sese.setText(co.finish());
-    co = new CachedOutput();
-    cs.execute(new ShowDatabases(), co);
-    sedb.setText(co.finish());
+  private void refreshSess() throws BaseXException {
+    sese.setText(Token.token(cs.execute(new ShowSessions())));
+    sedb.setText(Token.token(cs.execute(new ShowDatabases())));
   }
 
   /**
@@ -459,7 +454,7 @@ public final class DialogServer extends Dialog {
   public void cancel() {
     try {
       if(connected) cs.execute(new Exit());
-    } catch(final IOException ex) {
+    } catch(final BaseXException ex) {
       Main.debug(ex);
     }
     super.cancel();

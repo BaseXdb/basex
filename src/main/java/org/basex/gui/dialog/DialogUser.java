@@ -2,8 +2,8 @@ package org.basex.gui.dialog;
 
 import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
-import java.io.IOException;
 import javax.swing.JScrollPane;
+import org.basex.core.BaseXException;
 import org.basex.core.Main;
 import org.basex.core.Session;
 import org.basex.core.Commands.CmdPerm;
@@ -23,7 +23,6 @@ import org.basex.gui.layout.BaseXPassword;
 import org.basex.gui.layout.BaseXTable;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
-import org.basex.io.CachedOutput;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.Token;
@@ -169,7 +168,7 @@ final class DialogUser extends BaseXBack {
         final boolean confirm = !g && uname.equals(dia.loguser.getText());
         if(confirm && !Dialog.confirm(this, Main.info(DBREVOKE))) return;
 
-        ok = sess.execute(new Grant(perm, uname, db));
+        sess.execute(new Grant(perm, uname, db));
         msg = sess.info();
         if(confirm) {
           if(perm == CmdPerm.ADMIN) {
@@ -188,7 +187,7 @@ final class DialogUser extends BaseXBack {
       } else if(cmp == create || cmp == user || cmp == pass) {
         final String u = user.getText();
         final String p = new String(pass.getPassword());
-        ok = sess.execute(new CreateUser(u, p));
+        sess.execute(new CreateUser(u, p));
         msg = sess.info();
         setData();
         user.setText("");
@@ -199,7 +198,7 @@ final class DialogUser extends BaseXBack {
         final int[] rows = table.getSelectedRows();
         if(Dialog.confirm(this, Main.info(DRQUESTION, rows.length))) {
           for(final int r : rows) {
-            ok = sess.execute(new DropUser(table.data.value(r, 0), db));
+            sess.execute(new DropUser(table.data.value(r, 0), db));
             if(msg == null) msg = sess.info();
             else if(msg2.isEmpty()) msg2 = " (...)";
             if(!ok) break;
@@ -210,7 +209,7 @@ final class DialogUser extends BaseXBack {
       } else if(cmp == alter) {
         final DialogPass dp = new DialogPass(dia.gui);
         if(dp.ok()) {
-          ok = sess.execute(new AlterUser(table.getValueAt(
+          sess.execute(new AlterUser(table.getValueAt(
               table.getSelectedRow(), 0).toString(), dp.pass()));
           msg = sess.info();
         }
@@ -221,14 +220,14 @@ final class DialogUser extends BaseXBack {
           int c = 3;
           while(--c >= 0 && users.value(r, c).isEmpty());
           final String perm = CmdPerm.values()[c].toString();
-          ok = sess.execute(new Grant(perm, us, db));
+          sess.execute(new Grant(perm, us, db));
           msg = sess.info();
           if(!ok) break;
         }
         setData();
         addUser.requestFocusInWindow();
       }
-    } catch(final IOException ex) {
+    } catch(final BaseXException ex) {
       msg = Main.server(ex);
       ok = false;
     }
@@ -263,9 +262,9 @@ final class DialogUser extends BaseXBack {
 
   /**
    * Sets new data.
-   * @throws IOException I/O Exception
+   * @throws BaseXException database exception
    */
-  public void setData() throws IOException {
+  public void setData() throws BaseXException {
     users = table(null);
 
     if(global) {
@@ -299,26 +298,21 @@ final class DialogUser extends BaseXBack {
    * Returns a global or local user table.
    * @param db database (optional)
    * @return table
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  private Table table(final String db) throws IOException {
-    final CachedOutput co = new CachedOutput();
-    if(!sess.execute(new ShowUsers(db), co))
-      throw new IOException(sess.info());
-    return new Table(co.toString());
+  private Table table(final String db) throws BaseXException {
+    return new Table(sess.execute(new ShowUsers(db)));
   }
 
   /**
    * Sets session.
    * @param s session
-   * @throws IOException I/O Exception
+   * @throws BaseXException database exception
    */
-  public void setSess(final Session s) throws IOException {
+  public void setSess(final Session s) throws BaseXException {
     sess = s;
     if(!global) {
-      final CachedOutput co = new CachedOutput();
-      sess.execute(new List(), co);
-      final Table dbs = new Table(co.toString());
+      final Table dbs = new Table(sess.execute(new List()));
       databases.removeAllItems();
       databases.addItem(numberof(DATABASES, dbs.contents.size()));
       for(final TokenList l : dbs.contents) {

@@ -81,7 +81,7 @@ public final class CommandBuilder {
    * @return self instance
    */
   public CommandBuilder arg(final String key, final int arg) {
-    final String a = cmd.args[arg];
+    final String a = cmd.args.length > arg ? cmd.args[arg] : null;
     if(a != null && !a.isEmpty()) {
       if(key != null) {
         tb.add(' ');

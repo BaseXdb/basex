@@ -1,14 +1,13 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
-import org.basex.io.CachedOutput;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -212,26 +211,39 @@ public class NamespaceTest {
         "<a><b xmlns='B'/><c/></a>");
   }
 
-  /** Creates the database context. */
+  /**
+   * Creates the database context.
+   * @throws BaseXException database exception
+   */
   @BeforeClass
-  public static void start() {
+  public static void start() throws BaseXException {
     context = new Context();
     // turn off pretty printing
-    exec(new Set(Prop.SERIALIZER, "indent=no"));
+    new Set(Prop.SERIALIZER, "indent=no").execute(context);
   }
 
-  /** Creates all test database. */
+  /**
+   * Creates all test databases.
+   * @throws BaseXException database exception
+   */
   @Before
-  public void startTest() {
+  public void startTest() throws BaseXException {
     // create all test databases
-    for(final String[] doc : docs) exec(new CreateDB(doc[0], doc[1]), null);
+    for(final String[] doc : docs) {
+      new CreateDB(doc[0], doc[1]).execute(context);
+    }
   }
 
-  /** Removes test databases and closes the database context. */
+  /**
+   * Removes test databases and closes the database context.
+   * @throws BaseXException database exception
+   */
   @AfterClass
-  public static void finish() {
+  public static void finish() throws BaseXException {
     // drop all test databases
-    for(final String[] doc : docs) exec(new DropDB(doc[0]), null);
+    for(final String[] doc : docs) {
+      new DropDB(doc[0]).execute(context);
+    }
     context.close();
   }
 
@@ -254,30 +266,16 @@ public class NamespaceTest {
   private void query(final String first, final String second,
       final String expected) {
 
-    if(first != null) exec(new XQuery(first));
-    final CachedOutput co = new CachedOutput();
-    exec(new XQuery(second), co);
-
-    // quotes are replaced by apostrophes to simplify comparison
-    final String res = co.toString().replaceAll("\\\"", "'");
-    final String exp = expected.replaceAll("\\\"", "'");
-    if(!exp.equals(res)) fail("\n" + res + "\n" + exp + " expected");
-  }
-
-  /**
-   * Runs a command.
-   * @param cmd command to be run
-   */
-  private static void exec(final Command cmd) {
-    if(!cmd.exec(context)) fail(cmd.info());
-  }
-
-  /**
-   * Runs a command and cached the output.
-   * @param cmd command to be run
-   * @param co cached output
-   */
-  private static void exec(final Command cmd, final CachedOutput co) {
-    if(!cmd.exec(context, co)) fail(cmd.info());
+    try {
+      if(first != null) new XQuery(first).execute(context);
+      final String result = new XQuery(second).execute(context);
+  
+      // quotes are replaced by apostrophes to simplify comparison
+      final String res = result.replaceAll("\\\"", "'");
+      final String exp = expected.replaceAll("\\\"", "'");
+      if(!exp.equals(res)) fail("\n" + res + "\n" + exp + " expected");
+    } catch(final BaseXException ex) {
+      fail(ex.getMessage());
+    }
   }
 }

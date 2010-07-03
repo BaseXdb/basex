@@ -9,6 +9,7 @@ import org.basex.core.Command;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
+import org.basex.data.Result;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.CachedOutput;
@@ -28,6 +29,9 @@ import org.basex.util.Performance;
  * @author Christian Gruen
  */
 public abstract class AQuery extends Command {
+  /** Query result. */
+  protected Result result;
+
   /** Query processor. */
   private QueryProcessor qp;
   /** Parsing time. */
@@ -151,6 +155,11 @@ public abstract class AQuery extends Command {
     }
   }
 
+  @Override
+  public final Result result() {
+    return result;
+  }
+
   /**
    * Adds evaluation information to the information string.
    * @param hits information
@@ -198,8 +207,7 @@ public abstract class AQuery extends Command {
         final CachedOutput co = new CachedOutput();
         qu.plan(new XMLSerializer(co));
         info(QUERYPLAN);
-        info.add(co.finish());
-        info.add(NL);
+        info.add(co + NL + NL);
       }
     } catch(final Exception ex) {
       Main.debug(ex);

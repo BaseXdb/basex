@@ -72,14 +72,15 @@ public class AddDeleteTest {
    * 1) with name and w/o target
    * 2) with name and target set
    * 3) w/o name and target set
+   * @throws BaseXException database exception
    */
   @Test
-  public final void testAddXMLString() {
-    new Add(XMLFRAG, "index.xml").exec(CTX);
+  public final void testAddXMLString() throws BaseXException {
+    new Add(XMLFRAG, "index.xml").execute(CTX);
     assertEquals(1, CTX.doc().length);
-    new Add(XMLFRAG, "index2.xml", "a/b/c").exec(CTX);
+    new Add(XMLFRAG, "index2.xml", "a/b/c").execute(CTX);
     assertEquals(2, CTX.doc().length);
-    new Add(XMLFRAG, null, "a/d/c").exec(CTX);
+    new Add(XMLFRAG, null, "a/d/c").execute(CTX);
     assertEquals(3, CTX.doc().length);
 
   }

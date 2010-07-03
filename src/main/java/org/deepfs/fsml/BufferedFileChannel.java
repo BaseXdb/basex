@@ -393,8 +393,8 @@ public final class BufferedFileChannel {
     if(parent != null) {
       // the fc position may have changed, so the 'rem' value of the parent has
       // to be corrected
-      long deviation = (fc.position() + parent.rem - parent.mark) - parent.size;
-      parent.rem -= deviation;
+      final long dev = fc.position() + parent.rem - parent.mark - parent.size;
+      parent.rem = dev;
       parent.locked = false;
     }
   }

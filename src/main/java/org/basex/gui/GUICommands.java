@@ -9,6 +9,8 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
 import javax.swing.AbstractButton;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Command;
@@ -85,7 +87,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, false);
       if(dialog.ok()) {
-        if(new Close().exec(gui.context)) gui.notify.init();
+        close(gui);
         gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODBQUESTION)) CREATE.execute(gui);
@@ -728,7 +730,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogOpen dialog = new DialogOpen(gui, false, true);
       if(dialog.ok()) {
-        if(new Close().exec(gui.context)) gui.notify.init();
+        close(gui);
         gui.execute(new Open(dialog.db()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
@@ -742,7 +744,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final DialogMountFS dialog = new DialogMountFS(gui);
       if(dialog.ok()) {
-        if(new Close().exec(gui.context)) gui.notify.init();
+        close(gui);
         gui.execute(new Mount(dialog.db(), dialog.mp()));
       } else if(dialog.nodb()) {
         if(Dialog.confirm(gui, NODEEPFSQUESTION)) CREATEFS.execute(gui);
@@ -946,24 +948,19 @@ public enum GUICommands implements GUICommand {
           final boolean fs = cmd instanceof CreateFS;
           final boolean di = cmd instanceof DropIndex;
           final boolean op = cmd instanceof Optimize;
-
-          if(!ci && !di && !op) {
-            new Close().exec(gui.context);
-            gui.notify.init();
-          }
+          if(!ci && !di && !op) close(gui);
 
           // execute command
           final DialogProgress wait = new DialogProgress(gui, t, !fs, !op, cmd);
           final Performance perf = new Performance();
-          final boolean ok = cmd.exec(gui.context);
-          wait.dispose();
-
-          // return user information
-          if(ok) {
+          try {
+            cmd.execute(gui.context);
             gui.status.setText(Main.info(PROCTIME, perf));
-          } else {
-            final String info = cmd.info();
+          } catch(final BaseXException ex) {
+            final String info = ex.getMessage();
             Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
+          } finally {
+            wait.dispose();
           }
           // initialize views
           if(!ci && !di) gui.notify.init();
@@ -972,6 +969,19 @@ public enum GUICommands implements GUICommand {
     }.start();
   }
 
+  /**
+   * Closes the current database and initializes the GUI.
+   * @param gui gui reference
+   */
+  static void close(final GUI gui) {
+    try {
+      new Close().execute(gui.context);
+    } catch(final BaseXException ex) {
+      /* Ignored. */
+    }
+    gui.notify.init();
+  }
+  
   /**
    * Displays a file save dialog and returns the file name or a null reference.
    * @param gui gui reference

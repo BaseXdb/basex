@@ -12,6 +12,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import org.basex.core.BaseXException;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
@@ -179,7 +180,7 @@ public final class DeepShell {
     }
     final DeepStat dst = fs.stat(args[1]);
     if(dst == null) {
-      System.err.printf("stat failed.\n");
+      Main.errln("stat failed.\n");
       return;
     }
     final PrintStream ps = new PrintStream(System.out);
@@ -204,7 +205,7 @@ public final class DeepShell {
         new FSWalker(new TreePrinter()).traverse(d);
         return;
       }
-      System.err.println("No such directory " + d.getAbsolutePath());
+      Main.errln("No such directory %", d.getAbsolutePath());
     }
     help(new String[] { "help", "tree"});
   }
@@ -222,7 +223,7 @@ public final class DeepShell {
     }
     final byte[][] dents = fs.readdir(args[1]);
     if(dents == null) {
-      System.err.printf("listing failed.\n");
+      Main.errln("listing failed.\n");
       return;
     }
     for(final byte[] de : dents) Main.out(">> " + string(de));
@@ -239,7 +240,12 @@ public final class DeepShell {
       help(new String[] { "help", "info"});
       return;
     }
-    new InfoTable(null, null).exec(fs.getContext(), System.out);
+
+    try {
+      Main.outln(new InfoTable(null, null).execute(fs.getContext()));
+    } catch(final BaseXException ex) {
+      Main.notexpected(ex);
+    }
   }
 
   /**

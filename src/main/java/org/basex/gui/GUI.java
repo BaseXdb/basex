@@ -19,6 +19,8 @@ import javax.swing.WindowConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
+
+import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -424,14 +426,22 @@ public final class GUI extends JFrame {
       final CachedOutput co = new CachedOutput(context.prop.num(Prop.MAXTEXT));
       final boolean up = c.writing(context);
       updating = up;
-      final boolean ok = c.exec(context, co);
-      final String inf = c.info();
-      updating = false;
 
-      if(!ok && inf.equals(PROGERR)) {
-        // command was interrupted..
-        cmd = null;
-        return false;
+      boolean ok = true;
+      String inf = null;
+      try {
+        c.execute(context, co);
+        inf = c.info();
+      } catch(final BaseXException ex) {
+        ok = false;
+        inf = ex.getMessage();
+        if(!ok && inf.equals(PROGERR)) {
+          // command was interrupted..
+          cmd = null;
+          return false;
+        }
+      } finally {
+        updating = false;
       }
 
       // show query info

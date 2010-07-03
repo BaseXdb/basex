@@ -32,8 +32,12 @@ public final class InfoTable extends AQuery {
 
   @Override
   protected boolean run() throws IOException {
+    // get arguments
+    final String start = args.length > 0 ? args[0] : null;
+    final String end = args.length > 1 ? args[1] : null;
+
     // evaluate input as number range or xquery
-    if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
+    if(start != null && toInt(start) == Integer.MIN_VALUE) {
       queryNodes();
       if(result == null) return false;
     }
@@ -47,12 +51,12 @@ public final class InfoTable extends AQuery {
       int ps = 0;
       int pe = data.meta.size;
 
-      if(args[0] != null) {
-        if(args[1] != null) {
-          ps = toInt(args[0]);
-          pe = toInt(args[1]) + 1;
+      if(start != null) {
+        if(end != null) {
+          ps = toInt(start);
+          pe = toInt(end) + 1;
         } else {
-          ps = toInt(args[0]);
+          ps = toInt(start);
           pe = ps + 1;
         }
       }
@@ -129,7 +133,8 @@ public final class InfoTable extends AQuery {
   @Override
   public void build(final CommandBuilder cb) {
     cb.init(Cmd.INFO + " " + CmdInfo.TABLE);
-    if(args[0] != null && toInt(args[0]) == Integer.MIN_VALUE) {
+    if(args.length > 0 && args[0] != null && toInt(args[0]) ==
+      Integer.MIN_VALUE) {
       cb.xquery(0);
     } else {
       cb.arg(0).arg(1);

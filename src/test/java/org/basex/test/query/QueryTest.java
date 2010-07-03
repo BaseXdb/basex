@@ -1,6 +1,8 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Command;
@@ -42,27 +44,31 @@ public abstract class QueryTest {
     context.prop.set(Prop.CACHEQUERY, true);
   }
 
-  /** Finish test. */
+  /**
+   * Finish the test.
+   * @throws BaseXException database exception
+   */
   @AfterClass
-  public static void stopTest() {
-    new DropDB(Main.name(QueryTest.class)).exec(context);
+  public static void stopTest() throws BaseXException {
+    new DropDB(Main.name(QueryTest.class)).execute(context);
     context.close();
   }
 
   /**
    * Tests the specified instance.
+   * @throws BaseXException database exception
    */
   @Test
-  public void test() {
+  public void test() throws BaseXException {
     final String file = doc.replaceAll("\\\"", "\\\\\"");
     final String name = Main.name(this);
     final boolean up = this instanceof XQUPTest;
-    exec(new CreateDB(name, file));
+    new CreateDB(name, file).execute(context);
 
     for(final Object[] qu : queries) {
       // added to renew document after each update test
       if(up && ((String) qu[0]).startsWith("xxx")) {
-        exec(new CreateDB(name, file));
+        new CreateDB(name, file).execute(context);
       }
 
       final boolean correct = qu.length == 3;
@@ -70,7 +76,8 @@ public abstract class QueryTest {
       final String cmd = qu[0] + ": " + query;
 
       final Command c = new XQuery(query);
-      if(c.exec(context)) {
+      try {
+        c.execute(context);
         final Result val = c.result();
         final Result cmp = correct ? (Result) qu[1] : null;
         if(val instanceof Nodes && cmp instanceof Nodes) {
@@ -80,18 +87,10 @@ public abstract class QueryTest {
           fail(cmd + ": Right: " + (correct ? qu[1] : "error") + "\n  Found: " +
               val + "\n" + details());
         }
-      } else if(correct) {
-        fail(qu[0] + ": " + c.info() + details());
+      } catch(final BaseXException ex) {
+        if(correct) fail(qu[0] + ": " + ex.getMessage() + details());
       }
     }
-  }
-
-  /**
-   * Runs a command.
-   * @param c command to be run
-   */
-  private static void exec(final Command c) {
-    if(!c.exec(context)) fail(c.info());
   }
 
   /**

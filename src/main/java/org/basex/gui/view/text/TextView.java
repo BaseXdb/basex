@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.Box;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
@@ -184,7 +186,7 @@ public final class TextView extends View implements ActionListener {
     try {
       out = new PrintOutput(file.toString());
       if(cmd != null) {
-        cmd.exec(gui.context, out);
+        cmd.execute(gui.context, out);
       } else if(ns != null) {
         ns.serialize(new XMLSerializer(out));
       } else {
@@ -192,6 +194,8 @@ public final class TextView extends View implements ActionListener {
         for(final byte t : txt) if(t < 0 || t > ' ' || Token.ws(t))
           out.write(t);
       }
+    } catch(final BaseXException ex) {
+      Dialog.error(gui, NOTSAVED);
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);
     } finally {

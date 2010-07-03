@@ -4,13 +4,13 @@ import static org.junit.Assert.*;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.core.Session;
 import org.basex.core.Command;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.XQuery;
-import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 import org.junit.AfterClass;
@@ -79,11 +79,14 @@ public final class LockingTest {
     new BaseXServer("stop");
   }
 
-  /** Runs a test for concurrent database creations. */
+  /**
+   * Runs a test for concurrent database creations.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void createTest() {
+  public void createTest() throws BaseXException {
     // drops database for clean test
-    exec(new DropDB("factbook"), session1);
+    session1.execute(new DropDB("factbook"));
 
     // second thread
     new Thread() {
@@ -91,45 +94,60 @@ public final class LockingTest {
       public void run() {
         // wait until first command is running
         Performance.sleep(200);
-        final String result = exec(new CreateDB(NAME, FILE), session2);
-        if(result == null) fail(FILE + " should still be locked.");
+        try {
+          session2.execute(new CreateDB(NAME, FILE));
+          fail(FILE + " should still be locked.");
+        } catch(final BaseXException ex) {
+        }
       }
     }.start();
 
     // first (main) thread
-    exec(new CreateDB(NAME, FILE), session1);
+    session1.execute(new CreateDB(NAME, FILE));
     // opens DB in session2 for further tests
-    exec(new Open(NAME), session2);
+    session2.execute(new Open(NAME));
 
     if(server.context.pool.pins("factbook") != 2) {
       fail("test failed conCreate");
     }
   }
 
-  /** Read/read test. */
+  /**
+   * Read/read test.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void readReadTest() {
+  public void readReadTest() throws BaseXException {
     runTest(true, true);
   }
 
-  /** Write/write test. */
+  /**
+   * Write/write test.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void writeWriteTest() {
+  public void writeWriteTest() throws BaseXException {
     runTest(false, false);
     if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
       fail("Not all nodes have been deleted.");
     }
   }
 
-  /** Write/read test. */
+  /**
+   * Write/read test.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void writeReadTest() {
+  public void writeReadTest() throws BaseXException {
     runTest(false, true);
   }
 
-  /** Write/read test. */
+  /**
+   * Write/read test.
+   * @throws BaseXException database exception
+   */
   @Test
-  public void readWriteTest() {
+  public void readWriteTest() throws BaseXException {
     runTest(true, false);
     if(!checkRes(new XQuery("count(//aa)"), session1).equals("0")) {
       fail("Not all nodes have been deleted.");
@@ -160,8 +178,11 @@ public final class LockingTest {
    * Runs the tests.
    * @param read1 perform read/write query in main thread
    * @param read2 perform read/write query in second thread
+   * @throws BaseXException database exception
    */
-  private void runTest(final boolean read1, final boolean read2) {
+  private void runTest(final boolean read1, final boolean read2)
+      throws BaseXException {
+
     new Thread() {
       @Override
       public void run() {
@@ -170,8 +191,11 @@ public final class LockingTest {
           final String res = checkRes(new XQuery(READ1), session2);
           if(!res.equals("192000")) fail("test failed: " + res);
         } else {
-          final String res = exec(new XQuery(WRITE2), session2);
-          if(res != null) fail("test failed: " + res);
+          try {
+            session2.execute(new XQuery(WRITE2));
+          } catch(final BaseXException bx) {
+            fail("test failed: " + bx.getMessage());
+          }
         }
         done = true;
       }
@@ -181,7 +205,7 @@ public final class LockingTest {
       final String res = checkRes(new XQuery(READ1), session1);
       if(!res.equals("192000")) fail("test failed: " + res);
     } else {
-      exec(new XQuery(WRITE1), session1);
+      session1.execute(new XQuery(WRITE1));
     }
     while(!done) {
       Performance.sleep(200);
@@ -221,26 +245,11 @@ public final class LockingTest {
    * @return String result
    */
   String checkRes(final Command cmd, final Session session) {
-    final CachedOutput co = new CachedOutput();
     try {
-      session.execute(cmd, co);
-    } catch(final IOException ex) {
+      return session.execute(cmd);
+    } catch(final BaseXException ex) {
       fail(ex.toString());
-    }
-    return co.toString();
-  }
-
-  /**
-   * Runs the specified command.
-   * @param cmd command reference
-   * @param session Session
-   * @return success flag
-   */
-  String exec(final Command cmd, final Session session) {
-    try {
-      return session.execute(cmd) ? null : session.info();
-    } catch(final IOException ex) {
-      return ex.toString();
+      return null;
     }
   }
 }

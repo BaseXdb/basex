@@ -2,7 +2,9 @@ package org.basex.test.cs;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
+
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Session;
 import org.basex.core.cmd.Close;
@@ -109,8 +111,11 @@ public final class PoolTest {
    * @param s Session
    */
   void ok(final Command cmd, final Session s) {
-    final String msg = exec(cmd, s);
-    if(msg != null) fail(msg);
+    try {
+      s.execute(cmd);
+    } catch(final BaseXException ex) {
+      fail(ex.getMessage());
+    }
   }
 
   /**
@@ -119,28 +124,10 @@ public final class PoolTest {
    * @param s Session
    */
   private void no(final Command cmd, final Session s) {
-    ok(exec(cmd, s) != null);
-  }
-
-  /**
-   * Assumes that the specified flag is successful.
-   * @param flag flag
-   */
-  private static void ok(final boolean flag) {
-    assertTrue(flag);
-  }
-
-  /**
-   * Executes the specified command.
-   * @param cmd command reference
-   * @param session Session
-   * @return success flag
-   */
-  private String exec(final Command cmd, final Session session) {
     try {
-      return session.execute(cmd) ? null : session.info();
-    } catch(final Exception ex) {
-      return ex.toString();
+      s.execute(cmd);
+      fail("Command was supposed to fail.");
+    } catch(final BaseXException ex) {
     }
   }
 }

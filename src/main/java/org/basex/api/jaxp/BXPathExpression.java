@@ -6,8 +6,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import org.basex.api.dom.BXNList;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Command;
 import org.basex.core.cmd.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -55,9 +55,12 @@ final class BXPathExpression implements XPathExpression {
   public Object evaluate(final InputSource is, final QName res)
       throws XPathExpressionException {
 
-    final Command cmd = new CreateDB(is.getSystemId());
-    if(cmd.exec(context)) return finish(eval(), res);
-    throw new XPathExpressionException(cmd.info());
+    try {
+      new CreateDB(is.getSystemId()).execute(context);
+      return finish(eval(), res);
+    } catch(final BaseXException ex) {
+      throw new XPathExpressionException(ex.getMessage());
+    }
   }
 
   /**

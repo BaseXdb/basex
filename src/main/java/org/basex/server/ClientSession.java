@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Session;
 import org.basex.core.Context;
 import org.basex.core.Command;
@@ -41,8 +43,6 @@ public final class ClientSession extends Session {
   private final PrintOutput out;
   /** Input stream. */
   private final InputStream in;
-  /** Command info. */
-  private String info;
 
   /**
    * Constructor, specifying the database context and the
@@ -87,26 +87,26 @@ public final class ClientSession extends Session {
   }
 
   @Override
-  public boolean execute(final String cmd, final OutputStream o)
-      throws IOException {
+  public void execute(final String cmd, final OutputStream o)
+      throws BaseXException {
 
-    send(cmd);
-    final BufferInput bi = new BufferInput(in);
-    int l;
-    while((l = bi.read()) != 0) o.write(l);
-    info = bi.readString();
-    return bi.read() == 0;
+    try {
+      send(cmd);
+      final BufferInput bi = new BufferInput(in);
+      int l;
+      while((l = bi.read()) != 0) o.write(l);
+      final String inf = bi.readString();
+      if(bi.read() != 0) throw new BaseXException(inf);
+      info = inf;
+    } catch(final IOException ex) {
+      throw new BaseXException(ex.getMessage());
+    }
   }
 
   @Override
-  public boolean execute(final Command cmd, final OutputStream o)
-      throws IOException {
-    return execute(cmd.toString(), o);
-  }
-
-  @Override
-  public String info() {
-    return info;
+  public void execute(final Command cmd, final OutputStream o)
+      throws BaseXException {
+    execute(cmd.toString(), o);
   }
 
   @Override

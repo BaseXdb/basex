@@ -2,7 +2,9 @@ package org.basex.test.cs;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
+
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.Session;
 import org.basex.core.Commands.CmdIndex;
@@ -32,7 +34,6 @@ import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowUsers;
 import org.basex.core.cmd.XQuery;
-import org.basex.io.NullOutput;
 import org.basex.server.ClientSession;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -215,44 +216,30 @@ public final class PermissionTest {
     ok(new DropUser("test"), adminSession);
   }
 
+
   /**
    * Assumes that this command is successful.
    * @param cmd command reference
-   * @param s Session
+   * @param s session
    */
-  static void ok(final Command cmd, final Session s) {
-    final String msg = exec(cmd, s);
-    if(msg != null) fail(cmd + "\n" + msg);
+  private static void ok(final Command cmd, final Session s) {
+    try {
+      s.execute(cmd);
+    } catch(final BaseXException ex) {
+      fail(ex.getMessage());
+    }
   }
 
   /**
    * Assumes that this command fails.
    * @param cmd command reference
-   * @param s Session
+   * @param s session
    */
-  private void no(final Command cmd, final Session s) {
-    ok(exec(cmd, s) != null);
-  }
-
-  /**
-   * Assumes that the specified flag is successful.
-   * @param flag flag
-   */
-  private static void ok(final boolean flag) {
-    assertTrue(flag);
-  }
-
-  /**
-   * Executes the specified command.
-   * @param cmd command reference
-   * @param session Session
-   * @return success flag
-   */
-  private static String exec(final Command cmd, final Session session) {
+  private static void no(final Command cmd, final Session s) {
     try {
-      return session.execute(cmd, new NullOutput()) ? null : session.info();
-    } catch(final Exception ex) {
-      return ex.toString();
+      s.execute(cmd);
+      fail("\"" + cmd + "\" was supposed to fail.");
+    } catch(final BaseXException ex) {
     }
   }
 

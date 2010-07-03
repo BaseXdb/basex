@@ -1,6 +1,5 @@
 package org.basex.core;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.query.QueryException;
 
@@ -13,8 +12,6 @@ import org.basex.query.QueryException;
 public class LocalSession extends Session {
   /** Database context. */
   private final Context ctx;
-  /** Command reference. */
-  private Command cmd;
 
   /**
    * Constructor.
@@ -25,25 +22,21 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public boolean execute(final String str, final OutputStream out)
-      throws IOException {
+  public void execute(final String str, final OutputStream out)
+      throws BaseXException {
 
     try {
-      return execute(new CommandParser(str, ctx).parse()[0], out);
+      execute(new CommandParser(str, ctx).parseSingle(), out);
     } catch(final QueryException ex) {
-      throw new IOException(ex.getMessage());
+      throw new BaseXException(ex.getMessage());
     }
   }
 
   @Override
-  public boolean execute(final Command c, final OutputStream out) {
-    cmd = c;
-    return c.exec(ctx, out);
-  }
-
-  @Override
-  public String info() {
-    return cmd.info();
+  public void execute(final Command cmd, final OutputStream out)
+      throws BaseXException {
+    cmd.execute(ctx, out);
+    info = cmd.info();
   }
 
   @Override

@@ -1,6 +1,7 @@
 package org.basex.test.query;
 
 import org.basex.core.AProp;
+import org.basex.core.BaseXException;
 import org.basex.core.Prop;
 import org.junit.Test;
 
@@ -551,7 +552,7 @@ public final class FTTest extends QueryTest {
 
   @Test
   @Override
-  public void test() {
+  public void test() throws BaseXException {
     final Prop prop = context.prop;
     if(ALL) {
       // testing all kinds of combinations
