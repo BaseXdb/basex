@@ -422,7 +422,7 @@ public final class GUI extends JFrame {
 
       // execute command and cache result
       final CachedOutput co = new CachedOutput(context.prop.num(Prop.MAXTEXT));
-      final boolean up = c.updating(context);
+      final boolean up = c.writing(context);
       updating = up;
       final boolean ok = c.exec(context, co);
       final String inf = c.info();

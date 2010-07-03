@@ -120,10 +120,7 @@ public final class ServerProcess extends Thread {
         final Performance perf = new Performance();
         cmd = null;
         try {
-          final Command[] c = new CommandParser(input, context, true).parse();
-          if(c.length != 1) throw new QueryException(SERVERPROC, c.length);
-
-          cmd = c[0];
+          cmd = new CommandParser(input, context, true).parseSingle();
         } catch(final QueryException ex) {
           // log invalid command
           final String msg = ex.extended();

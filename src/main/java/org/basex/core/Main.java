@@ -69,7 +69,8 @@ public abstract class Main {
 
     while(console) {
       Main.out("> ");
-      if(!execute(input())) return true;
+      final String in = input().trim();
+      if(in.length() != 0 && !execute(in)) return true;
     }
     return false;
   }
@@ -171,7 +172,7 @@ public abstract class Main {
    */
   protected final String input() {
     final Scanner sc = new Scanner(System.in);
-    return sc.hasNextLine() ? sc.nextLine() : "";
+    return sc.hasNextLine() ? sc.nextLine().trim() : "";
   }
 
   /**

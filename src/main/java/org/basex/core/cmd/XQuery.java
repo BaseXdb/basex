@@ -23,7 +23,7 @@ public final class XQuery extends AQuery {
   }
 
   @Override
-  public boolean updating(final Context ctx) {
+  public boolean writing(final Context ctx) {
     return updating(ctx, args[0]);
   }
 }

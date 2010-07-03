@@ -17,11 +17,10 @@ public final class Lock {
 
   /** States of locking. */
   private static enum State {
-    /** Idle state. */ IDLE,
-    /** Read state. */ READ,
+    /** Idle state.  */ IDLE,
+    /** Read state.  */ READ,
     /** Write state. */ WRITE
   }
-
   /** State of the lock. */
   private State state = State.IDLE;
   /** Number of active readers. */
@@ -124,15 +123,10 @@ public final class Lock {
     }
   }
 
-  /**
-   * Inner class for a locking object.
-   *
-   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
-   * @author Andreas Weiler
-   */
+  /** Inner class for a locking object. */
   private static class Resource {
     /** Writer flag. */
-    boolean writer;
+    final boolean writer;
     /** Flag if lock can start. */
     boolean valid;
 

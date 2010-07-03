@@ -91,17 +91,28 @@ public final class CommandParser extends InputParser {
   }
 
   /**
+   * Parses the input as single command and returns the result.
+   * @return command
+   * @throws QueryException query exception
+   */
+  public Command parseSingle() throws QueryException {
+    final Cmd cmd = consume(Cmd.class, null);
+    final Command command = parse(cmd, true);
+    consumeWS();
+    if(more()) help(null, cmd);
+    return command;
+  }
+
+  /**
    * Parses the input and returns a command list.
    * @return commands
    * @throws QueryException query exception
    */
   public Command[] parse() throws QueryException {
     Command[] list = new Command[0];
-    if(!more()) return list;
-
     while(true) {
       final Cmd cmd = consume(Cmd.class, null);
-      list = Array.add(list, parse(cmd));
+      list = Array.add(list, parse(cmd, false));
       consumeWS();
       if(!more()) return list;
       if(!consume(';')) help(null, cmd);
@@ -110,16 +121,18 @@ public final class CommandParser extends InputParser {
 
   /**
    * Parses a single command.
-   * @param cmd command
+   * @param cmd command definition
+   * @param s single command expected
    * @return resulting command
    * @throws QueryException query exception
    */
-  private Command parse(final Cmd cmd) throws QueryException {
+  private Command parse(final Cmd cmd, final boolean s)
+      throws QueryException {
     switch(cmd) {
       case CREATE: case C:
         switch(consume(CmdCreate.class, cmd)) {
           case DATABASE: case DB:
-            return new CreateDB(name(cmd), string(null));
+            return new CreateDB(name(cmd), s ? remaining(null) : string(null));
           case INDEX:
             return new CreateIndex(consume(CmdIndex.class, cmd));
           case FS:
@@ -145,7 +158,7 @@ public final class CommandParser extends InputParser {
       case ADD:
         String arg1 = key(AS, null) ? name(cmd) : null;
         String arg2 = key(TO, null) ? string(cmd) : null;
-        return new Add(string(cmd), arg1, arg2);
+        return new Add(s ? remaining(cmd) : string(cmd), arg1, arg2);
       case DELETE:
         return new Delete(string(cmd));
       case INFO: case I:
@@ -233,7 +246,7 @@ public final class CommandParser extends InputParser {
    * Parses and returns a string, delimited by a space or semicolon.
    * Quotes can be used to include spaces.
    * @param cmd referring command; if specified, the result must not be empty
-   * @return path
+   * @return string
    * @throws QueryException query exception
    */
   private String string(final Cmd cmd) throws QueryException {
@@ -249,6 +262,27 @@ public final class CommandParser extends InputParser {
     }
     return finish(cmd, tb);
   }
+
+  /**
+   * Parses and returns the remaining string. Quotes at the beginning and end
+   * of the argument will be stripped.
+   * @param cmd referring command; if specified, the result must not be empty
+   * @return remaining string
+   * @throws QueryException query exception
+   */
+  private String remaining(final Cmd cmd) throws QueryException {
+    final TokenBuilder tb = new TokenBuilder();
+    consumeWS();
+    while(more()) tb.add(consume());
+    String arg = finish(cmd, tb);
+    if(arg != null) {
+      // chop quotes; substrings are faster than replaces...
+      if(arg.startsWith("\"")) arg = arg.substring(1);
+      if(arg.endsWith("\"")) arg = arg.substring(0, arg.length() - 1);
+    }
+    return arg;
+  }
+
 
   /**
    * Parses and returns an xquery expression.

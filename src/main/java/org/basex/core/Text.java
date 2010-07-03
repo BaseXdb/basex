@@ -120,8 +120,6 @@ public interface Text {
   String SERVERUSER = lang("srv_user");
   /** Password. */
   String SERVERPW = lang("srv_pw");
-  /** Password. */
-  String SERVERPROC = "% instead of 1 commands received.";
   /** Localhost. */
   String LOCALHOST = "localhost";
 
@@ -329,6 +327,7 @@ public interface Text {
   String PROCSYNTAX = lang("proc_syntax") + ": %";
   /** Command execution error. */
   String PROCERR = lang("proc_err") + COL + NL + "%";
+
   /** No database error. */
   String PROCNODB = lang("proc_nodb");
   /** Main-memory error. */

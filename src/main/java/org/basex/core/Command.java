@@ -104,7 +104,7 @@ public abstract class Command extends Progress {
     // check concurrency of commands
     boolean ok = false;
     final boolean writing =
-      (flags & (User.CREATE | User.WRITE)) != 0 || updating(ctx);
+      (flags & (User.CREATE | User.WRITE)) != 0 || writing(ctx);
 
     ctx.lock.before(writing);
     ok = run(ctx, os);
@@ -188,7 +188,7 @@ public abstract class Command extends Progress {
    * @return result of check
    */
   @SuppressWarnings("unused")
-  public boolean updating(final Context ctx) {
+  public boolean writing(final Context ctx) {
     return false;
   }
 

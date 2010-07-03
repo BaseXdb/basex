@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Data;
@@ -77,11 +76,6 @@ public class Add extends ACreate {
 
     context.update();
     return info(PATHADDED, name, perf);
-  }
-
-  @Override
-  public boolean updating(final Context ctx) {
-    return true;
   }
 
   @Override

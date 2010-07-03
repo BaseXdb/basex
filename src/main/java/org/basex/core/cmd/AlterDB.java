@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -39,7 +38,7 @@ public final class AlterDB extends Command {
   }
 
   /**
-   * Deletes the specified database.
+   * Renames the specified database.
    * @param db database name
    * @param dbnew new database name
    * @param pr database properties
@@ -48,11 +47,6 @@ public final class AlterDB extends Command {
   public static synchronized boolean alter(final String db,
       final String dbnew, final Prop pr) {
     return pr.dbpath(db).renameTo(pr.dbpath(dbnew));
-  }
-
-  @Override
-  public boolean updating(final Context ctx) {
-    return true;
   }
 
   @Override

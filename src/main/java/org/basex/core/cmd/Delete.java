@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
 
@@ -46,10 +45,5 @@ public final class Delete extends ACreate {
       context.update();
     }
     return info(PATHDELETED, c, perf);
-  }
-
-  @Override
-  public boolean updating(final Context ctx) {
-    return true;
   }
 }
