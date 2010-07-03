@@ -2,10 +2,7 @@ package org.basex.examples.create;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
+import org.basex.core.cmd.*;
 
 /**
  * This example demonstrates how to import a file in the CSV format
@@ -46,11 +43,11 @@ public final class CSVExample {
     // Perform query
     System.out.println("\n* Number of records:");
 
-    new XQuery("count(//record)").execute(ctx, System.out);
+    System.out.println(new XQuery("count(//record)").execute(ctx));
 
     // ------------------------------------------------------------------------
     // Drop database and close context
-    System.out.println("\n\n* Drop database.");
+    System.out.println("\n* Drop database.");
 
     new DropDB(name).execute(ctx);
     ctx.close();

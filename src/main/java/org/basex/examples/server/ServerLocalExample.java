@@ -1,13 +1,12 @@
 package org.basex.examples.server;
 
-import java.io.IOException;
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
 import org.basex.examples.query.QueryExample;
-import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
 
 /**
@@ -51,24 +50,23 @@ public final class ServerLocalExample {
     // Locally cache the result of a server-side query
     System.out.println("\n* Cache server-side query results.");
 
-    CachedOutput result = new CachedOutput();
-    send("XQUERY for $x in doc('etc/xml/input.xml') return $x", result);
+    String result = send("XQUERY for $x in doc('etc/xml/input.xml') return $x");
 
     // -------------------------------------------------------------------------
     // Create a local database from the XML result string
     System.out.println("\n* Create a local database.");
 
-    new CreateDB("LocalDB", result.toString()).execute(CONTEXT, System.out);
+    new CreateDB("LocalDB", result).execute(CONTEXT);
 
     // -------------------------------------------------------------------------
     // Run a query on the locally cached results
     System.out.println("\n* Run a local query:");
 
-    new XQuery("//title").execute(CONTEXT, System.out);
+    System.out.println(new XQuery("//title").execute(CONTEXT));
 
     // ------------------------------------------------------------------------
     // Close the client session
-    System.out.println("\n\n* Close the client session.");
+    System.out.println("\n* Close the client session.");
 
     session.close();
 
@@ -90,18 +88,13 @@ public final class ServerLocalExample {
    * response to out.
    * Command info is printed to System.out by default.
    * @param command command to be executed
-   * @param out OutputStream to write to
-   * @throws IOException I/O exception
+   * @return string result of command
+   * @throws BaseXException database exception
    */
-  private static void send(final String command, final CachedOutput out)
-      throws IOException {
+  private static String send(final String command) throws BaseXException {
 
     // ------------------------------------------------------------------------
     // Execute the command
-    session.execute(command, out);
-
-    // ------------------------------------------------------------------------
-    // If available, print command information or error output
-    System.out.print(session.info());
+    return session.execute(command);
   }
 }

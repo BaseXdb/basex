@@ -1,15 +1,8 @@
 package org.basex.examples.query;
 
-import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.cmd.Add;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.Delete;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.InfoDB;
-import org.basex.core.cmd.Optimize;
-import org.basex.core.cmd.Set;
+import org.basex.core.cmd.*;
 
 /**
  * This class shows the basic usage of the BaseX collection commands.
@@ -22,13 +15,8 @@ import org.basex.core.cmd.Set;
  * @author BaseXTeam
  */
 public final class CollectionExample {
-  /** Database context. */
-  static final Context CONTEXT = new Context();
-  /** Output stream. */
-  static final OutputStream OUT = System.out;
-
-  /** Default constructor. */
-  protected CollectionExample() { }
+  /** Private constructor. */
+  private CollectionExample() { }
 
   /**
    * Runs the example code.
@@ -36,46 +24,52 @@ public final class CollectionExample {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
+    // Create database context.
+    Context context = new Context();
 
     System.out.println("=== CollectionExample ===");
 
     // ------------------------------------------------------------------------
     // You can modify the CREATEFILTER property to import XML
     // files with suffixes other than XML (for example KML):
-    new Set("CREATEFILTER", "*.xml").execute(CONTEXT);
+    new Set("CREATEFILTER", "*.xml").execute(context);
 
     // Variant 1 --------------------------------------------------------------
     // Create a collection and add all documents within the specified path
     System.out.println("\n* Create a collection.");
 
-    new CreateDB("Collection", "etc/").execute(CONTEXT);
-    new DropDB("Collection").execute(CONTEXT);
+    new CreateDB("Collection", "etc/").execute(context);
+    new DropDB("Collection").execute(context);
 
     // Variant 2 --------------------------------------------------------------
     // Or: Create an empty collection, add documents in a second pass
     // and optimize the database to refresh the index structures
     System.out.println("\n* Create an empty collection and add documents.");
 
-    new CreateDB("Collection").execute(CONTEXT);
-    new Add("etc/").execute(CONTEXT);
-    new Optimize().execute(CONTEXT);
+    new CreateDB("Collection").execute(context);
+    new Add("etc/").execute(context);
+    new Optimize().execute(context);
 
     // ------------------------------------------------------------------------
     // Remove a single document from the collection
     System.out.println("\n* Remove a single document.");
 
-    new Delete("test.xml").execute(CONTEXT);
+    new Delete("test.xml").execute(context);
 
     // ------------------------------------------------------------------------
     // Show information on the currently opened database
     System.out.println("\n* Show database information:");
 
-    new InfoDB().execute(CONTEXT, OUT);
+    System.out.println(new InfoDB().execute(context));
 
     // ------------------------------------------------------------------------
     // Drop the database
-    System.out.println("\n* Drop the collection.");
+    System.out.println("* Drop the collection.");
 
-    new DropDB("Collection").execute(CONTEXT);
+    new DropDB("Collection").execute(context);
+    
+    // ------------------------------------------------------------------------
+    // Close the database context
+    context.close();
   }
 }

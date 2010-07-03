@@ -8,7 +8,6 @@ import org.basex.core.Command;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
-import org.basex.io.CachedOutput;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Table;
@@ -97,10 +96,8 @@ public abstract class Statistics {
    * @throws BaseXException exception
    */
   final String exec(final Command cmd) throws BaseXException {
-    final CachedOutput co = new CachedOutput();
     if(debug) Main.errln("- " + cmd);
-    cmd.execute(ctx, co);
-    return co.toString();
+    return cmd.execute(ctx);
   }
 
   /**
@@ -115,6 +112,7 @@ public abstract class Statistics {
         "  -o<k=v>   set database property" + NL +
         "  -t        tabular output" + NL +
         "  database  database to be parsed");
+
     while(arg.more()) {
       if(arg.dash()) {
         final char ch = arg.next();
@@ -122,7 +120,7 @@ public abstract class Statistics {
           debug = true;
         } else if(ch == 'o') {
           final String[] kp = arg.string().split("=", 2);
-          arg.check(new Set(kp[0], kp[1]).exec(ctx));
+          arg.check(new Set(kp[0], kp[1]).run(ctx));
         } else if(ch == 't') {
           tab = true;
         } else {

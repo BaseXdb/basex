@@ -22,7 +22,6 @@ import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
@@ -195,11 +194,9 @@ public final class InexSubmit {
         "return (basex:sum-path($i), $s, base-uri($i))";
 
     final Command cmd = new XQuery(que);
-    final CachedOutput res = new CachedOutput();
-    session.execute(cmd, res);
 
     final SeqIter sq = new SeqIter();
-    final StringTokenizer st = new StringTokenizer(res.toString(), " ");
+    final StringTokenizer st = new StringTokenizer(session.execute(cmd), " ");
     int z = 0;
     while(st.hasMoreTokens() && z < size) {
       final String p = st.nextToken();

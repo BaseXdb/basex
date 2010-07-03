@@ -1,7 +1,6 @@
 package org.basex.examples.query;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import org.basex.core.Context;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
@@ -21,13 +20,8 @@ import org.basex.util.Token;
  * @author BaseX Team
  */
 public final class QueryBindExample {
-  /** Database context. */
-  static final Context CONTEXT = new Context();
-  /** Output stream. */
-  static final OutputStream OUT = System.out;
-
-  /** Default constructor. */
-  protected QueryBindExample() { }
+  /** Private constructor. */
+  private QueryBindExample() { }
 
   /**
    * Runs the example code.
@@ -38,6 +32,9 @@ public final class QueryBindExample {
   public static void main(final String[] args)
       throws IOException, QueryException {
 
+    /** Database context. */
+    Context context = new Context();
+
     System.out.println("=== QueryBindExample ===");
 
     // ------------------------------------------------------------------------
@@ -46,7 +43,7 @@ public final class QueryBindExample {
 
     // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor processor = new QueryProcessor(query, CONTEXT);
+    QueryProcessor processor = new QueryProcessor(query, context);
 
     // ------------------------------------------------------------------------
     // Create the item to be bound
@@ -68,12 +65,18 @@ public final class QueryBindExample {
     // Execute the query
     Result result = processor.query();
 
+    System.out.println("\n* Execute query:");
+
     // ------------------------------------------------------------------------
     // Serialize all results to OUT, using the specified serializer
-    result.serialize(new XMLSerializer(OUT));
+    result.serialize(new XMLSerializer(System.out));
 
     // ------------------------------------------------------------------------
     // Close the query processor
     processor.close();
+    
+    // ------------------------------------------------------------------------
+    // Close the database context
+    context.close();
   }
 }

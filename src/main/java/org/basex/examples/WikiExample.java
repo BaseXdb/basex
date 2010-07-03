@@ -1,11 +1,8 @@
 package org.basex.examples;
 
-import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.XQuery;
+import org.basex.core.cmd.*;
 
 /**
  * This example demonstrates how databases can be created from remote XML
@@ -16,11 +13,6 @@ import org.basex.core.cmd.XQuery;
  * @author BaseX Team
  */
 public final class WikiExample {
-  /** Database context. */
-  static final Context CONTEXT = new Context();
-  /** Output stream. */
-  static final OutputStream OUT = System.out;
-
   /** Default constructor. */
   private WikiExample() { }
 
@@ -30,6 +22,8 @@ public final class WikiExample {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
+    /** Database context. */
+    final Context context = new Context();
 
     System.out.println("=== WikiExample ===");
 
@@ -38,7 +32,7 @@ public final class WikiExample {
     System.out.println("\n* Create a database from a file via http.");
 
     String doc = "http://en.wikipedia.org/wiki/Wikipedia";
-    new CreateDB("WikiExample", doc).execute(CONTEXT);
+    new CreateDB("WikiExample", doc).execute(context);
 
     // -------------------------------------------------------------------------
     // Insert a node before the closing body tag
@@ -51,25 +45,29 @@ public final class WikiExample {
         "  <xhtml:p>I will match the following query because I contain" +
         "   the terms 'ARTICLE' and 'EDITABLE'. :-)</xhtml:p> " +
         "into //xhtml:body"
-    ).execute(CONTEXT, OUT);
+    ).execute(context);
 
     // ----------------------------------------------------------------------
     // Match all paragraphs' textual contents against
     // 'edit.*' AND ('article' or 'page').
     System.out.println("\n* Perform a full-text query:");
 
-    new XQuery(
+    System.out.println(new XQuery(
         "declare namespace xhtml='http://www.w3.org/1999/xhtml';" +
         "for $x in //xhtml:p/text()" +
         "where $x contains text ('edit.*' ftand ('article' ftor 'page')) " +
         "  using wildcards distance at most 10 words " +
         "return <p>{ $x }</p>"
-    ).execute(CONTEXT, OUT);
+    ).execute(context));
 
     // ----------------------------------------------------------------------
     // Drop the database
-    System.out.println("\n\n* Drop the database.");
+    System.out.println("\n* Drop the database.");
 
-    new DropDB("WikiExample").execute(CONTEXT);
+    new DropDB("WikiExample").execute(context);
+    
+    // ------------------------------------------------------------------------
+    // Close the database context
+    context.close();
   }
 }

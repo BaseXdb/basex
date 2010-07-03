@@ -38,7 +38,7 @@ public final class Delete extends Benchmark {
 
     // delete all text nodes in several runs
     final String qu = query("count(//text())");
-    final int n = Math.min(5000, Integer.parseInt(qu.trim()));
+    final int n = Math.min(500, Integer.parseInt(qu.trim()));
     update(n, "delete node (//text())[1]");
   }
 }

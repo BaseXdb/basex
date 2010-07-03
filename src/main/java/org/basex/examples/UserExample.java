@@ -1,15 +1,8 @@
 package org.basex.examples;
 
-import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.cmd.AlterUser;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.CreateUser;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.DropUser;
-import org.basex.core.cmd.Grant;
-import org.basex.core.cmd.ShowUsers;
+import org.basex.core.cmd.*;
 
 /**
  * This class presents methods to directly access
@@ -19,11 +12,6 @@ import org.basex.core.cmd.ShowUsers;
  * @author BaseX Team
  */
 public class UserExample {
-  /** Database context. */
-  static final Context CONTEXT = new Context();
-  /** Output stream. */
-  static final OutputStream OUT = System.out;
-
   /** Default constructor. */
   protected UserExample() { }
 
@@ -33,6 +21,8 @@ public class UserExample {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
+    /** Database context. */
+    final Context context = new Context();
 
     System.out.println("=== AdministrationExample ===");
 
@@ -40,49 +30,53 @@ public class UserExample {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    new CreateDB("input", "etc/xml/input.xml").execute(CONTEXT);
+    new CreateDB("input", "etc/xml/input.xml").execute(context);
 
     // ------------------------------------------------------------------------
     // Create a new user
     System.out.println("\n* Create a user.");
 
-    new CreateUser("testuser", "password").execute(CONTEXT);
+    new CreateUser("testuser", "password").execute(context);
 
     // ------------------------------------------------------------------------
     // Remove global user rights
     System.out.println("\n* Remove global user rights.");
 
-    new Grant("NONE", "testuser").execute(CONTEXT);
+    new Grant("NONE", "testuser").execute(context);
 
     // ------------------------------------------------------------------------
     // Grant local user rights on database 'input'
     System.out.println("\n* Grant local user rights.");
 
-    new Grant("WRITE", "testuser", "input").execute(CONTEXT);
+    new Grant("WRITE", "testuser", "input").execute(context);
 
     // ------------------------------------------------------------------------
     // Show global users
     System.out.println("\n* Show global users.");
 
-    new ShowUsers().execute(CONTEXT, OUT);
+    System.out.println(new ShowUsers().execute(context));
 
     // ------------------------------------------------------------------------
     // Show local users on a single database
-    System.out.println("\n* Show local users.");
+    System.out.println("* Show local users.");
 
-    new ShowUsers("input").execute(CONTEXT, OUT);
+    System.out.println(new ShowUsers("input").execute(context));
 
     // ------------------------------------------------------------------------
     // Change user password
-    System.out.println("\n* Alter a user's password.");
+    System.out.println("* Alter a user's password.");
 
-    new AlterUser("testuser", "newpass").execute(CONTEXT);
+    new AlterUser("testuser", "newpass").execute(context);
 
     // ------------------------------------------------------------------------
     // Drop the database and user
     System.out.println("\n* Drop the user and database.");
 
-    new DropUser("testuser").execute(CONTEXT);
-    new DropDB("input").execute(CONTEXT);
+    new DropUser("testuser").execute(context);
+    new DropDB("input").execute(context);
+    
+    // ------------------------------------------------------------------------
+    // Close the database context
+    context.close();
   }
 }

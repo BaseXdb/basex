@@ -2,6 +2,8 @@ package org.basex.test.w3c;
 
 import static org.basex.core.Text.*;
 import java.io.File;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Command;
@@ -69,7 +71,7 @@ public final class XMLTS {
     context.prop.set(Prop.ATTRINDEX, false);
     //context.prop.set(MAINMEM, true);
 
-    new CreateDB("oasis", FILE).exec(context);
+    new CreateDB("oasis", FILE).execute(context);
     data = context.data;
 
     int ok = 0;
@@ -86,7 +88,12 @@ public final class XMLTS {
 
       context.prop.set(Prop.INTPARSE, true);
       Command cmd = new CreateDB(uri, PATH + uri);
-      final boolean success = cmd.exec(context);
+      boolean success = true;
+      try {
+        cmd.execute(context);
+      } catch(final BaseXException ex) {
+        success = false;
+      }
       final boolean correct = valid == success;
 
       if(verbose || !correct) {
@@ -96,9 +103,9 @@ public final class XMLTS {
           String inf = cmd.info();
           if(!inf.isEmpty()) Main.outln("[BASEX ] " + inf);
           context.prop.set(Prop.INTPARSE, false);
-          new Close().exec(context);
+          new Close().execute(context);
           cmd = new CreateDB(uri, PATH + uri);
-          cmd.exec(context);
+          cmd.execute(context);
           inf = cmd.info();
           if(!inf.isEmpty()) Main.outln("[XERCES] " + inf);
         }
@@ -106,7 +113,7 @@ public final class XMLTS {
       if(correct) ok++;
       else wrong++;
 
-      new Close().exec(context);
+      new Close().execute(context);
     }
 
     Main.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");

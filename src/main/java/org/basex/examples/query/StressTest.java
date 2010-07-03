@@ -1,6 +1,5 @@
 package org.basex.examples.query;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Random;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -78,11 +77,10 @@ public final class StressTest {
           final int n = (RND.nextInt() & 0xFF) + 1;
           final String qu = "descendant::text()[position() = " + n + "]";
 
-          final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-          new XQuery(qu).execute(CONTEXT, buffer);
+          final String result = new XQuery(qu).execute(CONTEXT);
 
           if(VERBOSE) System.out.print("[" + counter + "] Thread " +
-              getId() + ", Pos " + n + ": " + buffer);
+              getId() + ", Pos " + n + ": " + result);
           counter++;
         }
 

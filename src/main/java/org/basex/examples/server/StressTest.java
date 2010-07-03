@@ -1,6 +1,5 @@
 package org.basex.examples.server;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
@@ -35,9 +34,9 @@ public final class StressTest {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
-   * @throws IOException exception
+   * @throws Exception exception
    */
-  public static void main(final String[] args) throws IOException {
+  public static void main(final String[] args) throws Exception {
     System.out.println("=== Server StressTest ===");
 
     // run server instance
@@ -62,9 +61,9 @@ public final class StressTest {
 
   /**
    * Stops the server.
-   * @throws IOException exception
+   * @throws Exception exception
    */
-  static void stopServer() throws IOException {
+  static void stopServer() throws Exception {
     // drop database and stop server
     System.out.println("\n* Stop server and drop test database.");
 
@@ -100,12 +99,10 @@ public final class StressTest {
 
           // return nth text of the database
           final int n = (RND.nextInt() & 0xFF) + 1;
-          final String qu = "xquery basex:db('factbook')/descendant::text()" +
+          final String qu = "basex:db('factbook')/descendant::text()" +
             "[position() = " + n + "]";
 
-          final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-          final String result = session.execute(qu, buffer) ?
-              buffer.toString() : session.info();
+          final String result = session.execute("xquery " + qu);
 
           if(VERBOSE) System.out.print("[" + counter + "] Thread " +
               getId() + ", Pos " + n + ": " + result);
@@ -115,7 +112,7 @@ public final class StressTest {
 
         // server is stopped after last client has finished
         if(++finished == StressTest.NCLIENTS) stopServer();
-      } catch(final IOException ex) {
+      } catch(final Exception ex) {
         ex.printStackTrace();
       }
     }

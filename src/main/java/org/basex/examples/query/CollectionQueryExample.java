@@ -1,11 +1,8 @@
 package org.basex.examples.query;
 
-import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.XQuery;
+import org.basex.core.cmd.*;
 
 /**
  * This class demonstrates collection relevant queries.
@@ -15,13 +12,8 @@ import org.basex.core.cmd.XQuery;
  * @author BaseX Team
  */
 public final class CollectionQueryExample {
-  /** Database context. */
-  static final Context CONTEXT = new Context();
-  /** Output stream. */
-  static final OutputStream OUT = System.out;
-
-  /** Default constructor. */
-  protected CollectionQueryExample() { }
+  /** Private constructor. */
+  private CollectionQueryExample() { }
 
   /**
    * Runs the example code.
@@ -29,6 +21,8 @@ public final class CollectionQueryExample {
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
+    /** Database context. */
+    Context context = new Context();
 
     System.out.println("=== CollectionQueryExample ===");
 
@@ -36,35 +30,39 @@ public final class CollectionQueryExample {
     // Create a collection from all XML documents in the 'etc' directory
     System.out.println("\n* Create a collection.");
 
-    new CreateDB("Collection", "etc/").execute(CONTEXT);
+    new CreateDB("Collection", "etc/").execute(context);
 
     // ------------------------------------------------------------------------
     // List all documents in the database
     System.out.println("\n* List all documents in the database:");
 
     // The XQuery base-uri() function returns a file path
-    new XQuery(
+    System.out.println(new XQuery(
         "for $doc in collection('Collection')" +
         "return <doc path='{ base-uri($doc) }'/>"
-    ).execute(CONTEXT, OUT);
+    ).execute(context));
 
     // ------------------------------------------------------------------------
     // Evaluate a query on a single document
-    System.out.println("\n\n* Evaluate a query on a single document:");
+    System.out.println("\n* Evaluate a query on a single document:");
 
     // If the name of the database is omitted in the collection() function,
     // the currently opened database will be referenced
-    new XQuery(
+    System.out.println(new XQuery(
         "for $doc in collection()" +
         "let $file-path := base-uri($doc)" +
         "where ends-with($file-path, 'factbook.xml')" +
         "return concat($file-path, ' has ', count($doc//*), ' elements')"
-    ).execute(CONTEXT, OUT);
+    ).execute(context));
 
     // ------------------------------------------------------------------------
     // Drop the database
-    System.out.println("\n\n* Drop the database.");
+    System.out.println("\n* Drop the database.");
 
-    new DropDB("Collection").execute(CONTEXT);
+    new DropDB("Collection").execute(context);
+    
+    // ------------------------------------------------------------------------
+    // Close the database context
+    context.close();
   }
 }

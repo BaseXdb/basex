@@ -21,12 +21,12 @@ import org.basex.query.iter.Iter;
  */
 public final class QueryExample {
   /** Database context. */
-  static final Context CONTEXT = new Context();
+  static Context context = new Context();
   /** Output stream. */
-  static final OutputStream OUT = System.out;
+  static OutputStream out = System.out;
 
-  /** Default constructor. */
-  protected QueryExample() { }
+  /** Private constructor. */
+  private QueryExample() { }
 
   /**
    * Runs the example code.
@@ -78,7 +78,7 @@ public final class QueryExample {
    * @throws BaseXException if a database command fails
    */
   static void query(final String query) throws BaseXException {
-    new XQuery(query).execute(CONTEXT, OUT);
+    new XQuery(query).execute(context, out);
   }
 
   /**
@@ -91,7 +91,7 @@ public final class QueryExample {
   static void process(final String query) throws QueryException, IOException {
     // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor processor = new QueryProcessor(query, CONTEXT);
+    QueryProcessor processor = new QueryProcessor(query, context);
 
     // ------------------------------------------------------------------------
     // Execute the query
@@ -99,7 +99,7 @@ public final class QueryExample {
 
     // ------------------------------------------------------------------------
     // Serialize all results to OUT, using the specified serializer
-    result.serialize(new XMLSerializer(OUT));
+    result.serialize(new XMLSerializer(out));
 
     // ------------------------------------------------------------------------
     // Close the query processor
@@ -118,7 +118,7 @@ public final class QueryExample {
   static void iterate(final String query) throws QueryException, IOException {
     // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor processor = new QueryProcessor(query, CONTEXT);
+    QueryProcessor processor = new QueryProcessor(query, context);
 
     // ------------------------------------------------------------------------
     // Store the pointer to the result in an iterator:
@@ -126,7 +126,7 @@ public final class QueryExample {
 
     // ------------------------------------------------------------------------
     // Create an XML serializer
-    XMLSerializer serializer = new XMLSerializer(OUT);
+    XMLSerializer serializer = new XMLSerializer(out);
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents

@@ -44,11 +44,11 @@ public final class LSTExample {
     // Perform query
     System.out.println("\n* Number of files:");
 
-    new XQuery("count(//file)").execute(ctx, System.out);
+    System.out.println(new XQuery("count(//file)").execute(ctx));
 
     // ------------------------------------------------------------------------
     // Drop database and close context
-    System.out.println("\n\n* Drop database.");
+    System.out.println("\n* Drop database.");
 
     new DropDB(name).execute(ctx);
     ctx.close();

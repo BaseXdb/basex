@@ -51,9 +51,7 @@ public final class JaxRxPUT {
     // Send document to server.
     System.out.println("\n* Send document...");
     int i;
-    while((i = in.read()) != -1) {
-      out.write(i);
-    }
+    while((i = in.read()) != -1) out.write(i);
     in.close();
     out.close();
 

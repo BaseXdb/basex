@@ -1,6 +1,7 @@
 package org.basex.examples.perf;
 
 import static java.lang.System.*;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
@@ -9,7 +10,6 @@ import org.basex.core.cmd.Check;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
-import org.basex.io.CachedOutput;
 import org.basex.server.ClientSession;
 import org.basex.util.Args;
 
@@ -22,12 +22,8 @@ import org.basex.util.Args;
 public abstract class Benchmark {
   /** Session. */
   private Session session;
-  /** Performance.
-  private final Performance perf = new Performance();
-  */
-
   /** Input document. */
-  private String input;
+  private String input = "etc/xml/input.xml";
   /** Number of runs. */
   private int runs = 1;
   /** Maximum number of milliseconds to wait for any query. */
@@ -60,17 +56,17 @@ public abstract class Benchmark {
 
   /**
    * Opens the test database.
-   * @throws Exception exception
+   * @throws BaseXException exception
    */
-  protected void check() throws Exception {
+  protected void check() throws BaseXException {
     session.execute(new Check(input));
   }
 
   /**
    * Drops the test database.
-   * @throws Exception exception
+   * @throws BaseXException exception
    */
-  protected void drop() throws Exception {
+  protected void drop() throws BaseXException {
     session.execute(new DropDB(Main.name(this)));
   }
 
@@ -89,9 +85,11 @@ public abstract class Benchmark {
    * @param queries queries to be evaluated
    * @param r runs the number for the specified number of time without creating
    *   a new database
-   * @throws Exception exception
+   * @throws BaseXException exception
    */
-  protected void update(final int r, final String... queries) throws Exception {
+  protected void update(final int r, final String... queries)
+      throws BaseXException {
+
     if(queries.length == 0) return;
 
     out.print("* Queries: " + queries[0]);
@@ -142,13 +140,11 @@ public abstract class Benchmark {
    * Performs the specified query and returns the result.
    * @param query query to be evaluated
    * @return result
-   * @throws Exception exception
+   * @throws BaseXException exception
    */
-  protected String query(final String query) throws Exception {
+  protected String query(final String query) throws BaseXException {
     check();
-    final CachedOutput co = new CachedOutput();
-    session.execute(new XQuery(query), co);
-    return co.toString();
+    return session.execute(new XQuery(query));
   }
 
   /**
@@ -184,13 +180,8 @@ public abstract class Benchmark {
         }
       } else {
         input = arg.string();
+        out.println("- Document: " + input);
       }
-    }
-    if(input == null) {
-      arg.check(false);
-    } else {
-      out.println("- Document: " + input);
-      out.println();
     }
     return arg.finish();
   }

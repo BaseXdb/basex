@@ -3,10 +3,7 @@ package org.basex.examples.create;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.cmd.CreateDB;
-import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Set;
-import org.basex.core.cmd.XQuery;
+import org.basex.core.cmd.*;
 
 /**
  * This example demonstrates how to import a file in the HTML format
@@ -48,11 +45,11 @@ public final class HTMLExample {
     // Perform query
     System.out.println("\n* <a/> elements:");
 
-    new XQuery("//*:a").execute(ctx, System.out);
+    System.out.println(new XQuery("//*:a").execute(ctx));
 
     // ------------------------------------------------------------------------
     // Drop database and close context
-    System.out.println("\n\n* Drop database.");
+    System.out.println("\n* Drop database.");
 
     new DropDB(name).execute(ctx);
     ctx.close();

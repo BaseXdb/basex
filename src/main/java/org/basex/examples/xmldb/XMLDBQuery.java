@@ -28,6 +28,11 @@ public final class XMLDBQuery {
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
+
+    System.out.println("=== XMLDBQuery ===");
+
+    System.out.println("\n* Run query via XML:DB:");
+
     // Collection instance.
     Collection coll = null;
 

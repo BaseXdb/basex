@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.OutputStream;
 import java.util.HashMap;
+
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
@@ -131,15 +133,15 @@ public final class InexSingle {
     String file = Integer.toString(quindex) + ".xml";
     while(file.length() < 7) file = "0" + file;
     final OutputStream out = quiet ? new NullOutput() : new PrintOutput(file);
-    final boolean ok = session.execute(new XQuery(qu.toString()), out);
-    out.close();
-    if(ok) {
+    try {
+      session.execute(new XQuery(qu.toString()), out);
       // output result
       Main.outln("- " + query);
       Main.outln("Result saved to % in %", file, p);
-    } else {
-      Main.outln(session.info());
+    } catch(final BaseXException ex) {
+      Main.outln(ex.getMessage());
     }
+    out.close();
   }
 
   /**

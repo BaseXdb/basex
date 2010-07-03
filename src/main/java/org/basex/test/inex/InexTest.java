@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -14,7 +15,6 @@ import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
-import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -151,11 +151,11 @@ public final class InexTest {
         }
         return;
       }
-//      session.execute(new Set(Prop.IBT, timer));
     }
 
     session.execute(new Set(Prop.SERIALIZE, false));
-    if(session.execute(new XQuery(queries.get(qu)), new CachedOutput())) {
+    try {
+      session.execute(new XQuery(queries.get(qu)));
       if(!store) return;
 
       final String str = session.info();
@@ -170,7 +170,7 @@ public final class InexTest {
 
       rqt[qu] += Double.parseDouble(time);
       if(res != null) res.println(time + ";" + items);
-    } else {
+    } catch(final BaseXException ex) {
       Main.outln(session.info());
       if(res != null) res.println("-1;-1");
     }

@@ -1,7 +1,7 @@
 package org.basex.examples.server;
 
-import java.io.IOException;
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
 
 /**
@@ -29,7 +29,6 @@ public final class ServerExample {
 
     // ------------------------------------------------------------------------
     // Start server on default port 1984.
-    // In a usual scenario, the server will only be run once
     new BaseXServer();
 
     // ------------------------------------------------------------------------
@@ -75,9 +74,9 @@ public final class ServerExample {
    * Sends the specified command to the server and
    * returns the output or command info.
    * @param command command to be executed
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  static void send(final String command) throws IOException {
+  static void send(final String command) throws BaseXException {
     // ------------------------------------------------------------------------
     // Execute the command
     session.execute(command, System.out);

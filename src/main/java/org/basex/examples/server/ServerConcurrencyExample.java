@@ -3,6 +3,7 @@ package org.basex.examples.server;
 import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
+import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
 
 /**
@@ -105,9 +106,9 @@ public final class ServerConcurrencyExample {
    * or command info.
    * @param cmd command to be executed
    * @param cs client session reference
-   * @throws IOException I/O exception
+   * @throws BaseXException database exception
    */
-  void send(final String cmd, final ClientSession cs) throws IOException {
+  void send(final String cmd, final ClientSession cs) throws BaseXException {
     // ------------------------------------------------------------------------
     // Execute the command
     cs.execute(cmd, System.out);
@@ -127,8 +128,9 @@ public final class ServerConcurrencyExample {
      * Constructor.
      * @param query query to be run
      * @throws IOException I/O exception
+     * @throws BaseXException database exception
      */
-    ClientExample(final String query) throws IOException {
+    ClientExample(final String query) throws BaseXException, IOException {
       // ----------------------------------------------------------------------
       // Create a client session and open database
       final ClientSession session =

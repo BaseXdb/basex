@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
 import org.basex.core.Prop;
@@ -14,7 +15,6 @@ import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
-import org.basex.io.CachedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -150,22 +150,21 @@ public final class InexTFCalc {
    * Performs a single query.
    * @param db database offset
    * @param qu query offset
-   * @throws Exception exception
    */
-  private void query(final int db, final int qu) throws Exception {
-    if(session.execute(new XQuery(
-        "distinct-values((for $i in //*[text() contains text \""  +
-        words.get(qu) + "\"] return base-uri($i)))"), new CachedOutput())) {
+  private void query(final int db, final int qu) {
+    try {
+      session.execute(new XQuery(
+          "distinct-values((for $i in //*[text() contains text \""  +
+          words.get(qu) + "\"] return base-uri($i)))"));
 
       final String str = session.info();
       final String items = find(str, "Results   : ([0-9]+) Item");
 
       // output result
-      Main.outln("Query % on %: % items",
-          qu + 1, databases.get(db), items);
+      Main.outln("Query % on %: % items", qu + 1, databases.get(db), items);
       final int n = Integer.parseInt(items);
       if(n > 0) freq[qu] += n;
-    } else {
+    } catch(final BaseXException ex) {
       Main.outln(session.info());
     }
   }
