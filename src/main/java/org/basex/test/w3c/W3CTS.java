@@ -355,10 +355,10 @@ public abstract class W3CTS {
         curr.doc = true;
       }
 
-      context.prop.set(Prop.ALLINFO, compile);
+      context.prop.set(Prop.QUERYINFO, compile);
       final QueryProcessor xq = new QueryProcessor(in, curr, context);
       final QueryContext qctx = xq.ctx;
-      context.prop.set(Prop.ALLINFO, false);
+      context.prop.set(Prop.QUERYINFO, false);
 
       try {
         files.add(file(nodes("*:input-file", state),
@@ -409,7 +409,7 @@ public abstract class W3CTS {
       // print compilation steps
       if(compile) {
         Main.errln("---------------------------------------------------------");
-        Main.err(xq.info(false));
+        Main.err(xq.info());
         Main.errln(in);
       }
 

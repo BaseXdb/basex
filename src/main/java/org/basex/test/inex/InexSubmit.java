@@ -506,7 +506,6 @@ public final class InexSubmit {
       if(!arg.finish()) return false;
 
       session = new ClientSession(ctx, ADMIN, ADMIN);
-      session.execute(new Set(Prop.INFO, true));
       return true;
     } catch(final Exception ex) {
       Main.errln("Please run BaseXServer for using server mode.");

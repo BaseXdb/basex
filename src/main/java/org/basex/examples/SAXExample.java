@@ -37,10 +37,10 @@ public final class SAXExample extends DefaultHandler {
     Context ctx = new Context();
 
     // ----------------------------------------------------------------------
-    // Evaluate the query
+    // Execute the query
     QueryProcessor processor =
       new QueryProcessor("doc('etc/xml/input.xml')//title", ctx);
-    Result result = processor.query();
+    Result result = processor.execute();
 
     // ----------------------------------------------------------------------
     // Create an XML reader, set the content handler and start parsing

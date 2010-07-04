@@ -5,7 +5,6 @@ import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.util.Performance;
 
@@ -46,7 +45,6 @@ public final class StressTest {
 
     // create test database
     System.out.println("\n* Create test database.");
-    new Set("info", true).execute(CONTEXT);
     new CreateDB("factbook", "etc/xml/factbook.xml").execute(CONTEXT);
 
     // run clients

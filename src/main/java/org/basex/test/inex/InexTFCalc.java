@@ -120,8 +120,7 @@ public final class InexTFCalc {
 
     try {
       session = new ClientSession(ctx, ADMIN, ADMIN);
-      session.execute(new Set(Prop.INFO, true));
-      session.execute(new Set(Prop.ALLINFO, false));
+      session.execute(new Set(Prop.QUERYINFO, false));
       return true;
     } catch(final Exception ex) {
       Main.outln("Please run BaseXServer for using server mode.");

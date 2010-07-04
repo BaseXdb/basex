@@ -63,7 +63,7 @@ public final class QueryBindExample {
 
     // ------------------------------------------------------------------------
     // Execute the query
-    Result result = processor.query();
+    Result result = processor.execute();
 
     System.out.println("\n* Execute query:");
 

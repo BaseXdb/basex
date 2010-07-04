@@ -41,21 +41,35 @@ public final class ServerExample {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    // Set an option: turn verbose command information on
-    send("SET INFO true");
-    send("CREATE DB input etc/xml/input.xml");
+    session.execute("CREATE DB input etc/xml/input.xml");
 
     // ------------------------------------------------------------------------
     // Run a query
     System.out.println("\n* Run a query:");
 
-    send("XQUERY //li");
+    System.out.println(session.execute("XQUERY //li"));
 
     // ------------------------------------------------------------------------
-    // Drop the database
-    System.out.println("\n* Close and drop the database:");
+    // Run a query
+    System.out.println("\n* Run a query (faster):");
 
-    send("DROP DB input");
+    session.execute("XQUERY //li", System.out);
+
+    // ------------------------------------------------------------------------
+    // Run a query
+    System.out.println("\n\n* Run a buggy query:");
+
+    try {
+      session.execute("XQUERY ///");
+    } catch(final BaseXException ex) {
+      System.out.println(ex.getMessage());
+    }
+    
+    // ------------------------------------------------------------------------
+    // Drop the database
+    System.out.println("\n* Close and drop the database.");
+
+    session.execute("DROP DB input");
 
     // ------------------------------------------------------------------------
     // Close the client session
@@ -68,21 +82,5 @@ public final class ServerExample {
     System.out.println("\n* Stop the server:");
 
     new BaseXServer("STOP");
-  }
-
-  /**
-   * Sends the specified command to the server and
-   * returns the output or command info.
-   * @param command command to be executed
-   * @throws BaseXException database exception
-   */
-  static void send(final String command) throws BaseXException {
-    // ------------------------------------------------------------------------
-    // Execute the command
-    session.execute(command, System.out);
-
-    // ------------------------------------------------------------------------
-    // If available, print command information or error output
-    System.out.print(session.info());
   }
 }

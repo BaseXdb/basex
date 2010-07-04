@@ -1,10 +1,13 @@
 package org.basex.examples.perf;
 
 import static java.lang.System.*;
+
+import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.LocalSession;
 import org.basex.core.Main;
+import org.basex.core.Prop;
 import org.basex.core.Session;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.DropDB;
@@ -32,6 +35,8 @@ public abstract class Benchmark {
   private int max = Integer.MAX_VALUE;
   /** Local vs server flag. */
   private boolean local;
+  /** Server started flag. */
+  private boolean start;
 
   /**
    * Private constructor.
@@ -44,14 +49,28 @@ public abstract class Benchmark {
     if(!parseArguments(args)) return false;
 
     final Context ctx = new Context();
+    
+    // check if server is (not) running
+    start = !local &&
+      !BaseXServer.ping("localhost", ctx.prop.num(Prop.SERVERPORT));
+    
+    if(start) new BaseXServer();
+    
     session = local ? new LocalSession(ctx) :
       new ClientSession(ctx, "admin", "admin");
     
     // create test database
-    session.execute(new Set("info", "all"));
+    session.execute(new Set(Prop.QUERYINFO, true));
 
     drop();
     return true;
+  }
+
+  /**
+   * Stops the server.
+   */
+  protected void finish() {
+    if(start) BaseXServer.stop(1984);
   }
 
   /**

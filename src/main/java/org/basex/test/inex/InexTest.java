@@ -224,8 +224,7 @@ public final class InexTest {
 
     try {
       session = new ClientSession(ctx, ADMIN, ADMIN);
-      session.execute(new Set(Prop.INFO, true));
-      session.execute(new Set(Prop.ALLINFO, info));
+      session.execute(new Set(Prop.QUERYINFO, info));
       return true;
     } catch(final Exception ex) {
       ex.printStackTrace();

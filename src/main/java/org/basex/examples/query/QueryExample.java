@@ -95,7 +95,7 @@ public final class QueryExample {
 
     // ------------------------------------------------------------------------
     // Execute the query
-    Result result = processor.query();
+    Result result = processor.execute();
 
     // ------------------------------------------------------------------------
     // Serialize all results to OUT, using the specified serializer
