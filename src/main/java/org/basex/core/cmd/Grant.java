@@ -66,7 +66,7 @@ public final class Grant extends Command {
       context.users.write();
     } else {
       try {
-        final Data data = Open.open(context, db);
+        final Data data = Open.open(db, context);
         User u = data.meta.users.get(name);
         // add local user reference
         if(u == null) {

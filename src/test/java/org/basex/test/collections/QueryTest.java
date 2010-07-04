@@ -66,7 +66,7 @@ public class QueryTest {
       + " and $x//location contains text 'uzbekistan' "
       + " return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CTX);
-    assertEquals(1, qp.query().size());
+    assertEquals(1, qp.execute().size());
     qp.close();
   }
 
@@ -80,7 +80,7 @@ public class QueryTest {
         + " where $x[matches(document-uri(.), 'test/zipped/')]"
         + " return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CTX);
-    assertEquals(4, qp.query().size());
+    assertEquals(4, qp.execute().size());
     qp.close();
   }
 

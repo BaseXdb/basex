@@ -410,6 +410,7 @@ qu_stopped=Stopped at
 qu_line=line %
 qu_col=column %
 qu_file=in %
+qu_exec=Query executed in %.
 
 # Admin Commands
 ad_databases=% opened database(s)
@@ -450,7 +451,7 @@ info_dbpath=Đường dẫn cơ sở dữ liệu
 info_nodb=Không có cơ sở dữ liệu nào được tìm thấy.
 info_nodeepfs=No DeepFS database found
 info_dberror=không mở được.
-info_info=Thông tin quy trình
+info_query=Query Info
 info_all=Đầy đủ
 info_debug=Chế độ chỉnh lỗi
 info_chop=Cắt khỏng trắng
@@ -536,7 +537,7 @@ ch_grant2=Grants permissions (on a database) to a user.
 ch_helpgeneral0=Những câu lệnh chung:
 ch_set1=Gán lựa chọn toàn cục (current values: try '%').
 ch_set2=Có [%] với [%] = on/off:
-ch_set21=Hiển thị (tất cả) thông tin quy trình
+ch_set21=Hiển thị thông tin quy trình
 ch_set22=Hiển thị thông tin chỉnh lỗi
 ch_set23=Ghi ra kết quả lệnh hỏi
 ch_set26=Chặt hết khoảng trắng

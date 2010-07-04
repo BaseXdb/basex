@@ -48,9 +48,9 @@ public final class Check extends Command {
   public static synchronized Data check(final Context ctx, final String path)
       throws IOException {
 
-    final IO f = IO.get(path);
-    final String db = f.dbname();
-    return MetaData.found(path, db, ctx.prop) ? Open.open(ctx, db) :
-      CreateDB.xml(ctx, f, db);
+    final IO io = IO.get(path);
+    final String name = io.dbname();
+    return MetaData.found(path, name, ctx.prop) ? Open.open(name, ctx) :
+      CreateDB.xml(io, name, ctx);
   }
 }

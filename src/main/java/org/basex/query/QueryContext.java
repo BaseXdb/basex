@@ -165,7 +165,7 @@ public final class QueryContext extends Progress {
     context = ctx;
     nodes = ctx.current;
     ftopt = new FTOpt(ctx.prop);
-    inf = ctx.prop.is(Prop.ALLINFO);
+    inf = ctx.prop.is(Prop.QUERYINFO);
     if(ctx.query != null) baseURI = Uri.uri(token(ctx.query.url()));
   }
 
@@ -230,11 +230,11 @@ public final class QueryContext extends Progress {
       }
 
       // evaluates the query and returns the result
-      if(inf) compInfo(QUERYCOMP);
+      if(inf) compInfo(NL + QUERYCOMP);
       fun.comp(this);
       vars.comp(this);
       root = root.comp(this);
-      if(inf) compInfo(QUERYRESULT + "%" + NL, root);
+      if(inf) info.add(NL + QUERYRESULT + root);
     } catch(final StackOverflowError ex) {
       if(Prop.debug) ex.printStackTrace();
       Err.or(XPSTACK);
@@ -418,7 +418,7 @@ public final class QueryContext extends Progress {
 
     if(db) {
       try {
-        data = Open.open(context, nm);
+        data = Open.open(nm, context);
       } catch(final IOException ex) {
         Err.or(NODB, nm);
       }
@@ -552,8 +552,8 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Returns query background information.
-   * @return warning
+   * Returns info on query compilation and evaluation.
+   * @return query info
    */
   String info() {
     return info.toString();

@@ -15,4 +15,12 @@ public final class BaseXException extends Exception {
   public BaseXException(final String s, final Object... e) {
     super(Main.info(s, e));
   }
+
+  /**
+   * Constructs an exception from the specified exception instance.
+   * @param ex exception
+   */
+  public BaseXException(final Exception ex) {
+    this(ex.getMessage() != null ? ex.getMessage() : ex.toString());
+  }
 }

@@ -1,6 +1,8 @@
 package org.basex.core;
 
+import java.io.InputStream;
 import java.io.OutputStream;
+import org.basex.core.cmd.CreateDB;
 import org.basex.query.QueryException;
 
 /**
@@ -28,7 +30,7 @@ public class LocalSession extends Session {
     try {
       execute(new CommandParser(str, ctx).parseSingle(), out);
     } catch(final QueryException ex) {
-      throw new BaseXException(ex.getMessage());
+      throw new BaseXException(ex);
     }
   }
 
@@ -37,6 +39,13 @@ public class LocalSession extends Session {
       throws BaseXException {
     cmd.execute(ctx, out);
     info = cmd.info();
+  }
+
+  @Override
+  public void create(final String name, final InputStream input)
+    throws BaseXException {
+    CreateDB.xml(name, input, ctx);
+    info = "Database created.";
   }
 
   @Override

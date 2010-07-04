@@ -77,7 +77,7 @@ public final class PermissionTest {
     ok(new Close(), adminSession);
     ok(new Grant("none", "test"), adminSession);
 
-    ok(new Set(CmdSet.INFO, false), testSession);
+    ok(new Set(CmdSet.QUERYINFO, false), testSession);
     ok(new Password("test"), testSession);
     ok(new Help("list"), testSession);
     ok(new Close(), testSession);

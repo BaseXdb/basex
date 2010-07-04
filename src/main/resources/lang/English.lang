@@ -410,6 +410,7 @@ qu_stopped=Stopped at
 qu_line=line %
 qu_col=column %
 qu_file=in %
+qu_exec=Query executed in %.
 
 # Admin Commands
 ad_databases=% opened database(s)
@@ -450,7 +451,7 @@ info_dbpath=Database Path
 info_nodb=No database found
 info_nodeepfs=No DeepFS database found
 info_dberror=could not be opened.
-info_info=Command Info
+info_query=Query Info
 info_all=verbose
 info_debug=Debug Mode
 info_chop=Whitespace Chopping
@@ -536,7 +537,7 @@ ch_grant2=Grants permissions (on a database) to a user.
 ch_helpgeneral0=General Commands:
 ch_set1=Set global options (current values: try '%').
 ch_set2=Available options [%] with value [%] = on/off:
-ch_set21=Display of (all) command info
+ch_set21=Display of query info
 ch_set22=Display of debug info
 ch_set23=Serialization of query results
 ch_set26=Chopping of XML whitespaces

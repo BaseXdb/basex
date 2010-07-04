@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.BindException;
 import java.net.ConnectException;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Random;
 import java.util.Scanner;
@@ -41,6 +42,8 @@ public abstract class Main {
   protected Session session;
   /** Console mode. */
   protected boolean console;
+  /** Verbose mode. */
+  protected boolean verbose;
 
   /**
    * Constructor.
@@ -48,6 +51,7 @@ public abstract class Main {
    */
   protected Main(final String... args) {
     success = parseArguments(args);
+    verbose |= console;
     if(!success) return;
 
     // guarantee correct shutdown...
@@ -65,8 +69,6 @@ public abstract class Main {
    * @throws IOException I/O exception
    */
   protected final boolean console() throws IOException {
-    set(Prop.INFO, ON);
-
     while(console) {
       Main.out("> ");
       final String in = input().trim();
@@ -108,7 +110,7 @@ public abstract class Main {
           Main.out(SERVERPW + COLS);
           cmd.args[i] = password();
         }
-        if(!execute(cmd, true)) break;
+        if(!execute(cmd, verbose)) break;
       }
     } catch(final QueryException ex) {
       error(ex, ex.getMessage());
@@ -119,23 +121,19 @@ public abstract class Main {
   /**
    * Executes the specified command and optionally prints some information.
    * @param cmd command to be run
-   * @param v verbose flag
+   * @param info verbose flag
    * @return true if operation was successful
    * @throws IOException I/O exception
    */
-  protected final boolean execute(final Command cmd, final boolean v)
+  protected final boolean execute(final Command cmd, final boolean info)
       throws IOException {
 
     final Session ss = session();
     if(ss == null) return false;
     try {
       ss.execute(cmd, out);
+      if(info) out(ss.info());
       if(cmd instanceof Exit) return true;
-
-      if(v) {
-        final String inf = ss.info();
-        if(!inf.isEmpty()) out(inf);
-      }
       return true;
     } catch(final BaseXException ex) {
       error(null, ex.getMessage());
@@ -307,6 +305,7 @@ public abstract class Main {
     else if(ex instanceof LoginException) return SERVERLOGIN;
     else if(ex instanceof ConnectException) return SERVERERR;
     else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
+    else if(ex instanceof SocketException) return SERVERBIND;
     return ex.getMessage();
   }
 

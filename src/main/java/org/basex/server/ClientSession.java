@@ -1,11 +1,11 @@
 package org.basex.server;
 
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Session;
 import org.basex.core.Context;
@@ -77,7 +77,8 @@ public final class ClientSession extends Session {
     final String ts = new BufferInput(in).readString();
 
     // send user name and hashed password/timestamp
-    out = new PrintOutput(socket.getOutputStream());
+    out = new PrintOutput(new BufferedOutputStream(
+        socket.getOutputStream()));
     send(user);
     send(Token.md5(Token.md5(pw) + ts));
     out.flush();
@@ -95,11 +96,10 @@ public final class ClientSession extends Session {
       final BufferInput bi = new BufferInput(in);
       int l;
       while((l = bi.read()) != 0) o.write(l);
-      final String inf = bi.readString();
-      if(bi.read() != 0) throw new BaseXException(inf);
-      info = inf;
+      info = bi.readString();
+      if(bi.read() != 0) throw new BaseXException(info);
     } catch(final IOException ex) {
-      throw new BaseXException(ex.getMessage());
+      throw new BaseXException(ex);
     }
   }
 
@@ -107,6 +107,25 @@ public final class ClientSession extends Session {
   public void execute(final Command cmd, final OutputStream o)
       throws BaseXException {
     execute(cmd.toString(), o);
+  }
+
+  @Override
+  public void create(final String name, final InputStream input)
+    throws BaseXException {
+
+    try {
+      out.write(3);
+      send(name);
+      int l;
+      while((l = input.read()) != -1) out.write(l);
+      out.write(0);
+      out.flush();
+      final BufferInput bi = new BufferInput(in);
+      info = bi.readString();
+      if(bi.read() != 0) throw new BaseXException(info);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
   }
 
   @Override
@@ -123,5 +142,6 @@ public final class ClientSession extends Session {
   private void send(final String s) throws IOException {
     out.print(s);
     out.write(0);
+    out.flush();
   }
 }

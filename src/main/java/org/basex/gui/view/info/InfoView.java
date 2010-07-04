@@ -35,22 +35,12 @@ public final class InfoView extends View {
   /** Text Area. */
   private final BaseXText area;
 
-  /** Focused bar. */
-  private int focus = -1;
   /** Query statistics. */
   private IntList stat = new IntList();
   /** Query statistics strings. */
-  private StringList compile;
-  /** Query statistics strings. */
   private StringList strings;
-  /** Query statistics strings. */
-  private StringList evaluate;
-  /** Query plan. */
-  private StringList plan;
-  /** Query. */
-  private String query = "";
-  /** Compiled Query. */
-  private String result = "";
+  /** Focused bar. */
+  private int focus = -1;
   /** Panel Width. */
   private int w;
   /** Panel Height. */
@@ -122,12 +112,14 @@ public final class InfoView extends View {
    * @param ok flag indicating if command execution was successful
    */
   public void setInfo(final String inf, final boolean ok) {
-    final IntList il = new IntList();
-    final StringList sl = new StringList();
-    final StringList cmp = new StringList();
     final StringList eval = new StringList();
-    final StringList pln = new StringList();
+    final StringList comp = new StringList();
+    final StringList plan = new StringList();
+    final StringList sl = new StringList();
+    final IntList il = new IntList();
     String err = "";
+    String qu = "";
+    String res = "";
 
     final String[] split = inf.split(NL);
     for(int i = 0; i < split.length; i++) {
@@ -140,13 +132,13 @@ public final class InfoView extends View {
         sl.add(line.substring(0, s).trim());
         il.add((int) (Double.parseDouble(line.substring(s + 1, t)) * 100));
       } else if(line.startsWith(QUERYSTRING)) {
-        query = line.substring(s + 1).trim();
+        qu = line.substring(s + 1).trim();
       } else if(line.startsWith(QUERYPLAN)) {
-        while(++i < split.length && split[i].length() != 0) pln.add(split[i]);
+        while(++i < split.length && split[i].length() != 0) plan.add(split[i]);
         --i;
       } else if(line.startsWith(QUERYCOMP)) {
-        while(!split[++i].contains(QUERYRESULT)) cmp.add(split[i]);
-        result = split[i].substring(split[i].indexOf(':') + 1).trim();
+        while(++i < split.length && split[i].length() != 0) comp.add(split[i]);
+        res = split[i].substring(split[i].indexOf(':') + 1).trim();
       } else if(line.startsWith(QUERYEVAL)) {
         while(split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
         --i;
@@ -156,36 +148,32 @@ public final class InfoView extends View {
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    String tm = "";
-
-    stat = il;
-    strings = sl;
-    compile = cmp;
-    evaluate = eval;
-    plan = pln;
+    String time = "";
 
     final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     if(sl.size() != 0) {
-      add(tb, QUERYQU, query);
-      add(tb, QUERYCOMP, compile);
-      if(compile.size() != 0) add(tb, QUERYRESULT, result);
+      add(tb, QUERYQU, qu);
+      add(tb, QUERYCOMP, comp);
+      if(comp.size() != 0) add(tb, QUERYRESULT, res);
       add(tb, QUERYPLAN, plan);
-      add(tb, QUERYEVAL, evaluate);
-      add(tb, QUERYTIME, strings);
-      tm = strings.get(il.size() - 1) + ": " + Performance.getTimer(
-          stat.get(il.size() - 1) * 10000L * runs, runs);
+      add(tb, QUERYEVAL, eval);
+      add(tb, QUERYTIME, sl);
+      time = sl.get(il.size() - 1) + COLS + Performance.getTimer(
+          il.get(il.size() - 1) * 10000L * runs, runs);
     } else if(!ok) {
       add(tb, INFOERROR, err.replaceAll(STOPPED + ".*\\r?\\n", ""));
-      tm = "";
+      time = "";
     }
 
+    stat = il;
+    strings = sl;
     area.setText(tb.finish());
-    timer.setText(tm);
+    timer.setText(time);
     repaint();
   }
 
   /**
-   * Adds the specified strings..
+   * Adds the specified strings.
    * @param tb token builder
    * @param head string header
    * @param list list reference

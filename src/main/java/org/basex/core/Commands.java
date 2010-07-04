@@ -3,6 +3,8 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 import java.util.regex.Pattern;
 
+import org.basex.core.cmd.Set;
+
 /**
  * This class defines the available command-line commands.
  *
@@ -21,8 +23,8 @@ public interface Commands {
   enum CmdShow { DATABASES, SESSIONS, USERS }
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
-  /** Set commands. */
-  enum CmdSet { INFO, DEBUG, SERIALIZE, CHOP, ENTITY, TEXTINDEX, ATTRINDEX,
+  /** Set commands. Should be synchronized with {@link Set#STRINGS}. */
+  enum CmdSet { QUERYINFO, DEBUG, SERIALIZE, CHOP, ENTITY, TEXTINDEX, ATTRINDEX,
     FTINDEX, PATHINDEX }
   /** Index types. */
   enum CmdIndex { TEXT, ATTRIBUTE, FULLTEXT, PATH }

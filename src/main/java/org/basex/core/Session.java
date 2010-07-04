@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import org.basex.io.CachedOutput;
 
@@ -17,7 +18,7 @@ public abstract class Session {
 
   /**
    * Executes a command and prints the result to the specified stream.
-   * @param cmd command to be executed
+   * @param cmd command to be parsed
    * @param out output stream
    * @throws BaseXException database exception
    */
@@ -34,8 +35,7 @@ public abstract class Session {
     throws BaseXException;
 
   /**
-   * Executes a command. {@link #execute(Command, OutputStream)} should be
-   * called if textual results are expected.
+   * Executes a command and returns the result as string.
    * @param cmd command to be executed
    * @return result
    * @throws BaseXException database exception
@@ -47,9 +47,8 @@ public abstract class Session {
   }
 
   /**
-   * Executes a command. {@link #execute(String, OutputStream)} should be
-   * called if textual results are expected.
-   * @param cmd command to be executed
+   * Executes a command and returns the result as string.
+   * @param cmd command to be parsed
    * @return result
    * @throws BaseXException database exception
    */
@@ -58,6 +57,15 @@ public abstract class Session {
     execute(cmd, out);
     return out.toString();
   }
+
+  /**
+   * Creates a database.
+   * @param name name of database
+   * @param input xml input
+   * @throws BaseXException database exception
+   */
+  public abstract void create(final String name, final InputStream input)
+    throws BaseXException;
 
   /**
    * Returns command info.

@@ -41,17 +41,6 @@ public class BufferInput {
   private CharsetDecoder csd;
 
   /**
-   * Fills the specified array with the beginning of the specified file.
-   * @param file the file to be read
-   * @param cont byte array
-   * @throws IOException IO Exception
-   */
-  public static void read(final File file, final byte[] cont)
-      throws IOException {
-    new BufferInput(new FileInputStream(file), cont).close();
-  }
-
-  /**
    * Initializes the file reader.
    * @param file the file to be read
    * @throws IOException IO Exception
@@ -253,6 +242,14 @@ public class BufferInput {
    */
   public final void close() throws IOException {
     if(in != null && !(in instanceof ZipInputStream)) in.close();
+  }
+
+  /**
+   * Returns the input stream.
+   * @return input stream
+   */
+  public final InputStream inputStream() {
+    return in;
   }
 
   /**

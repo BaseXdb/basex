@@ -149,7 +149,7 @@ public final class FSImporter implements FSTraversal {
           + targetNode;
       final QueryProcessor qp = new QueryProcessor(query, ctx);
       try {
-        qp.query();
+        qp.execute();
       } catch(final QueryException ex) { // insertion failed
         Main.debug(
             "FSImporter: Failed to insert a node for the file % into the " +

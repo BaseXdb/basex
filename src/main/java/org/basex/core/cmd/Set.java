@@ -4,7 +4,6 @@ import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import org.basex.core.Main;
 import org.basex.core.Command;
-import org.basex.core.Prop;
 
 /**
  * Evaluates the 'set' command and modifies database properties.
@@ -15,7 +14,7 @@ import org.basex.core.Prop;
 public final class Set extends Command {
   /** Info strings (same order as options defined in {@link CmdSet}). */
   private static final String[] STRINGS = {
-    INFOINFO, INFODEBUG, INFOSERIALIZE, INFOCHOP, INFOENTITY, INFOTEXTINDEX,
+    INFOQUERY, INFODEBUG, INFOSERIALIZE, INFOCHOP, INFOENTITY, INFOTEXTINDEX,
     INFOATTRINDEX, INFOFTINDEX, INFOPATHINDEX, INFODBPATH
   };
 
@@ -46,16 +45,7 @@ public final class Set extends Command {
         final boolean b = val == null ? !((Boolean) type).booleanValue() :
           val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
         prop.set(key, b);
-
-        final boolean all = ALL.equalsIgnoreCase(val);
         val = AInfo.flag(b);
-        if(s == CmdSet.INFO) {
-          prop.set(Prop.ALLINFO, all);
-          if(all) {
-            prop.set(Prop.INFO, true);
-            val = INFOON + " (" + INFOALL + ")";
-          }
-        }
       } else if(type instanceof Integer) {
         if(val == null) val = "0";
         prop.set(key, Integer.parseInt(val));

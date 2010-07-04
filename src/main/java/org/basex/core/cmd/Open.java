@@ -31,7 +31,7 @@ public final class Open extends Command {
     final String db = args[0];
 
     try {
-      final Data data = open(context, db);
+      final Data data = open(db, context);
       context.openDB(data);
       if(data.meta.oldindex) info(INDUPDATE);
       return info(DBOPENED, db, perf);
@@ -44,21 +44,21 @@ public final class Open extends Command {
 
   /**
    * Opens the specified database.
+   * @param name name of database
    * @param ctx database context
-   * @param db name of database
    * @return data reference
    * @throws IOException I/O exception
    */
-  public static synchronized Data open(final Context ctx, final String db)
+  public static synchronized Data open(final String name, final Context ctx)
       throws IOException {
 
-    Data data = ctx.pin(db);
+    Data data = ctx.pin(name);
     if(data == null) {
       // check if document exists
-      if(!ctx.prop.dbexists(db))
-        throw new IOException(Main.info(DBNOTFOUND, db));
+      if(!ctx.prop.dbexists(name))
+        throw new IOException(Main.info(DBNOTFOUND, name));
 
-      data = new DiskData(db, ctx.prop);
+      data = new DiskData(name, ctx.prop);
       ctx.pin(data);
     }
     // check permissions

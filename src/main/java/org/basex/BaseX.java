@@ -57,16 +57,16 @@ public class BaseX extends Main {
   private void run() {
     try {
       boolean u = false;
-      if(input != null) execute(new Check(input), true);
+      if(input != null) execute(new Check(input), verbose);
 
       if(file != null) {
         // query file contents
         context.query = IO.get(file);
         final String qu = content();
-        if(qu != null) execute(new XQuery(qu), true);
+        if(qu != null) execute(new XQuery(qu), verbose);
       } else if(query != null) {
         // query file contents
-        execute(new XQuery(query), true);
+        execute(new XQuery(query), verbose);
       } else if(commands != null) {
         // execute command-line arguments
         execute(commands);
@@ -167,10 +167,11 @@ public class BaseX extends Main {
             user = arg.string();
           } else if(c == 'v') {
             // show command info
-            arg.check(set(Prop.INFO, true));
+            verbose = true;
           } else if(c == 'V') {
-            // show all command info
-            arg.check(set(Prop.INFO, ALL));
+            // show query info
+            verbose = true;
+            arg.check(set(Prop.QUERYINFO, true));
           } else if(c == 'w') {
             // activate well-formed XML output
             arg.check(set(Prop.WRAPOUTPUT, true));

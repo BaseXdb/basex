@@ -49,7 +49,7 @@ final class BXPathExpression implements XPathExpression {
 
   public Object evaluate(final Object item, final QName res)
       throws XPathExpressionException {
-    return finish(eval(), res);
+    return finish(execute(), res);
   }
 
   public Object evaluate(final InputSource is, final QName res)
@@ -57,20 +57,20 @@ final class BXPathExpression implements XPathExpression {
 
     try {
       new CreateDB(is.getSystemId()).execute(context);
-      return finish(eval(), res);
+      return finish(execute(), res);
     } catch(final BaseXException ex) {
       throw new XPathExpressionException(ex.getMessage());
     }
   }
 
   /**
-   * Evaluates the current query.
+   * Executes the current query.
    * @return result
    * @throws XPathExpressionException xpath exception
    */
-  private Result eval() throws XPathExpressionException {
+  private Result execute() throws XPathExpressionException {
     try {
-      return xproc.query();
+      return xproc.execute();
     } catch(final QueryException ex) {
       throw new XPathExpressionException(ex);
     }

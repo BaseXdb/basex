@@ -53,7 +53,7 @@ public final class IOFile extends IO {
   @Override
   public void cache() throws IOException {
     cont = new byte[(int) file.length()];
-    BufferInput.read(file, cont);
+    new BufferInput(new FileInputStream(file), cont).close();
   }
 
   @Override

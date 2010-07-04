@@ -10,7 +10,6 @@ import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.query.iter.Iter;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * This abstract class contains various methods which allow querying in
@@ -88,7 +87,7 @@ public final class QueryProcessor extends Progress {
    * @return result of query
    * @throws QueryException query exception
    */
-  public Result query() throws QueryException {
+  public Result execute() throws QueryException {
     compile();
     return ctx.eval();
   }
@@ -99,7 +98,7 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public Nodes queryNodes() throws QueryException {
-    final Result res = query();
+    final Result res = execute();
     if(!(res instanceof Nodes)) throw new QueryException(QUERYNODESERR);
     return (Nodes) res;
   }
@@ -118,9 +117,17 @@ public final class QueryProcessor extends Progress {
    * Sets a new query. Should be called before parsing the query.
    * @param qu query
    */
-  public void setQuery(final String qu) {
+  public void query(final String qu) {
     query = qu;
     reset();
+  }
+
+  /**
+   * Returns the query in its string representation.
+   * @return query
+   */
+  public String query() {
+    return query;
   }
 
   /**
@@ -149,13 +156,10 @@ public final class QueryProcessor extends Progress {
 
   /**
    * Returns query background information.
-   * @param all show all information
    * @return background information
    */
-  public String info(final boolean all) {
-    final TokenBuilder tb = new TokenBuilder(ctx.info());
-    if(all) tb.add(QUERYSTRING + query);
-    return tb.toString();
+  public String info() {
+    return ctx.info();
   }
 
   /**

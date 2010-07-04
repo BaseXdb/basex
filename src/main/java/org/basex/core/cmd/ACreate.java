@@ -8,6 +8,7 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Main;
 import org.basex.core.Command;
+import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
@@ -67,11 +68,13 @@ public abstract class ACreate extends Command {
         context.openDB(d);
       } else {
         d.close();
-        final Open pr = new Open(db);
-        if(!pr.run(context)) return error(pr.info());
+        final Open cmd = new Open(db);
+        if(!cmd.run(context)) return error(cmd.info());
         index(context.data);
       }
       return info(DBCREATED, db, perf);
+    } catch(final ProgressException ex) {
+      throw ex;
     } catch(final Exception ex) {
       // Known exceptions:
       // - IllegalArgumentException (UTF8, zip files)

@@ -35,12 +35,12 @@ public final class ShowUsers extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    final String db = args[0];
-    if(db == null) {
+    final String name = args[0];
+    if(name == null) {
       out.println(context.users.info());
     } else {
       try {
-        final Data data = Open.open(context, db);
+        final Data data = Open.open(name, context);
         final ArrayList<User> loc = data.meta.users;
         for(int i = 0; i < loc.size(); i++) {
           final User us = context.users.get(loc.get(i).name);
@@ -53,7 +53,7 @@ public final class ShowUsers extends Command {
       } catch(final IOException ex) {
         Main.debug(ex);
         final String msg = ex.getMessage();
-        return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
+        return msg.isEmpty() ? error(DBOPENERR, name) : error(msg);
       }
     }
     return true;

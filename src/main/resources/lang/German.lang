@@ -410,6 +410,7 @@ qu_stopped=Gestoppt bei
 qu_line=Zeile %
 qu_col=Spalte %
 qu_file=in %
+qu_exec=Anfrage ausgeführt (%).
 
 # Admin Commands
 ad_databases=% geöffnete Datenbanken
@@ -450,7 +451,7 @@ info_dbpath=Datenbankpfad
 info_nodb=Keine Datenbank gefunden.
 info_nodeepfs=Keine DeepFS Datenbank gefunden
 info_dberror=konnte nicht geöffnet werden.
-info_info=Prozess-Info
+info_query=Anfrage-Info
 info_all=ausführlich
 info_debug=Debug-Modus
 info_chop=Entfernung von Leerzeichen
@@ -536,7 +537,7 @@ ch_grant2=Weist einem Benutzer (für eine Datenbank) Rechte zu.
 ch_helpgeneral0=Allgemeine Befehle:
 ch_set1=Setzen von allgemeinen Optionen (aktuelle Werte via '%').
 ch_set2=Verfügbare Optionen [%] mit [%] = on/off:
-ch_set21=Anzeige (aller) Prozess-Informationen
+ch_set21=Anzeige von Anfrage-Informationen
 ch_set22=Anzeige von Debug-Informationen
 ch_set23=Ausgabe der Anfrageergebnisse
 ch_set26=Leerzeichenentfernung in neuen XML-Dokumenten

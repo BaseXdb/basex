@@ -66,10 +66,8 @@ public final class Prop extends AProp {
   /** Debug mode. */
   public static final Object[] DEBUG = { "DEBUG", false };
 
-  /** Short command info. */
-  public static final Object[] INFO = { "INFO", false };
-  /** Detailed command info. */
-  public static final Object[] ALLINFO = { "ALLINFO", false };
+  /** Detailed query information. */
+  public static final Object[] QUERYINFO = { "QUERYINFO", false };
   /** Flag for serializing query results. */
   public static final Object[] SERIALIZE = { "SERIALIZE", true };
   /** Flag for wrapping result nodes. */

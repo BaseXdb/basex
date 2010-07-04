@@ -609,9 +609,8 @@ public final class GUI extends JFrame {
     final int s = !db ? 2 : prop.num(GUIProp.SEARCHMODE);
 
     final boolean inf = prop.is(GUIProp.SHOWINFO);
-    context.prop.set(Prop.ALLINFO, inf);
+    context.prop.set(Prop.QUERYINFO, inf);
     context.prop.set(Prop.XMLPLAN, inf);
-    context.prop.set(Prop.INFO, inf);
 
     input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
       s == 1 ? HELPXPATH : HELPCMD);

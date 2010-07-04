@@ -30,9 +30,6 @@ public final class Info extends AInfo {
       format(tb, INFODBPATH, prop.get(Prop.DBPATH));
       format(tb, INFOMEM, Performance.getMem());
     }
-    format(tb, INFOINFO, flag(prop.is(Prop.INFO)) +
-        (prop.is(Prop.ALLINFO) ? " (" + INFOALL + ")" : ""));
-
     tb.add(NL + INFOCREATE + NL);
     format(tb, INFOCHOP, flag(prop.is(Prop.CHOP)));
     format(tb, INFOENTITY, flag(prop.is(Prop.ENTITY)));

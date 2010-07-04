@@ -43,22 +43,22 @@ public final class DropUser extends Command {
     final User user = context.users.get(usern);
     if(user == null) return error(USERNO, usern);
 
-    final String db = args[1];
-    if(db == null) {
+    final String name = args[1];
+    if(name == null) {
       for(final ServerProcess s : context.sessions) {
         if(s.context.user.name.equals(usern)) return error(USERLOG, usern);
       }
       context.users.drop(user);
     } else {
       try {
-        final Data data = Open.open(context, db);
+        final Data data = Open.open(name, context);
         data.meta.users.remove(data.meta.users.get(args[0]));
         data.flush();
         Close.close(context, data);
       } catch(final IOException ex) {
         Main.debug(ex);
         final String msg = ex.getMessage();
-        return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
+        return msg.isEmpty() ? error(DBOPENERR, name) : error(msg);
       }
     }
     return info(USERDROP, usern);

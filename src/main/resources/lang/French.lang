@@ -410,6 +410,7 @@ qu_stopped=Stopped at
 qu_line=line %
 qu_col=column %
 qu_file=in %
+qu_exec=Query executed in %.
 
 # Commandes Admin
 ad_databases=% base(s) de données ouverte(s)
@@ -450,7 +451,7 @@ info_dbpath=Chemin de la base de données
 info_nodb=Aucune base de données trouvée
 info_nodeepfs=Aucune base de données DeepFS trouvée
 info_dberror=Ouverture impossible.
-info_info=Info processus
+info_query=Query Info
 info_all=Mode verbeux
 info_debug=Mode débug
 info_chop=Suppression des espaces
@@ -536,7 +537,7 @@ ch_grant2=Octroie les permissions à un utilisateur (sur une base de données).
 ch_helpgeneral0=Commandes générales :
 ch_set1=Définir les options globales (Valeurs courantes : essayer '%').
 ch_set2=Options [%] disponibles avec une valeur de [%] = marche/arrêt:
-ch_set21=Affichage des infos relatives au processus (tout)
+ch_set21=Affichage des infos relatives au processus
 ch_set22=Affichage des infos de débug
 ch_set23=Sérialisation des resultats de la requête
 ch_set26=Supprimer les espaces XML

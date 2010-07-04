@@ -14,7 +14,6 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.Exit;
-import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowDatabases;
 import org.basex.core.cmd.ShowSessions;
 import org.basex.gui.GUI;
@@ -324,7 +323,6 @@ public final class DialogServer extends Dialog {
         ctx.prop.set(Prop.HOST, host.getText());
         ctx.prop.set(Prop.PORT, Integer.parseInt(portc.getText()));
         cs = new ClientSession(ctx, gui.prop.get(GUIProp.SERVERUSER), pw);
-        cs.execute(new Set(Prop.INFO, true));
         user.setSess(cs);
         dbsP.setSess(cs);
         connected = true;

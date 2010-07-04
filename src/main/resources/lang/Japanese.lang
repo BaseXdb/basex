@@ -413,6 +413,7 @@ qu_stopped=Stopped at
 qu_line=line %
 qu_col=column %
 qu_file=in %
+qu_exec=Query executed in %.
 
 # Admin Commands
 ad_databases=% 個のデータベースが開かれています。
@@ -452,7 +453,7 @@ info_encoding=文字コード
 info_dbpath=データベースパス
 info_nodb=データベースが見付かりません。
 info_dberror=開けませんでした。
-info_info=プロセス情報
+info_query=Query Info
 info_all=冗長モード
 info_debug=デバッグモード
 info_chop=空白の除去
@@ -538,7 +539,7 @@ ch_grant2=ユーザーにデータベースに対するパーミッションを�
 ch_helpgeneral0=全般的なコマンド:
 ch_set1=グローバルオプションをセットします(現在の値を見るには '%' と入力します)。
 ch_set2=Available options [%] with [%] = on/off:
-ch_set21=(全ての)プロセス情報の表示
+ch_set21=プロセス情報の表示
 ch_set22=デバッグ情報の表示
 ch_set23=クエリー結果のシリアル化
 ch_set26=XML中の空白の切り捨て

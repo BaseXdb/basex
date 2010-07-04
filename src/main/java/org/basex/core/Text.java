@@ -44,7 +44,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.1.8";
+  String VERSION = "6.1.9";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -296,7 +296,7 @@ public interface Text {
     "[option] ([value])",
     lang("ch_set1", "info"),
     lang("ch_set2", "option", "value") + NL +
-    LI + CmdSet.INFO + " (ALL)" + COLS + lang("ch_set21") + NL +
+    LI + CmdSet.QUERYINFO + COLS + lang("ch_set21") + NL +
     LI + CmdSet.DEBUG     + COLS + lang("ch_set22") + NL +
     LI + CmdSet.SERIALIZE + COLS + lang("ch_set23") + NL +
     LI + CmdSet.CHOP      + COLS + lang("ch_set26") + NL +
@@ -482,14 +482,16 @@ public interface Text {
   String HITS = lang("qu_hits");
   /** Insert query info. */
   String QUERYNODESERR = lang("qu_nodeserr");
+  /** Query executed. */
+  String QUERYEXEC = lang("qu_exec");
 
-  /** Position info. */
+  /** Stopped info. */
   String STOPPED = lang("qu_stopped");
-  /** Position info. */
+  /** Line info. */
   String LINEINFO = lang("qu_line");
-  /** Position info. */
+  /** Column info. */
   String COLINFO = lang("qu_col");
-  /** Position info. */
+  /** File info. */
   String FILEINFO = lang("qu_file");
 
   /** Query hits. */
@@ -587,8 +589,8 @@ public interface Text {
 
   // The following strings are dynamically bound by the SET command
 
-  /** Info on query verbosity. */
-  String INFOINFO = lang("info_info");
+  /** Info on query info. */
+ String INFOQUERY = lang("info_query");
   /** Info on debug mode. */
   String INFODEBUG = lang("info_debug");
   /** Info on result serialization. */

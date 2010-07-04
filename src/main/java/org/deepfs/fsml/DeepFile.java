@@ -683,7 +683,7 @@ public final class DeepFile {
     ctx.openDB(data);
     final QueryProcessor qp = new QueryProcessor("/", ctx);
     try {
-      final Result res = qp.query();
+      final Result res = qp.execute();
       res.serialize(ser);
       final String xml = co.toString();
       ser.close();

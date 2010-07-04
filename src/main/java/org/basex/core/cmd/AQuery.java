@@ -1,6 +1,7 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
@@ -88,7 +89,7 @@ public abstract class AQuery extends Command {
         XMLSerializer xml;
 
         if(context.prop.is(Prop.CACHEQUERY)) {
-          result = qp.query();
+          result = qp.execute();
           eval += per.getTime();
           xml = new XMLSerializer(po, sp);
           result.serialize(xml);
@@ -114,11 +115,9 @@ public abstract class AQuery extends Command {
         prnt += per.getTime();
       }
       // dump some query info
-      evalInfo(hits, updates, runs);
-
-      if(ser && (prop.is(Prop.INFO) || prop.is(Prop.XMLPLAN))) out.println("");
+      if(prop.is(Prop.QUERYINFO)) evalInfo(hits, updates, runs);
       out.flush();
-      return true;
+      return info(NL + QUERYEXEC, perf.getTimer(runs));
     } catch(final QueryException ex) {
       Main.debug(ex);
       err = ex.getMessage();
@@ -167,14 +166,16 @@ public abstract class AQuery extends Command {
    * @param runs number of runs
    */
   private void evalInfo(final long hits, final long updates, final int runs) {
-    if(!prop.is(Prop.INFO)) return;
-    final String opt = qp.info(prop.is(Prop.ALLINFO));
-    if(!opt.isEmpty()) info(opt);
+    info("");
+    info("");
+    info(QUERYSTRING + qp.query());
+    info(qp.info());
+    info("");
     info(QUERYPARSE + Performance.getTimer(pars, runs));
     info(QUERYCOMPILE + Performance.getTimer(comp, runs));
     info(QUERYEVALUATE + Performance.getTimer(eval, runs));
     info(QUERYPRINT + Performance.getTimer(prnt, runs));
-    info(QUERYTOTAL + perf.getTimer(runs));
+    info(QUERYTOTAL + Performance.getTimer(pars + comp + eval + prnt, runs));
     info(QUERYHITS + hits + " " + (hits == 1 ? VALHIT : VALHITS));
     info(QUERYUPDATED + updates + " " + (updates == 1 ? VALHIT : VALHITS));
     info(QUERYPRINTED + Performance.format(out.size()));
@@ -206,8 +207,8 @@ public abstract class AQuery extends Command {
       if(prop.is(Prop.XMLPLAN)) {
         final CachedOutput co = new CachedOutput();
         qu.plan(new XMLSerializer(co));
-        info(QUERYPLAN);
-        info.add(co + NL + NL);
+        info(NL + QUERYPLAN);
+        info(co.toString());
       }
     } catch(final Exception ex) {
       Main.debug(ex);

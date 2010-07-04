@@ -13,11 +13,13 @@ import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
+import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.data.Data;
 import org.basex.io.BufferInput;
 import org.basex.io.BufferedOutput;
 import org.basex.io.PrintOutput;
+import org.basex.io.WrapInputStream;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -104,12 +106,17 @@ public final class ServerProcess extends Thread {
         try {
           // receive first byte
           final byte b = in.readByte();
-          if(b < ' ') {
-            // handle control codes
-            handle(b);
+          if(b < 3) {
+            // jump to query iterator
+            query(b);
             continue;
           }
-          // receive complete command
+          if(b == 3) {
+            // jump to database creation
+            create();
+            continue;
+          }
+          // database command
           input = new TokenBuilder().add(b).add(in.content()).toString();
         } catch(final IOException ex) {
           // this exception is thrown for each session if the server is stopped
@@ -144,7 +151,7 @@ public final class ServerProcess extends Thread {
         // start timeout
         cmd.startTimeout(context.prop.num(Prop.TIMEOUT));
 
-        // execute command and send {RESULT}0
+        // execute command and send {RESULT}
         boolean ok = true;
         String info = null;
         try {
@@ -158,14 +165,15 @@ public final class ServerProcess extends Thread {
         // stop timeout
         cmd.stopTimeout();
 
+        // send 0 to mark end of result
         out.write(0);
         // send {INFO}0
         out.writeString(info);
         // send {OK}
         send(ok);
 
-        final String pr = cmd.toString().replace('\r', ' ').replace('\n', ' ');
-        log.write(this, pr, ok ? "OK" : INFOERROR + info, perf);
+        final String c = cmd.toString().replace('\r', ' ').replace('\n', ' ');
+        log.write(this, c, ok ? "OK" : INFOERROR + info, perf);
       }
       log.write(this, "LOGOUT " + context.user.name, "OK");
     } catch(final IOException ex) {
@@ -176,16 +184,27 @@ public final class ServerProcess extends Thread {
   }
 
   /**
-   * Handles the control codes.
-   * @param c control code (first received byte from client)
-   * @throws IOException I/O Exception
+   * Creates a database.
+   * @throws IOException I/O exception
    */
-  private void handle(final byte c) throws IOException {
-    if(c < 3) query(c);
+  private void create() throws IOException {
+    try {
+      final String name = in.readString();
+      final WrapInputStream is = new WrapInputStream(in);
+      // send {MSG}0 and 0 as success flag
+      final String info = CreateDB.xml(name, is, context);
+      out.writeString(info);
+      out.write(0);
+    } catch(final BaseXException ex) {
+      // send {MSG}0 and 1 as error flag
+      out.writeString(ex.getMessage());
+      out.write(1);
+    }
+    out.flush();
   }
-
+  
   /**
-   * Process the query iterator.
+   * Processes the query iterator.
    * @param c control code (first received byte from client)
    * @throws IOException I/O exception
    */

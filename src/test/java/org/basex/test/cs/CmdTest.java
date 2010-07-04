@@ -305,9 +305,10 @@ public class CmdTest {
   /** Command test. */
   @Test
   public final void set() {
-    ok(new Set(CmdSet.INFO, Text.ON));
-    ok(new Set(CmdSet.INFO, false));
+    ok(new Set(CmdSet.CHOP, Text.ON));
+    ok(new Set(CmdSet.CHOP, false));
     ok(new Set(CmdSet.CHOP, true));
+    ok(new Set("chop", true));
     ok(new Set("runs", 1));
     no(new Set("runs", true));
     no(new Set(USER, USER));

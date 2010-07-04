@@ -2,7 +2,11 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
+
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
@@ -11,6 +15,7 @@ import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
 import org.basex.build.xml.SAXWrapper;
+import org.basex.core.BaseXException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -24,6 +29,8 @@ import org.basex.index.FTBuilder;
 import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.util.Performance;
+import org.xml.sax.InputSource;
 
 /**
  * Evaluates the 'create db' command and creates a new database.
@@ -62,26 +69,26 @@ public class CreateDB extends ACreate {
 
   /**
    * Creates an empty database.
-   * @param ctx database context
    * @param name name of the database
+   * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static Data empty(final Context ctx, final String name)
+  public static Data empty(final String name, final Context ctx)
       throws IOException {
     return xml(Parser.emptyParser(name), name, ctx);
   }
 
   /**
    * Creates a database for the specified file.
-   * @param ctx database context
    * @param io input reference
    * @param name name of the database
+   * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final Context ctx, final IO io,
-      final String name) throws IOException {
+  public static synchronized Data xml(final IO io, final String name,
+      final Context ctx) throws IOException {
 
     if(!ctx.user.perm(User.CREATE))
       throw new IOException(Main.info(PERMNO, CmdPerm.CREATE));
@@ -90,22 +97,55 @@ public class CreateDB extends ACreate {
   }
 
   /**
+   * Creates a database for the specified file.
+   * @param name name of the database
+   * @param input input stream
+   * @param ctx database context
+   * @return info string
+   * @throws BaseXException database exception
+   */
+  public static synchronized String xml(final String name,
+      final InputStream input, final Context ctx) throws BaseXException {
+
+    ctx.lock.before(true);
+    BaseXException bxex = null;
+    final Performance p = new Performance();
+
+    if(!ctx.user.perm(User.CREATE)) {
+      bxex = new BaseXException(PERMNO, CmdPerm.CREATE);
+    } else {
+      final BufferedInputStream is = new BufferedInputStream(input);
+      final SAXSource sax = new SAXSource(new InputSource(is));
+      try {
+        ctx.openDB(xml(new SAXWrapper(sax), name, ctx));
+      } catch(final IOException ex) {
+        bxex = new BaseXException(ex);
+      }
+    }
+    ctx.lock.after(true);
+    if(bxex != null) throw bxex;
+    return Main.info(DBCREATED, name, p);
+  }
+
+  /**
    * Creates a database instance from the specified parser.
    * @param parser input parser
-   * @param db name of the database
+   * @param name name of the database
    * @param ctx database context
    * @return database instance
    * @throws IOException I/O exception
    */
-  public static synchronized Data xml(final Parser parser, final String db,
+  public static synchronized Data xml(final Parser parser, final String name,
       final Context ctx) throws IOException {
 
-    if(ctx.prop.is(Prop.MAINMEM)) return MemBuilder.build(parser, ctx.prop, db);
-    if(ctx.pinned(db)) throw new IOException(Main.info(DBLOCKED, db));
+    if(ctx.prop.is(Prop.MAINMEM)) {
+      return MemBuilder.build(parser, ctx.prop, name);
+    }
+    if(ctx.pinned(name)) throw new IOException(Main.info(DBLOCKED, name));
 
     final Builder builder = new DiskBuilder(parser, ctx.prop);
     try {
-      final Data data = builder.build(db);
+      final Data data = builder.build(name);
       if(data.meta.txtindex) data.setIndex(IndexType.TXT,
         new ValueBuilder(data, true).build());
       if(data.meta.atvindex) data.setIndex(IndexType.ATV,
@@ -121,7 +161,7 @@ public class CreateDB extends ACreate {
       }
       throw ex;
     }
-    return Open.open(ctx, db);
+    return Open.open(name, ctx);
   }
 
   /**
