@@ -1,22 +1,8 @@
-# -----------------------------------------------------------------------------
+# Language Binding for BaseX.
+# Works with BaseX 6.1.9 and later
+# Documentation: http://basex.org/api
 #
-# This module provides methods to connect to and communicate with the
-# BaseX Server.
-#
-# The Constructor of the class expects a hostname, port, username and password
-# for the connection. The socket connection will then be established via the
-# hostname and the port.
-#
-# For the execution of commands you need to call the execute() method with the
-# database command as argument. The method returns the result or throws
-# an exception with the received error message.
-# For the execution of the iterative version of a query you need to call
-# the query() method. The results will then be returned via the more() and
-# the next() methods. If an error occurs an exception will be thrown.
-#
-# -----------------------------------------------------------------------------
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
-# -----------------------------------------------------------------------------
 
 import hashlib, socket, array
 
@@ -60,7 +46,7 @@ class Session():
   
   # see readme.txt
   def query(self, q):
-  	return Query(self, q)
+    return Query(self, q)
 
   # see readme.txt
   def info(self):
@@ -96,41 +82,41 @@ class Session():
     self.__bpos += 1
     return b
     
-  # Sends the defined str.	
+  # Sends the defined str.
   def send(self, str):
-  	s.send(str + '\0')
+    s.send(str + '\0')
   
-  # Returns success check.	
+  # Returns success check.
   def ok(self):
-   	return self.read() == 0
+    return self.read() == 0
    
-  # Returns the received string. 	
+  # Returns the received string.
   def receive(self):
-  	self.init()
-  	return self.readString()
+    self.init()
+    return self.readString()
      
    
 class Query():
-	# see readme.txt
-	def __init__(self, session, q):
-	  self.__session = session
-	  self.__session.send('\0' + q)
-	  self.__id = self.__session.receive()
-	  if not self.__session.ok():
-	    raise IOError(self.__session.readString())
-	
-	# see readme.txt
-	def more(self):
-	  self.__session.send('\1' + self.__id)
-	  self.__next = self.__session.receive()
-	  if not self.__session.ok():
-	    raise IOError(self.__session.readString())	
-	  return len(self.__next) != 0	
-		
-	# see readme.txt
-	def next(self):
-	  return self.__next
-	
-	# see readme.txt	
-	def close(self):
-	  self.__session.send('\2' + self.__id);
+  # see readme.txt
+  def __init__(self, session, q):
+    self.__session = session
+    self.__session.send('\0' + q)
+    self.__id = self.__session.receive()
+    if not self.__session.ok():
+      raise IOError(self.__session.readString())
+  
+  # see readme.txt
+  def more(self):
+    self.__session.send('\1' + self.__id)
+    self.__next = self.__session.receive()
+    if not self.__session.ok():
+      raise IOError(self.__session.readString())  
+    return len(self.__next) != 0  
+    
+  # see readme.txt
+  def next(self):
+    return self.__next
+  
+  # see readme.txt  
+  def close(self):
+    self.__session.send('\2' + self.__id);

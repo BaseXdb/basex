@@ -1,35 +1,8 @@
-; -----------------------------------------------------------------------------
-;
-; This module provides methods to connect to and communicate with the
-; BaseX Server.
-;
-; The Constructor of the class expects a hostname, port, username and password
-; for the connection. The socket connection will then be established via the
-; hostname and the port.
-;
-; For the execution of commands you need to call the execute() method with the
-; database command as argument. The method returns a boolean, indicating if
-; the command was successful. The result can be requested with the result()
-; method, and the info() method returns additional processing information
-; or error output.
-;
-; -----------------------------------------------------------------------------
-;
-; Example:
-;
-; (defpackage :basex-user
-; (:use :cl :basex))
-;
-; (time
-;   (let ((session (make-instance 'session)))
-;    (if (execute session "xquery 1 to 10")
-;        (print (result session))
-;        (print (info session)))
-;    (close-session session)))
-;
-; -----------------------------------------------------------------------------
+; Language Binding for BaseX.
+; Works with BaseX 6.1
+; Documentation: http://basex.org/api
+; 
 ; (C) Andy Chambers, Formedix Ltd 2010, ISC License
-; -----------------------------------------------------------------------------
 
 (defpackage :basex
  (:use :cl :usocket)

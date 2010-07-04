@@ -7,10 +7,8 @@ import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.StreamingOutput;
-
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Add;
-import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
@@ -174,16 +172,13 @@ public final class BXJaxRx implements JaxRx {
   public void update(final InputStream input, final ResourcePath rp) {
     new BXCode() {
       @Override
-      void code() throws IOException {
-        // create database from cached file
-        final File file = cache(input);
+      void code() {
+        final String name = root(rp);
         try {
-          cs.execute(new CreateDB(root(rp), file.toString()));
+          cs.create(name, input);
         } catch(final BaseXException ex) {
           // return exception if process failed
           throw new JaxRxException(400, ex.getMessage());
-        } finally {
-          file.delete();
         }
       }
     }.run();

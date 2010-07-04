@@ -1,22 +1,8 @@
-# -----------------------------------------------------------------------------
-#
-# This module provides methods to connect to and communicate with the
-# BaseX Server.
-#
-# The Constructor of the class expects a hostname, port, username and password
-# for the connection. The socket connection will then be established via the
-# hostname and the port.
-#
-# For the execution of commands you need to call the execute() method with the
-# database command as argument. The method returns the result or throws
-# an exception with the received error message.
-# For the execution of the iterative version of a query you need to call
-# the query() method. The results will then be returned via the more() and
-# the next() methods. If an error occurs an exception will be thrown.
-#
-# -----------------------------------------------------------------------------
+# Language Binding for BaseX.
+# Works with BaseX 6.1.9 and later
+# Documentation: http://basex.org/api
+# 
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
-# -----------------------------------------------------------------------------
 
 use Digest::MD5;
 use IO::Socket;

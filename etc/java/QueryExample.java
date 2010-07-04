@@ -1,45 +1,49 @@
+package org.basex.examples.tmp;
+
 import java.io.IOException;
 
 /**
- * -----------------------------------------------------------------------------
- *
- * This example shows how BaseX commands can be performed in an iterative mode.
- * The execution time will be printed along with the result of the command.
- *
+ * This example shows how queries can be executed in an iterative manner.
+ * Documentation: http://basex.org/api
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
-public final class QueryIteratorExample {
+public final class QueryExample {
   /**
    * Main method.
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new QueryIteratorExample();
+    new QueryExample();
   }
 
   /**
    * Constructor.
    */
-  private QueryIteratorExample() {
-    long time = System.nanoTime();
-
+  private QueryExample() {
     try {
+      // initialize timer
+      long time = System.nanoTime();
+
       // create session
       BaseXClient session =
         new BaseXClient("localhost", 1984, "admin", "admin");
 
-      // run query iterator
       try {
-        // perform command and output result
-        String result = session.execute("xquery 1 to 3");
-        System.out.println(result);
+        // create query instance
+        String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
+        BaseXClient.Query query = session.query(input);
 
-        BaseXClient.Query query = session.query("4 to 6");
+        // loop through all results
         while(query.more()) {
-          System.out.println("- " + query.next());
+          System.out.print(query.next());
         }
+
+        // close query instance
         query.close();
+
       } catch(IOException ex) {
+        // print exception
         ex.printStackTrace();
       }
 
@@ -49,7 +53,9 @@ public final class QueryIteratorExample {
       // print time needed
       double ms = (System.nanoTime() - time) / 1000000d;
       System.out.println("\n" + ms + " ms");
+
     } catch(IOException ex) {
+      // print exception
       ex.printStackTrace();
     }
   };

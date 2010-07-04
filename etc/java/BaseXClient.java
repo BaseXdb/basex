@@ -8,29 +8,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * -----------------------------------------------------------------------------
- *
- * This module provides methods to connect to and communicate with the
- * BaseX Server.
+ * Language Binding for BaseX.
+ * Works with BaseX 6.1.9 and later
+ * Documentation: http://basex.org/api
  * 
- * The Constructor of the class expects a hostname, port, username and password
- * for the connection. The socket connection will then be established via the
- * hostname and the port.
- *
- * For the execution of commands you need to call the execute() method with the
- * database command as argument. The method returns the result or throws
- * an exception with the received error message.
- * For the execution of the iterative version of a query you need to call
- * the query() method. The results will then be returned via the more() and
- * the next() methods. If an error occurs an exception will be thrown.
- *
- * An even faster approach is to call execute() with the database command and
- * an output stream. The result will directly be printed and does not have to
- * be cached.
- *
- * -----------------------------------------------------------------------------
- *
- * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
+ * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 public class BaseXClient {
   /** Output stream. */
@@ -66,23 +48,22 @@ public class BaseXClient {
     send(md5(md5(pw) + ts));
 
     // receive success flag
-    if(!ok()) throw new IOException();
+    if(!ok()) throw new IOException("Access denied.");
   }
 
   /**
    * Executes a command and serializes the result to the specified stream.
    * @param cmd command
    * @param o output stream
-   * @return boolean success flag
    * @throws IOException Exception
    */
-  public boolean execute(final String cmd, final OutputStream o)
+  public void execute(final String cmd, final OutputStream o)
       throws IOException {
     // send {Command}0
     send(cmd);
     receive(o);
     info = receive();
-    return ok();
+    if(!ok()) throw new IOException(info);
   }
 
   /**
@@ -92,12 +73,9 @@ public class BaseXClient {
    * @throws IOException Exception
    */
   public String execute(final String cmd) throws IOException {
-    // send {Command}0
-    send(cmd);
-    final String s = receive();
-    info = receive();
-    if(!ok()) throw new IOException(info);
-    return s;
+    final OutputStream os = new ByteArrayOutputStream();
+    execute(cmd, os);
+    return os.toString();
   }
 
   /**

@@ -1,15 +1,14 @@
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
- * -----------------------------------------------------------------------------
- *
- * This example shows how BaseX commands can be performed.
- * The execution time will be printed along with the result of the command.
+ * This example shows how database commands can be executed.
+ * Documentation: http://basex.org/api
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 public final class Example {
-  /** Privator constructor. */
+  /** Private constructor. */
   private Example() { }
 
   /**
@@ -17,29 +16,30 @@ public final class Example {
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    long time = System.nanoTime();
-
-    String cmd = "xquery 1 to 10";
-
     try {
-      BaseXClient session = new BaseXClient("localhost", 1984,
-          "admin", "admin");
+      // initialize timer
+      long time = System.nanoTime();
 
-      System.out.println("=== 1st version with output stream ===");
+      // create session
+      BaseXClient session =
+        new BaseXClient("localhost", 1984, "admin", "admin");
 
-      if(!session.execute(cmd, System.out)) System.out.println(session.info());
+      // version 1: perform command and print returned string
+      System.out.println(session.execute("info"));
 
-      System.out.println("\n\n=== 2nd version without output stream ===");
-
-      System.out.println(session.execute(cmd));
+      // version 2 (faster): perform command and pass on result to output stream
+      OutputStream out = System.out;
+      session.execute("xquery 1 to 10", out);
 
       // close session
       session.close();
 
       // print time needed
       double ms = (System.nanoTime() - time) / 1000000d;
-      System.out.println("\n" + ms + " ms");
+      System.out.println("\n\n" + ms + " ms");
+
     } catch(IOException ex) {
+      // print exception
       ex.printStackTrace();
     }
   };

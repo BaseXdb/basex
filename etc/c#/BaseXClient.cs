@@ -1,27 +1,9 @@
 /*
- * -----------------------------------------------------------------------------
+ * Language Binding for BaseX.
+ * Works with BaseX 6.1.9 and later
+ * Documentation: http://basex.org/api
  * 
- * This module provides methods to connect to and communicate with the
- * BaseX Server.
- *
- * The Constructor of the class expects a hostname, port, username and password
- * for the connection. The socket connection will then be established via the
- * hostname and the port.
- *
- * For the execution of commands you need to call the execute() method with the
- * database command as argument. The method returns the result or throws
- * an exception with the received error message.
- * For the execution of the iterative version of a query you need to call
- * the query() method. The results will then be returned via the more() and
- * the next() methods. If an error occurs an exception will be thrown.
- *
- * An even faster approach is to call execute() with the database command and
- * an output stream. The result will directly be printed and does not have to
- * be cached.
- * 
- * -----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * -----------------------------------------------------------------------------
  */
 using System;
 using System.Net.Sockets;
@@ -56,27 +38,24 @@ namespace BaseXClient
     }
     
     /** see readme.txt */
-    public bool Execute(string com, Stream ms)
+    public void Execute(string com, Stream ms)
     {
       Send(com);
       Init();
       Receive(ms);
       info = Receive();
-      return Ok();
+      if(!Ok()) 
+      {
+        throw new IOException(info);
+      }
     }
     
     /** see readme.txt */
     public String Execute(string com)
     {
-      Send(com);
-      Init();
-      String result = Receive();
-      info = Receive();
-      if(!Ok()) 
-      {
-      	throw new IOException(info);
-      }
-      return result;
+      MemoryStream ms = new MemoryStream();
+      Execute(com, ms);
+      return System.Text.Encoding.UTF8.GetString(ms.ToArray());
     }
     
     /** see readme.txt */
@@ -169,21 +148,21 @@ namespace BaseXClient
   
   class Query
   {
-  	private Session session;
-  	private string id;
-  	private string nextItem;
-  	
-  	/** see readme.txt */
+    private Session session;
+    private string id;
+    private string nextItem;
+
+    /** see readme.txt */
     public Query(Session s, string query)
     {
-	  session = s;
-	  session.stream.WriteByte(0);
-	  session.Send(query);
-	  id = session.Receive();
-	  if(!session.Ok())
-	  {
-	  	throw new IOException(session.Receive());
-	  }
+      session = s;
+      session.stream.WriteByte(0);
+      session.Send(query);
+      id = session.Receive();
+      if(!session.Ok())
+      {
+        throw new IOException(session.Receive());
+      }
     }
     
     /** see readme.txt */
@@ -193,9 +172,9 @@ namespace BaseXClient
       session.Send(id);
       nextItem = session.Receive();
       if(!session.Ok())
-	  {
-	  	throw new IOException(session.Receive());
-	  }
+      {
+        throw new IOException(session.Receive());
+      }
       return nextItem.Length != 0;
     }
     

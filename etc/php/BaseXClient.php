@@ -1,23 +1,10 @@
 <?php
-/* ----------------------------------------------------------------------------
- *
- * This module provides methods to connect to and communicate with the
- * BaseX Server.
- *
- * The Constructor of the class expects a hostname, port, username and password
- * for the connection. The socket connection will then be established via the
- * hostname and the port.
- *
- * For the execution of commands you need to call the execute() method with the
- * database command as argument. The method returns the result or throws
- * an exception with the received error message.
- * For the execution of the iterative version of a query you need to call
- * the query() method. The results will then be returned via the more() and
- * the next() methods. If an error occurs an exception will be thrown.
- *
- * ----------------------------------------------------------------------------
+/*
+ * Language Binding for BaseX.
+ * Works with BaseX 6.1.9 and later
+ * Documentation: http://basex.org/api
+ * 
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * ----------------------------------------------------------------------------
  */
 class Session {
   /* Class variables.*/
@@ -52,10 +39,10 @@ class Session {
     // receive result
     $result = $this->receive();
     $this->info = $this->readString();
-	if($this->ok() != True) {
-	  throw new Exception($this->info);
-	}
-	return $result;
+    if($this->ok() != True) {
+      throw new Exception($this->info);
+    }
+    return $result;
   }
 
   /* see readme.txt */
@@ -95,23 +82,23 @@ class Session {
   
   /* Returns the query object.*/
   public function query($q) {
-  	return new Query($this, $q);
+    return new Query($this, $q);
   }
   
   /* Sends the str. */
   public function send($str) {
-  	socket_write($this->socket, "$str\0");
+    socket_write($this->socket, "$str\0");
   }
   
   /* Returns success check. */
   public function ok() {
-  	return $this->read() == "\0";
+    return $this->read() == "\0";
   }
   
   /* Returns the result. */
   public function receive() {
-  	$this->init();
-  	return $this->readString();
+    $this->init();
+    return $this->readString();
   }
 }
 
@@ -119,16 +106,16 @@ class Query {
   /* Class variables.*/
   var $session, $id, $open, $next;
  
-  /* see readme.txt */	
+  /* see readme.txt */
   function __construct($s, $q) {
     $this->session = $s;
-	$this->session->send("\0$q");
-	$this->id = $this->session->receive();
-	if($this->session->ok() != True) {
+    $this->session->send("\0$q");
+    $this->id = $this->session->receive();
+    if($this->session->ok() != True) {
       throw new Exception($this->session->readString());
     }
   }
-	
+
   /* see readme.txt */
   public function more() {
     $this->session->send("\1$this->id");
@@ -138,15 +125,15 @@ class Query {
     }
     return strlen($this->next) > 0; 
   }
-	
+
   /* see readme.txt */
   public function next() {
     return $this->next;
   }
-	
+
   /* see readme.txt */
   public function close() {
     $this->session->send("\2$this->id");   
-  }	
+  }
 }
 ?>

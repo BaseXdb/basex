@@ -118,7 +118,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
         qp.ctx.ns.add(new QNm(token(n), Uri.uri(token(ns.get(n)))));
       }
       // perform query and return result
-      return new BXResourceSet(qp.query(), coll);
+      return new BXResourceSet(qp.execute(), coll);
     } catch(final QueryException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }

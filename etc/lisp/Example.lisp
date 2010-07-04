@@ -1,11 +1,7 @@
-; -----------------------------------------------------------------------------
+; This example shows how database commands can be executed.
+; Documentation: http://basex.org/api
 ;
-; This example shows how BaseX commands can be performed.
-; The execution time will be printed along with the result of the command.
-;
-; -----------------------------------------------------------------------------
 ; (C) Andy Chambers, Formedix Ltd 2010, ISC License
-; -----------------------------------------------------------------------------
 
 (defpackage :basex-user
  (:use :cl :basex))

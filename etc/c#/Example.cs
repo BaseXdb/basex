@@ -1,12 +1,8 @@
-﻿/*
- * -----------------------------------------------------------------------------
+/*
+ * This example shows how database commands can be executed.
+ * Documentation: http://basex.org/api
  *
- * This example shows how BaseX commands can be performed.
- * The execution time will be printed along with the result of the command.
- *
- * -----------------------------------------------------------------------------
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * -----------------------------------------------------------------------------
  */
 using System;
 using System.Diagnostics;
@@ -18,27 +14,21 @@ namespace BaseXClient
   {
     public static void Main(string[] args)
     {
-      // initialize timer
-      Stopwatch watch = new Stopwatch();
-      watch.Start();
-      
-      // command to be performed
-      string cmd = "xquery 1 to 10";
-      
       try
       {
+        // initialize timer
+        Stopwatch watch = new Stopwatch();
+        watch.Start();
+
         // create session
         Session session = new Session("localhost", 1984, "admin", "admin");
 
-        // Version 1: perform command and show result or error output
-        Console.WriteLine(session.Execute(cmd));
+        // version 1: perform command and print returned string
+        Console.WriteLine(session.Execute("info"));
         
-        // Version 2 (faster): send result to the specified output stream
+        // version 2 (faster): perform command and pass on result to output stream
         Stream stream = Console.OpenStandardOutput();
-        if (!session.Execute(cmd, stream))
-        {
-          Console.WriteLine(session.Info);
-        }
+        session.Execute("xquery 1 to 10", stream);
 
         // close session
         session.Close();

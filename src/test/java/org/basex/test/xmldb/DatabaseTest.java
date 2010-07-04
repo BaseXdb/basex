@@ -74,7 +74,7 @@ public class DatabaseTest extends TestCase {
     assertNull(database.getProperty("ProbablyUnknown"));
 
     // the following tests are database specific...
-    assertEquals("false", database.getProperty("info"));
+    assertEquals("false", database.getProperty("queryinfo"));
     assertEquals("1", database.getProperty("runs"));
   }
 
@@ -88,8 +88,8 @@ public class DatabaseTest extends TestCase {
     }
 
     // the following tests are database specific...
-    database.setProperty("info", "on");
-    database.setProperty("info", "off");
+    database.setProperty("queryinfo", "on");
+    database.setProperty("queryinfo", "off");
 
     try {
       database.setProperty("runs", "ABC");

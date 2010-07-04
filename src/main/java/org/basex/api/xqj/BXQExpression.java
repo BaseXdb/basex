@@ -55,7 +55,7 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
   }
 
   public XQResultSequence executeQuery(final String input) throws XQException {
-    qp.setQuery(input);
+    qp.query(input);
     return execute();
   }
 

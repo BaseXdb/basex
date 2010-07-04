@@ -8,8 +8,8 @@
 -- Stability   : experimental
 -- Portability : portable
 --
--- This example shows how BaseX commands can be performed via the Haskell API.
--- The execution time will be printed along with the result of the command.
+-- This example shows how database commands can be executed.
+-- Documentation: http://basex.org/api
 --
 -------------------------------------------------------------------------------
 
@@ -25,7 +25,7 @@ query = "xquery 1 to 10"
 
 main :: IO ()
 main = withSocketsDo $ do
-	-- start time
+    -- start time
     start <- getCurrentTime
     -- connect to the server
     (Just session) <- connect "localhost" 1984 "admin" "admin"

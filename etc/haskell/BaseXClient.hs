@@ -8,8 +8,8 @@
 -- Stability   : experimental
 -- Portability : portable
 --
--- This module provides methods to connect to and communicate with the
--- BaseX Server.
+-- Language Binding for BaseX.
+-- Works with BaseX 6.1
 --
 -- It requires the PureMD5 package fom Hackage: 'cabal install PureMD5'.
 --
