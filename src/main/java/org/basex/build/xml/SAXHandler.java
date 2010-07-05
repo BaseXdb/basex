@@ -91,6 +91,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
     }
   }
 
+  @Override
   public void comment(final char[] ch, final int s, final int l)
       throws SAXException {
 
@@ -157,16 +158,22 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   /* public void fatalError(final SAXParseException ex) { } */
 
   // LexicalHandler
+  @Override
   public void startDTD(final String n, final String pid, final String sid) {
     dtd = true;
   }
 
+  @Override
   public void endDTD() {
     dtd = false;
   }
 
+  @Override
   public void endCDATA() { }
+  @Override
   public void endEntity(final String n) { }
+  @Override
   public void startCDATA() { }
+  @Override
   public void startEntity(final String n) { }
 }

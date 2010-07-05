@@ -39,19 +39,23 @@ final class BXPathExpression implements XPathExpression {
     xproc = new QueryProcessor(qu, context);
   }
 
+  @Override
   public String evaluate(final Object item) throws XPathExpressionException {
     return evaluate(item, XPathConstants.STRING).toString();
   }
 
+  @Override
   public String evaluate(final InputSource is) throws XPathExpressionException {
     return evaluate(is, XPathConstants.STRING).toString();
   }
 
+  @Override
   public Object evaluate(final Object item, final QName res)
       throws XPathExpressionException {
     return finish(execute(), res);
   }
 
+  @Override
   public Object evaluate(final InputSource is, final QName res)
       throws XPathExpressionException {
 

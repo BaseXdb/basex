@@ -654,6 +654,7 @@ public class BaseXText extends BaseXPanel {
 
   /** Cursor. */
   final Timer cursor = new Timer(500, new ActionListener() {
+    @Override
     public void actionPerformed(final ActionEvent e) {
       rend.cursor(!rend.cursor());
       rend.repaint();
@@ -695,9 +696,18 @@ public class BaseXText extends BaseXPanel {
 
   /** Text command. */
   abstract class TextCmd implements GUICommand {
-    public boolean checked() { return false; }
-    public String help() { return null; }
-    public String key() { return null; }
+    @Override
+    public boolean checked() {
+      return false;
+    }
+    @Override
+    public String help() {
+      return null;
+    }
+    @Override
+    public String key() {
+      return null;
+    }
     /** Finishes a command. */
     public void finish() {
       text.setCaret();

@@ -58,25 +58,13 @@ public final class TableLayout implements LayoutManager {
     posY = new int[r];
   }
 
-  /**
-   * Adds the specified component with the specified name to the layout.
-   * @param name the component name
-   * @param comp the component to be added
-   */
+  @Override
   public void addLayoutComponent(final String name, final Component comp) { }
 
-  /**
-   * Removes the specified component from the layout.
-   * @param comp the component to be removed
-   */
+  @Override
   public void removeLayoutComponent(final Component comp) { }
 
-  /**
-   * Determines the preferred size of the container argument using this grid
-   * layout.
-   * @param parent the layout container
-   * @return the preferred dimensions for painting the container
-   */
+  @Override
   public Dimension preferredLayoutSize(final Container parent) {
     synchronized(parent.getTreeLock()) {
       final Insets in = parent.getInsets();
@@ -109,20 +97,12 @@ public final class TableLayout implements LayoutManager {
     }
   }
 
-  /**
-   * Determines the minimum size of the container argument using this grid
-   * layout.
-   * @param parent the layout container
-   * @return the preferred dimensions for painting the container
-   */
+  @Override
   public Dimension minimumLayoutSize(final Container parent) {
     return preferredLayoutSize(parent);
   }
 
-  /**
-   * Lays out the specified container using this layout.
-   * @param p the layout container
-   */
+  @Override
   public void layoutContainer(final Container p) {
     preferredLayoutSize(p);
     synchronized(p.getTreeLock()) {

@@ -29,6 +29,7 @@ public final class GIFParser implements IFileParser {
     ParserRegistry.register("gif", GIFParser.class);
   }
 
+  @Override
   public boolean check(final DeepFile deepFile) throws IOException {
     final int len = HEADERGIF87.length;
     final BufferedFileChannel f = deepFile.getBufferedFileChannel();

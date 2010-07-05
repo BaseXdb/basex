@@ -93,6 +93,7 @@ final class MapRect extends ViewRect implements Comparable<MapRect> {
     return r.x >= x && r.y >= y && r.x + r.w <= x + w && r.y + r.h <= y + h;
   }
 
+  @Override
   public int compareTo(final MapRect r) {
     return pre - r.pre;
   }

@@ -226,9 +226,7 @@ public final class MapView extends View implements Runnable {
     }
   }
 
-  /**
-   * Starts the zooming thread.
-   */
+  @Override
   public void run() {
     focused = null;
 

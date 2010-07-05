@@ -39,6 +39,7 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
     return s >= mtc.s && e <= mtc.e;
   }
 
+  @Override
   public int compareTo(final FTStringMatch sm) {
     final int st = s - sm.s;
     return st != 0 ? st : e - sm.e;

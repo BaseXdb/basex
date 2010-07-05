@@ -86,6 +86,7 @@ final class DialogFT extends BaseXBack {
 
     swbrowse = new BaseXButton(BUTTONBROWSE, d);
     swbrowse.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) { chooseStop(); }
     });
     b2.add(swbrowse);

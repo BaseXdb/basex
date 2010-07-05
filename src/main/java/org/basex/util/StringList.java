@@ -82,6 +82,7 @@ public class StringList implements Iterable<String> {
    */
   public final void sort(final boolean cs, final boolean asc) {
     Arrays.sort(list, 0, size, new Comparator<String>() {
+      @Override
       public int compare(final String s1, final String s2) {
         final int c = cs ? s1.compareTo(s2) :
           s1.toLowerCase().compareTo(s2.toLowerCase());
@@ -90,11 +91,15 @@ public class StringList implements Iterable<String> {
     });
   }
 
+  @Override
   public Iterator<String> iterator() {
     return new Iterator<String>() {
       private int c = -1;
+      @Override
       public boolean hasNext() { return ++c < size; }
+      @Override
       public String next() { return list[c]; }
+      @Override
       public void remove() { Main.notexpected(); }
     };
   }

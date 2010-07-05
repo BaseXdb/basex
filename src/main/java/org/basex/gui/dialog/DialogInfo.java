@@ -114,6 +114,7 @@ public final class DialogInfo extends Dialog {
       north.add(indexes[0], BorderLayout.WEST);
       final BaseXButton export = new BaseXButton(GUIEXPORT, this);
       export.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent e) {
           final IO file = GUICommands.save(gui, true);
           if(file != null) {

@@ -146,17 +146,22 @@ public final class TokenList implements Iterable<byte[]> {
    */
   public void sort(final boolean cs) {
     Arrays.sort(list, 0, size, new Comparator<byte[]>() {
+      @Override
       public int compare(final byte[] s1, final byte[] s2) {
         return cs ? diff(s1, s2) : diff(lc(s1), lc(s2));
       }
     });
   }
 
+  @Override
   public Iterator<byte[]> iterator() {
     return new Iterator<byte[]>() {
       private int c = -1;
+      @Override
       public boolean hasNext() { return ++c < size; }
+      @Override
       public byte[] next() { return list[c]; }
+      @Override
       public void remove() { Main.notexpected(); }
     };
   }

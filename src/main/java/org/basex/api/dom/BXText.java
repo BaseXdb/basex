@@ -19,19 +19,23 @@ public class BXText extends BXChar implements Text {
     super(n);
   }
 
+  @Override
   public String getWholeText() {
     return getNodeValue();
   }
 
+  @Override
   public boolean isElementContentWhitespace() {
     return Token.ws(node.str());
   }
 
+  @Override
   public BXText replaceWholeText(final String content) {
     error();
     return null;
   }
 
+  @Override
   public BXText splitText(final int off) {
     error();
     return null;

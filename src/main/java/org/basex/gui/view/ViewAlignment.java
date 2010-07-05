@@ -55,28 +55,18 @@ final class ViewAlignment implements ViewLayout {
     comp = Array.delete(comp, o);
   }
 
-  /**
-   * Checks if the view layout is visible.
-   * @return true if layout is visible
-   */
+  @Override
   public boolean isVisible() {
     for(final ViewLayout c : comp) if(c.isVisible()) return true;
     return false;
   }
 
-  /**
-   * Sets the visibility of the views to the property values.
-   * @param db database flag
-   */
+  @Override
   public void setVisibility(final boolean db) {
     for(final ViewLayout c : comp) c.setVisibility(db);
   }
 
-  /**
-   * Deletes the specified panel.
-   * @param panel panel to be removed
-   * @return true if only one view is left in the current level
-   */
+  @Override
   public boolean delete(final ViewPanel panel) {
     for(int o = 0; o < comp.length; o++) {
       if(comp[o].delete(panel)) {
@@ -90,10 +80,7 @@ final class ViewAlignment implements ViewLayout {
     return comp.length < 2;
   }
 
-  /**
-   * Adds a layout to the specified panel.
-   * @param panel current panel
-   */
+  @Override
   public void createView(final BaseXBack panel) {
     // skip invisible layouts
     if(!isVisible()) return;
@@ -103,10 +90,7 @@ final class ViewAlignment implements ViewLayout {
     panel.add(split);
   }
 
-  /**
-   * Constructs a build string.
-   * @return build string
-   */
+  @Override
   public String layoutString() {
     final StringBuilder str = new StringBuilder(horiz ? "H " : "V ");
     for(final ViewLayout c : comp) str.append(c.layoutString());

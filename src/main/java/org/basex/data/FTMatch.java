@@ -73,17 +73,22 @@ public final class FTMatch implements Iterable<FTStringMatch> {
    */
   public void sort() {
     Arrays.sort(match, 0, size, new Comparator<FTStringMatch>() {
+      @Override
       public int compare(final FTStringMatch s1, final FTStringMatch s2) {
         return s1.compareTo(s2);
       }
     });
   }
 
+  @Override
   public Iterator<FTStringMatch> iterator() {
     return new Iterator<FTStringMatch>() {
       private int c = -1;
+      @Override
       public boolean hasNext() { return ++c < size; }
+      @Override
       public FTStringMatch next() { return match[c]; }
+      @Override
       public void remove() { Main.notexpected(); }
     };
   }

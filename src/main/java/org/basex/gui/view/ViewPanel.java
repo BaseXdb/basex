@@ -25,14 +25,17 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
     view = v;
   }
 
+  @Override
   public void setVisibility(final boolean db) {
     setVisible(view.visible() && (db || !view.db()));
   }
 
+  @Override
   public boolean delete(final ViewPanel panel) {
     return this == panel;
   }
 
+  @Override
   public void createView(final BaseXBack panel) {
     if(isVisible()) panel.add(this);
   }
@@ -45,6 +48,7 @@ final class ViewPanel extends BaseXBack implements ViewLayout {
     view.gui.layoutViews();
   }
 
+  @Override
   public String layoutString() {
     return view.getName() + " ";
   }

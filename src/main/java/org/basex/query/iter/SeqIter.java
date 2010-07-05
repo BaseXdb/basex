@@ -79,6 +79,7 @@ public final class SeqIter extends Iter implements Result {
     item[size++] = it;
   }
 
+  @Override
   public boolean same(final Result v) {
     if(!(v instanceof SeqIter)) return false;
 
@@ -95,10 +96,12 @@ public final class SeqIter extends Iter implements Result {
     }
   }
 
+  @Override
   public void serialize(final Serializer ser) throws IOException {
     for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
   }
 
+  @Override
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
     item[n].serialize(ser);

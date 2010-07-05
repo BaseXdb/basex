@@ -71,10 +71,12 @@ public final class BaseXTable extends JTable {
    * Dialog specific table model.
    */
   final class TableModel extends AbstractTableModel {
+    @Override
     public int getColumnCount() {
       return data.cols();
     }
 
+    @Override
     public int getRowCount() {
       return data.rows();
     }
@@ -84,6 +86,7 @@ public final class BaseXTable extends JTable {
       return Token.string(data.header.get(col));
     }
 
+    @Override
     public Object getValueAt(final int row, final int col) {
       final String o = data.value(row, col);
       return o.isEmpty() ? Boolean.FALSE : o.equals("X") ? Boolean.TRUE : o;

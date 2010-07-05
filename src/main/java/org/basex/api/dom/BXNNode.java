@@ -22,6 +22,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
     super(nb);
   }
 
+  @Override
   public BXNode getNamedItem(final String name) {
     final byte[] nm = Token.token(name);
     final int s = getLength();
@@ -33,26 +34,31 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
     return null;
   }
 
+  @Override
   public BXNode getNamedItemNS(final String uri, final String ln) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public BXNode setNamedItem(final Node arg) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public BXNode removeNamedItem(final String name) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public BXNode setNamedItemNS(final Node arg) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public BXNode removeNamedItemNS(final String uri, final String ln) {
     Main.notimplemented();
     return null;

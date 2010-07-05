@@ -70,11 +70,15 @@ public final class IntArrayList implements Iterable<int[]> {
     list[p] = v;
   }
 
+  @Override
   public Iterator<int[]> iterator() {
     return new Iterator<int[]>() {
       private int c = -1;
+      @Override
       public boolean hasNext() { return ++c < size; }
+      @Override
       public int[] next() { return list[c]; }
+      @Override
       public void remove() { Main.notexpected(); }
     };
   }

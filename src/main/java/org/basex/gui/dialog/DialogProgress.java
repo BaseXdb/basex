@@ -102,6 +102,7 @@ public final class DialogProgress extends Dialog implements ActionListener {
     super.dispose();
   }
 
+  @Override
   public void actionPerformed(final ActionEvent e) {
     setTitle(prog.title());
     info.setText(prog.detail());

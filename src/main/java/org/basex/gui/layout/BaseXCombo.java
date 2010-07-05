@@ -25,6 +25,7 @@ public final class BaseXCombo extends JComboBox {
     if(!(win instanceof Dialog)) return;
 
     addItemListener(new ItemListener() {
+      @Override
       public void itemStateChanged(final ItemEvent ie) {
         if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) {
           ((Dialog) win).action(null);
@@ -46,6 +47,7 @@ public final class BaseXCombo extends JComboBox {
     if(!(win instanceof Dialog)) return;
 
     addItemListener(new ItemListener() {
+      @Override
       public void itemStateChanged(final ItemEvent ie) {
         if(isValid() && ie.getStateChange() == ItemEvent.SELECTED) {
           if(listen) ((Dialog) win).action(ie.getSource());

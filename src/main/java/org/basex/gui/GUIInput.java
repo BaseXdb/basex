@@ -51,6 +51,7 @@ public final class GUIInput extends BaseXTextField {
 
     box = new BaseXCombo(new String[] {}, main);
     box.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         if(e.getModifiers() == InputEvent.BUTTON1_MASK) completeInput();
       }

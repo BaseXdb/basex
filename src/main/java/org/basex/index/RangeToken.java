@@ -29,10 +29,12 @@ public final class RangeToken implements IndexToken {
     max = mx;
   }
 
+  @Override
   public IndexType type() {
     return type;
   }
 
+  @Override
   public byte[] get() {
     return Token.EMPTY;
   }

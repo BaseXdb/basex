@@ -39,6 +39,7 @@ public final class BXElem extends BXNode implements Element {
     return new BXNNode(finish(node.attr()));
   }
 
+  @Override
   public String getAttribute(final String name) {
     final Nod n = attribute(name);
     return n != null ? Token.string(n.str()) : "";
@@ -50,89 +51,108 @@ public final class BXElem extends BXNode implements Element {
     return uri.length == 0 ? null : Token.string(uri);
   }
 
+  @Override
   public String getAttributeNS(final String uri, final String ln) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public BXAttr getAttributeNode(final String name) {
     final Nod n = attribute(name);
     return n != null ? (BXAttr) n.java() : null;
   }
 
+  @Override
   public BXAttr getAttributeNodeNS(final String uri, final String ln) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public BXNList getElementsByTagName(final String name) {
     return getElements(name);
   }
 
+  @Override
   public BXNList getElementsByTagNameNS(final String uri, final String ln) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public TypeInfo getSchemaTypeInfo() {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public String getTagName() {
     return getNodeName();
   }
 
+  @Override
   public boolean hasAttribute(final String name) {
     return attribute(name) != null;
   }
 
+  @Override
   public boolean hasAttributeNS(final String uri, final String ln) {
     Main.notimplemented();
     return false;
   }
 
+  @Override
   public void removeAttribute(final String name) {
     error();
   }
 
+  @Override
   public void removeAttributeNS(final String uri, final String ln) {
     error();
   }
 
+  @Override
   public BXAttr removeAttributeNode(final Attr oldAttr) {
     error();
     return null;
   }
 
+  @Override
   public void setAttribute(final String name, final String value) {
     error();
   }
 
+  @Override
   public void setAttributeNS(final String uri, final String qn,
       final String value) {
     error();
   }
 
+  @Override
   public BXAttr setAttributeNode(final Attr at) {
     error();
     return null;
   }
 
+  @Override
   public BXAttr setAttributeNodeNS(final Attr at) {
     error();
     return null;
   }
 
+  @Override
   public void setIdAttribute(final String name, final boolean isId) {
     error();
   }
 
+  @Override
   public void setIdAttributeNS(final String uri, final String ln,
       final boolean isId) {
     error();
   }
 
+  @Override
   public void setIdAttributeNode(final Attr at, final boolean isId) {
     error();
   }

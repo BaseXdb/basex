@@ -35,6 +35,7 @@ public class BXNList implements NodeList {
     nodes = n;
   }
 
+  @Override
   public BXNode item(final int i) {
     Nod n = null;
     if(xquery != null) {
@@ -45,6 +46,7 @@ public class BXNList implements NodeList {
     return n != null ? n.java() : null;
   }
 
+  @Override
   public int getLength() {
     return xquery != null ? xquery.size() : nodes.size();
   }

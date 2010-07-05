@@ -29,14 +29,17 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
     return Token.string(node.nname());
   }
 
+  @Override
   public String getData() {
     return getNodeValue();
   }
 
+  @Override
   public String getTarget() {
     return getNodeName();
   }
 
+  @Override
   public void setData(final String dat) {
     error();
   }

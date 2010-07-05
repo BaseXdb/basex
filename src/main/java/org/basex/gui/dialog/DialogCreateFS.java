@@ -91,6 +91,7 @@ public final class DialogCreateFS extends Dialog {
 
     browse = new BaseXButton(BUTTONBROWSE, this);
     browse.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, path.getText(),
             main).select(BaseXFileChooser.Mode.DOPEN);
@@ -110,6 +111,7 @@ public final class DialogCreateFS extends Dialog {
     all.setToolTipText(IMPORTALLINFO);
     all.setBorder(new EmptyBorder(4, 4, 0, 0));
     all.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         action(null);
       }
@@ -149,6 +151,7 @@ public final class DialogCreateFS extends Dialog {
 
     cont = new BaseXCheckBox(IMPORTCONT, prop.is(Prop.FSCONT), this);
     cont.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         action(null);
       }
@@ -157,6 +160,7 @@ public final class DialogCreateFS extends Dialog {
 
     xml = new BaseXCheckBox(IMPORTXML, prop.is(Prop.FSXML), this);
     xml.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         action(null);
       }

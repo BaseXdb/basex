@@ -26,6 +26,7 @@ public class BaseXPassword extends JPasswordField {
 
     if(!(win instanceof Dialog)) return;
     addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         ((Dialog) win).action(e.getSource());
       }

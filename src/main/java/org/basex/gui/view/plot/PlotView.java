@@ -125,12 +125,14 @@ public final class PlotView extends View {
     xLog = new BaseXCheckBox(PLOTLOG, false, null);
     xLog.setSelected(gui.prop.is(GUIProp.PLOTXLOG));
     xLog.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         gui.prop.invert(GUIProp.PLOTXLOG);
         refreshUpdate();
       }
     });
     dots = new BaseXSlider(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         gui.prop.set(GUIProp.PLOTDOTS, dots.value());
         refreshLayout();
@@ -140,6 +142,7 @@ public final class PlotView extends View {
     yLog = new BaseXCheckBox(PLOTLOG, false, null);
     yLog.setSelected(gui.prop.is(GUIProp.PLOTYLOG));
     yLog.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         gui.prop.invert(GUIProp.PLOTYLOG);
         refreshUpdate();
@@ -155,18 +158,21 @@ public final class PlotView extends View {
     box = new Box(BoxLayout.X_AXIS);
     xCombo = new BaseXCombo(new String[] {}, gui);
     xCombo.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         setAxis(plotData.xAxis, xCombo);
       }
     });
     yCombo = new BaseXCombo(new String[] {}, gui);
     yCombo.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         setAxis(plotData.yAxis, yCombo);
       }
     });
     itemCombo = new BaseXCombo(new String[] {}, gui);
     itemCombo.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         final String item = (String) itemCombo.getSelectedItem();
         plotData.xAxis.log = gui.prop.is(GUIProp.PLOTXLOG);

@@ -21,6 +21,7 @@ abstract class BXChar extends BXNode implements CharacterData {
     super(n);
   }
 
+  @Override
   public final String getData() {
     return getNodeValue();
   }
@@ -30,10 +31,12 @@ abstract class BXChar extends BXNode implements CharacterData {
     return Token.string(node.str());
   }
 
+  @Override
   public final int getLength() {
     return node.str().length;
   }
 
+  @Override
   public final String substringData(final int off, final int count) {
     final String val = getNodeValue();
     if(count < 0 || off < 0 || off >= val.length()) throw new DOMException(
@@ -41,22 +44,27 @@ abstract class BXChar extends BXNode implements CharacterData {
     return val.substring(off, Math.min(val.length(), off + count));
   }
 
+  @Override
   public final void appendData(final String arg) {
     Main.notimplemented();
   }
 
+  @Override
   public final void deleteData(final int off, final int count) {
     Main.notimplemented();
   }
 
+  @Override
   public final void insertData(final int off, final String arg) {
     Main.notimplemented();
   }
 
+  @Override
   public final void replaceData(final int off, final int c, final String arg) {
     Main.notimplemented();
   }
 
+  @Override
   public final void setData(final String dat) {
     Main.notimplemented();
   }

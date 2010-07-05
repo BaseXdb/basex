@@ -79,6 +79,7 @@ public final class DialogInsert extends Dialog {
     final ButtonGroup group = new ButtonGroup();
 
     final ActionListener al = new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         change(e.getSource());
       }

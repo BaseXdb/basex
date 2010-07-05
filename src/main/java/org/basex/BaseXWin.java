@@ -58,6 +58,7 @@ public final class BaseXWin {
     GUIConstants.init(gprop);
 
     SwingUtilities.invokeLater(new Runnable() {
+      @Override
       public void run() {
         // initialize look and feel
         init(gprop);

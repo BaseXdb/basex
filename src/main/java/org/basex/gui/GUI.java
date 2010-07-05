@@ -188,6 +188,7 @@ public final class GUI extends JFrame {
     mode.setSelectedIndex(2);
 
     mode.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         final int s = mode.getSelectedIndex();
         if(s == prop.num(GUIProp.SEARCHMODE) || !mode.isEnabled()) return;
@@ -203,9 +204,11 @@ public final class GUI extends JFrame {
 
     hist = new BaseXButton(this, "hist", HELPHIST);
     hist.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu pop = new JPopupMenu("History");
         final ActionListener al = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent ac) {
             input.setText(ac.getActionCommand());
             input.requestFocusInWindow();
@@ -233,6 +236,7 @@ public final class GUI extends JFrame {
 
     go = new BaseXButton(this, "go", HELPGO);
     go.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         execute();
       }

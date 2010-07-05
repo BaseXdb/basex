@@ -77,9 +77,11 @@ public final class XQueryView extends View {
 
     final BaseXButton hist = new BaseXButton(gui, "hist", HELPRECENT);
     hist.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu popup = new JPopupMenu("History");
         final ActionListener al = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent ac) {
             confirm();
             setQuery(IO.get(ac.getActionCommand()));
@@ -129,7 +131,8 @@ public final class XQueryView extends View {
     stop = new BaseXButton(gui, "stop", HELPSTOP);
     stop.addKeyListener(this);
     stop.addActionListener(new ActionListener() {
-      public void actionPerformed(final ActionEvent e) {
+      @Override
+     public void actionPerformed(final ActionEvent e) {
         stop.setEnabled(false);
         gui.stop();
       }
@@ -139,6 +142,7 @@ public final class XQueryView extends View {
     go = new BaseXButton(gui, "go", HELPGO);
     go.addKeyListener(this);
     go.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         text.query();
       }

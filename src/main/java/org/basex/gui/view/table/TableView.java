@@ -144,9 +144,7 @@ public final class TableView extends View implements Runnable {
     if(tdata.rows == null && visible()) refreshInit();
   }
 
-  /**
-   * Starts a context switch animation.
-   */
+  @Override
   public void run() {
     zoomstep = ZOOM.length;
     while(--zoomstep >= 0) {

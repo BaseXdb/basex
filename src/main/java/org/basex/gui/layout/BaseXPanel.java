@@ -43,22 +43,37 @@ public abstract class BaseXPanel extends BaseXBack implements MouseListener,
     BaseXLayout.addInteraction(this, hlp, win);
   }
 
+  @Override
   public void mouseEntered(final MouseEvent e) { }
+  @Override
   public void mousePressed(final MouseEvent e) { }
+  @Override
   public void mouseReleased(final MouseEvent e) { }
+  @Override
   public void mouseClicked(final MouseEvent e) { }
+  @Override
   public void mouseExited(final MouseEvent e) { }
+  @Override
   public void mouseMoved(final MouseEvent e) { }
+  @Override
   public void mouseDragged(final MouseEvent e) { }
 
+  @Override
   public void keyPressed(final KeyEvent e) { }
+  @Override
   public void keyTyped(final KeyEvent e) { }
+  @Override
   public void keyReleased(final KeyEvent e) { }
 
+  @Override
   public void componentResized(final ComponentEvent e) { }
+  @Override
   public void componentHidden(final ComponentEvent e) { }
+  @Override
   public void componentShown(final ComponentEvent e) { }
+  @Override
   public void componentMoved(final ComponentEvent e) { }
 
+  @Override
   public void mouseWheelMoved(final MouseWheelEvent e) { }
 }

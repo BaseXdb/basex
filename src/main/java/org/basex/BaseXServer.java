@@ -80,9 +80,7 @@ public final class BaseXServer extends Main implements Runnable {
     }
   }
 
-  /**
-   * Runs the server thread.
-   */
+  @Override
   public void run() {
     running = true;
     while(running) {

@@ -43,10 +43,12 @@ public abstract class BXNode implements Node {
     node = n;
   }
 
+  @Override
   public String getNodeName() {
     return NAMES[kind()];
   }
 
+  @Override
   public final short getNodeType() {
     return TYPES[kind()];
   }
@@ -59,35 +61,43 @@ public abstract class BXNode implements Node {
     return Nod.kind(node.type);
   }
 
+  @Override
   public String getNodeValue() {
     return null;
   }
 
+  @Override
   public String getLocalName() {
     return null;
   }
 
+  @Override
   public final BXNode cloneNode(final boolean deep) {
     return node.copy().java();
   }
 
+  @Override
   public final short compareDocumentPosition(final Node other) {
     final int d = node.diff(((BXNode) other).node);
     return (short) (d < 0 ? -1 : d > 0 ? 1 : 0);
   }
 
+  @Override
   public BXNNode getAttributes() {
     return null;
   }
 
+  @Override
   public final String getBaseURI() {
     return IO.get(string(node.base())).url();
   }
 
+  @Override
   public BXNList getChildNodes() {
     return new BXNList(finish(node.child()));
   }
 
+  @Override
   public BXNode getFirstChild() {
     try {
       return finish(node.child().next());
@@ -97,6 +107,7 @@ public abstract class BXNode implements Node {
     }
   }
 
+  @Override
   public final BXNode getLastChild() {
     Nod n = null;
     try {
@@ -109,10 +120,12 @@ public abstract class BXNode implements Node {
     return finish(n);
   }
 
+  @Override
   public String getNamespaceURI() {
     return null;
   }
 
+  @Override
   public BXNode getNextSibling() {
     try {
       return finish(node.follSibl().next());
@@ -122,6 +135,7 @@ public abstract class BXNode implements Node {
     }
   }
 
+  @Override
   public BXNode getPreviousSibling() {
     try {
       return finish(node.precSibl().next());
@@ -131,6 +145,7 @@ public abstract class BXNode implements Node {
     }
   }
 
+  @Override
   public BXNode getParentNode() {
     return finish(node.parent());
   }
@@ -144,14 +159,17 @@ public abstract class BXNode implements Node {
     return n != null ? n.java() : null;
   }
 
+  @Override
   public final boolean hasChildNodes() {
     return getFirstChild() != null;
   }
 
+  @Override
   public final boolean isSameNode(final Node other) {
     return this == other;
   }
 
+  @Override
   public BXDoc getOwnerDocument() {
     Nod n = node;
     Nod p;
@@ -159,86 +177,105 @@ public abstract class BXNode implements Node {
     return n.type == Type.DOC ? (BXDoc) n.java() : null;
   }
 
+  @Override
   public final boolean hasAttributes() {
     return getAttributes().getLength() != 0;
   }
 
+  @Override
   public final Object getFeature(final String feature, final String version) {
     return null;
   }
 
+  @Override
   public final String getPrefix() {
     return null;
   }
 
+  @Override
   public final String getTextContent() {
     return string(node.str());
   }
 
+  @Override
   public final BXNode appendChild(final Node newChild) {
     error();
     return null;
   }
 
+  @Override
   public final Object getUserData(final String key) {
     return null;
   }
 
+  @Override
   public final boolean isSupported(final String feature, final String version) {
     return false;
   }
 
+  @Override
   public final BXNode insertBefore(final Node newChild, final Node refChild) {
     error();
     return null;
   }
 
+  @Override
   public final boolean isDefaultNamespace(final String namespaceURI) {
     Main.notimplemented();
     return false;
   }
 
+  @Override
   public final boolean isEqualNode(final Node arg) {
     Main.notimplemented();
     return false;
   }
 
+  @Override
   public final String lookupNamespaceURI(final String prefix) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public final String lookupPrefix(final String namespaceURI) {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public final void normalize() {
     error();
   }
 
+  @Override
   public final BXNode removeChild(final Node oldChild) {
     error();
     return null;
   }
 
+  @Override
   public final BXNode replaceChild(final Node newChild, final Node oldChild) {
     error();
     return null;
   }
 
+  @Override
   public final void setNodeValue(final String nodeValue) {
     error();
   }
 
+  @Override
   public final void setPrefix(final String prefix) {
     error();
   }
 
+  @Override
   public final void setTextContent(final String textContent) {
     error();
   }
 
+  @Override
   public final Object setUserData(final String key, final Object dat,
       final UserDataHandler handler) {
     error();

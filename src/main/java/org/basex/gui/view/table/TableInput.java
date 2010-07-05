@@ -105,9 +105,7 @@ final class TableInput implements Runnable {
     return true;
   }
 
-  /**
-   * Thread for cursor flashing.
-   */
+  @Override
   public void run() {
     while(text != null) {
       flashing ^= true;

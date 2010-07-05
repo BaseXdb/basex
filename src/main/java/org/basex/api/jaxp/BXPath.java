@@ -22,56 +22,68 @@ final class BXPath implements XPath {
   /** Functions. */
   private XPathFunctionResolver functions;
 
+  @Override
   public void reset() { }
 
+  @Override
   public void setXPathVariableResolver(final XPathVariableResolver var) {
     variables = var;
     Main.notimplemented();
   }
 
+  @Override
   public XPathVariableResolver getXPathVariableResolver() {
     return variables;
   }
 
+  @Override
   public void setXPathFunctionResolver(final XPathFunctionResolver fun) {
     functions = fun;
     Main.notimplemented();
   }
 
+  @Override
   public XPathFunctionResolver getXPathFunctionResolver() {
     return functions;
   }
 
+  @Override
   public void setNamespaceContext(final NamespaceContext ns) {
     Main.notimplemented();
   }
 
+  @Override
   public NamespaceContext getNamespaceContext() {
     return null;
   }
 
+  @Override
   public XPathExpression compile(final String expr) {
     return new BXPathExpression(expr);
   }
 
+  @Override
   public Object evaluate(final String expr, final Object item,
       final QName res) throws XPathExpressionException {
 
     return new BXPathExpression(expr).evaluate(item, res);
   }
 
+  @Override
   public String evaluate(final String expr, final Object item)
       throws XPathExpressionException {
 
     return new BXPathExpression(expr).evaluate(item);
   }
 
+  @Override
   public Object evaluate(final String expr, final InputSource source,
       final QName res) throws XPathExpressionException {
 
     return new BXPathExpression(expr).evaluate(source, res);
   }
 
+  @Override
   public String evaluate(final String expr, final InputSource source)
       throws XPathExpressionException {
 

@@ -300,6 +300,7 @@ final class TableHeader extends BaseXPanel {
       final int id = data.tags.id(en);
       final JMenuItem mi = new JRadioButtonMenuItem(string(en), eq(root, en));
       mi.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent ac) {
           tdata.init(data, id);
           view.refreshContext(true, false);
@@ -320,6 +321,7 @@ final class TableHeader extends BaseXPanel {
       final String item = (col.elem ? "" : "@") + string(col.name);
       final JMenuItem mi = new JCheckBoxMenuItem(item, col.width != 0);
       mi.addActionListener(new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent ac) {
           final boolean sel = mi.isSelected();
           boolean vis = sel;

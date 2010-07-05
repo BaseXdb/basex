@@ -196,6 +196,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     panel.add(sl, pos);
   }
 
+  @Override
   public void actionPerformed(final ActionEvent e) {
     if(e != null) {
       final Object source = e.getSource();

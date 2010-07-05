@@ -266,6 +266,7 @@ public final class DialogServer extends Dialog {
     running = ping(true);
 
     tabs.addChangeListener(new ChangeListener() {
+      @Override
       public void stateChanged(final ChangeEvent evt) {
         final BaseXTabs pane = (BaseXTabs) evt.getSource();
         tab = pane.getSelectedIndex();

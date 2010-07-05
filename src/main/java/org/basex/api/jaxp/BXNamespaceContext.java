@@ -24,15 +24,18 @@ public final class BXNamespaceContext implements NamespaceContext {
     ns = n;
   }
 
+  @Override
   public String getNamespaceURI(final String pre) {
     final byte[] uri = ns.find(token(pre));
     return uri == null ? null : string(uri);
   }
 
+  @Override
   public String getPrefix(final String uri) {
     return string(ns.prefix(token(uri)));
   }
 
+  @Override
   public Iterator<String> getPrefixes(final String uri) {
     final ArrayList<String> list = new ArrayList<String>();
     final String pre = getPrefix(uri);

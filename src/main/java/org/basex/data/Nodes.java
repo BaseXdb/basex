@@ -81,10 +81,12 @@ public final class Nodes implements Result {
     ftpos = null;
   }
 
+  @Override
   public int size() {
     return size;
   }
 
+  @Override
   public boolean same(final Result v) {
     if(!(v instanceof Nodes) || v.size() != size) return false;
     final Nodes n = (Nodes) v;
@@ -200,10 +202,12 @@ public final class Nodes implements Result {
     sorted = nodes;
   }
 
+  @Override
   public void serialize(final Serializer ser) throws IOException {
     for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
   }
 
+  @Override
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
     ser.node(data, nodes[n], ftpos);

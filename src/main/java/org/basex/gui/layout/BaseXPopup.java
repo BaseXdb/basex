@@ -60,6 +60,7 @@ public final class BaseXPopup extends JPopupMenu {
       } else {
         final JMenuItem item = add(c.desc());
         item.addActionListener(new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent e) {
             if(!gui.updating) c.execute(comp.gui);
           }

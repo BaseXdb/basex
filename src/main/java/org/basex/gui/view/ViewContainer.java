@@ -101,6 +101,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     gui.prop.set(GUIProp.LAYOUT, layout.layoutString());
   }
 
+  @Override
   public void run() {
     Performance.sleep(1000);
     while(++count < STEPS.length - 1) {

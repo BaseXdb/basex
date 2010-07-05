@@ -71,11 +71,15 @@ public final class Sessions implements Iterable<ServerProcess> {
     return tb.toString();
   }
 
+  @Override
   public Iterator<ServerProcess> iterator() {
     return new Iterator<ServerProcess>() {
       private int c = -1;
+      @Override
       public boolean hasNext() { return ++c < size; }
+      @Override
       public ServerProcess next() { return list[c]; }
+      @Override
       public void remove() { Main.notexpected(); }
     };
   }

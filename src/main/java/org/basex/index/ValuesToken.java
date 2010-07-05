@@ -24,10 +24,12 @@ public final class ValuesToken implements IndexToken {
     text = tok;
   }
 
+  @Override
   public IndexType type() {
     return type;
   }
 
+  @Override
   public byte[] get() {
     return text;
   }

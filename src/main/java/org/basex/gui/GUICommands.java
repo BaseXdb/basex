@@ -917,17 +917,22 @@ public enum GUICommands implements GUICommand {
     checked = c;
   }
 
+  @Override
   public void refresh(final GUI gui, final AbstractButton b) {
     final boolean e = !data || gui.context.data != null;
     if(b.isEnabled() != e) b.setEnabled(e);
   }
 
+  @Override
   public final boolean checked() { return checked; }
 
+  @Override
   public String help() { return help; }
 
+  @Override
   public String desc() { return entry; }
 
+  @Override
   public String key() { return key; }
 
   // STATIC METHODS ===========================================================

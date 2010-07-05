@@ -69,6 +69,7 @@ public final class DialogPrefs extends Dialog {
 
     final BaseXButton button = new BaseXButton(BUTTONBROWSE, this);
     button.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, path.getText(),
             gui).select(BaseXFileChooser.Mode.DOPEN);

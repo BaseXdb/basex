@@ -175,6 +175,7 @@ public final class TextView extends View implements ActionListener {
     }
   }
 
+  @Override
   public void actionPerformed(final ActionEvent e) {
     final BaseXFileChooser fc = new BaseXFileChooser(GUISAVEAS,
         gui.prop.get(GUIProp.SAVEPATH), gui);

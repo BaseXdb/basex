@@ -113,11 +113,15 @@ public final class FTMatches implements Iterable<FTMatch> {
     return size != 0;
   }
 
+  @Override
   public Iterator<FTMatch> iterator() {
     return new Iterator<FTMatch>() {
       private int c = -1;
+      @Override
       public boolean hasNext() { return ++c < size; }
+      @Override
       public FTMatch next() { return match[c]; }
+      @Override
       public void remove() { Main.notexpected(); }
     };
   }

@@ -104,6 +104,7 @@ public final class DialogMountFS extends Dialog {
     m.add(mountpoint);
     browse = new BaseXButton(BUTTONBROWSE, this);
     browse.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, mountpoint.getText(),
             main).select(BaseXFileChooser.Mode.DOPEN);

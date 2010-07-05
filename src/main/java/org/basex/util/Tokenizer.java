@@ -104,6 +104,7 @@ public final class Tokenizer implements IndexToken {
     }
   }
 
+  @Override
   public IndexType type() {
     return IndexType.FTX;
   }
@@ -218,6 +219,7 @@ public final class Tokenizer implements IndexToken {
     return true;
   }
 
+  @Override
   public byte[] get() {
     return get(orig());
   }

@@ -71,42 +71,23 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     revalidate();
   }
 
-  /**
-   * Adds the specified component.
-   * @param name the component name
-   * @param comp the component to be added
-   */
-  public void addLayoutComponent(final String name, final Component comp) {
-  }
+  @Override
+  public void addLayoutComponent(final String name, final Component comp) { }
 
-  /**
-   * Removes the specified component.
-   * @param comp the component to be removed
-   */
+  @Override
   public void removeLayoutComponent(final Component comp) { }
 
-  /**
-   * Determines the preferred container size (not implemented).
-   * @param parent the layout container
-   * @return preferred size
-   */
+  @Override
   public Dimension preferredLayoutSize(final Container parent) {
     return getSize();
   }
 
-  /**
-   * Determines the minimum container size (not implemented).
-   * @param parent the layout container
-   * @return minimum size
-   */
+  @Override
   public Dimension minimumLayoutSize(final Container parent) {
     return preferredLayoutSize(parent);
   }
 
-  /**
-   * Lays out the specified container using this layout.
-   * @param parent the layout container
-   */
+  @Override
   public void layoutContainer(final Container parent) {
       final Component[] c = getComponents();
       final int h = getHeight();

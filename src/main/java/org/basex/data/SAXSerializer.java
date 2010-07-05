@@ -40,42 +40,42 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     result = res;
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public ContentHandler getContentHandler() {
     return content;
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public DTDHandler getDTDHandler() {
     return null;
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public EntityResolver getEntityResolver() {
     return null;
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public ErrorHandler getErrorHandler() {
     return null;
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public boolean getFeature(final String name) {
     return false;
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public Object getProperty(final String name) {
     return null;
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public void parse(final InputSource input) throws SAXException {
     parse("");
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public void parse(final String id) throws SAXException {
     try {
       // execute query
@@ -87,7 +87,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     }
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public void setContentHandler(final ContentHandler c) {
     content = c;
   }
@@ -100,27 +100,27 @@ public final class SAXSerializer extends Serializer implements XMLReader {
     lexical = l;
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public void setDTDHandler(final DTDHandler h) {
     Main.notimplemented();
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public void setEntityResolver(final EntityResolver resolver) {
     Main.notimplemented();
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public void setErrorHandler(final ErrorHandler h) {
     Main.notimplemented();
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public void setFeature(final String name, final boolean value) {
     Main.notimplemented();
   }
 
-  /* Implements XMLReader method. */
+  @Override
   public void setProperty(final String name, final Object value) {
     Main.notimplemented();
   }

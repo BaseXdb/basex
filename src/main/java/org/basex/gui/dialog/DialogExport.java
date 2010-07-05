@@ -71,6 +71,7 @@ public final class DialogExport extends Dialog {
 
     final BaseXButton browse = new BaseXButton(BUTTONBROWSE, this);
     browse.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) { choose(); }
     });
     p.add(browse);

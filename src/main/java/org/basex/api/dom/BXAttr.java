@@ -38,6 +38,7 @@ public final class BXAttr extends BXNode implements Attr {
     return Token.string(node.str());
   }
 
+  @Override
   public String getName() {
     return getNodeName();
   }
@@ -63,27 +64,33 @@ public final class BXAttr extends BXNode implements Attr {
     return null;
   }
 
+  @Override
   public BXElem getOwnerElement() {
     return getParentNode();
   }
 
+  @Override
   public String getValue() {
     return getNodeValue();
   }
 
+  @Override
   public boolean isId() {
     return false;
   }
 
+  @Override
   public boolean getSpecified() {
     return false;
   }
 
+  @Override
   public TypeInfo getSchemaTypeInfo() {
     Main.notimplemented();
     return null;
   }
 
+  @Override
   public void setValue(final String value) {
     error();
   }

@@ -103,11 +103,15 @@ final class MapRects implements Iterable<MapRect> {
     sorted = list;
   }
 
+  @Override
   public Iterator<MapRect> iterator() {
     return new Iterator<MapRect>() {
       private int c = -1;
+      @Override
       public boolean hasNext() { return ++c < size; }
+      @Override
       public MapRect next() { return list[c]; }
+      @Override
       public void remove() { Main.notexpected(); }
     };
   }

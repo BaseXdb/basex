@@ -34,6 +34,7 @@ public final class BaseXButton extends JButton {
 
     final Dialog d = (Dialog) win;
     addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         final String text = getText();
         if(text.equals(BUTTONCANCEL)) d.cancel();
@@ -79,6 +80,7 @@ public final class BaseXButton extends JButton {
     final BaseXButton button = new BaseXButton(gui,
         cmd.toString().toLowerCase(), Token.token(cmd.help()));
     button.addActionListener(new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent e) {
         cmd.execute(gui);
       }
