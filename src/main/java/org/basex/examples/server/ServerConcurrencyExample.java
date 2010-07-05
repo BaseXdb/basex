@@ -48,8 +48,6 @@ public final class ServerConcurrencyExample {
     // Create a database
     System.out.println("\n* Create a database.");
 
-    // Set an option: turn verbose command information on
-    send("SET INFO true", session);
     send("CREATE DB input etc/xml/input.xml", session);
 
     // ------------------------------------------------------------------------

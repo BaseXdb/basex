@@ -19,9 +19,9 @@ public final class StressTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Number of clients. */
-  static final int NCLIENTS = 30;
+  static final int NCLIENTS = 100;
   /** Number of runs per client. */
-  static final int NQUERIES = 30;
+  static final int NQUERIES = 100;
 
   /** Global context. */
   static final Context CONTEXT = new Context();

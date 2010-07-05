@@ -47,7 +47,6 @@ public final class StressTest {
     System.out.println("\n* Create test database.");
 
     final ClientSession cs = newSession();
-    cs.execute("set info on");
     cs.execute("create db factbook etc/xml/factbook.xml");
     System.out.print(cs.info());
     cs.close();
