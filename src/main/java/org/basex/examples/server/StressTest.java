@@ -3,6 +3,7 @@ package org.basex.examples.server;
 import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
+import org.basex.core.Main;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
 
@@ -20,6 +21,11 @@ public final class StressTest {
   static final int NCLIENTS = 30;
   /** Number of runs per client. */
   static final int NQUERIES = 30;
+  /** Input document. */
+  static final String INPUT = "etc/xml/factbook.xml";
+  /** Query to be run ("%" serves as placeholder for dynamic content). */
+  static final String QUERY =
+    "basex:db('test')/descendant::text()[position() = %]";
 
   /** Random number generator. */
   static final Random RND = new Random();
@@ -47,7 +53,7 @@ public final class StressTest {
     System.out.println("\n* Create test database.");
 
     final ClientSession cs = newSession();
-    cs.execute("create db factbook etc/xml/factbook.xml");
+    cs.execute("create db test " + INPUT);
     System.out.print(cs.info());
     cs.close();
 
@@ -67,8 +73,9 @@ public final class StressTest {
     System.out.println("\n* Stop server and drop test database.");
 
     final ClientSession cs = newSession();
-    cs.execute("drop db factbook");
+    cs.execute("drop db test");
     System.out.print(cs.info());
+
     cs.close();
     new BaseXServer("stop");
   }
@@ -98,14 +105,11 @@ public final class StressTest {
 
           // return nth text of the database
           final int n = (RND.nextInt() & 0xFF) + 1;
-          final String qu = "basex:db('factbook')/descendant::text()" +
-            "[position() = " + n + "]";
-
+          final String qu = Main.info(QUERY, n);
           final String result = session.execute("xquery " + qu);
 
-          if(VERBOSE) System.out.print("[" + counter + "] Thread " +
+          if(VERBOSE) System.out.println("[" + counter++ + "] Thread " +
               getId() + ", Pos " + n + ": " + result);
-          counter++;
         }
         session.close();
 

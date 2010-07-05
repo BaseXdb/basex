@@ -3,6 +3,7 @@ package org.basex.examples.query;
 import java.util.Random;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
@@ -19,9 +20,13 @@ public final class StressTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Number of clients. */
-  static final int NCLIENTS = 100;
+  static final int NCLIENTS = 30;
   /** Number of runs per client. */
-  static final int NQUERIES = 100;
+  static final int NQUERIES = 30;
+  /** Input document. */
+  static final String INPUT = "etc/xml/factbook.xml";
+  /** Query to be run ("%" serves as placeholder for dynamic content). */
+  static final String QUERY = "descendant::text()[position() = %]";
 
   /** Global context. */
   static final Context CONTEXT = new Context();
@@ -45,7 +50,9 @@ public final class StressTest {
 
     // create test database
     System.out.println("\n* Create test database.");
-    new CreateDB("factbook", "etc/xml/factbook.xml").execute(CONTEXT);
+    final CreateDB cmd = new CreateDB("test", INPUT); 
+    cmd.execute(CONTEXT);
+    System.out.print(cmd.info());
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
@@ -59,7 +66,10 @@ public final class StressTest {
   static void dropDB() throws BaseXException {
     // drop database
     System.out.println("\n* Drop test database.");
-    new DropDB("factbook").execute(CONTEXT);
+
+    final DropDB cmd = new DropDB("test"); 
+    cmd.execute(CONTEXT);
+    System.out.print(cmd.info());
   }
 
   /** Single client. */
@@ -73,13 +83,11 @@ public final class StressTest {
 
           // return nth text of the database
           final int n = (RND.nextInt() & 0xFF) + 1;
-          final String qu = "descendant::text()[position() = " + n + "]";
-
+          final String qu = Main.info(QUERY, n);
           final String result = new XQuery(qu).execute(CONTEXT);
 
-          if(VERBOSE) System.out.print("[" + counter + "] Thread " +
+          if(VERBOSE) System.out.println("[" + counter++ + "] Thread " +
               getId() + ", Pos " + n + ": " + result);
-          counter++;
         }
 
         // database is dropped after last client has finished
