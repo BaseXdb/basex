@@ -175,10 +175,9 @@ public final class FElem extends FNode {
       }
     }
 
-    if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn)) {
+    if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn)) 
       ser.namespace(Token.EMPTY, uri);
-      ser.dn = uri;
-    }
+    ser.dn = uri;
 
     // serialize attributes
     for(int n = 0; n < atts.size(); n++) {
