@@ -30,10 +30,10 @@ public final class DropDB extends ACreate {
     // check if database is still pinned
     final String db = args[0];
     if(context.pinned(db)) return error(DBLOCKED, db);
-
+    // database does not exist; return true
+    if(!prop.dbexists(db)) return true;
     // try to drop database
-    return !prop.dbexists(db) ? info(DBNOTFOUND, db) :
-      drop(db, prop) ? info(DBDROPPED, db) : error(DBNOTDROPPED);
+    return drop(db, prop) ? info(DBDROPPED, db) : error(DBNOTDROPPED);
   }
 
   /**

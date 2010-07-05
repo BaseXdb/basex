@@ -74,7 +74,10 @@ public final class FNFileTest {
   /** Test function file:delete. */
   @Test
   public void testDelete() {
-    atomic(FunDef.DELETE, Str.get("test2"));
+    atomic(FunDef.DELETE, Str.get("test/test1/test2/test3"));
+    atomic(FunDef.DELETE, Str.get("test/test1/test2"));
+    atomic(FunDef.DELETE, Str.get("test/test1"));
+    atomic(FunDef.DELETE, Str.get("test"));
   }
 
   /** Test function file:path-to-full-path. */

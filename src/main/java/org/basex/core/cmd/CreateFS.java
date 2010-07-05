@@ -49,10 +49,7 @@ public final class CreateFS extends ACreate {
 
     final Optimize opt = new Optimize();
     progress(opt);
-    if(!opt.run(context)) return error(opt.info());
-
-    final Open cmd = new Open(db);
-    return cmd.run(context) ? info(DBCREATED, db, perf) : error(cmd.info());
+    return opt.run(context) ? info(DBCREATED, db, perf) : error(opt.info());
   }
 
   @Override

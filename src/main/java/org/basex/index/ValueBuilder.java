@@ -264,7 +264,7 @@ public final class ValueBuilder extends IndexBuilder {
   @Override
   public void abort() {
     final String f = text ? DATATXT : DATAATV;
-    DropDB.drop(data.meta.name, f + ".*" + IO.BASEXSUFFIX, data.meta.prop);
+    DropDB.drop(data.meta.name, f + ".+" + IO.BASEXSUFFIX, data.meta.prop);
     if(text) data.meta.txtindex = false;
     else data.meta.atvindex = false;
   }
