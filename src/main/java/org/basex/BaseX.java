@@ -56,6 +56,8 @@ public class BaseX extends Main {
    */
   private void run() {
     try {
+      session();
+
       boolean u = false;
       if(input != null) execute(new Check(input), verbose);
 
