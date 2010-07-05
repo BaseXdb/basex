@@ -1,5 +1,3 @@
-package org.basex.examples.tmp;
-
 import java.io.IOException;
 
 /**
@@ -22,9 +20,6 @@ public final class QueryExample {
    */
   private QueryExample() {
     try {
-      // initialize timer
-      long time = System.nanoTime();
-
       // create session
       BaseXClient session =
         new BaseXClient("localhost", 1984, "admin", "admin");
@@ -49,10 +44,6 @@ public final class QueryExample {
 
       // close session
       session.close();
-
-      // print time needed
-      double ms = (System.nanoTime() - time) / 1000000d;
-      System.out.println("\n" + ms + " ms");
 
     } catch(IOException ex) {
       // print exception

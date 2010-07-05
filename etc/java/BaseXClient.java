@@ -1,6 +1,7 @@
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -86,6 +87,24 @@ public class BaseXClient {
    */
   public Query query(final String query) throws IOException {
     return new Query(query);
+  }
+
+  /**
+   * Creates a database.
+   * @param name name of database
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  public void create(final String name, final InputStream input)
+      throws IOException {
+    // send 3 to mark start of query execution, and {Query}0 as query string
+    out.write(3);
+    send(name);
+    int l;
+    while((l = input.read()) != -1) out.write(l);
+    out.write(0);
+    info = receive();
+    if(!ok()) throw new IOException(info);
   }
 
   /**
