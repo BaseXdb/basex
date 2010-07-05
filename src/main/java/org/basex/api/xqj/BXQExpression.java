@@ -29,11 +29,13 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
     super(null, s, c);
   }
 
+  @Override
   public void cancel() throws XQException {
     opened();
     qp.ctx.stop();
   }
 
+  @Override
   public void executeCommand(final String cmd) throws XQException {
     opened();
     try {
@@ -50,24 +52,29 @@ final class BXQExpression extends BXQDynamicContext implements XQExpression {
     }
   }
 
+  @Override
   public void executeCommand(final Reader cmd) throws XQException {
     executeCommand(Token.string(content(cmd)));
   }
 
+  @Override
   public XQResultSequence executeQuery(final String input) throws XQException {
     qp.query(input);
     return execute();
   }
 
+  @Override
   public XQResultSequence executeQuery(final Reader qu) throws XQException {
     return executeQuery(Token.string(content(qu)));
   }
 
+  @Override
   public XQResultSequence executeQuery(final InputStream qu)
       throws XQException {
     return executeQuery(Token.string(content(qu)));
   }
 
+  @Override
   public XQStaticContext getStaticContext() throws XQException {
     opened();
     return sc;

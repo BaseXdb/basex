@@ -84,18 +84,22 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     pre = p;
   }
 
+  @Override
   public Collection getParentCollection() {
     return coll;
   }
 
+  @Override
   public String getId() {
     return id;
   }
 
+  @Override
   public String getResourceType() {
     return XMLResource.RESOURCE_TYPE;
   }
 
+  @Override
   public Object getContent() throws XMLDBException {
     if(content == null) {
       try {
@@ -117,6 +121,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     return content instanceof byte[] ? string((byte[]) content) : content;
   }
 
+  @Override
   public void setContent(final Object value) throws XMLDBException {
     // allow only strings, byte arrays and {@link File} instances
     if(value instanceof byte[]) {
@@ -135,6 +140,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     }
   }
 
+  @Override
   public String getDocumentId() throws XMLDBException {
     // throw exception if resource result from query; does not conform to the
     // specs, but many query results are not related to a document anymore
@@ -153,11 +159,13 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     return null;
   }
 
+  @Override
   public Node getContentAsDOM() {
     if(!(content instanceof Node)) content = new BXDoc(new DBNode(data, pre));
     return (Node) content;
   }
 
+  @Override
   public void setContentAsDOM(final Node cont) throws XMLDBException {
     // allow only document instances...
     if(cont == null) throw new XMLDBException(ErrorCodes.INVALID_RESOURCE);
@@ -165,6 +173,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     else throw new XMLDBException(ErrorCodes.WRONG_CONTENT_TYPE);
   }
 
+  @Override
   public void getContentAsSAX(final ContentHandler handler)
       throws XMLDBException {
 
@@ -183,6 +192,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     }
   }
 
+  @Override
   public ContentHandler setContentAsSAX() throws XMLDBException {
     try {
       // ..might be replaced by a custom SAX content handler in future

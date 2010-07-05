@@ -70,83 +70,99 @@ abstract class BXQDynamicContext extends BXQAbstract
     qp.ctx.copy(sc.ctx);
   }
 
+  @Override
   public void bindAtomicValue(final QName qn, final String v,
       final XQItemType t) throws XQException {
     valid(t, XQItemType.class);
     bind(qn, new Atm(Token.token(valid(v, String.class).toString())), t);
   }
 
+  @Override
   public void bindBoolean(final QName qn, final boolean v, final XQItemType it)
       throws XQException {
     bind(qn, Bln.get(v), it);
   }
 
+  @Override
   public void bindByte(final QName qn, final byte v, final XQItemType t)
       throws XQException {
     bind(qn, Itr.get(v, Type.BYT), t);
   }
 
+  @Override
   public void bindDocument(final QName qn, final InputStream is,
       final String base, final XQItemType t) throws XQException {
     bind(qn, createDB(is), t);
   }
 
+  @Override
   public void bindDocument(final QName qn, final Reader r, final String base,
       final XQItemType t) throws XQException {
     bind(qn, createDB(r), t);
   }
 
+  @Override
   public void bindDocument(final QName qn, final Source s, final XQItemType t)
       throws XQException {
     bind(qn, createDB(s, t), t);
   }
 
+  @Override
   public void bindDocument(final QName qn, final String v, final String base,
       final XQItemType t) throws XQException {
     valid(v, String.class);
     bind(qn, createDB(new IOContent(Token.token(v))), t);
   }
 
+  @Override
   public void bindDocument(final QName qn, final XMLStreamReader sr,
       final XQItemType t) throws XQException {
     bind(qn, createDB(sr), t);
   }
 
+  @Override
   public void bindDouble(final QName qn, final double v, final XQItemType t)
       throws XQException {
     bind(qn, Dbl.get(v), t);
   }
 
+  @Override
   public void bindFloat(final QName qn, final float v, final XQItemType t)
       throws XQException {
     bind(qn, Flt.get(v), t);
   }
 
+  @Override
   public void bindInt(final QName qn, final int v, final XQItemType t)
       throws XQException {
     bind(qn, Itr.get(v), t);
   }
 
+  @Override
   public void bindItem(final QName qn, final XQItem t) throws XQException {
     valid(t, XQItem.class);
     bind(qn, ((BXQItem) t).it, null);
   }
 
+  @Override
   public void bindLong(final QName qn, final long v, final XQItemType t)
       throws XQException {
     bind(qn, new Dec(new BigDecimal(v), Type.LNG), t);
   }
 
+  @Override
   public void bindNode(final QName qn, final Node n, final XQItemType t)
       throws XQException {
     bind(qn, create(n, null), t);
   }
 
+  @Override
   public void bindObject(final QName qn, final Object v, final XQItemType t)
       throws XQException {
     bind(qn, create(v, null), t);
   }
 
+  @Override
   public void bindSequence(final QName qn, final XQSequence s)
       throws XQException {
 
@@ -158,21 +174,25 @@ abstract class BXQDynamicContext extends BXQAbstract
     }
   }
 
+  @Override
   public void bindShort(final QName qn, final short v, final XQItemType t)
       throws XQException {
     bind(qn, Itr.get(v, Type.SHR), t);
   }
 
+  @Override
   public void bindString(final QName qn, final String v, final XQItemType t)
       throws XQException {
     bind(qn, Str.get(valid(v, String.class)), t);
   }
 
+  @Override
   public TimeZone getImplicitTimeZone() throws XQException {
     opened();
     return zone != null ? zone : new GregorianCalendar().getTimeZone();
   }
 
+  @Override
   public void setImplicitTimeZone(final TimeZone tz) throws XQException {
     opened();
     zone = tz;

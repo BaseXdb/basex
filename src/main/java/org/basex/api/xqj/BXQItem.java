@@ -66,56 +66,68 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     it = item;
   }
 
+  @Override
   public String getAtomicValue() throws XQException {
     opened();
     if(it.node()) throw new BXQException(ATOM);
     return Token.string(it.str());
   }
 
+  @Override
   public boolean getBoolean() throws XQException {
     return ((Bln) check(Type.BLN)).bool();
   }
 
+  @Override
   public byte getByte() throws XQException {
     return (byte) castItr(Type.BYT);
   }
 
+  @Override
   public double getDouble() throws XQException {
     return ((Dbl) check(Type.DBL)).dbl();
   }
 
+  @Override
   public float getFloat() throws XQException {
     return ((Flt) check(Type.FLT)).flt();
   }
 
+  @Override
   public int getInt() throws XQException {
     return (int) castItr(Type.INT);
   }
 
+  @Override
   public XMLStreamReader getItemAsStream() {
     return new IterStreamReader(new SeqIter(new Item[] { it }, 1));
   }
 
+  @Override
   public String getItemAsString(final Properties props) throws XQException {
     return it.node() && it.type != Type.TXT ? serialize() :
       Token.string(it.str());
   }
 
+  @Override
   public XQItemType getItemType() throws XQException {
     opened();
     return new BXQItemType(it.type);
   }
 
+  @Override
   public long getLong() throws XQException {
     return castItr(Type.LNG);
   }
 
+  @Override
   public Node getNode() throws XQException {
     opened();
     if(!it.node()) throw new BXQException(WRONG, Type.NOD, it.type);
     return ((Nod) it).java();
   }
 
+  @Override
   public URI getNodeUri() throws XQException {
     opened();
     if(!it.node()) throw new BXQException(NODE);
@@ -127,36 +139,43 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     }
   }
 
+  @Override
   public Object getObject() throws XQException {
     opened();
     return it.java();
   }
 
+  @Override
   public short getShort() throws XQException {
     return (short) castItr(Type.SHR);
   }
 
+  @Override
   public boolean instanceOf(final XQItemType type) throws XQException {
     opened();
     return it.type.instance(((BXQItemType) type).getType());
   }
 
+  @Override
   public void writeItem(final OutputStream os, final Properties props)
       throws XQException {
     valid(os, OutputStream.class);
     serialize(os);
   }
 
+  @Override
   public void writeItemToSAX(final ContentHandler sax) throws XQException {
     valid(sax, ContentHandler.class);
     writeItemToResult(new SAXResult(sax));
   }
 
+  @Override
   public XQConnection getConnection() throws XQException {
     opened();
     return conn;
   }
 
+  @Override
   public void writeItem(final Writer ow, final Properties props)
       throws XQException {
     valid(ow, Writer.class);
@@ -167,6 +186,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     }
   }
 
+  @Override
   public void writeItemToResult(final Result result) throws XQException {
     valid(result, Result.class);
 

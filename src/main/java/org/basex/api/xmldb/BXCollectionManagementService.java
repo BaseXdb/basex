@@ -35,16 +35,12 @@ final class BXCollectionManagementService implements
     coll = c;
   }
 
-  /**
-   * Creates a new collection. Note that a new collection equals a new database.
-   * @param name name of collection
-   * @return collection
-   * @throws XMLDBException exception
-   */
+  @Override
   public Collection createCollection(final String name) throws XMLDBException {
     return new BXCollection(name, false, coll.ctx);
   }
 
+  @Override
   public void removeCollection(final String name) throws XMLDBException {
     try {
       new DropDB(name).execute(coll.ctx);
@@ -53,22 +49,27 @@ final class BXCollectionManagementService implements
     }
   }
 
+  @Override
   public String getName() {
     return MANAGEMENT;
   }
 
+  @Override
   public String getVersion() {
     return VERSION;
   }
 
+  @Override
   public void setCollection(final Collection c) {
     coll = (BXCollection) c;
   }
 
+  @Override
   public String getProperty(final String nm) {
     return null;
   }
 
+  @Override
   public void setProperty(final String nm, final String value)
       throws XMLDBException {
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + nm);

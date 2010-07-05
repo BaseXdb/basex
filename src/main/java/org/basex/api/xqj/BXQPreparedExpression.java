@@ -43,16 +43,19 @@ final class BXQPreparedExpression extends BXQDynamicContext
     }
   }
 
+  @Override
   public void cancel() throws XQException {
     opened();
     qp.ctx.stop();
   }
 
+  @Override
   public XQResultSequence executeQuery() throws XQException {
     qp.reset();
     return execute();
   }
 
+  @Override
   public QName[] getAllExternalVariables() throws XQException {
     opened();
     final Var[] vars = getVariables();
@@ -61,6 +64,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
     return names;
   }
 
+  @Override
   public QName[] getAllUnboundExternalVariables() throws XQException {
     opened();
     QName[] names = new QName[0];
@@ -70,16 +74,19 @@ final class BXQPreparedExpression extends BXQDynamicContext
     return names;
   }
 
+  @Override
   public XQStaticContext getStaticContext() throws XQException {
     opened();
     return sc;
   }
 
+  @Override
   public XQSequenceType getStaticResultType() throws XQException {
     opened();
     return BXQItemType.DEFAULT;
   }
 
+  @Override
   public XQSequenceType getStaticVariableType(final QName qn)
       throws XQException {
     opened();

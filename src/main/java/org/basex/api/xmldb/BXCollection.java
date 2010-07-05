@@ -60,10 +60,12 @@ public final class BXCollection implements Collection, BXXMLDBText {
     }
   }
 
+  @Override
   public String getName() {
     return ctx.data.meta.name;
   }
 
+  @Override
   public Service[] getServices() throws XMLDBException {
     check();
     return new Service[] {
@@ -72,6 +74,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
         getService(BXCollectionManagementService.MANAGEMENT, "1.0") };
   }
 
+  @Override
   public Service getService(final String nm, final String ver)
       throws XMLDBException {
 
@@ -85,32 +88,38 @@ public final class BXCollection implements Collection, BXXMLDBText {
     return null;
   }
 
+  @Override
   public Collection getParentCollection() throws XMLDBException {
     check();
     return null;
   }
 
+  @Override
   public Collection getChildCollection(final String name)
       throws XMLDBException {
     check();
     return null;
   }
 
+  @Override
   public int getChildCollectionCount() throws XMLDBException {
     check();
     return 0;
   }
 
+  @Override
   public String[] listChildCollections() throws XMLDBException {
     check();
     return new String[] {};
   }
 
+  @Override
   public int getResourceCount() throws XMLDBException {
     check();
     return ctx.data.doc().length;
   }
 
+  @Override
   public String[] listResources() throws XMLDBException {
     check();
     final StringList sl = new StringList();
@@ -119,6 +128,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     return sl.finish();
   }
 
+  @Override
   public BXXMLResource createResource(final String id, final String type)
       throws XMLDBException {
 
@@ -134,6 +144,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
       new XMLDBException(ErrorCodes.UNKNOWN_RESOURCE_TYPE, ERR_TYPE + type);
   }
 
+  @Override
   public void removeResource(final Resource res) throws XMLDBException {
     check();
 
@@ -150,6 +161,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     data.flush();
   }
 
+  @Override
   public void storeResource(final Resource res) throws XMLDBException {
     check();
 
@@ -185,6 +197,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     }
   }
 
+  @Override
   public BXXMLResource getResource(final String id) throws XMLDBException {
     check();
     if(id == null) return null;
@@ -197,14 +210,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     return null;
   }
 
-  /**
-   * Creates a timestamp id and check if it's not already contained in the
-   * database. Collisions can still occur, if resources are not immediately
-   * stored in the database, so it's advisable in general to specify
-   * your own IDs.
-   * @return id
-   * @throws XMLDBException exception
-   */
+  @Override
   public String createId() throws XMLDBException {
     final String[] res = listResources();
     String id = null;
@@ -214,15 +220,18 @@ public final class BXCollection implements Collection, BXXMLDBText {
     return id;
   }
 
+  @Override
   public boolean isOpen() {
     return ctx != null;
   }
 
+  @Override
   public void close() {
     if(ctx != null) ctx.close();
     ctx = null;
   }
 
+  @Override
   public String getProperty(final String key) throws XMLDBException {
     check();
     try {
@@ -232,12 +241,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     }
   }
 
-  /**
-   * Be aware what you're doing here..
-   * @param key key
-   * @param val value
-   * @throws XMLDBException exception
-   */
+  @Override
   public void setProperty(final String key, final String val)
       throws XMLDBException {
     check();

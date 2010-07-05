@@ -21,10 +21,12 @@ public final class BXDatabase implements Database, BXXMLDBText {
   /** Context reference. */
   private final Context ctx = new Context();
 
+  @Override
   public boolean acceptsURI(final String uri) throws XMLDBException {
     return getCollectionName(uri) != null;
   }
 
+  @Override
   public Collection getCollection(final String uri, final String user,
       final String password) throws XMLDBException {
 
@@ -34,14 +36,17 @@ public final class BXDatabase implements Database, BXXMLDBText {
     return exists ? new BXCollection(name, exists, ctx) : null;
   }
 
+  @Override
   public String getConformanceLevel() {
     return CONFORMANCE_LEVEL;
   }
 
+  @Override
   public String getName() {
     return NAMELC;
   }
 
+  @Override
   public String getProperty(final String key) {
     try {
       final String prop = key.toUpperCase();
@@ -51,6 +56,7 @@ public final class BXDatabase implements Database, BXXMLDBText {
     }
   }
 
+  @Override
   public void setProperty(final String key, final String value)
       throws XMLDBException {
 

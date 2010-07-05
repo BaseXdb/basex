@@ -73,103 +73,126 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       getScrollability() == XQConstants.SCROLLTYPE_SCROLLABLE;
   }
 
+  @Override
   public XQConnection getConnection() throws XQException {
     opened();
     return conn;
   }
 
+  @Override
   public boolean absolute(final int p) throws XQException {
     final SeqIter seq = sequence();
     cursor(seq, p >= 0 ? p - 1 : seq.size() + p);
     return pos > 0;
   }
 
+  @Override
   public void afterLast() throws XQException {
     cursor(sequence(), Integer.MAX_VALUE);
   }
 
+  @Override
   public void beforeFirst() throws XQException {
     cursor(sequence(), -1);
   }
 
+  @Override
   public int count() throws XQException {
     return sequence().size();
   }
 
+  @Override
   public boolean first() throws XQException {
     return cursor(sequence(), 0);
   }
 
+  @Override
   public String getAtomicValue() throws XQException {
     return item().getAtomicValue();
   }
 
+  @Override
   public boolean getBoolean() throws XQException {
     return item().getBoolean();
   }
 
+  @Override
   public byte getByte() throws XQException {
     return item().getByte();
   }
 
+  @Override
   public double getDouble() throws XQException {
     return item().getDouble();
   }
 
+  @Override
   public float getFloat() throws XQException {
     return item().getFloat();
   }
 
+  @Override
   public int getInt() throws XQException {
     return item().getInt();
   }
 
+  @Override
   public XQItem getItem() throws XQException {
     return item();
   }
 
+  @Override
   public XMLStreamReader getItemAsStream() throws XQException {
     opened();
     return item().getItemAsStream();
   }
 
+  @Override
   public String getItemAsString(final Properties p) throws XQException {
     return item().getItemAsString(p);
   }
 
+  @Override
   public XQItemType getItemType() throws XQException {
     pos();
     return it.getItemType();
   }
 
+  @Override
   public long getLong() throws XQException {
     return item().getLong();
   }
 
+  @Override
   public Node getNode() throws XQException {
     return item().getNode();
   }
 
+  @Override
   public URI getNodeUri() throws XQException {
     pos();
     return it.getNodeUri();
   }
 
+  @Override
   public Object getObject() throws XQException {
     return item().getObject();
   }
 
+  @Override
   public int getPosition() throws XQException {
     final SeqIter iter = sequence();
     return pos != -1 ? pos : iter.size() + 1;
   }
 
+  @Override
   public XMLStreamReader getSequenceAsStream() throws XQException {
     opened();
     if(it != null && !next) throw new BXQException(TWICE);
     return new IterStreamReader(result);
   }
 
+  @Override
   public String getSequenceAsString(final Properties p) throws XQException {
     opened();
     if(it != null && !next) throw new BXQException(TWICE);
@@ -189,49 +212,59 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     return co.toString();
   }
 
+  @Override
   public short getShort() throws XQException {
     return item().getShort();
   }
 
+  @Override
   public boolean instanceOf(final XQItemType type) throws XQException {
     pos();
     return it.instanceOf(type);
   }
 
+  @Override
   public boolean isAfterLast() throws XQException {
     sequence();
     return pos == -1;
    }
 
+  @Override
   public boolean isBeforeFirst() throws XQException {
     sequence();
     return pos == 0 && pos < sequence().size();
   }
 
+  @Override
   public boolean isFirst() throws XQException {
     sequence();
     return pos == 1;
   }
 
+  @Override
   public boolean isLast() throws XQException {
     return pos == sequence().size();
   }
 
+  @Override
   public boolean isOnItem() throws XQException {
     opened();
     return pos > 0;
   }
 
+  @Override
   public boolean isScrollable() throws XQException {
     opened();
     return scrollable;
   }
 
+  @Override
   public boolean last() throws XQException {
     final SeqIter seq = sequence();
     return cursor(seq, seq.size() - 1);
   }
 
+  @Override
   public boolean next() throws XQException {
     opened();
     if(pos < 0) return false;
@@ -248,44 +281,53 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     }
   }
 
+  @Override
   public boolean previous() throws XQException {
     return relative(-1);
   }
 
+  @Override
   public boolean relative(final int p) throws XQException {
     return cursor(sequence(), getPosition() + p - 1);
   }
 
+  @Override
   public void writeItem(final OutputStream os, final Properties p)
       throws XQException {
     item().writeItem(os, p);
   }
 
+  @Override
   public void writeItem(final Writer ow, final Properties p)
       throws XQException {
     item().writeItem(ow, p);
   }
 
+  @Override
   public void writeItemToResult(final Result r) throws XQException {
     item().writeItemToResult(r);
   }
 
+  @Override
   public void writeItemToSAX(final ContentHandler sax) throws XQException {
     item().writeItemToSAX(sax);
   }
 
+  @Override
   public void writeSequence(final OutputStream os, final Properties p)
       throws XQException {
     if(it != null && !next) throw new BXQException(TWICE);
     while(next()) item().writeItem(os, p);
   }
 
+  @Override
   public void writeSequence(final Writer ow, final Properties p)
       throws XQException {
     if(it != null && !next) throw new BXQException(TWICE);
     while(next()) item().writeItem(ow, p);
   }
 
+  @Override
   public void writeSequenceToResult(final Result res) throws XQException {
     valid(res, Result.class);
     if(it != null && !next) throw new BXQException(TWICE);
@@ -308,6 +350,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     }
   }
 
+  @Override
   public void writeSequenceToSAX(final ContentHandler sax) throws XQException {
     valid(sax, ContentHandler.class);
     writeSequenceToResult(new SAXResult(sax));

@@ -31,15 +31,18 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
     super(name, pw);
   }
 
+  @Override
   public void commit() throws XQException {
     opened();
     throw new BXQException(TRANS);
   }
 
+  @Override
   public XQExpression createExpression() throws XQException {
     return createExpression(ctx);
   }
 
+  @Override
   public XQExpression createExpression(final XQStaticContext sc)
       throws XQException {
     opened();
@@ -47,40 +50,48 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
     return new BXQExpression((BXQStaticContext) sc, this);
   }
 
+  @Override
   public boolean getAutoCommit() {
     return true;
   }
 
+  @Override
   public XQMetaData getMetaData() throws XQException {
     opened();
     return meta;
   }
 
+  @Override
   public XQStaticContext getStaticContext() throws XQException {
     opened();
     return ctx;
   }
 
+  @Override
   public XQPreparedExpression prepareExpression(final InputStream is,
       final XQStaticContext sc) throws XQException {
     return prepareExpression(Token.string(content(is)), sc);
   }
 
+  @Override
   public XQPreparedExpression prepareExpression(final InputStream is)
       throws XQException {
     return prepareExpression(is, ctx);
   }
 
+  @Override
   public XQPreparedExpression prepareExpression(final Reader r,
       final XQStaticContext sc) throws XQException {
     return prepareExpression(Token.string(content(r)), sc);
   }
 
+  @Override
   public XQPreparedExpression prepareExpression(final Reader r)
       throws XQException {
     return prepareExpression(r, ctx);
   }
 
+  @Override
   public XQPreparedExpression prepareExpression(final String query,
       final XQStaticContext sc) throws XQException {
     opened();
@@ -90,21 +101,25 @@ final class BXQConnection extends BXQDataFactory implements XQConnection {
     return new BXQPreparedExpression(query, bsc, this);
   }
 
+  @Override
   public XQPreparedExpression prepareExpression(final String query)
       throws XQException {
     return prepareExpression(query, ctx);
   }
 
+  @Override
   public void rollback() throws XQException {
     opened();
     throw new BXQException(TRANS);
   }
 
+  @Override
   public void setAutoCommit(final boolean ac) throws XQException {
     opened();
     if(!ac) throw new BXQException(TRANS);
   }
 
+  @Override
   public void setStaticContext(final XQStaticContext sc) throws XQException {
     opened();
     valid(sc, XQStaticContext.class);

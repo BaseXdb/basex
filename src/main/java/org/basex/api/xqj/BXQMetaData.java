@@ -22,127 +22,152 @@ final class BXQMetaData extends BXQAbstract implements XQMetaData {
     super(c);
   }
 
+  @Override
   public int getMaxExpressionLength() throws XQException {
     opened();
     return Integer.MAX_VALUE;
   }
 
+  @Override
   public int getMaxUserNameLength() throws XQException {
     opened();
     return Integer.MAX_VALUE;
   }
 
+  @Override
   public int getProductMajorVersion() throws XQException {
     opened();
     return version(Text.VERSION, true);
   }
 
+  @Override
   public int getProductMinorVersion() throws XQException {
     opened();
     return version(Text.VERSION, false);
   }
 
+  @Override
   public String getProductName() throws XQException {
     opened();
     return Text.NAME;
   }
 
+  @Override
   public String getProductVersion() throws XQException {
     opened();
     return Text.VERSION;
   }
 
+  @Override
   public Set<String> getSupportedXQueryEncodings() throws XQException {
     opened();
     return Charset.availableCharsets().keySet();
   }
 
+  @Override
   public String getUserName() throws XQException {
     opened();
     return null;
   }
 
+  @Override
   public int getXQJMajorVersion() throws XQException {
     opened();
     return version(VERSION, true);
   }
 
+  @Override
   public int getXQJMinorVersion() throws XQException {
     opened();
     return version(VERSION, false);
   }
 
+  @Override
   public String getXQJVersion() throws XQException {
     opened();
     return VERSION;
   }
 
+  @Override
   public boolean isFullAxisFeatureSupported() throws XQException {
     opened();
     return true;
   }
 
+  @Override
   public boolean isModuleFeatureSupported() throws XQException {
     opened();
     return true;
   }
 
+  @Override
   public boolean isReadOnly() throws XQException {
     opened();
     return false;
   }
 
+  @Override
   public boolean isSchemaImportFeatureSupported() throws XQException {
     opened();
     return false;
   }
 
+  @Override
   public boolean isSchemaValidationFeatureSupported() throws XQException {
     opened();
     return false;
   }
 
+  @Override
   public boolean isSerializationFeatureSupported() throws XQException {
     opened();
     return true;
   }
 
+  @Override
   public boolean isStaticTypingExtensionsSupported() throws XQException {
     opened();
     return false;
   }
 
+  @Override
   public boolean isStaticTypingFeatureSupported() throws XQException {
     opened();
     return false;
   }
 
+  @Override
   public boolean isTransactionSupported() throws XQException {
     opened();
     return false;
   }
 
+  @Override
   public boolean isUserDefinedXMLSchemaTypeSupported() throws XQException {
     opened();
     return false;
   }
 
+  @Override
   public boolean isXQueryEncodingDeclSupported() throws XQException {
     opened();
     return true;
   }
 
+  @Override
   public boolean isXQueryEncodingSupported(final String encoding)
       throws XQException {
     opened();
     return true;
   }
 
+  @Override
   public boolean isXQueryXSupported() throws XQException {
     opened();
     return false;
   }
 
+  @Override
   public boolean wasCreatedFromJDBCConnection() throws XQException {
     opened();
     return false;

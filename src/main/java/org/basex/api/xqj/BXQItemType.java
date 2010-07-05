@@ -82,6 +82,7 @@ final class BXQItemType implements XQItemType {
     occ = o;
   }
 
+  @Override
   public int getBaseType() throws BXQException {
     if(type.unt) check(Type.DEL, Type.ELM, Type.ATT, Type.ATM);
 
@@ -90,6 +91,7 @@ final class BXQItemType implements XQItemType {
     throw new BXQException(NOBASE);
   }
 
+  @Override
   public int getItemKind() {
     switch(type) {
       case ATT : return XQITEMKIND_ATTRIBUTE;
@@ -105,24 +107,29 @@ final class BXQItemType implements XQItemType {
     }
   }
 
+  @Override
   public int getItemOccurrence() {
     return occ;
   }
 
+  @Override
   public QName getNodeName() throws BXQException {
     check(Type.DEL, Type.ELM, Type.ATT);
     return name;
   }
 
+  @Override
   public String getPIName() throws BXQException {
     if(type != Type.PI) throw new BXQException(PI);
     return name == null ? null : name.getLocalPart();
   }
 
+  @Override
   public URI getSchemaURI() {
     return null;
   }
 
+  @Override
   public QName getTypeName() throws BXQException {
     if(type.unt) check(Type.DEL, Type.ELM, Type.ATT, Type.ATM);
     if(type == Type.ITEM) throw new BXQException(TYPE);
@@ -131,14 +138,17 @@ final class BXQItemType implements XQItemType {
     return new QName(Token.string(QueryTokens.XSURI), t.name);
   }
 
+  @Override
   public boolean isAnonymousType() {
     return false;
   }
 
+  @Override
   public boolean isElementNillable() {
     return false;
   }
 
+  @Override
   public XQItemType getItemType() {
     return this;
   }

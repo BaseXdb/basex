@@ -28,16 +28,19 @@ final class BXResourceIterator implements ResourceIterator, BXXMLDBText,
     res = r.iterator();
   }
 
+  @Override
   public boolean hasMoreResources() {
     return res.hasNext();
   }
 
+  @Override
   public Resource nextResource() throws XMLDBException {
     if(!res.hasNext())
       throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE, ERR_ITER);
     return res.next();
   }
 
+  @Override
   public Iterator<Resource> iterator() {
     return res;
   }

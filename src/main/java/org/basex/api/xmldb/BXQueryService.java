@@ -46,6 +46,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
     version = v;
   }
 
+  @Override
   public void setNamespace(final String pre, final String uri)
       throws XMLDBException {
 
@@ -53,22 +54,27 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
     else throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_NSURI + pre);
   }
 
+  @Override
   public String getNamespace(final String pre) {
     return ns.get(pre == null ? "" : pre);
   }
 
+  @Override
   public void removeNamespace(final String pre) {
     ns.remove(pre == null ? "" : pre);
   }
 
+  @Override
   public void clearNamespaces() {
     ns.clear();
   }
 
+  @Override
   public BXResourceSet query(final String query) throws XMLDBException {
     return query(coll.ctx.current, query);
   }
 
+  @Override
   public BXResourceSet queryResource(final String id, final String query)
       throws XMLDBException {
 
@@ -78,22 +84,27 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_RES + id);
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public String getVersion() {
     return version;
   }
 
+  @Override
   public void setCollection(final Collection col) {
     coll = (BXCollection) col;
   }
 
+  @Override
   public String getProperty(final String nm) {
     return null;
   }
 
+  @Override
   public void setProperty(final String nm, final String value)
       throws XMLDBException {
     throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ERR_PROP + nm);

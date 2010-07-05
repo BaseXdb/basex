@@ -60,34 +60,41 @@ final class IterStreamReader implements XMLStreamReader {
     PROPS.put(XMLInputFactory.IS_NAMESPACE_AWARE, Boolean.FALSE);
   }
 
+  @Override
   public void close() {
   }
 
+  @Override
   public int getAttributeCount() {
     getAttributes();
     return atts.size();
   }
 
+  @Override
   public String getAttributeLocalName(final int i) {
     getAttributes();
     return string(atts.item[i].nname());
   }
 
+  @Override
   public QName getAttributeName(final int i) {
     getAttributes();
     return atts.item[i].qname().java();
   }
 
+  @Override
   public String getAttributeNamespace(final int i) {
     getAttributes();
     return string(atts.item[i].qname().uri.str());
   }
 
+  @Override
   public String getAttributePrefix(final int i) {
     getAttributes();
     return string(atts.item[i].qname().pref());
   }
 
+  @Override
   public String getAttributeType(final int i) {
     getAttributes();
     final String name = getAttributeLocalName(i);
@@ -100,11 +107,13 @@ final class IterStreamReader implements XMLStreamReader {
     "ID", "IDREF", "IDREFS", "NMTOKEN", "NMTOKENS", "ENTITY", "ENTITIES"
   };
 
+  @Override
   public String getAttributeValue(final int i) {
     getAttributes();
     return string(atts.item[i].str());
   }
 
+  @Override
   public String getAttributeValue(final String s, final String s1) {
     getAttributes();
     for(int a = 0; a < atts.size(); a++) {
@@ -132,10 +141,12 @@ final class IterStreamReader implements XMLStreamReader {
     }
   }
 
+  @Override
   public String getCharacterEncodingScheme() {
     return null;
   }
 
+  @Override
   public String getElementText() throws XMLStreamException {
     checkType(START_ELEMENT);
     next();
@@ -156,46 +167,56 @@ final class IterStreamReader implements XMLStreamReader {
     return tb.toString();
   }
 
+  @Override
   public String getEncoding() {
     return null;
   }
 
+  @Override
   public int getEventType() {
     return kind;
   }
 
+  @Override
   public String getLocalName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
     return string(((Nod) item).nname());
   }
 
+  @Override
   public Location getLocation() {
     return new LocationImpl();
   }
 
+  @Override
   public QName getName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
     return ((Nod) item).qname().java();
   }
 
+  @Override
   public NamespaceContext getNamespaceContext() {
     return new BXNamespaceContext(ns);
   }
 
+  @Override
   public int getNamespaceCount() {
     checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
     return 0;
   }
 
+  @Override
   public String getNamespacePrefix(final int i) {
     checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
     return null;
   }
 
+  @Override
   public String getNamespaceURI() {
     return null;
   }
 
+  @Override
   public String getNamespaceURI(final String s) {
     if(s == null) throw new IllegalArgumentException();
     checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
@@ -203,11 +224,13 @@ final class IterStreamReader implements XMLStreamReader {
     return uri == null ? null : string(uri);
   }
 
+  @Override
   public String getNamespaceURI(final int i) {
     checkType(START_ELEMENT, END_ELEMENT, NAMESPACE);
     return null;
   }
 
+  @Override
   public String getPIData() {
     checkType(PROCESSING_INSTRUCTION);
     final byte[] val = item.str();
@@ -215,6 +238,7 @@ final class IterStreamReader implements XMLStreamReader {
     return string(i == -1 ? EMPTY : substring(val, i + 1));
   }
 
+  @Override
   public String getPITarget() {
     checkType(PROCESSING_INSTRUCTION);
     final byte[] val = item.str();
@@ -222,26 +246,31 @@ final class IterStreamReader implements XMLStreamReader {
     return string(i == -1 ? val : substring(val, 0, i));
   }
 
+  @Override
   public String getPrefix() {
     checkType(START_ELEMENT, END_ELEMENT);
     final QNm qn = ((Nod) item).qname();
     return !qn.ns() ? null : string(qn.pref());
   }
 
+  @Override
   public Object getProperty(final String s) {
     if(s == null) throw new IllegalArgumentException();
     return PROPS.get(s);
   }
 
+  @Override
   public String getText() {
     checkType(CHARACTERS, COMMENT);
     return string(item.str());
   }
 
+  @Override
   public char[] getTextCharacters() {
     return getText().toCharArray();
   }
 
+  @Override
   public int getTextCharacters(final int ss, final char[] ac, final int ts,
       final int l) {
 
@@ -255,24 +284,29 @@ final class IterStreamReader implements XMLStreamReader {
     return se - ss;
   }
 
+  @Override
   public int getTextLength() {
     checkType(CHARACTERS, COMMENT);
     return item.str().length;
   }
 
+  @Override
   public int getTextStart() {
     checkType(CHARACTERS, COMMENT);
     return 0;
   }
 
+  @Override
   public String getVersion() {
     return "1.0";
   }
 
+  @Override
   public boolean hasName() {
     return isType(START_ELEMENT, END_ELEMENT);
   }
 
+  @Override
   public boolean hasNext() throws XMLStreamException {
     if(next) return true;
     next = true;
@@ -303,35 +337,43 @@ final class IterStreamReader implements XMLStreamReader {
     return item != null;
   }
 
+  @Override
   public boolean hasText() {
     return isType(CHARACTERS, DTD, ENTITY_REFERENCE, COMMENT, SPACE);
   }
 
+  @Override
   public boolean isAttributeSpecified(final int i) {
     checkType(START_ELEMENT, ATTRIBUTE);
     return true;
   }
 
+  @Override
   public boolean isCharacters() {
     return isType(CHARACTERS);
   }
 
+  @Override
   public boolean isEndElement() {
     return isType(END_ELEMENT);
   }
 
+  @Override
   public boolean isStandalone() {
     return false;
   }
 
+  @Override
   public boolean isStartElement() {
     return isType(START_ELEMENT);
   }
 
+  @Override
   public boolean isWhiteSpace() {
     return isCharacters() && ws(item.str());
   }
 
+  @Override
   public int next() throws XMLStreamException {
     if(next && item == null || !next && !hasNext())
       throw new NoSuchElementException();
@@ -343,6 +385,7 @@ final class IterStreamReader implements XMLStreamReader {
     return kind;
   }
 
+  @Override
   public int nextTag() throws XMLStreamException {
     next();
     while(kind == CHARACTERS && isWhiteSpace() ||
@@ -354,6 +397,7 @@ final class IterStreamReader implements XMLStreamReader {
     return kind;
   }
 
+  @Override
   public void require(final int t, final String uri, final String ln)
       throws XMLStreamException {
     checkType(t);
@@ -365,6 +409,7 @@ final class IterStreamReader implements XMLStreamReader {
     }
   }
 
+  @Override
   public boolean standaloneSet() {
     return false;
   }
@@ -528,10 +573,15 @@ final class IterStreamReader implements XMLStreamReader {
 
   /** Dummy location implementation. */
   static final class LocationImpl implements Location {
+    @Override
     public int getCharacterOffset() { return -1; }
+    @Override
     public int getColumnNumber() { return -1; }
+    @Override
     public int getLineNumber() { return -1; }
+    @Override
     public String getPublicId() { return null; }
+    @Override
     public String getSystemId() { return null; }
   }
 }

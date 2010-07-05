@@ -35,23 +35,28 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
     coll = c;
   }
 
+  @Override
   public Resource getResource(final long i) throws XMLDBException {
     if(i >= 0 && i < res.size()) return res.get((int) i);
     throw new XMLDBException(ErrorCodes.NO_SUCH_RESOURCE);
   }
 
+  @Override
   public void addResource(final Resource r) {
     res.add(r);
   }
 
+  @Override
   public void removeResource(final long index) {
     res.remove((int) index);
   }
 
+  @Override
   public BXResourceIterator getIterator() {
     return new BXResourceIterator(res);
   }
 
+  @Override
   public Resource getMembersAsResource() throws XMLDBException {
     final CachedOutput co = new CachedOutput();
     try {
@@ -67,10 +72,12 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
     return new BXXMLResource(co.finish(), coll);
   }
 
+  @Override
   public long getSize() {
     return res.size();
   }
 
+  @Override
   public void clear() {
     res.clear();
   }
