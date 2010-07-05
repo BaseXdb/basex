@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
-import java.io.File;
 import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.index.FTIndex;
@@ -101,8 +100,7 @@ public final class DiskData extends Data {
    * @throws IOException I/O exception
    */
   private void write() throws IOException {
-    final File file = meta.file(DATAINFO);
-    final DataOutput out = new DataOutput(file);
+    final DataOutput out = new DataOutput(meta.file(DATAINFO));
     meta.write(out);
     out.writeString(DBTAGS);
     tags.write(out);
