@@ -309,7 +309,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   }
 
   @Override
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
   public BXQSequence createSequence(final Iterator it) throws XQException {
     opened();
     valid(it, Iterator.class);
