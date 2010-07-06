@@ -116,7 +116,7 @@ public enum FunDef {
   /* FNGen functions. */
 
   /** XQuery function. */
-  DATA(FNURI, FNGen.class, 1, 1, "data(item)", ITEM_ZM),
+  DATA(FNURI, FNGen.class, 0, 1, "data(item)", ITEM_ZM),
   /** XQuery function. */
   COLLECTION(FNURI, FNGen.class, 0, 1, "collection(item)", NOD_ZM),
   /** XQuery function. */
@@ -138,11 +138,11 @@ public enum FunDef {
   /* FNNode functions. */
 
   /** XQuery function. */
-  DOCURI(FNURI, FNNode.class, 1, 1, "document-uri(node)", URI_ZO),
+  DOCURI(FNURI, FNNode.class, 0, 1, "document-uri(node)", URI_ZO),
   /** XQuery function. */
   NILLED(FNURI, FNNode.class, 1, 1, "nilled(node)", BLN_ZO),
   /** XQuery function. */
-  NODENAME(FNURI, FNNode.class, 1, 1, "node-name(node)", QNM_ZO),
+  NODENAME(FNURI, FNNode.class, 0, 1, "node-name(node?)", QNM_ZO),
   /** XQuery function. */
   LOCNAME(FNURI, FNNode.class, 0, 1, "local-name(node?)", STR),
   /** XQuery function. */
@@ -186,7 +186,7 @@ public enum FunDef {
   /** XQuery function. */
   FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", ITR_ZO),
   /** XQuery function. */
-  RND(FNURI, FNNum.class, 1, 1, "round(num)", ITR_ZO),
+  RND(FNURI, FNNum.class, 1, 2, "round(num, prec?)", ITR_ZO),
   /** XQuery function. */
   RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num, prec?)", ITR_ZO),
 
@@ -240,6 +240,10 @@ public enum FunDef {
   REVERSE(FNURI, FNSeq.class, 1, 1, "reverse(seq)", ITEM_ZM),
   /** XQuery function. */
   SUBSEQ(FNURI, FNSeq.class, 2, 3, "subsequence(seq, start, len?)", ITEM_ZM),
+  /** XQuery function. */
+  HEAD(FNURI, FNSeq.class, 1, 1, "head(seq)", ITEM_ZO),
+  /** XQuery function. */
+  TAIL(FNURI, FNSeq.class, 1, 1, "tail(seq)", ITEM_ZM),
 
   /* FNSimple functions. */
 
@@ -293,7 +297,7 @@ public enum FunDef {
   /** XQuery function. */
   STARTS(FNURI, FNStr.class, 2, 3, "starts-with(item, item)", BLN),
   /** XQuery function. */
-  STRJOIN(FNURI, FNStr.class, 2, 2, "string-join(item, sep)", STR),
+  STRJOIN(FNURI, FNStr.class, 1, 2, "string-join(item, sep?)", STR),
   /** XQuery function. */
   STCODE(FNURI, FNStr.class, 1, 1, "string-to-codepoints(string)", ITR_ZM),
   /** XQuery function. */
@@ -306,6 +310,27 @@ public enum FunDef {
   TRANS(FNURI, FNStr.class, 3, 3, "translate(arg, map, trans)", STR),
   /** XQuery function. */
   UPPER(FNURI, FNStr.class, 1, 1, "upper-case(item)", STR),
+
+  /* FNMath functions. */
+
+  /** XQuery math function. */
+  PI(MATHURI, FNMath.class, 0, 0, "pi()", ITR_ZO),
+  /** XQuery math function. */
+  SQRT(MATHURI, FNMath.class, 1, 1, "sqrt(number?)", ITR_ZO),
+  /** XQuery math function. */
+  SIN(MATHURI, FNMath.class, 1, 1, "sin(number?)", ITR_ZO),
+  /** XQuery math function. */
+  COS(MATHURI, FNMath.class, 1, 1, "cos(number?)", ITR_ZO),
+  /** XQuery math function. */
+  TAN(MATHURI, FNMath.class, 1, 1, "tan(number?)", ITR_ZO),
+  /** XQuery math function. */
+  ASIN(MATHURI, FNMath.class, 1, 1, "asin(number?)", ITR_ZO),
+  /** XQuery math function. */
+  ACOS(MATHURI, FNMath.class, 1, 1, "acos(number?)", ITR_ZO),
+  /** XQuery math function. */
+  ATAN(MATHURI, FNMath.class, 1, 1, "atan(number?)", ITR_ZO),
+
+  /* FNBaseX functions. */
 
   /** Project specific function - evaluates the specified query. */
   EVAL(BXURI, FNBaseX.class, 1, 1, "eval(string)", ITEM_ZM),

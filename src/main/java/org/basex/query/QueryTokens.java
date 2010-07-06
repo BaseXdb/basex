@@ -355,6 +355,8 @@ public interface QueryTokens {
   byte[] BXURI = token("http://www.basex.org");
   /** File module URI. */
   byte[] FILEURI = token("http://www.basex.org/file");
+  /** Math URI. */
+  byte[] MATHURI = token("http://www.w3.org/2005/xpath-functions/math");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
@@ -382,6 +384,8 @@ public interface QueryTokens {
   byte[] IDREF = token("idref");
   /** FN token. */
   byte[] FN = token("fn");
+  /** Math token. */
+  byte[] MATH = token("math");
   /** BaseX token. */
   byte[] BASEX = token("basex");
   /** XS token. */
@@ -390,10 +394,10 @@ public interface QueryTokens {
   byte[] XSI = token("xsi");
   /** XS token. */
   byte[] LOCAL = token("local");
-  /** Language attribute. */
-  byte[] LANG = token("xml:lang");
   /** File module token. */
   byte[] FILE = token("file");
+  /** Language attribute. */
+  byte[] LANG = token("xml:lang");
 
   // QUERY PLAN ===============================================================
 

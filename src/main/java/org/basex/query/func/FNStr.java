@@ -265,13 +265,13 @@ final class FNStr extends Fun {
   }
 
   /**
-   * Returns a string join.
+   * Returns a joined string.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
   private Item strjoin(final QueryContext ctx) throws QueryException {
-    final Item is = expr[1].atomic(ctx);
+    final Item is = expr.length == 2 ? expr[1].atomic(ctx) : Str.ZERO;
     if(is == null) Err.empty(this);
     final byte[] sep = checkStr(is);
 

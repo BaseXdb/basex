@@ -19,6 +19,14 @@ import org.basex.query.util.ItemSet;
  */
 final class FNSeq extends Fun {
   @Override
+  public Item atomic(final QueryContext ctx) throws QueryException {
+    switch(func) {
+      case HEAD:     return head(ctx);
+      default:       return super.atomic(ctx);
+    }
+  }
+
+  @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case INDEXOF:  return indexOf(ctx);
@@ -27,8 +35,39 @@ final class FNSeq extends Fun {
       case REVERSE:  return reverse(ctx);
       case REMOVE:   return remove(ctx);
       case SUBSEQ:   return subseq(ctx);
+      case TAIL:     return tail(ctx);
       default:       return super.iter(ctx);
     }
+  }
+
+  /**
+   * Returns the first item in a sequence.
+   * @param ctx query context
+   * @return first item
+   * @throws QueryException query exception
+   */
+  private Item head(final QueryContext ctx) throws QueryException {
+    return expr[0].iter(ctx).next();
+  }
+
+  /**
+   * Returns all but the first item in a sequence.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  private Iter tail(final QueryContext ctx) throws QueryException {
+    // create iterator
+    final Iter ir = expr[0].iter(ctx);
+    // skip first item; if empty, return empty iterator
+    if(ir.next() == null) return Iter.EMPTY;
+
+    return new Iter() {
+      @Override
+      public Item next() throws QueryException {
+        return ir.next();
+      }
+    };
   }
 
   /**
@@ -193,6 +232,7 @@ final class FNSeq extends Fun {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
+    // index-of will create integers, insert-before might add new types
     return func == FunDef.INDEXOF || func == FunDef.INSBEF ? super.returned(ctx)
         : new SeqType(expr[0].returned(ctx).type, SeqType.Occ.ZM);
   }

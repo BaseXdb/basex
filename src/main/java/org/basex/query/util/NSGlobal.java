@@ -19,6 +19,7 @@ public final class NSGlobal {
     NS.add(XS, XSURI);
     NS.add(XSI, XSIURI);
     NS.add(FN, FNURI);
+    NS.add(MATH, MATHURI);
     NS.add(XMLNS, XMLNSURI);
     NS.add(XML, XMLURI);
     NS.add(BASEX, BXURI);

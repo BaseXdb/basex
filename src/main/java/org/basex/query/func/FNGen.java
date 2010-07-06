@@ -27,7 +27,7 @@ final class FNGen extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case DATA:
-        return data(ctx.iter(expr[0]));
+        return data(ctx.iter(expr.length != 0 ? expr[0] : checkCtx(ctx)));
       case COLLECTION:
         if(expr.length == 0) return ctx.coll(null);
         final Iter iter = ctx.iter(expr[0]);

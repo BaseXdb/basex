@@ -31,8 +31,8 @@ final class FNNum extends Fun {
       case ABS:    return abs(it);
       case CEIL:   return num(it, d, Math.ceil(d));
       case FLOOR:  return num(it, d, Math.floor(d));
-      case RND:    return rnd(it);
-      case RNDHLF: return rnd(it, d, ctx);
+      case RND:    return rnd(it, d, ctx, false);
+      case RNDHLF: return rnd(it, d, ctx, true);
       default:     return super.atomic(ctx);
     }
   }
@@ -67,41 +67,37 @@ final class FNNum extends Fun {
   /**
    * Returns a rounded item.
    * @param it input item
+   * @param d input double value
+   * @param h2e half-to-even flag
+   * @param ctx query context
    * @return absolute item
    * @throws QueryException query exception
    */
-  private Item rnd(final Item it) throws QueryException {
-    final double d = it.dbl();
-    if(it.type != Type.DEC) {
-      return num(it, d, d == d && d != 0 && d >= Long.MIN_VALUE &&
-          d < Long.MAX_VALUE ? d >= -.5d && d < 0 ? -0d : Math.round(d) : d);
-    }
-    final BigDecimal bd = it.dec();
-    return Dec.get(bd.setScale(0, bd.signum() > 0 ? BigDecimal.ROUND_HALF_UP :
-      BigDecimal.ROUND_HALF_DOWN));
-  }
-
-  /**
-   * Returns a rounded item.
-   * @param it input item
-   * @param n input double value
-   * @param ctx query context
-   * @return rounded item
-   * @throws QueryException query exception
-   */
-  private Item rnd(final Item it, final double n, final QueryContext ctx)
-      throws QueryException {
+  private Item rnd(final Item it, final double d, final QueryContext ctx,
+      final boolean h2e) throws QueryException {
 
     final int pp = expr.length == 1 ? 0 : (int) checkItr(expr[1], ctx);
     if(it.type == Type.DEC && pp >= 0) {
-      return Dec.get(it.dec().setScale(pp, BigDecimal.ROUND_HALF_EVEN));
+      final BigDecimal bd = it.dec();
+      final int m = h2e ? BigDecimal.ROUND_HALF_EVEN : bd.signum() > 0 ?
+          BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN;
+      return Dec.get(bd.setScale(pp, m));
     }
 
-    final double p = p(pp);
-    double d = n;
-    if(p == 1 && (d % 2 == .5 || d % 2 == -1.5)) d -= .5;
-    else d = Math.floor(d * p + .5) / p;
-    return num(it, n, d);
+    // calculate precision factor
+    double p = 1;
+    for(long i = pp; i > 0; i--) p *= 10;
+    for(long i = pp; i < 0; i++) p /= 10;
+
+    double c = d;
+    if(h2e) {
+      c = p == 1 && (c % 2 == .5 || c % 2 == -1.5) ? c - .5 :
+        Math.floor(c * p + .5) / p;
+    } else if(d == d && d != 0 && d >= Long.MIN_VALUE && d < Long.MAX_VALUE) {
+      final double dp = d * p;
+      c = (dp >= -.5d && dp < 0 ? -0d : Math.round(dp)) / p;
+    }
+    return num(it, d, c);
   }
 
   /**
@@ -121,17 +117,5 @@ final class FNNum extends Fun {
       case FLT: return Flt.get((float) d);
       default:  return Itr.get((long) d);
     }
-  }
-
-  /**
-   * Returns the precision factor.
-   * @param p precision
-   * @return factor
-   */
-  private double p(final long p) {
-    double f = 1;
-    for(long i = p; i > 0; i--) f *= 10;
-    for(long i = p; i < 0; i++) f /= 10;
-    return f;
   }
 }
