@@ -254,7 +254,7 @@ public abstract class W3CTS {
       nodes("//*:test-group[starts-with(@name, 'Minim')]//*:test-case", root) :
       nodes("//*:test-case", root);
 
-    int total = nodes.size();
+    long total = nodes.size();
     Main.out("Parsing " + total + " Queries");
     for(int t = 0; t < total; t++) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
@@ -312,7 +312,7 @@ public abstract class W3CTS {
    * @param t total value
    * @return percentage
    */
-  private String pc(final int v, final int t) {
+  private String pc(final int v, final long t) {
     return (t == 0 ? 100 : v * 10000 / t / 100d) + "%";
   }
 

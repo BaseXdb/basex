@@ -43,9 +43,9 @@ public final class StressTest {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
-   * @throws BaseXException exception
+   * @throws Exception exception
    */
-  public static void main(final String[] args) throws BaseXException {
+  public static void main(final String[] args) throws Exception {
     System.out.println("=== Local StressTest ===");
 
     // create test database
@@ -56,7 +56,13 @@ public final class StressTest {
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
-    for(int i = 0; i < NCLIENTS; i++) new Client().start();
+    final Client[] cl = new Client[NCLIENTS];
+    for(int i = 0; i < NCLIENTS; i++) {
+      cl[i] = new Client();
+      cl[i].start();
+    }
+    for(final Client c : cl) c.join();
+    dropDB();
   }
 
   /**
@@ -89,9 +95,6 @@ public final class StressTest {
           if(VERBOSE) System.out.println("[" + counter++ + "] Thread " +
               getId() + ", Pos " + n + ": " + result);
         }
-
-        // database is dropped after last client has finished
-        if(++finished == StressTest.NCLIENTS) dropDB();
       } catch(final BaseXException ex) {
         ex.printStackTrace();
       }
