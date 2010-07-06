@@ -241,11 +241,7 @@ public interface DataText {
   /** URI header. */
   byte[] TABLEURI = token("URI");
   /** Table kinds. */
-  byte[][] TABLEKINDS = {
-      { 'D', 'O', 'C', ' ' }, { 'E', 'L', 'E', 'M' },
-      { 'T', 'E', 'X', 'T' }, { 'A', 'T', 'T', 'R' },
-      { 'C', 'O', 'M', 'M' }, { 'P', 'I', ' ', ' ' }
-  };
+  byte[][] TABLEKINDS = tokens("DOC ", "ELEM", "TEXT", "ATTR", "COMM", "PI  ");
 
   // DATABASE FILES ===========================================================
 

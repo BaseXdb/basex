@@ -29,7 +29,7 @@ final class FNAggr extends Fun {
 
     switch(func) {
       case COUNT:
-        int c = iter.size();
+        long c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
         return Itr.get(c);
       case MIN:

@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 
@@ -14,7 +15,7 @@ import org.basex.query.item.Item;
 final class FNMath extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    if(func == FunDef.PI) return Dbl.get(3.141592653589793e0);
+    if(func == FunDef.PI) return Dbl.get(Math.PI);
     if(expr[0].e()) return null;
     
     final double d = checkDbl(expr[0], ctx);
@@ -28,5 +29,10 @@ final class FNMath extends Fun {
       case ATAN: return Dbl.get(Math.atan(d));
       default:   return super.atomic(ctx);
     }
+  }
+
+  @Override
+  public Expr c(final QueryContext ctx) throws QueryException {
+    return func == FunDef.PI || expr[0].i() || expr[0].e() ? atomic(ctx) : this;
   }
 }

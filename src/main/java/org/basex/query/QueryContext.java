@@ -202,12 +202,12 @@ public final class QueryContext extends Progress {
         if(!context.perm(User.READ, data.meta))
           throw new QueryException(PERMNO, CmdPerm.READ);
 
+        final int s = (int) nodes.size();
         if(nodes.doc) {
           // create document nodes
-          doc = new DBNode[nodes.size()];
-          final int dl = nodes.size();
-          for(int d = 0; d < dl; d++) {
-            addDoc(new DBNode(data, nodes.nodes[d], Data.DOC));
+          doc = new DBNode[s];
+          for(int n = 0; n < s; n++) {
+            addDoc(new DBNode(data, nodes.nodes[n], Data.DOC));
           }
         } else {
           for(final int p : data.doc()) addDoc(new DBNode(data, p, Data.DOC));
@@ -219,8 +219,8 @@ public final class QueryContext extends Progress {
           item = Seq.get(doc, docs);
         } else {
           // otherwise, add all context items
-          final SeqIter si = new SeqIter(nodes.size());
-          for(int n = 0; n < nodes.size(); n++) {
+          final SeqIter si = new SeqIter(s);
+          for(int n = 0; n < s; n++) {
             si.add(new DBNode(data, nodes.nodes[n]));
           }
           item = si.finish();
@@ -478,18 +478,18 @@ public final class QueryContext extends Progress {
     // no collection specified.. return default collection/current context set
     if(coll == null) {
       if(colls == 0) Err.or(COLLDEF);
-      return new SeqIter(collect[0].item, collect[0].size());
+      return new SeqIter(collect[0].item, (int) collect[0].size());
     }
 
     // invalid collection reference
-    if(contains(coll, '<') || contains(coll, '\\')) Err.or(COLLINV,
-        Err.chop(coll));
+    if(contains(coll, '<') || contains(coll, '\\'))
+      Err.or(COLLINV, Err.chop(coll));
 
     int c = -1;
     while(true) {
       if(++c == colls) addDocs(doc(coll, true, false));
       else if(!eq(collName[c], coll)) continue;
-      return new SeqIter(collect[c].item, collect[c].size());
+      return new SeqIter(collect[c].item, (int) collect[c].size());
     }
   }
 

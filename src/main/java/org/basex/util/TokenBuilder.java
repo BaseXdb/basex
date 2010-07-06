@@ -154,7 +154,7 @@ public final class TokenBuilder {
    * @param i the integer to be added
    * @return self reference
    */
-  public TokenBuilder add(final int i) {
+  public TokenBuilder add(final long i) {
     add(Token.token(i));
     return this;
   }
@@ -232,6 +232,17 @@ public final class TokenBuilder {
     while(++s < size && Token.ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
     size -= s;
+  }
+
+  /**
+   * Reverses the byte order.
+   */
+  public void reverse() {
+    for(int i = 0, s = size - 1; i < s; i++, s--) {
+      byte b = chars[i];
+      chars[i] = chars[s];
+      chars[s] = b;
+    }
   }
 
   /**

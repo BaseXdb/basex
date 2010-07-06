@@ -70,7 +70,7 @@ public abstract class AQuery extends Command {
       }
 
       final boolean ser = prop.is(Prop.SERIALIZE);
-      int hits = 0;
+      long hits = 0;
       int updates = 0;
       for(int i = 0; i < runs; i++) {
         final Performance per = new Performance();

@@ -82,7 +82,7 @@ public final class Nodes implements Result {
   }
 
   @Override
-  public int size() {
+  public long size() {
     return size;
   }
 

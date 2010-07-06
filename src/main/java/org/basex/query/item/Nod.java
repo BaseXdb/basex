@@ -356,7 +356,7 @@ public abstract class Nod extends Item {
                 tmp.add(c.finish());
                 addDesc(c.child(), tmp);
               }
-              for(int t = tmp.size() - 1; t >= 0; t--) ir.add(tmp.get(t));
+              for(long t = tmp.size() - 1; t >= 0; t--) ir.add(tmp.get(t));
             }
             n = p;
             p = p.parent();
@@ -376,7 +376,7 @@ public abstract class Nod extends Item {
       /** Children nodes. */
       private NodIter ir;
       /** Counter. */
-      private int c;
+      private long c;
 
       @Override
       public Nod next() throws QueryException {

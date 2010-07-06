@@ -190,7 +190,7 @@ public class BaseX extends Main {
           file = file == null ? arg.string() : file + " " + arg.string();
         }
       }
-      console = file == null && commands == null;
+      console = file == null && commands == null && query == null;
       return arg.finish();
     } catch(final IOException ex) {
       errln(server(ex));

@@ -55,61 +55,44 @@ public final class MP3Parser implements IFileParser {
    * array represents the "code" of the genre, the textual representation of the
    * genre X is stored at GENRES[X].
    */
-  private static final byte[][] GENRES = new byte[][] {
-    token("Blues"), token("Classic Rock"), token("Country"), token("Dance"),
-    token("Disco"), token("Funk"), token("Grunge"), token("Hip-Hop"),
-    token("Jazz"), token("Metal"), token("New Age"), token("Oldies"),
-    token("Other"), token("Pop"), token("R&B"), token("Rap"), token("Reggae"),
-    token("Rock"), token("Techno"), token("Industrial"), token("Alternative"),
-    token("Ska"), token("Death Metal"), token("Pranks"), token("Soundtrack"),
-    token("Euro-Techno"), token("Ambient"), token("Trip-Hop"), token("Vocal"),
-    token("Jazz+Funk"), token("Fusion"), token("Trance"), token("Classical"),
-    token("Instrumental"), token("Acid"), token("House"), token("Game"),
-    token("Sound Clip"), token("Gospel"), token("Noise"), token("AlternRock"),
-    token("Bass"), token("Soul"), token("Punk"), token("Space"),
-    token("Meditative"), token("Instrumental Pop"), token("Instrumental Rock"),
-    token("Ethnic"), token("Gothic"), token("Darkwave"),
-    token("Techno-Industrial"), token("Electronic"), token("Pop-Folk"),
-    token("Eurodance"), token("Dream"), token("Southern Rock"), token("Comedy"),
-    token("Cult"), token("Gangsta"), token("Top 40"), token("Christian Rap"),
-    token("Pop/Funk"), token("Jungle"), token("Native American"),
-    token("Cabaret"), token("New Wave"), token("Psychadelic"), token("Rave"),
-    token("Showtunes"), token("Trailer"), token("Lo-Fi"), token("Tribal"),
-    token("Acid Punk"), token("Acid Jazz"), token("Polka"), token("Retro"),
-    token("Musical"), token("Rock & Roll"), token("Hard Rock"), token("Folk"),
-    token("Folk-Rock"), token("National Folk"), token("Swing"),
-    token("Fast Fusion"), token("Bebob"), token("Latin"), token("Revival"),
-    token("Celtic"), token("Bluegrass"), token("Avantgarde"),
-    token("Gothic Rock"), token("Progressive Rock"), token("Psychedelic Rock"),
-    token("Symphonic Rock"), token("Slow Rock"), token("Big Band"),
-    token("Chorus"), token("Easy Listening"), token("Acoustic"),
-    token("Humour"), token("Speech"), token("Chanson"), token("Opera"),
-    token("Chamber Music"), token("Sonata"), token("Symphony"),
-    token("Booty Brass"), token("Primus"), token("Porn Groove"),
-    token("Satire"), token("Slow Jam"), token("Club"), token("Tango"),
-    token("Samba"), token("Folklore"), token("Ballad"), token("Poweer Ballad"),
-    token("Rhytmic Soul"), token("Freestyle"), token("Duet"),
-    token("Punk Rock"), token("Drum Solo"), token("A Capela"),
-    token("Euro-House"), token("Dance Hall"), token("Goa"),
-    token("Drum & Bass"), token("Club-House"), token("Hardcore"),
-    token("Terror"), token("Indie"), token("BritPop"), token("Negerpunk"),
-    token("Polsk Punk"), token("Beat"), token("Christian Gangsta Rap"),
-    token("Heavy Metal"), token("Black Metal"), token("Crossover"),
-    token("Contemporary Christian"), token("Christian Rock"), token("Merengue"),
-    token("Salsa"), token("Trash Metal"), token("Anime"), token("Jpop"),
-    token("Synthpop")
-  };
+  private static final byte[][] GENRES = tokens("Blues", "Classic Rock",
+      "Country", "Dance", "Disco", "Funk", "Grunge", "Hip-Hop", "Jazz",
+      "Metal", "New Age", "Oldies", "Other", "Pop", "R&B", "Rap", "Reggae",
+      "Rock", "Techno", "Industrial", "Alternative", "Ska", "Death Metal",
+      "Pranks", "Soundtrack", "Euro-Techno", "Ambient", "Trip-Hop", "Vocal",
+      "Jazz+Funk", "Fusion", "Trance", "Classical", "Instrumental", "Acid",
+      "House", "Game", "Sound Clip", "Gospel", "Noise", "AlternRock", "Bass",
+      "Soul", "Punk", "Space", "Meditative", "Instrumental Pop",
+      "Instrumental Rock", "Ethnic", "Gothic", "Darkwave", "Techno-Industrial",
+      "Electronic", "Pop-Folk", "Eurodance", "Dream", "Southern Rock",
+      "Comedy", "Cult", "Gangsta", "Top 40", "Christian Rap", "Pop/Funk",
+      "Jungle", "Native American", "Cabaret", "New Wave", "Psychadelic",
+      "Rave", "Showtunes", "Trailer", "Lo-Fi", "Tribal", "Acid Punk",
+      "Acid Jazz", "Polka", "Retro", "Musical", "Rock & Roll", "Hard Rock",
+      "Folk", "Folk-Rock", "National Folk", "Swing", "Fast Fusion", "Bebob",
+      "Latin", "Revival", "Celtic", "Bluegrass", "Avantgarde", "Gothic Rock",
+      "Progressive Rock", "Psychedelic Rock", "Symphonic Rock", "Slow Rock",
+      "Big Band", "Chorus", "Easy Listening", "Acoustic", "Humour", "Speech",
+      "Chanson", "Opera", "Chamber Music", "Sonata", "Symphony", "Booty Brass",
+      "Primus", "Porn Groove", "Satire", "Slow Jam", "Club", "Tango", "Samba",
+      "Folklore", "Ballad", "Poweer Ballad", "Rhytmic Soul", "Freestyle",
+      "Duet", "Punk Rock", "Drum Solo", "A Capela", "Euro-House", "Dance Hall",
+      "Goa", "Drum & Bass", "Club-House", "Hardcore", "Terror", "Indie",
+      "BritPop", "Negerpunk", "Polsk Punk", "Beat", "Christian Gangsta Rap",
+      "Heavy Metal", "Black Metal", "Crossover", "Contemporary Christian",
+      "Christian Rock", "Merengue", "Salsa", "Trash Metal", "Anime", "Jpop",
+      "Synthpop");
 
   /** All available picture types for APIC frames. */
-  static final String[] PICTURE_TYPE = new String[] { "Other",
-      "file icon", "Other file icon", "Front cover", "Back cover",
-      "Leaflet page", "Media - e.g. label side of CD",
+  static final String[] PICTURE_TYPE = new String[] { "Other", "file icon",
+      "Other file icon", "Front cover", "Back cover", "Leaflet page",
+      "Media - e.g. label side of CD",
       "Lead artist or lead performer or soloist", "Artist or performer",
       "Conductor", "Band or Orchestra", "Composer", "Lyricist or text writer",
       "Recording Location", "During recording", "During performance",
       "Movie or video screen capture", "A bright coloured fish",
-      "Illustration", "Band or artist logotype", //
-      "Publisher or Studio logotype"};
+      "Illustration", "Band or artist logotype", "Publisher or Studio logotype"
+  };
 
   /** Flag for ISO-8859-1 encoding. */
   private static final int ENC_ISO_8859_1 = 0;
@@ -127,11 +110,11 @@ public final class MP3Parser implements IFileParser {
   private static final int ENC_UTF_8 = 3;
 
   /** MP3 modes. */
-  private static final byte[][] MODES = { token("Stereo"),
-    token("Joint Stereo"), token("Dual Channel"), token("Mono") };
+  private static final byte[][] MODES = 
+    tokens("Stereo", "Joint Stereo", "Dual Channel", "Mono");
   /** MP3 emphases. */
-  private static final byte[][] EMPH = { token("None"),
-    token("5015MS"), token("Illegal"), token("CCITT") };
+  private static final byte[][] EMPH =
+    tokens("None", "5015MS", "Illegal", "CCITT");
   /** Available bit rates. */
   private static final int[][][] BITRATES = { {
     { 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448 },
@@ -154,15 +137,13 @@ public final class MP3Parser implements IFileParser {
     { 384, 1152, 1152 }, { 384, 1152, 576 }
   };
   /** MP3 types. */
-  private static final byte[][] VERSIONS = new byte[][] {
-    token("MPEG-2.5 "), EMPTY, token("MPEG-2 "), token("MPEG-1 "),
-  };
+  private static final byte[][] VERSIONS =
+    tokens("MPEG-2.5 ", "MPEG-2 ", "MPEG-1 ");
   /** MP3 types. */
-  private static final byte[][] LAYERS = new byte[][] {
-    token("Layer 1"), token("Layer 2"), token("Layer 3"), EMPTY
-  };
+  private static final byte[][] LAYERS =
+    tokens("Layer 1", "Layer 2", "Layer 3", "");
   /** MP3 encoding. */
-  private static final byte[][] ENCODE = { token("CBR"), token("VBR") };
+  private static final byte[][] ENCODE = tokens("CBR", "VBR");
 
   static {
     ParserRegistry.register("mp3", MP3Parser.class);

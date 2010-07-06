@@ -104,7 +104,7 @@ public class Pred extends Preds {
       ctx.size = si.size();
       ctx.pos = 1;
       int c = 0;
-      final int sl = si.size();
+      final long sl = si.size();
       for(int s = 0; s < sl; s++) {
         ctx.item = si.item[s];
         if(p.test(ctx) != null) si.item[c++] = si.item[s];

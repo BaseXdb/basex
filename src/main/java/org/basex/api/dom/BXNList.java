@@ -48,6 +48,6 @@ public class BXNList implements NodeList {
 
   @Override
   public int getLength() {
-    return xquery != null ? xquery.size() : nodes.size();
+    return (int) (xquery != null ? xquery.size() : nodes.size());
   }
 }

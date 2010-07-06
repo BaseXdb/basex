@@ -38,8 +38,8 @@ public final class RangeIter extends Iter {
   }
 
   @Override
-  public int size() {
-    return (int) Math.abs(max - min);
+  public long size() {
+    return Math.abs(max - min);
   }
 
   @Override

@@ -22,11 +22,11 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class FNPat extends Fun {
-  /** From-To Pattern. */
-  private static final Pattern CLS =
+  /** Classes pattern. */
+  private static final Pattern CLASSES =
     Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
-  /** From-To Pattern. */
-  private static final Pattern CLSEX =
+  /** Excluded classes pattern. */
+  private static final Pattern EXCLASSES =
     Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\]");
 
   @Override
@@ -81,10 +81,15 @@ final class FNPat extends Fun {
         i++;
       }
     }
+
     final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
+    String r = Token.string(rep);
+    if((p.flags() & Pattern.LITERAL) != 0) {
+      r = r.replaceAll("\\\\", "\\\\\\\\").replaceAll("\\$", "\\\\\\$");
+    }
+
     try {
-      return Str.get(Token.token(p.matcher(
-          Token.string(val)).replaceAll(Token.string(rep))));
+      return Str.get(Token.token(p.matcher(Token.string(val)).replaceAll(r)));
     } catch(final Exception ex) {
       final String m = ex.getMessage();
       if(m.contains("No group")) Err.or(REGROUP);
@@ -142,6 +147,7 @@ final class FNPat extends Fun {
         if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         else if(b == 'm') m |= Pattern.MULTILINE;
         else if(b == 's') m |= Pattern.DOTALL;
+        else if(b == 'q') m |= Pattern.LITERAL;
         else if(b == 'x') {
           boolean cc = false;
           final TokenBuilder tb = new TokenBuilder();
@@ -168,7 +174,7 @@ final class FNPat extends Fun {
     if(str.indexOf('[') != -1 && str.indexOf('-') != -1) {
       // replace classes by single characters to support Unicode matches
       while(true) {
-        final Matcher mt = CLS.matcher(str);
+        final Matcher mt = CLASSES.matcher(str);
         if(!mt.matches()) break;
         final char c1 = mt.group(1).charAt(0);
         final char c2 = mt.group(2).charAt(0);
@@ -181,7 +187,7 @@ final class FNPat extends Fun {
 
       // remove excluded characters in classes
       while(true) {
-        final Matcher mt = CLSEX.matcher(str);
+        final Matcher mt = EXCLASSES.matcher(str);
         if(!mt.matches()) break;
         final String in = mt.group(1);
         final String ex = mt.group(2);

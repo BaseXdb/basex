@@ -162,6 +162,17 @@ public final class Token {
   }
 
   /**
+   * Converts the specified strings to tokens.
+   * @param strings strings
+   * @return tokens
+   */
+  public static byte[][] tokens(final String... strings) {
+    final byte[][] t = new byte[strings.length][];
+    for(int i = 0; i < t.length; i++) t[i] = token(strings[i]);
+    return t;
+  }
+
+  /**
    * Converts a string to a UTF8 byte array.
    * @param string string to be converted
    * @return byte array
@@ -391,7 +402,8 @@ public final class Token {
    * @return byte array
    */
   public static byte[] token(final long integer) {
-    return token(Long.toString(integer));
+    return integer >= Integer.MIN_VALUE && integer <= Integer.MAX_VALUE ?
+        token((int) integer) : token(Long.toString(integer));
   }
 
   /** US charset. */

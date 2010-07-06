@@ -64,7 +64,7 @@ public final class Group extends Expr {
     Item next = null;
     for(final Grp group : grp) {
       if(group == null) { continue; }
-      final int lastitem = sq.size();
+      final long lastitem = sq.size();
       for(int i = 0; i < lastitem; i++) { // check all items matching
                                           //the specified Grouping option
         next = group.item(i);

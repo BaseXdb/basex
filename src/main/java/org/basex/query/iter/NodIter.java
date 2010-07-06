@@ -101,7 +101,7 @@ public final class NodIter extends NodeIter {
   }
 
   @Override
-  public int size() {
+  public long size() {
     return size;
   }
 

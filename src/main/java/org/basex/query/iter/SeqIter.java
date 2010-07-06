@@ -55,7 +55,8 @@ public final class SeqIter extends Iter implements Result {
    */
   public static SeqIter get(final Iter iter) throws QueryException {
     if(iter instanceof SeqIter) return (SeqIter) iter;
-    final SeqIter si = new SeqIter(Math.max(1, iter.size()));
+    // size is cast as less than 2^32 are expected
+    final SeqIter si = new SeqIter(Math.max(1, (int) iter.size()));
     si.add(iter);
     return si;
   }
@@ -136,7 +137,7 @@ public final class SeqIter extends Iter implements Result {
   }
 
   @Override
-  public int size() {
+  public long size() {
     return size;
   }
 

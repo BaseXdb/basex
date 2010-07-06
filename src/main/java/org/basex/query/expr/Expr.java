@@ -44,7 +44,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
-   * If this method is not overwritten, {@link #atomic} must be implemented.
+   * If this method is not overwritten, {@link #atomic} must be implemented
+   * by an expression, as it will be called by this method.
    * @param ctx query context
    * @return resulting item
    * @throws QueryException query exception
@@ -56,8 +57,9 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns the resulting item or
-   * a {@code null} reference.
-   * If this method is not overwritten, {@link #iter} must be implemented.
+   * a {@code null} reference, if the expression yields an empty sequence.
+   * If this method is not overwritten, {@link #iter} must be implemented
+   * by an expression, as it will be called by this method.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception

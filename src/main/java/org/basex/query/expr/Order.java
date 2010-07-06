@@ -39,7 +39,8 @@ public final class Order extends Expr {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      final int e = sq.size();
+      // cast to int, as expected number of results will be small enough
+      final int e = (int) sq.size();
       int[] order;
       Iter ir;
       int p = -1;

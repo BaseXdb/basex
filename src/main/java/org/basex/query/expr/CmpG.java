@@ -180,7 +180,7 @@ public final class CmpG extends Arr {
     if(atom) return Bln.get(eval(expr[0].atomic(ctx), expr[1].atomic(ctx)));
 
     final Iter ir1 = ctx.iter(expr[0]);
-    final int is1 = ir1.size();
+    final long is1 = ir1.size();
 
     // skip empty result
     if(is1 == 0) return Bln.FALSE;
@@ -190,7 +190,7 @@ public final class CmpG extends Arr {
     if(s1 && expr[1].i()) return Bln.get(eval(ir1.next(), (Item) expr[1]));
 
     Iter ir2 = ctx.iter(expr[1]);
-    final int is2 = ir2.size();
+    final long is2 = ir2.size();
 
     // skip empty result
     if(is2 == 0) return Bln.FALSE;

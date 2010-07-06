@@ -175,7 +175,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type may exactly once.
+   * Tests if the type occurs exactly once.
    * @return result of check
    */
   public boolean one() {

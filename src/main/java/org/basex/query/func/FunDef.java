@@ -5,7 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.item.SeqType;
 
 /**
- * Definitions of all XQuery functions.
+ * Signatures of all XQuery functions.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -112,6 +112,12 @@ public enum FunDef {
       DAT_ZM),
   /** XQuery function. */
   DATETIME(FNURI, FNDate.class, 2, 2, "dateTime(date, time)", DAT_ZM),
+
+  /* FNFormat functions. */
+
+  /** XQuery function. */
+  FORMINT(FNURI, FNFormat.class, 2, 3,
+      "format-integer(number, picture, language?)", STR),
 
   /* FNGen functions. */
 

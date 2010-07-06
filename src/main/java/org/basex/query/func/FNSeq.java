@@ -3,8 +3,10 @@ package org.basex.query.func;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -21,8 +23,8 @@ final class FNSeq extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case HEAD:     return head(ctx);
-      default:       return super.atomic(ctx);
+      case HEAD: return head(ctx);
+      default:   return super.atomic(ctx);
     }
   }
 
@@ -57,17 +59,10 @@ final class FNSeq extends Fun {
    * @throws QueryException query exception
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
-    // create iterator
-    final Iter ir = expr[0].iter(ctx);
-    // skip first item; if empty, return empty iterator
-    if(ir.next() == null) return Iter.EMPTY;
-
-    return new Iter() {
-      @Override
-      public Item next() throws QueryException {
-        return ir.next();
-      }
-    };
+    final Expr e = expr[0];
+    if(e.i() || e.e()) return Iter.EMPTY;
+    final Iter ir = e.iter(ctx);
+    return ir.next() == null ? Iter.EMPTY : ir;
   }
 
   /**
@@ -82,13 +77,13 @@ final class FNSeq extends Fun {
     if(expr.length == 3) checkColl(expr[2], ctx);
 
     return new Iter() {
-      final Iter iter = expr[0].iter(ctx);
+      final Iter ir = expr[0].iter(ctx);
       int c;
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          final Item i = iter.next();
+          final Item i = ir.next();
           if(i == null) return null;
           c++;
           if(CmpV.valCheck(i, it) && CmpV.Comp.EQ.e(i, it)) return Itr.get(c);
@@ -107,13 +102,13 @@ final class FNSeq extends Fun {
     if(expr.length == 2) checkColl(expr[1], ctx);
 
     return new Iter() {
-      final Iter iter = expr[0].iter(ctx);
       final ItemSet map = new ItemSet();
+      final Iter ir = expr[0].iter(ctx);
 
       @Override
       public Item next() throws QueryException {
         while(true) {
-          Item i = iter.next();
+          Item i = ir.next();
           if(i == null) return null;
           i = FNGen.atom(i);
           if(map.index(i)) return i;
@@ -212,28 +207,50 @@ final class FNSeq extends Fun {
    */
   private Iter reverse(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
-
+    // only one item found
+    if(iter.size() == 1) return iter;
     // process reversable iterator...
     if(iter.reverse()) return iter;
 
     // process any other iterator...
     return new Iter() {
       final Iter si = iter.size() != -1 ? iter : SeqIter.get(iter);
-      long c = si.size();
+      final long s = si.size();
+      long c = s;
 
       @Override
-      public int size() { return si.size(); }
+      public long size() { return s; }
       @Override
-      public Item get(final long i) { return si.get(si.size() - i - 1); }
+      public Item get(final long i) { return si.get(s - i - 1); }
       @Override
       public Item next() { return --c < 0 ? null : si.get(c); }
     };
   }
 
   @Override
+  public Expr c(final QueryContext ctx) {
+    switch(func) {
+      case REVERSE:
+      case HEAD:
+        return expr[0].returned(ctx).zeroOrOne() ? expr[0] : this;
+      case TAIL:
+        return expr[0].returned(ctx).zeroOrOne() ? Seq.EMPTY : this;
+      default:
+        return this;
+    }
+  }
+
+  @Override
   public SeqType returned(final QueryContext ctx) {
     // index-of will create integers, insert-before might add new types
-    return func == FunDef.INDEXOF || func == FunDef.INSBEF ? super.returned(ctx)
-        : new SeqType(expr[0].returned(ctx).type, SeqType.Occ.ZM);
+    if(func == FunDef.INDEXOF || func == FunDef.INSBEF)
+      return super.returned(ctx);
+
+    // head will return first item of argument, or nothing
+    if(func == FunDef.HEAD)
+      return new SeqType(expr[0].returned(ctx).type, SeqType.Occ.ZO);
+
+    // all other types will return existing types
+    return new SeqType(expr[0].returned(ctx).type, SeqType.Occ.ZM);
   }
 }

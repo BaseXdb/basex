@@ -18,7 +18,7 @@ public abstract class Iter {
     @Override
     public Item finish() { return Seq.EMPTY; }
     @Override
-    public int size() { return 0; }
+    public long size() { return 0; }
     @Override
     public boolean reset() { return true; }
   };
@@ -31,8 +31,9 @@ public abstract class Iter {
   public abstract Item next() throws QueryException;
 
   /**
-   * Returns the specified item. Note: null is returned if the
-   * item cannot be retrieved, so the returned value has to be checked.
+   * Returns the specified item. This method needs to be implemented if
+   * {@link #size} returns the number of results, i.e., does not return
+   * {@code -1}.
    * @param i value offset
    * @return specified item
    */
@@ -42,18 +43,19 @@ public abstract class Iter {
   }
 
   /**
-   * Returns the number of entries. Note: -1 is returned if the
-   * number cannot be retrieved, so the returned value has to be checked.
-   * If this method is implemented, {@link #get} has to be implemented as well.
+   * Returns the number of entries. Note: {@code -1} is returned if the
+   * number is unknown, so the returned value has to be checked.
+   * If this method is implemented by an iterator, {@link #get} needs to be
+   * implemented as well.
    * @return number of entries
    */
-  public int size() {
+  public long size() {
     return -1;
   }
 
   /**
-   * Resets the iterator and returns true. Note: false is returned if the
-   * iterator cannot be reset, so the returned value has to be checked.
+   * Resets the iterator and returns {@code true} if operation was successful.
+   * {@code false} is returned if the iterator cannot be reversed.
    * @return true if operator could be reset
    */
   public boolean reset() {
@@ -61,8 +63,8 @@ public abstract class Iter {
   }
 
   /**
-   * Reverses the iterator and returns true if operation was successful.
-   * False is returned if the iterator cannot be reversed.
+   * Reverses the iterator and returns {@code true} if operation was successful.
+   * {@code false} is returned if the iterator cannot be reversed.
    * @return true if operator could be reversed
    */
   public boolean reverse() {
