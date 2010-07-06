@@ -67,7 +67,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public int getAttributeCount() {
     getAttributes();
-    return atts.size();
+    return (int) atts.size();
   }
 
   @Override

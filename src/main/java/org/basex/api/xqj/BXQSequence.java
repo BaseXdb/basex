@@ -82,7 +82,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
   @Override
   public boolean absolute(final int p) throws XQException {
     final SeqIter seq = sequence();
-    cursor(seq, p >= 0 ? p - 1 : seq.size() + p);
+    cursor(seq, p >= 0 ? p - 1 : (int) seq.size() + p);
     return pos > 0;
   }
 
@@ -98,7 +98,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   @Override
   public int count() throws XQException {
-    return sequence().size();
+    return (int) sequence().size();
   }
 
   @Override
@@ -182,7 +182,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
   @Override
   public int getPosition() throws XQException {
     final SeqIter iter = sequence();
-    return pos != -1 ? pos : iter.size() + 1;
+    return pos != -1 ? pos : (int) iter.size() + 1;
   }
 
   @Override
@@ -261,7 +261,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
   @Override
   public boolean last() throws XQException {
     final SeqIter seq = sequence();
-    return cursor(seq, seq.size() - 1);
+    return cursor(seq, (int) seq.size() - 1);
   }
 
   @Override
