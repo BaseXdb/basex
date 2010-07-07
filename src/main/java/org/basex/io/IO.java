@@ -74,8 +74,7 @@ public abstract class IO {
   public static IO get(final String s) {
     if(s == null) return new IOFile("");
     if(s.startsWith("<")) return new IOContent(Token.token(s));
-    if(!s.contains(":") || s.startsWith("file:") ||
-        s.length() > 2 && s.charAt(1) == ':') return new IOFile(s);
+    if(!s.contains("://") || s.startsWith("file:")) return new IOFile(s);
     return new IOUrl(s);
   }
 
