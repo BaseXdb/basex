@@ -167,7 +167,7 @@ public final class Tokenizer implements IndexToken {
     boolean sn = false;
     pa = false;
     boolean bs = false;
-    for(; p < l; p += cl(text[p])) {
+    for(; p < l; p += cl(text, p)) {
       final int c = cp(text, p);
       if(wc && !bs) {
         bs = c == '\\';
@@ -193,7 +193,7 @@ public final class Tokenizer implements IndexToken {
     if(p == l) return false;
 
     // parse token
-    for(; p < l; p += cl(text[p])) {
+    for(; p < l; p += cl(text, p)) {
       int c = cp(text, p);
       // parse wildcards
       if(wc && !bs) {
@@ -270,7 +270,7 @@ public final class Tokenizer implements IndexToken {
     pa = false;
     sc = false;
     lp = p;
-    for(; p < l; p += cl(text[p])) {
+    for(; p < l; p += cl(text, p)) {
       final int c = cp(text, p);
       if(c == '\n') {
         pa = true;
@@ -292,10 +292,10 @@ public final class Tokenizer implements IndexToken {
     if(p == l) return false;
 
     // parse token
-    for(; p < l; p += cl(text[p])) {
+    for(; p < l; p += cl(text, p)) {
       final int c = cp(text, p);
       if(!ftChar(c)) {
-        s = p - cl(text[p]);
+        s = p - cl(text, p);
         break;
       }
     }
@@ -353,13 +353,13 @@ public final class Tokenizer implements IndexToken {
 
     // find first character to be normalized
     final int tl = t.length;
-    for(int i = 0; i < tl; i += cl(t[i])) {
+    for(int i = 0; i < tl; i += cl(t, i)) {
       final int c = cp(t, i);
       // normalized character found; run conversion
       if(c != norm(c)) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(t, 0, i);
-        for(int j = i; j < tl; j += cl(t[j])) tb.addUTF(norm(cp(t, j)));
+        for(int j = i; j < tl; j += cl(t, j)) tb.addUTF(norm(cp(t, j)));
         return tb.finish();
       }
     }
@@ -380,7 +380,7 @@ public final class Tokenizer implements IndexToken {
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t[i])) tb.addUTF(uc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(t, i)) tb.addUTF(uc(cp(t, i)));
     return tb.finish();
   }
 
@@ -397,7 +397,7 @@ public final class Tokenizer implements IndexToken {
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t[i])) tb.addUTF(lc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(t, i)) tb.addUTF(lc(cp(t, i)));
     return tb.finish();
   }
 

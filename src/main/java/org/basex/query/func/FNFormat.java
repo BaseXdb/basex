@@ -37,6 +37,13 @@ final class FNFormat extends Fun {
 
   // PRIVATE METHODS ==========================================================
   
+  /** Cases */
+  private enum Case {
+    /** Lower case. */ LOWER,
+    /** Upper case. */ UPPER,
+    /** Standard.   */ STANDARD;
+  }
+  
   /**
    * Returns a formatted integer.
    * @param ctx query context
@@ -50,15 +57,12 @@ final class FNFormat extends Fun {
     final byte[] pic = checkStr(expr[1], ctx);
     if(pic.length == 0 || num == 0) return Str.get(token(num));
 
-    // choose ordinal characters
-    byte[] ord = ord(pic, 1);
-
     // choose sign
     final boolean sign = num < 0;
     if(sign) num = -num;
 
     // choose first character and case
-    final byte ch = pic[0];
+    final int ch = cp(pic, 0);
     Case cs = (ch & 0x20) != 0 ? Case.LOWER : Case.STANDARD;
 
     final TokenBuilder tb = new TokenBuilder();
@@ -67,19 +71,13 @@ final class FNFormat extends Fun {
     } else if((ch & 0xDF) == 'I') {
       roman(tb, num);
     } else if((ch & 0xDF) == 'W') {
-      if(pic.length == 1 || pic[1] != 'w') cs = Case.UPPER;
-      else ord = ord(pic, 2);
-      
-      word(tb, num, ord != null);
-      ord = null;
-    } else if(digit(ch)) {
-      number(tb, ch);
+      final boolean up = pic.length == 1 || pic[1] != 'w';
+      if(up) cs = Case.UPPER;
+      word(tb, num, ord(pic, up ? 1 : 2));
+    } else {
+      number(tb, num, pic);
     }
 
-    if(ord != null) {
-      
-    }
-    
     // finalize formatted string
     byte[] result = tb.finish();
     if(sign) result = concat(new byte[] { '-' }, result);
@@ -95,16 +93,11 @@ final class FNFormat extends Fun {
    * @return ordinal bytes
    */
   private byte[] ord(final byte[] pic, final int p) {
-    return p >= pic.length || pic[p] != 'o' ? null : substring(pic, p + 1);
+    return charAt(pic, p)  != 'o' ? null :
+      charAt(pic, p + 1) != '(' || charAt(pic, pic.length - 1) != ')' ? EMPTY :
+      substring(pic, p + 2, pic.length - 1);
   }
 
-  /** Cases */
-  private enum Case {
-    /** Lower case. */ LOWER,
-    /** Upper case. */ UPPER,
-    /** Standard.   */ STANDARD;
-  }
-  
   /**
    * Returns a Latin character sequence.
    * @param tb token builder
@@ -113,22 +106,6 @@ final class FNFormat extends Fun {
   private void latin(final TokenBuilder tb, final long n) {
     if(n > 26) latin(tb, (n - 1) / 26);
     tb.add((char) ('A' + (n - 1) % 26));
-  }
-
-  /**
-   * Returns a Roman character sequence.
-   * @param tb token builder
-   * @param n number to be formatted
-   */
-  private void roman(final TokenBuilder tb, final long n) {
-    if(n < 4000) {
-      tb.add(ROMAN1000[(int) n / 1000]);
-      tb.add(ROMAN100 [(int) n / 100 % 10]);
-      tb.add(ROMAN10  [(int) n / 10 % 10]);
-      tb.add(ROMAN    [(int) n % 10]);
-    } else {
-      tb.add(n);
-    }
   }
 
   /** Roman numbers (1-10). */
@@ -145,54 +122,19 @@ final class FNFormat extends Fun {
     tokens("", "M", "MM", "MMM");
   
   /**
-   * Returns an word character sequence (English; language specific).
+   * Returns a Roman character sequence.
    * @param tb token builder
    * @param n number to be formatted
-   * @param ord ordinal flag
    */
-  private void word(final TokenBuilder tb, final long n, final boolean ord) {
-    if(n < 20) {
-      tb.add((ord ? ORDINALS : WORDS)[(int) n]);
-    } else if(n < 100) {
-      int r = (int) (n % 10);
-      if(r == 0) {
-        tb.add((ord ? ORDINALS10 : WORDS10)[(int) n / 10]);
-      } else {
-        tb.add(WORDS10[(int) n / 10]);
-        tb.add(' ').add((ord ? ORDINALS : WORDS)[r]);
-      }
+  private void roman(final TokenBuilder tb, final long n) {
+    if(n < 4000) {
+      tb.add(ROMAN1000[(int) n / 1000]);
+      tb.add(ROMAN100 [(int) n / 100 % 10]);
+      tb.add(ROMAN10  [(int) n / 10 % 10]);
+      tb.add(ROMAN    [(int) n % 10]);
     } else {
-      for(int w = 0; w < WORDS100.length; w++) {
-        if(addWord(tb, n, UNITS100[w], WORDS100[w], ord)) break;
-      }
+      tb.add(n);
     }
-  }
-  
-  /**
-   * Adds a unit if the number is large enough (English; language specific).
-   * @param tb token builder
-   * @param n number
-   * @param f factor
-   * @param unit unit
-   * @param ord ordinal flag
-   * @return true if word was added
-   */
-  private boolean addWord(final TokenBuilder tb, final long n, final long f,
-      final byte[] unit, final boolean ord) {
-    
-    final boolean ge = n >= f;
-    if(ge) {
-      word(tb, n / f, false);
-      long r = n % f;
-      tb.add(' ').add(unit);
-      if(ord) tb.add(TH);
-      if(r > 0) {
-        tb.add(' ');
-        if(r < 100) tb.add(AND).add(' ');
-      }
-      word(tb, r, ord);
-    }
-    return ge;
   }
 
   /** Words (1-20). */
@@ -220,15 +162,80 @@ final class FNFormat extends Fun {
     1000000000000000L, 1000000000000L, 1000000000, 1000000, 1000, 100 };
   /** And. */
   private static final byte[] AND = token("and");
-  /** Ordinal suffix (th). */
-  private static final byte[] TH = token("th");
+  /** Ordinal suffixes (st, nr, rd, th). */
+  private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
 
   /**
-   * Returns an number character sequence.
+   * Returns an word character sequence (English; language specific).
    * @param tb token builder
    * @param n number to be formatted
+   * @param ord ordinal numbering
    */
-  private void number(final TokenBuilder tb, final long n) {
-    tb.add(n);
+  private void word(final TokenBuilder tb, final long n, final byte[] ord) {
+    if(n < 20) {
+      tb.add((ord != null ? ORDINALS : WORDS)[(int) n]);
+    } else if(n < 100) {
+      final int r = (int) (n % 10);
+      if(r == 0) {
+        tb.add((ord != null ? ORDINALS10 : WORDS10)[(int) n / 10]);
+      } else {
+        tb.add(WORDS10[(int) n / 10]);
+        tb.add(' ').add((ord != null ? ORDINALS : WORDS)[r]);
+      }
+    } else {
+      for(int w = 0; w < WORDS100.length; w++) {
+        if(addWord(tb, n, UNITS100[w], WORDS100[w], ord)) break;
+      }
+    }
+  }
+  
+  /**
+   * Adds a unit if the number is large enough (English; language specific).
+   * @param tb token builder
+   * @param n number
+   * @param f factor
+   * @param unit unit
+   * @param ord ordinal numbering
+   * @return true if word was added
+   */
+  private boolean addWord(final TokenBuilder tb, final long n, final long f,
+      final byte[] unit, final byte[] ord) {
+    
+    final boolean ge = n >= f;
+    if(ge) {
+      word(tb, n / f, null);
+      final long r = n % f;
+      tb.add(' ').add(unit);
+      if(ord != null) tb.add(ORDSUFFIX[3]);
+      if(r > 0) {
+        tb.add(' ');
+        if(r < 100) tb.add(AND).add(' ');
+      }
+      word(tb, r, ord);
+    }
+    return ge;
+  }
+
+  /**
+   * Returns a number character sequence.
+   * @param tb token builder
+   * @param n number to be formatted
+   * @param pic picture
+   */
+  private void number(final TokenBuilder tb, final long n, final byte[] pic) {
+    // find optional ordinal modifier
+    int p = 0;
+    for(; p < pic.length && pic[p] != 'o'; p += cl(pic, p));
+    
+    // find optional ordinal modifier
+    final byte[] s = token(n);
+    for(int i = p - s.length; i > 0; i--) tb.add('0');
+    tb.add(s);
+
+    // ordinal found; add suffix
+    if(ord(pic, p) != null) {
+      final int f = (int) (n % 10);
+      tb.add(ORDSUFFIX[f > 0 && f < 4 && n % 100 / 10 != 1 ? f - 1 : 3]);
+    }
   }
 }

@@ -77,7 +77,7 @@ public final class XMLToken {
    */
   private static int ncName(final byte[] v, final int p) {
     final int l = v.length;
-    for(int i = p + 1; i < l; i += cl(v[i])) {
+    for(int i = p + 1; i < l; i += cl(v, i)) {
       final int c = cp(v, i);
       if(isXMLLetter(c)) continue;
       if(i == p + 1 || !digit(c) && c != '-' && c != '.') return i;

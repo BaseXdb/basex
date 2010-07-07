@@ -171,7 +171,7 @@ final class FNStr extends Fun {
       public Item next() {
         if(l == s.length) return null;
         final int i = cp(s, l);
-        l += cl(s[l]);
+        l += cl(s, l);
         return Itr.get(i);
       }
     };
@@ -204,7 +204,7 @@ final class FNStr extends Fun {
     int ss = s;
     int ee = e;
     int p = 0;
-    for(l = 0; l < str.length; l += cl(str[l]), p++) {
+    for(l = 0; l < str.length; l += cl(str, l), p++) {
       if(p == s) ss = l;
       if(p == e) ee = l;
     }

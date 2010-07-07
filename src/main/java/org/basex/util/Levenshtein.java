@@ -36,8 +36,8 @@ public final class Levenshtein {
    */
   public boolean similar(final byte[] token, final byte[] sub, final int err) {
     int sl = 0, tl = 0;
-    for(int s = 0; s < sub.length; s += cl(sub[s])) sl++;
-    for(int t = 0; t < token.length; t += cl(token[t])) tl++;
+    for(int s = 0; s < sub.length; s += cl(sub, s)) sl++;
+    for(int t = 0; t < token.length; t += cl(token, t)) tl++;
     if(tl == 0) return false;
 
     // use exact search for too short and too long values
@@ -60,10 +60,10 @@ public final class Levenshtein {
   private boolean ls(final byte[] tk, final int tl, final byte[] sb,
       final int sl, final int k) {
     int e2 = -1, f2 = -1;
-    for(int t = 0; t < tl; t += cl(tk[t])) {
+    for(int t = 0; t < tl; t += cl(tk, t)) {
       final int e = norm(lc(cp(tk, t)));
       int d = Integer.MAX_VALUE;
-      for(int s = 0; s < sl; s += cl(sb[s])) {
+      for(int s = 0; s < sl; s += cl(sb, s)) {
         final int f = norm(lc(cp(sb, s)));
         int c = m(m[t][s + 1] + 1, m[t + 1][s] + 1, m[t][s] + (e == f ? 0 : 1));
         if(e == f2 && f == e2) c = m[t][s];
@@ -97,7 +97,7 @@ public final class Levenshtein {
    */
   private boolean same(final byte[] tk, final byte[] sb) {
     int t = 0, s = 0;
-    for(; t < tk.length && s < sb.length; t += cl(tk[t]), s += cl(sb[s])) {
+    for(; t < tk.length && s < sb.length; t += cl(tk, t), s += cl(sb, s)) {
       if(lc(norm(cp(tk, t))) != lc(norm(cp(sb, t)))) return false;
     }
     return true;

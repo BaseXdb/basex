@@ -68,13 +68,13 @@ public final class BaseXTextTokens {
 
     // find next token boundary
     int ch = cp(text, ps);
-    pe += cl(text[ps]);
+    pe += cl(text, ps);
     if(!ftChar(ch)) return true;
 
     while(pe < size) {
       ch = cp(text, pe);
       if(!ftChar(ch)) break;
-      pe += cl(text[pe]);
+      pe += cl(text, pe);
     };
     return true;
   }
@@ -165,7 +165,7 @@ public final class BaseXTextTokens {
    */
   int next() {
     final int c = curr();
-    if(ps < size) ps += cl(text[ps]);
+    if(ps < size) ps += cl(text, ps);
     return c;
   }
 
@@ -225,7 +225,7 @@ public final class BaseXTextTokens {
     if(ps == 0) return '\n';
     final int p = ps;
     ps = Math.max(0, ps - 5);
-    while(ps < p && ps + cl(text[ps]) < p) ps++;
+    while(ps < p && ps + cl(text, ps) < p) ps++;
     return curr();
   }
 
@@ -272,7 +272,7 @@ public final class BaseXTextTokens {
     if(size == 0) return;
     final TokenBuilder tb = new TokenBuilder();
     final int s = ms != -1 ? Math.min(ms, me) : ps;
-    final int e = ms != -1 ? Math.max(ms, me) : ps + cl(text[ps]);
+    final int e = ms != -1 ? Math.max(ms, me) : ps + cl(text, ps);
     tb.add(text, 0, s);
     if(e < size) tb.add(text, e, size);
     text = tb.finish();

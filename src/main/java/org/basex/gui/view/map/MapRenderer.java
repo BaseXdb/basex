@@ -82,7 +82,7 @@ final class MapRenderer {
       byte[] tok = ftt.nextSC();
       int wl = 0;
 
-      for(int n = 0; n < tok.length; n += cl(tok[n]))
+      for(int n = 0; n < tok.length; n += cl(tok, n))
         wl += BaseXLayout.width(g, cw, cp(tok, n));
 
       if(ll + wl >= ww) {
@@ -102,7 +102,7 @@ final class MapRenderer {
           if(twl >= ww) return Integer.MAX_VALUE;
 
           int n = 0;
-          for(; n < tok.length; n += cl(tok[n])) {
+          for(; n < tok.length; n += cl(tok, n)) {
             final int l = BaseXLayout.width(g, cw, cp(tok, n));
             if(twl + l >= ww) break;
             twl += l;
@@ -602,7 +602,7 @@ final class MapRenderer {
           }
 
           l = 0;
-          for(int n = 0; n < tok.length; n += cl(tok[n]))
+          for(int n = 0; n < tok.length; n += cl(tok, n))
             l += BaseXLayout.width(g, cw, cp(tok, n));
           if(si > i && ll + l + sp >= w / 2d) break;
           ll += l + sp;
@@ -653,7 +653,7 @@ final class MapRenderer {
           if(apm) tok[tok.length - 1] = (byte) data[4][psl - 1];
           sl += apm ? sl : tok.length;
 
-          for(int n = 0; n < tok.length; n += cl(tok[n]))
+          for(int n = 0; n < tok.length; n += cl(tok, n))
             l += BaseXLayout.width(g, cw, cp(tok, n));
           if(ll + l + sp + 2 * sd >= w / 2d) break;
           ll += l + sp;
@@ -720,7 +720,7 @@ final class MapRenderer {
       int l = 0;
       final byte[] tok = tl.get(i);
       final int ns = tok.length;
-      for(int n = 0; n < ns; n += cl(tok[n])) {
+      for(int n = 0; n < ns; n += cl(tok, n)) {
         l += BaseXLayout.width(g, cw, cp(tok, n));
       }
       if(wl + l + sw < wi) {

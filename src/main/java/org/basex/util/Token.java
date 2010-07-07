@@ -122,7 +122,7 @@ public final class Token {
     final StringBuilder sb = new StringBuilder(length);
     try {
       for(int i = start; i < start + length;) {
-        final int cl = cl(token[i]);
+        final int cl = cl(token, i);
         for(int c = 0; c < cl; c++) U8C[c] = token[i++];
         sb.append((char) cp(U8C, 0));
       }
@@ -219,26 +219,31 @@ public final class Token {
   }
 
   /**
-   * Returns the codepoint (unicode value) of the specified token,
-   * starting at the specified position.
+   * Returns the codepoint (unicode value) of the specified token, starting at
+   * the specified position. Returns a question mark for invalid values.
    * @param token token
    * @param pos character position
    * @return current character
    */
   public static int cp(final byte[] token, final int pos) {
     // 0xxxxxxx
-    final int v = token[pos] & 0xFF;
-    if(v < 192) return v;
+    final byte v = token[pos];
+    if((v & 0xFF) < 192) return v & 0xFF;
+
+    final int tl = token.length;
+    final int vl = cl(v);
+    if(pos + vl >= tl) return '?';
+
     // 110xxxxx 10xxxxxx
-    final int c = v >> 4;
-    int l = pos;
-    if(c == 12 || c == 13) return (v & 0x1F) << 6 | token[++l] & 0x3F;
+    if(vl == 2) return (v & 0x1F) << 6 | token[pos + 1] & 0x3F;
+
     // 1110xxxx 10xxxxxx 10xxxxxx
-    if(c == 14)
-      return (v & 0x0F) << 12 | (token[++l] & 0x3F) << 6 | token[++l] & 0x3F;
+    if(vl == 3) return (v & 0x0F) << 12 | (token[pos + 1] & 0x3F) << 6 |
+      token[pos + 2] & 0x3F;
+
     // 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
-    return (v & 0x07) << 18 | (token[++l] & 0x3F) << 12 |
-      (token[++l] & 0x3F) << 6 | token[++l] & 0x3F;
+    return (v & 0x07) << 18 | (token[pos + 1] & 0x3F) << 12 |
+      (token[pos + 2] & 0x3F) << 6 | token[pos + 3] & 0x3F;
   }
 
   /**
@@ -249,6 +254,17 @@ public final class Token {
   public static int cl(final byte first) {
     return first >= 0 ? 1 : CHLEN[first >> 4 & 0xF];
   }
+
+  /**
+   * Returns the expected codepoint length of the specified byte.
+   * @param token token
+   * @param pos character position
+   * @return character length
+   */
+  public static int cl(final byte[] token, final int pos) {
+    return cl(token[pos]);
+  }
+
 
   /*** Character lengths. */
   private static final int[] CHLEN = {
@@ -336,7 +352,7 @@ public final class Token {
    */
   public static int len(final byte[] token) {
     int l = 0;
-    for(int t = 0; t < token.length; t += cl(token[t])) l++;
+    for(int t = 0; t < token.length; t += cl(token, t)) l++;
     return l;
   }
 
@@ -476,6 +492,17 @@ public final class Token {
   }
 
   /**
+   * Returns a character at the specified position, or {@code 0} if the position
+   * is invalid.
+   * @param token token
+   * @param p position
+   * @return character
+   */
+  public static byte charAt(final byte[] token, final int p) {
+    return p >= 0 && p < token.length ? token[p] : 0;
+  }
+
+  /**
    * Finishes the numeric token, removing trailing zeroes.
    * @param token token to be modified
    * @return token
@@ -493,9 +520,8 @@ public final class Token {
   private static final float[] FLT = { 1.0E17f, 1.0E15f, 1.0E13f, 1.0E11f,
     -1.0E17f, -1.0E15f, -1.0E13f, -1.0E11f };
   /** String representations of float values. */
-  private static final byte[][] FLTSTR = { token("1.0E17"), token("1.0E15"),
-    token("1.0E13"), token("1.0E11"), token("-1.0E17"), token("-1.0E15"),
-    token("-1.0E13"), token("-1.0E11") };
+  private static final byte[][] FLTSTR = tokens("1.0E17", "1.0E15",
+    "1.0E13", "1.0E11", "-1.0E17", "-1.0E15", "-1.0E13", "-1.0E11");
 
   /**
    * Converts the specified token into a double value.

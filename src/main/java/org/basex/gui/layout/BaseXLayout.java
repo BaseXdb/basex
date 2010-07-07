@@ -360,7 +360,7 @@ public final class BaseXLayout {
           break;
         }
         fw += ww;
-        l = cl(s[k]);
+        l = cl(s, k);
       }
     } catch(final Exception ex) {
       Main.debug(ex);
@@ -382,7 +382,7 @@ public final class BaseXLayout {
     int fw = 0;
     try {
       // ignore faulty character sets
-      for(int k = 0; k < l; k += cl(s[k])) fw += width(g, cw, cp(s, k));
+      for(int k = 0; k < l; k += cl(s, k)) fw += width(g, cw, cp(s, k));
     } catch(final Exception ex) {
       Main.debug(ex);
     }

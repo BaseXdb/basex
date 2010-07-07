@@ -45,32 +45,24 @@ final class Stemming {
   private static final byte[] L = token("l");
 
   /** Step 2. */
-  private static final byte[][][] ST2 = { { token("ational"), token("ate") },
-    { token("tional"), token("tion") }, { token("enci"), token("ence") },
-    { token("anci"), token("ance") }, { token("izer"), token("ize") },
-    { token("izer"), token("ize") }, { token("abli"), token("able") },
-    { token("alli"), token("al") }, { token("entli"), token("ent") },
-    { token("eli"), token("e") }, { token("ousli"), token("ous") },
-    { token("ization"), token("ize") }, { token("ization"), token("ize") },
-    { token("ation"), token("ate") }, { token("ator"), token("ate") },
-    { token("alism"), token("al") }, { token("iveness"), token("ive") },
-    { token("fulness"), token("ful") }, { token("ousness"), token("ous") },
-    { token("aliti"), token("al") }, { token("iviti"), token("ive") },
-    { token("biliti"), token("ble") } };
+  private static final byte[][][] ST2 = {
+    tokens("ational", "ate"), tokens("tional", "tion"), tokens("enci", "ence"),
+    tokens("anci", "ance"), tokens("izer", "ize"), tokens("izer", "ize"),
+    tokens("abli", "able"), tokens("alli", "al"), tokens("entli", "ent"),
+    tokens("eli", "e"), tokens("ousli", "ous"), tokens("ization", "ize"),
+    tokens("ization", "ize"), tokens("ation", "ate"), tokens("ator", "ate"),
+    tokens("alism", "al"), tokens("iveness", "ive"), tokens("fulness", "ful"),
+    tokens("ousness", "ous"), tokens("aliti", "al"), tokens("iviti", "ive"),
+    tokens("biliti", "ble")};
   /** Step 3. */
-  private static final byte[][][] ST3 = { { token("icate"), token("ic") },
-    { token("ative"), token("") }, { token("alize"), token("al") },
-    { token("alize"), token("al") }, { token("iciti"), token("ic") },
-    { token("ical"), token("ic") }, { token("ful"), token("") },
-    { token("ness"), token("") } };
+  private static final byte[][][] ST3 = {
+    tokens("icate", "ic"), tokens("ative", ""), tokens("alize", "al"),
+    tokens("alize", "al"), tokens("iciti", "ic"), tokens("ical", "ic"),
+    tokens("ful", ""), tokens("ness", "") };
   /** Step 4. */
-  private static final byte[][] ST4 = {
-    token("al"), token("ance"), token("ence"), token("er"), token("ic"),
-    token("able"), token("ible"), token("ant"), token("ement"), token("ment"),
-    token("ent"), token("sion"), token("tion"), token("ou"), token("ism"),
-    token("ate"), token("iti"), token("ous"), token("ive"), token("ize"),
-    token("ize")
-  };
+  private static final byte[][] ST4 =  tokens("al", "ance", "ence", "er", "ic",
+    "able", "ible", "ant", "ement", "ment", "ent", "sion", "tion", "ou", "ism",
+    "ate", "iti", "ous", "ive", "ize", "ize");
 
   /** Token to be stemmed. */
   private byte[] tok;

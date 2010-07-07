@@ -224,7 +224,7 @@ public final class XMLSerializer extends Serializer {
         URIS.id(tagatt) != 0 ? escape(v) : v;
 
     print(ATT1);
-    for(int k = 0; k < val.length; k += cl(val[k])) {
+    for(int k = 0; k < val.length; k += cl(val, k)) {
       final int ch = cp(val, k);
       if(mth == M_HTML && (ch == '<' || ch == '&' &&
           val[Math.min(k + 1, val.length - 1)] == '{')) {
@@ -249,7 +249,7 @@ public final class XMLSerializer extends Serializer {
         mth != M_HTML && mth != M_TEXT) {
       print(CDATA1);
       int c = 0;
-      for(int k = 0; k < b.length; k += cl(b[k])) {
+      for(int k = 0; k < b.length; k += cl(b, k)) {
         final int ch = cp(b, k);
         if(ch == ']') {
           c++;
@@ -264,7 +264,7 @@ public final class XMLSerializer extends Serializer {
       }
       print(CDATA2);
     } else {
-      for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));
+      for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
     }
     ind = false;
   }
@@ -277,7 +277,7 @@ public final class XMLSerializer extends Serializer {
     final Tokenizer ftt = new Tokenizer(b, null);
     while(ftt.more()) {
       c++;
-      for(int i = wl; i < ftt.p; i += cl(b[i])) {
+      for(int i = wl; i < ftt.p; i += cl(b, i)) {
         final int ch = cp(b, i);
         if(ftChar(ch) && ftp.contains(c)) print((char) 0x10);
         ch(ch);
@@ -286,7 +286,7 @@ public final class XMLSerializer extends Serializer {
     }
     while(wl < b.length) {
       ch(cp(b, wl));
-      wl += cl(b[wl]);
+      wl += cl(b, wl);
     }
     ind = false;
   }
@@ -318,7 +318,7 @@ public final class XMLSerializer extends Serializer {
   public void item(final byte[] b) throws IOException {
     finishElement();
     if(ind) print(' ');
-    for(int k = 0; k < b.length; k += cl(b[k])) ch(cp(b, k));
+    for(int k = 0; k < b.length; k += cl(b, k)) ch(cp(b, k));
     ind = true;
     item = true;
   }
