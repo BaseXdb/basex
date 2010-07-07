@@ -207,7 +207,7 @@ public final class InexSubmit {
       //while(uri.indexOf(".xml") == -1) uri = st.nextToken();
       uri = uri.substring(uri.lastIndexOf('/') + 1, uri.indexOf(".xml") + 4);
       final String tmp = uri + ";" + p;
-      final Str str = Str.get(token(tmp));
+      final Str str = Str.get(tmp);
       str.score(Double.parseDouble(s));
       sq.add(str);
       z++;
