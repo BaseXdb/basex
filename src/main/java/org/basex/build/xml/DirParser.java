@@ -85,13 +85,14 @@ public final class DirParser extends Parser {
 
         // use global target as prefix
         String targ = target.length() != 0 ? target + '/' : "";
-        // add relative path without root (prefix) and file name (suffix)
-        final String path = file.path();
         final String name = file.name();
+        String path = file.path();
+        // add relative path without root (prefix) and file name (suffix)
         if(path.endsWith('/' + name)) {
-          targ += path.replaceAll("^" + root, "").replaceAll(name + "$", "");
+          path = path.substring(0, path.length() - name.length());
+          if(path.startsWith(root)) path = path.substring(root.length());
+          targ = (targ + path).replace("//", "/");
         }
-
         parser = Parser.fileParser(file, prop, targ);
         parser.parse(b);
 
