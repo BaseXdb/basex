@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryTokens;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
@@ -9,6 +10,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.util.TokenBuilder;
 
 /**
  * Node functions.
@@ -74,6 +76,9 @@ final class FNNode extends Fun {
         n = checkNode(it);
         while(n.parent() != null) n = n.parent();
         return n;
+      case GENID:
+        return empty ? Str.ZERO : Str.get(
+            new TokenBuilder(QueryTokens.ID).add(checkNode(it).id()).finish());
       default:
         return super.atomic(ctx);
     }

@@ -36,11 +36,11 @@ public enum FunDef {
   /** XQuery function. */
   COUNT(FNURI, FNAggr.class, 1, 1, "count(item)", ITR),
   /** XQuery function. */
-  MAX(FNURI, FNAggr.class, 1, 2, "max(item)", ITEM_ZO),
+  MAX(FNURI, FNAggr.class, 1, 2, "max(item, coll?)", ITEM_ZO),
   /** XQuery function. */
-  MIN(FNURI, FNAggr.class, 1, 2, "min(item)", ITEM_ZO),
+  MIN(FNURI, FNAggr.class, 1, 2, "min(item, coll?)", ITEM_ZO),
   /** XQuery function. */
-  SUM(FNURI, FNAggr.class, 1, 2, "sum(item, zero)", ITEM_ZO),
+  SUM(FNURI, FNAggr.class, 1, 2, "sum(item, zero?)", ITEM_ZO),
 
   /* FNContext functions. */
 
@@ -117,20 +117,64 @@ public enum FunDef {
 
   /** XQuery function. */
   FORMINT(FNURI, FNFormat.class, 2, 3,
-      "format-integer(number, picture, language?)", STR),
+      "format-integer(number, picture, lang?)", STR),
+  /** XQuery function (to be implemented). */
+  FORMNUM(FNURI, FNFormat.class, 2, 3,
+      "format-number(number, picture, name?)", STR),
+  /** XQuery function (to be implemented). */
+  FORMDTM(FNURI, FNFormat.class, 2, 5,
+      "format-dateTime(number, picture, lang?, cal?, place?)", STR),
+  /** XQuery function (to be implemented). */
+  FORMDAT(FNURI, FNFormat.class, 2, 5,
+      "format-date(number, picture, lang?, cal?, place?)", STR),
+  /** XQuery function (to be implemented). */
+  FORMTIM(FNURI, FNFormat.class, 2, 5,
+      "format-time(number, picture, lang?, cal?, place?)", STR),
+
+  /* FNFunc functions.
+
+  /** XQuery function (to be implemented).
+  FILTER(FNURI, FNFunc.class, 2, 2, "filter(function, seq)", ITEM_ZM),
+  /** XQuery function (to be implemented).
+  FUNCNAME(FNURI, FNFunc.class, 1, 1, "function-name(function)", STR),
+  /** XQuery function (to be implemented).
+  FUNCARITY(FNURI, FNFunc.class, 1, 1, "function-name(function)", ITR),
+  /** XQuery function (to be implemented).
+  MAP(FNURI, FNFunc.class, 2, 2, "map(function, seq)", ITEM_ZM),
+  /** XQuery function (to be implemented).
+  MAPPAIRS(FNURI, FNFunc.class, 2, 2, "map-pairs(function, seq1, seq2)",
+    ITEM_ZM),
+  /** XQuery function (to be implemented).
+  FOLDLEFT(FNURI, FNFunc.class, 3, 3, "fold-left(function, zero, seq)",
+    ITEM_ZM),
+  /** XQuery function (to be implemented).
+  FOLDRIGHT(FNURI, FNFunc.class, 3, 3, "fold-right(function, zero, seq)",
+    ITEM_ZM),
+  */
 
   /* FNGen functions. */
 
   /** XQuery function. */
-  DATA(FNURI, FNGen.class, 0, 1, "data(item)", ITEM_ZM),
+  DATA(FNURI, FNGen.class, 0, 1, "data(item?)", ITEM_ZM),
   /** XQuery function. */
-  COLLECTION(FNURI, FNGen.class, 0, 1, "collection(item)", NOD_ZM),
+  COLL(FNURI, FNGen.class, 0, 1, "collection(string?)", NOD_ZM),
   /** XQuery function. */
-  DOC(FNURI, FNGen.class, 1, 1, "doc(item)", NOD_ZO),
+  DOC(FNURI, FNGen.class, 1, 1, "doc(string)", NOD_ZO),
   /** XQuery function. */
-  DOCAVAILABLE(FNURI, FNGen.class, 1, 1, "doc-available(item)", BLN),
+  DOCAVL(FNURI, FNGen.class, 1, 1, "doc-available(string)", BLN),
   /** XQuery function. */
   PUT(FNURI, FNGen.class, 2, 2, "put(node, string)", ITEM_Z),
+  /** XQuery function (to be implemented). */
+  PARSETXT(FNURI, FNGen.class, 1, 2, "unparsed-text(uri, encoding?)", STR_ZO),
+  /** XQuery function (to be implemented). */
+  PARSETXTAVL(FNURI, FNGen.class, 1, 2,
+      "unparsed-text-available(uri, encoding?)", BLN),
+  /** XQuery function (to be implemented). */
+  PARSEXML(FNURI, FNGen.class, 1, 2, "parse-xml(uri, base?)", NOD),
+  /** XQuery function (to be implemented). */
+  URICOLL(FNURI, FNGen.class, 0, 1, "uri-collection(string?)", NOD),
+  /** XQuery function (to be implemented). */
+  SERIALIZE(FNURI, FNGen.class, 1, 2, "serialize(node, params?)", NOD),
 
   /* FNId functions. */
 
@@ -140,11 +184,13 @@ public enum FunDef {
   IDREF(FNURI, FNId.class, 1, 2, "idref(string, item?)", NOD_ZM),
   /** XQuery function. */
   LANG(FNURI, FNId.class, 1, 2, "lang(string, item?)", BLN),
+  /** XQuery function (to be implemented). */
+  ELID(FNURI, FNId.class, 1, 2, "lang(string, item?)", NOD_ZM),
 
   /* FNNode functions. */
 
   /** XQuery function. */
-  DOCURI(FNURI, FNNode.class, 0, 1, "document-uri(node)", URI_ZO),
+  DOCURI(FNURI, FNNode.class, 0, 1, "document-uri(node?)", URI_ZO),
   /** XQuery function. */
   NILLED(FNURI, FNNode.class, 1, 1, "nilled(node)", BLN_ZO),
   /** XQuery function. */
@@ -159,6 +205,8 @@ public enum FunDef {
   ROOT(FNURI, FNNode.class, 0, 1, "root(node?)", NOD_ZO),
   /** XQuery function. */
   BASEURI(FNURI, FNNode.class, 0, 1, "base-uri(node?)", URI_ZO),
+  /** XQuery function. */
+  GENID(FNURI, FNNode.class, 0, 1, "generate-id(node?)", STR),
 
   /* FNFile functions */
 
@@ -199,9 +247,13 @@ public enum FunDef {
   /* FNOut functions. */
 
   /** XQuery function. */
-  ERROR(FNURI, FNOut.class, 0, 3, "error(code?, desc?, object?)", ITEM_Z),
+  ERROR(FNURI, FNInfo.class, 0, 3, "error(code?, desc?, object?)", ITEM_Z),
   /** XQuery function. */
-  TRACE(FNURI, FNOut.class, 2, 2, "trace(item, message)", ITEM_ZM),
+  TRACE(FNURI, FNInfo.class, 2, 2, "trace(item, message)", ITEM_ZM),
+  /** XQuery function. */
+  ENV(FNURI, FNInfo.class, 1, 1, "get-environment-variable(string)", STR_ZO),
+  /** XQuery function. */
+  ENVS(FNURI, FNInfo.class, 0, 0, "available-environment-variables()", STR_ZM),
 
   /* FNPat functions. */
 
@@ -212,6 +264,9 @@ public enum FunDef {
       STR),
   /** XQuery function. */
   TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", STR_ZM),
+  /** XQuery function (to be implemented). */
+  ANALZYE(FNURI, FNPat.class, 2, 3, "analyze-string(input, pattern, mod?)",
+      NOD),
 
   /* FNQName functions. */
 
@@ -221,7 +276,7 @@ public enum FunDef {
   LOCNAMEQNAME(FNURI, FNQName.class, 1, 1, "local-name-from-QName(qname)",
       STR_ZO),
   /** XQuery function. */
-  NSURIPRE(FNURI, FNQName.class, 2, 2, "namespace-uri-for-prefix(pre, elem)",
+  NSURIPRE(FNURI, FNQName.class, 2, 2, "namespace-uri-for-prefix(pref, elem)",
       URI_ZO),
   /** XQuery function. */
   QNAME(FNURI, FNQName.class, 2, 2, "QName(uri, name)", QNM),
@@ -283,15 +338,15 @@ public enum FunDef {
   /** XQuery function. */
   CODESTR(FNURI, FNStr.class, 1, 1, "codepoints-to-string(num*)", STR),
   /** XQuery function. */
-  COMPARE(FNURI, FNStr.class, 2, 3, "compare(first, second, coll)", ITR_ZO),
+  COMPARE(FNURI, FNStr.class, 2, 3, "compare(first, second, coll?)", ITR_ZO),
   /** XQuery function. */
-  CONCAT(FNURI, FNStr.class, 2, 0, "concat(item, item+)", STR),
+  CONCAT(FNURI, FNStr.class, 2, Integer.MAX_VALUE, "concat(item, item+)", STR),
   /** XQuery function. */
-  CONTAINS(FNURI, FNStr.class, 2, 3, "contains(item, item)", BLN),
+  CONTAINS(FNURI, FNStr.class, 2, 3, "contains(item, item, coll?)", BLN),
   /** XQuery function. */
   ENCURI(FNURI, FNStr.class, 1, 1, "encode-for-uri(item)", STR),
   /** XQuery function. */
-  ENDS(FNURI, FNStr.class, 2, 3, "ends-with(item, item)", BLN),
+  ENDS(FNURI, FNStr.class, 2, 3, "ends-with(item, item, coll?)", BLN),
   /** XQuery function. */
   ESCURI(FNURI, FNStr.class, 1, 1, "escape-html-uri(item)", STR),
   /** XQuery function. */
@@ -299,9 +354,9 @@ public enum FunDef {
   /** XQuery function. */
   LOWER(FNURI, FNStr.class, 1, 1, "lower-case(item)", STR),
   /** XQuery function. */
-  NORMUNI(FNURI, FNStr.class, 1, 2, "normalize-unicode(string, form)", STR),
+  NORMUNI(FNURI, FNStr.class, 1, 2, "normalize-unicode(string, form?)", STR),
   /** XQuery function. */
-  STARTS(FNURI, FNStr.class, 2, 3, "starts-with(item, item)", BLN),
+  STARTS(FNURI, FNStr.class, 2, 3, "starts-with(item, item, coll?)", BLN),
   /** XQuery function. */
   STRJOIN(FNURI, FNStr.class, 1, 2, "string-join(item, sep?)", STR),
   /** XQuery function. */
@@ -309,9 +364,10 @@ public enum FunDef {
   /** XQuery function. */
   SUBSTR(FNURI, FNStr.class, 2, 3, "substring(item, start, len?)", STR),
   /** XQuery function. */
-  SUBAFTER(FNURI, FNStr.class, 2, 3, "substring-after(item, sub, coll)", STR),
+  SUBAFTER(FNURI, FNStr.class, 2, 3, "substring-after(item, sub, coll?)", STR),
   /** XQuery function. */
-  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll)", STR),
+  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll?)",
+      STR),
   /** XQuery function. */
   TRANS(FNURI, FNStr.class, 3, 3, "translate(arg, map, trans)", STR),
   /** XQuery function. */
@@ -322,19 +378,19 @@ public enum FunDef {
   /** XQuery math function. */
   PI(MATHURI, FNMath.class, 0, 0, "pi()", ITR_ZO),
   /** XQuery math function. */
-  SQRT(MATHURI, FNMath.class, 1, 1, "sqrt(number?)", ITR_ZO),
+  SQRT(MATHURI, FNMath.class, 1, 1, "sqrt(number)", ITR_ZO),
   /** XQuery math function. */
-  SIN(MATHURI, FNMath.class, 1, 1, "sin(number?)", ITR_ZO),
+  SIN(MATHURI, FNMath.class, 1, 1, "sin(number)", ITR_ZO),
   /** XQuery math function. */
-  COS(MATHURI, FNMath.class, 1, 1, "cos(number?)", ITR_ZO),
+  COS(MATHURI, FNMath.class, 1, 1, "cos(number)", ITR_ZO),
   /** XQuery math function. */
-  TAN(MATHURI, FNMath.class, 1, 1, "tan(number?)", ITR_ZO),
+  TAN(MATHURI, FNMath.class, 1, 1, "tan(number)", ITR_ZO),
   /** XQuery math function. */
-  ASIN(MATHURI, FNMath.class, 1, 1, "asin(number?)", ITR_ZO),
+  ASIN(MATHURI, FNMath.class, 1, 1, "asin(number)", ITR_ZO),
   /** XQuery math function. */
-  ACOS(MATHURI, FNMath.class, 1, 1, "acos(number?)", ITR_ZO),
+  ACOS(MATHURI, FNMath.class, 1, 1, "acos(number)", ITR_ZO),
   /** XQuery math function. */
-  ATAN(MATHURI, FNMath.class, 1, 1, "atan(number?)", ITR_ZO),
+  ATAN(MATHURI, FNMath.class, 1, 1, "atan(number)", ITR_ZO),
 
   /* FNBaseX functions. */
 

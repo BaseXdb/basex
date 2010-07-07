@@ -51,10 +51,10 @@ final class FNFormat extends Fun {
    * @throws QueryException query exception
    */
   private Str formatInt(final QueryContext ctx) throws QueryException {
+    final byte[] pic = checkStr(expr[1], ctx);
     if(expr[0].e()) return Str.ZERO;
 
     long num = checkItr(expr[0], ctx);
-    final byte[] pic = checkStr(expr[1], ctx);
     if(pic.length == 0 || num == 0) return Str.get(token(num));
 
     // choose sign
@@ -109,17 +109,16 @@ final class FNFormat extends Fun {
   }
 
   /** Roman numbers (1-10). */
-  private static final byte[][] ROMAN =
+  private static final byte[][] ROMANI =
     tokens("", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX");
   /** Roman numbers (10-100). */
-  private static final byte[][] ROMAN10 =
+  private static final byte[][] ROMANX =
     tokens("", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC");
   /** Roman numbers (100-1000). */
-  private static final byte[][] ROMAN100 =
+  private static final byte[][] ROMANC =
     tokens("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM");
   /** Roman numbers (1000-3000). */
-  private static final byte[][] ROMAN1000 =
-    tokens("", "M", "MM", "MMM");
+  private static final byte[][] ROMANM = tokens("", "M", "MM", "MMM");
   
   /**
    * Returns a Roman character sequence.
@@ -128,15 +127,18 @@ final class FNFormat extends Fun {
    */
   private void roman(final TokenBuilder tb, final long n) {
     if(n < 4000) {
-      tb.add(ROMAN1000[(int) n / 1000]);
-      tb.add(ROMAN100 [(int) n / 100 % 10]);
-      tb.add(ROMAN10  [(int) n / 10 % 10]);
-      tb.add(ROMAN    [(int) n % 10]);
+      final int v = (int) n;
+      tb.add(ROMANM[v / 1000]);
+      tb.add(ROMANC[v / 100 % 10]);
+      tb.add(ROMANX[v / 10 % 10]);
+      tb.add(ROMANI[v % 10]);
     } else {
       tb.add(n);
     }
   }
 
+  // Language dependent tokens (English is default) ===========================
+  
   /** Words (1-20). */
   private static final byte[][] WORDS = tokens("", "One", "Two", "Three",
       "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",

@@ -18,7 +18,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.SeqIter;
-import org.basex.util.Token;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -116,7 +115,7 @@ public abstract class QueryTest {
    * @return iterator
    */
   static SeqIter string(final String str) {
-    return item(Str.get(Token.token(str)));
+    return item(Str.get(str));
   }
 
   /**

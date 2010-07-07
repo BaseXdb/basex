@@ -28,10 +28,9 @@ final class FNGen extends Fun {
     switch(func) {
       case DATA:
         return data(ctx.iter(expr.length != 0 ? expr[0] : checkCtx(ctx)));
-      case COLLECTION:
+      case COLL:
         if(expr.length == 0) return ctx.coll(null);
-        final Iter iter = ctx.iter(expr[0]);
-        Item it = iter.next();
+        Item it = expr[0].atomic(ctx);
         if(it == null) Err.empty(this);
         return ctx.coll(checkStr(it));
       case PUT:
@@ -54,15 +53,12 @@ final class FNGen extends Fun {
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    final Iter iter = ctx.iter(expr[0]);
-
     switch(func) {
       case DOC:
-        Item it = iter.next();
-        return it == null ? null : it.type == Type.DOC ? it :
-          ctx.doc(checkStr(it), false, false);
-      case DOCAVAILABLE:
-        it = iter.next();
+        Item it = expr[0].atomic(ctx);
+        return it == null ? null : ctx.doc(checkStr(it), false, false);
+      case DOCAVL:
+        it = expr[0].atomic(ctx);
         if(it != null) {
           final byte[] file = checkStr(it);
           try {
@@ -78,15 +74,10 @@ final class FNGen extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    if(func == FunDef.DOC) {
-      if(!expr[0].i()) return this;
-      final Item it = (Item) expr[0];
-      return it.type == Type.DOC ? it : ctx.doc(checkStr(it), false, false);
-    } else if(func == FunDef.COLLECTION) {
-      if(expr.length == 0 || !expr[0].i()) return this;
-      final Item it = (Item) expr[0];
-      return it.type == Type.STR ? ctx.coll(checkStr(it)).finish() : this;
-    }
+    if(func == FunDef.DOC)
+      return expr[0].i() ? atomic(ctx) : this;
+    if(func == FunDef.COLL)
+      return expr.length != 0 && expr[0].i() ? iter(ctx).finish() : this;
     return this;
   }
 

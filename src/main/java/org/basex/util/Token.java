@@ -230,9 +230,8 @@ public final class Token {
     final byte v = token[pos];
     if((v & 0xFF) < 192) return v & 0xFF;
 
-    final int tl = token.length;
     final int vl = cl(v);
-    if(pos + vl >= tl) return '?';
+    if(pos + vl > token.length) return '?';
 
     // 110xxxxx 10xxxxxx
     if(vl == 2) return (v & 0x1F) << 6 | token[pos + 1] & 0x3F;
