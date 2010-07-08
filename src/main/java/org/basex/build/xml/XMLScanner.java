@@ -13,7 +13,7 @@ import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
-import org.basex.io.XMLInput;
+import org.basex.io.TextInput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
@@ -73,7 +73,7 @@ final class XMLScanner extends Progress {
   /** Current quote character. */
   private int quote;
   /** XML input. */
-  private XMLInput input;
+  private TextInput input;
 
   /**
    * Initializes the scanner.
@@ -82,7 +82,7 @@ final class XMLScanner extends Progress {
    * @throws IOException I/O exception
    */
   XMLScanner(final IO f, final Prop pr) throws IOException {
-    input = new XMLInput(f);
+    input = new TextInput(f);
     ents = new TokenMap();
     ents.add(E_AMP, AMP);
     ents.add(E_APOS, APOS);
@@ -142,8 +142,8 @@ final class XMLScanner extends Progress {
    * Finishes file scanning.
    * @throws IOException I/O exception
    */
-  void finish() throws IOException {
-    input.finish();
+  void close() throws IOException {
+    input.close();
     if(prolog) error(DOCEMPTY);
   }
 
@@ -694,11 +694,11 @@ final class XMLScanner extends Progress {
         final String name = string(tok.finish());
         if(!dtd && r) return cont;
 
-        final XMLInput tin = input;
+        final TextInput tin = input;
         try {
           final IO file = input.io().merge(name);
           cont = file.content();
-          input = new XMLInput(new IOContent(cont, name));
+          input = new TextInput(new IOContent(cont, name));
         } catch(final IOException ex) {
           Main.debug(ex);
           error(PARSEERR, name);
@@ -941,8 +941,8 @@ final class XMLScanner extends Progress {
       }
     }
 
-    final XMLInput tmp = input;
-    input = new XMLInput(new IOContent(tok.finish()));
+    final TextInput tmp = input;
+    input = new TextInput(new IOContent(tok.finish()));
     tok = new TokenBuilder();
     while((ch = consume()) != 0) {
       if(ch == '&') tok.add(ref(false));

@@ -10,7 +10,7 @@ import org.basex.core.cmd.Check;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
-import org.basex.io.XMLInput;
+import org.basex.io.TextInput;
 import org.basex.util.Args;
 
 /**
@@ -93,7 +93,7 @@ public class BaseX extends Main {
       errln(FILEWHICH, file);
     } else {
       try {
-        return XMLInput.content(io).toString().trim();
+        return TextInput.content(io).toString().trim();
       } catch(final IOException ex) {
         error(ex, ex.getMessage());
       }

@@ -35,8 +35,24 @@ final class FNId extends Fun {
       case ID:    return id(ctx.iter(expr[0]), node);
       case IDREF: return idref(ctx.iter(expr[0]), node);
       case LANG:  return lang(lc(checkStr(expr[0], ctx)), node);
+      case ELID:  return elid(ctx.iter(expr[0]), node);
       default:    return super.iter(ctx);
     }
+  }
+
+  /**
+   * Returns the parent result of the ID function.
+   * @param it item ids to be found
+   * @param node attribute
+   * @return resulting node list
+   * @throws QueryException query exception
+   */
+  private Iter elid(final Iter it, final Nod node) throws QueryException {
+    final NodIter nb = id(it, node);
+    final NodIter par = new NodIter(true);
+    Nod n;
+    while((n = nb.next()) != null) par.add(n.parent());
+    return par;
   }
 
   /**
@@ -46,7 +62,7 @@ final class FNId extends Fun {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  private Iter id(final Iter it, final Nod node) throws QueryException {
+  private NodIter id(final Iter it, final Nod node) throws QueryException {
     final NodIter nb = new NodIter(true);
     add(ids(it), nb, checkRoot(node));
     return nb;

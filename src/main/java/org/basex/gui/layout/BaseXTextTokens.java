@@ -186,7 +186,7 @@ public final class BaseXTextTokens {
   }
 
   /**
-   * Returns the the byte array, chopping the unused bytes.
+   * Returns the byte array, chopping the unused bytes.
    * @return character array
    */
   byte[] finish() {

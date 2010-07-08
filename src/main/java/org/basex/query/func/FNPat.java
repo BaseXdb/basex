@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryContext;
@@ -42,6 +43,7 @@ final class FNPat extends Fun {
     switch(func) {
       case MATCH:   return match(checkStr(expr[0], ctx), ctx);
       case REPLACE: return replace(checkStr(expr[0], ctx), ctx);
+      case ANALZYE: Err.or(NOTIMPL, func.desc); return null;
       default:      return super.atomic(ctx);
     }
   }

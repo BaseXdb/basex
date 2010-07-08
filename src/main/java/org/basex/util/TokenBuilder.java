@@ -10,6 +10,8 @@ import java.util.Arrays;
  * @author Christian Gruen
  */
 public final class TokenBuilder {
+  /** Resize factor for extending the byte arrays. */
+  private double factor = 1.5;
   /** Character array. */
   private byte[] chars;
   /** Entity flag. */
@@ -62,6 +64,16 @@ public final class TokenBuilder {
    */
   public void reset() {
     size = 0;
+  }
+
+  /**
+   * Sets the resize factor.
+   * @param f resize factor
+   * @return self reference
+   */
+  public TokenBuilder factor(final double f) {
+    factor = f;
+    return this;
   }
 
   /**
@@ -120,7 +132,9 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final byte b) {
-    if(size == chars.length) chars = Arrays.copyOf(chars, size << 1);
+    if(size == chars.length) {
+      chars = Arrays.copyOf(chars, Math.max(size + 1, (int) (size * factor)));
+    }
     chars[size++] = b;
     return this;
   }
@@ -176,14 +190,15 @@ public final class TokenBuilder {
    * @param e end position
    */
   public void add(final byte[] b, final int s, final int e) {
-    final int bs = e - s;
-    if(size + bs > chars.length) {
-      int ns = chars.length << 1;
-      while(size + bs > ns) ns <<= 1;
+    final int l = e - s;
+    final int cl = chars.length;
+    if(size + l > cl) {
+      int ns = Math.max(cl + 1, (int) (cl * factor));
+      if(ns < size + l) ns = size + l;
       chars = Arrays.copyOf(chars, size + ns);
     }
-    System.arraycopy(b, s, chars, size, bs);
-    size += bs;
+    System.arraycopy(b, s, chars, size, l);
+    size += l;
   }
 
   /**
@@ -232,17 +247,6 @@ public final class TokenBuilder {
     while(++s < size && Token.ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
     size -= s;
-  }
-
-  /**
-   * Reverses the byte order.
-   */
-  public void reverse() {
-    for(int i = 0, s = size - 1; i < s; i++, s--) {
-      byte b = chars[i];
-      chars[i] = chars[s];
-      chars[s] = b;
-    }
   }
 
   /**

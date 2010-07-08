@@ -11,7 +11,7 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public final class IntArrayList implements Iterable<int[]> {
-  /** Resize factor for extending the the byte arrays. */
+  /** Resize factor for extending the byte arrays. */
   private final double factor = 2;
   /** Value array. */
   int[][] list;

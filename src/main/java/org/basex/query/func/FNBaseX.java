@@ -4,11 +4,10 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.data.Data.IndexType;
 import org.basex.io.IO;
-import org.basex.io.XMLInput;
+import org.basex.io.TextInput;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -79,11 +78,10 @@ final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Item run(final QueryContext ctx) throws QueryException {
-    final IO io = file(ctx);
+    final IO io = checkIO(expr[0], ctx);
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
-      Main.debug(ex);
       Err.or(NODOC, ex.getMessage());
       return null;
     }
@@ -112,9 +110,8 @@ final class FNBaseX extends Fun {
    */
   private Item read(final QueryContext ctx) throws QueryException {
     try {
-      return Str.get(XMLInput.content(file(ctx)).finish());
+      return Str.get(TextInput.content(checkIO(expr[0], ctx)).finish());
     } catch(final IOException ex) {
-      Main.debug(ex);
       Err.or(NODOC, ex.getMessage());
       return null;
     }
@@ -140,20 +137,6 @@ final class FNBaseX extends Fun {
       tb.add(data.fs.path(((DBNode) it.atomic(ctx)).pre, false));
     }
     return tb.size() == 0 ? Str.ZERO : Str.get(tb.finish());
-  }
-
-  /**
-   * Returns a file instance for the first argument.
-   * @param ctx query context
-   * @return io instance
-   * @throws QueryException query exception
-   */
-  private IO file(final QueryContext ctx) throws QueryException {
-    checkAdmin(ctx);
-    final byte[] name = checkStr(expr[0], ctx);
-    final IO io = IO.get(string(name));
-    if(!io.exists()) Err.or(DOCERR, name);
-    return io;
   }
 
   /**

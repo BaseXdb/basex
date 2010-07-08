@@ -1,11 +1,13 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
+import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -20,6 +22,12 @@ final class FNFormat extends Fun {
     switch(func) {
       case FORMINT:
         return formatInt(ctx);
+      case FORMNUM:
+      case FORMDTM:
+      case FORMDAT:
+      case FORMTIM:
+        Err.or(NOTIMPL, func.desc);
+        return null;        
       default:
         return super.atomic(ctx);
     }

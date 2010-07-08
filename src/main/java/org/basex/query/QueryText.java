@@ -30,6 +30,9 @@ public interface QueryText {
   /** XQUS Error type. */ String XUST = "XUST";
   /** XUTY Error type. */ String XUTY = "XUTY";
 
+  /** BASX0000: Evaluation exception. */
+  Object[] NOTIMPL = { BASX, 0, "Not implemented yet: %" };
+
   /** BASX0001: Evaluation exception. */
   Object[] NOIDX = { BASX, 1, "Index not available: '%'." };
   /** BASX0002: Evaluation exception. */

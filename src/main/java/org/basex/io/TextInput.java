@@ -6,13 +6,13 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * This class provides a convenient access to XML input.
- * The encoding will be dynamically adjusted.
+ * This class provides a convenient access to text input.
+ * The encoding will be determined, analyzing the input.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class XMLInput {
+public final class TextInput {
   /** Input stream reference. */
   private BufferInput[] in = new BufferInput[1];
   /** Input pointer. */
@@ -22,7 +22,7 @@ public final class XMLInput {
   /** Current line. */
   private int line = 1;
 
-  /** Buffer with most current characters. */
+  /** Buffer with most recent characters. */
   private final int[] last = new int[16];
   /** Read position. */
   private int lp;
@@ -34,7 +34,7 @@ public final class XMLInput {
    * @param f file reference
    * @throws IOException I/O exception
    */
-  public XMLInput(final IO f) throws IOException {
+  public TextInput(final IO f) throws IOException {
     in[0] = f.buffer();
     in[0].encoding();
     file = f;
@@ -47,11 +47,24 @@ public final class XMLInput {
    * @throws IOException I/O exception
    */
   public static TokenBuilder content(final IO in) throws IOException {
-    final XMLInput xml = new XMLInput(in);
-    final int len = (int) xml.length();
-    final TokenBuilder tb = new TokenBuilder(len);
-    while(xml.pos() < len) tb.addUTF(xml.next());
-    xml.finish();
+    return content(in, null);
+  }
+
+  /**
+   * Returns the contents of the specified file, using the specified encoding.
+   * @param in input path
+   * @param enc encoding (will be ignored if set to {@code null})
+   * @return file contents
+   * @throws IOException I/O exception
+   */
+  public static TokenBuilder content(final IO in, final String enc)
+      throws IOException {
+    final TextInput ti = new TextInput(in);
+    if(enc != null) ti.encoding(enc);
+    final int len = (int) ti.length();
+    final TokenBuilder tb = new TokenBuilder(len).factor(1.2);
+    while(ti.pos() < len) tb.addUTF(ti.next());
+    ti.close();
     return tb;
   }
 
@@ -124,7 +137,7 @@ public final class XMLInput {
    * Finishes file input.
    * @throws IOException I/O exception
    */
-  public void finish() throws IOException {
+  public void close() throws IOException {
     in[0].close();
   }
 

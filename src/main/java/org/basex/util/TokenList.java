@@ -13,7 +13,7 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public final class TokenList implements Iterable<byte[]> {
-  /** Resize factor for extending the the byte arrays. */
+  /** Resize factor for extending the byte arrays. */
   private double factor = 2;
   /** Value array. */
   byte[][] list;

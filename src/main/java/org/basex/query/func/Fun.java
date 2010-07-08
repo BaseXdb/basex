@@ -2,12 +2,15 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.core.Text;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Serializer;
+import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
@@ -113,7 +116,7 @@ public abstract class Fun extends Arr {
 
   /**
    * Checks if the specified item is a node.
-   * Returns a token representation or an exception.
+   * Returns the node or an exception.
    * @param it item to be checked
    * @return item
    * @throws QueryException query exception
@@ -135,6 +138,23 @@ public abstract class Fun extends Arr {
     final Item it = e.atomic(ctx);
     if(it == null) Err.empty(this);
     if(!it.s() || !Token.eq(URLCOLL, it.str())) Err.or(IMPLCOL, e);
+  }
+
+  /**
+   * Checks if an expression yields a valid {@link IO} instance.
+   * Returns the instance or an exception.
+   * @param e expression to be evaluated
+   * @param ctx query context
+   * @return io instance
+   * @throws QueryException query exception
+   */
+  protected IO checkIO(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    checkAdmin(ctx);
+    final byte[] name = checkStr(e, ctx);
+    final IO io = IO.get(string(name));
+    if(!io.exists()) Err.or(DOCERR, name);
+    return io;
   }
 
   /**

@@ -118,39 +118,38 @@ public enum FunDef {
   /** XQuery function. */
   FORMINT(FNURI, FNFormat.class, 2, 3,
       "format-integer(number, picture, lang?)", STR),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   FORMNUM(FNURI, FNFormat.class, 2, 3,
       "format-number(number, picture, name?)", STR),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   FORMDTM(FNURI, FNFormat.class, 2, 5,
       "format-dateTime(number, picture, lang?, cal?, place?)", STR),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   FORMDAT(FNURI, FNFormat.class, 2, 5,
       "format-date(number, picture, lang?, cal?, place?)", STR),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   FORMTIM(FNURI, FNFormat.class, 2, 5,
       "format-time(number, picture, lang?, cal?, place?)", STR),
 
-  /* FNFunc functions.
+  /* FNFunc functions. */
 
-  /** XQuery function (to be implemented).
+  /** XQuery function. */
   FILTER(FNURI, FNFunc.class, 2, 2, "filter(function, seq)", ITEM_ZM),
-  /** XQuery function (to be implemented).
+  /** XQuery function. */
   FUNCNAME(FNURI, FNFunc.class, 1, 1, "function-name(function)", STR),
-  /** XQuery function (to be implemented).
-  FUNCARITY(FNURI, FNFunc.class, 1, 1, "function-name(function)", ITR),
-  /** XQuery function (to be implemented).
+  /** XQuery function. */
+  FUNCARITY(FNURI, FNFunc.class, 1, 1, "function-arity(function)", ITR),
+  /** XQuery function. */
   MAP(FNURI, FNFunc.class, 2, 2, "map(function, seq)", ITEM_ZM),
-  /** XQuery function (to be implemented).
+  /** XQuery function. */
   MAPPAIRS(FNURI, FNFunc.class, 2, 2, "map-pairs(function, seq1, seq2)",
     ITEM_ZM),
-  /** XQuery function (to be implemented).
+  /** XQuery function. */
   FOLDLEFT(FNURI, FNFunc.class, 3, 3, "fold-left(function, zero, seq)",
     ITEM_ZM),
-  /** XQuery function (to be implemented).
+  /** XQuery function. */
   FOLDRIGHT(FNURI, FNFunc.class, 3, 3, "fold-right(function, zero, seq)",
     ITEM_ZM),
-  */
 
   /* FNGen functions. */
 
@@ -164,16 +163,16 @@ public enum FunDef {
   DOCAVL(FNURI, FNGen.class, 1, 1, "doc-available(string)", BLN),
   /** XQuery function. */
   PUT(FNURI, FNGen.class, 2, 2, "put(node, string)", ITEM_Z),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   PARSETXT(FNURI, FNGen.class, 1, 2, "unparsed-text(uri, encoding?)", STR_ZO),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   PARSETXTAVL(FNURI, FNGen.class, 1, 2,
       "unparsed-text-available(uri, encoding?)", BLN),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   PARSEXML(FNURI, FNGen.class, 1, 2, "parse-xml(uri, base?)", NOD),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   URICOLL(FNURI, FNGen.class, 0, 1, "uri-collection(string?)", NOD),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   SERIALIZE(FNURI, FNGen.class, 1, 2, "serialize(node, params?)", NOD),
 
   /* FNId functions. */
@@ -184,8 +183,8 @@ public enum FunDef {
   IDREF(FNURI, FNId.class, 1, 2, "idref(string, item?)", NOD_ZM),
   /** XQuery function. */
   LANG(FNURI, FNId.class, 1, 2, "lang(string, item?)", BLN),
-  /** XQuery function (to be implemented). */
-  ELID(FNURI, FNId.class, 1, 2, "lang(string, item?)", NOD_ZM),
+  /** XQuery function. */
+  ELID(FNURI, FNId.class, 1, 2, "element-with-id(string, item?)", NOD_ZM),
 
   /* FNNode functions. */
 
@@ -264,7 +263,7 @@ public enum FunDef {
       STR),
   /** XQuery function. */
   TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", STR_ZM),
-  /** XQuery function (to be implemented). */
+  /** XQuery function. */
   ANALZYE(FNURI, FNPat.class, 2, 3, "analyze-string(input, pattern, mod?)",
       NOD),
 

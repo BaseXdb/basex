@@ -10,7 +10,7 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public class IntList {
-  /** Resize factor for extending the the byte arrays. */
+  /** Resize factor for extending the byte arrays. */
   private double factor = 2;
   /** Value array. */
   protected int[] list;

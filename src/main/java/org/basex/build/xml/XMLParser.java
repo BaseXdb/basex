@@ -55,8 +55,7 @@ public class XMLParser extends FileParser {
       }
       if(!scanner.more()) break;
     }
-    scanner.finish();
-
+    scanner.close();
     builder.encoding(scanner.encoding);
   }
 
