@@ -60,7 +60,7 @@ public final class CollectionQueryExample {
     System.out.println("\n* Drop the database.");
 
     new DropDB("Collection").execute(context);
-    
+
     // ------------------------------------------------------------------------
     // Close the database context
     context.close();

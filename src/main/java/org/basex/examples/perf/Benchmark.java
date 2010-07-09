@@ -1,7 +1,6 @@
 package org.basex.examples.perf;
 
 import static java.lang.System.*;
-
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
@@ -49,16 +48,16 @@ public abstract class Benchmark {
     if(!parseArguments(args)) return false;
 
     final Context ctx = new Context();
-    
+
     // check if server is (not) running
     start = !local &&
       !BaseXServer.ping("localhost", ctx.prop.num(Prop.SERVERPORT));
-    
+
     if(start) new BaseXServer();
-    
+
     session = local ? new LocalSession(ctx) :
       new ClientSession(ctx, "admin", "admin");
-    
+
     // create test database
     session.execute(new Set(Prop.QUERYINFO, true));
 
@@ -97,7 +96,7 @@ public abstract class Benchmark {
   protected void update(final String... queries) throws Exception {
     update(1, queries);
   }
-  
+
   /**
    * Creates a new database instance and performs a query for the
    * specified number of runs.
@@ -173,7 +172,7 @@ public abstract class Benchmark {
    */
   protected boolean parseArguments(final String[] args) {
     final Args arg = new Args(args, this,
-        " [-lr] document\n" + 
+        " [-lr] document\n" +
         " -l        use local session\n" +
         " -m<max>   maximum #ms for a single query\n" +
         " -M<max>   total maximum #ms\n" +

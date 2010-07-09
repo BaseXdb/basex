@@ -50,7 +50,7 @@ public final class StressTest {
 
     // create test database
     System.out.println("\n* Create test database.");
-    final CreateDB cmd = new CreateDB("test", INPUT); 
+    final CreateDB cmd = new CreateDB("test", INPUT);
     cmd.execute(CONTEXT);
     System.out.print(cmd.info());
 
@@ -73,7 +73,7 @@ public final class StressTest {
     // drop database
     System.out.println("\n* Drop test database.");
 
-    final DropDB cmd = new DropDB("test"); 
+    final DropDB cmd = new DropDB("test");
     cmd.execute(CONTEXT);
     System.out.print(cmd.info());
   }

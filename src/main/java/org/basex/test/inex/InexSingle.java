@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.OutputStream;
 import java.util.HashMap;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.LocalSession;

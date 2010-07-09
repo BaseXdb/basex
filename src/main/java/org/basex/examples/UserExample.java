@@ -74,7 +74,7 @@ public class UserExample {
 
     new DropUser("testuser").execute(context);
     new DropDB("input").execute(context);
-    
+
     // ------------------------------------------------------------------------
     // Close the database context
     context.close();

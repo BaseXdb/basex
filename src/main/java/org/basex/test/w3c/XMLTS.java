@@ -2,7 +2,6 @@ package org.basex.test.w3c;
 
 import static org.basex.core.Text.*;
 import java.io.File;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;

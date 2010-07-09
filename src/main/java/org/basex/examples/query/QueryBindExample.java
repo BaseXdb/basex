@@ -74,7 +74,7 @@ public final class QueryBindExample {
     // ------------------------------------------------------------------------
     // Close the query processor
     processor.close();
-    
+
     // ------------------------------------------------------------------------
     // Close the database context
     context.close();

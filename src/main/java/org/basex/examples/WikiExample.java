@@ -65,7 +65,7 @@ public final class WikiExample {
     System.out.println("\n* Drop the database.");
 
     new DropDB("WikiExample").execute(context);
-    
+
     // ------------------------------------------------------------------------
     // Close the database context
     context.close();

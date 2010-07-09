@@ -79,7 +79,7 @@ public final class DatabaseExample {
     System.out.println("* Drop the database.");
 
     new DropDB("DBExample").execute(context);
-    
+
     // ------------------------------------------------------------------------
     // Close the database context
     context.close();

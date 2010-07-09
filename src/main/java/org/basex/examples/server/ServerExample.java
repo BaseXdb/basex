@@ -64,7 +64,7 @@ public final class ServerExample {
     } catch(final BaseXException ex) {
       System.out.println(ex.getMessage());
     }
-    
+
     // ------------------------------------------------------------------------
     // Drop the database
     System.out.println("\n* Close and drop the database.");

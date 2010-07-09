@@ -67,7 +67,7 @@ public final class CollectionExample {
     System.out.println("* Drop the collection.");
 
     new DropDB("Collection").execute(context);
-    
+
     // ------------------------------------------------------------------------
     // Close the database context
     context.close();
