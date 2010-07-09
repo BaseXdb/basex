@@ -13,7 +13,7 @@ try {
   
   try {
     // create query instance
-    $input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
+    $input = 'for $i in 1 to 10 return <xml>Text { $i }</xml>';
     $query = $session->query($input);
 
     // loop through all results
