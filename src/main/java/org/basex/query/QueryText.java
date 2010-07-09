@@ -70,7 +70,7 @@ public interface QueryText {
   /** FODC0002: Evaluation exception. */
   Object[] COLLINV = { FODC, 2, "Invalid collection \"%\"." };
   /** FODC0002: Evaluation exception. */
-  Object[] COLLDEF = { FODC, 2, "No default collection available." };
+  Object[] NODEFCOLL = { FODC, 2, "No default collection available." };
   /** FODC0002: Evaluation exception. */
   Object[] NODOC = { FODC, 2, "%" };
   /** FODC0002: Evaluation exception. */
@@ -79,6 +79,10 @@ public interface QueryText {
   Object[] NOCOLL = { FODC, 4, "%" };
   /** FODC0005: Evaluation exception. */
   Object[] INVDOC = { FODC, 5, "Invalid document \"%\"." };
+  /** FODC0006: Evaluation exception. */
+  Object[] DOCWF = { FODC, 6, "Document \"%\" is not well-formed." };
+  /** FODC0007: Evaluation exception. */
+  Object[] DOCBASE = { FODC, 7, "Base-uri % is invalid." };
 
   /** FODT0002: Evaluation exception. */
   Object[] DATEZERO = { FODT, 2, "Invalid infinity/zero calculation in %." };

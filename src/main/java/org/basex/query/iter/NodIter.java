@@ -42,12 +42,12 @@ public final class NodIter extends NodeIter {
   }
 
   /**
-   * Constructor.
-   * @param it item array
+   * Constructor, specifying an array of sorted nodes.
+   * @param it node array
    * @param s size
    */
   public NodIter(final Nod[] it, final int s) {
-    this(false);
+    dupl = false;
     item = it;
     size = s;
   }

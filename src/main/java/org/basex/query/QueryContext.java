@@ -474,23 +474,21 @@ public final class QueryContext extends Progress {
    * @return collection
    * @throws QueryException query exception
    */
-  public SeqIter coll(final byte[] coll) throws QueryException {
+  public NodIter coll(final byte[] coll) throws QueryException {
     // no collection specified.. return default collection/current context set
+    int c = 0;
     if(coll == null) {
-      if(colls == 0) Err.or(COLLDEF);
-      return new SeqIter(collect[0].item, (int) collect[0].size());
-    }
+      // no default collection was defined
+      if(colls == 0) Err.or(NODEFCOLL);
+    } else {
+      // invalid collection reference
+      if(contains(coll, '<') || contains(coll, '\\'))
+        Err.or(COLLINV, Err.chop(coll));
 
-    // invalid collection reference
-    if(contains(coll, '<') || contains(coll, '\\'))
-      Err.or(COLLINV, Err.chop(coll));
-
-    int c = -1;
-    while(true) {
-      if(++c == colls) addDocs(doc(coll, true, false));
-      else if(!eq(collName[c], coll)) continue;
-      return new SeqIter(collect[c].item, (int) collect[c].size());
+      while(c < colls && !eq(collName[c], coll)) c++;
+      if(c == colls) addDocs(doc(coll, true, false));
     }
+    return new NodIter(collect[c].item, (int) collect[c].size());
   }
 
   /**

@@ -171,7 +171,7 @@ public enum FunDef {
   /** XQuery function. */
   PARSEXML(FNURI, FNGen.class, 1, 2, "parse-xml(uri, base?)", NOD),
   /** XQuery function. */
-  URICOLL(FNURI, FNGen.class, 0, 1, "uri-collection(string?)", NOD),
+  URICOLL(FNURI, FNGen.class, 0, 1, "uri-collection(string?)", URI_ZM),
   /** XQuery function. */
   SERIALIZE(FNURI, FNGen.class, 1, 2, "serialize(node, params?)", NOD),
 

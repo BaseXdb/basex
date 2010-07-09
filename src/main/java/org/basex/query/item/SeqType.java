@@ -54,6 +54,8 @@ public final class SeqType {
   public static final SeqType QNM_ZO = new SeqType(Type.QNM, Occ.ZO);
   /** Zero or one URIs. */
   public static final SeqType URI_ZO = new SeqType(Type.URI, Occ.ZO);
+  /** Zero or more URIs. */
+  public static final SeqType URI_ZM = new SeqType(Type.URI, Occ.ZM);
   /** Single URI. */
   public static final SeqType URI = new SeqType(Type.URI, Occ.O);
   /** Zero or more nodes. */

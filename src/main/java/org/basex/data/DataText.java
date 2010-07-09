@@ -199,7 +199,9 @@ public interface DataText {
   byte[] CHARSET = token("; charset=");
 
   /** Serialization error. */
-  String SERMAPS = "Character map '%' is not defined.";
+  String SERMAPS = "[SERE0000] Character map '%' is not defined.";
+  /** Serialization error. */
+  String SERKEY = "[SERE0000] Parameter '%' is unknown.";
   /** Serialization error SESU0007. */
   String SERENCODING = "[SESU0007] Unknown encoding: '%'";
   /** Serialization error SEPOM0009. */
@@ -214,8 +216,6 @@ public interface DataText {
   String SERVAL = "[SEPM0016] Parameter '%' must be set to '%'";
   /** Serialization error. */
   String SERVAL2 = " or '%'";
-  /** Serialization error. */
-  String SERKEY = "Parameter '%' is unknown.";
 
   // TABLE SERIALIZATION ======================================================
 

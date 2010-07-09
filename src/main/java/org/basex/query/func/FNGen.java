@@ -3,7 +3,14 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import org.basex.build.MemBuilder;
+import org.basex.build.Parser;
+import org.basex.core.Prop;
+import org.basex.data.SerializerProp;
+import org.basex.data.XMLSerializer;
+import org.basex.io.CachedOutput;
 import org.basex.io.IO;
+import org.basex.io.IOContent;
 import org.basex.io.TextInput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -11,6 +18,7 @@ import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Atm;
 import org.basex.query.item.Bln;
+import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.SeqType;
@@ -18,8 +26,11 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
+import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
+import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
 /**
@@ -35,10 +46,11 @@ final class FNGen extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case DATA: return data(ctx);
-      case COLL: return coll(ctx);
-      case PUT:  return put(ctx);
-      default:   return super.iter(ctx);
+      case DATA:    return data(ctx);
+      case COLL:    return collection(ctx);
+      case PUT:     return put(ctx);
+      case URICOLL: return uriCollection(ctx);
+      default:      return super.iter(ctx);
     }
   }
 
@@ -46,12 +58,11 @@ final class FNGen extends Fun {
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
       case DOC:         return doc(ctx);
-      case DOCAVL:      return docavl(ctx);
-      case PARSETXT:    return parsetxt(ctx);
-      case PARSETXTAVL: return parsetxtavl(ctx);
-      case PARSEXML:
-      case URICOLL:
-      case SERIALIZE:   Err.or(NOTIMPL, func.desc); return null;
+      case DOCAVL:      return docAvailable(ctx);
+      case PARSETXT:    return unparsedText(ctx);
+      case PARSETXTAVL: return unparsedTextAvailable(ctx);
+      case PARSEXML:    return parseXml(ctx);
+      case SERIALIZE:   return serialize(ctx);
       default:          return super.atomic(ctx);
     }
   }
@@ -93,11 +104,28 @@ final class FNGen extends Fun {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private Iter coll(final QueryContext ctx) throws QueryException {
-    if(expr.length == 0) return ctx.coll(null);
-    final Item it = expr[0].atomic(ctx);
-    if(it == null) Err.empty(this);
-    return ctx.coll(checkStr(it));
+  private NodIter collection(final QueryContext ctx) throws QueryException {
+    byte[] coll = null;
+    if(expr.length != 0) {
+      final Item it = expr[0].atomic(ctx);
+      if(it == null) Err.empty(this);
+      coll = checkStr(it);
+    }
+    return ctx.coll(coll);
+  }
+
+  /**
+   * Performs the uri-collection function.
+   * @param ctx query context
+   * @return resulting iterator
+   * @throws QueryException query exception
+   */
+  private SeqIter uriCollection(final QueryContext ctx) throws QueryException {
+    final NodIter coll = collection(ctx);
+    final SeqIter ir = new SeqIter();
+    Nod it = null;
+    while((it = coll.next()) != null) ir.add(Uri.uri(it.base()));
+    return ir;
   }
 
   /**
@@ -138,7 +166,7 @@ final class FNGen extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Bln docavl(final QueryContext ctx) throws QueryException {
+  private Bln docAvailable(final QueryContext ctx) throws QueryException {
     try {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
@@ -153,8 +181,8 @@ final class FNGen extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item parsetxt(final QueryContext ctx) throws QueryException {
-    return parsetxt(ctx, false);
+  private Item unparsedText(final QueryContext ctx) throws QueryException {
+    return unparsedText(ctx, false);
   }
 
   /**
@@ -163,9 +191,11 @@ final class FNGen extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Bln parsetxtavl(final QueryContext ctx) throws QueryException {
+  private Bln unparsedTextAvailable(final QueryContext ctx)
+      throws QueryException {
+
     try {
-      return Bln.get(parsetxt(ctx, true) != null);
+      return Bln.get(unparsedText(ctx, true) != null);
     } catch(final QueryException ex) {
       if(!ex.code().startsWith(QueryText.FODC)) throw ex;
       return Bln.FALSE;
@@ -179,7 +209,7 @@ final class FNGen extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Str parsetxt(final QueryContext ctx, final boolean cache)
+  private Str unparsedText(final QueryContext ctx, final boolean cache)
       throws QueryException {
 
     final IO io = checkIO(expr[0], ctx);
@@ -196,6 +226,63 @@ final class FNGen extends Fun {
     } catch(final IOException ex) {
       Err.or(NODOC, ex.getMessage() != null ? ex.getMessage() : ex.toString());
       return null;
+    }
+  }
+
+  /**
+   * Performs the parse-xml function.
+   * @param ctx query context
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  private Nod parseXml(final QueryContext ctx) throws QueryException {
+    final byte[] cont = checkStr(expr[0], ctx);
+    Uri base = ctx.baseURI;
+    if(expr.length == 2) {
+      base = Uri.uri(checkStr(expr[1], ctx));
+      if(!base.valid()) Err.or(DOCBASE, base);
+    }
+    
+    final Prop prop = ctx.context.prop;
+    final IO io = new IOContent(cont, string(base.str()));
+    try {
+      final Parser p = Parser.fileParser(io, prop, "");
+      return new DBNode(MemBuilder.build(p, prop, ""), 0);
+    } catch(final IOException ex) {
+      Err.or(DOCWF, cont);
+      return null;
+    }
+  }
+
+  /**
+   * Performs the serialize function.
+   * @param ctx query context
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  private Str serialize(final QueryContext ctx) throws QueryException {
+    final Item it = expr[0].atomic(ctx);
+    if(it == null) Err.empty(this);
+    final Nod nod = checkNode(it);
+
+    // interpret query parameters
+    final TokenBuilder tb = new TokenBuilder();
+    if(expr.length == 2) {
+      final Iter ir = expr[1].iter(ctx);
+      Item n;
+      while((n = ir.next()) != null) {
+        final Nod p = checkNode(n);
+        if(tb.size() != 0) tb.add(',');
+        tb.add(p.nname()).add('=').add(p.str());
+      }
+    }
+    try {
+      // run serialization
+      final CachedOutput co = new CachedOutput();
+      nod.serialize(new XMLSerializer(co, new SerializerProp(tb.toString())));
+      return Str.get(co.finish());
+    } catch(final IOException ex) {
+      throw new QueryException(ex.getMessage());
     }
   }
   

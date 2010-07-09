@@ -30,7 +30,7 @@ public final class InfoView extends View {
   private final BaseXLabel header;
   /** Timer label. */
   private final BaseXLabel timer;
-  /** Timer label. */
+  /** North label. */
   private final BaseXBack north;
   /** Text Area. */
   private final BaseXText area;
@@ -138,7 +138,8 @@ public final class InfoView extends View {
         --i;
       } else if(line.startsWith(QUERYCOMP)) {
         while(++i < split.length && split[i].length() != 0) comp.add(split[i]);
-        res = split[i].substring(split[i].indexOf(':') + 1).trim();
+      } else if(line.startsWith(QUERYRESULT)) {
+        res = line.substring(s + 1).trim();
       } else if(line.startsWith(QUERYEVAL)) {
         while(split[++i].startsWith(QUERYSEP)) eval.add(split[i]);
         --i;
@@ -149,6 +150,8 @@ public final class InfoView extends View {
 
     final TokenBuilder tb = new TokenBuilder();
     String time = "";
+    stat = il;
+    strings = sl;
 
     final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     if(sl.size() != 0) {
@@ -165,8 +168,6 @@ public final class InfoView extends View {
       time = "";
     }
 
-    stat = il;
-    strings = sl;
     area.setText(tb.finish());
     timer.setText(time);
     repaint();

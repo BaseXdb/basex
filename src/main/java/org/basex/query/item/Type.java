@@ -638,7 +638,7 @@ public enum Type {
           final Data data = MemBuilder.build(p, new Prop(false));
           return new DBNode(data, 0);
         } catch(final IOException ex) {
-          throw new QueryException(UNDOC, ex.getMessage());
+          Err.or(UNDOC, ex.getMessage());
         }
       }
       // document fragment
