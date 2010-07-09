@@ -1,24 +1,16 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
-
+import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.core.Main;
-import org.basex.core.Text;
-import org.basex.core.User;
-import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Serializer;
-import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -70,62 +62,6 @@ public abstract class Fun extends Arr {
     return this;
   }
 
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return func.ret;
-  }
-
-  /**
-   * Checks the data type and throws an exception, if necessary.
-   * @param i item to be checked
-   * @param t type to be checked
-   * @return specified item
-   * @throws QueryException query exception
-   */
-  protected final Item check(final Item i, final Type t) throws QueryException {
-    if(i == null) Err.empty(this);
-    if(i.type != t) Err.type(info(), t, i);
-    return i;
-  }
-
-  /**
-   * Checks if the specified expression yields a string.
-   * Returns a token representation or an exception.
-   * @param e expression to be checked
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  protected final byte[] checkStr(final Expr e, final QueryContext ctx)
-      throws QueryException {
-    return checkStr(e.atomic(ctx));
-  }
-
-  /**
-   * Checks if the specified item is a string.
-   * Returns a token representation or an exception.
-   * @param it item to be checked
-   * @return item
-   * @throws QueryException query exception
-   */
-  protected final byte[] checkStr(final Item it) throws QueryException {
-    if(it == null) return Token.EMPTY;
-    if(!it.s() && !it.u()) Err.type(info(), Type.STR, it);
-    return it.str();
-  }
-
-  /**
-   * Checks if the specified item is a node.
-   * Returns the node or an exception.
-   * @param it item to be checked
-   * @return item
-   * @throws QueryException query exception
-   */
-  protected final Nod checkNode(final Item it) throws QueryException {
-    if(!it.node()) Err.type(info(), Type.NOD, it);
-    return (Nod) it;
-  }
-
   /**
    * Checks if the specified collation is supported.
    * @param e expression to be checked
@@ -135,39 +71,13 @@ public abstract class Fun extends Arr {
   protected final void checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = e.atomic(ctx);
-    if(it == null) Err.empty(this);
+    final Item it = checkEmpty(e, ctx);
     if(!it.s() || !Token.eq(URLCOLL, it.str())) Err.or(IMPLCOL, e);
   }
 
-  /**
-   * Checks if an expression yields a valid {@link IO} instance.
-   * Returns the instance or an exception.
-   * @param e expression to be evaluated
-   * @param ctx query context
-   * @return io instance
-   * @throws QueryException query exception
-   */
-  protected IO checkIO(final Expr e, final QueryContext ctx)
-      throws QueryException {
-    checkAdmin(ctx);
-    final byte[] name = checkStr(e, ctx);
-    final IO io = IO.get(string(name));
-    if(!io.exists()) Err.or(DOCERR, name);
-    return io;
-  }
-
-  /**
-   * Checks if the current user has admin permissions. If negative, an
-   * exception is thrown.
-   * @param ctx query context
-   * @throws QueryException query exception
-   */
-  protected final void checkAdmin(final QueryContext ctx)
-      throws QueryException {
-
-    if(!ctx.context.user.perm(User.ADMIN))
-      throw new QueryException(Text.PERMNO, CmdPerm.ADMIN);
+  @Override
+  public SeqType returned(final QueryContext ctx) {
+    return func.ret;
   }
 
   @Override

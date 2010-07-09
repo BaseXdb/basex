@@ -134,6 +134,11 @@ public final class TableView extends View implements Runnable {
   }
 
   @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWTABLE, v);
+  }
+
+  @Override
   protected boolean db() {
     return true;
   }

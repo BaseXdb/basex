@@ -96,7 +96,9 @@ dc_meta=Meta-dati
 dc_ft=Full-Text
 
 do_title=Apri base di dati
+do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
 do_nodbquestion=Vuoi crearne una nuova?
+
 dqe_title=Apri una istanza DeepFS
 
 dmnt_title=Monta una istanza DeepFS

@@ -34,7 +34,7 @@ final class FNInfo extends Fun {
           if(it == null) {
             if(al == 1) Err.empty(this);
           } else {
-            code = Token.string(((QNm) check(it, Type.QNM)).ln());
+            code = Token.string(((QNm) checkType(it, Type.QNM)).ln());
             num = null;
           }
           if(al > 1) {

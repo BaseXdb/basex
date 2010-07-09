@@ -11,8 +11,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
@@ -27,24 +25,24 @@ public final class CmpN extends Arr {
     /** Node comparison: same. */
     EQ("is") {
       @Override
-      public boolean e(final Item a, final Item b) {
-        return ((Nod) a).is((Nod) b);
+      public boolean e(final Nod a, final Nod b) {
+        return a.is(b);
       }
     },
 
     /** Node comparison: before. */
     ET("<<") {
       @Override
-      public boolean e(final Item a, final Item b) {
-        return ((Nod) a).diff((Nod) b) < 0;
+      public boolean e(final Nod a, final Nod b) {
+        return a.diff(b) < 0;
       }
     },
 
     /** Node comparison: after. */
     GT(">>") {
       @Override
-      public boolean e(final Item a, final Item b) {
-        return ((Nod) a).diff((Nod) b) > 0;
+      public boolean e(final Nod a, final Nod b) {
+        return a.diff(b) > 0;
       }
     };
 
@@ -61,12 +59,12 @@ public final class CmpN extends Arr {
 
     /**
      * Evaluates the expression.
-     * @param a first item
-     * @param b second item
+     * @param a first node
+     * @param b second node
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean e(Item a, Item b) throws QueryException;
+    public abstract boolean e(Nod a, Nod b) throws QueryException;
 
     @Override
     public String toString() {
@@ -105,10 +103,7 @@ public final class CmpN extends Arr {
     if(a == null) return null;
     final Item b = expr[1].atomic(ctx);
     if(b == null) return null;
-
-    if(!a.node()) Err.type(info(), Type.NOD, a);
-    if(!b.node()) Err.type(info(), Type.NOD, b);
-    return Bln.get(cmp.e(a, b));
+    return Bln.get(cmp.e(checkNode(a), checkNode(b)));
   }
 
   @Override

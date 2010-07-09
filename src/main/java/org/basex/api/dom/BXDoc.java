@@ -75,13 +75,13 @@ public final class BXDoc extends BXNode implements Document {
   @Override
   public BXElem createElement(final String nm) {
     final QNm name = new QNm(token(nm));
-    return new BXElem(new FElem(name, node.base(), null));
+    return new BXElem(new FElem(name, node.base()));
   }
 
   @Override
   public BXElem createElementNS(final String uri, final String qn) {
     final QNm name = new QNm(token(qn), Uri.uri(token(uri)));
-    return new BXElem(new FElem(name, node.base(), null));
+    return new BXElem(new FElem(name, node.base()));
   }
 
   @Override

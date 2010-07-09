@@ -2,11 +2,9 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;

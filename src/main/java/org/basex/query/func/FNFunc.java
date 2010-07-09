@@ -23,7 +23,7 @@ final class FNFunc extends Fun {
       case FOLDLEFT:
       case FOLDRIGHT:
         Err.or(NOTIMPL, func.desc);
-        return null;        
+        return null;
       default:
         return super.iter(ctx);
     }
@@ -35,7 +35,7 @@ final class FNFunc extends Fun {
       case FUNCNAME:
       case FUNCARITY:
         Err.or(NOTIMPL, func.desc);
-        return null;        
+        return null;
       default:
         return super.atomic(ctx);
     }

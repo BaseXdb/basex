@@ -91,6 +91,11 @@ public final class ExploreView extends View {
   }
 
   @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWEXPLORE, v);
+  }
+
+  @Override
   protected boolean db() {
     return true;
   }

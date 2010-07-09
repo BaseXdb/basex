@@ -19,7 +19,6 @@ import javax.swing.WindowConstants;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
-
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
@@ -74,8 +73,6 @@ public final class GUI extends JFrame {
 
   /** Status line. */
   public final GUIStatus status;
-  /** Content panel, containing all views. */
-  public final ViewContainer views;
   /** Input field. */
   public final GUIInput input;
   /** Filter button. */
@@ -83,7 +80,7 @@ public final class GUI extends JFrame {
   /** Search view. */
   public final XQueryView query;
 
-  /** Painting flag; if activated, interactive operations ns are skipped. */
+  /** Painting flag; if activated, interactive operations are skipped. */
   public boolean painting;
   /** Updating flag; if activated, operations accessing the data are skipped. */
   public boolean updating;
@@ -92,6 +89,8 @@ public final class GUI extends JFrame {
   /** Help dialog. */
   public DialogHelp help;
 
+  /** Content panel, containing all views. */
+  final ViewContainer views;
   /** History button. */
   final BaseXButton hist;
   /** Current input Mode. */

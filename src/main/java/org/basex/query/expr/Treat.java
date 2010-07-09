@@ -45,8 +45,8 @@ public final class Treat extends Single {
     final Iter iter = ctx.iter(expr);
     final Item it = iter.next();
     if(it == null) {
-      if(seq.mayBeZero()) return Iter.EMPTY;
-      Err.empty(this);
+      if(seq.mayBeZero()) Err.empty(this);
+      return Iter.EMPTY;
     }
     if(seq.zeroOrOne()) {
       if(iter.next() != null) Err.or(NOTREATS, info(), seq);

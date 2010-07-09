@@ -913,6 +913,11 @@ public final class PlotView extends View {
   }
 
   @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWPLOT, v);
+  }
+
+  @Override
   protected boolean db() {
     return true;
   }

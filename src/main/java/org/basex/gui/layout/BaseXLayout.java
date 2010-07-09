@@ -158,7 +158,7 @@ public final class BaseXLayout {
         if(pressed(INPUT1, e) || pressed(INPUT2, e)) {
           gui.input.requestFocusInWindow();
         }
-        
+
         final int fs = gui.prop.num(GUIProp.FONTSIZE);
         int nfs = fs;
         if(pressed(INCFONT1, e) || pressed(INCFONT2, e)) {

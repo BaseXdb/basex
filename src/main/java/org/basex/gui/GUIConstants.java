@@ -72,6 +72,8 @@ public final class GUIConstants {
   /** Internal name of the XQuery View. */
   public static final String XQUERYVIEW = "xquery";
 
+  // V H xquery folder map plot - H text info table explore tree - -  
+
   /**
    * Default GUI Layout. The layout is formatted as follows:
    * The character 'H' or 'V' adds a new horizontal or vertical level,
@@ -79,9 +81,9 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String LAYOUT = "H V " + XQUERYVIEW + " " +
-    TEXTVIEW + " " + EXPLOREVIEW + " - V " + INFOVIEW + " " + MAPVIEW + " " +
-    TABLEVIEW + " " + PLOTVIEW + " " + FOLDERVIEW +  " " + TREEVIEW + " - -";
+  public static final String LAYOUT = "V H " + XQUERYVIEW + " " + FOLDERVIEW +
+    " " + MAPVIEW + " " + PLOTVIEW + " " + " - H " + TEXTVIEW + " " + INFOVIEW +
+    " " + TABLEVIEW + " " + EXPLOREVIEW + " - V " + TREEVIEW + " - -";
 
   // TOOLBAR ==================================================================
 

@@ -9,7 +9,6 @@ import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.net.URI;
 import javax.swing.AbstractButton;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;
@@ -986,7 +985,7 @@ public enum GUICommands implements GUICommand {
     }
     gui.notify.init();
   }
-  
+
   /**
    * Displays a file save dialog and returns the file name or a null reference.
    * @param gui gui reference

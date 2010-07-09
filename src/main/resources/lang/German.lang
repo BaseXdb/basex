@@ -95,6 +95,7 @@ dc_meta=Metadaten
 dc_ft=Volltext
 
 do_title=Datenbank öffnen
+do_large=Die zu öffnende Datenbank ist % groß. Wollen Sie einige\nVisualisierungen schließen, um die Arbeit zu beschleunigen?
 do_nodbquestion=Wollen Sie eine neue Datenbank erstellen?
 
 dqe_title=Open DeepFS instance

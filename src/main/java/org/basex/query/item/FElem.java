@@ -30,10 +30,32 @@ public final class FElem extends FNode {
    * Constructor.
    * @param n tag name
    * @param b base uri
+   */
+  public FElem(final QNm n, final byte[] b) {
+    this(n, new NodIter(), new NodIter(), b, null);
+  }
+
+  /**
+   * Constructor.
+   * @param n tag name
+   * @param ch children
+   * @param at attributes
+   * @param b base uri
+   * @param nsp namespaces
+   */
+  public FElem(final QNm n, final NodIter ch, final NodIter at, final byte[] b,
+      final Atts nsp) {
+    this(n, ch, at, b, nsp, null);
+  }
+
+  /**
+   * Constructor.
+   * @param n tag name
+   * @param ch children
    * @param p parent
    */
-  public FElem(final QNm n, final byte[] b, final Nod p) {
-    this(n, new NodIter(), new NodIter(), b, null, p);
+  public FElem(final QNm n, final NodIter ch, final Nod p) {
+    this(n, ch, new NodIter(), Token.EMPTY, new Atts(), p);
   }
 
   /**
@@ -45,8 +67,9 @@ public final class FElem extends FNode {
    * @param nsp namespaces
    * @param p parent
    */
-  public FElem(final QNm n, final NodIter ch, final NodIter at,
-      final byte[] b, final Atts nsp, final Nod p) {
+  public FElem(final QNm n, final NodIter ch, final NodIter at, final byte[] b,
+      final Atts nsp, final Nod p) {
+
     super(Type.ELM);
     name = n;
     children = ch;
@@ -175,7 +198,7 @@ public final class FElem extends FNode {
       }
     }
 
-    if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn)) 
+    if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn))
       ser.namespace(Token.EMPTY, uri);
     ser.dn = uri;
 

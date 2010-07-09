@@ -2,7 +2,6 @@ package org.basex.test.cs;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
-
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;

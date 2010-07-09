@@ -102,6 +102,11 @@ public final class InfoView extends View {
   }
 
   @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWINFO, v);
+  }
+
+  @Override
   protected boolean db() {
     return false;
   }

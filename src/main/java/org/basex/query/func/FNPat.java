@@ -1,19 +1,23 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-
+import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
+import org.basex.query.item.FElem;
+import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
+import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -33,7 +37,7 @@ final class FNPat extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case TOKEN:   return token(checkStr(expr[0], ctx), ctx);
+      case TOKEN:   return tokenize(checkStr(expr[0], ctx), ctx);
       default:      return super.iter(ctx);
     }
   }
@@ -41,9 +45,9 @@ final class FNPat extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case MATCH:   return match(checkStr(expr[0], ctx), ctx);
+      case MATCH:   return matches(checkStr(expr[0], ctx), ctx);
       case REPLACE: return replace(checkStr(expr[0], ctx), ctx);
-      case ANALZYE: Err.or(NOTIMPL, func.desc); return null;
+      case ANALZYE: return analyzeString(checkStr(expr[0], ctx), ctx);
       default:      return super.atomic(ctx);
     }
   }
@@ -55,11 +59,52 @@ final class FNPat extends Fun {
    * @return function result
    * @throws QueryException query exception
    */
-  private Item match(final byte[] val, final QueryContext ctx)
+  private Item matches(final byte[] val, final QueryContext ctx)
       throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    return Bln.get(p.matcher(Token.string(val)).find());
+    return Bln.get(p.matcher(string(val)).find());
+  }
+
+  /**
+   * Evaluates the analyze-string function.
+   * @param val input value
+   * @param ctx query context
+   * @return function result
+   * @throws QueryException query exception
+   */
+  private Item analyzeString(final byte[] val, final QueryContext ctx)
+      throws QueryException {
+
+    final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
+    final String str = string(val);
+    final Matcher m = p.matcher(str);
+    final NodIter ch = new NodIter();
+    final FElem root = new FElem(new QNm(ANALYZE), ch, null);
+    int s = 0;
+    while(m.find()) {
+      if(s != m.start()) {
+        ch.add(node(NONMATCH, str.substring(s, m.start()), root));
+      }
+      s = m.end();
+      ch.add(node(MATCH, m.group(), root));
+    }
+    if(s != str.length()) ch.add(node(NONMATCH, str.substring(s), root));
+    return root;
+  }
+
+  /**
+   * Returns a new match node.
+   * @param tag tag name
+   * @param text text
+   * @param root root node
+   * @return node
+   */
+  private FElem node(final byte[] tag, final String text, final FElem root) {
+    final NodIter txt = new NodIter();
+    final FElem sub = new FElem(new QNm(tag), txt, root);
+    txt.add(new FTxt(token(text), sub));
+    return sub;
   }
 
   /**
@@ -72,10 +117,7 @@ final class FNPat extends Fun {
   private Item replace(final byte[] val, final QueryContext ctx)
       throws QueryException {
 
-    final Item repl = expr[2].atomic(ctx);
-    if(repl == null) Err.empty(this);
-
-    final byte[] rep = checkStr(repl);
+    final byte[] rep = checkEmptyStr(expr[2], ctx);
     for(int i = 0; i < rep.length; i++) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
@@ -85,13 +127,13 @@ final class FNPat extends Fun {
     }
 
     final Pattern p = pattern(expr[1], expr.length == 4 ? expr[3] : null, ctx);
-    String r = Token.string(rep);
+    String r = string(rep);
     if((p.flags() & Pattern.LITERAL) != 0) {
       r = r.replaceAll("\\\\", "\\\\\\\\").replaceAll("\\$", "\\\\\\$");
     }
 
     try {
-      return Str.get(p.matcher(Token.string(val)).replaceAll(r));
+      return Str.get(p.matcher(string(val)).replaceAll(r));
     } catch(final Exception ex) {
       final String m = ex.getMessage();
       if(m.contains("No group")) Err.or(REGROUP);
@@ -107,12 +149,12 @@ final class FNPat extends Fun {
    * @return function result
    * @throws QueryException query exception
    */
-  private Iter token(final byte[] val, final QueryContext ctx)
+  private Iter tokenize(final byte[] val, final QueryContext ctx)
       throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     final SeqIter sb = new SeqIter();
-    final String str = Token.string(val);
+    final String str = string(val);
     if(!str.isEmpty()) {
       final Matcher m = p.matcher(str);
       int s = 0;
@@ -137,15 +179,10 @@ final class FNPat extends Fun {
       final QueryContext ctx) throws QueryException {
 
     // process modifiers
-    final Item pat = pattern.atomic(ctx);
-    if(pat == null) Err.empty(this);
-
-    byte[] pt = checkStr(pat);
+    byte[] pt = checkEmptyStr(pattern, ctx);
     int m = Pattern.UNIX_LINES;
     if(mod != null) {
-      final Item md = mod.atomic(ctx);
-      if(md == null) Err.empty(this);
-      for(final byte b : checkStr(md)) {
+      for(final byte b : checkEmptyStr(mod, ctx)) {
         if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         else if(b == 'm') m |= Pattern.MULTILINE;
         else if(b == 's') m |= Pattern.DOTALL;

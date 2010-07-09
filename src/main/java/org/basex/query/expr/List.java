@@ -1,12 +1,10 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -27,7 +25,7 @@ public final class List extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
-    updating(ctx, expr);
+    checkUp(ctx, expr);
 
     for(final Expr e : expr) if(!e.i() && !e.e()) return this;
 
@@ -35,24 +33,6 @@ public final class List extends Arr {
     final SeqIter seq = new SeqIter(expr.length);
     for(final Expr e : expr) seq.add(ctx.iter(e));
     return seq.finish();
-  }
-
-  /**
-   * Tests if the specified expressions are updating or vacuous.
-   * @param ctx query context
-   * @param expr expression array
-   * @throws QueryException query exception
-   */
-  static void updating(final QueryContext ctx, final Expr[] expr)
-      throws QueryException {
-    if(!ctx.updating) return;
-    int s = 0;
-    for(final Expr e : expr) {
-      if(e.v()) continue;
-      final boolean u = e.uses(Use.UPD, ctx);
-      if(u && s == 2 || !u && s == 1) Err.or(UPNOT);
-      s = u ? 1 : 2;
-    }
   }
 
   @Override

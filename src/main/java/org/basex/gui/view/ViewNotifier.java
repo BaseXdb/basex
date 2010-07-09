@@ -1,22 +1,28 @@
 package org.basex.gui.view;
 
+import static org.basex.core.Text.*;
 import java.awt.Window;
 import org.basex.core.Context;
+import org.basex.core.Main;
 import org.basex.core.Text;
+import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUI;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.util.Array;
+import org.basex.util.Performance;
 
 /**
- * This class stores all views in a window and notifies views of global
- * changes.
+ * This class serves as a container for all existing views. The observer pattern
+ * is used to inform all views on user interactions.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class ViewNotifier {
+  /** Large database size (minimum database size to show warning). */
+  public static final long LARGEDB = 200000000;
   /** Maximum history size. */
   public static final int MAXHIST = 20;
   /** History pointer. */
@@ -56,10 +62,21 @@ public final class ViewNotifier {
    */
   public void init() {
     final Context ctx = gui.context;
-    final boolean db = ctx.data != null;
+    final Data data = ctx.data;
+    final boolean db = data != null;
     if(db) {
       cont[0] = ctx.current;
-      marked[0] = new Nodes(ctx.data);
+      marked[0] = new Nodes(data);
+
+      // if a large database is opened, the user is asked if complex
+      /// visualizations should be closed first
+      final long fs = data.meta.dbsize();
+      boolean close = false;
+      for(final View v : view) close |= v.visible() && v.db();
+      if(close && fs > LARGEDB && Dialog.confirm(gui,
+          Main.info(OPENLARGE, Performance.format(fs)))) {
+        for(final View v : view) if(v.visible() && v.db()) v.visible(false);
+      }
     } else {
       // close all dialogs (except help) together with database
       for(final Window w : gui.getOwnedWindows()) {
@@ -73,7 +90,7 @@ public final class ViewNotifier {
     maxhist = 0;
     for(final View v : view) v.refreshInit();
     gui.layoutViews();
-    gui.setTitle(Text.TITLE + (db ? " - " + ctx.data.meta.name : ""));
+    gui.setTitle(Text.TITLE + (db ? " - " + data.meta.name : ""));
   }
 
   /**

@@ -178,6 +178,11 @@ public final class MapView extends View implements Runnable {
   }
 
   @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWMAP, v);
+  }
+
+  @Override
   protected boolean db() {
     return true;
   }

@@ -56,7 +56,7 @@ final class FNFile extends Fun {
    */
   private Iter listFiles(final QueryContext ctx) throws QueryException {
     return new Iter() {
-      final String path = new String(checkStr(expr[0].atomic(ctx)));
+      final String path = Token.string(checkEmptyStr(expr[0], ctx));
       final String[] files = new File(path).list();
       int c = -1;
 

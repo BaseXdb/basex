@@ -49,7 +49,7 @@ final class FNBaseX extends Fun {
       case RANDOM: return random();
       case RUN:    return run(ctx);
       case DB:     return db(ctx);
-      case DBID:   return id(ctx);
+      case NODEID: return nodeId(ctx);
       case FSPATH: return fspath(ctx);
       default:     return super.atomic(ctx);
     }
@@ -149,10 +149,7 @@ final class FNBaseX extends Fun {
     DBNode node = ctx.doc(checkStr(expr[0], ctx), false, true);
 
     if(expr.length == 2) {
-      final Item it = expr[1].atomic(ctx);
-      if(it == null) Err.empty(expr[1]);
-      if(!it.u() && !it.n()) Err.num(info(), it);
-      final int pre = node.data.pre((int) it.itr());
+      final int pre = (int) checkItr(expr[1], ctx);
       if(pre < 0 || pre >= node.data.meta.size) Err.or(NOPRE, pre);
       node = new DBNode(node.data, pre);
     }
@@ -160,14 +157,14 @@ final class FNBaseX extends Fun {
   }
 
   /**
-   * Performs the db function.
+   * Performs the node-id function.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  private Itr id(final QueryContext ctx) throws QueryException {
+  private Itr nodeId(final QueryContext ctx) throws QueryException {
     final Nod node = checkNode(expr[0].atomic(ctx));
-    if(!(node instanceof DBNode)) Err.type(info(), Type.NOD, node);
+    if(!(node instanceof DBNode)) errType(Type.NOD, node);
     final DBNode dbnode = (DBNode) node;
     return Itr.get(dbnode.data.id(dbnode.pre));
   }

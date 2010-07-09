@@ -129,6 +129,11 @@ public final class TreeView extends View implements TreeViewOptions {
   }
 
   @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWTREE, v);
+  }
+
+  @Override
   protected boolean db() {
     return true;
   }

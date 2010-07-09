@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.Box;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Main;
 import org.basex.core.Command;
@@ -132,6 +131,11 @@ public final class TextView extends View implements ActionListener {
   @Override
   public boolean visible() {
     return gui.prop.is(GUIProp.SHOWTEXT);
+  }
+
+  @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWTEXT, v);
   }
 
   @Override

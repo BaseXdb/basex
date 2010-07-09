@@ -17,7 +17,7 @@ final class FNMath extends Fun {
   public Item atomic(final QueryContext ctx) throws QueryException {
     if(func == FunDef.PI) return Dbl.get(Math.PI);
     if(expr[0].e()) return null;
-    
+
     final double d = checkDbl(expr[0], ctx);
     switch(func) {
       case SQRT: return Dbl.get(Math.sqrt(d));
@@ -33,6 +33,6 @@ final class FNMath extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    return func == FunDef.PI || expr[0].i() || expr[0].e() ? atomic(ctx) : this;
+    return func == FunDef.PI || expr[0].i() ? atomic(ctx) : this;
   }
 }

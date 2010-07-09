@@ -95,6 +95,7 @@ dc_meta=Metadata
 dc_ft=Nội dung
 
 do_title=Mở cơ sở dữ liệu
+do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
 do_nodbquestion=Bạn muốn tạo một cái mới không?
 
 dqe_title=Open DeepFS instance

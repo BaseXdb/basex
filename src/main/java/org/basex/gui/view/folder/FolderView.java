@@ -167,6 +167,11 @@ public final class FolderView extends View {
   }
 
   @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWFOLDER, v);
+  }
+
+  @Override
   protected boolean db() {
     return true;
   }

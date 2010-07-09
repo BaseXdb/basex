@@ -145,7 +145,7 @@ final class FNDate extends Fun {
    */
   private Item checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return it.u() ? t.e(it, ctx) : check(it, t);
+    return it.u() ? t.e(it, ctx) : checkType(it, t);
   }
 
   /**
@@ -157,7 +157,7 @@ final class FNDate extends Fun {
    */
   private Item checkDur(final Item it) throws QueryException {
     if(it.u()) return new Dur(it.str());
-    if(!it.d()) Err.type(info(), Type.DUR, it);
+    if(!it.d()) errType(Type.DUR, it);
     return it;
   }
 
@@ -172,7 +172,7 @@ final class FNDate extends Fun {
   private Item datzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.u() ? new Dat(it.str()) : check(it, Type.DAT);
+    final Item i = it.u() ? new Dat(it.str()) : checkType(it, Type.DAT);
     return adjust((Date) i, zon, d);
   }
 
@@ -187,7 +187,7 @@ final class FNDate extends Fun {
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.u() ? new Dtm(it.str()) : check(it, Type.DTM);
+    final Item i = it.u() ? new Dtm(it.str()) : checkType(it, Type.DTM);
     return adjust((Date) i, zon, d);
   }
 
@@ -202,7 +202,7 @@ final class FNDate extends Fun {
   private Item timzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.u() ? new Tim(it.str()) : check(it, Type.TIM);
+    final Item i = it.u() ? new Tim(it.str()) : checkType(it, Type.TIM);
     return adjust((Date) i, zon, d);
   }
 
@@ -219,8 +219,8 @@ final class FNDate extends Fun {
     final Item d = date.u() ? new Dat(date.str()) : date;
     final Item t = tm.u() ? new Tim(tm.str()) : tm;
 
-    final Dtm dtm = new Dtm((Dat) check(d, Type.DAT));
-    final Tim tim = (Tim) check(t, Type.TIM);
+    final Dtm dtm = new Dtm((Dat) checkType(d, Type.DAT));
+    final Tim tim = (Tim) checkType(t, Type.TIM);
 
     dtm.xc.setTime(tim.xc.getHour(), tim.xc.getMinute(), tim.xc.getSecond(),
         tim.xc.getMillisecond());
@@ -256,7 +256,7 @@ final class FNDate extends Fun {
       final Calendar c = Calendar.getInstance();
       tz = (c.get(Calendar.ZONE_OFFSET) + c.get(Calendar.DST_OFFSET)) / 60000;
     } else {
-      final DTd dtd = (DTd) check(zon, Type.DTD);
+      final DTd dtd = (DTd) checkType(zon, Type.DTD);
       tz = (int) (dtd.min() + dtd.hou() * 60);
       if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) Err.or(INVALZONE, zon);
     }

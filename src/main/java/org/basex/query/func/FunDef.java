@@ -168,8 +168,10 @@ public enum FunDef {
   /** XQuery function. */
   PARSETXTAVL(FNURI, FNGen.class, 1, 2,
       "unparsed-text-available(uri, encoding?)", BLN),
+  /** XQuery function (might get obsolete). */
+  PARSE(FNURI, FNGen.class, 1, 2, "parse(string, base?)", NOD),
   /** XQuery function. */
-  PARSEXML(FNURI, FNGen.class, 1, 2, "parse-xml(uri, base?)", NOD),
+  PARSEXML(FNURI, FNGen.class, 1, 2, "parse-xml(string, base?)", NOD),
   /** XQuery function. */
   URICOLL(FNURI, FNGen.class, 0, 1, "uri-collection(string?)", URI_ZM),
   /** XQuery function. */
@@ -404,9 +406,9 @@ public enum FunDef {
   /** Project specific function - evaluates the specified query file. */
   RUN(BXURI, FNBaseX.class, 1, 1, "run(string)", ITEM_ZM),
   /** Project specific function - opens a database node. */
-  DB(BXURI, FNBaseX.class, 1, 2, "db(string, id?)", NOD),
+  DB(BXURI, FNBaseX.class, 1, 2, "db(string, pre?)", NOD),
   /** Project specific function - returns the id of a node. */
-  DBID(BXURI, FNBaseX.class, 1, 1, "node-id(item)", ITR),
+  NODEID(BXURI, FNBaseX.class, 1, 1, "node-id(item)", ITR),
   /** Project specific function - returns a filesystem path. */
   FSPATH(BXURI, FNBaseX.class, 1, 1, "fspath(item)", STR);
 

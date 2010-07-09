@@ -1,7 +1,6 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;

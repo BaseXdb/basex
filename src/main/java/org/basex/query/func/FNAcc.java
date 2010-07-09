@@ -44,7 +44,7 @@ final class FNAcc extends Fun {
       case URIQNAME:
         it = e.atomic(ctx);
         if(it == null) return null;
-        return ((QNm) check(it, Type.QNM)).uri;
+        return ((QNm) checkType(it, Type.QNM)).uri;
       default:
         return super.atomic(ctx);
     }

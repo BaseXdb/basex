@@ -80,7 +80,7 @@ public interface QueryText {
   /** FODC0005: Evaluation exception. */
   Object[] INVDOC = { FODC, 5, "Invalid document \"%\"." };
   /** FODC0006: Evaluation exception. */
-  Object[] DOCWF = { FODC, 6, "Document \"%\" is not well-formed." };
+  Object[] DOCWF = { FODC, 6, "SAX: %" };
   /** FODC0007: Evaluation exception. */
   Object[] DOCBASE = { FODC, 7, "Base-uri % is invalid." };
 
@@ -341,18 +341,15 @@ public interface QueryText {
   /** XPTY0004: Typing exception. */
   Object[] XPSEQ = { XPTY, 4, "No sequence % allowed." };
   /** XPTY0004: Typing exception. */
-  Object[] XPEMPTY = { XPTY, 4, "Empty sequence not allowed." };
-  /** XPTY0004: Typing exception. */
   Object[] XPINVCAST = { XPTY, 4, "Invalid cast from % to %: %." };
   /** XPTY0004: Typing exception. */
   Object[] XPCAST = { XPTY, 4, "Invalid %(%) cast." };
   /** XPTY0004: Typing Exception. */
   Object[] XPTYPE = { XPTY, 4, "%: % expected, % found." };
+  /** XPTY0004: Typing exception. */
+  Object[] XPEMPTY = { XPTY, 4, "%: empty sequence not allowed." };
   /** XPTY0004: Typing Exception. */
   Object[] XPEMPTYPE = { XPTY, 4, "%: % expected, empty sequence found." };
-  /** XPTY0004: Typing exception. */
-  Object[] XPEMPTYNUM = { XPTY, 4,
-      "%: number expected, empty sequence found." };
   /** XPTY0004: Typing exception. */
   Object[] XPDUR = { XPTY, 4, "%: duration expected, % found." };
   /** XPTY0004: Typing Exception. */
@@ -530,8 +527,7 @@ public interface QueryText {
   Object[] UPURIDUP = { XUDY, 31, "Multiple use of URI: \"%\"." };
 
   /** XUST0001: Parsing exception. */
-  Object[] UPNOT = { XUST, 1,
-      "No updating expression allowed in this context." };
+  Object[] UPNOT = { XUST, 1, "%: no updating expression allowed." };
   /** XUST0002: Parsing exception. */
   Object[] UPEXPECTT = { XUST, 2,
       "Updating expression expected in modify clause." };

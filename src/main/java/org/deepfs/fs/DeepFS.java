@@ -5,7 +5,6 @@ import static org.deepfs.jfuse.JFUSEAdapter.*;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Main;

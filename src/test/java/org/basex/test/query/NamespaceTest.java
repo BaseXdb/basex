@@ -269,7 +269,7 @@ public class NamespaceTest {
     try {
       if(first != null) new XQuery(first).execute(context);
       final String result = new XQuery(second).execute(context);
-  
+
       // quotes are replaced by apostrophes to simplify comparison
       final String res = result.replaceAll("\\\"", "'");
       final String exp = expected.replaceAll("\\\"", "'");

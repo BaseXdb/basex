@@ -362,6 +362,12 @@ public interface QueryTokens {
   byte[] JAVAPRE = token("java:");
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
+  /** Root element for the analyze-string-result function. */
+  byte[] ANALYZE = token("analyze-string-result");
+  /** Element for the analyze-string-result function. */
+  byte[] MATCH = token("match");
+  /** Element for the analyze-string-result function. */
+  byte[] NONMATCH = token("non-match");
 
   // TYPES ====================================================================
 

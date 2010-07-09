@@ -5,7 +5,7 @@ import java.util.LinkedList;
 /**
  * Management of executing read/write processes. Multiple readers, single
  * writers (readers/writer lock).
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Andreas Weiler
  */

@@ -229,39 +229,24 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Item trans(final QueryContext ctx) throws QueryException {
-    final byte[] str = checkStr(expr[0], ctx);
-    final Item is = expr[1].atomic(ctx);
-    if(is == null) Err.empty(this);
-    final byte[] sea = checkStr(is);
-    final Item ir = expr[2].atomic(ctx);
-    if(ir == null) Err.empty(this);
-    final byte[] rep = checkStr(ir);
-    return Str.get(translate(string(str), string(sea), string(rep)));
-  }
+    final String tok = string(checkStr(expr[0], ctx));
+    final String srch = string(checkEmptyStr(expr[1], ctx));
+    final String rep = string(checkEmptyStr(expr[2], ctx));
 
-  /**
-   * Performs a translation on the specified token.
-   * @param tok token
-   * @param srch characters to be found
-   * @param rep characters to be replaced
-   * @return translated token
-   */
-  private static byte[] translate(final String tok, final String srch,
-      final String rep) {
     final int l = tok.length();
-    final StringBuilder tmp = new StringBuilder(l);
+    final TokenBuilder tmp = new TokenBuilder(l);
     for(int i = 0; i < l; i++) {
       final char b = tok.charAt(i);
       int j = -1;
       while(++j < srch.length() && b != srch.charAt(j));
       if(j < srch.length()) {
         if(j >= rep.length()) continue;
-        tmp.append(rep.charAt(j));
+        tmp.add(rep.charAt(j));
       } else {
-        tmp.append(tok.charAt(i));
+        tmp.add(tok.charAt(i));
       }
     }
-    return token(tmp.toString());
+    return Str.get(tmp.finish());
   }
 
   /**
@@ -271,9 +256,7 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Item strjoin(final QueryContext ctx) throws QueryException {
-    final Item is = expr.length == 2 ? expr[1].atomic(ctx) : Str.ZERO;
-    if(is == null) Err.empty(this);
-    final byte[] sep = checkStr(is);
+    final byte[] sep = expr.length == 2 ? checkEmptyStr(expr[1], ctx) : EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     final Iter iter = expr[0].iter(ctx);
@@ -298,9 +281,7 @@ final class FNStr extends Fun {
     final byte[] str = checkStr(expr[0], ctx);
     String nr = null;
     if(expr.length == 2) {
-      final Item is = expr[1].atomic(ctx);
-      if(is == null) Err.empty(this);
-      final String n = string(uc(trim(checkStr(is))));
+      final String n = string(uc(trim(checkEmptyStr(expr[1], ctx))));
       for(final String nrm : NORMS) if(nrm.equals(n)) nr = nrm;
       if(nr == null) Err.or(NORMUNI, n);
     }

@@ -55,7 +55,7 @@ public final class GUIProp extends AProp {
   public static final Object[] LAYOUT = { "LAYOUT", GUIConstants.LAYOUT };
 
   /** Flag for activated info view. */
-  public static final Object[] SHOWINFO = { "SHOWINFO", false };
+  public static final Object[] SHOWINFO = { "SHOWINFO", true };
   /** Flag for activated map view. */
   public static final Object[] SHOWMAP = { "SHOWMAP", true };
   /** Flag for activated table view. */

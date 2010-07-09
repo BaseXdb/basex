@@ -69,14 +69,14 @@ public final class Export extends Command {
     final IO root = IO.get(target);
     if(!(root instanceof IOFile))
       throw new IOException(Main.info(DBNOTEXPORTED, target));
-    
+
     if(!root.exists()) root.md();
 
     for(final int pre : data.doc()) {
       // create file path
       final IO file = root.merge(Token.string(data.text(pre, true)));
       // create dir if necessary
-      
+
       final IO dir = IO.get(file.dir());
       if(!dir.exists()) dir.md();
 

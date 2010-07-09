@@ -1029,9 +1029,11 @@ public interface Text {
 
   /** Dialog title for opening a database. */
   String OPENTITLE = lang("do_title");
+  /** Dialog title for opening a large database. */
+  String OPENLARGE = lang("do_large") + NL + " ";
   /** Dialog asking if a new database should be be created. */
   String NODBQUESTION = INFONODB + NL + lang("do_nodbquestion") + NL + " ";
-  /** Dialog asking if a new database should be be created. */
+  /** Dialog asking if a new deepfs database should be be created. */
   String NODEEPFSQUESTION = lang("info_nodeepfs") + DOT + NL +
     lang("do_nodbquestion") + NL + " ";
 

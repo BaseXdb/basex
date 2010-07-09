@@ -29,7 +29,7 @@ final class FNQName extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case INSCOPE:
-        return inscope(ctx, (Nod) check(expr[0].atomic(ctx), Type.ELM));
+        return inscope(ctx, (Nod) checkType(expr[0].atomic(ctx), Type.ELM));
       default:
         return super.iter(ctx);
     }
@@ -43,13 +43,12 @@ final class FNQName extends Fun {
 
     switch(func) {
       case RESQNAME:
-        if(it == null) return null;
         if(it2 == null) Err.empty(this);
-        return resolve(ctx, it, it2);
+        return it == null ? null : resolve(ctx, it, it2);
       case QNAME:
         final Uri uri = Uri.uri(it == null ? EMPTY :
-          check(it, Type.STR).str());
-        final Item it3 = it2 == null ? Str.ZERO : check(it2, Type.STR);
+          checkType(it, Type.STR).str());
+        final Item it3 = it2 == null ? Str.ZERO : checkType(it2, Type.STR);
         final byte[] str = it3.str();
         if(!XMLToken.isQName(str)) Err.value(Type.QNM, it3);
         QNm nm = new QNm(str, uri);
@@ -57,14 +56,14 @@ final class FNQName extends Fun {
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;
-        return new NCN(((QNm) check(it, Type.QNM)).ln());
+        return new NCN(((QNm) checkType(it, Type.QNM)).ln());
       case PREQNAME:
         if(it == null) return null;
-        nm = (QNm) check(it, Type.QNM);
+        nm = (QNm) checkType(it, Type.QNM);
         return !nm.ns() ? null : new NCN(nm.pref());
       case NSURIPRE:
         final byte[] pre = checkStr(it);
-        final Atts at = ((Nod) check(it2, Type.ELM)).ns();
+        final Atts at = ((Nod) checkType(it2, Type.ELM)).ns();
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
@@ -96,7 +95,7 @@ final class FNQName extends Fun {
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
-    final byte[] uri = ((Nod) check(it, Type.ELM)).uri(pref, ctx);
+    final byte[] uri = ((Nod) checkType(it, Type.ELM)).uri(pref, ctx);
     if(uri == null && pref.length != 0) Err.or(NSDECL, pref);
     nm.uri = Uri.uri(uri);
     return nm;

@@ -197,6 +197,11 @@ public final class XQueryView extends View {
   }
 
   @Override
+  public void visible(final boolean v) {
+    gui.prop.set(GUIProp.SHOWXQUERY, v);
+  }
+
+  @Override
   protected boolean db() {
     return false;
   }

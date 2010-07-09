@@ -52,7 +52,7 @@ public final class Func extends Single {
       if(var.type != null) Err.or(UPFUNCTYPE);
       if(!u && !expr.v()) Err.or(UPEXPECTF);
     } else if(u) {
-      Err.or(UPNOT);
+      Err.or(UPNOT, info());
     }
     ctx.vars.reset(s);
     return this;

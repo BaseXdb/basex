@@ -42,7 +42,7 @@ import org.basex.util.TokenMap;
 final class FNGen extends Fun {
   /** Cached file contents. */
   private final TokenMap contents = new TokenMap();
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
@@ -61,6 +61,7 @@ final class FNGen extends Fun {
       case DOCAVL:      return docAvailable(ctx);
       case PARSETXT:    return unparsedText(ctx);
       case PARSETXTAVL: return unparsedTextAvailable(ctx);
+      case PARSE:       // might get obsolete
       case PARSEXML:    return parseXml(ctx);
       case SERIALIZE:   return serialize(ctx);
       default:          return super.atomic(ctx);
@@ -105,13 +106,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private NodIter collection(final QueryContext ctx) throws QueryException {
-    byte[] coll = null;
-    if(expr.length != 0) {
-      final Item it = expr[0].atomic(ctx);
-      if(it == null) Err.empty(this);
-      coll = checkStr(it);
-    }
-    return ctx.coll(coll);
+    return ctx.coll(expr.length != 0 ? checkEmptyStr(expr[0], ctx) : null);
   }
 
   /**
@@ -242,14 +237,14 @@ final class FNGen extends Fun {
       base = Uri.uri(checkStr(expr[1], ctx));
       if(!base.valid()) Err.or(DOCBASE, base);
     }
-    
+
     final Prop prop = ctx.context.prop;
     final IO io = new IOContent(cont, string(base.str()));
     try {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
-      Err.or(DOCWF, cont);
+      Err.or(DOCWF, ex.getMessage());
       return null;
     }
   }
@@ -261,9 +256,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final Item it = expr[0].atomic(ctx);
-    if(it == null) Err.empty(this);
-    final Nod nod = checkNode(it);
+    final Nod nod = checkNode(checkEmpty(expr[0], ctx));
 
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
@@ -285,7 +278,7 @@ final class FNGen extends Fun {
       throw new QueryException(ex.getMessage());
     }
   }
-  
+
   /**
    * Atomizes the specified item.
    * @param it input item

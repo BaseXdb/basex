@@ -131,7 +131,7 @@ public final class ServerProcess extends Thread {
           cmd = new CommandParser(input, context, true).parseSingle();
         } catch(final QueryException ex) {
           // log invalid command
-          final String msg = ex.extended();
+          final String msg = ex.getMessage();
           log.write(this, input, INFOERROR + msg);
           // send 0 to mark end of potential result
           out.write(0);
@@ -202,7 +202,7 @@ public final class ServerProcess extends Thread {
     }
     out.flush();
   }
-  
+
   /**
    * Processes the query iterator.
    * @param c control code (first received byte from client)
@@ -248,7 +248,7 @@ public final class ServerProcess extends Thread {
       close = true;
 
       // log exception (static or runtime)
-      final String msg = ex.extended();
+      final String msg = ex.getMessage();
       log.write(this, arg, INFOERROR + msg);
       // send 0 to mark end of potential result, 1 as error flag, and {MSG}0
       out.write(0);

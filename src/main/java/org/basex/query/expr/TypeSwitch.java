@@ -50,7 +50,7 @@ public final class TypeSwitch extends Expr {
 
     final Expr[] tmp = new Expr[cs.length];
     for(int i = 0; i < cs.length; i++) tmp[i] = cs[i].expr;
-    List.updating(ctx, tmp);
+    checkUp(ctx, tmp);
 
     // pre-evaluate type switch
     if(ts.i()) {

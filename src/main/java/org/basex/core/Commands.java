@@ -2,7 +2,6 @@ package org.basex.core;
 
 import static org.basex.core.Text.*;
 import java.util.regex.Pattern;
-
 import org.basex.core.cmd.Set;
 
 /**

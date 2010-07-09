@@ -36,14 +36,13 @@ public final class CPI extends CFrag {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(checkUp(expr[0], ctx).e()) Err.empty(this);
+    checkUp(expr[0], ctx);
     return this;
   }
 
   @Override
   public FPI atomic(final QueryContext ctx) throws QueryException {
-    final Item it = expr[0].atomic(ctx);
-    if(it == null) Err.empty(this);
+    final Item it = checkEmpty(expr[0], ctx);
     if(!it.u() && !it.s() && it.type != Type.QNM) Err.or(CPIWRONG, it.type, it);
 
     final byte[] nm = trim(it.str());

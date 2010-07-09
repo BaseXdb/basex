@@ -95,6 +95,7 @@ dc_meta=Métadonnées
 dc_ft=Plein texte
 
 do_title=Ouvrir une base de données
+do_large=The database is % large. Do you want to close\nsome visualizations in order to speed up processing?
 do_nodbquestion=Voulez-vous en créer une nouvelle ?
 
 dqe_title=Ouvrir une instance DeepFS

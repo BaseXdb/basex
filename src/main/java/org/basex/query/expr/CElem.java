@@ -63,8 +63,7 @@ public final class CElem extends CFrag {
 
   @Override
   public FElem atomic(final QueryContext ctx) throws QueryException {
-    final Item it = tag.atomic(ctx);
-    if(it == null) Err.empty(CElem.this);
+    final Item it = checkEmpty(tag, ctx);
     final int s = ctx.ns.size();
     addNS(ctx);
 
@@ -82,7 +81,7 @@ public final class CElem extends CFrag {
     if(c.errAtt) Err.or(NOATTALL);
     if(c.duplAtt != null) Err.or(ATTDUPL, c.duplAtt);
 
-    final FElem node = new FElem(tname, c.children, c.ats, c.base, nsp, null);
+    final FElem node = new FElem(tname, c.children, c.ats, c.base, nsp);
     for(int n = 0; n < c.children.size(); n++) c.children.get(n).parent(node);
     for(int n = 0; n < c.ats.size(); n++) c.ats.get(n).parent(node);
     ctx.ns.size(s);

@@ -110,7 +110,7 @@ public final class MP3Parser implements IFileParser {
   private static final int ENC_UTF_8 = 3;
 
   /** MP3 modes. */
-  private static final byte[][] MODES = 
+  private static final byte[][] MODES =
     tokens("Stereo", "Joint Stereo", "Dual Channel", "Mono");
   /** MP3 emphases. */
   private static final byte[][] EMPH =

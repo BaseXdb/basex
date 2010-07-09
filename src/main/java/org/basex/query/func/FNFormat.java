@@ -20,38 +20,32 @@ final class FNFormat extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case FORMINT:
-        return formatInt(ctx);
+      case FORMINT: return formatInt(ctx);
       case FORMNUM:
       case FORMDTM:
       case FORMDAT:
-      case FORMTIM:
-        Err.or(NOTIMPL, func.desc);
-        return null;        
-      default:
-        return super.atomic(ctx);
+      case FORMTIM: Err.or(NOTIMPL, func.desc); return null;
+      default:      return super.atomic(ctx);
     }
   }
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case FORMINT:
-        return expr[0].e() ? atomic(ctx) : this;
-      default:
-        return this;
+      case FORMINT: return expr[0].e() ? atomic(ctx) : this;
+      default:      return this;
     }
   }
 
   // PRIVATE METHODS ==========================================================
-  
+
   /** Cases */
   private enum Case {
     /** Lower case. */ LOWER,
     /** Upper case. */ UPPER,
     /** Standard.   */ STANDARD;
   }
-  
+
   /**
    * Returns a formatted integer.
    * @param ctx query context
@@ -93,7 +87,7 @@ final class FNFormat extends Fun {
     if(cs == Case.UPPER) result = uc(result);
     return Str.get(result);
   }
-  
+
   /**
    * Returns ordinal characters.
    * @param pic picture
@@ -127,7 +121,7 @@ final class FNFormat extends Fun {
     tokens("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM");
   /** Roman numbers (1000-3000). */
   private static final byte[][] ROMANM = tokens("", "M", "MM", "MMM");
-  
+
   /**
    * Returns a Roman character sequence.
    * @param tb token builder
@@ -146,7 +140,7 @@ final class FNFormat extends Fun {
   }
 
   // Language dependent tokens (English is default) ===========================
-  
+
   /** Words (1-20). */
   private static final byte[][] WORDS = tokens("", "One", "Two", "Three",
       "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",
@@ -198,7 +192,7 @@ final class FNFormat extends Fun {
       }
     }
   }
-  
+
   /**
    * Adds a unit if the number is large enough (English; language specific).
    * @param tb token builder
@@ -210,7 +204,7 @@ final class FNFormat extends Fun {
    */
   private boolean addWord(final TokenBuilder tb, final long n, final long f,
       final byte[] unit, final byte[] ord) {
-    
+
     final boolean ge = n >= f;
     if(ge) {
       word(tb, n / f, null);
@@ -236,7 +230,7 @@ final class FNFormat extends Fun {
     // find optional ordinal modifier
     int p = 0;
     for(; p < pic.length && pic[p] != 'o'; p += cl(pic, p));
-    
+
     // find optional ordinal modifier
     final byte[] s = token(n);
     for(int i = p - s.length; i > 0; i--) tb.add('0');

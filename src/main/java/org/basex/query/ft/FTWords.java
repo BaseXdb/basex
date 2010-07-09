@@ -14,10 +14,8 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -232,9 +230,7 @@ public final class FTWords extends FTExpr {
    */
   private byte[] nextStr(final Iter iter) throws QueryException {
     final Item it = iter.next();
-    if(it == null) return null;
-    if(!it.s() && !it.u()) Err.type(info(), Type.STR, it);
-    return it.str();
+    return it == null ? null : checkStr(it);
   }
 
   @Override
