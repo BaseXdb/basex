@@ -28,7 +28,7 @@ namespace BaseXClient
     {
       socket = new TcpClient(host, port);
       stream = socket.GetStream();
-      string ts = receive();
+      string ts = Receive();
       Send(username);
       Send(MD5(MD5(pw) + ts));
       if (stream.ReadByte() != 0)
@@ -65,6 +65,44 @@ namespace BaseXClient
     }
     
     /** see readme.txt */
+    public void Create(string name, byte[] s)
+    {
+      stream.WriteByte(3);
+      Send(name);
+      int c = 0;
+      while (c < s.Length)
+      {
+      	stream.WriteByte(s[c]);
+      	c++;
+      }
+      stream.WriteByte(0);
+      info = Receive();
+      if(!Ok()) 
+      {
+        throw new IOException(info);
+      }
+    }
+    
+        /** see readme.txt */
+    public void Create(string name, Stream s)
+    {
+      stream.WriteByte(3);
+      Send(name);
+      while (true)
+      {
+      	int t = s.ReadByte();
+      	if (t == -1) break;
+      	stream.WriteByte(Convert.ToByte(t));
+      }
+      stream.WriteByte(0);
+      info = Receive();
+      if(!Ok()) 
+      {
+        throw new IOException(info);
+      }
+    }
+    
+    /** see readme.txt */
     public string Info
     {
       get
@@ -76,7 +114,7 @@ namespace BaseXClient
     /** see readme.txt */
     public void Close()
     {
-      send("exit");
+      Send("exit");
       socket.Close();
     }
     
