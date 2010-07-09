@@ -65,25 +65,6 @@ namespace BaseXClient
     }
     
     /** see readme.txt */
-    public void Create(string name, byte[] s)
-    {
-      stream.WriteByte(3);
-      Send(name);
-      int c = 0;
-      while (c < s.Length)
-      {
-      	stream.WriteByte(s[c]);
-      	c++;
-      }
-      stream.WriteByte(0);
-      info = Receive();
-      if(!Ok()) 
-      {
-        throw new IOException(info);
-      }
-    }
-    
-        /** see readme.txt */
     public void Create(string name, Stream s)
     {
       stream.WriteByte(3);
