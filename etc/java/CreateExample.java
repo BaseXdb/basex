@@ -30,7 +30,7 @@ public final class CreateExample {
         // define input stream
         InputStream bais =
           new ByteArrayInputStream("<xml>Hello World!</xml>".getBytes());
-        
+
         // create new database
         session.create("database", bais);
         System.out.println(session.info());

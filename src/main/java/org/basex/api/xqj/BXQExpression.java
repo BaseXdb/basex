@@ -6,7 +6,6 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQExpression;
 import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQStaticContext;
-
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Command;

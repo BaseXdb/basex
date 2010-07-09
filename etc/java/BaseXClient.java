@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
  * Language Binding for BaseX.
  * Works with BaseX 6.1.9 and later
  * Documentation: http://basex.org/api
- * 
+ *
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 public class BaseXClient {

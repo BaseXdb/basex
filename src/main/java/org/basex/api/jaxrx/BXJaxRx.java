@@ -194,7 +194,7 @@ public final class BXJaxRx implements JaxRx {
         } catch(final BaseXException ex) {
           // return exception if process failed
           throw new JaxRxException(404, ex.getMessage());
-        }        
+        }
       }
     }.run();
   }

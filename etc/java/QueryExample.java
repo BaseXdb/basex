@@ -3,7 +3,7 @@ import java.io.IOException;
 /**
  * This example shows how queries can be executed in an iterative manner.
  * Documentation: http://basex.org/api
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 public final class QueryExample {
