@@ -12,6 +12,7 @@ public interface QueryText {
   /** FOCA Error type. */ String FOCA = "FOCA";
   /** FOCH Error type. */ String FOCH = "FOCH";
   /** FODC Error type. */ String FODC = "FODC";
+  /** FODF Error type. */ String FODF = "FODF";
   /** FODT Error type. */ String FODT = "FODT";
   /** FOER Error type. */ String FOER = "FOER";
   /** FONS Error type. */ String FONS = "FONS";
@@ -83,6 +84,11 @@ public interface QueryText {
   Object[] DOCWF = { FODC, 6, "SAX: %" };
   /** FODC0007: Evaluation exception. */
   Object[] DOCBASE = { FODC, 7, "Base-uri % is invalid." };
+
+  /** FODF0000: Evaluation exception. */
+  Object[] FORMPIC = { FODF, 0, "Invalid picture format: \"%\"." };
+  /** FODF1280: Evaluation exception. */
+  Object[] FORMNUM = { FODF, 1280, "Unknown decimal format: %." };
 
   /** FODT0002: Evaluation exception. */
   Object[] DATEZERO = { FODT, 2, "Invalid infinity/zero calculation in %." };

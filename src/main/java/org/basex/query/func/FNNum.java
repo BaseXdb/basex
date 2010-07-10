@@ -31,8 +31,8 @@ final class FNNum extends Fun {
       case ABS:    return abs(it);
       case CEIL:   return num(it, d, Math.ceil(d));
       case FLOOR:  return num(it, d, Math.floor(d));
-      case RND:    return rnd(it, d, ctx, false);
-      case RNDHLF: return rnd(it, d, ctx, true);
+      case RND:    return rnd(it, d, false, ctx);
+      case RNDHLF: return rnd(it, d, true, ctx);
       default:     return super.atomic(ctx);
     }
   }
@@ -46,12 +46,27 @@ final class FNNum extends Fun {
   }
 
   /**
-   * Returns the absolute item.
+   * Returns a rounded item.
+   * @param it input item
+   * @param d input double value
+   * @param h2e half-to-even flag
+   * @param ctx query context
+   * @return absolute item
+   * @throws QueryException query exception
+   */
+  private Item rnd(final Item it, final double d, final boolean h2e,
+      final QueryContext ctx) throws QueryException {
+    final int p = expr.length == 1 ? 0 : (int) checkItr(expr[1], ctx);
+    return round(it, d, p, h2e);
+  }
+
+  /**
+   * Returns an absolute number.
    * @param it input item
    * @return absolute item
    * @throws QueryException query exception
    */
-  private Item abs(final Item it) throws QueryException {
+  public static Item abs(final Item it) throws QueryException {
     final double d = it.dbl();
     final boolean s = d > 0d || 1 / d > 0;
 
@@ -69,25 +84,24 @@ final class FNNum extends Fun {
    * @param it input item
    * @param d input double value
    * @param h2e half-to-even flag
-   * @param ctx query context
+   * @param prec precision
    * @return absolute item
    * @throws QueryException query exception
    */
-  private Item rnd(final Item it, final double d, final QueryContext ctx,
+  public static Item round(final Item it, final double d, final int prec,
       final boolean h2e) throws QueryException {
 
-    final int pp = expr.length == 1 ? 0 : (int) checkItr(expr[1], ctx);
-    if(it.type == Type.DEC && pp >= 0) {
+    if(it.type == Type.DEC && prec >= 0) {
       final BigDecimal bd = it.dec();
       final int m = h2e ? BigDecimal.ROUND_HALF_EVEN : bd.signum() > 0 ?
           BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN;
-      return Dec.get(bd.setScale(pp, m));
+      return Dec.get(bd.setScale(prec, m));
     }
 
     // calculate precision factor
     double p = 1;
-    for(long i = pp; i > 0; i--) p *= 10;
-    for(long i = pp; i < 0; i++) p /= 10;
+    for(long i = prec; i > 0; i--) p *= 10;
+    for(long i = prec; i < 0; i++) p /= 10;
 
     double c = d;
     if(h2e) {
@@ -107,7 +121,7 @@ final class FNNum extends Fun {
    * @param d calculated double value
    * @return numeric item
    */
-  private Item num(final Item it, final double n, final double d) {
+  private static Item num(final Item it, final double n, final double d) {
     final Item i = it.u() ? Dbl.get(n) : it;
     if(n == d) return i;
 

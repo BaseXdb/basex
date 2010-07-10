@@ -28,6 +28,19 @@ public final class Array {
   }
 
   /**
+   * Resizes an array and adds an entry at the end.
+   * @param ar array to be resized
+   * @param e entry to be added
+   * @return array
+   */
+  public static int[] add(final int[] ar, final int e) {
+    final int s = ar.length;
+    final int[] t = Arrays.copyOf(ar, s + 1);
+    t[s] = e;
+    return t;
+  }
+
+  /**
    * Moves entries inside an array.
    * @param ar array
    * @param pos position

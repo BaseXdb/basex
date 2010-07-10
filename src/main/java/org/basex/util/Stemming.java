@@ -12,57 +12,60 @@ import java.util.Arrays;
  */
 final class Stemming {
   /** Stemming character. */
-  private static final byte[] S = token("s");
-  /** Stemming character. */
-  private static final byte[] SSES = token("sses");
-  /** Stemming character. */
-  private static final byte[] IES = token("ies");
-  /** Stemming character. */
-  private static final byte[] EED = token("eed");
-  /** Stemming character. */
-  private static final byte[] ED = token("ed");
-  /** Stemming character. */
-  private static final byte[] ING = token("ing");
-  /** Stemming character. */
   private static final byte[] AT = token("at");
   /** Stemming character. */
   private static final byte[] BL = token("bl");
   /** Stemming character. */
-  private static final byte[] IZ = token("iz");
+  private static final byte[] ED = token("ed");
   /** Stemming character. */
-  private static final byte[] Y = token("y");
+  private static final byte[] EED = token("eed");
   /** Stemming character. */
-  private static final byte[] TION = token("tion");
+  private static final byte[] IES = token("ies");
   /** Stemming character. */
-  private static final byte[] SION = token("sion");
+  private static final byte[] ING = token("ing");
   /** Stemming character. */
   private static final byte[] ION = token("ion");
   /** Stemming character. */
-  private static final byte[] E = token("e");
+  private static final byte[] IZ = token("iz");
   /** Stemming character. */
   private static final byte[] LL = token("ll");
   /** Stemming character. */
-  private static final byte[] L = token("l");
+  private static final byte[] SION = token("sion");
+  /** Stemming character. */
+  private static final byte[] SSES = token("sses");
+  /** Stemming character. */
+  private static final byte[] TION = token("tion");
+  /** Stemming character. */
+  private static final byte S = 's';
+  /** Stemming character. */
+  private static final byte Y = 'y';
+  /** Stemming character. */
+  private static final byte E = 'e';
+  /** Stemming character. */
+  private static final byte L = 'l';
 
   /** Step 2. */
   private static final byte[][][] ST2 = {
-    tokens("ational", "ate"), tokens("tional", "tion"), tokens("enci", "ence"),
-    tokens("anci", "ance"), tokens("izer", "ize"), tokens("izer", "ize"),
-    tokens("abli", "able"), tokens("alli", "al"), tokens("entli", "ent"),
-    tokens("eli", "e"), tokens("ousli", "ous"), tokens("ization", "ize"),
-    tokens("ization", "ize"), tokens("ation", "ate"), tokens("ator", "ate"),
-    tokens("alism", "al"), tokens("iveness", "ive"), tokens("fulness", "ful"),
-    tokens("ousness", "ous"), tokens("aliti", "al"), tokens("iviti", "ive"),
-    tokens("biliti", "ble")};
+    tokens("abli", "able"), tokens("alism", "al"), tokens("aliti", "al"),
+    tokens("alli", "al"), tokens("anci", "ance"), tokens("ation", "ate"),
+    tokens("ational", "ate"), tokens("ator", "ate"), tokens("biliti", "ble"),
+    tokens("eli", "e"), tokens("enci", "ence"), tokens("entli", "ent"),
+    tokens("fulness", "ful"), tokens("iveness", "ive"), tokens("iviti", "ive"),
+    tokens("ization", "ize"), tokens("ization", "ize"), tokens("izer", "ize"),
+    tokens("izer", "ize"), tokens("ousli", "ous"), tokens("ousness", "ous"),
+    tokens("tional", "tion"),
+  };
   /** Step 3. */
   private static final byte[][][] ST3 = {
-    tokens("icate", "ic"), tokens("ative", ""), tokens("alize", "al"),
-    tokens("alize", "al"), tokens("iciti", "ic"), tokens("ical", "ic"),
-    tokens("ful", ""), tokens("ness", "") };
+    tokens("alize", "al"), tokens("alize", "al"), tokens("ative", ""),
+    tokens("ful", ""), tokens("ical", "ic"), tokens("icate", "ic"),
+    tokens("iciti", "ic"), tokens("ness", "")
+  };
   /** Step 4. */
-  private static final byte[][] ST4 =  tokens("al", "ance", "ence", "er", "ic",
-    "able", "ible", "ant", "ement", "ment", "ent", "sion", "tion", "ou", "ism",
-    "ate", "iti", "ous", "ive", "ize", "ize");
+  private static final byte[][] ST4 =  tokens(
+      "able", "al", "ance", "ant", "ate", "ement", "ence", "ent", "er", "ible",
+      "ic", "ism", "iti", "ive", "ize", "ment", "ou", "ous", "sion", "tion"
+  );
 
   /** Token to be stemmed. */
   private byte[] tok;
@@ -165,7 +168,7 @@ final class Stemming {
   }
 
   /**
-   * Suffix test.
+   * Suffix test for a token.
    * @param s suffix
    * @return result of check
    */
@@ -174,6 +177,18 @@ final class Stemming {
     final int l = te - sl;
     if(l < 0) return false;
     for(int i = 0; i < sl; i++) if(l(l + i) != s[i]) return false;
+    tt = l;
+    return true;
+  }
+
+  /**
+   * Suffix test for a single character.
+   * @param s suffix
+   * @return result of check
+   */
+  private boolean e(final byte s) {
+    final int l = te - 1;
+    if(l < 0 || l(l) != s) return false;
     tt = l;
     return true;
   }

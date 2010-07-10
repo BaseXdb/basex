@@ -62,64 +62,64 @@ public final class XQUPTest extends QueryTest {
     // name starts with 'xxx' is an update query.
     // The test query following q represents the actual test.
     queries = new Object[][] {
-        { "xxxxxxxxxxxxx", nodes(11),
+        { "xxxxxxxxxxxxx", nod(11),
         "/up/cars/good/car/wheels[text()='optional']" },
 
         // delete
-        { "xxxdel1", nodes(),
+        { "xxxdel1", nod(),
         "delete nodes /up/cars/good/car[1]" },
-        { "del1", nodes(5, 12, 22),
+        { "del1", nod(5, 12, 22),
         "//car" },
-        { "xxxdel2", nodes(),
+        { "xxxdel2", nod(),
         "delete nodes //car" },
-        { "del2", nodes(),
+        { "del2", nod(),
         "//car" },
-        { "xxxdel3", nodes(),
+        { "xxxdel3", nod(),
         "delete node /up/cars/good/car[1]/@id" },
-        { "del3", nodes(),
+        { "del3", nod(),
         "/up/cars/good/car[1]/@id" },
-        { "xxxdel4", nodes(),
+        { "xxxdel4", nod(),
         "delete node //wheels/text()" },
-        { "del4", nodes(),
+        { "del4", nod(),
         "//wheels/text()" },
-        { "xxxdel5", nodes(),
+        { "xxxdel5", nod(),
         "delete node //comment()" },
-        { "del5", nodes(),
+        { "del5", nod(),
         "//comment()" },
-        { "xxxdel6", nodes(),
+        { "xxxdel6", nod(),
         "delete node //processing-instruction()" },
-        { "del6", nodes(),
+        { "del6", nod(),
         "//processing-instruction()" },
 
         // rename
-        { "xxxren1", nodes(),
+        { "xxxren1", nod(),
         "rename node /up/cars as 'CARS'" },
-        { "ren1", nodes(2),
+        { "ren1", nod(2),
         "/up/CARS" },
-        { "xxxren2", nodes(),
+        { "xxxren2", nod(),
         "rename node /up/cars/good/car[1]/@id as 'ID'" },
-        { "ren2", nodes(6),
+        { "ren2", nod(6),
         "//car/@ID" },
-        { "xxxren3", nodes(),
+        { "xxxren3", nod(),
         "rename node //processing-instruction('dohere') as 'BADVICE'" },
-        { "ren3", nodes(28),
+        { "ren3", nod(28),
         "//processing-instruction('BADVICE')" },
 
         // replace elem
-        { "xxxrep1", nodes(),
+        { "xxxrep1", nod(),
         "replace node /up/cars/good/car[1] with /up/cars/good/car[2]" },
-        { "rep1", nodes(7),
+        { "rep1", nod(7),
         "/up/cars/good/car[1]/@color" },
         // replace attribute
-        { "xxxrep2", nodes(),
+        { "xxxrep2", nod(),
         "replace node /up/cars/good/car[1]/@id with " +
         "/up/cars/good/car[2]/@color" },
-        { "rep2", nodes(6),
+        { "rep2", nod(6),
         "/up/cars/good/car[1]/@color, /up/cars/good/car[1]/@id" },
         // replace text
-        { "xxxrep3", nodes(),
+        { "xxxrep3", nod(),
         "replace node /up/cars/good/car/wheels/text() with 'snap'" },
-        { "rep3", nodes(11),
+        { "rep3", nod(11),
         "/up/cars/good/car/wheels[text()='snap']" },
         /*
         { "xxxrep4", nodes(),
@@ -128,38 +128,38 @@ public final class XQUPTest extends QueryTest {
         "/up/cars/good/car/wheels[text()='5fooboo']" },
         */
         // replace attribute
-        { "xxxrep5", nodes(),
+        { "xxxrep5", nod(),
         "replace node /up/cars/good/car[@id='1']/@id with " + SEQ3},
-        { "rep5", nodes(6, 7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
+        { "rep5", nod(6, 7), "/up/cars/good/car/@n, /up/cars/good/car/@c" },
         // replace comment
-        { "xxxrep6", nodes(),
+        { "xxxrep6", nod(),
         "replace node /up/cars/good/car/comment() with " + SEQ1},
-        { "rep6", nodes(8),
+        { "rep6", nod(8),
         "/up/cars/good/car/text()" },
         // replace processing instruction
-        { "xxxrep7", nodes(),
+        { "xxxrep7", nod(),
         "replace node /up/cars/bad/car/processing-instruction() with " + SEQ1},
-        { "rep7", nodes(18, 19),
+        { "rep7", nod(18, 19),
         "/up/cars/bad/car/a, /up/cars/bad/car/text()" },
         // replace element content
-        { "xxxrep8", nodes(),
+        { "xxxrep8", nod(),
         "replace value of node //car[@id=1] with 'foo'"},
-        { "rep8", nodes(5),
+        { "rep8", nod(5),
         "//car[text()='foo']" },
         // "no man's land"
-        { "xxxrep9", nodes(),
+        { "xxxrep9", nod(),
         "replace value of node //car[@id=1] with \"no man's land\""},
-        { "rep9", nodes(5),
+        { "rep9", nod(5),
         "//car[text()=\"no man's land\"]" },
 
         // insert
-        { "xxxins1", nodes(),
+        { "xxxins1", nod(),
         "insert node " + SEQ1 + "into /up/cars/good/car[@id='1']"},
-        { "ins1", nodes(8, 9),
+        { "ins1", nod(8, 9),
         "/up/cars/good/car/a, /up/cars/good/car/text()" },
-        { "xxxins2", nodes(),
+        { "xxxins2", nod(),
         "insert node " + SEQ5 + "into /up/cars/good/car[@id=1]"},
-        { "ins2", nodes(6, 9, 10),
+        { "ins2", nod(6, 9, 10),
         "/up/cars/good/car/@n, /up/cars/good/car/a, " +
         "/up/cars/good/car/text()" },
         /*
@@ -171,9 +171,9 @@ public final class XQUPTest extends QueryTest {
         */
 
         // merge text nodes
-        { "xxxMERGEins", nodes(),
+        { "xxxMERGEins", nod(),
           "insert node 'foo' into /up/cars/good/car/wheels"},
-          { "MERGEins", nodes(11),
+          { "MERGEins", nod(11),
           "/up/cars/good/car/wheels[text()='optionalfoo']" },
 
         // parser tests

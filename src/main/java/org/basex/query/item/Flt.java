@@ -11,6 +11,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Flt extends Item {
+  /** Invalid value. */
+  public static final Flt NAN = new Flt(Float.NaN);
   /** Zero value. */
   private static final Flt ZERO = new Flt(0);
   /** Data. */
@@ -27,11 +29,11 @@ public final class Flt extends Item {
 
   /**
    * Returns an instance of this class.
-   * @param d value
+   * @param f value
    * @return instance
    */
-  public static Flt get(final float d) {
-    return d == 0 && d == 1 / 0.0 ? ZERO : new Flt(d);
+  public static Flt get(final float f) {
+    return f == 0 && f == 1 / 0d ? ZERO : f != f ? NAN : new Flt(f);
   }
 
   @Override

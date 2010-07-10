@@ -63,6 +63,8 @@ public abstract class QueryTest {
     final boolean up = this instanceof XQUPTest;
     new CreateDB(name, file).execute(context);
 
+    final StringBuilder sb = new StringBuilder();
+
     for(final Object[] qu : queries) {
       // added to renew document after each update test
       if(up && ((String) qu[0]).startsWith("xxx")) {
@@ -71,7 +73,6 @@ public abstract class QueryTest {
 
       final boolean correct = qu.length == 3;
       final String query = qu[correct ? 2 : 1].toString();
-      final String cmd = qu[0] + ": " + query;
 
       final Command c = new XQuery(query);
       try {
@@ -82,13 +83,17 @@ public abstract class QueryTest {
           ((Nodes) cmp).data = ((Nodes) val).data;
         }
         if(!correct || !val.same(cmp)) {
-          fail(cmd + ": Right: " + (correct ? qu[1] : "error") + "\n  Found: " +
-              val + "\n" + details());
+          sb.append("-- " + qu[0] + ": " + query + "\nExpected: " + (correct ?
+              qu[1] : "error") + "\nFound: " + val + " " + details() + "\n");
         }
       } catch(final BaseXException ex) {
-        if(correct) fail(qu[0] + ": " + ex.getMessage() + details());
+        if(correct) {
+          sb.append("-- " + qu[0] + ": " + query + "\n" +
+              ex.getMessage() + " " + details() + "\n");
+        }
       }
     }
+    if(sb.length() != 0) fail("\n" + sb.toString().trim());
   }
 
   /**
@@ -104,7 +109,7 @@ public abstract class QueryTest {
    * @param nodes node values
    * @return node array
    */
-  static Nodes nodes(final int... nodes) {
+  static Nodes nod(final int... nodes) {
     return new Nodes(nodes);
   }
 
@@ -113,7 +118,7 @@ public abstract class QueryTest {
    * @param str string
    * @return iterator
    */
-  static SeqIter string(final String str) {
+  static SeqIter str(final String str) {
     return item(Str.get(str));
   }
 

@@ -5,10 +5,12 @@ import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
+import org.basex.util.local.Formatter;
 
 /**
  * Formatting functions.
@@ -21,7 +23,7 @@ final class FNFormat extends Fun {
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
       case FORMINT: return formatInt(ctx);
-      case FORMNUM:
+      case FORMNUM: return formatNum(ctx);
       case FORMDTM:
       case FORMDAT:
       case FORMTIM: Err.or(NOTIMPL, func.desc); return null;
@@ -56,6 +58,9 @@ final class FNFormat extends Fun {
     final byte[] pic = checkStr(expr[1], ctx);
     if(expr[0].e()) return Str.ZERO;
 
+    final Formatter f = Formatter.get(
+        string(expr.length == 2 ? EMPTY : checkStr(expr[2], ctx)));
+
     long num = checkItr(expr[0], ctx);
     if(pic.length == 0 || num == 0) return Str.get(token(num));
 
@@ -73,11 +78,10 @@ final class FNFormat extends Fun {
     } else if((ch & 0xDF) == 'I') {
       roman(tb, num);
     } else if((ch & 0xDF) == 'W') {
-      final boolean up = pic.length == 1 || pic[1] != 'w';
-      if(up) cs = Case.UPPER;
-      word(tb, num, ord(pic, up ? 1 : 2));
+      if(ch == 'W' && charAt(pic, 1) != 'w') cs = Case.UPPER;
+      tb.add(f.word(num, ord(pic, cs == Case.STANDARD ? 2 : 1)));
     } else {
-      number(tb, num, pic);
+      number(tb, num, pic, f);
     }
 
     // finalize formatted string
@@ -88,13 +92,14 @@ final class FNFormat extends Fun {
     return Str.get(result);
   }
 
+
   /**
    * Returns ordinal characters.
    * @param pic picture
    * @param p position
    * @return ordinal bytes
    */
-  private byte[] ord(final byte[] pic, final int p) {
+  protected static byte[] ord(final byte[] pic, final int p) {
     return charAt(pic, p)  != 'o' ? null :
       charAt(pic, p + 1) != '(' || charAt(pic, pic.length - 1) != ')' ? EMPTY :
       substring(pic, p + 2, pic.length - 1);
@@ -105,7 +110,7 @@ final class FNFormat extends Fun {
    * @param tb token builder
    * @param n number to be formatted
    */
-  private void latin(final TokenBuilder tb, final long n) {
+  private static void latin(final TokenBuilder tb, final long n) {
     if(n > 26) latin(tb, (n - 1) / 26);
     tb.add((char) ('A' + (n - 1) % 26));
   }
@@ -127,7 +132,7 @@ final class FNFormat extends Fun {
    * @param tb token builder
    * @param n number to be formatted
    */
-  private void roman(final TokenBuilder tb, final long n) {
+  private static void roman(final TokenBuilder tb, final long n) {
     if(n < 4000) {
       final int v = (int) n;
       tb.add(ROMANM[v / 1000]);
@@ -139,107 +144,51 @@ final class FNFormat extends Fun {
     }
   }
 
-  // Language dependent tokens (English is default) ===========================
-
-  /** Words (1-20). */
-  private static final byte[][] WORDS = tokens("", "One", "Two", "Three",
-      "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven",
-      "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
-      "Seventeen", "Eighteen", "Nineteen");
-  /** Words (20-100). */
-  private static final byte[][] WORDS10 = tokens("", "Ten", "Twenty", "Thirty",
-      "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety");
-  /** Words (1-20). */
-  private static final byte[][] ORDINALS = tokens("", "First", "Second",
-      "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth",
-      "Tenth", "Eleventh", "Twelfth", "Thirteenth", "Fourteenth", "Fifteenth",
-      "Sixteenth", "Seventeenth", "Eighteenth", "Nineteenth");
-  /** Words (20-100). */
-  private static final byte[][] ORDINALS10 = tokens("", "Tenth", "Twentieth",
-      "Thirtieth", "Fortieth", "Fiftieth", "Sixtieth", "Seventieth",
-      "Eightieth", "Ninetieth");
-  /** Words (100, 1000, ...). */
-  private static final byte[][] WORDS100 = tokens("Quintillion",
-      "Quadrillion", "Trillion", "Billion", "Million", "Thousand", "Hundred");
-  /** Units (100, 1000, ...). */
-  private static final long[] UNITS100 = { 1000000000000000000L,
-    1000000000000000L, 1000000000000L, 1000000000, 1000000, 1000, 100 };
-  /** And. */
-  private static final byte[] AND = token("and");
-  /** Ordinal suffixes (st, nr, rd, th). */
-  private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
-
-  /**
-   * Returns an word character sequence (English; language specific).
-   * @param tb token builder
-   * @param n number to be formatted
-   * @param ord ordinal numbering
-   */
-  private void word(final TokenBuilder tb, final long n, final byte[] ord) {
-    if(n < 20) {
-      tb.add((ord != null ? ORDINALS : WORDS)[(int) n]);
-    } else if(n < 100) {
-      final int r = (int) (n % 10);
-      if(r == 0) {
-        tb.add((ord != null ? ORDINALS10 : WORDS10)[(int) n / 10]);
-      } else {
-        tb.add(WORDS10[(int) n / 10]);
-        tb.add(' ').add((ord != null ? ORDINALS : WORDS)[r]);
-      }
-    } else {
-      for(int w = 0; w < WORDS100.length; w++) {
-        if(addWord(tb, n, UNITS100[w], WORDS100[w], ord)) break;
-      }
-    }
-  }
-
-  /**
-   * Adds a unit if the number is large enough (English; language specific).
-   * @param tb token builder
-   * @param n number
-   * @param f factor
-   * @param unit unit
-   * @param ord ordinal numbering
-   * @return true if word was added
-   */
-  private boolean addWord(final TokenBuilder tb, final long n, final long f,
-      final byte[] unit, final byte[] ord) {
-
-    final boolean ge = n >= f;
-    if(ge) {
-      word(tb, n / f, null);
-      final long r = n % f;
-      tb.add(' ').add(unit);
-      if(ord != null) tb.add(ORDSUFFIX[3]);
-      if(r > 0) {
-        tb.add(' ');
-        if(r < 100) tb.add(AND).add(' ');
-      }
-      word(tb, r, ord);
-    }
-    return ge;
-  }
-
   /**
    * Returns a number character sequence.
    * @param tb token builder
    * @param n number to be formatted
    * @param pic picture
+   * @param form language-dependent formatter
    */
-  private void number(final TokenBuilder tb, final long n, final byte[] pic) {
+  private static void number(final TokenBuilder tb, final long n,
+      final byte[] pic, final Formatter form) {
+
     // find optional ordinal modifier
     int p = 0;
     for(; p < pic.length && pic[p] != 'o'; p += cl(pic, p));
 
-    // find optional ordinal modifier
-    final byte[] s = token(n);
-    for(int i = p - s.length; i > 0; i--) tb.add('0');
-    tb.add(s);
+    // find optional-digit-signs
+    int o = 0;
+    for(; o < pic.length && pic[o] == '#'; o += cl(pic, o));
 
-    // ordinal found; add suffix
-    if(ord(pic, p) != null) {
-      final int f = (int) (n % 10);
-      tb.add(ORDSUFFIX[f > 0 && f < 4 && n % 100 / 10 != 1 ? f - 1 : 3]);
-    }
+    // create string representation
+    final byte[] str = token(n);
+    // ordinal
+    final byte[] ord = form.ordinal(n, ord(pic, p));
+
+    final int d = p - str.length - ord.length;
+    for(int i = Math.min(o, d); i > 0; i--) tb.add(' ');
+    for(int i = d; i > o; i--) tb.add('0');
+    tb.add(str);
+    tb.add(ord);
+  }
+
+  /**
+   * Returns a formatted number.
+   * @param ctx query context
+   * @return string
+   * @throws QueryException query exception
+   */
+  private Str formatNum(final QueryContext ctx) throws QueryException {
+    // evaluate arguments
+    Item it = expr[0].atomic(ctx);
+    if(it == null) it = Dbl.NAN;
+    else if(!it.u() && !it.n()) Err.num(info(), it);
+
+    final String pic = string(checkStr(expr[1], ctx));
+    if(expr.length == 3) Err.or(FORMNUM, expr[2]);
+
+    return new FNFormatNum(it, pic).format();
   }
 }
