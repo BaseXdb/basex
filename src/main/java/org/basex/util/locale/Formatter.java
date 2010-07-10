@@ -1,4 +1,4 @@
-package org.basex.util.local;
+package org.basex.util.locale;
 
 import java.util.HashMap;
 

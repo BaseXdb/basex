@@ -10,7 +10,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
-import org.basex.util.local.Formatter;
+import org.basex.util.locale.Formatter;
 
 /**
  * Formatting functions.

@@ -1,4 +1,4 @@
-package org.basex.util.local;
+package org.basex.util.locale;
 
 import static org.basex.util.Token.*;
 import org.basex.util.TokenBuilder;
