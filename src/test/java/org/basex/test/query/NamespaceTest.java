@@ -235,15 +235,22 @@ public class NamespaceTest {
   }
 
   /**
-   * Removes test databases and closes the database context.
+   * Drops all test databases.
    * @throws BaseXException database exception
    */
-  @AfterClass
-  public static void finish() throws BaseXException {
+  @Before
+  public void endTest() throws BaseXException {
     // drop all test databases
     for(final String[] doc : docs) {
       new DropDB(doc[0]).execute(context);
     }
+  }
+
+  /**
+   * Removes test databases and closes the database context.
+   */
+  @AfterClass
+  public static void finish() {
     context.close();
   }
 

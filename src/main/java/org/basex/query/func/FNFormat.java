@@ -5,9 +5,12 @@ import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.Date;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 import org.basex.util.locale.Formatter;
@@ -22,11 +25,11 @@ final class FNFormat extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case FORMINT: return formatInt(ctx);
-      case FORMNUM: return formatNum(ctx);
-      case FORMDTM:
-      case FORMDAT:
-      case FORMTIM: Err.or(NOTIMPL, func.desc); return null;
+      case FORMINT: return formatInteger(ctx);
+      case FORMNUM: return formatNumber(ctx);
+      case FORMDTM: return formatDate(Type.DTM, ctx);
+      case FORMDAT: return formatDate(Type.DAT, ctx);
+      case FORMTIM: return formatDate(Type.TIM, ctx);
       default:      return super.atomic(ctx);
     }
   }
@@ -54,7 +57,7 @@ final class FNFormat extends Fun {
    * @return string
    * @throws QueryException query exception
    */
-  private Str formatInt(final QueryContext ctx) throws QueryException {
+  private Str formatInteger(final QueryContext ctx) throws QueryException {
     final byte[] pic = checkStr(expr[1], ctx);
     if(expr[0].e()) return Str.ZERO;
 
@@ -180,7 +183,7 @@ final class FNFormat extends Fun {
    * @return string
    * @throws QueryException query exception
    */
-  private Str formatNum(final QueryContext ctx) throws QueryException {
+  private Str formatNumber(final QueryContext ctx) throws QueryException {
     // evaluate arguments
     Item it = expr[0].atomic(ctx);
     if(it == null) it = Dbl.NAN;
@@ -190,5 +193,22 @@ final class FNFormat extends Fun {
     if(expr.length == 3) Err.or(FORMNUM, expr[2]);
 
     return new FNFormatNum(it, pic).format();
+  }
+
+  /**
+   * Returns a formatted number.
+   * @param ctx query context
+   * @param type input type
+   * @return string
+   * @throws QueryException query exception
+   */
+  private Item formatDate(final Type type, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = expr[0].atomic(ctx);
+    if(it == null) return Seq.EMPTY;
+    final Date date = (Date) checkType(it, type);
+    //final byte[] pic = checkStr(expr[1], ctx);
+    return Str.get(date.str());
   }
 }
