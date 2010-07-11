@@ -18,14 +18,15 @@ namespace BaseXClient
       {
         // create session
         Session session = new Session("localhost", 1984, "admin", "admin");
-        
+
         // define InputStream
-        MemoryStream ms = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("<xml>Hello World!</xml>"));
+        MemoryStream ms = new MemoryStream(
+          System.Text.Encoding.UTF8.GetBytes("<xml>Hello World!</xml>"));
 
         // create database
         session.Create("database", ms);
         Console.WriteLine(session.Info);
-        
+
         // run query on database
         Console.WriteLine(session.Execute("xquery /"));
 

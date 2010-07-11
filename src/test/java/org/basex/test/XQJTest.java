@@ -415,10 +415,7 @@ public final class XQJTest extends TestCase {
       for(int t = 1; t <= 51; t++) {
         try {
           conn.createItemFromObject(o, conn.createAtomicType(t));
-          //Main.outln("+ " + o.getClass() + " => " + t);
         } catch(final Exception ex) {
-          //Main.outln("- " + o.getClass() + " => " + t);
-          //Main.outln("  (" + ex.getMessage() + ")");
         }
       }
     }
@@ -491,10 +488,42 @@ public final class XQJTest extends TestCase {
     final XQExpression expr = conn.createExpression();
     try {
       expr.executeCommand("info db");
+      fail("Error expected: no database opened.");
     } catch(final XQException ex) {
     }
     expr.executeCommand("open input");
     expr.executeCommand("info db");
     expr.executeCommand("close");
+  }
+
+  /**
+   * Test (mailing list, Jul 10).
+   * @throws Exception exception
+   */
+  @Test
+  public void testCreateVar() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+    expr.executeQuery("declare variable $x := 1; $x");
+  }
+
+  /**
+   * Test (Sourceforge #2937184); bind context item.
+   * @throws Exception exception
+   */
+  @Test
+  public void testContext() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+    XQResultSequence result = expr.executeQuery("doc('input')//title/text()");
+    result.next();
+    XQItem item = conn.createItem(result.getItem());
+
+    // bind
+    final XQPreparedExpression pe = conn.prepareExpression(".");
+    pe.bindItem(XQConstants.CONTEXT_ITEM, item);
+    result = pe.executeQuery();
+    result.next();
+    assertEquals("XML", result.getItemAsString(null));
   }
 }

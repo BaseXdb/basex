@@ -51,7 +51,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
 
   @Override
   public XQResultSequence executeQuery() throws XQException {
-    qp.reset();
+    //qp.reset();
     return execute();
   }
 
