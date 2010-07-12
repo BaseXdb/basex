@@ -264,6 +264,16 @@ public final class Token {
     return cl(token[pos]);
   }
 
+  /**
+   * Returns the codepoint (unicode value) at the specified position.
+   * Returns a {@code 0} byte in the index is invalid.
+   * @param string string
+   * @param pos position
+   * @return character
+   */
+  public static int cp(final String string, final int pos) {
+    return pos >= 0 && pos < string.length() ? string.charAt(pos) : 0;
+  }
 
   /*** Character lengths. */
   private static final int[] CHLEN = {
@@ -488,17 +498,6 @@ public final class Token {
       if(i == dbl) return token(i);
     }
     return null;
-  }
-
-  /**
-   * Returns a character at the specified position, or {@code 0} if the position
-   * is invalid.
-   * @param token token
-   * @param p position
-   * @return character
-   */
-  public static byte charAt(final byte[] token, final int p) {
-    return p >= 0 && p < token.length ? token[p] : 0;
   }
 
   /**
@@ -851,8 +850,11 @@ public final class Token {
    */
   public static byte[] substring(final byte[] token, final int start,
       final int end) {
-    if(start == 0 && end == token.length) return token;
-    return start >= end ? EMPTY : Arrays.copyOfRange(token, start, end);
+
+    final int s = Math.max(0, start);
+    final int e = Math.min(end, token.length);
+    if(s == 0 && e == token.length) return token;
+    return s >= e ? EMPTY : Arrays.copyOfRange(token, s, e);
   }
 
   /**

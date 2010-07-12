@@ -39,33 +39,81 @@ final class FormatterEN extends Formatter {
       "Thirtieth", "Fortieth", "Fiftieth", "Sixtieth", "Seventieth",
       "Eightieth", "Ninetieth");
 
+  /** Days. */
+  private static final byte[][] DAYS = tokens("Sunday", "Monday", "Tuesday",
+      "Wednesday", "Thursday", "Friday", "Saturday");
+
+  /** Months. */
+  private static final byte[][] MONTHS = tokens(
+      "January", "February", "March", "April", "May", "June", "July",
+      "August", "September", "October", "November", "December");
+
+  /** AM/PM Markers. */
+  private static final byte[][] AMPM = tokens("AM", "PM");
+
   /** And. */
   private static final byte[] AND = token("and");
 
   /** Ordinal suffixes (st, nr, rd, th). */
   private static final byte[][] ORDSUFFIX = tokens("st", "nd", "rd", "th");
 
+  /** Eras: BC, AD. */
+  private static final byte[][] ERAS = tokens("BC", "AD");
+
+  
   @Override
-  public byte[] word(final long n, final byte[] ord) {
+  public byte[] word(final long n, final String ord) {
     final TokenBuilder tb = new TokenBuilder();
     word(tb, n, ord);
     return tb.finish();
   }
 
   @Override
-  public byte[] ordinal(final long n, final byte[] ord) {
+  public byte[] ordinal(final long n, final String ord) {
     if(ord == null) return EMPTY;
     final int f = (int) (n % 10);
     return ORDSUFFIX[f > 0 && f < 4 && n % 100 / 10 != 1 ? f - 1 : 3];
   }
 
+  @Override
+  public byte[] month(final int n, final int min, final int max) {
+    final TokenBuilder tb = new TokenBuilder(substring(MONTHS[n], 0, max));
+    while(tb.size() < min) tb.add(' ');
+    return tb.finish();
+  }
+
+  @Override
+  public byte[] day(final int n, final int min, final int max) {
+    final TokenBuilder tb = new TokenBuilder(substring(DAYS[n], 0, max));
+    while(tb.size() < min) tb.add(' ');
+    return tb.finish();
+  }
+
+  @Override
+  public byte[] ampm(final boolean am) {
+    return AMPM[am ? 0 : 1];
+  }
+
+  @Override
+  public byte[] calendar() {
+    return ERAS[1];
+  }
+
+  @Override
+  public byte[] era(final int year) {
+    return ERAS[year < 0 ? 0 : 1];
+  }
+
+  
+  // PRIVATE METHODS ==========================================================
+  
   /**
    * Creates a word character sequence for the specified number.
    * @param tb token builder
    * @param n number to be formatted
    * @param ord ordinal suffix
    */
-  private void word(final TokenBuilder tb, final long n, final byte[] ord) {
+  private void word(final TokenBuilder tb, final long n, final String ord) {
     if(n < 20) {
       tb.add((ord != null ? ORDINALS : WORDS)[(int) n]);
     } else if(n < 100) {
@@ -93,7 +141,7 @@ final class FormatterEN extends Formatter {
    * @return true if word was added
    */
   private boolean addWord(final TokenBuilder tb, final long n, final long f,
-      final byte[] unit, final byte[] ord) {
+      final byte[] unit, final String ord) {
 
     final boolean ge = n >= f;
     if(ge) {

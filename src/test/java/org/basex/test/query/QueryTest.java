@@ -64,6 +64,7 @@ public abstract class QueryTest {
     new CreateDB(name, file).execute(context);
 
     final StringBuilder sb = new StringBuilder();
+    int fail = 0;
 
     for(final Object[] qu : queries) {
       // added to renew document after each update test
@@ -83,17 +84,20 @@ public abstract class QueryTest {
           ((Nodes) cmp).data = ((Nodes) val).data;
         }
         if(!correct || !val.same(cmp)) {
-          sb.append("-- " + qu[0] + ": " + query + "\nExpected: " + (correct ?
-              qu[1] : "error") + "\nFound: " + val + " " + details() + "\n");
+          sb.append("-- " + qu[0] + ": " + query + "\n[E] " + (correct ?
+              qu[1] : "error") + "\n[F] " + val + " " + details() + "\n");
+          fail++;
         }
       } catch(final BaseXException ex) {
         if(correct) {
-          sb.append("-- " + qu[0] + ": " + query + "\n" +
-              ex.getMessage() + " " + details() + "\n");
+          sb.append("-- " + qu[0] + ": " + query + "\n[E] " +
+              qu[1] + "\n[F] " + ex.getMessage() + " " + details() + "\n");
+          fail++;
         }
       }
     }
-    if(sb.length() != 0) fail("\n" + sb.toString().trim());
+    if(fail != 0) fail(fail + " wrong queries; [E] expected, [F] found:\n" +
+        sb.toString().trim());
   }
 
   /**

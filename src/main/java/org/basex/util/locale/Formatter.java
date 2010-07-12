@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 /**
  * Abstract class for formatting data in different languages.
+ * Implementations are expected to return strings in a capitalized syntax.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -16,7 +17,7 @@ public abstract class Formatter {
   private static final HashMap<String, Formatter> MAP =
     new HashMap<String, Formatter>();
 
-  // initialize hash map with English default formatter
+  // initialize hash map with English formatter as default
   static { MAP.put(EN, new FormatterEN()); }
 
   /**
@@ -47,7 +48,7 @@ public abstract class Formatter {
    * @param ord ordinal suffix
    * @return token
    */
-  public abstract byte[] word(final long n, final byte[] ord);
+  public abstract byte[] word(final long n, final String ord);
 
   /**
    * Returns an ordinal representation for the specified number.
@@ -55,5 +56,43 @@ public abstract class Formatter {
    * @param ord ordinal suffix
    * @return ordinal
    */
-  public abstract byte[] ordinal(final long n, final byte[] ord);
+  public abstract byte[] ordinal(final long n, final String ord);
+
+  /**
+   * Returns the specified month (0-11).
+   * @param n number to be formatted
+   * @param min minimum length
+   * @param max maximum length
+   * @return month
+   */
+  public abstract byte[] month(final int n, final int min, final int max);
+
+  /**
+   * Returns the specified day of the week (0-6, Sunday-Saturday).
+   * @param n number to be formatted
+   * @param min minimum length
+   * @param max maximum length
+   * @return day of week
+   */
+  public abstract byte[] day(final int n, final int min, final int max);
+
+  /**
+   * Returns the am/pm marker.
+   * @param am am flag
+   * @return am/pm marker
+   */
+  public abstract byte[] ampm(final boolean am);
+
+  /**
+   * Returns the calendar.
+   * @return calendar
+   */
+  public abstract byte[] calendar();
+
+  /**
+   * Returns the era.
+   * @param year year
+   * @return era
+   */
+  public abstract byte[] era(final int year);
 }

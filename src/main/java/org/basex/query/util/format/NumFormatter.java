@@ -1,12 +1,12 @@
-package org.basex.query.func;
+package org.basex.query.util.format;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
+import org.basex.query.func.FNNum;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Str;
 import org.basex.query.util.Err;
 import org.basex.util.Array;
 
@@ -16,7 +16,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class FNFormatNum {
+public final class NumFormatter {
   /** Infinity. */
   private static final String INF = "Infinity";
   /** NaN. */
@@ -48,37 +48,29 @@ final class FNFormatNum {
   /** Passive characters. */
   private static final String PASSIVE = "" + MINUS + PERCENT + PERMILLE;
 
-  /** Number to be formatted. */
-  private final Item number;
-  /** Picture. */
-  private final String picture;
-
-  /**
-   * Constructor.
-   * @param it number
-   * @param p picture
-   */
-  FNFormatNum(final Item it, final String p) {
-    number = it;
-    picture = p;
-  }
-
+  /** Private constructor. */
+  private NumFormatter() { }
+  
   /**
    * Returns a formatted number.
-   * @return string
+   * @param number number to be formatted
+   * @param picture picture
+   * @return string representation
    * @throws QueryException query exception
    */
-  Str format() throws QueryException {
+  public static byte[] format(final Item number, final String picture)
+      throws QueryException {
+
     // find pattern separator and sub-patterns
     final String[] sub = picture.split(String.valueOf(PATTERN));
-    if(sub.length > 2) errPic(picture);
+    if(sub.length > 2) Err.or(PICNUM, picture);
 
     // check and analyze patterns
     check(sub);
     final Picture[] pics = analyze(sub);
 
     // return formatted string
-    return Str.get(token(format(number, pics)));
+    return token(format(number, pics));
   }
 
   /**
@@ -86,7 +78,7 @@ final class FNFormatNum {
    * @param patterns patterns
    * @throws QueryException query exception
    */
-  private void check(final String[] patterns) throws QueryException {
+  private static void check(final String[] patterns) throws QueryException {
     for(final String pat : patterns) {
       boolean frac = false, pas = false, act = false;
       boolean dig = false, opt1 = false, opt2 = false;
@@ -100,12 +92,12 @@ final class FNFormatNum {
 
         if(ch == DECIMAL) {
           // more than 1 decimal sign?
-          if(frac) errPic(pat);
+          if(frac) Err.or(PICNUM, pat);
           frac = true;
         } else if(ch == GROUP) {
           // adjacent decimal sign?
-          if(i > 0 && pat.charAt(i - 1) == DECIMAL ||
-             i + 1 < pat.length() && pat.charAt(i + 1) == DECIMAL) errPic(pat);
+          if(cp(pat, i - 1) == DECIMAL || cp(pat, i + 1) == DECIMAL)
+            Err.or(PICNUM, pat);
         } else if(ch == PERCENT) {
           pc++;
         } else if(ch == PERMILLE) {
@@ -113,31 +105,31 @@ final class FNFormatNum {
         } else if(ch == OPTIONAL) {
           if(!frac) {
             // integer part, and optional sign after digit?
-            if(dig) errPic(pat);
+            if(dig) Err.or(PICNUM, pat);
             opt1 = true;
           } else {
             opt2 = true;
           }
         } else if(DIGITS.indexOf(ch) != -1) {
           // fractional part, and digit after optional sign?
-          if(frac && opt2) errPic(pat);
+          if(frac && opt2) Err.or(PICNUM, pat);
           dig = true;
         } else if(ch != MINUS) {
           // unknown character
-          errPic(pat);
+          Err.or(PICNUM, pat);
         }
 
         // passive character with preceding and following active character?
-        if(a && pas && act) errPic(pat);
+        if(a && pas && act) Err.or(PICNUM, pat);
         // will be assigned if active characters were found
         if(act) pas |= p;
         act |= a;
       }
 
       // more than 1 percent and permille sign?
-      if(pc > 1 || pm > 1 || pc + pm > 1) errPic(pat);
+      if(pc > 1 || pm > 1 || pc + pm > 1) Err.or(PICNUM, pat);
       // no optional sign or digit?
-      if(!opt1 && !opt2 && !dig) errPic(pat);
+      if(!opt1 && !opt2 && !dig) Err.or(PICNUM, pat);
     }
   }
 
@@ -146,7 +138,7 @@ final class FNFormatNum {
    * @param patterns patterns
    * @return picture variables
    */
-  private Picture[] analyze(final String[] patterns) {
+  private static Picture[] analyze(final String[] patterns) {
     // pictures
     final Picture[] pics = new Picture[patterns.length];
 
@@ -200,7 +192,7 @@ final class FNFormatNum {
    * @return picture variables
    * @throws QueryException query exception
    */
-  private String format(final Item it, final Picture[] pics)
+  private static String format(final Item it, final Picture[] pics)
       throws QueryException {
 
     final double d = it.dbl();
@@ -252,15 +244,6 @@ final class FNFormatNum {
     res.append(pre);
     if(suf.length() != 0) res.append(DECIMAL).append(suf);
     return res.append(pic.fix[1]).toString();
-  }
-
-  /**
-   * Returns an error for the specified picture.
-   * @param pic picture
-   * @throws QueryException query exception
-   */
-  private static void errPic(final String pic) throws QueryException {
-    Err.or(FORMPIC, pic);
   }
 
   /** Picture variables. */

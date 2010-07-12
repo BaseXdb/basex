@@ -33,8 +33,7 @@ public final class Prop extends AProp {
 
   /** Property information. */
   static final String PROPHEADER = "# Property File." + NL +
-      "# This here will be overwritten every time, but" + NL +
-      "# you can set your own options at the end of the file." + NL;
+      "# You can set additional options at the end of the file." + NL;
   /** Property information. */
   static final String PROPUSER = "# User defined section";
 

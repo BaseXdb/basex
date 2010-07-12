@@ -19,7 +19,7 @@ import org.basex.query.util.Err;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class FNNum extends Fun {
+public final class FNNum extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].atomic(ctx);

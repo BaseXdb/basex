@@ -178,8 +178,8 @@ public abstract class Date extends Item {
   }
 
   /**
-   * Returns the days.
-   * @return seconds
+   * Returns the number of days since AD.
+   * @return days
    */
   protected final long days() {
     final int y = xc.getYear() == UNDEF ? 0 : xc.getYear();
@@ -208,14 +208,15 @@ public abstract class Date extends Item {
     return y % 4 == 0 && (y % 100 != 0 || y % 400 == 0) ? 1 : 0;
   }
 
-  /***
-   * Returns the nth day of the year.
+  /**
+   * Returns the number of days since AD for the specified years,
+   * months and days.
    * @param y year
    * @param m month
    * @param d days
    * @return days
    */
-  private static long days(final int y, final int m, final int d) {
+  public static long days(final int y, final int m, final int d) {
     long n = 0;
     final int yy = Math.abs(y);
     for(int i = 0; i < yy; i++) n += 365 + leap(i);

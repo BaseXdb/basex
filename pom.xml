@@ -4,7 +4,7 @@
   <groupId>org.basex</groupId>
   <artifactId>basex</artifactId>
   <packaging>jar</packaging>
-  <version>6.2</version>
+  <version>6.2.1</version>
   <name>BaseX</name>
   <url>http://basex.org</url>
   <properties>
@@ -85,6 +85,9 @@
               <mainClass>org.basex.BaseXWin</mainClass>
               <packageName>org.basex</packageName>
             </manifest>
+            <manifestEntries>
+              <SplashScreen-Image>img/start.png</SplashScreen-Image>
+            </manifestEntries>
           </archive>
         </configuration>
       </plugin>

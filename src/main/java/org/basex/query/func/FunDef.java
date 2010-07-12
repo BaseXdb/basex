@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import static org.basex.query.item.SeqType.*;
 import static org.basex.query.QueryTokens.*;
+
 import org.basex.query.item.SeqType;
 
 /**

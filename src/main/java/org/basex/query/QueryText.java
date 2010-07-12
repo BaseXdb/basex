@@ -15,6 +15,7 @@ public interface QueryText {
   /** FODF Error type. */ String FODF = "FODF";
   /** FODT Error type. */ String FODT = "FODT";
   /** FOER Error type. */ String FOER = "FOER";
+  /** FOFD Error type. */ String FOFD = "FOFD";
   /** FONS Error type. */ String FONS = "FONS";
   /** FORG Error type. */ String FORG = "FORG";
   /** FORX Error type. */ String FORX = "FORX";
@@ -85,10 +86,10 @@ public interface QueryText {
   /** FODC0007: Evaluation exception. */
   Object[] DOCBASE = { FODC, 7, "Base-uri % is invalid." };
 
-  /** FODF0000: Evaluation exception. */
-  Object[] FORMPIC = { FODF, 0, "Invalid picture format: \"%\"." };
   /** FODF1280: Evaluation exception. */
   Object[] FORMNUM = { FODF, 1280, "Unknown decimal format: %." };
+  /** FODF1310: Evaluation exception. */
+  Object[] PICNUM = { FODF, 1310, "Invalid picture string: \"%\"." };
 
   /** FODT0002: Evaluation exception. */
   Object[] DATEZERO = { FODT, 2, "Invalid infinity/zero calculation in %." };
@@ -97,6 +98,11 @@ public interface QueryText {
 
   /** FOER0000: Evaluation exception. */
   String FUNERR1 = "Halted on error().";
+
+  /** FOFD1340: Evaluation exception. */
+  Object[] PICDATE = { FODF, 1340, "Invalid picture string: \"%\"." };
+  /** FOFD1350: Evaluation exception. */
+  Object[] PICCOMP = { FODF, 1350, "Invalid component in string: \"%\"." };
 
   /** FONS0004: Evaluation exception. */
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"." };
