@@ -517,7 +517,7 @@ public final class XQJTest extends TestCase {
     final XQExpression expr = conn.createExpression();
     XQResultSequence result = expr.executeQuery("doc('input')//title/text()");
     result.next();
-    XQItem item = conn.createItem(result.getItem());
+    final XQItem item = conn.createItem(result.getItem());
 
     // bind
     final XQPreparedExpression pe = conn.prepareExpression(".");
