@@ -213,6 +213,7 @@ public final class BaseXServer extends Main implements Runnable {
       /** Stop file. */
       stopFile(port).write(Token.EMPTY);
       new Socket(LOCALHOST, port);
+      while(ping(LOCALHOST, port)) Performance.sleep(500); 
       outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       errln(server(ex));

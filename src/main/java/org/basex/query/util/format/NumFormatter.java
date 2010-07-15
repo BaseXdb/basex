@@ -45,8 +45,6 @@ public final class NumFormatter {
   private static final char PERCENT = '%';
   /** Permille-sign. */
   private static final char PERMILLE = '\u2030';
-  /** Passive characters. */
-  private static final String PASSIVE = "" + MINUS + PERCENT + PERMILLE;
 
   /** Private constructor. */
   private NumFormatter() { }
@@ -88,7 +86,6 @@ public final class NumFormatter {
       for(int i = 0; i < pat.length(); i++) {
         final char ch = pat.charAt(i);
         final boolean a = ACTIVE.indexOf(ch) != -1;
-        final boolean p = PASSIVE.indexOf(ch) != -1;
 
         if(ch == DECIMAL) {
           // more than 1 decimal sign?
@@ -114,15 +111,12 @@ public final class NumFormatter {
           // fractional part, and digit after optional sign?
           if(frac && opt2) Err.or(PICNUM, pat);
           dig = true;
-        } else if(ch != MINUS) {
-          // unknown character
-          Err.or(PICNUM, pat);
         }
 
         // passive character with preceding and following active character?
         if(a && pas && act) Err.or(PICNUM, pat);
         // will be assigned if active characters were found
-        if(act) pas |= p;
+        if(act) pas |= !a;
         act |= a;
       }
 
@@ -148,9 +142,11 @@ public final class NumFormatter {
       final Picture pic = new Picture();
 
       // position (integer/fractional)
-      int pos = 0;
+      int p = 0;
+      // active character found
       boolean act = false;
-      int[] opt = new int[2];
+      // number of optional characters
+      final int[] opt = new int[2];
 
       // loop through all characters
       for(int i = 0; i < pat.length(); i++) {
@@ -158,20 +154,20 @@ public final class NumFormatter {
         final boolean a = ACTIVE.indexOf(ch) != -1;
 
         if(ch == DECIMAL) {
-          pos++;
+          p++;
           act = false;
         } else if(ch == OPTIONAL) {
-          opt[pos]++;
+          opt[p]++;
         } else if(ch == GROUP) {
-          pic.group[pos] = Array.add(pic.group[pos], pic.min[pos] + opt[pos]);
+          pic.group[p] = Array.add(pic.group[p], pic.min[p] + opt[p]);
         } else if(DIGITS.indexOf(ch) != -1) {
-          pic.min[pos]++;
+          pic.min[p]++;
         } else {
           // passive characters
           pic.pc |= ch == PERCENT;
           pic.pm |= ch == PERMILLE;
           // prefixes/suffixes
-          if(pos == 0 ^ act) pic.fix[pos] += ch;
+          pic.fix[p == 0 && act ? p + 1 : p] += ch;
         }
         act |= a;
       }
@@ -213,18 +209,18 @@ public final class NumFormatter {
     final String str = num.toString();
 
     // integer/fractional separator
-    int sp = str.indexOf(DECIMAL);
-    //if(sp == -1) sp = str.length();
+    final int sp = str.indexOf(DECIMAL);
 
     // create integer part
     final StringBuilder pre = new StringBuilder();
     final int il = sp == -1 ? str.length() : sp;
     for(int i = il; i < pic.min[0]; i++) pre.append('0');
     pre.append(str.substring(0, il));
-    // add grouping separators
-    int pl = pre.length();
+
+    // squeeze in grouping separators
+    final int pl = pre.length();
     for(int i = 0; i < pic.group[0].length; i++) {
-      int pos = pl - pic.group[0][i];
+      final int pos = pl - pic.group[0][i];
       if(pos > 0) pre.insert(pos, GROUP);
     }
 
@@ -234,9 +230,10 @@ public final class NumFormatter {
     if(fl != 0) suf.append(str.substring(sp + 1));
     for(int i = fl; i < pic.min[1]; i++) suf.append('0');
 
-    int sl = suf.length();
+    // squeeze in grouping separators in a reverse manner
+    final int sl = suf.length();
     for(int i = pic.group[1].length - 1; i >= 0; i--) {
-      int pos = pic.group[1][i];
+      final int pos = pic.group[1][i];
       if(pos < sl) suf.insert(pos, GROUP);
     }
 

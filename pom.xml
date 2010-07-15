@@ -4,7 +4,7 @@
   <groupId>org.basex</groupId>
   <artifactId>basex</artifactId>
   <packaging>jar</packaging>
-  <version>6.2.1</version>
+  <version>6.2.2</version>
   <name>BaseX</name>
   <url>http://basex.org</url>
   <properties>
@@ -96,6 +96,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.5</version>
         <configuration>
+          <skipTests>true</skipTests>
           <forkMode>always</forkMode>
         </configuration>
       </plugin>

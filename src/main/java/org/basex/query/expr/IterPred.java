@@ -50,6 +50,7 @@ final class IterPred extends Pred {
           // iterator size is known - items can be directly accessed
           if(pos != null || last) {
             final long s = iter.size();
+            if(s == 0) return null;
             if(s != -1) {
               p = last ? s : pos.min;
               direct = true;

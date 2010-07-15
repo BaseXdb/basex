@@ -1,7 +1,6 @@
 package org.basex.query.util.format;
 
 import static org.basex.util.Token.*;
-
 import org.basex.query.util.format.FormatParser.Case;
 import org.basex.util.TokenBuilder;
 import org.basex.util.locale.Formatter;
@@ -115,20 +114,35 @@ public final class IntFormatter {
   private static void number(final TokenBuilder tb, final long n,
       final FormatParser mp, final Formatter form) {
 
-    // find optional-digit-signs
+    // count optional-digit-signs
+    final String pres = mp.pres;
     int o = 0;
-    while(cp(mp.pres, o) == '#') o++;
+    for(int i = 0; i < pres.length(); i++) {
+      if(pres.charAt(i) == '#') o++;
+    }
+    // count digits
+    int d = 0;
+    for(int i = 0; i < pres.length(); i++) {
+      if(digit(pres.charAt(i))) d++;
+    }
 
     // create string representation
-    final byte[] str = token(n);
-    // ordinal
-    final byte[] ord = form.ordinal(n, mp.ord);
+    final String str = Long.toString(n);
 
     // build string
-    final int d = mp.pres.length() - str.length;
-    for(int i = Math.min(o, d); i > 0; i--) tb.add(' ');
-    for(int i = d; i > o; i--) tb.add('0');
-    tb.add(str);
-    tb.add(ord);
+    final StringBuilder tmp = new StringBuilder();
+    final int r = o + d - str.length();
+    for(int i = r; i > o; i--) tmp.append('0');
+    tmp.append(str);
+
+    for(int p = pres.length() - 1, t = tmp.length() - 1; p >= 0 && t >= 0;
+        p--, t--) {
+      final char ch = pres.charAt(p);
+      if(!digit(ch) && ch != '#') tmp.insert(t, ch);
+    }
+    
+    // add ordinal suffix
+    tb.add(tmp);
+    tb.add(form.ordinal(n, mp.ord));
   }
 }

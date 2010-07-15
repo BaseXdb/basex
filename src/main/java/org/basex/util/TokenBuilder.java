@@ -132,9 +132,8 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final byte b) {
-    if(size == chars.length) {
+    if(size == chars.length)
       chars = Arrays.copyOf(chars, Math.max(size + 1, (int) (size * factor)));
-    }
     chars[size++] = b;
     return this;
   }
@@ -193,8 +192,7 @@ public final class TokenBuilder {
     final int l = e - s;
     final int cl = chars.length;
     if(size + l > cl) {
-      int ns = Math.max(cl + 1, (int) (cl * factor));
-      if(ns < size + l) ns = size + l;
+      final int ns = Math.max(size + l, (int) (cl * factor));
       chars = Arrays.copyOf(chars, size + ns);
     }
     System.arraycopy(b, s, chars, size, l);
