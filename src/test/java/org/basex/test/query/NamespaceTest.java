@@ -57,21 +57,12 @@ public class NamespaceTest {
 //
 //  /** Test query. */
 //  @Test
-//  public final void copy4() {
+//  public final void copy6() {
 //    query(
 //        "copy $c := <a:y xmlns:a='aa'><a:b/></a:y> modify () return $c",
 //        "<a:y xmlns:a='aa'><a:b/></a:y>");
 //  }
-
-  /** Test query. */
-  @Test
-  public final void copy5() {
-    query(
-        "copy $c := <n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n> " +
-        "modify () return $c",
-        "<n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n>");
-  }
-
+  
   /** Test query. */
   @Test
   public final void copy1() {
@@ -99,6 +90,38 @@ public class NamespaceTest {
         "declare namespace a='aa'; copy $c:=doc('d4')//a:y " +
         "modify () return $c",
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
+  }
+  
+//  /** Test query.
+//   * Detects duplicate namespace declaration in MemData instance.
+//   */
+//  @Test
+//  public final void copy4() {
+//    query(
+//        "copy $c := <a xmlns='test'><b><c/></b><d/></a> " +
+//        "modify () return $c",
+//        "<a xmlns='test'><b><c/></b><d/></a>");
+//  }
+//  
+//  /** Test query.
+//   *  Detects bogus namespace after insert. 
+//   */
+//  @Test
+//  public final void bogusDetector() {
+//    query(
+//        "declare namespace a='aa'; " +
+//        "insert node <a xmlns='test'><b><c/></b><d/></a> into doc('d1')/x",
+//        "doc('d1')/x",
+//        "<a xmlns='test'><b><c/></b><d/></a>");
+//  }
+  
+  /** Test query. */
+  @Test
+  public final void copy5() {
+    query(
+        "copy $c := <n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n> " +
+        "modify () return $c",
+    "<n><a:y xmlns:a='aa'/><a:y xmlns:a='aa'/></n>");
   }
 
   /** Test query. */
@@ -154,7 +177,7 @@ public class NamespaceTest {
         "declare namespace a='aa';doc('d5')//a:y",
         "<a:y xmlns:a='aa' xmlns:b='bb'/>");
   }
-
+  
 //  /** Test query.
 //   * Detects duplicate prefix declarations among the insertion nodes (MemData)
 //   * and the target node's data instance.
