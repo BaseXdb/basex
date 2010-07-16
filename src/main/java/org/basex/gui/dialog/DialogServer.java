@@ -307,9 +307,12 @@ public final class DialogServer extends Dialog {
           ctx.prop.set(Prop.PORT, p);
           portc.setText(ports.getText());
         }
-        running = BaseXServer.start(p);
-        msg = running ? SERVERSTART : SERVERBIND;
-        if(!running) icon = Msg.ERR;
+        msg = BaseXServer.start(p);
+        if(msg.equals(SERVERSTART)) {
+          running = true;
+        } else {
+          icon = Msg.ERR;
+        }
       } else if(cmp == stop) {
         if(running) BaseXServer.stop(ctx.prop.num(Prop.SERVERPORT));
         running = ping(true);

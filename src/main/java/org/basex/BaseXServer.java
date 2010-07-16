@@ -65,7 +65,7 @@ public final class BaseXServer extends Main implements Runnable {
 
     final int port = context.prop.num(Prop.SERVERPORT);
     if(service) {
-      start(port);
+      outln(start(port));
       return;
     }
 
@@ -76,7 +76,7 @@ public final class BaseXServer extends Main implements Runnable {
     try {
       server = new ServerSocket(port);
       new Thread(this).start();
-      do Performance.sleep(50); while(!running);
+      do Performance.sleep(100); while(!running);
 
       outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
       if(console) quit(console());
@@ -130,7 +130,7 @@ public final class BaseXServer extends Main implements Runnable {
     }
     console = false;
     context.close();
-    Performance.sleep(50);
+    Performance.sleep(100);
   }
 
   @Override
@@ -177,25 +177,29 @@ public final class BaseXServer extends Main implements Runnable {
   /**
    * Starts the server in a separate process.
    * @param port server port
-   * @return true if start was successful
+   * @return error string, or null
    */
-  public static boolean start(final int port) {
-    final String path = IOFile.file(BaseXServer.class.getProtectionDomain().
-        getCodeSource().getLocation().toString());
-    final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
-    final String clazz = BaseXServer.class.getName();
-    try {
-      new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
-          "-p", String.valueOf(port) }).start();
-
-      for(int c = 0; c < 6; c++) {
-        if(ping(LOCALHOST, port)) return true;
-        Performance.sleep(500);
+  public static String start(final int port) {
+    // check if server is already running (needs some time)
+    if(!ping(LOCALHOST, port)) {
+      final String path = IOFile.file(BaseXServer.class.getProtectionDomain().
+          getCodeSource().getLocation().toString());
+  
+      final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
+      final String clazz = BaseXServer.class.getName();
+      try {
+        new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
+            "-p", String.valueOf(port) }).start();
+  
+        for(int c = 0; c < 10; c++) {
+          if(ping(LOCALHOST, port)) return SERVERSTART;
+          Performance.sleep(200);
+        }
+      } catch(final IOException ex) {
+        return server(ex);
       }
-    } catch(final IOException ex) {
-      Main.debug(ex);
     }
-    return false;
+    return SERVERBIND;
   }
 
   /**
@@ -222,7 +226,7 @@ public final class BaseXServer extends Main implements Runnable {
       /** Stop file. */
       stopFile(port).write(Token.EMPTY);
       new Socket(LOCALHOST, port);
-      while(ping(LOCALHOST, port)) Performance.sleep(500); 
+      while(ping(LOCALHOST, port)) Performance.sleep(200); 
       outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       errln(server(ex));
