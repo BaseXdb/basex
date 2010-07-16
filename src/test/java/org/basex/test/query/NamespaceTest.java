@@ -92,28 +92,27 @@ public class NamespaceTest {
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
   
-//  /** Test query.
-//   * Detects duplicate namespace declaration in MemData instance.
-//   */
-//  @Test
-//  public final void copy4() {
-//    query(
-//        "copy $c := <a xmlns='test'><b><c/></b><d/></a> " +
-//        "modify () return $c",
-//        "<a xmlns='test'><b><c/></b><d/></a>");
-//  }
-//  
-//  /** Test query.
-//   *  Detects bogus namespace after insert. 
-//   */
-//  @Test
-//  public final void bogusDetector() {
-//    query(
-//        "declare namespace a='aa'; " +
-//        "insert node <a xmlns='test'><b><c/></b><d/></a> into doc('d1')/x",
-//        "doc('d1')/x",
-//        "<a xmlns='test'><b><c/></b><d/></a>");
-//  }
+  /** Test query.
+   * Detects duplicate namespace declaration in MemData instance.
+   */
+  @Test
+  public final void copy4() {
+    query(
+        "copy $c := <a xmlns='test'><b><c/></b><d/></a> " +
+        "modify () return $c",
+        "<a xmlns='test'><b><c/></b><d/></a>");
+  }
+  
+  /** Test query.
+   *  Detects bogus namespace after insert. 
+   */
+  @Test
+  public final void bogusDetector() {
+    query(
+        "insert node <a xmlns='test'><b><c/></b><d/></a> into doc('d1')/x",
+        "declare namespace na = 'test';doc('d1')/x/na:a",
+        "<a xmlns='test'><b><c/></b><d/></a>");
+  }
   
   /** Test query. */
   @Test

@@ -186,7 +186,7 @@ public abstract class UpdatePrimitive {
         m.ns.open();
         final Atts ns = par == 0 ? nd.nsScope() : nd.ns();
         if(ndPar != null) {
-          final Atts nsPar = ndPar.ns();
+          final Atts nsPar = ndPar.nsScope();
           if(nsPar != null)
             for(int j = 0; j < nsPar.size; j++) {
               final byte[] key = nsPar.key[j];
