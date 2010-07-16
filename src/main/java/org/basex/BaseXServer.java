@@ -37,6 +37,8 @@ public final class BaseXServer extends Main implements Runnable {
 
   /** Quiet mode (no logging). */
   private boolean quiet;
+  /** Start as daemon. */
+  private boolean service;
   /** Server socket. */
   private ServerSocket server;
   /** Flag for server activity. */
@@ -61,10 +63,14 @@ public final class BaseXServer extends Main implements Runnable {
     super(args);
     if(!success) return;
 
+    final int port = context.prop.num(Prop.SERVERPORT);
+    if(service) {
+      start(port);
+      return;
+    }
+
     log = new Log(context, quiet);
     triggers = new TriggerPool();
-
-    final int port = context.prop.num(Prop.SERVERPORT);
     stop = stopFile(port);
 
     try {
@@ -148,6 +154,9 @@ public final class BaseXServer extends Main implements Runnable {
         } else if(c == 'p') {
           // parse server port
           context.prop.set(Prop.SERVERPORT, arg.num());
+        } else if(c == 's') {
+          // parse server port
+          service = true;
         } else if(c == 'z') {
           // suppress logging
           quiet = true;
