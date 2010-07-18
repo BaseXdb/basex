@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
@@ -20,8 +19,6 @@ import org.basex.query.util.Var;
  * @author Michael Seiferle
  */
 public final class GroupBy extends Expr {
-  /** Sequence. */
-  SeqIter seq;
   /** Grouping expression. */
   Expr expr;
 
@@ -30,14 +27,16 @@ public final class GroupBy extends Expr {
    * @param e expression
    */
   public GroupBy(final Expr e) {
-    seq = new SeqIter();
+    //[MS] change type of expr to varcall.
+    assert e instanceof VarCall : "Grouping Argument must be a VarCall";
+    new SeqIter();
     expr = e;
   }
   /**
    * Returns the Grouping var.
    * @return grouping var
    */
-  public Var getVar() {
+  Var getVar() {
     return ((VarCall) expr).var;
   }
 
@@ -64,21 +63,21 @@ public final class GroupBy extends Expr {
 //
 //  }
 
-  /**
-   * Resets the built sequence.
-   */
-  void finish() {
-    seq = new SeqIter();
-  }
+//  /**
+//   * Resets the built sequence.
+//   */
+//  void finish() {
+//    seq = new SeqIter();
+//  }
 
-  /**
-   * Returns the specified item.
-   * @param i item index
-   * @return item
-   */
-  Item item(final int i) {
-    return seq.item[i];
-  }
+//  /**
+//   * Returns the specified item.
+//   * @param i item index
+//   * @return item
+//   */
+//  Item item(final int i) {
+//    return seq.item[i];
+//  }
 
   @Override
   public boolean uses(final Use use, final QueryContext ctx) {

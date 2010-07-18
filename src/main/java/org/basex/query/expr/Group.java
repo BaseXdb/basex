@@ -1,9 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.basex.core.Main;
 import org.basex.data.Serializer;
@@ -11,7 +10,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
 
 /**
@@ -21,14 +19,18 @@ import org.basex.query.util.Var;
  * @author Michael Seiferle
  */
 public final class Group extends Expr {
-  /** Sequence to be grouped. */
-  SeqIter sq;
+
+//  /** Sequence to be grouped. */
+//  SeqIter sq;
+
   /** Group by specification. */
-  final GroupBy[] groupby;
-  /**
-   * Post grouped tuples. [MS] remove this
-   */
-  HashMap<String, ArrayList<Item>> groups;
+  private final GroupBy[] groupby;
+
+//  /**
+//   * Post grouped tuples. [MS] remove this
+//   */
+//  HashMap<String, ArrayList<Item>> groups;
+//
 
   /** Grouping partition. **/
   GroupPartition gp;
@@ -48,8 +50,10 @@ public final class Group extends Expr {
   public void initgroup(final ForLet[] fl) {
     Var[] vs = new Var[groupby.length];
     Var[] fs = new Var[fl.length];
-    for(int i = 0; i < groupby.length; i++)
-      vs[i] = ((VarCall) groupby[i].expr).var;
+    for(int i = 0; i < groupby.length; i++) {
+      VarCall call = (VarCall) groupby[i].expr;
+      vs[i] = call.var;
+    }
     for(int i = 0; i < fl.length; i++)
       fs[i] = fl[i].var;
     gp = new GroupPartition(vs, fs);

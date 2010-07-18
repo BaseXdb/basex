@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.basex.query.QueryContext;
@@ -13,7 +14,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
-public class GroupPartition {
+class GroupPartition {
   /** Grouping variables. */
   private final Var[] gv;
   /** Non grouping variables. */
@@ -102,7 +103,7 @@ public class GroupPartition {
    * @author Michael Seiferle
    *
    */
-  public class GroupNode {
+  public static final class GroupNode {
     /** List of grouping vars. */
     final Var[] vars;
     /** List of grouping var values. */
@@ -141,7 +142,12 @@ public class GroupPartition {
      */
     @Override
     public String toString() {
-      return " " + vars.toString() + " with grouping var " + its.toString();
+      StringBuilder sb = new StringBuilder();
+      sb.append(" ");
+      sb.append(Arrays.toString(vars));
+      sb.append(" with grouping var ");
+      sb.append(its.toString());
+      return sb.toString();
     }
   }
 }

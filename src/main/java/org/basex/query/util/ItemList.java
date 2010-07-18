@@ -14,7 +14,7 @@ public final class ItemList {
   /** Initial hash capacity. */
   private static final int CAP = 1 << 3;
   /** Hash keys. */
-  private int next = 0 << 0;
+  private int size = 0 << 0;
   /** Items. */
   private Item[] values = new Item[CAP];
 
@@ -37,8 +37,8 @@ public final class ItemList {
    * @param i Item to add
    */
   public void add(final Item i) {
-    values[next] = i;
-    if(++next == values.length) resize();
+    values[size] = i;
+    if(++size == values.length) resize();
   }
 
   /**
@@ -46,7 +46,8 @@ public final class ItemList {
    */
   private void resize() {
     final int s = values.length << 1;
-    Item[] its = Arrays.copyOf(values, s);
+    Item[] its = new Item[s];
+    System.arraycopy(values, 0, its, 0, values.length);
     values = its;
   }
 
@@ -55,7 +56,7 @@ public final class ItemList {
    * @return size
    */
   public int size() {
-    return next;
+    return size;
   }
   /**
    * Returns the Item at position {@code i}, null if not found.
@@ -63,14 +64,24 @@ public final class ItemList {
    * @return Item {@code i}
    */
   public Item get(final int p) {
-    if(p >= next) return null;
+    if(p >= size) return null;
     return values[p];
   }
   /**
    * Returns an Array representation of the Item list.
    * @return ItemList as Array
    */
-  public Item[] toArray() {
-    return Arrays.copyOf(values, size());
+  public Item[] finish() {
+    assert size > 0 : "List is empty.";
+    
+    Item[] its = new Item[size];
+    System.arraycopy(values, 0, its, 0, size);
+    values = new Item[CAP];
+    size = 0;
+    return its;
+  }
+  @Override
+  public String toString() {
+    return Arrays.toString(values);
   }
 }

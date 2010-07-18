@@ -28,7 +28,7 @@ public class GFLWOR extends Expr {
   /** Expression list. */
   private Expr ret;
   /** For/Let expressions. */
-  private ForLet[] fl;
+  private final ForLet[] fl;
   /** Where expression. */
   private Expr where;
   /** Order expressions. */
@@ -153,9 +153,9 @@ public class GFLWOR extends Expr {
         gn.vars[j].bind(gn.its.get(j), ctx);
       }
       for(Var ngv : ngvars.keySet()) {
-        final Item[] its = ngvars.get(ngv).toArray(); 
+        final Item[] its = ngvars.get(ngv).finish(); 
         
-        ngv.bind(new SeqIter(its, ngvars.get(ngv).size()).finish(), ctx);
+        ngv.bind(new SeqIter(its, its.length).finish(), ctx);
       }
       si.add(ctx.iter(ret).finish());
     }

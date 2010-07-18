@@ -16,7 +16,7 @@ public class ItemListTest {
 
 
   /** Length of the list.*/
-  private static final int CAP = 1 << 8;
+  private static final int CAP = 1 << 4;
   /**
    * Tests the constructor.
    */
@@ -47,8 +47,7 @@ public class ItemListTest {
     for(int i = 0; i < CAP - 1; i++) {
       il.add(Itr.ZERO);
     }
-    assertEquals(CAP, il.toArray().length); 
-    assertEquals(il.size(), il.toArray().length);
+    assertEquals(CAP, il.finish().length); 
   }
 
 }
