@@ -31,8 +31,9 @@ import org.basex.query.expr.FLWR;
 import org.basex.query.expr.For;
 import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Func;
+import org.basex.query.expr.GFLWOR;
 import org.basex.query.expr.Group;
-import org.basex.query.expr.Grp;
+import org.basex.query.expr.GroupBy;
 import org.basex.query.expr.If;
 import org.basex.query.expr.Instance;
 import org.basex.query.expr.InterSect;
@@ -737,7 +738,7 @@ public class QueryParser extends InputParser {
       alter = NOWHERE;
     }
 
-    Grp[] group = null;
+    GroupBy[] group = null;
     if(consumeWS(GROUP)) {
       check(BY);
       ap = qp;
@@ -764,10 +765,10 @@ public class QueryParser extends InputParser {
     final Expr ret = check(single(), NORETURN);
     ctx.vars.reset(s);
     return ret == Seq.EMPTY ? ret : order == null && group == null ?
-      new FLWR(fl, where, ret) :
-      new FLWOR(fl, where,
-          order == null ? null : new Order(order),
-          group == null ? null : new Group(group), ret);
+        new FLWR(fl, where, ret) : group == null ? 
+            new FLWOR(fl, where, new Order(order), ret) : 
+              new GFLWOR(fl, where, order == null ? null : new Order(order),
+                  new Group(group), ret);
   }
 
   /**
@@ -854,15 +855,15 @@ public class QueryParser extends InputParser {
    * @return new group array
    * @throws QueryException query exception
    */
-  private Grp[] groupSpec(final Grp[] group) throws QueryException {
+  private GroupBy[] groupSpec(final GroupBy[] group) throws QueryException {
     final Var v = new Var(varName());
     if(consumeWS(COLLATION)) {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
 
-    final Grp grp = new Grp(new VarCall(v));
-    return group == null ? new Grp[] { grp } : Array.add(group, grp);
+    final GroupBy grp = new GroupBy(new VarCall(v));
+    return group == null ? new GroupBy[] { grp } : Array.add(group, grp);
   }
 
   /**

@@ -409,6 +409,9 @@ public interface QueryText {
   Object[] EVALNODES = { XPTY, 19, "Nodes needed for expression '%'." };
   /** XPTY0019: Typing exception. */
   Object[] NODESPATH = { XPTY, 19, "Context node required for %; % found." };
+  
+  /** XPDY0095: resulting value for any grouping variable >> 1 item. */
+  Object[] XGRP = { XQDY, 95, "No sequence allowed as grouping variable."};
 
   /** XPDY0002: Parsing exception. */
   Object[] VAREMPTY = { XQDY, 2, "No value defined for \"%\"." };
@@ -507,6 +510,8 @@ public interface QueryText {
   Object[] NSMODURI = { XQST, 88, "Module namespace can't be empty." };
   /** XQST0089: Parsing exception. */
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
+  /** [MS] XPST0008: Parsing exception. */
+  Object[] GVARNOTDEFINED = { XQST, 94, "Undefined grouping variable \"%\"." };
 
   /** XQTY0024: Parsing exception. */
   Object[] NOATTALL = { XQTY, 24, "Attribute must follow the root element." };

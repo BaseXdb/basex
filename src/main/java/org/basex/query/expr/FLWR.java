@@ -24,7 +24,7 @@ public final class FLWR extends FLWOR {
    * @param r return expression
    */
   public FLWR(final ForLet[] f, final Expr w, final Expr r) {
-    super(f, w, null, null, r);
+    super(f, w, null, r);
   }
 
   @Override
@@ -52,6 +52,7 @@ public final class FLWR extends FLWOR {
         }
       }
     }
+    ctx.grouping = false;
 
     final Expr ex = super.comp(ctx);
     if(ex != this) return ex;
@@ -103,7 +104,7 @@ public final class FLWR extends FLWOR {
             if(i != null) return i;
             ir = null;
           } else {
-            while(iter[p].next().bool()) {
+            while(iter[p].next() != null) {
               if(p + 1 != fl.length) {
                 p++;
               } else if(where == null || where.ebv(ctx).bool()) {

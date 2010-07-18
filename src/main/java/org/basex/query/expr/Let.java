@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
@@ -39,8 +38,10 @@ public final class Let extends ForLet {
     expr = checkUp(expr, ctx).comp(ctx);
 
     // bind variable if expression uses no var, pos, ctx or fragment
-    if(!score && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx) ||
-        expr.uses(Use.CTX, ctx) || expr.uses(Use.FRG, ctx))) {
+    if(!score
+        && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx)
+            || expr.uses(Use.CTX, ctx) || expr.uses(Use.FRG, ctx))
+        && !ctx.grouping) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
@@ -61,7 +62,7 @@ public final class Let extends ForLet {
       private boolean more;
 
       @Override
-      public Bln next() throws QueryException {
+      public Item next() throws QueryException {
         if(!more) {
           vs = ctx.vars.size();
           final Iter ir = ctx.iter(expr);
@@ -80,10 +81,10 @@ public final class Let extends ForLet {
           }
           ctx.vars.add(v.bind(it, ctx));
           more = true;
-        } else {
-          reset();
+          return it;
         }
-        return Bln.get(more);
+        reset();
+        return null;
       }
 
       @Override

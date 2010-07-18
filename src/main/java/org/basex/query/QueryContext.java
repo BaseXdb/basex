@@ -157,6 +157,9 @@ public final class QueryContext extends Progress {
   /** Indicates if this query performs updates. */
   public boolean updating;
 
+  /** Indicates a present group by clause. */
+  public boolean grouping;
+
   /**
    * Constructor.
    * @param ctx context reference

@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -48,8 +47,9 @@ public final class For extends ForLet {
     /* bind variable if zero or one values are returned,
        and if no variables and no context reference is used. */
     final SeqType ret = expr.returned(ctx);
-    if(pos == null && score == null && ret.zeroOrOne() &&
-        !expr.uses(Use.VAR, ctx) && !expr.uses(Use.CTX, ctx)) {
+    if(pos == null && score == null && ret.zeroOrOne()
+        && !expr.uses(Use.VAR, ctx) && !expr.uses(Use.CTX, ctx)
+        && !ctx.grouping) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
@@ -83,7 +83,7 @@ public final class For extends ForLet {
       private int c;
 
       @Override
-      public Bln next() throws QueryException {
+      public Item next() throws QueryException {
         if(ir == null) {
           vs = ctx.vars.size();
           ir = ctx.iter(expr);
@@ -97,10 +97,10 @@ public final class For extends ForLet {
           v.bind(it, ctx);
           if(p != null) p.bind(Itr.get(++c), ctx);
           if(s != null) s.bind(Dbl.get(it.score()), ctx);
-        } else {
-          reset();
+          return it;
         }
-        return Bln.get(ir != null);
+        reset();
+        return null;
       }
 
       @Override
