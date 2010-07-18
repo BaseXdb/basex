@@ -16,6 +16,7 @@ public interface QueryText {
   /** FODT Error type. */ String FODT = "FODT";
   /** FOER Error type. */ String FOER = "FOER";
   /** FOFD Error type. */ String FOFD = "FOFD";
+  /** FOFL Error type. */ String FOFL = "FOFL";
   /** FONS Error type. */ String FONS = "FONS";
   /** FORG Error type. */ String FORG = "FORG";
   /** FORX Error type. */ String FORX = "FORX";
@@ -103,7 +104,12 @@ public interface QueryText {
   Object[] PICDATE = { FODF, 1340, "Invalid picture string: \"%\"." };
   /** FOFD1350: Evaluation exception. */
   Object[] PICCOMP = { FODF, 1350, "Invalid component in string: \"%\"." };
-
+  
+  /** FOFL0007: Evaluation exception. */
+  Object[] FILELIST = { FOFL, 7, "Files of '%' cannot be returned." };
+  /** FOFL0008: Evaluation exception. */
+  Object[] FILEPATTERN = { FOFL, 8, "Invalid file name pattern '%'."};
+  
   /** FONS0004: Evaluation exception. */
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"." };
 

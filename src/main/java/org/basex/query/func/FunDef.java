@@ -7,7 +7,7 @@ import org.basex.query.item.SeqType;
 
 /**
  * Signatures of all XQuery functions.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -225,7 +225,7 @@ public enum FunDef {
   /** XQuery function */
   ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(item)", BLN),
   /** XQuery function */
-  FILES(FILEURI, FNFile.class, 1, 1, "files(item)", STR_ZM),
+  FILES(FILEURI, FNFile.class, 1, 2, "files(item, pattern)", STR_ZM),
   /** XQuery function */
   PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
   /** XQuery function */

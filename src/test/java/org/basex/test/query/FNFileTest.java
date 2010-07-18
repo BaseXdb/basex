@@ -15,7 +15,7 @@ import org.junit.Test;
 
 /**
  * This class tests the functions of the file library.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -89,7 +89,10 @@ public final class FNFileTest {
   /** Tests the function file:files. */
   @Test
   public void testFiles() {
-    iter(FunDef.FILES, Str.get("/home"));
+    Expr[] args = new Expr[2];
+    args[0] = Str.get("/home");
+    args[1] = Str.get("[^z]*e");
+    iter(FunDef.FILES, args);
   }
 
   /**
