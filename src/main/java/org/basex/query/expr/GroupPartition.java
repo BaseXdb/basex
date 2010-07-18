@@ -133,33 +133,8 @@ public class GroupPartition {
     }
     @Override
     public int hashCode() {
-      return hash;
-      
+      return hash;  
     }
-// -- add checks vor group by invariants
-//    /**
-//     * Checks the current Node for equality with an existing
-//     * GroupNode.
-//     * @param p candidate node
-//     * @return true if nodes are equal
-//     */
-//    public boolean essq(final GroupNode p) {
-//      if(p == null) return false;
-//
-//      if(p.hashCode() != this.hashCode()) return false;
-// //     if(p.vars.size() != vars.size()) return false;
-//      for(int i = 0; i < vars.size(); i++) {
-//        final boolean candedmpty = p.its.get(i).e();
-//        final long groupitem = hs.get(i);
-//        // n.b. empty sequences are considered equal
-//        final long canditem = candedmpty ? Long.MAX_VALUE
-//            : (long) p.its.get(i).hashCode();
-//        if(groupitem != canditem) return false;
-//        if(candedmpty && !its.get(i).e()) return false;
-//      }
-//      return true;
-//    }
-//
 
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

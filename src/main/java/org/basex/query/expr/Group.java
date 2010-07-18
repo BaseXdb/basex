@@ -4,6 +4,8 @@ import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -61,63 +63,15 @@ public final class Group extends Expr {
     return this;
   }
 
-//  /**
-//   * Groups the items.
-//   * @throws QueryException exception.
-//   */
-//  protected void grouping() throws QueryException {
-//    groups = new HashMap<String, ArrayList<Item>>();
-//
-//    for(GroupBy gb : groupby) {
-//      Var key = ((VarCall) gb.expr).var;
-//      ArrayList<Item> partition = new ArrayList<Item>();
-//      Item it;
-//
-//      for(int i = 0; i < gb.seq.size(); i++) {
-//        it = gb.item(i);
-//        boolean found = false;
-//        for(final Item cand : partition) {
-//          if(it.e()) {
-//            found = true;
-//          } else if(cand.eq(it)) { // cand.hashCode() == it.hashCode()
-//            found = true;
-//            break;
-//          }
-//        }
-//        if(!found) partition.add(it);
-//      }
-//      groups.put(key.toString(), partition);
-//    }
-//  }
-
-  // *TODO* delete this?
   @Override
   public Iter iter(final QueryContext ctx) {
-    return new Iter() { // group is blocking => no iterator
-      Iter ir;
-      int p = -1;
+    return  
+    new Iter() { // group is blocking => no iterator
 
       @Override
-      public Item next() throws QueryException {
-        if(groups == null) {
-          // group();
-          for(final GroupBy g : groupby)
-            g.finish();
-        }
-        final int s = groups.size();
-        final Integer[] hashes = groups.keySet().toArray(new Integer[s]);
-
-        while(true) {
-          if(ir != null) {
-            final Item i = ir.next();
-            if(i != null) return i;
-            ir = null;
-          } else {
-            if(++p == hashes.length) return null;
-            final int witness = 0; // groups.get(hashes[p])[0];
-            ir = sq.item[witness].iter();
-          }
-        }
+      public Item next() {
+        Main.notexpected(this);
+        return null;
       }
     };
   }

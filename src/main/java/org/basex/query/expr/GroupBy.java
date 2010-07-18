@@ -47,22 +47,22 @@ public final class GroupBy extends Expr {
     expr = expr.comp(ctx);
     return this;
   }
-
-  /**
-   * Adds an item for the membership check.
-   * @param it item
-   * @throws QueryException query exception * [MS] dynamic error is raised
-   *           [err:XQDY0095] iff grouping var contains more than 1 value.
-   */
-  void add(final Item it) throws QueryException {
-    if(seq != null) {
-      if(it.size(null) > 1) Err.or(XGRP);
-      seq.add(it);
-      return;
-    }
-    throw new QueryException("Todo check ITEM for conformance"); // [MS]
-
-  }
+// [MS] moved to GroupPartition
+//  /**
+//   * Adds an item for the membership check.
+//   * @param it item
+//   * @throws QueryException query exception * [MS] dynamic error is raised
+//   *           [err:XQDY0095] iff grouping var contains more than 1 value.
+//   */
+//  void adds(final Item it) throws QueryException {
+//    if(seq != null) {
+//      if(it.size(null) > 1) Err.or(XGRP);
+//      seq.add(it);
+//      return;
+//    }
+//    throw new QueryException("Todo check ITEM for conformance"); // [MS]
+//
+//  }
 
   /**
    * Resets the built sequence.
