@@ -113,7 +113,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         } else {
           return null;
         }
-        content = co.finish();
+        content = co.toArray();
       } catch(final IOException ex) {
         throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
       }
@@ -238,7 +238,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
     @Override
     public void endDocument() {
-      res.content = co.finish();
+      res.content = co.toArray();
     }
 
     @Override

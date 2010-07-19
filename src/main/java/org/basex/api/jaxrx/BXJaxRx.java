@@ -137,7 +137,7 @@ public final class BXJaxRx implements JaxRx {
 
         final XMLSerializer xml =
           new XMLSerializer(out, new SerializerProp(params(path)));
-        xml.text(Token.delete(co.finish(), '\r'));
+        xml.text(Token.delete(co.toArray(), '\r'));
         xml.close();
       }
     };

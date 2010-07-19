@@ -69,7 +69,7 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
-    return new BXXMLResource(co.finish(), coll);
+    return new BXXMLResource(co.toArray(), coll);
   }
 
   @Override
