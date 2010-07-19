@@ -240,7 +240,7 @@ public abstract class W3CTS {
       for(int d = 0; d < doc.size(); d++) {
         dl.add(token(sources + string(data.atom(doc.nodes[d])) + IO.XMLSUFFIX));
       }
-      colls.put(cname, dl.finish());
+      colls.put(cname, dl.toArray());
     }
     init(root);
 

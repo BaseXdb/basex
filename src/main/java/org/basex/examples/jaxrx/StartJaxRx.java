@@ -40,6 +40,6 @@ public final class StartJaxRx {
     System.setProperty("org.jaxrx.parameter.output", "indent=yes");
 
     // Start Jetty server on the specified port.
-    new StartJetty(8489);
+    new StartJetty(8984);
   }
 }
