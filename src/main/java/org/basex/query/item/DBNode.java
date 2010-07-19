@@ -79,12 +79,14 @@ public class DBNode extends Nod {
   public final void set(final int p, final int k) {
     type = type(k);
     par = null;
+    val = null;
     pre = p;
   }
 
   @Override
   public final byte[] str() {
-    return data.atom(pre);
+    if(val == null) val = data.atom(pre);
+    return val;
   }
 
   @Override

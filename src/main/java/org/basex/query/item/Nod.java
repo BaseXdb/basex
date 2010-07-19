@@ -31,8 +31,11 @@ public abstract class Nod extends Item {
   };
   /** Static node counter. */
   private static int sid;
+
   /** Unique node id. */
   protected final int id = sid++;
+  /** Text value. */
+  protected byte[] val;
   /** Parent node. */
   protected Nod par;
 
@@ -47,6 +50,11 @@ public abstract class Nod extends Item {
   @Override
   public final boolean bool() {
     return true;
+  }
+
+  @Override
+  public byte[] str() {
+    return val;
   }
 
   @Override

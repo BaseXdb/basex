@@ -16,8 +16,6 @@ import org.w3c.dom.Node;
 public final class FAttr extends FNode {
   /** Attribute name. */
   private final QNm name;
-  /** Attribute value. */
-  private final byte[] val;
 
   /**
    * Constructor.
@@ -41,11 +39,6 @@ public final class FAttr extends FNode {
   FAttr(final Node node, final Nod p) {
     this(new QNm(Token.token(node.getNodeName())),
         Token.token(node.getNodeValue()), p);
-  }
-
-  @Override
-  public byte[] str() {
-    return val;
   }
 
   @Override

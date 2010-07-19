@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.iter.NodIter;
-import org.basex.util.TokenBuilder;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -40,16 +39,6 @@ public final class FDoc extends FNode {
     this(new NodIter(), b);
     final NodeList nl = node.getChildNodes();
     if(nl.getLength() != 0) children.add(new FElem(nl.item(0), this));
-  }
-
-  @Override
-  public byte[] str() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(int c = 0; c < children.size(); c++) {
-      final Nod n = children.get(c);
-      if(n.type != Type.COM && n.type != Type.PI) tb.add(n.str());
-    }
-    return tb.finish();
   }
 
   @Override

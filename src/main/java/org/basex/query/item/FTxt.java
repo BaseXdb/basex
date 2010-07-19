@@ -13,9 +13,6 @@ import org.w3c.dom.Node;
  * @author Christian Gruen
  */
 public final class FTxt extends FNode {
-  /** Text value. */
-  private final byte[] val;
-
   /**
    * Constructor.
    * @param t text value
@@ -35,11 +32,6 @@ public final class FTxt extends FNode {
    */
   FTxt(final Node node, final Nod parent) {
     this(Token.token(node.getNodeValue()), parent);
-  }
-
-  @Override
-  public byte[] str() {
-    return val;
   }
 
   @Override

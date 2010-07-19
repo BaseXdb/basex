@@ -90,7 +90,7 @@ public final class FNFileTest {
   @Test
   public void testFiles() {
     Expr[] args = new Expr[2];
-    args[0] = Str.get("/home");
+    args[0] = Str.get("etc");
     args[1] = Str.get("[^z]*e");
     iter(FunDef.FILES, args);
   }

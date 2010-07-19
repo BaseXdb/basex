@@ -7,7 +7,6 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -143,16 +142,6 @@ public final class FElem extends FNode {
   @Override
   public Atts ns() {
     return ns;
-  }
-
-  @Override
-  public byte[] str() {
-    final TokenBuilder tb = new TokenBuilder();
-    for(int n = 0; n < children.size(); n++) {
-      final Nod c = children.get(n);
-      if(c.type == Type.ELM || c.type == Type.TXT) tb.add(c.str());
-    }
-    return tb.finish();
   }
 
   @Override

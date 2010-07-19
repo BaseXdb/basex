@@ -5,6 +5,7 @@ import org.basex.query.QueryException;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
+import org.basex.util.TokenBuilder;
 
 /**
  * Node type.
@@ -24,6 +25,19 @@ public abstract class FNode extends Nod {
    */
   protected FNode(final Type t) {
     super(t);
+  }
+
+  @Override
+  public final byte[] str() {
+    if(val == null) {
+      final TokenBuilder tb = new TokenBuilder();
+      for(int c = 0; c < children.size(); c++) {
+        final Nod nc = children.get(c);
+        if(nc.type == Type.ELM || nc.type == Type.TXT) tb.add(nc.str());
+      }
+      val = tb.finish();
+    }
+    return val;
   }
 
   @Override
