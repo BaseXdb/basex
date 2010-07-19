@@ -44,6 +44,6 @@ public final class ThesQuery {
   byte[][] find(final Tokenizer ft) throws QueryException {
     final TokenList tl = new TokenList();
     for(final Thesaurus th : thes) th.find(tl, ft);
-    return tl.finish();
+    return tl.toArray();
   }
 }

@@ -6,15 +6,17 @@ import java.util.Iterator;
 import org.basex.core.Main;
 
 /**
- * This is a simple container for string values.
+ * This is a simple container for strings.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public class StringList implements Iterable<String> {
-  /** Current string array. */
-  protected String[] list = new String[8];
-  /** Number of strings. */
+  /** Initial hash capacity. */
+  private static final int CAP = 1 << 3;
+  /** List entries. */
+  protected String[] list = new String[CAP];
+  /** Number of entries. */
   protected int size;
 
   /**
@@ -69,7 +71,7 @@ public class StringList implements Iterable<String> {
    * Returns the string array.
    * @return array
    */
-  public final String[] finish() {
+  public final String[] toArray() {
     final String[] tmp = new String[size];
     System.arraycopy(list, 0, tmp, 0, size);
     return tmp;

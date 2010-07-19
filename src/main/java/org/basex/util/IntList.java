@@ -113,7 +113,7 @@ public class IntList {
    * Finishes the int array.
    * @return int array
    */
-  public final int[] finish() {
+  public final int[] toArray() {
     return size == list.length ? list : Arrays.copyOf(list, size);
   }
 

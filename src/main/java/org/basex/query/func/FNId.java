@@ -116,7 +116,7 @@ final class FNId extends Fun {
     while((id = iter.next()) != null) {
       for(final byte[] i : split(norm(checkStr(id)), ' ')) tl.add(i);
     }
-    return tl.finish();
+    return tl.toArray();
   }
 
   /**

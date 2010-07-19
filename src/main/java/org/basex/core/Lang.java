@@ -157,7 +157,7 @@ public final class Lang {
     } catch(final IOException ex) {
       Main.errln(ex);
     }
-    return new String[][] { langs.finish(), creds.finish() };
+    return new String[][] { langs.toArray(), creds.toArray() };
   }
 
   /**

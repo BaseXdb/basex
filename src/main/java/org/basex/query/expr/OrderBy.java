@@ -77,7 +77,7 @@ public final class OrderBy extends Expr {
   /**
    * Resets the built sequence.
    */
-  void finish() {
+  void reset() {
     if(seq != null) seq = new SeqIter();
   }
 

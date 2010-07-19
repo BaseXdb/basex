@@ -66,7 +66,7 @@ public final class DialogOpen extends Dialog {
       List.list(main.context);
     fsInstance = fs;
 
-    choice = new BaseXListChooser(db.finish(), this);
+    choice = new BaseXListChooser(db.toArray(), this);
     set(choice, BorderLayout.CENTER);
     choice.setSize(130, 440);
 
@@ -139,8 +139,8 @@ public final class DialogOpen extends Dialog {
       if(dr.ok()) {
         final Prop prop = gui.context.prop;
         AlterDB.alter(old, dr.name.getText(), prop);
-        choice.setData(fsInstance ? List.listFS(ctx).finish() :
-          List.list(ctx).finish());
+        choice.setData(fsInstance ? List.listFS(ctx).toArray() :
+          List.list(ctx).toArray());
       }
     } else if(cmp == open) {
       close();
@@ -153,7 +153,7 @@ public final class DialogOpen extends Dialog {
           gui.notify.init();
         }
         DropDB.drop(db, ctx.prop);
-        choice.setData(List.list(ctx).finish());
+        choice.setData(List.list(ctx).toArray());
         choice.requestFocusInWindow();
       }
     } else {

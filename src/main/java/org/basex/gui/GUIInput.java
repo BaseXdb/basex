@@ -81,7 +81,7 @@ public final class GUIInput extends BaseXTextField {
               if(!hs[p].equals(txt)) sl.add(hs[p]);
             }
             gprop.set(i == 0 ? GUIProp.SEARCH : i == 1 ? GUIProp.XQUERY :
-              GUIProp.COMMANDS, sl.finish());
+              GUIProp.COMMANDS, sl.toArray());
 
             // evaluate the input
             if(e.getModifiers() == 0) main.execute();
@@ -220,7 +220,7 @@ public final class GUIInput extends BaseXTextField {
       return;
     }
     if(comboChanged(sl)) {
-      box.setModel(new DefaultComboBoxModel(sl.finish()));
+      box.setModel(new DefaultComboBoxModel(sl.toArray()));
       box.setSelectedIndex(-1);
       pop = new ComboPopup(box);
     }

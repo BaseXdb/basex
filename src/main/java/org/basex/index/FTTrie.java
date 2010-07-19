@@ -205,7 +205,7 @@ final class FTTrie extends FTIndex {
     }
     if(ep > 0) il.add(inA.read4(ep - 9));
     did = inA.read5();
-    return il.finish();
+    return il.toArray();
   }
 
   /**

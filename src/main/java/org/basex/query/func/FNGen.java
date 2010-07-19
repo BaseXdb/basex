@@ -273,7 +273,7 @@ final class FNGen extends Fun {
       // run serialization
       final CachedOutput co = new CachedOutput();
       nod.serialize(new XMLSerializer(co, new SerializerProp(tb.toString())));
-      return Str.get(co.finish());
+      return Str.get(co.toArray());
     } catch(final IOException ex) {
       throw new QueryException(ex.getMessage());
     }

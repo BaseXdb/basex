@@ -153,9 +153,8 @@ public class GFLWOR extends Expr {
         gn.vars[j].bind(gn.its.get(j), ctx);
       }
       for(Var ngv : ngvars.keySet()) {
-        final Item[] its = ngvars.get(ngv).finish(); 
-        
-        ngv.bind(new SeqIter(its, its.length).finish(), ctx);
+        final ItemList its = ngvars.get(ngv); 
+        ngv.bind(Seq.get(its.list, its.size()), ctx);
       }
       si.add(ctx.iter(ret).finish());
     }

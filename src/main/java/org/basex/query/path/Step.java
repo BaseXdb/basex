@@ -151,12 +151,12 @@ public class Step extends Preds {
   }
 
   /**
-   * Counts a single location step.
+   * Counts the number of results for this location step.
    * @param nodes input nodes
    * @param data data reference
-   * @return node array
+   * @return node array, or {@code null} if size cannot be evaluated
    */
-  final ArrayList<PathNode> count(final ArrayList<PathNode> nodes,
+  final ArrayList<PathNode> size(final ArrayList<PathNode> nodes,
       final Data data) {
 
     if(pred.length != 0) return null;
@@ -179,7 +179,7 @@ public class Step extends Preds {
     if(!desc && axis != Axis.CHILD) return null;
 
     final ArrayList<PathNode> out = new ArrayList<PathNode>();
-    for(final PathNode sn : nodes) data.path.desc(sn, out, name, kind, desc);
+    for(final PathNode pn : nodes) data.path.desc(pn, out, name, kind, desc);
     return out;
   }
 

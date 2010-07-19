@@ -61,7 +61,7 @@ final class DBPrimitives extends Primitives {
           p--;
         }
         if(par != -1) il.add(par);
-        checkNames(ctx, il.finish());
+        checkNames(ctx, il.toArray());
       } else {
         if(k == Data.ELEM) checkNames(ctx, pre);
         p--;

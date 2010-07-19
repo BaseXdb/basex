@@ -623,8 +623,8 @@ final class MapRenderer {
         p = cc;
         // invert tokens
         ul = tl.size() - 1;
-        final byte[][] toks = tl.finish();
-        final boolean[] tc = ttcol.finish();
+        final byte[][] toks = tl.toArray();
+        final boolean[] tc = ttcol.toArray();
         tl.reset();
         ttcol.reset();
         for(int j = toks.length - 1; j >= 0; j--) {

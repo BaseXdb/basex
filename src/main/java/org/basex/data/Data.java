@@ -190,7 +190,7 @@ public abstract class Data {
   public final int[] doc() {
     final IntList il = new IntList();
     for(int i = 0; i < meta.size; i += size(i, Data.DOC)) il.add(i);
-    return il.finish();
+    return il.toArray();
   }
 
   /**

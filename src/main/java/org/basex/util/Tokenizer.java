@@ -452,8 +452,8 @@ public final class Tokenizer implements IndexToken {
     // last sentence not finished with a punctuation mark
     il[1].add(sl + 1);
 
-    return new int[][] { il[0].finish(), il[1].finish(), il[2].finish(),
-        il[3].finish(), il[4].finish()};
+    return new int[][] { il[0].toArray(), il[1].toArray(), il[2].toArray(),
+        il[3].toArray(), il[4].toArray()};
   }
 
   @Override

@@ -69,8 +69,8 @@ public final class TableOutput extends FileOutputStream {
     final DataOutput info = new DataOutput(meta.file(file + 'i'));
     info.writeNum(bcount);
     info.writeNum(bcount);
-    info.writeNums(firstPres.finish());
-    info.writeNums(blocks.finish());
+    info.writeNums(firstPres.toArray());
+    info.writeNums(blocks.toArray());
     info.close();
   }
 }

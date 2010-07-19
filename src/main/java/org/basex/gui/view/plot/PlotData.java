@@ -121,7 +121,7 @@ final class PlotData {
         }
       }
     }
-    pres = tmpPres.finish();
+    pres = tmpPres.toArray();
     Arrays.sort(pres);
     size = pres.length;
   }

@@ -457,7 +457,7 @@ public final class TreeView extends View implements TreeViewOptions {
         }
       }
     }
-    gui.notify.mark(new Nodes(list.finish(), gui.context.data), this);
+    gui.notify.mark(new Nodes(list.toArray(), gui.context.data), this);
   }
 
   /**

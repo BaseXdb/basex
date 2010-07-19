@@ -208,7 +208,7 @@ public class BaseXText extends BaseXPanel {
    * @return output text
    */
   public final byte[] getText() {
-    return text.finish();
+    return text.toArray();
   }
 
   @Override
@@ -552,7 +552,7 @@ public class BaseXText extends BaseXPanel {
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    if(undo != null) undo.store(text.finish(), text.cursor());
+    if(undo != null) undo.store(text.toArray(), text.cursor());
   }
 
   /**
@@ -621,7 +621,7 @@ public class BaseXText extends BaseXPanel {
     text.pos(text.cursor());
     if(text.start() != -1) text.delete();
     text.add(txt);
-    if(undo != null) undo.store(text.finish(), text.cursor());
+    if(undo != null) undo.store(text.toArray(), text.cursor());
   }
 
   /**
@@ -630,7 +630,7 @@ public class BaseXText extends BaseXPanel {
   protected final void delete() {
     text.pos(text.cursor());
     text.delete();
-    if(undo != null) undo.store(text.finish(), text.cursor());
+    if(undo != null) undo.store(text.toArray(), text.cursor());
     text.setCaret();
   }
 

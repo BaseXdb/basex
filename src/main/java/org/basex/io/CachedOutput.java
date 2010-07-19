@@ -1,14 +1,15 @@
 package org.basex.io;
 
 import static org.basex.core.Text.*;
+
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import org.basex.util.Token;
 
 /**
- * This class caches the output bytes in an array.
- * If a maximum is specified, the returned byte array contains a notice
- * that the output was chopped in case there was more data than specified
- * by the limit.
+ * This class caches the output bytes in an array, similar to the
+ * {@link ByteArrayOutputStream} class. Bytes that exceed a optional maximum
+ * are ignored.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -41,7 +42,7 @@ public final class CachedOutput extends PrintOutput {
    * Returns the output as byte array.
    * @return byte array
    */
-  public byte[] finish() {
+  public byte[] toArray() {
     return Arrays.copyOf(buf, size);
   }
 
@@ -65,6 +66,6 @@ public final class CachedOutput extends PrintOutput {
 
   @Override
   public String toString() {
-    return Token.string(finish());
+    return Token.string(toArray());
   }
 }

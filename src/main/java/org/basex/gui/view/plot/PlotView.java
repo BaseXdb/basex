@@ -993,7 +993,7 @@ public final class PlotView extends View {
         il.add(plotData.pres[i]);
       }
     }
-    return il.finish();
+    return il.toArray();
   }
 
   /**
@@ -1110,7 +1110,7 @@ public final class PlotView extends View {
       if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);
     }
 
-    gui.notify.mark(new Nodes(il.finish(), gui.context.data), this);
+    gui.notify.mark(new Nodes(il.toArray(), gui.context.data), this);
     nextContext = gui.context.marked;
     drawSubNodes = false;
     markingChanged = true;

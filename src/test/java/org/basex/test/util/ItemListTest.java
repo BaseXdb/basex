@@ -22,7 +22,8 @@ public class ItemListTest {
    */
   @Test
   public final void testItemList() {
-    ItemList il = new ItemList(Itr.ZERO);
+    ItemList il = new ItemList();
+    il.add(Itr.ZERO);
     assertEquals(1, il.size());
     assertEquals(Itr.ZERO, il.get(0));
   }
@@ -32,7 +33,8 @@ public class ItemListTest {
    */
   @Test
   public final void testAdd() {
-    ItemList il = new ItemList(Itr.ZERO);
+    ItemList il = new ItemList();
+    il.add(Itr.ZERO);
 
     for(int i = 0; i < CAP - 1; i++) {
       il.add(Itr.ZERO);
@@ -40,14 +42,15 @@ public class ItemListTest {
   }
   /**
    * Tests the toArray implementation.
-   */
   @Test 
   public final void testToArray() {
-    ItemList il = new ItemList(Itr.ZERO);
+    ItemList il = new ItemList();
+    il.add(Itr.ZERO);
+
     for(int i = 0; i < CAP - 1; i++) {
       il.add(Itr.ZERO);
     }
-    assertEquals(CAP, il.finish().length); 
+    assertEquals(CAP, il.toArray().length); 
   }
-
+   */
 }

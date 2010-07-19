@@ -240,11 +240,11 @@ public class AxisPath extends Path {
       final int name = data.tags.id(step[s].test.name.ln());
 
       final ArrayList<PathNode> out = new ArrayList<PathNode>();
-      for(final PathNode sn : data.path.desc(in, desc)) {
-        if(sn.kind == Data.ELEM && name == sn.name) {
+      for(final PathNode pn : data.path.desc(in, desc)) {
+        if(pn.kind == Data.ELEM && name == pn.name) {
           // skip test if a tag is found on different levels
-          if(out.size() != 0 && out.get(0).level() != sn.level()) return null;
-          out.add(sn);
+          if(out.size() != 0 && out.get(0).level() != pn.level()) return null;
+          out.add(pn);
         }
       }
       if(out.size() == 0) return null;
@@ -424,25 +424,22 @@ public class AxisPath extends Path {
 
   @Override
   public final long size(final QueryContext ctx) {
-    long res = -1;
-
     final Item rt = root(ctx);
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
 
-    if(data != null && data.meta.pthindex && data.meta.uptodate &&
-        data.ns.size() == 0) {
+    if(data == null || !data.meta.pthindex || !data.meta.uptodate ||
+        data.ns.size() != 0) return -1;
 
-      ArrayList<PathNode> nodes = data.path.root();
-      for(final Step s : step) {
-        res = -1;
-        nodes = s.count(nodes, data);
-        if(nodes == null) break;
-        res = 0;
-        for(final PathNode sn : nodes) res += sn.size;
-      }
+    ArrayList<PathNode> nodes = data.path.root();
+    for(final Step s : step) {
+      nodes = s.size(nodes, data);
+      if(nodes == null) return -1;
     }
-    return res;
+
+    long size = 0;
+    for(final PathNode pn : nodes) size += pn.size;
+    return size;
   }
 
   /**

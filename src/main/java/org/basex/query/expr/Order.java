@@ -52,7 +52,7 @@ public final class Order extends Expr {
           order = new int[e];
           for(int i = 0; i < e; i++) order[i] = i;
           sort(order, 0, e);
-          for(final OrderBy o : ord) o.finish();
+          for(final OrderBy o : ord) o.reset();
         }
 
         while(true) {

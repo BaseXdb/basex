@@ -34,8 +34,8 @@ class GroupPartition {
    * @param fl1 Non grouping vars
    */
   public GroupPartition(final Var[] gv1, final Var[] fl1) {
-    this.gv = gv1;
-    this.fl = fl1;
+    gv = gv1;
+    fl = fl1;
     partitions = new ArrayList<GroupNode>();
     items = new ArrayList<HashMap<Var, ItemList>>();
   }
@@ -101,9 +101,8 @@ class GroupPartition {
    * GroupNode defines one valid partitioning setting.
    * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
    * @author Michael Seiferle
-   *
    */
-  public static final class GroupNode {
+  static final class GroupNode {
     /** List of grouping vars. */
     final Var[] vars;
     /** List of grouping var values. */
@@ -118,11 +117,11 @@ class GroupPartition {
      * @param is grouping var values
      */
     public GroupNode(final Var[] vs, final Item[] is) {
-      this.vars = vs;
-      this.its = new ItemList();
+      vars = vs;
+      its = new ItemList();
       final long[] hhs = new long[is.length];
       for(int i = 0; i < vs.length; i++) {
-        this.its.add(is[i]);
+        its.add(is[i]);
         if(is[i].e()) {  
           // Add long.max_value to denote empty sequence in item
           hhs[i] = Long.MAX_VALUE;
@@ -130,16 +129,15 @@ class GroupPartition {
           hhs[i] = is[i].hashCode();
         }
       }
-      this.hash = java.util.Arrays.hashCode(hhs);
+      hash = java.util.Arrays.hashCode(hhs);
     }
+
     @Override
     public int hashCode() {
       return hash;  
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
+    /* for debugging (should be removed later) */
     @Override
     public String toString() {
       StringBuilder sb = new StringBuilder();

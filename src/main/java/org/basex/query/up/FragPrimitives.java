@@ -28,7 +28,7 @@ final class FragPrimitives extends Primitives {
 
     // check fn:put constraints ... duplicate uri
     final TokenSet uris = new TokenSet();
-    for(final int i : putIds.finish()) {
+    for(final int i : putIds.toArray()) {
       final Put put = (Put) op.get(i).findSpecific(PrimitiveType.PUT);
       if(uris.add(put.path()) < 0) Err.or(UPURIDUP, put.path());
     }
@@ -36,7 +36,7 @@ final class FragPrimitives extends Primitives {
 
   @Override
   protected void apply(final QueryContext ctx) throws QueryException {
-    for(final int i : putIds.finish()) {
+    for(final int i : putIds.toArray()) {
       final Put put = (Put) op.get(i).findSpecific(PrimitiveType.PUT);
       put.apply(0);
     }

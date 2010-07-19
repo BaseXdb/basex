@@ -125,10 +125,10 @@ public final class PathNode {
    * @return level
    */
   public int level() {
-    PathNode sn = par;
+    PathNode pn = par;
     int c = 0;
-    while(sn != null) {
-      sn = sn.par;
+    while(pn != null) {
+      pn = pn.par;
       c++;
     }
     return c;

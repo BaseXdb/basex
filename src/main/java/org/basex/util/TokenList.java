@@ -119,8 +119,8 @@ public final class TokenList implements Iterable<byte[]> {
    * Finishes the array.
    * @return array
    */
-  public byte[][] finish() {
-    return size == list.length ? list : Arrays.copyOf(list, size);
+  public byte[][] toArray() {
+    return Arrays.copyOf(list, size);
   }
 
   /**

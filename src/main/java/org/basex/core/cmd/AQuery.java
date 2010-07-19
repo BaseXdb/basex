@@ -197,7 +197,7 @@ public abstract class AQuery extends Command {
         qu.plan(d);
         d.close();
         final String dot = "plan.dot";
-        IO.get(dot).write(co.finish());
+        IO.get(dot).write(co.toArray());
 
         if(prop.is(Prop.DOTDISPLAY))
           new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();

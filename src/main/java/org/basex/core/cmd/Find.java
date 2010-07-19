@@ -1,9 +1,11 @@
 package org.basex.core.cmd;
 
 import static org.basex.util.Token.*;
+import static org.basex.query.QueryTokens.*;
 import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.data.Data;
+import org.basex.data.MetaData;
 import org.basex.query.path.Axis;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
@@ -92,7 +94,22 @@ public final class Find extends AQuery {
     }
     if(pre.isEmpty() && preds.isEmpty()) return root ? "/" : ".";
 
-    return pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds;
+    // apply full-text specific options
+    final TokenBuilder opt = new TokenBuilder();
+    final MetaData md = data.meta;
+    if(md.ftxindex) {
+      if(md.wildcards)  opt.add(' ' + USING + ' ' + WILDCARDS);
+      if(md.stemming)   opt.add(' ' + USING + ' ' + STEMMING);
+      if(md.casesens)   opt.add(' ' + USING + ' ' + CASE + ' ' + SENSITIVE);
+      if(md.diacritics) opt.add(' ' + USING + ' ' + DIACRITICS + ' ' +
+          SENSITIVE);
+    }
+
+    // create final string
+    final TokenBuilder tb = new TokenBuilder();
+    if(opt.size() != 0) tb.add("declare ft-option" + opt + "; ");
+    tb.add(pre + (r ? "/" : "") + Axis.DESCORSELF + "::" + tag + preds);
+    return tb.toString();
   }
 
   /**

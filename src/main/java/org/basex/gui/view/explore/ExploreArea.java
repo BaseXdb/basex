@@ -155,7 +155,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     final TokenList tmp = data.path.desc(sl, data, !fs, false);
     if(tmp.size() == 0) return;
 
-    final String[] keys = entries(tmp.finish());
+    final String[] keys = entries(tmp.toArray());
     final BaseXCombo cm = new BaseXCombo(keys, gui);
     cm.addActionListener(this);
     cm.addKeyListener(main);
@@ -348,6 +348,6 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
     sl.add(Main.info(INFOENTRIES, key.length));
     for(final byte[] k : key) sl.add(Token.string(k));
     sl.sort(true, true);
-    return sl.finish();
+    return sl.toArray();
   }
 }

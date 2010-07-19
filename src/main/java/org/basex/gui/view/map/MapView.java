@@ -540,7 +540,7 @@ public final class MapView extends View implements Runnable {
         np = rect.pre + ViewData.size(data, rect.pre);
       }
     }
-    gui.notify.mark(new Nodes(il.finish(), data), null);
+    gui.notify.mark(new Nodes(il.toArray(), data), null);
   }
 
   @Override

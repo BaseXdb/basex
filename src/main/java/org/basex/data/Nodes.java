@@ -150,7 +150,7 @@ public final class Nodes implements Result {
     }
     while(a != al) c.add(ai[a++]);
     while(b != bl) c.add(bi[b++]);
-    return c.finish();
+    return c.toArray();
   }
 
   /**
@@ -171,7 +171,7 @@ public final class Nodes implements Result {
       if(d <= 0) a++;
     }
     while(a != al) c.add(ai[a++]);
-    return c.finish();
+    return c.toArray();
   }
 
   /**

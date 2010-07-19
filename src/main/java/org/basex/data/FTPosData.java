@@ -36,9 +36,9 @@ public final class FTPosData {
       c = -c - 1;
       if(size == pos.length) pos = Arrays.copyOf(pos, size << 1);
       Array.move(pos, c, 1, size++ - c);
-      pos[c] = new FTPos(pre, ps.finish());
+      pos[c] = new FTPos(pre, ps.toArray());
     } else {
-      pos[c].union(ps.finish());
+      pos[c].union(ps.toArray());
     }
   }
 

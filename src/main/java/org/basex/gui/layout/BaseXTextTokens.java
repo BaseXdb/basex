@@ -189,7 +189,7 @@ public final class BaseXTextTokens {
    * Returns the byte array, chopping the unused bytes.
    * @return character array
    */
-  byte[] finish() {
+  byte[] toArray() {
     return text.length == size ? text : Arrays.copyOf(text, size);
   }
 

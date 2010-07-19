@@ -765,10 +765,10 @@ public class QueryParser extends InputParser {
     final Expr ret = check(single(), NORETURN);
     ctx.vars.reset(s);
     return ret == Seq.EMPTY ? ret : order == null && group == null ?
-        new FLWR(fl, where, ret) : group == null ? 
-            new FLWOR(fl, where, new Order(order), ret) : 
-              new GFLWOR(fl, where, order == null ? null : new Order(order),
-                  new Group(group), ret);
+      new FLWR(fl, where, ret) : group == null ?
+      new FLWOR(fl, where, new Order(order), ret) : 
+      new GFLWOR(fl, where, order == null ? null : new Order(order),
+        new Group(group), ret);
   }
 
   /**

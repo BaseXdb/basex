@@ -269,7 +269,7 @@ public final class QueryContext extends Progress {
       }
 
       // completed... return standard nodeset with full-text positions
-      if(i == null) return new Nodes(pre.finish(), data, ftpos);
+      if(i == null) return new Nodes(pre.toArray(), data, ftpos);
 
       // otherwise, add nodes to standard iterator
       final int ps = pre.size();

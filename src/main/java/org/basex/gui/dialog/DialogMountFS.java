@@ -67,7 +67,7 @@ public final class DialogMountFS extends Dialog {
     // create database chooser
     final StringList db = List.listFS(main.context);
 
-    choice = new BaseXListChooser(db.finish(), this);
+    choice = new BaseXListChooser(db.toArray(), this);
 
     set(choice, BorderLayout.CENTER);
     choice.setSize(130, 420);

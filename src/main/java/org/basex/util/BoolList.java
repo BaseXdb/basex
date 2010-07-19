@@ -70,8 +70,8 @@ public final class BoolList {
    * Finishes the int array.
    * @return int array
    */
-  public boolean[] finish() {
-    return size == list.length ? list : Arrays.copyOf(list, size);
+  public boolean[] toArray() {
+    return Arrays.copyOf(list, size);
   }
 
   /**

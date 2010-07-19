@@ -192,6 +192,6 @@ public final class GUIProp extends AProp {
       final String f = qu[q];
       if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
     }
-    set(QUERIES, sl.finish());
+    set(QUERIES, sl.toArray());
   }
 }

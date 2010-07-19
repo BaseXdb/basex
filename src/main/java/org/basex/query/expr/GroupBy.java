@@ -32,6 +32,7 @@ public final class GroupBy extends Expr {
     new SeqIter();
     expr = e;
   }
+
   /**
    * Returns the Grouping var.
    * @return grouping var

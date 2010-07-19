@@ -512,8 +512,7 @@ public final class SpotlightExtractor implements IFileParser {
      */
     boolean check(final Object o, final Class<?> c) {
       if(c.isInstance(o)) return true;
-      Main.debug("SpotlightExtractor: wrong data type for attribute " +
-          this.toString());
+      Main.debug("SpotlightExtractor: wrong data type for attribute " + this);
       return false;
     }
 

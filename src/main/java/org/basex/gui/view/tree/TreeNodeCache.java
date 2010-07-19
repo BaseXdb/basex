@@ -94,7 +94,7 @@ final class TreeNodeCache implements TreeViewOptions {
 
     if(min == -1) return min;
 
-    final int[] n = nodes[lv].finish();
+    final int[] n = nodes[lv].toArray();
 
     while(min-- > 0 && n[min] > lp)
       ;

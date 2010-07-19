@@ -77,7 +77,7 @@ public final class Array {
       final boolean asc) {
     final IntList il = number(tok.length);
     il.sort(tok, num, asc);
-    return il.finish();
+    return il.toArray();
   }
 
   /**
@@ -90,7 +90,7 @@ public final class Array {
   public static int[] createOrder(final double[] tok, final boolean asc) {
     final IntList il = number(tok.length);
     il.sort(tok, asc);
-    return il.finish();
+    return il.toArray();
   }
 
   /**

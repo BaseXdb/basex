@@ -326,7 +326,7 @@ public final class GUI extends JFrame {
    * Executes a command, depending on the current input.
    */
   protected void execute() {
-    final String in = input.getText();
+    final String in = input.getText().trim();
     final boolean db = context.data != null;
     final boolean cmdmode = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
 
