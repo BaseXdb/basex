@@ -2,7 +2,6 @@ package org.basex.query.util;
 
 import java.util.Arrays;
 import org.basex.query.QueryException;
-import org.basex.query.expr.CmpV;
 import org.basex.query.item.Item;
 
 /**
@@ -36,12 +35,8 @@ public final class ItemSet {
 
     final int h = i.hashCode();
     final int p = h & bucket.length - 1;
-    final boolean nan = i.n() && Double.isNaN(i.dbl());
     for(int id = bucket[p]; id != 0; id = next[id]) {
-      final Item c = values[id];
-      // double value is NaN or values are equal..
-      if(nan && c.n() && Double.isNaN(c.dbl()) || CmpV.valCheck(i, c) &&
-          CmpV.Comp.EQ.e(i, c)) return false;
+      if(values[id].equiv(i)) return false;
     }
 
     next[size] = bucket[p];

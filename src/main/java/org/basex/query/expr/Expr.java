@@ -169,8 +169,8 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Removes the specified variable in a sub expression.
-   * @param v variable to be removed
+   * Substitutes a variable in a sub expression by a context reference.
+   * @param v variable to be replace
    * @return expression with removed variable
    */
   @SuppressWarnings("unused")

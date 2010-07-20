@@ -240,6 +240,8 @@ public interface QueryTokens {
   /** Parser token. */
   String STRIP = "strip";
   /** Parser token. */
+  String SWITCH = "switch";
+  /** Parser token. */
   String THEN = "then";
   /** Parser token. */
   String TIMES = "times";

@@ -184,19 +184,8 @@ public final class CmpV extends Arr {
     final Item b = expr[1].atomic(ctx);
     if(b == null) return null;
 
-    if(!valCheck(a, b)) Err.cmp(a, b);
+    if(!a.comparable(b)) Err.cmp(a, b);
     return Bln.get(cmp.e(a, b));
-  }
-
-  /**
-   * Checks if the specified items can be compared.
-   * @param a first item
-   * @param b second item
-   * @return result of check
-   */
-  public static boolean valCheck(final Item a, final Item b) {
-    return a.type == b.type || a.n() && b.n() || (a.u() || a.s()) &&
-      (b.s() || b.u()) || a.d() && b.d();
   }
 
   @Override

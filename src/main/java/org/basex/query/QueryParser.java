@@ -14,7 +14,7 @@ import org.basex.query.expr.CElem;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.CText;
 import org.basex.query.expr.Calc;
-import org.basex.query.expr.Case;
+import org.basex.query.expr.TypeCase;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Castable;
 import org.basex.query.expr.Catch;
@@ -48,6 +48,7 @@ import org.basex.query.expr.Range;
 import org.basex.query.expr.Root;
 import org.basex.query.expr.Satisfy;
 import org.basex.query.expr.Scored;
+import org.basex.query.expr.Switch;
 import org.basex.query.expr.Treat;
 import org.basex.query.expr.Try;
 import org.basex.query.expr.TypeSwitch;
@@ -704,6 +705,7 @@ public class QueryParser extends InputParser {
     alter = null;
     Expr e = flwor();
     if(e == null) e = quantified();
+    if(e == null) e = switchh();
     if(e == null) e = typeswitch();
     if(e == null) e = iff();
     if(e == null) e = tryCatch();
@@ -893,6 +895,38 @@ public class QueryParser extends InputParser {
   }
 
   /**
+   * [ 42] Parses a SwitchExpr.
+   * @return query expression
+   * @throws QueryException query exception
+   */
+  private Expr switchh() throws QueryException {
+    if(!consumeWS(SWITCH, PAR1, TYPEPAR)) return null;
+    check(PAR1);
+    Expr[] exprs = { check(expr(), NOSWITCH) };
+    check(PAR2);
+
+    // collect all cases
+    Expr[] cases;
+    while(true) {
+      cases = new Expr[0];
+      while(consumeWS(CASE)) cases = add(cases, single());
+      if(cases.length == 0) break;
+
+      check(RETURN);
+      final Expr ret = single();
+      for(final Expr c : cases) exprs = add(add(exprs, c), ret);
+    }
+
+    // add default case
+    if(exprs.length == 1) error(WRONGEND, CASE);
+    check(DEFAULT);
+    check(RETURN);
+    exprs = add(exprs, single());
+
+    return new Switch(exprs);
+  }
+  
+  /**
    * [ 42] Parses a TypeswitchExpr.
    * @return query expression
    * @throws QueryException query exception
@@ -903,7 +937,7 @@ public class QueryParser extends InputParser {
     final Expr ts = check(expr(), NOTYPESWITCH);
     check(PAR2);
 
-    Case[] cases = {};
+    TypeCase[] cases = {};
     final int s = ctx.vars.size();
     boolean cs = true;
     do {
@@ -919,7 +953,7 @@ public class QueryParser extends InputParser {
       if(name != null) ctx.vars.add(var);
       check(RETURN);
       final Expr ret = check(single(), NOTYPESWITCH);
-      cases = Array.add(cases, new Case(var, ret));
+      cases = Array.add(cases, new TypeCase(var, ret));
       ctx.vars.reset(s);
     } while(cs);
     if(cases.length == 1) error(NOTYPESWITCH);

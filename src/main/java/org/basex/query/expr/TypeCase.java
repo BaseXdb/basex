@@ -12,12 +12,12 @@ import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
- * Case expression.
+ * Case expression for typeswitch.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Case extends Single {
+public final class TypeCase extends Single {
   /** Variable. */
   final Var var;
 
@@ -26,13 +26,13 @@ public final class Case extends Single {
    * @param v variable
    * @param r return expression
    */
-  public Case(final Var v, final Expr r) {
+  public TypeCase(final Var v, final Expr r) {
     super(r);
     var = v;
   }
 
   @Override
-  public Case comp(final QueryContext ctx) throws QueryException {
+  public TypeCase comp(final QueryContext ctx) throws QueryException {
     return comp(ctx, null);
   }
 
@@ -43,7 +43,7 @@ public final class Case extends Single {
    * @return resulting item
    * @throws QueryException query exception
    */
-  Case comp(final QueryContext ctx, final Item it) throws QueryException {
+  TypeCase comp(final QueryContext ctx, final Item it) throws QueryException {
     if(var.name == null) {
       super.comp(ctx);
     } else {
@@ -61,7 +61,7 @@ public final class Case extends Single {
   }
 
   @Override
-  public Case remove(final Var v) {
+  public TypeCase remove(final Var v) {
     if(!v.eq(var)) expr = expr.remove(v);
     return this;
   }

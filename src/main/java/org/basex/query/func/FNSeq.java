@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -84,7 +83,7 @@ final class FNSeq extends Fun {
           final Item i = ir.next();
           if(i == null) return null;
           c++;
-          if(CmpV.valCheck(i, it) && CmpV.Comp.EQ.e(i, it)) return Itr.get(c);
+          if(i.comparable(it) && i.eq(it)) return Itr.get(c);
         }
       }
     };

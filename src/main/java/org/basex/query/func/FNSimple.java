@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -129,10 +128,7 @@ public final class FNSimple extends Fun {
     Item it2 = null;
     // explicit non-short-circuit..
     while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
-      if(it1.n() && it2.n() && Double.isNaN(it1.dbl()) &&
-          Double.isNaN(it2.dbl())) continue;
-
-      if(!CmpV.valCheck(it1, it2) || CmpV.Comp.NE.e(it1, it2)) return false;
+      if(!it1.equiv(it2)) return false;
       if(!it1.node() && !it2.node()) continue;
 
       // comparing nodes

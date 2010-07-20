@@ -207,6 +207,28 @@ public abstract class Item extends Expr {
   public abstract boolean eq(Item it) throws QueryException;
 
   /**
+   * Checks the items for equivalence.
+   * @param it item to be compared
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public final boolean equiv(final Item it) throws QueryException {
+    // check if both values are NaN, or if values are equal..
+    return (this == Dbl.NAN || this == Flt.NAN) && it.n() &&
+        Double.isNaN(it.dbl()) || comparable(it) && eq(it);
+  }
+
+  /**
+   * Checks if the items can be compared.
+   * @param b second item
+   * @return result of check
+   */
+  public boolean comparable(final Item b) {
+    return type == b.type || n() && b.n() || (u() || s()) &&
+      (b.s() || b.u()) || d() && b.d();
+  }
+
+  /**
    * Returns the difference between the current and the specified item.
    * @param it item to be compared
    * @return difference

@@ -270,6 +270,8 @@ public interface QueryText {
   /** XPST0003: Parsing exception. */
   Object[] NOTYPESWITCH = { XPST, 3, "Incomplete typeswitch expression." };
   /** XPST0003: Parsing exception. */
+  Object[] NOSWITCH = { XPST, 3, "Incomplete switch expression." };
+  /** XPST0003: Parsing exception. */
   Object[] TYPEPAR = { XPST, 3,
       "Expecting '(' after 'typeswitch' expression." };
   /** XPST0003: Parsing exception. */

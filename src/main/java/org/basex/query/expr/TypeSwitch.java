@@ -24,14 +24,14 @@ public final class TypeSwitch extends Expr {
   /** Typeswitch expression. */
   private Expr ts;
   /** Expression list. */
-  private Case[] cs;
+  private TypeCase[] cs;
 
   /**
    * Constructor.
    * @param t typeswitch expression
    * @param c case expressions
    */
-  public TypeSwitch(final Expr t, final Case[] c) {
+  public TypeSwitch(final Expr t, final TypeCase[] c) {
     ts = t;
     cs = c;
   }
@@ -39,10 +39,10 @@ public final class TypeSwitch extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     ts = checkUp(ts, ctx).comp(ctx);
-    for(final Case c : cs) c.comp(ctx);
+    for(final TypeCase c : cs) c.comp(ctx);
 
     boolean em = true;
-    for(final Case c : cs) em &= c.e();
+    for(final TypeCase c : cs) em &= c.e();
     if(em) {
       ctx.compInfo(OPTTRUE);
       return Seq.EMPTY;
@@ -70,7 +70,7 @@ public final class TypeSwitch extends Expr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter seq = SeqIter.get(ctx.iter(ts));
-    for(final Case c : cs) {
+    for(final TypeCase c : cs) {
       seq.reset();
       final Iter iter = c.iter(ctx, seq);
       if(iter != null) return iter;
@@ -82,7 +82,7 @@ public final class TypeSwitch extends Expr {
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
     if(u == Use.VAR) return true;
-    for(final Case c : cs) if(c.uses(u, ctx)) return true;
+    for(final TypeCase c : cs) if(c.uses(u, ctx)) return true;
     return ts.uses(u, ctx);
   }
 
@@ -103,17 +103,17 @@ public final class TypeSwitch extends Expr {
   }
 
   @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this);
+    for(final TypeCase c : cs) c.plan(ser);
+    ts.plan(ser);
+    ser.closeElement();
+  }
+
+  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(TYPESWITCH + "(" + ts + ") ");
     for(int l = 0; l != cs.length; l++) sb.append((l != 0 ? ", " : "") + cs[l]);
     return sb.toString();
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    for(final Case c : cs) c.plan(ser);
-    ts.plan(ser);
-    ser.closeElement();
   }
 }

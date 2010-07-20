@@ -68,7 +68,7 @@ public final class Flt extends Item {
 
   @Override
   public boolean eq(final Item it) throws QueryException {
-    return it.type == Type.DBL ? it.eq(this) : dbl() == it.flt();
+    return it.type == Type.DBL ? it.eq(this) : val == it.flt();
   }
 
   @Override
