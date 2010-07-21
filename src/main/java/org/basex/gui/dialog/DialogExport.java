@@ -159,7 +159,7 @@ public final class DialogExport extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
-    gui.context.prop.set(Prop.EXPORTER, "," +
+    gui.set(Prop.EXPORTER, "," +
         SerializerProp.S_INDENT[0] + "=" +
         (format.isSelected() ? YES : NO) + "," +
         SerializerProp.S_ENCODING[0] + "=" +

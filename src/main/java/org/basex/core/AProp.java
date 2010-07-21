@@ -283,6 +283,16 @@ public abstract class AProp {
   }
 
   /**
+   * Checks if the specified property has changed.
+   * @param key key
+   * @param val new value
+   * @return result of check
+   */
+  public final boolean sameAs(final Object[] key, final Object val) {
+    return props.get(key[0].toString()).equals(val);
+  }
+
+  /**
    * Retrieves the specified value. Throws an error if value cannot be read.
    * @param key key
    * @param c expected type
@@ -302,11 +312,14 @@ public abstract class AProp {
    * @param key key
    * @param c expected type
    * @param val value
+   * @return true if the value has changed
    */
-  private void set(final Object[] key, final Object val, final Class<?> c) {
-    get(key, c);
+  private boolean set(final Object[] key, final Object val, final Class<?> c) {
+    final Object old = get(key, c);
+    final boolean eq = old.equals(val);
     props.put(key[0].toString(), val);
     finish();
+    return !eq;
   }
 
   /**

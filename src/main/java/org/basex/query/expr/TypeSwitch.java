@@ -57,7 +57,7 @@ public final class TypeSwitch extends Expr {
       for(int c = 0; c < cs.length; c++) {
         if(cs[c].var.type != null) {
           if(cs[c].var.type.instance(ts.iter(ctx))) {
-            ctx.compInfo(OPTPRE, this);
+            ctx.compInfo(OPTPRE, TYPESWITCH + '(' + ts + ')');
             return cs[c].comp(ctx, (Item) ts).expr;
           }
           cs = Array.delete(cs, c);

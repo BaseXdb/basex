@@ -41,17 +41,20 @@ public final class Switch extends Arr {
       }
       if(items && e == this) e = expr[el - 1];
     }
-    if(e != this) ctx.compInfo(OPTPRE, this);
+    if(e != this) ctx.compInfo(OPTPRE, SWITCH + "(" + expr[0] + ")");
     return e;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item sw = expr[0].atomic(ctx);
+    final Item op = expr[0].atomic(ctx);
     final int el = expr.length;
     for(int i = 1; i < el - 1; i += 2) {
-      if(sw.equiv(expr[i].atomic(ctx))) return ctx.iter(expr[i + 1]);
+      final Item cs = expr[i].atomic(ctx);
+      // includes check for empty sequence (null reference)
+      if(op == cs || op.equiv(cs)) return ctx.iter(expr[i + 1]);
     }
+    // choose default expression
     return ctx.iter(expr[el - 1]);
   }
 
@@ -71,7 +74,7 @@ public final class Switch extends Arr {
     final int el = expr.length;
     for(int i = 1; i < el; i++) {
       sb.append(" " + (i + 1 < el ? CASE + ' ' + expr[i++] : DEFAULT));
-      sb.append(" " + expr[i]);
+      sb.append(" " + RETURN + " " + expr[i]);
     }
     return sb.toString();
   }

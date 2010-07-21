@@ -15,7 +15,7 @@ m_options=Options
 m_help=Help
 m_db=Database
 m_main=Main Window
-m_views=Views
+m_views=Visualizations
 m_inter=Interaction
 m_layout=Layout
 

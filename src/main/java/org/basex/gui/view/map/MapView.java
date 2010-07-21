@@ -567,7 +567,7 @@ public final class MapView extends View implements Runnable {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    if(gui.updating || mainRects == null || ignoreTyped(e)) return;
+    if(gui.updating || mainRects == null || control(e)) return;
 
     final boolean cursor = pressed(PREVLINE, e) || pressed(NEXTLINE, e) ||
       pressed(PREV, e) || pressed(NEXT, e);

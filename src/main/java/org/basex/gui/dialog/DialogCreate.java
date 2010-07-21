@@ -253,16 +253,16 @@ public final class DialogCreate extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
-    final Prop prop = gui.context.prop;
-    prop.set(Prop.CHOP, chop.isSelected());
-    prop.set(Prop.CREATEFILTER, filter.getText());
-    prop.set(Prop.ENTITY, entities.isSelected());
-    prop.set(Prop.DTD, dtd.isSelected());
-    prop.set(Prop.PATHINDEX, pathindex.isSelected());
-    prop.set(Prop.TEXTINDEX, txtindex.isSelected());
-    prop.set(Prop.ATTRINDEX, atvindex.isSelected());
-    prop.set(Prop.FTINDEX, ftxindex.isSelected());
-    prop.set(Prop.INTPARSE, intparse.isSelected());
+
+    gui.set(Prop.CHOP, chop.isSelected());
+    gui.set(Prop.CREATEFILTER, filter.getText());
+    gui.set(Prop.ENTITY, entities.isSelected());
+    gui.set(Prop.DTD, dtd.isSelected());
+    gui.set(Prop.PATHINDEX, pathindex.isSelected());
+    gui.set(Prop.TEXTINDEX, txtindex.isSelected());
+    gui.set(Prop.ATTRINDEX, atvindex.isSelected());
+    gui.set(Prop.FTINDEX, ftxindex.isSelected());
+    gui.set(Prop.INTPARSE, intparse.isSelected());
     ft.close();
   }
 

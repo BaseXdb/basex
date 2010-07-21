@@ -113,8 +113,8 @@ public final class GUIInput extends BaseXTextField {
           pop.setVisible(false);
         } else if(pressed(ENTER, e)) {
           pop.hide();
-        } else if(!ignoreTyped(e) && !pressed(NEXTLINE, e) &&
-            !pressed(PREVLINE, e)) {
+        } else if(!pressed(NEXTLINE, e) && !pressed(PREVLINE, e)) {
+          if(modifier(e) || control(e)) return;
           showPopup();
           // skip commands
           if(gui.prop.is(GUIProp.EXECRT) && !cmdMode()) main.execute();
@@ -198,7 +198,7 @@ public final class GUIInput extends BaseXTextField {
     StringList sl = null;
     try {
       final QuerySuggest qs = new QuerySuggest(
-          new QueryContext(gui.context), gui.context);
+          new QueryContext(gui.context), data);
       qs.parse(query, null, null);
       sl = qs.complete();
       pre = query.substring(0, qs.qm);

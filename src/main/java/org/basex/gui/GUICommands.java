@@ -957,15 +957,23 @@ public enum GUICommands implements GUICommand {
           // execute command
           final DialogProgress wait = new DialogProgress(gui, t, !fs, !op, cmd);
           final Performance perf = new Performance();
+          String info;
+          boolean ok = true;
           try {
             cmd.execute(gui.context);
-            gui.status.setText(Main.info(PROCTIME, perf));
+            info = cmd.info();
           } catch(final BaseXException ex) {
-            final String info = ex.getMessage();
-            Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
+            info = ex.getMessage();
+            ok = false;
           } finally {
             wait.dispose();
           }
+          final String time = perf.toString();
+          gui.info.setInfo(info, cmd, time, ok);
+          gui.info.reset();
+          gui.status.setText(Main.info(PROCTIME, time));
+          if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
+          
           // initialize views
           if(!ci && !di) gui.notify.init();
         }

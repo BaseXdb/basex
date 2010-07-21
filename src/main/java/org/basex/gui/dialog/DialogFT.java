@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import org.basex.core.Prop;
+import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXButton;
@@ -130,13 +131,13 @@ final class DialogFT extends BaseXBack {
    * Closes the dialog.
    */
   void close() {
-    final Prop prop = dialog.gui.context.prop;
-    prop.set(Prop.WILDCARDS, check[0].isSelected());
-    prop.set(Prop.STEMMING, check[1].isSelected());
-    prop.set(Prop.CASESENS, check[2].isSelected());
-    prop.set(Prop.DIACRITICS, check[3].isSelected());
-    prop.set(Prop.SCORING,
-        check[4].isSelected() ? scoring.getSelectedIndex() + 1 : 0);
-    prop.set(Prop.STOPWORDS, check[5].isSelected() ? swpath.getText() : "");
+    final GUI gui = dialog.gui;
+    gui.set(Prop.WILDCARDS, check[0].isSelected());
+    gui.set(Prop.STEMMING, check[1].isSelected());
+    gui.set(Prop.CASESENS, check[2].isSelected());
+    gui.set(Prop.DIACRITICS, check[3].isSelected());
+    gui.set(Prop.SCORING, check[4].isSelected() ?
+        scoring.getSelectedIndex() + 1 : 0);
+    gui.set(Prop.STOPWORDS, check[5].isSelected() ? swpath.getText() : "");
   }
 }

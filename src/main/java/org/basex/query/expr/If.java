@@ -39,7 +39,7 @@ public final class If extends Arr {
       // both branches are empty
       e = Seq.EMPTY;
     }
-    if(e != this) ctx.compInfo(OPTPRE, this);
+    if(e != this) ctx.compInfo(OPTPRE, IF + '(' + expr[0] + ')');
     return e;
   }
 
@@ -56,7 +56,7 @@ public final class If extends Arr {
 
   @Override
   public String toString() {
-    return IF + " " + expr[0] + " " + THEN + " " + expr[1] + " " +
-      ELSE + " " + expr[2];
+    return IF + '(' + expr[0] + ") " + THEN + ' ' + expr[1] + ' ' +
+      ELSE + ' ' + expr[2];
   }
 }

@@ -302,9 +302,9 @@ public final class DialogServer extends Dialog {
     try {
       if(cmp == start || cmp == ports) {
         final int p = Integer.parseInt(ports.getText());
-        ctx.prop.set(Prop.SERVERPORT, p);
+        gui.set(Prop.SERVERPORT, p);
         if(host.getText().equals(LOCALHOST)) {
-          ctx.prop.set(Prop.PORT, p);
+          gui.set(Prop.PORT, p);
           portc.setText(ports.getText());
         }
         msg = BaseXServer.start(p);
@@ -324,8 +324,8 @@ public final class DialogServer extends Dialog {
           cmp == host || cmp == portc) {
         gui.prop.set(GUIProp.SERVERUSER, loguser.getText());
         final String pw = new String(logpass.getPassword());
-        ctx.prop.set(Prop.HOST, host.getText());
-        ctx.prop.set(Prop.PORT, Integer.parseInt(portc.getText()));
+        gui.set(Prop.HOST, host.getText());
+        gui.set(Prop.PORT, Integer.parseInt(portc.getText()));
         cs = new ClientSession(ctx, gui.prop.get(GUIProp.SERVERUSER), pw);
         user.setSess(cs);
         dbsP.setSess(cs);

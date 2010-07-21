@@ -273,7 +273,7 @@ public interface QueryText {
   Object[] NOSWITCH = { XPST, 3, "Incomplete switch expression." };
   /** XPST0003: Parsing exception. */
   Object[] TYPEPAR = { XPST, 3,
-      "Expecting '(' after 'typeswitch' expression." };
+      "Expecting '(' after 'switch' or 'typeswitch'." };
   /** XPST0003: Parsing exception. */
   Object[] PRAGMAINCOMPLETE = { XPST, 3, "Incomplete pragma expression." };
   /** XPST0003: Parsing exception. */

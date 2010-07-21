@@ -5,7 +5,9 @@ import static org.basex.gui.GUIConstants.*;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
+import org.basex.core.Command;
 import org.basex.core.Prop;
+import org.basex.core.cmd.XQuery;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
@@ -34,6 +36,9 @@ public final class InfoView extends View {
   private final BaseXBack north;
   /** Text Area. */
   private final BaseXText area;
+
+  /** Old text. */
+  private final TokenBuilder text = new TokenBuilder();
 
   /** Query statistics. */
   private IntList stat = new IntList();
@@ -112,11 +117,14 @@ public final class InfoView extends View {
   }
 
   /**
-   * Displays the specified query information.
-   * @param inf info string
+   * Displays the specified information.
+   * @param info info string
+   * @param cmd command string
+   * @param time time needed
    * @param ok flag indicating if command execution was successful
    */
-  public void setInfo(final String inf, final boolean ok) {
+  public void setInfo(final String info, final Command cmd,
+      final String time, final boolean ok) {
     final StringList eval = new StringList();
     final StringList comp = new StringList();
     final StringList plan = new StringList();
@@ -126,7 +134,7 @@ public final class InfoView extends View {
     String qu = "";
     String res = "";
 
-    final String[] split = inf.split(NL);
+    final String[] split = info.split(NL);
     for(int i = 0; i < split.length; i++) {
       final String line = split[i];
       final int s = line.indexOf(':');
@@ -153,62 +161,74 @@ public final class InfoView extends View {
       }
     }
 
-    final TokenBuilder tb = new TokenBuilder();
-    String time = "";
     stat = il;
     strings = sl;
+    String total = time;  
 
-    final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
-    if(sl.size() != 0) {
-      add(tb, QUERYQU, qu);
-      add(tb, QUERYCOMP, comp);
-      if(comp.size() != 0) add(tb, QUERYRESULT, res);
-      add(tb, QUERYPLAN, plan);
-      add(tb, QUERYEVAL, eval);
-      add(tb, QUERYTIME, sl);
-      time = sl.get(il.size() - 1) + COLS + Performance.getTimer(
-          il.get(il.size() - 1) * 10000L * runs, runs);
-    } else if(!ok) {
-      add(tb, INFOERROR, err.replaceAll(STOPPED + ".*\\r?\\n", ""));
-      time = "";
+    final boolean q = cmd instanceof XQuery;
+    if(!ok || !q) {
+      text.high();
+      if(q) {
+        add(QUERYQU, cmd.toString().replaceAll("^.*? ", "").trim());
+      } else if(cmd != null) {
+        text.high().add(BUTTONCMD + COLS).norm().add(cmd).nl();
+      }
+      if(ok) {
+        text.add(info).nl();
+      } else {
+        add(INFOERROR, err.replaceAll(STOPPED + ".*\\r?\\n", ""));
+      }
+    } else if(sl.size() != 0) {
+      text.reset();
+      add(QUERYQU, qu);
+      add(QUERYCOMP, comp);
+      if(comp.size() != 0) add(QUERYRESULT, res);
+      add(QUERYPLAN, plan);
+      add(QUERYEVAL, eval);
+      add(QUERYTIME, sl);
+      final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
+      total = Performance.getTimer(il.get(il.size() - 1) * 10000L * runs, runs);
     }
 
-    area.setText(tb.finish());
-    timer.setText(time);
+    area.setText(text.finish());
+    if(total != null) timer.setText(QUERYTOTAL + total);
     repaint();
   }
 
   /**
+   * Resets the info string without repainting the view.
+   */
+  public void reset() {
+    text.reset();
+  }
+  
+  /**
    * Adds the specified strings.
-   * @param tb token builder
    * @param head string header
    * @param list list reference
    */
-  private void add(final TokenBuilder tb, final String head,
-      final StringList list) {
-
+  private void add(final String head, final StringList list) {
     final int runs = Math.max(1, gui.context.prop.num(Prop.RUNS));
     if(list.size() == 0) return;
-    tb.high().add(head).norm().nl();
+    text.high().add(head).norm().nl();
     final int is = list.size();
     for(int i = 0; i < is; i++) {
       String line = list.get(i);
       if(list == strings) line = " " + QUERYSEP + line + ":  " +
         Performance.getTimer(stat.get(i) * 10000L * runs, runs);
-      tb.add(line).nl();
+      text.add(line).nl();
     }
-    tb.hl();
+    text.hl();
   }
 
   /**
    * Adds a string.
-   * @param tb token builder
    * @param head string header
    * @param txt text
    */
-  private void add(final TokenBuilder tb, final String head, final String txt) {
+  private void add(final String head, final String txt) {
     if(txt.isEmpty()) return;
-    tb.high().add(head).norm().add(txt).nl().hl();
+    text.high().add(head).norm().add(txt).nl().hl();
   }
 
   @Override

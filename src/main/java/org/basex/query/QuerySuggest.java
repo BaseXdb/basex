@@ -3,7 +3,6 @@ package org.basex.query;
 import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.Stack;
-import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.PathNode;
 import org.basex.query.path.Axis;
@@ -34,12 +33,12 @@ public final class QuerySuggest extends QueryParser {
 
   /**
    * Constructor.
-   * @param c QueryContext
-   * @param context Context
+   * @param c query context
+   * @param d data reference
    */
-  public QuerySuggest(final QueryContext c, final Context context) {
+  public QuerySuggest(final QueryContext c, final Data d) {
     super(c);
-    data = context.data;
+    data = d;
     checkInit();
   }
 

@@ -162,23 +162,23 @@ public final class BaseXKeys {
   }
 
   /**
-   * Returns true if a typed key should be ignored.
+   * Returns true if the pressed key includes a control key.
    * @param e key event
    * @return result of check
    */
-  public static boolean ignoreTyped(final KeyEvent e) {
+  public static boolean control(final KeyEvent e) {
     // Mac offers special characters via ALT, Windows/Linux don't..
-    return !MAC && e.isAltDown() || (SC & e.getModifiers()) == SC;
+    return sc(e) || !MAC && e.isAltDown();
   }
 
   /**
-   * Returns true if the pressed key is a modifier.
+   * Returns true if the pressed key is a modifier key (including 'escape').
    * @param e key event
    * @return result of check
    */
   public static boolean modifier(final KeyEvent e) {
     final int c = e.getKeyCode();
     return c == VK_ALT || c == VK_SHIFT || c == VK_META || c == VK_CONTROL ||
-      c == VK_ESCAPE;
+      c == VK_ESCAPE || c == VK_CAPS_LOCK;
   }
 }

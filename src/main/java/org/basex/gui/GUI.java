@@ -27,6 +27,7 @@ import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.Find;
+import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.Data;
 import org.basex.data.Namespaces;
@@ -79,6 +80,8 @@ public final class GUI extends JFrame {
   public final BaseXButton filter;
   /** Search view. */
   public final XQueryView query;
+  /** Info view. */
+  public final InfoView info;
 
   /** Painting flag; if activated, interactive operations are skipped. */
   public boolean painting;
@@ -104,8 +107,6 @@ public final class GUI extends JFrame {
 
   /** Text view. */
   private final TextView text;
-  /** Info view. */
-  private final InfoView info;
   /** Top panel. */
   private final BaseXBack top;
   /** Execution Button. */
@@ -117,14 +118,14 @@ public final class GUI extends JFrame {
   /** Buttons. */
   private final GUIToolBar toolbar;
 
+  /** Current command. */
+  private Command command;
   /** Menu panel height. */
   private int menuHeight;
   /** Fullscreen Window. */
   private JFrame fullscr;
   /** Thread counter. */
   private int threadID;
-  /** Current command. */
-  private Command cmd;
 
   /**
    * Default constructor.
@@ -328,11 +329,11 @@ public final class GUI extends JFrame {
   protected void execute() {
     final String in = input.getText().trim();
     final boolean db = context.data != null;
-    final boolean cmdmode = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
+    final boolean cmd = prop.num(GUIProp.SEARCHMODE) == 2 || !db;
 
-    if(cmdmode || in.startsWith("!")) {
+    if(cmd || in.startsWith("!")) {
       // run as command: command mode or exclamation mark as first character
-      final int i = cmdmode ? 0 : 1;
+      final int i = cmd ? 0 : 1;
       if(in.length() > i) {
         try {
           for(final Command c : new CommandParser(in.substring(i),
@@ -341,7 +342,8 @@ public final class GUI extends JFrame {
           }
         } catch(final QueryException ex) {
           if(!info.visible()) GUICommands.SHOWINFO.execute(this);
-          info.setInfo(ex.getMessage(), false);
+          info.setInfo(ex.getMessage(), null, null, false);
+          info.reset();
         }
       }
     } else if(prop.num(GUIProp.SEARCHMODE) == 1 || in.startsWith("/")) {
@@ -395,11 +397,24 @@ public final class GUI extends JFrame {
    * Stops the current command.
    */
   public void stop() {
-    if(cmd != null) cmd.stop();
+    if(command != null) command.stop();
     cursor(CURSORARROW, true);
-    cmd = null;
+    command = null;
   }
 
+  /**
+   * Sets a property.
+   * @param pr property to be set
+   * @param val value
+   */
+  public void set(final Object[] pr, final Object val) {
+    if(!context.prop.sameAs(pr, val)) {
+      final Set cmd = new Set(pr, val);
+      cmd.run(context);
+      info.setInfo(cmd.info(), cmd, null, true);
+    }
+  }
+  
   /**
    * Executes the specified command.
    * @param c command to be executed
@@ -411,8 +426,8 @@ public final class GUI extends JFrame {
     final int thread = ++threadID;
 
     // wait when command is still running
-    while(cmd != null) {
-      cmd.stop();
+    while(command != null) {
+      command.stop();
       Performance.sleep(50);
       if(threadID != thread) return true;
     }
@@ -423,7 +438,7 @@ public final class GUI extends JFrame {
       final Performance perf = new Performance();
       final Nodes current = context.current;
       final Data data = context.data;
-      cmd = c;
+      command = c;
 
       // execute command and cache result
       final CachedOutput co = new CachedOutput(context.prop.num(Prop.MAXTEXT));
@@ -440,15 +455,17 @@ public final class GUI extends JFrame {
         inf = ex.getMessage();
         if(!ok && inf.equals(PROGERR)) {
           // command was interrupted..
-          cmd = null;
+          command = null;
           return false;
         }
       } finally {
         updating = false;
       }
+      final String time = perf.getTimer();
 
       // show query info
-      info.setInfo(inf, ok);
+      info.setInfo(inf, c, time, ok);
+      info.reset();
 
       // show feedback in query editor
       boolean feedback = main;
@@ -474,7 +491,6 @@ public final class GUI extends JFrame {
         }
 
         final Data ndata = context.data;
-        final String time = perf.getTimer();
         Nodes marked = context.marked;
 
         if(ndata != data) {
@@ -501,7 +517,7 @@ public final class GUI extends JFrame {
             // refresh views
             notify.mark(marked, null);
             if(thread != threadID) {
-              cmd = null;
+              command = null;
               return true;
             }
           }
@@ -521,7 +537,7 @@ public final class GUI extends JFrame {
     }
 
     cursor(CURSORARROW, true);
-    cmd = null;
+    command = null;
     return true;
   }
 
@@ -592,28 +608,15 @@ public final class GUI extends JFrame {
     if(marked != null) setHits(marked.size());
 
     filter.setEnabled(marked != null && marked.size() != 0);
-    refreshMode();
-    toolbar.refresh();
-    menu.refresh();
-
-    final int i = context.data == null ? 2 : prop.num(GUIProp.SEARCHMODE);
-    final String[] hs = i == 0 ? prop.strings(GUIProp.SEARCH) : i == 1 ?
-        prop.strings(GUIProp.XQUERY) : prop.strings(GUIProp.COMMANDS);
-    hist.setEnabled(hs.length != 0);
-  }
-
-  /**
-   * Refreshes the input mode.
-   */
-  private void refreshMode() {
-    final Data data = context.data;
-    final boolean db = data != null;
-    final int t = mode.getSelectedIndex();
-    final int s = !db ? 2 : prop.num(GUIProp.SEARCHMODE);
 
     final boolean inf = prop.is(GUIProp.SHOWINFO);
     context.prop.set(Prop.QUERYINFO, inf);
     context.prop.set(Prop.XMLPLAN, inf);
+
+    final Data data = context.data;
+    final boolean db = data != null;
+    final int t = mode.getSelectedIndex();
+    final int s = !db ? 2 : prop.num(GUIProp.SEARCHMODE);
 
     input.help(s == 0 ? data.fs != null ? HELPSEARCHFS : HELPSEARCHXML :
       s == 1 ? HELPXPATH : HELPCMD);
@@ -625,6 +628,14 @@ public final class GUI extends JFrame {
       input.setText("");
       input.requestFocusInWindow();
     }
+
+    toolbar.refresh();
+    menu.refresh();
+
+    final int i = context.data == null ? 2 : prop.num(GUIProp.SEARCHMODE);
+    final String[] hs = i == 0 ? prop.strings(GUIProp.SEARCH) : i == 1 ?
+        prop.strings(GUIProp.XQUERY) : prop.strings(GUIProp.COMMANDS);
+    hist.setEnabled(hs.length != 0);
   }
 
   /**

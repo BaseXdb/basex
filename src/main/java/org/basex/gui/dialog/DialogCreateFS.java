@@ -287,19 +287,18 @@ public final class DialogCreateFS extends Dialog {
   public void close() {
     if(!ok) return;
 
-    final Prop prop = gui.context.prop;
-    prop.set(Prop.FSCONT, cont.isSelected());
-    prop.set(Prop.FSMETA, meta.isSelected());
-    prop.set(Prop.FSXML, xml.isSelected());
-    prop.set(Prop.FSTEXTMAX, IMPORTFSMAXSIZE[maxsize.getSelectedIndex()]);
-    prop.set(Prop.PATHINDEX, pathindex.isSelected());
-    prop.set(Prop.TEXTINDEX, txtindex.isSelected());
-    prop.set(Prop.ATTRINDEX, atvindex.isSelected());
-    prop.set(Prop.FTINDEX, ftxindex.isSelected());
-    prop.set(Prop.WILDCARDS, ft[0].isSelected());
-    prop.set(Prop.STEMMING, ft[1].isSelected());
-    prop.set(Prop.CASESENS, ft[2].isSelected());
-    prop.set(Prop.DIACRITICS, ft[3].isSelected());
+    gui.set(Prop.FSCONT, cont.isSelected());
+    gui.set(Prop.FSMETA, meta.isSelected());
+    gui.set(Prop.FSXML, xml.isSelected());
+    gui.set(Prop.FSTEXTMAX, IMPORTFSMAXSIZE[maxsize.getSelectedIndex()]);
+    gui.set(Prop.PATHINDEX, pathindex.isSelected());
+    gui.set(Prop.TEXTINDEX, txtindex.isSelected());
+    gui.set(Prop.ATTRINDEX, atvindex.isSelected());
+    gui.set(Prop.FTINDEX, ftxindex.isSelected());
+    gui.set(Prop.WILDCARDS, ft[0].isSelected());
+    gui.set(Prop.STEMMING, ft[1].isSelected());
+    gui.set(Prop.CASESENS, ft[2].isSelected());
+    gui.set(Prop.DIACRITICS, ft[3].isSelected());
 
     final GUIProp gprop = gui.prop;
     gprop.set(GUIProp.FSALL, all.isSelected());

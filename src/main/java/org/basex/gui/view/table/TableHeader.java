@@ -372,8 +372,8 @@ final class TableHeader extends BaseXPanel {
 
   @Override
   public void keyPressed(final KeyEvent e) {
-    if(tdata.roots.size() == 0) return;
-    if(box == null && ignoreTyped(e) || inputCol == -1) return;
+    if(tdata.roots.size() == 0 || box == null || control(e) || inputCol == -1)
+      return;
 
     if(pressed(ENTER, e)) {
       box.stop();
@@ -403,7 +403,7 @@ final class TableHeader extends BaseXPanel {
   @Override
   public void keyTyped(final KeyEvent e) {
     if(tdata.roots.size() == 0 || box == null || inputCol == -1 ||
-        ignoreTyped(e) || !box.add(e)) return;
+        control(e) || !box.add(e)) return;
     tdata.cols[inputCol].filter = box.text;
     view.query();
   }
