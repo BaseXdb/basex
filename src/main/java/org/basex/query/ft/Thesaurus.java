@@ -14,6 +14,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.util.Err;
 import org.basex.util.ObjectMap;
+import org.basex.util.TokenMap;
 import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
 
@@ -27,20 +28,20 @@ public final class Thesaurus {
   /** Thesaurus root references. */
   private final ObjectMap<ThesNode> nodes = new ObjectMap<ThesNode>();
   /** Relationships. */
-  private static final ObjectMap<byte[]> RSHIPS = new ObjectMap<byte[]>();
+  private static final TokenMap RSHIPS = new TokenMap();
   /** Database properties. */
   private final Context ctx;
 
   static {
-    RSHIPS.put(token("NT"), token("BT"));
-    RSHIPS.put(token("BT"), token("BT"));
-    RSHIPS.put(token("BTG"), token("NTG"));
-    RSHIPS.put(token("NTG"), token("BTG"));
-    RSHIPS.put(token("BTP"), token("NTP"));
-    RSHIPS.put(token("NTP"), token("BTP"));
-    RSHIPS.put(token("USE"), token("UF"));
-    RSHIPS.put(token("UF"), token("USE"));
-    RSHIPS.put(token("RT"), token("RT"));
+    RSHIPS.add(token("NT"), token("BT"));
+    RSHIPS.add(token("BT"), token("BT"));
+    RSHIPS.add(token("BTG"), token("NTG"));
+    RSHIPS.add(token("NTG"), token("BTG"));
+    RSHIPS.add(token("BTP"), token("NTP"));
+    RSHIPS.add(token("NTP"), token("BTP"));
+    RSHIPS.add(token("USE"), token("UF"));
+    RSHIPS.add(token("UF"), token("USE"));
+    RSHIPS.add(token("RT"), token("RT"));
   }
 
   /** Thesaurus node. */

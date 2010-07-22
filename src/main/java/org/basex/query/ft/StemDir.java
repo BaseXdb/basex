@@ -3,7 +3,7 @@ package org.basex.query.ft;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.IO;
-import org.basex.util.ObjectMap;
+import org.basex.util.TokenMap;
 
 /**
  * Simple stemming directory for full-text requests.
@@ -11,7 +11,7 @@ import org.basex.util.ObjectMap;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class StemDir extends ObjectMap<byte[]> {
+public final class StemDir extends TokenMap {
   /**
    * Reads a stop words file.
    * @param fl file reference
@@ -23,7 +23,7 @@ public final class StemDir extends ObjectMap<byte[]> {
         byte[] val = null;
         for(final byte[] st : split(norm(sl), ' ')) {
           if(val == null) val = st;
-          else put(st, val);
+          else add(st, val);
         }
         add(sl);
       }

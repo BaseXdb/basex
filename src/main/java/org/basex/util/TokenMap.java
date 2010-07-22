@@ -9,7 +9,7 @@ import java.util.Arrays;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class TokenMap extends TokenSet {
+public class TokenMap extends TokenSet {
   /** Hash values. */
   private byte[][] values = new byte[CAP][];
 
