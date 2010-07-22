@@ -52,7 +52,7 @@ public final class GUIProp extends AProp {
   public static final Object[] SHOWSTATUS = { "SHOWSTATUS", true };
 
   /** GUI Layout. */
-  public static final Object[] LAYOUT = { "LAYOUT", GUIConstants.LAYOUT };
+  public static final Object[] VIEWS = { "VIEWS", GUIConstants.VIEWS };
 
   /** Flag for activated info view. */
   public static final Object[] SHOWINFO = { "SHOWINFO", true };

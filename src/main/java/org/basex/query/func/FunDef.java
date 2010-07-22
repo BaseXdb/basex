@@ -411,7 +411,12 @@ public enum FunDef {
   /** Project specific function - returns the id of a node. */
   NODEID(BXURI, FNBaseX.class, 1, 1, "node-id(item)", ITR),
   /** Project specific function - returns a filesystem path. */
-  FSPATH(BXURI, FNBaseX.class, 1, 1, "fspath(item)", STR);
+  FSPATH(BXURI, FNBaseX.class, 1, 1, "fspath(item)", STR),
+
+  /** Project specific function - returns a text sentiment. */ 
+  SENT(SENTURI, FNSent.class, 2, 2, "polarity(string, uri)", ITR),
+  /** Project specific function - returns a normed polarity value. */ 
+  NORMSENT(SENTURI, FNSent.class, 2, 2, "normed-polarity(string, uri)", ITR);
 
   /** Function classes. */
   final Class<? extends Fun> func;

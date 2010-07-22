@@ -26,7 +26,7 @@ import org.basex.io.IO;
  * <ul>
  *  <li> define a unique name for your view (e.g. {@code map})</li>
  *  <li> add a string for your view, as shown below</li>
- *  <li> add the string in the {@link #LAYOUT} string below</li>
+ *  <li> add the string in the {@link #VIEWS} string below</li>
  *  <li> create your view implementation in a new sub package
  *    (e.g. {@link org.basex.gui.view.map.MapView}).
  *  <li> add a new {@link View} instance in the {@link GUI} constructor.</li>
@@ -79,7 +79,7 @@ public final class GUIConstants {
    * separated with spaces, and all views must be specified in this layout.
    * This layout is displayed as soon as a database is opened.
    */
-  public static final String LAYOUT = "V H " + XQUERYVIEW + " " + FOLDERVIEW +
+  public static final String VIEWS = "V H " + XQUERYVIEW + " " + FOLDERVIEW +
     " " + MAPVIEW + " " + PLOTVIEW + " " + " - H " + TEXTVIEW + " " + INFOVIEW +
     " " + TABLEVIEW + " " + EXPLOREVIEW + " - V " + TREEVIEW + " - -";
 

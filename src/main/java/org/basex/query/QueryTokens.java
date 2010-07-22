@@ -1,6 +1,7 @@
 package org.basex.query;
 
 import static org.basex.util.Token.*;
+import org.basex.core.Text;
 
 /**
  * This class contains common tokens for the query implementations.
@@ -345,6 +346,8 @@ public interface QueryTokens {
   byte[] XMLURI = token("http://www.w3.org/XML/1998/namespace");
   /** Functions URI. */
   byte[] FNURI = token("http://www.w3.org/2005/xpath-functions");
+  /** Math URI. */
+  byte[] MATHURI = token("http://www.w3.org/2005/xpath-functions/math");
   /** XMLNS URI. */
   byte[] XMLNSURI = token("http://www.w3.org/2000/xmlns");
   /** Local Functions URI. */
@@ -354,11 +357,11 @@ public interface QueryTokens {
   /** XMLSchema Instance URI. */
   byte[] XSIURI = token("http://www.w3.org/2001/XMLSchema-instance");
   /** Database URI. */
-  byte[] BXURI = token("http://www.basex.org");
+  byte[] BXURI = token(Text.URL);
   /** File module URI. */
-  byte[] FILEURI = token("http://www.basex.org/file");
-  /** Math URI. */
-  byte[] MATHURI = token("http://www.w3.org/2005/xpath-functions/math");
+  byte[] FILEURI = token(Text.URL + "/file");
+  /** Sentiment URI.*/
+  byte[] SENTURI = token(Text.URL + "/sent");
 
   /** Java prefix. */
   byte[] JAVAPRE = token("java:");
@@ -404,6 +407,9 @@ public interface QueryTokens {
   byte[] LOCAL = token("local");
   /** File module token. */
   byte[] FILE = token("file");
+  /** Sentiment token. */
+  byte[] SENT = token("sent");
+
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
 

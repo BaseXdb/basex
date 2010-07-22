@@ -261,7 +261,7 @@ public final class Tokenizer implements IndexToken {
   }
 
   /**
-   * Checks if more tokens are to be returned.
+   * Checks if more tokens are to be returned; special characters are included.
    * @return result of check
    */
   public boolean moreSC() {
@@ -311,7 +311,7 @@ public final class Tokenizer implements IndexToken {
   }
 
   /**
-   * Get next token.
+   * Get next token, including special characters.
    * @return next token
    */
   public byte[] nextSC() {
@@ -321,7 +321,6 @@ public final class Tokenizer implements IndexToken {
 
   /**
    * Calculates a position value, dependent on the specified unit.
-   * Once calculated values are cached.
    * @param w word position
    * @param u unit
    * @return new position

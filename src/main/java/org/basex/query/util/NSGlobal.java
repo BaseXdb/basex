@@ -23,6 +23,7 @@ public final class NSGlobal {
     NS.add(XMLNS, XMLNSURI);
     NS.add(XML, XMLURI);
     NS.add(BASEX, BXURI);
+    NS.add(SENT, SENTURI);
     NS.add(FILE, FILEURI);
   }
 
