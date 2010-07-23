@@ -5,7 +5,7 @@ import org.basex.query.item.Item;
 
 /**
  * This is a simple container for items.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */

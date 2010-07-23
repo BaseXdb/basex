@@ -414,7 +414,7 @@ public final class GUI extends JFrame {
       info.setInfo(cmd.info(), cmd, null, true);
     }
   }
-  
+
   /**
    * Executes the specified command.
    * @param c command to be executed

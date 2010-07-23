@@ -973,7 +973,7 @@ public enum GUICommands implements GUICommand {
           gui.info.reset();
           gui.status.setText(Main.info(PROCTIME, time));
           if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
-          
+
           // initialize views
           if(!ci && !di) gui.notify.init();
         }

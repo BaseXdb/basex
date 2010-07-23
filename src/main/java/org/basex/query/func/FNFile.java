@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-
 import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -18,7 +17,7 @@ import org.basex.util.Token;
 
 /**
  * Functions on files and directories.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */

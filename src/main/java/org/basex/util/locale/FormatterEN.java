@@ -60,7 +60,7 @@ final class FormatterEN extends Formatter {
   /** Eras: BC, AD. */
   private static final byte[][] ERAS = tokens("BC", "AD");
 
-  
+
   @Override
   public byte[] word(final long n, final String ord) {
     final TokenBuilder tb = new TokenBuilder();
@@ -104,9 +104,9 @@ final class FormatterEN extends Formatter {
     return ERAS[year < 0 ? 0 : 1];
   }
 
-  
+
   // PRIVATE METHODS ==========================================================
-  
+
   /**
    * Creates a word character sequence for the specified number.
    * @param tb token builder

@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-
 import org.basex.query.QueryContext;
 import org.basex.query.item.Item;
 import org.basex.query.util.ItemList;
@@ -24,7 +23,7 @@ class GroupPartition {
   /** Resulting Sequence. */
   final ArrayList<HashMap<Var, ItemList>> items;
   /** HashValue, Position. */
-  private final HashMap<Integer, Integer> hashes = 
+  private final HashMap<Integer, Integer> hashes =
     new HashMap<Integer, Integer>();
   /** Items map. */
 
@@ -122,7 +121,7 @@ class GroupPartition {
       final long[] hhs = new long[is.length];
       for(int i = 0; i < vs.length; i++) {
         its.add(is[i]);
-        if(is[i].e()) {  
+        if(is[i].e()) {
           // Add long.max_value to denote empty sequence in item
           hhs[i] = Long.MAX_VALUE;
         } else {
@@ -134,7 +133,7 @@ class GroupPartition {
 
     @Override
     public int hashCode() {
-      return hash;  
+      return hash;
     }
 
     /* for debugging (should be removed later) */

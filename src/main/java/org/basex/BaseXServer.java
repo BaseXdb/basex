@@ -184,13 +184,13 @@ public final class BaseXServer extends Main implements Runnable {
     if(!ping(LOCALHOST, port)) {
       final String path = IOFile.file(BaseXServer.class.getProtectionDomain().
           getCodeSource().getLocation().toString());
-  
+
       final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
       final String clazz = BaseXServer.class.getName();
       try {
         new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
             "-p", String.valueOf(port) }).start();
-  
+
         for(int c = 0; c < 10; c++) {
           if(ping(LOCALHOST, port)) return SERVERSTART;
           Performance.sleep(200);
@@ -226,7 +226,7 @@ public final class BaseXServer extends Main implements Runnable {
       /** Stop file. */
       stopFile(port).write(Token.EMPTY);
       new Socket(LOCALHOST, port);
-      while(ping(LOCALHOST, port)) Performance.sleep(200); 
+      while(ping(LOCALHOST, port)) Performance.sleep(200);
       outln(SERVERSTOPPED);
     } catch(final IOException ex) {
       errln(server(ex));

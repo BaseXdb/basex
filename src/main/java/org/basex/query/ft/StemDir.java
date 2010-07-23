@@ -25,7 +25,6 @@ public final class StemDir extends TokenMap {
           if(val == null) val = st;
           else add(st, val);
         }
-        add(sl);
       }
       return true;
     } catch(final IOException ex) {

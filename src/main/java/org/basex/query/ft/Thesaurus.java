@@ -157,7 +157,7 @@ public final class Thesaurus {
     if(node == null) {
       node = new ThesNode();
       node.term = term;
-      nodes.put(term, node);
+      nodes.add(term, node);
     }
     return node;
   }

@@ -1,7 +1,6 @@
 package org.basex.io;
 
 import static org.basex.core.Text.*;
-
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import org.basex.util.Token;

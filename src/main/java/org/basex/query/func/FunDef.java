@@ -2,12 +2,11 @@ package org.basex.query.func;
 
 import static org.basex.query.item.SeqType.*;
 import static org.basex.query.QueryTokens.*;
-
 import org.basex.query.item.SeqType;
 
 /**
  * Signatures of all XQuery functions.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -413,9 +412,9 @@ public enum FunDef {
   /** Project specific function - returns a filesystem path. */
   FSPATH(BXURI, FNBaseX.class, 1, 1, "fspath(item)", STR),
 
-  /** Project specific function - returns a text sentiment. */ 
+  /** Project specific function - returns a text sentiment. */
   SENT(SENTURI, FNSent.class, 2, 2, "polarity(string, uri)", ITR),
-  /** Project specific function - returns a normed polarity value. */ 
+  /** Project specific function - returns a normed polarity value. */
   NORMSENT(SENTURI, FNSent.class, 2, 2, "normed-polarity(string, uri)", ITR);
 
   /** Function classes. */

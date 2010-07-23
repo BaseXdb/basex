@@ -5,7 +5,7 @@ import java.io.IOException;
 /**
  * This class subclasses {@link Serializer} and provides empty methods for all
  * abstract methods.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Josua Krause
  * @author Leo Woerteler

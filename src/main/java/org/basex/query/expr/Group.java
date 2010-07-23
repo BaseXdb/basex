@@ -1,9 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-
 import java.io.IOException;
-
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -14,7 +12,7 @@ import org.basex.query.util.Var;
 
 /**
  * Implementation of the group by clause.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
@@ -34,7 +32,7 @@ public final class Group extends Expr {
 
   /** Grouping partition. **/
   GroupPartition gp;
-  
+
   /**
    * Constructor.
    * @param gb group by Expressiosn
@@ -69,7 +67,7 @@ public final class Group extends Expr {
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    return  
+    return
     new Iter() { // group is blocking => no iterator
 
       @Override

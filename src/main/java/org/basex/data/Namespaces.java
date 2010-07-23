@@ -346,7 +346,7 @@ public final class Namespaces {
       TokenList old = map.get(key);
       if(old == null) {
         old = new TokenList();
-        map.put(key, old);
+        map.add(key, old);
       }
       if(!old.contains(val)) old.add(val);
     }

@@ -55,7 +55,7 @@ public final class FuncTest extends QueryTest {
         "format-number(0.123456789, '##%')" },
       { "formnum w3-40", str("123456789"),
         "format-number(123456789, '################')" },
-        
+
       { "formint  10", str("1"), "format-integer(1, '0')" },
       { "formint  20", str("01"), "format-integer(1, '00')" },
       { "formint  30", str("Eleventh"), "format-integer(11, 'Wwo')" },
@@ -68,7 +68,7 @@ public final class FuncTest extends QueryTest {
         "format-integer(123, 'w')" },
       { "formint 100", str("One Hundredth and Twenty-Third"),
         "format-integer(123, 'Wwo')" },
-        
+
       { "formdate  10", str("2002-12-31"),
         "format-date(xs:date('2002-12-31'), '[Y0001]-[M01]-[D01]')" },
       { "formdate  20", str("12-31-2002"),

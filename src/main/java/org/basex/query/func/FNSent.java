@@ -11,7 +11,7 @@ import org.basex.util.Tokenizer;
 
 /**
  * This class defines the sentiment functions.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Oliver Egli
  */
@@ -19,7 +19,7 @@ public final class FNSent extends Fun {
   /** Word lists. */
   private static final HashMap<String, SentList> LISTS =
     new HashMap<String, SentList>();
-  
+
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
@@ -41,7 +41,7 @@ public final class FNSent extends Fun {
 
     // text to be analyzed
     final byte[] str = checkEmptyStr(expr[0], ctx);
-    
+
     // if necessary, add new sentiment list to hash map
     final String uri = string(checkEmptyStr(expr[1], ctx));
     SentList list = LISTS.get(uri);
@@ -56,7 +56,7 @@ public final class FNSent extends Fun {
     final Tokenizer tk = new Tokenizer(str, null);
     // if stemming is activated, it should be performed on word lists as well...
     //tk.st = true;
-    
+
     // loop through all tokens
     while(tk.more()) {
       token4 = token3;
@@ -68,7 +68,7 @@ public final class FNSent extends Fun {
       double v = list.polarity(token1);
       if(list.negates(token2) || list.negates(token3) || list.negates(token4))
         v = -v;
-      
+
       if(v > 0) pos += v;
       else if(v < 0) neg -= v;
     }

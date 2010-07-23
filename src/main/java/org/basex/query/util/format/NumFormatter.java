@@ -48,7 +48,7 @@ public final class NumFormatter {
 
   /** Private constructor. */
   private NumFormatter() { }
-  
+
   /**
    * Returns a formatted number.
    * @param number number to be formatted

@@ -118,11 +118,11 @@ public final class BaseXWin {
     final JWindow win = new JWindow();
     final URL url = BaseXWin.class.getResource("/img/start.png");
     final Image img = Toolkit.getDefaultToolkit().getImage(url);
-    
+
     win.getContentPane().setBackground(Color.WHITE);
     win.add(new JLabel(new ImageIcon(img)));
     win.pack();
-  
+
     final Dimension s = Toolkit.getDefaultToolkit().getScreenSize();
     final Dimension p = win.getSize();
     win.setLocation(s.width - p.width >> 1, s.height - p.height >> 1);

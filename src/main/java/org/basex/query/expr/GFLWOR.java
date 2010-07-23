@@ -2,10 +2,8 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-
 import java.io.IOException;
 import java.util.HashMap;
-
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -20,7 +18,7 @@ import org.basex.query.util.Var;
 
 /**
  * GFLWOR clause.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -103,7 +101,7 @@ public class GFLWOR extends Expr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final HashMap<Var, ItemList> cache = 
+    final HashMap<Var, ItemList> cache =
       new HashMap<Var, ItemList>();
 
     final Iter[] iter = new Iter[fl.length];
@@ -134,15 +132,13 @@ public class GFLWOR extends Expr {
 //      return order.iter(ctx);
 //    }
 //    return si;
-    
-
   }
 
   /**
    * Returns grouped vars.
    * @param ctx context.
    * @param si sequence to be filled.
-   * @throws QueryException on error. 
+   * @throws QueryException on error.
    */
   private void retG(final QueryContext ctx, final SeqIter si)
       throws QueryException {
@@ -153,7 +149,7 @@ public class GFLWOR extends Expr {
         gn.vars[j].bind(gn.its.get(j), ctx);
       }
       for(Var ngv : ngvars.keySet()) {
-        final ItemList its = ngvars.get(ngv); 
+        final ItemList its = ngvars.get(ngv);
         ngv.bind(Seq.get(its.list, its.size()), ctx);
       }
       si.add(ctx.iter(ret).finish());

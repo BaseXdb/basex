@@ -163,7 +163,7 @@ public final class InfoView extends View {
 
     stat = il;
     strings = sl;
-    String total = time;  
+    String total = time;
 
     final boolean q = cmd instanceof XQuery;
     if(!ok || !q) {
@@ -201,7 +201,7 @@ public final class InfoView extends View {
   public void reset() {
     text.reset();
   }
-  
+
   /**
    * Adds the specified strings.
    * @param head string header

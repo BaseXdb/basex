@@ -64,10 +64,10 @@ public final class DOCWrapper extends Parser {
           for(int a = 0, as = at.getLength(); a < as; a++) {
             final Attr att = (Attr) at.item(a);
             final byte[] k = token(att.getName()), v = token(att.getValue());
-            if (eq(k, XMLNS)) {
+            if(eq(k, XMLNS)) {
               builder.startNS(EMPTY, v);
             } else if (startsWith(k, XMLNSC)) {
-              builder.startNS(substring(k, 6), v);
+              builder.startNS(ln(k), v);
             } else {
               atts.add(k, v);
             }

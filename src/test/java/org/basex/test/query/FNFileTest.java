@@ -15,7 +15,7 @@ import org.junit.Test;
 
 /**
  * This class tests the functions of the file library.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */

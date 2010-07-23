@@ -1,7 +1,6 @@
 package org.basex.query.util.format;
 
 import static org.basex.util.Token.*;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -92,14 +91,14 @@ final class FormatParser {
         error = true;
       }
     }
-    
+
     if(ext) {
       // extract and check width modifier
       final int w = pm.lastIndexOf(',');
       if(w != -1) {
         final String wd = pm.substring(w + 1);
         pm = pm.substring(0, w);
-        
+
         final Matcher match = WIDTH.matcher(wd);
         if(match.find()) {
           int m = toInt(match.group(1));
@@ -108,17 +107,17 @@ final class FormatParser {
           m = mc != null ? toInt(mc) : Integer.MIN_VALUE;
           if(m != Integer.MIN_VALUE) max = m;
         } else {
-          error = true; 
+          error = true;
         }
       }
     }
-        
+
     // choose first character and case
     cs = pm.length() > 1 ? Case.STANDARD :
       (cp(pm, 0) & 0x20) != 0 ? Case.LOWER : Case.UPPER;
     pres = pm.toLowerCase();
   }
-  
+
   /**
    * Parses a decimal-digit-pattern.
    * @param in input

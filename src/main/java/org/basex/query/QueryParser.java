@@ -768,7 +768,7 @@ public class QueryParser extends InputParser {
     ctx.vars.reset(s);
     return ret == Seq.EMPTY ? ret : order == null && group == null ?
       new FLWR(fl, where, ret) : group == null ?
-      new FLWOR(fl, where, new Order(order), ret) : 
+      new FLWOR(fl, where, new Order(order), ret) :
       new GFLWOR(fl, where, order == null ? null : new Order(order),
         new Group(group), ret);
   }
@@ -925,7 +925,7 @@ public class QueryParser extends InputParser {
 
     return new Switch(exprs);
   }
-  
+
   /**
    * [ 42] Parses a TypeswitchExpr.
    * @return query expression

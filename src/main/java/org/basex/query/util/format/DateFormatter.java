@@ -2,9 +2,7 @@ package org.basex.query.util.format;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-
 import java.util.Calendar;
-
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.QueryException;
 import org.basex.query.item.Date;
@@ -23,7 +21,7 @@ import org.basex.util.locale.Formatter;
 public final class DateFormatter {
   /** Private constructor. */
   private DateFormatter() { }
-  
+
   /**
    * Formats the specified date.
    * @param date date to be formatted
@@ -40,7 +38,7 @@ public final class DateFormatter {
 
     // ignore calendars and places
     if(cal != null || plc != null);
-    
+
     final Formatter form = Formatter.get(string(lng));
 
     final TokenBuilder tb = new TokenBuilder();

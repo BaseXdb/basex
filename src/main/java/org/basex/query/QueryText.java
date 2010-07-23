@@ -104,12 +104,12 @@ public interface QueryText {
   Object[] PICDATE = { FODF, 1340, "Invalid picture string: \"%\"." };
   /** FOFD1350: Evaluation exception. */
   Object[] PICCOMP = { FODF, 1350, "Invalid component in string: \"%\"." };
-  
+
   /** FOFL0007: Evaluation exception. */
   Object[] FILELIST = { FOFL, 7, "Files of '%' cannot be returned." };
   /** FOFL0008: Evaluation exception. */
   Object[] FILEPATTERN = { FOFL, 8, "Invalid file name pattern '%'."};
-  
+
   /** FONS0004: Evaluation exception. */
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"." };
 
@@ -417,7 +417,7 @@ public interface QueryText {
   Object[] EVALNODES = { XPTY, 19, "Nodes needed for expression '%'." };
   /** XPTY0019: Typing exception. */
   Object[] NODESPATH = { XPTY, 19, "Context node required for %; % found." };
-  
+
   /** XPDY0095: resulting value for any grouping variable >> 1 item. */
   Object[] XGRP = { XQDY, 95, "No sequence allowed as grouping variable."};
 

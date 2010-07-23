@@ -10,7 +10,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * A container for positive and negative word lists and negations.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Oliver Egli
  */
@@ -37,7 +37,7 @@ public final class SentList extends DefaultHandler {
       throw new QueryException(
           uri + " could not be parsed: " + ex.toString());
     }
-    
+
     // no negations defined - add defaults
     // (should better be included in the input file)
     if(words[2].size() == 0) {

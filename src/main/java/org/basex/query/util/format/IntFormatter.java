@@ -23,10 +23,10 @@ public final class IntFormatter {
     tokens("", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM");
   /** Roman numbers (1000-3000). */
   private static final byte[][] ROMANM = tokens("", "M", "MM", "MMM");
-  
+
   /** Private constructor. */
   private IntFormatter() { }
-  
+
   /**
    * Returns a formatted number.
    * @param number number to be formatted
@@ -140,7 +140,7 @@ public final class IntFormatter {
       final char ch = pres.charAt(p);
       if(!digit(ch) && ch != '#') tmp.insert(t, ch);
     }
-    
+
     // add ordinal suffix
     tb.add(tmp);
     tb.add(form.ordinal(n, mp.ord));
