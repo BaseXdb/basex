@@ -62,8 +62,15 @@ public final class DOCWrapper extends Parser {
           final int as = at.getLength();
           atts.reset();
           for(int a = 0; a < as; a++) {
-            atts.add(token(at.item(a).getNodeName()),
-                token(at.item(a).getNodeValue()));
+            final byte[] att = token(at.item(a).getNodeName());
+            if (eq(att, XMLNS)) {
+              builder.startNS(EMPTY, token(at.item(a).getNodeValue()));
+            } else if (eq(att, XMLNSC)) {
+              builder.startNS(substring(att, 6), 
+                  token(at.item(a).getNodeValue()));
+            } else {
+              atts.add(att, token(at.item(a).getNodeValue()));
+            }
           }
           builder.startElem(token(n.getNodeName()), atts);
         } else if(n instanceof Text) {
