@@ -8,6 +8,7 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Main;
 import org.basex.util.TokenBuilder;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -58,18 +59,17 @@ public final class DOCWrapper extends Parser {
         if(n instanceof Element) {
           stack.push(new NodeIterator(n));
 
-          final NamedNodeMap at = n.getAttributes();
-          final int as = at.getLength();
           atts.reset();
-          for(int a = 0; a < as; a++) {
-            final byte[] att = token(at.item(a).getNodeName());
-            if (eq(att, XMLNS)) {
-              builder.startNS(EMPTY, token(at.item(a).getNodeValue()));
-            } else if (eq(att, XMLNSC)) {
-              builder.startNS(substring(att, 6), 
-                  token(at.item(a).getNodeValue()));
+          final NamedNodeMap at = n.getAttributes();
+          for(int a = 0, as = at.getLength(); a < as; a++) {
+            final Attr att = (Attr) at.item(a);
+            final byte[] k = token(att.getName()), v = token(att.getValue());
+            if (eq(k, XMLNS)) {
+              builder.startNS(EMPTY, v);
+            } else if (startsWith(k, XMLNSC)) {
+              builder.startNS(substring(k, 6), v);
             } else {
-              atts.add(att, token(at.item(a).getNodeValue()));
+              atts.add(k, v);
             }
           }
           builder.startElem(token(n.getNodeName()), atts);
