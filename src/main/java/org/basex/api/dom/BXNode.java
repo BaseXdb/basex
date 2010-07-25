@@ -73,7 +73,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final BXNode cloneNode(final boolean deep) {
-    return node.copy().java();
+    return node.copy().toJava();
   }
 
   @Override
@@ -156,7 +156,7 @@ public abstract class BXNode implements Node {
    * @return resulting node
    */
   private BXNode finish(final Nod n) {
-    return n != null ? n.java() : null;
+    return n != null ? n.toJava() : null;
   }
 
   @Override
@@ -174,7 +174,7 @@ public abstract class BXNode implements Node {
     Nod n = node;
     Nod p;
     while((p = n.parent()) != null) n = p;
-    return n.type == Type.DOC ? (BXDoc) n.java() : null;
+    return n.type == Type.DOC ? (BXDoc) n.toJava() : null;
   }
 
   @Override

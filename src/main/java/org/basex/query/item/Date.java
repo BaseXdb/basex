@@ -130,7 +130,7 @@ public abstract class Date extends Item {
       throws QueryException {
 
     if(xc.getYear() + a.mon / 12 > 9999) Err.range(type, a.str());
-    xc.add(p ? a.java() : a.java().negate());
+    xc.add(p ? a.toJava() : a.toJava().negate());
   }
 
   @Override
@@ -159,7 +159,7 @@ public abstract class Date extends Item {
   }
 
   @Override
-  public final Object java() {
+  public final XMLGregorianCalendar toJava() {
     return xc;
   }
 

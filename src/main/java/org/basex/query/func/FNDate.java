@@ -131,7 +131,7 @@ final class FNDate extends Fun {
    */
   private Item zon(final Item it) {
     final int z = ((Date) it).xc.getTimezone();
-    return z == UNDEF ? null : new DTd(z);
+    return z == Item.UNDEF ? null : new DTd(z);
   }
 
   /**
@@ -226,9 +226,9 @@ final class FNDate extends Fun {
         tim.xc.getMillisecond());
 
     final int zone = tim.xc.getTimezone();
-    if(dtm.xc.getTimezone() == UNDEF) {
+    if(dtm.xc.getTimezone() == Item.UNDEF) {
       dtm.xc.setTimezone(zone);
-    } else if(dtm.xc.getTimezone() != zone && zone != UNDEF) {
+    } else if(dtm.xc.getTimezone() != zone && zone != Item.UNDEF) {
       Err.or(FUNZONE, dtm, tim);
     }
     return dtm;
@@ -246,7 +246,7 @@ final class FNDate extends Fun {
       throws QueryException {
 
     if(d && zon == null) {
-      date.xc.setTimezone(UNDEF);
+      date.xc.setTimezone(Item.UNDEF);
       return date;
     }
 
@@ -260,7 +260,7 @@ final class FNDate extends Fun {
       tz = (int) (dtd.min() + dtd.hou() * 60);
       if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) Err.or(INVALZONE, zon);
     }
-    if(zn != UNDEF) date.xc.add(Date.df.newDuration(-60000L * (zn - tz)));
+    if(zn != Item.UNDEF) date.xc.add(Date.df.newDuration(-60000L * (zn - tz)));
     date.xc.setTimezone(tz);
     return date;
   }

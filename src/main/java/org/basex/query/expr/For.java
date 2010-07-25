@@ -81,24 +81,13 @@ public final class For extends ForLet {
       private Iter ir;
       /** Counter. */
       private int c;
-
+      
       @Override
       public Item next() throws QueryException {
-        if(ir == null) {
-          vs = ctx.vars.size();
-          ir = ctx.iter(expr);
-          ctx.vars.add(v);
-          if(p != null) ctx.vars.add(p);
-          if(s != null) ctx.vars.add(s);
-        }
+        init();
 
         final Item it = ir.next();
-        if(it != null) {
-          v.bind(it, ctx);
-          if(p != null) p.bind(Itr.get(++c), ctx);
-          if(s != null) s.bind(Dbl.get(it.score()), ctx);
-          return it;
-        }
+        if(it != null) return bind(it, ++c);
         reset();
         return null;
       }
@@ -111,7 +100,49 @@ public final class For extends ForLet {
         c = 0;
         return true;
       }
+
+      @Override
+      public long size() throws QueryException {
+        return expr.size(ctx);
+      }
+      
+      @Override
+      public Item get(final long i) throws QueryException {
+        init();
+        return bind(ir.get(i), i + 1);
+      }
+
+      /**
+       * Initializes the iterator.
+       */
+      private void init() throws QueryException {
+        if(ir == null) {
+          vs = ctx.vars.size();
+          ir = ctx.iter(expr);
+          ctx.vars.add(v);
+          if(p != null) ctx.vars.add(p);
+          if(s != null) ctx.vars.add(s);
+        }
+      }
+
+      /**
+       * Binds an item to the loop variables.
+       * @param it item
+       * @param i position counter
+       * @return specified item
+       */
+      private Item bind(final Item it, final long i) throws QueryException {
+        v.bind(it, ctx);
+        if(p != null) p.bind(Itr.get(i), ctx);
+        if(s != null) s.bind(Dbl.get(it.score()), ctx);
+        return it;
+      }
     };
+  }
+
+  @Override
+  public long size(final QueryContext ctx) throws QueryException {
+    return expr.size(ctx);
   }
 
   @Override

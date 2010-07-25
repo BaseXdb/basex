@@ -92,14 +92,11 @@ public final class FElem extends FNode {
    */
   FElem(final Element elem, final Nod p) {
     super(Type.ELM);
-    
+ 
     // general stuff
-    if (elem.getNamespaceURI() != null) {
-      name = new QNm(token(elem.getNodeName()),
-        Uri.uri(token(elem.getNamespaceURI())));
-    } else {
-      name = new QNm(token(elem.getNodeName()));
-    }
+    final String nu = elem.getNamespaceURI();
+    name = new QNm(token(elem.getNodeName()),
+        Uri.uri(nu == null ? EMPTY : token(nu)));
     par = p;
     final String b = elem.getBaseURI();
     base = b == null ? EMPTY : token(b);
@@ -114,9 +111,9 @@ public final class FElem extends FNode {
     for(int i = 0; i < as; i++) {
       final Attr att = (Attr) at.item(i);
       final byte[] nm = token(att.getName()), uri = token(att.getValue());
-      if (Token.eq(nm, XMLNS)) {
+      if(Token.eq(nm, XMLNS)) {
         ns.add(EMPTY, uri);
-      } else if (startsWith(nm, XMLNSC)) {
+      } else if(startsWith(nm, XMLNSC)) {
         ns.add(ln(nm), uri);
       } else {
         attArr[pos++] = new FAttr(att, this);
@@ -125,10 +122,10 @@ public final class FElem extends FNode {
     atts = new NodIter(attArr, pos);
     
     // no parent, so we have to add all namespaces in scope
-    if (p == null) {
+    if(p == null) {
       final Atts nss = nsScope(elem.getParentNode());
-      for (int i = 0; i < nss.size; i++) {
-        if (!ns.contains(nss.key[i])) {
+      for(int i = 0; i < nss.size; i++) {
+        if(!ns.contains(nss.key[i])) {
           ns.add(nss.key[i], nss.val[i]);
         }
       }
@@ -171,19 +168,13 @@ public final class FElem extends FNode {
     final Atts ns = new Atts();
     Node n = elem;
     // only elements can declare namespaces
-    while (n != null && n instanceof Element) {
+    while(n != null && n instanceof Element) {
       final NamedNodeMap atts = n.getAttributes();
-      for (int i = 0, len = atts.getLength(); i < len; i++) {
+      for(int i = 0, len = atts.getLength(); i < len; i++) {
         final Attr a = (Attr) atts.item(i);
-        final byte[] name = token(a.getName()), uri = token(a.getValue());
-        if (Token.eq(name, XMLNS)) {
-          // default namespace
-          if (!ns.contains(EMPTY)) ns.add(EMPTY, uri);
-        } else if (startsWith(name, XMLNS)) {
-          // prefixed namespace
-          final byte[] ln = ln(name);
-          if (!ns.contains(ln)) ns.add(ln, uri);
-        }
+        final byte[] name = token(a.getName());
+        final byte[] pref = Token.eq(name, XMLNS) ? EMPTY : ln(name);
+        if(!ns.contains(pref)) ns.add(pref, token(a.getValue()));
       }
       n = n.getParentNode();
     }

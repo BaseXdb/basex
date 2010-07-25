@@ -1,10 +1,10 @@
 package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.Builder;
 import org.basex.util.Atts;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -51,9 +51,9 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
       final int as = at.getLength();
       atts.reset();
       for(int a = 0; a < as; a++) {
-        atts.add(Token.token(at.getQName(a)), Token.token(at.getValue(a)));
+        atts.add(token(at.getQName(a)), token(at.getValue(a)));
       }
-      builder.startElem(Token.token(qn), atts);
+      builder.startElem(token(qn), atts);
       nodes++;
     } catch(final IOException ex) {
       error(ex);
@@ -66,7 +66,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
 
     try {
       finishText();
-      builder.endElem(Token.token(qn));
+      builder.endElem(token(qn));
     } catch(final IOException ex) {
       error(ex);
     }
@@ -146,7 +146,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
 
   @Override
   public void startPrefixMapping(final String prefix, final String uri) {
-    ns.add(Token.token(prefix), Token.token(uri));
+    ns.add(token(prefix), token(uri));
   }
 
   /*public void endPrefixMapping(final String prefix) { } */

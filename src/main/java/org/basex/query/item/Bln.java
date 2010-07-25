@@ -92,7 +92,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public Boolean java() {
+  public Boolean toJava() {
     return val;
   }
 

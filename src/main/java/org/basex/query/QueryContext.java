@@ -78,8 +78,6 @@ public final class QueryContext extends Progress {
   public long pos;
   /** Current context size. */
   public long size;
-  /** Current leaf flag. */
-  public boolean leaf;
 
   /** Used documents. */
   public DBNode[] doc = new DBNode[1];
@@ -90,8 +88,6 @@ public final class QueryContext extends Progress {
   public FTPosData ftpos;
   /** Full-text token counter (for visualization). */
   public byte ftoknum;
-  /** Fast full-text evaluation (stop after first hit). */
-  public boolean ftfast = true;
 
   /** Current full-text options. */
   public FTOpt ftopt;
@@ -160,8 +156,12 @@ public final class QueryContext extends Progress {
   /** Indicates if this query performs updates. */
   public boolean updating;
 
-  /** Indicates a present group by clause. */
+  /** Compilation flag: current node has leaves. */
+  public boolean leaf;
+  /** Compilation flag: FLWOR clause performs grouping. */
   public boolean grouping;
+  /** Compilation flag: full-text evaluation can be stopped after first hit. */
+  public boolean ftfast = true;
 
   /**
    * Constructor.

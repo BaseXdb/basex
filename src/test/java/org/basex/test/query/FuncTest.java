@@ -12,6 +12,11 @@ public final class FuncTest extends QueryTest {
     doc = "<html/>";
 
     queries = new Object[][] {
+      { "count 1", "count()" },
+      { "count 2", "count(1, 1)" },
+      { "contains 1", "contains(.)" },
+      { "contains 2", "contains(. .)" },
+
       { "formnum  10", str("0"), "format-number(0, '0')" },
       { "formnum  20", str("0"), "format-number(0, '1')" },
       { "formnum  30", str("1"), "format-number(1, '0')" },
@@ -134,7 +139,7 @@ public final class FuncTest extends QueryTest {
   }
 
   /* TABLE REPRESENTATION
-  PRE DIS  TYPE  CONTENT
+  PRE PAR  TYPE  CONTENT
     0  -1  DOC   test.xml
     1   0  ELEM  html
   */

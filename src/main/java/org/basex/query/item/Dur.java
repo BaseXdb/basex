@@ -191,7 +191,7 @@ public class Dur extends Item {
   }
 
   @Override
-  public final Duration java() {
+  public final Duration toJava() {
     return Date.df.newDuration(string(str()));
   }
 

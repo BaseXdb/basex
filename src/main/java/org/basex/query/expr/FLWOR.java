@@ -126,6 +126,22 @@ public class FLWOR extends Expr {
   }
 
   @Override
+  public long size(final QueryContext ctx) throws QueryException {
+    // don't test where clause (order clause doesn't change result size)
+    if(where != null) return -1;
+    // check if number of results of return clause is known
+    long size = ret.size(ctx);
+    if(size == -1) return -1;
+    // multiply loop runs
+    for(final ForLet e : fl) {
+      final long s = e.size(ctx);
+      if(s == -1) return -1;
+      size *= s;
+    }
+    return size;
+  }
+
+  @Override
   public final boolean uses(final Use u, final QueryContext ctx) {
     return u == Use.VAR || ret.uses(u, ctx);
   }

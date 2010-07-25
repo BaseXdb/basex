@@ -468,7 +468,7 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public final BXNode java() {
+  public final BXNode toJava() {
     switch(type) {
       case DOC: return new BXDoc(this);
       case ELM: return new BXElem(this);

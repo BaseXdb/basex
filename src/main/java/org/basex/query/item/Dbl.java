@@ -92,7 +92,7 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public Object java() {
+  public Double toJava() {
     return val;
   }
 

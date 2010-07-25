@@ -79,7 +79,7 @@ public final class Flt extends Item {
   }
 
   @Override
-  public Object java() {
+  public Float toJava() {
     return val;
   }
 

@@ -36,9 +36,10 @@ public abstract class Iter {
    * {@code -1}.
    * @param i value offset
    * @return specified item
+   * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Item get(final long i) {
+  public Item get(final long i) throws QueryException {
     return null;
   }
 
@@ -48,8 +49,10 @@ public abstract class Iter {
    * If this method is implemented by an iterator, {@link #get} needs to be
    * implemented as well.
    * @return number of entries
+   * @throws QueryException query exception
    */
-  public long size() {
+  @SuppressWarnings("unused")
+  public long size()  throws QueryException {
     return -1;
   }
 

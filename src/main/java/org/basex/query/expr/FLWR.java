@@ -52,7 +52,6 @@ public final class FLWR extends FLWOR {
         }
       }
     }
-    ctx.grouping = false;
 
     final Expr ex = super.comp(ctx);
     if(ex != this) return ex;
@@ -85,19 +84,16 @@ public final class FLWR extends FLWOR {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter(final QueryContext ctx) throws QueryException {
+    final Iter[] iter = new Iter[fl.length];
+    for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
+
     return new Iter() {
-      private Iter[] iter;
       private Iter ir;
       private int p;
 
       @Override
       public Item next() throws QueryException {
-        if(iter == null) {
-          iter = new Iter[fl.length];
-          for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
-        }
-
         while(true) {
           if(ir != null) {
             final Item i = ir.next();
@@ -115,6 +111,29 @@ public final class FLWR extends FLWOR {
             if(ir == null && p-- == 0) return null;
           }
         }
+      }
+
+      @Override
+      public long size() throws QueryException {
+        // expected: only one loop, one returned result, and no where clause
+        return iter.length == 1 && where == null && ret.returned(ctx).one() ?
+            iter[0].size() : -1;
+      }
+
+      @Override
+      public Item get(final long i) throws QueryException {
+        // limited to one loop... iterator is reset after each call
+        iter[0].get(i);
+        final Item it = ret.atomic(ctx);
+        iter[0].reset();
+        return it;
+      }
+
+      @Override
+      public boolean reset() {
+        // limited to one loop...
+        for(final Iter i : iter) i.reset();
+        return false;
       }
     };
   }

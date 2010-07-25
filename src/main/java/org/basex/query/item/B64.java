@@ -52,7 +52,7 @@ public final class B64 extends Item {
   }
 
   @Override
-  public Object java() {
+  public byte[] toJava() {
     return val;
   }
 

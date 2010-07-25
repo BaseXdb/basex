@@ -101,10 +101,14 @@ public final class SimpleTest extends QueryTest {
       { "Union 1", nod(0), ".|." },
       { "Union 2", nod(0), ". | ." },
       { "Union 3", nod(1), "*|*" },
-      { "Func 1 Error", "count()" },
-      { "Func 2 Error", "count(1, 1)" },
-      { "Func 3 Error", "contains(.)" },
-      { "Func 3 Error", "contains(. .)" }
+
+      { "FLWOR 1", itr(3), "(for $i in 1 to 5 return $i)[3]" },
+      { "FLWOR 2", itr(4),
+        "(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]" },
+      { "FLWOR 3", itr(10000000), "count(for $i in 1 to 10000000 return $i)" },
+      { "FLWOR 4", itr(100000), "count(for $i in 1 to 100000 return $i * $i)" },
+      { "FLWOR 5", itr(100000000),
+        "count(for $i in 1 to 10000 for $i in 1 to 10000 return $i * $i)" },
     };
   }
 

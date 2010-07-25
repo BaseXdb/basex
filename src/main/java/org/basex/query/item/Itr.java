@@ -112,22 +112,16 @@ public class Itr extends Item {
   }
 
   @Override
-  public final Object java() {
-    // BigInteger and long are avoided to increase compatibility
+  public final Object toJava() {
     switch(type) {
-      case BYT:
-        return (byte) val;
+      case BYT: return (byte) val;
       case SHR:
-      case UBY:
-        return (short) val;
+      case UBY: return (short) val;
       case INT:
-      case USH:
-        return (int) val;
+      case USH: return (int) val;
       case LNG:
-      case UIN:
-        return val;
-      default:
-        return new BigInteger(Token.string(str()));
+      case UIN: return val;
+      default:  return new BigInteger(Token.string(str()));
     }
   }
 

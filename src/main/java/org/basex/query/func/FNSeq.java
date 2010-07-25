@@ -178,7 +178,7 @@ final class FNSeq extends Fun {
       long c = Math.max(1, s);
 
       @Override
-      public Item next() {
+      public Item next() throws QueryException {
         return c < e ? iter.get(c++ - 1) : null;
       }
     } : new Iter() {
@@ -218,9 +218,13 @@ final class FNSeq extends Fun {
       @Override
       public long size() { return s; }
       @Override
-      public Item get(final long i) { return si.get(s - i - 1); }
+      public Item get(final long i) throws QueryException {
+        return si.get(s - i - 1);
+      }
       @Override
-      public Item next() { return --c < 0 ? null : si.get(c); }
+      public Item next() throws QueryException {
+        return --c < 0 ? null : si.get(c);
+      }
     };
   }
 

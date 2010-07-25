@@ -29,7 +29,7 @@ public final class CmpV extends Arr {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
         final int v = a.diff(b);
-        return v != UNDEF && v <= 0;
+        return v != Item.UNDEF && v <= 0;
       }
       @Override
       public Comp invert() { return GE; }
@@ -40,7 +40,7 @@ public final class CmpV extends Arr {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
         final int v = a.diff(b);
-        return v != UNDEF && v < 0;
+        return v != Item.UNDEF && v < 0;
       }
       @Override
       public Comp invert() { return GT; }
@@ -51,7 +51,7 @@ public final class CmpV extends Arr {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
         final int v = a.diff(b);
-        return v != UNDEF && v >= 0;
+        return v != Item.UNDEF && v >= 0;
       }
       @Override
       public Comp invert() { return LE; }
@@ -62,7 +62,7 @@ public final class CmpV extends Arr {
       @Override
       public boolean e(final Item a, final Item b) throws QueryException {
         final int v = a.diff(b);
-        return v != UNDEF && v > 0;
+        return v != Item.UNDEF && v > 0;
       }
       @Override
       public Comp invert() { return LT; }

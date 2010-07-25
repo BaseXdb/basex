@@ -4,7 +4,7 @@ import java.util.Arrays;
 import org.basex.core.Main;
 
 /**
- * This is a simple container for attributes (keys and values).
+ * This is a simple container for attributes (key/value tokens).
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -18,7 +18,7 @@ public final class Atts {
   public int size;
 
   /**
-   * Adds next value.
+   * Adds the next key/value pair.
    * @param k key to be added
    * @param v value to be added
    * @return self reference
@@ -36,7 +36,7 @@ public final class Atts {
 
   /**
    * Deletes the specified entry.
-   * @param i entry to be deleted
+   * @param i entry offset
    */
   public void delete(final int i) {
     Array.move(key, i + 1, -1, --size - i);
@@ -63,7 +63,7 @@ public final class Atts {
   }
 
   /**
-   * Resets the integer list.
+   * Resets the container.
    * @return self reference
    */
   public Atts reset() {

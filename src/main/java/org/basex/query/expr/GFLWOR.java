@@ -54,8 +54,11 @@ public class GFLWOR extends Expr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     checkUp(where, ctx);
+
+    boolean grp = ctx.grouping;
     ctx.grouping = group != null;
     final int vs = ctx.vars.size();
+
     for(int f = 0; f != fl.length; f++) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
@@ -82,7 +85,9 @@ public class GFLWOR extends Expr {
     if(group != null) group.comp(ctx);
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
+
     ctx.vars.reset(vs);
+    ctx.grouping = grp;
 
     if(em) {
       ctx.compInfo(OPTFALSE, where);
@@ -109,7 +114,7 @@ public class GFLWOR extends Expr {
     // store pointers to the cached results here.
     for(int f = 0; f < fl.length; f++) { // fill each var with data
       iter[f] = ctx.iter(fl[f]);
-      if(!ctx.grouping) cache.put(fl[f].var, new ItemList());
+      if(group != null) cache.put(fl[f].var, new ItemList());
     }
 
     // evaluate pre grouping tuples

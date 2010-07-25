@@ -64,7 +64,7 @@ public final class Jav extends Item {
   }
 
   @Override
-  public Object java() {
+  public Object toJava() {
     return val;
   }
 

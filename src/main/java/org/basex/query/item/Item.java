@@ -21,6 +21,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public abstract class Item extends Expr {
+  /** Undefined item. */
+  public static final int UNDEF = Integer.MIN_VALUE;
   /** Score value. */
   public double score;
   /** Data type. */
@@ -137,10 +139,10 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Returns a Java object.
-   * @return string representation
+   * Returns a Java representation of the XQuery item.
+   * @return Java object
    */
-  public Object java() {
+  public Object toJava() {
     return Token.string(str());
   }
 

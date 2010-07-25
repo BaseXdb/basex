@@ -38,8 +38,6 @@ public abstract class Expr extends ExprInfo {
     /** Updates.   */ UPD,
     /** Variable.  */ VAR,
   }
-  /** Undefined value. */
-  protected static final int UNDEF = Integer.MIN_VALUE;
 
   /**
    * Optimizes and compiles the expression.

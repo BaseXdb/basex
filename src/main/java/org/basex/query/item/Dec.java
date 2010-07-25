@@ -109,7 +109,7 @@ public final class Dec extends Item {
   }
 
   @Override
-  public Object java() {
+  public Object toJava() {
     switch(type) {
       case ULN:
         return new BigInteger(val.toString());

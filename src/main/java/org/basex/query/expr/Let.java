@@ -97,6 +97,11 @@ public final class Let extends ForLet {
   }
 
   @Override
+  public long size(final QueryContext ctx) {
+    return 1;
+  }
+  
+  @Override
   boolean standard() {
     return !score;
   }

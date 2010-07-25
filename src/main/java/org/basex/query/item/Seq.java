@@ -79,9 +79,9 @@ public class Seq extends Item {
   }
 
   @Override
-  public final Object java() {
+  public final Object toJava() {
     final Object[] obj = new Object[size];
-    for(int s = 0; s < size; s++) obj[s] = val[s].java();
+    for(int s = 0; s < size; s++) obj[s] = val[s].toJava();
     return obj;
   }
 

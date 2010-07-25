@@ -47,7 +47,7 @@ public final class Hex extends Item {
   }
 
   @Override
-  public Object java() {
+  public byte[] toJava() {
     return val;
   }
 

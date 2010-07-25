@@ -43,7 +43,7 @@ public class BXNList implements NodeList {
     } else {
       if(i < nodes.size()) n = new DBNode(nodes.data, nodes.nodes[i]);
     }
-    return n != null ? n.java() : null;
+    return n != null ? n.toJava() : null;
   }
 
   @Override

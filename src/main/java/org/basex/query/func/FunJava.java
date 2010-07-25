@@ -154,7 +154,7 @@ public final class FunJava extends Arr {
 
       final Item arg = args[s + a];
       if(!arg.type.instance(jtype) && !jtype.instance(arg.type)) return null;
-      val[a++] = arg.java();
+      val[a++] = arg.toJava();
     }
     return val;
   }
