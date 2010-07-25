@@ -2,16 +2,12 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-
-import javax.xml.namespace.QName;
-
 import org.basex.data.Serializer;
 import org.basex.query.iter.NodIter;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import static org.basex.util.Token.*;
 import org.basex.util.Token;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Element;
@@ -98,9 +94,12 @@ public final class FElem extends FNode {
     super(Type.ELM);
     
     // general stuff
-    final QName qn = new QName(elem.getNamespaceURI(), elem.getLocalName(),
-        elem.getPrefix() == null ? "" : elem.getPrefix());
-    name = new QNm(qn);
+    if (elem.getNamespaceURI() != null) {
+      name = new QNm(token(elem.getNodeName()),
+        Uri.uri(token(elem.getNamespaceURI())));
+    } else {
+      name = new QNm(token(elem.getNodeName()));
+    }
     par = p;
     final String b = elem.getBaseURI();
     base = b == null ? EMPTY : token(b);
