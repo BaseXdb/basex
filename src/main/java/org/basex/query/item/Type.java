@@ -23,9 +23,13 @@ import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import org.w3c.dom.ProcessingInstruction;
+import org.w3c.dom.Text;
 
 /**
  * XQuery data types.
@@ -604,7 +608,7 @@ public enum Type {
     @Override
     public Nod e(final Object o) {
       return o instanceof BXText ? ((BXText) o).getNod() :
-        new FTxt((Node) o, null);
+        new FTxt((Text) o, null);
     }
   },
 
@@ -613,7 +617,7 @@ public enum Type {
     @Override
     public Nod e(final Object o) {
       return o instanceof BXPI ? ((BXPI) o).getNod() :
-        new FPI((Node) o, null);
+        new FPI((ProcessingInstruction) o, null);
     }
   },
 
@@ -622,7 +626,7 @@ public enum Type {
     @Override
     public Nod e(final Object o) {
       return o instanceof BXElem ? ((BXElem) o).getNod() :
-        new FElem((Node) o, null);
+        new FElem((Element) o, null);
     }
   },
 
@@ -644,7 +648,7 @@ public enum Type {
       // document fragment
       final DocumentFragment df = (DocumentFragment) o;
       final String bu = df.getBaseURI();
-      return new FDoc((Node) o, bu != null ? token(bu) : EMPTY);
+      return new FDoc(df, bu != null ? token(bu) : EMPTY);
     }
   },
 
@@ -656,7 +660,7 @@ public enum Type {
     @Override
     public Nod e(final Object o) {
       return o instanceof BXAttr ? ((BXAttr) o).getNod() :
-        new FAttr((Node) o, null);
+        new FAttr((Attr) o, null);
     }
   },
 
@@ -665,7 +669,7 @@ public enum Type {
     @Override
     public Nod e(final Object o) {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
-        new FComm((Node) o, null);
+        new FComm((Comment) o, null);
     }
   },
 

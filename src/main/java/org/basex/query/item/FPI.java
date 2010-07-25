@@ -4,8 +4,8 @@ import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
-import org.basex.util.Token;
-import org.w3c.dom.Node;
+import static org.basex.util.Token.*;
+import org.w3c.dom.ProcessingInstruction;
 
 /**
  * PI node fragment.
@@ -33,12 +33,11 @@ public final class FPI extends FNode {
   /**
    * Constructor for DOM nodes (partial).
    * Provided by Erdal Karaca.
-   * @param node DOM node
+   * @param pi DOM node
    * @param parent parent reference
    */
-  FPI(final Node node, final Nod parent) {
-    this(new QNm(Token.token(node.getNodeName())),
-        Token.token(node.getNodeValue()), parent);
+  FPI(final ProcessingInstruction pi, final Nod parent) {
+    this(new QNm(token(pi.getTarget())), token(pi.getData()), parent);
   }
 
   @Override

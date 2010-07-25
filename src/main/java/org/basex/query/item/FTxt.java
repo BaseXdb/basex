@@ -4,7 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.util.Token;
-import org.w3c.dom.Node;
+import org.w3c.dom.Text;
 
 /**
  * Text node fragment.
@@ -27,11 +27,11 @@ public final class FTxt extends FNode {
   /**
    * Constructor for DOM nodes (partial).
    * Provided by Erdal Karaca.
-   * @param node DOM node
+   * @param txt DOM node
    * @param parent parent reference
    */
-  FTxt(final Node node, final Nod parent) {
-    this(Token.token(node.getNodeValue()), parent);
+  FTxt(final Text txt, final Nod parent) {
+    this(Token.token(txt.getData()), parent);
   }
 
   @Override

@@ -2,14 +2,24 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+
+import javax.xml.namespace.QName;
+
 import org.basex.data.Serializer;
 import org.basex.query.iter.NodIter;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
+import static org.basex.util.Token.*;
 import org.basex.util.Token;
+
+import org.w3c.dom.Attr;
+import org.w3c.dom.Comment;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ProcessingInstruction;
+import org.w3c.dom.Text;
 
 /**
  * Element node fragment.
@@ -54,7 +64,7 @@ public final class FElem extends FNode {
    * @param p parent
    */
   public FElem(final QNm n, final NodIter ch, final Nod p) {
-    this(n, ch, new NodIter(), Token.EMPTY, new Atts(), p);
+    this(n, ch, new NodIter(), EMPTY, new Atts(), p);
   }
 
   /**
@@ -81,47 +91,104 @@ public final class FElem extends FNode {
   /**
    * Constructor for DOM nodes (partial).
    * Provided by Erdal Karaca.
-   * @param node DOM node
+   * @param elem DOM node
    * @param p parent reference
    */
-  FElem(final Node node, final Nod p) {
+  FElem(final Element elem, final Nod p) {
     super(Type.ELM);
-
-    final NodeList ch = node.getChildNodes();
-    final int s = ch.getLength();
-    final Nod[] childArr = new Nod[s];
-
-    final NamedNodeMap at = node.getAttributes();
+    
+    // general stuff
+    final QName qn = new QName(elem.getNamespaceURI(), elem.getLocalName(),
+        elem.getPrefix() == null ? "" : elem.getPrefix());
+    name = new QNm(qn);
+    par = p;
+    final String b = elem.getBaseURI();
+    base = b == null ? EMPTY : token(b);
+    
+    // attributes and namespaces
+    ns = new Atts();
+    final NamedNodeMap at = elem.getAttributes();
     final int as = at.getLength();
     final Nod[] attArr = new Nod[as];
-
-    name = new QNm(Token.token(node.getNodeName()));
-    children = new NodIter(childArr, childArr.length);
-    atts = new NodIter(attArr, attArr.length);
-    base = Token.EMPTY;
-    ns = null;
-    par = p;
-
-    for(int i = 0; i < at.getLength(); i++) {
-      attArr[i] = new FAttr(at.item(i), this);
+    
+    int pos = 0;
+    for(int i = 0; i < as; i++) {
+      final Attr att = (Attr) at.item(i);
+      final byte[] nm = token(att.getName()), uri = token(att.getValue());
+      if (Token.eq(nm, XMLNS)) {
+        ns.add(EMPTY, uri);
+      } else if (startsWith(nm, XMLNSC)) {
+        ns.add(ln(nm), uri);
+      } else {
+        attArr[pos++] = new FAttr(att, this);
+      }
     }
+    atts = new NodIter(attArr, pos);
+    
+    // no parent, so we have to add all namespaces in scope
+    if (p == null) {
+      final Atts nss = nsScope(elem.getParentNode());
+      for (int i = 0; i < nss.size; i++) {
+        if (!ns.contains(nss.key[i])) {
+          ns.add(nss.key[i], nss.val[i]);
+        }
+      }
+    }
+
+    // children
+    final NodeList ch = elem.getChildNodes();
+    final int s = ch.getLength();
+    final Nod[] childArr = new Nod[s];
+    children = new NodIter(childArr, childArr.length);
 
     for(int i = 0; i < ch.getLength(); i++) {
       final Node child = ch.item(i);
 
       switch(child.getNodeType()) {
         case Node.TEXT_NODE:
-          childArr[i] = new FTxt(child, this); break;
+          childArr[i] = new FTxt((Text) child, this);
+          break;
         case Node.COMMENT_NODE:
-          childArr[i] = new FComm(child, this); break;
+          childArr[i] = new FComm((Comment) child, this);
+          break;
         case Node.PROCESSING_INSTRUCTION_NODE:
-          childArr[i] = new FPI(child, this); break;
+          childArr[i] = new FPI((ProcessingInstruction) child, this);
+          break;
         case Node.ELEMENT_NODE:
-          childArr[i] = new FElem(child, this); break;
+          childArr[i] = new FElem((Element) child, this);
+          break;
         default:
           break;
       }
     }
+  }
+  
+  /**
+   * Gathers all defined namespaces in the scope of the given DOM element.
+   * @param elem DOM element
+   * @return namespaces
+   */
+  private static Atts nsScope(final Node elem) {
+    final Atts ns = new Atts();
+    Node n = elem;
+    // only elements can declare namespaces
+    while (n != null && n instanceof Element) {
+      final NamedNodeMap atts = n.getAttributes();
+      for (int i = 0, len = atts.getLength(); i < len; i++) {
+        final Attr a = (Attr) atts.item(i);
+        final byte[] name = token(a.getName()), uri = token(a.getValue());
+        if (Token.eq(name, XMLNS)) {
+          // default namespace
+          if (!ns.contains(EMPTY)) ns.add(EMPTY, uri);
+        } else if (startsWith(name, XMLNS)) {
+          // prefixed namespace
+          final byte[] ln = ln(name);
+          if (!ns.contains(ln)) ns.add(ln, uri);
+        }
+      }
+      n = n.getParentNode();
+    }
+    return ns;
   }
 
   @Override
@@ -172,7 +239,7 @@ public final class FElem extends FNode {
         if(ser.ns.key[p].length != 0) continue;
         xmlns = true;
         ser.dn = ser.ns.val[p];
-        ser.namespace(Token.EMPTY, ser.ns.val[p]);
+        ser.namespace(EMPTY, ser.ns.val[p]);
       }
     } else {
       if(ns != null) {
@@ -188,7 +255,7 @@ public final class FElem extends FNode {
     }
 
     if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn))
-      ser.namespace(Token.EMPTY, uri);
+      ser.namespace(EMPTY, uri);
     ser.dn = uri;
 
     // serialize attributes
@@ -238,7 +305,7 @@ public final class FElem extends FNode {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
-    sb.append(Token.string(name.str()));
+    sb.append(string(name.str()));
     if(atts.size() != 0 || ns != null && ns.size != 0 || children.size() != 0)
       sb.append(" ...");
     return sb.append("/>").toString();
