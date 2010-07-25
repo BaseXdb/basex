@@ -79,7 +79,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public QName getAttributeName(final int i) {
     getAttributes();
-    return atts.item[i].qname().java();
+    return atts.item[i].qname().toJava();
   }
 
   @Override
@@ -191,7 +191,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public QName getName() {
     checkType(START_ELEMENT, END_ELEMENT, ENTITY_REFERENCE);
-    return ((Nod) item).qname().java();
+    return ((Nod) item).qname().toJava();
   }
 
   @Override

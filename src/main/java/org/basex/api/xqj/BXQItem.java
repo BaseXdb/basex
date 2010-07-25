@@ -124,7 +124,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   public Node getNode() throws XQException {
     opened();
     if(!it.node()) throw new BXQException(WRONG, Type.NOD, it.type);
-    return ((Nod) it).java();
+    return ((Nod) it).toJava();
   }
 
   @Override
@@ -142,7 +142,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   @Override
   public Object getObject() throws XQException {
     opened();
-    return it.java();
+    return it.toJava();
   }
 
   @Override

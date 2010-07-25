@@ -60,7 +60,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
     opened();
     final Var[] vars = getVariables();
     final QName[] names = new QName[vars.length];
-    for(int v = 0; v < vars.length; v++) names[v] = vars[v].name.java();
+    for(int v = 0; v < vars.length; v++) names[v] = vars[v].name.toJava();
     return names;
   }
 
@@ -69,7 +69,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
     opened();
     QName[] names = new QName[0];
     for(final Var v : getVariables()) {
-      if(v.expr == null) names = Array.add(names, v.name.java());
+      if(v.expr == null) names = Array.add(names, v.name.toJava());
     }
     return names;
   }
