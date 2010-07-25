@@ -172,9 +172,15 @@ public final class FElem extends FNode {
       final NamedNodeMap atts = n.getAttributes();
       for(int i = 0, len = atts.getLength(); i < len; i++) {
         final Attr a = (Attr) atts.item(i);
-        final byte[] name = token(a.getName());
-        final byte[] pref = Token.eq(name, XMLNS) ? EMPTY : ln(name);
-        if(!ns.contains(pref)) ns.add(pref, token(a.getValue()));
+        final byte[] name = token(a.getName()), uri = token(a.getValue());
+        if(Token.eq(name, XMLNS)) {
+          // default namespace
+          if(!ns.contains(EMPTY)) ns.add(EMPTY, uri);
+        } else if(startsWith(name, XMLNS)) {
+          // prefixed namespace
+          final byte[] ln = ln(name);
+          if(!ns.contains(ln)) ns.add(ln, uri);
+        }
       }
       n = n.getParentNode();
     }
