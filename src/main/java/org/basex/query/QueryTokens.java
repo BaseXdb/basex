@@ -356,6 +356,8 @@ public interface QueryTokens {
   byte[] XSURI = token("http://www.w3.org/2001/XMLSchema");
   /** XMLSchema Instance URI. */
   byte[] XSIURI = token("http://www.w3.org/2001/XMLSchema-instance");
+  /** Output URI. */
+  byte[] OUTPUTURI = token("http://www.w3.org/2009/xquery-serialization");
   /** Database URI. */
   byte[] BXURI = token(Text.URL);
   /** File module URI. */
@@ -397,6 +399,8 @@ public interface QueryTokens {
   byte[] FN = token("fn");
   /** Math token. */
   byte[] MATH = token("math");
+  /** Output token. */
+  byte[] OUTPUT = token("output");
   /** BaseX token. */
   byte[] BASEX = token("basex");
   /** XS token. */

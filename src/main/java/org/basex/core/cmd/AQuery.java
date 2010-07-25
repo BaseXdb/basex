@@ -90,7 +90,7 @@ public abstract class AQuery extends Command {
         if(context.prop.is(Prop.CACHEQUERY)) {
           result = qp.execute();
           eval += per.getTime();
-          xml = new XMLSerializer(po, sp);
+          xml = qp.getSerializer(po, sp);
           result.serialize(xml);
           hits = result.size();
         } else {
@@ -98,7 +98,7 @@ public abstract class AQuery extends Command {
           eval += per.getTime();
           hits = 0;
           Item it = ir.next();
-          xml = new XMLSerializer(po, sp);
+          xml = qp.getSerializer(po, sp);
           while(it != null) {
             checkStop();
             xml.openResult();

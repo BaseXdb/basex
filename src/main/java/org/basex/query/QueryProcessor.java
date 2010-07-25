@@ -3,11 +3,15 @@ package org.basex.query;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.io.OutputStream;
+
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.data.SerializerProp;
+import org.basex.data.XMLSerializer;
 import org.basex.query.iter.Iter;
 import org.basex.util.Token;
 
@@ -90,6 +94,35 @@ public final class QueryProcessor extends Progress {
   public Result execute() throws QueryException {
     compile();
     return ctx.eval();
+  }
+
+  /**
+   * Returns a serializer for the given output stream.
+   * Optional output declarations within the query will be included in the
+   * serializer instance.
+   * @param os output stream
+   * @return serializer instance
+   * @throws IOException query exception
+   * @throws QueryException query exception
+   */
+  public XMLSerializer getSerializer(final OutputStream os) throws IOException,
+      QueryException {
+    return getSerializer(os, null);
+  }
+
+  /**
+   * Returns a serializer for the given output stream, specifying a default
+   * serializer.
+   * @param os output stream
+   * @param props serializer properties
+   * @return serializer instance
+   * @throws IOException query exception
+   * @throws QueryException query exception
+   */
+  public XMLSerializer getSerializer(final OutputStream os,
+      final SerializerProp props) throws IOException, QueryException {
+    compile();
+    return new XMLSerializer(os, ctx.serProp == null ? props : ctx.serProp);
   }
 
   /**

@@ -22,11 +22,13 @@ import org.basex.query.iter.Iter;
 final class QueryProcess extends Progress {
   /** Query processor. */
   private final QueryProcessor qp;
-  /** Serializer. */
-  private final XMLSerializer xml;
+  /** Output stream reference. */
+  private final PrintOutput out;
   /** Database context. */
   private final Context ctx;
 
+  /** Serializer. */
+  private XMLSerializer xml;
   /** Monitored flag. */
   private boolean monitored;
   /** Iterator. */
@@ -39,27 +41,26 @@ final class QueryProcess extends Progress {
    * @param q query string
    * @param o output
    * @param c database context
-   * @throws IOException I/O exception
    */
-  QueryProcess(final String q, final PrintOutput o, final Context c)
-      throws IOException {
-
+  QueryProcess(final String q, final PrintOutput o, final Context c) {
     qp = new QueryProcessor(q, c);
-    xml = new XMLSerializer(o);
+    out = o;
     ctx = c;
   }
 
   /**
    * Constructor.
+   * @throws IOException Exception
    * @throws QueryException query exception
    */
-  void init() throws QueryException {
+  void init() throws IOException, QueryException {
     qp.parse();
     if(!qp.ctx.updating) startTimeout(ctx.prop.num(Prop.TIMEOUT));
     monitored = true;
     ctx.lock.before(qp.ctx.updating);
     iter = qp.iter();
     item = iter.next();
+    xml = qp.getSerializer(out);
   }
 
   /**

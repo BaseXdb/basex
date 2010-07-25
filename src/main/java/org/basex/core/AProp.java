@@ -163,11 +163,11 @@ public abstract class AProp {
   }
 
   /**
-   * Returns the requested value.
+   * Returns the requested object, or {@code null}.
    * @param key key to be found
    * @return value
    */
-  public final Object object(final String key) {
+  public final Object get(final String key) {
     return props.get(key);
   }
 

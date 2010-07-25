@@ -78,23 +78,24 @@ public final class XMLSerializer extends Serializer {
 
   /**
    * Constructor.
-   * @param o output stream reference
+   * @param os output stream reference
    * @throws IOException I/O exception
    */
-  public XMLSerializer(final OutputStream o) throws IOException {
-    this(o, PROPS);
+  public XMLSerializer(final OutputStream os) throws IOException {
+    this(os, null);
   }
 
   /**
    * Constructor, specifying serialization options.
-   * @param o output stream reference
-   * @param p serialization properties
+   * @param os output stream reference
+   * @param props serialization properties
    * @throws IOException I/O exception
    */
-  public XMLSerializer(final OutputStream o, final SerializerProp p)
+  public XMLSerializer(final OutputStream os, final SerializerProp props)
       throws IOException {
 
-    out = o instanceof PrintOutput ? (PrintOutput) o : new PrintOutput(o);
+    out = os instanceof PrintOutput ? (PrintOutput) os : new PrintOutput(os);
+    final SerializerProp p = props == null ? PROPS : props;
 
     final String m = p.check(S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT);
     mth = m.equals(M_XML) ? M_XML : m.equals(M_XHTML) ?

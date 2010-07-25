@@ -23,7 +23,7 @@ public final class Get extends Command {
   @Override
   protected boolean run() throws IOException {
     final String key = args[0].toUpperCase();
-    final Object type = prop.object(key);
+    final Object type = prop.get(key);
     if(type == null) return error(SETKEY, key);
     out.println(key + ": " + type);
     return true;

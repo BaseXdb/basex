@@ -17,8 +17,6 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.InfoTable;
-import org.basex.data.Nodes;
-import org.basex.data.XMLSerializer;
 import org.basex.query.QueryProcessor;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.jfuse.DeepStat;
@@ -286,8 +284,9 @@ public final class DeepShell {
   @Command(shortcut = 'x', help = "print file hierarchy as XML")
   public void serialize(@SuppressWarnings("unused") final String[] args) {
     try {
-      final Nodes n = new QueryProcessor("/", fs.getContext()).queryNodes();
-      n.serialize(new XMLSerializer(System.out));
+      final QueryProcessor qp = new QueryProcessor("/", fs.getContext());
+      qp.queryNodes().serialize(qp.getSerializer(System.out));
+      qp.close();
     } catch(final Exception ex) {
       ex.printStackTrace();
     }

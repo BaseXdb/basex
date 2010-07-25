@@ -21,6 +21,7 @@ import org.basex.data.FTPosData;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
+import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.Expr;
 import org.basex.query.ft.FTOpt;
@@ -135,6 +136,8 @@ public final class QueryContext extends Progress {
   /** Evaluation flag. */
   private boolean firstEval = true;
 
+  /** Serializer options. */
+  SerializerProp serProp;
   /** List of modules. */
   final StringList modules = new StringList();
   /** List of loaded modules. */

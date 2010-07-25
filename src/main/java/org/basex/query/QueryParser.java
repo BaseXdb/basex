@@ -4,7 +4,9 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import org.basex.data.SerializerProp;
 import org.basex.io.IO;
 import org.basex.query.expr.And;
 import org.basex.query.expr.CAttr;
@@ -130,6 +132,8 @@ public class QueryParser extends InputParser {
   /** Alternative position. */
   private int ap;
 
+  /** Declared serialization options. */
+  private ArrayList<String> serial = new ArrayList<String>();
   /** Declaration flag. */
   private boolean declElem;
   /** Declaration flag. */
@@ -421,8 +425,21 @@ public class QueryParser extends InputParser {
   private void optionDecl() throws QueryException {
     // ignore option declarations
     final QNm name = new QNm(qName(QNAMEINV), ctx);
-    stringLiteral();
+    final byte[] val = stringLiteral();
     if(!name.ns()) error(NSMISS, name);
+
+    // output declaration
+    if(eq(name.pref(), OUTPUT)) {
+      final String key = string(name.ln());
+      if(module != null) error(MODOUT);
+
+      if(ctx.serProp == null) ctx.serProp = new SerializerProp();
+      if(ctx.serProp.get(key) == null) error(OUTWHICH, key);
+      if(serial.contains(key)) error(OUTDUPL, key);
+
+      ctx.serProp.set(key, string(val));
+      serial.add(key);
+    }
   }
 
   /**

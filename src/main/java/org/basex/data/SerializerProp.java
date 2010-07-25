@@ -95,7 +95,7 @@ public final class SerializerProp extends AProp {
       final String[] sprop = ser.split("=", 2);
       final String key = sprop[0].trim();
       final String val = sprop.length < 2 ? "" : sprop[1].trim();
-      if(object(key) != null) set(key, val);
+      if(get(key) != null) set(key, val);
       else throw new IOException(Main.info(SERKEY, key));
     }
   }

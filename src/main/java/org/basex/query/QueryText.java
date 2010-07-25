@@ -520,6 +520,13 @@ public interface QueryText {
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
   /** [MS] XPST0008: Parsing exception. */
   Object[] GVARNOTDEFINED = { XQST, 94, "Undefined grouping variable \"%\"." };
+  /** XQST0108: Parsing exception. */
+  Object[] MODOUT = { XQST, 108,
+      "No serialization parameters allowed in module." };
+  /** XPST0109: Parsing exception. */
+  Object[] OUTWHICH = { XQST, 109, "Unknown serialization parameter: \"%\"." };
+  /** XPST0110: Parsing exception. */
+  Object[] OUTDUPL = { XQST, 110, "Duplicate definition of \"output:%\"." };
 
   /** XQTY0024: Parsing exception. */
   Object[] NOATTALL = { XQTY, 24, "Attribute must follow the root element." };

@@ -38,7 +38,7 @@ public final class Set extends Command {
     try { s = Enum.valueOf(CmdSet.class, key); } catch(final Exception ex) { }
 
     try {
-      final Object type = prop.object(key);
+      final Object type = prop.get(key);
       if(type == null) return error(SETKEY, key);
 
       if(type instanceof Boolean) {
