@@ -98,8 +98,12 @@ public final class QueryExample {
     Result result = processor.execute();
 
     // ------------------------------------------------------------------------
+    // Create an XML serializer
+    XMLSerializer xml = processor.getSerializer(out);
+
+    // ------------------------------------------------------------------------
     // Serialize all results to OUT, using the specified serializer
-    result.serialize(new XMLSerializer(out));
+    result.serialize(xml);
 
     // ------------------------------------------------------------------------
     // Close the query processor
@@ -126,18 +130,18 @@ public final class QueryExample {
 
     // ------------------------------------------------------------------------
     // Create an XML serializer
-    XMLSerializer serializer = new XMLSerializer(out);
+    XMLSerializer xml = processor.getSerializer(out);
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents
     Item item;
     while((item = iter.next()) != null) {
-      item.serialize(serializer);
+      item.serialize(xml);
     }
 
     // ------------------------------------------------------------------------
     // Close the serializer
-    serializer.close();
+    xml.close();
 
     // ------------------------------------------------------------------------
     // Close the query processor

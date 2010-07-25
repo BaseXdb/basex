@@ -3,7 +3,6 @@ package org.basex.examples.query;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.data.Result;
-import org.basex.data.XMLSerializer;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
@@ -69,7 +68,7 @@ public final class QueryBindExample {
 
     // ------------------------------------------------------------------------
     // Serialize all results to OUT, using the specified serializer
-    result.serialize(new XMLSerializer(System.out));
+    result.serialize(processor.getSerializer(System.out));
 
     // ------------------------------------------------------------------------
     // Close the query processor
