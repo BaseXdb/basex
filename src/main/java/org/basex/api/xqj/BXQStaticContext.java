@@ -72,7 +72,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getBaseURI() {
-    return string(ctx.baseURI.str());
+    return string(ctx.baseURI.atom());
   }
 
   @Override
@@ -109,7 +109,7 @@ final class BXQStaticContext implements XQStaticContext {
 
   @Override
   public String getDefaultCollation() {
-    return string(ctx.collation.str());
+    return string(ctx.collation.atom());
   }
 
   @Override

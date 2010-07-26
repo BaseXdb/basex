@@ -70,7 +70,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   public String getAtomicValue() throws XQException {
     opened();
     if(it.node()) throw new BXQException(ATOM);
-    return Token.string(it.str());
+    return Token.string(it.atom());
   }
 
   @Override
@@ -106,7 +106,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   @Override
   public String getItemAsString(final Properties props) throws XQException {
     return it.node() && it.type != Type.TXT ? serialize() :
-      Token.string(it.str());
+      Token.string(it.atom());
   }
 
   @Override
@@ -256,7 +256,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
     opened();
     try {
       final double d = it.dbl();
-      if(!it.n() || d != (long) d) throw new BXQException(NUM, d);
+      if(!it.num() || d != (long) d) throw new BXQException(NUM, d);
       return type.e(it, null).itr();
     } catch(final QueryException ex) {
       throw new BXQException(ex);
