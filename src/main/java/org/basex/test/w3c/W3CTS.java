@@ -327,7 +327,8 @@ public abstract class W3CTS {
     final String outname = text("@name", root);
     if(single != null && !outname.startsWith(single)) return true;
 
-    if(verbose) Main.outln("- " + outname);
+    Performance perf = new Performance();
+    if(verbose) Main.out("- " + outname);
 
     boolean inspect = false;
     boolean correct = true;
@@ -581,6 +582,12 @@ public abstract class W3CTS {
       if(inspect) logReport.append("' todo='inspect");
       logReport.append("'/>");
       logReport.append(NL);
+    }
+
+    if(verbose) {
+      final long t = perf.getTime();
+      if(t > 100000000) Main.out(": " + Performance.getTimer(t, 1));
+      Main.outln();
     }
     return single == null || !outname.equals(single);
   }

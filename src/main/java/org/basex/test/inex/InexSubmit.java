@@ -417,7 +417,7 @@ public final class InexSubmit {
     Item a;
     int r = 1;
     while(res != null && (a = res.next()) != null && r <= k) {
-      final byte[] s = a.str();
+      final byte[] s = a.atom();
       final int i = indexOf(s, ';');
       xml.openElement(token("result"));
       xml.openElement(token("file"));
