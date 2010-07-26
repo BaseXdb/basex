@@ -8,13 +8,13 @@ package org.basex.data;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Philipp Ziemer
  */
-public class Node {
+final class LogNode {
   /** Addend is valid for this id and all following. */
-  public int id;
+  int id;
   /** What to add to calculate the Pre-value from the ID. */
-  public int addend;
+  int addend;
   /** Next node in the list. */
-  public Node next;
+  LogNode next;
   /** Subnodes of the Node. */
   private int[][] subnodes;
 
@@ -35,7 +35,7 @@ public class Node {
     int left = 0;
     int right = subnodes.length - 1;
     while(1 < right - left) {
-      int mid = left + (right - left) / 2;
+      final int mid = left + (right - left) / 2;
       if(subnodes[mid][0] <= subId) left = mid;
       else if(subId < subnodes[mid][0]) right = mid;
     }
@@ -52,7 +52,7 @@ public class Node {
    * @param theId Addend is valid for this id and all following.
    * @param theAddend What to add to calculate the Pre-value from the ID.
    */
-  public Node(final int theId, final int theAddend) {
+  LogNode(final int theId, final int theAddend) {
     id = theId;
     addend = theAddend;
     next = null;
@@ -66,7 +66,7 @@ public class Node {
    * @param subId ID of the subnode.
    * @param subAddend What to add to calculate the Pre-value from the ID.
    */
-  public void addSub(final int subId, final int subAddend) {
+  void addSub(final int subId, final int subAddend) {
     // empty sublist
     if(subnodes == null) {
       subnodes = new int[1][2];
@@ -74,8 +74,8 @@ public class Node {
       subnodes[0][1] = subAddend;
     // there are subnodes
     } else {
-      int pos = binarySearch(subId); // where to insert
-      int[][] newsubnodes = new int[subnodes.length + 1][2];
+      final int pos = binarySearch(subId); // where to insert
+      final int[][] newsubnodes = new int[subnodes.length + 1][2];
 
       // at the beginning
       if(pos == 0) {
@@ -102,8 +102,8 @@ public class Node {
    * @return Addend to calculate the Pre or
    * Integer.MIN_VALUE if the ID is not in the list.
    */
-  public int getSubAddend(final int subId) {
-    int pos = binarySearch(subId);
+  int getSubAddend(final int subId) {
+    final int pos = binarySearch(subId);
     // as binarySearch gives the position of the next
     // bigger calculate position - 1
     if(pos != 0 && subnodes[pos - 1][0] == subId) return subnodes[pos - 1][1];
@@ -114,8 +114,7 @@ public class Node {
    * Has the mainnode subnodes to check?
    * @return true if there are subnode, else false.
    */
-  public boolean hasSub() {
-    if(subnodes == null || subnodes.length == 0) return false;
-    return true;
+  boolean hasSub() {
+    return subnodes != null && subnodes.length != 0;
   }
 }

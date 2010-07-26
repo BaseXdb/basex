@@ -58,6 +58,9 @@ import org.deepfs.fs.DeepFS;
  * @author Christian Gruen
  */
 public abstract class Data {
+  /** Flag for ID->Pre Mapping. */
+  private static final boolean IDPREMAPON = false;
+
   /** Node kind: Document. */
   public static final byte DOC = 0x00;
   /** Node kind: Element. */
@@ -108,8 +111,6 @@ public abstract class Data {
   /** Full-text index instance. */
   protected Index ftxindex;
   
-  /** Flag for ID->Pre Mapping. */
-  private boolean idpremapon;
   /** LogList to realize the ID->Pre mapping. */
   private LogList loglist;
   
@@ -123,11 +124,8 @@ public abstract class Data {
     nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);
     
-    idpremapon = false;
     // initialize the ID->Pre mapping
-    if(idpremapon) {
-      loglist = new LogList();
-    }
+    if(IDPREMAPON) loglist = new LogList();
   }
 
   /**
@@ -268,9 +266,7 @@ public abstract class Data {
    * @return pre value or -1 if id was not found
    */
   public final int pre(final int id) {
-    if(idpremapon) {
-      return loglist.pre(id);
-    }
+    if(IDPREMAPON) return loglist.pre(id);
     
     // find pre value in table
     for(int p = id; p < meta.size; p++) if(id == id(p)) return p;
@@ -494,9 +490,7 @@ public abstract class Data {
     int s = size(pre, k);
     ns.delete(pre, s);
     
-    if(idpremapon) {
-      loglist.delete(pre, s);
-    }
+    if(IDPREMAPON) loglist.delete(pre, s);
 
     // reduce size of ancestors
     int par = pre;
@@ -546,9 +540,8 @@ public abstract class Data {
     meta.update();
     insert(pre, par, dt);
     attSize(par, ELEM, attSize(par, ELEM) + dt.meta.size);
-    if(idpremapon) {
-      loglist.insert(id(pre), pre);
-    }
+
+    if(IDPREMAPON) loglist.insert(id(pre), pre);
   }
 
   /**

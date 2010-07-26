@@ -8,37 +8,30 @@ package org.basex.data;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Philipp Ziemer
  */
-public class LogList {
+final class LogList {
   /** First Node in the list. */
-  Node first;
-
-  /**
-   * Creates an empty LogList.
-   */
-  public LogList() {
-    first = null;
-  }
+  LogNode first;
 
   /**
    * Logs a the insert of a new item into the database.
    * @param id value of the entry.
    * @param pre value of the entry.
    */
-  public void insert(final int id, final int pre) {
+  void insert(final int id, final int pre) {
     // list is empty
     if(first == null) {
       // calculation of the addends
-      int mainAddend = 1;
-      int subAddend = pre - id - 1;
+      final int mainAddend = 1;
+      final int subAddend = pre - id - 1;
 
       // insert the mainNode and then the subNode
-      first = new Node(pre, mainAddend);
+      first = new LogNode(pre, mainAddend);
       first.addSub(id, subAddend);
     // list has entries
     } else {
       // search right position for insert through linear search
-      Node pointer = first;
-      Node b4pointer = null; // node before pointer
+      LogNode pointer = first;
+      LogNode b4pointer = null; // node before pointer
       int addend = 0; // needed to calculate correct value for the sub-node
       while(pointer != null && pointer.id < pre) {
         addend += pointer.addend;
@@ -55,7 +48,7 @@ public class LogList {
       // new node needs to be created
       } else {
         // built up new node and subnode
-        Node newNode = new Node(pre, 1);
+        final LogNode newNode = new LogNode(pre, 1);
         // addend of subnode is pre - id - addend - addend of pointer
         // (which is not counted yet)
         newNode.addSub(id, pre - id - addend - 1);
@@ -76,16 +69,16 @@ public class LogList {
    * @param pre value of the entry.
    * @param count how many nodes are deleted (size of deleted root-node).
    */
-  public void delete(final int pre, final int count) {
+  void delete(final int pre, final int count) {
     // list is empty
     if(first == null)
       // insert the mainNode
-      first = new Node(pre, -count);
+      first = new LogNode(pre, -count);
     // list has entries
     else {
       // search right position for insert through linear search
-      Node pointer = first;
-      Node b4pointer = null; // node before pointer
+      LogNode pointer = first;
+      LogNode b4pointer = null; // node before pointer
       while(pointer != null && pointer.id < pre) {
         b4pointer = pointer;
         pointer = pointer.next;
@@ -97,7 +90,7 @@ public class LogList {
       // new node needs to be created
       else {
         // built up new node and subnode
-        Node newNode = new Node(pre, -count);
+        final LogNode newNode = new LogNode(pre, -count);
 
         // insert into list
         // check if item will be first item
@@ -115,9 +108,9 @@ public class LogList {
    * @param id value of the entry.
    * @return Pre-value.
    */
-  public int pre(final int id) {
+  int pre(final int id) {
     int addend = 0;
-    Node pointer = first;
+    LogNode pointer = first;
 
     while(pointer != null) {
       // check if id is still affected
@@ -126,18 +119,17 @@ public class LogList {
 
         // check for subitem
         if(pointer.hasSub()) {
-          int subaddend = pointer.getSubAddend(id);
+          final int subaddend = pointer.getSubAddend(id);
           if(subaddend != Integer.MIN_VALUE) {
             addend += subaddend;
-            pointer = null; // subitem found => end
+            break; // subitem found => end
           }
         }
-
-        if(pointer != null)
-          pointer = pointer.next;
-      } else pointer = null;
+        pointer = pointer.next;
+      } else {
+        pointer = null;
+      }
     }
-
     return id + addend;
   }
 }
