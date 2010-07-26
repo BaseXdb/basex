@@ -215,6 +215,7 @@ public final class FElem extends FNode {
 
     // remember top level namespace
     final byte[] dn = ser.dn;
+    // xmlns? namespace with prefix?
     boolean xmlns = false;
 
     // serialize all namespaces at top level...
@@ -250,8 +251,6 @@ public final class FElem extends FNode {
       }
     }
 
-    if(!xmlns && !name.ns() && !Token.eq(uri, ser.dn))
-      ser.namespace(EMPTY, uri);
     ser.dn = uri;
 
     // serialize attributes
