@@ -493,6 +493,10 @@ public abstract class Data {
     int k = kind(pre);
     int s = size(pre, k);
     ns.delete(pre, s);
+    
+    if(idpremapon) {
+      loglist.delete(pre, s);
+    }
 
     // reduce size of ancestors
     int par = pre;
@@ -542,6 +546,9 @@ public abstract class Data {
     meta.update();
     insert(pre, par, dt);
     attSize(par, ELEM, attSize(par, ELEM) + dt.meta.size);
+    if(idpremapon) {
+      loglist.insert(id(pre), pre);
+    }
   }
 
   /**
