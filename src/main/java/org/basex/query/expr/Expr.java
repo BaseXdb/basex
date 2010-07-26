@@ -128,9 +128,10 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).
+   * This check is needed for updating queries.
    * @return result of check
    */
-  public boolean v() {
+  public boolean vacuous() {
     return empty();
   }
 
@@ -156,7 +157,7 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean uses(final Use u, final QueryContext ctx);
 
   /**
-   * Checks if the specified variable is removable.
+   * Checks if the specified variable is removable (e.g., .
    * @param v variable to be removed
    * @param ctx query context
    * @return result of check
@@ -167,7 +168,9 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Substitutes a variable in a sub expression by a context reference.
+   * Substitutes all {@link VarCall} expressions for the given variable
+   * by a {@link Context} reference. This method is initially called by the
+   * {@link FLWR} class and passed on to all sub-expressions.
    * @param v variable to be replace
    * @return expression with removed variable
    */
@@ -269,7 +272,7 @@ public abstract class Expr extends ExprInfo {
     if(!ctx.updating) return;
     int s = 0;
     for(final Expr e : expr) {
-      if(e.v()) continue;
+      if(e.vacuous()) continue;
       final boolean u = e.uses(Use.UPD, ctx);
       if(u && s == 2 || !u && s == 1) Err.or(UPNOT, info());
       s = u ? 1 : 2;

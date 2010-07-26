@@ -113,7 +113,7 @@ public final class Let extends ForLet {
   }
   
   @Override
-  boolean standard() {
+  boolean simple() {
     return !score;
   }
 

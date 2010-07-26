@@ -147,7 +147,7 @@ public final class For extends ForLet {
   }
 
   @Override
-  boolean standard() {
+  boolean simple() {
     return pos == null && score == null;
   }
 

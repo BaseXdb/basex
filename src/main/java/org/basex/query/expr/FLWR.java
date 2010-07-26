@@ -29,34 +29,35 @@ public final class FLWR extends FLWOR {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    // add where clause to last for clause and remove variable calls
+    // add where clause to most inner FOR clause and remove variable calls
     if(where != null) {
       final ForLet f = fl[fl.length - 1];
-      if(f instanceof For && f.standard() && where.removable(f.var, ctx)) {
-        if(!where.returned(ctx).mayBeNum()) {
-          // converting where clauses to predicates
-          ctx.compInfo(OPTWHERE);
-          final Expr w = where.remove(f.var);
-          if(f.expr instanceof AxisPath) {
-            AxisPath ap = (AxisPath) f.expr;
-            if(w instanceof And) {
-              for(final Expr e : ((And) w).expr) ap = ap.addPred(e);
-            } else {
-              ap = ap.addPred(w);
-            }
-            f.expr = ap;
+      // WHERE results need not be numeric
+      if(f instanceof For && f.simple() && where.removable(f.var, ctx) &&
+          !where.returned(ctx).mayBeNum()) {
+
+        // convert where clause to predicates
+        ctx.compInfo(OPTWHERE);
+        final Expr w = where.remove(f.var);
+        if(f.expr instanceof AxisPath) {
+          AxisPath ap = (AxisPath) f.expr;
+          if(w instanceof And) {
+            for(final Expr e : ((And) w).expr) ap = ap.addPred(e);
           } else {
-            fl[fl.length - 1].expr = new Pred(f.expr, w);
+            ap = ap.addPred(w);
           }
-          where = null;
+          f.expr = ap;
+        } else {
+          fl[fl.length - 1].expr = new Pred(f.expr, w);
         }
+        where = null;
       }
     }
 
     final Expr ex = super.comp(ctx);
     if(ex != this) return ex;
 
-    // remove let clauses with static contents
+    // remove LET clauses with static contents
     for(int f = 0; f != fl.length; f++) {
       if(fl[f].var.expr != null) {
         ctx.compInfo(OPTVAR, fl[f].var);
@@ -71,8 +72,8 @@ public final class FLWR extends FLWOR {
       return where != null ? new If(where, ret, Seq.EMPTY) : ret;
     }
 
-    // simplify basic flwor expression (for $i in E return $i -> E)
-    if(where == null && fl.length == 1 && fl[0].standard() &&
+    // simplify basic FLWOR expression (for $i in E return $i -> E)
+    if(fl.length == 1 && where == null && fl[0].simple() &&
         ret instanceof VarCall) {
       final Var v = ((VarCall) ret).var;
       if(v.type == null && fl[0].var.eq(v)) {

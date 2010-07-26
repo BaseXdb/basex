@@ -62,7 +62,7 @@ public class GFLWOR extends Expr {
     for(int f = 0; f != fl.length; f++) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
-      ctx.ftfast = ctx.ftfast && fl[f].standard();
+      ctx.ftfast = ctx.ftfast && fl[f].simple();
       fl[f] = fl[f].comp(ctx);
       ctx.ftfast = fast;
     }

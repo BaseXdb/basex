@@ -32,7 +32,7 @@ public abstract class ForLet extends Single {
    * Checks if clause has no scoring and position.
    * @return result of check
    */
-  abstract boolean standard();
+  abstract boolean simple();
 
   @Override
   public final boolean uses(final Use u, final QueryContext ctx) {

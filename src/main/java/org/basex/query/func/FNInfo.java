@@ -83,7 +83,7 @@ final class FNInfo extends Fun {
   }
 
   @Override
-  public boolean v() {
+  public boolean vacuous() {
     return func == FunDef.ERROR;
   }
 }

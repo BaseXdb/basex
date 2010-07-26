@@ -54,7 +54,7 @@ public final class Transform extends Arr {
     }
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
 
-    if(!expr[0].uses(Use.UPD, ctx) && !expr[0].v()) Err.or(UPEXPECTT);
+    if(!expr[0].uses(Use.UPD, ctx) && !expr[0].vacuous()) Err.or(UPEXPECTT);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
     ctx.updating = u;
