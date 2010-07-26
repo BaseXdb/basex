@@ -129,12 +129,12 @@ public abstract class Date extends Item {
   protected final void calc(final Dur a, final boolean p)
       throws QueryException {
 
-    if(xc.getYear() + a.mon / 12 > 9999) Err.range(type, a.str());
+    if(xc.getYear() + a.mon / 12 > 9999) Err.range(type, a.atom());
     xc.add(p ? a.toJava() : a.toJava().negate());
   }
 
   @Override
-  public final byte[] str() {
+  public final byte[] atom() {
     String str = xc.toXMLFormat();
     str = str.replaceAll("\\.0+(Z|-.*|\\+.*)?$", "$1");
     str = str.replaceAll("(\\.\\d+?)0+(Z|-.*|\\+.*)?$", "$1$2");
@@ -226,6 +226,6 @@ public abstract class Date extends Item {
 
   @Override
   public final String toString() {
-    return Main.info("\"%\"", str());
+    return Main.info("\"%\"", atom());
   }
 }

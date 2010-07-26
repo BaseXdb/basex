@@ -29,7 +29,7 @@ public final class ReplaceValue extends NewValue {
     final DBNode n = (DBNode) node;
     final Data d = n.data;
     final int k = d.kind(n.pre);
-    final byte[] nn = name.str();
+    final byte[] nn = name.atom();
 
     if(k == Data.TEXT && nn.length == 0) {
       d.delete(n.pre);

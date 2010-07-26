@@ -84,7 +84,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final byte[] str() {
+  public final byte[] atom() {
     if(val == null) val = data.atom(pre);
     return val;
   }
@@ -305,13 +305,13 @@ public class DBNode extends Nod {
       case ATT:
       case PI:
         return type.name + " " + string(nname()) + " { \"" +
-        string(str()) + "\" }";
+          string(atom()) + "\" }";
       case ELM:
         return type.name + " " + string(nname()) + " { ... }";
       case DOC:
         return type.name + " { \"" + string(data.text(pre, true)) + "\" }";
       default:
-        return type.name + " { \"" + Err.chop(str()) + "\" }";
+        return type.name + " { \"" + Err.chop(atom()) + "\" }";
     }
   }
 }

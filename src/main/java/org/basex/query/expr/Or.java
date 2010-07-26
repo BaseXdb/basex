@@ -31,7 +31,7 @@ public final class Or extends Arr {
     super.comp(ctx);
 
     for(int e = 0; e < expr.length; e++) {
-      if(!expr[e].i()) continue;
+      if(!expr[e].item()) continue;
 
       if(((Item) expr[e]).bool()) {
         // atomic items can be pre-evaluated

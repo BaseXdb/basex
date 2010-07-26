@@ -28,12 +28,12 @@ public final class Switch extends Arr {
     super.comp(ctx);
 
     Expr e = this;
-    if(expr[0].i()) {
+    if(expr[0].item()) {
       final Item it = (Item) expr[0];
       final int el = expr.length;
       boolean items = true;
       for(int i = 1; i < el - 1; i += 2) {
-        items &= expr[i].i();
+        items &= expr[i].item();
         if(items && it.equiv((Item) expr[i])) {
           e = expr[i + 1];
           break;

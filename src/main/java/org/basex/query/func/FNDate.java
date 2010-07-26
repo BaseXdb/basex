@@ -145,7 +145,7 @@ final class FNDate extends Fun {
    */
   private Item checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return it.u() ? t.e(it, ctx) : checkType(it, t);
+    return it.unt() ? t.e(it, ctx) : checkType(it, t);
   }
 
   /**
@@ -156,8 +156,8 @@ final class FNDate extends Fun {
    * @throws QueryException query exception
    */
   private Item checkDur(final Item it) throws QueryException {
-    if(it.u()) return new Dur(it.str());
-    if(!it.d()) errType(Type.DUR, it);
+    if(it.unt()) return new Dur(it.atom());
+    if(!it.dur()) errType(Type.DUR, it);
     return it;
   }
 
@@ -172,7 +172,7 @@ final class FNDate extends Fun {
   private Item datzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.u() ? new Dat(it.str()) : checkType(it, Type.DAT);
+    final Item i = it.unt() ? new Dat(it.atom()) : checkType(it, Type.DAT);
     return adjust((Date) i, zon, d);
   }
 
@@ -187,7 +187,7 @@ final class FNDate extends Fun {
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.u() ? new Dtm(it.str()) : checkType(it, Type.DTM);
+    final Item i = it.unt() ? new Dtm(it.atom()) : checkType(it, Type.DTM);
     return adjust((Date) i, zon, d);
   }
 
@@ -202,7 +202,7 @@ final class FNDate extends Fun {
   private Item timzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.u() ? new Tim(it.str()) : checkType(it, Type.TIM);
+    final Item i = it.unt() ? new Tim(it.atom()) : checkType(it, Type.TIM);
     return adjust((Date) i, zon, d);
   }
 
@@ -216,8 +216,8 @@ final class FNDate extends Fun {
   private Item dattim(final Item date, final Item tm) throws QueryException {
     if(tm == null) return null;
 
-    final Item d = date.u() ? new Dat(date.str()) : date;
-    final Item t = tm.u() ? new Tim(tm.str()) : tm;
+    final Item d = date.unt() ? new Dat(date.atom()) : date;
+    final Item t = tm.unt() ? new Tim(tm.atom()) : tm;
 
     final Dtm dtm = new Dtm((Dat) checkType(d, Type.DAT));
     final Tim tim = (Tim) checkType(t, Type.TIM);

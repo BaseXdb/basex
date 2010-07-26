@@ -76,9 +76,9 @@ public final class Func extends Single {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.attribute(NAM, var.name.str());
+    ser.attribute(NAM, var.name.atom());
     for(int i = 0; i < args.length; i++) {
-      ser.attribute(Token.token(ARG + i), args[i].name.str());
+      ser.attribute(Token.token(ARG + i), args[i].name.atom());
     }
     expr.plan(ser);
     ser.closeElement();
@@ -86,7 +86,7 @@ public final class Func extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(var.name.str()).add("(...)");
+    final TokenBuilder tb = new TokenBuilder(var.name.atom()).add("(...)");
     if(var.type != null) tb.add(" " + AS + " " + var.type);
     if(expr != null) tb.add(" { " + expr + " }");
     return tb.toString();

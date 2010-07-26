@@ -35,7 +35,7 @@ public final class Hex extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     return b2h();
   }
 

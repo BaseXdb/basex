@@ -183,7 +183,7 @@ public final class Thesaurus {
    */
   private byte[] text(final String query, final Nodes in)
       throws QueryException {
-    return new QueryProcessor(query, in, ctx).iter().next().str();
+    return new QueryProcessor(query, in, ctx).iter().next().atom();
   }
 
   /**

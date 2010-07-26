@@ -57,10 +57,10 @@ public final class Pos extends Simple {
   static Expr get(final Expr expr, final Comp cmp, final Expr arg)
       throws QueryException {
 
-    if(!arg.i()) return expr;
+    if(!arg.item()) return expr;
 
     final Item it = (Item) arg;
-    if(it.n()) {
+    if(it.num()) {
       final long p = it.itr();
       final boolean ex = p == it.dbl();
       switch(cmp) {
@@ -120,14 +120,17 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public String toString() {
-    return "pos(" + min + (min == max ? "" : "-" +
-        (max == Long.MAX_VALUE ? "" : max)) + ")";
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, MIN, Token.token(min), MAX,
         max == Long.MAX_VALUE ? INF : Token.token(max));
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("position() ");
+    if(max == Long.MAX_VALUE) sb.append('>');
+    sb.append("= " + min);
+    if(max != Long.MAX_VALUE && min != max) sb.append(" to " + max);
+    return sb.toString();
   }
 }

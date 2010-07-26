@@ -77,7 +77,7 @@ final class FNInfo extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    if(func == FunDef.ENV)  return expr[0].i() ? atomic(ctx) : this;
+    if(func == FunDef.ENV)  return expr[0].item() ? atomic(ctx) : this;
     if(func == FunDef.ENVS) return SeqIter.get(iter(ctx)).finish();
     return this;
   }

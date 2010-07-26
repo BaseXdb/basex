@@ -21,7 +21,7 @@ public final class BXPI extends BXNode implements ProcessingInstruction {
 
   @Override
   public String getNodeValue() {
-    return Token.string(node.str());
+    return Token.string(node.atom());
   }
 
   @Override

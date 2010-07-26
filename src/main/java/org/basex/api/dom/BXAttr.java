@@ -35,7 +35,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public String getNodeValue() {
-    return Token.string(node.str());
+    return Token.string(node.atom());
   }
 
   @Override
@@ -45,7 +45,7 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public String getNamespaceURI() {
-    final byte[] uri = node.qname().uri.str();
+    final byte[] uri = node.qname().uri.atom();
     return uri.length == 0 ? null : Token.string(uri);
   }
 
@@ -97,13 +97,13 @@ public final class BXAttr extends BXNode implements Attr {
 
   @Override
   public BXText getFirstChild() {
-    return new BXText(new FTxt(node.str(), node));
+    return new BXText(new FTxt(node.atom(), node));
   }
 
   @Override
   public BXNList getChildNodes() {
     final NodIter nb = new NodIter();
-    nb.add(new FTxt(node.str(), node));
+    nb.add(new FTxt(node.atom(), node));
     return new BXNList(nb);
   }
 }

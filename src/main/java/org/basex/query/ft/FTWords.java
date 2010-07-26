@@ -90,7 +90,7 @@ public final class FTWords extends FTExpr {
       for(int o = 0; o < occ.length; o++) occ[o] = occ[o].comp(ctx);
     }
     query = query.comp(ctx);
-    if(query instanceof Str) txt = ((Str) query).str();
+    if(query instanceof Str) txt = ((Str) query).atom();
     simple = mode == FTMode.M_ANY && txt != null && occ == null;
     fast = ctx.ftfast && occ == null;
     return this;

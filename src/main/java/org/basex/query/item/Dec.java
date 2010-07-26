@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 
 /**
  * Decimal item.
@@ -25,7 +26,7 @@ public final class Dec extends Item {
    */
   public Dec(final byte[] t) {
     super(Type.DEC);
-    val = new BigDecimal(string(trim(t)));
+    val = new BigDecimal(Token.string(trim(t)));
   }
 
   /**
@@ -66,7 +67,7 @@ public final class Dec extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     return chopNumber(token(val.toPlainString()));
   }
 
@@ -143,7 +144,7 @@ public final class Dec extends Item {
   static BigDecimal parse(final byte[] val) throws QueryException {
     if(contains(val, 'e') || contains(val, 'E')) Err.or(FUNCAST, Type.DEC, val);
     try {
-      return new BigDecimal(string(val).trim());
+      return new BigDecimal(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
       ZERO.castErr(val);
       return null;

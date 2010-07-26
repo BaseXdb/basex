@@ -31,8 +31,8 @@ final class FNAcc extends Fun {
         return Itr.get(ctx.size);
       case STRING:
         Item it = e.atomic(ctx);
-        return it == null ? Str.ZERO : it.s() && !it.u() ? it :
-          Str.get(it.str());
+        return it == null ? Str.ZERO : it.str() && !it.unt() ? it :
+          Str.get(it.atom());
       case NUMBER:
         final Iter ir = ctx.iter(e);
         it = ir.next();
@@ -53,16 +53,16 @@ final class FNAcc extends Fun {
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     if(expr.length == 0) return this;
-    final Item it = expr[0].i() ? (Item) expr[0] : null;
+    final Item it = expr[0].item() ? (Item) expr[0] : null;
 
     switch(func) {
       case STRING:
       case NUMBER:
       case STRLEN:
       case NORM:
-        return expr[0].e() || it != null ? atomic(ctx) : this;
+        return expr[0].empty() || it != null ? atomic(ctx) : this;
       case URIQNAME:
-        return expr[0].e() ? Seq.EMPTY : it != null ? atomic(ctx) : this;
+        return expr[0].empty() ? Seq.EMPTY : it != null ? atomic(ctx) : this;
       default:
         return this;
     }
@@ -78,7 +78,8 @@ final class FNAcc extends Fun {
 
     double d = Double.NaN;
     try {
-      if(it.type != Type.URI && (it.s() || it.n() || it.u())) d = it.dbl();
+      if(it.type != Type.URI && (it.str() || it.num() || it.unt()))
+        d = it.dbl();
     } catch(final QueryException ex) { }
 
     return Dbl.get(d);

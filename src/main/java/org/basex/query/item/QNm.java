@@ -91,7 +91,7 @@ public final class QNm extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     return val;
   }
 
@@ -148,7 +148,8 @@ public final class QNm extends Item {
 
   @Override
   public QName toJava() {
-    return new QName(string(uri.str()), string(ln()), string(pref()));
+    return new QName(Token.string(uri.atom()), Token.string(ln()),
+        Token.string(pref()));
   }
 
   @Override
@@ -163,6 +164,6 @@ public final class QNm extends Item {
 
   @Override
   public String toString() {
-    return "\"" + string(val) + "\"";
+    return "\"" + Token.string(val) + "\"";
   }
 }

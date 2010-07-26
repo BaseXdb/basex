@@ -63,7 +63,7 @@ public final class Replace extends Update {
     NodIter list = c.children;
     if(value) {
       // replace value of node
-      final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).str();
+      final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).atom();
       if(type == Type.COM) CComm.check(txt);
       if(type == Type.PI) CPI.check(txt);
 

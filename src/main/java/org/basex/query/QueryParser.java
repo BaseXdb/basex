@@ -254,7 +254,7 @@ public class QueryParser extends InputParser {
     prolog1();
     prolog2();
     if(declColl) {
-      final byte[] coll = ctx.baseURI.resolve(ctx.collation).str();
+      final byte[] coll = ctx.baseURI.resolve(ctx.collation).atom();
       if(!eq(URLCOLL, coll)) error(COLLWHICH, coll);
     }
     return expr();
@@ -710,7 +710,7 @@ public class QueryParser extends InputParser {
     if(!consumeWS2(COMMA)) return e;
     Expr[] list = { e };
     do list = add(list, single()); while(consumeWS2(COMMA));
-    return list.length == 1 ? e : new List(list);
+    return new List(list);
   }
 
   /**
@@ -863,7 +863,7 @@ public class QueryParser extends InputParser {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
-    if(e.e()) return order;
+    if(e.empty()) return order;
     final OrderBy ord = new OrderBy(e, desc, least);
     return order == null ? new OrderBy[] { ord } : Array.add(order, ord);
   }
@@ -1649,7 +1649,7 @@ public class QueryParser extends InputParser {
       if(exprs.length != 0) check(COMMA);
       exprs = add(exprs, single());
     }
-    error(FUNCMISS, name.str());
+    error(FUNCMISS, name.atom());
     return null;
   }
 
@@ -1731,12 +1731,12 @@ public class QueryParser extends InputParser {
 
       if(eq(atn, XMLNS)) {
         if(!simple) error(NSCONS);
-        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).str();
+        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
         if(!open.ns()) open.uri = Uri.uri(v);
         addNS(ns, atn, v);
       } else if(startsWith(atn, XMLNS)) {
         if(!simple) error(NSCONS);
-        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).str();
+        final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
         if(v.length == 0) error(NSEMPTYURI);
         ctx.ns.add(new QNm(atn, Uri.uri(v)));
         addNS(ns, atn, v);
@@ -1761,7 +1761,7 @@ public class QueryParser extends InputParser {
       final byte[] close = qName(NOTAGNAME);
       consumeWSS();
       check('>');
-      if(!eq(open.str(), close)) error(TAGWRONG, open.str(), close);
+      if(!eq(open.atom(), close)) error(TAGWRONG, open.atom(), close);
     }
 
     ctx.ns.size(s);
@@ -2043,7 +2043,7 @@ public class QueryParser extends InputParser {
     final SeqType seq = new SeqType(Type.find(type, false), occ);
 
     if(seq.type == null) {
-      final byte[] uri = type.uri.str();
+      final byte[] uri = type.uri.atom();
       if(uri.length == 0 && type.ns()) error(PREUNKNOWN, type.pref());
       final String ln = string(type.ln());
       error(eq(uri, Type.NOT.uri) && ln.equals(Type.NOT.name) ||
@@ -2065,7 +2065,7 @@ public class QueryParser extends InputParser {
     final boolean par = consumeWS(PAR1);
     if(par) {
       while(!consumeWS(PAR2)) {
-        if(curr() == 0) error(FUNCMISS, type.str());
+        if(curr() == 0) error(FUNCMISS, type.atom());
         tok.add(consume());
       }
     }
@@ -2100,7 +2100,7 @@ public class QueryParser extends InputParser {
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx);
-      if(!eq(test.uri.str(), XSURI)) error(TESTINVALID, t, test);
+      if(!eq(test.uri.atom(), XSURI)) error(TESTINVALID, t, test);
       nm = trim(substring(nm, 0, i));
       final byte[] ln = test.ln();
       if(!eq(ln, ANYTYPE) && !eq(ln, ANYSIMPLE) && !eq(ln, UNTYPED) &&
@@ -2740,8 +2740,61 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void entity(final TokenBuilder tb) throws QueryException {
-    final String ent = ent(tb);
-    if(ent != null) error(ENTINVALID, ent);
+    final int p = qp;
+    if(consume('&')) {
+      if(consume('#')) {
+        final int b = consume('x') ? 16 : 10;
+        long n = 0;
+        do {
+          final char c = curr();
+          final boolean m = digit(c);
+          final boolean h = b == 16 && (c >= 'a' && c <= 'f' ||
+              c >= 'A' && c <= 'F');
+          if(!m && !h) invalidEnt(p);
+          final long nn = n;
+          n = n * b + (consume() & 15);
+          if(n < nn) invalidEnt(p);
+          if(!m) n += 9;
+        } while(!consume(';'));
+        if(!XMLToken.valid(n)) error(INVCHARREF, n);
+        tb.addUTF((int) n);
+      } else {
+        if(consume("lt")) {
+          tb.add('<');
+        } else if(consume("gt")) {
+          tb.add('>');
+        } else if(consume("amp")) {
+          tb.add('&');
+        } else if(consume("quot")) {
+          tb.add('"');
+        } else if(consume("apos")) {
+          tb.add('\'');
+        } else {
+          invalidEnt(p);
+        }
+        if(!consume(';')) invalidEnt(p);
+      }
+      tb.ent = true;
+    } else {
+      char c = consume();
+      if(c == 0x0d) {
+        c = 0x0a;
+        if(curr() == c) consume();
+      }
+      tb.add(c);
+    }
+  }
+
+  /**
+   * Returns the current entity snippet.
+   * @param p start position
+   * @throws QueryException query exception
+   */
+  private void invalidEnt(final int p) throws QueryException {
+    final String sub = qu.substring(p, Math.min(p + 20, ql));
+    final int sc = sub.indexOf(';');
+    final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
+    error(INVENTITY, ent);
   }
 
   /**
@@ -2896,7 +2949,7 @@ public class QueryParser extends InputParser {
     qp = ap;
     if(alter.length != 1) error(alter);
     ctx.fun.funError((QNm) alter[0]);
-    error(FUNCUNKNOWN, ((QNm) alter[0]).str());
+    error(FUNCUNKNOWN, ((QNm) alter[0]).atom());
   }
 
   /**

@@ -47,12 +47,12 @@ public final class FPI extends FNode {
 
   @Override
   public byte[] nname() {
-    return name.str();
+    return name.atom();
   }
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    ser.pi(name.str(), val);
+    ser.pi(name.atom(), val);
   }
 
   @Override
@@ -62,11 +62,11 @@ public final class FPI extends FNode {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.str(), VAL, val);
+    ser.emptyElement(this, NAM, name.atom(), VAL, val);
   }
 
   @Override
   public String toString() {
-    return Main.info("<?% %?>", name.str(), val);
+    return Main.info("<?% %?>", name.atom(), val);
   }
 }

@@ -106,10 +106,11 @@ public final class Err {
   /**
    * Throws a node exception.
    * @param ex expression
+   * @param it item
    * @throws QueryException query exception
    */
-  public static void nodes(final Expr ex) throws QueryException {
-    or(EVALNODES, ex);
+  public static void nodes(final Expr ex, final Item it) throws QueryException {
+    type(ex.info(), Type.NOD, it);
   }
 
   /**

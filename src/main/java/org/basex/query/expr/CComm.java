@@ -39,7 +39,7 @@ public final class CComm extends CFrag {
     Item it;
     while((it = iter.next()) != null) {
       if(more) tb.add(' ');
-      tb.add(it.str());
+      tb.add(it.atom());
       more = true;
     }
     return new FComm(check(tb.finish()), null);

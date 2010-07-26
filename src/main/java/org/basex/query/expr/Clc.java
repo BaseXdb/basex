@@ -36,8 +36,8 @@ public final class Clc extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
 
-    final Expr e = expr[0].i() && expr[1].i() ? atomic(ctx) :
-      expr[0].e() || expr[1].e() ? Seq.EMPTY : this;
+    final Expr e = expr[0].item() && expr[1].item() ? atomic(ctx) :
+      expr[0].empty() || expr[1].empty() ? Seq.EMPTY : this;
 
     if(e != this) ctx.compInfo(OPTPRE, this);
     return e;

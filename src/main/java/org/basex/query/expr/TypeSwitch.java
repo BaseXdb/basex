@@ -42,7 +42,7 @@ public final class TypeSwitch extends Expr {
     for(final TypeCase c : cs) c.comp(ctx);
 
     boolean em = true;
-    for(final TypeCase c : cs) em &= c.e();
+    for(final TypeCase c : cs) em &= c.empty();
     if(em) {
       ctx.compInfo(OPTTRUE);
       return Seq.EMPTY;
@@ -53,7 +53,7 @@ public final class TypeSwitch extends Expr {
     checkUp(ctx, tmp);
 
     // pre-evaluate type switch
-    if(ts.i()) {
+    if(ts.item()) {
       for(int c = 0; c < cs.length; c++) {
         if(cs[c].var.type != null) {
           if(cs[c].var.type.instance(ts.iter(ctx))) {

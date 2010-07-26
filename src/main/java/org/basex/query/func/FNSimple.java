@@ -42,8 +42,8 @@ public final class FNSimple extends Fun {
     switch(func) {
       case FALSE:   return Bln.FALSE;
       case TRUE:    return Bln.TRUE;
-      case EMPTY:   return Bln.get(!e.i() && e.iter(ctx).next() == null);
-      case EXISTS:  return Bln.get(e.i() || e.iter(ctx).next() != null);
+      case EMPTY:   return Bln.get(!e.item() && e.iter(ctx).next() == null);
+      case EXISTS:  return Bln.get(e.item() || e.iter(ctx).next() != null);
       case BOOLEAN: return Bln.get(e.ebv(ctx).bool());
       case NOT:     return Bln.get(!e.ebv(ctx).bool());
       case DEEPEQUAL:
@@ -75,9 +75,9 @@ public final class FNSimple extends Fun {
       case EMPTY:
       case EXISTS:
       case BOOLEAN:
-        return expr[0].e() || expr[0].i() ? atomic(ctx) : this;
+        return expr[0].empty() || expr[0].item() ? atomic(ctx) : this;
       case NOT:
-        if(expr[0].i()) return atomic(ctx);
+        if(expr[0].item()) return atomic(ctx);
         if(expr[0] instanceof Fun) {
           final Fun fs = (Fun) expr[0];
           if(fs.func == FunDef.EMPTY) {
@@ -148,7 +148,7 @@ public final class FNSimple extends Fun {
 
         if(n1.type == Type.ATT || n1.type == Type.PI || n1.type == Type.COM ||
             n1.type == Type.TXT) {
-          if(!Token.eq(n1.str(), n2.str())) return false;
+          if(!Token.eq(n1.atom(), n2.atom())) return false;
           continue;
         }
 
@@ -167,7 +167,7 @@ public final class FNSimple extends Fun {
           boolean found = false;
           while((a2 = att2.next()) != null) {
             if(a1.qname().eq(a2.qname())) {
-              found = Token.eq(a1.str(), a2.str());
+              found = Token.eq(a1.atom(), a2.atom());
               break;
             }
           }

@@ -53,7 +53,7 @@ public final class MixedPath extends Path {
     Expr e = this;
     for(int i = 0; i != step.length; i++) {
       step[i] = step[i].comp(ctx);
-      if(step[i].e()) {
+      if(step[i].empty()) {
         e = step[i];
         break;
       }

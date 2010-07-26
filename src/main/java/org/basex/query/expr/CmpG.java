@@ -119,7 +119,8 @@ public final class CmpG extends Arr {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
     if(expr[0] instanceof AxisPath && expr[1] instanceof AxisPath &&
-        ((AxisPath) expr[0]).root != null || expr[0].i() && !expr[1].i()) {
+        ((AxisPath) expr[0]).root != null || expr[0].item() &&
+        !expr[1].item()) {
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;
@@ -129,9 +130,9 @@ public final class CmpG extends Arr {
     final Expr e2 = expr[1];
 
     Expr e = this;
-    if(e1.i() && e2.i()) {
+    if(e1.item() && e2.item()) {
       e = Bln.get(eval((Item) e1, (Item) e2));
-    } else if(e1.e() || e2.e()) {
+    } else if(e1.empty() || e2.empty()) {
       e = Bln.FALSE;
     }
     if(e != this) {
@@ -149,7 +150,7 @@ public final class CmpG extends Arr {
         }
         if(e != this) ctx.compInfo(OPTWRITE, this);
       } else if(fun.func == FunDef.COUNT) {
-        if(e2.i() && ((Item) e2).n() && ((Item) e2).dbl() == 0) {
+        if(e2.item() && ((Item) e2).num() && ((Item) e2).dbl() == 0) {
           // count(...) CMP 0
           if(cmp == Comp.LT || cmp == Comp.GE) {
             // < 0: always false, >= 0: always true
@@ -187,7 +188,7 @@ public final class CmpG extends Arr {
     final boolean s1 = is1 == 1;
 
     // evaluate single items
-    if(s1 && expr[1].i()) return Bln.get(eval(ir1.next(), (Item) expr[1]));
+    if(s1 && expr[1].item()) return Bln.get(eval(ir1.next(), (Item) expr[1]));
 
     Iter ir2 = ctx.iter(expr[1]);
     final long is2 = ir2.size();
@@ -235,8 +236,8 @@ public final class CmpG extends Arr {
    * @throws QueryException query exception
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
-    if(a.type != b.type && !a.u() && !b.u() && !(a.s() && b.s()) &&
-        !(a.n() && b.n())) Err.cmp(a, b);
+    if(a.type != b.type && !a.unt() && !b.unt() && !(a.str() && b.str()) &&
+        !(a.num() && b.num())) Err.cmp(a, b);
     return cmp.cmp.e(a, b);
   }
 
@@ -256,7 +257,7 @@ public final class CmpG extends Arr {
 
     // support expressions
     final Expr arg = expr[1];
-    if(!(arg.i() || arg instanceof Seq)) {
+    if(!(arg.item() || arg instanceof Seq)) {
       final SeqType ret = arg.returned(ic.ctx);
       // index access not possible if returned type is no string or node,
       // and if expression is dependent on context
@@ -276,7 +277,7 @@ public final class CmpG extends Arr {
       final SeqType ret = it.returned(ic.ctx);
       if(!ret.type.str && !ret.type.node()) return false;
 
-      ic.is += ic.data.nrIDs(new ValuesToken(type, it.str()));
+      ic.is += ic.data.nrIDs(new ValuesToken(type, it.atom()));
       iacc = Array.add(iacc, new IndexAccess(it, type, ic));
     }
     return true;

@@ -71,11 +71,11 @@ final class FNGen extends Fun {
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     if(func == FunDef.DOC)
-      return expr[0].i() ? atomic(ctx) : this;
+      return expr[0].item() ? atomic(ctx) : this;
     if(func == FunDef.COLL)
-      return expr.length != 0 && expr[0].i() ? iter(ctx).finish() : this;
+      return expr.length != 0 && expr[0].item() ? iter(ctx).finish() : this;
     if(func == FunDef.PARSETXT) {
-      return expr[0].i() && (expr.length == 1 || expr[1].i()) ?
+      return expr[0].item() && (expr.length == 1 || expr[1].item()) ?
         atomic(ctx) : this;
     }
     return this;
@@ -239,7 +239,7 @@ final class FNGen extends Fun {
     }
 
     final Prop prop = ctx.context.prop;
-    final IO io = new IOContent(cont, string(base.str()));
+    final IO io = new IOContent(cont, string(base.atom()));
     try {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
@@ -266,7 +266,7 @@ final class FNGen extends Fun {
       while((n = ir.next()) != null) {
         final Nod p = checkNode(n);
         if(tb.size() != 0) tb.add(',');
-        tb.add(p.nname()).add('=').add(p.str());
+        tb.add(p.nname()).add('=').add(p.atom());
       }
     }
     try {
@@ -286,7 +286,7 @@ final class FNGen extends Fun {
    */
   static Item atom(final Item it) {
     return it.node() ? it.type == Type.PI || it.type == Type.COM ?
-        Str.get(it.str()) : new Atm(it.str()) : it;
+        Str.get(it.atom()) : new Atm(it.atom()) : it;
   }
 
   @Override

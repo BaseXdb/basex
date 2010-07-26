@@ -85,7 +85,7 @@ public abstract class UpdatePrimitive {
       if(i.type == Type.TXT) {
         final TokenBuilder tb = new TokenBuilder();
         while(i != null && i.type == Type.TXT) {
-          tb.add(i.str());
+          tb.add(i.atom());
           i = n.next();
         }
         s.add(new FTxt(tb.finish(), null));
@@ -161,22 +161,22 @@ public abstract class UpdatePrimitive {
         return p;
       case Data.ATTR:
         QNm q = nd.qname();
-        byte[] uri = q.uri.str();
+        byte[] uri = q.uri.atom();
         int u = 0;
         boolean ne = uri.length != 0;
         if(ne) {
           if(par == 0) m.ns.add(ms, pre - par, q.pref(), uri);
           u = m.ns.addURI(uri);
         }
-        final int n = m.atts.index(q.str(), null, false);
+        final int n = m.atts.index(q.atom(), null, false);
         // attribute namespace flag is only set in main-memory instance
-        m.attr(ms, pre - par, n, nd.str(), u, ne);
+        m.attr(ms, pre - par, n, nd.atom(), u, ne);
         m.insert(ms);
         return pre + 1;
       case Data.PI:
       case Data.TEXT:
       case Data.COMM:
-        byte[] v = nd.str();
+        byte[] v = nd.atom();
         if(k == Data.PI) v = trim(concat(nd.nname(), SPACE, v));
         m.text(ms, pre - par, v, k);
         m.insert(ms);
@@ -202,9 +202,9 @@ public abstract class UpdatePrimitive {
           m.ns.add(ns.key[a], ns.val[a], ms);
         }
 
-        uri = q.uri.str();
+        uri = q.uri.atom();
         u = uri.length != 0 ? m.ns.addURI(uri) : 0;
-        final int tn = m.tags.index(q.str(), null, false);
+        final int tn = m.tags.index(q.atom(), null, false);
         m.elem(pre - par, tn, size(nd, true), size(nd, false), u, ne);
         m.insert(ms);
         ir = nd.attr();

@@ -35,7 +35,7 @@ public final class Treat extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(!checkUp(expr, ctx).i()) return this;
+    if(!checkUp(expr, ctx).item()) return this;
     ctx.compInfo(OPTPRE, this);
     return atomic(ctx);
   }

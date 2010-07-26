@@ -32,7 +32,7 @@ public final class Union extends Arr {
     super.comp(ctx);
     final int el = expr.length;
     for(int e = 0; e != expr.length; e++) {
-      if(expr[e].e()) expr = Array.delete(expr, e--);
+      if(expr[e].empty()) expr = Array.delete(expr, e--);
     }
     if(el != expr.length) ctx.compInfo(OPTEMPTY);
 
@@ -60,7 +60,7 @@ public final class Union extends Arr {
     for(final Iter ir : iter) {
       Item it;
       while((it = ir.next()) != null) {
-        if(!it.node()) Err.nodes(this);
+        if(!it.node()) Err.nodes(this, it);
         ni.add((Nod) it);
       }
     }
@@ -102,7 +102,7 @@ public final class Union extends Arr {
 
       private void next(final int i) throws QueryException {
         final Item it = iter[i].next();
-        if(it != null && !it.node()) Err.nodes(Union.this);
+        if(it != null && !it.node()) Err.nodes(Union.this, it);
         items[i] = (Nod) it;
       }
     };

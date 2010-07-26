@@ -82,13 +82,13 @@ public final class Constr {
         final QNm name = node.qname();
         final byte[] ln = name.ln();
         final byte[] pre = name.pref();
-        if(eq(pre, XML) && eq(ln, BASE)) base = it.str();
+        if(eq(pre, XML) && eq(ln, BASE)) base = it.atom();
 
         // check for duplicate attribute names
         final QNm qname = node.qname();
         for(int a = 0; a < ats.size(); a++) {
           if(qname.eq(ats.get(a).qname())) {
-            duplAtt = qname.str();
+            duplAtt = qname.atom();
             return false;
           }
         }
@@ -123,7 +123,7 @@ public final class Constr {
       more = false;
     } else {
       if(more && it.type != Type.TXT) text.add(' ');
-      text.add(it.str());
+      text.add(it.atom());
       more = it.type != Type.TXT;
     }
     return true;

@@ -115,21 +115,21 @@ final class FNStr extends Fun {
     // optimize frequently used functions
     switch(func) {
       case UPPER:
-        return e.i() ? Str.get(uc(checkStr(e, ctx))) : this;
+        return e.item() ? Str.get(uc(checkStr(e, ctx))) : this;
       case LOWER:
-        return e.i() ? Str.get(lc(checkStr(e, ctx))) : this;
+        return e.item() ? Str.get(lc(checkStr(e, ctx))) : this;
       case CONCAT:
-        for(final Expr a : expr) if(!a.i()) return this;
+        for(final Expr a : expr) if(!a.item()) return this;
         return concat(ctx);
       case CONTAINS:
         if(expr.length == 2) {
-          final byte[] i = expr[1].i() ? checkStr((Item) expr[1]) : null;
+          final byte[] i = expr[1].item() ? checkStr((Item) expr[1]) : null;
           // empty query string: return true
-          if(expr[1].e() || i != null && i.length == 0) return Bln.TRUE;
+          if(expr[1].empty() || i != null && i.length == 0) return Bln.TRUE;
           // empty input string: return false
-          if(e.e() && i != null && i.length != 0) return Bln.FALSE;
+          if(e.empty() && i != null && i.length != 0) return Bln.FALSE;
           // evaluate items
-          if(e.i() && expr[1].i()) return Bln.get(contains(
+          if(e.item() && expr[1].item()) return Bln.get(contains(
               checkStr(e, ctx), checkStr((Item) expr[1])));
         }
         return this;
@@ -299,7 +299,7 @@ final class FNStr extends Fun {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
       final Item it = a.atomic(ctx);
-      if(it != null) tb.add(it.str());
+      if(it != null) tb.add(it.atom());
     }
     return Str.get(tb.finish());
   }

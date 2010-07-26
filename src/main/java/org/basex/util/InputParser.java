@@ -13,8 +13,6 @@ import org.basex.io.IO;
 public abstract class InputParser {
   /** Parsing exception. */
   private static final String FOUND = ", found \"%\"";
-  /** Parsing exception. */
-  private static final String INVENTITY = "Invalid entity \"%\".";
 
   /** Optional reference to query input. */
   public IO file;
@@ -148,70 +146,6 @@ public abstract class InputParser {
    */
   protected final byte[] found() {
     return curr() == 0 ? EMPTY : Main.inf(FOUND, curr());
-  }
-
-  /**
-   * Parses and convert entities.
-   * @param tb token builder
-   * @return error string or null
-   */
-  protected final String ent(final TokenBuilder tb) {
-    final int p = qp;
-    if(consume('&')) {
-      if(consume('#')) {
-        final int b = consume('x') ? 16 : 10;
-        int n = 0;
-        do {
-          final char c = curr();
-          final boolean m = digit(c);
-          final boolean h = b == 16 && (c >= 'a' && c <= 'f' ||
-              c >= 'A' && c <= 'F');
-          if(!m && !h) return invalidEnt(p);
-          final int nn = n;
-          n = n * b + (consume() & 15);
-          if(n < nn) return invalidEnt(p);
-          if(!m) n += 9;
-        } while(!consume(';'));
-        if(!XMLToken.valid(n)) return invalidEnt(p);
-        tb.addUTF(n);
-      } else {
-        if(consume("lt")) {
-          tb.add('<');
-        } else if(consume("gt")) {
-          tb.add('>');
-        } else if(consume("amp")) {
-          tb.add('&');
-        } else if(consume("quot")) {
-          tb.add('"');
-        } else if(consume("apos")) {
-          tb.add('\'');
-        } else {
-          return invalidEnt(p);
-        }
-        if(!consume(';')) return invalidEnt(p);
-      }
-      tb.ent = true;
-    } else {
-      char c = consume();
-      if(c == 0x0d) {
-        c = 0x0a;
-        if(curr() == c) consume();
-      }
-      tb.add(c);
-    }
-    return null;
-  }
-
-  /**
-   * Returns the current entity snippet.
-   * @param p start position
-   * @return entity
-   */
-  private String invalidEnt(final int p) {
-    final String sub = qu.substring(p, Math.min(p + 20, ql));
-    final int sc = sub.indexOf(';');
-    final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
-    return Main.info(INVENTITY, ent);
   }
 
   /**

@@ -194,6 +194,10 @@ final class CmpR extends Single {
 
   @Override
   public String toString() {
-    return min + (mni ? " <= " : " < ") + expr + (mxi ? " <= " : " < ") + max;
+    final StringBuilder sb = new StringBuilder();
+    if(min != Double.NEGATIVE_INFINITY) sb.append(min + (mni ? " <= " : " < "));
+    sb.append(expr);
+    if(max != Double.POSITIVE_INFINITY) sb.append((mxi ? " <= " : " < ") + max);
+    return sb.toString();
   }
 }

@@ -43,9 +43,10 @@ public final class CPI extends CFrag {
   @Override
   public FPI atomic(final QueryContext ctx) throws QueryException {
     final Item it = checkEmpty(expr[0], ctx);
-    if(!it.u() && !it.s() && it.type != Type.QNM) Err.or(CPIWRONG, it.type, it);
+    if(!it.unt() && !it.str() && it.type != Type.QNM)
+      Err.or(CPIWRONG, it.type, it);
 
-    final byte[] nm = trim(it.str());
+    final byte[] nm = trim(it.atom());
     if(eq(lc(nm), XML)) Err.or(CPIXML, nm);
     if(!XMLToken.isNCName(nm)) Err.or(CPIINVAL, nm);
 

@@ -37,11 +37,9 @@ public final class Let extends ForLet {
   public ForLet comp(final QueryContext ctx) throws QueryException {
     expr = checkUp(expr, ctx).comp(ctx);
 
-    // bind variable if expression uses no var, pos, ctx or fragment
-    if(!score
-        && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx)
-            || expr.uses(Use.CTX, ctx) || expr.uses(Use.FRG, ctx))
-        && !ctx.grouping) {
+    // bind variable if expression uses no var, pos, ctx, or fragment
+    if(!score && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx) ||
+        expr.uses(Use.CTX, ctx) || expr.uses(Use.FRG, ctx)) && !ctx.grouping) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
@@ -88,9 +86,22 @@ public final class Let extends ForLet {
       }
 
       @Override
+      public long size() {
+        return 1;
+      }
+      
+      @Override
+      public Item get(final long i) throws QueryException {
+        reset();
+        return next();
+      }
+
+      @Override
       public boolean reset() {
-        ctx.vars.reset(vs);
-        more = false;
+        if(more) {
+          ctx.vars.reset(vs);
+          more = false;
+        }
         return true;
       }
     };
@@ -108,7 +119,7 @@ public final class Let extends ForLet {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, score ? Token.token(SCORE) : VAR, var.name.str());
+    ser.openElement(this, score ? Token.token(SCORE) : VAR, var.name.atom());
     expr.plan(ser);
     ser.closeElement();
   }

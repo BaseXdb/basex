@@ -66,13 +66,13 @@ public class Str extends Item {
   }
 
   @Override
-  public final byte[] str() {
+  public final byte[] atom() {
     return val;
   }
 
   @Override
   public final boolean bool() {
-    return str().length != 0;
+    return atom().length != 0;
   }
 
   @Override
@@ -92,19 +92,19 @@ public class Str extends Item {
 
   @Override
   public final BigDecimal dec() throws QueryException {
-    return Dec.parse(str());
+    return Dec.parse(atom());
   }
 
   @Override
   @SuppressWarnings("unused")
   public boolean eq(final Item it) throws QueryException {
-    return Token.eq(val, it.str());
+    return Token.eq(val, it.atom());
   }
 
   @Override
   @SuppressWarnings("unused")
   public int diff(final Item it) throws QueryException {
-    return Token.diff(val, it.str());
+    return Token.diff(val, it.atom());
   }
 
   @Override

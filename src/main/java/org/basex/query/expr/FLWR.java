@@ -84,56 +84,89 @@ public final class FLWR extends FLWOR {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter[] iter = new Iter[fl.length];
-    for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
-
+  public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      private Iter ir;
+      private Iter[] iter;
+      private long[] sizes;
+      private Iter rtrn;
       private int p;
 
       @Override
       public Item next() throws QueryException {
+        init();
+
         while(true) {
-          if(ir != null) {
-            final Item i = ir.next();
+          if(rtrn != null) {
+            final Item i = rtrn.next();
             if(i != null) return i;
-            ir = null;
+            rtrn = null;
           } else {
             while(iter[p].next() != null) {
               if(p + 1 != fl.length) {
                 p++;
               } else if(where == null || where.ebv(ctx).bool()) {
-                ir = ctx.iter(ret);
+                rtrn = ctx.iter(ret);
                 break;
               }
             }
-            if(ir == null && p-- == 0) return null;
+            if(rtrn == null && p-- == 0) return null;
           }
         }
       }
 
       @Override
       public long size() throws QueryException {
-        // expected: only one loop, one returned result, and no where clause
-        return iter.length == 1 && where == null && ret.returned(ctx).one() ?
-            iter[0].size() : -1;
+        // expected: a single return item and a missing where clause
+        if(where != null || !ret.returned(ctx).one()) return -1;
+
+        // check if the number of returned items is known for all iterators
+        init();
+        long s = 1;
+        sizes = new long[fl.length];
+        for(int f = 0; f != fl.length; f++) {
+          sizes[f] = iter[f].size();
+          if(sizes[f] == -1) return -1;
+          s *= sizes[f];
+        }
+        return s;
       }
 
       @Override
       public Item get(final long i) throws QueryException {
-        // limited to one loop... iterator is reset after each call
-        iter[0].get(i);
-        final Item it = ret.atomic(ctx);
-        iter[0].reset();
-        return it;
+        // only called for a single return item and a missing where clause
+        long s = 1;
+        for(int f = 1; f != fl.length; f++) s *= sizes[f];
+
+        // calculate variable positions and call iterators
+        long o = i;
+        for(int f = 0; f != fl.length; f++) {
+          if(f != 0) s /= sizes[f];
+          final long n = o / s;
+          iter[f].get(n);
+          o -= n * s;
+        }
+        return ret.atomic(ctx);
       }
 
       @Override
       public boolean reset() {
-        // limited to one loop...
-        for(final Iter i : iter) i.reset();
-        return false;
+        if(iter != null) {
+          for(final Iter i : iter) i.reset();
+          sizes = null;
+          iter = null;
+          rtrn = null;
+          p = 0;
+        }
+        return true;
+      }
+
+      /**
+       * Initializes the iterator.
+       */
+      private void init() throws QueryException {
+        if(iter != null) return;
+        iter = new Iter[fl.length];
+        for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
       }
     };
   }

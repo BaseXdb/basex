@@ -53,38 +53,39 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     return val;
   }
 
   @Override
   public final long itr() throws QueryException {
-    return Itr.parse(str());
+    return Itr.parse(atom());
   }
 
   @Override
   public final float flt() throws QueryException {
-    return Flt.parse(str());
+    return Flt.parse(atom());
   }
 
   @Override
   public final BigDecimal dec() throws QueryException {
-    return Dec.parse(str());
+    return Dec.parse(atom());
   }
 
   @Override
   public final double dbl() throws QueryException {
-    return Dbl.parse(str());
+    return Dbl.parse(atom());
   }
 
   @Override
   public final boolean eq(final Item i) throws QueryException {
-    return i.type == Type.BLN || i.n() ? i.eq(this) : Token.eq(str(), i.str());
+    return i.type == Type.BLN || i.num() ? i.eq(this) :
+      Token.eq(atom(), i.atom());
   }
 
   @Override
   public final int diff(final Item i) throws QueryException {
-    return i.n() ? -i.diff(this) : Token.diff(str(), i.str());
+    return i.num() ? -i.diff(this) : Token.diff(atom(), i.atom());
   }
 
   /**

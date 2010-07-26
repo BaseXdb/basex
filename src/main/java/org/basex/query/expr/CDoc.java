@@ -63,7 +63,7 @@ public final class CDoc extends CFrag {
         more = false;
       } else {
         if(more && text.size() != 0 && it.type != Type.TXT) text.add(' ');
-        text.add(it.str());
+        text.add(it.atom());
         more = it.type != Type.TXT;
       }
     }

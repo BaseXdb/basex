@@ -57,8 +57,8 @@ final class FNBaseX extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    return func == FunDef.DB && expr[0].i() &&
-      (expr.length == 1 || expr[1].i()) ? db(ctx) : this;
+    return func == FunDef.DB && expr[0].item() &&
+      (expr.length == 1 || expr[1].item()) ? db(ctx) : this;
   }
 
   /**

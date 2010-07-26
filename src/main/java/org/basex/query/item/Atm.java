@@ -20,11 +20,11 @@ public final class Atm extends Str {
 
   @Override
   public boolean eq(final Item it) throws QueryException {
-    return it.type != type ? it.eq(this) : Token.eq(val, it.str());
+    return it.type != type ? it.eq(this) : Token.eq(val, it.atom());
   }
 
   @Override
   public int diff(final Item it) throws QueryException {
-    return it.type != type ? -it.diff(this) : Token.diff(val, it.str());
+    return it.type != type ? -it.diff(this) : Token.diff(val, it.atom());
   }
 }

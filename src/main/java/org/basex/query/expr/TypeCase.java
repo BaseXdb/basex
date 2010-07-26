@@ -91,7 +91,8 @@ public final class TypeCase extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, VAR, var.name != null ? var.name.str() : Token.EMPTY);
+    ser.openElement(this, VAR, var.name != null ? var.name.atom() :
+      Token.EMPTY);
     expr.plan(ser);
     ser.closeElement();
   }

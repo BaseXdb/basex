@@ -24,43 +24,43 @@ public final class Jav extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     return Token.token(val.toString());
   }
 
   @Override
   public boolean bool() {
-    return str().length != 0;
+    return atom().length != 0;
   }
 
   @Override
   public long itr() throws QueryException {
-    return Itr.parse(str());
+    return Itr.parse(atom());
   }
 
   @Override
   public float flt() throws QueryException {
-    return Flt.parse(str());
+    return Flt.parse(atom());
   }
 
   @Override
   public double dbl() throws QueryException {
-    return Dbl.parse(str());
+    return Dbl.parse(atom());
   }
 
   @Override
   public BigDecimal dec() throws QueryException {
-    return Dec.parse(str());
+    return Dec.parse(atom());
   }
 
   @Override
   public boolean eq(final Item it) {
-    return Token.eq(str(), it.str());
+    return Token.eq(atom(), it.atom());
   }
 
   @Override
   public int diff(final Item it) {
-    return Token.diff(str(), it.str());
+    return Token.diff(atom(), it.atom());
   }
 
   @Override

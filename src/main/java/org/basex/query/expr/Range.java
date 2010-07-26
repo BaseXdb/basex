@@ -32,7 +32,7 @@ public final class Range extends Arr {
     super.comp(ctx);
 
     Expr e = this;
-    if(expr[0].e() || expr[1].e()) {
+    if(expr[0].empty() || expr[1].empty()) {
       e = Seq.EMPTY;
     } else {
       final long[] v = range(ctx);
@@ -51,7 +51,7 @@ public final class Range extends Arr {
 
   @Override
   public long size(final QueryContext ctx) throws QueryException {
-    if(expr[0].i() && expr[1].i()) {
+    if(expr[0].item() && expr[1].item()) {
       final long[] v = rng(ctx);
       if(v[1] >= v[0]) return v[1] - v[0] + 1;
     }
@@ -66,7 +66,7 @@ public final class Range extends Arr {
    * @throws QueryException query exception
    */
   long[] range(final QueryContext ctx) throws QueryException {
-    return expr[0].i() && expr[1].i() ? rng(ctx) : null;
+    return expr[0].item() && expr[1].item() ? rng(ctx) : null;
   }
 
   /**

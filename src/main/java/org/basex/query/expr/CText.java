@@ -35,7 +35,7 @@ public final class CText extends CFrag {
     boolean more = false;
     do {
       if(more) tb.add(' ');
-      tb.add(it.str());
+      tb.add(it.atom());
       more = true;
     } while((it = iter.next()) != null);
 
@@ -54,7 +54,7 @@ public final class CText extends CFrag {
     Item it = null;
     while((it = iter.next()) != null) {
       if(more) tb.add(' ');
-      tb.add(it.str());
+      tb.add(it.atom());
       more = true;
     }
   }

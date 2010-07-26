@@ -32,10 +32,10 @@ public final class If extends Arr {
     checkUp(ctx, new Expr[] { expr[1], expr[2] });
 
     Expr e = this;
-    if(checkUp(expr[0], ctx).i()) {
+    if(checkUp(expr[0], ctx).item()) {
       // static result: return then or else branch
       e = expr[((Item) expr[0]).bool() ? 1 : 2];
-    } else if(expr[1].e() && expr[2].e()) {
+    } else if(expr[1].empty() && expr[2].empty()) {
       // both branches are empty
       e = Seq.EMPTY;
     }

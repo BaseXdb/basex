@@ -72,7 +72,7 @@ public abstract class Fun extends Arr {
       throws QueryException {
 
     final Item it = checkEmpty(e, ctx);
-    if(!it.s() || !Token.eq(URLCOLL, it.str())) Err.or(IMPLCOL, e);
+    if(!it.str() || !Token.eq(URLCOLL, it.atom())) Err.or(IMPLCOL, e);
   }
 
   @Override

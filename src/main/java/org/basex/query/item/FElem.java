@@ -199,7 +199,7 @@ public final class FElem extends FNode {
 
   @Override
   public byte[] nname() {
-    return name.str();
+    return name.atom();
   }
 
   @Override
@@ -209,8 +209,8 @@ public final class FElem extends FNode {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    final byte[] tag = name.str();
-    final byte[] uri = name.uri.str();
+    final byte[] tag = name.atom();
+    final byte[] uri = name.uri.atom();
     ser.openElement(tag);
 
     // remember top level namespace
@@ -259,13 +259,13 @@ public final class FElem extends FNode {
       final Nod nod = atts.get(n);
       final QNm atn = nod.qname();
       if(atn.ns()) {
-        if(!NSGlobal.standard(atn.uri.str())) {
+        if(!NSGlobal.standard(atn.uri.atom())) {
           final byte[] pre = atn.pref();
           final int i = ser.ns.get(pre);
-          if(i == -1) ser.namespace(pre, atn.uri.str());
+          if(i == -1) ser.namespace(pre, atn.uri.atom());
         }
       }
-      ser.attribute(atn.str(), nod.str());
+      ser.attribute(atn.atom(), nod.atom());
     }
 
     // serialize children
@@ -295,13 +295,13 @@ public final class FElem extends FNode {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, name.str());
+    ser.emptyElement(this, NAM, name.atom());
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("<");
-    sb.append(string(name.str()));
+    sb.append(Token.string(name.atom()));
     if(atts.size() != 0 || ns != null && ns.size != 0 || children.size() != 0)
       sb.append(" ...");
     return sb.append("/>").toString();

@@ -55,7 +55,7 @@ public class Pred extends Preds {
     ctx.item = tmp;
     if(e != this) return e;
 
-    if(root.e()) {
+    if(root.empty()) {
       ctx.compInfo(OPTPRE, this);
       return Seq.EMPTY;
     }
@@ -151,8 +151,8 @@ public class Pred extends Preds {
 
   @Override
   public final String toString() {
-    final StringBuilder sb = new StringBuilder("(" + root.toString());
-    sb.append(")" + super.toString());
-    return sb.toString();
+    final StringBuilder sb = new StringBuilder();
+    sb.append(root instanceof Seq ? root : "(" + root + ")");
+    return sb.append(super.toString()).toString();
   }
 }

@@ -47,9 +47,9 @@ final class FNQName extends Fun {
         return it == null ? null : resolve(ctx, it, it2);
       case QNAME:
         final Uri uri = Uri.uri(it == null ? EMPTY :
-          checkType(it, Type.STR).str());
+          checkType(it, Type.STR).atom());
         final Item it3 = it2 == null ? Str.ZERO : checkType(it2, Type.STR);
-        final byte[] str = it3.str();
+        final byte[] str = it3.atom();
         if(!XMLToken.isQName(str)) Err.value(Type.QNM, it3);
         QNm nm = new QNm(str, uri);
         if(nm.ns() && uri == Uri.EMPTY) Err.value(Type.URI, uri);

@@ -88,9 +88,9 @@ public final class NameTest extends Test {
   @Override
   public String toString() {
     if(kind == Kind.ALL) return "*";
-    if(kind == Kind.NAME) return "*:" + string(name.str());
+    if(kind == Kind.NAME) return "*:" + string(name.atom());
     final String uri = name.uri == Uri.EMPTY || name.ns() ? "" :
-      "{" + string(name.uri.str()) + "}";
-    return uri + (kind == Kind.NS ? "*" : string(name.str()));
+      "{" + string(name.uri.atom()) + "}";
+    return uri + (kind == Kind.NS ? "*" : string(name.atom()));
   }
 }

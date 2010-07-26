@@ -30,8 +30,8 @@ public enum Calc {
   PLUS("+") {
     @Override
     public Item ev(final Item a, final Item b) throws QueryException {
-      final boolean t1 = a.u() || a.n();
-      final boolean t2 = b.u() || b.n();
+      final boolean t1 = a.unt() || a.num();
+      final boolean t2 = b.unt() || b.num();
       if(t1 ^ t2) errNum(!t1 ? a : b);
       if(t1 && t2) {
         final Type t = type(a, b);
@@ -47,7 +47,7 @@ public enum Calc {
       }
 
       if(a.type == b.type) {
-        if(!a.d()) errNum(!t1 ? a : b);
+        if(!a.dur()) errNum(!t1 ? a : b);
         if(a.type == Type.YMD) return new YMd((YMd) a, (YMd) b, true);
         if(a.type == Type.DTD) return new DTd((DTd) a, (DTd) b, true);
       }
@@ -72,8 +72,8 @@ public enum Calc {
   MINUS("-") {
     @Override
     public Item ev(final Item a, final Item b) throws QueryException {
-      final boolean t1 = a.u() || a.n();
-      final boolean t2 = b.u() || b.n();
+      final boolean t1 = a.unt() || a.num();
+      final boolean t2 = b.unt() || b.num();
       if(t1 ^ t2) errNum(!t1 ? a : b);
       if(t1 && t2) {
         final Type t = type(a, b);
@@ -111,24 +111,24 @@ public enum Calc {
     @Override
     public Item ev(final Item a, final Item b) throws QueryException {
       if(a.type == Type.YMD) {
-        if(!b.n()) errNum(b);
+        if(!b.num()) errNum(b);
         return new YMd((Dur) a, b.dbl(), true);
       }
       if(b.type == Type.YMD) {
-        if(!a.n()) errNum(a);
+        if(!a.num()) errNum(a);
         return new YMd((Dur) b, a.dbl(), true);
       }
       if(a.type == Type.DTD) {
-        if(!b.n()) errNum(b);
+        if(!b.num()) errNum(b);
         return new DTd((Dur) a, b.dbl(), true);
       }
       if(b.type == Type.DTD) {
-        if(!a.n()) errNum(a);
+        if(!a.num()) errNum(a);
         return new DTd((Dur) b, a.dbl(), true);
       }
 
-      final boolean t1 = a.u() || a.n();
-      final boolean t2 = b.u() || b.n();
+      final boolean t1 = a.unt() || a.num();
+      final boolean t2 = b.unt() || b.num();
       if(t1 ^ t2) errType(a.type, b);
       if(t1 && t2) {
         final Type t = type(a, b);
@@ -166,11 +166,11 @@ public enum Calc {
         }
       }
       if(a.type == Type.YMD) {
-        if(!b.n()) errNum(b);
+        if(!b.num()) errNum(b);
         return new YMd((Dur) a, b.dbl(), false);
       }
       if(a.type == Type.DTD) {
-        if(!b.n()) errNum(b);
+        if(!b.num()) errNum(b);
         return new DTd((Dur) a, b.dbl(), false);
       }
 
@@ -252,7 +252,7 @@ public enum Calc {
    * @return type
    */
   static final Type type(final Item a, final Item b) {
-    if(a.type == DBL || b.type == DBL || a.u() || b.u()) return DBL;
+    if(a.type == DBL || b.type == DBL || a.unt() || b.unt()) return DBL;
     if(a.type == FLT || b.type == FLT) return FLT;
     if(a.type == DEC || b.type == DEC) return DEC;
     return ITR;
@@ -284,7 +284,7 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final Dur checkDur(final Item it) throws QueryException {
-    if(!it.d()) Err.or(XPDUR, info(), it.type);
+    if(!it.dur()) Err.or(XPDUR, info(), it.type);
     return (Dur) it;
   }
 
@@ -295,8 +295,8 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final void checkNum(final Item a, final Item b) throws QueryException {
-    if(!a.u() && !a.n()) errNum(a);
-    if(!b.u() && !b.n()) errNum(b);
+    if(!a.unt() && !a.num()) errNum(a);
+    if(!b.unt() && !b.num()) errNum(b);
   }
 
   /**

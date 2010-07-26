@@ -15,7 +15,7 @@ final class IterPred extends Pred {
   /** Flag is set to true if predicate has last function. */
   final boolean last;
   /** Optional position predicate. */
-  final Pos pos;
+  Pos pos;
 
   /**
    * Constructor.
@@ -47,8 +47,8 @@ final class IterPred extends Pred {
           iter = ctx.iter(root);
           p = 1;
 
-          // iterator size is known - items can be directly accessed
           if(pos != null || last) {
+            // items can be directly accessed if iterator size is known
             final long s = iter.size();
             if(s == 0) return null;
             if(s != -1) {
@@ -88,6 +88,7 @@ final class IterPred extends Pred {
 
         // check if more items are to be expected
         finish = last || pos != null && pos.last(ctx);
+        if(finish && direct) iter.reset();
 
         // reset context
         ctx.item = ci;

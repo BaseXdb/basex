@@ -49,6 +49,8 @@ public interface QueryText {
   Object[] DIVZERO = { FOAR, 1, "'%' was divided by zero." };
   /** FOAR0002: Evaluation exception. */
   Object[] DIVFLOW = { FOAR, 2, "Invalid division result: % / %." };
+  /** FOAR0002: Parsing exception. */
+  Object[] BOUNDS = { FOAR, 2, "Integer value % out of bounds." };
   /** FOAR0002: Evaluation exception. */
   Object[] RANGE = { FOAR, 2, "Value out of range: %" };
 
@@ -139,7 +141,7 @@ public interface QueryText {
   /** FORG0006: Evaluation exception. */
   Object[] CONDTYPE = { FORG, 6, "% not allowed as condition type." };
   /** FORG0006: Evaluation exception. */
-  Object[] FUNNUMDUR = { FORG, 6, "%: number or duration expected, % found." };
+  Object[] SUMTYPE = { FORG, 6, "%: % not allowed as input type." };
   /** FORG0006: Evaluation exception. */
   Object[] FUNNUM = { FORG, 6, "%: number expected, % found." };
   /** FORG0006: Evaluation exception. */
@@ -233,7 +235,7 @@ public interface QueryText {
   /** XPST0003: Parsing exception. */
   Object[] WRONGEND = { XPST, 3, "Expecting \"%\"." };
   /** XPST0003: Parsing exception. */
-  Object[] ENTINVALID = { XPST, 3, "%" };
+  Object[] INVENTITY = { XPST, 3, "Invalid entity \"%\"." };
   /** XPST0003: Parsing exception. */
   Object[] INCOMPLETE = { XPST, 3, "Incomplete expression." };
   /** XPST0003: Evaluation exception. */
@@ -320,8 +322,6 @@ public interface QueryText {
   Object[] EMPTYSEQOCC = { XPST, 3, "No occurrence indicator defined for %." };
   /** XPST0003: Parsing exception. */
   Object[] TESTINVALID = { XPST, 3, "Invalid % test: %." };
-  /** XPST0003: Parsing exception. */
-  Object[] BOUNDS = { XPST, 3, "Integer value % out of bounds." };
   /** XPQST0003: Evaluation exception. */
   Object[] QNAMEINV = { XPST, 3, "Invalid QName." };
 
@@ -386,6 +386,8 @@ public interface QueryText {
   Object[] CPIWRONG = { XPTY, 4, "% not allowed as PI name: \"%\"." };
   /** XPTY0004: Typing exception. */
   Object[] NAMEWRONG = { XPTY, 4, "Invalid QName: \"%\"." };
+  /** XPTY0004: Typing exception. */
+  Object[] XPNODES = { XPTY, 19, "%: nodes expected, % found." };
 
   /** Example for a Date format. */
   String XDATE = "2000-12-31";
@@ -518,6 +520,8 @@ public interface QueryText {
   Object[] NSMODURI = { XQST, 88, "Module namespace can't be empty." };
   /** XQST0089: Parsing exception. */
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
+  /** XQST0090: Parsing exception. */
+  Object[] INVCHARREF = { XQST, 90, "Invalid character reference \"&#%;\"." };
   /** [MS] XPST0008: Parsing exception. */
   Object[] GVARNOTDEFINED = { XQST, 94, "Undefined grouping variable \"%\"." };
   /** XQST0108: Parsing exception. */

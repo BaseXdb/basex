@@ -42,12 +42,12 @@ public final class BXElem extends BXNode implements Element {
   @Override
   public String getAttribute(final String name) {
     final Nod n = attribute(name);
-    return n != null ? Token.string(n.str()) : "";
+    return n != null ? Token.string(n.atom()) : "";
   }
 
   @Override
   public String getNamespaceURI() {
-    final byte[] uri = node.qname().uri.str();
+    final byte[] uri = node.qname().uri.atom();
     return uri.length == 0 ? null : Token.string(uri);
   }
 

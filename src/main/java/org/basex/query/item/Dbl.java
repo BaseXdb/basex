@@ -50,7 +50,7 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     return Token.token(val);
   }
 

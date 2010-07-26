@@ -56,14 +56,14 @@ public final class Functions extends ExprInfo {
       throws QueryException {
 
     // find function
-    final byte[] uri = name.uri.str();
+    final byte[] uri = name.uri.atom();
     final byte[] ln = name.ln();
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
       final SeqType seq = new SeqType(Type.find(name, false), SeqType.Occ.ZO);
       if(seq.type == null) typeErr(name);
-      if(args.length != 1) Err.or(FUNCTYPE, name.str());
+      if(args.length != 1) Err.or(FUNCTYPE, name.atom());
       return new Cast(args[0], seq);
     }
 
@@ -105,7 +105,7 @@ public final class Functions extends ExprInfo {
     // find local function
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
-      if(eq(ln, qn.ln()) && eq(uri, qn.uri.str()) &&
+      if(eq(ln, qn.ln()) && eq(uri, qn.uri.atom()) &&
           args.length == func[l].args.length) return new FunCall(qn, l, args);
     }
 
@@ -128,7 +128,7 @@ public final class Functions extends ExprInfo {
       if(t.par != null && ls.similar(lc(ln), lc(token(t.name)), 0))
         Err.or(FUNSIMILAR, ln, t.name);
     }
-    Err.or(FUNCUNKNOWN, type.str());
+    Err.or(FUNCUNKNOWN, type.atom());
   }
 
   /**
@@ -140,18 +140,18 @@ public final class Functions extends ExprInfo {
   public int add(final Func fun) throws QueryException {
     final QNm name = fun.var.name;
 
-    final byte[] uri = name.uri.str();
-    if(uri.length == 0) Err.or(FUNNONS, name.str());
+    final byte[] uri = name.uri.atom();
+    if(uri.length == 0) Err.or(FUNNONS, name.atom());
 
     if(NSGlobal.standard(uri)) {
-      if(fun.decl) Err.or(NAMERES, name.str());
+      if(fun.decl) Err.or(NAMERES, name.atom());
       else funError(fun.var.name);
     }
 
     final byte[] ln = name.ln();
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
-      final byte[] u = qn.uri.str();
+      final byte[] u = qn.uri.atom();
       final byte[] nm = qn.ln();
 
       if(eq(ln, nm) && eq(uri, u) &&
@@ -184,7 +184,7 @@ public final class Functions extends ExprInfo {
    */
   public void check() throws QueryException {
     for(int i = 0; i < size; i++) {
-      if(!func[i].decl) Err.or(FUNCUNKNOWN, func[i].var.name.str());
+      if(!func[i].decl) Err.or(FUNCUNKNOWN, func[i].var.name.atom());
     }
   }
 
@@ -202,7 +202,7 @@ public final class Functions extends ExprInfo {
     final Levenshtein ls = new Levenshtein();
     for(int n = 0; n < size; n++) {
       if(ls.similar(nm, lc(func[n].var.name.ln()), 0))
-        Err.or(FUNSIMILAR, name.str(), func[n].var.name.str());
+        Err.or(FUNSIMILAR, name.atom(), func[n].var.name.atom());
     }
   }
 

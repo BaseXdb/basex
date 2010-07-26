@@ -85,20 +85,10 @@ public final class For extends ForLet {
       @Override
       public Item next() throws QueryException {
         init();
-
         final Item it = ir.next();
         if(it != null) return bind(it, ++c);
         reset();
         return null;
-      }
-
-      @Override
-      public boolean reset() {
-        ctx.vars.reset(vs);
-        if(ir != null) ir.reset();
-        ir = null;
-        c = 0;
-        return true;
       }
 
       @Override
@@ -110,6 +100,17 @@ public final class For extends ForLet {
       public Item get(final long i) throws QueryException {
         init();
         return bind(ir.get(i), i + 1);
+      }
+
+      @Override
+      public boolean reset() {
+        if(ir != null) {
+          ctx.vars.reset(vs);
+          ir.reset();
+          ir = null;
+          c = 0;
+        }
+        return true;
       }
 
       /**
@@ -165,9 +166,9 @@ public final class For extends ForLet {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, VAR, var.name.str());
-    if(pos != null) ser.attribute(POS, pos.name.str());
-    if(score != null) ser.attribute(Token.token(SCORE), score.name.str());
+    ser.openElement(this, VAR, var.name.atom());
+    if(pos != null) ser.attribute(POS, pos.name.atom());
+    if(score != null) ser.attribute(Token.token(SCORE), score.name.atom());
     expr.plan(ser);
     ser.closeElement();
   }

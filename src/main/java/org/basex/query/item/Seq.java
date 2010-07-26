@@ -69,7 +69,7 @@ public class Seq extends Item {
   }
 
   @Override
-  public final boolean i() {
+  public final boolean item() {
     return false;
   }
 
@@ -130,7 +130,7 @@ public class Seq extends Item {
 
   @Override
   public SeqType returned(final QueryContext ctx) {
-    Type t = size > 32 ? Type.ITEM : val[0].type;
+    Type t = size > 128 ? Type.ITEM : val[0].type;
     for(int s = 1; s < size && t != Type.ITEM; s++) {
       if(t != val[s].type) t = Type.ITEM;
     }

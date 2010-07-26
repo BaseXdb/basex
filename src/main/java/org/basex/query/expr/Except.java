@@ -34,9 +34,9 @@ public final class Except extends Arr {
     super.comp(ctx);
     final int el = expr.length;
     for(int e = 1; e < expr.length; e++) {
-      if(expr[e].e()) expr = Array.delete(expr, e--);
+      if(expr[e].empty()) expr = Array.delete(expr, e--);
     }
-    final boolean em = expr[0].e();
+    final boolean em = expr[0].empty();
     if(el != expr.length || em) ctx.compInfo(OPTEMPTY);
     return em ? Seq.EMPTY : this;
   }
@@ -89,7 +89,7 @@ public final class Except extends Arr {
 
       private void next(final int i) throws QueryException {
         final Item it = iter[i].next();
-        if(it != null && !it.node()) Err.nodes(Except.this);
+        if(it != null && !it.node()) Err.nodes(Except.this, it);
         items[i] = (Nod) it;
       }
     };
@@ -106,14 +106,14 @@ public final class Except extends Arr {
 
     Item it;
     while((it = iter[0].next()) != null) {
-      if(!it.node()) Err.nodes(this);
+      if(!it.node()) Err.nodes(this, it);
       ni.add((Nod) it);
     }
 
     for(int e = 1; e != expr.length; e++) {
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
-        if(!it.node()) Err.nodes(this);
+        if(!it.node()) Err.nodes(this, it);
         final Nod node = (Nod) it;
         for(int s = 0; s < ni.size(); s++) {
           if(ni.get(s).is(node)) ni.delete(s--);

@@ -194,7 +194,7 @@ public abstract class BXNode implements Node {
 
   @Override
   public final String getTextContent() {
-    return string(node.str());
+    return string(node.atom());
   }
 
   @Override

@@ -31,9 +31,10 @@ public abstract class Iter {
   public abstract Item next() throws QueryException;
 
   /**
-   * Returns the specified item. This method needs to be implemented if
-   * {@link #size} returns the number of results, i.e., does not return
-   * {@code -1}.
+   * Returns the specified item. This method needs to be implemented - and
+   * should only be called - if {@link #size} returns the correct number of
+   * results. A calling method should call {@link #reset} after the last items
+   * has been retrieved.
    * @param i value offset
    * @return specified item
    * @throws QueryException query exception
@@ -44,10 +45,9 @@ public abstract class Iter {
   }
 
   /**
-   * Returns the number of entries. Note: {@code -1} is returned if the
-   * number is unknown, so the returned value has to be checked.
-   * If this method is implemented by an iterator, {@link #get} needs to be
-   * implemented as well.
+   * Returns the iterator size. Note: {@code -1} is returned if the
+   * result size is unknown. If this method is implemented by an iterator,
+   * {@link #get} needs to be implemented as well.
    * @return number of entries
    * @throws QueryException query exception
    */
@@ -58,7 +58,7 @@ public abstract class Iter {
 
   /**
    * Resets the iterator and returns {@code true} if operation was successful.
-   * {@code false} is returned if the iterator cannot be reversed.
+   * {@code false} is returned if the iterator cannot be reset.
    * @return true if operator could be reset
    */
   public boolean reset() {

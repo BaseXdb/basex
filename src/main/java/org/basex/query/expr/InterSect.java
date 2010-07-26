@@ -32,7 +32,7 @@ public final class InterSect extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     for(final Expr e : expr) {
-      if(!e.e()) continue;
+      if(!e.empty()) continue;
       ctx.compInfo(OPTSIMPLE, this, e);
       return Seq.EMPTY;
     }
@@ -57,7 +57,7 @@ public final class InterSect extends Arr {
 
     Item it;
     while((it = iter[0].next()) != null) {
-      if(!it.node()) Err.nodes(this);
+      if(!it.node()) Err.nodes(this, it);
       ni.add((Nod) it);
     }
     final boolean db = ni.dbnodes();
@@ -66,7 +66,7 @@ public final class InterSect extends Arr {
       final NodIter res = new NodIter(true);
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
-        if(!it.node()) Err.nodes(this);
+        if(!it.node()) Err.nodes(this, it);
         final Nod node = (Nod) it;
 
         if(db && node instanceof DBNode) {
@@ -114,7 +114,7 @@ public final class InterSect extends Arr {
       private boolean next(final int i) throws QueryException {
         final Item it = iter[i].next();
         if(it == null) return false;
-        if(!it.node()) Err.nodes(InterSect.this);
+        if(!it.node()) Err.nodes(InterSect.this, it);
         items[i] = (Nod) it;
         return true;
       }

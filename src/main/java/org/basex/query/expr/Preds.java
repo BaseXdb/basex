@@ -45,7 +45,7 @@ public abstract class Preds extends Expr {
       Expr ex = pred[p].comp(ctx);
       ex = Pos.get(ex, CmpV.Comp.EQ, ex);
 
-      if(ex.i()) {
+      if(ex.item()) {
         if(!((Item) ex).bool()) {
           ctx.compInfo(OPTFALSE, ex);
           e = Seq.EMPTY;

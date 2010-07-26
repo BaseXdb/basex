@@ -211,8 +211,9 @@ public final class IOFile extends IO {
         file = URLDecoder.decode(file, Prop.ENCODING);
       } catch(final Exception ex) { /* ignored. */ }
     }
-    final String fn = file.startsWith(PREFILE) ?
+    String fn = file.startsWith(PREFILE) ?
         file.substring(PREFILE.length()) : file;
+    while(fn.startsWith("//")) fn = fn.substring(1);
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
   }

@@ -79,7 +79,7 @@ public final class FunCall extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, name.str());
+    ser.openElement(this, NAM, name.atom());
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }

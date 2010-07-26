@@ -62,6 +62,8 @@ public final class QueryContext extends Progress {
 
   /** Database context. */
   public final Context context;
+  /** Query string. */
+  public String query;
 
   /** Cached stop word files. */
   public HashMap<String, String> stop;
@@ -182,6 +184,7 @@ public final class QueryContext extends Progress {
    */
   public void parse(final String q) throws QueryException {
     root = new QueryParser(this).parse(q, file(), null);
+    query = q;
   }
 
   /**
@@ -552,7 +555,7 @@ public final class QueryContext extends Progress {
    * @return IO reference
    */
   IO file() {
-    return baseURI != Uri.EMPTY ? IO.get(string(baseURI.str())) : null;
+    return baseURI != Uri.EMPTY ? IO.get(string(baseURI.atom())) : null;
   }
 
   /**

@@ -68,7 +68,7 @@ public final class CElem extends CFrag {
     addNS(ctx);
 
     final QNm tname = CAttr.name(ctx, it);
-    final byte[] uri = tname.uri.str();
+    final byte[] uri = tname.uri.atom();
     if(uri.length != 0) {
       final byte[] key = tname.pref();
       if(!eq(key, XML)) {

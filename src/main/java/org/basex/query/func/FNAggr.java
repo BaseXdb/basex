@@ -57,7 +57,7 @@ final class FNAggr extends Fun {
       case MIN:
       case MAX:
       case AVG:
-        return expr[0].e() ? Seq.EMPTY : this;
+        return expr[0].empty() ? Seq.EMPTY : this;
       default:
         return this;
     }
@@ -74,14 +74,15 @@ final class FNAggr extends Fun {
   private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
 
-    Item res = it.u() ? Dbl.get(it.str()) : it;
-    if(!res.n() && !res.d()) Err.or(FUNNUMDUR, this, res.type);
-    final boolean n = res.n();
+    Item res = it.unt() ? Dbl.get(it.atom()) : it;
+    if(!res.num() && (!res.dur() || res.type == Type.DUR))
+      Err.or(SUMTYPE, this, res.type);
+    final boolean n = res.num();
 
     int c = 1;
     Item i;
     while((i = iter.next()) != null) {
-      final boolean un = i.u() || i.n();
+      final boolean un = i.unt() || i.num();
       if(n && !un) Err.or(FUNNUM, this, i.type);
       if(!n && un) Err.or(FUNDUR, this, i.type);
       res = Calc.PLUS.ev(res, i);
@@ -107,17 +108,16 @@ final class FNAggr extends Fun {
     if(res == null) return null;
 
     cmp.e(res, res);
-    if(!res.u() && res.s() || res instanceof Date)
+    if(!res.unt() && res.str() || res instanceof Date)
       return evalStr(iter1, res, cmp);
 
-    Type t = res.u() ? DBL : res.type;
+    Type t = res.unt() ? DBL : res.type;
     if(res.type != t) res = t.e(res, ctx);
 
     Item it;
     while((it = iter1.next()) != null) {
       t = type(res, it);
-      final double d = it.dbl();
-      if(d != d || cmp.e(res, it)) res = it;
+      if(!it.dur() && Double.isNaN(it.dbl()) || cmp.e(res, it)) res = it;
       if(res.type != t) res = t.e(res, ctx);
     }
     return res;
@@ -131,18 +131,18 @@ final class FNAggr extends Fun {
    * @throws QueryException query exception
    */
   private Type type(final Item a, final Item b) throws QueryException {
-    if(b.u()) {
-      if(!a.n()) Err.or(FUNCMP, this, a.type, b.type);
+    if(b.unt()) {
+      if(!a.num()) Err.or(FUNCMP, this, a.type, b.type);
       return DBL;
     }
-    if(a.n() && !b.u() && b.s()) Err.or(FUNCMP, this, a.type, b.type);
+    if(a.num() && !b.unt() && b.str()) Err.or(FUNCMP, this, a.type, b.type);
     if(a.type == b.type) return a.type;
     if(a.type == DBL || b.type == DBL) return DBL;
     if(a.type == FLT || b.type == FLT) return FLT;
     if(a.type == DEC || b.type == DEC) return DEC;
-    if(a.type == BLN || a.n() && !b.n() || b.n() && !a.n())
+    if(a.type == BLN || a.num() && !b.num() || b.num() && !a.num())
       Err.or(FUNCMP, this, a.type, b.type);
-    return a.n() || b.n() ? ITR : a.type;
+    return a.num() || b.num() ? ITR : a.type;
   }
 
   /**

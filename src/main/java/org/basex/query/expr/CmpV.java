@@ -135,7 +135,7 @@ public final class CmpV extends Arr {
     super.comp(ctx);
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
-    if(expr[0].i() && !expr[1].i()) {
+    if(expr[0].item() && !expr[1].item()) {
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;
@@ -145,9 +145,9 @@ public final class CmpV extends Arr {
     final Expr e2 = expr[1];
 
     Expr e = this;
-    if(e1.i() && e2.i()) {
+    if(e1.item() && e2.item()) {
       e = atomic(ctx);
-    } else if(e1.e() || e2.e()) {
+    } else if(e1.empty() || e2.empty()) {
       e = Seq.EMPTY;
     }
     if(e != this) {
@@ -159,7 +159,7 @@ public final class CmpV extends Arr {
         if(e != this) ctx.compInfo(OPTWRITE, this);
       } else if(fun.func == FunDef.COUNT) {
         // same as for general comparisons
-        if(e2.i() && ((Item) e2).n() && ((Item) e2).dbl() == 0) {
+        if(e2.item() && ((Item) e2).num() && ((Item) e2).dbl() == 0) {
           // count(...) CMP 0
           if(cmp == Comp.LT || cmp == Comp.GE) {
             // < 0: always false, >= 0: always true

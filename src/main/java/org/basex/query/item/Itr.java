@@ -67,7 +67,7 @@ public class Itr extends Item {
   }
 
   @Override
-  public final byte[] str() {
+  public final byte[] atom() {
     return val == 0 ? Token.ZERO : Token.token(val);
   }
 
@@ -121,7 +121,7 @@ public class Itr extends Item {
       case USH: return (int) val;
       case LNG:
       case UIN: return val;
-      default:  return new BigInteger(Token.string(str()));
+      default:  return new BigInteger(Token.string(atom()));
     }
   }
 

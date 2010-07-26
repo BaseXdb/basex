@@ -40,7 +40,7 @@ public final class B64 extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     return h2b();
   }
 

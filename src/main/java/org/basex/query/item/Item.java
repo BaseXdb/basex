@@ -80,7 +80,7 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public boolean i() {
+  public boolean item() {
     return true;
   }
 
@@ -93,7 +93,7 @@ public abstract class Item extends Expr {
    * Checks if this is a numeric item.
    * @return result of check
    */
-  public final boolean n() {
+  public final boolean num() {
     return type.num;
   }
 
@@ -101,7 +101,7 @@ public abstract class Item extends Expr {
    * Checks if this is an untyped item.
    * @return result of check
    */
-  public final boolean u() {
+  public final boolean unt() {
     return type.unt;
   }
 
@@ -109,7 +109,7 @@ public abstract class Item extends Expr {
    * Checks if this is a string item.
    * @return result of check
    */
-  public final boolean s() {
+  public final boolean str() {
     return type.str;
   }
 
@@ -117,7 +117,7 @@ public abstract class Item extends Expr {
    * Checks if this is a duration.
    * @return result of check
    */
-  public final boolean d() {
+  public final boolean dur() {
     return type.dur;
   }
 
@@ -133,7 +133,7 @@ public abstract class Item extends Expr {
    * Returns an atomized string.
    * @return string representation
    */
-  public byte[] str() {
+  public byte[] atom() {
     Main.notexpected();
     return null;
   }
@@ -143,7 +143,7 @@ public abstract class Item extends Expr {
    * @return Java object
    */
   public Object toJava() {
-    return Token.string(str());
+    return Token.string(atom());
   }
 
   /**
@@ -216,7 +216,7 @@ public abstract class Item extends Expr {
    */
   public final boolean equiv(final Item it) throws QueryException {
     // check if both values are NaN, or if values are equal..
-    return (this == Dbl.NAN || this == Flt.NAN) && it.n() &&
+    return (this == Dbl.NAN || this == Flt.NAN) && it.num() &&
         Double.isNaN(it.dbl()) || comparable(it) && eq(it);
   }
 
@@ -226,8 +226,8 @@ public abstract class Item extends Expr {
    * @return result of check
    */
   public boolean comparable(final Item b) {
-    return type == b.type || n() && b.n() || (u() || s()) &&
-      (b.s() || b.u()) || d() && b.d();
+    return type == b.type || num() && b.num() || (unt() || str()) &&
+      (b.str() || b.unt()) || dur() && b.dur();
   }
 
   /**
@@ -272,7 +272,7 @@ public abstract class Item extends Expr {
    * @throws IOException I/O exception
    */
   public void serialize(final Serializer ser) throws IOException {
-    ser.item(str());
+    ser.item(atom());
   }
 
   @Override
@@ -308,18 +308,18 @@ public abstract class Item extends Expr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.attribute(VAL, str());
+    ser.attribute(VAL, atom());
     ser.closeElement();
   }
 
   @Override
   public int hashCode() {
-    return Token.hash(str());
+    return Token.hash(atom());
   }
 
   @Override
   public String toString() {
-    return Token.string(str());
+    return Token.string(atom());
   }
 
   /**

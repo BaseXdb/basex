@@ -32,7 +32,7 @@ public final class And extends Arr {
 
     for(int e = 0; e < expr.length; e++) {
       final Expr ex = expr[e];
-      if(!ex.i()) continue;
+      if(!ex.item()) continue;
 
       if(!((Item) ex).bool()) {
         // atomic items can be pre-evaluated

@@ -50,7 +50,7 @@ public final class IndexAccess extends Single {
       final Iter[] t = new Iter[s + 1];
       System.arraycopy(iter, 0, t, 0, s);
       iter = t;
-      iter[s] = index(it.str());
+      iter[s] = index(it.atom());
     }
     return iter.length == 0 ? Iter.EMPTY : iter.length == 1 ? iter[0] :
       new Union(new Expr[] { expr }).eval(iter);

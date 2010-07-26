@@ -79,7 +79,7 @@ public final class Var extends Expr {
    */
   public Var bind(final Expr e, final QueryContext ctx) throws QueryException {
     expr = e;
-    return e.i() ? bind((Item) e, ctx) : this;
+    return e.item() ? bind((Item) e, ctx) : this;
   }
 
   /**
@@ -183,7 +183,7 @@ public final class Var extends Expr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, name.str());
+    ser.openElement(this, NAM, name.atom());
     if(expr != null) expr.plan(ser);
     ser.closeElement();
   }
@@ -193,7 +193,7 @@ public final class Var extends Expr {
     final TokenBuilder tb = new TokenBuilder();
     if(name != null) {
       tb.add(DOLLAR);
-      tb.add(name.str());
+      tb.add(name.atom());
       if(type != null) tb.add(" " + AS + " ");
     }
     if(type != null) tb.add(type);

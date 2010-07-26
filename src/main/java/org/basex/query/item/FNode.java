@@ -28,12 +28,12 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public final byte[] str() {
+  public final byte[] atom() {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
       for(int c = 0; c < children.size(); c++) {
         final Nod nc = children.get(c);
-        if(nc.type == Type.ELM || nc.type == Type.TXT) tb.add(nc.str());
+        if(nc.type == Type.ELM || nc.type == Type.TXT) tb.add(nc.atom());
       }
       val = tb.finish();
     }

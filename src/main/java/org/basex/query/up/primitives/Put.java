@@ -48,7 +48,7 @@ public final class Put extends UpdatePrimitive {
    * @return string uri
    */
   public byte[] path() {
-    return u.str();
+    return u.atom();
   }
 
   @Override

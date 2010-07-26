@@ -51,7 +51,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     return Token.token(val);
   }
 
@@ -82,12 +82,12 @@ public final class Bln extends Item {
 
   @Override
   public boolean eq(final Item it) throws QueryException {
-    return val == (it.type == type ? it.bool() : check(it.str()));
+    return val == (it.type == type ? it.bool() : check(it.atom()));
   }
 
   @Override
   public int diff(final Item it) throws QueryException {
-    final boolean n = it.type == type ? it.bool() : check(it.str());
+    final boolean n = it.type == type ? it.bool() : check(it.atom());
     return val ? !n ? 1 : 0 : n ? -1 : 0;
   }
 

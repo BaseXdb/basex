@@ -2,12 +2,14 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.Duration;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -74,7 +76,7 @@ public class Dur extends Item {
   private Dur(final byte[] v, final Type t) throws QueryException {
     this(t);
 
-    final String val = string(v).trim();
+    final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
       Err.date(v, type, XDURR);
@@ -151,7 +153,7 @@ public class Dur extends Item {
   }
 
   @Override
-  public byte[] str() {
+  public byte[] atom() {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0 || sc.signum() < 0) tb.add('-');
     tb.add('P');
@@ -177,8 +179,8 @@ public class Dur extends Item {
   }
 
   @Override
-  public final boolean eq(final Item it) {
-    final Dur d = (Dur) it;
+  public final boolean eq(final Item it) throws QueryException {
+    final Dur d = (Dur) (!it.dur() ? type.e(it, null) : it);
     final double s1 = sc == null ? 0 : sc.doubleValue();
     final double s2 = d.sc == null ? 0 : d.sc.doubleValue();
     return mon == d.mon && s1 == s2;
@@ -192,7 +194,7 @@ public class Dur extends Item {
 
   @Override
   public final Duration toJava() {
-    return Date.df.newDuration(string(str()));
+    return Date.df.newDuration(Token.string(atom()));
   }
 
   @Override
@@ -202,6 +204,6 @@ public class Dur extends Item {
 
   @Override
   public final String toString() {
-    return "\"" + string(str()) + "\"";
+    return "\"" + Token.string(atom()) + "\"";
   }
 }

@@ -55,7 +55,7 @@ public final class CAttr extends CFrag {
     if(!name.ns()) name.uri = Uri.EMPTY;
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
-    if(comp && (eq(name.str(), XMLNS) || eq(pre, XMLNS))) Err.or(NSATTCONS);
+    if(comp && (eq(name.atom(), XMLNS) || eq(pre, XMLNS))) Err.or(NSATTCONS);
 
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : expr) CText.add(tb, ctx.iter(e));
@@ -77,7 +77,7 @@ public final class CAttr extends CFrag {
     if(i.type == Type.QNM) {
       name = (QNm) i;
     } else {
-      final byte[] nm = i.str();
+      final byte[] nm = i.atom();
       if(contains(nm, ' ')) Err.or(INVAL, nm);
       if(!XMLToken.isQName(nm)) Err.or(NAMEWRONG, nm);
       name = new QNm(nm);

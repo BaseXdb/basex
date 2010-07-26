@@ -28,12 +28,12 @@ abstract class BXChar extends BXNode implements CharacterData {
 
   @Override
   public final String getNodeValue() {
-    return Token.string(node.str());
+    return Token.string(node.atom());
   }
 
   @Override
   public final int getLength() {
-    return node.str().length;
+    return node.atom().length;
   }
 
   @Override

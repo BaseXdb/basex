@@ -38,7 +38,7 @@ final class FNFormat extends Fun {
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case FORMINT: return expr[0].e() ? atomic(ctx) : this;
+      case FORMINT: return expr[0].empty() ? atomic(ctx) : this;
       default:      return this;
     }
   }
@@ -51,7 +51,7 @@ final class FNFormat extends Fun {
    */
   private Str formatInteger(final QueryContext ctx) throws QueryException {
     final String pic = string(checkStr(expr[1], ctx));
-    if(expr[0].e()) return Str.ZERO;
+    if(expr[0].empty()) return Str.ZERO;
 
     final byte[] lang = expr.length == 2 ? EMPTY : checkStr(expr[2], ctx);
     final long num = checkItr(expr[0], ctx);
@@ -69,7 +69,7 @@ final class FNFormat extends Fun {
     // evaluate arguments
     Item it = expr[0].atomic(ctx);
     if(it == null) it = Dbl.NAN;
-    else if(!it.u() && !it.n()) Err.num(info(), it);
+    else if(!it.unt() && !it.num()) Err.num(info(), it);
 
     final String pic = string(checkStr(expr[1], ctx));
     if(expr.length == 3) Err.or(FORMNUM, expr[2]);

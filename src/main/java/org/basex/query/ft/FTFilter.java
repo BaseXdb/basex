@@ -47,7 +47,7 @@ abstract class FTFilter extends FTExpr {
         FTItem it;
         while((it = ir.next()) != null) {
           if(filter(ctx, it, content() ?
-              new Tokenizer(it.str(), ctx.context.prop) : null)) break;
+              new Tokenizer(it.atom(), ctx.context.prop) : null)) break;
         }
         return it;
       }

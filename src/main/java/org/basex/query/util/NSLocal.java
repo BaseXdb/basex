@@ -28,7 +28,7 @@ public final class NSLocal {
   public void add(final QNm name) throws QueryException {
     final byte[] ln = name.ln();
     if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(NSDEF, name);
-    final byte[] uri = name.uri.str();
+    final byte[] uri = name.uri.atom();
     if(eq(XMLURI, uri)) Err.or(NOXMLNS, name);
     ns.add(ln, uri);
   }

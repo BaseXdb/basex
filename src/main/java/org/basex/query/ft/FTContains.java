@@ -55,7 +55,7 @@ public class FTContains extends Expr {
     ft = new Tokenizer(ctx.context.prop);
 
     Expr e = this;
-    if(expr.e()) e = Bln.FALSE;
+    if(expr.empty()) e = Bln.FALSE;
     if(e != this) ctx.compInfo(OPTPRE, this);
     return e;
   }
@@ -69,7 +69,7 @@ public class FTContains extends Expr {
     Item it;
 
     while((it = iter.next()) != null) {
-      ft.init(it.str());
+      ft.init(it.atom());
       final FTItem item = ftexpr.atomic(ctx);
       double d = 0;
       if(item.all.matches()) {

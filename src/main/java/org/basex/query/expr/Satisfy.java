@@ -42,7 +42,7 @@ public final class Satisfy extends Expr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(int f = 0; f != fl.length; f++) {
       final Expr e = fl[f].comp(ctx);
-      if(e.e()) {
+      if(e.empty()) {
         ctx.compInfo(every ? OPTTRUE : OPTFALSE, fl[f]);
         return Bln.get(every);
       }

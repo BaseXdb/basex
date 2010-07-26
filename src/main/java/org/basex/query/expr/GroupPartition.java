@@ -121,7 +121,7 @@ class GroupPartition {
       final long[] hhs = new long[is.length];
       for(int i = 0; i < vs.length; i++) {
         its.add(is[i]);
-        if(is[i].e()) {
+        if(is[i].empty()) {
           // Add long.max_value to denote empty sequence in item
           hhs[i] = Long.MAX_VALUE;
         } else {

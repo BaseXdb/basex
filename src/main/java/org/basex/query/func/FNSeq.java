@@ -58,7 +58,7 @@ final class FNSeq extends Fun {
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    if(e.i() || e.e()) return Iter.EMPTY;
+    if(e.item() || e.empty()) return Iter.EMPTY;
     final Iter ir = e.iter(ctx);
     return ir.next() == null ? Iter.EMPTY : ir;
   }
@@ -179,7 +179,9 @@ final class FNSeq extends Fun {
 
       @Override
       public Item next() throws QueryException {
-        return c < e ? iter.get(c++ - 1) : null;
+        if(c < e) return iter.get(c++ - 1);
+        iter.reset();
+        return null;
       }
     } : new Iter() {
       // run through all items
@@ -204,26 +206,28 @@ final class FNSeq extends Fun {
    */
   private Iter reverse(final QueryContext ctx) throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
-    // only one item found
+    // only one item found; no reversion necessary
     if(iter.size() == 1) return iter;
-    // process reversable iterator...
+    // if possible, reverse and return the same iterator
     if(iter.reverse()) return iter;
 
     // process any other iterator...
     return new Iter() {
-      final Iter si = iter.size() != -1 ? iter : SeqIter.get(iter);
-      final long s = si.size();
+      final Iter ir = iter.size() != -1 ? iter : SeqIter.get(iter);
+      final long s = ir.size();
       long c = s;
 
       @Override
       public long size() { return s; }
       @Override
       public Item get(final long i) throws QueryException {
-        return si.get(s - i - 1);
+        return ir.get(s - i - 1);
       }
       @Override
       public Item next() throws QueryException {
-        return --c < 0 ? null : si.get(c);
+        if(--c >= 0) return ir.get(c);
+        ir.reset();
+        return null;
       }
     };
   }

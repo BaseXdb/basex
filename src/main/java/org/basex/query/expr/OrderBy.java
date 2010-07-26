@@ -67,8 +67,8 @@ public final class OrderBy extends Expr {
       Item it = iter.next();
       if(it != null) {
         if(iter.next() != null) Err.or(XPSORT);
-        if(it.node()) it = Str.get(it.str());
-        else if(it.n() && Double.isNaN(it.dbl())) it = null;
+        if(it.node()) it = Str.get(it.atom());
+        else if(it.num() && Double.isNaN(it.dbl())) it = null;
       }
       seq.add(it);
     }

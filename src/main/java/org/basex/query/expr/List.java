@@ -3,6 +3,8 @@ package org.basex.query.expr;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.TokenBuilder;
@@ -27,7 +29,7 @@ public final class List extends Arr {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     checkUp(ctx, expr);
 
-    for(final Expr e : expr) if(!e.i() && !e.e()) return this;
+    for(final Expr e : expr) if(!e.item() && !e.empty()) return this;
 
     // return simple sequence if all values are items
     final SeqIter seq = new SeqIter(expr.length);
@@ -65,6 +67,16 @@ public final class List extends Arr {
       s += c;
     }
     return s;
+  }
+
+  @Override
+  public SeqType returned(final QueryContext ctx) {
+    final int size = expr.length;
+    Type t = expr[0].returned(ctx).type;
+    for(int s = 1; s < size && t != Type.ITEM; s++) {
+      if(t != expr[s].returned(ctx).type) t = Type.ITEM;
+    }
+    return new SeqType(t, SeqType.Occ.OM);
   }
 
   @Override

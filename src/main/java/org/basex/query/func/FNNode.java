@@ -29,7 +29,7 @@ final class FNNode extends Fun {
       case NODENAME:
         if(empty) return null;
         QNm qname = checkNode(it).qname();
-        return qname != null && qname.str().length != 0 ? qname : null;
+        return qname != null && qname.atom().length != 0 ? qname : null;
       case DOCURI:
         if(empty) return null;
         final byte[] uri = checkNode(it).base();
@@ -56,7 +56,7 @@ final class FNNode extends Fun {
       case NAME:
         if(empty) return Str.ZERO;
         qname = checkNode(it).qname();
-        return qname != null ? Str.get(qname.str()) : Str.ZERO;
+        return qname != null ? Str.get(qname.atom()) : Str.ZERO;
       case LOCNAME:
         if(empty) return Str.ZERO;
         qname = checkNode(it).qname();

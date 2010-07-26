@@ -148,7 +148,7 @@ public final class SeqType {
     if(type == Type.EMP) Err.cast(type, item);
 
     boolean ins = it.type.instance(type);
-    if(!it.u() && !ins &&
+    if(!it.unt() && !ins &&
       // implicit type promotions
       (it.type != Type.DEC || type != Type.FLT && type != Type.DBL) &&
       (it.type != Type.URI || type != Type.STR)) Err.cast(type, it);
@@ -161,7 +161,7 @@ public final class SeqType {
     si.add(it);
     while(n != null) {
       ins = n.type.instance(type);
-      if(!n.u() && !ins) Err.cast(type, n);
+      if(!n.unt() && !ins) Err.cast(type, n);
       si.add(check(ins ? n : type.e(n, ctx)));
       n = iter.next();
     }

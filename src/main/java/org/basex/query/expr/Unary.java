@@ -38,20 +38,20 @@ public final class Unary extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(expr.e()) {
+    if(expr.empty()) {
       ctx.compInfo(OPTPRE, this);
       return expr;
     }
-    return expr.i() ? atomic(ctx) : this;
+    return expr.item() ? atomic(ctx) : this;
   }
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final Item it = expr.atomic(ctx);
     if(it == null) return null;
-    if(!it.u() && !it.n()) Err.num(info(), it);
+    if(!it.unt() && !it.num()) Err.num(info(), it);
     final double d = it.dbl();
-    if(it.u()) return Dbl.get(minus ? -d : d);
+    if(it.unt()) return Dbl.get(minus ? -d : d);
 
     if(!minus) return it;
     switch(it.type) {

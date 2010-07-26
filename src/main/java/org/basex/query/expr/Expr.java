@@ -107,22 +107,22 @@ public abstract class Expr extends ExprInfo {
    */
   public Item test(final QueryContext ctx) throws QueryException {
     final Item it = ebv(ctx);
-    return (it.n() ? it.dbl() == ctx.pos : it.bool()) ? it : null;
+    return (it.num() ? it.dbl() == ctx.pos : it.bool()) ? it : null;
   }
 
   /**
    * Checks if this is an item.
    * @return result of check
    */
-  public boolean i() {
-    return this instanceof Item;
+  public boolean item() {
+    return false;
   }
 
   /**
    * Tests if this is an empty sequence.
    * @return result of check
    */
-  public final boolean e() {
+  public final boolean empty() {
     return this == Seq.EMPTY;
   }
 
@@ -131,7 +131,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean v() {
-    return e();
+    return empty();
   }
 
   /**
@@ -289,7 +289,7 @@ public abstract class Expr extends ExprInfo {
 
     final Item it = e.atomic(ctx);
     if(it == null) Err.or(XPEMPTYPE, info(), Type.DBL);
-    if(!it.u() && !it.n()) Err.num(info(), it);
+    if(!it.unt() && !it.num()) Err.num(info(), it);
     return it.dbl();
   }
 
@@ -317,7 +317,7 @@ public abstract class Expr extends ExprInfo {
    * @throws QueryException query exception
    */
   public final long checkItr(final Item it) throws QueryException {
-    if(!it.u() && !it.type.instance(Type.ITR)) errType(Type.ITR, it);
+    if(!it.unt() && !it.type.instance(Type.ITR)) errType(Type.ITR, it);
     return it.itr();
   }
 
@@ -355,8 +355,8 @@ public abstract class Expr extends ExprInfo {
    */
   public final byte[] checkStr(final Item it) throws QueryException {
     if(it == null) return Token.EMPTY;
-    if(!it.s() && !it.u()) errType(Type.STR, it);
-    return it.str();
+    if(!it.str() && !it.unt()) errType(Type.STR, it);
+    return it.atom();
   }
 
   /**

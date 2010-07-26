@@ -70,8 +70,8 @@ public class GFLWOR extends Expr {
     boolean em = false;
     if(where != null) {
       where = checkUp(where, ctx).comp(ctx);
-      em = where.e();
-      if(!em && where.i()) {
+      em = where.empty();
+      if(!em && where.item()) {
         // test is always false: no results
         em = !((Item) where).bool();
         if(!em) {
@@ -96,7 +96,7 @@ public class GFLWOR extends Expr {
 
     for(int f = 0; f != fl.length; f++) {
       // remove GFLWOR clause if it the FOR clause is empty
-      if(fl[f].expr.e() && fl[f] instanceof For) {
+      if(fl[f].expr.empty() && fl[f] instanceof For) {
         ctx.compInfo(OPTFLWOR);
         return Seq.EMPTY;
       }

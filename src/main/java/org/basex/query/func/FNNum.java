@@ -25,7 +25,7 @@ public final class FNNum extends Fun {
     final Item it = expr[0].atomic(ctx);
     if(it == null) return null;
 
-    if(!it.u() && !it.n()) Err.num(info(), it);
+    if(!it.unt() && !it.num()) Err.num(info(), it);
     final double d = it.dbl();
     switch(func) {
       case ABS:    return abs(it);
@@ -39,8 +39,8 @@ public final class FNNum extends Fun {
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    if(expr[0].e()) return expr[0];
-    for(final Expr a : expr) if(!a.i()) return this;
+    if(expr[0].empty()) return expr[0];
+    for(final Expr a : expr) if(!a.item()) return this;
     final Item it = atomic(ctx);
     return it == null ? Seq.EMPTY : it;
   }
@@ -122,7 +122,7 @@ public final class FNNum extends Fun {
    * @return numeric item
    */
   private static Item num(final Item it, final double n, final double d) {
-    final Item i = it.u() ? Dbl.get(n) : it;
+    final Item i = it.unt() ? Dbl.get(n) : it;
     if(n == d) return i;
 
     switch(it.type) {
