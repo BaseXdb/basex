@@ -92,7 +92,7 @@ public final class FElem extends FNode {
    */
   FElem(final Element elem, final Nod p) {
     super(Type.ELM);
- 
+
     // general stuff
     final String nu = elem.getNamespaceURI();
     name = new QNm(token(elem.getNodeName()),
@@ -100,13 +100,13 @@ public final class FElem extends FNode {
     par = p;
     final String b = elem.getBaseURI();
     base = b == null ? EMPTY : token(b);
-    
+
     // attributes and namespaces
     ns = new Atts();
     final NamedNodeMap at = elem.getAttributes();
     final int as = at.getLength();
     final Nod[] attArr = new Nod[as];
-    
+
     int pos = 0;
     for(int i = 0; i < as; i++) {
       final Attr att = (Attr) at.item(i);
@@ -120,7 +120,7 @@ public final class FElem extends FNode {
       }
     }
     atts = new NodIter(attArr, pos);
-    
+
     // no parent, so we have to add all namespaces in scope
     if(p == null) {
       final Atts nss = nsScope(elem.getParentNode());
@@ -158,7 +158,7 @@ public final class FElem extends FNode {
       }
     }
   }
-  
+
   /**
    * Gathers all defined namespaces in the scope of the given DOM element.
    * @param elem DOM element

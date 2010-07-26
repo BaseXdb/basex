@@ -251,7 +251,7 @@ final class DialogUser extends BaseXBack {
     drop.setEnabled(valdrop && table.getSelectedRows().length > 0);
     valdrop |= table.getSelectedRows().length == 1;
 
-    Msg icon = ok ? Msg.OK : Msg.ERR;
+    Msg icon = ok ? Msg.SUCCESS : Msg.ERROR;
     if(msg == null && !(valname && valpass && newname && valdrop)) {
       msg = !newname ? Main.info(USERKNOWN, user.getText()) : !valdrop ?
           USERADMIN : Main.info(INVALID, !valname ? SERVERUSER : SERVERPW);

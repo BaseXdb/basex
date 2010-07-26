@@ -81,7 +81,7 @@ public final class For extends ForLet {
       private Iter ir;
       /** Counter. */
       private int c;
-      
+
       @Override
       public Item next() throws QueryException {
         init();
@@ -95,7 +95,7 @@ public final class For extends ForLet {
       public long size() throws QueryException {
         return expr.size(ctx);
       }
-      
+
       @Override
       public Item get(final long i) throws QueryException {
         init();

@@ -89,7 +89,7 @@ public final class Let extends ForLet {
       public long size() {
         return 1;
       }
-      
+
       @Override
       public Item get(final long i) throws QueryException {
         reset();
@@ -111,7 +111,7 @@ public final class Let extends ForLet {
   public long size(final QueryContext ctx) {
     return 1;
   }
-  
+
   @Override
   boolean simple() {
     return !score;

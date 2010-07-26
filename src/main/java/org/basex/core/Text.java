@@ -28,8 +28,6 @@ public interface Text {
   String DOTS = "...";
   /** List. */
   String LI = "- ";
-  /** All flag. */
-  String ALL = "ALL";
 
   /** Project name. */
   String NAME = "BaseX";
@@ -157,6 +155,8 @@ public interface Text {
   String USER = "USER";
   /** Command keyword. */
   String TRUE = "TRUE";
+  /** Keyword. */
+  String OK = "OK";
 
   /** Missing help. */
   String NOHELP = lang("ch_nohelp");
@@ -910,11 +910,6 @@ public interface Text {
   String BUTTONDELALL = lang("b_delall");
   /** Button for adding. */
   String BUTTONADD = lang("b_add");
-
-  // STATUS BAR ===============================================================
-
-  /** Default message. */
-  String STATUSOK = "OK.";
 
   // VISUALIZATIONS ===========================================================
 

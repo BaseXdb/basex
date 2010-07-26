@@ -295,7 +295,7 @@ public final class DialogServer extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    Msg icon = Msg.OK;
+    Msg icon = Msg.SUCCESS;
     String msg = null;
     String msg2 = null;
 
@@ -311,7 +311,7 @@ public final class DialogServer extends Dialog {
         if(msg.equals(SERVERSTART)) {
           running = true;
         } else {
-          icon = Msg.ERR;
+          icon = Msg.ERROR;
         }
       } else if(cmp == stop) {
         if(running) BaseXServer.stop(ctx.prop.num(Prop.SERVERPORT));
@@ -356,14 +356,14 @@ public final class DialogServer extends Dialog {
           refreshLog();
         } else {
           msg2 = Main.info(DBNOTDELETED, f.getName());
-          icon = Msg.ERR;
+          icon = Msg.ERROR;
         }
       } else if(cmp == deleteAll) {
         for(int i = 0; i < logc.getItemCount(); i++) {
           final File f = new File(logdir + logc.getItemAt(i).toString());
           if(!f.delete()) {
             msg2 = Main.info(DBNOTDELETED, f.getName());
-            icon = Msg.ERR;
+            icon = Msg.ERROR;
             break;
           }
         }
@@ -374,7 +374,7 @@ public final class DialogServer extends Dialog {
         if(tab == 2) dbsP.action(cmp);
       }
     } catch(final Exception ex) {
-      icon = Msg.ERR;
+      icon = Msg.ERROR;
       msg = Main.server(ex);
       if(msg.equals(Main.info(PERMNO, CmdPerm.values()[4]))) {
         try {

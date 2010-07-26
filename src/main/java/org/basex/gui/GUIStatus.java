@@ -21,9 +21,9 @@ public final class GUIStatus extends BaseXPanel {
   /** Memory usage. */
   private final BaseXMem mem;
   /** Current status text. */
-  private String status = STATUSOK;
+  private String status = OK;
   /** Current path. */
-  private String oldStatus = STATUSOK;
+  private String oldStatus = OK;
 
   /**
    * Constructor.

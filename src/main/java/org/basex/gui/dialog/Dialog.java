@@ -223,7 +223,7 @@ public abstract class Dialog extends JDialog {
    * @param text text
    */
   public static void info(final GUI gui, final String text) {
-    new DialogMessage(gui, text.trim(), Msg.OK);
+    new DialogMessage(gui, text.trim(), Msg.SUCCESS);
   }
 
   /**
@@ -241,6 +241,6 @@ public abstract class Dialog extends JDialog {
    * @param text text
    */
   public static void error(final GUI gui, final String text) {
-    new DialogMessage(gui, text.trim(), Msg.ERR);
+    new DialogMessage(gui, text.trim(), Msg.ERROR);
   }
 }

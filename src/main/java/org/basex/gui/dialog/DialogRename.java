@@ -73,7 +73,7 @@ final class DialogRename extends Dialog {
       ok = !nm.isEmpty() && DialogCreate.dbValid(nm);
       if(!nm.isEmpty() && !ok) msg = Main.info(INVALID, EDITNAME);
     }
-    info.setText(msg, Msg.ERR);
+    info.setText(msg, Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok && !nm.isEmpty());
   }
 

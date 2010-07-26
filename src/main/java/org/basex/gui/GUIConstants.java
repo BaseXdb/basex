@@ -154,9 +154,9 @@ public final class GUIConstants {
     /** Warning icon. */
     WARN("warn", "warning"),
     /** Error icon. */
-    ERR("error", "error"),
+    ERROR("error", "error"),
     /** Success icon. */
-    OK("ok", "information");
+    SUCCESS("ok", "information");
 
     /** Small icon. */
     public final Icon small;

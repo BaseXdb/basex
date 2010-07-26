@@ -25,7 +25,7 @@ final class DialogMessage extends Dialog {
    * @param ic message type
    */
   DialogMessage(final GUI main, final String txt, final Msg ic) {
-    super(main, ic == Msg.ERR ? DIALOGERR : DIALOGINFO, true);
+    super(main, ic == Msg.ERROR ? DIALOGERR : DIALOGINFO, true);
 
     final BaseXBack p = new BaseXBack();
     p.setLayout(new BorderLayout());

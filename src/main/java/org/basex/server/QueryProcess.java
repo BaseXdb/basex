@@ -90,7 +90,8 @@ final class QueryProcess extends Progress {
    */
   void close() throws IOException {
     qp.stopTimeout();
-    if(monitored) ctx.lock.after(qp.ctx.updating);
+    if(xml != null) xml.close();
     qp.close();
+    if(monitored) ctx.lock.after(qp.ctx.updating);
   }
 }

@@ -234,7 +234,7 @@ public final class DialogCreate extends Dialog {
     ok = exists && !nm.isEmpty();
 
     String inf = !exists ? PATHWHICH : !ok ? DBWHICH : null;
-    Msg icon = Msg.ERR;
+    Msg icon = Msg.ERROR;
     if(ok) {
       ok = dbValid(nm);
       if(!ok) {

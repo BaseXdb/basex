@@ -269,7 +269,7 @@ public final class DialogCreateFS extends Dialog {
       if(!cNam) inf = DBWHICH;
     }
 
-    Msg icon = Msg.ERR;
+    Msg icon = Msg.ERROR;
     if(ok) {
       ok = DialogCreate.dbValid(nm);
       if(!ok) {

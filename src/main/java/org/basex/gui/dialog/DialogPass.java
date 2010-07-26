@@ -59,7 +59,7 @@ final class DialogPass extends Dialog {
     final String nm = new String(pass.getPassword());
     ok = !nm.isEmpty() && nm.matches("[^ ;'\\\"]*");
     info.setText(ok || nm.isEmpty() ? null :
-      Main.info(INVALID, SERVERPW), Msg.ERR);
+      Main.info(INVALID, SERVERPW), Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

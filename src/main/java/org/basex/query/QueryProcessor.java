@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.io.OutputStream;
-
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.data.Nodes;

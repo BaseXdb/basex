@@ -117,7 +117,7 @@ public final class XQueryView extends View {
 
     info = new BaseXLabel(" ");
     info.setCursor(GUIConstants.CURSORHAND);
-    info.setText(STATUSOK, Msg.OK);
+    info.setText(OK, Msg.SUCCESS);
     info.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(final MouseEvent e) {
@@ -241,8 +241,8 @@ public final class XQueryView extends View {
   public void info(final String inf, final boolean ok) {
     final int error = text.error(inf, ok);
     info.setName(error != -1 ? Integer.toString(error) : null);
-    info.setText(ok ? STATUSOK : inf.replaceAll(STOPPED + ".*\\r?\\n", ""),
-        ok ? Msg.OK : Msg.ERR);
+    info.setText(ok ? OK : inf.replaceAll(STOPPED + ".*\\r?\\n", ""),
+        ok ? Msg.SUCCESS : Msg.ERROR);
     info.setToolTipText(ok ? null : inf);
     stop.setEnabled(false);
   }

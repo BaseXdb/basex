@@ -113,7 +113,7 @@ public class NamespaceTest {
         "declare namespace na = 'test';doc('d1')/x/na:a",
         "<a xmlns='test'><b><c/></b><d/></a>");
   }
-  
+
   /** Test query.
    * Detects empty default namespace in serializer.
    */
@@ -122,7 +122,7 @@ public class NamespaceTest {
     query("<ns:x xmlns:ns='X'><y/></ns:x>",
         "<ns:x xmlns:ns='X'><y/></ns:x>");
   }
-  
+
   /** Test query.
    * Detects duplicate default namespace in serializer.
    */

@@ -110,10 +110,10 @@ public abstract class Data {
   protected Index atvindex;
   /** Full-text index instance. */
   protected Index ftxindex;
-  
+
   /** LogList to realize the ID->Pre mapping. */
   private LogList loglist;
-  
+
   /**
    * Dissolves the references to often used tag names and attributes.
    * @throws IOException I/O exception
@@ -123,7 +123,7 @@ public abstract class Data {
     if(meta.deepfs) fs = new DeepFS(this);
     nameID = atts.id(DataText.NAME);
     sizeID = atts.id(DataText.SIZE);
-    
+
     // initialize the ID->Pre mapping
     if(IDPREMAPON) loglist = new LogList();
   }
@@ -267,7 +267,7 @@ public abstract class Data {
    */
   public final int pre(final int id) {
     if(IDPREMAPON) return loglist.pre(id);
-    
+
     // find pre value in table
     for(int p = id; p < meta.size; p++) if(id == id(p)) return p;
     for(int p = 0; p < id; p++) if(id == id(p)) return p;
@@ -489,7 +489,7 @@ public abstract class Data {
     int k = kind(pre);
     int s = size(pre, k);
     ns.delete(pre, s);
-    
+
     if(IDPREMAPON) loglist.delete(pre, s);
 
     // reduce size of ancestors

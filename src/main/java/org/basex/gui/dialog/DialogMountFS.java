@@ -188,7 +188,7 @@ public final class DialogMountFS extends Dialog {
           final IO file = IO.get(mp);
           final boolean mpok = !mp.isEmpty() && file.exists() &&
             file.isDir();
-          if(!mpok) warn.setText(NOVALIDMOUNT, Msg.ERR);
+          if(!mpok) warn.setText(NOVALIDMOUNT, Msg.ERROR);
           ok &= mpok;
         } catch(final IOException ex) {
           detail.setText(Token.token(ex.getMessage()));

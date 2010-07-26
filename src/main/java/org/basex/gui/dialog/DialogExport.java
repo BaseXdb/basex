@@ -151,7 +151,7 @@ public final class DialogExport extends Dialog {
     final boolean file = io instanceof IOFile;
     ok = !path().isEmpty() && file;
     info.setText(!ok && !file ? INVPATH : io.children().length > 0 ? OVERFILE
-        : null, ok ? Msg.WARN : Msg.ERR);
+        : null, ok ? Msg.WARN : Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

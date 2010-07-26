@@ -99,7 +99,7 @@ public final class ServerProcess extends Thread {
 
   @Override
   public void run() {
-    log.write(this, "LOGIN " + context.user.name, "OK");
+    log.write(this, "LOGIN " + context.user.name, OK);
     String input = null;
     try {
       while(true) {
@@ -173,9 +173,9 @@ public final class ServerProcess extends Thread {
         send(ok);
 
         final String c = cmd.toString().replace('\r', ' ').replace('\n', ' ');
-        log.write(this, c, ok ? "OK" : INFOERROR + info, perf);
+        log.write(this, c, ok ? OK : INFOERROR + info, perf);
       }
-      log.write(this, "LOGOUT " + context.user.name, "OK");
+      log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
       log.write(this, input, INFOERROR + ex.getMessage());
       ex.printStackTrace();
@@ -228,7 +228,7 @@ public final class ServerProcess extends Thread {
       if(c == 0) {
         // c = 0: initialize iterator
         if(qp != null) qp.init();
-        log.write(this, qp.query, "OK");
+        log.write(this, qp.query, OK);
         // send {ID}0 and 0 as success flag
         out.writeString(arg);
         out.write(0);
@@ -288,7 +288,6 @@ public final class ServerProcess extends Thread {
       new Close().execute(context);
       if(cmd != null) cmd.stop();
       context.delete(this);
-
       socket.close();
     } catch(final Exception ex) {
       log.write(ex.getMessage());
