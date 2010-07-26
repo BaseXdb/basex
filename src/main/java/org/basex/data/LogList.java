@@ -20,7 +20,7 @@ public class LogList {
   }
 
   /**
-   * Logs a the insert of a new item into the document.
+   * Logs a the insert of a new item into the database.
    * @param id value of the entry.
    * @param pre value of the entry.
    */
@@ -72,33 +72,32 @@ public class LogList {
   }
 
   /**
-   * Logs a the delete of a new item into the document.
+   * Logs a the delete of a node.
    * @param pre value of the entry.
+   * @param count how many nodes are deleted (size of deleted root-node).
    */
-  public void delete(final int pre) {
+  public void delete(final int pre, final int count) {
     // list is empty
     if(first == null)
       // insert the mainNode
-      first = new Node(pre, -1);
+      first = new Node(pre, -count);
     // list has entries
     else {
       // search right position for insert through linear search
       Node pointer = first;
       Node b4pointer = null; // node before pointer
-      int addend = 0; // needed to calculate correct value for the sub-node
       while(pointer != null && pointer.id < pre) {
-        addend += pointer.addend;
         b4pointer = pointer;
         pointer = pointer.next;
       }
 
       // handle node with pre exists
       if(pointer != null && pointer.id == pre)
-        --pointer.addend;
+        pointer.addend -= count;
       // new node needs to be created
       else {
         // built up new node and subnode
-        Node newNode = new Node(pre, -1);
+        Node newNode = new Node(pre, -count);
 
         // insert into list
         // check if item will be first item
