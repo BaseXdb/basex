@@ -26,6 +26,8 @@ final class QueryProcess extends Progress {
   private final PrintOutput out;
   /** Database context. */
   private final Context ctx;
+  /** Query string. */
+  public String query;
 
   /** Serializer. */
   private XMLSerializer xml;
@@ -43,6 +45,7 @@ final class QueryProcess extends Progress {
    * @param c database context
    */
   QueryProcess(final String q, final PrintOutput o, final Context c) {
+    query = q;
     qp = new QueryProcessor(q, c);
     out = o;
     ctx = c;

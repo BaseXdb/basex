@@ -228,6 +228,7 @@ public final class ServerProcess extends Thread {
       if(c == 0) {
         // c = 0: initialize iterator
         if(qp != null) qp.init();
+        log.write(this, qp.query, "OK");
         // send {ID}0 and 0 as success flag
         out.writeString(arg);
         out.write(0);
@@ -249,7 +250,7 @@ public final class ServerProcess extends Thread {
 
       // log exception (static or runtime)
       final String msg = ex.getMessage();
-      log.write(this, arg, INFOERROR + msg);
+      log.write(this, qp.query, INFOERROR + msg);
       // send 0 to mark end of potential result, 1 as error flag, and {MSG}0
       out.write(0);
       out.write(1);
