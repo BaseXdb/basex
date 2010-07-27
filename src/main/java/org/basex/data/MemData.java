@@ -35,6 +35,9 @@ public final class MemData extends Data {
     atts = att;
     ns = n;
     path = s;
+
+    // initialize the ID->Pre mapping
+    if(IDPREMAPON) loglist = new LogList();
   }
 
   /**

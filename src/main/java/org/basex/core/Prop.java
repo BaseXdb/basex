@@ -42,10 +42,9 @@ public final class Prop extends AProp {
   // DATABASE & PROGRAM PATHS =================================================
 
   /** Database path. */
-  public static final Object[] DBPATH = {
-    "DBPATH", HOME + Text.NAME + "Data" };
+  public static final Object[] DBPATH = { "DBPATH", HOME + Text.NAME + "Data" };
 
-  /** Language name (currently: English or German). */
+  /** Language name. */
   public static final Object[] LANGUAGE = { "LANGUAGE", "English" };
   /** Flag to include key names in the language strings. */
   public static final Object[] LANGKEYS = { "LANGKEYS", false };

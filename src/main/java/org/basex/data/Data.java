@@ -59,7 +59,7 @@ import org.deepfs.fs.DeepFS;
  */
 public abstract class Data {
   /** Flag for ID->Pre Mapping. */
-  private static final boolean IDPREMAPON = false;
+  static final boolean IDPREMAPON = false;
 
   /** Node kind: Document. */
   public static final byte DOC = 0x00;
@@ -112,7 +112,7 @@ public abstract class Data {
   protected Index ftxindex;
 
   /** LogList to realize the ID->Pre mapping. */
-  private LogList loglist;
+  LogList loglist;
 
   /**
    * Dissolves the references to often used tag names and attributes.
@@ -593,7 +593,7 @@ public abstract class Data {
           }
           ns.open();
           byte[] nm = md.name(mpre, mk);
-          elem(dis, tags.index(nm, null, false), md.attSize(mpre, mk),
+          elem(pre, dis, tags.index(nm, null, false), md.attSize(mpre, mk),
               md.size(mpre, mk), ns.uri(nm, true), ne);
           preStack[l++] = pre;
           break;
@@ -733,7 +733,8 @@ public abstract class Data {
    * @param vl document name
    */
   public final void doc(final int pre, final int s, final byte[] vl) {
-    final long i = ++meta.lastid;
+    final int i = ++meta.lastid;
+    if(IDPREMAPON) loglist.insert(i, pre);
     final long v = index(vl, pre, true);
     s(DOC); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
@@ -743,6 +744,7 @@ public abstract class Data {
 
   /**
    * Adds an element entry to the internal update buffer.
+   * @param pre pre value
    * @param d parent distance
    * @param tn tag name index
    * @param as number of attributes
@@ -750,11 +752,12 @@ public abstract class Data {
    * @param u namespace uri reference
    * @param ne namespace flag
    */
-  public final void elem(final int d, final int tn, final int as, final int s,
-      final int u, final boolean ne) {
+  public final void elem(final int pre, final int d, final int tn, final int as,
+      final int s, final int u, final boolean ne) {
 
     // build and insert new entry
-    final long i = ++meta.lastid;
+    final int i = ++meta.lastid;
+    if(IDPREMAPON) loglist.insert(i, pre);
     final int n = ne ? 1 << 7 : 0;
     s(as << 3 | ELEM); s(n | (byte) (tn >> 8)); s(tn); s(u);
     s(d >> 24); s(d >> 16); s(d >> 8); s(d);
@@ -773,7 +776,7 @@ public abstract class Data {
       final int k) {
 
     // build and insert new entry
-    final long i = ++meta.lastid;
+    final int i = newID(pre);
     final long v = index(vl, pre, true);
     s(k); s(0); s(0); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
@@ -795,7 +798,7 @@ public abstract class Data {
 
     // add attribute to text storage
     final long v = index(vl, pre, false);
-    final long i = ++meta.lastid;
+    final int i = newID(pre);
     final int n = ne ? 1 << 7 : 0;
     s(d << 3 | ATTR); s(n | (byte) (tn >> 8)); s(tn); s(v >> 32);
     s(v >> 24); s(v >> 16); s(v >> 8); s(v);
@@ -811,6 +814,17 @@ public abstract class Data {
     b[bp++] = (byte) v;
   }
 
+  /**
+   * Generates a new id.
+   * @param pre pre value
+   * @return id
+   */
+  private int newID(final int pre) {
+    final int i = ++meta.lastid;
+    if(IDPREMAPON) loglist.insert(i, pre);
+    return i;
+  }
+  
   /**
    * Stores the specified value in the update buffer.
    * @param v value to be stored

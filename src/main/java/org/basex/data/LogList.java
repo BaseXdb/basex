@@ -18,6 +18,8 @@ final class LogList {
    * @param pre value of the entry.
    */
   void insert(final int id, final int pre) {
+    if(id == pre) return;
+    
     // list is empty
     if(first == null) {
       // calculation of the addends

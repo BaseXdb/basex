@@ -77,7 +77,7 @@ public final class MemBuilder extends Builder {
   @Override
   protected void addElem(final int dis, final int n, final int as, final int u,
       final boolean ne) {
-    data.elem(dis, n, as, as, u, ne);
+    data.elem(meta.size, dis, n, as, as, u, ne);
     data.insert(meta.size);
   }
 
