@@ -115,7 +115,7 @@ final class NSNode {
   }
 
   /**
-   * Deletes nodes in the specified range (p .. p + nr) and updates the
+   * Deletes nodes in the specified range (p .. p + sz - 1) and updates the
    * following pre values
    * @param p pre value
    * @param sz number of nodes to be deleted
@@ -123,8 +123,10 @@ final class NSNode {
   void delete(final int p, final int sz) {
     int s = fnd(p);
     if(s == -1 || ch[s].pre != p) s++;
-    int c = sz;
-    while(c-- > 0 && size > s) System.arraycopy(ch, s + 1, ch, s, --size - s);
+    int num = 0, upper = p + sz;
+    for (int i = s; i < size && ch[i].pre < upper; i++, num++);
+    size -= num;
+    if (num > 0) System.arraycopy(ch, s + num, ch, s, size - s);
     update(s, -sz);
   }
 
