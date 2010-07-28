@@ -28,7 +28,7 @@ public class DBNode extends Nod {
   /** Root node (constructor). */
   private Nod root;
   /** Namespaces. */
-  private Atts nsp;
+  Atts nsp;
 
   /**
    * Constructor.
@@ -234,6 +234,7 @@ public class DBNode extends Nod {
         k = data.kind(p);
         node.set(p, k);
         node.score(Scoring.step(sc));
+        node.nsp = null;
         p += data.size(p, k);
         return node;
       }
