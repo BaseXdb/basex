@@ -148,7 +148,7 @@ final class NSNode {
    * @param p pre value
    * @return node
    */
-  private int fnd(final int p) {
+  int fnd(final int p) {
     int l = 0, h = size - 1;
     while(l <= h) { // binary search
       final int m = l + h >>> 1;

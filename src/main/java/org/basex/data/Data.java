@@ -13,6 +13,7 @@ import org.basex.io.TableAccess;
 import org.basex.util.Atts;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenMap;
 import org.deepfs.fs.DeepFS;
 
 /**
@@ -573,7 +574,7 @@ public abstract class Data {
       final int pre = ipre + mpre;
       final int dis = mpar >= 0 ? mpre - mpar : pre - ipar;
       final int par = pre - dis;
-      if(mpre == 0) ns.setRoot(ns.findAncestor(par));
+      if(mpre == 0) ns.setRootNearest(par);
       while(l > 0 && preStack[l - 1] > par) ns.close(preStack[--l]);
 
       switch(mk) {
@@ -586,10 +587,27 @@ public abstract class Data {
           break;
         case ELEM:
           // add element
-          final boolean ne = md.nsFlag(mpre);
-          if(ne) {
+          boolean ne = false;
+          if(md.nsFlag(mpre)) {
+            // find all namespaces in scope
+            final TokenMap nsScope = new TokenMap();
+            NSNode n = t; // root node of the namespace hierarchy
+            do {
+              for (int i = 0; i < n.vals.length; i += 2)
+                nsScope.add(ns.pref(n.vals[i]), ns.uri(n.vals[i + 1]));
+              final int pos = n.fnd(par);
+              if (pos < 0) break;
+              n = n.ch[pos];
+            } while (n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
+            
             final Atts at = md.ns(mpre);
-            for(int a = 0; a < at.size; a++) ns.add(at.key[a], at.val[a], pre);
+            for(int a = 0; a < at.size; a++) {
+              final byte[] old = nsScope.get(at.key[a]);
+              if (old == null || !eq(old, at.val[a])) {
+                ns.add(at.key[a], at.val[a], pre);
+                ne = true;
+              }
+            }
           }
           ns.open();
           byte[] nm = md.name(mpre, mk);

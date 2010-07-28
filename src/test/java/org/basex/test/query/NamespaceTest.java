@@ -192,7 +192,7 @@ public class NamespaceTest {
         "declare namespace a='aa';insert node doc('d4')//a:y " +
         "into doc('d5')/a:x",
         "declare namespace a='aa';doc('d5')//a:y",
-        "<a:y xmlns:a='aa' xmlns:b='bb'/>");
+        "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
 
   //  /** Test query.

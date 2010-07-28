@@ -184,10 +184,11 @@ public abstract class UpdatePrimitive {
       default:
         q = nd.qname();
         m.ns.open();
+        ne = false;
         final Atts ns = par == 0 ? nd.nsScope() : nd.ns();
-        if(ndPar != null) {
-          final Atts nsPar = ndPar.nsScope();
-          if(nsPar != null)
+        if (ns != null) {
+          if(ns.size > 0 && ndPar != null) {
+            final Atts nsPar = ndPar.nsScope();
             for(int j = 0; j < nsPar.size; j++) {
               final byte[] key = nsPar.key[j];
               final int ki = ns.get(key);
@@ -196,8 +197,9 @@ public abstract class UpdatePrimitive {
               // prefix must be added to the index
               if(ki > -1 && eq(nsPar.val[j], ns.val[ki])) ns.delete(ki);
             }
+          }
+          ne = ns.size > 0;
         }
-        ne = ns != null && ns.size > 0;
         for(int a = 0; ne && a < ns.size; a++) {
           m.ns.add(ns.key[a], ns.val[a], ms);
         }

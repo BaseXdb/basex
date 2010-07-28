@@ -117,10 +117,12 @@ public final class Performance {
   }
 
   /**
-   * Throws and catches an error to display the current stack.
+   * Prints the current stack trace to System.err .
    */
   public static void stack() {
-    try { throw new Error(); } catch(final Error ex) { ex.printStackTrace(); }
+    System.err.println("You're here:");
+    final StackTraceElement[] st = new Error().getStackTrace();
+    for (int i = 1; i < st.length; i++) System.err.println("\tat " + st[i]);
   }
 
   @Override
