@@ -44,11 +44,14 @@ public final class Context {
   public Nodes copied;
   /** Focused node. */
   public int focused = -1;
+  /** Main context for server/client. */
+  public Context main;
 
   /**
    * Constructor.
    */
   public Context() {
+    main = this;
     prop = new Prop(true);
     pool = new DataPool();
     sessions = new Sessions();
@@ -62,6 +65,7 @@ public final class Context {
    * @param ctx parent context
    */
   public Context(final Context ctx) {
+    main = ctx;
     prop = new Prop(true);
     pool = ctx.pool;
     sessions = ctx.sessions;

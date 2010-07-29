@@ -4,6 +4,7 @@ import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
 import org.basex.core.Main;
 import org.basex.core.Command;
+import org.basex.core.Prop;
 
 /**
  * Evaluates the 'set' command and modifies database properties.
@@ -40,7 +41,6 @@ public final class Set extends Command {
     try {
       final Object type = prop.get(key);
       if(type == null) return error(SETKEY, key);
-
       if(type instanceof Boolean) {
         final boolean b = val == null ? !((Boolean) type).booleanValue() :
           val.equalsIgnoreCase(ON) || val.equalsIgnoreCase(TRUE);
@@ -48,6 +48,9 @@ public final class Set extends Command {
         val = AInfo.flag(b);
       } else if(type instanceof Integer) {
         if(val == null) val = "0";
+        if(key.equals(Prop.TIMEOUT[0]) && context.main.prop != prop) {
+          context.main.prop.set(key, Integer.parseInt(val)); 
+        }
         prop.set(key, Integer.parseInt(val));
       } else if(type instanceof String) {
         if(val == null) val = "";
@@ -60,6 +63,7 @@ public final class Set extends Command {
       return info(key + ": " + val);
     } catch(final Exception ex) {
       Main.debug(ex);
+      ex.printStackTrace();
       return error(SETVAL, key, val);
     }
   }
