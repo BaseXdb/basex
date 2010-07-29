@@ -562,6 +562,17 @@ public abstract class Data {
     final int buf = Math.min(ms, IO.BLOCKSIZE >> IO.NODEPOWER);
     // resize buffer to cache more entries
     buffer(buf);
+    
+    // find all namespaces in scope
+    final TokenMap nsScope = new TokenMap();
+    NSNode n = ns.root;
+    do {
+      for (int i = 0; i < n.vals.length; i += 2)
+        nsScope.add(ns.pref(n.vals[i]), ns.uri(n.vals[i + 1]));
+      final int pos = n.fnd(ipar);
+      if (pos < 0) break;
+      n = n.ch[pos];
+    } while (n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
 
     // loop through all entries
     int mpre = -1;
@@ -589,17 +600,6 @@ public abstract class Data {
           // add element
           boolean ne = false;
           if(md.nsFlag(mpre)) {
-            // find all namespaces in scope
-            final TokenMap nsScope = new TokenMap();
-            NSNode n = t; // root node of the namespace hierarchy
-            do {
-              for (int i = 0; i < n.vals.length; i += 2)
-                nsScope.add(ns.pref(n.vals[i]), ns.uri(n.vals[i + 1]));
-              final int pos = n.fnd(par);
-              if (pos < 0) break;
-              n = n.ch[pos];
-            } while (n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
-            
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) {
               final byte[] old = nsScope.get(at.key[a]);
