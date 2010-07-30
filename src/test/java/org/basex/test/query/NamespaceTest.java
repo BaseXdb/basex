@@ -1,11 +1,14 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.junit.AfterClass;
@@ -32,7 +35,8 @@ public class NamespaceTest {
     { "d5", "<a:x xmlns:a='aa'/>" },
     { "d6", "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
     { "d7", "<x xmlns='xx'><y/></x>" },
-    { "d8", "<a><b xmlns='B'/><c/></a>" }
+    { "d8", "<a><b xmlns='B'/><c/></a>" },
+    { "d9", "<a xmlns='A'><b><c/><d xmlns='D'/></b><e/></a>" }
   };
 
 //  /** Test query. */
@@ -112,6 +116,28 @@ public class NamespaceTest {
         "insert node <a xmlns='test'><b><c/></b><d/></a> into doc('d1')/x",
         "declare namespace na = 'test';doc('d1')/x/na:a",
         "<a xmlns='test'><b><c/></b><d/></a>");
+  }
+
+  /** Test query.
+   *  Detects bogus namespace after insert.
+   */
+  @Test
+  public final void namespaceHierarchy() {
+    query("insert node <f xmlns='F'/> into doc('d9')//*:e", "");
+    try {
+      new Open("d9").execute(context);
+      assertEquals("\n" +
+          "  Pre[1] xmlns=\"A\" \n" +
+          "    Pre[4] xmlns=\"D\" \n" +
+          "    Pre[6] xmlns=\"F\" ",
+          context.data.ns.toString());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(BaseXException e) { }
+    }
   }
 
   /** Test query.
