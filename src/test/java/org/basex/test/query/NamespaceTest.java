@@ -119,7 +119,7 @@ public class NamespaceTest {
   }
 
   /** Test query.
-   *  Detects bogus namespace after insert.
+   *  Detects malformed namespace hierarchy.
    */
   @Test
   public final void namespaceHierarchy() {
