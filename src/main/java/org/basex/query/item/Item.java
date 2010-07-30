@@ -219,6 +219,17 @@ public abstract class Item extends Expr {
     return (this == Dbl.NAN || this == Flt.NAN) && it.num() &&
         Double.isNaN(it.dbl()) || comparable(it) && eq(it);
   }
+  /**
+   * Checks the items for equivalence.
+   * Empty sequence is equivalent to Empty Sequence.
+   * @param it item to be compared
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public final boolean equive(final Item it) throws QueryException {
+    // check if both values empty otherwise equivalence
+    return (it.empty() && this.empty()) || equiv(it);
+  }
 
   /**
    * Checks if the items can be compared.

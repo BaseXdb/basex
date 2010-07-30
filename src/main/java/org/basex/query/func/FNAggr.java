@@ -53,7 +53,7 @@ final class FNAggr extends Fun {
     switch(func) {
       case COUNT:
         final long c = expr[0].size(ctx);
-        return c >= 0 ? Itr.get(c) : this;
+        return c >= 0 && !ctx.grouping ? Itr.get(c) : this;
       case MIN:
       case MAX:
       case AVG:

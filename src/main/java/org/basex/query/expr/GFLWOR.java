@@ -129,59 +129,29 @@ public class GFLWOR extends Expr {
     ctx.vars.reset(vs);
     return si;
 
-    // Move variables to stack
-//    ret(ctx, si, cache);
-//    ctx.vars.reset(vs);
-//    if(order != null) {
-//      order.sq = si;
-//      return order.iter(ctx);
-//    }
-//    return si;
   }
 
   /**
    * Returns grouped vars.
    * @param ctx context.
    * @param si sequence to be filled.
-   * @throws QueryException on error.
+   * @throws QueryException on error. 
    */
   private void retG(final QueryContext ctx, final SeqIter si)
       throws QueryException {
     for(int i = 0; i < group.gp.partitions.size(); i++) { // bind grouping var
       HashMap<Var, ItemList> ngvars = group.gp.items.get(i);
-      GroupNode gn = group.gp.partitions.get(i);
-      for(int j = 0; j < gn.vars.length; j++) {
-        gn.vars[j].bind(gn.its.get(j), ctx);
+      final GroupNode gn =  group.gp.partitions.get(i);
+      for(int j = 0; j < GroupPartition.gv.length; j++) {
+        GroupPartition.gv[j].bind(gn.its[j], ctx);
       }
       for(Var ngv : ngvars.keySet()) {
-        final ItemList its = ngvars.get(ngv);
+        final ItemList its = ngvars.get(ngv); 
         ngv.bind(Seq.get(its.list, its.size()), ctx);
       }
       si.add(ctx.iter(ret).finish());
     }
   }
-
-//  /**
-//   * Evaluates return.
-//   * @param ctx context.
-//   * @param seq sequence to be filled.
-//   * @param cache intermediate items
-//   * @throws QueryException on error.
-//   */
-//  private void ret(final QueryContext ctx, final SeqIter seq,
-//      final HashMap<Var, ItemList> cache) throws QueryException {
-//    final ItemList al = cache.get(fl[0].var);
-//    for(int i = 0; i < al.size(); i++) {
-//      // bind outer variable
-//      fl[0].var.bind(al.get(i), ctx);
-//      for(int j = 1; j < fl.length; j++) {
-//        final Item it = cache.get(fl[j].var).get(i);
-//        fl[j].var.bind(it, ctx); // bind inner
-//      }
-//      seq.add(ctx.iter(ret).finish());
-//
-//    }
-//  }
 
   /**
    * Performs a recursive iteration on the specified variable position.

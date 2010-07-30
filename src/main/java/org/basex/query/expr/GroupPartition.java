@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import org.basex.query.QueryContext;
+import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.util.ItemList;
 import org.basex.query.util.Var;
@@ -15,7 +16,7 @@ import org.basex.query.util.Var;
  */
 class GroupPartition {
   /** Grouping variables. */
-  private final Var[] gv;
+  protected static Var[] gv;
   /** Non grouping variables. */
   private final Var[] fl;
   /** Group Partitioning. */
@@ -25,8 +26,6 @@ class GroupPartition {
   /** HashValue, Position. */
   private final HashMap<Integer, Integer> hashes =
     new HashMap<Integer, Integer>();
-  /** Items map. */
-
   /**
    * Sets up an empty partitioning.
    * @param gv1 Grouping vars
@@ -65,13 +64,19 @@ class GroupPartition {
     for(int i = 0; i < gv.length; i++) {
       its[i] = ctx.vars.get(gv[i]).item;
     }
-    final GroupNode cand = new GroupNode(gv, its);
+    final GroupNode cand = new GroupNode(its);
     boolean found = false;
     int p = 0;
     final int chash = cand.hashCode();
     if(hashes.containsKey(chash)) {
-      p = hashes.get(chash);
-      found = true;
+      p = hashes.get(cand.hash);
+      if(cand.equals(partitions.get(p))) {
+        found = true;
+      } else {
+        System.out.println("Possible collision cand" + cand + " and "
+            + partitions.get(p));
+      }
+        
     }
     if(!found) {
       partitions.add(cand);
@@ -102,25 +107,21 @@ class GroupPartition {
    * @author Michael Seiferle
    */
   static final class GroupNode {
-    /** List of grouping vars. */
-    final Var[] vars;
     /** List of grouping var values. */
-    final ItemList its;
+    final Item[] its;
     /** Hashes for the group representative values.
      *  N.B. long instead of int */
     final int hash;
+    
 
     /**
      * Creates a group node.
-     * @param vs grouping vars
      * @param is grouping var values
      */
-    public GroupNode(final Var[] vs, final Item[] is) {
-      vars = vs;
-      its = new ItemList();
+    public GroupNode(final Item[] is) {
+      its = is;
       final long[] hhs = new long[is.length];
-      for(int i = 0; i < vs.length; i++) {
-        its.add(is[i]);
+      for(int i = 0; i < gv.length; i++) {
         if(is[i].empty()) {
           // Add long.max_value to denote empty sequence in item
           hhs[i] = Long.MAX_VALUE;
@@ -141,10 +142,27 @@ class GroupPartition {
     public String toString() {
       StringBuilder sb = new StringBuilder();
       sb.append(" ");
-      sb.append(Arrays.toString(vars));
+      sb.append(Arrays.toString(gv));
       sb.append(" with grouping var ");
-      sb.append(its.toString());
+      sb.append(Arrays.toString(its));
       return sb.toString();
     }
+    @Override
+    public boolean equals(final Object o) {
+      if(!(o instanceof GroupNode)) return false;
+      final GroupNode c = (GroupNode) o;
+      if(its.length != c.its.length ||
+          gv.length != c.its.length) return false;
+      for(int i = 0; i < its.length; i++) {
+        try {
+          if(!its[i].equive(c.its[i]))
+            return false;
+        } catch(QueryException e) {
+          return false;
+        }
+      }
+      return true;
+    }
   }
+
 }
