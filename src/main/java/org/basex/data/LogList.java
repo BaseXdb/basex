@@ -69,13 +69,13 @@ final class LogList {
   /**
    * Logs a the delete of a node.
    * @param pre value of the entry.
-   * @param count how many nodes are deleted (size of deleted root-node).
+   * @param size of deleted root-node.
    */
-  void delete(final int pre, final int count) {
+  void delete(final int pre, final int size) {
     // list is empty
     if(first == null)
       // insert the mainNode
-      first = new LogNode(pre, -count);
+      first = new LogNode(pre, -size);
     // list has entries
     else {
       // search right position for insert through linear search
@@ -88,11 +88,11 @@ final class LogList {
 
       // handle node with pre exists
       if(pointer != null && pointer.id == pre)
-        pointer.addend -= count;
+        pointer.addend -= size;
       // new node needs to be created
       else {
         // built up new node and subnode
-        final LogNode newNode = new LogNode(pre, -count);
+        final LogNode newNode = new LogNode(pre, -size);
 
         // insert into list
         // check if item will be first item
