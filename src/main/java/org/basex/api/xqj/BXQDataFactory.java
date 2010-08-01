@@ -136,7 +136,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(v, XQItem.class);
     try {
       final Type type = ((BXQItemType) v.getItemType()).getType();
-      return new BXQItem(type.e(((BXQItem) v).it, null));
+      return new BXQItem(type.e(((BXQItem) v).it, ctx.ctx));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -148,7 +148,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     valid(it, XQItemType.class);
     try {
       final Str val = Str.get(valid(v, String.class));
-      return new BXQItem(check(Type.STR, it).e(val, null));
+      return new BXQItem(check(Type.STR, it).e(val, ctx.ctx));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -267,7 +267,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       throws XQException {
     try {
       final Str val = Str.get(valid(v, String.class));
-      return new BXQItem(check(Type.STR, it).e(val, null));
+      return new BXQItem(check(Type.STR, it).e(val, ctx.ctx));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
@@ -375,7 +375,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   private BXQItem itr(final long v, final Type e, final XQItemType t)
       throws XQException {
     try {
-      return new BXQItem(check(e, t).e(Itr.get(v), null));
+      return new BXQItem(check(e, t).e(Itr.get(v), ctx.ctx));
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
