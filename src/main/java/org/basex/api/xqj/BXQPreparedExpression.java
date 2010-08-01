@@ -92,7 +92,7 @@ final class BXQPreparedExpression extends BXQDynamicContext
     opened();
     valid(qn, String.class);
     final QNm nm = new QNm(qn);
-    final Var var = qp.ctx.vars.get(new Var(nm, true));
+    final Var var = qp.ctx.vars.get(new Var(nm));
     if(var == null) throw new BXQException(VAR, nm);
     return var.type != null ? new BXQItemType(var.type.type) :
       BXQItemType.DEFAULT;
