@@ -149,7 +149,7 @@ public final class ServerProcess extends Thread {
         }
 
         // start timeout
-        cmd.startTimeout(context.main.prop.num(Prop.TIMEOUT));
+        cmd.startTimeout(context.prop.num(Prop.TIMEOUT));
 
         // execute command and send {RESULT}
         boolean ok = true;
