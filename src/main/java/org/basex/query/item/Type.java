@@ -387,7 +387,7 @@ public enum Type {
   DUR("duration", AAT, XSURI, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.dur() ? new Dur((Dur) it) : checkStr(it) ?
+      return it.dur() ? new Dur((Dur) it) : str(it) ?
           new Dur(it.atom()) : error(it);
     }
     @Override
@@ -400,7 +400,7 @@ public enum Type {
   YMD("yearMonthDuration", DUR, XSURI, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.dur() ? new YMd((Dur) it) : checkStr(it) ?
+      return it.dur() ? new YMd((Dur) it) : str(it) ?
           new YMd(it.atom()) : error(it);
     }
     @Override
@@ -413,7 +413,7 @@ public enum Type {
   DTD("dayTimeDuration", DUR, XSURI, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.dur() ? new DTd((Dur) it) : checkStr(it) ?
+      return it.dur() ? new DTd((Dur) it) : str(it) ?
           new DTd(it.atom()) : error(it);
     }
     @Override
@@ -427,7 +427,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
       return it.type == LNG ? new Dtm((Itr) it) : it.type == DAT ?
-          new Dtm((Date) it) : checkStr(it) ? new Dtm(it.atom()) : error(it);
+          new Dtm((Date) it) : str(it) ? new Dtm(it.atom()) : error(it);
     }
     @Override
     public Item e(final Object o) throws QueryException {
@@ -439,7 +439,7 @@ public enum Type {
   DAT("date", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.type == DTM ? new Dat((Date) it) : checkStr(it) ?
+      return it.type == DTM ? new Dat((Date) it) : str(it) ?
           new Dat(it.atom()) : error(it);
     }
     @Override
@@ -452,7 +452,7 @@ public enum Type {
   TIM("time", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.type == DTM ? new Tim((Date) it) : checkStr(it) ?
+      return it.type == DTM ? new Tim((Date) it) : str(it) ?
           new Tim(it.atom()) : error(it);
     }
     @Override
@@ -466,7 +466,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        checkStr(it) ? new DSim(it.atom(), this) : error(it);
+        str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws QueryException {
@@ -479,7 +479,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        checkStr(it) ? new DSim(it.atom(), this) : error(it);
+        str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws QueryException {
@@ -492,7 +492,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        checkStr(it) ? new DSim(it.atom(), this) : error(it);
+        str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws QueryException {
@@ -505,7 +505,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        checkStr(it) ? new DSim(it.atom(), this) : error(it);
+        str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws QueryException {
@@ -518,7 +518,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        checkStr(it) ? new DSim(it.atom(), this) : error(it);
+        str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
     public Item e(final Object o) throws QueryException {
@@ -530,7 +530,7 @@ public enum Type {
   BLN("boolean", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.num() ? Bln.get(it.bool()) : checkStr(it) ?
+      return it.num() ? Bln.get(it.bool()) : str(it) ?
           Bln.get(Bln.check(it.atom())) : error(it);
     }
     @Override
@@ -543,7 +543,7 @@ public enum Type {
   B6B("base64Binary", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.type == HEX ? new B64((Hex) it) : checkStr(it) ?
+      return it.type == HEX ? new B64((Hex) it) : str(it) ?
           new B64(it.atom()) : error(it);
     }
     @Override
@@ -556,7 +556,7 @@ public enum Type {
   HEX("hexBinary", AAT, XSURI, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx) throws QueryException {
-      return it.type == B6B ? new Hex((B64) it) : checkStr(it) ?
+      return it.type == B6B ? new Hex((B64) it) : str(it) ?
           new Hex(it.atom()) : error(it);
     }
     @Override
@@ -787,7 +787,7 @@ public enum Type {
    * @param it item
    * @return item argument
    */
-  protected static boolean checkStr(final Item it) {
+  protected static boolean str(final Item it) {
     return (it.str() || it.unt()) && it.type != URI;
   }
 

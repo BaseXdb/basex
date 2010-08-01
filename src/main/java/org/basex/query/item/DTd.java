@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -128,8 +129,8 @@ public final class DTd extends Dur {
   }
 
   @Override
-  public int diff(final Item it) throws QueryException {
-    if(it.type != type) Err.cmp(it, this);
+  public int diff(final ParseExpr e, final Item it) throws QueryException {
+    if(it.type != type) e.diffError(it, this);
     return sc.subtract(((Dur) it).sc).signum();
   }
 

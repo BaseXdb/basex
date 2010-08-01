@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import javax.xml.namespace.QName;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 import org.basex.util.XMLToken;
@@ -102,8 +103,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) throws QueryException {
-    if(it.type != type) Err.cmp(this, it);
+  public boolean eq(final Item it) {
+    // at this stage, item will always be of the same type
     return eq((QNm) it);
   }
 
@@ -117,8 +118,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public int diff(final Item it) throws QueryException {
-    Err.cmp(it, this);
+  public int diff(final ParseExpr e, final Item it) throws QueryException {
+    e.diffError(it, this);
     return 0;
   }
 

@@ -73,7 +73,7 @@ final class QueryProcess extends Progress {
    * @throws QueryException query exception
    */
   boolean next() throws IOException, QueryException {
-    if(stopped) throw new QueryException(SERVERTIMEOUT);
+    if(stopped) throw new QueryException(null, SERVERTIMEOUT);
 
     final boolean more = item != null;
     if(more) {

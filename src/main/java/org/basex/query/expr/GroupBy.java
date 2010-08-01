@@ -56,7 +56,7 @@ public final class GroupBy extends ParseExpr {
 //   */
 //  void adds(final Item it) throws QueryException {
 //    if(seq != null) {
-//      if(it.size(null) > 1) Err.or(XGRP);
+//      if(it.size(null) > 1) error(XGRP);
 //      seq.add(it);
 //      return;
 //    }

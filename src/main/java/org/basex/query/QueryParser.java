@@ -99,7 +99,6 @@ import org.basex.query.up.Insert;
 import org.basex.query.up.Rename;
 import org.basex.query.up.Replace;
 import org.basex.query.up.Transform;
-import org.basex.query.util.Err;
 import org.basex.query.util.NSLocal;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -2600,7 +2599,7 @@ public class QueryParser extends InputParser {
     } else if(!consumeWS(INTO)) {
       after = consumeWS(AFTER);
       before = !after && consumeWS(BEFORE);
-      if(!after && !before) Err.or(INCOMPLETE);
+      if(!after && !before) error(INCOMPLETE);
     }
     final Expr trg = check(single(), INCOMPLETE);
     ctx.updating = true;
@@ -2961,24 +2960,6 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * Throws the specified error.
-   * @param err error to be thrown
-   * @param arg error arguments
-   * @throws QueryException query exception
-   */
-  void error(final Object[] err, final Object... arg) throws QueryException {
-    Err.or(err, arg);
-  }
-
-  /**
-   * Creates a query info instance.
-   * @return query info
-   */
-  public QueryInfo info() {
-    return new QueryInfo(this);
-  }
-
-  /**
    * Adds an expression to the specified array.
    * @param ar input array
    * @param e new expression
@@ -2992,5 +2973,16 @@ public class QueryParser extends InputParser {
     System.arraycopy(ar, 0, tmp, 0, a);
     tmp[a] = e;
     return tmp;
+  }
+
+  /**
+   * Throws the specified error.
+   * @param err error to be thrown
+   * @param arg error arguments
+   * @throws QueryException query exception
+   */
+  public void error(final Object[] err, final Object... arg)
+      throws QueryException {
+    throw new QueryException(info(), err, arg);
   }
 }

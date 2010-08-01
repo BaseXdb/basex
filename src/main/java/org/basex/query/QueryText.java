@@ -118,8 +118,6 @@ public interface QueryText {
   /** FORG0001: Evaluation exception. */
   Object[] INVALIDZONE = { FORG, 1, "Invalid timezone: %." };
   /** FORG0001: Evaluation exception. */
-  Object[] CASTBOOL = { FORG, 1, "Invalid boolean cast: \"%\"." };
-  /** FORG0001: Evaluation exception. */
   Object[] FUNCAST = { FORG, 1, "Invalid % cast: %." };
   /** FORG0001: Evaluation exception. */
   Object[] DATERANGE = { FORG, 1, "%(\"%\") out of range." };
@@ -333,7 +331,7 @@ public interface QueryText {
   Object[] FTMATCH = { XPST, 3, "Unknown match option '%...'." };
 
   /** XPST0005: Parsing exception. */
-  Object[] COMPSELF = { XPST, 5, "Warning: '%' won't yield any results." };
+  Object[] COMPSELF = { XPST, 5, "Warning: '%' will not yield any results." };
 
   /** XPST0008: Parsing exception. */
   Object[] VARNOTDEFINED = { XPST, 8, "Undefined variable \"%\"." };
@@ -373,7 +371,7 @@ public interface QueryText {
   /** XPTY0004: Typing exception. */
   Object[] XPDUR = { XPTY, 4, "%: duration expected, % found." };
   /** XPTY0004: Typing Exception. */
-  Object[] XPTYPECMP = { XPTY, 4, "% and % can't be compared." };
+  Object[] XPTYPECMP = { XPTY, 4, "% and % cannot be compared." };
   /** XPTY0004: Typing exception. */
   Object[] XPTYPENUM = { XPTY, 4, "%: number expected, % found." };
   /** XPTY0004: Typing exception. */
@@ -381,7 +379,7 @@ public interface QueryText {
   /** XPTY0004: Typing exception. */
   Object[] XPNAME = { XPTY, 4, "Expecting name." };
   /** XPTY0004: Typing exception. */
-  Object[] XPATT = { XPTY, 4, "Can't add attributes to a document node." };
+  Object[] XPATT = { XPTY, 4, "Cannot add attributes to a document node." };
   /** XPTY0004: Typing exception. */
   Object[] CPIWRONG = { XPTY, 4, "% not allowed as PI name: \"%\"." };
   /** XPTY0004: Typing exception. */
@@ -431,7 +429,7 @@ public interface QueryText {
   Object[] CPIINVAL = { XQDY, 41, "Invalid PI name: \"%\"" };
   /** XQDY0044: Evaluation exception. */
   Object[] NSATTCONS = { XQDY, 44,
-    "Attribute constructors can't create namespaces." };
+    "Attribute constructors cannot create namespaces." };
   /** XQDY0064: Evaluation exception. */
   Object[] CPIXML = { XQDY, 64, "Illegal PI name: \"%\"" };
   /** XQDY0072: Evaluation exception. */
@@ -478,7 +476,7 @@ public interface QueryText {
   /** XQST0055: Parsing exception. */
   Object[] DUPLCOPYNS = { XQST, 55, "Duplicate 'copy-namespace' declaration." };
   /** XQST0057: Parsing exception. */
-  Object[] NSEMPTY = { XQST, 57, "Namespace URI can't be empty." };
+  Object[] NSEMPTY = { XQST, 57, "Namespace URI cannot be empty." };
   /** XQST0059: Parsing exception. */
   Object[] NOMODULE = { XQST, 59, "Unknown module for namespace \"%\"." };
   /** XQST0059: Parsing exception. */
@@ -498,9 +496,9 @@ public interface QueryText {
   /** XQST0069: Parsing exception. */
   Object[] DUPLORDEMP = { XQST, 69, "Duplicate 'order empty' declaration." };
   /** XQST0070: Parsing exception. */
-  Object[] NSDEF = { XQST, 70, "Can't overwrite namespace %" };
+  Object[] NSDEF = { XQST, 70, "Cannot overwrite namespace %" };
   /** XQST0070: Parsing exception. */
-  Object[] NOXMLNS = { XQST, 70, "Can't declare XML namespace." };
+  Object[] NOXMLNS = { XQST, 70, "Cannot declare XML namespace." };
   /** XQST0071: Parsing exception. */
   Object[] DUPLNSDEF = { XQST, 71,
       "Duplicate declaration of namespace \"%\"." };
@@ -513,11 +511,11 @@ public interface QueryText {
   /** XQST0079: Parsing exception. */
   Object[] NOPRAGMA = { XQST, 79, "Expecting pragma expression." };
   /** XQST0085: Parsing exception. */
-  Object[] NSEMPTYURI = { XQST, 85, "Namespace URI can't be empty." };
+  Object[] NSEMPTYURI = { XQST, 85, "Namespace URI cannot be empty." };
   /** XQST0087: Parsing exception. */
   Object[] XQUERYENC2 = { XQST, 87, "Imprecise encoding definition '%'." };
   /** XQST0088: Parsing exception. */
-  Object[] NSMODURI = { XQST, 88, "Module namespace can't be empty." };
+  Object[] NSMODURI = { XQST, 88, "Module namespace cannot be empty." };
   /** XQST0089: Parsing exception. */
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
   /** XQST0090: Parsing exception. */

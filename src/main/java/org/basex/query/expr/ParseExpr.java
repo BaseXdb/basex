@@ -297,10 +297,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final void error(final Object[] err, final Object... x)
       throws QueryException {
-
-    final QueryException qe = new QueryException(err, x);
-    if(info != null) qe.pos(info);
-    throw qe;
+    throw new QueryException(info, err, x);
   }
   
   /**
@@ -311,10 +308,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final void error(final Object err, final Object... x)
       throws QueryException {
-
-    final QueryException qe = new QueryException(err, x);
-    if(info != null) qe.pos(info);
-    throw qe;
+    throw new QueryException(info, err, x);
   }
 
   /**
@@ -356,5 +350,17 @@ public abstract class ParseExpr extends Expr {
    */
   public void emptyError() throws QueryException {
     error(XPEMPTY, info());
+  }
+
+  /**
+   * Throws a comparison exception.
+   * @param it1 first item
+   * @param it2 second item
+   * @throws QueryException query exception
+   */
+  public void diffError(final Item it1, final Item it2)
+      throws QueryException {
+    if(it1 == it2) error(TYPECMP, it1.type);
+    else error(XPTYPECMP, it1.type, it2.type);
   }
 }

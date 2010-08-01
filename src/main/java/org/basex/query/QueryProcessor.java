@@ -131,7 +131,7 @@ public final class QueryProcessor extends Progress {
    */
   public Nodes queryNodes() throws QueryException {
     final Result res = execute();
-    if(!(res instanceof Nodes)) throw new QueryException(QUERYNODESERR);
+    if(!(res instanceof Nodes)) throw new QueryException(null, QUERYNODESERR);
     return (Nodes) res;
   }
 

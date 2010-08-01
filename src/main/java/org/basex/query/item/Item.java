@@ -9,6 +9,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
@@ -206,7 +207,7 @@ public abstract class Item extends Expr {
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(Item it) throws QueryException;
+  public abstract boolean eq(final Item it) throws QueryException;
 
   /**
    * Checks the items for equivalence.
@@ -243,12 +244,13 @@ public abstract class Item extends Expr {
 
   /**
    * Returns the difference between the current and the specified item.
+   * @param e calling expression
    * @param it item to be compared
    * @return difference
    * @throws QueryException query exception
    */
-  public int diff(final Item it) throws QueryException {
-    Err.cmp(it, this);
+  public int diff(final ParseExpr e, final Item it) throws QueryException {
+    e.diffError(it, this);
     return 0;
   }
 
@@ -274,7 +276,7 @@ public abstract class Item extends Expr {
    * @throws QueryException query exception
    */
   protected final void castErr(final Object val) throws QueryException {
-    Err.or(FUNCAST, type, Err.chop(val));
+    Err.or(FUNCAST, type, val);
   }
 
   /**

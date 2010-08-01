@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
-import org.basex.util.Token;
 
 /**
  * This class assembles common error messages.
@@ -24,7 +23,7 @@ public final class Err {
    */
   public static void or(final Object[] err, final Object... x)
       throws QueryException {
-    throw new QueryException(err, x);
+    throw new QueryException(null, err, x);
   }
 
   /**
@@ -60,34 +59,12 @@ public final class Err {
   }
 
   /**
-   * Throws a comparison exception.
-   * @param it1 first item
-   * @param it2 second item
-   * @throws QueryException query exception
-   */
-  public static void cmp(final Item it1, final Item it2) throws QueryException {
-    if(it1 == it2) or(TYPECMP, it1.type);
-    else or(XPTYPECMP, it1.type, it2.type);
-  }
-
-  /**
    * Throws a numeric type exception.
    * @param t expression cast type
    * @param it item
    * @throws QueryException query exception
    */
   public static void cast(final Type t, final Item it) throws QueryException {
-    or(XPINVCAST, it.type, t, chop(it));
-  }
-
-  /**
-   * Chops the specified input and returns the string.
-   * @param val input value
-   * @return chopped string
-   */
-  public static String chop(final Object val) {
-    final String str = val instanceof byte[] ? Token.string((byte[]) val) :
-      val.toString();
-    return str.length() > 30 ? str.substring(0, 30) + "..." : str;
+    or(XPINVCAST, it.type, t, it);
   }
 }

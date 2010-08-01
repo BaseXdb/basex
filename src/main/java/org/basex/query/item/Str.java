@@ -3,6 +3,7 @@ package org.basex.query.item;
 import java.math.BigDecimal;
 import org.basex.core.Main;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.util.Token;
 
 /**
@@ -91,7 +92,7 @@ public class Str extends Item {
 
   @Override
   @SuppressWarnings("unused")
-  public int diff(final Item it) throws QueryException {
+  public int diff(final ParseExpr e, final Item it) throws QueryException {
     return Token.diff(val, it.atom());
   }
 

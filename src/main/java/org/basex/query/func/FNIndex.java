@@ -65,7 +65,7 @@ public final class FNIndex extends TokenSet {
 
       final Fun f = Fun.create(qp.info(), fl, args);
       // check number of arguments
-      if(args.length < fl.min || args.length > fl.max) Err.or(XPARGS, fl);
+      if(args.length < fl.min || args.length > fl.max) qp.error(XPARGS, fl);
       return f;
     }
     return null;

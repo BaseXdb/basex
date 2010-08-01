@@ -285,7 +285,8 @@ final class FNGen extends Fun {
       nod.serialize(new XMLSerializer(co, new SerializerProp(tb.toString())));
       return Str.get(co.toArray());
     } catch(final IOException ex) {
-      throw new QueryException(ex.getMessage());
+      error(ex.getMessage() != null ? ex.getMessage() : ex.toString());
+      return null;
     }
   }
 

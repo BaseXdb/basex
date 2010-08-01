@@ -40,10 +40,9 @@ public final class Hex extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) throws QueryException {
-    if(it.type == type) return Token.eq(val, ((Hex) it).val);
-    castErr(it);
-    return false;
+  public boolean eq(final Item it) {
+    // at this stage, item will always be of the same type
+    return Token.eq(val, ((Hex) it).val);
   }
 
   @Override

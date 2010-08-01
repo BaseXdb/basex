@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.Main;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -78,8 +79,8 @@ public final class DSim extends Date {
   }
 
   @Override
-  public int diff(final Item it) throws QueryException {
-    Err.cmp(it, this);
+  public int diff(final ParseExpr e, final Item it) throws QueryException {
+    e.diffError(it, this);
     return 0;
   }
 }

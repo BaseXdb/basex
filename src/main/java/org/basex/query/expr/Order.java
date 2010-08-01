@@ -171,7 +171,7 @@ public final class Order extends ParseExpr {
       final boolean x = m == null;
       final boolean y = n == null;
       final int c = x ? y ? 0 : or.lst ? -1 : 1 : y ? or.lst ? 1 : -1 :
-        m.diff(n);
+        m.diff(this, n);
       if(c != 0) return or.desc ? -c : c;
     }
     return 0;
@@ -191,7 +191,8 @@ public final class Order extends ParseExpr {
       final Item n = l.item(o[b]);
       final boolean x = m == null;
       final boolean y = n == null;
-      final int c = x ? y ? 0 : l.lst ? -1 : 1 : y ? l.lst ? 1 : -1 : m.diff(n);
+      final int c = x ? y ? 0 : l.lst ? -1 : 1 : y ? l.lst ? 1 : -1 :
+        m.diff(this, n);
       if(c != 0) return l.desc ? -c : c;
     }
     return 0;

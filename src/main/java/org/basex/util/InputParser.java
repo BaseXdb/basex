@@ -3,6 +3,7 @@ package org.basex.util;
 import static org.basex.util.Token.*;
 import org.basex.core.Main;
 import org.basex.io.IO;
+import org.basex.query.QueryInfo;
 
 /**
  * Simple query parser; can be overwritten to support more complex parsings.
@@ -155,5 +156,13 @@ public abstract class InputParser {
   protected final String rest() {
     final int e = Math.min(ql, qp + 15);
     return qu.substring(qp, e) + (e == ql ? "" : "...");
+  }
+
+  /**
+   * Creates a query info instance.
+   * @return query info
+   */
+  public QueryInfo info() {
+    return new QueryInfo(this);
   }
 }

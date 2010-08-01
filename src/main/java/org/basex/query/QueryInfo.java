@@ -1,5 +1,7 @@
 package org.basex.query;
 
+import org.basex.util.InputParser;
+
 /**
  * Parsing information.
  *
@@ -16,7 +18,7 @@ public final class QueryInfo {
    * Optimizes and compiles the expression.
    * @param p parsing position
    */
-  public QueryInfo(final QueryParser p) {
+  public QueryInfo(final InputParser p) {
     query = p.qu;
     pos = p.qp;
   }

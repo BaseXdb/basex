@@ -88,8 +88,8 @@ public final class SeqIter extends Iter implements Result {
     if(size != sb.size) return false;
     try {
       for(int i = 0; i < size; i++) {
-        if(item[i].type != sb.item[i].type ||
-          !item[i].eq(sb.item[i])) return false;
+        if(item[i].type != sb.item[i].type || !item[i].eq(sb.item[i]))
+          return false;
       }
       return true;
     } catch(final QueryException ex) {

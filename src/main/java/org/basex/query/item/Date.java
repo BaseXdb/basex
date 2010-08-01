@@ -8,6 +8,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.core.Main;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -151,7 +152,7 @@ public abstract class Date extends Item {
 
   @SuppressWarnings("unused")
   @Override
-  public int diff(final Item it) throws QueryException {
+  public int diff(final ParseExpr e, final Item it) throws QueryException {
     final long d1 = days();
     final long d2 = ((Date) it).days();
     if(d1 != d2) return (int) (d1 - d2);

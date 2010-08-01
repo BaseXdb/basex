@@ -103,31 +103,41 @@ final class FNAggr extends Fun {
 
   /**
    * Returns a minimum or maximum item.
-   * @param iter1 first argument
+   * @param iter values to be compared
    * @param cmp comparator
    * @param ctx query context
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item minmax(final Iter iter1, final CmpV.Comp cmp,
+  private Item minmax(final Iter iter, final CmpV.Comp cmp,
       final QueryContext ctx) throws QueryException {
 
     if(expr.length == 2) checkColl(expr[1], ctx);
 
-    Item res = iter1.next();
+    Item res = iter.next();
     if(res == null) return null;
 
-    cmp.e(res, res);
-    if(!res.unt() && res.str() || res instanceof Date)
-      return evalStr(iter1, res, cmp);
+    // check if first item is comparable
+    cmp.e(this, res, res);
 
+    // strings or dates
+    if(!res.unt() && res.str() || res instanceof Date) {
+      Item it;
+      while((it = iter.next()) != null) {
+        if(it.type != res.type) error(FUNCMP, info(), res.type, it.type);
+        if(cmp.e(this, res, it)) res = it;
+      }
+      return res;
+    }
+
+    // durations or numbers
     Type t = res.unt() ? DBL : res.type;
     if(res.type != t) res = t.e(res, ctx);
 
     Item it;
-    while((it = iter1.next()) != null) {
+    while((it = iter.next()) != null) {
       t = type(res, it);
-      if(!it.dur() && Double.isNaN(it.dbl()) || cmp.e(res, it)) res = it;
+      if(!it.dur() && Double.isNaN(it.dbl()) || cmp.e(this, res, it)) res = it;
       if(res.type != t) res = t.e(res, ctx);
     }
     return res;
@@ -153,25 +163,5 @@ final class FNAggr extends Fun {
     if(a.type == BLN || a.num() && !b.num() || b.num() && !a.num())
       error(FUNCMP, this, a.type, b.type);
     return a.num() || b.num() ? ITR : a.type;
-  }
-
-  /**
-   * Compares strings.
-   * @param iter input iterator
-   * @param r first item
-   * @param cmp comparator
-   * @return resulting item
-   * @throws QueryException query exception
-   */
-  private Item evalStr(final Iter iter, final Item r, final CmpV.Comp cmp)
-      throws QueryException {
-
-    Item res = r;
-    Item it;
-    while((it = iter.next()) != null) {
-      if(it.type != res.type) error(FUNCMP, info(), res.type, it.type);
-      if(cmp.e(res, it)) res = it;
-    }
-    return res;
   }
 }

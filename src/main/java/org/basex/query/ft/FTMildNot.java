@@ -73,7 +73,7 @@ public final class FTMildNot extends FTExpr {
   FTItem mildnot(final FTItem it1, final FTItem it2) {
     it1.all = mildnot(it1.all, it2.all);
     // [CG] XQFT: check invalid mild not tests
-    //if(it1.all == null) Err.or(FTMILD);
+    //if(it1.all == null) error(FTMILD);
     return it1;
   }
 

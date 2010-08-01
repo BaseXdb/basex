@@ -9,7 +9,6 @@ import org.basex.io.IO;
 import org.basex.query.ft.Scoring;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
-import org.basex.query.util.Err;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 
@@ -312,7 +311,7 @@ public class DBNode extends Nod {
       case DOC:
         return type.name + " { \"" + string(data.text(pre, true)) + "\" }";
       default:
-        return type.name + " { \"" + Err.chop(atom()) + "\" }";
+        return type.name + " { \"" + string(atom()) + "\" }";
     }
   }
 }

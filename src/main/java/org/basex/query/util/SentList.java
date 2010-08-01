@@ -4,6 +4,7 @@ import static org.basex.util.Token.*;
 import javax.xml.parsers.SAXParserFactory;
 import org.basex.core.Main;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.util.TokenSet;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
@@ -24,18 +25,20 @@ public final class SentList extends DefaultHandler {
 
   /**
    * Default constructor.
+   * @param e calling expression
    * @param uri path to word list
    * @throws QueryException query exception
    */
-  public SentList(final String uri) throws QueryException {
+  public SentList(final ParseExpr e, final String uri)
+      throws QueryException {
+
     try {
       // [OE] could be extended for other XML formats (incl. negations),
       // or plain texts
       SAXParserFactory.newInstance().newSAXParser().parse(uri, this);
     } catch(final Exception ex) {
       Main.debug(ex);
-      throw new QueryException(
-          uri + " could not be parsed: " + ex.toString());
+      e.error(uri + " could not be parsed: " + ex);
     }
 
     // no negations defined - add defaults

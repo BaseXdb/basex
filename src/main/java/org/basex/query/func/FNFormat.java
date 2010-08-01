@@ -84,7 +84,7 @@ final class FNFormat extends Fun {
     final String pic = string(checkStr(expr[1], ctx));
     if(expr.length == 3) error(FORMNUM, expr[2]);
 
-    return Str.get(NumFormatter.format(it, pic));
+    return Str.get(NumFormatter.format(this, it, pic));
   }
 
   /**
@@ -104,7 +104,6 @@ final class FNFormat extends Fun {
     final byte[] lng = expr.length == 5 ? checkStr(expr[2], ctx) : EMPTY;
     final byte[] cal = expr.length == 5 ? checkStr(expr[3], ctx) : EMPTY;
     final byte[] plc = expr.length == 5 ? checkStr(expr[4], ctx) : EMPTY;
-
-    return Str.get(DateFormatter.format(date, pic, lng, cal, plc));
+    return Str.get(DateFormatter.format(this, date, pic, lng, cal, plc));
   }
 }

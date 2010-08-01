@@ -4,10 +4,10 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.func.FNNum;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 
 /**
@@ -51,20 +51,21 @@ public final class NumFormatter {
 
   /**
    * Returns a formatted number.
+   * @param e calling expression
    * @param number number to be formatted
    * @param picture picture
    * @return string representation
    * @throws QueryException query exception
    */
-  public static byte[] format(final Item number, final String picture)
-      throws QueryException {
+  public static byte[] format(final ParseExpr e, final Item number,
+      final String picture) throws QueryException {
 
     // find pattern separator and sub-patterns
     final String[] sub = picture.split(String.valueOf(PATTERN));
-    if(sub.length > 2) Err.or(PICNUM, picture);
+    if(sub.length > 2) e.error(PICNUM, picture);
 
     // check and analyze patterns
-    check(sub);
+    check(e, sub);
     final Picture[] pics = analyze(sub);
 
     // return formatted string
@@ -73,10 +74,13 @@ public final class NumFormatter {
 
   /**
    * Checks the syntax of the specified patterns.
+   * @param e calling expression
    * @param patterns patterns
    * @throws QueryException query exception
    */
-  private static void check(final String[] patterns) throws QueryException {
+  private static void check(final ParseExpr e, final String[] patterns)
+      throws QueryException {
+
     for(final String pat : patterns) {
       boolean frac = false, pas = false, act = false;
       boolean dig = false, opt1 = false, opt2 = false;
@@ -89,12 +93,12 @@ public final class NumFormatter {
 
         if(ch == DECIMAL) {
           // more than 1 decimal sign?
-          if(frac) Err.or(PICNUM, pat);
+          if(frac) e.error(PICNUM, pat);
           frac = true;
         } else if(ch == GROUP) {
           // adjacent decimal sign?
           if(cp(pat, i - 1) == DECIMAL || cp(pat, i + 1) == DECIMAL)
-            Err.or(PICNUM, pat);
+            e.error(PICNUM, pat);
         } else if(ch == PERCENT) {
           pc++;
         } else if(ch == PERMILLE) {
@@ -102,28 +106,28 @@ public final class NumFormatter {
         } else if(ch == OPTIONAL) {
           if(!frac) {
             // integer part, and optional sign after digit?
-            if(dig) Err.or(PICNUM, pat);
+            if(dig) e.error(PICNUM, pat);
             opt1 = true;
           } else {
             opt2 = true;
           }
         } else if(DIGITS.indexOf(ch) != -1) {
           // fractional part, and digit after optional sign?
-          if(frac && opt2) Err.or(PICNUM, pat);
+          if(frac && opt2) e.error(PICNUM, pat);
           dig = true;
         }
 
         // passive character with preceding and following active character?
-        if(a && pas && act) Err.or(PICNUM, pat);
+        if(a && pas && act) e.error(PICNUM, pat);
         // will be assigned if active characters were found
         if(act) pas |= !a;
         act |= a;
       }
 
       // more than 1 percent and permille sign?
-      if(pc > 1 || pm > 1 || pc + pm > 1) Err.or(PICNUM, pat);
+      if(pc > 1 || pm > 1 || pc + pm > 1) e.error(PICNUM, pat);
       // no optional sign or digit?
-      if(!opt1 && !opt2 && !dig) Err.or(PICNUM, pat);
+      if(!opt1 && !opt2 && !dig) e.error(PICNUM, pat);
     }
   }
 

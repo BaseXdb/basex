@@ -45,10 +45,9 @@ public final class B64 extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) throws QueryException {
-    if(it.type == type) return Token.eq(val, ((B64) it).val);
-    castErr(it);
-    return false;
+  public boolean eq(final Item it) {
+    // at this stage, item will always be of the same type
+    return Token.eq(val, ((B64) it).val);
   }
 
   @Override

@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.Duration;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -186,8 +187,8 @@ public class Dur extends Item {
   }
 
   @Override
-  public int diff(final Item it) throws QueryException {
-    Err.cmp(it, this);
+  public int diff(final ParseExpr e, final Item it) throws QueryException {
+    e.diffError(it, this);
     return 0;
   }
 

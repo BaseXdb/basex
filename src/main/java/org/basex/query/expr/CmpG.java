@@ -22,7 +22,6 @@ import org.basex.query.iter.SeqIter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.Step;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.Token;
 
@@ -239,8 +238,8 @@ public final class CmpG extends Arr {
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
     if(a.type != b.type && !a.unt() && !b.unt() && !(a.str() && b.str()) &&
-        !(a.num() && b.num())) Err.cmp(a, b);
-    return cmp.cmp.e(a, b);
+        !(a.num() && b.num())) error(XPTYPECMP, a.type, b.type);
+    return cmp.cmp.e(this, a, b);
   }
 
   @Override

@@ -12,6 +12,7 @@ import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
@@ -84,8 +85,8 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public final int diff(final Item i) throws QueryException {
-    return i.num() ? -i.diff(this) : Token.diff(atom(), i.atom());
+  public final int diff(final ParseExpr e, final Item i) throws QueryException {
+    return i.num() ? -i.diff(e, this) : Token.diff(atom(), i.atom());
   }
 
   /**

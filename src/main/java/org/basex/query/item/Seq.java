@@ -7,6 +7,7 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
@@ -114,7 +115,7 @@ public class Seq extends Item {
   }
 
   @Override
-  public final int diff(final Item it) {
+  public final int diff(final ParseExpr e, final Item it) {
     Main.notexpected();
     return 0;
   }

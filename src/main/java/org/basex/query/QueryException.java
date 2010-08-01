@@ -6,6 +6,7 @@ import org.basex.io.IO;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputParser;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 
 /**
  * This class indicates exceptions during query parsing or evaluation.
@@ -30,23 +31,52 @@ public final class QueryException extends Exception {
 
   /**
    * Constructor.
+   * @param qi query info
    * @param s message
    * @param e message extension
    */
-  public QueryException(final Object s, final Object... e) {
-    super(Main.info(s, e));
+  public QueryException(final QueryInfo qi, final Object s, final Object... e) {
+    super(Main.info(s, chop(e)));
+    if(qi == null) return;
+
+    line = 1;
+    col = 1;
+    for(int i = 0; i < qi.pos && i < qi.query.length(); i++) {
+      final char ch = qi.query.charAt(i);
+      if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
+    }
   }
 
   /**
    * Constructor.
+   * @param qi query info
    * @param s xquery error
    * @param e error arguments
    */
-  public QueryException(final Object[] s, final Object... e) {
-    this(s[2], e);
+  public QueryException(final QueryInfo qi, final Object[] s,
+      final Object... e) {
+    this(qi, s[2], e);
     code = s[1] == null ? s[0].toString() : String.format("%s%04d", s[0], s[1]);
   }
 
+  /**
+   * Chops the specified array entries to a maximum length.
+   * @param t token array
+   * @return argument
+   */
+  private static Object[] chop(final Object[] t) {
+    for(int i = 0; i < t.length; i++) {
+      if(t[i] instanceof byte[]) {
+        t[i] = Token.string((byte[]) t[i]);
+      } else if(!(t[i] instanceof String)) {
+        t[i] = t[i].toString();
+      }
+      final String s = t[i].toString();
+      t[i] = s.length() > 256 ? s.substring(0, 256) + DOTS : s;
+    }
+    return t;
+  }
+  
   /**
    * Returns the error code.
    * @return position
@@ -84,25 +114,14 @@ public final class QueryException extends Exception {
    * @param parser parser
    */
   void pos(final InputParser parser) {
-    if(line != 0 || parser == null) return;
+    // check if information has already been added
+    if(line != 0) return;
+
     file = parser.file;
     line = 1;
     col = 1;
     for(int i = 0; i < parser.qm && i < parser.ql; i++) {
       final char ch = parser.qu.charAt(i);
-      if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
-    }
-  }
-
-  /**
-   * Finds line and column for the specified query position.
-   * @param qi query info
-   */
-  public void pos(final QueryInfo qi) {
-    line = 1;
-    col = 1;
-    for(int i = 0; i < qi.pos && i < qi.query.length(); i++) {
-      final char ch = qi.query.charAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }
   }

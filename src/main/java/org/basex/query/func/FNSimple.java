@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryInfo;
@@ -8,6 +9,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -153,7 +155,7 @@ public final class FNSimple extends Fun {
         if(n1 == null && n2 == null || n1 == null ^ n2 == null) break;
         if(n1.type != n2.type) return false;
 
-        final Item qn1 = n1.qname();
+        final QNm qn1 = n1.qname();
         if(qn1 != null && !qn1.eq(n2.qname())) return false;
 
         if(n1.type == Type.ATT || n1.type == Type.PI || n1.type == Type.COM ||

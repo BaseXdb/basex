@@ -209,7 +209,7 @@ public final class QueryContext extends Progress {
       if(nodes != null) {
         final Data data = nodes.data;
         if(!context.perm(User.READ, data.meta))
-          throw new QueryException(PERMNO, CmdPerm.READ);
+          throw new QueryException(null, PERMNO, CmdPerm.READ);
 
         final int s = (int) nodes.size();
         if(nodes.doc) {
@@ -491,8 +491,7 @@ public final class QueryContext extends Progress {
       if(colls == 0) Err.or(NODEFCOLL);
     } else {
       // invalid collection reference
-      if(contains(coll, '<') || contains(coll, '\\'))
-        Err.or(COLLINV, Err.chop(coll));
+      if(contains(coll, '<') || contains(coll, '\\')) Err.or(COLLINV, coll);
 
       while(c < colls && !eq(collName[c], coll)) c++;
       if(c == colls) addDocs(doc(coll, true, false));

@@ -58,7 +58,7 @@ public final class FNSent extends Fun {
     final String uri = string(checkEmptyStr(expr[1], ctx));
     SentList list = LISTS.get(uri);
     if(list == null) {
-      list = new SentList(uri);
+      list = new SentList(this, uri);
       LISTS.put(uri, list);
     }
 

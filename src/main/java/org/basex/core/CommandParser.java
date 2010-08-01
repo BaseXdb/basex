@@ -452,7 +452,8 @@ public final class CommandParser extends InputParser {
    */
   private void error(final StringList comp, final String m, final Object... e)
       throws QueryException {
-    final QueryException qe = new QueryException(m, e);
+
+    final QueryException qe = new QueryException(info(), m, e);
     qe.complete(this, comp);
     throw qe;
   }

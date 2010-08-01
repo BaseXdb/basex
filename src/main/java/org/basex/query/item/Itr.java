@@ -3,6 +3,7 @@ package org.basex.query.item;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.util.Token;
 
 /**
@@ -102,7 +103,9 @@ public class Itr extends Item {
   }
 
   @Override
-  public final int diff(final Item it) throws QueryException {
+  public final int diff(final ParseExpr e, final Item it)
+      throws QueryException {
+
     if(it instanceof Itr) {
       final long i = ((Itr) it).val;
       return val < i ? -1 : val > i ? 1 : 0;

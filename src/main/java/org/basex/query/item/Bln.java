@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import java.math.BigDecimal;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
 import org.basex.util.Token;
 
@@ -86,7 +87,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public int diff(final Item it) throws QueryException {
+  public int diff(final ParseExpr e, final Item it) throws QueryException {
     final boolean n = it.type == type ? it.bool() : check(it.atom());
     return val ? !n ? 1 : 0 : n ? -1 : 0;
   }
@@ -111,7 +112,7 @@ public final class Bln extends Item {
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;
-    Err.or(CASTBOOL, str);
+    Err.or(FUNCAST, Type.BLN, str);
     return false;
   }
 

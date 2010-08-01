@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import static org.basex.util.Token.*;
 import java.util.Arrays;
 
 /**
@@ -39,7 +40,7 @@ public final class TokenBuilder {
    * @param str initial string
    */
   public TokenBuilder(final String str) {
-    this(Token.token(str));
+    this(token(str));
   }
 
   /**
@@ -168,7 +169,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final long i) {
-    add(Token.token(i));
+    add(token(i));
     return this;
   }
 
@@ -205,7 +206,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final String s) {
-    add(Token.token(s));
+    add(token(s));
     return this;
   }
 
@@ -219,7 +220,7 @@ public final class TokenBuilder {
    */
   public TokenBuilder add(final Object str, final Object... ext) {
     final byte[] t = str instanceof byte[] ? (byte[]) str :
-      Token.token(str == null ? "null" : str.toString());
+      token(str == null ? "null" : str.toString());
 
     for(int i = 0, e = 0; i < t.length; i++) {
       if(t[i] != '%' || e == ext.length) {
@@ -240,9 +241,9 @@ public final class TokenBuilder {
    * Chops leading and trailing whitespaces.
    */
   public void chop() {
-    while(size > 0 && Token.ws(chars[size - 1])) size--;
+    while(size > 0 && ws(chars[size - 1])) size--;
     int s = -1;
-    while(++s < size && Token.ws(chars[s]));
+    while(++s < size && ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);
     size -= s;
   }
@@ -252,7 +253,7 @@ public final class TokenBuilder {
    * @return result of check
    */
   public boolean wsp() {
-    for(int i = 0; i < size; i++) if(!Token.ws(chars[i])) return false;
+    for(int i = 0; i < size; i++) if(!ws(chars[i])) return false;
     return true;
   }
 
@@ -266,6 +267,6 @@ public final class TokenBuilder {
 
   @Override
   public String toString() {
-    return Token.string(chars, 0, size);
+    return string(chars, 0, size);
   }
 }
