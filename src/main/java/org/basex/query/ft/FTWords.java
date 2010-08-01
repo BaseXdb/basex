@@ -10,6 +10,7 @@ import org.basex.index.FTIndexIterator;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
@@ -62,11 +63,14 @@ public final class FTWords extends FTExpr {
 
   /**
    * Sequential constructor.
+   * @param i query info
    * @param e expression
    * @param m search mode
    * @param o occurrences
    */
-  public FTWords(final Expr e, final FTMode m, final Expr[] o) {
+  public FTWords(final QueryInfo i, final Expr e, final FTMode m,
+      final Expr[] o) {
+    super(i);
     query = e;
     mode = m;
     occ = o;
@@ -74,11 +78,14 @@ public final class FTWords extends FTExpr {
 
   /**
    * Index constructor.
+   * @param i query info
    * @param d data reference
    * @param t text
    * @param f fast evaluation
    */
-  public FTWords(final Data d, final byte[] t, final boolean f) {
+  public FTWords(final QueryInfo i, final Data d, final byte[] t,
+      final boolean f) {
+    super(i);
     data = d;
     txt = t;
     fast = f;

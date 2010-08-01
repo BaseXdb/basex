@@ -183,7 +183,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void parse(final String q) throws QueryException {
-    root = new QueryParser(this).parse(q, file(), null);
+    root = new QueryParser(q, this).parse(file(), null);
     query = q;
   }
 
@@ -193,7 +193,7 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public void module(final String q) throws QueryException {
-    new QueryParser(this).parse(q, file(), Uri.EMPTY);
+    new QueryParser(q, this).parse(file(), Uri.EMPTY);
   }
 
   /**

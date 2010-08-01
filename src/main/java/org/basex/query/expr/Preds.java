@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
@@ -19,15 +20,17 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class Preds extends Expr {
+public abstract class Preds extends ParseExpr {
   /** Predicates. */
   public Expr[] pred;
 
   /**
    * Constructor.
+   * @param i query info
    * @param p predicates
    */
-  public Preds(final Expr[] p) {
+  public Preds(final QueryInfo i, final Expr[] p) {
+    super(i);
     pred = p;
   }
 

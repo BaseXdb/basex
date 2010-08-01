@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -31,12 +31,13 @@ public final class Func extends Single {
 
   /**
    * Function constructor.
+   * @param i query info
    * @param v function name
    * @param a arguments
    * @param d declaration flag
    */
-  public Func(final Var v, final Var[] a, final boolean d) {
-    super(null);
+  public Func(final QueryInfo i, final Var v, final Var[] a, final boolean d) {
+    super(i, null);
     var = v;
     args = a;
     decl = d;
@@ -49,10 +50,10 @@ public final class Func extends Single {
     expr = expr.comp(ctx);
     final boolean u = expr.uses(Use.UPD, ctx);
     if(updating) {
-      if(var.type != null) Err.or(UPFUNCTYPE);
-      if(!u && !expr.vacuous()) Err.or(UPEXPECTF);
+      if(var.type != null) error(UPFUNCTYPE);
+      if(!u && !expr.vacuous()) error(UPEXPECTF);
     } else if(u) {
-      Err.or(UPNOT, info());
+      error(UPNOT, info());
     }
     ctx.vars.reset(s);
     return this;

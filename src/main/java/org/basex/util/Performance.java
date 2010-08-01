@@ -122,7 +122,7 @@ public final class Performance {
   public static void stack() {
     System.err.println("You're here:");
     final StackTraceElement[] st = new Error().getStackTrace();
-    for (int i = 1; i < st.length; i++) System.err.println("\tat " + st[i]);
+    for(int i = 1; i < st.length; i++) System.err.println("  " + st[i]);
   }
 
   @Override

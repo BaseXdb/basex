@@ -6,6 +6,7 @@ import static org.basex.util.Token.*;
 import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.CComm;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.Constr;
@@ -20,7 +21,6 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.ReplaceElemContent;
 import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.up.primitives.ReplaceValue;
-import org.basex.query.util.Err;
 
 /**
  * Replace expression.
@@ -34,28 +34,30 @@ public final class Replace extends Update {
 
   /**
    * Constructor.
+   * @param i query info
    * @param t target expression
    * @param r source expression
    * @param v replace value of
    */
-  public Replace(final Expr t, final Expr r, final boolean v) {
-    super(t, r);
+  public Replace(final QueryInfo i, final Expr t, final Expr r,
+      final boolean v) {
+    super(i, t, r);
     value = v;
   }
 
   @Override
   public Seq atomic(final QueryContext ctx) throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
-    if(c.errAtt) Err.or(UPNOATTRPER);
-    if(c.duplAtt != null) Err.or(UPATTDUPL, c.duplAtt);
+    if(c.errAtt) error(UPNOATTRPER);
+    if(c.duplAtt != null) error(UPATTDUPL, c.duplAtt);
 
     final Iter t = expr[0].iter(ctx);
     final Item i = t.next();
     // check target constraints
-    if(i == null) Err.or(UPSEQEMP, Main.name(this));
+    if(i == null) error(UPSEQEMP, Main.name(this));
     final Type type = i.type;
     if(!(i instanceof Nod) || type == Type.DOC || t.next() != null)
-      Err.or(UPTRGMULT, i);
+      error(UPTRGMULT);
     final Nod targ = (Nod) i;
 
     // replace node
@@ -64,23 +66,24 @@ public final class Replace extends Update {
     if(value) {
       // replace value of node
       final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).atom();
-      if(type == Type.COM) CComm.check(txt);
-      if(type == Type.PI) CPI.check(txt);
+      if(type == Type.COM) CComm.check(this, txt);
+      if(type == Type.PI) CPI.check(this, txt);
 
-      ctx.updates.add(type == Type.ELM ? new ReplaceElemContent(targ, txt) :
-        new ReplaceValue(targ, new QNm(txt)), ctx);
+      ctx.updates.add(type == Type.ELM ?
+          new ReplaceElemContent(this, targ, txt) :
+          new ReplaceValue(this, targ, new QNm(txt)), ctx);
     } else {
       final Nod par = targ.parent();
-      if(par == null) Err.or(UPNOPAR, i);
+      if(par == null) error(UPNOPAR, i);
       if(type == Type.ATT) {
         // replace attribute node
-        if(list.size() > 0) Err.or(UPWRATTR, i);
+        if(list.size() > 0) error(UPWRATTR);
         list = checkNS(aList, par, ctx);
       } else {
         // replace non-attribute node
-        if(aList.size() > 0) Err.or(UPWRELM, i);
+        if(aList.size() > 0) error(UPWRELM);
       }
-      ctx.updates.add(new ReplacePrimitive(targ, list), ctx);
+      ctx.updates.add(new ReplacePrimitive(this, targ, list), ctx);
     }
     return Seq.EMPTY;
   }

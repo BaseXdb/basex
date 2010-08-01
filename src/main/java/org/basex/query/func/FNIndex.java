@@ -5,6 +5,7 @@ import static org.basex.util.Token.*;
 import java.util.Arrays;
 import org.basex.core.Main;
 import org.basex.query.QueryException;
+import org.basex.query.QueryParser;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Err;
 import org.basex.util.Levenshtein;
@@ -49,11 +50,12 @@ public final class FNIndex extends TokenSet {
    * @param name function name
    * @param uri function uri
    * @param args optional arguments
+   * @param qp query parser
    * @return function instance
    * @throws QueryException query exception
    */
-  public Fun get(final byte[] name, final byte[] uri, final Expr[] args)
-      throws QueryException {
+  public Fun get(final byte[] name, final byte[] uri, final Expr[] args,
+      final QueryParser qp) throws QueryException {
 
     final int id = id(name);
     if(id != 0) {
@@ -61,7 +63,7 @@ public final class FNIndex extends TokenSet {
       final FunDef fl = funcs[id];
       if(!eq(fl.uri, uri)) return null;
 
-      final Fun f = Fun.create(fl, args);
+      final Fun f = Fun.create(qp.info(), fl, args);
       // check number of arguments
       if(args.length < fl.min || args.length > fl.max) Err.or(XPARGS, fl);
       return f;

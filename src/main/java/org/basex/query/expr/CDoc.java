@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FDoc;
 import org.basex.query.item.FTxt;
@@ -12,7 +13,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -25,10 +25,11 @@ import org.basex.util.TokenBuilder;
 public final class CDoc extends CFrag {
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    */
-  public CDoc(final Expr e) {
-    super(e);
+  public CDoc(final QueryInfo i, final Expr e) {
+    super(i, e);
   }
 
   @Override
@@ -49,7 +50,7 @@ public final class CDoc extends CFrag {
     Item it;
     while((it = iter.next()) != null) {
       if(it.node() && it.type != Type.TXT) {
-        if(it.type == Type.ATT) Err.or(XPATT);
+        if(it.type == Type.ATT) error(XPATT);
 
         if(text.size() != 0) {
           nodes.add(new FTxt(text.finish(), null));

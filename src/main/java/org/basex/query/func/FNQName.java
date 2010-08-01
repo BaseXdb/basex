@@ -4,6 +4,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.NCN;
 import org.basex.query.item.Nod;
@@ -25,6 +27,16 @@ import org.basex.util.XMLToken;
  * @author Christian Gruen
  */
 final class FNQName extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNQName(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
@@ -43,7 +55,7 @@ final class FNQName extends Fun {
 
     switch(func) {
       case RESQNAME:
-        if(it2 == null) Err.empty(this);
+        if(it2 == null) emptyError();
         return it == null ? null : resolve(ctx, it, it2);
       case QNAME:
         final Uri uri = Uri.uri(it == null ? EMPTY :
@@ -69,10 +81,10 @@ final class FNQName extends Fun {
       case RESURI:
         if(it == null) return null;
         final Uri rel = Uri.uri(checkStr(it));
-        if(!rel.valid()) Err.or(URIINV, it);
+        if(!rel.valid()) error(URIINV, it);
 
         final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkStr(it2));
-        if(!base.valid()) Err.or(URIINV, base);
+        if(!base.valid()) error(URIINV, base);
         return base.resolve(rel);
       default:
         return super.atomic(ctx);
@@ -96,7 +108,7 @@ final class FNQName extends Fun {
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
     final byte[] uri = ((Nod) checkType(it, Type.ELM)).uri(pref, ctx);
-    if(uri == null && pref.length != 0) Err.or(NSDECL, pref);
+    if(uri == null && pref.length != 0) error(NSDECL, pref);
     nm.uri = Uri.uri(uri);
     return nm;
   }

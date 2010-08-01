@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
@@ -20,7 +21,7 @@ import org.basex.util.Array;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class TypeSwitch extends Expr {
+public final class TypeSwitch extends ParseExpr {
   /** Typeswitch expression. */
   private Expr ts;
   /** Expression list. */
@@ -28,10 +29,12 @@ public final class TypeSwitch extends Expr {
 
   /**
    * Constructor.
+   * @param i query info
    * @param t typeswitch expression
    * @param c case expressions
    */
-  public TypeSwitch(final Expr t, final TypeCase[] c) {
+  public TypeSwitch(final QueryInfo i, final Expr t, final TypeCase[] c) {
+    super(i);
     ts = t;
     cs = c;
   }

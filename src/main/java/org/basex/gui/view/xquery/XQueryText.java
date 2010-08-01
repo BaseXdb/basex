@@ -51,7 +51,7 @@ final class XQueryText extends BaseXText {
   @Override
   public void keyPressed(final KeyEvent e) {
     super.keyPressed(e);
-    error(-1);
+    if(Character.isDefined(e.getKeyChar())) error(-1);
   }
 
   @Override
@@ -64,10 +64,10 @@ final class XQueryText extends BaseXText {
   protected void release(final boolean force) {
     final byte[] qu = getText();
     final boolean module = isModule(qu);
-    final boolean mod = !Token.eq(qu, last);
-    view.modified(view.modified || mod, false);
+    final boolean diff = !Token.eq(qu, last);
+    view.modified(view.modified || diff, false);
 
-    if(force || gui.prop.is(GUIProp.EXECRT) && !module && mod) {
+    if(force || gui.prop.is(GUIProp.EXECRT) && !module && diff) {
       query(qu, true);
     } else {
       try {

@@ -3,9 +3,10 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 
 /**
  * Functions on functions.
@@ -14,6 +15,16 @@ import org.basex.query.util.Err;
  * @author Christian Gruen
  */
 final class FNFunc extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNFunc(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
@@ -22,7 +33,7 @@ final class FNFunc extends Fun {
       case MAPPAIRS:
       case FOLDLEFT:
       case FOLDRIGHT:
-        Err.or(NOTIMPL, func.desc);
+        error(NOTIMPL, func.desc);
         return null;
       default:
         return super.iter(ctx);
@@ -34,7 +45,7 @@ final class FNFunc extends Fun {
     switch(func) {
       case FUNCNAME:
       case FUNCARITY:
-        Err.or(NOTIMPL, func.desc);
+        error(NOTIMPL, func.desc);
         return null;
       default:
         return super.atomic(ctx);

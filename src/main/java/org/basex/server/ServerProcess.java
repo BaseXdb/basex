@@ -78,7 +78,7 @@ public final class ServerProcess extends Thread {
 
       // evaluate login data
       in = new BufferInput(socket.getInputStream());
-      // reveive {USER}\0{PASSWORD}\0
+      // receive {USER}0{PASSWORD}0
       final String us = in.readString();
       final String pw = in.readString();
       context.user = context.users.get(us);

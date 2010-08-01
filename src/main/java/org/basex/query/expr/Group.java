@@ -6,6 +6,7 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -16,7 +17,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
-public final class Group extends Expr {
+public final class Group extends ParseExpr {
 
 //  /** Sequence to be grouped. */
 //  SeqIter sq;
@@ -35,9 +36,11 @@ public final class Group extends Expr {
 
   /**
    * Constructor.
-   * @param gb group by Expressiosn
+   * @param i query info
+   * @param gb group by expression
    */
-  public Group(final GroupBy[] gb) {
+  public Group(final QueryInfo i, final GroupBy[] gb) {
+    super(i);
     groupby = gb;
 
   }

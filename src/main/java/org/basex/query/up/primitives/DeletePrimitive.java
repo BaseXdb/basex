@@ -1,5 +1,6 @@
 package org.basex.query.up.primitives;
 
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.up.NamePool;
@@ -13,10 +14,11 @@ import org.basex.query.up.NamePool;
 public final class DeletePrimitive extends UpdatePrimitive {
   /**
    * Constructor.
+   * @param u updating expression
    * @param n expression target node
    */
-  public DeletePrimitive(final Nod n) {
-    super(n);
+  public DeletePrimitive(final ParseExpr u, final Nod n) {
+    super(u, n);
   }
 
   @Override

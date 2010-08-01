@@ -7,6 +7,7 @@ import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
@@ -25,12 +26,14 @@ public final class FTWindow extends FTFilter {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    * @param w window
    * @param u unit
    */
-  public FTWindow(final FTExpr e, final Expr w, final FTUnit u) {
-    super(e);
+  public FTWindow(final QueryInfo i, final FTExpr e, final Expr w,
+      final FTUnit u) {
+    super(i, e);
     win = w;
     unit = u;
   }

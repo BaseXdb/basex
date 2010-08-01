@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Uri;
@@ -19,15 +20,17 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class VarCall extends Expr {
+public final class VarCall extends ParseExpr {
   /** Variable name. */
   Var var;
 
   /**
    * Constructor.
+   * @param i query info
    * @param v variable
    */
-  public VarCall(final Var v) {
+  public VarCall(final QueryInfo i, final Var v) {
+    super(i);
     var = v;
   }
 
@@ -75,7 +78,7 @@ public final class VarCall extends Expr {
 
   @Override
   public Expr remove(final Var v) {
-    return var.eq(v) ? new Context() : this;
+    return var.eq(v) ? new Context(info) : this;
   }
 
   @Override

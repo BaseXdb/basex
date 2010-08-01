@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
@@ -14,7 +15,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 
 /**
@@ -30,11 +30,12 @@ public final class MixedPath extends Path {
 
   /**
    * Constructor.
+   * @param i query info
    * @param r root expression; can be null
    * @param s location steps; will at least have one entry
    */
-  public MixedPath(final Expr r, final Expr... s) {
-    super(r);
+  public MixedPath(final QueryInfo i, final Expr r, final Expr... s) {
+    super(i, r);
     step = s;
   }
 
@@ -93,7 +94,7 @@ public final class MixedPath extends Path {
       ctx.pos = 1;
       Item i;
       while((i = ir.next()) != null) {
-        if(!i.node()) Err.or(NODESPATH, this, i.type);
+        if(!i.node()) error(NODESPATH, this, i.type);
         ctx.item = i;
         si.add(ctx.iter(s));
         ctx.pos++;
@@ -103,13 +104,13 @@ public final class MixedPath extends Path {
       if(si.size() != 0 && si.get(0).node()) {
         final NodIter ni = new NodIter(true);
         while((i = si.next()) != null) {
-          if(!i.node()) Err.or(EVALNODESVALS);
+          if(!i.node()) error(EVALNODESVALS);
           ni.add((Nod) i);
         }
         it = ni.finish();
       } else {
         while((i = si.next()) != null) {
-          if(i.node()) Err.or(EVALNODESVALS);
+          if(i.node()) error(EVALNODESVALS);
         }
         it = si.finish();
       }

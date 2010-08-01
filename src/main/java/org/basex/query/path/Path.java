@@ -4,8 +4,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.expr.Root;
 import org.basex.query.item.Item;
 import org.basex.query.util.Var;
@@ -16,15 +18,17 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-abstract class Path extends Expr {
+abstract class Path extends ParseExpr {
   /** Top expression. */
   public Expr root;
 
   /**
    * Constructor.
+   * @param i query info
    * @param r root expression; can be null
    */
-  protected Path(final Expr r) {
+  protected Path(final QueryInfo i, final Expr r) {
+    super(i);
     root = r;
   }
 

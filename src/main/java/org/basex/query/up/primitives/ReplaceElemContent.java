@@ -4,9 +4,9 @@ import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.util.Err;
 
 /**
  * Replace element content primitive.
@@ -20,11 +20,12 @@ public final class ReplaceElemContent extends UpdatePrimitive {
 
   /**
    * Constructor.
+   * @param u updating expression
    * @param n target node
    * @param tn replacing content
    */
-  public ReplaceElemContent(final Nod n, final byte[] tn) {
-    super(n);
+  public ReplaceElemContent(final ParseExpr u, final Nod n, final byte[] tn) {
+    super(u, n);
     txt = tn;
   }
 
@@ -47,7 +48,7 @@ public final class ReplaceElemContent extends UpdatePrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    Err.or(UPMULTREPV, node);
+    parent.error(UPMULTREPV, node);
   }
 
   @Override

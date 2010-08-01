@@ -5,6 +5,8 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.FNode;
 import org.basex.query.item.Item;
@@ -13,7 +15,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 import org.basex.util.TokenList;
 
 /**
@@ -23,12 +24,22 @@ import org.basex.util.TokenList;
  * @author Christian Gruen
  */
 final class FNId extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNId(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
     final Item it = expr.length == 2 ? expr[1].atomic(ctx) :
       checkCtx(ctx).atomic(ctx);
-    if(it == null) Err.or(XPEMPTYPE, info(), Type.NOD);
+    if(it == null) error(XPEMPTYPE, info(), Type.NOD);
 
     final Nod node = checkNode(it);
     switch(func) {
@@ -178,7 +189,7 @@ final class FNId extends Fun {
       Nod n = nod;
       while(n.type != Type.DOC) {
         n = n.parent();
-        if(n == null) Err.or(IDDOC);
+        if(n == null) error(IDDOC);
       }
     }
     return nod;

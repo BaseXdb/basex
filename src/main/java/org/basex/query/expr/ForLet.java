@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Var;
 
@@ -17,11 +18,12 @@ public abstract class ForLet extends Single {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e variable input
    * @param v variable
    */
-  protected ForLet(final Expr e, final Var v) {
-    super(e);
+  protected ForLet(final QueryInfo i, final Expr e, final Var v) {
+    super(i, e);
     var = v;
   }
 

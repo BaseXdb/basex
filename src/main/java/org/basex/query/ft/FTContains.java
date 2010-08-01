@@ -7,8 +7,10 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.CmpG;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTItem;
@@ -27,7 +29,7 @@ import org.basex.util.Tokenizer;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class FTContains extends Expr {
+public class FTContains extends ParseExpr {
   /** Expression. */
   Expr expr;
   /** Full-text expression. */
@@ -39,8 +41,10 @@ public class FTContains extends Expr {
    * Constructor.
    * @param e expression
    * @param fte full-text expression
+   * @param i query info
    */
-  public FTContains(final Expr e, final FTExpr fte) {
+  public FTContains(final Expr e, final FTExpr fte, final QueryInfo i) {
+    super(i);
     expr = e;
     ftexpr = fte;
   }
@@ -48,16 +52,18 @@ public class FTContains extends Expr {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     expr = checkUp(expr, ctx).comp(ctx).addText(ctx);
+
     final boolean fast = ctx.ftfast;
     ctx.ftfast = ctx.ftfast && ctx.ftpos == null;
     ftexpr = ftexpr.comp(ctx);
     ctx.ftfast = fast;
     ft = new Tokenizer(ctx.context.prop);
 
-    Expr e = this;
-    if(expr.empty()) e = Bln.FALSE;
-    if(e != this) ctx.compInfo(OPTPRE, this);
-    return e;
+    if(expr.empty()) {
+      ctx.compInfo(OPTPRE, this);
+      return Bln.FALSE;
+    }
+    return this;
   }
 
   @Override
@@ -112,10 +118,11 @@ public class FTContains extends Expr {
     final FTExpr ie = ftexpr.indexEquivalent(ic);
 
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsIndex(expr, ie, ic);
+    if(ic.seq) return new FTContainsIndex(info, expr, ie, ic);
 
     // standard index evaluation; first expression will always be an axis path
-    return ((AxisPath) expr).invertPath(new FTIndexAccess(ie, ic), ic.step);
+    return ((AxisPath) expr).invertPath(new FTIndexAccess(info, ie, ic),
+        ic.step);
   }
 
   @Override

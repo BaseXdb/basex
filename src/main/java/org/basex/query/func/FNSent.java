@@ -4,6 +4,8 @@ import static org.basex.util.Token.*;
 import java.util.HashMap;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.util.SentList;
@@ -19,6 +21,16 @@ public final class FNSent extends Fun {
   /** Word lists. */
   private static final HashMap<String, SentList> LISTS =
     new HashMap<String, SentList>();
+
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNSent(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {

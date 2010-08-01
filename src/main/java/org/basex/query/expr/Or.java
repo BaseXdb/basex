@@ -5,6 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -20,10 +21,11 @@ import org.basex.util.Array;
 public final class Or extends Arr {
   /**
    * Constructor.
+   * @param i query info
    * @param e expression list
    */
-  public Or(final Expr[] e) {
-    super(e);
+  public Or(final QueryInfo i, final Expr[] e) {
+    super(i, e);
   }
 
   @Override
@@ -72,7 +74,7 @@ public final class Or extends Arr {
     }
 
     ctx.compInfo(OPTRED);
-    return new CmpG(e1.expr[0], ir.finish(), e1.cmp);
+    return new CmpG(info, e1.expr[0], ir.finish(), e1.cmp);
   }
 
   @Override
@@ -105,7 +107,7 @@ public final class Or extends Arr {
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     super.indexEquivalent(ic);
-    return new Union(expr);
+    return new Union(info, expr);
   }
 
   @Override

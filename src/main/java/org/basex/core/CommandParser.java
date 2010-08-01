@@ -85,9 +85,9 @@ public final class CommandParser extends InputParser {
    * @param i internal flag
    */
   public CommandParser(final String in, final Context c, final boolean i) {
+    super(in);
     ctx = c;
     internal = i;
-    init(in);
   }
 
   /**
@@ -294,8 +294,7 @@ public final class CommandParser extends InputParser {
     consumeWS();
     final TokenBuilder tb = new TokenBuilder();
     if(more() && !curr(';')) {
-      final QueryParser p = new QueryParser(new QueryContext(ctx));
-      p.init(qu);
+      final QueryParser p = new QueryParser(qu, new QueryContext(ctx));
       p.qp = qp;
       p.parse(null, false);
       tb.add(qu.substring(qp, p.qp));

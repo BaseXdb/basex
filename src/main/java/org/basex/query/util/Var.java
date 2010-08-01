@@ -6,12 +6,12 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Str;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.TokenBuilder;
 
@@ -21,13 +21,13 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Var extends Expr {
+public final class Var extends ParseExpr {
   /** Return type. */
   public SeqType ret = SeqType.ITEM_ZM;
-  /** Global flag. */
-  public final boolean global;
   /** Variable name. */
   public final QNm name;
+  /** Global flag. */
+  public boolean global;
   /** Data type. */
   public SeqType type;
   /** Variable expressions. */
@@ -36,32 +36,42 @@ public final class Var extends Expr {
   public Item item;
 
   /**
-   * Constructor.
+   * Constructor, specifying a global variable.
    * @param n variable name
    */
   public Var(final QNm n) {
-    this(n, false);
+    this(null, n, null);
+    global();
   }
 
   /**
-   * Constructor.
+   * Constructor, specifying a local variable.
+   * @param i query info
    * @param n variable name
-   * @param g global flag
    */
-  public Var(final QNm n, final boolean g) {
-    this(n, null, g);
+  public Var(final QueryInfo i, final QNm n) {
+    this(i, n, null);
   }
 
   /**
-   * Constructor.
+   * Constructor, specifying a local variable.
+   * @param i query info
    * @param n variable name
    * @param t data type
-   * @param g global flag
    */
-  public Var(final QNm n, final SeqType t, final boolean g) {
+  public Var(final QueryInfo i, final QNm n, final SeqType t) {
+    super(i);
     name = n;
     type = t;
-    global = g;
+  }
+
+  /**
+   * Sets the global flag.
+   * @return self reference
+   */
+  public Var global() {
+    global = true;
+    return this;
   }
 
   @Override
@@ -108,7 +118,7 @@ public final class Var extends Expr {
    */
   public Item item(final QueryContext ctx) throws QueryException {
     if(item == null) {
-      if(expr == null) Err.or(VAREMPTY, this);
+      if(expr == null) error(VAREMPTY, this);
       final Item it = ctx.item;
       ctx.item = null;
       item = cast(ctx.iter(expr).finish(), ctx);
@@ -145,11 +155,10 @@ public final class Var extends Expr {
   private Item cast(final Item it, final QueryContext ctx)
       throws QueryException {
 
-    if(it.type == Type.STR) ((Str) it).direct = false;
     if(type == null) return it;
 
     if(!global && type.zeroOrOne() && !it.type.instance(type.type))
-      Err.or(XPINVCAST, it.type, type, it);
+      error(XPINVCAST, it.type, type, it);
 
     return type.cast(it, ctx);
   }
@@ -159,7 +168,8 @@ public final class Var extends Expr {
    * @return copied variable
    */
   public Var copy() {
-    final Var v = new Var(name, type, global);
+    final Var v = new Var(info, name, type);
+    if(global) v.global();
     v.item = item;
     v.expr = expr;
     v.ret = ret;

@@ -10,6 +10,7 @@ import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryParser;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.FunCall;
@@ -50,10 +51,11 @@ public final class Functions extends ExprInfo {
    * @param args optional arguments
    * @param ctx query context
    * @return function instance
+   * @param qp query parser
    * @throws QueryException query exception
    */
-  public Expr get(final QNm name, final Expr[] args, final QueryContext ctx)
-      throws QueryException {
+  public Expr get(final QNm name, final Expr[] args, final QueryContext ctx,
+      final QueryParser qp) throws QueryException {
 
     // find function
     final byte[] uri = name.uri.atom();
@@ -64,7 +66,7 @@ public final class Functions extends ExprInfo {
       final SeqType seq = new SeqType(Type.find(name, false), SeqType.Occ.ZO);
       if(seq.type == null) typeErr(name);
       if(args.length != 1) Err.or(FUNCTYPE, name.atom());
-      return new Cast(args[0], seq);
+      return new Cast(qp.info(), args[0], seq);
     }
 
     // check Java functions - only allowed with administrator permissions
@@ -89,14 +91,14 @@ public final class Functions extends ExprInfo {
         final int i = java.lastIndexOf(".");
         final Class<?> cls = Class.forName(java.substring(0, i));
         final String mth = java.substring(i + 1);
-        return new FunJava(cls, mth, args);
+        return new FunJava(qp.info(), cls, mth, args);
       } catch(final ClassNotFoundException ex) {
         Err.or(FUNCJAVA, java);
       }
     }
 
     // check predefined functions
-    final Fun fun = FNIndex.get().get(ln, uri, args);
+    final Fun fun = FNIndex.get().get(ln, uri, args, qp);
     if(fun != null) {
       ctx.updating |= fun.func == FunDef.PUT;
       return fun;
@@ -105,12 +107,12 @@ public final class Functions extends ExprInfo {
     // find local function
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
-      if(eq(ln, qn.ln()) && eq(uri, qn.uri.atom()) &&
-          args.length == func[l].args.length) return new FunCall(qn, l, args);
+      if(eq(ln, qn.ln()) && eq(uri, qn.uri.atom()) && args.length ==
+        func[l].args.length) return new FunCall(qp.info(), qn, l, args);
     }
 
     if(Type.find(name, true) == null) {
-      return new FunCall(name, add(new Func(new Var(name),
+      return new FunCall(qp.info(), name, add(new Func(qp.info(), new Var(name),
           new Var[args.length], false)), args);
     }
     return null;

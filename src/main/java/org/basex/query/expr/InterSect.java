@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
@@ -10,7 +11,6 @@ import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 
 /**
  * Intersect expression.
@@ -22,10 +22,11 @@ import org.basex.query.util.Err;
 public final class InterSect extends Arr {
   /**
    * Constructor.
+   * @param i query info
    * @param l expression list
    */
-  public InterSect(final Expr[] l) {
-    super(l);
+  public InterSect(final QueryInfo i, final Expr[] l) {
+    super(i, l);
   }
 
   @Override
@@ -57,7 +58,7 @@ public final class InterSect extends Arr {
 
     Item it;
     while((it = iter[0].next()) != null) {
-      if(!it.node()) Err.nodes(this, it);
+      if(!it.node()) nodeError(this, it);
       ni.add((Nod) it);
     }
     final boolean db = ni.dbnodes();
@@ -66,7 +67,7 @@ public final class InterSect extends Arr {
       final NodIter res = new NodIter(true);
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
-        if(!it.node()) Err.nodes(this, it);
+        if(!it.node()) nodeError(this, it);
         final Nod node = (Nod) it;
 
         if(db && node instanceof DBNode) {
@@ -114,7 +115,7 @@ public final class InterSect extends Arr {
       private boolean next(final int i) throws QueryException {
         final Item it = iter[i].next();
         if(it == null) return false;
-        if(!it.node()) Err.nodes(InterSect.this, it);
+        if(!it.node()) nodeError(InterSect.this, it);
         items[i] = (Nod) it;
         return true;
       }

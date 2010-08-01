@@ -16,8 +16,6 @@ public class Str extends Item {
   public static final Str ZERO = new Str(Token.EMPTY);
   /** String data. */
   protected final byte[] val;
-  /** Direct parser creation (needed for QName types). */
-  public boolean direct;
 
   /**
    * Constructor.
@@ -35,16 +33,6 @@ public class Str extends Item {
   protected Str(final byte[] v, final Type t) {
     super(t);
     val = v;
-  }
-
-  /**
-   * Constructor.
-   * @param v value
-   * @param d direct flag
-   */
-  public Str(final byte[] v, final boolean d) {
-    this(v);
-    direct = d;
   }
 
   /**

@@ -14,22 +14,22 @@ public abstract class InputParser {
   /** Parsing exception. */
   private static final String FOUND = ", found \"%\"";
 
+  /** Input query. */
+  public final String qu;
+  /** Query length. */
+  public final int ql;
   /** Optional reference to query input. */
   public IO file;
-  /** Input query. */
-  public String qu;
   /** Current query position. */
   public int qp;
   /** Marked query position. */
   public int qm;
-  /** Query length. */
-  public int ql;
 
   /**
    * Constructor.
    * @param q input query
    */
-  public final void init(final String q) {
+  public InputParser(final String q) {
     qu = q;
     ql = qu.length();
   }

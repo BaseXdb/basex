@@ -2,13 +2,12 @@ package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.util.Token;
 
 /**
- * This class is supposed to support a consistent error output.
+ * This class assembles common error messages.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -26,18 +25,6 @@ public final class Err {
   public static void or(final Object[] err, final Object... x)
       throws QueryException {
     throw new QueryException(err, x);
-  }
-
-  /**
-   * Throws a type exception.
-   * @param inf expression info
-   * @param t expected type
-   * @param it item
-   * @throws QueryException query exception
-   */
-  public static void type(final String inf, final Type t, final Item it)
-      throws QueryException {
-    or(XPTYPE, inf, t, it.type);
   }
 
   /**
@@ -73,15 +60,6 @@ public final class Err {
   }
 
   /**
-   * Throws a empty sequence exception.
-   * @param e calling expression
-   * @throws QueryException query exception
-   */
-  public static void empty(final Expr e) throws QueryException {
-    or(XPEMPTY, e.info());
-  }
-
-  /**
    * Throws a comparison exception.
    * @param it1 first item
    * @param it2 second item
@@ -90,27 +68,6 @@ public final class Err {
   public static void cmp(final Item it1, final Item it2) throws QueryException {
     if(it1 == it2) or(TYPECMP, it1.type);
     else or(XPTYPECMP, it1.type, it2.type);
-  }
-
-  /**
-   * Throws a numeric type exception.
-   * @param inf expression info
-   * @param it item
-   * @throws QueryException query exception
-   */
-  public static void num(final String inf, final Item it)
-      throws QueryException {
-    or(XPTYPENUM, inf, it.type);
-  }
-
-  /**
-   * Throws a node exception.
-   * @param ex expression
-   * @param it item
-   * @throws QueryException query exception
-   */
-  public static void nodes(final Expr ex, final Item it) throws QueryException {
-    type(ex.info(), Type.NOD, it);
   }
 
   /**

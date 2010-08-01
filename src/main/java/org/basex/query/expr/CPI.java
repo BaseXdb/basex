@@ -4,13 +4,13 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -26,11 +26,12 @@ public final class CPI extends CFrag {
 
   /**
    * Constructor.
+   * @param i query info
    * @param n name
    * @param v value
    */
-  public CPI(final Expr n, final Expr v) {
-    super(n, v);
+  public CPI(final QueryInfo i, final Expr n, final Expr v) {
+    super(i, n, v);
   }
 
   @Override
@@ -44,11 +45,11 @@ public final class CPI extends CFrag {
   public FPI atomic(final QueryContext ctx) throws QueryException {
     final Item it = checkEmpty(expr[0], ctx);
     if(!it.unt() && !it.str() && it.type != Type.QNM)
-      Err.or(CPIWRONG, it.type, it);
+      error(CPIWRONG, it.type, it);
 
     final byte[] nm = trim(it.atom());
-    if(eq(lc(nm), XML)) Err.or(CPIXML, nm);
-    if(!XMLToken.isNCName(nm)) Err.or(CPIINVAL, nm);
+    if(eq(lc(nm), XML)) error(CPIXML, nm);
+    if(!XMLToken.isNCName(nm)) error(CPIINVAL, nm);
 
     final Iter iter = ctx.iter(expr[1]);
     final TokenBuilder tb = new TokenBuilder();
@@ -58,17 +59,20 @@ public final class CPI extends CFrag {
     int i = -1;
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
     v = substring(v, i);
-    return new FPI(new QNm(nm), check(v), null);
+    return new FPI(new QNm(nm), check(this, v), null);
   }
 
   /**
    * Checks the specified token for validity.
+   * @param e calling expression
    * @param atom token to be checked
    * @return token
    * @throws QueryException query exception
    */
-  public static byte[] check(final byte[] atom) throws QueryException {
-    if(contains(atom, CLOSE)) Err.or(CPICONT, atom);
+  public static byte[] check(final ParseExpr e, final byte[] atom)
+      throws QueryException {
+
+    if(contains(atom, CLOSE)) e.error(CPICONT, atom);
     return atom;
   }
 

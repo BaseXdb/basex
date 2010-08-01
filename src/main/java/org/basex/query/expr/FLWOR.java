@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
@@ -19,7 +20,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class FLWOR extends Expr {
+public class FLWOR extends ParseExpr {
   /** Expression list. */
   protected Expr ret;
   /** For/Let expressions. */
@@ -35,9 +36,12 @@ public class FLWOR extends Expr {
    * @param w where clause
    * @param o order expression
    * @param r return expression
+   * @param i query info
    */
-  public FLWOR(final ForLet[] f, final Expr w, final Order o,
-      final Expr r) {
+  public FLWOR(final ForLet[] f, final Expr w, final Order o, final Expr r,
+      final QueryInfo i) {
+
+    super(i);
     ret = r;
     fl = f;
     where = w;

@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -20,10 +21,11 @@ import org.basex.util.Array;
 public final class And extends Arr {
   /**
    * Constructor.
+   * @param i query info
    * @param e expression list
    */
-  public And(final Expr[] e) {
-    super(e);
+  public And(final QueryInfo i, final Expr[] e) {
+    super(i, e);
   }
 
   @Override
@@ -125,7 +127,7 @@ public final class And extends Arr {
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     super.indexEquivalent(ic);
-    return new InterSect(expr);
+    return new InterSect(info, expr);
   }
 
   @Override

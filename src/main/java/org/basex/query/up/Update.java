@@ -4,12 +4,12 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.NodIter;
-import org.basex.query.util.Err;
 
 /**
  * Abstract update expression.
@@ -20,10 +20,11 @@ import org.basex.query.util.Err;
 abstract class Update extends Arr {
   /**
    * Constructor.
+   * @param i query info
    * @param e expressions
    */
-  protected Update(final Expr... e) {
-    super(e);
+  protected Update(final QueryInfo i, final Expr... e) {
+    super(i, e);
   }
 
   @Override
@@ -49,7 +50,7 @@ abstract class Update extends Arr {
       if(pref.length == 0) continue;
       // check if attribute and target have the same namespace
       final byte[] uri = targ.uri(pref, ctx);
-      if(uri != null && !eq(name.uri.atom(), uri)) Err.or(UPNSCONFL);
+      if(uri != null && !eq(name.uri.atom(), uri)) error(UPNSCONFL);
     }
     return list;
   }

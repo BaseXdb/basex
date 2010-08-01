@@ -6,13 +6,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import static org.basex.util.Token.token;
 
@@ -22,7 +22,7 @@ import static org.basex.util.Token.token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class OrderBy extends Expr {
+public final class OrderBy extends ParseExpr {
   /** Order expression. */
   private SeqIter seq;
   /** Order expression. */
@@ -34,16 +34,22 @@ public final class OrderBy extends Expr {
 
   /**
    * Empty constructor for stable sorting.
+   * @param i query info
    */
-  public OrderBy() { }
+  public OrderBy(final QueryInfo i) {
+    super(i);
+  }
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    * @param d descending order
    * @param l least empty order
    */
-  public OrderBy(final Expr e, final boolean d, final boolean l) {
+  public OrderBy(final QueryInfo i, final Expr e, final boolean d,
+      final boolean l) {
+    super(i);
     seq = new SeqIter();
     expr = e;
     desc = d;
@@ -66,7 +72,7 @@ public final class OrderBy extends Expr {
       final Iter iter = ctx.iter(expr);
       Item it = iter.next();
       if(it != null) {
-        if(iter.next() != null) Err.or(XPSORT);
+        if(iter.next() != null) error(XPSORT);
         if(it.node()) it = Str.get(it.atom());
         else if(it.num() && Double.isNaN(it.dbl())) it = null;
       }

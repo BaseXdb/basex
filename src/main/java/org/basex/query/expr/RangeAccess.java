@@ -10,6 +10,7 @@ import org.basex.index.IndexToken;
 import org.basex.index.RangeToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -30,11 +31,13 @@ final class RangeAccess extends Simple {
 
   /**
    * Constructor.
-   * @param i index reference
+   * @param i query info
+   * @param t index reference
    * @param ic index context
    */
-  RangeAccess(final IndexToken i, final IndexContext ic) {
-    ind = i;
+  RangeAccess(final QueryInfo i, final IndexToken t, final IndexContext ic) {
+    super(i);
+    ind = t;
     ictx = ic;
   }
 

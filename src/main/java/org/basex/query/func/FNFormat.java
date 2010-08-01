@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Date;
 import org.basex.query.item.Dbl;
@@ -11,7 +12,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 import org.basex.query.util.format.DateFormatter;
 import org.basex.query.util.format.IntFormatter;
 import org.basex.query.util.format.NumFormatter;
@@ -23,6 +23,16 @@ import org.basex.query.util.format.NumFormatter;
  * @author Christian Gruen
  */
 final class FNFormat extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNFormat(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
@@ -69,10 +79,10 @@ final class FNFormat extends Fun {
     // evaluate arguments
     Item it = expr[0].atomic(ctx);
     if(it == null) it = Dbl.NAN;
-    else if(!it.unt() && !it.num()) Err.num(info(), it);
+    else if(!it.unt() && !it.num()) numError(info(), it);
 
     final String pic = string(checkStr(expr[1], ctx));
-    if(expr.length == 3) Err.or(FORMNUM, expr[2]);
+    if(expr.length == 3) error(FORMNUM, expr[2]);
 
     return Str.get(NumFormatter.format(it, pic));
   }

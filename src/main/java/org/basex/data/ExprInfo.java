@@ -10,7 +10,6 @@ import org.basex.core.Main;
  * @author Christian Gruen
  */
 public abstract class ExprInfo {
-
   /**
    * Returns a color string for the expression.
    * @return color

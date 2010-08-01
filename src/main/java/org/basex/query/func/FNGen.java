@@ -14,6 +14,7 @@ import org.basex.io.IOContent;
 import org.basex.io.TextInput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Atm;
@@ -29,7 +30,6 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.Put;
-import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
@@ -42,6 +42,16 @@ import org.basex.util.TokenMap;
 final class FNGen extends Fun {
   /** Cached file contents. */
   private final TokenMap contents = new TokenMap();
+
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNGen(final QueryInfo i, final FunDef f, final Expr[] e) {
+    super(i, f, e);
+  }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
@@ -135,11 +145,11 @@ final class FNGen extends Fun {
     final Item it = expr[0].atomic(ctx);
 
     if(it == null || it.type != Type.DOC && it.type != Type.ELM)
-      Err.or(UPFOTYPE, expr[0]);
+      error(UPFOTYPE, expr[0]);
 
     final Uri u = Uri.uri(file);
-    if(u == Uri.EMPTY || !u.valid()) Err.or(UPFOURI, file);
-    ctx.updates.add(new Put((Nod) it, u), ctx);
+    if(u == Uri.EMPTY || !u.valid()) error(UPFOURI, file);
+    ctx.updates.add(new Put(this, (Nod) it, u), ctx);
 
     return Iter.EMPTY;
   }
@@ -219,7 +229,7 @@ final class FNGen extends Fun {
       }
       return Str.get(cont);
     } catch(final IOException ex) {
-      Err.or(NODOC, ex.getMessage() != null ? ex.getMessage() : ex.toString());
+      error(NODOC, ex.getMessage() != null ? ex.getMessage() : ex.toString());
       return null;
     }
   }
@@ -235,7 +245,7 @@ final class FNGen extends Fun {
     Uri base = ctx.baseURI;
     if(expr.length == 2) {
       base = Uri.uri(checkStr(expr[1], ctx));
-      if(!base.valid()) Err.or(DOCBASE, base);
+      if(!base.valid()) error(DOCBASE, base);
     }
 
     final Prop prop = ctx.context.prop;
@@ -244,7 +254,7 @@ final class FNGen extends Fun {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
-      Err.or(DOCWF, ex.getMessage());
+      error(DOCWF, ex.getMessage());
       return null;
     }
   }

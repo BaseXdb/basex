@@ -587,8 +587,6 @@ public enum Type {
       if(it.type != STR) error(it);
       final byte[] s = trim(it.atom());
       if(s.length == 0) Err.or(QNMINV, s);
-      // test to disallow "xs:QName(xs:string(...))"
-      if(!((Str) it).direct) Err.cast(this, it);
       return new QNm(s, ctx);
     }
     @Override

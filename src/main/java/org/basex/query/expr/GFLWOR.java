@@ -7,6 +7,7 @@ import java.util.HashMap;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.GroupPartition.GroupNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
@@ -22,7 +23,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class GFLWOR extends Expr {
+public class GFLWOR extends ParseExpr {
   /** Expression list. */
   private Expr ret;
   /** For/Let expressions. */
@@ -41,9 +42,12 @@ public class GFLWOR extends Expr {
    * @param o order expression
    * @param g group by expression
    * @param r return expression
+   * @param i query info
    */
   public GFLWOR(final ForLet[] f, final Expr w, final Order o, final Group g,
-      final Expr r) {
+      final Expr r, final QueryInfo i) {
+
+    super(i);
     ret = r;
     fl = f;
     where = w;

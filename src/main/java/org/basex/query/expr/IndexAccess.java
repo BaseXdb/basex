@@ -11,6 +11,7 @@ import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -30,12 +31,14 @@ public final class IndexAccess extends Single {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e index expression
    * @param t access type
    * @param ic index context
    */
-  public IndexAccess(final Expr e, final IndexType t, final IndexContext ic) {
-    super(e);
+  public IndexAccess(final QueryInfo i, final Expr e, final IndexType t,
+      final IndexContext ic) {
+    super(i, e);
     type = t;
     ictx = ic;
   }
@@ -53,7 +56,7 @@ public final class IndexAccess extends Single {
       iter[s] = index(it.atom());
     }
     return iter.length == 0 ? Iter.EMPTY : iter.length == 1 ? iter[0] :
-      new Union(new Expr[] { expr }).eval(iter);
+      new Union(info, new Expr[] { expr }).eval(iter);
   }
 
   /**

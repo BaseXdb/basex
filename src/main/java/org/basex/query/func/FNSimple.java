@@ -3,6 +3,7 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -12,7 +13,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
@@ -22,12 +22,22 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class FNSimple extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNSimple(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case ONEORMORE:
         final Iter ir = SeqIter.get(ctx.iter(expr[0]));
-        if(ir.size() < 1) Err.or(EXP1M);
+        if(ir.size() < 1) error(EXP1M);
         return ir;
       case UNORDER:
         return ctx.iter(expr[0]);
@@ -52,12 +62,12 @@ public final class FNSimple extends Fun {
         Iter iter = e.iter(ctx);
         Item it = iter.next();
         if(it == null) return null;
-        if(iter.next() != null) Err.or(EXP01);
+        if(iter.next() != null) error(EXP01);
         return it;
       case EXACTLYONE:
         iter = e.iter(ctx);
         it = iter.next();
-        if(it == null || iter.next() != null) Err.or(EXP1);
+        if(it == null || iter.next() != null) error(EXP1);
         return it;
       default:
         return super.atomic(ctx);

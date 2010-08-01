@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
@@ -21,11 +22,13 @@ public class FTExtensionSelection extends FTExpr {
 
   /**
    * Constructor.
+   * @param i query info
    * @param prag pragmas
    * @param e enclosed FTSelection
    */
-  public FTExtensionSelection(final Expr[] prag, final FTExpr e) {
-    super(e);
+  public FTExtensionSelection(final QueryInfo i, final Expr[] prag,
+      final FTExpr e) {
+    super(i, e);
     pragmas = prag;
   }
 

@@ -80,7 +80,7 @@ public final class QueryException extends Exception {
   }
 
   /**
-   * Sets the error position.
+   * Finds line and column for the specified query parser.
    * @param parser parser
    */
   void pos(final InputParser parser) {
@@ -90,6 +90,19 @@ public final class QueryException extends Exception {
     col = 1;
     for(int i = 0; i < parser.qm && i < parser.ql; i++) {
       final char ch = parser.qu.charAt(i);
+      if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
+    }
+  }
+
+  /**
+   * Finds line and column for the specified query position.
+   * @param qi query info
+   */
+  public void pos(final QueryInfo qi) {
+    line = 1;
+    col = 1;
+    for(int i = 0; i < qi.pos && i < qi.query.length(); i++) {
+      final char ch = qi.query.charAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }
   }

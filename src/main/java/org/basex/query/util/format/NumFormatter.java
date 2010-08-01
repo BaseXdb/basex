@@ -201,8 +201,9 @@ public final class NumFormatter {
 
     // convert and round number
     Item num = it;
-    if(pic.pc) num = Calc.MULT.ev(num, Itr.get(100));
-    if(pic.pm) num = Calc.MULT.ev(num, Itr.get(1000));
+    // [CG] XQuery/Query Info
+    if(pic.pc) num = Calc.MULT.ev(null, num, Itr.get(100));
+    if(pic.pm) num = Calc.MULT.ev(null, num, Itr.get(1000));
     num = FNNum.abs(FNNum.round(num, num.dbl(), pic.maxFrac, true));
 
     // convert to string representation

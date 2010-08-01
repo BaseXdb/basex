@@ -11,6 +11,7 @@ import org.basex.io.TextInput;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.ft.FTIndexAccess;
@@ -23,7 +24,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -33,6 +33,16 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class FNBaseX extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNBaseX(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
@@ -82,7 +92,7 @@ final class FNBaseX extends Fun {
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
-      Err.or(NODOC, ex.getMessage());
+      error(NODOC, ex.getMessage());
       return null;
     }
   }
@@ -112,7 +122,7 @@ final class FNBaseX extends Fun {
     try {
       return Str.get(TextInput.content(checkIO(expr[0], ctx)).finish());
     } catch(final IOException ex) {
-      Err.or(NODOC, ex.getMessage());
+      error(NODOC, ex.getMessage());
       return null;
     }
   }
@@ -150,7 +160,7 @@ final class FNBaseX extends Fun {
 
     if(expr.length == 2) {
       final int pre = (int) checkItr(expr[1], ctx);
-      if(pre < 0 || pre >= node.data.meta.size) Err.or(NOPRE, pre);
+      if(pre < 0 || pre >= node.data.meta.size) error(NOPRE, pre);
       node = new DBNode(node.data, pre);
     }
     return node;
@@ -185,26 +195,26 @@ final class FNBaseX extends Fun {
    */
   private Iter index(final QueryContext ctx) throws QueryException {
     final Data data = ctx.data();
-    if(data == null) Err.or(XPNOCTX, this);
+    if(data == null) error(XPNOCTX, this);
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
     final String type = string(checkStr(expr[1], ctx)).toLowerCase();
 
     if(type.equals(FULLTEXT)) {
-      if(!data.meta.ftxindex) Err.or(NOIDX, FULLTEXT);
-      return new FTIndexAccess(new FTWords(
-          data, checkStr(expr[0], ctx), ctx.ftpos == null), ic).iter(ctx);
+      if(!data.meta.ftxindex) error(NOIDX, FULLTEXT);
+      return new FTIndexAccess(info, new FTWords(info, data,
+          checkStr(expr[0], ctx), ctx.ftpos == null), ic).iter(ctx);
     }
     if(type.equals(TEXT)) {
-      if(!data.meta.txtindex) Err.or(NOIDX, TEXT);
-      return new IndexAccess(expr[0], IndexType.TXT, ic).iter(ctx);
+      if(!data.meta.txtindex) error(NOIDX, TEXT);
+      return new IndexAccess(info, expr[0], IndexType.TXT, ic).iter(ctx);
     }
     if(type.equals(ATTRIBUTE)) {
-      if(!data.meta.atvindex) Err.or(NOIDX, ATTRIBUTE);
-      return new IndexAccess(expr[0], IndexType.ATV, ic).iter(ctx);
+      if(!data.meta.atvindex) error(NOIDX, ATTRIBUTE);
+      return new IndexAccess(info, expr[0], IndexType.ATV, ic).iter(ctx);
     }
 
-    Err.or(WHICHIDX, type);
+    error(WHICHIDX, type);
     return null;
   }
 }

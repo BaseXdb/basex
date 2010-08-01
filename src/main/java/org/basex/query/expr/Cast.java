@@ -7,6 +7,7 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
@@ -24,11 +25,12 @@ public final class Cast extends Single {
 
   /**
    * Function constructor.
+   * @param i query info
    * @param e expression
    * @param t data type
    */
-  public Cast(final Expr e, final SeqType t) {
-    super(e);
+  public Cast(final QueryInfo i, final Expr e, final SeqType t) {
+    super(i, e);
     seq = t;
   }
 

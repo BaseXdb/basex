@@ -2,6 +2,7 @@ package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -18,6 +19,16 @@ import org.basex.query.util.ItemSet;
  * @author Christian Gruen
  */
 final class FNSeq extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNSeq(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {

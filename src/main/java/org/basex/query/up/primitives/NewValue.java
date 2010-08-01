@@ -1,5 +1,6 @@
 package org.basex.query.up.primitives;
 
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 
@@ -16,11 +17,12 @@ abstract class NewValue extends UpdatePrimitive {
 
   /**
    * Constructor.
+   * @param u updating expression
    * @param n target node
    * @param newName new name
    */
-  protected NewValue(final Nod n, final QNm newName) {
-    super(n);
+  protected NewValue(final ParseExpr u, final Nod n, final QNm newName) {
+    super(u, n);
     name = newName;
   }
 }

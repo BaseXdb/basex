@@ -7,6 +7,7 @@ import org.basex.data.FTStringMatch;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 
@@ -20,10 +21,11 @@ import org.basex.query.iter.FTIter;
 public final class FTNot extends FTExpr {
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    */
-  public FTNot(final FTExpr e) {
-    super(e);
+  public FTNot(final QueryInfo i, final FTExpr e) {
+    super(i, e);
   }
 
   @Override

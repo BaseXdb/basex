@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
@@ -19,10 +20,11 @@ import org.basex.util.TokenBuilder;
 public final class CText extends CFrag {
   /**
    * Constructor.
+   * @param i query info
    * @param t text
    */
-  public CText(final Expr t) {
-    super(t);
+  public CText(final QueryInfo i, final Expr t) {
+    super(i, t);
   }
 
   @Override

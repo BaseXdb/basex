@@ -13,6 +13,7 @@ import org.basex.data.StatsKey;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.CAttr;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
@@ -29,7 +30,6 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.Test.Kind;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.TokenList;
@@ -53,22 +53,25 @@ public class AxisPath extends Path {
 
   /**
    * Constructor.
+   * @param i query info
    * @param r root expression; can be a {@code null} reference
    * @param s location steps; will at least have one entry
    */
-  protected AxisPath(final Expr r, final Step... s) {
-    super(r);
+  protected AxisPath(final QueryInfo i, final Expr r, final Step... s) {
+    super(i, r);
     step = s;
   }
 
   /**
    * Returns a new class instance.
+   * @param i query info
    * @param r root expression; can be a {@code null} reference
    * @param st location steps; will at least have one entry
    * @return class instance
    */
-  public static final AxisPath get(final Expr r, final Step... st) {
-    return new AxisPath(r, st).iterator(null);
+  public static final AxisPath get(final QueryInfo i, final Expr r,
+      final Step... st) {
+    return new AxisPath(i, r, st).iterator(null);
   }
 
   /**
@@ -77,7 +80,7 @@ public class AxisPath extends Path {
    * @return resulting operator
    */
   private AxisPath iterator(final QueryContext ctx) {
-    return iterable(ctx) ? new IterPath(root, step) : this;
+    return iterable(ctx) ? new IterPath(info, root, step) : this;
   }
 
   /**
@@ -107,6 +110,7 @@ public class AxisPath extends Path {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    
     for(final Step s : step) checkUp(s, ctx);
     if(root instanceof Context) root = null;
 
@@ -210,11 +214,11 @@ public class AxisPath extends Path {
         final byte[] n = tl.get(ts - t - 1);
         final NameTest nt = n == null ? new NameTest(false) :
           new NameTest(new QNm(n), Kind.NAME, false);
-        steps[t] = Step.get(Axis.CHILD, nt, preds);
+        steps[t] = Step.get(info, Axis.CHILD, nt, preds);
       }
       while(++s < step.length) steps[ts++] = step[s];
 
-      return get(root, steps).children(ctx, data);
+      return get(info, root, steps).children(ctx, data);
     }
     return this;
   }
@@ -328,10 +332,10 @@ public class AxisPath extends Path {
 
         if(j == 0) {
           if(a != Axis.ANC && a != Axis.ANCORSELF)
-            inv = Array.add(inv, Step.get(a, new KindTest(Type.DOC)));
+            inv = Array.add(inv, Step.get(info, a, new KindTest(Type.DOC)));
         } else {
           final Step prev = step[j - 1];
-          inv = Array.add(inv, Step.get(a, prev.test, prev.pred));
+          inv = Array.add(inv, Step.get(info, a, prev.test, prev.pred));
         }
       }
       final boolean add = inv.length != 0 || newPreds.length != 0;
@@ -341,8 +345,9 @@ public class AxisPath extends Path {
       if(ie instanceof AxisPath) {
         result = (AxisPath) ie;
       } else if(add || ms + 1 < step.length) {
-        result = add ? new AxisPath(ie, Step.get(Axis.SELF, Test.NODE)) :
-          new AxisPath(ie);
+        result = add ?
+            new AxisPath(info, ie, Step.get(info, Axis.SELF, Test.NODE)) :
+              new AxisPath(info, ie);
       } else {
         return ie;
       }
@@ -353,9 +358,9 @@ public class AxisPath extends Path {
         result.step[sl] = result.step[sl].addPred(np);
       }
       // add inverted path as predicate to last step
-      if(inv.length != 0) {
-        result.step[sl] = result.step[sl].addPred(AxisPath.get(null, inv));
-      }
+      if(inv.length != 0) result.step[sl] = result.step[sl].addPred(
+          AxisPath.get(info, null, inv));
+
       // add remaining steps
       for(int s = ms + 1; s < step.length; s++) {
         result.step = Array.add(result.step, step[s]);
@@ -505,7 +510,7 @@ public class AxisPath extends Path {
    * @throws QueryException query exception
    */
   private void warning(final Step s) throws QueryException {
-    Err.or(COMPSELF, s);
+    error(COMPSELF, s);
   }
 
   /**
@@ -519,15 +524,17 @@ public class AxisPath extends Path {
     int s = step.length;
     final Step[] e = new Step[s--];
     // add predicates of last step to new root node
-    final Expr rt = step[s].pred.length != 0 ? new Pred(r, step[s].pred) : r;
+    final Expr rt = step[s].pred.length != 0 ?
+        new Pred(info, r, step[s].pred) : r;
 
     // add inverted steps in a backward manner
     int c = 0;
     while(--s >= 0) {
-      e[c++] = Step.get(step[s + 1].axis.invert(), step[s].test, step[s].pred);
+      e[c++] = Step.get(info, step[s + 1].axis.invert(),
+          step[s].test, step[s].pred);
     }
-    e[c] = Step.get(step[s + 1].axis.invert(), curr.test);
-    return new AxisPath(rt, e);
+    e[c] = Step.get(info, step[s + 1].axis.invert(), curr.test);
+    return new AxisPath(info, rt, e);
   }
 
   /**
@@ -537,7 +544,7 @@ public class AxisPath extends Path {
    */
   public final AxisPath addPred(final Expr pred) {
     step[step.length - 1] = step[step.length - 1].addPred(pred);
-    return get(root, step);
+    return get(info, root, step);
   }
 
   /**
@@ -547,7 +554,7 @@ public class AxisPath extends Path {
   public final AxisPath copy() {
     final Step[] steps = new Step[step.length];
     for(int s = 0; s < step.length; s++) steps[s] = Step.get(step[s]);
-    return get(root, steps);
+    return get(info, root, steps);
   }
 
   @Override
@@ -562,7 +569,8 @@ public class AxisPath extends Path {
 
     final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
     if(stats != null && stats.leaf) {
-      step = Array.add(step, Step.get(Axis.CHILD, new KindTest(Type.TXT)));
+      step = Array.add(step,
+          Step.get(info, Axis.CHILD, new KindTest(Type.TXT)));
       ctx.compInfo(OPTTEXT, this);
     }
     return this;

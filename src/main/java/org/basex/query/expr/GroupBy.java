@@ -5,9 +5,9 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 
 /**
@@ -16,15 +16,17 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
-public final class GroupBy extends Expr {
+public final class GroupBy extends ParseExpr {
   /** Grouping expression. */
   Expr expr;
 
   /**
    * Constructor.
+   * @param i query  info
    * @param e expression
    */
-  public GroupBy(final Expr e) {
+  public GroupBy(final QueryInfo i, final Expr e) {
+    super(i);
     //[MS] change type of expr to varcall.
     assert e instanceof VarCall : "Grouping Argument must be a VarCall";
     new SeqIter();
@@ -41,7 +43,7 @@ public final class GroupBy extends Expr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    if(null == ctx.vars.get(getVar())) Err.or(GVARNOTDEFINED, getVar());
+    if(null == ctx.vars.get(getVar())) error(GVARNOTDEFINED, getVar());
     expr = expr.comp(ctx);
     return this;
   }

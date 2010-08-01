@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
@@ -24,12 +25,13 @@ public final class Let extends ForLet {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e variable input
    * @param v variable
    * @param s score flag
    */
-  public Let(final Expr e, final Var v, final boolean s) {
-    super(e, v);
+  public Let(final QueryInfo i, final Expr e, final Var v, final boolean s) {
+    super(i, e, v);
     score = s;
   }
 

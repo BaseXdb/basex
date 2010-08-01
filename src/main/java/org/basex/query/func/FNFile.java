@@ -7,12 +7,13 @@ import java.util.regex.PatternSyntaxException;
 import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.QueryText;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
@@ -22,6 +23,15 @@ import org.basex.util.Token;
  * @author Rositsa Shadura
  */
 final class FNFile extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNFile(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
@@ -81,7 +91,7 @@ final class FNFile extends Fun {
       pattern = expr.length == 2 ? Pattern.compile(Token.string(checkEmptyStr(
           expr[1], ctx))) : null;
     } catch(PatternSyntaxException ex) {
-      Err.or(QueryText.FILEPATTERN, expr[1]);
+      error(QueryText.FILEPATTERN, expr[1]);
       return null;
     }
 
@@ -97,7 +107,7 @@ final class FNFile extends Fun {
     });
 
     if(files == null) {
-      Err.or(QueryText.FILELIST, path);
+      error(QueryText.FILELIST, path);
     }
 
     return new Iter() {

@@ -9,6 +9,7 @@ import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
@@ -104,12 +105,13 @@ public final class CmpG extends Arr {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e1 first expression
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpG(final Expr e1, final Expr e2, final Comp c) {
-    super(e1, e2);
+  public CmpG(final QueryInfo i, final Expr e1, final Expr e2, final Comp c) {
+    super(i, e1, e2);
     cmp = c;
   }
 
@@ -159,8 +161,8 @@ public final class CmpG extends Arr {
           } else {
             // <=/= 0: empty(), >/!= 0: exist()
             ctx.compInfo(OPTWRITE, this);
-            e = Fun.create(cmp == Comp.EQ || cmp == Comp.LE ?
-                FunDef.EMPTY : FunDef.EXISTS, fun.expr);;
+            e = Fun.create(info, cmp == Comp.EQ || cmp == Comp.LE ?
+                FunDef.EMPTY : FunDef.EXISTS, fun.expr);
           }
         }
       }
@@ -265,7 +267,7 @@ public final class CmpG extends Arr {
         return false;
 
       ic.is += Math.max(1, ic.data.meta.size / 10);
-      iacc = Array.add(iacc, new IndexAccess(arg, type, ic));
+      iacc = Array.add(iacc, new IndexAccess(info, arg, type, ic));
       return true;
     }
 
@@ -278,7 +280,7 @@ public final class CmpG extends Arr {
       if(!ret.type.str && !ret.type.node()) return false;
 
       ic.is += ic.data.nrIDs(new ValuesToken(type, it.atom()));
-      iacc = Array.add(iacc, new IndexAccess(it, type, ic));
+      iacc = Array.add(iacc, new IndexAccess(info, it, type, ic));
     }
     return true;
   }
@@ -286,7 +288,7 @@ public final class CmpG extends Arr {
   @Override
   public Expr indexEquivalent(final IndexContext ic) {
     // more than one string - merge index results
-    final Expr root = iacc.length == 1 ? iacc[0] : new Union(iacc);
+    final Expr root = iacc.length == 1 ? iacc[0] : new Union(info, iacc);
 
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
@@ -297,7 +299,7 @@ public final class CmpG extends Arr {
       ic.ctx.compInfo(OPTATVINDEX);
       // add attribute step
       final Step step = orig.step[orig.step.length - 1];
-      Step[] steps = { Step.get(Axis.SELF, step.test) };
+      Step[] steps = { Step.get(info, Axis.SELF, step.test) };
       for(final Step s : path.step) steps = Array.add(steps, s);
       path.step = steps;
     }

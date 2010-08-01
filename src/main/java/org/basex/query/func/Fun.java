@@ -7,11 +7,11 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
-import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
@@ -25,19 +25,32 @@ public abstract class Fun extends Arr {
   public FunDef func;
 
   /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected Fun(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, e);
+    func = f;
+  }
+
+  /**
    * Creates a function with the specified arguments.
+   * @param i query info
    * @param f function description
    * @param e expression array
    * @return function
    */
-  public static final Fun create(final FunDef f, final Expr... e) {
+  public static final Fun create(final QueryInfo i,
+      final FunDef f, final Expr... e) {
+
     try {
-      final Fun fun = f.func.newInstance();
-      fun.func = f;
-      fun.expr = e;
-      return fun;
+      return f.func.getDeclaredConstructor(QueryInfo.class, FunDef.class,
+          Expr[].class).newInstance(i, f, e);
     } catch(final Exception ex) {
       // not expected to occur at all
+      ex.printStackTrace();
       Main.debug(ex);
       return null;
     }
@@ -72,7 +85,7 @@ public abstract class Fun extends Arr {
       throws QueryException {
 
     final Item it = checkEmpty(e, ctx);
-    if(!it.str() || !Token.eq(URLCOLL, it.atom())) Err.or(IMPLCOL, e);
+    if(!it.str() || !Token.eq(URLCOLL, it.atom())) error(IMPLCOL, e);
   }
 
   @Override

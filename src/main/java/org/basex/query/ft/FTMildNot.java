@@ -7,9 +7,9 @@ import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
-import org.basex.query.util.Err;
 
 /**
  * FTMildnot expression.
@@ -20,13 +20,15 @@ import org.basex.query.util.Err;
 public final class FTMildNot extends FTExpr {
   /**
    * Constructor.
+   * @param i query info
    * @param e1 first expression
    * @param e2 second expression
    * @throws QueryException query exception
    */
-  public FTMildNot(final FTExpr e1, final FTExpr e2) throws QueryException {
-    super(e1, e2);
-    if(usesExclude()) Err.or(FTMILD);
+  public FTMildNot(final QueryInfo i, final FTExpr e1, final FTExpr e2)
+      throws QueryException {
+    super(i, e1, e2);
+    if(usesExclude()) error(FTMILD);
   }
 
   @Override

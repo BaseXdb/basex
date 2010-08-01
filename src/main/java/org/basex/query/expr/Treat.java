@@ -6,10 +6,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
@@ -24,11 +24,12 @@ public final class Treat extends Single {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    * @param s sequence type
    */
-  public Treat(final Expr e, final SeqType s) {
-    super(e);
+  public Treat(final QueryInfo i, final Expr e, final SeqType s) {
+    super(i, e);
     seq = s;
   }
 
@@ -45,12 +46,12 @@ public final class Treat extends Single {
     final Iter iter = ctx.iter(expr);
     final Item it = iter.next();
     if(it == null) {
-      if(seq.mayBeZero()) Err.empty(this);
+      if(seq.mayBeZero()) emptyError();
       return Iter.EMPTY;
     }
     if(seq.zeroOrOne()) {
-      if(iter.next() != null) Err.or(NOTREATS, info(), seq);
-      if(!it.type.instance(seq.type)) Err.or(NOTREAT, info(), seq, it.type);
+      if(iter.next() != null) error(NOTREATS, info(), seq);
+      if(!it.type.instance(seq.type)) error(NOTREAT, info(), seq, it.type);
       return it.iter();
     }
 
@@ -60,7 +61,7 @@ public final class Treat extends Single {
       @Override
       public Item next() throws QueryException {
         if(i == null) return null;
-        if(!i.type.instance(seq.type)) Err.or(NOTREAT, info(), seq, i.type);
+        if(!i.type.instance(seq.type)) error(NOTREAT, info(), seq, i.type);
         final Item ii = i;
         i = iter.next();
         return ii;

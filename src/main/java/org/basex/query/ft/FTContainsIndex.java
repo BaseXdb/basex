@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
@@ -28,12 +29,14 @@ final class FTContainsIndex extends FTContains {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e contains, select and optional ignore expression
    * @param f full-text expression
    * @param ic index context
    */
-  FTContainsIndex(final Expr e, final FTExpr f, final IndexContext ic) {
-    super(e, f);
+  FTContainsIndex(final QueryInfo i, final Expr e, final FTExpr f,
+      final IndexContext ic) {
+    super(e, f, i);
     ictx = ic;
   }
 

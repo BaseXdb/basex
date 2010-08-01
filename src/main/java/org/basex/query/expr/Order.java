@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -16,7 +17,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Order extends Expr {
+public final class Order extends ParseExpr {
   /** Sort list. */
   final OrderBy[] ord;
   /** Sequence to be sorted. */
@@ -24,9 +25,11 @@ public final class Order extends Expr {
 
  /**
    * Constructor.
+   * @param i query info
    * @param e expressions
    */
-  public Order(final OrderBy[] e) {
+  public Order(final QueryInfo i, final OrderBy[] e) {
+    super(i);
     ord = e;
   }
 

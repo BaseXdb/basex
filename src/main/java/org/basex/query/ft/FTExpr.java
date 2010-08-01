@@ -5,7 +5,9 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.FTIter;
@@ -17,15 +19,17 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class FTExpr extends Expr {
+public abstract class FTExpr extends ParseExpr {
   /** Expression list. */
   protected final FTExpr[] expr;
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    */
-  protected FTExpr(final FTExpr... e) {
+  protected FTExpr(final QueryInfo i, final FTExpr... e) {
+    super(i);
     expr = e;
   }
 

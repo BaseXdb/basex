@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.util.Var;
 
 /**
@@ -12,15 +13,17 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-abstract class Single extends Expr {
+abstract class Single extends ParseExpr {
   /** Expression list. */
   public Expr expr;
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    */
-  protected Single(final Expr e) {
+  protected Single(final QueryInfo i, final Expr e) {
+    super(i);
     expr = e;
   }
 

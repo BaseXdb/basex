@@ -7,16 +7,14 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FAttr;
-import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.TokenBuilder;
-import org.basex.util.XMLToken;
 
 /**
  * Attribute fragment.
@@ -32,12 +30,14 @@ public final class CAttr extends CFrag {
 
   /**
    * Constructor.
+   * @param i query info
    * @param n name
    * @param v attribute values
    * @param c computed construction flag
    */
-  public CAttr(final Expr n, final Expr[] v, final boolean c) {
-    super(v);
+  public CAttr(final QueryInfo i, final Expr n, final Expr[] v,
+      final boolean c) {
+    super(i, v);
     atn = n;
     comp = c;
   }
@@ -51,11 +51,11 @@ public final class CAttr extends CFrag {
 
   @Override
   public FAttr atomic(final QueryContext ctx) throws QueryException {
-    final QNm name = name(ctx, checkEmpty(atn, ctx));
+    final QNm name = qname(ctx, checkEmpty(atn, ctx));
     if(!name.ns()) name.uri = Uri.EMPTY;
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
-    if(comp && (eq(name.atom(), XMLNS) || eq(pre, XMLNS))) Err.or(NSATTCONS);
+    if(comp && (eq(name.atom(), XMLNS) || eq(pre, XMLNS))) error(NSATTCONS);
 
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : expr) CText.add(tb, ctx.iter(e));
@@ -63,29 +63,6 @@ public final class CAttr extends CFrag {
     if(eq(pre, XML) && eq(ln, ID)) val = norm(val);
 
     return new FAttr(name, val, null);
-  }
-
-  /**
-   * Returns an updated name expression.
-   * @param ctx query context
-   * @param i item
-   * @return result
-   * @throws QueryException query exception
-   */
-  static QNm name(final QueryContext ctx, final Item i) throws QueryException {
-    QNm name = null;
-    if(i.type == Type.QNM) {
-      name = (QNm) i;
-    } else {
-      final byte[] nm = i.atom();
-      if(contains(nm, ' ')) Err.or(INVAL, nm);
-      if(!XMLToken.isQName(nm)) Err.or(NAMEWRONG, nm);
-      name = new QNm(nm);
-    }
-
-    if(name.uri == Uri.EMPTY) name.uri = Uri.uri(ctx.ns.uri(name.pref(),
-        name != i));
-    return name;
   }
 
   @Override

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.iter.Iter;
 
 /**
@@ -17,11 +18,12 @@ import org.basex.query.iter.Iter;
 public class Scored extends Arr {
   /**
    * Constructor.
+   * @param i query info
    * @param e scored expression
    * @param score expression computing the score
    */
-  public Scored(final Expr e, final Expr score) {
-    super(e, score);
+  public Scored(final QueryInfo i, final Expr e, final Expr score) {
+    super(i, e, score);
   }
 
   @Override

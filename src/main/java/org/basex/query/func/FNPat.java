@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.FElem;
@@ -17,7 +18,6 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
-import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -33,6 +33,16 @@ final class FNPat extends Fun {
   /** Excluded classes pattern. */
   private static final Pattern EXCLASSES =
     Pattern.compile(".*?\\[(.*?)-\\[(.*?)\\]");
+
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNPat(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
@@ -121,7 +131,7 @@ final class FNPat extends Fun {
     for(int i = 0; i < rep.length; i++) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          Err.or(FUNREGREP);
+          error(FUNREGREP);
         i++;
       }
     }
@@ -136,8 +146,8 @@ final class FNPat extends Fun {
       return Str.get(p.matcher(string(val)).replaceAll(r));
     } catch(final Exception ex) {
       final String m = ex.getMessage();
-      if(m.contains("No group")) Err.or(REGROUP);
-      Err.or(REGERR, m);
+      if(m.contains("No group")) error(REGROUP);
+      error(REGERR, m);
       return null;
     }
   }
@@ -197,7 +207,7 @@ final class FNPat extends Fun {
           }
           pt = tb.finish();
         } else {
-          Err.or(REGMOD, (char) b);
+          error(REGMOD, (char) b);
         }
       }
     }
@@ -241,7 +251,7 @@ final class FNPat extends Fun {
     try {
       return Pattern.compile(str, m);
     } catch(final Exception ex) {
-      Err.or(REGINV, pt);
+      error(REGINV, pt);
       return null;
     }
   }

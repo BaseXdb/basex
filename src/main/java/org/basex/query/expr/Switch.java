@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
@@ -17,10 +18,11 @@ import org.basex.query.iter.Iter;
 public final class Switch extends Arr {
   /**
    * Constructor.
+   * @param i query info
    * @param e expressions
    */
-  public Switch(final Expr[] e) {
-    super(e);
+  public Switch(final QueryInfo i, final Expr[] e) {
+    super(i, e);
   }
 
   @Override

@@ -567,12 +567,12 @@ public abstract class Data {
     final TokenMap nsScope = new TokenMap();
     NSNode n = ns.root;
     do {
-      for (int i = 0; i < n.vals.length; i += 2)
+      for(int i = 0; i < n.vals.length; i += 2)
         nsScope.add(ns.pref(n.vals[i]), ns.uri(n.vals[i + 1]));
       final int pos = n.fnd(ipar);
-      if (pos < 0) break;
+      if(pos < 0) break;
       n = n.ch[pos];
-    } while (n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
+    } while(n.pre <= ipar && ipar < n.pre + size(n.pre, ELEM));
 
     // loop through all entries
     int mpre = -1;
@@ -603,7 +603,7 @@ public abstract class Data {
             final Atts at = md.ns(mpre);
             for(int a = 0; a < at.size; a++) {
               final byte[] old = nsScope.get(at.key[a]);
-              if (old == null || !eq(old, at.val[a])) {
+              if(old == null || !eq(old, at.val[a])) {
                 ns.add(at.key[a], at.val[a], pre);
                 ne = true;
               }

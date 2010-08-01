@@ -33,11 +33,12 @@ public final class QuerySuggest extends QueryParser {
 
   /**
    * Constructor.
+   * @param q query
    * @param c query context
    * @param d data reference
    */
-  public QuerySuggest(final QueryContext c, final Data d) {
-    super(c);
+  public QuerySuggest(final String q, final QueryContext c, final Data d) {
+    super(q, c);
     data = d;
     checkInit();
   }

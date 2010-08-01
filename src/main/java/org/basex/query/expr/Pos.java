@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.CmpV.Comp;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -27,8 +28,10 @@ public final class Pos extends Simple {
    * Constructor.
    * @param mn minimum value
    * @param mx minimum value
+   * @param i query info
    */
-  private Pos(final long mn, final long mx) {
+  private Pos(final long mn, final long mx, final QueryInfo i) {
+    super(i);
     min = mn;
     max = mx;
   }
@@ -41,8 +44,9 @@ public final class Pos extends Simple {
    */
   static Expr get(final long mn, final long mx) {
     // suppose that positions always fit in int values..
+    // [CG] XQuery/Query Info
     return mn > mx || mx < 1 ? Bln.FALSE : mn <= 1 && mx == Long.MAX_VALUE ?
-      Bln.TRUE : new Pos(mn, mx);
+      Bln.TRUE : new Pos(mn, mx, null);
   }
 
   /**

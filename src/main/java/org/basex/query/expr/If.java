@@ -4,6 +4,7 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
@@ -18,12 +19,13 @@ import org.basex.query.iter.Iter;
 public final class If extends Arr {
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    * @param t then clause
    * @param s else clause
    */
-  public If(final Expr e, final Expr t, final Expr s) {
-    super(e, t, s);
+  public If(final QueryInfo i, final Expr e, final Expr t, final Expr s) {
+    super(i, e, t, s);
   }
 
   @Override

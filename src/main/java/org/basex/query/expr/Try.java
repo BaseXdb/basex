@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -22,11 +23,12 @@ public final class Try extends Single {
 
   /**
    * Constructor.
+   * @param i query info
    * @param t try expression
    * @param c catch expressions
    */
-  public Try(final Expr t, final Catch[] c) {
-    super(t);
+  public Try(final QueryInfo i, final Expr t, final Catch[] c) {
+    super(i, t);
     ctch = c;
   }
 

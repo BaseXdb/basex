@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
@@ -26,13 +27,14 @@ public final class FunCall extends Arr {
 
   /**
    * Function constructor.
+   * @param i query info
    * @param nm function name
-   * @param i function id
+   * @param d function id
    * @param a arguments
    */
-  public FunCall(final QNm nm, final int i, final Expr[] a) {
-    super(a);
-    id = i;
+  public FunCall(final QueryInfo i, final QNm nm, final int d, final Expr[] a) {
+    super(i, a);
+    id = d;
     name = nm;
   }
 

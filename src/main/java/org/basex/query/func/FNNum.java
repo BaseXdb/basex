@@ -3,6 +3,7 @@ package org.basex.query.func;
 import java.math.BigDecimal;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
@@ -11,7 +12,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 
 /**
  * Numeric functions.
@@ -20,12 +20,22 @@ import org.basex.query.util.Err;
  * @author Christian Gruen
  */
 public final class FNNum extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNNum(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].atomic(ctx);
     if(it == null) return null;
 
-    if(!it.unt() && !it.num()) Err.num(info(), it);
+    if(!it.unt() && !it.num()) numError(info(), it);
     final double d = it.dbl();
     switch(func) {
       case ABS:    return abs(it);

@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 
@@ -19,13 +20,15 @@ final class IterPred extends Pred {
 
   /**
    * Constructor.
+   * @param i query info
    * @param r root expression
    * @param p predicate
    * @param ps position predicate; may equal the first predicate
    * @param l true if predicate has a last function
    */
-  IterPred(final Expr r, final Expr[] p, final Pos ps, final boolean l) {
-    super(r, p);
+  IterPred(final QueryInfo i, final Expr r, final Expr[] p, final Pos ps,
+      final boolean l) {
+    super(i, r, p);
     last = l;
     pos = ps;
   }

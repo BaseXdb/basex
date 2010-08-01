@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
@@ -121,12 +122,13 @@ public final class CmpV extends Arr {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e1 first expression
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpV(final Expr e1, final Expr e2, final Comp c) {
-    super(e1, e2);
+  public CmpV(final QueryInfo i, final Expr e1, final Expr e2, final Comp c) {
+    super(i, e1, e2);
     cmp = c;
   }
 
@@ -168,7 +170,7 @@ public final class CmpV extends Arr {
           } else {
             // <=/= 0: empty(), >/!= 0: exist()
             ctx.compInfo(OPTWRITE, this);
-            e = Fun.create(cmp == Comp.EQ || cmp == Comp.LE ?
+            e = Fun.create(info, cmp == Comp.EQ || cmp == Comp.LE ?
                 FunDef.EMPTY : FunDef.EXISTS, fun.expr);
           }
         }

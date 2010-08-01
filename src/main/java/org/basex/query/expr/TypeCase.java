@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
@@ -23,11 +24,12 @@ public final class TypeCase extends Single {
 
   /**
    * Constructor.
+   * @param i query info
    * @param v variable
    * @param r return expression
    */
-  public TypeCase(final Var v, final Expr r) {
-    super(r);
+  public TypeCase(final QueryInfo i, final Var v, final Expr r) {
+    super(i, r);
     var = v;
   }
 

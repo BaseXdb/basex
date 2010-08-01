@@ -6,13 +6,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
-import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
@@ -27,11 +27,12 @@ public final class Unary extends Single {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    * @param min minus flag
    */
-  public Unary(final Expr e, final boolean min) {
-    super(e);
+  public Unary(final QueryInfo i, final Expr e, final boolean min) {
+    super(i, e);
     minus = min;
   }
 
@@ -49,7 +50,7 @@ public final class Unary extends Single {
   public Item atomic(final QueryContext ctx) throws QueryException {
     final Item it = expr.atomic(ctx);
     if(it == null) return null;
-    if(!it.unt() && !it.num()) Err.num(info(), it);
+    if(!it.unt() && !it.num()) numError(info(), it);
     final double d = it.dbl();
     if(it.unt()) return Dbl.get(minus ? -d : d);
 

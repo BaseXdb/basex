@@ -1,6 +1,7 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
@@ -19,12 +20,14 @@ public final class InsertInto extends NodeCopy {
 
   /**
    * Constructor.
+   * @param u updating expression
    * @param n target node
    * @param copy copy of nodes to be inserted
    * @param l as last flag
    */
-  public InsertInto(final Nod n, final NodIter copy, final boolean l) {
-    super(n, copy);
+  public InsertInto(final ParseExpr u, final Nod n, final NodIter copy,
+      final boolean l) {
+    super(u, n, copy);
     last = l;
   }
 

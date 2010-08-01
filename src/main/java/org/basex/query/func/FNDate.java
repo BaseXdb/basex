@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.DTd;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Date;
@@ -15,7 +17,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 
 /**
  * Date functions.
@@ -24,6 +25,16 @@ import org.basex.query.util.Err;
  * @author Christian Gruen
  */
 final class FNDate extends Fun {
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNDate(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
+
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
@@ -229,7 +240,7 @@ final class FNDate extends Fun {
     if(dtm.xc.getTimezone() == Item.UNDEF) {
       dtm.xc.setTimezone(zone);
     } else if(dtm.xc.getTimezone() != zone && zone != Item.UNDEF) {
-      Err.or(FUNZONE, dtm, tim);
+      error(FUNZONE, dtm, tim);
     }
     return dtm;
   }
@@ -258,7 +269,7 @@ final class FNDate extends Fun {
     } else {
       final DTd dtd = (DTd) checkType(zon, Type.DTD);
       tz = (int) (dtd.min() + dtd.hou() * 60);
-      if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) Err.or(INVALZONE, zon);
+      if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) error(INVALZONE, zon);
     }
     if(zn != Item.UNDEF) date.xc.add(Date.df.newDuration(-60000L * (zn - tz)));
     date.xc.setTimezone(tz);

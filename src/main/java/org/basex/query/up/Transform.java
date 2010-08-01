@@ -8,6 +8,7 @@ import org.basex.data.MemData;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ForLet;
@@ -18,7 +19,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.Err;
 
 /**
  * Transform expression.
@@ -32,12 +32,14 @@ public final class Transform extends Arr {
 
   /**
    * Constructor.
+   * @param i query info
    * @param c copy expressions
    * @param m modify expression
    * @param r return expression
    */
-  public Transform(final Let[] c, final Expr m, final Expr r) {
-    super(m, r);
+  public Transform(final QueryInfo i, final Let[] c, final Expr m,
+      final Expr r) {
+    super(i, m, r);
     copies = c;
   }
 
@@ -54,7 +56,7 @@ public final class Transform extends Arr {
     }
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
 
-    if(!expr[0].uses(Use.UPD, ctx) && !expr[0].vacuous()) Err.or(UPEXPECTT);
+    if(!expr[0].uses(Use.UPD, ctx) && !expr[0].vacuous()) error(UPEXPECTT);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
     ctx.updating = u;
@@ -68,7 +70,7 @@ public final class Transform extends Arr {
     for(final Let fo : copies) {
       final Iter ir = fo.expr.iter(ctx);
       final Item i = ir.next();
-      if(i == null || !i.node() || ir.next() != null) Err.or(UPCOPYMULT, this);
+      if(i == null || !i.node() || ir.next() != null) error(UPCOPYMULT);
       final Data m = UpdatePrimitive.buildDB(
           new NodIter(new Nod[] { (Nod) i }, 1), new MemData(ctx.context.prop));
       ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());

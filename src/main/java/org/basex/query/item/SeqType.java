@@ -3,7 +3,7 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
@@ -114,19 +114,15 @@ public final class SeqType {
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Item cast(final Item it, final Expr expr, final QueryContext ctx)
+  public Item cast(final Item it, final ParseExpr expr, final QueryContext ctx)
       throws QueryException {
 
     if(it == null) {
-      if(occ == Occ.O) Err.empty(expr);
+      if(occ == Occ.O) expr.emptyError();
       return null;
     }
     // test to disallow "xs:QName(xs:string(...))"
-    if(it.type == type) {
-      if(it.type == Type.STR) ((Str) it).direct = false;
-      return it;
-    }
-    return check(type.e(it, ctx));
+    return it.type == type ? it : check(type.e(it, ctx));
   }
 
   /**

@@ -5,6 +5,7 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.path.AxisPath;
@@ -16,15 +17,17 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class Arr extends Expr {
+public abstract class Arr extends ParseExpr {
   /** Expression list. */
   public Expr[] expr;
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression list
    */
-  protected Arr(final Expr... e) {
+  protected Arr(final QueryInfo i, final Expr... e) {
+    super(i);
     expr = e;
   }
 

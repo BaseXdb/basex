@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -23,11 +24,12 @@ public final class Castable extends Single {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    * @param s sequence type
    */
-  public Castable(final Expr e, final SeqType s) {
-    super(e);
+  public Castable(final QueryInfo i, final Expr e, final SeqType s) {
+    super(i, e);
     seq = s;
   }
 

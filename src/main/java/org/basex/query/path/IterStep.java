@@ -3,13 +3,13 @@ package org.basex.query.path;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Pos;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 
 /**
  * Path expression. Mustn't be called with more than one predicate.
@@ -25,15 +25,16 @@ final class IterStep extends Step {
 
   /**
    * Constructor.
+   * @param i query info
    * @param a axis
    * @param t node test
    * @param p predicates
    * @param ps position predicate
    * @param l lastFlag is true if predicate has a last function
    */
-  IterStep(final Axis a, final Test t, final Expr[] p,
+  IterStep(final QueryInfo i, final Axis a, final Test t, final Expr[] p,
       final Pos ps, final boolean l) {
-    super(a, t, p);
+    super(i, a, t, p);
     last = l;
     pos = ps;
   }
@@ -63,7 +64,7 @@ final class IterStep extends Step {
           if(ir == null) {
             final Item i = iter.next();
             if(i == null) break;
-            if(!i.node()) Err.or(NODESPATH, IterStep.this, i.type);
+            if(!i.node()) error(NODESPATH, IterStep.this, i.type);
             ir = axis.init((Nod) i);
           }
 

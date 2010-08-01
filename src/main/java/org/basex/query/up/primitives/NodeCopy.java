@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
@@ -25,11 +26,12 @@ public abstract class NodeCopy extends UpdatePrimitive {
 
   /**
    * Constructor.
+   * @param u updating expression
    * @param n target node
    * @param ni nodes to be inserted
    */
-  protected NodeCopy(final Nod n, final NodIter ni) {
-    super(n);
+  protected NodeCopy(final ParseExpr u, final Nod n, final NodIter ni) {
+    super(u, n);
     c.add(ni);
   }
 

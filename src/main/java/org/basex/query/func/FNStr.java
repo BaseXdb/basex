@@ -5,13 +5,13 @@ import static org.basex.util.Token.*;
 import java.util.Arrays;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -24,6 +24,16 @@ import org.basex.util.XMLToken;
 final class FNStr extends Fun {
   /** Normalization types. */
   private static final String[] NORMS = { "NFC", "NFD", "NFKC", "NFKD", "" };
+
+  /**
+   * Constructor.
+   * @param i query info
+   * @param f function definition
+   * @param e arguments
+   */
+  protected FNStr(final QueryInfo i, final FunDef f, final Expr... e) {
+    super(i, f, e);
+  }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
@@ -149,7 +159,7 @@ final class FNStr extends Fun {
     Item i;
     while((i = iter.next()) != null) {
       final long n = checkItr(i);
-      if(!XMLToken.valid(n)) Err.or(INVCODE, i);
+      if(!XMLToken.valid(n)) error(INVCODE, i);
       tb.addUTF((int) n);
     }
     return Str.get(tb.finish());
@@ -283,7 +293,7 @@ final class FNStr extends Fun {
     if(expr.length == 2) {
       final String n = string(uc(trim(checkEmptyStr(expr[1], ctx))));
       for(final String nrm : NORMS) if(nrm.equals(n)) nr = nrm;
-      if(nr == null) Err.or(NORMUNI, n);
+      if(nr == null) error(NORMUNI, n);
     }
     // [CG] XQuery: normalize-unicode()
     return Str.get(str);

@@ -7,6 +7,7 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryInfo;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.util.Tokenizer;
@@ -24,10 +25,11 @@ abstract class FTFilter extends FTExpr {
 
   /**
    * Constructor.
+   * @param i query info
    * @param e expression
    */
-  FTFilter(final FTExpr e) {
-    super(e);
+  FTFilter(final QueryInfo i, final FTExpr e) {
+    super(i, e);
   }
 
   @Override
