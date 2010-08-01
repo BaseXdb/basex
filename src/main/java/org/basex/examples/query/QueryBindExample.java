@@ -50,7 +50,7 @@ public final class QueryBindExample {
 
     // ------------------------------------------------------------------------
     // Create a variable
-    Var var = new Var(new QNm(Token.token("var")), true);
+    Var var = new Var(new QNm(Token.token("var")));
 
     // ------------------------------------------------------------------------
     // Bind the item to the variable

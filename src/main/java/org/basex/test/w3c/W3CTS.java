@@ -660,10 +660,11 @@ public abstract class W3CTS {
           def = FunDef.DB;
           src = IO.get(src).dbname();
         }
-        expr = Fun.create(def, Str.get(src));
+        // [CG] XQuery/Query Info
+        expr = Fun.create(null, def, Str.get(src));
       }
       if(var != null) {
-        final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
+        final Var v = new Var(new QNm(data.atom(var.nodes[c])));
         ctx.vars.addGlobal(v.bind(expr, ctx));
       }
     }
@@ -697,7 +698,7 @@ public abstract class W3CTS {
         // assign document
         expr = Str.get(src);
       }
-      final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
+      final Var v = new Var(new QNm(data.atom(var.nodes[c])));
       ctx.vars.addGlobal(v.bind(expr, ctx));
     }
   }
@@ -719,7 +720,7 @@ public abstract class W3CTS {
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
       final Item item = xq.iter().finish();
-      final Var v = new Var(new QNm(data.atom(var.nodes[c])), true);
+      final Var v = new Var(new QNm(data.atom(var.nodes[c])));
       ctx.vars.addGlobal(v.bind(item, ctx));
       xq.close();
     }
