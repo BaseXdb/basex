@@ -19,7 +19,7 @@ public interface Commands {
   /** Drop commands. */
   enum CmdDrop { DATABASE, DB, INDEX, USER }
   /** Show commands. */
-  enum CmdShow { DATABASES, SESSIONS, USERS }
+  enum CmdShow { DATABASES, SESSIONS, USERS, BACKUPS}
   /** Permission commands. */
   enum CmdPerm { NONE, READ, WRITE, CREATE, ADMIN }
   /** Set commands. Should be synchronized with {@link Set#STRINGS}. */

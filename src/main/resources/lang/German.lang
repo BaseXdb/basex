@@ -541,6 +541,7 @@ ch_show21=Zeigt Server-Information an:
 ch_show22=zeigt aktuell geöffnete Datenbanken.
 ch_show23=zeigt aktuelle Datenbankverbindungen.
 ch_show24=zeigt registrierte Benutzer (einer Datenbank).
+ch_show25=zeigt Backups an.
 ch_grant1=Zuweisung von Benutzerrechten.
 ch_grant2=Weist einem Benutzer (für eine Datenbank) Rechte zu.
 ch_helpgeneral0=Allgemeine Befehle:

@@ -542,6 +542,7 @@ ch_show21=mostra l'informazione sul server:
 ch_show22=mostra le basi di dati aperte.
 ch_show23=mostra le sessioni aperte.
 ch_show24=mostra gli utenti (su una base di dati).
+ch_show25=shows backups.
 ch_grant1=Assegna i permessi all'utente.
 ch_grant2=Assegna i permessi all'utente (su una base di dati) ad un utente.
 ch_helpgeneral0=Comandi generali:

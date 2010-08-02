@@ -272,12 +272,13 @@ public interface Text {
   /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
-    CmdShow.USERS + "]",
+    CmdShow.USERS + "|" + CmdShow.BACKUPS + "]",
     lang("ch_show1"),
     lang("ch_show21") + NL +
     LI + CmdShow.DATABASES + ": " + lang("ch_show22") + NL +
     LI + CmdShow.SESSIONS + ": " + lang("ch_show23") + NL +
-    LI + CmdShow.USERS + " (" + ON + " [db]): " + lang("ch_show24")
+    LI + CmdShow.USERS + " (" + ON + " [db]): " + lang("ch_show24") + NL +
+    LI + CmdShow.BACKUPS + ": " + lang("ch_show25")
   };
   /** Command help. */
   String[] HELPGRANT = {
