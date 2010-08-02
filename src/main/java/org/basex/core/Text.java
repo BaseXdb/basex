@@ -266,6 +266,10 @@ public interface Text {
     "[" + NAM + "]", lang("ch_backup1"), lang("ch_backup2")
   };
   /** Command help. */
+  String[] HELPRESTORE = {
+    "[ ZIP ]", lang("ch_restore1"), lang("ch_restore2")
+  };
+  /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
     CmdShow.USERS + "]",
@@ -415,6 +419,10 @@ public interface Text {
   String DBBACKUP = lang("db_backup");
   /** Backup of database not created. */
   String DBNOBACKUP = lang("db_nobackup");
+  /** Database restored. */
+  String DBRESTORE = lang("db_restore");
+  /** Database not restored. */
+  String DBNORESTORE = lang("db_norestore");
   /** Database not opened. */
   String DBOPENERR = lang("db_notopened");
   /** Database opened. */
