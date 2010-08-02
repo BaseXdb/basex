@@ -63,7 +63,7 @@ final class BXQStaticContext implements XQStaticContext {
       BXQAbstract.valid(prefix, String.class);
       BXQAbstract.valid(uri, String.class);
       final QNm name = new QNm(token(prefix), Uri.uri(token(uri)));
-      if(!uri.isEmpty()) ctx.ns.add(name);
+      if(!uri.isEmpty()) ctx.ns.add(name, null);
       else ctx.ns.delete(name);
     } catch(final QueryException ex) {
       throw new BXQException(ex);

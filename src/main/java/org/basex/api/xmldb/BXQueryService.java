@@ -126,7 +126,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
       // add default namespaces
       for(final String n : ns.keySet()) {
-        qp.ctx.ns.add(new QNm(token(n), Uri.uri(token(ns.get(n)))));
+        qp.ctx.ns.add(new QNm(token(n), Uri.uri(token(ns.get(n)))), null);
       }
       // perform query and return result
       return new BXResourceSet(qp.execute(), coll);

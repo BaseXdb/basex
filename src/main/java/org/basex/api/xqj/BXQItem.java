@@ -75,7 +75,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
   @Override
   public boolean getBoolean() throws XQException {
-    return ((Bln) check(Type.BLN)).bool();
+    return ((Bln) check(Type.BLN)).bool(null);
   }
 
   @Override
@@ -85,12 +85,12 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
   @Override
   public double getDouble() throws XQException {
-    return ((Dbl) check(Type.DBL)).dbl();
+    return ((Dbl) check(Type.DBL)).dbl(null);
   }
 
   @Override
   public float getFloat() throws XQException {
-    return ((Flt) check(Type.FLT)).flt();
+    return ((Flt) check(Type.FLT)).flt(null);
   }
 
   @Override
@@ -255,9 +255,9 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
   private long castItr(final Type type) throws XQException {
     opened();
     try {
-      final double d = it.dbl();
+      final double d = it.dbl(null);
       if(!it.num() || d != (long) d) throw new BXQException(NUM, d);
-      return type.e(it, ctx.ctx, null).itr();
+      return type.e(it, ctx.ctx, null).itr(null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }
