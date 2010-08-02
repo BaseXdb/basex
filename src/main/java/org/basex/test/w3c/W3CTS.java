@@ -493,7 +493,8 @@ public abstract class W3CTS {
                 pre += rdata.size(pre, rdata.kind(pre));
               }
 
-              final boolean eq = FNSimple.deep(iter, si);
+              // [CG] XQuery: check if null reference is safe
+              final boolean eq = FNSimple.deep(null, iter, si);
               if(!eq && debug) {
                 iter.reset();
                 si.reset();
@@ -646,13 +647,7 @@ public abstract class W3CTS {
 
       Expr expr = null;
       if(src == null) {
-        // assign collection
-        final NodIter col = new NodIter();
-        for(final byte[] cl : colls.get(string(nm))) {
-          col.add(ctx.doc(cl, true, false));
-        }
-        ctx.addColl(col, nm);
-        expr = Uri.uri(nm);
+        expr = coll(nm, ctx);
       } else {
         // assign document
         FunDef def = FunDef.DOC;
@@ -678,8 +673,8 @@ public abstract class W3CTS {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  private void var(final Nodes nod, final Nodes var,
-      final QueryContext ctx) throws QueryException {
+  private void var(final Nodes nod, final Nodes var, final QueryContext ctx)
+      throws QueryException {
 
     for(int c = 0; c < nod.size(); c++) {
       final byte[] nm = data.atom(nod.nodes[c]);
@@ -687,15 +682,8 @@ public abstract class W3CTS {
 
       Expr expr = null;
       if(src == null) {
-        // assign collection
-        final NodIter col = new NodIter();
-        for(final byte[] cl : colls.get(string(nm))) {
-          col.add(ctx.doc(cl, true, false));
-        }
-        ctx.addColl(col, nm);
-        expr = Uri.uri(nm);
+        expr = coll(nm, ctx);
       } else {
-        // assign document
         expr = Str.get(src);
       }
       final Var v = new Var(new QNm(data.atom(var.nodes[c])));
@@ -703,6 +691,27 @@ public abstract class W3CTS {
     }
   }
 
+  /**
+   * Assigns a collection.
+   * @param name collection name
+   * @param ctx query context
+   * @return expression
+   * @throws QueryException query exception
+   */
+  private Expr coll(final byte[] name, final QueryContext ctx)
+      throws QueryException {
+
+    // assign collection
+    final NodIter col = new NodIter();
+    for(final byte[] cl : colls.get(string(name))) {
+      if(new File(string(cl)).exists()) col.add(ctx.doc(cl, true, false, null));
+      else Main.errln("Warning: \"%\" not found.", cl);
+    }
+    ctx.addColl(col, name);
+    return Uri.uri(name);
+  }
+  
+  
   /**
    * Evaluates the the input files and assigns the result to the specified
    * variables.
