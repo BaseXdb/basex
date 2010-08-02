@@ -4,11 +4,11 @@ import static org.basex.util.Token.*;
 import java.util.HashMap;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.util.SentList;
+import org.basex.util.InputInfo;
 import org.basex.util.Tokenizer;
 
 /**
@@ -24,12 +24,12 @@ public final class FNSent extends Fun {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNSent(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNSent(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -52,13 +52,13 @@ public final class FNSent extends Fun {
       throws QueryException {
 
     // text to be analyzed
-    final byte[] str = checkEmptyStr(expr[0], ctx);
+    final byte[] str = checkStr(expr[0], ctx);
 
     // if necessary, add new sentiment list to hash map
-    final String uri = string(checkEmptyStr(expr[1], ctx));
+    final String uri = string(checkStr(expr[1], ctx));
     SentList list = LISTS.get(uri);
     if(list == null) {
-      list = new SentList(this, uri);
+      list = new SentList(input, uri);
       LISTS.put(uri, list);
     }
 

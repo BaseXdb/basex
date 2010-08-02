@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import org.basex.core.Main;
 import org.basex.query.QueryException;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -45,7 +46,7 @@ public final class B64 extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) {
+  public boolean eq(final InputInfo ii, final Item it) {
     // at this stage, item will always be of the same type
     return Token.eq(val, ((B64) it).val);
   }

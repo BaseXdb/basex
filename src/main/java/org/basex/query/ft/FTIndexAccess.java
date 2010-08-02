@@ -5,13 +5,13 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Simple;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 
 /**
  * FTContains expression with index access.
@@ -29,14 +29,14 @@ public final class FTIndexAccess extends Simple {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param ex contains, select and optional ignore expression
    * @param ic index context
    */
-  public FTIndexAccess(final QueryInfo i, final FTExpr ex,
+  public FTIndexAccess(final InputInfo ii, final FTExpr ex,
       final IndexContext ic) {
     
-    super(i);
+    super(ii);
     ftexpr = ex;
     ictx = ic;
     scoring = !ic.ctx.ftfast;

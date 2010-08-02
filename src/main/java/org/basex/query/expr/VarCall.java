@@ -6,13 +6,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.NSLocal;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Variable expression.
@@ -26,11 +26,11 @@ public final class VarCall extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param v variable
    */
-  public VarCall(final QueryInfo i, final Var v) {
-    super(i);
+  public VarCall(final InputInfo ii, final Var v) {
+    super(ii);
     var = v;
   }
 
@@ -78,7 +78,7 @@ public final class VarCall extends ParseExpr {
 
   @Override
   public Expr remove(final Var v) {
-    return var.eq(v) ? new Context(info) : this;
+    return var.eq(v) ? new Context(input) : this;
   }
 
   @Override
@@ -97,7 +97,7 @@ public final class VarCall extends ParseExpr {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return "Variable";
   }
 

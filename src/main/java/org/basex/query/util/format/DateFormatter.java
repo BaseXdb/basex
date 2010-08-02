@@ -5,10 +5,11 @@ import static org.basex.util.Token.*;
 import java.util.Calendar;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Date;
 import org.basex.query.item.Type;
+import org.basex.query.util.Err;
 import org.basex.query.util.format.FormatParser.Case;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.locale.Formatter;
 
@@ -24,7 +25,7 @@ public final class DateFormatter {
 
   /**
    * Formats the specified date.
-   * @param e calling expression
+   * @param ii input info
    * @param date date to be formatted
    * @param pic picture
    * @param lng language
@@ -33,7 +34,7 @@ public final class DateFormatter {
    * @return formatted string
    * @throws QueryException query exception
    */
-  public static byte[] format(final ParseExpr e, final Date date,
+  public static byte[] format(final InputInfo ii, final Date date,
       final String pic, final byte[] lng, final byte[] cal, final byte[] plc)
       throws QueryException {
 
@@ -43,7 +44,7 @@ public final class DateFormatter {
     final Formatter form = Formatter.get(string(lng));
 
     final TokenBuilder tb = new TokenBuilder();
-    final DateParser fp = new DateParser(e, pic);
+    final DateParser fp = new DateParser(ii, pic);
     while(fp.more()) {
       final char ch = fp.next();
       if(ch != 0) {
@@ -51,7 +52,7 @@ public final class DateFormatter {
         tb.add(ch);
       } else {
         String m = fp.marker();
-        if(m.length() == 0) e.error(PICDATE, pic);
+        if(m.length() == 0) Err.or(ii, PICDATE, pic);
         final int spec = cp(m, 0);
         m = m.substring(1);
         String pres = "1";
@@ -62,59 +63,59 @@ public final class DateFormatter {
         final XMLGregorianCalendar gc = date.xc;
         switch(spec) {
           case 'Y':
-            if(tim) e.error(PICCOMP, pic);
+            if(tim) Err.or(ii, PICCOMP, pic);
             num = gc.getYear();
             break;
           case 'M':
-            if(tim) e.error(PICCOMP, pic);
+            if(tim) Err.or(ii, PICCOMP, pic);
             num = gc.getMonth();
             break;
           case 'D':
-            if(tim) e.error(PICCOMP, pic);
+            if(tim) Err.or(ii, PICCOMP, pic);
             num = gc.getDay();
             break;
           case 'd':
-            if(tim) e.error(PICCOMP, pic);
+            if(tim) Err.or(ii, PICCOMP, pic);
             num = Date.days(0, gc.getMonth(), gc.getDay());
             break;
           case 'F':
-            if(tim) e.error(PICCOMP, pic);
+            if(tim) Err.or(ii, PICCOMP, pic);
             num = gc.toGregorianCalendar().get(Calendar.DAY_OF_WEEK) - 1;
             pres = "n";
             break;
           case 'W':
             num = gc.toGregorianCalendar().get(Calendar.WEEK_OF_YEAR);
-            if(tim) e.error(PICCOMP, pic);
+            if(tim) Err.or(ii, PICCOMP, pic);
             break;
           case 'w':
             num = gc.toGregorianCalendar().get(Calendar.WEEK_OF_MONTH);
-            if(tim) e.error(PICCOMP, pic);
+            if(tim) Err.or(ii, PICCOMP, pic);
             break;
           case 'H':
-            if(dat) e.error(PICCOMP, pic);
+            if(dat) Err.or(ii, PICCOMP, pic);
             num = gc.getHour();
             break;
           case 'h':
             num = gc.getHour() % 12;
-            if(dat) e.error(PICCOMP, pic);
+            if(dat) Err.or(ii, PICCOMP, pic);
             break;
           case 'P':
-            if(dat) e.error(PICCOMP, pic);
+            if(dat) Err.or(ii, PICCOMP, pic);
             num = gc.getHour() / 12;
             pres = "n";
             break;
           case 'm':
-            if(dat) e.error(PICCOMP, pic);
+            if(dat) Err.or(ii, PICCOMP, pic);
             num = gc.getMinute();
             pres = "01";
             break;
           case 's':
-            if(dat) e.error(PICCOMP, pic);
+            if(dat) Err.or(ii, PICCOMP, pic);
             num = gc.getSecond();
             pres = "01";
             break;
           case 'f':
-            if(dat) e.error(PICCOMP, pic);
+            if(dat) Err.or(ii, PICCOMP, pic);
             num = gc.getMillisecond();
             pres = "1";
             break;
@@ -134,12 +135,12 @@ public final class DateFormatter {
             pres = "n";
             break;
           default:
-            e.error(PICDATE, pic);
+            Err.or(ii, PICDATE, pic);
             break;
         }
 
         final FormatParser mp = new FormatParser(m, pres, true);
-        if(mp.error) e.error(PICDATE, pic);
+        if(mp.error) Err.or(ii, PICDATE, pic);
 
         if(mp.pres.startsWith("n")) {
           byte[] in = EMPTY;

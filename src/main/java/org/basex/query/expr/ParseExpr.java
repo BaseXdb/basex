@@ -8,12 +8,13 @@ import org.basex.core.Commands.CmdPerm;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -23,15 +24,15 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public abstract class ParseExpr extends Expr {
-  /** Query info. */
-  protected final QueryInfo info;
+  /** Input information. */
+  public final InputInfo input;
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    */
-  public ParseExpr(final QueryInfo i) {
-    info = i;
+  public ParseExpr(final InputInfo ii) {
+    input = ii;
   }
 
   @Override
@@ -50,7 +51,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null) return null;
 
     final Item n = ir.next();
-    if(n != null) error(XPSEQ, "(" + it + ", " + n +
+    if(n != null) Err.or(input, XPSEQ, "(" + it + ", " + n +
         (ir.next() != null ? ", ..." : "") + ")");
     return it;
   }
@@ -60,7 +61,7 @@ public abstract class ParseExpr extends Expr {
     final Iter ir = iter(ctx);
     final Item it = ir.next();
     if(it == null) return Bln.FALSE;
-    if(!it.node() && ir.next() != null) error(CONDTYPE, this);
+    if(!it.node() && ir.next() != null) Err.or(input, CONDTYPE, this);
     return it;
   }
 
@@ -86,7 +87,8 @@ public abstract class ParseExpr extends Expr {
    */
   public final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
-    if(e != null && ctx.updating && e.uses(Use.UPD, ctx)) error(UPNOT, info());
+    if(e != null && ctx.updating && e.uses(Use.UPD, ctx))
+      Err.or(input, UPNOT, desc());
     return e;
   }
 
@@ -104,7 +106,7 @@ public abstract class ParseExpr extends Expr {
     for(final Expr e : expr) {
       if(e.vacuous()) continue;
       final boolean u = e.uses(Use.UPD, ctx);
-      if(u && s == 2 || !u && s == 1) error(UPNOT, info());
+      if(u && s == 2 || !u && s == 1) Err.or(input, UPNOT, desc());
       s = u ? 1 : 2;
     }
   }
@@ -121,8 +123,8 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = e.atomic(ctx);
-    if(it == null) error(XPEMPTYPE, info(), Type.DBL);
-    if(!it.unt() && !it.num()) numError(info(), it);
+    if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.DBL);
+    if(!it.unt() && !it.num()) Err.number(this, it);
     return it.dbl();
   }
 
@@ -138,7 +140,7 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = e.atomic(ctx);
-    if(it == null) error(XPEMPTYPE, info(), Type.ITR);
+    if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.ITR);
     return checkItr(it);
   }
 
@@ -150,7 +152,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final long checkItr(final Item it) throws QueryException {
-    if(!it.unt() && !it.type.instance(Type.ITR)) errType(Type.ITR, it);
+    if(!it.unt() && !it.type.instance(Type.ITR)) Err.type(this, Type.ITR, it);
     return it.itr();
   }
 
@@ -162,76 +164,8 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Nod checkNode(final Item it) throws QueryException {
-    if(!it.node()) errType(Type.NOD, it);
+    if(!it.node()) Err.type(this, Type.NOD, it);
     return (Nod) it;
-  }
-
-  /**
-   * Checks if the specified expression yields a non-empty string.
-   * Returns a token representation or an exception.
-   * @param e expression to be evaluated
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  public final byte[] checkEmptyStr(final Expr e, final QueryContext ctx)
-      throws QueryException {
-    return checkStr(checkEmpty(e, ctx));
-  }
-
-  /**
-   * Checks if the specified item is a string.
-   * Returns a token representation or an exception.
-   * @param it item to be checked
-   * @return item
-   * @throws QueryException query exception
-   */
-  public final byte[] checkStr(final Item it) throws QueryException {
-    if(it == null) return Token.EMPTY;
-    if(!it.str() && !it.unt()) errType(Type.STR, it);
-    return it.atom();
-  }
-
-  /**
-   * Throws an exception if the context item is not set.
-   * @param ctx query context
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  public final Item checkCtx(final QueryContext ctx) throws QueryException {
-    final Item it = ctx.item;
-    if(it == null) error(XPNOCTX, this);
-    return it;
-  }
-
-  /**
-   * Checks if the specified expression yields a non-empty item.
-   * @param e expression to be evaluated
-   * @param ctx query context
-   * @return item
-   * @throws QueryException query exception
-   */
-  public final Item checkEmpty(final Expr e, final QueryContext ctx)
-      throws QueryException {
-
-    final Item it = e.atomic(ctx);
-    if(it == null) emptyError();
-    return it;
-  }
-
-  /**
-   * Checks the data type and throws an exception, if necessary.
-   * @param it item to be checked
-   * @param t type to be checked
-   * @return specified item
-   * @throws QueryException query exception
-   */
-  public final Item checkType(final Item it, final Type t)
-      throws QueryException {
-
-    if(it == null) emptyError();
-    if(it.type != t) errType(t, it);
-    return it;
   }
 
   /**
@@ -244,7 +178,84 @@ public abstract class ParseExpr extends Expr {
    */
   public final byte[] checkStr(final Expr e, final QueryContext ctx)
       throws QueryException {
-    return checkStr(e.atomic(ctx));
+    final Item it = checkItem(e, ctx);
+    if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
+    return it.atom();
+  }
+
+  /**
+   * Checks if the specified item is a string or an empty sequence.
+   * Returns a token representation or an exception.
+   * @param it item to be checked
+   * @return item
+   * @throws QueryException query exception
+   */
+  public final byte[] checkStrEmp(final Item it) throws QueryException {
+    if(it == null) return Token.EMPTY;
+    if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
+    return it.atom();
+  }
+
+  /**
+   * Throws an exception if the context item is not set.
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public final Item checkCtx(final QueryContext ctx) throws QueryException {
+    final Item it = ctx.item;
+    if(it == null) Err.or(input, XPNOCTX, this);
+    return it;
+  }
+
+  /**
+   * Checks if the specified expression yields a non-empty item.
+   * @param e expression to be evaluated
+   * @param ctx query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  public final Item checkItem(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    return checkEmpty(e.atomic(ctx));
+  }
+
+  /**
+   * Checks the data type and throws an exception, if necessary.
+   * @param it item to be checked
+   * @param t type to be checked
+   * @return specified item
+   * @throws QueryException query exception
+   */
+  public final Item checkType(final Item it, final Type t)
+      throws QueryException {
+
+    if(checkEmpty(it).type != t) Err.type(this, t, it);
+    return it;
+  }
+
+  /**
+   * Checks if the specified item is a empty sequence.
+   * @param it item to be checked
+   * @return specified item
+   * @throws QueryException query exception
+   */
+  public Item checkEmpty(final Item it) throws QueryException {
+    if(it == null) Err.or(input, XPEMPTY, desc());
+    return it;
+  }
+
+  /**
+   * Checks if the specified expression yields a string or empty sequence.
+   * Returns a token representation or an exception.
+   * @param e expression to be evaluated
+   * @param ctx query context
+   * @return item
+   * @throws QueryException query exception
+   */
+  public final byte[] checkEStr(final Expr e, final QueryContext ctx)
+      throws QueryException {
+    return checkStrEmp(e.atomic(ctx));
   }
 
   /**
@@ -259,9 +270,9 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     checkAdmin(ctx);
-    final byte[] name = checkStr(e, ctx);
+    final byte[] name = checkEStr(e, ctx);
     final IO io = IO.get(string(name));
-    if(!io.exists()) error(DOCERR, name);
+    if(!io.exists()) Err.or(input, DOCERR, name);
     return io;
   }
 
@@ -273,94 +284,6 @@ public abstract class ParseExpr extends Expr {
    */
   public final void checkAdmin(final QueryContext ctx) throws QueryException {
     if(!ctx.context.user.perm(User.ADMIN))
-      error(Text.PERMNO, CmdPerm.ADMIN);
-  }
-
-  /**
-   * Returns a type error.
-   * @param t expected type
-   * @param it item
-   * @throws QueryException query exception
-   */
-  public final void errType(final Type t, final Item it) throws QueryException {
-    typeError(info(), t, it);
-  }
-
-  // ERRORS ===================================================================
-
-  
-  /**
-   * Decorates the specified query exception with information on the.
-   * @param err error definition
-   * @param x extended info
-   * @throws QueryException query exception
-   */
-  public final void error(final Object[] err, final Object... x)
-      throws QueryException {
-    throw new QueryException(info, err, x);
-  }
-  
-  /**
-   * Decorates the specified query exception with information on the.
-   * @param err error message
-   * @param x extended info
-   * @throws QueryException query exception
-   */
-  public final void error(final Object err, final Object... x)
-      throws QueryException {
-    throw new QueryException(info, err, x);
-  }
-
-  /**
-   * Throws a type exception.
-   * @param inf expression info
-   * @param t expected type
-   * @param it item
-   * @throws QueryException query exception
-   */
-  public void typeError(final String inf, final Type t, final Item it)
-      throws QueryException {
-    error(XPTYPE, inf, t, it.type);
-  }
-
-  /**
-   * Throws a node exception.
-   * @param ex expression
-   * @param it item
-   * @throws QueryException query exception
-   */
-  public void nodeError(final Expr ex, final Item it) throws QueryException {
-    typeError(ex.info(), Type.NOD, it);
-  }
-
-  /**
-   * Throws a numeric type exception.
-   * @param inf expression info
-   * @param it item
-   * @throws QueryException query exception
-   */
-  public void numError(final String inf, final Item it)
-      throws QueryException {
-    error(XPTYPENUM, inf, it.type);
-  }
-
-  /**
-   * Throws a empty sequence exception.
-   * @throws QueryException query exception
-   */
-  public void emptyError() throws QueryException {
-    error(XPEMPTY, info());
-  }
-
-  /**
-   * Throws a comparison exception.
-   * @param it1 first item
-   * @param it2 second item
-   * @throws QueryException query exception
-   */
-  public void diffError(final Item it1, final Item it2)
-      throws QueryException {
-    if(it1 == it2) error(TYPECMP, it1.type);
-    else error(XPTYPECMP, it1.type, it2.type);
+      Err.or(input, Text.PERMNO, CmdPerm.ADMIN);
   }
 }

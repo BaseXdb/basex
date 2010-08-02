@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import org.basex.core.Main;
 import org.basex.io.IO;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -31,31 +32,32 @@ public final class QueryException extends Exception {
 
   /**
    * Constructor.
-   * @param qi query info
+   * @param ii input info
    * @param s message
    * @param e message extension
    */
-  public QueryException(final QueryInfo qi, final Object s, final Object... e) {
+  public QueryException(final InputInfo ii, final Object s, final Object... e) {
     super(Main.info(s, chop(e)));
-    if(qi == null) return;
+    if(ii == null) return;
 
     line = 1;
     col = 1;
-    for(int i = 0; i < qi.pos && i < qi.query.length(); i++) {
-      final char ch = qi.query.charAt(i);
+    final int qp = Math.min(ii.pos - 1, ii.query.length());
+    for(int i = 0; i < qp; i++) {
+      final char ch = ii.query.charAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }
   }
 
   /**
    * Constructor.
-   * @param qi query info
+   * @param ii input info
    * @param s xquery error
    * @param e error arguments
    */
-  public QueryException(final QueryInfo qi, final Object[] s,
+  public QueryException(final InputInfo ii, final Object[] s,
       final Object... e) {
-    this(qi, s[2], e);
+    this(ii, s[2], e);
     code = s[1] == null ? s[0].toString() : String.format("%s%04d", s[0], s[1]);
   }
 
@@ -68,6 +70,9 @@ public final class QueryException extends Exception {
     for(int i = 0; i < t.length; i++) {
       if(t[i] instanceof byte[]) {
         t[i] = Token.string((byte[]) t[i]);
+      } else if(t[i] instanceof Throwable) {
+        final Throwable th = (Throwable) t[i];
+        t[i] = th.getMessage() != null ? th.getMessage() : th.toString();
       } else if(!(t[i] instanceof String)) {
         t[i] = t[i].toString();
       }

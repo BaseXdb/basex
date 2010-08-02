@@ -2,7 +2,7 @@ package org.basex.query.item;
 
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -81,12 +81,12 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) throws QueryException {
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
     return val == it.dbl();
   }
 
   @Override
-  public int diff(final ParseExpr e, final Item it) throws QueryException {
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
     final double n = it.dbl();
     if(n != n || val != val) return UNDEF;
     return val < n ? -1 : val > n ? 1 : 0;

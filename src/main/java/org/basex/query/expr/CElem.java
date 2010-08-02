@@ -6,15 +6,16 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FElem;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 
 /**
  * Element fragment.
@@ -30,14 +31,14 @@ public final class CElem extends CFrag {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param t tag tag
    * @param cont element content
    * @param ns namespaces
    */
-  public CElem(final QueryInfo i, final Expr t, final Expr[] cont,
+  public CElem(final InputInfo ii, final Expr t, final Expr[] cont,
       final Atts ns) {
-    super(i, cont);
+    super(ii, cont);
     tag = t;
     nsp = ns;
   }
@@ -65,7 +66,7 @@ public final class CElem extends CFrag {
 
   @Override
   public FElem atomic(final QueryContext ctx) throws QueryException {
-    final Item it = checkEmpty(tag, ctx);
+    final Item it = checkItem(tag, ctx);
     final int s = ctx.ns.size();
     addNS(ctx);
 
@@ -80,8 +81,8 @@ public final class CElem extends CFrag {
     }
 
     final Constr c = new Constr(ctx, expr);
-    if(c.errAtt) error(NOATTALL);
-    if(c.duplAtt != null) error(ATTDUPL, c.duplAtt);
+    if(c.errAtt) Err.or(input, NOATTALL);
+    if(c.duplAtt != null) Err.or(input, ATTDUPL, c.duplAtt);
 
     final FElem node = new FElem(tname, c.children, c.ats, c.base, nsp);
     for(int n = 0; n < c.children.size(); n++) c.children.get(n).parent(node);
@@ -105,7 +106,7 @@ public final class CElem extends CFrag {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return info(QueryTokens.ELEMENT);
   }
 

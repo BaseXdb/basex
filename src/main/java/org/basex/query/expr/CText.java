@@ -2,13 +2,13 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -20,11 +20,11 @@ import org.basex.util.TokenBuilder;
 public final class CText extends CFrag {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param t text
    */
-  public CText(final QueryInfo i, final Expr t) {
-    super(i, t);
+  public CText(final InputInfo ii, final Expr t) {
+    super(ii, t);
   }
 
   @Override
@@ -67,7 +67,7 @@ public final class CText extends CFrag {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return info(QueryTokens.TEXT);
   }
 

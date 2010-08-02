@@ -4,14 +4,16 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.util.Err;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 
 /**
  * Except expression.
@@ -23,11 +25,11 @@ import org.basex.util.Array;
 public final class Except extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression list
    */
-  public Except(final QueryInfo i, final Expr[] e) {
-    super(i, e);
+  public Except(final InputInfo ii, final Expr[] e) {
+    super(ii, e);
   }
 
   @Override
@@ -37,9 +39,9 @@ public final class Except extends Arr {
     for(int e = 1; e < expr.length; e++) {
       if(expr[e].empty()) expr = Array.delete(expr, e--);
     }
-    final boolean em = expr[0].empty();
-    if(el != expr.length || em) ctx.compInfo(OPTEMPTY);
-    return em ? Seq.EMPTY : this;
+    final boolean ii = expr[0].empty();
+    if(el != expr.length || ii) ctx.compInfo(OPTEMPTY);
+    return ii ? Seq.EMPTY : this;
   }
 
   @Override
@@ -90,7 +92,7 @@ public final class Except extends Arr {
 
       private void next(final int i) throws QueryException {
         final Item it = iter[i].next();
-        if(it != null && !it.node()) nodeError(Except.this, it);
+        if(it != null && !it.node()) Err.type(Except.this, Type.NOD, it);
         items[i] = (Nod) it;
       }
     };
@@ -107,14 +109,14 @@ public final class Except extends Arr {
 
     Item it;
     while((it = iter[0].next()) != null) {
-      if(!it.node()) nodeError(this, it);
+      if(!it.node()) Err.type(this, Type.NOD, it);
       ni.add((Nod) it);
     }
 
     for(int e = 1; e != expr.length; e++) {
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
-        if(!it.node()) nodeError(this, it);
+        if(!it.node()) Err.type(this, Type.NOD, it);
         final Nod node = (Nod) it;
         for(int s = 0; s < ni.size(); s++) {
           if(ni.get(s).is(node)) ni.delete(s--);

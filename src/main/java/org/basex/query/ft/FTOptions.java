@@ -5,9 +5,9 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
+import org.basex.util.InputInfo;
 
 /**
  * FTOptions expression.
@@ -21,12 +21,12 @@ public final class FTOptions extends FTExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    * @param o ft options
    */
-  public FTOptions(final QueryInfo i, final FTExpr e, final FTOpt o) {
-    super(i, e);
+  public FTOptions(final InputInfo ii, final FTExpr e, final FTOpt o) {
+    super(ii, e);
     opt = o;
   }
 

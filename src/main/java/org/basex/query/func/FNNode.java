@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
@@ -12,6 +11,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -23,12 +23,12 @@ import org.basex.util.TokenBuilder;
 final class FNNode extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNNode(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNNode(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override

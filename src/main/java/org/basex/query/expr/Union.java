@@ -3,14 +3,16 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.util.Err;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 
 /**
  * Union expression.
@@ -21,11 +23,11 @@ import org.basex.util.Array;
 public final class Union extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression list
    */
-  public Union(final QueryInfo i, final Expr[] e) {
-    super(i, e);
+  public Union(final InputInfo ii, final Expr[] e) {
+    super(ii, e);
   }
 
   @Override
@@ -61,7 +63,7 @@ public final class Union extends Arr {
     for(final Iter ir : iter) {
       Item it;
       while((it = ir.next()) != null) {
-        if(!it.node()) nodeError(this, it);
+        if(!it.node()) Err.type(this, Type.NOD, it);
         ni.add((Nod) it);
       }
     }
@@ -103,7 +105,7 @@ public final class Union extends Arr {
 
       private void next(final int i) throws QueryException {
         final Item it = iter[i].next();
-        if(it != null && !it.node()) nodeError(Union.this, it);
+        if(it != null && !it.node()) Err.type(Union.this, Type.NOD, it);
         items[i] = (Nod) it;
       }
     };

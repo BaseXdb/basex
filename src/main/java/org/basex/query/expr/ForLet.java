@@ -2,9 +2,9 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Abstract For/Let Clause.
@@ -18,12 +18,12 @@ public abstract class ForLet extends Single {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e variable input
    * @param v variable
    */
-  protected ForLet(final QueryInfo i, final Expr e, final Var v) {
-    super(i, e);
+  protected ForLet(final InputInfo ii, final Expr e, final Var v) {
+    super(ii, e);
     var = v;
   }
 

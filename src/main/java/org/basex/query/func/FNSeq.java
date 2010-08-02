@@ -2,7 +2,7 @@ package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
+import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -11,6 +11,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.ItemSet;
+import org.basex.util.InputInfo;
 
 /**
  * Sequence functions.
@@ -21,12 +22,12 @@ import org.basex.query.util.ItemSet;
 final class FNSeq extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNSeq(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNSeq(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -41,11 +42,11 @@ final class FNSeq extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case INDEXOF:  return indexOf(ctx);
-      case DISTINCT: return distinct(ctx);
-      case INSBEF:   return insbef(ctx);
+      case DISTINCT: return distinctValues(ctx);
+      case INSBEF:   return insertBefore(ctx);
       case REVERSE:  return reverse(ctx);
       case REMOVE:   return remove(ctx);
-      case SUBSEQ:   return subseq(ctx);
+      case SUBSEQ:   return subsequence(ctx);
       case TAIL:     return tail(ctx);
       default:       return super.iter(ctx);
     }
@@ -81,7 +82,7 @@ final class FNSeq extends Fun {
    * @throws QueryException query exception
    */
   private Iter indexOf(final QueryContext ctx) throws QueryException {
-    final Item it = checkEmpty(expr[1], ctx);
+    final Item it = checkItem(expr[1], ctx);
     if(expr.length == 3) checkColl(expr[2], ctx);
 
     return new Iter() {
@@ -94,7 +95,8 @@ final class FNSeq extends Fun {
           final Item i = ir.next();
           if(i == null) return null;
           c++;
-          if(i.comparable(it) && i.eq(it)) return Itr.get(c);
+          if(i.comparable(it) && CmpV.Comp.EQ.e(input, i, it))
+            return Itr.get(c);
         }
       }
     };
@@ -106,7 +108,7 @@ final class FNSeq extends Fun {
    * @return distinct iterator
    * @throws QueryException query exception
    */
-  private Iter distinct(final QueryContext ctx) throws QueryException {
+  private Iter distinctValues(final QueryContext ctx) throws QueryException {
     if(expr.length == 2) checkColl(expr[1], ctx);
 
     return new Iter() {
@@ -118,8 +120,8 @@ final class FNSeq extends Fun {
         while(true) {
           Item i = ir.next();
           if(i == null) return null;
-          i = FNGen.atom(i);
-          if(map.index(i)) return i;
+          i = atom(i);
+          if(map.index(input, i)) return i;
         }
       }
     };
@@ -131,7 +133,7 @@ final class FNSeq extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Iter insbef(final QueryContext ctx) throws QueryException {
+  private Iter insertBefore(final QueryContext ctx) throws QueryException {
     return new Iter() {
       final long pos = Math.max(1, checkItr(expr[1], ctx));
       final Iter iter = expr[0].iter(ctx);
@@ -178,7 +180,7 @@ final class FNSeq extends Fun {
    * @return subsequence
    * @throws QueryException query exception
    */
-  private Iter subseq(final QueryContext ctx) throws QueryException {
+  private Iter subsequence(final QueryContext ctx) throws QueryException {
     final long s = Math.round(checkDbl(expr[1], ctx));
     final long e = expr.length > 2 ? s + Math.round(checkDbl(expr[2], ctx)) :
       Long.MAX_VALUE;

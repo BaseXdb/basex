@@ -4,8 +4,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Abstract single expression.
@@ -19,11 +19,11 @@ abstract class Single extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    */
-  protected Single(final QueryInfo i, final Expr e) {
-    super(i);
+  protected Single(final InputInfo ii, final Expr e) {
+    super(ii);
     expr = e;
   }
 

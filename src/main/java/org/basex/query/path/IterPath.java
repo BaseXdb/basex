@@ -3,11 +3,12 @@ package org.basex.query.path;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Iterative path expression for location paths which return sorted and
@@ -20,12 +21,12 @@ import org.basex.query.iter.Iter;
 final class IterPath extends AxisPath {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param r root expression
    * @param s location steps
    */
-  IterPath(final QueryInfo i, final Expr r, final Step[] s) {
-    super(i, r, s);
+  IterPath(final InputInfo ii, final Expr r, final Step[] s) {
+    super(ii, r, s);
   }
 
   @Override
@@ -60,7 +61,7 @@ final class IterPath extends AxisPath {
             p--;
           } else {
             if(p == iter.length - 1) {
-              if(!i.node()) error(NODESPATH, this, i.type);
+              if(!i.node()) Err.or(input, NODESPATH, this, i.type);
               final Nod n = (Nod) i;
               if(prev == null || !prev.is(n)) {
                 prev = n;

@@ -4,13 +4,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.expr.Root;
 import org.basex.query.item.Item;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Path expression.
@@ -24,11 +24,11 @@ abstract class Path extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param r root expression; can be null
    */
-  protected Path(final QueryInfo i, final Expr r) {
-    super(i);
+  protected Path(final InputInfo ii, final Expr r) {
+    super(ii);
     root = r;
   }
 

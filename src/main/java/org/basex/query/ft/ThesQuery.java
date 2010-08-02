@@ -2,6 +2,7 @@ package org.basex.query.ft;
 
 import java.util.ArrayList;
 import org.basex.query.QueryException;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
 
@@ -37,13 +38,14 @@ public final class ThesQuery {
 
   /**
    * Finds a thesaurus term.
+   * @param ii input info
    * @param ft tokenizer
    * @return result list
    * @throws QueryException query exception
    */
-  byte[][] find(final Tokenizer ft) throws QueryException {
+  byte[][] find(final InputInfo ii, final Tokenizer ft) throws QueryException {
     final TokenList tl = new TokenList();
-    for(final Thesaurus th : thes) th.find(tl, ft);
+    for(final Thesaurus th : thes) th.find(ii, tl, ft);
     return tl.toArray();
   }
 }

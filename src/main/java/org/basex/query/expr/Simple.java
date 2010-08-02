@@ -3,7 +3,7 @@ package org.basex.query.expr;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryInfo;
+import org.basex.util.InputInfo;
 
 /**
  * Simple expression without arguments.
@@ -14,10 +14,10 @@ import org.basex.query.QueryInfo;
 public abstract class Simple extends ParseExpr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    */
-  public Simple(final QueryInfo i) {
-    super(i);
+  public Simple(final InputInfo ii) {
+    super(ii);
   }
 
   @Override

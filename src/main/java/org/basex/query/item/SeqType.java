@@ -1,12 +1,14 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Stores a sequence type definition.
@@ -118,47 +120,47 @@ public final class SeqType {
       throws QueryException {
 
     if(it == null) {
-      if(occ == Occ.O) expr.emptyError();
+      if(occ == Occ.O) Err.or(expr.input, XPEMPTY, expr.desc());
       return null;
     }
-    // test to disallow "xs:QName(xs:string(...))"
-    return it.type == type ? it : check(type.e(it, ctx));
+    return it.type == type ? it : check(type.e(it, ctx, expr.input));
   }
 
   /**
    * Casts the specified item.
    * @param item item to be cast
    * @param ctx query context
+   * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Item cast(final Item item, final QueryContext ctx)
+  public Item cast(final Item item, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     final Iter iter = item.iter();
     Item it = iter.next();
     if(it == null) {
       if(mayBeZero()) return Seq.EMPTY;
-      Err.cast(type, item);
+      Err.cast(ii, type, item);
     }
-    if(type == Type.EMP) Err.cast(type, item);
+    if(type == Type.EMP) Err.cast(ii, type, item);
 
     boolean ins = it.type.instance(type);
     if(!it.unt() && !ins &&
       // implicit type promotions
       (it.type != Type.DEC || type != Type.FLT && type != Type.DBL) &&
-      (it.type != Type.URI || type != Type.STR)) Err.cast(type, it);
+      (it.type != Type.URI || type != Type.STR)) Err.cast(ii, type, it);
 
-    it = check(ins ? it : type.e(it, ctx));
+    it = check(ins ? it : type.e(it, ctx, ii));
     Item n = iter.next();
-    if(zeroOrOne() && n != null) Err.cast(type, item);
+    if(zeroOrOne() && n != null) Err.cast(ii, type, item);
 
     final SeqIter si = new SeqIter();
     si.add(it);
     while(n != null) {
       ins = n.type.instance(type);
-      if(!n.unt() && !ins) Err.cast(type, n);
-      si.add(check(ins ? n : type.e(n, ctx)));
+      if(!n.unt() && !ins) Err.cast(ii, type, n);
+      si.add(check(ins ? n : type.e(n, ctx, ii)));
       n = iter.next();
     }
     return si.finish();

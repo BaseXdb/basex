@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 
 /**
  * Pragma extension.
@@ -20,12 +20,12 @@ public final class Extension extends Single {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param prag pragmas
    * @param e enclosed expression
    */
-  public Extension(final QueryInfo i, final Expr[] prag, final Expr e) {
-    super(i, e);
+  public Extension(final InputInfo ii, final Expr[] prag, final Expr e) {
+    super(ii, e);
     pragmas = prag;
   }
 

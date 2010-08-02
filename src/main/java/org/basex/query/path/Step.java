@@ -9,7 +9,6 @@ import org.basex.data.Serializer;
 import org.basex.data.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Pos;
 import org.basex.query.expr.Preds;
@@ -24,7 +23,9 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.Test.Kind;
+import org.basex.query.util.Err;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -45,32 +46,32 @@ public class Step extends Preds {
    * @return step
    */
   public static Step get(final Step s) {
-    return get(s.info, s.axis, s.test, s.pred);
+    return get(s.input, s.axis, s.test, s.pred);
   }
 
   /**
    * This method creates a step instance.
-   * @param i query info
+   * @param ii input info
    * @param a axis
    * @param t node test
    * @param p predicates
    * @return step
    */
-  public static Step get(final QueryInfo i, final Axis a, final Test t,
+  public static Step get(final InputInfo ii, final Axis a, final Test t,
       final Expr... p) {
-    return p.length == 0 ? new SimpleIterStep(i, a, t) : new Step(i, a, t, p);
+    return p.length == 0 ? new SimpleIterStep(ii, a, t) : new Step(ii, a, t, p);
   }
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param a axis
    * @param t node test
    * @param p predicates
    */
-  protected Step(final QueryInfo i, final Axis a, final Test t,
+  protected Step(final InputInfo ii, final Axis a, final Test t,
       final Expr... p) {
-    super(i, p);
+    super(ii, p);
     axis = a;
     test = t;
   }
@@ -91,7 +92,7 @@ public class Step extends Preds {
     if(e != this) return e;
 
     // no predicates.. evaluate via simple iterator
-    if(pred.length == 0) return get(info, axis, test);
+    if(pred.length == 0) return get(input, axis, test);
     final Expr p = pred[0];
 
     // position predicate
@@ -102,7 +103,7 @@ public class Step extends Preds {
     if(pred.length > 1 || !last && pos == null && uses(Use.POS, ctx))
       return this;
     // use iterative evaluation
-    return new IterStep(info, axis, test, pred, pos, last);
+    return new IterStep(input, axis, test, pred, pos, last);
   }
 
   @Override
@@ -113,7 +114,7 @@ public class Step extends Preds {
     NodIter nb = new NodIter();
     Item it;
     while((it = iter.next()) != null) {
-      if(!it.node()) error(NODESPATH, Step.this, it.type);
+      if(!it.node()) Err.or(input, NODESPATH, Step.this, it.type);
       final NodeIter ir = axis.init((Nod) it);
       Nod nod;
       while((nod = ir.next()) != null) {
@@ -194,7 +195,7 @@ public class Step extends Preds {
    */
   final Step addPred(final Expr p) {
     pred = Array.add(pred, p);
-    return get(info, axis, test, pred);
+    return get(input, axis, test, pred);
   }
 
   @Override

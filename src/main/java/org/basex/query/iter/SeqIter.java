@@ -88,7 +88,8 @@ public final class SeqIter extends Iter implements Result {
     if(size != sb.size) return false;
     try {
       for(int i = 0; i < size; i++) {
-        if(item[i].type != sb.item[i].type || !item[i].eq(sb.item[i]))
+        /// it is safe to pass on null, as item has the same type
+        if(item[i].type != sb.item[i].type || !item[i].eq(null, sb.item[i]))
           return false;
       }
       return true;

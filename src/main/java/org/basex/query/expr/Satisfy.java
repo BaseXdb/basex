@@ -6,11 +6,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Bln;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -29,14 +29,14 @@ public final class Satisfy extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f variable inputs
    * @param s satisfier
    * @param e every flag
    */
-  public Satisfy(final QueryInfo i, final For[] f, final Expr s,
+  public Satisfy(final InputInfo ii, final For[] f, final Expr s,
       final boolean e) {
-    super(i);
+    super(ii);
     sat = s;
     fl = f;
     every = e;

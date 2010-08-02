@@ -7,10 +7,10 @@ import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.Tokenizer;
 import org.basex.util.Tokenizer.FTUnit;
 
@@ -26,14 +26,14 @@ public final class FTDistance extends FTFilter {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    * @param d distances
    * @param u unit
    */
-  public FTDistance(final QueryInfo i, final FTExpr e, final Expr[] d,
+  public FTDistance(final InputInfo ii, final FTExpr e, final Expr[] d,
       final FTUnit u) {
-    super(i, e);
+    super(ii, e);
     dist = d;
     unit = u;
   }

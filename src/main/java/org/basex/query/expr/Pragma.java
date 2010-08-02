@@ -3,8 +3,8 @@ package org.basex.query.expr;
 import java.io.IOException;
 import static org.basex.query.QueryTokens.*;
 import org.basex.data.Serializer;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.QNm;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -23,10 +23,10 @@ public class Pragma extends Simple {
    * Constructor.
    * @param qn QName
    * @param content pragma contents
-   * @param i query info
+   * @param ii input info
    */
-  public Pragma(final QNm qn, final byte[] content, final QueryInfo i) {
-    super(i);
+  public Pragma(final QNm qn, final byte[] content, final InputInfo ii) {
+    super(ii);
     qName = qn;
     pContent = content;
   }

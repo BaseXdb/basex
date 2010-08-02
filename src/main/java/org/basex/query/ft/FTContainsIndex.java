@@ -4,13 +4,13 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 import org.basex.util.Tokenizer;
 
 /**
@@ -29,14 +29,14 @@ final class FTContainsIndex extends FTContains {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e contains, select and optional ignore expression
    * @param f full-text expression
    * @param ic index context
    */
-  FTContainsIndex(final QueryInfo i, final Expr e, final FTExpr f,
+  FTContainsIndex(final InputInfo ii, final Expr e, final FTExpr f,
       final IndexContext ic) {
-    super(e, f, i);
+    super(e, f, ii);
     ictx = ic;
   }
 

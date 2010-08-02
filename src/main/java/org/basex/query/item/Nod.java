@@ -12,11 +12,11 @@ import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -79,14 +79,15 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public final boolean eq(final Item i) throws QueryException {
-    return i.type == Type.BLN || i.num() ? i.eq(this) :
-      Token.eq(atom(), i.atom());
+  public final boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
+    return !it.unt() ? it.eq(ii, this) : Token.eq(atom(), it.atom());
   }
 
   @Override
-  public final int diff(final ParseExpr e, final Item i) throws QueryException {
-    return i.num() ? -i.diff(e, this) : Token.diff(atom(), i.atom());
+  public final int diff(final InputInfo ii, final Item it)
+      throws QueryException {
+    return !it.unt() ? -it.diff(ii, this) : Token.diff(atom(), it.atom());
   }
 
   /**
@@ -273,7 +274,7 @@ public abstract class Nod extends Item {
    * Returns a descendant axis iterator.
    * @return iterator
    */
-  public abstract NodeIter desc();
+  public abstract NodeIter descendant();
 
   /**
    * Returns a descendant-or-self axis iterator.

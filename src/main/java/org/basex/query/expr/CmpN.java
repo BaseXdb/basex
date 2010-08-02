@@ -6,12 +6,12 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -78,13 +78,13 @@ public final class CmpN extends Arr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpN(final QueryInfo i, final Expr e1, final Expr e2, final Comp c) {
-    super(i, e1, e2);
+  public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final Comp c) {
+    super(ii, e1, e2);
     cmp = c;
   }
 
@@ -126,7 +126,7 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return "'" + cmp + "' operator";
   }
 

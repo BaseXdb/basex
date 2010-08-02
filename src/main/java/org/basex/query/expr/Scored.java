@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 
 /**
  * Scored expression. This is a proprietary extension to XQuery FT introduced by
@@ -18,12 +18,12 @@ import org.basex.query.iter.Iter;
 public class Scored extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e scored expression
    * @param score expression computing the score
    */
-  public Scored(final QueryInfo i, final Expr e, final Expr score) {
-    super(i, e, score);
+  public Scored(final InputInfo ii, final Expr e, final Expr score) {
+    super(ii, e, score);
   }
 
   @Override

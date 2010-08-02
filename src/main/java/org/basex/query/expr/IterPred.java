@@ -2,9 +2,9 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 
 /**
  * Iterative predicate expression. Supports one predicate.
@@ -20,15 +20,15 @@ final class IterPred extends Pred {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param r root expression
    * @param p predicate
    * @param ps position predicate; may equal the first predicate
    * @param l true if predicate has a last function
    */
-  IterPred(final QueryInfo i, final Expr r, final Expr[] p, final Pos ps,
+  IterPred(final InputInfo ii, final Expr r, final Expr[] p, final Pos ps,
       final boolean l) {
-    super(i, r, p);
+    super(ii, r, p);
     last = l;
     pos = ps;
   }

@@ -5,11 +5,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Order by expression.
@@ -25,11 +25,11 @@ public final class Order extends ParseExpr {
 
  /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expressions
    */
-  public Order(final QueryInfo i, final OrderBy[] e) {
-    super(i);
+  public Order(final InputInfo ii, final OrderBy[] e) {
+    super(ii);
     ord = e;
   }
 
@@ -171,7 +171,7 @@ public final class Order extends ParseExpr {
       final boolean x = m == null;
       final boolean y = n == null;
       final int c = x ? y ? 0 : or.lst ? -1 : 1 : y ? or.lst ? 1 : -1 :
-        m.diff(this, n);
+        m.diff(input, n);
       if(c != 0) return or.desc ? -c : c;
     }
     return 0;
@@ -192,7 +192,7 @@ public final class Order extends ParseExpr {
       final boolean x = m == null;
       final boolean y = n == null;
       final int c = x ? y ? 0 : l.lst ? -1 : 1 : y ? l.lst ? 1 : -1 :
-        m.diff(this, n);
+        m.diff(input, n);
       if(c != 0) return l.desc ? -c : c;
     }
     return 0;

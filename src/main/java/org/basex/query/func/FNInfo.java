@@ -1,9 +1,9 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
@@ -11,6 +11,8 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -22,12 +24,12 @@ import org.basex.util.Token;
 final class FNInfo extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNInfo(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNInfo(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -42,17 +44,17 @@ final class FNInfo extends Fun {
         if(al != 0) {
           final Item it = expr[0].atomic(ctx);
           if(it == null) {
-            if(al == 1) emptyError();
+            if(al == 1) Err.or(input, XPEMPTY, desc());
           } else {
             code = Token.string(((QNm) checkType(it, Type.QNM)).ln());
             num = null;
           }
           if(al > 1) {
-            msg = Token.string(checkStr(expr[1], ctx));
+            msg = Token.string(checkEStr(expr[1], ctx));
           }
         }
         try {
-          error(new Object[] { code, num, msg });
+          Err.or(input, new Object[] { code, num, msg });
           return null;
         } catch(final QueryException ex) {
           if(al > 2) ex.iter = expr[2].iter(ctx);
@@ -60,7 +62,7 @@ final class FNInfo extends Fun {
         }
       case TRACE:
         final Iter ir = SeqIter.get(expr[0].iter(ctx));
-        msg = Token.string(checkStr(expr[1], ctx)) + " " + ir;
+        msg = Token.string(checkEStr(expr[1], ctx)) + " " + ir;
         ctx.evalInfo(msg);
         return ir;
       case ENVS:
@@ -78,8 +80,8 @@ final class FNInfo extends Fun {
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
       case ENV:
-        final String env = System.getenv(Token.string(checkStr(expr[0], ctx)));
-        return env != null ? Str.get(env) : null;
+        final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
+        return e != null ? Str.get(e) : null;
       default:
         return super.atomic(ctx);
     }

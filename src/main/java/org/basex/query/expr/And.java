@@ -4,13 +4,13 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 
 /**
  * And expression.
@@ -21,11 +21,11 @@ import org.basex.util.Array;
 public final class And extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression list
    */
-  public And(final QueryInfo i, final Expr[] e) {
-    super(i, e);
+  public And(final InputInfo ii, final Expr[] e) {
+    super(ii, e);
   }
 
   @Override
@@ -54,7 +54,7 @@ public final class And extends Arr {
       Expr tmp = null;
       if(e instanceof Pos) {
         // merge position predicates
-        tmp = ps == null ? e : ps.intersect((Pos) e);
+        tmp = ps == null ? e : ps.intersect((Pos) e, input);
         if(!(tmp instanceof Pos)) return tmp;
         ps = (Pos) tmp;
       } else if(e instanceof CmpR) {
@@ -127,7 +127,7 @@ public final class And extends Arr {
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     super.indexEquivalent(ic);
-    return new InterSect(info, expr);
+    return new InterSect(input, expr);
   }
 
   @Override

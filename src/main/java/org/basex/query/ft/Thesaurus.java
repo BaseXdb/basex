@@ -13,6 +13,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.ObjectMap;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenList;
@@ -108,10 +109,11 @@ public final class Thesaurus {
 
   /**
    * Initializes the thesaurus.
+   * @param ii input info
    * @return success flag
    * @throws QueryException query exception
    */
-  private boolean init() throws QueryException {
+  private boolean init(final InputInfo ii) throws QueryException {
     try {
       final Data data = MemBuilder.build(
           Parser.fileParser(file, ctx.prop, ""), ctx.prop);
@@ -120,7 +122,7 @@ public final class Thesaurus {
         build(new Nodes(result.nodes[n], data));
       }
     } catch(final IOException ex) {
-      Err.or(NOTHES, file);
+      Err.or(ii, NOTHES, file);
     }
     return true;
   }
@@ -188,12 +190,14 @@ public final class Thesaurus {
 
   /**
    * Finds a thesaurus term.
+   * @param ii input info
    * @param list result list
    * @param ft tokenizer
    * @throws QueryException query exception
    */
-  void find(final TokenList list, final Tokenizer ft) throws QueryException {
-    if(nodes.size() == 0) init();
+  void find(final InputInfo ii, final TokenList list, final Tokenizer ft)
+      throws QueryException {
+    if(nodes.size() == 0) init(ii);
     find(list, nodes.get(ft.text), 1);
   }
 

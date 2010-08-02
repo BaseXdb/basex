@@ -10,7 +10,6 @@ import org.basex.index.FTIndexIterator;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
@@ -18,6 +17,7 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.FTIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
@@ -63,14 +63,14 @@ public final class FTWords extends FTExpr {
 
   /**
    * Sequential constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    * @param m search mode
    * @param o occurrences
    */
-  public FTWords(final QueryInfo i, final Expr e, final FTMode m,
+  public FTWords(final InputInfo ii, final Expr e, final FTMode m,
       final Expr[] o) {
-    super(i);
+    super(ii);
     query = e;
     mode = m;
     occ = o;
@@ -78,14 +78,14 @@ public final class FTWords extends FTExpr {
 
   /**
    * Index constructor.
-   * @param i query info
+   * @param ii input info
    * @param d data reference
    * @param t text
    * @param f fast evaluation
    */
-  public FTWords(final QueryInfo i, final Data d, final byte[] t,
+  public FTWords(final InputInfo ii, final Data d, final byte[] t,
       final boolean f) {
-    super(i);
+    super(ii);
     data = d;
     txt = t;
     fast = f;
@@ -237,7 +237,7 @@ public final class FTWords extends FTExpr {
    */
   private byte[] nextStr(final Iter iter) throws QueryException {
     final Item it = iter.next();
-    return it == null ? null : checkStr(it);
+    return it == null ? null : checkStrEmp(it);
   }
 
   @Override

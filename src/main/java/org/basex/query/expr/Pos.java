@@ -5,11 +5,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.CmpV.Comp;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -28,10 +28,10 @@ public final class Pos extends Simple {
    * Constructor.
    * @param mn minimum value
    * @param mx minimum value
-   * @param i query info
+   * @param ii input info
    */
-  private Pos(final long mn, final long mx, final QueryInfo i) {
-    super(i);
+  private Pos(final long mn, final long mx, final InputInfo ii) {
+    super(ii);
     min = mn;
     max = mx;
   }
@@ -40,43 +40,44 @@ public final class Pos extends Simple {
    * Returns an position or an optimized expression.
    * @param mn minimum value
    * @param mx minimum value
+   * @param ii input info
    * @return expression
    */
-  static Expr get(final long mn, final long mx) {
+  static Expr get(final long mn, final long mx, final InputInfo ii) {
     // suppose that positions always fit in int values..
-    // [CG] XQuery/Query Info
     return mn > mx || mx < 1 ? Bln.FALSE : mn <= 1 && mx == Long.MAX_VALUE ?
-      Bln.TRUE : new Pos(mn, mx, null);
+      Bln.TRUE : new Pos(mn, mx, ii);
   }
 
   /**
    * Returns an instance of this class, if possible, and the input expression
    * otherwise.
-   * @param expr calling expression
    * @param cmp comparator
-   * @param arg argument
-   * @return resulting expression
+   * @param a argument
+   * @param o original expression
+   * @param ii input info
+   * @return resulting expression, or null
    * @throws QueryException query exception
    */
-  static Expr get(final Expr expr, final Comp cmp, final Expr arg)
-      throws QueryException {
+  static Expr get(final Comp cmp, final Expr a, final Expr o,
+      final InputInfo ii) throws QueryException {
 
-    if(!arg.item()) return expr;
-
-    final Item it = (Item) arg;
-    if(it.num()) {
-      final long p = it.itr();
-      final boolean ex = p == it.dbl();
-      switch(cmp) {
-        case EQ: return ex ? get(p, p) : Bln.FALSE;
-        case GE: return get(ex ? p : p + 1, Long.MAX_VALUE);
-        case GT: return get(p + 1, Long.MAX_VALUE);
-        case LE: return get(1, p);
-        case LT: return get(1, ex ? p - 1 : p);
-        default:
+    if(a.item()) {
+      final Item it = (Item) a;
+      if(it.num()) {
+        final long p = it.itr();
+        final boolean ex = p == it.dbl();
+        switch(cmp) {
+          case EQ: return ex ? get(p, p, ii) : Bln.FALSE;
+          case GE: return get(ex ? p : p + 1, Long.MAX_VALUE, ii);
+          case GT: return get(p + 1, Long.MAX_VALUE, ii);
+          case LE: return get(1, p, ii);
+          case LT: return get(1, ex ? p - 1 : p, ii);
+          default:
+        }
       }
     }
-    return expr;
+    return o;
   }
 
   @Override
@@ -98,19 +99,21 @@ public final class Pos extends Simple {
    * Creates an intersection of the existing and the specified position
    * expressions.
    * @param pos second position expression
+   * @param ii input info
    * @return resulting expression
    */
-  Expr intersect(final Pos pos) {
-    return get(Math.max(min, pos.min), Math.min(max, pos.max));
+  Expr intersect(final Pos pos, final InputInfo ii) {
+    return get(Math.max(min, pos.min), Math.min(max, pos.max), ii);
   }
 
   /**
    * Creates a union of the existing and the specified position expressions.
    * @param pos second position expression
+   * @param ii input info
    * @return resulting expression
    */
-  Expr union(final Pos pos) {
-    return get(Math.min(min, pos.min), Math.max(max, pos.max));
+  Expr union(final Pos pos, final InputInfo ii) {
+    return get(Math.min(min, pos.min), Math.max(max, pos.max), ii);
   }
 
   @Override

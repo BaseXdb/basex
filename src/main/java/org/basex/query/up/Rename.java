@@ -6,7 +6,6 @@ import static org.basex.util.Token.*;
 import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.CAttr;
 import org.basex.query.expr.CElem;
 import org.basex.query.expr.CFrag;
@@ -19,7 +18,9 @@ import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.RenamePrimitive;
+import org.basex.query.util.Err;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 
 /**
  * Rename expression.
@@ -30,12 +31,12 @@ import org.basex.util.Atts;
 public final class Rename extends Update {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param tg target expression
    * @param n new name expression
    */
-  public Rename(final QueryInfo i, final Expr tg, final Expr n) {
-    super(i, tg, n);
+  public Rename(final InputInfo ii, final Expr tg, final Expr n) {
+    super(ii, tg, n);
   }
 
   @Override
@@ -44,18 +45,18 @@ public final class Rename extends Update {
     final Item i = t.next();
 
     // check target constraints
-    if(i == null) error(UPSEQEMP, Main.name(this));
-    if(t.next() != null) error(UPWRTRGTYP);
+    if(i == null) Err.or(input, UPSEQEMP, Main.name(this));
+    if(t.next() != null) Err.or(input, UPWRTRGTYP);
 
     CFrag ex = null;
     if(i.type == Type.ELM) {
-      ex = new CElem(info, expr[1], new Expr[0], new Atts());
+      ex = new CElem(input, expr[1], new Expr[0], new Atts());
     } else if(i.type == Type.ATT) {
-      ex = new CAttr(info, expr[1], new Expr[0], false);
+      ex = new CAttr(input, expr[1], new Expr[0], false);
     } else if(i.type == Type.PI) {
-      ex = new CPI(info, expr[1], Seq.EMPTY);
+      ex = new CPI(input, expr[1], Seq.EMPTY);
     } else {
-      error(UPWRTRGTYP);
+      Err.or(input, UPWRTRGTYP);
     }
 
     // check namespace conflicts...
@@ -66,9 +67,9 @@ public final class Rename extends Update {
 
     if(test != null) {
       final byte[] uri = test.uri(rename.pref(), ctx);
-      if(uri != null && !eq(rename.uri.atom(), uri)) error(UPNSCONFL);
+      if(uri != null && !eq(rename.uri.atom(), uri)) Err.or(input, UPNSCONFL);
     }
-    ctx.updates.add(new RenamePrimitive(this, targ, rename), ctx);
+    ctx.updates.add(new RenamePrimitive(input, targ, rename), ctx);
     return Seq.EMPTY;
   }
 

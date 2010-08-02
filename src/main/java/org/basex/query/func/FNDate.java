@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.DTd;
 import org.basex.query.item.Dat;
@@ -17,6 +16,8 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Date functions.
@@ -27,12 +28,12 @@ import org.basex.query.item.Type;
 final class FNDate extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNDate(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNDate(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -156,7 +157,7 @@ final class FNDate extends Fun {
    */
   private Item checkDate(final Item it, final Type t, final QueryContext ctx)
       throws QueryException {
-    return it.unt() ? t.e(it, ctx) : checkType(it, t);
+    return it.unt() ? t.e(it, ctx, input) : checkType(it, t);
   }
 
   /**
@@ -168,7 +169,7 @@ final class FNDate extends Fun {
    */
   private Item checkDur(final Item it) throws QueryException {
     if(it.unt()) return new Dur(it.atom());
-    if(!it.dur()) errType(Type.DUR, it);
+    if(!it.dur()) Err.type(this, Type.DUR, it);
     return it;
   }
 
@@ -240,7 +241,7 @@ final class FNDate extends Fun {
     if(dtm.xc.getTimezone() == Item.UNDEF) {
       dtm.xc.setTimezone(zone);
     } else if(dtm.xc.getTimezone() != zone && zone != Item.UNDEF) {
-      error(FUNZONE, dtm, tim);
+      Err.or(input, FUNZONE, dtm, tim);
     }
     return dtm;
   }
@@ -269,7 +270,9 @@ final class FNDate extends Fun {
     } else {
       final DTd dtd = (DTd) checkType(zon, Type.DTD);
       tz = (int) (dtd.min() + dtd.hou() * 60);
-      if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) error(INVALZONE, zon);
+      if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) {
+        Err.or(input, INVALZONE, zon);
+      }
     }
     if(zn != Item.UNDEF) date.xc.add(Date.df.newDuration(-60000L * (zn - tz)));
     date.xc.setTimezone(tz);

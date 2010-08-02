@@ -6,13 +6,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -29,15 +29,15 @@ public final class For extends ForLet {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e variable input
    * @param v variable
    * @param p positional variable
    * @param s score variable
    */
-  public For(final QueryInfo i, final Expr e, final Var v, final Var p,
+  public For(final InputInfo ii, final Expr e, final Var v, final Var p,
       final Var s) {
-    super(i, e, v);
+    super(ii, e, v);
     pos = p;
     score = s;
   }

@@ -17,7 +17,6 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
@@ -25,6 +24,8 @@ import org.basex.query.item.Jav;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -63,14 +64,14 @@ public final class FunJava extends Arr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param c Java class
    * @param m Java method/field
    * @param a arguments
    */
-  public FunJava(final QueryInfo i, final Class<?> c, final String m,
+  public FunJava(final InputInfo ii, final Class<?> c, final String m,
       final Expr[] a) {
-    super(i, a);
+    super(ii, a);
     cls = c;
     mth = m;
   }
@@ -80,7 +81,7 @@ public final class FunJava extends Arr {
     final Item[] arg = new Item[expr.length];
     for(int a = 0; a < expr.length; a++) {
       arg[a] = expr[a].iter(ctx).finish();
-      if(arg[a].size(ctx) == 0) emptyError();
+      if(arg[a].size(ctx) == 0) Err.or(input, XPEMPTY, desc());
     }
 
     Object result = null;
@@ -88,7 +89,7 @@ public final class FunJava extends Arr {
       result = mth.equals("new") ? constructor(arg) : method(arg);
     } catch(final Exception ex) {
       Main.debug(ex);
-      error(FUNJAVA, info());
+      Err.or(input, FUNJAVA, desc());
     }
     return result == null ? Iter.EMPTY : iter(result);
   }
@@ -247,7 +248,7 @@ public final class FunJava extends Arr {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return cls.getName() + "." + mth + "(...)" + (mth.equals("new") ?
         " constructor" : " method");
   }

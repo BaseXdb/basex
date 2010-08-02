@@ -6,10 +6,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -24,13 +24,13 @@ public final class Clc extends Arr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
    * @param c calculation operator
    */
-  public Clc(final QueryInfo i, final Expr e1, final Expr e2, final Calc c) {
-    super(i, e1, e2);
+  public Clc(final InputInfo ii, final Expr e1, final Expr e2, final Calc c) {
+    super(ii, e1, e2);
     calc = c;
   }
 
@@ -51,7 +51,7 @@ public final class Clc extends Arr {
     if(a == null) return null;
     final Item b = expr[1].atomic(ctx);
     if(b == null) return null;
-    return calc.ev(this, a, b);
+    return calc.ev(input, a, b);
   }
 
   @Override
@@ -70,7 +70,7 @@ public final class Clc extends Arr {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return "'" + calc.name + "' expression";
   }
 

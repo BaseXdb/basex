@@ -21,6 +21,7 @@ import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 import org.w3c.dom.Attr;
@@ -47,11 +48,11 @@ public enum Type {
   /** Untyped Atomic type. */
   ATM("untypedAtomic", AAT, XSURI, false, true, true, false) {
     @Override
-    public Atm e(final Item it, final QueryContext ctx) {
+    public Atm e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Atm(it.atom());
     }
     @Override
-    public Atm e(final Object o) {
+    public Atm e(final Object o, final InputInfo ii) {
       return new Atm(token(o.toString()));
     }
   },
@@ -59,11 +60,11 @@ public enum Type {
   /** String type. */
   STR("string", AAT, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return Str.get(it.atom());
     }
     @Override
-    public Str e(final Object o) {
+    public Str e(final Object o, final InputInfo ii) {
       return Str.get(o);
     }
   },
@@ -71,24 +72,24 @@ public enum Type {
   /** Normalized String type. */
   NST("normalizedString", STR, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Str(it.atom(), this);
     }
     @Override
-    public Str e(final Object o) {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Token type. */
   TOK("token", NST, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Str(norm(it.atom()), this);
     }
     @Override
-    public Str e(final Object o) {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) {
+      return e(Str.get(o), null, ii);
     }
   },
 
@@ -97,125 +98,135 @@ public enum Type {
     final Pattern pat = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
 
     @Override
-    public Str e(final Item it, final QueryContext ctx) throws QueryException {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       final byte[] v = norm(it.atom());
       if(!pat.matcher(string(v)).matches()) error(it);
       return new Str(v, this);
     }
     @Override
-    public Str e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** NMTOKEN type. */
   NMT("NMTOKEN", TOK, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) throws QueryException {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       final byte[] v = norm(it.atom());
       if(!XMLToken.isNMToken(v)) error(it);
       return new Str(v, this);
     }
     @Override
-    public Str e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Name type. */
   NAM("Name", TOK, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) throws QueryException {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       final byte[] v = norm(it.atom());
       if(!XMLToken.isName(v)) error(it);
       return new Str(v, this);
     }
     @Override
-    public Str e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** NCName type. */
   NCN("NCName", NAM, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) throws QueryException {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return new Str(checkName(it), this);
     }
     @Override
-    public Str e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** ID type. */
   ID("ID", NCN, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) throws QueryException {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return new Str(checkName(it), this);
     }
     @Override
-    public Str e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** IDREF type. */
   IDR("IDREF", NCN, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) throws QueryException {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return new Str(checkName(it), this);
     }
     @Override
-    public Str e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Entity type. */
   ENT("ENTITY", NCN, XSURI, false, false, true, false) {
     @Override
-    public Str e(final Item it, final QueryContext ctx) throws QueryException {
+    public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return new Str(checkName(it), this);
     }
     @Override
-    public Str e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Str e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Float type. */
   FLT("float", AAT, XSURI, true, false, false, false) {
     @Override
-    public Flt e(final Item it, final QueryContext ctx) throws QueryException {
+    public Flt e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return Flt.get(checkNum(it).flt());
     }
     @Override
-    public Flt e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Flt e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Double type. */
   DBL("double", AAT, XSURI, true, false, false, false) {
     @Override
-    public Dbl e(final Item it, final QueryContext ctx) throws QueryException {
+    public Dbl e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return Dbl.get(checkNum(it).dbl());
     }
     @Override
-    public Dbl e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Dbl e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Decimal type. */
   DEC("decimal", AAT, XSURI, true, false, false, false) {
     @Override
-    public Dec e(final Item it, final QueryContext ctx) throws QueryException {
+    public Dec e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return Dec.get(checkNum(it).dec());
     }
     @Override
-    public Dec e(final Object o) {
+    public Dec e(final Object o, final InputInfo ii) {
       return Dec.get(new BigDecimal(o.toString()));
     }
   },
@@ -223,11 +234,12 @@ public enum Type {
   /** Integer type. */
   ITR("integer", DEC, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException { 
       return Itr.get(check(o, 0, 0));
     }
   },
@@ -235,11 +247,12 @@ public enum Type {
   /** Non-positive integer type. */
   NPI("nonPositiveInteger", ITR, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, Long.MIN_VALUE, 0), this);
     }
   },
@@ -247,11 +260,12 @@ public enum Type {
   /** Negative integer type. */
   NIN("negativeInteger", NPI, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, Long.MIN_VALUE, -1), this);
     }
   },
@@ -259,11 +273,12 @@ public enum Type {
   /** Long type. */
   LNG("long", ITR, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return it instanceof Date ? new Itr((Date) it) : e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return it.date() ? new Itr((Date) it) : e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, 0, 0), this);
     }
   },
@@ -271,11 +286,12 @@ public enum Type {
   /** Int type. */
   INT("int", LNG, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, -0x80000000, 0x7FFFFFFF), this);
     }
   },
@@ -283,11 +299,12 @@ public enum Type {
   /** Short type. */
   SHR("short", INT, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, -0x8000, 0x7FFF), this);
     }
   },
@@ -295,11 +312,12 @@ public enum Type {
   /** Byte type. */
   BYT("byte", SHR, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, -0x80, 0x7F), this);
     }
   },
@@ -307,11 +325,12 @@ public enum Type {
   /** Non-negative integer type. */
   NNI("nonNegativeInteger", ITR, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, 0, Long.MAX_VALUE), this);
     }
   },
@@ -323,14 +342,15 @@ public enum Type {
         BigDecimal.valueOf(2)).add(BigDecimal.ONE);
 
     @Override
-    public Dec e(final Item it, final QueryContext ctx) throws QueryException {
+    public Dec e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       final BigDecimal v = checkNum(it).dec();
       if(v.signum() < 0 || v.compareTo(max) > 0 ||
           it.str() && contains(it.atom(), '.')) Err.or(FUNCAST, this, it);
       return new Dec(v, this);
     }
     @Override
-    public Dec e(final Object o) {
+    public Dec e(final Object o, final InputInfo ii) {
       return new Dec(token(o.toString()));
     }
   },
@@ -338,11 +358,12 @@ public enum Type {
   /** Short type. */
   UIN("unsignedInt", ULN, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, 0, 0xFFFFFFFFL), this);
     }
   },
@@ -350,11 +371,12 @@ public enum Type {
   /** Unsigned Short type. */
   USH("unsignedShort", UIN, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, 0, 0xFFFF), this);
     }
   },
@@ -362,11 +384,12 @@ public enum Type {
   /** Unsigned byte type. */
   UBY("unsignedByte", USH, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, 0, 0xFF), this);
     }
   },
@@ -374,11 +397,12 @@ public enum Type {
   /** Positive integer type. */
   PIN("positiveInteger", NNI, XSURI, true, false, false, false) {
     @Override
-    public Itr e(final Item it, final QueryContext ctx) throws QueryException {
-      return e(it);
+    public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
+      return e(it, ii);
     }
     @Override
-    public Itr e(final Object o) throws QueryException {
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return new Itr(check(o, 1, Long.MAX_VALUE), this);
     }
   },
@@ -386,155 +410,167 @@ public enum Type {
   /** Duration type. */
   DUR("duration", AAT, XSURI, false, false, false, true) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.dur() ? new Dur((Dur) it) : str(it) ?
           new Dur(it.atom()) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Year month duration type. */
   YMD("yearMonthDuration", DUR, XSURI, false, false, false, true) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.dur() ? new YMd((Dur) it) : str(it) ?
           new YMd(it.atom()) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Day time duration type. */
   DTD("dayTimeDuration", DUR, XSURI, false, false, false, true) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.dur() ? new DTd((Dur) it) : str(it) ?
           new DTd(it.atom()) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** DateTime type. */
   DTM("dateTime", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == LNG ? new Dtm((Itr) it) : it.type == DAT ?
           new Dtm((Date) it) : str(it) ? new Dtm(it.atom()) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Date type. */
   DAT("date", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == DTM ? new Dat((Date) it) : str(it) ?
           new Dat(it.atom()) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Time type. */
   TIM("time", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == DTM ? new Tim((Date) it) : str(it) ?
           new Tim(it.atom()) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Year month type. */
   YMO("gYearMonth", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
         str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Year type. */
   YEA("gYear", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
         str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Month day type. */
   MDA("gMonthDay", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
         str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Day type. */
   DAY("gDay", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
         str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Month type. */
   MON("gMonth", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
         str(it) ? new DSim(it.atom(), this) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
-      return e(Str.get(o), null);
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
+      return e(Str.get(o), null, ii);
     }
   },
 
   /** Boolean type. */
   BLN("boolean", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.num() ? Bln.get(it.bool()) : str(it) ?
-          Bln.get(Bln.check(it.atom())) : error(it);
+          Bln.get(Bln.parse(it.atom(), ii)) : error(it);
     }
     @Override
-    public Item e(final Object o) {
+    public Item e(final Object o, final InputInfo ii) {
       return Bln.get((Boolean) o);
     }
   },
@@ -542,12 +578,13 @@ public enum Type {
   /** Base64 binary type. */
   B6B("base64Binary", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == HEX ? new B64((Hex) it) : str(it) ?
           new B64(it.atom()) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
       return new B64((byte[]) o);
     }
   },
@@ -555,12 +592,13 @@ public enum Type {
   /** Hex binary type. */
   HEX("hexBinary", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       return it.type == B6B ? new Hex((B64) it) : str(it) ?
           new Hex(it.atom()) : error(it);
     }
     @Override
-    public Item e(final Object o) throws QueryException {
+    public Item e(final Object o, final InputInfo ii) throws QueryException {
       return new Hex((byte[]) o);
     }
   },
@@ -568,14 +606,15 @@ public enum Type {
   /** Any URI type. */
   URI("anyURI", AAT, XSURI, false, false, true, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       if(!it.str()) error(it);
       final Uri u = Uri.uri(it.atom());
       if(!u.valid()) Err.or(FUNCAST, this, it);
       return u;
     }
     @Override
-    public Item e(final Object o) {
+    public Item e(final Object o, final InputInfo ii) {
       return Uri.uri(token(o.toString()));
     }
   },
@@ -583,14 +622,15 @@ public enum Type {
   /** QName Type. */
   QNM("QName", AAT, XSURI, false, false, false, false) {
     @Override
-    public Item e(final Item it, final QueryContext ctx) throws QueryException {
+    public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+        throws QueryException {
       if(it.type != STR) error(it);
       final byte[] s = trim(it.atom());
       if(s.length == 0) Err.or(QNMINV, s);
       return new QNm(s, ctx);
     }
     @Override
-    public Item e(final Object o) {
+    public Item e(final Object o, final InputInfo ii) {
       return new QNm((QName) o);
     }
   },
@@ -604,7 +644,7 @@ public enum Type {
   /** Text type. */
   TXT("text", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Nod e(final Object o) {
+    public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXText ? ((BXText) o).getNod() :
         new FTxt((Text) o, null);
     }
@@ -613,7 +653,7 @@ public enum Type {
   /** PI type. */
   PI("processing-instruction", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Nod e(final Object o) {
+    public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXPI ? ((BXPI) o).getNod() :
         new FPI((ProcessingInstruction) o, null);
     }
@@ -622,7 +662,7 @@ public enum Type {
   /** Element type. */
   ELM("element", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Nod e(final Object o) {
+    public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXElem ? ((BXElem) o).getNod() :
         new FElem((Element) o, null);
     }
@@ -631,7 +671,7 @@ public enum Type {
   /** Document type. */
   DOC("document-node", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Nod e(final Object o) throws QueryException {
+    public Nod e(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
 
       if(o instanceof Document) {
@@ -656,7 +696,7 @@ public enum Type {
   /** Attribute type. */
   ATT("attribute", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Nod e(final Object o) {
+    public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXAttr ? ((BXAttr) o).getNod() :
         new FAttr((Attr) o, null);
     }
@@ -665,7 +705,7 @@ public enum Type {
   /** Comment type. */
   COM("comment", NOD, EMPTY, false, true, false, false) {
     @Override
-    public Nod e(final Object o) {
+    public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
         new FComm((Comment) o, null);
     }
@@ -699,11 +739,13 @@ public enum Type {
    * Constructs a new item from the specified item.
    * @param it item to be converted
    * @param ctx query context
+   * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Item e(final Item it, final QueryContext ctx) throws QueryException {
+  public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     return it.type != this ? error(it) : it;
   }
 
@@ -711,11 +753,12 @@ public enum Type {
    * Constructs a new item from the specified Java object.
    * The Java object is supposed to have a correct mapping type.
    * @param o Java object
+   * @param ii input info
    * @return new item
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Item e(final Object o) throws QueryException {
+  public Item e(final Object o, final InputInfo ii) throws QueryException {
     Main.notexpected(o);
     return null;
   }
@@ -768,7 +811,7 @@ public enum Type {
 
     if(it.type == Type.DBL || it.type == Type.FLT) {
       final double d = it.dbl();
-      if(d != d || d == 1 / 0d || d == -1 / 0d) Err.value(this, it);
+      if(d != d || d == 1 / 0d || d == -1 / 0d) Err.or(INVALUE, this, it);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(INTRANGE, d);
       if(min != max && (d < min || d > max)) Err.or(FUNCAST, this, it);
       return (long) d;
@@ -810,7 +853,8 @@ public enum Type {
    * @throws QueryException query exception
    */
   protected final Item error(final Item it) throws QueryException {
-    Err.cast(this, it);
+    // [CG] XQuery/query info
+    Err.cast(null, this, it);
     return null;
   }
 

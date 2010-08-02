@@ -5,10 +5,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
+import org.basex.util.InputInfo;
 
 /**
  * FTExtensionSelection expression.
@@ -22,13 +22,13 @@ public class FTExtensionSelection extends FTExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param prag pragmas
    * @param e enclosed FTSelection
    */
-  public FTExtensionSelection(final QueryInfo i, final Expr[] prag,
+  public FTExtensionSelection(final InputInfo ii, final Expr[] prag,
       final FTExpr e) {
-    super(i, e);
+    super(ii, e);
     pragmas = prag;
   }
 

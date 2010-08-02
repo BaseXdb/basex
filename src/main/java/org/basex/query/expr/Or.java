@@ -5,12 +5,12 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 
 /**
  * Or expression.
@@ -21,11 +21,11 @@ import org.basex.util.Array;
 public final class Or extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression list
    */
-  public Or(final QueryInfo i, final Expr[] e) {
-    super(i, e);
+  public Or(final InputInfo ii, final Expr[] e) {
+    super(ii, e);
   }
 
   @Override
@@ -46,7 +46,7 @@ public final class Or extends Arr {
     }
 
     if(expr.length == 2 && expr[0] instanceof Pos && expr[1] instanceof Pos) {
-      return ((Pos) expr[0]).union((Pos) expr[1]);
+      return ((Pos) expr[0]).union((Pos) expr[1], input);
     }
     return cmpG(ctx);
   }
@@ -74,7 +74,7 @@ public final class Or extends Arr {
     }
 
     ctx.compInfo(OPTRED);
-    return new CmpG(info, e1.expr[0], ir.finish(), e1.cmp);
+    return new CmpG(input, e1.expr[0], ir.finish(), e1.cmp);
   }
 
   @Override
@@ -107,7 +107,7 @@ public final class Or extends Arr {
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     super.indexEquivalent(ic);
-    return new Union(info, expr);
+    return new Union(input, expr);
   }
 
   @Override

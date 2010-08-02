@@ -70,7 +70,7 @@ final class DBPrimitives extends Primitives {
   }
 
   /**
-   * Checks nodes for duplicate attributes.
+   * Checks nodes for duplicate attributes and namespace conflicts.
    * @param ctx query context reference
    * @param pres pre values of nodes to check (in descending order)
    * @throws QueryException query exception

@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -11,6 +10,7 @@ import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.RangeIter;
+import org.basex.util.InputInfo;
 
 /**
  * Range expression.
@@ -21,12 +21,12 @@ import org.basex.query.iter.RangeIter;
 public final class Range extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
    */
-  public Range(final QueryInfo i, final Expr e1, final Expr e2) {
-    super(i, e1, e2);
+  public Range(final InputInfo ii, final Expr e1, final Expr e2) {
+    super(ii, e1, e2);
   }
 
   @Override

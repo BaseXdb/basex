@@ -57,7 +57,7 @@ public enum Axis {
   DESC("descendant", true) {
     @Override
     NodeIter init(final Nod n) {
-      return n.desc();
+      return n.descendant();
     }
   },
 

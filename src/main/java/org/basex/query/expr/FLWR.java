@@ -3,13 +3,13 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 
 /**
  * FLWR clause.
@@ -23,11 +23,11 @@ public final class FLWR extends FLWOR {
    * @param f variable inputs
    * @param w where clause
    * @param r return expression
-   * @param i query info
+   * @param ii input info
    */
   public FLWR(final ForLet[] f, final Expr w, final Expr r,
-      final QueryInfo i) {
-    super(f, w, null, r, i);
+      final InputInfo ii) {
+    super(f, w, null, r, ii);
   }
 
   @Override
@@ -51,7 +51,7 @@ public final class FLWR extends FLWOR {
           }
           f.expr = ap;
         } else {
-          fl[fl.length - 1].expr = new Pred(info, f.expr, w);
+          fl[fl.length - 1].expr = new Pred(input, f.expr, w);
         }
         where = null;
       }
@@ -72,7 +72,7 @@ public final class FLWR extends FLWOR {
     if(fl.length == 0) {
       // replace FLWR with IF clause or pass on return clause
       ctx.compInfo(OPTFLWOR);
-      return where != null ? new If(info, where, ret, Seq.EMPTY) : ret;
+      return where != null ? new If(input, where, ret, Seq.EMPTY) : ret;
     }
 
     // simplify basic FLWOR expression (for $i in E return $i -> E)

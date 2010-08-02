@@ -6,13 +6,14 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -27,9 +28,9 @@ public final class CmpV extends Arr {
     /** Item comparison:less or equal. */
     LE("le") {
       @Override
-      public boolean e(final ParseExpr e, final Item a, final Item b)
+      public boolean e(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
-        final int v = a.diff(e, b);
+        final int v = a.diff(ii, b);
         return v != Item.UNDEF && v <= 0;
       }
       @Override
@@ -39,9 +40,9 @@ public final class CmpV extends Arr {
     /** Item comparison:less. */
     LT("lt") {
       @Override
-      public boolean e(final ParseExpr e, final Item a, final Item b)
+      public boolean e(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
-        final int v = a.diff(e, b);
+        final int v = a.diff(ii, b);
         return v != Item.UNDEF && v < 0;
       }
       @Override
@@ -51,9 +52,9 @@ public final class CmpV extends Arr {
     /** Item comparison:greater of equal. */
     GE("ge") {
       @Override
-      public boolean e(final ParseExpr e, final Item a, final Item b)
+      public boolean e(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
-        final int v = a.diff(e, b);
+        final int v = a.diff(ii, b);
         return v != Item.UNDEF && v >= 0;
       }
       @Override
@@ -63,9 +64,9 @@ public final class CmpV extends Arr {
     /** Item comparison:greater. */
     GT("gt") {
       @Override
-      public boolean e(final ParseExpr e, final Item a, final Item b)
+      public boolean e(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
-        final int v = a.diff(e, b);
+        final int v = a.diff(ii, b);
         return v != Item.UNDEF && v > 0;
       }
       @Override
@@ -75,9 +76,9 @@ public final class CmpV extends Arr {
     /** Item comparison:equal. */
     EQ("eq") {
       @Override
-      public boolean e(final ParseExpr e, final Item a, final Item b)
+      public boolean e(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
-        return a.eq(b);
+        return a.eq(ii, b);
       }
       @Override
       public Comp invert() { return EQ; }
@@ -86,9 +87,9 @@ public final class CmpV extends Arr {
     /** Item comparison:not equal. */
     NE("ne") {
       @Override
-      public boolean e(final ParseExpr e, final Item a, final Item b)
+      public boolean e(final InputInfo ii, final Item a, final Item b)
           throws QueryException {
-        return !a.eq(b);
+        return !a.eq(ii, b);
       }
       @Override
       public Comp invert() { return NE; }
@@ -105,13 +106,13 @@ public final class CmpV extends Arr {
 
     /**
      * Evaluates the expression.
-     * @param e calling expression
+     * @param ii input info
      * @param a first item
      * @param b second item
      * @return result
      * @throws QueryException query exception
      */
-    public abstract boolean e(final ParseExpr e, final Item a, final Item b)
+    public abstract boolean e(final InputInfo ii, final Item a, final Item b)
         throws QueryException;
 
     /**
@@ -129,13 +130,13 @@ public final class CmpV extends Arr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpV(final QueryInfo i, final Expr e1, final Expr e2, final Comp c) {
-    super(i, e1, e2);
+  public CmpV(final InputInfo ii, final Expr e1, final Expr e2, final Comp c) {
+    super(ii, e1, e2);
     cmp = c;
   }
 
@@ -159,12 +160,14 @@ public final class CmpV extends Arr {
     } else if(e1.empty() || e2.empty()) {
       e = Seq.EMPTY;
     }
+
     if(e != this) {
       ctx.compInfo(OPTPRE, this);
     } else if(e1 instanceof Fun) {
       final Fun fun = (Fun) expr[0];
       if(fun.func == FunDef.POS) {
-        e = Pos.get(this, cmp, e2);
+        // position() CMP number
+        e = Pos.get(cmp, e2, e, input);
         if(e != this) ctx.compInfo(OPTWRITE, this);
       } else if(fun.func == FunDef.COUNT) {
         // same as for general comparisons
@@ -177,7 +180,7 @@ public final class CmpV extends Arr {
           } else {
             // <=/= 0: empty(), >/!= 0: exist()
             ctx.compInfo(OPTWRITE, this);
-            e = Fun.create(info, cmp == Comp.EQ || cmp == Comp.LE ?
+            e = Fun.create(input, cmp == Comp.EQ || cmp == Comp.LE ?
                 FunDef.EMPTY : FunDef.EXISTS, fun.expr);
           }
         }
@@ -193,8 +196,8 @@ public final class CmpV extends Arr {
     final Item b = expr[1].atomic(ctx);
     if(b == null) return null;
 
-    if(!a.comparable(b)) error(XPTYPECMP, a.type, b.type);
-    return Bln.get(cmp.e(this, a, b));
+    if(!a.comparable(b)) Err.or(input, XPTYPECMP, a.type, b.type);
+    return Bln.get(cmp.e(input, a, b));
   }
 
   @Override
@@ -215,7 +218,7 @@ public final class CmpV extends Arr {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return "'" + cmp + "' expression";
   }
 

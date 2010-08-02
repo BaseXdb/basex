@@ -7,7 +7,6 @@ import java.util.HashMap;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.GroupPartition.GroupNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
@@ -16,6 +15,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.ItemList;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * GFLWOR clause.
@@ -42,12 +42,12 @@ public class GFLWOR extends ParseExpr {
    * @param o order expression
    * @param g group by expression
    * @param r return expression
-   * @param i query info
+   * @param ii input info
    */
   public GFLWOR(final ForLet[] f, final Expr w, final Order o, final Group g,
-      final Expr r, final QueryInfo i) {
+      final Expr r, final InputInfo ii) {
 
-    super(i);
+    super(ii);
     ret = r;
     fl = f;
     where = w;
@@ -71,14 +71,14 @@ public class GFLWOR extends ParseExpr {
       ctx.ftfast = fast;
     }
 
-    boolean em = false;
+    boolean ii = false;
     if(where != null) {
       where = checkUp(where, ctx).comp(ctx);
-      em = where.empty();
-      if(!em && where.item()) {
+      ii = where.empty();
+      if(!ii && where.item()) {
         // test is always false: no results
-        em = !((Item) where).bool();
-        if(!em) {
+        ii = !((Item) where).bool();
+        if(!ii) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
           where = null;
@@ -93,7 +93,7 @@ public class GFLWOR extends ParseExpr {
     ctx.vars.reset(vs);
     ctx.grouping = grp;
 
-    if(em) {
+    if(ii) {
       ctx.compInfo(OPTFALSE, where);
       return Seq.EMPTY;
     }

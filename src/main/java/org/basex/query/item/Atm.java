@@ -1,7 +1,7 @@
 package org.basex.query.item;
 
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -20,12 +20,12 @@ public final class Atm extends Str {
   }
 
   @Override
-  public boolean eq(final Item it) throws QueryException {
-    return it.type != type ? it.eq(this) : Token.eq(val, it.atom());
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+    return !it.unt() ? it.eq(ii, this) : Token.eq(val, it.atom());
   }
 
   @Override
-  public int diff(final ParseExpr e, final Item it) throws QueryException {
-    return it.type != type ? -it.diff(e, this) : Token.diff(val, it.atom());
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
+    return !it.unt() ? -it.diff(ii, this) : Token.diff(val, it.atom());
   }
 }

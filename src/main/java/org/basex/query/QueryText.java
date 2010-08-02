@@ -176,7 +176,7 @@ public interface QueryText {
   /** FTDY0017: Evaluation exception. */
   Object[] FTMILD = { FTDY, 17, "Invalid mild not selection." };
   /** FTDY0020: Evaluation exception. */
-  Object[] FTREG = { FTDY, 20, "Invalid regular expression: %" };
+  Object[] FTREG = { FTDY, 20, "Invalid regular expression: '%'" };
 
   /** FTST0000: Parsing exception. */
   Object[] FTFZWC = { FTST, 0, "Only wildcards or Fuzzy search allowed." };

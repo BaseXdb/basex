@@ -3,10 +3,10 @@ package org.basex.util;
 import static org.basex.util.Token.*;
 import org.basex.core.Main;
 import org.basex.io.IO;
-import org.basex.query.QueryInfo;
 
 /**
- * Simple query parser; can be overwritten to support more complex parsings.
+ * Simple command and query parser; can be overwritten to support more complex
+ * parsings.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -159,10 +159,10 @@ public abstract class InputParser {
   }
 
   /**
-   * Creates a query info instance.
-   * @return query info
+   * Creates input information.
+   * @return input information
    */
-  public QueryInfo info() {
-    return new QueryInfo(this);
+  public InputInfo input() {
+    return new InputInfo(this);
   }
 }

@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.data.Data.IndexType;
@@ -9,7 +10,6 @@ import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
@@ -22,7 +22,9 @@ import org.basex.query.iter.SeqIter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.Step;
+import org.basex.query.util.Err;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -104,13 +106,13 @@ public final class CmpG extends Arr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpG(final QueryInfo i, final Expr e1, final Expr e2, final Comp c) {
-    super(i, e1, e2);
+  public CmpG(final InputInfo ii, final Expr e1, final Expr e2, final Comp c) {
+    super(ii, e1, e2);
     cmp = c;
   }
 
@@ -144,10 +146,10 @@ public final class CmpG extends Arr {
         if(e2 instanceof Range) {
           // position() CMP range
           final long[] rng = ((Range) e2).range(ctx);
-          if(rng != null) e = Pos.get(rng[0], rng[1]);
+          if(rng != null) e = Pos.get(rng[0], rng[1], input);
         } else {
           // position() CMP number
-          e = Pos.get(this, cmp.cmp, e2);
+          e = Pos.get(cmp.cmp, e2, e, input);
         }
         if(e != this) ctx.compInfo(OPTWRITE, this);
       } else if(fun.func == FunDef.COUNT) {
@@ -160,7 +162,7 @@ public final class CmpG extends Arr {
           } else {
             // <=/= 0: empty(), >/!= 0: exist()
             ctx.compInfo(OPTWRITE, this);
-            e = Fun.create(info, cmp == Comp.EQ || cmp == Comp.LE ?
+            e = Fun.create(input, cmp == Comp.EQ || cmp == Comp.LE ?
                 FunDef.EMPTY : FunDef.EXISTS, fun.expr);
           }
         }
@@ -238,8 +240,8 @@ public final class CmpG extends Arr {
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
     if(a.type != b.type && !a.unt() && !b.unt() && !(a.str() && b.str()) &&
-        !(a.num() && b.num())) error(XPTYPECMP, a.type, b.type);
-    return cmp.cmp.e(this, a, b);
+        !(a.num() && b.num())) Err.or(input, XPTYPECMP, a.type, b.type);
+    return cmp.cmp.e(input, a, b);
   }
 
   @Override
@@ -266,7 +268,7 @@ public final class CmpG extends Arr {
         return false;
 
       ic.is += Math.max(1, ic.data.meta.size / 10);
-      iacc = Array.add(iacc, new IndexAccess(info, arg, type, ic));
+      iacc = Array.add(iacc, new IndexAccess(input, arg, type, ic));
       return true;
     }
 
@@ -279,7 +281,7 @@ public final class CmpG extends Arr {
       if(!ret.type.str && !ret.type.node()) return false;
 
       ic.is += ic.data.nrIDs(new ValuesToken(type, it.atom()));
-      iacc = Array.add(iacc, new IndexAccess(info, it, type, ic));
+      iacc = Array.add(iacc, new IndexAccess(input, it, type, ic));
     }
     return true;
   }
@@ -287,7 +289,7 @@ public final class CmpG extends Arr {
   @Override
   public Expr indexEquivalent(final IndexContext ic) {
     // more than one string - merge index results
-    final Expr root = iacc.length == 1 ? iacc[0] : new Union(info, iacc);
+    final Expr root = iacc.length == 1 ? iacc[0] : new Union(input, iacc);
 
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
@@ -298,7 +300,7 @@ public final class CmpG extends Arr {
       ic.ctx.compInfo(OPTATVINDEX);
       // add attribute step
       final Step step = orig.step[orig.step.length - 1];
-      Step[] steps = { Step.get(info, Axis.SELF, step.test) };
+      Step[] steps = { Step.get(input, Axis.SELF, step.test) };
       for(final Step s : path.step) steps = Array.add(steps, s);
       path.step = steps;
     }
@@ -328,7 +330,7 @@ public final class CmpG extends Arr {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return "'" + cmp + "' expression";
   }
 

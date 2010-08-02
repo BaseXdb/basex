@@ -7,11 +7,15 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.Atm;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Str;
+import org.basex.query.item.Type;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -26,28 +30,28 @@ public abstract class Fun extends Arr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected Fun(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, e);
+  protected Fun(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, e);
     func = f;
   }
 
   /**
    * Creates a function with the specified arguments.
-   * @param i query info
+   * @param ii input info
    * @param f function description
    * @param e expression array
    * @return function
    */
-  public static final Fun create(final QueryInfo i,
+  public static final Fun create(final InputInfo ii,
       final FunDef f, final Expr... e) {
 
     try {
-      return f.func.getDeclaredConstructor(QueryInfo.class, FunDef.class,
-          Expr[].class).newInstance(i, f, e);
+      return f.func.getDeclaredConstructor(InputInfo.class, FunDef.class,
+          Expr[].class).newInstance(ii, f, e);
     } catch(final Exception ex) {
       // not expected to occur at all
       ex.printStackTrace();
@@ -84,8 +88,18 @@ public abstract class Fun extends Arr {
   protected final void checkColl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkEmpty(e, ctx);
-    if(!it.str() || !Token.eq(URLCOLL, it.atom())) error(IMPLCOL, e);
+    final Item it = checkItem(e, ctx);
+    if(!it.str() || !Token.eq(URLCOLL, it.atom())) Err.or(input, IMPLCOL, e);
+  }
+
+  /**
+   * Atomizes the specified item.
+   * @param it input item
+   * @return atomized item
+   */
+  protected Item atom(final Item it) {
+    return it.node() ? it.type == Type.PI || it.type == Type.COM ?
+        Str.get(it.atom()) : new Atm(it.atom()) : it;
   }
 
   @Override
@@ -94,7 +108,7 @@ public abstract class Fun extends Arr {
   }
 
   @Override
-  public final String info() {
+  public final String desc() {
     return func.toString();
   }
 

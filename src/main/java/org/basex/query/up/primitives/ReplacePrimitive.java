@@ -3,12 +3,13 @@ package org.basex.query.up.primitives;
 import static org.basex.query.QueryText.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.NamePool;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Replace primitive.
@@ -19,13 +20,12 @@ import org.basex.query.up.NamePool;
 public final class ReplacePrimitive extends NodeCopy {
   /**
    * Constructor.
-   * @param u updating expression
+   * @param ii input info
    * @param n target node
-   * @param replace replace nodes
+   * @param rep replace nodes
    */
-  public ReplacePrimitive(final ParseExpr u, final Nod n,
-      final NodIter replace) {
-    super(u, n, replace);
+  public ReplacePrimitive(final InputInfo ii, final Nod n, final NodIter rep) {
+    super(ii, n, rep);
   }
 
   @Override
@@ -45,7 +45,7 @@ public final class ReplacePrimitive extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    parent.error(UPMULTREPL, node.qname());
+    Err.or(input, UPMULTREPL, node.qname());
   }
 
   @Override

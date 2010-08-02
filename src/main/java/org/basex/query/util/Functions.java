@@ -64,9 +64,16 @@ public final class Functions extends ExprInfo {
     // parse data type constructors
     if(eq(uri, XSURI)) {
       final SeqType seq = new SeqType(Type.find(name, false), SeqType.Occ.ZO);
-      if(seq.type == null) typeErr(name);
-      if(args.length != 1) Err.or(FUNCTYPE, name.atom());
-      return new Cast(qp.info(), args[0], seq);
+      if(seq.type == null) {
+        final Levenshtein ls = new Levenshtein();
+        for(final Type t : Type.values()) {
+          if(t.par != null && ls.similar(lc(ln), lc(token(t.name)), 0))
+            qp.error(FUNSIMILAR, ln, t.name);
+        }
+        qp.error(FUNCUNKNOWN, name.atom());
+      }
+      if(args.length != 1) qp.error(FUNCTYPE, name.atom());
+      return new Cast(qp.input(), args[0], seq);
     }
 
     // check Java functions - only allowed with administrator permissions
@@ -91,9 +98,9 @@ public final class Functions extends ExprInfo {
         final int i = java.lastIndexOf(".");
         final Class<?> cls = Class.forName(java.substring(0, i));
         final String mth = java.substring(i + 1);
-        return new FunJava(qp.info(), cls, mth, args);
+        return new FunJava(qp.input(), cls, mth, args);
       } catch(final ClassNotFoundException ex) {
-        Err.or(FUNCJAVA, java);
+        qp.error(FUNCJAVA, java);
       }
     }
 
@@ -108,46 +115,32 @@ public final class Functions extends ExprInfo {
     for(int l = 0; l < size; l++) {
       final QNm qn = func[l].var.name;
       if(eq(ln, qn.ln()) && eq(uri, qn.uri.atom()) && args.length ==
-        func[l].args.length) return new FunCall(qp.info(), qn, l, args);
+        func[l].args.length) return new FunCall(qp.input(), qn, l, args);
     }
 
     if(Type.find(name, true) == null) {
-      return new FunCall(qp.info(), name, add(new Func(qp.info(), new Var(name),
-          new Var[args.length], false)), args);
+      return new FunCall(qp.input(), name, add(new Func(qp.input(),
+          new Var(name), new Var[args.length], false), qp), args);
     }
     return null;
   }
 
   /**
-   * Throws an error for the specified name.
-   * @param type type as string
-   * @throws QueryException query exception
-   */
-  private static void typeErr(final QNm type) throws QueryException {
-    final byte[] ln = type.ln();
-    final Levenshtein ls = new Levenshtein();
-    for(final Type t : Type.values()) {
-      if(t.par != null && ls.similar(lc(ln), lc(token(t.name)), 0))
-        Err.or(FUNSIMILAR, ln, t.name);
-    }
-    Err.or(FUNCUNKNOWN, type.atom());
-  }
-
-  /**
    * Adds a local function.
    * @param fun function instance
+   * @param qp query parser
    * @return function id
    * @throws QueryException query exception
    */
-  public int add(final Func fun) throws QueryException {
+  public int add(final Func fun, final QueryParser qp) throws QueryException {
     final QNm name = fun.var.name;
 
     final byte[] uri = name.uri.atom();
-    if(uri.length == 0) Err.or(FUNNONS, name.atom());
+    if(uri.length == 0) qp.error(FUNNONS, name.atom());
 
     if(NSGlobal.standard(uri)) {
-      if(fun.decl) Err.or(NAMERES, name.atom());
-      else funError(fun.var.name);
+      if(fun.decl) qp.error(NAMERES, name.atom());
+      else funError(fun.var.name, qp);
     }
 
     final byte[] ln = name.ln();
@@ -162,7 +155,7 @@ public final class Functions extends ExprInfo {
           func[l] = fun;
           return l;
         }
-        Err.or(FUNCDEFINED, fun);
+        qp.error(FUNCDEFINED, fun);
       }
     }
 
@@ -186,25 +179,29 @@ public final class Functions extends ExprInfo {
    */
   public void check() throws QueryException {
     for(int i = 0; i < size; i++) {
-      if(!func[i].decl) Err.or(FUNCUNKNOWN, func[i].var.name.atom());
+      if(!func[i].decl) {
+        Err.or(func[i].input, FUNCUNKNOWN, func[i].var.name.atom());
+      }
     }
   }
 
   /**
    * Finds similar function names and throws an error message.
    * @param name function name
+   * @param qp query parser
    * @throws QueryException query exception
    */
-  public void funError(final QNm name) throws QueryException {
+  public void funError(final QNm name, final QueryParser qp)
+      throws QueryException {
     // find function
     final byte[] nm = lc(name.ln());
-    FNIndex.get().error(nm);
+    FNIndex.get().error(nm, qp);
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();
     for(int n = 0; n < size; n++) {
       if(ls.similar(nm, lc(func[n].var.name.ln()), 0))
-        Err.or(FUNSIMILAR, name.atom(), func[n].var.name.atom());
+        qp.error(FUNSIMILAR, name.atom(), func[n].var.name.atom());
     }
   }
 

@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.NCN;
@@ -17,6 +16,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
 
@@ -29,12 +29,12 @@ import org.basex.util.XMLToken;
 final class FNQName extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNQName(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNQName(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -55,16 +55,15 @@ final class FNQName extends Fun {
 
     switch(func) {
       case RESQNAME:
-        if(it2 == null) emptyError();
-        return it == null ? null : resolve(ctx, it, it2);
+        return it == null ? null : resolve(ctx, it, checkEmpty(it2));
       case QNAME:
         final Uri uri = Uri.uri(it == null ? EMPTY :
           checkType(it, Type.STR).atom());
         final Item it3 = it2 == null ? Str.ZERO : checkType(it2, Type.STR);
         final byte[] str = it3.atom();
-        if(!XMLToken.isQName(str)) Err.value(Type.QNM, it3);
+        if(!XMLToken.isQName(str)) Err.or(input, INVALUE, Type.QNM, it3);
         QNm nm = new QNm(str, uri);
-        if(nm.ns() && uri == Uri.EMPTY) Err.value(Type.URI, uri);
+        if(nm.ns() && uri == Uri.EMPTY) Err.or(input, INVALUE, Type.URI, uri);
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;
@@ -74,17 +73,17 @@ final class FNQName extends Fun {
         nm = (QNm) checkType(it, Type.QNM);
         return !nm.ns() ? null : new NCN(nm.pref());
       case NSURIPRE:
-        final byte[] pre = checkStr(it);
+        final byte[] pre = checkStrEmp(it);
         final Atts at = ((Nod) checkType(it2, Type.ELM)).ns();
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
         if(it == null) return null;
-        final Uri rel = Uri.uri(checkStr(it));
-        if(!rel.valid()) error(URIINV, it);
+        final Uri rel = Uri.uri(checkStrEmp(it));
+        if(!rel.valid()) Err.or(input, URIINV, it);
 
-        final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkStr(it2));
-        if(!base.valid()) error(URIINV, base);
+        final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkStrEmp(it2));
+        if(!base.valid()) Err.or(input, URIINV, base);
         return base.resolve(rel);
       default:
         return super.atomic(ctx);
@@ -102,13 +101,13 @@ final class FNQName extends Fun {
   private Item resolve(final QueryContext ctx, final Item q, final Item it)
       throws QueryException {
 
-    final byte[] name = trim(checkStr(q));
-    if(!XMLToken.isQName(name)) Err.value(Type.QNM, q);
+    final byte[] name = trim(checkStrEmp(q));
+    if(!XMLToken.isQName(name)) Err.or(input, INVALUE, Type.QNM, q);
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
     final byte[] uri = ((Nod) checkType(it, Type.ELM)).uri(pref, ctx);
-    if(uri == null && pref.length != 0) error(NSDECL, pref);
+    if(uri == null && pref.length != 0) Err.or(input, NSDECL, pref);
     nm.uri = Uri.uri(uri);
     return nm;
   }

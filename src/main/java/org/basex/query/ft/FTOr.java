@@ -6,9 +6,9 @@ import org.basex.data.FTMatches;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
+import org.basex.util.InputInfo;
 
 /**
  * FTOr expression.
@@ -20,11 +20,11 @@ import org.basex.query.iter.FTIter;
 public final class FTOr extends FTExpr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression list
    */
-  public FTOr(final QueryInfo i, final FTExpr[] e) {
-    super(i, e);
+  public FTOr(final InputInfo ii, final FTExpr[] e) {
+    super(ii, e);
   }
 
   @Override
@@ -35,7 +35,7 @@ public final class FTOr extends FTExpr {
     if(not) {
       // convert (!A or !B or ...) to !(A and B and ...)
       for(int e = 0; e < expr.length; e++) expr[e] = expr[e].expr[0];
-      return new FTNot(info, new FTAnd(info, expr));
+      return new FTNot(input, new FTAnd(input, expr));
     }
     return this;
   }

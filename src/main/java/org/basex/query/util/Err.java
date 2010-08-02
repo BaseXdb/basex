@@ -1,9 +1,12 @@
 package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
+
 import org.basex.query.QueryException;
+import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
+import org.basex.util.InputInfo;
 
 /**
  * This class assembles common error messages.
@@ -17,54 +20,98 @@ public final class Err {
 
   /**
    * Throws an exception.
+   * @param ii input info
    * @param err error message
-   * @param x extended info
+   * @param ext extended info
    * @throws QueryException query exception
    */
-  public static void or(final Object[] err, final Object... x)
+  public static void or(final InputInfo ii, final Object[] err,
+      final Object... ext) throws QueryException {
+    throw new QueryException(ii, err, ext);
+  }
+
+  /**
+   * Throws an exception.
+   * @param ii input info
+   * @param err error message
+   * @param ext extended info
+   * @throws QueryException query exception
+   */
+  public static void or(final InputInfo ii, final Object err,
+      final Object... ext) throws QueryException {
+    throw new QueryException(ii, err, ext);
+  }
+
+  /**
+   * Throws a comparison exception.
+   * @param ii input info
+   * @param it1 first item
+   * @param it2 second item
+   * @throws QueryException query exception
+   */
+  public static void diff(final InputInfo ii, final Item it1, final Item it2)
       throws QueryException {
-    throw new QueryException(null, err, x);
-  }
-
-  /**
-   * Throws a date format exception.
-   * @param i input
-   * @param t expected type
-   * @param ex example format
-   * @throws QueryException query exception
-   */
-  public static void date(final byte[] i, final Type t, final String ex)
-      throws QueryException {
-    or(DATEFORMAT, t, i, ex);
-  }
-
-  /**
-   * Throws an invalid value exception.
-   * @param t expected type
-   * @param v value
-   * @throws QueryException query exception
-   */
-  public static void value(final Type t, final Object v) throws QueryException {
-    or(INVALUE, t, v);
-  }
-
-  /**
-   * Throws a date range exception.
-   * @param t expected type
-   * @param v value
-   * @throws QueryException query exception
-   */
-  public static void range(final Type t, final byte[] v) throws QueryException {
-    or(DATERANGE, t, v);
+    if(it1 == it2) or(ii, TYPECMP, it1.type);
+    else or(ii, XPTYPECMP, it1.type, it2.type);
   }
 
   /**
    * Throws a numeric type exception.
+   * @param ii input info
    * @param t expression cast type
    * @param it item
    * @throws QueryException query exception
    */
-  public static void cast(final Type t, final Item it) throws QueryException {
-    or(XPINVCAST, it.type, t, it);
+  public static void cast(final InputInfo ii, final Type t, final Item it)
+      throws QueryException {
+    or(ii, XPINVCAST, it.type, t, it);
+  }
+
+  /**
+   * Throws a type exception.
+   * @param ii input info
+   * @param inf expression info
+   * @param t expected type
+   * @param it found item
+   * @throws QueryException query exception
+   */
+  public static void type(final InputInfo ii, final String inf,
+      final Type t, final Item it) throws QueryException {
+    or(ii, XPTYPE, inf, t, it.type);
+  }
+
+  /**
+   * Throws a type exception.
+   * @param e parsing expression
+   * @param t expected type
+   * @param it found item
+   * @throws QueryException query exception
+   */
+  public static void type(final ParseExpr e, final Type t, final Item it)
+      throws QueryException {
+    type(e.input, e.desc(), t, it);
+  }
+
+  /**
+   * Throws a number exception.
+   * @param e parsing expression
+   * @param it found item
+   * @throws QueryException query exception
+   */
+  public static void number(final ParseExpr e, final Item it)
+      throws QueryException {
+    or(e.input, XPTYPENUM, e.desc(), it.type);
+  }
+
+  /**
+   * Throws an exception.
+   * @param err error message
+   * @param x extended info
+   * @throws QueryException query exception
+   */
+  // [CG] XQuery/query info: to be removed
+  public static void or(final Object[] err, final Object... x)
+      throws QueryException {
+    throw new QueryException(null, err, x);
   }
 }

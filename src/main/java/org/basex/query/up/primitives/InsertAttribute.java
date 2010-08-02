@@ -1,10 +1,10 @@
 package org.basex.query.up.primitives;
 
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.NamePool;
+import org.basex.util.InputInfo;
 
 /**
  * Insert attribute primitive.
@@ -15,12 +15,12 @@ import org.basex.query.up.NamePool;
 public final class InsertAttribute extends NodeCopy {
   /**
    * Constructor.
-   * @param u updating expression
+   * @param ii input info
    * @param n target node
    * @param copy insertion nods
    */
-  public InsertAttribute(final ParseExpr u, final Nod n, final NodIter copy) {
-    super(u, n, copy);
+  public InsertAttribute(final InputInfo ii, final Nod n, final NodIter copy) {
+    super(ii, n, copy);
   }
 
   @Override

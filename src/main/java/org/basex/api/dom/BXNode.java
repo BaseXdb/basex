@@ -294,7 +294,7 @@ public abstract class BXNode implements Node {
    */
   protected final BXNList getElements(final String tag) {
     final NodIter nb = new NodIter();
-    final NodeIter iter = node.desc();
+    final NodeIter iter = node.descendant();
     final byte[] nm = tag.equals("*") ? null : token(tag);
     try {
       Nod n = null;

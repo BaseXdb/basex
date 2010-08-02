@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Date;
 import org.basex.query.item.Dbl;
@@ -12,9 +11,11 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
+import org.basex.query.util.Err;
 import org.basex.query.util.format.DateFormatter;
 import org.basex.query.util.format.IntFormatter;
 import org.basex.query.util.format.NumFormatter;
+import org.basex.util.InputInfo;
 
 /**
  * Formatting functions.
@@ -25,12 +26,12 @@ import org.basex.query.util.format.NumFormatter;
 final class FNFormat extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNFormat(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNFormat(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -60,10 +61,10 @@ final class FNFormat extends Fun {
    * @throws QueryException query exception
    */
   private Str formatInteger(final QueryContext ctx) throws QueryException {
-    final String pic = string(checkStr(expr[1], ctx));
+    final String pic = string(checkEStr(expr[1], ctx));
     if(expr[0].empty()) return Str.ZERO;
 
-    final byte[] lang = expr.length == 2 ? EMPTY : checkStr(expr[2], ctx);
+    final byte[] lang = expr.length == 2 ? EMPTY : checkEStr(expr[2], ctx);
     final long num = checkItr(expr[0], ctx);
 
     return Str.get(IntFormatter.format(num, pic, string(lang)));
@@ -79,12 +80,12 @@ final class FNFormat extends Fun {
     // evaluate arguments
     Item it = expr[0].atomic(ctx);
     if(it == null) it = Dbl.NAN;
-    else if(!it.unt() && !it.num()) numError(info(), it);
+    else if(!it.unt() && !it.num()) Err.number(this, it);
 
-    final String pic = string(checkStr(expr[1], ctx));
-    if(expr.length == 3) error(FORMNUM, expr[2]);
+    final String pic = string(checkEStr(expr[1], ctx));
+    if(expr.length == 3) Err.or(input, FORMNUM, expr[2]);
 
-    return Str.get(NumFormatter.format(this, it, pic));
+    return Str.get(NumFormatter.format(input, it, pic));
   }
 
   /**
@@ -100,10 +101,10 @@ final class FNFormat extends Fun {
     final Item it = expr[0].atomic(ctx);
     if(it == null) return Seq.EMPTY;
     final Date date = (Date) checkType(it, type);
-    final String pic = string(checkStr(expr[1], ctx));
-    final byte[] lng = expr.length == 5 ? checkStr(expr[2], ctx) : EMPTY;
-    final byte[] cal = expr.length == 5 ? checkStr(expr[3], ctx) : EMPTY;
-    final byte[] plc = expr.length == 5 ? checkStr(expr[4], ctx) : EMPTY;
-    return Str.get(DateFormatter.format(this, date, pic, lng, cal, plc));
+    final String pic = string(checkEStr(expr[1], ctx));
+    final byte[] lng = expr.length == 5 ? checkEStr(expr[2], ctx) : EMPTY;
+    final byte[] cal = expr.length == 5 ? checkEStr(expr[3], ctx) : EMPTY;
+    final byte[] plc = expr.length == 5 ? checkEStr(expr[4], ctx) : EMPTY;
+    return Str.get(DateFormatter.format(input, date, pic, lng, cal, plc));
   }
 }

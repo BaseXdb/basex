@@ -7,7 +7,7 @@ import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryInfo;
+import org.basex.util.InputInfo;
 import org.basex.util.Tokenizer;
 
 /**
@@ -24,14 +24,14 @@ public final class FTContent extends FTFilter {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param ex expression
    * @param s start flag
    * @param e end flag
    */
-  public FTContent(final QueryInfo i, final FTExpr ex, final boolean s,
+  public FTContent(final InputInfo ii, final FTExpr ex, final boolean s,
       final boolean e) {
-    super(i, ex);
+    super(ii, ex);
     start = s;
     end = e;
   }

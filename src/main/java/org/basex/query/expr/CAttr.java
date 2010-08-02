@@ -7,13 +7,14 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.query.util.Err;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -30,14 +31,14 @@ public final class CAttr extends CFrag {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param n name
    * @param v attribute values
    * @param c computed construction flag
    */
-  public CAttr(final QueryInfo i, final Expr n, final Expr[] v,
+  public CAttr(final InputInfo ii, final Expr n, final Expr[] v,
       final boolean c) {
-    super(i, v);
+    super(ii, v);
     atn = n;
     comp = c;
   }
@@ -51,11 +52,12 @@ public final class CAttr extends CFrag {
 
   @Override
   public FAttr atomic(final QueryContext ctx) throws QueryException {
-    final QNm name = qname(ctx, checkEmpty(atn, ctx));
+    final QNm name = qname(ctx, checkItem(atn, ctx));
     if(!name.ns()) name.uri = Uri.EMPTY;
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
-    if(comp && (eq(name.atom(), XMLNS) || eq(pre, XMLNS))) error(NSATTCONS);
+    if(comp && (eq(name.atom(), XMLNS) || eq(pre, XMLNS)))
+      Err.or(input, NSATTCONS);
 
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : expr) CText.add(tb, ctx.iter(e));
@@ -80,7 +82,7 @@ public final class CAttr extends CFrag {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return info(QueryTokens.ATTRIBUTE);
   }
 

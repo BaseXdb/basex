@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,8 +9,8 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.core.Main;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -67,7 +68,7 @@ public abstract class Date extends Item {
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
       if(xc.getHour() == 24) xc.add(df.newDuration(0));
     } catch(final IllegalArgumentException ex) {
-      Err.date(d, type, e);
+      dateErr(d, type, e);
     }
   }
 
@@ -81,7 +82,7 @@ public abstract class Date extends Item {
       throws QueryException {
 
     final Matcher mt = DAT.matcher(Token.string(d).trim());
-    if(!mt.matches()) Err.date(d, type, e);
+    if(!mt.matches()) dateErr(d, type, e);
     zone(mt, 5, d);
   }
 
@@ -95,13 +96,13 @@ public abstract class Date extends Item {
       throws QueryException {
 
     final Matcher mt = TIM.matcher(Token.string(d).trim());
-    if(!mt.matches()) Err.date(d, type, e);
+    if(!mt.matches()) dateErr(d, type, e);
 
     final int h = Token.toInt(mt.group(1));
     final int s = Token.toInt(mt.group(3));
-    if(s > 59) Err.range(type, d);
+    if(s > 59) Err.or(DATERANGE, type, d);
     final double ms = mt.group(4) != null ? Double.parseDouble(mt.group(4)) : 0;
-    if(h == 24 && ms > 0) Err.date(d, type, e);
+    if(h == 24 && ms > 0) dateErr(d, type, e);
     zone(mt, 6, d);
   }
 
@@ -130,7 +131,7 @@ public abstract class Date extends Item {
   protected final void calc(final Dur a, final boolean p)
       throws QueryException {
 
-    if(xc.getYear() + a.mon / 12 > 9999) Err.range(type, a.atom());
+    if(xc.getYear() + a.mon / 12 > 9999) Err.or(DATERANGE, type, a.atom());
     xc.add(p ? a.toJava() : a.toJava().negate());
   }
 
@@ -143,18 +144,20 @@ public abstract class Date extends Item {
   }
 
   @Override
-  public final boolean eq(final Item it) {
+  public final boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
     final long d1 = days();
-    final long d2 = ((Date) it).days();
+    final Date d = (Date) (it.date() ? it : type.e(it, null, ii));
+    final long d2 = d.days();
     return d1 == d2 && seconds().doubleValue() ==
       ((Date) it).seconds().doubleValue();
   }
 
-  @SuppressWarnings("unused")
   @Override
-  public int diff(final ParseExpr e, final Item it) throws QueryException {
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
     final long d1 = days();
-    final long d2 = ((Date) it).days();
+    final Date d = (Date) (it.date() ? it : type.e(it, null, ii));
+    final long d2 = d.days();
     if(d1 != d2) return (int) (d1 - d2);
     return seconds().subtract(((Date) it).seconds()).signum();
   }

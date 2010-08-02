@@ -3,7 +3,6 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import java.text.SimpleDateFormat;
 import org.basex.query.QueryException;
-import org.basex.query.util.Err;
 import org.basex.util.Token;
 
 /**
@@ -38,7 +37,7 @@ public final class Dtm extends Date {
   public Dtm(final byte[] dt) throws QueryException {
     super(Type.DTM, dt, XDTM);
     final int i = Token.indexOf(dt, 'T');
-    if(i == -1) Err.date(dt, type, XDTM);
+    if(i == -1) dateErr(dt, type, XDTM);
     date(Token.substring(dt, 0, i), XDTM);
     time(Token.substring(dt, i + 1), XDTM);
   }

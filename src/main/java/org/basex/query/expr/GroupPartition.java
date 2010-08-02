@@ -147,6 +147,7 @@ class GroupPartition {
       sb.append(Arrays.toString(its));
       return sb.toString();
     }
+
     @Override
     public boolean equals(final Object o) {
       if(!(o instanceof GroupNode)) return false;
@@ -155,7 +156,9 @@ class GroupPartition {
           gv.length != c.its.length) return false;
       for(int i = 0; i < its.length; i++) {
         try {
-          if(!its[i].equive(c.its[i]))
+          // [CG] calling expression should be passed on
+          // (might be skipped again)
+          if(!its[i].equive(null, c.its[i]))
             return false;
         } catch(QueryException e) {
           return false;

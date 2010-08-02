@@ -4,11 +4,12 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.func.FNNum;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.util.Err;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 
 /**
  * Number formatter.
@@ -51,34 +52,34 @@ public final class NumFormatter {
 
   /**
    * Returns a formatted number.
-   * @param e calling expression
+   * @param ii input info
    * @param number number to be formatted
    * @param picture picture
    * @return string representation
    * @throws QueryException query exception
    */
-  public static byte[] format(final ParseExpr e, final Item number,
+  public static byte[] format(final InputInfo ii, final Item number,
       final String picture) throws QueryException {
 
     // find pattern separator and sub-patterns
     final String[] sub = picture.split(String.valueOf(PATTERN));
-    if(sub.length > 2) e.error(PICNUM, picture);
+    if(sub.length > 2) Err.or(ii, PICNUM, picture);
 
     // check and analyze patterns
-    check(e, sub);
+    check(sub, ii);
     final Picture[] pics = analyze(sub);
 
     // return formatted string
-    return token(format(number, pics));
+    return token(format(number, pics, ii));
   }
 
   /**
    * Checks the syntax of the specified patterns.
-   * @param e calling expression
    * @param patterns patterns
+   * @param ii input info
    * @throws QueryException query exception
    */
-  private static void check(final ParseExpr e, final String[] patterns)
+  private static void check(final String[] patterns, final InputInfo ii)
       throws QueryException {
 
     for(final String pat : patterns) {
@@ -93,12 +94,12 @@ public final class NumFormatter {
 
         if(ch == DECIMAL) {
           // more than 1 decimal sign?
-          if(frac) e.error(PICNUM, pat);
+          if(frac) Err.or(ii, PICNUM, pat);
           frac = true;
         } else if(ch == GROUP) {
           // adjacent decimal sign?
           if(cp(pat, i - 1) == DECIMAL || cp(pat, i + 1) == DECIMAL)
-            e.error(PICNUM, pat);
+            Err.or(ii, PICNUM, pat);
         } else if(ch == PERCENT) {
           pc++;
         } else if(ch == PERMILLE) {
@@ -106,28 +107,28 @@ public final class NumFormatter {
         } else if(ch == OPTIONAL) {
           if(!frac) {
             // integer part, and optional sign after digit?
-            if(dig) e.error(PICNUM, pat);
+            if(dig) Err.or(ii, PICNUM, pat);
             opt1 = true;
           } else {
             opt2 = true;
           }
         } else if(DIGITS.indexOf(ch) != -1) {
           // fractional part, and digit after optional sign?
-          if(frac && opt2) e.error(PICNUM, pat);
+          if(frac && opt2) Err.or(ii, PICNUM, pat);
           dig = true;
         }
 
         // passive character with preceding and following active character?
-        if(a && pas && act) e.error(PICNUM, pat);
+        if(a && pas && act) Err.or(ii, PICNUM, pat);
         // will be assigned if active characters were found
         if(act) pas |= !a;
         act |= a;
       }
 
       // more than 1 percent and permille sign?
-      if(pc > 1 || pm > 1 || pc + pm > 1) e.error(PICNUM, pat);
+      if(pc > 1 || pm > 1 || pc + pm > 1) Err.or(ii, PICNUM, pat);
       // no optional sign or digit?
-      if(!opt1 && !opt2 && !dig) e.error(PICNUM, pat);
+      if(!opt1 && !opt2 && !dig) Err.or(ii, PICNUM, pat);
     }
   }
 
@@ -189,11 +190,12 @@ public final class NumFormatter {
    * Formats the specified number and returns a string representation.
    * @param it item
    * @param pics pictures
+   * @param ii input info
    * @return picture variables
    * @throws QueryException query exception
    */
-  private static String format(final Item it, final Picture[] pics)
-      throws QueryException {
+  private static String format(final Item it, final Picture[] pics,
+      final InputInfo ii) throws QueryException {
 
     final double d = it.dbl();
     final Picture pic = pics[d < 0 && pics.length == 2 ? 1 : 0];
@@ -205,9 +207,8 @@ public final class NumFormatter {
 
     // convert and round number
     Item num = it;
-    // [CG] XQuery/Query Info
-    if(pic.pc) num = Calc.MULT.ev(null, num, Itr.get(100));
-    if(pic.pm) num = Calc.MULT.ev(null, num, Itr.get(1000));
+    if(pic.pc) num = Calc.MULT.ev(ii, num, Itr.get(100));
+    if(pic.pm) num = Calc.MULT.ev(ii, num, Itr.get(1000));
     num = FNNum.abs(FNNum.round(num, num.dbl(), pic.maxFrac, true));
 
     // convert to string representation

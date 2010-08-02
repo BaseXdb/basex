@@ -5,9 +5,10 @@ import java.io.IOException;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Uri;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -22,12 +23,12 @@ public final class Put extends UpdatePrimitive {
 
   /**
    * Constructor.
-   * @param up updating expression
+   * @param ii input info
    * @param n node to put
    * @param u location uri
    */
-  public Put(final ParseExpr up, final Nod n, final Uri u) {
-    super(up, n);
+  public Put(final InputInfo ii, final Nod n, final Uri u) {
+    super(ii, n);
     uri = u;
   }
 
@@ -38,7 +39,7 @@ public final class Put extends UpdatePrimitive {
       out = new PrintOutput(Token.string(path()));
       node.serialize(new XMLSerializer(out));
     } catch(final IOException ex) {
-      parent.error(UPPUTERR, path());
+      Err.or(input, UPPUTERR, path());
     } finally {
       try { if(out != null) out.close(); } catch(final IOException ex) { }
     }

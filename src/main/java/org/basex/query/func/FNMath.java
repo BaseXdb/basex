@@ -2,10 +2,10 @@ package org.basex.query.func;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
+import org.basex.util.InputInfo;
 
 /**
  * Math functions.
@@ -16,12 +16,12 @@ import org.basex.query.item.Item;
 final class FNMath extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNMath(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNMath(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override

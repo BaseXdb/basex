@@ -4,10 +4,10 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 
 /**
  * Switch expression.
@@ -18,11 +18,11 @@ import org.basex.query.iter.Iter;
 public final class Switch extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expressions
    */
-  public Switch(final QueryInfo i, final Expr[] e) {
-    super(i, e);
+  public Switch(final InputInfo ii, final Expr[] e) {
+    super(ii, e);
   }
 
   @Override
@@ -36,7 +36,7 @@ public final class Switch extends Arr {
       boolean items = true;
       for(int i = 1; i < el - 1; i += 2) {
         items &= expr[i].item();
-        if(items && it.equiv((Item) expr[i])) {
+        if(items && it.equiv(input, (Item) expr[i])) {
           e = expr[i + 1];
           break;
         }
@@ -54,7 +54,7 @@ public final class Switch extends Arr {
     for(int i = 1; i < el - 1; i += 2) {
       final Item cs = expr[i].atomic(ctx);
       // includes check for empty sequence (null reference)
-      if(op == cs || op.equiv(cs)) return ctx.iter(expr[i + 1]);
+      if(op == cs || op.equiv(input, cs)) return ctx.iter(expr[i + 1]);
     }
     // choose default expression
     return ctx.iter(expr[el - 1]);

@@ -4,13 +4,14 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -21,17 +22,14 @@ import org.basex.util.XMLToken;
  * @author Christian Gruen
  */
 public final class CPI extends CFrag {
-  /** Closing processing instruction. */
-  private static final byte[] CLOSE = { '?', '>' };
-
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param n name
    * @param v value
    */
-  public CPI(final QueryInfo i, final Expr n, final Expr v) {
-    super(i, n, v);
+  public CPI(final InputInfo ii, final Expr n, final Expr v) {
+    super(ii, n, v);
   }
 
   @Override
@@ -43,13 +41,13 @@ public final class CPI extends CFrag {
 
   @Override
   public FPI atomic(final QueryContext ctx) throws QueryException {
-    final Item it = checkEmpty(expr[0], ctx);
+    final Item it = checkItem(expr[0], ctx);
     if(!it.unt() && !it.str() && it.type != Type.QNM)
-      error(CPIWRONG, it.type, it);
+      Err.or(input, CPIWRONG, it.type, it);
 
     final byte[] nm = trim(it.atom());
-    if(eq(lc(nm), XML)) error(CPIXML, nm);
-    if(!XMLToken.isNCName(nm)) error(CPIINVAL, nm);
+    if(eq(lc(nm), XML)) Err.or(input, CPIXML, nm);
+    if(!XMLToken.isNCName(nm)) Err.or(input, CPIINVAL, nm);
 
     final Iter iter = ctx.iter(expr[1]);
     final TokenBuilder tb = new TokenBuilder();
@@ -59,25 +57,11 @@ public final class CPI extends CFrag {
     int i = -1;
     while(++i != v.length && v[i] >= 0 && v[i] <= ' ');
     v = substring(v, i);
-    return new FPI(new QNm(nm), check(this, v), null);
-  }
-
-  /**
-   * Checks the specified token for validity.
-   * @param e calling expression
-   * @param atom token to be checked
-   * @return token
-   * @throws QueryException query exception
-   */
-  public static byte[] check(final ParseExpr e, final byte[] atom)
-      throws QueryException {
-
-    if(contains(atom, CLOSE)) e.error(CPICONT, atom);
-    return atom;
+    return new FPI(new QNm(nm), FPI.parse(v, input), null);
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return info(QueryTokens.PI);
   }
 

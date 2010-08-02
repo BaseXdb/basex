@@ -14,10 +14,8 @@ import org.basex.io.IOContent;
 import org.basex.io.TextInput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Atm;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -30,6 +28,8 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.up.primitives.Put;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
 
@@ -45,12 +45,12 @@ final class FNGen extends Fun {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNGen(final QueryInfo i, final FunDef f, final Expr[] e) {
-    super(i, f, e);
+  protected FNGen(final InputInfo ii, final FunDef f, final Expr[] e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -116,7 +116,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private NodIter collection(final QueryContext ctx) throws QueryException {
-    return ctx.coll(expr.length != 0 ? checkEmptyStr(expr[0], ctx) : null);
+    return ctx.coll(expr.length != 0 ? checkStr(expr[0], ctx) : null, input);
   }
 
   /**
@@ -141,15 +141,15 @@ final class FNGen extends Fun {
    */
   private Iter put(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
-    final byte[] file = checkStr(expr[1], ctx);
+    final byte[] file = checkEStr(expr[1], ctx);
     final Item it = expr[0].atomic(ctx);
 
     if(it == null || it.type != Type.DOC && it.type != Type.ELM)
-      error(UPFOTYPE, expr[0]);
+      Err.or(input, UPFOTYPE, expr[0]);
 
     final Uri u = Uri.uri(file);
-    if(u == Uri.EMPTY || !u.valid()) error(UPFOURI, file);
-    ctx.updates.add(new Put(this, (Nod) it, u), ctx);
+    if(u == Uri.EMPTY || !u.valid()) Err.or(input, UPFOURI, file);
+    ctx.updates.add(new Put(input, (Nod) it, u), ctx);
 
     return Iter.EMPTY;
   }
@@ -162,7 +162,7 @@ final class FNGen extends Fun {
    */
   private Nod doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].atomic(ctx);
-    return it == null ? null : ctx.doc(checkStr(it), false, false);
+    return it == null ? null : ctx.doc(checkStrEmp(it), false, false, input);
   }
 
   /**
@@ -218,7 +218,9 @@ final class FNGen extends Fun {
       throws QueryException {
 
     final IO io = checkIO(expr[0], ctx);
-    final String enc = expr.length < 2 ? null : string(checkStr(expr[1], ctx));
+    final String enc = expr.length < 2 ? null :
+      string(checkEStr(expr[1], ctx));
+
     try {
       final byte[] path = token(io.path());
       byte[] cont = contents.get(path);
@@ -229,7 +231,7 @@ final class FNGen extends Fun {
       }
       return Str.get(cont);
     } catch(final IOException ex) {
-      error(NODOC, ex.getMessage() != null ? ex.getMessage() : ex.toString());
+      Err.or(input, NODOC, ex);
       return null;
     }
   }
@@ -241,11 +243,11 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Nod parseXml(final QueryContext ctx) throws QueryException {
-    final byte[] cont = checkStr(expr[0], ctx);
+    final byte[] cont = checkEStr(expr[0], ctx);
     Uri base = ctx.baseURI;
     if(expr.length == 2) {
-      base = Uri.uri(checkStr(expr[1], ctx));
-      if(!base.valid()) error(DOCBASE, base);
+      base = Uri.uri(checkEStr(expr[1], ctx));
+      if(!base.valid()) Err.or(input, DOCBASE, base);
     }
 
     final Prop prop = ctx.context.prop;
@@ -254,7 +256,7 @@ final class FNGen extends Fun {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
-      error(DOCWF, ex.getMessage());
+      Err.or(input, DOCWF, ex.getMessage());
       return null;
     }
   }
@@ -266,7 +268,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-    final Nod nod = checkNode(checkEmpty(expr[0], ctx));
+    final Nod nod = checkNode(checkItem(expr[0], ctx));
 
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
@@ -285,19 +287,9 @@ final class FNGen extends Fun {
       nod.serialize(new XMLSerializer(co, new SerializerProp(tb.toString())));
       return Str.get(co.toArray());
     } catch(final IOException ex) {
-      error(ex.getMessage() != null ? ex.getMessage() : ex.toString());
+      Err.or(input, ex.getMessage() != null ? ex.getMessage() : ex.toString());
       return null;
     }
-  }
-
-  /**
-   * Atomizes the specified item.
-   * @param it input item
-   * @return atomized item
-   */
-  static Item atom(final Item it) {
-    return it.node() ? it.type == Type.PI || it.type == Type.COM ?
-        Str.get(it.atom()) : new Atm(it.atom()) : it;
   }
 
   @Override

@@ -2,7 +2,8 @@ package org.basex.query.util.format;
 
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Parser for formatting dates.
@@ -11,8 +12,8 @@ import org.basex.query.expr.ParseExpr;
  * @author Christian Gruen
  */
 final class DateParser {
-  /** Calling expression. */
-  private final ParseExpr expr;
+  /** Input information. */
+  private final InputInfo input;
   /** String. */
   private final String pic;
   /** Position. */
@@ -20,11 +21,11 @@ final class DateParser {
 
   /**
    * Constructor.
-   * @param e calling expression
+   * @param ii input info
    * @param p picture
    */
-  DateParser(final ParseExpr e, final String p) {
-    expr = e;
+  DateParser(final InputInfo ii, final String p) {
+    input = ii;
     pic = p;
   }
 
@@ -44,9 +45,9 @@ final class DateParser {
   char next() throws QueryException {
     final char ch = pic.charAt(pos++);
     if(ch == '[' || ch == ']') {
-      if(!more()) expr.error(PICDATE, pic);
+      if(!more()) Err.or(input, PICDATE, pic);
       if(pic.charAt(pos) != ch) {
-        if(ch == ']') expr.error(PICDATE, pic);
+        if(ch == ']') Err.or(input, PICDATE, pic);
         return 0;
       }
       pos++;
@@ -62,7 +63,7 @@ final class DateParser {
   String marker() throws QueryException {
     int p = pos;
     while(pic.charAt(pos++) != ']')
-      if(!more()) expr.error(PICDATE, pic);
+      if(!more()) Err.or(input, PICDATE, pic);
     final StringBuilder sb = new StringBuilder();
     for(; p < pos - 1; p++) {
       final char ch = pic.charAt(p);

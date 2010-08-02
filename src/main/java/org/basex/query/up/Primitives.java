@@ -68,7 +68,9 @@ abstract class Primitives {
         // check if the identity of all target nodes of fn:put operations is
         // still available after the execution of updates. that includes parent
         // nodes
-        if(p.type() == PUT && parentDeleted(nodes.get(i))) Err.or(UPFOEMPT, p);
+        if(p.type() == PUT && parentDeleted(nodes.get(i))) {
+          Err.or(p.input, UPFOEMPT, p);
+        }
       }
     }
   };

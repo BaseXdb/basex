@@ -7,8 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.Duration;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -79,7 +79,7 @@ public class Dur extends Item {
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      Err.date(v, type, XDURR);
+      dateErr(v, type, XDURR);
     final int y = mt.group(2) != null ? toInt(mt.group(3)) : 0;
     final int m = mt.group(4) != null ? toInt(mt.group(5)) : 0;
     final long d = mt.group(6) != null ? toInt(mt.group(7)) : 0;
@@ -179,16 +179,17 @@ public class Dur extends Item {
   }
 
   @Override
-  public final boolean eq(final Item it) throws QueryException {
-    final Dur d = (Dur) (!it.dur() ? type.e(it, null) : it);
+  public final boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
+    final Dur d = (Dur) (!it.dur() ? type.e(it, null, ii) : it);
     final double s1 = sc == null ? 0 : sc.doubleValue();
     final double s2 = d.sc == null ? 0 : d.sc.doubleValue();
     return mon == d.mon && s1 == s2;
   }
 
   @Override
-  public int diff(final ParseExpr e, final Item it) throws QueryException {
-    e.diffError(it, this);
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
+    Err.diff(ii, it, this);
     return 0;
   }
 

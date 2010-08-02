@@ -1,12 +1,13 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.Main;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -58,12 +59,12 @@ public final class DSim extends Date {
 
     final int i = type(t);
     final Matcher mt = PATTERNS[i].matcher(Token.string(d).trim());
-    if(!mt.matches()) Err.date(d, type, EXAMPLES[i]);
+    if(!mt.matches()) dateErr(d, type, EXAMPLES[i]);
     zone(mt, ZONES[i], d);
 
     if(t == Type.MDA) {
       final int m = xc.getMonth() - 1;
-      if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0)) Err.range(type, d);
+      if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0)) Err.or(DATERANGE, type, d);
     }
   }
 
@@ -79,8 +80,8 @@ public final class DSim extends Date {
   }
 
   @Override
-  public int diff(final ParseExpr e, final Item it) throws QueryException {
-    e.diffError(it, this);
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
+    Err.diff(ii, it, this);
     return 0;
   }
 }

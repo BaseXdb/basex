@@ -7,10 +7,10 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -25,12 +25,12 @@ public final class Cast extends Single {
 
   /**
    * Function constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    * @param t data type
    */
-  public Cast(final QueryInfo i, final Expr e, final SeqType t) {
-    super(i, e);
+  public Cast(final InputInfo ii, final Expr e, final SeqType t) {
+    super(ii, e);
     seq = t;
   }
 
@@ -61,7 +61,7 @@ public final class Cast extends Single {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return seq.type + " " + CAST;
   }
 

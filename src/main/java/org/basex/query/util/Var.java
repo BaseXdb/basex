@@ -6,13 +6,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -46,21 +46,21 @@ public final class Var extends ParseExpr {
 
   /**
    * Constructor, specifying a local variable.
-   * @param i query info
+   * @param ii input info
    * @param n variable name
    */
-  public Var(final QueryInfo i, final QNm n) {
-    this(i, n, null);
+  public Var(final InputInfo ii, final QNm n) {
+    this(ii, n, null);
   }
 
   /**
    * Constructor, specifying a local variable.
-   * @param i query info
+   * @param ii input info
    * @param n variable name
    * @param t data type
    */
-  public Var(final QueryInfo i, final QNm n, final SeqType t) {
-    super(i);
+  public Var(final InputInfo ii, final QNm n, final SeqType t) {
+    super(ii);
     name = n;
     type = t;
   }
@@ -118,7 +118,7 @@ public final class Var extends ParseExpr {
    */
   public Item item(final QueryContext ctx) throws QueryException {
     if(item == null) {
-      if(expr == null) error(VAREMPTY, this);
+      if(expr == null) Err.or(input, VAREMPTY, this);
       final Item it = ctx.item;
       ctx.item = null;
       item = cast(ctx.iter(expr).finish(), ctx);
@@ -158,9 +158,9 @@ public final class Var extends ParseExpr {
     if(type == null) return it;
 
     if(!global && type.zeroOrOne() && !it.type.instance(type.type))
-      error(XPINVCAST, it.type, type, it);
+      Err.or(input, XPINVCAST, it.type, type, it);
 
-    return type.cast(it, ctx);
+    return type.cast(it, ctx, input);
   }
 
   /**
@@ -168,7 +168,7 @@ public final class Var extends ParseExpr {
    * @return copied variable
    */
   public Var copy() {
-    final Var v = new Var(info, name, type);
+    final Var v = new Var(input, name, type);
     if(global) v.global();
     v.item = item;
     v.expr = expr;

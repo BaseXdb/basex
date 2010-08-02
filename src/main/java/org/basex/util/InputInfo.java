@@ -1,14 +1,12 @@
-package org.basex.query;
-
-import org.basex.util.InputParser;
+package org.basex.util;
 
 /**
- * Parsing information.
+ * Input information.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class QueryInfo {
+public final class InputInfo {
   /** Input query. */
   public final String query;
   /** Parse position. */
@@ -18,7 +16,7 @@ public final class QueryInfo {
    * Optimizes and compiles the expression.
    * @param p parsing position
    */
-  public QueryInfo(final InputParser p) {
+  public InputInfo(final InputParser p) {
     query = p.qu;
     pos = p.qp;
   }

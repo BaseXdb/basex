@@ -3,13 +3,14 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Root node.
@@ -20,10 +21,10 @@ import org.basex.query.iter.NodIter;
 public final class Root extends Simple {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    */
-  public Root(final QueryInfo i) {
-    super(i);
+  public Root(final InputInfo ii) {
+    super(ii);
   }
 
   @Override
@@ -33,7 +34,7 @@ public final class Root extends Simple {
     Item i;
     while((i = iter.next()) != null) {
       final Nod n = root(i);
-      if(n == null || n.type != Type.DOC) error(CTXNODE);
+      if(n == null || n.type != Type.DOC) Err.or(input, CTXNODE);
       ni.add(n);
     }
     return ni;

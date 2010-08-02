@@ -3,6 +3,7 @@ package org.basex.query.util;
 import java.util.Arrays;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.util.InputInfo;
 
 /**
  * Set for quickly indexing items.
@@ -26,17 +27,18 @@ public final class ItemSet {
 
   /**
    * Indexes the specified item.
+   * @param ii input info
    * @param i item
    * @return true if value is new
    * @throws QueryException query exception
    */
-  public boolean index(final Item i) throws QueryException {
+  public boolean index(final InputInfo ii, final Item i) throws QueryException {
     if(size == next.length) rehash();
 
     final int h = i.hashCode();
     final int p = h & bucket.length - 1;
     for(int id = bucket[p]; id != 0; id = next[id]) {
-      if(values[id].equiv(i)) return false;
+      if(values[id].equiv(ii, i)) return false;
     }
 
     next[size] = bucket[p];

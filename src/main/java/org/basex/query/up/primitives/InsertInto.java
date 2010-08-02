@@ -1,10 +1,10 @@
 package org.basex.query.up.primitives;
 
 import org.basex.data.Data;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodIter;
+import org.basex.util.InputInfo;
 
 /**
  * Insert into as last primitive.
@@ -20,14 +20,14 @@ public final class InsertInto extends NodeCopy {
 
   /**
    * Constructor.
-   * @param u updating expression
+   * @param ii input info
    * @param n target node
    * @param copy copy of nodes to be inserted
    * @param l as last flag
    */
-  public InsertInto(final ParseExpr u, final Nod n, final NodIter copy,
+  public InsertInto(final InputInfo ii, final Nod n, final NodIter copy,
       final boolean l) {
-    super(u, n, copy);
+    super(ii, n, copy);
     last = l;
   }
 

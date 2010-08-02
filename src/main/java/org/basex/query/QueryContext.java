@@ -41,6 +41,7 @@ import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.NSLocal;
 import org.basex.query.util.Variables;
+import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -245,7 +246,7 @@ public final class QueryContext extends Progress {
       root = root.comp(this);
       if(inf) info.add(NL + QUERYRESULT + root);
     } catch(final StackOverflowError ex) {
-      if(Prop.debug) ex.printStackTrace();
+      Main.debug(ex);
       Err.or(XPSTACK);
     }
   }
@@ -306,7 +307,7 @@ public final class QueryContext extends Progress {
       if(context.data != null) context.update();
       return i.iter();
     } catch(final StackOverflowError ex) {
-      if(Prop.debug) ex.printStackTrace();
+      Main.debug(ex);
       Err.or(XPSTACK);
       return null;
     }
@@ -395,12 +396,13 @@ public final class QueryContext extends Progress {
    * @param path database name or file path
    * @param coll collection flag
    * @param db database flag
+   * @param ii input info
    * @return database instance
    * @throws QueryException query exception
    */
-  public DBNode doc(final byte[] path, final boolean coll, final boolean db)
-      throws QueryException {
-    if(contains(path, '<') || contains(path, '>')) Err.or(INVDOC, path);
+  public DBNode doc(final byte[] path, final boolean coll, final boolean db,
+      final InputInfo ii) throws QueryException {
+    if(contains(path, '<') || contains(path, '>')) Err.or(ii, INVDOC, path);
 
     // check if the collections contain the document
     for(int c = 0; c < colls; c++) {
@@ -429,13 +431,13 @@ public final class QueryContext extends Progress {
       try {
         data = Open.open(nm, context);
       } catch(final IOException ex) {
-        Err.or(NODB, nm);
+        Err.or(ii, NODB, nm);
       }
     } else {
       final IO file = file();
-      data = check(nm, file == null, coll);
+      data = check(nm, file == null, coll, ii);
       if(data == null) data = check(file.merge(string(path)).path(),
-          true, coll);
+          true, coll, ii);
     }
 
     // add document to array
@@ -463,16 +465,17 @@ public final class QueryContext extends Progress {
    * @param path document path
    * @param err error flag
    * @param coll collection flag
+   * @param ii input info
    * @return data instance
    * @throws QueryException query exception
    */
-  private Data check(final String path, final boolean err, final boolean coll)
-      throws QueryException {
+  private Data check(final String path, final boolean err, final boolean coll,
+      final InputInfo ii) throws QueryException {
 
     try {
       return Check.check(context, path);
     } catch(final IOException ex) {
-      if(err) Err.or(coll ? NOCOLL : NODOC, ex.getMessage());
+      if(err) Err.or(ii, coll ? NOCOLL : NODOC, ex.getMessage());
       return null;
     }
   }
@@ -480,21 +483,24 @@ public final class QueryContext extends Progress {
   /**
    * Adds a collection instance or returns an existing one.
    * @param coll name of the collection to be returned
+   * @param ii input info
    * @return collection
    * @throws QueryException query exception
    */
-  public NodIter coll(final byte[] coll) throws QueryException {
+  public NodIter coll(final byte[] coll, final InputInfo ii)
+      throws QueryException {
+
     // no collection specified.. return default collection/current context set
     int c = 0;
     if(coll == null) {
       // no default collection was defined
-      if(colls == 0) Err.or(NODEFCOLL);
+      if(colls == 0) Err.or(ii, NODEFCOLL);
     } else {
       // invalid collection reference
-      if(contains(coll, '<') || contains(coll, '\\')) Err.or(COLLINV, coll);
+      if(contains(coll, '<') || contains(coll, '\\')) Err.or(ii, COLLINV, coll);
 
       while(c < colls && !eq(collName[c], coll)) c++;
-      if(c == colls) addDocs(doc(coll, true, false));
+      if(c == colls) addDocs(doc(coll, true, false, ii));
     }
     return new NodIter(collect[c].item, (int) collect[c].size());
   }

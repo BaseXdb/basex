@@ -5,11 +5,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 
 /**
  * Function call.
@@ -27,13 +27,14 @@ public final class FunCall extends Arr {
 
   /**
    * Function constructor.
-   * @param i query info
+   * @param ii input info
    * @param nm function name
    * @param d function id
    * @param a arguments
    */
-  public FunCall(final QueryInfo i, final QNm nm, final int d, final Expr[] a) {
-    super(i, a);
+  public FunCall(final InputInfo ii, final QNm nm, final int d,
+      final Expr[] a) {
+    super(ii, a);
     id = d;
     name = nm;
   }
@@ -87,7 +88,7 @@ public final class FunCall extends Arr {
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return "Function";
   }
 

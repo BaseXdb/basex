@@ -5,13 +5,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 
 /**
  * Abstract predicate expression, implemented by {@link Pred} and
@@ -26,11 +26,11 @@ public abstract class Preds extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param p predicates
    */
-  public Preds(final QueryInfo i, final Expr[] p) {
-    super(i);
+  public Preds(final InputInfo ii, final Expr[] p) {
+    super(ii);
     pred = p;
   }
 
@@ -46,7 +46,7 @@ public abstract class Preds extends ParseExpr {
     Expr e = this;
     for(int p = 0; p < pred.length; p++) {
       Expr ex = pred[p].comp(ctx);
-      ex = Pos.get(ex, CmpV.Comp.EQ, ex);
+      ex = Pos.get(CmpV.Comp.EQ, ex, ex, input);
 
       if(ex.item()) {
         if(!((Item) ex).bool()) {

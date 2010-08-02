@@ -7,7 +7,6 @@ import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.query.expr.Expr;
-import org.basex.query.util.Err;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenSet;
 
@@ -63,7 +62,7 @@ public final class FNIndex extends TokenSet {
       final FunDef fl = funcs[id];
       if(!eq(fl.uri, uri)) return null;
 
-      final Fun f = Fun.create(qp.info(), fl, args);
+      final Fun f = Fun.create(qp.input(), fl, args);
       // check number of arguments
       if(args.length < fl.min || args.length > fl.max) qp.error(XPARGS, fl);
       return f;
@@ -74,14 +73,17 @@ public final class FNIndex extends TokenSet {
   /**
    * Finds similar function names for throwing an error message.
    * @param name function name
+   * @param qp query parser
    * @throws QueryException query exception
    */
-  public void error(final byte[] name) throws QueryException {
+  public void error(final byte[] name, final QueryParser qp)
+      throws QueryException {
+
     // check similar predefined function
     final byte[] nm = lc(name);
     final Levenshtein ls = new Levenshtein();
     for(int k = 1; k < size; k++) {
-      if(ls.similar(nm, lc(keys[k]), 0)) Err.or(FUNSIMILAR, name, keys[k]);
+      if(ls.similar(nm, lc(keys[k]), 0)) qp.error(FUNSIMILAR, name, keys[k]);
     }
   }
 

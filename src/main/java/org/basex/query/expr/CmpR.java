@@ -11,7 +11,6 @@ import org.basex.index.RangeToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -23,6 +22,7 @@ import org.basex.query.path.NameTest;
 import org.basex.query.path.Step;
 import org.basex.query.path.Test.Kind;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -45,16 +45,16 @@ final class CmpR extends Single {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    * @param mn minimum value
    * @param in include minimum value
    * @param mx maximum value
    * @param ix include maximum value
    */
-  private CmpR(final QueryInfo i, final Expr e, final double mn,
+  private CmpR(final InputInfo ii, final Expr e, final double mn,
       final boolean in, final double mx, final boolean ix) {
-    super(i, e);
+    super(ii, e);
     min = mn;
     mni = in;
     max = mx;
@@ -74,18 +74,17 @@ final class CmpR extends Single {
       final Expr e = c.expr[0];
       final double d = ((Item) c.expr[1]).dbl();
       switch(c instanceof CmpG ? ((CmpG) c).cmp.cmp : ((CmpV) c).cmp) {
-        case EQ:
-          return new CmpR(ex.info, e, d, true, d, true);
-        case GE:
-          return new CmpR(ex.info, e, d, true, Double.POSITIVE_INFINITY, true);
-        case GT:
-          return new CmpR(ex.info, e, d, false, Double.POSITIVE_INFINITY, true);
-        case LE:
-          return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, true);
-        case LT:
-          return new CmpR(ex.info, e, Double.NEGATIVE_INFINITY, true, d, false);
-        default:
-          return null;
+        case EQ: return new CmpR(
+            ex.input, e, d, true, d, true);
+        case GE: return new CmpR(
+            ex.input, e, d, true, Double.POSITIVE_INFINITY, true);
+        case GT: return new CmpR(
+            ex.input, e, d, false, Double.POSITIVE_INFINITY, true);
+        case LE: return new CmpR(
+            ex.input, e, Double.NEGATIVE_INFINITY, true, d, true);
+        case LT: return new CmpR(
+            ex.input, e, Double.NEGATIVE_INFINITY, true, d, false);
+        default: return null;
       }
     }
     return null;
@@ -118,7 +117,7 @@ final class CmpR extends Single {
     final double mn = Math.max(min, c.min);
     final double mx = Math.min(max, c.max);
     return mn > mx ? Bln.FALSE :
-      new CmpR(info, c.expr, mn, mni && c.mni, mx, mxi && c.mxi);
+      new CmpR(input, c.expr, mn, mni && c.mni, mx, mxi && c.mxi);
   }
 
   @Override
@@ -148,7 +147,7 @@ final class CmpR extends Single {
 
   @Override
   public AxisPath indexEquivalent(final IndexContext ic) {
-    final Expr root = new RangeAccess(info, rt, ic);
+    final Expr root = new RangeAccess(input, rt, ic);
 
     final AxisPath orig = (AxisPath) expr;
     final AxisPath path = orig.invertPath(root, ic.step);
@@ -157,7 +156,7 @@ final class CmpR extends Single {
     if(rt.type() == IndexType.ATV) {
       // add attribute step
       final Step step = orig.step[0];
-      Step[] steps = { Step.get(info, Axis.SELF, step.test) };
+      Step[] steps = { Step.get(input, Axis.SELF, step.test) };
       for(final Step s : path.step) steps = Array.add(steps, s);
       path.step = steps;
     }

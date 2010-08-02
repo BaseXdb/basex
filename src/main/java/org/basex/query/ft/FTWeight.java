@@ -6,12 +6,13 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
+import org.basex.query.util.Err;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * FTOptions expression.
@@ -25,12 +26,12 @@ public final class FTWeight extends FTExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    * @param w weight
    */
-  public FTWeight(final QueryInfo i, final FTExpr e, final Expr w) {
-    super(i, e);
+  public FTWeight(final InputInfo ii, final FTExpr e, final Expr w) {
+    super(ii, e);
     weight = w;
   }
 
@@ -70,7 +71,7 @@ public final class FTWeight extends FTExpr {
     // evaluate weight
     if(item == null) return null;
     final double d = checkDbl(weight, ctx);
-    if(Math.abs(d) > 1000) error(FTWEIGHT, d);
+    if(Math.abs(d) > 1000) Err.or(input, FTWEIGHT, d);
     if(d == 0) item.all.size = 0;
     item.score(item.score() * d);
     return item;

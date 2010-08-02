@@ -124,7 +124,7 @@ public final class QuerySuggest extends QueryParser {
   public void error(final Object[] err, final Object... arg)
       throws QueryException {
 
-    final QueryException qe = new QueryException(info(), err, arg);
+    final QueryException qe = new QueryException(input(), err, arg);
     qe.complete(this, complete());
     throw qe;
   }

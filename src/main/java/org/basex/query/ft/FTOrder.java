@@ -6,8 +6,8 @@ import org.basex.data.FTMatch;
 import org.basex.data.FTStringMatch;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
+import org.basex.util.InputInfo;
 import org.basex.util.Tokenizer;
 
 /**
@@ -19,11 +19,11 @@ import org.basex.util.Tokenizer;
 public final class FTOrder extends FTFilter {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    */
-  public FTOrder(final QueryInfo i, final FTExpr e) {
-    super(i, e);
+  public FTOrder(final InputInfo ii, final FTExpr e) {
+    super(ii, e);
   }
 
   @Override

@@ -1,10 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -15,6 +13,8 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -26,12 +26,12 @@ import org.basex.util.Token;
 public final class FNSimple extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNSimple(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNSimple(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -39,7 +39,7 @@ public final class FNSimple extends Fun {
     switch(func) {
       case ONEORMORE:
         final Iter ir = SeqIter.get(ctx.iter(expr[0]));
-        if(ir.size() < 1) error(EXP1M);
+        if(ir.size() < 1) Err.or(input, EXP1M);
         return ir;
       case UNORDER:
         return ctx.iter(expr[0]);
@@ -64,12 +64,12 @@ public final class FNSimple extends Fun {
         Iter iter = e.iter(ctx);
         Item it = iter.next();
         if(it == null) return null;
-        if(iter.next() != null) error(EXP01);
+        if(iter.next() != null) Err.or(input, EXP01);
         return it;
       case EXACTLYONE:
         iter = e.iter(ctx);
         it = iter.next();
-        if(it == null || iter.next() != null) error(EXP1);
+        if(it == null || iter.next() != null) Err.or(input, EXP1);
         return it;
       default:
         return super.atomic(ctx);
@@ -122,25 +122,26 @@ public final class FNSimple extends Fun {
    */
   private boolean deep(final QueryContext ctx) throws QueryException {
     if(expr.length == 3) checkColl(expr[2], ctx);
-    return deep(ctx.iter(expr[0]), ctx.iter(expr[1]));
+    return deep(input, ctx.iter(expr[0]), ctx.iter(expr[1]));
   }
 
   /**
    * Checks items for deep equality.
+   * @param ii input info
    * @param iter1 first iterator
    * @param iter2 second iterator
    * @return result of check
    * @throws QueryException query exception
    */
-  public static boolean deep(final Iter iter1, final Iter iter2)
-      throws QueryException {
+  public static boolean deep(final InputInfo ii, final Iter iter1,
+      final Iter iter2) throws QueryException {
 
     // [CG] check if namespaces references are correctly compared
     Item it1 = null;
     Item it2 = null;
     // explicit non-short-circuit..
     while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
-      if(!it1.equiv(it2)) return false;
+      if(!it1.equiv(ii, it2)) return false;
       if(!it1.node() && !it2.node()) continue;
 
       // comparing nodes

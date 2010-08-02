@@ -17,6 +17,8 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
 import org.basex.query.item.YMd;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Calculation.
@@ -28,18 +30,18 @@ public enum Calc {
   /** Addition. */
   PLUS("+") {
     @Override
-    public Item ev(final ParseExpr e, final Item a, final Item b)
+    public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
       final boolean t1 = a.unt() || a.num();
       final boolean t2 = b.unt() || b.num();
-      if(t1 ^ t2) errNum(e, !t1 ? a : b);
+      if(t1 ^ t2) errNum(ii, !t1 ? a : b);
       if(t1 && t2) {
         final Type t = type(a, b);
         if(t == Type.ITR) {
           final long l1 = a.itr();
           final long l2 = b.itr();
-          checkRange(e, l1 + (double) l2);
+          checkRange(ii, l1 + (double) l2);
           return Itr.get(l1 + l2);
         }
         if(t == Type.FLT) return Flt.get(a.flt() + b.flt());
@@ -48,23 +50,23 @@ public enum Calc {
       }
 
       if(a.type == b.type) {
-        if(!a.dur()) errNum(e, !t1 ? a : b);
+        if(!a.dur()) errNum(ii, !t1 ? a : b);
         if(a.type == Type.YMD) return new YMd((YMd) a, (YMd) b, true);
         if(a.type == Type.DTD) return new DTd((DTd) a, (DTd) b, true);
       }
-      if(a.type == Type.DTM) return new Dtm((Date) a, checkDur(e, b), true);
-      if(b.type == Type.DTM) return new Dtm((Date) b, checkDur(e, a), true);
-      if(a.type == Type.DAT) return new Dat((Date) a, checkDur(e, b), true);
-      if(b.type == Type.DAT) return new Dat((Date) b, checkDur(e, a), true);
+      if(a.type == Type.DTM) return new Dtm((Date) a, checkDur(ii, b), true);
+      if(b.type == Type.DTM) return new Dtm((Date) b, checkDur(ii, a), true);
+      if(a.type == Type.DAT) return new Dat((Date) a, checkDur(ii, b), true);
+      if(b.type == Type.DAT) return new Dat((Date) b, checkDur(ii, a), true);
       if(a.type == Type.TIM) {
-        if(b.type != Type.DTD) errType(e, Type.DTD, b);
+        if(b.type != Type.DTD) errType(ii, Type.DTD, b);
         return new Tim((Tim) a, (DTd) b, true);
       }
       if(b.type == Type.TIM) {
-        if(a.type != Type.DTD) errType(e, Type.DTD, b);
+        if(a.type != Type.DTD) errType(ii, Type.DTD, b);
         return new Tim((Tim) b, (DTd) a, true);
       }
-      errType(e, a.type, b);
+      errType(ii, a.type, b);
       return null;
     }
   },
@@ -72,18 +74,18 @@ public enum Calc {
   /** Subtraction. */
   MINUS("-") {
     @Override
-    public Item ev(final ParseExpr e, final Item a, final Item b)
+    public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
       final boolean t1 = a.unt() || a.num();
       final boolean t2 = b.unt() || b.num();
-      if(t1 ^ t2) errNum(e, !t1 ? a : b);
+      if(t1 ^ t2) errNum(ii, !t1 ? a : b);
       if(t1 && t2) {
         final Type t = type(a, b);
         if(t == Type.ITR) {
           final long l1 = a.itr();
           final long l2 = b.itr();
-          checkRange(e, l1 - (double) l2);
+          checkRange(ii, l1 - (double) l2);
           return Itr.get(l1 - l2);
         }
         if(t == Type.FLT) return Flt.get(a.flt() - b.flt());
@@ -96,15 +98,15 @@ public enum Calc {
           return new DTd((Date) a, (Date) b);
         if(a.type == Type.YMD) return new YMd((YMd) a, (YMd) b, false);
         if(a.type == Type.DTD) return new DTd((DTd) a, (DTd) b, false);
-        errNum(e, !t1 ? a : b);
+        errNum(ii, !t1 ? a : b);
       }
-      if(a.type == Type.DTM) return new Dtm((Date) a, checkDur(e, b), false);
-      if(a.type == Type.DAT) return new Dat((Date) a, checkDur(e, b), false);
+      if(a.type == Type.DTM) return new Dtm((Date) a, checkDur(ii, b), false);
+      if(a.type == Type.DAT) return new Dat((Date) a, checkDur(ii, b), false);
       if(a.type == Type.TIM) {
-        if(b.type != Type.DTD) errType(e, Type.DTD, b);
+        if(b.type != Type.DTD) errType(ii, Type.DTD, b);
         return new Tim((Tim) a, (DTd) b, false);
       }
-      errType(e, a.type, b);
+      errType(ii, a.type, b);
       return null;
     }
   },
@@ -112,42 +114,42 @@ public enum Calc {
   /** Multiplication. */
   MULT("*") {
     @Override
-    public Item ev(final ParseExpr e, final Item a, final Item b)
+    public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
       if(a.type == Type.YMD) {
-        if(!b.num()) errNum(e, b);
+        if(!b.num()) errNum(ii, b);
         return new YMd((Dur) a, b.dbl(), true);
       }
       if(b.type == Type.YMD) {
-        if(!a.num()) errNum(e, a);
+        if(!a.num()) errNum(ii, a);
         return new YMd((Dur) b, a.dbl(), true);
       }
       if(a.type == Type.DTD) {
-        if(!b.num()) errNum(e, b);
+        if(!b.num()) errNum(ii, b);
         return new DTd((Dur) a, b.dbl(), true);
       }
       if(b.type == Type.DTD) {
-        if(!a.num()) errNum(e, a);
+        if(!a.num()) errNum(ii, a);
         return new DTd((Dur) b, a.dbl(), true);
       }
 
       final boolean t1 = a.unt() || a.num();
       final boolean t2 = b.unt() || b.num();
-      if(t1 ^ t2) errType(e, a.type, b);
+      if(t1 ^ t2) errType(ii, a.type, b);
       if(t1 && t2) {
         final Type t = type(a, b);
         if(t == Type.ITR) {
           final long l1 = a.itr();
           final long l2 = b.itr();
-          checkRange(e, l1 * (double) l2);
+          checkRange(ii, l1 * (double) l2);
           return Itr.get(l1 * l2);
         }
         if(t == Type.FLT) return Flt.get(a.flt() * b.flt());
         if(t == Type.DBL) return Dbl.get(a.dbl() * b.dbl());
         return Dec.get(a.dec().multiply(b.dec()));
       }
-      errNum(e, !t1 ? a : b);
+      errNum(ii, !t1 ? a : b);
       return null;
     }
   },
@@ -155,40 +157,40 @@ public enum Calc {
   /** Division. */
   DIV("div") {
     @Override
-    public Item ev(final ParseExpr e, final Item a, final Item b)
+    public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
       if(a.type == b.type) {
         if(a.type == Type.YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMd) b).ymd());
-          if(bd.equals(BigDecimal.ZERO)) e.error(DATEZERO, info());
+          if(bd.equals(BigDecimal.ZERO)) Err.or(ii, DATEZERO, info());
           return Dec.get(BigDecimal.valueOf(((YMd) a).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(a.type == Type.DTD) {
           final BigDecimal bd = ((DTd) b).dtd();
-          if(bd.equals(BigDecimal.ZERO)) e.error(DATEZERO, info());
+          if(bd.equals(BigDecimal.ZERO)) Err.or(ii, DATEZERO, info());
           return Dec.get(((DTd) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
       }
       if(a.type == Type.YMD) {
-        if(!b.num()) errNum(e, b);
+        if(!b.num()) errNum(ii, b);
         return new YMd((Dur) a, b.dbl(), false);
       }
       if(a.type == Type.DTD) {
-        if(!b.num()) errNum(e, b);
+        if(!b.num()) errNum(ii, b);
         return new DTd((Dur) a, b.dbl(), false);
       }
 
-      checkNum(e, a, b);
+      checkNum(ii, a, b);
       final Type t = type(a, b);
       if(t == Type.DBL) return Dbl.get(a.dbl() / b.dbl());
       if(t == Type.FLT) return Flt.get(a.flt() / b.flt());
 
       final BigDecimal b1 = a.dec();
       final BigDecimal b2 = b.dec();
-      if(b2.signum() == 0) e.error(DIVZERO, a);
+      if(b2.signum() == 0) Err.or(ii, DIVZERO, a);
       final int s = Math.max(18, Math.max(b1.scale(), b2.scale()));
       return Dec.get(b1.divide(b2, s, BigDecimal.ROUND_HALF_EVEN));
     }
@@ -197,15 +199,15 @@ public enum Calc {
   /** Integer division. */
   IDIV("idiv") {
     @Override
-    public Item ev(final ParseExpr e, final Item a, final Item b)
+    public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
-      checkNum(e, a, b);
+      checkNum(ii, a, b);
       final double d1 = a.dbl();
       final double d2 = b.dbl();
-      if(d2 == 0) e.error(DIVZERO, a);
+      if(d2 == 0) Err.or(ii, DIVZERO, a);
       final double d = d1 / d2;
-      if(Double.isNaN(d) || Double.isInfinite(d)) e.error(DIVFLOW, d1, d2);
+      if(Double.isNaN(d) || Double.isInfinite(d)) Err.or(ii, DIVFLOW, d1, d2);
       return Itr.get(type(a, b) == Type.ITR ? a.itr() / b.itr() : (long) d);
     }
   },
@@ -213,10 +215,10 @@ public enum Calc {
   /** Modulo. */
   MOD("mod") {
     @Override
-    public Item ev(final ParseExpr e, final Item a, final Item b)
+    public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
-      checkNum(e, a, b);
+      checkNum(ii, a, b);
       final Type t = type(a, b);
       if(t == Type.DBL) return Dbl.get(a.dbl() % b.dbl());
       if(t == Type.FLT) return Flt.get(a.flt() % b.flt());
@@ -224,13 +226,13 @@ public enum Calc {
       if(t == Type.ITR) {
         final long b1 = a.itr();
         final long b2 = b.itr();
-        if(b2 == 0) e.error(DIVZERO, a);
+        if(b2 == 0) Err.or(ii, DIVZERO, a);
         return Itr.get(b1 % b2);
       }
 
       final BigDecimal b1 = a.dec();
       final BigDecimal b2 = b.dec();
-      if(b2.signum() == 0) e.error(DIVZERO, a);
+      if(b2.signum() == 0) Err.or(ii, DIVZERO, a);
       final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));
     }
@@ -249,13 +251,13 @@ public enum Calc {
 
   /**
    * Performs the calculation.
-   * @param e calling expression
+   * @param ii input info
    * @param a first item
    * @param b second item
    * @return result type
    * @throws QueryException query exception
    */
-  public abstract Item ev(final ParseExpr e, final Item a, final Item b)
+  public abstract Item ev(final InputInfo ii, final Item a, final Item b)
     throws QueryException;
 
   /**
@@ -273,60 +275,60 @@ public enum Calc {
 
   /**
    * Returns a type error.
-   * @param e calling expression
+   * @param ii input info
    * @param t expected type
    * @param it item
    * @throws QueryException query exception
    */
-  final void errType(final ParseExpr e, final Type t, final Item it)
+  final void errType(final InputInfo ii, final Type t, final Item it)
       throws QueryException {
-    e.typeError(info(), t, it);
+    Err.type(ii, info(), t, it);
   }
 
   /**
    * Returns a numeric type error.
-   * @param e calling expression
+   * @param ii input info
    * @param it item
    * @throws QueryException query exception
    */
-  final void errNum(final ParseExpr e, final Item it) throws QueryException {
-    e.error(XPTYPENUM, info(), it.type);
+  final void errNum(final InputInfo ii, final Item it) throws QueryException {
+    Err.or(ii, XPTYPENUM, info(), it.type);
   }
 
   /**
    * Returns a duration type error.
-   * @param e calling expression
+   * @param ii input info
    * @param it item
    * @return duration
    * @throws QueryException query exception
    */
-  final Dur checkDur(final ParseExpr e, final Item it) throws QueryException {
-    if(!it.dur()) e.error(XPDUR, info(), it.type);
+  final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
+    if(!it.dur()) Err.or(ii, XPDUR, info(), it.type);
     return (Dur) it;
   }
 
   /**
    * Checks if the specified items are numeric or untyped.
-   * @param e calling expression
+   * @param ii input info
    * @param a first item
    * @param b second item
    * @throws QueryException query exception
    */
-  final void checkNum(final ParseExpr e, final Item a,
+  final void checkNum(final InputInfo ii, final Item a,
       final Item b) throws QueryException {
-    if(!a.unt() && !a.num()) errNum(e, a);
-    if(!b.unt() && !b.num()) errNum(e, b);
+    if(!a.unt() && !a.num()) errNum(ii, a);
+    if(!b.unt() && !b.num()) errNum(ii, b);
   }
 
   /**
    * Checks if the specified value is outside the integer range.
-   * @param e calling expression
+   * @param ii input info
    * @param d value to be checked
    * @throws QueryException query exception
    */
-  final void checkRange(final ParseExpr e, final double d)
+  final void checkRange(final InputInfo ii, final double d)
       throws QueryException {
-    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) e.error(RANGE, d);
+    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(ii, RANGE, d);
   }
 
   /**

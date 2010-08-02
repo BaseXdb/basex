@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
@@ -16,6 +15,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Predicate expression.
@@ -31,12 +31,12 @@ public class Pred extends Preds {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param r expression
    * @param p predicates
    */
-  public Pred(final QueryInfo i, final Expr r, final Expr... p) {
-    super(i, p);
+  public Pred(final InputInfo ii, final Expr r, final Expr... p) {
+    super(ii, p);
     root = r;
   }
 
@@ -72,7 +72,7 @@ public class Pred extends Preds {
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // use iterative evaluation
     if(pred.length == 1 && (last || pos != null || !uses(Use.POS, ctx))) {
-      return new IterPred(info, root, pred, pos, last);
+      return new IterPred(input, root, pred, pos, last);
     }
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
@@ -86,9 +86,9 @@ public class Pred extends Preds {
     if(counter) {
       final Item it = pred[0].ebv(ctx);
       final long l = it.itr();
-      final Expr e = Pos.get(l, l);
+      final Expr e = Pos.get(l, l, input);
       return l != it.dbl() || e == Bln.FALSE ? Iter.EMPTY :
-        new IterPred(info, root, pred, (Pos) e, false).iter(ctx);
+        new IterPred(input, root, pred, (Pos) e, false).iter(ctx);
     }
 
     final Iter iter = ctx.iter(root);

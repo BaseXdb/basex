@@ -11,11 +11,11 @@ import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 
 /**
  * This index class retrieves texts and attribute values from the index.
@@ -31,14 +31,14 @@ public final class IndexAccess extends Single {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e index expression
    * @param t access type
    * @param ic index context
    */
-  public IndexAccess(final QueryInfo i, final Expr e, final IndexType t,
+  public IndexAccess(final InputInfo ii, final Expr e, final IndexType t,
       final IndexContext ic) {
-    super(i, e);
+    super(ii, e);
     type = t;
     ictx = ic;
   }
@@ -56,7 +56,7 @@ public final class IndexAccess extends Single {
       iter[s] = index(it.atom());
     }
     return iter.length == 0 ? Iter.EMPTY : iter.length == 1 ? iter[0] :
-      new Union(info, new Expr[] { expr }).eval(iter);
+      new Union(input, new Expr[] { expr }).eval(iter);
   }
 
   /**

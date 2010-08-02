@@ -5,13 +5,14 @@ import static org.basex.util.Token.*;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.XMLToken;
 
 /**
@@ -23,11 +24,11 @@ import org.basex.util.XMLToken;
 public abstract class CFrag extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param n name
    */
-  protected CFrag(final QueryInfo i, final Expr... n) {
-    super(i, n);
+  protected CFrag(final InputInfo ii, final Expr... n) {
+    super(ii, n);
   }
 
   @Override
@@ -46,8 +47,8 @@ public abstract class CFrag extends Arr {
       name = (QNm) i;
     } else {
       final byte[] nm = i.atom();
-      if(contains(nm, ' ')) error(INVAL, nm);
-      if(!XMLToken.isQName(nm)) error(NAMEWRONG, nm);
+      if(contains(nm, ' ')) Err.or(input, INVAL, nm);
+      if(!XMLToken.isQName(nm)) Err.or(input, NAMEWRONG, nm);
       name = new QNm(nm);
     }
 

@@ -15,6 +15,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.up.primitives.UpdatePrimitive;
+import org.basex.query.util.Err;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
@@ -71,7 +72,7 @@ public final class Updates {
 
     final boolean frag = p.node instanceof FNode;
     if(t && (frag || !refs.contains(((DBNode) p.node).data)))
-      p.parent.error(UPNOTCOPIED, p.node);
+      Err.or(p.input, UPNOTCOPIED, p.node);
 
     if(frag && fdata == null) fdata = new MemData(ctx.context.prop);
     final Data d = frag ? fdata : ((DBNode) p.node).data;
@@ -80,7 +81,7 @@ public final class Updates {
     if(prim == null) {
       // check permissions
       if(!t && !frag && !ctx.context.perm(User.WRITE, d.meta))
-        p.parent.error(PERMNO, CmdPerm.WRITE);
+        Err.or(p.input, PERMNO, CmdPerm.WRITE);
 
       prim = frag ? new FragPrimitives() : new DBPrimitives(d);
       primitives.put(d, prim);

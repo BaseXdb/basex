@@ -7,9 +7,9 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Bln;
 import org.basex.query.item.SeqType;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -24,12 +24,12 @@ public final class Instance extends Single {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    * @param s sequence type
    */
-  public Instance(final QueryInfo i, final Expr e, final SeqType s) {
-    super(i, e);
+  public Instance(final InputInfo ii, final Expr e, final SeqType s) {
+    super(ii, e);
     seq = s;
   }
 

@@ -11,7 +11,6 @@ import org.basex.io.TextInput;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.IndexAccess;
 import org.basex.query.ft.FTIndexAccess;
@@ -24,6 +23,8 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -35,12 +36,12 @@ import org.basex.util.TokenBuilder;
 final class FNBaseX extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNBaseX(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNBaseX(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -78,7 +79,7 @@ final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Item eval(final QueryContext ctx) throws QueryException {
-    return eval(ctx, checkStr(expr[0], ctx));
+    return eval(ctx, checkEStr(expr[0], ctx));
   }
 
   /**
@@ -92,7 +93,7 @@ final class FNBaseX extends Fun {
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
-      error(NODOC, ex.getMessage());
+      Err.or(input, NODOC, ex.getMessage());
       return null;
     }
   }
@@ -122,7 +123,7 @@ final class FNBaseX extends Fun {
     try {
       return Str.get(TextInput.content(checkIO(expr[0], ctx)).finish());
     } catch(final IOException ex) {
-      error(NODOC, ex.getMessage());
+      Err.or(input, NODOC, ex.getMessage());
       return null;
     }
   }
@@ -156,11 +157,11 @@ final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private DBNode db(final QueryContext ctx) throws QueryException {
-    DBNode node = ctx.doc(checkStr(expr[0], ctx), false, true);
+    DBNode node = ctx.doc(checkEStr(expr[0], ctx), false, true, input);
 
     if(expr.length == 2) {
       final int pre = (int) checkItr(expr[1], ctx);
-      if(pre < 0 || pre >= node.data.meta.size) error(NOPRE, pre);
+      if(pre < 0 || pre >= node.data.meta.size) Err.or(input, NOPRE, pre);
       node = new DBNode(node.data, pre);
     }
     return node;
@@ -174,7 +175,7 @@ final class FNBaseX extends Fun {
    */
   private Itr nodeId(final QueryContext ctx) throws QueryException {
     final Nod node = checkNode(expr[0].atomic(ctx));
-    if(!(node instanceof DBNode)) errType(Type.NOD, node);
+    if(!(node instanceof DBNode)) Err.type(this, Type.NOD, node);
     final DBNode dbnode = (DBNode) node;
     return Itr.get(dbnode.data.id(dbnode.pre));
   }
@@ -195,26 +196,26 @@ final class FNBaseX extends Fun {
    */
   private Iter index(final QueryContext ctx) throws QueryException {
     final Data data = ctx.data();
-    if(data == null) error(XPNOCTX, this);
+    if(data == null) Err.or(input, XPNOCTX, this);
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
-    final String type = string(checkStr(expr[1], ctx)).toLowerCase();
+    final String type = string(checkEStr(expr[1], ctx)).toLowerCase();
 
     if(type.equals(FULLTEXT)) {
-      if(!data.meta.ftxindex) error(NOIDX, FULLTEXT);
-      return new FTIndexAccess(info, new FTWords(info, data,
-          checkStr(expr[0], ctx), ctx.ftpos == null), ic).iter(ctx);
+      if(!data.meta.ftxindex) Err.or(input, NOIDX, FULLTEXT);
+      return new FTIndexAccess(input, new FTWords(input, data,
+          checkEStr(expr[0], ctx), ctx.ftpos == null), ic).iter(ctx);
     }
     if(type.equals(TEXT)) {
-      if(!data.meta.txtindex) error(NOIDX, TEXT);
-      return new IndexAccess(info, expr[0], IndexType.TXT, ic).iter(ctx);
+      if(!data.meta.txtindex) Err.or(input, NOIDX, TEXT);
+      return new IndexAccess(input, expr[0], IndexType.TXT, ic).iter(ctx);
     }
     if(type.equals(ATTRIBUTE)) {
-      if(!data.meta.atvindex) error(NOIDX, ATTRIBUTE);
-      return new IndexAccess(info, expr[0], IndexType.ATV, ic).iter(ctx);
+      if(!data.meta.atvindex) Err.or(input, NOIDX, ATTRIBUTE);
+      return new IndexAccess(input, expr[0], IndexType.ATV, ic).iter(ctx);
     }
 
-    error(WHICHIDX, type);
+    Err.or(input, WHICHIDX, type);
     return null;
   }
 }

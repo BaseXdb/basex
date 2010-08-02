@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.FElem;
@@ -18,6 +17,8 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -36,18 +37,18 @@ final class FNPat extends Fun {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNPat(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNPat(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case TOKEN:   return tokenize(checkStr(expr[0], ctx), ctx);
+      case TOKEN:   return tokenize(checkEStr(expr[0], ctx), ctx);
       default:      return super.iter(ctx);
     }
   }
@@ -55,9 +56,9 @@ final class FNPat extends Fun {
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case MATCH:   return matches(checkStr(expr[0], ctx), ctx);
-      case REPLACE: return replace(checkStr(expr[0], ctx), ctx);
-      case ANALZYE: return analyzeString(checkStr(expr[0], ctx), ctx);
+      case MATCH:   return matches(checkEStr(expr[0], ctx), ctx);
+      case REPLACE: return replace(checkEStr(expr[0], ctx), ctx);
+      case ANALZYE: return analyzeString(checkEStr(expr[0], ctx), ctx);
       default:      return super.atomic(ctx);
     }
   }
@@ -127,11 +128,11 @@ final class FNPat extends Fun {
   private Item replace(final byte[] val, final QueryContext ctx)
       throws QueryException {
 
-    final byte[] rep = checkEmptyStr(expr[2], ctx);
+    final byte[] rep = checkStr(expr[2], ctx);
     for(int i = 0; i < rep.length; i++) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          error(FUNREGREP);
+          Err.or(input, FUNREGREP);
         i++;
       }
     }
@@ -146,8 +147,8 @@ final class FNPat extends Fun {
       return Str.get(p.matcher(string(val)).replaceAll(r));
     } catch(final Exception ex) {
       final String m = ex.getMessage();
-      if(m.contains("No group")) error(REGROUP);
-      error(REGERR, m);
+      if(m.contains("No group")) Err.or(input, REGROUP);
+      Err.or(input, REGERR, m);
       return null;
     }
   }
@@ -189,10 +190,10 @@ final class FNPat extends Fun {
       final QueryContext ctx) throws QueryException {
 
     // process modifiers
-    byte[] pt = checkEmptyStr(pattern, ctx);
+    byte[] pt = checkStr(pattern, ctx);
     int m = Pattern.UNIX_LINES;
     if(mod != null) {
-      for(final byte b : checkEmptyStr(mod, ctx)) {
+      for(final byte b : checkStr(mod, ctx)) {
         if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         else if(b == 'm') m |= Pattern.MULTILINE;
         else if(b == 's') m |= Pattern.DOTALL;
@@ -207,7 +208,7 @@ final class FNPat extends Fun {
           }
           pt = tb.finish();
         } else {
-          error(REGMOD, (char) b);
+          Err.or(input, REGMOD, (char) b);
         }
       }
     }
@@ -251,7 +252,7 @@ final class FNPat extends Fun {
     try {
       return Pattern.compile(str, m);
     } catch(final Exception ex) {
-      error(REGINV, pt);
+      Err.or(input, REGINV, pt);
       return null;
     }
   }

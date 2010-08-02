@@ -9,10 +9,10 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -123,6 +123,14 @@ public abstract class Item extends Expr {
   }
 
   /**
+   * Checks if this is a date.
+   * @return result of check
+   */
+  public final boolean date() {
+    return this instanceof Date;
+  }
+
+  /**
    * Checks if this is a node.
    * @return result of check
    */
@@ -203,54 +211,65 @@ public abstract class Item extends Expr {
 
   /**
    * Checks the items for equality.
+   * @param ii input info
    * @param it item to be compared
    * @return result of check
    * @throws QueryException query exception
    */
-  public abstract boolean eq(final Item it) throws QueryException;
+  public abstract boolean eq(final InputInfo ii, final Item it)
+      throws QueryException;
 
   /**
    * Checks the items for equivalence.
+   * @param ii input info
    * @param it item to be compared
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean equiv(final Item it) throws QueryException {
+  public final boolean equiv(final InputInfo ii, final Item it)
+      throws QueryException {
+
+    // [CG] XQuery: check when/if comparable items may lead to exceptions
+
     // check if both values are NaN, or if values are equal..
     return (this == Dbl.NAN || this == Flt.NAN) && it.num() &&
-        Double.isNaN(it.dbl()) || comparable(it) && eq(it);
+        Double.isNaN(it.dbl()) || comparable(it) && eq(ii, it);
   }
   /**
    * Checks the items for equivalence.
    * Empty sequence is equivalent to Empty Sequence.
+   * @param ii input info
    * @param it item to be compared
    * @return result of check
    * @throws QueryException query exception
    */
-  public final boolean equive(final Item it) throws QueryException {
+  public final boolean equive(final InputInfo ii, final Item it)
+      throws QueryException {
     // check if both values empty otherwise equivalence
-    return (it.empty() && this.empty()) || equiv(it);
+    return (it.empty() && this.empty()) || equiv(ii, it);
   }
 
   /**
    * Checks if the items can be compared.
+   * Items are comparable
    * @param b second item
    * @return result of check
    */
-  public boolean comparable(final Item b) {
+  public final boolean comparable(final Item b) {
     return type == b.type || num() && b.num() || (unt() || str()) &&
       (b.str() || b.unt()) || dur() && b.dur();
   }
 
   /**
    * Returns the difference between the current and the specified item.
-   * @param e calling expression
+   * @param ii input info
    * @param it item to be compared
    * @return difference
    * @throws QueryException query exception
    */
-  public int diff(final ParseExpr e, final Item it) throws QueryException {
-    e.diffError(it, this);
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
+    if(this == it) Err.or(ii, TYPECMP, type);
+    else Err.or(ii, XPTYPECMP, type, it.type);
     return 0;
   }
 
@@ -277,6 +296,18 @@ public abstract class Item extends Expr {
    */
   protected final void castErr(final Object val) throws QueryException {
     Err.or(FUNCAST, type, val);
+  }
+
+  /**
+   * Throws a date format exception.
+   * @param i input
+   * @param t expected type
+   * @param ex example format
+   * @throws QueryException query exception
+   */
+  public static void dateErr(final byte[] i, final Type t, final String ex)
+      throws QueryException {
+    Err.or(DATEFORMAT, t, i, ex);
   }
 
   /**

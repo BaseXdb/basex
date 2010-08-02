@@ -24,7 +24,7 @@ public abstract class ExprInfo {
    * in the output.
    * @return result of check
    */
-  public String info() {
+  public String desc() {
     return name() + " expression";
   }
 

@@ -6,10 +6,10 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Implementation of the group by clause.
@@ -36,11 +36,11 @@ public final class Group extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param gb group by expression
    */
-  public Group(final QueryInfo i, final GroupBy[] gb) {
-    super(i);
+  public Group(final InputInfo ii, final GroupBy[] gb) {
+    super(ii);
     groupby = gb;
 
   }

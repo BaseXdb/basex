@@ -7,13 +7,14 @@ import java.util.regex.PatternSyntaxException;
 import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -25,12 +26,12 @@ import org.basex.util.Token;
 final class FNFile extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNFile(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNFile(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -50,7 +51,7 @@ final class FNFile extends Fun {
     checkAdmin(ctx);
 
     final File path = expr.length == 0 ? null : new File(
-        Token.string(checkStr(expr[0].atomic(ctx))));
+        Token.string(checkStrEmp(expr[0].atomic(ctx))));
 
     switch(func) {
       case MKDIR:
@@ -84,14 +85,14 @@ final class FNFile extends Fun {
    */
   private Iter listFiles(final QueryContext ctx) throws QueryException {
 
-    final String path = Token.string(checkEmptyStr(expr[0], ctx));
+    final String path = Token.string(checkStr(expr[0], ctx));
 
     final Pattern pattern;
     try {
-      pattern = expr.length == 2 ? Pattern.compile(Token.string(checkEmptyStr(
-          expr[1], ctx))) : null;
+      pattern = expr.length == 2 ?
+          Pattern.compile(Token.string(checkStr(expr[1], ctx))) : null;
     } catch(PatternSyntaxException ex) {
-      error(QueryText.FILEPATTERN, expr[1]);
+      Err.or(input, QueryText.FILEPATTERN, expr[1]);
       return null;
     }
 
@@ -107,7 +108,7 @@ final class FNFile extends Fun {
     });
 
     if(files == null) {
-      error(QueryText.FILELIST, path);
+      Err.or(input, QueryText.FILELIST, path);
     }
 
     return new Iter() {

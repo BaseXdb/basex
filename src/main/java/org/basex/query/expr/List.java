@@ -2,12 +2,12 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -19,11 +19,11 @@ import org.basex.util.TokenBuilder;
 public final class List extends Arr {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param l expression list
    */
-  public List(final QueryInfo i, final Expr... l) {
-    super(i, l);
+  public List(final InputInfo ii, final Expr... l) {
+    super(ii, l);
   }
 
   @Override

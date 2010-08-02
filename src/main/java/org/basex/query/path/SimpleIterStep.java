@@ -3,13 +3,14 @@ package org.basex.query.path;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Iterative step expression without predicates.
@@ -20,12 +21,12 @@ import org.basex.query.iter.NodeIter;
 final class SimpleIterStep extends Step {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param a axis
    * @param t node test
    */
-  SimpleIterStep(final QueryInfo i, final Axis a, final Test t) {
-    super(i, a, t);
+  SimpleIterStep(final InputInfo ii, final Axis a, final Test t) {
+    super(ii, a, t);
   }
 
   @Override
@@ -46,7 +47,9 @@ final class SimpleIterStep extends Step {
           if(ir == null) {
             final Item it = iter.next();
             if(it == null) return null;
-            if(!it.node()) error(NODESPATH, SimpleIterStep.this, it.type);
+            if(!it.node()) {
+              Err.or(input, NODESPATH, SimpleIterStep.this, it.type);
+            }
             ir = axis.init((Nod) it);
           }
           final Nod n = ir.next();

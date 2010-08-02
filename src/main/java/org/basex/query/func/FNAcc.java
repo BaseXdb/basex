@@ -3,7 +3,6 @@ package org.basex.query.func;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
@@ -13,6 +12,7 @@ import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 
 /**
  * Accessor functions.
@@ -23,12 +23,12 @@ import org.basex.query.iter.Iter;
 final class FNAcc extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNAcc(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNAcc(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -49,9 +49,9 @@ final class FNAcc extends Fun {
         it = ir.next();
         return it == null || ir.next() != null ? Dbl.NAN : number(it);
       case STRLEN:
-        return Itr.get(len(checkStr(e, ctx)));
+        return Itr.get(len(checkEStr(e, ctx)));
       case NORM:
-        return Str.get(norm(checkStr(e, ctx)));
+        return Str.get(norm(checkEStr(e, ctx)));
       case URIQNAME:
         it = e.atomic(ctx);
         if(it == null) return null;

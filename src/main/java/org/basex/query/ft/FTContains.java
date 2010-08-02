@@ -7,7 +7,6 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.CmpG;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
@@ -21,6 +20,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.Tokenizer;
 
 /**
@@ -41,10 +41,10 @@ public class FTContains extends ParseExpr {
    * Constructor.
    * @param e expression
    * @param fte full-text expression
-   * @param i query info
+   * @param ii input info
    */
-  public FTContains(final Expr e, final FTExpr fte, final QueryInfo i) {
-    super(i);
+  public FTContains(final Expr e, final FTExpr fte, final InputInfo ii) {
+    super(ii);
     expr = e;
     ftexpr = fte;
   }
@@ -118,10 +118,10 @@ public class FTContains extends ParseExpr {
     final FTExpr ie = ftexpr.indexEquivalent(ic);
 
     // sequential evaluation with index access
-    if(ic.seq) return new FTContainsIndex(info, expr, ie, ic);
+    if(ic.seq) return new FTContainsIndex(input, expr, ie, ic);
 
     // standard index evaluation; first expression will always be an axis path
-    return ((AxisPath) expr).invertPath(new FTIndexAccess(info, ie, ic),
+    return ((AxisPath) expr).invertPath(new FTIndexAccess(input, ie, ic),
         ic.step);
   }
 

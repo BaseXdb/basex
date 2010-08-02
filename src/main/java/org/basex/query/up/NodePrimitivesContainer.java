@@ -61,7 +61,7 @@ final class NodePrimitivesContainer implements NodePrimitives {
   }
 
   @Override
-  public UpdatePrimitive findSpecific(final PrimitiveType t) {
+  public UpdatePrimitive find(final PrimitiveType t) {
     for(final UpdatePrimitive p : primitives) if(p.type() == t) return p;
     return null;
   }

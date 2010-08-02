@@ -2,7 +2,7 @@ package org.basex.query.item;
 
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -55,12 +55,12 @@ public final class Jav extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) {
+  public boolean eq(final InputInfo ii, final Item it) {
     return Token.eq(atom(), it.atom());
   }
 
   @Override
-  public int diff(final ParseExpr e, final Item it) {
+  public int diff(final InputInfo ii, final Item it) {
     return Token.diff(atom(), it.atom());
   }
 

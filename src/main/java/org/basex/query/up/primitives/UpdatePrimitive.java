@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
@@ -14,6 +13,7 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.up.NamePool;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -25,16 +25,16 @@ import org.basex.util.TokenBuilder;
 public abstract class UpdatePrimitive {
   /** Target node of update expression. */
   public final Nod node;
-  /** Updating expression. */
-  public final ParseExpr parent;
+  /** Input information. */
+  public final InputInfo input;
 
   /**
    * Constructor.
-   * @param u updating expression
+   * @param ii input info
    * @param n DBNode reference
    */
-  protected UpdatePrimitive(final ParseExpr u, final Nod n) {
-    parent = u;
+  protected UpdatePrimitive(final InputInfo ii, final Nod n) {
+    input = ii;
     node = n;
   }
 

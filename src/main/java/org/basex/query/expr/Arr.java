@@ -5,11 +5,11 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Abstract array expression.
@@ -23,11 +23,11 @@ public abstract class Arr extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression list
    */
-  protected Arr(final QueryInfo i, final Expr... e) {
-    super(i);
+  protected Arr(final InputInfo ii, final Expr... e) {
+    super(ii);
     expr = e;
   }
 

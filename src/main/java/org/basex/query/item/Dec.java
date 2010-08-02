@@ -5,8 +5,8 @@ import static org.basex.util.Token.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -98,13 +98,13 @@ public final class Dec extends Item {
   }
 
   @Override
-  public boolean eq(final Item it) throws QueryException {
-    return it.type == Type.DBL || it.type == Type.FLT ? it.eq(this) :
+  public boolean eq(final InputInfo ii, final Item it) throws QueryException {
+    return it.type == Type.DBL || it.type == Type.FLT ? it.eq(ii, this) :
       val.compareTo(it.dec()) == 0;
   }
 
   @Override
-  public int diff(final ParseExpr e, final Item it) throws QueryException {
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
     final double d = it.dbl();
     return d == 1 / 0.0 ? -1 : d == -1 / 0.0 ? 1 :
       d != d ? UNDEF : val.compareTo(it.dec());
@@ -132,7 +132,8 @@ public final class Dec extends Item {
    * @throws QueryException query exception
    */
   static BigDecimal parse(final double val) throws QueryException {
-    if(val != val || val == 1 / 0d || val == -1 / 0d) Err.value(Type.DEC, val);
+    if(val != val || val == 1 / 0d || val == -1 / 0d)
+      Err.or(INVALUE, Type.DEC, val);
     return BigDecimal.valueOf(val);
   }
 

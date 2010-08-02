@@ -7,10 +7,10 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -109,13 +109,14 @@ public class Seq extends Item {
   }
 
   @Override
-  public final boolean eq(final Item it) throws QueryException {
+  public final boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
     castErr(it);
     return false;
   }
 
   @Override
-  public final int diff(final ParseExpr e, final Item it) {
+  public final int diff(final InputInfo ii, final Item it) {
     Main.notexpected();
     return 0;
   }

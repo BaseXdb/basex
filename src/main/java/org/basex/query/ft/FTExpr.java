@@ -5,13 +5,13 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.FTIter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * This class defines is an abstract class for full-text expressions.
@@ -25,11 +25,11 @@ public abstract class FTExpr extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param e expression
    */
-  protected FTExpr(final QueryInfo i, final FTExpr... e) {
-    super(i);
+  protected FTExpr(final InputInfo ii, final FTExpr... e) {
+    super(ii);
     expr = e;
   }
 

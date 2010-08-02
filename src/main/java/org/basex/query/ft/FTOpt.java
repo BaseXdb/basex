@@ -10,7 +10,9 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
+import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
 
 /**
@@ -49,6 +51,8 @@ public final class FTOpt extends ExprInfo {
   /** States which flags are assigned. */
   private final boolean[] set = new boolean[flag.length];
 
+  /** Cached tokens. */
+  private final TokenList query = new TokenList();
   /** Levenshtein reference. */
   private Levenshtein ls;
   /** Full-text tokenizer. */
@@ -144,14 +148,19 @@ public final class FTOpt extends ExprInfo {
     qu.dc = tk.dc;
     qu.cs = tk.cs;
     qu.sd = tk.sd;
-    // the following options only apply to the query terms..
+    // the following options only apply to the query terms
     qu.uc = is(UC);
     qu.lc = is(LC);
     qu.wc = is(WC);
     qu.fz = is(FZ);
-
     if(qu.fz && ls == null) ls = new Levenshtein();
 
+    // cache query tokens
+    query.reset();
+    qu.init();
+    while(qu.more()) query.add(qu.get());
+
+    // iterate through all input tokens
     int c = 0;
     while(tk.more()) {
       final int tp = tk.p;
@@ -160,34 +169,35 @@ public final class FTOpt extends ExprInfo {
       boolean f = false;
       boolean m = false;
       qu.init();
-      while(qu.more()) {
+      int i = -1;
+      while(++i  < query.size()) {
         if(m) {
           tk.more();
           t = tk.get();
         } else {
           m = true;
         }
-        final byte[] s = qu.get();
+        final byte[] s = query.get(i);
         if(sw != null && sw.id(s) != 0) continue;
 
-        f = qu.fz ? ls.similar(t, s, lserr) : qu.wc ? wc(t, s, 0, 0) : eq(t, s);
+        f = qu.fz ? ls.similar(t, s, lserr) : qu.wc ?
+            wc(words.input, t, s, 0, 0) : eq(t, s);
         if(!f) break;
       }
 
       if(!f && th != null) {
-        final byte[] tmp = qu.text;
-        for(final byte[] txt : th.find(qu)) {
+        i = 0;
+        for(final byte[] txt : th.find(words.input, qu)) {
           qu.init(txt);
           qu.more();
           f |= eq(qu.get(), t);
           if(f) break;
         }
-        qu.text = tmp;
       }
 
       if(f) {
         c++;
-        if(words.add(tpos, tpos + qu.pos - 1)) break;
+        if(words.add(tpos, tpos + i - 1)) break;
       }
       tk.p = tp;
       tk.pos = tpos;
@@ -200,6 +210,7 @@ public final class FTOpt extends ExprInfo {
 
   /**
    * Performs a wildcard search.
+   * @param ii input info
    * @param t text token
    * @param q query token
    * @param tp input position
@@ -207,8 +218,8 @@ public final class FTOpt extends ExprInfo {
    * @return result of check, or -1 for a negative match
    * @throws QueryException query exception
    */
-  private boolean wc(final byte[] t, final byte[] q, final int tp, final int qp)
-      throws QueryException {
+  private boolean wc(final InputInfo ii, final byte[] t, final byte[] q,
+      final int tp, final int qp) throws QueryException {
 
     int ql = qp;
     int tl = tp;
@@ -233,13 +244,13 @@ public final class FTOpt extends ExprInfo {
             c = ++ql < q.length ? q[ql] : 0;
             if(c >= '0' && c <= '9') n = (n << 3) + (n << 1) + c - '0';
             else if(c == ',') break;
-            else Err.or(FTREG, q);
+            else Err.or(ii, FTREG, q);
           }
           while(true) {
             c = ++ql < q.length ? q[ql] : 0;
             if(c >= '0' && c <= '9') m = (m << 3) + (m << 1) + c - '0';
             else if(c == '}') break;
-            else Err.or(FTREG, q);
+            else Err.or(ii, FTREG, q);
           }
           ++ql;
         } else { // .
@@ -247,11 +258,11 @@ public final class FTOpt extends ExprInfo {
           n = 1;
         }
         // recursively evaluates wildcards (non-greedy)
-        while(!wc(t, q, tl + n, ql)) if(tl + ++n > t.length) return false;
+        while(!wc(ii, t, q, tl + n, ql)) if(tl + ++n > t.length) return false;
         if(n > m) return false;
         tl += n;
       } else {
-        if(q[ql] == '\\' && ++ql == q.length) Err.or(FTREG, q);
+        if(q[ql] == '\\' && ++ql == q.length) Err.or(ii, FTREG, q);
         if(tl >= t.length || t[tl++] != q[ql++]) return false;
       }
     }

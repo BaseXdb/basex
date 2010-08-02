@@ -3,7 +3,7 @@ package org.basex.query.item;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -98,12 +98,13 @@ public class Itr extends Item {
   }
 
   @Override
-  public final boolean eq(final Item it) throws QueryException {
+  public final boolean eq(final InputInfo ii, final Item it)
+      throws QueryException {
     return it instanceof Itr ? val == ((Itr) it).val : val == it.dbl();
   }
 
   @Override
-  public final int diff(final ParseExpr e, final Item it)
+  public final int diff(final InputInfo ii, final Item it)
       throws QueryException {
 
     if(it instanceof Itr) {

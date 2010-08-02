@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
@@ -14,6 +13,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
+import org.basex.util.InputInfo;
 
 /**
  * Typeswitch expression.
@@ -29,12 +29,12 @@ public final class TypeSwitch extends ParseExpr {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param t typeswitch expression
    * @param c case expressions
    */
-  public TypeSwitch(final QueryInfo i, final Expr t, final TypeCase[] c) {
-    super(i);
+  public TypeSwitch(final InputInfo ii, final Expr t, final TypeCase[] c) {
+    super(ii);
     ts = t;
     cs = c;
   }
@@ -44,9 +44,9 @@ public final class TypeSwitch extends ParseExpr {
     ts = checkUp(ts, ctx).comp(ctx);
     for(final TypeCase c : cs) c.comp(ctx);
 
-    boolean em = true;
-    for(final TypeCase c : cs) em &= c.empty();
-    if(em) {
+    boolean ii = true;
+    for(final TypeCase c : cs) ii &= c.empty();
+    if(ii) {
       ctx.compInfo(OPTTRUE);
       return Seq.EMPTY;
     }

@@ -1,9 +1,14 @@
 package org.basex.query.item;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
+import org.basex.query.QueryException;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
+
 import static org.basex.util.Token.*;
 import org.w3c.dom.ProcessingInstruction;
 
@@ -14,6 +19,9 @@ import org.w3c.dom.ProcessingInstruction;
  * @author Christian Gruen
  */
 public final class FPI extends FNode {
+  /** Closing processing instruction. */
+  private static final byte[] CLOSE = { '?', '>' };
+
   /** PI name. */
   private final QNm name;
 
@@ -68,5 +76,19 @@ public final class FPI extends FNode {
   @Override
   public String toString() {
     return Main.info("<?% %?>", name.atom(), val);
+  }
+
+  /**
+   * Checks the specified token for validity.
+   * @param atom token to be checked
+   * @param ii input info
+   * @return token
+   * @throws QueryException query exception
+   */
+  public static byte[] parse(final byte[] atom, final InputInfo ii)
+      throws QueryException {
+
+    if(contains(atom, CLOSE)) Err.or(ii, CPICONT, atom);
+    return atom;
   }
 }

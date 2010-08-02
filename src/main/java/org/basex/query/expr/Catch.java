@@ -2,12 +2,12 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
@@ -24,14 +24,14 @@ public final class Catch extends Single {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param ct catch expression
    * @param c supported error codes
    * @param v variables
    */
-  public Catch(final QueryInfo i, final Expr ct, final QNm[] c,
+  public Catch(final InputInfo ii, final Expr ct, final QNm[] c,
       final Var... v) {
-    super(i, ct);
+    super(ii, ct);
     codes = c;
     var = v;
   }

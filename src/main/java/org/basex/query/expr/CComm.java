@@ -1,15 +1,13 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
-import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FComm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -19,16 +17,13 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class CComm extends CFrag {
-  /** Two dashes, marking the start/end of a comment. */
-  private static final byte[] DASHES = { '-', '-' };
-
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param c comment
    */
-  public CComm(final QueryInfo i, final Expr c) {
-    super(i, c);
+  public CComm(final InputInfo ii, final Expr c) {
+    super(ii, c);
   }
 
   @Override
@@ -43,25 +38,11 @@ public final class CComm extends CFrag {
       tb.add(it.atom());
       more = true;
     }
-    return new FComm(check(this, tb.finish()), null);
-  }
-
-  /**
-   * Checks the specified token for validity.
-   * @param e calling expression
-   * @param atom token to be checked
-   * @return token
-   * @throws QueryException query exception
-   */
-  public static byte[] check(final ParseExpr e, final byte[] atom)
-      throws QueryException {
-
-    if(contains(atom, DASHES) || endsWith(atom, '-')) e.error(COMINVALID, atom);
-    return atom;
+    return new FComm(FComm.parse(tb.finish(), input), null);
   }
 
   @Override
-  public String info() {
+  public String desc() {
     return info(QueryTokens.COMMENT);
   }
 

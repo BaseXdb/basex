@@ -6,13 +6,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * FLWOR clause.
@@ -36,12 +36,12 @@ public class FLWOR extends ParseExpr {
    * @param w where clause
    * @param o order expression
    * @param r return expression
-   * @param i query info
+   * @param ii input info
    */
   public FLWOR(final ForLet[] f, final Expr w, final Order o, final Expr r,
-      final QueryInfo i) {
+      final InputInfo ii) {
 
-    super(i);
+    super(ii);
     ret = r;
     fl = f;
     where = w;
@@ -61,14 +61,14 @@ public class FLWOR extends ParseExpr {
       ctx.ftfast = fast;
     }
 
-    boolean em = false;
+    boolean ii = false;
     if(where != null) {
       where = checkUp(where, ctx).comp(ctx);
-      em = where.empty();
-      if(!em && where.item()) {
+      ii = where.empty();
+      if(!ii && where.item()) {
         // test is always false: no results
-        em = !((Item) where).bool();
-        if(!em) {
+        ii = !((Item) where).bool();
+        if(!ii) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
           where = null;
@@ -80,7 +80,7 @@ public class FLWOR extends ParseExpr {
     ret = ret.comp(ctx);
     ctx.vars.reset(vs);
 
-    if(em) {
+    if(ii) {
       ctx.compInfo(OPTFALSE, where);
       return Seq.EMPTY;
     }

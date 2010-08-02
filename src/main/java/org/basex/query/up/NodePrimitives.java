@@ -27,5 +27,5 @@ interface NodePrimitives extends Iterable<UpdatePrimitive> {
    * @param t type of the primitive to find
    * @return primitive of type t or null if not found
    */
-  UpdatePrimitive findSpecific(final PrimitiveType t);
+  UpdatePrimitive find(final PrimitiveType t);
 }

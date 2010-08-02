@@ -241,7 +241,7 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final NodeIter desc() {
+  public final NodeIter descendant() {
     return new NodeIter() {
       int k = data.kind(pre);
       int p = pre + data.attSize(pre, k);

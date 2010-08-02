@@ -102,7 +102,7 @@ public abstract class FNode extends Nod {
   }
 
   @Override
-  public final NodeIter desc() {
+  public final NodeIter descendant() {
     return desc(false);
   }
 

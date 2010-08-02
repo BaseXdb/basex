@@ -4,8 +4,8 @@ import static org.basex.query.QueryText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryException;
-import org.basex.query.expr.ParseExpr;
 import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
@@ -51,8 +51,8 @@ public final class YMd extends Dur {
       throws QueryException {
 
     this(it);
-    if(f != f) Err.or(DATECALC, info(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, info());
+    if(f != f) Err.or(DATECALC, desc(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, desc());
     mon = (int) Math.round(m ? mon * f : mon / f);
   }
 
@@ -65,7 +65,7 @@ public final class YMd extends Dur {
     super(Type.YMD);
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P")) Err.date(v, type, XYMD);
+    if(!mt.matches() || val.endsWith("P")) dateErr(v, type, XYMD);
 
     final int y = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
     final int m = mt.group(4) != null ? Token.toInt(mt.group(5)) : 0;
@@ -94,8 +94,8 @@ public final class YMd extends Dur {
   }
 
   @Override
-  public int diff(final ParseExpr e, final Item it) throws QueryException {
-    if(it.type != type) e.diffError(it, this);
+  public int diff(final InputInfo ii, final Item it) throws QueryException {
+    if(it.type != type) Err.diff(ii, it, this);
     return mon - ((Dur) it).mon;
   }
 

@@ -5,13 +5,14 @@ import static org.basex.util.Token.*;
 import java.util.Arrays;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -27,12 +28,12 @@ final class FNStr extends Fun {
 
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNStr(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNStr(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -59,13 +60,13 @@ final class FNStr extends Fun {
         Item it1 = e.atomic(ctx);
         Item it2 = expr[1].atomic(ctx);
         if(it1 == null || it2 == null) return null;
-        final int d = diff(checkStr(it1), checkStr(it2));
+        final int d = diff(checkStrEmp(it1), checkStrEmp(it2));
         return Itr.get(Math.max(-1, Math.min(1, d)));
       case CODEPNT:
         it1 = e.atomic(ctx);
         it2 = expr[1].atomic(ctx);
         if(it1 == null || it2 == null) return null;
-        return Bln.get(eq(checkStr(it1), checkStr(it2)));
+        return Bln.get(eq(checkStrEmp(it1), checkStrEmp(it2)));
       case STRJOIN:
         return strjoin(ctx);
       case SUBSTR:
@@ -73,45 +74,45 @@ final class FNStr extends Fun {
       case NORMUNI:
         return normuni(ctx);
       case UPPER:
-        return Str.get(uc(checkStr(e, ctx)));
+        return Str.get(uc(checkEStr(e, ctx)));
       case LOWER:
-        return Str.get(lc(checkStr(e, ctx)));
+        return Str.get(lc(checkEStr(e, ctx)));
       case TRANS:
         return trans(ctx);
       case ENCURI:
-        return Str.get(uri(checkStr(e, ctx), false));
+        return Str.get(uri(checkEStr(e, ctx), false));
       case IRIURI:
-        return Str.get(uri(checkStr(e, ctx), true));
+        return Str.get(uri(checkEStr(e, ctx), true));
       case ESCURI:
-        return Str.get(escape(checkStr(e, ctx)));
+        return Str.get(escape(checkEStr(e, ctx)));
       case CONCAT:
         return concat(ctx);
       case CONTAINS:
         if(expr.length == 3) checkColl(expr[2], ctx);
         Item it = expr[1].atomic(ctx);
         if(it == null) return Bln.TRUE;
-        return Bln.get(contains(checkStr(e, ctx), checkStr(it)));
+        return Bln.get(contains(checkEStr(e, ctx), checkStrEmp(it)));
       case STARTS:
         if(expr.length == 3) checkColl(expr[2], ctx);
         it = expr[1].atomic(ctx);
         if(it == null) return Bln.TRUE;
-        return Bln.get(startsWith(checkStr(e, ctx), checkStr(it)));
+        return Bln.get(startsWith(checkEStr(e, ctx), checkStrEmp(it)));
       case ENDS:
         if(expr.length == 3) checkColl(expr[2], ctx);
         it = expr[1].atomic(ctx);
         if(it == null) return Bln.TRUE;
-        return Bln.get(endsWith(checkStr(e, ctx), checkStr(it)));
+        return Bln.get(endsWith(checkEStr(e, ctx), checkStrEmp(it)));
       case SUBAFTER:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        final byte[] str = checkStr(e, ctx);
-        final byte[] sa = checkStr(expr[1], ctx);
+        final byte[] str = checkEStr(e, ctx);
+        final byte[] sa = checkEStr(expr[1], ctx);
         final int pa = indexOf(str, sa);
         return pa != -1 ? Str.get(substring(str, pa + sa.length)) :
           Str.ZERO;
       case SUBBEFORE:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        final byte[] sb = checkStr(e, ctx);
-        final int pb = indexOf(sb, checkStr(expr[1], ctx));
+        final byte[] sb = checkEStr(e, ctx);
+        final int pb = indexOf(sb, checkEStr(expr[1], ctx));
         return pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO;
       default:
         return super.atomic(ctx);
@@ -125,22 +126,22 @@ final class FNStr extends Fun {
     // optimize frequently used functions
     switch(func) {
       case UPPER:
-        return e.item() ? Str.get(uc(checkStr(e, ctx))) : this;
+        return e.item() ? Str.get(uc(checkEStr(e, ctx))) : this;
       case LOWER:
-        return e.item() ? Str.get(lc(checkStr(e, ctx))) : this;
+        return e.item() ? Str.get(lc(checkEStr(e, ctx))) : this;
       case CONCAT:
         for(final Expr a : expr) if(!a.item()) return this;
         return concat(ctx);
       case CONTAINS:
         if(expr.length == 2) {
-          final byte[] i = expr[1].item() ? checkStr((Item) expr[1]) : null;
+          final byte[] i = expr[1].item() ? checkStrEmp((Item) expr[1]) : null;
           // empty query string: return true
           if(expr[1].empty() || i != null && i.length == 0) return Bln.TRUE;
           // empty input string: return false
           if(e.empty() && i != null && i.length != 0) return Bln.FALSE;
           // evaluate items
           if(e.item() && expr[1].item()) return Bln.get(contains(
-              checkStr(e, ctx), checkStr((Item) expr[1])));
+              checkEStr(e, ctx), checkStrEmp((Item) expr[1])));
         }
         return this;
       default:
@@ -159,7 +160,7 @@ final class FNStr extends Fun {
     Item i;
     while((i = iter.next()) != null) {
       final long n = checkItr(i);
-      if(!XMLToken.valid(n)) error(INVCODE, i);
+      if(!XMLToken.valid(n)) Err.or(input, INVCODE, i);
       tb.addUTF((int) n);
     }
     return Str.get(tb.finish());
@@ -173,7 +174,7 @@ final class FNStr extends Fun {
    */
   private Iter str2cp(final Item it) throws QueryException {
     if(it == null) return Iter.EMPTY;
-    final byte[] s = checkStr(it);
+    final byte[] s = checkStrEmp(it);
 
     return new Iter() {
       int l;
@@ -196,7 +197,7 @@ final class FNStr extends Fun {
   private Item substr(final QueryContext ctx) throws QueryException {
     // normalize positions
     final double ds = checkDbl(expr[1], ctx);
-    final byte[] str = checkStr(expr[0], ctx);
+    final byte[] str = checkEStr(expr[0], ctx);
     if(ds != ds) return Str.ZERO;
 
     final boolean end = expr.length == 3;
@@ -239,9 +240,9 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Item trans(final QueryContext ctx) throws QueryException {
-    final String tok = string(checkStr(expr[0], ctx));
-    final String srch = string(checkEmptyStr(expr[1], ctx));
-    final String rep = string(checkEmptyStr(expr[2], ctx));
+    final String tok = string(checkEStr(expr[0], ctx));
+    final String srch = string(checkStr(expr[1], ctx));
+    final String rep = string(checkStr(expr[2], ctx));
 
     final int l = tok.length();
     final TokenBuilder tmp = new TokenBuilder(l);
@@ -266,14 +267,15 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Item strjoin(final QueryContext ctx) throws QueryException {
-    final byte[] sep = expr.length == 2 ? checkEmptyStr(expr[1], ctx) : EMPTY;
+    final byte[] sep = expr.length == 2 ?
+        checkStr(expr[1], ctx) : EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     final Iter iter = expr[0].iter(ctx);
     int c = 0;
     Item i;
     while((i = iter.next()) != null) {
-      tb.add(checkStr(i));
+      tb.add(checkStrEmp(i));
       tb.add(sep);
       c++;
     }
@@ -288,12 +290,12 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Item normuni(final QueryContext ctx) throws QueryException {
-    final byte[] str = checkStr(expr[0], ctx);
+    final byte[] str = checkEStr(expr[0], ctx);
     String nr = null;
     if(expr.length == 2) {
-      final String n = string(uc(trim(checkEmptyStr(expr[1], ctx))));
+      final String n = string(uc(trim(checkStr(expr[1], ctx))));
       for(final String nrm : NORMS) if(nrm.equals(n)) nr = nrm;
-      if(nr == null) error(NORMUNI, n);
+      if(nr == null) Err.or(input, NORMUNI, n);
     }
     // [CG] XQuery: normalize-unicode()
     return Str.get(str);

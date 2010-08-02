@@ -4,17 +4,17 @@ import static org.basex.query.QueryText.*;
 import static org.basex.query.item.Type.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryInfo;
 import org.basex.query.expr.Calc;
 import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Date;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
+import org.basex.util.InputInfo;
 
 /**
  * Aggregating functions.
@@ -25,12 +25,12 @@ import org.basex.query.iter.Iter;
 final class FNAggr extends Fun {
   /**
    * Constructor.
-   * @param i query info
+   * @param ii input info
    * @param f function definition
    * @param e arguments
    */
-  protected FNAggr(final QueryInfo i, final FunDef f, final Expr... e) {
-    super(i, f, e);
+  protected FNAggr(final InputInfo ii, final FunDef f, final Expr... e) {
+    super(ii, f, e);
   }
 
   @Override
@@ -86,19 +86,19 @@ final class FNAggr extends Fun {
 
     Item res = it.unt() ? Dbl.get(it.atom()) : it;
     if(!res.num() && (!res.dur() || res.type == Type.DUR))
-      error(SUMTYPE, this, res.type);
+      Err.or(input, SUMTYPE, this, res.type);
     final boolean n = res.num();
 
     int c = 1;
     Item i;
     while((i = iter.next()) != null) {
       final boolean un = i.unt() || i.num();
-      if(n && !un) error(FUNNUM, this, i.type);
-      if(!n && un) error(FUNDUR, this, i.type);
-      res = Calc.PLUS.ev(this, res, i);
+      if(n && !un) Err.or(input, FUNNUM, this, i.type);
+      if(!n && un) Err.or(input, FUNDUR, this, i.type);
+      res = Calc.PLUS.ev(input, res, i);
       c++;
     }
-    return avg ? Calc.DIV.ev(this, res, Itr.get(c)) : res;
+    return avg ? Calc.DIV.ev(input, res, Itr.get(c)) : res;
   }
 
   /**
@@ -118,27 +118,29 @@ final class FNAggr extends Fun {
     if(res == null) return null;
 
     // check if first item is comparable
-    cmp.e(this, res, res);
+    cmp.e(input, res, res);
 
     // strings or dates
-    if(!res.unt() && res.str() || res instanceof Date) {
+    if(!res.unt() && res.str() || res.date()) {
       Item it;
       while((it = iter.next()) != null) {
-        if(it.type != res.type) error(FUNCMP, info(), res.type, it.type);
-        if(cmp.e(this, res, it)) res = it;
+        if(it.type != res.type) {
+          Err.or(input, FUNCMP, desc(), res.type, it.type);
+        }
+        if(cmp.e(input, res, it)) res = it;
       }
       return res;
     }
 
     // durations or numbers
     Type t = res.unt() ? DBL : res.type;
-    if(res.type != t) res = t.e(res, ctx);
+    if(res.type != t) res = t.e(res, ctx, input);
 
     Item it;
     while((it = iter.next()) != null) {
       t = type(res, it);
-      if(!it.dur() && Double.isNaN(it.dbl()) || cmp.e(this, res, it)) res = it;
-      if(res.type != t) res = t.e(res, ctx);
+      if(!it.dur() && Double.isNaN(it.dbl()) || cmp.e(input, res, it)) res = it;
+      if(res.type != t) res = t.e(res, ctx, input);
     }
     return res;
   }
@@ -152,16 +154,18 @@ final class FNAggr extends Fun {
    */
   private Type type(final Item a, final Item b) throws QueryException {
     if(b.unt()) {
-      if(!a.num()) error(FUNCMP, this, a.type, b.type);
+      if(!a.num()) Err.or(input, FUNCMP, this, a.type, b.type);
       return DBL;
     }
-    if(a.num() && !b.unt() && b.str()) error(FUNCMP, this, a.type, b.type);
+    if(a.num() && !b.unt() && b.str()) {
+      Err.or(input, FUNCMP, this, a.type, b.type);
+    }
     if(a.type == b.type) return a.type;
     if(a.type == DBL || b.type == DBL) return DBL;
     if(a.type == FLT || b.type == FLT) return FLT;
     if(a.type == DEC || b.type == DEC) return DEC;
     if(a.type == BLN || a.num() && !b.num() || b.num() && !a.num())
-      error(FUNCMP, this, a.type, b.type);
+      Err.or(input, FUNCMP, this, a.type, b.type);
     return a.num() || b.num() ? ITR : a.type;
   }
 }
