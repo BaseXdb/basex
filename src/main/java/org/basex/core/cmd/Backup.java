@@ -16,7 +16,7 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 
 /**
- * Evaluates the 'backup' command creates a backup of a database.
+ * Evaluates the 'backup' command and creates a backup of a database.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -61,10 +61,11 @@ public final class Backup extends Command {
         File zip = new File(pr.get(Prop.DBPATH) + Prop.SEP + db
             + "-" + DATE.format(now) + "-" + TIME.format(now) + ".zip");
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zip));
+        out.putNextEntry(new ZipEntry(db + "/"));
         for (String file : filenames) {
             FileInputStream in = new FileInputStream(pr.dbpath(db)
                 + Prop.SEP + file);
-            out.putNextEntry(new ZipEntry(file));
+            out.putNextEntry(new ZipEntry(db + "/" + file));
             int len;
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
