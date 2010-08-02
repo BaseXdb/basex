@@ -61,7 +61,8 @@ public final class Func extends Single {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     // evaluate function and reset variable scope
     final Item ci = ctx.item;
     ctx.item = null;

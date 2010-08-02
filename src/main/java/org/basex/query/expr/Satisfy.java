@@ -57,7 +57,8 @@ public final class Satisfy extends ParseExpr {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Iter[] iter = new Iter[fl.length];
     // casting is safe, but should be removed
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
@@ -77,7 +78,8 @@ public final class Satisfy extends ParseExpr {
 
     final boolean last = p + 1 == fl.length;
     while(it[p].next() != null) {
-      if(every ^ (last ? sat.ebv(ctx).bool(input) : iter(ctx, it, p + 1))) {
+      if(every ^ (last ? sat.ebv(ctx, input).bool(input) :
+        iter(ctx, it, p + 1))) {
         for(final Iter ri : it) ri.reset();
         return !every;
       }

@@ -38,7 +38,7 @@ public final class Clc extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
 
-    final Expr e = expr[0].item() && expr[1].item() ? atomic(ctx) :
+    final Expr e = expr[0].item() && expr[1].item() ? atomic(ctx, input) :
       expr[0].empty() || expr[1].empty() ? Seq.EMPTY : this;
 
     if(e != this) ctx.compInfo(OPTPRE, this);
@@ -46,10 +46,11 @@ public final class Clc extends Arr {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
-    final Item a = expr[0].atomic(ctx);
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final Item a = expr[0].atomic(ctx, input);
     if(a == null) return null;
-    final Item b = expr[1].atomic(ctx);
+    final Item b = expr[1].atomic(ctx, input);
     if(b == null) return null;
     return calc.ev(input, a, b);
   }

@@ -32,7 +32,8 @@ public abstract class CFrag extends Arr {
   }
 
   @Override
-  public abstract Nod atomic(final QueryContext ctx) throws QueryException;
+  public abstract Nod atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Returns an updated name expression.

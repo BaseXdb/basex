@@ -41,7 +41,7 @@ public final class FDoc extends FNode {
     final Node elem = doc.getFirstChild();
     if(elem != null && elem instanceof Element)
       children.add(new FElem((Element) elem, this));
-    // TODO DocumentFragment != Document, possibly multiple roots
+    // [LW] DocumentFragment != Document, possibly multiple roots
   }
 
   @Override

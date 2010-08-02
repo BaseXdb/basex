@@ -42,14 +42,15 @@ final class FNFunc extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     switch(func) {
       case FUNCNAME:
       case FUNCARITY:
         Err.or(input, NOTIMPL, func.desc);
         return null;
       default:
-        return super.atomic(ctx);
+        return super.atomic(ctx, ii);
     }
   }
 }

@@ -43,10 +43,11 @@ public final class FTOptions extends FTExpr {
 
   // called by sequential variant
   @Override
-  public FTItem atomic(final QueryContext ctx) throws QueryException {
+  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final FTOpt tmp = ctx.ftopt;
     ctx.ftopt = opt;
-    final FTItem it = expr[0].atomic(ctx);
+    final FTItem it = expr[0].atomic(ctx, input);
     ctx.ftopt = tmp;
     return it;
   }

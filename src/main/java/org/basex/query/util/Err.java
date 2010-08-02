@@ -104,14 +104,14 @@ public final class Err {
   }
 
   /**
-   * Throws an exception.
-   * @param err error message
-   * @param x extended info
+   * Throws an invalid value exception.
+   * @param ii input info
+   * @param t expected type
+   * @param v value
    * @throws QueryException query exception
-  // [CG] XQuery/query info: to be removed
-  public static void or(final Object[] err, final Object... x)
-      throws QueryException {
-    throw new QueryException(null, err, x);
-  }
    */
+  public static void value(final InputInfo ii, final Type t, final Object v)
+      throws QueryException {
+    or(ii, INVALUE, t, v);
+  }
 }

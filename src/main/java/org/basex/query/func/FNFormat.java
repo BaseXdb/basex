@@ -35,21 +35,22 @@ final class FNFormat extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     switch(func) {
       case FORMINT: return formatInteger(ctx);
       case FORMNUM: return formatNumber(ctx);
       case FORMDTM: return formatDate(Type.DTM, ctx);
       case FORMDAT: return formatDate(Type.DAT, ctx);
       case FORMTIM: return formatDate(Type.TIM, ctx);
-      default:      return super.atomic(ctx);
+      default:      return super.atomic(ctx, ii);
     }
   }
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case FORMINT: return expr[0].empty() ? atomic(ctx) : this;
+      case FORMINT: return expr[0].empty() ? atomic(ctx, input) : this;
       default:      return this;
     }
   }
@@ -78,7 +79,7 @@ final class FNFormat extends Fun {
    */
   private Str formatNumber(final QueryContext ctx) throws QueryException {
     // evaluate arguments
-    Item it = expr[0].atomic(ctx);
+    Item it = expr[0].atomic(ctx, input);
     if(it == null) it = Dbl.NAN;
     else if(!it.unt() && !it.num()) Err.number(this, it);
 
@@ -98,7 +99,7 @@ final class FNFormat extends Fun {
   private Item formatDate(final Type type, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = expr[0].atomic(ctx);
+    final Item it = expr[0].atomic(ctx, input);
     if(it == null) return Seq.EMPTY;
     final Date date = (Date) checkType(it, type);
     final String pic = string(checkEStr(expr[1], ctx));

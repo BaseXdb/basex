@@ -79,10 +79,11 @@ public final class And extends Arr {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     double s = 0;
     for(final Expr e : expr) {
-      final Item it = e.ebv(ctx);
+      final Item it = e.ebv(ctx, input);
       if(!it.bool(input)) return Bln.FALSE;
       s = ctx.score.and(s, it.score());
     }

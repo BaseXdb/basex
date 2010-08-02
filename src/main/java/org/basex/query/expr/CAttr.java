@@ -51,7 +51,8 @@ public final class CAttr extends CFrag {
   }
 
   @Override
-  public FAttr atomic(final QueryContext ctx) throws QueryException {
+  public FAttr atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final QNm name = qname(ctx, checkItem(atn, ctx));
     if(!name.ns()) name.uri = Uri.EMPTY;
     final byte[] pre = name.pref();

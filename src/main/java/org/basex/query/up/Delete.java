@@ -30,7 +30,8 @@ public final class Delete extends Update {
   }
 
   @Override
-  public Seq atomic(final QueryContext ctx) throws QueryException {
+  public Seq atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Iter t = expr[0].iter(ctx);
     Item i;
     while((i = t.next()) != null) {

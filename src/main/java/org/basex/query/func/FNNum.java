@@ -32,8 +32,9 @@ public final class FNNum extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
-    final Item it = expr[0].atomic(ctx);
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final Item it = expr[0].atomic(ctx, input);
     if(it == null) return null;
 
     if(!it.unt() && !it.num()) Err.number(this, it);
@@ -44,7 +45,7 @@ public final class FNNum extends Fun {
       case FLOOR:  return num(it, d, Math.floor(d));
       case RND:    return rnd(it, d, false, ctx);
       case RNDHLF: return rnd(it, d, true, ctx);
-      default:     return super.atomic(ctx);
+      default:     return super.atomic(ctx, ii);
     }
   }
 
@@ -52,7 +53,7 @@ public final class FNNum extends Fun {
   public Expr c(final QueryContext ctx) throws QueryException {
     if(expr[0].empty()) return expr[0];
     for(final Expr a : expr) if(!a.item()) return this;
-    final Item it = atomic(ctx);
+    final Item it = atomic(ctx, input);
     return it == null ? Seq.EMPTY : it;
   }
 

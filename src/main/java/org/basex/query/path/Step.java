@@ -128,7 +128,7 @@ public class Step extends Preds {
         int c = 0;
         for(int s = 0; s < nb.size(); s++) {
           ctx.item = nb.get(s);
-          final Item i = p.test(ctx);
+          final Item i = p.test(ctx, input);
           if(i != null) {
             // assign score value
             nb.get(s).score(i.score());

@@ -27,7 +27,8 @@ public final class CComm extends CFrag {
   }
 
   @Override
-  public FComm atomic(final QueryContext ctx) throws QueryException {
+  public FComm atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
 
     final TokenBuilder tb = new TokenBuilder();

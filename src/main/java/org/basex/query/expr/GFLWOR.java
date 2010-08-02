@@ -174,7 +174,7 @@ public class GFLWOR extends ParseExpr {
         iter(ctx, cache, it, p + 1);
       } else {
 
-        if(where == null || where.ebv(ctx).bool(input)) {
+        if(where == null || where.ebv(ctx, input).bool(input)) {
           for(ForLet aFl : fl) {
             if(order != null) cache.get(aFl.var).add(
                 ctx.vars.get(aFl.var).item(ctx));

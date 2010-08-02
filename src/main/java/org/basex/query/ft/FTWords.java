@@ -104,7 +104,8 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public FTItem atomic(final QueryContext ctx) throws QueryException {
+  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     if(tokNum == 0) tokNum = ++ctx.ftoknum;
     all.reset(tokNum);
 

@@ -25,7 +25,8 @@ final class FNMath extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     if(func == FunDef.PI) return Dbl.get(Math.PI);
     if(expr[0].empty()) return null;
 
@@ -38,12 +39,12 @@ final class FNMath extends Fun {
       case ASIN: return Dbl.get(Math.asin(d));
       case ACOS: return Dbl.get(Math.acos(d));
       case ATAN: return Dbl.get(Math.atan(d));
-      default:   return super.atomic(ctx);
+      default:   return super.atomic(ctx, ii);
     }
   }
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
-    return func == FunDef.PI || expr[0].item() ? atomic(ctx) : this;
+    return func == FunDef.PI || expr[0].item() ? atomic(ctx, input) : this;
   }
 }

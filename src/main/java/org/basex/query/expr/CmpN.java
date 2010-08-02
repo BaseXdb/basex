@@ -100,10 +100,11 @@ public final class CmpN extends Arr {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
-    final Item a = expr[0].atomic(ctx);
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final Item a = expr[0].atomic(ctx, input);
     if(a == null) return null;
-    final Item b = expr[1].atomic(ctx);
+    final Item b = expr[1].atomic(ctx, input);
     if(b == null) return null;
     return Bln.get(cmp.e(checkNode(a), checkNode(b)));
   }

@@ -58,7 +58,8 @@ public final class Insert extends Update {
   }
 
   @Override
-  public Seq atomic(final QueryContext ctx) throws QueryException {
+  public Seq atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
     final NodIter cList = c.children;
     final NodIter aList = c.ats;

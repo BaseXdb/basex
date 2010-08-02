@@ -14,7 +14,7 @@ import org.basex.query.util.Var;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
-class GroupPartition {
+final class GroupPartition {
   /** Grouping variables. */
   protected static Var[] gv;
   /** Non grouping variables. */
@@ -26,41 +26,25 @@ class GroupPartition {
   /** HashValue, Position. */
   private final HashMap<Integer, Integer> hashes =
     new HashMap<Integer, Integer>();
+
   /**
    * Sets up an empty partitioning.
    * @param gv1 Grouping vars
    * @param fl1 Non grouping vars
    */
-  public GroupPartition(final Var[] gv1, final Var[] fl1) {
+  GroupPartition(final Var[] gv1, final Var[] fl1) {
     gv = gv1;
     fl = fl1;
     partitions = new ArrayList<GroupNode>();
     items = new ArrayList<HashMap<Var, ItemList>>();
   }
 
-  /* (non-Javadoc)
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    int i = 0;
-    for(GroupNode gp : partitions) {
-      sb.append(gp);
-      sb.append("\n");
-      sb.append(" ").append(items.get(i));
-      sb.append("\n\n");
-      i++;
-    }
-    return sb.toString();
-  }
-
   /**
    * Adds the current variable binding to the partitioning scheme.
    * @param ctx QueryContext
    */
-  public void add(final QueryContext ctx)  {
-    Item[] its = new Item[gv.length];
+  void add(final QueryContext ctx)  {
+    final Item[] its = new Item[gv.length];
     for(int i = 0; i < gv.length; i++) {
       its[i] = ctx.vars.get(gv[i]).item;
     }
@@ -86,9 +70,9 @@ class GroupPartition {
     if(items.size() <= p) items.add(new HashMap<Var, ItemList>());
     HashMap<Var, ItemList> sq = items.get(p);
 
-    for(Var v : fl) {
+    for(final Var v : fl) {
       boolean skip = false;
-      for(Var g : gv)
+      for(final Var g : gv)
         if(v.eq(g)) {
           skip = true;
           break;
@@ -113,12 +97,11 @@ class GroupPartition {
      *  N.B. long instead of int */
     final int hash;
     
-
     /**
      * Creates a group node.
      * @param is grouping var values
      */
-    public GroupNode(final Item[] is) {
+    GroupNode(final Item[] is) {
       its = is;
       final long[] hhs = new long[is.length];
       for(int i = 0; i < gv.length; i++) {
@@ -129,7 +112,7 @@ class GroupPartition {
           hhs[i] = is[i].hashCode();
         }
       }
-      hash = java.util.Arrays.hashCode(hhs);
+      hash = Arrays.hashCode(hhs);
     }
 
     @Override
@@ -140,29 +123,27 @@ class GroupPartition {
     /* for debugging (should be removed later) */
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       sb.append(" ");
       sb.append(Arrays.toString(gv));
       sb.append(" with grouping var ");
       sb.append(Arrays.toString(its));
       return sb.toString();
     }
-
-    @Override
-    public boolean equals(final Object o) {
-      if(!(o instanceof GroupNode)) return false;
-      final GroupNode c = (GroupNode) o;
+    
+    /**
+     * Checks the nodes for equality.
+     * @param c second group node
+     * @return result of check
+     * @throws QueryException query exception
+     */
+    boolean eq(final GroupNode c) throws QueryException {
       if(its.length != c.its.length ||
           gv.length != c.its.length) return false;
       for(int i = 0; i < its.length; i++) {
-        try {
-          // [CG] calling expression should be passed on
-          // (might be skipped again)
-          if(!its[i].equive(null, c.its[i]))
-            return false;
-        } catch(QueryException e) {
-          return false;
-        }
+        // [CG] calling expression should be passed on
+        // (might be skipped again)
+        if(!its[i].equive(null, c.its[i])) return false;
       }
       return true;
     }

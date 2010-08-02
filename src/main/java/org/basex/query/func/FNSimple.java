@@ -49,15 +49,16 @@ public final class FNSimple extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Expr e = expr.length == 1 ? expr[0] : null;
     switch(func) {
       case FALSE:   return Bln.FALSE;
       case TRUE:    return Bln.TRUE;
       case EMPTY:   return Bln.get(!e.item() && e.iter(ctx).next() == null);
       case EXISTS:  return Bln.get(e.item() || e.iter(ctx).next() != null);
-      case BOOLEAN: return Bln.get(e.ebv(ctx).bool(input));
-      case NOT:     return Bln.get(!e.ebv(ctx).bool(input));
+      case BOOLEAN: return Bln.get(e.ebv(ctx, input).bool(input));
+      case NOT:     return Bln.get(!e.ebv(ctx, input).bool(input));
       case DEEPEQUAL:
         return Bln.get(deep(ctx));
       case ZEROORONE:
@@ -72,7 +73,7 @@ public final class FNSimple extends Fun {
         if(it == null || iter.next() != null) Err.or(input, EXP1);
         return it;
       default:
-        return super.atomic(ctx);
+        return super.atomic(ctx, ii);
     }
   }
 
@@ -83,13 +84,13 @@ public final class FNSimple extends Fun {
     switch(func) {
       case FALSE:
       case TRUE:
-        return atomic(ctx);
+        return atomic(ctx, input);
       case EMPTY:
       case EXISTS:
       case BOOLEAN:
-        return expr[0].empty() || expr[0].item() ? atomic(ctx) : this;
+        return expr[0].empty() || expr[0].item() ? atomic(ctx, input) : this;
       case NOT:
-        if(expr[0].item()) return atomic(ctx);
+        if(expr[0].item()) return atomic(ctx, input);
         if(expr[0] instanceof Fun) {
           final Fun fs = (Fun) expr[0];
           if(fs.func == FunDef.EMPTY) {

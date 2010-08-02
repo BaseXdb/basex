@@ -33,11 +33,12 @@ public final class FNSent extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     switch(func) {
       case SENT:     return polarity(ctx, false);
       case NORMSENT: return polarity(ctx, true);
-      default:       return super.atomic(ctx);
+      default:       return super.atomic(ctx, ii);
     }
   }
 

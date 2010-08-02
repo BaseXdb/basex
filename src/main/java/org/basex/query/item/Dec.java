@@ -135,7 +135,7 @@ public final class Dec extends Item {
   static BigDecimal parse(final double val, final InputInfo ii)
       throws QueryException {
     if(val != val || val == 1 / 0d || val == -1 / 0d)
-      Err.or(ii, INVALUE, Type.DEC, val);
+      Err.value(ii, Type.DEC, val);
     return BigDecimal.valueOf(val);
   }
 

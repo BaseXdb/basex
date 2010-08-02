@@ -46,8 +46,8 @@ public abstract class Fun extends Arr {
    * @param e expression array
    * @return function
    */
-  public static final Fun create(final InputInfo ii,
-      final FunDef f, final Expr... e) {
+  public static final Fun create(final InputInfo ii, final FunDef f,
+      final Expr... e) {
 
     try {
       return f.func.getDeclaredConstructor(InputInfo.class, FunDef.class,

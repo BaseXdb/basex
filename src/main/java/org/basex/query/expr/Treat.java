@@ -39,7 +39,7 @@ public final class Treat extends Single {
     super.comp(ctx);
     if(!checkUp(expr, ctx).item()) return this;
     ctx.compInfo(OPTPRE, this);
-    return atomic(ctx);
+    return atomic(ctx, input);
   }
 
   @Override

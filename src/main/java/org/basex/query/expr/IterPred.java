@@ -78,7 +78,7 @@ final class IterPred extends Pred {
             ctx.item = it;
             ctx.pos = p++;
             old = it;
-            final Item i = pred[0].test(ctx);
+            final Item i = pred[0].test(ctx, input);
             if(i != null) {
               // item accepted.. adopt scoring value
               it.score(i.score());

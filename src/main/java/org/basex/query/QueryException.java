@@ -76,8 +76,9 @@ public final class QueryException extends Exception {
       } else if(!(t[i] instanceof String)) {
         t[i] = t[i].toString();
       }
-      final String s = t[i].toString();
-      t[i] = s.length() > 1000 ? s.substring(0, 1000) + DOTS : s;
+      // [CG] XQuery/Exception: verify if/which strings are to be chopped
+      //final String s = t[i].toString();
+      //t[i] = s.length() > 1000 ? s.substring(0, 1000) + DOTS : s;
     }
     return t;
   }

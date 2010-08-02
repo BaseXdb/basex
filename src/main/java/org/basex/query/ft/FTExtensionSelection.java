@@ -33,8 +33,9 @@ public class FTExtensionSelection extends FTExpr {
   }
 
   @Override
-  public FTItem atomic(final QueryContext ctx) throws QueryException {
-    return expr[0].atomic(ctx);
+  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return expr[0].atomic(ctx, input);
   }
 
   @Override

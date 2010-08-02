@@ -38,8 +38,8 @@ final class FNId extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = expr.length == 2 ? expr[1].atomic(ctx) :
-      checkCtx(ctx).atomic(ctx);
+    final Item it = expr.length == 2 ? expr[1].atomic(ctx, input) :
+      checkCtx(ctx).atomic(ctx, input);
     if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.NOD);
 
     final Nod node = checkNode(it);

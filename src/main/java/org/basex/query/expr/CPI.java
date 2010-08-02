@@ -40,7 +40,8 @@ public final class CPI extends CFrag {
   }
 
   @Override
-  public FPI atomic(final QueryContext ctx) throws QueryException {
+  public FPI atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Item it = checkItem(expr[0], ctx);
     if(!it.unt() && !it.str() && it.type != Type.QNM)
       Err.or(input, CPIWRONG, it.type, it);

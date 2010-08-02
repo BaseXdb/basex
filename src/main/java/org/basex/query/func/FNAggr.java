@@ -34,7 +34,8 @@ final class FNAggr extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Iter iter = ctx.iter(expr[0]);
 
     switch(func) {
@@ -49,12 +50,12 @@ final class FNAggr extends Fun {
       case SUM:
         Item it = iter.next();
         return it != null ? sum(iter, it, false) :
-          expr.length == 2 ? expr[1].atomic(ctx) : Itr.ZERO;
+          expr.length == 2 ? expr[1].atomic(ctx, input) : Itr.ZERO;
       case AVG:
         it = iter.next();
         return it == null ? null : sum(iter, it, true);
       default:
-        return super.atomic(ctx);
+        return super.atomic(ctx, ii);
     }
   }
 

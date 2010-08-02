@@ -67,7 +67,8 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Iter iter = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
     ctx.fttoken = ft;
@@ -76,7 +77,7 @@ public class FTContains extends ParseExpr {
 
     while((it = iter.next()) != null) {
       ft.init(it.atom());
-      final FTItem item = ftexpr.atomic(ctx);
+      final FTItem item = ftexpr.atomic(ctx, input);
       double d = 0;
       if(item.all.matches()) {
         d = item.score();

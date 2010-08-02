@@ -47,7 +47,8 @@ public abstract class FTExpr extends ParseExpr {
    * @throws QueryException query exception
    */
   @Override
-  public abstract FTItem atomic(final QueryContext ctx) throws QueryException;
+  public abstract FTItem atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException;
 
   /**
    * This method is called by the index-based full-text evaluation.

@@ -33,8 +33,9 @@ public final class FTMildNot extends FTExpr {
   }
 
   @Override
-  public FTItem atomic(final QueryContext ctx) throws QueryException {
-    return mildnot(expr[0].atomic(ctx), expr[1].atomic(ctx));
+  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return mildnot(expr[0].atomic(ctx, input), expr[1].atomic(ctx, input));
   }
 
   @Override

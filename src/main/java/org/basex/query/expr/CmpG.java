@@ -179,9 +179,11 @@ public final class CmpG extends Arr {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     // atomic evaluation of arguments (faster)
-    if(atom) return Bln.get(eval(expr[0].atomic(ctx), expr[1].atomic(ctx)));
+    if(atom) return Bln.get(eval(expr[0].atomic(ctx, input),
+        expr[1].atomic(ctx, input)));
 
     final Iter ir1 = ctx.iter(expr[0]);
     final long is1 = ir1.size();

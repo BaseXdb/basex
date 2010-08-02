@@ -156,7 +156,7 @@ public final class CmpV extends Arr {
 
     Expr e = this;
     if(e1.item() && e2.item()) {
-      e = atomic(ctx);
+      e = atomic(ctx, input);
     } else if(e1.empty() || e2.empty()) {
       e = Seq.EMPTY;
     }
@@ -190,10 +190,11 @@ public final class CmpV extends Arr {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
-    final Item a = expr[0].atomic(ctx);
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final Item a = expr[0].atomic(ctx, input);
     if(a == null) return null;
-    final Item b = expr[1].atomic(ctx);
+    final Item b = expr[1].atomic(ctx, input);
     if(b == null) return null;
 
     if(!a.comparable(b)) Err.or(input, XPTYPECMP, a.type, b.type);

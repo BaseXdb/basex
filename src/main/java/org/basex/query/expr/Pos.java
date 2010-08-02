@@ -81,7 +81,8 @@ public final class Pos extends Simple {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     checkCtx(ctx);
     return Bln.get(ctx.pos >= min && ctx.pos <= max);
   }

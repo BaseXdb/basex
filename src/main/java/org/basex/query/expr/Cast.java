@@ -39,13 +39,14 @@ public final class Cast extends Single {
     super.comp(ctx);
     if(!checkUp(expr, ctx).item()) return this;
     ctx.compInfo(OPTPRE, this);
-    final Item it = atomic(ctx);
+    final Item it = atomic(ctx, input);
     return it != null ? it : Seq.EMPTY;
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
-    return seq.cast(expr.atomic(ctx), this, ctx, input);
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return seq.cast(expr.atomic(ctx, input), this, ctx, input);
   }
 
   @Override

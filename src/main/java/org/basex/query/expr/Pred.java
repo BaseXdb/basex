@@ -84,7 +84,7 @@ public class Pred extends Preds {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     if(counter) {
-      final Item it = pred[0].ebv(ctx);
+      final Item it = pred[0].ebv(ctx, input);
       final long l = it.itr(input);
       final Expr e = Pos.get(l, l, input);
       return l != it.dbl(input) || e == Bln.FALSE ? Iter.EMPTY :
@@ -109,7 +109,7 @@ public class Pred extends Preds {
       final long sl = si.size();
       for(int s = 0; s < sl; s++) {
         ctx.item = si.item[s];
-        if(p.test(ctx) != null) si.item[c++] = si.item[s];
+        if(p.test(ctx, input) != null) si.item[c++] = si.item[s];
         ctx.pos++;
       }
       si.size(c);

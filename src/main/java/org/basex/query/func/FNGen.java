@@ -65,7 +65,8 @@ final class FNGen extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     switch(func) {
       case DOC:         return doc(ctx);
       case DOCAVL:      return docAvailable(ctx);
@@ -74,19 +75,19 @@ final class FNGen extends Fun {
       case PARSE:       // might get obsolete
       case PARSEXML:    return parseXml(ctx);
       case SERIALIZE:   return serialize(ctx);
-      default:          return super.atomic(ctx);
+      default:          return super.atomic(ctx, ii);
     }
   }
 
   @Override
   public Expr c(final QueryContext ctx) throws QueryException {
     if(func == FunDef.DOC)
-      return expr[0].item() ? atomic(ctx) : this;
+      return expr[0].item() ? atomic(ctx, input) : this;
     if(func == FunDef.COLL)
       return expr.length != 0 && expr[0].item() ? iter(ctx).finish() : this;
     if(func == FunDef.PARSETXT) {
       return expr[0].item() && (expr.length == 1 || expr[1].item()) ?
-        atomic(ctx) : this;
+        atomic(ctx, input) : this;
     }
     return this;
   }
@@ -142,7 +143,7 @@ final class FNGen extends Fun {
   private Iter put(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
-    final Item it = expr[0].atomic(ctx);
+    final Item it = expr[0].atomic(ctx, input);
 
     if(it == null || it.type != Type.DOC && it.type != Type.ELM)
       Err.or(input, UPFOTYPE, expr[0]);
@@ -161,7 +162,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Nod doc(final QueryContext ctx) throws QueryException {
-    final Item it = expr[0].atomic(ctx);
+    final Item it = expr[0].atomic(ctx, input);
     return it == null ? null : ctx.doc(checkStrEmp(it), false, false, input);
   }
 

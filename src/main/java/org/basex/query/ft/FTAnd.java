@@ -44,9 +44,12 @@ public final class FTAnd extends FTExpr {
   }
 
   @Override
-  public FTItem atomic(final QueryContext ctx) throws QueryException {
-    final FTItem item = expr[0].atomic(ctx);
-    for(int e = 1; e < expr.length; e++) and(ctx, item, expr[e].atomic(ctx));
+  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final FTItem item = expr[0].atomic(ctx, input);
+    for(int e = 1; e < expr.length; e++) {
+      and(ctx, item, expr[e].atomic(ctx, input));
+    }
     return item;
   }
 

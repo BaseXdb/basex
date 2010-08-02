@@ -51,7 +51,7 @@ public final class QNm extends Item {
   public QNm(final byte[] n, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     this(n);
-    if(!XMLToken.isQName(val)) Err.or(ii, INVALUE, type, val);
+    if(!XMLToken.isQName(val)) Err.value(ii, type, val);
     if(ns()) uri = Uri.uri(ctx.ns.uri(pref(), false, ii));
   }
 

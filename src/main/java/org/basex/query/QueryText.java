@@ -365,7 +365,7 @@ public interface QueryText {
   /** XPTY0004: Typing Exception. */
   Object[] XPTYPE = { XPTY, 4, "%: % expected, % found." };
   /** XPTY0004: Typing exception. */
-  Object[] XPEMPTY = { XPTY, 4, "%: empty sequence not allowed." };
+  Object[] XPEMPTY = { XPTY, 4, "%: no empty sequence allowed." };
   /** XPTY0004: Typing Exception. */
   Object[] XPEMPTYPE = { XPTY, 4, "%: % expected, empty sequence found." };
   /** XPTY0004: Typing exception. */
@@ -520,7 +520,7 @@ public interface QueryText {
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
   /** XQST0090: Parsing exception. */
   Object[] INVCHARREF = { XQST, 90, "Invalid character reference \"&#%;\"." };
-  /** [MS] XPST0008: Parsing exception. */
+  /** XPST0094: Parsing exception. */
   Object[] GVARNOTDEFINED = { XQST, 94, "Undefined grouping variable \"%\"." };
   /** XQST0108: Parsing exception. */
   Object[] MODOUT = { XQST, 108,

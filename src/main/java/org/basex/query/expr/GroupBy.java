@@ -61,7 +61,7 @@ public final class GroupBy extends ParseExpr {
 //      seq.add(it);
 //      return;
 //    }
-//    throw new QueryException("Todo check ITEM for conformance"); // [MS]
+//    throw new QueryException("[MS] check ITEM for conformance"); // [MS]
 //
 //  }
 

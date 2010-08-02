@@ -121,7 +121,7 @@ public class FLWOR extends ParseExpr {
       if(more) {
         iter(ctx, seq, it, p + 1);
       } else {
-        if(where == null || where.ebv(ctx).bool(input)) {
+        if(where == null || where.ebv(ctx, input).bool(input)) {
           order.add(ctx);
           seq.add(ctx.iter(ret).finish());
         }

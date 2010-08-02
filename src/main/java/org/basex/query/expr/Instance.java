@@ -38,11 +38,12 @@ public final class Instance extends Single {
     super.comp(ctx);
     if(!checkUp(expr, ctx).item()) return this;
     ctx.compInfo(OPTPRE, this);
-    return atomic(ctx);
+    return atomic(ctx, input);
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     return Bln.get(seq.instance(expr.iter(ctx)));
   }
 

@@ -75,7 +75,7 @@ final class IterStep extends Step {
               // evaluates predicates
               ctx.item = nod;
               ctx.pos++;
-              final Item i = pred[0].test(ctx);
+              final Item i = pred[0].test(ctx, input);
 
               if(i != null) {
                 // assign score value

@@ -108,7 +108,7 @@ public final class FLWR extends FLWOR {
             while(iter[p].next() != null) {
               if(p + 1 != fl.length) {
                 p++;
-              } else if(where == null || where.ebv(ctx).bool(input)) {
+              } else if(where == null || where.ebv(ctx, input).bool(input)) {
                 rtrn = ctx.iter(ret);
                 break;
               }
@@ -149,7 +149,7 @@ public final class FLWR extends FLWOR {
           iter[f].get(n);
           o -= n * s;
         }
-        return ret.atomic(ctx);
+        return ret.atomic(ctx, input);
       }
 
       @Override

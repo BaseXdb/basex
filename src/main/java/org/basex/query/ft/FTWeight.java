@@ -43,8 +43,9 @@ public final class FTWeight extends FTExpr {
 
   // called by sequential variant
   @Override
-  public FTItem atomic(final QueryContext ctx) throws QueryException {
-    return weight(expr[0].atomic(ctx), ctx);
+  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return weight(expr[0].atomic(ctx, input), ctx);
   }
 
   // called by index variant

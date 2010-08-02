@@ -10,6 +10,7 @@ import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 
 /**
  * Abstract expression.
@@ -52,28 +53,34 @@ public abstract class Expr extends ExprInfo {
    * If this method is not overwritten, {@link #iter} must be implemented
    * by an expression, as it will be called by this method.
    * @param ctx query context
+   * @param ii input info
    * @return iterator
    * @throws QueryException query exception
    */
-  public abstract Item atomic(final QueryContext ctx) throws QueryException;
+  public abstract Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Checks if the iterator can be dissolved into an effective boolean value.
    * If not, returns an error. If yes, returns the first value - which can be
    * also be e.g. an integer, which is later evaluated as position predicate.
    * @param ctx query context
+   * @param ii input info
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item ebv(final QueryContext ctx) throws QueryException;
+  public abstract Item ebv(final QueryContext ctx, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Performs a predicate test and returns the item if test was successful.
    * @param ctx query context
+   * @param ii input info
    * @return item
    * @throws QueryException query exception
    */
-  public abstract Item test(final QueryContext ctx) throws QueryException;
+  public abstract Item test(final QueryContext ctx, final InputInfo ii)
+      throws QueryException;
 
   /**
    * Checks if this is an item.

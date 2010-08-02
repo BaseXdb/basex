@@ -32,9 +32,11 @@ final class FNNode extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     // functions have 0 or 1 arguments...
-    final Item it = (expr.length != 0 ? expr[0] : checkCtx(ctx)).atomic(ctx);
+    final Item it = (expr.length != 0 ? expr[0] :
+      checkCtx(ctx)).atomic(ctx, input);
     final boolean empty = it == null;
 
     switch(func) {
@@ -92,7 +94,7 @@ final class FNNode extends Fun {
         return empty ? Str.ZERO : Str.get(
             new TokenBuilder(QueryTokens.ID).add(checkNode(it).id()).finish());
       default:
-        return super.atomic(ctx);
+        return super.atomic(ctx, ii);
     }
   }
 

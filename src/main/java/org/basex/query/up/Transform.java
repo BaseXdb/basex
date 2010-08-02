@@ -66,7 +66,8 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final int s = ctx.vars.size();
     final Updates pu = new Updates(true);
     for(final Let fo : copies) {

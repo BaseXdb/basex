@@ -47,11 +47,12 @@ final class FNFile extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     checkAdmin(ctx);
 
     final File path = expr.length == 0 ? null : new File(
-        Token.string(checkStrEmp(expr[0].atomic(ctx))));
+        Token.string(checkStrEmp(expr[0].atomic(ctx, input))));
 
     switch(func) {
       case MKDIR:
@@ -73,7 +74,7 @@ final class FNFile extends Fun {
       case PATHTOFULL:
         return Str.get(path.getAbsolutePath());
       default:
-        return super.atomic(ctx);
+        return super.atomic(ctx, ii);
     }
   }
 

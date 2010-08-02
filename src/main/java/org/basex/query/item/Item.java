@@ -65,19 +65,22 @@ public abstract class Item extends Expr {
 
   @Override
   @SuppressWarnings("unused")
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     return this;
   }
 
   @Override
   @SuppressWarnings("unused")
-  public Item ebv(final QueryContext ctx) throws QueryException {
+  public Item ebv(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     return this;
   }
 
   @Override
-  public Item test(final QueryContext ctx) throws QueryException {
-    return bool(null) ? this : null;
+  public Item test(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return bool(ii) ? this : null;
   }
 
   @Override
@@ -157,7 +160,7 @@ public abstract class Item extends Expr {
 
   /**
    * Returns a boolean representation of the item.
-   * @param ii TODO
+   * @param ii input info
    * @return boolean value
    * @throws QueryException query exception
    */
@@ -178,7 +181,7 @@ public abstract class Item extends Expr {
 
   /**
    * Returns an integer (long) representation of the item.
-   * @param ii TODO
+   * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
@@ -188,7 +191,7 @@ public abstract class Item extends Expr {
 
   /**
    * Returns a float representation of the item.
-   * @param ii TODO
+   * @param ii input info
    * @return float value
    * @throws QueryException query exception
    */
@@ -198,7 +201,7 @@ public abstract class Item extends Expr {
 
   /**
    * Returns a double representation of the item.
-   * @param ii TODO
+   * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */

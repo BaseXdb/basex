@@ -25,11 +25,14 @@ public class Seq extends Item {
     @Override
     public Iter iter() { return Iter.EMPTY; }
     @Override
-    public Item atomic(final QueryContext ctx) { return null; }
+    public Item atomic(final QueryContext ctx, final InputInfo ii) {
+      return null; }
     @Override
-    public Item ebv(final QueryContext ctx) { return Bln.FALSE; }
+    public Item ebv(final QueryContext ctx, final InputInfo ii) {
+      return Bln.FALSE; }
     @Override
-    public Item test(final QueryContext ctx) { return null; }
+    public Item test(final QueryContext ctx, final InputInfo ii) {
+      return null; }
     @Override
     public SeqType returned(final QueryContext ctx) { return SeqType.ITEM_Z; }
   };
@@ -92,20 +95,23 @@ public class Seq extends Item {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
-    Err.or(null, XPSEQ, this);
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    Err.or(ii, XPSEQ, this);
     return null;
   }
 
   @Override
-  public Item ebv(final QueryContext ctx) throws QueryException {
-    if(!val[0].node()) Err.or(null, CONDTYPE, this);
+  public Item ebv(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    if(!val[0].node()) Err.or(ii, CONDTYPE, this);
     return val[0];
   }
 
   @Override
-  public Item test(final QueryContext ctx) throws QueryException {
-    return ebv(ctx);
+  public Item test(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return ebv(ctx, ii);
   }
 
   @Override

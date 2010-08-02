@@ -40,18 +40,18 @@ final class FNQName extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case INSCOPE:
-        return inscope(ctx, (Nod) checkType(expr[0].atomic(ctx), Type.ELM));
-      default:
-        return super.iter(ctx);
+      case INSCOPE: return inscope(ctx,
+          (Nod) checkType(expr[0].atomic(ctx, input), Type.ELM));
+      default:      return super.iter(ctx);
     }
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = expr[0].atomic(ctx);
-    final Item it2 = expr.length == 2 ? expr[1].atomic(ctx) : null;
+    final Item it = expr[0].atomic(ctx, input);
+    final Item it2 = expr.length == 2 ? expr[1].atomic(ctx, input) : null;
 
     switch(func) {
       case RESQNAME:
@@ -61,9 +61,9 @@ final class FNQName extends Fun {
           checkType(it, Type.STR).atom());
         final Item it3 = it2 == null ? Str.ZERO : checkType(it2, Type.STR);
         final byte[] str = it3.atom();
-        if(!XMLToken.isQName(str)) Err.or(input, INVALUE, Type.QNM, it3);
+        if(!XMLToken.isQName(str)) Err.value(input, Type.QNM, it3);
         QNm nm = new QNm(str, uri);
-        if(nm.ns() && uri == Uri.EMPTY) Err.or(input, INVALUE, Type.URI, uri);
+        if(nm.ns() && uri == Uri.EMPTY) Err.value(input, Type.URI, uri);
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;
@@ -86,7 +86,7 @@ final class FNQName extends Fun {
         if(!base.valid()) Err.or(input, URIINV, base);
         return base.resolve(rel);
       default:
-        return super.atomic(ctx);
+        return super.atomic(ctx, ii);
     }
   }
 
@@ -102,7 +102,7 @@ final class FNQName extends Fun {
       throws QueryException {
 
     final byte[] name = trim(checkStrEmp(q));
-    if(!XMLToken.isQName(name)) Err.or(input, INVALUE, Type.QNM, q);
+    if(!XMLToken.isQName(name)) Err.value(input, Type.QNM, q);
 
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();

@@ -101,7 +101,7 @@ public enum Type {
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       final byte[] v = norm(it.atom());
-      if(!pat.matcher(string(v)).matches()) error(it);
+      if(!pat.matcher(string(v)).matches()) error(it, ii);
       return new Str(v, this);
     }
     @Override
@@ -116,7 +116,7 @@ public enum Type {
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       final byte[] v = norm(it.atom());
-      if(!XMLToken.isNMToken(v)) error(it);
+      if(!XMLToken.isNMToken(v)) error(it, ii);
       return new Str(v, this);
     }
     @Override
@@ -131,7 +131,7 @@ public enum Type {
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       final byte[] v = norm(it.atom());
-      if(!XMLToken.isName(v)) error(it);
+      if(!XMLToken.isName(v)) error(it, ii);
       return new Str(v, this);
     }
     @Override
@@ -145,7 +145,7 @@ public enum Type {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return new Str(checkName(it), this);
+      return new Str(checkName(it, ii), this);
     }
     @Override
     public Str e(final Object o, final InputInfo ii) throws QueryException {
@@ -158,7 +158,7 @@ public enum Type {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return new Str(checkName(it), this);
+      return new Str(checkName(it, ii), this);
     }
     @Override
     public Str e(final Object o, final InputInfo ii) throws QueryException {
@@ -171,7 +171,7 @@ public enum Type {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return new Str(checkName(it), this);
+      return new Str(checkName(it, ii), this);
     }
     @Override
     public Str e(final Object o, final InputInfo ii) throws QueryException {
@@ -184,7 +184,7 @@ public enum Type {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return new Str(checkName(it), this);
+      return new Str(checkName(it, ii), this);
     }
     @Override
     public Str e(final Object o, final InputInfo ii) throws QueryException {
@@ -197,7 +197,7 @@ public enum Type {
     @Override
     public Flt e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return Flt.get(checkNum(it).flt(ii));
+      return Flt.get(checkNum(it, ii).flt(ii));
     }
     @Override
     public Flt e(final Object o, final InputInfo ii) throws QueryException {
@@ -210,7 +210,7 @@ public enum Type {
     @Override
     public Dbl e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return Dbl.get(checkNum(it).dbl(ii));
+      return Dbl.get(checkNum(it, ii).dbl(ii));
     }
     @Override
     public Dbl e(final Object o, final InputInfo ii) throws QueryException {
@@ -223,7 +223,7 @@ public enum Type {
     @Override
     public Dec e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return Dec.get(checkNum(it).dec(ii));
+      return Dec.get(checkNum(it, ii).dec(ii));
     }
     @Override
     public Dec e(final Object o, final InputInfo ii) {
@@ -344,7 +344,7 @@ public enum Type {
     @Override
     public Dec e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      final BigDecimal v = checkNum(it).dec(ii);
+      final BigDecimal v = checkNum(it, ii).dec(ii);
       if(v.signum() < 0 || v.compareTo(max) > 0 ||
           it.str() && contains(it.atom(), '.')) Err.or(ii, FUNCAST, this, it);
       return new Dec(v, this);
@@ -413,7 +413,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.dur() ? new Dur((Dur) it) : str(it) ?
-          new Dur(it.atom(), ii) : error(it);
+          new Dur(it.atom(), ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -427,7 +427,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.dur() ? new YMd((Dur) it) : str(it) ?
-          new YMd(it.atom(), ii) : error(it);
+          new YMd(it.atom(), ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -441,7 +441,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.dur() ? new DTd((Dur) it) : str(it) ?
-          new DTd(it.atom(), ii) : error(it);
+          new DTd(it.atom(), ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -455,7 +455,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == LNG ? new Dtm((Itr) it, ii) : it.type == DAT ?
-          new Dtm((Date) it) : str(it) ? new Dtm(it.atom(), ii) : error(it);
+          new Dtm((Date) it) : str(it) ? new Dtm(it.atom(), ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -469,7 +469,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == DTM ? new Dat((Date) it) : str(it) ?
-          new Dat(it.atom(), ii) : error(it);
+          new Dat(it.atom(), ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -483,7 +483,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == DTM ? new Tim((Date) it) : str(it) ?
-          new Tim(it.atom(), ii) : error(it);
+          new Tim(it.atom(), ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -497,7 +497,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it);
+        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -511,7 +511,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it);
+        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -525,7 +525,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it);
+        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -539,7 +539,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it);
+        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -553,7 +553,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it);
+        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -567,7 +567,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.num() ? Bln.get(it.bool(ii)) : str(it) ?
-          Bln.get(Bln.parse(it.atom(), ii)) : error(it);
+          Bln.get(Bln.parse(it.atom(), ii)) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) {
@@ -581,7 +581,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == HEX ? new B64((Hex) it) : str(it) ?
-          new B64(it.atom(), ii) : error(it);
+          new B64(it.atom(), ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -595,7 +595,7 @@ public enum Type {
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return it.type == B6B ? new Hex((B64) it) : str(it) ?
-          new Hex(it.atom(), ii) : error(it);
+          new Hex(it.atom(), ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -608,7 +608,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      if(!it.str()) error(it);
+      if(!it.str()) error(it, ii);
       final Uri u = Uri.uri(it.atom());
       if(!u.valid()) Err.or(ii, FUNCAST, this, it);
       return u;
@@ -624,7 +624,7 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      if(it.type != STR) error(it);
+      if(it.type != STR) error(it, ii);
       final byte[] s = trim(it.atom());
       if(s.length == 0) Err.or(ii, QNMINV, s);
       return new QNm(s, ctx, ii);
@@ -746,7 +746,7 @@ public enum Type {
   @SuppressWarnings("unused")
   public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return it.type != this ? error(it) : it;
+    return it.type != this ? error(it, ii) : it;
   }
 
   /**
@@ -787,12 +787,14 @@ public enum Type {
   /**
    * Throws an exception if the specified item can't be converted to a number.
    * @param it item
+   * @param ii input info
    * @return item argument
    * @throws QueryException query exception
    */
-  protected final Item checkNum(final Item it) throws QueryException {
+  protected final Item checkNum(final Item it, final InputInfo ii)
+      throws QueryException {
     return it.type == URI || !it.str() && !it.num() && !it.unt() &&
-      it.type != BLN ? error(it) : it;
+      it.type != BLN ? error(it, ii) : it;
   }
 
   /**
@@ -808,11 +810,11 @@ public enum Type {
       final long max, final InputInfo ii) throws QueryException {
 
     final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());
-    checkNum(it);
+    checkNum(it, ii);
 
     if(it.type == Type.DBL || it.type == Type.FLT) {
       final double d = it.dbl(ii);
-      if(d != d || d == 1 / 0d || d == -1 / 0d) Err.or(ii, INVALUE, this, it);
+      if(d != d || d == 1 / 0d || d == -1 / 0d) Err.value(ii, this, it);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(ii, INTRANGE, d);
       if(min != max && (d < min || d > max)) Err.or(ii, FUNCAST, this, it);
       return (long) d;
@@ -839,24 +841,27 @@ public enum Type {
   /**
    * Checks the validity of the specified name.
    * @param it value to be checked
+   * @param ii input info
    * @throws QueryException query exception
    * @return name
    */
-  protected final byte[] checkName(final Item it) throws QueryException {
+  protected final byte[] checkName(final Item it, final InputInfo ii)
+      throws QueryException {
     final byte[] v = norm(it.atom());
-    if(!XMLToken.isNCName(v)) error(it);
+    if(!XMLToken.isNCName(v)) error(it, ii);
     return v;
   }
 
   /**
    * Throws a casting exception.
    * @param it item to be included in the error message
+   * @param ii input info
    * @return dummy item
    * @throws QueryException query exception
    */
-  protected final Item error(final Item it) throws QueryException {
-    // [CG] XQuery/query info
-    Err.cast(null, this, it);
+  protected final Item error(final Item it, final InputInfo ii)
+      throws QueryException {
+    Err.cast(ii, this, it);
     return null;
   }
 

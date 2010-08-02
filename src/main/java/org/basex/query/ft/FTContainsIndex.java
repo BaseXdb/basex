@@ -41,7 +41,8 @@ final class FTContainsIndex extends FTContains {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Iter ir = expr.iter(ctx);
     final Tokenizer tmp = ctx.fttoken;
     ctx.fttoken = ft;

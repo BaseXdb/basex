@@ -47,7 +47,8 @@ public final class Replace extends Update {
   }
 
   @Override
-  public Seq atomic(final QueryContext ctx) throws QueryException {
+  public Seq atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
     if(c.errAtt) Err.or(input, UPNOATTRPER);
     if(c.duplAtt != null) Err.or(input, UPATTDUPL, c.duplAtt);

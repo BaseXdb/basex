@@ -91,7 +91,8 @@ final class CmpR extends Single {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) throws QueryException {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     final Iter ir = ctx.iter(expr);
 
     // evaluate iterator

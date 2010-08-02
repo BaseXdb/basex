@@ -49,10 +49,10 @@ public final class Switch extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item op = expr[0].atomic(ctx);
+    final Item op = expr[0].atomic(ctx, input);
     final int el = expr.length;
     for(int i = 1; i < el - 1; i += 2) {
-      final Item cs = expr[i].atomic(ctx);
+      final Item cs = expr[i].atomic(ctx, input);
       // includes check for empty sequence (null reference)
       if(op == cs || op.equiv(input, cs)) return ctx.iter(expr[i + 1]);
     }

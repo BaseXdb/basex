@@ -54,12 +54,13 @@ final class FNPat extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     switch(func) {
       case MATCH:   return matches(checkEStr(expr[0], ctx), ctx);
       case REPLACE: return replace(checkEStr(expr[0], ctx), ctx);
       case ANALZYE: return analyzeString(checkEStr(expr[0], ctx), ctx);
-      default:      return super.atomic(ctx);
+      default:      return super.atomic(ctx, ii);
     }
   }
 

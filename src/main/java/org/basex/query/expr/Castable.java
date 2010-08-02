@@ -37,15 +37,15 @@ public final class Castable extends Single {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     if(!checkUp(expr, ctx).item()) return this;
-    final Item ok = atomic(ctx);
+    final Item ok = atomic(ctx, input);
     ctx.compInfo(ok == Bln.TRUE ? OPTTRUE : OPTFALSE, this);
     return ok;
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx) {
+  public Bln atomic(final QueryContext ctx, final InputInfo ii) {
     try {
-      final Item it = expr.atomic(ctx);
+      final Item it = expr.atomic(ctx, input);
       seq.cast(it, this, ctx, input);
       return Bln.TRUE;
     } catch(final QueryException ex) {

@@ -44,12 +44,13 @@ public final class Unary extends Single {
       ctx.compInfo(OPTPRE, this);
       return expr;
     }
-    return expr.item() ? atomic(ctx) : this;
+    return expr.item() ? atomic(ctx, input) : this;
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
-    final Item it = expr.atomic(ctx);
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    final Item it = expr.atomic(ctx, input);
     if(it == null) return null;
     if(!it.unt() && !it.num()) Err.number(this, it);
     final double d = it.dbl(input);

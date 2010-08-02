@@ -1,5 +1,6 @@
 package org.basex.gui.view.xquery;
 
+import static org.basex.core.Text.*;
 import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
@@ -19,14 +20,15 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 final class XQueryText extends BaseXText {
+  /** Error pattern. */
+  private static final Pattern ERRPATTERN = Pattern.compile((".* " + LINEINFO +
+      ", " + COLINFO + ".*").replaceAll("%", "([0-9]+)"), Pattern.DOTALL);
+
   /** Last error position. */
   int error = -1;
   /** Thread counter. */
   int threadID;
 
-  /** Error pattern. */
-  private static final Pattern ERRPATTERN = Pattern.compile(
-      ".* line ([0-9]+), column ([0-9]+).*", Pattern.DOTALL);
   /** View reference. */
   private final XQueryView view;
   /** Last Query. */
@@ -135,12 +137,12 @@ final class XQueryText extends BaseXText {
 
         // find approximate error position
         final int ll = error;
-        for(int i = 0, l = 1, c = 1; i < ll; c++, i++) {
+        for(int e = 0, l = 1, c = 1; e < ll; c++, e++) {
           if(l > el || l == el && c == ec) {
-            error = i;
+            error = e;
             break;
           }
-          if(last[i] == '\n') {
+          if(last[e] == '\n') {
             l++;
             c = 0;
           }

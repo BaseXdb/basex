@@ -78,11 +78,12 @@ public final class Or extends Arr {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx) throws QueryException {
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     double d = 0;
     boolean f = false;
     for(final Expr e : expr) {
-      final Item it = e.ebv(ctx);
+      final Item it = e.ebv(ctx, input);
       if(it.bool(input)) {
         final double s = it.score();
         if(s == 0) return Bln.TRUE;
