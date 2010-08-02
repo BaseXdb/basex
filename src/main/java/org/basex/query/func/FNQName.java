@@ -67,11 +67,11 @@ final class FNQName extends Fun {
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;
-        return new NCN(((QNm) checkType(it, Type.QNM)).ln());
+        return new NCN(((QNm) checkType(it, Type.QNM)).ln(), input);
       case PREQNAME:
         if(it == null) return null;
         nm = (QNm) checkType(it, Type.QNM);
-        return !nm.ns() ? null : new NCN(nm.pref());
+        return !nm.ns() ? null : new NCN(nm.pref(), input);
       case NSURIPRE:
         final byte[] pre = checkStrEmp(it);
         final Atts at = ((Nod) checkType(it2, Type.ELM)).ns();

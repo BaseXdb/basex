@@ -57,38 +57,38 @@ public final class Bln extends Item {
   }
 
   @Override
-  public boolean bool() {
+  public boolean bool(final InputInfo ii) {
     return val;
   }
 
   @Override
-  public long itr() {
+  public long itr(final InputInfo ii) {
     return val ? 1 : 0;
   }
 
   @Override
-  public float flt() {
+  public float flt(final InputInfo ii) {
     return val ? 1 : 0;
   }
 
   @Override
-  public double dbl() {
+  public double dbl(final InputInfo ii) {
     return val ? 1 : 0;
   }
 
   @Override
-  public BigDecimal dec() {
+  public BigDecimal dec(final InputInfo ii) {
     return val ? BigDecimal.ONE : BigDecimal.ZERO;
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return val == (it.type == type ? it.bool() : parse(it.atom(), ii));
+    return val == (it.type == type ? it.bool(ii) : parse(it.atom(), ii));
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    final boolean n = it.type == type ? it.bool() : parse(it.atom(), ii);
+    final boolean n = it.type == type ? it.bool(ii) : parse(it.atom(), ii);
     return val ? !n ? 1 : 0 : n ? -1 : 0;
   }
 

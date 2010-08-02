@@ -92,17 +92,17 @@ final class DBPrimitives extends Primitives {
         final int ps = pre + d.attSize(pre, Data.ELEM);
         for(int p = pre + 1; p < ps; p++) {
           final byte[] nm = d.name(p, Data.ATTR);
-          if(!il.contains(p)) pool.add(new QNm(nm, ctx), Type.ATT);
+          if(!il.contains(p)) pool.add(new QNm(nm, ctx, null), Type.ATT);
         }
       }
     }
 
     // find duplicate attributes
     final QNm dup = pool.duplicate();
-    if(dup != null) Err.or(UPATTDUPL, dup);
+    if(dup != null) Err.or(null, UPATTDUPL, dup);
 
     // find namespace conflicts
-    if(!pool.nsOK()) Err.or(UPNSCONFL2);
+    if(!pool.nsOK()) Err.or(null, UPNSCONFL2);
   }
 
   @Override
@@ -142,7 +142,7 @@ final class DBPrimitives extends Primitives {
       try {
         Export.export(ctx.context, d);
       } catch(final IOException ex) {
-        Err.or(UPPUTERR, d.meta.file);
+        Err.or(null, UPPUTERR, d.meta.file);
       }
     }
   }

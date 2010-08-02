@@ -45,7 +45,7 @@ public final class Cast extends Single {
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    return seq.cast(expr.atomic(ctx), this, ctx);
+    return seq.cast(expr.atomic(ctx), this, ctx, input);
   }
 
   @Override

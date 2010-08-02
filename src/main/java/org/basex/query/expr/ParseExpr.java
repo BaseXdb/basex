@@ -68,7 +68,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public final Item test(final QueryContext ctx) throws QueryException {
     final Item it = ebv(ctx);
-    return (it.num() ? it.dbl() == ctx.pos : it.bool()) ? it : null;
+    return (it.num() ? it.dbl(input) == ctx.pos : it.bool(input)) ? it : null;
   }
 
   @Override
@@ -125,7 +125,7 @@ public abstract class ParseExpr extends Expr {
     final Item it = e.atomic(ctx);
     if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.DBL);
     if(!it.unt() && !it.num()) Err.number(this, it);
-    return it.dbl();
+    return it.dbl(input);
   }
 
   /**
@@ -153,7 +153,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final long checkItr(final Item it) throws QueryException {
     if(!it.unt() && !it.type.instance(Type.ITR)) Err.type(this, Type.ITR, it);
-    return it.itr();
+    return it.itr(input);
   }
 
   /**

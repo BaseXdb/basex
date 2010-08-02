@@ -67,7 +67,7 @@ public class FLWOR extends ParseExpr {
       ii = where.empty();
       if(!ii && where.item()) {
         // test is always false: no results
-        ii = !((Item) where).bool();
+        ii = !((Item) where).bool(input);
         if(!ii) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
@@ -121,7 +121,7 @@ public class FLWOR extends ParseExpr {
       if(more) {
         iter(ctx, seq, it, p + 1);
       } else {
-        if(where == null || where.ebv(ctx).bool()) {
+        if(where == null || where.ebv(ctx).bool(input)) {
           order.add(ctx);
           seq.add(ctx.iter(ret).finish());
         }

@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryException;
+import org.basex.util.InputInfo;
 
 /**
  * Date item.
@@ -25,20 +26,23 @@ public final class Dat extends Date {
    * @param d date
    * @param a duration
    * @param p plus/minus flag
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Dat(final Date d, final Dur a, final boolean p) throws QueryException {
+  public Dat(final Date d, final Dur a, final boolean p, final InputInfo ii)
+      throws QueryException {
     this(d);
-    calc(a, p);
+    calc(a, p, ii);
   }
 
   /**
    * Constructor.
    * @param d date
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Dat(final byte[] d) throws QueryException {
-    super(Type.DAT, d, XDATE);
-    date(d, XDATE);
+  public Dat(final byte[] d, final InputInfo ii) throws QueryException {
+    super(Type.DAT, d, XDATE, ii);
+    date(d, XDATE, ii);
   }
 }

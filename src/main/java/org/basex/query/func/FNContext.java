@@ -61,7 +61,7 @@ final class FNContext extends Fun {
     final String zone = new SimpleDateFormat("Z").format(d);
     final String form = new SimpleDateFormat("yyyy-MM-dd").format(d);
     ctx.date = new Dat(Token.token(form + zone.substring(0, 3) + ":" +
-        zone.substring(3)));
+        zone.substring(3)), input);
     return ctx.date;
   }
 
@@ -78,7 +78,7 @@ final class FNContext extends Fun {
     final String df1 = new SimpleDateFormat("yyyy-MM-dd").format(d);
     final String df2 = new SimpleDateFormat("HH:mm:ss.S").format(d);
     ctx.dtm = new Dtm(Token.token(df1 + "T" + df2 + zone.substring(0, 3) +
-        ":" + zone.substring(3)));
+        ":" + zone.substring(3)), input);
     return ctx.dtm;
   }
 
@@ -94,7 +94,7 @@ final class FNContext extends Fun {
     final String zone = new SimpleDateFormat("Z").format(dat);
     final String form = new SimpleDateFormat("HH:mm:ss.S").format(dat);
     ctx.time = new Tim(Token.token(form + zone.substring(0, 3) + ":" +
-        zone.substring(3)));
+        zone.substring(3)), input);
     return ctx.time;
   }
 

@@ -43,38 +43,38 @@ public final class Flt extends Item {
   }
 
   @Override
-  public boolean bool() {
+  public boolean bool(final InputInfo ii) {
     return val == val && val != 0;
   }
 
   @Override
-  public long itr() {
+  public long itr(final InputInfo ii) {
     return (long) val;
   }
 
   @Override
-  public float flt() {
+  public float flt(final InputInfo ii) {
     return val;
   }
 
   @Override
-  public double dbl() {
+  public double dbl(final InputInfo ii) {
     return val;
   }
 
   @Override
-  public BigDecimal dec() throws QueryException {
-    return Dec.parse(val);
+  public BigDecimal dec(final InputInfo ii) throws QueryException {
+    return Dec.parse(val, ii);
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return it.type == Type.DBL ? it.eq(ii, this) : val == it.flt();
+    return it.type == Type.DBL ? it.eq(ii, this) : val == it.flt(ii);
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    final double n = it.flt();
+    final double n = it.flt(ii);
     if(n != n || val != val) return UNDEF;
     return val < n ? -1 : val > n ? 1 : 0;
   }
@@ -92,16 +92,19 @@ public final class Flt extends Item {
   /**
    * Converts the given token into a double value.
    * @param val value to be converted
+   * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  static float parse(final byte[] val) throws QueryException {
+  static float parse(final byte[] val, final InputInfo ii)
+      throws QueryException {
+
     try {
       return Float.parseFloat(Token.string(val));
     } catch(final NumberFormatException ex) {
       if(Token.eq(Token.trim(val), Token.INF)) return Float.POSITIVE_INFINITY;
       if(Token.eq(Token.trim(val), Token.NINF)) return Float.NEGATIVE_INFINITY;
-      ZERO.castErr(val);
+      ZERO.castErr(val, ii);
       return 0f;
     }
   }

@@ -72,7 +72,7 @@ final class CmpR extends Single {
       final Arr c = (Arr) ex;
       if(!c.pathAndItem(true)) return null;
       final Expr e = c.expr[0];
-      final double d = ((Item) c.expr[1]).dbl();
+      final double d = ((Item) c.expr[1]).dbl(ex.input);
       switch(c instanceof CmpG ? ((CmpG) c).cmp.cmp : ((CmpV) c).cmp) {
         case EQ: return new CmpR(
             ex.input, e, d, true, d, true);
@@ -99,7 +99,7 @@ final class CmpR extends Single {
     boolean mx = false;
     Item it;
     while((it = ir.next()) != null) {
-      final double d = it.dbl();
+      final double d = it.dbl(input);
       mn |= mni ? d >= min : d > min;
       mx |= mxi ? d <= max : d < max;
       if(mn && mx) return Bln.TRUE;

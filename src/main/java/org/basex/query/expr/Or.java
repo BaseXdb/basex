@@ -35,7 +35,7 @@ public final class Or extends Arr {
     for(int e = 0; e < expr.length; e++) {
       if(!expr[e].item()) continue;
 
-      if(((Item) expr[e]).bool()) {
+      if(((Item) expr[e]).bool(input)) {
         // atomic items can be pre-evaluated
         ctx.compInfo(OPTTRUE, expr[e]);
         return Bln.TRUE;
@@ -83,7 +83,7 @@ public final class Or extends Arr {
     boolean f = false;
     for(final Expr e : expr) {
       final Item it = e.ebv(ctx);
-      if(it.bool()) {
+      if(it.bool(input)) {
         final double s = it.score();
         if(s == 0) return Bln.TRUE;
         d = ctx.score.or(d, s);

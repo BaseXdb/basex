@@ -77,7 +77,7 @@ public final class Satisfy extends ParseExpr {
 
     final boolean last = p + 1 == fl.length;
     while(it[p].next() != null) {
-      if(every ^ (last ? sat.ebv(ctx).bool() : iter(ctx, it, p + 1))) {
+      if(every ^ (last ? sat.ebv(ctx).bool(input) : iter(ctx, it, p + 1))) {
         for(final Iter ri : it) ri.reset();
         return !every;
       }

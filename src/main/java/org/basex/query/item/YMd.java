@@ -45,27 +45,29 @@ public final class YMd extends Dur {
    * @param it duration item
    * @param f factor
    * @param m multiplication/division flag
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public YMd(final Dur it, final double f, final boolean m)
+  public YMd(final Dur it, final double f, final boolean m, final InputInfo ii)
       throws QueryException {
 
     this(it);
-    if(f != f) Err.or(DATECALC, desc(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, desc());
+    if(f != f) Err.or(ii, DATECALC, desc(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(ii, DATEZERO, desc());
     mon = (int) Math.round(m ? mon * f : mon / f);
   }
 
   /**
    * Constructor.
    * @param v value
+   * @param ii input info
    * @throws QueryException query exception
    */
-  YMd(final byte[] v) throws QueryException {
+  YMd(final byte[] v, final InputInfo ii) throws QueryException {
     super(Type.YMD);
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P")) dateErr(v, type, XYMD);
+    if(!mt.matches() || val.endsWith("P")) dateErr(v, type, XYMD, ii);
 
     final int y = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
     final int m = mt.group(4) != null ? Token.toInt(mt.group(5)) : 0;

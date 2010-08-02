@@ -73,41 +73,41 @@ public final class Dec extends Item {
   }
 
   @Override
-  public boolean bool() {
+  public boolean bool(final InputInfo ii) {
     return val.signum() != 0;
   }
 
   @Override
-  public long itr() {
+  public long itr(final InputInfo ii) {
     return val.longValue();
   }
 
   @Override
-  public float flt() {
+  public float flt(final InputInfo ii) {
     return val.floatValue();
   }
 
   @Override
-  public double dbl() {
+  public double dbl(final InputInfo ii) {
     return val.doubleValue();
   }
 
   @Override
-  public BigDecimal dec() {
+  public BigDecimal dec(final InputInfo ii) {
     return val;
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
     return it.type == Type.DBL || it.type == Type.FLT ? it.eq(ii, this) :
-      val.compareTo(it.dec()) == 0;
+      val.compareTo(it.dec(ii)) == 0;
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    final double d = it.dbl();
+    final double d = it.dbl(ii);
     return d == 1 / 0.0 ? -1 : d == -1 / 0.0 ? 1 :
-      d != d ? UNDEF : val.compareTo(it.dec());
+      d != d ? UNDEF : val.compareTo(it.dec(ii));
   }
 
   @Override
@@ -128,27 +128,34 @@ public final class Dec extends Item {
   /**
    * Converts the given double into a decimal value.
    * @param val value to be converted
+   * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  static BigDecimal parse(final double val) throws QueryException {
+  static BigDecimal parse(final double val, final InputInfo ii)
+      throws QueryException {
     if(val != val || val == 1 / 0d || val == -1 / 0d)
-      Err.or(INVALUE, Type.DEC, val);
+      Err.or(ii, INVALUE, Type.DEC, val);
     return BigDecimal.valueOf(val);
   }
 
   /**
    * Converts the given token into a decimal value.
    * @param val value to be converted
+   * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  static BigDecimal parse(final byte[] val) throws QueryException {
-    if(contains(val, 'e') || contains(val, 'E')) Err.or(FUNCAST, Type.DEC, val);
+  static BigDecimal parse(final byte[] val, final InputInfo ii)
+      throws QueryException {
+
+    if(contains(val, 'e') || contains(val, 'E'))
+      Err.or(ii, FUNCAST, Type.DEC, val);
+
     try {
       return new BigDecimal(Token.string(val).trim());
     } catch(final NumberFormatException ex) {
-      ZERO.castErr(val);
+      ZERO.castErr(val, ii);
       return null;
     }
   }

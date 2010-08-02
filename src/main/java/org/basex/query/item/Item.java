@@ -77,7 +77,7 @@ public abstract class Item extends Expr {
 
   @Override
   public Item test(final QueryContext ctx) throws QueryException {
-    return bool() ? this : null;
+    return bool(null) ? this : null;
   }
 
   @Override
@@ -157,56 +157,53 @@ public abstract class Item extends Expr {
 
   /**
    * Returns a boolean representation of the item.
+   * @param ii TODO
    * @return boolean value
    * @throws QueryException query exception
    */
-  public boolean bool() throws QueryException {
-    Err.or(CONDTYPE, type, this);
+  public boolean bool(final InputInfo ii) throws QueryException {
+    Err.or(ii, CONDTYPE, type, this);
     return false;
   }
 
   /**
    * Returns a decimal representation of the item.
+   * @param ii input info
    * @return decimal value
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public BigDecimal dec() throws QueryException {
-    Main.notexpected();
-    return null;
+  public BigDecimal dec(final InputInfo ii) throws QueryException {
+    return Dec.parse(atom(), ii);
   }
 
   /**
    * Returns an integer (long) representation of the item.
+   * @param ii TODO
    * @return long value
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public long itr() throws QueryException {
-    Main.notexpected();
-    return 0;
+  public long itr(final InputInfo ii) throws QueryException {
+    return Itr.parse(atom(), ii);
   }
 
   /**
    * Returns a float representation of the item.
+   * @param ii TODO
    * @return float value
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public float flt() throws QueryException {
-    Main.notexpected();
-    return 0;
+  public float flt(final InputInfo ii) throws QueryException {
+    return Flt.parse(atom(), ii);
   }
 
   /**
    * Returns a double representation of the item.
+   * @param ii TODO
    * @return double value
    * @throws QueryException query exception
    */
-  @SuppressWarnings("unused")
-  public double dbl() throws QueryException {
-    Main.notexpected();
-    return 0;
+  public double dbl(final InputInfo ii) throws QueryException {
+    return Dbl.parse(atom(), ii);
   }
 
   /**
@@ -233,7 +230,7 @@ public abstract class Item extends Expr {
 
     // check if both values are NaN, or if values are equal..
     return (this == Dbl.NAN || this == Flt.NAN) && it.num() &&
-        Double.isNaN(it.dbl()) || comparable(it) && eq(ii, it);
+        Double.isNaN(it.dbl(ii)) || comparable(it) && eq(ii, it);
   }
   /**
    * Checks the items for equivalence.
@@ -292,10 +289,12 @@ public abstract class Item extends Expr {
   /**
    * Throws a cast error.
    * @param val cast value
+   * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void castErr(final Object val) throws QueryException {
-    Err.or(FUNCAST, type, val);
+  protected final void castErr(final Object val, final InputInfo ii)
+      throws QueryException {
+    Err.or(ii, FUNCAST, type, val);
   }
 
   /**
@@ -303,11 +302,12 @@ public abstract class Item extends Expr {
    * @param i input
    * @param t expected type
    * @param ex example format
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public static void dateErr(final byte[] i, final Type t, final String ex)
-      throws QueryException {
-    Err.or(DATEFORMAT, t, i, ex);
+  public static void dateErr(final byte[] i, final Type t, final String ex,
+      final InputInfo ii) throws QueryException {
+    Err.or(ii, DATEFORMAT, t, i, ex);
   }
 
   /**

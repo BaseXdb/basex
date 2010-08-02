@@ -76,7 +76,7 @@ public final class OrderBy extends ParseExpr {
       if(it != null) {
         if(iter.next() != null) Err.or(input, XPSORT);
         if(it.node()) it = Str.get(it.atom());
-        else if(it.num() && Double.isNaN(it.dbl())) it = null;
+        else if(it.num() && Double.isNaN(it.dbl(input))) it = null;
       }
       seq.add(it);
     }

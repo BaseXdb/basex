@@ -197,7 +197,7 @@ public final class NumFormatter {
   private static String format(final Item it, final Picture[] pics,
       final InputInfo ii) throws QueryException {
 
-    final double d = it.dbl();
+    final double d = it.dbl(ii);
     final Picture pic = pics[d < 0 && pics.length == 2 ? 1 : 0];
     if(d < 0 && pics.length == 1) pic.fix[0] = String.valueOf(MINUS);
 
@@ -209,7 +209,7 @@ public final class NumFormatter {
     Item num = it;
     if(pic.pc) num = Calc.MULT.ev(ii, num, Itr.get(100));
     if(pic.pm) num = Calc.MULT.ev(ii, num, Itr.get(1000));
-    num = FNNum.abs(FNNum.round(num, num.dbl(), pic.maxFrac, true));
+    num = FNNum.abs(FNNum.round(num, num.dbl(ii), pic.maxFrac, true, ii), ii);
 
     // convert to string representation
     final String str = num.toString();

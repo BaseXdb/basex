@@ -113,17 +113,18 @@ public final class SeqType {
    * @param it item
    * @param expr expression reference
    * @param ctx query context
+   * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Item cast(final Item it, final ParseExpr expr, final QueryContext ctx)
-      throws QueryException {
+  public Item cast(final Item it, final ParseExpr expr, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
 
     if(it == null) {
       if(occ == Occ.O) Err.or(expr.input, XPEMPTY, expr.desc());
       return null;
     }
-    return it.type == type ? it : check(type.e(it, ctx, expr.input));
+    return it.type == type ? it : check(type.e(it, ctx, expr.input), ii);
   }
 
   /**
@@ -151,7 +152,7 @@ public final class SeqType {
       (it.type != Type.DEC || type != Type.FLT && type != Type.DBL) &&
       (it.type != Type.URI || type != Type.STR)) Err.cast(ii, type, it);
 
-    it = check(ins ? it : type.e(it, ctx, ii));
+    it = check(ins ? it : type.e(it, ctx, ii), ii);
     Item n = iter.next();
     if(zeroOrOne() && n != null) Err.cast(ii, type, item);
 
@@ -160,7 +161,7 @@ public final class SeqType {
     while(n != null) {
       ins = n.type.instance(type);
       if(!n.unt() && !ins) Err.cast(ii, type, n);
-      si.add(check(ins ? n : type.e(n, ctx, ii)));
+      si.add(check(ins ? n : type.e(n, ctx, ii), ii));
       n = iter.next();
     }
     return si.finish();
@@ -210,11 +211,12 @@ public final class SeqType {
   /**
    * Checks the sequence extension.
    * @param it item
+   * @param ii input info
    * @return same item
    * @throws QueryException query exception
    */
-  private Item check(final Item it) throws QueryException {
-    if(!checkInstance(it)) Err.or(XPCAST, it.type, ext);
+  private Item check(final Item it, final InputInfo ii) throws QueryException {
+    if(!checkInstance(it)) Err.or(ii, XPCAST, it.type, ext);
     return it;
   }
 

@@ -153,7 +153,7 @@ public final class CmpG extends Arr {
         }
         if(e != this) ctx.compInfo(OPTWRITE, this);
       } else if(fun.func == FunDef.COUNT) {
-        if(e2.item() && ((Item) e2).num() && ((Item) e2).dbl() == 0) {
+        if(e2.item() && ((Item) e2).num() && ((Item) e2).dbl(input) == 0) {
           // count(...) CMP 0
           if(cmp == Comp.LT || cmp == Comp.GE) {
             // < 0: always false, >= 0: always true

@@ -34,10 +34,11 @@ public class Dur extends Item {
   /**
    * Constructor.
    * @param v value
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public Dur(final byte[] v) throws QueryException {
-    this(v, Type.DUR);
+  public Dur(final byte[] v, final InputInfo ii) throws QueryException {
+    this(v, Type.DUR, ii);
   }
 
   /**
@@ -71,15 +72,17 @@ public class Dur extends Item {
    * Constructor.
    * @param v value
    * @param t data type
+   * @param ii input info
    * @throws QueryException query exception
    */
-  private Dur(final byte[] v, final Type t) throws QueryException {
+  private Dur(final byte[] v, final Type t, final InputInfo ii)
+      throws QueryException {
     this(t);
 
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      dateErr(v, type, XDURR);
+      dateErr(v, type, XDURR, ii);
     final int y = mt.group(2) != null ? toInt(mt.group(3)) : 0;
     final int m = mt.group(4) != null ? toInt(mt.group(5)) : 0;
     final long d = mt.group(6) != null ? toInt(mt.group(7)) : 0;

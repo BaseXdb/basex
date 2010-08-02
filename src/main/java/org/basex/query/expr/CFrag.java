@@ -52,8 +52,8 @@ public abstract class CFrag extends Arr {
       name = new QNm(nm);
     }
 
-    if(name.uri == Uri.EMPTY) name.uri = Uri.uri(ctx.ns.uri(name.pref(),
-        name != i));
+    if(name.uri == Uri.EMPTY)
+      name.uri = Uri.uri(ctx.ns.uri(name.pref(), name != i, input));
     return name;
   }
 

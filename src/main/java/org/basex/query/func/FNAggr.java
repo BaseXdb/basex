@@ -84,7 +84,7 @@ final class FNAggr extends Fun {
   private Item sum(final Iter iter, final Item it, final boolean avg)
       throws QueryException {
 
-    Item res = it.unt() ? Dbl.get(it.atom()) : it;
+    Item res = it.unt() ? Dbl.get(it.atom(), input) : it;
     if(!res.num() && (!res.dur() || res.type == Type.DUR))
       Err.or(input, SUMTYPE, this, res.type);
     final boolean n = res.num();
@@ -139,7 +139,8 @@ final class FNAggr extends Fun {
     Item it;
     while((it = iter.next()) != null) {
       t = type(res, it);
-      if(!it.dur() && Double.isNaN(it.dbl()) || cmp.e(input, res, it)) res = it;
+      if(!it.dur() && Double.isNaN(it.dbl(input)) || cmp.e(input, res, it))
+        res = it;
       if(res.type != t) res = t.e(res, ctx, input);
     }
     return res;

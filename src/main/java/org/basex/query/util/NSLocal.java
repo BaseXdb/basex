@@ -7,6 +7,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Uri;
 import org.basex.util.Atts;
+import org.basex.util.InputInfo;
 
 /**
  * Local namespaces.
@@ -23,13 +24,14 @@ public final class NSLocal {
   /**
    * Adds the specified namespace.
    * @param name namespace
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public void add(final QNm name) throws QueryException {
+  public void add(final QNm name, final InputInfo ii) throws QueryException {
     final byte[] ln = name.ln();
-    if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(NSDEF, name);
+    if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(ii, NSDEF, name);
     final byte[] uri = name.uri.atom();
-    if(eq(XMLURI, uri)) Err.or(NOXMLNS, name);
+    if(eq(XMLURI, uri)) Err.or(ii, NOXMLNS, name);
     ns.add(ln, uri);
   }
 
@@ -59,14 +61,16 @@ public final class NSLocal {
    * Finds the uri for the specified prefix in the local and global namespaces.
    * @param pre prefix of the namespace
    * @param dn dynamic error
+   * @param ii input info
    * @return uri
    * @throws QueryException query exception
    */
-  public byte[] uri(final byte[] pre, final boolean dn) throws QueryException {
+  public byte[] uri(final byte[] pre, final boolean dn, final InputInfo ii)
+      throws QueryException {
     byte[] uri = find(pre);
     if(uri == null) uri = NSGlobal.uri(pre);
     if(uri.length == 0 && pre.length != 0) {
-      Err.or(dn ? INVAL : PREUNKNOWN, pre);
+      Err.or(ii, dn ? INVAL : PREUNKNOWN, pre);
     }
     return uri;
   }

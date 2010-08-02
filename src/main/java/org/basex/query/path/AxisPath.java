@@ -213,8 +213,8 @@ public class AxisPath extends Path {
       for(int t = 0; t < ts; t++) {
         final Expr[] preds = t == ts - 1 ? step[s].pred : new Expr[] {};
         final byte[] n = tl.get(ts - t - 1);
-        final NameTest nt = n == null ? new NameTest(false) :
-          new NameTest(new QNm(n), Kind.NAME, false);
+        final NameTest nt = n == null ? new NameTest(false, input) :
+          new NameTest(new QNm(n), Kind.NAME, false, input);
         steps[t] = Step.get(input, Axis.CHILD, nt, preds);
       }
       while(++s < step.length) steps[ts++] = step[s];

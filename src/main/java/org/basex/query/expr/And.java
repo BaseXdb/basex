@@ -36,7 +36,7 @@ public final class And extends Arr {
       final Expr ex = expr[e];
       if(!ex.item()) continue;
 
-      if(!((Item) ex).bool()) {
+      if(!((Item) ex).bool(input)) {
         // atomic items can be pre-evaluated
         ctx.compInfo(OPTFALSE, ex);
         return Bln.FALSE;
@@ -83,7 +83,7 @@ public final class And extends Arr {
     double s = 0;
     for(final Expr e : expr) {
       final Item it = e.ebv(ctx);
-      if(!it.bool()) return Bln.FALSE;
+      if(!it.bool(input)) return Bln.FALSE;
       s = ctx.score.and(s, it.score());
     }
     // no scoring - return default boolean

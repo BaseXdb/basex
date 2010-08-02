@@ -85,9 +85,9 @@ public class Pred extends Preds {
   public Iter iter(final QueryContext ctx) throws QueryException {
     if(counter) {
       final Item it = pred[0].ebv(ctx);
-      final long l = it.itr();
+      final long l = it.itr(input);
       final Expr e = Pos.get(l, l, input);
-      return l != it.dbl() || e == Bln.FALSE ? Iter.EMPTY :
+      return l != it.dbl(input) || e == Bln.FALSE ? Iter.EMPTY :
         new IterPred(input, root, pred, (Pos) e, false).iter(ctx);
     }
 

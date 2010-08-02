@@ -1,7 +1,5 @@
 package org.basex.query.item;
 
-import java.math.BigDecimal;
-import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -30,28 +28,8 @@ public final class Jav extends Item {
   }
 
   @Override
-  public boolean bool() {
+  public boolean bool(final InputInfo ii) {
     return atom().length != 0;
-  }
-
-  @Override
-  public long itr() throws QueryException {
-    return Itr.parse(atom());
-  }
-
-  @Override
-  public float flt() throws QueryException {
-    return Flt.parse(atom());
-  }
-
-  @Override
-  public double dbl() throws QueryException {
-    return Dbl.parse(atom());
-  }
-
-  @Override
-  public BigDecimal dec() throws QueryException {
-    return Dec.parse(atom());
   }
 
   @Override

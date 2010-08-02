@@ -49,7 +49,7 @@ public abstract class Preds extends ParseExpr {
       ex = Pos.get(CmpV.Comp.EQ, ex, ex, input);
 
       if(ex.item()) {
-        if(!((Item) ex).bool()) {
+        if(!((Item) ex).bool(input)) {
           ctx.compInfo(OPTFALSE, ex);
           e = Seq.EMPTY;
           break;

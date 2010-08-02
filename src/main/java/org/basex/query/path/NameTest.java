@@ -9,6 +9,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.util.InputInfo;
 
 /**
  * XQuery name test.
@@ -17,15 +18,18 @@ import org.basex.query.item.Uri;
  * @author Christian Gruen
  */
 public final class NameTest extends Test {
+  /** Input information. */
+  public final InputInfo input;
   /** Local name. */
   public final byte[] ln;
 
   /**
    * Empty constructor ('*').
    * @param att attribute flag
+   * @param ii input info
    */
-  public NameTest(final boolean att) {
-    this(null, Kind.ALL, att);
+  public NameTest(final boolean att, final InputInfo ii) {
+    this(null, Kind.ALL, att, ii);
   }
 
   /**
@@ -33,12 +37,15 @@ public final class NameTest extends Test {
    * @param nm name
    * @param t test type
    * @param att attribute flag
+   * @param ii input info
    */
-  public NameTest(final QNm nm, final Kind t, final boolean att) {
+  public NameTest(final QNm nm, final Kind t, final boolean att,
+      final InputInfo ii) {
     type = att ? Type.ATT : Type.ELM;
     ln = nm != null ? nm.ln() : null;
     name = nm;
     kind = t;
+    input = ii;
   }
 
   @Override
@@ -63,7 +70,7 @@ public final class NameTest extends Test {
     // check namespace context
     if(ctx.ns.size() != 0) {
       if(name != null && name.uri == Uri.EMPTY) {
-        name.uri = Uri.uri(ctx.ns.uri(name.pref(), false));
+        name.uri = Uri.uri(ctx.ns.uri(name.pref(), false, input));
       }
     } else {
       final Data data = ctx.data();

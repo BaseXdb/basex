@@ -60,7 +60,8 @@ public final class CElem extends CFrag {
    */
   private void addNS(final QueryContext ctx) throws QueryException {
     for(int n = nsp.size - 1; n >= 0; n--) {
-      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), Uri.uri(nsp.val[n])));
+      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]),
+          Uri.uri(nsp.val[n])), input);
     }
   }
 

@@ -43,11 +43,13 @@ public final class Dbl extends Item {
   /**
    * Returns an instance of this class.
    * @param v value
+   * @param ii input info
    * @return instance
    * @throws QueryException query exception
    */
-  public static Dbl get(final byte[] v) throws QueryException {
-    return get(parse(v));
+  public static Dbl get(final byte[] v, final InputInfo ii)
+      throws QueryException {
+    return get(parse(v, ii));
   }
 
   @Override
@@ -56,38 +58,38 @@ public final class Dbl extends Item {
   }
 
   @Override
-  public boolean bool() {
+  public boolean bool(final InputInfo ii) {
     return val == val && val != 0;
   }
 
   @Override
-  public long itr() {
+  public long itr(final InputInfo ii) {
     return (long) val;
   }
 
   @Override
-  public float flt() {
+  public float flt(final InputInfo ii) {
     return (float) val;
   }
 
   @Override
-  public double dbl() {
+  public double dbl(final InputInfo ii) {
     return val;
   }
 
   @Override
-  public BigDecimal dec() throws QueryException {
-    return Dec.parse(val);
+  public BigDecimal dec(final InputInfo ii) throws QueryException {
+    return Dec.parse(val, ii);
   }
 
   @Override
   public boolean eq(final InputInfo ii, final Item it) throws QueryException {
-    return val == it.dbl();
+    return val == it.dbl(ii);
   }
 
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    final double n = it.dbl();
+    final double n = it.dbl(ii);
     if(n != n || val != val) return UNDEF;
     return val < n ? -1 : val > n ? 1 : 0;
   }
@@ -105,16 +107,19 @@ public final class Dbl extends Item {
   /**
    * Converts the given token into a double value.
    * @param val value to be converted
+   * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
-  static double parse(final byte[] val) throws QueryException {
+  static double parse(final byte[] val, final InputInfo ii)
+      throws QueryException {
+
     try {
       return Double.parseDouble(Token.string(val));
     } catch(final NumberFormatException ex) {
       if(Token.eq(Token.trim(val), Token.INF)) return Double.POSITIVE_INFINITY;
       if(Token.eq(Token.trim(val), Token.NINF)) return Double.NEGATIVE_INFINITY;
-      ZERO.castErr(val);
+      ZERO.castErr(val, ii);
       return 0;
     }
   }

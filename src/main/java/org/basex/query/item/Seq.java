@@ -93,13 +93,13 @@ public class Seq extends Item {
 
   @Override
   public Item atomic(final QueryContext ctx) throws QueryException {
-    Err.or(XPSEQ, this);
+    Err.or(null, XPSEQ, this);
     return null;
   }
 
   @Override
   public Item ebv(final QueryContext ctx) throws QueryException {
-    if(!val[0].node()) Err.or(CONDTYPE, this);
+    if(!val[0].node()) Err.or(null, CONDTYPE, this);
     return val[0];
   }
 
@@ -111,7 +111,7 @@ public class Seq extends Item {
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    castErr(it);
+    castErr(it, ii);
     return false;
   }
 

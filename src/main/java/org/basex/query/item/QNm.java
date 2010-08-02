@@ -45,12 +45,14 @@ public final class QNm extends Item {
    * Constructor.
    * @param n name
    * @param ctx query context
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public QNm(final byte[] n, final QueryContext ctx) throws QueryException {
+  public QNm(final byte[] n, final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
     this(n);
-    if(!XMLToken.isQName(val)) Err.or(INVALUE, type, val);
-    if(ns()) uri = Uri.uri(ctx.ns.uri(pref(), false));
+    if(!XMLToken.isQName(val)) Err.or(ii, INVALUE, type, val);
+    if(ns()) uri = Uri.uri(ctx.ns.uri(pref(), false, ii));
   }
 
   /**
@@ -97,8 +99,8 @@ public final class QNm extends Item {
   }
 
   @Override
-  public boolean bool() throws QueryException {
-    Err.or(CONDTYPE, type, this);
+  public boolean bool(final InputInfo ii) throws QueryException {
+    Err.or(ii, CONDTYPE, type, this);
     return false;
   }
 

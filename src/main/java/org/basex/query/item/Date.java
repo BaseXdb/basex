@@ -59,16 +59,17 @@ public abstract class Date extends Item {
    * @param typ data type
    * @param d date reference
    * @param e expected format
+   * @param ii input info
    * @throws QueryException query exception
    */
-  protected Date(final Type typ, final byte[] d, final String e)
-      throws QueryException {
+  protected Date(final Type typ, final byte[] d, final String e,
+      final InputInfo ii) throws QueryException {
     super(typ);
     try {
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
       if(xc.getHour() == 24) xc.add(df.newDuration(0));
     } catch(final IllegalArgumentException ex) {
-      dateErr(d, type, e);
+      dateErr(d, type, e, ii);
     }
   }
 
@@ -76,34 +77,36 @@ public abstract class Date extends Item {
    * Checks the date format.
    * @param d input format
    * @param e expected format
+   * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void date(final byte[] d, final String e)
+  protected final void date(final byte[] d, final String e, final InputInfo ii)
       throws QueryException {
 
     final Matcher mt = DAT.matcher(Token.string(d).trim());
-    if(!mt.matches()) dateErr(d, type, e);
-    zone(mt, 5, d);
+    if(!mt.matches()) dateErr(d, type, e, ii);
+    zone(mt, 5, d, ii);
   }
 
   /**
    * Checks the time format.
    * @param d input format
    * @param e expected format
+   * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void time(final byte[] d, final String e)
+  protected final void time(final byte[] d, final String e, final InputInfo ii)
       throws QueryException {
 
     final Matcher mt = TIM.matcher(Token.string(d).trim());
-    if(!mt.matches()) dateErr(d, type, e);
+    if(!mt.matches()) dateErr(d, type, e, ii);
 
     final int h = Token.toInt(mt.group(1));
     final int s = Token.toInt(mt.group(3));
-    if(s > 59) Err.or(DATERANGE, type, d);
+    if(s > 59) Err.or(ii, DATERANGE, type, d);
     final double ms = mt.group(4) != null ? Double.parseDouble(mt.group(4)) : 0;
-    if(h == 24 && ms > 0) dateErr(d, type, e);
-    zone(mt, 6, d);
+    if(h == 24 && ms > 0) dateErr(d, type, e, ii);
+    zone(mt, 6, d, ii);
   }
 
   /**
@@ -111,27 +114,29 @@ public abstract class Date extends Item {
    * @param mt matcher
    * @param p matching position
    * @param val value
+   * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void zone(final Matcher mt, final int p, final byte[] val)
-    throws QueryException {
+  protected final void zone(final Matcher mt, final int p, final byte[] val,
+      final InputInfo ii) throws QueryException {
 
     if(mt.group(p) == null || mt.group(p).equals("Z")) return;
     final int th = Token.toInt(mt.group(p + 2));
     final int tm = Token.toInt(mt.group(p + 3));
-    if(th > 14 || tm > 59 || th == 14 && tm != 0) Err.or(INVALIDZONE, val);
+    if(th > 14 || tm > 59 || th == 14 && tm != 0) Err.or(ii, INVALIDZONE, val);
   }
 
   /**
    * Add/subtract the specified duration.
    * @param a duration
    * @param p plus/minus flag
+   * @param ii input info
    * @throws QueryException query exception
    */
-  protected final void calc(final Dur a, final boolean p)
+  protected final void calc(final Dur a, final boolean p, final InputInfo ii)
       throws QueryException {
 
-    if(xc.getYear() + a.mon / 12 > 9999) Err.or(DATERANGE, type, a.atom());
+    if(xc.getYear() + a.mon / 12 > 9999) Err.or(ii, DATERANGE, type, a.atom());
     xc.add(p ? a.toJava() : a.toJava().negate());
   }
 

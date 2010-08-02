@@ -22,13 +22,14 @@ public final class B64 extends Item {
   /**
    * Constructor.
    * @param d data
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public B64(final byte[] d) throws QueryException {
+  public B64(final byte[] d, final InputInfo ii) throws QueryException {
     super(Type.B6B);
     final TokenBuilder tb = new TokenBuilder();
     for(final byte c : d) if(c < 0 || c > ' ') tb.add(c);
-    b2h(tb.finish());
+    b2h(tb.finish(), ii);
   }
 
   /**
@@ -105,10 +106,11 @@ public final class B64 extends Item {
   /**
    * Byte to hex conversion.
    * @param s base64 array
+   * @param ii input info
    * @throws QueryException query exception
    */
-  private void b2h(final byte[] s) throws QueryException {
-    if((s.length & 3) != 0) castErr(s);
+  private void b2h(final byte[] s, final InputInfo ii) throws QueryException {
+    if((s.length & 3) != 0) castErr(s, ii);
     final int l = s.length;
     final int g = l >>> 2;
     int m = 0, n = g;
@@ -119,39 +121,40 @@ public final class B64 extends Item {
       }
       if(s[l - 2] == '=') m++;
       if(m == 2 && !Token.contains(ENDING, s[l - 3]))
-        castErr(Token.substring(s, l - 3));
+        castErr(Token.substring(s, l - 3), ii);
     }
     val = new byte[3 * g - m];
 
     int c = 0, o = 0;
     for(int i = 0; i < n; i++) {
-      final int c0 = b2h(s[c++]);
-      final int c1 = b2h(s[c++]);
-      final int c2 = b2h(s[c++]);
-      final int c3 = b2h(s[c++]);
+      final int c0 = b2h(s[c++], ii);
+      final int c1 = b2h(s[c++], ii);
+      final int c2 = b2h(s[c++], ii);
+      final int c3 = b2h(s[c++], ii);
       val[o++] = (byte) (c0 << 2 | c1 >> 4);
       val[o++] = (byte) (c1 << 4 | c2 >> 2);
       val[o++] = (byte) (c2 << 6 | c3);
     }
 
     if(m != 0) {
-      final int c0 = b2h(s[c++]);
-      final int c1 = b2h(s[c++]);
+      final int c0 = b2h(s[c++], ii);
+      final int c1 = b2h(s[c++], ii);
       val[o++] = (byte) (c0 << 2 | c1 >> 4);
-      if(m == 1) val[o++] = (byte) (c1 << 4 | b2h(s[c++]) >> 2);
+      if(m == 1) val[o++] = (byte) (c1 << 4 | b2h(s[c++], ii) >> 2);
     }
   }
 
   /**
    * Byte to hex conversion.
    * @param c character to be encoded
+   * @param ii input info
    * @return encoded value
    * @throws QueryException query exception
    */
-  private int b2h(final byte c) throws QueryException {
-    if(c < 0 || c >= B2H.length) castErr((char) c);
+  private int b2h(final byte c, final InputInfo ii) throws QueryException {
+    if(c < 0 || c >= B2H.length) castErr((char) c, ii);
     final int result = B2H[c];
-    if(result < 0) castErr((char) c);
+    if(result < 0) castErr((char) c, ii);
     return result;
   }
 

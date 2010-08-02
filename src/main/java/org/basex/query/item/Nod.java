@@ -1,6 +1,5 @@
 package org.basex.query.item;
 
-import java.math.BigDecimal;
 import org.basex.api.dom.BXAttr;
 import org.basex.api.dom.BXComm;
 import org.basex.api.dom.BXDoc;
@@ -49,33 +48,13 @@ public abstract class Nod extends Item {
   }
 
   @Override
-  public final boolean bool() {
+  public final boolean bool(final InputInfo ii) {
     return true;
   }
 
   @Override
   public byte[] atom() {
     return val;
-  }
-
-  @Override
-  public final long itr() throws QueryException {
-    return Itr.parse(atom());
-  }
-
-  @Override
-  public final float flt() throws QueryException {
-    return Flt.parse(atom());
-  }
-
-  @Override
-  public final BigDecimal dec() throws QueryException {
-    return Dec.parse(atom());
-  }
-
-  @Override
-  public final double dbl() throws QueryException {
-    return Dbl.parse(atom());
   }
 
   @Override

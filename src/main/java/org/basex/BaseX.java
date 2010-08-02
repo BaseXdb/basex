@@ -164,6 +164,9 @@ public class BaseX extends Main {
           } else if(c == 'r') {
             // hidden option: parse number of runs
             arg.check(set(Prop.RUNS, arg.string()));
+          } else if(c == 'u') {
+            // activate write-back for updates
+            arg.check(set(Prop.WRITEBACK, true));
           } else if(c == 'U' && !sa()) {
             // specify user name
             user = arg.string();

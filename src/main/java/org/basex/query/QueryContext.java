@@ -247,7 +247,7 @@ public final class QueryContext extends Progress {
       if(inf) info.add(NL + QUERYRESULT + root);
     } catch(final StackOverflowError ex) {
       Main.debug(ex);
-      Err.or(XPSTACK);
+      Err.or(null, XPSTACK);
     }
   }
 
@@ -308,7 +308,7 @@ public final class QueryContext extends Progress {
       return i.iter();
     } catch(final StackOverflowError ex) {
       Main.debug(ex);
-      Err.or(XPSTACK);
+      Err.or(null, XPSTACK);
       return null;
     }
   }

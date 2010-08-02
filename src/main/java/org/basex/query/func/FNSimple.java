@@ -56,8 +56,8 @@ public final class FNSimple extends Fun {
       case TRUE:    return Bln.TRUE;
       case EMPTY:   return Bln.get(!e.item() && e.iter(ctx).next() == null);
       case EXISTS:  return Bln.get(e.item() || e.iter(ctx).next() != null);
-      case BOOLEAN: return Bln.get(e.ebv(ctx).bool());
-      case NOT:     return Bln.get(!e.ebv(ctx).bool());
+      case BOOLEAN: return Bln.get(e.ebv(ctx).bool(input));
+      case NOT:     return Bln.get(!e.ebv(ctx).bool(input));
       case DEEPEQUAL:
         return Bln.get(deep(ctx));
       case ZEROORONE:

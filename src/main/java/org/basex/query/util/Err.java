@@ -108,10 +108,10 @@ public final class Err {
    * @param err error message
    * @param x extended info
    * @throws QueryException query exception
-   */
   // [CG] XQuery/query info: to be removed
   public static void or(final Object[] err, final Object... x)
       throws QueryException {
     throw new QueryException(null, err, x);
   }
+   */
 }

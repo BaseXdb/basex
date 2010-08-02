@@ -37,9 +37,9 @@ public final class FNNum extends Fun {
     if(it == null) return null;
 
     if(!it.unt() && !it.num()) Err.number(this, it);
-    final double d = it.dbl();
+    final double d = it.dbl(input);
     switch(func) {
-      case ABS:    return abs(it);
+      case ABS:    return abs(it, input);
       case CEIL:   return num(it, d, Math.ceil(d));
       case FLOOR:  return num(it, d, Math.floor(d));
       case RND:    return rnd(it, d, false, ctx);
@@ -68,25 +68,28 @@ public final class FNNum extends Fun {
   private Item rnd(final Item it, final double d, final boolean h2e,
       final QueryContext ctx) throws QueryException {
     final int p = expr.length == 1 ? 0 : (int) checkItr(expr[1], ctx);
-    return round(it, d, p, h2e);
+    return round(it, d, p, h2e, input);
   }
 
   /**
    * Returns an absolute number.
    * @param it input item
+   * @param ii input info
    * @return absolute item
    * @throws QueryException query exception
    */
-  public static Item abs(final Item it) throws QueryException {
-    final double d = it.dbl();
+  public static Item abs(final Item it, final InputInfo ii)
+      throws QueryException {
+
+    final double d = it.dbl(ii);
     final boolean s = d > 0d || 1 / d > 0;
 
     switch(it.type) {
-      case DBL: return s ? it : Dbl.get(Math.abs(it.dbl()));
-      case FLT: return s ? it : Flt.get(Math.abs(it.flt()));
-      case DEC: return s ? it : Dec.get(it.dec().abs());
-      case ITR: return s ? it : Itr.get(Math.abs(it.itr()));
-      default:  return Itr.get(Math.abs(it.itr()));
+      case DBL: return s ? it : Dbl.get(Math.abs(it.dbl(ii)));
+      case FLT: return s ? it : Flt.get(Math.abs(it.flt(ii)));
+      case DEC: return s ? it : Dec.get(it.dec(ii).abs());
+      case ITR: return s ? it : Itr.get(Math.abs(it.itr(ii)));
+      default:  return Itr.get(Math.abs(it.itr(ii)));
     }
   }
 
@@ -96,14 +99,15 @@ public final class FNNum extends Fun {
    * @param d input double value
    * @param h2e half-to-even flag
    * @param prec precision
+   * @param ii input info
    * @return absolute item
    * @throws QueryException query exception
    */
   public static Item round(final Item it, final double d, final int prec,
-      final boolean h2e) throws QueryException {
+      final boolean h2e, final InputInfo ii) throws QueryException {
 
     if(it.type == Type.DEC && prec >= 0) {
-      final BigDecimal bd = it.dec();
+      final BigDecimal bd = it.dec(ii);
       final int m = h2e ? BigDecimal.ROUND_HALF_EVEN : bd.signum() > 0 ?
           BigDecimal.ROUND_HALF_UP : BigDecimal.ROUND_HALF_DOWN;
       return Dec.get(bd.setScale(prec, m));

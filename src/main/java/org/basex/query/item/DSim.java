@@ -52,19 +52,21 @@ public final class DSim extends Date {
    * Constructor.
    * @param d date
    * @param t data type
+   * @param ii input info
    * @throws QueryException query exception
    */
-  DSim(final byte[] d, final Type t) throws QueryException {
-    super(t, d, EXAMPLES[type(t)]);
+  DSim(final byte[] d, final Type t, final InputInfo ii) throws QueryException {
+    super(t, d, EXAMPLES[type(t)], ii);
 
     final int i = type(t);
     final Matcher mt = PATTERNS[i].matcher(Token.string(d).trim());
-    if(!mt.matches()) dateErr(d, type, EXAMPLES[i]);
-    zone(mt, ZONES[i], d);
+    if(!mt.matches()) dateErr(d, type, EXAMPLES[i], ii);
+    zone(mt, ZONES[i], d, ii);
 
     if(t == Type.MDA) {
       final int m = xc.getMonth() - 1;
-      if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0)) Err.or(DATERANGE, type, d);
+      if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0))
+        Err.or(ii, DATERANGE, type, d);
     }
   }
 

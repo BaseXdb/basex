@@ -72,33 +72,34 @@ public interface Text {
 
   /** Start information. */
   String CLIENTINFO =
-    " [-npPU] [-doqvVwz] [query] [-c]" + NL +
-    "  [query]    query file" + NL +
-    "  -c<cmd>    database commands" + NL +
-    "  -d         debug mode" + NL +
+    " [-npPU] [-dovVwz] [-cq] [query]" + NL +
+    "  [query]    query file to be executed" + NL +
+    "  -c<cmd>    commands to be executed" + NL +
+    "  -d         switch on debugging" + NL +
     "  -n<name>   server name" + NL +
-    "  -o<file>   output file" + NL +
+    "  -o<file>   write output to file" + NL +
     "  -p<port>   server port" + NL +
     "  -P<pass>   user password" + NL +
-    "  -q<expr>   query expression" + NL +
+    "  -q<expr>   query to be evaluated" + NL +
     "  -U<name>   user name" + NL +
-    "  -v/V       show (all) command info" + NL +
+    "  -v/V       show (all) process info" + NL +
     "  -w         wrap query result to xml" + NL +
-    "  -z         skip query output";
+    "  -z         skip query result output";
 
   /** Start information. */
   String LOCALINFO =
-    " [-dioqsvVwz] [query] [-c]" + NL +
-    "  [query]    query file" + NL +
-    "  -c<cmd>    database commands" + NL +
-    "  -d         debug mode" + NL +
-    "  -i<file>   XML input" + NL +
-    "  -o<file>   output file" + NL +
-    "  -q<expr>   query expression" + NL +
+    " [-diosuvVwz] [-cq] [query]" + NL +
+    "  [query]    query file to be executed" + NL +
+    "  -c<cmd>    commands to be executed" + NL +
+    "  -d         switch on debugging" + NL +
+    "  -i<file>   initial context set" + NL +
+    "  -o<file>   write output to file" + NL +
+    "  -q<expr>   query string to be executed" + NL +
     "  -s<pars>   serialization parameters" + NL +
-    "  -v/V       show (all) command info" + NL +
+    "  -u         write back update results" + NL +
+    "  -v/V       show (all) process info" + NL +
     "  -w         wrap query result to xml" + NL +
-    "  -z         skip query output";
+    "  -z         skip query result output";
 
   // SERVER ===================================================================
 

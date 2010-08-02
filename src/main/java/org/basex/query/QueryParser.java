@@ -274,7 +274,7 @@ public class QueryParser extends InputParser {
     // skip uri check for empty input uri...
     if(u != Uri.EMPTY && !u.eq(module.uri))
       error(WRONGMODULE, module.uri, file);
-    ctx.ns.add(module);
+    ctx.ns.add(module, input());
     skipWS();
     check(';');
     prolog1();
@@ -370,7 +370,7 @@ public class QueryParser extends InputParser {
     check(IS);
     name.uri = Uri.uri(stringLiteral());
     if(ctx.ns.find(name.ln()) != null) error(DUPLNSDECL, name);
-    ctx.ns.add(name);
+    ctx.ns.add(name, input());
   }
 
   /**
@@ -423,7 +423,7 @@ public class QueryParser extends InputParser {
    */
   private void optionDecl() throws QueryException {
     // ignore option declarations
-    final QNm name = new QNm(qName(QNAMEINV), ctx);
+    final QNm name = new QNm(qName(QNAMEINV), ctx, input());
     final byte[] val = stringLiteral();
     if(!name.ns()) error(NSMISS, name);
 
@@ -544,7 +544,7 @@ public class QueryParser extends InputParser {
     final byte[] uri = stringLiteral();
     if(uri.length == 0) error(NSMODURI);
     name.uri = Uri.uri(uri);
-    ctx.ns.add(name);
+    ctx.ns.add(name, input());
 
     final TokenList fl = new TokenList();
     if(consumeWS(AT)) do fl.add(stringLiteral()); while(consumeWS(COMMA));
@@ -649,7 +649,8 @@ public class QueryParser extends InputParser {
    */
   private void functionDecl(final boolean up) throws QueryException {
     final QNm name = new QNm(qName(DECLFUNC));
-    name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pref(), false) : ctx.nsFunc);
+    name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) :
+      ctx.nsFunc);
 
     if(name.pref().length == 0 && Type.find(name, true) != null)
       error(FUNCRES, name);
@@ -1276,7 +1277,7 @@ public class QueryParser extends InputParser {
   private Expr[] pragma() throws QueryException {
     Expr[] pragmas = { };
     while(consumeWS(PRAGMA)) {
-      final QNm name = new QNm(qName(PRAGMAINCOMPLETE), ctx);
+      final QNm name = new QNm(qName(PRAGMAINCOMPLETE), ctx, input());
       if(!name.ns()) error(NSMISS, name);
       char c = curr();
       if(c != '#' && !ws(c)) error(PRAGMAINCOMPLETE);
@@ -1478,25 +1479,28 @@ public class QueryParser extends InputParser {
         // name test "pre:tag"
         if(contains(name, ':')) {
           skipWS();
-          return new NameTest(new QNm(name, ctx), NameTest.Kind.STD, att);
+          return new NameTest(new QNm(name, ctx, input()),
+              NameTest.Kind.STD, att, input());
         }
         // name test "tag"
         if(!consume(':')) {
           skipWS();
           final QNm nm = new QNm(name, Uri.uri(ctx.nsElem));
-          return new NameTest(nm, NameTest.Kind.STD, att);
+          return new NameTest(nm, NameTest.Kind.STD, att, input());
         }
         // name test "pre:*"
         if(consume('*')) {
-          final QNm nm = new QNm(EMPTY, Uri.uri(ctx.ns.uri(name, false)));
-          return new NameTest(nm, NameTest.Kind.NS, att);
+          final QNm nm = new QNm(EMPTY,
+              Uri.uri(ctx.ns.uri(name, false, input())));
+          return new NameTest(nm, NameTest.Kind.NS, att, input());
         }
       }
     } else if(consume('*')) {
       // name test "*"
-      if(!consume(':')) return new NameTest(att);
+      if(!consume(':')) return new NameTest(att, input());
       // name test "*:tag"
-      return new NameTest(new QNm(qName(null)), NameTest.Kind.NAME, att);
+      return new NameTest(new QNm(qName(null)), NameTest.Kind.NAME, att,
+          input());
     }
     qp = p;
     return null;
@@ -1603,7 +1607,7 @@ public class QueryParser extends InputParser {
   private QNm varName() throws QueryException {
     check(DOLLAR);
     final QNm name = new QNm(qName(NOVARNAME));
-    if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pref(), false));
+    if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pref(), false, input()));
     ctx.ns.uri(name);
     return name;
   }
@@ -1641,7 +1645,7 @@ public class QueryParser extends InputParser {
         ap = qp;
         ctx.ns.uri(name);
         name.uri = Uri.uri(name.ns() ?
-            ctx.ns.uri(name.pref(), false) : ctx.nsFunc);
+            ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
         final Expr func = ctx.fun.get(name, exprs, ctx, this);
         if(func != null) {
           alter = null;
@@ -1742,7 +1746,7 @@ public class QueryParser extends InputParser {
         if(!simple) error(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
         if(v.length == 0) error(NSEMPTYURI);
-        ctx.ns.add(new QNm(atn, Uri.uri(v)));
+        ctx.ns.add(new QNm(atn, Uri.uri(v)), input());
         addNS(ns, atn, v);
       } else {
         cont = add(cont, new CAttr(input(), new QNm(atn), attv, false));
@@ -2077,7 +2081,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final Occ occ = consume('?') ? Occ.ZO : consume('+') ?
         Occ.OM : consume('*') ? Occ.ZM : Occ.O;
-    if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pref(), false));
+    if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pref(), false, input()));
 
     final byte[] ext = tok.finish();
     final SeqType seq = new SeqType(Type.find(type, true), occ);
@@ -2104,7 +2108,7 @@ public class QueryParser extends InputParser {
     byte[] nm = delete(delete(k, '\''), '"');
     final int i = indexOf(nm, ',');
     if(i != -1) {
-      final QNm test = new QNm(trim(substring(nm, i + 1)), ctx);
+      final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());
       if(!eq(test.uri.atom(), XSURI)) error(TESTINVALID, t, test);
       nm = trim(substring(nm, 0, i));
       final byte[] ln = test.ln();
@@ -2112,7 +2116,7 @@ public class QueryParser extends InputParser {
           !eq(ln, UNATOMIC)) return new QNm(EMPTY);
     }
     return (t == Type.ELM || t == Type.ATT) && nm.length == 1 && nm[0] == '*' ?
-        null : new QNm(nm, ctx);
+        null : new QNm(nm, ctx, input());
   }
 
   /**
@@ -2143,7 +2147,7 @@ public class QueryParser extends InputParser {
     }
     if(!dig) error(NUMBERINC);
     if(letter(curr())) error(NUMBERWS);
-    return Dbl.get(tok.finish());
+    return Dbl.get(tok.finish(), input());
   }
 
   /**
@@ -2562,8 +2566,8 @@ public class QueryParser extends InputParser {
     if(range != null) {
       check(LEVELS);
       if(range[0] instanceof Itr && range[1] instanceof Itr) {
-        min = ((Itr) range[0]).itr();
-        max = ((Itr) range[1]).itr();
+        min = ((Itr) range[0]).itr(input());
+        max = ((Itr) range[1]).itr(input());
       } else {
         error(THESRNG);
       }

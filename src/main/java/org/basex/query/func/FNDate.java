@@ -168,7 +168,7 @@ final class FNDate extends Fun {
    * @throws QueryException query exception
    */
   private Item checkDur(final Item it) throws QueryException {
-    if(it.unt()) return new Dur(it.atom());
+    if(it.unt()) return new Dur(it.atom(), input);
     if(!it.dur()) Err.type(this, Type.DUR, it);
     return it;
   }
@@ -184,7 +184,8 @@ final class FNDate extends Fun {
   private Item datzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Dat(it.atom()) : checkType(it, Type.DAT);
+    final Item i = it.unt() ? new Dat(it.atom(), input) :
+      checkType(it, Type.DAT);
     return adjust((Date) i, zon, d);
   }
 
@@ -199,7 +200,8 @@ final class FNDate extends Fun {
   private Item dtmzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Dtm(it.atom()) : checkType(it, Type.DTM);
+    final Item i = it.unt() ? new Dtm(it.atom(), input) :
+      checkType(it, Type.DTM);
     return adjust((Date) i, zon, d);
   }
 
@@ -214,7 +216,8 @@ final class FNDate extends Fun {
   private Item timzon(final Item it, final Item zon, final boolean d)
       throws QueryException {
 
-    final Item i = it.unt() ? new Tim(it.atom()) : checkType(it, Type.TIM);
+    final Item i = it.unt() ? new Tim(it.atom(), input) :
+      checkType(it, Type.TIM);
     return adjust((Date) i, zon, d);
   }
 
@@ -228,8 +231,8 @@ final class FNDate extends Fun {
   private Item dattim(final Item date, final Item tm) throws QueryException {
     if(tm == null) return null;
 
-    final Item d = date.unt() ? new Dat(date.atom()) : date;
-    final Item t = tm.unt() ? new Tim(tm.atom()) : tm;
+    final Item d = date.unt() ? new Dat(date.atom(), input) : date;
+    final Item t = tm.unt() ? new Tim(tm.atom(), input) : tm;
 
     final Dtm dtm = new Dtm((Dat) checkType(d, Type.DAT));
     final Tim tim = (Tim) checkType(t, Type.TIM);

@@ -52,15 +52,15 @@ public final class Unary extends Single {
     final Item it = expr.atomic(ctx);
     if(it == null) return null;
     if(!it.unt() && !it.num()) Err.number(this, it);
-    final double d = it.dbl();
+    final double d = it.dbl(input);
     if(it.unt()) return Dbl.get(minus ? -d : d);
 
     if(!minus) return it;
     switch(it.type) {
       case DBL: return Dbl.get(-d);
-      case FLT: return Flt.get(-it.flt());
-      case DEC: return Dec.get(it.dec().negate());
-      default:  return Itr.get(-it.itr());
+      case FLT: return Flt.get(-it.flt(input));
+      case DEC: return Dec.get(it.dec(input).negate());
+      default:  return Itr.get(-it.itr(input));
     }
   }
 

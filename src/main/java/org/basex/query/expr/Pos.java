@@ -65,8 +65,8 @@ public final class Pos extends Simple {
     if(a.item()) {
       final Item it = (Item) a;
       if(it.num()) {
-        final long p = it.itr();
-        final boolean ex = p == it.dbl();
+        final long p = it.itr(ii);
+        final boolean ex = p == it.dbl(ii);
         switch(cmp) {
           case EQ: return ex ? get(p, p, ii) : Bln.FALSE;
           case GE: return get(ex ? p : p + 1, Long.MAX_VALUE, ii);

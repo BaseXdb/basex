@@ -77,7 +77,7 @@ public class GFLWOR extends ParseExpr {
       ii = where.empty();
       if(!ii && where.item()) {
         // test is always false: no results
-        ii = !((Item) where).bool();
+        ii = !((Item) where).bool(input);
         if(!ii) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
@@ -174,7 +174,7 @@ public class GFLWOR extends ParseExpr {
         iter(ctx, cache, it, p + 1);
       } else {
 
-        if(where == null || where.ebv(ctx).bool()) {
+        if(where == null || where.ebv(ctx).bool(input)) {
           for(ForLet aFl : fl) {
             if(order != null) cache.get(aFl.var).add(
                 ctx.vars.get(aFl.var).item(ctx));

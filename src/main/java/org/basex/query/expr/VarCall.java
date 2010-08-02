@@ -43,7 +43,8 @@ public final class VarCall extends ParseExpr {
     // pre-assign static variables
     final NSLocal lc = ctx.ns;
     ctx.ns = lc.copy();
-    if(ctx.nsElem.length != 0) ctx.ns.add(new QNm(EMPTY, Uri.uri(ctx.nsElem)));
+    if(ctx.nsElem.length != 0)
+      ctx.ns.add(new QNm(EMPTY, Uri.uri(ctx.nsElem)), input);
 
     /* Choose variables to be pre-evaluated.
      * If a variable is pre-evaluated, it may not be available for further

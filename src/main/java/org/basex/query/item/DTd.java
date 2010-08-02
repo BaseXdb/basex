@@ -55,14 +55,15 @@ public final class DTd extends Dur {
    * @param it duration item
    * @param f factor
    * @param m multiplication flag
+   * @param ii input info
    * @throws QueryException query exception
    */
-  public DTd(final Dur it, final double f, final boolean m)
+  public DTd(final Dur it, final double f, final boolean m, final InputInfo ii)
       throws QueryException {
 
     this(it);
-    if(f != f) Err.or(DATECALC, desc(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(DATEZERO, desc());
+    if(f != f) Err.or(ii, DATECALC, desc(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(ii, DATEZERO, desc());
     sc = sc.multiply(BigDecimal.valueOf(m ? f : 1 / f));
     if(Math.abs(sc.doubleValue()) < 1E-13) sc = BigDecimal.valueOf(0);
   }
@@ -84,15 +85,16 @@ public final class DTd extends Dur {
   /**
    * Constructor.
    * @param v value
+   * @param ii input info
    * @throws QueryException query exception
    */
-  DTd(final byte[] v) throws QueryException {
+  DTd(final byte[] v, final InputInfo ii) throws QueryException {
     super(Type.DTD);
 
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      dateErr(v, type, XDTD);
+      dateErr(v, type, XDTD, ii);
     final long d = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
     final long h = mt.group(5) != null ? Token.toInt(mt.group(6)) : 0;
     final long n = mt.group(7) != null ? Token.toInt(mt.group(8)) : 0;

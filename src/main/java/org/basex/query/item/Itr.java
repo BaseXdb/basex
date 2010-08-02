@@ -73,34 +73,34 @@ public class Itr extends Item {
   }
 
   @Override
-  public final boolean bool() {
+  public final boolean bool(final InputInfo ii) {
     return val != 0;
   }
 
   @Override
-  public final long itr() {
+  public final long itr(final InputInfo ii) {
     return val;
   }
 
   @Override
-  public final float flt() {
+  public final float flt(final InputInfo ii) {
     return val;
   }
 
   @Override
-  public final double dbl() {
+  public final double dbl(final InputInfo ii) {
     return val;
   }
 
   @Override
-  public final BigDecimal dec() {
+  public final BigDecimal dec(final InputInfo ii) {
     return BigDecimal.valueOf(val);
   }
 
   @Override
   public final boolean eq(final InputInfo ii, final Item it)
       throws QueryException {
-    return it instanceof Itr ? val == ((Itr) it).val : val == it.dbl();
+    return it instanceof Itr ? val == ((Itr) it).val : val == it.dbl(ii);
   }
 
   @Override
@@ -111,7 +111,7 @@ public class Itr extends Item {
       final long i = ((Itr) it).val;
       return val < i ? -1 : val > i ? 1 : 0;
     }
-    final double n = it.dbl();
+    final double n = it.dbl(ii);
     return n != n ? UNDEF : val < n ? -1 : val > n ? 1 : 0;
   }
 
@@ -137,15 +137,18 @@ public class Itr extends Item {
   /**
    * Converts the given item into a long value.
    * @param val value to be converted
+   * @param ii input info
    * @return long value
    * @throws QueryException query exception
    */
-  static long parse(final byte[] val) throws QueryException {
+  static long parse(final byte[] val, final InputInfo ii)
+      throws QueryException {
+
     try {
       final String v = Token.string(Token.trim(val));
       return Long.parseLong(v.startsWith("+") ? v.substring(1) : v);
     } catch(final NumberFormatException ex) {
-      ZERO.castErr(val);
+      ZERO.castErr(val, ii);
       return 0;
     }
   }
