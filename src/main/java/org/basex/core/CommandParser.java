@@ -14,6 +14,7 @@ import org.basex.core.Commands.CmdShow;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.AlterUser;
+import org.basex.core.cmd.Backup;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
@@ -41,6 +42,7 @@ import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Optimize;
 import org.basex.core.cmd.Password;
+import org.basex.core.cmd.Restore;
 import org.basex.core.cmd.Run;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.ShowDatabases;
@@ -219,6 +221,10 @@ public final class CommandParser extends InputParser {
         return new Exit();
       case KILL:
         return new Kill(name(cmd));
+      case BACKUP:
+        return new Backup(name(cmd));
+      case RESTORE:
+        return new Restore(name(cmd));  
       case SHOW:
         switch(consume(CmdShow.class, cmd)) {
           case DATABASES:

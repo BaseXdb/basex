@@ -262,6 +262,10 @@ public interface Text {
     "[" + NAM + "]", lang("ch_kill1"), lang("ch_kill2")
   };
   /** Command help. */
+  String[] HELPBACKUP = {
+    "[" + NAM + "]", lang("ch_backup1"), lang("ch_backup2")
+  };
+  /** Command help. */
   String[] HELPSHOW = {
     "[" + CmdShow.DATABASES + "|" + CmdShow.SESSIONS + "|" +
     CmdShow.USERS + "]",
@@ -407,6 +411,10 @@ public interface Text {
   String DBALTERED = lang("db_altered");
   /** Database not dropped. */
   String DBNOTALTERED = lang("db_notaltered");
+  /** Backup of database created. */
+  String DBBACKUP = lang("db_backup");
+  /** Backup of database not created. */
+  String DBNOBACKUP = lang("db_nobackup");
   /** Database not opened. */
   String DBOPENERR = lang("db_notopened");
   /** Database opened. */
