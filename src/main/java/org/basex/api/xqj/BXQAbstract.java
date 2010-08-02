@@ -123,13 +123,13 @@ abstract class BXQAbstract {
     // return xquery items
     if(t == null && v instanceof BXQItem) return ((BXQItem) v).it;
 
-    // get XQuery mapping
+    // get xquery mapping
     final Type e = FunJava.type(v);
     if(e == null) throw new BXQException(CONV, v.getClass().getSimpleName());
 
     try {
       // return item with correct type
-      return check(e, t).e(v);
+      return check(e, t).e(v, null);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

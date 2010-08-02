@@ -151,9 +151,9 @@ abstract class BXQDynamicContext extends BXQAbstract
   }
 
   @Override
-  public void bindNode(final QName qn, final Node n, final XQItemType t)
+  public void bindNode(final QName qn, final Node v, final XQItemType t)
       throws XQException {
-    bind(qn, create(n, null), t);
+    bind(qn, create(v, null), t);
   }
 
   @Override
@@ -215,7 +215,7 @@ abstract class BXQDynamicContext extends BXQAbstract
     Item i = it;
     if(tt != it.type) {
       try {
-        i = tt.e(it, ctx.ctx);
+        i = tt.e(it, ctx.ctx, null);
       } catch(final QueryException ex) {
         throw new BXQException(ex);
       }
