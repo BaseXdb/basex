@@ -77,7 +77,7 @@ public final class QueryException extends Exception {
         t[i] = t[i].toString();
       }
       final String s = t[i].toString();
-      t[i] = s.length() > 256 ? s.substring(0, 256) + DOTS : s;
+      t[i] = s.length() > 1000 ? s.substring(0, 1000) + DOTS : s;
     }
     return t;
   }
