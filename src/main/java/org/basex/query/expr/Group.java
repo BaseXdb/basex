@@ -120,8 +120,9 @@ public final class Group extends ParseExpr {
   /**
    * Adds the current context to the grouping partition.
    * @param ctx context
+   * @throws QueryException ex
    */
-  public void add(final QueryContext ctx) {
+  public void add(final QueryContext ctx) throws QueryException {
     gp.add(ctx);
   }
 

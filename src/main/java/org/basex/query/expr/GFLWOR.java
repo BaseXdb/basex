@@ -146,8 +146,8 @@ public class GFLWOR extends ParseExpr {
     for(int i = 0; i < group.gp.partitions.size(); i++) { // bind grouping var
       HashMap<Var, ItemList> ngvars = group.gp.items.get(i);
       final GroupNode gn =  group.gp.partitions.get(i);
-      for(int j = 0; j < GroupPartition.gv.length; j++) {
-        GroupPartition.gv[j].bind(gn.its[j], ctx);
+      for(int j = 0; j < group.gp.gv.length; j++) {
+        group.gp.gv[j].bind(gn.its[j], ctx);
       }
       for(Var ngv : ngvars.keySet()) {
         final ItemList its = ngvars.get(ngv); 
@@ -175,11 +175,11 @@ public class GFLWOR extends ParseExpr {
       } else {
 
         if(where == null || where.ebv(ctx, input).bool(input)) {
-          for(ForLet aFl : fl) {
+          for(final ForLet aFl : fl) {
             if(order != null) cache.get(aFl.var).add(
                 ctx.vars.get(aFl.var).item(ctx));
           }
-          if(group != null)  group.add(ctx);
+          if(group != null) group.add(ctx);
           if(order != null) order.add(ctx);
         }
       }
