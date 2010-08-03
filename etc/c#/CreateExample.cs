@@ -32,7 +32,6 @@ namespace BaseXClient
 
         // close session
         session.Close();
-        Console.ReadLine();
       }
       catch (IOException e)
       {

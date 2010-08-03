@@ -7,34 +7,33 @@ Imports System
 Imports System.Diagnostics
 Imports System.IO
 
-Namespace BaseXClient
-  Public Class Example
-    Public Shared Sub Main(args As String())
-      Try
-        ' initialize timer
-        Dim watch As New Stopwatch()
-        watch.Start()
+Module Example
+  Sub Main()
+    Try
+      ' initialize timer
+      Dim watch As New Stopwatch()
+      watch.Start()
 
-        ' create session
-        Dim session As New Session("localhost", 1984, "admin", "admin")
+      ' create session
+      Dim session As New Session("localhost", 1984, "admin", "admin")
+ 
+      ' version 1: perform command and print returned string
+      Console.WriteLine(session.Execute("info"))
 
-        ' version 1: perform command and print returned string
-        Console.WriteLine(session.Execute("info"))
+      ' version 2 (faster): perform command and pass on result to output stream
+      Dim stream As Stream = Console.OpenStandardOutput()
+      session.Execute("xquery 1 to 10", stream)
 
-        ' version 2 (faster): perform command and pass on result to output stream
-        Dim stream As Stream = Console.OpenStandardOutput()
-        session.Execute("xquery 1 to 10", stream)
+      ' close session
+      session.Close()
 
-        ' close session
-        session.Close()
-
-        ' print time needed
-        Console.WriteLine(vbLf & watch.ElapsedMilliseconds & " ms.")
-
-      Catch e As IOException
-        ' print exception
-        Console.WriteLine(e.Message)
-      End Try
-    End Sub
-  End Class
-End Namespace
+      ' print time needed
+      Console.WriteLine(vbLf & watch.ElapsedMilliseconds & " ms.")
+      
+    Catch e As IOException
+      ' print exception
+      Console.WriteLine(e.Message)
+      Console.ReadLine()
+    End Try
+  End Sub
+End Module
