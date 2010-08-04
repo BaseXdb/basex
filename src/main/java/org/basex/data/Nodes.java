@@ -87,7 +87,7 @@ public final class Nodes implements Result {
   }
 
   @Override
-  public boolean same(final Result v) {
+  public boolean equiv(final Result v) {
     if(!(v instanceof Nodes) || v.size() != size) return false;
     final Nodes n = (Nodes) v;
     if(data != n.data) return false;

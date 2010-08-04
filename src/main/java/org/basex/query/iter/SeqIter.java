@@ -81,7 +81,7 @@ public final class SeqIter extends Iter implements Result {
   }
 
   @Override
-  public boolean same(final Result v) {
+  public boolean equiv(final Result v) {
     if(!(v instanceof SeqIter)) return false;
 
     final SeqIter sb = (SeqIter) v;
@@ -89,7 +89,7 @@ public final class SeqIter extends Iter implements Result {
     try {
       for(int i = 0; i < size; i++) {
         /// it is safe to pass on null, as item has the same type
-        if(item[i].type != sb.item[i].type || !item[i].eq(null, sb.item[i]))
+        if(item[i].type != sb.item[i].type || !item[i].equiv(null, sb.item[i]))
           return false;
       }
       return true;

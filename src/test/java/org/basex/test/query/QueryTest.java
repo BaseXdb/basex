@@ -12,6 +12,7 @@ import org.basex.core.cmd.XQuery;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.query.item.Bln;
+import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
@@ -83,7 +84,7 @@ public abstract class QueryTest {
         if(val instanceof Nodes && cmp instanceof Nodes) {
           ((Nodes) cmp).data = ((Nodes) val).data;
         }
-        if(!correct || !val.same(cmp)) {
+        if(!correct || !val.equiv(cmp)) {
           sb.append("-- " + qu[0] + ": " + query + "\n[E] " + (correct ?
               qu[1] : "error") + "\n[F] " + val + " " + details() + "\n");
           fail++;
@@ -128,6 +129,15 @@ public abstract class QueryTest {
 
   /**
    * Creates an iterator for the specified double.
+   * @param d double value
+   * @return iterator
+   */
+  static SeqIter dbl(final double d) {
+    return item(Dbl.get(d));
+  }
+
+  /**
+   * Creates an iterator for the specified integer.
    * @param d double value
    * @return iterator
    */
