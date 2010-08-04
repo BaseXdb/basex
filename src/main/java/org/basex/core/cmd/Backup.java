@@ -17,6 +17,7 @@ import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
+import org.basex.util.Performance;
 
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
@@ -39,10 +40,11 @@ public final class Backup extends Command {
 
   @Override
   protected boolean run() {
+    final Performance p = new Performance();
     final String db = args[0];
     // try to backup database
     return !prop.dbexists(db) ? error(DBNOTFOUND, db)
-        : backup(db, prop) ? info(DBBACKUP, db) : error(DBNOBACKUP, db);
+        : backup(db, prop) ? info(DBBACKUP, db, p) : error(DBNOBACKUP, db);
   }
 
   /**

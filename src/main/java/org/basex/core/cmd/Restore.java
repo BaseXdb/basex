@@ -16,6 +16,7 @@ import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.io.IO;
+import org.basex.util.Performance;
 
 /**
  * Evaluates the 'restore' command and restores a backup of a database.
@@ -34,6 +35,7 @@ public final class Restore extends Command {
 
   @Override
   protected boolean run() {
+    final Performance p = new Performance();
     String db = args[0];
     File file = null;
     final int i = db.indexOf("-");
@@ -56,7 +58,8 @@ public final class Restore extends Command {
     // check if database is pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
     // try to restore database
-    return restore(file, prop) ? info(DBRESTORE, db) : error(DBNORESTORE, db);
+    return restore(file, prop) ? info(DBRESTORE, db, p) :
+      error(DBNORESTORE, db);
   }
 
   /**
