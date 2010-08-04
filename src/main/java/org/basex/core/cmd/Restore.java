@@ -15,6 +15,7 @@ import java.util.zip.ZipInputStream;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.io.IO;
 
 /**
  * Evaluates the 'restore' command and restores a backup of a database.
@@ -23,10 +24,6 @@ import org.basex.core.User;
  * @author Christian Gruen
  */
 public final class Restore extends Command {
-
-  /** Buffer size. */
-  private static final int SIZE = 1024;
-
   /**
    * Default constructor.
    * @param arg optional argument
@@ -37,32 +34,25 @@ public final class Restore extends Command {
 
   @Override
   protected boolean run() {
-    String filename = args[0];
+    String db = args[0];
     File file = null;
-    String db = "";
-    int i = filename.indexOf("-");
+    final int i = db.indexOf("-");
     if(i == -1) {
-      File folder = new File(prop.get(Prop.DBPATH));
-      String[] files = folder.list();
-      File newest = null;
-      int c = 0;
-      for(String n : files) {
-        if(n.startsWith(filename) && n.endsWith(".zip")) {
-          db = filename;
-          if(c == 0) newest = new File(prop.get(Prop.DBPATH) + Prop.SEP + n);
-          File tmp = new File(prop.get(Prop.DBPATH) + Prop.SEP + n);
-          if(tmp.lastModified() < newest.lastModified()) newest = tmp;
-          c++;
+      // find most recent backup
+      for(final File f : new File(prop.get(Prop.DBPATH)).listFiles()) {
+        final String n = f.getName();
+        if(n.startsWith(db) && n.endsWith(IO.ZIPSUFFIX)) {
+          if(file == null || file.lastModified() < f.lastModified()) file = f;
         }
       }
-      file = newest;
-      if(file == null) return error("No Backup found for '" + filename + "'");
+      if(file == null) return error("No Backup found for '" + db + "'");
     } else {
-      db = filename.substring(0, i);
-      if(!filename.endsWith(".zip")) filename = filename.concat(".zip");
-      file = new File(prop.get(Prop.DBPATH) + Prop.SEP + filename);
+      if(!db.endsWith(IO.ZIPSUFFIX)) db += IO.ZIPSUFFIX;
+      file = new File(prop.get(Prop.DBPATH) + Prop.SEP + db);
+      db = db.substring(0, i);
     }
-    if(!file.exists()) return error(FILEWHICH, filename);
+    if(!file.exists()) return error(FILEWHICH, db);
+
     // check if database is pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
     // try to restore database
@@ -77,27 +67,26 @@ public final class Restore extends Command {
    */
   public static synchronized boolean restore(final File file, final Prop pr) {
     try {
-      InputStream is = new BufferedInputStream(new FileInputStream(file));
-      ZipInputStream zis = new ZipInputStream(is);
+      final InputStream is = new BufferedInputStream(new FileInputStream(file));
+      final ZipInputStream zis = new ZipInputStream(is);
+      final byte[] data = new byte[IO.BLOCKSIZE];
       ZipEntry e;
       while((e = zis.getNextEntry()) != null) {
+        final String path = pr.get(Prop.DBPATH) + Prop.SEP + e.getName();
         if(e.isDirectory()) {
-          new File(pr.get(Prop.DBPATH) + Prop.SEP + e.getName()).mkdir();
+          new File(path).mkdir();
         } else {
-          BufferedOutputStream bos = new BufferedOutputStream(new
-              FileOutputStream(pr.get(Prop.DBPATH) + Prop.SEP + e.getName()));
-          byte[] data = new byte[SIZE];
-          int count;
-          while((count = zis.read(data, 0, SIZE)) != -1) {
-            bos.write(data, 0, count);
-          }
+          final BufferedOutputStream bos = new BufferedOutputStream(
+              new FileOutputStream(path));
+          int c;
+          while((c = zis.read(data)) != -1) bos.write(data, 0, c);
           bos.close();
         }
       }
       zis.close();
-    } catch(IOException io) {
+      return true;
+    } catch(final IOException io) {
       return false;
     }
-    return true;
   }
 }
