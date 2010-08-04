@@ -2,13 +2,15 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import org.basex.core.Command;
 import org.basex.core.Prop;
@@ -21,6 +23,10 @@ import org.basex.core.User;
  * @author Christian Gruen
  */
 public final class Restore extends Command {
+
+  /** Buffer size. */
+  private static final int SIZE = 1024;
+
   /**
    * Default constructor.
    * @param arg optional argument
@@ -31,49 +37,64 @@ public final class Restore extends Command {
 
   @Override
   protected boolean run() {
-    final String file = args[0];
+    String filename = args[0];
+    File file = null;
     String db = "";
-    try {
-      db = file.substring(0, file.indexOf("-"));
-    } catch(Exception e) {
-      return error("Not a valid backup file.");
+    int i = filename.indexOf("-");
+    if(i == -1) {
+      File folder = new File(prop.get(Prop.DBPATH));
+      String[] files = folder.list();
+      File newest = null;
+      int c = 0;
+      for(String n : files) {
+        if(n.startsWith(filename) && n.endsWith(".zip")) {
+          db = filename;
+          if(c == 0) newest = new File(prop.get(Prop.DBPATH) + Prop.SEP + n);
+          File tmp = new File(prop.get(Prop.DBPATH) + Prop.SEP + n);
+          if(tmp.lastModified() < newest.lastModified()) newest = tmp;
+          c++;
+        }
+      }
+      file = newest;
+      if(file == null) return error("No Backup found for '" + filename + "'");
+    } else {
+      db = filename.substring(0, i);
+      if(!filename.endsWith(".zip")) filename = filename.concat(".zip");
+      file = new File(prop.get(Prop.DBPATH) + Prop.SEP + filename);
     }
-    // DB is currently locked
+    if(!file.exists()) return error(FILEWHICH, filename);
+    // check if database is pinned
     if(context.pinned(db)) return error(DBLOCKED, db);
-
-    // try to alter database
+    // try to restore database
     return restore(file, prop) ? info(DBRESTORE, db) : error(DBNORESTORE, db);
   }
 
   /**
    * Restores the specified database.
-   * @param file file name
+   * @param file file
    * @param pr database properties
    * @return success flag
    */
-  public static synchronized boolean restore(final String file, final Prop pr) {
+  public static synchronized boolean restore(final File file, final Prop pr) {
     try {
-      ZipFile zip = new ZipFile(new File(pr.get(Prop.DBPATH)
-          + Prop.SEP + file));
-      Enumeration<? extends ZipEntry> files = zip.entries(); 
-      String destDir = "";
-      byte[] buf = new byte[1024];
-      while(files.hasMoreElements()) {
-        ZipEntry entry = files.nextElement();
-          if(entry.isDirectory()) {
-            destDir = pr.get(Prop.DBPATH) + Prop.SEP + entry.getName();
-            new File(destDir).mkdir();
-          } else {
-            File f = new File(pr.get(Prop.DBPATH) + Prop.SEP, entry.getName()); 
-              InputStream in = zip.getInputStream(entry); 
-              FileOutputStream out = new FileOutputStream(f);
-              int len;
-              while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-          } 
+      InputStream is = new BufferedInputStream(new FileInputStream(file));
+      ZipInputStream zis = new ZipInputStream(is);
+      ZipEntry e;
+      while((e = zis.getNextEntry()) != null) {
+        if(e.isDirectory()) {
+          new File(pr.get(Prop.DBPATH) + Prop.SEP + e.getName()).mkdir();
+        } else {
+          BufferedOutputStream bos = new BufferedOutputStream(new
+              FileOutputStream(pr.get(Prop.DBPATH) + Prop.SEP + e.getName()));
+          byte[] data = new byte[SIZE];
+          int count;
+          while((count = zis.read(data, 0, SIZE)) != -1) {
+            bos.write(data, 0, count);
+          }
+          bos.close();
+        }
       }
-      zip.close();
+      zis.close();
     } catch(IOException io) {
       return false;
     }
