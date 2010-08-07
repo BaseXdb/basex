@@ -508,7 +508,7 @@ public abstract class W3CTS {
               }
               rdata.close();
               if(eq) break;
-            } catch(final IOException ex) {
+            } catch(final Exception ex) {
               ex.printStackTrace();
             }
           }
