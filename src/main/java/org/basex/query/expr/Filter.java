@@ -18,16 +18,16 @@ import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
 /**
- * Predicate expression.
+ * Filter expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class Pred extends Preds {
+public class Filter extends Preds {
   /** Expression. */
   Expr root;
   /** Counter flag. */
-  private boolean counter;
+  private boolean direct;
 
   /**
    * Constructor.
@@ -35,7 +35,7 @@ public class Pred extends Preds {
    * @param r expression
    * @param p predicates
    */
-  public Pred(final InputInfo ii, final Expr r, final Expr... p) {
+  public Filter(final InputInfo ii, final Expr r, final Expr... p) {
     super(ii, p);
     root = r;
   }
@@ -71,19 +71,17 @@ public class Pred extends Preds {
     // last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
     // use iterative evaluation
-    if(pred.length == 1 && (last || pos != null || !uses(Use.POS, ctx))) {
+    if(pred.length == 1 && (last || pos != null || !uses(Use.POS, ctx)))
       return new IterPred(input, root, pred, pos, last);
-    }
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
-    counter = pred.length == 1 && p.returned(ctx).num() &&
-      !p.uses(Use.CTX, ctx);
+    direct = pred.length == 1 && p.returned(ctx).num() && !p.uses(Use.CTX, ctx);
     return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    if(counter) {
+    if(direct) {
       final Item it = pred[0].ebv(ctx, input);
       final long l = it.itr(input);
       final Expr e = Pos.get(l, l, input);

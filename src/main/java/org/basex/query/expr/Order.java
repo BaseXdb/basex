@@ -19,23 +19,23 @@ import org.basex.util.InputInfo;
  */
 public final class Order extends ParseExpr {
   /** Sort list. */
-  final OrderBy[] ord;
+  final OrderBy[] ob;
   /** Sequence to be sorted. */
   SeqIter sq;
 
  /**
    * Constructor.
    * @param ii input info
-   * @param e expressions
+   * @param o order by expressions
    */
-  public Order(final InputInfo ii, final OrderBy[] e) {
+  public Order(final InputInfo ii, final OrderBy[] o) {
     super(ii);
-    ord = e;
+    ob = o;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(final OrderBy o : ord) o.comp(ctx);
+    for(final OrderBy o : ob) o.comp(ctx);
     return this;
   }
 
@@ -55,7 +55,7 @@ public final class Order extends ParseExpr {
           order = new int[e];
           for(int i = 0; i < e; i++) order[i] = i;
           sort(order, 0, e);
-          for(final OrderBy o : ord) o.reset();
+          for(final OrderBy o : ob) o.reset();
         }
 
         while(true) {
@@ -78,18 +78,18 @@ public final class Order extends ParseExpr {
    * @throws QueryException query exception
    */
   void add(final QueryContext ctx) throws QueryException {
-    for(final OrderBy o : ord) o.add(ctx);
+    for(final OrderBy o : ob) o.add(ctx);
   }
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    for(final OrderBy o : ord) if(o.uses(u, ctx)) return true;
+    for(final OrderBy o : ob) if(o.uses(u, ctx)) return true;
     return false;
   }
 
   @Override
   public Order remove(final Var v) {
-    for(int o = 0; o < ord.length; o++) ord[o] = ord[o].remove(v);
+    for(int o = 0; o < ob.length; o++) ob[o] = ob[o].remove(v);
     return this;
   }
 
@@ -121,8 +121,8 @@ public final class Order extends ParseExpr {
       m = m(o, l, m, n);
     }
 
-    final Item[] im = new Item[ord.length];
-    for(int k = 0; k < ord.length; k++) im[k] = ord[k].item(o[m]);
+    final Item[] im = new Item[ob.length];
+    for(int k = 0; k < ob.length; k++) im[k] = ob[k].item(o[m]);
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
@@ -164,8 +164,8 @@ public final class Order extends ParseExpr {
   private int d(final int[] o, final int a, final Item[] it)
       throws QueryException {
 
-    for(int k = 0; k < ord.length; k++) {
-      final OrderBy or = ord[k];
+    for(int k = 0; k < ob.length; k++) {
+      final OrderBy or = ob[k];
       final Item m = or.item(o[a]);
       final Item n = it[k];
       final boolean x = m == null;
@@ -186,7 +186,7 @@ public final class Order extends ParseExpr {
    * @throws QueryException query exception
    */
   private int d(final int[] o, final int a, final int b) throws QueryException {
-    for(final OrderBy l : ord) {
+    for(final OrderBy l : ob) {
       final Item m = l.item(o[a]);
       final Item n = l.item(o[b]);
       final boolean x = m == null;
@@ -245,7 +245,7 @@ public final class Order extends ParseExpr {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(int o = 0; o != ord.length - 1; o++) ord[o].plan(ser);
+    for(int o = 0; o != ob.length - 1; o++) ob[o].plan(ser);
     ser.closeElement();
   }
 
@@ -253,8 +253,8 @@ public final class Order extends ParseExpr {
   public String toString() {
     final StringBuilder sb = new StringBuilder(" " + ORDER + " " +
         BY + " ");
-    for(int l = 0; l != ord.length - 1; l++) {
-      sb.append((l != 0 ? ", " : "") + ord[l]);
+    for(int l = 0; l != ob.length - 1; l++) {
+      sb.append((l != 0 ? ", " : "") + ob[l]);
     }
     return sb.toString();
   }

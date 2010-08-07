@@ -81,6 +81,8 @@ public final class SimpleTest extends QueryTest {
       { "Pred 6", nod(20), "/html/body/div/ul/li[text() = 'Exercise 1']" },
       { "Pred 7", nod(8), "//*[@* = '#FFFFFF']" },
       { "Pred 8", nod(8), "//*[@id = 1]" },
+      { "Pred 9", nod(5, 17), "//*[text() = 'XML' or text() = 'Assignments']" },
+      { "Pred 10", nod(5, 17), "//*[text() = ('XML', 'Assignments')]" },
       { "Pred Error 1", "/[/]" },
       { "Pred Error 2", "/*[]" },
       { "Pred Error 3", "/*[//]" },
@@ -109,6 +111,10 @@ public final class SimpleTest extends QueryTest {
       { "FLWOR 4", itr(100000), "count(for $i in 1 to 100000 return $i * $i)" },
       { "FLWOR 5", itr(100000000),
         "count(for $i in 1 to 10000 for $i in 1 to 10000 return $i * $i)" },
+      { "FLWOR 6", itr(2),
+        "count((for $a in (1,2) for $b in <b/> return $b)/.)" },
+      { "FLWOR 7", itr(2),
+        "count((for $a in (1,2) let $b := <b/> return $b)/.)" },
     };
   }
 

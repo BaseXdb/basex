@@ -33,13 +33,6 @@ public final class CPI extends CFrag {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-    checkUp(expr[0], ctx);
-    return this;
-  }
-
-  @Override
   public FPI atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Item it = checkItem(expr[0], ctx);
@@ -52,7 +45,7 @@ public final class CPI extends CFrag {
 
     final Iter iter = ctx.iter(expr[1]);
     final TokenBuilder tb = new TokenBuilder();
-    CText.add(tb, iter);
+    CAttr.add(tb, iter);
     byte[] v = tb.finish();
 
     int i = -1;

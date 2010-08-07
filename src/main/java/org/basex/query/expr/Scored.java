@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.iter.Iter;
+import org.basex.query.item.Item;
 import org.basex.util.InputInfo;
 
 /**
@@ -20,21 +20,19 @@ public class Scored extends Arr {
    * Constructor.
    * @param ii input info
    * @param e scored expression
-   * @param score expression computing the score
+   * @param s expression computing the score
    */
-  public Scored(final InputInfo ii, final Expr e, final Expr score) {
-    super(ii, e, score);
+  public Scored(final InputInfo ii, final Expr e, final Expr s) {
+    super(ii, e, s);
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    // ignore pragma
-    return expr[0].comp(ctx);
-  }
-
-  @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    return expr[0].iter(ctx);
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    // attaches a score value to the first item
+    final Item it = expr[0].atomic(ctx, input);
+    it.score(checkDbl(expr[1], ctx));
+    return it;
   }
 
   @Override

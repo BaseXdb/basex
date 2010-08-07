@@ -45,10 +45,10 @@ import org.basex.query.expr.Or;
 import org.basex.query.expr.OrderBy;
 import org.basex.query.expr.Order;
 import org.basex.query.expr.Pragma;
-import org.basex.query.expr.Pred;
+import org.basex.query.expr.Filter;
 import org.basex.query.expr.Range;
 import org.basex.query.expr.Root;
-import org.basex.query.expr.Satisfy;
+import org.basex.query.expr.Quantified;
 import org.basex.query.expr.Scored;
 import org.basex.query.expr.Switch;
 import org.basex.query.expr.Treat;
@@ -884,7 +884,7 @@ public class QueryParser extends InputParser {
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
 
-    final GroupBy grp = new GroupBy(input(), new VarCall(input(), v));
+    final GroupBy grp = new GroupBy(input(), v);
     return group == null ? new GroupBy[] { grp } : Array.add(group, grp);
   }
 
@@ -911,7 +911,7 @@ public class QueryParser extends InputParser {
     check(SATISFIES);
     final Expr e = check(single(), NOSOME);
     ctx.vars.reset(s);
-    return new Satisfy(input(), fl, e, !some);
+    return new Quantified(input(), fl, e, !some);
   }
 
   /**
@@ -1033,11 +1033,11 @@ public class QueryParser extends InputParser {
   private Expr comparison() throws QueryException {
     final Expr e = ftContains();
     if(e != null) {
-      for(final CmpV.Comp c : CmpV.Comp.values()) if(consumeWS(c.name))
+      for(final CmpV.Op c : CmpV.Op.values()) if(consumeWS(c.name))
         return new CmpV(input(), e, check(ftContains(), CMPEXPR), c);
-      for(final CmpN.Comp c : CmpN.Comp.values()) if(consumeWS(c.name))
+      for(final CmpN.Op c : CmpN.Op.values()) if(consumeWS(c.name))
         return new CmpN(input(), e, check(ftContains(), CMPEXPR), c);
-      for(final CmpG.Comp c : CmpG.Comp.values()) if(consumeWS2(c.name))
+      for(final CmpG.Op c : CmpG.Op.values()) if(consumeWS2(c.name))
         return new CmpG(input(), e, check(ftContains(), CMPEXPR), c);
     }
     return e;
@@ -1520,7 +1520,7 @@ public class QueryParser extends InputParser {
     if(e == null) error(PREDMISSING);
     Expr[] pred = {};
     do { pred = add(pred, expr()); check(BR2); } while(consumeWS2(BR1));
-    return new Pred(input(), e, pred);
+    return new Filter(input(), e, pred);
   }
 
   /**
@@ -1681,7 +1681,7 @@ public class QueryParser extends InputParser {
    */
   private Expr dirElemConstructor() throws QueryException {
     if(skipWS()) error(NOTAGNAME);
-    final QNm open = new QNm(qName(NOTAGNAME));
+    final QNm tag = new QNm(qName(NOTAGNAME));
     consumeWSS();
 
     Expr[] cont = {};
@@ -1740,7 +1740,7 @@ public class QueryParser extends InputParser {
       if(eq(atn, XMLNS)) {
         if(!simple) error(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
-        if(!open.ns()) open.uri = Uri.uri(v);
+        if(!tag.ns()) tag.uri = Uri.uri(v);
         addNS(ns, atn, v);
       } else if(startsWith(atn, XMLNS)) {
         if(!simple) error(NSCONS);
@@ -1749,7 +1749,7 @@ public class QueryParser extends InputParser {
         ctx.ns.add(new QNm(atn, Uri.uri(v)), input());
         addNS(ns, atn, v);
       } else {
-        cont = add(cont, new CAttr(input(), new QNm(atn), attv, false));
+        cont = add(cont, new CAttr(input(), false, new QNm(atn), attv));
       }
       if(!consumeWSS()) break;
     }
@@ -1759,7 +1759,7 @@ public class QueryParser extends InputParser {
     } else {
       check('>');
       while(curr() != '<' || next() != '/') {
-        final Expr e = dirElemContent(open);
+        final Expr e = dirElemContent(tag);
         if(e == null) continue;
         cont = add(cont, e);
       }
@@ -1769,11 +1769,11 @@ public class QueryParser extends InputParser {
       final byte[] close = qName(NOTAGNAME);
       consumeWSS();
       check('>');
-      if(!eq(open.atom(), close)) error(TAGWRONG, open.atom(), close);
+      if(!eq(tag.atom(), close)) error(TAGWRONG, tag.atom(), close);
     }
 
     ctx.ns.size(s);
-    return new CElem(input(), open, cont, ns);
+    return new CElem(input(), tag, ns, cont);
   }
 
   /**
@@ -1965,8 +1965,8 @@ public class QueryParser extends InputParser {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = expr();
     check(BRACE2);
-    return new CElem(input(), name, e == null ? new Expr[0] : new Expr[] { e },
-        new Atts());
+    return new CElem(input(), name, new Atts(),
+        e == null ? new Expr[0] : new Expr[] { e });
   }
 
   /**
@@ -1989,8 +1989,7 @@ public class QueryParser extends InputParser {
     check(BRACE1);
     final Expr e = expr();
     check(BRACE2);
-    return new CAttr(input(), nm,
-        new Expr[] { e == null ? Seq.EMPTY : e }, true);
+    return new CAttr(input(), true, nm, e == null ? Seq.EMPTY : e);
   }
 
   /**

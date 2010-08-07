@@ -1,6 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -19,7 +21,6 @@ import org.basex.util.InputInfo;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
- * @author Dennis Stratmann
  */
 public final class InterSect extends Arr {
   /**
@@ -126,6 +127,6 @@ public final class InterSect extends Arr {
 
   @Override
   public String toString() {
-    return "(" + toString(" & ") + ")";
+    return "(" + toString(" " + INTERSECT + " ") + ")";
   }
 }

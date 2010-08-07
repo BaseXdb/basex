@@ -32,7 +32,7 @@ public final class Delete extends Update {
   @Override
   public Seq atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Iter t = expr[0].iter(ctx);
+    final Iter t = ctx.iter(expr[0]);
     Item i;
     while((i = t.next()) != null) {
       if(!(i instanceof Nod)) Err.or(input, UPTRGDELEMPT);

@@ -33,15 +33,14 @@ public final class And extends Arr {
     super.comp(ctx);
 
     for(int e = 0; e < expr.length; e++) {
-      final Expr ex = expr[e];
-      if(!ex.item()) continue;
+      if(!expr[e].item()) continue;
 
-      if(!((Item) ex).bool(input)) {
+      if(!((Item) expr[e]).bool(input)) {
         // atomic items can be pre-evaluated
-        ctx.compInfo(OPTFALSE, ex);
+        ctx.compInfo(OPTFALSE, expr[e]);
         return Bln.FALSE;
       }
-      ctx.compInfo(OPTTRUE, ex);
+      ctx.compInfo(OPTTRUE, expr[e]);
       expr = Array.delete(expr, e--);
       if(expr.length == 0) return Bln.TRUE;
     }
@@ -73,9 +72,12 @@ public final class And extends Arr {
     if(ps != null) expr = Array.add(expr, ps);
     if(cr != null) expr = Array.add(expr, cr);
 
-    if(expr.length != 1) return this;
-    final SeqType ret = expr[0].returned(ctx);
-    return ret.type == Type.BLN && ret.one() ? expr[0] : this;
+    // one expression left
+    if(expr.length == 1) {
+      final SeqType ret = expr[0].returned(ctx);
+      if(ret.type == Type.BLN && ret.one()) return expr[0];
+    }
+    return this;
   }
 
   @Override

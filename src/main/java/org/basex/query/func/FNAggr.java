@@ -44,9 +44,9 @@ final class FNAggr extends Fun {
         if(c == -1) do ++c; while(iter.next() != null);
         return Itr.get(c);
       case MIN:
-        return minmax(iter, CmpV.Comp.GT, ctx);
+        return minmax(iter, CmpV.Op.GT, ctx);
       case MAX:
-        return minmax(iter, CmpV.Comp.LT, ctx);
+        return minmax(iter, CmpV.Op.LT, ctx);
       case SUM:
         Item it = iter.next();
         return it != null ? sum(iter, it, false) :
@@ -110,7 +110,7 @@ final class FNAggr extends Fun {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item minmax(final Iter iter, final CmpV.Comp cmp,
+  private Item minmax(final Iter iter, final CmpV.Op cmp,
       final QueryContext ctx) throws QueryException {
 
     if(expr.length == 2) checkColl(expr[1], ctx);

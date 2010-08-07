@@ -16,7 +16,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.CAttr;
 import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Pred;
+import org.basex.query.expr.Filter;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -211,7 +211,7 @@ public class AxisPath extends Path {
       int ts = tl.size();
       final Step[] steps = new Step[ts + step.length - s - 1];
       for(int t = 0; t < ts; t++) {
-        final Expr[] preds = t == ts - 1 ? step[s].pred : new Expr[] {};
+        final Expr[] preds = t == ts - 1 ? step[s].pred : new Expr[0];
         final byte[] n = tl.get(ts - t - 1);
         final NameTest nt = n == null ? new NameTest(false, input) :
           new NameTest(new QNm(n), Kind.NAME, false, input);
@@ -383,7 +383,7 @@ public class AxisPath extends Path {
       litem = it;
       citer = new NodIter();
       if(it != null && it.size(ctx) != 1) {
-        final Iter ir = it.iter(ctx);
+        final Iter ir = ctx.iter(it);
         while((it = ir.next()) != null) {
           ctx.item = it;
           iter(0, citer, ctx);
@@ -526,7 +526,7 @@ public class AxisPath extends Path {
     final Step[] e = new Step[s--];
     // add predicates of last step to new root node
     final Expr rt = step[s].pred.length != 0 ?
-        new Pred(input, r, step[s].pred) : r;
+        new Filter(input, r, step[s].pred) : r;
 
     // add inverted steps in a backward manner
     int c = 0;

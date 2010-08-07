@@ -14,7 +14,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
- * Abstract predicate expression, implemented by {@link Pred} and
+ * Abstract predicate expression, implemented by {@link Filter} and
  * {@link Step}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -38,26 +38,27 @@ public abstract class Preds extends ParseExpr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(final Expr p : pred) checkUp(p, ctx);
 
+    // as predicates will not necessarily start from the document node,
+    // the context item type is temporarily set to element
     final Item ci = ctx.item;
     final Type ct = ci != null ? ci.type : null;
-    // predicates will not necessarily start from the document node..
     if(ct == Type.DOC) ctx.item.type = Type.ELM;
 
     Expr e = this;
     for(int p = 0; p < pred.length; p++) {
-      Expr ex = pred[p].comp(ctx);
-      ex = Pos.get(CmpV.Comp.EQ, ex, ex, input);
+      Expr pr = pred[p].comp(ctx);
+      pr = Pos.get(CmpV.Op.EQ, pr, pr, input);
 
-      if(ex.item()) {
-        if(!((Item) ex).bool(input)) {
-          ctx.compInfo(OPTFALSE, ex);
+      if(pr.item()) {
+        if(!((Item) pr).bool(input)) {
+          ctx.compInfo(OPTFALSE, pr);
           e = Seq.EMPTY;
           break;
         }
-        ctx.compInfo(OPTTRUE, ex);
+        ctx.compInfo(OPTTRUE, pr);
         pred = Array.delete(pred, p--);
       } else {
-        pred[p] = ex;
+        pred[p] = pr;
       }
     }
     ctx.item = ci;

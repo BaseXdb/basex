@@ -49,8 +49,7 @@ public final class VarCall extends ParseExpr {
     /* Choose variables to be pre-evaluated.
      * If a variable is pre-evaluated, it may not be available for further
      * optimizations (IndexAceess, count, ...). On the other hand, multiple
-     * evaluations of the same expression can be avoided here.
-     */
+     * evaluations of the same expression can be avoided here. */
     Expr e = var.expr;
     if(ctx.nsElem.length != 0 || lc.size() != 0 || var.type != null ||
         var.global || e.uses(Use.FRG, ctx) || e instanceof FunCall) {
@@ -63,7 +62,7 @@ public final class VarCall extends ParseExpr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     var = ctx.vars.get(var);
-    return var.iter(ctx);
+    return ctx.iter(var);
   }
 
   @Override

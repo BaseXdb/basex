@@ -40,11 +40,11 @@ public final class SeqType {
   public static final SeqType BLN_ZO = new SeqType(Type.BLN, Occ.ZO);
   /** Zero or more booleans. */
   public static final SeqType BLN_ZM = new SeqType(Type.BLN, Occ.ZM);
-  /** Single number. */
+  /** Single number; for simplicity, all numbers are treated the same. */
   public static final SeqType ITR = new SeqType(Type.ITR, Occ.O);
-  /** Zero or one number. */
+  /** Zero or one number; for simplicity, all numbers are treated the same. */
   public static final SeqType ITR_ZO = new SeqType(Type.ITR, Occ.ZO);
-  /** Zero or more numbers. */
+  /** Zero or more numbers; for simplicity, all numbers are treated the same. */
   public static final SeqType ITR_ZM = new SeqType(Type.ITR, Occ.ZM);
   /** Single node. */
   public static final SeqType NOD = new SeqType(Type.NOD, Occ.O);

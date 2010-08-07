@@ -22,7 +22,7 @@ import org.basex.util.Token;
  */
 public final class CmpN extends Arr {
   /** Comparators. */
-  public enum Comp {
+  public enum Op {
     /** Node comparison: same. */
     EQ("is") {
       @Override
@@ -54,7 +54,7 @@ public final class CmpN extends Arr {
      * Constructor.
      * @param n string representation
      */
-    private Comp(final String n) {
+    private Op(final String n) {
       name = n;
     }
 
@@ -74,7 +74,7 @@ public final class CmpN extends Arr {
   }
 
   /** Comparator. */
-  private final Comp cmp;
+  private final Op cmp;
 
   /**
    * Constructor.
@@ -83,7 +83,7 @@ public final class CmpN extends Arr {
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final Comp c) {
+  public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final Op c) {
     super(ii, e1, e2);
     cmp = c;
   }

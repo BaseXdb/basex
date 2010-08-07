@@ -127,7 +127,7 @@ public abstract class Expr extends ExprInfo {
   public abstract boolean uses(final Use u, final QueryContext ctx);
 
   /**
-   * Checks if the specified variable is removable (e.g., .
+   * Checks if the specified variable is removable by a context item.
    * @param v variable to be removed
    * @param ctx query context
    * @return result of check

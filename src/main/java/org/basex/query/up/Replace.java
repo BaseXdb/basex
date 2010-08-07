@@ -53,7 +53,7 @@ public final class Replace extends Update {
     if(c.errAtt) Err.or(input, UPNOATTRPER);
     if(c.duplAtt != null) Err.or(input, UPATTDUPL, c.duplAtt);
 
-    final Iter t = expr[0].iter(ctx);
+    final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     // check target constraints
     if(i == null) Err.or(input, UPSEQEMP, Main.name(this));

@@ -10,9 +10,9 @@ import org.basex.util.InputInfo;
  * Iterative predicate expression. Supports one predicate.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Dennis Stratmann
+ * @author Christian Gruen
  */
-final class IterPred extends Pred {
+final class IterPred extends Filter {
   /** Flag is set to true if predicate has last function. */
   final boolean last;
   /** Optional position predicate. */

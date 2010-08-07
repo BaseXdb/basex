@@ -9,9 +9,11 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FAttr;
+import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -32,12 +34,12 @@ public final class CAttr extends CFrag {
   /**
    * Constructor.
    * @param ii input info
+   * @param c computed construction flag
    * @param n name
    * @param v attribute values
-   * @param c computed construction flag
    */
-  public CAttr(final InputInfo ii, final Expr n, final Expr[] v,
-      final boolean c) {
+  public CAttr(final InputInfo ii, final boolean c, final Expr n,
+      final Expr... v) {
     super(ii, v);
     atn = n;
     comp = c;
@@ -61,11 +63,27 @@ public final class CAttr extends CFrag {
       Err.or(input, NSATTCONS);
 
     final TokenBuilder tb = new TokenBuilder();
-    for(final Expr e : expr) CText.add(tb, ctx.iter(e));
+    for(final Expr e : expr) add(tb, ctx.iter(e));
     byte[] val = tb.finish();
     if(eq(pre, XML) && eq(ln, ID)) val = norm(val);
 
     return new FAttr(name, val, null);
+  }
+
+  /**
+   * Adds the atomized value of an item to a token builder.
+   * @param tb token builder
+   * @param ir iterator
+   * @throws QueryException query exception
+   */
+  static void add(final TokenBuilder tb, final Iter ir) throws QueryException {
+    Item it = null;
+    boolean m = false;
+    while((it = ir.next()) != null) {
+      if(m) tb.add(' ');
+      tb.add(it.atom());
+      m = true;
+    }
   }
 
   @Override

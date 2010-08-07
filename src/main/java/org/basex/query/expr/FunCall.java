@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -42,13 +43,25 @@ public final class FunCall extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     func = ctx.fun.get(id);
-    return super.comp(ctx);
+    super.comp(ctx);
+    final Expr e = func.expr;
+
+    // [CG] XQuery/Functions: check for inlining
+    if(e.item()) {
+      // inline simple items
+      ctx.compInfo(OPTINLINE, this);
+      return func.atomic(ctx, input);
+    }
+    return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    if(func == null) comp(ctx);
-
+    if(func == null) {
+      Expr e = comp(ctx);
+      if(e != this) return e.iter(ctx);
+    }
+    
     final int al = expr.length;
     final Item[] args = new Item[al];
     // evaluate arguments

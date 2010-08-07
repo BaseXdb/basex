@@ -46,7 +46,7 @@ public final class IndexAccess extends Single {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     Iter[] iter = {};
-    final Iter ir = expr.iter(ctx);
+    final Iter ir = ctx.iter(expr);
     Item it;
     while((it = ir.next()) != null) {
       final int s = iter.length;
@@ -56,7 +56,7 @@ public final class IndexAccess extends Single {
       iter[s] = index(it.atom());
     }
     return iter.length == 0 ? Iter.EMPTY : iter.length == 1 ? iter[0] :
-      new Union(input, new Expr[] { expr }).eval(iter);
+      new Union(input, expr).eval(iter);
   }
 
   /**

@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -40,18 +39,16 @@ public final class Unary extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(expr.empty()) {
-      ctx.compInfo(OPTPRE, this);
-      return expr;
-    }
-    return expr.item() ? atomic(ctx, input) : this;
+    return expr.item() || expr.empty() ? preEval(ctx) : this;
   }
 
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Item it = expr.atomic(ctx, input);
     if(it == null) return null;
+
     if(!it.unt() && !it.num()) Err.number(this, it);
     final double d = it.dbl(input);
     if(it.unt()) return Dbl.get(minus ? -d : d);

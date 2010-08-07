@@ -30,6 +30,7 @@ public final class CText extends CFrag {
   @Override
   public FTxt atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Iter iter = ctx.iter(expr[0]);
     Item it = iter.next();
     if(it == null) return null;
@@ -43,23 +44,6 @@ public final class CText extends CFrag {
     } while((it = iter.next()) != null);
 
     return new FTxt(tb.finish(), null);
-  }
-
-  /**
-   * Adds a single item to the token builder.
-   * @param tb token builder
-   * @param iter iterator
-   * @throws QueryException query exception
-   */
-  static void add(final TokenBuilder tb, final Iter iter)
-      throws QueryException {
-    boolean more = false;
-    Item it = null;
-    while((it = iter.next()) != null) {
-      if(more) tb.add(' ');
-      tb.add(it.atom());
-      more = true;
-    }
   }
 
   @Override

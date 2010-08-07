@@ -42,7 +42,7 @@ public final class Rename extends Update {
   @Override
   public Seq atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Iter t = expr[0].iter(ctx);
+    final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
 
     // check target constraints
@@ -51,9 +51,9 @@ public final class Rename extends Update {
 
     CFrag ex = null;
     if(i.type == Type.ELM) {
-      ex = new CElem(input, expr[1], new Expr[0], new Atts());
+      ex = new CElem(input, expr[1], new Atts());
     } else if(i.type == Type.ATT) {
-      ex = new CAttr(input, expr[1], new Expr[0], false);
+      ex = new CAttr(input, false, expr[1]);
     } else if(i.type == Type.PI) {
       ex = new CPI(input, expr[1], Seq.EMPTY);
     } else {

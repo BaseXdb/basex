@@ -19,36 +19,27 @@ import org.basex.util.InputInfo;
  */
 public final class GroupBy extends ParseExpr {
   /** Grouping expression. */
-  Expr expr;
+  Var expr;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e expression
    */
-  public GroupBy(final InputInfo ii, final Expr e) {
+  public GroupBy(final InputInfo ii, final Var e) {
     super(ii);
-    //[MS] change type of expr to varcall.
-    assert e instanceof VarCall : "Grouping Argument must be a VarCall";
     new SeqIter();
     expr = e;
   }
 
-  /**
-   * Returns the Grouping var.
-   * @return grouping var
-   */
-  Var getVar() {
-    return ((VarCall) expr).var;
-  }
-
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    if(null == ctx.vars.get(getVar())) Err.or(input, GVARNOTDEFINED, getVar());
-    expr = expr.comp(ctx);
+    // [MS] might be moved to parser?
+    if(ctx.vars.get(expr) == null) Err.or(input, GVARNOTDEFINED, expr);
     return this;
   }
-// [MS] moved to GroupPartition
+
+  // [MS] moved to GroupPartition
 //  /**
 //   * Adds an item for the membership check.
 //   * @param it item
@@ -87,9 +78,8 @@ public final class GroupBy extends ParseExpr {
   }
 
   @Override
-  public GroupBy remove(final Var v) {
-    if(expr != null) expr = expr.remove(v);
-    return this;
+  public boolean removable(final Var v, final QueryContext ctx) {
+    return !v.eq(expr);
   }
 
   @Override

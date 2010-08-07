@@ -71,7 +71,7 @@ public final class Transform extends Arr {
     final int s = ctx.vars.size();
     final Updates pu = new Updates(true);
     for(final Let fo : copies) {
-      final Iter ir = fo.expr.iter(ctx);
+      final Iter ir = ctx.iter(fo.expr);
       final Item i = ir.next();
       if(i == null || !i.node() || ir.next() != null) Err.or(input, UPCOPYMULT);
       final Data m = UpdatePrimitive.buildDB(
@@ -86,7 +86,7 @@ public final class Transform extends Arr {
     ctx.updates.apply(ctx);
     ctx.updates = tmp;
 
-    final Item im = expr[1].iter(ctx).finish();
+    final Item im = ctx.iter(expr[1]).finish();
     ctx.vars.reset(s);
     return im;
   }

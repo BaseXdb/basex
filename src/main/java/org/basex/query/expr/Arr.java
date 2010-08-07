@@ -7,7 +7,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -63,12 +62,12 @@ public abstract class Arr extends ParseExpr {
   }
 
   /**
-   * Checks if this expression has an axis path and an item as arguments.
-   * @param num item must be numeric
+   * Checks if this expression has an expression and an item as arguments.
+   * @param num flag for numeric or string item
    * @return result of check
    */
-  protected final boolean pathAndItem(final boolean num) {
-    return expr.length == 2 && expr[0] instanceof AxisPath && expr[1].item() &&
+  protected final boolean exprAndItem(final boolean num) {
+    return expr.length == 2 && expr[1].item() &&
       (num ? ((Item) expr[1]).num() : expr[1] instanceof Str);
   }
 

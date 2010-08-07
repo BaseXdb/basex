@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -24,7 +25,7 @@ import org.basex.util.Token;
  */
 public final class CmpV extends Arr {
   /** Comparators. */
-  public enum Comp {
+  public enum Op {
     /** Item comparison:less or equal. */
     LE("le") {
       @Override
@@ -34,7 +35,7 @@ public final class CmpV extends Arr {
         return v != Item.UNDEF && v <= 0;
       }
       @Override
-      public Comp invert() { return GE; }
+      public Op invert() { return GE; }
     },
 
     /** Item comparison:less. */
@@ -46,7 +47,7 @@ public final class CmpV extends Arr {
         return v != Item.UNDEF && v < 0;
       }
       @Override
-      public Comp invert() { return GT; }
+      public Op invert() { return GT; }
     },
 
     /** Item comparison:greater of equal. */
@@ -58,7 +59,7 @@ public final class CmpV extends Arr {
         return v != Item.UNDEF && v >= 0;
       }
       @Override
-      public Comp invert() { return LE; }
+      public Op invert() { return LE; }
     },
 
     /** Item comparison:greater. */
@@ -70,7 +71,7 @@ public final class CmpV extends Arr {
         return v != Item.UNDEF && v > 0;
       }
       @Override
-      public Comp invert() { return LT; }
+      public Op invert() { return LT; }
     },
 
     /** Item comparison:equal. */
@@ -81,7 +82,7 @@ public final class CmpV extends Arr {
         return a.eq(ii, b);
       }
       @Override
-      public Comp invert() { return EQ; }
+      public Op invert() { return EQ; }
     },
 
     /** Item comparison:not equal. */
@@ -92,7 +93,7 @@ public final class CmpV extends Arr {
         return !a.eq(ii, b);
       }
       @Override
-      public Comp invert() { return NE; }
+      public Op invert() { return NE; }
     };
 
     /** String representation. */
@@ -102,7 +103,7 @@ public final class CmpV extends Arr {
      * Constructor.
      * @param n string representation
      */
-    private Comp(final String n) { name = n; }
+    private Op(final String n) { name = n; }
 
     /**
      * Evaluates the expression.
@@ -119,14 +120,14 @@ public final class CmpV extends Arr {
      * Inverts the comparator.
      * @return inverted comparator
      */
-    public abstract Comp invert();
+    public abstract Op invert();
 
     @Override
     public String toString() { return name; }
   }
 
   /** Comparator. */
-  Comp cmp;
+  Op cmp;
 
   /**
    * Constructor.
@@ -135,7 +136,7 @@ public final class CmpV extends Arr {
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpV(final InputInfo ii, final Expr e1, final Expr e2, final Comp c) {
+  public CmpV(final InputInfo ii, final Expr e1, final Expr e2, final Op c) {
     super(ii, e1, e2);
     cmp = c;
   }
@@ -156,36 +157,51 @@ public final class CmpV extends Arr {
 
     Expr e = this;
     if(e1.item() && e2.item()) {
-      e = atomic(ctx, input);
+      e = preEval(ctx);
     } else if(e1.empty() || e2.empty()) {
-      e = Seq.EMPTY;
-    }
-
-    if(e != this) {
-      ctx.compInfo(OPTPRE, this);
+      e = optPre(Seq.EMPTY, ctx);
     } else if(e1 instanceof Fun) {
       final Fun fun = (Fun) expr[0];
-      if(fun.func == FunDef.POS) {
+      if(fun.func == FunDef.COUNT) {
+        e = count(this, cmp);
+        if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+      } else if(fun.func == FunDef.POS) {
         // position() CMP number
         e = Pos.get(cmp, e2, e, input);
         if(e != this) ctx.compInfo(OPTWRITE, this);
-      } else if(fun.func == FunDef.COUNT) {
-        // same as for general comparisons
-        if(e2.item() && ((Item) e2).num() && ((Item) e2).dbl(input) == 0) {
-          // count(...) CMP 0
-          if(cmp == Comp.LT || cmp == Comp.GE) {
-            // < 0: always false, >= 0: always true
-            ctx.compInfo(OPTPRE, this);
-            e = Bln.get(cmp == Comp.GE);
-          } else {
-            // <=/= 0: empty(), >/!= 0: exist()
-            ctx.compInfo(OPTWRITE, this);
-            e = Fun.create(input, cmp == Comp.EQ || cmp == Comp.LE ?
-                FunDef.EMPTY : FunDef.EXISTS, fun.expr);
-          }
-        }
       }
     }
+    return e;
+  }
+
+  /**
+   * Optimizes a {@code count()} function.
+   * @param e calling expression
+   * @param op comparison operator
+   * @return resulting expression
+   * @throws QueryException query exception
+   */
+  static Expr count(final Arr e, final Op op) throws QueryException {
+    // evaluate argument
+    final Expr a = e.expr[1];
+    if(!a.item()) return e;
+    final Item it = (Item) a;
+    if(!it.num() && !it.unt()) return e;
+
+    final double d = it.dbl(e.input);
+    // x > (d<0), x >= (d<=0), x != (d<=0), x != not-int(d)
+    if(op == Op.GT && d < 0 || (op == Op.GE || op == Op.NE) && d <= 0 ||
+       op == Op.NE && d != (int) d) return Bln.TRUE;
+    // x < (d<=0), x <= (d<0), x = (d<0), x = not-int(d)
+    if(op == Op.LT && d <= 0 || (op == Op.LE || op == Op.EQ) && d < 0 ||
+       op == Op.EQ && d != (int) d) return Bln.FALSE;
+    // x > (d<1), x >= (d<=1),  x != (d=0)
+    if(op == Op.GT && d < 1 || op == Op.GE && d <= 1 || op == Op.NE && d == 0)
+      return Fun.create(e.input, FunDef.EXISTS, ((Fun) e.expr[0]).expr);
+    // x < (d<=1), x <= (d<1),  x = (d=0)
+    if(op == Op.LT && d <= 1 || op == Op.LE && d < 1 || op == Op.EQ && d == 0)
+      return Fun.create(e.input, FunDef.EMPTY, ((Fun) e.expr[0]).expr);
+
     return e;
   }
 

@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -36,10 +35,7 @@ public final class Castable extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(!checkUp(expr, ctx).item()) return this;
-    final Item ok = atomic(ctx, input);
-    ctx.compInfo(ok == Bln.TRUE ? OPTTRUE : OPTFALSE, this);
-    return ok;
+    return checkUp(expr, ctx).item() ? preEval(ctx) : this;
   }
 
   @Override

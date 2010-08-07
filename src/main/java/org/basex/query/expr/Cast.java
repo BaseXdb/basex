@@ -1,14 +1,12 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -37,10 +35,7 @@ public final class Cast extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(!checkUp(expr, ctx).item()) return this;
-    ctx.compInfo(OPTPRE, this);
-    final Item it = atomic(ctx, input);
-    return it != null ? it : Seq.EMPTY;
+    return checkUp(expr, ctx).item() ? preEval(ctx) : this;
   }
 
   @Override

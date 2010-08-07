@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
@@ -38,10 +37,12 @@ public final class Range extends Arr {
       e = Seq.EMPTY;
     } else {
       final long[] v = range(ctx);
-      if(v != null && v[0] == v[1]) e = Itr.get(v[0]);
+      if(v != null) {
+        if(v[0] == v[1]) e = Itr.get(v[0]);
+        if(v[0] >  v[1]) e = Seq.EMPTY;
+      }
     }
-    if(e != this) ctx.compInfo(OPTPRE, this);
-    return e;
+    return optPre(e, ctx);
   }
 
   @Override
@@ -72,8 +73,8 @@ public final class Range extends Arr {
   }
 
   /**
-   * Returns the start and end value of the range operator, or null if
-   * the range could not be evaluated.
+   * Returns the start and end value of the range operator, or null if the
+   * range could not be evaluated.
    * @param ctx query context
    * @return value array
    * @throws QueryException query exception

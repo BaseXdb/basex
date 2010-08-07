@@ -20,7 +20,6 @@ import org.basex.util.InputInfo;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
- * @author Dennis Stratmann
  */
 public final class Except extends Arr {
   /**

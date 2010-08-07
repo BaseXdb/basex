@@ -62,40 +62,39 @@ final class CmpR extends Single {
   }
 
   /**
-   * Creates an intersection of the existing and the specified expressions.
+   * Tries to convert the specified expression into a range expression.
    * @param ex expression
-   * @return resulting expression
+   * @return resulting or specified expression
    * @throws QueryException query exception
    */
-  static Expr get(final ParseExpr ex) throws QueryException {
-    if(ex instanceof CmpG || ex instanceof CmpV) {
-      final Arr c = (Arr) ex;
-      if(!c.pathAndItem(true)) return null;
-      final Expr e = c.expr[0];
-      final double d = ((Item) c.expr[1]).dbl(ex.input);
-      switch(c instanceof CmpG ? ((CmpG) c).cmp.cmp : ((CmpV) c).cmp) {
-        case EQ: return new CmpR(
-            ex.input, e, d, true, d, true);
-        case GE: return new CmpR(
-            ex.input, e, d, true, Double.POSITIVE_INFINITY, true);
-        case GT: return new CmpR(
-            ex.input, e, d, false, Double.POSITIVE_INFINITY, true);
-        case LE: return new CmpR(
-            ex.input, e, Double.NEGATIVE_INFINITY, true, d, true);
-        case LT: return new CmpR(
-            ex.input, e, Double.NEGATIVE_INFINITY, true, d, false);
-        default: return null;
-      }
+  static Expr get(final Arr ex) throws QueryException {
+    if(!(ex instanceof CmpG || ex instanceof CmpV) || !ex.exprAndItem(true))
+      return ex;
+
+    final Expr e = ex.expr[0];
+    final double d = ((Item) ex.expr[1]).dbl(ex.input);
+    switch(ex instanceof CmpG ? ((CmpG) ex).cmp.cmp : ((CmpV) ex).cmp) {
+      case EQ: return new CmpR(
+          ex.input, e, d, true, d, true);
+      case GE: return new CmpR(
+          ex.input, e, d, true, Double.POSITIVE_INFINITY, true);
+      case GT: return new CmpR(
+          ex.input, e, d, false, Double.POSITIVE_INFINITY, true);
+      case LE: return new CmpR(
+          ex.input, e, Double.NEGATIVE_INFINITY, true, d, true);
+      case LT: return new CmpR(
+          ex.input, e, Double.NEGATIVE_INFINITY, true, d, false);
+      default:
     }
-    return null;
+    return ex;
   }
 
   @Override
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Iter ir = ctx.iter(expr);
 
     // evaluate iterator
+    final Iter ir = ctx.iter(expr);
     boolean mn = false;
     boolean mx = false;
     Item it;

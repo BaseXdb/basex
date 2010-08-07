@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
@@ -36,15 +35,13 @@ public final class Instance extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    if(!checkUp(expr, ctx).item()) return this;
-    ctx.compInfo(OPTPRE, this);
-    return atomic(ctx, input);
+    return checkUp(expr, ctx).item() ? preEval(ctx) : this;
   }
 
   @Override
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return Bln.get(seq.instance(expr.iter(ctx)));
+    return Bln.get(seq.instance(ctx.iter(expr)));
   }
 
   @Override

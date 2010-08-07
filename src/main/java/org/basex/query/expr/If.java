@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -31,7 +30,7 @@ public final class If extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
-    checkUp(ctx, new Expr[] { expr[1], expr[2] });
+    checkUp(ctx, expr[1], expr[2]);
 
     Expr e = this;
     if(checkUp(expr[0], ctx).item()) {
@@ -41,15 +40,14 @@ public final class If extends Arr {
       // both branches are empty
       e = Seq.EMPTY;
     }
-    if(e != this) ctx.compInfo(OPTPRE, IF + '(' + expr[0] + ')');
-    return e;
+    return optPre(e, ctx);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return ctx.iter(expr[expr[0].ebv(ctx, input).bool(input) ? 1 : 2]);
   }
-
+  
   @Override
   public SeqType returned(final QueryContext ctx) {
     final SeqType ret = expr[1].returned(ctx);

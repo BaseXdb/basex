@@ -43,16 +43,16 @@ public final class For extends ForLet {
   }
 
   @Override
-  public ForLet comp(final QueryContext ctx) throws QueryException {
-    // empty sequence - empty loop
+  public For comp(final QueryContext ctx) throws QueryException {
+    // always returns a self reference
     expr = checkUp(expr, ctx).comp(ctx);
 
-    /* bind variable if zero or one values are returned,
+    /* bind variable if expression returns zero or one values,
        and if no variables and no context reference is used. */
     final SeqType ret = expr.returned(ctx);
-    if(pos == null && score == null && ret.zeroOrOne()
-        && !expr.uses(Use.VAR, ctx) && !expr.uses(Use.CTX, ctx)
-        && !ctx.grouping) {
+    if(pos == null && score == null && ret.zeroOrOne() &&
+        !(expr.uses(Use.VAR, ctx) || expr.uses(Use.CTX, ctx) ||
+            expr.uses(Use.FRG, ctx)) && !ctx.grouping) {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {

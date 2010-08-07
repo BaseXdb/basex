@@ -26,20 +26,22 @@ public final class Union extends Arr {
    * @param ii input info
    * @param e expression list
    */
-  public Union(final InputInfo ii, final Expr[] e) {
+  public Union(final InputInfo ii, final Expr... e) {
     super(ii, e);
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+
     final int el = expr.length;
     for(int e = 0; e != expr.length; e++) {
+      // remove empty operands
       if(expr[e].empty()) expr = Array.delete(expr, e--);
     }
     if(el != expr.length) ctx.compInfo(OPTEMPTY);
 
-    // as union always returns sorted results,
+    // as union is required to always returns sorted results,
     // a single, non-sorted argument must be evaluated as well
     return expr.length == 0 ? Seq.EMPTY :
       expr.length == 1 && !duplicates(ctx) ? expr[0] : this;

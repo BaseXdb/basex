@@ -35,54 +35,54 @@ import org.basex.util.Token;
  */
 public final class CmpG extends Arr {
   /** Comparators. */
-  public enum Comp {
+  public enum Op {
     /** General comparison: less or equal. */
-    LE("<=", CmpV.Comp.LE) {
+    LE("<=", CmpV.Op.LE) {
       @Override
-      public Comp invert() { return Comp.GE; }
+      public Op invert() { return Op.GE; }
     },
 
     /** General comparison: less. */
-    LT("<", CmpV.Comp.LT) {
+    LT("<", CmpV.Op.LT) {
       @Override
-      public Comp invert() { return Comp.GT; }
+      public Op invert() { return Op.GT; }
     },
 
     /** General comparison: greater of equal. */
-    GE(">=", CmpV.Comp.GE) {
+    GE(">=", CmpV.Op.GE) {
       @Override
-      public Comp invert() { return Comp.LE; }
+      public Op invert() { return Op.LE; }
     },
 
     /** General comparison: greater. */
-    GT(">", CmpV.Comp.GT) {
+    GT(">", CmpV.Op.GT) {
       @Override
-      public Comp invert() { return Comp.LT; }
+      public Op invert() { return Op.LT; }
     },
 
     /** General comparison: equal. */
-    EQ("=", CmpV.Comp.EQ) {
+    EQ("=", CmpV.Op.EQ) {
       @Override
-      public Comp invert() { return Comp.EQ; }
+      public Op invert() { return Op.EQ; }
     },
 
     /** General comparison: not equal. */
-    NE("!=", CmpV.Comp.NE) {
+    NE("!=", CmpV.Op.NE) {
       @Override
-      public Comp invert() { return Comp.NE; }
+      public Op invert() { return Op.NE; }
     };
 
     /** String representation. */
     public final String name;
     /** Comparator. */
-    final CmpV.Comp cmp;
+    final CmpV.Op cmp;
 
     /**
      * Constructor.
      * @param n string representation
      * @param c comparator
      */
-    private Comp(final String n, final CmpV.Comp c) {
+    private Op(final String n, final CmpV.Op c) {
       name = n;
       cmp = c;
     }
@@ -91,14 +91,14 @@ public final class CmpG extends Arr {
      * Inverts the comparator.
      * @return inverted comparator
      */
-    public abstract Comp invert();
+    public abstract Op invert();
 
     @Override
     public String toString() { return name; }
   };
 
   /** Comparator. */
-  Comp cmp;
+  Op cmp;
   /** Index expression. */
   private IndexAccess[] iacc = {};
   /** Flag for atomic evaluation. */
@@ -111,7 +111,7 @@ public final class CmpG extends Arr {
    * @param e2 second expression
    * @param c comparator
    */
-  public CmpG(final InputInfo ii, final Expr e1, final Expr e2, final Comp c) {
+  public CmpG(final InputInfo ii, final Expr e1, final Expr e2, final Op c) {
     super(ii, e1, e2);
     cmp = c;
   }
@@ -134,50 +134,35 @@ public final class CmpG extends Arr {
 
     Expr e = this;
     if(e1.item() && e2.item()) {
-      e = Bln.get(eval((Item) e1, (Item) e2));
+      e = optPre(Bln.get(eval((Item) e1, (Item) e2)), ctx);
     } else if(e1.empty() || e2.empty()) {
-      e = Bln.FALSE;
-    }
-    if(e != this) {
-      ctx.compInfo(OPTPRE, this);
+      e = optPre(Bln.FALSE, ctx);
     } else if(e1 instanceof Fun) {
       final Fun fun = (Fun) expr[0];
-      if(fun.func == FunDef.POS) {
+      if(fun.func == FunDef.COUNT) {
+        e = CmpV.count(this, cmp.cmp);
+        if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+      } else if(fun.func == FunDef.POS) {
         if(e2 instanceof Range) {
           // position() CMP range
           final long[] rng = ((Range) e2).range(ctx);
-          if(rng != null) e = Pos.get(rng[0], rng[1], input);
+          e = rng == null ? this : Pos.get(rng[0], rng[1], input);
         } else {
           // position() CMP number
-          e = Pos.get(cmp.cmp, e2, e, input);
+          e = Pos.get(cmp.cmp, e2, this, input);
         }
         if(e != this) ctx.compInfo(OPTWRITE, this);
-      } else if(fun.func == FunDef.COUNT) {
-        if(e2.item() && ((Item) e2).num() && ((Item) e2).dbl(input) == 0) {
-          // count(...) CMP 0
-          if(cmp == Comp.LT || cmp == Comp.GE) {
-            // < 0: always false, >= 0: always true
-            ctx.compInfo(OPTPRE, this);
-            e = Bln.get(cmp == Comp.GE);
-          } else {
-            // <=/= 0: empty(), >/!= 0: exist()
-            ctx.compInfo(OPTWRITE, this);
-            e = Fun.create(input, cmp == Comp.EQ || cmp == Comp.LE ?
-                FunDef.EMPTY : FunDef.EXISTS, fun.expr);
-          }
-        }
       }
-    } else if(pathAndItem(true)) {
+    } else {
       // rewrite path CMP number
       e = CmpR.get(this);
-      if(e == null) e = this;
-      else ctx.compInfo(OPTWRITE, this);
-    } else {
-      atom = expr[0].returned(ctx).one() && expr[1].returned(ctx).one();
+      if(e != this) ctx.compInfo(OPTWRITE, this);
+      // both arguments will always yield one result
+      else atom = expr[0].returned(ctx).one() && expr[1].returned(ctx).one();
     }
     return e;
   }
-
+  
   @Override
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
@@ -250,7 +235,7 @@ public final class CmpG extends Arr {
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr[0]);
-    if(s == null || cmp != Comp.EQ) return false;
+    if(s == null || cmp != Op.EQ) return false;
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&

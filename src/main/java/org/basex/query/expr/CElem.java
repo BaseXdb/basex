@@ -36,8 +36,8 @@ public final class CElem extends CFrag {
    * @param cont element content
    * @param ns namespaces
    */
-  public CElem(final InputInfo ii, final Expr t, final Expr[] cont,
-      final Atts ns) {
+  public CElem(final InputInfo ii, final Expr t, final Atts ns,
+      final Expr... cont) {
     super(ii, cont);
     tag = t;
     nsp = ns;

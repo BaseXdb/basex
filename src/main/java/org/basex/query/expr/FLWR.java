@@ -32,10 +32,13 @@ public final class FLWR extends FLWOR {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    final Expr ex = super.comp(ctx);
+    if(ex != this) return ex;
+
     // add where clause to most inner FOR clause and remove variable calls
     if(where != null) {
       final ForLet f = fl[fl.length - 1];
-      // WHERE results need not be numeric
+      // WHERE results must not be numeric
       if(f instanceof For && f.simple() && where.removable(f.var, ctx) &&
           !where.returned(ctx).mayBeNum()) {
 
@@ -51,14 +54,11 @@ public final class FLWR extends FLWOR {
           }
           f.expr = ap;
         } else {
-          fl[fl.length - 1].expr = new Pred(input, f.expr, w);
+          f.expr = new Filter(input, f.expr, w);
         }
         where = null;
       }
     }
-
-    final Expr ex = super.comp(ctx);
-    if(ex != this) return ex;
 
     // remove LET clauses with static contents
     for(int f = 0; f != fl.length; f++) {

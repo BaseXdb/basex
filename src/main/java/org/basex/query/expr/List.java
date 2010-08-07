@@ -33,7 +33,7 @@ public final class List extends Arr {
 
     for(final Expr e : expr) if(!e.item() && !e.empty()) return this;
 
-    // return simple sequence if all values are items
+    // return simple sequence if all values are items or empty sequences
     final SeqIter seq = new SeqIter(expr.length);
     for(final Expr e : expr) seq.add(ctx.iter(e));
     return seq.finish();

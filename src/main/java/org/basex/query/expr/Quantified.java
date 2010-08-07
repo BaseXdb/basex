@@ -19,7 +19,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Satisfy extends ParseExpr {
+public final class Quantified extends ParseExpr {
   /** For/Let expressions. */
   private final For[] fl;
   /** Every flag. */
@@ -34,7 +34,7 @@ public final class Satisfy extends ParseExpr {
    * @param s satisfier
    * @param e every flag
    */
-  public Satisfy(final InputInfo ii, final For[] f, final Expr s,
+  public Quantified(final InputInfo ii, final For[] f, final Expr s,
       final boolean e) {
     super(ii);
     sat = s;
@@ -44,23 +44,33 @@ public final class Satisfy extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int f = 0; f != fl.length; f++) {
-      final Expr e = fl[f].comp(ctx);
-      if(e.empty()) {
-        ctx.compInfo(every ? OPTTRUE : OPTFALSE, fl[f]);
-        return Bln.get(every);
+    // compile for clauses
+    final int vs = ctx.vars.size();
+    for(final For f : fl) f.comp(ctx);
+    sat = checkUp(sat, ctx).comp(ctx);
+    ctx.vars.reset(vs);
+
+    // find empty sequences
+    Expr e = null;
+    for(final For f : fl) {
+      if(f.expr.empty()) {
+        e = f;
+        break;
       }
-      fl[f] = (For) e;
     }
-    sat = sat.comp(ctx);
-    return this;
+    if(e == null && sat.empty()) e = sat;
+    if(e == null) return this;
+
+    // return boolean result
+    ctx.compInfo(every ? OPTTRUE : OPTFALSE, e);
+    return Bln.get(every);
   }
 
   @Override
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Iter[] iter = new Iter[fl.length];
-    // casting is safe, but should be removed
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     return Bln.get(iter(ctx, iter, 0));
   }

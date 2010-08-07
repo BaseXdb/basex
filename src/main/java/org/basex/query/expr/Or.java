@@ -8,6 +8,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Type;
 import org.basex.query.iter.SeqIter;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
@@ -45,36 +46,32 @@ public final class Or extends Arr {
       if(expr.length == 0) return Bln.FALSE;
     }
 
-    if(expr.length == 2 && expr[0] instanceof Pos && expr[1] instanceof Pos) {
+    // combines two position expressions
+    if(expr.length == 2 && expr[0] instanceof Pos && expr[1] instanceof Pos)
       return ((Pos) expr[0]).union((Pos) expr[1], input);
-    }
-    return cmpG(ctx);
-  }
 
-  /**
-   * If possible, converts the expressions to a comparison operator.
-   * @param ctx query context
-   * @return expression
-   */
-  private Expr cmpG(final QueryContext ctx) {
-    if(!(expr[0] instanceof CmpG)) return this;
+    // one expression left
+    if(expr.length == 1) {
+      final SeqType ret = expr[0].returned(ctx);
+      if(ret.type == Type.BLN && ret.one()) return expr[0];
+    }
+
+    // tries to create a comparison expression
+    for(final Expr e : expr) if(!(e instanceof CmpG)) return this;
 
     final CmpG e1 = (CmpG) expr[0];
-    if(!e1.pathAndItem(false)) return this;
+    final SeqIter cmp = new SeqIter();
 
-    final SeqIter ir = new SeqIter();
-    ir.add((Item) e1.expr[1]);
-
-    for(int e = 1; e != expr.length; e++) {
-      if(!(expr[e] instanceof CmpG)) return this;
-      final CmpG e2 = (CmpG) expr[e];
-      if(!e2.pathAndItem(false) || e1.cmp != e2.cmp ||
+    for(final Expr e : expr) {
+      // check comparison operators and left operands for equality
+      final CmpG e2 = (CmpG) e;
+      if(!e2.exprAndItem(false) || e1.cmp != e2.cmp ||
          !e1.expr[0].sameAs(e2.expr[0])) return this;
-      ir.add((Item) e2.expr[1]);
+      cmp.add((Item) e2.expr[1]);
     }
 
-    ctx.compInfo(OPTRED);
-    return new CmpG(input, e1.expr[0], ir.finish(), e1.cmp);
+    ctx.compInfo(OPTWRITE, this);
+    return new CmpG(input, e1.expr[0], cmp.finish(), e1.cmp);
   }
 
   @Override

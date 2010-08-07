@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -37,12 +36,8 @@ public final class Clc extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-
-    final Expr e = expr[0].item() && expr[1].item() ? atomic(ctx, input) :
-      expr[0].empty() || expr[1].empty() ? Seq.EMPTY : this;
-
-    if(e != this) ctx.compInfo(OPTPRE, this);
-    return e;
+    return optPre(expr[0].item() && expr[1].item() ? atomic(ctx, input) :
+      expr[0].empty() || expr[1].empty() ? Seq.EMPTY : this, ctx);
   }
 
   @Override

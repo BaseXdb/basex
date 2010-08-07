@@ -11,6 +11,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Case expression for typeswitch.
@@ -101,7 +102,8 @@ public final class TypeCase extends Single {
 
   @Override
   public String toString() {
-    return (var.type == null ? DEFAULT : CASE) + ' ' + var + ' ' +
-      RETURN + ' ' + expr;
+    final TokenBuilder tb = new TokenBuilder(var.type == null ? DEFAULT : CASE);
+    if(var.name != null) tb.add(' ');
+    return tb.add(var + " " + RETURN + ' ' + expr).toString();
   }
 }

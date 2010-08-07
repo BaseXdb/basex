@@ -52,8 +52,7 @@ public final class Group extends ParseExpr {
     Var[] vs = new Var[groupby.length];
     Var[] fs = new Var[fl.length];
     for(int i = 0; i < groupby.length; i++) {
-      VarCall call = (VarCall) groupby[i].expr;
-      vs[i] = call.var;
+      vs[i] = groupby[i].expr;
     }
     for(int i = 0; i < fl.length; i++)
       fs[i] = fl[i].var;
@@ -72,7 +71,6 @@ public final class Group extends ParseExpr {
   public Iter iter(final QueryContext ctx) {
     return
     new Iter() { // group is blocking => no iterator
-
       @Override
       public Item next() {
         Main.notexpected(this);
@@ -89,10 +87,9 @@ public final class Group extends ParseExpr {
   }
 
   @Override
-  public Group remove(final Var v) {
-    for(int o = 0; o < groupby.length; o++)
-      groupby[o] = groupby[o].remove(v);
-    return this;
+  public boolean removable(final Var v, final QueryContext ctx) {
+    for(final GroupBy g : groupby) if(!g.removable(v, ctx)) return false;
+    return true;
   }
 
   @Override
@@ -125,7 +122,4 @@ public final class Group extends ParseExpr {
   public void add(final QueryContext ctx) throws QueryException {
     gp.add(ctx);
   }
-
-
-
 }

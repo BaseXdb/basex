@@ -57,28 +57,28 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    checkUp(where, ctx);
-
     boolean grp = ctx.grouping;
     ctx.grouping = group != null;
     final int vs = ctx.vars.size();
 
+    // optimize for/let clauses
     for(int f = 0; f != fl.length; f++) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
-      ctx.ftfast = ctx.ftfast && fl[f].simple();
+      ctx.ftfast &= fl[f].simple();
       fl[f] = fl[f].comp(ctx);
       ctx.ftfast = fast;
     }
 
-    boolean ii = false;
+    // optimize where clause
+    boolean empty = false;
     if(where != null) {
-      where = checkUp(where, ctx).comp(ctx);
-      ii = where.empty();
-      if(!ii && where.item()) {
+      where = checkUp(where.comp(ctx), ctx);
+      empty = where.empty();
+      if(!empty && where.item()) {
         // test is always false: no results
-        ii = !((Item) where).bool(input);
-        if(!ii) {
+        empty = !((Item) where).bool(input);
+        if(!empty) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
           where = null;
@@ -93,13 +93,13 @@ public class GFLWOR extends ParseExpr {
     ctx.vars.reset(vs);
     ctx.grouping = grp;
 
-    if(ii) {
+    if(empty) {
       ctx.compInfo(OPTFALSE, where);
       return Seq.EMPTY;
     }
 
     for(int f = 0; f != fl.length; f++) {
-      // remove GFLWOR clause if it the FOR clause is empty
+      // remove GFLWOR expression if a FOR clause yields an empty sequence
       if(fl[f].expr.empty() && fl[f] instanceof For) {
         ctx.compInfo(OPTFLWOR);
         return Seq.EMPTY;
@@ -110,9 +110,7 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final HashMap<Var, ItemList> cache =
-      new HashMap<Var, ItemList>();
-
+    final HashMap<Var, ItemList> cache = new HashMap<Var, ItemList>();
     final Iter[] iter = new Iter[fl.length];
 
     // store pointers to the cached results here.

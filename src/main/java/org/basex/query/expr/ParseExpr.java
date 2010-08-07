@@ -11,6 +11,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -79,6 +80,29 @@ public abstract class ParseExpr extends Expr {
     return false;
   }
 
+  // OPTIMIZATIONS ============================================================
+
+  /**
+   * Pre-evaluates the specified expression.
+   * @param ctx query context
+   * @return optimized expression
+   * @throws QueryException query exception
+   */
+  public final Expr preEval(final QueryContext ctx) throws QueryException {
+    return optPre(atomic(ctx, input), ctx);
+  }
+
+  /**
+   * Adds an optimization info for pre-evaluating the specified expression.
+   * @param opt optimized expression
+   * @param ctx query context
+   * @return optimized expression
+   */
+  protected final Expr optPre(final Expr opt, final QueryContext ctx) {
+    if(opt != this) ctx.compInfo(OPTPRE, this);
+    return opt == null ? Seq.EMPTY : opt;
+  }
+
   // VALIDITY CHECKS ==========================================================
 
   /**
@@ -101,7 +125,7 @@ public abstract class ParseExpr extends Expr {
    * @param expr expression array
    * @throws QueryException query exception
    */
-  public void checkUp(final QueryContext ctx, final Expr[] expr)
+  public void checkUp(final QueryContext ctx, final Expr... expr)
       throws QueryException {
 
     if(!ctx.updating) return;

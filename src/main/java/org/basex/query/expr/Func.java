@@ -49,20 +49,26 @@ public final class Func extends Single {
     final int s = ctx.vars.size();
     for(final Var v : args) ctx.vars.add(v);
     expr = expr.comp(ctx);
+    
     final boolean u = expr.uses(Use.UPD, ctx);
     if(updating) {
+      // updating function
       if(var.type != null) Err.or(input, UPFUNCTYPE);
       if(!u && !expr.vacuous()) Err.or(input, UPEXPECTF);
     } else if(u) {
+      // uses updates, but is not declared as such
       Err.or(input, UPNOT, desc());
     }
     ctx.vars.reset(s);
+
+    // returned expression will be ignored
     return this;
   }
 
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     // evaluate function and reset variable scope
     final Item ci = ctx.item;
     ctx.item = null;

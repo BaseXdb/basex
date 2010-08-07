@@ -67,7 +67,7 @@ public final class Insert extends Update {
     if(c.duplAtt != null) Err.or(input, UPATTDUPL, c.duplAtt);
 
     // check target constraints
-    final Iter t = expr[0].iter(ctx);
+    final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     if(i == null) Err.or(input, UPSEQEMP, Main.name(this));
     if(!(i instanceof Nod) || t.next() != null)

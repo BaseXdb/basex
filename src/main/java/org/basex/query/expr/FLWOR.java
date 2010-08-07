@@ -50,25 +50,26 @@ public class FLWOR extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    checkUp(where, ctx);
-
     final int vs = ctx.vars.size();
+
+    // optimize for/let clauses
     for(int f = 0; f != fl.length; f++) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
-      ctx.ftfast = ctx.ftfast && fl[f].simple();
-      fl[f] = fl[f].comp(ctx);
+      ctx.ftfast &= fl[f].simple();
+      fl[f].comp(ctx);
       ctx.ftfast = fast;
     }
 
-    boolean ii = false;
+    // optimize where clause
+    boolean empty = false;
     if(where != null) {
       where = checkUp(where, ctx).comp(ctx);
-      ii = where.empty();
-      if(!ii && where.item()) {
+      empty = where.empty();
+      if(!empty && where.item()) {
         // test is always false: no results
-        ii = !((Item) where).bool(input);
-        if(!ii) {
+        empty = !((Item) where).bool(input);
+        if(!empty) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
           where = null;
@@ -78,16 +79,17 @@ public class FLWOR extends ParseExpr {
 
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
+
     ctx.vars.reset(vs);
 
-    if(ii) {
+    if(empty) {
       ctx.compInfo(OPTFALSE, where);
       return Seq.EMPTY;
     }
 
-    for(int f = 0; f != fl.length; f++) {
+    for(final ForLet f : fl) {
       // remove FLWOR expression if a FOR clause yields an empty sequence
-      if(fl[f] instanceof For && fl[f].expr.empty()) {
+      if(f.expr.empty() && f instanceof For) {
         ctx.compInfo(OPTFLWOR);
         return Seq.EMPTY;
       }
@@ -102,7 +104,7 @@ public class FLWOR extends ParseExpr {
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
     iter(ctx, seq, iter, 0);
     order.sq = seq;
-    return order.iter(ctx);
+    return ctx.iter(order);
   }
 
   /**
@@ -137,8 +139,8 @@ public class FLWOR extends ParseExpr {
     long size = ret.size(ctx);
     if(size == -1) return -1;
     // multiply loop runs
-    for(final ForLet e : fl) {
-      final long s = e.size(ctx);
+    for(final ForLet f : fl) {
+      final long s = f.size(ctx);
       if(s == -1) return -1;
       size *= s;
     }

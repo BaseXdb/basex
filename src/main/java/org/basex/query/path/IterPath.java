@@ -15,7 +15,6 @@ import org.basex.util.InputInfo;
  * duplicate-free results.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
- * @author Dennis Stratmann
  * @author Christian Gruen
  */
 final class IterPath extends AxisPath {

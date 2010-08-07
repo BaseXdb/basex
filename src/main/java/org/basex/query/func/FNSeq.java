@@ -96,7 +96,7 @@ final class FNSeq extends Fun {
           final Item i = ir.next();
           if(i == null) return null;
           c++;
-          if(i.comparable(it) && CmpV.Comp.EQ.e(input, i, it))
+          if(i.comparable(it) && CmpV.Op.EQ.e(input, i, it))
             return Itr.get(c);
         }
       }

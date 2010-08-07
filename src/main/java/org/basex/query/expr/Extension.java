@@ -32,12 +32,12 @@ public final class Extension extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     // ignore pragma
-    return expr.comp(ctx);
+    return optPre(expr.comp(ctx), ctx);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return expr.iter(ctx);
+    return ctx.iter(expr);
   }
 
   @Override
@@ -51,8 +51,7 @@ public final class Extension extends Single {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(final Expr p : pragmas)
-      sb.append(p).append(' ');
+    for(final Expr p : pragmas) sb.append(p).append(' ');
     return sb.append(BRACE1 + ' ' + expr + ' ' + BRACE2).toString();
   }
 }

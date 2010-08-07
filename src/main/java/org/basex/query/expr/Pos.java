@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.CmpV.Comp;
+import org.basex.query.expr.CmpV.Op;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -59,7 +59,7 @@ public final class Pos extends Simple {
    * @return resulting expression, or null
    * @throws QueryException query exception
    */
-  static Expr get(final Comp cmp, final Expr a, final Expr o,
+  static Expr get(final Op cmp, final Expr a, final Expr o,
       final InputInfo ii) throws QueryException {
 
     if(a.item()) {

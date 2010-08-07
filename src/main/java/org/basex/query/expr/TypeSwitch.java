@@ -12,7 +12,6 @@ import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Var;
-import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
@@ -22,10 +21,10 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public final class TypeSwitch extends ParseExpr {
+  /** Expression list. */
+  private final TypeCase[] cs;
   /** Typeswitch expression. */
   private Expr ts;
-  /** Expression list. */
-  private TypeCase[] cs;
 
   /**
    * Constructor.
@@ -55,19 +54,17 @@ public final class TypeSwitch extends ParseExpr {
     for(int i = 0; i < cs.length; i++) tmp[i] = cs[i].expr;
     checkUp(ctx, tmp);
 
-    // pre-evaluate type switch
+    // pre-evaluate typeswitch
+    Expr e = this;
     if(ts.item()) {
-      for(int c = 0; c < cs.length; c++) {
-        if(cs[c].var.type != null) {
-          if(cs[c].var.type.instance(ts.iter(ctx))) {
-            ctx.compInfo(OPTPRE, TYPESWITCH + '(' + ts + ')');
-            return cs[c].comp(ctx, (Item) ts).expr;
-          }
-          cs = Array.delete(cs, c);
+      for(final TypeCase c : cs) {
+        if(c.var.type == null || c.var.type.instance(ctx.iter(ts))) {
+          e = c.comp(ctx, (Item) ts).expr;
+          break;
         }
       }
     }
-    return this;
+    return optPre(e, ctx);
   }
 
   @Override

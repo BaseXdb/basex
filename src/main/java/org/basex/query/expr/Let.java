@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -36,7 +37,8 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public ForLet comp(final QueryContext ctx) throws QueryException {
+  public Let comp(final QueryContext ctx) throws QueryException {
+    // always returns a self reference
     expr = checkUp(expr, ctx).comp(ctx);
 
     // bind variable if expression uses no var, pos, ctx, or fragment
@@ -45,7 +47,7 @@ public final class Let extends ForLet {
       ctx.compInfo(OPTBIND, var);
       var.bind(expr, ctx);
     } else {
-      var.ret = expr.returned(ctx);
+      var.ret = score ? SeqType.ITR : expr.returned(ctx);
     }
     ctx.vars.add(var);
     return this;

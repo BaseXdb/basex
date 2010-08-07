@@ -5,7 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.data.Serializer;
 import org.basex.query.item.QNm;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Pragma.
@@ -40,8 +40,8 @@ public class Pragma extends Simple {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(PRAGMA + ' ' + qName + ' ');
-    if(pContent.length > 0) sb.append(Token.string(pContent) + ' ');
-    return sb.append(PRAGMA2).toString();
+    final TokenBuilder tb = new TokenBuilder(PRAGMA + ' ' + qName + ' ');
+    if(pContent.length != 0) tb.add(pContent).add(' ');
+    return tb.add(PRAGMA2).toString();
   }
 }
