@@ -23,7 +23,7 @@ public class AddDeleteTest {
   private static final Context CTX = new Context();
 
   /** Test database name. */
-  private static final String NAME = AddDeleteTest.class.getSimpleName();
+  private static final String DBNAME = AddDeleteTest.class.getSimpleName();
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
   /** Test folder. */
@@ -55,7 +55,7 @@ public class AddDeleteTest {
    */
   @Before
   public void setUp() throws BaseXException {
-    new CreateDB(NAME).execute(CTX);
+    new CreateDB(DBNAME).execute(CTX);
   }
 
   /**
@@ -64,7 +64,7 @@ public class AddDeleteTest {
    */
   @After
   public void tearDown() throws BaseXException {
-    new DropDB(NAME).execute(CTX);
+    new DropDB(DBNAME).execute(CTX);
   }
 
   /**

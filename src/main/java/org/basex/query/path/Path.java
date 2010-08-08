@@ -33,9 +33,36 @@ abstract class Path extends ParseExpr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public final Expr comp(final QueryContext ctx) throws QueryException {
     if(root != null) root = checkUp(root, ctx).comp(ctx);
-    return this;
+    final Item ci = ctx.item;
+    ctx.item = root(ctx);
+    final Expr e = compPath(ctx);
+    ctx.item = ci;
+    if(root instanceof Context) root = null;
+    return e;
+  }
+
+  /**
+   * Compiles the location path.
+   * @param ctx query context
+   * @return optimized Expression
+   * @throws QueryException query exception
+   */
+  protected abstract Expr compPath(final QueryContext ctx)
+    throws QueryException;
+
+  /**
+   * Returns the root of the current context, or null.
+   * @param ctx query context
+   * @return root
+   */
+  protected final Item root(final QueryContext ctx) {
+    final Item it = ctx != null ? ctx.item : null;
+    if(root == null) return it;
+    if(root.value()) return (Item) root;
+    if(!(root instanceof Root) || it == null) return null;
+    return it.size(ctx) != 1 ? it : ((Root) root).root(it);
   }
 
   /**
@@ -53,19 +80,6 @@ abstract class Path extends ParseExpr {
 
     for(final Expr s : step) if(s.uses(use, ctx)) return true;
     return root != null && root.uses(use, ctx);
-  }
-
-  /**
-   * Returns the root of the current context or null.
-   * @param ctx query context
-   * @return root
-   */
-  protected final Item root(final QueryContext ctx) {
-    final Item it = ctx != null ? ctx.item : null;
-    if(root == null) return it;
-    if(root.item()) return (Item) root;
-    if(!(root instanceof Root) || it == null) return null;
-    return it.size(ctx) != 1 ? it : ((Root) root).root(it);
   }
 
   @Override

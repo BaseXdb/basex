@@ -89,7 +89,7 @@ public final class Var extends ParseExpr {
    */
   public Var bind(final Expr e, final QueryContext ctx) throws QueryException {
     expr = e;
-    return e.item() ? bind((Item) e, ctx) : this;
+    return e.value() ? bind((Item) e, ctx) : this;
   }
 
   /**
@@ -156,10 +156,8 @@ public final class Var extends ParseExpr {
       throws QueryException {
 
     if(type == null) return it;
-
     if(!global && type.zeroOrOne() && !it.type.instance(type.type))
       Err.or(input, XPINVCAST, it.type, type, it);
-
     return type.cast(it, ctx, input);
   }
 

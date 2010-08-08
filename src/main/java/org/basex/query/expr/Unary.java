@@ -39,7 +39,7 @@ public final class Unary extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return expr.item() || expr.empty() ? preEval(ctx) : this;
+    return expr.value() ? preEval(ctx) : this;
   }
 
   @Override

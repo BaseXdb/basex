@@ -36,13 +36,14 @@ public final class Clc extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return optPre(expr[0].item() && expr[1].item() ? atomic(ctx, input) :
-      expr[0].empty() || expr[1].empty() ? Seq.EMPTY : this, ctx);
+    return optPre(expr[0].empty() || expr[1].empty() ? Seq.EMPTY : 
+      expr[0].value() && expr[1].value() ? atomic(ctx, input) : this, ctx);
   }
 
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Item a = expr[0].atomic(ctx, input);
     if(a == null) return null;
     final Item b = expr[1].atomic(ctx, input);

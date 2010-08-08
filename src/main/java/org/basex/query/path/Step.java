@@ -80,6 +80,7 @@ public class Step extends Preds {
   public Expr comp(final QueryContext ctx) throws QueryException {
     if(!test.comp(ctx)) return Seq.EMPTY;
 
+    // if possible, add text() step to predicates
     final Data data = ctx.data();
     ctx.leaf = false;
     if(data != null && test.kind == Kind.NAME && test.type != Type.ATT) {
@@ -91,17 +92,19 @@ public class Step extends Preds {
     ctx.leaf = false;
     if(e != this) return e;
 
-    // no predicates.. evaluate via simple iterator
+    // no predicates.. use simple iterator
     if(pred.length == 0) return get(input, axis, test);
-    final Expr p = pred[0];
 
     // position predicate
+    final Expr p = pred[0];
     final Pos pos = p instanceof Pos ? (Pos) p : null;
     // last flag
     final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
-    // multiple Predicates or POS
+
+    // use standard evaluation for multiple predicates or standard POS predicate
     if(pred.length > 1 || !last && pos == null && uses(Use.POS, ctx))
       return this;
+
     // use iterative evaluation
     return new IterStep(input, axis, test, pred, pos, last);
   }

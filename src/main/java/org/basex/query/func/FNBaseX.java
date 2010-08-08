@@ -67,12 +67,6 @@ final class FNBaseX extends Fun {
     }
   }
 
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    return func == FunDef.DB && expr[0].item() &&
-      (expr.length == 1 || expr[1].item()) ? db(ctx) : this;
-  }
-
   /**
    * Performs the eval function.
    * @param ctx query context
@@ -158,7 +152,7 @@ final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private DBNode db(final QueryContext ctx) throws QueryException {
-    DBNode node = ctx.doc(checkEStr(expr[0], ctx), false, true, input);
+    DBNode node = ctx.doc(checkStr(expr[0], ctx), false, true, input);
 
     if(expr.length == 2) {
       final int pre = (int) checkItr(expr[1], ctx);
@@ -218,5 +212,10 @@ final class FNBaseX extends Fun {
 
     Err.or(input, WHICHIDX, type);
     return null;
+  }
+
+  @Override
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.CTX && func == FunDef.RANDOM || super.uses(u, ctx);
   }
 }

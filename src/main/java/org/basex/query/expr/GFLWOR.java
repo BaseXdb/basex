@@ -57,7 +57,7 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    boolean grp = ctx.grouping;
+    final boolean grp = ctx.grouping;
     ctx.grouping = group != null;
     final int vs = ctx.vars.size();
 
@@ -74,10 +74,9 @@ public class GFLWOR extends ParseExpr {
     boolean empty = false;
     if(where != null) {
       where = checkUp(where.comp(ctx), ctx);
-      empty = where.empty();
-      if(!empty && where.item()) {
+      if(where.value()) {
         // test is always false: no results
-        empty = !((Item) where).bool(input);
+        empty = !((Item) where).ebv(ctx, input).bool(input);
         if(!empty) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
@@ -124,7 +123,7 @@ public class GFLWOR extends ParseExpr {
     iter(ctx, cache, iter, 0);
 
     final int vs = ctx.vars.size();
-    for(ForLet aFl : fl) ctx.vars.add(aFl.var);
+    for(final ForLet aFl : fl) ctx.vars.add(aFl.var);
 
     final SeqIter si = new SeqIter();
     retG(ctx, si);
@@ -142,12 +141,12 @@ public class GFLWOR extends ParseExpr {
   private void retG(final QueryContext ctx, final SeqIter si)
       throws QueryException {
     for(int i = 0; i < group.gp.partitions.size(); i++) { // bind grouping var
-      HashMap<Var, ItemList> ngvars = group.gp.items.get(i);
+      final HashMap<Var, ItemList> ngvars = group.gp.items.get(i);
       final GroupNode gn =  group.gp.partitions.get(i);
       for(int j = 0; j < group.gp.gv.length; j++) {
         group.gp.gv[j].bind(gn.its[j], ctx);
       }
-      for(Var ngv : ngvars.keySet()) {
+      for(final Var ngv : ngvars.keySet()) {
         final ItemList its = ngvars.get(ngv); 
         ngv.bind(Seq.get(its.list, its.size()), ctx);
       }

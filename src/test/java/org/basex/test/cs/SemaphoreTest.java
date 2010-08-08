@@ -26,7 +26,7 @@ import org.junit.Test;
 public final class SemaphoreTest {
   /** Create random number. */
   static Random rand = new Random();
-  /** Name. */
+  /** Test database name. */
   private static final String NAME = "factbook";
   /** Test file. */
   private static final String FILE = "etc/xml/factbook.zip";

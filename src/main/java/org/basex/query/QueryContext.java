@@ -541,8 +541,7 @@ public final class QueryContext extends Progress {
     if(item == null) return null;
     Data data = null;
 
-    if(item.size(this) == docs && item instanceof Seq
-        && ((Seq) item).val == doc) return doc[0].data;
+    if(docNodes()) return doc[0].data;
 
     final Iter iter = item.iter();
     Item it;
@@ -555,6 +554,14 @@ public final class QueryContext extends Progress {
     return data;
   }
 
+  /**
+   * Returns true if the current context item contains all root document nodes.
+   * @return result of check
+   */
+  public boolean docNodes() {
+    return item instanceof Seq && ((Seq) item).val == doc;
+  }
+  
   /**
    * Returns an IO representation of the base uri.
    * @return IO reference

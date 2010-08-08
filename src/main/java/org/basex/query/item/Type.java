@@ -43,7 +43,16 @@ public enum Type {
   ITEM("item", null, EMPTY, false, false, false, false),
 
   /** Any atomic type. */
-  AAT("anyAtomicType", ITEM, XSURI, false, false, false, false),
+  AAT("anyAtomicType", ITEM, XSURI, false, false, false, false) {
+    @Override
+    public Atm e(final Item it, final QueryContext ctx, final InputInfo ii) {
+      return new Atm(it.atom());
+    }
+    @Override
+    public Atm e(final Object o, final InputInfo ii) {
+      return new Atm(token(o.toString()));
+    }
+  },
 
   /** Untyped Atomic type. */
   ATM("untypedAtomic", AAT, XSURI, false, true, true, false) {
@@ -639,7 +648,7 @@ public enum Type {
   NOT("NOTATION", null, XSURI, false, false, false, false),
 
   /** Node type. */
-  NOD("node", AAT, EMPTY, false, true, false, false),
+  NOD("node", ITEM, EMPTY, false, true, false, false),
 
   /** Text type. */
   TXT("text", NOD, EMPTY, false, true, false, false) {

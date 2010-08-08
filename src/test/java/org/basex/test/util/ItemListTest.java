@@ -21,7 +21,7 @@ public class ItemListTest {
    */
   @Test
   public final void testItemList() {
-    ItemList il = new ItemList();
+    final ItemList il = new ItemList();
     il.add(Itr.ZERO);
     assertEquals(1, il.size());
     assertEquals(Itr.ZERO, il.get(0));
@@ -32,7 +32,7 @@ public class ItemListTest {
    */
   @Test
   public final void testAdd() {
-    ItemList il = new ItemList();
+    final ItemList il = new ItemList();
     il.add(Itr.ZERO);
 
     for(int i = 0; i < CAP - 1; i++) {

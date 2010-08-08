@@ -47,14 +47,6 @@ final class FNFormat extends Fun {
     }
   }
 
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    switch(func) {
-      case FORMINT: return expr[0].empty() ? atomic(ctx, input) : this;
-      default:      return this;
-    }
-  }
-
   /**
    * Returns a formatted integer.
    * @param ctx query context

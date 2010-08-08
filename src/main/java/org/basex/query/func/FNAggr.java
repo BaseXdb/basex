@@ -10,7 +10,6 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -36,8 +35,8 @@ final class FNAggr extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Iter iter = ctx.iter(expr[0]);
 
+    final Iter iter = ctx.iter(expr[0]);
     switch(func) {
       case COUNT:
         long c = iter.size();
@@ -59,26 +58,11 @@ final class FNAggr extends Fun {
     }
   }
 
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    switch(func) {
-      case COUNT:
-        final long c = expr[0].size(ctx);
-        return c >= 0 && !ctx.grouping ? Itr.get(c) : this;
-      case MIN:
-      case MAX:
-      case AVG:
-        return expr[0].empty() ? Seq.EMPTY : this;
-      default:
-        return this;
-    }
-  }
-
   /**
    * Sums up the specified item(s).
    * @param iter iterator
    * @param it first item
-   * @param avg calculating the average
+   * @param avg calculate average
    * @return summed up item
    * @throws QueryException query exception
    */
@@ -169,5 +153,17 @@ final class FNAggr extends Fun {
     if(a.type == BLN || a.num() && !b.num() || b.num() && !a.num())
       Err.or(input, FUNCMP, this, a.type, b.type);
     return a.num() || b.num() ? ITR : a.type;
+  }
+
+  @Override
+  public Expr cmp(final QueryContext ctx) throws QueryException {
+    final Expr e = expr[0];
+    switch(func) {
+      case COUNT:
+        final long c = e.size(ctx);
+        return c >= 0 && !ctx.grouping ? Itr.get(c) : this;
+      default:
+        return this;
+    }
   }
 }

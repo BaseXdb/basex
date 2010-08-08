@@ -244,7 +244,7 @@ public interface QueryText {
   Object[] DECLINCOMPLETE = { XPST, 3,
     "Incomplete declaration; expecting 'function', 'variable', ..." };
   /** XPST0003: Parsing exception. */
-  Object[] DECLFUNC = { XPST, 3, "Expecting function name." };
+  Object[] FUNCNAME = { XPST, 3, "Expecting function name." };
   /** XPST0003: Parsing exception. */
   Object[] PREDMISSING = { XPST, 3, "Expecting expression before predicate." };
   /** XPST0003: Parsing exception. */
@@ -252,7 +252,7 @@ public interface QueryText {
   /** XPST0003: Parsing exception. */
   Object[] TAGWRONG = { XPST, 3, "Start and end tag are different (%/%)." };
   /** XPST0003: Parsing exception. */
-  Object[] PIWRONG = { XPST, 3, "Invalid processing-instruction." };
+  Object[] PIWRONG = { XPST, 3, "Expecting name of processing-instruction." };
   /** XPST0003: Parsing exception. */
   Object[] NOENCLEXPR = { XPST, 3, "Expecting valid expression after \"{\"." };
   /** XPST0003: Parsing exception. */
@@ -266,7 +266,7 @@ public interface QueryText {
   /** XPST0003: Parsing exception. */
   Object[] FUNCMISS = { XPST, 3, "Expecting closing bracket for \"%(...\"." };
   /** XPST0003: Parsing exception. */
-  Object[] TYPEINVALID = { XPST, 3, "Expecting data type." };
+  Object[] TYPEINVALID = { XPST, 3, "Expecting type declaration." };
   /** XPST0003: Parsing exception. */
   Object[] NOTYPESWITCH = { XPST, 3, "Incomplete typeswitch expression." };
   /** XPST0003: Parsing exception. */
@@ -275,7 +275,7 @@ public interface QueryText {
   Object[] TYPEPAR = { XPST, 3,
       "Expecting '(' after 'switch' or 'typeswitch'." };
   /** XPST0003: Parsing exception. */
-  Object[] PRAGMAINCOMPLETE = { XPST, 3, "Incomplete pragma expression." };
+  Object[] PRAGMAINV = { XPST, 3, "Invalid pragma expression." };
   /** XPST0003: Parsing exception. */
   Object[] TESTINCOMPLETE = { XPST, 3, "Incomplete node test." };
   /** XPST0003: Parsing exception. */
@@ -321,7 +321,7 @@ public interface QueryText {
   /** XPST0003: Parsing exception. */
   Object[] TESTINVALID = { XPST, 3, "Invalid % test: %." };
   /** XPQST0003: Evaluation exception. */
-  Object[] QNAMEINV = { XPST, 3, "Invalid QName." };
+  Object[] QNAMEINV = { XPST, 3, "Expecting QName." };
 
   /** XPST0003: Parsing exception. */
   Object[] FTRANGE = { XPST, 3, "Expecting full-text range." };
@@ -519,7 +519,7 @@ public interface QueryText {
   /** XQST0089: Parsing exception. */
   Object[] VARDEFINED = { XQST, 89, "Duplicate definition of %." };
   /** XQST0090: Parsing exception. */
-  Object[] INVCHARREF = { XQST, 90, "Invalid character reference \"&#%;\"." };
+  Object[] INVCHARREF = { XQST, 90, "Invalid character reference \"%\"." };
   /** XPST0094: Parsing exception. */
   Object[] GVARNOTDEFINED = { XQST, 94, "Undefined grouping variable \"%\"." };
   /** XQST0108: Parsing exception. */

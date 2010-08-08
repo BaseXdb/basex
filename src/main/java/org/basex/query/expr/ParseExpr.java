@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.core.Text;
 import org.basex.core.User;
@@ -16,7 +17,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * Abstract parse expression, containing information on the original query.
@@ -61,6 +61,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public final Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Iter ir = iter(ctx);
     final Item it = ir.next();
     if(it == null) return Bln.FALSE;
@@ -76,7 +77,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
-  public final boolean item() {
+  public final boolean value() {
     return false;
   }
 
@@ -112,7 +113,7 @@ public abstract class ParseExpr extends Expr {
    * @return the specified expression
    * @throws QueryException query exception
    */
-  public final Expr checkUp(final Expr e, final QueryContext ctx)
+  protected final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
     if(e != null && ctx.updating && e.uses(Use.UPD, ctx))
       Err.or(input, UPNOT, desc());
@@ -125,7 +126,7 @@ public abstract class ParseExpr extends Expr {
    * @param expr expression array
    * @throws QueryException query exception
    */
-  public void checkUp(final QueryContext ctx, final Expr... expr)
+  protected void checkUp(final QueryContext ctx, final Expr... expr)
       throws QueryException {
 
     if(!ctx.updating) return;
@@ -146,7 +147,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final double checkDbl(final Expr e, final QueryContext ctx)
+  protected final double checkDbl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
     final Item it = e.atomic(ctx, input);
@@ -178,7 +179,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final long checkItr(final Item it) throws QueryException {
+  protected final long checkItr(final Item it) throws QueryException {
     if(!it.unt() && !it.type.instance(Type.ITR)) Err.type(this, Type.ITR, it);
     return it.itr(input);
   }
@@ -190,9 +191,22 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final Nod checkNode(final Item it) throws QueryException {
+  protected final Nod checkNode(final Item it) throws QueryException {
     if(!it.node()) Err.type(this, Type.NOD, it);
     return (Nod) it;
+  }
+
+  /**
+   * Checks if the specified collation is supported.
+   * @param e expression to be checked
+   * @param ctx query context
+   * @throws QueryException query exception
+   */
+  protected final void checkColl(final Expr e, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = checkItem(e, ctx);
+    if(!it.str() || !eq(URLCOLL, it.atom())) Err.or(input, IMPLCOL, e);
   }
 
   /**
@@ -203,7 +217,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final byte[] checkStr(final Expr e, final QueryContext ctx)
+  protected final byte[] checkStr(final Expr e, final QueryContext ctx)
       throws QueryException {
     final Item it = checkItem(e, ctx);
     if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
@@ -217,8 +231,8 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final byte[] checkStrEmp(final Item it) throws QueryException {
-    if(it == null) return Token.EMPTY;
+  protected final byte[] checkStrEmp(final Item it) throws QueryException {
+    if(it == null) return EMPTY;
     if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
     return it.atom();
   }
@@ -242,7 +256,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final Item checkItem(final Expr e, final QueryContext ctx)
+  protected final Item checkItem(final Expr e, final QueryContext ctx)
       throws QueryException {
     return checkEmpty(e.atomic(ctx, input));
   }
@@ -254,7 +268,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  public final Item checkType(final Item it, final Type t)
+  protected final Item checkType(final Item it, final Type t)
       throws QueryException {
 
     if(checkEmpty(it).type != t) Err.type(this, t, it);
@@ -267,7 +281,7 @@ public abstract class ParseExpr extends Expr {
    * @return specified item
    * @throws QueryException query exception
    */
-  public Item checkEmpty(final Item it) throws QueryException {
+  protected final Item checkEmpty(final Item it) throws QueryException {
     if(it == null) Err.or(input, XPEMPTY, desc());
     return it;
   }
@@ -280,7 +294,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  public final byte[] checkEStr(final Expr e, final QueryContext ctx)
+  protected final byte[] checkEStr(final Expr e, final QueryContext ctx)
       throws QueryException {
     return checkStrEmp(e.atomic(ctx, input));
   }
@@ -293,7 +307,7 @@ public abstract class ParseExpr extends Expr {
    * @return io instance
    * @throws QueryException query exception
    */
-  public IO checkIO(final Expr e, final QueryContext ctx)
+  protected final IO checkIO(final Expr e, final QueryContext ctx)
       throws QueryException {
 
     checkAdmin(ctx);
@@ -309,7 +323,9 @@ public abstract class ParseExpr extends Expr {
    * @param ctx query context
    * @throws QueryException query exception
    */
-  public final void checkAdmin(final QueryContext ctx) throws QueryException {
+  protected final void checkAdmin(final QueryContext ctx)
+      throws QueryException {
+
     if(!ctx.context.user.perm(User.ADMIN))
       Err.or(input, Text.PERMNO, CmdPerm.ADMIN);
   }

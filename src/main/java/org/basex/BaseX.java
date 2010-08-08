@@ -22,6 +22,8 @@ import org.basex.util.Args;
  * @author Christian Gruen
  */
 public class BaseX extends Main {
+  /** Flag for writing properties to disk. */
+  private boolean writeProps;
   /** User query. */
   private String commands;
   /** Query file. */
@@ -32,8 +34,6 @@ public class BaseX extends Main {
   protected String user;
   /** Password. */
   protected String pass;
-  /** Flag for writing properties to disk. */
-  protected boolean writeProps;
 
   /**
    * Main method, launching the standalone console mode.

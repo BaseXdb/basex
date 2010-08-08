@@ -24,7 +24,7 @@ import org.junit.Test;
 public final class PoolTest {
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
-  /** Test name. */
+  /** Test database name. */
   private static final String NAME = "input";
 
   /** Server reference. */

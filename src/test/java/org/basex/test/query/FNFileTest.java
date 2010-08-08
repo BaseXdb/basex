@@ -89,7 +89,7 @@ public final class FNFileTest {
   /** Tests the function file:files. */
   @Test
   public void testFiles() {
-    Expr[] args = new Expr[2];
+    final Expr[] args = new Expr[2];
     args[0] = Str.get("etc");
     args[1] = Str.get("[^z]*e");
     iter(FunDef.FILES, args);

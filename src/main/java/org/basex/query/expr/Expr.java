@@ -83,18 +83,18 @@ public abstract class Expr extends ExprInfo {
       throws QueryException;
 
   /**
-   * Checks if this is an item.
-   * @return result of check
-   */
-  public abstract boolean item();
-
-  /**
    * Tests if this is an empty sequence.
    * @return result of check
    */
   public final boolean empty() {
     return this == Seq.EMPTY;
   }
+
+  /**
+   * Tests if this is a value.
+   * @return result of check
+   */
+  public abstract boolean value();
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).

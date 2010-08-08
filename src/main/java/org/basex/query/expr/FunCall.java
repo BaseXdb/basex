@@ -47,7 +47,7 @@ public final class FunCall extends Arr {
     final Expr e = func.expr;
 
     // [CG] XQuery/Functions: check for inlining
-    if(e.item()) {
+    if(e.value()) {
       // inline simple items
       ctx.compInfo(OPTINLINE, this);
       return func.atomic(ctx, input);
@@ -58,7 +58,7 @@ public final class FunCall extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     if(func == null) {
-      Expr e = comp(ctx);
+      final Expr e = comp(ctx);
       if(e != this) return e.iter(ctx);
     }
     

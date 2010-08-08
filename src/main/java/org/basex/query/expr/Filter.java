@@ -138,7 +138,8 @@ public class Filter extends Preds {
   @Override
   public final SeqType returned(final QueryContext ctx) {
     final SeqType ret = root.returned(ctx);
-    return ret.zeroOrOne() ? super.returned(ctx) : ret;
+    return new SeqType(ret.type, ret.zeroOrOne() ?
+        SeqType.Occ.ZO : SeqType.Occ.ZM);
   }
 
   @Override

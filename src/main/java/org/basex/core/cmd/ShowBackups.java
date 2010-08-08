@@ -28,17 +28,17 @@ public final class ShowBackups extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    File file = new File(prop.get(Prop.DBPATH));
-    File[] files = file.listFiles();
+    final File file = new File(prop.get(Prop.DBPATH));
+    final File[] files = file.listFiles();
     int size = 0;
-    TokenBuilder tmp = new TokenBuilder();
-    for(File f : files) {
+    final TokenBuilder tmp = new TokenBuilder();
+    for(final File f : files) {
       if(f.getName().endsWith(".zip")) {
         tmp.add(NL + LI + f.getName());
         size++;
       }
     }
-    TokenBuilder tb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     if(size == 0) {
       tb.add(size + " Backup(s)" + DOT);
     } else {

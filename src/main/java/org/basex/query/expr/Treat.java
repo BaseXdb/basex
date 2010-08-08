@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -37,7 +38,7 @@ public final class Treat extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return checkUp(expr, ctx).item() ? preEval(ctx) : this;
+    return checkUp(expr, ctx).value() ? preEval(ctx) : this;
   }
 
   @Override
@@ -45,8 +46,8 @@ public final class Treat extends Single {
     final Iter iter = ctx.iter(expr);
     final Item it = iter.next();
     if(it == null) {
-      if(seq.mayBeZero()) Err.or(input, XPEMPTY, desc());
-      return Iter.EMPTY;
+      if(!seq.mayBeZero() || seq.type == Type.EMP) return Iter.EMPTY;
+      Err.or(input, XPEMPTY, desc());
     }
     if(seq.zeroOrOne()) {
       if(iter.next() != null) Err.or(input, NOTREATS, desc(), seq);

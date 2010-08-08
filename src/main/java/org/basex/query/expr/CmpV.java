@@ -146,7 +146,7 @@ public final class CmpV extends Arr {
     super.comp(ctx);
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
-    if(expr[0].item() && !expr[1].item()) {
+    if(expr[0].value() && !expr[1].value()) {
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;
@@ -156,10 +156,10 @@ public final class CmpV extends Arr {
     final Expr e2 = expr[1];
 
     Expr e = this;
-    if(e1.item() && e2.item()) {
-      e = preEval(ctx);
-    } else if(e1.empty() || e2.empty()) {
+    if(e1.empty() || e2.empty()) {
       e = optPre(Seq.EMPTY, ctx);
+    } else if(e1.value() && e2.value()) {
+      e = preEval(ctx);
     } else if(e1 instanceof Fun) {
       final Fun fun = (Fun) expr[0];
       if(fun.func == FunDef.COUNT) {
@@ -184,7 +184,7 @@ public final class CmpV extends Arr {
   static Expr count(final Arr e, final Op op) throws QueryException {
     // evaluate argument
     final Expr a = e.expr[1];
-    if(!a.item()) return e;
+    if(!a.value()) return e;
     final Item it = (Item) a;
     if(!it.num() && !it.unt()) return e;
 

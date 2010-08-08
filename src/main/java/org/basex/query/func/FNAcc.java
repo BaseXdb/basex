@@ -8,7 +8,6 @@ import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -34,8 +33,8 @@ final class FNAcc extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
 
+    final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
     switch(func) {
       case POS:
         return Itr.get(ctx.pos);
@@ -62,25 +61,6 @@ final class FNAcc extends Fun {
     }
   }
 
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    if(expr.length == 0) return this;
-    final Item it = expr[0].item() ? (Item) expr[0] : null;
-
-    switch(func) {
-      case STRING:
-      case NUMBER:
-      case STRLEN:
-      case NORM:
-        return expr[0].empty() || it != null ? atomic(ctx, input) : this;
-      case URIQNAME:
-        return expr[0].empty() ? Seq.EMPTY : it != null ?
-            atomic(ctx, input) : this;
-      default:
-        return this;
-    }
-  }
-
   /**
    * Converts the specified item to a double.
    * @param it input item
@@ -88,7 +68,7 @@ final class FNAcc extends Fun {
    * @return double iterator
    */
   private Item number(final Item it, final QueryContext ctx) {
-    double d = Double.NaN;
+    final double d = Double.NaN;
     if(it != null) {
       try {
         return it.type == Type.DBL ? it : Type.DBL.e(it, ctx, input);

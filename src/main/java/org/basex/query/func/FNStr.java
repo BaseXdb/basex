@@ -120,36 +120,6 @@ final class FNStr extends Fun {
     }
   }
 
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    final Expr e = expr[0];
-
-    // optimize frequently used functions
-    switch(func) {
-      case UPPER:
-        return e.item() ? Str.get(uc(checkEStr(e, ctx))) : this;
-      case LOWER:
-        return e.item() ? Str.get(lc(checkEStr(e, ctx))) : this;
-      case CONCAT:
-        for(final Expr a : expr) if(!a.item()) return this;
-        return concat(ctx);
-      case CONTAINS:
-        if(expr.length == 2) {
-          final byte[] i = expr[1].item() ? checkStrEmp((Item) expr[1]) : null;
-          // empty query string: return true
-          if(expr[1].empty() || i != null && i.length == 0) return Bln.TRUE;
-          // empty input string: return false
-          if(e.empty() && i != null && i.length != 0) return Bln.FALSE;
-          // evaluate items
-          if(e.item() && expr[1].item()) return Bln.get(contains(
-              checkEStr(e, ctx), checkStrEmp((Item) expr[1])));
-        }
-        return this;
-      default:
-        return this;
-    }
-  }
-
   /**
    * Converts codepoints to a string.
    * @param iter iterator

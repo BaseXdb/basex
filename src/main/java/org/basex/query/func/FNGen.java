@@ -79,19 +79,6 @@ final class FNGen extends Fun {
     }
   }
 
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    if(func == FunDef.DOC)
-      return expr[0].item() ? atomic(ctx, input) : this;
-    if(func == FunDef.COLL)
-      return expr.length != 0 && expr[0].item() ? iter(ctx).finish() : this;
-    if(func == FunDef.PARSETXT) {
-      return expr[0].item() && (expr.length == 1 || expr[1].item()) ?
-        atomic(ctx, input) : this;
-    }
-    return this;
-  }
-
   /**
    * Performs the data function.
    * @param ctx query context
@@ -295,7 +282,9 @@ final class FNGen extends Fun {
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD ? func == FunDef.PUT : super.uses(u, ctx);
+    return u == Use.UPD ? func == FunDef.PUT : 
+      u == Use.CTX ? expr.length == 0 && func == FunDef.DATA :
+      super.uses(u, ctx);
   }
 
   @Override

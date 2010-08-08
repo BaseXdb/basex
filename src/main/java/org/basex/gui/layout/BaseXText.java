@@ -538,8 +538,8 @@ public class BaseXText extends BaseXPanel {
 
   @Override
   public final void keyTyped(final KeyEvent e) {
-    if(undo == null || control(e) || pressed(DELNEXT, e) || pressed(DELPREV, e))
-      return;
+    if(undo == null || control(e) || pressed(DELNEXT, e) ||
+        pressed(DELPREV, e) || pressed(ESCAPE, e)) return;
 
     text.pos(text.cursor());
     if(text.start() != -1) text.delete();

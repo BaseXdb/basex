@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -89,14 +88,13 @@ final class FNInfo extends Fun {
   }
 
   @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    if(func == FunDef.ENV)  return expr[0].item() ? atomic(ctx, input) : this;
-    if(func == FunDef.ENVS) return SeqIter.get(iter(ctx)).finish();
-    return this;
+  public boolean vacuous() {
+    return func == FunDef.ERROR;
   }
 
   @Override
-  public boolean vacuous() {
-    return func == FunDef.ERROR;
+  public boolean uses(final Use u, final QueryContext ctx) {
+    return u == Use.CTX && (func == FunDef.ERROR || func == FunDef.TRACE) ||
+      super.uses(u, ctx);
   }
 }

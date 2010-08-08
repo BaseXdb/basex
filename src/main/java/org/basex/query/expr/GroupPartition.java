@@ -76,7 +76,7 @@ final class GroupPartition {
     
     if(hashes.containsKey(chash)) {
       final IntList ps = hashes.get(cand.hash);
-      for(int pp : ps.toArray()) {
+      for(final int pp : ps.toArray()) {
         if(cand.eq(partitions.get(pp))) {
           found = true;
           p = pp;

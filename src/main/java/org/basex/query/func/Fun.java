@@ -1,6 +1,5 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.core.Main;
@@ -14,7 +13,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -62,34 +60,26 @@ public abstract class Fun extends Arr {
 
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
+    // compile all arguments
     super.comp(ctx);
-    final Expr e = c(ctx);
-    if(e != this) ctx.compInfo(OPTPRE, this);
-    return e;
+    // skip functions based on context
+    if(uses(Use.CTX, ctx)) return cmp(ctx);
+    // use custom compilation if not all arguments are values
+    for(final Expr e : expr) if(!e.value()) return cmp(ctx);
+    // pre-evaluate function
+    return optPre(func.ret.zeroOrOne() ? atomic(ctx, input) :
+      iter(ctx).finish(), ctx);
   }
 
   /**
-   * Compiles the function.
+   * Performs function specific compilations.
    * @param ctx query context
    * @return evaluated item
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
-  public Expr c(final QueryContext ctx) throws QueryException {
+  public Expr cmp(final QueryContext ctx) throws QueryException {
     return this;
-  }
-
-  /**
-   * Checks if the specified collation is supported.
-   * @param e expression to be checked
-   * @param ctx query context
-   * @throws QueryException query exception
-   */
-  protected final void checkColl(final Expr e, final QueryContext ctx)
-      throws QueryException {
-
-    final Item it = checkItem(e, ctx);
-    if(!it.str() || !Token.eq(URLCOLL, it.atom())) Err.or(input, IMPLCOL, e);
   }
 
   /**

@@ -36,13 +36,14 @@ public final class FNSimple extends Fun {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
+    Iter ir = ctx.iter(expr[0]);
     switch(func) {
       case ONEORMORE:
-        final Iter ir = SeqIter.get(ctx.iter(expr[0]));
+        if(expr[0].returned(ctx).mayBeZero()) ir = SeqIter.get(ir);
         if(ir.size() < 1) Err.or(input, EXP1M);
         return ir;
       case UNORDER:
-        return ctx.iter(expr[0]);
+        return ir;
       default:
         return super.iter(ctx);
     }
@@ -53,12 +54,18 @@ public final class FNSimple extends Fun {
       throws QueryException {
     final Expr e = expr.length == 1 ? expr[0] : null;
     switch(func) {
-      case FALSE:   return Bln.FALSE;
-      case TRUE:    return Bln.TRUE;
-      case EMPTY:   return Bln.get(!e.item() && e.iter(ctx).next() == null);
-      case EXISTS:  return Bln.get(e.item() || e.iter(ctx).next() != null);
-      case BOOLEAN: return Bln.get(e.ebv(ctx, input).bool(input));
-      case NOT:     return Bln.get(!e.ebv(ctx, input).bool(input));
+      case FALSE:
+        return Bln.FALSE;
+      case TRUE:
+        return Bln.TRUE;
+      case EMPTY:
+        return Bln.get(e.iter(ctx).next() == null);
+      case EXISTS:
+        return Bln.get(e.iter(ctx).next() != null);
+      case BOOLEAN:
+        return Bln.get(e.ebv(ctx, input).bool(input));
+      case NOT:
+        return Bln.get(!e.ebv(ctx, input).bool(input));
       case DEEPEQUAL:
         return Bln.get(deep(ctx));
       case ZEROORONE:
@@ -78,19 +85,11 @@ public final class FNSimple extends Fun {
   }
 
   @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
+  public Expr cmp(final QueryContext ctx) {
     final SeqType s = expr.length == 1 ? expr[0].returned(ctx) : null;
 
     switch(func) {
-      case FALSE:
-      case TRUE:
-        return atomic(ctx, input);
-      case EMPTY:
-      case EXISTS:
-      case BOOLEAN:
-        return expr[0].empty() || expr[0].item() ? atomic(ctx, input) : this;
       case NOT:
-        if(expr[0].item()) return atomic(ctx, input);
         if(expr[0] instanceof Fun) {
           final Fun fs = (Fun) expr[0];
           if(fs.func == FunDef.EMPTY) {

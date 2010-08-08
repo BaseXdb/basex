@@ -92,7 +92,7 @@ final class FNFile extends Fun {
     try {
       pattern = expr.length == 2 ?
           Pattern.compile(Token.string(checkStr(expr[1], ctx))) : null;
-    } catch(PatternSyntaxException ex) {
+    } catch(final PatternSyntaxException ex) {
       Err.or(input, QueryText.FILEPATTERN, expr[1]);
       return null;
     }
@@ -103,7 +103,7 @@ final class FNFile extends Fun {
         if(pathname.isHidden()) return false;
 
         return pattern == null ? true
-            : (pattern.matcher(pathname.getName()).matches());
+            : pattern.matcher(pathname.getName()).matches();
 
       }
     });

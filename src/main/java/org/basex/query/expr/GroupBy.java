@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.SeqType;
-import org.basex.query.iter.SeqIter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -28,7 +27,6 @@ public final class GroupBy extends ParseExpr {
    */
   public GroupBy(final InputInfo ii, final Var e) {
     super(ii);
-    new SeqIter();
     expr = e;
   }
 

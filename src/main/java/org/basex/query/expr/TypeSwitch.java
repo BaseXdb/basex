@@ -56,9 +56,9 @@ public final class TypeSwitch extends ParseExpr {
 
     // pre-evaluate typeswitch
     Expr e = this;
-    if(ts.item()) {
+    if(ts.value()) {
       for(final TypeCase c : cs) {
-        if(c.var.type == null || c.var.type.instance(ctx.iter(ts))) {
+        if(c.var.type == null || c.var.type.instance(ts.iter(ctx))) {
           e = c.comp(ctx, (Item) ts).expr;
           break;
         }

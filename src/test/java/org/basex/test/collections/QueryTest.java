@@ -25,7 +25,7 @@ public class QueryTest {
   private static final Context CTX = new Context();
 
   /** Test database name. */
-  private static final String NAME = QueryTest.class.getSimpleName();
+  private static final String DBNAME = QueryTest.class.getSimpleName();
   /** Test files. */
   private static final String[] FILES = {
     "etc/xml/input.xml", "etc/xml/xmark.xml", "etc/xml/test.xml"
@@ -39,7 +39,7 @@ public class QueryTest {
    */
   @BeforeClass
   public static void before() throws BaseXException {
-    new CreateDB(NAME).execute(CTX);
+    new CreateDB(DBNAME).execute(CTX);
     for(final String file : FILES) new Add(file, null, "etc/xml").execute(CTX);
     new Add(ZIP, null, "test/zipped").execute(CTX);
     new CreateIndex(Commands.CmdIndex.FULLTEXT);
@@ -51,7 +51,7 @@ public class QueryTest {
    */
   @AfterClass
   public static void after() throws BaseXException {
-    new DropDB(NAME).execute(CTX);
+    new DropDB(DBNAME).execute(CTX);
     CTX.close();
   }
 
@@ -95,7 +95,7 @@ public class QueryTest {
       + " return base-uri($x)";
     final QueryProcessor qp = new QueryProcessor(find, CTX);
     final Item it = qp.iter().next();
-    final String expath = '"' + CTX.data.meta.file.url().replace(NAME, "")
+    final String expath = '"' + CTX.data.meta.file.url().replace(DBNAME, "")
         + FILES[1] + '"';
     assertEquals(expath, it.toString());
     qp.close();

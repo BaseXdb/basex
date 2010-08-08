@@ -14,7 +14,6 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CAttr;
-import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Filter;
 import org.basex.query.item.Bln;
@@ -109,11 +108,8 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-    
+  protected Expr compPath(final QueryContext ctx) throws QueryException {
     for(final Step s : step) checkUp(s, ctx);
-    if(root instanceof Context) root = null;
 
     // merge two axis paths
     if(root instanceof AxisPath) {
@@ -124,21 +120,6 @@ public class AxisPath extends Path {
     }
     checkEmpty();
 
-    final Item ci = ctx.item;
-    ctx.item = root(ctx);
-    final Expr e = c(ctx);
-    ctx.item = ci;
-    return e;
-  }
-
-  /**
-   * Compiles the location path.
-   * @param ctx query context
-   * @return optimized Expression
-   * @throws QueryException query exception
-   */
-  private Expr c(final QueryContext ctx) throws QueryException {
-    // step optimizations will always return step instances
     for(int i = 0; i != step.length; i++) {
       final Expr e = step[i].comp(ctx);
       if(!(e instanceof Step)) return e;
@@ -146,17 +127,18 @@ public class AxisPath extends Path {
     }
     mergeDesc(ctx);
 
-    // check if context is set to document nodes
+    // check if all context nodes reference document nodes
+    // [CG] XQuery: optimize paths without root context
     final Data data = ctx.data();
-    // [CG] XQuery: check if optimization is limited to paths with roots
     if(data != null) {
-      boolean doc = true;
-      final Item item = ctx.item;
-      if(item.size(ctx) != ctx.docs || !(item instanceof Seq) ||
-          ((Seq) item).val != ctx.doc) {
-        final Iter iter = item.iter();
+      boolean doc = ctx.docNodes();
+      if(!doc) {
+        final Iter iter = ctx.item.iter();
         Item it;
-        while((it = iter.next()) != null) doc = doc && it.type == Type.DOC;
+        while((it = iter.next()) != null) {
+          doc = it.type == Type.DOC;
+          if(!doc) break;
+        }
       }
 
       if(doc) {
@@ -339,16 +321,15 @@ public class AxisPath extends Path {
           inv = Array.add(inv, Step.get(input, a, prev.test, prev.pred));
         }
       }
-      final boolean add = inv.length != 0 || newPreds.length != 0;
+      final boolean simple = inv.length == 0 && newPreds.length == 0;
 
       // create resulting expression
       AxisPath result = null;
       if(ie instanceof AxisPath) {
         result = (AxisPath) ie;
-      } else if(add || ms + 1 < step.length) {
-        result = add ?
-            new AxisPath(input, ie, Step.get(input, Axis.SELF, Test.NODE)) :
-              new AxisPath(input, ie);
+      } else if(ms + 1 < step.length || !simple) {
+        result = simple ? new AxisPath(input, ie) :
+          new AxisPath(input, ie, Step.get(input, Axis.SELF, Test.NODE));
       } else {
         return ie;
       }
@@ -470,7 +451,7 @@ public class AxisPath extends Path {
   }
 
   /**
-   * Checks if any of the location steps will never yield results.
+   * Checks if some location steps will never yield results.
    * @throws QueryException query exception
    */
   private void checkEmpty() throws QueryException {

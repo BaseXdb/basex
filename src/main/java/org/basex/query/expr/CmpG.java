@@ -14,7 +14,6 @@ import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -121,24 +120,24 @@ public final class CmpG extends Arr {
     super.comp(ctx);
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
-    if(expr[0] instanceof AxisPath && expr[1] instanceof AxisPath &&
-        ((AxisPath) expr[0]).root != null || expr[0].item() &&
-        !expr[1].item()) {
+    if(expr[0].value() && !expr[1].value() || expr[0] instanceof AxisPath &&
+        ((AxisPath) expr[0]).root != null && expr[1] instanceof AxisPath) {
       final Expr tmp = expr[0];
       expr[0] = expr[1];
       expr[1] = tmp;
       cmp = cmp.invert();
     }
+
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
+    // check if both arguments will always yield one result
+    atom = e1.returned(ctx).one() && e2.returned(ctx).one();
 
     Expr e = this;
-    if(e1.item() && e2.item()) {
-      e = optPre(Bln.get(eval((Item) e1, (Item) e2)), ctx);
-    } else if(e1.empty() || e2.empty()) {
-      e = optPre(Bln.FALSE, ctx);
+    if(e1.value() && e2.value()) {
+      e = preEval(ctx);
     } else if(e1 instanceof Fun) {
-      final Fun fun = (Fun) expr[0];
+      final Fun fun = (Fun) e1;
       if(fun.func == FunDef.COUNT) {
         e = CmpV.count(this, cmp.cmp);
         if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
@@ -157,8 +156,6 @@ public final class CmpG extends Arr {
       // rewrite path CMP number
       e = CmpR.get(this);
       if(e != this) ctx.compInfo(OPTWRITE, this);
-      // both arguments will always yield one result
-      else atom = expr[0].returned(ctx).one() && expr[1].returned(ctx).one();
     }
     return e;
   }
@@ -178,7 +175,8 @@ public final class CmpG extends Arr {
     final boolean s1 = is1 == 1;
 
     // evaluate single items
-    if(s1 && expr[1].item()) return Bln.get(eval(ir1.next(), (Item) expr[1]));
+    if(s1 && expr[1].value() && expr[1].size(ctx) == 1)
+      return Bln.get(eval(ir1.next(), expr[1].atomic(ctx, input)));
 
     Iter ir2 = ctx.iter(expr[1]);
     final long is2 = ir2.size();
@@ -247,10 +245,10 @@ public final class CmpG extends Arr {
 
     // support expressions
     final Expr arg = expr[1];
-    if(!(arg.item() || arg instanceof Seq)) {
+    if(!arg.value()) {
       final SeqType ret = arg.returned(ic.ctx);
       // index access not possible if returned type is no string or node,
-      // and if expression is dependent on context
+      // and if expression depends on context
       if(!ret.type.str && !ret.type.node() || arg.uses(Use.CTX, ic.ctx))
         return false;
 

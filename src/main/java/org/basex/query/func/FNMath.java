@@ -42,9 +42,4 @@ final class FNMath extends Fun {
       default:   return super.atomic(ctx, ii);
     }
   }
-
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    return func == FunDef.PI || expr[0].item() ? atomic(ctx, input) : this;
-  }
 }

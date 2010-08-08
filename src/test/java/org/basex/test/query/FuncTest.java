@@ -47,6 +47,7 @@ public final class FuncTest extends QueryTest {
 
       { "contains 1", "contains(.)" },
       { "contains 2", "contains(. .)" },
+
       { "number 1", dbl(1), "number(true())" },
       { "number 2", dbl(0), "number(false())" },
       { "number 3", dbl(Double.NaN), "number(xs:gYear('2005'))" },

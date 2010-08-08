@@ -62,7 +62,7 @@ public final class Pos extends Simple {
   static Expr get(final Op cmp, final Expr a, final Expr o,
       final InputInfo ii) throws QueryException {
 
-    if(a.item()) {
+    if(a.value()) {
       final Item it = (Item) a;
       if(it.num()) {
         final long p = it.itr(ii);

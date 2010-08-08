@@ -73,11 +73,6 @@ public class Seq extends Item {
   }
 
   @Override
-  public final boolean item() {
-    return false;
-  }
-
-  @Override
   public final long size(final QueryContext ctx) {
     return size;
   }

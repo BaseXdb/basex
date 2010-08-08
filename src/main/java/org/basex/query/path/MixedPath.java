@@ -5,12 +5,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.SeqIter;
@@ -19,7 +18,7 @@ import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
 /**
- * Path expression.
+ * Mixed path expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -41,28 +40,13 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+  protected Expr compPath(final QueryContext ctx) throws QueryException {
     for(final Expr e : step) checkUp(e, ctx);
-    if(root instanceof Context) root = null;
-
-    final Item ci = ctx.item;
-    ctx.item = root(ctx);
-    final Type ct = ctx.item != null ? ctx.item.type : null;
-    // expressions will not necessarily start from the document node..
-    if(ct == Type.DOC) ctx.item.type = Type.ELM;
-
-    Expr e = this;
     for(int i = 0; i != step.length; i++) {
       step[i] = step[i].comp(ctx);
-      if(step[i].empty()) {
-        e = step[i];
-        break;
-      }
+      if(step[i].empty()) return Seq.EMPTY;
     }
-    if(ct != null) ctx.item.type = ct;
-    ctx.item = ci;
-    return e;
+    return this;
   }
 
   @Override

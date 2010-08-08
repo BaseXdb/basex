@@ -54,7 +54,7 @@ public final class Range extends Arr {
 
   @Override
   public long size(final QueryContext ctx) throws QueryException {
-    if(expr[0].item() && expr[1].item()) {
+    if(expr[0].value() && expr[1].value()) {
       final long[] v = rng(ctx);
       if(v[1] >= v[0]) return v[1] - v[0] + 1;
     }
@@ -69,7 +69,7 @@ public final class Range extends Arr {
    * @throws QueryException query exception
    */
   long[] range(final QueryContext ctx) throws QueryException {
-    return expr[0].item() && expr[1].item() ? rng(ctx) : null;
+    return expr[0].value() && expr[1].value() ? rng(ctx) : null;
   }
 
   /**

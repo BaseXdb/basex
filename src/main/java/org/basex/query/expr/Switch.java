@@ -30,18 +30,18 @@ public final class Switch extends Arr {
     super.comp(ctx);
 
     Expr e = this;
-    if(expr[0].item()) {
-      final Item it = (Item) expr[0];
+    if(expr[0].value()) {
+      final Item it = expr[0].atomic(ctx, input);
       final int el = expr.length;
-      boolean items = true;
+      boolean vals = true;
       for(int i = 1; i < el - 1; i += 2) {
-        items &= expr[i].item();
-        if(items && it.equiv(input, (Item) expr[i])) {
+        vals &= expr[i].value();
+        if(vals && it.equiv(input, (Item) expr[i])) {
           e = expr[i + 1];
           break;
         }
       }
-      if(items && e == this) e = expr[el - 1];
+      if(vals && e == this) e = expr[el - 1];
     }
     if(e != this) ctx.compInfo(OPTPRE, SWITCH + "(" + expr[0] + ")");
     return e;

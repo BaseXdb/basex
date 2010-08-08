@@ -6,7 +6,6 @@ import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.SeqIter;
@@ -60,7 +59,8 @@ final class FNSeq extends Fun {
    * @throws QueryException query exception
    */
   private Item head(final QueryContext ctx) throws QueryException {
-    return expr[0].iter(ctx).next();
+    return expr[0].returned(ctx).zeroOrOne() ? expr[0].atomic(ctx, input) :
+      expr[0].iter(ctx).next();
   }
 
   /**
@@ -71,7 +71,7 @@ final class FNSeq extends Fun {
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    if(e.item() || e.empty()) return Iter.EMPTY;
+    if(e.returned(ctx).zeroOrOne()) return Iter.EMPTY;
     final Iter ir = e.iter(ctx);
     return ir.next() == null ? Iter.EMPTY : ir;
   }
@@ -244,19 +244,6 @@ final class FNSeq extends Fun {
         return null;
       }
     };
-  }
-
-  @Override
-  public Expr c(final QueryContext ctx) {
-    switch(func) {
-      case REVERSE:
-      case HEAD:
-        return expr[0].returned(ctx).zeroOrOne() ? expr[0] : this;
-      case TAIL:
-        return expr[0].returned(ctx).zeroOrOne() ? Seq.EMPTY : this;
-      default:
-        return this;
-    }
   }
 
   @Override

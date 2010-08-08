@@ -132,7 +132,7 @@ public class QueryParser extends InputParser {
   private int ap;
 
   /** Declared serialization options. */
-  private ArrayList<String> serial = new ArrayList<String>();
+  private final ArrayList<String> serial = new ArrayList<String>();
   /** Declaration flag. */
   private boolean declElem;
   /** Declaration flag. */
@@ -423,6 +423,7 @@ public class QueryParser extends InputParser {
    */
   private void optionDecl() throws QueryException {
     // ignore option declarations
+    skipWS();
     final QNm name = new QNm(qName(QNAMEINV), ctx, input());
     final byte[] val = stringLiteral();
     if(!name.ns()) error(NSMISS, name);
@@ -648,7 +649,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void functionDecl(final boolean up) throws QueryException {
-    final QNm name = new QNm(qName(DECLFUNC));
+    skipWS();
+    final QNm name = new QNm(qName(FUNCNAME));
     name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) :
       ctx.nsFunc);
 
@@ -1277,14 +1279,15 @@ public class QueryParser extends InputParser {
   private Expr[] pragma() throws QueryException {
     Expr[] pragmas = { };
     while(consumeWS(PRAGMA)) {
-      final QNm name = new QNm(qName(PRAGMAINCOMPLETE), ctx, input());
+      skipWS();
+      final QNm name = new QNm(qName(PRAGMAINV), ctx, input());
       if(!name.ns()) error(NSMISS, name);
       char c = curr();
-      if(c != '#' && !ws(c)) error(PRAGMAINCOMPLETE);
+      if(c != '#' && !ws(c)) error(PRAGMAINV);
 
       tok.reset();
       while(c != '#' || next() != ')') {
-        if(c == 0) error(PRAGMAINCOMPLETE);
+        if(c == 0) error(PRAGMAINV);
         tok.add(consume());
         c = curr();
       }
@@ -1463,6 +1466,7 @@ public class QueryParser extends InputParser {
     final char ch = curr();
     if(XMLToken.isXMLLetter(ch)) {
       final byte[] name = qName(null);
+      final int p2 = qp;
       if(consumeWS(PAR1)) {
         final Type type = Type.node(new QNm(name));
         if(type != null) {
@@ -1476,6 +1480,7 @@ public class QueryParser extends InputParser {
           return type == Type.NOD ? Test.NODE : new KindTest(type, qn);
         }
       } else {
+        qp = p2;
         // name test "pre:tag"
         if(contains(name, ':')) {
           skipWS();
@@ -1499,7 +1504,7 @@ public class QueryParser extends InputParser {
       // name test "*"
       if(!consume(':')) return new NameTest(att, input());
       // name test "*:tag"
-      return new NameTest(new QNm(qName(null)), NameTest.Kind.NAME, att,
+      return new NameTest(new QNm(qName(QNAMEINV)), NameTest.Kind.NAME, att,
           input());
     }
     qp = p;
@@ -1551,10 +1556,11 @@ public class QueryParser extends InputParser {
     if(letter(c)) {
       e = functionCall();
       if(e != null) return e;
-      e = computedConstructor();
+      e = compConstructor();
       if(e != null) return e;
       // ordered expression
-      if(consumeWS(ORDERED) || consumeWS(UNORDERED))
+      if(consumeWS(ORDERED, BRACE1, INCOMPLETE) ||
+         consumeWS(UNORDERED, BRACE1, INCOMPLETE))
         return enclosed(NOENCLEXPR);
     }
     return null;
@@ -1606,6 +1612,7 @@ public class QueryParser extends InputParser {
    */
   private QNm varName() throws QueryException {
     check(DOLLAR);
+    skipWS();
     final QNm name = new QNm(qName(NOVARNAME));
     if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pref(), false, input()));
     ctx.ns.uri(name);
@@ -1669,8 +1676,7 @@ public class QueryParser extends InputParser {
    */
   private Expr constructor() throws QueryException {
     check('<');
-    return consume('!') ? dirCommentConstructor() :
-      consume('?') ? dirPIConstructor() : dirElemConstructor();
+    return consume('!') ? dirComment() : consume('?') ? dirPI() : dirElement();
   }
 
 /**
@@ -1679,7 +1685,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr dirElemConstructor() throws QueryException {
+  private Expr dirElement() throws QueryException {
     if(skipWS()) error(NOTAGNAME);
     final QNm tag = new QNm(qName(NOTAGNAME));
     consumeWSS();
@@ -1845,7 +1851,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr dirCommentConstructor() throws QueryException {
+  private Expr dirComment() throws QueryException {
     check('-');
     check('-');
     final TokenBuilder tb = new TokenBuilder();
@@ -1865,7 +1871,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr dirPIConstructor() throws QueryException {
+  private Expr dirPI() throws QueryException {
     if(consumeWSS()) error(PIXML, EMPTY);
     final byte[] str = qName(PIWRONG);
     final Expr pi = Str.get(str);
@@ -1910,14 +1916,14 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr computedConstructor() throws QueryException {
+  private Expr compConstructor() throws QueryException {
     final int p = qp;
-    if(consumeWS(DOCUMENT)) return consume(compDocConstructor(), p);
-    else if(consumeWS(ELEMENT)) return consume(compElemConstructor(), p);
-    else if(consumeWS(ATTRIBUTE)) return consume(compAttrConstructor(), p);
-    else if(consumeWS(TEXT)) return consume(compTextConstructor(), p);
-    else if(consumeWS(COMMENT)) return consume(compCommentConstructor(), p);
-    else if(consumeWS(PI)) return consume(compPIConstructor(), p);
+    if(consumeWS(DOCUMENT))       return consume(compDoc(), p);
+    else if(consumeWS(ELEMENT))   return consume(compElemConstructor(), p);
+    else if(consumeWS(ATTRIBUTE)) return consume(compAttribute(), p);
+    else if(consumeWS(TEXT))      return consume(compText(), p);
+    else if(consumeWS(COMMENT))   return consume(compComment(), p);
+    else if(consumeWS(PI))        return consume(compPI(), p);
     return null;
   }
 
@@ -1937,7 +1943,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr compDocConstructor() throws QueryException {
+  private Expr compDoc() throws QueryException {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = check(expr(), NODOCCONS);
     check(BRACE2);
@@ -1974,7 +1980,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr compAttrConstructor() throws QueryException {
+  private Expr compAttribute() throws QueryException {
     skipWS();
 
     Expr nm;
@@ -1986,7 +1992,7 @@ public class QueryParser extends InputParser {
       check(BRACE2);
     }
 
-    check(BRACE1);
+    if(!consumeWS2(BRACE1)) return null;
     final Expr e = expr();
     check(BRACE2);
     return new CAttr(input(), true, nm, e == null ? Seq.EMPTY : e);
@@ -1997,7 +2003,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr compTextConstructor() throws QueryException {
+  private Expr compText() throws QueryException {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = check(expr(), NOTXTCONS);
     check(BRACE2);
@@ -2009,7 +2015,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr compCommentConstructor() throws QueryException {
+  private Expr compComment() throws QueryException {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = check(expr(), NOCOMCONS);
     check(BRACE2);
@@ -2021,7 +2027,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr compPIConstructor() throws QueryException {
+  private Expr compPI() throws QueryException {
     skipWS();
     Expr name;
     if(XMLToken.isXMLLetter(curr())) {
@@ -2032,7 +2038,7 @@ public class QueryParser extends InputParser {
       check(BRACE2);
     }
 
-    check(BRACE1);
+    if(!consumeWS2(BRACE1)) return null;
     final Expr e = expr();
     check(BRACE2);
     return new CPI(input(), name, e == null ? Seq.EMPTY : e);
@@ -2044,6 +2050,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private SeqType simpleType() throws QueryException {
+    skipWS();
     final QNm type = new QNm(qName(TYPEINVALID));
     ctx.ns.uri(type);
     skipWS();
@@ -2068,6 +2075,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private SeqType sequenceType() throws QueryException {
+    skipWS();
     final QNm type = new QNm(qName(TYPEINVALID));
     tok.reset();
     final boolean par = consumeWS(PAR1);
@@ -2367,7 +2375,7 @@ public class QueryParser extends InputParser {
    */
   private FTExpr ftPrimary(final boolean prg) throws QueryException {
     final Expr[] pragmas = pragma();
-    if(pragmas.length > 0) {
+    if(pragmas.length != 0) {
       check(BRACE1);
       final FTExpr e = ftSelection(true);
       check(BRACE2);
@@ -2710,12 +2718,12 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a QName.
-   * @param err optional error message
+   * @param err optional error message.
+   * Will be thrown if no QName is found, and ignored if set to {@code null}.
    * @return string
    * @throws QueryException query exception
    */
   private byte[] qName(final Object[] err) throws QueryException {
-    skipWS();
     tok.reset();
     final boolean ok = ncName(true);
     if(ok && consume(':')) ncName(false);
@@ -2760,13 +2768,13 @@ public class QueryParser extends InputParser {
           final boolean m = digit(c);
           final boolean h = b == 16 && (c >= 'a' && c <= 'f' ||
               c >= 'A' && c <= 'F');
-          if(!m && !h) invalidEnt(p);
+          if(!m && !h) invalidEnt(p, INVENTITY);
           final long nn = n;
           n = n * b + (consume() & 15);
-          if(n < nn) invalidEnt(p);
+          if(n < nn) invalidEnt(p, INVCHARREF);
           if(!m) n += 9;
         } while(!consume(';'));
-        if(!XMLToken.valid(n)) error(INVCHARREF, n);
+        if(!XMLToken.valid(n)) invalidEnt(p, INVCHARREF);
         tb.addUTF((int) n);
       } else {
         if(consume("lt")) {
@@ -2780,9 +2788,9 @@ public class QueryParser extends InputParser {
         } else if(consume("apos")) {
           tb.add('\'');
         } else {
-          invalidEnt(p);
+          invalidEnt(p, INVENTITY);
         }
-        if(!consume(';')) invalidEnt(p);
+        if(!consume(';')) invalidEnt(p, INVENTITY);
       }
       tb.ent = true;
     } else {
@@ -2798,13 +2806,14 @@ public class QueryParser extends InputParser {
   /**
    * Returns the current entity snippet.
    * @param p start position
+   * @param c cerror code
    * @throws QueryException query exception
    */
-  private void invalidEnt(final int p) throws QueryException {
+  private void invalidEnt(final int p, final Object[] c) throws QueryException {
     final String sub = qu.substring(p, Math.min(p + 20, ql));
     final int sc = sub.indexOf(';');
     final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
-    error(INVENTITY, ent);
+    error(c, ent);
   }
 
   /**
@@ -2847,7 +2856,7 @@ public class QueryParser extends InputParser {
    * @return result of check
    * @throws QueryException query exception
    */
-  private boolean not(final int ch) throws QueryException {
+  private boolean not(final char ch) throws QueryException {
     final char c = curr();
     if(c == 0) error(WRONGEND, ch);
     return c != ch;

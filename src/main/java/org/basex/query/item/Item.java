@@ -38,7 +38,7 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) {
+  public final Expr comp(final QueryContext ctx) {
     return this;
   }
 
@@ -84,7 +84,7 @@ public abstract class Item extends Expr {
   }
 
   @Override
-  public boolean item() {
+  public boolean value() {
     return true;
   }
 

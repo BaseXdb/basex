@@ -9,7 +9,6 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -47,14 +46,6 @@ public final class FNNum extends Fun {
       case RNDHLF: return rnd(it, d, true, ctx);
       default:     return super.atomic(ctx, ii);
     }
-  }
-
-  @Override
-  public Expr c(final QueryContext ctx) throws QueryException {
-    if(expr[0].empty()) return expr[0];
-    for(final Expr a : expr) if(!a.item()) return this;
-    final Item it = atomic(ctx, input);
-    return it == null ? Seq.EMPTY : it;
   }
 
   /**

@@ -31,7 +31,7 @@ public final class List extends Arr {
     for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
     checkUp(ctx, expr);
 
-    for(final Expr e : expr) if(!e.item() && !e.empty()) return this;
+    for(final Expr e : expr) if(!e.value()) return this;
 
     // return simple sequence if all values are items or empty sequences
     final SeqIter seq = new SeqIter(expr.length);
