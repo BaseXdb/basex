@@ -209,7 +209,7 @@ public abstract class W3CTS {
     context.prop.set(Prop.TABLEMEM, false);
     context.prop.set(Prop.CHOP, false);
 
-    new CreateDB(input, path + input).execute(context);
+    new Check(path + input).execute(context);
     data = context.data;
 
     final Nodes root = new Nodes(0, data);
@@ -508,7 +508,7 @@ public abstract class W3CTS {
               }
               rdata.close();
               if(eq) break;
-            } catch(final Exception ex) {
+            } catch(final Throwable ex) {
               ex.printStackTrace();
             }
           }

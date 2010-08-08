@@ -103,7 +103,7 @@ public final class DeepFSExample {
 
     System.out.println(
         "\n* Serialize a single file (with metadata and text/xml contents)");
-    DeepFile deepFile = new DeepFile(FILE);
+    final DeepFile deepFile = new DeepFile(FILE);
     // Extracts metadata and text/xml contents
     deepFile.extract();
     // Serializes the deep file
@@ -124,7 +124,7 @@ public final class DeepFSExample {
 
     System.out.println("\n\n* Traverse a file system hierarchy (method 2)");
     // Initializes the file system importer
-    FSImporter importer = new FSImporter(CONTEXT);
+    final FSImporter importer = new FSImporter(CONTEXT);
     // Creates the database
     importer.createDB(DB[0]);
     // Traverses the directory, extracts the metadata and text/xml contents and
@@ -142,8 +142,8 @@ public final class DeepFSExample {
     System.out.println("\n\n* List available parsers");
     System.out.println("file suffix\t| \t java class");
     System.out.println("-----------------------------------------------------");
-    ParserRegistry registry = new ParserRegistry();
-    for(String[] parser : registry.availableParsers()) {
+    final ParserRegistry registry = new ParserRegistry();
+    for(final String[] parser : registry.availableParsers()) {
       System.out.println(parser[0] + (parser[0].length() > 7 ? "" : "\t") +
           "\t  " + parser[1]);
     }
@@ -181,12 +181,12 @@ public final class DeepFSExample {
   static File[] findFiles() {
     System.out.println(
         "\nsearching for mp3 and jpg files (needed for example queries) ");
-    FileFinder ff = new FileFinder();
-    FSWalker walker = new FSWalker(ff);
+    final FileFinder ff = new FileFinder();
+    final FSWalker walker = new FSWalker(ff);
     File mp3Directory = null;
     File jpgDirectory = null;
     try {
-      for(File f : File.listRoots())
+      for(final File f : File.listRoots())
         walker.traverse(f);
     } catch(final RuntimeException ex) {
       if(ff.mp3Dir != null)
@@ -228,7 +228,7 @@ public final class DeepFSExample {
 
     @Override
     public void regularFileVisit(final File f) {
-      String name = f.getName();
+      final String name = f.getName();
       if(name.endsWith(".mp3")) {
         mp3Dir = f.getAbsolutePath();
         if(jpgDir != null) throw new RuntimeException();

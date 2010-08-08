@@ -31,7 +31,7 @@ public final class WikiExample {
     // Create a database from a remote XML document
     System.out.println("\n* Create a database from a file via http.");
 
-    String doc = "http://en.wikipedia.org/wiki/Wikipedia";
+    final String doc = "http://en.wikipedia.org/wiki/Wikipedia";
     new CreateDB("WikiExample", doc).execute(context);
 
     // -------------------------------------------------------------------------
