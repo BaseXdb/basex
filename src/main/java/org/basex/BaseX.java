@@ -32,6 +32,8 @@ public class BaseX extends Main {
   protected String user;
   /** Password. */
   protected String pass;
+  /** Flag for writing properties to disk. */
+  protected boolean writeProps;
 
   /**
    * Main method, launching the standalone console mode.
@@ -77,6 +79,7 @@ public class BaseX extends Main {
         outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
         u = console();
       }
+      if(writeProps) context.prop.write();
       quit(u);
     } catch(final IOException ex) {
       errln(server(ex));
@@ -186,6 +189,9 @@ public class BaseX extends Main {
           } else if(c == 'z') {
             // turn off result serialization
             arg.check(set(Prop.SERIALIZE, false));
+          } else if (c == 'W') {
+            // hidden option: write properties before exit
+            writeProps = true;
           } else {
             arg.check(false);
           }
