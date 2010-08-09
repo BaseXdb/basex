@@ -23,7 +23,7 @@ import org.basex.io.CachedOutput;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
@@ -81,8 +81,8 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   @Override
   public boolean absolute(final int p) throws XQException {
-    final SeqIter seq = sequence();
-    cursor(seq, p >= 0 ? p - 1 : (int) seq.size() + p);
+    final ItemIter ir = sequence();
+    cursor(ir, p >= 0 ? p - 1 : (int) ir.size() + p);
     return pos > 0;
   }
 
@@ -181,7 +181,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   @Override
   public int getPosition() throws XQException {
-    final SeqIter iter = sequence();
+    final ItemIter iter = sequence();
     return pos != -1 ? pos : (int) iter.size() + 1;
   }
 
@@ -260,8 +260,8 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
 
   @Override
   public boolean last() throws XQException {
-    final SeqIter seq = sequence();
-    return cursor(seq, (int) seq.size() - 1);
+    final ItemIter ir = sequence();
+    return cursor(ir, (int) ir.size() - 1);
   }
 
   @Override
@@ -381,10 +381,10 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @return sequence iterator
    * @throws XQException xquery exception
    */
-  private SeqIter sequence() throws XQException {
+  private ItemIter sequence() throws XQException {
     opened();
     if(!scrollable) throw new BXQException(FORWARD);
-    return (SeqIter) result;
+    return (ItemIter) result;
   }
 
   /**
@@ -394,7 +394,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
    * @return result of check
    * @throws XQException xquery exception
    */
-  private boolean cursor(final SeqIter seq, final int p) throws XQException {
+  private boolean cursor(final ItemIter seq, final int p) throws XQException {
     pos = p < 0 ? 0 : p >= seq.size() ? -1 : p;
     seq.pos(pos - 1);
     return p < 0 ? false : next();

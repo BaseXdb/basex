@@ -26,7 +26,7 @@ import org.basex.query.item.Flt;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
@@ -100,7 +100,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
 
   @Override
   public XMLStreamReader getItemAsStream() {
-    return new IterStreamReader(new SeqIter(new Item[] { it }, 1));
+    return new IterStreamReader(new ItemIter(new Item[] { it }, 1));
   }
 
   @Override

@@ -23,7 +23,7 @@ import org.basex.query.item.Flt;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.util.Token;
 import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -313,7 +313,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
   public BXQSequence createSequence(final Iterator it) throws XQException {
     opened();
     valid(it, Iterator.class);
-    final SeqIter iter = new SeqIter();
+    final ItemIter iter = new ItemIter();
     while(it.hasNext()) iter.add(create(it.next(), null));
     return new BXQSequence(iter, this);
   }
@@ -325,7 +325,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
     final BXQSequence s = (BXQSequence) seq;
     s.opened();
     try {
-      return new BXQSequence(SeqIter.get(s.result), this);
+      return new BXQSequence(ItemIter.get(s.result), this);
     } catch(final QueryException ex) {
       throw new BXQException(ex);
     }

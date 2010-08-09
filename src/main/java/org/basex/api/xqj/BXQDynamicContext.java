@@ -33,8 +33,9 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Var;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -201,40 +202,41 @@ abstract class BXQDynamicContext extends BXQAbstract
   /**
    * Binds an item to the specified variable.
    * @param var variable name
-   * @param it item to be bound
+   * @param v value to be bound
    * @param t target type
    * @throws XQException query exception
    */
-  private void bind(final QName var, final Item it, final XQItemType t)
+  private void bind(final QName var, final Value v, final XQItemType t)
       throws XQException {
     opened();
 
     valid(var, QName.class);
 
-    final Type tt = check(it.type, t);
-    Item i = it;
-    if(tt != it.type) {
+    final Type tt = check(v.type, t);
+    Value vl = v;
+    // don't cast sequences
+    if(tt != v.type && v instanceof Item) {
       try {
-        i = tt.e(it, ctx.ctx, null);
+        vl = tt.e((Item) v, ctx.ctx, null);
       } catch(final QueryException ex) {
         throw new BXQException(ex);
       }
     }
 
     if(var == XQConstants.CONTEXT_ITEM) {
-      qp.ctx.item = i;
+      qp.ctx.value = vl;
     } else {
       final QNm name = new QNm(Token.token(var.getLocalPart()));
-      Var v = new Var(name);
+      Var vr = new Var(name);
       if(this instanceof BXQPreparedExpression) {
-        v = qp.ctx.vars.get(v);
-        if(v == null) throw new BXQException(VAR, var);
+        vr = qp.ctx.vars.get(vr);
+        if(vr == null) throw new BXQException(VAR, var);
       } else {
-        qp.ctx.vars.addGlobal(v);
+        qp.ctx.vars.addGlobal(vr);
       }
 
       try {
-        v.bind(i, null);
+        vr.bind(vl, null);
       } catch(final QueryException ex) {
         throw new BXQException(ex);
       }
@@ -264,7 +266,7 @@ abstract class BXQDynamicContext extends BXQAbstract
       qp.parse();
       qctx.compile();
       Iter iter = qctx.iter();
-      if(sc.scrollable) iter = SeqIter.get(iter);
+      if(sc.scrollable) iter = ItemIter.get(iter);
       return new BXQSequence(iter, this, (BXQConnection) par);
     } catch(final QueryException ex) {
       throw new XQQueryException(ex.getMessage(), new QName(ex.code()),
