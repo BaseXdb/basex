@@ -35,13 +35,11 @@ import org.basex.util.TokenMap;
 
 /**
  * Generating functions.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 final class FNGen extends Fun {
-  /** Cached file contents. */
-  private final TokenMap contents = new TokenMap();
 
   /**
    * Constructor.
@@ -56,11 +54,16 @@ final class FNGen extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
-      case DATA:    return data(ctx);
-      case COLL:    return collection(ctx);
-      case PUT:     return put(ctx);
-      case URICOLL: return uriCollection(ctx);
-      default:      return super.iter(ctx);
+      case DATA:
+        return data(ctx);
+      case COLL:
+        return collection(ctx);
+      case PUT:
+        return put(ctx);
+      case URICOLL:
+        return uriCollection(ctx);
+      default:
+        return super.iter(ctx);
     }
   }
 
@@ -68,14 +71,21 @@ final class FNGen extends Fun {
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(func) {
-      case DOC:         return doc(ctx);
-      case DOCAVL:      return docAvailable(ctx);
-      case PARSETXT:    return unparsedText(ctx);
-      case PARSETXTAVL: return unparsedTextAvailable(ctx);
-      case PARSE:       // might get obsolete
-      case PARSEXML:    return parseXml(ctx);
-      case SERIALIZE:   return serialize(ctx);
-      default:          return super.atomic(ctx, ii);
+      case DOC:
+        return doc(ctx);
+      case DOCAVL:
+        return docAvailable(ctx);
+      case PARSETXT:
+        return unparsedText(ctx);
+      case PARSETXTAVL:
+        return unparsedTextAvailable(ctx);
+      case PARSE: // might get obsolete
+      case PARSEXML:
+        return parseXml(ctx);
+      case SERIALIZE:
+        return serialize(ctx);
+      default:
+        return super.atomic(ctx, ii);
     }
   }
 
@@ -117,7 +127,8 @@ final class FNGen extends Fun {
     final NodIter coll = collection(ctx);
     final ItemIter ir = new ItemIter();
     Nod it = null;
-    while((it = coll.next()) != null) ir.add(Uri.uri(it.base()));
+    while((it = coll.next()) != null)
+      ir.add(Uri.uri(it.base()));
     return ir;
   }
 
@@ -132,8 +143,8 @@ final class FNGen extends Fun {
     final byte[] file = checkEStr(expr[1], ctx);
     final Item it = expr[0].atomic(ctx, input);
 
-    if(it == null || it.type != Type.DOC && it.type != Type.ELM)
-      Err.or(input, UPFOTYPE, expr[0]);
+    if(it == null || it.type != Type.DOC && it.type != Type.ELM) Err.or(input,
+        UPFOTYPE, expr[0]);
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.valid()) Err.or(input, UPFOURI, file);
@@ -175,7 +186,9 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Item unparsedText(final QueryContext ctx) throws QueryException {
-    return unparsedText(ctx, false);
+    final IO io = checkIO(expr[0], ctx);
+    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
+    return unparsedText(false, io, enc, this.input);
   }
 
   /**
@@ -186,9 +199,10 @@ final class FNGen extends Fun {
    */
   private Bln unparsedTextAvailable(final QueryContext ctx)
       throws QueryException {
-
+    final IO io = checkIO(expr[0], ctx);
+    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
-      return Bln.get(unparsedText(ctx, true) != null);
+      return Bln.get(unparsedText(true, io, enc, this.input) != null);
     } catch(final QueryException ex) {
       if(!ex.code().startsWith(QueryText.FODC)) throw ex;
       return Bln.FALSE;
@@ -197,20 +211,19 @@ final class FNGen extends Fun {
 
   /**
    * Performs the unparsed-text function. The result is optionally cached.
-   * @param ctx query context
    * @param cache flag for caching the result
+   * @param io input path
+   * @param enc encoding
+   * @param input input information
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Str unparsedText(final QueryContext ctx, final boolean cache)
-      throws QueryException {
-
-    final IO io = checkIO(expr[0], ctx);
-    final String enc = expr.length < 2 ? null :
-      string(checkEStr(expr[1], ctx));
+  static Str unparsedText(final boolean cache, final IO io, final String enc,
+      final InputInfo input) throws QueryException {
 
     try {
       final byte[] path = token(io.path());
+      final TokenMap contents = new TokenMap();
       byte[] cont = contents.get(path);
       // check if content has already been parsed; if not, read original file
       if(cont == null) {
@@ -282,9 +295,8 @@ final class FNGen extends Fun {
 
   @Override
   public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD ? func == FunDef.PUT : 
-      u == Use.CTX ? expr.length == 0 && func == FunDef.DATA :
-      super.uses(u, ctx);
+    return u == Use.UPD ? func == FunDef.PUT : u == Use.CTX ? expr.length == 0
+        && func == FunDef.DATA : super.uses(u, ctx);
   }
 
   @Override
