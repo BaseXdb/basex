@@ -41,8 +41,9 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.query.item.Value;
 import org.basex.query.iter.NodIter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Var;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -341,7 +342,7 @@ public abstract class W3CTS {
       context.query = IO.get(queries + pth + inname + IO.XQSUFFIX);
       final String in = read(context.query);
       String error = null;
-      SeqIter iter = null;
+      ItemIter iter = null;
       boolean doc = true;
 
       final TokenBuilder files = new TokenBuilder();
@@ -386,7 +387,7 @@ public abstract class W3CTS {
             DataText.YES : DataText.NO);
         final XMLSerializer xml = new XMLSerializer(co, sp);
 
-        iter = SeqIter.get(xq.iter());
+        iter = ItemIter.get(xq.iter());
         Item it;
         while((it = iter.next()) != null) {
           doc &= it.type == Type.DOC;
@@ -487,21 +488,21 @@ public abstract class W3CTS {
 
             try {
               final Data rdata = CreateDB.xml(IO.get(ri), context);
-              final SeqIter si = new SeqIter();
+              final ItemIter ir = new ItemIter();
               for(int pre = doc ? 0 : 2; pre < rdata.meta.size;) {
-                si.add(new DBNode(rdata, pre));
+                ir.add(new DBNode(rdata, pre));
                 pre += rdata.size(pre, rdata.kind(pre));
               }
 
               // [CG] XQuery: check if null reference is safe
-              final boolean eq = FNSimple.deep(null, iter, si);
+              final boolean eq = FNSimple.deep(null, iter, ir);
               if(!eq && debug) {
                 iter.reset();
-                si.reset();
+                ir.reset();
                 final XMLSerializer ser = new XMLSerializer(System.out);
                 Item it;
                 Main.outln(NL + "=== " + testid + " ===");
-                while((it = si.next()) != null) it.serialize(ser);
+                while((it = ir.next()) != null) it.serialize(ser);
                 Main.outln(NL + "=== " + NAME + " ===");
                 while((it = iter.next()) != null) it.serialize(ser);
                 Main.outln();
@@ -728,9 +729,9 @@ public abstract class W3CTS {
       final String file = pth + string(data.atom(nod.nodes[c])) + IO.XQSUFFIX;
       final String in = read(IO.get(queries + file));
       final QueryProcessor xq = new QueryProcessor(in, context);
-      final Item item = xq.iter().finish();
+      final Value val = xq.iter().finish();
       final Var v = new Var(new QNm(data.atom(var.nodes[c])));
-      ctx.vars.addGlobal(v.bind(item, ctx));
+      ctx.vars.addGlobal(v.bind(val, ctx));
       xq.close();
     }
   }

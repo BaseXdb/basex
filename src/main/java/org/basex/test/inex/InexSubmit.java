@@ -25,7 +25,7 @@ import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.server.ClientSession;
 import org.basex.util.Args;
 import org.basex.util.Performance;
@@ -74,7 +74,7 @@ public final class InexSubmit {
   /** Collection for query times. */
   private final double[] qtimes;
   /** Results of the queries. */
-  private final SeqIter[] results;
+  private final ItemIter[] results;
   /** Number of queries. */
   private final int nqueries;
 
@@ -125,7 +125,7 @@ public final class InexSubmit {
     // allocate space for query times
     nqueries = queries.size();
     qtimes = new double[nqueries];
-    results = new SeqIter[nqueries];
+    results = new ItemIter[nqueries];
     qressizes = new int[10 * nqueries];
     qt = new double[10 * nqueries];
 
@@ -181,12 +181,12 @@ public final class InexSubmit {
    * @return iter for the results
    * @throws Exception exception
    */
-  private SeqIter query(final int db, final int qu) throws Exception {
+  private ItemIter query(final int db, final int qu) throws Exception {
     final int size = qressizes[db * nqueries + qu];
     final double qtime = qt[db * nqueries + qu];
     qtimes[qu] += qtime;
 
-    if(size == 0) return new SeqIter();
+    if(size == 0) return new ItemIter();
 
     // query and cache result
     final String que = XQM + "for $i score $s in " +
@@ -195,7 +195,7 @@ public final class InexSubmit {
 
     final Command cmd = new XQuery(que);
 
-    final SeqIter sq = new SeqIter();
+    final ItemIter sq = new ItemIter();
     final StringTokenizer st = new StringTokenizer(session.execute(cmd), " ");
     int z = 0;
     while(st.hasMoreTokens() && z < size) {
@@ -224,16 +224,16 @@ public final class InexSubmit {
    * @param it2 entry to be added
    * @return SeqIter with all values
    */
-  private SeqIter addSortedServer(final SeqIter it1, final SeqIter it2) {
+  private ItemIter addSortedServer(final ItemIter it1, final ItemIter it2) {
     if(it1 == null || it1.size() == 0) return it2;
 
-    final SeqIter tmp = new SeqIter();
+    final ItemIter tmp = new ItemIter();
     Item i1 = it1.next(), i2 = it2.next();
     while(i1 != null && i2 != null) {
-      if(i1.score < i2.score) {
+      if(i1.score() < i2.score()) {
         tmp.add(i2);
         i2 = it2.next();
-      } else if(i1.score > i2.score) {
+      } else if(i1.score() > i2.score()) {
         tmp.add(i1);
         i1 = it1.next();
       } else {
@@ -407,7 +407,7 @@ public final class InexSubmit {
    * @param k max number of results
    * @throws IOException IOException
    */
-  private void createQueryEntryServer(final int q, final SeqIter res,
+  private void createQueryEntryServer(final int q, final ItemIter res,
       final int k) throws IOException {
 
     xml.openElement(token("topic"), token("topic-id"), token(tid.get(q)),
@@ -430,7 +430,7 @@ public final class InexSubmit {
       xml.text(token(r++));
       xml.closeElement();
       xml.openElement(token("rsv"));
-      xml.text(token(a.score));
+      xml.text(token(a.score()));
       xml.closeElement();
       xml.closeElement();
     }
