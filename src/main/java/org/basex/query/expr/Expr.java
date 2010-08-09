@@ -6,7 +6,6 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -86,15 +85,25 @@ public abstract class Expr extends ExprInfo {
    * Tests if this is an empty sequence.
    * @return result of check
    */
-  public final boolean empty() {
-    return this == Seq.EMPTY;
+  public boolean empty() {
+    return false;
   }
 
   /**
    * Tests if this is a value.
    * @return result of check
    */
-  public abstract boolean value();
+  public boolean value() {
+    return false;
+  }
+
+  /**
+   * Tests if this is an item.
+   * @return result of check
+   */
+  public boolean item() {
+    return false;
+  }
 
   /**
    * Tests if this is a vacuous expression (empty sequence or error function).

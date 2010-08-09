@@ -5,9 +5,9 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -40,9 +40,9 @@ public abstract class Preds extends ParseExpr {
 
     // as predicates will not necessarily start from the document node,
     // the context item type is temporarily set to element
-    final Item ci = ctx.item;
-    final Type ct = ci != null ? ci.type : null;
-    if(ct == Type.DOC) ctx.item.type = Type.ELM;
+    final Value cv = ctx.value;
+    final Type ct = cv != null ? cv.type : null;
+    if(ct == Type.DOC) ctx.value.type = Type.ELM;
 
     Expr e = this;
     for(int p = 0; p < pred.length; p++) {
@@ -52,7 +52,7 @@ public abstract class Preds extends ParseExpr {
       if(pr.value()) {
         if(!pr.ebv(ctx, input).bool(input)) {
           ctx.compInfo(OPTFALSE, pr);
-          e = Seq.EMPTY;
+          e = Empty.SEQ;
           break;
         }
         ctx.compInfo(OPTTRUE, pr);
@@ -61,8 +61,8 @@ public abstract class Preds extends ParseExpr {
         pred[p] = pr;
       }
     }
-    ctx.item = ci;
-    if(ct != null) ctx.item.type = ct;
+    ctx.value = cv;
+    if(ct != null) ctx.value.type = ct;
     return e;
   }
 

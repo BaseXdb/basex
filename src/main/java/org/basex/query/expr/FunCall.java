@@ -6,10 +6,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ItemIter;
 import org.basex.util.InputInfo;
 
 /**
@@ -46,11 +47,11 @@ public final class FunCall extends Arr {
     super.comp(ctx);
     final Expr e = func.expr;
 
-    // [CG] XQuery/Functions: check for inlining
+    // [CG] XQuery/Functions: improve inlining
     if(e.value()) {
       // inline simple items
       ctx.compInfo(OPTINLINE, this);
-      return func.atomic(ctx, input);
+      return func.iter(ctx).finish();
     }
     return this;
   }
@@ -63,7 +64,7 @@ public final class FunCall extends Arr {
     }
     
     final int al = expr.length;
-    final Item[] args = new Item[al];
+    final Value[] args = new Value[al];
     // evaluate arguments
     for(int a = 0; a < al; a++) args[a] = ctx.iter(expr[a]).finish();
     // move variables to stack
@@ -72,9 +73,9 @@ public final class FunCall extends Arr {
       ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
     }
     // evaluate function and reset variable scope
-    final Item im = ctx.iter(func).finish();
+    final ItemIter ir = ItemIter.get(ctx.iter(func));
     ctx.vars.reset(s);
-    return im.iter();
+    return ir;
   }
 
   @Override

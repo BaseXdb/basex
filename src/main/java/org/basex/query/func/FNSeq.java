@@ -8,7 +8,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.ItemSet;
 import org.basex.util.InputInfo;
 
@@ -187,15 +187,14 @@ final class FNSeq extends Fun {
       Long.MAX_VALUE;
 
     final Iter iter = ctx.iter(expr[0]);
-    return iter.size() != -1 ? new Iter() {
+    final long max = iter.size();
+    return max != -1 ? new Iter() {
       // directly access specified items
       long c = Math.max(1, s);
 
       @Override
       public Item next() throws QueryException {
-        if(c < e) return iter.get(c++ - 1);
-        iter.reset();
-        return null;
+        return c < e && c <= max ? iter.get(c++ - 1) : null;
       }
     } : new Iter() {
       // run through all items
@@ -227,7 +226,7 @@ final class FNSeq extends Fun {
 
     // process any other iterator...
     return new Iter() {
-      final Iter ir = iter.size() != -1 ? iter : SeqIter.get(iter);
+      final Iter ir = iter.size() != -1 ? iter : ItemIter.get(iter);
       final long s = ir.size();
       long c = s;
 

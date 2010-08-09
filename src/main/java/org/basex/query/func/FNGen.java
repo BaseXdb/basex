@@ -26,7 +26,7 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -113,9 +113,9 @@ final class FNGen extends Fun {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  private SeqIter uriCollection(final QueryContext ctx) throws QueryException {
+  private ItemIter uriCollection(final QueryContext ctx) throws QueryException {
     final NodIter coll = collection(ctx);
-    final SeqIter ir = new SeqIter();
+    final ItemIter ir = new ItemIter();
     Nod it = null;
     while((it = coll.next()) != null) ir.add(Uri.uri(it.base()));
     return ir;

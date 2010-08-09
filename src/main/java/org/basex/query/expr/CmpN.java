@@ -7,9 +7,9 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -93,8 +93,8 @@ public final class CmpN extends Arr {
     super.comp(ctx);
 
     if(expr[0].empty() || expr[1].empty()) {
-      ctx.compInfo(OPTSIMPLE, this, Seq.EMPTY);
-      return Seq.EMPTY;
+      ctx.compInfo(OPTSIMPLE, this, Empty.SEQ);
+      return Empty.SEQ;
     }
     return this;
   }

@@ -1,8 +1,10 @@
 package org.basex.query.iter;
 
 import org.basex.query.QueryException;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
+import org.basex.query.item.Value;
 
 /**
  * Iterator interface.
@@ -16,7 +18,7 @@ public abstract class Iter {
     @Override
     public Item next() { return null; }
     @Override
-    public Item finish() { return Seq.EMPTY; }
+    public Value finish() { return Empty.SEQ; }
     @Override
     public long size() { return 0; }
     @Override
@@ -31,10 +33,10 @@ public abstract class Iter {
   public abstract Item next() throws QueryException;
 
   /**
-   * Returns the specified item. This method needs to be implemented - and
-   * should only be called - if {@link #size} returns the correct number of
-   * results. A calling method should call {@link #reset} after the last items
-   * has been retrieved.
+   * Returns the specified item, or an arbitrary item if the index is invalid.
+   * This method needs to be implemented - and should only be called - if
+   * {@link #size} returns the correct number of results. A calling method
+   * should call {@link #reset} after the last items has been retrieved.
    * @param i value offset
    * @return specified item
    * @throws QueryException query exception
@@ -80,9 +82,9 @@ public abstract class Iter {
    * @return sequence
    * @throws QueryException query exception
    */
-  public Item finish() throws QueryException {
+  public Value finish() throws QueryException {
     Item i = next();
-    if(i == null) return Seq.EMPTY;
+    if(i == null) return Empty.SEQ;
 
     Item[] item = { i };
     int s = 1;

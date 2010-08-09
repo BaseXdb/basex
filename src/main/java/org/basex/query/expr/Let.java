@@ -6,9 +6,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -55,7 +57,7 @@ public final class Let extends ForLet {
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    final Var v = var.copy();
+    final Var vr = var.copy();
 
     return new Iter() {
       /** Variable stack size. */
@@ -68,22 +70,26 @@ public final class Let extends ForLet {
         if(!more) {
           vs = ctx.vars.size();
           final Iter ir = ctx.iter(expr);
-          Item it;
+          Value v;
           if(score) {
             // assign average score value
             double s = 0;
             int c = 0;
+            Item it;
             while((it = ir.next()) != null) {
               s += it.score();
               c++;
             }
-            it = Dbl.get(ctx.score.let(s, c));
+            v = Dbl.get(ctx.score.let(s, c));
           } else {
-            it = ir.finish();
+            v = ir.finish();
           }
-          ctx.vars.add(v.bind(it, ctx));
+          ctx.vars.add(vr.bind(v, ctx));
           more = true;
-          return it;
+          // [MS] only one item at a time can be returned;
+          // check what happens with sequences as results
+          //return SeqIter.get(ir).get(0);
+          return Bln.TRUE;
         }
         reset();
         return null;

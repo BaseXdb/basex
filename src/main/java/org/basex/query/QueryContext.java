@@ -33,9 +33,10 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.up.Updates;
 import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
@@ -75,8 +76,8 @@ public final class QueryContext extends Progress {
   public NSLocal ns = new NSLocal();
   /** Reference to the root expression. */
   public Expr root;
-  /** Current context. */
-  public Item item;
+  /** Current context value. */
+  public Value value;
   /** Current context position. */
   public long pos;
   /** Current context size. */
@@ -226,14 +227,14 @@ public final class QueryContext extends Progress {
 
         // create initial context items
         if(nodes.doc) {
-          item = Seq.get(doc, docs);
+          value = Seq.get(doc, docs);
         } else {
           // otherwise, add all context items
-          final SeqIter si = new SeqIter(s);
+          final ItemIter ir = new ItemIter(s);
           for(int n = 0; n < s; n++) {
-            si.add(new DBNode(data, nodes.nodes[n]));
+            ir.add(new DBNode(data, nodes.nodes[n]));
           }
-          item = si.finish();
+          value = ir.finish();
         }
         // add collection instances
         addColl(new NodIter(doc, docs), token(data.meta.name));
@@ -259,7 +260,7 @@ public final class QueryContext extends Progress {
   protected Result eval() throws QueryException {
     // evaluates the query
     final Iter it = iter();
-    final SeqIter ir = new SeqIter();
+    final ItemIter ir = new ItemIter();
     Item i;
 
     // check if all results belong to the database of the input context
@@ -302,10 +303,10 @@ public final class QueryContext extends Progress {
       final Iter iter = iter(root);
       if(!updating) return iter;
 
-      final Item i = iter.finish();
+      final Value v = iter.finish();
       updates.apply(this);
       if(context.data != null) context.update();
-      return i.iter();
+      return v.iter(this);
     } catch(final StackOverflowError ex) {
       Main.debug(ex);
       Err.or(null, XPSTACK);
@@ -538,12 +539,12 @@ public final class QueryContext extends Progress {
    * @throws QueryException query exception
    */
   public Data data() throws QueryException {
-    if(item == null) return null;
+    if(value == null) return null;
     Data data = null;
 
     if(docNodes()) return doc[0].data;
 
-    final Iter iter = item.iter();
+    final Iter iter = value.iter(this);
     Item it;
     while((it = iter.next()) != null) {
       if(!(it instanceof DBNode)) return null;
@@ -559,7 +560,7 @@ public final class QueryContext extends Progress {
    * @return result of check
    */
   public boolean docNodes() {
-    return item instanceof Seq && ((Seq) item).val == doc;
+    return value instanceof Seq && ((Seq) value).val == doc;
   }
   
   /**

@@ -8,11 +8,13 @@ import org.basex.query.QueryException;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -51,15 +53,15 @@ public class Filter extends Preds {
       return path.comp(ctx);
     }
 
-    final Item tmp = ctx.item;
-    ctx.item = null;
+    final Value tmp = ctx.value;
+    ctx.value = null;
     final Expr e = super.comp(ctx);
-    ctx.item = tmp;
+    ctx.value = tmp;
     if(e != this) return e;
 
     if(root.empty()) {
       ctx.compInfo(OPTPRE, this);
-      return Seq.EMPTY;
+      return Empty.SEQ;
     }
 
     // no predicates.. return root
@@ -90,33 +92,32 @@ public class Filter extends Preds {
     }
 
     final Iter iter = ctx.iter(root);
-    final Item ci = ctx.item;
+    final Value cv = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
 
     // cache results to support last() function
-    final SeqIter si = new SeqIter();
+    final ItemIter ir = new ItemIter();
     Item i;
-    while((i = iter.next()) != null) si.add(i);
+    while((i = iter.next()) != null) ir.add(i);
 
     // evaluate predicates
     for(final Expr p : pred) {
-      ctx.size = si.size();
+      ctx.size = ir.size();
       ctx.pos = 1;
       int c = 0;
-      final long sl = si.size();
+      final long sl = ir.size();
       for(int s = 0; s < sl; s++) {
-        ctx.item = si.item[s];
-        if(p.test(ctx, input) != null) si.item[c++] = si.item[s];
+        ctx.value = ir.item[s];
+        if(p.test(ctx, input) != null) ir.item[c++] = ir.item[s];
         ctx.pos++;
       }
-      si.size(c);
+      ir.size(c);
     }
-
-    ctx.item = ci;
+    ctx.value = cv;
     ctx.size = cs;
     ctx.pos = cp;
-    return si;
+    return ir;
   }
 
   @Override

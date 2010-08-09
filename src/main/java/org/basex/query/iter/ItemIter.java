@@ -6,14 +6,15 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
+import org.basex.query.item.Value;
 
 /**
- * Sequence iterator.
+ * Item iterator.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class SeqIter extends Iter implements Result {
+public final class ItemIter extends Iter implements Result {
   /** Items. */
   public Item[] item;
   /** Size. */
@@ -24,7 +25,7 @@ public final class SeqIter extends Iter implements Result {
   /**
    * Constructor.
    */
-  public SeqIter() {
+  public ItemIter() {
     this(1);
   }
 
@@ -32,7 +33,7 @@ public final class SeqIter extends Iter implements Result {
    * Constructor.
    * @param c initial capacity
    */
-  public SeqIter(final int c) {
+  public ItemIter(final int c) {
     item = new Item[c];
   }
 
@@ -41,7 +42,7 @@ public final class SeqIter extends Iter implements Result {
    * @param it item array
    * @param s size
    */
-  public SeqIter(final Item[] it, final int s) {
+  public ItemIter(final Item[] it, final int s) {
     item = it;
     size = s;
   }
@@ -53,12 +54,12 @@ public final class SeqIter extends Iter implements Result {
    * @return iterator
    * @throws QueryException query exception
    */
-  public static SeqIter get(final Iter iter) throws QueryException {
-    if(iter instanceof SeqIter) return (SeqIter) iter;
+  public static ItemIter get(final Iter iter) throws QueryException {
+    if(iter instanceof ItemIter) return (ItemIter) iter;
     // size is cast as less than 2^32 are expected
-    final SeqIter si = new SeqIter(Math.max(1, (int) iter.size()));
-    si.add(iter);
-    return si;
+    final ItemIter ir = new ItemIter(Math.max(1, (int) iter.size()));
+    ir.add(iter);
+    return ir;
   }
 
   /**
@@ -82,9 +83,9 @@ public final class SeqIter extends Iter implements Result {
 
   @Override
   public boolean equiv(final Result v) {
-    if(!(v instanceof SeqIter)) return false;
+    if(!(v instanceof ItemIter)) return false;
 
-    final SeqIter sb = (SeqIter) v;
+    final ItemIter sb = (ItemIter) v;
     if(size != sb.size) return false;
     try {
       for(int i = 0; i < size; i++) {
@@ -148,7 +149,7 @@ public final class SeqIter extends Iter implements Result {
   }
 
   @Override
-  public Item finish() {
+  public Value finish() {
     return Seq.get(item, size);
   }
 

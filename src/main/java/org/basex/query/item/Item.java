@@ -2,16 +2,16 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+
 import java.io.IOException;
 import java.math.BigDecimal;
+
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
-import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -21,37 +21,22 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class Item extends Expr {
+public abstract class Item extends Value {
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
   /** Score value. */
-  public double score;
-  /** Data type. */
-  public Type type;
+  protected double score;
 
   /**
    * Constructor.
    * @param t data type
    */
   protected Item(final Type t) {
-    type = t;
-  }
-
-  @Override
-  public final Expr comp(final QueryContext ctx) {
-    return this;
+    super(t);
   }
 
   @Override
   public Iter iter(final QueryContext ctx) {
-    return iter();
-  }
-
-  /**
-   * Returns an item iterator.
-   * @return iterator
-   */
-  public Iter iter() {
     return new Iter() {
       private boolean more;
       @Override
@@ -59,8 +44,17 @@ public abstract class Item extends Expr {
       @Override
       public long size() { return 1; }
       @Override
-      public Item get(final long i) { return i == 0 ? Item.this : null; }
+      public Item get(final long i) { return Item.this; }
+      @Override
+      public boolean reset() { more = false; return true; }
+      @Override
+      public boolean reverse() { return true; }
     };
+  }
+  
+  @Override
+  public final boolean item() {
+    return true;
   }
 
   @Override
@@ -83,64 +77,6 @@ public abstract class Item extends Expr {
     return bool(ii) ? this : null;
   }
 
-  @Override
-  public boolean value() {
-    return true;
-  }
-
-  @Override
-  public long size(final QueryContext ctx) {
-    return 1;
-  }
-
-  /**
-   * Checks if this is a numeric item.
-   * @return result of check
-   */
-  public final boolean num() {
-    return type.num;
-  }
-
-  /**
-   * Checks if this is an untyped item.
-   * @return result of check
-   */
-  public final boolean unt() {
-    return type.unt;
-  }
-
-  /**
-   * Checks if this is a string item.
-   * @return result of check
-   */
-  public final boolean str() {
-    return type.str;
-  }
-
-  /**
-   * Checks if this is a duration.
-   * @return result of check
-   */
-  public final boolean dur() {
-    return type.dur;
-  }
-
-  /**
-   * Checks if this is a date.
-   * @return result of check
-   */
-  public final boolean date() {
-    return this instanceof Date;
-  }
-
-  /**
-   * Checks if this is a node.
-   * @return result of check
-   */
-  public final boolean node() {
-    return type.node();
-  }
-
   /**
    * Returns an atomized string.
    * @return string representation
@@ -151,15 +87,7 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Returns a Java representation of the XQuery item.
-   * @return Java object
-   */
-  public Object toJava() {
-    return Token.string(atom());
-  }
-
-  /**
-   * Returns a boolean representation of the item.
+   * Returns a boolean representation of the value.
    * @param ii input info
    * @return boolean value
    * @throws QueryException query exception
@@ -170,7 +98,7 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Returns a decimal representation of the item.
+   * Returns a decimal representation of the value.
    * @param ii input info
    * @return decimal value
    * @throws QueryException query exception
@@ -180,7 +108,7 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Returns an integer (long) representation of the item.
+   * Returns an integer (long) representation of the value.
    * @param ii input info
    * @return long value
    * @throws QueryException query exception
@@ -190,7 +118,7 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Returns a float representation of the item.
+   * Returns a float representation of the value.
    * @param ii input info
    * @return float value
    * @throws QueryException query exception
@@ -200,13 +128,29 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Returns a double representation of the item.
+   * Returns a double representation of the value.
    * @param ii input info
    * @return double value
    * @throws QueryException query exception
    */
   public double dbl(final InputInfo ii) throws QueryException {
     return Dbl.parse(atom(), ii);
+  }
+
+  @Override
+  public Object toJava() {
+    return Token.string(atom());
+  }
+
+  /**
+   * Checks if the items can be compared.
+   * Items are comparable
+   * @param b second item
+   * @return result of check
+   */
+  public final boolean comparable(final Item b) {
+    return type == b.type || num() && b.num() || (unt() || str()) &&
+      (b.str() || b.unt()) || dur() && b.dur();
   }
 
   /**
@@ -237,17 +181,6 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Checks if the items can be compared.
-   * Items are comparable
-   * @param b second item
-   * @return result of check
-   */
-  public final boolean comparable(final Item b) {
-    return type == b.type || num() && b.num() || (unt() || str()) &&
-      (b.str() || b.unt()) || dur() && b.dur();
-  }
-
-  /**
    * Returns the difference between the current and the specified item.
    * @param ii input info
    * @param it item to be compared
@@ -258,6 +191,21 @@ public abstract class Item extends Expr {
     if(this == it) Err.or(ii, TYPECMP, type);
     else Err.or(ii, XPTYPECMP, type, it.type);
     return 0;
+  }
+
+  @Override
+  public SeqType returned(final QueryContext ctx) {
+    return new SeqType(type, SeqType.Occ.O);
+  }
+
+  @Override
+  public long size(final QueryContext ctx) {
+    return 1;
+  }
+
+  @Override
+  public final boolean duplicates(final QueryContext ctx) {
+    return false;
   }
 
   /**
@@ -274,6 +222,15 @@ public abstract class Item extends Expr {
    */
   public final void score(final double s) {
     score = s;
+  }
+
+  /**
+   * Serializes the item.
+   * @param ser serializer
+   * @throws IOException I/O exception
+   */
+  public void serialize(final Serializer ser) throws IOException {
+    ser.item(atom());
   }
 
   /**
@@ -301,48 +258,20 @@ public abstract class Item extends Expr {
   }
 
   /**
-   * Serializes the item.
-   * @param ser serializer
-   * @throws IOException I/O exception
+   * Returns an item array with double the size of the input array.
+   * @param it item array
+   * @return resulting array
    */
-  public void serialize(final Serializer ser) throws IOException {
-    ser.item(atom());
-  }
-
-  @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return false;
-  }
-
-  @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    return true;
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return new SeqType(type, SeqType.Occ.O);
-  }
-
-  @Override
-  public boolean duplicates(final QueryContext ctx) {
-    return false;
-  }
-
-  @Override
-  public final String color() {
-    return "9999FF";
-  }
-
-  @Override
-  public final String name() {
-    return type.name;
+  public static Item[] extend(final Item[] it) {
+    final int s = it.length;
+    final Item[] tmp = new Item[s << 1];
+    System.arraycopy(it, 0, tmp, 0, s);
+    return tmp;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
-    ser.attribute(VAL, atom());
+    ser.emptyElement(this, VAL, atom());
     ser.closeElement();
   }
 
@@ -354,17 +283,5 @@ public abstract class Item extends Expr {
   @Override
   public String toString() {
     return Token.string(atom());
-  }
-
-  /**
-   * Returns an item array with double the size of the input array.
-   * @param it item array
-   * @return resulting array
-   */
-  public static Item[] extend(final Item[] it) {
-    final int s = it.length;
-    final Item[] tmp = new Item[s << 1];
-    System.arraycopy(it, 0, tmp, 0, s);
-    return tmp;
   }
 }

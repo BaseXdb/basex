@@ -79,9 +79,9 @@ import org.basex.query.ft.Thesaurus;
 import org.basex.query.ft.FTWords.FTMode;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Dec;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.SeqType.Occ;
 import org.basex.query.item.Str;
@@ -615,13 +615,13 @@ public class QueryParser extends InputParser {
       if(old == null) {
         ctx.vars.addGlobal(var);
       } else {
-        if(old.expr == null || typ != null && old.item == null) {
+        if(old.expr == null || typ != null && old.value == null) {
           error(VARDEFINE, var);
         }
         // a variable has been bound before the query has been parsed...
         if(typ != null) {
           old.type = typ;
-          old.item(ctx);
+          old.value(ctx);
         }
       }
     } else {
@@ -786,7 +786,7 @@ public class QueryParser extends InputParser {
     }
     final Expr ret = check(single(), NORETURN);
     ctx.vars.reset(s);
-    return ret == Seq.EMPTY ? ret : order == null && group == null ?
+    return ret == Empty.SEQ ? ret : order == null && group == null ?
       new FLWR(fl, where, ret, input()) : group == null ?
       new FLWOR(fl, where, new Order(input(), order), ret, input()) :
       new GFLWOR(fl, where, order == null ? null : new Order(input(), order),
@@ -1628,7 +1628,7 @@ public class QueryParser extends InputParser {
     check(PAR1);
     final Expr e = expr();
     check(PAR2);
-    return e == null ? Seq.EMPTY : e;
+    return e == null ? Empty.SEQ : e;
   }
 
   /**
@@ -1995,7 +1995,7 @@ public class QueryParser extends InputParser {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = expr();
     check(BRACE2);
-    return new CAttr(input(), true, nm, e == null ? Seq.EMPTY : e);
+    return new CAttr(input(), true, nm, e == null ? Empty.SEQ : e);
   }
 
   /**
@@ -2041,7 +2041,7 @@ public class QueryParser extends InputParser {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = expr();
     check(BRACE2);
-    return new CPI(input(), name, e == null ? Seq.EMPTY : e);
+    return new CPI(input(), name, e == null ? Empty.SEQ : e);
   }
 
   /**

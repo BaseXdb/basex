@@ -1,9 +1,9 @@
 package org.basex.query.iter;
 
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
+import org.basex.query.item.Value;
 import org.basex.util.Array;
 
 /**
@@ -106,7 +106,7 @@ public final class NodIter extends NodeIter {
   }
 
   @Override
-  public Item finish() {
+  public Value finish() {
     if(dupl) sort(sort);
     return Seq.get(item, size);
   }
@@ -163,7 +163,7 @@ public final class NodIter extends NodeIter {
       int i = 1;
       for(int j = 1; j < size; j++) {
         while(j < size && item[i - 1].is(item[j])) {
-          item[i - 1].score = Math.max(item[j++].score, item[i - 1].score);
+          item[i - 1].score(Math.max(item[j++].score(), item[i - 1].score()));
         }
         if(j == size) break;
         item[i++] = item[j];

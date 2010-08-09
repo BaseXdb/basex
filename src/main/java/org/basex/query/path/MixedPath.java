@@ -6,13 +6,14 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -44,23 +45,23 @@ public final class MixedPath extends Path {
     for(final Expr e : step) checkUp(e, ctx);
     for(int i = 0; i != step.length; i++) {
       step[i] = step[i].comp(ctx);
-      if(step[i].empty()) return Seq.EMPTY;
+      if(step[i].empty()) return Empty.SEQ;
     }
     return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item it = root != null ? ctx.iter(root).finish() : checkCtx(ctx);
-    final Item c = ctx.item;
+    Value v = root != null ? ctx.iter(root).finish() : checkCtx(ctx);
+    final Value c = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    ctx.item = it;
-    final Item i = eval(ctx);
-    ctx.item = c;
+    ctx.value = v;
+    final ItemIter ir = eval(ctx);
+    ctx.value = c;
     ctx.size = cs;
     ctx.pos = cp;
-    return i.iter();
+    return ir;
   }
 
   /**
@@ -69,38 +70,39 @@ public final class MixedPath extends Path {
    * @return resulting item
    * @throws QueryException query exception
    */
-  private Item eval(final QueryContext ctx) throws QueryException {
+  private ItemIter eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...
-    Item it = ctx.item;
+    ItemIter res = ItemIter.get(ctx.value.iter(ctx));
     for(final Expr s : step) {
-      final SeqIter si = new SeqIter();
-      final Iter ir = it.iter();
-      ctx.size = it.size(ctx);
+      final Iter ir = res;
+      final ItemIter ii = new ItemIter();
+      ctx.size = ir.size();
       ctx.pos = 1;
       Item i;
       while((i = ir.next()) != null) {
         if(!i.node()) Err.or(input, NODESPATH, this, i.type);
-        ctx.item = i;
-        si.add(ctx.iter(s));
+        ctx.value = i;
+        ii.add(ctx.iter(s));
         ctx.pos++;
       }
 
       // either nodes or atomic items are allowed in a result set, but not both
-      if(si.size() != 0 && si.get(0).node()) {
+      if(ii.size() != 0 && ii.get(0).node()) {
         final NodIter ni = new NodIter(true);
-        while((i = si.next()) != null) {
+        while((i = ii.next()) != null) {
           if(!i.node()) Err.or(input, EVALNODESVALS);
           ni.add((Nod) i);
         }
-        it = ni.finish();
+        res = ItemIter.get(ni);
       } else {
-        while((i = si.next()) != null) {
+        while((i = ii.next()) != null) {
           if(i.node()) Err.or(input, EVALNODESVALS);
         }
-        it = si.finish();
+        res = ii;
       }
     }
-    return it;
+    res.reset();
+    return res;
   }
 
   @Override

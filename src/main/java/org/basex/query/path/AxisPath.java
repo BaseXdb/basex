@@ -18,12 +18,13 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.Filter;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
@@ -49,7 +50,7 @@ public class AxisPath extends Path {
   /** Cached result. */
   private NodIter citer;
   /** Last visited item. */
-  private Item litem;
+  private Value lvalue;
 
   /**
    * Constructor.
@@ -133,7 +134,7 @@ public class AxisPath extends Path {
     if(data != null) {
       boolean doc = ctx.docNodes();
       if(!doc) {
-        final Iter iter = ctx.item.iter();
+        final Iter iter = ctx.value.iter(ctx);
         Item it;
         while((it = iter.next()) != null) {
           doc = it.type == Type.DOC;
@@ -278,7 +279,7 @@ public class AxisPath extends Path {
           }
           // no results...
           ctx.compInfo(OPTNOINDEX, this);
-          return Seq.EMPTY;
+          return Empty.SEQ;
         }
         if(ics == null || ics.is > ic.is) {
           ics = ic;
@@ -354,23 +355,23 @@ public class AxisPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item c = ctx.item;
+    final Value c = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    Item it = root != null ? ctx.iter(root).finish() : c;
+    Value v = root != null ? ctx.iter(root).finish() : c;
 
-    if(!cache || citer == null || litem.type != Type.DOC ||
-        it.type != Type.DOC || !((Nod) litem).is((Nod) it)) {
-      litem = it;
+    if(!cache || citer == null || lvalue.type != Type.DOC ||
+        v.type != Type.DOC || !((Nod) lvalue).is((Nod) v)) {
+      lvalue = v;
       citer = new NodIter();
-      if(it != null && it.size(ctx) != 1) {
-        final Iter ir = ctx.iter(it);
-        while((it = ir.next()) != null) {
-          ctx.item = it;
+      if(v != null && v.size(ctx) != 1) {
+        final Iter ir = ctx.iter(v);
+        while((v = ir.next()) != null) {
+          ctx.value = v;
           iter(0, citer, ctx);
         }
       } else {
-        ctx.item = it;
+        ctx.value = v;
         iter(0, citer, ctx);
       }
       citer.sort(true);
@@ -378,7 +379,7 @@ public class AxisPath extends Path {
       citer.reset();
     }
 
-    ctx.item = c;
+    ctx.value = c;
     ctx.size = cs;
     ctx.pos = cp;
     return citer;
@@ -397,21 +398,21 @@ public class AxisPath extends Path {
     // cast is ok as all steps are axis steps here (see calling method)
     final NodeIter ir = (NodeIter) ctx.iter(step[l]);
     final boolean more = l + 1 != step.length;
-    Nod it;
-    while((it = ir.next()) != null) {
+    Nod v;
+    while((v = ir.next()) != null) {
       if(more) {
-        ctx.item = it;
+        ctx.value = v;
         iter(l + 1, ni, ctx);
       } else {
         ctx.checkStop();
-        ni.add(it);
+        ni.add(v);
       }
     }
   }
 
   @Override
   public final long size(final QueryContext ctx) {
-    final Item rt = root(ctx);
+    final Value rt = root(ctx);
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
 

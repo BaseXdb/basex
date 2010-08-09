@@ -23,6 +23,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -48,6 +49,8 @@ final class FNBaseX extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(func) {
       case INDEX: return index(ctx);
+      case EVAL:  return eval(ctx);
+      case RUN:   return run(ctx);
       default:    return super.iter(ctx);
     }
   }
@@ -56,10 +59,8 @@ final class FNBaseX extends Fun {
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(func) {
-      case EVAL:   return eval(ctx);
       case READ:   return read(ctx);
       case RANDOM: return random();
-      case RUN:    return run(ctx);
       case DB:     return db(ctx);
       case NODEID: return nodeId(ctx);
       case FSPATH: return fspath(ctx);
@@ -73,7 +74,7 @@ final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item eval(final QueryContext ctx) throws QueryException {
+  private Iter eval(final QueryContext ctx) throws QueryException {
     return eval(ctx, checkEStr(expr[0], ctx));
   }
 
@@ -83,7 +84,7 @@ final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item run(final QueryContext ctx) throws QueryException {
+  private Iter run(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     try {
       return eval(ctx, io.content());
@@ -100,12 +101,12 @@ final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private Item eval(final QueryContext ctx, final byte[] qu)
+  private Iter eval(final QueryContext ctx, final byte[] qu)
       throws QueryException {
     final QueryContext qt = new QueryContext(ctx.context);
     qt.parse(string(qu));
     qt.compile();
-    return qt.iter().finish();
+    return ItemIter.get(qt.iter());
   }
 
   /**

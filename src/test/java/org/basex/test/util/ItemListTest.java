@@ -23,8 +23,8 @@ public class ItemListTest {
   public final void testItemList() {
     final ItemList il = new ItemList();
     il.add(Itr.ZERO);
-    assertEquals(1, il.size());
-    assertEquals(Itr.ZERO, il.get(0));
+    assertEquals(1, il.size);
+    assertEquals(Itr.ZERO, il.list[0]);
   }
 
   /**

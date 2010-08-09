@@ -6,11 +6,11 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
+import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -47,7 +47,7 @@ public final class TypeSwitch extends ParseExpr {
     for(final TypeCase c : cs) ii &= c.empty();
     if(ii) {
       ctx.compInfo(OPTTRUE);
-      return Seq.EMPTY;
+      return Empty.SEQ;
     }
 
     final Expr[] tmp = new Expr[cs.length];
@@ -59,7 +59,7 @@ public final class TypeSwitch extends ParseExpr {
     if(ts.value()) {
       for(final TypeCase c : cs) {
         if(c.var.type == null || c.var.type.instance(ts.iter(ctx))) {
-          e = c.comp(ctx, (Item) ts).expr;
+          e = c.comp(ctx, (Value) ts).expr;
           break;
         }
       }
@@ -69,7 +69,7 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter seq = SeqIter.get(ctx.iter(ts));
+    final Iter seq = ItemIter.get(ctx.iter(ts));
     for(final TypeCase c : cs) {
       seq.reset();
       final Iter iter = c.iter(ctx, seq);

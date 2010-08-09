@@ -66,7 +66,8 @@ final class GroupPartition {
   void add(final QueryContext ctx) throws QueryException  {
     final Item[] its = new Item[gv.length];
     for(int i = 0; i < gv.length; i++) {
-      its[i] = ctx.vars.get(gv[i]).item;
+      // [MS] check if values are always single items (and no sequences)
+      its[i] = (Item) ctx.vars.get(gv[i]).value;
     }
     
     boolean found = false;
@@ -109,7 +110,8 @@ final class GroupPartition {
     for(final Var v : ngv) {
       if(sq == null) sq = new HashMap<Var, ItemList>();
       if(sq.get(v) == null) sq.put(v, new ItemList());
-      sq.get(v).add(ctx.vars.get(v).item);
+      // [MS] check if values are always single items (and no sequences)
+      sq.get(v).add((Item) ctx.vars.get(v).value);
     }
   }
 
@@ -119,7 +121,7 @@ final class GroupPartition {
    * @author Michael Seiferle
    */
   static final class GroupNode {
-    /** List of grouping var values. */
+    /** List of grouping var items. */
     final Item[] its;
     /** Length of grouping variables. */
     final int varlen;
@@ -130,7 +132,7 @@ final class GroupPartition {
 
     /**
      * Creates a group node.
-     * @param is grouping var values
+     * @param is grouping var items
      * @param vl number of grouping variables
      */
     public GroupNode(final Item[] is, final int vl) {
@@ -160,13 +162,10 @@ final class GroupPartition {
      * @throws QueryException query exception
      */
     boolean eq(final GroupNode c) throws QueryException {
-      if(its.length != c.its.length ||
-          varlen != c.its.length) return false;
+      if(its.length != c.its.length || varlen != c.its.length) return false;
       for(int i = 0; i < its.length; i++) {
-          if(its[i].empty() && c.its[i].empty())
-            continue;
-          if(!its[i].equiv(null, c.its[i]))
-            return false;
+        if(its[i].empty() && c.its[i].empty()) continue;
+        if(!its[i].equiv(null, c.its[i])) return false;
       }
       return true;
     }

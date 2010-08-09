@@ -10,10 +10,11 @@ import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -39,7 +40,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Item it = atomic(ctx, input);
-    return it != null ? it.iter() : Iter.EMPTY;
+    return it != null ? it.iter(ctx) : Iter.EMPTY;
   }
 
   @Override
@@ -76,11 +77,6 @@ public abstract class ParseExpr extends Expr {
     return (it.num() ? it.dbl(input) == ctx.pos : it.bool(input)) ? it : null;
   }
 
-  @Override
-  public final boolean value() {
-    return false;
-  }
-
   // OPTIMIZATIONS ============================================================
 
   /**
@@ -101,7 +97,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Expr optPre(final Expr opt, final QueryContext ctx) {
     if(opt != this) ctx.compInfo(OPTPRE, this);
-    return opt == null ? Seq.EMPTY : opt;
+    return opt == null ? Empty.SEQ : opt;
   }
 
   // VALIDITY CHECKS ==========================================================
@@ -243,10 +239,10 @@ public abstract class ParseExpr extends Expr {
    * @return result of check
    * @throws QueryException query exception
    */
-  public final Item checkCtx(final QueryContext ctx) throws QueryException {
-    final Item it = ctx.item;
-    if(it == null) Err.or(input, XPNOCTX, this);
-    return it;
+  public final Value checkCtx(final QueryContext ctx) throws QueryException {
+    final Value v = ctx.value;
+    if(v == null) Err.or(input, XPNOCTX, this);
+    return v;
   }
 
   /**

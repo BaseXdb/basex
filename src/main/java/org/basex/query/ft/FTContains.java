@@ -93,9 +93,10 @@ public class FTContains extends ParseExpr {
     }
 
     ctx.fttoken = tmp;
-    /*final double is = ctx.item.score;
+    /*final double is = ctx.value.score;
     if(s != is && s != 0 && s == s && is != 0 && is == is) {
-      s = Math.max(ctx.item.score - s / ctx.item.score, s - ctx.item.score / s);
+      s = Math.max(ctx.value.score - s / ctx.value.score, s -
+        ctx.value.score / s);
     }*/
     return Bln.get(s);
   }

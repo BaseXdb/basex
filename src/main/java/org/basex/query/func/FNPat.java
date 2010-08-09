@@ -16,7 +16,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -165,7 +165,7 @@ final class FNPat extends Fun {
       throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    final SeqIter sb = new SeqIter();
+    final ItemIter sb = new ItemIter();
     final String str = string(val);
     if(!str.isEmpty()) {
       final Matcher m = p.matcher(str);

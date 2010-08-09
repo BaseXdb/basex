@@ -25,17 +25,17 @@ public final class DateFormatter {
 
   /**
    * Formats the specified date.
-   * @param ii input info
    * @param date date to be formatted
    * @param pic picture
    * @param lng language
    * @param cal calendar
    * @param plc place
+   * @param ii input info
    * @return formatted string
    * @throws QueryException query exception
    */
-  public static byte[] format(final InputInfo ii, final Date date,
-      final String pic, final byte[] lng, final byte[] cal, final byte[] plc)
+  public static byte[] format(final Date date, final String pic,
+      final byte[] lng, final byte[] cal, final byte[] plc, final InputInfo ii)
       throws QueryException {
 
     // ignore calendars and places

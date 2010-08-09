@@ -14,9 +14,9 @@ import org.basex.query.expr.Pos;
 import org.basex.query.expr.Preds;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
@@ -78,7 +78,7 @@ public class Step extends Preds {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    if(!test.comp(ctx)) return Seq.EMPTY;
+    if(!test.comp(ctx)) return Empty.SEQ;
 
     // if possible, add text() step to predicates
     final Data data = ctx.data();
@@ -111,7 +111,7 @@ public class Step extends Preds {
 
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = checkCtx(ctx).iter();
+    final Iter iter = checkCtx(ctx).iter(ctx);
 
     final NodIter ni = new NodIter();
     NodIter nb = new NodIter();
@@ -130,7 +130,7 @@ public class Step extends Preds {
         ctx.pos = 1;
         int c = 0;
         for(int s = 0; s < nb.size(); s++) {
-          ctx.item = nb.get(s);
+          ctx.value = nb.get(s);
           final Item i = p.test(ctx, input);
           if(i != null) {
             // assign score value

@@ -6,7 +6,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
+import org.basex.query.item.Value;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -66,15 +67,13 @@ public final class Func extends Single {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
-
+  public Iter iter(final QueryContext ctx) throws QueryException {
     // evaluate function and reset variable scope
-    final Item ci = ctx.item;
-    ctx.item = null;
-    final Item i = ctx.iter(expr).finish();
-    ctx.item = ci;
-    return var.type != null ? var.type.cast(i, ctx, input) : i;
+    final Value cv = ctx.value;
+    ctx.value = null;
+    final Value v = ctx.iter(expr).finish();
+    ctx.value = cv;
+    return (var.type != null ? var.type.cast(v, ctx, input) : v).iter(ctx);
   }
 
   @Override

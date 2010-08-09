@@ -38,17 +38,30 @@ final class FNId extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = expr.length == 2 ? expr[1].atomic(ctx, input) :
-      checkCtx(ctx).atomic(ctx, input);
+    final Item it = (expr.length == 2 ? expr[1] :
+      checkCtx(ctx)).atomic(ctx, input);
     if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.NOD);
 
     final Nod node = checkNode(it);
     switch(func) {
       case ID:    return id(ctx.iter(expr[0]), node);
       case IDREF: return idref(ctx.iter(expr[0]), node);
-      case LANG:  return lang(lc(checkEStr(expr[0], ctx)), node);
       case ELID:  return elid(ctx.iter(expr[0]), node);
       default:    return super.iter(ctx);
+    }
+  }
+
+  @Override
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    // functions have 1 or 2 arguments...
+    final Item it = (expr.length == 2 ? expr[1] :
+      checkCtx(ctx)).atomic(ctx, input);
+    if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.NOD);
+
+    switch(func) {
+      case LANG:  return lang(lc(checkEStr(expr[0], ctx)), checkNode(it));
+      default:    return super.atomic(ctx, ii);
     }
   }
 
@@ -100,7 +113,7 @@ final class FNId extends Fun {
    * @return resulting node list
    * @throws QueryException query exception
    */
-  private Iter lang(final byte[] lang, final Nod node) throws QueryException {
+  private Bln lang(final byte[] lang, final Nod node) throws QueryException {
     Nod n = node;
     while(n != null) {
       final NodeIter atts = n.attr();
@@ -109,11 +122,11 @@ final class FNId extends Fun {
         if(!eq(at.qname().atom(), LANG)) continue;
         final byte[] ln = lc(norm(checkStrEmp(at)));
         if(startsWith(ln, lang) && (lang.length == ln.length ||
-            !letter(ln[lang.length]))) return Bln.TRUE.iter();
+            !letter(ln[lang.length]))) return Bln.TRUE;
       }
       n = n.parent();
     }
-    return Bln.FALSE.iter();
+    return Bln.FALSE;
   }
 
   /**

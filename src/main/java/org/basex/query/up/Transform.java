@@ -15,6 +15,7 @@ import org.basex.query.expr.Let;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.UpdatePrimitive;
@@ -66,8 +67,7 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Iter iter(final QueryContext ctx) throws QueryException {
     final int s = ctx.vars.size();
     final Updates pu = new Updates(true);
     for(final Let fo : copies) {
@@ -86,9 +86,9 @@ public final class Transform extends Arr {
     ctx.updates.apply(ctx);
     ctx.updates = tmp;
 
-    final Item im = ctx.iter(expr[1]).finish();
+    final ItemIter ir = ItemIter.get(ctx.iter(expr[1]));
     ctx.vars.reset(s);
-    return im;
+    return ir;
   }
 
   @Override

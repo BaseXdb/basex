@@ -17,7 +17,7 @@ import org.basex.query.item.Dec;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -123,7 +123,7 @@ public abstract class QueryTest {
    * @param str string
    * @return iterator
    */
-  static SeqIter str(final String str) {
+  static ItemIter str(final String str) {
     return item(Str.get(str));
   }
 
@@ -132,7 +132,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  static SeqIter dbl(final double d) {
+  static ItemIter dbl(final double d) {
     return item(Dbl.get(d));
   }
 
@@ -141,7 +141,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  static SeqIter itr(final long d) {
+  static ItemIter itr(final long d) {
     return item(Itr.get(d));
   }
 
@@ -150,7 +150,7 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  static SeqIter dec(final double d) {
+  static ItemIter dec(final double d) {
     return item(Dec.get(d));
   }
 
@@ -159,7 +159,7 @@ public abstract class QueryTest {
    * @param b boolean value
    * @return iterator
    */
-  static SeqIter bool(final boolean b) {
+  static ItemIter bool(final boolean b) {
     return item(Bln.get(b));
   }
 
@@ -168,7 +168,7 @@ public abstract class QueryTest {
    * @param i item
    * @return iterator
    */
-  private static SeqIter item(final Item i) {
-    return new SeqIter(new Item[] { i }, 1);
+  private static ItemIter item(final Item i) {
+    return new ItemIter(new Item[] { i }, 1);
   }
 }

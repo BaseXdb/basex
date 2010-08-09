@@ -9,7 +9,6 @@ import org.basex.query.expr.Constr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -58,7 +57,7 @@ public final class Insert extends Update {
   }
 
   @Override
-  public Seq atomic(final QueryContext ctx, final InputInfo ii)
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
     final NodIter cList = c.children;
@@ -104,7 +103,7 @@ public final class Insert extends Update {
       }
       ctx.updates.add(up, ctx);
     }
-    return Seq.EMPTY;
+    return null;
   }
 
   @Override

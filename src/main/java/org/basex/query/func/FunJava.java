@@ -19,11 +19,11 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
-import org.basex.query.item.Item;
 import org.basex.query.item.Jav;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -78,7 +78,7 @@ public final class FunJava extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item[] arg = new Item[expr.length];
+    final Value[] arg = new Value[expr.length];
     for(int a = 0; a < expr.length; a++) {
       arg[a] = expr[a].iter(ctx).finish();
       if(arg[a].size(ctx) == 0) Err.or(input, XPEMPTY, desc());
@@ -91,7 +91,7 @@ public final class FunJava extends Arr {
       Main.debug(ex);
       Err.or(input, FUNJAVA, desc());
     }
-    return result == null ? Iter.EMPTY : iter(result);
+    return result == null ? Iter.EMPTY : iter(result, ctx);
   }
 
   /**
@@ -100,7 +100,7 @@ public final class FunJava extends Arr {
    * @return resulting object
    * @throws Exception exception
    */
-  private Object constructor(final Item[] ar) throws Exception {
+  private Object constructor(final Value[] ar) throws Exception {
     for(final Constructor<?> con : cls.getConstructors()) {
       final Object[] arg = args(con.getParameterTypes(), ar, true);
       if(arg != null) return con.newInstance(arg);
@@ -114,7 +114,7 @@ public final class FunJava extends Arr {
    * @return resulting object
    * @throws Exception exception
    */
-  private Object method(final Item[] ar) throws Exception {
+  private Object method(final Value[] ar) throws Exception {
     // check if a field with the specified name exists
     try {
       final Field f = cls.getField(mth);
@@ -140,7 +140,7 @@ public final class FunJava extends Arr {
    * @param stat static flag
    * @return argument array or null
    */
-  private Object[] args(final Class<?>[] params, final Item[] args,
+  private Object[] args(final Class<?>[] params, final Value[] args,
       final boolean stat) {
 
     final int s = stat ? 0 : 1;
@@ -155,7 +155,7 @@ public final class FunJava extends Arr {
       final Type jtype = type(par);
       if(jtype == null) return null;
 
-      final Item arg = args[s + a];
+      final Value arg = args[s + a];
       if(!arg.type.instance(jtype) && !jtype.instance(arg.type)) return null;
       val[a++] = arg.toJava();
     }
@@ -212,32 +212,33 @@ public final class FunJava extends Arr {
   /**
    * Converts the specified object to an iterator.
    * @param res object
+   * @param ctx query context
    * @return iterator
    */
-  private Iter iter(final Object res) {
-    if(!res.getClass().isArray()) return new Jav(res).iter();
+  private Iter iter(final Object res, final QueryContext ctx) {
+    if(!res.getClass().isArray()) return new Jav(res).iter(ctx);
 
-    final SeqIter seq = new SeqIter();
+    final ItemIter ir = new ItemIter();
     if(res instanceof boolean[]) {
-      for(final Object o : (boolean[]) res) seq.add(new Jav(o));
+      for(final Object o : (boolean[]) res) ir.add(new Jav(o));
     } else if(res instanceof char[]) {
-      for(final Object o : (char[]) res) seq.add(new Jav(o));
+      for(final Object o : (char[]) res) ir.add(new Jav(o));
     } else if(res instanceof byte[]) {
-      for(final Object o : (byte[]) res) seq.add(new Jav(o));
+      for(final Object o : (byte[]) res) ir.add(new Jav(o));
     } else if(res instanceof short[]) {
-      for(final Object o : (short[]) res) seq.add(new Jav(o));
+      for(final Object o : (short[]) res) ir.add(new Jav(o));
     } else if(res instanceof int[]) {
-      for(final Object o : (int[]) res) seq.add(new Jav(o));
+      for(final Object o : (int[]) res) ir.add(new Jav(o));
     } else if(res instanceof long[]) {
-      for(final Object o : (long[]) res) seq.add(new Jav(o));
+      for(final Object o : (long[]) res) ir.add(new Jav(o));
     } else if(res instanceof float[]) {
-      for(final Object o : (float[]) res) seq.add(new Jav(o));
+      for(final Object o : (float[]) res) ir.add(new Jav(o));
     } else if(res instanceof double[]) {
-      for(final Object o : (double[]) res) seq.add(new Jav(o));
+      for(final Object o : (double[]) res) ir.add(new Jav(o));
     } else {
-      for(final Object o : (Object[]) res) seq.add(new Jav(o));
+      for(final Object o : (Object[]) res) ir.add(new Jav(o));
     }
-    return seq;
+    return ir;
   }
 
   @Override

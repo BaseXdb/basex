@@ -67,7 +67,7 @@ public abstract class Arr extends ParseExpr {
    * @return result of check
    */
   protected final boolean exprAndItem(final boolean num) {
-    if(expr.length != 2 || !expr[1].value()) return false;
+    if(expr.length != 2 || !expr[1].item()) return false;
     final Item it = (Item) expr[1];
     return num ? it.num() : it.str();
   }

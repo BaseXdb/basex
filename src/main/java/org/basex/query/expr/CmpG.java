@@ -17,7 +17,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.Step;
@@ -199,14 +199,14 @@ public final class CmpG extends Arr {
     // evaluate two iterators
     if(!ir2.reset()) {
       // cache items for next comparisons
-      final SeqIter seq = new SeqIter();
+      final ItemIter ir = new ItemIter();
       if((it1 = ir1.next()) != null) {
         while((it2 = ir2.next()) != null) {
           if(eval(it1, it2)) return Bln.TRUE;
-          seq.add(it2);
+          ir.add(it2);
         }
       }
-      ir2 = seq;
+      ir2 = ir;
     }
 
     while((it1 = ir1.next()) != null) {

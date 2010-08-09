@@ -53,7 +53,7 @@ public final class Treat extends Single {
       if(iter.next() != null) Err.or(input, NOTREATS, desc(), seq);
       if(!it.type.instance(seq.type))
         Err.or(input, NOTREAT, desc(), seq, it.type);
-      return it.iter();
+      return it.iter(ctx);
     }
 
     return new Iter() {

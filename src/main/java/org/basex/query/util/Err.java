@@ -6,6 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.util.InputInfo;
 
 /**
@@ -59,12 +60,12 @@ public final class Err {
    * Throws a numeric type exception.
    * @param ii input info
    * @param t expression cast type
-   * @param it item
+   * @param v value
    * @throws QueryException query exception
    */
-  public static void cast(final InputInfo ii, final Type t, final Item it)
+  public static void cast(final InputInfo ii, final Type t, final Value v)
       throws QueryException {
-    or(ii, XPINVCAST, it.type, t, it);
+    or(ii, XPINVCAST, v.type, t, v);
   }
 
   /**

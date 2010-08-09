@@ -11,7 +11,7 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -26,7 +26,7 @@ import static org.basex.util.Token.token;
  */
 public final class OrderBy extends ParseExpr {
   /** Order expression. */
-  private SeqIter seq;
+  private ItemIter seq;
   /** Order expression. */
   private Expr expr;
   /** Ascending/descending order. */
@@ -52,7 +52,7 @@ public final class OrderBy extends ParseExpr {
   public OrderBy(final InputInfo ii, final Expr e, final boolean d,
       final boolean l) {
     super(ii);
-    seq = new SeqIter();
+    seq = new ItemIter();
     expr = e;
     desc = d;
     lst = l;
@@ -86,7 +86,7 @@ public final class OrderBy extends ParseExpr {
    * Resets the built sequence.
    */
   void reset() {
-    if(seq != null) seq = new SeqIter();
+    if(seq != null) seq = new ItemIter();
   }
 
   /**

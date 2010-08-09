@@ -4,9 +4,9 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
@@ -31,12 +31,12 @@ final class SimpleIterStep extends Step {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    return !test.comp(ctx) ? Seq.EMPTY : this;
+    return !test.comp(ctx) ? Empty.SEQ : this;
   }
 
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = checkCtx(ctx).iter();
+    final Iter iter = checkCtx(ctx).iter(ctx);
 
     return new NodeIter() {
       NodeIter ir;

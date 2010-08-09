@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 
@@ -51,18 +52,20 @@ final class IterPred extends Filter {
           p = 1;
 
           if(pos != null || last) {
+            // runtime optimization:
             // items can be directly accessed if iterator size is known
             final long s = iter.size();
             if(s == 0) return null;
             if(s != -1) {
               p = last ? s : pos.min;
+              if(p > s) return null;
               direct = true;
             }
           }
         }
 
         // cache context
-        final Item ci = ctx.item;
+        final Value cv = ctx.value;
         final long cp = ctx.pos;
         Item it = null;
 
@@ -75,7 +78,7 @@ final class IterPred extends Filter {
           Item old = null;
           while((it = iter.next()) != null) {
             // set context item and position
-            ctx.item = it;
+            ctx.value = it;
             ctx.pos = p++;
             old = it;
             final Item i = pred[0].test(ctx, input);
@@ -94,7 +97,7 @@ final class IterPred extends Filter {
         if(finish && direct) iter.reset();
 
         // reset context
-        ctx.item = ci;
+        ctx.value = cv;
         ctx.pos = cp;
         return it;
       }

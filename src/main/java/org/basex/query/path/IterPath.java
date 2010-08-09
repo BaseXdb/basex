@@ -6,6 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -31,7 +32,7 @@ final class IterPath extends AxisPath {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      final Item c = ctx.item;
+      final Value v = ctx.value;
       Expr[] expr;
       Iter[] iter;
       Nod prev;
@@ -64,23 +65,23 @@ final class IterPath extends AxisPath {
               final Nod n = (Nod) i;
               if(prev == null || !prev.is(n)) {
                 prev = n;
-                ctx.item = c;
+                ctx.value = v;
                 return n;
               }
             } else {
               p++;
-              ctx.item = i;
+              ctx.value = i;
               iter[p] = ctx.iter(expr[p]);
             }
           }
         }
-        ctx.item = c;
+        ctx.value = v;
         return null;
       }
 
       @Override
       public boolean reset() {
-        ctx.item = c;
+        ctx.value = v;
         iter = null;
         return true;
       }

@@ -7,6 +7,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.expr.Pos;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
@@ -43,7 +44,7 @@ final class IterStep extends Step {
   @Override
   public NodeIter iter(final QueryContext ctx) {
     return new NodeIter() {
-      final Item ci = ctx.item;
+      final Value cv = ctx.value;
       final long cp = ctx.pos;
       boolean finish;
       NodeIter ir;
@@ -54,7 +55,7 @@ final class IterStep extends Step {
         if(finish) return null;
 
         if(iter == null) {
-          iter = checkCtx(ctx).iter();
+          iter = checkCtx(ctx).iter(ctx);
           ctx.pos = 0;
         }
 
@@ -73,7 +74,7 @@ final class IterStep extends Step {
           if(nod != null) {
             if(test.eval(nod)) {
               // evaluates predicates
-              ctx.item = nod;
+              ctx.value = nod;
               ctx.pos++;
               final Item i = pred[0].test(ctx, input);
 
@@ -91,8 +92,7 @@ final class IterStep extends Step {
             ir = null;
           }
         }
-
-        ctx.item = ci;
+        ctx.value = cv;
         ctx.pos = cp;
         finish = last;
         return temp;

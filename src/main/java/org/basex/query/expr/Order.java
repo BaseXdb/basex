@@ -7,7 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -20,8 +20,8 @@ import org.basex.util.InputInfo;
 public final class Order extends ParseExpr {
   /** Sort list. */
   final OrderBy[] ob;
-  /** Sequence to be sorted. */
-  SeqIter sq;
+  /** Values to be sorted. */
+  ValueList vl;
 
  /**
    * Constructor.
@@ -43,7 +43,7 @@ public final class Order extends ParseExpr {
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
       // cast to int, as expected number of results will be small enough
-      final int e = (int) sq.size();
+      final int e = vl.size;
       int[] order;
       Iter ir;
       int p = -1;
@@ -65,7 +65,7 @@ public final class Order extends ParseExpr {
             ir = null;
           } else {
             if(++p == e) return null;
-            ir = sq.item[order[p]].iter();
+            ir = vl.list[order[p]].iter(ctx);
           }
         }
       }

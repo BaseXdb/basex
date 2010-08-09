@@ -51,9 +51,6 @@ public final class IntFormatter {
   public static byte[] format(final long number, final FormatParser mp,
       final Formatter form) {
 
-    // to be checked...
-    if(number == 0) return token(number);
-
     // choose sign
     long num = number;
     final boolean sign = num < 0;

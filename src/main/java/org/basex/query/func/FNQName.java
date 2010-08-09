@@ -13,7 +13,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -135,8 +135,8 @@ final class FNQName extends Fun {
       n = n.parent();
     } while(n != null && ctx.nsInherit);
 
-    final SeqIter seq = new SeqIter();
-    for(final byte[] t : tl) seq.add(Str.get(t));
-    return seq;
+    final ItemIter ir = new ItemIter();
+    for(final byte[] t : tl) ir.add(Str.get(t));
+    return ir;
   }
 }

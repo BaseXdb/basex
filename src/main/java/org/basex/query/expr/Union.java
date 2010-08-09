@@ -3,9 +3,9 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -43,7 +43,7 @@ public final class Union extends Arr {
 
     // as union is required to always returns sorted results,
     // a single, non-sorted argument must be evaluated as well
-    return expr.length == 0 ? Seq.EMPTY :
+    return expr.length == 0 ? Empty.SEQ :
       expr.length == 1 && !duplicates(ctx) ? expr[0] : this;
   }
 

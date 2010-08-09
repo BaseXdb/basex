@@ -3,8 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
+import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
@@ -35,10 +34,10 @@ public final class If extends Arr {
     Expr e = this;
     if(checkUp(expr[0], ctx).value()) {
       // static result: return then or else branch
-      e = expr[((Item) expr[0]).ebv(ctx, input).bool(input) ? 1 : 2];
+      e = expr[expr[0].ebv(ctx, input).bool(input) ? 1 : 2];
     } else if(expr[1].empty() && expr[2].empty()) {
       // both branches are empty
-      e = Seq.EMPTY;
+      e = Empty.SEQ;
     }
     return optPre(e, ctx);
   }

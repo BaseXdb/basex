@@ -8,7 +8,6 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Date;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.util.Err;
@@ -92,12 +91,12 @@ final class FNFormat extends Fun {
       throws QueryException {
 
     final Item it = expr[0].atomic(ctx, input);
-    if(it == null) return Seq.EMPTY;
+    if(it == null) return null;
     final Date date = (Date) checkType(it, type);
     final String pic = string(checkEStr(expr[1], ctx));
     final byte[] lng = expr.length == 5 ? checkEStr(expr[2], ctx) : EMPTY;
     final byte[] cal = expr.length == 5 ? checkEStr(expr[3], ctx) : EMPTY;
     final byte[] plc = expr.length == 5 ? checkEStr(expr[4], ctx) : EMPTY;
-    return Str.get(DateFormatter.format(input, date, pic, lng, cal, plc));
+    return Str.get(DateFormatter.format(date, pic, lng, cal, plc, input));
   }
 }

@@ -12,7 +12,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -39,7 +39,7 @@ public final class FNSimple extends Fun {
     Iter ir = ctx.iter(expr[0]);
     switch(func) {
       case ONEORMORE:
-        if(expr[0].returned(ctx).mayBeZero()) ir = SeqIter.get(ir);
+        if(expr[0].returned(ctx).mayBeZero()) ir = ItemIter.get(ir);
         if(ir.size() < 1) Err.or(input, EXP1M);
         return ir;
       case UNORDER:

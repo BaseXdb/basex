@@ -19,32 +19,11 @@ public final class ItemList {
 
   /**
    * Adds an item to the list.
-   * @param i Item to add
+   * @param it item to be added
    */
-  public void add(final Item i) {
-    if(size == list.length) {
-      final Item[] tmp = new Item[size << 1];
-      System.arraycopy(list, 0, tmp, 0, size);
-      list = tmp;
-    }
-    list[size++] = i;
-  }
-
-  /**
-   * Returns the length of the list.
-   * @return size
-   */
-  public int size() {
-    return size;
-  }
-
-  /**
-   * Returns the Item at position {@code i}, null if not found.
-   * @param p position.
-   * @return Item {@code i}
-   */
-  public Item get(final int p) {
-    return list[p];
+  public void add(final Item it) {
+    if(size == list.length) list = Item.extend(list);
+    list[size++] = it;
   }
 
   /* for debugging (should be removed later) */

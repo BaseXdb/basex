@@ -249,7 +249,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException { 
-      return Itr.get(check(o, 0, 0, ii));
+      return Itr.get(checkLong(o, 0, 0, ii));
     }
   },
 
@@ -262,7 +262,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, Long.MIN_VALUE, 0, ii), this);
+      return new Itr(checkLong(o, Long.MIN_VALUE, 0, ii), this);
     }
   },
 
@@ -275,7 +275,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, Long.MIN_VALUE, -1, ii), this);
+      return new Itr(checkLong(o, Long.MIN_VALUE, -1, ii), this);
     }
   },
 
@@ -288,7 +288,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, 0, 0, ii), this);
+      return new Itr(checkLong(o, 0, 0, ii), this);
     }
   },
 
@@ -301,7 +301,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, -0x80000000, 0x7FFFFFFF, ii), this);
+      return new Itr(checkLong(o, -0x80000000, 0x7FFFFFFF, ii), this);
     }
   },
 
@@ -314,7 +314,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, -0x8000, 0x7FFF, ii), this);
+      return new Itr(checkLong(o, -0x8000, 0x7FFF, ii), this);
     }
   },
 
@@ -327,7 +327,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, -0x80, 0x7F, ii), this);
+      return new Itr(checkLong(o, -0x80, 0x7F, ii), this);
     }
   },
 
@@ -340,7 +340,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, 0, Long.MAX_VALUE, ii), this);
+      return new Itr(checkLong(o, 0, Long.MAX_VALUE, ii), this);
     }
   },
 
@@ -373,7 +373,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, 0, 0xFFFFFFFFL, ii), this);
+      return new Itr(checkLong(o, 0, 0xFFFFFFFFL, ii), this);
     }
   },
 
@@ -386,7 +386,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, 0, 0xFFFF, ii), this);
+      return new Itr(checkLong(o, 0, 0xFFFF, ii), this);
     }
   },
 
@@ -399,7 +399,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, 0, 0xFF, ii), this);
+      return new Itr(checkLong(o, 0, 0xFF, ii), this);
     }
   },
 
@@ -412,7 +412,7 @@ public enum Type {
     }
     @Override
     public Itr e(final Object o, final InputInfo ii) throws QueryException {
-      return new Itr(check(o, 1, Long.MAX_VALUE, ii), this);
+      return new Itr(checkLong(o, 1, Long.MAX_VALUE, ii), this);
     }
   },
 
@@ -815,7 +815,7 @@ public enum Type {
    * @return integer value
    * @throws QueryException query exception
    */
-  protected final long check(final Object o, final long min,
+  protected final long checkLong(final Object o, final long min,
       final long max, final InputInfo ii) throws QueryException {
 
     final Item it = o instanceof Item ? (Item) o : Str.get(o.toString());

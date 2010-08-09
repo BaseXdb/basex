@@ -11,10 +11,10 @@ import org.basex.query.expr.CElem;
 import org.basex.query.expr.CFrag;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.RenamePrimitive;
@@ -40,7 +40,7 @@ public final class Rename extends Update {
   }
 
   @Override
-  public Seq atomic(final QueryContext ctx, final InputInfo ii)
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
@@ -55,7 +55,7 @@ public final class Rename extends Update {
     } else if(i.type == Type.ATT) {
       ex = new CAttr(input, false, expr[1]);
     } else if(i.type == Type.PI) {
-      ex = new CPI(input, expr[1], Seq.EMPTY);
+      ex = new CPI(input, expr[1], Empty.SEQ);
     } else {
       Err.or(input, UPWRTRGTYP);
     }
@@ -71,7 +71,7 @@ public final class Rename extends Update {
       if(uri != null && !eq(rename.uri.atom(), uri)) Err.or(input, UPNSCONFL);
     }
     ctx.updates.add(new RenamePrimitive(input, targ, rename), ctx);
-    return Seq.EMPTY;
+    return null;
   }
 
   @Override

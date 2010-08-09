@@ -9,7 +9,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -60,16 +60,16 @@ final class FNInfo extends Fun {
           throw ex;
         }
       case TRACE:
-        final Iter ir = SeqIter.get(expr[0].iter(ctx));
+        ItemIter ir = ItemIter.get(expr[0].iter(ctx));
         msg = Token.string(checkEStr(expr[1], ctx)) + " " + ir;
         ctx.evalInfo(msg);
         return ir;
       case ENVS:
-        final SeqIter si = new SeqIter();
+        ir = new ItemIter();
         for(final Object k : System.getenv().keySet().toArray()) {
-          si.add(Str.get(k));
+          ir.add(Str.get(k));
         }
-        return si;
+        return ir;
       default:
         return super.iter(ctx);
     }

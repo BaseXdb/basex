@@ -8,9 +8,9 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
-import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -33,7 +33,7 @@ public final class Var extends ParseExpr {
   /** Variable expressions. */
   public Expr expr;
   /** Variable results. */
-  public Item item;
+  public Value value;
 
   /**
    * Constructor, specifying a global variable.
@@ -89,42 +89,42 @@ public final class Var extends ParseExpr {
    */
   public Var bind(final Expr e, final QueryContext ctx) throws QueryException {
     expr = e;
-    return e.value() ? bind((Item) e, ctx) : this;
+    return e.value() ? bind((Value) e, ctx) : this;
   }
 
   /**
-   * Binds the specified item to the variable.
-   * @param it item to be set
+   * Binds the specified value to the variable.
+   * @param v value to be set
    * @param ctx query context
    * @return self reference
    * @throws QueryException query exception
    */
-  public Var bind(final Item it, final QueryContext ctx) throws QueryException {
-    expr = it;
-    item = cast(it, ctx);
+  public Var bind(final Value v, final QueryContext ctx) throws QueryException {
+    expr = v;
+    value = cast(v, ctx);
     return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    return item(ctx).iter();
+    return value(ctx).iter(ctx);
   }
 
   /**
-   * Evaluates the variable and returns the resulting item.
+   * Evaluates the variable and returns the resulting value.
    * @param ctx query context
    * @return iterator
    * @throws QueryException query exception
    */
-  public Item item(final QueryContext ctx) throws QueryException {
-    if(item == null) {
+  public Value value(final QueryContext ctx) throws QueryException {
+    if(value == null) {
       if(expr == null) Err.or(input, VAREMPTY, this);
-      final Item it = ctx.item;
-      ctx.item = null;
-      item = cast(ctx.iter(expr).finish(), ctx);
-      ctx.item = it;
+      final Value v = ctx.value;
+      ctx.value = null;
+      value = cast(ctx.iter(expr).finish(), ctx);
+      ctx.value = v;
     }
-    return item;
+    return value;
   }
 
   /**
@@ -146,19 +146,19 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Casts the specified item or checks its type.
-   * @param it input item
+   * Casts the specified value or checks its type.
+   * @param v input value
    * @param ctx query context
-   * @return cast item
+   * @return cast value
    * @throws QueryException query exception
    */
-  private Item cast(final Item it, final QueryContext ctx)
+  private Value cast(final Value v, final QueryContext ctx)
       throws QueryException {
 
-    if(type == null) return it;
-    if(!global && type.zeroOrOne() && !it.type.instance(type.type))
-      Err.or(input, XPINVCAST, it.type, type, it);
-    return type.cast(it, ctx, input);
+    if(type == null) return v;
+    if(!global && type.zeroOrOne() && !v.type.instance(type.type))
+      Err.or(input, XPINVCAST, v.type, type, v);
+    return type.cast(v, ctx, input);
   }
 
   /**
@@ -168,7 +168,7 @@ public final class Var extends ParseExpr {
   public Var copy() {
     final Var v = new Var(input, name, type);
     if(global) v.global();
-    v.item = item;
+    v.value = value;
     v.expr = expr;
     v.ret = ret;
     return v;

@@ -8,11 +8,12 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.GroupPartition.GroupNode;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.ItemList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -76,7 +77,7 @@ public class GFLWOR extends ParseExpr {
       where = checkUp(where.comp(ctx), ctx);
       if(where.value()) {
         // test is always false: no results
-        empty = !((Item) where).ebv(ctx, input).bool(input);
+        empty = !where.ebv(ctx, input).bool(input);
         if(!empty) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
@@ -94,14 +95,14 @@ public class GFLWOR extends ParseExpr {
 
     if(empty) {
       ctx.compInfo(OPTFALSE, where);
-      return Seq.EMPTY;
+      return Empty.SEQ;
     }
 
     for(int f = 0; f != fl.length; f++) {
       // remove GFLWOR expression if a FOR clause yields an empty sequence
       if(fl[f].expr.empty() && fl[f] instanceof For) {
         ctx.compInfo(OPTFLWOR);
-        return Seq.EMPTY;
+        return Empty.SEQ;
       }
     }
     return this;
@@ -125,20 +126,20 @@ public class GFLWOR extends ParseExpr {
     final int vs = ctx.vars.size();
     for(final ForLet aFl : fl) ctx.vars.add(aFl.var);
 
-    final SeqIter si = new SeqIter();
-    retG(ctx, si);
+    final ItemIter ir = new ItemIter();
+    retG(ctx, ir);
     ctx.vars.reset(vs);
-    return si;
+    return ir;
 
   }
 
   /**
-   * Returns grouped vars.
+   * Returns grouped variables.
    * @param ctx context.
-   * @param si sequence to be filled.
+   * @param ir sequence to be filled.
    * @throws QueryException on error. 
    */
-  private void retG(final QueryContext ctx, final SeqIter si)
+  private void retG(final QueryContext ctx, final ItemIter ir)
       throws QueryException {
     for(int i = 0; i < group.gp.partitions.size(); i++) { // bind grouping var
       final HashMap<Var, ItemList> ngvars = group.gp.items.get(i);
@@ -148,9 +149,9 @@ public class GFLWOR extends ParseExpr {
       }
       for(final Var ngv : ngvars.keySet()) {
         final ItemList its = ngvars.get(ngv); 
-        ngv.bind(Seq.get(its.list, its.size()), ctx);
+        ngv.bind(Seq.get(its.list, its.size), ctx);
       }
-      si.add(ctx.iter(ret).finish());
+      ir.add(ctx.iter(ret));
     }
   }
 
@@ -170,11 +171,12 @@ public class GFLWOR extends ParseExpr {
       if(more) {
         iter(ctx, cache, it, p + 1);
       } else {
-
         if(where == null || where.ebv(ctx, input).bool(input)) {
           for(final ForLet aFl : fl) {
-            if(order != null) cache.get(aFl.var).add(
-                ctx.vars.get(aFl.var).item(ctx));
+            if(order != null) {
+              // [MS] check if values are always single items (and no sequences)
+              cache.get(aFl.var).add((Item) ctx.vars.get(aFl.var).value(ctx));
+            }
           }
           if(group != null) group.add(ctx);
           if(order != null) order.add(ctx);

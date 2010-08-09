@@ -36,7 +36,7 @@ public final class Switch extends Arr {
       boolean vals = true;
       for(int i = 1; i < el - 1; i += 2) {
         vals &= expr[i].value();
-        if(vals && it.equiv(input, (Item) expr[i])) {
+        if(vals && it.equiv(input, expr[i].atomic(ctx, input))) {
           e = expr[i + 1];
           break;
         }
@@ -49,12 +49,12 @@ public final class Switch extends Arr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item op = expr[0].atomic(ctx, input);
+    final Item it = expr[0].atomic(ctx, input);
     final int el = expr.length;
     for(int i = 1; i < el - 1; i += 2) {
       final Item cs = expr[i].atomic(ctx, input);
       // includes check for empty sequence (null reference)
-      if(op == cs || op.equiv(input, cs)) return ctx.iter(expr[i + 1]);
+      if(it == cs || it.equiv(input, cs)) return ctx.iter(expr[i + 1]);
     }
     // choose default expression
     return ctx.iter(expr[el - 1]);

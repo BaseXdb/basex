@@ -13,7 +13,6 @@ import org.basex.query.item.FPI;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Seq;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
@@ -47,7 +46,7 @@ public final class Replace extends Update {
   }
 
   @Override
-  public Seq atomic(final QueryContext ctx, final InputInfo ii)
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
     if(c.errAtt) Err.or(input, UPNOATTRPER);
@@ -87,7 +86,7 @@ public final class Replace extends Update {
       }
       ctx.updates.add(new ReplacePrimitive(input, targ, list), ctx);
     }
-    return Seq.EMPTY;
+    return null;
   }
 
   @Override

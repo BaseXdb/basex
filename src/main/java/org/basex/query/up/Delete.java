@@ -7,7 +7,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
-import org.basex.query.item.Seq;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.DeletePrimitive;
 import org.basex.query.util.Err;
@@ -30,7 +29,7 @@ public final class Delete extends Update {
   }
 
   @Override
-  public Seq atomic(final QueryContext ctx, final InputInfo ii)
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Iter t = ctx.iter(expr[0]);
     Item i;
@@ -41,7 +40,7 @@ public final class Delete extends Update {
       if(n.parent() == null) continue;
       ctx.updates.add(new DeletePrimitive(input, n), ctx);
     }
-    return Seq.EMPTY;
+    return null;
   }
 
   @Override

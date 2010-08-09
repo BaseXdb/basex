@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -10,8 +9,8 @@ import org.basex.query.QueryException;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -157,7 +156,7 @@ public final class CmpV extends Arr {
 
     Expr e = this;
     if(e1.empty() || e2.empty()) {
-      e = optPre(Seq.EMPTY, ctx);
+      e = optPre(Empty.SEQ, ctx);
     } else if(e1.value() && e2.value()) {
       e = preEval(ctx);
     } else if(e1 instanceof Fun) {
@@ -184,7 +183,7 @@ public final class CmpV extends Arr {
   static Expr count(final Arr e, final Op op) throws QueryException {
     // evaluate argument
     final Expr a = e.expr[1];
-    if(!a.value()) return e;
+    if(!a.item()) return e;
     final Item it = (Item) a;
     if(!it.num() && !it.unt()) return e;
 

@@ -1,12 +1,11 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
@@ -135,13 +134,13 @@ public final class SeqType {
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Item cast(final Item item, final QueryContext ctx, final InputInfo ii)
-      throws QueryException {
+  public Value cast(final Value item, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
 
-    final Iter iter = item.iter();
+    final Iter iter = item.iter(ctx);
     Item it = iter.next();
     if(it == null) {
-      if(mayBeZero()) return Seq.EMPTY;
+      if(mayBeZero()) return Empty.SEQ;
       Err.cast(ii, type, item);
     }
     if(type == Type.EMP) Err.cast(ii, type, item);
@@ -156,15 +155,15 @@ public final class SeqType {
     Item n = iter.next();
     if(zeroOrOne() && n != null) Err.cast(ii, type, item);
 
-    final SeqIter si = new SeqIter();
-    si.add(it);
+    final ItemIter ir = new ItemIter();
+    ir.add(it);
     while(n != null) {
       ins = n.type.instance(type);
       if(!n.unt() && !ins) Err.cast(ii, type, n);
-      si.add(check(ins ? n : type.e(n, ctx, ii), ii));
+      ir.add(check(ins ? n : type.e(n, ctx, ii), ii));
       n = iter.next();
     }
-    return si.finish();
+    return ir.finish();
   }
 
   /**

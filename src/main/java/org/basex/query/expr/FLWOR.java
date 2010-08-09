@@ -6,11 +6,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
+import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -67,7 +66,7 @@ public class FLWOR extends ParseExpr {
       where = checkUp(where, ctx).comp(ctx);
       if(where.value()) {
         // test is always false: no results
-        empty = !((Item) where).ebv(ctx, input).bool(input);
+        empty = !where.ebv(ctx, input).bool(input);
         if(!empty) {
           // always true: test can be skipped
           ctx.compInfo(OPTTRUE, where);
@@ -83,14 +82,14 @@ public class FLWOR extends ParseExpr {
 
     if(empty) {
       ctx.compInfo(OPTFALSE, where);
-      return Seq.EMPTY;
+      return Empty.SEQ;
     }
 
     for(final ForLet f : fl) {
       // remove FLWOR expression if a FOR clause yields an empty sequence
       if(f.expr.empty() && f instanceof For) {
         ctx.compInfo(OPTFLWOR);
-        return Seq.EMPTY;
+        return Empty.SEQ;
       }
     }
     return this;
@@ -98,33 +97,33 @@ public class FLWOR extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final SeqIter seq = new SeqIter();
+    final ValueList vl = new ValueList();
     final Iter[] iter = new Iter[fl.length];
     for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
-    iter(ctx, seq, iter, 0);
-    order.sq = seq;
+    iter(ctx, vl, iter, 0);
+    order.vl = vl;
     return ctx.iter(order);
   }
 
   /**
    * Performs a recursive iteration on the specified variable position.
    * @param ctx root reference
-   * @param seq result sequence
-   * @param it iterator
+   * @param vl value lists
+   * @param it iterators
    * @param p variable position
    * @throws QueryException query exception
    */
-  private void iter(final QueryContext ctx, final SeqIter seq,
+  private void iter(final QueryContext ctx, final ValueList vl,
       final Iter[] it, final int p) throws QueryException {
 
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {
       if(more) {
-        iter(ctx, seq, it, p + 1);
+        iter(ctx, vl, it, p + 1);
       } else {
         if(where == null || where.ebv(ctx, input).bool(input)) {
           order.add(ctx);
-          seq.add(ctx.iter(ret).finish());
+          vl.add(ctx.iter(ret).finish());
         }
       }
     }

@@ -418,9 +418,6 @@ public interface QueryText {
   /** XPTY0019: Typing exception. */
   Object[] NODESPATH = { XPTY, 19, "Context node required for %; % found." };
 
-  /** XPDY0095: resulting value for any grouping variable >> 1 item. */
-  Object[] XGRP = { XQDY, 95, "No sequence allowed as grouping variable."};
-
   /** XPDY0002: Parsing exception. */
   Object[] VAREMPTY = { XQDY, 2, "No value defined for \"%\"." };
   /** XQDY0026: Evaluation exception. */
@@ -436,6 +433,8 @@ public interface QueryText {
   Object[] COMINVALID = { XQDY, 72, "Invalid comment." };
   /** XQDY0074: Evaluation exception. */
   Object[] INVAL = { XQDY, 74, "Invalid name: \"%\"" };
+  /** XPDY0095: resulting value for any grouping variable >> 1 item. */
+  Object[] XGRP = { XQDY, 95, "No sequence allowed as grouping variable."};
 
   /** XQST0009: Parsing exception. */
   Object[] IMPLSCHEMA = { XQST, 9, "Schema import not supported." };

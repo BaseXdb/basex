@@ -46,10 +46,10 @@ public final class StopWords extends TokenSet {
    */
   void comp(final QueryContext ctx) {
     // stop words have already been defined..
-    if(size() != 0 || !(ctx.item instanceof DBNode)) return;
+    if(size() != 0 || !(ctx.value instanceof DBNode)) return;
     // try to parse the stop words file of the current database
     try {
-      final Data data = ((DBNode) ctx.item).data;
+      final Data data = ((DBNode) ctx.value).data;
       final File file = data.meta.file(DATASWL);
       if(!file.exists()) return;
       final DataInput in = new DataInput(data.meta.file(DATASWL));

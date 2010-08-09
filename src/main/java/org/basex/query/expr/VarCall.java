@@ -53,7 +53,7 @@ public final class VarCall extends ParseExpr {
     Expr e = var.expr;
     if(ctx.nsElem.length != 0 || lc.size() != 0 || var.type != null ||
         var.global || e.uses(Use.FRG, ctx) || e instanceof FunCall) {
-      e = var.item(ctx);
+      e = var.value(ctx);
     }
     ctx.ns = lc;
     return e;

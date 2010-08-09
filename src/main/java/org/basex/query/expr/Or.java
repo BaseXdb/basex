@@ -9,7 +9,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
-import org.basex.query.iter.SeqIter;
+import org.basex.query.iter.ItemIter;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -60,7 +60,7 @@ public final class Or extends Arr {
     for(final Expr e : expr) if(!(e instanceof CmpG)) return this;
 
     final CmpG e1 = (CmpG) expr[0];
-    final SeqIter cmp = new SeqIter();
+    final ItemIter cmp = new ItemIter();
 
     for(final Expr e : expr) {
       // check comparison operators and left operands for equality

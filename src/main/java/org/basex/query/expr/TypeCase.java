@@ -5,9 +5,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -42,16 +43,16 @@ public final class TypeCase extends Single {
   /**
    * Compiles the expression.
    * @param ctx query context
-   * @param it item to be bound
+   * @param v value to be bound
    * @return resulting item
    * @throws QueryException query exception
    */
-  TypeCase comp(final QueryContext ctx, final Item it) throws QueryException {
+  TypeCase comp(final QueryContext ctx, final Value v) throws QueryException {
     if(var.name == null) {
       super.comp(ctx);
     } else {
       final int s = ctx.vars.size();
-      ctx.vars.add(it == null ? var : var.bind(it, ctx).copy());
+      ctx.vars.add(v == null ? var : var.bind(v, ctx).copy());
       super.comp(ctx);
       ctx.vars.reset(s);
     }
@@ -82,9 +83,9 @@ public final class TypeCase extends Single {
 
     final int s = ctx.vars.size();
     ctx.vars.add(var.bind(seq.finish(), ctx).copy());
-    final Item im = ctx.iter(expr).finish();
+    final ItemIter ir = ItemIter.get(ctx.iter(expr));
     ctx.vars.reset(s);
-    return im.iter();
+    return ir;
   }
 
   @Override

@@ -8,7 +8,7 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.expr.Root;
-import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -35,10 +35,10 @@ abstract class Path extends ParseExpr {
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
     if(root != null) root = checkUp(root, ctx).comp(ctx);
-    final Item ci = ctx.item;
-    ctx.item = root(ctx);
+    final Value vi = ctx.value;
+    ctx.value = root(ctx);
     final Expr e = compPath(ctx);
-    ctx.item = ci;
+    ctx.value = vi;
     if(root instanceof Context) root = null;
     return e;
   }
@@ -57,12 +57,12 @@ abstract class Path extends ParseExpr {
    * @param ctx query context
    * @return root
    */
-  protected final Item root(final QueryContext ctx) {
-    final Item it = ctx != null ? ctx.item : null;
-    if(root == null) return it;
-    if(root.value()) return (Item) root;
-    if(!(root instanceof Root) || it == null) return null;
-    return it.size(ctx) != 1 ? it : ((Root) root).root(it);
+  protected final Value root(final QueryContext ctx) {
+    final Value v = ctx != null ? ctx.value : null;
+    if(root == null) return v;
+    if(root.value()) return (Value) root;
+    if(!(root instanceof Root) || v == null) return null;
+    return v.size(ctx) != 1 ? v : ((Root) root).root(v);
   }
 
   /**

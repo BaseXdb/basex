@@ -3,9 +3,9 @@ package org.basex.query.expr;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.RangeIter;
@@ -34,12 +34,12 @@ public final class Range extends Arr {
 
     Expr e = this;
     if(expr[0].empty() || expr[1].empty()) {
-      e = Seq.EMPTY;
+      e = Empty.SEQ;
     } else {
       final long[] v = range(ctx);
       if(v != null) {
         if(v[0] == v[1]) e = Itr.get(v[0]);
-        if(v[0] >  v[1]) e = Seq.EMPTY;
+        if(v[0] >  v[1]) e = Empty.SEQ;
       }
     }
     return optPre(e, ctx);
@@ -49,7 +49,7 @@ public final class Range extends Arr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final long[] v = rng(ctx);
     return v == null || v[0] > v[1] ? Iter.EMPTY :
-      v[0] == v[1] ? Itr.get(v[0]).iter() : new RangeIter(v[0], v[1]);
+      v[0] == v[1] ? Itr.get(v[0]).iter(ctx) : new RangeIter(v[0], v[1]);
   }
 
   @Override
