@@ -120,8 +120,8 @@ final class FNId extends Fun {
       while((at = atts.next()) != null) {
         if(eq(at.qname().atom(), LANG)) {
           final byte[] ln = lc(norm(checkStrEmp(at)));
-          return startsWith(ln, lang) && (lang.length == ln.length ||
-              ln[lang.length] == '-') ? Bln.TRUE : Bln.FALSE;
+          return Bln.get(startsWith(ln, lang)
+              && (lang.length == ln.length || ln[lang.length] == '-'));
         }
       }
     }
