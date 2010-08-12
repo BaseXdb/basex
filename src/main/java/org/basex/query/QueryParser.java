@@ -35,7 +35,6 @@ import org.basex.query.expr.ForLet;
 import org.basex.query.expr.Func;
 import org.basex.query.expr.GFLWOR;
 import org.basex.query.expr.Group;
-import org.basex.query.expr.GroupBy;
 import org.basex.query.expr.If;
 import org.basex.query.expr.Instance;
 import org.basex.query.expr.InterSect;
@@ -760,7 +759,7 @@ public class QueryParser extends InputParser {
       alter = NOWHERE;
     }
 
-    GroupBy[] group = null;
+    Var[] group = null;
     if(consumeWS(GROUP)) {
       check(BY);
       ap = qp;
@@ -879,15 +878,13 @@ public class QueryParser extends InputParser {
    * @return new group array
    * @throws QueryException query exception
    */
-  private GroupBy[] groupSpec(final GroupBy[] group) throws QueryException {
+  private Var[] groupSpec(final Var[] group) throws QueryException {
     final Var v = new Var(input(), varName());
     if(consumeWS(COLLATION)) {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
-
-    final GroupBy grp = new GroupBy(input(), v);
-    return group == null ? new GroupBy[] { grp } : Array.add(group, grp);
+    return group == null ? new Var[] { v } : Array.add(group, v);
   }
 
   /**

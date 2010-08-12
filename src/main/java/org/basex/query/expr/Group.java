@@ -19,17 +19,9 @@ import org.basex.util.InputInfo;
  */
 public final class Group extends ParseExpr {
 
-//  /** Sequence to be grouped. */
-//  SeqIter sq;
-
   /** Group by specification. */
-  private final GroupBy[] groupby;
+  private final Var[] groupby;
 
-//  /**
-//   * Post grouped tuples. [MS] remove this
-//   */
-//  HashMap<String, ArrayList<Item>> groups;
-//
 
   /** Grouping partition. **/
   GroupPartition gp;
@@ -39,7 +31,7 @@ public final class Group extends ParseExpr {
    * @param ii input info
    * @param gb group by expression
    */
-  public Group(final InputInfo ii, final GroupBy[] gb) {
+  public Group(final InputInfo ii, final Var[] gb) {
     super(ii);
     groupby = gb;
 
@@ -50,9 +42,9 @@ public final class Group extends ParseExpr {
    */
   public void initgroup(final ForLet[] fl) {
     final Var[] vs = new Var[groupby.length];
-    final Var[] fs = new Var[fl.length];
+    Var[] fs = new Var[fl.length];
     for(int i = 0; i < groupby.length; i++) {
-      vs[i] = groupby[i].expr;
+      vs[i] = groupby[i];
     }
     for(int i = 0; i < fl.length; i++)
       fs[i] = fl[i].var;
@@ -62,7 +54,7 @@ public final class Group extends ParseExpr {
   }
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(final GroupBy g : groupby)
+    for(final Var g : groupby)
       g.comp(ctx);
     return this;
   }
@@ -81,14 +73,14 @@ public final class Group extends ParseExpr {
 
   @Override
   public boolean uses(final Use use, final QueryContext ctx) {
-    for(final GroupBy g : groupby)
+    for(final Var g : groupby)
       if(g.uses(use, ctx)) return true;
     return false;
   }
 
   @Override
   public boolean removable(final Var v, final QueryContext ctx) {
-    for(final GroupBy g : groupby) if(!g.removable(v, ctx)) return false;
+    for(final Var g : groupby) if(!g.removable(v, ctx)) return false;
     return true;
   }
 

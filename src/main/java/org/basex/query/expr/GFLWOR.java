@@ -118,7 +118,7 @@ public class GFLWOR extends ParseExpr {
       iter[f] = ctx.iter(fl[f]);
       if(group != null) cache.put(fl[f].var, new ItemList());
     }
-
+    
     // evaluate pre grouping tuples
     group.initgroup(fl);
     iter(ctx, cache, iter, 0);
@@ -141,15 +141,23 @@ public class GFLWOR extends ParseExpr {
    */
   private void retG(final QueryContext ctx, final ItemIter ir)
       throws QueryException {
+    Var[] pgvars = new Var[group.gp.gv.length];
+    Var[] pgngvar = new Var[group.gp.ngv.length];
+    for(int j = 0; j <  group.gp.gv.length; j++) 
+      pgvars[j] = ctx.vars.get(group.gp.gv[j]);
+    for(int j = 0; j <  group.gp.ngv.length; j++) 
+      pgngvar[j] = ctx.vars.get(group.gp.ngv[j]);
+
     for(int i = 0; i < group.gp.partitions.size(); i++) { // bind grouping var
       final HashMap<Var, ItemList> ngvars = group.gp.items.get(i);
       final GroupNode gn =  group.gp.partitions.get(i);
+      for(int j = 0; j < group.gp.gv.length; j++)
+        pgvars[j].bind(gn.its[j], ctx);
+
       for(int j = 0; j < group.gp.gv.length; j++) {
-        group.gp.gv[j].bind(gn.its[j], ctx);
-      }
-      for(final Var ngv : ngvars.keySet()) {
-        final ItemList its = ngvars.get(ngv); 
-        ngv.bind(Seq.get(its.list, its.size), ctx);
+        final ItemList its = ngvars.get(group.gp.ngv[j]); 
+        pgngvar[j].bind(
+            Seq.get(its.list, its.size), ctx);
       }
       ir.add(ctx.iter(ret));
     }
@@ -197,7 +205,8 @@ public class GFLWOR extends ParseExpr {
       if(f.shadows(v)) return true;
     }
     return (where == null || where.removable(v, ctx))
-        && (order == null || order.removable(v, ctx)) && ret.removable(v, ctx);
+        && (order == null || order.removable(v, ctx))
+        && (group == null || group.removable(v, ctx)) && ret.removable(v, ctx);
   }
 
   @Override
