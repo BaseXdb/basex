@@ -95,27 +95,23 @@ Section "Hauptgruppe" SEC01
   File "License.txt"
   File ".basex"
   nsExec::Exec "java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData"
-  !insertmacro MUI_INSTALLOPTIONS_READ $R3 "Options" "Field 6" "State"
-  ${If} $R3 == 1
-  CreateDirectory "$SMPROGRAMS\BaseX"
-  CreateShortCut "$SMPROGRAMS\BaseX\BaseX.lnk" "$INSTDIR\${JAR}" "" "$INSTDIR\BaseX.ico" 0
-  ${Else}
-  ${EndIf}
-  ${If} $R3 == 1
-  CreateShortCut "$DESKTOP\BaseX.lnk" "$INSTDIR\${JAR}" "" "$INSTDIR\BaseX.ico" 0
-  ${EndIf}
   File "jsl.exe"
   File "jsl.ini"
 SectionEnd
 
 Section -AdditionalIcons
   !insertmacro MUI_INSTALLOPTIONS_READ $R4 "Options" "Field 7" "State"
-  WriteIniStr "$INSTDIR\BaseX.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
+  !insertmacro MUI_INSTALLOPTIONS_READ $R3 "Options" "Field 6" "State"
+  ${If} $R3 == 1
+    CreateShortCut "$DESKTOP\BaseX.lnk" "$INSTDIR\${JAR}" "" "$INSTDIR\BaseX.ico" 0
+  ${EndIf}
   ${If} $R4 == 1
-  CreateShortCut "$SMPROGRAMS\BaseX\Website.lnk" "$INSTDIR\BaseX.url" "" "$INSTDIR\BaseX.url" 0
-  CreateShortCut "$SMPROGRAMS\BaseX\StartService.lnk" "$INSTDIR\StartService.bat"
-  CreateShortCut "$SMPROGRAMS\BaseX\StopService.lnk" "$INSTDIR\StopService.bat"
-  CreateShortCut "$SMPROGRAMS\BaseX\Uninstall.lnk" "$INSTDIR\uninst.exe"
+    CreateDirectory "$SMPROGRAMS\BaseX"
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX.lnk" "$INSTDIR\${JAR}" "" "$INSTDIR\BaseX.ico" 0
+    WriteINIStr "$SMPROGRAMS\BaseX\Website.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
+    CreateShortCut "$SMPROGRAMS\BaseX\StartService.lnk" "$INSTDIR\StartService.bat"
+    CreateShortCut "$SMPROGRAMS\BaseX\StopService.lnk" "$INSTDIR\StopService.bat"
+    CreateShortCut "$SMPROGRAMS\BaseX\Uninstall.lnk" "$INSTDIR\uninst.exe"
   ${EndIf}
 SectionEnd
 
@@ -155,12 +151,12 @@ Section Uninstall
   Delete "$INSTDIR\UninstallService.bat"
   Delete "$INSTDIR\License.txt"
 
-  Delete "$SMPROGRAMS\BaseX\Uninstall.lnk"
-  Delete "$SMPROGRAMS\BaseX\Website.lnk"
   Delete "$DESKTOP\BaseX.lnk"
+  Delete "$SMPROGRAMS\BaseX\BaseX.lnk"
+  Delete "$SMPROGRAMS\BaseX\Website.url"
+  Delete "$SMPROGRAMS\BaseX\Uninstall.lnk"
   Delete "$SMPROGRAMS\BaseX\StartService.lnk"
   Delete "$SMPROGRAMS\BaseX\StopService.lnk"
-  Delete "$SMPROGRAMS\BaseX\BaseX.lnk"
 
   RMDir "$SMPROGRAMS\BaseX"
   RMDir "$INSTDIR"
