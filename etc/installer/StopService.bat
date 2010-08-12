@@ -1,0 +1,1 @@
+NET stop BaseXServer
