@@ -11,7 +11,8 @@ NOTES --------------------------------------------------------------------------
 
 The installer automatically gets the basex*.jar from the target folder.
 Furthermore it gets the BaseX.ico-File from the images folder.
-For each new version the version name in the BaseX.nsi-File has to be set.
+For each new version the version name in the BaseX.nsi-File and
+the jsi.ini-File has to be set.
 
 The installed Service can be found in the Service Directory under the
 name 'BaseXServer'. The DBPath and Home Directory of the service are the
@@ -23,7 +24,7 @@ BaseX.nsi: Main installer file with all functions and definitions.
 Options.ini: Custom Options panel for Installation options.
 Jsl.exe: Java Service Launcher (http://jslwin.sourceforge.net)
 Jsl.ini: Configuration file for JSL
-.basex: Needed as flag for the right Home-Folder Configuration
+.basex: Flag for the right Home-Folder Configuration
 
 --------------------------------------------------------------------------------
  

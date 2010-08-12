@@ -134,8 +134,8 @@ FunctionEnd
 Function un.onInit
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "All components of $(^Name) will be uninstalled?" IDYES +2
   Abort
-  nsExec::Exec "stopService.bat"
-  nsExec::Exec "UninstallService.bat"
+  nsExec::Exec "$INSTDIR\StopService.bat"
+  nsExec::Exec "$INSTDIR\jsl.exe -remove"
 FunctionEnd
 
 Section Uninstall
