@@ -114,17 +114,16 @@ final class FNId extends Fun {
    * @throws QueryException query exception
    */
   private Bln lang(final byte[] lang, final Nod node) throws QueryException {
-    Nod n = node;
-    while(n != null) {
+    for(Nod n = node; n != null; n = n.parent()) {
       final NodeIter atts = n.attr();
       Nod at;
       while((at = atts.next()) != null) {
-        if(!eq(at.qname().atom(), LANG)) continue;
-        final byte[] ln = lc(norm(checkStrEmp(at)));
-        if(startsWith(ln, lang) && (lang.length == ln.length ||
-            !letter(ln[lang.length]))) return Bln.TRUE;
+        if(eq(at.qname().atom(), LANG)) {
+          final byte[] ln = lc(norm(checkStrEmp(at)));
+          return startsWith(ln, lang) && (lang.length == ln.length ||
+              ln[lang.length] == '-') ? Bln.TRUE : Bln.FALSE;
+        }
       }
-      n = n.parent();
     }
     return Bln.FALSE;
   }

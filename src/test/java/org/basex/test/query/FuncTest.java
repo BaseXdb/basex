@@ -9,7 +9,9 @@ package org.basex.test.query;
 public final class FuncTest extends QueryTest {
   /** Constructor. */
   static {
-    doc = "<html/>";
+    doc = "<desclist xml:lang='en'><desc xml:lang='en-US'>" +
+        "<line>A line of text.</line></desc><desc xml:lang='fr'>" +
+        "<line>Une ligne de texte.</line></desc></desclist>";
 
     queries = new Object[][] {
       { "count 1", "count()" },
@@ -170,12 +172,30 @@ public final class FuncTest extends QueryTest {
       { "formdate 230", str("12/31/2002 at 15:58:45"),
         "format-dateTime(xs:dateTime('2002-12-31T15:58:45.762+02:00'), " +
         "'[M01]/[D01]/[Y0001] at [H01]:[m01]:[s01]')" },
+      
+      // http://www.xqueryfunctions.com/xq/fn_lang.html
+      { "lang 1", nod(3), "//desc[lang('en')]" },
+      { "lang 2", nod(3), "//desc[lang('en-US')]" },
+      { "lang 3", nod(7), "//desc[lang('fr')]" },
+      { "lang 4", nod(5), "//desc/line[lang('en')]" },
+      { "lang 5", nod(),  "/.[lang('en-US')]" },
+      { "lang 6", nod(7), "//desc[lang('FR')]" },
     };
   }
 
   /* TABLE REPRESENTATION
-  PRE PAR  TYPE  CONTENT
-    0  -1  DOC   test.xml
-    1   0  ELEM  html
+  PRE  DIS  SIZ  ATS  NS  KIND  CONTENT              
+  -------------------------------------------------
+    0    1   11    1  +0  DOC   test.xml                
+    1    1   10    2   0  ELEM  desclist             
+    2    1    1    1   0  ATTR  xml:lang="en"        
+    3    2    4    2   0  ELEM  desc                 
+    4    1    1    1   0  ATTR  xml:lang="en-US"     
+    5    2    2    1   0  ELEM  line                 
+    6    1    1    1   0  TEXT  A line of text.      
+    7    6    4    2   0  ELEM  desc                 
+    8    1    1    1   0  ATTR  xml:lang="fr"        
+    9    2    2    1   0  ELEM  line                 
+   10    1    1    1   0  TEXT  Une ligne de texte.  
   */
 }
