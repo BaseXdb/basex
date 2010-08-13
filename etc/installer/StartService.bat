@@ -1,1 +1,1 @@
-NET start BaseXServer
+Service.exe start

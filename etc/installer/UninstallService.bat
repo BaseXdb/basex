@@ -1,1 +1,1 @@
-jsl.exe -remove
+Service.exe uninstall

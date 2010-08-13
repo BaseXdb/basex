@@ -22,8 +22,9 @@ FILES --------------------------------------------------------------------------
 
 BaseX.nsi: Main installer file with all functions and definitions.
 Options.ini: Custom Options panel for Installation options.
-Jsl.exe: Java Service Launcher (http://jslwin.sourceforge.net)
-Jsl.ini: Configuration file for JSL
+Service.exe: Windows Service Wrapper (http://kenai.com/projects/winsw/pages/Home)
+Service.xml: Configuration file for Windows Service Wrapper
+BaseXServer.bat: Batch for starting and stopping the BaseXServer
 .basex: Flag for the right Home-Folder Configuration
 
 --------------------------------------------------------------------------------

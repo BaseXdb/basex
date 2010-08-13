@@ -1,1 +1,1 @@
-NET stop BaseXServer
+Service.exe stop

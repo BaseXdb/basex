@@ -1,1 +1,1 @@
-jsl.exe -install
+Service.exe install

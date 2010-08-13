@@ -42,7 +42,7 @@ Page custom OptionsPage OptionsLeave
 !insertmacro MUI_PAGE_FINISH
 
 Function install_service
-         nsExec::Exec '"InstallService.bat"'
+         nsExec::Exec 'InstallService.bat'
 FunctionEnd
 
 Function run_basex
@@ -62,7 +62,7 @@ Function OptionsLeave
 !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Options" "Field 3" "State"
         ${If} $R1 == $R0
               ${If} $R0 != "admin"
-                    nsExec::Exec '"java -cp ${JAR} org.basex.BaseX -c alter user admin $R0"'
+                    nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -c alter user admin $R0'
               ${EndIf}
         ${Else}
           MessageBox MB_OK "Passwords do not match."
@@ -96,9 +96,10 @@ Section "Hauptgruppe" SEC01
   File "UninstallService.bat"
   File "License.txt"
   File ".basex"
-  nsExec::Exec '"java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData"'
-  File "jsl.exe"
-  File "jsl.ini"
+  nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
+  File "Service.exe"
+  File "Service.xml"
+  File "BaseXServer.bat"
 SectionEnd
 
 Section -AdditionalIcons
@@ -121,7 +122,6 @@ Section -Post
   WriteUninstaller "$INSTDIR\uninst.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\jsl.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
@@ -136,21 +136,22 @@ FunctionEnd
 Function un.onInit
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "All components of $(^Name) will be uninstalled?" IDYES +2
   Abort
-  nsExec::Exec '"$INSTDIR\StopService.bat"'
-  nsExec::Exec '"$INSTDIR\jsl.exe -remove"'
+  nsExec::Exec '$INSTDIR\StopService.bat'
+  nsExec::Exec '$INSTDIR\UninstallService.bat'
 FunctionEnd
 
 Section Uninstall
   Delete "$INSTDIR\${PRODUCT_NAME}.url"
   Delete "$INSTDIR\uninst.exe"
-  Delete "$INSTDIR\jsl.ini"
-  Delete "$INSTDIR\jsl.exe"
+  Delete "$INSTDIR\Service.xml"
+  Delete "$INSTDIR\Service.exe"
   Delete "$INSTDIR\${JAR}"
   Delete "$INSTDIR\BaseX.ico"
   Delete "$INSTDIR\StartService.bat"
   Delete "$INSTDIR\StopService.bat"
   Delete "$INSTDIR\InstallService.bat"
   Delete "$INSTDIR\UninstallService.bat"
+  Delete "$INSTDIR\BaseXServer.bat"
   Delete "$INSTDIR\License.txt"
 
   Delete "$DESKTOP\BaseX.lnk"
