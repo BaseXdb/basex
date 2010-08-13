@@ -28,16 +28,6 @@
       <name>DBIS Maven Repository</name>
       <url>http://www.inf.uni-konstanz.de/dbis/basex/maven</url>
     </repository>
-    <repository>
-      <id>disy-ukn</id>
-      <name>DISY Maven Repository</name>
-      <url>http://xen5.disy.inf.uni-konstanz.de/repo/repository</url>
-    </repository>
-    <repository>
-      <id>disy-ukn-snap</id>
-      <name>DISY Maven Snapshot Repository</name>
-      <url>http://xen5.disy.inf.uni-konstanz.de/repo/snapshotRepository</url>
-    </repository>
   </repositories>
   <organization>
     <name>Chair for Database and Information Systems, U Konstanz</name>
