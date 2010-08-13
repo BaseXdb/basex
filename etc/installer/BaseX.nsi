@@ -7,6 +7,8 @@
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
+RequestExecutionLevel admin
+
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
 
@@ -40,7 +42,7 @@ Page custom OptionsPage OptionsLeave
 !insertmacro MUI_PAGE_FINISH
 
 Function install_service
-         nsExec::Exec "InstallService.bat"
+         nsExec::Exec '"InstallService.bat"'
 FunctionEnd
 
 Function run_basex
@@ -60,7 +62,7 @@ Function OptionsLeave
 !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Options" "Field 3" "State"
         ${If} $R1 == $R0
               ${If} $R0 != "admin"
-                    nsExec::Exec "java -cp ${JAR} org.basex.BaseX -c alter user admin $R0"
+                    nsExec::Exec '"java -cp ${JAR} org.basex.BaseX -c alter user admin $R0"'
               ${EndIf}
         ${Else}
           MessageBox MB_OK "Passwords do not match."
@@ -94,7 +96,7 @@ Section "Hauptgruppe" SEC01
   File "UninstallService.bat"
   File "License.txt"
   File ".basex"
-  nsExec::Exec "java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData"
+  nsExec::Exec '"java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData"'
   File "jsl.exe"
   File "jsl.ini"
 SectionEnd
@@ -134,8 +136,8 @@ FunctionEnd
 Function un.onInit
   MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "All components of $(^Name) will be uninstalled?" IDYES +2
   Abort
-  nsExec::Exec "$INSTDIR\StopService.bat"
-  nsExec::Exec "$INSTDIR\jsl.exe -remove"
+  nsExec::Exec '"$INSTDIR\StopService.bat"'
+  nsExec::Exec '"$INSTDIR\jsl.exe -remove"'
 FunctionEnd
 
 Section Uninstall
