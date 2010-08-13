@@ -79,7 +79,7 @@
       <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>jax-rx</groupId>
+      <groupId>org.jaxrx</groupId>
       <artifactId>jax-rx</artifactId>
       <version>1.2.1</version>
     </dependency>
