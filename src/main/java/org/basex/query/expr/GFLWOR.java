@@ -153,11 +153,13 @@ public class GFLWOR extends ParseExpr {
       final GroupNode gn =  group.gp.partitions.get(i);
       for(int j = 0; j < group.gp.gv.length; j++)
         pgvars[j].bind(gn.its[j], ctx);
-
-      for(int j = 0; j < group.gp.gv.length; j++) {
-        final ItemList its = ngvars.get(group.gp.ngv[j]); 
+      
+      for(int j = 0; j < group.gp.ngv.length; j++) {
+        final ItemList its = ngvars.get(group.gp.ngv[j]);
+        if(its != null)
         pgngvar[j].bind(
             Seq.get(its.list, its.size), ctx);
+        else pgngvar[j].bind(Seq.get(null, 0), ctx);
       }
       ir.add(ctx.iter(ret));
     }
