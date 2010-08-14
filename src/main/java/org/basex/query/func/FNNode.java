@@ -11,7 +11,9 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
+import static org.basex.util.Token.*;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -48,10 +50,18 @@ final class FNNode extends Fun {
         if(empty) return null;
         final byte[] uri = checkNode(it).base();
         return uri.length == 0 ? null : Uri.uri(uri);
-      case NILLED: // [CG] XQuery: nilled flag
+      case NILLED:
         if(empty) return null;
-        checkNode(it);
-        return it.type != Type.ELM ? null : Bln.FALSE;
+        final Nod nilled = checkNode(it);
+        if(it.type != Type.ELM) return Bln.FALSE;
+        final NodeIter atts = nilled.attr();
+        for(Nod att; (att = atts.next()) != null;) {
+          if(eq(att.qname().atom(), QueryTokens.NIL)
+              && eq(lc(trim(att.atom())), TRUE)) {
+            return Bln.TRUE;
+          }
+        }
+        return Bln.FALSE;
       case BASEURI:
         if(empty) return null;
         Nod n = checkNode(it);

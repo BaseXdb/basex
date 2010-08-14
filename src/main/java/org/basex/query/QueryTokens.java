@@ -416,6 +416,8 @@ public interface QueryTokens {
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
+  /** NIL attribute. */
+  byte[] NIL = token("xsi:nil");
 
   // QUERY PLAN ===============================================================
 

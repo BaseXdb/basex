@@ -2,6 +2,8 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
+import java.text.Normalizer;
 import java.util.Arrays;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -23,8 +25,6 @@ import org.basex.util.XMLToken;
  * @author Christian Gruen
  */
 final class FNStr extends Fun {
-  /** Normalization types. */
-  private static final String[] NORMS = { "NFC", "NFD", "NFKC", "NFKD", "" };
 
   /**
    * Constructor.
@@ -262,14 +262,18 @@ final class FNStr extends Fun {
    */
   private Item normuni(final QueryContext ctx) throws QueryException {
     final byte[] str = checkEStr(expr[0], ctx);
-    String nr = null;
+    Normalizer.Form nr = null;
     if(expr.length == 2) {
-      final String n = string(uc(trim(checkStr(expr[1], ctx))));
-      for(final String nrm : NORMS) if(nrm.equals(n)) nr = nrm;
-      if(nr == null) Err.or(input, NORMUNI, n);
+      final byte[] n = uc(trim(checkStr(expr[1], ctx)));
+      if(n.length == 0) return Str.get(str);
+      try {
+        nr = Normalizer.Form.valueOf(string(n));
+      } catch(final IllegalArgumentException e) {
+        Err.or(input, NORMUNI, n);
+      }
     }
-    // [CG] XQuery: normalize-unicode()
-    return Str.get(str);
+    if(nr == null) nr = Normalizer.Form.NFC;
+    return Str.get(Normalizer.normalize(string(str), nr));
   }
 
   /**
