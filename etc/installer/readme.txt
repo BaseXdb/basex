@@ -12,7 +12,7 @@ NOTES --------------------------------------------------------------------------
 The installer automatically gets the basex*.jar from the target folder.
 Furthermore it gets the BaseX.ico-File from the images folder.
 For each new version the version name in the BaseX.nsi-File and
-the jsi.ini-File has to be set.
+the service\wrapper.conf-File has to be set.
 
 The installed Service can be found in the Service Directory under the
 name 'BaseXServer'. The DBPath and Home Directory of the service are the
@@ -22,9 +22,7 @@ FILES --------------------------------------------------------------------------
 
 BaseX.nsi: Main installer file with all functions and definitions.
 Options.ini: Custom Options panel for Installation options.
-Service.exe: Windows Service Wrapper (http://kenai.com/projects/winsw/pages/Home)
-Service.xml: Configuration file for Windows Service Wrapper
-BaseXServer.bat: Batch for starting and stopping the BaseXServer
+service: Folder for yajsw (http://yajsw.sourceforge.net)
 .basex: Flag for the right Home-Folder Configuration
 
 --------------------------------------------------------------------------------

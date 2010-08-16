@@ -1,9 +1,0 @@
-<service>
-  <id>BaseXServer</id>
-  <name>BaseXServer</name>
-  <description>Servicemode of BaseXServer</description>
-  <executable>%BASE%\BaseXServer.bat</executable>
-  <logmode>reset</logmode>
-  <startargument>start</startargument>
-  <stopargument>stop</stopargument>
-</service>

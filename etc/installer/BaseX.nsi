@@ -42,7 +42,7 @@ Page custom OptionsPage OptionsLeave
 !insertmacro MUI_PAGE_FINISH
 
 Function install_service
-         nsExec::Exec 'InstallService.bat'
+         nsExec::Exec '$INSTDIR\service\installService.bat'
 FunctionEnd
 
 Function run_basex
@@ -90,16 +90,41 @@ Section "Hauptgruppe" SEC01
   SetOverwrite ifnewer
   File "..\..\target\${JAR}"
   File "..\images\BaseX.ico"
-  File "StartService.bat"
-  File "StopService.bat"
-  File "InstallService.bat"
-  File "UninstallService.bat"
   File "License.txt"
   File ".basex"
   nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
-  File "Service.exe"
-  File "Service.xml"
-  File "BaseXServer.bat"
+  SetOutPath "$INSTDIR\service\lib\core\commons"
+  File "service\lib\core\commons\commons-cli-2.jar"
+  File "service\lib\core\commons\commons-codec-1.3.jar"
+  File "service\lib\core\commons\commons-collections-3.2.jar"
+  File "service\lib\core\commons\commons-configuration-1.7-SNAPSHOT.jar"
+  File "service\lib\core\commons\commons-httpclient-3.0.1.jar"
+  File "service\lib\core\commons\commons-io-1.3.1.jar"
+  File "service\lib\core\commons\commons-jexl-1.1.jar"
+  File "service\lib\core\commons\commons-lang-2.4.jar"
+  File "service\lib\core\commons\commons-logging-1.1.jar"
+  File "service\lib\core\commons\commons-net-1.4.1.jar"
+  File "service\lib\core\commons\commons-vfs-2.0-SNAPSHOT.jar"
+  SetOutPath "$INSTDIR\service\lib\core\groovy"
+  File "service\lib\core\groovy\groovy-all-1.7.2.jar"
+  SetOutPath "$INSTDIR\service\lib\core\jna"
+  File "service\lib\core\jna\jna-3.2.5.jar"
+  SetOutPath "$INSTDIR\service\lib\core\netty"
+  File "service\lib\core\netty\netty-3.2.1.Final.jar"
+  SetOutPath "$INSTDIR\service\lib\core"
+  File "service\lib\core\ReadMe.txt"
+  SetOutPath "$INSTDIR\service\lib\core\regex"
+  File "service\lib\core\regex\jrexx-1.1.1.jar"
+  SetOutPath "$INSTDIR\service"
+  File "service\installService.bat"
+  File "service\setenv.bat"
+  File "service\startService.bat"
+  File "service\stopService.bat"
+  File "service\uninstallService.bat"
+  File "service\wrapper.bat"
+  File "service\wrapper.conf"
+  File "service\wrapper.jar"
+  File "service\wrapperApp.jar"
 SectionEnd
 
 Section -AdditionalIcons
@@ -112,8 +137,8 @@ Section -AdditionalIcons
     CreateDirectory "$SMPROGRAMS\BaseX"
     CreateShortCut "$SMPROGRAMS\BaseX\BaseX.lnk" "$INSTDIR\${JAR}" "" "$INSTDIR\BaseX.ico" 0
     WriteINIStr "$SMPROGRAMS\BaseX\Website.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-    CreateShortCut "$SMPROGRAMS\BaseX\StartService.lnk" "$INSTDIR\StartService.bat"
-    CreateShortCut "$SMPROGRAMS\BaseX\StopService.lnk" "$INSTDIR\StopService.bat"
+    CreateShortCut "$SMPROGRAMS\BaseX\StartService.lnk" "$INSTDIR\service\startService.bat"
+    CreateShortCut "$SMPROGRAMS\BaseX\StopService.lnk" "$INSTDIR\service\stopService.bat"
     CreateShortCut "$SMPROGRAMS\BaseX\Uninstall.lnk" "$INSTDIR\uninst.exe"
   ${EndIf}
 SectionEnd
@@ -134,35 +159,17 @@ Function un.onUninstSuccess
 FunctionEnd
 
 Function un.onInit
-  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "All components of $(^Name) will be uninstalled?" IDYES +2
+  MessageBox MB_ICONQUESTION|MB_YESNO|MB_DEFBUTTON2 "All components of $(^Name) will be uninstalled??" IDYES +2
   Abort
-  nsExec::Exec '$INSTDIR\StopService.bat'
-  nsExec::Exec '$INSTDIR\UninstallService.bat'
+  nsExec::Exec 'net stop BaseXServer'
+  nsExec::Exec 'sc delete BaseXServer'
 FunctionEnd
 
 Section Uninstall
-  Delete "$INSTDIR\${PRODUCT_NAME}.url"
-  Delete "$INSTDIR\uninst.exe"
-  Delete "$INSTDIR\Service.xml"
-  Delete "$INSTDIR\Service.exe"
-  Delete "$INSTDIR\${JAR}"
-  Delete "$INSTDIR\BaseX.ico"
-  Delete "$INSTDIR\StartService.bat"
-  Delete "$INSTDIR\StopService.bat"
-  Delete "$INSTDIR\InstallService.bat"
-  Delete "$INSTDIR\UninstallService.bat"
-  Delete "$INSTDIR\BaseXServer.bat"
-  Delete "$INSTDIR\License.txt"
-
   Delete "$DESKTOP\BaseX.lnk"
-  Delete "$SMPROGRAMS\BaseX\BaseX.lnk"
-  Delete "$SMPROGRAMS\BaseX\Website.url"
-  Delete "$SMPROGRAMS\BaseX\Uninstall.lnk"
-  Delete "$SMPROGRAMS\BaseX\StartService.lnk"
-  Delete "$SMPROGRAMS\BaseX\StopService.lnk"
-
-  RMDir "$SMPROGRAMS\BaseX"
-  RMDir "$INSTDIR"
+  RMDir /r "$SMPROGRAMS\BaseX"
+  RMDIR /r "$INSTDIR\service"
+  RMDir /r "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
