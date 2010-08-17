@@ -6,10 +6,7 @@ import org.basex.data.Result;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
-import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
-import org.basex.query.util.Var;
-import org.basex.util.Token;
 
 /**
  * This example demonstrates how items can be bound to variables with
@@ -49,16 +46,8 @@ public final class QueryBindExample {
     Item string = Str.get("Hello World!\n");
 
     // ------------------------------------------------------------------------
-    // Create a variable
-    Var var = new Var(new QNm(Token.token("var")));
-
-    // ------------------------------------------------------------------------
-    // Bind the item to the variable
-    var.bind(string, processor.ctx);
-
-    // ------------------------------------------------------------------------
-    // Add the variable to the global context
-    processor.ctx.vars.addGlobal(var);
+    // Binds a variable to the global context
+    processor.bind("var", string);
 
     // ------------------------------------------------------------------------
     // Execute the query

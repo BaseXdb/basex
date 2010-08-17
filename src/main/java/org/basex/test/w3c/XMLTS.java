@@ -130,7 +130,7 @@ public final class XMLTS {
   private String text(final String qu, final Nodes root) throws Exception {
     final Nodes n = nodes(qu, root);
     final TokenBuilder sb = new TokenBuilder();
-    for(int i = 0; i < n.size(); i++) {
+    for(int i = 0; i < n.size(); ++i) {
       if(i != 0) sb.add("/");
       sb.add(data.atom(n.nodes[i]));
     }

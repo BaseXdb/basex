@@ -91,7 +91,7 @@ public final class InexTFCalc {
     // run test
     test();
 
-    for(int i = 0; i < freq.length; i++)
+    for(int i = 0; i < freq.length; ++i)
       res.println(words.get(i) + ";" + freq[i]);
     res.close();
 
@@ -135,10 +135,10 @@ public final class InexTFCalc {
    */
   private void test() throws Exception {
     // loop through all databases
-    for(int d = 0; d < databases.size(); d++) {
+    for(int d = 0; d < databases.size(); ++d) {
       // open database and loop through all queries
       session.execute(new Open(databases.get(d)));
-      for(int q = 0; q < words.size(); q++) {
+      for(int q = 0; q < words.size(); ++q) {
         query(d, q);
       }
       session.execute(new Close());

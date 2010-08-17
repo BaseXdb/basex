@@ -6,6 +6,7 @@ import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
+import org.basex.query.QueryProcessor;
 import org.basex.query.ft.StemDir;
 import org.basex.query.ft.StopWords;
 import org.basex.query.ft.ThesQuery;
@@ -69,31 +70,32 @@ public final class XQFTTS extends W3CTS {
   }
 
   @Override
-  void parse(final QueryContext qctx, final Nodes root) throws Exception {
-    qctx.stop = stop;
-    qctx.thes = thes;
+  void parse(final QueryProcessor qp, final Nodes root) throws Exception {
+    final QueryContext ctx = qp.ctx;
+    ctx.stop = stop;
+    ctx.thes = thes;
 
     for(final String s : aux("stopwords", root)) {
       final String fn = stop2.get(s);
       if(fn != null) {
-        if(qctx.ftopt.sw == null) qctx.ftopt.sw = new StopWords();
-        qctx.ftopt.sw.read(IO.get(fn), false);
+        if(ctx.ftopt.sw == null) ctx.ftopt.sw = new StopWords();
+        ctx.ftopt.sw.read(IO.get(fn), false);
       }
     }
 
     for(final String s : aux("stemming-dictionary", root)) {
       final String fn = stem.get(s);
       if(fn != null) {
-        if(qctx.ftopt.sd == null) qctx.ftopt.sd = new StemDir();
-        qctx.ftopt.sd.read(IO.get(fn));
+        if(ctx.ftopt.sd == null) ctx.ftopt.sd = new StemDir();
+        ctx.ftopt.sd.read(IO.get(fn));
       }
     }
 
     for(final String s : aux("thesaurus", root)) {
       final String fn = thes2.get(s);
       if(fn != null) {
-        if(qctx.ftopt.th == null) qctx.ftopt.th = new ThesQuery();
-        qctx.ftopt.th.add(new Thesaurus(IO.get(fn), context));
+        if(ctx.ftopt.th == null) ctx.ftopt.th = new ThesQuery();
+        ctx.ftopt.th.add(new Thesaurus(IO.get(fn), context));
       }
     }
   }

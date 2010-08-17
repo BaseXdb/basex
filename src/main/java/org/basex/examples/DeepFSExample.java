@@ -163,7 +163,7 @@ public final class DeepFSExample {
         execute(CONTEXT, System.out);
       new Close().execute(CONTEXT, System.out);
     }
-    for(int i = 0; i < QUERIES.length; i++) {
+    for(int i = 0; i < QUERIES.length; ++i) {
       if(DIR[INDEX[i]] == null) continue;
       System.out.println("\n\n* " + QUERIES[i][0]);
       new Open(DB[INDEX[i]]).execute(CONTEXT, System.out);
@@ -197,10 +197,10 @@ public final class DeepFSExample {
     if(mp3Directory == null || !mp3Directory.exists()) {
       System.out.println("... no mp3 files found. skipping example queries");
     }
-    if(jpgDirectory == null || !mp3Directory.exists()) {
-      System.out.println("... no mp3 files found. skipping example queries");
+    if(jpgDirectory == null || !jpgDirectory.exists()) {
+      System.out.println("... no jpg files found. skipping example queries");
     }
-    return new File[] { mp3Directory, jpgDirectory};
+    return new File[] { mp3Directory, jpgDirectory };
   }
 
   /** Class to find a folder that contains mp3 files. */

@@ -149,7 +149,7 @@ public final class InexSubmit {
     test();
 
     openSubFile();
-    for(int i = 0; i < results.length; i++) {
+    for(int i = 0; i < results.length; ++i) {
       createQueryEntryServer(i, results[i], 1500);
     }
     closeSubFile();
@@ -164,10 +164,10 @@ public final class InexSubmit {
   private void test() throws Exception {
     session.execute(new Set(Prop.SERIALIZE, true));
     // loop through all databases
-    for(int d = 0; d < databases.size(); d++) {
+    for(int d = 0; d < databases.size(); ++d) {
       // open database and loop through all queries
       session.execute(new Open(databases.get(d)));
-      for(int q = 0; q < queries.size(); q++) {
+      for(int q = 0; q < queries.size(); ++q) {
         results[q] = addSortedServer(results[q], query(d, q));
       }
       session.execute(new Close());
@@ -348,7 +348,7 @@ public final class InexSubmit {
    */
   private void updateTimes(final String[] args) throws IOException {
     final BufferedReader[] bf = new BufferedReader[args.length];
-    for(int j = 0; j < bf.length; j++)
+    for(int j = 0; j < bf.length; ++j)
       bf[j] = new BufferedReader(new FileReader(args[j]));
 
     final int numdb = 10;
@@ -360,7 +360,7 @@ public final class InexSubmit {
     }
     bf[0].close();
 
-    for(int j = 1; j < bf.length; j++) {
+    for(int j = 1; j < bf.length; ++j) {
       i = 0;
       while((l = bf[j].readLine()) != null) {
         qut[i] = Math.min(qut[i], Double.parseDouble(l));
@@ -370,8 +370,8 @@ public final class InexSubmit {
     }
 
     final double[] tmp = new double[nqueries];
-    for(int j = 0; j < tmp.length; j++) {
-      for(int z = 0; z < numdb; z++) {
+    for(int j = 0; j < tmp.length; ++j) {
+      for(int z = 0; z < numdb; ++z) {
         tmp[j] += qut[j + z * nqueries];
       }
     }

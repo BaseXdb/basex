@@ -122,11 +122,11 @@ public final class InexTest {
    */
   private void test() throws Exception {
     // loop through all databases
-    for(int d = 0; d < databases.size(); d++) {
+    for(int d = 0; d < databases.size(); ++d) {
       // open database and loop through all queries
       session.execute(new Open(databases.get(d)));
-      for(int q = 0; q < queries.size(); q++) {
-        for(int r = 0; r < runs; r++) query(d, q, r == runs - 1);
+      for(int q = 0; q < queries.size(); ++q) {
+        for(int r = 0; r < runs; ++r) query(d, q, r == runs - 1);
       }
       session.execute(new Close());
     }

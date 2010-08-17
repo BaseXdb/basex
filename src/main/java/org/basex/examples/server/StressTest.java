@@ -59,7 +59,7 @@ public final class StressTest {
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
-    for(int i = 0; i < NCLIENTS; i++) {
+    for(int i = 0; i < NCLIENTS; ++i) {
       new Client().start();
     }
   }
@@ -100,7 +100,7 @@ public final class StressTest {
         session = newSession();
 
         // perform some queries
-        for(int i = 0; i < NQUERIES; i++) {
+        for(int i = 0; i < NQUERIES; ++i) {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
           // return nth text of the database

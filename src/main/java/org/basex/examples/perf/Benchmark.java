@@ -121,7 +121,7 @@ public abstract class Benchmark {
     int upd = 0;
 
     // loop through global number of runs
-    for(int rr = 0; rr < runs; rr++) {
+    for(int rr = 0; rr < runs; ++rr) {
       upd = 0;
       double t = 0;
       check();
@@ -129,7 +129,7 @@ public abstract class Benchmark {
       // loop through all queries
       for(final String q : queries) {
         // loop through number of runs for a single query
-        for(int rn = 0; rn < r; rn++) {
+        for(int rn = 0; rn < r; ++rn) {
           session.execute(new XQuery(q));
 
           final String inf = session.info().replaceAll("\\r?\\n", " ");

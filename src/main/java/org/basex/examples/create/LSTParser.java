@@ -67,10 +67,10 @@ public final class LSTParser extends FileParser {
         while(++i < Math.min(old.length, path.length)) {
           if(!eq(old[i], path[i])) break;
         }
-        for(int j = i; j < old.length; j++) {
+        for(int j = i; j < old.length; ++j) {
           builder.endElem(DeepFS.DIR);
         }
-        for(int j = i; j < path.length; j++) {
+        for(int j = i; j < path.length; ++j) {
           atts.reset();
           atts.add(DeepFS.NAME, path[i]);
           atts.add(DeepFS.MTIME, mtime);
