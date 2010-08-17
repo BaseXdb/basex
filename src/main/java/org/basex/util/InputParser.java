@@ -40,8 +40,10 @@ public abstract class InputParser {
    * @return 0 if everything is valid
    */
   protected final int valid() {
-    for(qp = ql; qp > 0; qp--) {
-      if(!XMLToken.valid(qu.charAt(qp - 1))) return qu.charAt(qp - 1);
+    for(int pos = 0; pos < ql;) {
+      final int cp = qu.codePointAt(pos);
+      if(!XMLToken.valid(cp)) return cp;
+      pos += Character.charCount(cp);
     }
     return -1;
   }

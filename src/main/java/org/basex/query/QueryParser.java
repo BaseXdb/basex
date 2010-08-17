@@ -2791,12 +2791,17 @@ public class QueryParser extends InputParser {
       }
       tb.ent = true;
     } else {
-      char c = consume();
-      if(c == 0x0d) {
-        c = 0x0a;
-        if(curr() == c) consume();
+      final char c = consume();
+      int cp = c;
+      if(Character.isHighSurrogate(c) && curr() != 0
+          && Character.isLowSurrogate(curr())) {
+        cp = Character.toCodePoint(c, consume());
       }
-      tb.add(c);
+      if(cp == 0x0d) {
+        cp = 0x0a;
+        if(curr() == cp) consume();
+      }
+      tb.addUTF(cp);
     }
   }
 

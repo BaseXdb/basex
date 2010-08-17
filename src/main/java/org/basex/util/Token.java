@@ -124,7 +124,7 @@ public final class Token {
       for(int i = start; i < start + length;) {
         final int cl = cl(token, i);
         for(int c = 0; c < cl; c++) U8C[c] = token[i++];
-        sb.append((char) cp(U8C, 0));
+        sb.append(Character.toChars(cp(U8C, 0)));
       }
     } catch(final ArrayIndexOutOfBoundsException ex) {
       Main.debug(ex);
@@ -178,9 +178,13 @@ public final class Token {
    * @return byte array
    */
   private static byte[] utf8(final String string) {
-    final int sl = string.length();
-    final TokenBuilder tb = new TokenBuilder(sl << 1);
-    for(int c = 0; c < sl; c++) tb.addUTF(string.charAt(c));
+    final char[] arr = string.toCharArray();
+    final TokenBuilder tb = new TokenBuilder(arr.length << 1);
+    for(int c = 0; c < arr.length; c++) {
+      tb.addUTF(Character.isHighSurrogate(arr[c]) && c < arr.length - 1
+          && Character.isLowSurrogate(arr[c + 1])
+          ? Character.toCodePoint(arr[c], arr[++c]) : arr[c]);
+    }
     return tb.finish();
   }
 
@@ -220,7 +224,8 @@ public final class Token {
 
   /**
    * Returns the codepoint (unicode value) of the specified token, starting at
-   * the specified position. Returns a question mark for invalid values.
+   * the specified position. Returns a unicode replacement character for invalid
+   * values.
    * @param token token
    * @param pos character position
    * @return current character
@@ -231,7 +236,7 @@ public final class Token {
     if((v & 0xFF) < 192) return v & 0xFF;
 
     final int vl = cl(v);
-    if(pos + vl > token.length) return '?';
+    if(pos + vl > token.length) return 0xFFFD;
 
     // 110xxxxx 10xxxxxx
     if(vl == 2) return (v & 0x1F) << 6 | token[pos + 1] & 0x3F;
@@ -272,7 +277,11 @@ public final class Token {
    * @return character
    */
   public static int cp(final String string, final int pos) {
-    return pos >= 0 && pos < string.length() ? string.charAt(pos) : 0;
+    try {
+      return string.codePointAt(pos);
+    } catch(final IndexOutOfBoundsException e) {
+      return 0;
+    }
   }
 
   /*** Character lengths. */
