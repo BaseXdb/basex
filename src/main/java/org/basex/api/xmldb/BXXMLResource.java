@@ -228,7 +228,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
         throws SAXException {
       try {
         final TokenBuilder tb = new TokenBuilder();
-        for(int k = 0; k < j; k++) tb.add(ac[i + k]);
+        for(int k = 0; k < j; ++k) tb.add(ac[i + k]);
         xml.text(tb.finish());
       } catch(final IOException ex) {
         throw new SAXException(ex);
@@ -272,7 +272,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
 
       try {
         xml.openElement(token(s2));
-        for(int i = 0; i < attributes.getLength(); i++) xml.attribute(
+        for(int i = 0; i < attributes.getLength(); ++i) xml.attribute(
             token(attributes.getQName(i)), token(attributes.getValue(i)));
         for(final String k : ns.keySet()) xml.attribute(
             concat(XMLNS, token(k)), token(ns.get(k)));

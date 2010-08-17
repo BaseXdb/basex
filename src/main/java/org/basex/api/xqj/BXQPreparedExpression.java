@@ -12,7 +12,7 @@ import javax.xml.xquery.XQStaticContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
 import org.basex.query.util.Var;
-import org.basex.query.util.Vars;
+import org.basex.query.util.VarList;
 import org.basex.util.Array;
 
 /**
@@ -57,19 +57,26 @@ final class BXQPreparedExpression extends BXQDynamicContext
 
   @Override
   public QName[] getAllExternalVariables() throws XQException {
-    opened();
-    final Var[] vars = getVariables();
-    final QName[] names = new QName[vars.length];
-    for(int v = 0; v < vars.length; v++) names[v] = vars[v].name.toJava();
-    return names;
+    return getVariables(true);
   }
 
   @Override
   public QName[] getAllUnboundExternalVariables() throws XQException {
+    return getVariables(false);
+  }
+
+  /**
+   * Returns the names of all global variables.
+   * @param all return all/unbound variables
+   * @throws XQException query exception
+   * @return variables
+   */
+  private QName[] getVariables(final boolean all) throws XQException {
     opened();
-    QName[] names = new QName[0];
-    for(final Var v : getVariables()) {
-      if(v.expr == null) names = Array.add(names, v.name.toJava());
+    QName[] names = { };
+    final VarList vars = qp.ctx.vars.global();
+    for(final Var v : Arrays.copyOf(vars.vars, vars.size)) {
+      if(all || v.expr() == null) names = Array.add(names, v.name.toJava());
     }
     return names;
   }
@@ -96,16 +103,5 @@ final class BXQPreparedExpression extends BXQDynamicContext
     if(var == null) throw new BXQException(VAR, nm);
     return var.type != null ? new BXQItemType(var.type.type) :
       BXQItemType.DEFAULT;
-  }
-
-  /**
-   * Returns the variable array.
-   * @return variables
-   * @throws XQException exception
-   */
-  private Var[] getVariables() throws XQException {
-    opened();
-    final Vars vars = qp.ctx.vars.getGlobal();
-    return Arrays.copyOf(vars.vars, vars.size);
   }
 }

@@ -138,7 +138,7 @@ final class BXQStaticContext implements XQStaticContext {
   public String[] getNamespacePrefixes() {
     final Atts atts = ctx.ns.ns;
     final String[] pre = new String[atts.size];
-    for(int p = 0; p < pre.length; p++) pre[p] = string(atts.key[p]);
+    for(int p = 0; p < pre.length; ++p) pre[p] = string(atts.key[p]);
     return pre;
   }
 

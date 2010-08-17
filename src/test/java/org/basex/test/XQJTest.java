@@ -100,24 +100,6 @@ public final class XQJTest extends TestCase {
    * @throws Exception exception
    */
   @Test
-  public void test3() throws Exception {
-    final XQConnection conn = conn(drv);
-    final XQExpression expr = conn.createExpression();
-    expr.bindInt(new QName("x3"), 21, null);
-
-    final XQSequence result = expr.executeQuery(
-       "declare variable $x3 as xs:integer external; for $i in $x3 return $i");
-
-    final StringBuilder sb = new StringBuilder();
-    while(result.next()) sb.append(result.getItemAsString(null));
-    assertEquals("", "21", sb.toString());
-  }
-
-  /**
-   * Test.
-   * @throws Exception exception
-   */
-  @Test
   public void test4() throws Exception {
     final XQConnection conn = conn(drv);
 
@@ -155,7 +137,7 @@ public final class XQJTest extends TestCase {
       conn.createItemFromInt(1000,
           conn.createAtomicType(XQItemType.XQBASETYPE_BYTE));
       fail("1000 cannot be converted to byte.");
-    } catch(final Exception ex) {
+    } catch(final Exception ex) { /* ignored */
     }
   }
 
@@ -387,7 +369,7 @@ public final class XQJTest extends TestCase {
     try {
       expr.getTypeName();
       fail("Test should fail");
-    } catch(final Exception ex) {
+    } catch(final Exception ex) { /* ignored */
     }
   }
 
@@ -412,10 +394,10 @@ public final class XQJTest extends TestCase {
     };
 
     for(final Object o : objects) {
-      for(int t = 1; t <= 51; t++) {
+      for(int t = 1; t <= 51; ++t) {
         try {
           conn.createItemFromObject(o, conn.createAtomicType(t));
-        } catch(final Exception ex) {
+        } catch(final Exception ex) { /* ignored */
         }
       }
     }
@@ -489,7 +471,7 @@ public final class XQJTest extends TestCase {
     try {
       expr.executeCommand("info db");
       fail("Error expected: no database opened.");
-    } catch(final XQException ex) {
+    } catch(final XQException ex) { /* ignored */
     }
     expr.executeCommand("open input");
     expr.executeCommand("info db");
@@ -525,5 +507,49 @@ public final class XQJTest extends TestCase {
     result = pe.executeQuery();
     result.next();
     assertEquals("XML", result.getItemAsString(null));
+  }
+
+  /**
+   * Bind variable before parsing the query (1).
+   * @throws Exception exception
+   */
+  @Test
+  public void testBind() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+    expr.bindInt(new QName("x"), 21, null);
+
+    final XQSequence result = expr.executeQuery(
+       "declare variable $x external; $x");
+    result.next();
+    assertEquals("21", result.getItemAsString(null));
+  }
+
+  /**
+   * Bind variable before parsing the query (2).
+   * @throws Exception exception
+   */
+  @Test
+  public void testBindWithType() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+    expr.bindInt(new QName("x"), 21, null);
+    expr.executeQuery("declare variable $x as xs:integer external; $x");
+  }
+
+  /**
+   * Bind variable before parsing the query, using a wrong type.
+   * @throws Exception exception
+   */
+  @Test
+  public void testBindWithWrongType() throws Exception {
+    final XQConnection conn = conn(drv);
+    final XQExpression expr = conn.createExpression();
+    expr.bindInt(new QName("x"), 21, null);
+    try {
+      expr.executeQuery("declare variable $x as xs:string external; $x");
+      fail("Error expected: bound value has wrong type.");
+    } catch(final XQException ex) { /* ignored */
+    }
   }
 }

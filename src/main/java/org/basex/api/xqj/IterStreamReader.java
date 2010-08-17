@@ -116,7 +116,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getAttributeValue(final String s, final String s1) {
     getAttributes();
-    for(int a = 0; a < atts.size(); a++) {
+    for(int a = 0; a < atts.size(); ++a) {
       if(!s1.equals(getAttributeLocalName(a))) continue;
       if(s == null || s.equals(getAttributeNamespace(a)))
         return getAttributeValue(a);

@@ -87,7 +87,7 @@ final class BXQItemType implements XQItemType {
     if(type.unt) check(Type.DEL, Type.ELM, Type.ATT, Type.ATM);
 
     if(base != -1) return base;
-    for(int b = 0; b < BASE.length; b++) if(BASE[b] == type) return b;
+    for(int b = 0; b < BASE.length; ++b) if(BASE[b] == type) return b;
     throw new BXQException(NOBASE);
   }
 

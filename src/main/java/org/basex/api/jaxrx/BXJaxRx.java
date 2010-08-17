@@ -108,6 +108,7 @@ public final class BXJaxRx implements JaxRx {
       final int i = Integer.parseInt(val);
       if(i > 0) return i;
     } catch(final NumberFormatException ex) {
+      /* exception follows for both branches. */
     }
     throw new JaxRxException(400, "Parameter '" + qp +
         "' is no valid integer: " + val);

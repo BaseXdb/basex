@@ -48,7 +48,7 @@ public class SignatureTest extends XQJTestCase {
     // fields
     set = new TreeSet();
     final Field[] fields = c.getFields();
-    for (int i = 0; i < fields.length; i++) {
+    for (int i = 0; i < fields.length; ++i) {
       if (!fields[i].getDeclaringClass().equals(c)) continue;
       final StringBuffer tmp = new StringBuffer();
       tmp.append(Modifier.toString(fields[i].getModifiers()));
@@ -74,7 +74,7 @@ public class SignatureTest extends XQJTestCase {
       tmp.append(c.getName());
       tmp.append(" (");
       final Class[] parameters = constructor.getParameterTypes();
-      for (int j = 0; j < parameters.length; j++) {
+      for (int j = 0; j < parameters.length; ++j) {
         tmp.append(parameters[j].getName());
         if (j != parameters.length-1) tmp.append(",");
       }
@@ -82,7 +82,7 @@ public class SignatureTest extends XQJTestCase {
       final Class[] exceptions = constructor.getExceptionTypes();
       if (exceptions != null && exceptions.length > 0) {
         tmp.append(" throws ");
-        for (int j = 0; j < exceptions.length; j++) {
+        for (int j = 0; j < exceptions.length; ++j) {
           tmp.append(exceptions[j].getName());
           if (j != exceptions.length-1) tmp.append(",");
         }
@@ -98,7 +98,7 @@ public class SignatureTest extends XQJTestCase {
     // methods
     set = new TreeSet();
     final Method[] methods = c.getMethods();
-    for (int i = 0; i < methods.length; i++) {
+    for (int i = 0; i < methods.length; ++i) {
       final StringBuffer tmp = new StringBuffer();
       if (!methods[i].getDeclaringClass().equals(c)) continue;
       tmp.append(Modifier.toString(methods[i].getModifiers()));
@@ -108,7 +108,7 @@ public class SignatureTest extends XQJTestCase {
       tmp.append(methods[i].getName());
       tmp.append(" (");
       final Class[] parameters = methods[i].getParameterTypes();
-      for (int j = 0; j < parameters.length; j++) {
+      for (int j = 0; j < parameters.length; ++j) {
         tmp.append(parameters[j].getName());
         if (j != parameters.length-1) tmp.append(",");
       }
@@ -116,7 +116,7 @@ public class SignatureTest extends XQJTestCase {
       final Class[] exceptions = methods[i].getExceptionTypes();
       if (exceptions != null && exceptions.length > 0) {
         tmp.append(" throws ");
-        for (int j = 0; j < exceptions.length; j++) {
+        for (int j = 0; j < exceptions.length; ++j) {
           tmp.append(exceptions[j].getName());
           if (j != exceptions.length-1) tmp.append(",");
         }

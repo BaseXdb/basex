@@ -669,7 +669,7 @@ public class XQMetaDataTest extends XQJTestCase {
     final XQMetaData xqmd = xqc.getMetaData();
 
     try {
-      xqmd.isXQueryEncodingSupported("UTF-8");;
+      xqmd.isXQueryEncodingSupported("UTF-8");
     } catch (final XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }
@@ -692,7 +692,7 @@ public class XQMetaDataTest extends XQJTestCase {
     final XQMetaData xqmd = xqc.getMetaData();
 
     try {
-      xqmd.isUserDefinedXMLSchemaTypeSupported();;
+      xqmd.isUserDefinedXMLSchemaTypeSupported();
     } catch (final XQException e) {
       fail("A-XQMD-1.2: XQMetaData method failed with message: " + e.getMessage());
     }

@@ -283,7 +283,7 @@ public class CollectionTest extends TestCase {
     };
 
     // check some ids for their uniqueness
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 10; ++i) {
       if(coll.getResource(code.run().toString()) != null) {
         fail("Returned ID not unique.");
       }

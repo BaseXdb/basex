@@ -46,7 +46,7 @@ final class XMLStreamWrapper extends Parser {
           case XMLStreamConstants.START_ELEMENT:
             final int as = reader.getAttributeCount();
             final Atts att = new Atts();
-            for(int a = 0; a < as; a++) {
+            for(int a = 0; a < as; ++a) {
               att.add(token(reader.getAttributeLocalName(a)),
                   token(reader.getAttributeValue(a)));
             }

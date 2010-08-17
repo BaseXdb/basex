@@ -75,7 +75,7 @@ public class XQStaticContextTest extends XQJTestCase {
     }
     String[] prefixes = xqsc.getNamespacePrefixes();
   boolean found = false;
-  for (int i = 0; i<prefixes.length && !found; i++) {
+  for (int i = 0; i<prefixes.length && !found; ++i) {
     found = "p".equals(prefixes[i]);
   }
   assertTrue("A-XQSC-3.2: Successfully declare a namespace.", found);
@@ -88,7 +88,7 @@ public class XQStaticContextTest extends XQJTestCase {
     }
     prefixes = xqsc.getNamespacePrefixes();
   found = false;
-  for (int i = 0; i<prefixes.length && !found; i++) {
+  for (int i = 0; i<prefixes.length && !found; ++i) {
     found = "p".equals(prefixes[i]);
   }
   assertFalse("A-XQSC-3.2: Successfully undeclare a namespace.", found);
