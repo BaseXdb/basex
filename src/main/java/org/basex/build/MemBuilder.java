@@ -66,7 +66,8 @@ public final class MemBuilder extends Builder {
   }
 
   @Override
-  public void close() { }
+  public void close() {
+  }
 
   @Override
   protected void addDoc(final byte[] txt) {

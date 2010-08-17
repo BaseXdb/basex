@@ -111,7 +111,7 @@ public final class TokenList implements Iterable<byte[]> {
    * @return true if value is found
    */
   public boolean contains(final byte[] v) {
-    for(int i = 0; i < size; i++) if(eq(list[i], v)) return true;
+    for(int i = 0; i < size; ++i) if(eq(list[i], v)) return true;
     return false;
   }
 
@@ -129,7 +129,7 @@ public final class TokenList implements Iterable<byte[]> {
    */
   public String[] finishString() {
     final String[] items = new String[size];
-    for(int i = 0; i < items.length; i++) items[i] = string(list[i]);
+    for(int i = 0; i < items.length; ++i) items[i] = string(list[i]);
     return items;
   }
 
@@ -169,7 +169,7 @@ public final class TokenList implements Iterable<byte[]> {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(Main.name(this) + '[');
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(i != 0) tb.add(", ");
       tb.add(list[i]);
     }

@@ -39,6 +39,8 @@ public final class Unary extends Single {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
+    type = expr.type();
+    if(!type.num()) type = SeqType.ITR;
     return expr.value() ? preEval(ctx) : this;
   }
 
@@ -60,11 +62,6 @@ public final class Unary extends Single {
       case DEC: return Dec.get(it.dec(input).negate());
       default:  return Itr.get(-it.itr(input));
     }
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.ITR;
   }
 
   @Override

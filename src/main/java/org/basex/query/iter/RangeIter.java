@@ -60,7 +60,7 @@ public final class RangeIter extends Iter {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("(");
-    for(long v = min; v != max; v++) {
+    for(long v = min; v != max; ++v) {
       sb.append((v != min ? ", " : "") + v);
       if(sb.length() > 15 && v + 1 != max) {
         sb.append(", ...");

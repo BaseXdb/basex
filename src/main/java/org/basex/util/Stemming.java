@@ -176,7 +176,7 @@ final class Stemming {
     final int sl = s.length;
     final int l = te - sl;
     if(l < 0) return false;
-    for(int i = 0; i < sl; i++) if(l(l + i) != s[i]) return false;
+    for(int i = 0; i < sl; ++i) if(l(l + i) != s[i]) return false;
     tt = l;
     return true;
   }
@@ -215,7 +215,7 @@ final class Stemming {
    * @return result of check
    */
   private boolean v() {
-    for(int i = 0; i < tt; i++) if(v(i)) return true;
+    for(int i = 0; i < tt; ++i) if(v(i)) return true;
     return false;
   }
 

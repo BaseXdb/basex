@@ -360,8 +360,8 @@ public final class DeepFile {
    * @return all text sections
    */
   public Content[] getTextContents() {
-    return textContents == null ? null
-        : textContents.toArray(new Content[textContents.size()]);
+    return textContents == null ? null :
+      textContents.toArray(new Content[textContents.size()]);
   }
 
   /**
@@ -370,8 +370,8 @@ public final class DeepFile {
    * @return all xml sections
    */
   public Content[] getXMLContents() {
-    return xmlContents == null ? null
-        : xmlContents.toArray(new Content[xmlContents.size()]);
+    return xmlContents == null ? null :
+      xmlContents.toArray(new Content[xmlContents.size()]);
   }
 
   // ---------------------------------------------------------------------------
@@ -657,7 +657,7 @@ public final class DeepFile {
     if(!extractText()) return;
     final String s = text.trim();
     if(s.isEmpty()) return;
-    for(int i = 0; i < s.length(); i++)
+    for(int i = 0; i < s.length(); ++i)
       if(!XMLToken.valid(s.charAt(i))) {
         unknown();
         return;
@@ -702,7 +702,7 @@ public final class DeepFile {
     if(xml.length() > context.prop.num(Prop.FSTEXTMAX))
       addText(pos, byteCount, xml);
     else {
-      for(int i = 0; i < xml.length(); i++)
+      for(int i = 0; i < xml.length(); ++i)
         if(!XMLToken.valid(xml.charAt(i))) {
           unknown();
           return;

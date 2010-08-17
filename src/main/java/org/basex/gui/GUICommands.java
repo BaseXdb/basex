@@ -303,7 +303,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final StringBuilder sb = new StringBuilder();
       final Nodes n = gui.context.copied;
-      for(int i = 0; i < n.size(); i++) {
+      for(int i = 0; i < n.size(); ++i) {
         if(i > 0) sb.append(',');
         sb.append(fndb(n, i));
       }
@@ -327,7 +327,7 @@ public enum GUICommands implements GUICommand {
       if(Dialog.confirm(gui, DELETECONF)) {
         final StringBuilder sb = new StringBuilder();
         final Nodes n = gui.context.marked;
-        for(int i = 0; i < n.size(); i++) {
+        for(int i = 0; i < n.size(); ++i) {
           if(i > 0) sb.append(',');
           sb.append(fndb(n, i));
         }

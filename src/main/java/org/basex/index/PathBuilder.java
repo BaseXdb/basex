@@ -27,7 +27,7 @@ public final class PathBuilder extends IndexBuilder {
     final int[] parStack = new int[IO.MAXHEIGHT];
     final PathSummary path = new PathSummary();
     int h = 0, l = 0;
-    for(pre = 0; pre < size; pre++) {
+    for(pre = 0; pre < size; ++pre) {
       final byte kind = (byte) data.kind(pre);
       final int par = data.parent(pre, kind);
       while(l > 0 && parStack[l - 1] > par) --l;

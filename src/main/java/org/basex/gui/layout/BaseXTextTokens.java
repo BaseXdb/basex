@@ -75,7 +75,7 @@ public final class BaseXTextTokens {
       ch = cp(text, pe);
       if(!ftChar(ch)) break;
       pe += cl(text, pe);
-    };
+    }
     return true;
   }
 
@@ -251,7 +251,7 @@ public final class BaseXTextTokens {
     tb.add(text, 0, ps);
     int cc = 0;
     final int cl = str.length();
-    for(int c = 0; c < cl; c++) {
+    for(int c = 0; c < cl; ++c) {
       final int ch = str.charAt(c);
       if(ch != '\r') {
         tb.addUTF(ch);
@@ -261,7 +261,7 @@ public final class BaseXTextTokens {
     tb.add(text, ps, size);
     text = tb.finish();
     size = tb.size();
-    for(int c = 0; c < cc; c++) next();
+    for(int c = 0; c < cc; ++c) next();
   }
 
   /**
@@ -361,7 +361,7 @@ public final class BaseXTextTokens {
     if(ms == -1) return "";
     final TokenBuilder tb = new TokenBuilder();
     final int e = ms < me ? me : ms;
-    for(int s = ms < me ? ms : me; s < e; s++) {
+    for(int s = ms < me ? ms : me; s < e; ++s) {
       final byte t = text[s];
       if(t < 0 || t >= ' ' || t == 0x0A || t == 0x09) tb.add(t);
     }

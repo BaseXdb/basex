@@ -54,7 +54,7 @@ public final class PathNode {
     ch = new PathNode[in.readNum()];
     in.readDouble();
     par = p;
-    for(int i = 0; i < ch.length; i++) ch[i] = new PathNode(in, this);
+    for(int i = 0; i < ch.length; ++i) ch[i] = new PathNode(in, this);
   }
 
   /**
@@ -143,7 +143,7 @@ public final class PathNode {
   byte[] info(final Data data, final int l) {
     final TokenBuilder tb = new TokenBuilder();
     if(l != 0) tb.add(Text.NL);
-    for(int i = 0; i < l << 1; i++) tb.add(' ');
+    for(int i = 0; i < l << 1; ++i) tb.add(' ');
     switch(kind) {
       case Data.DOC:  tb.add(DOC); break;
       case Data.ELEM: tb.add(data.tags.key(name)); break;

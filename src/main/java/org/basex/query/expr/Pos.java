@@ -34,6 +34,7 @@ public final class Pos extends Simple {
     super(ii);
     min = mn;
     max = mx;
+    type = SeqType.BLN;
   }
 
   /**
@@ -107,24 +108,9 @@ public final class Pos extends Simple {
     return get(Math.max(min, pos.min), Math.min(max, pos.max), ii);
   }
 
-  /**
-   * Creates a union of the existing and the specified position expressions.
-   * @param pos second position expression
-   * @param ii input info
-   * @return resulting expression
-   */
-  Expr union(final Pos pos, final InputInfo ii) {
-    return get(Math.min(min, pos.min), Math.max(max, pos.max), ii);
-  }
-
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.POS || u == Use.ELM;
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
+  public boolean uses(final Use u) {
+    return u == Use.POS;
   }
 
   @Override

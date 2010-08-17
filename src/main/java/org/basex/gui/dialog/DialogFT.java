@@ -57,7 +57,7 @@ final class DialogFT extends BaseXBack {
         prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING), prop.is(Prop.CASESENS),
         prop.is(Prop.DIACRITICS), prop.num(Prop.SCORING) > 0, !sw.isEmpty() };
 
-    for(int f = 0; f < check.length; f++) {
+    for(int f = 0; f < check.length; ++f) {
       check[f] = new BaseXCheckBox(cb[f], val[f], create ? 1 : 0, d);
       if(!create) {
         labels[f] = new BaseXLabel(desc[f], true, false);
@@ -114,7 +114,7 @@ final class DialogFT extends BaseXBack {
    * @param ftx full-text flag
    */
   void action(final boolean ftx) {
-    for(int f = 0; f < check.length; f++) {
+    for(int f = 0; f < check.length; ++f) {
       check[f].setEnabled(ftx);
       if(labels[f] != null) labels[f].setEnabled(ftx);
     }

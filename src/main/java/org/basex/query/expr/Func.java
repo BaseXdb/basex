@@ -15,7 +15,7 @@ import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * User defined function.
+ * User-defined function.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -26,8 +26,7 @@ public final class Func extends Single {
   /** Arguments. */
   public final Var[] args;
   /** Declaration flag. */
-  public final boolean decl;
-
+  public final boolean declared;
   /** Updating flag. */
   public boolean updating;
 
@@ -42,16 +41,17 @@ public final class Func extends Single {
     super(ii, null);
     var = v;
     args = a;
-    decl = d;
+    declared = d;
   }
 
-  @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
-    final int s = ctx.vars.size();
-    for(final Var v : args) ctx.vars.add(v);
-    expr = expr.comp(ctx);
-    
-    final boolean u = expr.uses(Use.UPD, ctx);
+  /**
+   * Checks the function for updating behavior.
+   * @throws QueryException query exception
+   */
+  public void check() throws QueryException {
+    if(!declared) Err.or(input, FUNCUNKNOWN, var.name.atom());
+
+    final boolean u = expr.uses(Use.UPD);
     if(updating) {
       // updating function
       if(var.type != null) Err.or(input, UPFUNCTYPE);
@@ -60,6 +60,13 @@ public final class Func extends Single {
       // uses updates, but is not declared as such
       Err.or(input, UPNOT, desc());
     }
+  }
+
+  @Override
+  public Expr comp(final QueryContext ctx) throws QueryException {
+    final int s = ctx.vars.size();
+    for(final Var v : args) ctx.vars.add(v);
+    expr = expr.comp(ctx);
     ctx.vars.reset(s);
 
     // returned expression will be ignored
@@ -77,15 +84,10 @@ public final class Func extends Single {
   }
 
   @Override
-  public String color() {
-    return "CC99FF";
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    ser.attribute(NAM, var.name.atom());
-    for(int i = 0; i < args.length; i++) {
+    ser.attribute(NAM, Token.concat(var.name.atom(), Token.token(PAR)));
+    for(int i = 0; i < args.length; ++i) {
       ser.attribute(Token.token(ARG + i), args[i].name.atom());
     }
     expr.plan(ser);
@@ -94,7 +96,7 @@ public final class Func extends Single {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(var.name.atom()).add("(...)");
+    final TokenBuilder tb = new TokenBuilder(var.name.atom()).add(PAR);
     if(var.type != null) tb.add(" " + AS + " " + var.type);
     if(expr != null) tb.add(" { " + expr + " }");
     return tb.toString();

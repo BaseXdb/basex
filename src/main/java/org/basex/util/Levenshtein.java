@@ -21,7 +21,7 @@ public final class Levenshtein {
    * Constructor.
    */
   public Levenshtein() {
-    for(int i = 0; i < m.length; i++) {
+    for(int i = 0; i < m.length; ++i) {
       m[0][i] = i;
       m[i][0] = i;
     }

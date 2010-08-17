@@ -157,7 +157,7 @@ public final class LockingTest {
   /** Efficiency test. */
   @Test
   public void efficiencyTest() {
-    for(int i = 0; i < TESTS; i++) {
+    for(int i = 0; i < TESTS; ++i) {
       final ClientSession s = createSession();
       new Thread() {
         @Override

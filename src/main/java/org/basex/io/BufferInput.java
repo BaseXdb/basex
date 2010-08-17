@@ -197,7 +197,7 @@ public class BufferInput {
       final int cl = cl(ch);
       if(cl == 1) return ch & 0xFF;
       cache[0] = ch;
-      for(int c = 1; c < cl; c++) cache[c] = readByte();
+      for(int c = 1; c < cl; ++c) cache[c] = readByte();
       return cp(cache, 0);
     }
     if(ch >= 0) return ch;
@@ -211,7 +211,7 @@ public class BufferInput {
         final CharBuffer cb = csd.decode(
             ByteBuffer.wrap(Arrays.copyOf(cache, p)));
         int i = 0;
-        for(int c = 0; c < cb.limit(); c++) i |= cb.get(c) << (c << 3);
+        for(int c = 0; c < cb.limit(); ++c) i |= cb.get(c) << (c << 3);
         return i;
       } catch(final CharacterCodingException ex) {
         ch = readByte();
@@ -231,7 +231,7 @@ public class BufferInput {
       final int ch = readChar();
       if(ch == 0x0D) continue;
       if(ch == 0) return tb.size() != 0;
-      if(ch == 0x0A) return true;;
+      if(ch == 0x0A) return true;
       tb.addUTF(ch);
     }
   }

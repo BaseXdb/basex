@@ -18,7 +18,7 @@ public final class XMLToken {
    * @param ch the letter to be checked
    * @return result of comparison
    */
-  public static boolean valid(final long ch) {
+  public static boolean valid(final int ch) {
     return ch >= 0x20 && ch <= 0xD7FF || ch == 0xA || ch == 0x9 || ch == 0xD ||
       ch >= 0xE000 && ch <= 0xFFFD || ch >= 0x10000 && ch <= 0x10ffff;
   }
@@ -92,7 +92,7 @@ public final class XMLToken {
    */
   public static boolean isName(final byte[] v) {
     if(v.length == 0 || !isFirstLetter(v[0])) return false;
-    for(int i = 1; i < v.length; i++) if(!isLetterOrDigit(v[i])) return false;
+    for(int i = 1; i < v.length; ++i) if(!isLetterOrDigit(v[i])) return false;
     return true;
   }
 

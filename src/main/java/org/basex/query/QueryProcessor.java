@@ -11,7 +11,10 @@ import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
+import org.basex.query.expr.Expr;
+import org.basex.query.item.QNm;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Var;
 import org.basex.util.Token;
 
 /**
@@ -23,8 +26,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class QueryProcessor extends Progress {
-  /** Query Info: Plan. */
-  private static final byte[] PLAN = Token.token("QueryPlan");
   /** Expression context. */
   public final QueryContext ctx;
   /** Query. */
@@ -93,6 +94,16 @@ public final class QueryProcessor extends Progress {
   public Result execute() throws QueryException {
     compile();
     return ctx.eval();
+  }
+
+  /**
+   * Adds a global variables.
+   * @param n name of variable
+   * @param ex expression to be bound
+   * @throws QueryException query exception
+   */
+  public void bind(final String n, final Expr ex) throws QueryException {
+    ctx.vars.addGlobal(new Var(new QNm(Token.token(n))).bind(ex, ctx));
   }
 
   /**
@@ -210,16 +221,13 @@ public final class QueryProcessor extends Progress {
     return false;
   }
 
-
   /**
    * Returns the query plan in the dot notation.
    * @param ser serializer
    * @throws Exception exception
    */
   public void plan(final Serializer ser) throws Exception {
-    ser.openElement(PLAN);
     ctx.plan(ser);
-    ser.closeElement();
   }
 
   @Override

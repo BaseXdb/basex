@@ -199,7 +199,7 @@ public final class DialogCreate extends Dialog {
     if(file != null) {
       path.setText(file.path());
       dbname.setText(file.dbname().replaceAll("[^\\w.-]", ""));
-      gprop.set(GUIProp.OPENPATH, file.getDir());
+      gprop.set(GUIProp.OPENPATH, file.dir());
     }
   }
 

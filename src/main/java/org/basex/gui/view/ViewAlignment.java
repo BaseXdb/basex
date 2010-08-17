@@ -68,7 +68,7 @@ final class ViewAlignment implements ViewLayout {
 
   @Override
   public boolean delete(final ViewPanel panel) {
-    for(int o = 0; o < comp.length; o++) {
+    for(int o = 0; o < comp.length; ++o) {
       if(comp[o].delete(panel)) {
         if(comp[o] instanceof ViewPanel) {
           remove(o--);

@@ -100,6 +100,11 @@ public final class Dbl extends Item {
   }
 
   @Override
+  public SeqType type() {
+    return SeqType.DBL;
+  }
+
+  @Override
   public int hashCode() {
     return (int) val;
   }

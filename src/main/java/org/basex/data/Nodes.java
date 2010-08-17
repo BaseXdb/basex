@@ -91,7 +91,7 @@ public final class Nodes implements Result {
     if(!(v instanceof Nodes) || v.size() != size) return false;
     final Nodes n = (Nodes) v;
     if(data != n.data) return false;
-    for(int c = 0; c < size; c++) if(n.nodes[c] != nodes[c]) return false;
+    for(int c = 0; c < size; ++c) if(n.nodes[c] != nodes[c]) return false;
     return ftpos == null || ftpos.same(n.ftpos);
   }
 
@@ -204,7 +204,7 @@ public final class Nodes implements Result {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
+    for(int c = 0; c < size && !ser.finished(); ++c) serialize(ser, c);
   }
 
   @Override
@@ -217,7 +217,7 @@ public final class Nodes implements Result {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(Main.name(this) + '[');
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(',');
       tb.add(nodes[i]);
     }

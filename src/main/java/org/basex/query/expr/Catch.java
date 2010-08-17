@@ -85,8 +85,8 @@ public final class Catch extends Single {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.VAR || super.uses(u);
   }
 
   @Override

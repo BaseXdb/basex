@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.data.Data.IndexType;
@@ -32,7 +31,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class CmpG extends Arr {
+public final class CmpG extends Cmp {
   /** Comparators. */
   public enum Op {
     /** General comparison: less or equal. */
@@ -74,7 +73,7 @@ public final class CmpG extends Arr {
     /** String representation. */
     public final String name;
     /** Comparator. */
-    final CmpV.Op cmp;
+    final CmpV.Op op;
 
     /**
      * Constructor.
@@ -83,7 +82,7 @@ public final class CmpG extends Arr {
      */
     private Op(final String n, final CmpV.Op c) {
       name = n;
-      cmp = c;
+      op = c;
     }
 
     /**
@@ -94,61 +93,58 @@ public final class CmpG extends Arr {
 
     @Override
     public String toString() { return name; }
-  };
+  }
 
   /** Comparator. */
-  Op cmp;
+  Op op;
   /** Index expression. */
   private IndexAccess[] iacc = {};
   /** Flag for atomic evaluation. */
-  private boolean atom;
+  private boolean single;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
-   * @param c comparator
+   * @param o operator
    */
-  public CmpG(final InputInfo ii, final Expr e1, final Expr e2, final Op c) {
+  public CmpG(final InputInfo ii, final Expr e1, final Expr e2, final Op o) {
     super(ii, e1, e2);
-    cmp = c;
+    op = o;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].addText(ctx);
 
-    if(expr[0].value() && !expr[1].value() || expr[0] instanceof AxisPath &&
-        ((AxisPath) expr[0]).root != null && expr[1] instanceof AxisPath) {
-      final Expr tmp = expr[0];
-      expr[0] = expr[1];
-      expr[1] = tmp;
-      cmp = cmp.invert();
+    // swap expressions; add text() to location paths to simplify optimizations
+    if(swap()) {
+      op = op.invert();
+      ctx.compInfo(OPTSWAP, this);
     }
+    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].addText(ctx);
 
     final Expr e1 = expr[0];
     final Expr e2 = expr[1];
-    // check if both arguments will always yield one result
-    atom = e1.returned(ctx).one() && e2.returned(ctx).one();
-
     Expr e = this;
-    if(e1.value() && e2.value()) {
+    if(oneEmpty()) {
+      e = optPre(Bln.FALSE, ctx);
+    } else if(values()) {
       e = preEval(ctx);
     } else if(e1 instanceof Fun) {
       final Fun fun = (Fun) e1;
-      if(fun.func == FunDef.COUNT) {
-        e = CmpV.count(this, cmp.cmp);
+      if(fun.def == FunDef.COUNT) {
+        e = count(op.op);
         if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-      } else if(fun.func == FunDef.POS) {
+      } else if(fun.def == FunDef.POS) {
         if(e2 instanceof Range) {
           // position() CMP range
           final long[] rng = ((Range) e2).range(ctx);
           e = rng == null ? this : Pos.get(rng[0], rng[1], input);
         } else {
           // position() CMP number
-          e = Pos.get(cmp.cmp, e2, this, input);
+          e = Pos.get(op.op, e2, e, input);
         }
         if(e != this) ctx.compInfo(OPTWRITE, this);
       }
@@ -157,14 +153,19 @@ public final class CmpG extends Arr {
       e = CmpR.get(this);
       if(e != this) ctx.compInfo(OPTWRITE, this);
     }
+
+    // check if both arguments will always yield one result
+    single = e1.type().one() && e2.type().one();
+    type = SeqType.BLN;
     return e;
   }
-  
+
   @Override
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    // atomic evaluation of arguments (faster)
-    if(atom) return Bln.get(eval(expr[0].atomic(ctx, input),
+
+    // direct evaluation of arguments (faster)
+    if(single) return Bln.get(eval(expr[0].atomic(ctx, input),
         expr[1].atomic(ctx, input)));
 
     final Iter ir1 = ctx.iter(expr[0]);
@@ -175,7 +176,7 @@ public final class CmpG extends Arr {
     final boolean s1 = is1 == 1;
 
     // evaluate single items
-    if(s1 && expr[1].value() && expr[1].size(ctx) == 1)
+    if(s1 && expr[1].value() && expr[1].size() == 1)
       return Bln.get(eval(ir1.next(), expr[1].atomic(ctx, input)));
 
     Iter ir2 = ctx.iter(expr[1]);
@@ -226,14 +227,28 @@ public final class CmpG extends Arr {
   private boolean eval(final Item a, final Item b) throws QueryException {
     if(a.type != b.type && !a.unt() && !b.unt() && !(a.str() && b.str()) &&
         !(a.num() && b.num())) Err.or(input, XPTYPECMP, a.type, b.type);
-    return cmp.cmp.e(input, a, b);
+    return op.op.e(input, a, b);
+  }
+
+
+  /**
+   * Creates a union of the existing and the specified expressions.
+   * @param g general comparison
+   * @param ctx query context
+   * @return true if union was successful
+   * @throws QueryException query exception
+   */
+  boolean union(final CmpG g, final QueryContext ctx) throws QueryException {
+    if(op != g.op || !expr[0].sameAs(g.expr[0])) return false;
+    expr[1] = new List(input, expr[1], g.expr[1]).comp(ctx);
+    return true;
   }
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // accept only location path, string and equality expressions
     final Step s = indexStep(expr[0]);
-    if(s == null || cmp != Op.EQ) return false;
+    if(s == null || op != Op.EQ) return false;
 
     final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
     final boolean attr = !text && ic.data.meta.atvindex &&
@@ -241,19 +256,19 @@ public final class CmpG extends Arr {
 
     // no text or attribute index applicable
     if(!text && !attr) return false;
-    final IndexType type = text ? IndexType.TXT : IndexType.ATV;
+    final IndexType ind = text ? IndexType.TXT : IndexType.ATV;
 
     // support expressions
     final Expr arg = expr[1];
     if(!arg.value()) {
-      final SeqType ret = arg.returned(ic.ctx);
+      final SeqType t = arg.type();
       // index access not possible if returned type is no string or node,
       // and if expression depends on context
-      if(!ret.type.str && !ret.type.node() || arg.uses(Use.CTX, ic.ctx))
+      if(!t.type.str && !t.type.node() || arg.uses(Use.CTX))
         return false;
 
       ic.is += Math.max(1, ic.data.meta.size / 10);
-      iacc = Array.add(iacc, new IndexAccess(input, arg, type, ic));
+      iacc = Array.add(iacc, new IndexAccess(input, arg, ind, ic));
       return true;
     }
 
@@ -262,11 +277,13 @@ public final class CmpG extends Arr {
     Item it;
     ic.is = 0;
     while((it = ir.next()) != null) {
-      final SeqType ret = it.returned(ic.ctx);
-      if(!ret.type.str && !ret.type.node()) return false;
+      final SeqType t = it.type();
+      if(!t.type.str && !t.type.node()) return false;
 
-      ic.is += ic.data.nrIDs(new ValuesToken(type, it.atom()));
-      iacc = Array.add(iacc, new IndexAccess(input, it, type, ic));
+      final int is = ic.data.nrIDs(new ValuesToken(ind, it.atom()));
+      // add only expressions that yield results
+      if(is != 0) iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));
+      ic.is += is;
     }
     return true;
   }
@@ -279,7 +296,7 @@ public final class CmpG extends Arr {
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
 
-    if(iacc[0].type == IndexType.TXT) {
+    if(iacc[0].ind == IndexType.TXT) {
       ic.ctx.compInfo(OPTTXTINDEX);
     } else {
       ic.ctx.compInfo(OPTATVINDEX);
@@ -293,46 +310,33 @@ public final class CmpG extends Arr {
   }
 
   /**
-   * Returns the indexable index step or null.
-   * @param expr expression arguments
-   * @return result of check
+   * If possible, returns the last location step of the specified expression.
+   * @param expr expression
+   * @return location step
    */
   public static Step indexStep(final Expr expr) {
     // check if index can be applied
     if(!(expr instanceof AxisPath)) return null;
-
     // accept only single axis steps as first expression
     final AxisPath path = (AxisPath) expr;
-    if(path.root != null) return null;
-
-    // step must not contain predicates
-    return path.step[path.step.length - 1];
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
-  }
-
-  @Override
-  public String desc() {
-    return "'" + cmp + "' expression";
-  }
-
-  @Override
-  public String color() {
-    return "FF9966";
+    // path must contain no root node
+    return path.root != null ? null : path.step[path.step.length - 1];
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(cmp.name));
+    ser.openElement(this, OP, Token.token(op.name));
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }
 
   @Override
+  public String desc() {
+    return "'" + op + "' expression";
+  }
+
+  @Override
   public String toString() {
-    return toString(" " + cmp + " ");
+    return toString(" " + op + " ");
   }
 }

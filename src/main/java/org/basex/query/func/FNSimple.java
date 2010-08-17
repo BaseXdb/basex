@@ -37,9 +37,9 @@ public final class FNSimple extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     Iter ir = ctx.iter(expr[0]);
-    switch(func) {
+    switch(def) {
       case ONEORMORE:
-        if(expr[0].returned(ctx).mayBeZero()) ir = ItemIter.get(ir);
+        if(expr[0].type().mayBeZero()) ir = ItemIter.get(ir);
         if(ir.size() < 1) Err.or(input, EXP1M);
         return ir;
       case UNORDER:
@@ -53,7 +53,7 @@ public final class FNSimple extends Fun {
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Expr e = expr.length == 1 ? expr[0] : null;
-    switch(func) {
+    switch(def) {
       case FALSE:
         return Bln.FALSE;
       case TRUE:
@@ -86,26 +86,36 @@ public final class FNSimple extends Fun {
 
   @Override
   public Expr cmp(final QueryContext ctx) {
-    final SeqType s = expr.length == 1 ? expr[0].returned(ctx) : null;
+    final SeqType s = expr.length == 1 ? expr[0].type() : null;
 
-    switch(func) {
+    switch(def) {
       case NOT:
         if(expr[0] instanceof Fun) {
-          final Fun fs = (Fun) expr[0];
-          if(fs.func == FunDef.EMPTY) {
-            expr = fs.expr;
-            func = FunDef.EXISTS;
-          } else if(fs.func == FunDef.EXISTS) {
-            expr = fs.expr;
-            func = FunDef.EMPTY;
+          final Fun fun = (Fun) expr[0];
+          if(fun.def == FunDef.EMPTY) {
+            // simplify: not(empty(A)) -> exists(A)
+            expr = fun.expr;
+            def = FunDef.EXISTS;
+          } else if(fun.def == FunDef.EXISTS) {
+            // simplify: not(exists(A)) -> empty(A)
+            expr = fun.expr;
+            def = FunDef.EMPTY;
+          } else if(fun.def == FunDef.BOOLEAN) {
+            // simplify: not(boolean(A)) -> not(A)
+            expr = fun.expr;
           }
         }
         return this;
+      case BOOLEAN:
+        return expr[0].type().eq(SeqType.BLN) ? expr[0] : this;
       case ZEROORONE:
+        type = new SeqType(s.type, SeqType.Occ.ZO);
         return s.zeroOrOne() ? expr[0] : this;
       case EXACTLYONE:
+        type = new SeqType(s.type, SeqType.Occ.O);
         return s.one() ? expr[0] : this;
       case ONEORMORE:
+        type = new SeqType(s.type, SeqType.Occ.OM);
         return !s.mayBeZero() ? expr[0] : this;
       case UNORDER:
         return expr[0];
@@ -190,14 +200,5 @@ public final class FNSimple extends Fun {
       if(n1 != n2) return false;
     }
     return it1 == it2;
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    final Type t = expr.length == 1 ? expr[0].returned(ctx).type : null;
-    if(func == FunDef.ZEROORONE)  return new SeqType(t, SeqType.Occ.ZO);
-    if(func == FunDef.EXACTLYONE) return new SeqType(t, SeqType.Occ.O);
-    if(func == FunDef.ONEORMORE)  return new SeqType(t, SeqType.Occ.OM);
-    return super.returned(ctx);
   }
 }

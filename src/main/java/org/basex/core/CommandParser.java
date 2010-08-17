@@ -225,7 +225,7 @@ public final class CommandParser extends InputParser {
       case BACKUP:
         return new Backup(name(cmd));
       case RESTORE:
-        return new Restore(name(cmd));  
+        return new Restore(name(cmd));
       case SHOW:
         switch(consume(CmdShow.class, cmd)) {
           case DATABASES:
@@ -388,7 +388,7 @@ public final class CommandParser extends InputParser {
       if(!Cmd.class.isInstance(cmd)) return cmd;
       final Cmd c = Cmd.class.cast(cmd);
       if(!c.help() && (internal || !c.internal())) return cmd;
-    } catch(final IllegalArgumentException ex) { }
+    } catch(final IllegalArgumentException ex) { /* will not happen. */ }
 
     final Enum<?>[] alt = list(cmp, token);
     if(token == null) {

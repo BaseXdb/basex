@@ -29,7 +29,7 @@ public final class DataPool {
    * @return data reference
    */
   Data pin(final String db) {
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(data[i].meta.name.equals(db)) {
         pins[i]++;
         return data[i];
@@ -47,7 +47,7 @@ public final class DataPool {
     // ignore main-memory database instances
     if(d instanceof MemData) return false;
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(data[i] == d) {
         final boolean close = --pins[i] == 0;
         if(close) {
@@ -67,7 +67,7 @@ public final class DataPool {
    * @return result of check
    */
   boolean pinned(final String db) {
-    for(int i = 0; i < size; i++) if(data[i].meta.name.equals(db)) return true;
+    for(int i = 0; i < size; ++i) if(data[i].meta.name.equals(db)) return true;
     return false;
   }
 
@@ -96,7 +96,7 @@ public final class DataPool {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(SRVDATABASES, size);
     tb.add(size != 0 ? COL : DOT);
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       tb.add(NL + LI + data[i].meta.name + " (" + pins[i] + "x)");
     }
     return tb.toString();
@@ -107,7 +107,7 @@ public final class DataPool {
    */
   void close() {
     try {
-      for(int i = 0; i < size; i++) data[i].close();
+      for(int i = 0; i < size; ++i) data[i].close();
     } catch(final IOException ex) {
       Main.debug(ex);
     }
@@ -121,7 +121,7 @@ public final class DataPool {
    * @return number of references
    */
   public int pins(final String db) {
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(data[i].meta.name.equals(db)) return pins[i];
     }
     return 0;

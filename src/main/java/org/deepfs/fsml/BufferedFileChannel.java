@@ -512,7 +512,7 @@ public final class BufferedFileChannel {
     final TokenBuilder tb = new TokenBuilder(100);
     out: while(true) {
       final int max = buf.remaining();
-      for(int i = 0; i < max; i++) {
+      for(int i = 0; i < max; ++i) {
         final int b = get();
         if(b == '\n') {
           break out;

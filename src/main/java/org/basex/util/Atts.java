@@ -58,7 +58,7 @@ public final class Atts {
    * @return reference or -1
    */
   public int get(final byte[] k) {
-    for(int i = 0; i < size; i++) if(Token.eq(key[i], k)) return i;
+    for(int i = 0; i < size; ++i) if(Token.eq(key[i], k)) return i;
     return -1;
   }
 
@@ -74,7 +74,7 @@ public final class Atts {
   @Override
   public String toString() {
     final TokenBuilder sb = new TokenBuilder(Main.name(this) + "[");
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       sb.add(key[i]);
       sb.add("=\"");
       sb.add(val[i]);

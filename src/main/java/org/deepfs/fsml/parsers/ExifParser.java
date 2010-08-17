@@ -678,7 +678,7 @@ public final class ExifParser {
       int i = 0;
       final int numFormats = aFormats.length;
       sb.append(aFormats[i++]);
-      for(final int max = numFormats - 1; i < max; i++)
+      for(final int max = numFormats - 1; i < max; ++i)
         sb.append(", ").append(aFormats[i]);
       if(i < numFormats) sb.append(" or ").append(aFormats[i]);
       sb.append(", found: ").append(format).append(")");
@@ -724,7 +724,7 @@ public final class ExifParser {
           if(count == 1) d.addMeta(elem, readByte(b));
           else {
             final StringBuilder sbb = new StringBuilder();
-            for(int i = 0, max = count - 1; i < max; i++)
+            for(int i = 0, max = count - 1; i < max; ++i)
               sbb.append(readByte(b)).append(", ");
             sbb.append(readByte(b));
             d.addMeta(elem, sbb.toString());
@@ -735,7 +735,7 @@ public final class ExifParser {
           if(count == 1) d.addMeta(elem, readShort(b));
           else {
             final StringBuilder sbs = new StringBuilder();
-            for(int i = 0, max = count - 1; i < max; i++)
+            for(int i = 0, max = count - 1; i < max; ++i)
               sbs.append(readShort(b)).append(", ");
             sbs.append(readShort(b));
             d.addMeta(elem, sbs.toString());
@@ -762,7 +762,7 @@ public final class ExifParser {
             if(count == 1) d.addMeta(elem, readByte(b));
             else {
               final StringBuilder sbb = new StringBuilder();
-              for(int i = 0, max = count - 1; i < max; i++)
+              for(int i = 0, max = count - 1; i < max; ++i)
                 sbb.append(readByte(b)).append(", ");
               sbb.append(readByte(b));
               d.addMeta(elem, sbb.toString());
@@ -776,7 +776,7 @@ public final class ExifParser {
             if(count == 1) d.addMeta(elem, readShort(b));
             else {
               final StringBuilder sbs = new StringBuilder();
-              for(int i = 0, max = count - 1; i < max; i++)
+              for(int i = 0, max = count - 1; i < max; ++i)
                 sbs.append(readShort(b)).append(", ");
               sbs.append(readShort(b));
               d.addMeta(elem, sbs.toString());
@@ -786,7 +786,7 @@ public final class ExifParser {
             if(count == 1) d.addMeta(elem, readLong(b));
             else {
               final StringBuilder sbl = new StringBuilder();
-              for(int i = 0, max = count - 1; i < max; i++)
+              for(int i = 0, max = count - 1; i < max; ++i)
                 sbl.append(readLong(b)).append(", ");
               sbl.append(readLong(b));
               d.addMeta(elem, sbl.toString());
@@ -796,7 +796,7 @@ public final class ExifParser {
             if(count == 1) d.addMeta(elem, readRational(b));
             else {
               final StringBuilder sbr = new StringBuilder();
-              for(int i = 0; i < count; i++) {
+              for(int i = 0; i < count; ++i) {
                 final double db = readRational(b);
                 final long rounded = Math.round(db);
                 if(rounded == db) sbr.append(rounded);
@@ -810,7 +810,7 @@ public final class ExifParser {
             if(count == 1) d.addMeta(elem, readSLong(b));
             else {
               final StringBuilder sbsl = new StringBuilder();
-              for(int i = 0, max = count - 1; i < max; i++)
+              for(int i = 0, max = count - 1; i < max; ++i)
                 sbsl.append(readSLong(b)).append(", ");
               sbsl.append(readSLong(b));
               d.addMeta(elem, sbsl.toString());
@@ -820,7 +820,7 @@ public final class ExifParser {
             if(count == 1) d.addMeta(elem, readSRational(b));
             else {
               final StringBuilder sbsr = new StringBuilder();
-              for(int i = 0; i < count; i++) {
+              for(int i = 0; i < count; ++i) {
                 final double db = readSRational(b);
                 final long rounded = Math.round(db);
                 if(rounded == db) sbsr.append(rounded);
@@ -1055,7 +1055,7 @@ public final class ExifParser {
     final int numFields = bfc.getShort();
     // one field contains 12 bytes
     final byte[] buf = bfc.get(new byte[numFields * 12]);
-    for(int i = 0; i < numFields; i++) {
+    for(int i = 0; i < numFields; ++i) {
       readField(ByteBuffer.wrap(buf, i * 12, 12).order(bfc.getByteOrder()));
     }
   }

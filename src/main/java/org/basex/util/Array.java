@@ -100,7 +100,7 @@ public final class Array {
    */
   private static IntList number(final int l) {
     final int[] tmp = new int[l];
-    for(int i = 0; i < l; i++) tmp[i] = i;
+    for(int i = 0; i < l; ++i) tmp[i] = i;
     return new IntList(tmp);
   }
 }

@@ -38,7 +38,7 @@ public final class FNNum extends Fun {
 
     if(!it.unt() && !it.num()) Err.number(this, it);
     final double d = it.dbl(input);
-    switch(func) {
+    switch(def) {
       case ABS:    return abs(it, input);
       case CEIL:   return num(it, d, Math.ceil(d));
       case FLOOR:  return num(it, d, Math.floor(d));
@@ -108,7 +108,7 @@ public final class FNNum extends Fun {
     // calculate precision factor
     double p = 1;
     for(long i = prec; i > 0; i--) p *= 10;
-    for(long i = prec; i < 0; i++) p /= 10;
+    for(long i = prec; i < 0; ++i) p /= 10;
 
     double c = d;
     if(h2e) {

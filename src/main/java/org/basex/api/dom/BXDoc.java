@@ -108,7 +108,7 @@ public final class BXDoc extends BXNode implements Document {
   @Override
   public BXElem getDocumentElement() {
     final BXNList list = getChildNodes();
-    for(int l = 0; l < list.getLength(); l++) {
+    for(int l = 0; l < list.getLength(); ++l) {
       final BXNode n = list.item(l);
       if(n.getNodeType() == Node.ELEMENT_NODE) return (BXElem) n;
     }

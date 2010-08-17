@@ -73,7 +73,7 @@ final class TableContent extends BaseXBack {
 
     final TableIterator ti = new TableIterator(data, tdata);
     final TokenBuilder[] tb = new TokenBuilder[nCols];
-    for(int i = 0; i < nCols; i++) tb[i] = new TokenBuilder();
+    for(int i = 0; i < nCols; ++i) tb[i] = new TokenBuilder();
 
     focusedString = null;
     final Nodes marked = context.marked;
@@ -143,7 +143,7 @@ final class TableContent extends BaseXBack {
       byte[] focusStr = null;
       int fx = -1;
       double x = 1;
-      for(int c = 0; c < nCols; c++) {
+      for(int c = 0; c < nCols; ++c) {
         // draw single column
         double cw = w * tdata.cols[c].width;
         final double ce = x + cw;

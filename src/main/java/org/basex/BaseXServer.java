@@ -194,7 +194,7 @@ public final class BaseXServer extends Main implements Runnable {
         new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
             "-p", String.valueOf(port) }).start();
 
-        for(int c = 0; c < 10; c++) {
+        for(int c = 0; c < 10; ++c) {
           if(ping(LOCALHOST, port)) return SERVERSTART;
           Performance.sleep(200);
         }
@@ -219,7 +219,7 @@ public final class BaseXServer extends Main implements Runnable {
     }
     return false;
   }
-  
+
   /**
    * Stops the service.
    */

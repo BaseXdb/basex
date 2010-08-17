@@ -85,8 +85,8 @@ public final class FTWeight extends FTExpr {
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    return weight.removable(v, ctx) && super.removable(v, ctx);
+  public boolean removable(final Var v) {
+    return weight.removable(v) && super.removable(v);
   }
 
   @Override

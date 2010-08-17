@@ -182,7 +182,7 @@ public final class DataAccess {
    */
   public synchronized byte[] readBytes(final int l) {
     final byte[] b = new byte[l];
-    for(int i = 0; i < b.length; i++) b[i] = (byte) read();
+    for(int i = 0; i < b.length; ++i) b[i] = (byte) read();
     return b;
   }
 

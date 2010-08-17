@@ -62,7 +62,7 @@ abstract class Primitives {
     for(final int i : op.keySet()) nodes.add(i);
     nodes.sort();
 
-    for(int i = 0; i < s; i++) {
+    for(int i = 0; i < s; ++i) {
       for(final UpdatePrimitive p : op.get(nodes.get(i))) {
         p.prepare();
         // check if the identity of all target nodes of fn:put operations is
@@ -73,7 +73,7 @@ abstract class Primitives {
         }
       }
     }
-  };
+  }
 
   /**
    * Checks updates for violations.

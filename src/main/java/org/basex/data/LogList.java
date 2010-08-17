@@ -1,9 +1,8 @@
 package org.basex.data;
 
 /**
- * A pseudo-linear logging List to realize the ID->Pre Mapping. It saves
- * the inserts and deletes into the Database and calculates the mapping.
- * Works together with the Node-class.
+ * A pseudo-linear logging list to realize the ID->Pre mapping. It saves
+ * the inserts and deletes into the database and calculates the mapping.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Philipp Ziemer
@@ -19,7 +18,7 @@ final class LogList {
    */
   void insert(final int id, final int pre) {
     if(id == pre) return;
-    
+
     // list is empty
     if(first == null) {
       // calculation of the addends

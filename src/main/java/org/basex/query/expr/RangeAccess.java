@@ -23,7 +23,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class RangeAccess extends Simple {
+public final class RangeAccess extends Simple {
   /** Index type. */
   final IndexToken ind;
   /** Index context. */
@@ -39,6 +39,7 @@ final class RangeAccess extends Simple {
     super(ii);
     ind = t;
     ictx = ic;
+    type = SeqType.NOD_ZM;
   }
 
   @Override
@@ -56,23 +57,13 @@ final class RangeAccess extends Simple {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD_ZM;
-  }
-
-  @Override
-  public boolean duplicates(final QueryContext ctx) {
+  public boolean duplicates() {
     return ictx.dupl;
   }
 
   @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof RangeAccess;
-  }
-
-  @Override
-  public String color() {
-    return "CC99FF";
   }
 
   @Override

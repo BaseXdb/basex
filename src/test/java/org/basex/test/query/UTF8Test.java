@@ -19,16 +19,16 @@ import org.junit.Test;
 public class UTF8Test {
   /** Database context. */
   private static Context context = new Context();
-  
+
   /** Codepoint of the MUSICAL SYMBOL PARENTHESIS NOTEHEAD. */
   private static final int CP = 0x1D156;
-  
+
   /** UTF16 chars of the codepoint. */
   private static final char[] CA = Character.toChars(CP);
-  
+
   /** String containing the codepoint. */
   private static final String STR = new String(CA);
-  
+
   /** UTF-8 bytes of the codepoint. */
   private static final byte[] BA = STR.getBytes(Charset.availableCharsets().get(
       "UTF-8"));
@@ -56,7 +56,7 @@ public class UTF8Test {
   public final void surrogates4() {
     assertEquals(CP, cp(BA, 0));
   }
-  
+
   /**
    * Executes a query and returns the serialized result.
    * @param xq query
@@ -70,5 +70,4 @@ public class UTF8Test {
       return null; // never reached
     }
   }
-  
 }

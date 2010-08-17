@@ -5,7 +5,6 @@ import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 
@@ -43,7 +42,13 @@ public final class Switch extends Arr {
       }
       if(vals && e == this) e = expr[el - 1];
     }
-    if(e != this) ctx.compInfo(OPTPRE, SWITCH + "(" + expr[0] + ")");
+    if(e != this) {
+      ctx.compInfo(OPTPRE, SWITCH + "(" + expr[0] + ")");
+    } else {
+      final int el = expr.length;
+      type = expr[el - 1].type();
+      for(int i = 1; i < el - 1; i += 2) type = type.intersect(expr[i].type());
+    }
     return e;
   }
 
@@ -61,20 +66,10 @@ public final class Switch extends Arr {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    final int el = expr.length;
-    final SeqType ret = expr[el - 1].returned(ctx);
-    for(int i = 1; i < el - 1; i += 2) {
-      if(!ret.eq(expr[i].returned(ctx))) return SeqType.ITEM_ZM;
-    }
-    return ret;
-  }
-
-  @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(SWITCH + "(" + expr[0] + ")");
     final int el = expr.length;
-    for(int i = 1; i < el; i++) {
+    for(int i = 1; i < el; ++i) {
       sb.append(" " + (i + 1 < el ? CASE + ' ' + expr[i++] : DEFAULT));
       sb.append(" " + RETURN + " " + expr[i]);
     }

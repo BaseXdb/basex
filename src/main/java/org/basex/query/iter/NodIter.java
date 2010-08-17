@@ -16,8 +16,7 @@ public final class NodIter extends NodeIter {
   /** Items. */
   public Nod[] item;
   /** Size. */
-  public int size;
-
+  private int size;
   /** Iterator. */
   private int pos = -1;
   /** Sort flag. */
@@ -105,6 +104,14 @@ public final class NodIter extends NodeIter {
     return size;
   }
 
+  /**
+   * Sets a new item size.
+   * @param s size
+   */
+  public void size(final int s) {
+    size = s;
+  }
+
   @Override
   public Value finish() {
     if(dupl) sort(sort);
@@ -121,7 +128,7 @@ public final class NodIter extends NodeIter {
 
     if(size == 0 || !(item[0] instanceof DBNode)) return false;
     final DBNode n = (DBNode) item[0];
-    for(int s = 1; s < size; s++) {
+    for(int s = 1; s < size; ++s) {
       if(!(item[s] instanceof DBNode) || n.data != ((DBNode) item[s]).data)
         return false;
     }
@@ -150,10 +157,19 @@ public final class NodIter extends NodeIter {
   }
 
   /**
+   * Sorts the nodes, if necessary.
+   * @return self reference
+   */
+  public NodIter sort() {
+    if(dupl) sort(sort);
+    return this;
+  }
+
+  /**
    * Sorts the nodes.
    * @param force force sort
    */
-  public void sort(final boolean force) {
+  private void sort(final boolean force) {
     dupl = false;
     if(size > 1) {
       // sort arrays and remove duplicates
@@ -161,7 +177,7 @@ public final class NodIter extends NodeIter {
 
       // remove duplicates and merge scores
       int i = 1;
-      for(int j = 1; j < size; j++) {
+      for(int j = 1; j < size; ++j) {
         while(j < size && item[i - 1].is(item[j])) {
           item[i - 1].score(Math.max(item[j++].score(), item[i - 1].score()));
         }
@@ -180,7 +196,7 @@ public final class NodIter extends NodeIter {
    */
   private void sort(final int s, final int e) {
     if(e < 7) {
-      for(int i = s; i < e + s; i++)
+      for(int i = s; i < e + s; ++i)
         for(int j = i; j > s && item[j - 1].diff(item[j]) > 0; j--) s(j, j - 1);
       return;
     }
@@ -235,7 +251,7 @@ public final class NodIter extends NodeIter {
    * @param n number of values
    */
   private void s(final int a, final int b, final int n) {
-    for(int i = 0; i < n; i++) s(a + i, b + i);
+    for(int i = 0; i < n; ++i) s(a + i, b + i);
   }
 
   /**
@@ -265,7 +281,7 @@ public final class NodIter extends NodeIter {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("(");
-    for(int v = 0; v != size; v++) {
+    for(int v = 0; v != size; ++v) {
       sb.append((v != 0 ? ", " : "") + item[v]);
       if(sb.length() > 15 && v + 1 != size) {
         sb.append(", ...");

@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import java.util.Arrays;
 import org.basex.core.User;
 import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
@@ -13,7 +12,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.FunCall;
+import org.basex.query.expr.FuncCall;
 import org.basex.query.expr.Func;
 import org.basex.query.func.FNIndex;
 import org.basex.query.func.Fun;
@@ -22,19 +21,21 @@ import org.basex.query.func.FunJava;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
+import org.basex.util.Array;
+import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
 
 /**
- * Global expression context.
+ * Container for global function declarations.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Functions extends ExprInfo {
+  /** Cached function call. */
+  private FuncCall[][] calls = { };
   /** Local functions. */
-  private Func[] func = new Func[1];
-  /** Number of local functions. */
-  private int size;
+  private Func[] func = { };
 
   /**
    * Returns the function with the specified id.
@@ -43,6 +44,14 @@ public final class Functions extends ExprInfo {
    */
   public Func get(final int id) {
     return func[id];
+  }
+
+  /**
+   * Returns the number of functions.
+   * @return function
+   */
+  public int size() {
+    return func.length;
   }
 
   /**
@@ -107,22 +116,38 @@ public final class Functions extends ExprInfo {
     // check predefined functions
     final Fun fun = FNIndex.get().get(ln, uri, args, qp);
     if(fun != null) {
-      ctx.updating |= fun.func == FunDef.PUT;
+      ctx.updating |= fun.def == FunDef.PUT;
       return fun;
     }
 
     // find local function
-    for(int l = 0; l < size; l++) {
+    for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].var.name;
       if(eq(ln, qn.ln()) && eq(uri, qn.uri.atom()) && args.length ==
-        func[l].args.length) return new FunCall(qp.input(), qn, l, args);
+        func[l].args.length) return add(qp.input(), qn, l, args);
     }
 
+    // add function call for function that has not been defined yet
     if(Type.find(name, true) == null) {
-      return new FunCall(qp.input(), name, add(new Func(qp.input(),
+      return add(qp.input(), name, add(new Func(qp.input(),
           new Var(name), new Var[args.length], false), qp), args);
     }
     return null;
+  }
+
+  /**
+   * Registers and returns a new function call.
+   * @param ii input info
+   * @param nm function name
+   * @param id function id
+   * @param arg arguments
+   * @return new function call
+   */
+  private FuncCall add(final InputInfo ii, final QNm nm, final int id,
+      final Expr[] arg) {
+    final FuncCall call = new FuncCall(ii, nm, arg);
+    calls[id] = Array.add(calls[id], call);
+    return call;
   }
 
   /**
@@ -139,29 +164,43 @@ public final class Functions extends ExprInfo {
     if(uri.length == 0) qp.error(FUNNONS, name.atom());
 
     if(NSGlobal.standard(uri)) {
-      if(fun.decl) qp.error(NAMERES, name.atom());
+      if(fun.declared) qp.error(NAMERES, name.atom());
       else funError(fun.var.name, qp);
     }
 
     final byte[] ln = name.ln();
-    for(int l = 0; l < size; l++) {
+    for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].var.name;
       final byte[] u = qn.uri.atom();
       final byte[] nm = qn.ln();
 
-      if(eq(ln, nm) && eq(uri, u) &&
-          fun.args.length == func[l].args.length) {
-        if(!func[l].decl) {
+      if(eq(ln, nm) && eq(uri, u) && fun.args.length == func[l].args.length) {
+        // declare function that has been called before
+        if(!func[l].declared) {
           func[l] = fun;
           return l;
         }
+        // duplicate declaration
         qp.error(FUNCDEFINED, fun);
       }
     }
+    // add function skeleton
+    func = Array.add(func, fun);
+    calls = Array.add(calls, new FuncCall[0]);
+    return func.length - 1;
+  }
 
-    if(size == func.length) func = Arrays.copyOf(func, size << 1);
-    func[size] = fun;
-    return size++;
+  /**
+   * Checks if all functions have been correctly declared, and initializes
+   * all function calls.
+   * @throws QueryException query exception
+   */
+  public void check() throws QueryException {
+    // initialize function calls
+    for(int i = 0; i < func.length; ++i) {
+      for(final FuncCall c : calls[i]) c.init(func[i]);
+    }
+    for(final Func f : func) f.check();
   }
 
   /**
@@ -170,18 +209,9 @@ public final class Functions extends ExprInfo {
    * @throws QueryException query exception
    */
   public void comp(final QueryContext ctx) throws QueryException {
-    for(int i = 0; i < size; i++) func[i].comp(ctx);
-  }
-
-  /**
-   * Checks if all functions have been correctly initialized.
-   * @throws QueryException query exception
-   */
-  public void check() throws QueryException {
-    for(int i = 0; i < size; i++) {
-      if(!func[i].decl) {
-        Err.or(func[i].input, FUNCUNKNOWN, func[i].var.name.atom());
-      }
+    // only compile those functions that are used
+    for(int i = 0; i < func.length; ++i) {
+      if(calls[i].length != 0) func[i].comp(ctx);
     }
   }
 
@@ -199,7 +229,7 @@ public final class Functions extends ExprInfo {
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();
-    for(int n = 0; n < size; n++) {
+    for(int n = 0; n < func.length; ++n) {
       if(ls.similar(nm, lc(func[n].var.name.ln()), 0))
         qp.error(FUNSIMILAR, name.atom(), func[n].var.name.atom());
     }
@@ -207,9 +237,9 @@ public final class Functions extends ExprInfo {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    if(size == 0) return;
+    if(func.length == 0) return;
     ser.openElement(this);
-    for(int i = 0; i < size; i++) func[i].plan(ser);
+    for(int i = 0; i < func.length; ++i) func[i].plan(ser);
     ser.closeElement();
   }
 

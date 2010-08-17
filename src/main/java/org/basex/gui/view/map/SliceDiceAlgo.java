@@ -25,7 +25,7 @@ final class SliceDiceAlgo extends MapAlgo {
     final MapRects rects = new MapRects();
     // calculate map for each rectangle on this level
     final int is = ml.size();
-    for(int i = 0; i < is; i++) {
+    for(int i = 0; i < is; ++i) {
       if((r.level & 1) == 0) {
         yy += hh;
         hh = ml.weight[i] * r.h;

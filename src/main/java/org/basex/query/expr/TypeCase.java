@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
@@ -56,12 +55,13 @@ public final class TypeCase extends Single {
       super.comp(ctx);
       ctx.vars.reset(s);
     }
+    type = expr.type();
     return this;
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.VAR || super.uses(u);
   }
 
   @Override
@@ -86,11 +86,6 @@ public final class TypeCase extends Single {
     final ItemIter ir = ItemIter.get(ctx.iter(expr));
     ctx.vars.reset(s);
     return ir;
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return expr.returned(ctx);
   }
 
   @Override

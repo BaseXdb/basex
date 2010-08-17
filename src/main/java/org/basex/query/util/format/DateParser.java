@@ -65,7 +65,7 @@ final class DateParser {
     while(pic.charAt(pos++) != ']')
       if(!more()) Err.or(input, PICDATE, pic);
     final StringBuilder sb = new StringBuilder();
-    for(; p < pos - 1; p++) {
+    for(; p < pos - 1; ++p) {
       final char ch = pic.charAt(p);
       if(!Character.isWhitespace(ch)) sb.append(ch);
     }

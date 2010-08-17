@@ -42,7 +42,7 @@ public final class ShowUsers extends Command {
       try {
         final Data data = Open.open(name, context);
         final ArrayList<User> loc = data.meta.users;
-        for(int i = 0; i < loc.size(); i++) {
+        for(int i = 0; i < loc.size(); ++i) {
           final User us = context.users.get(loc.get(i).name);
           if(us == null) loc.remove(loc.get(i--));
         }

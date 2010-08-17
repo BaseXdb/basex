@@ -73,7 +73,7 @@ public final class DialogPrefs extends Dialog {
       public void actionPerformed(final ActionEvent e) {
         final IO file = new BaseXFileChooser(DIALOGFC, path.getText(),
             gui).select(BaseXFileChooser.Mode.DOPEN);
-        if(file != null) path.setText(file.getDir());
+        if(file != null) path.setText(file.dir());
       }
     });
 
@@ -154,7 +154,7 @@ public final class DialogPrefs extends Dialog {
    * @return credits
    */
   static String creds(final String lng) {
-    for(int i = 0; i < LANGS[0].length; i++) {
+    for(int i = 0; i < LANGS[0].length; ++i) {
       if(lng.equals(LANGS[0][i])) return LANGS[1][i];
     }
     return "";

@@ -1,0 +1,36 @@
+
+REDMINE CONNECTOR ==============================================================
+
+ 1. Install Mylyn from the eclipse update site, if not installed anyway:
+    Work With: http://download.eclipse.org/tools/mylyn/update/helios
+  - Mylyn Bridge, Eclipse IDE
+  - Mylyn Bridge, Java Developement
+  - Mylyn Bridge, Team Support
+  - Mylyn Task List
+  - Mylyn Task-Focused Interface
+
+ 2. Install the Redmine Connection:
+    Work With: http://redmin-mylyncon.sourceforge.net/update-site/nightly
+
+ 3. Add new Task Repository:
+    Window -> Show View -> Other -> "Task Repositories" -> OK
+    Right click in the new view and choose "Add Task Repository..."
+
+ 4. Choose the Redmine Connection, click Next and fill out the fields:
+  - Server: https://projects.uni-konstanz.de
+  - Label: Redmine
+  - User ID: first part of your university e-mail address
+  - Password: your university password
+  - Additional Settings, Redmine plugin: RESTful
+  -> FINISH
+
+ On the view called "Task List", you will find the tasks assigned to you.
+ You can insert new tasks within the plugin. In the "Package Explorer" view,
+ hit the right button on the top ("Focus on Active Task"). This will
+ enable/disable the focused workflow.
+
+ Thanks to Sebastian Graf for the tutorial!
+
+ BaseX Team, 2010
+
+============================================= DBIS Group, University of Konstanz

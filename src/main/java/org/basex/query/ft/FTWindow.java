@@ -62,7 +62,7 @@ public final class FTWindow extends FTFilter {
     if(f == null) return false;
 
     final int w = n - pos(f.e, ft) + pos(f.s, ft);
-    for(int s = pos(f.s, ft) - w; s <= pos(f.s, ft); s++) {
+    for(int s = pos(f.s, ft) - w; s <= pos(f.s, ft); ++s) {
       boolean h = false;
       for(final FTStringMatch m : mtc) {
         h = m.n && pos(m.s, ft) >= s && pos(m.e, ft) <= s + w;
@@ -78,8 +78,8 @@ public final class FTWindow extends FTFilter {
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    return win.removable(v, ctx) && super.removable(v, ctx);
+  public boolean removable(final Var v) {
+    return win.removable(v) && super.removable(v);
   }
 
   @Override

@@ -77,7 +77,7 @@ public final class GUIInput extends BaseXTextField {
             final String[] hs = i == 0 ? gprop.strings(GUIProp.SEARCH) :
               i == 1 ? gprop.strings(GUIProp.XQUERY) :
               gprop.strings(GUIProp.COMMANDS);
-            for(int p = 0; p < hs.length && sl.size() < 10; p++) {
+            for(int p = 0; p < hs.length && sl.size() < 10; ++p) {
               if(!hs[p].equals(txt)) sl.add(hs[p]);
             }
             gprop.set(i == 0 ? GUIProp.SEARCH : i == 1 ? GUIProp.XQUERY :
@@ -237,7 +237,7 @@ public final class GUIInput extends BaseXTextField {
   private boolean comboChanged(final StringList sl) {
     if(sl.size() != box.getItemCount()) return true;
     final int is = sl.size();
-    for(int i = 0; i < is; i++) {
+    for(int i = 0; i < is; ++i) {
       if(!sl.get(i).equals(box.getItemAt(i))) return true;
     }
     return false;

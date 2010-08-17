@@ -1,8 +1,8 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.SeqType;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -27,6 +27,22 @@ public abstract class ForLet extends Single {
     var = v;
   }
 
+  /**
+   * If possible, binds the variable at compile time.
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  protected boolean bind(final QueryContext ctx) throws QueryException {
+    // don't bind variable if expression uses variables, context, or fragments
+    if(expr.uses(Use.VAR) || expr.uses(Use.CTX) || expr.uses(Use.FRG) ||
+        ctx.grouping) return false;
+
+    ctx.compInfo(OPTBIND, var);
+    var.bind(expr, ctx);
+    return true;
+  }
+
   @Override
   public abstract ForLet comp(final QueryContext ctx) throws QueryException;
 
@@ -36,38 +52,26 @@ public abstract class ForLet extends Single {
    */
   abstract boolean simple();
 
+  /**
+   * Checks if the specified is not shadowed by another variable.
+   * @param v variable to be checked
+   * @return result of check
+   */
+  abstract boolean shadows(final Var v);
+
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || super.uses(u, ctx);
+  public final boolean uses(final Use u) {
+    return u == Use.VAR || super.uses(u);
   }
 
   @Override
-  public final boolean removable(final Var v, final QueryContext ctx) {
-    return expr.removable(v, ctx);
+  public final boolean removable(final Var v) {
+    return expr.removable(v);
   }
 
   @Override
   public final Expr remove(final Var v) {
     expr = expr.remove(v);
     return this;
-  }
-
-  @Override
-  public final SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN_ZM;
-  }
-
-  /**
-   * Checks if the specified is not shadowed by another variable.
-   * @param v variable to be checked
-   * @return result of check
-   */
-  boolean shadows(final Var v) {
-    return !v.visible(var);
-  }
-
-  @Override
-  public final String color() {
-    return "66CC66";
   }
 }

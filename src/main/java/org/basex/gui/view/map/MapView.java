@@ -38,7 +38,7 @@ public final class MapView extends View implements Runnable {
   /** Dynamic zooming steps. */
   private static final int[] ZS = { 0, 0, 0, 0, 20, 80, 180, 320, 540, 840,
       1240, 1740, 2380, 3120, 4000, 4980, 5980, 6860, 7600, 8240, 8740, 9140,
-      9440, 9660, 9800, 9900, 9960, 9980, 9980, 9980, 10000};
+      9440, 9660, 9800, 9900, 9960, 9980, 9980, 9980, 10000 };
   /** Number of zooming steps. */
   private static final int ZOOMSIZE = ZS.length - 1;
   /** Maximum zooming step. */
@@ -127,7 +127,7 @@ public final class MapView extends View implements Runnable {
 
     if(mainRects == null) return;
     final int ms = mainRects.size;
-    for(int mi = 0; mi < ms; mi++) {
+    for(int mi = 0; mi < ms; ++mi) {
       final MapRect rect = mainRects.get(mi);
       if(f == rect.pre || mi + 1 == ms || f < mainRects.get(mi + 1).pre) {
         focused = rect;
@@ -148,9 +148,9 @@ public final class MapView extends View implements Runnable {
     // use simple zooming animation for result node filtering
     final Nodes context = gui.context.current;
     final int hist = gui.notify.hist;
-    final boolean page = !more && rectHist[hist + 1] != null
-        && rectHist[hist + 1].pre == 0 || more && (context.size() != 1 ||
-        focused == null || context.nodes[0] != focused.pre);
+    final boolean page = !more && rectHist[hist + 1] != null &&
+      rectHist[hist + 1].pre == 0 || more && (context.size() != 1 ||
+      focused == null || context.nodes[0] != focused.pre);
     if(page) focused = new MapRect(0, 0, getWidth(), 1);
 
     zoom(more, quick);
@@ -532,7 +532,7 @@ public final class MapView extends View implements Runnable {
     final IntList il = new IntList();
     int np = 0;
     final int rl = mainRects.size;
-    for(int r = 0; r < rl; r++) {
+    for(int r = 0; r < rl; ++r) {
       final MapRect rect = mainRects.get(r);
       if(mainRects.get(r).pre < np) continue;
       if(selBox.contains(rect)) {
@@ -623,7 +623,7 @@ public final class MapView extends View implements Runnable {
     final int[] parStack = new int[IO.MAXHEIGHT];
     int l = 0;
 
-    for(int pre = 0; pre < size; pre++) {
+    for(int pre = 0; pre < size; ++pre) {
       final int kind = data.kind(pre);
       final int par = data.parent(pre, kind);
 

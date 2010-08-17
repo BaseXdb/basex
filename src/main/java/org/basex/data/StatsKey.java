@@ -23,7 +23,7 @@ public final class StatsKey {
     /** Numeric.  */ INT,
     /** Numeric.  */ DBL,
     /** No texts. */ NONE
-  };
+  }
   /** Node kind. */
   public Kind kind;
   /** Categories. */
@@ -64,7 +64,7 @@ public final class StatsKey {
     } else if(kind == Kind.CAT) {
       cats = new TokenSet();
       final int cl = in.readNum();
-      for(int i = 0; i < cl; i++) cats.add(in.readBytes());
+      for(int i = 0; i < cl; ++i) cats.add(in.readBytes());
     }
     counter = in.readNum();
     leaf = in.readBool();
@@ -90,7 +90,7 @@ public final class StatsKey {
     } else if(kind == Kind.CAT) {
       final int cl = cats.size();
       out.writeNum(cl);
-      for(int i = 1; i <= cl; i++) out.writeToken(cats.key(i));
+      for(int i = 1; i <= cl; ++i) out.writeToken(cats.key(i));
     }
     out.writeNum(counter);
     out.writeBool(leaf);

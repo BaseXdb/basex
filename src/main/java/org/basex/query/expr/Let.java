@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -24,7 +24,7 @@ import org.basex.util.Token;
  */
 public final class Let extends ForLet {
   /** Scoring flag. */
-  final boolean score;
+  protected final boolean score;
 
   /**
    * Constructor.
@@ -43,15 +43,15 @@ public final class Let extends ForLet {
     // always returns a self reference
     expr = checkUp(expr, ctx).comp(ctx);
 
-    // bind variable if expression uses no var, pos, ctx, or fragment
-    if(!score && !(expr.uses(Use.VAR, ctx) || expr.uses(Use.POS, ctx) ||
-        expr.uses(Use.CTX, ctx) || expr.uses(Use.FRG, ctx)) && !ctx.grouping) {
-      ctx.compInfo(OPTBIND, var);
-      var.bind(expr, ctx);
-    } else {
-      var.ret = score ? SeqType.ITR : expr.returned(ctx);
+    // bind variable or set return type
+    if(score || !bind(ctx)) {
+      // set return type if variable cannot be statically bound
+      var.ret = score ? SeqType.DBL : expr.type();
     }
     ctx.vars.add(var);
+
+    type = SeqType.ITEM;
+    size = 1;
     return this;
   }
 
@@ -118,18 +118,19 @@ public final class Let extends ForLet {
   }
 
   @Override
-  public long size(final QueryContext ctx) {
-    return 1;
-  }
-
-  @Override
   boolean simple() {
     return !score;
   }
 
   @Override
+  boolean shadows(final Var v) {
+    return !v.visible(var);
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, score ? Token.token(SCORE) : VAR, var.name.atom());
+    ser.openElement(this, score ? Token.token(SCORE) : VAR,
+        token(var.toString()));
     expr.plan(ser);
     ser.closeElement();
   }

@@ -35,7 +35,7 @@ final class FNAcc extends Fun {
       throws QueryException {
 
     final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
-    switch(func) {
+    switch(def) {
       case POS:
         return Itr.get(ctx.pos);
       case LAST:
@@ -79,9 +79,9 @@ final class FNAcc extends Fun {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    final boolean pos = func == FunDef.POS || func == FunDef.LAST;
+  public boolean uses(final Use u) {
+    final boolean pos = def == FunDef.POS || def == FunDef.LAST;
     return u == Use.CTX && (pos || expr.length == 0) ||
-      u == Use.POS && pos || super.uses(u, ctx);
+      u == Use.POS && pos || super.uses(u);
   }
 }

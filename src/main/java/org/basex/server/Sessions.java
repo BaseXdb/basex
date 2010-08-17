@@ -50,7 +50,7 @@ public final class Sessions implements Iterable<ServerProcess> {
    * @param s entry to be deleted
    */
   public void delete(final ServerProcess s) {
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(list[i] == s) {
         Array.move(list, i + 1, -1, --size - i);
         break;
@@ -66,7 +66,7 @@ public final class Sessions implements Iterable<ServerProcess> {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(SRVSESSIONS, size);
     tb.add(size != 0 ? COL : DOT);
-    for(int i = 0; i < size; i++) tb.add(NL + LI +
+    for(int i = 0; i < size; ++i) tb.add(NL + LI +
         list[i].context.user.name + " " + list[i].info());
     return tb.toString();
   }

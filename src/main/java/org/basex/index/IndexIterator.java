@@ -12,9 +12,9 @@ public abstract class IndexIterator {
    */
   static final IndexIterator EMPTY = new IndexIterator() {
     @Override
-    public boolean more() { return false; };
+    public boolean more() { return false; }
     @Override
-    public int next() { return 0; };
+    public int next() { return 0; }
     @Override
     public double score() { return -1; }
   };

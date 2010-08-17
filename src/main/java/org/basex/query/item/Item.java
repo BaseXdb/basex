@@ -2,11 +2,8 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
-
 import java.io.IOException;
 import java.math.BigDecimal;
-
-import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -36,7 +33,7 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter() {
     return new Iter() {
       private boolean more;
       @Override
@@ -50,11 +47,6 @@ public abstract class Item extends Value {
       @Override
       public boolean reverse() { return true; }
     };
-  }
-  
-  @Override
-  public final boolean item() {
-    return true;
   }
 
   @Override
@@ -77,14 +69,16 @@ public abstract class Item extends Value {
     return bool(ii) ? this : null;
   }
 
+  @Override
+  public final boolean item() {
+    return true;
+  }
+
   /**
    * Returns an atomized string.
    * @return string representation
    */
-  public byte[] atom() {
-    Main.notexpected();
-    return null;
-  }
+  public abstract byte[] atom();
 
   /**
    * Returns a boolean representation of the value.
@@ -194,17 +188,17 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
+  public SeqType type() {
     return new SeqType(type, SeqType.Occ.O);
   }
 
   @Override
-  public long size(final QueryContext ctx) {
+  public final long size() {
     return 1;
   }
 
   @Override
-  public final boolean duplicates(final QueryContext ctx) {
+  public final boolean duplicates() {
     return false;
   }
 
@@ -247,14 +241,13 @@ public abstract class Item extends Value {
   /**
    * Throws a date format exception.
    * @param i input
-   * @param t expected type
    * @param ex example format
    * @param ii input info
    * @throws QueryException query exception
    */
-  public static void dateErr(final byte[] i, final Type t, final String ex,
-      final InputInfo ii) throws QueryException {
-    Err.or(ii, DATEFORMAT, t, i, ex);
+  public void dateErr(final byte[] i, final String ex, final InputInfo ii)
+      throws QueryException {
+    Err.or(ii, DATEFORMAT, type, i, ex);
   }
 
   /**
@@ -272,7 +265,6 @@ public abstract class Item extends Value {
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, VAL, atom());
-    ser.closeElement();
   }
 
   @Override

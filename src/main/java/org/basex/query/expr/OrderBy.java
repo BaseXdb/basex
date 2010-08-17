@@ -15,7 +15,6 @@ import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
-
 import static org.basex.util.Token.token;
 
 /**
@@ -56,6 +55,7 @@ public final class OrderBy extends ParseExpr {
     expr = e;
     desc = d;
     lst = l;
+    type = expr == null ? SeqType.ITEM_ZM : expr.type();
   }
 
   @Override
@@ -99,24 +99,14 @@ public final class OrderBy extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return expr != null && expr.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return expr != null && expr.uses(u);
   }
 
   @Override
   public OrderBy remove(final Var v) {
     if(expr != null) expr = expr.remove(v);
     return this;
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return expr == null ? SeqType.ITEM_ZM : expr.returned(ctx);
-  }
-
-  @Override
-  public String color() {
-    return "66FF66";
   }
 
   @Override

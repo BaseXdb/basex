@@ -1,7 +1,6 @@
 package org.basex.query.util;
 
 import static org.basex.query.QueryText.*;
-
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.item.Item;

@@ -605,7 +605,7 @@ final class XMLScanner extends Progress {
    * @throws IOException I/O exception
    */
   private boolean consume(final byte[] tok) throws IOException {
-    for(int t = 0; t < tok.length; t++) {
+    for(int t = 0; t < tok.length; ++t) {
       final int ch = consume();
       if(ch != tok[t]) {
         prev(t + 1);

@@ -347,7 +347,7 @@ public final class GUIFS {
   private boolean equal(final byte[] t1, final byte[] t2, final int s) {
     final int tl = t1.length;
     if(tl != t2.length - s) return false;
-    for(int t = 0; t < tl; t++) {
+    for(int t = 0; t < tl; ++t) {
       if(Token.lc(t1[t]) != Token.lc(t2[s + t])) return false;
     }
     return true;
@@ -361,7 +361,7 @@ public final class GUIFS {
    */
   private int hash(final byte[] tok, final int s) {
     int h = 0;
-    for(int t = s; t < tok.length; t++) h = (h << 5) - h + Token.lc(tok[t]);
+    for(int t = s; t < tok.length; ++t) h = (h << 5) - h + Token.lc(tok[t]);
     return h;
   }
 }

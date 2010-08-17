@@ -26,6 +26,7 @@ public final class Root extends Simple {
    */
   public Root(final InputInfo ii) {
     super(ii);
+    type = SeqType.NOD_ZM;
   }
 
   @Override
@@ -57,17 +58,12 @@ public final class Root extends Simple {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public boolean uses(final Use u) {
     return u == Use.CTX;
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD_ZM;
-  }
-
-  @Override
-  public boolean duplicates(final QueryContext ctx) {
+  public boolean duplicates() {
     return false;
   }
 

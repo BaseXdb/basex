@@ -27,7 +27,7 @@ import org.basex.util.InputInfo;
  */
 public final class MixedPath extends Path {
   /** Expression list. */
-  private final Expr[] step;
+  private final Expr[] expr;
 
   /**
    * Constructor.
@@ -37,16 +37,18 @@ public final class MixedPath extends Path {
    */
   public MixedPath(final InputInfo ii, final Expr r, final Expr... s) {
     super(ii, r);
-    step = s;
+    expr = s;
   }
 
   @Override
   protected Expr compPath(final QueryContext ctx) throws QueryException {
-    for(final Expr e : step) checkUp(e, ctx);
-    for(int i = 0; i != step.length; i++) {
-      step[i] = step[i].comp(ctx);
-      if(step[i].empty()) return Empty.SEQ;
+    for(final Expr e : expr) checkUp(e, ctx);
+
+    for(int e = 0; e != expr.length; ++e) {
+      expr[e] = expr[e].comp(ctx);
+      if(expr[e].empty()) return Empty.SEQ;
     }
+    type = new SeqType(expr[expr.length - 1].type().type, SeqType.Occ.ZM);
     return this;
   }
 
@@ -73,7 +75,7 @@ public final class MixedPath extends Path {
   private ItemIter eval(final QueryContext ctx) throws QueryException {
     // simple location step traversal...
     ItemIter res = ItemIter.get(ctx.value.iter(ctx));
-    for(final Expr s : step) {
+    for(final Expr e : expr) {
       final Iter ir = res;
       final ItemIter ii = new ItemIter();
       ctx.size = ir.size();
@@ -82,7 +84,7 @@ public final class MixedPath extends Path {
       while((i = ir.next()) != null) {
         if(!i.node()) Err.or(input, NODESPATH, this, i.type);
         ctx.value = i;
-        ii.add(ctx.iter(s));
+        ii.add(ctx.iter(e));
         ctx.pos++;
       }
 
@@ -106,35 +108,29 @@ public final class MixedPath extends Path {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return uses(step, u, ctx);
+  public boolean uses(final Use u) {
+    return uses(expr, u);
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    for(final Expr s : step) if(s.uses(Use.VAR, ctx)) return false;
+  public boolean removable(final Var v) {
+    for(final Expr e : expr) if(e.uses(Use.VAR)) return false;
     return true;
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(int s = 0; s != step.length; s++) step[s] = step[s].remove(v);
+    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
     return super.remove(v);
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    final SeqType ret = step[step.length - 1].returned(ctx);
-    return new SeqType(ret.type, SeqType.Occ.ZM);
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
-    super.plan(ser, step);
+    super.plan(ser, expr);
   }
 
   @Override
   public String toString() {
-    return toString(step);
+    return toString(expr);
   }
 }

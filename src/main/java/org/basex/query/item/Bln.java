@@ -2,7 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
 import java.math.BigDecimal;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -98,7 +97,7 @@ public final class Bln extends Item {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
+  public SeqType type() {
     return SeqType.BLN;
   }
 

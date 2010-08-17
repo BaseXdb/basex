@@ -67,7 +67,7 @@ public final class Values implements Index {
     final long l = idxl.length() + idxr.length();
     tb.add(SIZEDISK + Performance.format(l, true) + NL);
     final IndexStats stats = new IndexStats(data);
-    for(int m = 0; m < size; m++) {
+    for(int m = 0; m < size; ++m) {
       final int oc = idxl.readNum(idxr.read5(m * 5L));
       if(stats.adding(oc)) stats.add(data.text(idxl.readNum(), text));
     }
@@ -121,7 +121,7 @@ public final class Values implements Index {
   private IndexIterator iter(final int s, final long ps) {
     final IntList ids = new IntList(s);
     long p = ps;
-    for(int l = 0, v = 0; l < s; l++) {
+    for(int l = 0, v = 0; l < s; ++l) {
       v += idxl.readNum(p);
       p = idxl.pos();
       ids.add(v);
@@ -143,7 +143,7 @@ public final class Values implements Index {
 
     final IntList ids = new IntList();
     boolean found = false;
-    for(int l = 0; l < size - 1; l++) {
+    for(int l = 0; l < size - 1; ++l) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
       final double v = data.textNum(pre, text);
@@ -162,7 +162,7 @@ public final class Values implements Index {
         continue;
       }
       ids.add(pre);
-      for(int d = 0; d < ds - 1; d++) ids.add(pre += idxl.readNum());
+      for(int d = 0; d < ds - 1; ++d) ids.add(pre += idxl.readNum());
     }
     ids.sort();
     return iter(ids);

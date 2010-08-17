@@ -110,7 +110,7 @@ public final class Users extends ArrayList<User> {
    */
   private void read(final DataInput in) throws IOException {
     final int s = in.readNum();
-    for(int u = 0; u < s; u++) {
+    for(int u = 0; u < s; ++u) {
       final User user = new User(string(in.readBytes()),
         in.readBytes(), in.readNum());
       add(user);
@@ -154,7 +154,7 @@ public final class Users extends ArrayList<User> {
     table.desc = USERS;
 
     final int sz = file == null ? 3 : 5;
-    for(int u = 0; u < sz; u++) table.header.add(USERHEAD[u]);
+    for(int u = 0; u < sz; ++u) table.header.add(USERHEAD[u]);
 
     for(final User user : this) {
       final TokenList entry = new TokenList();

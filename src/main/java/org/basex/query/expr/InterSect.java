@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -34,19 +33,14 @@ public final class InterSect extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    for(final Expr e : expr) {
-      if(!e.empty()) continue;
-      ctx.compInfo(OPTSIMPLE, this, e);
-      return Empty.SEQ;
-    }
-    return this;
+    return oneEmpty() ? optPre(Empty.SEQ, ctx) : this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
-    for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
-    return duplicates(ctx) ? eval(iter) : iter(iter);
+    for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
+    return duplicates() ? eval(iter) : iter(iter);
   }
 
   /**
@@ -56,7 +50,7 @@ public final class InterSect extends Arr {
    * @throws QueryException query exception
    */
   private NodIter eval(final Iter[] iter) throws QueryException {
-    NodIter ni = new NodIter(true);
+    NodIter ni = new NodIter();
 
     Item it;
     while((it = iter[0].next()) != null) {
@@ -65,7 +59,7 @@ public final class InterSect extends Arr {
     }
     final boolean db = ni.dbnodes();
 
-    for(int e = 1; e != expr.length && ni.size() != 0; e++) {
+    for(int e = 1; e != expr.length && ni.size() != 0; ++e) {
       final NodIter res = new NodIter(true);
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
@@ -73,10 +67,10 @@ public final class InterSect extends Arr {
         final Nod node = (Nod) it;
 
         if(db && node instanceof DBNode) {
-          // optimization: use binary search
+          // optimization: use binary search for database nodes
           if(ni.contains((DBNode) node)) res.add(node);
         } else {
-          for(int n = 0; n < ni.size(); n++) {
+          for(int n = 0; n < ni.size(); ++n) {
             if(ni.get(n).is(node)) {
               res.add(node);
               break;
@@ -86,7 +80,7 @@ public final class InterSect extends Arr {
       }
       ni = res;
     }
-    return ni;
+    return ni.sort();
   }
 
   /**
@@ -100,9 +94,9 @@ public final class InterSect extends Arr {
 
       @Override
       public Nod next() throws QueryException {
-        for(int i = 0; i != iter.length; i++) if(!next(i)) return null;
+        for(int i = 0; i != iter.length; ++i) if(!next(i)) return null;
 
-        for(int i = 1; i != items.length; i++) {
+        for(int i = 1; i != items.length; ++i) {
           final int d = items[0].diff(items[i]);
           if(d < 0) {
             if(!next(0)) return null;

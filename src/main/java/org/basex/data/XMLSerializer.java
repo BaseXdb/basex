@@ -198,7 +198,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void openResult() throws IOException {
     if(wrap) {
-      openElement(concat(wrapPre, COL, RESULT));;
+      openElement(concat(wrapPre, COL, RESULT));
       ind = false;
     }
   }
@@ -440,7 +440,7 @@ public final class XMLSerializer extends Serializer {
       item = false;
     } else {
       print(NL);
-      for(int l = 0, ls = (level() - (close ? 0 : 1)) * spaces; l < ls; l++)
+      for(int l = 0, ls = (level() - (close ? 0 : 1)) * spaces; l < ls; ++l)
         print(' ');
     }
   }
@@ -510,7 +510,7 @@ public final class XMLSerializer extends Serializer {
       print(token(s));
     } else if(enc == UTF16BE || enc == UTF16LE) {
       final boolean l = enc == UTF16LE;
-      for(int i = 0; i < s.length(); i++) {
+      for(int i = 0; i < s.length(); ++i) {
         final char ch = s.charAt(i);
         out.write(l ? ch & 0xFF : ch >>> 8);
         out.write(l ? ch >>> 8 : ch & 0xFF);

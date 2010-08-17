@@ -33,7 +33,7 @@ final class FNInfo extends Fun {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(func) {
+    switch(def) {
       case ERROR:
         final int al = expr.length;
         String code = FOER;
@@ -78,7 +78,7 @@ final class FNInfo extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(func) {
+    switch(def) {
       case ENV:
         final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
         return e != null ? Str.get(e) : null;
@@ -89,12 +89,12 @@ final class FNInfo extends Fun {
 
   @Override
   public boolean vacuous() {
-    return func == FunDef.ERROR;
+    return def == FunDef.ERROR;
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.CTX && (func == FunDef.ERROR || func == FunDef.TRACE) ||
-      super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.CTX && (def == FunDef.ERROR || def == FunDef.TRACE) ||
+      super.uses(u);
   }
 }

@@ -46,7 +46,7 @@ public final class FTPos {
     final int psl = ps.length;
     final int pol = pos.length;
     final int[] ts = new int[psl + pol];
-    for(int i = 0, si = 0, oi = 0; i < ts.length; i++) {
+    for(int i = 0, si = 0, oi = 0; i < ts.length; ++i) {
       final boolean s = si == psl || oi < pol && pos[oi] < ps[si];
       ts[i] = s ? pos[oi++] : ps[si++];
     }
@@ -74,7 +74,7 @@ public final class FTPos {
   public String toString() {
     final StringBuilder sb = new StringBuilder(Main.name(this));
     sb.append("[" + pre + ": ");
-    for(int i = 0; i < pos.length; i++) sb.append((i != 0 ? "," : "") + pos[i]);
+    for(int i = 0; i < pos.length; ++i) sb.append((i != 0 ? "," : "") + pos[i]);
     return sb.append("]").toString();
   }
 }

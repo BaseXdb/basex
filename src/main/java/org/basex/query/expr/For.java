@@ -1,7 +1,7 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -23,9 +23,9 @@ import org.basex.util.Token;
  */
 public final class For extends ForLet {
   /** Positional variable. */
-  private final Var pos;
+  protected final Var pos;
   /** Full-text score. */
-  private final Var score;
+  protected final Var score;
 
   /**
    * Constructor.
@@ -47,27 +47,17 @@ public final class For extends ForLet {
     // always returns a self reference
     expr = checkUp(expr, ctx).comp(ctx);
 
-    /* bind variable if expression returns zero or one values,
-       and if no variables and no context reference is used. */
-    final SeqType ret = expr.returned(ctx);
-    if(pos == null && score == null && ret.zeroOrOne() &&
-        !(expr.uses(Use.VAR, ctx) || expr.uses(Use.CTX, ctx) ||
-            expr.uses(Use.FRG, ctx)) && !ctx.grouping) {
-      ctx.compInfo(OPTBIND, var);
-      var.bind(expr, ctx);
-    } else {
-      var.ret = new SeqType(ret.type, SeqType.Occ.O);
+    type = expr.type();
+    // bind variable or set return type
+    if(pos != null || score != null || !type.one() || !bind(ctx)) {
+      var.ret = new SeqType(type.type, SeqType.Occ.O);
     }
-    ctx.vars.add(var);
 
-    if(pos != null) {
-      ctx.vars.add(pos);
-      pos.ret = SeqType.ITR;
-    }
-    if(score != null) {
-      ctx.vars.add(score);
-      score.ret = SeqType.ITR;
-    }
+    ctx.vars.add(var);
+    if(pos   != null) ctx.vars.add(pos);
+    if(score != null) ctx.vars.add(score);
+
+    size = expr.size();
     return this;
   }
 
@@ -95,8 +85,8 @@ public final class For extends ForLet {
       }
 
       @Override
-      public long size() throws QueryException {
-        return expr.size(ctx);
+      public long size() {
+        return expr.size();
       }
 
       @Override
@@ -145,18 +135,23 @@ public final class For extends ForLet {
   }
 
   @Override
-  public long size(final QueryContext ctx) throws QueryException {
-    return expr.size(ctx);
-  }
-
-  @Override
   boolean simple() {
     return pos == null && score == null;
   }
 
   @Override
   public boolean shadows(final Var v) {
-    return super.shadows(v) || !v.visible(pos) || !v.visible(score);
+    return !v.visible(var) || !v.visible(pos) || !v.visible(score);
+  }
+
+  @Override
+  public void plan(final Serializer ser) throws IOException {
+    ser.openElement(this, VAR, token(var.toString()));
+    if(pos != null) ser.attribute(POS, token(pos.toString()));
+    if(score != null) ser.attribute(Token.token(SCORE),
+        token(score.toString()));
+    expr.plan(ser);
+    ser.closeElement();
   }
 
   @Override
@@ -165,14 +160,5 @@ public final class For extends ForLet {
     if(pos != null) sb.append(AT + " " + pos + " ");
     if(score != null) sb.append(SCORE + " " + score + " ");
     return sb.append(IN + " " + expr).toString();
-  }
-
-  @Override
-  public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, VAR, var.name.atom());
-    if(pos != null) ser.attribute(POS, pos.name.atom());
-    if(score != null) ser.attribute(Token.token(SCORE), score.name.atom());
-    expr.plan(ser);
-    ser.closeElement();
   }
 }

@@ -35,18 +35,18 @@ final class TreeNodeCache implements TreeViewOptions {
       }
     } else {
       final IntList[] li = new IntList[maxLevel];
-      for(int i = 0; i < maxLevel; i++)
+      for(int i = 0; i < maxLevel; ++i)
         li[i] = new IntList();
       final int ts = data.meta.size;
       final int[] roots = data.doc();
-      for(int i = 0; i < roots.length; i++) {
+      for(int i = 0; i < roots.length; ++i) {
         final int root = roots[i];
         li[0].add(root);
         final int sh = i + 1 == roots.length ? ts : roots[i + 1];
-        for(int p = root + 1; p < sh; p++) {
+        for(int p = root + 1; p < sh; ++p) {
           final int k = data.kind(p);
-          if(!SHOW_ATTR && k == Data.ATTR
-              || ONLY_ELEMENT_NODES & k != Data.ELEM) continue;
+          if(!SHOW_ATTR && k == Data.ATTR ||
+              ONLY_ELEMENT_NODES & k != Data.ELEM) continue;
           int lv = 0;
           final int par = data.parent(p, k);
           while(par != li[lv].get(li[lv].size() - 1))
@@ -67,13 +67,12 @@ final class TreeNodeCache implements TreeViewOptions {
   private IntList getNextNodeLine(final IntList parentList, final Data data) {
     final int l = parentList.size();
     final IntList line = new IntList();
-    for(int i = 0; i < l; i++) {
+    for(int i = 0; i < l; ++i) {
       final int p = parentList.get(i);
       final ChildIterator iterator = new ChildIterator(data, p);
       while(iterator.more()) {
         final int pre = iterator.next();
-        if(data.kind(pre) == Data.ELEM ||
-            !ONLY_ELEMENT_NODES) line.add(pre);
+        if(data.kind(pre) == Data.ELEM || !ONLY_ELEMENT_NODES) line.add(pre);
       }
     }
     return line;
@@ -112,7 +111,7 @@ final class TreeNodeCache implements TreeViewOptions {
 
     final TreeBorder[] bo = new TreeBorder[maxLevel];
     if(pre == 0 && d.meta.ndocs == 1) {
-      for(int i = 0; i < maxLevel; i++)
+      for(int i = 0; i < maxLevel; ++i)
         bo[i] = new TreeBorder(i, 0, nodes[i].size());
 
       return bo;
@@ -128,7 +127,7 @@ final class TreeNodeCache implements TreeViewOptions {
     final int np = pre + d.size(pre, d.kind(pre));
     int h = 1;
 
-    for(int i = rl + 1; i < maxLevel; i++) {
+    for(int i = rl + 1; i < maxLevel; ++i) {
 
       final int min = getMinIndex(i, pre, np);
 
@@ -136,7 +135,7 @@ final class TreeNodeCache implements TreeViewOptions {
 
       int c = 0;
 
-      for(int j = min; j < nodes[i].size(); j++)
+      for(int j = min; j < nodes[i].size(); ++j)
         if(nodes[i].get(j) < np) ++c;
         else break;
 
@@ -158,7 +157,7 @@ final class TreeNodeCache implements TreeViewOptions {
   private int[] findPre(final int pre) {
     int pos = -1;
     int l;
-    for(l = 0; l < maxLevel; l++) {
+    for(l = 0; l < maxLevel; ++l) {
       pos = searchPreArrayPos(l, 0, nodes[l].size() - 1, pre);
       if(pos > -1) break;
     }

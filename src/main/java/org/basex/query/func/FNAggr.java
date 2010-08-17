@@ -37,7 +37,7 @@ final class FNAggr extends Fun {
       throws QueryException {
 
     final Iter iter = ctx.iter(expr[0]);
-    switch(func) {
+    switch(def) {
       case COUNT:
         long c = iter.size();
         if(c == -1) do ++c; while(iter.next() != null);
@@ -49,12 +49,24 @@ final class FNAggr extends Fun {
       case SUM:
         Item it = iter.next();
         return it != null ? sum(iter, it, false) :
-          expr.length == 2 ? expr[1].atomic(ctx, input) : Itr.ZERO;
+          expr.length == 2 ? expr[1].atomic(ctx, input) : Itr.get(0);
       case AVG:
         it = iter.next();
         return it == null ? null : sum(iter, it, true);
       default:
         return super.atomic(ctx, ii);
+    }
+  }
+
+  @Override
+  public Expr cmp(final QueryContext ctx) {
+    final Expr e = expr[0];
+    switch(def) {
+      case COUNT:
+        final long c = e.size();
+        return c >= 0 && !ctx.grouping ? Itr.get(c) : this;
+      default:
+        return this;
     }
   }
 
@@ -153,17 +165,5 @@ final class FNAggr extends Fun {
     if(a.type == BLN || a.num() && !b.num() || b.num() && !a.num())
       Err.or(input, FUNCMP, this, a.type, b.type);
     return a.num() || b.num() ? ITR : a.type;
-  }
-
-  @Override
-  public Expr cmp(final QueryContext ctx) throws QueryException {
-    final Expr e = expr[0];
-    switch(func) {
-      case COUNT:
-        final long c = e.size(ctx);
-        return c >= 0 && !ctx.grouping ? Itr.get(c) : this;
-      default:
-        return this;
-    }
   }
 }

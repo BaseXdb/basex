@@ -1,7 +1,6 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -21,7 +19,7 @@ import org.basex.util.Performance;
 
 /**
  * Evaluates the 'backup' command and creates a backup of a database.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -57,7 +55,7 @@ public final class Backup extends Command {
     try {
       final File inFolder = pr.dbpath(db);
       final File outFile = new File(pr.get(Prop.DBPATH) + Prop.SEP + db + "-"
-          + DATE.format(new Date()) + IO.ZIPSUFFIX);    
+          + DATE.format(new Date()) + IO.ZIPSUFFIX);
       final byte[] data = new byte[IO.BLOCKSIZE];
 
       // OutputStream for zipping

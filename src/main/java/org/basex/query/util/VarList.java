@@ -9,12 +9,12 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 
 /**
- * Variables.
+ * Variable array.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Vars extends ExprInfo {
+public final class VarList extends ExprInfo {
   /** Variable expressions. */
   public Var[] vars = new Var[8];
   /** Number of stored variables. */
@@ -24,7 +24,7 @@ public final class Vars extends ExprInfo {
    * Indexes the specified variable name.
    * @param v variable
    */
-  void add(final Var v) {
+  public void add(final Var v) {
     if(size == vars.length) vars = Arrays.copyOf(vars, size << 1);
     vars[size++] = v;
   }
@@ -40,31 +40,35 @@ public final class Vars extends ExprInfo {
   }
 
   /**
+   * Checks if all functions have been correctly declared, and initializes
+   * all function calls.
+   * @throws QueryException query exception
+   */
+  public void check() throws QueryException {
+    for(int i = 0; i < size; ++i) vars[i].check();
+  }
+
+  /**
    * Compiles the variables.
    * @param ctx query context
    * @throws QueryException query exception
    */
   void comp(final QueryContext ctx) throws QueryException {
-    for(int i = 0; i < size; i++) vars[i].comp(ctx);
-  }
-
-  @Override
-  public String color() {
-    return "66FF66";
+    for(int i = 0; i < size; ++i) vars[i].comp(ctx);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     if(size == 0) return;
     ser.openElement(this);
-    for(int i = 0; i < size; i++) vars[i].plan(ser);
+    for(int i = 0; i < size; ++i) vars[i].plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < size; i++)
+    for(int i = 0; i < size; ++i)
       sb.append((i == 0 ? "" : Text.NL) + i + ": " + vars[i]);
     return sb.toString();
   }

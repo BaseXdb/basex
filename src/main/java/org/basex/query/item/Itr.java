@@ -13,10 +13,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public class Itr extends Item {
-  /** Zero value. */
-  public static final Itr ZERO = new Itr(0);
   /** Constant values. */
-  private static final Itr[] NUM = { ZERO, new Itr(1), new Itr(2),
+  private static final Itr[] NUMS = { new Itr(0), new Itr(1), new Itr(2),
     new Itr(3), new Itr(4), new Itr(5), new Itr(6), new Itr(7),
     new Itr(8), new Itr(9) };
   /** Integer value. */
@@ -54,7 +52,7 @@ public class Itr extends Item {
    * @return instance
    */
   public static Itr get(final long v) {
-    return v >= 0 && v <= 9 ? NUM[(int) v] : new Itr(v);
+    return v >= 0 && v <= 9 ? NUMS[(int) v] : new Itr(v);
   }
 
   /**
@@ -130,6 +128,11 @@ public class Itr extends Item {
   }
 
   @Override
+  public final SeqType type() {
+    return SeqType.ITR;
+  }
+
+  @Override
   public final int hashCode() {
     return (int) val;
   }
@@ -148,7 +151,7 @@ public class Itr extends Item {
       final String v = Token.string(Token.trim(val));
       return Long.parseLong(v.startsWith("+") ? v.substring(1) : v);
     } catch(final NumberFormatException ex) {
-      ZERO.castErr(val, ii);
+      NUMS[0].castErr(val, ii);
       return 0;
     }
   }

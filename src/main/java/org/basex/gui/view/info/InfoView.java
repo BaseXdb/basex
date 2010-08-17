@@ -135,7 +135,7 @@ public final class InfoView extends View {
     String res = "";
 
     final String[] split = info.split(NL);
-    for(int i = 0; i < split.length; i++) {
+    for(int i = 0; i < split.length; ++i) {
       final String line = split[i];
       final int s = line.indexOf(':');
       if(line.startsWith(QUERYPARSE) || line.startsWith(QUERYCOMPILE) ||
@@ -212,7 +212,7 @@ public final class InfoView extends View {
     if(list.size() == 0) return;
     text.high().add(head).norm().nl();
     final int is = list.size();
-    for(int i = 0; i < is; i++) {
+    for(int i = 0; i < is; ++i) {
       String line = list.get(i);
       if(list == strings) line = " " + QUERYSEP + line + ":  " +
         Performance.getTimer(stat.get(i) * 10000L * runs, runs);
@@ -238,7 +238,7 @@ public final class InfoView extends View {
 
     focus = -1;
     if(e.getY() < h) {
-      for(int i = 0; i < l; i++) {
+      for(int i = 0; i < l; ++i) {
         final int bx = w - bw + bs * i;
         if(e.getX() >= bx && e.getX() < bx + bs) focus = i;
       }
@@ -264,13 +264,13 @@ public final class InfoView extends View {
 
     // find maximum value
     int m = 0;
-    for(int i = 0; i < l - 1; i++) m = Math.max(m, stat.get(i));
+    for(int i = 0; i < l - 1; ++i) m = Math.max(m, stat.get(i));
 
     // draw focused bar
     final int by = 10;
     final int bh = h - by;
 
-    for(int i = 0; i < l - 1; i++) {
+    for(int i = 0; i < l - 1; ++i) {
       if(i != focus) continue;
       final int bx = w - bw + bs * i;
       g.setColor(color4);
@@ -278,7 +278,7 @@ public final class InfoView extends View {
     }
 
     // draw all bars
-    for(int i = 0; i < l - 1; i++) {
+    for(int i = 0; i < l - 1; ++i) {
       final int bx = w - bw + bs * i;
       g.setColor(COLORS[(i == focus ? 3 : 2) + i * 2]);
       final int p = Math.max(1, stat.get(i) * bh / m);

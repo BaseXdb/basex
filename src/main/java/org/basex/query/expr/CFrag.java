@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -29,6 +28,7 @@ public abstract class CFrag extends Arr {
    */
   protected CFrag(final InputInfo ii, final Expr... n) {
     super(ii, n);
+    type = SeqType.NOD;
   }
 
   @Override
@@ -59,18 +59,8 @@ public abstract class CFrag extends Arr {
   }
 
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.FRG || super.uses(u, ctx);
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD;
-  }
-
-  @Override
-  public String color() {
-    return "FF9999";
+  public final boolean uses(final Use u) {
+    return u == Use.FRG || super.uses(u);
   }
 
   /**

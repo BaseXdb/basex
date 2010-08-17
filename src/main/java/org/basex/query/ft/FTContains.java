@@ -47,6 +47,7 @@ public class FTContains extends ParseExpr {
     super(ii);
     expr = e;
     ftexpr = fte;
+    type = SeqType.BLN;
   }
 
   @Override
@@ -59,11 +60,7 @@ public class FTContains extends ParseExpr {
     ctx.ftfast = fast;
     ft = new Tokenizer(ctx.context.prop);
 
-    if(expr.empty()) {
-      ctx.compInfo(OPTPRE, this);
-      return Bln.FALSE;
-    }
-    return this;
+    return expr.empty() ? optPre(Bln.FALSE, ctx) : this;
   }
 
   @Override
@@ -128,13 +125,13 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
-    return expr.uses(u, ctx) || ftexpr.uses(u, ctx);
+  public final boolean uses(final Use u) {
+    return expr.uses(u) || ftexpr.uses(u);
   }
 
   @Override
-  public final boolean removable(final Var v, final QueryContext ctx) {
-    return expr.removable(v, ctx) && ftexpr.removable(v, ctx);
+  public final boolean removable(final Var v) {
+    return expr.removable(v) && ftexpr.removable(v);
   }
 
   @Override
@@ -142,16 +139,6 @@ public class FTContains extends ParseExpr {
     expr = expr.remove(v);
     ftexpr = ftexpr.remove(v);
     return this;
-  }
-
-  @Override
-  public final SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
-  }
-
-  @Override
-  public final String color() {
-    return "33CC33";
   }
 
   @Override

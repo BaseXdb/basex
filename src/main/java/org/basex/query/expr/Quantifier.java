@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -19,11 +18,11 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Quantified extends ParseExpr {
-  /** For/Let expressions. */
-  private final For[] fl;
+public final class Quantifier extends ParseExpr {
   /** Every flag. */
   private final boolean every;
+  /** For/Let expressions. */
+  private For[] fl;
   /** Expression list. */
   private Expr sat;
 
@@ -34,12 +33,13 @@ public final class Quantified extends ParseExpr {
    * @param s satisfier
    * @param e every flag
    */
-  public Quantified(final InputInfo ii, final For[] f, final Expr s,
+  public Quantifier(final InputInfo ii, final For[] f, final Expr s,
       final boolean e) {
     super(ii);
     sat = s;
     fl = f;
     every = e;
+    type = SeqType.BLN;
   }
 
   @Override
@@ -51,19 +51,11 @@ public final class Quantified extends ParseExpr {
     ctx.vars.reset(vs);
 
     // find empty sequences
-    Expr e = null;
-    for(final For f : fl) {
-      if(f.expr.empty()) {
-        e = f;
-        break;
-      }
-    }
-    if(e == null && sat.empty()) e = sat;
-    if(e == null) return this;
+    boolean empty = sat.empty();
+    for(final For f : fl) empty |= f.empty();
 
-    // return boolean result
-    ctx.compInfo(every ? OPTTRUE : OPTFALSE, e);
-    return Bln.get(every);
+    // return pre-evaluated result
+    return empty ? optPre(Bln.get(every), ctx) : this;
   }
 
   @Override
@@ -71,7 +63,7 @@ public final class Quantified extends ParseExpr {
       throws QueryException {
 
     final Iter[] iter = new Iter[fl.length];
-    for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
+    for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
     return Bln.get(iter(ctx, iter, 0));
   }
 
@@ -98,17 +90,17 @@ public final class Quantified extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || sat.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.VAR || sat.uses(u);
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
+  public boolean removable(final Var v) {
     for(final ForLet f : fl) {
-      if(!f.removable(v, ctx)) return false;
+      if(!f.removable(v)) return false;
       if(f.shadows(v)) return true;
     }
-    return sat.removable(v, ctx);
+    return sat.removable(v);
   }
 
   @Override
@@ -119,11 +111,6 @@ public final class Quantified extends ParseExpr {
     }
     sat = sat.remove(v);
     return this;
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
   }
 
   @Override

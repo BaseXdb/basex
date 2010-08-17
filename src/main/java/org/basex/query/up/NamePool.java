@@ -49,7 +49,7 @@ public final class NamePool {
    * @return duplicate attribute
    */
   QNm duplicate() {
-    for(int i = 0; i < size; i++) if(occ[i] > 1) return names[i];
+    for(int i = 0; i < size; ++i) if(occ[i] > 1) return names[i];
     return null;
   }
 
@@ -59,7 +59,7 @@ public final class NamePool {
    */
   boolean nsOK() {
     final Atts at = new Atts();
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(occ[i] <= 0) continue;
       final QNm nm = names[i];
       final byte[] pref = nm.pref();
@@ -79,7 +79,7 @@ public final class NamePool {
    * @return index offset
    */
   private int index(final QNm name, final boolean at) {
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(names[i].eq(name) && attr[i] == at) return i;
     }
     if(size == names.length) {

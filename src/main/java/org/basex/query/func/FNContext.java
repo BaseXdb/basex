@@ -37,9 +37,9 @@ final class FNContext extends Fun {
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Iter[] arg = new Iter[expr.length];
-    for(int a = 0; a < expr.length; a++) arg[a] = ctx.iter(expr[a]);
+    for(int a = 0; a < expr.length; ++a) arg[a] = ctx.iter(expr[a]);
 
-    switch(func) {
+    switch(def) {
       case CURRDATE:  return currDate(ctx);
       case CURRDTM:   return currDTM(ctx);
       case CURRTIME:  return currTIM(ctx);

@@ -10,7 +10,6 @@ import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Atm;
 import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.util.InputInfo;
@@ -23,18 +22,19 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public abstract class Fun extends Arr {
-  /** Function description. */
-  public FunDef func;
+  /** Function definition. */
+  public FunDef def;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param f function definition
+   * @param d function definition
    * @param e arguments
    */
-  protected Fun(final InputInfo ii, final FunDef f, final Expr... e) {
+  protected Fun(final InputInfo ii, final FunDef d, final Expr... e) {
     super(ii, e);
-    func = f;
+    def = d;
+    type = def.ret;
   }
 
   /**
@@ -62,12 +62,10 @@ public abstract class Fun extends Arr {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     // compile all arguments
     super.comp(ctx);
-    // skip functions based on context
-    if(uses(Use.CTX, ctx)) return cmp(ctx);
-    // use custom compilation if not all arguments are values
-    for(final Expr e : expr) if(!e.value()) return cmp(ctx);
+    // skip functions based on context or with non-values as arguments
+    if(uses(Use.CTX) || !values()) return optPre(cmp(ctx), ctx);
     // pre-evaluate function
-    return optPre(func.ret.zeroOrOne() ? atomic(ctx, input) :
+    return optPre(def.ret.zeroOrOne() ? atomic(ctx, input) :
       iter(ctx).finish(), ctx);
   }
 
@@ -93,23 +91,13 @@ public abstract class Fun extends Arr {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return func.ret;
-  }
-
-  @Override
   public final String desc() {
-    return func.toString();
-  }
-
-  @Override
-  public String color() {
-    return "CC99FF";
+    return def.toString();
   }
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, Token.token(func.desc));
+    ser.openElement(this, NAM, Token.token(def.desc));
     for(final Expr arg : expr) arg.plan(ser);
     ser.closeElement();
   }
@@ -117,8 +105,8 @@ public abstract class Fun extends Arr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(func.toString().replaceAll("\\(.*\\)", "") + "(");
-    for(int a = 0; a < expr.length; a++) {
+    sb.append(def.toString().replaceAll("\\(.*\\)", "") + "(");
+    for(int a = 0; a < expr.length; ++a) {
       sb.append((a != 0 ? ", " : "") + expr[a]);
     }
     sb.append(')');

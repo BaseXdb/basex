@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.Main;
@@ -60,7 +59,7 @@ public final class DSim extends Date {
 
     final int i = type(t);
     final Matcher mt = PATTERNS[i].matcher(Token.string(d).trim());
-    if(!mt.matches()) dateErr(d, type, EXAMPLES[i], ii);
+    if(!mt.matches()) dateErr(d, EXAMPLES[i], ii);
     zone(mt, ZONES[i], d, ii);
 
     if(t == Type.MDA) {
@@ -76,7 +75,7 @@ public final class DSim extends Date {
    * @return offset
    */
   private static int type(final Type type) {
-    for(int t = 0; t < TYPES.length; t++) if(TYPES[t] == type) return t;
+    for(int t = 0; t < TYPES.length; ++t) if(TYPES[t] == type) return t;
     Main.notexpected();
     return -1;
   }

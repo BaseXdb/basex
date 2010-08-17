@@ -7,11 +7,11 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 
 /**
  * Function call.
@@ -19,57 +19,56 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FunCall extends Arr {
-  /** Function id reference. */
-  private final int id;
-  /** Function reference. */
-  private Func func;
+public final class FuncCall extends Arr {
   /** Function name. */
   private final QNm name;
+  /** Function reference. */
+  private Func func;
 
   /**
    * Function constructor.
    * @param ii input info
    * @param nm function name
-   * @param d function id
-   * @param a arguments
+   * @param arg arguments
    */
-  public FunCall(final InputInfo ii, final QNm nm, final int d,
-      final Expr[] a) {
-    super(ii, a);
-    id = d;
+  public FuncCall(final InputInfo ii, final QNm nm, final Expr[] arg) {
+    super(ii, arg);
     name = nm;
+  }
+
+  /**
+   * Initializes the function call after all functions have been declared.
+   * @param f function reference
+   */
+  public void init(final Func f) {
+    func = f;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    func = ctx.fun.get(id);
     super.comp(ctx);
-    final Expr e = func.expr;
 
-    // [CG] XQuery/Functions: improve inlining
-    if(e.value()) {
-      // inline simple items
-      ctx.compInfo(OPTINLINE, this);
+    // inline if result and arguments are all values.
+    // [CG] XQuery/Inlining:
+    if(func.expr.value() && values()) {
+      // evaluate arguments to catch cast exceptions
+      for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
+      ctx.compInfo(OPTINLINE, func.var.name.atom());
       return func.iter(ctx).finish();
     }
+    type = func.type();
     return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    if(func == null) {
-      final Expr e = comp(ctx);
-      if(e != this) return e.iter(ctx);
-    }
-    
     final int al = expr.length;
     final Value[] args = new Value[al];
     // evaluate arguments
-    for(int a = 0; a < al; a++) args[a] = ctx.iter(expr[a]).finish();
+    for(int a = 0; a < al; ++a) args[a] = ctx.iter(expr[a]).finish();
     // move variables to stack
     final int s = ctx.vars.size();
-    for(int a = 0; a < al; a++) {
+    for(int a = 0; a < al; ++a) {
       ctx.vars.add(func.args[a].bind(args[a], ctx).copy());
     }
     // evaluate function and reset variable scope
@@ -79,24 +78,13 @@ public final class FunCall extends Arr {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return func.returned(ctx);
-  }
-
-  @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD ? (func == null ? ctx.fun.get(id) : func).updating :
-      super.uses(u, ctx);
-  }
-
-  @Override
-  public String color() {
-    return "CC99FF";
+  public boolean uses(final Use u) {
+    return u == Use.UPD ? func.updating : super.uses(u);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, name.atom());
+    ser.openElement(this, NAM, Token.token(toString()));
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }
@@ -108,6 +96,6 @@ public final class FunCall extends Arr {
 
   @Override
   public String toString() {
-    return "FunCall(" + id + ")";
+    return Token.string(name.atom()) + PAR;
   }
 }

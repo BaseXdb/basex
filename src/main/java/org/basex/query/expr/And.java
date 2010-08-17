@@ -1,14 +1,12 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryTokens;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -18,7 +16,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class And extends Arr {
+public final class And extends Logical {
   /**
    * Constructor.
    * @param ii input info
@@ -30,20 +28,9 @@ public final class And extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
-
-    for(int e = 0; e < expr.length; e++) {
-      if(!expr[e].value()) continue;
-
-      if(!expr[e].ebv(ctx, input).bool(input)) {
-        // atomic items can be pre-evaluated
-        ctx.compInfo(OPTFALSE, expr[e]);
-        return Bln.FALSE;
-      }
-      ctx.compInfo(OPTTRUE, expr[e]);
-      expr = Array.delete(expr, e--);
-      if(expr.length == 0) return Bln.TRUE;
-    }
+    // remove atomic values
+    final Expr c = super.comp(ctx);
+    if(c != this) return c;
 
     // merge predicates if possible
     Expr[] ex = {};
@@ -59,25 +46,19 @@ public final class And extends Arr {
       } else if(e instanceof CmpR) {
         // merge comparisons
         tmp = cr == null ? e : cr.intersect((CmpR) e);
-        if(tmp instanceof CmpR) {
-          cr = (CmpR) tmp;
-        } else if(tmp != null) {
-          return tmp;
-        }
+        if(tmp instanceof CmpR) cr = (CmpR) tmp;
+        else if(tmp != null) return tmp;
       }
+      // no optimization found; add original expression
       if(tmp == null) ex = Array.add(ex, e);
     }
-
     expr = ex;
     if(ps != null) expr = Array.add(expr, ps);
     if(cr != null) expr = Array.add(expr, cr);
+    if(ex.length != expr.length) ctx.compInfo(OPTWRITE, this);
 
-    // one expression left
-    if(expr.length == 1) {
-      final SeqType ret = expr[0].returned(ctx);
-      if(ret.type == Type.BLN && ret.one()) return expr[0];
-    }
-    return this;
+    // return single expression if it yields a boolean
+    return expr.length == 1 ? single() : this;
   }
 
   @Override
@@ -94,16 +75,11 @@ public final class And extends Arr {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
-  }
-
-  @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     int is = 0;
     boolean empty = false;
     final double[] ics = new double[expr.length];
-    for(int e = 0; e < expr.length; e++) {
+    for(int e = 0; e < expr.length; ++e) {
       if(!expr[e].indexAccessible(ic) || ic.seq) return false;
       ics[e] = ic.is;
       // evaluate empty result first
@@ -121,7 +97,7 @@ public final class And extends Arr {
       // reorder arguments to speedup intersection
       final int[] ord = Array.createOrder(ics, false);
       final Expr[] ex = new Expr[ics.length];
-      for(int e = 0; e < expr.length; e++) ex[e] = expr[ord[e]];
+      for(int e = 0; e < expr.length; ++e) ex[e] = expr[ord[e]];
       expr = ex;
     }
     return true;
@@ -135,6 +111,6 @@ public final class And extends Arr {
 
   @Override
   public String toString() {
-    return toString(" " + QueryTokens.AND + " ");
+    return toString(" " + AND + " ");
   }
 }

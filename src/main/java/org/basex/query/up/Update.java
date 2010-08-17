@@ -29,8 +29,8 @@ abstract class Update extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD || super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.UPD || super.uses(u);
   }
 
   /**
@@ -44,7 +44,7 @@ abstract class Update extends Arr {
   protected final NodIter checkNS(final NodIter list, final Nod targ,
       final QueryContext ctx) throws QueryException {
 
-    for(int a = 0; a < list.size(); a++) {
+    for(int a = 0; a < list.size(); ++a) {
       final QNm name = list.get(a).qname();
       final byte[] pref = name.pref();
       // attributes without prefix have no namespace

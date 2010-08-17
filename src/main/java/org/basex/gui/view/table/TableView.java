@@ -181,7 +181,7 @@ public final class TableView extends View implements Runnable {
    */
   private int getOff(final int pre) {
     final int ns = tdata.rows.size();
-    for(int n = 0; n < ns; n++) {
+    for(int n = 0; n < ns; ++n) {
       if(tdata.rows.get(n) == pre) return n;
     }
     return -1;

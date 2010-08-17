@@ -76,6 +76,11 @@ public class Str extends Item {
   }
 
   @Override
+  public SeqType type() {
+    return SeqType.STR;
+  }
+
+  @Override
   public final String toString() {
     return Main.info("\"%\"", val);
   }

@@ -7,9 +7,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
-import org.basex.query.item.SeqType;
-import org.basex.query.item.Type;
-import org.basex.query.iter.ItemIter;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -19,7 +16,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Or extends Arr {
+public final class Or extends Logical {
   /**
    * Constructor.
    * @param ii input info
@@ -31,47 +28,29 @@ public final class Or extends Arr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    super.comp(ctx);
+    // remove atomic values
+    final Expr c = super.comp(ctx);
+    if(c != this) return c;
 
-    for(int e = 0; e < expr.length; e++) {
-      if(!expr[e].value()) continue;
-
-      if(expr[e].ebv(ctx, input).bool(input)) {
-        // atomic items can be pre-evaluated
-        ctx.compInfo(OPTTRUE, expr[e]);
-        return Bln.TRUE;
-      }
-      ctx.compInfo(OPTFALSE, expr[e]);
-      expr = Array.delete(expr, e--);
-      if(expr.length == 0) return Bln.FALSE;
-    }
-
-    // combines two position expressions
-    if(expr.length == 2 && expr[0] instanceof Pos && expr[1] instanceof Pos)
-      return ((Pos) expr[0]).union((Pos) expr[1], input);
-
-    // one expression left
-    if(expr.length == 1) {
-      final SeqType ret = expr[0].returned(ctx);
-      if(ret.type == Type.BLN && ret.one()) return expr[0];
-    }
-
-    // tries to create a comparison expression
-    for(final Expr e : expr) if(!(e instanceof CmpG)) return this;
-
-    final CmpG e1 = (CmpG) expr[0];
-    final ItemIter cmp = new ItemIter();
-
+    // merge predicates if possible
+    CmpG cmpg = null;
+    Expr[] ex = {};
     for(final Expr e : expr) {
-      // check comparison operators and left operands for equality
-      final CmpG e2 = (CmpG) e;
-      if(!e2.exprAndItem(false) || e1.cmp != e2.cmp ||
-         !e1.expr[0].sameAs(e2.expr[0])) return this;
-      cmp.add((Item) e2.expr[1]);
+      Expr tmp = null;
+      if(e instanceof CmpG) {
+        // merge general comparisons
+        final CmpG g = (CmpG) e;
+        if(cmpg == null) cmpg = g;
+        else if(cmpg.union(g, ctx)) tmp = g;
+      }
+      // no optimization found; add original expression
+      if(tmp == null) ex = Array.add(ex, e);
     }
+    if(ex.length != expr.length) ctx.compInfo(OPTWRITE, this);
+    expr = ex;
 
-    ctx.compInfo(OPTWRITE, this);
-    return new CmpG(input, e1.expr[0], cmp.finish(), e1.cmp);
+    // return single expression if it yields a boolean
+    return expr.length == 1 ? single() : this;
   }
 
   @Override
@@ -94,11 +73,15 @@ public final class Or extends Arr {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     int is = 0;
+    Expr[] exprs = {};
     for(final Expr e : expr) {
       if(!e.indexAccessible(ic) || ic.seq) return false;
       is += ic.is;
+      // add only expressions that yield results
+      if(ic.is != 0) exprs = Array.add(exprs, e);
     }
     ic.is = is;
+    expr = exprs;
     return true;
   }
 
@@ -106,11 +89,6 @@ public final class Or extends Arr {
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
     super.indexEquivalent(ic);
     return new Union(input, expr);
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
   }
 
   @Override

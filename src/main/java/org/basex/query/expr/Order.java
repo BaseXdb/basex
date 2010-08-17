@@ -53,7 +53,7 @@ public final class Order extends ParseExpr {
         if(order == null) {
           // enumerate sort array and sort entries
           order = new int[e];
-          for(int i = 0; i < e; i++) order[i] = i;
+          for(int i = 0; i < e; ++i) order[i] = i;
           sort(order, 0, e);
           for(final OrderBy o : ob) o.reset();
         }
@@ -82,14 +82,14 @@ public final class Order extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    for(final OrderBy o : ob) if(o.uses(u, ctx)) return true;
+  public boolean uses(final Use u) {
+    for(final OrderBy o : ob) if(o.uses(u)) return true;
     return false;
   }
 
   @Override
   public Order remove(final Var v) {
-    for(int o = 0; o < ob.length; o++) ob[o] = ob[o].remove(v);
+    for(int o = 0; o < ob.length; ++o) ob[o] = ob[o].remove(v);
     return this;
   }
 
@@ -103,7 +103,7 @@ public final class Order extends ParseExpr {
    */
   void sort(final int[] o, final int s, final int e) throws QueryException {
     if(e < 7) {
-      for(int i = s; i < e + s; i++)
+      for(int i = s; i < e + s; ++i)
         for(int j = i; j > s && d(o, j - 1, j) > 0; j--) s(o, j, j - 1);
       return;
     }
@@ -122,7 +122,7 @@ public final class Order extends ParseExpr {
     }
 
     final Item[] im = new Item[ob.length];
-    for(int k = 0; k < ob.length; k++) im[k] = ob[k].item(o[m]);
+    for(int k = 0; k < ob.length; ++k) im[k] = ob[k].item(o[m]);
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
@@ -164,7 +164,7 @@ public final class Order extends ParseExpr {
   private int d(final int[] o, final int a, final Item[] it)
       throws QueryException {
 
-    for(int k = 0; k < ob.length; k++) {
+    for(int k = 0; k < ob.length; ++k) {
       final OrderBy or = ob[k];
       final Item m = or.item(o[a]);
       final Item n = it[k];
@@ -222,7 +222,7 @@ public final class Order extends ParseExpr {
    * @param n number of values
    */
   private void s(final int[] o, final int a, final int b, final int n) {
-    for(int i = 0; i < n; i++) s(o, a + i, b + i);
+    for(int i = 0; i < n; ++i) s(o, a + i, b + i);
   }
 
   /**
@@ -238,14 +238,9 @@ public final class Order extends ParseExpr {
   }
 
   @Override
-  public String color() {
-    return "66FF66";
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(int o = 0; o != ob.length - 1; o++) ob[o].plan(ser);
+    for(int o = 0; o != ob.length - 1; ++o) ob[o].plan(ser);
     ser.closeElement();
   }
 
@@ -253,7 +248,7 @@ public final class Order extends ParseExpr {
   public String toString() {
     final StringBuilder sb = new StringBuilder(" " + ORDER + " " +
         BY + " ");
-    for(int l = 0; l != ob.length - 1; l++) {
+    for(int l = 0; l != ob.length - 1; ++l) {
       sb.append((l != 0 ? ", " : "") + ob[l]);
     }
     return sb.toString();

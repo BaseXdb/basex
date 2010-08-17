@@ -46,7 +46,7 @@ public final class FDoc extends FNode {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < children.size(); c++) children.get(c).serialize(ser);
+    for(int c = 0; c < children.size(); ++c) children.get(c).serialize(ser);
   }
 
   @Override

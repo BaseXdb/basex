@@ -49,7 +49,7 @@ public final class TableMemAccess extends TableAccess {
     final RandomAccessFile f = new RandomAccessFile(md.file(pf), "r");
     final byte[] array = new byte[IO.BLOCKSIZE];
     int np = 0, c = 0, l = 0;
-    for(int i = 0; i != md.size; i++) {
+    for(int i = 0; i != md.size; ++i) {
       while(i == np) {
         f.seek((long) blocks[c++] * IO.BLOCKSIZE);
         f.read(array);
@@ -78,15 +78,15 @@ public final class TableMemAccess extends TableAccess {
       out.writeNum(meta.size);
 
       final int[] array = new int[blocks];
-      for(int b = 0, c = 0; b < blocks; b++, c += ent) array[b] = c;
+      for(int b = 0, c = 0; b < blocks; ++b, c += ent) array[b] = c;
       out.writeNums(array);
-      for(int b = 0; b < blocks; b++) array[b] = b;
+      for(int b = 0; b < blocks; ++b) array[b] = b;
       out.writeNums(array);
       out.close();
       out = new DataOutput(meta.file(pref));
       final byte[] data = new byte[IO.BLOCKSIZE];
       int a = 0;
-      for(int b = 0; b < blocks; b++) {
+      for(int b = 0; b < blocks; ++b) {
         for(int p = 0; p < IO.BLOCKSIZE && a < meta.size; p += 16, a++) {
           copy(buf1[a], data, p);
           copy(buf2[a], data, p + 8);
@@ -163,7 +163,7 @@ public final class TableMemAccess extends TableAccess {
   public synchronized void insert(final int pre, final byte[] entries) {
     final int nr = entries.length >>> IO.NODEPOWER;
     move(pre, pre + nr);
-    for(int l = 0, i = pre; i < pre + nr; i++, l += 16) {
+    for(int l = 0, i = pre; i < pre + nr; ++i, l += 16) {
       buf1[i] = getLong(entries, l);
       buf2[i] = getLong(entries, l + 8);
     }
@@ -172,7 +172,7 @@ public final class TableMemAccess extends TableAccess {
   @Override
   public synchronized void set(final int pre, final byte[] entries) {
     final int nr = entries.length >>> IO.NODEPOWER;
-    for(int l = 0, i = pre; i < pre + nr; i++, l += 1 << IO.NODEPOWER) {
+    for(int l = 0, i = pre; i < pre + nr; ++i, l += 1 << IO.NODEPOWER) {
       buf1[i] = getLong(entries, l);
       buf2[i] = getLong(entries, l + 8);
     }

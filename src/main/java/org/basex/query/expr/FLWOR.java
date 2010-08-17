@@ -9,8 +9,10 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.AxisPath;
 import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
+import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
@@ -52,11 +54,11 @@ public class FLWOR extends ParseExpr {
     final int vs = ctx.vars.size();
 
     // optimize for/let clauses
-    for(int f = 0; f != fl.length; f++) {
+    for(final ForLet f : fl) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
-      ctx.ftfast &= fl[f].simple();
-      fl[f].comp(ctx);
+      ctx.ftfast &= f.simple();
+      f.comp(ctx);
       ctx.ftfast = fast;
     }
 
@@ -69,7 +71,7 @@ public class FLWOR extends ParseExpr {
         empty = !where.ebv(ctx, input).bool(input);
         if(!empty) {
           // always true: test can be skipped
-          ctx.compInfo(OPTTRUE, where);
+          ctx.compInfo(OPTREMOVE, desc(), where);
           where = null;
         }
       }
@@ -80,18 +82,80 @@ public class FLWOR extends ParseExpr {
 
     ctx.vars.reset(vs);
 
+    // remove FLWOR expression if WHERE clause always returns false
     if(empty) {
-      ctx.compInfo(OPTFALSE, where);
+      ctx.compInfo(OPTREMOVE, desc(), where);
       return Empty.SEQ;
     }
 
+    // remove inlined clauses
+    for(int f = 0; f != fl.length; ++f) {
+      if(fl[f].var.expr() != null) {
+        ctx.compInfo(OPTVAR, fl[f].var);
+        fl = Array.delete(fl, f--);
+      }
+    }
+
+    // no clauses left: simplify expression
+    // an optional order clause can be safely ignored
+    if(fl.length == 0) {
+      // if where is null: where A return B -> if A then B else ()
+      // otherwise: return B -> B
+      ctx.compInfo(OPTFLWOR);
+      return where != null ? new If(input, where, ret, Empty.SEQ) : ret;
+    }
+
+    // remove FLWOR expression if a FOR clause yields an empty sequence
     for(final ForLet f : fl) {
-      // remove FLWOR expression if a FOR clause yields an empty sequence
-      if(f.expr.empty() && f instanceof For) {
+      if(f instanceof For && (f.empty() || f.size() == 0)) {
         ctx.compInfo(OPTFLWOR);
         return Empty.SEQ;
       }
     }
+
+    // add where clause to most inner FOR clause and remove variable calls
+    // WHERE results must not be numeric
+    if(where != null) {
+      final ForLet f = fl[fl.length - 1];
+      if(f instanceof For && f.simple() && where.removable(f.var) &&
+          !where.type().mayBeNum()) {
+        // convert where clause to predicate(s)
+        ctx.compInfo(OPTWHERE);
+        final Expr w = where.remove(f.var);
+
+        if(f.expr instanceof AxisPath) {
+          AxisPath ap = (AxisPath) f.expr;
+          if(w instanceof And) {
+            for(final Expr e : ((And) w).expr) ap = ap.addPred(e);
+          } else {
+            ap = ap.addPred(w);
+          }
+          f.expr = ap;
+        } else {
+          f.expr = new Filter(input, f.expr, w);
+        }
+        where = null;
+        // recompile expression
+        return comp(ctx);
+      }
+    }
+
+    // compute number of results
+    if(where == null) {
+      size = ret.size();
+      if(size != -1) {
+        // multiply loop runs
+        for(final ForLet f : fl) {
+          final long s = f.size();
+          if(s == -1) {
+            size = s;
+            break;
+          }
+          size *= s;
+        }
+      }
+    }
+    type = new SeqType(ret.type().type, SeqType.Occ.ZM);
     return this;
   }
 
@@ -99,7 +163,7 @@ public class FLWOR extends ParseExpr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final ValueList vl = new ValueList();
     final Iter[] iter = new Iter[fl.length];
-    for(int f = 0; f < fl.length; f++) iter[f] = ctx.iter(fl[f]);
+    for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
     iter(ctx, vl, iter, 0);
     order.vl = vl;
     return ctx.iter(order);
@@ -130,34 +194,18 @@ public class FLWOR extends ParseExpr {
   }
 
   @Override
-  public long size(final QueryContext ctx) throws QueryException {
-    // don't test where clause (order clause doesn't change result size)
-    if(where != null) return -1;
-    // check if number of results of return clause is known
-    long size = ret.size(ctx);
-    if(size == -1) return -1;
-    // multiply loop runs
-    for(final ForLet f : fl) {
-      final long s = f.size(ctx);
-      if(s == -1) return -1;
-      size *= s;
-    }
-    return size;
+  public final boolean uses(final Use u) {
+    return u == Use.VAR || ret.uses(u);
   }
 
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || ret.uses(u, ctx);
-  }
-
-  @Override
-  public final boolean removable(final Var v, final QueryContext ctx) {
+  public final boolean removable(final Var v) {
     for(final ForLet f : fl) {
-      if(!f.removable(v, ctx)) return false;
+      if(!f.removable(v)) return false;
       if(f.shadows(v)) return true;
     }
-    return (where == null || where.removable(v, ctx)) &&
-      (order == null || order.removable(v, ctx)) && ret.removable(v, ctx);
+    return (where == null || where.removable(v)) &&
+      (order == null || order.removable(v)) && ret.removable(v);
   }
 
   @Override
@@ -170,16 +218,6 @@ public class FLWOR extends ParseExpr {
     if(order != null) order = order.remove(v);
     ret = ret.remove(v);
     return this;
-  }
-
-  @Override
-  public final SeqType returned(final QueryContext ctx) {
-    return new SeqType(ret.returned(ctx).type, SeqType.Occ.ZM);
-  }
-
-  @Override
-  public final String color() {
-    return "66FF66";
   }
 
   @Override
@@ -201,7 +239,7 @@ public class FLWOR extends ParseExpr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i != fl.length; i++) sb.append((i != 0 ? " " : "") + fl[i]);
+    for(int i = 0; i != fl.length; ++i) sb.append((i != 0 ? " " : "") + fl[i]);
     if(where != null) sb.append(" " + WHERE + " " + where);
     if(order != null) sb.append(order);
     return sb.append(" " + RETURN + " " + ret).toString();

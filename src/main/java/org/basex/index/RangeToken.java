@@ -11,7 +11,7 @@ import org.basex.util.Token;
  */
 public final class RangeToken implements IndexToken {
   /** Index type. */
-  private final IndexType type;
+  private final IndexType ind;
   /** Minimum value. */
   public final double min;
   /** Maximum value. */
@@ -19,19 +19,19 @@ public final class RangeToken implements IndexToken {
 
   /**
    * Constructor.
-   * @param t index type
+   * @param i index type
    * @param mn minimum value
    * @param mx maximum value
    */
-  public RangeToken(final boolean t, final double mn, final double mx) {
-    type = t ? IndexType.TXT : IndexType.ATV;
+  public RangeToken(final boolean i, final double mn, final double mx) {
+    ind = i ? IndexType.TXT : IndexType.ATV;
     min = mn;
     max = mx;
   }
 
   @Override
   public IndexType type() {
-    return type;
+    return ind;
   }
 
   @Override

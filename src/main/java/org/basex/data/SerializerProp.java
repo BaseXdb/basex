@@ -124,7 +124,7 @@ public final class SerializerProp extends AProp {
   public static String error(final String key, final String... allowed) {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(SERVAL, key, allowed[0]);
-    for(int a = 1; a < allowed.length; a++) tb.add(SERVAL2, allowed[a]);
+    for(int a = 1; a < allowed.length; ++a) tb.add(SERVAL2, allowed[a]);
     return tb.toString();
   }
 }

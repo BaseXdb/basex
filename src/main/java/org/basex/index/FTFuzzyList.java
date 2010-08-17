@@ -33,7 +33,7 @@ final class FTFuzzyList extends FTList {
    */
   protected FTFuzzyList(final Data d, final int cf) throws IOException {
     super(d, cf, 'y', 'z');
-    for(int i = 0; i < tp.length; i++) tp[i] = -1;
+    for(int i = 0; i < tp.length; ++i) tp[i] = -1;
     sizes = d.meta.file(DATAFTX + cf + 'x');
     final DataAccess li = new DataAccess(sizes);
     int is = li.read1();

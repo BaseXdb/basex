@@ -95,7 +95,7 @@ public final class DialogInfo extends Dialog {
         data.meta.atvindex, data.meta.ftxindex };
 
     final BaseXBack[] panels = new BaseXBack[indexes.length];
-    for(int i = 0; i < indexes.length; i++) {
+    for(int i = 0; i < indexes.length; ++i) {
       indexes[i] = new BaseXCheckBox(cb[i], val[i], 0, this);
       indexes[i].setEnabled(data instanceof DiskData);
       panels[i] = new BaseXBack();
@@ -218,7 +218,7 @@ public final class DialogInfo extends Dialog {
    */
   public boolean[] indexes() {
     final boolean[] in = new boolean[indexes.length];
-    for(int i = 0; i < indexes.length; i++) in[i] = indexes[i].isSelected();
+    for(int i = 0; i < indexes.length; ++i) in[i] = indexes[i].isSelected();
     return in;
   }
 

@@ -46,7 +46,7 @@ public final class DirParser extends Parser {
   public DirParser(final IO path, final Prop pr, final String t) {
     super(path, t);
     prop = pr;
-    final String dir = path.getDir();
+    final String dir = path.dir();
     root = dir.endsWith("/") ? dir : dir + '/';
 
     if(path.isDir()) {

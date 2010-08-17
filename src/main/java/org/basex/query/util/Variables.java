@@ -7,35 +7,37 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 
 /**
- * Variables.
+ * Container for all global and local variables that are specified in the
+ * current context.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Variables extends ExprInfo {
   /** Global variables. */
-  private final Vars global = new Vars();
+  private final VarList global = new VarList();
   /** Local variables. */
-  private final Vars local = new Vars();
-
-  /**
-   * Indexes a global variable.
-   * @param v variable
-   */
-  public void addGlobal(final Var v) {
-    global.add(v);
-  }
+  private final VarList local = new VarList();
 
   /**
    * Returns the global variables.
    * @return global variables
    */
-  public Vars getGlobal() {
+  public VarList global() {
     return global;
   }
 
   /**
-   * Indexes a local variable.
+   * Adds a global variable.
+   * @param v variable to be added
+   */
+  public void addGlobal(final Var v) {
+    global.add(v);
+    v.global = true;
+  }
+
+  /**
+   * Adds a local variable.
    * @param v variable
    */
   public void add(final Var v) {
@@ -50,6 +52,15 @@ public final class Variables extends ExprInfo {
   public Var get(final Var var) {
     final Var v = local.get(var);
     return v != null ? v : global.get(var);
+  }
+
+  /**
+   * Checks if all functions have been correctly declared, and initializes
+   * all function calls.
+   * @throws QueryException query exception
+   */
+  public void check() throws QueryException {
+    global.check();
   }
 
   /**

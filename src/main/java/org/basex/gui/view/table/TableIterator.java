@@ -61,7 +61,7 @@ final class TableIterator {
       if(text || k == Data.ATTR) {
         final int id = text ? tag : data.name(pre);
         // find correct column...
-        for(col = 0; col < tdata.cols.length; col++) {
+        for(col = 0; col < tdata.cols.length; ++col) {
           if(tdata.cols[col].id == id && tdata.cols[col].elem == text) {
             return true;
           }

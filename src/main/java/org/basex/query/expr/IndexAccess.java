@@ -26,8 +26,8 @@ import org.basex.util.InputInfo;
 public final class IndexAccess extends Single {
   /** Index context. */
   private final IndexContext ictx;
-  /** Access type. */
-  final IndexType type;
+  /** Index type. */
+  final IndexType ind;
 
   /**
    * Constructor.
@@ -39,8 +39,9 @@ public final class IndexAccess extends Single {
   public IndexAccess(final InputInfo ii, final Expr e, final IndexType t,
       final IndexContext ic) {
     super(ii, e);
-    type = t;
+    ind = t;
     ictx = ic;
+    type = SeqType.NOD_ZM;
   }
 
   @Override
@@ -66,11 +67,11 @@ public final class IndexAccess extends Single {
    */
   private Iter index(final byte[] term) {
     final Data data = ictx.data;
-    final boolean text = type == IndexType.TXT;
+    final boolean text = ind == IndexType.TXT;
     final byte kind = text ? Data.TEXT : Data.ATTR;
 
     return term.length <= MAXLEN ? new Iter() {
-      final IndexIterator ii = data.ids(new ValuesToken(type, term));
+      final IndexIterator ii = data.ids(new ValuesToken(ind, term));
 
       @Override
       public Item next() {
@@ -92,23 +93,13 @@ public final class IndexAccess extends Single {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD_ZM;
-  }
-
-  @Override
-  public boolean duplicates(final QueryContext ctx) {
+  public boolean duplicates() {
     return ictx.dupl;
   }
 
   @Override
   public boolean sameAs(final Expr cmp) {
     return cmp instanceof IndexAccess;
-  }
-
-  @Override
-  public String color() {
-    return "CC99FF";
   }
 
   @Override

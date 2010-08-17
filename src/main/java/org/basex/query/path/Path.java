@@ -8,6 +8,7 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.expr.Root;
+import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -18,7 +19,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-abstract class Path extends ParseExpr {
+public abstract class Path extends ParseExpr {
   /** Top expression. */
   public Expr root;
 
@@ -59,27 +60,28 @@ abstract class Path extends ParseExpr {
    */
   protected final Value root(final QueryContext ctx) {
     final Value v = ctx != null ? ctx.value : null;
-    if(root == null) return v;
+    // no root specified: return context, if it does not reference a document
+    // as e.g. happens in //a(b|c)
+    if(root == null) return v == null || v.type != Type.DOC ? v : null;
+    // root is value: return root
     if(root.value()) return (Value) root;
+    // no root reference, no context: return null
     if(!(root instanceof Root) || v == null) return null;
-    return v.size(ctx) != 1 ? v : ((Root) root).root(v);
+    // return context sequence or root of current context
+    return v.size() != 1 ? v : ((Root) root).root(v);
   }
 
   /**
    * Position test.
    * @param step step array
    * @param use use type
-   * @param ctx query context
    * @return result of check
    */
-  protected final boolean uses(final Expr[] step, final Use use,
-      final QueryContext ctx) {
+  protected final boolean uses(final Expr[] step, final Use use) {
+    if(use == Use.CTX) return root == null || root.uses(use);
 
-    if(use == Use.CTX || use == Use.ELM)
-      return root == null || root.uses(use, ctx);
-
-    for(final Expr s : step) if(s.uses(use, ctx)) return true;
-    return root != null && root.uses(use, ctx);
+    for(final Expr s : step) if(s.uses(use)) return true;
+    return root != null && root.uses(use);
   }
 
   @Override
@@ -87,11 +89,6 @@ abstract class Path extends ParseExpr {
     if(root != null) root = root.remove(v);
     if(root instanceof Context) root = null;
     return this;
-  }
-
-  @Override
-  public final String color() {
-    return "FFCC33";
   }
 
   /**

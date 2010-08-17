@@ -114,7 +114,7 @@ public final class NSLocal {
    */
   public NSLocal copy() {
     final NSLocal local = new NSLocal();
-    for(int i = 0; i < def; i++) local.ns.add(ns.key[i], ns.val[i]);
+    for(int i = 0; i < def; ++i) local.ns.add(ns.key[i], ns.val[i]);
     return local;
   }
 

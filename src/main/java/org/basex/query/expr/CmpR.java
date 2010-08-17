@@ -31,7 +31,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class CmpR extends Single {
+public final class CmpR extends Single {
   /** Minimum. */
   private final double min;
   /** Include minimum value. */
@@ -59,6 +59,7 @@ final class CmpR extends Single {
     mni = in;
     max = mx;
     mxi = ix;
+    type = SeqType.BLN;
   }
 
   /**
@@ -67,13 +68,14 @@ final class CmpR extends Single {
    * @return resulting or specified expression
    * @throws QueryException query exception
    */
-  static Expr get(final Arr ex) throws QueryException {
-    if(!(ex instanceof CmpG || ex instanceof CmpV) || !ex.exprAndItem(true))
-      return ex;
+  static Expr get(final CmpG ex) throws QueryException {
+    if(!ex.expr[1].item()) return ex;
+    final Item it = (Item) ex.expr[1];
+    if(!it.num()) return ex;
 
     final Expr e = ex.expr[0];
-    final double d = ((Item) ex.expr[1]).dbl(ex.input);
-    switch(ex instanceof CmpG ? ((CmpG) ex).cmp.cmp : ((CmpV) ex).cmp) {
+    final double d = it.dbl(ex.input);
+    switch(ex.op.op) {
       case EQ: return new CmpR(
           ex.input, e, d, true, d, true);
       case GE: return new CmpR(
@@ -113,7 +115,7 @@ final class CmpR extends Single {
    * @return resulting expression or null
    */
   Expr intersect(final CmpR c) {
-    if(c == null || !c.expr.sameAs(expr)) return null;
+    if(!c.expr.sameAs(expr)) return null;
     final double mn = Math.max(min, c.min);
     final double mx = Math.min(max, c.max);
     return mn > mx ? Bln.FALSE :
@@ -185,11 +187,6 @@ final class CmpR extends Single {
     final Step step = path.step[st - 1];
     return !step.simple(Axis.ATTR, true) ? null :
       ic.data.atts.stat(ic.data.atts.id(((NameTest) step.test).ln));
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
   }
 
   @Override

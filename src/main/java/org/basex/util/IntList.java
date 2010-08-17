@@ -95,7 +95,7 @@ public class IntList {
    * @return true if value is found
    */
   public final boolean contains(final int v) {
-    for(int i = 0; i < size; i++) if(list[i] == v) return true;
+    for(int i = 0; i < size; ++i) if(list[i] == v) return true;
     return false;
   }
 
@@ -167,7 +167,7 @@ public class IntList {
       final boolean f, final byte[][] t) {
 
     if(e < 7) {
-      for(int i = s; i < e + s; i++) {
+      for(int i = s; i < e + s; ++i) {
         for(int j = i; j > s; j--) {
           final int h = g ? s(t[j - 1], t[j]) : d(t[j - 1], t[j]);
           if(f ? h < 0 : h > 0) break;
@@ -231,7 +231,7 @@ public class IntList {
       final double[] t) {
 
     if(e < 7) {
-      for(int i = s; i < e + s; i++) {
+      for(int i = s; i < e + s; ++i) {
         for(int j = i; j > s; j--) {
           final double h = t[j - 1] - t[j];
           if(f ? h < 0 : h > 0) break;
@@ -343,7 +343,7 @@ public class IntList {
    * @param t sort tokens
    */
   private void s(final int a, final int b, final int n, final byte[][] t) {
-    for(int i = 0; i < n; i++) s(a + i, b + i, t);
+    for(int i = 0; i < n; ++i) s(a + i, b + i, t);
   }
 
   /**
@@ -354,7 +354,7 @@ public class IntList {
    * @param t sort tokens
    */
   private void s(final int a, final int b, final int n, final double[] t) {
-    for(int i = 0; i < n; i++) s(a + i, b + i, t);
+    for(int i = 0; i < n; ++i) s(a + i, b + i, t);
   }
 
   /**
@@ -373,7 +373,7 @@ public class IntList {
   @Override
   public String toString() {
     final TokenBuilder sb = new TokenBuilder(Main.name(this) + '[');
-    for(int i = 0; i < size; i++) sb.add((i == 0 ? "" : ",") + list[i]);
+    for(int i = 0; i < size; ++i) sb.add((i == 0 ? "" : ",") + list[i]);
     return sb.add(']').toString();
   }
 }

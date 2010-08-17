@@ -63,7 +63,7 @@ public class GFLWOR extends ParseExpr {
     final int vs = ctx.vars.size();
 
     // optimize for/let clauses
-    for(int f = 0; f != fl.length; f++) {
+    for(int f = 0; f != fl.length; ++f) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
       ctx.ftfast &= fl[f].simple();
@@ -80,7 +80,7 @@ public class GFLWOR extends ParseExpr {
         empty = !where.ebv(ctx, input).bool(input);
         if(!empty) {
           // always true: test can be skipped
-          ctx.compInfo(OPTTRUE, where);
+          ctx.compInfo(OPTREMOVE, desc(), where);
           where = null;
         }
       }
@@ -94,17 +94,19 @@ public class GFLWOR extends ParseExpr {
     ctx.grouping = grp;
 
     if(empty) {
-      ctx.compInfo(OPTFALSE, where);
+      ctx.compInfo(OPTREMOVE, desc(), where);
       return Empty.SEQ;
     }
 
-    for(int f = 0; f != fl.length; f++) {
+    for(int f = 0; f != fl.length; ++f) {
       // remove GFLWOR expression if a FOR clause yields an empty sequence
       if(fl[f].expr.empty() && fl[f] instanceof For) {
         ctx.compInfo(OPTFLWOR);
         return Empty.SEQ;
       }
     }
+
+    type = new SeqType(ret.type().type, SeqType.Occ.ZM);
     return this;
   }
 
@@ -114,11 +116,11 @@ public class GFLWOR extends ParseExpr {
     final Iter[] iter = new Iter[fl.length];
 
     // store pointers to the cached results here.
-    for(int f = 0; f < fl.length; f++) { // fill each var with data
+    for(int f = 0; f < fl.length; ++f) { // fill each var with data
       iter[f] = ctx.iter(fl[f]);
       if(group != null) cache.put(fl[f].var, new ItemList());
     }
-    
+
     // evaluate pre grouping tuples
     group.initgroup(fl);
     iter(ctx, cache, iter, 0);
@@ -137,24 +139,24 @@ public class GFLWOR extends ParseExpr {
    * Returns grouped variables.
    * @param ctx context.
    * @param ir sequence to be filled.
-   * @throws QueryException on error. 
+   * @throws QueryException on error.
    */
   private void retG(final QueryContext ctx, final ItemIter ir)
       throws QueryException {
     Var[] pgvars = new Var[group.gp.gv.length];
     Var[] pgngvar = new Var[group.gp.ngv.length];
-    for(int j = 0; j <  group.gp.gv.length; j++) 
+    for(int j = 0; j <  group.gp.gv.length; ++j)
       pgvars[j] = ctx.vars.get(group.gp.gv[j]);
-    for(int j = 0; j <  group.gp.ngv.length; j++) 
+    for(int j = 0; j <  group.gp.ngv.length; ++j)
       pgngvar[j] = ctx.vars.get(group.gp.ngv[j]);
 
-    for(int i = 0; i < group.gp.partitions.size(); i++) { // bind grouping var
+    for(int i = 0; i < group.gp.partitions.size(); ++i) { // bind grouping var
       final HashMap<Var, ItemList> ngvars = group.gp.items.get(i);
       final GroupNode gn =  group.gp.partitions.get(i);
-      for(int j = 0; j < group.gp.gv.length; j++)
+      for(int j = 0; j < group.gp.gv.length; ++j)
         pgvars[j].bind(gn.its[j], ctx);
-      
-      for(int j = 0; j < group.gp.ngv.length; j++) {
+
+      for(int j = 0; j < group.gp.ngv.length; ++j) {
         final ItemList its = ngvars.get(group.gp.ngv[j]);
         if(its != null)
         pgngvar[j].bind(
@@ -196,19 +198,19 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || ret.uses(u, ctx);
+  public final boolean uses(final Use u) {
+    return u == Use.VAR || ret.uses(u);
   }
 
   @Override
-  public final boolean removable(final Var v, final QueryContext ctx) {
+  public final boolean removable(final Var v) {
     for(final ForLet f : fl) {
-      if(!f.removable(v, ctx)) return false;
+      if(!f.removable(v)) return false;
       if(f.shadows(v)) return true;
     }
-    return (where == null || where.removable(v, ctx))
-        && (order == null || order.removable(v, ctx))
-        && (group == null || group.removable(v, ctx)) && ret.removable(v, ctx);
+    return (where == null || where.removable(v))
+        && (order == null || order.removable(v))
+        && (group == null || group.removable(v)) && ret.removable(v);
   }
 
   @Override
@@ -221,16 +223,6 @@ public class GFLWOR extends ParseExpr {
     if(order != null) order = order.remove(v);
     ret = ret.remove(v);
     return this;
-  }
-
-  @Override
-  public final SeqType returned(final QueryContext ctx) {
-    return new SeqType(ret.returned(ctx).type, SeqType.Occ.ZM);
-  }
-
-  @Override
-  public final String color() {
-    return "66FF66";
   }
 
   @Override
@@ -254,7 +246,7 @@ public class GFLWOR extends ParseExpr {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i != fl.length; i++)
+    for(int i = 0; i != fl.length; ++i)
       sb.append(i != 0 ? " " : "").append(fl[i]);
     if(where != null) sb.append(" ").append(WHERE).append(" ").append(where);
     if(order != null) sb.append(order);

@@ -60,7 +60,7 @@ public final class BaseXTable extends JTable {
   public void update(final Table t) {
     data = t;
     model.fireTableChanged(null);
-    for(int i = 1; i < data.cols(); i++) {
+    for(int i = 1; i < data.cols(); ++i) {
       final TableColumn tc = getColumnModel().getColumn(i);
       tc.setResizable(false);
       tc.setPreferredWidth(30);

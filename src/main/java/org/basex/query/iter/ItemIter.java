@@ -48,8 +48,9 @@ public final class ItemIter extends Iter implements Result {
   }
 
   /**
-   * Returns the argument, if it is a sequence iterator.
-   * Otherwise, returns a new sequence iterator with the iterator contents.
+   * Returns a new sequence iterator with the contents of the specified
+   * iterator. The specified iterator is returned if it is already an
+   * {@link ItemIter} sequence.
    * @param iter iterator
    * @return iterator
    * @throws QueryException query exception
@@ -88,7 +89,7 @@ public final class ItemIter extends Iter implements Result {
     final ItemIter sb = (ItemIter) v;
     if(size != sb.size) return false;
     try {
-      for(int i = 0; i < size; i++) {
+      for(int i = 0; i < size; ++i) {
         /// it is safe to pass on null, as item has the same type
         if(item[i].type != sb.item[i].type || !item[i].equiv(null, sb.item[i]))
           return false;
@@ -101,7 +102,7 @@ public final class ItemIter extends Iter implements Result {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < size && !ser.finished(); c++) serialize(ser, c);
+    for(int c = 0; c < size && !ser.finished(); ++c) serialize(ser, c);
   }
 
   @Override
@@ -157,7 +158,7 @@ public final class ItemIter extends Iter implements Result {
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     if(size != 1) sb.append("(");
-    for(int v = 0; v != size; v++) {
+    for(int v = 0; v != size; ++v) {
       sb.append((v != 0 ? ", " : "") + item[v]);
       if(sb.length() > 15 && v + 1 != size) {
         sb.append(", ...");

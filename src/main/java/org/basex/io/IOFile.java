@@ -25,7 +25,7 @@ public final class IOFile extends IO {
   ZipEntry zip;
 
   /** File prefix. */
-  private static final String PREFILE = "file:";
+  private static final String FILEPREF = "file:";
   /** Input stream reference. */
   private InputStream is;
   /** File reference. */
@@ -159,16 +159,11 @@ public final class IOFile extends IO {
   }
 
   @Override
-  public String dir() {
-    return file.isDirectory() ? file.getPath() : file.getParent();
-  }
-
-  @Override
   public IO[] children() {
     final File[] ch = file.listFiles();
     final int l = ch != null ? ch.length : 0;
     final IO[] io = new IO[l];
-    for(int i = 0; i < l; i++) io[i] = new IOFile(ch[i]);
+    for(int i = 0; i < l; ++i) io[i] = new IOFile(ch[i]);
     return io;
   }
 
@@ -188,12 +183,13 @@ public final class IOFile extends IO {
 
   @Override
   public String url() {
-    String pre = PREFILE;
+    String pre = FILEPREF;
     if(!path.startsWith("/")) {
-      pre += "/";
+      pre += '/';
       if(path.length() < 2 || path.charAt(1) != ':') {
-        pre += "/" + Prop.WORK.replace('\\', '/');
-        if(!pre.endsWith("/")) pre += "/";
+        // [CG] IO paths: check HOME reference
+        pre += "/" + Prop.HOME.replace('\\', '/');
+        if(!pre.endsWith("/")) pre += '/';
       }
     }
     return pre + path.replace('\\', '/');
@@ -206,13 +202,14 @@ public final class IOFile extends IO {
    */
   public static String file(final String url) {
     String file = url;
+    // [CG] IO paths: check for '+'
     if(file.indexOf("%") != -1) {
       try {
         file = URLDecoder.decode(file, Prop.ENCODING);
       } catch(final Exception ex) { /* ignored. */ }
     }
-    String fn = file.startsWith(PREFILE) ?
-        file.substring(PREFILE.length()) : file;
+    String fn = file.startsWith(FILEPREF) ?
+        file.substring(FILEPREF.length()) : file;
     while(fn.startsWith("//")) fn = fn.substring(1);
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
@@ -231,13 +228,13 @@ public final class IOFile extends IO {
     String create(final String path) {
       final TokenBuilder tb = new TokenBuilder();
       final int l = path.length();
-      for(int i = 0; i < l; i++) {
+      for(int i = 0; i < l; ++i) {
         final char ch = path.charAt(i);
         if(ch == '\\' || ch == '/') add(tb);
         else tb.add(ch);
       }
       add(tb);
-      for(int s = 0; s < size; s++) {
+      for(int s = 0; s < size; ++s) {
         if(s != 0 || path.startsWith("/")) tb.add('/');
         tb.add(list[s]);
       }

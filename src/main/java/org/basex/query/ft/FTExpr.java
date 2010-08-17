@@ -31,12 +31,13 @@ public abstract class FTExpr extends ParseExpr {
   protected FTExpr(final InputInfo ii, final FTExpr... e) {
     super(ii);
     expr = e;
+    type = SeqType.BLN;
   }
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
     ctx.ftfast = false;
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
+    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
     return this;
   }
 
@@ -60,31 +61,26 @@ public abstract class FTExpr extends ParseExpr {
   public abstract FTIter iter(final QueryContext ctx) throws QueryException;
 
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
-    for(final FTExpr e : expr) if(e.uses(u, ctx)) return true;
+  public final boolean uses(final Use u) {
+    for(final FTExpr e : expr) if(e.uses(u)) return true;
     return false;
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    for(final Expr e : expr) if(!e.removable(v, ctx)) return false;
+  public boolean removable(final Var v) {
+    for(final Expr e : expr) if(!e.removable(v)) return false;
     return true;
   }
 
   @Override
   public FTExpr remove(final Var v) {
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].remove(v);
+    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
     return this;
   }
 
   @Override
-  public final SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
-  }
-
-  @Override
   public FTExpr indexEquivalent(final IndexContext ic) throws QueryException {
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].indexEquivalent(ic);
+    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].indexEquivalent(ic);
     return this;
   }
 
@@ -96,11 +92,6 @@ public abstract class FTExpr extends ParseExpr {
   protected boolean usesExclude() {
     for(final FTExpr e : expr) if(e.usesExclude()) return true;
     return false;
-  }
-
-  @Override
-  public final String color() {
-    return "66FF66";
   }
 
   @Override
@@ -117,7 +108,7 @@ public abstract class FTExpr extends ParseExpr {
    */
   protected final String toString(final Object sep) {
     final StringBuilder sb = new StringBuilder();
-    for(int e = 0; e != expr.length; e++) {
+    for(int e = 0; e != expr.length; ++e) {
       sb.append((e != 0 ? sep.toString() : "") + expr[e]);
     }
     return sb.toString();

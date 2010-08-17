@@ -38,7 +38,7 @@ final class FNFile extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
 
-    switch(func) {
+    switch(def) {
       case FILES:
         return listFiles(ctx);
       default:
@@ -54,7 +54,7 @@ final class FNFile extends Fun {
     final File path = expr.length == 0 ? null : new File(
         Token.string(checkStrEmp(expr[0].atomic(ctx, input))));
 
-    switch(func) {
+    switch(def) {
       case MKDIR:
         return Bln.get(path.mkdir());
       case MKDIRS:

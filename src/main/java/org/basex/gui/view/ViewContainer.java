@@ -47,7 +47,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     /** West orientation.  */ WEST,
     /** East orientation.  */ EAST,
     /** South orientation. */ SOUTH
-  };
+  }
 
   /** Reference to main window. */
   private final GUI gui;
@@ -81,7 +81,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     logo = BaseXLayout.image("logo");
 
     views = new ViewPanel[v.length];
-    for(int i = 0; i < v.length; i++) views[i] = new ViewPanel(v[i]);
+    for(int i = 0; i < v.length; ++i) views[i] = new ViewPanel(v[i]);
     gui = main;
     // build layout or use default if something goes wrong
     if(!buildLayout(gui.prop.get(GUIProp.VIEWS)) && !buildLayout(VIEWS)) {
@@ -171,7 +171,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
    * @return true if component was successfully added
    */
   private boolean add(final ViewAlignment lay) {
-    for(int o = 0; o < lay.comp.length; o++) {
+    for(int o = 0; o < lay.comp.length; ++o) {
       final ViewLayout comp = lay.comp[o];
       if(comp instanceof ViewAlignment) {
         if(add((ViewAlignment) comp)) return true;

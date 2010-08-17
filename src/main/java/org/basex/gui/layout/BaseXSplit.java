@@ -62,12 +62,12 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
     final Component[] m = getComponents();
     final int r = s.length;
     int q = 0;
-    for(int n = 0; n < r - 1; n++) if(m[(n << 1) + 1] == sep) q = n + 1;
+    for(int n = 0; n < r - 1; ++n) if(m[(n << 1) + 1] == sep) q = n + 1;
     final double v = (d - p) / (l ? getWidth() : getHeight());
-    for(int i = 0; i < q; i++) if(t[i] - v / q < .0001) return;
-    for(int i = q; i < r; i++) if(t[i] + v / (r - q) < .0001) return;
-    for(int i = 0; i < q; i++) s[i] = t[i] - v / q;
-    for(int i = q; i < r; i++) s[i] = t[i] + v / (r - q);
+    for(int i = 0; i < q; ++i) if(t[i] - v / q < .0001) return;
+    for(int i = q; i < r; ++i) if(t[i] + v / (r - q) < .0001) return;
+    for(int i = 0; i < q; ++i) s[i] = t[i] - v / q;
+    for(int i = q; i < r; ++i) s[i] = t[i] + v / (r - q);
     revalidate();
   }
 
@@ -99,7 +99,7 @@ public final class BaseXSplit extends BaseXBack implements LayoutManager {
       if(a) s = new double[m];
 
       double v = 0;
-      for(int n = 0; n < c.length; n++) {
+      for(int n = 0; n < c.length; ++n) {
         final boolean b = (n & 1) == 0;
         double z = BaseXSplitSep.SIZE;
         if(b) z = s[n >> 1] == 0 ? (int) (p / m) : s[n >> 1] * p;

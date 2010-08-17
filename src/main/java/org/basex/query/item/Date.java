@@ -1,7 +1,6 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
-
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,7 +68,7 @@ public abstract class Date extends Item {
       xc = df.newXMLGregorianCalendar(Token.string(d).trim());
       if(xc.getHour() == 24) xc.add(df.newDuration(0));
     } catch(final IllegalArgumentException ex) {
-      dateErr(d, type, e, ii);
+      dateErr(d, e, ii);
     }
   }
 
@@ -84,7 +83,7 @@ public abstract class Date extends Item {
       throws QueryException {
 
     final Matcher mt = DAT.matcher(Token.string(d).trim());
-    if(!mt.matches()) dateErr(d, type, e, ii);
+    if(!mt.matches()) dateErr(d, e, ii);
     zone(mt, 5, d, ii);
   }
 
@@ -99,13 +98,13 @@ public abstract class Date extends Item {
       throws QueryException {
 
     final Matcher mt = TIM.matcher(Token.string(d).trim());
-    if(!mt.matches()) dateErr(d, type, e, ii);
+    if(!mt.matches()) dateErr(d, e, ii);
 
     final int h = Token.toInt(mt.group(1));
     final int s = Token.toInt(mt.group(3));
     if(s > 59) Err.or(ii, DATERANGE, type, d);
     final double ms = mt.group(4) != null ? Double.parseDouble(mt.group(4)) : 0;
-    if(h == 24 && ms > 0) dateErr(d, type, e, ii);
+    if(h == 24 && ms > 0) dateErr(d, e, ii);
     zone(mt, 6, d, ii);
   }
 
@@ -228,9 +227,14 @@ public abstract class Date extends Item {
   public static long days(final int y, final int m, final int d) {
     long n = 0;
     final int yy = Math.abs(y);
-    for(int i = 0; i < yy; i++) n += 365 + leap(i);
-    for(int i = 0; i < m; i++) n += dpm(y, i);
+    for(int i = 0; i < yy; ++i) n += 365 + leap(i);
+    for(int i = 0; i < m; ++i) n += dpm(y, i);
     return n + d;
+  }
+
+  @Override
+  public final SeqType type() {
+    return SeqType.DAT;
   }
 
   @Override

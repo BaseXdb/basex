@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -46,12 +45,15 @@ public class Filter extends Preds {
   public final Expr comp(final QueryContext ctx) throws QueryException {
     root = checkUp(root, ctx).comp(ctx);
 
-    // if possible, convert filters to axis paths
-    if(root instanceof AxisPath && !super.uses(Use.POS, ctx)) {
+    // convert filters to axis paths
+    if(root instanceof AxisPath && !super.uses(Use.POS)) {
       AxisPath path = ((AxisPath) root).copy();
       for(final Expr p : pred) path = path.addPred(p);
       return path.comp(ctx);
     }
+
+    // return empty root
+    if(root.empty()) return optPre(Empty.SEQ, ctx);
 
     final Value tmp = ctx.value;
     ctx.value = null;
@@ -59,25 +61,25 @@ public class Filter extends Preds {
     ctx.value = tmp;
     if(e != this) return e;
 
-    if(root.empty()) {
-      ctx.compInfo(OPTPRE, this);
-      return Empty.SEQ;
-    }
-
     // no predicates.. return root
     if(pred.length == 0) return root;
     final Expr p = pred[0];
 
+    // evaluate return type
+    final SeqType t = root.type();
+    type = new SeqType(t.type, t.zeroOrOne() ? SeqType.Occ.ZO : SeqType.Occ.ZM);
+
     // position predicate
     final Pos pos = p instanceof Pos ? (Pos) p : null;
     // last flag
-    final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
+    final boolean last = p instanceof Fun && ((Fun) p).def == FunDef.LAST;
     // use iterative evaluation
-    if(pred.length == 1 && (last || pos != null || !uses(Use.POS, ctx)))
-      return new IterPred(input, root, pred, pos, last);
+    if(pred.length == 1 && (last || pos != null || !uses(Use.POS)))
+      return new IterPred(this, pos, last);
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
-    direct = pred.length == 1 && p.returned(ctx).num() && !p.uses(Use.CTX, ctx);
+    direct = pred.length == 1 && p.type().num() && !p.uses(Use.CTX);
+
     return this;
   }
 
@@ -88,7 +90,7 @@ public class Filter extends Preds {
       final long l = it.itr(input);
       final Expr e = Pos.get(l, l, input);
       return l != it.dbl(input) || e == Bln.FALSE ? Iter.EMPTY :
-        new IterPred(input, root, pred, (Pos) e, false).iter(ctx);
+        new IterPred(this, (Pos) e, false).iter(ctx);
     }
 
     final Iter iter = ctx.iter(root);
@@ -107,7 +109,7 @@ public class Filter extends Preds {
       ctx.pos = 1;
       int c = 0;
       final long sl = ir.size();
-      for(int s = 0; s < sl; s++) {
+      for(int s = 0; s < sl; ++s) {
         ctx.value = ir.item[s];
         if(p.test(ctx, input) != null) ir.item[c++] = ir.item[s];
         ctx.pos++;
@@ -121,26 +123,19 @@ public class Filter extends Preds {
   }
 
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
-    return root.uses(u, ctx) || super.uses(u, ctx);
+  public final boolean uses(final Use u) {
+    return root.uses(u) || super.uses(u);
   }
 
   @Override
-  public final boolean removable(final Var v, final QueryContext ctx) {
-    return root.removable(v, ctx) && super.removable(v, ctx);
+  public final boolean removable(final Var v) {
+    return root.removable(v) && super.removable(v);
   }
 
   @Override
   public final Expr remove(final Var v) {
     root = root.remove(v);
     return super.remove(v);
-  }
-
-  @Override
-  public final SeqType returned(final QueryContext ctx) {
-    final SeqType ret = root.returned(ctx);
-    return new SeqType(ret.type, ret.zeroOrOne() ?
-        SeqType.Occ.ZO : SeqType.Occ.ZM);
   }
 
   @Override

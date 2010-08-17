@@ -53,7 +53,7 @@ public final class ParserUtil {
   }
 
   /** Hidden constructor. */
-  private ParserUtil() { /* */}
+  private ParserUtil() { }
 
   /**
    * Converts a duration value in milliseconds to an {@link Duration} instance.

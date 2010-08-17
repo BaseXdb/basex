@@ -45,7 +45,7 @@ final class FNDate extends Fun {
     final boolean d = expr.length == 2;
     final Item zon = d ? expr[1].atomic(ctx, input) : null;
 
-    switch(func) {
+    switch(def) {
       case YEADUR:   return yea(checkDur(it));
       case YEADTM:   return yea(checkDate(it, Type.DTM, ctx));
       case YEADAT:   return yea(checkDate(it, Type.DAT, ctx));

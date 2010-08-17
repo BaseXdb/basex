@@ -34,20 +34,23 @@ public final class Except extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    final int el = expr.length;
-    for(int e = 1; e < expr.length; e++) {
-      if(expr[e].empty()) expr = Array.delete(expr, e--);
+    if(expr[0].empty()) return optPre(Empty.SEQ, ctx);
+
+    for(int e = 1; e < expr.length; ++e) {
+      if(expr[e].empty()) {
+        expr = Array.delete(expr, e--);
+        ctx.compInfo(OPTREMOVE, desc(), Type.EMP);
+      }
     }
-    final boolean ii = expr[0].empty();
-    if(el != expr.length || ii) ctx.compInfo(OPTEMPTY);
-    return ii ? Empty.SEQ : this;
+    // results must always be sorted
+    return expr.length == 1 && !duplicates() ? expr[0] : this;
   }
 
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
-    for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
-    return duplicates(ctx) ? eval(iter) : iter(iter);
+    for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
+    return duplicates() ? eval(iter) : iter(iter);
   }
 
   /**
@@ -63,10 +66,10 @@ public final class Except extends Arr {
       public Nod next() throws QueryException {
         if(items == null) {
           items = new Nod[iter.length];
-          for(int i = 0; i != iter.length; i++) next(i);
+          for(int i = 0; i != iter.length; ++i) next(i);
         }
 
-        for(int i = 1; i != items.length; i++) {
+        for(int i = 1; i != items.length; ++i) {
           if(items[0] == null) return null;
           if(items[i] == null) continue;
           final int d = items[0].diff(items[i]);
@@ -112,17 +115,17 @@ public final class Except extends Arr {
       ni.add((Nod) it);
     }
 
-    for(int e = 1; e != expr.length; e++) {
+    for(int e = 1; e != expr.length; ++e) {
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
         if(!it.node()) Err.type(this, Type.NOD, it);
         final Nod node = (Nod) it;
-        for(int s = 0; s < ni.size(); s++) {
+        for(int s = 0; s < ni.size(); ++s) {
           if(ni.get(s).is(node)) ni.delete(s--);
         }
       }
     }
-    return ni;
+    return ni.sort();
   }
 
   @Override

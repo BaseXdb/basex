@@ -76,7 +76,7 @@ public final class DiskBuilder extends Builder {
     // copy temporary values into database table
     final TableAccess ta = new TableDiskAccess(meta, DATATBL);
     final DataInput in = new DataInput(meta.file(DATATMP));
-    for(; spos < ssize; spos++) ta.write4(in.readNum(), 8, in.readNum());
+    for(; spos < ssize; ++spos) ta.write4(in.readNum(), 8, in.readNum());
     ta.close();
     in.close();
     meta.file(DATATMP).delete();

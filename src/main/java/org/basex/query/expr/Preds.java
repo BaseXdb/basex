@@ -45,17 +45,17 @@ public abstract class Preds extends ParseExpr {
     if(ct == Type.DOC) ctx.value.type = Type.ELM;
 
     Expr e = this;
-    for(int p = 0; p < pred.length; p++) {
+    for(int p = 0; p < pred.length; ++p) {
       Expr pr = pred[p].comp(ctx);
       pr = Pos.get(CmpV.Op.EQ, pr, pr, input);
 
       if(pr.value()) {
         if(!pr.ebv(ctx, input).bool(input)) {
-          ctx.compInfo(OPTFALSE, pr);
+          ctx.compInfo(OPTREMOVE, desc(), pr);
           e = Empty.SEQ;
           break;
         }
-        ctx.compInfo(OPTTRUE, pr);
+        ctx.compInfo(OPTREMOVE, desc(), pr);
         pred = Array.delete(pred, p--);
       } else {
         pred[p] = pr;
@@ -67,29 +67,23 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public boolean uses(final Use u) {
     for(final Expr p : pred) {
-      if(u == Use.POS && p.returned(ctx).mayBeNum() || p.uses(u, ctx))
-        return true;
+      if(u == Use.POS && p.type().mayBeNum() || p.uses(u)) return true;
     }
     return false;
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    for(final Expr p : pred) if(p.uses(Use.VAR, ctx)) return false;
+  public boolean removable(final Var v) {
+    for(final Expr p : pred) if(p.uses(Use.VAR)) return false;
     return true;
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(int p = 0; p < pred.length; p++) pred[p] = pred[p].remove(v);
+    for(int p = 0; p < pred.length; ++p) pred[p] = pred[p].remove(v);
     return this;
-  }
-
-  @Override
-  public final String color() {
-    return "FFFF66";
   }
 
   @Override

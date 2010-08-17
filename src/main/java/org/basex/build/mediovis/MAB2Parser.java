@@ -117,7 +117,7 @@ public final class MAB2Parser extends Parser {
     b.encoding(ENCODING);
 
     // read in indexes
-    final String dir = file.getDir();
+    final String dir = file.dir();
     index(mediatypes, dir + "/mediatypes.dat");
     index(subjects, dir + "/subjects.dat");
     index(languages, dir + "/lang.dat");
@@ -128,7 +128,7 @@ public final class MAB2Parser extends Parser {
     index(genres, dir + "/genres.dat");
 
     // find maximum mediovis id
-    for(int i = 1; i <= mvids.size(); i++) {
+    for(int i = 1; i <= mvids.size(); ++i) {
       final int id = toInt(mvids.value(i));
       if(maxid < id) maxid = id;
     }
@@ -179,13 +179,13 @@ public final class MAB2Parser extends Parser {
         Performance.getMem());
 
     // create all titles
-    for(i = 1; i <= ids.size(); i++) {
+    for(i = 1; i <= ids.size(); ++i) {
       final MAB2Entry entry = ids.value(i);
       final long pos = entry.pos;
       // check if top entry exists...
       final byte[] l = pos != 0 ? addEntry(input, pos, entry.size, null) : null;
       // loop through all children...
-      for(int j = 0; j < entry.size; j++) {
+      for(int j = 0; j < entry.size; ++j) {
         addEntry(input, entry.children[j], 0, l);
       }
       if(entry.size != 0 && pos != 0 && !flat) builder.endElem(MEDIUM);
@@ -199,7 +199,7 @@ public final class MAB2Parser extends Parser {
 
     // write the mediovis ids back to disk
     final PrintOutput out = new PrintOutput(dir + "/mvids.dat");
-    for(i = 1; i <= mvids.size(); i++) {
+    for(i = 1; i <= mvids.size(); ++i) {
       out.print(mvids.key(i));
       out.write('\t');
       out.println(mvids.value(i));
@@ -389,8 +389,8 @@ public final class MAB2Parser extends Parser {
         builder.startElem(MEDIUM, atts);
         add(TYPE, type);
         add(LANGUAGE, language);
-        for(int s = 0; s < nrPers; s++) add(PERSON, pers[s]);
-        for(int s = 0; s < nrInst; s++) add(INSTITUTE, inst[s]);
+        for(int s = 0; s < nrPers; ++s) add(PERSON, pers[s]);
+        for(int s = 0; s < nrInst; ++s) add(INSTITUTE, inst[s]);
         add(ORIGINAL, original);
         add(TITLE, title);
         add(SUBTITLE, subtitle);
@@ -401,9 +401,9 @@ public final class MAB2Parser extends Parser {
         add(FORMAT, format);
         add(DETAILS, details);
         add(NOTE, note);
-        for(int s = 0; s < nrSigs; s++) add(SIGNATURE, sig[s]);
+        for(int s = 0; s < nrSigs; ++s) add(SIGNATURE, sig[s]);
         // actually: several subjects/lending numbers per medium..
-        for(int s = 0; s < nrSigs; s++) {
+        for(int s = 0; s < nrSigs; ++s) {
           if(subject == null) subject = subjects.get(subject(sig[s]));
         }
         add(SUBJECT, subject);
@@ -440,7 +440,7 @@ public final class MAB2Parser extends Parser {
     final byte[] n = new byte[4];
     final int l = line.length;
     int c = 0;
-    for(int i = 4; i < l; i++) {
+    for(int i = 4; i < l; ++i) {
       final byte b = line[i];
       if(b >= '0' && b <= '9') {
         n[c++] = b;
@@ -503,7 +503,7 @@ public final class MAB2Parser extends Parser {
    */
   private byte[] language(final byte[] token) {
     final byte[] t = string(token);
-    for(int i = 0; i < t.length; i++) if(t[i] == '?' || t[i] == '$') t[i] = '+';
+    for(int i = 0; i < t.length; ++i) if(t[i] == '?' || t[i] == '$') t[i] = '+';
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] lang : split(t, '+')) {
       final byte[] l = languages.get(lang);
@@ -523,7 +523,7 @@ public final class MAB2Parser extends Parser {
     int c = 0;
     final int l = line.length;
     boolean space = false;
-    for(int s = 4; s < l; s++) {
+    for(int s = 4; s < l; ++s) {
       byte b = line[s];
       // double cross
       if(b == -121) b = '+';

@@ -76,7 +76,7 @@ public abstract class UpdatePrimitive {
    * @param pool name pool
    */
   @SuppressWarnings("unused")
-  public void update(final NamePool pool) { };
+  public void update(final NamePool pool) { }
 
   /**
    * Merges all adjacent text nodes in the given sequence.
@@ -194,7 +194,7 @@ public abstract class UpdatePrimitive {
         if(ns != null) {
           if(ns.size > 0 && ndPar != null) {
             final Atts nsPar = ndPar.nsScope();
-            for(int j = 0; j < nsPar.size; j++) {
+            for(int j = 0; j < nsPar.size; ++j) {
               final byte[] key = nsPar.key[j];
               final int ki = ns.get(key);
               // check if prefix (or empty prefix) is already indexed and if so
@@ -205,7 +205,7 @@ public abstract class UpdatePrimitive {
           }
           ne = ns.size > 0;
         }
-        for(int a = 0; ne && a < ns.size; a++) {
+        for(int a = 0; ne && a < ns.size; ++a) {
           m.ns.add(ns.key[a], ns.val[a], ms);
         }
 

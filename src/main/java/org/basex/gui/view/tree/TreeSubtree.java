@@ -35,7 +35,7 @@ final class TreeSubtree {
     if(rl == 0) return rl;
     border = new TreeBorder[rl][];
 
-    for(int i = 0; i < rl; i++) {
+    for(int i = 0; i < rl; ++i) {
       border[i] = nc.subtree(d, roots[i]);
     }
     return rl;

@@ -110,7 +110,7 @@ public abstract class Dialog extends JDialog {
    * @param comp the action component
    */
   @SuppressWarnings("unused")
-  public void action(final Object comp) { /* */}
+  public void action(final Object comp) { }
 
   /**
    * Called when GUI design has changed.

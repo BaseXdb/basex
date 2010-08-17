@@ -27,7 +27,7 @@ public final class FTPosData {
     final IntList ps = new IntList();
     for(final FTMatch m : all) {
       for(final FTStringMatch sm : m) {
-        for(int s = sm.s; s <= sm.e; s++) ps.add(s);
+        for(int s = sm.s; s <= sm.e; ++s) ps.add(s);
       }
     }
 
@@ -62,7 +62,7 @@ public final class FTPosData {
    */
   boolean same(final FTPosData ft) {
     if(size != ft.size) return false;
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       if(pos[i].pre != ft.pos[i].pre ||
           !Arrays.equals(pos[i].pos, ft.pos[i].pos)) return false;
     }

@@ -38,12 +38,11 @@ final class FNId extends Fun {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = (expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).atomic(ctx, input);
-    if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.NOD);
+    final Item it = checkEmptyType((expr.length == 2 ? expr[1] :
+      checkCtx(ctx)).atomic(ctx, input), Type.NOD);
 
     final Nod node = checkNode(it);
-    switch(func) {
+    switch(def) {
       case ID:    return id(ctx.iter(expr[0]), node);
       case IDREF: return idref(ctx.iter(expr[0]), node);
       case ELID:  return elid(ctx.iter(expr[0]), node);
@@ -55,11 +54,10 @@ final class FNId extends Fun {
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = (expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).atomic(ctx, input);
-    if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.NOD);
+    final Item it = checkEmptyType((expr.length == 2 ? expr[1] :
+      checkCtx(ctx)).atomic(ctx, input), Type.NOD);
 
-    switch(func) {
+    switch(def) {
       case LANG:  return lang(lc(checkEStr(expr[0], ctx)), checkNode(it));
       default:    return super.atomic(ctx, ii);
     }
@@ -209,7 +207,7 @@ final class FNId extends Fun {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.CTX && expr.length == 1 || super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.CTX && expr.length == 1 || super.uses(u);
   }
 }

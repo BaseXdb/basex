@@ -85,6 +85,11 @@ public final class Flt extends Item {
   }
 
   @Override
+  public SeqType type() {
+    return SeqType.FLT;
+  }
+
+  @Override
   public int hashCode() {
     return (int) val;
   }

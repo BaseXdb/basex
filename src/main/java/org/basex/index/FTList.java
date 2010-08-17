@@ -68,7 +68,7 @@ abstract class FTList {
     } else {
       prv = new int[size];
       pov = new int[size];
-      for(int j = 0; j < size; j++) {
+      for(int j = 0; j < size; ++j) {
         prv[j] = dat.readNum();
         pov[j] = dat.readNum();
       }

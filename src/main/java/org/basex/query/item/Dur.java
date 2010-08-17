@@ -82,7 +82,7 @@ public class Dur extends Item {
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
     if(!mt.matches() || val.endsWith("P") || val.endsWith("T"))
-      dateErr(v, type, XDURR, ii);
+      dateErr(v, XDURR, ii);
     final int y = mt.group(2) != null ? toInt(mt.group(3)) : 0;
     final int m = mt.group(4) != null ? toInt(mt.group(5)) : 0;
     final long d = mt.group(6) != null ? toInt(mt.group(7)) : 0;

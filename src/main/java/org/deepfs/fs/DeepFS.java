@@ -260,7 +260,7 @@ public final class DeepFS implements DataText {
     qb.append("/" + S_DEEPFS);
     if(path.equals("/")) return qb.toString();
 
-    for(int i = 0; i < path.length(); i++) {
+    for(int i = 0; i < path.length(); ++i) {
       final char c = path.charAt(i);
       if(c == '/') {
         if(eb.length() != 0) {
@@ -635,7 +635,7 @@ public final class DeepFS implements DataText {
     if(cld == null) return null;
     final int len = cld.length;
     final byte[][] dents = new byte[len][];
-    for(int i = 0; i < len; i++)
+    for(int i = 0; i < len; ++i)
       dents[i] = attr(cld[i], nameID);
     return dents;
   }

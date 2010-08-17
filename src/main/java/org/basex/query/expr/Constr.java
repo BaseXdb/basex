@@ -86,7 +86,7 @@ public final class Constr {
 
         // check for duplicate attribute names
         final QNm qname = node.qname();
-        for(int a = 0; a < ats.size(); a++) {
+        for(int a = 0; a < ats.size(); ++a) {
           if(qname.eq(ats.get(a).qname())) {
             duplAtt = qname.atom();
             return false;
@@ -113,7 +113,7 @@ public final class Constr {
           node = node.parent();
           while(node != null && node.type == Type.ELM) {
             final Atts ns = node.ns();
-            for(int a = 0; a < ns.size; a++) {
+            for(int a = 0; a < ns.size; ++a) {
               if(!atts.contains(ns.key[a])) atts.add(ns.key[a], ns.val[a]);
             }
             node = node.parent();

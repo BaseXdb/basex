@@ -375,7 +375,7 @@ public final class Tokenizer implements IndexToken {
   private static byte[] upper(final byte[] t, final boolean a) {
     final int tl = t.length;
     if(a) {
-      for(int i = 0; i < tl; i++) t[i] = (byte) uc(t[i]);
+      for(int i = 0; i < tl; ++i) t[i] = (byte) uc(t[i]);
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
@@ -392,7 +392,7 @@ public final class Tokenizer implements IndexToken {
   private static byte[] lower(final byte[] t, final boolean a) {
     final int tl = t.length;
     if(a) {
-      for(int i = 0; i < tl; i++) t[i] = (byte) lc(t[i]);
+      for(int i = 0; i < tl; ++i) t[i] = (byte) lc(t[i]);
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();

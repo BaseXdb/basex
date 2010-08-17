@@ -79,9 +79,9 @@ public final class FunJava extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Value[] arg = new Value[expr.length];
-    for(int a = 0; a < expr.length; a++) {
+    for(int a = 0; a < expr.length; ++a) {
       arg[a] = expr[a].iter(ctx).finish();
-      if(arg[a].size(ctx) == 0) Err.or(input, XPEMPTY, desc());
+      if(arg[a].size() == 0) Err.or(input, XPEMPTY, desc());
     }
 
     Object result = null;
@@ -168,7 +168,7 @@ public final class FunJava extends Arr {
    * @return xquery type
    */
   private static Type type(final Class<?> par) {
-    for(int j = 0; j < JAVA.length; j++) if(par == JAVA[j]) return XQUERY[j];
+    for(int j = 0; j < JAVA.length; ++j) if(par == JAVA[j]) return XQUERY[j];
     return Type.JAVA;
   }
 
@@ -250,7 +250,7 @@ public final class FunJava extends Arr {
 
   @Override
   public String desc() {
-    return cls.getName() + "." + mth + "(...)" + (mth.equals("new") ?
+    return cls.getName() + "." + mth + PAR + (mth.equals("new") ?
         " constructor" : " method");
   }
 

@@ -108,7 +108,7 @@ public abstract class UpdateTest {
    */
   protected void assertByteArraysEqual(final byte[] exp, final byte[] act) {
     assertEquals("array lengths don't equal", exp.length, act.length);
-    for(int i = 0; i < exp.length; i++) assertEquals(exp[i], act[i]);
+    for(int i = 0; i < exp.length; ++i) assertEquals(exp[i], act[i]);
   }
 
   /**

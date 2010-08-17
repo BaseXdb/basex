@@ -102,7 +102,7 @@ final class MapLayout {
       int nn = 0;
       if(r.level == 0) {
         final int is = l.size();
-        for(int i = 0; i < is; i++) nn += ViewData.size(data, l.get(i));
+        for(int i = 0; i < is; ++i) nn += ViewData.size(data, l.get(i));
       } else {
         nn = l.get(ne) - l.get(ns) + ViewData.size(data, l.get(ne));
       }

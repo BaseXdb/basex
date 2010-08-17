@@ -71,7 +71,7 @@ public abstract class AQuery extends Command {
       final boolean ser = prop.is(Prop.SERIALIZE);
       long hits = 0;
       int updates = 0;
-      for(int i = 0; i < runs; i++) {
+      for(int i = 0; i < runs; ++i) {
         final Performance per = new Performance();
 
         qp = new QueryProcessor(query, context);
@@ -196,7 +196,9 @@ public abstract class AQuery extends Command {
         final DOTSerializer d = new DOTSerializer(co, prop.is(Prop.DOTCOMPACT));
         qu.plan(d);
         d.close();
-        final String dot = "plan.dot";
+
+        final String dot = context.query == null ? "plan.dot" :
+            context.query.name().replaceAll("\\..*?$", ".dot");
         IO.get(dot).write(co.toArray());
 
         if(prop.is(Prop.DOTDISPLAY))

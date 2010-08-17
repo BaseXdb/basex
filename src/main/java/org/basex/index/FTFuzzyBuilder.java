@@ -92,7 +92,7 @@ final class FTFuzzyBuilder extends FTBuilder {
 
     // open all temporary sorted lists
     final FTList[] v = new FTList[csize];
-    for(int b = 0; b < csize; b++) v[b] = new FTFuzzyList(data, b);
+    for(int b = 0; b < csize; ++b) v[b] = new FTFuzzyList(data, b);
 
     final IntList il = new IntList();
     while(check(v)) {
@@ -100,7 +100,7 @@ final class FTFuzzyBuilder extends FTBuilder {
       il.reset();
       il.add(min);
       // find next token to write on disk
-      for(int i = 0; i < csize; i++) {
+      for(int i = 0; i < csize; ++i) {
         if(min == i || v[i].tok.length == 0) continue;
         final int l = v[i].tok.length - v[min].tok.length;
         final int d = diff(v[min].tok, v[i].tok);
@@ -178,7 +178,7 @@ final class FTFuzzyBuilder extends FTBuilder {
         ind.add(j);
         ind.add(tr);
       }
-      for(int i = 0; i < j; i++) outy.write1(key[i]);
+      for(int i = 0; i < j; ++i) outy.write1(key[i]);
       // write pointer on full-text data
       outy.write5(dr);
       // write full-text data size (number of pre values)

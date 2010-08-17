@@ -61,7 +61,7 @@ final class FTHash extends TokenSet {
    */
   void init() {
     final int[] ids = new int[size];
-    for(int i = 0; i < size; i++) ids[i] = i;
+    for(int i = 0; i < size; ++i) ids[i] = i;
     il = new IntList(ids);
     il.sort(keys, false, true);
     it = 0;

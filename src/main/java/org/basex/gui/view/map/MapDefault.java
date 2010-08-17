@@ -39,7 +39,7 @@ final class MapDefault extends MapPainter {
 
     final int off = prop.num(GUIProp.MAPOFFSETS);
     final int rs = rects.size;
-    for(int ri = 0; ri < rs; ri++) {
+    for(int ri = 0; ri < rs; ++ri) {
       // get rectangle information
       final MapRect r = rects.get(ri);
       final int pre = r.pre;

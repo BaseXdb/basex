@@ -26,7 +26,7 @@ public interface BuildText {
   String LIMITTAGS = "%: Document has too many different tag names (limit: %).";
   /** Builder error. */
   String LIMITATTS =
-    "%: Document has too many different attribute names (limit: %).";;
+    "%: Document has too many different attribute names (limit: %).";
   /** Builder error. */
   String LIMITATT =
     "%: Element has too many different attributes (limit: %).";

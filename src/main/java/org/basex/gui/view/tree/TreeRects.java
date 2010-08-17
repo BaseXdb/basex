@@ -47,7 +47,7 @@ final class TreeRects implements TreeViewOptions {
 
     rects = new TreeRect[rl][][];
 
-    for(int i = 0; i < rl; i++) {
+    for(int i = 0; i < rl; ++i) {
       generateRects(sub, c, g, i, w);
     }
     return w;
@@ -69,7 +69,7 @@ final class TreeRects implements TreeViewOptions {
     rects[rn] = new TreeRect[h][];
     double w = -1;
 
-    for(int lv = 0; lv < h; lv++) {
+    for(int lv = 0; lv < h; ++lv) {
 
       w = sw / sub.getLevelSize(rn, lv);
 
@@ -113,7 +113,7 @@ final class TreeRects implements TreeViewOptions {
     double xx = rn * w * subSi;
     double ww = w;
 
-    for(int i = 0; i < subSi; i++) {
+    for(int i = 0; i < subSi; ++i) {
 
       if(SLIM_TO_TEXT) {
         final double boxMiddle = xx + ww / 2f;

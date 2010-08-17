@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import org.basex.query.QueryContext;
 import org.basex.query.expr.Expr;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 
 /**
@@ -26,14 +27,25 @@ public abstract class Value extends Expr {
   public final Value comp(final QueryContext ctx) {
     return this;
   }
-  
+
+  @Override
+  public final Iter iter(final QueryContext ctx) {
+    return iter();
+  }
+
+  /**
+   * Returns an iterator.
+   * @return iterator
+   */
+  public abstract Iter iter();
+
   @Override
   public final boolean value() {
     return true;
   }
-  
+
   @Override
-  public abstract long size(final QueryContext ctx);
+  public abstract long size();
 
   /**
    * Checks if this is a single numeric item.
@@ -72,7 +84,7 @@ public abstract class Value extends Expr {
    * @return result of check
    */
   public final boolean date() {
-    return this instanceof Date;
+    return type.dat;
   }
 
   /**
@@ -90,25 +102,25 @@ public abstract class Value extends Expr {
   public abstract Object toJava();
 
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
+  public final boolean uses(final Use u) {
     return false;
   }
 
   @Override
-  public final boolean removable(final Var v, final QueryContext ctx) {
+  public final boolean removable(final Var v) {
     return true;
   }
 
   @Override
-  public abstract boolean duplicates(final QueryContext ctx);
+  public abstract boolean duplicates();
 
   @Override
-  public final String color() {
-    return "9999FF";
+  public final String desc() {
+    return name();
   }
 
   @Override
   public final String name() {
-    return type.name;
+    return type.toString();
   }
 }

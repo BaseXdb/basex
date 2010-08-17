@@ -90,7 +90,7 @@ final class DBPrimitives extends Primitives {
         il.add(pre);
       } else {
         final int ps = pre + d.attSize(pre, Data.ELEM);
-        for(int p = pre + 1; p < ps; p++) {
+        for(int p = pre + 1; p < ps; ++p) {
           final byte[] nm = d.name(p, Data.ATTR);
           if(!il.contains(p)) pool.add(new QNm(nm, ctx, null), Type.ATT);
         }

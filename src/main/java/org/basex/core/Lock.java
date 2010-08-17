@@ -17,12 +17,9 @@ public final class Lock {
 
   /** States of locking. */
   private static enum State {
-    /** Idle state. */
-    IDLE,
-    /** Read state. */
-    READ,
-    /** Write state. */
-    WRITE
+    /** Idle state. */  IDLE,
+    /** Read state. */  READ,
+    /** Write state. */ WRITE
   }
 
   /** State of the lock. */

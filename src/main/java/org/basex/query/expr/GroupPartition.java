@@ -6,6 +6,7 @@ import java.util.HashMap;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 import org.basex.query.util.ItemList;
 import org.basex.query.util.Var;
 import org.basex.util.IntList;
@@ -57,28 +58,28 @@ final class GroupPartition {
   /**
    * Adds the current grouping variable binding to the partitioning scheme.
    * Then the resulting non grouping variable item sequence is built for each
-   * candidate.  
-   * Searches the known partition hashes {@link GroupPartition#hashes} for 
+   * candidate.
+   * Searches the known partition hashes {@link GroupPartition#hashes} for
    * potential matches and checks them for equivalence.
    * The GroupNode candidate is ignored if it exists otherwise added to the
    * partitioning scheme.
-   * 
+   *
    * @param ctx QueryContext
    * @throws QueryException exception
    */
   void add(final QueryContext ctx) throws QueryException  {
     final Item[] its = new Item[gv.length];
-    for(int i = 0; i < gv.length; i++) {
-      if(ctx.vars.get(gv[i]).value.item())
-        its[i] = (Item) ctx.vars.get(gv[i]).value;
+    for(int i = 0; i < gv.length; ++i) {
+      final Value val = ctx.vars.get(gv[i]).value(ctx);
+      if(val.item()) its[i] = (Item) val;
       else throw new QueryException(null, null); // [MS]  [err:XQDY0095].
     }
-    
+
     boolean found = false;
     int p = 0;
     final GroupNode cand = new GroupNode(its);
     final Integer chash = cand.hashCode();
-    
+
     if(hashes.containsKey(chash)) {
       final IntList ps = hashes.get(cand.hash);
       for(final int pp : ps.toArray()) {
@@ -87,7 +88,7 @@ final class GroupPartition {
           p = pp;
           break;
         }
-      }    
+      }
     }
      if(!found) {
       p = partitions.size();
@@ -102,23 +103,27 @@ final class GroupPartition {
   }
 
   /**
-   * Adds the current non grouping variable bindings to the 
+   * Adds the current non grouping variable bindings to the
    * {@code p-th} partition.
    * @param ctx query context
    * @param p partition position
+   * @throws QueryException query exception
    */
-  private void addNonGrpIts(final QueryContext ctx, final int p) {
+  private void addNonGrpIts(final QueryContext ctx, final int p)
+      throws QueryException {
+
     if(!cachedVars) cacheVars(ctx);
     if(items.size() <= p) items.add(new HashMap<Var, ItemList>());
     HashMap<Var, ItemList> sq = items.get(p);
 
-    for(int i = 0; i < ngv.length; i++) {
+    for(int i = 0; i < ngv.length; ++i) {
       if(sq == null) sq = new HashMap<Var, ItemList>();
       if(sq.get(ngv[i]) == null) sq.put(ngv[i], new ItemList());
-      if(ngv[i].value.item()) {
-        // [MS] cache ctx.vars here to obtain them only once and not in 
+      final Value v = ngv[i].value(ctx);
+      if(v.item()) {
+        // [MS] cache ctx.vars here to obtain them only once and not in
         // each run.
-        sq.get(ngv[i]).add((Item) ngv[i].value);
+        sq.get(ngv[i]).add((Item) v);
       }
     }
   }
@@ -128,11 +133,11 @@ final class GroupPartition {
    * @param ctx query context
    */
   private void cacheVars(final QueryContext ctx) {
-    for(int i = 0; i < ngv.length; i++) {
+    for(int i = 0; i < ngv.length; ++i) {
       ngv[i] = ctx.vars.get(ngv[i]);
     }
     this.cachedVars = true;
-    
+
   }
   /**
    * GroupNode defines one valid partitioning setting.
@@ -147,7 +152,7 @@ final class GroupPartition {
     /** Hashes for the group representative values.
      *  N.B. long instead of int */
     final int hash;
-    
+
 
     /**
      * Creates a group node.
@@ -155,9 +160,9 @@ final class GroupPartition {
      */
     public GroupNode(final Item[] is) {
       its = is;
-      
+
       final long[] hhs = new long[is.length];
-      for(int i = 0; i < varlen; i++) {
+      for(int i = 0; i < varlen; ++i) {
         if(is[i].empty()) {
           // Add long.max_value to denote empty sequence in item
           hhs[i] = Long.MAX_VALUE;
@@ -191,12 +196,12 @@ final class GroupPartition {
      */
     boolean eq(final GroupNode c) throws QueryException {
       if(its.length != c.its.length || varlen != c.its.length) return false;
-      for(int i = 0; i < its.length; i++) {
+      for(int i = 0; i < its.length; ++i) {
         if(its[i].empty() && c.its[i].empty()) continue;
         if(!its[i].equiv(null, c.its[i])) return false;
       }
       return true;
     }
   }
-  
+
 }

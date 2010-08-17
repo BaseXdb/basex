@@ -7,7 +7,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
-import org.basex.query.item.SeqType;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.NSLocal;
@@ -15,12 +14,12 @@ import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
 /**
- * Variable expression.
+ * Variable Reference expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class VarCall extends ParseExpr {
+public final class VarRef extends ParseExpr {
   /** Variable name. */
   Var var;
 
@@ -29,7 +28,7 @@ public final class VarCall extends ParseExpr {
    * @param ii input info
    * @param v variable
    */
-  public VarCall(final InputInfo ii, final Var v) {
+  public VarRef(final InputInfo ii, final Var v) {
     super(ii);
     var = v;
   }
@@ -37,8 +36,11 @@ public final class VarCall extends ParseExpr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     var = ctx.vars.get(var);
+    type = var.type();
+
     // return if variable expression has not yet been assigned
-    if(var.expr == null) return this;
+    Expr e = var.expr();
+    if(e == null) return this;
 
     // pre-assign static variables
     final NSLocal lc = ctx.ns;
@@ -48,13 +50,13 @@ public final class VarCall extends ParseExpr {
 
     /* Choose variables to be pre-evaluated.
      * If a variable is pre-evaluated, it may not be available for further
-     * optimizations (IndexAceess, count, ...). On the other hand, multiple
-     * evaluations of the same expression can be avoided here. */
-    Expr e = var.expr;
-    if(ctx.nsElem.length != 0 || lc.size() != 0 || var.type != null ||
-        var.global || e.uses(Use.FRG, ctx) || e instanceof FunCall) {
+     * optimizations (index access, count, ...). On the other hand, multiple
+     * evaluations of the same expression are avoided. */
+    if(var.global || ctx.nsElem.length != 0 || lc.size() != 0 ||
+        var.type != null || e.uses(Use.FRG) || e instanceof FuncCall) {
       e = var.value(ctx);
     }
+
     ctx.ns = lc;
     return e;
   }
@@ -66,13 +68,14 @@ public final class VarCall extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || (u == Use.POS ? var.returned(ctx).mayBeNum() :
-        u != Use.CTX && var.expr != null && var.expr.uses(u, ctx));
+  public boolean uses(final Use u) {
+    // [CG] XQuery/flags: check flags (FRG?)
+    return u == Use.VAR || u != Use.CTX &&
+      var.expr() != null && var.expr().uses(u);
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
+  public boolean removable(final Var v) {
     return true;
   }
 
@@ -82,18 +85,8 @@ public final class VarCall extends ParseExpr {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return var.returned(ctx);
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, VAR, var.name.atom());
-  }
-
-  @Override
-  public String color() {
-    return "66DDAA";
+    ser.emptyElement(this, NAM, token(var.toString()));
   }
 
   @Override

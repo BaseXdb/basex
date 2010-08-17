@@ -40,10 +40,10 @@ public abstract class InputParser {
    * @return 0 if everything is valid
    */
   protected final int valid() {
-    for(int pos = 0; pos < ql;) {
-      final int cp = qu.codePointAt(pos);
+    for(int p = 0; p < ql;) {
+      final int cp = qu.codePointAt(p);
       if(!XMLToken.valid(cp)) return cp;
-      pos += Character.charCount(cp);
+      p += Character.charCount(cp);
     }
     return -1;
   }
@@ -138,7 +138,7 @@ public abstract class InputParser {
     int p = qp;
     final int l = str.length();
     if(p + l > ql) return false;
-    for(int s = 0; s < l; s++) if(qu.charAt(p++) != str.charAt(s)) return false;
+    for(int s = 0; s < l; ++s) if(qu.charAt(p++) != str.charAt(s)) return false;
     qp = p;
     return true;
   }

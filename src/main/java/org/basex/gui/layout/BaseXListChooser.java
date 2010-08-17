@@ -104,7 +104,7 @@ public final class BaseXListChooser extends BaseXBack {
 
           final String txt = text.getText().trim().toLowerCase();
           int i = 0;
-          for(i = 0; i < values.length; i++) {
+          for(i = 0; i < values.length; ++i) {
             final String txt2 = values[i].toLowerCase();
             if(txt2.startsWith(txt)) break;
           }

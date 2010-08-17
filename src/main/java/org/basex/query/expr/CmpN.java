@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -74,65 +73,53 @@ public final class CmpN extends Arr {
   }
 
   /** Comparator. */
-  private final Op cmp;
+  private final Op op;
 
   /**
    * Constructor.
    * @param ii input info
    * @param e1 first expression
    * @param e2 second expression
-   * @param c comparator
+   * @param o comparator
    */
-  public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final Op c) {
+  public CmpN(final InputInfo ii, final Expr e1, final Expr e2, final Op o) {
     super(ii, e1, e2);
-    cmp = c;
+    op = o;
+    type = SeqType.BLN;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-
-    if(expr[0].empty() || expr[1].empty()) {
-      ctx.compInfo(OPTSIMPLE, this, Empty.SEQ);
-      return Empty.SEQ;
-    }
-    return this;
+    return optPre(oneEmpty() ? Empty.SEQ : values() ?
+        atomic(ctx, input) : this, ctx);
   }
 
   @Override
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Item a = expr[0].atomic(ctx, input);
     if(a == null) return null;
     final Item b = expr[1].atomic(ctx, input);
     if(b == null) return null;
-    return Bln.get(cmp.e(checkNode(a), checkNode(b)));
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
-  }
-
-  @Override
-  public String color() {
-    return "FF9966";
+    return Bln.get(op.e(checkNode(a), checkNode(b)));
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(cmp.name));
+    ser.openElement(this, OP, Token.token(op.name));
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String desc() {
-    return "'" + cmp + "' operator";
+    return "'" + op + "' operator";
   }
 
   @Override
   public String toString() {
-    return toString(" " + cmp + " ");
+    return toString(" " + op + " ");
   }
 }

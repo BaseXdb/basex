@@ -34,16 +34,22 @@ public final class Try extends Single {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int c = 0; c < ctch.length; c++) {
+    for(int c = 0; c < ctch.length; ++c) {
       ctch[c] = ((Catch) checkUp(ctch[c], ctx)).comp(ctx);
     }
     checkUp(expr, ctx);
+
+    // compile expression, catch exceptions
+    Expr e = this;
     try {
-      return super.comp(ctx);
+      e = super.comp(ctx);
     } catch(final QueryException ex) {
       qe = ex;
-      return this;
     }
+    // evaluate result type
+    type = expr.type();
+    for(final Catch c : ctch) type = type.intersect(c.type());
+    return e;
   }
 
   @Override
@@ -75,7 +81,8 @@ public final class Try extends Single {
    * @throws QueryException query exception
    */
   Iter err(final QueryContext ctx, final QueryException ex)
-    throws QueryException {
+      throws QueryException {
+
     for(final Catch c : ctch) {
       final Iter it = c.iter(ctx, ex);
       if(it != null) return it;
@@ -84,9 +91,9 @@ public final class Try extends Single {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    for(final Catch c : ctch) if(c.uses(u, ctx)) return true;
-    return super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    for(final Catch c : ctch) if(c.uses(u)) return true;
+    return super.uses(u);
   }
 
   @Override

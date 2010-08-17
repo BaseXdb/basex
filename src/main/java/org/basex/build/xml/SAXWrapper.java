@@ -117,7 +117,7 @@ public final class SAXWrapper extends FileParser {
       public int read(final byte[] b, final int off, final int len)
           throws IOException {
         final int i = super.read(b, off, len);
-        for(int o = off; o < len; o++)
+        for(int o = off; o < len; ++o)
           if(b[off + o] == '\n') line++;
         counter += i;
         return i;

@@ -174,7 +174,7 @@ final class FTTrie extends FTIndex {
     byte[] nt = tok;
     if(cn > 0) {
       nt = Arrays.copyOf(tok, tok.length + ne[0]);
-      for(int i = 0; i < ne[0]; i++) nt[tok.length + i] = (byte) ne[i + 1];
+      for(int i = 0; i < ne[0]; ++i) nt[tok.length + i] = (byte) ne[i + 1];
       final int size = ne[ne.length - 1];
       if(size > 0 && st.adding(size)) st.add(nt);
     }
@@ -194,7 +194,7 @@ final class FTTrie extends FTIndex {
     inA.cursor(sp++);
     final int l = inA.read1();
     il.add(l);
-    for(int j = 0; j < l; j++) il.add(inA.read1());
+    for(int j = 0; j < l; ++j) il.add(inA.read1());
     sp += l;
 
     // inner node

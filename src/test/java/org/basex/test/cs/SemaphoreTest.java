@@ -77,7 +77,7 @@ public final class SemaphoreTest {
     sess.execute(new DropDB(NAME));
     // create database for clean test
     sess.execute(new CreateDB(NAME, FILE));
-    for(int i = 0; i < TESTS; i++) {
+    for(int i = 0; i < TESTS; ++i) {
       sessions.add(createSession());
     }
   }
@@ -85,7 +85,7 @@ public final class SemaphoreTest {
   /** Efficiency test. */
   @Test
   public void runClients() {
-    for(int n = 0; n < TESTS; n++) {
+    for(int n = 0; n < TESTS; ++n) {
       final int j = n;
       Performance.sleep(rand.nextInt(500));
       new Thread() {

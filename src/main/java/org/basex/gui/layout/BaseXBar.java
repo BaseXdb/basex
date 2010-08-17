@@ -173,7 +173,7 @@ public final class BaseXBar extends BaseXPanel {
   private void drawButton(final Graphics g, final int[][] pol, final int y,
       final boolean focus) {
     BaseXLayout.drawCell(g, 0, ww, y, y + ww, focus);
-    for(int i = 0; i < pol[0].length; i++) {
+    for(int i = 0; i < pol[0].length; ++i) {
       pol[0][i] += SIZE / 2 - 3;
       pol[1][i] += y + SIZE / 2 - 3;
     }

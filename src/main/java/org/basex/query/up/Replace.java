@@ -56,8 +56,8 @@ public final class Replace extends Update {
     final Item i = t.next();
     // check target constraints
     if(i == null) Err.or(input, UPSEQEMP, Main.name(this));
-    final Type type = i.type;
-    if(!(i instanceof Nod) || type == Type.DOC || t.next() != null)
+    final Type tp = i.type;
+    if(!(i instanceof Nod) || tp == Type.DOC || t.next() != null)
       Err.or(input, UPTRGMULT);
     final Nod targ = (Nod) i;
 
@@ -67,16 +67,16 @@ public final class Replace extends Update {
     if(value) {
       // replace value of node
       final byte[] txt = list.size() < 1 ? EMPTY : list.get(0).atom();
-      if(type == Type.COM) FComm.parse(txt, input);
-      if(type == Type.PI) FPI.parse(txt, input);
+      if(tp == Type.COM) FComm.parse(txt, input);
+      if(tp == Type.PI) FPI.parse(txt, input);
 
-      ctx.updates.add(type == Type.ELM ?
+      ctx.updates.add(tp == Type.ELM ?
           new ReplaceElemContent(input, targ, txt) :
           new ReplaceValue(input, targ, new QNm(txt)), ctx);
     } else {
       final Nod par = targ.parent();
       if(par == null) Err.or(input, UPNOPAR, i);
-      if(type == Type.ATT) {
+      if(tp == Type.ATT) {
         // replace attribute node
         if(list.size() > 0) Err.or(input, UPWRATTR);
         list = checkNS(aList, par, ctx);

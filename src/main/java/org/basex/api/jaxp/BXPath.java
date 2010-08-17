@@ -23,7 +23,8 @@ final class BXPath implements XPath {
   private XPathFunctionResolver functions;
 
   @Override
-  public void reset() { }
+  public void reset() {
+  }
 
   @Override
   public void setXPathVariableResolver(final XPathVariableResolver var) {

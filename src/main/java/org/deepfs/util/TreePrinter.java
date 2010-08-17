@@ -25,7 +25,7 @@ public final class TreePrinter implements FSTraversal {
    * @param depth of indentation
    */
   private void printIndent(final int depth) {
-    for(int i = 0; i < depth; i++)
+    for(int i = 0; i < depth; ++i)
       System.out.print(indentStrings[i]);
   }
 

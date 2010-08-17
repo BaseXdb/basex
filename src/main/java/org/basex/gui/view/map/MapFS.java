@@ -65,7 +65,7 @@ final class MapFS extends MapPainter {
     final int off = prop.num(GUIProp.MAPOFFSETS);
     final int fsz = prop.num(GUIProp.FONTSIZE);
     final int rs = rects.size;
-    for(int ri = 0; ri < rs; ri++) {
+    for(int ri = 0; ri < rs; ++ri) {
       // get rectangle information
       final MapRect r = rects.get(ri);
       final int pre = r.pre;
@@ -315,7 +315,7 @@ final class MapFS extends MapPainter {
       try {
         fs.launch(view.gui.context.focused);
       } catch (final IOException ex) {
-        Dialog.warn(view.gui, NODEFAULTAPP);;
+        Dialog.warn(view.gui, NODEFAULTAPP);
       }
     }
     return active;

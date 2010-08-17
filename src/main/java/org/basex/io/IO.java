@@ -111,14 +111,6 @@ public abstract class IO {
   }
 
   /**
-   * Returns the directory of this path.
-   * @return result of check
-   */
-  public final String getDir() {
-    return isDir() ? path() : path.substring(0, path.lastIndexOf('/') + 1);
-  }
-
-  /**
    * Returns the modification date of this file.
    * @return modification date
    */
@@ -221,8 +213,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public String dir() {
-    Main.notexpected();
-    return null;
+    return isDir() ? path() : path.substring(0, path.lastIndexOf('/') + 1);
   }
 
   /**

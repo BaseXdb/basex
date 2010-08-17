@@ -69,10 +69,7 @@ public abstract class Nod extends Item {
     return !it.unt() ? -it.diff(ii, this) : Token.diff(atom(), it.atom());
   }
 
-  /**
-   * Creates a new copy (clone) of the node.
-   * @return new copy
-   */
+  @Override
   public abstract Nod copy();
 
   /**
@@ -460,5 +457,10 @@ public abstract class Nod extends Item {
       case PI : return new BXPI(this);
       default : return null;
     }
+  }
+
+  @Override
+  public final SeqType type() {
+    return SeqType.NOD;
   }
 }

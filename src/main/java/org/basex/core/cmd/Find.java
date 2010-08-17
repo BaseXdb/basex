@@ -212,7 +212,7 @@ public final class Find extends AQuery {
 
     final TokenBuilder tb = new TokenBuilder();
     final int is = filter.size();
-    for(int i = 0; i < is; i++) {
+    for(int i = 0; i < is; ++i) {
       final String[] spl = fs ? new String[] {
           FSImporter.escape(filter.get(i)) } : split(filter.get(i));
       for(final String s : spl) {
@@ -277,7 +277,7 @@ public final class Find extends AQuery {
     int s = 0;
     char delim = 0;
     final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < l; i++) {
+    for(int i = 0; i < l; ++i) {
       final char c = str.charAt(i);
       if(delim == 0) {
         if(c == '\'' || c == '"') {

@@ -35,7 +35,7 @@ public final class FTIndexAccess extends Simple {
    */
   public FTIndexAccess(final InputInfo ii, final FTExpr ex,
       final IndexContext ic) {
-    
+
     super(ii);
     ftexpr = ex;
     ictx = ic;
@@ -71,7 +71,7 @@ public final class FTIndexAccess extends Simple {
   }
 
   @Override
-  public boolean duplicates(final QueryContext ctx) {
+  public boolean duplicates() {
     return ictx.dupl;
   }
 

@@ -36,7 +36,7 @@ final class BinaryAlgo extends MapAlgo {
     // setting middle of the list and calc weights
     double weight = 0;
     final int ni = ns + (ne - ns) / 2;
-    for(int i = ns; i <= ni; i++) {
+    for(int i = ns; i <= ni; ++i) {
       weight += ml.weight[i];
     }
 

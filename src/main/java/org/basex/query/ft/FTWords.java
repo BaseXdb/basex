@@ -94,7 +94,7 @@ public final class FTWords extends FTExpr {
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
     if(occ != null) {
-      for(int o = 0; o < occ.length; o++) occ[o] = occ[o].comp(ctx);
+      for(int o = 0; o < occ.length; ++o) occ[o] = occ[o].comp(ctx);
     }
     query = query.comp(ctx);
     if(query instanceof Str) txt = ((Str) query).atom();
@@ -302,18 +302,18 @@ public final class FTWords extends FTExpr {
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
+  public boolean removable(final Var v) {
     if(occ != null) {
-      for(int o = 0; o != occ.length; o++) if(!occ[o].removable(v, ctx))
-        return false;
+      for(int o = 0; o != occ.length; ++o)
+        if(!occ[o].removable(v)) return false;
     }
-    return query.removable(v, ctx);
+    return query.removable(v);
   }
 
   @Override
   public FTExpr remove(final Var v) {
     if(occ != null) {
-      for(int o = 0; o != occ.length; o++) occ[o] = occ[o].remove(v);
+      for(int o = 0; o != occ.length; ++o) occ[o] = occ[o].remove(v);
     }
     query = query.remove(v);
     return this;

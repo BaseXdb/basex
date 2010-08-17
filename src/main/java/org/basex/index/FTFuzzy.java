@@ -71,7 +71,7 @@ final class FTFuzzy extends FTIndex {
     ti = new DataAccess(d.meta.file(DATAFTX + 'y'));
     dat = new DataAccess(d.meta.file(DATAFTX + 'z'));
     li = new DataAccess(d.meta.file(DATAFTX + 'x'));
-    for(int i = 0; i < tp.length; i++) tp[i] = -1;
+    for(int i = 0; i < tp.length; ++i) tp[i] = -1;
     int is = li.read1();
     while(--is >= 0) {
       final int p = li.read1();

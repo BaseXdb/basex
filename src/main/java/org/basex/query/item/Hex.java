@@ -63,7 +63,7 @@ public final class Hex extends Item {
     final int l = h.length >>> 1;
     val = new byte[l];
 
-    for(int i = 0; i < l; i++) {
+    for(int i = 0; i < l; ++i) {
       val[i] = (byte) ((h2b(h[i << 1], ii) << 4) + h2b(h[(i << 1) + 1], ii));
     }
   }

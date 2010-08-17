@@ -88,7 +88,7 @@ public final class NumFormatter {
       int pc = 0, pm = 0;
 
       // loop through all characters
-      for(int i = 0; i < pat.length(); i++) {
+      for(int i = 0; i < pat.length(); ++i) {
         final char ch = pat.charAt(i);
         final boolean a = ACTIVE.indexOf(ch) != -1;
 
@@ -142,7 +142,7 @@ public final class NumFormatter {
     final Picture[] pics = new Picture[patterns.length];
 
     // analyze patterns
-    for(int s = 0; s < patterns.length; s++) {
+    for(int s = 0; s < patterns.length; ++s) {
       final String pat = patterns[s];
       final Picture pic = new Picture();
 
@@ -154,7 +154,7 @@ public final class NumFormatter {
       final int[] opt = new int[2];
 
       // loop through all characters
-      for(int i = 0; i < pat.length(); i++) {
+      for(int i = 0; i < pat.length(); ++i) {
         final char ch = pat.charAt(i);
         final boolean a = ACTIVE.indexOf(ch) != -1;
 
@@ -177,7 +177,7 @@ public final class NumFormatter {
         act |= a;
       }
       // finalize group positions
-      for(int g = 0; g < pic.group[0].length; g++) {
+      for(int g = 0; g < pic.group[0].length; ++g) {
         pic.group[0][g] = pic.min[0] + opt[0] - pic.group[0][g];
       }
       pic.maxFrac = pic.min[1] + opt[1];
@@ -220,12 +220,12 @@ public final class NumFormatter {
     // create integer part
     final StringBuilder pre = new StringBuilder();
     final int il = sp == -1 ? str.length() : sp;
-    for(int i = il; i < pic.min[0]; i++) pre.append('0');
+    for(int i = il; i < pic.min[0]; ++i) pre.append('0');
     pre.append(str.substring(0, il));
 
     // squeeze in grouping separators
     final int pl = pre.length();
-    for(int i = 0; i < pic.group[0].length; i++) {
+    for(int i = 0; i < pic.group[0].length; ++i) {
       final int pos = pl - pic.group[0][i];
       if(pos > 0) pre.insert(pos, GROUP);
     }
@@ -234,7 +234,7 @@ public final class NumFormatter {
     final StringBuilder suf = new StringBuilder();
     final int fl = sp == -1 ? 0 : str.length() - il - 1;
     if(fl != 0) suf.append(str.substring(sp + 1));
-    for(int i = fl; i < pic.min[1]; i++) suf.append('0');
+    for(int i = fl; i < pic.min[1]; ++i) suf.append('0');
 
     // squeeze in grouping separators in a reverse manner
     final int sl = suf.length();

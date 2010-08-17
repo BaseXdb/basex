@@ -24,7 +24,7 @@ public class BXNList implements NodeList {
    */
   protected BXNList(final NodIter nb) {
     xquery = nb;
-    xquery.sort(true);
+    xquery.sort();
   }
 
   /**

@@ -612,7 +612,7 @@ public final class MP3Parser implements IFileParser {
         String[] suffixes;
         if(string.equals("jpeg")) string = "jpg";
         if(string.length() != 3) suffixes = new String[] { "png", "jpg"};
-        else suffixes = new String[] { string};
+        else suffixes = new String[] { string };
 
         // read the picture type id and convert it to a text
         obj.bfc.buffer(1);

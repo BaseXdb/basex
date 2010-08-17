@@ -34,7 +34,7 @@ public final class FTOr extends FTExpr {
     for(final FTExpr e : expr) not &= e instanceof FTNot;
     if(not) {
       // convert (!A or !B or ...) to !(A and B and ...)
-      for(int e = 0; e < expr.length; e++) expr[e] = expr[e].expr[0];
+      for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].expr[0];
       return new FTNot(input, new FTAnd(input, expr));
     }
     return this;
@@ -44,7 +44,7 @@ public final class FTOr extends FTExpr {
   public FTItem atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final FTItem item = expr[0].atomic(ctx, input);
-    for(int e = 1; e < expr.length; e++) {
+    for(int e = 1; e < expr.length; ++e) {
       or(ctx, item, expr[e].atomic(ctx, input));
     }
     return item;
@@ -55,7 +55,7 @@ public final class FTOr extends FTExpr {
     // initialize iterators
     final FTIter[] ir = new FTIter[expr.length];
     final FTItem[] it = new FTItem[expr.length];
-    for(int e = 0; e < expr.length; e++) {
+    for(int e = 0; e < expr.length; ++e) {
       ir[e] = expr[e].iter(ctx);
       it[e] = ir[e].next();
     }
@@ -65,7 +65,7 @@ public final class FTOr extends FTExpr {
       public FTItem next() throws QueryException {
         // find item with smallest pre value
         int p = -1;
-        for(int i = 0; i < it.length; i++) {
+        for(int i = 0; i < it.length; ++i) {
           if(it[i] != null && (p == -1 || it[p].pre > it[i].pre)) p = i;
         }
         // no items left - leave
@@ -73,7 +73,7 @@ public final class FTOr extends FTExpr {
 
         // merge all matches
         final FTItem item = it[p];
-        for(int i = 0; i < it.length; i++) {
+        for(int i = 0; i < it.length; ++i) {
           if(it[i] != null && p != i && item.pre == it[i].pre) {
             or(ctx, item, it[i]);
             it[i] = ir[i].next();
@@ -104,7 +104,7 @@ public final class FTOr extends FTExpr {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     int is = 0;
-    for(int i = 0; i < expr.length; i++) {
+    for(int i = 0; i < expr.length; ++i) {
       // no index access if negative operators is found
       if(!expr[i].indexAccessible(ic) || ic.not) return false;
       ic.not = false;

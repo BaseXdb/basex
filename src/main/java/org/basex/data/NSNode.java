@@ -46,7 +46,7 @@ final class NSNode {
     vals = in.readNums();
     size = in.readNum();
     ch = new NSNode[size];
-    for(int c = 0; c < size; c++) ch[c] = new NSNode(in, this);
+    for(int c = 0; c < size; ++c) ch[c] = new NSNode(in, this);
   }
 
   /**
@@ -58,7 +58,7 @@ final class NSNode {
     out.writeNum(pre);
     out.writeNums(vals);
     out.writeNum(size);
-    for(int c = 0; c < size; c++) ch[c].write(out);
+    for(int c = 0; c < size; ++c) ch[c].write(out);
   }
 
   /**
@@ -125,7 +125,7 @@ final class NSNode {
     if(s == -1 || ch[s].pre != p) s++;
     int num = 0;
     final int upper = p + sz;
-    for(int i = s; i < size && ch[i].pre < upper; i++, num++);
+    for(int i = s; i < size && ch[i].pre < upper; ++i, ++num);
     size -= num;
     if(num > 0) System.arraycopy(ch, s + num, ch, s, size - s);
     update(s, -sz);
@@ -137,7 +137,7 @@ final class NSNode {
    * @param o offset
    */
   private void update(final int s, final int o) {
-    for(int c = s; c < size; c++) {
+    for(int c = s; c < size; ++c) {
       ch[c].pre += o;
       ch[c].update(0, o);
     }
@@ -188,7 +188,7 @@ final class NSNode {
       final int s, final int e) {
     if(pre >= s && pre <= e) {
       tb.add('\n');
-      for(int i = 0; i < l; i++) tb.add("  ");
+      for(int i = 0; i < l; ++i) tb.add("  ");
       tb.add("Pre[" + pre + "] ");
       for(int i = 0; i < vals.length; i += 2) {
         tb.add("xmlns");
@@ -200,7 +200,7 @@ final class NSNode {
         tb.add("\" ");
       }
     }
-    for(int c = 0; c < size; c++) ch[c].print(tb, l + 1, ns, s, e);
+    for(int c = 0; c < size; ++c) ch[c].print(tb, l + 1, ns, s, e);
   }
 
   @Override

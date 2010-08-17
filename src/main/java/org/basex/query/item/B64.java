@@ -68,7 +68,7 @@ public final class B64 extends Item {
     final int p = a - 3 * f;
 
     int c = 0;
-    for(int i = 0; i < f; i++) {
+    for(int i = 0; i < f; ++i) {
       final int b0 = val[c++] & 0xff;
       final int b1 = val[c++] & 0xff;
       final int b2 = val[c++] & 0xff;
@@ -126,7 +126,7 @@ public final class B64 extends Item {
     val = new byte[3 * g - m];
 
     int c = 0, o = 0;
-    for(int i = 0; i < n; i++) {
+    for(int i = 0; i < n; ++i) {
       final int c0 = b2h(s[c++], ii);
       final int c1 = b2h(s[c++], ii);
       final int c2 = b2h(s[c++], ii);

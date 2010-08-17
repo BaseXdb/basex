@@ -18,11 +18,8 @@ import org.basex.util.InputInfo;
  * @author Michael Seiferle
  */
 public final class Group extends ParseExpr {
-
   /** Group by specification. */
   private final Var[] groupby;
-
-
   /** Grouping partition. **/
   GroupPartition gp;
 
@@ -34,8 +31,8 @@ public final class Group extends ParseExpr {
   public Group(final InputInfo ii, final Var[] gb) {
     super(ii);
     groupby = gb;
-
   }
+
   /**
    * Initializes the grouping partition.
    * @param fl ForLet
@@ -43,10 +40,10 @@ public final class Group extends ParseExpr {
   public void initgroup(final ForLet[] fl) {
     final Var[] vs = new Var[groupby.length];
     Var[] fs = new Var[fl.length];
-    for(int i = 0; i < groupby.length; i++) {
+    for(int i = 0; i < groupby.length; ++i) {
       vs[i] = groupby[i];
     }
-    for(int i = 0; i < fl.length; i++)
+    for(int i = 0; i < fl.length; ++i)
       fs[i] = fl[i].var;
     gp = new GroupPartition(vs, fs);
 
@@ -72,35 +69,28 @@ public final class Group extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use use, final QueryContext ctx) {
-    for(final Var g : groupby)
-      if(g.uses(use, ctx)) return true;
+  public boolean uses(final Use use) {
+    for(final Var v : groupby) if(v.uses(use)) return true;
     return false;
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    for(final Var g : groupby) if(!g.removable(v, ctx)) return false;
+  public boolean removable(final Var v) {
+    for(final Var g : groupby) if(g.eq(v)) return false;
     return true;
-  }
-
-  @Override
-  public String color() {
-    return "66FF66";
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(int o = 0; o != groupby.length; o++)
-      groupby[o].plan(ser);
+    for(int o = 0; o != groupby.length; ++o) groupby[o].plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(" " + GROUP + " " + BY + " ");
-    for(int l = 0; l != groupby.length; l++) {
+    for(int l = 0; l != groupby.length; ++l) {
       sb.append(l != 0 ? ", " : "").append(groupby[l]);
     }
     return sb.toString();

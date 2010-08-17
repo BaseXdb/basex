@@ -13,25 +13,26 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
- * Variable.
+ * Variable expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class Var extends ParseExpr {
-  /** Return type. */
+  /** Expected return type. */
   public SeqType ret = SeqType.ITEM_ZM;
   /** Variable name. */
   public final QNm name;
   /** Global flag. */
   public boolean global;
-  /** Data type. */
-  public SeqType type;
+  /** Declaration flag. */
+  public boolean declared;
   /** Variable expressions. */
-  public Expr expr;
+  private Expr expr;
   /** Variable results. */
   public Value value;
 
@@ -41,7 +42,6 @@ public final class Var extends ParseExpr {
    */
   public Var(final QNm n) {
     this(null, n, null);
-    global();
   }
 
   /**
@@ -66,12 +66,12 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Sets the global flag.
-   * @return self reference
+   * Checks if all functions have been correctly declared, and initializes
+   * all function calls.
+   * @throws QueryException query exception
    */
-  public Var global() {
-    global = true;
-    return this;
+  public void check() throws QueryException {
+    if(expr != null && expr.uses(Use.UPD)) Err.or(input, UPNOT, desc());
   }
 
   @Override
@@ -90,6 +90,14 @@ public final class Var extends ParseExpr {
   public Var bind(final Expr e, final QueryContext ctx) throws QueryException {
     expr = e;
     return e.value() ? bind((Value) e, ctx) : this;
+  }
+
+  /**
+   * Returns the bound expression.
+   * @return expression
+   */
+  public Expr expr() {
+    return expr;
   }
 
   /**
@@ -121,7 +129,7 @@ public final class Var extends ParseExpr {
       if(expr == null) Err.or(input, VAREMPTY, this);
       final Value v = ctx.value;
       ctx.value = null;
-      value = cast(ctx.iter(expr).finish(), ctx);
+      value = cast(ctx.iter(expr.comp(ctx)).finish(), ctx);
       ctx.value = v;
     }
     return value;
@@ -146,7 +154,7 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Casts the specified value or checks its type.
+   * If necessary, casts the specified value if a type is specified.
    * @param v input value
    * @param ctx query context
    * @return cast value
@@ -154,20 +162,13 @@ public final class Var extends ParseExpr {
    */
   private Value cast(final Value v, final QueryContext ctx)
       throws QueryException {
-
-    if(type == null) return v;
-    if(!global && type.zeroOrOne() && !v.type.instance(type.type))
-      Err.or(input, XPINVCAST, v.type, type, v);
-    return type.cast(v, ctx, input);
+    return type == null ? v : type.cast(v, ctx, input);
   }
 
-  /**
-   * Returns a copy of the variable.
-   * @return copied variable
-   */
+  @Override
   public Var copy() {
     final Var v = new Var(input, name, type);
-    if(global) v.global();
+    v.global = global;
     v.value = value;
     v.expr = expr;
     v.ret = ret;
@@ -175,23 +176,18 @@ public final class Var extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public boolean uses(final Use u) {
     return u == Use.VAR;
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return type != null ? type : expr != null ? expr.returned(ctx) : ret;
-  }
-
-  @Override
-  public String color() {
-    return "66CC66";
+  public SeqType type() {
+    return type != null ? type : expr != null ? expr.type() : ret;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, NAM, name.atom());
+    ser.openElement(this, NAM, Token.token(toString()));
     if(expr != null) expr.plan(ser);
     ser.closeElement();
   }
@@ -202,9 +198,9 @@ public final class Var extends ParseExpr {
     if(name != null) {
       tb.add(DOLLAR);
       tb.add(name.atom());
-      if(type != null) tb.add(" " + AS + " ");
+      if(type != null) tb.add(" " + AS);
     }
-    if(type != null) tb.add(type);
+    if(type != null) tb.add(" " + type);
     return tb.toString();
   }
 }

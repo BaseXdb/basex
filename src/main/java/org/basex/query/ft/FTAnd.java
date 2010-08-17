@@ -37,7 +37,7 @@ public final class FTAnd extends FTExpr {
     for(final FTExpr e : expr) not &= e instanceof FTNot;
     if(not) {
       // convert (!A and !B and ...) to !(A or B or ...)
-      for(int e = 0; e < expr.length; e++) expr[e] = expr[e].expr[0];
+      for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].expr[0];
       return new FTNot(input, new FTOr(input, expr));
     }
     return this;
@@ -47,7 +47,7 @@ public final class FTAnd extends FTExpr {
   public FTItem atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final FTItem item = expr[0].atomic(ctx, input);
-    for(int e = 1; e < expr.length; e++) {
+    for(int e = 1; e < expr.length; ++e) {
       and(ctx, item, expr[e].atomic(ctx, input));
     }
     return item;
@@ -58,7 +58,7 @@ public final class FTAnd extends FTExpr {
     // initialize iterators
     final FTIter[] ir = new FTIter[expr.length];
     final FTItem[] it = new FTItem[expr.length];
-    for(int e = 0; e < expr.length; e++) {
+    for(int e = 0; e < expr.length; ++e) {
       ir[e] = expr[e].iter(ctx);
       it[e] = ir[e].next();
     }
@@ -67,7 +67,7 @@ public final class FTAnd extends FTExpr {
       @Override
       public FTItem next() throws QueryException {
         // find item with lowest pre value
-        for(int i = 0; i < it.length; i++) {
+        for(int i = 0; i < it.length; ++i) {
           if(it[i] == null) {
             if(neg[i]) continue;
             return null;
@@ -91,7 +91,7 @@ public final class FTAnd extends FTExpr {
 
         // merge all matches
         final FTItem item = it[0];
-        for(int i = 1; i < it.length; i++) {
+        for(int i = 1; i < it.length; ++i) {
           // [CG] XQFT: item.all = FTMatches.not(it[i].all, 0);
           if(neg[i]) continue;
           and(ctx, item, it[i]);
@@ -128,7 +128,7 @@ public final class FTAnd extends FTExpr {
 
     int is = 0;
     int n = 0;
-    for(int i = 0; i < expr.length; i++) {
+    for(int i = 0; i < expr.length; ++i) {
       if(!expr[i].indexAccessible(ic)) return false;
       neg[i] = ic.not;
       if(ic.not) n++;

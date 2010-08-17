@@ -43,7 +43,7 @@ public final class QueryException extends Exception {
     line = 1;
     col = 1;
     final int qp = Math.min(ii.pos - 1, ii.query.length());
-    for(int i = 0; i < qp; i++) {
+    for(int i = 0; i < qp; ++i) {
       final char ch = ii.query.charAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }
@@ -67,7 +67,7 @@ public final class QueryException extends Exception {
    * @return argument
    */
   private static Object[] chop(final Object[] t) {
-    for(int i = 0; i < t.length; i++) {
+    for(int i = 0; i < t.length; ++i) {
       if(t[i] instanceof byte[]) {
         t[i] = Token.string((byte[]) t[i]);
       } else if(t[i] instanceof Throwable) {
@@ -82,7 +82,7 @@ public final class QueryException extends Exception {
     }
     return t;
   }
-  
+
   /**
    * Returns the error code.
    * @return position
@@ -126,7 +126,7 @@ public final class QueryException extends Exception {
     file = parser.file;
     line = 1;
     col = 1;
-    for(int i = 0; i < parser.qm && i < parser.ql; i++) {
+    for(int i = 0; i < parser.qm && i < parser.ql; ++i) {
       final char ch = parser.qu.charAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }

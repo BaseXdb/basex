@@ -37,14 +37,14 @@ public final class Names extends TokenSet {
   public Names(final DataInput in) throws IOException {
     super(in);
     stat = new StatsKey[keys.length];
-    for(int s = 1; s < size; s++) stat[s] = new StatsKey(in);
+    for(int s = 1; s < size; ++s) stat[s] = new StatsKey(in);
   }
 
   /**
    * Initializes the statistics.
    */
   public void init() {
-    for(int s = 1; s < size; s++) stat[s] = new StatsKey();
+    for(int s = 1; s < size; ++s) stat[s] = new StatsKey();
   }
 
   /**
@@ -76,7 +76,7 @@ public final class Names extends TokenSet {
   @Override
   public void write(final DataOutput out) throws IOException {
     super.write(out);
-    for(int s = 1; s < size; s++) {
+    for(int s = 1; s < size; ++s) {
       if(stat[s] == null) stat[s] = new StatsKey();
       stat[s].finish(out);
     }
@@ -99,7 +99,7 @@ public final class Names extends TokenSet {
     final double[] tl = new double[size];
     int len = 0;
     tl[0] = 0;
-    for(int i = 1; i < size; i++) {
+    for(int i = 1; i < size; ++i) {
       if(len < keys[i].length) len = keys[i].length;
       if(stat[i] == null) continue;
       tl[i] = stat[i].counter;
@@ -112,13 +112,13 @@ public final class Names extends TokenSet {
     final TokenBuilder tb = new TokenBuilder();
     tb.add(NAMINDEX + NL);
     tb.add(IDXENTRIES + (size - 1) + NL);
-    for(int i = 0; i < size - 1; i++) {
+    for(int i = 0; i < size - 1; ++i) {
       final int s = ids[i];
       if(stat[s] == null) continue;
       final byte[] key = keys[s];
       tb.add("  ");
       tb.add(key);
-      for(int j = 0; j < len - key.length; j++) tb.add(' ');
+      for(int j = 0; j < len - key.length; ++j) tb.add(' ');
       tb.add(stat[s] + NL);
     }
     return tb.finish();

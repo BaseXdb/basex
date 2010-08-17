@@ -5,7 +5,6 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Item;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -31,50 +30,56 @@ public abstract class Arr extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(int e = 0; e != expr.length; e++)
+    for(int e = 0; e != expr.length; ++e)
       expr[e] = checkUp(expr[e].comp(ctx), ctx);
     return this;
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    for(final Expr e : expr) if(e.uses(u, ctx)) return true;
+  public boolean uses(final Use u) {
+    for(final Expr e : expr) if(e.uses(u)) return true;
     return false;
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    for(final Expr e : expr) if(!e.removable(v, ctx)) return false;
+  public boolean removable(final Var v) {
+    for(final Expr e : expr) if(!e.removable(v)) return false;
     return true;
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].remove(v);
+    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].remove(v);
     return this;
   }
 
   @Override
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
-    for(int e = 0; e < expr.length; e++) expr[e] = expr[e].indexEquivalent(ic);
+    for(int e = 0; e < expr.length; ++e) expr[e] = expr[e].indexEquivalent(ic);
     return this;
   }
 
   /**
-   * Checks if this expression has an expression and a number of string
-   * as arguments.
-   * @param num flag for numeric or string item
+   * Returns true if all arguments are values.
    * @return result of check
    */
-  protected final boolean exprAndItem(final boolean num) {
-    if(expr.length != 2 || !expr[1].item()) return false;
-    final Item it = (Item) expr[1];
-    return num ? it.num() : it.str();
+  protected final boolean values() {
+    for(final Expr e : expr) if(!e.value()) return false;
+    return true;
+  }
+
+  /**
+   * Returns true if at least one argument is empty, or will yield 0 results.
+   * @return result of check
+   */
+  protected final boolean oneEmpty() {
+    for(final Expr e : expr) if(e.empty()) return true;
+    return false;
   }
 
   @Override
-  public boolean duplicates(final QueryContext ctx) {
-    for(final Expr e : expr) if(e.duplicates(ctx)) return true;
+  public boolean duplicates() {
+    for(final Expr e : expr) if(e.duplicates()) return true;
     return false;
   }
 
@@ -92,7 +97,7 @@ public abstract class Arr extends ParseExpr {
    */
   protected final String toString(final Object sep) {
     final StringBuilder sb = new StringBuilder();
-    for(int e = 0; e != expr.length; e++) {
+    for(int e = 0; e != expr.length; ++e) {
       if(e != 0) sb.append(sep);
       sb.append(expr[e]);
     }

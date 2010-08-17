@@ -74,7 +74,7 @@ public final class FTOpt extends ExprInfo {
    * @param opt parent full-text options
    */
   public void init(final FTOpt opt) {
-    for(int i = 0; i < flag.length; i++) {
+    for(int i = 0; i < flag.length; ++i) {
       if(!set[i]) {
         set[i] = opt.set[i];
         flag[i] = opt.flag[i];

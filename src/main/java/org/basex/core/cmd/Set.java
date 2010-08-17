@@ -56,7 +56,7 @@ public final class Set extends Command {
         Main.notexpected();
       }
       final CmdSet[] cs = CmdSet.values();
-      for(int c = 0; c < cs.length; c++) if(cs[c] == s) key = STRINGS[c];
+      for(int c = 0; c < cs.length; ++c) if(cs[c] == s) key = STRINGS[c];
       return info(key + ": " + val);
     } catch(final Exception ex) {
       Main.debug(ex);

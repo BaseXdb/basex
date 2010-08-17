@@ -23,7 +23,7 @@ public final class SeqType {
     /** Exactly one. */  O,
     /** One or more. */  OM,
     /** Zero or more. */ ZM,
-  };
+  }
 
   /** Zero items. */
   public static final SeqType ITEM_Z = new SeqType(Type.ITEM, Occ.Z);
@@ -33,22 +33,34 @@ public final class SeqType {
   public static final SeqType ITEM_ZO = new SeqType(Type.ITEM, Occ.ZO);
   /** Zero or more items. */
   public static final SeqType ITEM_ZM = new SeqType(Type.ITEM, Occ.ZM);
+  /** One or more items. */
+  public static final SeqType ITEM_OM = new SeqType(Type.ITEM, Occ.OM);
   /** Single boolean. */
   public static final SeqType BLN = new SeqType(Type.BLN, Occ.O);
   /** Zero or one booleans. */
   public static final SeqType BLN_ZO = new SeqType(Type.BLN, Occ.ZO);
   /** Zero or more booleans. */
   public static final SeqType BLN_ZM = new SeqType(Type.BLN, Occ.ZM);
-  /** Single number; for simplicity, all numbers are treated the same. */
+  /** Double number. */
+  public static final SeqType DBL = new SeqType(Type.DBL, Occ.O);
+  /** Float number. */
+  public static final SeqType FLT = new SeqType(Type.FLT, Occ.O);
+  /** Single number; for simplicity, numbers are summarized by this type. */
   public static final SeqType ITR = new SeqType(Type.ITR, Occ.O);
-  /** Zero or one number; for simplicity, all numbers are treated the same. */
+  /** Zero or one number. */
   public static final SeqType ITR_ZO = new SeqType(Type.ITR, Occ.ZO);
-  /** Zero or more numbers; for simplicity, all numbers are treated the same. */
+  /** Zero or more numbers. */
   public static final SeqType ITR_ZM = new SeqType(Type.ITR, Occ.ZM);
+  /** One or more numbers. */
+  public static final SeqType ITR_OM = new SeqType(Type.ITR, Occ.OM);
   /** Single node. */
   public static final SeqType NOD = new SeqType(Type.NOD, Occ.O);
   /** Zero or one nodes. */
   public static final SeqType NOD_ZO = new SeqType(Type.NOD, Occ.ZO);
+  /** Zero or more nodes. */
+  public static final SeqType NOD_ZM = new SeqType(Type.NOD, Occ.ZM);
+  /** One or more nodes. */
+  public static final SeqType NOD_OM = new SeqType(Type.NOD, Occ.OM);
   /** Single QName. */
   public static final SeqType QNM = new SeqType(Type.QNM, Occ.O);
   /** Zero or one QNames. */
@@ -59,8 +71,6 @@ public final class SeqType {
   public static final SeqType URI_ZM = new SeqType(Type.URI, Occ.ZM);
   /** Single URI. */
   public static final SeqType URI = new SeqType(Type.URI, Occ.O);
-  /** Zero or more nodes. */
-  public static final SeqType NOD_ZM = new SeqType(Type.NOD, Occ.ZM);
   /** Single string. */
   public static final SeqType STR = new SeqType(Type.STR, Occ.O);
   /** Zero or one strings. */
@@ -87,6 +97,16 @@ public final class SeqType {
   public SeqType(final Type t, final Occ o) {
     type = t;
     occ = t == Type.EMP ? Occ.Z : o;
+  }
+
+  /**
+   * Constructor.
+   * @param t type
+   * @param o number of occurrences
+   */
+  public SeqType(final Type t, final long o) {
+    type = t;
+    occ = o == 0 ? Occ.Z : o == 1 ? Occ.O : o > 1 ? Occ.OM : Occ.ZM;
   }
 
   /**
@@ -167,7 +187,27 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type may occur at most once.
+   * Combine two sequence types.
+   * @param t second type
+   * @return resulting type
+   */
+  public SeqType intersect(final SeqType t) {
+    final Type tp = type == t.type ? type : Type.ITEM;
+    final Occ oc = occ == t.occ ? occ : zeroOrOne() && t.zeroOrOne() ?
+        Occ.ZO : Occ.ZM;
+    return new SeqType(tp, oc);
+  }
+
+  /**
+   * Returns the number of occurrences, or {@code -1} if the number is unknown.
+   * @return result of check
+   */
+  public long occ() {
+    return occ == Occ.Z ? 0 : occ == Occ.O ? 1 : -1;
+  }
+
+  /**
+   * Tests if the type yields at most item.
    * @return result of check
    */
   public boolean zeroOrOne() {
@@ -175,7 +215,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type occurs exactly once.
+   * Tests if the type exactly one item.
    * @return result of check
    */
   public boolean one() {
@@ -183,7 +223,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type may occur 0 times.
+   * Tests if the type may yield zero items.
    * @return result of check
    */
   public boolean mayBeZero() {
@@ -191,7 +231,7 @@ public final class SeqType {
   }
 
   /**
-   * Tests if the type represents a single number.
+   * Tests if the type is a single number.
    * @return result of check
    */
   public boolean num() {
@@ -203,8 +243,7 @@ public final class SeqType {
    * @return result of check
    */
   public boolean mayBeNum() {
-    return !(type.str || type.node() || type.dur || type.unt ||
-        type == Type.BLN);
+    return type.num || type == Type.ITEM;
   }
 
   /**
@@ -240,6 +279,6 @@ public final class SeqType {
   @Override
   public String toString() {
     return type + (occ == Occ.O || occ == Occ.Z ? "" :
-      occ == Occ.ZM ? "?" : occ == Occ.OM ? "+" : "*");
+      occ == Occ.ZM ? "*" : occ == Occ.OM ? "+" : "?");
   }
 }

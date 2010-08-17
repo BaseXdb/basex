@@ -35,7 +35,7 @@ import org.basex.util.TokenMap;
 
 /**
  * Generating functions.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -53,40 +53,37 @@ final class FNGen extends Fun {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(func) {
-      case DATA:
-        return data(ctx);
-      case COLL:
-        return collection(ctx);
-      case PUT:
-        return put(ctx);
-      case URICOLL:
-        return uriCollection(ctx);
-      default:
-        return super.iter(ctx);
+    switch(def) {
+      case DATA:    return data(ctx);
+      case COLL:    return collection(ctx);
+      case PUT:     return put(ctx);
+      case URICOLL: return uriCollection(ctx);
+      default:      return super.iter(ctx);
     }
   }
 
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(func) {
-      case DOC:
-        return doc(ctx);
-      case DOCAVL:
-        return docAvailable(ctx);
-      case PARSETXT:
-        return unparsedText(ctx);
-      case PARSETXTAVL:
-        return unparsedTextAvailable(ctx);
+    switch(def) {
+      case DOC:         return doc(ctx);
+      case DOCAVL:      return docAvailable(ctx);
+      case PARSETXT:    return unparsedText(ctx);
+      case PARSETXTAVL: return unparsedTextAvailable(ctx);
       case PARSE: // might get obsolete
-      case PARSEXML:
-        return parseXml(ctx);
-      case SERIALIZE:
-        return serialize(ctx);
-      default:
-        return super.atomic(ctx, ii);
+      case PARSEXML:    return parseXml(ctx);
+      case SERIALIZE:   return serialize(ctx);
+      default:          return super.atomic(ctx, ii);
     }
+  }
+
+  @Override
+  public Expr cmp(final QueryContext ctx) {
+    if(def == FunDef.DATA &&  expr.length == 1) {
+      final SeqType t = expr[0].type();
+      type = t.type.node() ? new SeqType(Type.ATM, t.occ) : t;
+    }
+    return this;
   }
 
   /**
@@ -127,8 +124,7 @@ final class FNGen extends Fun {
     final NodIter coll = collection(ctx);
     final ItemIter ir = new ItemIter();
     Nod it = null;
-    while((it = coll.next()) != null)
-      ir.add(Uri.uri(it.base()));
+    while((it = coll.next()) != null) ir.add(Uri.uri(it.base()));
     return ir;
   }
 
@@ -141,10 +137,10 @@ final class FNGen extends Fun {
   private Iter put(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
-    final Item it = expr[0].atomic(ctx, input);
+    final Item it = checkNode(expr[0].atomic(ctx, input));
 
-    if(it == null || it.type != Type.DOC && it.type != Type.ELM) Err.or(input,
-        UPFOTYPE, expr[0]);
+    if(it == null || it.type != Type.DOC && it.type != Type.ELM)
+      Err.or(input, UPFOTYPE, expr[0]);
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.valid()) Err.or(input, UPFOURI, file);
@@ -199,10 +195,10 @@ final class FNGen extends Fun {
    */
   private Bln unparsedTextAvailable(final QueryContext ctx)
       throws QueryException {
-    final IO io = checkIO(expr[0], ctx);
-    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     try {
-      return Bln.get(unparsedText(true, io, enc, this.input) != null);
+      final IO io = checkIO(expr[0], ctx);
+      final String e = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
+      return Bln.get(unparsedText(true, io, e, this.input) != null);
     } catch(final QueryException ex) {
       if(!ex.code().startsWith(QueryText.FODC)) throw ex;
       return Bln.FALSE;
@@ -294,17 +290,8 @@ final class FNGen extends Fun {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.UPD ? func == FunDef.PUT : u == Use.CTX ? expr.length == 0
-        && func == FunDef.DATA : super.uses(u, ctx);
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    if(func == FunDef.DATA) {
-      final SeqType ret = expr[0].returned(ctx);
-      return ret.type.node() ? new SeqType(Type.ATM, ret.occ) : ret;
-    }
-    return super.returned(ctx);
+  public boolean uses(final Use u) {
+    return u == Use.UPD ? def == FunDef.PUT : u == Use.CTX ? expr.length == 0
+        && def == FunDef.DATA : super.uses(u);
   }
 }

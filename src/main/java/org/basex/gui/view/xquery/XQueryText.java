@@ -137,7 +137,7 @@ final class XQueryText extends BaseXText {
 
         // find approximate error position
         final int ll = error;
-        for(int e = 0, l = 1, c = 1; e < ll; c++, e++) {
+        for(int e = 0, l = 1, c = 1; e < ll; ++c, ++e) {
           if(l > el || l == el && c == ec) {
             error = e;
             break;

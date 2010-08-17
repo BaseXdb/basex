@@ -58,7 +58,7 @@ public final class Table {
     final int s = il.size() - 1;
     while(!(line = scan.nextLine()).isEmpty()) {
       final TokenList entry = new TokenList();
-      for(int e = 0; e < s; e++) {
+      for(int e = 0; e < s; ++e) {
         entry.add(token(line.substring(il.get(e), il.get(e + 1)).trim()));
       }
       contents.add(entry);
@@ -69,8 +69,8 @@ public final class Table {
    * Sorts the table by the first column.
    */
   public void sort() {
-    for(int i = 0; i < contents.size() - 1; i++) {
-      for(int j = i + 1; j < contents.size(); j++) {
+    for(int i = 0; i < contents.size() - 1; ++i) {
+      for(int j = i + 1; j < contents.size(); ++j) {
         if(diff(lc(contents.get(i).get(0)), lc(contents.get(j).get(0))) > 0) {
           final TokenList tmp = contents.get(i);
           contents.set(i, contents.get(j));
@@ -129,7 +129,7 @@ public final class Table {
   public byte[] finish() {
     final int[] ind = new int[header.size()];
     final int sz = header.size();
-    for(int s = 0; s < sz; s++) {
+    for(int s = 0; s < sz; ++s) {
       for(final TokenList e : contents) {
         ind[s] = Math.max(ind[s], e.get(s).length);
       }
@@ -137,29 +137,29 @@ public final class Table {
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int u = 0; u < sz; u++) {
+    for(int u = 0; u < sz; ++u) {
       final byte[] s = header.get(u);
       final int is = ind[u] - s.length + DIST;
       tb.add(s);
-      for(int i = 0; i < is; i++) tb.add(' ');
+      for(int i = 0; i < is; ++i) tb.add(' ');
     }
     tb.add(NL);
-    for(int u = 0; u < sz; u++) {
-      for(int i = 0; i < ind[u] + (u + 1 == sz ? 0 : DIST); i++) tb.add('-');
+    for(int u = 0; u < sz; ++u) {
+      for(int i = 0; i < ind[u] + (u + 1 == sz ? 0 : DIST); ++i) tb.add('-');
     }
     tb.add(NL);
     for(final TokenList e : contents) {
-      for(int u = 0; u < sz; u++) {
+      for(int u = 0; u < sz; ++u) {
         final byte[] s = e.get(u);
         final int is = ind[u] - s.length;
         if(u < align.size() && align.get(u)) {
-          for(int i = 0; i < is; i++) tb.add((byte) ' ');
+          for(int i = 0; i < is; ++i) tb.add((byte) ' ');
           tb.add(s);
         } else {
           tb.add(s);
-          for(int i = 0; i < is; i++) tb.add((byte) ' ');
+          for(int i = 0; i < is; ++i) tb.add((byte) ' ');
         }
-        for(int i = 0; i < DIST; i++) tb.add((byte) ' ');
+        for(int i = 0; i < DIST; ++i) tb.add((byte) ' ');
       }
       tb.add(NL);
     }

@@ -359,7 +359,7 @@ public final class DialogServer extends Dialog {
           icon = Msg.ERROR;
         }
       } else if(cmp == deleteAll) {
-        for(int i = 0; i < logc.getItemCount(); i++) {
+        for(int i = 0; i < logc.getItemCount(); ++i) {
           final File f = new File(logdir + logc.getItemAt(i).toString());
           if(!f.delete()) {
             msg2 = Main.info(DBNOTDELETED, f.getName());

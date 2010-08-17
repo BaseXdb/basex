@@ -155,7 +155,7 @@ public class BaseXText extends BaseXPanel {
     final int ts = text.size();
     final byte[] tt = text.text;
     boolean eq = true;
-    for(int r = 0; r < s; r++) {
+    for(int r = 0; r < s; ++r) {
       if(t[r] != 0x0D) t[ns++] = t[r];
       eq &= ns < ts && ns < s && t[ns] == tt[ns];
     }
@@ -505,7 +505,7 @@ public class BaseXText extends BaseXPanel {
     if(!mark) text.noMark();
     final int x = text.bol(mark);
     if(lastCol == -1) lastCol = x;
-    for(int i = 0; i < l; i++) {
+    for(int i = 0; i < l; ++i) {
       text.forward(Integer.MAX_VALUE, mark);
       text.next(mark);
     }
@@ -526,7 +526,7 @@ public class BaseXText extends BaseXPanel {
       lastCol = -1;
       return;
     }
-    for(int i = 0; i < l; i++) {
+    for(int i = 0; i < l; ++i) {
       text.prev(mark);
       text.bol(mark);
     }

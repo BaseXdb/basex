@@ -26,7 +26,7 @@ public final class JPGParser implements IFileParser {
 
   /** Exif header. Null terminated ASCII representation of 'Exif'. */
   private static final byte[] HEADER_EXIF =
-      { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00};
+      { 0x45, 0x78, 0x69, 0x66, 0x00, 0x00 };
   /**
    * <p>
    * JFIF header.
@@ -37,9 +37,9 @@ public final class JPGParser implements IFileParser {
    * </ul>
    */
   private static final byte[] HEADER_JFIF = //
-  { 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01};
+    { 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01 };
   /** Extended JFIF header. Null terminated ASCII representation of 'JFXX'. */
-  private static final byte[] HEADER_JFXX = { 0x4A, 0x46, 0x58, 0x58, 0x00};
+  private static final byte[] HEADER_JFXX = { 0x4A, 0x46, 0x58, 0x58, 0x00 };
   /** DeepFile instance to store metadata and file contents. */
   private DeepFile deepFile;
   /** Parser for Exif data. */
@@ -125,7 +125,7 @@ public final class JPGParser implements IFileParser {
     final int len = a.length;
     final byte[] a2 = new byte[len];
     bfc.get(a2, 0, len);
-    for(int i = 0; i < len; i++)
+    for(int i = 0; i < len; ++i)
       if(a[i] != a2[i]) return false;
     return true;
   }

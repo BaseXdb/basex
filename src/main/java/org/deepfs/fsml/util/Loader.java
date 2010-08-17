@@ -20,7 +20,7 @@ import org.basex.core.Main;
 public final class Loader extends ClassLoader {
 
   /** Hidden constructor. */
-  private Loader() { /* */}
+  private Loader() { }
 
   /**
    * Returns the {@link URL} for the package {@code pkg}.

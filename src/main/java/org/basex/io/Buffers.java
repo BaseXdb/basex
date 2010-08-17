@@ -18,7 +18,7 @@ final class Buffers {
    * Constructor.
    */
   Buffers() {
-    for(int b = 0; b < BUFFERS; b++) buf[b] = new Buffer();
+    for(int b = 0; b < BUFFERS; ++b) buf[b] = new Buffer();
   }
 
   /**

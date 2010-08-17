@@ -30,6 +30,7 @@ public final class Castable extends Single {
   public Castable(final InputInfo ii, final Expr e, final SeqType s) {
     super(ii, e);
     seq = s;
+    type = SeqType.BLN;
   }
 
   @Override
@@ -47,11 +48,6 @@ public final class Castable extends Single {
     } catch(final QueryException ex) {
       return Bln.FALSE;
     }
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
   }
 
   @Override

@@ -31,7 +31,12 @@ public final class Empty extends Value {
   }
 
   @Override
-  public long size(final QueryContext ctx) {
+  public boolean vacuous() {
+    return true;
+  }
+
+  @Override
+  public long size() {
     return 0;
   }
 
@@ -41,7 +46,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter() {
     return Iter.EMPTY;
   }
 
@@ -61,12 +66,12 @@ public final class Empty extends Value {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
+  public SeqType type() {
     return SeqType.ITEM_Z;
   }
 
   @Override
-  public boolean duplicates(final QueryContext ctx) {
+  public boolean duplicates() {
     return false;
   }
 

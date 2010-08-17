@@ -77,7 +77,7 @@ public final class InfoTable extends AQuery {
     final int ps = Math.max(0, s);
     final int pe = Math.min(data.meta.size, e);
     final Table table = th();
-    for(int p = ps; p < pe; p++) table(table, data, p);
+    for(int p = ps; p < pe; ++p) table(table, data, p);
     tb.add(table.finish());
 
     final byte[] ns = data.ns.table(ps, pe);
@@ -103,7 +103,7 @@ public final class InfoTable extends AQuery {
     t.header.add(TABLENS);
     t.header.add(TABLEKND);
     t.header.add(TABLECON);
-    for(int i = 0; i < 6; i++) t.align.add(true);
+    for(int i = 0; i < 6; ++i) t.align.add(true);
     return t;
   }
 

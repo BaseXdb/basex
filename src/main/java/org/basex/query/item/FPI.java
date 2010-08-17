@@ -8,7 +8,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
-
 import static org.basex.util.Token.*;
 import org.w3c.dom.ProcessingInstruction;
 

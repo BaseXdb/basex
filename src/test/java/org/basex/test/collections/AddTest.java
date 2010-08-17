@@ -83,7 +83,7 @@ public class AddTest {
    */
   @Test
   public final void createDBWithInput() throws BaseXException {
-    for(int i = 0; i < INPUTS.length; i++) {
+    for(int i = 0; i < INPUTS.length; ++i) {
       new CreateDB(DBNAME, INPUTS[i]).execute(CTX);
       // check name of database
       assertEquals(DBNAME, dbName());
@@ -98,7 +98,7 @@ public class AddTest {
    */
   @Test
   public final void createDBandAdd() throws BaseXException {
-    for(int i = 0; i < INPUTS.length; i++) {
+    for(int i = 0; i < INPUTS.length; ++i) {
       new CreateDB(DBNAME).execute(CTX);
       new Add(INPUTS[i]).execute(CTX);
       // check name of document
@@ -126,7 +126,7 @@ public class AddTest {
    */
   @Test
   public final void createDBandAddTo() throws BaseXException {
-    for(int i = 0; i < INPUTS.length; i++) {
+    for(int i = 0; i < INPUTS.length; ++i) {
       new CreateDB(DBNAME).execute(CTX);
       new Add(INPUTS[i], null, TARGET).execute(CTX);
       // check name of document

@@ -50,7 +50,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
       finishText();
       final int as = at.getLength();
       atts.reset();
-      for(int a = 0; a < as; a++) {
+      for(int a = 0; a < as; ++a) {
         atts.add(token(at.getQName(a)), token(at.getValue(a)));
       }
       builder.startElem(token(qn), atts);
@@ -75,7 +75,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   @Override
   public void characters(final char[] ch, final int s, final int l) {
     final int e = s + l;
-    for(int i = s; i < e; i++) tb.addUTF(ch[i]);
+    for(int i = s; i < e; ++i) tb.addUTF(ch[i]);
   }
 
   @Override
@@ -118,7 +118,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
       builder.text(tb);
       tb.reset();
     }
-    for(int i = 0; i < ns.size; i++) builder.startNS(ns.key[i], ns.val[i]);
+    for(int i = 0; i < ns.size; ++i) builder.startNS(ns.key[i], ns.val[i]);
     ns.reset();
   }
 
@@ -169,11 +169,11 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   }
 
   @Override
-  public void endCDATA() { }
+  public void endCDATA() { /* ignored. */ }
   @Override
-  public void endEntity(final String n) { }
+  public void endEntity(final String n) { /* ignored. */ }
   @Override
-  public void startCDATA() { }
+  public void startCDATA() { /* ignored. */ }
   @Override
-  public void startEntity(final String n) { }
+  public void startEntity(final String n) { /* ignored. */ }
 }

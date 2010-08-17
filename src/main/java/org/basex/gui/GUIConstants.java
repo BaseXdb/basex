@@ -172,7 +172,7 @@ public final class GUIConstants {
       small = BaseXLayout.icon(s);
       large = UIManager.getIcon("OptionPane." + l + "Icon");
     }
-  };
+  }
 
   /** Background fill options. */
   public static enum Fill {
@@ -180,7 +180,7 @@ public final class GUIConstants {
     /** Transparent mode.  */ NONE,
     /** Upward gradient.   */ UP,
     /** Downward gradient. */ DOWN
-  };
+  }
 
   // COLORS ===================================================================
 
@@ -286,7 +286,7 @@ public final class GUIConstants {
     colormark4 = new Color(col(r, 1), col(g, 40), col(b, 80));
 
     // create color array
-    for(int l = 1; l < 257; l++) {
+    for(int l = 1; l < 257; ++l) {
       COLORS[l - 1] = new Color(Math.max(255 - l * r, 0),
         Math.max(255 - l * g, 0), Math.max(255 - l * b, 0));
     }

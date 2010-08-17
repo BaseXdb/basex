@@ -24,15 +24,15 @@ public final class PNGParser implements IFileParser {
 
   /** PNG header. */
   private static final byte[] HEADER = { (byte) 0x89, 0x50, 0x4E, 0x47, 0x0D,
-      0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52};
+      0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52 };
   /** Length of the PNG header. */
   private static final int HEADER_LENGTH = HEADER.length + 8;
 
   @Override
   public boolean check(final DeepFile df) throws IOException {
     final BufferedFileChannel bfc = df.getBufferedFileChannel();
-    return bfc.size() >= HEADER_LENGTH
-        && eq(bfc.get(new byte[HEADER.length]), HEADER);
+    return bfc.size() >= HEADER_LENGTH &&
+    eq(bfc.get(new byte[HEADER.length]), HEADER);
   }
 
   @Override

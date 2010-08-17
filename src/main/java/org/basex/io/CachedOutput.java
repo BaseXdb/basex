@@ -24,6 +24,7 @@ public final class CachedOutput extends PrintOutput {
 
   /**
    * Constructor, specifying the maximum number of bytes to write.
+   * Note that the limit might break unicode characters.
    * @param m maximum
    */
   public CachedOutput(final int m) {

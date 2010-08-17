@@ -26,13 +26,8 @@ public abstract class Simple extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.ELM;
-  }
-
-  @Override
-  public String color() {
-    return "FFFF66";
+  public boolean uses(final Use u) {
+    return false;
   }
 
   @Override

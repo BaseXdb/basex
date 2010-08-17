@@ -30,6 +30,7 @@ public final class Instance extends Single {
   public Instance(final InputInfo ii, final Expr e, final SeqType s) {
     super(ii, e);
     seq = s;
+    type = SeqType.BLN;
   }
 
   @Override
@@ -42,11 +43,6 @@ public final class Instance extends Single {
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return Bln.get(seq.instance(ctx.iter(expr)));
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.BLN;
   }
 
   @Override

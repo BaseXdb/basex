@@ -430,7 +430,7 @@ final class MapRenderer {
     int sl = 0, pl = 0;
     int psl = 0, ppl = 0;
     int cchars = 0;
-    for(int i = 0; i < data[0].length; i++) {
+    for(int i = 0; i < data[0].length; ++i) {
       wl = (int) (data[0][i] * r.thumbf);
       e += data[0][i] * r.thumbf - wl;
 
@@ -528,7 +528,7 @@ final class MapRenderer {
     int psl = 0, ppl = 0, pl = 0, sl = 0, cc = 0;
     final TokenList tl = new TokenList();
     ttcol = new BoolList();
-    for(int i = 0; i < data[0].length; i++) {
+    for(int i = 0; i < data[0].length; ++i) {
       boolean ir = false;
       double wl = data[0][i] * r.thumbf;
       // sum up error, caused by int cast
@@ -585,7 +585,7 @@ final class MapRenderer {
           // append punctuation mark
           apm = psl < data[1].length && data[1][psl] == sl;
           tok = new byte[data[0][i] + (apm ? 1 : 0)];
-          for(int k = 0; k < tok.length - (apm ? 1 : 0); k++) {
+          for(int k = 0; k < tok.length - (apm ? 1 : 0); ++k) {
             tok[k] = (byte) data[3][p + k];
           }
 
@@ -646,7 +646,7 @@ final class MapRenderer {
           tok = new byte[data[0][i] + (apm ? 1 : 0)];
           l = 0;
 
-          for(int k = 0; k < tok.length - (apm ? 1 : 0); k++) {
+          for(int k = 0; k < tok.length - (apm ? 1 : 0); ++k) {
             tok[k] = (byte) data[3][p + k];
           }
 
@@ -716,7 +716,7 @@ final class MapRenderer {
     int nl = 1;
     int wi = mr.w / 2;
     final IntList len = new IntList();
-    for(int i = 0; i < tl.size(); i++) {
+    for(int i = 0; i < tl.size(); ++i) {
       int l = 0;
       final byte[] tok = tl.get(i);
       final int ns = tok.length;
@@ -746,7 +746,7 @@ final class MapRenderer {
     g.setColor(COLORS[20]);
     wl = 0;
     final int is = tl.size();
-    for(int i = 0; i < is; i++) {
+    for(int i = 0; i < is; ++i) {
       final int l = len.get(i);
       if(wl + l + sw >= wi) {
         yy += fs + 1;

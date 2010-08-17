@@ -55,7 +55,7 @@ public class StringList implements Iterable<String> {
    * @return true if value is found
    */
   public final boolean contains(final String v) {
-    for(int i = 0; i < size; i++) if(list[i].equals(v)) return true;
+    for(int i = 0; i < size; ++i) if(list[i].equals(v)) return true;
     return false;
   }
 

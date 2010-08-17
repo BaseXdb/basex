@@ -102,7 +102,7 @@ public final class FolderView extends View {
     final Data data = gui.context.data;
     opened = new boolean[data.meta.size];
     final int is = data.meta.size;
-    for(int pre = 0; pre < is; pre++) {
+    for(int pre = 0; pre < is; ++pre) {
       opened[pre] = data.parent(pre, data.kind(pre)) <= 0;
     }
   }

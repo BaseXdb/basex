@@ -157,7 +157,7 @@ public final class FSImporter implements FSTraversal {
       } finally {
         try {
           qp.close();
-        } catch(final IOException ex) { /* */ }
+        } catch(final IOException ex) { }
       }
     }
 

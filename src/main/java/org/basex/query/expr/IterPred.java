@@ -5,7 +5,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.util.InputInfo;
 
 /**
  * Iterative predicate expression. Supports one predicate.
@@ -21,15 +20,13 @@ final class IterPred extends Filter {
 
   /**
    * Constructor.
-   * @param ii input info
-   * @param r root expression
-   * @param p predicate
+   * @param f original filter
    * @param ps position predicate; may equal the first predicate
    * @param l true if predicate has a last function
    */
-  IterPred(final InputInfo ii, final Expr r, final Expr[] p, final Pos ps,
-      final boolean l) {
-    super(ii, r, p);
+  IterPred(final Filter f, final Pos ps, final boolean l) {
+    super(f.input, f.root, f.pred);
+    type = f.type;
     last = l;
     pos = ps;
   }
@@ -71,7 +68,7 @@ final class IterPred extends Filter {
 
         if(direct) {
           // directly access relevant items
-          it = iter.get(p - 1);
+          it = iter.size() < p ? null : iter.get(p - 1);
           ctx.pos = p++;
         } else {
           // loop through all items

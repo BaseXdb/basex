@@ -83,7 +83,7 @@ public abstract class Data {
     /** Attribute index. */ ATV,
     /** Full-text index. */ FTX,
     /** Path index. */      PTH
-  };
+  }
 
   /** Meta data. */
   public MetaData meta;
@@ -270,8 +270,11 @@ public abstract class Data {
     if(IDPREMAPON) return loglist.pre(id);
 
     // find pre value in table
-    for(int p = id; p < meta.size; p++) if(id == id(p)) return p;
-    for(int p = 0; p < id; p++) if(id == id(p)) return p;
+    for(int p = id; p < meta.size; ++p)
+      if(id == id(p)) return p;
+    for(int p = 0, ps = Math.min(meta.size, id); p < ps; ++p)
+      if(id == id(p)) return p;
+
     // id not found
     return -1;
   }
@@ -562,7 +565,7 @@ public abstract class Data {
     final int buf = Math.min(ms, IO.BLOCKSIZE >> IO.NODEPOWER);
     // resize buffer to cache more entries
     buffer(buf);
-    
+
     // find all namespaces in scope
     final TokenMap nsScope = new TokenMap();
     NSNode n = ns.root;
@@ -601,7 +604,7 @@ public abstract class Data {
           boolean ne = false;
           if(md.nsFlag(mpre)) {
             final Atts at = md.ns(mpre);
-            for(int a = 0; a < at.size; a++) {
+            for(int a = 0; a < at.size; ++a) {
               final byte[] old = nsScope.get(at.key[a]);
               if(old == null || !eq(old, at.val[a])) {
                 ns.add(at.key[a], at.val[a], pre);
@@ -842,7 +845,7 @@ public abstract class Data {
     if(IDPREMAPON) loglist.insert(i, pre);
     return i;
   }
-  
+
   /**
    * Stores the specified value in the update buffer.
    * @param v value to be stored

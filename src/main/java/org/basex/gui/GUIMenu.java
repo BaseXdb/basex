@@ -41,18 +41,18 @@ final class GUIMenu extends JMenuBar {
 
     // create menu for each top level menu entries
     int c = 0;
-    for(int i = 0; i < MENUBAR.length; i++)
-      for(int j = 0; j < MENUITEMS[i].length; j++) c++;
+    for(int i = 0; i < MENUBAR.length; ++i)
+      for(int j = 0; j < MENUITEMS[i].length; ++j) c++;
     items = new JMenuItem[c];
 
     c = 0;
     // loop through all menu entries
-    for(int i = 0; i < MENUBAR.length; i++) {
+    for(int i = 0; i < MENUBAR.length; ++i) {
       final JMenu menu = new JMenu(MENUBAR[i]);
       menu.setMnemonic((int) MENUBAR[i].charAt(0));
 
       // create menu point for each sub menu entry
-      for(int j = 0; j < MENUITEMS[i].length; j++) {
+      for(int j = 0; j < MENUITEMS[i].length; ++j) {
         // add a separator
         final Object subEntry = MENUITEMS[i][j];
         if(subEntry == null) continue;
@@ -98,8 +98,8 @@ final class GUIMenu extends JMenuBar {
    */
   void refresh() {
     int c = 0;
-    for(int i = 0; i < MENUBAR.length; i++) {
-      for(int j = 0; j < MENUITEMS[i].length; j++) {
+    for(int i = 0; i < MENUBAR.length; ++i) {
+      for(int j = 0; j < MENUITEMS[i].length; ++j) {
         final Object item = MENUITEMS[i][j];
         if(!(item instanceof GUICommand)) continue;
         ((GUICommand) item).refresh(gui, items[c++]);

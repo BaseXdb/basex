@@ -11,9 +11,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
-import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
-import static org.basex.util.Token.*;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -41,7 +39,7 @@ final class FNNode extends Fun {
       checkCtx(ctx)).atomic(ctx, input);
     final boolean empty = it == null;
 
-    switch(func) {
+    switch(def) {
       case NODENAME:
         if(empty) return null;
         QNm qname = checkNode(it).qname();
@@ -51,17 +49,10 @@ final class FNNode extends Fun {
         final byte[] uri = checkNode(it).base();
         return uri.length == 0 ? null : Uri.uri(uri);
       case NILLED:
+        // always false without schema information
         if(empty) return null;
-        final Nod nilled = checkNode(it);
-        if(it.type != Type.ELM) return Bln.FALSE;
-        final NodeIter atts = nilled.attr();
-        for(Nod att; (att = atts.next()) != null;) {
-          if(eq(att.qname().atom(), QueryTokens.NIL)
-              && eq(lc(trim(att.atom())), TRUE)) {
-            return Bln.TRUE;
-          }
-        }
-        return Bln.FALSE;
+        checkNode(it);
+        return it.type != Type.ELM ? null : Bln.FALSE;
       case BASEURI:
         if(empty) return null;
         Nod n = checkNode(it);
@@ -109,7 +100,7 @@ final class FNNode extends Fun {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.CTX && expr.length == 0 || super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.CTX && expr.length == 0 || super.uses(u);
   }
 }

@@ -186,6 +186,7 @@ public class BaseX extends Main {
           } else if(c == 'X') {
             // hidden option: show xml query plan
             arg.check(set(Prop.XMLPLAN, true));
+            verbose = true;
           } else if(c == 'z') {
             // turn off result serialization
             arg.check(set(Prop.SERIALIZE, false));

@@ -69,7 +69,7 @@ abstract class FTFilter extends FTExpr {
       final Tokenizer ft) throws QueryException {
 
     final FTMatches all = item.all;
-    for(int a = 0; a < all.size; a++) {
+    for(int a = 0; a < all.size; ++a) {
       if(!filter(ctx, all.match[a], ft)) all.delete(a--);
     }
     return all.size != 0;

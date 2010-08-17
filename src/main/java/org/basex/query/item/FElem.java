@@ -108,7 +108,7 @@ public final class FElem extends FNode {
     final Nod[] attArr = new Nod[as];
 
     int pos = 0;
-    for(int i = 0; i < as; i++) {
+    for(int i = 0; i < as; ++i) {
       final Attr att = (Attr) at.item(i);
       final byte[] nm = token(att.getName()), uri = token(att.getValue());
       if(Token.eq(nm, XMLNS)) {
@@ -124,7 +124,7 @@ public final class FElem extends FNode {
     // no parent, so we have to add all namespaces in scope
     if(p == null) {
       final Atts nss = nsScope(elem.getParentNode());
-      for(int i = 0; i < nss.size; i++) {
+      for(int i = 0; i < nss.size; ++i) {
         if(!ns.contains(nss.key[i])) {
           ns.add(nss.key[i], nss.val[i]);
         }
@@ -137,7 +137,7 @@ public final class FElem extends FNode {
     final Nod[] childArr = new Nod[s];
     children = new NodIter(childArr, childArr.length);
 
-    for(int i = 0; i < ch.getLength(); i++) {
+    for(int i = 0; i < ch.getLength(); ++i) {
       final Node child = ch.item(i);
 
       switch(child.getNodeType()) {
@@ -170,7 +170,7 @@ public final class FElem extends FNode {
     // only elements can declare namespaces
     while(n != null && n instanceof Element) {
       final NamedNodeMap atts = n.getAttributes();
-      for(int i = 0, len = atts.getLength(); i < len; i++) {
+      for(int i = 0, len = atts.getLength(); i < len; ++i) {
         final Attr a = (Attr) atts.item(i);
         final byte[] name = token(a.getName()), uri = token(a.getValue());
         if(Token.eq(name, XMLNS)) {
@@ -221,7 +221,7 @@ public final class FElem extends FNode {
     // serialize all namespaces at top level...
     if(ser.level() == 1) {
       final Atts nns = nsScope();
-      for(int a = 0; a < nns.size; a++) {
+      for(int a = 0; a < nns.size; ++a) {
         if(nns.key[a].length == 0) {
           xmlns = true;
           if(Token.eq(ser.dn, nns.val[a])) continue;
@@ -254,7 +254,7 @@ public final class FElem extends FNode {
     ser.dn = uri;
 
     // serialize attributes
-    for(int n = 0; n < atts.size(); n++) {
+    for(int n = 0; n < atts.size(); ++n) {
       final Nod nod = atts.get(n);
       final QNm atn = nod.qname();
       if(atn.ns()) {
@@ -268,7 +268,7 @@ public final class FElem extends FNode {
     }
 
     // serialize children
-    for(int n = 0; n < children.size(); n++) children.get(n).serialize(ser);
+    for(int n = 0; n < children.size(); ++n) children.get(n).serialize(ser);
     ser.closeElement();
 
     // reset top level namespace
@@ -281,11 +281,11 @@ public final class FElem extends FNode {
     final NodIter at = new NodIter();
     final FElem node = new FElem(name, ch, at, base, ns, par);
 
-    for(int c = 0; c < children.size(); c++) {
+    for(int c = 0; c < children.size(); ++c) {
       ch.add(children.get(c).copy());
       ch.get(c).parent(node);
     }
-    for(int c = 0; c < atts.size(); c++) {
+    for(int c = 0; c < atts.size(); ++c) {
       at.add(atts.get(c).copy());
       at.get(c).parent(node);
     }

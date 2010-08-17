@@ -19,13 +19,13 @@ public abstract class FTIndexIterator extends IndexIterator {
   /** Empty iterator. */
   static final FTIndexIterator EMP = new FTIndexIterator() {
     @Override
-    public boolean more() { return false; };
+    public boolean more() { return false; }
     @Override
-    public int next() { return 0; };
+    public int next() { return 0; }
     @Override
-    public FTMatches matches() { return null; };
+    public FTMatches matches() { return null; }
     @Override
-    public double score() { return -1; };
+    public double score() { return -1; }
   };
 
   /**

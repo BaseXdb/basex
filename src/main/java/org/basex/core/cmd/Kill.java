@@ -28,7 +28,7 @@ public final class Kill extends Command {
 
     final Sessions ss = context.sessions;
     final int s = ss.size();
-    for(int i = 0; i < ss.size(); i++) {
+    for(int i = 0; i < ss.size(); ++i) {
       if(user.equals(ss.get(i).context.user.name)) ss.get(i--).exit();
     }
     return info(USERKILL, s - ss.size());

@@ -46,19 +46,19 @@ public final class Seq extends Value {
   }
 
   @Override
-  public long size(final QueryContext ctx) {
+  public long size() {
     return size;
   }
 
   @Override
   public Object toJava() {
     final Object[] obj = new Object[size];
-    for(int s = 0; s != size; s++) obj[s] = val[s].toJava();
+    for(int s = 0; s != size; ++s) obj[s] = val[s].toJava();
     return obj;
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) {
+  public Iter iter() {
     return new ItemIter(val, size);
   }
 
@@ -83,30 +83,30 @@ public final class Seq extends Value {
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
+  public SeqType type() {
     Type t = size > 128 ? Type.ITEM : val[0].type;
-    for(int s = 1; s != size && t != Type.ITEM; s++) {
+    for(int s = 1; s != size && t != Type.ITEM; ++s) {
       if(t != val[s].type) t = Type.ITEM;
     }
     return new SeqType(t, SeqType.Occ.OM);
   }
 
   @Override
-  public boolean duplicates(final QueryContext ctx) {
+  public boolean duplicates() {
     return true;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(Token.token(Type.SEQ.name), SIZE, Token.token(size));
-    for(int v = 0; v != Math.min(size, 5); v++) val[v].plan(ser);
+    ser.openElement(this, SIZE, Token.token(size));
+    for(int v = 0; v != Math.min(size, 5); ++v) val[v].plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder("(");
-    for(int v = 0; v != size; v++) {
+    for(int v = 0; v != size; ++v) {
       sb.append((v != 0 ? ", " : "") + val[v]);
       if(sb.length() > 32 && v + 1 != size) {
         sb.append(", ...");

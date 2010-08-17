@@ -222,7 +222,7 @@ public final class TokenBuilder {
     final byte[] t = str instanceof byte[] ? (byte[]) str :
       token(str == null ? "null" : str.toString());
 
-    for(int i = 0, e = 0; i < t.length; i++) {
+    for(int i = 0, e = 0; i < t.length; ++i) {
       if(t[i] != '%' || e == ext.length) {
         add(t[i]);
       } else {
@@ -253,7 +253,7 @@ public final class TokenBuilder {
    * @return result of check
    */
   public boolean wsp() {
-    for(int i = 0; i < size; i++) if(!ws(chars[i])) return false;
+    for(int i = 0; i < size; ++i) if(!ws(chars[i])) return false;
     return true;
   }
 

@@ -14,6 +14,9 @@ public final class FuncTest extends QueryTest {
         "<line>Une ligne de texte.</line></desc></desclist>";
 
     queries = new Object[][] {
+      { "false 1", bool(false), "false()" },
+      { "true 2", bool(true), "true()" },
+
       { "count 1", "count()" },
       { "count 2", "count(1, 1)" },
       { "count 3", bool(false), "count(1[.]) eq 0" },
@@ -172,7 +175,7 @@ public final class FuncTest extends QueryTest {
       { "formdate 230", str("12/31/2002 at 15:58:45"),
         "format-dateTime(xs:dateTime('2002-12-31T15:58:45.762+02:00'), " +
         "'[M01]/[D01]/[Y0001] at [H01]:[m01]:[s01]')" },
-      
+
       // http://www.xqueryfunctions.com/xq/fn_lang.html
       { "lang 1", nod(3), "//desc[lang('en')]" },
       { "lang 2", nod(3), "//desc[lang('en-US')]" },
@@ -184,18 +187,18 @@ public final class FuncTest extends QueryTest {
   }
 
   /* TABLE REPRESENTATION
-  PRE  DIS  SIZ  ATS  NS  KIND  CONTENT              
+  PRE  DIS  SIZ  ATS  NS  KIND  CONTENT
   -------------------------------------------------
-    0    1   11    1  +0  DOC   test.xml                
-    1    1   10    2   0  ELEM  desclist             
-    2    1    1    1   0  ATTR  xml:lang="en"        
-    3    2    4    2   0  ELEM  desc                 
-    4    1    1    1   0  ATTR  xml:lang="en-US"     
-    5    2    2    1   0  ELEM  line                 
-    6    1    1    1   0  TEXT  A line of text.      
-    7    6    4    2   0  ELEM  desc                 
-    8    1    1    1   0  ATTR  xml:lang="fr"        
-    9    2    2    1   0  ELEM  line                 
-   10    1    1    1   0  TEXT  Une ligne de texte.  
+    0    1   11    1  +0  DOC   test.xml
+    1    1   10    2   0  ELEM  desclist
+    2    1    1    1   0  ATTR  xml:lang="en"
+    3    2    4    2   0  ELEM  desc
+    4    1    1    1   0  ATTR  xml:lang="en-US"
+    5    2    2    1   0  ELEM  line
+    6    1    1    1   0  TEXT  A line of text.
+    7    6    4    2   0  ELEM  desc
+    8    1    1    1   0  ATTR  xml:lang="fr"
+    9    2    2    1   0  ELEM  line
+   10    1    1    1   0  TEXT  Une ligne de texte.
   */
 }

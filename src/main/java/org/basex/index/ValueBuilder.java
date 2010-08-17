@@ -66,7 +66,7 @@ public final class ValueBuilder extends IndexBuilder {
     final String f = text ? DATATXT : DATAATV;
     final int k = text ? Data.TEXT : Data.ATTR;
 
-    for(pre = 0; pre < size; pre++) {
+    for(pre = 0; pre < size; ++pre) {
       if((pre & 0x0FFF) == 0) {
         check();
         // check if main-memory is exhausted
@@ -114,7 +114,7 @@ public final class ValueBuilder extends IndexBuilder {
     outl.write4(0);
 
     final ValueMerge[] vm = new ValueMerge[csize];
-    for(int i = 0; i < csize; i++) vm[i] = new ValueMerge(data, text, i);
+    for(int i = 0; i < csize; ++i) vm[i] = new ValueMerge(data, text, i);
 
     int min;
     int sz = 0;
@@ -126,7 +126,7 @@ public final class ValueBuilder extends IndexBuilder {
       outr.write5(outl.size());
       min = 0;
       ml.reset();
-      for(int i = 0; i < csize; i++) {
+      for(int i = 0; i < csize; ++i) {
         if(min == i || vm[i].token.length == 0) continue;
         final int d = diff(vm[min].token, vm[i].token);
         if(d > 0 || vm[min].token.length == 0) {
@@ -146,7 +146,7 @@ public final class ValueBuilder extends IndexBuilder {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(new byte[4]);
         int opre = 0, npre = 0;
-        for(int j = 0; j < ms; j++) {
+        for(int j = 0; j < ms; ++j) {
           final int m = ml.get(j);
           if(j == 0) {
             int l = 4;

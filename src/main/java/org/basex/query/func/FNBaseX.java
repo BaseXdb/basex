@@ -47,7 +47,7 @@ final class FNBaseX extends Fun {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(func) {
+    switch(def) {
       case INDEX: return index(ctx);
       case EVAL:  return eval(ctx);
       case RUN:   return run(ctx);
@@ -58,7 +58,7 @@ final class FNBaseX extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(func) {
+    switch(def) {
       case READ:   return read(ctx);
       case RANDOM: return random();
       case DB:     return db(ctx);
@@ -195,28 +195,28 @@ final class FNBaseX extends Fun {
     if(data == null) Err.or(input, XPNOCTX, this);
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
-    final String type = string(checkEStr(expr[1], ctx)).toLowerCase();
+    final String tp = string(checkEStr(expr[1], ctx)).toLowerCase();
 
-    if(type.equals(FULLTEXT)) {
+    if(tp.equals(FULLTEXT)) {
       if(!data.meta.ftxindex) Err.or(input, NOIDX, FULLTEXT);
       return new FTIndexAccess(input, new FTWords(input, data,
           checkEStr(expr[0], ctx), ctx.ftpos == null), ic).iter(ctx);
     }
-    if(type.equals(TEXT)) {
+    if(tp.equals(TEXT)) {
       if(!data.meta.txtindex) Err.or(input, NOIDX, TEXT);
       return new IndexAccess(input, expr[0], IndexType.TXT, ic).iter(ctx);
     }
-    if(type.equals(ATTRIBUTE)) {
+    if(tp.equals(ATTRIBUTE)) {
       if(!data.meta.atvindex) Err.or(input, NOIDX, ATTRIBUTE);
       return new IndexAccess(input, expr[0], IndexType.ATV, ic).iter(ctx);
     }
 
-    Err.or(input, WHICHIDX, type);
+    Err.or(input, WHICHIDX, tp);
     return null;
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.CTX && func == FunDef.RANDOM || super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.CTX && def == FunDef.RANDOM || super.uses(u);
   }
 }

@@ -34,24 +34,25 @@ public final class Union extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
 
-    final int el = expr.length;
-    for(int e = 0; e != expr.length; e++) {
+    for(int e = 0; e != expr.length; ++e) {
       // remove empty operands
-      if(expr[e].empty()) expr = Array.delete(expr, e--);
+      if(expr[e].empty()) {
+        expr = Array.delete(expr, e--);
+        ctx.compInfo(OPTREMOVE, desc(), Type.EMP);
+      }
     }
-    if(el != expr.length) ctx.compInfo(OPTEMPTY);
 
     // as union is required to always returns sorted results,
     // a single, non-sorted argument must be evaluated as well
     return expr.length == 0 ? Empty.SEQ :
-      expr.length == 1 && !duplicates(ctx) ? expr[0] : this;
+      expr.length == 1 && !duplicates() ? expr[0] : this;
   }
 
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
-    for(int e = 0; e != expr.length; e++) iter[e] = ctx.iter(expr[e]);
-    return duplicates(ctx) ? eval(iter) : iter(iter);
+    for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
+    return duplicates() ? eval(iter) : iter(iter);
   }
 
   /**
@@ -69,7 +70,7 @@ public final class Union extends Arr {
         ni.add((Nod) it);
       }
     }
-    return ni;
+    return ni.sort();
   }
 
   /**
@@ -85,11 +86,11 @@ public final class Union extends Arr {
       public Nod next() throws QueryException {
         if(items == null) {
           items = new Nod[iter.length];
-          for(int i = 0; i != iter.length; i++) next(i);
+          for(int i = 0; i != iter.length; ++i) next(i);
         }
 
         int m = -1;
-        for(int i = 0; i != items.length; i++) {
+        for(int i = 0; i != items.length; ++i) {
           if(items[i] == null) continue;
           final int d = m == -1 ? 1 : items[m].diff(items[i]);
           if(d == 0) {

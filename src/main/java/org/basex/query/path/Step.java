@@ -74,6 +74,7 @@ public class Step extends Preds {
     super(ii, p);
     axis = a;
     test = t;
+    type = SeqType.NOD_ZM;
   }
 
   @Override
@@ -99,10 +100,10 @@ public class Step extends Preds {
     final Expr p = pred[0];
     final Pos pos = p instanceof Pos ? (Pos) p : null;
     // last flag
-    final boolean last = p instanceof Fun && ((Fun) p).func == FunDef.LAST;
+    final boolean last = p instanceof Fun && ((Fun) p).def == FunDef.LAST;
 
     // use standard evaluation for multiple predicates or standard POS predicate
-    if(pred.length > 1 || !last && pos == null && uses(Use.POS, ctx))
+    if(pred.length > 1 || !last && pos == null && uses(Use.POS))
       return this;
 
     // use iterative evaluation
@@ -129,7 +130,7 @@ public class Step extends Preds {
         ctx.size = nb.size();
         ctx.pos = 1;
         int c = 0;
-        for(int s = 0; s < nb.size(); s++) {
+        for(int s = 0; s < nb.size(); ++s) {
           ctx.value = nb.get(s);
           final Item i = p.test(ctx, input);
           if(i != null) {
@@ -139,9 +140,9 @@ public class Step extends Preds {
           }
           ctx.pos++;
         }
-        nb.size = c;
+        nb.size(c);
       }
-      for(int n = 0; n < nb.size(); n++) ni.add(nb.get(n));
+      for(int n = 0; n < nb.size(); ++n) ni.add(nb.get(n));
       nb = new NodIter();
     }
     return ni;
@@ -159,10 +160,10 @@ public class Step extends Preds {
   }
 
   /**
-   * Counts the number of results for this location step.
+   * Returns all path nodes that yield results for this step.
    * @param nodes input nodes
    * @param data data reference
-   * @return node array, or {@code null} if size cannot be evaluated
+   * @return path nodes, or {@code null} if size cannot be evaluated
    */
   final ArrayList<PathNode> size(final ArrayList<PathNode> nodes,
       final Data data) {
@@ -207,15 +208,10 @@ public class Step extends Preds {
     final Step st = (Step) cmp;
     if(pred.length != st.pred.length || axis != st.axis ||
         !test.sameAs(st.test)) return false;
-    for(int p = 0; p < pred.length; p++) {
+    for(int p = 0; p < pred.length; ++p) {
       if(!pred[p].sameAs(st.pred[p])) return false;
     }
     return true;
-  }
-
-  @Override
-  public final SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD_ZM;
   }
 
   @Override

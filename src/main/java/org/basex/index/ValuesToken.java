@@ -10,23 +10,23 @@ import org.basex.data.Data.IndexType;
  */
 public final class ValuesToken implements IndexToken {
   /** Index type. */
-  private final IndexType type;
+  private final IndexType ind;
   /** Text. */
   private final byte[] text;
 
   /**
    * Constructor.
-   * @param t index type
+   * @param i index type
    * @param tok token
    */
-  public ValuesToken(final IndexType t, final byte[] tok) {
-    type = t;
+  public ValuesToken(final IndexType i, final byte[] tok) {
+    ind = i;
     text = tok;
   }
 
   @Override
   public IndexType type() {
-    return type;
+    return ind;
   }
 
   @Override

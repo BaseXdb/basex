@@ -227,7 +227,7 @@ public final class TableDiskAccess extends TableAccess {
       copy(entries, 0, bf.buf, ins, nr);
 
       // update index entries
-      for(int i = index + 1; i < blocks; i++) fpres[i] += nr;
+      for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
       npre += nr;
       return;
     }
@@ -277,7 +277,7 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // update index entries
-    for(int i = index + 1; i < blocks; i++) fpres[i] += nr;
+    for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
 
     // update cached variables
     fpre = pre;
@@ -289,7 +289,7 @@ public final class TableDiskAccess extends TableAccess {
   public synchronized void set(final int pre, final byte[] entries) {
     dirty = true;
     final int nr = entries.length >>> IO.NODEPOWER;
-    for(int l = 0, i = pre; i < pre + nr; i++, l += 1 << IO.NODEPOWER) {
+    for(int l = 0, i = pre; i < pre + nr; ++i, l += 1 << IO.NODEPOWER) {
       final int o = cursor(pre);
       System.arraycopy(entries, l, bf.buf, o, 1 << IO.NODEPOWER);
     }
@@ -381,7 +381,7 @@ public final class TableDiskAccess extends TableAccess {
    */
   private synchronized void updatePre(final int nr) {
     // update index entries for all following blocks and reduce counter
-    for(int i = index + 1; i < blocks; i++) fpres[i] -= nr;
+    for(int i = index + 1; i < blocks; ++i) fpres[i] -= nr;
     meta.size -= nr;
     npre = index + 1 >= blocks ? meta.size : fpres[index + 1];
   }

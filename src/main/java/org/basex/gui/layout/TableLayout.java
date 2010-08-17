@@ -72,12 +72,12 @@ public final class TableLayout implements LayoutManager {
 
       int maxW = 0;
       int maxH = 0;
-      for(int i = 0; i < cols; i++) {
+      for(int i = 0; i < cols; ++i) {
         posX[i] = maxW;
         final int w = maxW;
         int h = 0;
 
-        for(int j = 0; j < rows; j++) {
+        for(int j = 0; j < rows; ++j) {
           final int n = j * cols + i;
           if(n >= nr) break;
 
@@ -108,8 +108,8 @@ public final class TableLayout implements LayoutManager {
     synchronized(p.getTreeLock()) {
       final Insets in = p.getInsets();
       final int nr = p.getComponentCount();
-      for(int j = 0; j < rows; j++) {
-        for(int i = 0; i < cols; i++) {
+      for(int j = 0; j < rows; ++j) {
+        for(int i = 0; i < cols; ++i) {
           final int n = j * cols + i;
           if(n >= nr) return;
           final Dimension cs = p.getComponent(n).getPreferredSize();

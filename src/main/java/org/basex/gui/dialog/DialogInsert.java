@@ -86,7 +86,7 @@ public final class DialogInsert extends Dialog {
     };
 
     radio = new BaseXRadio[EDITKIND.length];
-    for(int i = 1; i < EDITKIND.length; i++) {
+    for(int i = 1; i < EDITKIND.length; ++i) {
       radio[i] = new BaseXRadio(EDITKIND[i], false, this);
       radio[i].addActionListener(al);
       radio[i].setSelected(i == lkind);
@@ -123,7 +123,7 @@ public final class DialogInsert extends Dialog {
    */
   void change(final Object src) {
     int n = 0;
-    for(int r = 0; r < radio.length; r++) if(src == radio[r]) n = r;
+    for(int r = 0; r < radio.length; ++r) if(src == radio[r]) n = r;
     BaseXLayout.setHeight(input2, n == Data.ATTR ? 25 : 200);
 
     back.removeAll();
@@ -147,7 +147,7 @@ public final class DialogInsert extends Dialog {
 
   @Override
   public void action(final Object cmp) {
-    for(int i = 1; i < EDITKIND.length; i++) if(radio[i].isSelected()) kind = i;
+    for(int i = 1; i < EDITKIND.length; ++i) if(radio[i].isSelected()) kind = i;
     lkind = kind;
 
     String msg = null;

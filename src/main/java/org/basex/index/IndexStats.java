@@ -38,7 +38,7 @@ final class IndexStats {
     occMax = new int[max];
     txtMin = new byte[max][];
     txtMax = new byte[max][];
-    for(int o = 0; o < txtMin.length; o++) {
+    for(int o = 0; o < txtMin.length; ++o) {
       txtMin[o] = Token.EMPTY;
       txtMax[o] = Token.EMPTY;
       occMin[o] = Integer.MAX_VALUE;
@@ -83,7 +83,7 @@ final class IndexStats {
     tb.add(IDXENTRIES + size + NL);
     int m = 0;
     int c = 0;
-    for(int o = 0; o < max; o++) {
+    for(int o = 0; o < max; ++o) {
       int tl = txtMin[o].length;
       if(tl == 0) c++;
       else if(m < tl) m = tl;
@@ -106,11 +106,11 @@ final class IndexStats {
    */
   private void print(final TokenBuilder tb, final byte[][] txt, final int[] ocs,
       final int len) {
-    for(int o = 0; o < ocs.length; o++) {
+    for(int o = 0; o < ocs.length; ++o) {
       if(txt[o].length == 0) continue;
       tb.add("  ");
       tb.add(txt[o]);
-      for(int j = 0; j < len - txt[o].length; j++) tb.add(' ');
+      for(int j = 0; j < len - txt[o].length; ++j) tb.add(' ');
       tb.add(ocs[o]);
       tb.add('x');
       tb.add(NL);

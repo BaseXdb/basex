@@ -161,6 +161,11 @@ public final class QNm extends Item {
   }
 
   @Override
+  public SeqType type() {
+    return SeqType.QNM;
+  }
+
+  @Override
   public int hashCode() {
     return super.hashCode();
   }

@@ -556,11 +556,11 @@ public final class FTTest extends QueryTest {
     final Prop prop = context.prop;
     if(ALL) {
       // testing all kinds of combinations
-      for(int a = 0; a < 2; a++) { prop.set(Prop.FTINDEX, a == 0);
-        for(int b = 0; b < 2; b++) { prop.set(Prop.WILDCARDS, b == 0);
-          for(int c = 0; c < 2; c++) { prop.set(Prop.STEMMING, c == 0);
-            for(int d = 0; d < 2; d++) { prop.set(Prop.DIACRITICS, d == 0);
-              for(int e = 0; e < 2; e++) { prop.set(Prop.CASESENS, e == 0);
+      for(int a = 0; a < 2; ++a) { prop.set(Prop.FTINDEX, a == 0);
+        for(int b = 0; b < 2; ++b) { prop.set(Prop.WILDCARDS, b == 0);
+          for(int c = 0; c < 2; ++c) { prop.set(Prop.STEMMING, c == 0);
+            for(int d = 0; d < 2; ++d) { prop.set(Prop.DIACRITICS, d == 0);
+              for(int e = 0; e < 2; ++e) { prop.set(Prop.CASESENS, e == 0);
                 super.test();
               }
             }

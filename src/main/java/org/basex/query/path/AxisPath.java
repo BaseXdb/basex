@@ -81,7 +81,7 @@ public class AxisPath extends Path {
    * @return resulting operator
    */
   private AxisPath iterator(final QueryContext ctx) {
-    return iterable(ctx) ? new IterPath(input, root, step) : this;
+    return iterable(ctx) ? new IterPath(input, root, step, type, size) : this;
   }
 
   /**
@@ -90,10 +90,14 @@ public class AxisPath extends Path {
    * @return resulting operator
    */
   private boolean iterable(final QueryContext ctx) {
-    if(root == null || root.uses(Use.VAR, ctx) || root.duplicates(ctx))
+    // evaluate return type
+    size = size(ctx);
+    type = new SeqType(Type.NOD, size);
+
+    if(root == null || root.uses(Use.VAR) || root.duplicates())
       return false;
 
-    for(int i = 0; i < step.length; i++) {
+    for(int i = 0; i < step.length; ++i) {
       switch(step[i].axis) {
         // reverse results - don't iterate
         case ANC: case ANCORSELF: case PREC: case PRECSIBL:
@@ -108,6 +112,31 @@ public class AxisPath extends Path {
     return true;
   }
 
+  /**
+   * Computes the number of results.
+   * @param ctx query context
+   * @return number of results
+   */
+  private long size(final QueryContext ctx) {
+
+    final Value rt = root(ctx);
+    final Data data = rt != null && rt.type == Type.DOC &&
+      rt instanceof DBNode ? ((DBNode) rt).data : null;
+
+    if(data == null || !data.meta.pthindex || !data.meta.uptodate ||
+        data.ns.size() != 0) return -1;
+
+    ArrayList<PathNode> nodes = data.path.root();
+    for(final Step s : step) {
+      nodes = s.size(nodes, data);
+      if(nodes == null) return -1;
+    }
+
+    long sz = 0;
+    for(final PathNode pn : nodes) sz += pn.size;
+    return sz;
+  }
+
   @Override
   protected Expr compPath(final QueryContext ctx) throws QueryException {
     for(final Step s : step) checkUp(s, ctx);
@@ -118,16 +147,18 @@ public class AxisPath extends Path {
       root = ((AxisPath) root).root;
       for(final Step s : step) st = Array.add(st, s);
       step = st;
+      // refresh root context
+      ctx.value = root(ctx);
     }
     checkEmpty();
 
-    for(int i = 0; i != step.length; i++) {
+    for(int i = 0; i != step.length; ++i) {
       final Expr e = step[i].comp(ctx);
       if(!(e instanceof Step)) return e;
       step[i] = (Step) e;
     }
     mergeDesc(ctx);
-
+    
     // check if all context nodes reference document nodes
     // [CG] XQuery: optimize paths without root context
     final Data data = ctx.data();
@@ -141,11 +172,10 @@ public class AxisPath extends Path {
           if(!doc) break;
         }
       }
-
       if(doc) {
         Expr e = this;
         // check index access
-        if(root != null && !uses(Use.POS, ctx)) e = index(ctx, data);
+        if(root != null && !uses(Use.POS)) e = index(ctx, data);
         // check children path rewriting
         if(e == this) e = children(ctx, data);
         // return optimized expression
@@ -154,7 +184,7 @@ public class AxisPath extends Path {
     }
 
     // analyze if result set can be cached - no predicates/variables...
-    cache = root != null && !uses(Use.VAR, ctx);
+    cache = root != null && !uses(Use.VAR);
 
     // if applicable, return iterator
     return iterator(ctx);
@@ -167,7 +197,7 @@ public class AxisPath extends Path {
    * @return path
    */
   private AxisPath children(final QueryContext ctx, final Data data) {
-    for(int s = 0; s < step.length; s++) {
+    for(int s = 0; s < step.length; ++s) {
       // don't allow predicates in preceding location steps
       if(s > 0 && step[s - 1].pred.length != 0) break;
 
@@ -183,7 +213,7 @@ public class AxisPath extends Path {
       final TokenList tl = new TokenList();
       while(nodes.get(0).par != null) {
         byte[] tag = data.tags.key(nodes.get(0).name);
-        for(int j = 0; j < nodes.size(); j++) {
+        for(int j = 0; j < nodes.size(); ++j) {
           if(nodes.get(0).name != nodes.get(j).name) tag = null;
         }
         tl.add(tag);
@@ -193,7 +223,7 @@ public class AxisPath extends Path {
       // build new steps
       int ts = tl.size();
       final Step[] steps = new Step[ts + step.length - s - 1];
-      for(int t = 0; t < ts; t++) {
+      for(int t = 0; t < ts; ++t) {
         final Expr[] preds = t == ts - 1 ? step[s].pred : new Expr[0];
         final byte[] n = tl.get(ts - t - 1);
         final NameTest nt = n == null ? new NameTest(false, input) :
@@ -220,7 +250,7 @@ public class AxisPath extends Path {
       return null;
 
     ArrayList<PathNode> in = data.path.root();
-    for(int s = 0; s <= l; s++) {
+    for(int s = 0; s <= l; ++s) {
       final boolean desc = step[s].axis == Axis.DESC;
       if(!desc && step[s].axis != Axis.CHILD || step[s].test.kind != Kind.NAME)
         return null;
@@ -258,7 +288,7 @@ public class AxisPath extends Path {
     int ms = 0;
 
     // check if path can be converted to an index access
-    for(int s = 0; s < step.length; s++) {
+    for(int s = 0; s < step.length; ++s) {
       // find cheapest index access
       final Step stp = step[s];
       if(!stp.axis.down) break;
@@ -267,7 +297,7 @@ public class AxisPath extends Path {
       final boolean d = pathNodes(data, s) == null;
 
       // choose cheapest index access
-      for(int p = 0; p < stp.pred.length; p++) {
+      for(int p = 0; p < stp.pred.length; ++p) {
         final IndexContext ic = new IndexContext(ctx, data, stp, d);
         if(!stp.pred[p].indexAccessible(ic)) continue;
 
@@ -305,7 +335,7 @@ public class AxisPath extends Path {
       // collect remaining predicates
       final Expr[] newPreds = new Expr[stp.pred.length - 1];
       int c = 0;
-      for(int p = 0; p != stp.pred.length; p++) {
+      for(int p = 0; p != stp.pred.length; ++p) {
         if(p != ips) newPreds[c++] = stp.pred[p];
       }
 
@@ -345,7 +375,7 @@ public class AxisPath extends Path {
           AxisPath.get(input, null, inv));
 
       // add remaining steps
-      for(int s = ms + 1; s < step.length; s++) {
+      for(int s = ms + 1; s < step.length; ++s) {
         result.step = Array.add(result.step, step[s]);
       }
       return result;
@@ -358,23 +388,25 @@ public class AxisPath extends Path {
     final Value c = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    Value v = root != null ? ctx.iter(root).finish() : c;
+    Value r = root != null ? ctx.iter(root).finish() : c;
 
     if(!cache || citer == null || lvalue.type != Type.DOC ||
-        v.type != Type.DOC || !((Nod) lvalue).is((Nod) v)) {
-      lvalue = v;
-      citer = new NodIter();
-      if(v != null && v.size(ctx) != 1) {
-        final Iter ir = ctx.iter(v);
-        while((v = ir.next()) != null) {
-          ctx.value = v;
+        r.type != Type.DOC || !((Nod) lvalue).is((Nod) r)) {
+
+      lvalue = r;
+      citer = new NodIter(true);
+      if(r != null) {
+        final Iter ir = ctx.iter(r);
+        while((r = ir.next()) != null) {
+          ctx.value = r;
           iter(0, citer, ctx);
         }
+
       } else {
-        ctx.value = v;
+        ctx.value = r;
         iter(0, citer, ctx);
       }
-      citer.sort(true);
+      citer.sort();
     } else {
       citer.reset();
     }
@@ -410,26 +442,6 @@ public class AxisPath extends Path {
     }
   }
 
-  @Override
-  public final long size(final QueryContext ctx) {
-    final Value rt = root(ctx);
-    final Data data = rt != null && rt.type == Type.DOC &&
-      rt instanceof DBNode ? ((DBNode) rt).data : null;
-
-    if(data == null || !data.meta.pthindex || !data.meta.uptodate ||
-        data.ns.size() != 0) return -1;
-
-    ArrayList<PathNode> nodes = data.path.root();
-    for(final Step s : step) {
-      nodes = s.size(nodes, data);
-      if(nodes == null) return -1;
-    }
-
-    long size = 0;
-    for(final PathNode pn : nodes) size += pn.size;
-    return size;
-  }
-
   /**
    * Merges superfluous descendant-or-self steps.
    * This method implies that all expressions are location steps.
@@ -437,10 +449,10 @@ public class AxisPath extends Path {
    */
   private void mergeDesc(final QueryContext ctx) {
     int ll = step.length;
-    for(int l = 1; l < ll; l++) {
+    for(int l = 1; l < ll; ++l) {
       if(!step[l - 1].simple(DESCORSELF, false)) continue;
       final Step next = step[l];
-      if(next.axis == CHILD && !next.uses(Use.POS, ctx)) {
+      if(next.axis == CHILD && !next.uses(Use.POS)) {
         Array.move(step, l, -1, ll-- - l);
         next.axis = DESC;
       }
@@ -465,7 +477,7 @@ public class AxisPath extends Path {
         warning(s);
     }
 
-    for(int l = 1; l < ll; l++) {
+    for(int l = 1; l < ll; ++l) {
       final Step s1 = step[l];
       final Step s0 = step[l - 1];
 
@@ -530,13 +542,10 @@ public class AxisPath extends Path {
     return get(input, root, step);
   }
 
-  /**
-   * Returns a copy of the specified path.
-   * @return class instance
-   */
+  @Override
   public final AxisPath copy() {
     final Step[] steps = new Step[step.length];
-    for(int s = 0; s < step.length; s++) steps[s] = Step.get(step[s]);
+    for(int s = 0; s < step.length; ++s) steps[s] = Step.get(step[s]);
     return get(input, root, steps);
   }
 
@@ -560,25 +569,20 @@ public class AxisPath extends Path {
   }
 
   @Override
-  public final boolean uses(final Use u, final QueryContext ctx) {
-    return uses(step, u, ctx);
+  public final boolean uses(final Use u) {
+    return uses(step, u);
   }
 
   @Override
-  public final boolean removable(final Var v, final QueryContext ctx) {
-    for(final Step s : step) if(!s.removable(v, ctx)) return false;
+  public final boolean removable(final Var v) {
+    for(final Step s : step) if(!s.removable(v)) return false;
     return true;
   }
 
   @Override
   public final Expr remove(final Var v) {
-    for(int s = 0; s != step.length; s++) step[s].remove(v);
+    for(int s = 0; s != step.length; ++s) step[s].remove(v);
     return super.remove(v);
-  }
-
-  @Override
-  public final SeqType returned(final QueryContext ctx) {
-    return size(ctx) == 1 ? SeqType.NOD : SeqType.NOD_ZM;
   }
 
   @Override
@@ -589,7 +593,7 @@ public class AxisPath extends Path {
         step.length != ap.step.length ||
         root != null && !root.sameAs(ap.root)) return false;
 
-    for(int s = 0; s < step.length; s++) {
+    for(int s = 0; s < step.length; ++s) {
       if(!step[s].sameAs(ap.step[s])) return false;
     }
     return true;

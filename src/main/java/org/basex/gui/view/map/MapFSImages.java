@@ -61,7 +61,7 @@ final class MapFSImages extends Thread {
    * @return cached image
    */
   Image get(final int id) {
-    for(int i = 0; i < MAXNR; i++) if(imgid[i] == id) return imgs[i];
+    for(int i = 0; i < MAXNR; ++i) if(imgid[i] == id) return imgs[i];
     return null;
   }
 
@@ -202,7 +202,7 @@ final class MapFSImages extends Thread {
    */
   void close() {
     reset();
-    /*for(int i = 0; i < MAXNR; i++) {
+    /*for(int i = 0; i < MAXNR; ++i) {
       imgs[i] = null;
       imgid[i] = 0;
     }*/

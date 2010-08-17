@@ -132,7 +132,7 @@ public class TokenSet {
   public final byte[][] keys() {
     final byte[][] tmp = new byte[size()][];
     int t = 0;
-    for(int i = 1; i < size; i++) tmp[t++] = keys[i];
+    for(int i = 1; i < size; ++i) tmp[t++] = keys[i];
     return tmp;
   }
 
@@ -152,7 +152,7 @@ public class TokenSet {
     final int[] tmp = new int[s];
 
     final int l = bucket.length;
-    for(int i = 0; i != l; i++) {
+    for(int i = 0; i != l; ++i) {
       int id = bucket[i];
       while(id != 0) {
         final int p = Token.hash(keys[id]) & s - 1;

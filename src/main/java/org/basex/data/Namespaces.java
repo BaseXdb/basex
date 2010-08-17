@@ -248,7 +248,7 @@ public final class Namespaces {
   /**
    * Finds the nearest namespace node (in document order) for the given pre
    * value and sets it as the new root of the namespace hierarchy.
-   * 
+   *
    * This is only called when a MemData instance is inserted. Make sure the root
    * node is pre==-1, hence the actual root of the namespace hierarchy.
    * @param pre pre value to find nearest namespace node for
@@ -283,7 +283,7 @@ public final class Namespaces {
     t.header.add(TABLEDIST);
     t.header.add(TABLEPREF);
     t.header.add(TABLEURI);
-    for(int i = 0; i < 3; i++) t.align.add(true);
+    for(int i = 0; i < 3; ++i) t.align.add(true);
     table(t, root, s, e);
     return t.contents.size() != 0 ? t.finish() : Token.EMPTY;
   }
@@ -324,7 +324,7 @@ public final class Namespaces {
       final int ks = key.size();
       if(ks > 1 || key.get(0).length != 0) {
         if(key.size() != 1) tb.add("(");
-        for(int k = 0; k < ks; k++) {
+        for(int k = 0; k < ks; ++k) {
           if(k != 0) tb.add(", ");
           tb.add(key.get(k));
         }

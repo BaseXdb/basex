@@ -69,7 +69,7 @@ public final class CDoc extends CFrag {
     }
 
     final FDoc doc = new FDoc(nodes, base);
-    for(int n = 0; n < nodes.size(); n++) nodes.get(n).parent(doc);
+    for(int n = 0; n < nodes.size(); ++n) nodes.get(n).parent(doc);
     return doc;
   }
 

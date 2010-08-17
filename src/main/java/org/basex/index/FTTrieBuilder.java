@@ -98,7 +98,7 @@ final class FTTrieBuilder extends FTBuilder {
 
     // open all temporary sorted lists
     final FTList[] v = new FTList[csize];
-    for(int b = 0; b < csize; b++) v[b] = new FTTrieList(data, b);
+    for(int b = 0; b < csize; ++b) v[b] = new FTTrieList(data, b);
 
     final IntList il = new IntList();
     while(check(v)) {
@@ -106,7 +106,7 @@ final class FTTrieBuilder extends FTBuilder {
       il.reset();
       il.add(min);
       // find next token to write on disk
-      for(int i = 0; i < csize; i++) {
+      for(int i = 0; i < csize; ++i) {
         if(min == i || v[i].tok.length == 0) continue;
         final int d = diff(v[min].tok, v[i].tok);
         if(d > 0 || v[min].tok.length == 0) {
@@ -175,7 +175,7 @@ final class FTTrieBuilder extends FTBuilder {
     // write next pointer
     int j = 1;
     final int js = next.get(0).length - 2;
-    for(; j < js; j++) {
+    for(; j < js; ++j) {
       // pointer
       final int p = next.get(0)[j];
       outa.write4(p);
@@ -210,7 +210,7 @@ final class FTTrieBuilder extends FTBuilder {
     outa.write1(1);
     outa.write1(-1);
     // write tmp next pointer
-    for(int j = 0; j < roots.size(); j++) {
+    for(int j = 0; j < roots.size(); ++j) {
      outa.write4(0); // dummy pointer
      outa.write1(roots.get(j)); // first char of next node
     }
@@ -275,7 +275,7 @@ final class FTTrieBuilder extends FTBuilder {
     int s = siz;
     final int il = next.size();
     // loop over all trie nodes
-    for(int i = 1; i < il; i++) {
+    for(int i = 1; i < il; ++i) {
       final int[] nxt = next.get(i);
       // check pointer on data needs 1 or 2 ints
       final int lp = nxt[nxt.length - 1] >= 0 ? 0 : -1;
@@ -285,7 +285,7 @@ final class FTTrieBuilder extends FTBuilder {
       outa.writeBytes(tokens.get(nxt[0]));
       // write next pointer
       int j = 1;
-      for(; j < nxt.length - 2 + lp; j++) {
+      for(; j < nxt.length - 2 + lp; ++j) {
         outa.write4(nxt[j] + offset); // pointer
         // first char of next node
         outa.write1(tokens.get(next.get(nxt[j])[0])[0]);

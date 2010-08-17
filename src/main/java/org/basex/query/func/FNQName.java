@@ -39,7 +39,7 @@ final class FNQName extends Fun {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(func) {
+    switch(def) {
       case INSCOPE: return inscope(ctx,
           (Nod) checkType(expr[0].atomic(ctx, input), Type.ELM));
       default:      return super.iter(ctx);
@@ -53,7 +53,7 @@ final class FNQName extends Fun {
     final Item it = expr[0].atomic(ctx, input);
     final Item it2 = expr.length == 2 ? expr[1].atomic(ctx, input) : null;
 
-    switch(func) {
+    switch(def) {
       case RESQNAME:
         return it == null ? null : resolve(ctx, it, checkEmpty(it2));
       case QNAME:
@@ -128,7 +128,7 @@ final class FNQName extends Fun {
       final Atts at = n.ns();
       if(at == null) break;
       if(n != node || ctx.nsPreserve) {
-        for(int a = 0; a < at.size; a++) {
+        for(int a = 0; a < at.size; ++a) {
           if(!tl.contains(at.key[a])) tl.add(at.key[a]);
         }
       }

@@ -2,6 +2,7 @@ package org.basex.query;
 
 import static org.basex.util.Token.*;
 import org.basex.core.Text;
+import org.basex.util.Token;
 
 /**
  * This class contains common tokens for the query implementations.
@@ -424,6 +425,12 @@ public interface QueryTokens {
   /** Query Plan. */
   String ARG = "arg";
   /** Query Plan. */
+  String PAR = "(...)";
+  /** Query Info: Plan. */
+  byte[] PLAN = Token.token("QueryPlan");
+  /** Query Plan. */
+  byte[] OP = token("op");
+  /** Query Plan. */
   byte[] POS = token("pos");
   /** Query Plan. */
   byte[] VAR = token("var");
@@ -435,6 +442,10 @@ public interface QueryTokens {
   byte[] WHR = token("Where");
   /** Query Plan. */
   byte[] RET = token("Return");
+  /** Query Plan. */
+  byte[] THN = token("Then");
+  /** Query Plan. */
+  byte[] ELS = token("Else");
   /** Query Plan. */
   byte[] DIR = token("dir");
   /** Query Plan. */

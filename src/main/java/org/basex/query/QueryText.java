@@ -20,7 +20,7 @@ public interface QueryText {
   /** FONS Error type. */ String FONS = "FONS";
   /** FORG Error type. */ String FORG = "FORG";
   /** FORX Error type. */ String FORX = "FORX";
-  /** FOTY Error type. */ String FOUP = "FOUP";
+  /** FOUP Error type. */ String FOUP = "FOUP";
   /** FTDY Error type. */ String FTDY = "FTDY";
   /** FTST Error type. */ String FTST = "FTST";
   /** XPDY Error type. */ String XPDY = "XPDY";
@@ -30,7 +30,7 @@ public interface QueryText {
   /** XQST Error type. */ String XQST = "XQST";
   /** XQTY Error type. */ String XQTY = "XQTY";
   /** XUDY Error type. */ String XUDY = "XUDY";
-  /** XQUS Error type. */ String XUST = "XUST";
+  /** XUST Error type. */ String XUST = "XUST";
   /** XUTY Error type. */ String XUTY = "XUTY";
 
   /** BASX0000: Evaluation exception. */
@@ -59,7 +59,7 @@ public interface QueryText {
   /** FOCA0003: Evaluation exception. */
   Object[] INTRANGE = { FOCA, 3, "Integer value out of range: %" };
   /** FOCA0005: Evaluation exception. */
-  Object[] DATECALC = { FOCA, 5, "Invalid % calculation (%)." };
+  Object[] DATECALC = { FOCA, 5, "Invalid % calculation: %." };
 
   /** FOCH0001: Evaluation exception. */
   Object[] INVCODE = { FOCH, 1, "Invalid codepoint '%'." };
@@ -95,7 +95,7 @@ public interface QueryText {
   Object[] PICNUM = { FODF, 1310, "Invalid picture string: \"%\"." };
 
   /** FODT0002: Evaluation exception. */
-  Object[] DATEZERO = { FODT, 2, "Invalid infinity/zero calculation in %." };
+  Object[] DATEZERO = { FODT, 2, "Invalid % calculation: infinity/zero." };
   /** FODT0003: Evaluation exception. */
   Object[] INVALZONE = { FODT, 3, "Invalid timezone: %." };
 
@@ -334,7 +334,7 @@ public interface QueryText {
   Object[] COMPSELF = { XPST, 5, "Warning: '%' will not yield any results." };
 
   /** XPST0008: Parsing exception. */
-  Object[] VARNOTDEFINED = { XPST, 8, "Undefined variable \"%\"." };
+  Object[] VARNOTDEFINED = { XPST, 8, "Undefined variable %." };
   /** XPST0017: Parsing Exception. */
   Object[] XPARGS = { XPST, 17, "Wrong arguments: % expected." };
   /** XPST0017: Parsing exception. */
@@ -454,7 +454,7 @@ public interface QueryText {
   /** XQST0076: Parsing exception. */
   Object[] COLLWHICH = { XQST, 38, "Unknown collation \"%\"." };
   /** XQST0039: Parsing exception. */
-  Object[] FUNCDUPL = { XQST, 39, "Duplicate function argument %." };
+  Object[] FUNCDUPL = { XQST, 39, "Duplicate function argument $%." };
   /** XQST0040: Parsing exception. */
   Object[] ATTDUPL = { XQST, 40, "Duplicate attribute \"%\"." };
   /** XQST0045: Parsing exception. */
@@ -610,23 +610,19 @@ public interface QueryText {
   /** Optimization info. */
   String OPTWRITE = "rewriting %";
   /** Optimization info. */
-  String OPTFALSE = "removing always false expression: %";
+  String OPTREMOVE = "%: removing %";
   /** Optimization info. */
-  String OPTTRUE = "removing always true expression: %";
+  String OPTSWAP = "operands swapped: %";
   /** Optimization info. */
   String OPTTEXT = "adding text() step";
   /** Optimization info. */
-  String OPTSIMPLE = "simplifying: % => %";
-  /** Optimization info. */
   String OPTFLWOR = "simplifying flwor expression";
   /** Optimization info. */
-  String OPTINLINE = "inlining function %";
+  String OPTINLINE = "inlining function %(...)";
   /** Optimization info. */
   String OPTWHERE = "converting where clause to predicate";
   /** Optimization info. */
   String OPTVAR = "removing variable %";
-  /** Optimization info. */
-  String OPTRED = "merging redundant location paths";
   /** Optimization info. */
   String OPTNAME = "removing unknown tag/attribute \"%\"";
   /** Optimization info. */
@@ -637,8 +633,6 @@ public interface QueryText {
   String OPTFTXINDEX = "applying full-text index";
   /** Optimization info. */
   String OPTRNGINDEX = "applying range index";
-  /** Optimization info. */
-  String OPTEMPTY = "removing empty sequences.";
   /** Optimization info. */
   String OPTNOINDEX = "removing path with no index results";
   /** Optimization info. */

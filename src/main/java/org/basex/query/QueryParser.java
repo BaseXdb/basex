@@ -15,12 +15,12 @@ import org.basex.query.expr.CDoc;
 import org.basex.query.expr.CElem;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.CText;
-import org.basex.query.expr.Calc;
+import org.basex.query.expr.Arith;
 import org.basex.query.expr.TypeCase;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Castable;
 import org.basex.query.expr.Catch;
-import org.basex.query.expr.Clc;
+import org.basex.query.expr.Calc;
 import org.basex.query.expr.CmpG;
 import org.basex.query.expr.CmpN;
 import org.basex.query.expr.CmpV;
@@ -47,7 +47,7 @@ import org.basex.query.expr.Pragma;
 import org.basex.query.expr.Filter;
 import org.basex.query.expr.Range;
 import org.basex.query.expr.Root;
-import org.basex.query.expr.Quantified;
+import org.basex.query.expr.Quantifier;
 import org.basex.query.expr.Scored;
 import org.basex.query.expr.Switch;
 import org.basex.query.expr.Treat;
@@ -55,7 +55,7 @@ import org.basex.query.expr.Try;
 import org.basex.query.expr.TypeSwitch;
 import org.basex.query.expr.Unary;
 import org.basex.query.expr.Union;
-import org.basex.query.expr.VarCall;
+import org.basex.query.expr.VarRef;
 import org.basex.query.ft.FTAnd;
 import org.basex.query.ft.FTContains;
 import org.basex.query.ft.FTContent;
@@ -172,8 +172,7 @@ public class QueryParser extends InputParser {
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final IO f, final Uri u)
-      throws QueryException {
+  public final Expr parse(final IO f, final Uri u) throws QueryException {
     file = f;
     if(!more()) error(QUERYEMPTY);
     final int v = valid();
@@ -186,35 +185,34 @@ public class QueryParser extends InputParser {
    * If {@code u != null}, the query is treated as a module
    * [  1] Parses a Module.
    * @param u module uri
-   * @param end if true, input must be completely evaluated
+   * @param c if true, input must be completely evaluated
    * @return resulting expression
    * @throws QueryException query exception
    */
-  public final Expr parse(final Uri u, final boolean end)
-      throws QueryException {
-
+  public final Expr parse(final Uri u, final boolean c) throws QueryException {
+    Expr expr = null;
     try {
       versionDecl();
-      Expr ex = null;
       if(u == null) {
-        ex = mainModule();
-        if(ex == null) if(alter != null) error(); else error(EXPREMPTY);
+        expr = mainModule();
+        if(expr == null) if(alter != null) error(); else error(EXPREMPTY);
       } else {
         moduleDecl(u);
       }
 
-      if(end && more()) {
+      if(c && more()) {
         if(alter != null) error();
         error(QUERYEND, rest());
       }
-      ctx.fun.check();
-      ctx.ns.finish(ctx.nsElem);
-      return ex;
     } catch(final QueryException ex) {
       mark();
       ex.pos(this);
       throw ex;
     }
+    ctx.funcs.check();
+    ctx.vars.check();
+    ctx.ns.finish(ctx.nsElem);
+    return expr;
   }
 
   /**
@@ -563,7 +561,7 @@ public class QueryParser extends InputParser {
         }
         if(!found) error(NOMODULE, uri);
       }
-      for(int n = 0; n < fl.size(); n++) {
+      for(int n = 0; n < fl.size(); ++n) {
         module(string(fl.get(n)), name.uri);
         modLoaded.add(uri);
       }
@@ -606,28 +604,28 @@ public class QueryParser extends InputParser {
     final QNm name = varName();
     if(module != null && !name.uri.eq(module.uri)) error(MODNS, name);
 
-    final SeqType typ = consumeWS(AS) ? sequenceType() : null;
-    final Var var = new Var(input(), name, typ).global();
-    final Var old = ctx.vars.get(var);
+    final SeqType t = consumeWS(AS) ? sequenceType() : null;
+    final Var v = new Var(input(), name, t);
+
+    // check if variable has already been declared
+    final Var o = ctx.vars.get(v);
+    // throw no error if a variable has been externally bound
+    if(o != null && o.declared) error(VARDEFINE, o);
+    (o != null ? o : v).declared = true;
 
     if(consumeWS2(EXTERNAL)) {
-      if(old == null) {
-        ctx.vars.addGlobal(var);
-      } else {
-        if(old.expr == null || typ != null && old.value == null) {
-          error(VARDEFINE, var);
-        }
-        // a variable has been bound before the query has been parsed...
-        if(typ != null) {
-          old.type = typ;
-          old.value(ctx);
-        }
+      if(o != null && t != null) {
+        // bind value with new type
+        o.type = t;
+        o.value = null;
       }
     } else {
-      if(old != null) error(VARDEFINE, var);
       check(ASSIGN);
-      ctx.vars.addGlobal(var.bind(check(single(), VARMISSING), ctx));
+      v.bind(check(single(), VARMISSING), ctx);
     }
+
+    // bind variable if not done yet
+    if(o == null) ctx.vars.addGlobal(v);
   }
 
   /**
@@ -664,9 +662,9 @@ public class QueryParser extends InputParser {
     while(curr() == '$') {
       final QNm arg = varName();
       final SeqType argType = consumeWS(AS) ? sequenceType() : null;
-      final Var var = new Var(input(), arg, argType).global();
+      final Var var = new Var(input(), arg, argType);
       ctx.vars.add(var);
-      for(final Var v : args) if(v.name.eq(arg)) error(FUNCDUPL, arg);
+      for(final Var v : args) if(v.name.eq(arg)) error(FUNCDUPL, arg.atom());
 
       args = Array.add(args, var);
       if(!consume(',')) break;
@@ -676,10 +674,10 @@ public class QueryParser extends InputParser {
 
     final SeqType type = consumeWS(AS) ? sequenceType() : null;
     final Func func = new Func(input(),
-        new Var(input(), name, type).global(), args, true);
+        new Var(input(), name, type), args, true);
     func.updating = up;
 
-    ctx.fun.add(func, this);
+    ctx.funcs.add(func, this);
     if(!consumeWS(EXTERNAL)) func.expr = enclosed(NOFUNBODY);
     ctx.vars.reset(s);
   }
@@ -710,9 +708,9 @@ public class QueryParser extends InputParser {
     }
 
     if(!consumeWS2(COMMA)) return e;
-    Expr[] list = { e };
-    do list = add(list, single()); while(consumeWS2(COMMA));
-    return new List(input(), list);
+    Expr[] l = { e };
+    do l = add(l, single()); while(consumeWS2(COMMA));
+    return new List(input(), l);
   }
 
   /**
@@ -814,13 +812,14 @@ public class QueryParser extends InputParser {
         if(comma && !fr) score = consumeWS(SCORE);
 
         final QNm name = varName();
-        final SeqType type = !score && consumeWS(AS) ? sequenceType() : null;
+        final SeqType type = score ? SeqType.DBL :
+          consumeWS(AS) ? sequenceType() : null;
         final Var var = new Var(input(), name, type);
 
         final Var at = fr && consumeWS(AT) ?
-            new Var(input(), varName()) : null;
+            new Var(input(), varName(), SeqType.ITR) : null;
         final Var sc = fr && consumeWS(SCORE) ?
-            new Var(input(), varName()) : null;
+            new Var(input(), varName(), SeqType.DBL) : null;
 
         check(fr ? IN : ASSIGN);
         final Expr e = check(single(), VARMISSING);
@@ -910,7 +909,7 @@ public class QueryParser extends InputParser {
     check(SATISFIES);
     final Expr e = check(single(), NOSOME);
     ctx.vars.reset(s);
-    return new Quantified(input(), fl, e, !some);
+    return new Quantifier(input(), fl, e, !some);
   }
 
   /**
@@ -1091,7 +1090,7 @@ public class QueryParser extends InputParser {
       final Calc c = consume('+') ? Calc.PLUS : consume('-') ?
           Calc.MINUS : null;
       if(c == null) break;
-      e = new Clc(input(), e, check(multiplicative(), CALCEXPR), c);
+      e = new Arith(input(), e, check(multiplicative(), CALCEXPR), c);
     }
     return e;
   }
@@ -1108,7 +1107,7 @@ public class QueryParser extends InputParser {
         Calc.DIV : consumeWS(IDIV) ? Calc.IDIV : consumeWS(MOD) ?
         Calc.MOD : null;
       if(c == null) break;
-      e = new Clc(input(), e, check(union(), CALCEXPR), c);
+      e = new Arith(input(), e, check(union(), CALCEXPR), c);
     }
     return e;
   }
@@ -1252,8 +1251,8 @@ public class QueryParser extends InputParser {
    */
   private Expr extension() throws QueryException {
     final Expr[] pragmas = pragma();
-    return pragmas.length == 0 ? null
-        : new Extension(input(), pragmas, enclosed(NOPRAGMA));
+    return pragmas.length == 0 ? null :
+      new Extension(input(), pragmas, enclosed(NOPRAGMA));
   }
 
   /**
@@ -1344,7 +1343,7 @@ public class QueryParser extends InputParser {
     // check if all steps are axis steps
     boolean axes = true;
     final Step[] tmp = new Step[list.length];
-    for(int l = 0; l < list.length; l++) {
+    for(int l = 0; l < list.length; ++l) {
       axes &= list[l] instanceof Step;
       if(axes) tmp[l] = (Step) list[l];
     }
@@ -1543,7 +1542,7 @@ public class QueryParser extends InputParser {
       final Var v = new Var(input(), varName());
       final Var var = ctx.vars.get(v);
       if(var == null) error(VARNOTDEFINED, v);
-      return new VarCall(input(), var);
+      return new VarRef(input(), var);
     }
     // parentheses
     if(c == '(' && next() != '#') return parenthesized();
@@ -1650,7 +1649,7 @@ public class QueryParser extends InputParser {
         ctx.ns.uri(name);
         name.uri = Uri.uri(name.ns() ?
             ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
-        final Expr func = ctx.fun.get(name, exprs, ctx, this);
+        final Expr func = ctx.funcs.get(name, exprs, ctx, this);
         if(func != null) {
           alter = null;
           return func;
@@ -1828,7 +1827,7 @@ public class QueryParser extends InputParser {
       } else if(c != 0) {
         entity(tb);
       } else {
-        error(NOCLOSING, tag);
+        error(NOCLOSING, tag.atom());
       }
     } while(true);
   }
@@ -2759,7 +2758,7 @@ public class QueryParser extends InputParser {
     if(consume('&')) {
       if(consume('#')) {
         final int b = consume('x') ? 16 : 10;
-        long n = 0;
+        int n = 0;
         do {
           final char c = curr();
           final boolean m = digit(c);
@@ -2772,7 +2771,7 @@ public class QueryParser extends InputParser {
           if(!m) n += 9;
         } while(!consume(';'));
         if(!XMLToken.valid(n)) invalidEnt(p, INVCHARREF);
-        tb.addUTF((int) n);
+        tb.addUTF(n);
       } else {
         if(consume("lt")) {
           tb.add('<');
@@ -2969,7 +2968,7 @@ public class QueryParser extends InputParser {
   private void error() throws QueryException {
     qp = ap;
     if(alter.length != 1) error(alter);
-    ctx.fun.funError((QNm) alter[0], this);
+    ctx.funcs.funError((QNm) alter[0], this);
     error(FUNCUNKNOWN, ((QNm) alter[0]).atom());
   }
 

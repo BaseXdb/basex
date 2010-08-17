@@ -68,7 +68,7 @@ public final class BlockAccessTest {
 
     final int bytecount = size * (1 << IO.NODEPOWER);
     storage = new byte[bytecount];
-    for(int i = 0; i < bytecount; i++) {
+    for(int i = 0; i < bytecount; ++i) {
       storage[i] = (byte) tda.read1(i >> IO.NODEPOWER, i % (1 << IO.NODEPOWER));
     }
     nodes = IO.BLOCKSIZE >>> IO.NODEPOWER;
@@ -110,7 +110,7 @@ public final class BlockAccessTest {
       final int currentNodeNumber, final int count) {
     final int startOffset = startNodeNumber << IO.NODEPOWER;
     final int currentOffset = currentNodeNumber << IO.NODEPOWER;
-    for(int i = 0; i < count << IO.NODEPOWER; i++) {
+    for(int i = 0; i < count << IO.NODEPOWER; ++i) {
       final int startByteNum = startOffset + i;
       final int currentByteNum = currentOffset + i;
       final byte startByte = storage[startByteNum];
@@ -313,8 +313,8 @@ public final class BlockAccessTest {
    * @param count number of entries
    */
   private void assertAreInserted(final int startNum, final int count) {
-    for(int i = 0; i < count; i++)
-      for(int j = 0; j < 1 << IO.NODEPOWER; j++)
+    for(int i = 0; i < count; ++i)
+      for(int j = 0; j < 1 << IO.NODEPOWER; ++j)
         assertEquals(5, tda.read1(startNum + i, j));
   }
 
@@ -326,7 +326,7 @@ public final class BlockAccessTest {
    */
   private byte[] getTestEntries(final int e) {
     final byte[] result = new byte[e << IO.NODEPOWER];
-    for(int i = 0; i < result.length; i++) result[i] = 5;
+    for(int i = 0; i < result.length; ++i) result[i] = 5;
     return result;
   }
 }

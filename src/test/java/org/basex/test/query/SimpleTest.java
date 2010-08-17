@@ -31,8 +31,6 @@ public final class SimpleTest extends QueryTest {
       "</html>";
 
     queries = new Object[][] {
-      { "Boolean 1", bool(false), "false()" },
-      { "Boolean 2", bool(true), "true()" },
       { "Int 1", itr(1), "1" },
       { "Int 2", itr(-1), "-1" },
       { "Int 3", itr(1234567890), "1234567890" },
@@ -71,8 +69,6 @@ public final class SimpleTest extends QueryTest {
       { "Ancestor 2", nod(0, 1), "/*/*/ancestor::node()" },
       { "Attribute 1", nod(4, 9, 10, 11, 12, 16), "//@*" },
       { "Attribute 2", nod(4, 9, 10, 11, 12, 16), "//*/attribute::node()" },
-      { "Index 1", nod(20), "//li[text() = 'Exercise 1']" },
-      { "Index 2", nod(21), "//li[text() = 'Exercise 1']/text()" },
       { "Pred 1", nod(1), "/*[/]" },
       { "Pred 2", nod(1), "/*[/*]" },
       { "Pred 3", nod(19), "//ul[li]" },
@@ -87,6 +83,7 @@ public final class SimpleTest extends QueryTest {
       { "Pred Error 2", "/*[]" },
       { "Pred Error 3", "/*[//]" },
       { "Pred Error 4", "/*[li" },
+
       { "PosPred 1", nod(20), "//li[1]" },
       { "PosPred 2", nod(20), "//li[position() = 1]" },
       { "PosPred 3", nod(22), "//li[2]" },
@@ -98,6 +95,8 @@ public final class SimpleTest extends QueryTest {
       { "PosPred 9", nod(8, 15, 19, 22), "//*[position() > 1.1]" },
       { "PosPred A", nod(), "//*[position() <= 0.9]" },
       { "PosPred B", str("XML"), "(('XML')[1])[1]" },
+      { "PosPred C", itr(1), "1[position() = 1 to 2]" },
+
       { "Prec 1", nod(3, 5), "//body/preceding::*" },
       { "Prec 2", nod(3, 5), "//@id/preceding::*" },
       { "Union 1", nod(0), ".|." },
@@ -109,12 +108,23 @@ public final class SimpleTest extends QueryTest {
         "(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]" },
       { "FLWOR 3", itr(10000000), "count(for $i in 1 to 10000000 return $i)" },
       { "FLWOR 4", itr(100000), "count(for $i in 1 to 100000 return $i * $i)" },
-      { "FLWOR 5", itr(100000000),
-        "count(for $i in 1 to 10000 for $i in 1 to 10000 return $i * $i)" },
+      { "FLWOR 5", itr(1000000000000l),
+        "count(for $i in 1 to 10000000 for $i in 1 to 100000 return $i * $i)" },
       { "FLWOR 6", itr(2),
         "count((for $a in (1,2) for $b in <b/> return $b)/.)" },
       { "FLWOR 7", itr(2),
         "count((for $a in (1,2) let $b := <b/> return $b)/.)" },
+      { "FLWOR 8", bool(true), "declare namespace x = 'X'; " +
+        "let $a := <a>0</a> let $b := $a return $b = 0" },
+
+      { "Index 1", nod(20), "//li[text() = 'Exercise 1']" },
+      { "Index 2", nod(21), "//li[text() = 'Exercise 1']/text()" },
+      { "Index 3", nod(5), "for $a in //title where $a = 'XML' return $a" },
+      { "Index 4", nod(5), "for $a in //* where $a/text() = 'XML' return $a" },
+      { "Index 5", nod(3, 5), "for $a in //* where $a = 'XML' return $a" },
+
+      { "ExtVar 1", itr(1), "declare variable $a external; 1" },
+      { "ExtVar 2", "declare variable $a external; $a" },
     };
   }
 

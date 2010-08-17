@@ -251,7 +251,7 @@ public final class BaseXLayout {
     int nr = 0, ng = 0, nb = 0;
     int cr = 0, cg = 0, cb = 0;
     int hh = 0;
-    for(int y = 0; y < h; y++) {
+    for(int y = 0; y < h; ++y) {
       nr = r + (int) (rf * y);
       ng = g + (int) (gf * y);
       nb = b + (int) (bf * y);

@@ -118,7 +118,7 @@ public final class Thesaurus {
       final Data data = MemBuilder.build(
           Parser.fileParser(file, ctx.prop, ""), ctx.prop);
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
-      for(int n = 0; n < result.size(); n++) {
+      for(int n = 0; n < result.size(); ++n) {
         build(new Nodes(result.nodes[n], data));
       }
     } catch(final IOException ex) {
@@ -137,7 +137,7 @@ public final class Thesaurus {
     if(sub.size() == 0) return;
 
     final ThesNode node = getNode(text("*:term", in));
-    for(int n = 0; n < sub.size(); n++) {
+    for(int n = 0; n < sub.size(); ++n) {
       final Nodes tmp = new Nodes(sub.nodes[n], sub.data);
       final ThesNode snode = getNode(text("*:term", tmp));
       final byte[] rs = text("*:relationship", tmp);
@@ -210,7 +210,7 @@ public final class Thesaurus {
   private void find(final TokenList list, final ThesNode node, final long lev) {
     if(lev > max || node == null) return;
 
-    for(int n = 0; n < node.size; n++) {
+    for(int n = 0; n < node.size; ++n) {
       if(rel.length == 0 || eq(node.rs[n], rel)) {
         final byte[] term = node.nodes[n].term;
         if(!list.contains(term)) {

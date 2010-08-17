@@ -38,7 +38,7 @@ public final class DataInput extends BufferInput {
     final int l = readNum();
     if(l == 0) return Token.EMPTY;
     final byte[] array = new byte[l];
-    for(int i = 0; i < l; i++) array[i] = readByte();
+    for(int i = 0; i < l; ++i) array[i] = readByte();
     return array;
   }
 
@@ -68,7 +68,7 @@ public final class DataInput extends BufferInput {
    */
   public int[] readNums(final int s) throws IOException {
     final int[] array = new int[s];
-    for(int a = 0; a < s; a++) array[a] = readNum();
+    for(int a = 0; a < s; ++a) array[a] = readNum();
     return array;
   }
 
@@ -80,7 +80,7 @@ public final class DataInput extends BufferInput {
   public byte[][] readBytesArray() throws IOException {
     final int l = readNum();
     final byte[][] array = new byte[l][];
-    for(int i = 0; i < l; i++) array[i] = readBytes();
+    for(int i = 0; i < l; ++i) array[i] = readBytes();
     return array;
   }
 

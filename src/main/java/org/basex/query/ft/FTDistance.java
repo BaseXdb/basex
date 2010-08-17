@@ -40,7 +40,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public FTExpr comp(final QueryContext ctx) throws QueryException {
-    for(int d = 0; d != dist.length; d++) dist[d] = dist[d].comp(ctx);
+    for(int d = 0; d != dist.length; ++d) dist[d] = dist[d].comp(ctx);
     return super.comp(ctx);
   }
 
@@ -76,15 +76,15 @@ public final class FTDistance extends FTFilter {
   }
 
   @Override
-  public boolean removable(final Var v, final QueryContext ctx) {
-    for(int d = 0; d != dist.length; d++) if(!dist[d].removable(v, ctx))
-      return false;
-    return super.removable(v, ctx);
+  public boolean removable(final Var v) {
+    for(int d = 0; d != dist.length; ++d)
+      if(!dist[d].removable(v)) return false;
+    return super.removable(v);
   }
 
   @Override
   public FTExpr remove(final Var v) {
-    for(int d = 0; d != dist.length; d++) dist[d] = dist[d].remove(v);
+    for(int d = 0; d != dist.length; ++d) dist[d] = dist[d].remove(v);
     return super.remove(v);
   }
 

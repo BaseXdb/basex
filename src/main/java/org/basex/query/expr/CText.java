@@ -25,6 +25,7 @@ public final class CText extends CFrag {
    */
   public CText(final InputInfo ii, final Expr t) {
     super(ii, t);
+    type = SeqType.NOD_ZO;
   }
 
   @Override
@@ -44,11 +45,6 @@ public final class CText extends CFrag {
     } while((it = iter.next()) != null);
 
     return new FTxt(tb.finish(), null);
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.NOD_ZO;
   }
 
   @Override

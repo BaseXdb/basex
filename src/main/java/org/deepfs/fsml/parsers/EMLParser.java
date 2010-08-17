@@ -193,7 +193,7 @@ public final class EMLParser implements IFileParser {
       55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -2, -1, -1, -1, 0, 1, 2, 3, 4, 5,
       6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
       25, -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36,
-      37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51};
+      37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 };
   /** The format of the date values. */
   static final SimpleDateFormat SDF = new SimpleDateFormat(
       "EEE, d MMM yyyy HH:mm:ss Z", Locale.US);
@@ -630,7 +630,7 @@ public final class EMLParser implements IFileParser {
   static byte[] decodeQ(final byte[] text, final boolean utf) {
     final TokenBuilder tmp = new TokenBuilder();
     final int len = text.length;
-    for(int i = 0; i < len; i++) {
+    for(int i = 0; i < len; ++i) {
       final byte c = text[i];
       if(c == '=') {
         if(i + 2 >= len) break;

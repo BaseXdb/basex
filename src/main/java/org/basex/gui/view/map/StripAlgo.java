@@ -39,7 +39,7 @@ final class StripAlgo extends MapAlgo {
       final MapRects tmp = new MapRects();
 
       double y = yy;
-      for(int i = start; i <= ni; i++) {
+      for(int i = start; i <= ni; ++i) {
         int h = i == ni ? (int) (yy + hh - y) :
           (int) (ml.weight[i] / weight * hh);
         h = h > 0 ? h : 1;

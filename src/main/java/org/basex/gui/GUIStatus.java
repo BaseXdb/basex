@@ -78,7 +78,7 @@ public final class GUIStatus extends BaseXPanel {
     final StringBuilder sb = new StringBuilder(status);
     if(fm.stringWidth(status) > fw) {
       sb.setLength(0);
-      for(int s = 0; s < status.length() && fw > 0; s++) {
+      for(int s = 0; s < status.length() && fw > 0; ++s) {
         sb.append(status.charAt(s));
         fw -= fm.charWidth(sb.charAt(s));
       }

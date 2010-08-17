@@ -40,10 +40,10 @@ import org.w3c.dom.Text;
  */
 public enum Type {
   /** Item type. */
-  ITEM("item", null, EMPTY, false, false, false, false),
+  ITEM("item", null, EMPTY, false, false, false, false, false),
 
   /** Any atomic type. */
-  AAT("anyAtomicType", ITEM, XSURI, false, false, false, false) {
+  AAT("anyAtomicType", ITEM, XSURI, false, false, false, false, false) {
     @Override
     public Atm e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Atm(it.atom());
@@ -55,7 +55,7 @@ public enum Type {
   },
 
   /** Untyped Atomic type. */
-  ATM("untypedAtomic", AAT, XSURI, false, true, true, false) {
+  ATM("untypedAtomic", AAT, XSURI, false, true, true, false, false) {
     @Override
     public Atm e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Atm(it.atom());
@@ -67,7 +67,7 @@ public enum Type {
   },
 
   /** String type. */
-  STR("string", AAT, XSURI, false, false, true, false) {
+  STR("string", AAT, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return Str.get(it.atom());
@@ -79,7 +79,7 @@ public enum Type {
   },
 
   /** Normalized String type. */
-  NST("normalizedString", STR, XSURI, false, false, true, false) {
+  NST("normalizedString", STR, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Str(it.atom(), this);
@@ -91,7 +91,7 @@ public enum Type {
   },
 
   /** Token type. */
-  TOK("token", NST, XSURI, false, false, true, false) {
+  TOK("token", NST, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii) {
       return new Str(norm(it.atom()), this);
@@ -103,7 +103,7 @@ public enum Type {
   },
 
   /** Language type. */
-  LAN("language", TOK, XSURI, false, false, true, false) {
+  LAN("language", TOK, XSURI, false, false, true, false, false) {
     final Pattern pat = Pattern.compile("[A-Za-z]{1,8}(-[A-Za-z0-9]{1,8})*");
 
     @Override
@@ -120,7 +120,7 @@ public enum Type {
   },
 
   /** NMTOKEN type. */
-  NMT("NMTOKEN", TOK, XSURI, false, false, true, false) {
+  NMT("NMTOKEN", TOK, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -135,7 +135,7 @@ public enum Type {
   },
 
   /** Name type. */
-  NAM("Name", TOK, XSURI, false, false, true, false) {
+  NAM("Name", TOK, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -150,7 +150,7 @@ public enum Type {
   },
 
   /** NCName type. */
-  NCN("NCName", NAM, XSURI, false, false, true, false) {
+  NCN("NCName", NAM, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -163,7 +163,7 @@ public enum Type {
   },
 
   /** ID type. */
-  ID("ID", NCN, XSURI, false, false, true, false) {
+  ID("ID", NCN, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -176,7 +176,7 @@ public enum Type {
   },
 
   /** IDREF type. */
-  IDR("IDREF", NCN, XSURI, false, false, true, false) {
+  IDR("IDREF", NCN, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -189,7 +189,7 @@ public enum Type {
   },
 
   /** Entity type. */
-  ENT("ENTITY", NCN, XSURI, false, false, true, false) {
+  ENT("ENTITY", NCN, XSURI, false, false, true, false, false) {
     @Override
     public Str e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -202,7 +202,7 @@ public enum Type {
   },
 
   /** Float type. */
-  FLT("float", AAT, XSURI, true, false, false, false) {
+  FLT("float", AAT, XSURI, true, false, false, false, false) {
     @Override
     public Flt e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -215,7 +215,7 @@ public enum Type {
   },
 
   /** Double type. */
-  DBL("double", AAT, XSURI, true, false, false, false) {
+  DBL("double", AAT, XSURI, true, false, false, false, false) {
     @Override
     public Dbl e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -228,7 +228,7 @@ public enum Type {
   },
 
   /** Decimal type. */
-  DEC("decimal", AAT, XSURI, true, false, false, false) {
+  DEC("decimal", AAT, XSURI, true, false, false, false, false) {
     @Override
     public Dec e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -241,20 +241,20 @@ public enum Type {
   },
 
   /** Integer type. */
-  ITR("integer", DEC, XSURI, true, false, false, false) {
+  ITR("integer", DEC, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
       return e(it, ii);
     }
     @Override
-    public Itr e(final Object o, final InputInfo ii) throws QueryException { 
+    public Itr e(final Object o, final InputInfo ii) throws QueryException {
       return Itr.get(checkLong(o, 0, 0, ii));
     }
   },
 
   /** Non-positive integer type. */
-  NPI("nonPositiveInteger", ITR, XSURI, true, false, false, false) {
+  NPI("nonPositiveInteger", ITR, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -267,7 +267,7 @@ public enum Type {
   },
 
   /** Negative integer type. */
-  NIN("negativeInteger", NPI, XSURI, true, false, false, false) {
+  NIN("negativeInteger", NPI, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -280,7 +280,7 @@ public enum Type {
   },
 
   /** Long type. */
-  LNG("long", ITR, XSURI, true, false, false, false) {
+  LNG("long", ITR, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -293,7 +293,7 @@ public enum Type {
   },
 
   /** Int type. */
-  INT("int", LNG, XSURI, true, false, false, false) {
+  INT("int", LNG, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -306,7 +306,7 @@ public enum Type {
   },
 
   /** Short type. */
-  SHR("short", INT, XSURI, true, false, false, false) {
+  SHR("short", INT, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -319,7 +319,7 @@ public enum Type {
   },
 
   /** Byte type. */
-  BYT("byte", SHR, XSURI, true, false, false, false) {
+  BYT("byte", SHR, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -332,7 +332,7 @@ public enum Type {
   },
 
   /** Non-negative integer type. */
-  NNI("nonNegativeInteger", ITR, XSURI, true, false, false, false) {
+  NNI("nonNegativeInteger", ITR, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -345,7 +345,7 @@ public enum Type {
   },
 
   /** Unsigned long type. */
-  ULN("unsignedLong", NNI, XSURI, true, false, false, false) {
+  ULN("unsignedLong", NNI, XSURI, true, false, false, false, false) {
     /** Maximum value. */
     final BigDecimal max = new BigDecimal(Long.MAX_VALUE).multiply(
         BigDecimal.valueOf(2)).add(BigDecimal.ONE);
@@ -365,7 +365,7 @@ public enum Type {
   },
 
   /** Short type. */
-  UIN("unsignedInt", ULN, XSURI, true, false, false, false) {
+  UIN("unsignedInt", ULN, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -378,7 +378,7 @@ public enum Type {
   },
 
   /** Unsigned Short type. */
-  USH("unsignedShort", UIN, XSURI, true, false, false, false) {
+  USH("unsignedShort", UIN, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -391,7 +391,7 @@ public enum Type {
   },
 
   /** Unsigned byte type. */
-  UBY("unsignedByte", USH, XSURI, true, false, false, false) {
+  UBY("unsignedByte", USH, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -404,7 +404,7 @@ public enum Type {
   },
 
   /** Positive integer type. */
-  PIN("positiveInteger", NNI, XSURI, true, false, false, false) {
+  PIN("positiveInteger", NNI, XSURI, true, false, false, false, false) {
     @Override
     public Itr e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -417,7 +417,7 @@ public enum Type {
   },
 
   /** Duration type. */
-  DUR("duration", AAT, XSURI, false, false, false, true) {
+  DUR("duration", AAT, XSURI, false, false, false, true, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -431,7 +431,7 @@ public enum Type {
   },
 
   /** Year month duration type. */
-  YMD("yearMonthDuration", DUR, XSURI, false, false, false, true) {
+  YMD("yearMonthDuration", DUR, XSURI, false, false, false, true, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -445,7 +445,7 @@ public enum Type {
   },
 
   /** Day time duration type. */
-  DTD("dayTimeDuration", DUR, XSURI, false, false, false, true) {
+  DTD("dayTimeDuration", DUR, XSURI, false, false, false, true, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -459,7 +459,7 @@ public enum Type {
   },
 
   /** DateTime type. */
-  DTM("dateTime", AAT, XSURI, false, false, false, false) {
+  DTM("dateTime", AAT, XSURI, false, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -473,7 +473,7 @@ public enum Type {
   },
 
   /** Date type. */
-  DAT("date", AAT, XSURI, false, false, false, false) {
+  DAT("date", AAT, XSURI, false, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -487,7 +487,7 @@ public enum Type {
   },
 
   /** Time type. */
-  TIM("time", AAT, XSURI, false, false, false, false) {
+  TIM("time", AAT, XSURI, false, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -501,7 +501,7 @@ public enum Type {
   },
 
   /** Year month type. */
-  YMO("gYearMonth", AAT, XSURI, false, false, false, false) {
+  YMO("gYearMonth", AAT, XSURI, false, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -515,7 +515,7 @@ public enum Type {
   },
 
   /** Year type. */
-  YEA("gYear", AAT, XSURI, false, false, false, false) {
+  YEA("gYear", AAT, XSURI, false, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -529,7 +529,7 @@ public enum Type {
   },
 
   /** Month day type. */
-  MDA("gMonthDay", AAT, XSURI, false, false, false, false) {
+  MDA("gMonthDay", AAT, XSURI, false, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -543,7 +543,7 @@ public enum Type {
   },
 
   /** Day type. */
-  DAY("gDay", AAT, XSURI, false, false, false, false) {
+  DAY("gDay", AAT, XSURI, false, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -557,7 +557,7 @@ public enum Type {
   },
 
   /** Month type. */
-  MON("gMonth", AAT, XSURI, false, false, false, false) {
+  MON("gMonth", AAT, XSURI, false, false, false, false, true) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -571,7 +571,7 @@ public enum Type {
   },
 
   /** Boolean type. */
-  BLN("boolean", AAT, XSURI, false, false, false, false) {
+  BLN("boolean", AAT, XSURI, false, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -585,7 +585,7 @@ public enum Type {
   },
 
   /** Base64 binary type. */
-  B6B("base64Binary", AAT, XSURI, false, false, false, false) {
+  B6B("base64Binary", AAT, XSURI, false, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -599,7 +599,7 @@ public enum Type {
   },
 
   /** Hex binary type. */
-  HEX("hexBinary", AAT, XSURI, false, false, false, false) {
+  HEX("hexBinary", AAT, XSURI, false, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -613,7 +613,7 @@ public enum Type {
   },
 
   /** Any URI type. */
-  URI("anyURI", AAT, XSURI, false, false, true, false) {
+  URI("anyURI", AAT, XSURI, false, false, true, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -629,7 +629,7 @@ public enum Type {
   },
 
   /** QName Type. */
-  QNM("QName", AAT, XSURI, false, false, false, false) {
+  QNM("QName", AAT, XSURI, false, false, false, false, false) {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
@@ -645,13 +645,13 @@ public enum Type {
   },
 
   /** NOTATION Type. */
-  NOT("NOTATION", null, XSURI, false, false, false, false),
+  NOT("NOTATION", null, XSURI, false, false, false, false, false),
 
   /** Node type. */
-  NOD("node", ITEM, EMPTY, false, true, false, false),
+  NOD("node", ITEM, EMPTY, false, true, false, false, false),
 
   /** Text type. */
-  TXT("text", NOD, EMPTY, false, true, false, false) {
+  TXT("text", NOD, EMPTY, false, true, false, false, false) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXText ? ((BXText) o).getNod() :
@@ -660,7 +660,7 @@ public enum Type {
   },
 
   /** PI type. */
-  PI("processing-instruction", NOD, EMPTY, false, true, false, false) {
+  PI("processing-instruction", NOD, EMPTY, false, true, false, false, false) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXPI ? ((BXPI) o).getNod() :
@@ -669,7 +669,7 @@ public enum Type {
   },
 
   /** Element type. */
-  ELM("element", NOD, EMPTY, false, true, false, false) {
+  ELM("element", NOD, EMPTY, false, true, false, false, false) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXElem ? ((BXElem) o).getNod() :
@@ -678,7 +678,7 @@ public enum Type {
   },
 
   /** Document type. */
-  DOC("document-node", NOD, EMPTY, false, true, false, false) {
+  DOC("document-node", NOD, EMPTY, false, true, false, false, false) {
     @Override
     public Nod e(final Object o, final InputInfo ii) throws QueryException {
       if(o instanceof BXDoc) return ((BXDoc) o).getNod();
@@ -700,10 +700,10 @@ public enum Type {
   },
 
   /** Document element type (required by XQJ API). */
-  DEL("document-node(...)", NOD, EMPTY, false, true, false, false),
+  DEL("document-node(...)", NOD, EMPTY, false, true, false, false, false),
 
   /** Attribute type. */
-  ATT("attribute", NOD, EMPTY, false, true, false, false) {
+  ATT("attribute", NOD, EMPTY, false, true, false, false, false) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXAttr ? ((BXAttr) o).getNod() :
@@ -712,7 +712,7 @@ public enum Type {
   },
 
   /** Comment type. */
-  COM("comment", NOD, EMPTY, false, true, false, false) {
+  COM("comment", NOD, EMPTY, false, true, false, false, false) {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXComm ? ((BXComm) o).getNod() :
@@ -721,13 +721,13 @@ public enum Type {
   },
 
   /** Sequence type. */
-  SEQ("sequence", null, EMPTY, false, false, false, false),
+  SEQ("sequence", null, EMPTY, false, false, false, false, false),
 
   /** Empty sequence type. */
-  EMP("empty-sequence", null, EMPTY, false, false, false, false),
+  EMP("empty-sequence", null, EMPTY, false, false, false, false, false),
 
   /** Java type. */
-  JAVA("java", null, EMPTY, true, true, true, false);
+  JAVA("java", null, EMPTY, true, true, true, false, false);
 
   /** String representation. */
   public final String name;
@@ -743,6 +743,8 @@ public enum Type {
   public final boolean str;
   /** Duration flag. */
   public final boolean dur;
+  /** Date flag. */
+  public final boolean dat;
 
   /**
    * Constructs a new item from the specified item.
@@ -781,9 +783,10 @@ public enum Type {
    * @param u untyped flag
    * @param s string flag
    * @param d duration flag
+   * @param t date flag
    */
   private Type(final String nm, final Type pr, final byte[] ur, final boolean n,
-      final boolean u, final boolean s, final boolean d) {
+      final boolean u, final boolean s, final boolean d, final boolean t) {
     name = nm;
     par = pr;
     uri = ur;
@@ -791,6 +794,7 @@ public enum Type {
     unt = u;
     str = s;
     dur = d;
+    dat = t;
   }
 
   /**
@@ -935,4 +939,4 @@ public enum Type {
     if(uri != XSURI) tb.add("()");
     return tb.toString();
   }
-};
+}

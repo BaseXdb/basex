@@ -56,7 +56,7 @@ public final class ItemSet {
     final int[] tmp = new int[s];
 
     final int l = bucket.length;
-    for(int i = 0; i != l; i++) {
+    for(int i = 0; i != l; ++i) {
       int id = bucket[i];
       while(id != 0) {
         final int p = keys[id] & s - 1;

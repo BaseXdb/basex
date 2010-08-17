@@ -11,14 +11,6 @@ import org.basex.core.Main;
  */
 public abstract class ExprInfo {
   /**
-   * Returns a color string for the expression.
-   * @return color
-   */
-  public String color() {
-    return null;
-  }
-
-  /**
    * Returns a string description of the expression. Contrary to the
    * {@link #toString()} method, arguments are not included
    * in the output.

@@ -12,12 +12,12 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
- * Calculation.
+ * Arithmetic expression.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Clc extends Arr {
+public final class Arith extends Arr {
   /** Calculation operator. */
   private final Calc calc;
 
@@ -28,7 +28,7 @@ public final class Clc extends Arr {
    * @param e2 second expression
    * @param c calculation operator
    */
-  public Clc(final InputInfo ii, final Expr e1, final Expr e2, final Calc c) {
+  public Arith(final InputInfo ii, final Expr e1, final Expr e2, final Calc c) {
     super(ii, e1, e2);
     calc = c;
   }
@@ -36,8 +36,14 @@ public final class Clc extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return optPre(expr[0].empty() || expr[1].empty() ? Empty.SEQ : 
-      expr[0].value() && expr[1].value() ? atomic(ctx, input) : this, ctx);
+
+    final SeqType s0 = expr[0].type();
+    final SeqType s1 = expr[1].type();
+    type = s0.num() && s1.num() ? SeqType.ITR :
+      s0.one() && s1.one() ? SeqType.ITEM : SeqType.ITEM_ZO;
+
+    return optPre(oneEmpty() ? Empty.SEQ : values() ?
+        atomic(ctx, input) : this, ctx);
   }
 
   @Override
@@ -53,27 +59,14 @@ public final class Clc extends Arr {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(calc.name));
+    ser.openElement(this, OP, Token.token(calc.name));
     for(final Expr e : expr) e.plan(ser);
     ser.closeElement();
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    final SeqType s0 = expr[0].returned(ctx);
-    final SeqType s1 = expr[1].returned(ctx);
-    return s0.num() && s1.num() ? SeqType.ITR :
-      s0.one() && s1.one() ? SeqType.ITEM : SeqType.ITEM_ZO;
-  }
-
-  @Override
   public String desc() {
     return "'" + calc.name + "' expression";
-  }
-
-  @Override
-  public String color() {
-    return "FF9966";
   }
 
   @Override

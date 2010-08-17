@@ -162,7 +162,7 @@ public enum FunDef {
   /** XQuery function. */
   DOCAVL(FNURI, FNGen.class, 1, 1, "doc-available(string)", BLN),
   /** XQuery function. */
-  PUT(FNURI, FNGen.class, 2, 2, "put(node, string)", ITEM_Z),
+  PUT(FNURI, FNGen.class, 2, 2, "put(node, string)", ITEM_ZM),
   /** XQuery function. */
   PARSETXT(FNURI, FNGen.class, 1, 2, "unparsed-text(uri, encoding?)", STR_ZO),
   /** XQuery function. */
@@ -248,7 +248,7 @@ public enum FunDef {
   /* FNOut functions. */
 
   /** XQuery function. */
-  ERROR(FNURI, FNInfo.class, 0, 3, "error(code?, desc?, object?)", ITEM_Z),
+  ERROR(FNURI, FNInfo.class, 0, 3, "error(code?, desc?, object?)", ITEM_ZM),
   /** XQuery function. */
   TRACE(FNURI, FNInfo.class, 2, 2, "trace(item, message)", ITEM_ZM),
   /** XQuery function. */
@@ -324,11 +324,11 @@ public enum FunDef {
   /** XQuery function. */
   UNORDER(FNURI, FNSimple.class, 1, 1, "unordered(item)", ITEM_ZM),
   /** XQuery function. */
-  ZEROORONE(FNURI, FNSimple.class, 1, 1, "zero-or-one(item)", ITEM_ZM),
+  ZEROORONE(FNURI, FNSimple.class, 1, 1, "zero-or-one(item)", ITEM_ZO),
   /** XQuery function. */
-  EXACTLYONE(FNURI, FNSimple.class, 1, 1, "exactly-one(item)", ITEM_ZM),
+  EXACTLYONE(FNURI, FNSimple.class, 1, 1, "exactly-one(item)", ITEM),
   /** XQuery function. */
-  ONEORMORE(FNURI, FNSimple.class, 1, 1, "one-or-more(item)", ITEM_ZM),
+  ONEORMORE(FNURI, FNSimple.class, 1, 1, "one-or-more(item)", ITEM_OM),
   /** XQuery function. */
   DEEPEQUAL(FNURI, FNSimple.class, 2, 3, "deep-equal(item, item, coll?)", BLN),
 

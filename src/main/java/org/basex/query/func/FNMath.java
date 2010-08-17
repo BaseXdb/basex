@@ -27,11 +27,11 @@ final class FNMath extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(func == FunDef.PI) return Dbl.get(Math.PI);
+    if(def == FunDef.PI) return Dbl.get(Math.PI);
     if(expr[0].empty()) return null;
 
     final double d = checkDbl(expr[0], ctx);
-    switch(func) {
+    switch(def) {
       case SQRT: return Dbl.get(Math.sqrt(d));
       case SIN:  return Dbl.get(Math.sin(d));
       case COS:  return Dbl.get(Math.cos(d));

@@ -211,7 +211,7 @@ public final class DialogCreateFS extends Dialog {
     final boolean[] val = { prop.is(Prop.WILDCARDS), prop.is(Prop.STEMMING),
         prop.is(Prop.CASESENS), prop.is(Prop.DIACRITICS)
     };
-    for(int f = 0; f < ft.length; f++) {
+    for(int f = 0; f < ft.length; ++f) {
       ft[f] = new BaseXCheckBox(cb[f], val[f], this);
       p4.add(ft[f]);
     }

@@ -234,16 +234,16 @@ public final class TreeView extends View implements TreeViewOptions {
     tg.setFont(font);
     smooth(tg);
 
-    for(int rn = 0; rn < numRoots; rn++) {
+    for(int rn = 0; rn < numRoots; ++rn) {
 
       final int h = sub.getSubtreeHeight(rn);
 
-      for(int lv = 0; lv < h; lv++) {
+      for(int lv = 0; lv < h; ++lv) {
 
         final boolean br = tr.isBigRectangle(sub, rn, lv);
         final TreeRect[] lr = tr.getTreeRectsPerLevel(rn, lv);
 
-        for(int i = 0; i < lr.length; i++) {
+        for(int i = 0; i < lr.length; ++i) {
           final TreeRect r = lr[i];
           final int pre = sub.getPrePerIndex(rn, lv, i);
           drawRectangle(tg, rn, lv, r, pre, DRAW_RECTANGLE);
@@ -430,7 +430,7 @@ public final class TreeView extends View implements TreeViewOptions {
     final int size = sub.getMaxSubtreeHeight();
     final IntList list = new IntList();
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       final int yL = getYperLevel(i);
 
       if(i < sub.getSubtreeHeight(frn) && (yL >= y || yL + nodeHeight >= y)
@@ -450,7 +450,7 @@ public final class TreeView extends View implements TreeViewOptions {
           while(sPrePos++ < ePrePos)
             list.add(sub.getPrePerIndex(frn, i, sPrePos));
         } else {
-          for(int j = 0; j < s; j++) {
+          for(int j = 0; j < s; ++j) {
             final TreeRect rect = rlv[j];
             if(rect.contains(x, w)) list.add(sub.getPrePerIndex(frn, i, j));
           }
@@ -485,10 +485,10 @@ public final class TreeView extends View implements TreeViewOptions {
     while(rn < numRoots) {
 
       final LinkedList<Integer> marklink = new LinkedList<Integer>();
-      for(int i = 0; i < mark.length; i++)
+      for(int i = 0; i < mark.length; ++i)
         marklink.add(i, mark[i]);
 
-      for(int lv = 0; lv < sub.getSubtreeHeight(rn); lv++) {
+      for(int lv = 0; lv < sub.getSubtreeHeight(rn); ++lv) {
 
         final int y = getYperLevel(lv);
         final ListIterator<Integer> li = marklink.listIterator();
@@ -512,7 +512,7 @@ public final class TreeView extends View implements TreeViewOptions {
         } else {
           while(li.hasNext()) {
             final int pre = li.next();
-            ;
+
             final TreeRect rect = tr.searchRect(sub, rn, lv, pre);
 
             if(rect != null) {
@@ -703,7 +703,7 @@ public final class TreeView extends View implements TreeViewOptions {
         final int start = bo.start >= bos.start ? bo.start - bos.start
             : bo.start;
 
-        for(int j = 0; j < bo.size; j++) {
+        for(int j = 0; j < bo.size; ++j) {
 
           final int dp = sub.getPrePerIndex(rn, lvd, j + start);
 
@@ -741,7 +741,7 @@ public final class TreeView extends View implements TreeViewOptions {
     // final TreeBorder bo = sbo[1];
     // final TreeBorder bos = cache.getTreeBorder(rn, lv);
     //
-    // for(int j = 0; j < bo.size; j++) {
+    // for(int j = 0; j < bo.size; ++j) {
     // final int pi = cache.getPrePerIndex(bo, j);
     // // if(gui.context.current.nodes[0] > 0) System.out.println("rn:" + rn
     // // + " lv:" + lv + " bo-size:" + bo.size + " bo-start:" + (bo.start)
@@ -787,7 +787,7 @@ public final class TreeView extends View implements TreeViewOptions {
     int cen = parc;
     int i;
 
-    for(i = 1; i < subt.length && tr.isBigRectangle(sub, rn, lvv); i++) {
+    for(i = 1; i < subt.length && tr.isBigRectangle(sub, rn, lvv); ++i) {
 
       final TreeBorder bos = sub.getTreeBorder(rn, lvv);
       final TreeBorder bo = subt[i];
@@ -818,7 +818,7 @@ public final class TreeView extends View implements TreeViewOptions {
       if(lvv + 1 < sub.getSubtreeHeight(rn)
           && !tr.isBigRectangle(sub, rn, lvv + 1)) {
         final Data d = gui.context.current.data;
-        for(int j = start; j < start + bo.size; j++) {
+        for(int j = start; j < start + bo.size; ++j) {
           final int pre = sub.getPrePerIndex(rn, lvv, j);
           final int pos = getBigRectPosition(rn, lvv, pre, r);
           final int k = d.kind(pre);
@@ -847,10 +847,8 @@ public final class TreeView extends View implements TreeViewOptions {
     final int prey = getYperLevel(lv) - 1;
     final int boRight = r.x + r.w + BORDER_PADDING - 2;
     final int boLeft = r.x + BORDER_PADDING;
-    // [WM] ...not used?
     final int boBottom = prey + nodeHeight + 1;
     final int boTop = prey + 1;
-    // [WM] ...not used?
     final int parmx = r.x + (int) ((boRight - boLeft) / 2d);
     Color c = null;
     int alpha;
@@ -918,7 +916,7 @@ public final class TreeView extends View implements TreeViewOptions {
     if(refreshedFocus) {
       final int pre = gui.context.focused;
 
-      for(int i = 0; i < sub.getSubtreeHeight(frn); i++) {
+      for(int i = 0; i < sub.getSubtreeHeight(frn); ++i) {
 
         if(tr.isBigRectangle(sub, frn, i)) {
           final int index = sub.getPreIndex(frn, i, pre);
@@ -951,7 +949,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
       final TreeRect[] rL = tr.getTreeRectsPerLevel(rn, lv);
 
-      for(int i = 0; i < rL.length; i++) {
+      for(int i = 0; i < rL.length; ++i) {
         final TreeRect r = rL[i];
 
         if(r.contains(mousePosX)) {
@@ -1011,7 +1009,7 @@ public final class TreeView extends View implements TreeViewOptions {
   private void setLevelDistance() {
     final int h = getHeight() - BOTTOM_MARGIN;
     int lvs = 0;
-    for(int i = 0; i < numRoots; i++) {
+    for(int i = 0; i < numRoots; ++i) {
       final int th = sub.getSubtreeHeight(i);
       if(th > lvs) lvs = th;
     }
@@ -1019,9 +1017,7 @@ public final class TreeView extends View implements TreeViewOptions {
     int lD;
     while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) <
         (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
-        : BEST_LEVEL_DISTANCE)
-        && nodeHeight >= MIN_NODE_HEIGHT)
-      nodeHeight--;
+        : BEST_LEVEL_DISTANCE) && nodeHeight >= MIN_NODE_HEIGHT) nodeHeight--;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
     final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight))
@@ -1034,8 +1030,8 @@ public final class TreeView extends View implements TreeViewOptions {
    * @return window-size has changed
    */
   private boolean windowSizeChanged() {
-    if(wwidth > -1 && wheight > -1 && getHeight() == wheight
-        && getWidth() == wwidth) return false;
+    if(wwidth > -1 && wheight > -1 && getHeight() == wheight &&
+        getWidth() == wwidth) return false;
     wheight = getHeight();
     wwidth = getWidth();
     return true;
@@ -1071,7 +1067,7 @@ public final class TreeView extends View implements TreeViewOptions {
     int dpre = -1;
     int si = 0;
 
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       final int pre = sub.getPrePerIndex(rn, lv, i + idx);
       final int k = d.kind(pre);
       final int s = d.size(pre, k);
@@ -1108,7 +1104,7 @@ public final class TreeView extends View implements TreeViewOptions {
         final int sum = getHitBigRectNodesNum(frn, flv, frect);
         final int fix = sub.getPreIndex(frn, flv, fpre);
         final int[] m = new int[sum];
-        for(int i = 0; i < sum; i++) {
+        for(int i = 0; i < sum; ++i) {
           m[i] = sub.getPrePerIndex(frn, flv, i + fix);
         }
         ns.union(m);

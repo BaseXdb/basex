@@ -49,7 +49,7 @@ final class MapList extends IntList {
 
     // only children
     if(w == 0) {
-      for(int i = 0; i < size; i++) {
+      for(int i = 0; i < size; ++i) {
         weight[i] = (double) ViewData.size(data, list[i]) / nchildren;
       }
       return;
@@ -58,17 +58,17 @@ final class MapList extends IntList {
     // summarize sizes
     final double sizeP = w / 100d;
     long sum = 0;
-    for(int i = 0; i < size; i++) sum += weight(textLen, data, i);
+    for(int i = 0; i < size; ++i) sum += weight(textLen, data, i);
 
     // use #children and size for weight
     if(sizeP < 1) {
-      for(int i = 0; i < size; i++) {
+      for(int i = 0; i < size; ++i) {
         weight[i] = sizeP * weight(textLen, data, i) / sum +
           (1 - sizeP) * ViewData.size(data, list[i]) / nchildren;
       }
     // only sizes
     } else {
-      for(int i = 0; i < size; i++) {
+      for(int i = 0; i < size; ++i) {
         weight[i] = weight(textLen, data, i) / sum;
       }
     }
@@ -95,7 +95,7 @@ final class MapList extends IntList {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(Main.name(this) + '[');
-    for(int i = 0; i < size; i++) {
+    for(int i = 0; i < size; ++i) {
       sb.append((i == 0 ? "" : ", ") + list[i]);
       if(weight != null) sb.append("/" + weight[i]);
     }

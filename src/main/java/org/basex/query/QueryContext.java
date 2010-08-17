@@ -56,7 +56,7 @@ import org.basex.util.Tokenizer;
  */
 public final class QueryContext extends Progress {
   /** Functions. */
-  public final Functions fun = new Functions();
+  public final Functions funcs = new Functions();
   /** Variables. */
   public final Variables vars = new Variables();
   /** Scoring instance. */
@@ -217,7 +217,7 @@ public final class QueryContext extends Progress {
         if(nodes.doc) {
           // create document nodes
           doc = new DBNode[s];
-          for(int n = 0; n < s; n++) {
+          for(int n = 0; n < s; ++n) {
             addDoc(new DBNode(data, nodes.nodes[n], Data.DOC));
           }
         } else {
@@ -231,7 +231,7 @@ public final class QueryContext extends Progress {
         } else {
           // otherwise, add all context items
           final ItemIter ir = new ItemIter(s);
-          for(int n = 0; n < s; n++) {
+          for(int n = 0; n < s; ++n) {
             ir.add(new DBNode(data, nodes.nodes[n]));
           }
           value = ir.finish();
@@ -242,8 +242,10 @@ public final class QueryContext extends Progress {
 
       // evaluates the query and returns the result
       if(inf) compInfo(NL + QUERYCOMP);
-      fun.comp(this);
-      vars.comp(this);
+      // compiles global functions and variables
+      funcs.comp(this);
+      //vars.comp(this);
+      // compiles the expression
       root = root.comp(this);
       if(inf) info.add(NL + QUERYRESULT + root);
     } catch(final StackOverflowError ex) {
@@ -281,7 +283,7 @@ public final class QueryContext extends Progress {
 
       // otherwise, add nodes to standard iterator
       final int ps = pre.size();
-      for(int p = 0; p < ps; p++) ir.add(new DBNode(data, pre.get(p)));
+      for(int p = 0; p < ps; ++p) ir.add(new DBNode(data, pre.get(p)));
       ir.add(i);
     }
 
@@ -320,8 +322,13 @@ public final class QueryContext extends Progress {
    * @throws Exception exception
    */
   protected void plan(final Serializer ser) throws Exception {
-    fun.plan(ser);
+    // only show root node if functions or variables exist
+    final boolean r = funcs.size() != 0 || vars.global().size != 0;
+    if(r) ser.openElement(PLAN);
+    funcs.plan(ser);
+    vars.plan(ser);
     root.plan(ser);
+    if(r) ser.closeElement();
   }
 
   /**
@@ -340,7 +347,7 @@ public final class QueryContext extends Progress {
    * @throws IOException I/O exception
    */
   void close() throws IOException {
-    for(int d = rootDocs; d < docs; d++) Close.close(context, doc[d].data);
+    for(int d = rootDocs; d < docs; ++d) Close.close(context, doc[d].data);
     docs = 0;
   }
 
@@ -393,7 +400,7 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Adds a database instance or returns an existing one.
+   * Opens an existing document/collection, or creates a new database instance.
    * @param path database name or file path
    * @param coll collection flag
    * @param db database flag
@@ -403,11 +410,12 @@ public final class QueryContext extends Progress {
    */
   public DBNode doc(final byte[] path, final boolean coll, final boolean db,
       final InputInfo ii) throws QueryException {
+
     if(contains(path, '<') || contains(path, '>')) Err.or(ii, INVDOC, path);
 
-    // check if the collections contain the document
-    for(int c = 0; c < colls; c++) {
-      for(int n = 0; n < collect[c].size(); n++) {
+    // check if the existing collections contain the document
+    for(int c = 0; c < colls; ++c) {
+      for(int n = 0; n < collect[c].size(); ++n) {
         if(eq(path, collect[c].get(n).base())) {
           return (DBNode) collect[c].get(n);
         }
@@ -416,12 +424,12 @@ public final class QueryContext extends Progress {
 
     // check if the database has already been opened
     final String nm = string(path);
-    for(int d = 0; d < docs; d++)
+    for(int d = 0; d < docs; ++d)
       if(doc[d].data.meta.name.equals(nm)) return doc[d];
 
     // check if the document has already been opened
     final IO io = IO.get(string(path));
-    for(int d = 0; d < docs; d++) {
+    for(int d = 0; d < docs; ++d) {
       if(doc[d].data.meta.file.eq(io)) return doc[d];
     }
 
@@ -436,8 +444,8 @@ public final class QueryContext extends Progress {
       }
     } else {
       final IO file = file();
-      data = check(nm, file == null, coll, ii);
-      if(data == null) data = check(file.merge(string(path)).path(),
+      data = doc(nm, file == null, coll, ii);
+      if(data == null) data = doc(file.merge(string(path)).path(),
           true, coll, ii);
     }
 
@@ -470,7 +478,7 @@ public final class QueryContext extends Progress {
    * @return data instance
    * @throws QueryException query exception
    */
-  private Data check(final String path, final boolean err, final boolean coll,
+  private Data doc(final String path, final boolean err, final boolean coll,
       final InputInfo ii) throws QueryException {
 
     try {
@@ -562,7 +570,7 @@ public final class QueryContext extends Progress {
   public boolean docNodes() {
     return value instanceof Seq && ((Seq) value).val == doc;
   }
-  
+
   /**
    * Returns an IO representation of the base uri.
    * @return IO reference

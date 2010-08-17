@@ -39,7 +39,7 @@ public final class Dtm extends Date {
   public Dtm(final byte[] dt, final InputInfo ii) throws QueryException {
     super(Type.DTM, dt, XDTM, ii);
     final int i = Token.indexOf(dt, 'T');
-    if(i == -1) dateErr(dt, type, XDTM, ii);
+    if(i == -1) dateErr(dt, XDTM, ii);
     date(Token.substring(dt, 0, i), XDTM, ii);
     time(Token.substring(dt, i + 1), XDTM, ii);
   }

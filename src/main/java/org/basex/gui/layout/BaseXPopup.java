@@ -73,7 +73,7 @@ public final class BaseXPopup extends JPopupMenu {
 
   @Override
   public void show(final Component comp, final int x, final int y) {
-    for(int b = 0; b < popup.length; b++) {
+    for(int b = 0; b < popup.length; ++b) {
       if(popup[b] != null) popup[b].refresh(gui, (JMenuItem) getComponent(b));
     }
     super.show(comp, x, y);

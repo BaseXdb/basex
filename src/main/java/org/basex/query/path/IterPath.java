@@ -6,6 +6,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
@@ -24,9 +25,14 @@ final class IterPath extends AxisPath {
    * @param ii input info
    * @param r root expression
    * @param s location steps
+   * @param t return type
+   * @param c cardinality
    */
-  IterPath(final InputInfo ii, final Expr r, final Step[] s) {
+  IterPath(final InputInfo ii, final Expr r, final Step[] s, final SeqType t,
+      final long c) {
     super(ii, r, s);
+    type = t;
+    size = c;
   }
 
   @Override
@@ -89,7 +95,7 @@ final class IterPath extends AxisPath {
   }
 
   @Override
-  public boolean duplicates(final QueryContext ctx) {
+  public boolean duplicates() {
     return false;
   }
 }

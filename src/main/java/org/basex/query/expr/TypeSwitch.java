@@ -1,13 +1,11 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
-import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
@@ -21,9 +19,9 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public final class TypeSwitch extends ParseExpr {
-  /** Expression list. */
+  /** Cases. */
   private final TypeCase[] cs;
-  /** Typeswitch expression. */
+  /** Condition. */
   private Expr ts;
 
   /**
@@ -41,18 +39,14 @@ public final class TypeSwitch extends ParseExpr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     ts = checkUp(ts, ctx).comp(ctx);
-    for(final TypeCase c : cs) c.comp(ctx);
+    final Expr[] tmp = new Expr[cs.length];
+    for(int i = 0; i < cs.length; ++i) tmp[i] = cs[i].expr;
+    checkUp(ctx, tmp);
 
+    for(final TypeCase c : cs) c.comp(ctx);
     boolean ii = true;
     for(final TypeCase c : cs) ii &= c.empty();
-    if(ii) {
-      ctx.compInfo(OPTTRUE);
-      return Empty.SEQ;
-    }
-
-    final Expr[] tmp = new Expr[cs.length];
-    for(int i = 0; i < cs.length; i++) tmp[i] = cs[i].expr;
-    checkUp(ctx, tmp);
+    if(ii) return optPre(Empty.SEQ, ctx);
 
     // pre-evaluate typeswitch
     Expr e = this;
@@ -64,6 +58,10 @@ public final class TypeSwitch extends ParseExpr {
         }
       }
     }
+
+    // evaluate return type
+    type = cs[0].type();
+    for(int l = 1; l < cs.length; ++l) type = type.intersect(cs[l].type());
     return optPre(e, ctx);
   }
 
@@ -80,26 +78,23 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
+  public boolean vacuous() {
+    for(final TypeCase c : cs) if(!c.expr.vacuous()) return false;
+    return true;
+  }
+
+  @Override
+  public boolean uses(final Use u) {
     if(u == Use.VAR) return true;
-    for(final TypeCase c : cs) if(c.uses(u, ctx)) return true;
-    return ts.uses(u, ctx);
+    for(final TypeCase c : cs) if(c.uses(u)) return true;
+    return ts.uses(u);
   }
 
   @Override
   public Expr remove(final Var v) {
-    for(int c = 0; c < cs.length; c++) cs[c] = cs[c].remove(v);
+    for(int c = 0; c < cs.length; ++c) cs[c] = cs[c].remove(v);
     ts = ts.remove(v);
     return this;
-  }
-
-  @Override
-  public SeqType returned(final QueryContext ctx) {
-    final SeqType t = cs[0].returned(ctx);
-    for(int l = 1; l < cs.length; l++) {
-      if(!t.eq(cs[l].returned(ctx))) return SeqType.ITEM_ZM;
-    }
-    return t;
   }
 
   @Override
@@ -113,7 +108,7 @@ public final class TypeSwitch extends ParseExpr {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(TYPESWITCH + "(" + ts + ") ");
-    for(int l = 0; l != cs.length; l++) sb.append((l != 0 ? ", " : "") + cs[l]);
+    for(int l = 0; l != cs.length; ++l) sb.append((l != 0 ? ", " : "") + cs[l]);
     return sb.toString();
   }
 }

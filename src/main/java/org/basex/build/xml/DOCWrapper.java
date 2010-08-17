@@ -61,7 +61,7 @@ public final class DOCWrapper extends Parser {
 
           atts.reset();
           final NamedNodeMap at = n.getAttributes();
-          for(int a = 0, as = at.getLength(); a < as; a++) {
+          for(int a = 0, as = at.getLength(); a < as; ++a) {
             final Attr att = (Attr) at.item(a);
             final byte[] k = token(att.getName()), v = token(att.getValue());
             if(eq(k, XMLNS)) {

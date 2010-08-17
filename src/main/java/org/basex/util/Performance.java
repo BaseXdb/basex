@@ -113,7 +113,7 @@ public final class Performance {
    * @param n number of times to execute garbage collection
    */
   public static void gc(final int n) {
-    for(int i = 0; i < n; i++) System.gc();
+    for(int i = 0; i < n; ++i) System.gc();
   }
 
   /**
@@ -122,7 +122,7 @@ public final class Performance {
   public static void stack() {
     System.err.println("You're here:");
     final StackTraceElement[] st = new Error().getStackTrace();
-    for(int i = 1; i < st.length; i++) System.err.println("  " + st[i]);
+    for(int i = 1; i < st.length; ++i) System.err.println("  " + st[i]);
   }
 
   @Override

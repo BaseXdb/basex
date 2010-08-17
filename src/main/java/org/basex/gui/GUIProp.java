@@ -122,13 +122,13 @@ public final class GUIProp extends AProp {
     { "HELPSIZE", new int[] { 300, 250 } };
 
   /** Path for creating new databases. */
-  public static final Object[] OPENPATH = { "OPENPATH", Prop.WORK };
+  public static final Object[] OPENPATH = { "OPENPATH", Prop.HOME };
   /** Path for creating new XML Documents. */
-  public static final Object[] SAVEPATH = { "SAVEPATH", Prop.WORK };
+  public static final Object[] SAVEPATH = { "SAVEPATH", Prop.HOME };
   /** Path for XQuery files. */
-  public static final Object[] XQPATH = { "XQPATH", Prop.WORK };
+  public static final Object[] XQPATH = { "XQPATH", Prop.HOME };
   /** Path for stopwords. */
-  public static final Object[] STOPPATH = { "STOPPATH", Prop.WORK };
+  public static final Object[] STOPPATH = { "STOPPATH", Prop.HOME };
 
   /** Path to mapped file hierarchy. */
   public static final Object[] FSBACKING = { "FSBACKING", Prop.HOME };
@@ -184,11 +184,11 @@ public final class GUIProp extends AProp {
     String path = null;
     if(file != null) {
       path = file.path();
-      set(XQPATH, file.getDir());
+      set(XQPATH, file.dir());
       sl.add(path);
     }
     final String[] qu = strings(QUERIES);
-    for(int q = 0; q < qu.length && q < 9; q++) {
+    for(int q = 0; q < qu.length && q < 9; ++q) {
       final String f = qu[q];
       if(!f.equalsIgnoreCase(path) && IO.get(f).exists()) sl.add(f);
     }

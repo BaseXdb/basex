@@ -7,6 +7,7 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.util.ItemSet;
@@ -32,7 +33,7 @@ final class FNSeq extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(func) {
+    switch(def) {
       case HEAD: return head(ctx);
       default:   return super.atomic(ctx, ii);
     }
@@ -40,7 +41,7 @@ final class FNSeq extends Fun {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(func) {
+    switch(def) {
       case INDEXOF:  return indexOf(ctx);
       case DISTINCT: return distinctValues(ctx);
       case INSBEF:   return insertBefore(ctx);
@@ -59,8 +60,9 @@ final class FNSeq extends Fun {
    * @throws QueryException query exception
    */
   private Item head(final QueryContext ctx) throws QueryException {
-    return expr[0].returned(ctx).zeroOrOne() ? expr[0].atomic(ctx, input) :
-      expr[0].iter(ctx).next();
+    final Expr e = expr[0];
+    return e.item() || e.type().zeroOrOne() ? e.atomic(ctx, input) :
+      e.iter(ctx).next();
   }
 
   /**
@@ -71,7 +73,7 @@ final class FNSeq extends Fun {
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    if(e.returned(ctx).zeroOrOne()) return Iter.EMPTY;
+    if(e.item() || e.type().zeroOrOne()) return Iter.EMPTY;
     final Iter ir = e.iter(ctx);
     return ir.next() == null ? Iter.EMPTY : ir;
   }
@@ -245,17 +247,20 @@ final class FNSeq extends Fun {
     };
   }
 
+
   @Override
-  public SeqType returned(final QueryContext ctx) {
+  public Expr cmp(final QueryContext ctx) {
+    // evaluate return type
+
     // index-of will create integers, insert-before might add new types
-    if(func == FunDef.INDEXOF || func == FunDef.INSBEF)
-      return super.returned(ctx);
+    if(def == FunDef.INDEXOF || def == FunDef.INSBEF) return this;
 
-    // head will return first item of argument, or nothing
-    if(func == FunDef.HEAD)
-      return new SeqType(expr[0].returned(ctx).type, SeqType.Occ.ZO);
-
+    // head will return first item of argument, or nothing;
     // all other types will return existing types
-    return new SeqType(expr[0].returned(ctx).type, SeqType.Occ.ZM);
+    final Type t = expr[0].type().type;
+    final SeqType.Occ o = def == FunDef.HEAD ? SeqType.Occ.ZO : SeqType.Occ.ZM;
+    type = new SeqType(t, o);
+
+    return this;
   }
 }

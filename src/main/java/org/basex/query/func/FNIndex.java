@@ -82,7 +82,7 @@ public final class FNIndex extends TokenSet {
     // check similar predefined function
     final byte[] nm = lc(name);
     final Levenshtein ls = new Levenshtein();
-    for(int k = 1; k < size; k++) {
+    for(int k = 1; k < size; ++k) {
       if(ls.similar(nm, lc(keys[k]), 0)) qp.error(FUNSIMILAR, name, keys[k]);
     }
   }

@@ -62,7 +62,7 @@ public final class FSMLSerializer {
     final byte[][] keys = atts.key;
     final byte[][] vals = atts.val;
     final String[][] a = new String[size][];
-    for(int i = 0; i < size; i++)
+    for(int i = 0; i < size; ++i)
       a[i] = new String[] { string(keys[i]), string(vals[i]) };
     return a;
   }

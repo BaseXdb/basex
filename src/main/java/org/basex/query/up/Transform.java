@@ -53,12 +53,11 @@ public final class Transform extends Arr {
     final int s = ctx.vars.size();
     for(final Let c : copies) {
       c.expr = checkUp(c.expr, ctx).comp(ctx);
-      c.var.ret = c.expr.returned(ctx);
       ctx.vars.add(c.var);
     }
-    for(int e = 0; e != expr.length; e++) expr[e] = expr[e].comp(ctx);
+    for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
 
-    if(!expr[0].uses(Use.UPD, ctx) && !expr[0].vacuous())
+    if(!expr[0].uses(Use.UPD) && !expr[0].vacuous())
       Err.or(input, UPEXPECTT);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
@@ -92,8 +91,8 @@ public final class Transform extends Arr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return u == Use.VAR || u != Use.UPD && super.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return u == Use.VAR || u != Use.UPD && super.uses(u);
   }
 
   @Override

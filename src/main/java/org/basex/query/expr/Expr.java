@@ -8,6 +8,8 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.AxisPath;
+import org.basex.query.path.MixedPath;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -21,7 +23,6 @@ public abstract class Expr extends ExprInfo {
   /** Usage flags. */
   protected enum Use {
     /** Context.   */ CTX,
-    /** Root flag. */ ELM,
     /** Fragment.  */ FRG,
     /** Position.  */ POS,
     /** Updates.   */ UPD,
@@ -86,7 +87,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean empty() {
-    return false;
+    return false; //size() == 0;
   }
 
   /**
@@ -111,47 +112,49 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean vacuous() {
-    return empty();
-  }
-
-  /**
-   * Returns the sequence size or 1.
-   * @param ctx query context
-   * @return result of check
-   * @throws QueryException query exception
-   */
-  @SuppressWarnings("unused")
-  public long size(final QueryContext ctx) throws QueryException {
-    return returned(ctx).one() ? 1 : -1;
-  }
-
-  /**
-   * Indicates if an expression uses the specified type.
-   * Called by the compiler to perform certain optimizations.
-   * {@code true} is returned by default and thus assumed as "worst-case".
-   * @param u use type to be checked
-   * @param ctx query context
-   * @return result of check
-   */
-  public abstract boolean uses(final Use u, final QueryContext ctx);
-
-  /**
-   * Checks if the specified variable is removable by a context item.
-   * @param v variable to be removed
-   * @param ctx query context
-   * @return result of check
-   */
-  @SuppressWarnings("unused")
-  public boolean removable(final Var v, final QueryContext ctx) {
     return false;
   }
 
   /**
-   * Substitutes all {@link VarCall} expressions for the given variable
-   * by a {@link Context} reference. This method is initially called by the
-   * {@link FLWR} class and passed on to all sub-expressions.
-   * @param v variable to be replace
-   * @return expression with removed variable
+   * Returns the sequence size or 1.
+   * @return result of check
+   */
+  public abstract long size();
+
+  /**
+   * Indicates if an expression uses the specified type/operation.
+   * Called by the compiler to test properties of sub-expressions.
+   * {@code true} will be returned by default and thus assumed as "worst-case".
+   * @param u use type to be checked
+   * @return result of check
+   */
+  public abstract boolean uses(final Use u);
+
+  /**
+   * Checks if the specified variable is replaceable by a context item.
+   * The following methods might return false:
+   * <ul>
+   * <li>{@link Preds#removable}, if one of the variables is used within
+   * a predicate.</li>
+   * <li>{@link MixedPath#removable}, if the variable occurs within
+   * the path.</li>
+   * </ul>
+   * This method is called by {@link FLWOR#comp} to rewrite where clauses
+   * as predicates.
+   * @param v variable to be replaced
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  public boolean removable(final Var v) {
+    return false;
+  }
+
+  /**
+   * Substitutes all {@link VarRef} expressions for the given variable
+   * by a {@link Context} reference. This method is called by {@link FLWOR#comp}
+   * to rewrite where clauses as predicates.
+   * @param v variable to be replaced
+   * @return new expression
    */
   @SuppressWarnings("unused")
   public Expr remove(final Var v) {
@@ -159,27 +162,25 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Indicates the return type of an expression.
-   * @param ctx query context
+   * Returns the sequence type of the evaluated value. For simplicity,
+   * some types have been summarized. E.g., all numbers are treated as integers.
    * @return result of check
    */
-  @SuppressWarnings("unused")
-  public SeqType returned(final QueryContext ctx) {
-    return SeqType.ITEM_ZM;
-  }
+  public abstract SeqType type();
 
   /**
    * Returns true if the expression might yield duplicates and unsorted
-   * results.
-   * @param ctx query context
+   * results. This method is called e.g. by {@link Union} or {@link AxisPath}.
    * @return result of check
    */
-  public boolean duplicates(final QueryContext ctx) {
-    return !returned(ctx).zeroOrOne();
+  public boolean duplicates() {
+    return !type().zeroOrOne();
   }
 
   /**
-   * Checks if an index can be used for query evaluation.
+   * Checks if an expression can be rewritten to an index access.
+   * If this method returns true, {@link #indexEquivalent} must be implemented
+   * for an expression.
    * @param ic index context
    * @return true if an index can be used
    * @throws QueryException query exception
@@ -221,6 +222,15 @@ public abstract class Expr extends ExprInfo {
    */
   @SuppressWarnings("unused")
   public Expr addText(final QueryContext ctx) throws QueryException {
+    return this;
+  }
+
+  /**
+   * Returns a copy of the expression.
+   * @return copy
+   */
+  public Expr copy() {
+    Main.notexpected();
     return this;
   }
 }

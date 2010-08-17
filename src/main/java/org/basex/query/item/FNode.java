@@ -31,7 +31,7 @@ public abstract class FNode extends Nod {
   public final byte[] atom() {
     if(val == null) {
       final TokenBuilder tb = new TokenBuilder();
-      for(int c = 0; c < children.size(); c++) {
+      for(int c = 0; c < children.size(); ++c) {
         final Nod nc = children.get(c);
         if(nc.type == Type.ELM || nc.type == Type.TXT) tb.add(nc.atom());
       }

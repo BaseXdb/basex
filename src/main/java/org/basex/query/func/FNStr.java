@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
-
 import java.text.Normalizer;
 import java.util.Arrays;
 import org.basex.query.QueryContext;
@@ -40,7 +39,7 @@ final class FNStr extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
 
-    switch(func) {
+    switch(def) {
       case STCODE:
         return str2cp(e.atomic(ctx, input));
       default:
@@ -53,7 +52,7 @@ final class FNStr extends Fun {
       throws QueryException {
     final Expr e = expr[0];
 
-    switch(func) {
+    switch(def) {
       case CODESTR:
         return cp2str(e.iter(ctx));
       case COMPARE:
@@ -131,7 +130,7 @@ final class FNStr extends Fun {
     Item i;
     while((i = iter.next()) != null) {
       final long n = checkItr(i);
-      if(!XMLToken.valid(n)) Err.or(input, INVCODE, i);
+      if(!XMLToken.valid((int) n)) Err.or(input, INVCODE, i);
       tb.addUTF((int) n);
     }
     return Str.get(tb.finish());
@@ -217,7 +216,7 @@ final class FNStr extends Fun {
 
     final int l = tok.length();
     final TokenBuilder tmp = new TokenBuilder(l);
-    for(int i = 0; i < l; i++) {
+    for(int i = 0; i < l; ++i) {
       final char b = tok.charAt(i);
       int j = -1;
       while(++j < srch.length() && b != srch.charAt(j));
@@ -254,6 +253,9 @@ final class FNStr extends Fun {
     return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length));
   }
 
+  /** Normalization types.
+  private static final String[] NORMS = { "NFC", "NFD", "NFKC", "NFKD", "" }; */
+
   /**
    * Returns normalized unicode.
    * @param ctx query context
@@ -262,18 +264,30 @@ final class FNStr extends Fun {
    */
   private Item normuni(final QueryContext ctx) throws QueryException {
     final byte[] str = checkEStr(expr[0], ctx);
-    Normalizer.Form nr = null;
+
+    /*String nr = null;
+    if(expr.length == 2) {
+      final String n = string(uc(trim(checkStr(expr[1], ctx))));
+      for(final String nrm : NORMS) if(nrm.equals(n)) nr = nrm;
+      if(nr == null) Err.or(input, NORMUNI, n);
+    }
+    // [CG] XQuery: normalize-unicode()
+    return Str.get(str);*/
+
+    // [LW] to be checked...
+    Normalizer.Form form = Normalizer.Form.NFC;
     if(expr.length == 2) {
       final byte[] n = uc(trim(checkStr(expr[1], ctx)));
       if(n.length == 0) return Str.get(str);
+
       try {
-        nr = Normalizer.Form.valueOf(string(n));
+        form = Normalizer.Form.valueOf(string(n));
       } catch(final IllegalArgumentException e) {
         Err.or(input, NORMUNI, n);
       }
     }
-    if(nr == null) nr = Normalizer.Form.NFC;
-    return Str.get(Normalizer.normalize(string(str), nr));
+    return ascii(str) ? Str.get(str) :
+      Str.get(Normalizer.normalize(string(str), form));
   }
 
   /**

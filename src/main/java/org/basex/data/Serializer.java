@@ -133,6 +133,7 @@ public abstract class Serializer {
    */
   public final void openElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
+    finishElement();
     openElement(name(expr), a);
   }
 
@@ -188,6 +189,7 @@ public abstract class Serializer {
    */
   public final void emptyElement(final ExprInfo expr, final byte[]... a)
       throws IOException {
+    finishElement();
     emptyElement(name(expr), a);
   }
 
@@ -301,7 +303,7 @@ public abstract class Serializer {
           int pp = p;
           do {
             final Atts atn = data.ns(pp);
-            for(int n = 0; n < atn.size; n++) {
+            for(int n = 0; n < atn.size; ++n) {
               final byte[] key = atn.key[n];
               final byte[] val = atn.val[n];
               if(!nsp.contains(key)) {
@@ -349,10 +351,8 @@ public abstract class Serializer {
    * Returns the name of the specified expression.
    * @param expr expression
    * @return name
-   * @throws IOException I/O exception
    */
-  @SuppressWarnings("unused")
-  protected byte[] name(final ExprInfo expr) throws IOException {
+  protected byte[] name(final ExprInfo expr) {
     return token(expr.name());
   }
 

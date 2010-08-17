@@ -47,7 +47,7 @@ final class FNPat extends Fun {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    switch(func) {
+    switch(def) {
       case TOKEN:   return tokenize(checkEStr(expr[0], ctx), ctx);
       default:      return super.iter(ctx);
     }
@@ -56,7 +56,7 @@ final class FNPat extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(func) {
+    switch(def) {
       case MATCH:   return matches(checkEStr(expr[0], ctx), ctx);
       case REPLACE: return replace(checkEStr(expr[0], ctx), ctx);
       case ANALZYE: return analyzeString(checkEStr(expr[0], ctx), ctx);
@@ -130,7 +130,7 @@ final class FNPat extends Fun {
       throws QueryException {
 
     final byte[] rep = checkStr(expr[2], ctx);
-    for(int i = 0; i < rep.length; i++) {
+    for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
           Err.or(input, FUNREGREP);
@@ -215,7 +215,7 @@ final class FNPat extends Fun {
     }
 
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < pt.length; i++) {
+    for(int i = 0; i < pt.length; ++i) {
       final byte b = pt[i];
       tb.add(b);
       if(b == '\\' && i + 1 != pt.length && pt[i + 1] == ' ') tb.add(b);
@@ -231,7 +231,7 @@ final class FNPat extends Fun {
         final char c2 = mt.group(2).charAt(0);
         if(c1 < c2) {
           final TokenBuilder sb = new TokenBuilder("[");
-          for(char c = c1; c <= c2; c++) sb.add(c);
+          for(char c = c1; c <= c2; ++c) sb.add(c);
           str = str.replaceAll("\\[" + c1 + "-" + c2, sb.toString());
         }
       }
@@ -243,7 +243,7 @@ final class FNPat extends Fun {
         final String in = mt.group(1);
         final String ex = mt.group(2);
         String out = in;
-        for(int e = 0; e < ex.length(); e++) {
+        for(int e = 0; e < ex.length(); ++e) {
           out = out.replaceAll(ex.substring(e, e + 1), "");
         }
         str = str.replaceAll("\\[" + in + "-\\[.*?\\]", "[" + out);

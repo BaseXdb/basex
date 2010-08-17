@@ -35,7 +35,7 @@ public final class FNSent extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    switch(func) {
+    switch(def) {
       case SENT:     return polarity(ctx, false);
       case NORMSENT: return polarity(ctx, true);
       default:       return super.atomic(ctx, ii);

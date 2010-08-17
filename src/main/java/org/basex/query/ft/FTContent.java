@@ -49,7 +49,7 @@ public final class FTContent extends FTFilter {
       final boolean[] bl = new boolean[s];
       for(final FTStringMatch sm : mtc) {
         if(sm.g) continue;
-        for(int p = sm.s; p <= sm.e; p++) bl[p] = true;
+        for(int p = sm.s; p <= sm.e; ++p) bl[p] = true;
       }
       for(final boolean b : bl) if(!b) return false;
       return true;

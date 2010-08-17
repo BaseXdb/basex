@@ -13,6 +13,7 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
+import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
@@ -28,6 +29,10 @@ import org.basex.util.InputInfo;
 public abstract class ParseExpr extends Expr {
   /** Input information. */
   public final InputInfo input;
+  /** Cached sequence type. */
+  public SeqType type;
+  /** Cardinality of result; unknown if set to -1. */
+  public long size = -1;
 
   /**
    * Constructor.
@@ -79,6 +84,16 @@ public abstract class ParseExpr extends Expr {
 
   // OPTIMIZATIONS ============================================================
 
+  @Override
+  public SeqType type() {
+    return type != null ? type : SeqType.ITEM_ZM;
+  }
+
+  @Override
+  public final long size() {
+    return size == -1 ? type().occ() : size;
+  }
+
   /**
    * Pre-evaluates the specified expression.
    * @param ctx query context
@@ -111,7 +126,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
-    if(e != null && ctx.updating && e.uses(Use.UPD, ctx))
+    if(e != null && ctx.updating && e.uses(Use.UPD))
       Err.or(input, UPNOT, desc());
     return e;
   }
@@ -129,7 +144,7 @@ public abstract class ParseExpr extends Expr {
     int s = 0;
     for(final Expr e : expr) {
       if(e.vacuous()) continue;
-      final boolean u = e.uses(Use.UPD, ctx);
+      final boolean u = e.uses(Use.UPD);
       if(u && s == 2 || !u && s == 1) Err.or(input, UPNOT, desc());
       s = u ? 1 : 2;
     }
@@ -146,8 +161,7 @@ public abstract class ParseExpr extends Expr {
   protected final double checkDbl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = e.atomic(ctx, input);
-    if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.DBL);
+    final Item it = checkEmptyType(e.atomic(ctx, input), Type.DBL);;
     if(!it.unt() && !it.num()) Err.number(this, it);
     return it.dbl(input);
   }
@@ -162,10 +176,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final long checkItr(final Expr e, final QueryContext ctx)
       throws QueryException {
-
-    final Item it = e.atomic(ctx, input);
-    if(it == null) Err.or(input, XPEMPTYPE, desc(), Type.ITR);
-    return checkItr(it);
+    return checkItr(checkEmptyType(e.atomic(ctx, input), Type.ITR));
   }
 
   /**
@@ -279,6 +290,19 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item checkEmpty(final Item it) throws QueryException {
     if(it == null) Err.or(input, XPEMPTY, desc());
+    return it;
+  }
+
+  /**
+   * Checks if the specified item is a empty sequence.
+   * @param it item to be checked
+   * @param t expected type
+   * @return specified item
+   * @throws QueryException query exception
+   */
+  protected final Item checkEmptyType(final Item it, final Type t)
+      throws QueryException {
+    if(it == null) Err.or(input, XPEMPTYPE, desc(), t);
     return it;
   }
 

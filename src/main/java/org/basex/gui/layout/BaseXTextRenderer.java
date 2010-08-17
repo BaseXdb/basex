@@ -316,7 +316,7 @@ final class BaseXTextRenderer extends BaseXBack {
       }
       if(search != null && searched()) {
         int cw = 0;
-        for(int c = 0; c < search.length(); c++) {
+        for(int c = 0; c < search.length(); ++c) {
           cw += charW(g, search.charAt(c));
         }
         g.setColor(GUIConstants.COLORS[text.cursor() == text.pos() ? 5 : 2]);
@@ -421,7 +421,7 @@ final class BaseXTextRenderer extends BaseXBack {
         }
         s = text.pos();
         next();
-      };
+      }
 
       if(!finish) text.startMark();
       else text.endMark();

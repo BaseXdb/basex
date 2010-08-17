@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Type;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -18,9 +19,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Cast extends Single {
-  /** Type. */
-  private final SeqType seq;
-
   /**
    * Function constructor.
    * @param ii input info
@@ -29,40 +27,50 @@ public final class Cast extends Single {
    */
   public Cast(final InputInfo ii, final Expr e, final SeqType t) {
     super(ii, e);
-    seq = t;
+    type = t;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    checkUp(expr, ctx);
     super.comp(ctx);
-    return checkUp(expr, ctx).value() ? preEval(ctx) : this;
+
+    Expr e = this;
+    if(expr.value()) {
+      // pre-evaluate value
+      e = preEval(ctx);
+    } else if(type.type == Type.BLN || type.type == Type.FLT ||
+        type.type == Type.DBL || type.type == Type.QNM ||
+        type.type == Type.URI) {
+      // skip cast if specified and return types are equal
+      final SeqType t = expr.type();
+      if(t.eq(type)) e = expr;
+      else if(t.type == type.type && t.one() && type.zeroOrOne()) e = expr;
+      if(e != this) optPre(e, ctx);
+    }
+    return e;
   }
 
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return seq.cast(expr.atomic(ctx, input), this, ctx, input);
+    return type.cast(expr.atomic(ctx, input), this, ctx, input);
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(seq.toString()));
+    ser.openElement(this, TYPE, Token.token(type.toString()));
     expr.plan(ser);
     ser.closeElement();
   }
 
   @Override
-  public SeqType returned(final QueryContext ctx) {
-    return seq;
-  }
-
-  @Override
   public String desc() {
-    return seq.type + " " + CAST;
+    return type.type + " " + CAST;
   }
 
   @Override
   public String toString() {
-    return Main.info("% cast as %", expr, seq);
+    return Main.info("% cast as %", expr, type);
   }
 }

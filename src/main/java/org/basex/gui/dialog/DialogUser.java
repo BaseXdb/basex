@@ -215,7 +215,7 @@ final class DialogUser extends BaseXBack {
         }
       } else if(cmp == add) {
         final String us = addUser.getSelectedItem().toString();
-        for(int r = 0; r < users.contents.size(); r++) {
+        for(int r = 0; r < users.contents.size(); ++r) {
           if(!users.value(r, 0).equals(us)) continue;
           int c = 3;
           while(--c >= 0 && users.value(r, c).isEmpty());
@@ -236,12 +236,12 @@ final class DialogUser extends BaseXBack {
     final boolean valpass = new String(
         pass.getPassword()).matches("[^ ;'\\\"]*");
     boolean newname = true;
-    for(int r = 0; r < users.contents.size(); r++)
+    for(int r = 0; r < users.contents.size(); ++r)
       newname &= !users.value(r, 0).equals(user.getText());
 
     alter.setEnabled(table.getSelectedRows().length == 1);
-    create.setEnabled(valname && valpass && newname
-        && !user.getText().isEmpty() && pass.getPassword().length != 0);
+    create.setEnabled(valname && valpass && newname &&
+        !user.getText().isEmpty() && pass.getPassword().length != 0);
     add.setEnabled(addUser.getSelectedIndex() > 0);
     addUser.setEnabled(addUser.getSelectedIndex() > -1);
     boolean valdrop = true;

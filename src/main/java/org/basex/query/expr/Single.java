@@ -34,8 +34,8 @@ abstract class Single extends ParseExpr {
   }
 
   @Override
-  public boolean uses(final Use u, final QueryContext ctx) {
-    return expr.uses(u, ctx);
+  public boolean uses(final Use u) {
+    return expr.uses(u);
   }
 
   @Override

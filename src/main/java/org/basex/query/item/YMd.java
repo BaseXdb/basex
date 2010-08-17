@@ -67,7 +67,7 @@ public final class YMd extends Dur {
     super(Type.YMD);
     final String val = Token.string(v).trim();
     final Matcher mt = DUR.matcher(val);
-    if(!mt.matches() || val.endsWith("P")) dateErr(v, type, XYMD, ii);
+    if(!mt.matches() || val.endsWith("P")) dateErr(v, XYMD, ii);
 
     final int y = mt.group(2) != null ? Token.toInt(mt.group(3)) : 0;
     final int m = mt.group(4) != null ? Token.toInt(mt.group(5)) : 0;
