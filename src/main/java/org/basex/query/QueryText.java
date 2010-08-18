@@ -435,6 +435,8 @@ public interface QueryText {
   Object[] INVAL = { XQDY, 74, "Invalid name: \"%\"" };
   /** XPDY0095: resulting value for any grouping variable >> 1 item. */
   Object[] XGRP = { XQDY, 95, "No sequence allowed as grouping variable."};
+  /** XQDY0096: Invalid namespace in constructed element. */
+  Object[] CEINS = { XQDY, 96, "Invalid element namespace: \"%\" (URI \"%\")"};
 
   /** XQST0009: Parsing exception. */
   Object[] IMPLSCHEMA = { XQST, 9, "Schema import not supported." };

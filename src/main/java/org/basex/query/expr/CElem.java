@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -64,6 +65,19 @@ public final class CElem extends CFrag {
           Uri.uri(nsp.val[n])), input);
     }
   }
+  
+  /**
+   * Checks the element name for illegal prefixes or URIs.
+   * @param name element name
+   * @return checked name
+   * @throws QueryException XQDY0096, if invalid namespace was found
+   */
+  private QNm checkNS(final QNm name) throws QueryException {
+    final byte[] pre = name.pref(), uri = name.uri.atom();
+    if(eq(pre, XMLNS) || eq(uri, XMLNSURI) || (eq(pre, XML) ^ eq(uri, XMLURI)))
+      Err.or(input, CEINS, pre, uri);
+    return name;
+  }
 
   @Override
   public FElem atomic(final QueryContext ctx, final InputInfo ii)
@@ -72,7 +86,7 @@ public final class CElem extends CFrag {
     final int s = ctx.ns.size();
     addNS(ctx);
 
-    final QNm tname = qname(ctx, it);
+    final QNm tname = checkNS(qname(ctx, it));
     final byte[] uri = tname.uri.atom();
     if(uri.length != 0) {
       final byte[] key = tname.pref();

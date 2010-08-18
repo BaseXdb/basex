@@ -350,7 +350,7 @@ public interface QueryTokens {
   /** Math URI. */
   byte[] MATHURI = token("http://www.w3.org/2005/xpath-functions/math");
   /** XMLNS URI. */
-  byte[] XMLNSURI = token("http://www.w3.org/2000/xmlns");
+  byte[] XMLNSURI = token("http://www.w3.org/2000/xmlns/");
   /** Local Functions URI. */
   byte[] LOCALURI = token("http://www.w3.org/2005/xquery-local-functions");
   /** XMLSchema URI. */
