@@ -210,21 +210,19 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Item trans(final QueryContext ctx) throws QueryException {
-    final String tok = string(checkEStr(expr[0], ctx));
-    final String srch = string(checkStr(expr[1], ctx));
-    final String rep = string(checkStr(expr[2], ctx));
+    final int[] tok =  cps(checkEStr(expr[0], ctx));
+    final int[] srch = cps(checkStr(expr[1], ctx));
+    final int[] rep =  cps(checkStr(expr[2], ctx));
 
-    final int l = tok.length();
-    final TokenBuilder tmp = new TokenBuilder(l);
-    for(int i = 0; i < l; ++i) {
-      final char b = tok.charAt(i);
+    final TokenBuilder tmp = new TokenBuilder(tok.length);
+    for(int i = 0; i < tok.length; ++i) {
       int j = -1;
-      while(++j < srch.length() && b != srch.charAt(j));
-      if(j < srch.length()) {
-        if(j >= rep.length()) continue;
-        tmp.add(rep.charAt(j));
+      while(++j < srch.length && tok[i] != srch[j]);
+      if(j < srch.length) {
+        if(j >= rep.length) continue;
+        tmp.addUTF(rep[j]);
       } else {
-        tmp.add(tok.charAt(i));
+        tmp.addUTF(tok[i]);
       }
     }
     return Str.get(tmp.finish());
