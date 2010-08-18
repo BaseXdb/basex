@@ -11,6 +11,7 @@ RequestExecutionLevel admin
 
 ; MUI 1.67 compatible ------
 !include "MUI.nsh"
+!include "FileFunc.nsh"
 
 ; MUI Settings
 !define MUI_ABORTWARNING
@@ -60,6 +61,8 @@ Function OptionsLeave
 # Get the user entered values.
 !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Options" "Field 2" "State"
 !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Options" "Field 3" "State"
+!insertmacro MUI_INSTALLOPTIONS_READ $R2 "Options" "Field 8" "State"
+!insertmacro MUI_INSTALLOPTIONS_READ $R3 "Options" "Field 9" "State"
         ${If} $R1 == $R0
               ${If} $R0 != "admin"
                     nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -c alter user admin $R0'
@@ -69,6 +72,23 @@ Function OptionsLeave
           Abort
         ${EndIf}
         CreateDirectory "$INSTDIR\BaseXData"
+        ; .xq file Association
+        ${If} $R2 == 1
+          WriteRegStr HKCR ".xq" "" "File.xq"
+          WriteRegStr HKCR "File.xq" "" "XQuery File"
+          WriteRegStr HKCR "File.xq\shell" "" "Open"
+          WriteRegStr HKCR "File.xq\shell\Open\command" "" "javaw -jar $INSTDIR\${JAR} %1"
+          WriteRegStr HKCR "File.xq\DefaultIcon" "" "$INSTDIR\xml.ico"
+        ${EndIf}
+        ; .xml file Association
+        ${If} $R3 == 1
+          WriteRegStr HKCR ".xml" "" "File.xml"
+          WriteRegStr HKCR "File.xml" "" "XML File"
+          WriteRegStr HKCR "File.xml\shell" "" "Open"
+          WriteRegStr HKCR "File.xml\shell\Open\command" "" "javaw -jar $INSTDIR\${JAR} %1"
+          WriteRegStr HKCR "File.xml\DefaultIcon" "" "$INSTDIR\xml.ico"
+        ${EndIf}
+        ${RefreshShellIcons}
 FunctionEnd
 
 ; Language files
@@ -89,9 +109,9 @@ Section "Hauptgruppe" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   File "..\..\target\${JAR}"
-  File "..\images\BaseX.ico"
   File "License.txt"
   File ".basex"
+  File "..\images\xml.ico"
   nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
   SetOutPath "$INSTDIR\service\bin"
   File "service\bin\BaseX.bat"
@@ -154,5 +174,14 @@ Section Uninstall
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
+  DeleteRegKey HKCR ".xq"
+  DeleteRegKey HKCR "File.xq\shell\Open\command"
+  DeleteRegKey HKCR "File.xq\DefaultIcon"
+  DeleteRegKey HKCR "File.xq"
+  DeleteRegKey HKCR ".xml"
+  DeleteRegKey HKCR "File.xml\shell\Open\command"
+  DeleteRegKey HKCR "File.xml\DefaultIcon"
+  DeleteRegKey HKCR "File.xml"
+  ${RefreshShellIcons}
   SetAutoClose true
 SectionEnd
