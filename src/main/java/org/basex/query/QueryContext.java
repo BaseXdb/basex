@@ -247,7 +247,9 @@ public final class QueryContext extends Progress {
       //vars.comp(this);
       // compiles the expression
       root = root.comp(this);
-      if(inf) info.add(NL + QUERYRESULT + root);
+
+      if(inf) info.add(NL + QUERYRESULT + funcs + root + NL);
+
     } catch(final StackOverflowError ex) {
       Main.debug(ex);
       Err.or(null, XPSTACK);
@@ -384,17 +386,15 @@ public final class QueryContext extends Progress {
   /**
    * Adds some evaluation info.
    * @param string evaluation info
-   * @param ext text text extensions
+   * @param msg message
    */
-  public void evalInfo(final String string, final Object... ext) {
+  public void evalInfo(final byte[] string, final String msg) {
     if(!inf) return;
-    if(firstEval) {
-      info.add(NL);
-      info.add(QUERYEVAL);
-      info.add(NL);
-    }
+    if(firstEval) info.add(NL + QUERYEVAL + NL);
     info.add(QUERYSEP);
-    info.add(string, ext);
+    info.add(string);
+    info.add(' ');
+    info.add(msg);
     info.add(NL);
     firstEval = false;
   }

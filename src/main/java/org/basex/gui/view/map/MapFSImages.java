@@ -122,7 +122,7 @@ final class MapFSImages extends Thread {
         } catch(final Throwable ex) {
           if(ex instanceof OutOfMemoryError) {
             Performance.gc(2);
-            if(err++ == 0) Dialog.error(view.gui, PROCOUTMEM);
+            if(err++ == 0) Dialog.error(view.gui, PROCMEM);
           }
           image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_BGR);
         }

@@ -250,7 +250,7 @@ public final class FunJava extends Arr {
 
   @Override
   public String desc() {
-    return cls.getName() + "." + mth + PAR + (mth.equals("new") ?
+    return cls.getName() + "." + mth + "(...)" + (mth.equals("new") ?
         " constructor" : " method");
   }
 

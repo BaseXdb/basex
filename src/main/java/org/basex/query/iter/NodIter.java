@@ -277,17 +277,4 @@ public final class NodIter extends NodeIter {
     item[a] = item[b];
     item[b] = tmp;
   }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("(");
-    for(int v = 0; v != size; ++v) {
-      sb.append((v != 0 ? ", " : "") + item[v]);
-      if(sb.length() > 15 && v + 1 != size) {
-        sb.append(", ...");
-        break;
-      }
-    }
-    return sb.append(")").toString();
-  }
 }

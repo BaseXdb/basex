@@ -422,10 +422,14 @@ public interface QueryTokens {
 
   // QUERY PLAN ===============================================================
 
+  /** Separator. */
+  String SEP = ", ";
   /** Query Plan. */
   String ARG = "arg";
   /** Query Plan. */
-  String PAR = "(...)";
+  String FUNC = "Function";
+  /** Query Plan. */
+  String VARBL = "Variable";
   /** Query Info: Plan. */
   byte[] PLAN = Token.token("QueryPlan");
   /** Query Plan. */

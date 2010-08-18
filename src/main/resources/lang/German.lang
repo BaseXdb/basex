@@ -321,7 +321,8 @@ proc_syntax=Syntax
 proc_err=% konnte nicht ausgeführt werden
 proc_nodb=Keine Datenbank geöffnet.
 proc_mm=Der Befehl ist im Hauptspeicher-Modus nicht verfügbar.
-proc_outmem=Der Hauptspeicher ist voll.\nDie folgenden Hinweise helfen vielleicht weiter:\n- Erhöhen Sei den verfügbaren Speicher mit dem Java-Flag -Xmx<size>\n- Wählen Sie den internen XML-Parser über die GUI oder mit 'set intparse on' aus\n- deaktivieren Sie die Text- und Attribut-Indizes
+proc_mem=Der Hauptspeicher ist voll.
+proc_memcreate=\nDie folgenden Hinweise helfen vielleicht weiter:\n- Erhöhen Sei den verfügbaren Speicher mit dem Java-Flag -Xmx<size>\n- Wählen Sie den internen XML-Parser über die GUI oder mit 'set intparse on' aus\n- deaktivieren Sie die Text- und Attribut-Indizes
 
 cmd_no=Befehl erwartet.
 cmd_unknown=Unbekannter Befehl "%"

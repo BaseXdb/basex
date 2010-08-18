@@ -321,7 +321,8 @@ proc_syntax=Syntaxe
 proc_err=Impossible d'exécuter %
 proc_nodb=Aucune base de données ouverte.
 proc_mm=Cette commande n'et pas disponible en mode mémoire principale.
-proc_outmem=Dépassement de mémoire principale.\nVoici quelques suggestions qui peuvent vous aider :\n- augmenter la mémoire maximum allouée à Java avec le paramètre -Xmx<size>\n- Choisir le parseur XML interne via la GUI ou via 'set intparse on'\n- Désactiver les index du texte et des attributs
+proc_mem=Dépassement de mémoire principale.
+proc_memcreate=\nVoici quelques suggestions qui peuvent vous aider :\n- augmenter la mémoire maximum allouée à Java avec le paramètre -Xmx<size>\n- Choisir le parseur XML interne via la GUI ou via 'set intparse on'\n- Désactiver les index du texte et des attributs
 
 cmd_no=Commande attendue.
 cmd_unknown=Commande '%' inconnue

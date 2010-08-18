@@ -65,7 +65,7 @@ public class FLWOR extends ParseExpr {
     // optimize where clause
     boolean empty = false;
     if(where != null) {
-      where = checkUp(where, ctx).comp(ctx);
+      where = checkUp(where, ctx).comp(ctx).compEbv(ctx);
       if(where.value()) {
         // test is always false: no results
         empty = !where.ebv(ctx, input).bool(input);

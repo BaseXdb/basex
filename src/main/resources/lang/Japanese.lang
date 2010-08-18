@@ -321,7 +321,8 @@ proc_syntax=文法
 proc_err=%を実行できませんでした。
 proc_nodb=メモリー上にデータベースはありません。
 proc_mm=メインメモリモードでは（この？）コマンドは使用できません。
-proc_outmem=メモリー不足。\n以下のヒントが役に立つかもしれません。\n- -Xmx<サイズ>を使うことで、Javaのヒープサイズを増やすことが出来ます。\n- BaseXの内部XMLパーサーに 'set intparse on' を設定してみて下さい。 \n- いくつかのインデックスを無効にすることによりメモリーを節約できます。
+proc_mem=メモリー不足。\n以下のヒントが役に立つかもしれません。
+proc_memcreate=\n- -Xmx<サイズ>を使うことで、Javaのヒープサイズを増やすことが出来ます。\n- BaseXの内部XMLパーサーに 'set intparse on' を設定してみて下さい。 \n- いくつかのインデックスを無効にすることによりメモリーを節約できます。
 
 cmd_no=Expecting command.
 cmd_unknown=不明なコマンドです '%'

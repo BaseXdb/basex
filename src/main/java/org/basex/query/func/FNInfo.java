@@ -8,6 +8,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
@@ -60,12 +61,11 @@ final class FNInfo extends Fun {
           throw ex;
         }
       case TRACE:
-        ItemIter ir = ItemIter.get(expr[0].iter(ctx));
-        msg = Token.string(checkEStr(expr[1], ctx)) + " " + ir;
-        ctx.evalInfo(msg);
-        return ir;
+        final Value val = expr[0].iter(ctx).finish();
+        ctx.evalInfo(checkEStr(expr[1], ctx), val.toString());
+        return val.iter();
       case ENVS:
-        ir = new ItemIter();
+        final ItemIter ir = new ItemIter();
         for(final Object k : System.getenv().keySet().toArray()) {
           ir.add(Str.get(k));
         }

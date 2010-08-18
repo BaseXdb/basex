@@ -46,7 +46,7 @@ public abstract class Preds extends ParseExpr {
 
     Expr e = this;
     for(int p = 0; p < pred.length; ++p) {
-      Expr pr = pred[p].comp(ctx);
+      Expr pr = pred[p].comp(ctx).compEbv(ctx);
       pr = Pos.get(CmpV.Op.EQ, pr, pr, input);
 
       if(pr.value()) {

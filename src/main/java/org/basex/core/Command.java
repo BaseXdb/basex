@@ -239,7 +239,8 @@ public abstract class Command extends Progress {
       Performance.gc(2);
       Main.debug(ex);
       abort();
-      if(ex instanceof OutOfMemoryError) return error(PROCOUTMEM);
+      if(ex instanceof OutOfMemoryError) return error(PROCMEM +
+          ((flags & User.CREATE) != 0 ? PROCMEMCREATE : ""));
 
       final Object[] st = ex.getStackTrace();
       final Object[] obj = new Object[st.length + 1];

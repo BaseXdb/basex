@@ -153,19 +153,4 @@ public final class ItemIter extends Iter implements Result {
   public Value finish() {
     return Seq.get(item, size);
   }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    if(size != 1) sb.append("(");
-    for(int v = 0; v != size; ++v) {
-      sb.append((v != 0 ? ", " : "") + item[v]);
-      if(sb.length() > 15 && v + 1 != size) {
-        sb.append(", ...");
-        break;
-      }
-    }
-    if(size != 1) sb.append(")");
-    return sb.toString();
-  }
 }

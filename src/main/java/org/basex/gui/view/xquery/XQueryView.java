@@ -241,6 +241,9 @@ public final class XQueryView extends View {
   public void info(final String inf, final boolean ok) {
     final int error = text.error(inf, ok);
     info.setName(error != -1 ? Integer.toString(error) : null);
+    info.setCursor(error !=  -1 ?
+        GUIConstants.CURSORHAND : GUIConstants.CURSORARROW);
+
     info.setText(ok ? OK : inf.replaceAll(STOPPED + ".*\\r?\\n", ""),
         ok ? Msg.SUCCESS : Msg.ERROR);
     info.setToolTipText(ok ? null : inf);

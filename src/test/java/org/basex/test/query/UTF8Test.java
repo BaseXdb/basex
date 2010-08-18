@@ -2,9 +2,7 @@ package org.basex.test.query;
 
 import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
-
 import java.nio.charset.Charset;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.XQuery;
@@ -31,7 +29,7 @@ public class UTF8Test {
 
   /** UTF-8 bytes of the codepoint. */
   private static final byte[] BA = STR.getBytes(Charset.availableCharsets().get(
-      "UTF-8"));
+      UTF8));
 
   /** Tests is characters outside of BMP survive token-creation. */
   @Test

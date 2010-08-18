@@ -12,6 +12,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.NSLocal;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Variable Reference expression.
@@ -91,11 +92,11 @@ public final class VarRef extends ParseExpr {
 
   @Override
   public String desc() {
-    return "Variable";
+    return VARBL;
   }
 
   @Override
   public String toString() {
-    return var.toString();
+    return new TokenBuilder(DOLLAR).add(var.name.atom()).toString();
   }
 }

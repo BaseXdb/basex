@@ -91,10 +91,6 @@ public final class List extends Arr {
 
   @Override
   public String toString() {
-    final TokenBuilder sb = new TokenBuilder("(");
-    for(int v = 0; v != expr.length; ++v) {
-      sb.add((v != 0 ? ", " : "") + expr[v]);
-    }
-    return sb.add(')').toString();
+    return new TokenBuilder("(").add(expr, ", ").add(')').toString();
   }
 }

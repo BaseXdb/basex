@@ -162,6 +162,16 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
+   * Compiles and simplifies effective boolean values tests.
+   * @param ctx query context
+   * @return optimized expression
+   */
+  @SuppressWarnings("unused")
+  public Expr compEbv(final QueryContext ctx) {
+    return this;
+  }
+
+  /**
    * Returns the sequence type of the evaluated value. For simplicity,
    * some types have been summarized. E.g., all numbers are treated as integers.
    * @return result of check

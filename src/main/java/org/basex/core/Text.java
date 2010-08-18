@@ -344,7 +344,9 @@ public interface Text {
   /** Main-memory error. */
   String PROCMM = lang("proc_mm");
   /** Out of memory error. */
-  String PROCOUTMEM = lang("proc_outmem");
+  String PROCMEM = lang("proc_mem");
+  /** Out of memory error due to database creation. */
+  String PROCMEMCREATE = lang("proc_memcreate");
   /** Progress exception. */
   String PROGERR = "Interrupted";
 

@@ -253,9 +253,6 @@ final class FNStr extends Fun {
     return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length));
   }
 
-  /** Normalization types.
-  private static final String[] NORMS = { "NFC", "NFD", "NFKC", "NFKD", "" }; */
-
   /**
    * Returns normalized unicode.
    * @param ctx query context
@@ -265,16 +262,6 @@ final class FNStr extends Fun {
   private Item normuni(final QueryContext ctx) throws QueryException {
     final byte[] str = checkEStr(expr[0], ctx);
 
-    /*String nr = null;
-    if(expr.length == 2) {
-      final String n = string(uc(trim(checkStr(expr[1], ctx))));
-      for(final String nrm : NORMS) if(nrm.equals(n)) nr = nrm;
-      if(nr == null) Err.or(input, NORMUNI, n);
-    }
-    // [CG] XQuery: normalize-unicode()
-    return Str.get(str);*/
-
-    // [LW] to be checked...
     Normalizer.Form form = Normalizer.Form.NFC;
     if(expr.length == 2) {
       final byte[] n = uc(trim(checkStr(expr[1], ctx)));

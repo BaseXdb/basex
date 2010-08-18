@@ -14,6 +14,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Abstract function definition.
@@ -104,12 +105,7 @@ public abstract class Fun extends Arr {
 
   @Override
   public final String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(def.toString().replaceAll("\\(.*\\)", "") + "(");
-    for(int a = 0; a < expr.length; ++a) {
-      sb.append((a != 0 ? ", " : "") + expr[a]);
-    }
-    sb.append(')');
-    return sb.toString();
+    return new TokenBuilder().add(def.toString().replaceAll(
+        "\\(.*\\)", "") + "(").add(expr, ", ").add(')').toString();
   }
 }

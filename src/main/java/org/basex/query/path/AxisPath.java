@@ -118,7 +118,6 @@ public class AxisPath extends Path {
    * @return number of results
    */
   private long size(final QueryContext ctx) {
-
     final Value rt = root(ctx);
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
@@ -158,7 +157,7 @@ public class AxisPath extends Path {
       step[i] = (Step) e;
     }
     mergeDesc(ctx);
-    
+
     // check if all context nodes reference document nodes
     // [CG] XQuery: optimize paths without root context
     final Data data = ctx.data();
@@ -464,48 +463,39 @@ public class AxisPath extends Path {
   }
 
   /**
-   * Checks if some location steps will never yield results.
+   * Checks at compile time if the location path will never yield results.
    * @throws QueryException query exception
    */
   private void checkEmpty() throws QueryException {
-    final int ll = step.length;
-    if(ll > 0) {
-      final Step s = step[0];
-      if(root instanceof DBNode && ((DBNode) root).type == Type.DOC &&
-        (s.axis == ATTR || s.axis == PARENT || s.axis == SELF &&
-         s.test != NODE) || root instanceof CAttr && s.axis == CHILD)
-        warning(s);
-    }
+    for(int l = 0; l < step.length; ++l) {
+      final Step s = step[l];
+      if(l == 0) {
+        if(root instanceof DBNode && ((DBNode) root).type == Type.DOC &&
+            (s.axis == ATTR || s.axis == PARENT || s.axis == SELF &&
+             s.test != NODE) || root instanceof CAttr && s.axis == CHILD)
+            Err.or(input, COMPSELF, s);
+      } else {
+        final Step sp = step[l - 1];
+        if(s.axis == SELF || s.axis == DESCORSELF) {
+          if(s.test == NODE) continue;
+          if(sp.axis == ATTR) Err.or(input, COMPSELF, s);
+          if(sp.test.type == Type.TXT && s.test.type != Type.TXT)
+            Err.or(input, COMPSELF, s);
 
-    for(int l = 1; l < ll; ++l) {
-      final Step s1 = step[l];
-      final Step s0 = step[l - 1];
-
-      if(s1.axis == SELF || s1.axis == DESCORSELF) {
-        if(s1.test == NODE) continue;
-        if(s0.axis == ATTR) warning(s1);
-        if(s0.test.type == Type.TXT && s1.test.type != Type.TXT) warning(s1);
-
-        if(s1.axis == DESCORSELF) continue;
-        final QNm n1 = s1.test.name;
-        final QNm n0 = s0.test.name;
-        if(n0 == null || n1 == null) continue;
-        if(!n1.eq(n0)) warning(s1);
-      } else if(s1.axis == FOLLSIBL || s1.axis == PRECSIBL) {
-        if(s0.axis == ATTR) warning(s1);
-      } else if(s1.axis == DESC || s1.axis == CHILD) {
-        if(s0.axis == ATTR || s0.test.type == Type.TXT) warning(s1);
+          if(s.axis == DESCORSELF) continue;
+          final QNm n1 = s.test.name;
+          final QNm n0 = sp.test.name;
+          if(n0 == null || n1 == null) continue;
+          if(!n1.eq(n0)) Err.or(input, COMPSELF, s);
+        } else if(s.axis == FOLLSIBL || s.axis == PRECSIBL) {
+          if(sp.axis == ATTR) Err.or(input, COMPSELF, s);
+        } else if(s.axis == DESC || s.axis == CHILD || s.axis == ATTR) {
+          if(sp.axis == ATTR || sp.test.type == Type.TXT ||
+             sp.test.type == Type.COM || sp.test.type == Type.PI)
+            Err.or(input, COMPSELF, s);
+        }
       }
     }
-  }
-
-  /**
-   * Throws a static warning.
-   * @param s step
-   * @throws QueryException query exception
-   */
-  private void warning(final Step s) throws QueryException {
-    Err.or(input, COMPSELF, s);
   }
 
   /**

@@ -47,7 +47,7 @@ public final class Quantifier extends ParseExpr {
     // compile for clauses
     final int vs = ctx.vars.size();
     for(final For f : fl) f.comp(ctx);
-    sat = checkUp(sat, ctx).comp(ctx);
+    sat = checkUp(sat, ctx).comp(ctx).compEbv(ctx);
     ctx.vars.reset(vs);
 
     // find empty sequences

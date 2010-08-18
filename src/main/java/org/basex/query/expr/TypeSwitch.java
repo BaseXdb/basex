@@ -11,6 +11,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Typeswitch expression.
@@ -107,8 +108,7 @@ public final class TypeSwitch extends ParseExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(TYPESWITCH + "(" + ts + ") ");
-    for(int l = 0; l != cs.length; ++l) sb.append((l != 0 ? ", " : "") + cs[l]);
-    return sb.toString();
+    return new TokenBuilder(TYPESWITCH + "(" + ts + ") ").add(
+        cs, ", ").toString();
   }
 }

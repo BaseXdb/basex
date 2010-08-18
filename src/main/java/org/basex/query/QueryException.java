@@ -166,7 +166,7 @@ public final class QueryException extends Exception {
     if(line != 0) {
       sb.append(STOPPED + ' ');
       sb.append(Main.info(LINEINFO, line));
-      if(col != 0) sb.append(", " + Main.info(COLINFO, col));
+      if(col != 0) sb.append(QueryTokens.SEP + Main.info(COLINFO, col));
       if(file != null) sb.append(Main.info(' ' + FILEINFO, file));
       sb.append(": \n");
     }

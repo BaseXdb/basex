@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -43,7 +42,7 @@ public final class Switch extends Arr {
       if(vals && e == this) e = expr[el - 1];
     }
     if(e != this) {
-      ctx.compInfo(OPTPRE, SWITCH + "(" + expr[0] + ")");
+      optPre(e, ctx);
     } else {
       final int el = expr.length;
       type = expr[el - 1].type();

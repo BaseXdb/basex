@@ -86,42 +86,61 @@ public final class FNSimple extends Fun {
 
   @Override
   public Expr cmp(final QueryContext ctx) {
-    final SeqType s = expr.length == 1 ? expr[0].type() : null;
-
+    // all functions have at least 1 argument
+    final Expr e = expr[0];
     switch(def) {
+      case BOOLEAN:
+        expr[0] = expr[0].compEbv(ctx);
+        return e.type().eq(SeqType.BLN) ? e : this;
       case NOT:
-        if(expr[0] instanceof Fun) {
-          final Fun fun = (Fun) expr[0];
+        if(e instanceof Fun) {
+          final Fun fun = (Fun) e;
           if(fun.def == FunDef.EMPTY) {
             // simplify: not(empty(A)) -> exists(A)
+            ctx.compInfo(OPTWRITE, this);
             expr = fun.expr;
             def = FunDef.EXISTS;
           } else if(fun.def == FunDef.EXISTS) {
             // simplify: not(exists(A)) -> empty(A)
+            ctx.compInfo(OPTWRITE, this);
             expr = fun.expr;
             def = FunDef.EMPTY;
-          } else if(fun.def == FunDef.BOOLEAN) {
+          } else {
             // simplify: not(boolean(A)) -> not(A)
-            expr = fun.expr;
+            expr[0] = expr[0].compEbv(ctx);
           }
         }
         return this;
-      case BOOLEAN:
-        return expr[0].type().eq(SeqType.BLN) ? expr[0] : this;
       case ZEROORONE:
-        type = new SeqType(s.type, SeqType.Occ.ZO);
-        return s.zeroOrOne() ? expr[0] : this;
+        type = new SeqType(e.type().type, SeqType.Occ.ZO);
+        return e.type().zeroOrOne() ? e : this;
       case EXACTLYONE:
-        type = new SeqType(s.type, SeqType.Occ.O);
-        return s.one() ? expr[0] : this;
+        type = new SeqType(e.type().type, SeqType.Occ.O);
+        return e.type().one() ? e : this;
       case ONEORMORE:
-        type = new SeqType(s.type, SeqType.Occ.OM);
-        return !s.mayBeZero() ? expr[0] : this;
+        type = new SeqType(e.type().type, SeqType.Occ.OM);
+        return !e.type().mayBeZero() ? e : this;
       case UNORDER:
-        return expr[0];
+        return e;
       default:
         return this;
     }
+  }
+
+  @Override
+  public Expr compEbv(final QueryContext ctx) {
+    // all functions have at least 1 argument
+    final Expr e = expr[0];
+    Expr ex = this;
+    if(def == FunDef.BOOLEAN) {
+      // if(boolean(A)) -> if(A)
+      ex = e;
+    } else if(def == FunDef.EXISTS) {
+      // if(exists(node*)) -> if(node*)
+      if(e.type().type.node()) ex = e;
+    }
+    if(ex != this) ctx.compInfo(OPTWRITE, this);
+    return ex;
   }
 
   /**

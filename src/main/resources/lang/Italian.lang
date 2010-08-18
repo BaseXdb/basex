@@ -322,7 +322,8 @@ proc_syntax=Sintassi
 proc_err=Impossibile eseguire %
 proc_nodb=Nessuna base di dati aperta.
 proc_mm=Questo comando non è disponibile in modalità memoria principale.
-proc_outmem=Spazio in memoria principale insufficiente.\nLe seguenti azioni potrebbero aiutarti:\n- aumenta la dimensione dello heap di Java con l'opzione -Xmx<size>\n- scegli il parser XML integrato nella GUI o attraverso 'set intparse on'\n- disattiva gli indici di testo ed attributi
+proc_mem=Spazio in memoria principale insufficiente.
+proc_memcreate=\nLe seguenti azioni potrebbero aiutarti:\n- aumenta la dimensione dello heap di Java con l'opzione -Xmx<size>\n- scegli il parser XML integrato nella GUI o attraverso 'set intparse on'\n- disattiva gli indici di testo ed attributi
 
 cmd_no=Attendo un comando.
 cmd_unknown=Comando sconosciuto: '%'

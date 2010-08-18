@@ -10,6 +10,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Implementation of the group by clause.
@@ -89,11 +90,8 @@ public final class Group extends ParseExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(" " + GROUP + " " + BY + " ");
-    for(int l = 0; l != groupby.length; ++l) {
-      sb.append(l != 0 ? ", " : "").append(groupby[l]);
-    }
-    return sb.toString();
+    return new TokenBuilder(" " + GROUP + " " + BY + " ").add(
+        groupby, ", ").toString();
   }
 
   /**

@@ -34,7 +34,7 @@ public final class If extends Arr {
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     // check for updating expressions
-    expr[0] = checkUp(expr[0].comp(ctx), ctx);
+    expr[0] = checkUp(expr[0], ctx).comp(ctx).compEbv(ctx);
     checkUp(ctx, expr[1], expr[2]);
 
     // static result: return branch in question

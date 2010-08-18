@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+import java.util.Arrays;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -10,6 +11,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Order by expression.
@@ -246,11 +248,7 @@ public final class Order extends ParseExpr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(" " + ORDER + " " +
-        BY + " ");
-    for(int l = 0; l != ob.length - 1; ++l) {
-      sb.append((l != 0 ? ", " : "") + ob[l]);
-    }
-    return sb.toString();
+    return new TokenBuilder(' ' + ORDER + ' ' + BY + ' ').add(
+        Arrays.copyOf(ob, ob.length - 1), ", ").toString();
   }
 }

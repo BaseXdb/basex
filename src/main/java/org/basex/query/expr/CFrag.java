@@ -53,8 +53,9 @@ public abstract class CFrag extends Arr {
       name = new QNm(nm);
     }
 
-    if(name.uri == Uri.EMPTY)
+    if(name.uri == Uri.EMPTY) {
       name.uri = Uri.uri(ctx.ns.uri(name.pref(), name != i, input));
+    }
     return name;
   }
 
@@ -65,19 +66,15 @@ public abstract class CFrag extends Arr {
 
   /**
    * Returns a string info for the expression.
-   * @param pre info prefix
+   * @param pref info prefix
    * @return string
    */
-  protected final String info(final String pre) {
-    return pre + " constructor";
+  protected final String info(final String pref) {
+    return pref + " constructor";
   }
 
-  /**
-   * Returns a string representation of the expression.
-   * @param pre expression prefix
-   * @return string
-   */
-  protected final String toString(final String pre) {
-    return pre + " { " + super.toString(", ") + " }";
+  @Override
+  protected final String toString(final String pref) {
+    return pref + " { " + super.toString(", ") + " }";
   }
 }

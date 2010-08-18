@@ -245,6 +245,8 @@ public final class Functions extends ExprInfo {
 
   @Override
   public String toString() {
-    return name();
+    final StringBuilder sb = new StringBuilder();
+    for(int i = 0; i < func.length; ++i) sb.append(func[i].toString());
+    return sb.toString();
   }
 }

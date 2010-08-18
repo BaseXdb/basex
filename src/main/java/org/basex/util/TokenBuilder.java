@@ -211,6 +211,21 @@ public final class TokenBuilder {
   }
 
   /**
+   * Adds multiple strings to the token, separated by the specified string.
+   * @param s the string to be added
+   * @param sep separator
+   * @return self reference
+   */
+  public TokenBuilder add(final Object[] s, final String sep) {
+    for(int e = 0; e != s.length; ++e) {
+      if(e != 0) add(sep);
+      add(s[e]);
+    }
+    return this;
+  }
+
+
+  /**
    * Replaces all % characters in the input string by the specified extension
    * objects, which can be byte arrays or any other object.
    * If a digit is found after %, it is interpreted as insertion position.

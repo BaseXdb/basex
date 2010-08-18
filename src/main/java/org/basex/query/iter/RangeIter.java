@@ -56,17 +56,4 @@ public final class RangeIter extends Iter {
     asc ^= true;
     return true;
   }
-
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("(");
-    for(long v = min; v != max; ++v) {
-      sb.append((v != min ? ", " : "") + v);
-      if(sb.length() > 15 && v + 1 != max) {
-        sb.append(", ...");
-        break;
-      }
-    }
-    return sb.append(")").toString();
-  }
 }

@@ -12,6 +12,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 
 /**
  * Function call.
@@ -91,11 +92,12 @@ public final class FuncCall extends Arr {
 
   @Override
   public String desc() {
-    return "Function";
+    return FUNC;
   }
 
   @Override
   public String toString() {
-    return Token.string(name.atom()) + PAR;
+    return new TokenBuilder(name.atom()).add('(').add(
+        toString(", ")).add(')').toString();
   }
 }

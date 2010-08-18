@@ -7,6 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Abstract array expression.
@@ -95,12 +96,7 @@ public abstract class Arr extends ParseExpr {
    * @param sep separator
    * @return string representation
    */
-  protected final String toString(final Object sep) {
-    final StringBuilder sb = new StringBuilder();
-    for(int e = 0; e != expr.length; ++e) {
-      if(e != 0) sb.append(sep);
-      sb.append(expr[e]);
-    }
-    return sb.toString();
+  protected String toString(final String sep) {
+    return new TokenBuilder().add(expr, sep).toString();
   }
 }

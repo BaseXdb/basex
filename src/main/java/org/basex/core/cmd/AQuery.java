@@ -165,11 +165,9 @@ public abstract class AQuery extends Command {
    * @param runs number of runs
    */
   private void evalInfo(final long hits, final long updates, final int runs) {
-    info("");
-    info("");
+    info(NL);
     info(QUERYSTRING + qp.query());
     info(qp.info());
-    info("");
     info(QUERYPARSE + Performance.getTimer(pars, runs));
     info(QUERYCOMPILE + Performance.getTimer(comp, runs));
     info(QUERYEVALUATE + Performance.getTimer(eval, runs));
