@@ -215,6 +215,8 @@ public interface DataText {
   /** Serialization error. */
   String SERVAL = "[SEPM0016] Parameter '%' must be set to '%'";
   /** Serialization error. */
+  String SERTAT = "[SENR0001] No top level attributes allowed";
+  /** Serialization error. */
   String SERVAL2 = " or '%'";
 
   // TABLE SERIALIZATION ======================================================

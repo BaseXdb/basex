@@ -211,6 +211,8 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void attribute(final byte[] n, final byte[] v) throws IOException {
     if(mth == M_TEXT) return;
+    
+    if(!inTag) error(SERTAT);
 
     print(' ');
     print(n);

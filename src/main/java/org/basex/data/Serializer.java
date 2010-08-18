@@ -27,7 +27,7 @@ public abstract class Serializer {
   /** Namespace levels. */
   private final IntList nsl = new IntList();
   /** Flag for opened tag. */
-  private boolean inTag;
+  protected boolean inTag;
 
   // === abstract methods =====================================================
 
