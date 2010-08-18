@@ -22,7 +22,7 @@ FILES --------------------------------------------------------------------------
 
 BaseX.nsi: Main installer file with all functions and definitions.
 Options.ini: Custom Options panel for Installation options.
-service: Folder for yajsw (http://yajsw.sourceforge.net)
+service: Folder for Tanuki Service Wrapper (http://wrapper.tanukisoftware.com)
 .basex: Flag for the right Home-Folder Configuration
 
 --------------------------------------------------------------------------------

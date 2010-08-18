@@ -42,7 +42,7 @@ Page custom OptionsPage OptionsLeave
 !insertmacro MUI_PAGE_FINISH
 
 Function install_service
-         nsExec::Exec '$INSTDIR\service\installService.bat'
+         nsExec::Exec '$INSTDIR\service\bin\InstallService.bat'
 FunctionEnd
 
 Function run_basex
@@ -93,38 +93,19 @@ Section "Hauptgruppe" SEC01
   File "License.txt"
   File ".basex"
   nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
-  SetOutPath "$INSTDIR\service\lib\core\commons"
-  File "service\lib\core\commons\commons-cli-2.jar"
-  File "service\lib\core\commons\commons-codec-1.3.jar"
-  File "service\lib\core\commons\commons-collections-3.2.jar"
-  File "service\lib\core\commons\commons-configuration-1.7-SNAPSHOT.jar"
-  File "service\lib\core\commons\commons-httpclient-3.0.1.jar"
-  File "service\lib\core\commons\commons-io-1.3.1.jar"
-  File "service\lib\core\commons\commons-jexl-1.1.jar"
-  File "service\lib\core\commons\commons-lang-2.4.jar"
-  File "service\lib\core\commons\commons-logging-1.1.jar"
-  File "service\lib\core\commons\commons-net-1.4.1.jar"
-  File "service\lib\core\commons\commons-vfs-2.0-SNAPSHOT.jar"
-  SetOutPath "$INSTDIR\service\lib\core\groovy"
-  File "service\lib\core\groovy\groovy-all-1.7.2.jar"
-  SetOutPath "$INSTDIR\service\lib\core\jna"
-  File "service\lib\core\jna\jna-3.2.5.jar"
-  SetOutPath "$INSTDIR\service\lib\core\netty"
-  File "service\lib\core\netty\netty-3.2.1.Final.jar"
-  SetOutPath "$INSTDIR\service\lib\core"
-  File "service\lib\core\ReadMe.txt"
-  SetOutPath "$INSTDIR\service\lib\core\regex"
-  File "service\lib\core\regex\jrexx-1.1.1.jar"
-  SetOutPath "$INSTDIR\service"
-  File "service\installService.bat"
-  File "service\setenv.bat"
-  File "service\startService.bat"
-  File "service\stopService.bat"
-  File "service\uninstallService.bat"
-  File "service\wrapper.bat"
-  File "service\wrapper.conf"
-  File "service\wrapper.jar"
-  File "service\wrapperApp.jar"
+  SetOutPath "$INSTDIR\service\bin"
+  File "service\bin\BaseX.bat"
+  File "service\bin\StartService.bat"
+  File "service\bin\InstallService.bat"
+  File "service\bin\StopService.bat"
+  File "service\bin\UninstallService.bat"
+  File "service\bin\wrapper.exe"
+  SetOutPath "$INSTDIR\service\lib"
+  File "service\lib\wrapper.dll"
+  File "service\lib\wrapper.jar"
+  SetOutPath "$INSTDIR\service\conf"
+  File "service\conf\wrapper.conf"
+  CreateDirectory "$INSTDIR\service\logs"
 SectionEnd
 
 Section -AdditionalIcons
