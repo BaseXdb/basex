@@ -8,6 +8,7 @@ import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
 import static org.basex.util.Token.*;
 import org.basex.util.Token;
+import org.basex.util.TokenMap;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Element;
@@ -89,8 +90,9 @@ public final class FElem extends FNode {
    * Provided by Erdal Karaca.
    * @param elem DOM node
    * @param p parent reference
+   * @param nss namespaces in scope
    */
-  FElem(final Element elem, final Nod p) {
+  FElem(final Element elem, final Nod p, final TokenMap nss) {
     super(Type.ELM);
 
     // general stuff
@@ -120,15 +122,22 @@ public final class FElem extends FNode {
       }
     }
     atts = new NodIter(attArr, pos);
+    
+    // add all new namespaces
+    for(int i = 0; i < ns.size; i++) nss.add(ns.key[i], ns.val[i]);
 
     // no parent, so we have to add all namespaces in scope
     if(p == null) {
-      final Atts nss = nsScope(elem.getParentNode());
-      for(int i = 0; i < nss.size; ++i) {
-        if(!ns.contains(nss.key[i])) {
-          ns.add(nss.key[i], nss.val[i]);
-        }
+      nsScope(elem.getParentNode(), nss);
+      for(final byte[] key : nss.keys()) {
+        if(!ns.contains(key)) ns.add(key, nss.get(key));
       }
+    }
+    
+    final byte[] pref = name.pref(), uri = name.uri.atom(), old = nss.get(pref);
+    if(old == null || !Token.eq(uri, old)) {
+      ns.add(pref, uri);
+      nss.add(pref, uri);
     }
 
     // children
@@ -151,7 +160,7 @@ public final class FElem extends FNode {
           childArr[i] = new FPI((ProcessingInstruction) child, this);
           break;
         case Node.ELEMENT_NODE:
-          childArr[i] = new FElem((Element) child, this);
+          childArr[i] = new FElem((Element) child, this, nss);
           break;
         default:
           break;
@@ -162,29 +171,29 @@ public final class FElem extends FNode {
   /**
    * Gathers all defined namespaces in the scope of the given DOM element.
    * @param elem DOM element
-   * @return namespaces
+   * @param nss map
    */
-  private static Atts nsScope(final Node elem) {
-    final Atts ns = new Atts();
+  private static void nsScope(final Node elem, final TokenMap nss) {
     Node n = elem;
     // only elements can declare namespaces
     while(n != null && n instanceof Element) {
       final NamedNodeMap atts = n.getAttributes();
+      final byte[] pre = token(n.getPrefix());
+      if(nss.get(pre) != null) nss.add(pre, token(n.getNamespaceURI()));
       for(int i = 0, len = atts.getLength(); i < len; ++i) {
         final Attr a = (Attr) atts.item(i);
-        final byte[] name = token(a.getName()), uri = token(a.getValue());
+        final byte[] name = token(a.getName()), val = token(a.getValue());
         if(Token.eq(name, XMLNS)) {
           // default namespace
-          if(!ns.contains(EMPTY)) ns.add(EMPTY, uri);
+          if(nss.get(EMPTY) == null) nss.add(EMPTY, val);
         } else if(startsWith(name, XMLNS)) {
           // prefixed namespace
           final byte[] ln = ln(name);
-          if(!ns.contains(ln)) ns.add(ln, uri);
+          if(nss.get(ln) == null) nss.add(ln, val);
         }
       }
       n = n.getParentNode();
     }
-    return ns;
   }
 
   @Override

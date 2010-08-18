@@ -23,6 +23,7 @@ import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.TokenMap;
 import org.basex.util.XMLToken;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -673,7 +674,7 @@ public enum Type {
     @Override
     public Nod e(final Object o, final InputInfo ii) {
       return o instanceof BXElem ? ((BXElem) o).getNod() :
-        new FElem((Element) o, null);
+        new FElem((Element) o, null, new TokenMap());
     }
   },
 

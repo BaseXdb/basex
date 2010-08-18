@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.iter.NodIter;
+import org.basex.util.TokenMap;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,7 +41,7 @@ public final class FDoc extends FNode {
     this(new NodIter(), b);
     final Node elem = doc.getFirstChild();
     if(elem != null && elem instanceof Element)
-      children.add(new FElem((Element) elem, this));
+      children.add(new FElem((Element) elem, this, new TokenMap()));
     // [LW] DocumentFragment != Document, possibly multiple roots
   }
 
