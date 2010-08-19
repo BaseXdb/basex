@@ -98,7 +98,7 @@ import org.basex.query.up.Insert;
 import org.basex.query.up.Rename;
 import org.basex.query.up.Replace;
 import org.basex.query.up.Transform;
-import org.basex.query.util.NSLocal;
+import org.basex.query.util.Namespaces;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.Atts;
@@ -589,8 +589,8 @@ public class QueryParser extends InputParser {
       error(NOMODULEFILE, fl);
     }
 
-    final NSLocal ns = ctx.ns;
-    ctx.ns = new NSLocal();
+    final Namespaces ns = ctx.ns;
+    ctx.ns = new Namespaces();
     new QueryParser(query, ctx).parse(fl, u);
     ctx.ns = ns;
     ctx.modLoaded.add(f);

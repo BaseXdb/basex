@@ -55,7 +55,7 @@ public final class PermissionTest {
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    server = new BaseXServer();
+    server = new BaseXServer("-z");
 
     try {
       adminSession = new ClientSession(server.context, ADMIN, ADMIN);

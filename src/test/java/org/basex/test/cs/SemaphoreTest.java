@@ -52,7 +52,7 @@ public final class SemaphoreTest {
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    server = new BaseXServer();
+    server = new BaseXServer("-z");
     sess = createSession();
   }
 

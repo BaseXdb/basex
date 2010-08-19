@@ -37,7 +37,7 @@ public final class PoolTest {
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    server = new BaseXServer();
+    server = new BaseXServer("-z");
     try {
       session1 = new ClientSession(server.context, ADMIN, ADMIN);
       session2 = new ClientSession(server.context, ADMIN, ADMIN);

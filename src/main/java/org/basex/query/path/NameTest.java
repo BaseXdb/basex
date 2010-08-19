@@ -72,21 +72,20 @@ public final class NameTest extends Test {
       if(name != null && name.uri == Uri.EMPTY) {
         name.uri = Uri.uri(ctx.ns.uri(name.pref(), false, input));
       }
-    } else {
-      final Data data = ctx.data();
-      if(data == null) return true;
+    }
 
-      // check existence of namespaces in input document
-      if(ctx.nsElem.length == 0 && data.ns.size() == 0) {
-        // no prefix - check only name
-        if(kind == Kind.STD && !name.ns()) kind = Kind.NAME;
+    // check existence of namespaces in input document
+    final Data data = ctx.data();
+    if(data == null) return true;
+    if(ctx.nsElem.length == 0 && data.ns.size() == 0) {
+      // no prefix - check only name
+      if(kind == Kind.STD && !name.ns()) kind = Kind.NAME;
 
-        // pre-evaluate unknown tag/attribute names
-        if(kind == Kind.NAME && (type == Type.ELM ?
-            data.tags : data.atts).id(ln) == 0) {
-          ctx.compInfo(OPTNAME, ln);
-          return false;
-        }
+      // pre-evaluate unknown tag/attribute names
+      if(kind == Kind.NAME && (type == Type.ELM ?
+          data.tags : data.atts).id(ln) == 0) {
+        ctx.compInfo(OPTNAME, ln);
+        return false;
       }
     }
     return true;

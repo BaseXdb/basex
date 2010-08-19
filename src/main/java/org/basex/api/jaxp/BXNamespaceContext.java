@@ -4,7 +4,7 @@ import static org.basex.util.Token.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 import javax.xml.namespace.NamespaceContext;
-import org.basex.query.util.NSLocal;
+import org.basex.query.util.Namespaces;
 
 /**
  * This class provides access to namespace context.
@@ -14,13 +14,13 @@ import org.basex.query.util.NSLocal;
  */
 public final class BXNamespaceContext implements NamespaceContext {
   /** Namespaces references. */
-  private final NSLocal ns;
+  private final Namespaces ns;
 
   /**
    * Constructor.
    * @param n namespace references
    */
-  public BXNamespaceContext(final NSLocal n) {
+  public BXNamespaceContext(final Namespaces n) {
     ns = n;
   }
 

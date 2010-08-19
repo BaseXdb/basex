@@ -9,7 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.NSLocal;
+import org.basex.query.util.Namespaces;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -44,7 +44,7 @@ public final class VarRef extends ParseExpr {
     if(e == null) return this;
 
     // pre-assign static variables
-    final NSLocal lc = ctx.ns;
+    final Namespaces lc = ctx.ns;
     ctx.ns = lc.copy();
     if(ctx.nsElem.length != 0)
       ctx.ns.add(new QNm(EMPTY, Uri.uri(ctx.nsElem)), input);

@@ -17,7 +17,7 @@ public final class CmdServerTest extends CmdTest {
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    new BaseXServer();
+    new BaseXServer("-z");
 
     try {
       session = new ClientSession(CONTEXT, ADMIN, ADMIN);

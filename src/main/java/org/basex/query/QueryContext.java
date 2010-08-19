@@ -40,7 +40,7 @@ import org.basex.query.iter.ItemIter;
 import org.basex.query.up.Updates;
 import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
-import org.basex.query.util.NSLocal;
+import org.basex.query.util.Namespaces;
 import org.basex.query.util.Variables;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
@@ -61,6 +61,8 @@ public final class QueryContext extends Progress {
   public final Variables vars = new Variables();
   /** Scoring instance. */
   public final Scoring score = new Scoring();
+  /** Namespaces. */
+  public Namespaces ns = new Namespaces();
 
   /** Database context. */
   public final Context context;
@@ -72,8 +74,6 @@ public final class QueryContext extends Progress {
   /** Cached thesaurus files. */
   public HashMap<String, String> thes;
 
-  /** Namespaces. */
-  public NSLocal ns = new NSLocal();
   /** Reference to the root expression. */
   public Expr root;
   /** Current context value. */

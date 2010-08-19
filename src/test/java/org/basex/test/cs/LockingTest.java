@@ -65,7 +65,7 @@ public final class LockingTest {
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    server = new BaseXServer();
+    server = new BaseXServer("-z");
     session1 = createSession();
     session2 = createSession();
   }

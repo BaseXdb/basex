@@ -15,7 +15,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class NSLocal {
+public final class Namespaces {
   /** Namespaces. */
   public final Atts ns = new Atts();
   /** Number of default namespaces. */
@@ -112,8 +112,8 @@ public final class NSLocal {
    * Creates a copy with the default namespaces.
    * @return copy
    */
-  public NSLocal copy() {
-    final NSLocal local = new NSLocal();
+  public Namespaces copy() {
+    final Namespaces local = new Namespaces();
     for(int i = 0; i < def; ++i) local.ns.add(ns.key[i], ns.val[i]);
     return local;
   }
