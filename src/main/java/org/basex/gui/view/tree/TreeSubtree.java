@@ -26,19 +26,17 @@ final class TreeSubtree {
   /**
    * Generates subtree borders.
    * @param c context
-   * @return root length
    */
-  int generateBorders(final Context c) {
+  void generateBorders(final Context c) {
     final Data d = c.current.data;
     final int[] roots = c.current.nodes;
     final int rl = roots.length;
-    if(rl == 0) return rl;
+    if(rl == 0) return;
     border = new TreeBorder[rl][];
 
     for(int i = 0; i < rl; ++i) {
       border[i] = nc.subtree(d, roots[i]);
     }
-    return rl;
   }
 
   /**

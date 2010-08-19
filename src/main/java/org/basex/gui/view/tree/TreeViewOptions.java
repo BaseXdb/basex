@@ -46,7 +46,7 @@ interface TreeViewOptions {
   /** Minimum rectangle space for text. */
   int MIN_TXT_SPACE = 4;
   /** Minimum space between the levels. */
-  int MIN_LEVEL_DISTANCE = 1;
+  int MIN_LEVEL_DISTANCE = 2;
   /** Optimal space between the levels. */
   int BEST_LEVEL_DISTANCE = 26;
   /** Maximum level distance. */
