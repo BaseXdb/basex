@@ -1,5 +1,6 @@
 package org.basex.test.w3c;
 
+import org.basex.core.Prop;
 import org.basex.data.Nodes;
 
 /**
@@ -23,6 +24,7 @@ public final class XQUTS extends W3CTS {
    */
   public XQUTS() {
     super("XQUTS");
+    context.prop.set(Prop.FORCECREATE, true);
   }
 
   @Override
