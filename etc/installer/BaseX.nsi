@@ -26,7 +26,7 @@ FunctionEnd
 !insertmacro MUI_PAGE_WELCOME
 ; License page
 !define MUI_LICENSEPAGE_RADIOBUTTONS
-!insertmacro MUI_PAGE_LICENSE "license.txt"
+!insertmacro MUI_PAGE_LICENSE "..\..\license.txt"
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
 ; Custom page
@@ -47,7 +47,7 @@ Function install_service
 FunctionEnd
 
 Function run_basex
-        Exec 'javaw -jar ${JAR}'
+        nsExec::Exec '$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe'
 FunctionEnd
 
 # CUSTOM PAGE.
@@ -77,7 +77,7 @@ Function OptionsLeave
           WriteRegStr HKCR ".xq" "" "File.xq"
           WriteRegStr HKCR "File.xq" "" "XQuery File"
           WriteRegStr HKCR "File.xq\shell" "" "Open"
-          WriteRegStr HKCR "File.xq\shell\Open\command" "" "javaw -jar $INSTDIR\${JAR} %1"
+          WriteRegStr HKCR "File.xq\shell\Open\command" "" "$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe %1"
           WriteRegStr HKCR "File.xq\DefaultIcon" "" "$INSTDIR\xml.ico"
         ${EndIf}
         ; .xml file Association
@@ -85,7 +85,7 @@ Function OptionsLeave
           WriteRegStr HKCR ".xml" "" "File.xml"
           WriteRegStr HKCR "File.xml" "" "XML File"
           WriteRegStr HKCR "File.xml\shell" "" "Open"
-          WriteRegStr HKCR "File.xml\shell\Open\command" "" "javaw -jar $INSTDIR\${JAR} %1"
+          WriteRegStr HKCR "File.xml\shell\Open\command" "" "$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe %1"
           WriteRegStr HKCR "File.xml\DefaultIcon" "" "$INSTDIR\xml.ico"
         ${EndIf}
         ${RefreshShellIcons}
@@ -109,9 +109,11 @@ Section "Hauptgruppe" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   File "..\..\target\${JAR}"
-  File "License.txt"
+  File "..\..\license.txt"
   File ".basex"
   File "..\images\xml.ico"
+  File "..\images\BaseX.ico"
+  File "${PRODUCT_NAME}${PRODUCT_VERSION}.exe"
   nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
   SetOutPath "$INSTDIR\service\bin"
   File "service\bin\BaseX.bat"
