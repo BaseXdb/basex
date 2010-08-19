@@ -451,7 +451,7 @@ public final class XQJTest extends TestCase {
     conn.getStaticContext().setScrollability(XQConstants.SCROLLTYPE_SCROLLABLE);
 
     XQExpression xqe = conn.createExpression();
-    final XQSequence xqs = xqe.executeQuery("basex:db('input')");
+    final XQSequence xqs = xqe.executeQuery("doc('etc/xml/input.xml')");
     xqs.first();
     final XQItem xqi = xqs.getItem();
 
@@ -473,7 +473,7 @@ public final class XQJTest extends TestCase {
       fail("Error expected: no database opened.");
     } catch(final XQException ex) { /* ignored */
     }
-    expr.executeCommand("open input");
+    expr.executeCommand("create db input etc/xml/input.xml");
     expr.executeCommand("info db");
     expr.executeCommand("close");
   }
@@ -497,7 +497,8 @@ public final class XQJTest extends TestCase {
   public void testContext() throws Exception {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
-    XQResultSequence result = expr.executeQuery("doc('input')//title/text()");
+    XQResultSequence result =
+      expr.executeQuery("doc('etc/xml/input.xml')//title/text()");
     result.next();
     final XQItem item = conn.createItem(result.getItem());
 
