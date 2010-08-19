@@ -39,6 +39,11 @@ abstract class Single extends ParseExpr {
   }
 
   @Override
+  public boolean removable(final Var v) {
+    return expr.removable(v);
+  }
+
+  @Override
   public Expr remove(final Var v) {
     expr = expr.remove(v);
     return this;

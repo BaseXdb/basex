@@ -49,7 +49,7 @@ final class FNNode extends Fun {
         final byte[] uri = checkNode(it).base();
         return uri.length == 0 ? null : Uri.uri(uri);
       case NILLED:
-        // always false without schema information
+        // always false, as no schema information is given
         if(empty) return null;
         checkNode(it);
         return it.type != Type.ELM ? null : Bln.FALSE;

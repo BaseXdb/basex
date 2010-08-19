@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import org.basex.core.Main;
 import org.basex.data.ExprInfo;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -189,8 +188,8 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Checks if an expression can be rewritten to an index access.
-   * If this method returns true, {@link #indexEquivalent} must be implemented
-   * for an expression.
+   * If this method is implemented, {@link #indexEquivalent} must be
+   * implemented as well.
    * @param ic index context
    * @return true if an index can be used
    * @throws QueryException query exception
@@ -202,15 +201,14 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Returns an equivalent expression which accesses an index structure.
-   * Must be called if {@link #indexAccessible} is implemented for an
+   * Will be called if {@link #indexAccessible} is returns true for an
    * expression.
    * @param ic index context
-   * @return Equivalent index-expression or null
+   * @return equivalent index-expression
    * @throws QueryException query exception
    */
   @SuppressWarnings("unused")
   public Expr indexEquivalent(final IndexContext ic) throws QueryException {
-    Main.notexpected();
     return null;
   }
 
@@ -236,11 +234,11 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Returns a copy of the expression.
-   * @return copy
+   * Returns a copy of the expression. {@code null} is returned if the
+   * expression cannot be copied.
+   * @return copy, or {@code null}
    */
   public Expr copy() {
-    Main.notexpected();
-    return this;
+    return null;
   }
 }

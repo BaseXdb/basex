@@ -131,10 +131,11 @@ public final class FNSimple extends Fun {
   public Expr compEbv(final QueryContext ctx) {
     // all functions have at least 1 argument
     final Expr e = expr[0];
+
     Expr ex = this;
     if(def == FunDef.BOOLEAN) {
-      // if(boolean(A)) -> if(A)
-      ex = e;
+      // (test)[boolean(A)] -> (test)[A]
+      if(!e.type().mayBeNum()) ex = e;
     } else if(def == FunDef.EXISTS) {
       // if(exists(node*)) -> if(node*)
       if(e.type().type.node()) ex = e;

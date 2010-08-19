@@ -70,6 +70,8 @@ public final class GUIProp extends AProp {
   public static final Object[] SHOWPLOT = { "SHOWPLOT", false };
   /** Flag for activated xquery view. */
   public static final Object[] SHOWXQUERY = { "SHOWXQUERY", true };
+  /** Flag for activated tree view. */
+  public static final Object[] SHOWTREE = { "SHOWTREE", false };
 
   /** Flag for Java look and feel. */
   public static final Object[] JAVALOOK = { "JAVALOOK", false };
@@ -157,8 +159,6 @@ public final class GUIProp extends AProp {
   public static final Object[] SHOWMENU = { "SHOWMENU", true };
   /** Flag for activated help view. */
   public static final Object[] SHOWHELP = { "SHOWHELP", false };
-  /** Flag for activated tree view. */
-  public static final Object[] SHOWTREE = { "SHOWTREE", false };
 
   /** Server user. */
   public static final Object[] SERVERUSER = { "SERVERUSER", "admin" };

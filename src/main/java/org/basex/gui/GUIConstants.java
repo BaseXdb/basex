@@ -81,7 +81,7 @@ public final class GUIConstants {
    */
   public static final String VIEWS = "V H " + XQUERYVIEW + " " + FOLDERVIEW +
     " " + MAPVIEW + " " + PLOTVIEW + " " + " - H " + TEXTVIEW + " " + INFOVIEW +
-    " " + TABLEVIEW + " " + EXPLOREVIEW + " - V " + TREEVIEW + " - -";
+    " " + TABLEVIEW + " " + TREEVIEW + " " + EXPLOREVIEW + " - -";
 
   // TOOLBAR ==================================================================
 
@@ -89,7 +89,7 @@ public final class GUIConstants {
   static final GUICommand[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, GOHOME, null, CREATE, OPEN, INFO, null,
       SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
-      SHOWTABLE, SHOWPLOT, SHOWEXPLORE, null, SHOWHELP
+      SHOWTABLE, SHOWPLOT, SHOWTREE, SHOWEXPLORE, null, SHOWHELP
   };
 
   // MENUBARS =================================================================
@@ -115,7 +115,7 @@ public final class GUIConstants {
   }, {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, SEPARATOR,
     MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWFOLDER, SHOWTABLE, SHOWPLOT,
-    SHOWEXPLORE, SEPARATOR, FULL
+    SHOWTREE, SHOWEXPLORE, SEPARATOR, FULL
   }, {
     MENUINTER, RTEXEC, RTFILTER, SEPARATOR,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT,

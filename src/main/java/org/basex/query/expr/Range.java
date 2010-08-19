@@ -82,6 +82,6 @@ public final class Range extends Arr {
 
   @Override
   public String toString() {
-    return toString(" " + QueryTokens.TO + " ");
+    return '(' + toString(" " + QueryTokens.TO + " ") + ')';
   }
 }

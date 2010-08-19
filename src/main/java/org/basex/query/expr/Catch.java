@@ -90,8 +90,14 @@ public final class Catch extends Single {
   }
 
   @Override
+  public boolean removable(final Var v) {
+    for(final Var vr : var) if(vr.shadows(v)) return true;
+    return true;
+  }
+
+  @Override
   public Expr remove(final Var v) {
-    for(final Var vr : var) if(!v.visible(vr)) return this;
+    for(final Var vr : var) if(vr.shadows(v)) return this;
     return super.remove(v);
   }
 

@@ -97,6 +97,12 @@ public final class Try extends Single {
   }
 
   @Override
+  public boolean removable(final Var v) {
+    for(final Catch c : ctch) if(!c.removable(v)) return false;
+    return super.removable(v);
+  }
+
+  @Override
   public Expr remove(final Var v) {
     for(final Catch c : ctch) c.remove(v);
     return super.remove(v);

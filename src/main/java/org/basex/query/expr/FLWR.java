@@ -33,8 +33,7 @@ public final class FLWR extends FLWOR {
     if(ex != this) return ex;
 
     // simplify basic FLWOR expression (for $i in A return $i -> A)
-    if(fl.length == 1 && where == null && fl[0].simple() &&
-        ret instanceof VarRef) {
+    if(fl.length == 1 && where == null && ret instanceof VarRef) {
       final Var v = ((VarRef) ret).var;
       if(v.type == null && fl[0].var.eq(v)) {
         ctx.compInfo(OPTFLWOR);

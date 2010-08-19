@@ -202,15 +202,15 @@ public interface DataText {
   String SERMAPS = "[SERE0000] Character map '%' is not defined.";
   /** Serialization error. */
   String SERKEY = "[SERE0000] Parameter '%' is unknown.";
-  /** Serialization error SESU0007. */
+  /** Serialization error. */
   String SERENCODING = "[SESU0007] Unknown encoding: '%'";
-  /** Serialization error SEPOM0009. */
+  /** Serialization error. */
   String SERSTAND = "[SEPM0009] Invalid combination of 'omit-xml-declaration'.";
-  /** Serialization error SEPM0010. */
+  /** Serialization error. */
   String SERUNDECL = "[SEPM0010] XML 1.0: undeclaring prefixes not allowed.";
-  /** Serialization error SERE0014. */
+  /** Serialization error. */
   String SERILL = "[SERE0014] Illegal HTML character found: #x%";
-  /** Serialization error SERE0015. */
+  /** Serialization error. */
   String SERPI = "[SERE0015] Processing construction contains '>'";
   /** Serialization error. */
   String SERVAL = "[SEPM0016] Parameter '%' must be set to '%'";

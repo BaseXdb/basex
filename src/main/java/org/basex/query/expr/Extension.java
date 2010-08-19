@@ -37,6 +37,7 @@ public final class Extension extends Single {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
+    // currently, will never be called, as compilation step returns argument
     return ctx.iter(expr);
   }
 

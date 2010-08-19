@@ -67,8 +67,6 @@ public final class SimpleTest extends QueryTest {
       { "Desc Error 2", "///" },
       { "Ancestor 1", nod(0), "/*/ancestor::node()" },
       { "Ancestor 2", nod(0, 1), "/*/*/ancestor::node()" },
-      { "Attribute 1", nod(4, 9, 10, 11, 12, 16), "//@*" },
-      { "Attribute 2", nod(4, 9, 10, 11, 12, 16), "//*/attribute::node()" },
       { "Pred 1", nod(1), "/*[/]" },
       { "Pred 2", nod(1), "/*[/*]" },
       { "Pred 3", nod(19), "//ul[li]" },

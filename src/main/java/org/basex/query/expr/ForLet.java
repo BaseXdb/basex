@@ -53,7 +53,7 @@ public abstract class ForLet extends Single {
   abstract boolean simple();
 
   /**
-   * Checks if the specified is not shadowed by another variable.
+   * Checks if the clause will shadow the specified variable.
    * @param v variable to be checked
    * @return result of check
    */
@@ -62,16 +62,5 @@ public abstract class ForLet extends Single {
   @Override
   public final boolean uses(final Use u) {
     return u == Use.VAR || super.uses(u);
-  }
-
-  @Override
-  public final boolean removable(final Var v) {
-    return expr.removable(v);
-  }
-
-  @Override
-  public final Expr remove(final Var v) {
-    expr = expr.remove(v);
-    return this;
   }
 }

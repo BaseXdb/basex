@@ -854,21 +854,25 @@ public interface Text {
   /** Command info. */
   String GUISHOWMENUTT = lang("c_showmenutt");
   /** Command info. */
+  String GUISHOWPLOT = lang("c_showplot");
+  /** Command info. */
+  String GUISHOWPLOTTT = lang("c_showplottt");
+  /** Command info. */
   String GUISHOWSTATUS = lang("c_showstatus");
   /** Command info. */
   String GUISHOWSTATUSTT = lang("c_showstatustt");
   /** Command info. */
   String GUISHOWTABLE = lang("c_showtable");
   /** Command info. */
-  String GUISHOWPLOT = lang("c_showplot");
-  /** Command info. */
   String GUISHOWTABLETT = lang("c_showtablett");
-  /** Command info. */
-  String GUISHOWPLOTTT = lang("c_showplottt");
   /** Command info. */
   String GUISHOWTEXT = lang("c_showtext");
   /** Command info. */
   String GUISHOWTEXTTT = lang("c_showtexttt");
+  /** Command info. */
+  String GUISHOWTREE = lang("c_showtree");
+  /** Command info. */
+  String GUISHOWTREETT = lang("c_showtreett");
   /** Command info. */
   String GUISHOWXQUERY = lang("c_showxquery");
   /** Command info. */

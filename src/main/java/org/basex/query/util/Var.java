@@ -145,12 +145,12 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Checks if the variable is not shadowed by the specified variable.
+   * Checks if the variable shadows the specified variable.
    * @param v variable
    * @return result of check
    */
-  public boolean visible(final Var v) {
-    return v == null || !v.name.eq(name);
+  public boolean shadows(final Var v) {
+    return v.name.eq(name);
   }
 
   /**

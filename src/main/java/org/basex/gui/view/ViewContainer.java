@@ -400,7 +400,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
         }
       }
       if(nv == views.length) return true;
-      Main.errln(Main.name(this) + "Missing Views: " + cnstr);
+      Main.errln(Main.name(this) + ": initializing views: " + cnstr);
     } catch(final Exception ex) {
       Main.debug(ex);
       Main.errln(Main.name(this) + ": could not build layout: " + cnstr);

@@ -124,7 +124,7 @@ public final class FElem extends FNode {
     atts = new NodIter(attArr, pos);
     
     // add all new namespaces
-    for(int i = 0; i < ns.size; i++) nss.add(ns.key[i], ns.val[i]);
+    for(int i = 0; i < ns.size; ++i) nss.add(ns.key[i], ns.val[i]);
 
     // no parent, so we have to add all namespaces in scope
     if(p == null) {

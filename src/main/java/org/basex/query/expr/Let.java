@@ -124,7 +124,7 @@ public final class Let extends ForLet {
 
   @Override
   boolean shadows(final Var v) {
-    return !v.visible(var);
+    return var.shadows(v);
   }
 
   @Override

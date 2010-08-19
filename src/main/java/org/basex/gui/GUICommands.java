@@ -595,8 +595,23 @@ public enum GUICommands implements GUICommand {
     }
   },
 
+  /** Shows the tree view. */
+  SHOWTREE(GUISHOWTREE, "% 6", GUISHOWTREETT, true, true) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.prop.invert(GUIProp.SHOWTREE);
+      gui.layoutViews();
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWTREE));
+    }
+  },
+
   /** Shows the explorer view. */
-  SHOWEXPLORE(GUISHOWEXPLORE, "% 6", GUISHOWEXPLORETT, true, true) {
+  SHOWEXPLORE(GUISHOWEXPLORE, "% 7", GUISHOWEXPLORETT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWEXPLORE);

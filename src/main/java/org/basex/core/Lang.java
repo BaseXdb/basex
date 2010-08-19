@@ -105,7 +105,7 @@ public final class Lang {
     if(val == null) {
       if(TETXTS.size() != 0) Main.errln("%." + SUFFIX + ": '%' missing",
           Prop.language, key);
-      return "?????";
+      return "[" + key + "]";
     }
     if(CHECK) check.remove(key);
     return val;

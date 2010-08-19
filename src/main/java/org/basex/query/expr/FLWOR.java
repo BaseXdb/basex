@@ -6,6 +6,8 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.func.Fun;
+import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
@@ -114,14 +116,15 @@ public class FLWOR extends ParseExpr {
     }
 
     // add where clause to most inner FOR clause and remove variable calls
-    // WHERE results must not be numeric
     if(where != null) {
       final ForLet f = fl[fl.length - 1];
-      if(f instanceof For && f.simple() && where.removable(f.var) &&
-          !where.type().mayBeNum()) {
+      if(f instanceof For && f.simple() && where.removable(f.var)) {
         // convert where clause to predicate(s)
         ctx.compInfo(OPTWHERE);
-        final Expr w = where.remove(f.var);
+        Expr w = where.remove(f.var);
+        // expression will be wrapped by a boolean function
+        // if the result is numeric
+        if(w.type().mayBeNum()) w = Fun.create(input, FunDef.BOOLEAN, w);
 
         if(f.expr instanceof AxisPath) {
           AxisPath ap = (AxisPath) f.expr;
@@ -140,7 +143,7 @@ public class FLWOR extends ParseExpr {
       }
     }
 
-    // compute number of results
+    // compute number of results to speed up count() operations
     if(where == null) {
       size = ret.size();
       if(size != -1) {

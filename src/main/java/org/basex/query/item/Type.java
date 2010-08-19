@@ -17,7 +17,6 @@ import org.basex.build.MemBuilder;
 import org.basex.build.xml.DOCWrapper;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
@@ -687,8 +686,7 @@ public enum Type {
       if(o instanceof Document) {
         try {
           final DOCWrapper p = new DOCWrapper((Document) o, "");
-          final Data data = MemBuilder.build(p, new Prop(false));
-          return new DBNode(data, 0);
+          return new DBNode(MemBuilder.build(p, new Prop(false)), 0);
         } catch(final IOException ex) {
           Err.or(ii, UNDOC, ex.getMessage());
         }
