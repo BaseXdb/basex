@@ -136,11 +136,14 @@ public class CreateDB extends ACreate {
   public static synchronized Data xml(final Parser parser, final String name,
       final Context ctx) throws IOException {
 
-    if(ctx.prop.is(Prop.MAINMEM)) {
+    // create main-memory database instance
+    if(ctx.prop.is(Prop.MAINMEM))
       return MemBuilder.build(parser, ctx.prop, name);
-    }
+
+    // database is currently locked by another process
     if(ctx.pinned(name)) throw new IOException(Main.info(DBLOCKED, name));
 
+    // build database and index structures
     final Builder builder = new DiskBuilder(parser, ctx.prop);
     try {
       final Data data = builder.build(name);
@@ -171,6 +174,9 @@ public class CreateDB extends ACreate {
    */
   public static synchronized Data xml(final Parser parser, final Context ctx)
       throws IOException {
+
+    if(!ctx.user.perm(User.CREATE))
+      throw new IOException(Main.info(PERMNO, CmdPerm.CREATE));
     return MemBuilder.build(parser, ctx.prop);
   }
 

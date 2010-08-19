@@ -12,7 +12,7 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class IterPred extends Filter {
+final class IterFilter extends Filter {
   /** Flag is set to true if predicate has last function. */
   final boolean last;
   /** Optional position predicate. */
@@ -24,7 +24,7 @@ final class IterPred extends Filter {
    * @param ps position predicate; may equal the first predicate
    * @param l true if predicate has a last function
    */
-  IterPred(final Filter f, final Pos ps, final boolean l) {
+  IterFilter(final Filter f, final Pos ps, final boolean l) {
     super(f.input, f.root, f.pred);
     type = f.type;
     last = l;

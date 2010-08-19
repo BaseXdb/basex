@@ -193,12 +193,12 @@ public class Step extends Preds {
   }
 
   /**
-   * Adds a predicate to the step.
-   * @param p predicate to be added
+   * Adds predicates to the step.
+   * @param preds predicates to be added
    * @return resulting step instance
    */
-  final Step addPred(final Expr p) {
-    pred = Array.add(pred, p);
+  final Step addPreds(final Expr... preds) {
+    for(final Expr p : preds) pred = Array.add(pred, p);
     return get(input, axis, test, pred);
   }
 

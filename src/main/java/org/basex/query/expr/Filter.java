@@ -46,11 +46,8 @@ public class Filter extends Preds {
     root = checkUp(root, ctx).comp(ctx);
 
     // convert filters to axis paths
-    if(root instanceof AxisPath && !super.uses(Use.POS)) {
-      AxisPath path = ((AxisPath) root).copy();
-      for(final Expr p : pred) path = path.addPred(p);
-      return path.comp(ctx);
-    }
+    if(root instanceof AxisPath && !super.uses(Use.POS))
+      return ((AxisPath) root).copy().addPreds(pred).comp(ctx);
 
     // return empty root
     if(root.empty()) return optPre(Empty.SEQ, ctx);
@@ -75,7 +72,7 @@ public class Filter extends Preds {
     final boolean last = p instanceof Fun && ((Fun) p).def == FunDef.LAST;
     // use iterative evaluation
     if(pred.length == 1 && (last || pos != null || !uses(Use.POS)))
-      return new IterPred(this, pos, last);
+      return new IterFilter(this, pos, last);
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
     direct = pred.length == 1 && p.type().num() && !p.uses(Use.CTX);
@@ -90,7 +87,7 @@ public class Filter extends Preds {
       final long l = it.itr(input);
       final Expr e = Pos.get(l, l, input);
       return l != it.dbl(input) || e == Bln.FALSE ? Iter.EMPTY :
-        new IterPred(this, (Pos) e, false).iter(ctx);
+        new IterFilter(this, (Pos) e, false).iter(ctx);
     }
 
     final Iter iter = ctx.iter(root);

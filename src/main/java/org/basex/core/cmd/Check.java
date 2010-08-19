@@ -3,6 +3,7 @@ package org.basex.core.cmd;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Command;
+import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
@@ -50,7 +51,12 @@ public final class Check extends Command {
 
     final IO io = IO.get(path);
     final String name = io.dbname();
+
+    // if found, an existing database is opened
     return MetaData.found(path, name, ctx.prop) ? Open.open(name, ctx) :
-      CreateDB.xml(io, name, ctx);
+      // if flag is set to true, a new database instance is created on disk
+      ctx.prop.is(Prop.FORCECREATE) ? CreateDB.xml(io, name, ctx) :
+        // otherwise, a main-memory instance is created
+        CreateDB.xml(io, ctx);
   }
 }

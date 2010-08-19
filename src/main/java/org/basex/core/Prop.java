@@ -110,6 +110,8 @@ public final class Prop extends AProp {
   public static final Object[] CACHEQUERY = { "CACHEQUERY", false };
   /** Writes original files back after updates. */
   public static final Object[] WRITEBACK = { "WRITEBACK", false };
+  /** Forces database creation for unknown documents. */
+  public static final Object[] FORCECREATE = { "FORCECREATE", false };
 
   /** Use internal XML parser. */
   public static final Object[] INTPARSE = { "INTPARSE", false };

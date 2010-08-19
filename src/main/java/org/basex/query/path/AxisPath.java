@@ -366,11 +366,9 @@ public class AxisPath extends Path {
 
       // add remaining predicates to last step
       final int sl = result.step.length - 1;
-      for(final Expr np : newPreds) {
-        result.step[sl] = result.step[sl].addPred(np);
-      }
+      result.step[sl] = result.step[sl].addPreds(newPreds);
       // add inverted path as predicate to last step
-      if(inv.length != 0) result.step[sl] = result.step[sl].addPred(
+      if(inv.length != 0) result.step[sl] = result.step[sl].addPreds(
           AxisPath.get(input, null, inv));
 
       // add remaining steps
@@ -527,8 +525,8 @@ public class AxisPath extends Path {
    * @param pred predicate to be added
    * @return resulting path instance
    */
-  public final AxisPath addPred(final Expr pred) {
-    step[step.length - 1] = step[step.length - 1].addPred(pred);
+  public final AxisPath addPreds(final Expr[] pred) {
+    step[step.length - 1] = step[step.length - 1].addPreds(pred);
     return get(input, root, step);
   }
 

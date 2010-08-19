@@ -53,6 +53,34 @@ public class FLWOR extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    // add where clause to most inner FOR clause and remove variable calls
+    // this is done first to force index access over other path rewritings
+    if(where != null) {
+      final ForLet f = fl[fl.length - 1];
+      if(f instanceof For && f.simple() && where.removable(f.var)) {
+        // convert where clause to predicate(s)
+        ctx.compInfo(OPTWHERE);
+
+        final Expr e = where.remove(f.var);
+        final Expr[] pr = e instanceof And ? ((And) e).expr : new Expr[] { e };
+
+        // expression will be wrapped by a boolean function
+        // if the result is numeric
+        for(int p = 0; p < pr.length; p++) {
+          if(pr[p].type().mayBeNum())
+            pr[p] = Fun.create(input, FunDef.BOOLEAN, pr[p]);
+        }
+
+        // attach predicates to axis path, or create a filter
+        if(f.expr instanceof AxisPath) {
+          f.expr = ((AxisPath) f.expr).addPreds(pr);
+        } else {
+          f.expr = new Filter(input, f.expr, pr);
+        }
+        where = null;
+      }
+    }
+
     final int vs = ctx.vars.size();
 
     // optimize for/let clauses
@@ -90,7 +118,7 @@ public class FLWOR extends ParseExpr {
       return Empty.SEQ;
     }
 
-    // remove inlined clauses
+    // remove inlined variable declarations
     for(int f = 0; f != fl.length; ++f) {
       if(fl[f].var.expr() != null) {
         ctx.compInfo(OPTVAR, fl[f].var);
@@ -101,7 +129,7 @@ public class FLWOR extends ParseExpr {
     // no clauses left: simplify expression
     // an optional order clause can be safely ignored
     if(fl.length == 0) {
-      // if where is null: where A return B -> if A then B else ()
+      // if where clause exists: where A return B -> if A then B else ()
       // otherwise: return B -> B
       ctx.compInfo(OPTFLWOR);
       return where != null ? new If(input, where, ret, Empty.SEQ) : ret;
@@ -112,34 +140,6 @@ public class FLWOR extends ParseExpr {
       if(f instanceof For && (f.empty() || f.size() == 0)) {
         ctx.compInfo(OPTFLWOR);
         return Empty.SEQ;
-      }
-    }
-
-    // add where clause to most inner FOR clause and remove variable calls
-    if(where != null) {
-      final ForLet f = fl[fl.length - 1];
-      if(f instanceof For && f.simple() && where.removable(f.var)) {
-        // convert where clause to predicate(s)
-        ctx.compInfo(OPTWHERE);
-        Expr w = where.remove(f.var);
-        // expression will be wrapped by a boolean function
-        // if the result is numeric
-        if(w.type().mayBeNum()) w = Fun.create(input, FunDef.BOOLEAN, w);
-
-        if(f.expr instanceof AxisPath) {
-          AxisPath ap = (AxisPath) f.expr;
-          if(w instanceof And) {
-            for(final Expr e : ((And) w).expr) ap = ap.addPred(e);
-          } else {
-            ap = ap.addPred(w);
-          }
-          f.expr = ap;
-        } else {
-          f.expr = new Filter(input, f.expr, w);
-        }
-        where = null;
-        // recompile expression
-        return comp(ctx);
       }
     }
 
