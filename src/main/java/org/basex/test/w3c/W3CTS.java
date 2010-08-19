@@ -338,7 +338,7 @@ public abstract class W3CTS {
       final String inname = text("*:query/@name", state);
       context.query = IO.get(queries + pth + inname + IO.XQSUFFIX);
       final String in = read(context.query);
-      String error = null;
+      String er = null;
       ItemIter iter = null;
       boolean doc = true;
 
@@ -391,18 +391,13 @@ public abstract class W3CTS {
           it.serialize(xml);
         }
         xml.close();
-      } catch(final QueryException ex) {
-        error = ex.getMessage();
-        if(error.startsWith(STOPPED)) {
-          error = error.substring(error.indexOf('\n') + 1);
-        }
-        if(error.startsWith("[")) {
-          error = error.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
-        }
       } catch(final Exception ex) {
-        error = ex.getMessage() != null ? ex.getMessage() : ex.toString();
-        System.err.print("\n" + inname + ": ");
-        ex.printStackTrace();
+        if(!(ex instanceof QueryException || ex instanceof IOException))
+          ex.printStackTrace();
+        er = ex.getMessage();
+        if(er.startsWith(STOPPED)) er = er.substring(er.indexOf('\n') + 1);
+        if(er.startsWith("[")) er = er.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
+        // unexpected error - dump stack trace
       }
 
       // print compilation steps
@@ -444,11 +439,11 @@ public abstract class W3CTS {
       final boolean print = currTime || !logStr.contains("current-");
 
       boolean correctError = false;
-      if(error != null && (outFiles.size() == 0 || !expError.isEmpty())) {
+      if(er != null && (outFiles.size() == 0 || !expError.isEmpty())) {
         expError = error(pth + outname, expError);
-        final String code = error.substring(0, Math.min(8, error.length()));
-        for(final String er : SLASH.split(expError)) {
-          if(code.equals(er)) {
+        final String code = er.substring(0, Math.min(8, er.length()));
+        for(final String e : SLASH.split(expError)) {
+          if(code.equals(e)) {
             correctError = true;
             break;
           }
@@ -459,13 +454,13 @@ public abstract class W3CTS {
         if(print) {
           logOK.append(logStr);
           logOK.append("[Right] ");
-          logOK.append(norm(error));
+          logOK.append(norm(er));
           logOK.append(NL);
           logOK.append(NL);
-          addLog(pth, outname + ".log", error);
+          addLog(pth, outname + ".log", er);
         }
         ok++;
-      } else if(error == null) {
+      } else if(er == null) {
         int s = -1;
         final int rs = result.size();
         while(++s < rs) {
@@ -548,10 +543,10 @@ public abstract class W3CTS {
             logOK2.append(norm(expError));
             logOK2.append(NL);
             logOK2.append("[Rght?] ");
-            logOK2.append(norm(error));
+            logOK2.append(norm(er));
             logOK2.append(NL);
             logOK2.append(NL);
-            addLog(pth, outname + ".log", error);
+            addLog(pth, outname + ".log", er);
           }
           ok2++;
         } else {
@@ -561,10 +556,10 @@ public abstract class W3CTS {
             logErr2.append(norm(string(result.get(0))));
             logErr2.append(NL);
             logErr2.append("[Wrong] ");
-            logErr2.append(norm(error));
+            logErr2.append(norm(er));
             logErr2.append(NL);
             logErr2.append(NL);
-            addLog(pth, outname + ".log", error);
+            addLog(pth, outname + ".log", er);
           }
           correct = false;
           err2++;
