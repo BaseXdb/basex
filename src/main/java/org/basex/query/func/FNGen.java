@@ -93,7 +93,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Iter data(final QueryContext ctx) throws QueryException {
-    final Iter ir = ctx.iter(expr.length != 0 ? expr[0] : checkCtx(ctx));
+    final Iter ir = ctx.iter(expr[0]);
 
     return new Iter() {
       @Override

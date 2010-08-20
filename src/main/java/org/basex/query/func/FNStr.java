@@ -235,8 +235,7 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Item strjoin(final QueryContext ctx) throws QueryException {
-    final byte[] sep = expr.length == 2 ?
-        checkStr(expr[1], ctx) : EMPTY;
+    final byte[] sep = checkStr(expr[1], ctx);
 
     final TokenBuilder tb = new TokenBuilder();
     final Iter iter = expr[0].iter(ctx);

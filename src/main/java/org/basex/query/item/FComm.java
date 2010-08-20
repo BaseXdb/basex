@@ -49,7 +49,7 @@ public final class FComm extends FNode {
 
   @Override
   public FComm copy() {
-    return new FComm(val, par);
+    return new FComm(val.clone(), par);
   }
 
   @Override
