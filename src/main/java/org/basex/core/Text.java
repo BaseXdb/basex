@@ -415,6 +415,8 @@ public interface Text {
   String DBDROPPED = lang("db_dropped");
   /** Database not dropped. */
   String DBNOTDROPPED = lang("db_notdropped");
+  /** Database not dropped. */
+  String DBDROPERROR = lang("db_droperror");
   /** Database altered. */
   String DBALTERED = lang("db_altered");
   /** Database not dropped. */

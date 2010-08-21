@@ -20,8 +20,8 @@ public final class IndexContext {
   /** Flag for potential duplicates. */
   public final boolean dupl;
 
-  /** Number of estimated results. */
-  public int is = Integer.MAX_VALUE;
+  /** Costs of index access: smaller is better, 0 means no results. */
+  public int costs = Integer.MAX_VALUE;
   /** Flag for ftnot expressions. */
   public boolean not;
   /** Flag for sequential processing. */

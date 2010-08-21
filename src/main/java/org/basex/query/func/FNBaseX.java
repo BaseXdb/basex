@@ -5,7 +5,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Data;
-import org.basex.data.Data.IndexType;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
 import org.basex.io.TextInput;
 import org.basex.query.IndexContext;
@@ -204,11 +204,11 @@ final class FNBaseX extends Fun {
     }
     if(tp.equals(TEXT)) {
       if(!data.meta.txtindex) Err.or(input, NOIDX, TEXT);
-      return new IndexAccess(input, expr[0], IndexType.TXT, ic).iter(ctx);
+      return new IndexAccess(input, expr[0], IndexType.TEXT, ic).iter(ctx);
     }
     if(tp.equals(ATTRIBUTE)) {
       if(!data.meta.atvindex) Err.or(input, NOIDX, ATTRIBUTE);
-      return new IndexAccess(input, expr[0], IndexType.ATV, ic).iter(ctx);
+      return new IndexAccess(input, expr[0], IndexType.ATTV, ic).iter(ctx);
     }
 
     Err.or(input, WHICHIDX, tp);

@@ -122,7 +122,7 @@ public final class FElem extends FNode {
       }
     }
     atts = new NodIter(attArr, pos);
-    
+
     // add all new namespaces
     for(int i = 0; i < ns.size; ++i) nss.add(ns.key[i], ns.val[i]);
 
@@ -133,7 +133,7 @@ public final class FElem extends FNode {
         if(!ns.contains(key)) ns.add(key, nss.get(key));
       }
     }
-    
+
     final byte[] pref = name.pref(), uri = name.uri.atom(), old = nss.get(pref);
     if(old == null || !Token.eq(uri, old)) {
       ns.add(pref, uri);

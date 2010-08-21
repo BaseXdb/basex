@@ -22,7 +22,7 @@ public final class Quantifier extends ParseExpr {
   /** Every flag. */
   private final boolean every;
   /** For/Let expressions. */
-  private For[] fl;
+  private final For[] fl;
   /** Expression list. */
   private Expr sat;
 

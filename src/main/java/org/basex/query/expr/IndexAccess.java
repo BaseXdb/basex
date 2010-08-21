@@ -5,8 +5,8 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
-import org.basex.data.Data.IndexType;
 import org.basex.index.IndexIterator;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -67,7 +67,7 @@ public final class IndexAccess extends Single {
    */
   private Iter index(final byte[] term) {
     final Data data = ictx.data;
-    final boolean text = ind == IndexType.TXT;
+    final boolean text = ind == IndexType.TEXT;
     final byte kind = text ? Data.TEXT : Data.ATTR;
 
     return term.length <= MAXLEN ? new Iter() {
@@ -104,13 +104,13 @@ public final class IndexAccess extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, token(type.toString()));
+    ser.openElement(this, TYPE, token(ind.toString()));
     expr.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    return name() + "(" + expr + ", " + type + ")";
+    return name() + "(" + expr + ", " + ind + ")";
   }
 }

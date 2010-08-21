@@ -290,14 +290,15 @@ public final class Token {
     /*try { return string.codePointAt(pos);
     } catch(final IndexOutOfBoundsException e) { return 0; }*/
   }
-  
+
   /**
    * Converts a token to a sequence of codepoints.
    * @param token token
    * @return codepoints
    */
   public static int[] cps(final byte[] token) {
-    int pos = 0, len = token.length;
+    int pos = 0;
+    final int len = token.length;
     final int[] cp = new int[len];
     for(int i = 0; i < len; i += cl(token, i)) cp[pos++] = cp(token, i);
     return pos < len ? Arrays.copyOf(cp, pos) : cp;

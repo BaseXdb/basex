@@ -76,11 +76,11 @@ public final class Or extends Logical {
     Expr[] exprs = {};
     for(final Expr e : expr) {
       if(!e.indexAccessible(ic) || ic.seq) return false;
-      is += ic.is;
+      is += ic.costs;
       // add only expressions that yield results
-      if(ic.is != 0) exprs = Array.add(exprs, e);
+      if(ic.costs != 0) exprs = Array.add(exprs, e);
     }
-    ic.is = is;
+    ic.costs = is;
     expr = exprs;
     return true;
   }

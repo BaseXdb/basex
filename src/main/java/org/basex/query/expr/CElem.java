@@ -65,7 +65,7 @@ public final class CElem extends CFrag {
           Uri.uri(nsp.val[n])), input);
     }
   }
-  
+
   /**
    * Checks the element name for illegal prefixes or URIs.
    * @param name element name
@@ -74,7 +74,7 @@ public final class CElem extends CFrag {
    */
   private QNm checkNS(final QNm name) throws QueryException {
     final byte[] pre = name.pref(), uri = name.uri.atom();
-    if(eq(pre, XMLNS) || eq(uri, XMLNSURI) || (eq(pre, XML) ^ eq(uri, XMLURI)))
+    if(eq(pre, XMLNS) || eq(uri, XMLNSURI) || eq(pre, XML) ^ eq(uri, XMLURI))
       Err.or(input, CEINS, pre, uri);
     return name;
   }

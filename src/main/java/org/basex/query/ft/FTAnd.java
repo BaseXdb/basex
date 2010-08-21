@@ -133,10 +133,10 @@ public final class FTAnd extends FTExpr {
       neg[i] = ic.not;
       if(ic.not) n++;
       ic.not = false;
-      if(is == 0 || ic.is < is) is = ic.is;
-      if(ic.is == 0) break;
+      if(is == 0 || ic.costs < is) is = ic.costs;
+      if(ic.costs == 0) break;
     }
-    ic.is = is;
+    ic.costs = is;
 
     // no index access if first or all operators are negative
     return !neg[0] && n < expr.length;

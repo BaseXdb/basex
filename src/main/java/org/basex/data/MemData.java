@@ -2,6 +2,7 @@ package org.basex.data;
 
 import org.basex.core.Prop;
 import org.basex.index.Index;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.MemValues;
 import org.basex.index.Names;
 import org.basex.io.TableMemAccess;

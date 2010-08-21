@@ -10,7 +10,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Data.IndexType;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
 
 /**
@@ -37,13 +37,13 @@ public final class DropIndex extends ACreate {
     switch(getOption(CmdIndex.class)) {
       case TEXT:
         data.meta.txtindex = false;
-        return drop(IndexType.TXT, DATATXT);
+        return drop(IndexType.TEXT, DATATXT);
       case ATTRIBUTE:
         data.meta.atvindex = false;
-        return drop(IndexType.ATV, DATAATV);
+        return drop(IndexType.ATTV, DATAATV);
       case FULLTEXT:
         data.meta.ftxindex = false;
-        return drop(IndexType.FTX, DATAFTX);
+        return drop(IndexType.FTXT, DATAFTX);
       case PATH:
         if(data.meta.pthindex) {
           data.meta.pthindex = false;

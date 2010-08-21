@@ -1,9 +1,7 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
-
 import java.lang.reflect.Field;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
@@ -72,7 +70,7 @@ public class LogListTest {
     new DropDB(LogListTest.class.getSimpleName()).execute(context);
     context.close();
   }
-  
+
   /**
    * Executes the given XQueries on the current DB and checks the mapping.
    * @param qs queries
@@ -82,7 +80,7 @@ public class LogListTest {
     for(final String q : qs) new XQuery(q).execute(context);
     checkMapping();
   }
-  
+
   /**
    * Checks if for all PRE values existing in the document pre(id(PRE)) == PRE
    * holds.
@@ -94,5 +92,4 @@ public class LogListTest {
           context.data.pre(id));
     }
   }
-  
 }

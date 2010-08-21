@@ -260,7 +260,7 @@ public final class FTWords extends FTExpr {
 
     // no index results
     if(txt.length == 0) {
-      ic.is = 0;
+      ic.costs = 0;
       return true;
     }
 
@@ -276,7 +276,7 @@ public final class FTWords extends FTExpr {
 
     // summarize number of hits; break loop if no hits are expected
     final Tokenizer ft = new Tokenizer(txt, fto, fast, ic.ctx.context.prop);
-    ic.is = 0;
+    ic.costs = 0;
     while(ft.more()) {
       final byte[] tok = ft.get();
       if(tok.length > Token.MAXLEN) return false;
@@ -284,7 +284,7 @@ public final class FTWords extends FTExpr {
 
       // reduce number of expected results to favor full-text index requests
       final int s = ic.data.nrIDs(ft) + 3 >> 2;
-      if(ic.is > s || ic.is == 0) ic.is = s;
+      if(ic.costs > s || ic.costs == 0) ic.costs = s;
       if(s == 0) break;
     }
     return true;

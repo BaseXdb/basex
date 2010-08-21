@@ -101,10 +101,10 @@ public final class FTMildNot extends FTExpr {
 
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
-    int sum = ic.is;
+    int sum = ic.costs;
     for(final FTExpr e : expr) {
       if(!e.indexAccessible(ic)) return false;
-      sum += ic.is;
+      sum += ic.costs;
     }
     return true;
   }

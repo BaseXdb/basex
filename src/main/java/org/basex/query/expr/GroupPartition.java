@@ -181,7 +181,7 @@ final class GroupPartition {
     /* for debugging (should be removed later) */
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder();
+      final StringBuilder sb = new StringBuilder();
       sb.append(" ");
       sb.append(" with grouping var ");
       sb.append(Arrays.toString(its));

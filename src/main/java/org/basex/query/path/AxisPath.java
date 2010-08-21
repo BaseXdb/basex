@@ -283,8 +283,8 @@ public class AxisPath extends Path {
 
     // cache index access costs
     IndexContext ics = null;
-    int ips = 0;
-    int ms = 0;
+    int pmin = 0;
+    int smin = 0;
 
     // check if path can be converted to an index access
     for(int s = 0; s < step.length; ++s) {
@@ -300,7 +300,7 @@ public class AxisPath extends Path {
         final IndexContext ic = new IndexContext(ctx, data, stp, d);
         if(!stp.pred[p].indexAccessible(ic)) continue;
 
-        if(ic.is == 0) {
+        if(ic.costs == 0) {
           if(ic.not) {
             // not operator... accept all results
             stp.pred[p] = Bln.TRUE;
@@ -310,10 +310,10 @@ public class AxisPath extends Path {
           ctx.compInfo(OPTNOINDEX, this);
           return Empty.SEQ;
         }
-        if(ics == null || ics.is > ic.is) {
+        if(ics == null || ics.costs > ic.costs) {
           ics = ic;
-          ips = p;
-          ms = s;
+          pmin = p;
+          smin = s;
         }
       }
     }
@@ -322,12 +322,12 @@ public class AxisPath extends Path {
     if(ics == null) return this;
 
     // replace expressions for index access
-    final Step stp = step[ms];
-    final Expr ie = stp.pred[ips].indexEquivalent(ics);
+    final Step stp = step[smin];
+    final Expr ie = stp.pred[pmin].indexEquivalent(ics);
 
     if(ics.seq) {
       // do not invert path
-      stp.pred[ips] = ie;
+      stp.pred[pmin] = ie;
     } else {
       Step[] inv = {};
 
@@ -335,11 +335,11 @@ public class AxisPath extends Path {
       final Expr[] newPreds = new Expr[stp.pred.length - 1];
       int c = 0;
       for(int p = 0; p != stp.pred.length; ++p) {
-        if(p != ips) newPreds[c++] = stp.pred[p];
+        if(p != pmin) newPreds[c++] = stp.pred[p];
       }
 
       // invert path before index step
-      for(int j = ms; j >= 0; j--) {
+      for(int j = smin; j >= 0; j--) {
         final Axis a = step[j].axis.invert();
         if(a == null) break;
 
@@ -357,7 +357,7 @@ public class AxisPath extends Path {
       AxisPath result = null;
       if(ie instanceof AxisPath) {
         result = (AxisPath) ie;
-      } else if(ms + 1 < step.length || !simple) {
+      } else if(smin + 1 < step.length || !simple) {
         result = simple ? new AxisPath(input, ie) :
           new AxisPath(input, ie, Step.get(input, Axis.SELF, Test.NODE));
       } else {
@@ -372,7 +372,7 @@ public class AxisPath extends Path {
           AxisPath.get(input, null, inv));
 
       // add remaining steps
-      for(int s = ms + 1; s < step.length; ++s) {
+      for(int s = smin + 1; s < step.length; ++s) {
         result.step = Array.add(result.step, step[s]);
       }
       return result;

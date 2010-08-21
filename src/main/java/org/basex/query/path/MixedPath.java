@@ -54,7 +54,7 @@ public final class MixedPath extends Path {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    Value v = root != null ? ctx.iter(root).finish() : checkCtx(ctx);
+    final Value v = root != null ? ctx.iter(root).finish() : checkCtx(ctx);
     final Value c = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.core.Prop;
 import org.basex.index.FTIndex;
 import org.basex.index.Index;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.Names;
 import org.basex.index.Values;
 import org.basex.io.DataAccess;
@@ -133,18 +134,18 @@ public final class DiskData extends Data {
     table.close();
     texts.close();
     values.close();
-    closeIndex(IndexType.TXT);
-    closeIndex(IndexType.ATV);
-    closeIndex(IndexType.FTX);
+    closeIndex(IndexType.TEXT);
+    closeIndex(IndexType.ATTV);
+    closeIndex(IndexType.FTXT);
   }
 
   @Override
   public void closeIndex(final IndexType type) throws IOException {
     switch(type) {
-      case TXT: if(txtindex != null) txtindex.close(); break;
-      case ATV: if(atvindex != null) atvindex.close(); break;
-      case FTX: if(ftxindex != null) ftxindex.close(); break;
-      case PTH: if(ftxindex != null) path.close(); break;
+      case TEXT: if(txtindex != null) txtindex.close(); break;
+      case ATTV: if(atvindex != null) atvindex.close(); break;
+      case FTXT: if(ftxindex != null) ftxindex.close(); break;
+      case PATH: if(ftxindex != null) path.close(); break;
       default: break;
     }
   }
@@ -152,10 +153,10 @@ public final class DiskData extends Data {
   @Override
   public void setIndex(final IndexType type, final Index index) {
     switch(type) {
-      case TXT: if(meta.txtindex) txtindex = index; break;
-      case ATV: if(meta.atvindex) atvindex = index; break;
-      case FTX: if(meta.ftxindex) ftxindex = index; break;
-      case PTH: if(meta.pthindex) path = (PathSummary) index; break;
+      case TEXT: if(meta.txtindex) txtindex = index; break;
+      case ATTV: if(meta.atvindex) atvindex = index; break;
+      case FTXT: if(meta.ftxindex) ftxindex = index; break;
+      case PATH: if(meta.pthindex) path = (PathSummary) index; break;
       default: break;
     }
   }

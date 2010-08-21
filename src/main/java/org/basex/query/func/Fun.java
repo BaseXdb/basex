@@ -6,14 +6,12 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import static org.basex.query.QueryText.*;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Atm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -46,14 +44,10 @@ public abstract class Fun extends Arr {
    * @param f function description
    * @param e expression array
    * @return function
-   * @throws QueryException wrong number of arguments
    */
   public static final Fun create(final InputInfo ii, final FunDef f,
-      final Expr... e) throws QueryException {
+      final Expr... e) {
 
-    // check number of arguments
-    if(e.length < f.min || e.length > f.max) Err.or(ii, XPARGS, f);
-    
     try {
       return f.func.getDeclaredConstructor(InputInfo.class, FunDef.class,
           Expr[].class).newInstance(ii, f, e);

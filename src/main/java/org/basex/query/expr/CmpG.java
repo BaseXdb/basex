@@ -4,7 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
-import org.basex.data.Data.IndexType;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -250,24 +250,21 @@ public final class CmpG extends Cmp {
     final Step s = indexStep(expr[0]);
     if(s == null || op != Op.EQ) return false;
 
-    final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
-    final boolean attr = !text && ic.data.meta.atvindex &&
-      s.simple(Axis.ATTR, true);
-
-    // no text or attribute index applicable
+    // check which index applies
+    final boolean text = s.test.type == Type.TXT && ic.data.meta.txtindex;
+    final boolean attr = s.test.type == Type.ATT && ic.data.meta.atvindex;
     if(!text && !attr) return false;
-    final IndexType ind = text ? IndexType.TXT : IndexType.ATV;
 
     // support expressions
+    final IndexType ind = text ? IndexType.TEXT : IndexType.ATTV;
     final Expr arg = expr[1];
     if(!arg.value()) {
       final SeqType t = arg.type();
       // index access not possible if returned type is no string or node,
       // and if expression depends on context
-      if(!t.type.str && !t.type.node() || arg.uses(Use.CTX))
-        return false;
+      if(arg.uses(Use.CTX) || !(t.type.str || t.type.node())) return false;
 
-      ic.is += Math.max(1, ic.data.meta.size / 10);
+      ic.costs += Math.max(1, ic.data.meta.size / 10);
       iacc = Array.add(iacc, new IndexAccess(input, arg, ind, ic));
       return true;
     }
@@ -275,15 +272,15 @@ public final class CmpG extends Cmp {
     // loop through all items
     final Iter ir = arg.iter(ic.ctx);
     Item it;
-    ic.is = 0;
+    ic.costs = 0;
     while((it = ir.next()) != null) {
       final SeqType t = it.type();
-      if(!t.type.str && !t.type.node()) return false;
+      if(!(t.type.str || t.type.node())) return false;
 
       final int is = ic.data.nrIDs(new ValuesToken(ind, it.atom()));
       // add only expressions that yield results
       if(is != 0) iacc = Array.add(iacc, new IndexAccess(input, it, ind, ic));
-      ic.is += is;
+      ic.costs += is;
     }
     return true;
   }
@@ -296,15 +293,17 @@ public final class CmpG extends Cmp {
     final AxisPath orig = (AxisPath) expr[0];
     final AxisPath path = orig.invertPath(root, ic.step);
 
-    if(iacc[0].ind == IndexType.TXT) {
+    if(iacc[0].ind == IndexType.TEXT) {
       ic.ctx.compInfo(OPTTXTINDEX);
     } else {
       ic.ctx.compInfo(OPTATVINDEX);
       // add attribute step
       final Step step = orig.step[orig.step.length - 1];
-      Step[] steps = { Step.get(input, Axis.SELF, step.test) };
-      for(final Step s : path.step) steps = Array.add(steps, s);
-      path.step = steps;
+      if(step.test.name != null) {
+        Step[] steps = { Step.get(input, Axis.SELF, step.test) };
+        for(final Step s : path.step) steps = Array.add(steps, s);
+        path.step = steps;
+      }
     }
     return path;
   }

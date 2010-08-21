@@ -4,7 +4,6 @@ import static org.basex.util.Token.*;
 import java.util.Arrays;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.data.Data.IndexType;
 import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
 import org.basex.query.ft.StemDir;
@@ -106,7 +105,7 @@ public final class Tokenizer implements IndexToken {
 
   @Override
   public IndexType type() {
-    return IndexType.FTX;
+    return IndexType.FTXT;
   }
 
   /**

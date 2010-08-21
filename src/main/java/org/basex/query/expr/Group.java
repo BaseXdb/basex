@@ -40,7 +40,7 @@ public final class Group extends ParseExpr {
    */
   public void initgroup(final ForLet[] fl) {
     final Var[] vs = new Var[groupby.length];
-    Var[] fs = new Var[fl.length];
+    final Var[] fs = new Var[fl.length];
     for(int i = 0; i < groupby.length; ++i) {
       vs[i] = groupby[i];
     }

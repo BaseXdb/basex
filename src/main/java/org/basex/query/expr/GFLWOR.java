@@ -143,8 +143,8 @@ public class GFLWOR extends ParseExpr {
    */
   private void retG(final QueryContext ctx, final ItemIter ir)
       throws QueryException {
-    Var[] pgvars = new Var[group.gp.gv.length];
-    Var[] pgngvar = new Var[group.gp.ngv.length];
+    final Var[] pgvars = new Var[group.gp.gv.length];
+    final Var[] pgngvar = new Var[group.gp.ngv.length];
     for(int j = 0; j <  group.gp.gv.length; ++j)
       pgvars[j] = ctx.vars.get(group.gp.gv[j]);
     for(int j = 0; j <  group.gp.ngv.length; ++j)

@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.data.MemData;
 import org.basex.data.Serializer;
 import org.basex.data.StatsKey;
-import org.basex.data.Data.IndexType;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.RangeToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -128,10 +128,9 @@ public final class CmpR extends Single {
     final Step s = CmpG.indexStep(expr);
     if(s == null || ic.data instanceof MemData) return false;
 
-    final boolean text = ic.data.meta.txtindex && s.test.type == Type.TXT;
-    final boolean attr = !text && ic.data.meta.atvindex &&
-      s.simple(Axis.ATTR, true);
-
+    // check which index applies
+    final boolean text = s.test.type == Type.TXT && ic.data.meta.txtindex;
+    final boolean attr = s.test.type == Type.ATT && ic.data.meta.atvindex;
     // no text or attribute index applicable, min/max not included in range
     if(!text && !attr || !mni || !mxi || min == Double.NEGATIVE_INFINITY ||
         max == Double.POSITIVE_INFINITY) return false;
@@ -142,7 +141,7 @@ public final class CmpR extends Single {
     rt = new RangeToken(text, Math.max(min, key.min), Math.min(max, key.max));
 
     // estimate costs for range access; all values out of range: no results
-    ic.is = rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
+    ic.costs = rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
       Math.max(1, ic.data.meta.size / 5);
     return true;
   }
@@ -155,7 +154,7 @@ public final class CmpR extends Single {
     final AxisPath path = orig.invertPath(root, ic.step);
 
     ic.ctx.compInfo(OPTRNGINDEX);
-    if(rt.type() == IndexType.ATV) {
+    if(rt.type() == IndexType.ATTV) {
       // add attribute step
       final Step step = orig.step[0];
       Step[] steps = { Step.get(input, Axis.SELF, step.test) };

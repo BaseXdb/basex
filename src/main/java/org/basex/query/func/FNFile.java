@@ -1,13 +1,13 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryText.*;
+import static org.basex.util.Token.*;
 import java.io.File;
-import java.io.FileFilter;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -15,7 +15,6 @@ import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
 
 /**
  * Functions on files and directories.
@@ -52,7 +51,7 @@ final class FNFile extends Fun {
     checkAdmin(ctx);
 
     final File path = expr.length == 0 ? null : new File(
-        Token.string(checkStrEmp(expr[0].atomic(ctx, input))));
+        string(checkStrEmp(expr[0].atomic(ctx, input))));
 
     switch(def) {
       case MKDIR:
@@ -85,40 +84,31 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private Iter listFiles(final QueryContext ctx) throws QueryException {
-
-    final String path = Token.string(checkStr(expr[0], ctx));
-
+    final String path = string(checkStr(expr[0], ctx));
     final Pattern pattern;
     try {
-      pattern = expr.length == 2 ?
-          Pattern.compile(Token.string(checkStr(expr[1], ctx))) : null;
+      pattern = expr.length == 1 ? null :
+        Pattern.compile(string(checkStr(expr[1], ctx)));
     } catch(final PatternSyntaxException ex) {
-      Err.or(input, QueryText.FILEPATTERN, expr[1]);
+      Err.or(input, FILEPATTERN, expr[1]);
       return null;
     }
 
-    final File[] files = new File(path).listFiles(new FileFilter() {
-      @Override
-      public boolean accept(final File pathname) {
-        if(pathname.isHidden()) return false;
-
-        return pattern == null ? true
-            : pattern.matcher(pathname.getName()).matches();
-
-      }
-    });
-
-    if(files == null) {
-      Err.or(input, QueryText.FILELIST, path);
-    }
-
     return new Iter() {
-
+      String[] files;
       int c = -1;
 
       @Override
-      public Item next() {
-        return ++c < files.length ? Str.get(files[c].getName()) : null;
+      public Item next() throws QueryException {
+        if(files == null) {
+          files = new File(path).list();
+          if(files == null) Err.or(input, FILELIST, path);
+        }
+        while(++c < files.length) {
+          if(pattern == null || pattern.matcher(files[c]).matches())
+            return Str.get(files[c]);
+        }
+        return null;
       }
     };
   }

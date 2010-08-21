@@ -4,7 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
-import org.basex.data.Data.IndexType;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
 import org.basex.index.RangeToken;
@@ -45,7 +45,7 @@ public final class RangeAccess extends Simple {
   @Override
   public Iter iter(final QueryContext ctx) {
     final Data data = ictx.data;
-    final byte kind = ind.type() == IndexType.TXT ? Data.TEXT : Data.ATTR;
+    final byte kind = ind.type() == IndexType.TEXT ? Data.TEXT : Data.ATTR;
 
     return new Iter() {
       final IndexIterator it = data.ids(ind);

@@ -154,7 +154,7 @@ public enum FunDef {
   /* FNGen functions. */
 
   /** XQuery function. */
-  DATA(FNURI, FNGen.class, 1, 1, "data(item*)", ITEM_ZM),
+  DATA(FNURI, FNGen.class, 0, 1, "data(item?)", ITEM_ZM),
   /** XQuery function. */
   COLL(FNURI, FNGen.class, 0, 1, "collection(string?)", NOD_ZM),
   /** XQuery function. */
@@ -191,11 +191,11 @@ public enum FunDef {
   /* FNNode functions. */
 
   /** XQuery function. */
-  DOCURI(FNURI, FNNode.class, 1, 1, "document-uri(node)", URI_ZO),
+  DOCURI(FNURI, FNNode.class, 0, 1, "document-uri(node?)", URI_ZO),
   /** XQuery function. */
   NILLED(FNURI, FNNode.class, 1, 1, "nilled(node)", BLN_ZO),
   /** XQuery function. */
-  NODENAME(FNURI, FNNode.class, 1, 1, "node-name(node)", QNM_ZO),
+  NODENAME(FNURI, FNNode.class, 0, 1, "node-name(node?)", QNM_ZO),
   /** XQuery function. */
   LOCNAME(FNURI, FNNode.class, 0, 1, "local-name(node?)", STR),
   /** XQuery function. */
@@ -241,7 +241,7 @@ public enum FunDef {
   /** XQuery function. */
   FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", ITR_ZO),
   /** XQuery function. */
-  RND(FNURI, FNNum.class, 1, 1, "round(num)", ITR_ZO),
+  RND(FNURI, FNNum.class, 1, 2, "round(num, prec?)", ITR_ZO),
   /** XQuery function. */
   RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num, prec?)", ITR_ZO),
 
@@ -359,7 +359,7 @@ public enum FunDef {
   /** XQuery function. */
   STARTS(FNURI, FNStr.class, 2, 3, "starts-with(item, item, coll?)", BLN),
   /** XQuery function. */
-  STRJOIN(FNURI, FNStr.class, 2, 2, "string-join(item, sep)", STR),
+  STRJOIN(FNURI, FNStr.class, 1, 2, "string-join(item, sep?)", STR),
   /** XQuery function. */
   STCODE(FNURI, FNStr.class, 1, 1, "string-to-codepoints(string)", ITR_ZM),
   /** XQuery function. */

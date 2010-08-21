@@ -77,6 +77,8 @@ public final class SimpleTest extends QueryTest {
       { "Pred 8", nod(8), "//*[@id = 1]" },
       { "Pred 9", nod(5, 17), "//*[text() = 'XML' or text() = 'Assignments']" },
       { "Pred 10", nod(5, 17), "//*[text() = ('XML', 'Assignments')]" },
+      { "Pred 11", nod(5), "//title[text() = .]" },
+
       { "Pred Error 1", "/[/]" },
       { "Pred Error 2", "/*[]" },
       { "Pred Error 3", "/*[//]" },

@@ -63,7 +63,7 @@ public class UTF8Test {
   private static String query(final String xq) {
     try {
       return new XQuery(xq).execute(context);
-    } catch(BaseXException e) {
+    } catch(final BaseXException e) {
       fail(e.getMessage());
       return null; // never reached
     }

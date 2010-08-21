@@ -8,7 +8,7 @@ import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdIndexInfo;
 import org.basex.core.Commands.CmdInfo;
 import org.basex.data.Data;
-import org.basex.data.Data.IndexType;
+import org.basex.index.IndexToken.IndexType;
 
 /**
  * Evaluates the 'info index' command and returns information on the indexes
@@ -61,23 +61,23 @@ public final class InfoIndex extends AInfo {
         return true;
       case ATTNAME:
         out.println(INFOATTS);
-        out.println(data.info(IndexType.ATN));
+        out.println(data.info(IndexType.ATTN));
         return true;
       case TEXT:
         out.println(INFOTEXTINDEX);
-        if(data.meta.txtindex) out.println(data.info(IndexType.TXT));
+        if(data.meta.txtindex) out.println(data.info(IndexType.TEXT));
         return true;
       case ATTRIBUTE:
         out.println(INFOATTRINDEX);
-        if(data.meta.atvindex) out.println(data.info(IndexType.ATV));
+        if(data.meta.atvindex) out.println(data.info(IndexType.ATTV));
         return true;
       case FULLTEXT:
         out.println(INFOFTINDEX);
-        if(data.meta.ftxindex) out.println(data.info(IndexType.FTX));
+        if(data.meta.ftxindex) out.println(data.info(IndexType.FTXT));
         return true;
       case PATH:
         out.println(INFOPATHINDEX);
-        if(data.meta.pthindex) out.println(data.info(IndexType.PTH));
+        if(data.meta.pthindex) out.println(data.info(IndexType.PATH));
         return true;
       default:
         return false;

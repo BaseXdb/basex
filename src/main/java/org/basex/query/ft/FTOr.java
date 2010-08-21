@@ -108,9 +108,9 @@ public final class FTOr extends FTExpr {
       // no index access if negative operators is found
       if(!expr[i].indexAccessible(ic) || ic.not) return false;
       ic.not = false;
-      is += ic.is;
+      is += ic.costs;
     }
-    ic.is = is;
+    ic.costs = is;
     return true;
   }
 

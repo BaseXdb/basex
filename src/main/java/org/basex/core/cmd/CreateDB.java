@@ -22,7 +22,7 @@ import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
-import org.basex.data.Data.IndexType;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.FTBuilder;
 import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
@@ -147,11 +147,11 @@ public class CreateDB extends ACreate {
     final Builder builder = new DiskBuilder(parser, ctx.prop);
     try {
       final Data data = builder.build(name);
-      if(data.meta.txtindex) data.setIndex(IndexType.TXT,
+      if(data.meta.txtindex) data.setIndex(IndexType.TEXT,
         new ValueBuilder(data, true).build());
-      if(data.meta.atvindex) data.setIndex(IndexType.ATV,
+      if(data.meta.atvindex) data.setIndex(IndexType.ATTV,
         new ValueBuilder(data, false).build());
-      if(data.meta.ftxindex) data.setIndex(IndexType.FTX,
+      if(data.meta.ftxindex) data.setIndex(IndexType.FTXT,
         FTBuilder.get(data, data.meta.wildcards).build());
       data.close();
     } catch(final IOException ex) {

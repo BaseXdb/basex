@@ -1,8 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-
-import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.Fun;
@@ -52,14 +50,7 @@ public abstract class Logical extends Arr {
    * @return resulting expression
    */
   protected final Expr single() {
-    try {
-      return expr[0].type().equals(SeqType.BLN) ? expr[0] :
-        Fun.create(input, FunDef.BOOLEAN, expr[0]);
-    } catch(QueryException e) {
-      // not expected to occur at all
-      e.printStackTrace();
-      Main.debug(e);
-      return null;
-    }
+    return expr[0].type().equals(SeqType.BLN) ? expr[0] :
+      Fun.create(input, FunDef.BOOLEAN, expr[0]);
   }
 }

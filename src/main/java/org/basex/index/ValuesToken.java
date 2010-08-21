@@ -1,7 +1,5 @@
 package org.basex.index;
 
-import org.basex.data.Data.IndexType;
-
 /**
  * This class defines access to index text tokens.
  *

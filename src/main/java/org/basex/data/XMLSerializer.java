@@ -211,7 +211,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void attribute(final byte[] n, final byte[] v) throws IOException {
     if(mth == M_TEXT) return;
-    
+
     // [LW] temporarily disabled; many tests rely on serializing attributes
     //if(!inTag) error(SERTAT);
 

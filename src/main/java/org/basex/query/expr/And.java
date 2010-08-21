@@ -81,18 +81,18 @@ public final class And extends Logical {
     final double[] ics = new double[expr.length];
     for(int e = 0; e < expr.length; ++e) {
       if(!expr[e].indexAccessible(ic) || ic.seq) return false;
-      ics[e] = ic.is;
+      ics[e] = ic.costs;
       // evaluate empty result first
-      if(ic.is == 0) {
+      if(ic.costs == 0) {
         final Expr tmp = expr[e];
         expr[e] = expr[0];
         expr[0] = tmp;
         empty = true;
       }
-      is += ic.is;
+      is += ic.costs;
     }
     if(empty) {
-      ic.is = 0;
+      ic.costs = 0;
     } else {
       // reorder arguments to speedup intersection
       final int[] ord = Array.createOrder(ics, false);

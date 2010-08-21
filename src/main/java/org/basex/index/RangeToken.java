@@ -1,6 +1,5 @@
 package org.basex.index;
 
-import org.basex.data.Data.IndexType;
 import org.basex.util.Token;
 
 /**
@@ -24,7 +23,7 @@ public final class RangeToken implements IndexToken {
    * @param mx maximum value
    */
   public RangeToken(final boolean i, final double mn, final double mx) {
-    ind = i ? IndexType.TXT : IndexType.ATV;
+    ind = i ? IndexType.TEXT : IndexType.ATTV;
     min = mn;
     max = mx;
   }

@@ -11,7 +11,7 @@ import org.basex.core.Commands.CmdCreate;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Data.IndexType;
+import org.basex.index.IndexToken.IndexType;
 
 /**
  * Evaluates the 'create db' command and creates a new index.
@@ -38,11 +38,11 @@ public final class CreateIndex extends ACreate {
       switch(getOption(CmdIndex.class)) {
         case TEXT:
           data.meta.txtindex = true;
-          index = IndexType.TXT;
+          index = IndexType.TEXT;
           break;
         case ATTRIBUTE:
           data.meta.atvindex = true;
-          index = IndexType.ATV;
+          index = IndexType.ATTV;
           break;
         case FULLTEXT:
           data.meta.ftxindex = true;
@@ -51,10 +51,10 @@ public final class CreateIndex extends ACreate {
           data.meta.casesens = prop.is(Prop.CASESENS);
           data.meta.diacritics = prop.is(Prop.DIACRITICS);
           data.meta.scoring = prop.num(Prop.SCORING);
-          index = IndexType.FTX;
+          index = IndexType.FTXT;
           break;
         case PATH:
-          index = IndexType.PTH;
+          index = IndexType.PATH;
           break;
         default:
           return false;

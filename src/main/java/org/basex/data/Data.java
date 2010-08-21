@@ -7,6 +7,7 @@ import org.basex.core.cmd.InfoTable;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.Names;
 import org.basex.io.IO;
 import org.basex.io.TableAccess;
@@ -74,16 +75,6 @@ public abstract class Data {
   public static final byte COMM = 0x04;
   /** Node kind: Processing Instruction. */
   public static final byte PI = 0x05;
-
-  /** Index types. */
-  public enum IndexType {
-    /** Attribute index. */ ATN,
-    /** Tag index.       */ TAG,
-    /** Text index.      */ TXT,
-    /** Attribute index. */ ATV,
-    /** Full-text index. */ FTX,
-    /** Path index. */      PTH
-  }
 
   /** Meta data. */
   public MetaData meta;
@@ -170,9 +161,9 @@ public abstract class Data {
    */
   public final synchronized IndexIterator ids(final IndexToken token) {
     switch(token.type()) {
-      case TXT: return txtindex.ids(token);
-      case ATV: return atvindex.ids(token);
-      case FTX: return ftxindex.ids(token);
+      case TEXT: return txtindex.ids(token);
+      case ATTV: return atvindex.ids(token);
+      case FTXT: return ftxindex.ids(token);
       default:  return null;
     }
   }
@@ -186,9 +177,9 @@ public abstract class Data {
     // token too long.. no results can be expected
     if(token.get().length > MAXLEN) return Integer.MAX_VALUE;
     switch(token.type()) {
-      case TXT: return txtindex.nrIDs(token);
-      case ATV: return atvindex.nrIDs(token);
-      case FTX: return ftxindex.nrIDs(token);
+      case TEXT: return txtindex.nrIDs(token);
+      case ATTV: return atvindex.nrIDs(token);
+      case FTXT: return ftxindex.nrIDs(token);
       default:  return Integer.MAX_VALUE;
     }
   }
@@ -211,11 +202,11 @@ public abstract class Data {
   public final synchronized byte[] info(final IndexType type) {
     switch(type) {
       case TAG: return tags.info();
-      case ATN: return atts.info();
-      case TXT: return txtindex.info();
-      case ATV: return atvindex.info();
-      case FTX: return ftxindex.info();
-      case PTH: return path.info(this);
+      case ATTN: return atts.info();
+      case TEXT: return txtindex.info();
+      case ATTV: return atvindex.info();
+      case FTXT: return ftxindex.info();
+      case PATH: return path.info(this);
       default:  return EMPTY;
     }
   }

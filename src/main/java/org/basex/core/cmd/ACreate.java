@@ -13,9 +13,9 @@ import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.MemData;
-import org.basex.data.Data.IndexType;
 import org.basex.index.FTBuilder;
 import org.basex.index.IndexBuilder;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.index.PathBuilder;
 import org.basex.index.ValueBuilder;
 
@@ -92,9 +92,9 @@ public abstract class ACreate extends Command {
    * @throws IOException I/O exception
    */
   protected final void index(final Data data) throws IOException {
-    if(data.meta.txtindex) index(IndexType.TXT, data);
-    if(data.meta.atvindex) index(IndexType.ATV, data);
-    if(data.meta.ftxindex) index(IndexType.FTX, data);
+    if(data.meta.txtindex) index(IndexType.TEXT, data);
+    if(data.meta.atvindex) index(IndexType.ATTV, data);
+    if(data.meta.ftxindex) index(IndexType.FTXT, data);
   }
 
   /**
@@ -109,10 +109,10 @@ public abstract class ACreate extends Command {
     if(d instanceof MemData) return;
     IndexBuilder b = null;
     switch(i) {
-      case TXT: b = new ValueBuilder(d, true); break;
-      case ATV: b = new ValueBuilder(d, false); break;
-      case FTX: b = FTBuilder.get(d, d.meta.wildcards); break;
-      case PTH: b = new PathBuilder(d); break;
+      case TEXT: b = new ValueBuilder(d, true); break;
+      case ATTV: b = new ValueBuilder(d, false); break;
+      case FTXT: b = FTBuilder.get(d, d.meta.wildcards); break;
+      case PATH: b = new PathBuilder(d); break;
       default: break;
     }
     d.closeIndex(i);
