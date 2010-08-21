@@ -23,6 +23,8 @@ public final class Token {
   public static final byte[] EMPTY = {};
   /** XML token. */
   public static final byte[] XML = token("xml");
+  /** XML token with colon. */
+  public static final byte[] XMLC = token("xml:");
   /** XMLNS token. */
   public static final byte[] XMLNS = token("xmlns");
   /** XMLNS token with colon. */

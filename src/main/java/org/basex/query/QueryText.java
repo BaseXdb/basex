@@ -425,8 +425,8 @@ public interface QueryText {
   /** XQDY0041: Evaluation exception. */
   Object[] CPIINVAL = { XQDY, 41, "Invalid PI name: \"%\"" };
   /** XQDY0044: Evaluation exception. */
-  Object[] NSATTCONS = { XQDY, 44,
-    "Attribute constructors cannot create namespaces." };
+  Object[] CAINS = { XQDY, 44,
+      "Invalid attribute namespace: \"%\" (URI \"%\")" };
   /** XQDY0064: Evaluation exception. */
   Object[] CPIXML = { XQDY, 64, "Illegal PI name: \"%\"" };
   /** XQDY0072: Evaluation exception. */
@@ -467,7 +467,7 @@ public interface QueryText {
   Object[] DUPLMODULE = { XQST, 47, "Module is defined twice: %." };
   /** XQST0047: Parsing exception. */
   Object[] MODNS = { XQST, 48,
-    "Declaration % does not match the module namespace." };
+      "Declaration % does not match the module namespace." };
   /** XQST0049: Parsing exception. */
   Object[] VARDEFINE = { XQST, 49, "Duplicate definition of %." };
   /** XQST0054: Parsing exception. */
@@ -500,6 +500,8 @@ public interface QueryText {
   Object[] NSDEF = { XQST, 70, "Cannot overwrite namespace %" };
   /** XQST0070: Parsing exception. */
   Object[] NOXMLNS = { XQST, 70, "Cannot declare XML namespace." };
+  /** XQST0070: Parsing exception. */
+  Object[] NOXMLNS2 = { XQST, 70, "Cannot declare XMLNS namespace." };
   /** XQST0071: Parsing exception. */
   Object[] DUPLNSDEF = { XQST, 71,
       "Duplicate declaration of namespace \"%\"." };

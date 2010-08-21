@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -59,8 +60,10 @@ public final class CAttr extends CFrag {
     if(!name.ns()) name.uri = Uri.EMPTY;
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
-    if(comp && (eq(name.atom(), XMLNS) || eq(pre, XMLNS)))
-      Err.or(input, NSATTCONS);
+    final byte[] uri = name.uri.atom();
+
+    if(comp && (eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
+        || eq(pre, XML) ^ eq(uri, XMLURI))) Err.or(input, CAINS, pre, uri);
 
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : expr) add(tb, ctx.iter(e));

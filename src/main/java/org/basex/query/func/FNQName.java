@@ -1,6 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -60,7 +61,9 @@ final class FNQName extends Fun {
         final Uri uri = Uri.uri(it == null ? EMPTY :
           checkType(it, Type.STR).atom());
         final Item it3 = it2 == null ? Str.ZERO : checkType(it2, Type.STR);
-        final byte[] str = it3.atom();
+        final byte[] atm = it3.atom();
+        final byte[] str = (!contains(atm, ':') && eq(uri.atom(), XMLURI))
+            ? concat(XMLC, atm) : atm;
         if(!XMLToken.isQName(str)) Err.value(input, Type.QNM, it3);
         QNm nm = new QNm(str, uri);
         if(nm.ns() && uri == Uri.EMPTY) Err.value(input, Type.URI, uri);
