@@ -33,7 +33,6 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FNSimple;
-import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
@@ -648,7 +647,7 @@ public abstract class W3CTS {
           src = IO.get(src).dbname();
         }
         // [CG] XQuery/Query Info
-        expr = Fun.create(null, def, Str.get(src));
+        expr = def.newInstance(null, Str.get(src));
       }
       if(var != null) qp.bind(string(data.atom(var.nodes[c])), expr);
     }
