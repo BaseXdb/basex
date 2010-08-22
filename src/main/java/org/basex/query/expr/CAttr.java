@@ -46,7 +46,7 @@ public final class CAttr extends CFrag {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public CAttr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     atn = checkUp(atn, ctx).comp(ctx);
     return this;
@@ -56,13 +56,14 @@ public final class CAttr extends CFrag {
   public FAttr atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final QNm name = qname(ctx, checkItem(atn, ctx));
-    if(!name.ns()) name.uri = Uri.EMPTY;
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
     final byte[] uri = name.uri.atom();
 
     if(comp && (eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
         || eq(pre, XML) ^ eq(uri, XMLURI))) Err.or(input, CAINS, pre, uri);
+    
+    if(!name.ns()) name.uri = Uri.EMPTY;
 
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : expr) add(tb, ctx.iter(e));

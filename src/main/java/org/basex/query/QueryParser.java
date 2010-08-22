@@ -176,7 +176,10 @@ public class QueryParser extends InputParser {
     file = f;
     if(!more()) error(QUERYEMPTY);
     final int v = valid();
-    if(v != -1) error(QUERYINV, v);
+    if(v != -1) {
+      qp = v; // correct position for error message
+      error(QUERYINV, qu.codePointAt(v));
+    }
     return parse(u, true);
   }
 
@@ -1691,6 +1694,7 @@ public class QueryParser extends InputParser {
     final int s = ctx.ns.size();
 
     // parse attributes...
+    boolean xmlDef = false; // xml prefix explicitly declared?
     while(XMLToken.isXMLLetter(curr())) {
       final byte[] atn = qName(null);
       Expr[] attv = {};
@@ -1743,13 +1747,20 @@ public class QueryParser extends InputParser {
         if(!simple) error(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
         if(!tag.ns()) tag.uri = Uri.uri(v);
-        addNS(ns, atn, v);
+        addNS(ns, EMPTY, v);
       } else if(startsWith(atn, XMLNS)) {
         if(!simple) error(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
         if(v.length == 0) error(NSEMPTYURI);
-        ctx.ns.add(new QNm(atn, Uri.uri(v)), input());
-        addNS(ns, atn, v);
+        final QNm nsd = new QNm(atn, Uri.uri(v));
+        final byte[] pref = nsd.ln();
+        if(!eq(pref, XML) || !eq(v, XMLURI)) {
+          ctx.ns.add(nsd, input());
+          addNS(ns, pref, v);
+        } else {
+          if(xmlDef) error(DUPLNSDEF, XML);
+          xmlDef = true;
+        }
       } else {
         cont = add(cont, new CAttr(input(), false, new QNm(atn), attv));
       }
@@ -1781,17 +1792,15 @@ public class QueryParser extends InputParser {
   /**
    * Checks the uniqueness of the namespace and adds it to the attributes.
    * @param ns namespace array
-   * @param k namespace
+   * @param k namespace prefix
    * @param v uri
    * @throws QueryException query exception
    */
   private void addNS(final Atts ns, final byte[] k, final byte[] v)
       throws QueryException {
-
-    final int i = indexOf(k, ':');
-    final byte[] key = i == -1 ? EMPTY : substring(k, i + 1);
-    if(ns.get(key) != -1) error(DUPLNSDEF, k);
-    ns.add(key, v);
+    
+    if(ns.get(k) != -1) error(DUPLNSDEF, k);
+    ns.add(k, v);
   }
 
   /**

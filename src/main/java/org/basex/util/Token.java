@@ -49,7 +49,7 @@ public final class Token {
   public static final byte[] ONE = { '1' };
 
   /** Quote entity. */
-  public static final byte[] QU = { '\"' };
+  public static final byte[] QU = { '"' };
   /** Ampersand entity. */
   public static final byte[] AMP = { '&' };
   /** Apostrophe entity. */
