@@ -499,9 +499,7 @@ public interface QueryText {
   /** XQST0070: Parsing exception. */
   Object[] NSDEF = { XQST, 70, "Cannot overwrite namespace %" };
   /** XQST0070: Parsing exception. */
-  Object[] NOXMLNS = { XQST, 70, "Cannot declare XML namespace." };
-  /** XQST0070: Parsing exception. */
-  Object[] NOXMLNS2 = { XQST, 70, "Cannot declare XMLNS namespace." };
+  Object[] NOXMLNS = { XQST, 70, "Cannot declare % namespace." };
   /** XQST0071: Parsing exception. */
   Object[] DUPLNSDEF = { XQST, 71,
       "Duplicate declaration of namespace \"%\"." };

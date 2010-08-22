@@ -77,6 +77,7 @@ final class DOTData {
     // cyan
     { "009999", org.basex.query.expr.FuncCall.class },
     { "00BBBB", org.basex.query.func.Fun.class },
+    { "00BBBB", org.basex.query.expr.Root.class },
     { "00BBBB", org.basex.query.expr.VarRef.class },
     { "00BBBB", org.basex.query.expr.IndexAccess.class },
     { "00BBBB", org.basex.query.expr.RangeAccess.class },
@@ -86,10 +87,10 @@ final class DOTData {
   /** Hash map, caching expression names. */
   private static final Object[][] NAMES = {
     { "Arithmetics", org.basex.query.expr.Arith.class },
-    { "Compare", org.basex.query.expr.CmpG.class },
-    { "Compare", org.basex.query.expr.CmpN.class },
-    { "Compare", org.basex.query.expr.CmpV.class },
-    { "Compare", org.basex.query.expr.CmpR.class },
+    { "Comparison", org.basex.query.expr.CmpG.class },
+    { "Comparison", org.basex.query.expr.CmpN.class },
+    { "Comparison", org.basex.query.expr.CmpV.class },
+    { "Comparison", org.basex.query.expr.CmpR.class },
     { "FLWOR", org.basex.query.expr.FLWR.class },
     { "Declaration", org.basex.query.expr.Func.class },
     { "Function", org.basex.query.func.Fun.class },

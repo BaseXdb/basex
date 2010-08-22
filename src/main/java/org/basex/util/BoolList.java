@@ -3,22 +3,20 @@ package org.basex.util;
 import java.util.Arrays;
 
 /**
- * This is a simple container for native boolean values.
+ * This is a simple container for boolean values.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BoolList {
-  /** Value array. */
+public final class BoolList extends ElementList {
+  /** Element container. */
   private boolean[] list;
-  /** Current array size. */
-  private int size;
 
   /**
    * Default constructor.
    */
   public BoolList() {
-    this(8);
+    this(CAP);
   }
 
   /**
@@ -30,40 +28,32 @@ public final class BoolList {
   }
 
   /**
-   * Adds next value.
-   * @param v value to be added
+   * Adds an element.
+   * @param e element to be added
    */
-  public void add(final boolean v) {
-    if(size == list.length) list = Arrays.copyOf(list, size << 1);
-    list[size++] = v;
+  public void add(final boolean e) {
+    if(size == list.length) list = Arrays.copyOf(list, newSize());
+    list[size++] = e;
   }
 
   /**
-   * Returns the number of entries.
-   * @return number of entries
+   * Returns the element at the specified index.
+   * @param i index
+   * @return element
    */
-  public int size() {
-    return size;
+  public boolean get(final int i) {
+    return list[i];
   }
 
   /**
-   * Returns the specified value.
-   * @param p position
-   * @return value
+   * Sets an element at the specified index.
+   * @param e element to be set
+   * @param i index
    */
-  public boolean get(final int p) {
-    return list[p];
-  }
-
-  /**
-   * Sets a value at the specified position.
-   * @param v value to be added
-   * @param p position
-   */
-  public void set(final boolean v, final int p) {
-    if(p >= list.length) list = Arrays.copyOf(list, p + 1);
-    list[p] = v;
-    size = Math.max(size, p + 1);
+  public void set(final boolean e, final int i) {
+    if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
+    list[i] = e;
+    size = Math.max(size, i + 1);
   }
 
   /**
@@ -72,12 +62,5 @@ public final class BoolList {
    */
   public boolean[] toArray() {
     return Arrays.copyOf(list, size);
-  }
-
-  /**
-   * Resets the integer list.
-   */
-  public void reset() {
-    size = 0;
   }
 }

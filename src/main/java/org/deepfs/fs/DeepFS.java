@@ -376,7 +376,7 @@ public final class DeepFS implements DataText {
     m.attr(6, 6, atimeID, time, 0, false);
     m.attr(7, 7, ctimeID, time, 0, false);
     m.attr(8, 8, mtimeID, time, 0, false);
-    m.attr(9, 9, nlinkID, token("1"), 0, false);
+    m.attr(9, 9, nlinkID, ONE, 0, false);
     m.attr(10, 10, suffixID, getSuffix(fn), 0, false);
     m.insert(0);
     return m;
@@ -406,7 +406,7 @@ public final class DeepFS implements DataText {
     atts.add(ATIME, time);
     atts.add(CTIME, time);
     atts.add(MTIME, token(f.lastModified()));
-    atts.add(NLINK, token("1"));
+    atts.add(NLINK, ONE);
     atts.add(SUFFIX, getSuffix(name));
     return atts;
   }

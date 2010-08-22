@@ -12,13 +12,9 @@ import org.basex.core.Main;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class TokenList implements Iterable<byte[]> {
-  /** Resize factor for extending the byte arrays. */
-  private double factor = 2;
-  /** Value array. */
-  byte[][] list;
-  /** Current array size. */
-  int size;
+public final class TokenList extends ElementList implements Iterable<byte[]> {
+  /** Element container. */
+  protected byte[][] list;
 
   /**
    * Default constructor.
@@ -45,103 +41,80 @@ public final class TokenList implements Iterable<byte[]> {
   }
 
   /**
-   * Adds next value.
-   * @param v value to be added
+   * Adds an element.
+   * @param e element to be added
    */
-  public void add(final byte[] v) {
-    if(size == list.length) {
-      list = Arrays.copyOf(list, Math.max(size + 1, (int) (size * factor)));
-    }
-    list[size++] = v;
+  public void add(final byte[] e) {
+    if(size == list.length) list = Array.copyOf(list, newSize());
+    list[size++] = e;
   }
 
   /**
-   * Adds next value.
-   * @param v value to be added
+   * Adds a long value.
+   * @param e element to be added
    */
-  public void add(final long v) {
-    add(token(v));
+  public void add(final long e) {
+    add(token(e));
   }
 
   /**
-   * Adds next value.
-   * @param v value to be added
+   * Adds a string.
+   * @param e element to be added
    */
-  public void add(final String v) {
-    add(Token.token(v));
+  public void add(final String e) {
+    add(Token.token(e));
   }
 
   /**
-   * Returns the number of entries.
-   * @return number of entries
+   * Returns the element at the specified index.
+   * @param i index
+   * @return element
    */
-  public int size() {
-    return size;
+  public byte[] get(final int i) {
+    return list[i];
   }
 
   /**
-   * Sets the number of entries.
-   * @param s number of entries
+   * Sets an element at the specified index.
+   * @param e element to be set
+   * @param i index
    */
-  public void size(final int s) {
-    size = s;
+  public void set(final byte[] e, final int i) {
+    if(i >= list.length) list = Array.copyOf(list, newSize(i + 1));
+    list[i] = e;
+    size = Math.max(size, i + 1);
   }
 
   /**
-   * Returns the specified value.
-   * @param p position
-   * @return value
+   * Checks if the specified element is found in the list.
+   * @param e element to be checked
+   * @return result of check
    */
-  public byte[] get(final int p) {
-    return list[p];
-  }
-
-  /**
-   * Sets the specified value at the specified position.
-   * @param v value
-   * @param p position
-   */
-  public void set(final byte[] v, final int p) {
-    list[p] = v;
-  }
-
-  /**
-   * Checks if the specified token is found in the list.
-   * @param v token to be checked
-   * @return true if value is found
-   */
-  public boolean contains(final byte[] v) {
-    for(int i = 0; i < size; ++i) if(eq(list[i], v)) return true;
+  public boolean contains(final byte[] e) {
+    for(int i = 0; i < size; ++i) if(eq(list[i], e)) return true;
     return false;
   }
 
   /**
-   * Finishes the array.
+   * Returns an array with all elements.
    * @return array
    */
   public byte[][] toArray() {
-    return Arrays.copyOf(list, size);
+    return Array.copyOf(list, size);
   }
 
   /**
-   * Finishes the list as string array.
+   * Returns an array with all elements as strings.
    * @return array
    */
-  public String[] finishString() {
+  public String[] toStringArray() {
     final String[] items = new String[size];
     for(int i = 0; i < items.length; ++i) items[i] = string(list[i]);
     return items;
   }
 
   /**
-   * Resets the integer list.
-   */
-  public void reset() {
-    size = 0;
-  }
-
-  /**
-   * Sorts the strings.
+   * Sorts the elements.
    * @param cs respect case sensitivity
    */
   public void sort(final boolean cs) {

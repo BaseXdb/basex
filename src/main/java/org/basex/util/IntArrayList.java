@@ -1,73 +1,60 @@
 package org.basex.util;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import org.basex.core.Main;
 
 /**
- * This is a simple container for native int array values.
+ * This is a simple container for int arrays.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class IntArrayList implements Iterable<int[]> {
-  /** Resize factor for extending the byte arrays. */
-  private final double factor = 2;
-  /** Value array. */
-  int[][] list;
-  /** Current array size. */
-  int size;
+public final class IntArrayList extends ElementList implements Iterable<int[]> {
+  /** Elements container. */
+  protected int[][] list;
 
   /**
    * Default constructor.
    */
   public IntArrayList() {
-    this(8);
+    this(CAP);
   }
 
   /**
-   * Constructor.
-   * @param is initial size of the list
+   * Constructor, specifying an initial array capacity.
+   * @param c initial capacity
    */
-  public IntArrayList(final int is) {
-    list = new int[is][];
+  public IntArrayList(final int c) {
+    list = new int[c][];
   }
 
   /**
-   * Adds next value.
-   * @param v value to be added
+   * Adds an element.
+   * @param e element to be added
    */
-  public void add(final int[] v) {
-    if(size == list.length) {
-      list = Arrays.copyOf(list, Math.max(size + 1, (int) (size * factor)));
-    }
-    list[size++] = v;
+  public void add(final int[] e) {
+    if(size == list.length) list = Array.copyOf(list, newSize());
+    list[size++] = e;
   }
 
   /**
-   * Returns the number of entries.
-   * @return number of entries
+   * Returns the element at the specified index.
+   * @param i index
+   * @return element
    */
-  public int size() {
-    return size;
+  public int[] get(final int i) {
+    return list[i];
   }
 
   /**
-   * Returns the specified value.
-   * @param p position
-   * @return value
+   * Sets an element at the specified index.
+   * @param e element to be set
+   * @param i index
    */
-  public int[] get(final int p) {
-    return list[p];
-  }
-
-  /**
-   * Sets the specified value at the specified position.
-   * @param v value
-   * @param p position
-   */
-  public void set(final int[] v, final int p) {
-    list[p] = v;
+  public void set(final int[] e, final int i) {
+    if(i >= list.length) list = Array.copyOf(list, newSize(i + 1));
+    list[i] = e;
+    size = Math.max(size, i + 1);
   }
 
   @Override

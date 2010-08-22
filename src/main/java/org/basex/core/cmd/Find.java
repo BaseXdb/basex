@@ -2,11 +2,11 @@ package org.basex.core.cmd;
 
 import static org.basex.util.Token.*;
 import static org.basex.query.QueryTokens.*;
-import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.query.path.Axis;
+import org.basex.util.Array;
 import org.basex.util.BoolList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
@@ -304,6 +304,6 @@ public final class Find extends AQuery {
       }
     }
     if(sb.length() != 0) split[s++] = sb.toString();
-    return Arrays.copyOf(split, s);
+    return Array.copyOf(split, s);
   }
 }

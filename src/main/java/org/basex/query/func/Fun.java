@@ -2,7 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -36,27 +35,6 @@ public abstract class Fun extends Arr {
     super(ii, e);
     def = d;
     type = def.ret;
-  }
-
-  /**
-   * Creates a function with the specified arguments.
-   * @param ii input info
-   * @param f function description
-   * @param e expression array
-   * @return function
-   */
-  public static final Fun create(final InputInfo ii, final FunDef f,
-      final Expr... e) {
-
-    try {
-      return f.func.getDeclaredConstructor(InputInfo.class, FunDef.class,
-          Expr[].class).newInstance(ii, f, e);
-    } catch(final Exception ex) {
-      // not expected to occur at all
-      ex.printStackTrace();
-      Main.debug(ex);
-      return null;
-    }
   }
 
   @Override

@@ -1,6 +1,5 @@
 package org.basex.util;
 
-import java.util.Arrays;
 import org.basex.core.Main;
 
 /**
@@ -26,8 +25,8 @@ public final class Atts {
   public Atts add(final byte[] k, final byte[] v) {
     if(size == key.length) {
       final int s = size << 1;
-      key = Arrays.copyOf(key, s);
-      val = Arrays.copyOf(val, s);
+      key = Array.copyOf(key, s);
+      val = Array.copyOf(val, s);
     }
     key[size] = k;
     val[size++] = v;

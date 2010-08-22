@@ -7,7 +7,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Value;
-import org.basex.query.util.ItemList;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Var;
 import org.basex.util.IntList;
 
@@ -24,7 +24,7 @@ final class GroupPartition {
   /** Group Partitioning. */
   final ArrayList<GroupNode> partitions;
   /** Resulting Sequence for non grouping variables. */
-  final ArrayList<HashMap<Var, ItemList>> items;
+  final ArrayList<HashMap<Var, ItemIter>> items;
   /** HashValue, Position. */
   private final HashMap<Integer, IntList> hashes =
     new HashMap<Integer, IntList>();
@@ -52,7 +52,7 @@ final class GroupPartition {
       ngv[i++] = v;
     }
     partitions = new ArrayList<GroupNode>();
-    items = new ArrayList<HashMap<Var, ItemList>>();
+    items = new ArrayList<HashMap<Var, ItemIter>>();
   }
 
   /**
@@ -113,12 +113,12 @@ final class GroupPartition {
       throws QueryException {
 
     if(!cachedVars) cacheVars(ctx);
-    if(items.size() <= p) items.add(new HashMap<Var, ItemList>());
-    HashMap<Var, ItemList> sq = items.get(p);
+    if(items.size() <= p) items.add(new HashMap<Var, ItemIter>());
+    HashMap<Var, ItemIter> sq = items.get(p);
 
     for(int i = 0; i < ngv.length; ++i) {
-      if(sq == null) sq = new HashMap<Var, ItemList>();
-      if(sq.get(ngv[i]) == null) sq.put(ngv[i], new ItemList());
+      if(sq == null) sq = new HashMap<Var, ItemIter>();
+      if(sq.get(ngv[i]) == null) sq.put(ngv[i], new ItemIter());
       final Value v = ngv[i].value(ctx);
       if(v.item()) {
         // [MS] cache ctx.vars here to obtain them only once and not in

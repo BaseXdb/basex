@@ -5,7 +5,6 @@ import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
@@ -103,7 +102,7 @@ public final class FNFileTest {
    */
   private Item atomic(final FunDef def, final Expr... args) {
     try {
-      return Fun.create(null, def, args).atomic(qc, null);
+      return def.newInstance(null, args).atomic(qc, null);
     } catch(final QueryException ex) {
       Main.notexpected(ex);
       return null;
@@ -118,7 +117,7 @@ public final class FNFileTest {
    */
   private Iter iter(final FunDef def, final Expr... args) {
     try {
-      return Fun.create(null, def, args).iter(qc);
+      return def.newInstance(null, args).iter(qc);
     } catch(final QueryException ex) {
       Main.notexpected(ex);
       return null;

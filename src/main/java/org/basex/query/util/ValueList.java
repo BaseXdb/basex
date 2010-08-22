@@ -2,6 +2,7 @@ package org.basex.query.util;
 
 import java.util.Arrays;
 import org.basex.query.item.Value;
+import org.basex.util.ElementList;
 
 /**
  * This is a simple container for values.
@@ -9,13 +10,9 @@ import org.basex.query.item.Value;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class ValueList {
-  /** Initial hash capacity. */
-  private static final int CAP = 1 << 3;
+public final class ValueList extends ElementList {
   /** List entries. */
-  public Value[] list = new Value[CAP];
-  /** Number of entries. */
-  public int size;
+  Value[] list = new Value[CAP];
 
   /**
    * Adds a value to the list.
@@ -28,6 +25,15 @@ public final class ValueList {
       list = tmp;
     }
     list[size++] = v;
+  }
+
+  /**
+   * Returns the element at the specified index.
+   * @param i index
+   * @return element
+   */
+  public Value get(final int i) {
+    return list[i];
   }
 
   /* for debugging (should be removed later) */

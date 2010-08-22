@@ -2,6 +2,7 @@ package org.basex.index;
 
 import java.util.Arrays;
 import org.basex.core.Main;
+import org.basex.util.Array;
 import org.basex.util.TokenSet;
 import org.basex.util.Token;
 
@@ -80,7 +81,7 @@ public final class MemValues extends TokenSet implements Index {
   public void rehash() {
     super.rehash();
     final int s = size << 1;
-    ids = Arrays.copyOf(ids, s);
+    ids = Array.copyOf(ids, s);
     len = Arrays.copyOf(len, s);
   }
 }

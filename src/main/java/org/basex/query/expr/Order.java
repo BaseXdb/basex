@@ -45,7 +45,7 @@ public final class Order extends ParseExpr {
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
       // cast to int, as expected number of results will be small enough
-      final int e = vl.size;
+      final int e = vl.size();
       int[] order;
       Iter ir;
       int p = -1;
@@ -67,7 +67,7 @@ public final class Order extends ParseExpr {
             ir = null;
           } else {
             if(++p == e) return null;
-            ir = vl.list[order[p]].iter(ctx);
+            ir = vl.get(order[p]).iter(ctx);
           }
         }
       }

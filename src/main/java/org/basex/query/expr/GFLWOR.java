@@ -10,11 +10,9 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.GroupPartition.GroupNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
-import org.basex.query.util.ItemList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -112,13 +110,13 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final HashMap<Var, ItemList> cache = new HashMap<Var, ItemList>();
+    final HashMap<Var, ItemIter> cache = new HashMap<Var, ItemIter>();
     final Iter[] iter = new Iter[fl.length];
 
     // store pointers to the cached results here.
     for(int f = 0; f < fl.length; ++f) { // fill each var with data
       iter[f] = ctx.iter(fl[f]);
-      if(group != null) cache.put(fl[f].var, new ItemList());
+      if(group != null) cache.put(fl[f].var, new ItemIter());
     }
 
     // evaluate pre grouping tuples
@@ -151,17 +149,16 @@ public class GFLWOR extends ParseExpr {
       pgngvar[j] = ctx.vars.get(group.gp.ngv[j]);
 
     for(int i = 0; i < group.gp.partitions.size(); ++i) { // bind grouping var
-      final HashMap<Var, ItemList> ngvars = group.gp.items.get(i);
+      final HashMap<Var, ItemIter> ngvars = group.gp.items.get(i);
       final GroupNode gn =  group.gp.partitions.get(i);
       for(int j = 0; j < group.gp.gv.length; ++j)
         pgvars[j].bind(gn.its[j], ctx);
 
       for(int j = 0; j < group.gp.ngv.length; ++j) {
-        final ItemList its = ngvars.get(group.gp.ngv[j]);
+        final ItemIter its = ngvars.get(group.gp.ngv[j]);
         if(its != null)
-        pgngvar[j].bind(
-            Seq.get(its.list, its.size), ctx);
-        else pgngvar[j].bind(Seq.get(null, 0), ctx);
+        pgngvar[j].bind(its.finish(), ctx);
+        else pgngvar[j].bind(Empty.SEQ, ctx);
       }
       ir.add(ctx.iter(ret));
     }
@@ -176,7 +173,7 @@ public class GFLWOR extends ParseExpr {
    * @throws QueryException query exception
    */
   private void iter(final QueryContext ctx,
-      final HashMap<Var, ItemList> cache, final Iter[] it, final int p)
+      final HashMap<Var, ItemIter> cache, final Iter[] it, final int p)
       throws QueryException {
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {

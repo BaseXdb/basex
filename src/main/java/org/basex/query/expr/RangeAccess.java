@@ -68,7 +68,7 @@ public final class RangeAccess extends Simple {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(ind.type().toString()));
+    ser.openElement(this, TYPE, Token.token(ind.toString()));
     final RangeToken rt = (RangeToken) ind;
     ser.attribute(MIN, Token.token(rt.min));
     ser.attribute(MAX, Token.token(rt.max));
@@ -78,6 +78,6 @@ public final class RangeAccess extends Simple {
   @Override
   public String toString() {
     final RangeToken rt = (RangeToken) ind;
-    return name() + "(" + rt.min + "-" + rt.max + ", " + ind.type() + ")";
+    return name() + PAR1 + rt.min + "-" + rt.max + SEP + ind + PAR2;
   }
 }

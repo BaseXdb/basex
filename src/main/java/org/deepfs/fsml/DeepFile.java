@@ -761,7 +761,7 @@ public final class DeepFile {
     atts.add(ATIME, time);
     atts.add(CTIME, time);
     atts.add(MTIME, token(f.lastModified()));
-    atts.add(NLINK, token("1"));
+    atts.add(NLINK, ONE);
     atts.add(SUFFIX, DeepFS.getSuffix(name));
     return atts;
   }

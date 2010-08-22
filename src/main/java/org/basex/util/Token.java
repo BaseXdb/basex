@@ -49,15 +49,15 @@ public final class Token {
   public static final byte[] ONE = { '1' };
 
   /** Quote entity. */
-  public static final byte[] QU = token("\"");
+  public static final byte[] QU = { '\"' };
   /** Ampersand entity. */
-  public static final byte[] AMP = token("&");
+  public static final byte[] AMP = { '&' };
   /** Apostrophe entity. */
-  public static final byte[] APOS = token("'");
+  public static final byte[] APOS = { '\'' };
   /** GreaterThan entity. */
-  public static final byte[] GT = token(">");
+  public static final byte[] GT = { '>' };
   /** LessThan entity. */
-  public static final byte[] LT = token("<");
+  public static final byte[] LT = { '<' };
 
   /** Hex codes. */
   public static final byte[] HEX = token("0123456789ABCDEF");
@@ -100,6 +100,7 @@ public final class Token {
    */
   public static String string(final byte[] token, final int start,
       final int length) {
+
     if(length <= 0) return "";
     final char[] str = new char[length];
     for(int i = 0; i < length; ++i) {
@@ -124,13 +125,9 @@ public final class Token {
     // larger than Character.MAX_CODE_POINT, results might be unexpected.
 
     final StringBuilder sb = new StringBuilder(length);
-    // utf8 conversion cache
-    final byte[] uc = new byte[4];
     final int il = Math.min(start + length, token.length);
-    for(int i = start; i < il;) {
-      final int cl = cl(token, i);
-      for(int c = 0; c < cl && i < il; ++c, ++i) uc[c] = token[i];
-      final int cp = cp(uc, 0);
+    for(int i = start; i < il; i += cl(token, i)) {
+      final int cp = cp(token, i);
       if(cp < Character.MIN_SUPPLEMENTARY_CODE_POINT) {
         sb.append((char) cp);
       } else {
@@ -912,7 +909,7 @@ public final class Token {
       }
     }
     if(sb.size() != 0) split[s++] = sb.finish();
-    return Arrays.copyOf(split, s);
+    return Array.copyOf(split, s);
   }
 
   /**

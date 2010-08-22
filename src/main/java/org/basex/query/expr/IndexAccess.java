@@ -104,13 +104,15 @@ public final class IndexAccess extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, token(ind.toString()));
+    ser.openElement(this, DATA, token(ictx.data.meta.name),
+        TYPE, token(ind.toString()));
     expr.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    return name() + "(" + expr + ", " + ind + ")";
+    return name() + PAR1 + "\"" + ictx.data.meta.name + "\"" +
+      SEP + expr + SEP + ind + PAR2;
   }
 }

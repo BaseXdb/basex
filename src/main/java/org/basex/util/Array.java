@@ -14,6 +14,41 @@ public final class Array {
   private Array() { }
 
   /**
+   * Copies the specified array.
+   * @param a array to be copied
+   * @param s new array size
+   * @return new array
+   */
+  public static byte[][] copyOf(final byte[][] a, final int s) {
+    final byte[][] tmp = new byte[s][];
+    System.arraycopy(a, 0, tmp, 0, Math.min(s, a.length));
+    return tmp;
+  }
+
+  /**
+   * Copies the specified array.
+   * @param a array to be copied
+   * @param s new array size
+   * @return new array
+   */
+  public static int[][] copyOf(final int[][] a, final int s) {
+    final int[][] tmp = new int[s][];
+    System.arraycopy(a, 0, tmp, 0, Math.min(s, a.length));
+    return tmp;
+  }
+  /**
+   * Copies the specified array.
+   * @param a array to be copied
+   * @param s new array size
+   * @return new array
+   */
+  public static String[] copyOf(final String[] a, final int s) {
+    final String[] tmp = new String[s];
+    System.arraycopy(a, 0, tmp, 0, Math.min(s, a.length));
+    return tmp;
+  }
+
+  /**
    * Resizes an array and adds an entry at the end.
    * @param ar array to be resized
    * @param e entry to be added

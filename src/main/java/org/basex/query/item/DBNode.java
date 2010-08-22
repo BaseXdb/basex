@@ -294,7 +294,9 @@ public class DBNode extends Nod {
 
   @Override
   public final void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, NAM, token(data.meta.file.name()), PRE, token(pre));
+    ser.openElement(this, NAM, token(data.meta.name));
+    if(pre != 0) ser.attribute(PRE, token(pre));
+    ser.closeElement();
   }
 
   @Override

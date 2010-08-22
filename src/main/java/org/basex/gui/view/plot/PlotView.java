@@ -182,7 +182,7 @@ public final class PlotView extends View {
           markingChanged = true;
 
           final String[] keys =
-            plotData.getCategories(token(item)).finishString();
+            plotData.getCategories(token(item)).toStringArray();
           xCombo.setModel(new DefaultComboBoxModel(keys));
           yCombo.setModel(new DefaultComboBoxModel(keys));
           if(keys.length > 0) {
@@ -866,7 +866,7 @@ public final class PlotView extends View {
 
       plotData = new PlotData(gui.context);
 
-      final String[] items = plotData.getItems().finishString();
+      final String[] items = plotData.getItems().toStringArray();
       itemCombo.setModel(new DefaultComboBoxModel(items));
 
       // set first item and trigger assignment of axis assignments

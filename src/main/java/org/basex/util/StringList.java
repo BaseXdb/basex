@@ -11,37 +11,21 @@ import org.basex.core.Main;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class StringList implements Iterable<String> {
-  /** Initial hash capacity. */
-  private static final int CAP = 1 << 3;
-  /** List entries. */
+public class StringList extends ElementList implements Iterable<String> {
+  /** Element container. */
   protected String[] list = new String[CAP];
-  /** Number of entries. */
-  protected int size;
 
   /**
-   * Adds a string to the array.
-   * @param s string to be added
+   * Adds an element to the array.
+   * @param e element to be added
    */
-  public final void add(final String s) {
-    if(size == list.length) {
-      final String[] tmp = new String[size << 1];
-      System.arraycopy(list, 0, tmp, 0, size);
-      list = tmp;
-    }
-    list[size++] = s;
+  public final void add(final String e) {
+    if(size == list.length) list = Array.copyOf(list, newSize());
+    list[size++] = e;
   }
 
   /**
-   * Returns the number of entries.
-   * @return number of entries
-   */
-  public final int size() {
-    return size;
-  }
-
-  /**
-   * Returns the specified value.
+   * Returns the specified element.
    * @param p position
    * @return value
    */
@@ -50,35 +34,33 @@ public class StringList implements Iterable<String> {
   }
 
   /**
-   * Checks if the specified string is found in the list.
-   * @param v string to be checked
-   * @return true if value is found
+   * Checks if the specified element is found in the list.
+   * @param e element to be checked
+   * @return result of check
    */
-  public final boolean contains(final String v) {
-    for(int i = 0; i < size; ++i) if(list[i].equals(v)) return true;
+  public final boolean contains(final String e) {
+    for(int i = 0; i < size; ++i) if(list[i].equals(e)) return true;
     return false;
   }
 
   /**
-   * Deletes the specified entry.
-   * @param i entry to be deleted
+   * Deletes the specified element.
+   * @param i element to be deleted
    */
   public final void delete(final int i) {
     Array.move(list, i + 1, -1, --size - i);
   }
 
   /**
-   * Returns the string array.
+   * Returns an array with all elements.
    * @return array
    */
   public final String[] toArray() {
-    final String[] tmp = new String[size];
-    System.arraycopy(list, 0, tmp, 0, size);
-    return tmp;
+    return Array.copyOf(list, size);
   }
 
   /**
-   * Sorts the strings.
+   * Sorts the elements.
    * @param cs respect case sensitivity
    * @param asc ascending/descending flag
    */

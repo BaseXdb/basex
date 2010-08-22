@@ -2,7 +2,10 @@ package org.basex.query.func;
 
 import static org.basex.query.item.SeqType.*;
 import static org.basex.query.QueryTokens.*;
+import org.basex.core.Main;
+import org.basex.query.expr.Expr;
 import org.basex.query.item.SeqType;
+import org.basex.util.InputInfo;
 
 /**
  * Signatures of all XQuery functions.
@@ -447,6 +450,22 @@ public enum FunDef {
     max = mx;
     desc = dsc;
     ret = rt;
+  }
+
+  /**
+   * Creates a new instance of the function.
+   * @param ii input info
+   * @param e expression array
+   * @return function
+   */
+  public Fun newInstance(final InputInfo ii, final Expr... e) {
+    try {
+      return func.getDeclaredConstructor(InputInfo.class, FunDef.class,
+          Expr[].class).newInstance(ii, this, e);
+    } catch(final Exception ex) {
+      Main.notexpected(ex);
+      return null;
+    }
   }
 
   @Override

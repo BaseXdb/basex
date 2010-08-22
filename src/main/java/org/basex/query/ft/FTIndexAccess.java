@@ -1,5 +1,7 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
@@ -65,7 +67,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this);
+    ser.openElement(this, DATA, token(ictx.data.meta.name));
     ftexpr.plan(ser);
     ser.closeElement();
   }
@@ -82,6 +84,7 @@ public final class FTIndexAccess extends Simple {
 
   @Override
   public String toString() {
-    return name() + "(" + ftexpr + ")";
+    return name() + PAR1 + "\"" + ictx.data.meta.name + "\"" +
+      SEP + ftexpr + PAR2;
   }
 }

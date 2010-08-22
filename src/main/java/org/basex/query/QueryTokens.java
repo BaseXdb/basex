@@ -439,6 +439,8 @@ public interface QueryTokens {
   /** Query Plan. */
   byte[] VAR = token("var");
   /** Query Plan. */
+  byte[] DATA = token("data");
+  /** Query Plan. */
   byte[] TYPE = token("type");
   /** Query Plan. */
   byte[] NAM = token("name");

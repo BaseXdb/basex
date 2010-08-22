@@ -1,6 +1,7 @@
 package org.basex.index;
 
 import java.util.Arrays;
+import org.basex.util.Array;
 import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.TokenSet;
@@ -44,8 +45,8 @@ final class FTHash extends TokenSet {
   protected void rehash() {
     super.rehash();
     final int s = size << 1;
-    pre = Arrays.copyOf(pre, s);
-    pos = Arrays.copyOf(pos, s);
+    pre = Array.copyOf(pre, s);
+    pos = Array.copyOf(pos, s);
     ns = Arrays.copyOf(ns, s);
   }
 

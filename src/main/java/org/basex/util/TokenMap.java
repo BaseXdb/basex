@@ -1,7 +1,5 @@
 package org.basex.util;
 
-import java.util.Arrays;
-
 /**
  * This is a simple hash map, extending the even simpler
  * {@link TokenSet hash set}.
@@ -46,6 +44,6 @@ public class TokenMap extends TokenSet {
   @Override
   protected void rehash() {
     super.rehash();
-    values = Arrays.copyOf(values, size << 1);
+    values = Array.copyOf(values, size << 1);
   }
 }

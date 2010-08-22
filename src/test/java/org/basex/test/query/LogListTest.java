@@ -1,13 +1,11 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
-import java.lang.reflect.Field;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
-import org.basex.data.Data;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -26,16 +24,18 @@ public class LogListTest {
   /** Test document. */
   private static final String DOC = "<a><b><c/></b><d/></a>";
 
-  /**
+  /*
    * Tests if the LogList is activated.
+   * [LW] removed to work both for default and log list
    * @throws Exception exception
-   */
   @Test
   public final void activated() throws Exception {
     final Field on = Data.class.getDeclaredField("IDPREMAPON");
     on.setAccessible(true);
-    assertTrue("LogList isn't activated", on.getBoolean(null));
+    // 
+    //assertTrue("LogList isn't activated", on.getBoolean(null));
   }
+   */
 
   /**
    * Tests if inserts are correctly reflected in the mapping.

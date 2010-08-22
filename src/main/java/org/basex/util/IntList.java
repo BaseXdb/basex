@@ -4,32 +4,28 @@ import java.util.Arrays;
 import org.basex.core.Main;
 
 /**
- * This is a simple container for native int values.
+ * This is a simple container for int values.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class IntList {
-  /** Resize factor for extending the byte arrays. */
-  private double factor = 2;
-  /** Value array. */
+public class IntList extends ElementList {
+  /** Element container. */
   protected int[] list;
-  /** Number of entries. */
-  protected int size;
 
   /**
    * Default constructor.
    */
   public IntList() {
-    this(8);
+    this(CAP);
   }
 
   /**
-   * Constructor, specifying an initial list size.
-   * @param is initial size of the list
+   * Constructor, specifying an initial array capacity.
+   * @param c array capacity
    */
-  public IntList(final int is) {
-    list = new int[is];
+  public IntList(final int c) {
+    list = new int[c];
   }
 
   /**
@@ -43,85 +39,68 @@ public class IntList {
 
   /**
    * Constructor, specifying an initial array.
-   * @param v initial list values
+   * @param a initial array
    */
-  public IntList(final int[] v) {
-    list = v;
-    size = v.length;
+  public IntList(final int[] a) {
+    list = a;
+    size = a.length;
   }
 
   /**
-   * Adds next value.
-   * @param v value to be added
+   * Adds an entry to the array.
+   * @param e entry to be added
    */
-  public final void add(final int v) {
-    if(size == list.length) {
-      list = Arrays.copyOf(list, Math.max(size + 1, (int) (size * factor)));
-    }
-    list[size++] = v;
+  public final void add(final int e) {
+    if(size == list.length) list = Arrays.copyOf(list, newSize());
+    list[size++] = e;
   }
 
   /**
-   * Returns the number of entries.
-   * @return number of entries
+   * Returns the element at the specified index.
+   * @param i index
+   * @return element
    */
-  public final int size() {
-    return size;
+  public final int get(final int i) {
+    return list[i];
   }
 
   /**
-   * Returns the specified value.
-   * @param p position
-   * @return value
+   * Sets an element at the specified index.
+   * @param e element to be set
+   * @param i index
    */
-  public final int get(final int p) {
-    return list[p];
+  public final void set(final int e, final int i) {
+    if(i >= list.length) list = Arrays.copyOf(list, newSize(i + 1));
+    list[i] = e;
+    size = Math.max(size, i + 1);
   }
 
   /**
-   * Sets a value at the specified position.
-   * @param v value to be added
-   * @param p position
+   * Checks if the specified element is found in the list.
+   * @param e element to be found
+   * @return result of check
    */
-  public final void set(final int v, final int p) {
-    if(p >= list.length) list = Arrays.copyOf(list, p + 1);
-    list[p] = v;
-    size = Math.max(size, p + 1);
-  }
-
-  /**
-   * Checks if the specified value is found in the list.
-   * @param v value to be added
-   * @return true if value is found
-   */
-  public final boolean contains(final int v) {
-    for(int i = 0; i < size; ++i) if(list[i] == v) return true;
+  public final boolean contains(final int e) {
+    for(int i = 0; i < size; ++i) if(list[i] == e) return true;
     return false;
   }
 
   /**
-     * Searches for the specified value via binary search.
-     * Note that the values must be sorted.
-     * @param v value to find
-     * @return index of the search key, or the negative insertion point - 1
+   * Searches the specified element via binary search.
+   * Note that the elements must be sorted.
+   * @param e element to be found
+   * @return index of the search key, or the negative insertion point - 1
    */
-  public final int find(final int v) {
-    return Arrays.binarySearch(list, 0, size, v);
+  public final int find(final int e) {
+    return Arrays.binarySearch(list, 0, size, e);
   }
 
   /**
-   * Finishes the int array.
-   * @return int array
+   * Returns an array with all elements.
+   * @return array
    */
   public final int[] toArray() {
-    return size == list.length ? list : Arrays.copyOf(list, size);
-  }
-
-  /**
-   * Resets the integer list.
-   */
-  public final void reset() {
-    size = 0;
+    return Arrays.copyOf(list, size);
   }
 
   /**
@@ -306,7 +285,7 @@ public class IntList {
   }
 
   /**
-   * Swaps two array values.
+   * Swaps two array elements.
    * @param a first offset
    * @param b second offset
    * @param t sort tokens
@@ -321,7 +300,7 @@ public class IntList {
   }
 
   /**
-   * Swaps two array values.
+   * Swaps two array elements.
    * @param a first offset
    * @param b second offset
    * @param t sort tokens
@@ -339,7 +318,7 @@ public class IntList {
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
    * @param a first offset
    * @param b second offset
-   * @param n number of values
+   * @param n number of elements
    * @param t sort tokens
    */
   private void s(final int a, final int b, final int n, final byte[][] t) {
@@ -350,7 +329,7 @@ public class IntList {
    * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
    * @param a first offset
    * @param b second offset
-   * @param n number of values
+   * @param n number of elements
    * @param t sort tokens
    */
   private void s(final int a, final int b, final int n, final double[] t) {

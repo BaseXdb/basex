@@ -62,7 +62,7 @@ final class FNQName extends Fun {
           checkType(it, Type.STR).atom());
         final Item it3 = it2 == null ? Str.ZERO : checkType(it2, Type.STR);
         final byte[] atm = it3.atom();
-        final byte[] str = (!contains(atm, ':') && eq(uri.atom(), XMLURI))
+        final byte[] str = !contains(atm, ':') && eq(uri.atom(), XMLURI)
             ? concat(XMLC, atm) : atm;
         if(!XMLToken.isQName(str)) Err.value(input, Type.QNM, it3);
         QNm nm = new QNm(str, uri);

@@ -6,7 +6,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
@@ -68,7 +67,7 @@ public class FLWOR extends ParseExpr {
         // if the result is numeric
         for(int p = 0; p < pr.length; p++) {
           if(pr[p].type().mayBeNum())
-            pr[p] = Fun.create(input, FunDef.BOOLEAN, pr[p]);
+            pr[p] = FunDef.BOOLEAN.newInstance(input, pr[p]);
         }
 
         // attach predicates to axis path, or create a filter

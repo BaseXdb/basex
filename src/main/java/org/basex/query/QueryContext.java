@@ -42,6 +42,7 @@ import org.basex.query.util.Err;
 import org.basex.query.util.Functions;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Variables;
+import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
@@ -535,7 +536,7 @@ public final class QueryContext extends Progress {
   public void addColl(final NodIter ni, final byte[] name) {
     if(colls == collect.length) {
       collect = Arrays.copyOf(collect, colls << 1);
-      collName = Arrays.copyOf(collName, colls << 1);
+      collName = Array.copyOf(collName, colls << 1);
     }
     collect[colls] = ni;
     collName[colls++] = name;

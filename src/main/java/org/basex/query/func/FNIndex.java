@@ -62,7 +62,7 @@ public final class FNIndex extends TokenSet {
       final FunDef fl = funcs[id];
       if(!eq(fl.uri, uri)) return null;
 
-      final Fun f = Fun.create(qp.input(), fl, args);
+      final Fun f = fl.newInstance(qp.input(), args);
       // check number of arguments
       if(args.length < fl.min || args.length > fl.max) qp.error(XPARGS, fl);
       return f;

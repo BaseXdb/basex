@@ -31,8 +31,8 @@ public final class Namespaces {
     final byte[] ln = name.ln();
     if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(ii, NSDEF, name);
     final byte[] uri = name.uri.atom();
-    if(eq(XMLURI, uri)) Err.or(ii, NOXMLNS, name);
-    if(eq(XMLNSURI, uri)) Err.or(ii, NOXMLNS2, name);
+    if(eq(XMLURI, uri)) Err.or(ii, NOXMLNS, XML, name);
+    if(eq(XMLNSURI, uri)) Err.or(ii, NOXMLNS, XMLNS, name);
     ns.add(ln, uri);
   }
 
