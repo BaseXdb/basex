@@ -45,7 +45,7 @@ public final class CElem extends CFrag {
   }
 
   @Override
-  public Expr comp(final QueryContext ctx) throws QueryException {
+  public CElem comp(final QueryContext ctx) throws QueryException {
     final int s = ctx.ns.size();
     addNS(ctx);
     super.comp(ctx);

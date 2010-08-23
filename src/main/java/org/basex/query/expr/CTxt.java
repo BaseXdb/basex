@@ -17,13 +17,13 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class CText extends CFrag {
+public final class CTxt extends CFrag {
   /**
    * Constructor.
    * @param ii input info
    * @param t text
    */
-  public CText(final InputInfo ii, final Expr t) {
+  public CTxt(final InputInfo ii, final Expr t) {
     super(ii, t);
     type = SeqType.NOD_ZO;
   }

@@ -49,7 +49,7 @@ public final class Uri extends Str {
     if(add.val.length == 0) return this;
 
     try {
-      final java.net.URI base = new URI(Token.string(val));
+      final URI base = new URI(Token.string(val));
       final URI uri = base.resolve(Token.string(add.val));
       return uri(Token.token(uri.toString()));
     } catch(final Exception ex) {

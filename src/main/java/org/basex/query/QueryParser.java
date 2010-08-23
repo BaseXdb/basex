@@ -14,7 +14,7 @@ import org.basex.query.expr.CComm;
 import org.basex.query.expr.CDoc;
 import org.basex.query.expr.CElem;
 import org.basex.query.expr.CPI;
-import org.basex.query.expr.CText;
+import org.basex.query.expr.CTxt;
 import org.basex.query.expr.Arith;
 import org.basex.query.expr.TypeCase;
 import org.basex.query.expr.Cast;
@@ -2012,7 +2012,7 @@ public class QueryParser extends InputParser {
     if(!consumeWS2(BRACE1)) return null;
     final Expr e = check(expr(), NOTXTCONS);
     check(BRACE2);
-    return new CText(input(), e);
+    return new CTxt(input(), e);
   }
 
   /**

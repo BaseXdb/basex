@@ -18,7 +18,7 @@ import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
-import org.basex.util.TokenList;
+import org.basex.util.TokenSet;
 import org.basex.util.XMLToken;
 
 /**
@@ -122,24 +122,34 @@ final class FNQName extends Fun {
    * @return prefix sequence
    */
   private Iter inscope(final QueryContext ctx, final Nod node) {
-    final TokenList tl = new TokenList();
-    tl.add(XML);
-    if(ctx.nsElem.length != 0) tl.add(EMPTY);
+    final TokenSet pref = new TokenSet();
+    pref.add(XML);
 
+    byte[] emp = null;
     Nod n = node;
     do {
       final Atts at = n.ns();
       if(at == null) break;
       if(n != node || ctx.nsPreserve) {
         for(int a = 0; a < at.size; ++a) {
-          if(!tl.contains(at.key[a])) tl.add(at.key[a]);
+          final byte[] pre = at.key[a];
+          if(pre.length == 0) {
+            if(emp == null) emp = at.val[a];
+          } else pref.add(pre);
         }
+      }
+      if(emp == null) {
+        final QNm nm = n.qname();
+        if(!nm.ns()) emp = nm.uri.atom();
       }
       n = n.parent();
     } while(n != null && ctx.nsInherit);
+    
+    if(emp == null) emp = ctx.nsElem;
+    if(emp.length != 0) pref.add(EMPTY);
 
-    final ItemIter ir = new ItemIter();
-    for(final byte[] t : tl) ir.add(Str.get(t));
+    final ItemIter ir = new ItemIter(pref.size());
+    for(final byte[] t : pref.keys()) ir.add(Str.get(t));
     return ir;
   }
 }

@@ -11,8 +11,10 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import static org.basex.util.Token.*;
 
 /**
  * Node functions.
@@ -83,6 +85,11 @@ final class FNNode extends Fun {
           qname = node.qname();
           if(qname == null) break;
           if(qname.uri != Uri.EMPTY) return qname.uri;
+          final Atts ns = node.ns();
+          if(ns != null) {
+            int pos = ns.get(EMPTY);
+            if(pos != -1) return Uri.uri(ns.val[pos]);
+          }
           node = node.parent();
         }
         return Uri.uri(ctx.nsElem);

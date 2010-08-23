@@ -5,17 +5,9 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FDoc;
-import org.basex.query.item.FTxt;
-import org.basex.query.item.Item;
-import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
-import org.basex.query.iter.Iter;
-import org.basex.query.iter.NodIter;
-import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * Document fragment.
@@ -36,53 +28,14 @@ public final class CDoc extends CFrag {
   @Override
   public FDoc atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final NodIter nodes = new NodIter();
-    final Iter iter = ctx.iter(expr[0]);
-    final byte[] base = Token.EMPTY;
 
-    final TokenBuilder text = new TokenBuilder();
-    boolean more = false;
-    Item it;
-    while((it = iter.next()) != null) {
-      if(it.node() && it.type != Type.TXT) {
-        if(it.type == Type.ATT) Err.or(input, XPATT);
+    final Constr con = new Constr(ctx, expr);
+    if(con.errAtt || con.ats.size() != 0) Err.or(ii, XPATT);
 
-        if(text.size() != 0) {
-          nodes.add(new FTxt(text.finish(), null));
-          text.reset();
-        }
-        if(it.type == Type.DOC) {
-          add(nodes, (Nod) it);
-        } else {
-          nodes.add(((Nod) it).copy());
-        }
-        more = false;
-      } else {
-        if(more && text.size() != 0 && it.type != Type.TXT) text.add(' ');
-        text.add(it.atom());
-        more = it.type != Type.TXT;
-      }
-    }
-    if(text.size() != 0) {
-      nodes.add(new FTxt(text.finish(), null));
-      text.reset();
-    }
-
-    final FDoc doc = new FDoc(nodes, base);
-    for(int n = 0; n < nodes.size(); ++n) nodes.get(n).parent(doc);
+    final FDoc doc = new FDoc(con.children, con.base);
+    for(int n = 0; n < con.children.size(); ++n)
+      con.children.get(n).parent(doc);
     return doc;
-  }
-
-  /**
-   * Recursively adds children of a document node.
-   * @param nodes node container
-   * @param doc document node
-   * @throws QueryException query exception
-   */
-  private void add(final NodIter nodes, final Nod doc) throws QueryException {
-    final NodeIter ni = doc.child();
-    Nod it;
-    while((it = ni.next()) != null) nodes.add(it.copy());
   }
 
   @Override
