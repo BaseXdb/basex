@@ -15,7 +15,7 @@ import org.basex.util.TokenList;
  */
 public abstract class Serializer {
   /** Namespaces. */
-  public final Atts ns = new Atts();
+  private final Atts ns = new Atts();
   /** Current default namespace. */
   public byte[] dn = EMPTY;
 
@@ -162,10 +162,13 @@ public abstract class Serializer {
    */
   public final void namespace(final byte[] n, final byte[] v)
       throws IOException {
-
+    
     if(!undecl && n.length != 0 && v.length == 0) return;
-    attribute(n.length == 0 ? XMLNS : concat(XMLNSC, n), v);
-    ns.add(n, v);
+    final byte[] uri = ns(n);
+    if(uri == null || !eq(uri, v)) {
+      attribute(n.length == 0 ? XMLNS : concat(XMLNSC, n), v);
+      ns.add(n, v);
+    }
   }
 
   /**
@@ -234,6 +237,17 @@ public abstract class Serializer {
    */
   public final int level() {
     return tags.size();
+  }
+  
+  /**
+   * Gets the URI currently bound by the given prefix.
+   * @param pre namespace prefix
+   * @return URI if found, {@code null} otherwise
+   */
+  public final byte[] ns(final byte[] pre) {
+    for(int i = ns.size - 1; i >= 0; i--)
+      if(eq(ns.key[i], pre)) return ns.val[i];
+    return null;
   }
 
   /**

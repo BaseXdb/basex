@@ -225,14 +225,12 @@ public final class FElem extends FNode {
     // remember top level namespace
     final byte[] dn = ser.dn;
     // xmlns? namespace with prefix?
-    boolean xmlns = false;
 
     // serialize all namespaces at top level...
     if(ser.level() == 1) {
       final Atts nns = nsScope();
       for(int a = 0; a < nns.size; ++a) {
         if(nns.key[a].length == 0) {
-          xmlns = true;
           if(Token.eq(ser.dn, nns.val[a])) continue;
           // reset default namespace
           ser.dn = nns.val[a];
@@ -241,23 +239,13 @@ public final class FElem extends FNode {
       }
 
       // serialize default namespace if not done yet
-      for(int p = ser.ns.size - 1; p >= 0 && !xmlns; p--) {
-        if(ser.ns.key[p].length != 0) continue;
-        xmlns = true;
-        ser.dn = ser.ns.val[p];
-        ser.namespace(EMPTY, ser.ns.val[p]);
+      final byte[] def = ser.ns(EMPTY);
+      if(def != null) {
+        ser.dn = def;
+        ser.namespace(EMPTY, def);
       }
-    } else {
-      if(ns != null) {
-        for(int p = ns.size - 1; p >= 0; p--) {
-          final byte[] key = ns.key[p];
-          final int i = ser.ns.get(key);
-          if(i == -1 || !Token.eq(ser.ns.val[i], uri)) {
-            ser.namespace(key, ns.val[p]);
-            xmlns |= key.length == 0;
-          }
-        }
-      }
+    } else if(ns != null) {
+      for(int p = ns.size - 1; p >= 0; p--) ser.namespace(ns.key[p], ns.val[p]);
     }
 
     ser.dn = uri;
@@ -266,12 +254,8 @@ public final class FElem extends FNode {
     for(int n = 0; n < atts.size(); ++n) {
       final Nod nod = atts.get(n);
       final QNm atn = nod.qname();
-      if(atn.ns()) {
-        if(!NSGlobal.standard(atn.uri.atom())) {
-          final byte[] pre = atn.pref();
-          final int i = ser.ns.get(pre);
-          if(i == -1) ser.namespace(pre, atn.uri.atom());
-        }
+      if(atn.ns() && !NSGlobal.standard(atn.uri.atom())) {
+        ser.namespace(atn.pref(), atn.uri.atom());
       }
       ser.attribute(atn.atom(), nod.atom());
     }
