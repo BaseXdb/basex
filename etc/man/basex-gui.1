@@ -1,0 +1,62 @@
+.\" Copyright (c) 2010 Alexander Holupirek <alex@holupirek.de>
+.\"
+.\" Permission to use, copy, modify, and distribute this software for any
+.\" purpose with or without fee is hereby granted, provided that the above
+.\" copyright notice and this permission notice appear in all copies.
+.\"
+.\" THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+.\" WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+.\" MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+.\" ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+.\" WHATSOEVER RESULTING FROM LOSS OF MIND, USE, DATA OR PROFITS, WHETHER IN
+.\" AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+.\" OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+.\"
+.Dd $Mdocdate$
+.Dt BASEX-GUI 1
+.Os BaseX v6.2.1.2043
+.Sh NAME
+.Nm basex-gui
+.Nd "XML database system and XPath/XQuery processor"
+.Sh SYNOPSIS
+.Nm basex-gui
+.Sh DESCRIPTION
+The 
+.Nm
+utility starts the GUI mode of the native XML database system BaseX. Hereby the content of XML databases can be analyzed with several visualizations.
+.Sh FILES
+.Bl -tag -width "/etc/ntpd.confXXX" -compact
+.It Pa ~/.basex
+default
+.Nm
+configuration file
+.It Pa ~/.basexwin
+configuration of the
+.Nm
+GUI options
+.It Pa ~/.basexperm
+user file with all
+.Nm
+user names and md5-hashed passwords
+.El
+.\" .Sh EXAMPLES
+.\" This next request is for sections 1, 4, 6, and 8 only.
+.\" .Sh DIAGNOSTICS
+.Sh SEE ALSO
+.Xr basex-gui 1 ,
+.Xr basex-server 1 ,
+.Xr basex-client 1
+.\" .Xr foobar 1
+.\" .Sh STANDARDS
+.\" .Sh HISTORY
+.Sh AUTHORS
+.An -nosplit
+BaseX is primarily developed by
+.An Christian Gruen <christian.gruen@gmail.com>
+with the help of others listed on Lk http://www.basex.org/about.php.
+.Pp
+This man page was written by
+.An Alexander Holupirek <alex@holupirek.de> 
+in the progress of packaging BaseX for Debian GNU/Linux.
+.\" .Sh CAVEATS
+.\" .Sh BUGS
