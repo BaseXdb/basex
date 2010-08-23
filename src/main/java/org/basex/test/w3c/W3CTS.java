@@ -26,7 +26,7 @@ import org.basex.data.DataText;
 import org.basex.data.Nodes;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.io.TextInput;
 import org.basex.query.QueryException;
@@ -343,7 +343,7 @@ public abstract class W3CTS {
 
       final TokenBuilder files = new TokenBuilder();
       // limit result sizes to 1MB
-      final CachedOutput co = new CachedOutput(1 << 19);
+      final ArrayOutput co = new ArrayOutput(1 << 20);
 
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
