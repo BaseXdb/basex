@@ -26,7 +26,7 @@ import javax.xml.xquery.XQResultSequence;
 import javax.xml.xquery.XQSequence;
 import javax.xml.xquery.XQStaticContext;
 import junit.framework.TestCase;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.test.xqj.TestContentHandler;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,7 +89,7 @@ public final class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     final XQSequence seq = expr.executeQuery("'Hello World!'");
-    final CachedOutput co = new CachedOutput();
+    final ArrayOutput co = new ArrayOutput();
     seq.writeSequence(co, new Properties());
     final String str = co.toString().replaceAll("<\\?.*?>", "");
     assertEquals("", "Hello World!", str);

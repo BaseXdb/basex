@@ -18,7 +18,7 @@ import javax.xml.xquery.XQResultItem;
 import org.basex.core.Main;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Dbl;
@@ -229,7 +229,7 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
    */
   private String serialize() throws XQException {
     opened();
-    final CachedOutput co = new CachedOutput();
+    final ArrayOutput co = new ArrayOutput();
     serialize(co);
     return co.toString();
   }

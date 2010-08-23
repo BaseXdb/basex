@@ -19,7 +19,7 @@ import javax.xml.xquery.XQResultSequence;
 import org.basex.core.Main;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
@@ -198,7 +198,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     if(it != null && !next) throw new BXQException(TWICE);
     if(!next && !next()) return "";
 
-    final CachedOutput co = new CachedOutput();
+    final ArrayOutput co = new ArrayOutput();
     try {
       final XMLSerializer xml = new XMLSerializer(co);
       do {

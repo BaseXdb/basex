@@ -16,7 +16,7 @@ import org.basex.core.cmd.Run;
 import org.basex.core.cmd.XQuery;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.util.Table;
 import org.basex.util.Token;
@@ -57,7 +57,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() throws IOException {
         // retrieve list of databases
-        final CachedOutput co = new CachedOutput();
+        final ArrayOutput co = new ArrayOutput();
         exec(new List(), co);
         final Table table = new Table(co.toString());
 
@@ -133,7 +133,7 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() throws IOException {
         // perform command and serialize output
-        final CachedOutput co = new CachedOutput();
+        final ArrayOutput co = new ArrayOutput();
         exec(cmd, co);
 
         final XMLSerializer xml =

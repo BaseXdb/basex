@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.Resource;
@@ -58,7 +58,7 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
 
   @Override
   public Resource getMembersAsResource() throws XMLDBException {
-    final CachedOutput co = new CachedOutput();
+    final ArrayOutput co = new ArrayOutput();
     try {
       final XMLSerializer xml = new XMLSerializer(co);
       for(final Resource r : getIterator()) {

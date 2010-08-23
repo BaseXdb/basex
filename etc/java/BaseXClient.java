@@ -1,4 +1,5 @@
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class BaseXClient {
   /** Output stream. */
-  final OutputStream out;
+  final BufferedOutputStream out;
   /** Socket. */
   private final Socket socket;
   /** Cache. */
@@ -39,12 +40,11 @@ public class BaseXClient {
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
     in = new BufferedInputStream(socket.getInputStream());
+    out = new BufferedOutputStream(socket.getOutputStream());
 
     // receive timestamp
     final String ts = receive();
-
     // send {Username}0 and hashed {Password/Timestamp}0
-    out = socket.getOutputStream();
     send(usern);
     send(md5(md5(pw) + ts));
 
@@ -121,6 +121,7 @@ public class BaseXClient {
    */
   public void close() throws IOException {
     send("exit");
+    out.flush();
     socket.close();
   }
 
@@ -130,6 +131,7 @@ public class BaseXClient {
    * @throws IOException Exception
    */
   boolean ok() throws IOException {
+    out.flush();
     return in.read() == 0;
   }
 
@@ -160,6 +162,7 @@ public class BaseXClient {
    * @throws IOException I/O exception
    */
   private void receive(final OutputStream o) throws IOException {
+    out.flush();
     while(true) {
       final int b = in.read();
       if(b == 0) break;
@@ -241,6 +244,7 @@ public class BaseXClient {
       // send 2 to mark end of query execution, and {ID}0 for identification
       out.write(2);
       send(id);
+      out.flush();
     }
   }
 }

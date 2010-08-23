@@ -10,7 +10,7 @@ import org.basex.api.dom.BXDoc;
 import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.io.IOFile;
 import org.basex.query.item.DBNode;
 import org.basex.util.TokenBuilder;
@@ -104,7 +104,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     if(content == null) {
       try {
         // serialize and cache content
-        final CachedOutput co = new CachedOutput();
+        final ArrayOutput co = new ArrayOutput();
         final XMLSerializer xml = new XMLSerializer(co);
         if(data != null) {
           new DBNode(data, pre).serialize(xml);
@@ -207,7 +207,7 @@ final class BXXMLResource implements XMLResource, BXXMLDBText {
     /** HashMap. */
     private final HashMap<String, String> ns = new HashMap<String, String>();
     /** Cached output. */
-    private final CachedOutput co = new CachedOutput();
+    private final ArrayOutput co = new ArrayOutput();
     /** Serializer. */
     private final XMLSerializer xml;
     /** XMLResource. */
