@@ -3,7 +3,7 @@ package org.basex.core;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 
 /**
  * This class allows a generic command execution.
@@ -41,7 +41,7 @@ public abstract class Session {
    * @throws BaseXException database exception
    */
   public final String execute(final Command cmd) throws BaseXException {
-    final CachedOutput out = new CachedOutput();
+    final ArrayOutput out = new ArrayOutput();
     execute(cmd, out);
     return out.toString();
   }
@@ -53,7 +53,7 @@ public abstract class Session {
    * @throws BaseXException database exception
    */
   public final String execute(final String cmd) throws BaseXException {
-    final CachedOutput out = new CachedOutput();
+    final ArrayOutput out = new ArrayOutput();
     execute(cmd, out);
     return out.toString();
   }

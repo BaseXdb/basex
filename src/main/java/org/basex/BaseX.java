@@ -130,6 +130,9 @@ public class BaseX extends Main {
           if(c == 'c') {
             // send database commands
             commands = arg.remaining();
+          } else if(c == 'C' && sa()) {
+            // hidden option: show original query plan
+            arg.check(set(Prop.COMPPLAN, false));
           } else if(c == 'd') {
             // activate debug mode
             context.prop.set(Prop.DEBUG, true);

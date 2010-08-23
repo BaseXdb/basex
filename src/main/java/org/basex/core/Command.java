@@ -6,7 +6,7 @@ import java.io.OutputStream;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 import org.basex.data.Result;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
@@ -73,7 +73,7 @@ public abstract class Command extends Progress {
    * @throws BaseXException command exception
    */
   public final String execute(final Context ctx) throws BaseXException {
-    final CachedOutput co = new CachedOutput();
+    final ArrayOutput co = new ArrayOutput();
     execute(ctx, co);
     return co.toString();
   }

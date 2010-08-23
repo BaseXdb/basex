@@ -8,7 +8,7 @@ import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.io.TextInput;
@@ -280,7 +280,7 @@ final class FNGen extends Fun {
     }
     try {
       // run serialization
-      final CachedOutput co = new CachedOutput();
+      final ArrayOutput co = new ArrayOutput();
       nod.serialize(new XMLSerializer(co, new SerializerProp(tb.toString())));
       return Str.get(co.toArray());
     } catch(final IOException ex) {

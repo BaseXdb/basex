@@ -608,6 +608,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTDESC = "merging descendant-or-self step(s)";
   /** Optimization info. */
+  String OPTPATH = "merging axis paths";
+  /** Optimization info. */
   String OPTPRE = "pre-evaluating %";
   /** Optimization info. */
   String OPTWRITE = "rewriting %";

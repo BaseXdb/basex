@@ -13,7 +13,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.DBNode;
@@ -102,7 +102,7 @@ final class BXPathExpression implements XPathExpression {
     }
 
     try {
-      final CachedOutput co = new CachedOutput();
+      final ArrayOutput co = new ArrayOutput();
       item.serialize(new XMLSerializer(co));
       final String val = co.toString();
       if(res == XPathConstants.NUMBER) return Double.valueOf(val);

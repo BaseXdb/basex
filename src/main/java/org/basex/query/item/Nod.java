@@ -30,6 +30,7 @@ public abstract class Nod extends Item {
     Type.DOC, Type.ELM, Type.TXT, Type.ATT, Type.COM, Type.PI
   };
   /** Static node counter. */
+  // [CG] XQuery/ID: move to query context?
   private static int sid;
 
   /** Unique node id. */

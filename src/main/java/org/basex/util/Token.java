@@ -1230,6 +1230,7 @@ public final class Token {
    */
   private static synchronized char[] ch() {
     if(norm == null) {
+      // will be only initialized if needed
       norm = new char[0x200];
       for(int n = 0; n < norm.length; ++n) norm[n] = (char) n;
       for(int n = 0; n < NC.length; ++n) norm[NC[n][0]] = NC[n][1];

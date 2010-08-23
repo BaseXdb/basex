@@ -117,9 +117,9 @@ public final class TextInput {
    * @return true if everything went alright
    */
   public boolean add(final byte[] val, final boolean s) {
-    if(s) a(new CachedInput(Token.SPACE));
-    a(new CachedInput(val));
-    if(s) a(new CachedInput(Token.SPACE));
+    if(s) a(new ArrayInput(Token.SPACE));
+    a(new ArrayInput(val));
+    if(s) a(new ArrayInput(Token.SPACE));
     return ip < 20;
   }
 
@@ -127,7 +127,7 @@ public final class TextInput {
    * Inserts a cached input buffer.
    * @param ci buffer to be added
    */
-  private void a(final CachedInput ci) {
+  private void a(final ArrayInput ci) {
     if(++ip == in.length) in = Arrays.copyOf(in, ip << 1);
     in[ip] = ci;
     ci.encoding();

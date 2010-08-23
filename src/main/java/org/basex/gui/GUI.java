@@ -52,7 +52,7 @@ import org.basex.gui.view.table.TableView;
 import org.basex.gui.view.text.TextView;
 import org.basex.gui.view.tree.TreeView;
 import org.basex.gui.view.xquery.XQueryView;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -441,7 +441,7 @@ public final class GUI extends JFrame {
       command = c;
 
       // execute command and cache result
-      final CachedOutput co = new CachedOutput(context.prop.num(Prop.MAXTEXT));
+      final ArrayOutput co = new ArrayOutput(context.prop.num(Prop.MAXTEXT));
       final boolean up = c.writing(context);
       updating = up;
 

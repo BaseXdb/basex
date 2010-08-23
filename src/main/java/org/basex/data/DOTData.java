@@ -86,7 +86,7 @@ final class DOTData {
 
   /** Hash map, caching expression names. */
   private static final Object[][] NAMES = {
-    { "Arithmetics", org.basex.query.expr.Arith.class },
+    { "Calculation", org.basex.query.expr.Arith.class },
     { "Comparison", org.basex.query.expr.CmpG.class },
     { "Comparison", org.basex.query.expr.CmpN.class },
     { "Comparison", org.basex.query.expr.CmpV.class },

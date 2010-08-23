@@ -12,7 +12,7 @@ import org.basex.data.DOTSerializer;
 import org.basex.data.Result;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
@@ -190,7 +190,7 @@ public abstract class AQuery extends Command {
     // show dot plan
     try {
       if(prop.is(Prop.DOTPLAN)) {
-        final CachedOutput co = new CachedOutput();
+        final ArrayOutput co = new ArrayOutput();
         final DOTSerializer d = new DOTSerializer(co, prop.is(Prop.DOTCOMPACT));
         qu.plan(d);
         d.close();
@@ -204,7 +204,7 @@ public abstract class AQuery extends Command {
       }
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {
-        final CachedOutput co = new CachedOutput();
+        final ArrayOutput co = new ArrayOutput();
         qu.plan(new XMLSerializer(co));
         info(NL + QUERYPLAN);
         info(co.toString());

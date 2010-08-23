@@ -1,6 +1,5 @@
 package org.basex.io;
 
-import static org.basex.core.Text.*;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import org.basex.util.Token;
@@ -13,21 +12,21 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class CachedOutput extends PrintOutput {
+public final class ArrayOutput extends PrintOutput {
   /** Byte buffer. */
   private byte[] buf = new byte[8];
 
   /**
    * Default constructor.
    */
-  public CachedOutput() { }
+  public ArrayOutput() { }
 
   /**
    * Constructor, specifying the maximum number of bytes to write.
    * Note that the limit might break unicode characters.
    * @param m maximum
    */
-  public CachedOutput(final int m) {
+  public ArrayOutput(final int m) {
     max = m;
   }
 
@@ -56,11 +55,6 @@ public final class CachedOutput extends PrintOutput {
    * @return buffer
    */
   public byte[] buffer() {
-    final byte[] chop = Token.token(DOTS);
-    if(finished() && size >= chop.length) {
-      // add dots at the end of the output
-      System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
-    }
     return buf;
   }
 

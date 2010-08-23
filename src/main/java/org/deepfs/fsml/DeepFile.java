@@ -17,7 +17,7 @@ import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Result;
 import org.basex.data.XMLSerializer;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Type;
@@ -677,7 +677,7 @@ public final class DeepFile {
    */
   public void addXML(final long position, final int byteCount,
       final Data data) throws IOException {
-    final CachedOutput co = new CachedOutput();
+    final ArrayOutput co = new ArrayOutput();
     final XMLSerializer ser = new XMLSerializer(co);
     final Context ctx = new Context();
     ctx.openDB(data);

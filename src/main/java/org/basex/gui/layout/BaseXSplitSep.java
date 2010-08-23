@@ -17,9 +17,9 @@ final class BaseXSplitSep extends BaseXBack {
   /** Size of splitter. */
   static final int SIZE = 6;
   /** Color foreground. */
-  private static Color fore;
+  private Color fore;
   /** Color background. */
-  private static Color back;
+  private Color back;
   /** Layout: horizontal = true, vertical = false. */
   private final boolean l;
 

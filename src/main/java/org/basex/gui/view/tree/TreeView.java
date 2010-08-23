@@ -50,7 +50,7 @@ public final class TreeView extends View implements TreeViewOptions {
   /** Notified focus flag. */
   private boolean refreshedFocus;
   /** Distance between the levels. */
-  private static int levelDistance;
+  private int levelDistance;
   /** Image of the current marked nodes. */
   private BufferedImage markedImage;
   /** If something is selected. */

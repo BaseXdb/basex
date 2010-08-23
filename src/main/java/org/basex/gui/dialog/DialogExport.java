@@ -32,7 +32,7 @@ import org.basex.io.IOFile;
  */
 public final class DialogExport extends Dialog {
   /** Available encodings. */
-  private static String[] encodings;
+  private static final String[] ENCODINGS;
   /** Directory path. */
   private final BaseXTextField path;
   /** Database info. */
@@ -46,6 +46,12 @@ public final class DialogExport extends Dialog {
   /** Buttons. */
   private final BaseXBack buttons;
 
+  // initialize encodings
+  static {
+    final SortedMap<String, Charset> cs = Charset.availableCharsets();
+    ENCODINGS = cs.keySet().toArray(new String[cs.size()]);
+  }
+  
   /**
    * Default constructor.
    * @param main reference to the main window
@@ -90,17 +96,13 @@ public final class DialogExport extends Dialog {
       sp = new SerializerProp();
     }
 
-    if(encodings == null) {
-      final SortedMap<String, Charset> cs = Charset.availableCharsets();
-      encodings = cs.keySet().toArray(new String[cs.size()]);
-    }
-    encoding = new BaseXCombo(encodings, this);
+    encoding = new BaseXCombo(ENCODINGS, this);
     String enc = gui.context.data.meta.encoding;
     boolean f = false;
-    for(final String s : encodings) f |= s.equals(enc);
+    for(final String s : ENCODINGS) f |= s.equals(enc);
     if(!f) {
       enc = enc.toUpperCase();
-      for(final String s : encodings) f |= s.equals(enc);
+      for(final String s : ENCODINGS) f |= s.equals(enc);
     }
     encoding.setSelectedItem(f ? enc : sp.get(SerializerProp.S_ENCODING));
     encoding.addKeyListener(keys);

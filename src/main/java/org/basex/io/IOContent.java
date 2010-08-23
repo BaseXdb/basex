@@ -39,7 +39,7 @@ public final class IOContent extends IO {
 
   @Override
   public BufferInput buffer() {
-    return new CachedInput(cont);
+    return new ArrayInput(cont);
   }
 
   @Override

@@ -6,12 +6,12 @@ package org.basex.io;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class CachedInput extends BufferInput {
+public final class ArrayInput extends BufferInput {
   /**
    * Initializes the file reader.
    * @param input input bytes
    */
-  public CachedInput(final byte[] input) {
+  public ArrayInput(final byte[] input) {
     super(input);
   }
 

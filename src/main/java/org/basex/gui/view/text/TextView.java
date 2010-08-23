@@ -28,7 +28,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
-import org.basex.io.CachedOutput;
+import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
@@ -151,7 +151,7 @@ public final class TextView extends View implements ActionListener {
     ns = n;
     if(!visible()) return;
     try {
-      final CachedOutput co = new CachedOutput(
+      final ArrayOutput co = new ArrayOutput(
           gui.context.prop.num(Prop.MAXTEXT));
       if(n != null) n.serialize(new XMLSerializer(co));
       setText(co, null);
@@ -166,8 +166,14 @@ public final class TextView extends View implements ActionListener {
    * @param co cached output
    * @param c command
    */
-  public void setText(final CachedOutput co, final Command c) {
-    area.setText(co.buffer(), co.size());
+  public void setText(final ArrayOutput co, final Command c) {
+    final byte[] buf = co.buffer();
+    final int size = co.size();
+    final byte[] chop = Token.token(DOTS);
+    if(co.finished() && size >= chop.length) {
+      System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
+    }
+    area.setText(buf, size);
     header.setText(TEXTTIT + (co.finished() ? RESULTCHOP : ""));
     home.setEnabled(gui.context.data != null);
     refresh = true;

@@ -147,6 +147,7 @@ public class AxisPath extends Path {
       for(final Step s : step) st = Array.add(st, s);
       step = st;
       // refresh root context
+      ctx.compInfo(OPTPATH);
       ctx.value = root(ctx);
     }
     checkEmpty();

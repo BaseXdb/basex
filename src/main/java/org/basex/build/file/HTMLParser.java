@@ -10,7 +10,7 @@ import org.basex.build.xml.XMLParser;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.BufferInput;
-import org.basex.io.CachedInput;
+import org.basex.io.ArrayInput;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.xml.sax.ContentHandler;
@@ -63,7 +63,7 @@ public final class HTMLParser extends XMLParser {
     try {
       // tries to extract the encoding from the input
       byte[] content = io.content();
-      final BufferInput bi = new CachedInput(content);
+      final BufferInput bi = new ArrayInput(content);
       String enc = bi.encoding();
       content = bi.content().finish();
 
