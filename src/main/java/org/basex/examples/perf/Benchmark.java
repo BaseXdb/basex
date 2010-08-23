@@ -4,15 +4,15 @@ import static java.lang.System.*;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.core.Session;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
+import org.basex.server.LocalSession;
+import org.basex.server.Session;
 import org.basex.util.Args;
 
 /**

@@ -1,22 +1,22 @@
 package org.basex.examples.server;
 
 import org.basex.BaseXServer;
-import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
+import org.basex.server.Query;
 
 /**
- * This class demonstrates database access via the
+ * This class demonstrates query execution via the
  * client/server architecture.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class ServerExample {
+public final class ServerQueryExample {
   /** Reference to the client session. */
   static ClientSession session;
 
   /** Private constructor. */
-  private ServerExample() { }
+  private ServerQueryExample() { }
 
   /**
    * Runs the example code.
@@ -25,7 +25,7 @@ public final class ServerExample {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerExample ===");
+    System.out.println("=== ServerQueryExample ===");
 
     // ------------------------------------------------------------------------
     // Start server on default port 1984.
@@ -38,42 +38,46 @@ public final class ServerExample {
     session = new ClientSession("localhost", 1984, "admin", "admin");
 
     // ------------------------------------------------------------------------
-    // Create a database
-    System.out.println("\n* Create a database.");
-
-    session.execute("CREATE DB input etc/xml/input.xml");
-
-    // ------------------------------------------------------------------------
     // Run a query
     System.out.println("\n* Run a query:");
 
-    System.out.println(session.execute("XQUERY //li"));
+    System.out.println(session.execute("XQUERY 1"));
 
     // ------------------------------------------------------------------------
     // Run a query, specifying an output stream
     System.out.println("\n* Run a query (faster):");
 
-    session.execute("XQUERY //li", System.out);
+    session.execute("XQUERY 1 to 2", System.out);
 
     // ------------------------------------------------------------------------
-    // Run a query
-    System.out.println("\n\n* Run a buggy query:");
+    // Iteratively run a query
+    System.out.println("\n\n* Iterate a query:");
 
-    try {
-      session.execute("XQUERY ///");
-    } catch(final BaseXException ex) {
-      System.out.println(ex.getMessage());
-    }
+    // Create query instance
+    Query query = session.query("1 to 3");
 
+    // Loop through all results
+    while(query.more()) System.out.print(query.next());
+
+    // close iterator
+    query.close();
+    
     // ------------------------------------------------------------------------
-    // Drop the database
-    System.out.println("\n* Close and drop the database.");
+    // Iteratively run a query
+    System.out.println("\n\n* Iterate a query (faster):");
 
-    session.execute("DROP DB input");
+    // Create query instance
+    query = session.query("1 to 4");
 
+    // Loop through all results
+    while(query.more()) query.next(System.out);
+
+    // close iterator
+    query.close();
+    
     // ------------------------------------------------------------------------
     // Close the client session
-    System.out.println("\n* Close the client session.");
+    System.out.println("\n\n* Close the client session.");
 
     session.close();
 

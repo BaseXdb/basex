@@ -343,7 +343,7 @@ public abstract class W3CTS {
 
       final TokenBuilder files = new TokenBuilder();
       // limit result sizes to 1MB
-      final ArrayOutput co = new ArrayOutput(1 << 20);
+      final ArrayOutput ao = new ArrayOutput(1 << 20);
 
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
@@ -381,7 +381,7 @@ public abstract class W3CTS {
         final SerializerProp sp = new SerializerProp();
         sp.set(SerializerProp.S_INDENT, context.prop.is(Prop.CHOP) ?
             DataText.YES : DataText.NO);
-        final XMLSerializer xml = new XMLSerializer(co, sp);
+        final XMLSerializer xml = new XMLSerializer(ao, sp);
 
         iter = ItemIter.get(xq.iter());
         Item it;
@@ -467,7 +467,7 @@ public abstract class W3CTS {
             eq(data.atom(cmpFiles.nodes[s]), INSPECT);
 
           final byte[] res = result.get(s);
-          if(res.length == co.size() && eq(res, co.toArray())) break;
+          if(res.length == ao.size() && eq(res, ao.toArray())) break;
 
           if(xml || frag) {
             iter.reset();
@@ -514,11 +514,11 @@ public abstract class W3CTS {
             logErr.append(norm(string(result.get(0))));
             logErr.append(NL);
             logErr.append("[Wrong] ");
-            logErr.append(norm(co.toString()));
+            logErr.append(norm(ao.toString()));
             logErr.append(NL);
             logErr.append(NL);
             addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
-                co.toString());
+                ao.toString());
           }
           correct = false;
           err++;
@@ -526,11 +526,11 @@ public abstract class W3CTS {
           if(print) {
             logOK.append(logStr);
             logOK.append("[Right] ");
-            logOK.append(norm(co.toString()));
+            logOK.append(norm(ao.toString()));
             logOK.append(NL);
             logOK.append(NL);
             addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
-                co.toString());
+                ao.toString());
           }
           ok++;
         }
