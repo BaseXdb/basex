@@ -1,4 +1,4 @@
-!define JAR "Basex-6.2.4.jar"
+!define JAR "basex-6.2.4.jar"
 !define PRODUCT_NAME "BaseX"
 !define PRODUCT_VERSION "6.2.4"
 !define PRODUCT_PUBLISHER "DBIS Group, University of Konstanz"
@@ -63,9 +63,10 @@ Function OptionsLeave
 !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Options" "Field 3" "State"
 !insertmacro MUI_INSTALLOPTIONS_READ $R2 "Options" "Field 8" "State"
 !insertmacro MUI_INSTALLOPTIONS_READ $R3 "Options" "Field 9" "State"
+        ; Admin password modification
         ${If} $R1 == $R0
               ${If} $R0 != "admin"
-                    nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -c alter user admin $R0'
+                    nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -c alter user admin $R0'
               ${EndIf}
         ${Else}
           MessageBox MB_OK "Passwords do not match."
@@ -114,7 +115,7 @@ Section "Hauptgruppe" SEC01
   File "..\images\xml.ico"
   File "..\images\BaseX.ico"
   File "${PRODUCT_NAME}${PRODUCT_VERSION}.exe"
-  nsExec::Exec 'java -cp ${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
+  nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
   SetOutPath "$INSTDIR\service\bin"
   File "service\bin\BaseX.bat"
   File "service\bin\StartService.bat"
@@ -134,11 +135,11 @@ Section -AdditionalIcons
   !insertmacro MUI_INSTALLOPTIONS_READ $R4 "Options" "Field 7" "State"
   !insertmacro MUI_INSTALLOPTIONS_READ $R3 "Options" "Field 6" "State"
   ${If} $R3 == 1
-    CreateShortCut "$DESKTOP\BaseX.lnk" "$INSTDIR\${JAR}" "" "$INSTDIR\BaseX.ico" 0
+    CreateShortCut "$DESKTOP\BaseX.lnk" "$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe" "" "$INSTDIR\BaseX.ico" 0
   ${EndIf}
   ${If} $R4 == 1
     CreateDirectory "$SMPROGRAMS\BaseX"
-    CreateShortCut "$SMPROGRAMS\BaseX\BaseX.lnk" "$INSTDIR\${JAR}" "" "$INSTDIR\BaseX.ico" 0
+    CreateShortCut "$SMPROGRAMS\BaseX\BaseX.lnk" "$INSTDIR\${PRODUCT_NAME}${PRODUCT_VERSION}.exe" "" "$INSTDIR\BaseX.ico" 0
     WriteINIStr "$SMPROGRAMS\BaseX\Website.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
     CreateShortCut "$SMPROGRAMS\BaseX\StartService.lnk" "$INSTDIR\service\startService.bat"
     CreateShortCut "$SMPROGRAMS\BaseX\StopService.lnk" "$INSTDIR\service\stopService.bat"
