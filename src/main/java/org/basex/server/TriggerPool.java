@@ -42,7 +42,7 @@ public final class TriggerPool {
   }
 
   /**
-   * Attaches the server process to the trigger.
+   * Detaches the server process from the trigger.
    * @param trigger trigger
    * @param sp server process
    * @return success of operation

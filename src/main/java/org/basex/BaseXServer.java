@@ -45,8 +45,6 @@ public final class BaseXServer extends Main implements Runnable {
   private boolean running;
   /** Stop file. */
   private IO stop;
-  /** Port for service stopping. */
-  private static int sPort;
 
   /**
    * Main method, launching the server process. Command-line arguments can be
@@ -66,7 +64,6 @@ public final class BaseXServer extends Main implements Runnable {
     if(!success) return;
 
     final int port = context.prop.num(Prop.SERVERPORT);
-    sPort = port;
     if(service) {
       outln(start(port));
       return;
@@ -218,15 +215,6 @@ public final class BaseXServer extends Main implements Runnable {
       if(ex instanceof LoginException) return true;
     }
     return false;
-  }
-
-  /**
-   * Stops the service.
-   */
-  public static void serviceStop() {
-    stop(sPort);
-    // needed for stopping service
-    System.exit(0);
   }
 
   /**
