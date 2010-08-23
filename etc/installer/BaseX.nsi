@@ -116,6 +116,12 @@ Section "Hauptgruppe" SEC01
   File "..\images\BaseX.ico"
   File "${PRODUCT_NAME}${PRODUCT_VERSION}.exe"
   nsExec::Exec 'java -cp $INSTDIR\${JAR} org.basex.BaseX -Wc set dbpath $INSTDIR\BaseXData'
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
+                 "DisplayName" "BaseX"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
+                 "DisplayIcon" "$\"$INSTDIR\BaseX.ico$\""
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX" \
+                 "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
   SetOutPath "$INSTDIR\service\bin"
   File "service\bin\BaseX.bat"
   File "service\bin\StartService.bat"
@@ -174,7 +180,7 @@ Section Uninstall
   RMDir /r "$SMPROGRAMS\BaseX"
   RMDIR /r "$INSTDIR\service"
   RMDir /r "$INSTDIR"
-
+  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\BaseX"
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
   DeleteRegKey HKCR ".xq"
