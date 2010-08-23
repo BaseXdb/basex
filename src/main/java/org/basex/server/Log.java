@@ -73,10 +73,8 @@ public final class Log {
       for(final Object s : str) {
         sb.append("\t" + s.toString().replaceAll("\\r?\\n", " "));
       }
-      if(fw != null) {
         fw.write(sb.append(NL).toString());
         fw.flush();
-      }
     } catch(final IOException ex) {
       ex.printStackTrace();
     }
@@ -104,7 +102,6 @@ public final class Log {
   synchronized void close() {
     try {
       fw.close();
-      fw = null;
     } catch(final IOException ex) {
       ex.printStackTrace();
     }

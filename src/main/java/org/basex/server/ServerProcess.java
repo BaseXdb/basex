@@ -51,6 +51,8 @@ public final class ServerProcess extends Thread {
   private Command cmd;
   /** Query id counter. */
   private int id;
+  /** Running of thread. */
+  private boolean running;
 
   /**
    * Constructor.
@@ -101,8 +103,9 @@ public final class ServerProcess extends Thread {
   public void run() {
     log.write(this, "LOGIN " + context.user.name, OK);
     String input = null;
+    running = true;
     try {
-      while(true) {
+      while(running) {
         try {
           // receive first byte
           final byte b = in.readByte();
@@ -145,6 +148,7 @@ public final class ServerProcess extends Thread {
         // stop console
         if(cmd instanceof Exit) {
           exit();
+          running = false;
           break;
         }
 
@@ -175,7 +179,7 @@ public final class ServerProcess extends Thread {
         final String c = cmd.toString().replace('\r', ' ').replace('\n', ' ');
         log.write(this, c, ok ? OK : INFOERROR + info, perf);
       }
-      log.write(this, "LOGOUT " + context.user.name, OK);
+      if(!running) log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
       log.write(this, input, INFOERROR + ex.getMessage());
       ex.printStackTrace();
