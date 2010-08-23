@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import org.basex.core.BaseXException;
-import org.basex.core.Session;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
@@ -38,11 +37,11 @@ import org.basex.util.Token;
  */
 public final class ClientSession extends Session {
   /** Socket reference. */
-  private final Socket socket;
+  final Socket socket;
   /** Output stream. */
-  private final PrintOutput out;
+  final PrintOutput out;
   /** Input stream. */
-  private final InputStream in;
+  final BufferInput in;
 
   /**
    * Constructor, specifying the database context and the
@@ -69,12 +68,13 @@ public final class ClientSession extends Session {
   public ClientSession(final String host, final int port,
       final String user, final String pw) throws IOException {
 
+    // 5 seconds timeout
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
-    in = socket.getInputStream();
+    in = new BufferInput(socket.getInputStream());
 
     // receive timestamp
-    final String ts = new BufferInput(in).readString();
+    final String ts = in.readString();
 
     // send user name and hashed password/timestamp
     out = new PrintOutput(new BufferedOutputStream(socket.getOutputStream()));
@@ -83,7 +83,7 @@ public final class ClientSession extends Session {
     out.flush();
 
     // receive success flag
-    if(in.read() != 0) throw new LoginException();
+    if(!ok()) throw new LoginException();
   }
 
   @Override
@@ -92,11 +92,10 @@ public final class ClientSession extends Session {
 
     try {
       send(cmd);
-      final BufferInput bi = new BufferInput(in);
       int l;
-      while((l = bi.read()) != 0) o.write(l);
-      info = bi.readString();
-      if(bi.read() != 0) throw new BaseXException(info);
+      while((l = in.read()) != 0) o.write(l);
+      info = in.readString();
+      if(!ok()) throw new BaseXException(info);
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
@@ -119,9 +118,21 @@ public final class ClientSession extends Session {
       while((l = input.read()) != -1) out.write(l);
       out.write(0);
       out.flush();
-      final BufferInput bi = new BufferInput(in);
-      info = bi.readString();
-      if(bi.read() != 0) throw new BaseXException(info);
+      info = in.readString();
+      if(!ok()) throw new BaseXException(info);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  @Override
+  public Query query(final String query) throws BaseXException {
+    try {
+      out.write(0);
+      send(query);
+      final String id = in.readString();
+      if(!ok()) throw new BaseXException(in.readString());
+      return new ClientQuery(this, id);
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
@@ -138,9 +149,18 @@ public final class ClientSession extends Session {
    * @param s string to be sent
    * @throws IOException I/O exception
    */
-  private void send(final String s) throws IOException {
+  void send(final String s) throws IOException {
     out.print(s);
     out.write(0);
     out.flush();
+  }
+
+  /**
+   * Returns the next success flag.
+   * @return value of check
+   * @throws IOException Exception
+   */
+  boolean ok() throws IOException {
+    return in.read() == 0;
   }
 }

@@ -4,17 +4,16 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import org.basex.core.LocalSession;
-import org.basex.core.Session;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
+import org.basex.server.LocalSession;
 import org.basex.server.Log;
 import org.basex.server.LoginException;
 import org.basex.server.ServerProcess;
-import org.basex.server.TriggerPool;
+import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
@@ -32,8 +31,6 @@ import org.basex.util.Token;
 public final class BaseXServer extends Main implements Runnable {
   /** Log. */
   public Log log;
-  /** Pool for triggers. */
-  public TriggerPool triggers;
 
   /** Quiet mode (no logging). */
   private boolean quiet;
@@ -70,7 +67,6 @@ public final class BaseXServer extends Main implements Runnable {
     }
 
     log = new Log(context, quiet);
-    triggers = new TriggerPool();
     stop = stopFile(port);
 
     try {

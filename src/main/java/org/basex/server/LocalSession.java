@@ -1,9 +1,14 @@
-package org.basex.core;
+package org.basex.server;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.basex.core.BaseXException;
+import org.basex.core.Command;
+import org.basex.core.CommandParser;
+import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
 
 /**
  * This wrapper executes commands locally.
@@ -44,8 +49,12 @@ public class LocalSession extends Session {
   @Override
   public void create(final String name, final InputStream input)
     throws BaseXException {
-    CreateDB.xml(name, input, ctx);
-    info = "Database created.";
+    info = CreateDB.xml(name, input, ctx);
+  }
+
+  @Override
+  public Query query(final String query) {
+    return new LocalQuery(new QueryProcessor(query, ctx));
   }
 
   @Override

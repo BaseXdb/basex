@@ -677,15 +677,15 @@ public final class DeepFile {
    */
   public void addXML(final long position, final int byteCount,
       final Data data) throws IOException {
-    final ArrayOutput co = new ArrayOutput();
-    final XMLSerializer ser = new XMLSerializer(co);
+    final ArrayOutput ao = new ArrayOutput();
+    final XMLSerializer ser = new XMLSerializer(ao);
     final Context ctx = new Context();
     ctx.openDB(data);
     final QueryProcessor qp = new QueryProcessor("/", ctx);
     try {
       final Result res = qp.execute();
       res.serialize(ser);
-      final String xml = co.toString();
+      final String xml = ao.toString();
       ser.close();
       addXML(position, byteCount, xml);
     } catch(final QueryException ex) { return; }

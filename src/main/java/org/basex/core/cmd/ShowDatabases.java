@@ -23,7 +23,7 @@ public final class ShowDatabases extends Command {
 
   @Override
   protected boolean run() throws IOException {
-    out.println(context.pool.info());
+    out.println(context.datas.info());
     return true;
   }
 

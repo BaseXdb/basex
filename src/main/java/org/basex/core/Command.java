@@ -73,9 +73,9 @@ public abstract class Command extends Progress {
    * @throws BaseXException command exception
    */
   public final String execute(final Context ctx) throws BaseXException {
-    final ArrayOutput co = new ArrayOutput();
-    execute(ctx, co);
-    return co.toString();
+    final ArrayOutput ao = new ArrayOutput();
+    execute(ctx, ao);
+    return ao.toString();
   }
 
   /**

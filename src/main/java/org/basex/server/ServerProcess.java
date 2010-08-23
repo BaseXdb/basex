@@ -238,9 +238,7 @@ public final class ServerProcess extends Thread {
         out.write(0);
       } else if(c == 1) {
         // c = 1: request next item
-        if(qp != null) {
-          close = qp.next();
-        }
+        if(qp != null) close = qp.next();
         // send 0 to mark end of result and 0 as success flag
         out.write(0);
         out.write(0);

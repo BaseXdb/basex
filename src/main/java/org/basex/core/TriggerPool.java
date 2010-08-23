@@ -1,6 +1,9 @@
-package org.basex.server;
+package org.basex.core;
 
 import java.util.HashMap;
+
+import org.basex.server.ServerProcess;
+import org.basex.server.Sessions;
 
 /**
  * Management of Notification Triggers.
@@ -12,11 +15,6 @@ public final class TriggerPool {
   /** Active triggers. */
   private final HashMap<ServerProcess, Sessions> triggers =
     new HashMap<ServerProcess, Sessions>();
-
-  /**
-   * Standard constructor.
-   */
-  public TriggerPool() { }
 
   /**
    * Adds a trigger to the pool.
@@ -34,11 +32,9 @@ public final class TriggerPool {
    */
   public boolean attach(final ServerProcess trigger, final ServerProcess sp) {
     final Sessions s = triggers.get(trigger);
-    if(s != null) {
-      s.add(sp);
-      return true;
-    }
-    return false;
+    if(s == null) return false;
+    s.add(sp);
+    return true;
   }
 
   /**
@@ -49,11 +45,9 @@ public final class TriggerPool {
    */
   public boolean detach(final ServerProcess trigger, final ServerProcess sp) {
     final Sessions s = triggers.get(trigger);
-    if(s != null) {
-      s.delete(sp);
-      return true;
-    }
-    return false;
+    if(s == null) return false;
+    s.delete(sp);
+    return true;
   }
 
   /**

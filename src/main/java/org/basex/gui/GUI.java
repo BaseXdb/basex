@@ -441,14 +441,14 @@ public final class GUI extends JFrame {
       command = c;
 
       // execute command and cache result
-      final ArrayOutput co = new ArrayOutput(context.prop.num(Prop.MAXTEXT));
+      final ArrayOutput ao = new ArrayOutput(context.prop.num(Prop.MAXTEXT));
       final boolean up = c.writing(context);
       updating = up;
 
       boolean ok = true;
       String inf = null;
       try {
-        c.execute(context, co);
+        c.execute(context, ao);
         inf = c.info();
       } catch(final BaseXException ex) {
         ok = false;
@@ -484,10 +484,10 @@ public final class GUI extends JFrame {
         final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
         // treat text view different to other views
-        if(ok && co.size() != 0 && nodes == null) {
+        if(ok && ao.size() != 0 && nodes == null) {
           // display text view
           if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
-          text.setText(co, c);
+          text.setText(ao, c);
         }
 
         final Data ndata = context.data;

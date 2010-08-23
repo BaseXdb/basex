@@ -22,7 +22,9 @@ public final class Context {
   /** Process locking. */
   public final Lock lock;
   /** Database pool. */
-  public final DataPool pool;
+  public final DataPool datas;
+  /** Trigger pool. */
+  public final TriggerPool triggers;
   /** Users. */
   public final Users users;
   /** Database properties. */
@@ -50,7 +52,8 @@ public final class Context {
    */
   public Context() {
     prop = new Prop(true);
-    pool = new DataPool();
+    datas = new DataPool();
+    triggers = new TriggerPool();
     sessions = new Sessions();
     lock = new Lock();
     users = new Users(true);
@@ -63,7 +66,8 @@ public final class Context {
    */
   public Context(final Context ctx) {
     prop = new Prop(true);
-    pool = ctx.pool;
+    datas = ctx.datas;
+    triggers = ctx.triggers;
     sessions = ctx.sessions;
     lock = ctx.lock;
     users = ctx.users;
@@ -74,7 +78,7 @@ public final class Context {
    */
   public synchronized void close() {
     while(sessions.size() > 0) sessions.get(0).exit();
-    pool.close();
+    datas.close();
   }
 
   /**
@@ -128,7 +132,7 @@ public final class Context {
    * @param d data reference
    */
   public synchronized void pin(final Data d) {
-    pool.add(d);
+    datas.add(d);
   }
 
   /**
@@ -137,7 +141,7 @@ public final class Context {
    * @return data reference
    */
   public synchronized Data pin(final String name) {
-    return pool.pin(name);
+    return datas.pin(name);
   }
 
   /**
@@ -146,7 +150,7 @@ public final class Context {
    * @return true if reference was removed from the pool
    */
   public synchronized boolean unpin(final Data d) {
-    return pool.unpin(d);
+    return datas.unpin(d);
   }
 
   /**
@@ -155,7 +159,7 @@ public final class Context {
    * @return int use-status
    */
   public boolean pinned(final String db) {
-    return pool.pinned(db);
+    return datas.pinned(db);
   }
 
   /**

@@ -1,13 +1,15 @@
-package org.basex.core;
+package org.basex.server;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import org.basex.core.BaseXException;
+import org.basex.core.Command;
 import org.basex.io.ArrayOutput;
 
 /**
- * This class allows a generic command execution.
- * It is implemented both by the local as well as the client/server model.
+ * This class defines all commands for a generic command execution.
+ * It is implemented both by {@link LocalSession} and {@link ClientSession}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -17,7 +19,7 @@ public abstract class Session {
   protected String info;
 
   /**
-   * Executes a command and prints the result to the specified stream.
+   * Executes a command and prints the result to the specified output stream.
    * @param cmd command to be parsed
    * @param out output stream
    * @throws BaseXException database exception
@@ -26,7 +28,7 @@ public abstract class Session {
     throws BaseXException;
 
   /**
-   * Executes a command and prints the result to the specified stream.
+   * Executes a command and prints the result to the specified output stream.
    * @param cmd command to be executed
    * @param out output stream
    * @throws BaseXException database exception
@@ -57,6 +59,14 @@ public abstract class Session {
     execute(cmd, out);
     return out.toString();
   }
+
+  /**
+   * Creates a query object.
+   * @param query query string
+   * @return query
+   * @throws BaseXException database exception
+   */
+  public abstract Query query(final String query) throws BaseXException;
 
   /**
    * Creates a database.

@@ -2,8 +2,6 @@ package org.basex;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import org.basex.core.Session;
-import org.basex.core.LocalSession;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
@@ -11,6 +9,8 @@ import org.basex.core.cmd.XQuery;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.io.TextInput;
+import org.basex.server.LocalSession;
+import org.basex.server.Session;
 import org.basex.util.Args;
 
 /**

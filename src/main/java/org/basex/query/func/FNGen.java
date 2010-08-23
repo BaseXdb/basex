@@ -290,9 +290,9 @@ final class FNGen extends Fun {
       final InputInfo input) throws QueryException {
     try {
       // run serialization
-      final ArrayOutput co = new ArrayOutput();
-      nod.serialize(new XMLSerializer(co, new SerializerProp(tb.toString())));
-      return Str.get(co.toArray());
+      final ArrayOutput ao = new ArrayOutput();
+      nod.serialize(new XMLSerializer(ao, new SerializerProp(tb.toString())));
+      return Str.get(ao.toArray());
     } catch(final IOException ex) {
       Err.or(input, ex.getMessage() != null ? ex.getMessage() : ex.toString());
       return null;

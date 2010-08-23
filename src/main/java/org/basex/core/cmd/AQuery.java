@@ -190,24 +190,24 @@ public abstract class AQuery extends Command {
     // show dot plan
     try {
       if(prop.is(Prop.DOTPLAN)) {
-        final ArrayOutput co = new ArrayOutput();
-        final DOTSerializer d = new DOTSerializer(co, prop.is(Prop.DOTCOMPACT));
+        final ArrayOutput ao = new ArrayOutput();
+        final DOTSerializer d = new DOTSerializer(ao, prop.is(Prop.DOTCOMPACT));
         qu.plan(d);
         d.close();
 
         final String dot = context.query == null ? "plan.dot" :
             context.query.name().replaceAll("\\..*?$", ".dot");
-        IO.get(dot).write(co.toArray());
+        IO.get(dot).write(ao.toArray());
 
         if(prop.is(Prop.DOTDISPLAY))
           new ProcessBuilder(prop.get(Prop.DOTTY), dot).start();
       }
       // show XML plan
       if(prop.is(Prop.XMLPLAN)) {
-        final ArrayOutput co = new ArrayOutput();
-        qu.plan(new XMLSerializer(co));
+        final ArrayOutput ao = new ArrayOutput();
+        qu.plan(new XMLSerializer(ao));
         info(NL + QUERYPLAN);
-        info(co.toString());
+        info(ao.toString());
       }
     } catch(final Exception ex) {
       Main.debug(ex);

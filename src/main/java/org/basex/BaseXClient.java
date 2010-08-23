@@ -3,8 +3,8 @@ package org.basex;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Main;
-import org.basex.core.Session;
 import org.basex.server.ClientSession;
+import org.basex.server.Session;
 
 /**
  * This is the starter class for the client console mode.

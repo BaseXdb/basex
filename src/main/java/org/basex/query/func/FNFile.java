@@ -110,9 +110,7 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private Iter listFiles(final QueryContext ctx) throws QueryException {
-
     final String path = string(checkStr(expr[0], ctx));
-
     final String pattern;
     try {
       pattern = expr.length == 2 ? string(checkStr(expr[1], ctx)).replaceAll(
@@ -125,19 +123,13 @@ final class FNFile extends Fun {
     final File[] files = new File(path).listFiles(new FileFilter() {
       @Override
       public boolean accept(final File pathname) {
-        if(pathname.isHidden()) return false;
-
-        return pattern == null ? true : pathname.getName().matches(pattern);
-
+        return !pathname.isHidden() &&
+          (pattern == null || pathname.getName().matches(pattern));
       }
     });
-
-    if(files == null) {
-      Err.or(input, QueryText.FILELIST, path);
-    }
+    if(files == null) Err.or(input, QueryText.FILELIST, path);
 
     return new Iter() {
-
       int c = -1;
 
       @Override
@@ -154,12 +146,9 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private Str readFile(final QueryContext ctx) throws QueryException {
-
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
-
     return Str.get(FNGen.unparsedText(io, enc, input));
-
   }
 
   /**
@@ -169,36 +158,28 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private B64 readBinary(final File file) throws QueryException {
-
     if(file.length() > Integer.MAX_VALUE) {
       Err.or(input, QueryText.FILEREAD, file.getName());
       return null;
     }
-    int cap = new Long(file.length()).intValue();
+
+    final int cap = new Long(file.length()).intValue();
     final ByteBuffer byteBuffer = ByteBuffer.allocate(cap);
     try {
 
       final BufferedInputStream bufferInput = new BufferedInputStream(
           new FileInputStream(file));
 
-      int b;
-
       try {
-        while((b = bufferInput.read()) != -1)
-          byteBuffer.put((byte) b);
-
+        int b;
+        while((b = bufferInput.read()) != -1) byteBuffer.put((byte) b);
       } finally {
         bufferInput.close();
       }
-
-    } catch(IOException ex) {
-
+    } catch(final IOException ex) {
       Err.or(input, QueryText.FILEREAD, file.getName());
-
     }
-
     return new B64(byteBuffer.array());
-
   }
 
   /**
@@ -221,28 +202,21 @@ final class FNFile extends Fun {
 
       try {
         while((n = ir.next()) != null) {
-
           if(n instanceof Nod) {
             final Nod nod = checkNode(checkItem(n, ctx));
-
-            Str str = FNGen.serialize(nod, params, input);
+            final Str str = FNGen.serialize(nod, params, input);
             out.write(str.atom());
-
           } else {
-
             out.write(checkItem(n, ctx).toString().getBytes());
           }
         }
       } finally {
         out.close();
       }
-
-    } catch(IOException e) {
-
+    } catch(final IOException e) {
       Err.or(input, QueryText.FILEWRITE, file.getName());
       return Bln.FALSE;
     }
-
     return Bln.TRUE;
   }
 
@@ -266,7 +240,6 @@ final class FNFile extends Fun {
         tb.add(p.nname()).add('=').add(p.atom());
       }
     }
-
     return tb;
   }
 
@@ -277,29 +250,22 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private Bln copy(final QueryContext ctx) throws QueryException {
-
     final String src = string(checkStr(expr[0], ctx));
     final String dest = string(checkStr(expr[1], ctx));
 
     try {
-
-      final FileChannel srcChannel = new FileInputStream(new File(src)).getChannel();
-      final FileChannel destChannel = new FileOutputStream(new File(dest)).getChannel();
-
+      final FileChannel srcc = new FileInputStream(new File(src)).getChannel();
+      final FileChannel dc = new FileOutputStream(new File(dest)).getChannel();
       try {
-        destChannel.transferFrom(srcChannel, 0, srcChannel.size());
+        dc.transferFrom(srcc, 0, srcc.size());
       } finally {
-
-        srcChannel.close();
-        destChannel.close();
+        srcc.close();
+        dc.close();
       }
-
-    } catch(IOException ex) {
-
+    } catch(final IOException ex) {
       Err.or(input, QueryText.FILECOPY, src, dest);
       return Bln.FALSE;
     }
-
     return Bln.TRUE;
   }
 
@@ -317,11 +283,10 @@ final class FNFile extends Fun {
 
     try {
       return Bln.get(file.renameTo(new File(dest, file.getName())));
-    } catch(RuntimeException ex) {
+    } catch(final RuntimeException ex) {
       Err.or(input, QueryText.FILEMOVE, ex);
       return Bln.FALSE;
     }
-
   }
 
   /**
@@ -331,16 +296,12 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private Bln delete(final File file) throws QueryException {
-
     try {
-
       return Bln.get(file.delete());
-
-    } catch(SecurityException ex) {
+    } catch(final SecurityException ex) {
       Err.or(input, QueryText.FILEDELETE, ex);
       return Bln.FALSE;
     }
-
   }
 
   /**
@@ -355,16 +316,10 @@ final class FNFile extends Fun {
       throws QueryException {
 
     try {
-
       return includeParents ? Bln.get(file.mkdirs()) : Bln.get(file.mkdir());
-
-    } catch(SecurityException ex) {
-
+    } catch(final SecurityException ex) {
       Err.or(input, QueryText.DIRCREATE, ex);
       return Bln.FALSE;
-
     }
-
   }
-
 }

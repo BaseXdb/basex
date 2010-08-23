@@ -5,13 +5,13 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
-import org.basex.core.Session;
 import org.basex.core.Command;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.XQuery;
 import org.basex.server.ClientSession;
+import org.basex.server.Session;
 import org.basex.util.Performance;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -107,7 +107,7 @@ public final class LockingTest {
     // opens DB in session2 for further tests
     session2.execute(new Open(NAME));
 
-    if(server.context.pool.pins("factbook") != 2) {
+    if(server.context.datas.pins("factbook") != 2) {
       fail("test failed conCreate");
     }
   }

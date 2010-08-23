@@ -5,12 +5,12 @@ import static org.junit.Assert.*;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Command;
-import org.basex.core.Session;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.server.ClientSession;
+import org.basex.server.Session;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -101,7 +101,7 @@ public final class PoolTest {
    * @param name name of database
    */
   private void pins(final int pin, final String name) {
-    assertEquals(pin, server.context.pool.pins(name));
+    assertEquals(pin, server.context.datas.pins(name));
   }
 
   /**

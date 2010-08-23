@@ -151,10 +151,10 @@ public final class TextView extends View implements ActionListener {
     ns = n;
     if(!visible()) return;
     try {
-      final ArrayOutput co = new ArrayOutput(
+      final ArrayOutput ao = new ArrayOutput(
           gui.context.prop.num(Prop.MAXTEXT));
-      if(n != null) n.serialize(new XMLSerializer(co));
-      setText(co, null);
+      if(n != null) n.serialize(new XMLSerializer(ao));
+      setText(ao, null);
       refresh = false;
     } catch(final IOException ex) {
       Main.debug(ex);
@@ -163,21 +163,21 @@ public final class TextView extends View implements ActionListener {
 
   /**
    * Sets the output text.
-   * @param co cached output
+   * @param out cached output
    * @param c command
    */
-  public void setText(final ArrayOutput co, final Command c) {
-    final byte[] buf = co.buffer();
-    final int size = co.size();
+  public void setText(final ArrayOutput out, final Command c) {
+    final byte[] buf = out.buffer();
+    final int size = out.size();
     final byte[] chop = Token.token(DOTS);
-    if(co.finished() && size >= chop.length) {
+    if(out.finished() && size >= chop.length) {
       System.arraycopy(chop, 0, buf, size - chop.length, chop.length);
     }
     area.setText(buf, size);
-    header.setText(TEXTTIT + (co.finished() ? RESULTCHOP : ""));
+    header.setText(TEXTTIT + (out.finished() ? RESULTCHOP : ""));
     home.setEnabled(gui.context.data != null);
     refresh = true;
-    if(!co.finished()) {
+    if(!out.finished()) {
       cmd = null;
       ns = null;
     } else {

@@ -1,9 +1,9 @@
 package org.basex.data;
 
 import static org.basex.data.DataText.*;
+import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Main;
-import org.basex.util.Token;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
@@ -137,13 +137,13 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) {
-    final String an = Token.string(n);
-    atts.addAttribute("", an, an, "", Token.string(v));
+    final String an = string(n);
+    atts.addAttribute("", an, an, "", string(v));
   }
 
   @Override
   protected void start(final byte[] t) {
-    tag = Token.string(t);
+    tag = string(t);
     atts = new AttributesImpl();
   }
 
@@ -169,7 +169,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   protected void close(final byte[] t) throws IOException {
     try {
-      tag = Token.string(t);
+      tag = string(t);
       content.endElement("", tag, tag);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
@@ -183,7 +183,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   @Override
   public void text(final byte[] b) throws IOException {
     finishElement();
-    final char[] c = Token.string(b).toCharArray();
+    final char[] c = string(b).toCharArray();
     try {
       content.characters(c, 0, c.length);
     } catch(final SAXException ex) {
@@ -200,7 +200,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void comment(final byte[] t) throws IOException {
     finishElement();
     try {
-      final char[] c = Token.string(t).toCharArray();
+      final char[] c = string(t).toCharArray();
       if(lexical != null) lexical.comment(c, 0, t.length);
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
@@ -211,7 +211,7 @@ public final class SAXSerializer extends Serializer implements XMLReader {
   public void pi(final byte[] n, final byte[] v) throws IOException {
     finishElement();
     try {
-      content.processingInstruction(Token.string(n), Token.string(v));
+      content.processingInstruction(string(n), string(v));
     } catch(final SAXException ex) {
       throw new IOException(ex.getMessage());
     }

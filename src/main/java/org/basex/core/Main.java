@@ -16,6 +16,7 @@ import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Set;
 import org.basex.query.QueryException;
 import org.basex.server.LoginException;
+import org.basex.server.Session;
 import org.basex.util.Performance;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;

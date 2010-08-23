@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.core.Text.*;
+import static org.basex.util.Token.*;
 import static org.basex.data.DataText.*;
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import org.basex.core.Users;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.Token;
 
 /**
  * This class provides meta information on a database.
@@ -29,7 +29,7 @@ public final class MetaData {
   public Users users;
 
   /** Encoding of XML document. */
-  public String encoding = Token.UTF8;
+  public String encoding = UTF8;
   /** Original filename of XML document. */
   public IO file;
   /** Original file size of XML document. */
@@ -127,11 +127,11 @@ public final class MetaData {
       String str = "", k;
       IO f = null;
       long t = 0;
-      while(!(k = Token.string(in.readBytes())).isEmpty()) {
-        final String v = Token.string(in.readBytes());
+      while(!(k = string(in.readBytes())).isEmpty()) {
+        final String v = string(in.readBytes());
         if(k.equals(DBSTR)) str = v;
         else if(k.equals(DBFNAME)) f = IO.get(v);
-        else if(k.equals(DBTIME)) t = Token.toLong(v);
+        else if(k.equals(DBTIME)) t = toLong(v);
       }
       return f != null && f.eq(IO.get(path)) && STORAGE.equals(str) &&
         f.date() == t;
@@ -195,22 +195,22 @@ public final class MetaData {
   public void read(final DataInput in) throws IOException {
     String storage = "", istorage = "";
     while(true) {
-      final String k = Token.string(in.readBytes());
+      final String k = string(in.readBytes());
       if(k.isEmpty()) break;
       if(k.equals(DBPERM)) {
         users = new Users(in);
         continue;
       }
-      final String v = Token.string(in.readBytes());
+      final String v = string(in.readBytes());
       if(k.equals(DBSTR))         storage    = v;
       else if(k.equals(IDBSTR))   istorage   = v;
-      else if(k.equals(DBSIZE))   size       = Token.toInt(v);
+      else if(k.equals(DBSIZE))   size       = toInt(v);
       else if(k.equals(DBFNAME))  file       = IO.get(v);
-      else if(k.equals(DBFSIZE))  filesize   = Token.toLong(v);
-      else if(k.equals(DBNDOCS))  ndocs      = Token.toInt(v);
+      else if(k.equals(DBFSIZE))  filesize   = toLong(v);
+      else if(k.equals(DBNDOCS))  ndocs      = toInt(v);
       else if(k.equals(DBFTDC))   diacritics = toBool(v);
       else if(k.equals(DBENC))    encoding   = v;
-      else if(k.equals(DBHGHT))   height     = Token.toInt(v);
+      else if(k.equals(DBHGHT))   height     = toInt(v);
       else if(k.equals(DBCHOP))   chop       = toBool(v);
       else if(k.equals(DBENTITY)) entity     = toBool(v);
       else if(k.equals(DBPTHIDX)) pthindex   = toBool(v);
@@ -221,12 +221,12 @@ public final class MetaData {
       else if(k.equals(DBFTST))   stemming   = toBool(v);
       else if(k.equals(DBFTCS))   casesens   = toBool(v);
       else if(k.equals(DBFTDC))   diacritics = toBool(v);
-      else if(k.equals(DBSCMAX))  ftscmax    = Token.toInt(v);
-      else if(k.equals(DBSCMIN))  ftscmin    = Token.toInt(v);
-      else if(k.equals(DBSCTYPE)) scoring    = Token.toInt(v);
-      else if(k.equals(DBTIME))   time       = Token.toLong(v);
+      else if(k.equals(DBSCMAX))  ftscmax    = toInt(v);
+      else if(k.equals(DBSCMIN))  ftscmin    = toInt(v);
+      else if(k.equals(DBSCTYPE)) scoring    = toInt(v);
+      else if(k.equals(DBTIME))   time       = toLong(v);
       else if(k.equals(DBUTD))    uptodate   = toBool(v);
-      else if(k.equals(DBLID))    lastid     = Token.toInt(v);
+      else if(k.equals(DBLID))    lastid     = toInt(v);
       else if(k.equals(DBMNT))    mount      = v;
       else if(k.equals(DBDEEPFS)) deepfs     = toBool(v);
     }

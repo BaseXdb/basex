@@ -1,15 +1,15 @@
 package org.basex.test.cs;
 
 import org.basex.core.BaseXException;
-import org.basex.core.Session;
 import org.basex.core.Context;
-import org.basex.core.LocalSession;
 import org.basex.core.Command;
 import org.basex.core.Text;
 import org.basex.core.cmd.*;
 import org.basex.core.Commands.*;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
+import org.basex.server.LocalSession;
+import org.basex.server.Session;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
