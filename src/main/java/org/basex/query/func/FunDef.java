@@ -1,7 +1,8 @@
 package org.basex.query.func;
 
-import static org.basex.query.item.SeqType.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.item.SeqType.*;
+
 import org.basex.core.Main;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.SeqType;
@@ -215,7 +216,7 @@ public enum FunDef {
   /* FNFile functions */
 
   /** XQuery function */
-  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(item)", BLN),
+  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(item)", ITEM_Z),
   /** XQuery function */
   MKDIRS(FILEURI, FNFile.class, 1, 1, "mkdirs(item)", BLN),
   /** XQuery function */
@@ -234,6 +235,18 @@ public enum FunDef {
   DELETE(FILEURI, FNFile.class, 1, 1, "delete(item)", BLN),
   /** XQuery function */
   PATHTOFULL(FILEURI, FNFile.class, 1, 1, "path-to-full-path(item)", STR),
+  /** XQuery function */
+  READFILE(FILEURI, FNFile.class, 1, 2, "read-file(item, encoding)", STR),
+  /** XQuery function */
+  READBINARY(FILEURI, FNFile.class, 1, 1, "read-binary(item)", B64),
+  /** XQuery function */
+  WRITE(FILEURI, FNFile.class, 2, 3, "write(path, content, params)", BLN),
+  /** XQuery function */
+  COPY(FILEURI, FNFile.class, 2, 2, "copy(src, dest)", BLN),
+  /** XQuery function */
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(path, dest)", BLN),
+  /** XQuery function */
+  LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
 
   /* FNNum functions. */
 

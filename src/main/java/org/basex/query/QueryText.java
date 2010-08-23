@@ -107,6 +107,18 @@ public interface QueryText {
   /** FOFD1350: Evaluation exception. */
   Object[] PICCOMP = { FODF, 1350, "Invalid component in string: \"%\"." };
 
+  /** FOFL0001: Evaluation exception. */
+  Object[] FILECOPY = { FOFL, 1, "File '%' cannot be copied. "};
+  /** FOFL0002: Evaluation exception. */
+  Object[] FILEDELETE = { FOFL, 2, "File '%' cannot be deleted. "};
+  /** FOFL0003: Evaluation exception. */
+  Object[] DIRCREATE = { FOFL, 3, "Directory '%' cannot be created. "};
+  /** FOFL0004: Evaluation exception. */
+  Object[] FILEMOVE = { FOFL, 4, "File '%' cannot be moved. "};
+  /** FOFL0005: Evaluation exception. */
+  Object[] FILEREAD = { FOFL, 5, "File '%' cannot be read. "};
+  /** FOFL0006: Evaluation exception. */
+  Object[] FILEWRITE = { FOFL, 6, "File '%' cannot be written. "};
   /** FOFL0007: Evaluation exception. */
   Object[] FILELIST = { FOFL, 7, "Files of '%' cannot be returned." };
   /** FOFL0008: Evaluation exception. */

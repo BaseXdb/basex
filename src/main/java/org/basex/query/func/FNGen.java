@@ -2,7 +2,9 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
@@ -24,14 +26,13 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.iter.ItemIter;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
-import org.basex.util.TokenMap;
 
 /**
  * Generating functions.
@@ -184,7 +185,7 @@ final class FNGen extends Fun {
   private Item unparsedText(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
-    return unparsedText(false, io, enc, this.input);
+    return unparsedText(io, enc, this.input);
   }
 
   /**
@@ -198,7 +199,7 @@ final class FNGen extends Fun {
     try {
       final IO io = checkIO(expr[0], ctx);
       final String e = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
-      return Bln.get(unparsedText(true, io, e, this.input) != null);
+      return Bln.get(unparsedText(io, e, this.input) != null);
     } catch(final QueryException ex) {
       if(!ex.code().startsWith(QueryText.FODC)) throw ex;
       return Bln.FALSE;
@@ -207,26 +208,19 @@ final class FNGen extends Fun {
 
   /**
    * Performs the unparsed-text function. The result is optionally cached.
-   * @param cache flag for caching the result
    * @param io input path
    * @param enc encoding
    * @param input input information
    * @return resulting item
    * @throws QueryException query exception
    */
-  static Str unparsedText(final boolean cache, final IO io, final String enc,
-      final InputInfo input) throws QueryException {
+  static Str unparsedText(final IO io, final String enc, final InputInfo input)
+      throws QueryException {
 
     try {
-      final byte[] path = token(io.path());
-      final TokenMap contents = new TokenMap();
-      byte[] cont = contents.get(path);
-      // check if content has already been parsed; if not, read original file
-      if(cont == null) {
-        cont = TextInput.content(io, enc).finish();
-        if(cache) contents.add(path, cont);
-      }
-      return Str.get(cont);
+
+      return Str.get(TextInput.content(io, enc).finish());
+
     } catch(final IOException ex) {
       Err.or(input, NODOC, ex);
       return null;
@@ -265,6 +259,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
+
     final Nod nod = checkNode(checkItem(expr[0], ctx));
 
     // interpret query parameters
@@ -278,6 +273,21 @@ final class FNGen extends Fun {
         tb.add(p.nname()).add('=').add(p.atom());
       }
     }
+
+    return serialize(nod, tb, input);
+
+  }
+
+  /**
+   * Performs the serialize function.
+   * @param nod node
+   * @param tb token builder with serialization params
+   * @param input input
+   * @return resulting item
+   * @throws QueryException query exception
+   */
+  static Str serialize(final Nod nod, final TokenBuilder tb,
+      final InputInfo input) throws QueryException {
     try {
       // run serialization
       final ArrayOutput co = new ArrayOutput();

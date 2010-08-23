@@ -8,7 +8,7 @@ import org.basex.util.Token;
 
 /**
  * DateTime item.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -52,6 +52,16 @@ public final class Dtm extends Date {
    */
   Dtm(final Itr tm, final InputInfo ii) throws QueryException {
     this(Token.token(DATE.format(new java.util.Date(tm.itr(ii)))), ii);
+  }
+
+  /**
+   * Constructor.
+   * @param tm milliseconds since January 1, 1970, 00:00:00 GMT
+   * @param ii input info
+   * @throws QueryException query exception
+   */
+  public Dtm(final long tm, final InputInfo ii) throws QueryException {
+    this(Token.token(DATE.format(new java.util.Date(tm))), ii);
   }
 
   /**

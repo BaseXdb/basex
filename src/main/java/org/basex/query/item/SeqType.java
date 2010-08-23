@@ -41,6 +41,8 @@ public final class SeqType {
   public static final SeqType BLN_ZO = new SeqType(Type.BLN, Occ.ZO);
   /** Zero or more booleans. */
   public static final SeqType BLN_ZM = new SeqType(Type.BLN, Occ.ZM);
+  /** Single Base64Binary. */
+  public static final SeqType B64 = new SeqType(Type.B6B, Occ.O);
   /** Double number. */
   public static final SeqType DBL = new SeqType(Type.DBL, Occ.O);
   /** Float number. */

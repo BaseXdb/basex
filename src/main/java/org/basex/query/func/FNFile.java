@@ -1,24 +1,38 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
-import java.util.regex.Pattern;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.regex.PatternSyntaxException;
+
 import org.basex.core.Prop;
+import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.B64;
 import org.basex.query.item.Bln;
+import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
+import org.basex.util.TokenBuilder;
 
 /**
  * Functions on files and directories.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -55,9 +69,9 @@ final class FNFile extends Fun {
 
     switch(def) {
       case MKDIR:
-        return Bln.get(path.mkdir());
+        return makeDir(path, false);
       case MKDIRS:
-        return Bln.get(path.mkdirs());
+        return makeDir(path, true);
       case ISDIR:
         return Bln.get(path.isDirectory());
       case ISFILE:
@@ -69,9 +83,21 @@ final class FNFile extends Fun {
       case PATHSEP:
         return Str.get(Prop.SEP);
       case DELETE:
-        return Bln.get(path.delete());
+        return delete(path);
       case PATHTOFULL:
         return Str.get(path.getAbsolutePath());
+      case READFILE:
+        return readFile(ctx);
+      case READBINARY:
+        return readBinary(path);
+      case WRITE:
+        return writeFile(path, ctx);
+      case COPY:
+        return copy(ctx);
+      case MOVE:
+        return move(path, ctx);
+      case LASTMOD:
+        return new Dtm(path.lastModified(), input);
       default:
         return super.atomic(ctx, ii);
     }
@@ -84,32 +110,261 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private Iter listFiles(final QueryContext ctx) throws QueryException {
+
     final String path = string(checkStr(expr[0], ctx));
-    final Pattern pattern;
+
+    final String pattern;
     try {
-      pattern = expr.length == 1 ? null :
-        Pattern.compile(string(checkStr(expr[1], ctx)));
+      pattern = expr.length == 2 ? string(checkStr(expr[1], ctx)).replaceAll(
+          "\\.", "\\\\.").replaceAll("\\*", ".*") : null;
     } catch(final PatternSyntaxException ex) {
-      Err.or(input, FILEPATTERN, expr[1]);
+      Err.or(input, QueryText.FILEPATTERN, expr[1]);
       return null;
     }
 
+    final File[] files = new File(path).listFiles(new FileFilter() {
+      @Override
+      public boolean accept(final File pathname) {
+        if(pathname.isHidden()) return false;
+
+        return pattern == null ? true : pathname.getName().matches(pattern);
+
+      }
+    });
+
+    if(files == null) {
+      Err.or(input, QueryText.FILELIST, path);
+    }
+
     return new Iter() {
-      String[] files;
+
       int c = -1;
 
       @Override
-      public Item next() throws QueryException {
-        if(files == null) {
-          files = new File(path).list();
-          if(files == null) Err.or(input, FILELIST, path);
-        }
-        while(++c < files.length) {
-          if(pattern == null || pattern.matcher(files[c]).matches())
-            return Str.get(files[c]);
-        }
-        return null;
+      public Item next() {
+        return ++c < files.length ? Str.get(files[c].getName()) : null;
       }
     };
   }
+
+  /**
+   * Reads the content of a file.
+   * @param ctx query context
+   * @return string
+   * @throws QueryException query exception
+   */
+  private Str readFile(final QueryContext ctx) throws QueryException {
+
+    final IO io = checkIO(expr[0], ctx);
+    final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
+
+    return Str.get(FNGen.unparsedText(io, enc, input));
+
+  }
+
+  /**
+   * Reads the content of a binary file.
+   * @param file input file
+   * @return Base64Binary
+   * @throws QueryException query exception
+   */
+  private B64 readBinary(final File file) throws QueryException {
+
+    if(file.length() > Integer.MAX_VALUE) {
+      Err.or(input, QueryText.FILEREAD, file.getName());
+      return null;
+    }
+    int cap = new Long(file.length()).intValue();
+    final ByteBuffer byteBuffer = ByteBuffer.allocate(cap);
+    try {
+
+      final BufferedInputStream bufferInput = new BufferedInputStream(
+          new FileInputStream(file));
+
+      int b;
+
+      try {
+        while((b = bufferInput.read()) != -1)
+          byteBuffer.put((byte) b);
+
+      } finally {
+        bufferInput.close();
+      }
+
+    } catch(IOException ex) {
+
+      Err.or(input, QueryText.FILEREAD, file.getName());
+
+    }
+
+    return new B64(byteBuffer.array());
+
+  }
+
+  /**
+   * Writes a sequence of items to a file.
+   * @param file file to be written
+   * @param ctx query context
+   * @return true if file was successfully written
+   * @throws QueryException query exception
+   */
+  private Bln writeFile(final File file, final QueryContext ctx)
+      throws QueryException {
+
+    final BufferedOutputStream out;
+    final Iter ir = expr[1].iter(ctx);
+    final TokenBuilder params = interpretSerialParams(ctx);
+    Item n;
+
+    try {
+      out = new BufferedOutputStream(new FileOutputStream(file, true));
+
+      try {
+        while((n = ir.next()) != null) {
+
+          if(n instanceof Nod) {
+            final Nod nod = checkNode(checkItem(n, ctx));
+
+            Str str = FNGen.serialize(nod, params, input);
+            out.write(str.atom());
+
+          } else {
+
+            out.write(checkItem(n, ctx).toString().getBytes());
+          }
+        }
+      } finally {
+        out.close();
+      }
+
+    } catch(IOException e) {
+
+      Err.or(input, QueryText.FILEWRITE, file.getName());
+      return Bln.FALSE;
+    }
+
+    return Bln.TRUE;
+  }
+
+  /**
+   * Interprets serialization parameters.
+   * @param ctx query context
+   * @return serialization params
+   * @throws QueryException query exception
+   */
+  private TokenBuilder interpretSerialParams(final QueryContext ctx)
+      throws QueryException {
+
+    // interpret query parameters
+    final TokenBuilder tb = new TokenBuilder();
+    if(expr.length == 3) {
+      final Iter ir = expr[2].iter(ctx);
+      Item n;
+      while((n = ir.next()) != null) {
+        final Nod p = checkNode(n);
+        if(tb.size() != 0) tb.add(',');
+        tb.add(p.nname()).add('=').add(p.atom());
+      }
+    }
+
+    return tb;
+  }
+
+  /**
+   * Copies a file given a source and a destination.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Bln copy(final QueryContext ctx) throws QueryException {
+
+    final String src = string(checkStr(expr[0], ctx));
+    final String dest = string(checkStr(expr[1], ctx));
+
+    try {
+
+      final FileChannel srcChannel = new FileInputStream(new File(src)).getChannel();
+      final FileChannel destChannel = new FileOutputStream(new File(dest)).getChannel();
+
+      try {
+        destChannel.transferFrom(srcChannel, 0, srcChannel.size());
+      } finally {
+
+        srcChannel.close();
+        destChannel.close();
+      }
+
+    } catch(IOException ex) {
+
+      Err.or(input, QueryText.FILECOPY, src, dest);
+      return Bln.FALSE;
+    }
+
+    return Bln.TRUE;
+  }
+
+  /**
+   * Moves a file or directory.
+   * @param file file/dir to be moved
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Bln move(final File file, final QueryContext ctx)
+      throws QueryException {
+
+    final String dest = string(checkStr(expr[1], ctx));
+
+    try {
+      return Bln.get(file.renameTo(new File(dest, file.getName())));
+    } catch(RuntimeException ex) {
+      Err.or(input, QueryText.FILEMOVE, ex);
+      return Bln.FALSE;
+    }
+
+  }
+
+  /**
+   * Deleted a file or directory.
+   * @param file file/dir to be deleted
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Bln delete(final File file) throws QueryException {
+
+    try {
+
+      return Bln.get(file.delete());
+
+    } catch(SecurityException ex) {
+      Err.or(input, QueryText.FILEDELETE, ex);
+      return Bln.FALSE;
+    }
+
+  }
+
+  /**
+   * Creates a directory.
+   * @param file dir to be created
+   * @param includeParents indicator for including nonexistent parent
+   *          directories by the creation
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Bln makeDir(final File file, final boolean includeParents)
+      throws QueryException {
+
+    try {
+
+      return includeParents ? Bln.get(file.mkdirs()) : Bln.get(file.mkdir());
+
+    } catch(SecurityException ex) {
+
+      Err.or(input, QueryText.DIRCREATE, ex);
+      return Bln.FALSE;
+
+    }
+
+  }
+
 }
