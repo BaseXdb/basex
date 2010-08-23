@@ -57,9 +57,9 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() throws IOException {
         // retrieve list of databases
-        final ArrayOutput co = new ArrayOutput();
-        exec(new List(), co);
-        final Table table = new Table(co.toString());
+        final ArrayOutput ao = new ArrayOutput();
+        exec(new List(), ao);
+        final Table table = new Table(ao.toString());
 
         final XMLSerializer xml = new XMLSerializer(out,
             new SerializerProp(params(rp)));
@@ -133,12 +133,12 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() throws IOException {
         // perform command and serialize output
-        final ArrayOutput co = new ArrayOutput();
-        exec(cmd, co);
+        final ArrayOutput ao = new ArrayOutput();
+        exec(cmd, ao);
 
         final XMLSerializer xml =
           new XMLSerializer(out, new SerializerProp(params(path)));
-        xml.text(Token.delete(co.toArray(), '\r'));
+        xml.text(Token.delete(ao.toArray(), '\r'));
         xml.close();
       }
     };

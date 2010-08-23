@@ -89,9 +89,9 @@ public final class XQJTest extends TestCase {
     final XQConnection conn = conn(drv);
     final XQExpression expr = conn.createExpression();
     final XQSequence seq = expr.executeQuery("'Hello World!'");
-    final ArrayOutput co = new ArrayOutput();
-    seq.writeSequence(co, new Properties());
-    final String str = co.toString().replaceAll("<\\?.*?>", "");
+    final ArrayOutput ao = new ArrayOutput();
+    seq.writeSequence(ao, new Properties());
+    final String str = ao.toString().replaceAll("<\\?.*?>", "");
     assertEquals("", "Hello World!", str);
   }
 

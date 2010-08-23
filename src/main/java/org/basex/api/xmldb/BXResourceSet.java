@@ -58,18 +58,18 @@ final class BXResourceSet implements ResourceSet, BXXMLDBText {
 
   @Override
   public Resource getMembersAsResource() throws XMLDBException {
-    final ArrayOutput co = new ArrayOutput();
+    final ArrayOutput ao = new ArrayOutput();
     try {
-      final XMLSerializer xml = new XMLSerializer(co);
+      final XMLSerializer xml = new XMLSerializer(ao);
       for(final Resource r : getIterator()) {
         xml.openResult();
-        co.print(r.getContent().toString());
+        ao.print(r.getContent().toString());
         xml.closeResult();
       }
     } catch(final IOException ex) {
       throw new XMLDBException(ErrorCodes.VENDOR_ERROR, ex.getMessage());
     }
-    return new BXXMLResource(co.toArray(), coll);
+    return new BXXMLResource(ao.toArray(), coll);
   }
 
   @Override

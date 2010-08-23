@@ -198,9 +198,9 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     if(it != null && !next) throw new BXQException(TWICE);
     if(!next && !next()) return "";
 
-    final ArrayOutput co = new ArrayOutput();
+    final ArrayOutput ao = new ArrayOutput();
     try {
-      final XMLSerializer xml = new XMLSerializer(co);
+      final XMLSerializer xml = new XMLSerializer(ao);
       do {
         final BXQItem item = item();
         item.serialize(item.it, xml);
@@ -209,7 +209,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     } catch(final IOException ex) {
       throw new BXQException(ex);
     }
-    return co.toString();
+    return ao.toString();
   }
 
   @Override

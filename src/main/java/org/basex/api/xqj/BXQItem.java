@@ -229,9 +229,9 @@ final class BXQItem extends BXQAbstract implements XQResultItem {
    */
   private String serialize() throws XQException {
     opened();
-    final ArrayOutput co = new ArrayOutput();
-    serialize(co);
-    return co.toString();
+    final ArrayOutput ao = new ArrayOutput();
+    serialize(ao);
+    return ao.toString();
   }
 
   /**
