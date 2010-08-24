@@ -36,6 +36,7 @@ final class FNFormat extends Fun {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     switch(def) {
       case FORMINT: return formatInteger(ctx);
       case FORMNUM: return formatNumber(ctx);
@@ -44,6 +45,11 @@ final class FNFormat extends Fun {
       case FORMTIM: return formatDate(Type.TIM, ctx);
       default:      return super.atomic(ctx, ii);
     }
+  }
+
+  @Override
+  public boolean xquery11() {
+    return true;
   }
 
   /**

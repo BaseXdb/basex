@@ -9,7 +9,7 @@ import org.basex.io.ArrayOutput;
 
 /**
  * This class defines all commands for a generic command execution.
- * It is implemented both by {@link LocalSession} and {@link ClientSession}.
+ * It is implemented both by {@link ClientSession} and {@link LocalSession}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

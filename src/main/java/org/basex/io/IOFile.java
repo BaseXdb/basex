@@ -187,7 +187,7 @@ public final class IOFile extends IO {
     if(!path.startsWith("/")) {
       pre += '/';
       if(path.length() < 2 || path.charAt(1) != ':') {
-        // [CG] IO paths: check HOME reference
+        // [CG] IO paths: check is HOME reference is really needed here
         pre += "/" + Prop.HOME.replace('\\', '/');
         if(!pre.endsWith("/")) pre += '/';
       }
@@ -202,7 +202,7 @@ public final class IOFile extends IO {
    */
   public static String file(final String url) {
     String file = url;
-    // [CG] IO paths: check for '+'
+    // [CG] IO paths: check if '+' is correctly recognized/handled
     if(file.indexOf("%") != -1) {
       try {
         file = URLDecoder.decode(file, Prop.ENCODING);

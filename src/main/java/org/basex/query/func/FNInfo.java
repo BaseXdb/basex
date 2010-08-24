@@ -88,6 +88,11 @@ final class FNInfo extends Fun {
   }
 
   @Override
+  public boolean xquery11() {
+    return def == FunDef.ENV || def == FunDef.ENVS;
+  }
+
+  @Override
   public boolean vacuous() {
     return def == FunDef.ERROR;
   }

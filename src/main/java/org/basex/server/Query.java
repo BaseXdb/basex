@@ -5,15 +5,15 @@ import org.basex.core.BaseXException;
 
 /**
  * This class defines all commands for iterative query execution.
- * It is implemented both by {@link LocalSession} and {@link ClientSession}.
+ * It is implemented both by {@link ClientQuery} and {@link LocalQuery}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public abstract class Query {
   /**
-   * Checks for the next item.
-   * @return value of check
+   * Returns {@code true} if more items are available.
+   * @return result of check
    * @throws BaseXException database exception
    */
   public abstract boolean more() throws BaseXException;

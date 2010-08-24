@@ -14,10 +14,12 @@ import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
+import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
+import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
@@ -28,6 +30,8 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 final class FNPat extends Fun {
+  /** Function namespace. */
+  private static final Uri FNNS = Uri.uri(FNURI);
   /** Classes pattern. */
   private static final Pattern CLASSES =
     Pattern.compile(".*?\\[([a-zA-Z])-([a-zA-Z]).*");
@@ -64,6 +68,11 @@ final class FNPat extends Fun {
     }
   }
 
+  @Override
+  public boolean xquery11() {
+    return def == FunDef.ANALZYE;
+  }
+
   /**
    * Evaluates the match function.
    * @param val input value
@@ -92,7 +101,8 @@ final class FNPat extends Fun {
     final String str = string(val);
     final Matcher m = p.matcher(str);
     final NodIter ch = new NodIter();
-    final FElem root = new FElem(new QNm(ANALYZE), ch, null);
+    final FElem root = new FElem(new QNm(ANALYZE, FNNS), ch, new NodIter(),
+        EMPTY, new Atts().add(FN, FNURI));
     int s = 0;
     while(m.find()) {
       if(s != m.start()) {
@@ -114,7 +124,7 @@ final class FNPat extends Fun {
    */
   private FElem node(final byte[] tag, final String text, final FElem root) {
     final NodIter txt = new NodIter();
-    final FElem sub = new FElem(new QNm(tag), txt, root);
+    final FElem sub = new FElem(new QNm(tag, FNNS), txt, root);
     txt.add(new FTxt(token(text), sub));
     return sub;
   }
@@ -198,7 +208,7 @@ final class FNPat extends Fun {
         if(b == 'i') m |= Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
         else if(b == 'm') m |= Pattern.MULTILINE;
         else if(b == 's') m |= Pattern.DOTALL;
-        else if(b == 'q') m |= Pattern.LITERAL;
+        else if(b == 'q' && ctx.xquery11) m |= Pattern.LITERAL;
         else if(b == 'x') {
           boolean cc = false;
           final TokenBuilder tb = new TokenBuilder();
@@ -222,18 +232,17 @@ final class FNPat extends Fun {
     }
 
     String str = tb.toString();
-    if(str.indexOf('[') != -1 && str.indexOf('-') != -1) {
+    if((m & Pattern.LITERAL) == 0 && str.indexOf('[') != -1 &&
+        str.indexOf('-') != -1) {
       // replace classes by single characters to support Unicode matches
       while(true) {
         final Matcher mt = CLASSES.matcher(str);
         if(!mt.matches()) break;
         final char c1 = mt.group(1).charAt(0);
         final char c2 = mt.group(2).charAt(0);
-        if(c1 < c2) {
-          final TokenBuilder sb = new TokenBuilder("[");
-          for(char c = c1; c <= c2; ++c) sb.add(c);
-          str = str.replaceAll("\\[" + c1 + "-" + c2, sb.toString());
-        }
+        final TokenBuilder sb = new TokenBuilder("[");
+        for(char c = c1; c <= c2; ++c) sb.add(c);
+        str = str.replaceAll("\\[" + c1 + "-" + c2, sb.toString());
       }
 
       // remove excluded characters in classes

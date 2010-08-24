@@ -53,6 +53,25 @@ final class FNSeq extends Fun {
     }
   }
 
+  @Override
+  public boolean xquery11() {
+    return def == FunDef.HEAD || def == FunDef.TAIL;
+  }
+  
+  @Override
+  public Expr cmp(final QueryContext ctx) {
+    // index-of will create integers, insert-before might add new types
+    if(def == FunDef.INDEXOF || def == FunDef.INSBEF) return this;
+
+    // head will return first item of argument, or nothing;
+    // all other types will return existing types
+    final Type t = expr[0].type().type;
+    final SeqType.Occ o = def == FunDef.HEAD ? SeqType.Occ.ZO : SeqType.Occ.ZM;
+    type = new SeqType(t, o);
+
+    return this;
+  }
+
   /**
    * Returns the first item in a sequence.
    * @param ctx query context
@@ -74,8 +93,16 @@ final class FNSeq extends Fun {
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
     if(e.item() || e.type().zeroOrOne()) return Iter.EMPTY;
+
     final Iter ir = e.iter(ctx);
-    return ir.next() == null ? Iter.EMPTY : ir;
+    if(ir.next() == null) return Iter.EMPTY;
+
+    return new Iter() {
+      @Override
+      public Item next() throws QueryException {
+        return ir.next();
+      }
+    };
   }
 
   /**
@@ -245,22 +272,5 @@ final class FNSeq extends Fun {
         return null;
       }
     };
-  }
-
-
-  @Override
-  public Expr cmp(final QueryContext ctx) {
-    // evaluate return type
-
-    // index-of will create integers, insert-before might add new types
-    if(def == FunDef.INDEXOF || def == FunDef.INSBEF) return this;
-
-    // head will return first item of argument, or nothing;
-    // all other types will return existing types
-    final Type t = expr[0].type().type;
-    final SeqType.Occ o = def == FunDef.HEAD ? SeqType.Occ.ZO : SeqType.Occ.ZM;
-    type = new SeqType(t, o);
-
-    return this;
   }
 }

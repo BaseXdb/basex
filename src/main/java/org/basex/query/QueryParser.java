@@ -115,11 +115,11 @@ import org.basex.util.Tokenizer.FTUnit;
  * @author Christian Gruen
  */
 public class QueryParser extends InputParser {
+  /** Query context. */
+  public final QueryContext ctx;
+
   /** Temporary token builder. */
   private final TokenBuilder tok = new TokenBuilder();
-  /** Query context. */
-  private final QueryContext ctx;
-
   /** List of loaded modules. */
   private final TokenList modLoaded = new TokenList();
   /** Module name. */
@@ -232,14 +232,16 @@ public class QueryParser extends InputParser {
 
     final byte[] enc = consumeWS2(ENCODING) ? lc(stringLiteral()) : null;
     if(enc != null) {
+      // actual encoding is ignored, as input comes in as string
       boolean v = true;
       for(final byte e : enc) v &= ftChar(e) || e == '-';
       if(!v) error(XQUERYENC2, enc);
     }
-    //ctx.encoding = enc;
     skipWS();
     check(';');
-    if(!ver.equals(ONEZERO)) error(XQUERYVER, ver);
+    if(ver.equals(XQ10)) ctx.xquery11 = false;
+    else if(ver.equals(XQ11)) ctx.xquery11 = true;
+    else error(XQUERYVER, ver);
   }
 
   /**
@@ -429,7 +431,7 @@ public class QueryParser extends InputParser {
     if(!name.ns()) error(NSMISS, name);
 
     // output declaration
-    if(eq(name.pref(), OUTPUT)) {
+    if(ctx.xquery11 && eq(name.pref(), OUTPUT)) {
       final String key = string(name.ln());
       if(module != null) error(MODOUT);
 
@@ -622,6 +624,10 @@ public class QueryParser extends InputParser {
         o.type = t;
         o.value = null;
       }
+      // bind default value
+      if(ctx.xquery11 && consumeWS(ASSIGN)) {
+        v.bind(check(single(), VARMISSING), ctx);
+      }
     } else {
       check(ASSIGN);
       v.bind(check(single(), VARMISSING), ctx);
@@ -743,7 +749,7 @@ public class QueryParser extends InputParser {
    * [ 37] Parses a WhereClause.
    * [ 38] Parses an OrderByClause.
    * [ 39] Parses an OrderSpecList.
-   * [ 57]* Parses GroupByClause (*Xquery 1.1 draft)
+   * [ 57]* Parses GroupByClause
    * @return query expression
    * @throws QueryException query exception
    */
@@ -761,7 +767,7 @@ public class QueryParser extends InputParser {
     }
 
     Var[] group = null;
-    if(consumeWS(GROUP)) {
+    if(ctx.xquery11 && consumeWS(GROUP)) {
       check(BY);
       ap = qp;
       do group = groupSpec(group); while(consumeWS2(COMMA));
@@ -875,7 +881,7 @@ public class QueryParser extends InputParser {
   }
 
   /**
-   * [59]* GroupingSpec (*Xquery 1.1 Draft).
+   * [59]* GroupingSpec.
    * @param group grouping specification
    * @return new group array
    * @throws QueryException query exception
@@ -2190,7 +2196,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Expr tryCatch() throws QueryException {
-    if(!consumeWS2(TRY)) return null;
+    if(!ctx.xquery11 || !consumeWS2(TRY)) return null;
 
     final Expr tr = enclosed(NOENCLEXPR);
     check(CATCH);

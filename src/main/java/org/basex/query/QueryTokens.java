@@ -329,7 +329,9 @@ public interface QueryTokens {
   /** Parser token. */
   String IS = "=";
   /** Parser token. */
-  String ONEZERO = "1.0";
+  String XQ10 = "1.0";
+  /** Parser token. */
+  String XQ11 = "1.1";
   /** Parser token. */
   String PAR1 = "(";
   /** Parser token. */
@@ -371,11 +373,11 @@ public interface QueryTokens {
   /** Default collation. */
   byte[] URLCOLL = concat(FNURI, token("/collation/codepoint"));
   /** Root element for the analyze-string-result function. */
-  byte[] ANALYZE = token("analyze-string-result");
+  byte[] ANALYZE = token("fn:analyze-string-result");
   /** Element for the analyze-string-result function. */
-  byte[] MATCH = token("match");
+  byte[] MATCH = token("fn:match");
   /** Element for the analyze-string-result function. */
-  byte[] NONMATCH = token("non-match");
+  byte[] NONMATCH = token("fn:non-match");
 
   // TYPES ====================================================================
 

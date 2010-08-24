@@ -12,6 +12,7 @@ import org.basex.data.Serializer;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.query.expr.Expr;
+import org.basex.query.func.FunJava;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
@@ -97,14 +98,18 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Adds a global variables.
+   * Binds an object to a global variables. If the object is an {@link Expr}
+   * instance, it is directly assigned. Otherwise, it is first cast to the
+   * appropriate XQuery type.
    * @param n name of variable
-   * @param ex expression to be bound
+   * @param o object to be bound
    * @throws QueryException query exception
    */
-  public void bind(final String n, final Expr ex) throws QueryException {
+  public void bind(final String n, final Object o) throws QueryException {
+    final Expr ex = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
     ctx.vars.addGlobal(new Var(new QNm(Token.token(n))).bind(ex, ctx));
   }
+
 
   /**
    * Returns a serializer for the given output stream.

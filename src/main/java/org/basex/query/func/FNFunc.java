@@ -53,4 +53,9 @@ final class FNFunc extends Fun {
         return super.atomic(ctx, ii);
     }
   }
+
+  @Override
+  public boolean xquery11() {
+    return true;
+  }
 }

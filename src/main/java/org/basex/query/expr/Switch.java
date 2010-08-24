@@ -34,21 +34,22 @@ public final class Switch extends Arr {
       boolean vals = true;
       for(int i = 1; i < el - 1; i += 2) {
         vals &= expr[i].value();
-        if(vals && it.equiv(input, expr[i].atomic(ctx, input))) {
+        if(!vals) break;
+        final Item cs = expr[i].atomic(ctx, input);
+        if(it == cs || cs != null && it != null && it.equiv(input, cs)) {
           e = expr[i + 1];
           break;
         }
       }
       if(vals && e == this) e = expr[el - 1];
     }
-    if(e != this) {
-      optPre(e, ctx);
-    } else {
+
+    if(e == this) {
       final int el = expr.length;
       type = expr[el - 1].type();
       for(int i = 1; i < el - 1; i += 2) type = type.intersect(expr[i].type());
     }
-    return e;
+    return optPre(e, ctx);
   }
 
   @Override
@@ -58,7 +59,8 @@ public final class Switch extends Arr {
     for(int i = 1; i < el - 1; i += 2) {
       final Item cs = expr[i].atomic(ctx, input);
       // includes check for empty sequence (null reference)
-      if(it == cs || it.equiv(input, cs)) return ctx.iter(expr[i + 1]);
+      if(it == cs || it != null && cs != null && it.equiv(input, cs))
+        return ctx.iter(expr[i + 1]);
     }
     // choose default expression
     return ctx.iter(expr[el - 1]);

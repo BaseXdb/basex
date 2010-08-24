@@ -332,8 +332,10 @@ public interface QueryText {
   Object[] EMPTYSEQOCC = { XPST, 3, "No occurrence indicator defined for %." };
   /** XPST0003: Parsing exception. */
   Object[] TESTINVALID = { XPST, 3, "Invalid % test: %." };
-  /** XPQST0003: Evaluation exception. */
+  /** XPST0003: Parsing exception. */
   Object[] QNAMEINV = { XPST, 3, "Expecting QName." };
+  /** XPST0003: Parsing exception. */
+  Object[] FEATURE11 = { XPST, 3, "Feature not available in XQuery 1.0." };
 
   /** XPST0003: Parsing exception. */
   Object[] FTRANGE = { XPST, 3, "Expecting full-text range." };

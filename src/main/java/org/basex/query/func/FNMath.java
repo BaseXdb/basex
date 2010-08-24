@@ -42,4 +42,9 @@ final class FNMath extends Fun {
       default:   return super.atomic(ctx, ii);
     }
   }
+
+  @Override
+  public boolean xquery11() {
+    return true;
+  }
 }

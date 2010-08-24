@@ -79,6 +79,20 @@ final class FNGen extends Fun {
   }
 
   @Override
+  public boolean xquery11() {
+    switch(def) {
+      case DATA:        return expr.length == 0;
+      case PARSE:
+      case PARSETXT:
+      case PARSETXTAVL:
+      case PARSEXML:
+      case URICOLL:
+      case SERIALIZE:   return true;
+      default:          return false;
+    }
+  }
+
+  @Override
   public Expr cmp(final QueryContext ctx) {
     if(def == FunDef.DATA &&  expr.length == 1) {
       final SeqType t = expr[0].type();

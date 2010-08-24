@@ -22,12 +22,22 @@ public final class ClientQuery extends Query {
   
   /**
    * Standard constructor.
-   * @param c client session
-   * @param i query id
+   * @param session client session
+   * @param query query to be run
+   * @throws BaseXException database exception
    */
-  public ClientQuery(final ClientSession c, final String i) {
-    cs = c;
-    id = i;
+  public ClientQuery(final ClientSession session, final String query)
+      throws BaseXException {
+
+    cs = session;
+    try {
+      cs.out.write(0);
+      cs.send(query);
+      id = cs.receive();
+      if(!cs.ok()) throw new BaseXException(cs.receive());
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
   }
 
   @Override
@@ -37,7 +47,7 @@ public final class ClientQuery extends Query {
       cs.out.write(1);
       cs.send(id);
       next = cs.in.content();
-      if(!cs.ok()) throw new BaseXException(cs.in.readString());
+      if(!cs.ok()) throw new BaseXException(cs.receive());
       return next.size() != 0;
     } catch(final IOException ex) {
       throw new BaseXException(ex);

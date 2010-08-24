@@ -119,6 +119,11 @@ final class FNStr extends Fun {
     }
   }
 
+  @Override
+  public boolean xquery11() {
+    return def == FunDef.STRJOIN && expr.length == 1;
+  }
+
   /**
    * Converts codepoints to a string.
    * @param iter iterator

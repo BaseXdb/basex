@@ -63,6 +63,11 @@ final class FNId extends Fun {
     }
   }
 
+  @Override
+  public boolean xquery11() {
+    return def == FunDef.ELID;
+  }
+
   /**
    * Returns the parent result of the ID function.
    * @param it item ids to be found

@@ -8,7 +8,6 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.query.QueryException;
-import org.basex.query.QueryProcessor;
 
 /**
  * This wrapper executes commands locally.
@@ -18,7 +17,7 @@ import org.basex.query.QueryProcessor;
  */
 public class LocalSession extends Session {
   /** Database context. */
-  private final Context ctx;
+  final Context ctx;
 
   /**
    * Constructor.
@@ -31,7 +30,6 @@ public class LocalSession extends Session {
   @Override
   public void execute(final String str, final OutputStream out)
       throws BaseXException {
-
     try {
       execute(new CommandParser(str, ctx).parseSingle(), out);
     } catch(final QueryException ex) {
@@ -53,8 +51,8 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public Query query(final String query) {
-    return new LocalQuery(new QueryProcessor(query, ctx));
+  public LocalQuery query(final String query) {
+    return new LocalQuery(query, ctx);
   }
 
   @Override
