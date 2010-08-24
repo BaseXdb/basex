@@ -1,5 +1,7 @@
 package org.basex.test.w3c;
 
+import org.basex.core.Prop;
+
 /**
  * XQuery Test Suite wrapper.
  *
@@ -21,5 +23,6 @@ public final class XQTS extends W3CTS {
    */
   public XQTS() {
     super("XQTS");
+    context.prop.set(Prop.XQUERY11, false);
   }
 }

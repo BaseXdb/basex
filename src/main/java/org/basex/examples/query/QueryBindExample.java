@@ -5,8 +5,6 @@ import org.basex.core.Context;
 import org.basex.data.Result;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.item.Item;
-import org.basex.query.item.Str;
 
 /**
  * This example demonstrates how items can be bound to variables with
@@ -43,7 +41,7 @@ public final class QueryBindExample {
 
     // ------------------------------------------------------------------------
     // Create the item to be bound
-    Item string = Str.get("Hello World!\n");
+    String string = "Hello World!\n";
 
     // ------------------------------------------------------------------------
     // Binds a variable to the global context

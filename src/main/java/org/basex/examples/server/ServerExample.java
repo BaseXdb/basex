@@ -5,14 +5,13 @@ import org.basex.core.BaseXException;
 import org.basex.server.ClientSession;
 
 /**
- * This class demonstrates database access via the
- * client/server architecture.
+ * This class demonstrates database access via the client/server architecture.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
 public final class ServerExample {
-  /** Reference to the client session. */
+  /** Session reference. */
   static ClientSession session;
 
   /** Private constructor. */

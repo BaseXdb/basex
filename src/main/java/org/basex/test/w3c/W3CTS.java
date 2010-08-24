@@ -668,13 +668,8 @@ public abstract class W3CTS {
       final byte[] nm = data.atom(nod.nodes[c]);
       final String src = srcs.get(string(nm));
 
-      Expr expr = null;
-      if(src == null) {
-        expr = coll(nm, qp);
-      } else {
-        expr = Str.get(src);
-      }
-      qp.bind(string(data.atom(var.nodes[c])), expr);
+      final Item it = src == null ? coll(nm, qp) : Str.get(src);
+      qp.bind(string(data.atom(var.nodes[c])), it);
     }
   }
 
@@ -685,7 +680,7 @@ public abstract class W3CTS {
    * @return expression
    * @throws QueryException query exception
    */
-  private Expr coll(final byte[] name, final QueryProcessor qp)
+  private Uri coll(final byte[] name, final QueryProcessor qp)
       throws QueryException {
 
     // assign collection

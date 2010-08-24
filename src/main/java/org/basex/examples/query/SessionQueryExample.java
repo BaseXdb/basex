@@ -1,21 +1,25 @@
-package org.basex.examples.server;
+package org.basex.examples.query;
 
 import org.basex.BaseXServer;
-import org.basex.server.ClientSession;
-import org.basex.server.ClientQuery;
+import org.basex.core.Context;
+import org.basex.server.LocalSession;
+import org.basex.server.Query;
+import org.basex.server.Session;
 
 /**
- * This class demonstrates query execution via the client/server architecture.
+ * This class demonstrates local query execution via the session architecture.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class ServerQueryExample {
+public final class SessionQueryExample {
+  /** Database context. */
+  private static Context context = new Context();
   /** Session reference. */
-  private static ClientSession session;
+  private static Session session;
 
   /** Private constructor. */
-  private ServerQueryExample() { }
+  private SessionQueryExample() { }
 
   /**
    * Runs the example code.
@@ -24,7 +28,7 @@ public final class ServerQueryExample {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerQueryExample ===");
+    System.out.println("=== LocalQueryExample ===");
 
     // ------------------------------------------------------------------------
     // Start server on default port 1984.
@@ -34,7 +38,7 @@ public final class ServerQueryExample {
     // Create a client session with host name, port, user name and password
     System.out.println("\n* Create a client session.");
 
-    session = new ClientSession("localhost", 1984, "admin", "admin");
+    session = new LocalSession(context);
 
     // ------------------------------------------------------------------------
     // Run a query
@@ -53,12 +57,10 @@ public final class ServerQueryExample {
     System.out.println("\n\n* Iterate a query:");
 
     // Create query instance
-    ClientQuery query = session.query("1 to 3");
+    Query query = session.query("1 to 3");
 
     // Loop through all results
-    while(query.more()) {
-      System.out.print(query.next());
-    }
+    while(query.more()) System.out.print(query.next());
 
     // close iterator
     query.close();
@@ -71,9 +73,7 @@ public final class ServerQueryExample {
     query = session.query("1 to 4");
 
     // Loop through all results
-    while(query.more()) {
-      query.next(System.out);
-    }
+    while(query.more()) query.next(System.out);
 
     // close iterator
     query.close();
