@@ -9,6 +9,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
+import org.basex.query.item.FAttr;
 import org.basex.query.item.FElem;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Item;
@@ -63,7 +64,7 @@ final class FNPat extends Fun {
     switch(def) {
       case MATCH:   return matches(checkEStr(expr[0], ctx), ctx);
       case REPLACE: return replace(checkEStr(expr[0], ctx), ctx);
-      case ANALZYE: return analyzeString(checkEStr(expr[0], ctx), ctx);
+      case ANALZYE: return analyzeString(checkEStr(expr[0], ctx), ctx, ii);
       default:      return super.atomic(ctx, ii);
     }
   }
@@ -91,42 +92,79 @@ final class FNPat extends Fun {
    * Evaluates the analyze-string function.
    * @param val input value
    * @param ctx query context
+   * @param ii input info
    * @return function result
    * @throws QueryException query exception
    */
-  private Item analyzeString(final byte[] val, final QueryContext ctx)
-      throws QueryException {
+  private Item analyzeString(final byte[] val, final QueryContext ctx,
+      final InputInfo ii) throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
+    if(p.matcher("").matches()) Err.or(ii, REGROUP);
     final String str = string(val);
     final Matcher m = p.matcher(str);
+    
     final NodIter ch = new NodIter();
     final FElem root = new FElem(new QNm(ANALYZE, FNNS), ch, new NodIter(),
         EMPTY, new Atts().add(FN, FNURI));
     int s = 0;
     while(m.find()) {
-      if(s != m.start()) {
-        ch.add(node(NONMATCH, str.substring(s, m.start()), root));
-      }
+      if(s != m.start()) nonmatch(str.substring(s, m.start()), root, ch);
+      match(m, str, root, ch, 0, ii);
       s = m.end();
-      ch.add(node(MATCH, m.group(), root));
     }
-    if(s != str.length()) ch.add(node(NONMATCH, str.substring(s), root));
+    if(s != str.length()) nonmatch(str.substring(s), root, ch);
     return root;
+  }
+  
+  /**
+   * Processes a match.
+   * @param m matcher
+   * @param str string
+   * @param par parent 
+   * @param ch child iterator
+   * @param g group number
+   * @param ii input info
+   * @return match element
+   * @throws QueryException if the regex is wrong
+   */
+  private int match(final Matcher m, final String str, final FElem par,
+      final NodIter ch, final int g, final InputInfo ii) throws QueryException {
+    
+    final NodIter sub = new NodIter(), att = new NodIter();
+    final FElem nd = new FElem(new QNm(g == 0 ? MATCH : MGROUP, FNNS),
+        sub, att, EMPTY, new Atts(), par);
+    if(g > 0) att.add(new FAttr(new QNm(NR), token(g), nd));
+    
+    final int start = m.start(g), end = m.end(g), gc = m.groupCount();
+    int gr = g + 1, pos = start;
+    while(gr <= gc && m.end(gr) <= end) {
+      int st = m.start(gr);
+      if(st < 0) {
+        // TODO [CG] what should we do here?
+        Err.or(ii, XPARGS, "correct regex");
+      }
+      if(pos < st) sub.add(new FTxt(token(str.substring(pos, st)), nd));
+      gr = match(m, str, nd, sub, gr, ii);
+      pos = m.end(gr - 1);
+    }
+    final int gend = gr >= gc ? end : m.end(gr);
+    if(pos < gend) sub.add(new FTxt(token(str.substring(pos, gend)), nd));
+    ch.add(nd);
+    return gr;
   }
 
   /**
    * Returns a new match node.
-   * @param tag tag name
    * @param text text
-   * @param root root node
-   * @return node
+   * @param par root node
+   * @param ch child iterator
    */
-  private FElem node(final byte[] tag, final String text, final FElem root) {
+  private void nonmatch(final String text, final FElem par, final NodIter ch) {
     final NodIter txt = new NodIter();
-    final FElem sub = new FElem(new QNm(tag, FNNS), txt, root);
+    final FElem sub = new FElem(new QNm(NONMATCH, FNNS), txt, par);
     txt.add(new FTxt(token(text), sub));
-    return sub;
+    ch.add(sub);
   }
 
   /**
