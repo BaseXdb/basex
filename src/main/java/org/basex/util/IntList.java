@@ -1,6 +1,8 @@
 package org.basex.util;
 
 import java.util.Arrays;
+import java.util.EmptyStackException;
+
 import org.basex.core.Main;
 
 /**
@@ -83,6 +85,34 @@ public class IntList extends ElementList {
   public final boolean contains(final int e) {
     for(int i = 0; i < size; ++i) if(list[i] == e) return true;
     return false;
+  }
+  
+  /**
+   * Pops the uppermost element from the stack.
+   * @return the popped element
+   * @throws EmptyStackException if the stack is empty
+   */
+  public int pop() {
+    if(size == 0) throw new EmptyStackException();
+    return list[--size];
+  }
+  
+  /**
+   * Pushes an element onto the stack.
+   * @param val element
+   */
+  public void push(final int val) {
+    add(val);
+  }
+  
+  /**
+   * Returns the uppermost element on the stack, without removing it.
+   * @return uppermost element
+   * @throws EmptyStackException if the stack is empty
+   */
+  public int peek() {
+    if(size == 0) throw new EmptyStackException();
+    return list[size - 1];
   }
 
   /**
@@ -352,7 +382,7 @@ public class IntList extends ElementList {
   @Override
   public String toString() {
     final TokenBuilder sb = new TokenBuilder(Main.name(this) + '[');
-    for(int i = 0; i < size; ++i) sb.add((i == 0 ? "" : ",") + list[i]);
+    for(int i = 0; i < size; ++i) sb.add((i == 0 ? "" : ", ") + list[i]);
     return sb.add(']').toString();
   }
 }

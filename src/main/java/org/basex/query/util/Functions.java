@@ -67,7 +67,7 @@ public final class Functions extends ExprInfo {
       final QueryParser qp) throws QueryException {
 
     // find function
-    final byte[] uri = name.uri.atom();
+    final byte[] uri = name.uri().atom();
     final byte[] ln = name.ln();
 
     // parse data type constructors
@@ -123,7 +123,7 @@ public final class Functions extends ExprInfo {
     // find local function
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].var.name;
-      if(eq(ln, qn.ln()) && eq(uri, qn.uri.atom()) && args.length ==
+      if(eq(ln, qn.ln()) && eq(uri, qn.uri().atom()) && args.length ==
         func[l].args.length) return add(qp.input(), qn, l, args);
     }
 
@@ -160,7 +160,7 @@ public final class Functions extends ExprInfo {
   public int add(final Func fun, final QueryParser qp) throws QueryException {
     final QNm name = fun.var.name;
 
-    final byte[] uri = name.uri.atom();
+    final byte[] uri = name.uri().atom();
     if(uri.length == 0) qp.error(FUNNONS, name.atom());
 
     if(NSGlobal.standard(uri)) {
@@ -171,7 +171,7 @@ public final class Functions extends ExprInfo {
     final byte[] ln = name.ln();
     for(int l = 0; l < func.length; ++l) {
       final QNm qn = func[l].var.name;
-      final byte[] u = qn.uri.atom();
+      final byte[] u = qn.uri().atom();
       final byte[] nm = qn.ln();
 
       if(eq(ln, nm) && eq(uri, u) && fun.args.length == func[l].args.length) {

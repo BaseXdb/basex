@@ -64,7 +64,7 @@ final class FNPat extends Fun {
     switch(def) {
       case MATCH:   return matches(checkEStr(expr[0], ctx), ctx);
       case REPLACE: return replace(checkEStr(expr[0], ctx), ctx);
-      case ANALZYE: return analyzeString(checkEStr(expr[0], ctx), ctx, ii);
+      case ANALZYE: return analyzeString(checkEStr(expr[0], ctx), ctx);
       default:      return super.atomic(ctx, ii);
     }
   }
@@ -92,15 +92,14 @@ final class FNPat extends Fun {
    * Evaluates the analyze-string function.
    * @param val input value
    * @param ctx query context
-   * @param ii input info
    * @return function result
    * @throws QueryException query exception
    */
-  private Item analyzeString(final byte[] val, final QueryContext ctx,
-      final InputInfo ii) throws QueryException {
+  private Item analyzeString(final byte[] val, final QueryContext ctx)
+      throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) Err.or(ii, REGROUP);
+    if(p.matcher("").matches()) Err.or(input, REGROUP);
     final String str = string(val);
     final Matcher m = p.matcher(str);
     
@@ -110,7 +109,7 @@ final class FNPat extends Fun {
     int s = 0;
     while(m.find()) {
       if(s != m.start()) nonmatch(str.substring(s, m.start()), root, ch);
-      match(m, str, root, ch, 0, ii);
+      match(m, str, root, ch, 0);
       s = m.end();
     }
     if(s != str.length()) nonmatch(str.substring(s), root, ch);
@@ -124,12 +123,10 @@ final class FNPat extends Fun {
    * @param par parent 
    * @param ch child iterator
    * @param g group number
-   * @param ii input info
-   * @return match element
-   * @throws QueryException if the regex is wrong
+   * @return next group number and position in string
    */
-  private int match(final Matcher m, final String str, final FElem par,
-      final NodIter ch, final int g, final InputInfo ii) throws QueryException {
+  private int[] match(final Matcher m, final String str, final FElem par,
+      final NodIter ch, final int g) {
     
     final NodIter sub = new NodIter(), att = new NodIter();
     final FElem nd = new FElem(new QNm(g == 0 ? MATCH : MGROUP, FNNS),
@@ -137,21 +134,21 @@ final class FNPat extends Fun {
     if(g > 0) att.add(new FAttr(new QNm(NR), token(g), nd));
     
     final int start = m.start(g), end = m.end(g), gc = m.groupCount();
-    int gr = g + 1, pos = start;
-    while(gr <= gc && m.end(gr) <= end) {
-      int st = m.start(gr);
-      if(st < 0) {
-        // TODO [CG] what should we do here?
-        Err.or(ii, XPARGS, "correct regex");
-      }
-      if(pos < st) sub.add(new FTxt(token(str.substring(pos, st)), nd));
-      gr = match(m, str, nd, sub, gr, ii);
-      pos = m.end(gr - 1);
+    int[] pos = { g + 1, start }; // group and position in string
+    while(pos[0] <= gc && m.end(pos[0]) <= end) {
+      int st = m.start(pos[0]);
+      if(st >= 0) {
+        if(pos[1] < st) sub.add(new FTxt(token(str.substring(pos[1], st)), nd));
+        pos = match(m, str, nd, sub, pos[0]);
+      } else pos[0]++;
     }
-    final int gend = gr >= gc ? end : m.end(gr);
-    if(pos < gend) sub.add(new FTxt(token(str.substring(pos, gend)), nd));
+    final int gend = pos[0] >= gc ? end : m.end(pos[0]);
+    if(pos[1] < gend) {
+      sub.add(new FTxt(token(str.substring(pos[1], gend)), nd));
+      pos[1] = gend;
+    }
     ch.add(nd);
-    return gr;
+    return pos;
   }
 
   /**

@@ -12,7 +12,6 @@ import org.basex.query.item.FAttr;
 import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
-import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
@@ -55,15 +54,15 @@ public final class CAttr extends CFrag {
   @Override
   public FAttr atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final QNm name = qname(ctx, checkItem(atn, ctx));
+    final QNm name = qname(ctx, checkItem(atn, ctx), true);
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
-    final byte[] uri = name.uri.atom();
+    final byte[] uri = name.uri().atom();
 
     if(comp && (eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
         || eq(pre, XML) ^ eq(uri, XMLURI))) Err.or(input, CAINS, pre, uri);
     
-    if(!name.ns()) name.uri = Uri.EMPTY;
+    // TODO [CG] create a prefix if none is given but a URI exists
 
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr e : expr) add(tb, ctx.iter(e));

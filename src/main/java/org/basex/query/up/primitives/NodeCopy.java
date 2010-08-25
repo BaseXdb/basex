@@ -7,7 +7,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.NamePool;
 import org.basex.util.InputInfo;
@@ -60,7 +59,7 @@ public abstract class NodeCopy extends UpdatePrimitive {
       if(k != Data.ATTR && k != Data.ELEM || md.parent(pre, k) > -1) continue;
       final int u = md.uri(pre, k);
       final QNm qnm = new QNm(md.name(pre, k));
-      if(u != 0) qnm.uri = Uri.uri(md.ns.uri(u));
+      if(u != 0) qnm.uri(md.ns.uri(u));
       pool.add(qnm, Nod.type(k));
     }
   }

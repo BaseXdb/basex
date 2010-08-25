@@ -68,7 +68,7 @@ public final class Rename extends Update {
 
     if(test != null) {
       final byte[] uri = test.uri(rename.pref(), ctx);
-      if(uri != null && !eq(rename.uri.atom(), uri)) Err.or(input, UPNSCONFL);
+      if(uri != null && !eq(rename.uri().atom(), uri)) Err.or(input, UPNSCONFL);
     }
     ctx.updates.add(new RenamePrimitive(input, targ, rename), ctx);
     return null;

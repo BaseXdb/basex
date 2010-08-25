@@ -134,7 +134,8 @@ public final class FElem extends FNode {
       }
     }
 
-    final byte[] pref = name.pref(), uri = name.uri.atom(), old = nss.get(pref);
+    final byte[] pref = name.pref(), uri = name.uri().atom(),
+        old = nss.get(pref);
     if(old == null || !Token.eq(uri, old)) {
       ns.add(pref, uri);
       nss.add(pref, uri);
@@ -219,43 +220,24 @@ public final class FElem extends FNode {
   @Override
   public void serialize(final Serializer ser) throws IOException {
     final byte[] tag = name.atom();
-    final byte[] uri = name.uri.atom();
     ser.openElement(tag);
 
-    // remember top level namespace
-    final byte[] dn = ser.dn;
-    // xmlns? namespace with prefix?
+    if(name.hasUri()) ser.namespace(name.pref(), name.uri().atom());
 
     // serialize all namespaces at top level...
     if(ser.level() == 1) {
       final Atts nns = nsScope();
-      for(int a = 0; a < nns.size; ++a) {
-        if(nns.key[a].length == 0) {
-          if(Token.eq(ser.dn, nns.val[a])) continue;
-          // reset default namespace
-          ser.dn = nns.val[a];
-        }
-        ser.namespace(nns.key[a], nns.val[a]);
-      }
-
-      // serialize default namespace if not done yet
-      final byte[] def = ser.ns(EMPTY);
-      if(def != null) {
-        ser.dn = def;
-        ser.namespace(EMPTY, def);
-      }
+      for(int a = 0; a < nns.size; ++a) ser.namespace(nns.key[a], nns.val[a]);
     } else if(ns != null) {
       for(int p = ns.size - 1; p >= 0; p--) ser.namespace(ns.key[p], ns.val[p]);
     }
-
-    ser.dn = uri;
 
     // serialize attributes
     for(int n = 0; n < atts.size(); ++n) {
       final Nod nod = atts.get(n);
       final QNm atn = nod.qname();
-      if(atn.ns() && !NSGlobal.standard(atn.uri.atom())) {
-        ser.namespace(atn.pref(), atn.uri.atom());
+      if(atn.ns() && !NSGlobal.standard(atn.uri().atom())) {
+        ser.namespace(atn.pref(), atn.uri().atom());
       }
       ser.attribute(atn.atom(), nod.atom());
     }
@@ -263,9 +245,6 @@ public final class FElem extends FNode {
     // serialize children
     for(int n = 0; n < children.size(); ++n) children.get(n).serialize(ser);
     ser.closeElement();
-
-    // reset top level namespace
-    ser.dn = dn;
   }
 
   @Override

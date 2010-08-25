@@ -18,7 +18,7 @@ import org.basex.util.XMLToken;
  */
 public final class QNm extends Item {
   /** URI. */
-  public Uri uri = Uri.EMPTY;
+  private Uri uri;
   /** String data. */
   private byte[] val;
   /** Namespace index. */
@@ -52,7 +52,7 @@ public final class QNm extends Item {
       throws QueryException {
     this(n);
     if(!XMLToken.isQName(val)) Err.value(ii, type, val);
-    if(ns()) uri = Uri.uri(ctx.ns.uri(pref(), false, ii));
+    if(ns()) uri(ctx.ns.uri(pref(), false, ii));
   }
 
   /**
@@ -62,7 +62,7 @@ public final class QNm extends Item {
    */
   public QNm(final byte[] n, final Uri u) {
     this(n);
-    uri = u;
+    uri(u);
   }
 
   /**
@@ -71,6 +71,38 @@ public final class QNm extends Item {
    */
   public QNm(final QName qn) {
     this(token(qname(qn)), Uri.uri(token(qn.getNamespaceURI())));
+  }
+
+  /**
+   * Sets the URI of this QName.
+   * @param u the uri to set
+   */
+  public void uri(final Uri u) {
+    this.uri = u;
+  }
+
+  /**
+   * Sets the URI of this QName.
+   * @param u the uri to set
+   */
+  public void uri(final byte[] u) {
+    uri(Uri.uri(u));
+  }
+
+  /**
+   * Returns the URI of this QName.
+   * @return the uri
+   */
+  public Uri uri() {
+    return uri == null ? Uri.EMPTY : uri;
+  }
+  
+  /**
+   * Checks if the URI of this QName has been set explicitly.
+   * @return {@code true} if it has been set, {@code false} otherwise
+   */
+  public boolean hasUri() {
+    return uri != null;
   }
 
   /**
@@ -116,7 +148,7 @@ public final class QNm extends Item {
    * @return result of check
    */
   public boolean eq(final QNm n) {
-    return n == this || Token.eq(ln(), n.ln()) && uri.eq(n.uri);
+    return n == this || Token.eq(ln(), n.ln()) && uri().eq(n.uri());
   }
 
   @Override
@@ -151,7 +183,7 @@ public final class QNm extends Item {
 
   @Override
   public QName toJava() {
-    return new QName(Token.string(uri.atom()), Token.string(ln()),
+    return new QName(Token.string(uri().atom()), Token.string(ln()),
         Token.string(pref()));
   }
 

@@ -73,7 +73,7 @@ public final class CElem extends CFrag {
    * @throws QueryException XQDY0096, if invalid namespace was found
    */
   private QNm checkNS(final QNm name) throws QueryException {
-    final byte[] pre = name.pref(), uri = name.uri.atom();
+    final byte[] pre = name.pref(), uri = name.uri().atom();
     if(eq(pre, XMLNS) || eq(uri, XMLNSURI) || eq(pre, XML) ^ eq(uri, XMLURI))
       Err.or(input, CEINS, pre, uri);
     return name;
@@ -86,13 +86,24 @@ public final class CElem extends CFrag {
     final int s = ctx.ns.size();
     addNS(ctx);
 
-    final QNm tname = checkNS(qname(ctx, it));
-    final byte[] uri = tname.uri.atom();
-    if(uri.length != 0) {
-      final byte[] key = tname.pref();
-      if(!eq(key, XML)) {
-        final int i = nsp.get(key);
-        if(i == -1 || !eq(nsp.val[i], uri)) nsp.add(key, uri);
+    // clone namespaces for context sensitive operations
+    final Atts nsc = new Atts();
+    for(int i = 0; i < nsp.size; i++) nsc.add(nsp.key[i], nsp.val[i]);
+    
+    final QNm tname = checkNS(qname(ctx, it, false));
+    final byte[] pref = tname.pref();
+    if(!eq(pref, XML)) {
+      final byte[] uri = ctx.ns.find(pref);
+      if(tname.hasUri()) {
+        final byte[] muri = tname.uri().atom();
+        if(uri == null || !eq(uri, muri)) {
+          ctx.ns.add(new QNm(tname.pref(), tname.uri()), ii);
+          nsc.add(pref, muri);
+        } else if(!nsc.contains(pref)) {
+          nsc.add(pref, uri);
+        }
+      } else if(uri != null) {
+        tname.uri(uri);
       }
     }
 
@@ -100,7 +111,7 @@ public final class CElem extends CFrag {
     if(c.errAtt) Err.or(input, NOATTALL);
     if(c.duplAtt != null) Err.or(input, ATTDUPL, c.duplAtt);
 
-    final FElem node = new FElem(tname, c.children, c.ats, c.base, nsp);
+    final FElem node = new FElem(tname, c.children, c.ats, c.base, nsc);
     for(int n = 0; n < c.children.size(); ++n) c.children.get(n).parent(node);
     for(int n = 0; n < c.ats.size(); ++n) c.ats.get(n).parent(node);
     ctx.ns.size(s);

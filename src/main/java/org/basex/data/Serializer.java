@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
+import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.io.IO;
 import org.basex.util.Atts;
@@ -15,16 +16,14 @@ import org.basex.util.TokenList;
  */
 public abstract class Serializer {
   /** Namespaces. */
-  private final Atts ns = new Atts();
-  /** Current default namespace. */
-  public byte[] dn = EMPTY;
+  private final Atts ns = new Atts().add(XML, XMLURI).add(EMPTY, EMPTY);
 
-  /** Opened tags. */
+  /** Stack of opened tags. */
   protected final TokenList tags = new TokenList();
   /** Declare namespaces flag. */
   protected boolean undecl;
 
-  /** Namespace levels. */
+  /** Stack of namespace levels. */
   private final IntList nsl = new IntList();
   /** Flag for opened tag. */
   protected boolean inTag;
@@ -147,8 +146,8 @@ public abstract class Serializer {
       throws IOException {
 
     finishElement();
-    tags.add(t);
-    nsl.add(ns.size);
+    tags.push(t);
+    nsl.push(ns.size);
     inTag = true;
     start(t);
     for(int i = 0; i < a.length; i += 2) attribute(a[i], a[i + 1]);
@@ -162,7 +161,7 @@ public abstract class Serializer {
    */
   public final void namespace(final byte[] n, final byte[] v)
       throws IOException {
-    
+
     if(!undecl && n.length != 0 && v.length == 0) return;
     final byte[] uri = ns(n);
     if(uri == null || !eq(uri, v)) {
@@ -202,15 +201,12 @@ public abstract class Serializer {
    */
   public final void closeElement() throws IOException {
     if(tags.size() == 0) throw new IOException("All elements closed.");
-    final int s = tags.size() - 1;
-    tags.size(s);
-    ns.size = nsl.get(s);
+    final byte[] open = tags.pop();
+    ns.size = nsl.pop();
     if(inTag) {
       inTag = false;
       empty();
-    } else {
-      close(tags.get(tags.size()));
-    }
+    } else close(open);
   }
 
   /**
@@ -220,7 +216,7 @@ public abstract class Serializer {
   public final void close() throws IOException {
     cls();
     if(tags.size() > 0) throw new IOException(
-        "<" + string(tags.get(tags.size())) + "> still opened");
+        "<" + string(tags.peek()) + "> still opened");
   }
 
   /**
@@ -275,7 +271,7 @@ public abstract class Serializer {
     final TokenList nsp = data.ns.size() != 0 ? new TokenList() : null;
     final int[] parStack = new int[IO.MAXHEIGHT];
     final byte[][] names = new byte[IO.MAXHEIGHT][];
-    names[0] = dn;
+    names[0] = ns(EMPTY);
 
     int l = 0;
     int p = pre;
@@ -328,7 +324,7 @@ public abstract class Serializer {
             }
             pp = data.parent(pp, data.kind(pp));
           } while(pp >= 0 && data.kind(pp) == Data.ELEM &&
-              l == 0 && tags.size() == 1);
+              l == 0 && level() == 1);
 
           // check namespace of current element
           final byte[] key = pref(name);
@@ -340,7 +336,7 @@ public abstract class Serializer {
             namespace(key, val);
             empty = val;
           }
-        } else if(l == 0 && dn != EMPTY) {
+        } else if(l == 0 && ns(EMPTY) != EMPTY) {
           namespace(EMPTY, EMPTY);
         }
 

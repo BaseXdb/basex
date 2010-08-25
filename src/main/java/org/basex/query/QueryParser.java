@@ -271,11 +271,11 @@ public class QueryParser extends InputParser {
     check(NSPACE);
     module = new QNm(ncName(XPNAME));
     check(IS);
-    module.uri = Uri.uri(stringLiteral());
-    if(module.uri == Uri.EMPTY) error(NSMODURI);
+    module.uri(stringLiteral());
+    if(module.uri() == Uri.EMPTY) error(NSMODURI);
     // skip uri check for empty input uri...
-    if(u != Uri.EMPTY && !u.eq(module.uri))
-      error(WRONGMODULE, module.uri, file);
+    if(u != Uri.EMPTY && !u.eq(module.uri()))
+      error(WRONGMODULE, module.uri(), file);
     ctx.ns.add(module, input());
     skipWS();
     check(';');
@@ -370,7 +370,7 @@ public class QueryParser extends InputParser {
   private void namespaceDecl() throws QueryException {
     final QNm name = new QNm(ncName(XPNAME));
     check(IS);
-    name.uri = Uri.uri(stringLiteral());
+    name.uri(stringLiteral());
     if(ctx.ns.find(name.ln()) != null) error(DUPLNSDECL, name);
     ctx.ns.add(name, input());
   }
@@ -546,20 +546,20 @@ public class QueryParser extends InputParser {
     }
     final byte[] uri = stringLiteral();
     if(uri.length == 0) error(NSMODURI);
-    name.uri = Uri.uri(uri);
+    name.uri(uri);
     ctx.ns.add(name, input());
 
     final TokenList fl = new TokenList();
     if(consumeWS(AT)) do fl.add(stringLiteral()); while(consumeWS(COMMA));
 
-    if(modLoaded.contains(uri)) error(DUPLMODULE, name.uri);
+    if(modLoaded.contains(uri)) error(DUPLMODULE, name.uri());
     try {
       if(fl.size() == 0) {
         boolean found = false;
         final int ns = ctx.modules.size();
         for(int n = 0; n < ns; n += 2) {
           if(ctx.modules.get(n).equals(string(uri))) {
-            module(ctx.modules.get(n + 1), name.uri);
+            module(ctx.modules.get(n + 1), name.uri());
             modLoaded.add(uri);
             found = true;
           }
@@ -567,7 +567,7 @@ public class QueryParser extends InputParser {
         if(!found) error(NOMODULE, uri);
       }
       for(int n = 0; n < fl.size(); ++n) {
-        module(string(fl.get(n)), name.uri);
+        module(string(fl.get(n)), name.uri());
         modLoaded.add(uri);
       }
     } catch(final StackOverflowError ex) {
@@ -607,7 +607,7 @@ public class QueryParser extends InputParser {
    */
   private void varDecl() throws QueryException {
     final QNm name = varName();
-    if(module != null && !name.uri.eq(module.uri)) error(MODNS, name);
+    if(module != null && !name.uri().eq(module.uri())) error(MODNS, name);
 
     final SeqType t = consumeWS(AS) ? sequenceType() : null;
     final Var v = new Var(input(), name, t);
@@ -657,12 +657,12 @@ public class QueryParser extends InputParser {
   private void functionDecl(final boolean up) throws QueryException {
     skipWS();
     final QNm name = new QNm(qName(FUNCNAME));
-    name.uri = Uri.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) :
+    name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input()) :
       ctx.nsFunc);
 
     if(name.pref().length == 0 && Type.find(name, true) != null)
       error(FUNCRES, name);
-    if(module != null && !name.uri.eq(module.uri)) error(MODNS, name);
+    if(module != null && !name.uri().eq(module.uri())) error(MODNS, name);
 
     check(PAR1);
     skipWS();
@@ -1495,7 +1495,7 @@ public class QueryParser extends InputParser {
         // name test "tag"
         if(!consume(':')) {
           skipWS();
-          final QNm nm = new QNm(name, Uri.uri(ctx.nsElem));
+          final QNm nm = new QNm(name, att ? Uri.EMPTY : null);
           return new NameTest(nm, NameTest.Kind.STD, att, input());
         }
         // name test "pre:*"
@@ -1619,7 +1619,7 @@ public class QueryParser extends InputParser {
     check(DOLLAR);
     skipWS();
     final QNm name = new QNm(qName(NOVARNAME));
-    if(name.ns()) name.uri = Uri.uri(ctx.ns.uri(name.pref(), false, input()));
+    if(name.ns()) name.uri(ctx.ns.uri(name.pref(), false, input()));
     ctx.ns.uri(name);
     return name;
   }
@@ -1656,8 +1656,8 @@ public class QueryParser extends InputParser {
         alter = new Object[] { name };
         ap = qp;
         ctx.ns.uri(name);
-        name.uri = Uri.uri(name.ns() ?
-            ctx.ns.uri(name.pref(), false, input()) : ctx.nsFunc);
+        name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input())
+            : ctx.nsFunc);
         final Expr func = ctx.funcs.get(name, exprs, ctx, this);
         if(func != null) {
           alter = null;
@@ -1752,9 +1752,9 @@ public class QueryParser extends InputParser {
       if(eq(atn, XMLNS)) {
         if(!simple) error(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
-        if(!tag.ns()) tag.uri = Uri.uri(v);
+        if(!tag.ns()) tag.uri(v);
         addNS(ns, EMPTY, v);
-      } else if(startsWith(atn, XMLNS)) {
+      } else if(startsWith(atn, XMLNSC)) {
         if(!simple) error(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
         if(v.length == 0) error(NSEMPTYURI);
@@ -1763,12 +1763,14 @@ public class QueryParser extends InputParser {
         if(!eq(pref, XML) || !eq(v, XMLURI)) {
           ctx.ns.add(nsd, input());
           addNS(ns, pref, v);
+          if(eq(pref, tag.pref())) tag.uri(v);
         } else {
           if(xmlDef) error(DUPLNSDEF, XML);
           xmlDef = true;
         }
       } else {
-        cont = add(cont, new CAttr(input(), false, new QNm(atn), attv));
+        cont = add(cont, new CAttr(input(), false,
+            new QNm(atn, contains(atn, ':') ? null : Uri.EMPTY), attv));
       }
       if(!consumeWSS()) break;
     }
@@ -2069,7 +2071,7 @@ public class QueryParser extends InputParser {
     final SeqType seq = new SeqType(Type.find(type, false), occ);
 
     if(seq.type == null) {
-      final byte[] uri = type.uri.atom();
+      final byte[] uri = type.uri().atom();
       if(uri.length == 0 && type.ns()) error(PREUNKNOWN, type.pref());
       final String ln = string(type.ln());
       error(eq(uri, Type.NOT.uri) && ln.equals(Type.NOT.name) ||
@@ -2099,7 +2101,7 @@ public class QueryParser extends InputParser {
     skipWS();
     final Occ occ = consume('?') ? Occ.ZO : consume('+') ?
         Occ.OM : consume('*') ? Occ.ZM : Occ.O;
-    if(type.ns()) type.uri = Uri.uri(ctx.ns.uri(type.pref(), false, input()));
+    if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, input()));
 
     final byte[] ext = tok.finish();
     final SeqType seq = new SeqType(Type.find(type, true), occ);
@@ -2127,7 +2129,7 @@ public class QueryParser extends InputParser {
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());
-      if(!eq(test.uri.atom(), XSURI)) error(TESTINVALID, t, test);
+      if(!eq(test.uri().atom(), XSURI)) error(TESTINVALID, t, test);
       nm = trim(substring(nm, 0, i));
       final byte[] ln = test.ln();
       if(!eq(ln, ANYTYPE) && !eq(ln, ANYSIMPLE) && !eq(ln, UNTYPED) &&

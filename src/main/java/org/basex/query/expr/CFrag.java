@@ -9,7 +9,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
-import org.basex.query.item.Uri;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.XMLToken;
@@ -39,10 +38,12 @@ public abstract class CFrag extends Arr {
    * Returns an updated name expression.
    * @param ctx query context
    * @param i item
+   * @param att attribute flag
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext ctx, final Item i) throws QueryException {
+  final QNm qname(final QueryContext ctx, final Item i, final boolean att)
+      throws QueryException {
     QNm name = null;
     if(i.type == Type.QNM) {
       name = (QNm) i;
@@ -53,9 +54,12 @@ public abstract class CFrag extends Arr {
       name = new QNm(nm);
     }
 
-    if(name.uri == Uri.EMPTY) {
-      name.uri = Uri.uri(ctx.ns.uri(name.pref(), name != i, input));
+    // attributes don't inherit namespaces
+    if(!name.hasUri()) {
+      name.uri(att && !name.ns() 
+          ? EMPTY : ctx.ns.uri(name.pref(), name != i, input));
     }
+    
     return name;
   }
 

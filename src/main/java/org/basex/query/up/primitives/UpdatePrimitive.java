@@ -166,7 +166,7 @@ public abstract class UpdatePrimitive {
         return p;
       case Data.ATTR:
         QNm q = nd.qname();
-        byte[] uri = q.uri.atom();
+        byte[] uri = q.uri().atom();
         int u = 0;
         boolean ne = uri.length != 0;
         if(ne) {
@@ -209,7 +209,7 @@ public abstract class UpdatePrimitive {
           m.ns.add(ns.key[a], ns.val[a], ms);
         }
 
-        uri = q.uri.atom();
+        uri = q.uri().atom();
         u = uri.length != 0 ? m.ns.addURI(uri) : 0;
         final int tn = m.tags.index(q.atom(), null, false);
         m.elem(0, pre - par, tn, size(nd, true), size(nd, false), u, ne);

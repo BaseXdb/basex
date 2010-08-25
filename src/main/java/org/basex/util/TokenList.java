@@ -3,6 +3,7 @@ package org.basex.util;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.EmptyStackException;
 import java.util.Iterator;
 import org.basex.core.Main;
 
@@ -83,6 +84,34 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
     if(i >= list.length) list = Array.copyOf(list, newSize(i + 1));
     list[i] = e;
     size = Math.max(size, i + 1);
+  }
+  
+  /**
+   * Pops the uppermost element from the stack.
+   * @return the popped element
+   * @throws EmptyStackException if the stack is empty
+   */
+  public byte[] pop() {
+    if(size == 0) throw new EmptyStackException();
+    return list[--size];
+  }
+  
+  /**
+   * Pushes an element onto the stack.
+   * @param val element
+   */
+  public void push(final byte[] val) {
+    add(val);
+  }
+  
+  /**
+   * Returns the uppermost element on the stack, without removing it.
+   * @return uppermost element
+   * @throws EmptyStackException if the stack is empty
+   */
+  public byte[] peek() {
+    if(size == 0) throw new EmptyStackException();
+    return list[size - 1];
   }
 
   /**

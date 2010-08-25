@@ -904,7 +904,7 @@ public enum Type {
    */
   public static Type find(final QNm type, final boolean root) {
     final String ln = string(type.ln());
-    final byte[] uri = type.uri.atom();
+    final byte[] uri = type.uri().atom();
 
     for(final Type t : values()) {
       if((root || t.par != null && t != AAT) && ln.equals(t.name) &&
@@ -920,7 +920,7 @@ public enum Type {
    */
   public static Type node(final QNm type) {
     final String ln = string(type.ln());
-    final byte[] uri = type.uri.atom();
+    final byte[] uri = type.uri().atom();
     for(final Type t : Type.values()) {
       if(t.node() && ln.equals(t.name) && eq(uri, t.uri)) return t;
     }

@@ -10,6 +10,7 @@ import org.basex.query.item.Itr;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
+import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 
@@ -55,7 +56,9 @@ final class FNAcc extends Fun {
       case URIQNAME:
         it = e.atomic(ctx, input);
         if(it == null) return null;
-        return ((QNm) checkType(it, Type.QNM)).uri;
+        final QNm qn = (QNm) checkType(it, Type.QNM);
+        return qn.hasUri() ? qn.uri() 
+            : Uri.uri(ctx.ns.uri(qn.pref(), true, ii));
       default:
         return super.atomic(ctx, ii);
     }

@@ -5,7 +5,6 @@ import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Uri;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 
@@ -30,7 +29,7 @@ public final class Namespaces {
   public void add(final QNm name, final InputInfo ii) throws QueryException {
     final byte[] ln = name.ln();
     if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(ii, NSDEF, name);
-    final byte[] uri = name.uri.atom();
+    final byte[] uri = name.uri().atom();
     if(eq(XMLURI, uri)) Err.or(ii, NOXMLNS, XML, name);
     if(eq(XMLNSURI, uri)) Err.or(ii, NOXMLNS, XMLNS, name);
     ns.add(ln, uri);
@@ -55,7 +54,7 @@ public final class Namespaces {
     final byte[] pre = qname.pref();
     if(pre.length == 0) return;
     final byte[] uri = find(pre);
-    qname.uri = Uri.uri(uri != null ? uri : NSGlobal.uri(pre));
+    qname.uri(uri != null ? uri : NSGlobal.uri(pre));
   }
 
   /**

@@ -58,7 +58,7 @@ public final class NameTest extends Test {
     // namespaces wildcard - check only name
     if(kind == Kind.NAME) return eq(ln, ln(node.nname()));
     // name wildcard - check only namespace
-    if(kind == Kind.NS) return name.uri.eq(node.qname(tmpq).uri);
+    if(kind == Kind.NS) return name.uri().eq(node.qname(tmpq).uri());
     // check attributes
     if(type == Type.ATT && !name.ns()) return eq(ln, node.nname());
     // check everything
@@ -69,8 +69,8 @@ public final class NameTest extends Test {
   public boolean comp(final QueryContext ctx) throws QueryException {
     // check namespace context
     if(ctx.ns.size() != 0) {
-      if(name != null && name.uri == Uri.EMPTY) {
-        name.uri = Uri.uri(ctx.ns.uri(name.pref(), false, input));
+      if(name != null && !name.hasUri()) {
+        name.uri(ctx.ns.uri(name.pref(), false, input));
       }
     }
 
@@ -95,8 +95,8 @@ public final class NameTest extends Test {
   public String toString() {
     if(kind == Kind.ALL) return "*";
     if(kind == Kind.NAME) return "*:" + string(name.atom());
-    final String uri = name.uri == Uri.EMPTY || name.ns() ? "" :
-      "{" + string(name.uri.atom()) + "}";
+    final String uri = name.uri() == Uri.EMPTY || name.ns() ? "" :
+      "{" + string(name.uri().atom()) + "}";
     return uri + (kind == Kind.NS ? "*" : string(name.atom()));
   }
 }

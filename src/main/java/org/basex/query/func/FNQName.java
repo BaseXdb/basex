@@ -111,7 +111,7 @@ final class FNQName extends Fun {
     final byte[] pref = nm.pref();
     final byte[] uri = ((Nod) checkType(it, Type.ELM)).uri(pref, ctx);
     if(uri == null && pref.length != 0) Err.or(input, NSDECL, pref);
-    nm.uri = Uri.uri(uri);
+    nm.uri(uri);
     return nm;
   }
 
@@ -140,7 +140,7 @@ final class FNQName extends Fun {
       }
       if(emp == null) {
         final QNm nm = n.qname();
-        if(!nm.ns()) emp = nm.uri.atom();
+        if(!nm.ns()) emp = nm.uri().atom();
       }
       n = n.parent();
     } while(n != null && ctx.nsInherit);
@@ -151,5 +151,10 @@ final class FNQName extends Fun {
     final ItemIter ir = new ItemIter(pref.size());
     for(final byte[] t : pref.keys()) ir.add(Str.get(t));
     return ir;
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.CTX && def == FunDef.INSCOPE || super.uses(u);
   }
 }

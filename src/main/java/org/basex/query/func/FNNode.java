@@ -84,7 +84,7 @@ final class FNNode extends Fun {
         while(node != null) {
           qname = node.qname();
           if(qname == null) break;
-          if(qname.uri != Uri.EMPTY) return qname.uri;
+          if(qname.uri() != Uri.EMPTY) return qname.uri();
           final Atts ns = node.ns();
           if(ns != null) {
             final int pos = ns.get(EMPTY);
