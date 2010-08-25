@@ -378,6 +378,10 @@ public interface QueryTokens {
   byte[] MATCH = token("fn:match");
   /** Element for the analyze-string-result function. */
   byte[] NONMATCH = token("fn:non-match");
+  /** Element for the analyze-string-result function. */
+  byte[] MGROUP = token("fn:group");
+  /** Attribute for the analyze-string-result function. */
+  byte[] NR = token("nr");
 
   // TYPES ====================================================================
 
