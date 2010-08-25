@@ -85,7 +85,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getAttributeNamespace(final int i) {
     getAttributes();
-    return string(atts.item[i].qname().uri.atom());
+    return string(atts.item[i].qname().uri().atom());
   }
 
   @Override
