@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import org.basex.data.SerializerProp;
 import org.basex.io.IO;
@@ -103,6 +102,7 @@ import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.Atts;
 import org.basex.util.InputParser;
+import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.XMLToken;
@@ -131,7 +131,7 @@ public class QueryParser extends InputParser {
   private int ap;
 
   /** Declared serialization options. */
-  private final ArrayList<String> serial = new ArrayList<String>();
+  private final StringList serial = new StringList();
   /** Declaration flag. */
   private boolean declElem;
   /** Declaration flag. */

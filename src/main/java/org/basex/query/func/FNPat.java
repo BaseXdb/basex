@@ -137,22 +137,21 @@ final class FNPat extends Fun {
     int[] pos = { g + 1, start }; // group and position in string
     while(pos[0] <= gc && m.end(pos[0]) <= end) {
       int st = m.start(pos[0]);
-      if(st >= 0) {
+      if(st >= 0) { // group matched
         if(pos[1] < st) sub.add(new FTxt(token(str.substring(pos[1], st)), nd));
         pos = match(m, str, nd, sub, pos[0]);
-      } else pos[0]++;
+      } else pos[0]++; // skip it
     }
-    final int gend = pos[0] >= gc ? end : m.end(pos[0]);
-    if(pos[1] < gend) {
-      sub.add(new FTxt(token(str.substring(pos[1], gend)), nd));
-      pos[1] = gend;
+    if(pos[1] < end) {
+      sub.add(new FTxt(token(str.substring(pos[1], end)), nd));
+      pos[1] = end;
     }
     ch.add(nd);
     return pos;
   }
 
   /**
-   * Returns a new match node.
+   * Processes a non-match.
    * @param text text
    * @param par root node
    * @param ch child iterator
@@ -210,6 +209,8 @@ final class FNPat extends Fun {
       throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
+    if(p.matcher("").matches()) Err.or(input, REGROUP);
+    
     final ItemIter sb = new ItemIter();
     final String str = string(val);
     if(!str.isEmpty()) {

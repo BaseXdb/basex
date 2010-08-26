@@ -334,8 +334,6 @@ public interface QueryText {
   Object[] TESTINVALID = { XPST, 3, "Invalid % test: %." };
   /** XPST0003: Parsing exception. */
   Object[] QNAMEINV = { XPST, 3, "Expecting QName." };
-  /** XPST0003: Parsing exception. */
-  Object[] FEATURE11 = { XPST, 3, "Feature not available in XQuery 1.0." };
 
   /** XPST0003: Parsing exception. */
   Object[] FTRANGE = { XPST, 3, "Expecting full-text range." };
@@ -355,6 +353,8 @@ public interface QueryText {
   Object[] FUNSIMILAR = { XPST, 17, "Unknown function \"%\" (similar: %())." };
   /** XPST0017: Parsing Exception. */
   Object[] FUNCTYPE = { XPST, 17, "Wrong arguments: %(value) expected." };
+  /** XPST0003: Parsing exception. */
+  Object[] FEATURE11 = { XPST, 17, "Feature not available in XQuery 1.0." };
   /** XPST0017: Parsing exception. */
   Object[] FUNCUNKNOWN = { XPST, 17, "Unknown function \"%(...)\"." };
   /** XPST0017: Parsing exception. */
