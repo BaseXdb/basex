@@ -154,23 +154,26 @@ public final class TreeView extends View implements TreeViewOptions {
     if(data == null) return;
 
     super.paintComponent(g);
-
     gui.painting = true;
+    
+    roots = gui.context.current.nodes;
+    if(roots.length == 0) return;
+    
+    smooth(g);
+    g.setFont(font);
+    fontHeight = g.getFontMetrics().getHeight();
 
     // timer
     // final Performance perf = new Performance();
     // perf.initTimer();
 
-    // initializes sizes
-    smooth(g);
-    g.setFont(font);
-    fontHeight = g.getFontMetrics().getHeight();
-    roots = gui.context.current.nodes;
+    // initializes sizes   
 
     if(paintType == PAINT_NEW_INIT) {
       sub = new TreeSubtree(data);
       tr = new TreeRects(gui.prop);
     }
+    
     if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT) 
       sub.generateBorders(c);
 
@@ -184,7 +187,7 @@ public final class TreeView extends View implements TreeViewOptions {
       createNewMainImage();
       if(gui.context.marked.size() > 0) markNodes();
     }
-
+    
     g.drawImage(treeImage, 0, 0, getWidth(), getHeight(), this);
 
     if(selection) {
@@ -206,7 +209,7 @@ public final class TreeView extends View implements TreeViewOptions {
         getHeight(), this);
 
     // highlights the focused node
-    inFocus = focus();
+    inFocus = paintType < 0 ? focus() : false;
 
     if(inFocus) {
       int focused = gui.context.focused;
@@ -286,7 +289,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @return height
    */
   private int getRealBigRectangleHeight(final int px) {
-    final int p = getRealBigRectRootsPerPixel();
+    final int p = getRealBigRectRootsPerPixel(px);
     int pp = px / 2 * p;
 
     int maxHeight = 0;
@@ -299,12 +302,14 @@ public final class TreeView extends View implements TreeViewOptions {
 
   /**
    * Returns number of roots per pixel in real big rects.
+   * @param px pixel position
    * @return number of roots
    */
-  private int getRealBigRectRootsPerPixel() {
+  private int getRealBigRectRootsPerPixel(final int px) {
     final int rl = roots.length;
-    final double w = getWidth() / 4;
-    //    final double overhead = rl % w;
+    final double w = (getWidth() - 1) / 2d;
+    final int overhead = (int) (rl % w);
+    if(overhead <= px / 2) return (int) (rl / w) + overhead;
     return (int) (rl / w);
   }
 
@@ -1070,7 +1075,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final int lv = getLevelPerY(mousePosY);
 
       if(rbr) {
-        //        final int ms = mousePosX / 2;
+        // final int ms = mousePosX / 2;
         // final int rts = getRealBigRectRootNum() * ms;
 
       } else {
@@ -1149,14 +1154,14 @@ public final class TreeView extends View implements TreeViewOptions {
     }
     nodeHeight = MAX_NODE_HEIGHT;
     int lD;
-    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) 
-        < (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
+    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) < 
+        (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
         : BEST_LEVEL_DISTANCE)
         && nodeHeight >= MIN_NODE_HEIGHT)
       nodeHeight--;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight)) 
+    final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight))
         / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }
@@ -1180,7 +1185,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param r rectangle
    * @return size
    */
-  private int getHitBigRectNodesNum(final int rn, final int lv,
+  private int getHitBigRectNodesNum(final int rn, final int lv, 
       final TreeRect r) {
     final int w = r.w;
     final int ls = sub.getLevelSize(rn, lv);

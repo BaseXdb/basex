@@ -41,7 +41,7 @@ final class TreeRects implements TreeViewOptions {
     final int rl = roots.length;
     if(rl == 0) return 0;
     final double w = (sw - BORDER_PADDING) / (double) rl;
-    if(w <= 2) {
+    if(w < 2) {
       return -1;
     }
 
