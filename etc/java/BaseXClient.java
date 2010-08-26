@@ -1,5 +1,4 @@
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
  */
 public class BaseXClient {
   /** Output stream. */
-  final BufferedOutputStream out;
+  final OutputStream out;
   /** Socket. */
   private final Socket socket;
   /** Cache. */
@@ -40,7 +39,7 @@ public class BaseXClient {
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
     in = new BufferedInputStream(socket.getInputStream());
-    out = new BufferedOutputStream(socket.getOutputStream());
+    out = socket.getOutputStream();
 
     // receive timestamp
     final String ts = receive();
@@ -53,7 +52,7 @@ public class BaseXClient {
   }
 
   /**
-   * Executes a command and serializes the result to the specified stream.
+   * Executes a command and serializes the result to an output stream.
    * @param cmd command
    * @param o output stream
    * @throws IOException Exception
@@ -152,8 +151,7 @@ public class BaseXClient {
    * @throws IOException I/O exception
    */
   void send(final String s) throws IOException {
-    for(final byte t : s.getBytes()) out.write(t);
-    out.write(0);
+    out.write((s + '\0').getBytes("UTF8"));
   }
 
   /**
