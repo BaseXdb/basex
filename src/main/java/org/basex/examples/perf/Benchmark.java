@@ -25,7 +25,7 @@ public abstract class Benchmark {
   /** Session. */
   private Session session;
   /** Input document. */
-  private String input = "etc/xml/input.xml";
+  private String input = "etc/xml/factbook.xml";
   /** Number of runs. */
   private int runs = 1;
   /** Maximum number of milliseconds to wait for any query. */
