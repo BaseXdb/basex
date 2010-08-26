@@ -110,7 +110,7 @@ public class GFLWOR extends ParseExpr {
     final Iter[] iter = new Iter[fl.length];
     final int vss = ctx.vars.size();
 
-    buildIter(iter, ctx);
+    for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
     
     // evaluate pre grouping tuples
     group.initgroup(fl);
@@ -127,36 +127,6 @@ public class GFLWOR extends ParseExpr {
 
   }
 
-  /**
-   * Builds the iter array.
-   * @param iter iterator
-   * @param ctx querycontext
-   * @throws QueryException exception
-   */
-  private void buildIter(final Iter[] iter, final QueryContext ctx)
-      throws QueryException {
-    // bitmap indicates which grouping variables have been added to iter
-    boolean[] vars = new boolean[fl.length];
-    
-    for(int f = 0; f < group.groupby.length; ++f) { // fill each var with data
-      for(int p = 0; p < fl.length; ++p) {
-        if(fl[p].var.eq(group.groupby[f])) {
-          iter[f] = ctx.iter(fl[p]);
-          vars[p] = true;
-        }
-      } 
-    }
-    for(int f = 0; f < iter.length; ++f) {
-      if(iter[f] != null) continue;
-      for(int p = 0; p < fl.length; ++p) {
-        if(vars[p]) continue;
-        iter[f] = ctx.iter(fl[p]);
-        vars[p] = true;
-        break;
-
-      }
-    }
-  }
 
   /**
    * Performs a recursive iteration on the specified variable position.

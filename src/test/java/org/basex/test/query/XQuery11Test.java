@@ -33,10 +33,10 @@ public final class XQuery11Test extends QueryTest {
     queries = new Object[][] {
         { "FLWOR 1", itr(1), "for $i in (1,1) group by $i return $i"},
         { "FLWOR 2", itr(1, 2), "for $i in (1, 2, 2, 1) group by $i return $i"},
-        { "FLWOR 3", itr(1, 2, 2, 1, 1, 2, 2, 1),
+        { "FLWOR 3", itr(1, 1, 2, 2, 2, 2, 1, 1),
            "for $x in (1, 2, 2, 1) for $y in ('a','a') group by $y return $x "},
         { "FLWOR 3",
-            itr(1, 2, 2, 1, 1, 2, 2, 1, 1, 2, 2, 1),
+            itr(1, 2, 2, 1, 1, 1, 2, 2, 2, 2, 1, 1),
             "for $x in (1, 2, 2, 1) for $y in ('b','a','a') "
              + "group by $y return $x "},
         { "FLWOR group varref",
