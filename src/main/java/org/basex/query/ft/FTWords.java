@@ -238,7 +238,7 @@ public final class FTWords extends FTExpr {
    */
   private byte[] nextStr(final Iter iter) throws QueryException {
     final Item it = iter.next();
-    return it == null ? null : checkStrEmp(it);
+    return it == null ? null : checkEStr(it);
   }
 
   @Override
@@ -266,8 +266,9 @@ public final class FTWords extends FTExpr {
 
     // limit index access to trie version and simple wildcard patterns
     if(fto.is(FTOpt.WC)) {
-      // don't use index if term starts with a wildcard
-      if(!md.wildcards || txt[0] == '.') return false;
+      // don't use index if one of the terms starts with a wildcard
+      if(!md.wildcards || txt[0] == '.' ||
+          Token.contains(txt, new byte[] { ' ', '+' })) return false;
       int d = 0;
       for(final byte w : txt) {
         if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;

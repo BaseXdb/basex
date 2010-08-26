@@ -3,6 +3,7 @@ package org.basex.server;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
+import org.basex.io.BufferInput;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -33,8 +34,9 @@ public final class ClientQuery extends Query {
     try {
       cs.out.write(0);
       cs.send(query);
-      id = cs.receive();
-      if(!cs.ok()) throw new BaseXException(cs.receive());
+      final BufferInput bi = cs.bufIn();
+      id = bi.readString();
+      if(!cs.ok(bi)) throw new BaseXException(bi.readString());
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
@@ -46,8 +48,9 @@ public final class ClientQuery extends Query {
     try {
       cs.out.write(1);
       cs.send(id);
-      next = cs.in.content();
-      if(!cs.ok()) throw new BaseXException(cs.receive());
+      final BufferInput bi = cs.bufIn();
+      next = bi.content();
+      if(!cs.ok(bi)) throw new BaseXException(bi.readString());
       return next.size() != 0;
     } catch(final IOException ex) {
       throw new BaseXException(ex);

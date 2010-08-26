@@ -98,7 +98,7 @@ public final class QNm extends Item {
   }
   
   /**
-   * Checks if the URI of this QName has been set explicitly.
+   * Checks if the URI of this QName has been explicitly set.
    * @return {@code true} if it has been set, {@code false} otherwise
    */
   public boolean hasUri() {

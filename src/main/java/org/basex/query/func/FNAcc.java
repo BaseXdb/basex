@@ -46,9 +46,7 @@ final class FNAcc extends Fun {
         return it == null ? Str.ZERO : it.str() && !it.unt() ? it :
           Str.get(it.atom());
       case NUMBER:
-        final Iter ir = ctx.iter(e);
-        it = ir.next();
-        return it == null || ir.next() != null ? Dbl.NAN : number(it, ctx);
+        return number(ctx.iter(e), ctx);
       case STRLEN:
         return Itr.get(len(checkEStr(e, ctx)));
       case NORM:
@@ -66,19 +64,22 @@ final class FNAcc extends Fun {
 
   /**
    * Converts the specified item to a double.
-   * @param it input item
+   * @param ir iterator
    * @param ctx query context
    * @return double iterator
+   * @throws QueryException query exception
    */
-  private Item number(final Item it, final QueryContext ctx) {
-    final double d = Double.NaN;
-    if(it != null) {
-      try {
-        return it.type == Type.DBL ? it : Type.DBL.e(it, ctx, input);
-      } catch(final QueryException ex) {
-      }
+  private Item number(final Iter ir, final QueryContext ctx)
+      throws QueryException {
+
+    final Item it = ir.next();
+    if(it == null || ir.next() != null) return Dbl.NAN;
+
+    try {
+      return it.type == Type.DBL ? it : Type.DBL.e(it, ctx, input);
+    } catch(final QueryException ex) {
+      return Dbl.NAN;
     }
-    return Dbl.get(d);
   }
 
   @Override

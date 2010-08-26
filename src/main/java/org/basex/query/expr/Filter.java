@@ -6,7 +6,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
-import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
@@ -28,7 +27,7 @@ public class Filter extends Preds {
   /** Expression. */
   Expr root;
   /** Counter flag. */
-  private boolean direct;
+  private boolean offset;
 
   /**
    * Constructor.
@@ -75,18 +74,20 @@ public class Filter extends Preds {
       return new IterFilter(this, pos, last);
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
-    direct = pred.length == 1 && p.type().num() && !p.uses(Use.CTX);
+    offset = pred.length == 1 && p.type().num() && !p.uses(Use.CTX);
 
     return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    if(direct) {
+    if(offset) {
+      // evaluate offset and create position expression
       final Item it = pred[0].ebv(ctx, input);
       final long l = it.itr(input);
       final Expr e = Pos.get(l, l, input);
-      return l != it.dbl(input) || e == Bln.FALSE ? Iter.EMPTY :
+      // don't accept fractional numbers
+      return l != it.dbl(input) || !(e instanceof Pos) ? Iter.EMPTY :
         new IterFilter(this, (Pos) e, false).iter(ctx);
     }
 

@@ -90,10 +90,8 @@ public class IntList extends ElementList {
   /**
    * Pops the uppermost element from the stack.
    * @return the popped element
-   * @throws EmptyStackException if the stack is empty
    */
-  public int pop() {
-    if(size == 0) throw new EmptyStackException();
+  public final int pop() {
     return list[--size];
   }
   
@@ -101,7 +99,7 @@ public class IntList extends ElementList {
    * Pushes an element onto the stack.
    * @param val element
    */
-  public void push(final int val) {
+  public final void push(final int val) {
     add(val);
   }
   
@@ -110,8 +108,7 @@ public class IntList extends ElementList {
    * @return uppermost element
    * @throws EmptyStackException if the stack is empty
    */
-  public int peek() {
-    if(size == 0) throw new EmptyStackException();
+  public final int peek() {
     return list[size - 1];
   }
 

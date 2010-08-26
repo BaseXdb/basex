@@ -60,13 +60,13 @@ final class FNStr extends Fun {
         Item it1 = e.atomic(ctx, input);
         Item it2 = expr[1].atomic(ctx, input);
         if(it1 == null || it2 == null) return null;
-        final int d = diff(checkStrEmp(it1), checkStrEmp(it2));
+        final int d = diff(checkEStr(it1), checkEStr(it2));
         return Itr.get(Math.max(-1, Math.min(1, d)));
       case CODEPNT:
         it1 = e.atomic(ctx, input);
         it2 = expr[1].atomic(ctx, input);
         if(it1 == null || it2 == null) return null;
-        return Bln.get(eq(checkStrEmp(it1), checkStrEmp(it2)));
+        return Bln.get(eq(checkEStr(it1), checkEStr(it2)));
       case STRJOIN:
         return strjoin(ctx);
       case SUBSTR:
@@ -91,17 +91,17 @@ final class FNStr extends Fun {
         if(expr.length == 3) checkColl(expr[2], ctx);
         Item it = expr[1].atomic(ctx, input);
         if(it == null) return Bln.TRUE;
-        return Bln.get(contains(checkEStr(e, ctx), checkStrEmp(it)));
+        return Bln.get(contains(checkEStr(e, ctx), checkEStr(it)));
       case STARTS:
         if(expr.length == 3) checkColl(expr[2], ctx);
         it = expr[1].atomic(ctx, input);
         if(it == null) return Bln.TRUE;
-        return Bln.get(startsWith(checkEStr(e, ctx), checkStrEmp(it)));
+        return Bln.get(startsWith(checkEStr(e, ctx), checkEStr(it)));
       case ENDS:
         if(expr.length == 3) checkColl(expr[2], ctx);
         it = expr[1].atomic(ctx, input);
         if(it == null) return Bln.TRUE;
-        return Bln.get(endsWith(checkEStr(e, ctx), checkStrEmp(it)));
+        return Bln.get(endsWith(checkEStr(e, ctx), checkEStr(it)));
       case SUBAFTER:
         if(expr.length == 3) checkColl(expr[2], ctx);
         final byte[] str = checkEStr(e, ctx);
@@ -149,7 +149,7 @@ final class FNStr extends Fun {
    */
   private Iter str2cp(final Item it) throws QueryException {
     if(it == null) return Iter.EMPTY;
-    final byte[] s = checkStrEmp(it);
+    final byte[] s = checkEStr(it);
 
     return new Iter() {
       int l;
@@ -248,7 +248,7 @@ final class FNStr extends Fun {
     int c = 0;
     Item i;
     while((i = iter.next()) != null) {
-      tb.add(checkStrEmp(i));
+      tb.add(checkEStr(i));
       tb.add(sep);
       c++;
     }

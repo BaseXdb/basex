@@ -47,6 +47,11 @@ final class DOTData {
     { "6666FF", org.basex.query.item.Value.class },
     // violet
     { "9933FF", org.basex.query.expr.CFrag.class },
+    { "9933CC", org.basex.query.expr.And.class },
+    { "9933CC", org.basex.query.expr.Or.class },
+    { "9933CC", org.basex.query.expr.Union.class },
+    { "9933CC", org.basex.query.expr.InterSect.class },
+    { "9933CC", org.basex.query.expr.Except.class },
     { "9933CC", "Then" },
     { "9933CC", "Else" },
     // pink
@@ -59,9 +64,13 @@ final class DOTData {
     { "FF3333", org.basex.query.expr.Arith.class },
     { "FF3333", org.basex.query.expr.CmpG.class },
     { "FF3333", org.basex.query.expr.CmpN.class },
+    { "FF3333", org.basex.query.expr.CmpV.class },
     { "FF3333", org.basex.query.expr.CmpR.class },
+    { "FF3333", org.basex.query.expr.Pos.class },
     { "FF3333", org.basex.query.ft.FTContains.class },
     { "FF6666", org.basex.query.ft.FTExpr.class },
+    { "FF6666", org.basex.query.expr.Try.class },
+    { "FF6666", org.basex.query.expr.Catch.class },
     // orange
     { "AA9988", org.basex.query.expr.Func.class },
     { "776655", org.basex.query.util.Functions.class },
@@ -72,8 +81,12 @@ final class DOTData {
     { "009900", org.basex.query.expr.GFLWOR.class },
     { "339933", org.basex.query.util.VarList.class },
     { "33CC33", org.basex.query.expr.ForLet.class },
+    { "33CC33", org.basex.query.expr.List.class },
+    { "33CC33", org.basex.query.expr.Range.class },
+    { "33CC33", org.basex.query.expr.Context.class },
     { "33CC33", "Return" },
     { "66CC66", org.basex.query.util.Var.class },
+    { "66CC66", org.basex.query.expr.Cast.class },
     // cyan
     { "009999", org.basex.query.expr.FuncCall.class },
     { "00BBBB", org.basex.query.func.Fun.class },

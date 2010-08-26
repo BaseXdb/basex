@@ -65,7 +65,7 @@ final class FNFile extends Fun {
     checkAdmin(ctx);
 
     final File path = expr.length == 0 ? null : new File(
-        string(checkStrEmp(expr[0].atomic(ctx, input))));
+        string(checkEStr(expr[0].atomic(ctx, input))));
 
     switch(def) {
       case MKDIR:

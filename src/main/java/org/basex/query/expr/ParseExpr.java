@@ -238,7 +238,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final byte[] checkStrEmp(final Item it) throws QueryException {
+  protected final byte[] checkEStr(final Item it) throws QueryException {
     if(it == null) return EMPTY;
     if(!it.str() && !it.unt()) Err.type(this, Type.STR, it);
     return it.atom();
@@ -283,7 +283,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a empty sequence.
+   * Checks if the specified item is no empty sequence.
    * @param it item to be checked
    * @return specified item
    * @throws QueryException query exception
@@ -294,7 +294,7 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is a empty sequence.
+   * Checks if the specified item is no empty sequence.
    * @param it item to be checked
    * @param t expected type
    * @return specified item
@@ -316,7 +316,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] checkEStr(final Expr e, final QueryContext ctx)
       throws QueryException {
-    return checkStrEmp(e.atomic(ctx, input));
+    return checkEStr(e.atomic(ctx, input));
   }
 
   /**

@@ -137,6 +137,8 @@ public final class DOTSerializer extends Serializer {
    */
   private void print(final byte[] t, final String col) throws IOException {
     String txt = t.length > 60 ? string(t).substring(0, 60) + "..." : string(t);
+    txt = txt.replaceAll("\"|\\r|\\n", "'");
+    
     if(compact) {
       /*while(txt.matches(".*[A-Z][a-z]+[A-Z].*")) {
         txt = txt.replaceAll("([A-Z])[a-z]+([A-Z])", "$1$2");
@@ -152,6 +154,7 @@ public final class DOTSerializer extends Serializer {
   @Override
   protected byte[] name(final ExprInfo expr) {
     color = DOTData.color(expr);
+    if(color == null) System.out.println(expr.getClass());
     return token(DOTData.name(expr));
   }
 }

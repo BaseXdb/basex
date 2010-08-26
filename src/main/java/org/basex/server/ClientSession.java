@@ -41,7 +41,7 @@ public final class ClientSession extends Session {
   /** Output stream. */
   final PrintOutput out;
   /** Input stream. */
-  final BufferInput in;
+  final InputStream in;
 
   /**
    * Constructor, specifying the database context and the
@@ -71,10 +71,11 @@ public final class ClientSession extends Session {
     // 5 seconds timeout
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
-    in = new BufferInput(socket.getInputStream());
+    in = socket.getInputStream();
 
     // receive timestamp
-    final String ts = receive();
+    final BufferInput bi = bufIn();
+    final String ts = bi.readString();
 
     // send user name and hashed password/timestamp
     out = new PrintOutput(new BufferedOutputStream(socket.getOutputStream()));
@@ -83,7 +84,7 @@ public final class ClientSession extends Session {
     out.flush();
 
     // receive success flag
-    if(!ok()) throw new LoginException();
+    if(!ok(bi)) throw new LoginException();
   }
 
   @Override
@@ -92,10 +93,11 @@ public final class ClientSession extends Session {
 
     try {
       send(cmd);
+      final BufferInput bi = bufIn();
       int l;
-      while((l = in.read()) != 0) o.write(l);
-      info = receive();
-      if(!ok()) throw new BaseXException(info);
+      while((l = bi.read()) != 0) o.write(l);
+      info = bi.readString();
+      if(!ok(bi)) throw new BaseXException(info);
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
@@ -118,8 +120,9 @@ public final class ClientSession extends Session {
       while((l = input.read()) != -1) out.write(l);
       out.write(0);
       out.flush();
-      info = receive();
-      if(!ok()) throw new BaseXException(info);
+      final BufferInput bi = bufIn();
+      info = bi.readString();
+      if(!ok(bi)) throw new BaseXException(info);
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
@@ -148,20 +151,21 @@ public final class ClientSession extends Session {
   }
 
   /**
-   * Returns the next received string.
-   * @return String result or info
+   * Returns a new buffer input instance.
+   * @return buffer input
    * @throws IOException I/O exception
    */
-  String receive() throws IOException {
-    return in.readString();
+  BufferInput bufIn() throws IOException {
+    return new BufferInput(in);
   }
 
   /**
-   * Returns the next success flag.
+   * Checks the next success flag.
+   * @param bi buffer input
    * @return value of check
-   * @throws IOException Exception
+   * @throws IOException I/O exception
    */
-  boolean ok() throws IOException {
-    return in.read() == 0;
+  boolean ok(final BufferInput bi) throws IOException {
+    return bi.read() == 0;
   }
 }

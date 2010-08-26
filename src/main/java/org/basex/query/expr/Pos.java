@@ -38,7 +38,7 @@ public final class Pos extends Simple {
   }
 
   /**
-   * Returns an position or an optimized expression.
+   * Returns a position expression, or an optimized boolean item.
    * @param mn minimum value
    * @param mx minimum value
    * @param ii input info

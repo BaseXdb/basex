@@ -122,7 +122,7 @@ final class FNId extends Fun {
       Nod at;
       while((at = atts.next()) != null) {
         if(eq(at.qname().atom(), LANG)) {
-          final byte[] ln = lc(norm(checkStrEmp(at)));
+          final byte[] ln = lc(norm(checkEStr(at)));
           return Bln.get(startsWith(ln, lang)
               && (lang.length == ln.length || ln[lang.length] == '-'));
         }
@@ -141,7 +141,7 @@ final class FNId extends Fun {
     final TokenList tl = new TokenList();
     Item id;
     while((id = iter.next()) != null) {
-      for(final byte[] i : split(norm(checkStrEmp(id)), ' ')) tl.add(i);
+      for(final byte[] i : split(norm(checkEStr(id)), ' ')) tl.add(i);
     }
     return tl.toArray();
   }
@@ -161,7 +161,7 @@ final class FNId extends Fun {
     while((att = ni.next()) != null) {
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
-        if(!eq(checkStrEmp(att), id)) continue;
+        if(!eq(checkEStr(att), id)) continue;
         final byte[] nm = lc(att.qname().atom());
         if(contains(nm, ID) && !contains(nm, IDREF)) nb.add(nod);
       }
@@ -185,7 +185,7 @@ final class FNId extends Fun {
     while((att = ni.next()) != null) {
       // [CG] XQuery: ID-IDREF Parsing
       for(final byte[] id : ids) {
-        if(!eq(checkStrEmp(att), id)) continue;
+        if(!eq(checkEStr(att), id)) continue;
         final byte[] nm = lc(att.qname().atom());
         if(contains(nm, IDREF)) nb.add(att.finish());
       }

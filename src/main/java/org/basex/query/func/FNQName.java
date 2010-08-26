@@ -76,16 +76,16 @@ final class FNQName extends Fun {
         nm = (QNm) checkType(it, Type.QNM);
         return !nm.ns() ? null : new NCN(nm.pref(), input);
       case NSURIPRE:
-        final byte[] pre = checkStrEmp(it);
+        final byte[] pre = checkEStr(it);
         final Atts at = ((Nod) checkType(it2, Type.ELM)).nsScope();
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:
         if(it == null) return null;
-        final Uri rel = Uri.uri(checkStrEmp(it));
+        final Uri rel = Uri.uri(checkEStr(it));
         if(!rel.valid()) Err.or(input, URIINV, it);
 
-        final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkStrEmp(it2));
+        final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkEStr(it2));
         if(!base.valid()) Err.or(input, URIINV, base);
         return base.resolve(rel);
       default:
@@ -104,7 +104,7 @@ final class FNQName extends Fun {
   private Item resolve(final QueryContext ctx, final Item q, final Item it)
       throws QueryException {
 
-    final byte[] name = trim(checkStrEmp(q));
+    final byte[] name = trim(checkEStr(q));
     if(!XMLToken.isQName(name)) Err.value(input, Type.QNM, q);
 
     final QNm nm = new QNm(name);

@@ -172,7 +172,7 @@ final class FNGen extends Fun {
    */
   private Nod doc(final QueryContext ctx) throws QueryException {
     final Item it = expr[0].atomic(ctx, input);
-    return it == null ? null : ctx.doc(checkStrEmp(it), false, false, input);
+    return it == null ? null : ctx.doc(checkEStr(it), false, false, input);
   }
 
   /**

@@ -92,7 +92,6 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @throws EmptyStackException if the stack is empty
    */
   public byte[] pop() {
-    if(size == 0) throw new EmptyStackException();
     return list[--size];
   }
   
@@ -110,7 +109,6 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
    * @throws EmptyStackException if the stack is empty
    */
   public byte[] peek() {
-    if(size == 0) throw new EmptyStackException();
     return list[size - 1];
   }
 
