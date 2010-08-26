@@ -117,6 +117,7 @@ public final class TreeView extends View implements TreeViewOptions {
   @Override
   public void refreshMark() {
     markNodes();
+    refreshedFocus = true;
     repaint();
   }
 
