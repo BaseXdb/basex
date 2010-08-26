@@ -2,11 +2,16 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+import java.util.HashMap;
+
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.expr.GroupPartition.GroupNode;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
+import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -20,7 +25,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class Group extends ParseExpr {
   /** Group by specification. */
-  private final Var[] groupby;
+  final Var[] groupby;
   /** Grouping partition. **/
   GroupPartition gp;
 
@@ -101,5 +106,37 @@ public final class Group extends ParseExpr {
    */
   public void add(final QueryContext ctx) throws QueryException {
     gp.add(ctx);
+  }
+
+  /**
+   * Returns grouped variables.
+   * @param ctx context.
+   * @param ir sequence to be filled.
+   * @param ret return expression
+   * @throws QueryException on error.
+   */
+  void ret(final QueryContext ctx, final ItemIter ir, final Expr ret)
+      throws QueryException {
+    final Var[] pgvars = new Var[gp.gv.length];
+    final Var[] pgngvar = new Var[gp.ngv.length];
+    for(int j = 0; j <  gp.gv.length; ++j)
+      pgvars[j] = ctx.vars.get(gp.gv[j]);
+    for(int j = 0; j <  gp.ngv.length; ++j)
+      pgngvar[j] = ctx.vars.get(gp.ngv[j]);
+  
+    for(int i = 0; i < gp.partitions.size(); ++i) { // bind grouping var
+      final HashMap<Var, ItemIter> ngvars = gp.items.get(i);
+      final GroupNode gn =  gp.partitions.get(i);
+      for(int j = 0; j < gp.gv.length; ++j)
+        pgvars[j].bind(gn.its[j], ctx);
+  
+      for(int j = 0; j < gp.ngv.length; ++j) {
+        final ItemIter its = ngvars.get(gp.ngv[j]);
+        if(its != null)
+        pgngvar[j].bind(its.finish(), ctx);
+        else pgngvar[j].bind(Empty.SEQ, ctx);
+      }
+      ir.add(ctx.iter(ret));
+    }
   }
 }

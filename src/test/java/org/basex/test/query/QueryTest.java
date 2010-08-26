@@ -141,8 +141,10 @@ public abstract class QueryTest {
    * @param d double value
    * @return iterator
    */
-  static ItemIter itr(final long d) {
-    return item(Itr.get(d));
+  static ItemIter itr(final long... d) {
+    final ItemIter ii = new ItemIter();
+    for(final long dd : d) ii.add(Itr.get(dd));
+    return ii;
   }
 
   /**

@@ -39,7 +39,6 @@ final class GroupPartition {
   GroupPartition(final Var[] gv1, final Var[] fl1) {
     gv = gv1;
     ngv = new Var[fl1.length - gv.length];
-    GroupNode.varlen = gv.length;
     int i = 0;
     for(final Var v : fl1) {
       boolean skip = false;
@@ -72,12 +71,12 @@ final class GroupPartition {
     for(int i = 0; i < gv.length; ++i) {
       final Value val = ctx.vars.get(gv[i]).value(ctx);
       if(val.item()) its[i] = (Item) val;
-      else throw new QueryException(null, null); // [MS]  [err:XQDY0095].
+      else throw new QueryException(null, null); // [MS] [err:XQDY0095].
     }
 
     boolean found = false;
     int p = 0;
-    final GroupNode cand = new GroupNode(its);
+    final GroupNode cand = new GroupNode(its, gv.length);
     final Integer chash = cand.hashCode();
 
     if(hashes.containsKey(chash)) {
@@ -121,8 +120,6 @@ final class GroupPartition {
       if(sq.get(ngv[i]) == null) sq.put(ngv[i], new ItemIter());
       final Value v = ngv[i].value(ctx);
       if(v.item()) {
-        // [MS] cache ctx.vars here to obtain them only once and not in
-        // each run.
         sq.get(ngv[i]).add((Item) v);
       }
     }
@@ -148,7 +145,7 @@ final class GroupPartition {
     /** List of grouping var items. */
     final Item[] its;
     /** Length of grouping variables. */
-    static int varlen;
+    int varlen;
     /** Hashes for the group representative values.
      *  N.B. long instead of int */
     final int hash;
@@ -157,9 +154,11 @@ final class GroupPartition {
     /**
      * Creates a group node.
      * @param is grouping var items
+     * @param vl # of grouping vars
      */
-    public GroupNode(final Item[] is) {
+    public GroupNode(final Item[] is, final int vl) {
       its = is;
+      varlen = vl;
 
       final long[] hhs = new long[is.length];
       for(int i = 0; i < varlen; ++i) {

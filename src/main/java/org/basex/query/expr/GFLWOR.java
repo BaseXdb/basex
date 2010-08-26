@@ -3,13 +3,10 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import java.util.HashMap;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.GroupPartition.GroupNode;
 import org.basex.query.item.Empty;
-import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
@@ -24,7 +21,7 @@ import org.basex.util.InputInfo;
  */
 public class GFLWOR extends ParseExpr {
   /** Expression list. */
-  private Expr ret;
+  Expr ret;
   /** For/Let expressions. */
   private final ForLet[] fl;
   /** Where expression. */
@@ -110,83 +107,79 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final HashMap<Var, ItemIter> cache = new HashMap<Var, ItemIter>();
     final Iter[] iter = new Iter[fl.length];
+    final int vss = ctx.vars.size();
 
-    // store pointers to the cached results here.
-    for(int f = 0; f < fl.length; ++f) { // fill each var with data
-      iter[f] = ctx.iter(fl[f]);
-      if(group != null) cache.put(fl[f].var, new ItemIter());
-    }
-
+    buildIter(iter, ctx);
+    
     // evaluate pre grouping tuples
     group.initgroup(fl);
-    iter(ctx, cache, iter, 0);
+    iter(ctx, iter, 0);
+    ctx.vars.reset(vss);
 
     final int vs = ctx.vars.size();
     for(final ForLet aFl : fl) ctx.vars.add(aFl.var);
 
     final ItemIter ir = new ItemIter();
-    retG(ctx, ir);
+    group.ret(ctx, ir, ret);
     ctx.vars.reset(vs);
     return ir;
 
   }
 
   /**
-   * Returns grouped variables.
-   * @param ctx context.
-   * @param ir sequence to be filled.
-   * @throws QueryException on error.
+   * Builds the iter array.
+   * @param iter iterator
+   * @param ctx querycontext
+   * @throws QueryException exception
    */
-  private void retG(final QueryContext ctx, final ItemIter ir)
+  private void buildIter(final Iter[] iter, final QueryContext ctx)
       throws QueryException {
-    final Var[] pgvars = new Var[group.gp.gv.length];
-    final Var[] pgngvar = new Var[group.gp.ngv.length];
-    for(int j = 0; j <  group.gp.gv.length; ++j)
-      pgvars[j] = ctx.vars.get(group.gp.gv[j]);
-    for(int j = 0; j <  group.gp.ngv.length; ++j)
-      pgngvar[j] = ctx.vars.get(group.gp.ngv[j]);
+    // bitmap indicates which grouping variables have been added to iter
+    boolean[] vars = new boolean[fl.length];
+    
+    for(int f = 0; f < group.groupby.length; ++f) { // fill each var with data
+      for(int p = 0; p < fl.length; ++p) {
+        if(fl[p].var.eq(group.groupby[f])) {
+          iter[f] = ctx.iter(fl[p]);
+          vars[p] = true;
+        }
+      } 
+    }
+    for(int f = 0; f < iter.length; ++f) {
+      if(iter[f] != null) continue;
+      for(int p = 0; p < fl.length; ++p) {
+        if(vars[p]) continue;
+        iter[f] = ctx.iter(fl[p]);
+        vars[p] = true;
+        break;
 
-    for(int i = 0; i < group.gp.partitions.size(); ++i) { // bind grouping var
-      final HashMap<Var, ItemIter> ngvars = group.gp.items.get(i);
-      final GroupNode gn =  group.gp.partitions.get(i);
-      for(int j = 0; j < group.gp.gv.length; ++j)
-        pgvars[j].bind(gn.its[j], ctx);
-
-      for(int j = 0; j < group.gp.ngv.length; ++j) {
-        final ItemIter its = ngvars.get(group.gp.ngv[j]);
-        if(its != null)
-        pgngvar[j].bind(its.finish(), ctx);
-        else pgngvar[j].bind(Empty.SEQ, ctx);
       }
-      ir.add(ctx.iter(ret));
     }
   }
 
   /**
    * Performs a recursive iteration on the specified variable position.
    * @param ctx root reference
-   * @param cache cached items
    * @param it iterator
    * @param p variable position
    * @throws QueryException query exception
    */
   private void iter(final QueryContext ctx,
-      final HashMap<Var, ItemIter> cache, final Iter[] it, final int p)
+       final Iter[] it, final int p)
       throws QueryException {
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {
       if(more) {
-        iter(ctx, cache, it, p + 1);
+        iter(ctx, it, p + 1);
       } else {
         if(where == null || where.ebv(ctx, input).bool(input)) {
-          for(final ForLet aFl : fl) {
-            if(order != null) {
-              // [MS] check if values are always single items (and no sequences)
-              cache.get(aFl.var).add((Item) ctx.vars.get(aFl.var).value(ctx));
-            }
-          }
+//          for(final ForLet aFl : fl) {
+//            if(order != null) {
+//            [MS] check if values are always single items (and no sequences)
+//            cache.get(aFl.var).add((Item) ctx.vars.get(aFl.var).value(ctx));
+//            }
+//          }
           if(group != null) group.add(ctx);
           if(order != null) order.add(ctx);
         }
