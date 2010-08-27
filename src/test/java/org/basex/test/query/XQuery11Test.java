@@ -35,19 +35,17 @@ public final class XQuery11Test extends QueryTest {
         { "FLWOR 2", itr(1, 2), "for $i in (1, 2, 2, 1) group by $i return $i"},
         { "FLWOR 3", itr(1, 1, 2, 2, 2, 2, 1, 1),
            "for $x in (1, 2, 2, 1) for $y in ('a','a') group by $y return $x "},
-        { "FLWOR 3",
-            itr(1, 2, 2, 1, 1, 1, 2, 2, 2, 2, 1, 1),
-            "for $x in (1, 2, 2, 1) for $y in ('b','a','a') "
-             + "group by $y return $x "},
-        { "FLWOR group varref",
-               itr(2, 1),
-               "for $x in (2,1) let $y:=($x+1) group by $y return $x"
-        }
-    // *TODO*
-    
+        { "FLWOR 4", itr(1, 2, 1, 1, 2, 2),
+           "for $x in (1, 2) for $y in ('b','a','a') group by $y return $x "},
+        { "FLWOR group varref", itr(2, 1),
+           "for $x in (2,1) let $y:=($x+1) group by $y return $x"},
+        { "GFLWOR varref ordered", itr(1, 2),
+           "for $x in (2,1) let $y:=($x+1) group by $y order by $y return $x"},
+        { "FLWOR Err 1", "let $x := (1,2) group by $x return $x" },
+        { "FLWOR Err 2", "let $x := (1,2) group by $z return $x"},
+
     };
   }
-
   /* TABLE REPRESENTATION
   PRE PAR  TYPE  CONTENT
     0  -1  DOC   test.xml

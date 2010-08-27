@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryText;
 import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
@@ -28,6 +29,10 @@ final class GroupPartition {
   /** HashValue, Position. */
   private final HashMap<Integer, IntList> hashes =
     new HashMap<Integer, IntList>();
+  /** Order by specifier. */
+  final Order order;
+  /** ordering among groups. *TODO* */
+  final boolean among;
   /** flag indicates variable caching. */
   private boolean cachedVars;
 
@@ -37,10 +42,25 @@ final class GroupPartition {
    * @param fl1 ForLet Variables
    */
   GroupPartition(final Var[] gv1, final Var[] fl1) {
-    gv = gv1;
-    ngv = new Var[fl1.length - gv.length];
+    this(gv1, fl1, null);
+  }
+
+  /**
+   * Sets up an empty partitioning.
+   * Sets up the ordering scheme. 
+   * [MS] *TODO* Order by so far only orders
+   * by grouping variables, non grouping variables are silently ignored
+   * in most cases where an XPTY0004 (no sequences allowed as sort keys) should
+   * be thrown. 
+   * @param gvs grouping vars
+   * @param fls ForLet Variables
+   * @param ob OrderBy specifier.
+   */
+  public GroupPartition(final Var[] gvs, final Var[] fls, final Order ob) {
+    gv = gvs;
+    ngv = new Var[fls.length - gv.length];
     int i = 0;
-    for(final Var v : fl1) {
+    for(final Var v : fls) {
       boolean skip = false;
       for(final Var g : gv)
         if(v.eq(g)) {
@@ -52,6 +72,8 @@ final class GroupPartition {
     }
     partitions = new ArrayList<GroupNode>();
     items = new ArrayList<HashMap<Var, ItemIter>>();
+    order = ob;
+    among = false;
   }
 
   /**
@@ -71,9 +93,8 @@ final class GroupPartition {
     for(int i = 0; i < gv.length; ++i) {
       final Value val = ctx.vars.get(gv[i]).value(ctx);
       if(val.item()) its[i] = (Item) val;
-      else throw new QueryException(null, null); // [MS] [err:XQDY0095].
+      else throw new QueryException(null, QueryText.XGRP); 
     }
-
     boolean found = false;
     int p = 0;
     final GroupNode cand = new GroupNode(its, gv.length);
@@ -90,6 +111,7 @@ final class GroupPartition {
       }
     }
      if(!found) {
+      if(order != null) order.add(ctx);
       p = partitions.size();
       partitions.add(cand);
       final IntList pos = hashes.get(chash) != null ?

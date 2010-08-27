@@ -9,7 +9,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
-import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -113,15 +112,15 @@ public class GFLWOR extends ParseExpr {
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
     
     // evaluate pre grouping tuples
-    group.initgroup(fl);
+    group.initgroup(fl, order);
     iter(ctx, iter, 0);
     ctx.vars.reset(vss);
 
     final int vs = ctx.vars.size();
     for(final ForLet aFl : fl) ctx.vars.add(aFl.var);
 
-    final ItemIter ir = new ItemIter();
-    group.ret(ctx, ir, ret);
+//    final ItemIter ir = new ItemIter();
+    final Iter ir = group.ret(ctx, ret);
     ctx.vars.reset(vs);
     return ir;
 
@@ -144,14 +143,7 @@ public class GFLWOR extends ParseExpr {
         iter(ctx, it, p + 1);
       } else {
         if(where == null || where.ebv(ctx, input).bool(input)) {
-//          for(final ForLet aFl : fl) {
-//            if(order != null) {
-//            [MS] check if values are always single items (and no sequences)
-//            cache.get(aFl.var).add((Item) ctx.vars.get(aFl.var).value(ctx));
-//            }
-//          }
           if(group != null) group.add(ctx);
-          if(order != null) order.add(ctx);
         }
       }
     }
