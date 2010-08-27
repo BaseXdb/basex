@@ -13,7 +13,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
-import org.basex.query.item.Uri;
 import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.Atts;
@@ -62,8 +61,7 @@ public final class CElem extends CFrag {
    */
   private void addNS(final QueryContext ctx) throws QueryException {
     for(int n = nsp.size - 1; n >= 0; n--) {
-      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]),
-          Uri.uri(nsp.val[n])), input);
+      ctx.ns.add(new QNm(concat(XMLNSC, nsp.key[n]), nsp.val[n]), input);
     }
   }
 

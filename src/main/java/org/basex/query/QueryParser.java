@@ -1500,8 +1500,7 @@ public class QueryParser extends InputParser {
         }
         // name test "pre:*"
         if(consume('*')) {
-          final QNm nm = new QNm(EMPTY,
-              Uri.uri(ctx.ns.uri(name, false, input())));
+          final QNm nm = new QNm(EMPTY, ctx.ns.uri(name, false, input()));
           return new NameTest(nm, NameTest.Kind.NS, att, input());
         }
       }
@@ -1758,7 +1757,7 @@ public class QueryParser extends InputParser {
         if(!simple) error(NSCONS);
         final byte[] v = attv.length == 0 ? EMPTY : ((Str) attv[0]).atom();
         if(v.length == 0) error(NSEMPTYURI);
-        final QNm nsd = new QNm(atn, Uri.uri(v));
+        final QNm nsd = new QNm(atn, v);
         final byte[] pref = nsd.ln();
         if(!eq(pref, XML) || !eq(v, XMLURI)) {
           ctx.ns.add(nsd, input());

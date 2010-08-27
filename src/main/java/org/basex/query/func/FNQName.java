@@ -58,15 +58,15 @@ final class FNQName extends Fun {
       case RESQNAME:
         return it == null ? null : resolve(ctx, it, checkEmpty(it2));
       case QNAME:
-        final Uri uri = Uri.uri(it == null ? EMPTY :
-          checkType(it, Type.STR).atom());
+        final byte[] uri = it == null ? EMPTY :
+          checkType(it, Type.STR).atom();
         final Item it3 = it2 == null ? Str.ZERO : checkType(it2, Type.STR);
         final byte[] atm = it3.atom();
-        final byte[] str = !contains(atm, ':') && eq(uri.atom(), XMLURI)
+        final byte[] str = !contains(atm, ':') && eq(uri, XMLURI)
             ? concat(XMLC, atm) : atm;
         if(!XMLToken.isQName(str)) Err.value(input, Type.QNM, it3);
         QNm nm = new QNm(str, uri);
-        if(nm.ns() && uri == Uri.EMPTY) Err.value(input, Type.URI, uri);
+        if(nm.ns() && uri.length == 0) Err.value(input, Type.URI, nm.uri());
         return nm;
       case LOCNAMEQNAME:
         if(it == null) return null;

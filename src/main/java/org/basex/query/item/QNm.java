@@ -66,11 +66,21 @@ public final class QNm extends Item {
   }
 
   /**
+   * Constructor.
+   * @param n name
+   * @param u uri
+   */
+  public QNm(final byte[] n, final byte[] u) {
+    this(n);
+    uri(u);
+  }
+
+  /**
    * Convenience method for converting a Java QName.
    * @param qn qname
    */
   public QNm(final QName qn) {
-    this(token(qname(qn)), Uri.uri(token(qn.getNamespaceURI())));
+    this(token(qname(qn)), token(qn.getNamespaceURI()));
   }
 
   /**

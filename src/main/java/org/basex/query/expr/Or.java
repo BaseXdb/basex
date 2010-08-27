@@ -74,15 +74,20 @@ public final class Or extends Logical {
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     int is = 0;
     Expr[] exprs = {};
+    boolean ia = true;
     for(final Expr e : expr) {
-      if(!e.indexAccessible(ic) || ic.seq) return false;
-      is += ic.costs;
-      // add only expressions that yield results
-      if(ic.costs != 0) exprs = Array.add(exprs, e);
+      if(e.indexAccessible(ic) && !ic.seq) {
+        // skip expressions without results
+        if(ic.costs == 0) continue;
+        is += ic.costs;
+      } else {
+        ia = false;
+      }
+      exprs = Array.add(exprs, e);
     }
     ic.costs = is;
     expr = exprs;
-    return true;
+    return ia;
   }
 
   @Override

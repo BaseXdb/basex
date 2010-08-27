@@ -97,8 +97,7 @@ public final class FElem extends FNode {
 
     // general stuff
     final String nu = elem.getNamespaceURI();
-    name = new QNm(token(elem.getNodeName()),
-        Uri.uri(nu == null ? EMPTY : token(nu)));
+    name = new QNm(token(elem.getNodeName()), nu == null ? EMPTY : token(nu));
     par = p;
     final String b = elem.getBaseURI();
     base = b == null ? EMPTY : token(b);

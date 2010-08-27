@@ -10,7 +10,6 @@ import org.basex.query.item.FPI;
 import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Uri;
 import org.basex.query.iter.NodIter;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
@@ -53,7 +52,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXAttr createAttributeNS(final String uri, final String qn) {
-    final QNm name = new QNm(token(qn), Uri.uri(token(uri)));
+    final QNm name = new QNm(token(qn), token(uri));
     return new BXAttr(new FAttr(name, EMPTY, null));
   }
 
@@ -80,7 +79,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXElem createElementNS(final String uri, final String qn) {
-    final QNm name = new QNm(token(qn), Uri.uri(token(uri)));
+    final QNm name = new QNm(token(qn), token(uri));
     return new BXElem(new FElem(name, node.base()));
   }
 

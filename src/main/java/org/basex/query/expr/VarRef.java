@@ -7,7 +7,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Var;
@@ -44,21 +43,20 @@ public final class VarRef extends ParseExpr {
     if(e == null) return this;
 
     // pre-assign static variables
-    final Namespaces lc = ctx.ns;
-    ctx.ns = lc.copy();
-    if(ctx.nsElem.length != 0)
-      ctx.ns.add(new QNm(EMPTY, Uri.uri(ctx.nsElem)), input);
+    final Namespaces ns = ctx.ns;
+    ctx.ns = ns.copy();
+    if(ctx.nsElem.length != 0) ctx.ns.add(new QNm(EMPTY, ctx.nsElem), input);
 
     /* Choose variables to be pre-evaluated.
      * If a variable is pre-evaluated, it may not be available for further
-     * optimizations (index access, count, ...). On the other hand, multiple
-     * evaluations of the same expression are avoided. */
-    if(var.global || ctx.nsElem.length != 0 || lc.size() != 0 ||
+     * optimizations (index access, count, ...). On the other hand, repeated
+     * evaluation of the same expression is avoided. */
+    if(var.global || ctx.nsElem.length != 0 || ns.size() != 0 ||
         var.type != null || e.uses(Use.FRG) || e instanceof FuncCall) {
       e = var.value(ctx);
     }
 
-    ctx.ns = lc;
+    ctx.ns = ns;
     return e;
   }
 

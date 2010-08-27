@@ -66,8 +66,9 @@ public class FLWOR extends ParseExpr {
         // expression will be wrapped by a boolean function
         // if the result is numeric
         for(int p = 0; p < pr.length; p++) {
-          if(pr[p].type().mayBeNum())
+          if(pr[p].type().mayBeNum()) {
             pr[p] = FunDef.BOOLEAN.newInstance(input, pr[p]);
+          }
         }
 
         // attach predicates to axis path, or create a filter
@@ -117,7 +118,7 @@ public class FLWOR extends ParseExpr {
       return Empty.SEQ;
     }
 
-    // remove inlined variable declarations
+    // remove declarations of statically bound variables
     for(int f = 0; f != fl.length; ++f) {
       if(fl[f].var.expr() != null) {
         ctx.compInfo(OPTVAR, fl[f].var);

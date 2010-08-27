@@ -122,6 +122,10 @@ public final class SimpleTest extends QueryTest {
       { "Index 3", nod(5), "for $a in //title where $a = 'XML' return $a" },
       { "Index 4", nod(5), "for $a in //* where $a/text() = 'XML' return $a" },
       { "Index 5", nod(3, 5), "for $a in //* where $a = 'XML' return $a" },
+      { "Index 6", nod(5), "//*[text() = 'XML' and text()]" },
+      { "Index 7", nod(), "//*[text() = 'XM' and text()]" },
+      { "Index 8", nod(5), "//title[text() = 'XML' or text()]" },
+      { "Index 9", nod(5), "//title[text() = 'XM' or text()]" },
 
       { "ExtVar 1", itr(1), "declare variable $a external; 1" },
       { "ExtVar 2", "declare variable $a external; $a" },
