@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import org.basex.core.Main;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -78,6 +79,13 @@ public class Str extends Item {
   @Override
   public SeqType type() {
     return SeqType.STR;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof Str)) return false;
+    final Str i = (Str) cmp;
+    return type == i.type && Token.eq(val, i.val);
   }
 
   @Override

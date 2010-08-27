@@ -290,7 +290,7 @@ public final class TreeView extends View implements TreeViewOptions {
    */
   private int getRealBigRectangleHeight(final int px) {
     final int p = getRealBigRectRootsPerPixel(px);
-    int pp = px / 2 * p;
+    final int pp = px / 2 * p;
 
     int maxHeight = 0;
     for(int i = pp; i < pp + p; ++i) {

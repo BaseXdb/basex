@@ -234,7 +234,7 @@ public abstract class Serializer {
   public final int level() {
     return tags.size();
   }
-  
+
   /**
    * Gets the URI currently bound by the given prefix.
    * @param pre namespace prefix

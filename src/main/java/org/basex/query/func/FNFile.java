@@ -1,7 +1,6 @@
 package org.basex.query.func;
 
 import static org.basex.util.Token.*;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -12,7 +11,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.regex.PatternSyntaxException;
-
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;

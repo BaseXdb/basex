@@ -44,7 +44,7 @@ final class FNMath extends Fun {
   }
 
   @Override
-  public boolean xquery11() {
-    return true;
+  public boolean uses(final Use u) {
+    return u == Use.X11 || super.uses(u);
   }
 }

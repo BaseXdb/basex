@@ -44,26 +44,26 @@ public final class TypeSwitch extends ParseExpr {
     for(int i = 0; i < cs.length; ++i) tmp[i] = cs[i].expr;
     checkUp(ctx, tmp);
 
-    for(final TypeCase c : cs) c.comp(ctx);
-    boolean ii = true;
-    for(final TypeCase c : cs) ii &= c.empty();
-    if(ii) return optPre(Empty.SEQ, ctx);
-
-    // pre-evaluate typeswitch
-    Expr e = this;
+    // static condition: return branch in question
     if(ts.value()) {
       for(final TypeCase c : cs) {
-        if(c.var.type == null || c.var.type.instance(ts.iter(ctx))) {
-          e = c.comp(ctx, (Value) ts).expr;
-          break;
-        }
+        if(c.var.type == null || c.var.type.instance(ts.iter(ctx)))
+          return optPre(c.comp(ctx, (Value) ts).expr, ctx);
       }
     }
+
+    // compile branches
+    for(final TypeCase c : cs) c.comp(ctx);
+
+    // return result if all branches are equal (e.g., empty)
+    boolean eq = true;
+    for(int i = 1; i < cs.length; ++i) eq &= cs[i - 1].expr.sameAs(cs[i].expr);
+    if(eq) return optPre(Empty.SEQ, ctx);
 
     // evaluate return type
     type = cs[0].type();
     for(int l = 1; l < cs.length; ++l) type = type.intersect(cs[l].type());
-    return optPre(e, ctx);
+    return this;
   }
 
   @Override

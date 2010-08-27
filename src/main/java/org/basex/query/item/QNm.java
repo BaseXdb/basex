@@ -78,7 +78,7 @@ public final class QNm extends Item {
    * @param u the uri to set
    */
   public void uri(final Uri u) {
-    this.uri = u;
+    uri = u;
   }
 
   /**

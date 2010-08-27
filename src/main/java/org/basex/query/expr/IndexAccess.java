@@ -98,11 +98,6 @@ public final class IndexAccess extends Single {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof IndexAccess;
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, DATA, token(ictx.data.meta.name),
         TYPE, token(ind.toString()));

@@ -1,7 +1,6 @@
 package org.basex.core;
 
 import java.util.HashMap;
-
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
 

@@ -51,7 +51,7 @@ public final class DialogExport extends Dialog {
     final SortedMap<String, Charset> cs = Charset.availableCharsets();
     ENCODINGS = cs.keySet().toArray(new String[cs.size()]);
   }
-  
+
   /**
    * Default constructor.
    * @param main reference to the main window

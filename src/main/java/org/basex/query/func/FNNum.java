@@ -48,11 +48,6 @@ public final class FNNum extends Fun {
     }
   }
 
-  @Override
-  public boolean xquery11() {
-    return def == FunDef.RND && expr.length == 2;
-  }
-
   /**
    * Returns a rounded item.
    * @param it input item
@@ -143,5 +138,12 @@ public final class FNNum extends Fun {
       case FLT: return Flt.get((float) d);
       default:  return Itr.get((long) d);
     }
+  }
+
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.X11 && def == FunDef.RND && expr.length == 2 ||
+      super.uses(u);
   }
 }

@@ -133,7 +133,7 @@ final class GroupPartition {
     for(int i = 0; i < ngv.length; ++i) {
       ngv[i] = ctx.vars.get(ngv[i]);
     }
-    this.cachedVars = true;
+    cachedVars = true;
 
   }
   /**

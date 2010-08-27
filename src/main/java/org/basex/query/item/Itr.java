@@ -3,6 +3,7 @@ package org.basex.query.item;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -15,8 +16,10 @@ import org.basex.util.Token;
 public class Itr extends Item {
   /** Constant values. */
   private static final Itr[] NUMS = { new Itr(0), new Itr(1), new Itr(2),
-    new Itr(3), new Itr(4), new Itr(5), new Itr(6), new Itr(7),
-    new Itr(8), new Itr(9) };
+    new Itr(3), new Itr(4), new Itr(5), new Itr(6), new Itr(7), new Itr(8),
+    new Itr(9), new Itr(10), new Itr(11), new Itr(12), new Itr(13), new Itr(14),
+    new Itr(15), new Itr(16), new Itr(17), new Itr(18), new Itr(19), new Itr(20)
+  };
   /** Integer value. */
   private final long val;
 
@@ -52,7 +55,7 @@ public class Itr extends Item {
    * @return instance
    */
   public static Itr get(final long v) {
-    return v >= 0 && v <= 9 ? NUMS[(int) v] : new Itr(v);
+    return v >= 0 && v <= 19 ? NUMS[(int) v] : new Itr(v);
   }
 
   /**
@@ -135,6 +138,13 @@ public class Itr extends Item {
   @Override
   public final int hashCode() {
     return (int) val;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof Itr)) return false;
+    final Itr i = (Itr) cmp;
+    return type == i.type && val == i.val;
   }
 
   /**

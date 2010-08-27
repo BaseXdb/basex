@@ -69,11 +69,6 @@ final class FNPat extends Fun {
     }
   }
 
-  @Override
-  public boolean xquery11() {
-    return def == FunDef.ANALZYE;
-  }
-
   /**
    * Evaluates the match function.
    * @param val input value
@@ -136,7 +131,7 @@ final class FNPat extends Fun {
     final int start = m.start(g), end = m.end(g), gc = m.groupCount();
     int[] pos = { g + 1, start }; // group and position in string
     while(pos[0] <= gc && m.end(pos[0]) <= end) {
-      int st = m.start(pos[0]);
+      final int st = m.start(pos[0]);
       if(st >= 0) { // group matched
         if(pos[1] < st) sub.add(new FTxt(token(str.substring(pos[1], st)), nd));
         pos = match(m, str, nd, sub, pos[0]);
@@ -301,5 +296,10 @@ final class FNPat extends Fun {
       Err.or(input, REGINV, pt);
       return null;
     }
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.X11 && def == FunDef.ANALZYE || super.uses(u);
   }
 }

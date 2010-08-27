@@ -37,15 +37,15 @@ public final class If extends Arr {
     expr[0] = checkUp(expr[0], ctx).comp(ctx).compEbv(ctx);
     checkUp(ctx, expr[1], expr[2]);
 
-    // static result: return branch in question
+    // static condition: return branch in question
     if(expr[0].value()) return optPre(eval(ctx).comp(ctx), ctx);
 
     // compile both branches
     for(int e = 1; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
 
     // if A then B else B -> B (errors in A will be ignored)
-    if(expr[1] == expr[2]) return optPre(expr[1], ctx);
-
+    if(expr[1].sameAs(expr[2])) return optPre(expr[1], ctx);
+    
     // if A then true() else false() -> boolean(A)
     if(expr[1] == Bln.TRUE && expr[2] == Bln.FALSE) {
       ctx.compInfo(OPTWRITE, this);

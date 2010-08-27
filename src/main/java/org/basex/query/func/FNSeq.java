@@ -52,11 +52,6 @@ final class FNSeq extends Fun {
       default:       return super.iter(ctx);
     }
   }
-
-  @Override
-  public boolean xquery11() {
-    return def == FunDef.HEAD || def == FunDef.TAIL;
-  }
   
   @Override
   public Expr cmp(final QueryContext ctx) {
@@ -272,5 +267,11 @@ final class FNSeq extends Fun {
         return null;
       }
     };
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.X11 && (def == FunDef.HEAD || def == FunDef.TAIL) ||
+      super.uses(u);
   }
 }

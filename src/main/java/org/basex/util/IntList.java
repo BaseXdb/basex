@@ -2,7 +2,6 @@ package org.basex.util;
 
 import java.util.Arrays;
 import java.util.EmptyStackException;
-
 import org.basex.core.Main;
 
 /**

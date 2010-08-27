@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -107,6 +108,12 @@ public final class Dbl extends Item {
   @Override
   public int hashCode() {
     return (int) val;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof Dbl && val == ((Dbl) cmp).val ||
+      this == NAN && cmp == NAN;
   }
 
   /**

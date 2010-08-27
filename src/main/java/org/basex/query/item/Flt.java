@@ -2,6 +2,7 @@ package org.basex.query.item;
 
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -34,7 +35,7 @@ public final class Flt extends Item {
    * @return instance
    */
   public static Flt get(final float f) {
-    return f == 0 && f == 1 / 0d ? ZERO : f != f ? NAN : new Flt(f);
+    return f == 0 && f == 1 / 0f ? ZERO : f != f ? NAN : new Flt(f);
   }
 
   @Override
@@ -92,6 +93,12 @@ public final class Flt extends Item {
   @Override
   public int hashCode() {
     return (int) val;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof Flt && val == ((Flt) cmp).val ||
+      this == NAN && cmp == NAN;
   }
 
   /**

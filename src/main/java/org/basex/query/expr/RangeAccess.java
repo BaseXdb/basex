@@ -62,11 +62,6 @@ public final class RangeAccess extends Simple {
   }
 
   @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof RangeAccess;
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this, TYPE, Token.token(ind.toString()));
     final RangeToken rt = (RangeToken) ind;

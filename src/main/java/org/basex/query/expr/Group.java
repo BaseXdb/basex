@@ -3,7 +3,6 @@ package org.basex.query.expr;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import java.util.HashMap;
-
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;

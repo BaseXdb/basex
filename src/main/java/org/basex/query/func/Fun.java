@@ -49,14 +49,6 @@ public abstract class Fun extends Arr {
   }
 
   /**
-   * Checks if this is an XQuery 1.1 function.
-   * @return evaluated item
-   */
-  public boolean xquery11() {
-    return false;
-  }
-
-  /**
    * Performs function specific compilations.
    * @param ctx query context
    * @return evaluated item

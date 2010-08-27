@@ -20,12 +20,13 @@ import org.basex.util.InputInfo;
  */
 public abstract class Expr extends ExprInfo {
   /** Usage flags. */
-  protected enum Use {
+  public enum Use {
     /** Context.   */ CTX,
     /** Fragment.  */ FRG,
     /** Position.  */ POS,
     /** Updates.   */ UPD,
     /** Variable.  */ VAR,
+    /** XQuery 11. */ X11,
   }
 
   /**
@@ -213,13 +214,12 @@ public abstract class Expr extends ExprInfo {
   }
 
   /**
-   * Checks the current and specified expression for equality.
+   * Compares the current and specified expression for equality.
    * @param cmp expression to be compared
    * @return result of check
    */
-  @SuppressWarnings("unused")
   public boolean sameAs(final Expr cmp) {
-    return false;
+    return this == cmp;
   }
 
   /**

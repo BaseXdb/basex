@@ -7,7 +7,6 @@ import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.Expr;
 import org.basex.query.expr.Simple;
 import org.basex.query.item.FTItem;
 import org.basex.query.item.Item;
@@ -75,11 +74,6 @@ public final class FTIndexAccess extends Simple {
   @Override
   public boolean duplicates() {
     return ictx.dupl;
-  }
-
-  @Override
-  public boolean sameAs(final Expr cmp) {
-    return cmp instanceof FTIndexAccess;
   }
 
   @Override

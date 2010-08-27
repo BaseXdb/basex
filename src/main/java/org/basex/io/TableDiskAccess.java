@@ -320,7 +320,7 @@ public final class TableDiskAccess extends TableAccess {
         fp = fpres[m];
         np = m == last ? fp + ENTRIES : fpres[m + 1];
       }
-      if(l > h) Main.notexpected("Invalid Data Access [pre:" + pre +
+      if(l > h) Main.notexpected("Data Access out of bounds [pre:" + pre +
           ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
 
       readBlock(m, fp, np);

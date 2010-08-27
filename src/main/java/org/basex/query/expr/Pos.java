@@ -114,6 +114,13 @@ public final class Pos extends Simple {
   }
 
   @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof Pos)) return false;
+    final Pos p = (Pos) cmp;
+    return min == p.min && max == p.max;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, MIN, Token.token(min), MAX,
         max == Long.MAX_VALUE ? INF : Token.token(max));

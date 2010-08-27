@@ -119,11 +119,6 @@ final class FNStr extends Fun {
     }
   }
 
-  @Override
-  public boolean xquery11() {
-    return def == FunDef.STRJOIN && expr.length == 1;
-  }
-
   /**
    * Converts codepoints to a string.
    * @param iter iterator
@@ -293,5 +288,11 @@ final class FNStr extends Fun {
       if(it != null) tb.add(it.atom());
     }
     return Str.get(tb.finish());
+  }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.X11 && def == FunDef.STRJOIN && expr.length == 1 ||
+      super.uses(u);
   }
 }

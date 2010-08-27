@@ -63,11 +63,6 @@ final class FNId extends Fun {
     }
   }
 
-  @Override
-  public boolean xquery11() {
-    return def == FunDef.ELID;
-  }
-
   /**
    * Returns the parent result of the ID function.
    * @param it item ids to be found
@@ -210,9 +205,10 @@ final class FNId extends Fun {
     }
     return nod;
   }
-
+  
   @Override
   public boolean uses(final Use u) {
-    return u == Use.CTX && expr.length == 1 || super.uses(u);
+    return u == Use.X11 && def == FunDef.ELID ||
+      u == Use.CTX && expr.length == 1 || super.uses(u);
   }
 }
