@@ -67,6 +67,12 @@ public abstract class FTExpr extends ParseExpr {
   }
 
   @Override
+  public final boolean uses(final Var v) {
+    for(final FTExpr e : expr) if(e.uses(v)) return true;
+    return false;
+  }
+
+  @Override
   public boolean removable(final Var v) {
     for(final Expr e : expr) if(!e.removable(v)) return false;
     return true;

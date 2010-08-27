@@ -65,14 +65,18 @@ public final class TypeCase extends Single {
   }
 
   @Override
-  public boolean removable(final Var v) {
-    return var.shadows(v) || expr.removable(v);
+  public boolean uses(final Var v) {
+    return !var.shadows(v) && super.uses(v);
   }
 
   @Override
-  public TypeCase remove(final Var v) {
-    if(!var.shadows(v)) expr = expr.remove(v);
-    return this;
+  public boolean removable(final Var v) {
+    return var.shadows(v) || super.removable(v);
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    return var.shadows(v) ? this : super.remove(v);
   }
 
   /**

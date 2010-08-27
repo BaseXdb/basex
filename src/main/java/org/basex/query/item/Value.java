@@ -107,6 +107,11 @@ public abstract class Value extends Expr {
   }
 
   @Override
+  public final boolean uses(final Var v) {
+    return false;
+  }
+
+  @Override
   public final boolean removable(final Var v) {
     return true;
   }

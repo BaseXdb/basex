@@ -73,6 +73,6 @@ public final class RangeAccess extends Simple {
   @Override
   public String toString() {
     final RangeToken rt = (RangeToken) ind;
-    return name() + PAR1 + rt.min + "-" + rt.max + SEP + ind + PAR2;
+    return name() + PAR1 + rt.min + "-" + rt.max + SEP + rt.ind + PAR2;
   }
 }

@@ -15,6 +15,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
+import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
@@ -118,6 +119,16 @@ public class Filter extends Preds {
     ctx.size = cs;
     ctx.pos = cp;
     return ir;
+  }
+
+  /**
+   * Adds a predicate to the filter.
+   * @param p predicate to be added
+   * @return self reference
+   */
+  public final Filter addPred(final Expr p) {
+    pred = Array.add(pred, p);
+    return this;
   }
 
   @Override

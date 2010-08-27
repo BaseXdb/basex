@@ -526,7 +526,7 @@ public class AxisPath extends Path {
    * @param pred predicate to be added
    * @return resulting path instance
    */
-  public final AxisPath addPreds(final Expr[] pred) {
+  public final AxisPath addPreds(final Expr... pred) {
     step[step.length - 1] = step[step.length - 1].addPreds(pred);
     return get(input, root, step);
   }
@@ -563,9 +563,15 @@ public class AxisPath extends Path {
   }
 
   @Override
+  public final boolean uses(final Var v) {
+    for(final Step s : step) if(s.uses(v)) return true;
+    return super.uses(v);
+  }
+
+  @Override
   public final boolean removable(final Var v) {
     for(final Step s : step) if(!s.removable(v)) return false;
-    return true;
+    return super.removable(v);
   }
 
   @Override

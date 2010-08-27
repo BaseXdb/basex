@@ -10,7 +10,7 @@ import org.basex.util.Token;
  */
 public final class RangeToken implements IndexToken {
   /** Index type. */
-  private final IndexType ind;
+  public final IndexType ind;
   /** Minimum value. */
   public final double min;
   /** Maximum value. */

@@ -52,38 +52,10 @@ public class FLWOR extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    // add where clause to most inner FOR clause and remove variable calls
-    // this is done first to force index access over other path rewritings
-    if(where != null) {
-      final ForLet f = fl[fl.length - 1];
-      if(f instanceof For && f.simple() && where.removable(f.var)) {
-        // convert where clause to predicate(s)
-        ctx.compInfo(OPTWHERE);
-
-        final Expr e = where.remove(f.var);
-        final Expr[] pr = e instanceof And ? ((And) e).expr : new Expr[] { e };
-
-        // expression will be wrapped by a boolean function
-        // if the result is numeric
-        for(int p = 0; p < pr.length; p++) {
-          if(pr[p].type().mayBeNum()) {
-            pr[p] = FunDef.BOOLEAN.newInstance(input, pr[p]);
-          }
-        }
-
-        // attach predicates to axis path, or create a filter
-        if(f.expr instanceof AxisPath) {
-          f.expr = ((AxisPath) f.expr).addPreds(pr);
-        } else {
-          f.expr = new Filter(input, f.expr, pr);
-        }
-        where = null;
-      }
-    }
-
-    final int vs = ctx.vars.size();
+    compWhere(ctx);
 
     // optimize for/let clauses
+    final int vs = ctx.vars.size();
     for(final ForLet f : fl) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
@@ -109,7 +81,6 @@ public class FLWOR extends ParseExpr {
 
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
-
     ctx.vars.reset(vs);
 
     // remove FLWOR expression if WHERE clause always returns false
@@ -162,6 +133,63 @@ public class FLWOR extends ParseExpr {
     return this;
   }
 
+  /**
+   * Optimizes a where clause.
+   * @param ctx query context
+   */
+  private void compWhere(final QueryContext ctx) {
+    // no where clause specified
+    if(where == null) return; 
+
+    // check if all clauses are simple, and if variables are removable
+    for(final ForLet f : fl) if(!f.simple() || !where.removable(f.var)) return;
+    
+    // create array with tests
+    final Expr[] preds = where instanceof And ? ((And) where).expr :
+      new Expr[] { where };
+
+    // find which tests access which variables
+    final int[] pos = new int[preds.length];
+    for(int p = 0; p < preds.length; ++p) {
+      int fr = fl.length;
+      for(int f = fr - 1; f >= 0; --f) {
+        // remember index of most inner FOR clause
+        if(fl[f] instanceof For) fr = f;
+        // predicate uses the current variable
+        //System.out.println(preds[p] + " (" + Main.name(preds[p]) + 
+        //    "): " + fl[f].var + "? " + (preds[p].uses(fl[f].var)));
+        
+        if(preds[p].uses(fl[f].var)) {
+          // stop rewriting if most inner clause is LET
+          if(fr == fl.length) return;
+          // attach predicate to use most inner FOR clause
+          pos[p] = fr;
+          break;
+        }
+      }
+    }
+    // convert where clause to predicate(s)
+    ctx.compInfo(OPTWHERE);
+
+    // bind tests to the corresponding variables
+    for(int p = 0; p < preds.length; ++p) {
+      final ForLet f = fl[pos[p]];
+      Expr pr = preds[p].remove(f.var);
+      // wrap test with boolean() if the result is numeric
+      if(pr.type().mayBeNum()) pr = FunDef.BOOLEAN.newInstance(input, pr);
+      // attach predicates to axis path or filter, or create a new filter
+      if(f.expr instanceof AxisPath) {
+        f.expr = ((AxisPath) f.expr).addPreds(pr);
+      } else if(f.expr instanceof Filter) {
+        f.expr = ((Filter) f.expr).addPred(pr);
+      } else {
+        f.expr = new Filter(input, f.expr, pr);
+      }
+    }
+    // eliminate where clause
+    where = null;
+  }
+  
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final ValueList vl = new ValueList();
@@ -202,13 +230,23 @@ public class FLWOR extends ParseExpr {
   }
 
   @Override
+  public final boolean uses(final Var v) {
+    for(final ForLet f : fl) {
+      if(f.uses(v)) return true;
+      if(f.shadows(v)) return false;
+    }
+    return where != null && where.uses(v) ||
+           order != null && order.uses(v) || ret.uses(v);
+  }
+
+  @Override
   public final boolean removable(final Var v) {
     for(final ForLet f : fl) {
       if(!f.removable(v)) return false;
       if(f.shadows(v)) return true;
     }
     return (where == null || where.removable(v)) &&
-      (order == null || order.removable(v)) && ret.removable(v);
+           (order == null || order.removable(v)) && ret.removable(v);
   }
 
   @Override

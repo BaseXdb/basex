@@ -47,19 +47,15 @@ public final class Group extends ParseExpr {
   public void initgroup(final ForLet[] fl, final Order ob) {
     final Var[] vs = new Var[groupby.length];
     final Var[] fs = new Var[fl.length];
-    for(int i = 0; i < groupby.length; ++i) {
-      vs[i] = groupby[i];
-    }
-    for(int i = 0; i < fl.length; ++i)
-      fs[i] = fl[i].var;
+    for(int i = 0; i < groupby.length; ++i) vs[i] = groupby[i];
+    for(int i = 0; i < fl.length; ++i) fs[i] = fl[i].var;
     gp = new GroupPartition(vs, fs, ob);
 
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
-    for(final Var g : groupby)
-      g.comp(ctx);
+    for(final Var g : groupby) g.comp(ctx);
     return this;
   }
 
@@ -76,23 +72,26 @@ public final class Group extends ParseExpr {
 
   @Override
   public boolean uses(final Use use) {
-    for(final Var v : groupby)
-      if(v.uses(use)) return true;
+    for(final Var v : groupby) if(v.uses(use)) return true;
+    return false;
+  }
+
+  @Override
+  public boolean uses(final Var v) {
+    for(final Var g : groupby) if(v.eq(g)) return true;
     return false;
   }
 
   @Override
   public boolean removable(final Var v) {
-    for(final Var g : groupby)
-      if(g.eq(v)) return false;
+    for(final Var g : groupby) if(g.eq(v)) return false;
     return true;
   }
 
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
-    for(int o = 0; o != groupby.length; ++o)
-      groupby[o].plan(ser);
+    for(int o = 0; o != groupby.length; ++o) groupby[o].plan(ser);
     ser.closeElement();
   }
 

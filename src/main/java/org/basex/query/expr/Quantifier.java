@@ -23,7 +23,7 @@ public final class Quantifier extends ParseExpr {
   private final boolean every;
   /** For/Let expressions. */
   private final For[] fl;
-  /** Expression list. */
+  /** Satisfier. */
   private Expr sat;
 
   /**
@@ -92,6 +92,15 @@ public final class Quantifier extends ParseExpr {
   @Override
   public boolean uses(final Use u) {
     return u == Use.VAR || sat.uses(u);
+  }
+
+  @Override
+  public boolean uses(final Var v) {
+    for(final ForLet f : fl) {
+      if(f.uses(v)) return true;
+      if(f.shadows(v)) return false;
+    }
+    return sat.removable(v);
   }
 
   @Override

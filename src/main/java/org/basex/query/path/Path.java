@@ -85,6 +85,16 @@ public abstract class Path extends ParseExpr {
   }
 
   @Override
+  public boolean uses(final Var v) {
+    return root != null && root.uses(v);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    return root == null || root.removable(v);
+  }
+
+  @Override
   public Expr remove(final Var v) {
     if(root != null) root = root.remove(v);
     if(root instanceof Context) root = null;

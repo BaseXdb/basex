@@ -155,6 +155,17 @@ public class GFLWOR extends ParseExpr {
   }
 
   @Override
+  public final boolean uses(final Var v) {
+    for(final ForLet f : fl) {
+      if(f.uses(v)) return true;
+      if(f.shadows(v)) return false;
+    }
+    return where != null && where.uses(v)
+        || order != null && order.uses(v)
+        || group != null && group.uses(v) && ret.uses(v);
+  }
+
+  @Override
   public final boolean removable(final Var v) {
     for(final ForLet f : fl) {
       if(!f.removable(v)) return false;

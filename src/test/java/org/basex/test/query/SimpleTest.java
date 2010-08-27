@@ -99,6 +99,7 @@ public final class SimpleTest extends QueryTest {
 
       { "Prec 1", nod(3, 5), "//body/preceding::*" },
       { "Prec 2", nod(3, 5), "//@id/preceding::*" },
+
       { "Union 1", nod(0), ".|." },
       { "Union 2", nod(0), ". | ." },
       { "Union 3", nod(1), "*|*" },
@@ -106,16 +107,18 @@ public final class SimpleTest extends QueryTest {
       { "FLWOR 1", itr(3), "(for $i in 1 to 5 return $i)[3]" },
       { "FLWOR 2", itr(4),
         "(for $a in 1 to 5 for $b in 1 to 5 return $a * $b)[7]" },
-      { "FLWOR 3", itr(10000000), "count(for $i in 1 to 10000000 return $i)" },
-      { "FLWOR 4", itr(100000), "count(for $i in 1 to 100000 return $i * $i)" },
-      { "FLWOR 5", itr(1000000000000l),
-        "count(for $i in 1 to 10000000 for $i in 1 to 100000 return $i * $i)" },
-      { "FLWOR 6", itr(2),
-        "count((for $a in (1,2) for $b in <b/> return $b)/.)" },
-      { "FLWOR 7", itr(2),
-        "count((for $a in (1,2) let $b := <b/> return $b)/.)" },
-      { "FLWOR 8", bool(true), "declare namespace x = 'X'; " +
+      { "FLWOR 3", bool(true), "declare namespace x = 'X'; " +
         "let $a := <a>0</a> let $b := $a return $b = 0" },
+      { "FLWOR 4", itr(1),
+        "for $a in (1,2) let $b := 'a' where $a = 1 return $a" },
+      { "FLWOR 5", itr(1, 2),
+        "for $a in (1,2) let $b := 'a'[$a = 1] return $a" },
+      { "FLWOR 6", nod(),
+        "for $a in (1,2) let $b := 3 where $b = 4 return $a" },
+      { "FLWOR 7", itr(1, 2),
+        "for $a in (1,2) let $b := 3[. = 4] return $a" },
+      { "FLWOR 8", itr(2),
+        "for $a at $p in (1,2) where $a = 2 return $p" },
 
       { "Index 1", nod(20), "//li[text() = 'Exercise 1']" },
       { "Index 2", nod(21), "//li[text() = 'Exercise 1']/text()" },

@@ -124,15 +124,27 @@ public abstract class Expr extends ExprInfo {
   /**
    * Indicates if an expression uses the specified type/operation.
    * Called by the compiler to test properties of sub-expressions.
-   * {@code true} will be returned by default and thus assumed as "worst-case".
+   * {@code true} is returned as default.
    * @param u use type to be checked
    * @return result of check
    */
   public abstract boolean uses(final Use u);
 
   /**
+   * Checks if the specified variable is used by an expression.
+   * This method is called by {@link FLWOR#comp} to rewrite where clauses
+   * as predicates. {@code true} is returned as default.
+   * @param v variable to be replaced
+   * @return result of check
+   */
+  @SuppressWarnings("unused")
+  public boolean uses(final Var v) {
+    return true;
+  }
+
+  /**
    * Checks if the specified variable is replaceable by a context item.
-   * The following methods might return false:
+   * The following tests might return false:
    * <ul>
    * <li>{@link Preds#removable}, if one of the variables is used within
    * a predicate.</li>

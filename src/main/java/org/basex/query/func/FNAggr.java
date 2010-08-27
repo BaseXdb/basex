@@ -36,6 +36,22 @@ final class FNAggr extends Fun {
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
+    if(def == FunDef.COUNT) {
+      long c = expr[0].size();
+      if(c != -1) {
+        boolean cc = false;
+        final StackTraceElement[] st = new Error().getStackTrace();
+        for(int i = 1; i < st.length; ++i) {
+          cc |= st[i].toString().contains("compile(");
+        }
+        if(!cc) {
+          System.out.println("[1] " + ctx.query);
+          System.out.println("[2] " + this + ": " + c);
+          return Itr.get(c);
+        }
+      }
+    }
+    
     final Iter iter = ctx.iter(expr[0]);
     switch(def) {
       case COUNT:

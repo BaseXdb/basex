@@ -75,8 +75,14 @@ public abstract class Preds extends ParseExpr {
   }
 
   @Override
+  public boolean uses(final Var v) {
+    for(final Expr p : pred) if(p.uses(v)) return true;
+    return false;
+  }
+
+  @Override
   public boolean removable(final Var v) {
-    for(final Expr p : pred) if(p.uses(Use.VAR)) return false;
+    for(final Expr p : pred) if(p.uses(v)) return false;
     return true;
   }
 

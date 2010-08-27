@@ -14,7 +14,7 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 abstract class Single extends ParseExpr {
-  /** Expression list. */
+  /** Expression. */
   public Expr expr;
 
   /**
@@ -36,6 +36,11 @@ abstract class Single extends ParseExpr {
   @Override
   public boolean uses(final Use u) {
     return expr.uses(u);
+  }
+
+  @Override
+  public boolean uses(final Var v) {
+    return expr.uses(v);
   }
 
   @Override

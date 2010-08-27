@@ -130,6 +130,11 @@ public class FTContains extends ParseExpr {
   }
 
   @Override
+  public final boolean uses(final Var v) {
+    return expr.uses(v) || ftexpr.uses(v);
+  }
+
+  @Override
   public final boolean removable(final Var v) {
     return expr.removable(v) && ftexpr.removable(v);
   }

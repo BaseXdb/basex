@@ -47,7 +47,8 @@ public abstract class ForLet extends Single {
   public abstract ForLet comp(final QueryContext ctx) throws QueryException;
 
   /**
-   * Checks if clause has no scoring and position.
+   * Checks if the clause contains a simple variable declaration, using
+   * no scoring and no positioning.
    * @return result of check
    */
   abstract boolean simple();

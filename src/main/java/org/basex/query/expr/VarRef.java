@@ -74,6 +74,11 @@ public final class VarRef extends ParseExpr {
   }
 
   @Override
+  public boolean uses(final Var v) {
+    return var.eq(v);
+  }
+
+  @Override
   public boolean removable(final Var v) {
     return true;
   }
