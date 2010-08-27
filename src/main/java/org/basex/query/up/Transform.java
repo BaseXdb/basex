@@ -20,6 +20,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.UpdatePrimitive;
 import org.basex.query.util.Err;
+import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
 /**
@@ -93,6 +94,33 @@ public final class Transform extends Arr {
   @Override
   public boolean uses(final Use u) {
     return u == Use.VAR || u != Use.UPD && super.uses(u);
+  }
+
+  @Override
+  public boolean uses(final Var v) {
+    for(final Let c : copies) {
+      if(c.uses(v)) return true;
+      if(c.shadows(v)) return false;
+    }
+    return super.removable(v);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    for(final Let c : copies) {
+      if(!c.removable(v)) return false;
+      if(c.shadows(v)) return true;
+    }
+    return super.removable(v);
+  }
+
+  @Override
+  public Expr remove(final Var v) {
+    for(final Let c : copies) {
+      c.remove(v);
+      if(c.shadows(v)) return this;
+    }
+    return super.remove(v);
   }
 
   @Override

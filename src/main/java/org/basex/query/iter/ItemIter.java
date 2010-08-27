@@ -1,12 +1,15 @@
 package org.basex.query.iter;
 
+import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
+import java.util.Arrays;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Value;
+import org.basex.util.TokenBuilder;
 
 /**
  * Item iterator.
@@ -156,8 +159,6 @@ public final class ItemIter extends Iter implements Result {
   
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    for(int i = 0; i < size; i++) sb.append((i != 0 ? ", " : "") + item[i]);
-    return sb.toString();
+    return new TokenBuilder().add(Arrays.copyOf(item, size), SEP).toString();
   }  
 }

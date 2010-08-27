@@ -131,19 +131,19 @@ public final class CmpR extends Single {
     // check which index applies
     final boolean text = s.test.type == Type.TXT && ic.data.meta.txtindex;
     final boolean attr = s.test.type == Type.ATT && ic.data.meta.atvindex;
-    // no text or attribute index applicable, min/max not included in range
-    if(!text && !attr || !mni || !mxi || min == Double.NEGATIVE_INFINITY ||
-        max == Double.POSITIVE_INFINITY) return false;
+    if(!text && !attr || !mni || !mxi) return false;
 
     final StatsKey key = getKey(ic, text);
     if(key == null) return false;
 
-    rt = new RangeToken(text, Math.max(min, key.min), Math.min(max, key.max));
-
     // estimate costs for range access; all values out of range: no results
+    rt = new RangeToken(text, Math.max(min, key.min), Math.min(max, key.max));
     ic.costs = rt.min > rt.max || rt.max < key.min || rt.min > key.max ? 0 :
       Math.max(1, ic.data.meta.size / 5);
-    return true;
+
+    // use index if costs are zero, or if min/max is not infinite
+    return ic.costs == 0 || min != Double.NEGATIVE_INFINITY &&
+      max != Double.POSITIVE_INFINITY;
   }
 
   @Override

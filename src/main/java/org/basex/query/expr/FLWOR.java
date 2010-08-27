@@ -142,28 +142,28 @@ public class FLWOR extends ParseExpr {
     if(where == null) return; 
 
     // check if all clauses are simple, and if variables are removable
-    for(final ForLet f : fl) if(!f.simple() || !where.removable(f.var)) return;
-    
+    for(final ForLet f : fl)
+      if(f instanceof For && (!f.simple() || !where.removable(f.var))) return;
+
     // create array with tests
-    final Expr[] preds = where instanceof And ? ((And) where).expr :
+    final Expr[] w = where instanceof And ? ((And) where).expr :
       new Expr[] { where };
 
-    // find which tests access which variables
-    final int[] pos = new int[preds.length];
-    for(int p = 0; p < preds.length; ++p) {
+    // find which tests access which variables. if a test will not use any
+    // variables defined in the local context, they will be added to the
+    // most outer predicate
+    final int[] pos = new int[w.length];
+    for(int i = 0; i < w.length; ++i) {
       int fr = fl.length;
       for(int f = fr - 1; f >= 0; --f) {
         // remember index of most inner FOR clause
         if(fl[f] instanceof For) fr = f;
-        // predicate uses the current variable
-        //System.out.println(preds[p] + " (" + Main.name(preds[p]) + 
-        //    "): " + fl[f].var + "? " + (preds[p].uses(fl[f].var)));
-        
-        if(preds[p].uses(fl[f].var)) {
+        // predicate is found that uses the current variable
+        if(w[i].uses(fl[f].var)) {
           // stop rewriting if most inner clause is LET
           if(fr == fl.length) return;
-          // attach predicate to use most inner FOR clause
-          pos[p] = fr;
+          // attach predicate to the corresponding FOR clause, and stop
+          pos[i] = fr;
           break;
         }
       }
@@ -172,9 +172,9 @@ public class FLWOR extends ParseExpr {
     ctx.compInfo(OPTWHERE);
 
     // bind tests to the corresponding variables
-    for(int p = 0; p < preds.length; ++p) {
+    for(int p = 0; p < w.length; ++p) {
       final ForLet f = fl[pos[p]];
-      Expr pr = preds[p].remove(f.var);
+      Expr pr = w[p].remove(f.var);
       // wrap test with boolean() if the result is numeric
       if(pr.type().mayBeNum()) pr = FunDef.BOOLEAN.newInstance(input, pr);
       // attach predicates to axis path or filter, or create a new filter

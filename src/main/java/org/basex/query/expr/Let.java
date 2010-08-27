@@ -123,7 +123,7 @@ public final class Let extends ForLet {
   }
 
   @Override
-  boolean shadows(final Var v) {
+  public boolean shadows(final Var v) {
     return var.shadows(v);
   }
 

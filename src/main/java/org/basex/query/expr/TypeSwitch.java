@@ -92,6 +92,18 @@ public final class TypeSwitch extends ParseExpr {
   }
 
   @Override
+  public boolean uses(final Var v) {
+    for(final TypeCase c : cs) if(c.uses(v)) return true;
+    return ts.uses(v);
+  }
+
+  @Override
+  public boolean removable(final Var v) {
+    for(final TypeCase c : cs) if(!c.removable(v)) return false;
+    return ts.removable(v);
+  }
+
+  @Override
   public Expr remove(final Var v) {
     for(int c = 0; c < cs.length; ++c) cs[c].remove(v);
     ts = ts.remove(v);

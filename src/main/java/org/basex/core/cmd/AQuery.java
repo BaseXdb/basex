@@ -128,7 +128,14 @@ public abstract class AQuery extends Command {
     }
     // close processor after exceptions
     try { if(qp != null) qp.close(); } catch(final IOException ex) { }
-    return error(err);
+
+    error(err);
+    if(Prop.debug) {
+      info(NL);
+      info(QUERYSTRING + qp.query());
+      info(qp.info());
+    }
+    return false;
   }
 
   /**

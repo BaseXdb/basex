@@ -638,7 +638,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTINLINE = "inlining function %(...)";
   /** Optimization info. */
-  String OPTWHERE = "converting where clause to predicate";
+  String OPTWHERE = "rewriting where clause to predicate(s)";
   /** Optimization info. */
   String OPTVAR = "removing variable %";
   /** Optimization info. */

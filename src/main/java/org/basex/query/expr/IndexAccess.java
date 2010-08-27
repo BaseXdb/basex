@@ -107,7 +107,7 @@ public final class IndexAccess extends Single {
 
   @Override
   public String toString() {
-    return name() + PAR1 + "\"" + ictx.data.meta.name + "\"" +
-      SEP + expr + SEP + ind + PAR2;
+    return name() + PAR1 + "\"" + ictx.data.meta.name + "\"" + SEP +
+      expr + SEP + ind + PAR2;
   }
 }

@@ -895,8 +895,7 @@ public final class TreeView extends View implements TreeViewOptions {
     int cen = parc;
     int i;
 
-    for(i = 1; i < subt.length && tr.isBigRectangle(sub, rn, lvv); i++) {
-
+    for(i = 1; i < subt.length && tr.isBigRectangle(sub, rn, lvv); ++i) {
       final TreeBorder bos = sub.getTreeBorder(rn, lvv);
       final TreeBorder bo = subt[i];
 

@@ -1,6 +1,8 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
+import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
@@ -63,16 +65,16 @@ public final class RangeAccess extends Simple {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(ind.toString()));
     final RangeToken rt = (RangeToken) ind;
-    ser.attribute(MIN, Token.token(rt.min));
-    ser.attribute(MAX, Token.token(rt.max));
-    ser.closeElement();
+    ser.emptyElement(this, DATA, token(ictx.data.meta.name),
+        MIN, Token.token(rt.min), MAX, Token.token(rt.max),
+        TYPE, Token.token(rt.ind.toString()));
   }
 
   @Override
   public String toString() {
     final RangeToken rt = (RangeToken) ind;
-    return name() + PAR1 + rt.min + "-" + rt.max + SEP + rt.ind + PAR2;
+    return name() + PAR1 + "\"" + ictx.data.meta.name + "\"" + SEP +
+      rt.min + "-" + rt.max + SEP + rt.ind + PAR2;
   }
 }
