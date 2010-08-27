@@ -6,7 +6,6 @@ import org.basex.data.Nodes;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.QNm;
-import org.basex.query.item.Uri;
 import org.xmldb.api.base.Collection;
 import org.xmldb.api.base.ErrorCodes;
 import org.xmldb.api.base.XMLDBException;
@@ -126,7 +125,7 @@ final class BXQueryService implements XPathQueryService, BXXMLDBText {
 
       // add default namespaces
       for(final String n : ns.keySet()) {
-        qp.ctx.ns.add(new QNm(token(n), Uri.uri(token(ns.get(n)))), null);
+        qp.ctx.ns.add(new QNm(token(n), token(ns.get(n))), null);
       }
       // perform query and return result
       return new BXResourceSet(qp.execute(), coll);
