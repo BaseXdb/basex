@@ -1,6 +1,9 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
+
+import java.util.Stack;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -166,7 +169,6 @@ public final class FNSimple extends Fun {
   public static boolean deep(final InputInfo ii, final Iter iter1,
       final Iter iter2) throws QueryException {
 
-    // [CG] check if namespaces references are correctly compared
     Item it1 = null;
     Item it2 = null;
     // explicit non-short-circuit..
@@ -176,48 +178,69 @@ public final class FNSimple extends Fun {
 
       // comparing nodes
       if(!(it1.node() && it2.node())) return false;
-      final NodeIter niter1 = ((Nod) it1).descOrSelf();
-      final NodeIter niter2 = ((Nod) it2).descOrSelf();
-
-      Nod n1 = null, n2 = null;
-      while(true) {
-        n1 = niter1.next();
-        n2 = niter2.next();
-        if(n1 == null && n2 == null || n1 == null ^ n2 == null) break;
-        if(n1.type != n2.type) return false;
-
-        final QNm qn1 = n1.qname();
-        if(qn1 != null && !qn1.eq(n2.qname())) return false;
-
-        if(n1.type == Type.ATT || n1.type == Type.PI || n1.type == Type.COM ||
-            n1.type == Type.TXT) {
-          if(!Token.eq(n1.atom(), n2.atom())) return false;
+      
+      Nod sub1 = (Nod) it1, sub2 = (Nod) it2;
+      final Stack<NodeIter[]> chld = new Stack<NodeIter[]>();
+      NodeIter[] ch = { sub1.child(), sub2.child() };
+      chld.push(ch);
+      do {
+        // skip comments and processing instructions
+        if(sub1 != null && (sub1.type == Type.PI || sub1.type == Type.COM)) {
+          sub1 = ch[0].next();
+          continue;
+        } else if(sub2 != null && (sub2.type == Type.PI
+            || sub2.type == Type.COM)) {
+          sub2 = ch[1].next();
           continue;
         }
+        
+        if(sub1 == null) {
+          if(sub2 == null) ch = chld.pop();
+          else return false;
+        } else if(sub2 == null) {
+          return false;
+        } else {
+          if(!sub1.equiv(ii, sub2)) return false;
+          if(!sub1.node() && !sub2.node()) continue;
+          
+          // check names
+          final QNm n1 = sub1.qname(), n2 = sub2.qname();
+          if(n1 != null && n2 != null && !n1.eq(n2)) return false;
 
-        NodeIter att1 = n1.attr();
-        int s1 = 0;
-        while(att1.next() != null) s1++;
-        NodeIter att2 = n2.attr();
-        int s2 = 0;
-        while(att2.next() != null) s2++;
-        if(s1 != s2) return false;
+          // process attributes
+          NodeIter att1 = sub1.attr();
+          int s1 = 0;
+          while(att1.next() != null)
+            s1++;
+          NodeIter att2 = sub2.attr();
+          int s2 = 0;
+          while(att2.next() != null)
+            s2++;
+          if(s1 != s2) return false;
 
-        Nod a1 = null, a2 = null;
-        att1 = n1.attr();
-        while((a1 = att1.next()) != null) {
-          att2 = n2.attr();
-          boolean found = false;
-          while((a2 = att2.next()) != null) {
-            if(a1.qname().eq(a2.qname())) {
-              found = Token.eq(a1.atom(), a2.atom());
-              break;
+          Nod a1 = null, a2 = null;
+          att1 = sub1.attr();
+          while((a1 = att1.next()) != null) {
+            att2 = sub2.attr();
+            boolean found = false;
+            while((a2 = att2.next()) != null) {
+              if(a1.qname().eq(a2.qname())) {
+                found = Token.eq(a1.atom(), a2.atom());
+                break;
+              }
             }
+            if(!found) return false;
           }
-          if(!found) return false;
+          
+          // check children
+          chld.push(ch);
+          ch = new NodeIter[]{ sub1.child(), sub2.child() };
         }
-      }
-      if(n1 != n2) return false;
+        
+        // check next child
+        sub1 = ch[0].next();
+        sub2 = ch[1].next();
+      } while(!chld.isEmpty());
     }
     return it1 == it2;
   }
