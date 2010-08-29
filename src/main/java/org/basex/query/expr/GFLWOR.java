@@ -110,7 +110,7 @@ public class GFLWOR extends ParseExpr {
     final int vss = ctx.vars.size();
 
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
-    
+
     // evaluate pre grouping tuples
     group.initgroup(fl, order);
     iter(ctx, iter, 0);

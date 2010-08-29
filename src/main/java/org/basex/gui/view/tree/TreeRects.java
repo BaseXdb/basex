@@ -216,11 +216,8 @@ final class TreeRects implements TreeViewOptions {
    */
   TreeRect searchRect(final TreeSubtree sub, final int rn, final int lv,
       final int pre) {
+
     final int i = sub.searchPreArrayPos(rn, lv, pre);
-
-    // System.out.println("i " + i + " b " + (i - bo.start) + " l " +
-    // rects[rn][lv].length);
-
     return i < 0 ? null : isBigRectangle(sub, rn, lv) ? rects[rn][lv][0]
         : rects[rn][lv][i];
   }

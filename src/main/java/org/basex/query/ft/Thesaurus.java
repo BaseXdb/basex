@@ -14,7 +14,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
-import org.basex.util.ObjectMap;
+import org.basex.util.TokenObjMap;
 import org.basex.util.TokenMap;
 import org.basex.util.TokenList;
 import org.basex.util.Tokenizer;
@@ -27,7 +27,7 @@ import org.basex.util.Tokenizer;
  */
 public final class Thesaurus {
   /** Thesaurus root references. */
-  private final ObjectMap<ThesNode> nodes = new ObjectMap<ThesNode>();
+  private final TokenObjMap<ThesNode> nodes = new TokenObjMap<ThesNode>();
   /** Relationships. */
   private static final TokenMap RSHIPS = new TokenMap();
   /** Database properties. */

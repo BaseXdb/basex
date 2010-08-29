@@ -19,7 +19,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Implementation of the group by clause.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
@@ -49,7 +49,7 @@ public final class Group extends ParseExpr {
     final Var[] fs = new Var[fl.length];
     for(int i = 0; i < groupby.length; ++i) vs[i] = groupby[i];
     for(int i = 0; i < fl.length; ++i) fs[i] = fl[i].var;
-    gp = new GroupPartition(vs, fs, ob);
+    gp = new GroupPartition(vs, fs, ob, input);
 
   }
 

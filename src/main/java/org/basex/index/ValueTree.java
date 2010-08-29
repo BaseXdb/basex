@@ -2,7 +2,7 @@ package org.basex.index;
 
 import org.basex.util.BoolList;
 import org.basex.util.IntList;
-import org.basex.util.IntMap;
+import org.basex.util.TokenIntMap;
 import org.basex.util.Num;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
@@ -23,7 +23,7 @@ class ValueTree {
   /** Compressed pre values. */
   TokenList pres = new TokenList(FACTOR);
   /** Mapping for usage of existing tree. */
-  IntMap maps = new IntMap();
+  TokenIntMap maps = new TokenIntMap();
   /** Current iterator node. */
   int cn;
 

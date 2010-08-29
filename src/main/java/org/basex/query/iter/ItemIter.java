@@ -81,7 +81,7 @@ public final class ItemIter extends Iter implements Result {
    * @param it item to be added
    */
   public void add(final Item it) {
-    if(size == item.length) item = Item.extend(item);
+    if(size == item.length) item = extend(item);
     item[size++] = it;
   }
 

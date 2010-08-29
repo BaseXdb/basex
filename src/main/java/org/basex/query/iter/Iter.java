@@ -5,6 +5,7 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Value;
+import org.basex.util.Array;
 
 /**
  * Iterator interface.
@@ -77,21 +78,37 @@ public abstract class Iter {
   }
 
   /**
-   * Returns a sequence from all iterator values.
-   * Should be called before {@link #next}.
+   * Returns a sequence with all iterator values.
+   * Must only be called if {@link #next} has not be called before.
    * @return sequence
    * @throws QueryException query exception
    */
   public Value finish() throws QueryException {
+    // check if sequence is empty
     Item i = next();
     if(i == null) return Empty.SEQ;
 
-    Item[] item = { i };
-    int s = 1;
-    while((i = next()) != null) {
-      if(s == item.length) item = Item.extend(item);
+    // if possible, allocate array with final size, and add all single items
+    Item[] item = new Item[Math.max(1, (int) size())];
+    int s = 0;
+    do {
+      if(s == item.length) item = extend(item);
       item[s++] = i;
-    }
+    } while((i = next()) != null);
+
+    // create final value
     return Seq.get(item, s);
+  }
+
+  /**
+   * Returns an item array with double the size of the input array.
+   * @param it item array
+   * @return resulting array
+   */
+  protected static Item[] extend(final Item[] it) {
+    final int s = it.length;
+    final Item[] tmp = new Item[Array.newSize(s)];
+    System.arraycopy(it, 0, tmp, 0, s);
+    return tmp;
   }
 }

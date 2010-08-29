@@ -61,7 +61,7 @@ public final class CAttr extends CFrag {
 
     if(comp && (eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
         || eq(pre, XML) ^ eq(uri, XMLURI))) Err.or(input, CAINS, pre, uri);
-    
+
     // TODO [CG] create a prefix if none is given but a URI exists
 
     final TokenBuilder tb = new TokenBuilder();

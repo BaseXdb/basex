@@ -9,7 +9,9 @@ import org.basex.query.QueryText;
 import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
+import org.basex.query.util.Err;
 import org.basex.query.util.Var;
+import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 
 /**
@@ -18,6 +20,8 @@ import org.basex.util.IntList;
  * @author Michael Seiferle
  */
 final class GroupPartition {
+  /** Input information. */
+  final InputInfo input;
   /** Grouping variables. */
   final Var[] gv;
   /** Non-grouping variables. */
@@ -38,25 +42,19 @@ final class GroupPartition {
 
   /**
    * Sets up an empty partitioning.
-   * @param gv1 Grouping vars
-   * @param fl1 ForLet Variables
-   */
-  GroupPartition(final Var[] gv1, final Var[] fl1) {
-    this(gv1, fl1, null);
-  }
-
-  /**
-   * Sets up an empty partitioning.
-   * Sets up the ordering scheme. 
+   * Sets up the ordering scheme.
    * [MS] *TODO* Order by so far only orders
    * by grouping variables, non grouping variables are silently ignored
    * in most cases where an XPTY0004 (no sequences allowed as sort keys) should
-   * be thrown. 
+   * be thrown.
    * @param gvs grouping vars
    * @param fls ForLet Variables
    * @param ob OrderBy specifier.
+   * @param ii input info
    */
-  public GroupPartition(final Var[] gvs, final Var[] fls, final Order ob) {
+  GroupPartition(final Var[] gvs, final Var[] fls, final Order ob,
+      final InputInfo ii) {
+
     gv = gvs;
     ngv = new Var[fls.length - gv.length];
     int i = 0;
@@ -74,6 +72,7 @@ final class GroupPartition {
     items = new ArrayList<HashMap<Var, ItemIter>>();
     order = ob;
     among = false;
+    input = ii;
   }
 
   /**
@@ -93,7 +92,7 @@ final class GroupPartition {
     for(int i = 0; i < gv.length; ++i) {
       final Value val = ctx.vars.get(gv[i]).value(ctx);
       if(val.item()) its[i] = (Item) val;
-      else throw new QueryException(null, QueryText.XGRP); 
+      else Err.or(input, QueryText.XGRP);
     }
     boolean found = false;
     int p = 0;
@@ -167,18 +166,17 @@ final class GroupPartition {
     /** List of grouping var items. */
     final Item[] its;
     /** Length of grouping variables. */
-    int varlen;
+    final int varlen;
     /** Hashes for the group representative values.
      *  N.B. long instead of int */
     final int hash;
-
 
     /**
      * Creates a group node.
      * @param is grouping var items
      * @param vl # of grouping vars
      */
-    public GroupNode(final Item[] is, final int vl) {
+    GroupNode(final Item[] is, final int vl) {
       its = is;
       varlen = vl;
 

@@ -465,7 +465,7 @@ public final class QueryContext extends Progress {
    */
   private void addDoc(final DBNode node) {
     if(docs == doc.length) {
-      final DBNode[] tmp = new DBNode[docs << 1];
+      final DBNode[] tmp = new DBNode[Array.newSize(docs)];
       System.arraycopy(doc, 0, tmp, 0, docs);
       doc = tmp;
     }

@@ -45,7 +45,7 @@ public final class If extends Arr {
 
     // if A then B else B -> B (errors in A will be ignored)
     if(expr[1].sameAs(expr[2])) return optPre(expr[1], ctx);
-    
+
     // if A then true() else false() -> boolean(A)
     if(expr[1] == Bln.TRUE && expr[2] == Bln.FALSE) {
       ctx.compInfo(OPTWRITE, this);

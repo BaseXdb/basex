@@ -12,7 +12,7 @@ import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
-import org.basex.util.ObjectMap;
+import org.basex.util.TokenObjMap;
 import org.basex.util.TokenMap;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
@@ -150,7 +150,7 @@ public final class MAB2Parser extends Parser {
     final Performance p = new Performance();
 
     // MAB2 entries
-    final ObjectMap<MAB2Entry> ids = new ObjectMap<MAB2Entry>();
+    final TokenObjMap<MAB2Entry> ids = new TokenObjMap<MAB2Entry>();
 
     int i = 0;
     byte[] id;

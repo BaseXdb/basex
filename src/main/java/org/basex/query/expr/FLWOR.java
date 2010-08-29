@@ -139,31 +139,31 @@ public class FLWOR extends ParseExpr {
    */
   private void compWhere(final QueryContext ctx) {
     // no where clause specified
-    if(where == null) return; 
+    if(where == null) return;
 
     // check if all clauses are simple, and if variables are removable
     for(final ForLet f : fl)
       if(f instanceof For && (!f.simple() || !where.removable(f.var))) return;
 
     // create array with tests
-    final Expr[] w = where instanceof And ? ((And) where).expr :
+    final Expr[] tests = where instanceof And ? ((And) where).expr :
       new Expr[] { where };
 
-    // find which tests access which variables. if a test will not use any
-    // variables defined in the local context, they will be added to the
-    // most outer predicate
-    final int[] pos = new int[w.length];
-    for(int i = 0; i < w.length; ++i) {
-      int fr = fl.length;
-      for(int f = fr - 1; f >= 0; --f) {
+    // find which tests access which variables. if a test will not use any of
+    // the variables defined in the local context, they will be added to the
+    // first binding
+    final int[] tar = new int[tests.length];
+    for(int t = 0; t < tests.length; ++t) {
+      int fr = -1;
+      for(int f = fl.length - 1; f >= 0; --f) {
         // remember index of most inner FOR clause
         if(fl[f] instanceof For) fr = f;
         // predicate is found that uses the current variable
-        if(w[i].uses(fl[f].var)) {
-          // stop rewriting if most inner clause is LET
-          if(fr == fl.length) return;
+        if(tests[t].uses(fl[f].var)) {
+          // stop rewriting if no most inner FOR clause is defined
+          if(fr == -1) return;
           // attach predicate to the corresponding FOR clause, and stop
-          pos[i] = fr;
+          tar[t] = fr;
           break;
         }
       }
@@ -172,24 +172,24 @@ public class FLWOR extends ParseExpr {
     ctx.compInfo(OPTWHERE);
 
     // bind tests to the corresponding variables
-    for(int p = 0; p < w.length; ++p) {
-      final ForLet f = fl[pos[p]];
-      Expr pr = w[p].remove(f.var);
+    for(int t = 0; t < tests.length; ++t) {
+      final ForLet f = fl[tar[t]];
+      Expr e = tests[t].remove(f.var);
       // wrap test with boolean() if the result is numeric
-      if(pr.type().mayBeNum()) pr = FunDef.BOOLEAN.newInstance(input, pr);
+      if(e.type().mayBeNum()) e = FunDef.BOOLEAN.newInstance(input, e);
       // attach predicates to axis path or filter, or create a new filter
       if(f.expr instanceof AxisPath) {
-        f.expr = ((AxisPath) f.expr).addPreds(pr);
+        f.expr = ((AxisPath) f.expr).addPreds(e);
       } else if(f.expr instanceof Filter) {
-        f.expr = ((Filter) f.expr).addPred(pr);
+        f.expr = ((Filter) f.expr).addPred(e);
       } else {
-        f.expr = new Filter(input, f.expr, pr);
+        f.expr = new Filter(input, f.expr, e);
       }
     }
     // eliminate where clause
     where = null;
   }
-  
+
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final ValueList vl = new ValueList();

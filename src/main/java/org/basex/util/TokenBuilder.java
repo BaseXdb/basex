@@ -11,8 +11,6 @@ import java.util.Arrays;
  * @author Christian Gruen
  */
 public final class TokenBuilder {
-  /** Resize factor for extending the byte arrays. */
-  private double factor = 1.5;
   /** Character array. */
   private byte[] chars;
   /** Entity flag. */
@@ -65,16 +63,6 @@ public final class TokenBuilder {
    */
   public void reset() {
     size = 0;
-  }
-
-  /**
-   * Sets the resize factor.
-   * @param f resize factor
-   * @return self reference
-   */
-  public TokenBuilder factor(final double f) {
-    factor = f;
-    return this;
   }
 
   /**
@@ -133,8 +121,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final byte b) {
-    if(size == chars.length)
-      chars = Arrays.copyOf(chars, Math.max(size + 1, (int) (size * factor)));
+    if(size == chars.length) chars = Arrays.copyOf(chars, Array.newSize(size));
     chars[size++] = b;
     return this;
   }
@@ -193,8 +180,8 @@ public final class TokenBuilder {
     final int l = e - s;
     final int cl = chars.length;
     if(size + l > cl) {
-      final int ns = Math.max(size + l, (int) (cl * factor));
-      chars = Arrays.copyOf(chars, size + ns);
+      final int ns = Math.max(size + l, (int) (cl * Array.RESIZE));
+      chars = Arrays.copyOf(chars, ns);
     }
     System.arraycopy(b, s, chars, size, l);
     size += l;

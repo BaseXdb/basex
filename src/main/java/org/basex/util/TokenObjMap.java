@@ -10,7 +10,7 @@ import java.util.Arrays;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class ObjectMap<E> extends TokenSet {
+public class TokenObjMap<E> extends TokenSet {
   /** Values. */
   private Object[] values = new Object[CAP];
 

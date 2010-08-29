@@ -74,7 +74,7 @@ public final class NodIter extends NodeIter {
    */
   public void add(final Nod n) {
     if(size == item.length) {
-      final Nod[] tmp = new Nod[size << 1];
+      final Nod[] tmp = new Nod[Array.newSize(size)];
       System.arraycopy(item, 0, tmp, 0, size);
       item = tmp;
     }

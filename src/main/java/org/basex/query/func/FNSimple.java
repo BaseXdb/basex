@@ -1,9 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryText.*;
-
 import java.util.Stack;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -173,10 +171,13 @@ public final class FNSimple extends Fun {
     Item it2 = null;
     // explicit non-short-circuit..
     while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
-      if(!it1.equiv(ii, it2)) return false;
-      if(!it1.node() && !it2.node()) continue;
+      // no nodes: check for equivalence
+      if(!it1.node() && !it2.node()) {
+        if(!it1.equiv(ii, it2)) return false;
+        continue;
+      }
 
-      // comparing nodes
+      // only one instance is a node
       if(!(it1.node() && it2.node())) return false;
       
       Nod sub1 = (Nod) it1, sub2 = (Nod) it2;
@@ -188,40 +189,28 @@ public final class FNSimple extends Fun {
         if(sub1 != null && (sub1.type == Type.PI || sub1.type == Type.COM)) {
           sub1 = ch[0].next();
           continue;
-        } else if(sub2 != null && (sub2.type == Type.PI
-            || sub2.type == Type.COM)) {
+        }
+        if(sub2 != null && (sub2.type == Type.PI || sub2.type == Type.COM)) {
           sub2 = ch[1].next();
           continue;
         }
-        
-        if(sub1 == null) {
-          if(sub2 == null) ch = chld.pop();
-          else return false;
-        } else if(sub2 == null) {
-          return false;
+
+        if(sub1 == null || sub2 == null) {
+          if(sub1 != sub2) return false;
+          ch = chld.pop();
         } else {
-          if(!sub1.equiv(ii, sub2)) return false;
-          if(!sub1.node() && !sub2.node()) continue;
-          
           // check names
           final QNm n1 = sub1.qname(), n2 = sub2.qname();
           if(n1 != null && n2 != null && !n1.eq(n2)) return false;
 
-          // process attributes
-          NodeIter att1 = sub1.attr();
-          int s1 = 0;
-          while(att1.next() != null)
-            s1++;
-          NodeIter att2 = sub2.attr();
-          int s2 = 0;
-          while(att2.next() != null)
-            s2++;
-          if(s1 != s2) return false;
-
+          // compare number of attributes
+          if(sub1.attr().finish().size() != sub2.attr().finish().size())
+            return false;
+          // compare attributes names and values
           Nod a1 = null, a2 = null;
-          att1 = sub1.attr();
+          final NodeIter att1 = sub1.attr();
           while((a1 = att1.next()) != null) {
-            att2 = sub2.attr();
+            final NodeIter att2 = sub2.attr();
             boolean found = false;
             while((a2 = att2.next()) != null) {
               if(a1.qname().eq(a2.qname())) {
@@ -231,7 +220,6 @@ public final class FNSimple extends Fun {
             }
             if(!found) return false;
           }
-          
           // check children
           chld.push(ch);
           ch = new NodeIter[]{ sub1.child(), sub2.child() };

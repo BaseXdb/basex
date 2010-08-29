@@ -141,8 +141,8 @@ public final class For extends ForLet {
 
   @Override
   public boolean shadows(final Var v) {
-    return var.shadows(v) || pos != null && pos.shadows(v) ||
-      score != null && score.shadows(v);
+    return var.eq(v) || pos != null && pos.eq(v) ||
+      score != null && score.eq(v);
   }
 
   @Override

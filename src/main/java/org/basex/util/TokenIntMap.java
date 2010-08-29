@@ -5,23 +5,21 @@ import java.util.Arrays;
 /**
  * This is a simple hash map, extending the even simpler
  * {@link TokenSet hash set}.
- * @param <E> generic value type
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class IntMap<E> extends IntSet {
+public final class TokenIntMap extends TokenSet {
   /** Values. */
-  private Object[] values = new Object[CAP];
+  private int[] values = new int[CAP];
 
   /**
    * Indexes the specified keys and values.
-   * If the key exists, the value is updated.
+   * If the entry exists, the old value is replaced.
    * @param key key
    * @param val value
    */
-  public void add(final int key, final E val) {
-    // array bounds are checked before array is resized..
+  public void add(final byte[] key, final int val) {
     final int i = add(key);
     values[Math.abs(i)] = val;
   }
@@ -29,11 +27,11 @@ public final class IntMap<E> extends IntSet {
   /**
    * Returns the value for the specified key.
    * @param key key to be found
-   * @return value or null if nothing was found
+   * @return value or -1 if nothing was found
    */
-  @SuppressWarnings("unchecked")
-  public E get(final int key) {
-    return (E) values[id(key)];
+  public int get(final byte[] key) {
+    final int id = id(key);
+    return id == 0 ? -1 : values[id];
   }
 
   @Override

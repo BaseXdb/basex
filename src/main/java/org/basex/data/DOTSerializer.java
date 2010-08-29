@@ -154,7 +154,6 @@ public final class DOTSerializer extends Serializer {
   @Override
   protected byte[] name(final ExprInfo expr) {
     color = DOTData.color(expr);
-    if(color == null) System.out.println(expr.getClass());
     return token(DOTData.name(expr));
   }
 }

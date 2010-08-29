@@ -1,6 +1,5 @@
 package org.basex.query.util;
 
-import java.util.Arrays;
 import org.basex.query.item.Value;
 import org.basex.util.ElementList;
 
@@ -15,16 +14,16 @@ public final class ValueList extends ElementList {
   Value[] list = new Value[CAP];
 
   /**
-   * Adds a value to the list.
-   * @param v value to be added
+   * Adds an element to the list.
+   * @param e element be added
    */
-  public void add(final Value v) {
+  public void add(final Value e) {
     if(size == list.length) {
-      final Value[] tmp = new Value[size << 1];
+      final Value[] tmp = new Value[newSize()];
       System.arraycopy(list, 0, tmp, 0, size);
       list = tmp;
     }
-    list[size++] = v;
+    list[size++] = e;
   }
 
   /**
@@ -34,11 +33,5 @@ public final class ValueList extends ElementList {
    */
   public Value get(final int i) {
     return list[i];
-  }
-
-  /* for debugging (should be removed later) */
-  @Override
-  public String toString() {
-    return Arrays.toString(list);
   }
 }

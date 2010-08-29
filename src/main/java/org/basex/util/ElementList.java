@@ -10,7 +10,7 @@ public abstract class ElementList {
   /** Initial hash capacity. */
   protected static final int CAP = 1 << 3;
   /** Resize factor for extending the arrays. */
-  protected double factor = 1.5;
+  protected double factor = Array.RESIZE;
   /** Number of elements. */
   protected int size;
 
@@ -24,7 +24,7 @@ public abstract class ElementList {
    * @return new array size
    */
   protected final int newSize() {
-    return Math.max(size + 1, (int) (size * factor));
+    return Array.newSize(size, factor);
   }
 
   /**

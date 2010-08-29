@@ -265,7 +265,7 @@ public final class FTWords extends FTExpr {
     }
 
     // limit index access to trie version and simple wildcard patterns
-    boolean wc = fto.is(FTOpt.WC);  
+    boolean wc = fto.is(FTOpt.WC);
     if(wc) {
       wc = md.wildcards;
       // index does not support wildcards
@@ -282,15 +282,15 @@ public final class FTWords extends FTExpr {
 
       if(wc) {
         // don't use index if one of the terms starts with a wildcard
-        byte[] t = ft.get();
+        final byte[] t = ft.get();
         if(t[0] == '.') return false;
         // don't use index if certain characters, or more than one dot are found
         int d = 0;
         for(final byte w : t) {
           if(w == '{' || w == '\\' || w == '.' && ++d > 1) return false;
         }
-      }      
-      
+      }
+
       // reduce number of expected results to favor full-text index requests
       final int s = ic.data.nrIDs(ft) + 3 >> 2;
       if(ic.costs > s || ic.costs == 0) ic.costs = s;

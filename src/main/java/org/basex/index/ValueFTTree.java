@@ -1,7 +1,7 @@
 package org.basex.index;
 
 import org.basex.util.IntList;
-import org.basex.util.IntMap;
+import org.basex.util.TokenIntMap;
 import org.basex.util.Num;
 import org.basex.util.TokenList;
 
@@ -55,7 +55,7 @@ final class ValueFTTree extends ValueTree {
     poss = new TokenList(FACTOR);
     pres = new TokenList(FACTOR);
     numpre = new IntList(FACTOR);
-    maps = new IntMap();
+    maps = new TokenIntMap();
   }
 
   /**

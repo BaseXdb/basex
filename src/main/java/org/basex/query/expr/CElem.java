@@ -88,7 +88,7 @@ public final class CElem extends CFrag {
     // clone namespaces for context sensitive operations
     final Atts nsc = new Atts();
     for(int i = 0; i < nsp.size; ++i) nsc.add(nsp.key[i], nsp.val[i]);
-    
+
     final QNm tname = checkNS(qname(ctx, it, false));
     final byte[] pref = tname.pref();
     if(!eq(pref, XML)) {

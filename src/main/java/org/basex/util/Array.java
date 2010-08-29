@@ -10,6 +10,8 @@ import java.util.Arrays;
  * @author Christian Gruen
  */
 public final class Array {
+  /** Default factor for resizing dynamic arrays. */
+  public static final double RESIZE = 1.5;
   /** Private constructor. */
   private Array() { }
 
@@ -137,5 +139,26 @@ public final class Array {
     final int[] tmp = new int[l];
     for(int i = 0; i < l; ++i) tmp[i] = i;
     return new IntList(tmp);
+  }
+
+  /**
+   * Returns a value for a new array size, which will always be larger than
+   * the specified value.
+   * @param old old size
+   * @return resulting size
+   */
+  public static int newSize(final int old) {
+    return newSize(old, RESIZE);
+  }
+
+  /**
+   * Returns a value for a new array size, which will always be larger than
+   * the specified value.
+   * @param old old size
+   * @param factor resize factor; must be larger than or equal to 1
+   * @return resulting size
+   */
+  public static int newSize(final int old, final double factor) {
+    return (int) (old * factor) + 1;
   }
 }

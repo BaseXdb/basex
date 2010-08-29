@@ -145,15 +145,6 @@ public final class Var extends ParseExpr {
   }
 
   /**
-   * Checks if the variable shadows the specified variable.
-   * @param v variable
-   * @return result of check
-   */
-  public boolean shadows(final Var v) {
-    return v.name.eq(name);
-  }
-
-  /**
    * If necessary, casts the specified value if a type is specified.
    * @param v input value
    * @param ctx query context

@@ -6,7 +6,7 @@ import java.io.IOException;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.ObjectMap;
+import org.basex.util.TokenObjMap;
 import org.basex.util.Token;
 import org.basex.util.TokenSet;
 import org.basex.util.Table;
@@ -314,7 +314,7 @@ public final class Namespaces {
    * @return info string
    */
   public byte[] info() {
-    final ObjectMap<TokenList> map = new ObjectMap<TokenList>();
+    final TokenObjMap<TokenList> map = new TokenObjMap<TokenList>();
     info(map, root);
     final TokenBuilder tb = new TokenBuilder();
     for(final byte[] val : map.keys()) {
@@ -341,7 +341,7 @@ public final class Namespaces {
    * @param map namespace map
    * @param n namespace node
    */
-  private void info(final ObjectMap<TokenList> map, final NSNode n) {
+  private void info(final TokenObjMap<TokenList> map, final NSNode n) {
     for(int i = 0; i < n.vals.length; i += 2) {
       final byte[] key = uri.key(n.vals[i + 1]);
       final byte[] val = pref.key(n.vals[i]);

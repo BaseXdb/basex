@@ -53,22 +53,24 @@ public final class ItemSet {
    */
   private void rehash() {
     final int s = size << 1;
-    final int[] tmp = new int[s];
+    final int[] b = new int[s];
 
     final int l = bucket.length;
-    for(int i = 0; i != l; ++i) {
+    for(int i = 0; i < l; ++i) {
       int id = bucket[i];
       while(id != 0) {
         final int p = keys[id] & s - 1;
         final int nx = next[id];
-        next[id] = tmp[p];
-        tmp[p] = id;
+        next[id] = b[p];
+        b[p] = id;
         id = nx;
       }
     }
-    bucket = tmp;
+    bucket = b;
     next = Arrays.copyOf(next, s);
     keys = Arrays.copyOf(keys, s);
-    values = Item.extend(values);
+    final Item[] i = new Item[s];
+    System.arraycopy(values, 0, i, 0, size);
+    values = i;
   }
 }
