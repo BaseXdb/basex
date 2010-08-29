@@ -391,8 +391,11 @@ public abstract class W3CTS {
         }
         xml.close();
       } catch(final Exception ex) {
-        if(!(ex instanceof QueryException || ex instanceof IOException))
+        if(!(ex instanceof QueryException || ex instanceof IOException)) {
+          System.err.println("\n*** " + outname + " ***");
+          System.err.println(in + "\n");
           ex.printStackTrace();
+        }
         er = ex.getMessage();
         if(er.startsWith(STOPPED)) er = er.substring(er.indexOf('\n') + 1);
         if(er.startsWith("[")) er = er.replaceAll("\\[(.*?)\\] (.*)", "$1 $2");
