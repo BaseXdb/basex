@@ -124,6 +124,7 @@ public interface QueryText {
   /** FOFL0008: Evaluation exception. */
   Object[] FILEPATTERN = { FOFL, 8, "Invalid file name pattern '%'."};
 
+
   /** FONS0004: Evaluation exception. */
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"." };
 

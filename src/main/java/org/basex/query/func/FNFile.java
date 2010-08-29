@@ -1,18 +1,21 @@
 package org.basex.query.func;
 
 import static org.basex.util.Token.*;
-import java.io.BufferedInputStream;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.util.regex.PatternSyntaxException;
+
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
@@ -23,6 +26,7 @@ import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Str;
+import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
@@ -84,12 +88,16 @@ final class FNFile extends Fun {
         return delete(path);
       case PATHTOFULL:
         return Str.get(path.getAbsolutePath());
+      case PATHTOURI:
+        return pathToUri(ctx);
       case READFILE:
-        return readFile(ctx);
+        return read(ctx);
       case READBINARY:
         return readBinary(path);
       case WRITE:
-        return writeFile(path, ctx);
+        return write(path, ctx);
+      case WRITEBIN:
+        return writeBinary(path, ctx);
       case COPY:
         return copy(ctx);
       case MOVE:
@@ -118,23 +126,36 @@ final class FNFile extends Fun {
       return null;
     }
 
-    final File[] files = new File(path).listFiles(new FileFilter() {
-      @Override
-      public boolean accept(final File pathname) {
-        return !pathname.isHidden() &&
-          (pattern == null || pathname.getName().matches(pattern));
-      }
-    });
-    if(files == null) Err.or(input, QueryText.FILELIST, path);
+    try {
+      Iter i = new Iter() {
+        int c = -1;
 
-    return new Iter() {
-      int c = -1;
+        final File[] files = new File(path).listFiles(new FileFilter() {
 
-      @Override
-      public Item next() {
-        return ++c < files.length ? Str.get(files[c].getName()) : null;
-      }
-    };
+          @Override
+          public boolean accept(final File pathname) {
+
+            return !pathname.isHidden()
+                && (pattern == null || pathname.getName().matches(pattern));
+          }
+        });
+
+        @Override
+        public Item next() throws QueryException {
+          try {
+            return ++c < files.length ? Str.get(files[c].getName()) : null;
+          } catch(Exception ex) {
+            Err.or(input, QueryText.FILELIST, path);
+            return null;
+          }
+        }
+      };
+      return i;
+    } catch(Exception ex) {
+      Err.or(input, QueryText.FILELIST, path);
+      return null;
+    }
+
   }
 
   /**
@@ -143,7 +164,7 @@ final class FNFile extends Fun {
    * @return string
    * @throws QueryException query exception
    */
-  private Str readFile(final QueryContext ctx) throws QueryException {
+  private Str read(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
     return Str.get(FNGen.unparsedText(io, enc, input));
@@ -156,28 +177,13 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private B64 readBinary(final File file) throws QueryException {
-    if(file.length() > Integer.MAX_VALUE) {
+
+    try {
+      return new B64(new IOFile(file).content());
+    } catch(IOException e) {
       Err.or(input, QueryText.FILEREAD, file.getName());
       return null;
     }
-
-    final int cap = new Long(file.length()).intValue();
-    final ByteBuffer byteBuffer = ByteBuffer.allocate(cap);
-    try {
-
-      final BufferedInputStream bufferInput = new BufferedInputStream(
-          new FileInputStream(file));
-
-      try {
-        int b;
-        while((b = bufferInput.read()) != -1) byteBuffer.put((byte) b);
-      } finally {
-        bufferInput.close();
-      }
-    } catch(final IOException ex) {
-      Err.or(input, QueryText.FILEREAD, file.getName());
-    }
-    return new B64(byteBuffer.array());
   }
 
   /**
@@ -187,16 +193,16 @@ final class FNFile extends Fun {
    * @return true if file was successfully written
    * @throws QueryException query exception
    */
-  private Bln writeFile(final File file, final QueryContext ctx)
+  private Item write(final File file, final QueryContext ctx)
       throws QueryException {
 
-    final BufferedOutputStream out;
     final Iter ir = expr[1].iter(ctx);
     final TokenBuilder params = interpretSerialParams(ctx);
     Item n;
 
     try {
-      out = new BufferedOutputStream(new FileOutputStream(file, true));
+      final BufferedOutputStream out = new BufferedOutputStream(
+          new FileOutputStream(file, true));
 
       try {
         while((n = ir.next()) != null) {
@@ -213,9 +219,32 @@ final class FNFile extends Fun {
       }
     } catch(final IOException e) {
       Err.or(input, QueryText.FILEWRITE, file.getName());
-      return Bln.FALSE;
     }
-    return Bln.TRUE;
+    return null;
+  }
+
+  /**
+   * Writes the content of a binary file.
+   * @param file file to be written
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item writeBinary(final File file, final QueryContext ctx)
+      throws QueryException {
+
+    final B64 b64 = expr.length == 2 ? (B64) expr[1].atomic(ctx, input) : null;
+
+    try {
+
+      final FileOutputStream out = new FileOutputStream(file);
+      out.write(b64.getVal());
+
+    } catch(IOException ex) {
+
+      Err.or(input, QueryText.FILEWRITE, file.getName());
+    }
+    return null;
   }
 
   /**
@@ -247,7 +276,7 @@ final class FNFile extends Fun {
    * @return result
    * @throws QueryException query exception
    */
-  private Bln copy(final QueryContext ctx) throws QueryException {
+  private Item copy(final QueryContext ctx) throws QueryException {
     final String src = string(checkStr(expr[0], ctx));
     final String dest = string(checkStr(expr[1], ctx));
 
@@ -262,9 +291,8 @@ final class FNFile extends Fun {
       }
     } catch(final IOException ex) {
       Err.or(input, QueryText.FILECOPY, src, dest);
-      return Bln.FALSE;
     }
-    return Bln.TRUE;
+    return null;
   }
 
   /**
@@ -274,17 +302,17 @@ final class FNFile extends Fun {
    * @return result
    * @throws QueryException query exception
    */
-  private Bln move(final File file, final QueryContext ctx)
+  private Item move(final File file, final QueryContext ctx)
       throws QueryException {
 
     final String dest = string(checkStr(expr[1], ctx));
 
     try {
-      return Bln.get(file.renameTo(new File(dest, file.getName())));
+      file.renameTo(new File(dest, file.getName()));
     } catch(final RuntimeException ex) {
       Err.or(input, QueryText.FILEMOVE, ex);
-      return Bln.FALSE;
     }
+    return null;
   }
 
   /**
@@ -310,14 +338,37 @@ final class FNFile extends Fun {
    * @return result
    * @throws QueryException query exception
    */
-  private Bln makeDir(final File file, final boolean includeParents)
+  private Item makeDir(final File file, final boolean includeParents)
       throws QueryException {
 
     try {
-      return includeParents ? Bln.get(file.mkdirs()) : Bln.get(file.mkdir());
+      if(includeParents) {
+        Bln.get(file.mkdirs());
+      } else {
+        Bln.get(file.mkdir());
+      }
     } catch(final SecurityException ex) {
       Err.or(input, QueryText.DIRCREATE, ex);
-      return Bln.FALSE;
+    }
+    return null;
+  }
+
+  /**
+   * Transforms a file system path into a URI with the file:// scheme.
+   * @param ctx query context
+   * @return result
+   * @throws QueryException query context
+   */
+  private Uri pathToUri(final QueryContext ctx) throws QueryException {
+
+    final String path = expr.length == 1 ? string(checkEStr(expr[0].atomic(ctx,
+        input))) : null;
+    try {
+      final URI uri = new URI("file", path, null);
+      return Uri.uri(uri.toString().getBytes());
+    } catch(URISyntaxException e) {
+      Err.or(input, QueryText.URIINV, path);
+      return null;
     }
   }
 }

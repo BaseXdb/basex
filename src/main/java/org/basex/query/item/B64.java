@@ -40,6 +40,7 @@ public final class B64 extends Item {
     super(Type.B6B);
     val = d;
     h2b();
+
   }
 
   /**
@@ -179,6 +180,14 @@ public final class B64 extends Item {
   @Override
   public String toString() {
     return Main.info("\"%\"", h2b());
+  }
+
+  /**
+   * Returns the byte array associated with this B64.
+   * @return val
+   */
+  public byte[] getVal() {
+    return val;
   }
 
 }
