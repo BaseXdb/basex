@@ -72,7 +72,7 @@ public final class Functions extends ExprInfo {
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
-      final SeqType seq = new SeqType(Type.find(name, false), SeqType.Occ.ZO);
+      final SeqType seq = SeqType.get(Type.find(name, false), SeqType.Occ.ZO);
       if(seq.type == null) {
         final Levenshtein ls = new Levenshtein();
         for(final Type t : Type.values()) {

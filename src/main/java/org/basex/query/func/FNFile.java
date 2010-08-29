@@ -1,10 +1,8 @@
 package org.basex.query.func;
 
 import static org.basex.util.Token.*;
-
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,7 +10,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.util.regex.PatternSyntaxException;
-
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -126,36 +123,25 @@ final class FNFile extends Fun {
       return null;
     }
 
-    try {
-      Iter i = new Iter() {
-        int c = -1;
+    return new Iter() {
+      File[] files;
+      int c = -1;
 
-        final File[] files = new File(path).listFiles(new FileFilter() {
-
-          @Override
-          public boolean accept(final File pathname) {
-
-            return !pathname.isHidden()
-                && (pattern == null || pathname.getName().matches(pattern));
-          }
-        });
-
-        @Override
-        public Item next() throws QueryException {
-          try {
-            return ++c < files.length ? Str.get(files[c].getName()) : null;
-          } catch(Exception ex) {
-            Err.or(input, QueryText.FILELIST, path);
-            return null;
-          }
+      @Override
+      public Item next() throws QueryException {
+        if(files == null) {
+          files = new File(path).listFiles();
+          if(files == null) Err.or(input, QueryText.FILELIST, path);
         }
-      };
-      return i;
-    } catch(Exception ex) {
-      Err.or(input, QueryText.FILELIST, path);
-      return null;
-    }
-
+        
+        while(++c < files.length) {
+          final String name = files[c].getName();
+          if(!files[c].isHidden() && 
+              (pattern == null || name.matches(pattern))) return Str.get(name);
+        }
+        return null;
+      }
+    };
   }
 
   /**
@@ -177,7 +163,6 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private B64 readBinary(final File file) throws QueryException {
-
     try {
       return new B64(new IOFile(file).content());
     } catch(IOException e) {
@@ -306,7 +291,6 @@ final class FNFile extends Fun {
       throws QueryException {
 
     final String dest = string(checkStr(expr[1], ctx));
-
     try {
       file.renameTo(new File(dest, file.getName()));
     } catch(final RuntimeException ex) {
@@ -316,7 +300,7 @@ final class FNFile extends Fun {
   }
 
   /**
-   * Deleted a file or directory.
+   * Deletes a file or directory.
    * @param file file/dir to be deleted
    * @return result
    * @throws QueryException query exception
@@ -343,9 +327,9 @@ final class FNFile extends Fun {
 
     try {
       if(includeParents) {
-        Bln.get(file.mkdirs());
+        file.mkdirs();
       } else {
-        Bln.get(file.mkdir());
+        file.mkdir();
       }
     } catch(final SecurityException ex) {
       Err.or(input, QueryText.DIRCREATE, ex);

@@ -87,12 +87,12 @@ public final class Nodes implements Result {
   }
 
   @Override
-  public boolean equiv(final Result v) {
+  public boolean sameAs(final Result v) {
     if(!(v instanceof Nodes) || v.size() != size) return false;
     final Nodes n = (Nodes) v;
     if(data != n.data) return false;
     for(int c = 0; c < size; ++c) if(n.nodes[c] != nodes[c]) return false;
-    return ftpos == null || ftpos.same(n.ftpos);
+    return ftpos == null || ftpos.sameAs(n.ftpos);
   }
 
   /**

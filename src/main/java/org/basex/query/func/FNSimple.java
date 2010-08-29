@@ -113,13 +113,13 @@ public final class FNSimple extends Fun {
         }
         return this;
       case ZEROORONE:
-        type = new SeqType(e.type().type, SeqType.Occ.ZO);
+        type = SeqType.get(e.type().type, SeqType.Occ.ZO);
         return e.type().zeroOrOne() ? e : this;
       case EXACTLYONE:
-        type = new SeqType(e.type().type, SeqType.Occ.O);
+        type = SeqType.get(e.type().type, SeqType.Occ.O);
         return e.type().one() ? e : this;
       case ONEORMORE:
-        type = new SeqType(e.type().type, SeqType.Occ.OM);
+        type = SeqType.get(e.type().type, SeqType.Occ.OM);
         return !e.type().mayBeZero() ? e : this;
       case UNORDER:
         return e;
@@ -171,63 +171,79 @@ public final class FNSimple extends Fun {
     Item it2 = null;
     // explicit non-short-circuit..
     while((it1 = iter1.next()) != null & (it2 = iter2.next()) != null) {
-      // no nodes: check for equivalence
+      // check atomic values
       if(!it1.node() && !it2.node()) {
         if(!it1.equiv(ii, it2)) return false;
         continue;
       }
 
-      // only one instance is a node
-      if(!(it1.node() && it2.node())) return false;
+      // node types must be equal
+      if(it1.type != it2.type) return false;
       
-      Nod sub1 = (Nod) it1, sub2 = (Nod) it2;
+      Nod s1 = (Nod) it1, s2 = (Nod) it2;
       final Stack<NodeIter[]> chld = new Stack<NodeIter[]>();
-      NodeIter[] ch = { sub1.child(), sub2.child() };
+      NodeIter[] ch = { s1.child(), s2.child() };
       chld.push(ch);
+      boolean desc = false;
       do {
-        // skip comments and processing instructions
-        if(sub1 != null && (sub1.type == Type.PI || sub1.type == Type.COM)) {
-          sub1 = ch[0].next();
-          continue;
-        }
-        if(sub2 != null && (sub2.type == Type.PI || sub2.type == Type.COM)) {
-          sub2 = ch[1].next();
-          continue;
+        final Type t1 = s1 != null ? s1.type : null;
+        final Type t2 = s2 != null ? s2.type : null;
+
+        if(desc) {
+          // skip descendant comments and processing instructions
+          if(t1 == Type.PI || t1 == Type.COM) {
+            s1 = ch[0].next();
+            continue;
+          }
+          if(t2 == Type.PI || t2 == Type.COM) {
+            s2 = ch[1].next();
+            continue;
+          }
         }
 
-        if(sub1 == null || sub2 == null) {
-          if(sub1 != sub2) return false;
+        if(s1 == null || s2 == null) {
+          if(s1 != s2) return false;
           ch = chld.pop();
         } else {
-          // check names
-          final QNm n1 = sub1.qname(), n2 = sub2.qname();
+          // compare names
+          final QNm n1 = s1.qname(), n2 = s2.qname();
           if(n1 != null && n2 != null && !n1.eq(n2)) return false;
 
-          // compare number of attributes
-          if(sub1.attr().finish().size() != sub2.attr().finish().size())
-            return false;
-          // compare attributes names and values
-          Nod a1 = null, a2 = null;
-          final NodeIter att1 = sub1.attr();
-          while((a1 = att1.next()) != null) {
-            final NodeIter att2 = sub2.attr();
-            boolean found = false;
-            while((a2 = att2.next()) != null) {
-              if(a1.qname().eq(a2.qname())) {
-                found = Token.eq(a1.atom(), a2.atom());
-                break;
+          // compare string values
+          if((t1 == Type.TXT || t1 == Type.ATT || t1 == Type.COM ||
+              t1 == Type.PI) && !Token.eq(s1.atom(), s2.atom())) return false;
+          
+          // compare elements
+          if(t1 == Type.ELM) {
+            // compare number of attributes
+            if(s1.attr().finish().size() != s2.attr().finish().size())
+              return false;
+  
+            // compare attributes names and values
+            Nod a1 = null, a2 = null;
+            final NodeIter att1 = s1.attr();
+            while((a1 = att1.next()) != null) {
+              final NodeIter att2 = s2.attr();
+              boolean f = false;
+              while((a2 = att2.next()) != null) {
+                if(a1.qname().eq(a2.qname())) {
+                  f = Token.eq(a1.atom(), a2.atom());
+                  break;
+                }
               }
+              if(!f) return false;
             }
-            if(!found) return false;
+            
+            // check children
+            chld.push(ch);
+            ch = new NodeIter[] { s1.child(), s2.child() };
           }
-          // check children
-          chld.push(ch);
-          ch = new NodeIter[]{ sub1.child(), sub2.child() };
         }
         
         // check next child
-        sub1 = ch[0].next();
-        sub2 = ch[1].next();
+        s1 = ch[0].next();
+        s2 = ch[1].next();
+        desc = true;
       } while(!chld.isEmpty());
     }
     return it1 == it2;

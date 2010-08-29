@@ -244,14 +244,21 @@ public final class QueryContext extends Progress {
         addColl(new NodIter(doc, docs), token(data.meta.name));
       }
 
-      // evaluates the query and returns the result
+      // dump compilation info
       if(inf) compInfo(NL + QUERYCOMP);
-      // compiles global functions and variables
-      funcs.comp(this);
-      //vars.comp(this);
-      // compiles the expression
-      root = root.comp(this);
 
+      // cache initial context
+      final boolean empty = value == null;
+      if(empty) value = Item.DUMMY;
+      // compile global functions.
+      // variables will be compiled if called for the first time
+      funcs.comp(this);
+      // compile the expression
+      root = root.comp(this);
+      // reset initial context
+      if(empty) value = null;
+      
+      // dump resulting query
       if(inf) info.add(NL + QUERYRESULT + funcs + root + NL);
 
     } catch(final StackOverflowError ex) {

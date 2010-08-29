@@ -19,6 +19,13 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
+  /** Dummy item. */
+  public static final Item DUMMY = new Item(Type.ITEM) {
+    @Override public byte[] atom() { return Token.EMPTY; }
+    @Override public boolean eq(final InputInfo ii, final Item it) {
+      return false;
+    }
+  };
   /** Undefined item. */
   public static final int UNDEF = Integer.MIN_VALUE;
   /** Score value. */
@@ -191,7 +198,7 @@ public abstract class Item extends Value {
 
   @Override
   public SeqType type() {
-    return new SeqType(type, SeqType.Occ.O);
+    return type.seq();
   }
 
   @Override

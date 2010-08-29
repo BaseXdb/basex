@@ -3,7 +3,6 @@ package org.basex.query.util;
 import java.io.IOException;
 import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 
 /**
@@ -77,15 +76,6 @@ public final class Variables extends ExprInfo {
    */
   public void reset(final int s) {
     local.size = s;
-  }
-
-  /**
-   * Compiles the variables.
-   * @param ctx query context
-   * @throws QueryException query exception
-   */
-  public void comp(final QueryContext ctx) throws QueryException {
-    global.comp(ctx);
   }
 
   @Override

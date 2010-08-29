@@ -48,7 +48,7 @@ public final class MixedPath extends Path {
       expr[e] = expr[e].comp(ctx);
       if(expr[e].empty()) return Empty.SEQ;
     }
-    type = new SeqType(expr[expr.length - 1].type().type, SeqType.Occ.ZM);
+    type = SeqType.get(expr[expr.length - 1].type().type, SeqType.Occ.ZM);
     return this;
   }
 

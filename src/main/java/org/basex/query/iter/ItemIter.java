@@ -86,21 +86,16 @@ public final class ItemIter extends Iter implements Result {
   }
 
   @Override
-  public boolean equiv(final Result v) {
+  public boolean sameAs(final Result v) {
     if(!(v instanceof ItemIter)) return false;
 
     final ItemIter sb = (ItemIter) v;
     if(size != sb.size) return false;
-    try {
-      for(int i = 0; i < size; ++i) {
-        /// it is safe to pass on null, as item has the same type
-        if(item[i].type != sb.item[i].type || !item[i].equiv(null, sb.item[i]))
-          return false;
-      }
-      return true;
-    } catch(final QueryException ex) {
-      return false;
+    for(int i = 0; i < size; ++i) {
+      if(item[i].type != sb.item[i].type || !item[i].sameAs(sb.item[i]))
+        return false;
     }
+    return true;
   }
 
   @Override

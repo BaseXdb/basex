@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
@@ -27,8 +28,20 @@ public final class Context extends Simple {
   }
 
   @Override
+  public Expr comp(final QueryContext ctx) {
+    if(ctx.value != null) type = ctx.value.type.seq();
+    return this;
+  }
+
+  @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     return checkCtx(ctx).iter(ctx);
+  }
+  
+  @Override
+  public Item atomic(final QueryContext ctx, final InputInfo ii)
+      throws QueryException {
+    return checkCtx(ctx).atomic(ctx, input);
   }
 
   @Override

@@ -49,28 +49,25 @@ public enum Calc {
         return Dec.get(a.dec(ii).add(b.dec(ii)));
       }
 
-      if(a.type == b.type) {
+      final Type ta = a.type, tb = b.type;
+      if(ta == tb) {
         if(!a.dur()) errNum(ii, !t1 ? a : b);
-        if(a.type == Type.YMD) return new YMd((YMd) a, (YMd) b, true);
-        if(a.type == Type.DTD) return new DTd((DTd) a, (DTd) b, true);
+        if(ta == Type.YMD) return new YMd((YMd) a, (YMd) b, true);
+        if(ta == Type.DTD) return new DTd((DTd) a, (DTd) b, true);
       }
-      if(a.type == Type.DTM)
-        return new Dtm((Date) a, checkDur(ii, b), true, ii);
-      if(b.type == Type.DTM)
-        return new Dtm((Date) b, checkDur(ii, a), true, ii);
-      if(a.type == Type.DAT)
-        return new Dat((Date) a, checkDur(ii, b), true, ii);
-      if(b.type == Type.DAT)
-        return new Dat((Date) b, checkDur(ii, a), true, ii);
-      if(a.type == Type.TIM) {
-        if(b.type != Type.DTD) errType(ii, Type.DTD, b);
+      if(ta == Type.DTM) return new Dtm((Date) a, checkDur(ii, b), true, ii);
+      if(tb == Type.DTM) return new Dtm((Date) b, checkDur(ii, a), true, ii);
+      if(ta == Type.DAT) return new Dat((Date) a, checkDur(ii, b), true, ii);
+      if(tb == Type.DAT) return new Dat((Date) b, checkDur(ii, a), true, ii);
+      if(ta == Type.TIM) {
+        if(tb != Type.DTD) errType(ii, Type.DTD, b);
         return new Tim((Tim) a, (DTd) b, true, ii);
       }
-      if(b.type == Type.TIM) {
-        if(a.type != Type.DTD) errType(ii, Type.DTD, b);
+      if(tb == Type.TIM) {
+        if(ta != Type.DTD) errType(ii, Type.DTD, b);
         return new Tim((Tim) b, (DTd) a, true, ii);
       }
-      errType(ii, a.type, b);
+      errType(ii, ta, b);
       return null;
     }
   },
@@ -97,22 +94,21 @@ public enum Calc {
         return Dec.get(a.dec(ii).subtract(b.dec(ii)));
       }
 
-      if(a.type == b.type) {
-        if(a.type == Type.DTM || a.type == Type.DAT || a.type == Type.TIM)
+      final Type ta = a.type, tb = b.type;
+      if(ta == tb) {
+        if(ta == Type.DTM || ta == Type.DAT || ta == Type.TIM)
           return new DTd((Date) a, (Date) b);
-        if(a.type == Type.YMD) return new YMd((YMd) a, (YMd) b, false);
-        if(a.type == Type.DTD) return new DTd((DTd) a, (DTd) b, false);
+        if(ta == Type.YMD) return new YMd((YMd) a, (YMd) b, false);
+        if(ta == Type.DTD) return new DTd((DTd) a, (DTd) b, false);
         errNum(ii, !t1 ? a : b);
       }
-      if(a.type == Type.DTM)
-        return new Dtm((Date) a, checkDur(ii, b), false, ii);
-      if(a.type == Type.DAT)
-        return new Dat((Date) a, checkDur(ii, b), false, ii);
-      if(a.type == Type.TIM) {
-        if(b.type != Type.DTD) errType(ii, Type.DTD, b);
+      if(ta == Type.DTM) return new Dtm((Date) a, checkDur(ii, b), false, ii);
+      if(ta == Type.DAT) return new Dat((Date) a, checkDur(ii, b), false, ii);
+      if(ta == Type.TIM) {
+        if(tb != Type.DTD) errType(ii, Type.DTD, b);
         return new Tim((Tim) a, (DTd) b, false, ii);
       }
-      errType(ii, a.type, b);
+      errType(ii, ta, b);
       return null;
     }
   },
@@ -123,26 +119,27 @@ public enum Calc {
     public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
-      if(a.type == Type.YMD) {
+      final Type ta = a.type, tb = b.type;
+      if(ta == Type.YMD) {
         if(!b.num()) errNum(ii, b);
         return new YMd((Dur) a, b.dbl(ii), true, ii);
       }
-      if(b.type == Type.YMD) {
+      if(tb == Type.YMD) {
         if(!a.num()) errNum(ii, a);
         return new YMd((Dur) b, a.dbl(ii), true, ii);
       }
-      if(a.type == Type.DTD) {
+      if(ta == Type.DTD) {
         if(!b.num()) errNum(ii, b);
         return new DTd((Dur) a, b.dbl(ii), true, ii);
       }
-      if(b.type == Type.DTD) {
+      if(tb == Type.DTD) {
         if(!a.num()) errNum(ii, a);
         return new DTd((Dur) b, a.dbl(ii), true, ii);
       }
 
       final boolean t1 = a.unt() || a.num();
       final boolean t2 = b.unt() || b.num();
-      if(t1 ^ t2) errType(ii, a.type, b);
+      if(t1 ^ t2) errType(ii, ta, b);
       if(t1 && t2) {
         final Type t = type(a, b);
         if(t == Type.ITR) {
@@ -166,25 +163,26 @@ public enum Calc {
     public Item ev(final InputInfo ii, final Item a, final Item b)
         throws QueryException {
 
-      if(a.type == b.type) {
-        if(a.type == Type.YMD) {
+      final Type ta = a.type, tb = b.type;
+      if(ta == tb) {
+        if(ta == Type.YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMd) b).ymd());
           if(bd.equals(BigDecimal.ZERO)) Err.or(ii, DATEZERO, info());
           return Dec.get(BigDecimal.valueOf(((YMd) a).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
-        if(a.type == Type.DTD) {
+        if(ta == Type.DTD) {
           final BigDecimal bd = ((DTd) b).dtd();
           if(bd.equals(BigDecimal.ZERO)) Err.or(ii, DATEZERO, info());
           return Dec.get(((DTd) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
       }
-      if(a.type == Type.YMD) {
+      if(ta == Type.YMD) {
         if(!b.num()) errNum(ii, b);
         return new YMd((Dur) a, b.dbl(ii), false, ii);
       }
-      if(a.type == Type.DTD) {
+      if(ta == Type.DTD) {
         if(!b.num()) errNum(ii, b);
         return new DTd((Dur) a, b.dbl(ii), false, ii);
       }
@@ -273,9 +271,10 @@ public enum Calc {
    * @return type
    */
   static final Type type(final Item a, final Item b) {
-    if(a.type == DBL || b.type == DBL || a.unt() || b.unt()) return DBL;
-    if(a.type == FLT || b.type == FLT) return FLT;
-    if(a.type == DEC || b.type == DEC) return DEC;
+    final Type ta = a.type, tb = b.type;
+    if(ta == DBL || tb == DBL || a.unt() || b.unt()) return DBL;
+    if(ta == FLT || tb == FLT) return FLT;
+    if(ta == DEC || tb == DEC) return DEC;
     return ITR;
   }
 

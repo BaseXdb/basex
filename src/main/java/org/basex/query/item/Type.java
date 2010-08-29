@@ -505,8 +505,9 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
+      return it.type == DTM || it.type == DAT ?
+          new DSim((Date) it, this) : str(it) ?
+          new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -519,8 +520,9 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
+      return it.type == DTM || it.type == DAT ?
+          new DSim((Date) it, this) : str(it) ?
+          new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -533,8 +535,9 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
+      return it.type == DTM || it.type == DAT ?
+          new DSim((Date) it, this) : str(it) ?
+          new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -547,8 +550,9 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
+      return it.type == DTM || it.type == DAT ?
+          new DSim((Date) it, this) : str(it) ?
+          new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -561,8 +565,9 @@ public enum Type {
     @Override
     public Item e(final Item it, final QueryContext ctx, final InputInfo ii)
         throws QueryException {
-      return it.type == DTM || it.type == DAT ? new DSim((Date) it, this) :
-        str(it) ? new DSim(it.atom(), this, ii) : error(it, ii);
+      return it.type == DTM || it.type == DAT ?
+          new DSim((Date) it, this) : str(it) ?
+          new DSim(it.atom(), this, ii) : error(it, ii);
     }
     @Override
     public Item e(final Object o, final InputInfo ii) throws QueryException {
@@ -744,6 +749,8 @@ public enum Type {
   public final boolean dur;
   /** Date flag. */
   public final boolean dat;
+  /** Sequence type. */
+  private SeqType seq;
 
   /**
    * Constructs a new item from the specified item.
@@ -796,6 +803,15 @@ public enum Type {
     dat = t;
   }
 
+  /**
+   * Returns the sequence type of this type.
+   * @return sequence type
+   */
+  public SeqType seq() {
+    if(seq == null) seq = new SeqType(this);
+    return seq;
+  }
+  
   /**
    * Throws an exception if the specified item can't be converted to a number.
    * @param it item

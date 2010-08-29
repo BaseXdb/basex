@@ -216,7 +216,6 @@ final class GroupPartition {
     boolean eq(final GroupNode c) throws QueryException {
       if(its.length != c.its.length || varlen != c.its.length) return false;
       for(int i = 0; i < its.length; ++i) {
-        if(its[i].empty() && c.its[i].empty()) continue;
         if(!its[i].equiv(null, c.its[i])) return false;
       }
       return true;

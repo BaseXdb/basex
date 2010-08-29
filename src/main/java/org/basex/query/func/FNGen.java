@@ -79,7 +79,7 @@ final class FNGen extends Fun {
   public Expr cmp(final QueryContext ctx) {
     if(def == FunDef.DATA &&  expr.length == 1) {
       final SeqType t = expr[0].type();
-      type = t.type.node() ? new SeqType(Type.ATM, t.occ) : t;
+      type = t.type.node() ? SeqType.get(Type.ATM, t.occ) : t;
     }
     return this;
   }

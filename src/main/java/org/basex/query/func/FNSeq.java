@@ -62,7 +62,7 @@ final class FNSeq extends Fun {
     // all other types will return existing types
     final Type t = expr[0].type().type;
     final SeqType.Occ o = def == FunDef.HEAD ? SeqType.Occ.ZO : SeqType.Occ.ZM;
-    type = new SeqType(t, o);
+    type = SeqType.get(t, o);
 
     return this;
   }

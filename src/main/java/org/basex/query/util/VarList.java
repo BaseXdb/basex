@@ -5,7 +5,6 @@ import java.util.Arrays;
 import org.basex.core.Text;
 import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
-import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 
 /**
@@ -46,15 +45,6 @@ public final class VarList extends ExprInfo {
    */
   public void check() throws QueryException {
     for(int i = 0; i < size; ++i) vars[i].check();
-  }
-
-  /**
-   * Compiles the variables.
-   * @param ctx query context
-   * @throws QueryException query exception
-   */
-  void comp(final QueryContext ctx) throws QueryException {
-    for(int i = 0; i < size; ++i) vars[i].comp(ctx);
   }
 
   @Override

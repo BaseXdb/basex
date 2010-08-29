@@ -42,7 +42,7 @@ public final class List extends Arr {
     type = expr[0].type();
     for(int i = 1; i < el; ++i) type = type.intersect(expr[i].type());
     final SeqType.Occ o = type.mayBeZero() ? SeqType.Occ.ZM : SeqType.Occ.OM;
-    type = new SeqType(type.type, o);
+    type = SeqType.get(type.type, o);
 
     // compute number of results
     size = 0;

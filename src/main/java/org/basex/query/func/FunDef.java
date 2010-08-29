@@ -239,9 +239,9 @@ public enum FunDef {
   /** XQuery function */
   READBINARY(FILEURI, FNFile.class, 1, 1, "read-binary(filepath)", B64),
   /** XQuery function */
-  WRITE(FILEURI, FNFile.class, 2, 3, "write(filepath, content, params)", ITEM_Z),
+  WRITE(FILEURI, FNFile.class, 2, 3, "write(filepath, data, params)", ITEM_Z),
   /** XQuery function */
-  WRITEBIN(FILEURI, FNFile.class, 2, 2, "write-binary(filepath, binarydata)", ITEM_Z),
+  WRITEBIN(FILEURI, FNFile.class, 2, 2, "write-binary(filepath, data)", ITEM_Z),
   /** XQuery function */ 
   COPY(FILEURI, FNFile.class, 2, 2, "copy(src, dest)", ITEM_Z),
   /** XQuery function */

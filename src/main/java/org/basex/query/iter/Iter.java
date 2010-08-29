@@ -16,14 +16,10 @@ import org.basex.util.Array;
 public abstract class Iter {
   /** Empty iterator. */
   public static final Iter EMPTY = new Iter() {
-    @Override
-    public Item next() { return null; }
-    @Override
-    public Value finish() { return Empty.SEQ; }
-    @Override
-    public long size() { return 0; }
-    @Override
-    public boolean reset() { return true; }
+    @Override public Item next() { return null; }
+    @Override public Value finish() { return Empty.SEQ; }
+    @Override public long size() { return 0; }
+    @Override public boolean reset() { return true; }
   };
 
   /**

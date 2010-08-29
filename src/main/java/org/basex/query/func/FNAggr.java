@@ -151,19 +151,20 @@ final class FNAggr extends Fun {
    * @throws QueryException query exception
    */
   private Type type(final Item a, final Item b) throws QueryException {
+    final Type ta = a.type, tb = b.type;
     if(b.unt()) {
-      if(!a.num()) Err.or(input, FUNCMP, this, a.type, b.type);
+      if(!a.num()) Err.or(input, FUNCMP, this, ta, tb);
       return DBL;
     }
     if(a.num() && !b.unt() && b.str()) {
-      Err.or(input, FUNCMP, this, a.type, b.type);
+      Err.or(input, FUNCMP, this, ta, tb);
     }
-    if(a.type == b.type) return a.type;
-    if(a.type == DBL || b.type == DBL) return DBL;
-    if(a.type == FLT || b.type == FLT) return FLT;
-    if(a.type == DEC || b.type == DEC) return DEC;
-    if(a.type == BLN || a.num() && !b.num() || b.num() && !a.num())
-      Err.or(input, FUNCMP, this, a.type, b.type);
-    return a.num() || b.num() ? ITR : a.type;
+    if(ta == tb) return ta;
+    if(ta == DBL || tb == DBL) return DBL;
+    if(ta == FLT || tb == FLT) return FLT;
+    if(ta == DEC || tb == DEC) return DEC;
+    if(ta == BLN || a.num() && !b.num() || b.num() && !a.num())
+      Err.or(input, FUNCMP, this, ta, tb);
+    return a.num() || b.num() ? ITR : ta;
   }
 }

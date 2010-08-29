@@ -129,7 +129,7 @@ public class FLWOR extends ParseExpr {
         }
       }
     }
-    type = new SeqType(ret.type().type, SeqType.Occ.ZM);
+    type = SeqType.get(ret.type().type, SeqType.Occ.ZM);
     return this;
   }
 

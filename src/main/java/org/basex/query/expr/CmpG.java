@@ -100,7 +100,7 @@ public final class CmpG extends Cmp {
   /** Index expression. */
   private IndexAccess[] iacc = {};
   /** Flag for atomic evaluation. */
-  private boolean single;
+  private boolean atomic;
 
   /**
    * Constructor.
@@ -155,7 +155,7 @@ public final class CmpG extends Cmp {
     }
 
     // check if both arguments will always yield one result
-    single = e1.type().one() && e2.type().one();
+    atomic = e1.type().zeroOrOne() && e2.type().zeroOrOne();
     type = SeqType.BLN;
     return e;
   }
@@ -164,9 +164,14 @@ public final class CmpG extends Cmp {
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    // direct evaluation of arguments (faster)
-    if(single) return Bln.get(eval(expr[0].atomic(ctx, input),
-        expr[1].atomic(ctx, input)));
+    // atomic evaluation of arguments (faster)
+    if(atomic) {
+      final Item it1 = expr[0].atomic(ctx, input);
+      if(it1 == null) return Bln.FALSE;
+      final Item it2 = expr[1].atomic(ctx, input);
+      if(it2 == null) return Bln.FALSE;
+      return Bln.get(eval(it1, it2));
+    }
 
     final Iter ir1 = ctx.iter(expr[0]);
     final long is1 = ir1.size();
@@ -241,6 +246,7 @@ public final class CmpG extends Cmp {
   boolean union(final CmpG g, final QueryContext ctx) throws QueryException {
     if(op != g.op || !expr[0].sameAs(g.expr[0])) return false;
     expr[1] = new List(input, expr[1], g.expr[1]).comp(ctx);
+    atomic &= expr[1].type().zeroOrOne();
     return true;
   }
 

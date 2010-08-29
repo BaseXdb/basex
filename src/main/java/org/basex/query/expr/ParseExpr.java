@@ -29,10 +29,10 @@ import org.basex.util.InputInfo;
 public abstract class ParseExpr extends Expr {
   /** Input information. */
   public final InputInfo input;
-  /** Cached sequence type. */
-  public SeqType type;
   /** Cardinality of result; unknown if set to -1. */
   public long size = -1;
+  /** Data type. */
+  public SeqType type;
 
   /**
    * Constructor.

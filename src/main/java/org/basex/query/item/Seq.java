@@ -88,7 +88,7 @@ public final class Seq extends Value {
     for(int s = 1; s != size && t != Type.ITEM; ++s) {
       if(t != val[s].type) t = Type.ITEM;
     }
-    return new SeqType(t, SeqType.Occ.OM);
+    return SeqType.get(t, SeqType.Occ.OM);
   }
 
   @Override

@@ -89,7 +89,13 @@ public class Step extends Preds {
       ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
         data.tags.stat(data.tags.id(ln)).leaf;
     }
+
+    // as predicates will not necessarily start from the document node,
+    // a document context item is temporarily set to element
+    final Type ct = ctx.value != null ? ctx.value.type : null;
+    if(ct == Type.DOC) ctx.value.type = Type.ELM;
     final Expr e = super.comp(ctx);
+    if(ct != null) ctx.value.type = ct;
     ctx.leaf = false;
     if(e != this) return e;
 
@@ -103,11 +109,8 @@ public class Step extends Preds {
     final boolean last = p instanceof Fun && ((Fun) p).def == FunDef.LAST;
 
     // use standard evaluation for multiple predicates or standard POS predicate
-    if(pred.length > 1 || !last && pos == null && uses(Use.POS))
-      return this;
-
-    // use iterative evaluation
-    return new IterStep(input, axis, test, pred, pos, last);
+    return pred.length > 1 || !last && pos == null && uses(Use.POS) ?
+      this : new IterStep(input, axis, test, pred, pos, last);
   }
 
   @Override

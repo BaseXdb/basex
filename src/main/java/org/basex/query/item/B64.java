@@ -20,27 +20,24 @@ public final class B64 extends Item {
 
   /**
    * Constructor.
-   * @param d data
+   * @param d textual data
    * @param ii input info
    * @throws QueryException query exception
    */
   public B64(final byte[] d, final InputInfo ii) throws QueryException {
     super(Type.B6B);
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte c : d)
-      if(c < 0 || c > ' ') tb.add(c);
+    for(final byte c : d) if(c < 0 || c > ' ') tb.add(c);
     b2h(tb.finish(), ii);
   }
 
   /**
    * Constructor.
-   * @param d data
+   * @param d binary data
    */
   public B64(final byte[] d) {
     super(Type.B6B);
     val = d;
-    h2b();
-
   }
 
   /**
@@ -48,8 +45,7 @@ public final class B64 extends Item {
    * @param h hex item
    */
   B64(final Hex h) {
-    super(Type.B6B);
-    val = h.val;
+    this(h.val);
   }
 
   @Override

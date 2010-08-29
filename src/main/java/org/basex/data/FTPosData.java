@@ -60,7 +60,7 @@ public final class FTPosData {
    * @param ft reference to compare to
    * @return boolean same()
    */
-  boolean same(final FTPosData ft) {
+  boolean sameAs(final FTPosData ft) {
     if(size != ft.size) return false;
     for(int i = 0; i < size; ++i) {
       if(pos[i].pre != ft.pos[i].pre ||

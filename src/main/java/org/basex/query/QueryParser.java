@@ -2073,16 +2073,16 @@ public class QueryParser extends InputParser {
     ctx.ns.uri(type);
     skipWS();
     final Occ occ = consume('?') ? Occ.ZO : Occ.O;
-    final SeqType seq = new SeqType(Type.find(type, false), occ);
-
-    if(seq.type == null) {
+    
+    final Type t = Type.find(type, false);
+    if(t == null) {
       final byte[] uri = type.uri().atom();
       if(uri.length == 0 && type.ns()) error(PREUNKNOWN, type.pref());
       final String ln = string(type.ln());
       error(eq(uri, Type.NOT.uri) && ln.equals(Type.NOT.name) ||
           ln.equals(Type.AAT.name) ? CASTUNKNOWN : TYPEUNKNOWN, type);
     }
-    return seq;
+    return SeqType.get(t, occ);
   }
 
   /**
@@ -2108,14 +2108,13 @@ public class QueryParser extends InputParser {
         Occ.OM : consume('*') ? Occ.ZM : Occ.O;
     if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, input()));
 
-    final byte[] ext = tok.finish();
-    final SeqType seq = new SeqType(Type.find(type, true), occ);
-    if(seq.type == null || seq.type == Type.SEQ || seq.type == Type.JAVA)
+    final Type t = Type.find(type, true);
+    if(t == null || t == Type.SEQ || t == Type.JAVA)
       error(par ? NOTYPE : TYPEUNKNOWN, type, par);
-    if(seq.type == Type.EMP && occ != Occ.O) error(EMPTYSEQOCC, seq.type);
-    seq.ext = checkTest(seq.type, ext);
+    if(t == Type.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
+    final QNm e = checkTest(t, tok.finish());
     skipWS();
-    return seq;
+    return SeqType.get(t, occ, e);
   }
 
   /**

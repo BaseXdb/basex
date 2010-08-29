@@ -8,6 +8,7 @@ import org.basex.query.expr.Context;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.ParseExpr;
 import org.basex.query.expr.Root;
+import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.util.Var;
@@ -65,8 +66,8 @@ public abstract class Path extends ParseExpr {
     if(root == null) return v == null || v.type != Type.DOC ? v : null;
     // root is value: return root
     if(root.value()) return (Value) root;
-    // no root reference, no context: return null
-    if(!(root instanceof Root) || v == null) return null;
+    // no root reference, no/dummy context: return null
+    if(!(root instanceof Root) || v == null || v == Item.DUMMY) return null;
     // return context sequence or root of current context
     return v.size() != 1 ? v : ((Root) root).root(v);
   }

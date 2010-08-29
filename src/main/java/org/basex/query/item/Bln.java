@@ -3,6 +3,7 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -99,6 +100,11 @@ public final class Bln extends Item {
   @Override
   public SeqType type() {
     return SeqType.BLN;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    return cmp instanceof Bln && val == ((Bln) cmp).val;
   }
 
   /**

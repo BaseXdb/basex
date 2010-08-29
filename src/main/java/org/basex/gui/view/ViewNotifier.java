@@ -179,7 +179,7 @@ public final class ViewNotifier {
     final Context context = gui.context;
     final Nodes n = new Nodes(new int[0], context.data, context.marked.ftpos);
 
-    if(!cont[hist].equiv(quick ? context.current : context.marked)) {
+    if(!cont[hist].sameAs(quick ? context.current : context.marked)) {
       checkHist();
       if(!quick) {
         // add new entry

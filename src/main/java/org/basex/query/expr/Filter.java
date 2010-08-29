@@ -10,6 +10,7 @@ import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
@@ -52,11 +53,11 @@ public class Filter extends Preds {
     // return empty root
     if(root.empty()) return optPre(Empty.SEQ, ctx);
 
-    final Value tmp = ctx.value;
-    ctx.value = null;
+    final Type ct = ctx.value != null ? ctx.value.type : null;
+    if(ct != null) ctx.value.type = root.type().type;
     final Expr e = super.comp(ctx);
-    ctx.value = tmp;
     if(e != this) return e;
+    if(ct != null) ctx.value.type = ct;
 
     // no predicates.. return root
     if(pred.length == 0) return root;
@@ -64,7 +65,7 @@ public class Filter extends Preds {
 
     // evaluate return type
     final SeqType t = root.type();
-    type = new SeqType(t.type, t.zeroOrOne() ? SeqType.Occ.ZO : SeqType.Occ.ZM);
+    type = SeqType.get(t.type, t.zeroOrOne() ? SeqType.Occ.ZO : SeqType.Occ.ZM);
 
     // position predicate
     final Pos pos = p instanceof Pos ? (Pos) p : null;

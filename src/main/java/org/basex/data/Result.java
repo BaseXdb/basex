@@ -16,11 +16,11 @@ public interface Result {
   long size();
 
   /**
-   * Compares results for equivalence.
+   * Compares results for equality.
    * @param r result to be compared
    * @return true if results are equal
    */
-  boolean equiv(Result r);
+  boolean sameAs(Result r);
 
   /**
    * Serializes the complete result.

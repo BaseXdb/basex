@@ -621,7 +621,7 @@ public interface QueryText {
   // OPTIMIZATIONS
 
   /** Optimization info. */
-  String OPTDESC = "merging descendant-or-self step(s)";
+  String OPTDESC = "optimizing descendant-or-self step(s)";
   /** Optimization info. */
   String OPTPATH = "merging axis paths";
   /** Optimization info. */

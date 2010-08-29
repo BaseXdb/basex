@@ -6,8 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
-import org.basex.query.item.Type;
-import org.basex.query.item.Value;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -38,12 +36,6 @@ public abstract class Preds extends ParseExpr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     for(final Expr p : pred) checkUp(p, ctx);
 
-    // as predicates will not necessarily start from the document node,
-    // the context item type is temporarily set to element
-    final Value cv = ctx.value;
-    final Type ct = cv != null ? cv.type : null;
-    if(ct == Type.DOC) ctx.value.type = Type.ELM;
-
     Expr e = this;
     for(int p = 0; p < pred.length; ++p) {
       Expr pr = pred[p].comp(ctx).compEbv(ctx);
@@ -61,8 +53,6 @@ public abstract class Preds extends ParseExpr {
         pred[p] = pr;
       }
     }
-    ctx.value = cv;
-    if(ct != null) ctx.value.type = ct;
     return e;
   }
 

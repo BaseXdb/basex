@@ -42,11 +42,13 @@ public final class CmpR extends Single {
   private final boolean mxi;
   /** Index container. */
   private RangeToken rt;
+  /** Flag for atomic evaluation. */
+  private final boolean atomic;
 
   /**
    * Constructor.
    * @param ii input info
-   * @param e expression
+   * @param e (compiled) expression
    * @param mn minimum value
    * @param in include minimum value
    * @param mx maximum value
@@ -60,6 +62,7 @@ public final class CmpR extends Single {
     max = mx;
     mxi = ix;
     type = SeqType.BLN;
+    atomic = e.type().zeroOrOne();
   }
 
   /**
@@ -76,26 +79,34 @@ public final class CmpR extends Single {
     final Expr e = ex.expr[0];
     final double d = it.dbl(ex.input);
     switch(ex.op.op) {
-      case EQ: return new CmpR(
-          ex.input, e, d, true, d, true);
-      case GE: return new CmpR(
-          ex.input, e, d, true, Double.POSITIVE_INFINITY, true);
-      case GT: return new CmpR(
-          ex.input, e, d, false, Double.POSITIVE_INFINITY, true);
-      case LE: return new CmpR(
-          ex.input, e, Double.NEGATIVE_INFINITY, true, d, true);
-      case LT: return new CmpR(
-          ex.input, e, Double.NEGATIVE_INFINITY, true, d, false);
+      case EQ:
+        return new CmpR(ex.input, e, d, true, d, true);
+      case GE:
+        return new CmpR(ex.input, e, d, true, Double.POSITIVE_INFINITY, true);
+      case GT:
+        return new CmpR(ex.input, e, d, false, Double.POSITIVE_INFINITY, true);
+      case LE:
+        return new CmpR(ex.input, e, Double.NEGATIVE_INFINITY, true, d, true);
+      case LT:
+        return new CmpR(ex.input, e, Double.NEGATIVE_INFINITY, true, d, false);
       default:
+        return ex;
     }
-    return ex;
   }
 
   @Override
   public Bln atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    // evaluate iterator
+    // atomic evaluation of arguments (faster)
+    if(atomic) {
+      final Item it = expr.atomic(ctx, input);
+      if(it == null) return Bln.FALSE;
+      final double d = it.dbl(input);
+      return Bln.get((mni ? d >= min : d > min) && (mxi ? d <= max : d < max));
+    }
+    
+    // iterative evaluation
     final Iter ir = ctx.iter(expr);
     boolean mn = false;
     boolean mx = false;

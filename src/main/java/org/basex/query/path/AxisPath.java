@@ -90,9 +90,11 @@ public class AxisPath extends Path {
    * @return resulting operator
    */
   private boolean iterable(final QueryContext ctx) {
-    // evaluate return type
+    // evaluate number of results
     size = size(ctx);
-    type = new SeqType(Type.NOD, size);
+    // set type with number of results or occurrence from last step
+    type = size != -1 ? SeqType.get(Type.NOD, size) :
+      step[step.length - 1].type();
 
     if(root == null || root.uses(Use.VAR) || root.duplicates())
       return false;
@@ -157,8 +159,8 @@ public class AxisPath extends Path {
       if(!(e instanceof Step)) return e;
       step[i] = (Step) e;
     }
-    mergeDesc(ctx);
-
+    optSteps(ctx);
+    
     // check if all context nodes reference document nodes
     // [CG] XQuery: optimize paths without root context
     final Data data = ctx.data();
@@ -182,7 +184,7 @@ public class AxisPath extends Path {
         if(e != this) return e.comp(ctx);
       }
     }
-
+    
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !uses(Use.VAR);
 
@@ -441,23 +443,33 @@ public class AxisPath extends Path {
   }
 
   /**
-   * Merges superfluous descendant-or-self steps.
-   * This method implies that all expressions are location steps.
+   * Optimizes descendant-or-self steps and static types.
    * @param ctx query context
    */
-  private void mergeDesc(final QueryContext ctx) {
-    int ll = step.length;
-    for(int l = 1; l < ll; ++l) {
+  private void optSteps(final QueryContext ctx) {
+    boolean opt = false;
+    for(int l = 1; l < step.length; ++l) {
       if(!step[l - 1].simple(DESCORSELF, false)) continue;
+
       final Step next = step[l];
       if(next.axis == CHILD && !next.uses(Use.POS)) {
-        Array.move(step, l, -1, ll-- - l);
+        // descendant-or-self::node()/child::X -> descendant::X 
+        Array.move(step, l, -1, step.length - l);
+        step = Arrays.copyOf(step, step.length - 1);
         next.axis = DESC;
+        opt = true;
+      } else if(next.axis == ATTR && !next.uses(Use.POS)) {
+        // descendant-or-self::node()/@X -> descendant-or-self::*/@X 
+        step[l - 1].test = new NameTest(false, step[l - 1].input);
+        opt = true;
       }
     }
-    if(ll != step.length) {
-      ctx.compInfo(OPTDESC);
-      step = Arrays.copyOf(step, ll);
+    if(opt) ctx.compInfo(OPTDESC);
+
+    // set atomic type for single attribute steps to speedup predicate tests
+    if(root == null && step.length == 1 && step[0].axis == ATTR &&
+        step[0].test.kind != Kind.ALL) {
+      step[0].type = SeqType.NOD_ZO; 
     }
   }
 
