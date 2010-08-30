@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -13,6 +12,7 @@ import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
+import org.basex.util.IntMap;
 
 /**
  * Stores the grouping for a group by clause.
@@ -24,15 +24,16 @@ final class GroupPartition {
   final InputInfo input;
   /** Grouping variables. */
   final Var[] gv;
+  /** Cached Grouping variables. Needed to allow return iteration. */
+  final Var[] cgv;
   /** Non-grouping variables. */
   final Var[] ngv;
   /** Group Partitioning. */
   final ArrayList<GroupNode> partitions;
   /** Resulting Sequence for non grouping variables. */
   final ArrayList<HashMap<Var, ItemIter>> items;
-  /** HashValue, Position. */
-  private final HashMap<Integer, IntList> hashes =
-    new HashMap<Integer, IntList>();
+  /** HashValue, Position (with overflow bucket). */
+  private final IntMap<IntList> hashes = new IntMap<IntList>();
   /** Order by specifier. */
   final Order order;
   /** ordering among groups. *TODO* */
@@ -56,6 +57,7 @@ final class GroupPartition {
       final InputInfo ii) {
 
     gv = gvs;
+    cgv = gvs;
     ngv = new Var[fls.length - gv.length];
     int i = 0;
     for(final Var v : fls) {
@@ -88,20 +90,22 @@ final class GroupPartition {
    * @throws QueryException exception
    */
   void add(final QueryContext ctx) throws QueryException  {
+    if(!cachedVars) cacheVars(ctx);
+
     final Item[] its = new Item[gv.length];
     for(int i = 0; i < gv.length; ++i) {
-      final Value val = ctx.vars.get(gv[i]).value(ctx);
+      final Value val = cgv[i].value(ctx);
       if(val.item()) its[i] = (Item) val;
       else Err.or(input, QueryText.XGRP);
     }
     boolean found = false;
     int p = 0;
-    final GroupNode cand = new GroupNode(its, gv.length);
-    final Integer chash = cand.hashCode();
-
-    if(hashes.containsKey(chash)) {
-      final IntList ps = hashes.get(cand.hash);
-      for(final int pp : ps.toArray()) {
+    final GroupNode cand = new GroupNode(its);
+    final int chash = cand.hashCode();
+    IntList ps;
+    if(null != (ps = hashes.get(chash))) {
+      for(int i = 0; i <= ps.size(); ++i) {
+        final int pp  = ps.get(i);
         if(cand.eq(partitions.get(pp))) {
           found = true;
           p = pp;
@@ -113,11 +117,13 @@ final class GroupPartition {
       if(order != null) order.add(ctx);
       p = partitions.size();
       partitions.add(cand);
-      final IntList pos = hashes.get(chash) != null ?
-          hashes.get(chash)
-          : new IntList(8);
+      
+      IntList pos = hashes.get(chash);
+      if(pos == null) {
+        pos = new IntList(2);
+        hashes.add(chash, pos);
+      }
       pos.add(p);
-      hashes.put(chash, pos);
     }
     addNonGrpIts(ctx, p);
   }
@@ -131,95 +137,30 @@ final class GroupPartition {
    */
   private void addNonGrpIts(final QueryContext ctx, final int p)
       throws QueryException {
-
-    if(!cachedVars) cacheVars(ctx);
-    if(items.size() <= p) items.add(new HashMap<Var, ItemIter>());
+    
+    if(p == items.size()) items.add(new HashMap<Var, ItemIter>());
     HashMap<Var, ItemIter> sq = items.get(p);
 
     for(int i = 0; i < ngv.length; ++i) {
-      if(sq == null) sq = new HashMap<Var, ItemIter>();
-      if(sq.get(ngv[i]) == null) sq.put(ngv[i], new ItemIter());
-      final Value v = ngv[i].value(ctx);
-      if(v.item()) {
-        sq.get(ngv[i]).add((Item) v);
+      ItemIter ir = sq.get(ngv[i]);
+      if(ir == null) {
+        ir = new ItemIter();
+        sq.put(ngv[i], ir);
       }
+        ir.add(ngv[i].iter(ctx));
     }
   }
 
   /**
-   * Caches the non grouping variables to avoid calls to vars.get.
+   * Caches the variables to avoid calls to vars.get.
    * @param ctx query context
    */
   private void cacheVars(final QueryContext ctx) {
-    for(int i = 0; i < ngv.length; ++i) {
-      ngv[i] = ctx.vars.get(ngv[i]);
-    }
+    for(int i = 0; i < ngv.length; ++i) ngv[i] = ctx.vars.get(ngv[i]);
+    
+    for(int i = 0; i < gv.length; ++i) cgv[i] = ctx.vars.get(gv[i]);
     cachedVars = true;
 
-  }
-  /**
-   * GroupNode defines one valid partitioning setting.
-   * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
-   * @author Michael Seiferle
-   */
-  static final class GroupNode {
-    /** List of grouping var items. */
-    final Item[] its;
-    /** Length of grouping variables. */
-    final int varlen;
-    /** Hashes for the group representative values.
-     *  N.B. long instead of int */
-    final int hash;
-
-    /**
-     * Creates a group node.
-     * @param is grouping var items
-     * @param vl # of grouping vars
-     */
-    GroupNode(final Item[] is, final int vl) {
-      its = is;
-      varlen = vl;
-
-      final long[] hhs = new long[is.length];
-      for(int i = 0; i < varlen; ++i) {
-        if(is[i].empty()) {
-          // Add long.max_value to denote empty sequence in item
-          hhs[i] = Long.MAX_VALUE;
-        } else {
-          hhs[i] = is[i].hashCode();
-        }
-      }
-      hash = java.util.Arrays.hashCode(hhs);
-    }
-
-    @Override
-    public int hashCode() {
-      return hash;
-    }
-
-    /* for debugging (should be removed later) */
-    @Override
-    public String toString() {
-      final StringBuilder sb = new StringBuilder();
-      sb.append(" ");
-      sb.append(" with grouping var ");
-      sb.append(Arrays.toString(its));
-      return sb.toString();
-    }
-
-    /**
-     * Checks the nodes for equality.
-     * @param c second group node
-     * @return result of check
-     * @throws QueryException query exception
-     */
-    boolean eq(final GroupNode c) throws QueryException {
-      if(its.length != c.its.length || varlen != c.its.length) return false;
-      for(int i = 0; i < its.length; ++i) {
-        if(!its[i].equiv(null, c.its[i])) return false;
-      }
-      return true;
-    }
   }
 
 }

@@ -7,7 +7,6 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.expr.GroupPartition.GroupNode;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.iter.ItemIter;

@@ -37,20 +37,26 @@ public final class XQuery11Test extends QueryTest {
            "for $x in (1, 2, 2, 1) for $y in ('a','a') group by $y return $x "},
         { "FLWOR 4", itr(1, 2, 1, 1, 2, 2),
            "for $x in (1, 2) for $y in ('b','a','a') group by $y return $x "},
+        { "FLWOR 5", itr(1, 2),
+           "for $a in 1 let $b := (1, 2) group by $a return $b" },
+
         { "FLWOR group varref", itr(2, 1),
            "for $x in (2,1) let $y:=($x+1) group by $y return $x"},
         { "GFLWOR varref ordered", itr(1, 2),
            "for $x in (2,1) let $y:=($x+1) group by $y order by $y return $x"},
         { "FLWOR Err 1", "let $x := (1,2) group by $x return $x" },
         { "FLWOR Err 2", "let $x := (1,2) group by $z return $x"},
-
+        { "FLWOR Err 3", 
+        "for $a in (1,1) let $b := $a, group by $b, order by $a, return 1" },
+        
         /* [MS] to be checked...
-        { "FLWOR 5", itr(1, 2),
-          "for $a in 1 let $b := (1, 2) group by $a return $b" },
         { "FLWOR 6", itr(2),
           "for $a in 1 for $a in 2 group by $a return $a" },
         { "FLWOR 7", itr(2, 3),
           "for $a in 1 for $a in (2,3) group by $a return $a" },
+        { "FLWOR Err 4", 
+        "for $a in (1,1) let $b := $a group by $b order by $a return 1" },
+          
         { "FLWOR Err 3", 
           "for $a in (1,1) let $b := $a, group by $b, order by $a, return 1" },
         { "FLWOR Err 4", 
