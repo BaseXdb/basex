@@ -23,10 +23,12 @@ import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.Str;
+import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -133,11 +135,10 @@ final class FNFile extends Fun {
           files = new File(path).listFiles();
           if(files == null) Err.or(input, QueryText.FILELIST, path);
         }
-        
+
         while(++c < files.length) {
           final String name = files[c].getName();
-          if(!files[c].isHidden() && 
-              (pattern == null || name.matches(pattern))) return Str.get(name);
+          if(!files[c].isHidden() && (pattern == null || name.matches(pattern))) return Str.get(name);
         }
         return null;
       }
@@ -196,7 +197,7 @@ final class FNFile extends Fun {
             final Str str = FNGen.serialize(nod, params, input);
             out.write(str.atom());
           } else {
-            out.write(checkItem(n, ctx).toString().getBytes());
+            out.write(Token.token(checkItem(n, ctx).toString()));
           }
         }
       } finally {
@@ -218,7 +219,7 @@ final class FNFile extends Fun {
   private Item writeBinary(final File file, final QueryContext ctx)
       throws QueryException {
 
-    final B64 b64 = expr.length == 2 ? (B64) expr[1].atomic(ctx, input) : null;
+    final B64 b64 = (B64) checkType(expr[1].atomic(ctx, input), Type.B6B);
 
     try {
 
@@ -345,8 +346,7 @@ final class FNFile extends Fun {
    */
   private Uri pathToUri(final QueryContext ctx) throws QueryException {
 
-    final String path = expr.length == 1 ? string(checkEStr(expr[0].atomic(ctx,
-        input))) : null;
+    final String path = string(checkEStr(expr[0].atomic(ctx, input)));
     try {
       final URI uri = new URI("file", path, null);
       return Uri.uri(uri.toString().getBytes());
