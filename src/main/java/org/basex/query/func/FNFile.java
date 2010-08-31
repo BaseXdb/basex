@@ -293,7 +293,7 @@ final class FNFile extends Fun {
     final String dest = string(checkStr(expr[1], ctx));
     try {
       file.renameTo(new File(dest, file.getName()));
-    } catch(final RuntimeException ex) {
+    } catch(final NullPointerException ex) {
       Err.or(input, QueryText.FILEMOVE, ex);
     }
     return null;
@@ -308,7 +308,7 @@ final class FNFile extends Fun {
   private Bln delete(final File file) throws QueryException {
     try {
       return Bln.get(file.delete());
-    } catch(final SecurityException ex) {
+    } catch(final NullPointerException ex) {
       Err.or(input, QueryText.FILEDELETE, ex);
       return Bln.FALSE;
     }
