@@ -122,6 +122,7 @@ public interface Commands {
     /**
      * Returns a help string as html.
      * @return string
+     *
     public final String html() {
       final StringBuilder sb = new StringBuilder();
       if(help.length == 1) {
@@ -138,8 +139,10 @@ public interface Commands {
 
         final String help1 = Pattern.compile("\n\r?\n.*", Pattern.DOTALL).
           matcher(help2).replaceAll("");
-        sb.append(help1.replaceAll("(\\[.*?\\]\\??)", "<code>$1</code>"));
-        sb.append(NL + "</p>" + NL);
+        int tmp = help1.indexOf(":");
+        if(tmp == -1) tmp = help1.indexOf(".");
+        sb.append(help1.substring(0, tmp + 1));
+        sb.append(NL + "</p>" + NL + NL);
 
         boolean first = true;
         for(String s : help2.split(NL)) {
@@ -158,7 +161,6 @@ public interface Commands {
         sb.append(NL);
       }
       return sb.toString();
-    }
-     */
+    }*/
   }
 }
