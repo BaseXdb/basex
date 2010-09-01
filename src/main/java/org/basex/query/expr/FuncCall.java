@@ -55,7 +55,7 @@ public final class FuncCall extends Arr {
       // evaluate arguments to catch cast exceptions
       for(int a = 0; a < expr.length; ++a) func.args[a].bind(expr[a], ctx);
       ctx.compInfo(OPTINLINE, func.var.name.atom());
-      return func.iter(ctx).finish();
+      return func.value(ctx);
     }
     type = func.type();
     return this;
@@ -66,7 +66,7 @@ public final class FuncCall extends Arr {
     final int al = expr.length;
     final Value[] args = new Value[al];
     // evaluate arguments
-    for(int a = 0; a < al; ++a) args[a] = ctx.iter(expr[a]).finish();
+    for(int a = 0; a < al; ++a) args[a] = expr[a].value(ctx);
     // move variables to stack
     final int s = ctx.vars.size();
     for(int a = 0; a < al; ++a) {

@@ -78,7 +78,7 @@ public final class Func extends Single {
     // evaluate function and reset variable scope
     final Value cv = ctx.value;
     ctx.value = null;
-    final Value v = ctx.iter(expr).finish();
+    final Value v = expr.value(ctx);
     ctx.value = cv;
     return (var.type != null ? var.type.cast(v, ctx, input) : v).iter(ctx);
   }

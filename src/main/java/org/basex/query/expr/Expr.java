@@ -6,6 +6,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
+import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.MixedPath;
@@ -61,6 +62,14 @@ public abstract class Expr extends ExprInfo {
       throws QueryException;
 
   /**
+   * Evaluates the expression and returns the resulting value.
+   * @param ctx query context
+   * @return iterator
+   * @throws QueryException query exception
+   */
+  public abstract Value value(final QueryContext ctx) throws QueryException;
+
+  /**
    * Checks if the iterator can be dissolved into an effective boolean value.
    * If not, returns an error. If yes, returns the first value - which can be
    * also be e.g. an integer, which is later evaluated as position predicate.
@@ -87,7 +96,7 @@ public abstract class Expr extends ExprInfo {
    * @return result of check
    */
   public boolean empty() {
-    return false; //size() == 0;
+    return false;
   }
 
   /**

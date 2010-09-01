@@ -190,23 +190,23 @@ public final class SeqType {
   }
 
   /**
-   * Casts the specified item.
-   * @param item item to be cast
+   * Casts the specified value.
+   * @param val value to be cast
    * @param ctx query context
    * @param ii input info
    * @return resulting item
    * @throws QueryException query exception
    */
-  public Value cast(final Value item, final QueryContext ctx,
+  public Value cast(final Value val, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
-    final Iter iter = item.iter(ctx);
+    final Iter iter = val.iter(ctx);
     Item it = iter.next();
     if(it == null) {
       if(mayBeZero()) return Empty.SEQ;
-      Err.cast(ii, type, item);
+      Err.cast(ii, type, val);
     }
-    if(type == Type.EMP) Err.cast(ii, type, item);
+    if(type == Type.EMP) Err.cast(ii, type, val);
 
     boolean ins = it.type.instance(type);
     if(!it.unt() && !ins &&
@@ -216,7 +216,7 @@ public final class SeqType {
 
     it = check(ins ? it : type.e(it, ctx, ii), ii);
     Item n = iter.next();
-    if(zeroOrOne() && n != null) Err.cast(ii, type, item);
+    if(zeroOrOne() && n != null) Err.cast(ii, type, val);
 
     final ItemIter ir = new ItemIter();
     ir.add(it);

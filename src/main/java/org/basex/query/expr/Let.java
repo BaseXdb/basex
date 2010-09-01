@@ -69,20 +69,20 @@ public final class Let extends ForLet {
       public Item next() throws QueryException {
         if(!more) {
           vs = ctx.vars.size();
-          final Iter ir = ctx.iter(expr);
           Value v;
           if(score) {
             // assign average score value
             double s = 0;
             int c = 0;
             Item it;
+            final Iter ir = ctx.iter(expr);
             while((it = ir.next()) != null) {
               s += it.score();
               c++;
             }
             v = Dbl.get(ctx.score.let(s, c));
           } else {
-            v = ir.finish();
+            v = expr.value(ctx);
           }
           ctx.vars.add(vr.bind(v, ctx));
           more = true;

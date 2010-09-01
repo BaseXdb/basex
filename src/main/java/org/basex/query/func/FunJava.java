@@ -80,7 +80,7 @@ public final class FunJava extends Arr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Value[] arg = new Value[expr.length];
     for(int a = 0; a < expr.length; ++a) {
-      arg[a] = expr[a].iter(ctx).finish();
+      arg[a] = expr[a].value(ctx);
       if(arg[a].size() == 0) Err.or(input, XPEMPTY, desc());
     }
 

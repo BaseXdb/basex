@@ -118,18 +118,13 @@ public final class Var extends ParseExpr {
     return value(ctx).iter(ctx);
   }
 
-  /**
-   * Evaluates the variable and returns the resulting value.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
+  @Override
   public Value value(final QueryContext ctx) throws QueryException {
     if(value == null) {
       if(expr == null) Err.or(input, VAREMPTY, this);
       final Value v = ctx.value;
       ctx.value = null;
-      value = cast(ctx.iter(expr.comp(ctx)).finish(), ctx);
+      value = cast(expr.comp(ctx).value(ctx), ctx);
       ctx.value = v;
     }
     return value;

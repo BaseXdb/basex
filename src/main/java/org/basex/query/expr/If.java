@@ -70,7 +70,7 @@ public final class If extends Arr {
       }
     }
 
-    type = expr[1].type().intersect(expr[1].type());
+    type = expr[1].type().intersect(expr[2].type());
     return this;
   }
 

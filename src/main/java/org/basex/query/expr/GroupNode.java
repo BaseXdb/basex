@@ -7,14 +7,14 @@ import org.basex.query.item.Item;
 
 /**
  * GroupNode defines one valid partitioning setting.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
 final class GroupNode {
   /** List of grouping var items. */
   final Item[] its;
-  /** Hashes for the group representative values.
-   *  N.B. long instead of int */
+  /** Hashes for the group representative values. */
   final int hash;
 
   /**
@@ -23,25 +23,9 @@ final class GroupNode {
    */
   GroupNode(final Item[] is) {
     its = is;
-    int result = 1;
-    for(Item it : its)
-      result = 31 * result + it.hashCode();
-    hash = result;
-  }
-
-  @Override
-  public int hashCode() {
-    return hash;
-  }
-
-  /* for debugging (should be removed later) */
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(" ");
-    sb.append(" with grouping var ");
-    sb.append(Arrays.toString(its));
-    return sb.toString();
+    int h = 0;
+    for(final Item it : its) h = (h << 5) - h + it.hashCode();
+    hash = h;
   }
 
   /**
@@ -56,5 +40,16 @@ final class GroupNode {
       if(!its[i].equiv(null, c.its[i])) return false;
     }
     return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return hash;
+  }
+
+  /* for debugging (should be removed later) */
+  @Override
+  public String toString() {
+    return " with grouping var " + Arrays.toString(its);
   }
 }

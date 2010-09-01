@@ -42,7 +42,7 @@ public final class Group extends ParseExpr {
    * @param fl ForLet
    * @param ob order by spec
    */
-  public void initgroup(final ForLet[] fl, final Order ob) {
+  void initgroup(final ForLet[] fl, final Order ob) {
     final Var[] vs = new Var[groupby.length];
     final Var[] fs = new Var[fl.length];
     for(int i = 0; i < groupby.length; ++i) vs[i] = groupby[i];
@@ -102,18 +102,18 @@ public final class Group extends ParseExpr {
   /**
    * Adds the current context to the grouping partition.
    * @param ctx context
-   * @throws QueryException ex
+   * @throws QueryException query exception
    */
-  public void add(final QueryContext ctx) throws QueryException {
+  void add(final QueryContext ctx) throws QueryException {
     gp.add(ctx);
   }
 
   /**
    * Returns grouped variables.
-   * @param ctx context.
+   * @param ctx context
    * @param ret return expression
    * @return iterator on the result set
-   * @throws QueryException on error.
+   * @throws QueryException query exception
    */
   Iter ret(final QueryContext ctx, final Expr ret) throws QueryException {
     final ItemIter ir = new ItemIter();
@@ -128,7 +128,7 @@ public final class Group extends ParseExpr {
     for(int i = 0; i < gp.partitions.size(); ++i) { // bind grouping var
       collectValues(ctx, pgvars, pgngvar, i);
 
-      if(gp.order != null) vl.add(ctx.iter(ret).finish());
+      if(gp.order != null) vl.add(ret.value(ctx));
       else ir.add(ctx.iter(ret));
     }
     if(gp.order != null) {

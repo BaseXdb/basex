@@ -218,7 +218,7 @@ public class FLWOR extends ParseExpr {
       } else {
         if(where == null || where.ebv(ctx, input).bool(input)) {
           order.add(ctx);
-          vl.add(ctx.iter(ret).finish());
+          vl.add(ret.value(ctx));
         }
       }
     }

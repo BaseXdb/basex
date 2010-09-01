@@ -44,8 +44,7 @@ public abstract class Fun extends Arr {
     // skip functions based on context or with non-values as arguments
     if(uses(Use.CTX) || !values()) return optPre(cmp(ctx), ctx);
     // pre-evaluate function
-    return optPre(def.ret.zeroOrOne() ? atomic(ctx, input) :
-      iter(ctx).finish(), ctx);
+    return optPre(def.ret.zeroOrOne() ? atomic(ctx, input) : value(ctx), ctx);
   }
 
   /**

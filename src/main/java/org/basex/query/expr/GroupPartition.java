@@ -15,6 +15,7 @@ import org.basex.util.IntMap;
 
 /**
  * Stores the grouping for a group by clause.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Michael Seiferle
  */
@@ -61,16 +62,17 @@ final class GroupPartition {
     int i = 0;
     for(final Var v : fls) {
       boolean skip = false;
-      for(final Var g : gv)
+      for(final Var g : gv) {
         if(v.eq(g)) {
           skip = true;
           break;
         }
+      }
       if(skip) continue;
       ngv[i++] = v;
     }
     partitions = new ArrayList<GroupNode>();
-    
+
     items = ngv.length != 0 ? new ArrayList<ItemIter[]>() : null;
     order = ob;
     among = false;
@@ -85,7 +87,6 @@ final class GroupPartition {
    * potential matches and checks them for equivalence.
    * The GroupNode candidate is ignored if it exists otherwise added to the
    * partitioning scheme.
-   *
    * @param ctx QueryContext
    * @throws QueryException exception
    */
@@ -101,10 +102,10 @@ final class GroupPartition {
     int p = -1;
     final GroupNode cand = new GroupNode(its);
     final int chash = cand.hashCode();
-    IntList ps;
-    if(null != (ps = hashes.get(chash))) {
-      for(int i = 0; i <= ps.size(); ++i) {
-        final int pp  = ps.get(i);
+    IntList ps = hashes.get(chash);
+    if(ps != null) {
+      for(int i = 0; i < ps.size(); ++i) {
+        final int pp = ps.get(i);
         if(cand.eq(partitions.get(pp))) {
           p = pp;
           break;
@@ -115,10 +116,10 @@ final class GroupPartition {
       if(order != null) order.add(ctx);
       p = partitions.size();
       partitions.add(cand);
-      
+
       IntList pos = hashes.get(chash);
       if(pos == null) {
-        pos = new IntList(2);
+        pos = new IntList(1);
         hashes.add(chash, pos);
       }
       pos.add(p);
@@ -135,9 +136,9 @@ final class GroupPartition {
    */
   private void addNonGrpIts(final QueryContext ctx, final int p)
       throws QueryException {
-    
+
     if(p == items.size()) items.add(new ItemIter[ngv.length]);
-    ItemIter[] sq = items.get(p);
+    final ItemIter[] sq = items.get(p);
 
     for(int i = 0; i < ngv.length; ++i) {
       ItemIter ir = sq[i];
@@ -145,7 +146,7 @@ final class GroupPartition {
         ir = new ItemIter();
         sq[i] = ir;
       }
-        ir.add(ngv[i].iter(ctx));
+      ir.add(ngv[i].iter(ctx));
     }
   }
 
@@ -155,10 +156,7 @@ final class GroupPartition {
    */
   private void cacheVars(final QueryContext ctx) {
     for(int i = 0; i < ngv.length; ++i) ngv[i] = ctx.vars.get(ngv[i]);
-    
     for(int i = 0; i < gv.length; ++i) cgv[i] = ctx.vars.get(gv[i]);
     cachedVars = true;
-
   }
-
 }

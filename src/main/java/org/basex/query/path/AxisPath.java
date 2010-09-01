@@ -388,7 +388,7 @@ public class AxisPath extends Path {
     final Value c = ctx.value;
     final long cs = ctx.size;
     final long cp = ctx.pos;
-    Value r = root != null ? ctx.iter(root).finish() : c;
+    Value r = root != null ? root.value(ctx) : c;
 
     if(!cache || citer == null || lvalue.type != Type.DOC ||
         r.type != Type.DOC || !((Nod) lvalue).is((Nod) r)) {
@@ -468,8 +468,8 @@ public class AxisPath extends Path {
 
     // set atomic type for single attribute steps to speedup predicate tests
     if(root == null && step.length == 1 && step[0].axis == ATTR &&
-        step[0].test.kind != Kind.ALL) {
-      step[0].type = SeqType.NOD_ZO; 
+        step[0].test.kind != Kind.STD) {
+      step[0].type = SeqType.NOD_ZO;
     }
   }
 

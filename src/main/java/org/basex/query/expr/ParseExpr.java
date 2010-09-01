@@ -65,6 +65,12 @@ public abstract class ParseExpr extends Expr {
   }
 
   @Override
+  public Value value(final QueryContext ctx) throws QueryException {
+    final Value v = type().one() ? atomic(ctx, input) : ctx.iter(this).finish();
+    return v == null ? Empty.SEQ : v;
+  }
+  
+  @Override
   public final Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
@@ -82,8 +88,6 @@ public abstract class ParseExpr extends Expr {
     return (it.num() ? it.dbl(input) == ctx.pos : it.bool(input)) ? it : null;
   }
 
-  // OPTIMIZATIONS ============================================================
-
   @Override
   public SeqType type() {
     return type != null ? type : SeqType.ITEM_ZM;
@@ -93,6 +97,8 @@ public abstract class ParseExpr extends Expr {
   public final long size() {
     return size == -1 ? type().occ() : size;
   }
+
+  // OPTIMIZATIONS ============================================================
 
   /**
    * Pre-evaluates the specified expression.

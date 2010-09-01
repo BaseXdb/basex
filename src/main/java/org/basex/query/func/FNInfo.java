@@ -61,7 +61,7 @@ final class FNInfo extends Fun {
           throw ex;
         }
       case TRACE:
-        final Value val = expr[0].iter(ctx).finish();
+        final Value val = expr[0].value(ctx);
         ctx.evalInfo(checkEStr(expr[1], ctx), val.toString());
         return val.iter();
       case ENVS:

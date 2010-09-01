@@ -138,7 +138,8 @@ final class FNFile extends Fun {
 
         while(++c < files.length) {
           final String name = files[c].getName();
-          if(!files[c].isHidden() && (pattern == null || name.matches(pattern))) return Str.get(name);
+          if(!files[c].isHidden() && (pattern == null || name.matches(pattern)))
+            return Str.get(name);
         }
         return null;
       }
