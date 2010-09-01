@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
@@ -44,6 +43,12 @@ final class GroupPartition {
   final boolean among;
   /** flag indicates variable caching. */
   private boolean cachedVars;
+  /** flag indicates return variable caching.*/
+  private boolean cachedRet;
+  /** Cached postgrouping grouping variables. */
+  private Var[] pgvars;
+  /** Cached postgrouping non grouping variables. */
+  private Var[] pgngvars;
 
   /**
    * Sets up an empty partitioning.
@@ -212,20 +217,24 @@ final class GroupPartition {
    * @return iterator on the result set
    * @throws QueryException query exception
    */
-  Iter ret(final QueryContext ctx, final Expr ret)
-      throws QueryException {
+  Iter ret(final QueryContext ctx, final Expr ret) throws QueryException {
     final ItemIter ir = new ItemIter();
     final ValueList vl = new ValueList();
-    final Var[] pgvars = new Var[gv.length];
-    final Var[] pgngvar = new Var[ngv.length];
-    for(int j = 0; j < gv.length; ++j)
-      pgvars[j] = ctx.vars.get(gv[j]);
-    for(int j = 0; j < ngv.length; ++j)
-      pgngvar[j] = ctx.vars.get(ngv[j]);
-  
-    for(int i = 0; i < partitions.size(); ++i) { // bind grouping var
-     collectValues(ctx, pgvars, pgngvar, i);
-  
+    if(!cachedRet) cacheRet(ctx);
+
+    for(int i = 0; i < partitions.size(); ++i) {
+      final GroupNode gn = partitions.get(i);
+      for(int j = 0; j < pgvars.length; ++j)
+        pgvars[j].bind(gn.its[j], ctx);
+
+      if(items != null) {
+        final ItemIter[] ngvars = items.get(i);
+        for(int j = 0; j < ngvars.length; ++j) {
+          final ItemIter its = ngvars[j];
+          pgngvars[j].bind(its.finish(), ctx);
+        }
+      }
+
       if(order != null) vl.add(ret.value(ctx));
       else ir.add(ctx.iter(ret));
     }
@@ -237,25 +246,16 @@ final class GroupPartition {
   }
 
   /**
-   * Extracts the current variable binding.
-   * @param ctx QueryContext
-   * @param pgvars grouping variables
-   * @param pgngvar non grouping variables
-   * @param i position
-   * @throws QueryException exception
+   * Caches the return variables.
+   * @param ctx query context.
    */
-  void collectValues(final QueryContext ctx, final Var[] pgvars,
-      final Var[] pgngvar, final int i) throws QueryException {
-    final ItemIter[] ngvars = items != null ? items.get(i)
-        : null;
-    final GroupNode gn = partitions.get(i);
+  private void cacheRet(final QueryContext ctx) {
+    pgvars = new Var[gv.length];
+    pgngvars = new Var[ngv.length];
     for(int j = 0; j < gv.length; ++j)
-      pgvars[j].bind(gn.its[j], ctx);
-  
-    for(int j = 0; j < ngv.length; ++j) {
-      final ItemIter its = ngvars[j];
-      if(its != null) pgngvar[j].bind(its.finish(), ctx);
-      else pgngvar[j].bind(Empty.SEQ, ctx);
-    }
+      pgvars[j] = ctx.vars.get(gv[j]);
+    for(int j = 0; j < ngv.length; ++j)
+      pgngvars[j] = ctx.vars.get(ngv[j]);
+    cachedRet = true;
   }
 }
