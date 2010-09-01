@@ -339,7 +339,7 @@ public final class QueryContext extends Progress {
     final boolean r = funcs.size() != 0 || vars.global().size != 0;
     if(r) ser.openElement(PLAN);
     funcs.plan(ser);
-    vars.plan(ser);
+    //vars.plan(ser);
     root.plan(ser);
     if(r) ser.closeElement();
   }
@@ -559,11 +559,10 @@ public final class QueryContext extends Progress {
    */
   public Data data() throws QueryException {
     if(value == null) return null;
-    Data data = null;
-
     if(docNodes()) return doc[0].data;
 
     final Iter iter = value.iter(this);
+    Data data = null;
     Item it;
     while((it = iter.next()) != null) {
       if(!(it instanceof DBNode)) return null;
@@ -579,7 +578,7 @@ public final class QueryContext extends Progress {
    * @return result of check
    */
   public boolean docNodes() {
-    return value instanceof Seq && ((Seq) value).val == doc;
+    return value instanceof Seq && value.sameAs(Seq.get(doc, docs));
   }
 
   /**

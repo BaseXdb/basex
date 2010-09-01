@@ -200,6 +200,8 @@ public final class SeqType {
   public Value cast(final Value val, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
 
+    //System.out.println(val.type() + ": " + this);
+    
     final Iter iter = val.iter(ctx);
     Item it = iter.next();
     if(it == null) {

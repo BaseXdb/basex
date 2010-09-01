@@ -23,17 +23,17 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public class FLWOR extends ParseExpr {
-  /** Expression list. */
+  /** Return expression. */
   protected Expr ret;
-  /** For/Let expressions. */
+  /** For/Let clause. */
   protected ForLet[] fl;
-  /** Where expression. */
+  /** Where clause. */
   protected Expr where;
-  /** Order expressions. */
-  private Order order;
+  /** Order clause. */
+  protected Order order;
 
   /**
-   * FLWOR initialization.
+   * FLWOR constructor.
    * @param f variable inputs
    * @param w where clause
    * @param o order expression

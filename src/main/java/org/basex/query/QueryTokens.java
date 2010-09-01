@@ -467,6 +467,8 @@ public interface QueryTokens {
   /** Query Plan. */
   byte[] SIZE = token("size");
   /** Query Plan. */
+  byte[] STRT = token("start");
+  /** Query Plan. */
   byte[] AXIS = token("axis");
   /** Query Plan. */
   byte[] TEST = token("test");

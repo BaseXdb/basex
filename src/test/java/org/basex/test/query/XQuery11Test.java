@@ -48,6 +48,7 @@ public final class XQuery11Test extends QueryTest {
              "for $x in (1,2,3) for $y in ('a') group by $x order by $y," +
              " $x descending return $x"
         },
+
         { "FLWOR Err 1", "let $x := (1,2) group by $x return $x" },
         { "FLWOR Err 2", "let $x := (1,2) group by $z return $x"},
         { "FLWOR Err 3", 
@@ -63,11 +64,18 @@ public final class XQuery11Test extends QueryTest {
          "$p order by $p return $s" },      
         { "FLWOR 9", itr(0),
           "for $s in (1) let $p := () group by $p order by $p return 0" },
-        { "FLWOR 9", itr(1),
+        { "FLWOR 10", itr(1),
           "for $i as xs:integer in 1 for $i in 1 return $i" },
         { "FLWOR Err 4 (global)", 
           "declare variable $a := 1; for $b in 1 group by $a return $b" },
-          
+
+        /** [MS] GroupPartition.add: (!among && order.uses(ngv[i])) should be
+         *    checked later if ret() is called. Next, it should support
+         *    empty sequences...
+
+        { "FLWOR 11", itr(1),
+          "for $x in (1,1) let $y := () group by $x order by $y return 1" },
+        */
     };
   }
   /* TABLE REPRESENTATION

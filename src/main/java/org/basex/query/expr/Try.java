@@ -39,13 +39,15 @@ public final class Try extends Single {
     }
     checkUp(expr, ctx);
 
-    // compile expression, catch exceptions
+    // compile expression
     Expr e = this;
     try {
       e = super.comp(ctx);
     } catch(final QueryException ex) {
+      // catch exception for evaluation if expression fails at compile time
       qe = ex;
     }
+
     // evaluate result type
     type = expr.type();
     for(final Catch c : ctch) type = type.intersect(c.type());

@@ -12,6 +12,11 @@ import org.basex.query.item.Type;
  * @author Christian Gruen
  */
 public final class KindTest extends Test {
+  /** Static text node test. */
+  public static final Test TEXT = new KindTest(Type.TXT);
+  /** Static document node test. */
+  public static final Test DOC = new KindTest(Type.DOC);
+
   /**
    * Constructor.
    * @param t node type

@@ -286,6 +286,7 @@ public class AxisPath extends Path {
 
     // cache index access costs
     IndexContext ics = null;
+    // cheapest predicate and step
     int pmin = 0;
     int smin = 0;
 
@@ -346,12 +347,11 @@ public class AxisPath extends Path {
         final Axis a = step[j].axis.invert();
         if(a == null) break;
 
-        if(j == 0) {
-          if(a != Axis.ANC && a != Axis.ANCORSELF)
-            inv = Array.add(inv, Step.get(input, a, new KindTest(Type.DOC)));
-        } else {
+        if(j != 0) {
           final Step prev = step[j - 1];
           inv = Array.add(inv, Step.get(input, a, prev.test, prev.pred));
+        } else if(a != Axis.ANC && a != Axis.ANCORSELF) {
+          inv = Array.add(inv, Step.get(input, a, KindTest.DOC));
         }
       }
       final boolean simple = inv.length == 0 && newPreds.length == 0;
@@ -563,7 +563,7 @@ public class AxisPath extends Path {
     final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
     if(stats != null && stats.leaf) {
       step = Array.add(step,
-          Step.get(input, Axis.CHILD, new KindTest(Type.TXT)));
+          Step.get(input, Axis.CHILD, KindTest.TEXT));
       ctx.compInfo(OPTTEXT, this);
     }
     return this;

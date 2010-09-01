@@ -4,7 +4,6 @@ import static org.basex.query.QueryText.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
-import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
@@ -50,7 +49,7 @@ public final class Context extends Simple {
     if(!ctx.leaf) return this;
     ctx.compInfo(OPTTEXT);
     return AxisPath.get(input, null,
-        Step.get(input, Axis.CHILD, new KindTest(Type.TXT)));
+        Step.get(input, Axis.CHILD, KindTest.TEXT));
   }
 
   @Override

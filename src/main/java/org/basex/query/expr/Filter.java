@@ -8,7 +8,6 @@ import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.item.Seq;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
@@ -159,7 +158,7 @@ public class Filter extends Preds {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(root instanceof Seq ? root : "(" + root + ")");
+    sb.append(root.size() > 1 ? root : "(" + root + ")");
     return sb.append(super.toString()).toString();
   }
 }

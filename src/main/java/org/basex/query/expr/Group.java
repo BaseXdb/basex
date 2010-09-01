@@ -41,11 +41,13 @@ public final class Group extends ParseExpr {
    * @throws QueryException exception
    */
   void initgroup(final ForLet[] fl, final Order ob) throws QueryException {
+    // [MS] copy isn't needed imo; what about directly passing on
+    // "groupby" to GroupPartition?
     final Var[] vs = new Var[groupby.length];
     final Var[] fs = new Var[fl.length];
     System.arraycopy(groupby, 0, vs, 0, groupby.length);
     for(int i = 0; i < fl.length; ++i) fs[i] = fl[i].var;
-    gp = new GroupPartition(vs, fs, ob, input);
+    gp = new GroupPartition(groupby, fs, ob, input);
 
   }
 
@@ -79,16 +81,20 @@ public final class Group extends ParseExpr {
   }
 
   @Override
-  public Group remove(final Var v) {
-    for(int g = 0; g < groupby.length; ++g)
-      groupby[g] = (Var) groupby[g].remove(v);
-    return this;
-  }
-
-  @Override
   public boolean removable(final Var v) {
     for(final Var g : groupby) if(g.eq(v)) return false;
     return true;
+  }
+
+  @Override
+  // [MS] cast isn't safe! This method isn't needed anyway,
+  //   as the specified variable will never be replaced here, so..
+  //   just remove it
+  public Group remove(final Var v) {
+    for(int g = 0; g < groupby.length; ++g) {
+      groupby[g] = (Var) groupby[g].remove(v);
+    }
+    return this;
   }
 
   @Override
@@ -102,14 +108,5 @@ public final class Group extends ParseExpr {
   public String toString() {
     return new TokenBuilder(" " + GROUP + " " + BY + " ").
     add(groupby, ", ").toString();
-  }
-
-  /**
-   * Adds the current context to the grouping partition.
-   * @param ctx context
-   * @throws QueryException query exception
-   */
-  void add(final QueryContext ctx) throws QueryException {
-    gp.add(ctx);
   }
 }

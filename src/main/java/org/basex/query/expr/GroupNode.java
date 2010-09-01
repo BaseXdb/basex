@@ -11,19 +11,19 @@ import org.basex.query.item.Value;
  * @author Michael Seiferle
  */
 final class GroupNode {
-  /** List of grouping var items. */
-  final Value[] its;
-  /** Hashes for the group representative values. */
+  /** Cached hash code. */
   private final int hash;
+  /** List of grouping values. */
+  final Value[] vals;
 
   /**
    * Creates a group node.
-   * @param is grouping var items
+   * @param vl grouping values
    */
-  GroupNode(final Value[] is) {
-    its = is;
+  GroupNode(final Value[] vl) {
+    vals = vl;
     int h = 0;
-    for(final Value it : its) h = (h << 5) - h + it.hashCode();
+    for(final Value v : vals) h = (h << 5) - h + v.hashCode();
     hash = h;
   }
 
@@ -34,12 +34,11 @@ final class GroupNode {
    * @throws QueryException query exception
    */
   boolean eq(final GroupNode c) throws QueryException {
-    if(its.length != c.its.length) return false;
-    for(int i = 0; i < its.length; ++i) {
-      final boolean isitem = its[i].item();
-      if(isitem ^ c.its[i].item() || its[i].empty() ^ c.its[i].empty())
-        return false;
-      if(isitem && !((Item) its[i]).equiv(null, (Item) c.its[i])) return false;
+    if(vals.length != c.vals.length) return false;
+    for(int i = 0; i < vals.length; ++i) {
+      final boolean it = vals[i].item();
+      if(it ^ c.vals[i].item() || it &&
+          !((Item) vals[i]).equiv(null, (Item) c.vals[i])) return false;
     }
     return true;
   }
@@ -48,5 +47,4 @@ final class GroupNode {
   public int hashCode() {
     return hash;
   }
-
 }

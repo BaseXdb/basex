@@ -23,39 +23,38 @@ import org.basex.util.TokenSet;
  */
 final class GroupPartition {
   /** Input information. */
-  final InputInfo input;
-  /** Grouping variables. */
-  final Var[] gv;
-  /** Cached Grouping variables. Needed to allow return iteration. */
-  final Var[] cgv;
-  /** Non-grouping variables. */
-  final Var[] ngv;
-  /** Group Partitioning. */
-  final ArrayList<GroupNode> partitions;
-  /** Resulting Sequence for non grouping variables. */
-  final ArrayList<ItemIter[]> items;
-  /** HashValue, Position (with overflow bucket). */
-  private final IntMap<IntList> hashes = new IntMap<IntList>();
+  private final InputInfo input;
   /** Order by specifier. */
-  final Order order;
+  private final Order order;
+
+  /** Grouping variables. */
+  private final Var[] gv;
+  /** Non-grouping variables. */
+  private final Var[] ngv;
+  /** Cached post-grouping grouping variables. */
+  private Var[] pggv;
+  /** Cached post-grouping non-grouping variables. */
+  private Var[] pgngv;
+
+  /** Group partitioning. */
+  private final ArrayList<GroupNode> part = new ArrayList<GroupNode>();
+  /** Resulting sequence for non-grouping variables. */
+  private final ArrayList<ItemIter[]> items;
+  /** HashValue, position (with overflow bucket). */
+  private final IntMap<IntList> hashes = new IntMap<IntList>();
+
   /** ordering among groups. Set to false if order by contains
-  at least one non grouping variable. */
-  final boolean among;
+  at least one non-grouping variable. */
+  private final boolean among;
   /** flag indicates variable caching. */
   private boolean cachedVars;
-  /** flag indicates return variable caching.*/
-  private boolean cachedRet;
-  /** Cached postgrouping grouping variables. */
-  private Var[] pgvars;
-  /** Cached postgrouping non grouping variables. */
-  private Var[] pgngvars;
 
   /**
    * Sets up an empty partitioning.
    * Sets up the ordering scheme.
-   * @param gvs grouping vars
-   * @param fls ForLet Variables
-   * @param ob OrderBy specifier
+   * @param gvs grouping variables
+   * @param fls ForLet variables
+   * @param ob order by specifier
    * @param ii input info
    * @throws QueryException exception
    */
@@ -63,74 +62,56 @@ final class GroupPartition {
       final InputInfo ii) throws QueryException {
 
     gv = gvs;
-    cgv = gvs;
-    final int ns = ngvSize(gvs, fls);
-    ngv = new Var[ns];
-    int i = 0;
+    ngv = new Var[ngvSize(gvs, fls)];
     order = ob;
 
+    int i = 0;
     for(final Var v : fls) {
-      boolean skip = false;
-      for(final Var g : gv) {
-        if(v.eq(g)) {
-          skip = true;
-          break;
-        }
-      }
-      if(skip) continue;
-      
-      ngv[i++] = v;
+      boolean ng = true;
+      for(final Var g : gv) ng &= !v.eq(g);
+      if(ng) ngv[i++] = v;
     }
+
+    boolean am = true;
     if(order != null) {
-      boolean[] ams = new boolean[order.ob.length - 1];
-      for(int ol = 0; ol < ams.length; ++ol) {
-        for(final Var g : gv) {
-          if(order.ob[ol].uses(g)) ams[ol] = true;
-        }
+      final boolean[] ams = new boolean[order.ob.length - 1];
+      for(int ol = 0; ol < ams.length; ol++) {
+        for(final Var g : gv) if(order.ob[ol].uses(g)) ams[ol] = true;
       }
-      boolean am = true;
-      for (boolean am1 : ams) am &= am1;
-      among = am;
-    } else among = true;
-    
-    partitions = new ArrayList<GroupNode>();
+      for(final boolean a : ams) am &= a;
+    }
+    among = am;
     items = ngv.length != 0 ? new ArrayList<ItemIter[]>() : null;
     input = ii;
   }
 
   /**
-   * Calculates the number of unique non grouping variables.
+   * Calculates the number of unique non-grouping variables.
    * This is #ForLet - #GroupBy
    * <p>Returns 0 for <br />
    * <code>for $a in 1 for $a in 2 group by $a return $a</code></p>
    * @param gvs grouping vars
    * @param fls forlet vars
-   * @return size of non grouping variables container.
+   * @return size of non-grouping variables container.
    * @throws QueryException var not found.
    */
   private int ngvSize(final Var[] gvs, final Var[] fls) throws QueryException {
-    final TokenSet flshelp = new TokenSet();
-    final TokenSet glshelp = new TokenSet();
+    final TokenSet fc = new TokenSet();
+    final TokenSet gc = new TokenSet();
 
-    for(final Var v : fls)
-      flshelp.add(v.name.atom());
-    for(final Var g : gvs)
-      glshelp.add(g.name.atom());
+    for(final Var v : fls) fc.add(v.name.atom());
+    for(final Var g : gvs) gc.add(g.name.atom());
     for(final Var g : gvs) {
-      boolean found = false;
-      for(final Var f : fls) {
-        found |= f.eq(g);
-      }
-      if(!found) Err.or(null, QueryText.GVARNOTDEFINED, g);
+      boolean f = false;
+      for(final Var v : fls) f |= v.eq(g);
+      if(!f) Err.or(null, QueryText.GVARNOTDEFINED, g);
     }
-    final int vl = flshelp.size();
-    final int gl = glshelp.size();
-    return vl - gl;
+    return fc.size() - gc.size();
   }
 
   /**
    * Adds the current grouping variable binding to the partitioning scheme.
-   * Then the resulting non grouping variable item sequence is built for each
+   * Then the resulting non-grouping variable item sequence is built for each
    * candidate.
    * Searches the known partition hashes {@link GroupPartition#hashes} for
    * potential matches and checks them for equivalence.
@@ -142,20 +123,22 @@ final class GroupPartition {
   void add(final QueryContext ctx) throws QueryException  {
     if(!cachedVars) cacheVars(ctx);
 
-    final Value[] its = new Value[gv.length];
-    for(int i = 0; i < gv.length; ++i) {
-      final Value val = cgv[i].value(ctx);
-      if(val.item() || val.empty()) its[i] = val;
-      else Err.or(input, QueryText.XGRP);
+    final int gl = gv.length;
+    final Value[] vals = new Value[gl];
+    for(int i = 0; i < gl; ++i) {
+      final Value val = gv[i].value(ctx);
+      if(val.size() > 1) Err.or(input, QueryText.XGRP);
+      vals[i] = val;
     }
+
+    final GroupNode gn = new GroupNode(vals);
+    final int h = gn.hashCode();
+    final IntList ps = hashes.get(h);
     int p = -1;
-    final GroupNode cand = new GroupNode(its);
-    final int chash = cand.hashCode();
-    IntList ps = hashes.get(chash);
     if(ps != null) {
       for(int i = 0; i < ps.size(); ++i) {
         final int pp = ps.get(i);
-        if(cand.eq(partitions.get(pp))) {
+        if(gn.eq(part.get(pp))) {
           p = pp;
           break;
         }
@@ -163,39 +146,35 @@ final class GroupPartition {
     }
     if(p < 0) {
       if(order != null) order.add(ctx);
-      p = partitions.size();
-      partitions.add(cand);
+      p = part.size();
+      part.add(gn);
 
-      IntList pos = hashes.get(chash);
+      IntList pos = hashes.get(h);
       if(pos == null) {
         pos = new IntList(1);
-        hashes.add(chash, pos);
+        hashes.add(h, pos);
       }
       pos.add(p);
     }
-    if(ngv.length != 0) addNonGrpIts(ctx, p);
-  }
 
-  /**
-   * Adds the current non grouping variable bindings to the
-   * {@code p-th} partition.
-   * @param ctx query context
-   * @param p partition position
-   * @throws QueryException query exception
-   */
-  private void addNonGrpIts(final QueryContext ctx, final int p)
-      throws QueryException {
+    // no non-grouping variables exist
+    final int ngl = ngv.length;
+    if(ngl == 0) return;
 
-    if(p == items.size()) items.add(new ItemIter[ngv.length]);
+    // Adds the current non-grouping variable bindings to the p-th partition.
+    if(p == items.size()) items.add(new ItemIter[ngl]);
     final ItemIter[] sq = items.get(p);
 
-    for(int i = 0; i < ngv.length; ++i) {
+    for(int i = 0; i < ngl; ++i) {
       ItemIter ir = sq[i];
       if(ir == null) {
         ir = new ItemIter();
         sq[i] = ir;
-      } else if(!among && order.uses(ngv[i])) Err.or(input, QueryText.XPSORT);
-      
+      } else if(!among && order.uses(ngv[i])) {
+        // [MS] buggy; see "FLWOR 11" test
+        // (better do it once at the end, and only for non-empty sequences)
+        Err.or(input, QueryText.XPSORT);
+      }
       ir.add(ngv[i].iter(ctx));
     }
   }
@@ -206,7 +185,7 @@ final class GroupPartition {
    */
   private void cacheVars(final QueryContext ctx) {
     for(int i = 0; i < ngv.length; ++i) ngv[i] = ctx.vars.get(ngv[i]);
-    for(int i = 0; i < gv.length; ++i) cgv[i] = ctx.vars.get(gv[i]);
+    for(int i = 0; i < gv.length; ++i) gv[i] = ctx.vars.get(gv[i]);
     cachedVars = true;
   }
 
@@ -220,19 +199,15 @@ final class GroupPartition {
   Iter ret(final QueryContext ctx, final Expr ret) throws QueryException {
     final ItemIter ir = new ItemIter();
     final ValueList vl = new ValueList();
-    if(!cachedRet) cacheRet(ctx);
+    if(pggv == null) cacheRet(ctx);
 
-    for(int i = 0; i < partitions.size(); ++i) {
-      final GroupNode gn = partitions.get(i);
-      for(int j = 0; j < pgvars.length; ++j)
-        pgvars[j].bind(gn.its[j], ctx);
+    for(int i = 0; i < part.size(); ++i) {
+      final GroupNode gn = part.get(i);
+      for(int j = 0; j < pggv.length; ++j) pggv[j].bind(gn.vals[j], ctx);
 
       if(items != null) {
-        final ItemIter[] ngvars = items.get(i);
-        for(int j = 0; j < ngvars.length; ++j) {
-          final ItemIter its = ngvars[j];
-          pgngvars[j].bind(its.finish(), ctx);
-        }
+        final ItemIter[] ii = items.get(i);
+        for(int j = 0; j < ii.length; ++j) pgngv[j].bind(ii[j].finish(), ctx);
       }
 
       if(order != null) vl.add(ret.value(ctx));
@@ -250,12 +225,10 @@ final class GroupPartition {
    * @param ctx query context.
    */
   private void cacheRet(final QueryContext ctx) {
-    pgvars = new Var[gv.length];
-    pgngvars = new Var[ngv.length];
-    for(int j = 0; j < gv.length; ++j)
-      pgvars[j] = ctx.vars.get(gv[j]);
-    for(int j = 0; j < ngv.length; ++j)
-      pgngvars[j] = ctx.vars.get(ngv[j]);
-    cachedRet = true;
+    // [MS] wondering why the references differ... but, hm, it's true
+    pggv = new Var[gv.length];
+    pgngv = new Var[ngv.length];
+    for(int j = 0; j < gv.length; ++j) pggv[j] = ctx.vars.get(gv[j]);
+    for(int j = 0; j < ngv.length; ++j) pgngv[j] = ctx.vars.get(ngv[j]);
   }
 }

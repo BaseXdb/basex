@@ -6,10 +6,13 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.query.path.AxisPath;
 import org.basex.query.util.Var;
+import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
@@ -19,19 +22,19 @@ import org.basex.util.InputInfo;
  * @author Christian Gruen
  */
 public class GFLWOR extends ParseExpr {
-  /** Expression list. */
-  private Expr ret;
-  /** For/Let expressions. */
-  private final ForLet[] fl;
-  /** Where expression. */
-  private Expr where;
-  /** Order expressions. */
-  private Order order;
-  /** Group by expression. */
-  private Group group;
+  /** Return expression. */
+  protected Expr ret;
+  /** For/Let expression. */
+  protected ForLet[] fl;
+  /** Where clause. */
+  protected Expr where;
+  /** Order clause. */
+  protected Order order;
+  /** Group by clause. */
+  protected Group group;
 
   /**
-   * GFLWOR initialization.
+   * GFLWOR constructor.
    * @param f variable inputs
    * @param w where clause
    * @param o order expression
@@ -52,6 +55,8 @@ public class GFLWOR extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    compWhere(ctx);
+
     final boolean grp = ctx.grouping;
     ctx.grouping = group != null;
 
@@ -95,13 +100,102 @@ public class GFLWOR extends ParseExpr {
     // remove declarations of statically bound variables
     for(int f = 0; f != fl.length; ++f) {
       if(fl[f].var.expr() != null) {
+        ctx.compInfo(OPTVAR, fl[f].var);
+        fl = Array.delete(fl, f--);
+      }
+    }
+
+    // no clauses left: simplify expression
+    // an optional order clause can be safely ignored
+    if(fl.length == 0) {
+      // if where clause exists: where A return B -> if A then B else ()
+      // otherwise: return B -> B
+      ctx.compInfo(OPTFLWOR);
+      return where != null ? new If(input, where, ret, Empty.SEQ) : ret;
+    }
+
+    // remove FLWOR expression if a FOR clause yields an empty sequence
+    for(final ForLet f : fl) {
+      if(f instanceof For && (f.empty() || f.size() == 0)) {
         ctx.compInfo(OPTFLWOR);
         return Empty.SEQ;
       }
     }
 
+    // compute number of results to speed up count() operations
+    if(where == null && group == null) {
+      size = ret.size();
+      if(size != -1) {
+        // multiply loop runs
+        for(final ForLet f : fl) {
+          final long s = f.size();
+          if(s == -1) {
+            size = s;
+            break;
+          }
+          size *= s;
+        }
+      }
+    }
     type = SeqType.get(ret.type().type, SeqType.Occ.ZM);
     return this;
+  }
+
+  /**
+   * Optimizes a where clause.
+   * @param ctx query context
+   */
+  private void compWhere(final QueryContext ctx) {
+    // no where clause specified
+    if(where == null) return;
+
+    // check if all clauses are simple, and if variables are removable
+    for(final ForLet f : fl)
+      if(f instanceof For && (!f.simple() || !where.removable(f.var))) return;
+
+    // create array with tests
+    final Expr[] tests = where instanceof And ? ((And) where).expr :
+      new Expr[] { where };
+
+    // find which tests access which variables. if a test will not use any of
+    // the variables defined in the local context, they will be added to the
+    // first binding
+    final int[] tar = new int[tests.length];
+    for(int t = 0; t < tests.length; ++t) {
+      int fr = -1;
+      for(int f = fl.length - 1; f >= 0; --f) {
+        // remember index of most inner FOR clause
+        if(fl[f] instanceof For) fr = f;
+        // predicate is found that uses the current variable
+        if(tests[t].uses(fl[f].var)) {
+          // stop rewriting if no most inner FOR clause is defined
+          if(fr == -1) return;
+          // attach predicate to the corresponding FOR clause, and stop
+          tar[t] = fr;
+          break;
+        }
+      }
+    }
+    // convert where clause to predicate(s)
+    ctx.compInfo(OPTWHERE);
+
+    // bind tests to the corresponding variables
+    for(int t = 0; t < tests.length; ++t) {
+      final ForLet f = fl[tar[t]];
+      Expr e = tests[t].remove(f.var);
+      // wrap test with boolean() if the result is numeric
+      if(e.type().mayBeNum()) e = FunDef.BOOLEAN.newInstance(input, e);
+      // attach predicates to axis path or filter, or create a new filter
+      if(f.expr instanceof AxisPath) {
+        f.expr = ((AxisPath) f.expr).addPreds(e);
+      } else if(f.expr instanceof Filter) {
+        f.expr = ((Filter) f.expr).addPred(e);
+      } else {
+        f.expr = new Filter(input, f.expr, e);
+      }
+    }
+    // eliminate where clause
+    where = null;
   }
 
   @Override
@@ -122,9 +216,7 @@ public class GFLWOR extends ParseExpr {
     final Iter ir = group.gp.ret(ctx, ret);
     ctx.vars.reset(vs);
     return ir;
-
   }
-
 
   /**
    * Performs a recursive iteration on the specified variable position.
@@ -133,16 +225,16 @@ public class GFLWOR extends ParseExpr {
    * @param p variable position
    * @throws QueryException query exception
    */
-  private void iter(final QueryContext ctx,
-       final Iter[] it, final int p)
+  private void iter(final QueryContext ctx, final Iter[] it, final int p)
       throws QueryException {
+
     final boolean more = p + 1 != fl.length;
     while(it[p].next() != null) {
       if(more) {
         iter(ctx, it, p + 1);
       } else {
         if(where == null || where.ebv(ctx, input).bool(input)) {
-          if(group != null) group.add(ctx);
+          if(group != null) group.gp.add(ctx);
         }
       }
     }
@@ -161,7 +253,7 @@ public class GFLWOR extends ParseExpr {
     }
     return where != null && where.uses(v)
         || order != null && order.uses(v)
-        || group != null && group.uses(v) && ret.uses(v);
+        || group != null && group.uses(v) || ret.uses(v);
   }
 
   @Override
@@ -182,6 +274,7 @@ public class GFLWOR extends ParseExpr {
       if(f.shadows(v)) return this;
     }
     if(where != null) where = where.remove(v);
+    if(group != null) group = group.remove(v);
     if(order != null) order = order.remove(v);
     ret = ret.remove(v);
     return this;

@@ -1,7 +1,10 @@
 package org.basex.query.iter;
 
+import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.RangeSeq;
+import org.basex.query.item.Value;
 
 /**
  * Range iterator.
@@ -12,7 +15,7 @@ import org.basex.query.item.Itr;
 public final class RangeIter extends Iter {
   /** Minimum value. */
   private long min;
-  /** Maximum value. */
+  /** Maximum value (plus one). */
   private long max;
   /** Current value. */
   private long pos;
@@ -55,5 +58,10 @@ public final class RangeIter extends Iter {
     min = pos + (asc ? -1 : 1);
     asc ^= true;
     return true;
+  }
+
+  @Override
+  public Value finish() throws QueryException {
+    return asc ? new RangeSeq(min, max - min) : super.finish();
   }
 }
