@@ -36,7 +36,8 @@ final class GroupPartition {
   private final IntMap<IntList> hashes = new IntMap<IntList>();
   /** Order by specifier. */
   final Order order;
-  /** ordering among groups. *TODO* */
+  /** ordering among groups. Set to false if order by contains
+  at leasst one non grouping varibale. */
   final boolean among;
   /** flag indicates variable caching. */
   private boolean cachedVars;
@@ -44,10 +45,6 @@ final class GroupPartition {
   /**
    * Sets up an empty partitioning.
    * Sets up the ordering scheme.
-   * [MS] *TODO* Order by so far only orders
-   * by grouping variables, non grouping variables are silently ignored
-   * in most cases where an XPTY0004 (no sequences allowed as sort keys) should
-   * be thrown.
    * @param gvs grouping vars
    * @param fls ForLet Variables
    * @param ob OrderBy specifier.
@@ -60,6 +57,8 @@ final class GroupPartition {
     cgv = gvs;
     ngv = new Var[fls.length - gv.length];
     int i = 0;
+    order = ob;
+
     for(final Var v : fls) {
       boolean skip = false;
       for(final Var g : gv) {
@@ -71,11 +70,21 @@ final class GroupPartition {
       if(skip) continue;
       ngv[i++] = v;
     }
+    if(order != null) {
+      boolean[] ams = new boolean[order.ob.length - 1];
+      for(int ol = 0; ol < ams.length; ++ol) {
+        for(final Var g : gv) {
+          if(order.ob[ol].uses(g)) ams[ol] = true;
+        }
+      }
+      boolean am = true;
+      for(int j = 0; j < ams.length; ++j)
+        am &= ams[j];
+      among = am;
+    } else among = true;
+    
     partitions = new ArrayList<GroupNode>();
-
     items = ngv.length != 0 ? new ArrayList<ItemIter[]>() : null;
-    order = ob;
-    among = false;
     input = ii;
   }
 
@@ -145,7 +154,8 @@ final class GroupPartition {
       if(ir == null) {
         ir = new ItemIter();
         sq[i] = ir;
-      }
+      } else if(!among && order.uses(ngv[i])) Err.or(input, QueryText.XPSORT);
+      
       ir.add(ngv[i].iter(ctx));
     }
   }

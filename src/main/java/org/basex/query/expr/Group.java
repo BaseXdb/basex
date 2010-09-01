@@ -81,6 +81,13 @@ public final class Group extends ParseExpr {
   }
 
   @Override
+  public Group remove(final Var v) {
+    for(int g = 0; g < groupby.length; ++g)
+      groupby[g] = (Var) groupby[g].remove(v);
+    return this;
+  }
+
+  @Override
   public boolean removable(final Var v) {
     for(final Var g : groupby) if(g.eq(v)) return false;
     return true;

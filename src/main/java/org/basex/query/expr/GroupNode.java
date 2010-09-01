@@ -1,7 +1,5 @@
 package org.basex.query.expr;
 
-import java.util.Arrays;
-
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 
@@ -47,9 +45,4 @@ final class GroupNode {
     return hash;
   }
 
-  /* for debugging (should be removed later) */
-  @Override
-  public String toString() {
-    return " with grouping var " + Arrays.toString(its);
-  }
 }

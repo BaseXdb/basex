@@ -28,7 +28,7 @@ public class GFLWOR extends ParseExpr {
   /** Order expressions. */
   private Order order;
   /** Group by expression. */
-  private final Group group;
+  private Group group;
 
   /**
    * GFLWOR initialization.
