@@ -13,7 +13,7 @@ eval {
   my $session = Session->new("localhost", 1984, "admin", "admin");
 
   # create query instance
-  my $input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
+  my $input = "for \$i in 1 to 10 return <xml>Text { \$i }</xml>";
   my $query = $session->query($input);
 
   # loop through all results
