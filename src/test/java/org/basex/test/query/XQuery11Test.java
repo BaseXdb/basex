@@ -54,14 +54,14 @@ public final class XQuery11Test extends QueryTest {
         "for $a in (1,1) let $b := $a group by $b order by $a return 1" },
         { "FLWOR Err 4", 
         "for $a in (1,1) let $b := $a group by $b order by $a return 1" },
+        { "FLWOR 6", itr(2),
+        "for $a in 1 for $a in 2 group by $a return $a" },
+      { "FLWOR 7", itr(2, 3),
+        "for $a in 1 for $a in (2,3) group by $a return $a" },
         
         /* [MS] to be checked...
-        { "FLWOR 6", itr(2),
-          "for $a in 1 for $a in 2 group by $a return $a" },
-        { "FLWOR 7", itr(2, 3),
-          "for $a in 1 for $a in (2,3) group by $a return $a" },
-        { "FLWOR Err 4", 
-          "declare variable $a := 1; for $b in 1 group by $a return $b" },
+      { "FLWOR Err 4", 
+        "declare variable $a := 1; for $b in 1 group by $a return $b" },
         */
     };
   }

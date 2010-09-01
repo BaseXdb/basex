@@ -1,6 +1,8 @@
 package org.basex.query.expr;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
@@ -55,7 +57,8 @@ final class GroupPartition {
 
     gv = gvs;
     cgv = gvs;
-    ngv = new Var[fls.length - gv.length];
+    final int ns = ngvSize(gvs, fls);
+    ngv = new Var[ns];
     int i = 0;
     order = ob;
 
@@ -68,6 +71,7 @@ final class GroupPartition {
         }
       }
       if(skip) continue;
+      
       ngv[i++] = v;
     }
     if(order != null) {
@@ -86,6 +90,28 @@ final class GroupPartition {
     partitions = new ArrayList<GroupNode>();
     items = ngv.length != 0 ? new ArrayList<ItemIter[]>() : null;
     input = ii;
+  }
+
+  /**
+   * Calculates the number of unique non grouping variables.
+   * This is #ForLet - #GroupBy
+   * <p>Returns 0 for <br />
+   * <code>for $a in 1 for $a in 2 group by $a return $a</code></p>
+   * @param gvs grouping vars
+   * @param fls forlet vars
+   * @return size of non grouping variables container.
+   */
+  private int ngvSize(final Var[] gvs, final Var[] fls) {
+    final HashSet<String> flshelp = new HashSet<String>();
+    final HashSet<String> glshelp = new HashSet<String>();
+
+    for(final Var v : fls)
+      flshelp.add(v.toString());
+    for(final Var g : gvs)
+      glshelp.add(g.toString());
+    final int vl = flshelp.size();
+    final int gl = glshelp.size();
+    return vl - gl;
   }
 
   /**

@@ -104,7 +104,7 @@ public final class OrderBy extends ParseExpr {
   }
   @Override
   public boolean uses(final Var v) {
-    return v != null && expr != null && expr.uses(v);
+    return expr != null && expr.uses(v);
   }
   @Override
   public OrderBy remove(final Var v) {
