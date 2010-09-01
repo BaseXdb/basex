@@ -62,7 +62,7 @@ public final class ServerQueryExample {
 
     // close iterator
     query.close();
-    
+
     // ------------------------------------------------------------------------
     // Iteratively run a query
     System.out.println("\n\n* Iterate a query (faster):");
@@ -77,7 +77,7 @@ public final class ServerQueryExample {
 
     // close iterator
     query.close();
-    
+
     // ------------------------------------------------------------------------
     // Close the client session
     System.out.println("\n\n* Close the client session.");
