@@ -41,8 +41,9 @@ public final class Group extends ParseExpr {
    * Initializes the grouping partition.
    * @param fl ForLet
    * @param ob order by spec
+   * @throws QueryException exception
    */
-  void initgroup(final ForLet[] fl, final Order ob) {
+  void initgroup(final ForLet[] fl, final Order ob) throws QueryException {
     final Var[] vs = new Var[groupby.length];
     final Var[] fs = new Var[fl.length];
     for(int i = 0; i < groupby.length; ++i) vs[i] = groupby[i];

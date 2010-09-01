@@ -2,6 +2,7 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
+import org.basex.query.item.Value;
 
 /**
  * GroupNode defines one valid partitioning setting.
@@ -11,7 +12,7 @@ import org.basex.query.item.Item;
  */
 final class GroupNode {
   /** List of grouping var items. */
-  final Item[] its;
+  final Value[] its;
   /** Hashes for the group representative values. */
   final int hash;
 
@@ -19,10 +20,10 @@ final class GroupNode {
    * Creates a group node.
    * @param is grouping var items
    */
-  GroupNode(final Item[] is) {
+  GroupNode(final Value[] is) {
     its = is;
     int h = 0;
-    for(final Item it : its) h = (h << 5) - h + it.hashCode();
+    for(final Value it : its) h = (h << 5) - h + it.hashCode();
     hash = h;
   }
 
@@ -35,7 +36,10 @@ final class GroupNode {
   boolean eq(final GroupNode c) throws QueryException {
     if(its.length != c.its.length) return false;
     for(int i = 0; i < its.length; ++i) {
-      if(!its[i].equiv(null, c.its[i])) return false;
+      final boolean isitem = its[i].item();
+      if(isitem ^ c.its[i].item() || its[i].empty() ^ c.its[i].empty())
+        return false;
+      if(isitem && !((Item) its[i]).equiv(null, (Item) c.its[i])) return false;
     }
     return true;
   }

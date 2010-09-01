@@ -6,7 +6,6 @@ import java.util.HashSet;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
-import org.basex.query.item.Item;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
@@ -39,7 +38,7 @@ final class GroupPartition {
   /** Order by specifier. */
   final Order order;
   /** ordering among groups. Set to false if order by contains
-  at leasst one non grouping varibale. */
+  at least one non grouping variable. */
   final boolean among;
   /** flag indicates variable caching. */
   private boolean cachedVars;
@@ -51,9 +50,10 @@ final class GroupPartition {
    * @param fls ForLet Variables
    * @param ob OrderBy specifier
    * @param ii input info
+   * @throws QueryException exception
    */
   GroupPartition(final Var[] gvs, final Var[] fls, final Order ob,
-      final InputInfo ii) {
+      final InputInfo ii) throws QueryException {
 
     gv = gvs;
     cgv = gvs;
@@ -100,8 +100,9 @@ final class GroupPartition {
    * @param gvs grouping vars
    * @param fls forlet vars
    * @return size of non grouping variables container.
+   * @throws QueryException var not found.
    */
-  private int ngvSize(final Var[] gvs, final Var[] fls) {
+  private int ngvSize(final Var[] gvs, final Var[] fls) throws QueryException {
     final HashSet<String> flshelp = new HashSet<String>();
     final HashSet<String> glshelp = new HashSet<String>();
 
@@ -109,6 +110,13 @@ final class GroupPartition {
       flshelp.add(v.toString());
     for(final Var g : gvs)
       glshelp.add(g.toString());
+    for(final Var g : gvs) {
+      boolean found = false;
+      for(final Var f : fls) {
+        found |= f.eq(g);
+      }
+      if(!found) Err.or(null, QueryText.GVARNOTDEFINED, g);
+    }
     final int vl = flshelp.size();
     final int gl = glshelp.size();
     return vl - gl;
@@ -128,10 +136,10 @@ final class GroupPartition {
   void add(final QueryContext ctx) throws QueryException  {
     if(!cachedVars) cacheVars(ctx);
 
-    final Item[] its = new Item[gv.length];
+    final Value[] its = new Value[gv.length];
     for(int i = 0; i < gv.length; ++i) {
       final Value val = cgv[i].value(ctx);
-      if(val.item()) its[i] = (Item) val;
+      if(val.item() || val.empty()) its[i] = val;
       else Err.or(input, QueryText.XGRP);
     }
     int p = -1;
