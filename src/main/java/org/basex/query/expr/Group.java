@@ -6,11 +6,8 @@ import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -23,7 +20,7 @@ import org.basex.util.TokenBuilder;
  */
 public final class Group extends ParseExpr {
   /** Group by specification. */
-  final Var[] groupby;
+  private final Var[] groupby;
   /** Grouping partition. **/
   GroupPartition gp;
 
@@ -46,7 +43,7 @@ public final class Group extends ParseExpr {
   void initgroup(final ForLet[] fl, final Order ob) throws QueryException {
     final Var[] vs = new Var[groupby.length];
     final Var[] fs = new Var[fl.length];
-    for(int i = 0; i < groupby.length; ++i) vs[i] = groupby[i];
+    System.arraycopy(groupby, 0, vs, 0, groupby.length);
     for(int i = 0; i < fl.length; ++i) fs[i] = fl[i].var;
     gp = new GroupPartition(vs, fs, ob, input);
 
@@ -114,58 +111,5 @@ public final class Group extends ParseExpr {
    */
   void add(final QueryContext ctx) throws QueryException {
     gp.add(ctx);
-  }
-
-  /**
-   * Returns grouped variables.
-   * @param ctx context
-   * @param ret return expression
-   * @return iterator on the result set
-   * @throws QueryException query exception
-   */
-  Iter ret(final QueryContext ctx, final Expr ret) throws QueryException {
-    final ItemIter ir = new ItemIter();
-    final ValueList vl = new ValueList();
-    final Var[] pgvars = new Var[gp.gv.length];
-    final Var[] pgngvar = new Var[gp.ngv.length];
-    for(int j = 0; j < gp.gv.length; ++j)
-      pgvars[j] = ctx.vars.get(gp.gv[j]);
-    for(int j = 0; j < gp.ngv.length; ++j)
-      pgngvar[j] = ctx.vars.get(gp.ngv[j]);
-
-    for(int i = 0; i < gp.partitions.size(); ++i) { // bind grouping var
-      collectValues(ctx, pgvars, pgngvar, i);
-
-      if(gp.order != null) vl.add(ret.value(ctx));
-      else ir.add(ctx.iter(ret));
-    }
-    if(gp.order != null) {
-      gp.order.vl = vl;
-      return ctx.iter(gp.order);
-    }
-    return ir;
-  }
-
-  /**
-   * Extracts the current variable binding.
-   * @param ctx QueryContext
-   * @param pgvars grouping variables
-   * @param pgngvar non grouping variables
-   * @param i position
-   * @throws QueryException exception
-   */
-  private void collectValues(final QueryContext ctx, final Var[] pgvars,
-      final Var[] pgngvar, final int i) throws QueryException {
-    final ItemIter[] ngvars = gp.items != null ? gp.items.get(i)
-        : null;
-    final GroupNode gn = gp.partitions.get(i);
-    for(int j = 0; j < gp.gv.length; ++j)
-      pgvars[j].bind(gn.its[j], ctx);
-
-    for(int j = 0; j < gp.ngv.length; ++j) {
-      final ItemIter its = ngvars[j];
-      if(its != null) pgngvar[j].bind(its.finish(), ctx);
-      else pgngvar[j].bind(Empty.SEQ, ctx);
-    }
   }
 }

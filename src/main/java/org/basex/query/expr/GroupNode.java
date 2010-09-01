@@ -14,7 +14,7 @@ final class GroupNode {
   /** List of grouping var items. */
   final Value[] its;
   /** Hashes for the group representative values. */
-  final int hash;
+  private final int hash;
 
   /**
    * Creates a group node.

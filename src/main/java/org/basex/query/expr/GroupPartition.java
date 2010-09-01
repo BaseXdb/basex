@@ -1,18 +1,20 @@
 package org.basex.query.expr;
 
 import java.util.ArrayList;
-import java.util.HashSet;
-
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
+import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.IntMap;
+import org.basex.util.TokenSet;
 
 /**
  * Stores the grouping for a group by clause.
@@ -82,8 +84,7 @@ final class GroupPartition {
         }
       }
       boolean am = true;
-      for(int j = 0; j < ams.length; ++j)
-        am &= ams[j];
+      for (boolean am1 : ams) am &= am1;
       among = am;
     } else among = true;
     
@@ -103,13 +104,13 @@ final class GroupPartition {
    * @throws QueryException var not found.
    */
   private int ngvSize(final Var[] gvs, final Var[] fls) throws QueryException {
-    final HashSet<String> flshelp = new HashSet<String>();
-    final HashSet<String> glshelp = new HashSet<String>();
+    final TokenSet flshelp = new TokenSet();
+    final TokenSet glshelp = new TokenSet();
 
     for(final Var v : fls)
-      flshelp.add(v.toString());
+      flshelp.add(v.name.atom());
     for(final Var g : gvs)
-      glshelp.add(g.toString());
+      glshelp.add(g.name.atom());
     for(final Var g : gvs) {
       boolean found = false;
       for(final Var f : fls) {
@@ -202,5 +203,59 @@ final class GroupPartition {
     for(int i = 0; i < ngv.length; ++i) ngv[i] = ctx.vars.get(ngv[i]);
     for(int i = 0; i < gv.length; ++i) cgv[i] = ctx.vars.get(gv[i]);
     cachedVars = true;
+  }
+
+  /**
+   * Returns grouped variables.
+   * @param ctx context
+   * @param ret return expression
+   * @return iterator on the result set
+   * @throws QueryException query exception
+   */
+  Iter ret(final QueryContext ctx, final Expr ret)
+      throws QueryException {
+    final ItemIter ir = new ItemIter();
+    final ValueList vl = new ValueList();
+    final Var[] pgvars = new Var[gv.length];
+    final Var[] pgngvar = new Var[ngv.length];
+    for(int j = 0; j < gv.length; ++j)
+      pgvars[j] = ctx.vars.get(gv[j]);
+    for(int j = 0; j < ngv.length; ++j)
+      pgngvar[j] = ctx.vars.get(ngv[j]);
+  
+    for(int i = 0; i < partitions.size(); ++i) { // bind grouping var
+     collectValues(ctx, pgvars, pgngvar, i);
+  
+      if(order != null) vl.add(ret.value(ctx));
+      else ir.add(ctx.iter(ret));
+    }
+    if(order != null) {
+      order.vl = vl;
+      return ctx.iter(order);
+    }
+    return ir;
+  }
+
+  /**
+   * Extracts the current variable binding.
+   * @param ctx QueryContext
+   * @param pgvars grouping variables
+   * @param pgngvar non grouping variables
+   * @param i position
+   * @throws QueryException exception
+   */
+  void collectValues(final QueryContext ctx, final Var[] pgvars,
+      final Var[] pgngvar, final int i) throws QueryException {
+    final ItemIter[] ngvars = items != null ? items.get(i)
+        : null;
+    final GroupNode gn = partitions.get(i);
+    for(int j = 0; j < gv.length; ++j)
+      pgvars[j].bind(gn.its[j], ctx);
+  
+    for(int j = 0; j < ngv.length; ++j) {
+      final ItemIter its = ngvars[j];
+      if(its != null) pgngvar[j].bind(its.finish(), ctx);
+      else pgngvar[j].bind(Empty.SEQ, ctx);
+    }
   }
 }

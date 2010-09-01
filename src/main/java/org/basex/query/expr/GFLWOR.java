@@ -20,7 +20,7 @@ import org.basex.util.InputInfo;
  */
 public class GFLWOR extends ParseExpr {
   /** Expression list. */
-  Expr ret;
+  private Expr ret;
   /** For/Let expressions. */
   private final ForLet[] fl;
   /** Where expression. */
@@ -119,8 +119,7 @@ public class GFLWOR extends ParseExpr {
     final int vs = ctx.vars.size();
     for(final ForLet aFl : fl) ctx.vars.add(aFl.var);
 
-//    final ItemIter ir = new ItemIter();
-    final Iter ir = group.ret(ctx, ret);
+    final Iter ir = group.gp.ret(ctx, ret);
     ctx.vars.reset(vs);
     return ir;
 
