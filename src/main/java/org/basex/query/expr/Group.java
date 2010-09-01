@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import java.util.HashMap;
 import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -149,13 +148,14 @@ public final class Group extends ParseExpr {
    */
   private void collectValues(final QueryContext ctx, final Var[] pgvars,
       final Var[] pgngvar, final int i) throws QueryException {
-    final HashMap<Var, ItemIter> ngvars = gp.items.get(i);
+    final ItemIter[] ngvars = gp.items != null ? gp.items.get(i)
+        : null;
     final GroupNode gn = gp.partitions.get(i);
     for(int j = 0; j < gp.gv.length; ++j)
       pgvars[j].bind(gn.its[j], ctx);
 
     for(int j = 0; j < gp.ngv.length; ++j) {
-      final ItemIter its = ngvars.get(gp.ngv[j]);
+      final ItemIter its = ngvars[j];
       if(its != null) pgngvar[j].bind(its.finish(), ctx);
       else pgngvar[j].bind(Empty.SEQ, ctx);
     }

@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryText;
@@ -31,7 +30,7 @@ final class GroupPartition {
   /** Group Partitioning. */
   final ArrayList<GroupNode> partitions;
   /** Resulting Sequence for non grouping variables. */
-  final ArrayList<HashMap<Var, ItemIter>> items;
+  final ArrayList<ItemIter[]> items;
   /** HashValue, Position (with overflow bucket). */
   private final IntMap<IntList> hashes = new IntMap<IntList>();
   /** Order by specifier. */
@@ -71,7 +70,8 @@ final class GroupPartition {
       ngv[i++] = v;
     }
     partitions = new ArrayList<GroupNode>();
-    items = new ArrayList<HashMap<Var, ItemIter>>();
+    
+    items = ngv.length != 0 ? new ArrayList<ItemIter[]>() : null;
     order = ob;
     among = false;
     input = ii;
@@ -98,8 +98,7 @@ final class GroupPartition {
       if(val.item()) its[i] = (Item) val;
       else Err.or(input, QueryText.XGRP);
     }
-    boolean found = false;
-    int p = 0;
+    int p = -1;
     final GroupNode cand = new GroupNode(its);
     final int chash = cand.hashCode();
     IntList ps;
@@ -107,13 +106,12 @@ final class GroupPartition {
       for(int i = 0; i <= ps.size(); ++i) {
         final int pp  = ps.get(i);
         if(cand.eq(partitions.get(pp))) {
-          found = true;
           p = pp;
           break;
         }
       }
     }
-     if(!found) {
+    if(p < 0) {
       if(order != null) order.add(ctx);
       p = partitions.size();
       partitions.add(cand);
@@ -125,7 +123,7 @@ final class GroupPartition {
       }
       pos.add(p);
     }
-    addNonGrpIts(ctx, p);
+    if(ngv.length != 0) addNonGrpIts(ctx, p);
   }
 
   /**
@@ -138,14 +136,14 @@ final class GroupPartition {
   private void addNonGrpIts(final QueryContext ctx, final int p)
       throws QueryException {
     
-    if(p == items.size()) items.add(new HashMap<Var, ItemIter>());
-    HashMap<Var, ItemIter> sq = items.get(p);
+    if(p == items.size()) items.add(new ItemIter[ngv.length]);
+    ItemIter[] sq = items.get(p);
 
     for(int i = 0; i < ngv.length; ++i) {
-      ItemIter ir = sq.get(ngv[i]);
+      ItemIter ir = sq[i];
       if(ir == null) {
         ir = new ItemIter();
-        sq.put(ngv[i], ir);
+        sq[i] = ir;
       }
         ir.add(ngv[i].iter(ctx));
     }

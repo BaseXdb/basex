@@ -24,13 +24,8 @@ final class GroupNode {
   GroupNode(final Item[] is) {
     its = is;
     int result = 1;
-    for(Item it : its) {
-      int elementHash = it.empty() ? 
-         (int) (Integer.MIN_VALUE)
-          : it.hashCode();
-      result = 31 * result + elementHash;
-    }
-
+    for(Item it : its)
+      result = 31 * result + it.hashCode();
     hash = result;
   }
 
