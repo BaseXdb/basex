@@ -43,7 +43,7 @@ sub execute {
   my $cmd = shift;
 
   # send command to server and receive result
-  $self->send("$cmd\0");
+  $self->send("$cmd");
   $self->{result} = $self->_readString();
   $self->{info} = $self->_readString();
   if (!$self->ok()) {
@@ -68,7 +68,7 @@ sub info {
 # see readme.txt
 sub close {
   my $self = shift;
-  $self->send("exit\0");
+  $self->send("exit");
   close($self->{sock});
 }
 
