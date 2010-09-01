@@ -584,7 +584,6 @@ public abstract class W3CTS {
     if(verbose) {
       final long t = perf.getTime();
       if(t > 100000000) Main.out(": " + Performance.getTimer(t, 1));
-      Main.outln();
     }
     return single == null || !outname.equals(single);
   }
