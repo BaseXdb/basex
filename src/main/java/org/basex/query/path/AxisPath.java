@@ -160,7 +160,7 @@ public class AxisPath extends Path {
       step[i] = (Step) e;
     }
     optSteps(ctx);
-    
+
     // check if all context nodes reference document nodes
     // [CG] XQuery: optimize paths without root context
     final Data data = ctx.data();
@@ -184,7 +184,7 @@ public class AxisPath extends Path {
         if(e != this) return e.comp(ctx);
       }
     }
-    
+
     // analyze if result set can be cached - no predicates/variables...
     cache = root != null && !uses(Use.VAR);
 
@@ -453,13 +453,13 @@ public class AxisPath extends Path {
 
       final Step next = step[l];
       if(next.axis == CHILD && !next.uses(Use.POS)) {
-        // descendant-or-self::node()/child::X -> descendant::X 
+        // descendant-or-self::node()/child::X -> descendant::X
         Array.move(step, l, -1, step.length - l);
         step = Arrays.copyOf(step, step.length - 1);
         next.axis = DESC;
         opt = true;
       } else if(next.axis == ATTR && !next.uses(Use.POS)) {
-        // descendant-or-self::node()/@X -> descendant-or-self::*/@X 
+        // descendant-or-self::node()/@X -> descendant-or-self::*/@X
         step[l - 1].test = new NameTest(false, step[l - 1].input);
         opt = true;
       }

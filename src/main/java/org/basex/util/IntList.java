@@ -85,7 +85,7 @@ public class IntList extends ElementList {
     for(int i = 0; i < size; ++i) if(list[i] == e) return true;
     return false;
   }
-  
+
   /**
    * Pops the uppermost element from the stack.
    * @return the popped element
@@ -93,7 +93,7 @@ public class IntList extends ElementList {
   public final int pop() {
     return list[--size];
   }
-  
+
   /**
    * Pushes an element onto the stack.
    * @param val element
@@ -101,7 +101,7 @@ public class IntList extends ElementList {
   public final void push(final int val) {
     add(val);
   }
-  
+
   /**
    * Returns the uppermost element on the stack, without removing it.
    * @return uppermost element

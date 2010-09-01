@@ -26,7 +26,7 @@ public abstract class FileParser extends Parser {
   /**
    * Constructor.
    * @param f file reference
-   * @param tar target for collection adding.
+   * @param tar target for collection adding
    */
   public FileParser(final IO f, final String tar) {
     super(f, tar);

@@ -26,7 +26,7 @@ public class XMLParser extends FileParser {
    * The length of the rootPath is passed in to correctly chop
    * the relative path inside the collection.
    * @param f file reference
-   * @param tar target for collection adding.
+   * @param tar target for collection adding
    * @param pr database properties
    * @throws IOException I/O exception
    */

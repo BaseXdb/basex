@@ -9,6 +9,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
+import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -49,7 +50,8 @@ public final class For extends ForLet {
     type = expr.type();
     // bind variable or set return type
     if(pos != null || score != null || !type.one() || !bind(ctx)) {
-      var.ret = type.type.seq();
+      var.ret = ctx.grouping ? SeqType.get(type.type, SeqType.Occ.ZM) :
+        type.type.seq();
     }
 
     ctx.vars.add(var);

@@ -13,8 +13,8 @@ final class LogList {
 
   /**
    * Logs a the insert of a new item into the database.
-   * @param id value of the entry.
-   * @param pre value of the entry.
+   * @param id value of the entry
+   * @param pre value of the entry
    */
   void insert(final int id, final int pre) {
     if(id == pre) return;
@@ -67,8 +67,8 @@ final class LogList {
 
   /**
    * Logs a the delete of a node.
-   * @param pre value of the entry.
-   * @param size of deleted root-node.
+   * @param pre value of the entry
+   * @param size of deleted root-node
    */
   void delete(final int pre, final int size) {
     // list is empty
@@ -106,8 +106,8 @@ final class LogList {
 
   /**
    * Calculates the Pre-value for a given ID.
-   * @param id value of the entry.
-   * @return Pre-value.
+   * @param id value of the entry
+   * @return pre value
    */
   int pre(final int id) {
     int addend = 0;

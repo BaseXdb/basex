@@ -32,7 +32,7 @@ public class LogListTest {
   public final void activated() throws Exception {
     final Field on = Data.class.getDeclaredField("IDPREMAPON");
     on.setAccessible(true);
-    // 
+    //
     //assertTrue("LogList isn't activated", on.getBoolean(null));
   }
    */

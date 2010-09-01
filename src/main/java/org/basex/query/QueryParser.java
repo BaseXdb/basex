@@ -15,6 +15,7 @@ import org.basex.query.expr.CElem;
 import org.basex.query.expr.CPI;
 import org.basex.query.expr.CTxt;
 import org.basex.query.expr.Arith;
+import org.basex.query.expr.OrderByExpr;
 import org.basex.query.expr.TypeCase;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Castable;
@@ -876,7 +877,7 @@ public class QueryParser extends InputParser {
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
     }
     if(e.empty()) return order;
-    final OrderBy ord = new OrderBy(input(), e, desc, least);
+    final OrderBy ord = new OrderByExpr(input(), e, desc, least);
     return order == null ? new OrderBy[] { ord } : Array.add(order, ord);
   }
 
@@ -885,7 +886,6 @@ public class QueryParser extends InputParser {
    * @param group grouping specification
    * @return new group array
    * @throws QueryException query exception
-   * 
    */
   private Var[] groupSpec(final Var[] group) throws QueryException {
     final int qqp = qp;
@@ -1811,7 +1811,7 @@ public class QueryParser extends InputParser {
    */
   private void addNS(final Atts ns, final byte[] k, final byte[] v)
       throws QueryException {
-    
+
     if(ns.get(k) != -1) error(DUPLNSDEF, k);
     ns.add(k, v);
   }
@@ -2073,7 +2073,7 @@ public class QueryParser extends InputParser {
     ctx.ns.uri(type);
     skipWS();
     final Occ occ = consume('?') ? Occ.ZO : Occ.O;
-    
+
     final Type t = Type.find(type, false);
     if(t == null) {
       final byte[] uri = type.uri().atom();
@@ -2735,8 +2735,8 @@ public class QueryParser extends InputParser {
 
   /**
    * Parses a QName.
-   * @param err optional error message.
-   * Will be thrown if no QName is found, and ignored if set to {@code null}.
+   * @param err optional error message. Will be thrown if no QName is found,
+   * and ignored if set to {@code null}
    * @return string
    * @throws QueryException query exception
    */

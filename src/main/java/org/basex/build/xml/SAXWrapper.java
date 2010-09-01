@@ -47,7 +47,7 @@ public final class SAXWrapper extends FileParser {
    * Constructor.
    * @param s sax source
    * @param n name
-   * @param ta target to insert into.
+   * @param ta target to insert into
    */
   public SAXWrapper(final SAXSource s, final String n, final String ta) {
     super(io(s, n), ta);

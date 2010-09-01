@@ -54,21 +54,21 @@ public class GFLWOR extends ParseExpr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     final boolean grp = ctx.grouping;
     ctx.grouping = group != null;
-    final int vs = ctx.vars.size();
 
     // optimize for/let clauses
-    for(int f = 0; f != fl.length; ++f) {
+    final int vs = ctx.vars.size();
+    for(final ForLet f : fl) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
-      ctx.ftfast &= fl[f].simple();
-      fl[f] = fl[f].comp(ctx);
+      ctx.ftfast &= f.simple();
+      f.comp(ctx);
       ctx.ftfast = fast;
     }
 
     // optimize where clause
     boolean empty = false;
     if(where != null) {
-      where = checkUp(where.comp(ctx), ctx);
+      where = checkUp(where, ctx).comp(ctx).compEbv(ctx);
       if(where.value()) {
         // test is always false: no results
         empty = !where.ebv(ctx, input).bool(input);
@@ -83,18 +83,18 @@ public class GFLWOR extends ParseExpr {
     if(group != null) group.comp(ctx);
     if(order != null) order.comp(ctx);
     ret = ret.comp(ctx);
-
     ctx.vars.reset(vs);
     ctx.grouping = grp;
 
+    // remove FLWOR expression if WHERE clause always returns false
     if(empty) {
       ctx.compInfo(OPTREMOVE, desc(), where);
       return Empty.SEQ;
     }
 
+    // remove declarations of statically bound variables
     for(int f = 0; f != fl.length; ++f) {
-      // remove GFLWOR expression if a FOR clause yields an empty sequence
-      if(fl[f].expr.empty() && fl[f] instanceof For) {
+      if(fl[f].var.expr() != null) {
         ctx.compInfo(OPTFLWOR);
         return Empty.SEQ;
       }
@@ -212,8 +212,8 @@ public class GFLWOR extends ParseExpr {
     for(int i = 0; i != fl.length; ++i)
       sb.append(i != 0 ? " " : "").append(fl[i]);
     if(where != null) sb.append(" ").append(WHERE).append(" ").append(where);
-    if(order != null) sb.append(order);
     if(group != null) sb.append(group);
+    if(order != null) sb.append(order);
     return sb.append(" ").append(RETURN).append(" ").append(ret).toString();
   }
 }

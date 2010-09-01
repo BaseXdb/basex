@@ -20,7 +20,7 @@ public final class ClientQuery extends Query {
   private final String id;
   /** Next result. */
   private TokenBuilder next;
-  
+
   /**
    * Standard constructor.
    * @param session client session

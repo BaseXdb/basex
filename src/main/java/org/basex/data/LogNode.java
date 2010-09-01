@@ -23,9 +23,9 @@ final class LogNode {
   /**
    * Searches the position where the id has to be inserted in
    * the list through binary search.
-   * @param subId Position for this value.
+   * @param subId Position for this value
    * @return The position of the next bigger id in the list
-   * or sublist.length if the searched id is the largest.
+   * or sublist.length if the searched id is the largest
    */
   private int binarySearch(final int subId) {
     if(subnodes.length == 0)
@@ -48,8 +48,8 @@ final class LogNode {
   // ##############################
   /**
    * Creates a new node with the given values.
-   * @param theId Addend is valid for this id and all following.
-   * @param theAddend What to add to calculate the Pre-value from the ID.
+   * @param theId Addend is valid for this id and all following
+   * @param theAddend What to add to calculate the Pre-value from the ID
    */
   LogNode(final int theId, final int theAddend) {
     id = theId;
@@ -62,8 +62,8 @@ final class LogNode {
   // ################################
   /**
    * Adds a subnode to the mainnode.
-   * @param subId ID of the subnode.
-   * @param subAddend What to add to calculate the Pre-value from the ID.
+   * @param subId ID of the subnode
+   * @param subAddend What to add to calculate the Pre-value from the ID
    */
   void addSub(final int subId, final int subAddend) {
     // empty sublist
@@ -97,9 +97,9 @@ final class LogNode {
 
   /**
    * Returns the addend of the ID.
-   * @param subId ID of the entry.
-   * @return Addend to calculate the Pre or
-   * Integer.MIN_VALUE if the ID is not in the list.
+   * @param subId ID of the entry
+   * @return addend to calculate the Pre or {@code Integer#MIN_VALUE} if the
+   * ID is not in the list
    */
   int getSubAddend(final int subId) {
     final int pos = binarySearch(subId);
@@ -111,7 +111,7 @@ final class LogNode {
 
   /**
    * Has the mainnode subnodes to check?
-   * @return true if there are subnode, else false.
+   * @return true if there are subnode, else false
    */
   boolean hasSub() {
     return subnodes != null && subnodes.length != 0;

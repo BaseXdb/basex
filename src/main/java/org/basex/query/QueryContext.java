@@ -257,7 +257,7 @@ public final class QueryContext extends Progress {
       root = root.comp(this);
       // reset initial context
       if(empty) value = null;
-      
+
       // dump resulting query
       if(inf) info.add(NL + QUERYRESULT + funcs + root + NL);
 

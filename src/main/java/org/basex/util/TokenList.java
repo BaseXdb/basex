@@ -85,7 +85,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
     list[i] = e;
     size = Math.max(size, i + 1);
   }
-  
+
   /**
    * Pops the uppermost element from the stack.
    * @return the popped element
@@ -94,7 +94,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   public byte[] pop() {
     return list[--size];
   }
-  
+
   /**
    * Pushes an element onto the stack.
    * @param val element
@@ -102,7 +102,7 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
   public void push(final byte[] val) {
     add(val);
   }
-  
+
   /**
    * Returns the uppermost element on the stack, without removing it.
    * @return uppermost element

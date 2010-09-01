@@ -28,7 +28,7 @@ public final class LocalQuery extends Query {
   private Iter iter;
   /** Next item. */
   private Item item;
-  
+
   /**
    * Standard constructor.
    * @param query query to be run

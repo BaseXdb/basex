@@ -49,7 +49,7 @@ final class GroupPartition {
    * Sets up the ordering scheme.
    * @param gvs grouping vars
    * @param fls ForLet Variables
-   * @param ob OrderBy specifier.
+   * @param ob OrderBy specifier
    * @param ii input info
    */
   GroupPartition(final Var[] gvs, final Var[] fls, final Order ob,

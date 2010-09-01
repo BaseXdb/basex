@@ -42,7 +42,7 @@ public final class HTMLParser extends XMLParser {
   /**
    * Constructor.
    * @param f file reference
-   * @param tar target for collection adding.
+   * @param tar target for collection adding
    * @param pr database properties
    * @throws IOException I/O exception
    */

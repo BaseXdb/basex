@@ -8,7 +8,7 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 
 /**
- * Variable array.
+ * Variable stack.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

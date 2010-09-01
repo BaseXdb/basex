@@ -81,8 +81,6 @@ public final class FuncTest extends QueryTest {
       { "deep-equal 14", bool(false),
         "deep-equal(comment{ 'a' }, processing-instruction{ 'a' } { 'a' })" },
 
-      //{ "deep-equal ", bool(), "deep-equal()" },
-      
       { "number 1", dbl(1), "number(true())" },
       { "number 2", dbl(0), "number(false())" },
       { "number 3", dbl(Double.NaN), "number(xs:gYear('2005'))" },
