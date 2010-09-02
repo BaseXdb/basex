@@ -56,10 +56,9 @@ public abstract class CFrag extends Arr {
 
     // attributes don't inherit namespaces
     if(!name.hasUri()) {
-      name.uri(att && !name.ns() 
+      name.uri(att && !name.ns()
           ? EMPTY : ctx.ns.uri(name.pref(), name != i, input));
     }
-    
     return name;
   }
 

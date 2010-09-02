@@ -36,7 +36,7 @@ public final class Context extends Simple {
   public Iter iter(final QueryContext ctx) throws QueryException {
     return checkCtx(ctx).iter(ctx);
   }
-  
+
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {

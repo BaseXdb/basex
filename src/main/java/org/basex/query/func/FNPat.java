@@ -97,7 +97,7 @@ final class FNPat extends Fun {
     if(p.matcher("").matches()) Err.or(input, REGROUP);
     final String str = string(val);
     final Matcher m = p.matcher(str);
-    
+
     final NodIter ch = new NodIter();
     final FElem root = new FElem(new QNm(ANALYZE, FNNS), ch, new NodIter(),
         EMPTY, new Atts().add(FN, FNURI));
@@ -110,24 +110,24 @@ final class FNPat extends Fun {
     if(s != str.length()) nonmatch(str.substring(s), root, ch);
     return root;
   }
-  
+
   /**
    * Processes a match.
    * @param m matcher
    * @param str string
-   * @param par parent 
+   * @param par parent
    * @param ch child iterator
    * @param g group number
    * @return next group number and position in string
    */
   private int[] match(final Matcher m, final String str, final FElem par,
       final NodIter ch, final int g) {
-    
+
     final NodIter sub = new NodIter(), att = new NodIter();
     final FElem nd = new FElem(new QNm(g == 0 ? MATCH : MGROUP, FNNS),
         sub, att, EMPTY, new Atts(), par);
     if(g > 0) att.add(new FAttr(new QNm(NR), token(g), nd));
-    
+
     final int start = m.start(g), end = m.end(g), gc = m.groupCount();
     int[] pos = { g + 1, start }; // group and position in string
     while(pos[0] <= gc && m.end(pos[0]) <= end) {
@@ -205,7 +205,7 @@ final class FNPat extends Fun {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
     if(p.matcher("").matches()) Err.or(input, REGROUP);
-    
+
     final ItemIter sb = new ItemIter();
     final String str = string(val);
     if(!str.isEmpty()) {

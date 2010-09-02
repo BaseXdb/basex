@@ -106,7 +106,7 @@ public final class QNm extends Item {
   public Uri uri() {
     return uri == null ? Uri.EMPTY : uri;
   }
-  
+
   /**
    * Checks if the URI of this QName has been explicitly set.
    * @return {@code true} if it has been set, {@code false} otherwise

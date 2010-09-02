@@ -8,7 +8,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Base64Binary item. Derived from java.util.prefs.Base64.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */

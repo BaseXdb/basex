@@ -158,7 +158,7 @@ final class GroupPartition {
       if(ir == null) {
         ir = new ItemIter();
         sq[i] = ir;
-      } 
+      }
       ir.add(iter);
     }
   }

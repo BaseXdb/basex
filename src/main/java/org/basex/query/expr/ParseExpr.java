@@ -69,7 +69,7 @@ public abstract class ParseExpr extends Expr {
     final Value v = type().one() ? atomic(ctx, input) : ctx.iter(this).finish();
     return v == null ? Empty.SEQ : v;
   }
-  
+
   @Override
   public final Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {

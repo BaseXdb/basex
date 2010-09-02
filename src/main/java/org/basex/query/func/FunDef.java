@@ -242,7 +242,7 @@ public enum FunDef {
   WRITE(FILEURI, FNFile.class, 2, 3, "write(filepath, data, params)", ITEM_Z),
   /** XQuery function */
   WRITEBIN(FILEURI, FNFile.class, 2, 2, "write-binary(filepath, data)", ITEM_Z),
-  /** XQuery function */ 
+  /** XQuery function */
   COPY(FILEURI, FNFile.class, 2, 2, "copy(src, dest)", ITEM_Z),
   /** XQuery function */
   MOVE(FILEURI, FNFile.class, 2, 2, "move(path, dest)", ITEM_Z),

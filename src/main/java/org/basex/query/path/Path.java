@@ -36,7 +36,11 @@ public abstract class Path extends ParseExpr {
 
   @Override
   public final Expr comp(final QueryContext ctx) throws QueryException {
-    if(root != null) root = checkUp(root, ctx).comp(ctx);
+    if(root != null) {
+      root = checkUp(root, ctx).comp(ctx);
+      if(root instanceof Context) root = null;
+    }
+
     final Value vi = ctx.value;
     ctx.value = root(ctx);
     final Expr e = compPath(ctx);

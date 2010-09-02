@@ -43,7 +43,7 @@ public abstract class Value extends Expr {
   public final Value value(final QueryContext ctx) {
     return this;
   }
-  
+
   @Override
   public final boolean value() {
     return true;

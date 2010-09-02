@@ -8,7 +8,7 @@ import org.basex.util.Token;
 
 /**
  * DateTime item.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */

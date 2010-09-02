@@ -205,7 +205,7 @@ final class FNId extends Fun {
     }
     return nod;
   }
-  
+
   @Override
   public boolean uses(final Use u) {
     return u == Use.X11 && def == FunDef.ELID ||

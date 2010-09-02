@@ -179,7 +179,7 @@ public final class FNSimple extends Fun {
 
       // node types must be equal
       if(it1.type != it2.type) return false;
-      
+
       Nod s1 = (Nod) it1, s2 = (Nod) it2;
       final Stack<NodeIter[]> chld = new Stack<NodeIter[]>();
       NodeIter[] ch = { s1.child(), s2.child() };
@@ -212,13 +212,13 @@ public final class FNSimple extends Fun {
           // compare string values
           if((t1 == Type.TXT || t1 == Type.ATT || t1 == Type.COM ||
               t1 == Type.PI) && !Token.eq(s1.atom(), s2.atom())) return false;
-          
+
           // compare elements
           if(t1 == Type.ELM) {
             // compare number of attributes
             if(s1.attr().finish().size() != s2.attr().finish().size())
               return false;
-  
+
             // compare attributes names and values
             Nod a1 = null, a2 = null;
             final NodeIter att1 = s1.attr();
@@ -233,13 +233,13 @@ public final class FNSimple extends Fun {
               }
               if(!f) return false;
             }
-            
+
             // check children
             chld.push(ch);
             ch = new NodeIter[] { s1.child(), s2.child() };
           }
         }
-        
+
         // check next child
         s1 = ch[0].next();
         s2 = ch[1].next();

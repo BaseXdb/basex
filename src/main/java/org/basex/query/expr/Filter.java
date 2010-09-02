@@ -104,11 +104,11 @@ public class Filter extends Preds {
 
     // evaluate predicates
     for(final Expr p : pred) {
-      ctx.size = ir.size();
+      final long is = ir.size();
+      ctx.size = is;
       ctx.pos = 1;
       int c = 0;
-      final long sl = ir.size();
-      for(int s = 0; s < sl; ++s) {
+      for(int s = 0; s < is; ++s) {
         ctx.value = ir.item[s];
         if(p.test(ctx, input) != null) ir.item[c++] = ir.item[s];
         ctx.pos++;
@@ -158,7 +158,8 @@ public class Filter extends Preds {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(root.size() > 1 ? root : "(" + root + ")");
+    sb.append(root);
+    //sb.append(root.size() != 1 ? root : "(" + root + ")");
     return sb.append(super.toString()).toString();
   }
 }

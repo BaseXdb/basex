@@ -144,7 +144,7 @@ final class FNQName extends Fun {
       }
       n = n.parent();
     } while(n != null && ctx.nsInherit);
-    
+
     if(emp == null) emp = ctx.nsElem;
     if(emp.length != 0) pref.add(EMPTY);
 

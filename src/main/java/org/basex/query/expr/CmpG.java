@@ -181,7 +181,7 @@ public final class CmpG extends Cmp {
     final boolean s1 = is1 == 1;
 
     // evaluate single items
-    if(s1 && expr[1].value() && expr[1].size() == 1)
+    if(s1 && expr[1].size() == 1)
       return Bln.get(eval(ir1.next(), expr[1].atomic(ctx, input)));
 
     Iter ir2 = ctx.iter(expr[1]);

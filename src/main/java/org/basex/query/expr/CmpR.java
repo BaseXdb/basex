@@ -105,7 +105,7 @@ public final class CmpR extends Single {
       final double d = it.dbl(input);
       return Bln.get((mni ? d >= min : d > min) && (mxi ? d <= max : d < max));
     }
-    
+
     // iterative evaluation
     final Iter ir = ctx.iter(expr);
     boolean mn = false;
@@ -137,6 +137,7 @@ public final class CmpR extends Single {
   public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
     final Step s = CmpG.indexStep(expr);
+    // sequential main memory is assumed to be faster than range index access
     if(s == null || ic.data instanceof MemData) return false;
 
     // check which index applies

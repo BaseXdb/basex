@@ -201,7 +201,7 @@ public final class SeqType {
       final InputInfo ii) throws QueryException {
 
     //System.out.println(val.type() + ": " + this);
-    
+
     final Iter iter = val.iter(ctx);
     Item it = iter.next();
     if(it == null) {

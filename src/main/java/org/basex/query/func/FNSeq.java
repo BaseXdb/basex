@@ -52,7 +52,7 @@ final class FNSeq extends Fun {
       default:       return super.iter(ctx);
     }
   }
-  
+
   @Override
   public Expr cmp(final QueryContext ctx) {
     // index-of will create integers, insert-before might add new types

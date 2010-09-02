@@ -33,7 +33,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Functions on files and directories.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */

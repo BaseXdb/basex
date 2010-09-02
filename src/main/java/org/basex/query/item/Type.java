@@ -811,7 +811,7 @@ public enum Type {
     if(seq == null) seq = new SeqType(this);
     return seq;
   }
-  
+
   /**
    * Throws an exception if the specified item can't be converted to a number.
    * @param it item
