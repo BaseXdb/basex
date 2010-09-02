@@ -888,12 +888,8 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private Var[] groupSpec(final Var[] group) throws QueryException {
-    final int qqp = qp;
-    // [MS] *FIXME* This should raise  [err:XQST0094] on undefined variables
-    // instead of [err:XPST0008] as it does now.
-    check(single(), GRPBY);
-    qp = qqp;
     final Var v = new Var(input(), varName());
+    if(null == ctx.vars.get(v)) error(GVARNOTDEFINED, v);
     if(consumeWS(COLLATION)) {
       final byte[] coll = stringLiteral();
       if(!eq(URLCOLL, coll)) error(INVCOLL, coll);
