@@ -41,11 +41,7 @@ public final class Group extends ParseExpr {
    * @throws QueryException exception
    */
   void initgroup(final ForLet[] fl, final Order ob) throws QueryException {
-    // [MS] copy isn't needed imo; what about directly passing on
-    // "groupby" to GroupPartition?
-    final Var[] vs = new Var[groupby.length];
     final Var[] fs = new Var[fl.length];
-    System.arraycopy(groupby, 0, vs, 0, groupby.length);
     for(int i = 0; i < fl.length; ++i) fs[i] = fl[i].var;
     gp = new GroupPartition(groupby, fs, ob, input);
 
@@ -86,16 +82,6 @@ public final class Group extends ParseExpr {
     return true;
   }
 
-  @Override
-  // [MS] cast isn't safe! This method isn't needed anyway,
-  //   as the specified variable will never be replaced here, so..
-  //   just remove it
-  public Group remove(final Var v) {
-    for(int g = 0; g < groupby.length; ++g) {
-      groupby[g] = (Var) groupby[g].remove(v);
-    }
-    return this;
-  }
 
   @Override
   public void plan(final Serializer ser) throws IOException {

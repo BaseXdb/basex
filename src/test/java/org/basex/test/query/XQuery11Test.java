@@ -68,14 +68,9 @@ public final class XQuery11Test extends QueryTest {
           "for $i as xs:integer in 1 for $i in 1 return $i" },
         { "FLWOR Err 4 (global)", 
           "declare variable $a := 1; for $b in 1 group by $a return $b" },
-
-        /** [MS] GroupPartition.add: (!among && order.uses(ngv[i])) should be
-         *    checked later if ret() is called. Next, it should support
-         *    empty sequences...
-
         { "FLWOR 11", itr(1),
           "for $x in (1,1) let $y := () group by $x order by $y return 1" },
-        */
+
     };
   }
   /* TABLE REPRESENTATION

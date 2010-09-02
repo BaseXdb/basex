@@ -43,9 +43,6 @@ final class GroupPartition {
   /** HashValue, position (with overflow bucket). */
   private final IntMap<IntList> hashes = new IntMap<IntList>();
 
-  /** ordering among groups. Set to false if order by contains
-  at least one non-grouping variable. */
-  private final boolean among;
   /** flag indicates variable caching. */
   private boolean cachedVars;
 
@@ -72,15 +69,6 @@ final class GroupPartition {
       if(ng) ngv[i++] = v;
     }
 
-    boolean am = true;
-    if(order != null) {
-      final boolean[] ams = new boolean[order.ob.length - 1];
-      for(int ol = 0; ol < ams.length; ol++) {
-        for(final Var g : gv) if(order.ob[ol].uses(g)) ams[ol] = true;
-      }
-      for(final boolean a : ams) am &= a;
-    }
-    among = am;
     items = ngv.length != 0 ? new ArrayList<ItemIter[]>() : null;
     input = ii;
   }
@@ -145,7 +133,6 @@ final class GroupPartition {
       }
     }
     if(p < 0) {
-      if(order != null) order.add(ctx);
       p = part.size();
       part.add(gn);
 
@@ -167,15 +154,12 @@ final class GroupPartition {
 
     for(int i = 0; i < ngl; ++i) {
       ItemIter ir = sq[i];
+      final Iter iter = ngv[i].iter(ctx);
       if(ir == null) {
         ir = new ItemIter();
         sq[i] = ir;
-      } else if(!among && order.uses(ngv[i])) {
-        // [MS] buggy; see "FLWOR 11" test
-        // (better do it once at the end, and only for non-empty sequences)
-        Err.or(input, QueryText.XPSORT);
-      }
-      ir.add(ngv[i].iter(ctx));
+      } 
+      ir.add(iter);
     }
   }
 
@@ -207,11 +191,14 @@ final class GroupPartition {
 
       if(items != null) {
         final ItemIter[] ii = items.get(i);
-        for(int j = 0; j < ii.length; ++j) pgngv[j].bind(ii[j].finish(), ctx);
+        for(int j = 0; j < ii.length; ++j) {
+          pgngv[j].bind(ii[j].finish(), ctx);
+        }
       }
-
-      if(order != null) vl.add(ret.value(ctx));
-      else ir.add(ctx.iter(ret));
+      if(order != null) {
+        order.add(ctx);
+        vl.add(ret.value(ctx));
+      } else ir.add(ctx.iter(ret));
     }
     if(order != null) {
       order.vl = vl;

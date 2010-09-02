@@ -274,7 +274,6 @@ public class GFLWOR extends ParseExpr {
       if(f.shadows(v)) return this;
     }
     if(where != null) where = where.remove(v);
-    if(group != null) group = group.remove(v);
     if(order != null) order = order.remove(v);
     ret = ret.remove(v);
     return this;
