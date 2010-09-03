@@ -215,9 +215,9 @@ public enum FunDef {
   /* FNFile functions */
 
   /** XQuery function */
-  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(path)", ITEM_Z),
+  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(path)", BLN),
   /** XQuery function */
-  MKDIRS(FILEURI, FNFile.class, 1, 1, "mkdirs(path)", ITEM_Z),
+  MKDIRS(FILEURI, FNFile.class, 1, 1, "mkdirs(path)", BLN),
   /** XQuery function */
   ISDIR(FILEURI, FNFile.class, 1, 1, "is-directory(path)", BLN),
   /** XQuery function */
@@ -245,7 +245,7 @@ public enum FunDef {
   /** XQuery function */
   COPY(FILEURI, FNFile.class, 2, 2, "copy(src, dest)", ITEM_Z),
   /** XQuery function */
-  MOVE(FILEURI, FNFile.class, 2, 2, "move(path, dest)", ITEM_Z),
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(path, dest)", BLN),
   /** XQuery function */
   LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
   /** XQuery function */

@@ -33,7 +33,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Functions on files and directories.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -84,7 +84,7 @@ final class FNFile extends Fun {
       case PATHSEP:
         return Str.get(Prop.SEP);
       case DELETE:
-        return delete(path);
+        return Bln.get(path.delete());
       case PATHTOFULL:
         return Str.get(path.getAbsolutePath());
       case PATHTOURI:
@@ -138,8 +138,8 @@ final class FNFile extends Fun {
 
         while(++c < files.length) {
           final String name = files[c].getName();
-          if(!files[c].isHidden() && (pattern == null || name.matches(pattern)))
-            return Str.get(name);
+          if(!files[c].isHidden() && (pattern == null || 
+              name.matches(pattern))) return Str.get(name);
         }
         return null;
       }
@@ -277,7 +277,7 @@ final class FNFile extends Fun {
         dc.close();
       }
     } catch(final IOException ex) {
-      Err.or(input, QueryText.FILECOPY, src, dest);
+      Err.or(input, ex.getMessage(), src, dest);
     }
     return null;
   }
@@ -289,31 +289,12 @@ final class FNFile extends Fun {
    * @return result
    * @throws QueryException query exception
    */
-  private Item move(final File file, final QueryContext ctx)
+  private Bln move(final File file, final QueryContext ctx)
       throws QueryException {
 
     final String dest = string(checkStr(expr[1], ctx));
-    try {
-      file.renameTo(new File(dest, file.getName()));
-    } catch(final NullPointerException ex) {
-      Err.or(input, QueryText.FILEMOVE, ex);
-    }
-    return null;
-  }
+    return Bln.get(file.renameTo(new File(dest, file.getName())));
 
-  /**
-   * Deletes a file or directory.
-   * @param file file/dir to be deleted
-   * @return result
-   * @throws QueryException query exception
-   */
-  private Bln delete(final File file) throws QueryException {
-    try {
-      return Bln.get(file.delete());
-    } catch(final NullPointerException ex) {
-      Err.or(input, QueryText.FILEDELETE, ex);
-      return Bln.FALSE;
-    }
   }
 
   /**
@@ -322,21 +303,11 @@ final class FNFile extends Fun {
    * @param includeParents indicator for including nonexistent parent
    *          directories by the creation
    * @return result
-   * @throws QueryException query exception
    */
-  private Item makeDir(final File file, final boolean includeParents)
-      throws QueryException {
+  private Bln makeDir(final File file, final boolean includeParents) {
 
-    try {
-      if(includeParents) {
-        file.mkdirs();
-      } else {
-        file.mkdir();
-      }
-    } catch(final SecurityException ex) {
-      Err.or(input, QueryText.DIRCREATE, ex);
-    }
-    return null;
+    return includeParents ? Bln.get(file.mkdirs()) : Bln.get(file.mkdir());
+
   }
 
   /**
