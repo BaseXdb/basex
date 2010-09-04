@@ -237,11 +237,14 @@ public abstract class Command extends Progress {
       return error(PROGERR);
     } catch(final Throwable ex) {
       Performance.gc(2);
-      Main.debug(ex);
       abort();
-      if(ex instanceof OutOfMemoryError) return error(PROCMEM +
-          ((flags & User.CREATE) != 0 ? PROCMEMCREATE : ""));
+      if(ex instanceof OutOfMemoryError) {
+        ex.printStackTrace();
+        return error(PROCMEM +
+            ((flags & User.CREATE) != 0 ? PROCMEMCREATE : ""));
+      }
 
+      Main.debug(ex);
       final Object[] st = ex.getStackTrace();
       final Object[] obj = new Object[st.length + 1];
       obj[0] = ex.toString();

@@ -624,6 +624,8 @@ public interface QueryText {
   /** Optimization info. */
   String OPTREMOVE = "%: removing %";
   /** Optimization info. */
+  String OPTFORLET = "moving for/let clauses";
+  /** Optimization info. */
   String OPTSWAP = "operands swapped: %";
   /** Optimization info. */
   String OPTTEXT = "adding text() step";

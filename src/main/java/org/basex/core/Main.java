@@ -86,7 +86,7 @@ public abstract class Main {
     try {
       if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
       execute(new Exit(), true);
-      out.close();
+      out.flush();
     } catch(final IOException ex) {
       errln(server(ex));
     }

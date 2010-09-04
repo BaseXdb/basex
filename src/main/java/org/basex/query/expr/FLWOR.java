@@ -52,6 +52,7 @@ public class FLWOR extends ParseExpr {
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
+    compForLet(ctx);
     compWhere(ctx);
 
     // optimize for/let clauses
@@ -133,6 +134,39 @@ public class FLWOR extends ParseExpr {
     return this;
   }
 
+  /**
+   * Optimizes for/let clauses. Avoids repeated calls to static let clauses.
+   * @param ctx query context
+   */
+  private void compForLet(final QueryContext ctx) {
+    // check if all clauses are simple, and if variables are removable
+    boolean m = false;
+    // loop through all clauses
+    for(int f = fl.length - 1; f >= 0; --f) {
+      ForLet t = fl[f];
+      // ignore for clauses
+      if(t instanceof For) continue;
+      // loop through all outer clauses
+      for(int g = f - 1; g >= 0; --g) {
+        // stop if variable is shadowed or used by the current clause
+        if(fl[g].shadows(t.var) || t.uses(fl[g].var)) break;
+        // ignore let clauses and fragment constructors
+        if(fl[g] instanceof Let || t.uses(Use.FRG)) continue;
+        // stop if variable is used by as position or score
+        final For fr = (For) fl[g];
+        if(fr.pos != null && t.uses(fr.pos) ||
+           fr.score != null && t.uses(fr.score)) break;
+
+        // move let clause to outer position
+        System.arraycopy(fl, g, fl, g + 1, f - g);
+        fl[g] = t;
+        t = fl[f];
+        if(!m) ctx.compInfo(OPTFORLET);
+        m = true;
+      }
+    }
+  }
+  
   /**
    * Optimizes a where clause.
    * @param ctx query context

@@ -137,6 +137,11 @@ public class Filter extends Preds {
   }
 
   @Override
+  public final boolean uses(final Var v) {
+    return root.uses(v) || super.uses(v);
+  }
+
+  @Override
   public final boolean removable(final Var v) {
     return root.removable(v) && super.removable(v);
   }

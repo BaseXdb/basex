@@ -196,6 +196,8 @@ public final class Prop extends AProp {
 
   // STATIC PROPERTIES ========================================================
 
+  /** Root properties. */
+  public static Prop root;
   /** GUI mode. */
   public static boolean gui;
   /** Debug mode. */
@@ -212,6 +214,7 @@ public final class Prop extends AProp {
    */
   public Prop(final boolean read) {
     super(read ? "" : null);
+    if(root == null) root = this;
     if(read) finish();
   }
 
@@ -236,8 +239,10 @@ public final class Prop extends AProp {
   @Override
   protected void finish() {
     // set static properties
-    Prop.language = get(Prop.LANGUAGE);
-    Prop.langkeys = is(Prop.LANGKEYS);
-    Prop.debug = is(Prop.DEBUG);
+    if(this == root) {
+      Prop.language = get(Prop.LANGUAGE);
+      Prop.langkeys = is(Prop.LANGKEYS);
+      Prop.debug = is(Prop.DEBUG);
+    }
   }
 }

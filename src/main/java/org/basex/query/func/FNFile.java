@@ -305,9 +305,7 @@ final class FNFile extends Fun {
    * @return result
    */
   private Bln makeDir(final File file, final boolean includeParents) {
-
-    return includeParents ? Bln.get(file.mkdirs()) : Bln.get(file.mkdir());
-
+    return Bln.get(includeParents ? file.mkdirs() : file.mkdir());
   }
 
   /**
@@ -317,7 +315,6 @@ final class FNFile extends Fun {
    * @throws QueryException query context
    */
   private Uri pathToUri(final QueryContext ctx) throws QueryException {
-
     final String path = string(checkEStr(expr[0].atomic(ctx, input)));
     try {
       final URI uri = new URI("file", path, null);
