@@ -25,7 +25,7 @@ public final class SentList extends DefaultHandler {
   /** Current parsing mode. */
   private int posMode;
   
-  /** Tokenizer to stem WordLists */
+  /** Tokenizer to stem WordLists. */
   final Tokenizer tk = new Tokenizer(null);
   
   

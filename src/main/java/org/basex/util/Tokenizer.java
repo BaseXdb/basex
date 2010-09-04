@@ -154,7 +154,8 @@ public final class Tokenizer implements IndexToken {
   }
 
   /**
-   * Checks if more tokens are to be returned.
+   * Scans the next token and returns {@code true} if more tokens can be
+   * returned.
    * @return result of check
    */
   public boolean more() {
