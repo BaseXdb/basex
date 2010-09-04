@@ -40,20 +40,6 @@ public final class SentList extends DefaultHandler {
       Main.debug(ex);
       Err.or(ii, uri + " could not be parsed: " + ex);
     }
-
-    // no negations defined - add defaults
-    // (should better be included in the input file)
-    if(words[2].size() == 0) {
-      words[2].add(token("no"));
-      words[2].add(token("not"));
-      words[2].add(token("never"));
-      words[2].add(token("without"));
-      words[2].add(token("none"));
-      words[2].add(token("neither"));
-      words[2].add(token("nothing"));
-      words[2].add(token("nobody"));
-      words[2].add(token("nowhere"));
-    }
   }
 
   /**
@@ -85,12 +71,13 @@ public final class SentList extends DefaultHandler {
   public void startElement(final String uri, final String ln,
       final String qName, final Attributes atts) {
 
-    if(qName.equals("axis")) {
+    System.out.println(qName);
+    if(qName.equals("Category")) {
       final String term = atts.getValue("name");
       if(term.equals("positive")) posMode = 0;
       if(term.equals("negative")) posMode = 1;
       if(term.equals("negated"))  posMode = 2;
-    } else if(qName.equals("term")) {
+    } else if(qName.equals("word")) {
       words[posMode].add(lc(token(atts.getValue("name"))));
     }
   }
