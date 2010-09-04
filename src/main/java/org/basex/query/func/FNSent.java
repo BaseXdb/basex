@@ -67,8 +67,7 @@ public final class FNSent extends Fun {
     byte[] token1 = EMPTY, token2 = EMPTY, token3 = EMPTY, token4 = EMPTY;
 
     final Tokenizer tk = new Tokenizer(str, null);
-    // if stemming is activated, it should be performed on word lists as well...
-    //tk.st = true;
+    tk.st = true;
 
     // loop through all tokens
     while(tk.more()) {
