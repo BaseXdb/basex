@@ -33,7 +33,7 @@ public final class SentList extends DefaultHandler {
       throws QueryException {
 
     try {
-      // [OE] could be extended for other XML formats (incl. negations),
+      // [OE] could be extended for other XML formats
       // or plain texts
       SAXParserFactory.newInstance().newSAXParser().parse(uri, this);
     } catch(final Exception ex) {
@@ -71,7 +71,6 @@ public final class SentList extends DefaultHandler {
   public void startElement(final String uri, final String ln,
       final String qName, final Attributes atts) {
 
-    System.out.println(qName);
     if(qName.equals("Category")) {
       final String term = atts.getValue("name");
       if(term.equals("positive")) posMode = 0;
