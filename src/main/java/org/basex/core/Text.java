@@ -268,7 +268,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPRESTORE = {
-    "[ ZIP ]", lang("ch_restore1"), lang("ch_restore2")
+    "[" + NAM + "]", lang("ch_restore1"), lang("ch_restore2")
   };
   /** Command help. */
   String[] HELPSHOW = {

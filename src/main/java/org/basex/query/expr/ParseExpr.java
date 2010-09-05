@@ -51,12 +51,10 @@ public abstract class ParseExpr extends Expr {
   @Override
   public Item atomic(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final Iter ir = iter(ctx);
-    final long s = ir.size();
-    if(s == 1) return ir.next();
 
+    final Iter ir = iter(ctx);
     final Item it = ir.next();
-    if(it == null) return null;
+    if(it == null || ir.size() == 1) return it;
 
     final Item n = ir.next();
     if(n != null) Err.or(input, XPSEQ, "(" + it + ", " + n +

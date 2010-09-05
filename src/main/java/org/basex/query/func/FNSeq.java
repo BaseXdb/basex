@@ -215,10 +215,24 @@ final class FNSeq extends Fun {
     return max != -1 ? new Iter() {
       // directly access specified items
       long c = Math.max(1, s);
+      long m = Math.min(e, max + 1);
 
       @Override
       public Item next() throws QueryException {
-        return c < e && c <= max ? iter.get(c++ - 1) : null;
+        return c < m ? iter.get(c++ - 1) : null;
+      }
+      @Override
+      public Item get(final long i) throws QueryException {
+        return iter.get(c + i - 1);
+      }
+      @Override
+      public long size() {
+        return Math.max(0, m - c);
+      }
+      @Override
+      public boolean reset() {
+        c = Math.max(1, s);
+        return true;
       }
     } : new Iter() {
       // run through all items
@@ -255,16 +269,21 @@ final class FNSeq extends Fun {
       long c = s;
 
       @Override
-      public long size() { return s; }
+      public Item next() throws QueryException {
+        return --c >= 0 ? ir.get(c) : null;
+      }
       @Override
       public Item get(final long i) throws QueryException {
         return ir.get(s - i - 1);
       }
       @Override
-      public Item next() throws QueryException {
-        if(--c >= 0) return ir.get(c);
-        ir.reset();
-        return null;
+      public long size() {
+        return s;
+      }
+      @Override
+      public boolean reset() {
+        c = s;
+        return true;
       }
     };
   }

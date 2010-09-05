@@ -31,6 +31,8 @@ public final class TableOutput extends FileOutputStream {
   private int bcount;
   /** First pre value of current block. */
   private int fpre;
+  /** Closed flag. */
+  private boolean closed;
 
   /**
    * Initializes the output.
@@ -63,6 +65,11 @@ public final class TableOutput extends FileOutputStream {
 
   @Override
   public void close() throws IOException {
+    // close() is called by super.finalize().
+    // The flag prevents that the file is closed more than once.
+    if(closed) return;
+    closed = true;
+
     flush();
     super.close();
 
