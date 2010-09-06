@@ -59,15 +59,15 @@ public final class ViewData {
       k = data.kind(p);
     }
 
-    final TokenBuilder sb = new TokenBuilder();
-    sb.add("doc(\"");
-    sb.add(content(data, p, true));
-    sb.add("\")");
+    final TokenBuilder tb = new TokenBuilder();
+    tb.add("doc(\"");
+    tb.add(content(data, p, true));
+    tb.add("\")");
     for(int i = il.size() - 1; i >= 0; i--) {
-      sb.add('/');
-      sb.add(content(data, il.get(i), true));
+      tb.add('/');
+      tb.add(content(data, il.get(i), true));
     }
-    return sb.finish();
+    return tb.finish();
   }
 
   /**

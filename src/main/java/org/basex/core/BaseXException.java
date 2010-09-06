@@ -1,5 +1,7 @@
 package org.basex.core;
 
+import org.basex.util.Util;
+
 /**
  * This is a simple container for sessions.
  *
@@ -13,7 +15,7 @@ public final class BaseXException extends Exception {
    * @param e message extension
    */
   public BaseXException(final String s, final Object... e) {
-    super(Main.info(s, e));
+    super(Util.info(s, e));
   }
 
   /**

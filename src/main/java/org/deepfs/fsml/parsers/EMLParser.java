@@ -7,9 +7,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.FileType;
@@ -227,7 +227,7 @@ public final class EMLParser implements IFileParser {
 
   @Override
   public void propagate(final DeepFile df) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   @Override
@@ -667,7 +667,7 @@ public final class EMLParser implements IFileParser {
       throws DecodingException {
     final TokenBuilder tmp = new TokenBuilder();
 
-    final byte[] data = Token.delete(text, 0xA); // delete line feeds
+    final byte[] data = Token.delete(text, (char) 0xA); // delete line feeds
     final int size = data.length;
     if(size % 4 != 0)
       throw new DecodingException("Invalid number of bytes (" + size + ")");

@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.CreateDB;
@@ -22,6 +21,7 @@ import org.basex.util.Atts;
 import org.basex.util.IntList;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.deepfs.DeepShell;
 import org.deepfs.fsml.DeepNS;
 import org.deepfs.jfuse.DeepStat;
@@ -190,7 +190,7 @@ public final class DeepFS implements DataText {
         new CreateDB(name, "<" + S_DEEPFS + " " + "mountpoint=\""
             + mp + "\"/>").execute(ctx);
       } catch(final BaseXException exx) {
-        Main.notexpected(exx);
+        Util.notexpected(exx);
       }
     }
     return ctx;
@@ -279,7 +279,7 @@ public final class DeepFS implements DataText {
     String qu = qb.toString();
     qu = qu.endsWith("/") ? qu.substring(0, qu.length() - 1) : qu;
 
-    Main.debug("[pn2xp] " + qu);
+    Util.debug("[pn2xp] " + qu);
 
     return qu;
   }
@@ -294,7 +294,7 @@ public final class DeepFS implements DataText {
       final Nodes n = xquery(pn2xp(path, false));
       return n.size() == 0 ? -1 : n.nodes[0];
     } catch(final QueryException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       return -1;
     }
   }
@@ -309,7 +309,7 @@ public final class DeepFS implements DataText {
       final Nodes n = xquery(pn2xp(path, true) + "/child::*");
       return n.nodes;
     } catch(final QueryException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       return null;
     }
   }
@@ -465,7 +465,7 @@ public final class DeepFS implements DataText {
       final Nodes n = xquery(pn2xp(dirname(path), true));
       return n.size() == 0 ? -1 : n.nodes[0];
     } catch(final QueryException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       return -1;
     }
   }
@@ -498,7 +498,7 @@ public final class DeepFS implements DataText {
       if(n.size() == 0) return -1;
       data.delete(n.nodes[0]);
     } catch(final QueryException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       return -1;
     }
     return 0;
@@ -590,7 +590,7 @@ public final class DeepFS implements DataText {
 
     final int pre = path2pre(path);
     if(pre == -1) {
-      Main.debug(method + path + " (-1)");
+      Util.debug(method + path + " (-1)");
       return null;
     }
     final byte[] mtime = attr(pre, mtimeID);
@@ -601,7 +601,7 @@ public final class DeepFS implements DataText {
     final byte[] uid   = attr(pre, uidID);
     final byte[] gid   = attr(pre, gidID);
     final byte[] nlink = attr(pre, nlinkID);
-    Main.debug(
+    Util.debug(
         "pre/inode: " + pre +
         "\natime: " + string(atime) +
         "\nmtime: " + string(mtime) +
@@ -621,7 +621,7 @@ public final class DeepFS implements DataText {
     sbuf.stuid = Long.parseLong(string(uid));
     sbuf.stgid = Long.parseLong(string(gid));
     sbuf.stnlink = Long.parseLong(string(nlink));
-    Main.debug(method + path + " ino: " + sbuf.stino);
+    Util.debug(method + path + " ino: " + sbuf.stino);
     return sbuf;
   }
 
@@ -660,7 +660,7 @@ public final class DeepFS implements DataText {
    * @return zero on success, -1 on failure
    */
   public int rmdir(final String path) {
-    Main.debug("[basex_rmdir] path: " + path);
+    Util.debug("[basex_rmdir] path: " + path);
     final int n = delete(path, true, false);
     return n;
   }
@@ -672,24 +672,24 @@ public final class DeepFS implements DataText {
   public void close() throws IOException {
     if(data.meta.prop.is(Prop.FUSE)) {
       final String method = "[" + Text.NAME + ".close] ";
-      Main.debug(method + "Initiating DeepFS shutdown sequence ");
+      Util.debug(method + "Initiating DeepFS shutdown sequence ");
       // -- unmount running fuse
       for(int i = 3; i > 0; i--) {
         Performance.sleep(1000);
-        Main.err(i + " .. ");
+        Util.err(i + " .. ");
       }
-      Main.debug("GO.");
+      Util.debug("GO.");
       final String cmd = "umount -f " + data.meta.mount;
-      Main.errln(method + "Trying to unmount deepfs: " + cmd);
+      Util.errln(method + "Trying to unmount deepfs: " + cmd);
       final Runtime r = Runtime.getRuntime();
       final java.lang.Process p = r.exec(cmd);
       try {
         p.waitFor();
       } catch(final InterruptedException ex) {
-        ex.printStackTrace();
+        Util.stack(ex);
       }
       final int rc = p.exitValue();
-      Main.debug(method + "Unmount " + data.meta.mount + (rc == 0 ?
+      Util.debug(method + "Unmount " + data.meta.mount + (rc == 0 ?
           " ... OK." : " ... FAILED(" + rc + ") (Please unmount manually)"));
     }
   }
@@ -775,7 +775,7 @@ public final class DeepFS implements DataText {
     // if(!isDir(mode)) return -1; // Linux does not submit S_IFDIR
     final String method = "[mkdir] ";
     final int n = createNode(path, getSIFDIR() | mode);
-    Main.debug(method + "path: " + path + " mode: "
+    Util.debug(method + "path: " + path + " mode: "
         + Integer.toOctalString(mode) + " id : (" + n + ")");
     return n;
   }

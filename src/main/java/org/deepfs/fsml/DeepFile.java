@@ -12,7 +12,6 @@ import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.data.Result;
@@ -22,6 +21,7 @@ import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Type;
 import org.basex.util.Atts;
+import org.basex.util.Util;
 import org.basex.util.XMLToken;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.parsers.IFileParser;
@@ -418,7 +418,7 @@ public final class DeepFile {
     if(metaFinished || value.isEmpty()) return;
 
     if(e.equals(MetaElem.TYPE) || e.equals(MetaElem.FORMAT)) {
-      Main.debug("The metadata attributes " + MetaElem.TYPE + " and "
+      Util.debug("The metadata attributes " + MetaElem.TYPE + " and "
           + MetaElem.FORMAT + " must not be set by an addMetaElem() method."
           + " Use setMetaType() and setFormat() instead.");
       return;
@@ -440,7 +440,7 @@ public final class DeepFile {
     final ArrayList<String> vals;
     if(metaElements.containsKey(e)) {
       if(!e.isMultiVal()) {
-        Main.debug(
+        Util.debug(
             "DeepFile: Failed to add metadata value. Multiple values are " +
             "forbidden for " + "metadata element % (%).", e, bfc.getFileName());
         return;
@@ -547,7 +547,7 @@ public final class DeepFile {
       try {
         addMeta(elem, xgc.toXMLFormat(), null);
       } catch(final IllegalStateException ex) {
-        Main.debug("DeepFile: Invalid date (file: %, error message: %)",
+        Util.debug("DeepFile: Invalid date (file: %, error message: %)",
             bfc.getFileName(), ex.getMessage());
       }
     }
@@ -572,7 +572,7 @@ public final class DeepFile {
    * @param foundType the type that was tried to set
    */
   private void metaDebug(final MetaElem elem, final String foundType) {
-    Main.debug("DeepFile: Invalid data type (file: %, metadata element: %, " +
+    Util.debug("DeepFile: Invalid data type (file: %, metadata element: %, " +
         "expected data type: %, found data type: %).", bfc.getFileName(), elem,
         elem.getType(), foundType);
   }
@@ -601,7 +601,7 @@ public final class DeepFile {
           addMeta0(MetaElem.SENDER_EMAIL, creator.get(0));
           metaElements.remove(MetaElem.CREATOR_EMAIL);
         }
-        if(err) Main.debug("Found multiple creators for a message. " +
+        if(err) Util.debug("Found multiple creators for a message. " +
             "All but the first one are dropped (%).", bfc.getFileName());
       }
     }
@@ -688,7 +688,7 @@ public final class DeepFile {
       final String xml = ao.toString();
       ser.close();
       addXML(position, byteCount, xml);
-    } catch(final QueryException ex) { return; }
+    } catch(final QueryException ex) { /* ignore */ }
   }
 
   /**
@@ -955,7 +955,7 @@ public final class DeepFile {
    */
   public void debug(final String str, final Object...ext) {
     if(context.prop.is(Prop.FSVERBOSE))
-      Main.debug(bfc.getFileName() + " - " + str, ext);
+      Util.debug(bfc.getFileName() + " - " + str, ext);
   }
 
   // ---------------------------------------------------------------------------

@@ -125,7 +125,6 @@ dd_question=Die Datenbank '%' wird gelöscht.\nSind Sie sicher?
 dx_question=Möchten Sie wirklich löschen?
 dq_question=Änderungen speichern in %?
 
-dx_outfile=Ausgabedatei
 dx_outdir=Ausgabeverzeichnis
 dx_overfile=Verzeichnis ist nicht leer.
 dx_indent=Mit Leerzeichen einrücken
@@ -461,7 +460,6 @@ info_nodb=Keine Datenbank gefunden.
 info_nodeepfs=Keine DeepFS Datenbank gefunden
 info_dberror=konnte nicht geöffnet werden.
 info_query=Anfrage-Info
-info_all=ausführlich
 info_debug=Debug-Modus
 info_chop=Entfernung von Leerzeichen
 info_entities=Parsen von Entities

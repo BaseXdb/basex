@@ -1,5 +1,7 @@
 package org.basex.io;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -18,9 +20,9 @@ public class PrintOutput extends OutputStream {
   /** Output stream reference. */
   private final OutputStream os;
   /** Maximum numbers of bytes to write. */
-  int max = Integer.MAX_VALUE;
+  protected int max = Integer.MAX_VALUE;
   /** Number of bytes written. */
-  int size;
+  protected int size;
 
   /** Protected default constructor. */
   protected PrintOutput() {
@@ -33,20 +35,34 @@ public class PrintOutput extends OutputStream {
    * @throws IOException I/O exception
    */
   public PrintOutput(final String fn) throws IOException {
-    os = new BufferedOutput(new FileOutputStream(fn));
+    this(new BufferedOutput(new FileOutputStream(fn)));
   }
 
   /**
    * Constructor, given an output stream.
    * @param out output stream reference
    */
-  public PrintOutput(final OutputStream out) {
+  private PrintOutput(final OutputStream out) {
     os = out;
+  }
+
+  /**
+   * Returns a new instance for the given output stream.
+   * @param out output stream reference
+   * @return print output
+   */
+  public static PrintOutput get(final OutputStream out) {
+    return out instanceof PrintOutput ? (PrintOutput) out :
+      new PrintOutput(
+          out instanceof ByteArrayOutputStream ||
+          out instanceof BufferedOutputStream ||
+          out instanceof BufferedOutput ||
+          out instanceof ArrayOutput ? out : new BufferedOutput(out));
   }
 
   @Override
   public void write(final int b) throws IOException {
-    if(size++ < max) os.write(b);
+    if(size++ < max && os != null) os.write(b);
   }
 
   /**
@@ -106,12 +122,12 @@ public class PrintOutput extends OutputStream {
   }
 
   @Override
-  public void flush() throws IOException {
+  public final void flush() throws IOException {
     if(os != null) os.flush();
   }
 
   @Override
-  public void close() throws IOException {
+  public final void close() throws IOException {
     if(os != null) {
       if(os == System.out || os == System.err) os.flush();
       else os.close();

@@ -38,15 +38,6 @@ public final class Functions extends ExprInfo {
   private Func[] func = { };
 
   /**
-   * Returns the function with the specified id.
-   * @param id function id
-   * @return function
-   */
-  public Func get(final int id) {
-    return func[id];
-  }
-
-  /**
    * Returns the number of functions.
    * @return function
    */

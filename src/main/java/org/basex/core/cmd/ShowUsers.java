@@ -4,12 +4,12 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdShow;
 import org.basex.data.Data;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'show users' command and shows existing users.
@@ -51,7 +51,7 @@ public final class ShowUsers extends Command {
         Close.close(context, data);
         return true;
       } catch(final IOException ex) {
-        Main.debug(ex);
+        Util.debug(ex);
         final String msg = ex.getMessage();
         return msg.isEmpty() ? error(DBOPENERR, name) : error(msg);
       }

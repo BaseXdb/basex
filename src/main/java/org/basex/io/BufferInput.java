@@ -20,7 +20,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class BufferInput {
+public class BufferInput extends InputStream {
   /** UTF8 cache. */
   private final byte[] cache = new byte[4];
   /** Byte buffer. */
@@ -128,17 +128,13 @@ public class BufferInput {
     }
   }
 
-  /**
-   * Reads a single byte and returns it as integer.
-   * @return read byte
-   * @throws IOException I/O exception
-   */
+  @Override
   public final int read() throws IOException {
     return readByte() & 0xFF;
   }
 
   /**
-   * Returns the next byte or 0 if all bytes have been read.
+   * Returns the next byte, or 0 if all bytes have been read.
    * @return next byte
    * @throws IOException I/O exception
    */
@@ -230,26 +226,15 @@ public class BufferInput {
     while(true) {
       final int ch = readChar();
       if(ch == 0x0D) continue;
-      if(ch == 0) return tb.size() != 0;
+      if(ch == 0x00) return tb.size() != 0;
       if(ch == 0x0A) return true;
       tb.addUTF(ch);
     }
   }
 
-  /**
-   * Closes the input stream.
-   * @throws IOException IO Exception
-   */
+  @Override
   public final void close() throws IOException {
     if(in != null && !(in instanceof ZipInputStream)) in.close();
-  }
-
-  /**
-   * Returns the input stream.
-   * @return input stream
-   */
-  public final InputStream inputStream() {
-    return in;
   }
 
   /**

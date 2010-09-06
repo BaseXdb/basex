@@ -1,7 +1,7 @@
 package org.deepfs.fsml.parsers;
 
 import java.io.IOException;
-import org.basex.core.Main;
+import org.basex.util.Util;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.FileType;
 import org.deepfs.fsml.MimeType;
@@ -40,6 +40,6 @@ public final class TIFFParser implements IFileParser {
 
   @Override
   public void propagate(final DeepFile deepFile) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 }

@@ -39,8 +39,6 @@ public final class SeqType {
   public static final SeqType BLN = new SeqType(Type.BLN);
   /** Zero or one booleans. */
   public static final SeqType BLN_ZO = new SeqType(Type.BLN, Occ.ZO);
-  /** Zero or more booleans. */
-  public static final SeqType BLN_ZM = new SeqType(Type.BLN, Occ.ZM);
   /** Single Base64Binary. */
   public static final SeqType B64 = new SeqType(Type.B6B);
   /** Double number. */
@@ -61,8 +59,6 @@ public final class SeqType {
   public static final SeqType NOD_ZO = new SeqType(Type.NOD, Occ.ZO);
   /** Zero or more nodes. */
   public static final SeqType NOD_ZM = new SeqType(Type.NOD, Occ.ZM);
-  /** One or more nodes. */
-  public static final SeqType NOD_OM = new SeqType(Type.NOD, Occ.OM);
   /** Single QName. */
   public static final SeqType QNM = new SeqType(Type.QNM);
   /** Zero or one QNames. */
@@ -199,8 +195,6 @@ public final class SeqType {
    */
   public Value cast(final Value val, final QueryContext ctx,
       final InputInfo ii) throws QueryException {
-
-    //System.out.println(val.type() + ": " + this);
 
     final Iter iter = val.iter(ctx);
     Item it = iter.next();

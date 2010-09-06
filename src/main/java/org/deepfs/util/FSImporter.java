@@ -5,12 +5,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
+import org.basex.util.Util;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
@@ -59,7 +59,7 @@ public final class FSImporter implements FSTraversal {
       try {
         spot = new SpotlightExtractor();
       } catch(final ParserException ex) {
-        Main.debug("Failed to load spotex library (%).", ex);
+        Util.debug("Failed to load spotex library (%).", ex);
         spot = null;
       }
       spotlight = spot;
@@ -74,7 +74,7 @@ public final class FSImporter implements FSTraversal {
    */
   public void createDB(final String name) {
     final CreateDB c = new CreateDB(name, "<" + DeepFS.S_FSML + "/>");
-    if(!c.run(ctx)) Main.notexpected(
+    if(!c.run(ctx)) Util.notexpected(
         "Failed to create file system database (%).", c.info());
     ctx.data.meta.deepfs = true;
   }
@@ -125,19 +125,19 @@ public final class FSImporter implements FSTraversal {
           deepFile.extract();
           xmlFragment = FSMLSerializer.serialize(deepFile);
         } catch(final Exception ex) {
-          Main.debug(
+          Util.debug(
               "FSImporter: Failed to extract metadata/contents from the file " +
               "(% - %)", f.getAbsolutePath(), ex);
         } finally {
           try {
             bfc.close();
           } catch(final IOException e1) {
-            Main.err("FSImporter: Failed to close the file (% - %)",
+            Util.err("FSImporter: Failed to close the file (% - %)",
                 bfc.getFileName(), e1);
           }
         }
       } catch(final IOException ex) {
-        Main.debug("FSImporter: Failed to open the file (% - %)",
+        Util.debug("FSImporter: Failed to open the file (% - %)",
             f.getAbsolutePath(), ex);
       }
       if(xmlFragment == null)
@@ -151,13 +151,11 @@ public final class FSImporter implements FSTraversal {
       try {
         qp.execute();
       } catch(final QueryException ex) { // insertion failed
-        Main.debug(
+        Util.debug(
             "FSImporter: Failed to insert a node for the file % into the " +
             "document (%)", f.getAbsolutePath(), ex);
       } finally {
-        try {
-          qp.close();
-        } catch(final IOException ex) { }
+        try { qp.close(); } catch(final Exception ex) { }
       }
     }
 

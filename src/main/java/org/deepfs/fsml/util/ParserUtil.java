@@ -7,7 +7,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * Utility methods for file parsers.
@@ -48,7 +48,7 @@ public final class ParserUtil {
     try {
       factory = DatatypeFactory.newInstance();
     } catch(final DatatypeConfigurationException ex) {
-      Main.debug(ex.getMessage());
+      Util.debug(ex.getMessage());
     }
   }
 
@@ -106,11 +106,11 @@ public final class ParserUtil {
       }
       b = minSec[++i];
     }
-    if(mins == Integer.MIN_VALUE) Main.debug(
+    if(mins == Integer.MIN_VALUE) Util.debug(
         "ParserUtil: Invalid min value in minSec duration (%)", string(minSec));
     // read seconds
     final int secs = toInt(minSec, ++i, max);
-    if(secs == Integer.MIN_VALUE) Main.debug(
+    if(secs == Integer.MIN_VALUE) Util.debug(
         "ParserUtil: Invalid sec value in minSec duration (%)", string(minSec));
     final int milliseconds = secs * 1000 + mins * 60000;
     return factory.newDuration(milliseconds);

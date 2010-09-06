@@ -17,6 +17,7 @@ import org.basex.BaseX;
 import org.basex.io.IOFile;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This class loads language specific texts when the {@link #lang}
@@ -58,9 +59,9 @@ public final class Lang {
       if(chk) check = new HashMap<String, Boolean>();
 
       final String path = "/" + SUFFIX + "/" + lang + "." + SUFFIX;
-      final URL url = BaseX.class.getResource(path);
+      final URL url = Lang.class.getResource(path);
       if(url == null) {
-        Main.errln("%." + SUFFIX + " not found.", lang);
+        Util.errln("%." + SUFFIX + " not found.", lang);
       } else {
         final BufferedReader br = new BufferedReader(new InputStreamReader(
             (InputStream) url.getContent(), Token.UTF8));
@@ -75,14 +76,14 @@ public final class Lang {
           if(TETXTS.get(key) == null) {
             TETXTS.put(key, val);
           } else if(chk) {
-            Main.errln("%." + SUFFIX + ": '%' assigned twice", lang, key);
+            Util.errln("%." + SUFFIX + ": '%' assigned twice", lang, key);
           }
           if(chk) check.put(key, true);
         }
         br.close();
       }
     } catch(final IOException ex) {
-      Main.errln(ex);
+      Util.errln(ex);
     }
   }
 
@@ -95,7 +96,7 @@ public final class Lang {
     if(key == null) {
       if(CHECK && check.size() != 0) {
         final Iterator<String> it = check.keySet().iterator();
-        while(it.hasNext()) Main.errln("%." + SUFFIX + ": '%' not used",
+        while(it.hasNext()) Util.errln("%." + SUFFIX + ": '%' not used",
             Prop.language, it.next());
       }
       return null;
@@ -103,7 +104,7 @@ public final class Lang {
 
     final String val = TETXTS.get(key);
     if(val == null) {
-      if(TETXTS.size() != 0) Main.errln("%." + SUFFIX + ": '%' missing",
+      if(TETXTS.size() != 0) Util.errln("%." + SUFFIX + ": '%' missing",
           Prop.language, key);
       return "[" + key + "]";
     }
@@ -118,7 +119,7 @@ public final class Lang {
    * @return string
    */
   static synchronized String lang(final String key, final Object... e) {
-    return Main.info(lang(key), e);
+    return Util.info(lang(key), e);
   }
 
   /**
@@ -155,7 +156,7 @@ public final class Lang {
         }
       }
     } catch(final IOException ex) {
-      Main.errln(ex);
+      Util.errln(ex);
     }
     return new String[][] { langs.toArray(), creds.toArray() };
   }

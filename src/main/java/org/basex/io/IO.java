@@ -3,9 +3,9 @@ package org.basex.io;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
 /**
@@ -161,7 +161,7 @@ public abstract class IO {
    * @return contents
    */
   public boolean md() {
-    Main.notexpected();
+    Util.notexpected();
     return false;
   }
 
@@ -231,7 +231,7 @@ public abstract class IO {
    */
   @SuppressWarnings("unused")
   public void write(final byte[] c) throws IOException {
-    Main.notexpected();
+    Util.notexpected();
   }
 
   /**
@@ -239,7 +239,7 @@ public abstract class IO {
    * @return chopped filename
    */
   public boolean delete() {
-    Main.notexpected();
+    Util.notexpected();
     return false;
   }
 
@@ -265,11 +265,10 @@ public abstract class IO {
    */
   protected final byte[] cache(final InputStream i) throws IOException {
     final TokenBuilder tb = new TokenBuilder();
-    final InputStream bis = i instanceof BufferedInputStream ? i :
-      new BufferedInputStream(i);
+    final InputStream bis = i instanceof BufferedInputStream ||
+      i instanceof BufferInput ? i : new BufferedInputStream(i);
     int b;
-    while((b = bis.read()) != -1)
-      tb.add((byte) b);
+    while((b = bis.read()) != -1) tb.add((byte) b);
     bis.close();
     cont = tb.finish();
     return cont;

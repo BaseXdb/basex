@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * Some utility methods for loading class files from folders, packages or jar
@@ -18,7 +18,6 @@ import org.basex.core.Main;
  * @author Bastian Lemke
  */
 public final class Loader extends ClassLoader {
-
   /** Hidden constructor. */
   private Loader() { }
 
@@ -109,7 +108,7 @@ public final class Loader extends ClassLoader {
       throw ex;
     } catch(final Throwable t) {
       // catch all exceptions and JVM errors and break after the first error
-      Main.errln("Failed to load class: %", t);
+      Util.errln("Failed to load class: %", t);
     }
     // return only the correctly initialized classes
     final int counter = initializeClasses(foundClasses);
@@ -131,7 +130,7 @@ public final class Loader extends ClassLoader {
         Class.forName(c.getName(), true, ClassLoader.getSystemClassLoader());
         counter++;
       } catch(final Throwable t) { // catch everything and break after an error
-        Main.errln("Failed to load class (%)", t.getMessage());
+        Util.errln("Failed to load class (%)", t.getMessage());
         break;
       }
     }

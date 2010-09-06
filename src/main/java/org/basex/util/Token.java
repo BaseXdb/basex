@@ -2,7 +2,6 @@ package org.basex.util;
 
 import java.security.MessageDigest;
 import java.util.Arrays;
-import org.basex.core.Main;
 
 /**
  * This class provides convenience operations for handling so-called
@@ -211,7 +210,7 @@ public final class Token {
     try {
       return token(new String(token, encoding));
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return EMPTY;
     }
   }
@@ -896,19 +895,19 @@ public final class Token {
     final byte[][] split = new byte[l][];
 
     int s = 0;
-    final TokenBuilder sb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < l; ++i) {
       final byte c = token[i];
       if(c == sep) {
-        if(sb.size() != 0) {
-          split[s++] = sb.finish();
-          sb.reset();
+        if(tb.size() != 0) {
+          split[s++] = tb.finish();
+          tb.reset();
         }
       } else {
-        sb.add(c);
+        tb.add(c);
       }
     }
-    if(sb.size() != 0) split[s++] = sb.finish();
+    if(tb.size() != 0) split[s++] = tb.finish();
     return Array.copyOf(split, s);
   }
 
@@ -993,10 +992,10 @@ public final class Token {
    * @param ch character to be removed
    * @return resulting token
    */
-  public static byte[] delete(final byte[] token, final int ch) {
-    final TokenBuilder sb = new TokenBuilder(token.length);
-    for(final byte b : token) if(b != ch) sb.add(b);
-    return sb.finish();
+  public static byte[] delete(final byte[] token, final char ch) {
+    final TokenBuilder tb = new TokenBuilder(token.length);
+    for(final byte b : token) if(b != ch) tb.add(b);
+    return tb.finish();
   }
 
   /**
@@ -1209,7 +1208,7 @@ public final class Token {
       }
       return tb.toString();
     } catch(final Exception ex) {
-      Main.notexpected(ex);
+      Util.notexpected(ex);
       return null;
     }
   }

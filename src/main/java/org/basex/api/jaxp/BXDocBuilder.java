@@ -10,9 +10,9 @@ import org.basex.api.dom.BXDomImpl;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.SAXWrapper;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.query.item.DBNode;
+import org.basex.util.Util;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
@@ -64,7 +64,7 @@ final class BXDocBuilder extends DocumentBuilder {
 
   @Override
   public Document newDocument() {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 

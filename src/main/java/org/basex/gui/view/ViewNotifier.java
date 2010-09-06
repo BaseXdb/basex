@@ -3,7 +3,6 @@ package org.basex.gui.view;
 import static org.basex.core.Text.*;
 import java.awt.Window;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Text;
 import org.basex.data.Data;
 import org.basex.data.Nodes;
@@ -12,6 +11,7 @@ import org.basex.gui.dialog.Dialog;
 import org.basex.gui.dialog.DialogHelp;
 import org.basex.util.Array;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 
 /**
  * This class serves as a container for all existing views. The observer pattern
@@ -74,7 +74,7 @@ public final class ViewNotifier {
       boolean close = false;
       for(final View v : view) close |= v.visible() && v.db();
       if(close && fs > LARGEDB && Dialog.confirm(gui,
-          Main.info(OPENLARGE, Performance.format(fs)))) {
+          Util.info(OPENLARGE, Performance.format(fs)))) {
         for(final View v : view) if(v.visible() && v.db()) v.visible(false);
       }
     } else {

@@ -6,12 +6,12 @@ import static org.basex.data.DataText.*;
 import java.io.File;
 import java.io.IOException;
 import org.basex.build.BuildException;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Users;
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * This class provides meta information on a database.
@@ -136,10 +136,10 @@ public final class MetaData {
       return f != null && f.eq(IO.get(path)) && STORAGE.equals(str) &&
         f.date() == t;
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return false;
     } finally {
-      try { if(in != null) in.close(); } catch(final IOException ex) { }
+      try { in.close(); } catch(final Exception ex) { }
     }
   }
 

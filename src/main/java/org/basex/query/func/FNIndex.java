@@ -3,13 +3,13 @@ package org.basex.query.func;
 import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
-import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.QueryParser;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Expr.Use;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenSet;
+import org.basex.util.Util;
 
 /**
  * Global expression context.
@@ -40,7 +40,7 @@ public final class FNIndex extends TokenSet {
       final String dsc = def.desc;
       final byte[] key = token(dsc.substring(0, dsc.indexOf("(")));
       final int i = add(key);
-      if(i < 0) Main.notexpected("Function defined twice:" + def);
+      if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;
     }
   }

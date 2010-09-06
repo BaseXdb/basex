@@ -24,12 +24,12 @@ import javax.swing.AbstractButton;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.MatteBorder;
-import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommand;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.util.Undo;
+import org.basex.util.Util;
 import static org.basex.util.Token.*;
 
 /**
@@ -646,7 +646,7 @@ public class BaseXText extends BaseXPanel {
       try {
         return (String) t.getTransferData(DataFlavor.stringFlavor);
       } catch(final Exception ex) {
-        Main.debug(ex);
+        Util.debug(ex);
       }
     }
     return null;
@@ -686,7 +686,7 @@ public class BaseXText extends BaseXPanel {
   }
 
   /** Calculation counter. */
-  private final Thread calc = new Thread() {
+  private final transient Thread calc = new Thread() {
     @Override
     public void run() {
       rend.calc();

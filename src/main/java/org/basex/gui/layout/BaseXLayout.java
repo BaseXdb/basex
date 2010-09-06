@@ -20,13 +20,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import javax.swing.ImageIcon;
-import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 
 /**
  * This class assembles layout and paint methods which are frequently
@@ -207,7 +207,7 @@ public final class BaseXLayout {
   public static URL imageURL(final String name) {
     final String path = "/img/" + name + ".png";
     final URL url = GUI.class.getResource(path);
-    if(url == null) Main.errln("Not found: " + path);
+    if(url == null) Util.errln("Not found: " + path);
     return url;
   }
 
@@ -363,7 +363,7 @@ public final class BaseXLayout {
         l = cl(s, k);
       }
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
     g.drawString(string(s, 0, j), x, y + fs);
     return fw;
@@ -384,7 +384,7 @@ public final class BaseXLayout {
       // ignore faulty character sets
       for(int k = 0; k < l; k += cl(s, k)) fw += width(g, cw, cp(s, k));
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
     return fw;
   }

@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import org.basex.core.Main;
+import org.basex.util.Util;
 import org.deepfs.fsml.parsers.IFileParser;
 import org.deepfs.fsml.parsers.TXTParser;
 import org.deepfs.fsml.util.Loader;
@@ -40,7 +40,7 @@ public final class ParserRegistry {
    */
   public static void registerFallback(final Class<? extends IFileParser> c) {
     if(fallbackParser != null) {
-      Main.debug("Replacing fallback parser with " + c.getName());
+      Util.debug("Replacing fallback parser with " + c.getName());
     }
     fallbackParser = c;
   }
@@ -52,10 +52,10 @@ public final class ParserRegistry {
       for(final Class<?> c : classes) {
         final String name = c.getSimpleName();
         if(!REGISTRY.containsValue(c) && fallbackParser != c)
-          Main.debug("Loading % ... FAILED", name);
+          Util.debug("Loading % ... FAILED", name);
       }
     } catch(final IOException ex) {
-      Main.errln("Failed to load parsers (%)", ex.getMessage());
+      Util.errln("Failed to load parsers (%)", ex.getMessage());
     }
   }
 
@@ -114,7 +114,7 @@ public final class ParserRegistry {
     if(fallbackParserInstance == null) {
       try {
         fallbackParserInstance = fallbackParser.newInstance();
-        Main.debug("Successfully initialized fallback parser.");
+        Util.debug("Successfully initialized fallback parser.");
       } catch(final Exception ex) {
         final StringBuilder sb = new StringBuilder();
         sb.append("Failed to load fallback parser (");

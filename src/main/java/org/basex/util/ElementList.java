@@ -46,15 +46,6 @@ public abstract class ElementList {
   }
 
   /**
-   * Sets the number of entries. No validity checks are performed; the
-   * specified value must be smaller than or equal to the actual array size.
-   * @param s number of entries
-   */
-  public void size(final int s) {
-    size = s;
-  }
-
-  /**
    * Resets the array size.
    */
   public final void reset() {

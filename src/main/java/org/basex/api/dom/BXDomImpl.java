@@ -1,6 +1,6 @@
 package org.basex.api.dom;
 
-import org.basex.core.Main;
+import org.basex.util.Util;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.DocumentType;
 
@@ -25,14 +25,14 @@ public final class BXDomImpl implements DOMImplementation {
   @Override
   public BXDoc createDocument(final String nsURI, final String qn,
       final DocumentType doctype) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
   @Override
   public DocumentType createDocumentType(final String qn, final String pid,
       final String sid) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 

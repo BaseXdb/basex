@@ -3,9 +3,9 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.AProp;
-import org.basex.core.Main;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class contains serialization properties.
@@ -96,7 +96,7 @@ public final class SerializerProp extends AProp {
       final String key = sprop[0].trim();
       final String val = sprop.length < 2 ? "" : sprop[1].trim();
       if(get(key) != null) set(key, val);
-      else throw new IOException(Main.info(SERKEY, key));
+      else throw new IOException(Util.info(SERKEY, key));
     }
   }
 

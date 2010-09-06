@@ -15,6 +15,7 @@ import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableMemAccess;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This class stores and organizes the database table and the index structures
@@ -124,7 +125,7 @@ public final class DiskData extends Data {
       write();
       meta.dirty = false;
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 

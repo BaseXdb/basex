@@ -9,7 +9,6 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.EtchedBorder;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.AlterDB;
 import org.basex.core.cmd.Close;
@@ -27,6 +26,7 @@ import org.basex.gui.layout.BaseXText;
 import org.basex.io.DataInput;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Open database dialog.
@@ -147,7 +147,7 @@ public final class DialogOpen extends Dialog {
     } else if(cmp == drop) {
       final String db = choice.getValue();
       if(db.isEmpty()) return;
-      if(Dialog.confirm(this, Main.info(DROPCONF, db))) {
+      if(Dialog.confirm(this, Util.info(DROPCONF, db))) {
         if(ctx.data != null && ctx.data.meta.name.equals(db)) {
           new Close().run(gui.context);
           gui.notify.init();
@@ -173,7 +173,7 @@ public final class DialogOpen extends Dialog {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;
         } finally {
-          try { if(in != null) in.close(); } catch(final IOException ex) { }
+          try { in.close(); } catch(final Exception ex) { }
         }
       }
       enableOK(buttons, BUTTONOPEN, ok);

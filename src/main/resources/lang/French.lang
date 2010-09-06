@@ -125,7 +125,6 @@ dd_question=La base de données '%' va être effacée.\nConfirmer ?
 dx_question=Voulez-vous vraiment supprimer?
 dq_question=Enregistrer les modifications à % ?
 
-dx_outfile=Fichier de sortie
 dx_outdir=Dossier de sortie
 dx_overfile=Dossier n'est pas vide.
 dx_indent=Indenter par des espaces
@@ -462,7 +461,6 @@ info_nodb=Aucune base de données trouvée
 info_nodeepfs=Aucune base de données DeepFS trouvée
 info_dberror=Ouverture impossible.
 info_query=Query Info
-info_all=Mode verbeux
 info_debug=Mode débug
 info_chop=Suppression des espaces
 info_entities=Parsage entité

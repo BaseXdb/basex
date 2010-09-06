@@ -6,7 +6,7 @@ import org.basex.util.Token;
 
 /**
  * This class caches the output bytes in an array, similar to the
- * {@link ByteArrayOutputStream} class. Bytes that exceed a optional maximum
+ * {@link ByteArrayOutputStream} class. Bytes that exceed an optional maximum
  * are ignored.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -22,12 +22,14 @@ public final class ArrayOutput extends PrintOutput {
   public ArrayOutput() { }
 
   /**
-   * Constructor, specifying the maximum number of bytes to write.
+   * Sets the maximum number of bytes to be written.
    * Note that the limit might break unicode characters.
    * @param m maximum
+   * @return self reference
    */
-  public ArrayOutput(final int m) {
+  public ArrayOutput max(final int m) {
     max = m;
+    return this;
   }
 
   @Override

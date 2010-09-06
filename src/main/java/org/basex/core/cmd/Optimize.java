@@ -2,11 +2,11 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'optimize' command and optimizes the data structures of
@@ -90,7 +90,7 @@ public final class Optimize extends ACreate {
       data.meta.ftxindex |= prop.is(Prop.FTINDEX);
       index(data);
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
     data.flush();
   }

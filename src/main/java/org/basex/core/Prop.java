@@ -1,9 +1,8 @@
 package org.basex.core;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * This class assembles properties which are used all around the project. They
@@ -34,19 +33,13 @@ public final class Prop extends AProp {
 
   /** User's home directory. */
   public static final String HOME;
-  // checks for correct HOME directory
+
+  // set HOME directory of the application
   static {
-    String t = null;
-    try {
-      // retrieve application path
-      t = URLDecoder.decode(Prop.class.getProtectionDomain().
-          getCodeSource().getLocation().getPath(), ENCODING);
-      if(WIN) t = t.substring(1);
-      t = new File(t).getParent() + SEP;
-    } catch(final UnsupportedEncodingException ex) {
-    }
-    // use home directory after error or missing configuration file
-    HOME = t != null && new File(t + IO.BASEXSUFFIX).exists() ? t :
+    // retrieve application path
+    final String t = new File(Util.applicationPath()).getParent() + SEP;
+    // choose user home directory if no props are found in the application path
+    HOME = new File(t + IO.BASEXSUFFIX).exists() ? t :
       System.getProperty("user.home") + SEP;
   }
 
@@ -197,11 +190,9 @@ public final class Prop extends AProp {
   // STATIC PROPERTIES ========================================================
 
   /** Root properties. */
-  public static Prop root;
+  private static Prop root;
   /** GUI mode. */
   public static boolean gui;
-  /** Debug mode. */
-  public static boolean debug;
 
   /** Language (applied after restart). */
   static String language = LANGUAGE[1].toString();
@@ -242,7 +233,7 @@ public final class Prop extends AProp {
     if(this == root) {
       Prop.language = get(Prop.LANGUAGE);
       Prop.langkeys = is(Prop.LANGKEYS);
-      Prop.debug = is(Prop.DEBUG);
+      Util.debug = is(Prop.DEBUG);
     }
   }
 }

@@ -2,8 +2,8 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.data.Serializer;
+import org.basex.util.Util;
 import static org.basex.util.Token.*;
 import org.w3c.dom.Attr;
 
@@ -67,6 +67,6 @@ public final class FAttr extends FNode {
 
   @Override
   public String toString() {
-    return Main.info("%(%=\"%\")", name(), name.atom(), val);
+    return Util.info("%(%=\"%\")", name(), name.atom(), val);
   }
 }

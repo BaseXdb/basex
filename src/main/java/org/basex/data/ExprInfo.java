@@ -1,7 +1,7 @@
 package org.basex.data;
 
 import java.io.IOException;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * Expression information.
@@ -25,7 +25,7 @@ public abstract class ExprInfo {
    * @return class name
    */
   public String name() {
-    return Main.name(this);
+    return Util.name(this);
   }
 
   /**

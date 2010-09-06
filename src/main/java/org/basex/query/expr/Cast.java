@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -11,6 +10,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Cast expression.
@@ -71,6 +71,6 @@ public final class Cast extends Single {
 
   @Override
   public String toString() {
-    return Main.info("% cast as %", expr, type);
+    return Util.info("% cast as %", expr, type);
   }
 }

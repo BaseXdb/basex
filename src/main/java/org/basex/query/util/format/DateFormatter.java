@@ -38,7 +38,7 @@ public final class DateFormatter {
       final byte[] lng, final byte[] cal, final byte[] plc, final InputInfo ii)
       throws QueryException {
 
-    // ignore calendars and places
+    // [CG] XQuery/Formatter: calendars and places are ignored
     if(cal != null || plc != null);
 
     final Formatter form = Formatter.get(string(lng));

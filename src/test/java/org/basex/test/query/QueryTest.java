@@ -3,7 +3,6 @@ package org.basex.test.query;
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.CreateDB;
@@ -17,6 +16,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.ItemIter;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public abstract class QueryTest {
    */
   @AfterClass
   public static void stopTest() throws BaseXException {
-    new DropDB(Main.name(QueryTest.class)).execute(context);
+    new DropDB(Util.name(QueryTest.class)).execute(context);
     context.close();
   }
 
@@ -59,7 +59,7 @@ public abstract class QueryTest {
   @Test
   public void test() throws BaseXException {
     final String file = doc.replaceAll("\\\"", "\\\\\"");
-    final String name = Main.name(this);
+    final String name = Util.name(this);
     final boolean up = this instanceof XQUPTest;
     new CreateDB(name, file).execute(context);
 

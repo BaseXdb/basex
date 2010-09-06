@@ -1,9 +1,9 @@
 package org.deepfs.fsml;
 
 import static org.deepfs.fsml.DeepNS.*;
-import org.basex.core.Main;
 import org.basex.query.item.Type;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Available metadata elements.
@@ -329,7 +329,7 @@ public enum MetaElem {
    * @param dataType the new xml data type to set for this metadata element
    */
   void refineDataType(final Type dataType) {
-    if(!dataType.instance(dt)) Main.notexpected("Failed to refine the xml " +
+    if(!dataType.instance(dt)) Util.notexpected("Failed to refine the xml " +
         "data type " + "for the metadata element " + n
         + " (invalid data type: " + dataType + ")");
     else pdt = dataType;

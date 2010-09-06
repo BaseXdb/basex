@@ -1,10 +1,10 @@
 package org.basex.query.item;
 
-import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * HexBinary item.
@@ -107,6 +107,6 @@ public final class Hex extends Item {
 
   @Override
   public String toString() {
-    return Main.info("\"%\"", b2h());
+    return Util.info("\"%\"", b2h());
   }
 }

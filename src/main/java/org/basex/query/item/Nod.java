@@ -7,7 +7,6 @@ import org.basex.api.dom.BXElem;
 import org.basex.api.dom.BXNode;
 import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -17,6 +16,7 @@ import org.basex.query.iter.NodeMore;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Node type.
@@ -434,7 +434,7 @@ public abstract class Nod extends Item {
       case ATT: return Data.ATTR;
       case COM: return Data.COMM;
       case PI : return Data.PI;
-      default : Main.notexpected(); return -1;
+      default : Util.notexpected(); return -1;
     }
   }
 

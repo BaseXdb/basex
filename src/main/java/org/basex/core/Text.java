@@ -42,7 +42,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.2.7";
+  String VERSION = "6.2.8";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -103,17 +103,17 @@ public interface Text {
 
   // SERVER ===================================================================
 
-  /** Server start. */
+  /** Server was started. */
   String SERVERSTART = lang("srv_start");
-  /** Server stop. */
+  /** Server was stopped. */
   String SERVERSTOPPED = lang("srv_stop");
-  /** Server started. */
+  /** Server is running or permission was denied. */
   String SERVERBIND = lang("srv_bind");
-  /** Timeout error. */
+  /** Timeout exceeded. */
   String SERVERTIMEOUT = lang("srv_timeout");
   /** Connection error. */
-  String SERVERERR = lang("srv_connect");
-  /** Login error. */
+  String SERVERERROR = lang("srv_connect");
+  /** Access denied. */
   String SERVERLOGIN = lang("srv_login");
   /** User name. */
   String SERVERUSER = lang("srv_user");
@@ -443,11 +443,11 @@ public interface Text {
   /** Database optimized. */
   String DBOPTIMIZED = lang("db_optimized");
   /** Index created. */
-  String DBINDEXED = lang("in_created");
+  String INDCREATED = lang("in_created");
   /** Index dropped. */
-  String DBDROP = lang("in_dropped");
+  String INDDROP = lang("in_dropped");
   /** Index not dropped. */
-  String DBDROPERR = lang("in_notdropped");
+  String INDDROPERROR = lang("in_notdropped");
 
   // DATABASE/INDEX INFORMATION ===============================================
 
@@ -633,8 +633,6 @@ public interface Text {
   /** Info on database path. */
   String INFODBPATH = lang("info_dbpath");
 
-  /** Info on query verbosity. */
-  String INFOALL = lang("info_all");
   /** Info on tags. */
   String INFOTAGS = lang("info_tags");
   /** Info on attributes. */
@@ -1184,8 +1182,6 @@ public interface Text {
   /** Dialog title for closing XQuery file. */
   String XQUERYCONF = lang("dq_question");
 
-  /** Dialog title for exporting nodes. */
-  String OUTFILE = lang("dx_outfile");
   /** Dialog title for exporting nodes. */
   String OUTDIR = lang("dx_outdir");
   /** Dialog title for exporting nodes. */

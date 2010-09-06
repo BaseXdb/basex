@@ -2,8 +2,8 @@ package org.basex.data;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import org.basex.core.Main;
 import org.basex.util.Array;
+import org.basex.util.Util;
 
 /**
  * AllMatches full-text container,
@@ -122,14 +122,14 @@ public final class FTMatches implements Iterable<FTMatch> {
       @Override
       public FTMatch next() { return match[c]; }
       @Override
-      public void remove() { Main.notexpected(); }
+      public void remove() { Util.notexpected(); }
     };
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append(Main.name(this) + "[" + sTokenNum + "]");
+    sb.append(Util.name(this) + "[" + sTokenNum + "]");
     for(final FTMatch m : this) sb.append("\n  " + m);
     return sb.toString();
   }

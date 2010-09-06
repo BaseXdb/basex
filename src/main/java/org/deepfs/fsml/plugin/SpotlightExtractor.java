@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Map.Entry;
-import org.basex.core.Main;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.FileType;
 import org.deepfs.fsml.MetaElem;
@@ -242,7 +242,7 @@ public final class SpotlightExtractor implements IFileParser {
             if(mi != null) deepFile.setFileFormat(mi);
           }
         } catch(final IllegalArgumentException ex) {
-          Main.debug("SpotlightExtractor: unsupported ContentType found (%)",
+          Util.debug("SpotlightExtractor: unsupported ContentType found (%)",
               (String) o);
         }
       }
@@ -512,7 +512,7 @@ public final class SpotlightExtractor implements IFileParser {
      */
     boolean check(final Object o, final Class<?> c) {
       if(c.isInstance(o)) return true;
-      Main.debug("SpotlightExtractor: wrong data type for attribute " + this);
+      Util.debug("SpotlightExtractor: wrong data type for attribute " + this);
       return false;
     }
 
@@ -566,12 +566,12 @@ public final class SpotlightExtractor implements IFileParser {
           i++;
         value = Token.toLong(a, 0, i);
         if(value == Long.MIN_VALUE) {
-          Main.debug("SpotlightExtractor: invalid value for int field: %",
+          Util.debug("SpotlightExtractor: invalid value for int field: %",
               (String) o);
           return null;
         }
       } else {
-        Main.debug("SpotlightExtractor: unsupported data type: %",
+        Util.debug("SpotlightExtractor: unsupported data type: %",
             o.getClass().getName());
         return null;
       }
@@ -624,7 +624,7 @@ public final class SpotlightExtractor implements IFileParser {
 
   @Override
   public void propagate(final DeepFile deepFile) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   /**

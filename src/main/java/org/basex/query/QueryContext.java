@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -48,6 +47,7 @@ import org.basex.util.IntList;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
+import org.basex.util.Util;
 
 /**
  * This abstract query expression provides the architecture for a compiled
@@ -262,7 +262,7 @@ public final class QueryContext extends Progress {
       if(inf) info.add(NL + QUERYRESULT + funcs + root + NL);
 
     } catch(final StackOverflowError ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       Err.or(null, XPSTACK);
     }
   }
@@ -323,7 +323,7 @@ public final class QueryContext extends Progress {
       if(context.data != null) context.update();
       return v.iter(this);
     } catch(final StackOverflowError ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       Err.or(null, XPSTACK);
       return null;
     }
@@ -614,6 +614,6 @@ public final class QueryContext extends Progress {
 
   @Override
   public String toString() {
-    return Main.name(this) + '[' + file() + ']';
+    return Util.name(this) + '[' + file() + ']';
   }
 }

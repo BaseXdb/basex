@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.File;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.DataInput;
@@ -13,6 +12,7 @@ import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.item.DBNode;
 import org.basex.util.TokenSet;
+import org.basex.util.Util;
 
 /**
  * Simple stop words set for full-text requests.
@@ -56,7 +56,7 @@ public final class StopWords extends TokenSet {
       read(in);
       in.close();
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
   }
 

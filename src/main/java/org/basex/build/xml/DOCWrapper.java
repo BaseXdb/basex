@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.Stack;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.core.Main;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -98,7 +98,7 @@ public final class DOCWrapper extends Parser {
 
   @Override
   public String det() {
-    return Main.info(NODESPARSED, filename, nodes);
+    return Util.info(NODESPARSED, filename, nodes);
   }
 
   @Override

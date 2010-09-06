@@ -2,8 +2,8 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Commands.*;
 import static org.basex.core.Text.*;
-import org.basex.core.Main;
 import org.basex.core.Command;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'set' command and modifies database properties.
@@ -53,13 +53,13 @@ public final class Set extends Command {
         if(val == null) val = "";
         prop.set(key, val);
       } else {
-        Main.notexpected();
+        Util.notexpected();
       }
       final CmdSet[] cs = CmdSet.values();
       for(int c = 0; c < cs.length; ++c) if(cs[c] == s) key = STRINGS[c];
       return info(key + ": " + val);
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return error(SETVAL, key, val);
     }
   }

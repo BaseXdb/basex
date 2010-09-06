@@ -21,7 +21,7 @@ public final class User {
   /** User name. */
   public final String name;
   /** Password. */
-  public byte[] pw;
+  public byte[] password;
   /** Permission. */
   public int perm;
 
@@ -33,7 +33,7 @@ public final class User {
    */
   User(final String n, final byte[] p, final int r) {
     name = n;
-    pw = p;
+    password = p;
     perm = r;
   }
 
@@ -51,6 +51,6 @@ public final class User {
    * @return user copy
    */
   public User copy() {
-    return new User(name, pw, Math.min(perm, WRITE));
+    return new User(name, password, Math.min(perm, WRITE));
   }
 }

@@ -6,7 +6,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ButtonGroup;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
@@ -19,6 +18,7 @@ import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.util.StringList;
+import org.basex.util.Util;
 import org.basex.util.XMLToken;
 
 /**
@@ -154,7 +154,7 @@ public final class DialogInsert extends Dialog {
     ok = kind != Data.TEXT || input2.getText().length != 0;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
-      if(!ok && !input1.getText().isEmpty()) msg = Main.info(INVALID, EDITNAME);
+      if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID, EDITNAME);
     }
     info.setText(msg, Msg.WARN);
     enableOK(buttons, BUTTONOK, ok);

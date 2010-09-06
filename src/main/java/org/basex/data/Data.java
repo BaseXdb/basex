@@ -87,7 +87,7 @@ public abstract class Data {
   /** Path summary. */
   public PathSummary path;
 
-  /** File system reference. */
+  /** DeepFS reference. */
   public DeepFS fs;
   /** Index reference for a name attribute. */
   public int nameID;

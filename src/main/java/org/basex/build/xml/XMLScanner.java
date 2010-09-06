@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.build.BuildException;
 import org.basex.build.BuildText.Type;
-import org.basex.core.Main;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.io.IO;
@@ -16,6 +15,7 @@ import org.basex.io.IOContent;
 import org.basex.io.TextInput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
+import org.basex.util.Util;
 
 /**
  * This class scans an XML document and creates atomic tokens.
@@ -700,7 +700,7 @@ final class XMLScanner extends Progress {
           cont = file.content();
           input = new TextInput(new IOContent(cont, name));
         } catch(final IOException ex) {
-          Main.debug(ex);
+          Util.debug(ex);
           error(PARSEERR, name);
         }
 
@@ -1019,7 +1019,7 @@ final class XMLScanner extends Progress {
 
   @Override
   public String det() {
-    return Main.info(SCANPOS, input.io().name(), input.line());
+    return Util.info(SCANPOS, input.io().name(), input.line());
   }
 
   @Override

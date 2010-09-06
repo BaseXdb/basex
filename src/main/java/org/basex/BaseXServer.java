@@ -7,7 +7,6 @@ import java.net.Socket;
 import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
-import org.basex.io.IOFile;
 import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Log;
@@ -17,6 +16,7 @@ import org.basex.server.Session;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This is the starter class for the database server.
@@ -62,7 +62,7 @@ public final class BaseXServer extends Main implements Runnable {
 
     final int port = context.prop.num(Prop.SERVERPORT);
     if(service) {
-      outln(start(port));
+      Util.outln(start(port));
       return;
     }
 
@@ -74,11 +74,11 @@ public final class BaseXServer extends Main implements Runnable {
       new Thread(this).start();
       do Performance.sleep(100); while(!running);
 
-      outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
+      Util.outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
       if(console) quit(console());
     } catch(final Exception ex) {
       log.write(ex.getMessage());
-      errln(server(ex));
+      Util.errln(Util.server(ex));
     }
   }
 
@@ -89,7 +89,7 @@ public final class BaseXServer extends Main implements Runnable {
       try {
         final ServerProcess s = new ServerProcess(server.accept(), this);
         if(stop.exists()) {
-          if(!stop.delete()) log.write(Main.info(DBNOTDELETED, stop));
+          if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit(false);
         } else if(s.init()) {
           context.add(s);
@@ -122,7 +122,7 @@ public final class BaseXServer extends Main implements Runnable {
       server.close();
     } catch(final IOException ex) {
       log.write(ex.getMessage());
-      ex.printStackTrace();
+      Util.stack(ex);
     }
     console = false;
     context.close();
@@ -177,25 +177,37 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public static String start(final int port) {
     // check if server is already running (needs some time)
-    if(!ping(LOCALHOST, port)) {
-      final String path = IOFile.file(BaseXServer.class.getProtectionDomain().
-          getCodeSource().getLocation().toString());
+    if(ping(LOCALHOST, port)) return SERVERBIND;
 
-      final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
-      final String clazz = BaseXServer.class.getName();
-      try {
-        new ProcessBuilder(new String[] { "java", mem, "-cp", path, clazz,
-            "-p", String.valueOf(port) }).start();
+    final String path = Util.applicationPath();
+    final String mem = "-Xmx" + Runtime.getRuntime().maxMemory();
+    final String clz = BaseXServer.class.getName();
+    try {
+      new ProcessBuilder(new String[] { "java", mem, "-cp", path, clz,
+          "-p", String.valueOf(port) }).start();
 
-        for(int c = 0; c < 10; ++c) {
-          if(ping(LOCALHOST, port)) return SERVERSTART;
-          Performance.sleep(200);
-        }
-      } catch(final IOException ex) {
-        return server(ex);
+      // try to connect to the new server instance
+      for(int c = 0; c < 25; ++c) {
+        if(ping(LOCALHOST, port)) return SERVERSTART;
+        Performance.sleep(200);
       }
+    } catch(final IOException ex) {
+      Util.notexpected(ex);
     }
-    return SERVERBIND;
+    return SERVERERROR;
+  }
+
+  /**
+   * Stops the server.
+   */
+  public void stop() {
+    final int port = context.prop.num(Prop.SERVERPORT);
+    try {
+      stop.write(Token.EMPTY);
+      new Socket(LOCALHOST, port);
+    } catch(final IOException ex) {
+      Util.errln(Util.server(ex));
+    }
   }
 
   /**
@@ -206,11 +218,13 @@ public final class BaseXServer extends Main implements Runnable {
    */
   public static boolean ping(final String host, final int port) {
     try {
+      // connect server with invalid login data
       new ClientSession(host, port, "", "");
+      return false;
     } catch(final IOException ex) {
-      if(ex instanceof LoginException) return true;
+      // if login was checked, server is running
+      return ex instanceof LoginException;
     }
-    return false;
   }
 
   /**
@@ -218,14 +232,16 @@ public final class BaseXServer extends Main implements Runnable {
    * @param port server port
    */
   public static void stop(final int port) {
+    /** Stop file. */
+    final IO stop = stopFile(port);
     try {
-      /** Stop file. */
-      stopFile(port).write(Token.EMPTY);
+      stop.write(Token.EMPTY);
       new Socket(LOCALHOST, port);
-      while(ping(LOCALHOST, port)) Performance.sleep(200);
-      outln(SERVERSTOPPED);
+      do Performance.sleep(200); while(ping(LOCALHOST, port));
+      Util.outln(SERVERSTOPPED);
     } catch(final IOException ex) {
-      errln(server(ex));
+      stop.delete();
+      Util.errln(Util.server(ex));
     }
   }
 }

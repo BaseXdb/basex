@@ -14,7 +14,6 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.StringTokenizer;
-import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIProp;
@@ -22,6 +21,7 @@ import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 
 /**
  * This class manages all visible and invisible views and allows drag and
@@ -85,7 +85,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     gui = main;
     // build layout or use default if something goes wrong
     if(!buildLayout(gui.prop.get(GUIProp.VIEWS)) && !buildLayout(VIEWS)) {
-      Main.errln(Main.name(this) + ": could not build layout \"%\"", VIEWS);
+      Util.errln(Util.name(this) + ": could not build layout \"%\"", VIEWS);
     }
   }
 
@@ -400,10 +400,10 @@ public final class ViewContainer extends BaseXBack implements Runnable {
         }
       }
       if(nv == views.length) return true;
-      Main.errln(Main.name(this) + ": initializing views: " + cnstr);
+      Util.errln(Util.name(this) + ": initializing views: " + cnstr);
     } catch(final Exception ex) {
-      Main.debug(ex);
-      Main.errln(Main.name(this) + ": could not build layout: " + cnstr);
+      Util.debug(ex);
+      Util.errln(Util.name(this) + ": could not build layout: " + cnstr);
     }
     return false;
   }
@@ -418,7 +418,7 @@ public final class ViewContainer extends BaseXBack implements Runnable {
     for(final ViewPanel view : views) {
       if(view.toString().equals(name)) return view;
     }
-    Main.debug(Main.name(this) + ": Unknown view \"%\"", name);
+    Util.debug(Util.name(this) + ": Unknown view \"%\"", name);
     return null;
   }
 }

@@ -2,7 +2,7 @@ package org.basex.gui.view.map;
 
 import java.util.Arrays;
 import java.util.Iterator;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * This class organizes all map rectangles in a simple list.
@@ -112,7 +112,7 @@ final class MapRects implements Iterable<MapRect> {
       @Override
       public MapRect next() { return list[c]; }
       @Override
-      public void remove() { Main.notexpected(); }
+      public void remove() { Util.notexpected(); }
     };
   }
 

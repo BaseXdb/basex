@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import static org.basex.util.Token.*;
-import org.basex.core.Main;
 import org.basex.io.IO;
 
 /**
@@ -148,7 +147,7 @@ public abstract class InputParser {
    * @return completion
    */
   protected final byte[] found() {
-    return curr() == 0 ? EMPTY : Main.inf(FOUND, curr());
+    return curr() == 0 ? EMPTY : Util.inf(FOUND, curr());
   }
 
   /**

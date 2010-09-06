@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.util.LinkedList;
+import org.basex.util.Util;
 
 /**
  * Management of executing read/write processes. Multiple readers, single
@@ -47,7 +48,7 @@ public final class Lock {
           try {
             lx.wait();
           } catch(final InterruptedException ex) {
-            ex.printStackTrace();
+            Util.stack(ex);
           }
         }
         state = State.WRITE;
@@ -68,7 +69,7 @@ public final class Lock {
           try {
             ls.wait();
           } catch(final InterruptedException ex) {
-            ex.printStackTrace();
+            Util.stack(ex);
           }
         }
         activeR++;

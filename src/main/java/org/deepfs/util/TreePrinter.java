@@ -1,6 +1,7 @@
 package org.deepfs.util;
 
 import java.io.File;
+import org.basex.util.Util;
 
 /**
  * Produces tree(1)-like output of a directory hierarchy.
@@ -25,8 +26,7 @@ public final class TreePrinter implements FSTraversal {
    * @param depth of indentation
    */
   private void printIndent(final int depth) {
-    for(int i = 0; i < depth; ++i)
-      System.out.print(indentStrings[i]);
+    for(int i = 0; i < depth; ++i) Util.out(indentStrings[i]);
   }
 
   /**
@@ -50,10 +50,10 @@ public final class TreePrinter implements FSTraversal {
     final File[] ch = f.getParentFile().listFiles();
     if(ch.length == 1 || ch[ch.length - 1].equals(f)) {
       indentStrings[level] = "    ";
-      System.out.println("`-- " + f.getName());
+      Util.outln("`-- " + f.getName());
     } else {
       indentStrings[level] = "|   ";
-      System.out.println("|-- " + f.getName());
+      Util.outln("|-- " + f.getName());
     }
   }
 
@@ -102,7 +102,7 @@ public final class TreePrinter implements FSTraversal {
    */
   @Override
   public void preTraversalVisit(final File d) {
-    System.out.println(d.getAbsolutePath());
+    Util.outln(d.getAbsolutePath());
   }
 
   /**

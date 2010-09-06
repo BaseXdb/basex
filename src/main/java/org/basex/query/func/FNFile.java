@@ -33,7 +33,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Functions on files and directories.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -138,7 +138,7 @@ final class FNFile extends Fun {
 
         while(++c < files.length) {
           final String name = files[c].getName();
-          if(!files[c].isHidden() && (pattern == null || 
+          if(!files[c].isHidden() && (pattern == null ||
               name.matches(pattern))) return Str.get(name);
         }
         return null;
@@ -222,14 +222,14 @@ final class FNFile extends Fun {
 
     final B64 b64 = (B64) checkType(expr[1].atomic(ctx, input), Type.B6B);
 
+    FileOutputStream out = null;
     try {
-
-      final FileOutputStream out = new FileOutputStream(file);
+      out = new FileOutputStream(file);
       out.write(b64.getVal());
-
     } catch(IOException ex) {
-
       Err.or(input, QueryText.FILEWRITE, file.getName());
+    } finally {
+      try { out.close(); } catch(final Exception ex) { }
     }
     return null;
   }

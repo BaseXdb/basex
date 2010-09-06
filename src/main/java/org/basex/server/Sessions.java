@@ -3,9 +3,9 @@ package org.basex.server;
 import static org.basex.core.Text.*;
 import java.util.Arrays;
 import java.util.Iterator;
-import org.basex.core.Main;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This is a simple container for sessions.
@@ -80,7 +80,7 @@ public final class Sessions implements Iterable<ServerProcess> {
       @Override
       public ServerProcess next() { return list[c]; }
       @Override
-      public void remove() { Main.notexpected(); }
+      public void remove() { Util.notexpected(); }
     };
   }
 }

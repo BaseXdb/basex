@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.Box;
 import org.basex.core.BaseXException;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.data.Nodes;
@@ -32,6 +31,7 @@ import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This class offers a fast text view, using the {@link BaseXText} class.
@@ -151,13 +151,13 @@ public final class TextView extends View implements ActionListener {
     ns = n;
     if(!visible()) return;
     try {
-      final ArrayOutput ao = new ArrayOutput(
-          gui.context.prop.num(Prop.MAXTEXT));
+      final ArrayOutput ao =
+        new ArrayOutput().max(gui.context.prop.num(Prop.MAXTEXT));
       if(n != null) n.serialize(new XMLSerializer(ao));
       setText(ao, null);
       refresh = false;
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
   }
 
@@ -210,7 +210,7 @@ public final class TextView extends View implements ActionListener {
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);
     } finally {
-      try { if(out != null) out.close(); } catch(final IOException ex) { }
+      try { out.close(); } catch(final Exception ex) { }
     }
   }
 }

@@ -2,7 +2,6 @@ package org.basex.build;
 
 import static org.basex.data.DataText.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
@@ -15,6 +14,7 @@ import org.basex.io.TableAccess;
 import org.basex.io.TableDiskAccess;
 import org.basex.io.TableOutput;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This class creates a disk based database instance. The storage layout is
@@ -90,24 +90,20 @@ public final class DiskBuilder extends Builder {
     try {
       close();
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
     DropDB.drop(meta.name, meta.prop);
   }
 
   @Override
   public void close() throws IOException {
-    if(tout == null) return;
-    tout.close();
+    if(tout != null) tout.close();
+    if(xout != null) xout.close();
+    if(vout != null) vout.close();
+    if(sout != null) sout.close();
     tout = null;
-    if(xout == null) return;
-    xout.close();
     xout = null;
-    if(vout == null) return;
-    vout.close();
     vout = null;
-    if(sout == null) return;
-    sout.close();
     sout = null;
   }
 

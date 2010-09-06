@@ -13,11 +13,11 @@ import java.lang.reflect.Method;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import org.basex.core.BaseXException;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Text;
 import org.basex.core.cmd.InfoTable;
 import org.basex.query.QueryProcessor;
+import org.basex.util.Util;
 import org.deepfs.fs.DeepFS;
 import org.deepfs.jfuse.DeepStat;
 import org.deepfs.util.FSWalker;
@@ -87,11 +87,11 @@ public final class DeepShell {
           }
         }
       }
-      Main.out(
+      Util.out(
           "%: commmand not found. Type 'help' for available commands.\n",
           args[0] == null ? "" : args[0]);
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 
@@ -101,7 +101,7 @@ public final class DeepShell {
    * @return user input
    */
   private String input(final String prompt) {
-    Main.out(prompt);
+    Util.out(prompt);
     return new Scanner(System.in).nextLine();
   }
 
@@ -178,7 +178,7 @@ public final class DeepShell {
     }
     final DeepStat dst = fs.stat(args[1]);
     if(dst == null) {
-      Main.errln("stat failed.\n");
+      Util.errln("stat failed.\n");
       return;
     }
     final PrintStream ps = new PrintStream(System.out);
@@ -203,7 +203,7 @@ public final class DeepShell {
         new FSWalker(new TreePrinter()).traverse(d);
         return;
       }
-      Main.errln("No such directory %", d.getAbsolutePath());
+      Util.errln("No such directory %", d.getAbsolutePath());
     }
     help(new String[] { "help", "tree"});
   }
@@ -221,10 +221,10 @@ public final class DeepShell {
     }
     final byte[][] dents = fs.readdir(args[1]);
     if(dents == null) {
-      Main.errln("listing failed.\n");
+      Util.errln("listing failed.\n");
       return;
     }
-    for(final byte[] de : dents) Main.out(">> " + string(de));
+    for(final byte[] de : dents) Util.out(">> " + string(de));
   }
 
   /**
@@ -240,9 +240,9 @@ public final class DeepShell {
     }
 
     try {
-      Main.outln(new InfoTable(null, null).execute(fs.getContext()));
+      Util.outln(new InfoTable(null, null).execute(fs.getContext()));
     } catch(final BaseXException ex) {
-      Main.notexpected(ex);
+      Util.notexpected(ex);
     }
   }
 
@@ -273,7 +273,8 @@ public final class DeepShell {
   @Command(shortcut = 'q', help = "quit shell (unmounts fuse and closes db)")
   public void quit(@SuppressWarnings("unused") final String[] args) {
     fs.umount();
-    Main.outln("cu");
+    Util.outln("cu");
+    // [AH] better: break loop
     System.exit(0);
   }
 
@@ -288,7 +289,7 @@ public final class DeepShell {
       qp.queryNodes().serialize(qp.getSerializer(System.out));
       qp.close();
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 

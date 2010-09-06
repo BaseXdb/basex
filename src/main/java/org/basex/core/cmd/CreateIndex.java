@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -12,6 +11,7 @@ import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'create db' command and creates a new index.
@@ -63,9 +63,9 @@ public final class CreateIndex extends ACreate {
       index(index, data);
       data.flush();
 
-      return info(DBINDEXED, perf);
+      return info(INDCREATED, perf);
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return error(ex.getMessage());
     }
   }

@@ -845,7 +845,7 @@ public final class TreeView extends View implements TreeViewOptions {
     //
     // for(int j = 0; j < bo.size; ++j) {
     // final int pi = cache.getPrePerIndex(bo, j);
-    // // if(gui.context.current.nodes[0] > 0) System.out.println("rn:" + rn
+    // // if(gui.context.current.nodes[0] > 0) Util.outln("rn:" + rn
     // // + " lv:" + lv + " bo-size:" + bo.size + " bo-start:" + (bo.start)
     // // + " bos-start:" + bos.start);
     //

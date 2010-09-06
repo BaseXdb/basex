@@ -4,11 +4,11 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.data.DiskData;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'open' command and opens a database.
@@ -36,7 +36,7 @@ public final class Open extends Command {
       if(data.meta.oldindex) info(INDUPDATE);
       return info(DBOPENED, db, perf);
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       final String msg = ex.getMessage();
       return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
     }
@@ -56,7 +56,7 @@ public final class Open extends Command {
     if(data == null) {
       // check if document exists
       if(!ctx.prop.dbexists(name))
-        throw new IOException(Main.info(DBNOTFOUND, name));
+        throw new IOException(Util.info(DBNOTFOUND, name));
 
       data = new DiskData(name, ctx.prop);
       ctx.pin(data);
@@ -65,6 +65,6 @@ public final class Open extends Command {
     if(ctx.perm(User.READ, data.meta)) return data;
 
     Close.close(ctx, data);
-    throw new IOException(Main.info(PERMNO, CmdPerm.READ));
+    throw new IOException(Util.info(PERMNO, CmdPerm.READ));
   }
 }

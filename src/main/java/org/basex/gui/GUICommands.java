@@ -11,7 +11,6 @@ import java.net.URI;
 import javax.swing.AbstractButton;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdIndex;
@@ -54,6 +53,7 @@ import org.basex.util.Array;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.deepfs.util.LibraryLoader;
 
 /**
@@ -163,7 +163,7 @@ public enum GUICommands implements GUICommand {
           // show message for overwriting files or directories
           final String msg = file == null ? DIRREPLACE : FILEREPLACE;
           if(file == null) file = root;
-          if(!Dialog.confirm(gui, Main.info(msg, file))) return;
+          if(!Dialog.confirm(gui, Util.info(msg, file))) return;
         }
       }
 
@@ -802,7 +802,7 @@ public enum GUICommands implements GUICommand {
       try {
         Desktop.getDesktop().browse(new URI(url));
       } catch(final Exception ex) {
-        Dialog.error(gui, Main.info(INFOBROSERERR, url));
+        Dialog.error(gui, Util.info(INFOBROSERERR, url));
       }
     }
   },
@@ -815,7 +815,7 @@ public enum GUICommands implements GUICommand {
       try {
         Desktop.getDesktop().browse(new URI(url));
       } catch(final Exception ex) {
-        Dialog.error(gui, Main.info(INFOBROSERERR, url));
+        Dialog.error(gui, Util.info(INFOBROSERERR, url));
       }
     }
   },
@@ -986,7 +986,7 @@ public enum GUICommands implements GUICommand {
           final String time = perf.toString();
           gui.info.setInfo(info, cmd, time, ok);
           gui.info.reset();
-          gui.status.setText(Main.info(PROCTIME, time));
+          gui.status.setText(Util.info(PROCTIME, time));
           if(!ok) Dialog.error(gui, info.equals(PROGERR) ? CANCELCREATE : info);
 
           // initialize views

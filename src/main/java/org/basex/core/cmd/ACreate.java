@@ -6,7 +6,6 @@ import org.basex.build.Builder;
 import org.basex.build.DiskBuilder;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
@@ -18,6 +17,7 @@ import org.basex.index.IndexBuilder;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.index.PathBuilder;
 import org.basex.index.ValueBuilder;
+import org.basex.util.Util;
 
 /**
  * Abstract class for database creation.
@@ -78,10 +78,10 @@ public abstract class ACreate extends Command {
     } catch(final Exception ex) {
       // Known exceptions:
       // - IllegalArgumentException (UTF8, zip files)
-      Main.debug(ex);
+      Util.debug(ex);
       abort();
       final String msg = ex instanceof IOException ?
-          ex.getMessage() : Main.info(PARSEERR, p.file);
+          ex.getMessage() : Util.info(PARSEERR, p.file);
       return error(msg != null ? msg : args[0]);
     }
   }

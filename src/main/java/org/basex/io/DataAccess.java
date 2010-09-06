@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import org.basex.util.Num;
+import org.basex.util.Util;
 
 /**
  * This class allows positional read and write access to a database file.
@@ -54,7 +55,7 @@ public final class DataAccess {
    * @return text as byte array
    */
   public synchronized long pos() {
-    return bm.curr().pos + off;
+    return bm.current().pos + off;
   }
 
   /**
@@ -146,19 +147,19 @@ public final class DataAccess {
     int l = readNum();
     int ll = IO.BLOCKSIZE - off;
     final byte[] b = new byte[l];
-    Buffer bf = bm.curr();
+    Buffer bf = bm.current();
 
-    System.arraycopy(bf.buf, off, b, 0, Math.min(l, ll));
+    System.arraycopy(bf.data, off, b, 0, Math.min(l, ll));
     if(l > ll) {
       l -= ll;
       while(l > IO.BLOCKSIZE) {
         bf = next();
-        System.arraycopy(bf.buf, 0, b, ll, IO.BLOCKSIZE);
+        System.arraycopy(bf.data, 0, b, ll, IO.BLOCKSIZE);
         ll += IO.BLOCKSIZE;
         l -= IO.BLOCKSIZE;
       }
       bf = next();
-      System.arraycopy(bf.buf, 0, b, ll, l);
+      System.arraycopy(bf.data, 0, b, ll, l);
     }
     off += l;
     return b;
@@ -206,15 +207,15 @@ public final class DataAccess {
     off = (int) (p & IO.BLOCKSIZE - 1);
 
     final boolean ch = bm.cursor(p - off);
-    final Buffer bf = bm.curr();
+    final Buffer bf = bm.current();
     if(ch) {
       try {
         if(bf.dirty) writeBlock(bf);
         bf.pos = p - off;
         file.seek(bf.pos);
-        file.read(bf.buf);
+        file.read(bf.data);
       } catch(final IOException ex) {
-        ex.printStackTrace();
+        Util.stack(ex);
       }
     }
     return bf;
@@ -245,7 +246,7 @@ public final class DataAccess {
    */
   private synchronized void writeBlock(final Buffer bf) throws IOException {
     file.seek(bf.pos);
-    file.write(bf.buf);
+    file.write(bf.data);
   }
 
   /**
@@ -270,8 +271,8 @@ public final class DataAccess {
    * @return next byte
    */
   private synchronized int read() {
-    final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.curr();
-    return bf.buf[off++] & 0xFF;
+    final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.current();
+    return bf.data[off++] & 0xFF;
   }
 
   /**
@@ -279,8 +280,8 @@ public final class DataAccess {
    * @param b byte to be written
    */
   private synchronized void write(final int b) {
-    final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.curr();
-    bf.buf[off++] = (byte) b;
+    final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.current();
+    bf.data[off++] = (byte) b;
     len = Math.max(len, bf.pos + off);
     bf.dirty = true;
   }
@@ -302,6 +303,6 @@ public final class DataAccess {
    */
   private synchronized Buffer next() {
     off = 0;
-    return cursor(bm.curr().pos + IO.BLOCKSIZE);
+    return cursor(bm.current().pos + IO.BLOCKSIZE);
   }
 }

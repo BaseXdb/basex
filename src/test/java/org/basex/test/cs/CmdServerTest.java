@@ -14,10 +14,13 @@ import org.junit.BeforeClass;
  * @author Christian Gruen
  */
 public final class CmdServerTest extends CmdTest {
+  /** Server instance. */
+  private static BaseXServer server;
+
   /** Starts the server. */
   @BeforeClass
   public static void start() {
-    new BaseXServer("-z");
+    server = new BaseXServer("-z");
 
     try {
       session = new ClientSession(CONTEXT, ADMIN, ADMIN);
@@ -35,6 +38,6 @@ public final class CmdServerTest extends CmdTest {
       throw new AssertionError(ex.toString());
     }
     // stop server instance
-    new BaseXServer("stop");
+    server.stop();
   }
 }

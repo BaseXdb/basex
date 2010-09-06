@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -14,6 +13,7 @@ import org.basex.io.IO;
 import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'list' command and shows all available databases.
@@ -55,7 +55,7 @@ public final class List extends Command {
       } catch(final IOException ex) {
         file = INFODBERR;
       } finally {
-        try { if(in != null) in.close(); } catch(final IOException ex) { }
+        try { in.close(); } catch(final Exception ex) { }
       }
       if(file != null) {
         final TokenList sl = new TokenList();
@@ -108,9 +108,9 @@ public final class List extends Command {
         meta.read(in);
         if(meta.deepfs) dbl.add(name);
       } catch(final IOException ex) {
-        Main.debug(ex.getMessage());
+        Util.debug(ex.getMessage());
       } finally {
-        try { if(in != null) in.close(); } catch(final IOException ex) { }
+        try { in.close(); } catch(final Exception ex) { }
       }
     }
     return dbl;

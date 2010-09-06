@@ -116,15 +116,6 @@ public final class Performance {
     for(int i = 0; i < n; ++i) System.gc();
   }
 
-  /**
-   * Prints the current stack trace to System.err .
-   */
-  public static void stack() {
-    System.err.println("You're here:");
-    final StackTraceElement[] st = new Error().getStackTrace();
-    for(int i = 1; i < st.length; ++i) System.err.println("  " + st[i]);
-  }
-
   @Override
   public String toString() {
     return getTimer();

@@ -401,9 +401,8 @@ public class AxisPath extends Path {
           ctx.value = r;
           iter(0, citer, ctx);
         }
-
       } else {
-        ctx.value = r;
+        ctx.value = null;
         iter(0, citer, ctx);
       }
       citer.sort();

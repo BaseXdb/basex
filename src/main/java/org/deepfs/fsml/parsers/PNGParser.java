@@ -2,7 +2,7 @@ package org.deepfs.fsml.parsers;
 
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Main;
+import org.basex.util.Util;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.FileType;
@@ -51,6 +51,6 @@ public final class PNGParser implements IFileParser {
 
   @Override
   public void propagate(final DeepFile deepFile) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 }

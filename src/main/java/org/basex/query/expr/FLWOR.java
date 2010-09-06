@@ -166,7 +166,7 @@ public class FLWOR extends ParseExpr {
       }
     }
   }
-  
+
   /**
    * Optimizes a where clause.
    * @param ctx query context

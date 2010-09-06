@@ -2,7 +2,6 @@ package org.basex.util;
 
 import java.util.Arrays;
 import java.util.EmptyStackException;
-import org.basex.core.Main;
 
 /**
  * This is a simple container for int values.
@@ -377,8 +376,8 @@ public class IntList extends ElementList {
 
   @Override
   public String toString() {
-    final TokenBuilder sb = new TokenBuilder(Main.name(this) + '[');
-    for(int i = 0; i < size; ++i) sb.add((i == 0 ? "" : ", ") + list[i]);
-    return sb.add(']').toString();
+    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
+    for(int i = 0; i < size; ++i) tb.add((i == 0 ? "" : ", ") + list[i]);
+    return tb.add(']').toString();
   }
 }

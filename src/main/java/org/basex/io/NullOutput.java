@@ -5,7 +5,6 @@ package org.basex.io;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
- * @author Tim Petrowsky
  */
 public final class NullOutput extends PrintOutput {
   /** Skip flag. */
@@ -28,12 +27,6 @@ public final class NullOutput extends PrintOutput {
 
   @Override
   public void write(final int b) { }
-
-  @Override
-  public void flush() { }
-
-  @Override
-  public void close() { }
 
   @Override
   public boolean finished() {

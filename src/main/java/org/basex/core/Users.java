@@ -9,6 +9,7 @@ import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.util.Table;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 
 /**
  * This class organizes all users.
@@ -38,7 +39,7 @@ public final class Users extends ArrayList<User> {
           write();
         }
       } catch(final IOException ex) {
-        Main.debug(ex);
+        Util.debug(ex);
       }
     }
   }
@@ -79,7 +80,7 @@ public final class Users extends ArrayList<User> {
     final User user = get(usern);
     if(user == null) return false;
 
-    user.pw = token(md5(pass));
+    user.password = token(md5(pass));
     write();
     return true;
   }
@@ -126,7 +127,7 @@ public final class Users extends ArrayList<User> {
       write(out);
       out.close();
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
   }
 
@@ -140,7 +141,7 @@ public final class Users extends ArrayList<User> {
     out.writeNum(size());
     for(final User user : this) {
       out.writeString(user.name);
-      out.writeToken(user.pw);
+      out.writeToken(user.password);
       out.writeNum(user.perm);
     }
   }

@@ -3,7 +3,6 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
@@ -14,6 +13,7 @@ import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.io.PrintOutput;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'export' command and saves the currently opened database
@@ -38,7 +38,7 @@ public final class Export extends Command {
       export(context.prop, data, args[0]);
       return info(DBEXPORTED, data.meta.name, perf);
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return error(ex.getMessage());
     }
   }
@@ -68,7 +68,7 @@ public final class Export extends Command {
     final SerializerProp sp = new SerializerProp(prop.get(Prop.EXPORTER));
     final IO root = IO.get(target);
     if(!(root instanceof IOFile))
-      throw new IOException(Main.info(DBNOTEXPORTED, target));
+      throw new IOException(Util.info(DBNOTEXPORTED, target));
 
     if(!root.exists()) root.md();
 

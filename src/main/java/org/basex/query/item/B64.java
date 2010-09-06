@@ -1,10 +1,10 @@
 package org.basex.query.item;
 
-import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Base64Binary item. Derived from java.util.prefs.Base64.
@@ -175,7 +175,7 @@ public final class B64 extends Item {
 
   @Override
   public String toString() {
-    return Main.info("\"%\"", h2b());
+    return Util.info("\"%\"", h2b());
   }
 
   /**

@@ -6,11 +6,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Date container.
@@ -39,7 +39,7 @@ public abstract class Date extends Item {
     try {
       df = DatatypeFactory.newInstance();
     } catch(final Exception ex) {
-      Main.notexpected();
+      Util.notexpected();
     }
   }
 
@@ -239,6 +239,6 @@ public abstract class Date extends Item {
 
   @Override
   public final String toString() {
-    return Main.info("\"%\"", atom());
+    return Util.info("\"%\"", atom());
   }
 }

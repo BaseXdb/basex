@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
@@ -20,6 +19,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
 import org.basex.util.StringList;
+import org.basex.util.Util;
 
 /**
  * Dialog window for specifying options for creating a new database.
@@ -238,7 +238,7 @@ public final class DialogCreate extends Dialog {
     if(ok) {
       ok = dbValid(nm);
       if(!ok) {
-        inf = Main.info(INVALID, EDITNAME);
+        inf = Util.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
         inf = RENAMEOVER;
         icon = Msg.WARN;

@@ -15,7 +15,6 @@ import org.basex.api.dom.BXPI;
 import org.basex.api.dom.BXText;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DOCWrapper;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -23,6 +22,7 @@ import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
+import org.basex.util.Util;
 import org.basex.util.XMLToken;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
@@ -776,7 +776,7 @@ public enum Type {
    */
   @SuppressWarnings("unused")
   public Item e(final Object o, final InputInfo ii) throws QueryException {
-    Main.notexpected(o);
+    Util.notexpected(o);
     return null;
   }
 

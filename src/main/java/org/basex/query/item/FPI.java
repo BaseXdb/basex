@@ -3,11 +3,11 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 import static org.basex.util.Token.*;
 import org.w3c.dom.ProcessingInstruction;
 
@@ -74,7 +74,7 @@ public final class FPI extends FNode {
 
   @Override
   public String toString() {
-    return Main.info("<?% %?>", name.atom(), val);
+    return Util.info("<?% %?>", name.atom(), val);
   }
 
   /**

@@ -7,8 +7,8 @@ package org.basex.io;
  * @author Christian Gruen
  */
 final class Buffer {
-  /** Buffer. */
-  final byte[] buf = new byte[IO.BLOCKSIZE];
+  /** Buffer data. */
+  final byte[] data = new byte[IO.BLOCKSIZE];
   /** Disk position. */
   long pos = -1;
   /** Dirty flag. */

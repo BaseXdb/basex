@@ -3,11 +3,11 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Simple date item.
@@ -76,7 +76,7 @@ public final class DSim extends Date {
    */
   private static int type(final Type type) {
     for(int t = 0; t < TYPES.length; ++t) if(TYPES[t] == type) return t;
-    Main.notexpected();
+    Util.notexpected();
     return -1;
   }
 

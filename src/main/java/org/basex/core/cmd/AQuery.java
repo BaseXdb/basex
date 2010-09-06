@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.ProgressException;
 import org.basex.core.Prop;
@@ -21,6 +20,7 @@ import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 
 /**
  * Abstract class for database queries.
@@ -118,10 +118,10 @@ public abstract class AQuery extends Command {
       out.flush();
       return info(NL + QUERYEXEC, perf.getTimer(runs));
     } catch(final QueryException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       err = ex.getMessage();
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       err = ex.getMessage();
     } catch(final ProgressException ex) {
       err = PROGERR;
@@ -130,7 +130,7 @@ public abstract class AQuery extends Command {
     try { if(qp != null) qp.close(); } catch(final IOException ex) { }
 
     error(err);
-    if(Prop.debug) {
+    if(Util.debug) {
       info(NL);
       info(QUERYSTRING + qp.query());
       info(qp.info());
@@ -155,7 +155,7 @@ public abstract class AQuery extends Command {
     try {
       result = new QueryProcessor(args[0], context).queryNodes();
     } catch(final QueryException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       error(ex.getMessage());
     }
   }
@@ -217,7 +217,7 @@ public abstract class AQuery extends Command {
         info(ao.toString());
       }
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
   }
 

@@ -126,7 +126,6 @@ dd_question=La base di dati '%' verrà cancellata.\nSei sicuro?
 dx_question=Cancellare. Sei sicuro?
 dq_question=Salva in %?
 
-dx_outfile=Documento di output
 dx_outdir=Cartella di output
 dx_overfile=Directory is not empty.
 dx_indent=Indentare con spazi
@@ -462,7 +461,6 @@ info_nodb=Nessuna base di dati trovata.
 info_nodeepfs=Nessuna base di dati DeepFS trovata
 info_dberror=non può essere aperto.
 info_query=Query Info
-info_all=verboso
 info_debug=Modalità messa a punto
 info_chop=Rimozione spazi
 info_entities=Analisi delle entità

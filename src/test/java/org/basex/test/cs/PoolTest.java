@@ -92,7 +92,7 @@ public final class PoolTest {
       throw new AssertionError(ex.toString());
     }
     // stop server instance
-    new BaseXServer("stop");
+    server.stop();
   }
 
   /**

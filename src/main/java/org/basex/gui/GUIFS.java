@@ -6,6 +6,7 @@ import java.awt.MediaTracker;
 import java.awt.Toolkit;
 import org.basex.gui.layout.BaseXLayout;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This class organizes icons and data types for common file types.
@@ -242,7 +243,7 @@ public final class GUIFS {
       images[1][0] = add("unknown2", tracker, tk, i++);
       tracker.waitForAll();
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 

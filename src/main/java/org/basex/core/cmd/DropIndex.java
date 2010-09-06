@@ -5,13 +5,13 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdIndex;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'drop index' command and deletes indexes in the currently
@@ -50,7 +50,7 @@ public final class DropIndex extends ACreate {
           data.path.root = null;
           data.flush();
         }
-        return info(DBDROP, perf);
+        return info(INDDROP, perf);
       default:
         return false;
     }
@@ -68,9 +68,9 @@ public final class DropIndex extends ACreate {
       data.flush();
       data.closeIndex(index);
       return DropDB.drop(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
-          info(DBDROP, perf) : error(DBDROPERR);
+          info(INDDROP, perf) : error(INDDROP);
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return error(ex.getMessage());
     }
   }

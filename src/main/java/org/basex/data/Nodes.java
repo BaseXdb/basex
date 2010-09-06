@@ -3,10 +3,10 @@ package org.basex.data;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class stores node references of a database in an ascending order.
@@ -67,7 +67,7 @@ public final class Nodes implements Result {
     data = d;
     ftpos = ft;
     set(n);
-    if(d == null) Main.notexpected("No data available");
+    if(d == null) Util.notexpected("No data available");
   }
 
   /**
@@ -216,7 +216,7 @@ public final class Nodes implements Result {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Main.name(this) + '[');
+    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(',');
       tb.add(nodes[i]);

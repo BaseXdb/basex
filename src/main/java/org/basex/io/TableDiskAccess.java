@@ -3,9 +3,9 @@ package org.basex.io;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Arrays;
-import org.basex.core.Main;
 import org.basex.data.MetaData;
 import org.basex.util.Array;
+import org.basex.util.Util;
 
 /**
  * This class stores the table on disk and reads it block-wise.
@@ -90,21 +90,21 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized int read1(final int pre, final int off) {
     final int o = off + cursor(pre);
-    final byte[] b = bf.buf;
+    final byte[] b = bf.data;
     return b[o] & 0xFF;
   }
 
   @Override
   public synchronized int read2(final int pre, final int off) {
     final int o = off + cursor(pre);
-    final byte[] b = bf.buf;
+    final byte[] b = bf.data;
     return ((b[o] & 0xFF) << 8) + (b[o + 1] & 0xFF);
   }
 
   @Override
   public synchronized int read4(final int pre, final int off) {
     final int o = off + cursor(pre);
-    final byte[] b = bf.buf;
+    final byte[] b = bf.data;
     return ((b[o] & 0xFF) << 24) + ((b[o + 1] & 0xFF) << 16) +
       ((b[o + 2] & 0xFF) << 8) + (b[o + 3] & 0xFF);
   }
@@ -112,7 +112,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized long read5(final int pre, final int off) {
     final int o = off + cursor(pre);
-    final byte[] b = bf.buf;
+    final byte[] b = bf.data;
     return ((long) (b[o] & 0xFF) << 32) + ((long) (b[o + 1] & 0xFF) << 24) +
       ((b[o + 2] & 0xFF) << 16) + ((b[o + 3] & 0xFF) << 8) + (b[o + 4] & 0xFF);
   }
@@ -120,7 +120,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized void write1(final int pre, final int off, final int v) {
     final int o = off + cursor(pre);
-    final byte[] b = bf.buf;
+    final byte[] b = bf.data;
     b[o] = (byte) v;
     bf.dirty = true;
   }
@@ -128,7 +128,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized void write2(final int pre, final int off, final int v) {
     final int o = off + cursor(pre);
-    final byte[] b = bf.buf;
+    final byte[] b = bf.data;
     b[o] = (byte) (v >>> 8);
     b[o + 1] = (byte) v;
     bf.dirty = true;
@@ -137,7 +137,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized void write4(final int pre, final int off, final int v) {
     final int o = off + cursor(pre);
-    final byte[] b = bf.buf;
+    final byte[] b = bf.data;
     b[o]     = (byte) (v >>> 24);
     b[o + 1] = (byte) (v >>> 16);
     b[o + 2] = (byte) (v >>> 8);
@@ -148,7 +148,7 @@ public final class TableDiskAccess extends TableAccess {
   @Override
   public synchronized void write5(final int pre, final int off, final long v) {
     final int o = off + cursor(pre);
-    final byte[] b = bf.buf;
+    final byte[] b = bf.data;
     b[o]     = (byte) (v >>> 32);
     b[o + 1] = (byte) (v >>> 24);
     b[o + 2] = (byte) (v >>> 16);
@@ -171,7 +171,7 @@ public final class TableDiskAccess extends TableAccess {
 
     // check if all entries are in current block => handle and return
     if(last - 1 < npre) {
-      copy(bf.buf, from + nr, bf.buf, from, npre - last);
+      copy(bf.data, from + nr, bf.data, from, npre - last);
       updatePre(nr);
 
       // if whole block was deleted, remove it from the index
@@ -203,7 +203,7 @@ public final class TableDiskAccess extends TableAccess {
     }
 
     // delete entries at beginning of current (last) block
-    copy(bf.buf, last - fpre, bf.buf, 0, npre - last);
+    copy(bf.data, last - fpre, bf.data, 0, npre - last);
 
     // update index entry for this block
     fpres[index] = first;
@@ -223,8 +223,8 @@ public final class TableDiskAccess extends TableAccess {
     // all entries fit in current block
     if(nr < ENTRIES - npre + fpre) {
       // shift following entries forward and insert next entries
-      copy(bf.buf, ins, bf.buf, ins + nr, npre - pre + 1);
-      copy(entries, 0, bf.buf, ins, nr);
+      copy(bf.data, ins, bf.data, ins + nr, npre - pre + 1);
+      copy(entries, 0, bf.data, ins, nr);
 
       // update index entries
       for(int i = index + 1; i < blocks; ++i) fpres[i] += nr;
@@ -237,7 +237,7 @@ public final class TableDiskAccess extends TableAccess {
     // save entries to be added into new block after inserted blocks
     final int move = npre - pre;
     final byte[] rest = new byte[move << IO.NODEPOWER];
-    copy(bf.buf, ins, rest, 0, move);
+    copy(bf.data, ins, rest, 0, move);
 
     // make room in index for new blocks
     int newBlocks = (int) Math.ceil((double) nr / ENTRIES) + 1;
@@ -257,7 +257,7 @@ public final class TableDiskAccess extends TableAccess {
     int pos = 0;
     while(remain > 0) {
       newBlock();
-      copy(entries, pos, bf.buf, 0, Math.min(remain, ENTRIES));
+      copy(entries, pos, bf.data, 0, Math.min(remain, ENTRIES));
 
       fpres[++index] = nr - remain + pre;
       pages[index] = (int) bf.pos;
@@ -269,7 +269,7 @@ public final class TableDiskAccess extends TableAccess {
     // add remaining part of split block
     if(rest.length > 0) {
       newBlock();
-      copy(rest, 0, bf.buf, 0, move);
+      copy(rest, 0, bf.data, 0, move);
 
       fpres[++index] = pre + nr;
       pages[index] = (int) bf.pos;
@@ -291,7 +291,7 @@ public final class TableDiskAccess extends TableAccess {
     final int nr = entries.length >>> IO.NODEPOWER;
     for(int l = 0, i = pre; i < pre + nr; ++i, l += 1 << IO.NODEPOWER) {
       final int o = cursor(pre);
-      System.arraycopy(entries, l, bf.buf, o, 1 << IO.NODEPOWER);
+      System.arraycopy(entries, l, bf.data, o, 1 << IO.NODEPOWER);
     }
   }
 
@@ -320,7 +320,7 @@ public final class TableDiskAccess extends TableAccess {
         fp = fpres[m];
         np = m == last ? fp + ENTRIES : fpres[m + 1];
       }
-      if(l > h) Main.notexpected("Data Access out of bounds [pre:" + pre +
+      if(l > h) Util.notexpected("Data Access out of bounds [pre:" + pre +
           ", indexSize:" + blocks + ", access:" + l + " > " + h + "]");
 
       readBlock(m, fp, np);
@@ -343,15 +343,15 @@ public final class TableDiskAccess extends TableAccess {
 
     final int b = pages[i];
     final boolean ch = bm.cursor(b);
-    bf = bm.curr();
+    bf = bm.current();
     if(ch) {
       try {
         if(bf.dirty) writeBlock(bf);
         bf.pos = b;
         data.seek(bf.pos * IO.BLOCKSIZE);
-        data.read(bf.buf);
+        data.read(bf.data);
       } catch(final IOException ex) {
-        ex.printStackTrace();
+        Util.stack(ex);
       }
     }
   }
@@ -363,7 +363,7 @@ public final class TableDiskAccess extends TableAccess {
    */
   private synchronized void writeBlock(final Buffer buf) throws IOException {
     data.seek(buf.pos * IO.BLOCKSIZE);
-    data.write(buf.buf);
+    data.write(buf.data);
     buf.dirty = false;
   }
 
@@ -393,7 +393,7 @@ public final class TableDiskAccess extends TableAccess {
     try {
       if(bf.dirty) writeBlock(bf);
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
     bf.pos = allBlocks++;
     bf.dirty = true;

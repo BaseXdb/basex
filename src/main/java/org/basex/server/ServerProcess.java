@@ -9,7 +9,6 @@ import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
@@ -17,12 +16,12 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
 import org.basex.data.Data;
 import org.basex.io.BufferInput;
-import org.basex.io.BufferedOutput;
 import org.basex.io.PrintOutput;
 import org.basex.io.WrapInputStream;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Single session for a client-server connection.
@@ -74,7 +73,7 @@ public final class ServerProcess extends Thread {
       final String ts = Long.toString(System.nanoTime());
 
       // send {TIMESTAMP}0
-      out = new PrintOutput(new BufferedOutput(socket.getOutputStream()));
+      out = PrintOutput.get(socket.getOutputStream());
       out.print(ts);
       send(true);
 
@@ -85,7 +84,7 @@ public final class ServerProcess extends Thread {
       final String pw = in.readString();
       context.user = context.users.get(us);
       final boolean ok = context.user != null &&
-        md5(string(context.user.pw) + ts).equals(pw);
+        md5(string(context.user.password) + ts).equals(pw);
       // send {OK}
       send(ok);
 
@@ -93,7 +92,7 @@ public final class ServerProcess extends Thread {
       else if(!us.isEmpty()) log.write(this, "LOGIN " + us, "failed");
       return ok;
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       log.write(ex.getMessage());
       return false;
     }
@@ -182,7 +181,7 @@ public final class ServerProcess extends Thread {
       if(!running) log.write(this, "LOGOUT " + context.user.name, OK);
     } catch(final IOException ex) {
       log.write(this, input, INFOERROR + ex.getMessage());
-      ex.printStackTrace();
+      Util.stack(ex);
       exit();
     }
   }
@@ -231,8 +230,10 @@ public final class ServerProcess extends Thread {
     try {
       if(c == 0) {
         // c = 0: initialize iterator
-        if(qp != null) qp.init();
-        log.write(this, qp.query, OK);
+        if(qp != null) {
+          qp.init();
+          log.write(this, qp.query, OK);
+        }
         // send {ID}0 and 0 as success flag
         out.writeString(arg);
         out.write(0);
@@ -252,7 +253,7 @@ public final class ServerProcess extends Thread {
 
       // log exception (static or runtime)
       final String msg = ex.getMessage();
-      log.write(this, qp.query, INFOERROR + msg);
+      if(qp != null) log.write(this, qp.query, INFOERROR + msg);
       // send 0 to mark end of potential result, 1 as error flag, and {MSG}0
       out.write(0);
       out.write(1);
@@ -293,7 +294,7 @@ public final class ServerProcess extends Thread {
       socket.close();
     } catch(final Exception ex) {
       log.write(ex.getMessage());
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 
@@ -310,6 +311,6 @@ public final class ServerProcess extends Thread {
   public String toString() {
     final String host = socket.getInetAddress().getHostAddress();
     final int port = socket.getPort();
-    return Main.info("[%:%]", host, port);
+    return Util.info("[%:%]", host, port);
   }
 }

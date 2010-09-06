@@ -4,8 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.io.DataAccess;
@@ -15,6 +13,7 @@ import org.basex.util.IntList;
 import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class builds an index for attribute values and text contents in a
@@ -60,8 +59,8 @@ public final class ValueBuilder extends IndexBuilder {
     // delete old index
     abort();
 
-    final Performance perf = Prop.debug ? new Performance() : null;
-    Main.debug(det() + COL);
+    final Performance perf = Util.debug ? new Performance() : null;
+    Util.debug(det() + COL);
 
     final String f = text ? DATATXT : DATAATV;
     final int k = text ? Data.TEXT : Data.ATTR;
@@ -98,7 +97,7 @@ public final class ValueBuilder extends IndexBuilder {
     if(text) data.meta.txtindex = true;
     else data.meta.atvindex = true;
 
-    Main.gc(perf);
+    Util.gc(perf);
     return new Values(data, text);
   }
 

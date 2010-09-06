@@ -6,10 +6,10 @@ import java.io.IOException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.FileParser;
-import org.basex.core.Main;
 import org.basex.core.ProgressException;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
+import org.basex.util.Util;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
@@ -87,7 +87,7 @@ public final class SAXWrapper extends FileParser {
       if(is != null) r.parse(is);
       else r.parse(source.getSystemId());
     } catch(final SAXParseException ex) {
-      final String msg = Main.info(SCANPOS, ex.getSystemId(),
+      final String msg = Util.info(SCANPOS, ex.getSystemId(),
           ex.getLineNumber(), ex.getColumnNumber())
           + ": " + ex.getMessage();
       final IOException ioe = new IOException(msg);
@@ -136,7 +136,7 @@ public final class SAXWrapper extends FileParser {
 
   @Override
   public String det() {
-    return length == 0 ? super.det() : Main.info(SCANPOS, file.name(), line);
+    return length == 0 ? super.det() : Util.info(SCANPOS, file.name(), line);
   }
 
   @Override

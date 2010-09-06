@@ -3,7 +3,6 @@ package org.basex.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import org.basex.core.Main;
 
 /**
  * This is a simple container for strings.
@@ -84,7 +83,7 @@ public class StringList extends ElementList implements Iterable<String> {
       @Override
       public String next() { return list[c]; }
       @Override
-      public void remove() { Main.notexpected(); }
+      public void remove() { Util.notexpected(); }
     };
   }
 }

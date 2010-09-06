@@ -8,6 +8,7 @@ import org.basex.gui.layout.BaseXSyntax;
 import org.basex.gui.layout.BaseXTextTokens;
 import org.basex.query.QueryTokens;
 import org.basex.query.func.FunDef;
+import org.basex.util.Util;
 import org.basex.util.XMLToken;
 
 /**
@@ -47,7 +48,7 @@ final class XQuerySyntax extends BaseXSyntax {
           FUNC.add(ss);
       }
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 

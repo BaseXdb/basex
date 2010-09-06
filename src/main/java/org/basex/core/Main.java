@@ -3,10 +3,6 @@ package org.basex.core;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.BindException;
-import java.net.ConnectException;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 import java.util.Random;
 import java.util.Scanner;
 import org.basex.core.cmd.AlterUser;
@@ -15,11 +11,8 @@ import org.basex.core.cmd.Exit;
 import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Set;
 import org.basex.query.QueryException;
-import org.basex.server.LoginException;
 import org.basex.server.Session;
-import org.basex.util.Performance;
-import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This is the abstract main class for all starter classes.
@@ -71,7 +64,7 @@ public abstract class Main {
    */
   protected final boolean console() throws IOException {
     while(console) {
-      Main.out("> ");
+      Util.out("> ");
       final String in = input().trim();
       if(in.length() != 0 && !execute(in)) return true;
     }
@@ -84,11 +77,11 @@ public abstract class Main {
    */
   protected void quit(final boolean user) {
     try {
-      if(user) outln(CLIENTBYE[new Random().nextInt(4)]);
+      if(user) Util.outln(CLIENTBYE[new Random().nextInt(4)]);
       execute(new Exit(), true);
       out.flush();
     } catch(final IOException ex) {
-      errln(server(ex));
+      Util.errln(Util.server(ex));
     }
   }
 
@@ -108,7 +101,7 @@ public abstract class Main {
           (cmd instanceof CreateUser || cmd instanceof AlterUser) &&
           cmd.args[1] == null ? 1 : -1;
         if(i != -1) {
-          Main.out(SERVERPW + COLS);
+          Util.out(SERVERPW + COLS);
           cmd.args[i] = password();
         }
         if(!execute(cmd, verbose)) break;
@@ -133,7 +126,7 @@ public abstract class Main {
     if(ss == null) return false;
     try {
       ss.execute(cmd, out);
-      if(info) out(ss.info());
+      if(info) Util.out(ss.info());
       if(cmd instanceof Exit) return true;
       return true;
     } catch(final BaseXException ex) {
@@ -160,8 +153,8 @@ public abstract class Main {
    * @param msg message
    */
   protected final void error(final Exception ex, final String msg) {
-    errln((console ? "" : INFOERROR) + msg.trim());
-    debug(ex);
+    Util.errln((console ? "" : INFOERROR) + msg.trim());
+    Util.debug(ex);
   }
 
   /**
@@ -196,173 +189,4 @@ public abstract class Main {
    * @return success flag
    */
   protected abstract boolean parseArguments(final String[] args);
-
-  // GLOBAL STATIC METHODS ====================================================
-
-  /**
-   * Prints some information for an unexpected exception.
-   * @param ext optional extension
-   * @return dummy object
-   */
-  public static String bug(final Object... ext) {
-    final TokenBuilder tb = new TokenBuilder(
-        "Possible bug? Feedback is welcome: " + MAIL);
-    if(ext.length != 0) {
-      tb.add(NL + NAME + ' ' + VERSION + COLS + NL);
-      for(final Object e : ext) tb.add(e + NL);
-    }
-    return tb.toString();
-  }
-
-  /**
-   * Throws a runtime exception for an unexpected exception.
-   * @param ext optional extension
-   * @return dummy object
-   */
-  public static Object notexpected(final Object... ext) {
-    throw new RuntimeException(bug(ext));
-  }
-
-  /**
-   * Throws a runtime exception for an unimplemented method.
-   * @param ext optional extension
-   * @return dummy object
-   */
-  public static Object notimplemented(final Object... ext) {
-    final TokenBuilder sb = new TokenBuilder("Not Implemented.");
-    if(ext.length != 0) sb.add(" (%)", ext);
-    throw new RuntimeException(sb.add('.').toString());
-  }
-
-  /**
-   * Returns the class name of the specified object.
-   * @param o object
-   * @return class name
-   */
-  private static String name(final Class<?> o) {
-    return o.getSimpleName();
-  }
-
-  /**
-   * Returns the class name of the specified object.
-   * @param o object
-   * @return class name
-   */
-  public static String name(final Object o) {
-    return name(o.getClass());
-  }
-
-  /**
-   * Global method for printing a newline.
-   */
-  public static void outln() {
-    out(NL);
-  }
-
-  /**
-   * Global method for printing information to the standard output.
-   * @param str output string
-   * @param ext text optional extensions
-   */
-  public static void outln(final Object str, final Object... ext) {
-    out(str + NL, ext);
-  }
-
-  /**
-   * Global method for printing information to the standard output.
-   * @param str output string
-   * @param ext text optional extensions
-   */
-  public static void out(final Object str, final Object... ext) {
-    System.out.print(info(str, ext));
-  }
-
-  /**
-   * Global method for printing information to the standard output.
-   * @param obj error string
-   * @param ext text optional extensions
-   */
-  public static void errln(final Object obj, final Object... ext) {
-    err(obj + NL, ext);
-  }
-
-  /**
-   * Global method for printing information to the standard output.
-   * @param string debug string
-   * @param ext text optional extensions
-   */
-  public static void err(final String string, final Object... ext) {
-    System.err.print(info(string, ext));
-  }
-
-  /**
-   * Returns a server error message.
-   * @param ex exception reference
-   * @return error message
-   */
-  public static String server(final Exception ex) {
-    debug(ex);
-    if(ex instanceof BindException) return SERVERBIND;
-    else if(ex instanceof LoginException) return SERVERLOGIN;
-    else if(ex instanceof ConnectException) return SERVERERR;
-    else if(ex instanceof SocketTimeoutException) return SERVERTIMEOUT;
-    else if(ex instanceof SocketException) return SERVERBIND;
-    return ex.getMessage();
-  }
-
-  /**
-   * Global method for printing the exception stack trace if the
-   * {@link Prop#debug} flag is set.
-   * @param ex exception
-   * @return always false
-   */
-  public static boolean debug(final Throwable ex) {
-    if(Prop.debug && ex != null) ex.printStackTrace();
-    return false;
-  }
-
-  /**
-   * Global method for printing debug information if the
-   * {@link Prop#debug} flag is set.
-   * @param str debug string
-   * @param ext text optional extensions
-   */
-  public static void debug(final Object str, final Object... ext) {
-    if(Prop.debug) errln(str, ext);
-  }
-
-  /**
-   * Global method for garbage collecting and printing performance information
-   * if the {@link Prop#debug} flag is set.
-   * @param perf performance reference
-   */
-  public static void gc(final Performance perf) {
-    if(!Prop.debug) return;
-    Performance.gc(4);
-    errln(" " + perf + " (" + Performance.getMem() + ")");
-  }
-
-  /**
-   * Global method, replacing all % characters
-   * (see {@link TokenBuilder#add(Object, Object...)} for details.
-   * @param str string to be extended
-   * @param ext text text extensions
-   * @return extended string
-   */
-  public static String info(final Object str, final Object... ext) {
-    return Token.string(inf(str, ext));
-  }
-
-  /**
-   * Global method, replacing all % characters
-   * (see {@link TokenBuilder#add(Object, Object...)} for details.
-   * @param str string to be extended
-   * @param ext text text extensions
-   * @return token
-   */
-  public static byte[] inf(final Object str, final Object... ext) {
-    final TokenBuilder info = new TokenBuilder();
-    info.add(str, ext);
-    return info.finish();
-  }
 }

@@ -7,12 +7,11 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import org.basex.build.xml.XMLParser;
-import org.basex.core.Main;
 import org.basex.core.Prop;
-import org.basex.io.BufferInput;
 import org.basex.io.ArrayInput;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.util.Util;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -63,9 +62,9 @@ public final class HTMLParser extends XMLParser {
     try {
       // tries to extract the encoding from the input
       byte[] content = io.content();
-      final BufferInput bi = new ArrayInput(content);
-      String enc = bi.encoding();
-      content = bi.content().finish();
+      final ArrayInput ai = new ArrayInput(content);
+      String enc = ai.encoding();
+      content = ai.content().finish();
 
       // looks for a charset definition
       final byte[] encoding = token("charset=");
@@ -89,7 +88,7 @@ public final class HTMLParser extends XMLParser {
       reader.parse(is);
       return new IOContent(token(sw.toString()), io.name());
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return io;
     }
   }

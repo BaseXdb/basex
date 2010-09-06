@@ -1,7 +1,6 @@
 package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
-import org.basex.core.Main;
 import org.basex.query.item.FAttr;
 import org.basex.query.item.FComm;
 import org.basex.query.item.FDoc;
@@ -11,6 +10,7 @@ import org.basex.query.item.FTxt;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.NodIter;
+import org.basex.util.Util;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -111,7 +111,7 @@ public final class BXDoc extends BXNode implements Document {
       final BXNode n = list.item(l);
       if(n.getNodeType() == Node.ELEMENT_NODE) return (BXElem) n;
     }
-    Main.notexpected();
+    Util.notexpected();
     return null;
   }
 
@@ -122,13 +122,13 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public DOMConfiguration getDomConfig() {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
   @Override
   public BXElem getElementById(final String elementId) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
@@ -140,7 +140,7 @@ public final class BXDoc extends BXNode implements Document {
   @Override
   public BXNList getElementsByTagNameNS(final String namespaceURI,
       final String localName) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
@@ -156,7 +156,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public boolean getStrictErrorChecking() {
-    Main.notimplemented();
+    Util.notimplemented();
     return false;
   }
 
@@ -177,7 +177,7 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public BXNode importNode(final Node importedNode, final boolean deep) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
@@ -200,16 +200,16 @@ public final class BXDoc extends BXNode implements Document {
 
   @Override
   public void setStrictErrorChecking(final boolean strictErrorChecking) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   @Override
   public void setXmlStandalone(final boolean xmlStandalone) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   @Override
   public void setXmlVersion(final String xmlVersion) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 }

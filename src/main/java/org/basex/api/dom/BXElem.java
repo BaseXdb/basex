@@ -1,10 +1,10 @@
 package org.basex.api.dom;
 
-import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.item.Nod;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.TypeInfo;
@@ -53,7 +53,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public String getAttributeNS(final String uri, final String ln) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
@@ -65,7 +65,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXAttr getAttributeNodeNS(final String uri, final String ln) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
@@ -76,13 +76,13 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public BXNList getElementsByTagNameNS(final String uri, final String ln) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
   @Override
   public TypeInfo getSchemaTypeInfo() {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
@@ -98,7 +98,7 @@ public final class BXElem extends BXNode implements Element {
 
   @Override
   public boolean hasAttributeNS(final String uri, final String ln) {
-    Main.notimplemented();
+    Util.notimplemented();
     return false;
   }
 
@@ -171,7 +171,7 @@ public final class BXElem extends BXNode implements Element {
         if(Token.eq(nm, n.nname())) return n;
       }
     } catch(final QueryException ex) {
-      Main.notexpected();
+      Util.notexpected();
     }
     return null;
   }

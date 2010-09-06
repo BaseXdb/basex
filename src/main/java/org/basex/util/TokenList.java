@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.EmptyStackException;
 import java.util.Iterator;
-import org.basex.core.Main;
 
 /**
  * This is a simple container for tokens (byte arrays).
@@ -162,13 +161,13 @@ public final class TokenList extends ElementList implements Iterable<byte[]> {
       @Override
       public byte[] next() { return list[c]; }
       @Override
-      public void remove() { Main.notexpected(); }
+      public void remove() { Util.notexpected(); }
     };
   }
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Main.name(this) + '[');
+    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i != 0) tb.add(", ");
       tb.add(list[i]);

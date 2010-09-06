@@ -11,8 +11,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 import javax.swing.border.EmptyBorder;
-import org.basex.core.Main;
 import org.basex.gui.layout.BaseXLabel;
+import org.basex.util.Util;
 import static org.basex.gui.GUIConstants.*;
 
 /**
@@ -81,7 +81,7 @@ final class GUIMenu extends JMenuBar {
 
             final String sc = cmd.key();
             if(sc != null) {
-              item.setAccelerator(KeyStroke.getKeyStroke(Main.info(sc, sm)));
+              item.setAccelerator(KeyStroke.getKeyStroke(Util.info(sc, sm)));
             }
             comp = item;
             items[c++] = item;

@@ -15,7 +15,6 @@ public interface QueryText {
   /** FODF Error type. */ String FODF = "FODF";
   /** FODT Error type. */ String FODT = "FODT";
   /** FOER Error type. */ String FOER = "FOER";
-  /** FOFD Error type. */ String FOFD = "FOFD";
   /** FOFL Error type. */ String FOFL = "FOFL";
   /** FONS Error type. */ String FONS = "FONS";
   /** FORG Error type. */ String FORG = "FORG";
@@ -102,9 +101,9 @@ public interface QueryText {
   /** FOER0000: Evaluation exception. */
   String FUNERR1 = "Halted on error().";
 
-  /** FOFD1340: Evaluation exception. */
+  /** FODF1340: Evaluation exception. */
   Object[] PICDATE = { FODF, 1340, "Invalid picture string: \"%\"." };
-  /** FOFD1350: Evaluation exception. */
+  /** FODF1350: Evaluation exception. */
   Object[] PICCOMP = { FODF, 1350, "Invalid component in string: \"%\"." };
 
 
@@ -392,8 +391,6 @@ public interface QueryText {
   Object[] CPIWRONG = { XPTY, 4, "% not allowed as PI name: \"%\"." };
   /** XPTY0004: Typing exception. */
   Object[] NAMEWRONG = { XPTY, 4, "Invalid QName: \"%\"." };
-  /** XPTY0004: Typing exception. */
-  Object[] XPNODES = { XPTY, 19, "%: nodes expected, % found." };
 
   /** Example for a Date format. */
   String XDATE = "2000-12-31";
@@ -421,8 +418,6 @@ public interface QueryText {
   /** XPTY0018: Typing exception. */
   Object[] EVALNODESVALS = { XPTY, 18,
     "Result yields both nodes and atomic values." };
-  /** XPTY0019: Typing exception. */
-  Object[] EVALNODES = { XPTY, 19, "Nodes needed for expression '%'." };
   /** XPTY0019: Typing exception. */
   Object[] NODESPATH = { XPTY, 19, "Context node required for %; % found." };
 

@@ -3,10 +3,10 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.io.IO;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'run' command and processes a query file as XQuery.
@@ -34,7 +34,7 @@ public final class Run extends AQuery {
     try {
       return query(Token.string(io.content()));
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return error(ex.getMessage());
     }
   }

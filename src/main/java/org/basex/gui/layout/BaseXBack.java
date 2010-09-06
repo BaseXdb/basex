@@ -8,9 +8,9 @@ import java.awt.Toolkit;
 import java.util.Map;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import org.basex.core.Main;
 import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIConstants.Fill;
+import org.basex.util.Util;
 
 /**
  * Panel background, extending the {@link JPanel}.
@@ -68,7 +68,7 @@ public class BaseXBack extends JPanel {
       try {
         ((Graphics2D) g).addRenderingHints(HINTS);
       } catch(final Exception ex) {
-        Main.debug(ex);
+        Util.debug(ex);
         hints = false;
       }
     }

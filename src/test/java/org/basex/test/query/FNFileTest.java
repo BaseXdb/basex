@@ -1,7 +1,6 @@
 package org.basex.test.query;
 
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -9,6 +8,7 @@ import org.basex.query.func.FunDef;
 import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
+import org.basex.util.Util;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -104,7 +104,7 @@ public final class FNFileTest {
     try {
       return def.newInstance(null, args).atomic(qc, null);
     } catch(final QueryException ex) {
-      Main.notexpected(ex);
+      Util.notexpected(ex);
       return null;
     }
   }
@@ -119,7 +119,7 @@ public final class FNFileTest {
     try {
       return def.newInstance(null, args).iter(qc);
     } catch(final QueryException ex) {
-      Main.notexpected(ex);
+      Util.notexpected(ex);
       return null;
     }
   }

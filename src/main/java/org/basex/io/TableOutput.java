@@ -2,6 +2,7 @@ package org.basex.io;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import org.basex.data.MetaData;
 import org.basex.util.IntList;
 
@@ -12,7 +13,7 @@ import org.basex.util.IntList;
  * @author Christian Gruen
  * @author Tim Petrowsky
  */
-public final class TableOutput extends FileOutputStream {
+public final class TableOutput extends OutputStream {
   /** Buffer. */
   private final byte[] buffer = new byte[IO.BLOCKSIZE];
   /** Index entries. */
@@ -20,6 +21,8 @@ public final class TableOutput extends FileOutputStream {
   /** Index entries. */
   private final IntList blocks = new IntList();
 
+  /** The underlying output stream. */
+  private final OutputStream os;
   /** Meta data. */
   private final MetaData meta;
   /** Current filename. */
@@ -31,18 +34,16 @@ public final class TableOutput extends FileOutputStream {
   private int bcount;
   /** First pre value of current block. */
   private int fpre;
-  /** Closed flag. */
-  private boolean closed;
 
   /**
    * Initializes the output.
    * The database suffix will be added to all filenames.
    * @param md meta data
    * @param fn the file to be written to
-   * @throws IOException IO Exception
+   * @throws IOException I/O exception
    */
   public TableOutput(final MetaData md, final String fn) throws IOException {
-    super(md.file(fn));
+    os = new FileOutputStream(md.file(fn));
     meta = md;
     file = fn;
   }
@@ -56,7 +57,7 @@ public final class TableOutput extends FileOutputStream {
   @Override
   public void flush() throws IOException {
     if(pos == 0) return;
-    super.write(buffer);
+    os.write(buffer);
     firstPres.add(fpre);
     blocks.add(bcount++);
     fpre += pos >>> IO.NODEPOWER;
@@ -65,19 +66,14 @@ public final class TableOutput extends FileOutputStream {
 
   @Override
   public void close() throws IOException {
-    // close() is called by super.finalize().
-    // The flag prevents that the file is closed more than once.
-    if(closed) return;
-    closed = true;
-
     flush();
-    super.close();
+    os.close();
 
-    final DataOutput info = new DataOutput(meta.file(file + 'i'));
-    info.writeNum(bcount);
-    info.writeNum(bcount);
-    info.writeNums(firstPres.toArray());
-    info.writeNums(blocks.toArray());
-    info.close();
+    final DataOutput dt = new DataOutput(meta.file(file + 'i'));
+    dt.writeNum(bcount);
+    dt.writeNum(bcount);
+    dt.writeNums(firstPres.toArray());
+    dt.writeNums(blocks.toArray());
+    dt.close();
   }
 }

@@ -7,7 +7,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
 import org.basex.gui.GUI;
@@ -15,6 +14,7 @@ import org.basex.gui.GUIConstants;
 import org.basex.gui.GUIMacOSX;
 import org.basex.gui.GUIProp;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * This is the starter class for the graphical frontend.
@@ -45,7 +45,7 @@ public final class BaseXWin {
       try {
         osxGUI = new GUIMacOSX();
       } catch(final Exception ex) {
-        Main.notexpected("Failed to initialize native Mac OS X interface", ex);
+        Util.notexpected("Failed to initialize native Mac OS X interface", ex);
       }
     }
 
@@ -108,7 +108,7 @@ public final class BaseXWin {
         }
       }
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 

@@ -12,6 +12,7 @@ import org.basex.io.TextInput;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
 import org.basex.util.Args;
+import org.basex.util.Util;
 
 /**
  * This is the starter class for the stand-alone console mode.
@@ -76,13 +77,13 @@ public class BaseX extends Main {
         execute(commands);
       } else {
         // enter interactive mode
-        outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
+        Util.outln(CONSOLE, sa() ? LOCALMODE : CLIENTMODE, CONSOLE2);
         u = console();
       }
       if(writeProps) context.prop.write();
       quit(u);
     } catch(final IOException ex) {
-      errln(server(ex));
+      Util.errln(Util.server(ex));
     }
   }
 
@@ -93,7 +94,7 @@ public class BaseX extends Main {
   private String content() {
     final IO io = IO.get(file);
     if(!io.exists()) {
-      errln(FILEWHICH, file);
+      Util.errln(FILEWHICH, file);
     } else {
       try {
         return TextInput.content(io).toString().trim();
@@ -206,7 +207,7 @@ public class BaseX extends Main {
       console = file == null && commands == null && query == null;
       return arg.finish();
     } catch(final IOException ex) {
-      errln(server(ex));
+      Util.errln(Util.server(ex));
       return false;
     }
   }

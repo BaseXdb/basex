@@ -6,13 +6,13 @@ import static org.basex.data.SerializerProp.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
 import org.basex.util.TokenSet;
 import org.basex.util.Tokenizer;
+import org.basex.util.Util;
 
 /**
  * This class serializes trees as XML.
@@ -94,7 +94,7 @@ public final class XMLSerializer extends Serializer {
   public XMLSerializer(final OutputStream os, final SerializerProp props)
       throws IOException {
 
-    out = os instanceof PrintOutput ? (PrintOutput) os : new PrintOutput(os);
+    out = PrintOutput.get(os);
     final SerializerProp p = props == null ? PROPS : props;
 
     final String m = p.check(S_METHOD, M_XML, M_XHTML, M_HTML, M_TEXT);
@@ -187,7 +187,7 @@ public final class XMLSerializer extends Serializer {
    */
   private static void error(final Object str, final Object... ext)
       throws IOException {
-    throw new IOException(Main.info(str, ext));
+    throw new IOException(Util.info(str, ext));
   }
 
   @Override
@@ -431,6 +431,7 @@ public final class XMLSerializer extends Serializer {
     print(ELEM2);
     ind = indent;
     if(mth == M_HTML) script &= !SCRIPTS.contains(lc(t));
+    out.flush();
   }
 
   /**

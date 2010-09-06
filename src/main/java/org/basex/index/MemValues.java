@@ -1,10 +1,10 @@
 package org.basex.index;
 
 import java.util.Arrays;
-import org.basex.core.Main;
 import org.basex.util.Array;
 import org.basex.util.TokenSet;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This class provides a main-memory access to attribute values and
@@ -71,7 +71,7 @@ public final class MemValues extends TokenSet implements Index {
 
   @Override
   public byte[] info() {
-    return Token.token(Main.name(this));
+    return Token.token(Util.name(this));
   }
 
   @Override

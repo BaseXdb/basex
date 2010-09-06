@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import javax.swing.JScrollPane;
 import org.basex.core.BaseXException;
-import org.basex.core.Main;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.CreateUser;
@@ -27,6 +26,7 @@ import org.basex.util.StringList;
 import org.basex.util.Table;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 
 /**
  * Panel for displaying information about global/local users.
@@ -166,7 +166,7 @@ final class DialogUser extends BaseXBack {
             (Integer) o[1], 0).toString();
 
         final boolean confirm = !g && uname.equals(dia.loguser.getText());
-        if(confirm && !Dialog.confirm(this, Main.info(DBREVOKE))) return;
+        if(confirm && !Dialog.confirm(this, Util.info(DBREVOKE))) return;
 
         sess.execute(new Grant(perm, uname, db));
         msg = sess.info();
@@ -196,7 +196,7 @@ final class DialogUser extends BaseXBack {
       } else if(cmp == drop) {
         String msg2 = "";
         final int[] rows = table.getSelectedRows();
-        if(Dialog.confirm(this, Main.info(DRQUESTION, rows.length))) {
+        if(Dialog.confirm(this, Util.info(DRQUESTION, rows.length))) {
           for(final int r : rows) {
             sess.execute(new DropUser(table.data.value(r, 0), db));
             if(msg == null) msg = sess.info();
@@ -228,7 +228,7 @@ final class DialogUser extends BaseXBack {
         addUser.requestFocusInWindow();
       }
     } catch(final BaseXException ex) {
-      msg = Main.server(ex);
+      msg = Util.server(ex);
       ok = false;
     }
 
@@ -253,8 +253,8 @@ final class DialogUser extends BaseXBack {
 
     Msg icon = ok ? Msg.SUCCESS : Msg.ERROR;
     if(msg == null && !(valname && valpass && newname && valdrop)) {
-      msg = !newname ? Main.info(USERKNOWN, user.getText()) : !valdrop ?
-          USERADMIN : Main.info(INVALID, !valname ? SERVERUSER : SERVERPW);
+      msg = !newname ? Util.info(USERKNOWN, user.getText()) : !valdrop ?
+          USERADMIN : Util.info(INVALID, !valname ? SERVERUSER : SERVERPW);
       icon = Msg.WARN;
     }
     info.setText(msg, icon);

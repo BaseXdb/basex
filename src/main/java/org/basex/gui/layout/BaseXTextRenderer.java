@@ -52,7 +52,7 @@ final class BaseXTextRenderer extends BaseXBack {
   /** Text array to be written. */
   private BaseXTextTokens text;
   /** Vertical start position. */
-  private BaseXSyntax syntax = BaseXSyntax.SIMPLE;
+  private transient BaseXSyntax syntax = BaseXSyntax.SIMPLE;
   /** Visibility of cursor. */
   private boolean cursor;
 

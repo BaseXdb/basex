@@ -3,13 +3,13 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.Commands.CmdDrop;
 import org.basex.data.Data;
 import org.basex.server.ServerProcess;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'drop user' command and drops a user.
@@ -56,7 +56,7 @@ public final class DropUser extends Command {
         data.flush();
         Close.close(context, data);
       } catch(final IOException ex) {
-        Main.debug(ex);
+        Util.debug(ex);
         final String msg = ex.getMessage();
         return msg.isEmpty() ? error(DBOPENERR, name) : error(msg);
       }

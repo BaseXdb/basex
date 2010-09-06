@@ -76,7 +76,7 @@ public final class LockingTest {
     closeSession(session1);
     closeSession(session2);
     // stop server instance
-    new BaseXServer("stop");
+    server.stop();
   }
 
   /**

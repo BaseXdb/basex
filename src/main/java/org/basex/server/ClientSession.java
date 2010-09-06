@@ -1,6 +1,5 @@
 package org.basex.server;
 
-import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -78,7 +77,7 @@ public final class ClientSession extends Session {
     final String ts = bi.readString();
 
     // send user name and hashed password/timestamp
-    out = new PrintOutput(new BufferedOutputStream(socket.getOutputStream()));
+    out = PrintOutput.get(socket.getOutputStream());
     send(user);
     send(Token.md5(Token.md5(pw) + ts));
     out.flush();

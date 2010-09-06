@@ -3,7 +3,7 @@ package org.basex.data;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Main;
+import org.basex.util.Util;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
@@ -102,27 +102,27 @@ public final class SAXSerializer extends Serializer implements XMLReader {
 
   @Override
   public void setDTDHandler(final DTDHandler h) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   @Override
   public void setEntityResolver(final EntityResolver resolver) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   @Override
   public void setErrorHandler(final ErrorHandler h) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   @Override
   public void setFeature(final String name, final boolean value) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   @Override
   public void setProperty(final String name, final Object value) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 
   @Override

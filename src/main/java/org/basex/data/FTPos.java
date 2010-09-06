@@ -1,7 +1,7 @@
 package org.basex.data;
 
 import java.util.Arrays;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * This class contains full-text positions.
@@ -72,7 +72,7 @@ public final class FTPos {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Main.name(this));
+    final StringBuilder sb = new StringBuilder(Util.name(this));
     sb.append("[" + pre + ": ");
     for(int i = 0; i < pos.length; ++i) sb.append((i != 0 ? "," : "") + pos[i]);
     return sb.append("]").toString();

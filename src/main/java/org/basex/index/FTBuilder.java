@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
@@ -17,6 +16,7 @@ import org.basex.util.Num;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
+import org.basex.util.Util;
 
 /**
  * This class contains common methods for full-text index builders.
@@ -88,8 +88,8 @@ public abstract class FTBuilder extends IndexBuilder {
     // delete old index
     abort();
 
-    final Performance perf = Prop.debug ? new Performance() : null;
-    Main.debug(det() + COL);
+    final Performance perf = Util.debug ? new Performance() : null;
+    Util.debug(det() + COL);
 
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0xFFFF) == 0) check();
@@ -137,7 +137,7 @@ public abstract class FTBuilder extends IndexBuilder {
     data.meta.ftxindex = true;
     data.meta.dirty = true;
 
-    Main.gc(perf);
+    Util.gc(perf);
   }
 
   /**

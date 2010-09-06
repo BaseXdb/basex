@@ -1,5 +1,6 @@
 package org.basex.io;
 
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import org.basex.util.Token;
 
 /**
  * This is an output stream for project specific data types.
+ * It bears resemblance to Java's {@link DataOutputStream}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

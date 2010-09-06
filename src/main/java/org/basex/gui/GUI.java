@@ -22,7 +22,6 @@ import javax.swing.border.EtchedBorder;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.Text;
@@ -56,6 +55,7 @@ import org.basex.io.ArrayOutput;
 import org.basex.query.QueryException;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This class is the main window of the GUI. It is the central instance
@@ -364,7 +364,7 @@ public final class GUI extends JFrame {
     final Namespaces ns = context.data.ns;
     final int u = ns.uri(Token.EMPTY, 0);
     String in = qu.trim().isEmpty() ? "." : qu;
-    if(u != 0) in = Main.info("declare default element namespace \"%\"; %",
+    if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
         ns.uri(u), in);
 
     execute(new XQuery(in), main);
@@ -441,7 +441,8 @@ public final class GUI extends JFrame {
       command = c;
 
       // execute command and cache result
-      final ArrayOutput ao = new ArrayOutput(context.prop.num(Prop.MAXTEXT));
+      final ArrayOutput ao =
+        new ArrayOutput().max(context.prop.num(Prop.MAXTEXT));
       final boolean up = c.writing(context);
       updating = up;
 
@@ -526,12 +527,12 @@ public final class GUI extends JFrame {
         setHits(result == null ? 0 : result.size());
 
         // show status info
-        status.setText(Main.info(PROCTIME, time));
+        status.setText(Util.info(PROCTIME, time));
       }
     } catch(final Exception ex) {
       // unexpected error
-      ex.printStackTrace();
-      Dialog.error(this, Main.info(PROCERR, c,
+      Util.stack(ex);
+      Dialog.error(this, Util.info(PROCERR, c,
           !ex.toString().isEmpty() ? ex.toString() : ex.getMessage()));
       updating = false;
     }

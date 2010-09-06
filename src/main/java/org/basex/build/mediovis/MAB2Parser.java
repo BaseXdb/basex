@@ -8,14 +8,13 @@ import java.util.Arrays;
 import org.basex.build.BuildException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.core.Main;
-import org.basex.core.Prop;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
 import org.basex.util.TokenObjMap;
 import org.basex.util.TokenMap;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class parses MAB2 data and creates a hierarchical representation.
@@ -168,14 +167,14 @@ public final class MAB2Parser extends Parser {
       if(child) entry.add(pos);
       else entry.pos(pos);
 
-      if(Prop.debug) {
-        if(++i % 50000 == 0) Main.err(" " + i + "\n");
-        else if(i % 5000 == 0) Main.err("!");
-        else if(i % 1000 == 0) Main.err(".");
+      if(Util.debug) {
+        if(++i % 50000 == 0) Util.err(" " + i + "\n");
+        else if(i % 5000 == 0) Util.err("!");
+        else if(i % 1000 == 0) Util.err(".");
       }
     }
 
-    if(Prop.debug) Main.err("\nParse Offsets (%): %/%\n", ids.size(), p,
+    if(Util.debug) Util.err("\nParse Offsets (%): %/%\n", ids.size(), p,
         Performance.getMem());
 
     // create all titles
@@ -191,7 +190,7 @@ public final class MAB2Parser extends Parser {
       if(entry.size != 0 && pos != 0 && !flat) builder.endElem(MEDIUM);
     }
 
-    if(Prop.debug) Main.err("\nCreate Titles: %/%\n", p, Performance.getMem());
+    if(Util.debug) Util.err("\nCreate Titles: %/%\n", p, Performance.getMem());
 
     builder.endElem(LIBRARY);
     builder.endDoc();
@@ -575,7 +574,7 @@ public final class MAB2Parser extends Parser {
         hash.add(key, val);
       }
     } catch(final IOException ex) {
-      Main.debug(new File(fn).getAbsolutePath() + " not found.");
+      Util.debug(new File(fn).getAbsolutePath() + " not found.");
     }
   }
 

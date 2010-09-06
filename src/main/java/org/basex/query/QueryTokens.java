@@ -423,8 +423,6 @@ public interface QueryTokens {
 
   /** Language attribute. */
   byte[] LANG = token("xml:lang");
-  /** NIL attribute. */
-  byte[] NIL = token("xsi:nil");
 
   // QUERY PLAN ===============================================================
 
@@ -466,8 +464,6 @@ public interface QueryTokens {
   byte[] VAL = token("value");
   /** Query Plan. */
   byte[] SIZE = token("size");
-  /** Query Plan. */
-  byte[] STRT = token("start");
   /** Query Plan. */
   byte[] AXIS = token("axis");
   /** Query Plan. */

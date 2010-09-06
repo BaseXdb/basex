@@ -3,7 +3,7 @@ package org.basex.data;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * Match full-text container,
@@ -89,13 +89,13 @@ public final class FTMatch implements Iterable<FTStringMatch> {
       @Override
       public FTStringMatch next() { return match[c]; }
       @Override
-      public void remove() { Main.notexpected(); }
+      public void remove() { Util.notexpected(); }
     };
   }
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(Main.name(this));
+    final StringBuilder sb = new StringBuilder(Util.name(this));
     for(final FTStringMatch s : this) sb.append(' ').append(s);
     return sb.toString();
   }

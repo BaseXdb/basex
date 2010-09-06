@@ -31,14 +31,6 @@ public class DBNode extends Nod {
 
   /**
    * Constructor.
-   */
-  public DBNode() {
-    super(Type.TXT);
-    data = null;
-  }
-
-  /**
-   * Constructor.
    * @param d data reference
    * @param p pre value
    */

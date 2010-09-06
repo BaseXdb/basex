@@ -1,13 +1,13 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import org.basex.core.Main;
 import org.basex.io.IO;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This class indicates exceptions during query parsing or evaluation.
@@ -37,7 +37,7 @@ public final class QueryException extends Exception {
    * @param e message extension
    */
   public QueryException(final InputInfo ii, final Object s, final Object... e) {
-    super(Main.info(s, chop(e)));
+    super(Util.info(s, chop(e)));
     if(ii == null) return;
 
     line = 1;
@@ -165,9 +165,9 @@ public final class QueryException extends Exception {
     final StringBuilder sb = new StringBuilder();
     if(line != 0) {
       sb.append(STOPPED + ' ');
-      sb.append(Main.info(LINEINFO, line));
-      if(col != 0) sb.append(QueryTokens.SEP + Main.info(COLINFO, col));
-      if(file != null) sb.append(Main.info(' ' + FILEINFO, file));
+      sb.append(Util.info(LINEINFO, line));
+      if(col != 0) sb.append(QueryTokens.SEP + Util.info(COLINFO, col));
+      if(file != null) sb.append(Util.info(' ' + FILEINFO, file));
       sb.append(": \n");
     }
     return sb.append(extended()).toString();

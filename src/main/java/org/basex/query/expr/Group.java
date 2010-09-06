@@ -2,7 +2,6 @@ package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -11,6 +10,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Implementation of the group by clause.
@@ -58,7 +58,7 @@ public final class Group extends ParseExpr {
     return new Iter() { // group is blocking => no iterator
       @Override
       public Item next() {
-        Main.notexpected(this);
+        Util.notexpected(this);
         return null;
       }
     };

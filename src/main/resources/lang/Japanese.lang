@@ -125,7 +125,6 @@ dd_question=データベース '%' を削除します。\nよろしいですか�
 dx_question=本当に削除しますか。
 dq_question=% への変更を保存しますか。
 
-dx_outfile=出力ファイル
 dx_outdir=出力ディレクトリ
 dx_overfile=ファイルは上書きされます。
 dx_indent=スペースでインデント
@@ -463,7 +462,6 @@ info_dbpath=データベースパス
 info_nodb=データベースが見付かりません。
 info_dberror=開けませんでした。
 info_query=Query Info
-info_all=冗長モード
 info_debug=デバッグモード
 info_chop=空白の除去
 info_entities=実体のパース

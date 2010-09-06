@@ -4,9 +4,9 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * This class parses the tokens that are delivered by the
@@ -96,7 +96,7 @@ public final class DirParser extends Parser {
         parser = Parser.fileParser(file, prop, targ);
         parser.parse(b);
 
-        if(Prop.debug && ++c % 1000 == 0) Main.err(";");
+        if(Util.debug && ++c % 1000 == 0) Util.err(";");
       }
     }
   }

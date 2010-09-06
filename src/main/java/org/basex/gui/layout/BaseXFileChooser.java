@@ -5,11 +5,11 @@ import java.awt.FileDialog;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileFilter;
-import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIProp;
 import org.basex.gui.dialog.Dialog;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * Project specific File Chooser implementation.
@@ -115,7 +115,7 @@ public final class BaseXFileChooser {
       io = IO.get(io.path() + suffix);
 
     // show replace dialog
-    return !io.exists() || Dialog.confirm(gui, Main.info(FILEREPLACE, io)) ?
+    return !io.exists() || Dialog.confirm(gui, Util.info(FILEREPLACE, io)) ?
         io : null;
   }
 

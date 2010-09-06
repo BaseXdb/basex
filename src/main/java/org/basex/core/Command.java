@@ -11,6 +11,7 @@ import org.basex.io.NullOutput;
 import org.basex.io.PrintOutput;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class provides the architecture for all internal command
@@ -165,7 +166,7 @@ public abstract class Command extends Progress {
    */
   protected final boolean info(final String str, final Object... ext) {
     info.add(str, ext);
-    info.add(Prop.NL);
+    info.add(NL);
     return true;
   }
 
@@ -226,30 +227,36 @@ public abstract class Command extends Progress {
    * @return result of check
    */
   private boolean run(final Context ctx, final OutputStream os) {
+    perf = new Performance();
+    context = ctx;
+    prop = ctx.prop;
+    out = PrintOutput.get(os);
+
     try {
-      perf = new Performance();
-      context = ctx;
-      prop = ctx.prop;
-      out = os instanceof PrintOutput ? (PrintOutput) os : new PrintOutput(os);
       return run();
     } catch(final ProgressException ex) {
+      // process was interrupted by the user or server
       abort();
       return error(PROGERR);
     } catch(final Throwable ex) {
+      // information on a critical error is output
       Performance.gc(2);
       abort();
       if(ex instanceof OutOfMemoryError) {
-        ex.printStackTrace();
+        Util.stack(ex);
         return error(PROCMEM +
             ((flags & User.CREATE) != 0 ? PROCMEMCREATE : ""));
       }
 
-      Main.debug(ex);
+      Util.debug(ex);
       final Object[] st = ex.getStackTrace();
       final Object[] obj = new Object[st.length + 1];
       obj[0] = ex.toString();
       System.arraycopy(st, 0, obj, 1, st.length);
-      return error(Main.bug(obj));
+      return error(Util.bug(obj));
+    } finally {
+      // flushes the output
+      try { out.flush(); } catch(final Exception ex) { }
     }
   }
 }

@@ -64,7 +64,7 @@ public final class SemaphoreTest {
       closeSession(s);
     }
     // stop server instance
-    new BaseXServer("stop");
+    server.stop();
   }
 
   /**

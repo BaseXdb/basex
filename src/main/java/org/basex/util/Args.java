@@ -1,6 +1,5 @@
 package org.basex.util;
 
-import org.basex.core.Main;
 
 /**
  * This class parses command-line arguments.
@@ -118,7 +117,7 @@ public final class Args {
    * @return success flag
    */
   public boolean finish() {
-    if(!ok) Main.outln("Usage: " + Main.name(obj) + usage);
+    if(!ok) Util.outln("Usage: " + Util.name(obj) + usage);
     return ok;
   }
 }

@@ -1,7 +1,7 @@
 package org.deepfs.util;
 
 import java.util.HashMap;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * Utility class to load shared libraries.
@@ -36,7 +36,7 @@ public final class LibraryLoader {
     if(found) return LIBS.get(lib);
     try {
       System.loadLibrary(lib);
-      Main.debug("Loading library (" + lib + ") ... OK.");
+      Util.debug("Loading library (" + lib + ") ... OK.");
       found = true;
     } catch(final UnsatisfiedLinkError ex) {
       found = false;

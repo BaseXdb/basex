@@ -3,9 +3,9 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.data.Data;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'close' command and closes the current database.
@@ -30,7 +30,7 @@ public final class Close extends Command {
       context.closeDB();
       return info(DBCLOSED, data.meta.name);
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       return error(DBCLOSEERR);
     }
   }

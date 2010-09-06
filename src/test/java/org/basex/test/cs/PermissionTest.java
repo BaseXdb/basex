@@ -251,6 +251,6 @@ public final class PermissionTest {
       throw new AssertionError(ex.toString());
     }
     // stop server instance
-    new BaseXServer("stop");
+    server.stop();
   }
 }

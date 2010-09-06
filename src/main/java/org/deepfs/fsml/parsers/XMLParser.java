@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.TreeMap;
 import org.basex.build.MemBuilder;
 import org.basex.build.Parser;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.data.Data;
 import org.basex.io.IOContent;
+import org.basex.util.Util;
 import org.deepfs.fsml.BufferedFileChannel;
 import org.deepfs.fsml.DeepFile;
 import org.deepfs.fsml.FileType;
@@ -81,7 +81,7 @@ public final class XMLParser implements IFileParser {
           final String suf = name.substring(
               name.lastIndexOf('.') + 1).toLowerCase();
           final MimeType mime = SUFFIXES.get(suf);
-          if(mime == null) Main.notexpected();
+          if(mime == null) Util.notexpected();
           deepFile.setFileFormat(mime);
         }
         if(deepFile.extractXML()) {
@@ -103,6 +103,6 @@ public final class XMLParser implements IFileParser {
 
   @Override
   public void propagate(final DeepFile deepFile) {
-    Main.notimplemented();
+    Util.notimplemented();
   }
 }

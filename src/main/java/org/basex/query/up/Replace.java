@@ -3,7 +3,6 @@ package org.basex.query.up;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Constr;
@@ -21,6 +20,7 @@ import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.up.primitives.ReplaceValue;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Replace expression.
@@ -55,7 +55,7 @@ public final class Replace extends Update {
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     // check target constraints
-    if(i == null) Err.or(input, UPSEQEMP, Main.name(this));
+    if(i == null) Err.or(input, UPSEQEMP, Util.name(this));
     final Type tp = i.type;
     if(!(i instanceof Nod) || tp == Type.DOC || t.next() != null)
       Err.or(input, UPTRGMULT);

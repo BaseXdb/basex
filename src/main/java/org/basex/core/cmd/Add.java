@@ -5,11 +5,11 @@ import java.io.IOException;
 import org.basex.build.MemBuilder;
 import org.basex.build.xml.DirParser;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Main;
 import org.basex.core.User;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'add' command and adds a single document to a collection.
@@ -69,7 +69,7 @@ public class Add extends ACreate {
       data.insert(data.meta.size, -1, MemBuilder.build(p, context.prop, name));
       data.flush();
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       final String msg = ex.getMessage();
       return error(msg != null ? msg : name);
     }

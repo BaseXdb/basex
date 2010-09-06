@@ -4,7 +4,6 @@ import static org.basex.data.DataText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.basex.core.Main;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
@@ -13,6 +12,7 @@ import org.basex.io.DataOutput;
 import org.basex.io.IO;
 import org.basex.util.Array;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 
 /**
  * This class stores the path summary of a database.
@@ -226,13 +226,13 @@ public final class PathSummary implements Index {
 
   @Override
   public IndexIterator ids(final IndexToken tok) {
-    Main.notexpected();
+    Util.notexpected();
     return null;
   }
 
   @Override
   public int nrIDs(final IndexToken tok) {
-    Main.notexpected();
+    Util.notexpected();
     return 0;
   }
 

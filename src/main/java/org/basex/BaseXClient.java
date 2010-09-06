@@ -2,9 +2,9 @@ package org.basex;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.server.ClientSession;
 import org.basex.server.Session;
+import org.basex.util.Util;
 
 /**
  * This is the starter class for the client console mode.
@@ -43,11 +43,11 @@ public final class BaseXClient extends BaseX {
     if(session == null) {
       // user/password input
       while(user == null) {
-        Main.out(SERVERUSER + COLS);
+        Util.out(SERVERUSER + COLS);
         user = input();
       }
       while(pass == null) {
-        Main.out(SERVERPW + COLS);
+        Util.out(SERVERPW + COLS);
         pass = password();
       }
       session = new ClientSession(context, user, pass);

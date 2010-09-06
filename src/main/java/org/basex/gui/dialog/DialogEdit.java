@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
@@ -15,6 +14,7 @@ import org.basex.gui.layout.BaseXLayout;
 import org.basex.gui.layout.BaseXText;
 import org.basex.gui.layout.BaseXTextField;
 import org.basex.util.StringList;
+import org.basex.util.Util;
 import org.basex.util.XMLToken;
 
 /**
@@ -65,7 +65,7 @@ public final class DialogEdit extends Dialog {
     final Data data = context.data;
     kind = data.kind(pre);
 
-    final String title = Main.info(EDITTEXT, EDITKIND[kind]);
+    final String title = Util.info(EDITTEXT, EDITKIND[kind]);
     final BaseXLabel label = new BaseXLabel(title, true, true);
     pp.add(label, BorderLayout.NORTH);
 
@@ -126,7 +126,7 @@ public final class DialogEdit extends Dialog {
     ok = kind != Data.TEXT || input3.getText().length != 0;
     if(kind != Data.TEXT && kind != Data.COMM) {
       ok = XMLToken.isQName(token(input1.getText()));
-      if(!ok && !input1.getText().isEmpty()) msg = Main.info(INVALID, EDITNAME);
+      if(!ok && !input1.getText().isEmpty()) msg = Util.info(INVALID, EDITNAME);
     }
     info.setText(msg, Msg.WARN);
     enableOK(buttons, BUTTONOK, ok);

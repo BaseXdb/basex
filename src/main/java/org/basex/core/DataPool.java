@@ -7,6 +7,7 @@ import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class organizes all currently opened database.
@@ -109,7 +110,7 @@ public final class DataPool {
     try {
       for(int i = 0; i < size; ++i) data[i].close();
     } catch(final IOException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
     size = 0;
   }

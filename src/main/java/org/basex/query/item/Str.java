@@ -1,10 +1,10 @@
 package org.basex.query.item;
 
-import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * String item.
@@ -90,6 +90,6 @@ public class Str extends Item {
 
   @Override
   public final String toString() {
-    return Main.info("\"%\"", val);
+    return Util.info("\"%\"", val);
   }
 }

@@ -13,7 +13,6 @@ import java.math.BigInteger;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
-import org.basex.core.Main;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -27,6 +26,7 @@ import org.basex.query.iter.ItemIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
@@ -88,7 +88,7 @@ public final class FunJava extends Arr {
     try {
       result = mth.equals("new") ? constructor(arg) : method(arg);
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       Err.or(input, FUNJAVA, desc());
     }
     return result == null ? Iter.EMPTY : iter(result, ctx);

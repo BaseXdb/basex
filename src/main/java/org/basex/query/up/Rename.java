@@ -3,7 +3,6 @@ package org.basex.query.up;
 import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Main;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CAttr;
@@ -21,6 +20,7 @@ import org.basex.query.up.primitives.RenamePrimitive;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Rename expression.
@@ -46,7 +46,7 @@ public final class Rename extends Update {
     final Item i = t.next();
 
     // check target constraints
-    if(i == null) Err.or(input, UPSEQEMP, Main.name(this));
+    if(i == null) Err.or(input, UPSEQEMP, Util.name(this));
     if(t.next() != null) Err.or(input, UPWRTRGTYP);
 
     CFrag ex = null;

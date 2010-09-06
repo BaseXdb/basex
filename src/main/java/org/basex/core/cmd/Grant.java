@@ -3,11 +3,11 @@ package org.basex.core.cmd;
 import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.CommandBuilder;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'grant' command and grants permissions to users.
@@ -77,7 +77,7 @@ public final class Grant extends Command {
         data.flush();
         Close.close(context, data);
       } catch(final IOException ex) {
-        Main.debug(ex);
+        Util.debug(ex);
         final String msg = ex.getMessage();
         return msg.isEmpty() ? error(DBOPENERR, db) : error(msg);
       }

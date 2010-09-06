@@ -10,7 +10,6 @@ import javax.swing.event.ChangeListener;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.core.cmd.Exit;
@@ -34,6 +33,7 @@ import org.basex.io.IO;
 import org.basex.server.ClientSession;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Dialog window for displaying information about the server.
@@ -332,7 +332,7 @@ public final class DialogServer extends Dialog {
         connected = true;
         super.setTitle(GUISERVER + LI + loguser.getText() + "@" + host.getText()
             + COL + portc.getText());
-        msg = Main.info(CONNECTED, host.getText(), portc.getText());
+        msg = Util.info(CONNECTED, host.getText(), portc.getText());
         refreshSess();
       } else if(cmp == disconnect) {
         cs.execute(new Exit());
@@ -355,14 +355,14 @@ public final class DialogServer extends Dialog {
           logc.setSelectedIndex(-1);
           refreshLog();
         } else {
-          msg2 = Main.info(DBNOTDELETED, f.getName());
+          msg2 = Util.info(DBNOTDELETED, f.getName());
           icon = Msg.ERROR;
         }
       } else if(cmp == deleteAll) {
         for(int i = 0; i < logc.getItemCount(); ++i) {
           final File f = new File(logdir + logc.getItemAt(i).toString());
           if(!f.delete()) {
-            msg2 = Main.info(DBNOTDELETED, f.getName());
+            msg2 = Util.info(DBNOTDELETED, f.getName());
             icon = Msg.ERROR;
             break;
           }
@@ -375,12 +375,12 @@ public final class DialogServer extends Dialog {
       }
     } catch(final Exception ex) {
       icon = Msg.ERROR;
-      msg = Main.server(ex);
-      if(msg.equals(Main.info(PERMNO, CmdPerm.values()[4]))) {
+      msg = Util.server(ex);
+      if(msg.equals(Util.info(PERMNO, CmdPerm.values()[4]))) {
         try {
           cs.execute(new Exit());
         } catch(final BaseXException exx) {
-          exx.printStackTrace();
+          Util.stack(exx);
         }
       }
     }
@@ -396,7 +396,7 @@ public final class DialogServer extends Dialog {
 
     if(msg == null && msg2 == null &&
         !(valpl && valh && valp && vallu && vallp)) {
-      msg = Main.info(INVALID, !valpl ? LOCALPORT : !valh ? HOST :
+      msg = Util.info(INVALID, !valpl ? LOCALPORT : !valh ? HOST :
         !valp ? PORT : !vallu ? SERVERUSER : SERVERPW);
       icon = Msg.WARN;
     }
@@ -457,7 +457,7 @@ public final class DialogServer extends Dialog {
     try {
       if(connected) cs.execute(new Exit());
     } catch(final BaseXException ex) {
-      Main.debug(ex);
+      Util.debug(ex);
     }
     super.cancel();
   }

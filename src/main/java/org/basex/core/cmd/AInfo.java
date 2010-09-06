@@ -2,7 +2,6 @@ package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
 import org.basex.core.Command;
-import org.basex.core.Prop;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -31,7 +30,7 @@ public abstract class AInfo extends Command {
       final String val) {
     tb.add(' ');
     tb.add(key);
-    tb.add(": " + val + Prop.NL);
+    tb.add(": " + val + NL);
   }
 
   /**

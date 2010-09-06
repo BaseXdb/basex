@@ -2,10 +2,10 @@ package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.item.SeqType.*;
-import org.basex.core.Main;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.SeqType;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Signatures of all XQuery functions.
@@ -479,7 +479,7 @@ public enum FunDef {
       return func.getDeclaredConstructor(InputInfo.class, FunDef.class,
           Expr[].class).newInstance(ii, this, e);
     } catch(final Exception ex) {
-      Main.notexpected(ex);
+      Util.notexpected(ex);
       return null;
     }
   }

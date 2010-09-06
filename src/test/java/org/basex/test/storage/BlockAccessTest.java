@@ -12,6 +12,7 @@ import org.basex.core.cmd.DropDB;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.io.TableDiskAccess;
+import org.basex.util.Util;
 import static org.junit.Assert.*;
 import static org.basex.data.DataText.*;
 
@@ -63,7 +64,7 @@ public final class BlockAccessTest {
       data.close();
       tda = new TableDiskAccess(data.meta, DATATBL);
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
 
     final int bytecount = size * (1 << IO.NODEPOWER);
@@ -84,7 +85,7 @@ public final class BlockAccessTest {
       if(tda != null) tda.close();
       DropDB.drop(DBNAME, PROP);
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 

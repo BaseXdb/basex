@@ -4,14 +4,13 @@ import static org.basex.util.Token.*;
 import static org.junit.Assert.*;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
-import org.basex.util.Performance;
+import org.basex.util.Util;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -130,9 +129,7 @@ public abstract class UpdateTest {
     try {
       cmd.execute(CONTEXT);
     } catch(final BaseXException ex) {
-      Main.errln(ex.getMessage());
-      Performance.stack();
-      System.exit(1);
+      Util.errln(ex.getMessage());
     }
   }
 }

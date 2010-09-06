@@ -1,7 +1,6 @@
 package org.basex.api.dom;
 
 import static org.basex.util.Token.*;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
@@ -9,6 +8,7 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
+import org.basex.util.Util;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Node;
 import org.w3c.dom.UserDataHandler;
@@ -102,7 +102,7 @@ public abstract class BXNode implements Node {
     try {
       return finish(node.child().next());
     } catch(final QueryException ex) {
-      Main.notexpected();
+      Util.notexpected();
       return null;
     }
   }
@@ -115,7 +115,7 @@ public abstract class BXNode implements Node {
       Nod t = null;
       while((t = it.next()) != null) n = t;
     } catch(final QueryException ex) {
-      Main.notexpected();
+      Util.notexpected();
     }
     return finish(n);
   }
@@ -130,7 +130,7 @@ public abstract class BXNode implements Node {
     try {
       return finish(node.follSibl().next());
     } catch(final QueryException ex) {
-      Main.notexpected();
+      Util.notexpected();
       return null;
     }
   }
@@ -140,7 +140,7 @@ public abstract class BXNode implements Node {
     try {
       return finish(node.precSibl().next());
     } catch(final QueryException ex) {
-      Main.notexpected();
+      Util.notexpected();
       return null;
     }
   }
@@ -221,25 +221,25 @@ public abstract class BXNode implements Node {
 
   @Override
   public final boolean isDefaultNamespace(final String namespaceURI) {
-    Main.notimplemented();
+    Util.notimplemented();
     return false;
   }
 
   @Override
   public final boolean isEqualNode(final Node arg) {
-    Main.notimplemented();
+    Util.notimplemented();
     return false;
   }
 
   @Override
   public final String lookupNamespaceURI(final String prefix) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
   @Override
   public final String lookupPrefix(final String namespaceURI) {
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 
@@ -303,7 +303,7 @@ public abstract class BXNode implements Node {
           nb.add(n.copy());
       }
     } catch(final QueryException ex) {
-      Main.notexpected();
+      Util.notexpected();
     }
     return new BXNList(nb);
   }
@@ -319,7 +319,7 @@ public abstract class BXNode implements Node {
       Nod n = null;
       while((n = it.next()) != null) nb.add(n.copy());
     } catch(final QueryException ex) {
-      Main.notexpected();
+      Util.notexpected();
     }
     return nb;
   }

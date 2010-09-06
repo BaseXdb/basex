@@ -10,6 +10,7 @@ import java.util.Date;
 import org.basex.core.Context;
 import org.basex.core.Prop;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * Management of logging.
@@ -73,10 +74,10 @@ public final class Log {
       for(final Object s : str) {
         sb.append("\t" + s.toString().replaceAll("\\r?\\n", " "));
       }
-        fw.write(sb.append(NL).toString());
-        fw.flush();
+      fw.write(sb.append(NL).toString());
+      fw.flush();
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 
@@ -92,7 +93,7 @@ public final class Log {
       fw = new OutputStreamWriter(
           new FileOutputStream(file, true), Token.UTF8);
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 
@@ -103,7 +104,7 @@ public final class Log {
     try {
       fw.close();
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 }

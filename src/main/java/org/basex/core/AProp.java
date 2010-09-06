@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import org.basex.io.IO;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class assembles properties which are used all around the project. They
@@ -42,7 +43,7 @@ public abstract class AProp {
         props.put(arr[0].toString(), arr[1]);
       }
     } catch(final Exception ex) {
-      Main.notexpected(ex);
+      Util.notexpected(ex);
     }
     if(prop == null) return;
 
@@ -98,11 +99,11 @@ public abstract class AProp {
         br.close();
       } catch(final Exception ex) {
         err.add("% could not be parsed." + NL, filename);
-        Main.debug(ex);
+        Util.debug(ex);
       }
     }
     if(err.size() != 0) {
-      Main.err(err.toString());
+      Util.err(err.toString());
       write();
     }
   }
@@ -157,8 +158,8 @@ public abstract class AProp {
       bw.write(user.toString());
       bw.close();
     } catch(final Exception ex) {
-      Main.errln("% could not be written.", filename);
-      Main.debug(ex);
+      Util.errln("% could not be written.", filename);
+      Util.debug(ex);
     }
   }
 
@@ -300,9 +301,9 @@ public abstract class AProp {
    */
   private Object get(final Object[] key, final Class<?> c) {
     final Object entry = props.get(key[0].toString());
-    if(entry == null) Main.notexpected("Property " + key[0] + " not defined.");
+    if(entry == null) Util.notexpected("Property " + key[0] + " not defined.");
     final Class<?> cc = entry.getClass();
-    if(c != cc) Main.notexpected("Property '" + key[0] + "' is a " +
+    if(c != cc) Util.notexpected("Property '" + key[0] + "' is a " +
         cc.getSimpleName());
     return entry;
   }

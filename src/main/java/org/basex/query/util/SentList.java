@@ -1,13 +1,12 @@
 package org.basex.query.util;
 
 import static org.basex.util.Token.*;
-
 import javax.xml.parsers.SAXParserFactory;
-import org.basex.core.Main;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenSet;
 import org.basex.util.Tokenizer;
+import org.basex.util.Util;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -24,11 +23,10 @@ public final class SentList extends DefaultHandler {
   };
   /** Current parsing mode. */
   private int posMode;
-  
+
   /** Tokenizer to stem WordLists. */
   final Tokenizer tk = new Tokenizer(null);
-  
-  
+
   /**
    * Default constructor.
    * @param ii input info
@@ -43,7 +41,7 @@ public final class SentList extends DefaultHandler {
       // or plain texts
       SAXParserFactory.newInstance().newSAXParser().parse(uri, this);
     } catch(final Exception ex) {
-      Main.debug(ex);
+      Util.debug(ex);
       Err.or(ii, uri + " could not be parsed: " + ex);
     }
   }
@@ -82,7 +80,7 @@ public final class SentList extends DefaultHandler {
       if(term.equals("positive")) posMode = 0;
       if(term.equals("negative")) posMode = 1;
       if(term.equals("negated"))  posMode = 2;
-    } else if(qName.equals("word")) {  
+    } else if(qName.equals("word")) {
       tk.init(lc(token(atts.getValue("name"))));
       tk.st = true;
       tk.more();

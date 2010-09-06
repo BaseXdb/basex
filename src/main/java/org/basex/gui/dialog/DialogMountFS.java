@@ -194,7 +194,7 @@ public final class DialogMountFS extends Dialog {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;
         } finally {
-          try { if(in != null) in.close(); } catch(final IOException ex) { }
+          try { in.close(); } catch(final Exception ex) { }
         }
       }
       enableOK(buttons, BUTTONMOUNT, ok);

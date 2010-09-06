@@ -15,13 +15,15 @@ import org.basex.util.Token;
  */
 public class Itr extends Item {
   /** Constant values. */
-  private static final Itr[] NUMS = { new Itr(0), new Itr(1), new Itr(2),
-    new Itr(3), new Itr(4), new Itr(5), new Itr(6), new Itr(7), new Itr(8),
-    new Itr(9), new Itr(10), new Itr(11), new Itr(12), new Itr(13), new Itr(14),
-    new Itr(15), new Itr(16), new Itr(17), new Itr(18), new Itr(19), new Itr(20)
-  };
+  private static final Itr[] NUMS;
   /** Integer value. */
   private final long val;
+
+  // caches the first 128 integers
+  static {
+    NUMS = new Itr[128];
+    for(int i = 0; i < NUMS.length; i++) NUMS[i] = new Itr(i);
+  }
 
   /**
    * Constructor.
@@ -55,7 +57,7 @@ public class Itr extends Item {
    * @return instance
    */
   public static Itr get(final long v) {
-    return v >= 0 && v <= 19 ? NUMS[(int) v] : new Itr(v);
+    return v >= 0 && v < NUMS.length ? NUMS[(int) v] : new Itr(v);
   }
 
   /**

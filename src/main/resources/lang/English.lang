@@ -125,7 +125,6 @@ dd_question=Database '%' will be dropped.\nAre you sure?
 dx_question=Do you really want to delete?
 dq_question=Save changes to %?
 
-dx_outfile=Output file
 dx_outdir=Output directory
 dx_overfile=Directory is not empty.
 dx_indent=Indent with whitespaces
@@ -461,7 +460,6 @@ info_nodb=No database found
 info_nodeepfs=No DeepFS database found
 info_dberror=could not be opened.
 info_query=Query Info
-info_all=verbose
 info_debug=Debug Mode
 info_chop=Whitespace Chopping
 info_entities=Entity Parsing

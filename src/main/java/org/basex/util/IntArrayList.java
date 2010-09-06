@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import java.util.Iterator;
-import org.basex.core.Main;
 
 /**
  * This is a simple container for int arrays.
@@ -66,7 +65,7 @@ public final class IntArrayList extends ElementList implements Iterable<int[]> {
       @Override
       public int[] next() { return list[c]; }
       @Override
-      public void remove() { Main.notexpected(); }
+      public void remove() { Util.notexpected(); }
     };
   }
 }

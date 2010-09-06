@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import org.basex.core.Main;
 import org.basex.core.cmd.Find;
 import org.basex.data.Data;
 import org.basex.data.StatsKey;
@@ -29,6 +28,7 @@ import org.basex.util.StringList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 import org.deepfs.fs.DeepFS;
 
 /**
@@ -345,7 +345,7 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
    */
   private String[] entries(final byte[][] key) {
     final StringList sl = new StringList();
-    sl.add(Main.info(INFOENTRIES, key.length));
+    sl.add(Util.info(INFOENTRIES, key.length));
     for(final byte[] k : key) sl.add(Token.string(k));
     sl.sort(true, true);
     return sl.toArray();

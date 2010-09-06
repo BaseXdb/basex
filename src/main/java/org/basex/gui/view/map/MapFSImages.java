@@ -6,11 +6,11 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.imageio.ImageIO;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.gui.dialog.Dialog;
 import org.basex.util.Performance;
 import org.basex.util.Token;
+import org.basex.util.Util;
 
 /**
  * This is an cache for images which have been retrieved from the file system.
@@ -155,7 +155,7 @@ final class MapFSImages extends Thread {
         if((loaderC & 5) == 0 && !view.gui.painting) paint();
       } catch(final Exception ex) {
         // catch and ignore any kind of exception
-        Main.debug(ex);
+        Util.debug(ex);
       }
     }
     paint();

@@ -1,6 +1,6 @@
 package org.deepfs.fsml;
 
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * Available MIME types.
@@ -125,7 +125,7 @@ public enum MimeType {
   public static MimeType getItem(final String name) {
     for(final MimeType mt : MimeType.values())
       if(mt.val.equals(name)) return mt;
-    Main.debug("MIME type not found: " + name);
+    Util.debug("MIME type not found: " + name);
     return null;
   }
 

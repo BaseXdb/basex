@@ -271,9 +271,9 @@ final class FNPat extends Fun {
         if(!mt.matches()) break;
         final char c1 = mt.group(1).charAt(0);
         final char c2 = mt.group(2).charAt(0);
-        final TokenBuilder sb = new TokenBuilder("[");
-        for(char c = c1; c <= c2; ++c) sb.add(c);
-        str = str.replaceAll("\\[" + c1 + "-" + c2, sb.toString());
+        final TokenBuilder tb2 = new TokenBuilder("[");
+        for(char c = c1; c <= c2; ++c) tb2.add(c);
+        str = str.replaceAll("\\[" + c1 + "-" + c2, tb2.toString());
       }
 
       // remove excluded characters in classes

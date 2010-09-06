@@ -2,7 +2,6 @@ package org.basex.util;
 
 import static org.basex.util.Token.*;
 import java.util.Arrays;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.index.IndexToken;
 import org.basex.query.ft.FTOpt;
@@ -457,6 +456,6 @@ public final class Tokenizer implements IndexToken {
 
   @Override
   public String toString() {
-    return Main.name(this) + '[' + string(text) + ']';
+    return Util.name(this) + '[' + string(text) + ']';
   }
 }

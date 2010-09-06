@@ -11,7 +11,6 @@ import java.io.IOException;
 import javax.swing.Box;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import org.basex.core.Main;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
@@ -27,6 +26,7 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * This view allows the input and evaluation of XQuery queries.
@@ -254,7 +254,7 @@ public final class XQueryView extends View {
    * Shows a quit dialog for saving the opened XQuery.
    */
   public void confirm() {
-    if(gui.context.query != null && modified && Dialog.confirm(gui, Main.info(
+    if(gui.context.query != null && modified && Dialog.confirm(gui, Util.info(
         XQUERYCONF, gui.context.query.name()))) GUICommands.XQSAVE.execute(gui);
   }
 

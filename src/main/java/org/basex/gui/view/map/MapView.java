@@ -307,7 +307,7 @@ public final class MapView extends View implements Runnable {
     /*
      * Screenshots: try { File file = new File("screenshot.png");
      * ImageIO.write(mainMap, "png", file); } catch(IOException ex) {
-     * ex.printStackTrace(); }
+     * Util.stack(ex); }
      */
     gui.cursor(CURSORARROW, true);
   }

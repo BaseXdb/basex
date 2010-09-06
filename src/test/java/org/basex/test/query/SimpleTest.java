@@ -119,7 +119,7 @@ public final class SimpleTest extends QueryTest {
         "for $a in (1,2) let $b := 3[. = 4] return $a" },
       { "FLWOR 8", itr(2),
         "for $a at $p in (1,2) where $a = 2 return $p" },
- 
+
       { "CompForLet 1", itr(3, 3),
         "for $a in 1 to 2 let $b := 3 return $b" },
       { "CompForLet 2", itr(3, 3),
@@ -130,7 +130,7 @@ public final class SimpleTest extends QueryTest {
         "for $a score $s in 1 let $s := 3 return $s" },
       { "CompForLet 4", itr(1),
         "for $a at $p in 1 let $s := $p return $s" },
-        
+
       { "Index 1", nod(20), "//li[text() = 'Exercise 1']" },
       { "Index 2", nod(21), "//li[text() = 'Exercise 1']/text()" },
       { "Index 3", nod(5), "for $a in //title where $a = 'XML' return $a" },

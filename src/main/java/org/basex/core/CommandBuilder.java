@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class simplifies the composition of the string representation of
@@ -28,7 +29,7 @@ public final class CommandBuilder {
    * @return self instance
    */
   public CommandBuilder init() {
-    init(Main.name(cmd).toUpperCase());
+    init(Util.name(cmd).toUpperCase());
     return this;
   }
 

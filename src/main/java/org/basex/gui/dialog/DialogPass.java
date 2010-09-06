@@ -5,12 +5,12 @@ import static org.basex.gui.layout.BaseXKeys.*;
 import java.awt.BorderLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import org.basex.core.Main;
 import org.basex.gui.GUI;
 import org.basex.gui.GUIConstants.Msg;
 import org.basex.gui.layout.BaseXBack;
 import org.basex.gui.layout.BaseXLabel;
 import org.basex.gui.layout.BaseXPassword;
+import org.basex.util.Util;
 
 /**
  * Open database dialog.
@@ -59,7 +59,7 @@ final class DialogPass extends Dialog {
     final String nm = new String(pass.getPassword());
     ok = !nm.isEmpty() && nm.matches("[^ ;'\\\"]*");
     info.setText(ok || nm.isEmpty() ? null :
-      Main.info(INVALID, SERVERPW), Msg.ERROR);
+      Util.info(INVALID, SERVERPW), Msg.ERROR);
     enableOK(buttons, BUTTONOK, ok);
   }
 

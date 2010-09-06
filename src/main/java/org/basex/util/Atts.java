@@ -1,6 +1,5 @@
 package org.basex.util;
 
-import org.basex.core.Main;
 
 /**
  * This is a simple container for attributes (key/value tokens).
@@ -72,13 +71,13 @@ public final class Atts {
 
   @Override
   public String toString() {
-    final TokenBuilder sb = new TokenBuilder(Main.name(this) + "[");
+    final TokenBuilder tb = new TokenBuilder(Util.name(this) + "[");
     for(int i = 0; i < size; ++i) {
-      sb.add(key[i]);
-      sb.add("=\"");
-      sb.add(val[i]);
-      sb.add("\"");
+      tb.add(key[i]);
+      tb.add("=\"");
+      tb.add(val[i]);
+      tb.add("\"");
     }
-    return sb.add("]").toString();
+    return tb.add("]").toString();
   }
 }

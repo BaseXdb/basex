@@ -33,7 +33,7 @@ final class Buffers {
    * Returns the current buffer.
    * @return current buffer
    */
-  synchronized Buffer curr() {
+  synchronized Buffer current() {
     return buf[c];
   }
 

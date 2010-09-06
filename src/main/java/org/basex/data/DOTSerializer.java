@@ -4,11 +4,11 @@ import static org.basex.data.DataText.*;
 import static org.basex.data.DOTData.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
-import org.basex.core.Main;
 import org.basex.io.IO;
 import org.basex.io.PrintOutput;
 import org.basex.util.IntList;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class serializes trees in the DOT syntax.
@@ -90,7 +90,7 @@ public final class DOTSerializer extends Serializer {
     final int c = nodes.get(level);
     final IntList il = children[level];
     final int is = il.size();
-    for(int i = 0; i < is; ++i) out.println(Main.info(DOTLINK, c, il.get(i)));
+    for(int i = 0; i < is; ++i) out.println(Util.info(DOTLINK, c, il.get(i)));
     color = null;
     il.reset();
   }
@@ -145,7 +145,7 @@ public final class DOTSerializer extends Serializer {
       }*/
       txt = txt.replaceAll("\\\\n\\w+:", "\\\\n");
     }
-    out.println(Main.info(DOTNODE, count, txt, col));
+    out.println(Util.info(DOTNODE, count, txt, col));
     nodes.set(count, level);
     if(level > 0) children[level - 1].add(count);
     count++;

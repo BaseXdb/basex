@@ -5,7 +5,6 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.border.EmptyBorder;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
@@ -23,6 +22,7 @@ import org.basex.gui.layout.BaseXTextField;
 import org.basex.gui.layout.TableLayout;
 import org.basex.io.IO;
 import org.basex.util.StringList;
+import org.basex.util.Util;
 
 /**
  * Dialog window for specifying the options for importing a file system.
@@ -273,7 +273,7 @@ public final class DialogCreateFS extends Dialog {
     if(ok) {
       ok = DialogCreate.dbValid(nm);
       if(!ok) {
-        inf = Main.info(INVALID, EDITNAME);
+        inf = Util.info(INVALID, EDITNAME);
       } else if(db.contains(nm)) {
         inf = prop.is(Prop.FUSE) ? RENAMEOVERBACKING : RENAMEOVER;
         icon = Msg.WARN;

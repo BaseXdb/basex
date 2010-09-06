@@ -16,7 +16,6 @@ import org.basex.build.xml.SAXWrapper;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandBuilder;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.User;
 import org.basex.core.Commands.Cmd;
@@ -28,6 +27,7 @@ import org.basex.index.ValueBuilder;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
 /**
@@ -89,7 +89,7 @@ public class CreateDB extends ACreate {
       final Context ctx) throws IOException {
 
     if(!ctx.user.perm(User.CREATE))
-      throw new IOException(Main.info(PERMNO, CmdPerm.CREATE));
+      throw new IOException(Util.info(PERMNO, CmdPerm.CREATE));
     if(!io.exists()) throw new BuildException(FILEWHICH, io);
     return xml(new DirParser(io, ctx.prop), name, ctx);
   }
@@ -122,7 +122,7 @@ public class CreateDB extends ACreate {
     }
     ctx.lock.after(true);
     if(bxex != null) throw bxex;
-    return Main.info(DBCREATED, name, p);
+    return Util.info(DBCREATED, name, p);
   }
 
   /**
@@ -141,7 +141,7 @@ public class CreateDB extends ACreate {
       return MemBuilder.build(parser, ctx.prop, name);
 
     // database is currently locked by another process
-    if(ctx.pinned(name)) throw new IOException(Main.info(DBLOCKED, name));
+    if(ctx.pinned(name)) throw new IOException(Util.info(DBLOCKED, name));
 
     // build database and index structures
     final Builder builder = new DiskBuilder(parser, ctx.prop);
@@ -158,7 +158,7 @@ public class CreateDB extends ACreate {
       try {
         builder.close();
       } catch(final IOException exx) {
-        Main.debug(exx);
+        Util.debug(exx);
       }
       throw ex;
     }
@@ -176,7 +176,7 @@ public class CreateDB extends ACreate {
       throws IOException {
 
     if(!ctx.user.perm(User.CREATE))
-      throw new IOException(Main.info(PERMNO, CmdPerm.CREATE));
+      throw new IOException(Util.info(PERMNO, CmdPerm.CREATE));
     return MemBuilder.build(parser, ctx.prop);
   }
 
