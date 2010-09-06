@@ -1,6 +1,8 @@
 package org.basex.test.xmldb;
 
 import static org.basex.core.Text.*;
+
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -108,8 +110,9 @@ public final class AllTests {
     final File file = new File(fn);
     final byte[] buffer = new byte[(int) file.length()];
     final FileInputStream fis = new FileInputStream(file);
-    fis.read(buffer);
-    fis.close();
+    final DataInputStream dis = new DataInputStream(fis);
+    dis.readFully(buffer);
+    dis.close();
     return buffer;
   }
 }
