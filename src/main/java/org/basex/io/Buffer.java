@@ -9,7 +9,7 @@ package org.basex.io;
 final class Buffer {
   /** Buffer data. */
   final byte[] data = new byte[IO.BLOCKSIZE];
-  /** Disk position. */
+  /** Disk offset. */
   long pos = -1;
   /** Dirty flag. */
   boolean dirty;

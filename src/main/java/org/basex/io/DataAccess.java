@@ -213,7 +213,8 @@ public final class DataAccess {
         if(bf.dirty) writeBlock(bf);
         bf.pos = p - off;
         file.seek(bf.pos);
-        file.read(bf.data);
+        final int l = Math.min((int) (len - bf.pos), IO.BLOCKSIZE);
+        file.readFully(bf.data, 0, l);
       } catch(final IOException ex) {
         Util.stack(ex);
       }

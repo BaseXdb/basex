@@ -65,18 +65,7 @@ public class BufferInput extends InputStream {
    * @throws IOException IO Exception
    */
   public BufferInput(final InputStream is) throws IOException {
-    this(is, new byte[IO.BLOCKSIZE]);
-  }
-
-  /**
-   * Initializes the file reader.
-   * @param is input stream
-   * @param b input buffer
-   * @throws IOException IO Exception
-   */
-  protected BufferInput(final InputStream is, final byte[] b)
-      throws IOException {
-    this(b);
+    this(new byte[IO.BLOCKSIZE]);
     in = is;
     next();
   }

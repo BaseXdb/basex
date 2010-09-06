@@ -144,6 +144,7 @@ public final class ItemIter extends Iter implements Result {
 
   @Override
   public Item get(final long i) {
+    if(i >= size) System.out.println("!");
     return i < size ? item[(int) i] : null;
   }
 

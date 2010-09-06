@@ -69,7 +69,7 @@ public final class OrderByExpr extends OrderBy {
 
   @Override
   Item item(final int i) {
-    return seq.item[i];
+    return seq.get(i);
   }
 
   @Override

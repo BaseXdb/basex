@@ -1,6 +1,7 @@
 package org.basex.core;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -145,7 +146,7 @@ public final class Lang {
           if(!name.startsWith(pre) || !name.endsWith(SUFFIX)) continue;
 
           final byte[] cont = new byte[(int) entry.getSize()];
-          jar.getInputStream(entry).read(cont);
+          new DataInputStream(jar.getInputStream(entry)).readFully(cont);
           langs.add(name.replaceAll(".*/|." + SUFFIX, ""));
           creds.add(credits(cont));
         }

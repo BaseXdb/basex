@@ -59,22 +59,22 @@ public final class Backup extends Command {
       final byte[] data = new byte[IO.BLOCKSIZE];
 
       // OutputStream for zipping
-      final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(
+      final ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(
           new FileOutputStream(outFile)));
       // Create folder in the zip
-      out.putNextEntry(new ZipEntry(inFolder.getName() + "/"));
-      out.closeEntry();
+      zos.putNextEntry(new ZipEntry(inFolder.getName() + "/"));
+      zos.closeEntry();
       // Process each file
       for(final File f : inFolder.listFiles()) {
-        final BufferedInputStream in = new BufferedInputStream(
+        final BufferedInputStream bis = new BufferedInputStream(
             new FileInputStream(f), IO.BLOCKSIZE);
-        out.putNextEntry(new ZipEntry(inFolder.getName() + "/" + f.getName()));
+        zos.putNextEntry(new ZipEntry(inFolder.getName() + "/" + f.getName()));
         int c;
-        while((c = in.read(data)) != -1) out.write(data, 0, c);
-        out.closeEntry();
-        in.close();
+        while((c = bis.read(data)) != -1) zos.write(data, 0, c);
+        zos.closeEntry();
+        bis.close();
       }
-      out.close();
+      zos.close();
       return true;
     } catch(final IOException e) {
       return false;

@@ -52,7 +52,7 @@ public final class TableMemAccess extends TableAccess {
     for(int i = 0; i != md.size; ++i) {
       while(i == np) {
         f.seek((long) blocks[c++] * IO.BLOCKSIZE);
-        f.read(array);
+        f.readFully(array);
         np = c == firstPres.length ? Integer.MAX_VALUE : firstPres[c];
         l = 0;
       }

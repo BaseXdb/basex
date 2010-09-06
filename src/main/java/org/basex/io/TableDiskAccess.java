@@ -349,7 +349,7 @@ public final class TableDiskAccess extends TableAccess {
         if(bf.dirty) writeBlock(bf);
         bf.pos = b;
         data.seek(bf.pos * IO.BLOCKSIZE);
-        data.read(bf.data);
+        data.readFully(bf.data);
       } catch(final IOException ex) {
         Util.stack(ex);
       }
