@@ -33,7 +33,7 @@ import org.basex.util.TokenBuilder;
 
 /**
  * Functions on files and directories.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -84,7 +84,7 @@ final class FNFile extends Fun {
       case PATHSEP:
         return Str.get(Prop.SEP);
       case DELETE:
-        return Bln.get(path.delete());
+        return delete(path);
       case PATHTOFULL:
         return Str.get(path.getAbsolutePath());
       case PATHTOURI:
@@ -293,19 +293,68 @@ final class FNFile extends Fun {
       throws QueryException {
 
     final String dest = string(checkStr(expr[1], ctx));
+
+    final String destFile = dest.endsWith(Prop.SEP) ? dest + file.getName()
+        : dest + Prop.SEP + file.getName();
+
+    // Raise an exception if the target file already exists
+    if(new File(destFile).exists()) {
+      Err.or(input, QueryText.TARGETEXISTS, file.getPath());
+      return Bln.FALSE;
+    }
+
+    // Raise an exception if the user has no access
+    // to the destination
+    if(!new File(dest).canWrite()) {
+      Err.or(input, QueryText.FILEMOVE, file.getPath(), dest);
+      return Bln.FALSE;
+    }
+
+    // Raise an exception if a directory is to be moved
+    if(file.isDirectory()) {
+      Err.or(input, QueryText.DIRMOVE);
+      return Bln.FALSE;
+    }
+
     return Bln.get(file.renameTo(new File(dest, file.getName())));
 
   }
 
   /**
    * Creates a directory.
-   * @param file dir to be created
+   * @param file directory to be created
    * @param includeParents indicator for including nonexistent parent
    *          directories by the creation
    * @return result
+   * @throws QueryException query exception
    */
-  private Bln makeDir(final File file, final boolean includeParents) {
-    return Bln.get(includeParents ? file.mkdirs() : file.mkdir());
+  private Bln makeDir(final File file, final boolean includeParents)
+      throws QueryException {
+
+    // Raise an exception if the directory cannot be created because
+    // a file with the same name already exists
+    if(file.exists() && file.isFile()) {
+      Err.or(input, QueryText.FILEEXISTS, file.getName());
+      return Bln.FALSE;
+    } else if(file.exists() && file.isDirectory()) {
+      return Bln.TRUE;
+    }
+
+    if(includeParents) {
+
+      // Raise an exception if the existent directory, in which
+      // the dirs are to be created, is write-protected
+      final File existingParent = getExistingParent(file);
+      if(!existingParent.canWrite()) {
+       Err.or(input, QueryText.MKDIR, file.getPath(), existingParent.getPath());
+       return Bln.FALSE;
+      }
+      return Bln.get(file.mkdirs());
+
+    }
+
+    return Bln.get(file.mkdir());
+
   }
 
   /**
@@ -323,5 +372,52 @@ final class FNFile extends Fun {
       Err.or(input, QueryText.URIINV, path);
       return null;
     }
+  }
+
+  /**
+   * Deletes a file.
+   * @param file file to be deleted
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Bln delete(final File file) throws QueryException {
+
+    if(!file.exists()) {
+      Err.or(input, QueryText.FILENOTEXISTS, file.getPath());
+      return Bln.FALSE;
+    }
+
+    if(!file.canWrite()) {
+      Err.or(input, QueryText.FILEDEL, file.getPath());
+      return Bln.FALSE;
+    }
+
+    if(file.isDirectory() && file.listFiles().length != 0) {
+      Err.or(input, QueryText.FILEDELDIR, file.getPath());
+      return Bln.FALSE;
+    }
+
+    return Bln.get(file.delete());
+
+  }
+
+  /**
+   * Returns the lowest existing parent of the directory to be created.
+   * @param file directory to be created
+   * @return existing parent
+   */
+  private File getExistingParent(final File file) {
+
+    File parent = file.getParentFile();
+
+    while(parent.getParent() != null) {
+      if(parent.exists()) {
+        return parent;
+      }
+      parent = parent.getParentFile();
+
+    }
+
+    return parent;
   }
 }
