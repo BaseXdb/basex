@@ -16,7 +16,6 @@ import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItem;
 import javax.xml.xquery.XQItemType;
 import javax.xml.xquery.XQResultSequence;
-import org.basex.core.Main;
 import org.basex.data.SAXSerializer;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
@@ -24,6 +23,7 @@ import org.basex.query.QueryException;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
+import org.basex.util.Util;
 import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
@@ -346,7 +346,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
       ser.setLexicalHandler(sax.getLexicalHandler());
       while(next()) serialize(item().it, ser);
     } else {
-      Main.notimplemented();
+      Util.notimplemented();
     }
   }
 

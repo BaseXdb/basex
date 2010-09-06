@@ -11,6 +11,7 @@ import org.basex.core.Prop;
 import org.basex.data.DataText;
 import org.basex.data.SerializerProp;
 import org.basex.server.ClientSession;
+import org.basex.util.Util;
 import org.jaxrx.core.JaxRxException;
 import org.jaxrx.core.QueryParameter;
 import org.jaxrx.core.ResourcePath;
@@ -35,7 +36,7 @@ abstract class BXCode {
           System.getProperty("org.basex.user"),
           System.getProperty("org.basex.password"));
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       throw new JaxRxException(ex);
     }
   }
@@ -56,7 +57,7 @@ abstract class BXCode {
     } catch(final IOException ex) {
       throw new JaxRxException(ex);
     } finally {
-      try { if(cs != null) cs.close(); } catch(final IOException ex) { }
+      try { cs.close(); } catch(final Exception ex) { /**/ }
     }
   }
 
@@ -99,7 +100,7 @@ abstract class BXCode {
       return file;
     } catch(final IOException ex) {
       // try to delete temporary file before returning the exception
-      try { bos.close(); } catch(final IOException exx) { /**/ }
+      try { bos.close(); } catch(final Exception exx) { /**/ }
       file.delete();
       throw ex;
     }

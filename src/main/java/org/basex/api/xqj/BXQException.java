@@ -1,7 +1,7 @@
 package org.basex.api.xqj;
 
 import javax.xml.xquery.XQException;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * Java XQuery API - Exception.
@@ -25,6 +25,6 @@ final class BXQException extends XQException {
    * @param e message extension
    */
   BXQException(final String s, final Object... e) {
-    super(Main.info(s, e));
+    super(Util.info(s, e));
   }
 }

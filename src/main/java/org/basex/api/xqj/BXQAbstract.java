@@ -13,7 +13,6 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xquery.XQException;
 import javax.xml.xquery.XQItemType;
-import org.basex.core.Main;
 import org.basex.core.cmd.CreateDB;
 import org.basex.data.Data;
 import org.basex.data.Serializer;
@@ -24,6 +23,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 
@@ -197,7 +197,7 @@ abstract class BXQAbstract {
       if(r != null) return createDB(r);
       return createDB(IO.get(ss.getSystemId()));
     }
-    Main.notimplemented();
+    Util.notimplemented();
     return null;
   }
 

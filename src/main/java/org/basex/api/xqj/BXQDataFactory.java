@@ -25,6 +25,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.ItemIter;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.w3c.dom.Node;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
@@ -245,7 +246,7 @@ class BXQDataFactory extends BXQAbstract implements XQDataFactory {
       output.setByteStream(ba);
       impl.createLSSerializer().write(v, output);
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
     return new BXQItem(createDB(new IOContent(ba.toByteArray())));
   }

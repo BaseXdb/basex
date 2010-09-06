@@ -161,10 +161,10 @@ public final class BXJaxRx implements JaxRx {
         try {
           cs.execute(new Add(file.toString()));
         } catch(final BaseXException ex) {
-          file.delete();
           throw new JaxRxException(404, ex.getMessage());
+        } finally {
+          file.delete();
         }
-        file.delete();
       }
     }.run();
   }

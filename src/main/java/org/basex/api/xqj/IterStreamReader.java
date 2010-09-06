@@ -9,7 +9,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.basex.api.jaxp.BXNamespaceContext;
-import org.basex.core.Main;
 import org.basex.data.Data;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
@@ -24,6 +23,7 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.util.Namespaces;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import static org.basex.util.Token.*;
 
 /**
@@ -137,7 +137,7 @@ final class IterStreamReader implements XMLStreamReader {
         atts.add(it);
       }
     } catch(final QueryException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
     }
   }
 
@@ -561,7 +561,7 @@ final class IterStreamReader implements XMLStreamReader {
           kind = END_ELEMENT;
         }
       } catch(final QueryException ex) {
-        Main.notexpected();
+        Util.notexpected();
       }
       return true;
     }

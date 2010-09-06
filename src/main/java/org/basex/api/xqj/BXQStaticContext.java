@@ -50,7 +50,7 @@ final class BXQStaticContext implements XQStaticContext {
     context = new Context();
     if(name != null) {
       context.user = context.users.get(name);
-      if(context.user == null || !string(context.user.pw).equals(md5(pw)))
+      if(context.user == null || !string(context.user.password).equals(md5(pw)))
         throw new BXQException(DENIED, name);
     }
     ctx = new QueryContext(context);

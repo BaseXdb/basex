@@ -8,10 +8,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
-import org.basex.core.Main;
 import org.basex.core.ProgressException;
 import org.basex.util.Atts;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * This class parses an XML document via a conventional SAX parser.
@@ -79,7 +79,7 @@ final class XMLStreamWrapper extends Parser {
     } catch(final ProgressException ex) {
       throw ex;
     } catch(final IOException ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       throw ex;
     } catch(final XMLStreamException ex) {
       final IOException ioe = new IOException(ex.getMessage());
@@ -95,7 +95,7 @@ final class XMLStreamWrapper extends Parser {
 
   @Override
   public String det() {
-    return Main.info(NODESPARSED, file.name(), nodes);
+    return Util.info(NODESPARSED, file.name(), nodes);
   }
 
   @Override
