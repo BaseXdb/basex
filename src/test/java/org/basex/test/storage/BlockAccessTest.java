@@ -81,7 +81,7 @@ public final class BlockAccessTest {
   @After
   public void tearDown() {
     try {
-      tda.close();
+      if(tda != null) tda.close();
       DropDB.drop(DBNAME, PROP);
     } catch(final Exception ex) {
       ex.printStackTrace();
@@ -96,7 +96,7 @@ public final class BlockAccessTest {
       tda.close();
       tda = new TableDiskAccess(data.meta, DATATBL);
     } catch(final IOException ex) {
-      fail();
+      fail(ex.getMessage());
     }
   }
 

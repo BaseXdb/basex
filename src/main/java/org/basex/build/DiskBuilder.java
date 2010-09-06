@@ -100,10 +100,13 @@ public final class DiskBuilder extends Builder {
     if(tout == null) return;
     tout.close();
     tout = null;
+    if(xout == null) return;
     xout.close();
     xout = null;
+    if(vout == null) return;
     vout.close();
     vout = null;
+    if(sout == null) return;
     sout.close();
     sout = null;
   }
