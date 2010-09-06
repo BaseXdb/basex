@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.List;
@@ -19,6 +18,7 @@ import org.basex.io.PrintOutput;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
+import org.basex.util.Util;
 
 /**
  * Simple INEX database test.
@@ -81,7 +81,7 @@ public final class InexTest {
    */
   private InexTest(final String[] args) throws Exception {
     final Performance p = new Performance();
-    Main.outln(Main.name(InexTest.class));
+    Util.outln(Util.name(this));
 
     if(!parseArguments(args)) return;
 
@@ -105,7 +105,7 @@ public final class InexTest {
          s.equals(DBPREFIX + dbindex))) databases.add(s);
     }
 
-    Main.outln("=> % queries on % databases, % runs: time in ms\n",
+    Util.outln("=> % queries on % databases, % runs: time in ms\n",
         queries.size(), databases.size(), runs);
 
     // run test
@@ -113,7 +113,7 @@ public final class InexTest {
     test();
     if(res != null) res.close();
 
-    Main.outln("Total Time: " + p);
+    Util.outln("Total Time: " + p);
   }
 
   /**
@@ -147,7 +147,7 @@ public final class InexTest {
       if(timer <= 0) {
         if(store) {
           if(res != null) res.println(0 + ";" + 0);
-          Main.outln("Query % on %: %", qu + 1, databases.get(db), 0);
+          Util.outln("Query % on %: %", qu + 1, databases.get(db), 0);
         }
         return;
       }
@@ -163,15 +163,15 @@ public final class InexTest {
       final String items = find(str, "Results   : ([0-9]+) Item");
 
       // output result
-      Main.outln("Query % on %: % (% items)",
+      Util.outln("Query % on %: % (% items)",
           qu + 1, databases.get(db), time, items);
 
-      if(info) Main.outln("- " + find(str, "Result: (.*)\\r?\\n"));
+      if(info) Util.outln("- " + find(str, "Result: (.*)\\r?\\n"));
 
       rqt[qu] += Double.parseDouble(time);
       if(res != null) res.println(time + ";" + items);
     } catch(final BaseXException ex) {
-      Main.outln(session.info());
+      Util.outln(session.info());
       if(res != null) res.println("-1;-1");
     }
   }
@@ -227,7 +227,7 @@ public final class InexTest {
       session.execute(new Set(Prop.QUERYINFO, info));
       return true;
     } catch(final Exception ex) {
-      ex.printStackTrace();
+      Util.stack(ex);
       return false;
     }
   }

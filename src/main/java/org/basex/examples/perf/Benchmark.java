@@ -1,10 +1,10 @@
 package org.basex.examples.perf;
 
+import static org.basex.core.Text.*;
 import static java.lang.System.*;
 import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.DropDB;
@@ -14,6 +14,7 @@ import org.basex.server.ClientSession;
 import org.basex.server.LocalSession;
 import org.basex.server.Session;
 import org.basex.util.Args;
+import org.basex.util.Util;
 
 /**
  * This class benchmarks delete operations.
@@ -44,16 +45,16 @@ public abstract class Benchmark {
    * @throws Exception exception
    */
   protected boolean init(final String... args) throws Exception {
-    out.println("=== " + Main.name(this) + " Test ===\n");
+    out.println("=== " + Util.name(this) + " Test ===\n");
     if(!parseArguments(args)) return false;
 
     final Context ctx = new Context();
 
     // check if server is (not) running
     start = !local &&
-      !BaseXServer.ping("localhost", ctx.prop.num(Prop.SERVERPORT));
+      !BaseXServer.ping(LOCALHOST, ctx.prop.num(Prop.SERVERPORT));
 
-    if(start) new BaseXServer();
+    if(start) new BaseXServer("");
 
     session = local ? new LocalSession(ctx) :
       new ClientSession(ctx, "admin", "admin");
@@ -85,7 +86,7 @@ public abstract class Benchmark {
    * @throws BaseXException exception
    */
   protected void drop() throws BaseXException {
-    session.execute(new DropDB(Main.name(this)));
+    session.execute(new DropDB(Util.name(this)));
   }
 
   /**

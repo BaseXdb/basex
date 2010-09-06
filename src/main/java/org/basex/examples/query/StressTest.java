@@ -3,11 +3,11 @@ package org.basex.examples.query;
 import java.util.Random;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 
 /**
  * This class performs a local stress tests with a specified
@@ -34,8 +34,6 @@ public final class StressTest {
   static final Random RND = new Random();
   /** Result counter. */
   static int counter;
-  /** Finished counter. */
-  static int finished;
 
   /** Private constructor. */
   private StressTest() { }
@@ -57,10 +55,8 @@ public final class StressTest {
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
     final Client[] cl = new Client[NCLIENTS];
-    for(int i = 0; i < NCLIENTS; ++i) {
-      cl[i] = new Client();
-      cl[i].start();
-    }
+    for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client();
+    for(final Client c : cl) c.start();
     for(final Client c : cl) c.join();
     dropDB();
   }
@@ -89,7 +85,7 @@ public final class StressTest {
 
           // return nth text of the database
           final int n = (RND.nextInt() & 0xFF) + 1;
-          final String qu = Main.info(QUERY, n);
+          final String qu = Util.info(QUERY, n);
           final String result = new XQuery(qu).execute(CONTEXT);
 
           if(VERBOSE) System.out.println("[" + counter++ + "] Thread " +

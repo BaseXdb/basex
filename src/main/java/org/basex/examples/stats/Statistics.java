@@ -3,7 +3,6 @@ package org.basex.examples.stats;
 import static org.basex.core.Text.*;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
@@ -13,6 +12,7 @@ import org.basex.util.Performance;
 import org.basex.util.Table;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 
 /**
  * This class assembles statistics on the specified database.
@@ -59,9 +59,9 @@ public abstract class Statistics {
     }
 
     if(tab) {
-      Main.out(table.toString());
+      Util.out(table.toString());
     } else {
-      Main.out(Token.string(table.finish()));
+      Util.out(Token.string(table.finish()));
     }
   }
 
@@ -78,7 +78,7 @@ public abstract class Statistics {
       analyze(tl);
       table.contents.add(tl);
     } catch(BaseXException ex) {
-      Main.errln("- " + input + ": " + ex.getMessage());
+      Util.errln("- " + input + ": " + ex.getMessage());
     }
   }
 
@@ -96,7 +96,7 @@ public abstract class Statistics {
    * @throws BaseXException exception
    */
   final String exec(final Command cmd) throws BaseXException {
-    if(debug) Main.errln("- " + cmd);
+    if(debug) Util.errln("- " + cmd);
     return cmd.execute(ctx);
   }
 

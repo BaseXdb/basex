@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.basex.core.Main;
+import org.basex.util.Util;
 
 /**
  * Checks all project interfaces for potentially obsolete texts.
@@ -45,12 +45,12 @@ public final class ObsoleteTexts {
       for(final Field f : c.getDeclaredFields()) {
         final String name = f.getName();
         if(!set.contains(name)) {
-          if(i == 0) Main.outln(c.getSimpleName() + ".java");
-          if(++i % 8 == 0) Main.out("\n");
-          Main.out(name + " ");
+          if(i == 0) Util.outln(c.getSimpleName() + ".java");
+          if(++i % 8 == 0) Util.out("\n");
+          Util.out(name + " ");
         }
       }
-      if(i != 0) Main.outln("\n");
+      if(i != 0) Util.outln("\n");
     }
   }
 

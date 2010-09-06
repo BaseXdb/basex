@@ -124,10 +124,9 @@ public final class Part4 extends Main {
     list.add(conn.createItemFromInt(1, null));
     list.add(conn.createItemFromInt(2, null));
     list.add(conn.createItemFromInt(3, null));
-    // Plain Old Java Objects are ok:
-    list.add(new Integer(4));
-    list.add(new Integer(5));
-    list.add(new Integer(6));
+    list.add(Integer.valueOf(4));
+    list.add(Integer.valueOf(5));
+    list.add(Integer.valueOf(6));
 
     XQSequence sequence = conn.createSequence(list.iterator());
 

@@ -9,7 +9,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.XQuery;
 import org.basex.io.NullOutput;
@@ -18,6 +17,7 @@ import org.basex.server.LocalSession;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * Simple INEX database test.
@@ -93,7 +93,7 @@ public final class InexSingle {
    */
   private InexSingle(final String[] args) throws Exception {
     final Performance p = new Performance();
-    Main.outln(Main.name(InexSingle.class));
+    Util.outln(Util.name(this));
 
     // use tf/idf scoring model
     if(!parseArguments(args)) return;
@@ -135,10 +135,10 @@ public final class InexSingle {
     try {
       session.execute(new XQuery(qu.toString()), out);
       // output result
-      Main.outln("- " + query);
-      Main.outln("Result saved to % in %", file, p);
+      Util.outln("- " + query);
+      Util.outln("Result saved to % in %", file, p);
     } catch(final BaseXException ex) {
-      Main.outln(ex.getMessage());
+      Util.outln(ex.getMessage());
     }
     out.close();
   }

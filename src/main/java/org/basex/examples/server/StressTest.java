@@ -3,9 +3,9 @@ package org.basex.examples.server;
 import java.io.IOException;
 import java.util.Random;
 import org.basex.BaseXServer;
-import org.basex.core.Main;
 import org.basex.server.ClientSession;
 import org.basex.util.Performance;
+import org.basex.util.Util;
 
 /**
  * This class performs a client/server stress tests with a specified
@@ -16,23 +16,23 @@ import org.basex.util.Performance;
  */
 public final class StressTest {
   /** Verbose flag. */
-  private static final boolean VERBOSE = false;
+  static final boolean VERBOSE = false;
   /** Number of clients. */
   static final int NCLIENTS = 30;
   /** Number of runs per client. */
-  static final int NQUERIES = 30;
+  static final int NQUERIES = 100;
   /** Input document. */
   static final String INPUT = "etc/xml/factbook.xml";
   /** Query to be run ("%" serves as placeholder for dynamic content). */
   static final String QUERY =
     "basex:db('test')/descendant::text()[position() = %]";
 
+  /** Server reference. */
+  static BaseXServer server;
   /** Random number generator. */
   static final Random RND = new Random();
   /** Result counter. */
   static int counter;
-  /** Finished counter. */
-  static int finished;
 
   /** Private constructor. */
   private StressTest() { }
@@ -47,7 +47,7 @@ public final class StressTest {
 
     // run server instance
     System.out.println("\n* Start server.");
-    new BaseXServer("-z");
+    server = new BaseXServer("-z");
 
     // create test database
     System.out.println("\n* Create test database.");
@@ -59,9 +59,11 @@ public final class StressTest {
 
     // run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
-    for(int i = 0; i < NCLIENTS; ++i) {
-      new Client().start();
-    }
+    final Client[] cl = new Client[NCLIENTS];
+    for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client();
+    for(final Client c : cl) c.start();
+    for(final Client c : cl) c.join();
+    stopServer();
   }
 
   /**
@@ -77,7 +79,7 @@ public final class StressTest {
     System.out.print(cs.info());
 
     cs.close();
-    new BaseXServer("stop");
+    server.stop();
   }
 
   /**
@@ -105,16 +107,13 @@ public final class StressTest {
 
           // return nth text of the database
           final int n = (RND.nextInt() & 0xFF) + 1;
-          final String qu = Main.info(QUERY, n);
+          final String qu = Util.info(QUERY, n);
           final String result = session.execute("xquery " + qu);
 
           if(VERBOSE) System.out.println("[" + counter++ + "] Thread " +
               getId() + ", Pos " + n + ": " + result);
         }
         session.close();
-
-        // server is stopped after last client has finished
-        if(++finished == StressTest.NCLIENTS) stopServer();
       } catch(final Exception ex) {
         ex.printStackTrace();
       }

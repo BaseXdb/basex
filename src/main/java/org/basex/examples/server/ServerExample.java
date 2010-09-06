@@ -28,7 +28,7 @@ public final class ServerExample {
 
     // ------------------------------------------------------------------------
     // Start server on default port 1984.
-    new BaseXServer();
+    BaseXServer server = new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
@@ -80,6 +80,6 @@ public final class ServerExample {
     // Stop the server
     System.out.println("\n* Stop the server.");
 
-    new BaseXServer("STOP");
+    server.stop();
   }
 }

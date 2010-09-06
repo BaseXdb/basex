@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.List;
@@ -19,6 +18,7 @@ import org.basex.io.PrintOutput;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
+import org.basex.util.Util;
 
 /**
  * Simple word frequency collector for INEXDBtests.
@@ -65,7 +65,7 @@ public final class InexTFCalc {
    */
   private InexTFCalc(final String[] args) throws Exception {
     final Performance p = new Performance();
-    Main.outln(Main.name(InexTFCalc.class));
+    Util.outln(Util.name(this));
     databases = new StringList();
 
     if(!parseArguments(args)) return;
@@ -85,7 +85,7 @@ public final class InexTFCalc {
       for(final String s : List.list(ctx))
         if(s.startsWith(DBPREFIX)) databases.add(s);
 
-    Main.outln("=> % words on % databases: time in ms\n",
+    Util.outln("=> % words on % databases: time in ms\n",
         words.size(), databases.size());
 
     // run test
@@ -95,7 +95,7 @@ public final class InexTFCalc {
       res.println(words.get(i) + ";" + freq[i]);
     res.close();
 
-    Main.outln("Total Time: " + p);
+    Util.outln("Total Time: " + p);
   }
 
   /**
@@ -123,8 +123,8 @@ public final class InexTFCalc {
       session.execute(new Set(Prop.QUERYINFO, false));
       return true;
     } catch(final Exception ex) {
-      Main.outln("Please run BaseXServer for using server mode.");
-      ex.printStackTrace();
+      Util.errln("Please run BaseXServer for using server mode.");
+      Util.stack(ex);
       return false;
     }
   }
@@ -160,11 +160,11 @@ public final class InexTFCalc {
       final String items = find(str, "Results   : ([0-9]+) Item");
 
       // output result
-      Main.outln("Query % on %: % items", qu + 1, databases.get(db), items);
+      Util.outln("Query % on %: % items", qu + 1, databases.get(db), items);
       final int n = Integer.parseInt(items);
       if(n > 0) freq[qu] += n;
     } catch(final BaseXException ex) {
-      Main.outln(session.info());
+      Util.outln(session.info());
     }
   }
 

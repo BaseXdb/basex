@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
@@ -30,6 +29,7 @@ import org.basex.server.ClientSession;
 import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.StringList;
+import org.basex.util.Util;
 
 /**
  * Simple INEX database test.
@@ -105,7 +105,7 @@ public final class InexSubmit {
    */
   private InexSubmit(final String[] args) throws Exception {
     final Performance p = new Performance();
-    Main.outln(Main.name(InexSubmit.class));
+    Util.outln(Util.name(this));
 
     // cache queries
     final BufferedReader br = new BufferedReader(new FileReader(QUERIES));
@@ -154,7 +154,7 @@ public final class InexSubmit {
     }
     closeSubFile();
 
-    Main.outln("Total Time: " + p);
+    Util.outln("Total Time: " + p);
   }
 
   /**
@@ -213,7 +213,7 @@ public final class InexSubmit {
       z++;
     }
 
-    Main.outln("Query % on %: % with size: %", qu + 1,
+    Util.outln("Query % on %: % with size: %", qu + 1,
         databases.get(db), qtime, size);
     return sq;
   }
@@ -397,7 +397,7 @@ public final class InexSubmit {
     br.close();
     o.flush();
     o.close();
-    Main.outln("Updated");
+    Util.outln("Updated");
   }
 
   /**
@@ -444,7 +444,7 @@ public final class InexSubmit {
   private void convertTopics() throws Exception {
     final File file = new File(TOPICS);
     if(!file.exists()) {
-      Main.outln("Could not read \"" + file.getAbsolutePath() + "\"");
+      Util.outln("Could not read \"" + file.getAbsolutePath() + "\"");
       return;
     }
 
@@ -508,8 +508,8 @@ public final class InexSubmit {
       session = new ClientSession(ctx, ADMIN, ADMIN);
       return true;
     } catch(final Exception ex) {
-      Main.errln("Please run BaseXServer for using server mode.");
-      ex.printStackTrace();
+      Util.errln("Please run BaseXServer for using server mode.");
+      Util.stack(ex);
       return false;
     }
   }

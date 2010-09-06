@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.File;
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Close;
@@ -13,6 +12,7 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.query.QueryProcessor;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 
 /**
  * XML Conformance Test Suite wrapper.
@@ -60,7 +60,7 @@ public final class XMLTS {
       if(arg.equals("-v")) {
         verbose = true;
       } else {
-        Main.outln("\nXML Conformance Tests\n -v verbose output");
+        Util.outln("\nXML Conformance Tests\n -v verbose output");
         return;
       }
     }
@@ -77,8 +77,8 @@ public final class XMLTS {
     int wrong = 0;
 
     final Nodes root = new Nodes(0, data);
-    Main.outln("\nXML Conformance Tests\n");
-    Main.outln("file = (expected result) -> " + NAME + " result");
+    Util.outln("\nXML Conformance Tests\n");
+    Util.outln("file = (expected result) -> " + NAME + " result");
 
     for(final int t : nodes("//*:TEST", root).nodes) {
       final Nodes srcRoot = new Nodes(t, data);
@@ -96,17 +96,17 @@ public final class XMLTS {
       final boolean correct = valid == success;
 
       if(verbose || !correct) {
-        Main.outln(uri + " = " + (valid ? "correct" : "wrong") + " -> " +
+        Util.outln(uri + " = " + (valid ? "correct" : "wrong") + " -> " +
             (success ? "correct" : "wrong") + (correct ? " (OK)" : " (WRONG)"));
         if(verbose) {
           String inf = cmd.info();
-          if(!inf.isEmpty()) Main.outln("[BASEX ] " + inf);
+          if(!inf.isEmpty()) Util.outln("[BASEX ] " + inf);
           context.prop.set(Prop.INTPARSE, false);
           new Close().execute(context);
           cmd = new CreateDB(uri, PATH + uri);
           cmd.execute(context);
           inf = cmd.info();
-          if(!inf.isEmpty()) Main.outln("[XERCES] " + inf);
+          if(!inf.isEmpty()) Util.outln("[XERCES] " + inf);
         }
       }
       if(correct) ok++;
@@ -115,9 +115,9 @@ public final class XMLTS {
       new Close().execute(context);
     }
 
-    Main.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");
-    Main.outln("Successful: " + ok);
-    Main.outln("Wrong: " + wrong);
+    Util.outln("\nResult of Test \"" + new File(FILE).getName() + "\":");
+    Util.outln("Successful: " + ok);
+    Util.outln("Wrong: " + wrong);
   }
 
   /**
@@ -129,12 +129,12 @@ public final class XMLTS {
    */
   private String text(final String qu, final Nodes root) throws Exception {
     final Nodes n = nodes(qu, root);
-    final TokenBuilder sb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < n.size(); ++i) {
-      if(i != 0) sb.add("/");
-      sb.add(data.atom(n.nodes[i]));
+      if(i != 0) tb.add("/");
+      tb.add(data.atom(n.nodes[i]));
     }
-    return sb.toString();
+    return tb.toString();
   }
 
   /**

@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import org.basex.build.FileParser;
-import org.basex.core.Main;
 import org.basex.io.BufferInput;
 import org.basex.util.TokenBuilder;
+import org.basex.util.Util;
 import org.deepfs.fs.DeepFS;
 
 /**
@@ -55,7 +55,7 @@ public final class LSTParser extends FileParser {
         final String time = string(entries[2]) + ' ' + string(entries[3]);
         mtime = token(DATE.parse(time).getTime());
       } catch(final ParseException ex) {
-        Main.debug(ex);
+        Util.debug(ex);
       }
 
       if(indexOf(name, '/') != -1) {

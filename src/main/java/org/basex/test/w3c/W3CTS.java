@@ -16,7 +16,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import org.basex.core.Context;
-import org.basex.core.Main;
 import org.basex.core.Prop;
 import org.basex.core.cmd.Check;
 import org.basex.core.cmd.Close;
@@ -46,6 +45,7 @@ import org.basex.util.Args;
 import org.basex.util.Performance;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.basex.util.Util;
 
 /**
  * XQuery Test Suite wrapper.
@@ -210,24 +210,24 @@ public abstract class W3CTS {
     data = context.data;
 
     final Nodes root = new Nodes(0, data);
-    Main.outln(NL + Main.name(this) + " Test Suite " +
+    Util.outln(NL + Util.name(this) + " Test Suite " +
         text("/*:test-suite/@version", root));
 
-    Main.outln(NL + "Caching Sources...");
+    Util.outln(NL + "Caching Sources...");
     for(final int s : nodes("//*:source", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       srcs.put(text("@ID", srcRoot), val);
     }
 
-    Main.outln("Caching Modules...");
+    Util.outln("Caching Modules...");
     for(final int s : nodes("//*:module", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       mods.put(text("@ID", srcRoot), val);
     }
 
-    Main.outln("Caching Collections...");
+    Util.outln("Caching Collections...");
     for(final int c : nodes("//*:collection", root).nodes) {
       final Nodes nodes = new Nodes(c, data);
       final String cname = text("@ID", nodes);
@@ -242,26 +242,26 @@ public abstract class W3CTS {
     init(root);
 
     if(reporting) {
-      Main.outln("Delete old results...");
+      Util.outln("Delete old results...");
       delete(new File[] { new File(results) });
     }
 
-    if(verbose) Main.outln();
+    if(verbose) Util.outln();
     final Nodes nodes = minimum ?
       nodes("//*:test-group[starts-with(@name, 'Minim')]//*:test-case", root) :
       nodes("//*:test-case", root);
 
     long total = nodes.size();
-    Main.out("Parsing " + total + " Queries");
+    Util.out("Parsing " + total + " Queries");
     for(int t = 0; t < total; ++t) {
       if(!parse(new Nodes(nodes.nodes[t], data))) break;
-      if(!verbose && t % 500 == 0) Main.out(".");
+      if(!verbose && t % 500 == 0) Util.out(".");
     }
-    Main.outln();
+    Util.outln();
     total = ok + ok2 + err + err2;
 
     final String time = perf.getTimer();
-    Main.outln("Writing log file..." + NL);
+    Util.outln("Writing log file..." + NL);
     BufferedWriter bw = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(path + pathlog), UTF8));
     bw.write("TEST RESULTS ==================================================");
@@ -294,11 +294,11 @@ public abstract class W3CTS {
       bw.close();
     }
 
-    Main.outln("Total #Queries: " + total);
-    Main.outln("Correct / Empty results: " + ok + " / " + ok2);
-    Main.out("Conformance (w/empty results): ");
-    Main.outln(pc(ok, total) + " / " + pc(ok + ok2, total));
-    Main.outln("Total Time: " + time);
+    Util.outln("Total #Queries: " + total);
+    Util.outln("Correct / Empty results: " + ok + " / " + ok2);
+    Util.out("Conformance (w/empty results): ");
+    Util.outln(pc(ok, total) + " / " + pc(ok + ok2, total));
+    Util.outln("Total Time: " + time);
 
     context.close();
   }
@@ -325,7 +325,7 @@ public abstract class W3CTS {
     if(single != null && !outname.startsWith(single)) return true;
 
     Performance perf = new Performance();
-    if(verbose) Main.out("- " + outname);
+    if(verbose) Util.out("- " + outname);
 
     boolean inspect = false;
     boolean correct = true;
@@ -341,10 +341,6 @@ public abstract class W3CTS {
       ItemIter iter = null;
       boolean doc = true;
 
-      final TokenBuilder files = new TokenBuilder();
-      // limit result sizes to 1MB
-      final ArrayOutput ao = new ArrayOutput(1 << 20);
-
       final Nodes cont = nodes("*:contextItem", state);
       Nodes curr = null;
       if(cont.size() != 0) {
@@ -357,6 +353,10 @@ public abstract class W3CTS {
       context.prop.set(Prop.QUERYINFO, compile);
       final QueryProcessor xq = new QueryProcessor(in, curr, context);
       context.prop.set(Prop.QUERYINFO, false);
+
+      // limit result sizes to 1MB
+      final ArrayOutput ao = new ArrayOutput();
+      final TokenBuilder files = new TokenBuilder();
 
       try {
         files.add(file(nodes("*:input-file", state),
@@ -404,9 +404,9 @@ public abstract class W3CTS {
 
       // print compilation steps
       if(compile) {
-        Main.errln("---------------------------------------------------------");
-        Main.err(xq.info());
-        Main.errln(in);
+        Util.errln("---------------------------------------------------------");
+        Util.err(xq.info());
+        Util.errln(in);
       }
 
       final Nodes outFiles = nodes("*:output-file/text()", state);
@@ -496,11 +496,11 @@ public abstract class W3CTS {
                 ir.reset();
                 final XMLSerializer ser = new XMLSerializer(System.out);
                 Item it;
-                Main.outln(NL + "=== " + testid + " ===");
+                Util.outln(NL + "=== " + testid + " ===");
                 while((it = ir.next()) != null) it.serialize(ser);
-                Main.outln(NL + "=== " + NAME + " ===");
+                Util.outln(NL + "=== " + NAME + " ===");
                 while((it = iter.next()) != null) it.serialize(ser);
-                Main.outln();
+                Util.outln();
               }
               rdata.close();
               if(eq) break;
@@ -583,7 +583,7 @@ public abstract class W3CTS {
 
     if(verbose) {
       final long t = perf.getTime();
-      if(t > 100000000) Main.out(": " + Performance.getTimer(t, 1));
+      if(t > 100000000) Util.out(": " + Performance.getTimer(t, 1));
     }
     return single == null || !outname.equals(single);
   }
@@ -691,7 +691,7 @@ public abstract class W3CTS {
       if(new File(string(cl)).exists()) {
         col.add(qp.ctx.doc(cl, true, false, null));
       } else {
-        Main.errln("Warning: \"%\" not found.", cl);
+        Util.errln("Warning: \"%\" not found.", cl);
       }
     }
     qp.ctx.addColl(col, name);
@@ -761,12 +761,12 @@ public abstract class W3CTS {
    */
   protected String text(final String qu, final Nodes root) throws Exception {
     final Nodes n = nodes(qu, root);
-    final TokenBuilder sb = new TokenBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     for(int i = 0; i < n.size(); ++i) {
-      if(i != 0) sb.add('/');
-      sb.add(data.atom(n.nodes[i]));
+      if(i != 0) tb.add('/');
+      tb.add(data.atom(n.nodes[i]));
     }
-    return sb.toString();
+    return tb.toString();
   }
 
   /**

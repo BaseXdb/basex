@@ -1,7 +1,6 @@
 package org.basex.test.w3c;
 
 import java.util.HashMap;
-import org.basex.core.Main;
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
@@ -10,6 +9,7 @@ import org.basex.query.ft.StemDir;
 import org.basex.query.ft.StopWords;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
+import org.basex.util.Util;
 
 /**
  * XQuery Full Text Test Suite wrapper.
@@ -47,7 +47,7 @@ public final class XQFTTS extends W3CTS {
 
   @Override
   void init(final Nodes root) throws Exception {
-    Main.outln("Caching Full-text Structures...");
+    Util.outln("Caching Full-text Structures...");
     for(final int s : nodes("//*:stopwords", root).nodes) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');

@@ -35,7 +35,7 @@ public final class ServerConcurrencyExample {
 
     // ------------------------------------------------------------------------
     // Start server instance
-    new BaseXServer();
+    BaseXServer server = new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
@@ -96,7 +96,7 @@ public final class ServerConcurrencyExample {
     // Stop the server
     System.out.println("\n* Stop the server:");
 
-    new BaseXServer("STOP");
+    server.stop();
   }
 
   /**

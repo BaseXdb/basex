@@ -38,7 +38,7 @@ public final class ServerLocalExample {
 
     // ------------------------------------------------------------------------
     // Start server
-    new BaseXServer();
+    BaseXServer server = new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
@@ -74,7 +74,7 @@ public final class ServerLocalExample {
     // Stop the server
     System.out.println("\n* Stop the server:");
 
-    new BaseXServer("STOP");
+    server.stop();
 
     // ----------------------------------------------------------------------
     // Drop the local database
