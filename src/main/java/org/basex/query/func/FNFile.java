@@ -104,6 +104,8 @@ final class FNFile extends Fun {
         return move(path, ctx);
       case LASTMOD:
         return new Dtm(path.lastModified(), input);
+      case FILEEXISTS:
+        return Bln.get(path.exists());
       default:
         return super.atomic(ctx, ii);
     }

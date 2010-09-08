@@ -250,6 +250,8 @@ public enum FunDef {
   LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
   /** XQuery function */
   PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", URI),
+  /** XQuery function */
+  FILEEXISTS(FILEURI, FNFile.class, 1, 1, "file-exists(path)", BLN),
 
   /* FNNum functions. */
 
