@@ -1,15 +1,16 @@
 package org.basex.query.func;
 
 import static org.basex.util.Token.*;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.channels.FileChannel;
 import java.util.regex.PatternSyntaxException;
+
 import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
@@ -138,8 +139,8 @@ final class FNFile extends Fun {
 
         while(++c < files.length) {
           final String name = files[c].getName();
-          if(!files[c].isHidden() && (pattern == null ||
-              name.matches(pattern))) return Str.get(name);
+          if(!files[c].isHidden() && (pattern == null 
+              || name.matches(pattern))) return Str.get(name);
         }
         return null;
       }
@@ -229,7 +230,9 @@ final class FNFile extends Fun {
     } catch(IOException ex) {
       Err.or(input, QueryText.FILEWRITE, file.getName());
     } finally {
-      try { out.close(); } catch(final Exception ex) { }
+      try {
+        out.close();
+      } catch(final Exception ex) { }
     }
     return null;
   }
@@ -273,8 +276,12 @@ final class FNFile extends Fun {
       try {
         dc.transferFrom(srcc, 0, srcc.size());
       } finally {
-        srcc.close();
-        dc.close();
+        try {
+          srcc.close();
+        } catch(final IOException ex) { }
+        try {
+          dc.close();
+        } catch(final IOException ex) { }
       }
     } catch(final IOException ex) {
       Err.or(input, ex.getMessage(), src, dest);
@@ -289,7 +296,7 @@ final class FNFile extends Fun {
    * @return result
    * @throws QueryException query exception
    */
-  private Bln move(final File file, final QueryContext ctx)
+  private Item move(final File file, final QueryContext ctx)
       throws QueryException {
 
     final String dest = string(checkStr(expr[1], ctx));
@@ -300,23 +307,23 @@ final class FNFile extends Fun {
     // Raise an exception if the target file already exists
     if(new File(destFile).exists()) {
       Err.or(input, QueryText.TARGETEXISTS, file.getPath());
-      return Bln.FALSE;
     }
 
     // Raise an exception if the user has no access
     // to the destination
     if(!new File(dest).canWrite()) {
       Err.or(input, QueryText.FILEMOVE, file.getPath(), dest);
-      return Bln.FALSE;
     }
 
     // Raise an exception if a directory is to be moved
     if(file.isDirectory()) {
       Err.or(input, QueryText.DIRMOVE);
-      return Bln.FALSE;
     }
 
-    return Bln.get(file.renameTo(new File(dest, file.getName())));
+    if(!file.renameTo(new File(dest, file.getName()))) {
+      Err.or(input, QueryText.CANNOTMOVE, file.getPath());
+    }
+    return null;
 
   }
 
@@ -328,33 +335,30 @@ final class FNFile extends Fun {
    * @return result
    * @throws QueryException query exception
    */
-  private Bln makeDir(final File file, final boolean includeParents)
+  private Item makeDir(final File file, final boolean includeParents)
       throws QueryException {
 
     // Raise an exception if the directory cannot be created because
     // a file with the same name already exists
-    if(file.exists() && file.isFile()) {
+    if(file.exists()) if(!file.isDirectory()) 
       Err.or(input, QueryText.FILEEXISTS, file.getName());
-      return Bln.FALSE;
-    } else if(file.exists() && file.isDirectory()) {
-      return Bln.TRUE;
-    }
 
     if(includeParents) {
 
       // Raise an exception if the existent directory, in which
       // the dirs are to be created, is write-protected
-      final File existingParent = getExistingParent(file);
-      if(!existingParent.canWrite()) {
-       Err.or(input, QueryText.MKDIR, file.getPath(), existingParent.getPath());
-       return Bln.FALSE;
-      }
-      return Bln.get(file.mkdirs());
+      final File parent = getExistingParent(file);
+      if(!parent.canWrite())
+        Err.or(input, QueryText.MKDIR, file.getPath(), parent.getPath());
 
+      if(!file.mkdirs())
+        Err.or(input, QueryText.CANNOTMKDIR, file.getPath());
     }
 
-    return Bln.get(file.mkdir());
+      if(!file.mkdir())
+        Err.or(input, QueryText.CANNOTMKDIR, file.getPath());
 
+    return null;
   }
 
   /**
@@ -364,14 +368,12 @@ final class FNFile extends Fun {
    * @throws QueryException query context
    */
   private Uri pathToUri(final QueryContext ctx) throws QueryException {
+
     final String path = string(checkEStr(expr[0].atomic(ctx, input)));
-    try {
-      final URI uri = new URI("file", path, null);
-      return Uri.uri(uri.toString().getBytes());
-    } catch(URISyntaxException e) {
-      Err.or(input, QueryText.URIINV, path);
-      return null;
-    }
+
+    final URI uri = new File(path).toURI();
+    return Uri.uri(Token.token(uri.toString()));
+
   }
 
   /**
@@ -380,44 +382,45 @@ final class FNFile extends Fun {
    * @return result
    * @throws QueryException query exception
    */
-  private Bln delete(final File file) throws QueryException {
+  private Item delete(final File file) throws QueryException {
 
-    if(!file.exists()) {
+    if(!file.exists())
       Err.or(input, QueryText.FILENOTEXISTS, file.getPath());
-      return Bln.FALSE;
-    }
 
-    if(!file.canWrite()) {
+    if(!file.canWrite())
       Err.or(input, QueryText.FILEDEL, file.getPath());
-      return Bln.FALSE;
-    }
 
-    if(file.isDirectory() && file.listFiles().length != 0) {
+    if(file.isDirectory() && file.listFiles().length != 0) 
       Err.or(input, QueryText.FILEDELDIR, file.getPath());
-      return Bln.FALSE;
-    }
 
-    return Bln.get(file.delete());
+    if(!file.delete())
+      Err.or(input, QueryText.CANNOTDEL, file.getPath());
 
+    return null;
   }
 
   /**
    * Returns the lowest existing parent of the directory to be created.
    * @param file directory to be created
    * @return existing parent
+   * @throws QueryException query exception
    */
-  private File getExistingParent(final File file) {
+  private File getExistingParent(final File file) throws QueryException {
 
-    File parent = file.getParentFile();
+    try {
+      File f = file.getCanonicalFile();
 
-    while(parent.getParent() != null) {
-      if(parent.exists()) {
-        return parent;
-      }
-      parent = parent.getParentFile();
+      do {
 
+        f = f.getParentFile();
+        if(f == null) Err.or(input, QueryText.DIRINV, file);
+
+      } while(!f.exists());
+      return f;
+    } catch(IOException ex) {
+      Err.or(input, QueryText.DIRINV, file);
+      return null;
     }
 
-    return parent;
   }
 }

@@ -9,7 +9,7 @@ import org.basex.util.Util;
 
 /**
  * Signatures of all XQuery functions.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -122,8 +122,8 @@ public enum FunDef {
   FORMINT(FNURI, FNFormat.class, 2, 3,
       "format-integer(number, picture, lang?)", STR),
   /** XQuery function. */
-  FORMNUM(FNURI, FNFormat.class, 2, 3,
-      "format-number(number, picture, name?)", STR),
+  FORMNUM(FNURI, FNFormat.class, 2, 3, "format-number(number, picture, name?)",
+      STR),
   /** XQuery function. */
   FORMDTM(FNURI, FNFormat.class, 2, 5,
       "format-dateTime(number, picture, lang?, cal?, place?)", STR),
@@ -146,13 +146,13 @@ public enum FunDef {
   MAP(FNURI, FNFunc.class, 2, 2, "map(function, seq)", ITEM_ZM),
   /** XQuery function. */
   MAPPAIRS(FNURI, FNFunc.class, 2, 2, "map-pairs(function, seq1, seq2)",
-    ITEM_ZM),
+      ITEM_ZM),
   /** XQuery function. */
-  FOLDLEFT(FNURI, FNFunc.class, 3, 3, "fold-left(function, zero, seq)",
-    ITEM_ZM),
+  FOLDLEFT(FNURI, FNFunc.class, 3, 3, "fold-left(function, zero, seq)", 
+      ITEM_ZM),
   /** XQuery function. */
   FOLDRIGHT(FNURI, FNFunc.class, 3, 3, "fold-right(function, zero, seq)",
-    ITEM_ZM),
+      ITEM_ZM),
 
   /* FNGen functions. */
 
@@ -215,9 +215,9 @@ public enum FunDef {
   /* FNFile functions */
 
   /** XQuery function */
-  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(path)", BLN),
+  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(path)", ITEM_Z),
   /** XQuery function */
-  MKDIRS(FILEURI, FNFile.class, 1, 1, "mkdirs(path)", BLN),
+  MKDIRS(FILEURI, FNFile.class, 1, 1, "mkdirs(path)", ITEM_Z),
   /** XQuery function */
   ISDIR(FILEURI, FNFile.class, 1, 1, "is-directory(path)", BLN),
   /** XQuery function */
@@ -227,25 +227,25 @@ public enum FunDef {
   /** XQuery function */
   ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(filepath)", BLN),
   /** XQuery function */
-  FILES(FILEURI, FNFile.class, 1, 2, "files(path, pattern)", STR_ZM),
+  FILES(FILEURI, FNFile.class, 1, 2, "files(path, pattern?)", STR_ZM),
   /** XQuery function */
   PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
   /** XQuery function */
-  DELETE(FILEURI, FNFile.class, 1, 1, "delete(path)", BLN),
+  DELETE(FILEURI, FNFile.class, 1, 1, "delete(path)", ITEM_Z),
   /** XQuery function */
   PATHTOFULL(FILEURI, FNFile.class, 1, 1, "path-to-full-path(path)", STR),
   /** XQuery function */
-  READFILE(FILEURI, FNFile.class, 1, 2, "read-file(filepath, encoding)", STR),
+  READFILE(FILEURI, FNFile.class, 1, 2, "read-file(filepath, encoding?)", STR),
   /** XQuery function */
   READBINARY(FILEURI, FNFile.class, 1, 1, "read-binary(filepath)", B64),
   /** XQuery function */
-  WRITE(FILEURI, FNFile.class, 2, 3, "write(filepath, data, params)", ITEM_Z),
+  WRITE(FILEURI, FNFile.class, 2, 3, "write(filepath, data, params?)", ITEM_Z),
   /** XQuery function */
   WRITEBIN(FILEURI, FNFile.class, 2, 2, "write-binary(filepath, data)", ITEM_Z),
   /** XQuery function */
   COPY(FILEURI, FNFile.class, 2, 2, "copy(src, dest)", ITEM_Z),
   /** XQuery function */
-  MOVE(FILEURI, FNFile.class, 2, 2, "move(path, dest)", BLN),
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(path, dest)", ITEM_Z),
   /** XQuery function */
   LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
   /** XQuery function */
@@ -285,7 +285,7 @@ public enum FunDef {
   /** XQuery function. */
   TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", STR_ZM),
   /** XQuery function. */
-  ANALZYE(FNURI, FNPat.class, 2, 3, "analyze-string(input, pattern, mod?)",
+  ANALZYE(FNURI, FNPat.class, 2, 3, "analyze-string(input, pattern, mod?)", 
       NOD),
 
   /* FNQName functions. */
@@ -386,7 +386,7 @@ public enum FunDef {
   /** XQuery function. */
   SUBAFTER(FNURI, FNStr.class, 2, 3, "substring-after(item, sub, coll?)", STR),
   /** XQuery function. */
-  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll?)",
+  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll?)", 
       STR),
   /** XQuery function. */
   TRANS(FNURI, FNStr.class, 3, 3, "translate(arg, map, trans)", STR),

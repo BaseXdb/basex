@@ -14,7 +14,7 @@ import org.junit.Test;
 
 /**
  * This class tests the functions of the file library.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -68,6 +68,18 @@ public final class FNFileTest {
   @Test
   public void testPathSeparator() {
     atomic(FunDef.PATHSEP);
+  }
+
+  /** Test function file:read-file. */
+  @Test
+  public void testRead() {
+    atomic(FunDef.READFILE, Str.get("readme.txt"));
+  }
+
+  /** Test function file:read-binary. */
+  @Test
+  public void testReadBinary() {
+    atomic(FunDef.READBINARY, Str.get("readme.txt"));
   }
 
   /** Test function file:delete. */

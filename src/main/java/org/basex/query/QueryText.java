@@ -108,16 +108,15 @@ public interface QueryText {
   Object[] PICCOMP = { FODF, 1350, "Invalid component in string: \"%\"."};
 
   /** FOFL0001: Evaluation exception. */
-  Object[] FILEREAD = { FOFL, 1, "File '%' cannot be read. "};
+  Object[] FILEREAD = { FOFL, 1, "File '%' cannot be read."};
   /** FOFL0002: Evaluation exception. */
-  Object[] FILEWRITE = { FOFL, 2, "File '%' cannot be written. "};
+  Object[] FILEWRITE = { FOFL, 2, "File '%' cannot be written."};
   /** FOFL0003: Evaluation exception. */
   Object[] FILELIST = { FOFL, 3, "Files of '%' cannot be returned."};
   /** FOFL0004: Evaluation exception. */
   Object[] FILEPATTERN = { FOFL, 4, "Invalid file name pattern '%'."};
   /** FOFL0005: Evaluation exception. */
-  Object[] FILEDEL = { FOFL, 5,
-      "'%' cannot be deleted. Permission denied. "};
+  Object[] FILEDEL = { FOFL, 5, "'%' cannot be deleted. Permission denied."};
   /** FOFL0006: Evaluation exception. */
   Object[] FILENOTEXISTS = { FOFL, 6, "File '%' does not exist."};
   /** FOFL0007: Evaluation exception. */
@@ -129,13 +128,20 @@ public interface QueryText {
   Object[] DIRMOVE = { FOFL, 9, "A directory cannot be moved. "};
   /** FOFL0010: Evaluation exception. */
   Object[] FILEMOVE = { FOFL, 10, 
-      "'%' cannot be moved. '%' is write-protected. "};
+      "'%' cannot be moved. '%' is write-protected."};
   /** FOFL0011: Evaluation exception. */
   Object[] MKDIR = { FOFL, 11, "Directory '%' cannot be created. " +
-  		"The parent directory '%' is write-protected. "};
+  "The parent directory '%' is write-protected."};
   /** FOFL0012: Evaluation exception. */
-  Object[] FILEEXISTS = { FOFL, 12, "A file named '%' already exists. "};
-  
+  Object[] FILEEXISTS = { FOFL, 12, "A file named '%' already exists."};
+  /** FOFL0013: Evaluation exception. */
+  Object[] CANNOTMKDIR = { FOFL, 13, "Directory '%' cannot be created."};
+  /** FOFL0014: Evaluation exception. */
+  Object[] CANNOTDEL = { FOFL, 14, "'%' cannot be deleted."};
+  /** FOFL0015: Evaluation exception. */
+  Object[] CANNOTMOVE = { FOFL, 15, "File '%' cannot be moved."};
+  /** FOFL0016: Evaluation exception. */
+  Object[] DIRINV = { FOFL, 16, "The path '%' is invalid in the filesystem."}; 
 
   /** FONS0004: Evaluation exception. */
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"."};
@@ -297,7 +303,8 @@ public interface QueryText {
   /** XPST0003: Parsing exception. */
   Object[] NOSWITCH = { XPST, 3, "Incomplete switch expression."};
   /** XPST0003: Parsing exception. */
-  Object[] TYPEPAR = { XPST, 3, "Expecting '(' after 'switch' or 'typeswitch'."};
+  Object[] TYPEPAR = { XPST, 3, 
+      "Expecting '(' after 'switch' or 'typeswitch'."};
   /** XPST0003: Parsing exception. */
   Object[] PRAGMAINV = { XPST, 3, "Invalid pragma expression."};
   /** XPST0003: Parsing exception. */
@@ -450,7 +457,8 @@ public interface QueryText {
   /** XQDY0041: Evaluation exception. */
   Object[] CPIINVAL = { XQDY, 41, "Invalid PI name: \"%\""};
   /** XQDY0044: Evaluation exception. */
-  Object[] CAINS = { XQDY, 44, "Invalid attribute namespace: \"%\" (URI \"%\")"};
+  Object[] CAINS = { XQDY, 44, 
+      "Invalid attribute namespace: \"%\" (URI \"%\")"};
   /** XQDY0064: Evaluation exception. */
   Object[] CPIXML = { XQDY, 64, "Illegal PI name: \"%\""};
   /** XQDY0072: Evaluation exception. */
@@ -473,7 +481,8 @@ public interface QueryText {
   /** XQST0033: Parsing exception. */
   Object[] DUPLNSDECL = { XQST, 33, "Duplicate declaration of namespace %."};
   /** XQST0034: Parsing exception. */
-  Object[] FUNCDEFINED = { XQST, 34, "Duplicate declaration of function \"%\"."};
+  Object[] FUNCDEFINED = { XQST, 34, 
+      "Duplicate declaration of function \"%\"."};
   /** XQST0038: Parsing exception. */
   Object[] DUPLCOLL = { XQST, 38, "Duplicate 'collation' declaration."};
   /** XQST0076: Parsing exception. */
