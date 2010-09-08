@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.Box;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
@@ -104,22 +103,14 @@ public final class XQueryView extends View {
     close.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        Object[] options = {"Yes", "No", "Cancel"};
-        int n = JOptionPane.showOptionDialog(gui,
-            "Would you like to save the query?",
-            "Save query?",
-            JOptionPane.YES_NO_CANCEL_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            options,
-            options[0]);
-        if(n == 0) {
-          save.doClick();
+        
+        if(header.getText().endsWith("*")) {
+          if (Dialog.confirm(gui, Util.info(
+              XQUERYCONF, gui.context.query.name()))) save.doClick();
         }
-        if(n < 2) {
-          text.setText(new byte[0]);
-          header.setText(XQUERYTIT);
-        }
+        text.setText(new byte[0]);
+        header.setText(XQUERYTIT);
+        gui.context.query = null;
       }
     });
 
