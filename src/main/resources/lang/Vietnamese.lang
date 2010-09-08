@@ -569,6 +569,7 @@ h_save=Saves the result.
 h_go=Chạy lệnh hỏi.
 h_stop=Dừng qua trình hiện hành.
 h_recent=Những tệp vừa được mở
+h_qclose=Closes the query and clears the textfield
 h_cmd=Bạn có thể nhập lệnh BaseX vào đây. Thử 'Giúp đỡ' để xem tất cả các câu lệnh.\n\nBạn có thể lấy lại các thông tin nhập với phím LÊN hoặc XUỐNG.
 h_searchxml=Gõ cái gì đó vào miền văn bản để tìm nó trong cơ sở dữ liệu. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tags và văn bản\n=...   Tìm thấy chính xác nút văn bản\n@ ...  Tìm thấy thuộc tính và giá trị thuộc tính\n@=   Tìm thấy chính xác giá trị thuộc tính\n/...     Đánh giá dữ liệu nhập theo XQuery
 h_searchfs=Gõ cái gì đó vào miền văn bản để tìm nó trong hệ thống tệp. Cú pháp sau được hỗ trợ:\n...      Tìm thấy tệp hay thư mục\n= ...  Tìm thấy chính xác tên\n. ..     Tìm thấy đuôi tệp\n< ...  Tìm thấy tệp kích cỡ nhỏ hơn tệp trên\n> ...  Tìm thấy tệp kích cỡ lớn hơn tệp trên\n\nbạn có thể nhập câu lệnh BaseX bằng cách thêm vào trước dữ liệu nhập 1 dấu chấm than.

@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import javax.swing.Box;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
@@ -45,7 +46,7 @@ public final class XQueryView extends View {
   boolean modified;
 
   /** Header string. */
-  private final BaseXLabel header;
+  final BaseXLabel header;
   /** Scroll Pane. */
   private final BaseXBack south;
   /** Execute button. */
@@ -87,6 +88,9 @@ public final class XQueryView extends View {
             setQuery(IO.get(ac.getActionCommand()));
           }
         };
+        if(gui.prop.strings(GUIProp.QUERIES).length == 0) {
+          popup.add(new JMenuItem("- No recently opened files -"));
+        }
         for(final String en : gui.prop.strings(GUIProp.QUERIES)) {
           final JMenuItem jmi = new JMenuItem(en);
           jmi.addActionListener(al);
@@ -95,9 +99,32 @@ public final class XQueryView extends View {
         popup.show(hist, 0, hist.getHeight());
       }
     });
+    
+    final BaseXButton close = new BaseXButton(gui, "close", HELPQCLOSE);
+    close.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        Object[] options = {"Yes", "No", "Cancel"};
+        int n = JOptionPane.showOptionDialog(gui,
+            "Would you like to save the query?",
+            "Save query?",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            options,
+            options[0]);
+        if(n == 0) {
+          save.doClick();
+        }
+        if(n < 2) {
+          text.setText(new byte[0]);
+          header.setText(XQUERYTIT);
+        }
+      }
+    });
 
     BaseXBack sp = new BaseXBack(Fill.NONE);
-    sp.setLayout(new TableLayout(1, 7));
+    sp.setLayout(new TableLayout(1, 9));
     sp.add(find);
     sp.add(Box.createHorizontalStrut(5));
     sp.add(open);
@@ -105,6 +132,8 @@ public final class XQueryView extends View {
     sp.add(save);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(hist);
+    sp.add(Box.createHorizontalStrut(1));
+    sp.add(close);
     b.add(sp, BorderLayout.EAST);
     add(b, BorderLayout.NORTH);
 

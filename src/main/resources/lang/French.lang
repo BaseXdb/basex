@@ -572,6 +572,7 @@ h_save=Enregistre le resultat.
 h_go=Execute la requête.
 h_stop=Stoppe le processus en cours.
 h_recent=Fichiers récemment ouverts
+h_qclose=Closes the query and clears the textfield
 h_cmd=Saisir ici vos commandes BaseX. Afficher l'aide pour avoir un aperçu de toutes les commandes disponibles. \n\nVous pouvez rappeler vos précédentes saisies en utilisant les touches HAUT et BAS.
 h_searchxml=Entrez du texte dans le champ texte pour lancer une recherche dans votre document XML. Syntaxe acceptée :\n...      Rechercher balises ou textes\n=...   Rechercher exactement ce texte\n@ ...  Rechercher attributs et valeurs d'attributs\n@=   Rechercher exactement cette valeur d'attribut\n/...     Evaluer la saisie comme requête XQuery
 h_searchfs=Entrez du texte dans le champ texte pour lancer une recherche dans votre système de fichiers. Syntaxe acceptée :\n...      Rechercher fichiers ou dossiers\n= ...  Rechercher exactement ce nom de fichier\n. ..     Rechercher extensions de fichiers\n< ...  Rechercher fichiers de taille inférieure à la taille spécifiée\n> ...  Rechercher fichiers de taille supérieure à la taille spécifiée\n\nVous pouvez entrer des commandes BaseX en insérant un point d'exclamation devant votre requête.
