@@ -387,7 +387,8 @@ public final class CommandParser extends InputParser {
       final E cmd = Enum.valueOf(cmp, t);
       if(!Cmd.class.isInstance(cmd)) return cmd;
       final Cmd c = Cmd.class.cast(cmd);
-      if(!c.help() && (internal || !c.internal())) return cmd;
+      // [CG] fix for command suggest
+      if(!c.help() && (internal || !c.internal()) && !c.hidden()) return cmd;
     } catch(final IllegalArgumentException ex) { /* will not happen. */ }
 
     final Enum<?>[] alt = list(cmp, token);
