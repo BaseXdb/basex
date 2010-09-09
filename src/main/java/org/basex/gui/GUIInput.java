@@ -146,7 +146,6 @@ public final class GUIInput extends BaseXTextField {
     final Object sel = box.getSelectedItem();
     if(sel == null) return;
     final String suf = sel.toString();
-    System.out.println(suf);
     final int pl = pre.length();
     final int ll = pl > 0 ? pre.charAt(pl - 1) : ' ';
     if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
