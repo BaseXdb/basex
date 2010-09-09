@@ -363,10 +363,10 @@ public final class GUI extends JFrame {
     // check and add default namespace
     final Namespaces ns = context.data.ns;
     final int u = ns.uri(Token.EMPTY, 0);
-    String in = qu.trim().isEmpty() ? "." : qu;
+    // [CG] fix for empty sequences
+    String in = qu.trim().isEmpty() ? "()" : qu;
     if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
         ns.uri(u), in);
-
     execute(new XQuery(in), main);
   }
 
