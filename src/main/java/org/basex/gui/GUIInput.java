@@ -146,6 +146,7 @@ public final class GUIInput extends BaseXTextField {
     final Object sel = box.getSelectedItem();
     if(sel == null) return;
     final String suf = sel.toString();
+    System.out.println(suf);
     final int pl = pre.length();
     final int ll = pl > 0 ? pre.charAt(pl - 1) : ' ';
     if(Character.isLetter(ll) && Character.isLetter(suf.charAt(0))) pre += " ";
@@ -204,7 +205,9 @@ public final class GUIInput extends BaseXTextField {
       pre = query.substring(0, qs.qm);
     } catch(final QueryException ex) {
       sl = ex.complete();
-      pre = query.substring(0, ex.col() - 1);
+      // [CG] Query Input fix
+      boolean t = ex.col() == 1;
+      pre = query.substring(0, ex.col() - (t ? 1 : 0));
     }
     if(getCaretPosition() < pre.length()) sl = null;
     createCombo(sl);
