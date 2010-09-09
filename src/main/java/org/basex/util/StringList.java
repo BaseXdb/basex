@@ -64,7 +64,17 @@ public class StringList extends ElementList implements Iterable<String> {
    * @param asc ascending/descending flag
    */
   public final void sort(final boolean cs, final boolean asc) {
-    Arrays.sort(list, 0, size, new Comparator<String>() {
+    sort(cs, asc, 0);
+  }
+  
+  /**
+   * Sorts the elements.
+   * @param cs respect case sensitivity
+   * @param asc ascending/descending flag
+   * @param pos position where sorting starts
+   */
+  public final void sort(final boolean cs, final boolean asc, final int pos) {
+    Arrays.sort(list, pos, size, new Comparator<String>() {
       @Override
       public int compare(final String s1, final String s2) {
         final int c = cs ? s1.compareTo(s2) :
