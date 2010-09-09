@@ -53,7 +53,7 @@ public class BaseXTextField extends JTextField {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(pressed(UNDO, e) || pressed(REDO, e)) {
+        if(UNDO.is(e) || REDO.is(e)) {
           final String t = getText();
           setText(last);
           last = t;
@@ -75,18 +75,18 @@ public class BaseXTextField extends JTextField {
       @Override
       public void keyPressed(final KeyEvent e) {
         final String text = getText();
-        final boolean enter = pressed(ENTER, e);
-        if(pressed(ESCAPE, e) || enter && text.isEmpty()) {
+        final boolean enter = ENTER.is(e);
+        if(ESCAPE.is(e) || enter && text.isEmpty()) {
           area.requestFocusInWindow();
-        } else if(enter || pressed(FINDNEXT, e) || pressed(FINDPREV, e)) {
-          area.find(text, pressed(FINDPREV, e) || e.isShiftDown());
+        } else if(enter || FINDNEXT.is(e) || FINDPREV.is(e)) {
+          area.find(text, FINDPREV.is(e) || e.isShiftDown());
         }
       }
       @Override
       public void keyReleased(final KeyEvent e) {
         final String text = getText();
         final char ch = e.getKeyChar();
-        if(!control(e) && Character.isDefined(ch) && !pressed(ENTER, e))
+        if(!control(e) && Character.isDefined(ch) && !ENTER.is(e))
           area.find(text, false);
         repaint();
       }

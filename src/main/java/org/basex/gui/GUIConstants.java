@@ -5,6 +5,7 @@ import static org.basex.gui.GUICommands.*;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.Event;
 import java.awt.Font;
 import javax.swing.Icon;
 import javax.swing.UIManager;
@@ -256,6 +257,17 @@ public final class GUIConstants {
   private static int[] fwidth;
   /** Bold character widths. */
   private static int[] bwidth;
+  
+  // KEYS =====================================================================
+
+  /** Shift key. */
+  public static final int SHF = Event.SHIFT_MASK;
+  /** Alt key. */
+  public static final int ALT = Event.ALT_MASK;
+  /** Ctrl key. */
+  public static final int CTRL = Event.CTRL_MASK;
+  /** Shortcut key (CTRL/META). */
+  public static final int SC = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
 
   /** Private constructor, preventing class instantiation. */
   private GUIConstants() { }

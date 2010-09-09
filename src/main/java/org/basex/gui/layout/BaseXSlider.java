@@ -156,17 +156,17 @@ public final class BaseXSlider extends BaseXPanel {
   @Override
   public void keyPressed(final KeyEvent e) {
     final int old = curr;
-    if(pressed(PREV, e) || pressed(PREVLINE, e)) {
+    if(PREV.is(e) || PREVLINE.is(e)) {
       curr = Math.max(min, curr - 1);
-    } else if(pressed(NEXT, e) || pressed(NEXTLINE, e)) {
+    } else if(NEXT.is(e) || NEXTLINE.is(e)) {
       curr = Math.min(max, curr + 1);
-    } else if(pressed(NEXTPAGE, e)) {
+    } else if(NEXTPAGE.is(e)) {
       curr = Math.max(min, curr + 10);
-    } else if(pressed(PREVPAGE, e)) {
+    } else if(PREVPAGE.is(e)) {
       curr = Math.min(max, curr - 10);
-    } else if(pressed(LINESTART, e)) {
+    } else if(LINESTART.is(e)) {
       curr = min;
-    } else if(pressed(LINEEND, e)) {
+    } else if(LINEEND.is(e)) {
       curr = max;
     }
     if(curr != old) {

@@ -335,15 +335,15 @@ public class BaseXText extends BaseXPanel {
     if(modifier(e)) return;
 
     // operations that change the focus are put first..
-    if(pressed(PREVTAB, e)) {
+    if(PREVTAB.is(e)) {
       transferFocusBackward();
       return;
     }
-    if(pressed(NEXTTAB, e)) {
+    if(NEXTTAB.is(e)) {
       transferFocus();
       return;
     }
-    if(pressed(FIND, e)) {
+    if(FIND.is(e)) {
       if(find != null) find.requestFocusInWindow();
       return;
     }
@@ -353,28 +353,28 @@ public class BaseXText extends BaseXPanel {
 
     // operations without cursor movement...
     final int fh = rend.fontH();
-    if(pressed(SCROLLDOWN, e)) {
+    if(SCROLLDOWN.is(e)) {
       scroll.pos(scroll.pos() + fh);
       return;
     }
-    if(pressed(SCROLLUP, e)) {
+    if(SCROLLUP.is(e)) {
       scroll.pos(scroll.pos() - fh);
       return;
     }
-    if(pressed(COPY, e)) {
+    if(COPY.is(e)) {
       copy();
       return;
     }
 
     // set cursor position and reset last column
     text.pos(text.cursor());
-    if(!pressed(PREVLINE, e) && !pressed(NEXTLINE, e)) lastCol = -1;
+    if(!PREVLINE.is(e) && !NEXTLINE.is(e)) lastCol = -1;
 
-    if(pressed(FINDNEXT, e) || pressed(FINDPREV, e)) {
-      find(rend.find(pressed(FINDPREV, e), true));
+    if(FINDNEXT.is(e) || FINDPREV.is(e)) {
+      find(rend.find(FINDPREV.is(e), true));
       return;
     }
-    if(pressed(SELECTALL, e)) {
+    if(SELECTALL.is(e)) {
       selectAll();
       text.setCaret();
       return;
@@ -387,65 +387,64 @@ public class BaseXText extends BaseXPanel {
     boolean consumed = true;
 
     // operations that consider the last text mark..
-    if(pressed(NEXTWORD, e)) {
+    if(NEXTWORD.is(e)) {
       text.nextToken(marking);
-    } else if(pressed(PREVWORD, e)) {
+    } else if(PREVWORD.is(e)) {
       text.prevToken(marking);
       down = false;
-    } else if(pressed(TEXTSTART, e)) {
+    } else if(TEXTSTART.is(e)) {
       if(!marking) text.noMark();
       text.pos(0);
       down = false;
-    } else if(pressed(TEXTEND, e)) {
+    } else if(TEXTEND.is(e)) {
       if(!marking) text.noMark();
       text.pos(text.size());
-    } else if(pressed(LINESTART, e)) {
+    } else if(LINESTART.is(e)) {
       text.bol(marking);
       down = false;
-    } else if(pressed(LINEEND, e)) {
+    } else if(LINEEND.is(e)) {
       text.forward(Integer.MAX_VALUE, marking);
-    } else if(pressed(NEXTPAGE, e)) {
+    } else if(NEXTPAGE.is(e)) {
       down(getHeight() / fh, marking);
-    } else if(pressed(PREVPAGE, e)) {
+    } else if(PREVPAGE.is(e)) {
       up(getHeight() / fh, marking);
       down = false;
-    } else if(pressed(NEXT, e)) {
+    } else if(NEXT.is(e)) {
       text.next(marking);
-    } else if(pressed(PREV, e)) {
+    } else if(PREV.is(e)) {
       text.prev(marking);
       down = false;
-    } else if(pressed(PREVLINE, e)) {
+    } else if(PREVLINE.is(e)) {
       up(1, marking);
       down = false;
-    } else if(pressed(NEXTLINE, e)) {
+    } else if(NEXTLINE.is(e)) {
       down(1, marking);
     } else {
       consumed = false;
     }
 
     final byte[] txt = text.text;
-    if(marking && !pressed(DELNEXT, e) && !pressed(DELPREV, e)) {
+    if(marking && !DELNEXT.is(e) && !DELPREV.is(e)) {
       // refresh scroll position
       text.endMark();
       text.checkMark();
     } else if(undo != null) {
       // edit operations...
-      if(pressed(CUT, e)) {
+      if(CUT.is(e)) {
         cut();
-      } else if(pressed(PASTE, e)) {
+      } else if(PASTE.is(e)) {
         paste();
-      } else if(pressed(UNDO, e)) {
+      } else if(UNDO.is(e)) {
         undo();
-      } else if(pressed(REDO, e)) {
+      } else if(REDO.is(e)) {
         redo();
-      } else if(pressed(DELLINEEND, e) || pressed(DELNEXTWORD, e) ||
-          pressed(DELNEXT, e)) {
+      } else if(DELLINEEND.is(e) || DELNEXTWORD.is(e) || DELNEXT.is(e)) {
         if(nomark) {
           if(text.pos() == text.size()) return;
           text.startMark();
-          if(pressed(DELNEXTWORD, e)) {
+          if(DELNEXTWORD.is(e)) {
             text.nextToken(true);
-          } else if(pressed(DELLINEEND, e)) {
+          } else if(DELLINEEND.is(e)) {
             text.forward(Integer.MAX_VALUE, true);
           } else {
             text.next(true);
@@ -453,14 +452,13 @@ public class BaseXText extends BaseXPanel {
           text.endMark();
         }
         text.delete();
-      } else if(pressed(DELLINESTART, e) || pressed(DELPREVWORD, e) ||
-          pressed(DELPREV, e)) {
+      } else if(DELLINESTART.is(e) || DELPREVWORD.is(e) || DELPREV.is(e)) {
         if(nomark) {
           if(text.pos() == 0) return;
           text.startMark();
-          if(pressed(DELPREVWORD, e)) {
+          if(DELPREVWORD.is(e)) {
             text.prevToken(true);
-          } else if(pressed(DELLINESTART, e)) {
+          } else if(DELLINESTART.is(e)) {
             text.bol(true);
           } else {
             text.prev();
@@ -538,8 +536,8 @@ public class BaseXText extends BaseXPanel {
 
   @Override
   public final void keyTyped(final KeyEvent e) {
-    if(undo == null || control(e) || pressed(DELNEXT, e) ||
-        pressed(DELPREV, e) || pressed(ESCAPE, e)) return;
+    if(undo == null || control(e) || DELNEXT.is(e) || DELPREV.is(e) ||
+        ESCAPE.is(e)) return;
 
     text.pos(text.cursor());
     if(text.start() != -1) text.delete();

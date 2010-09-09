@@ -47,7 +47,7 @@ final class DialogRename extends Dialog {
     name.addKeyListener(new KeyAdapter() {
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(!modifier(e)) action(pressed(ENTER, e) ? e.getSource() : null);
+        if(!modifier(e)) action(ENTER.is(e) ? e.getSource() : null);
       }
     });
     info = new BaseXLabel(" ");

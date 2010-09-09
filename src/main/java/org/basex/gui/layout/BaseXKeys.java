@@ -1,155 +1,133 @@
 package org.basex.gui.layout;
 
 import static java.awt.event.KeyEvent.*;
-import java.awt.Event;
+import static org.basex.gui.GUIConstants.*;
+import static org.basex.core.Prop.MAC;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import org.basex.core.Prop;
 
 /**
- * This class offers system-dependent key mappings. Each key mapping is
- * represented as an integer array. The semantics is as follows:
- * <ul>
- *   <li>The first integer defines the modifier keys
- *   <li>The second integer defines the key code
- *   <li>If a third integer is set, no other modifier keys are allowed
- * </ul>
+ * This class offers system-dependent key mappings.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class BaseXKeys {
+public enum BaseXKeys {
 
-  /** Mac OS flag. */
-  private static final boolean MAC = Prop.MAC;
-  /** Shift key. */
-  private static final int SHF = Event.SHIFT_MASK;
-  /** Alt key. */
-  private static final int ALT = Event.ALT_MASK;
-  /** Ctrl key. */
-  private static final int CTRL = Event.CTRL_MASK;
-  /** Shortcut key (CTRL/META). */
-  public static final int SC = Prop.MAC ? Event.META_MASK : Event.CTRL_MASK;
+  /** Find search term.  */ FIND(SC, VK_F, true),
+  /** Find next hit.     */ FINDNEXT(SC, VK_G, true),
+  /** Find previous hit. */ FINDPREV(SC | SHF, VK_G, true),
+  /** Select all.        */ SELECTALL(SC, VK_A, true),
+  /** Browse back.       */ GOBACK(MAC ? SC : ALT, VK_LEFT, true),
+  /** Browse back.       */ GOBACK2(VK_BACK_SPACE, true),
+  /** Browse forward.    */ GOFORWARD(MAC ? SC : ALT, VK_RIGHT, true),
+  /** Browse up.         */ GOUP(MAC ? SC : ALT, VK_UP, true),
+  /** Browse home.       */ GOHOME(MAC ? SC : ALT, VK_HOME, true),
+  /** Copy.              */ COPY(SC, VK_C, true),
+  /** Cut.               */ CUT(SC, VK_X, true),
+  /** Paste.             */ PASTE(SC, VK_V, true),
+  /** Undo.              */ UNDO(SC, VK_Z, true),
+  /** Redo.              */ REDO(MAC ? SC | SHF : SC, MAC ? VK_Z : VK_Y, true),
 
-  /** Find search term. */
-  public static final int[] FIND = { SC, VK_F, 0 };
-  /** Find next hit. */
-  public static final int[] FINDNEXT = { SC, VK_G, 0 };
-  /** Find previous hit. */
-  public static final int[] FINDPREV = { SC | SHF, VK_G, 0 };
-  /** Select all. */
-  public static final int[] SELECTALL = { SC, VK_A, 0 };
-  /** Browse back. */
-  public static final int[] GOBACK = { MAC ? SC : ALT, VK_LEFT, 0 };
-  /** Browse back. */
-  public static final int[] GOBACK2 = { 0, VK_BACK_SPACE, 0 };
-  /** Browse forward. */
-  public static final int[] GOFORWARD = { MAC ? SC : ALT, VK_RIGHT, 0 };
-  /** Browse up. */
-  public static final int[] GOUP = { MAC ? SC : ALT, VK_UP, 0 };
-  /** Browse home. */
-  public static final int[] GOHOME = { MAC ? SC : ALT, VK_HOME, 0 };
-  /** Copy. */
-  public static final int[] COPY = { SC, VK_C, 0 };
-  /** Cut. */
-  public static final int[] CUT = { SC, VK_X, 0 };
-  /** Paste. */
-  public static final int[] PASTE = { SC, VK_V, 0 };
-  /** Undo. */
-  public static final int[] UNDO = { SC, VK_Z, 0 };
-  /** Redo. */
-  public static final int[] REDO = { MAC ? SC | SHF : SC,
-      MAC ? VK_Z : VK_Y, 0 };
+  /** Word right.        */ NEXTWORD(MAC ? ALT : SC, VK_RIGHT),
+  /** Word left.         */ PREVWORD(MAC ? ALT : SC, VK_LEFT),
+  /** Right.             */ NEXT(VK_RIGHT),
+  /** Left.              */ PREV(VK_LEFT),
+  /** Up.                */ PREVLINE(VK_UP),
+  /** Down.              */ NEXTLINE(VK_DOWN),
+  /** Beginning of line. */ LINESTART (MAC ? SC : 0, MAC ? VK_LEFT : VK_HOME),
+  /** End of line.       */ LINEEND(MAC ? SC : 0, MAC ? VK_RIGHT : VK_END),
+  /** Beginning of text. */ TEXTSTART(SC, MAC ? VK_UP : VK_HOME),
+  /** End of text.       */ TEXTEND(SC, MAC ? VK_DOWN : VK_END),
+  /** Page up.           */ PREVPAGE(VK_PAGE_UP),
+  /** Page down.         */ NEXTPAGE(VK_PAGE_DOWN),
 
-  /** Word right. */
-  public static final int[] NEXTWORD = { MAC ? ALT : SC, VK_RIGHT };
-  /** Word left. */
-  public static final int[] PREVWORD = { MAC ? ALT : SC, VK_LEFT };
-  /** Right. */
-  public static final int[] NEXT = { 0, VK_RIGHT };
-  /** Left. */
-  public static final int[] PREV = { 0, VK_LEFT };
-  /** Up. */
-  public static final int[] PREVLINE = { 0, VK_UP };
-  /** Down. */
-  public static final int[] NEXTLINE = { 0, VK_DOWN };
-  /** Beginning of line. */
-  public static final int[] LINESTART =
-    { MAC ? SC : 0, MAC ? VK_LEFT : VK_HOME };
-  /** End of line. */
-  public static final int[] LINEEND = { MAC ? SC : 0, MAC ? VK_RIGHT : VK_END };
-  /** Beginning of text. */
-  public static final int[] TEXTSTART = { SC, MAC ? VK_UP : VK_HOME };
-  /** End of text. */
-  public static final int[] TEXTEND = { SC, MAC ? VK_DOWN : VK_END };
-  /** Page up. */
-  public static final int[] PREVPAGE = { 0, VK_PAGE_UP };
-  /** Page down. */
-  public static final int[] NEXTPAGE = { 0, VK_PAGE_DOWN };
+  /** Scroll up.         */ SCROLLUP(MAC ? ALT : SC, VK_UP, true),
+  /** Scroll down.       */ SCROLLDOWN(MAC ? ALT : SC, VK_DOWN, true),
 
-  /** Scroll up. */
-  public static final int[] SCROLLUP = { MAC ? ALT : SC, VK_UP, 0 };
-  /** Scroll down. */
-  public static final int[] SCROLLDOWN = { MAC ? ALT : SC, VK_DOWN, 0 };
+  /** Delete word backwards. */ DELPREVWORD(MAC ? ALT : SC, VK_BACK_SPACE,
+                                true),
+  /** Delete word.       */ DELNEXTWORD(MAC ? ALT : SC, VK_DELETE, true),
+  /** Delete line to begin. */ DELLINESTART(SC | (MAC ? 0 : SHF), VK_BACK_SPACE,
+                                true),
+  /** Delete line to end.
+   *                     */ DELLINEEND(SC | (MAC ? 0 : SHF), VK_DELETE, true),
+  /** Delete backwards.  */ DELPREV(VK_BACK_SPACE),
+  /** Delete.            */ DELNEXT(VK_DELETE),
 
-  /** Delete word backwards. */
-  public static final int[] DELPREVWORD = { MAC ? ALT : SC, VK_BACK_SPACE, 0 };
-  /** Delete word. */
-  public static final int[] DELNEXTWORD = { MAC ? ALT : SC, VK_DELETE, 0 };
-  /** Delete line to begin. */
-  public static final int[] DELLINESTART = { SC | (MAC ? 0 : SHF),
-    VK_BACK_SPACE, 0 };
-  /** Delete line to end. */
-  public static final int[] DELLINEEND = { SC | (MAC ? 0 : SHF), VK_DELETE, 0 };
-  /** Delete backwards. */
-  public static final int[] DELPREV = { 0, VK_BACK_SPACE };
-  /** Delete. */
-  public static final int[] DELNEXT = { 0, VK_DELETE };
+  /** Escape.            */ ESCAPE(VK_ESCAPE),
+  /** Next panel.        */ NEXTTAB(CTRL, VK_TAB, true),
+  /** Previous panel.    */ PREVTAB(CTRL | SHF, VK_TAB, true),
+  /** Context menu.      */ CONTEXT(VK_CONTEXT_MENU),
+  /** Space key.         */ SPACE(VK_SPACE),
+  /** Tab key.           */ TAB(VK_TAB),
+  /** Enter.             */ ENTER(VK_ENTER),
+  /** Execute.           */ EXEC(SC, VK_ENTER, true),
 
-  /** Escape. */
-  public static final int[] ESCAPE = { 0, VK_ESCAPE };
-  /** Next panel. */
-  public static final int[] NEXTTAB = { CTRL, VK_TAB, 0 };
-  /** Previous panel. */
-  public static final int[] PREVTAB = { CTRL | SHF, VK_TAB, 0 };
-  /** Context menu. */
-  public static final int[] CONTEXT = { 0, VK_CONTEXT_MENU };
-  /** Space key. */
-  public static final int[] SPACE = { 0, VK_SPACE };
-  /** Tab key. */
-  public static final int[] TAB = { 0, VK_TAB };
-  /** Enter. */
-  public static final int[] ENTER = { 0, VK_ENTER };
-  /** Execute. */
-  public static final int[] EXEC = { SC, VK_ENTER, 0 };
+  /** Increment size.    */ INCFONT1(SC, VK_PLUS, true),
+  /** Increment size (2nd variant). */ INCFONT2(SC, VK_EQUALS, true),
+  /** Decrease size.     */ DECFONT(SC, VK_MINUS, true),
+  /** Standard size.     */ NORMFONT(SC, VK_0, true),
+  /** Jump to input bar. */ INPUT1(SC, VK_L, true),
+  /** Jump to input bar. */ INPUT2(VK_F6, true);
 
-  /** Increment size. */
-  public static final int[] INCFONT1 = { SC, VK_PLUS, 0 };
-  /** Increment size (2nd variant). */
-  public static final int[] INCFONT2 = { SC, VK_EQUALS, 0 };
-  /** Decrease size. */
-  public static final int[] DECFONT = { SC, VK_MINUS, 0 };
-  /** Standard size. */
-  public static final int[] NORMFONT = { SC, VK_0, 0 };
-  /** Jump to input bar. */
-  public static final int[] INPUT1 = { SC, VK_L, 0 };
-  /** Jump to input bar. */
-  public static final int[] INPUT2 = { 0, VK_F6, 0 };
-
-  /** Private constructor. */
-  private BaseXKeys() { }
+  /** Modifiers. */
+  private final int mod;
+  
+  /** Key. */
+  private final int key;
+  
+  /** Exclusive modifiers flag. */
+  private final boolean excl;
+  
+  /**
+   * Constructor.
+   * @param m modifiers
+   * @param k key code
+   * @param ex modifiers exclusive
+   */
+  private BaseXKeys(final int m, final int k, final boolean ex) {
+    mod = m;
+    key = k;
+    excl = ex;
+  }
+  
+  /**
+   * Constructor for non-exclusive modifiers.
+   * @param m modifiers
+   * @param k key code
+   */
+  private BaseXKeys(final int m, final int k) {
+    this(m, k, false);
+  }
+  
+  /**
+   * Constructor for ignoring modifiers.
+   * @param k key code
+   * @param ig ignore modifiers
+   */
+  private BaseXKeys(final int k, final boolean ig) {
+    this(0, k, ig);
+  }
+  
+  /**
+   * Constructor without modifiers.
+   * @param k key code
+   */
+  private BaseXKeys(final int k) {
+    this(0, k);
+  }
 
   /**
    * Returns true if the specified key combination was pressed.
-   * @param op operation
    * @param e key event
    * @return result of check
    */
-  public static boolean pressed(final int[] op, final KeyEvent e) {
+  public boolean is(final KeyEvent e) {
     final int code = e.getKeyCode() == 0 ? e.getKeyChar() : e.getKeyCode();
-    int mod = e.getModifiers();
-    if(op.length != 3) mod &= op[0];
-    return mod == op[0] && code == op[1];
+    int m = e.getModifiers();
+    if(!excl) m &= mod;
+    return m == mod && code == key;
   }
 
   /**

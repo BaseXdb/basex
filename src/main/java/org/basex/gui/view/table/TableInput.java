@@ -68,20 +68,20 @@ final class TableInput implements Runnable {
    * @param e key event
    */
   void code(final KeyEvent e) {
-    if(pressed(ENTER, e) || text == null) stop();
+    if(ENTER.is(e) || text == null) stop();
 
     flashing = true;
-    if(pressed(LINESTART, e)) {
+    if(LINESTART.is(e)) {
       pos = 0;
-    } else if(pressed(LINEEND, e)) {
+    } else if(LINEEND.is(e)) {
       pos = text.length();
-    } else if(pressed(PREV, e)) {
+    } else if(PREV.is(e)) {
       pos = Math.max(0, pos - 1);
-    } else if(pressed(NEXT, e)) {
+    } else if(NEXT.is(e)) {
       pos = Math.min(text.length(), pos + 1);
-    } else if(pressed(DELPREV, e)) {
+    } else if(DELPREV.is(e)) {
       if(pos > 0) text = text.substring(0, pos - 1) + text.substring(pos--);
-    } else if(pressed(DELNEXT, e)) {
+    } else if(DELNEXT.is(e)) {
       if(pos < text.length()) {
         text = text.substring(0, pos) + text.substring(pos + 1);
       }
@@ -95,7 +95,7 @@ final class TableInput implements Runnable {
    */
   boolean add(final KeyEvent e) {
     // backspace/delete...
-    if(pressed(DELNEXT, e) || pressed(DELPREV, e)) return true;
+    if(DELNEXT.is(e) || DELPREV.is(e)) return true;
     // skip other control chars
     final char ch = e.getKeyChar();
     if(ch < ' ') return false;

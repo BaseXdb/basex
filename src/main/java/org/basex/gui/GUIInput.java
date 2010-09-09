@@ -62,7 +62,7 @@ public final class GUIInput extends BaseXTextField {
       @Override
       public void keyPressed(final KeyEvent e) {
         final int count = box.getItemCount();
-        if(pressed(ENTER, e)) {
+        if(ENTER.is(e)) {
           if(pop.isVisible()) {
             completeInput();
           } else {
@@ -91,13 +91,13 @@ public final class GUIInput extends BaseXTextField {
         if(count == 0) return;
 
         int bi = box.getSelectedIndex();
-        if(pressed(NEXTLINE, e)) {
+        if(NEXTLINE.is(e)) {
           if(!pop.isVisible()) {
             showPopup();
           } else {
             if(++bi == count) bi = 0;
           }
-        } else if(pressed(PREVLINE, e)) {
+        } else if(PREVLINE.is(e)) {
           if(!pop.isVisible()) {
             showPopup();
           } else {
@@ -109,11 +109,11 @@ public final class GUIInput extends BaseXTextField {
 
       @Override
       public void keyReleased(final KeyEvent e) {
-        if(pressed(ESCAPE, e)) {
+        if(ESCAPE.is(e)) {
           pop.setVisible(false);
-        } else if(pressed(ENTER, e)) {
+        } else if(ENTER.is(e)) {
           pop.hide();
-        } else if(!pressed(NEXTLINE, e) && !pressed(PREVLINE, e)) {
+        } else if(!NEXTLINE.is(e) && !PREVLINE.is(e)) {
           if(modifier(e) || control(e)) return;
           showPopup();
           // skip commands

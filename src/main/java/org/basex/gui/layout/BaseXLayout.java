@@ -127,10 +127,10 @@ public final class BaseXLayout {
             if(((BaseXCombo) e.getSource()).isPopupVisible()) return;
           }
           // process key events
-          if(pressed(ENTER, e)) {
+          if(ENTER.is(e)) {
             final Object s = e.getSource();
             if(!(s instanceof BaseXButton || s instanceof BaseXText)) d.close();
-          } else if(pressed(ESCAPE, e)) {
+          } else if(ESCAPE.is(e)) {
             d.cancel();
           }
         }
@@ -144,28 +144,28 @@ public final class BaseXLayout {
       public void keyPressed(final KeyEvent e) {
         // browse back/forward
         if(gui.context.data != null) {
-          if(pressed(GOBACK, e)) {
+          if(GOBACK.is(e)) {
             GUICommands.GOBACK.execute(gui);
-          } else if(pressed(GOFORWARD, e)) {
+          } else if(GOFORWARD.is(e)) {
             GUICommands.GOFORWARD.execute(gui);
-          } else if(pressed(GOUP, e)) {
+          } else if(GOUP.is(e)) {
             GUICommands.GOUP.execute(gui);
-          } else if(pressed(GOHOME, e)) {
+          } else if(GOHOME.is(e)) {
             GUICommands.GOHOME.execute(gui);
           }
         }
 
-        if(pressed(INPUT1, e) || pressed(INPUT2, e)) {
+        if(INPUT1.is(e) || INPUT2.is(e)) {
           gui.input.requestFocusInWindow();
         }
 
         final int fs = gui.prop.num(GUIProp.FONTSIZE);
         int nfs = fs;
-        if(pressed(INCFONT1, e) || pressed(INCFONT2, e)) {
+        if(INCFONT1.is(e) || INCFONT2.is(e)) {
           nfs = fs + 1;
-        } else if(pressed(DECFONT, e)) {
+        } else if(DECFONT.is(e)) {
           nfs = Math.max(1, fs - 1);
-        } else if(pressed(NORMFONT, e)) {
+        } else if(NORMFONT.is(e)) {
           nfs = 12;
         }
         if(fs != nfs) {

@@ -59,7 +59,7 @@ final class XQueryText extends BaseXText {
   @Override
   public void keyReleased(final KeyEvent e) {
     super.keyReleased(e);
-    if(!e.isActionKey() && !modifier(e)) release(pressed(EXEC, e));
+    if(!e.isActionKey() && !modifier(e)) release(EXEC.is(e));
   }
 
   @Override

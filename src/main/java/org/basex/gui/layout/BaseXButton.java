@@ -45,7 +45,7 @@ public final class BaseXButton extends JButton {
     addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(final KeyEvent e) {
-        if(pressed(ESCAPE, e)) d.cancel();
+        if(ESCAPE.is(e)) d.cancel();
       }
     });
   }

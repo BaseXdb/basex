@@ -323,17 +323,17 @@ public final class TableView extends View implements Runnable {
     int pre = oldPre;
 
     final IntList rows = tdata.rows;
-    if(pressed(LINESTART, e)) {
+    if(LINESTART.is(e)) {
       pre = rows.get(0);
-    } else if(pressed(LINEEND, e)) {
+    } else if(LINEEND.is(e)) {
       pre = rows.get(rows.size() - 1);
-    } else if(pressed(PREVLINE, e)) {
+    } else if(PREVLINE.is(e)) {
       pre = rows.get(Math.max(0, getOff(pre) - 1));
-    } else if(pressed(NEXTLINE, e)) {
+    } else if(NEXTLINE.is(e)) {
       pre = rows.get(Math.min(rows.size() - 1, getOff(pre) + 1));
-    } else if(pressed(PREVPAGE, e)) {
+    } else if(PREVPAGE.is(e)) {
       pre = rows.get(Math.max(0, getOff(pre) - lines));
-    } else if(pressed(NEXTPAGE, e)) {
+    } else if(NEXTPAGE.is(e)) {
       pre = rows.get(Math.min(rows.size() - 1, getOff(pre) + lines));
     }
 

@@ -375,12 +375,12 @@ final class TableHeader extends BaseXPanel {
     if(tdata.roots.size() == 0 || box == null || control(e) || inputCol == -1)
       return;
 
-    if(pressed(ENTER, e)) {
+    if(ENTER.is(e)) {
       box.stop();
       inputCol = -1;
       final Nodes marked = view.gui.context.marked;
       if(marked.size() != 0) view.gui.notify.context(marked, false, null);
-    } else if(pressed(TAB, e)) {
+    } else if(TAB.is(e)) {
       if(box != null) {
         tdata.cols[inputCol].filter = box.text;
         box.stop();

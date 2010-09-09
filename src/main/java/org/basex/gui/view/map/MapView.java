@@ -569,8 +569,8 @@ public final class MapView extends View implements Runnable {
     super.keyPressed(e);
     if(gui.updating || mainRects == null || control(e)) return;
 
-    final boolean cursor = pressed(PREVLINE, e) || pressed(NEXTLINE, e) ||
-      pressed(PREV, e) || pressed(NEXT, e);
+    final boolean cursor = PREVLINE.is(e) || NEXTLINE.is(e) ||
+        PREV.is(e) || NEXT.is(e);
     if(!cursor) return;
 
     if(focused == null) focused = mainRects.get(0);
@@ -578,16 +578,16 @@ public final class MapView extends View implements Runnable {
     final int fs = gui.prop.num(GUIProp.FONTSIZE);
     int o = fs + 4;
     final boolean shift = e.isShiftDown();
-    if(pressed(PREVLINE, e)) {
+    if(PREVLINE.is(e)) {
       mouseY = focused.y + (shift ? focused.h - fs : 0) - 1;
       if(shift) mouseX = focused.x + (focused.w >> 1);
-    } else if(pressed(NEXTLINE, e)) {
+    } else if(NEXTLINE.is(e)) {
       mouseY = focused.y + (shift ? o : focused.h + 1);
       if(shift) mouseX = focused.x + (focused.w >> 1);
-    } else if(pressed(PREV, e)) {
+    } else if(PREV.is(e)) {
       mouseX = focused.x + (shift ? focused.w - fs : 0) - 1;
       if(shift) mouseY = focused.y + (focused.h >> 1);
-    } else if(pressed(NEXT, e)) {
+    } else if(NEXT.is(e)) {
       mouseX = focused.x + (shift ? o : focused.w + 1);
       if(shift) mouseY = focused.y + (focused.h >> 1);
     }
