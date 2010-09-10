@@ -71,6 +71,8 @@ public final class CommandParser extends InputParser {
   private final Context ctx;
   /** Flag for including internal commands. */
   private final boolean internal;
+  /** Flag for command input in gui. */
+  private boolean gui;
 
   /**
    * Constructor, parsing the input queries.
@@ -120,6 +122,17 @@ public final class CommandParser extends InputParser {
       if(!more()) return list;
       if(!consume(';')) help(null, cmd);
     }
+  }
+  
+  /**
+   * Parses the input and returns a command list.
+   * @param g flag for input completion
+   * @return commands
+   * @throws QueryException query exception
+   */
+  public Command[] parse(final boolean g) throws QueryException {
+    gui = g;
+    return parse();
   }
 
   /**
@@ -388,7 +401,7 @@ public final class CommandParser extends InputParser {
       if(!Cmd.class.isInstance(cmd)) return cmd;
       final Cmd c = Cmd.class.cast(cmd);
       // [CG] fix for command suggest
-      if(!c.help() && (internal || !c.internal()) && !c.hidden()) return cmd;
+      if(!c.help() && (internal || !c.internal()) && !gui) return cmd;
     } catch(final IllegalArgumentException ex) { /* will not happen. */ }
 
     final Enum<?>[] alt = list(cmp, token);
