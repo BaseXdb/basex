@@ -3,12 +3,13 @@ package org.basex.query.item;
 import static org.basex.query.QueryText.*;
 import java.text.SimpleDateFormat;
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
  * DateTime item.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -76,5 +77,12 @@ public final class Dtm extends Date {
       throws QueryException {
     this(d);
     calc(a, p, ii);
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof Dtm)) return false;
+    final Dtm dtm = (Dtm) cmp;
+    return type == dtm.type && xc.equals(dtm.xc);
   }
 }

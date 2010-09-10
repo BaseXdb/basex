@@ -228,13 +228,13 @@ final class FNFile extends Fun {
     FileOutputStream out = null;
     try {
       out = new FileOutputStream(file);
+      try {
       out.write(b64.getVal());
+      } finally {
+        out.close();
+      }
     } catch(IOException ex) {
       Err.or(input, QueryText.FILEWRITE, file.getName());
-    } finally {
-      try {
-        out.close();
-      } catch(final Exception ex) { }
     }
     return null;
   }
@@ -342,23 +342,22 @@ final class FNFile extends Fun {
 
     // Raise an exception if the directory cannot be created because
     // a file with the same name already exists
-    if(file.exists()) if(!file.isDirectory()) 
-      Err.or(input, QueryText.FILEEXISTS, file.getName());
+    if(file.exists()) if(!file.isDirectory()) Err.or(input,
+        QueryText.FILEEXISTS, file.getName());
 
     if(includeParents) {
 
       // Raise an exception if the existent directory, in which
       // the dirs are to be created, is write-protected
       final File parent = getExistingParent(file);
-      if(!parent.canWrite())
-        Err.or(input, QueryText.MKDIR, file.getPath(), parent.getPath());
+      if(!parent.canWrite()) Err.or(input, QueryText.MKDIR, file.getPath(),
+          parent.getPath());
 
-      if(!file.mkdirs())
-        Err.or(input, QueryText.CANNOTMKDIR, file.getPath());
+      if(!file.mkdirs()) Err.or(input, QueryText.CANNOTMKDIR, file.getPath());
+    } else {
+
+      if(!file.mkdir()) Err.or(input, QueryText.CANNOTMKDIR, file.getPath());
     }
-
-      if(!file.mkdir())
-        Err.or(input, QueryText.CANNOTMKDIR, file.getPath());
 
     return null;
   }
@@ -386,17 +385,14 @@ final class FNFile extends Fun {
    */
   private Item delete(final File file) throws QueryException {
 
-    if(!file.exists())
-      Err.or(input, QueryText.FILENOTEXISTS, file.getPath());
+    if(!file.exists()) Err.or(input, QueryText.FILENOTEXISTS, file.getPath());
 
-    if(!file.canWrite())
-      Err.or(input, QueryText.FILEDEL, file.getPath());
+    if(!file.canWrite()) Err.or(input, QueryText.FILEDEL, file.getPath());
 
-    if(file.isDirectory() && file.listFiles().length != 0) 
-      Err.or(input, QueryText.FILEDELDIR, file.getPath());
+    if(file.isDirectory() && file.listFiles().length != 0) Err.or(input,
+        QueryText.FILEDELDIR, file.getPath());
 
-    if(!file.delete())
-      Err.or(input, QueryText.CANNOTDEL, file.getPath());
+    if(!file.delete()) Err.or(input, QueryText.CANNOTDEL, file.getPath());
 
     return null;
   }

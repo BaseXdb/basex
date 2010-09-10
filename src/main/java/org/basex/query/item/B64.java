@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import org.basex.query.QueryException;
+import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
@@ -8,7 +9,7 @@ import org.basex.util.Util;
 
 /**
  * Base64Binary item. Derived from java.util.prefs.Base64.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -27,7 +28,8 @@ public final class B64 extends Item {
   public B64(final byte[] d, final InputInfo ii) throws QueryException {
     super(Type.B6B);
     final TokenBuilder tb = new TokenBuilder();
-    for(final byte c : d) if(c < 0 || c > ' ') tb.add(c);
+    for(final byte c : d)
+      if(c < 0 || c > ' ') tb.add(c);
     b2h(tb.finish(), ii);
   }
 
@@ -184,6 +186,13 @@ public final class B64 extends Item {
    */
   public byte[] getVal() {
     return val;
+  }
+
+  @Override
+  public boolean sameAs(final Expr cmp) {
+    if(!(cmp instanceof B64)) return false;
+    final B64 i = (B64) cmp;
+    return type == i.type && Token.eq(val, i.val);
   }
 
 }
