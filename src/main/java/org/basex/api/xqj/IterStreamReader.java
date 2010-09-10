@@ -73,25 +73,25 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getAttributeLocalName(final int i) {
     getAttributes();
-    return string(atts.item[i].nname());
+    return string(atts.get(i).nname());
   }
 
   @Override
   public QName getAttributeName(final int i) {
     getAttributes();
-    return atts.item[i].qname().toJava();
+    return atts.get(i).qname().toJava();
   }
 
   @Override
   public String getAttributeNamespace(final int i) {
     getAttributes();
-    return string(atts.item[i].qname().uri().atom());
+    return string(atts.get(i).qname().uri().atom());
   }
 
   @Override
   public String getAttributePrefix(final int i) {
     getAttributes();
-    return string(atts.item[i].qname().pref());
+    return string(atts.get(i).qname().pref());
   }
 
   @Override
@@ -110,7 +110,7 @@ final class IterStreamReader implements XMLStreamReader {
   @Override
   public String getAttributeValue(final int i) {
     getAttributes();
-    return string(atts.item[i].atom());
+    return string(atts.get(i).atom());
   }
 
   @Override
