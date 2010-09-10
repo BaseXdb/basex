@@ -40,7 +40,7 @@ public final class Instance extends Single {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+  public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return Bln.get(seq.instance(ctx.iter(expr)));
   }

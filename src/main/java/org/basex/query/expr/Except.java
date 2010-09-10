@@ -107,7 +107,7 @@ public final class Except extends Arr {
    * @throws QueryException query exception
    */
   private NodeIter eval(final Iter[] iter) throws QueryException {
-    final NodIter ni = new NodIter(true);
+    final NodIter ni = new NodIter().random();
 
     Item it;
     while((it = iter[0].next()) != null) {

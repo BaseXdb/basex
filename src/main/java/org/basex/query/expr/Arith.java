@@ -43,16 +43,16 @@ public final class Arith extends Arr {
       s0.one() && s1.one() ? SeqType.ITEM : SeqType.ITEM_ZO;
 
     return optPre(oneEmpty() ? Empty.SEQ : values() ?
-        atomic(ctx, input) : this, ctx);
+        item(ctx, input) : this, ctx);
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Item a = expr[0].atomic(ctx, input);
+    final Item a = expr[0].item(ctx, input);
     if(a == null) return null;
-    final Item b = expr[1].atomic(ctx, input);
+    final Item b = expr[1].item(ctx, input);
     if(b == null) return null;
     return calc.ev(input, a, b);
   }

@@ -38,9 +38,9 @@ public final class Context extends Simple {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return checkCtx(ctx).atomic(ctx, input);
+    return checkCtx(ctx).item(ctx, input);
   }
 
   @Override

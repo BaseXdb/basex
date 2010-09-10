@@ -27,11 +27,11 @@ public class Scored extends Arr {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     // binds a score value to the operand
-    final Item it = expr[0].atomic(ctx, input);
+    final Item it = expr[0].item(ctx, input);
     it.score(checkDbl(expr[1], ctx));
     return it;
   }

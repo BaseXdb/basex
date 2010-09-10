@@ -92,16 +92,16 @@ public final class CmpN extends Arr {
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
     return optPre(oneEmpty() ? Empty.SEQ : values() ?
-        atomic(ctx, input) : this, ctx);
+        item(ctx, input) : this, ctx);
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+  public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Item a = expr[0].atomic(ctx, input);
+    final Item a = expr[0].item(ctx, input);
     if(a == null) return null;
-    final Item b = expr[1].atomic(ctx, input);
+    final Item b = expr[1].item(ctx, input);
     if(b == null) return null;
     return Bln.get(op.e(checkNode(a), checkNode(b)));
   }

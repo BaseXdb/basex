@@ -62,7 +62,7 @@ public final class Union extends Arr {
    * @throws QueryException query exception
    */
   public NodeIter eval(final Iter[] iter) throws QueryException {
-    final NodIter ni = new NodIter(true);
+    final NodIter ni = new NodIter().random();
     for(final Iter ir : iter) {
       Item it;
       while((it = ir.next()) != null) {

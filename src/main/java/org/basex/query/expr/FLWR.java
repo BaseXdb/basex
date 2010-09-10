@@ -105,7 +105,7 @@ public final class FLWR extends FLWOR {
           iter[f].get(n);
           o -= n * s;
         }
-        return ret.atomic(ctx, input);
+        return ret.item(ctx, input);
       }
 
       @Override

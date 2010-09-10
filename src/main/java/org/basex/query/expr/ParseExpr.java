@@ -44,12 +44,12 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final Item it = atomic(ctx, input);
+    final Item it = item(ctx, input);
     return it != null ? it.iter(ctx) : Iter.EMPTY;
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     final Iter ir = iter(ctx);
@@ -64,7 +64,7 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final Value v = type().one() ? atomic(ctx, input) : ctx.iter(this).finish();
+    final Value v = type().one() ? item(ctx, input) : ctx.iter(this).finish();
     return v == null ? Empty.SEQ : v;
   }
 
@@ -105,7 +105,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   public final Expr preEval(final QueryContext ctx) throws QueryException {
-    return optPre(atomic(ctx, input), ctx);
+    return optPre(item(ctx, input), ctx);
   }
 
   /**
@@ -165,7 +165,7 @@ public abstract class ParseExpr extends Expr {
   protected final double checkDbl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
-    final Item it = checkEmptyType(e.atomic(ctx, input), Type.DBL);;
+    final Item it = checkEmptyType(e.item(ctx, input), Type.DBL);;
     if(!it.unt() && !it.num()) Err.number(this, it);
     return it.dbl(input);
   }
@@ -180,7 +180,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final long checkItr(final Expr e, final QueryContext ctx)
       throws QueryException {
-    return checkItr(checkEmptyType(e.atomic(ctx, input), Type.ITR));
+    return checkItr(checkEmptyType(e.item(ctx, input), Type.ITR));
   }
 
   /**
@@ -269,7 +269,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item checkItem(final Expr e, final QueryContext ctx)
       throws QueryException {
-    return checkEmpty(e.atomic(ctx, input));
+    return checkEmpty(e.item(ctx, input));
   }
 
   /**
@@ -320,7 +320,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final byte[] checkEStr(final Expr e, final QueryContext ctx)
       throws QueryException {
-    return checkEStr(e.atomic(ctx, input));
+    return checkEStr(e.item(ctx, input));
   }
 
   /**

@@ -54,7 +54,7 @@ public final class Or extends Logical {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     double d = 0;
     boolean f = false;

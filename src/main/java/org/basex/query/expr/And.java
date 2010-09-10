@@ -62,7 +62,7 @@ public final class And extends Logical {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+  public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     double s = 0;
     for(final Expr e : expr) {

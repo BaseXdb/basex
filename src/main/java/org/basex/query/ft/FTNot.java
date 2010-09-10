@@ -35,9 +35,9 @@ public final class FTNot extends FTExpr {
   }
 
   @Override
-  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+  public FTItem item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return not(ctx, expr[0].atomic(ctx, input));
+    return not(ctx, expr[0].item(ctx, input));
   }
 
   @Override

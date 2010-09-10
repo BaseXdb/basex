@@ -394,7 +394,7 @@ public class AxisPath extends Path {
         r.type != Type.DOC || !((Nod) lvalue).is((Nod) r)) {
 
       lvalue = r;
-      citer = new NodIter(true);
+      citer = new NodIter().random();
       if(r != null) {
         final Iter ir = ctx.iter(r);
         while((r = ir.next()) != null) {

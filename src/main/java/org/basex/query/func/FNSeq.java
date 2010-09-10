@@ -31,11 +31,11 @@ final class FNSeq extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
       case HEAD: return head(ctx);
-      default:   return super.atomic(ctx, ii);
+      default:   return super.item(ctx, ii);
     }
   }
 
@@ -75,7 +75,7 @@ final class FNSeq extends Fun {
    */
   private Item head(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    return e.item() || e.type().zeroOrOne() ? e.atomic(ctx, input) :
+    return e.item() || e.type().zeroOrOne() ? e.item(ctx, input) :
       e.iter(ctx).next();
   }
 

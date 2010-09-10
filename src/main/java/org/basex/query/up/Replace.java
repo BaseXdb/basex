@@ -46,7 +46,7 @@ public final class Replace extends Update {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
     if(c.errAtt) Err.or(input, UPNOATTRPER);

@@ -174,12 +174,12 @@ public final class CmpV extends Cmp {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+  public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Item a = expr[0].atomic(ctx, input);
+    final Item a = expr[0].item(ctx, input);
     if(a == null) return null;
-    final Item b = expr[1].atomic(ctx, input);
+    final Item b = expr[1].item(ctx, input);
     if(b == null) return null;
 
     if(!a.comparable(b)) Err.or(input, XPTYPECMP, a.type, b.type);

@@ -45,10 +45,10 @@ public final class Unary extends Single {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Item it = expr.atomic(ctx, input);
+    final Item it = expr.item(ctx, input);
     if(it == null) return null;
 
     if(!it.unt() && !it.num()) Err.number(this, it);

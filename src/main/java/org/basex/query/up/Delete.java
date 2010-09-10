@@ -29,7 +29,7 @@ public final class Delete extends Update {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Iter t = ctx.iter(expr[0]);
     Item i;

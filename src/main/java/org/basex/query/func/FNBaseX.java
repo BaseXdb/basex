@@ -56,7 +56,7 @@ final class FNBaseX extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
       case READ:   return read(ctx);
@@ -64,7 +64,7 @@ final class FNBaseX extends Fun {
       case DB:     return db(ctx);
       case NODEID: return nodeId(ctx);
       case FSPATH: return fspath(ctx);
-      default:     return super.atomic(ctx, ii);
+      default:     return super.item(ctx, ii);
     }
   }
 
@@ -141,7 +141,7 @@ final class FNBaseX extends Fun {
     while((it = iter.next()) != null) {
       if(first) first = false;
       else tb.add('\n');
-      tb.add(data.fs.path(((DBNode) it.atomic(ctx, input)).pre, false));
+      tb.add(data.fs.path(((DBNode) it.item(ctx, input)).pre, false));
     }
     return tb.size() == 0 ? Str.ZERO : Str.get(tb.finish());
   }
@@ -170,7 +170,7 @@ final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Itr nodeId(final QueryContext ctx) throws QueryException {
-    final Nod node = checkNode(expr[0].atomic(ctx, input));
+    final Nod node = checkNode(expr[0].item(ctx, input));
     if(!(node instanceof DBNode)) Err.type(this, Type.NOD, node);
     final DBNode dbnode = (DBNode) node;
     return Itr.get(dbnode.data.id(dbnode.pre));

@@ -79,7 +79,7 @@ public final class FNFileTest {
   /** Test function file:read-binary. */
   @Test
   public void testReadBinary() {
-    atomic(FunDef.READBINARY, Str.get("readme.txt"));
+    atomic(FunDef.READBIN, Str.get("readme.txt"));
   }
 
   /** Test function file:delete. */
@@ -114,7 +114,7 @@ public final class FNFileTest {
    */
   private Item atomic(final FunDef def, final Expr... args) {
     try {
-      return def.newInstance(null, args).atomic(qc, null);
+      return def.newInstance(null, args).item(qc, null);
     } catch(final QueryException ex) {
       Util.notexpected(ex);
       return null;

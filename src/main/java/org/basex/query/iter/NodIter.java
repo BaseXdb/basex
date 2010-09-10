@@ -13,42 +13,42 @@ import org.basex.util.Array;
  * @author Christian Gruen
  */
 public final class NodIter extends NodeIter {
-  /** Items. */
+  /** Node container. */
   public Nod[] item;
-  /** Size. */
+  /** Number of ize. */
   private int size;
-  /** Iterator. */
+  /** Current iterator position. */
   private int pos = -1;
   /** Sort flag. */
   private boolean sort;
-  /** Flag for potential duplicates. */
-  private boolean dupl;
+  /** Flag for potential duplicates and unsorted entries. */
+  private boolean random;
 
   /**
    * Constructor.
    */
   public NodIter() {
-    this(false);
-  }
-
-  /**
-   * Constructor.
-   * @param d flag indicating potential duplicates
-   */
-  public NodIter(final boolean d) {
     item = new Nod[1];
-    dupl = d;
   }
 
   /**
-   * Constructor, specifying an array of sorted nodes.
+   * Constructor, specifying an initial array of sorted nodes.
    * @param it node array
    * @param s size
    */
   public NodIter(final Nod[] it, final int s) {
-    dupl = false;
     item = it;
     size = s;
+  }
+
+  /**
+   * Sets the internal duplicate flag, which indicates that duplicate and
+   * unordered nodes might be added to this iterator.
+   * @return self reference
+   */
+  public NodIter random() {
+    random = true;
+    return this;
   }
 
   /**
@@ -78,7 +78,7 @@ public final class NodIter extends NodeIter {
       System.arraycopy(item, 0, tmp, 0, size);
       item = tmp;
     }
-    if(dupl && !sort) sort = size != 0 && item[size - 1].diff(n) > 0;
+    if(random && !sort && size != 0) sort = item[size - 1].diff(n) > 0;
     item[size++] = n;
   }
 
@@ -90,7 +90,7 @@ public final class NodIter extends NodeIter {
 
   @Override
   public Nod next() {
-    if(dupl) sort(sort);
+    if(random) sort(sort);
     return ++pos < size ? item[pos] : null;
   }
 
@@ -114,7 +114,7 @@ public final class NodIter extends NodeIter {
 
   @Override
   public Value finish() {
-    if(dupl) sort(sort);
+    if(random) sort(sort);
     return Seq.get(item, size);
   }
 
@@ -124,7 +124,7 @@ public final class NodIter extends NodeIter {
    * @return result of check
    */
   public boolean dbnodes() {
-    if(dupl) sort(sort);
+    if(random) sort(sort);
 
     if(size == 0 || !(item[0] instanceof DBNode)) return false;
     final DBNode n = (DBNode) item[0];
@@ -161,7 +161,7 @@ public final class NodIter extends NodeIter {
    * @return self reference
    */
   public NodIter sort() {
-    if(dupl) sort(sort);
+    if(random) sort(sort);
     return this;
   }
 
@@ -170,7 +170,7 @@ public final class NodIter extends NodeIter {
    * @param force force sort
    */
   private void sort(final boolean force) {
-    dupl = false;
+    random = false;
     if(size > 1) {
       // sort arrays and remove duplicates
       if(force) sort(0, size);

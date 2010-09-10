@@ -34,7 +34,7 @@ final class FNContext extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Iter[] arg = new Iter[expr.length];
     for(int a = 0; a < expr.length; ++a) arg[a] = ctx.iter(expr[a]);
@@ -46,7 +46,7 @@ final class FNContext extends Fun {
       case IMPLZONE:  return implZone();
       case COLLAT:    return ctx.baseURI.resolve(ctx.collation);
       case STBASEURI: return ctx.baseURI != Uri.EMPTY ? ctx.baseURI : null;
-      default: return super.atomic(ctx, ii);
+      default: return super.item(ctx, ii);
     }
   }
 

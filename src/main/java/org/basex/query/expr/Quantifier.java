@@ -59,7 +59,7 @@ public final class Quantifier extends ParseExpr {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+  public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     final Iter[] iter = new Iter[fl.length];

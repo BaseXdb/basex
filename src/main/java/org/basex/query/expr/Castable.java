@@ -40,9 +40,9 @@ public final class Castable extends Single {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx, final InputInfo ii) {
+  public Bln item(final QueryContext ctx, final InputInfo ii) {
     try {
-      final Item it = expr.atomic(ctx, input);
+      final Item it = expr.item(ctx, input);
       seq.cast(it, this, ctx, input);
       return Bln.TRUE;
     } catch(final QueryException ex) {

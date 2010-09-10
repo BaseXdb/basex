@@ -237,7 +237,7 @@ public enum FunDef {
   /** XQuery function */
   READFILE(FILEURI, FNFile.class, 1, 2, "read-file(filepath, encoding?)", STR),
   /** XQuery function */
-  READBINARY(FILEURI, FNFile.class, 1, 1, "read-binary(filepath)", B64),
+  READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(filepath)", B64),
   /** XQuery function */
   WRITE(FILEURI, FNFile.class, 2, 3, "write(filepath, data, params?)", ITEM_Z),
   /** XQuery function */

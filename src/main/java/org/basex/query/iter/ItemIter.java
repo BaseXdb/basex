@@ -18,11 +18,11 @@ import org.basex.util.TokenBuilder;
  * @author Christian Gruen
  */
 public final class ItemIter extends Iter implements Result {
-  /** Items. */
+  /** Item container. */
   public Item[] item;
-  /** Size. */
+  /** Number of items. */
   private int size;
-  /** Iterator. */
+  /** Current iterator position. */
   private int pos = -1;
 
   /**
@@ -144,8 +144,7 @@ public final class ItemIter extends Iter implements Result {
 
   @Override
   public Item get(final long i) {
-    if(i >= size) System.out.println("!");
-    return i < size ? item[(int) i] : null;
+    return item[(int) i];
   }
 
   @Override

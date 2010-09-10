@@ -60,7 +60,7 @@ public final class InterSect extends Arr {
     final boolean db = ni.dbnodes();
 
     for(int e = 1; e != expr.length && ni.size() != 0; ++e) {
-      final NodIter res = new NodIter(true);
+      final NodIter res = new NodIter().random();
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
         if(!it.node()) Err.type(this, Type.NOD, it);

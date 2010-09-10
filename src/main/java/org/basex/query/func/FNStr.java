@@ -41,14 +41,14 @@ final class FNStr extends Fun {
 
     switch(def) {
       case STCODE:
-        return str2cp(e.atomic(ctx, input));
+        return str2cp(e.item(ctx, input));
       default:
         return super.iter(ctx);
     }
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Expr e = expr[0];
 
@@ -57,14 +57,14 @@ final class FNStr extends Fun {
         return cp2str(e.iter(ctx));
       case COMPARE:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        Item it1 = e.atomic(ctx, input);
-        Item it2 = expr[1].atomic(ctx, input);
+        Item it1 = e.item(ctx, input);
+        Item it2 = expr[1].item(ctx, input);
         if(it1 == null || it2 == null) return null;
         final int d = diff(checkEStr(it1), checkEStr(it2));
         return Itr.get(Math.max(-1, Math.min(1, d)));
       case CODEPNT:
-        it1 = e.atomic(ctx, input);
-        it2 = expr[1].atomic(ctx, input);
+        it1 = e.item(ctx, input);
+        it2 = expr[1].item(ctx, input);
         if(it1 == null || it2 == null) return null;
         return Bln.get(eq(checkEStr(it1), checkEStr(it2)));
       case STRJOIN:
@@ -89,17 +89,17 @@ final class FNStr extends Fun {
         return concat(ctx);
       case CONTAINS:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        Item it = expr[1].atomic(ctx, input);
+        Item it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(contains(checkEStr(e, ctx), checkEStr(it)));
       case STARTS:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        it = expr[1].atomic(ctx, input);
+        it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(startsWith(checkEStr(e, ctx), checkEStr(it)));
       case ENDS:
         if(expr.length == 3) checkColl(expr[2], ctx);
-        it = expr[1].atomic(ctx, input);
+        it = expr[1].item(ctx, input);
         if(it == null) return Bln.TRUE;
         return Bln.get(endsWith(checkEStr(e, ctx), checkEStr(it)));
       case SUBAFTER:
@@ -115,7 +115,7 @@ final class FNStr extends Fun {
         final int pb = indexOf(sb, checkEStr(expr[1], ctx));
         return pb > 0 ? Str.get(substring(sb, 0, pb)) : Str.ZERO;
       default:
-        return super.atomic(ctx, ii);
+        return super.item(ctx, ii);
     }
   }
 
@@ -284,7 +284,7 @@ final class FNStr extends Fun {
   private Item concat(final QueryContext ctx) throws QueryException {
     final TokenBuilder tb = new TokenBuilder();
     for(final Expr a : expr) {
-      final Item it = a.atomic(ctx, input);
+      final Item it = a.item(ctx, input);
       if(it != null) tb.add(it.atom());
     }
     return Str.get(tb.finish());

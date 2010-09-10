@@ -37,13 +37,13 @@ final class FNDate extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = expr[0].atomic(ctx, input);
+    final Item it = expr[0].item(ctx, input);
     if(it == null) return null;
     final boolean d = expr.length == 2;
-    final Item zon = d ? expr[1].atomic(ctx, input) : null;
+    final Item zon = d ? expr[1].item(ctx, input) : null;
 
     switch(def) {
       case YEADUR:   return yea(checkDur(it));
@@ -71,7 +71,7 @@ final class FNDate extends Fun {
       case DTMZON:   return dtmzon(it, zon, d);
       case TIMZON:   return timzon(it, zon, d);
       case DATETIME: return dattim(it, zon);
-      default:       return super.atomic(ctx, ii);
+      default:       return super.item(ctx, ii);
     }
   }
 

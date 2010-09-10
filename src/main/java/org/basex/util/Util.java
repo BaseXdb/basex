@@ -198,7 +198,10 @@ public final class Util {
    * @param th error/exception instance
    */
   public static void stack(final Throwable th) {
-    for(final StackTraceElement s : th.getStackTrace()) errln("  " + s);
+    final String u = Util.class.getName();
+    for(final StackTraceElement s : th.getStackTrace()) {
+      if(!s.getClassName().equals(u)) errln("  " + s);
+    }
   }
 
   /**

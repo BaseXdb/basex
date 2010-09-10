@@ -41,7 +41,7 @@ public abstract class Seq extends Value {
   }
 
   @Override
-  public final Item atomic(final QueryContext ctx, final InputInfo ii)
+  public final Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     Err.or(ii, XPSEQ, this);
     return null;

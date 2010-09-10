@@ -32,7 +32,7 @@ final class FNAcc extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     final Expr e = expr.length != 0 ? expr[0] : checkCtx(ctx);
@@ -42,7 +42,7 @@ final class FNAcc extends Fun {
       case LAST:
         return Itr.get(ctx.size);
       case STRING:
-        Item it = e.atomic(ctx, input);
+        Item it = e.item(ctx, input);
         return it == null ? Str.ZERO : it.str() && !it.unt() ? it :
           Str.get(it.atom());
       case NUMBER:
@@ -52,13 +52,13 @@ final class FNAcc extends Fun {
       case NORM:
         return Str.get(norm(checkEStr(e, ctx)));
       case URIQNAME:
-        it = e.atomic(ctx, input);
+        it = e.item(ctx, input);
         if(it == null) return null;
         final QNm qn = (QNm) checkType(it, Type.QNM);
         return qn.hasUri() ? qn.uri()
             : Uri.uri(ctx.ns.uri(qn.pref(), true, ii));
       default:
-        return super.atomic(ctx, ii);
+        return super.item(ctx, ii);
     }
   }
 

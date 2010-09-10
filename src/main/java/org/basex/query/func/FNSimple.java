@@ -51,7 +51,7 @@ public final class FNSimple extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Expr e = expr.length == 1 ? expr[0] : null;
     switch(def) {
@@ -81,7 +81,7 @@ public final class FNSimple extends Fun {
         if(it == null || iter.next() != null) Err.or(input, EXP1);
         return it;
       default:
-        return super.atomic(ctx, ii);
+        return super.item(ctx, ii);
     }
   }
 

@@ -51,9 +51,9 @@ public final class IndexAccess extends Single {
     Item it;
     while((it = ir.next()) != null) {
       final int s = iter.length;
-      final Iter[] t = new Iter[s + 1];
-      System.arraycopy(iter, 0, t, 0, s);
-      iter = t;
+      final Iter[] tmp = new Iter[s + 1];
+      System.arraycopy(iter, 0, tmp, 0, s);
+      iter = tmp;
       iter[s] = index(it.atom());
     }
     return iter.length == 0 ? Iter.EMPTY : iter.length == 1 ? iter[0] :
@@ -78,7 +78,7 @@ public final class IndexAccess extends Single {
         return ii.more() ? new DBNode(data, ii.next(), kind) : null;
       }
     } : new Iter() {
-      // just in case: parse complete data if string is too long
+      // fallback solution: parse complete data if string is too long
       int pre = -1;
 
       @Override

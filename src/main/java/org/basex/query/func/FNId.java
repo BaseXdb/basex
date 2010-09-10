@@ -39,7 +39,7 @@ final class FNId extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     // functions have 1 or 2 arguments...
     final Item it = checkEmptyType((expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).atomic(ctx, input), Type.NOD);
+      checkCtx(ctx)).item(ctx, input), Type.NOD);
 
     final Nod node = checkNode(it);
     switch(def) {
@@ -51,15 +51,15 @@ final class FNId extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     // functions have 1 or 2 arguments...
     final Item it = checkEmptyType((expr.length == 2 ? expr[1] :
-      checkCtx(ctx)).atomic(ctx, input), Type.NOD);
+      checkCtx(ctx)).item(ctx, input), Type.NOD);
 
     switch(def) {
       case LANG:  return lang(lc(checkEStr(expr[0], ctx)), checkNode(it));
-      default:    return super.atomic(ctx, ii);
+      default:    return super.item(ctx, ii);
     }
   }
 
@@ -72,7 +72,7 @@ final class FNId extends Fun {
    */
   private Iter elid(final Iter it, final Nod node) throws QueryException {
     final NodIter nb = id(it, node);
-    final NodIter par = new NodIter(true);
+    final NodIter par = new NodIter().random();
     Nod n;
     while((n = nb.next()) != null) par.add(n.parent());
     return par;
@@ -86,7 +86,7 @@ final class FNId extends Fun {
    * @throws QueryException query exception
    */
   private NodIter id(final Iter it, final Nod node) throws QueryException {
-    final NodIter nb = new NodIter(true);
+    final NodIter nb = new NodIter().random();
     add(ids(it), nb, checkRoot(node));
     return nb;
   }
@@ -99,7 +99,7 @@ final class FNId extends Fun {
    * @throws QueryException query exception
    */
   private Iter idref(final Iter it, final Nod node) throws QueryException {
-    final NodIter nb = new NodIter(true);
+    final NodIter nb = new NodIter().random();
     addRef(ids(it), nb, checkRoot(node));
     return nb;
   }

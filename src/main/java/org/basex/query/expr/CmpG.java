@@ -161,14 +161,14 @@ public final class CmpG extends Cmp {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+  public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     // atomic evaluation of arguments (faster)
     if(atomic) {
-      final Item it1 = expr[0].atomic(ctx, input);
+      final Item it1 = expr[0].item(ctx, input);
       if(it1 == null) return Bln.FALSE;
-      final Item it2 = expr[1].atomic(ctx, input);
+      final Item it2 = expr[1].item(ctx, input);
       if(it2 == null) return Bln.FALSE;
       return Bln.get(eval(it1, it2));
     }
@@ -182,7 +182,7 @@ public final class CmpG extends Cmp {
 
     // evaluate single items
     if(s1 && expr[1].size() == 1)
-      return Bln.get(eval(ir1.next(), expr[1].atomic(ctx, input)));
+      return Bln.get(eval(ir1.next(), expr[1].item(ctx, input)));
 
     Iter ir2 = ctx.iter(expr[1]);
     final long is2 = ir2.size();

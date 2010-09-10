@@ -42,7 +42,7 @@ final class FNInfo extends Fun {
         String msg = FUNERR1;
 
         if(al != 0) {
-          final Item it = expr[0].atomic(ctx, input);
+          final Item it = expr[0].item(ctx, input);
           if(it == null) {
             if(al == 1) Err.or(input, XPEMPTY, desc());
           } else {
@@ -76,14 +76,14 @@ final class FNInfo extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
       case ENV:
         final String e = System.getenv(Token.string(checkEStr(expr[0], ctx)));
         return e != null ? Str.get(e) : null;
       default:
-        return super.atomic(ctx, ii);
+        return super.item(ctx, ii);
     }
   }
 

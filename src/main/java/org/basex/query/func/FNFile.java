@@ -62,12 +62,12 @@ final class FNFile extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     checkAdmin(ctx);
 
     final File path = expr.length == 0 ? null : new File(
-        string(checkEStr(expr[0].atomic(ctx, input))));
+        string(checkEStr(expr[0].item(ctx, input))));
 
     switch(def) {
       case MKDIR:
@@ -92,7 +92,7 @@ final class FNFile extends Fun {
         return pathToUri(ctx);
       case READFILE:
         return read(ctx);
-      case READBINARY:
+      case READBIN:
         return readBinary(path);
       case WRITE:
         return write(path, ctx);
@@ -107,7 +107,7 @@ final class FNFile extends Fun {
       case FILEEXISTS:
         return Bln.get(path.exists());
       default:
-        return super.atomic(ctx, ii);
+        return super.item(ctx, ii);
     }
   }
 
@@ -223,7 +223,7 @@ final class FNFile extends Fun {
   private Item writeBinary(final File file, final QueryContext ctx)
       throws QueryException {
 
-    final B64 b64 = (B64) checkType(expr[1].atomic(ctx, input), Type.B6B);
+    final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B6B);
 
     FileOutputStream out = null;
     try {
@@ -371,7 +371,7 @@ final class FNFile extends Fun {
    */
   private Uri pathToUri(final QueryContext ctx) throws QueryException {
 
-    final String path = string(checkEStr(expr[0].atomic(ctx, input)));
+    final String path = string(checkEStr(expr[0].item(ctx, input)));
 
     final URI uri = new File(path).toURI();
     return Uri.uri(Token.token(uri.toString()));

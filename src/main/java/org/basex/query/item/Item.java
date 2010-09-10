@@ -60,7 +60,7 @@ public abstract class Item extends Value {
 
   @Override
   @SuppressWarnings("unused")
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     return this;
   }

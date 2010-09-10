@@ -51,7 +51,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii) {
+  public Item item(final QueryContext ctx, final InputInfo ii) {
     return null;
   }
 

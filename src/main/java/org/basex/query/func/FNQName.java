@@ -42,17 +42,17 @@ final class FNQName extends Fun {
   public Iter iter(final QueryContext ctx) throws QueryException {
     switch(def) {
       case INSCOPE: return inscope(ctx,
-          (Nod) checkType(expr[0].atomic(ctx, input), Type.ELM));
+          (Nod) checkType(expr[0].item(ctx, input), Type.ELM));
       default:      return super.iter(ctx);
     }
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     // functions have 1 or 2 arguments...
-    final Item it = expr[0].atomic(ctx, input);
-    final Item it2 = expr.length == 2 ? expr[1].atomic(ctx, input) : null;
+    final Item it = expr[0].item(ctx, input);
+    final Item it2 = expr.length == 2 ? expr[1].item(ctx, input) : null;
 
     switch(def) {
       case RESQNAME:
@@ -89,7 +89,7 @@ final class FNQName extends Fun {
         if(!base.valid()) Err.or(input, URIINV, base);
         return base.resolve(rel);
       default:
-        return super.atomic(ctx, ii);
+        return super.item(ctx, ii);
     }
   }
 

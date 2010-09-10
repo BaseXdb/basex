@@ -75,7 +75,7 @@ public abstract class Iter {
 
   /**
    * Returns a sequence with all iterator values.
-   * Must only be called if {@link #next} has not be called before.
+   * Must only be called if {@link #next} has not been called before.
    * @return sequence
    * @throws QueryException query exception
    */
@@ -97,7 +97,7 @@ public abstract class Iter {
   }
 
   /**
-   * Returns an item array with double the size of the input array.
+   * Doubles the size of an item array.
    * @param it item array
    * @return resulting array
    */

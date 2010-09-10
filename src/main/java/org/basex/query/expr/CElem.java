@@ -79,7 +79,7 @@ public final class CElem extends CFrag {
   }
 
   @Override
-  public FElem atomic(final QueryContext ctx, final InputInfo ii)
+  public FElem item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Item it = checkItem(tag, ctx);
     final int s = ctx.ns.size();

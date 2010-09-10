@@ -52,9 +52,9 @@ public final class Cast extends Single {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return type.cast(expr.atomic(ctx, input), this, ctx, input);
+    return type.cast(expr.item(ctx, input), this, ctx, input);
   }
 
   @Override

@@ -26,7 +26,7 @@ public final class CDoc extends CFrag {
   }
 
   @Override
-  public FDoc atomic(final QueryContext ctx, final InputInfo ii)
+  public FDoc item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     final Constr con = new Constr(ctx, expr);

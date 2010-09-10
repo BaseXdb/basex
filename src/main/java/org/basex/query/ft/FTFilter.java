@@ -33,9 +33,9 @@ abstract class FTFilter extends FTExpr {
   }
 
   @Override
-  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+  public FTItem item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FTItem it = expr[0].atomic(ctx, input);
+    final FTItem it = expr[0].item(ctx, input);
     filter(ctx, it, ctx.fttoken);
     return it;
   }

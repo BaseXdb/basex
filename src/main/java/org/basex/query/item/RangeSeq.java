@@ -45,7 +45,7 @@ public final class RangeSeq extends Seq {
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return atomic(ctx, ii);
+    return item(ctx, ii);
   }
 
   @Override

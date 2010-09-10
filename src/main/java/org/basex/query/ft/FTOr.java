@@ -41,11 +41,11 @@ public final class FTOr extends FTExpr {
   }
 
   @Override
-  public FTItem atomic(final QueryContext ctx, final InputInfo ii)
+  public FTItem item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    final FTItem item = expr[0].atomic(ctx, input);
+    final FTItem item = expr[0].item(ctx, input);
     for(int e = 1; e < expr.length; ++e) {
-      or(ctx, item, expr[e].atomic(ctx, input));
+      or(ctx, item, expr[e].item(ctx, input));
     }
     return item;
   }

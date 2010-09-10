@@ -40,7 +40,7 @@ public abstract class Expr extends ExprInfo {
 
   /**
    * Evaluates the expression and returns an iterator on the resulting items.
-   * If this method is not overwritten, {@link #atomic} must be implemented
+   * If this method is not overwritten, {@link #item} must be implemented
    * by an expression, as it will be called by this method.
    * @param ctx query context
    * @return resulting item
@@ -58,7 +58,7 @@ public abstract class Expr extends ExprInfo {
    * @return iterator
    * @throws QueryException query exception
    */
-  public abstract Item atomic(final QueryContext ctx, final InputInfo ii)
+  public abstract Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException;
 
   /**

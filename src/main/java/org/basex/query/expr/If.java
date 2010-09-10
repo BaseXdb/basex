@@ -80,9 +80,9 @@ public final class If extends Arr {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return eval(ctx).atomic(ctx, input);
+    return eval(ctx).item(ctx, input);
   }
 
   /**

@@ -95,12 +95,12 @@ public final class CmpR extends Single {
   }
 
   @Override
-  public Bln atomic(final QueryContext ctx, final InputInfo ii)
+  public Bln item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
     // atomic evaluation of arguments (faster)
     if(atomic) {
-      final Item it = expr.atomic(ctx, input);
+      final Item it = expr.item(ctx, input);
       if(it == null) return Bln.FALSE;
       final double d = it.dbl(input);
       return Bln.get((mni ? d >= min : d > min) && (mxi ? d <= max : d < max));

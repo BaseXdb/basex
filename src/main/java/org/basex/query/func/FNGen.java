@@ -60,7 +60,7 @@ final class FNGen extends Fun {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
       case DOC:         return doc(ctx);
@@ -71,7 +71,7 @@ final class FNGen extends Fun {
       case PARSE: // might get obsolete
       case PARSEXML:    return parseXml(ctx);
       case SERIALIZE:   return serialize(ctx);
-      default:          return super.atomic(ctx, ii);
+      default:          return super.item(ctx, ii);
     }
   }
 
@@ -135,7 +135,7 @@ final class FNGen extends Fun {
   private Item put(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
-    final Item it = checkNode(expr[0].atomic(ctx, input));
+    final Item it = checkNode(expr[0].item(ctx, input));
 
     if(it == null || it.type != Type.DOC && it.type != Type.ELM)
       Err.or(input, UPFOTYPE, expr[0]);
@@ -154,7 +154,7 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Nod doc(final QueryContext ctx) throws QueryException {
-    final Item it = expr[0].atomic(ctx, input);
+    final Item it = expr[0].item(ctx, input);
     return it == null ? null : ctx.doc(checkEStr(it), false, false, input);
   }
 

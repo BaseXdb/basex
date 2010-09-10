@@ -40,7 +40,7 @@ public final class Rename extends Update {
   }
 
   @Override
-  public Item atomic(final QueryContext ctx, final InputInfo ii)
+  public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
@@ -61,7 +61,7 @@ public final class Rename extends Update {
     }
 
     // check namespace conflicts...
-    final QNm rename = ex.atomic(ctx, input).qname();
+    final QNm rename = ex.item(ctx, input).qname();
     final Nod targ = (Nod) i;
     final Nod test = i.type == Type.ELM ? targ :
       i.type == Type.ATT ? targ.parent() : null;
