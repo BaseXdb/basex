@@ -202,8 +202,6 @@ public abstract class W3CTS {
     final String dat = sdf.format(Calendar.getInstance().getTime());
 
     final Performance perf = new Performance();
-    context.prop.set(Prop.MAINMEM, false);
-    context.prop.set(Prop.TABLEMEM, false);
     context.prop.set(Prop.CHOP, false);
 
     new Check(path + input).execute(context);

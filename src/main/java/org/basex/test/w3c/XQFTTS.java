@@ -1,6 +1,7 @@
 package org.basex.test.w3c;
 
 import java.util.HashMap;
+
 import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
