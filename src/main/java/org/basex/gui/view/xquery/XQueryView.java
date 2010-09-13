@@ -71,7 +71,34 @@ public final class XQueryView extends View {
     b.add(header, BorderLayout.CENTER);
 
     final BaseXButton open = BaseXButton.command(GUICommands.XQOPEN, gui);
-    final BaseXButton save = BaseXButton.command(GUICommands.XQSAVEAS, gui);
+    // hidden buttons for actions
+    final BaseXButton hsave = BaseXButton.command(GUICommands.XQSAVE, gui);
+    final BaseXButton hsaveAs = BaseXButton.command(GUICommands.XQSAVEAS, gui);
+    
+    final BaseXButton save = new BaseXButton(gui, "xqsaveas", HELPSAVE);
+    save.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) {
+        final JPopupMenu popup = new JPopupMenu(GUISAVE);
+        final ActionListener al = new ActionListener() {
+          @Override
+          public void actionPerformed(final ActionEvent ac) {
+            if(ac.getActionCommand().equals(GUISAVE)) {
+              hsave.doClick();
+            } else {
+             hsaveAs.doClick(); 
+            } 
+          }
+        };
+        final JMenuItem saving = new JMenuItem(GUISAVE);
+        final JMenuItem saveAs = new JMenuItem(GUISAVEAS);
+        saving.addActionListener(al);
+        saveAs.addActionListener(al);
+        popup.add(saving);
+        popup.add(saveAs);
+        popup.show(save, 0, save.getHeight());
+      }
+    });
     final BaseXTextField find = new BaseXTextField(gui);
     BaseXLayout.setHeight(find, (int) open.getPreferredSize().getHeight());
 
