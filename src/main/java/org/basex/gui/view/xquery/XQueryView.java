@@ -91,7 +91,7 @@ public final class XQueryView extends View {
           }
         };
         final JMenuItem saving = new JMenuItem(GUISAVE);
-        final JMenuItem saveAs = new JMenuItem(GUISAVEAS);
+        final JMenuItem saveAs = new JMenuItem(GUISAVEAS + DOTS);
         saving.addActionListener(al);
         saveAs.addActionListener(al);
         popup.add(saving);
