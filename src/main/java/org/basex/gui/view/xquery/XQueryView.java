@@ -133,7 +133,7 @@ public final class XQueryView extends View {
         
         if(header.getText().endsWith("*")) {
           if (Dialog.confirm(gui, Util.info(
-              XQUERYCONF, gui.context.query.name()))) save.doClick();
+              XQUERYCONF, gui.context.query.name()))) hsave.doClick();
         }
         text.setText(new byte[0]);
         header.setText(XQUERYTIT);
