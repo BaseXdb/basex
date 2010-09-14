@@ -71,12 +71,8 @@ public final class XQueryView extends View {
     b.add(header, BorderLayout.CENTER);
 
     final BaseXButton open = BaseXButton.command(GUICommands.XQOPEN, gui);
-    // hidden buttons for actions
-    final BaseXButton hsave = BaseXButton.command(GUICommands.XQSAVE, gui);
-    final BaseXButton hsaveAs = BaseXButton.command(GUICommands.XQSAVEAS, gui);
-    
-    final BaseXButton save = new BaseXButton(gui, "xqsaveas", HELPSAVE);
-    save.addActionListener(new ActionListener() {
+    final BaseXButton saveB = new BaseXButton(gui, "xqsaveas", HELPSAVE);
+    saveB.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
         final JPopupMenu popup = new JPopupMenu(GUISAVE);
@@ -84,19 +80,19 @@ public final class XQueryView extends View {
           @Override
           public void actionPerformed(final ActionEvent ac) {
             if(ac.getActionCommand().equals(GUISAVE)) {
-              hsave.doClick();
+              GUICommands.XQSAVE.execute(gui);
             } else {
-             hsaveAs.doClick(); 
+              GUICommands.XQSAVEAS.execute(gui);
             } 
           }
         };
-        final JMenuItem saving = new JMenuItem(GUISAVE);
+        final JMenuItem save = new JMenuItem(GUISAVE);
         final JMenuItem saveAs = new JMenuItem(GUISAVEAS + DOTS);
-        saving.addActionListener(al);
+        save.addActionListener(al);
         saveAs.addActionListener(al);
-        popup.add(saving);
+        popup.add(save);
         popup.add(saveAs);
-        popup.show(save, 0, save.getHeight());
+        popup.show(saveB, 0, saveB.getHeight());
       }
     });
     final BaseXTextField find = new BaseXTextField(gui);
@@ -133,7 +129,8 @@ public final class XQueryView extends View {
         
         if(header.getText().endsWith("*")) {
           if (Dialog.confirm(gui, Util.info(
-              XQUERYCONF, gui.context.query.name()))) hsave.doClick();
+              XQUERYCONF, gui.context.query.name()))) 
+            GUICommands.XQSAVE.execute(gui);
         }
         text.setText(new byte[0]);
         header.setText(XQUERYTIT);
@@ -147,7 +144,7 @@ public final class XQueryView extends View {
     sp.add(Box.createHorizontalStrut(5));
     sp.add(open);
     sp.add(Box.createHorizontalStrut(1));
-    sp.add(save);
+    sp.add(saveB);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(hist);
     sp.add(Box.createHorizontalStrut(1));
