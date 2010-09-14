@@ -104,15 +104,15 @@ public abstract class Progress {
 
   /**
    * Starts a timeout thread.
-   * @param time time to wait
+   * @param sec seconds to wait; deactivated if set to 0
    */
-  public final void startTimeout(final long time) {
-    if(time == 0) return;
+  public final void startTimeout(final long sec) {
+    if(sec == 0) return;
 
     timeout = new Thread() {
       @Override
       public void run() {
-        Performance.sleep(time * 1000);
+        Performance.sleep(sec * 1000);
         Progress.this.stop();
       }
     };

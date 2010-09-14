@@ -467,9 +467,7 @@ public class AxisPath extends Path {
 
     // set atomic type for single attribute steps to speedup predicate tests
     if(root == null && step.length == 1 && step[0].axis == ATTR &&
-        step[0].test.kind != Kind.STD) {
-      step[0].type = SeqType.NOD_ZO;
-    }
+        step[0].test.kind == Kind.STD) step[0].type = SeqType.NOD_ZO;
   }
 
   /**

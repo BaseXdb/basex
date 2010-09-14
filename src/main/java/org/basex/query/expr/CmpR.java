@@ -7,6 +7,7 @@ import org.basex.data.MemData;
 import org.basex.data.Serializer;
 import org.basex.data.StatsKey;
 import org.basex.index.IndexToken.IndexType;
+import org.basex.index.Names;
 import org.basex.index.RangeToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
@@ -188,16 +189,20 @@ public final class CmpR extends Single {
 
     final AxisPath path = (AxisPath) expr;
     final int st = path.step.length;
+    
+    Step step = null;
     if(text) {
-      final Step step = st == 1 ? ic.step : path.step[st - 2];
+      step = st == 1 ? ic.step : path.step[st - 2];
       if(!(step.test.kind == Kind.NAME)) return null;
-      final byte[] nm = ((NameTest) step.test).ln;
-      return ic.data.tags.stat(ic.data.tags.id(nm));
+    } else {
+      step = path.step[st - 1];
+      if(!step.simple(Axis.ATTR, true)) return null;
     }
 
-    final Step step = path.step[st - 1];
-    return !step.simple(Axis.ATTR, true) ? null :
-      ic.data.atts.stat(ic.data.atts.id(((NameTest) step.test).ln));
+    final Names names = text ? ic.data.tags : ic.data.atts;
+    final StatsKey key = names.stat(names.id(((NameTest) step.test).ln));
+    return key == null || key.kind == StatsKey.Kind.INT ||
+      key.kind == StatsKey.Kind.DBL ? key : null;
   }
 
   @Override

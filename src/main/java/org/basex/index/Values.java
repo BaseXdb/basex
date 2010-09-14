@@ -143,7 +143,7 @@ public final class Values implements Index {
 
     final IntList ids = new IntList();
     boolean found = false;
-    for(int l = 0; l < size - 1; ++l) {
+    for(int l = 0; l < size; ++l) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
       final double v = data.textNum(pre, text);

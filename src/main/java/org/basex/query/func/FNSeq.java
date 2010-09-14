@@ -55,15 +55,22 @@ final class FNSeq extends Fun {
 
   @Override
   public Expr cmp(final QueryContext ctx) {
+    // static typing:
     // index-of will create integers, insert-before might add new types
     if(def == FunDef.INDEXOF || def == FunDef.INSBEF) return this;
 
-    // head will return first item of argument, or nothing;
     // all other types will return existing types
     final Type t = expr[0].type().type;
-    final SeqType.Occ o = def == FunDef.HEAD ? SeqType.Occ.ZO : SeqType.Occ.ZM;
-    type = SeqType.get(t, o);
+    SeqType.Occ o = SeqType.Occ.ZM;
 
+    // head will return at most one item
+    if(def == FunDef.HEAD) o = SeqType.Occ.ZO;
+
+    // at most one returned item
+    if(def == FunDef.SUBSEQ && expr.length == 3 && expr[2].type().one())
+      o = SeqType.Occ.ZO;
+    
+    type = SeqType.get(t, o);
     return this;
   }
 
