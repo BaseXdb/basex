@@ -222,6 +222,7 @@ public enum GUICommands implements GUICommand {
       } else {
         try {
           file.write(gui.query.getQuery());
+          gui.prop.files(file);
         } catch(final IOException ex) {
           Dialog.error(gui, NOTSAVED);
         }
