@@ -182,9 +182,7 @@ public final class GUIInput extends BaseXTextField {
       new CommandParser(suf, gui.context).parse(true);
     } catch(final QueryException ex) {
       sl = ex.complete();
-      if(ex.col() > 1) {
-        pre = query;
-      }
+      if(ex.col2() > 0) pre = query.substring(0, ex.col2());
     }
     createCombo(sl);
   }
