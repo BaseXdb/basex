@@ -21,7 +21,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Except extends Arr {
+public final class Except extends Set {
   /**
    * Constructor.
    * @param ii input info
@@ -43,22 +43,34 @@ public final class Except extends Arr {
       }
     }
     // results must always be sorted
-    return expr.length == 1 && !duplicates() ? expr[0] : this;
+    return expr.length == 1 && !dupl ? expr[0] : this;
   }
 
   @Override
-  public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter[] iter = new Iter[expr.length];
-    for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
-    return duplicates() ? eval(iter) : iter(iter);
+  protected NodeIter eval(final Iter[] iter) throws QueryException {
+    final NodIter ni = new NodIter().random();
+
+    Item it;
+    while((it = iter[0].next()) != null) {
+      if(!it.node()) Err.type(this, Type.NOD, it);
+      ni.add((Nod) it);
+    }
+
+    for(int e = 1; e != expr.length; ++e) {
+      final Iter ir = iter[e];
+      while((it = ir.next()) != null) {
+        if(!it.node()) Err.type(this, Type.NOD, it);
+        final Nod node = (Nod) it;
+        for(int s = 0; s < ni.size(); ++s) {
+          if(ni.get(s).is(node)) ni.delete(s--);
+        }
+      }
+    }
+    return ni.sort();
   }
 
-  /**
-   * Creates an except iterator.
-   * @param iter iterators
-   * @return resulting iterator
-   */
-  private NodeIter iter(final Iter[] iter) {
+  @Override
+  protected NodeIter iter(final Iter[] iter) {
     return new NodeIter() {
       Nod[] items;
 
@@ -98,34 +110,6 @@ public final class Except extends Arr {
         items[i] = (Nod) it;
       }
     };
-  }
-
-  /**
-   * Evaluates the iterators.
-   * @param iter iterators
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  private NodeIter eval(final Iter[] iter) throws QueryException {
-    final NodIter ni = new NodIter().random();
-
-    Item it;
-    while((it = iter[0].next()) != null) {
-      if(!it.node()) Err.type(this, Type.NOD, it);
-      ni.add((Nod) it);
-    }
-
-    for(int e = 1; e != expr.length; ++e) {
-      final Iter ir = iter[e];
-      while((it = ir.next()) != null) {
-        if(!it.node()) Err.type(this, Type.NOD, it);
-        final Nod node = (Nod) it;
-        for(int s = 0; s < ni.size(); ++s) {
-          if(ni.get(s).is(node)) ni.delete(s--);
-        }
-      }
-    }
-    return ni.sort();
   }
 
   @Override

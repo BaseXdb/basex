@@ -38,9 +38,8 @@ public final class List extends Arr {
     }
 
     // evaluate sequence type
-    final int el = expr.length;
     type = expr[0].type();
-    for(int i = 1; i < el; ++i) type = type.intersect(expr[i].type());
+    for(int i = 1; i < expr.length; ++i) type = type.intersect(expr[i].type());
     final SeqType.Occ o = type.mayBeZero() ? SeqType.Occ.ZM : SeqType.Occ.OM;
     type = SeqType.get(type.type, o);
 
@@ -81,11 +80,6 @@ public final class List extends Arr {
   @Override
   public boolean vacuous() {
     for(final Expr e : expr) if(!e.vacuous()) return false;
-    return true;
-  }
-
-  @Override
-  public boolean duplicates() {
     return true;
   }
 

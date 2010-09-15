@@ -254,42 +254,45 @@ final class FNGen extends Fun {
    * @throws QueryException query exception
    */
   private Str serialize(final QueryContext ctx) throws QueryException {
-
     final Nod nod = checkNode(checkItem(expr[0], ctx));
-
-    // interpret query parameters
-    final TokenBuilder tb = new TokenBuilder();
-    if(expr.length == 2) {
-      final Iter ir = expr[1].iter(ctx);
-      Item n;
-      while((n = ir.next()) != null) {
-        final Nod p = checkNode(n);
-        if(tb.size() != 0) tb.add(',');
-        tb.add(p.nname()).add('=').add(p.atom());
-      }
+    final ArrayOutput ao = new ArrayOutput();
+    try {
+      // run serialization
+      final XMLSerializer xml = new XMLSerializer(ao, serialPar(this, 1, ctx));
+      nod.serialize(xml);
+      xml.close();
+    } catch(final IOException ex) {
+      Err.or(input, ex.getMessage());
     }
-
-    return serialize(nod, tb, input);
-
+    return Str.get(ao.toArray());
   }
 
   /**
-   * Performs the serialize function.
-   * @param nod node
-   * @param tb token builder with serialization params
-   * @param input input
-   * @return resulting item
+   * Creates a serializer.
+   * @param fun calling function
+   * @param arg argument with parameters
+   * @param ctx query context
+   * @return serialization parameters
    * @throws QueryException query exception
    */
-  static Str serialize(final Nod nod, final TokenBuilder tb,
-      final InputInfo input) throws QueryException {
+  static SerializerProp serialPar(final Fun fun, final int arg,
+      final QueryContext ctx) throws QueryException {
+
+    if(arg >= fun.expr.length) return null;
+    
+    // interpret query parameters
+    final TokenBuilder tb = new TokenBuilder();
+    final Iter ir = fun.expr[arg].iter(ctx);
+    Item it;
+    while((it = ir.next()) != null) {
+      final Nod n = fun.checkNode(it);
+      if(tb.size() != 0) tb.add(',');
+      tb.add(n.nname()).add('=').add(n.atom());
+    }
     try {
-      // run serialization
-      final ArrayOutput ao = new ArrayOutput();
-      nod.serialize(new XMLSerializer(ao, new SerializerProp(tb.toString())));
-      return Str.get(ao.toArray());
+      return new SerializerProp(tb.toString());
     } catch(final IOException ex) {
-      Err.or(input, ex.getMessage() != null ? ex.getMessage() : ex.toString());
+      Err.or(fun.input, ex.getMessage());
       return null;
     }
   }
@@ -303,5 +306,10 @@ final class FNGen extends Fun {
         def == FunDef.URICOLL || def == FunDef.SERIALIZE) ||
         u == Use.CTX && def == FunDef.DATA && expr.length == 0 ||
         super.uses(u);
+  }
+
+  @Override
+  public boolean duplicates() {
+    return def != FunDef.COLL && super.duplicates();
   }
 }

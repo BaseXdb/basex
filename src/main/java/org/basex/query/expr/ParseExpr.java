@@ -64,19 +64,27 @@ public abstract class ParseExpr extends Expr {
 
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
-    final Value v = type().one() ? item(ctx, input) : ctx.iter(this).finish();
-    return v == null ? Empty.SEQ : v;
+    if(type().zeroOrOne()) {
+      final Value v = item(ctx, input);
+      return v == null ? Empty.SEQ : v;
+    }
+    return ctx.iter(this).finish();
   }
 
   @Override
   public final Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
 
-    final Iter ir = iter(ctx);
-    final Item it = ir.next();
-    if(it == null) return Bln.FALSE;
-    if(!it.node() && ir.next() != null) Err.or(input, CONDTYPE, this);
-    return it;
+    Item it = null;
+    if(type().zeroOrOne()) {
+      it = item(ctx, input);
+    } else {
+      final Iter ir = iter(ctx);
+      it = ir.next();
+      if(it != null && !it.node() && ir.next() != null)
+        Err.or(input, CONDTYPE, this);
+    }
+    return it == null ? Bln.FALSE : it;
   }
 
   @Override
@@ -162,7 +170,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final double checkDbl(final Expr e, final QueryContext ctx)
+  public final double checkDbl(final Expr e, final QueryContext ctx)
       throws QueryException {
 
     final Item it = checkEmptyType(e.item(ctx, input), Type.DBL);;
@@ -190,7 +198,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final long checkItr(final Item it) throws QueryException {
+  public final long checkItr(final Item it) throws QueryException {
     if(!it.unt() && !it.type.instance(Type.ITR)) Err.type(this, Type.ITR, it);
     return it.itr(input);
   }
@@ -202,7 +210,7 @@ public abstract class ParseExpr extends Expr {
    * @return item
    * @throws QueryException query exception
    */
-  protected final Nod checkNode(final Item it) throws QueryException {
+  public final Nod checkNode(final Item it) throws QueryException {
     if(!it.node()) Err.type(this, Type.NOD, it);
     return (Nod) it;
   }

@@ -62,7 +62,7 @@ public final class TypeSwitch extends ParseExpr {
 
     // evaluate return type
     type = cs[0].type();
-    for(int l = 1; l < cs.length; ++l) type = type.intersect(cs[l].type());
+    for(int c = 1; c < cs.length; ++c) type = type.intersect(cs[c].type());
     return this;
   }
 

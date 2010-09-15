@@ -74,6 +74,8 @@ final class IterFilter extends Filter {
           // loop through all items
           Item old = null;
           while((it = iter.next()) != null) {
+            ctx.checkStop();
+
             // set context item and position
             ctx.value = it;
             ctx.pos = p++;

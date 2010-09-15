@@ -22,7 +22,7 @@ public class Itr extends Item {
   // caches the first 128 integers
   static {
     NUMS = new Itr[128];
-    for(int i = 0; i < NUMS.length; i++) NUMS[i] = new Itr(i);
+    for(int i = 0; i < NUMS.length; ++i) NUMS[i] = new Itr(i);
   }
 
   /**

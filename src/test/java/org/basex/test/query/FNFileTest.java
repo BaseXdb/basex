@@ -102,8 +102,8 @@ public class FNFileTest extends QueryTest {
         { "Test file:path-separator()", str(Prop.SEP), "file:path-separator()"},
         
          // /_tmpdir_/testDir1/fileCopy
-        { "Test file:read-file()", str("\"" + doc + "\""),  
-            "file:read-file(\"" + fileCopy.getPath() + "\")" },
+        { "Test file:read()", str("\"" + doc + "\""),  
+            "file:read(\"" + fileCopy.getPath() + "\")" },
             
         // /_tmpdir_/testDir1/fileCopy    
         { "Test file:read-binary()",

@@ -130,7 +130,7 @@ public final class Values implements Index {
   }
 
   /**
-   * Performs a range query.
+   * Performs a range query. All index values must be numeric.
    * @param tok index term
    * @return results
    */
@@ -138,31 +138,29 @@ public final class Values implements Index {
     final double min = tok.min;
     final double max = tok.max;
 
-    final int mx = (long) max == max ? token(max).length : 0;
-    final boolean sl = mx != 0 && (long) min == min && token(min).length == mx;
+    // check if min and max are positive integers with the same number of digits
+    final int len = max > 0 && (long) max == max ? token(max).length : 0;
+    final boolean simple = len != 0 && min > 0 && (long) min == min &&
+      token(min).length == len;
 
     final IntList ids = new IntList();
-    boolean found = false;
     for(int l = 0; l < size; ++l) {
       final int ds = idxl.readNum(idxr.read5(l * 5L));
       int pre = idxl.readNum();
       final double v = data.textNum(pre, text);
 
-      if(!found) {
-        found = v == v;
-        if(!found || v < min || v > max) continue;
-      } else if(v == v) {
-        // skip if if min, max and the current value have the same length
-        // and if current value is larger
-        if(sl && data.textLen(pre, text) == mx && v > max) break;
-        if(v < min || v > max) continue;
-      } else {
-        // skip if all numbers have been parsed
-        if(data.text(pre, text)[0] > '9') break;
-        continue;
+      if(v >= min && v <= max) {
+        // value is in range
+        for(int d = 0; d < ds; ++d) {
+          ids.add(pre);
+          pre += idxl.readNum();
+        }
+      } else if(simple && v > max && data.textLen(pre, text) == len) {
+        // if limits are integers, if min, max and current value have the same
+        // string length, and if current value is larger than max, test can be
+        // skipped, as all remaining values will be bigger
+        break;
       }
-      ids.add(pre);
-      for(int d = 0; d < ds - 1; ++d) ids.add(pre += idxl.readNum());
     }
     ids.sort();
     return iter(ids);

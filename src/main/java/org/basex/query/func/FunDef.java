@@ -215,9 +215,7 @@ public enum FunDef {
   /* FNFile functions */
 
   /** XQuery function */
-  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(path)", ITEM_Z),
-  /** XQuery function */
-  MKDIRS(FILEURI, FNFile.class, 1, 1, "mkdirs(path)", ITEM_Z),
+  FILEEXISTS(FILEURI, FNFile.class, 1, 1, "file-exists(path)", BLN),
   /** XQuery function */
   ISDIR(FILEURI, FNFile.class, 1, 1, "is-directory(path)", BLN),
   /** XQuery function */
@@ -227,15 +225,25 @@ public enum FunDef {
   /** XQuery function */
   ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(filepath)", BLN),
   /** XQuery function */
+  LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
+  /** XQuery function */
+  SIZE(FILEURI, FNFile.class, 1, 1, "size(path)", ITR),
+  /** XQuery function */
   FILES(FILEURI, FNFile.class, 1, 2, "files(path, pattern?)", STR_ZM),
   /** XQuery function */
   PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
   /** XQuery function */
-  DELETE(FILEURI, FNFile.class, 1, 1, "delete(path)", ITEM_Z),
-  /** XQuery function */
   PATHTOFULL(FILEURI, FNFile.class, 1, 1, "path-to-full-path(path)", STR),
   /** XQuery function */
-  READFILE(FILEURI, FNFile.class, 1, 2, "read-file(filepath, encoding?)", STR),
+  PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", URI),
+  /** XQuery function */
+  MKDIR(FILEURI, FNFile.class, 1, 1, "mkdir(path)", ITEM_Z),
+  /** XQuery function */
+  MKDIRS(FILEURI, FNFile.class, 1, 1, "mkdirs(path)", ITEM_Z),
+  /** XQuery function */
+  DELETE(FILEURI, FNFile.class, 1, 1, "delete(path)", ITEM_Z),
+  /** XQuery function */
+  READFILE(FILEURI, FNFile.class, 1, 2, "read(filepath, encoding?)", STR),
   /** XQuery function */
   READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(filepath)", B64),
   /** XQuery function */
@@ -243,15 +251,9 @@ public enum FunDef {
   /** XQuery function */
   WRITEBIN(FILEURI, FNFile.class, 2, 2, "write-binary(filepath, data)", ITEM_Z),
   /** XQuery function */
-  COPY(FILEURI, FNFile.class, 2, 2, "copy(src, dest)", ITEM_Z),
+  COPY(FILEURI, FNFile.class, 2, 2, "copy(path, destination)", ITEM_Z),
   /** XQuery function */
-  MOVE(FILEURI, FNFile.class, 2, 2, "move(path, dest)", ITEM_Z),
-  /** XQuery function */
-  LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
-  /** XQuery function */
-  PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", URI),
-  /** XQuery function */
-  FILEEXISTS(FILEURI, FNFile.class, 1, 1, "file-exists(path)", BLN),
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(path, destination)", ITEM_Z),
 
   /* FNNum functions. */
 
@@ -422,8 +424,6 @@ public enum FunDef {
   RANDOM(BXURI, FNBaseX.class, 0, 0, "random()", ITR),
   /** Project specific function - accesses an index. */
   INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", NOD_ZM),
-  /** Project specific function - opens and returns file contents. */
-  READ(BXURI, FNBaseX.class, 1, 1, "read(string)", STR),
   /** Project specific function - evaluates the specified query file. */
   RUN(BXURI, FNBaseX.class, 1, 1, "run(string)", ITEM_ZM),
   /** Project specific function - opens a database node. */

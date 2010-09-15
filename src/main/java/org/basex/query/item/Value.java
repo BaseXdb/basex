@@ -122,9 +122,6 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public abstract boolean duplicates();
-
-  @Override
   public final String desc() {
     return name();
   }

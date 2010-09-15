@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.basex.data.Data;
 import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
-import org.basex.io.TextInput;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -59,7 +58,6 @@ final class FNBaseX extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case READ:   return read(ctx);
       case RANDOM: return random();
       case DB:     return db(ctx);
       case NODEID: return nodeId(ctx);
@@ -107,21 +105,6 @@ final class FNBaseX extends Fun {
     qt.parse(string(qu));
     qt.compile();
     return ItemIter.get(qt.iter());
-  }
-
-  /**
-   * Performs the read function.
-   * @param ctx query context
-   * @return iterator
-   * @throws QueryException query exception
-   */
-  private Item read(final QueryContext ctx) throws QueryException {
-    try {
-      return Str.get(TextInput.content(checkIO(expr[0], ctx)).finish());
-    } catch(final IOException ex) {
-      Err.or(input, NODOC, ex.getMessage());
-      return null;
-    }
   }
 
   /**

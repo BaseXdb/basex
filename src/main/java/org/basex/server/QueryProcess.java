@@ -58,7 +58,7 @@ final class QueryProcess extends Progress {
    */
   void init() throws IOException, QueryException {
     qp.parse();
-    if(!qp.ctx.updating) startTimeout(ctx.prop.num(Prop.TIMEOUT));
+    startTimeout(ctx.prop.num(Prop.TIMEOUT));
     monitored = true;
     ctx.lock.before(qp.ctx.updating);
     iter = qp.iter();
@@ -73,10 +73,9 @@ final class QueryProcess extends Progress {
    * @throws QueryException query exception
    */
   boolean next() throws IOException, QueryException {
-    if(stopped) throw new QueryException(null, SERVERTIMEOUT);
-
     final boolean more = item != null;
     if(more) {
+      if(stopped) throw new QueryException(null, SERVERTIMEOUT);
       // item found: send {ITEM}
       item.serialize(xml);
       item = iter.next();

@@ -118,7 +118,7 @@ public interface QueryText {
   /** FOFL0005: Evaluation exception. */
   Object[] FILEDEL = { FOFL, 5, "'%' cannot be deleted. Permission denied."};
   /** FOFL0006: Evaluation exception. */
-  Object[] FILENOTEXISTS = { FOFL, 6, "File '%' does not exist."};
+  Object[] PATHNOTEXISTS = { FOFL, 6, "'%' does not exist."};
   /** FOFL0007: Evaluation exception. */
   Object[] FILEDELDIR = { FOFL, 7, "Directory '%' is not empty."};
   /** FOFL0008: Evaluation exception. */

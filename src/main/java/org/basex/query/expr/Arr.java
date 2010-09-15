@@ -85,12 +85,6 @@ public abstract class Arr extends ParseExpr {
   }
 
   @Override
-  public boolean duplicates() {
-    for(final Expr e : expr) if(e.duplicates()) return true;
-    return false;
-  }
-
-  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);
     for(final Expr e : expr) e.plan(ser);

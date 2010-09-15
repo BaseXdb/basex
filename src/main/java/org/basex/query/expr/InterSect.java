@@ -20,7 +20,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class InterSect extends Arr {
+public final class InterSect extends Set {
   /**
    * Constructor.
    * @param ii input info
@@ -37,19 +37,7 @@ public final class InterSect extends Arr {
   }
 
   @Override
-  public Iter iter(final QueryContext ctx) throws QueryException {
-    final Iter[] iter = new Iter[expr.length];
-    for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
-    return duplicates() ? eval(iter) : iter(iter);
-  }
-
-  /**
-   * Evaluates the iterators.
-   * @param iter iterators
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  private NodIter eval(final Iter[] iter) throws QueryException {
+  protected NodIter eval(final Iter[] iter) throws QueryException {
     NodIter ni = new NodIter();
 
     Item it;
@@ -83,12 +71,8 @@ public final class InterSect extends Arr {
     return ni.sort();
   }
 
-  /**
-   * Creates a intersect iterator.
-   * @param iter iterators
-   * @return resulting iterator
-   */
-  private NodeIter iter(final Iter[] iter) {
+  @Override
+  protected NodeIter iter(final Iter[] iter) {
     return new NodeIter() {
       final Nod[] items = new Nod[iter.length];
 

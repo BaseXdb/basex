@@ -215,7 +215,7 @@ public final class Util {
 
     // decode path; URLDecode returns wrong results
     final TokenBuilder tb = new TokenBuilder();
-    for(int p = 0; p < path.length(); p++) {
+    for(int p = 0; p < path.length(); ++p) {
       final char ch = path.charAt(p);
       if(ch == '%' && p + 2 < path.length()) {
         tb.add((byte) Integer.parseInt(path.substring(p + 1, p + 3), 16));

@@ -429,14 +429,14 @@ public class AxisPath extends Path {
     // cast is ok as all steps are axis steps here (see calling method)
     final NodeIter ir = (NodeIter) ctx.iter(step[l]);
     final boolean more = l + 1 != step.length;
-    Nod v;
-    while((v = ir.next()) != null) {
+    Nod it;
+    while((it = ir.next()) != null) {
       if(more) {
-        ctx.value = v;
+        ctx.value = it;
         iter(l + 1, ni, ctx);
       } else {
         ctx.checkStop();
-        ni.add(v);
+        ni.add(it);
       }
     }
   }
@@ -587,6 +587,11 @@ public class AxisPath extends Path {
   public final Expr remove(final Var v) {
     for(int s = 0; s != step.length; ++s) step[s].remove(v);
     return super.remove(v);
+  }
+
+  @Override
+  public boolean duplicates() {
+    return false;
   }
 
   @Override

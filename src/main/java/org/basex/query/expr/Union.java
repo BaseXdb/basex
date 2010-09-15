@@ -20,7 +20,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class Union extends Arr {
+public final class Union extends Set {
   /**
    * Constructor.
    * @param ii input info
@@ -41,27 +41,15 @@ public final class Union extends Arr {
         ctx.compInfo(OPTREMOVE, desc(), Type.EMP);
       }
     }
-
+    
     // as union is required to always returns sorted results,
     // a single, non-sorted argument must be evaluated as well
     return expr.length == 0 ? Empty.SEQ :
-      expr.length == 1 && !duplicates() ? expr[0] : this;
+      expr.length == 1 && !dupl ? expr[0] : this;
   }
 
   @Override
-  public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter[] iter = new Iter[expr.length];
-    for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
-    return duplicates() ? eval(iter) : iter(iter);
-  }
-
-  /**
-   * Evaluates the iterators.
-   * @param iter iterators
-   * @return resulting iterator
-   * @throws QueryException query exception
-   */
-  public NodeIter eval(final Iter[] iter) throws QueryException {
+  protected NodeIter eval(final Iter[] iter) throws QueryException {
     final NodIter ni = new NodIter().random();
     for(final Iter ir : iter) {
       Item it;
@@ -73,12 +61,8 @@ public final class Union extends Arr {
     return ni.sort();
   }
 
-  /**
-   * Creates a union iterator.
-   * @param iter iterators
-   * @return resulting iterator
-   */
-  private NodeIter iter(final Iter[] iter) {
+  @Override
+  protected NodeIter iter(final Iter[] iter) {
     return new NodeIter() {
       Nod[] items;
 

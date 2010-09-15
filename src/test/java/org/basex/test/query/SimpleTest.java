@@ -141,6 +141,9 @@ public final class SimpleTest extends QueryTest {
       { "Index 8", nod(5), "//title[text() = 'XML' or text()]" },
       { "Index 9", nod(5), "//title[text() = 'XM' or text()]" },
 
+      { "RangeIndex 1", nod(8), "//*[@id = 1]" },
+      { "RangeIndex 2", nod(3, 8), "//*[@id >= 0 and @id <= 1]" },
+
       { "ExtVar 1", itr(1), "declare variable $a external; 1" },
       { "ExtVar 2", "declare variable $a external; $a" },
     };

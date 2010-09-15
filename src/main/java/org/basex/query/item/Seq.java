@@ -52,9 +52,4 @@ public abstract class Seq extends Value {
       throws QueryException {
     return ebv(ctx, ii);
   }
-
-  @Override
-  public boolean duplicates() {
-    return true;
-  }
 }

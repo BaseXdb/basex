@@ -29,7 +29,7 @@ public final class BaseXWin {
   /**
    * Main method.
    * @param args command-line arguments
-   * An initial XML document or query file can be specified as argument
+   * An XML document or query file can be specified as argument
    */
   public static void main(final String[] args) {
     new BaseXWin(args);

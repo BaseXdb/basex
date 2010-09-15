@@ -54,6 +54,11 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
+  public boolean duplicates() {
+    return false;
+  }
+
+  @Override
   public void plan(final Serializer ser) throws IOException {
     ser.emptyElement(this, MIN, Token.token(start),
         MAX, Token.token(start + size - 1));
