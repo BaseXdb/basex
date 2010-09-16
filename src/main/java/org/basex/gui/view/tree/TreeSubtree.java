@@ -57,7 +57,9 @@ final class TreeSubtree {
    * @return pre
    */
   private int getPrePerIndex(final TreeBorder bo, final int ix) {
-    return nc.getPrePerLevelAndIndex(bo.level, bo.start + ix);
+    final int start = bo.start + ix;
+    if(start < 0) return -1;
+    return nc.getPrePerLevelAndIndex(bo.level, start);
   }
 
   /**
