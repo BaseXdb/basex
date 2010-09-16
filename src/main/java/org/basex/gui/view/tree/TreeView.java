@@ -288,13 +288,13 @@ public final class TreeView extends View implements TreeViewOptions {
       final int w = wwidth;
       tg.setColor(getColorPerLevel(0, false));
       tg.drawRect(0, getYperLevel(0), w, nodeHeight);
-//      drawBigRectSquares(tg, 0, 0, w - 1, 4);
+      drawBigRectSquares(tg, 0, 0, w - 1, 4);
       
       System.out.println(w);
 
-//      for(int px = 0; px < w; px += 2) {
-//        drawRealBigRectangle(tg, -1, 0, -1, px, DRAW_CONN);
-//      }
+      for(int px = 0; px < w; px += 2) {
+        drawRealBigRectangle(tg, -1, 0, -1, px, DRAW_CONN);
+      }
     }
   }
 
