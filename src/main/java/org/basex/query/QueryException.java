@@ -29,8 +29,8 @@ public final class QueryException extends Exception {
   private int line;
   /** Error column. */
   private int col;
-  /** Error column. */
-  private int col2;
+  /** Marked error column. */
+  private int markedCol;
 
   /**
    * Constructor.
@@ -102,11 +102,11 @@ public final class QueryException extends Exception {
   }
   
   /**
-   * Returns the error column.
+   * Returns the marked error column.
    * @return error column
    */
-  public int col2() {
-    return col2 + 1;
+  public int markedCol() {
+    return markedCol;
   }
 
   /**
@@ -130,7 +130,7 @@ public final class QueryException extends Exception {
    * @param parser parser
    */
   void pos(final InputParser parser) {
-    col2 = parser.qm;
+    markedCol = parser.qm;
     // check if information has already been added
     if(line != 0) return;
 
