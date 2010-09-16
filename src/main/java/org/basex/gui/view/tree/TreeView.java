@@ -122,6 +122,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
   @Override
   public void refreshUpdate() {
+    paintType = PAINT_NEW_INIT;
     repaint();
   }
 

@@ -25,7 +25,7 @@ interface TreeViewOptions {
   /** Slim rectangles to text length. */
   boolean SLIM_TO_TEXT = true;
   /** Show extra node information. */
-  boolean SHOW_EXTRA_INFO = true;
+  boolean SHOW_EXTRA_INFO = false;
   /** Draw node text. */
   boolean DRAW_NODE_TEXT = true;
   /** Show 3d descendant connection. */
