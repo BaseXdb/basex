@@ -1,14 +1,14 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
-import org.basex.core.Text;
 import org.basex.core.User;
 import org.basex.core.Commands.CmdPerm;
 import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryText;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -57,7 +57,7 @@ public abstract class ParseExpr extends Expr {
     if(it == null || ir.size() == 1) return it;
 
     final Item n = ir.next();
-    if(n != null) Err.or(input, XPSEQ, "(" + it + ", " + n +
+    if(n != null) XPSEQ.thrw(input, "(" + it + ", " + n +
         (ir.next() != null ? ", ..." : "") + ")");
     return it;
   }
@@ -82,7 +82,7 @@ public abstract class ParseExpr extends Expr {
       final Iter ir = iter(ctx);
       it = ir.next();
       if(it != null && !it.node() && ir.next() != null)
-        Err.or(input, CONDTYPE, this);
+        CONDTYPE.thrw(input, this);
     }
     return it == null ? Bln.FALSE : it;
   }
@@ -123,7 +123,7 @@ public abstract class ParseExpr extends Expr {
    * @return optimized expression
    */
   protected final Expr optPre(final Expr opt, final QueryContext ctx) {
-    if(opt != this) ctx.compInfo(OPTPRE, this);
+    if(opt != this) ctx.compInfo(QueryText.OPTPRE, this);
     return opt == null ? Empty.SEQ : opt;
   }
 
@@ -139,7 +139,7 @@ public abstract class ParseExpr extends Expr {
   protected final Expr checkUp(final Expr e, final QueryContext ctx)
       throws QueryException {
     if(e != null && ctx.updating && e.uses(Use.UPD))
-      Err.or(input, UPNOT, desc());
+      UPNOT.thrw(input, desc());
     return e;
   }
 
@@ -157,7 +157,7 @@ public abstract class ParseExpr extends Expr {
     for(final Expr e : expr) {
       if(e.vacuous()) continue;
       final boolean u = e.uses(Use.UPD);
-      if(u && s == 2 || !u && s == 1) Err.or(input, UPNOT, desc());
+      if(u && s == 2 || !u && s == 1) UPNOT.thrw(input, desc());
       s = u ? 1 : 2;
     }
   }
@@ -225,7 +225,7 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     final Item it = checkItem(e, ctx);
-    if(!it.str() || !eq(URLCOLL, it.atom())) Err.or(input, IMPLCOL, e);
+    if(!it.str() || !eq(URLCOLL, it.atom())) IMPLCOL.thrw(input, e);
   }
 
   /**
@@ -264,7 +264,7 @@ public abstract class ParseExpr extends Expr {
    */
   public final Value checkCtx(final QueryContext ctx) throws QueryException {
     final Value v = ctx.value;
-    if(v == null) Err.or(input, XPNOCTX, this);
+    if(v == null) XPNOCTX.thrw(input, this);
     return v;
   }
 
@@ -301,7 +301,7 @@ public abstract class ParseExpr extends Expr {
    * @throws QueryException query exception
    */
   protected final Item checkEmpty(final Item it) throws QueryException {
-    if(it == null) Err.or(input, XPEMPTY, desc());
+    if(it == null) XPEMPTY.thrw(input, desc());
     return it;
   }
 
@@ -314,7 +314,7 @@ public abstract class ParseExpr extends Expr {
    */
   protected final Item checkEmptyType(final Item it, final Type t)
       throws QueryException {
-    if(it == null) Err.or(input, XPEMPTYPE, desc(), t);
+    if(it == null) XPEMPTYPE.thrw(input, desc(), t);
     return it;
   }
 
@@ -345,7 +345,7 @@ public abstract class ParseExpr extends Expr {
     checkAdmin(ctx);
     final byte[] name = checkEStr(e, ctx);
     final IO io = IO.get(string(name));
-    if(!io.exists()) Err.or(input, DOCERR, name);
+    if(!io.exists()) DOCERR.thrw(input, name);
     return io;
   }
 
@@ -359,6 +359,6 @@ public abstract class ParseExpr extends Expr {
       throws QueryException {
 
     if(!ctx.context.user.perm(User.ADMIN))
-      Err.or(input, Text.PERMNO, CmdPerm.ADMIN);
+      PERMNO.thrw(input, CmdPerm.ADMIN);
   }
 }

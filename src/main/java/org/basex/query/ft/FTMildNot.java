@@ -1,6 +1,6 @@
 package org.basex.query.ft;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.data.FTMatch;
 import org.basex.data.FTMatches;
@@ -9,7 +9,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -29,7 +28,7 @@ public final class FTMildNot extends FTExpr {
   public FTMildNot(final InputInfo ii, final FTExpr e1, final FTExpr e2)
       throws QueryException {
     super(ii, e1, e2);
-    if(usesExclude()) Err.or(input, FTMILD);
+    if(usesExclude()) FTMILD.thrw(input);
   }
 
   @Override
@@ -75,7 +74,7 @@ public final class FTMildNot extends FTExpr {
   FTItem mildnot(final FTItem it1, final FTItem it2) {
     it1.all = mildnot(it1.all, it2.all);
     // [CG] XQFT: check invalid mild not tests
-    //if(it1.all == null) Err.or(input, FTMILD);
+    //if(it1.all == null) FTMILD.error(input);
     return it1;
   }
 

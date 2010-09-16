@@ -3,11 +3,10 @@ package org.basex.query.expr;
 import java.util.ArrayList;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.item.Value;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
+import static org.basex.query.util.Err.*;
 import org.basex.query.util.ValueList;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
@@ -92,7 +91,7 @@ final class GroupPartition {
     for(final Var g : gvs) {
       boolean f = false;
       for(final Var v : fls) f |= v.eq(g);
-      if(!f) Err.or(null, QueryText.GVARNOTDEFINED, g);
+      if(!f) GVARNOTDEFINED.thrw(null, g);
     }
     return fc.size() - gc.size();
   }
@@ -115,7 +114,7 @@ final class GroupPartition {
     final Value[] vals = new Value[gl];
     for(int i = 0; i < gl; ++i) {
       final Value val = gv[i].value(ctx);
-      if(val.size() > 1) Err.or(input, QueryText.XGRP);
+      if(val.size() > 1) XGRP.thrw(input);
       vals[i] = val;
     }
 

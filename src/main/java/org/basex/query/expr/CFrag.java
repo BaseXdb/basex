@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -9,7 +9,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.XMLToken;
 
@@ -49,8 +48,8 @@ public abstract class CFrag extends Arr {
       name = (QNm) i;
     } else {
       final byte[] nm = i.atom();
-      if(contains(nm, ' ')) Err.or(input, INVAL, nm);
-      if(!XMLToken.isQName(nm)) Err.or(input, NAMEWRONG, nm);
+      if(contains(nm, ' ')) INVAL.thrw(input, nm);
+      if(!XMLToken.isQName(nm)) NAMEWRONG.thrw(input, nm);
       name = new QNm(nm);
     }
 

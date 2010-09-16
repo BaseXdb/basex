@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.text.Normalizer;
 import java.util.Arrays;
@@ -12,7 +12,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
@@ -130,7 +129,7 @@ final class FNStr extends Fun {
     Item i;
     while((i = iter.next()) != null) {
       final long n = checkItr(i);
-      if(!XMLToken.valid((int) n)) Err.or(input, INVCODE, i);
+      if(!XMLToken.valid((int) n)) INVCODE.thrw(input, i);
       tb.addUTF((int) n);
     }
     return Str.get(tb.finish());
@@ -168,7 +167,7 @@ final class FNStr extends Fun {
     // normalize positions
     final double ds = checkDbl(expr[1], ctx);
     final byte[] str = checkEStr(expr[0], ctx);
-    if(ds != ds) return Str.ZERO;
+    if(Double.isNaN(ds)) return Str.ZERO;
 
     final boolean end = expr.length == 3;
     int l = len(str);
@@ -268,7 +267,7 @@ final class FNStr extends Fun {
       try {
         form = Normalizer.Form.valueOf(string(n));
       } catch(final IllegalArgumentException e) {
-        Err.or(input, NORMUNI, n);
+        NORMUNI.thrw(input, n);
       }
     }
     return ascii(str) ? Str.get(str) :

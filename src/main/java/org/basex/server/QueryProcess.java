@@ -1,6 +1,6 @@
 package org.basex.server;
 
-import static org.basex.core.Text.*;
+import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Progress;
@@ -75,7 +75,7 @@ final class QueryProcess extends Progress {
   boolean next() throws IOException, QueryException {
     final boolean more = item != null;
     if(more) {
-      if(stopped) throw new QueryException(null, SERVERTIMEOUT);
+      if(stopped) SERVERTIMEOUT.thrw(null);
       // item found: send {ITEM}
       item.serialize(xml);
       item = iter.next();

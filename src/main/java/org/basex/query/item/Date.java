@@ -1,13 +1,12 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.basex.query.QueryException;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -102,7 +101,7 @@ public abstract class Date extends Item {
 
     final int h = Token.toInt(mt.group(1));
     final int s = Token.toInt(mt.group(3));
-    if(s > 59) Err.or(ii, DATERANGE, type, d);
+    if(s > 59) DATERANGE.thrw(ii, type, d);
     final double ms = mt.group(4) != null ? Double.parseDouble(mt.group(4)) : 0;
     if(h == 24 && ms > 0) dateErr(d, e, ii);
     zone(mt, 6, d, ii);
@@ -122,7 +121,7 @@ public abstract class Date extends Item {
     if(mt.group(p) == null || mt.group(p).equals("Z")) return;
     final int th = Token.toInt(mt.group(p + 2));
     final int tm = Token.toInt(mt.group(p + 3));
-    if(th > 14 || tm > 59 || th == 14 && tm != 0) Err.or(ii, INVALIDZONE, val);
+    if(th > 14 || tm > 59 || th == 14 && tm != 0) INVALIDZONE.thrw(ii, val);
   }
 
   /**
@@ -135,7 +134,7 @@ public abstract class Date extends Item {
   protected final void calc(final Dur a, final boolean p, final InputInfo ii)
       throws QueryException {
 
-    if(xc.getYear() + a.mon / 12 > 9999) Err.or(ii, DATERANGE, type, a.atom());
+    if(xc.getYear() + a.mon / 12 > 9999) DATERANGE.thrw(ii, type, a.atom());
     xc.add(p ? a.toJava() : a.toJava().negate());
   }
 

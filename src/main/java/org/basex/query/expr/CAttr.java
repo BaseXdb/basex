@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -13,7 +12,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
+import static org.basex.query.util.Err.*;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -60,7 +59,7 @@ public final class CAttr extends CFrag {
     final byte[] uri = name.uri().atom();
 
     if(comp && (eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
-        || eq(pre, XML) ^ eq(uri, XMLURI))) Err.or(input, CAINS, pre, uri);
+        || eq(pre, XML) ^ eq(uri, XMLURI))) CAINS.thrw(input, pre, uri);
 
     // TODO [CG] create a prefix if none is given but a URI exists
 

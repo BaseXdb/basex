@@ -1,7 +1,7 @@
 package org.basex.query.ft;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.core.Prop;
@@ -9,7 +9,6 @@ import org.basex.data.ExprInfo;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Levenshtein;
 import org.basex.util.TokenList;
@@ -244,13 +243,13 @@ public final class FTOpt extends ExprInfo {
             c = ++ql < q.length ? q[ql] : 0;
             if(c >= '0' && c <= '9') n = (n << 3) + (n << 1) + c - '0';
             else if(c == ',') break;
-            else Err.or(ii, FTREG, q);
+            else FTREG.thrw(ii, q);
           }
           while(true) {
             c = ++ql < q.length ? q[ql] : 0;
             if(c >= '0' && c <= '9') m = (m << 3) + (m << 1) + c - '0';
             else if(c == '}') break;
-            else Err.or(ii, FTREG, q);
+            else FTREG.thrw(ii, q);
           }
           ++ql;
         } else { // .
@@ -262,7 +261,7 @@ public final class FTOpt extends ExprInfo {
         if(n > m) return false;
         tl += n;
       } else {
-        if(q[ql] == '\\' && ++ql == q.length) Err.or(ii, FTREG, q);
+        if(q[ql] == '\\' && ++ql == q.length) FTREG.thrw(ii, q);
         if(tl >= t.length || t[tl++] != q[ql++]) return false;
       }
     }

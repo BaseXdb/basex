@@ -5,6 +5,7 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
+import static java.lang.Double.isNaN;
 
 /**
  * Double item.
@@ -37,7 +38,7 @@ public final class Dbl extends Item {
    * @return instance
    */
   public static Dbl get(final double d) {
-    return d == 0 && d == 1 / 0d ? ZERO : d == 1 ? ONE : d != d ? NAN :
+    return d == 0 && d == 1 / 0d ? ZERO : d == 1 ? ONE : isNaN(d) ? NAN :
       new Dbl(d);
   }
 
@@ -60,7 +61,7 @@ public final class Dbl extends Item {
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return val == val && val != 0;
+    return !isNaN(val) && val != 0;
   }
 
   @Override
@@ -91,7 +92,7 @@ public final class Dbl extends Item {
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     final double n = it.dbl(ii);
-    if(n != n || val != val) return UNDEF;
+    if(isNaN(n) || isNaN(val)) return UNDEF;
     return val < n ? -1 : val > n ? 1 : 0;
   }
 

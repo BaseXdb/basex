@@ -1,12 +1,11 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.XPATT;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.QueryTokens;
 import org.basex.query.item.FDoc;
 import org.basex.query.item.Type;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -30,7 +29,7 @@ public final class CDoc extends CFrag {
       throws QueryException {
 
     final Constr con = new Constr(ctx, expr);
-    if(con.errAtt || con.ats.size() != 0) Err.or(ii, XPATT);
+    if(con.errAtt || con.ats.size() != 0) XPATT.thrw(ii);
 
     final FDoc doc = new FDoc(con.children, con.base);
     for(int n = 0; n < con.children.size(); ++n)

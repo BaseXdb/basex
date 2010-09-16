@@ -1,6 +1,6 @@
 package org.basex.query.ft;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.IndexContext;
@@ -10,7 +10,6 @@ import org.basex.query.QueryTokens;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.FTItem;
 import org.basex.query.iter.FTIter;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -72,7 +71,7 @@ public final class FTWeight extends FTExpr {
     // evaluate weight
     if(item == null) return null;
     final double d = checkDbl(weight, ctx);
-    if(Math.abs(d) > 1000) Err.or(input, FTWEIGHT, d);
+    if(Math.abs(d) > 1000) FTWEIGHT.thrw(input, d);
     if(d == 0) item.all.size = 0;
     item.score(item.score() * d);
     return item;

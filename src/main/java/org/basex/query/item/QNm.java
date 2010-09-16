@@ -1,6 +1,6 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import javax.xml.namespace.QName;
 import org.basex.query.QueryContext;
@@ -142,7 +142,7 @@ public final class QNm extends Item {
 
   @Override
   public boolean bool(final InputInfo ii) throws QueryException {
-    Err.or(ii, CONDTYPE, type, this);
+    CONDTYPE.thrw(ii, type, this);
     return false;
   }
 

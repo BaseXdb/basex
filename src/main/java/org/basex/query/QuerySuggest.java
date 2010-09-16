@@ -7,6 +7,7 @@ import org.basex.data.Data;
 import org.basex.data.PathNode;
 import org.basex.query.path.Axis;
 import org.basex.query.path.Test;
+import org.basex.query.util.Err;
 import org.basex.util.StringList;
 import org.basex.util.TokenBuilder;
 
@@ -121,7 +122,7 @@ public final class QuerySuggest extends QueryParser {
   }
 
   @Override
-  public void error(final Object[] err, final Object... arg)
+  public void error(final Err err, final Object... arg)
       throws QueryException {
 
     final QueryException qe = new QueryException(input(), err, arg);

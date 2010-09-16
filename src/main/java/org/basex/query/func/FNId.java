@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -14,7 +14,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenList;
 
@@ -200,7 +199,7 @@ final class FNId extends Fun {
       Nod n = nod;
       while(n.type != Type.DOC) {
         n = n.parent();
-        if(n == null) Err.or(input, IDDOC);
+        if(n == null) IDDOC.thrw(input);
       }
     }
     return nod;

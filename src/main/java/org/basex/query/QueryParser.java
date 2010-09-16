@@ -1,7 +1,7 @@
 package org.basex.query;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
@@ -98,6 +98,7 @@ import org.basex.query.up.Insert;
 import org.basex.query.up.Rename;
 import org.basex.query.up.Replace;
 import org.basex.query.up.Transform;
+import org.basex.query.util.Err;
 import org.basex.query.util.Namespaces;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -127,7 +128,9 @@ public class QueryParser extends InputParser {
   private QNm module;
 
   /** Alternative error output. */
-  private Object[] alter;
+  private Err alter;
+  /** Alternative error description. */
+  private QNm alterFunc;
   /** Alternative position. */
   private int ap;
 
@@ -698,7 +701,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Expr enclosed(final Object[] err) throws QueryException {
+  private Expr enclosed(final Err err) throws QueryException {
     check(BRACE1);
     final Expr e = check(expr(), err);
     check(BRACE2);
@@ -1654,7 +1657,8 @@ public class QueryParser extends InputParser {
     Expr[] exprs = {};
     while(curr() != 0) {
       if(consumeWS2(PAR2)) {
-        alter = new Object[] { name };
+        alter = FUNCUNKNOWN;
+        alterFunc = name;
         ap = qp;
         ctx.ns.uri(name);
         name.uri(name.ns() ? ctx.ns.uri(name.pref(), false, input())
@@ -2721,7 +2725,7 @@ public class QueryParser extends InputParser {
    * @return string
    * @throws QueryException query exception
    */
-  private byte[] ncName(final Object[] err) throws QueryException {
+  private byte[] ncName(final Err err) throws QueryException {
     skipWS();
     tok.reset();
     if(ncName(true)) return tok.finish();
@@ -2736,7 +2740,7 @@ public class QueryParser extends InputParser {
    * @return string
    * @throws QueryException query exception
    */
-  private byte[] qName(final Object[] err) throws QueryException {
+  private byte[] qName(final Err err) throws QueryException {
     tok.reset();
     final boolean ok = ncName(true);
     if(ok && consume(':')) ncName(false);
@@ -2824,10 +2828,10 @@ public class QueryParser extends InputParser {
   /**
    * Returns the current entity snippet.
    * @param p start position
-   * @param c cerror code
+   * @param c error code
    * @throws QueryException query exception
    */
-  private void invalidEnt(final int p, final Object[] c) throws QueryException {
+  private void invalidEnt(final int p, final Err c) throws QueryException {
     final String sub = qu.substring(p, Math.min(p + 20, ql));
     final int sc = sub.indexOf(';');
     final String ent = sc != -1 ? sub.substring(0, sc + 1) : sub;
@@ -2841,7 +2845,7 @@ public class QueryParser extends InputParser {
    * @return expression
    * @throws QueryException query exception
    */
-  private Expr check(final Expr expr, final Object[] err)
+  private Expr check(final Expr expr, final Err err)
       throws QueryException {
     if(expr == null) error(err);
     return expr;
@@ -2907,7 +2911,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private boolean consumeWS(final String s1, final String s2,
-      final Object[] expr) throws QueryException {
+      final Err expr) throws QueryException {
     final int p = qp;
     if(!consumeWS(s1)) return false;
     alter = expr;
@@ -2984,9 +2988,9 @@ public class QueryParser extends InputParser {
    */
   private void error() throws QueryException {
     qp = ap;
-    if(alter.length != 1) error(alter);
-    ctx.funcs.funError((QNm) alter[0], this);
-    error(FUNCUNKNOWN, ((QNm) alter[0]).atom());
+    if(alter != FUNCUNKNOWN) error(alter);
+    ctx.funcs.funError(alterFunc, this);
+    error(alter, alterFunc.atom());
   }
 
   /**
@@ -3011,8 +3015,8 @@ public class QueryParser extends InputParser {
    * @param arg error arguments
    * @throws QueryException query exception
    */
-  public void error(final Object[] err, final Object... arg)
+  public void error(final Err err, final Object... arg)
       throws QueryException {
-    throw new QueryException(input(), err, arg);
+    err.thrw(input(), arg);
   }
 }

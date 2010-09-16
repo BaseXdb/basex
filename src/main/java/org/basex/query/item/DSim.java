@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryException;
@@ -65,7 +66,7 @@ public final class DSim extends Date {
     if(t == Type.MDA) {
       final int m = xc.getMonth() - 1;
       if(xc.getDay() > DAYS[m] + (m == 1 ? 1 : 0))
-        Err.or(ii, DATERANGE, type, d);
+        DATERANGE.thrw(ii, type, d);
     }
   }
 

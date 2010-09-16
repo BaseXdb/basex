@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.item.Type.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -12,7 +12,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -83,15 +82,15 @@ final class FNAggr extends Fun {
 
     Item res = it.unt() ? Dbl.get(it.atom(), input) : it;
     if(!res.num() && (!res.dur() || res.type == Type.DUR))
-      Err.or(input, SUMTYPE, this, res.type);
+      SUMTYPE.thrw(input, this, res.type);
     final boolean n = res.num();
 
     int c = 1;
     Item i;
     while((i = iter.next()) != null) {
       final boolean un = i.unt() || i.num();
-      if(n && !un) Err.or(input, FUNNUM, this, i.type);
-      if(!n && un) Err.or(input, FUNDUR, this, i.type);
+      if(n && !un) FUNNUM.thrw(input, this, i.type);
+      if(!n && un) FUNDUR.thrw(input, this, i.type);
       res = Calc.PLUS.ev(input, res, i);
       ++c;
     }
@@ -122,7 +121,7 @@ final class FNAggr extends Fun {
       Item it;
       while((it = iter.next()) != null) {
         if(it.type != res.type) {
-          Err.or(input, FUNCMP, desc(), res.type, it.type);
+          FUNCMP.thrw(input, desc(), res.type, it.type);
         }
         if(cmp.e(input, res, it)) res = it;
       }
@@ -153,18 +152,18 @@ final class FNAggr extends Fun {
   private Type type(final Item a, final Item b) throws QueryException {
     final Type ta = a.type, tb = b.type;
     if(b.unt()) {
-      if(!a.num()) Err.or(input, FUNCMP, this, ta, tb);
+      if(!a.num()) FUNCMP.thrw(input, this, ta, tb);
       return DBL;
     }
     if(a.num() && !b.unt() && b.str()) {
-      Err.or(input, FUNCMP, this, ta, tb);
+      FUNCMP.thrw(input, this, ta, tb);
     }
     if(ta == tb) return ta;
     if(ta == DBL || tb == DBL) return DBL;
     if(ta == FLT || tb == FLT) return FLT;
     if(ta == DEC || tb == DEC) return DEC;
     if(ta == BLN || a.num() && !b.num() || b.num() && !a.num())
-      Err.or(input, FUNCMP, this, ta, tb);
+      FUNCMP.thrw(input, this, ta, tb);
     return a.num() || b.num() ? ITR : ta;
   }
 }

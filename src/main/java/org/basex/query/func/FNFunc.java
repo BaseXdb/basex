@@ -1,12 +1,11 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -34,7 +33,7 @@ final class FNFunc extends Fun {
       case MAPPAIRS:
       case FOLDLEFT:
       case FOLDRIGHT:
-        Err.or(input, NOTIMPL, def.desc);
+        NOTIMPL.thrw(input, def.desc);
         return null;
       default:
         return super.iter(ctx);
@@ -47,7 +46,7 @@ final class FNFunc extends Fun {
     switch(def) {
       case FUNCNAME:
       case FUNCARITY:
-        Err.or(input, NOTIMPL, def.desc);
+        NOTIMPL.thrw(input, def.desc);
         return null;
       default:
         return super.item(ctx, ii);

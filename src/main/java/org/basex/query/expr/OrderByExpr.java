@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -10,7 +10,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Str;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import static org.basex.util.Token.token;
@@ -55,7 +54,7 @@ public final class OrderByExpr extends OrderBy {
     final Iter ir = ctx.iter(expr);
     Item it = ir.next();
     if(it != null) {
-      if(ir.next() != null) Err.or(input, XPSORT);
+      if(ir.next() != null) XPSORT.thrw(input);
       if(it.node()) it = Str.get(it.atom());
       else if(it.num() && Double.isNaN(it.dbl(input))) it = null;
     }

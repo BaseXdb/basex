@@ -1,6 +1,6 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
@@ -179,7 +179,7 @@ public final class SeqType {
       final InputInfo ii) throws QueryException {
 
     if(it == null) {
-      if(occ == Occ.O) Err.or(expr.input, XPEMPTY, expr.desc());
+      if(occ == Occ.O) XPEMPTY.thrw(expr.input, expr.desc());
       return null;
     }
     return it.type == type ? it : check(type.e(it, ctx, expr.input), ii);
@@ -293,7 +293,7 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   private Item check(final Item it, final InputInfo ii) throws QueryException {
-    if(!checkInstance(it)) Err.or(ii, XPCAST, it.type, ext);
+    if(!checkInstance(it)) XPCAST.thrw(ii, it.type, ext);
     return it;
   }
 

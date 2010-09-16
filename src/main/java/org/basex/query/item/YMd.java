@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.basex.query.QueryException;
@@ -52,8 +53,8 @@ public final class YMd extends Dur {
       throws QueryException {
 
     this(it);
-    if(f != f) Err.or(ii, DATECALC, desc(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(ii, DATEZERO, desc());
+    if(Double.isNaN(f)) DATECALC.thrw(ii, desc(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, desc());
     mon = (int) Math.round(m ? mon * f : mon / f);
   }
 

@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
 import java.io.IOException;
 import org.basex.core.Prop;
@@ -14,7 +14,6 @@ import org.basex.query.item.Type;
 import org.basex.query.up.primitives.NodeCopy;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
 /**
@@ -99,10 +98,10 @@ final class DBPrimitives extends Primitives {
 
     // find duplicate attributes
     final QNm dup = pool.duplicate();
-    if(dup != null) Err.or(null, UPATTDUPL, dup);
+    if(dup != null) UPATTDUPL.thrw(null, dup);
 
     // find namespace conflicts
-    if(!pool.nsOK()) Err.or(null, UPNSCONFL2);
+    if(!pool.nsOK()) UPNSCONFL2.thrw(null);
   }
 
   @Override
@@ -142,7 +141,7 @@ final class DBPrimitives extends Primitives {
       try {
         Export.export(ctx.context, d);
       } catch(final IOException ex) {
-        Err.or(null, UPPUTERR, d.meta.file);
+        UPPUTERR.thrw(null, d.meta.file);
       }
     }
   }

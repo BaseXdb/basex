@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
@@ -20,7 +21,6 @@ import org.basex.query.iter.ItemIter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.Step;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -231,7 +231,7 @@ public final class CmpG extends Cmp {
    */
   private boolean eval(final Item a, final Item b) throws QueryException {
     if(a.type != b.type && !a.unt() && !b.unt() && !(a.str() && b.str()) &&
-        !(a.num() && b.num())) Err.or(input, XPTYPECMP, a.type, b.type);
+        !(a.num() && b.num())) XPTYPECMP.thrw(input, a.type, b.type);
     return op.op.e(input, a, b);
   }
 

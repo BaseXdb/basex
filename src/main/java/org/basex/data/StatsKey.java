@@ -130,7 +130,7 @@ public final class StatsKey {
     }
     if(kind == Kind.DBL) {
       final double d = toDouble(val);
-      if(d != d) {
+      if(Double.isNaN(d)) {
         kind = cats.size() < MAXCATS ? Kind.CAT : Kind.TEXT;
       } else {
         if(min > d) min = d;

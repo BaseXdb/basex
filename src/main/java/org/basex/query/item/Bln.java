@@ -1,10 +1,9 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -120,7 +119,7 @@ public final class Bln extends Item {
     final byte[] s = Token.trim(str);
     if(Token.eq(s, Token.TRUE) || Token.eq(s, Token.ONE)) return true;
     if(Token.eq(s, Token.FALSE) || Token.eq(s, Token.ZERO)) return false;
-    Err.or(ii, FUNCAST, Type.BLN, str);
+    FUNCAST.thrw(ii, Type.BLN, str);
     return false;
   }
 

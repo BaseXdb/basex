@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
@@ -17,7 +17,6 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.up.primitives.RenamePrimitive;
-import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
@@ -46,8 +45,8 @@ public final class Rename extends Update {
     final Item i = t.next();
 
     // check target constraints
-    if(i == null) Err.or(input, UPSEQEMP, Util.name(this));
-    if(t.next() != null) Err.or(input, UPWRTRGTYP);
+    if(i == null) UPSEQEMP.thrw(input, Util.name(this));
+    if(t.next() != null) UPWRTRGTYP.thrw(input);
 
     CFrag ex = null;
     if(i.type == Type.ELM) {
@@ -57,7 +56,7 @@ public final class Rename extends Update {
     } else if(i.type == Type.PI) {
       ex = new CPI(input, expr[1], Empty.SEQ);
     } else {
-      Err.or(input, UPWRTRGTYP);
+      UPWRTRGTYP.thrw(input);
     }
 
     // check namespace conflicts...
@@ -68,7 +67,7 @@ public final class Rename extends Update {
 
     if(test != null) {
       final byte[] uri = test.uri(rename.pref(), ctx);
-      if(uri != null && !eq(rename.uri().atom(), uri)) Err.or(input, UPNSCONFL);
+      if(uri != null && !eq(rename.uri().atom(), uri)) UPNSCONFL.thrw(input);
     }
     ctx.updates.add(new RenamePrimitive(input, targ, rename), ctx);
     return null;

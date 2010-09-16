@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -17,7 +17,6 @@ import org.basex.query.up.primitives.InsertBefore;
 import org.basex.query.up.primitives.InsertInto;
 import org.basex.query.up.primitives.InsertIntoFirst;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
@@ -62,30 +61,30 @@ public final class Insert extends Update {
     final Constr c = new Constr(ctx, expr[1]);
     final NodIter cList = c.children;
     final NodIter aList = c.ats;
-    if(c.errAtt) Err.or(input, UPNOATTRPER);
-    if(c.duplAtt != null) Err.or(input, UPATTDUPL, c.duplAtt);
+    if(c.errAtt) UPNOATTRPER.thrw(input);
+    if(c.duplAtt != null) UPATTDUPL.thrw(input, c.duplAtt);
 
     // check target constraints
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
-    if(i == null) Err.or(input, UPSEQEMP, Util.name(this));
+    if(i == null) UPSEQEMP.thrw(input, Util.name(this));
     if(!(i instanceof Nod) || t.next() != null)
-      Err.or(input, before || after ? UPTRGTYP2 : UPTRGTYP);
+      (before || after ? UPTRGTYP2 : UPTRGTYP).thrw(input);
 
     final Nod n = (Nod) i;
     final Nod par = n.parent();
     if(before || after) {
-      if(n.type == Type.ATT || n.type == Type.DOC) Err.or(input, UPTRGTYP2);
-      if(par == null) Err.or(input, UPPAREMPTY);
+      if(n.type == Type.ATT || n.type == Type.DOC) UPTRGTYP2.thrw(input);
+      if(par == null) UPPAREMPTY.thrw(input);
     } else {
-      if(n.type != Type.ELM && n.type != Type.DOC) Err.or(input, UPTRGTYP);
+      if(n.type != Type.ELM && n.type != Type.DOC) UPTRGTYP.thrw(input);
     }
 
     UpdatePrimitive up = null;
     if(aList.size() > 0) {
       final Nod targ = before || after ? par : n;
       if(targ.type != Type.ELM)
-        Err.or(input, before || after ? UPATTELM : UPATTELM2);
+        (before || after ? UPATTELM : UPATTELM2).thrw(input);
 
       up = new InsertAttribute(input, targ, checkNS(aList, targ, ctx));
       ctx.updates.add(up, ctx);

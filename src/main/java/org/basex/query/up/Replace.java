@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
@@ -18,7 +18,6 @@ import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.ReplaceElemContent;
 import org.basex.query.up.primitives.ReplacePrimitive;
 import org.basex.query.up.primitives.ReplaceValue;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 
@@ -49,16 +48,16 @@ public final class Replace extends Update {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     final Constr c = new Constr(ctx, expr[1]);
-    if(c.errAtt) Err.or(input, UPNOATTRPER);
-    if(c.duplAtt != null) Err.or(input, UPATTDUPL, c.duplAtt);
+    if(c.errAtt) UPNOATTRPER.thrw(input);
+    if(c.duplAtt != null) UPATTDUPL.thrw(input, c.duplAtt);
 
     final Iter t = ctx.iter(expr[0]);
     final Item i = t.next();
     // check target constraints
-    if(i == null) Err.or(input, UPSEQEMP, Util.name(this));
+    if(i == null) UPSEQEMP.thrw(input, Util.name(this));
     final Type tp = i.type;
     if(!(i instanceof Nod) || tp == Type.DOC || t.next() != null)
-      Err.or(input, UPTRGMULT);
+      UPTRGMULT.thrw(input);
     final Nod targ = (Nod) i;
 
     // replace node
@@ -75,14 +74,14 @@ public final class Replace extends Update {
           new ReplaceValue(input, targ, new QNm(txt)), ctx);
     } else {
       final Nod par = targ.parent();
-      if(par == null) Err.or(input, UPNOPAR, i);
+      if(par == null) UPNOPAR.thrw(input, i);
       if(tp == Type.ATT) {
         // replace attribute node
-        if(list.size() > 0) Err.or(input, UPWRATTR);
+        if(list.size() > 0) UPWRATTR.thrw(input);
         list = checkNS(aList, par, ctx);
       } else {
         // replace non-attribute node
-        if(aList.size() > 0) Err.or(input, UPWRELM);
+        if(aList.size() > 0) UPWRELM.thrw(input);
       }
       ctx.updates.add(new ReplacePrimitive(input, targ, list), ctx);
     }

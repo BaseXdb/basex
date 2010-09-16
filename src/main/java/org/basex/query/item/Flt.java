@@ -1,5 +1,6 @@
 package org.basex.query.item;
 
+import static java.lang.Double.isNaN;
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -35,7 +36,7 @@ public final class Flt extends Item {
    * @return instance
    */
   public static Flt get(final float f) {
-    return f == 0 && f == 1 / 0f ? ZERO : f != f ? NAN : new Flt(f);
+    return f == 0 && f == 1 / 0f ? ZERO : isNaN(f) ? NAN : new Flt(f);
   }
 
   @Override
@@ -45,7 +46,7 @@ public final class Flt extends Item {
 
   @Override
   public boolean bool(final InputInfo ii) {
-    return val == val && val != 0;
+    return !isNaN(val) && val != 0;
   }
 
   @Override
@@ -76,7 +77,7 @@ public final class Flt extends Item {
   @Override
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     final double n = it.flt(ii);
-    if(n != n || val != val) return UNDEF;
+    if(isNaN(n) || isNaN(val)) return UNDEF;
     return val < n ? -1 : val > n ? 1 : 0;
   }
 

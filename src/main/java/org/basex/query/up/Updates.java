@@ -1,7 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.core.Text.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,7 +14,6 @@ import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FNode;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.Err;
 
 /**
  * Holds all update operations and primitives a snapshot contains, checks
@@ -72,7 +70,7 @@ public final class Updates {
 
     final boolean frag = p.node instanceof FNode;
     if(t && (frag || !refs.contains(((DBNode) p.node).data)))
-      Err.or(p.input, UPNOTCOPIED, p.node);
+      UPNOTCOPIED.thrw(p.input, p.node);
 
     if(frag && fdata == null) fdata = new MemData(ctx.context.prop);
     final Data d = frag ? fdata : ((DBNode) p.node).data;
@@ -81,7 +79,7 @@ public final class Updates {
     if(prim == null) {
       // check permissions
       if(!t && !frag && !ctx.context.perm(User.WRITE, d.meta))
-        Err.or(p.input, PERMNO, CmdPerm.WRITE);
+        PERMNO.thrw(p.input, CmdPerm.WRITE);
 
       prim = frag ? new FragPrimitives() : new DBPrimitives(d);
       primitives.put(d, prim);

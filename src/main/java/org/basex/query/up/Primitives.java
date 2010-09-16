@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.up.primitives.PrimitiveType.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.Err;
 import org.basex.util.IntList;
 
 /**
@@ -69,7 +68,7 @@ abstract class Primitives {
         // still available after the execution of updates. that includes parent
         // nodes
         if(p.type() == PUT && parentDeleted(nodes.get(i))) {
-          Err.or(p.input, UPFOEMPT, p);
+          UPFOEMPT.thrw(p.input, p);
         }
       }
     }

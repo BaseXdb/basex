@@ -1,6 +1,7 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryText.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -12,7 +13,6 @@ import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -182,7 +182,7 @@ public final class CmpV extends Cmp {
     final Item b = expr[1].item(ctx, input);
     if(b == null) return null;
 
-    if(!a.comparable(b)) Err.or(input, XPTYPECMP, a.type, b.type);
+    if(!a.comparable(b)) XPTYPECMP.thrw(input, a.type, b.type);
     return Bln.get(op.e(input, a, b));
   }
 

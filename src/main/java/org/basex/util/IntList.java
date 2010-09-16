@@ -1,7 +1,6 @@
 package org.basex.util;
 
 import java.util.Arrays;
-import java.util.EmptyStackException;
 
 /**
  * This is a simple container for int values.
@@ -104,7 +103,6 @@ public class IntList extends ElementList {
   /**
    * Returns the uppermost element on the stack, without removing it.
    * @return uppermost element
-   * @throws EmptyStackException if the stack is empty
    */
   public final int peek() {
     return list[size - 1];

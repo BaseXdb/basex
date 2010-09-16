@@ -1,6 +1,7 @@
 package org.basex.query.util;
 
 import static org.basex.util.Token.*;
+import static org.basex.query.util.Err.*;
 import javax.xml.parsers.SAXParserFactory;
 import org.basex.query.QueryException;
 import org.basex.util.InputInfo;
@@ -42,7 +43,7 @@ public final class SentList extends DefaultHandler {
       SAXParserFactory.newInstance().newSAXParser().parse(uri, this);
     } catch(final Exception ex) {
       Util.debug(ex);
-      Err.or(ii, uri + " could not be parsed: " + ex);
+      SENTLISTPARSE.thrw(ii, uri, ex);
     }
   }
 

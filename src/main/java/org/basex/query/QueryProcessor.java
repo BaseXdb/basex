@@ -2,6 +2,7 @@ package org.basex.query;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.core.Text.*;
+import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.Context;
@@ -147,7 +148,7 @@ public final class QueryProcessor extends Progress {
    */
   public Nodes queryNodes() throws QueryException {
     final Result res = execute();
-    if(!(res instanceof Nodes)) throw new QueryException(null, QUERYNODESERR);
+    if(!(res instanceof Nodes)) QUERYNODES.thrw(null);
     return (Nodes) res;
   }
 

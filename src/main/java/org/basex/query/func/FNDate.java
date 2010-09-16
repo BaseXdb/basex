@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import org.basex.query.QueryContext;
@@ -245,7 +245,7 @@ final class FNDate extends Fun {
     if(dtm.xc.getTimezone() == Item.UNDEF) {
       dtm.xc.setTimezone(zone);
     } else if(dtm.xc.getTimezone() != zone && zone != Item.UNDEF) {
-      Err.or(input, FUNZONE, dtm, tim);
+      FUNZONE.thrw(input, dtm, tim);
     }
     return dtm;
   }
@@ -275,7 +275,7 @@ final class FNDate extends Fun {
       final DTd dtd = (DTd) checkType(zon, Type.DTD);
       tz = (int) (dtd.min() + dtd.hou() * 60);
       if(dtd.sec().signum() != 0 || Math.abs(tz) > 840) {
-        Err.or(input, INVALZONE, zon);
+        INVALZONE.thrw(input, zon);
       }
     }
     if(zn != Item.UNDEF) date.xc.add(Date.df.newDuration(-60000L * (zn - tz)));

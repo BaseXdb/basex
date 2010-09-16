@@ -1,8 +1,8 @@
 package org.basex.query;
 
 import static org.basex.core.Text.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
@@ -215,7 +215,7 @@ public final class QueryContext extends Progress {
       if(nodes != null) {
         final Data data = nodes.data;
         if(!context.perm(User.READ, data.meta))
-          throw new QueryException(null, PERMNO, CmdPerm.READ);
+          Err.PERMNO.thrw(null, CmdPerm.READ);
 
         final int s = (int) nodes.size();
         if(nodes.doc) {
@@ -263,7 +263,7 @@ public final class QueryContext extends Progress {
 
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      Err.or(null, XPSTACK);
+      XPSTACK.thrw(null);
     }
   }
 
@@ -324,7 +324,7 @@ public final class QueryContext extends Progress {
       return v.iter(this);
     } catch(final StackOverflowError ex) {
       Util.debug(ex);
-      Err.or(null, XPSTACK);
+      XPSTACK.thrw(null);
       return null;
     }
   }
@@ -422,7 +422,7 @@ public final class QueryContext extends Progress {
   public DBNode doc(final byte[] path, final boolean coll, final boolean db,
       final InputInfo ii) throws QueryException {
 
-    if(contains(path, '<') || contains(path, '>')) Err.or(ii, INVDOC, path);
+    if(contains(path, '<') || contains(path, '>')) INVDOC.thrw(ii, path);
 
     // check if the existing collections contain the document
     for(int c = 0; c < colls; ++c) {
@@ -451,7 +451,7 @@ public final class QueryContext extends Progress {
       try {
         data = Open.open(nm, context);
       } catch(final IOException ex) {
-        Err.or(ii, NODB, nm);
+        NODB.thrw(ii, nm);
       }
     } else {
       final IO file = file();
@@ -495,7 +495,7 @@ public final class QueryContext extends Progress {
     try {
       return Check.check(context, path);
     } catch(final IOException ex) {
-      if(err) Err.or(ii, coll ? NOCOLL : NODOC, ex.getMessage());
+      if(err) (coll ? NOCOLL : NODOC).thrw(ii, ex.getMessage());
       return null;
     }
   }
@@ -514,10 +514,10 @@ public final class QueryContext extends Progress {
     int c = 0;
     if(coll == null) {
       // no default collection was defined
-      if(colls == 0) Err.or(ii, NODEFCOLL);
+      if(colls == 0) NODEFCOLL.thrw(ii);
     } else {
       // invalid collection reference
-      if(contains(coll, '<') || contains(coll, '\\')) Err.or(ii, COLLINV, coll);
+      if(contains(coll, '<') || contains(coll, '\\')) COLLINV.thrw(ii, coll);
 
       while(c < colls && !eq(collName[c], coll)) ++c;
       if(c == colls) addDocs(doc(coll, true, false, ii));

@@ -1,6 +1,6 @@
 package org.basex.query.path;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -14,7 +14,6 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.ItemIter;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -82,7 +81,7 @@ public final class MixedPath extends Path {
       ctx.pos = 1;
       Item i;
       while((i = ir.next()) != null) {
-        if(!i.node()) Err.or(input, NODESPATH, this, i.type);
+        if(!i.node()) NODESPATH.thrw(input, this, i.type);
         ctx.value = i;
         ii.add(ctx.iter(e));
         ctx.pos++;
@@ -92,13 +91,13 @@ public final class MixedPath extends Path {
       if(ii.size() != 0 && ii.get(0).node()) {
         final NodIter ni = new NodIter().random();
         while((i = ii.next()) != null) {
-          if(!i.node()) Err.or(input, EVALNODESVALS);
+          if(!i.node()) EVALNODESVALS.thrw(input);
           ni.add((Nod) i);
         }
         res = ItemIter.get(ni);
       } else {
         while((i = ii.next()) != null) {
-          if(i.node()) Err.or(input, EVALNODESVALS);
+          if(i.node()) EVALNODESVALS.thrw(input);
         }
         res = ii;
       }

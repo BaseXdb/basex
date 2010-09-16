@@ -3,6 +3,7 @@ package org.basex.query;
 import static org.basex.core.Text.*;
 import org.basex.io.IO;
 import org.basex.query.iter.Iter;
+import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.StringList;
@@ -23,7 +24,11 @@ public final class QueryException extends Exception {
   private IO file;
   /** Possible completions. */
   private StringList complete;
-  /** Error code. */
+  /** Error type. */
+  private Err.Type type;
+  /** Error number. */
+  private int num;
+  /** Alternative error code. */
   private String code;
   /** Error line. */
   private int line;
@@ -35,18 +40,21 @@ public final class QueryException extends Exception {
   /**
    * Constructor.
    * @param ii input info
+   * @param c code
    * @param s message
    * @param e message extension
    */
-  public QueryException(final InputInfo ii, final Object s, final Object... e) {
+  public QueryException(final InputInfo ii, final String c, final String s,
+      final Object... e) {
     super(Util.info(s, chop(e)));
+    code = c;
     if(ii == null) return;
 
     line = 1;
     col = 1;
     final int qp = Math.min(ii.pos - 1, ii.query.length());
-    for(int i = 0; i < qp; ++i) {
-      final char ch = ii.query.charAt(i);
+    for(int i = 0, ch; i < qp; i += Character.charCount(ch)) {
+      ch = ii.query.codePointAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }
   }
@@ -57,10 +65,10 @@ public final class QueryException extends Exception {
    * @param s xquery error
    * @param e error arguments
    */
-  public QueryException(final InputInfo ii, final Object[] s,
-      final Object... e) {
-    this(ii, s[2], e);
-    code = s[1] == null ? s[0].toString() : String.format("%s%04d", s[0], s[1]);
+  public QueryException(final InputInfo ii, final Err s, final Object... e) {
+    this(ii, null, s.desc, e);
+    type = s.type;
+    num = s.num;
   }
 
   /**
@@ -90,7 +98,15 @@ public final class QueryException extends Exception {
    * @return position
    */
   public String code() {
-    return code;
+    return code == null ? String.format("%s%04d", type, num) : code;
+  }
+  
+  /**
+   * Returns the error type of this error.
+   * @return error type
+   */
+  public Err.Type type() {
+    return type;
   }
 
   /**
@@ -137,8 +153,9 @@ public final class QueryException extends Exception {
     file = parser.file;
     line = 1;
     col = 1;
-    for(int i = 0; i < parser.qm && i < parser.ql; ++i) {
-      final char ch = parser.qu.charAt(i);
+    final int len = Math.min(parser.qm, parser.ql);
+    for(int i = 0, ch; i < len; i += Character.charCount(ch)) {
+      ch = parser.qu.codePointAt(i);
       if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
     }
   }
@@ -167,7 +184,7 @@ public final class QueryException extends Exception {
    */
   public String extended() {
     final StringBuilder sb = new StringBuilder();
-    if(code != null) sb.append("[" + code + "] ");
+    if(type != null) sb.append("[" + code() + "] ");
     return sb + simple();
   }
 

@@ -1,8 +1,8 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
 import static org.basex.util.Token.*;
+import static java.lang.Double.isNaN;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
@@ -19,6 +19,7 @@ import org.basex.core.Prop;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.util.Err;
+import static org.basex.query.util.Err.*;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenMap;
@@ -355,7 +356,7 @@ public enum Type {
         throws QueryException {
       final BigDecimal v = checkNum(it, ii).dec(ii);
       if(v.signum() < 0 || v.compareTo(max) > 0 ||
-          it.str() && contains(it.atom(), '.')) Err.or(ii, FUNCAST, this, it);
+          it.str() && contains(it.atom(), '.')) FUNCAST.thrw(ii, this, it);
       return new Dec(v, this);
     }
     @Override
@@ -624,7 +625,7 @@ public enum Type {
         throws QueryException {
       if(!it.str()) error(it, ii);
       final Uri u = Uri.uri(it.atom());
-      if(!u.valid()) Err.or(ii, FUNCAST, this, it);
+      if(!u.valid()) FUNCAST.thrw(ii, this, it);
       return u;
     }
     @Override
@@ -640,7 +641,7 @@ public enum Type {
         throws QueryException {
       if(it.type != STR) error(it, ii);
       final byte[] s = trim(it.atom());
-      if(s.length == 0) Err.or(ii, QNMINV, s);
+      if(s.length == 0) QNMINV.thrw(ii, s);
       return new QNm(s, ctx, ii);
     }
     @Override
@@ -693,7 +694,7 @@ public enum Type {
           final DOCWrapper p = new DOCWrapper((Document) o, "");
           return new DBNode(MemBuilder.build(p, new Prop(false)), 0);
         } catch(final IOException ex) {
-          Err.or(ii, UNDOC, ex.getMessage());
+          UNDOC.thrw(ii, ex.getMessage());
         }
       }
       // document fragment
@@ -842,18 +843,18 @@ public enum Type {
 
     if(it.type == Type.DBL || it.type == Type.FLT) {
       final double d = it.dbl(ii);
-      if(d != d || d == 1 / 0d || d == -1 / 0d) Err.value(ii, this, it);
-      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(ii, INTRANGE, d);
-      if(min != max && (d < min || d > max)) Err.or(ii, FUNCAST, this, it);
+      if(isNaN(d) || d == 1 / 0d || d == -1 / 0d) Err.value(ii, this, it);
+      if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) INTRANGE.thrw(ii, d);
+      if(min != max && (d < min || d > max)) FUNCAST.thrw(ii, this, it);
       return (long) d;
     }
     final long l = it.itr(ii);
     if(min == max) {
       final double d = it.dbl(ii);
       if(d < Long.MIN_VALUE || d > Long.MAX_VALUE)
-        Err.or(ii, FUNCAST, this, it);
+        FUNCAST.thrw(ii, this, it);
     }
-    if(min != max && (l < min || l > max)) Err.or(ii, FUNCAST, this, it);
+    if(min != max && (l < min || l > max)) FUNCAST.thrw(ii, this, it);
     return l;
   }
 

@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -11,7 +11,6 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -37,29 +36,24 @@ final class FNInfo extends Fun {
     switch(def) {
       case ERROR:
         final int al = expr.length;
-        String code = FOER;
-        Object num = 0;
-        String msg = FUNERR1;
+        if(al == 0) FUNERR1.thrw(input);
+        
+        String code = FUNERR1.code();
+        String msg = FUNERR1.desc;
 
-        if(al != 0) {
-          final Item it = expr[0].item(ctx, input);
-          if(it == null) {
-            if(al == 1) Err.or(input, XPEMPTY, desc());
-          } else {
-            code = Token.string(((QNm) checkType(it, Type.QNM)).ln());
-            num = null;
-          }
-          if(al > 1) {
-            msg = Token.string(checkEStr(expr[1], ctx));
-          }
+        final Item it = expr[0].item(ctx, input);
+        if(it == null) {
+          if(al == 1) XPEMPTY.thrw(input, desc());
+        } else {
+          code = Token.string(((QNm) checkType(it, Type.QNM)).ln());
         }
-        try {
-          Err.or(input, new Object[] { code, num, msg });
-          return null;
-        } catch(final QueryException ex) {
-          if(al > 2) ex.iter = expr[2].iter(ctx);
-          throw ex;
+        if(al > 1) {
+          msg = Token.string(checkEStr(expr[1], ctx));
         }
+        final QueryException ex = new QueryException(input, code, msg);
+        if(al > 2) ex.iter = expr[2].iter(ctx);
+        throw ex;
+        
       case TRACE:
         final Value val = expr[0].value(ctx);
         ctx.evalInfo(checkEStr(expr[1], ctx), val.toString());

@@ -1,6 +1,7 @@
 package org.basex.util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 
@@ -74,14 +75,8 @@ public class StringList extends ElementList implements Iterable<String> {
    * @param pos position where sorting starts
    */
   public final void sort(final boolean cs, final boolean asc, final int pos) {
-    Arrays.sort(list, pos, size, new Comparator<String>() {
-      @Override
-      public int compare(final String s1, final String s2) {
-        final int c = cs ? s1.compareTo(s2) :
-          s1.toLowerCase().compareTo(s2.toLowerCase());
-        return asc ? c : -c;
-      }
-    });
+    final Comparator<String> comp = cs ? null : String.CASE_INSENSITIVE_ORDER;
+    Arrays.sort(list, pos, size, asc ? comp : Collections.reverseOrder(comp));
   }
 
   @Override

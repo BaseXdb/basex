@@ -1,8 +1,7 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryException;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -22,13 +21,13 @@ public final class NCN extends Str {
   public NCN(final byte[] v, final InputInfo ii) throws QueryException {
     super(Token.norm(v), Type.NCN);
 
-    if(v.length == 0) Err.or(ii, XPNAME);
+    if(v.length == 0) XPNAME.thrw(ii);
     int i = -1;
     while(++i != v.length) {
       final byte c = v[i];
       if(Token.letter(c)) continue;
       if(i == 0 || !Token.digit(c) && c != '-' && c != '_' && c != '.')
-        Err.or(ii, XPINVNAME, v);
+        XPINVNAME.thrw(ii, v);
     }
   }
 }

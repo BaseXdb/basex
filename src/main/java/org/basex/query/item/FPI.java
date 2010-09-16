@@ -1,11 +1,10 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Util;
 import static org.basex.util.Token.*;
@@ -87,7 +86,7 @@ public final class FPI extends FNode {
   public static byte[] parse(final byte[] atom, final InputInfo ii)
       throws QueryException {
 
-    if(contains(atom, CLOSE)) Err.or(ii, CPICONT, atom);
+    if(contains(atom, CLOSE)) CPICONT.thrw(ii, atom);
     return atom;
   }
 }

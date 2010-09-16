@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
@@ -8,7 +8,6 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -49,16 +48,16 @@ public final class Func extends Single {
    * @throws QueryException query exception
    */
   public void check() throws QueryException {
-    if(!declared) Err.or(input, FUNCUNKNOWN, var.name.atom());
+    if(!declared) FUNCUNKNOWN.thrw(input, var.name.atom());
 
     final boolean u = expr.uses(Use.UPD);
     if(updating) {
       // updating function
-      if(var.type != null) Err.or(input, UPFUNCTYPE);
-      if(!u && !expr.vacuous()) Err.or(input, UPEXPECTF);
+      if(var.type != null) UPFUNCTYPE.thrw(input);
+      if(!u && !expr.vacuous()) UPEXPECTF.thrw(input);
     } else if(u) {
       // uses updates, but is not declared as such
-      Err.or(input, UPNOT, desc());
+      UPNOT.thrw(input, desc());
     }
   }
 

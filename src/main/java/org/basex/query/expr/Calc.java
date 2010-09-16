@@ -1,6 +1,5 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.item.Type.*;
 import java.math.BigDecimal;
 import org.basex.query.QueryException;
@@ -18,6 +17,7 @@ import org.basex.query.item.Tim;
 import org.basex.query.item.Type;
 import org.basex.query.item.YMd;
 import org.basex.query.util.Err;
+import static org.basex.query.util.Err.*;
 import org.basex.util.InputInfo;
 
 /**
@@ -167,13 +167,13 @@ public enum Calc {
       if(ta == tb) {
         if(ta == Type.YMD) {
           final BigDecimal bd = BigDecimal.valueOf(((YMd) b).ymd());
-          if(bd.equals(BigDecimal.ZERO)) Err.or(ii, DATEZERO, info());
+          if(bd.equals(BigDecimal.ZERO)) DATEZERO.thrw(ii, info());
           return Dec.get(BigDecimal.valueOf(((YMd) a).ymd()).divide(
               bd, 20, BigDecimal.ROUND_HALF_EVEN));
         }
         if(ta == Type.DTD) {
           final BigDecimal bd = ((DTd) b).dtd();
-          if(bd.equals(BigDecimal.ZERO)) Err.or(ii, DATEZERO, info());
+          if(bd.equals(BigDecimal.ZERO)) DATEZERO.thrw(ii, info());
           return Dec.get(((DTd) a).dtd().divide(bd, 20,
               BigDecimal.ROUND_HALF_EVEN));
         }
@@ -194,7 +194,7 @@ public enum Calc {
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) Err.or(ii, DIVZERO, a);
+      if(b2.signum() == 0) DIVZERO.thrw(ii, a);
       final int s = Math.max(18, Math.max(b1.scale(), b2.scale()));
       return Dec.get(b1.divide(b2, s, BigDecimal.ROUND_HALF_EVEN));
     }
@@ -209,9 +209,9 @@ public enum Calc {
       checkNum(ii, a, b);
       final double d1 = a.dbl(ii);
       final double d2 = b.dbl(ii);
-      if(d2 == 0) Err.or(ii, DIVZERO, a);
+      if(d2 == 0) DIVZERO.thrw(ii, a);
       final double d = d1 / d2;
-      if(Double.isNaN(d) || Double.isInfinite(d)) Err.or(ii, DIVFLOW, d1, d2);
+      if(Double.isNaN(d) || Double.isInfinite(d)) DIVFLOW.thrw(ii, d1, d2);
       return Itr.get(type(a, b) == Type.ITR ? a.itr(ii) / b.itr(ii) : (long) d);
     }
   },
@@ -230,13 +230,13 @@ public enum Calc {
       if(t == Type.ITR) {
         final long b1 = a.itr(ii);
         final long b2 = b.itr(ii);
-        if(b2 == 0) Err.or(ii, DIVZERO, a);
+        if(b2 == 0) DIVZERO.thrw(ii, a);
         return Itr.get(b1 % b2);
       }
 
       final BigDecimal b1 = a.dec(ii);
       final BigDecimal b2 = b.dec(ii);
-      if(b2.signum() == 0) Err.or(ii, DIVZERO, a);
+      if(b2.signum() == 0) DIVZERO.thrw(ii, a);
       final BigDecimal q = b1.divide(b2, 0, BigDecimal.ROUND_DOWN);
       return Dec.get(b1.subtract(q.multiply(b2)));
     }
@@ -297,7 +297,7 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final void errNum(final InputInfo ii, final Item it) throws QueryException {
-    Err.or(ii, XPTYPENUM, info(), it.type);
+    XPTYPENUM.thrw(ii, info(), it.type);
   }
 
   /**
@@ -308,7 +308,7 @@ public enum Calc {
    * @throws QueryException query exception
    */
   final Dur checkDur(final InputInfo ii, final Item it) throws QueryException {
-    if(!it.dur()) Err.or(ii, XPDUR, info(), it.type);
+    if(!it.dur()) XPDUR.thrw(ii, info(), it.type);
     return (Dur) it;
   }
 
@@ -333,7 +333,7 @@ public enum Calc {
    */
   final void checkRange(final InputInfo ii, final double d)
       throws QueryException {
-    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) Err.or(ii, RANGE, d);
+    if(d < Long.MIN_VALUE || d > Long.MAX_VALUE) RANGE.thrw(ii, d);
   }
 
   /**

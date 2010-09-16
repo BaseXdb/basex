@@ -1,7 +1,7 @@
 package org.basex.query.func;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static javax.xml.datatype.DatatypeConstants.*;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -23,7 +23,6 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -81,7 +80,7 @@ public final class FunJava extends Arr {
     final Value[] arg = new Value[expr.length];
     for(int a = 0; a < expr.length; ++a) {
       arg[a] = expr[a].value(ctx);
-      if(arg[a].size() == 0) Err.or(input, XPEMPTY, desc());
+      if(arg[a].size() == 0) XPEMPTY.thrw(input, desc());
     }
 
     Object result = null;
@@ -89,7 +88,7 @@ public final class FunJava extends Arr {
       result = mth.equals("new") ? constructor(arg) : method(arg);
     } catch(final Exception ex) {
       Util.debug(ex);
-      Err.or(input, FUNJAVA, desc());
+      FUNJAVA.thrw(input, desc());
     }
     return result == null ? Iter.EMPTY : iter(result, ctx);
   }

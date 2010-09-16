@@ -1,12 +1,11 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.up.primitives.PrimitiveType;
 import org.basex.query.up.primitives.Put;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.Err;
 import org.basex.util.TokenSet;
 
 /**
@@ -29,7 +28,7 @@ final class FragPrimitives extends Primitives {
     final TokenSet uris = new TokenSet();
     for(final int i : putIds.toArray()) {
       final Put put = (Put) op.get(i).find(PrimitiveType.PUT);
-      if(uris.add(put.path()) < 0) Err.or(put.input, UPURIDUP, put.path());
+      if(uris.add(put.path()) < 0) UPURIDUP.thrw(put.input, put.path());
     }
   }
 

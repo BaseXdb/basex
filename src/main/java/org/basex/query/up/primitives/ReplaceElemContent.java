@@ -1,12 +1,11 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.Nod;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -49,7 +48,7 @@ public final class ReplaceElemContent extends UpdatePrimitive {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    Err.or(input, UPMULTREPV, node);
+    UPMULTREPV.thrw(input, node);
   }
 
   @Override

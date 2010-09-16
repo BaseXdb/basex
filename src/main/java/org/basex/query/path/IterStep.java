@@ -1,6 +1,6 @@
 package org.basex.query.path;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -10,7 +10,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -66,7 +65,7 @@ final class IterStep extends Step {
           if(ir == null) {
             final Item i = iter.next();
             if(i == null) break;
-            if(!i.node()) Err.or(input, NODESPATH, IterStep.this, i.type);
+            if(!i.node()) NODESPATH.thrw(input, IterStep.this, i.type);
             ir = axis.init((Nod) i);
           }
 

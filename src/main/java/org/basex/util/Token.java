@@ -518,7 +518,7 @@ public final class Token {
     if(dbl == 1 / 0d) return INF;
     if(dbl == -1 / 0d) return NINF;
     if(dbl == 0) return 1 / dbl > 0 ? ZERO : MZERO;
-    if(dbl != dbl) return NAN;
+    if(Double.isNaN(dbl)) return NAN;
     final double a = Math.abs(dbl);
     if(a < 1e6) {
       final int i = (int) dbl;

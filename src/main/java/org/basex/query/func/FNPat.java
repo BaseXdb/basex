@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.util.regex.Matcher;
@@ -19,7 +19,6 @@ import org.basex.query.item.Uri;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.ItemIter;
-import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -94,7 +93,7 @@ final class FNPat extends Fun {
       throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) Err.or(input, REGROUP);
+    if(p.matcher("").matches()) REGROUP.thrw(input);
     final String str = string(val);
     final Matcher m = p.matcher(str);
 
@@ -172,7 +171,7 @@ final class FNPat extends Fun {
     for(int i = 0; i < rep.length; ++i) {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
-          Err.or(input, FUNREGREP);
+          FUNREGREP.thrw(input);
         ++i;
       }
     }
@@ -187,8 +186,8 @@ final class FNPat extends Fun {
       return Str.get(p.matcher(string(val)).replaceAll(r));
     } catch(final Exception ex) {
       final String m = ex.getMessage();
-      if(m.contains("No group")) Err.or(input, REGROUP);
-      Err.or(input, REGERR, m);
+      if(m.contains("No group")) REGROUP.thrw(input);
+      REGERR.thrw(input, m);
       return null;
     }
   }
@@ -204,7 +203,7 @@ final class FNPat extends Fun {
       throws QueryException {
 
     final Pattern p = pattern(expr[1], expr.length == 3 ? expr[2] : null, ctx);
-    if(p.matcher("").matches()) Err.or(input, REGROUP);
+    if(p.matcher("").matches()) REGROUP.thrw(input);
 
     final ItemIter sb = new ItemIter();
     final String str = string(val);
@@ -250,7 +249,7 @@ final class FNPat extends Fun {
           }
           pt = tb.finish();
         } else {
-          Err.or(input, REGMOD, (char) b);
+          REGMOD.thrw(input, (char) b);
         }
       }
     }
@@ -293,7 +292,7 @@ final class FNPat extends Fun {
     try {
       return Pattern.compile(str, m);
     } catch(final Exception ex) {
-      Err.or(input, REGINV, pt);
+      REGINV.thrw(input, pt);
       return null;
     }
   }

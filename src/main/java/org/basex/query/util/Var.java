@@ -1,7 +1,7 @@
 package org.basex.query.util;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -71,7 +71,7 @@ public final class Var extends ParseExpr {
    * @throws QueryException query exception
    */
   public void check() throws QueryException {
-    if(expr != null && expr.uses(Use.UPD)) Err.or(input, UPNOT, desc());
+    if(expr != null && expr.uses(Use.UPD)) UPNOT.thrw(input, desc());
   }
 
   @Override
@@ -121,7 +121,7 @@ public final class Var extends ParseExpr {
   @Override
   public Value value(final QueryContext ctx) throws QueryException {
     if(value == null) {
-      if(expr == null) Err.or(input, VAREMPTY, this);
+      if(expr == null) VAREMPTY.thrw(input, this);
       final Value v = ctx.value;
       ctx.value = null;
       value = cast(expr.comp(ctx).value(ctx), ctx);

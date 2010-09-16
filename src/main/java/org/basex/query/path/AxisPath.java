@@ -29,7 +29,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.Test.Kind;
-import org.basex.query.util.Err;
+import static org.basex.query.util.Err.*;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
@@ -481,26 +481,26 @@ public class AxisPath extends Path {
         if(root instanceof DBNode && ((DBNode) root).type == Type.DOC &&
             (s.axis == ATTR || s.axis == PARENT || s.axis == SELF &&
              s.test != NODE) || root instanceof CAttr && s.axis == CHILD)
-            Err.or(input, COMPSELF, s);
+            COMPSELF.thrw(input, s);
       } else {
         final Step sp = step[l - 1];
         if(s.axis == SELF || s.axis == DESCORSELF) {
           if(s.test == NODE) continue;
-          if(sp.axis == ATTR) Err.or(input, COMPSELF, s);
+          if(sp.axis == ATTR) COMPSELF.thrw(input, s);
           if(sp.test.type == Type.TXT && s.test.type != Type.TXT)
-            Err.or(input, COMPSELF, s);
+            COMPSELF.thrw(input, s);
 
           if(s.axis == DESCORSELF) continue;
           final QNm n1 = s.test.name;
           final QNm n0 = sp.test.name;
           if(n0 == null || n1 == null) continue;
-          if(!n1.eq(n0)) Err.or(input, COMPSELF, s);
+          if(!n1.eq(n0)) COMPSELF.thrw(input, s);
         } else if(s.axis == FOLLSIBL || s.axis == PRECSIBL) {
-          if(sp.axis == ATTR) Err.or(input, COMPSELF, s);
+          if(sp.axis == ATTR) COMPSELF.thrw(input, s);
         } else if(s.axis == DESC || s.axis == CHILD || s.axis == ATTR) {
           if(sp.axis == ATTR || sp.test.type == Type.TXT ||
              sp.test.type == Type.COM || sp.test.type == Type.PI)
-            Err.or(input, COMPSELF, s);
+            COMPSELF.thrw(input, s);
         }
       }
     }

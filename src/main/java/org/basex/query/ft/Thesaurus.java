@@ -1,6 +1,6 @@
 package org.basex.query.ft;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
@@ -12,7 +12,6 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenObjMap;
 import org.basex.util.TokenMap;
@@ -122,7 +121,7 @@ public final class Thesaurus {
         build(new Nodes(result.nodes[n], data));
       }
     } catch(final IOException ex) {
-      Err.or(ii, NOTHES, file);
+      NOTHES.thrw(ii, file);
     }
     return true;
   }

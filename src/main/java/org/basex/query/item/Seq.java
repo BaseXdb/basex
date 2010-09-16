@@ -1,9 +1,8 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -43,7 +42,7 @@ public abstract class Seq extends Value {
   @Override
   public final Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    Err.or(ii, XPSEQ, this);
+    XPSEQ.thrw(ii, this);
     return null;
   }
 

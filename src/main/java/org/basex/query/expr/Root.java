@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Item;
@@ -10,7 +10,6 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -36,7 +35,7 @@ public final class Root extends Simple {
     Item i;
     while((i = iter.next()) != null) {
       final Nod n = root(i);
-      if(n == null || n.type != Type.DOC) Err.or(input, CTXNODE);
+      if(n == null || n.type != Type.DOC) CTXNODE.thrw(input);
       ni.add(n);
     }
     return ni;

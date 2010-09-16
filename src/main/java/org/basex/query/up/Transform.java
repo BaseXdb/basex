@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Data;
@@ -19,7 +19,6 @@ import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.primitives.UpdatePrimitive;
-import org.basex.query.util.Err;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
@@ -59,7 +58,7 @@ public final class Transform extends Arr {
     for(int e = 0; e != expr.length; ++e) expr[e] = expr[e].comp(ctx);
 
     if(!expr[0].uses(Use.UPD) && !expr[0].vacuous())
-      Err.or(input, UPEXPECTT);
+      UPEXPECTT.thrw(input);
     checkUp(expr[1], ctx);
     ctx.vars.reset(s);
     ctx.updating = u;
@@ -73,7 +72,7 @@ public final class Transform extends Arr {
     for(final Let fo : copies) {
       final Iter ir = ctx.iter(fo.expr);
       final Item i = ir.next();
-      if(i == null || !i.node() || ir.next() != null) Err.or(input, UPCOPYMULT);
+      if(i == null || !i.node() || ir.next() != null) UPCOPYMULT.thrw(input);
       final Data m = UpdatePrimitive.buildDB(
           new NodIter(new Nod[] { (Nod) i }, 1), new MemData(ctx.context.prop));
       ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());

@@ -1,7 +1,7 @@
 package org.basex.query.util;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
 import org.basex.query.item.QNm;
@@ -28,10 +28,10 @@ public final class Namespaces {
    */
   public void add(final QNm name, final InputInfo ii) throws QueryException {
     final byte[] ln = name.ln();
-    if(eq(ln, XML) || eq(ln, XMLNS)) Err.or(ii, NSDEF, name);
+    if(eq(ln, XML) || eq(ln, XMLNS)) NSDEF.thrw(ii, name);
     final byte[] uri = name.uri().atom();
-    if(eq(XMLURI, uri)) Err.or(ii, NOXMLNS, XML, name);
-    if(eq(XMLNSURI, uri)) Err.or(ii, NOXMLNS, XMLNS, name);
+    if(eq(XMLURI, uri)) NOXMLNS.thrw(ii, XML, name);
+    if(eq(XMLNSURI, uri)) NOXMLNS.thrw(ii, XMLNS, name);
     ns.add(ln, uri);
   }
 
@@ -70,7 +70,7 @@ public final class Namespaces {
     byte[] uri = find(pre);
     if(uri == null) uri = NSGlobal.uri(pre);
     if(uri.length == 0 && pre.length != 0) {
-      Err.or(ii, dn ? INVAL : PREUNKNOWN, pre);
+      (dn ? INVAL : PREUNKNOWN).thrw(ii, pre);
     }
     return uri;
   }

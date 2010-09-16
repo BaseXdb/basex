@@ -115,7 +115,7 @@ public class Itr extends Item {
       return val < i ? -1 : val > i ? 1 : 0;
     }
     final double n = it.dbl(ii);
-    return n != n ? UNDEF : val < n ? -1 : val > n ? 1 : 0;
+    return Double.isNaN(n) ? UNDEF : val < n ? -1 : val > n ? 1 : 0;
   }
 
   @Override

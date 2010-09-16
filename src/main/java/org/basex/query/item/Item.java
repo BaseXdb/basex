@@ -1,6 +1,6 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -8,7 +8,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -96,7 +95,7 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public boolean bool(final InputInfo ii) throws QueryException {
-    Err.or(ii, CONDTYPE, type, this);
+    CONDTYPE.thrw(ii, type, this);
     return false;
   }
 
@@ -191,8 +190,8 @@ public abstract class Item extends Value {
    * @throws QueryException query exception
    */
   public int diff(final InputInfo ii, final Item it) throws QueryException {
-    if(this == it) Err.or(ii, TYPECMP, type);
-    else Err.or(ii, XPTYPECMP, type, it.type);
+    if(this == it) TYPECMP.thrw(ii, type);
+    else XPTYPECMP.thrw(ii, type, it.type);
     return 0;
   }
 
@@ -244,7 +243,7 @@ public abstract class Item extends Value {
    */
   protected final void castErr(final Object val, final InputInfo ii)
       throws QueryException {
-    Err.or(ii, FUNCAST, type, val);
+    FUNCAST.thrw(ii, type, val);
   }
 
   /**
@@ -256,7 +255,7 @@ public abstract class Item extends Value {
    */
   public void dateErr(final byte[] i, final String ex, final InputInfo ii)
       throws QueryException {
-    Err.or(ii, DATEFORMAT, type, i, ex);
+    DATEFORMAT.thrw(ii, type, i, ex);
   }
 
   @Override

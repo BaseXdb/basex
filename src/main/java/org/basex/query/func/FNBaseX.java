@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
@@ -87,7 +87,7 @@ final class FNBaseX extends Fun {
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
-      Err.or(input, NODOC, ex.getMessage());
+      NODOC.thrw(input, ex.getMessage());
       return null;
     }
   }
@@ -140,7 +140,7 @@ final class FNBaseX extends Fun {
 
     if(expr.length == 2) {
       final int pre = (int) checkItr(expr[1], ctx);
-      if(pre < 0 || pre >= node.data.meta.size) Err.or(input, NOPRE, pre);
+      if(pre < 0 || pre >= node.data.meta.size) NOPRE.thrw(input, pre);
       node = new DBNode(node.data, pre);
     }
     return node;
@@ -175,26 +175,26 @@ final class FNBaseX extends Fun {
    */
   private Iter index(final QueryContext ctx) throws QueryException {
     final Data data = ctx.data();
-    if(data == null) Err.or(input, XPNOCTX, this);
+    if(data == null) XPNOCTX.thrw(input, this);
 
     final IndexContext ic = new IndexContext(ctx, data, null, true);
     final String tp = string(checkEStr(expr[1], ctx)).toLowerCase();
 
     if(tp.equals(FULLTEXT)) {
-      if(!data.meta.ftxindex) Err.or(input, NOIDX, FULLTEXT);
+      if(!data.meta.ftxindex) NOIDX.thrw(input, FULLTEXT);
       return new FTIndexAccess(input, new FTWords(input, data,
           checkEStr(expr[0], ctx), ctx.ftpos == null), ic).iter(ctx);
     }
     if(tp.equals(TEXT)) {
-      if(!data.meta.txtindex) Err.or(input, NOIDX, TEXT);
+      if(!data.meta.txtindex) NOIDX.thrw(input, TEXT);
       return new IndexAccess(input, expr[0], IndexType.TEXT, ic).iter(ctx);
     }
     if(tp.equals(ATTRIBUTE)) {
-      if(!data.meta.atvindex) Err.or(input, NOIDX, ATTRIBUTE);
+      if(!data.meta.atvindex) NOIDX.thrw(input, ATTRIBUTE);
       return new IndexAccess(input, expr[0], IndexType.ATTV, ic).iter(ctx);
     }
 
-    Err.or(input, WHICHIDX, tp);
+    WHICHIDX.thrw(input, tp);
     return null;
   }
 

@@ -1,6 +1,6 @@
 package org.basex.query.expr;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -10,7 +10,6 @@ import org.basex.query.item.Item;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
@@ -37,11 +36,11 @@ public final class CPI extends CFrag {
       throws QueryException {
     final Item it = checkItem(expr[0], ctx);
     if(!it.unt() && !it.str() && it.type != Type.QNM)
-      Err.or(input, CPIWRONG, it.type, it);
+      CPIWRONG.thrw(input, it.type, it);
 
     final byte[] nm = trim(it.atom());
-    if(eq(lc(nm), XML)) Err.or(input, CPIXML, nm);
-    if(!XMLToken.isNCName(nm)) Err.or(input, CPIINVAL, nm);
+    if(eq(lc(nm), XML)) CPIXML.thrw(input, nm);
+    if(!XMLToken.isNCName(nm)) CPIINVAL.thrw(input, nm);
 
     final Iter iter = ctx.iter(expr[1]);
     final TokenBuilder tb = new TokenBuilder();

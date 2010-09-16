@@ -1,6 +1,6 @@
 package org.basex.query.up.primitives;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import org.basex.data.Data;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
@@ -8,7 +8,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.Type;
 import org.basex.query.iter.NodIter;
 import org.basex.query.up.NamePool;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -45,7 +44,7 @@ public final class ReplacePrimitive extends NodeCopy {
 
   @Override
   public void merge(final UpdatePrimitive p) throws QueryException {
-    Err.or(input, UPMULTREPL, node.qname());
+    UPMULTREPL.thrw(input, node.qname());
   }
 
   @Override

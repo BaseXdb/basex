@@ -1,13 +1,12 @@
 package org.basex.query.util.format;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Calc;
 import org.basex.query.func.FNNum;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -63,7 +62,7 @@ public final class NumFormatter {
 
     // find pattern separator and sub-patterns
     final String[] sub = picture.split(String.valueOf(PATTERN));
-    if(sub.length > 2) Err.or(ii, PICNUM, picture);
+    if(sub.length > 2) PICNUM.thrw(ii, picture);
 
     // check and analyze patterns
     check(sub, ii);
@@ -94,12 +93,12 @@ public final class NumFormatter {
 
         if(ch == DECIMAL) {
           // more than 1 decimal sign?
-          if(frac) Err.or(ii, PICNUM, pat);
+          if(frac) PICNUM.thrw(ii, pat);
           frac = true;
         } else if(ch == GROUP) {
           // adjacent decimal sign?
           if(cp(pat, i - 1) == DECIMAL || cp(pat, i + 1) == DECIMAL)
-            Err.or(ii, PICNUM, pat);
+            PICNUM.thrw(ii, pat);
         } else if(ch == PERCENT) {
           ++pc;
         } else if(ch == PERMILLE) {
@@ -107,28 +106,28 @@ public final class NumFormatter {
         } else if(ch == OPTIONAL) {
           if(!frac) {
             // integer part, and optional sign after digit?
-            if(dig) Err.or(ii, PICNUM, pat);
+            if(dig) PICNUM.thrw(ii, pat);
             opt1 = true;
           } else {
             opt2 = true;
           }
         } else if(DIGITS.indexOf(ch) != -1) {
           // fractional part, and digit after optional sign?
-          if(frac && opt2) Err.or(ii, PICNUM, pat);
+          if(frac && opt2) PICNUM.thrw(ii, pat);
           dig = true;
         }
 
         // passive character with preceding and following active character?
-        if(a && pas && act) Err.or(ii, PICNUM, pat);
+        if(a && pas && act) PICNUM.thrw(ii, pat);
         // will be assigned if active characters were found
         if(act) pas |= !a;
         act |= a;
       }
 
       // more than 1 percent and permille sign?
-      if(pc > 1 || pm > 1 || pc + pm > 1) Err.or(ii, PICNUM, pat);
+      if(pc > 1 || pm > 1 || pc + pm > 1) PICNUM.thrw(ii, pat);
       // no optional sign or digit?
-      if(!opt1 && !opt2 && !dig) Err.or(ii, PICNUM, pat);
+      if(!opt1 && !opt2 && !dig) PICNUM.thrw(ii, pat);
     }
   }
 

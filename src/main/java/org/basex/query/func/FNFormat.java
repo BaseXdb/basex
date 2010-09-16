@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -81,7 +81,7 @@ final class FNFormat extends Fun {
     else if(!it.unt() && !it.num()) Err.number(this, it);
 
     final String pic = string(checkEStr(expr[1], ctx));
-    if(expr.length == 3) Err.or(input, FORMNUM, expr[2]);
+    if(expr.length == 3) FORMNUM.thrw(input, expr[2]);
 
     return Str.get(NumFormatter.format(input, it, pic));
   }

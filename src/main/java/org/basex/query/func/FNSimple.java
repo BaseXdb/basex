@@ -1,9 +1,10 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.util.Stack;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -14,7 +15,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.ItemIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -41,7 +41,7 @@ public final class FNSimple extends Fun {
     switch(def) {
       case ONEORMORE:
         if(expr[0].type().mayBeZero()) ir = ItemIter.get(ir);
-        if(ir.size() < 1) Err.or(input, EXP1M);
+        if(ir.size() < 1) EXP1M.thrw(input);
         return ir;
       case UNORDER:
         return ir;
@@ -73,12 +73,12 @@ public final class FNSimple extends Fun {
         Iter iter = e.iter(ctx);
         Item it = iter.next();
         if(it == null) return null;
-        if(iter.next() != null) Err.or(input, EXP01);
+        if(iter.next() != null) EXP01.thrw(input);
         return it;
       case EXACTLYONE:
         iter = e.iter(ctx);
         it = iter.next();
-        if(it == null || iter.next() != null) Err.or(input, EXP1);
+        if(it == null || iter.next() != null) EXP1.thrw(input);
         return it;
       default:
         return super.item(ctx, ii);
@@ -98,12 +98,12 @@ public final class FNSimple extends Fun {
           final Fun fun = (Fun) e;
           if(fun.def == FunDef.EMPTY) {
             // simplify: not(empty(A)) -> exists(A)
-            ctx.compInfo(OPTWRITE, this);
+            ctx.compInfo(QueryText.OPTWRITE, this);
             expr = fun.expr;
             def = FunDef.EXISTS;
           } else if(fun.def == FunDef.EXISTS) {
             // simplify: not(exists(A)) -> empty(A)
-            ctx.compInfo(OPTWRITE, this);
+            ctx.compInfo(QueryText.OPTWRITE, this);
             expr = fun.expr;
             def = FunDef.EMPTY;
           } else {
@@ -141,7 +141,7 @@ public final class FNSimple extends Fun {
       // if(exists(node*)) -> if(node*)
       if(e.type().type.node()) ex = e;
     }
-    if(ex != this) ctx.compInfo(OPTWRITE, this);
+    if(ex != this) ctx.compInfo(QueryText.OPTWRITE, this);
     return ex;
   }
 

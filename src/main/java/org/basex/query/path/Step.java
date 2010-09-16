@@ -1,7 +1,7 @@
 package org.basex.query.path;
 
 import static org.basex.query.QueryTokens.*;
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.basex.data.Data;
@@ -23,7 +23,6 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.query.path.Test.Kind;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -121,7 +120,7 @@ public class Step extends Preds {
     NodIter nb = new NodIter();
     Item it;
     while((it = iter.next()) != null) {
-      if(!it.node()) Err.or(input, NODESPATH, Step.this, it.type);
+      if(!it.node()) NODESPATH.thrw(input, Step.this, it.type);
       final NodeIter ir = axis.init((Nod) it);
       Nod nod;
       while((nod = ir.next()) != null) {

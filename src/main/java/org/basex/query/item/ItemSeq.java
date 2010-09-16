@@ -1,7 +1,7 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.util.Err.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -9,7 +9,6 @@ import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.iter.Iter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -50,7 +49,7 @@ public final class ItemSeq extends Seq {
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(!val[0].node()) Err.or(ii, CONDTYPE, this);
+    if(!val[0].node()) CONDTYPE.thrw(ii, this);
     return val[0];
   }
 

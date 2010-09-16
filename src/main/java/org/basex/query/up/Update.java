@@ -1,6 +1,6 @@
 package org.basex.query.up;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
@@ -9,7 +9,6 @@ import org.basex.query.expr.Expr;
 import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.iter.NodIter;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 
 /**
@@ -51,7 +50,7 @@ abstract class Update extends Arr {
       if(pref.length == 0) continue;
       // check if attribute and target have the same namespace
       final byte[] uri = targ.uri(pref, ctx);
-      if(uri != null && !eq(name.uri().atom(), uri)) Err.or(input, UPNSCONFL);
+      if(uri != null && !eq(name.uri().atom(), uri)) UPNSCONFL.thrw(input);
     }
     return list;
   }

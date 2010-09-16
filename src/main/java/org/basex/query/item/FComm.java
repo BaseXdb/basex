@@ -1,11 +1,12 @@
 package org.basex.query.item;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+
 import org.basex.data.Serializer;
 import org.basex.query.QueryException;
-import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 import org.basex.util.Util;
@@ -67,7 +68,7 @@ public final class FComm extends FNode {
   public static byte[] parse(final byte[] str, final InputInfo ii)
       throws QueryException {
 
-    if(contains(str, DASHES) || endsWith(str, '-')) Err.or(ii, COMINVALID, str);
+    if(contains(str, DASHES) || endsWith(str, '-')) COMINVALID.thrw(ii, str);
     return str;
   }
 }

@@ -53,8 +53,11 @@ public final class StopWords extends TokenSet {
       final File file = data.meta.file(DATASWL);
       if(!file.exists()) return;
       final DataInput in = new DataInput(data.meta.file(DATASWL));
-      read(in);
-      in.close();
+      try {
+        read(in);
+      } finally {
+        in.close();
+      }
     } catch(final Exception ex) {
       Util.debug(ex);
     }

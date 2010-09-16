@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
@@ -83,10 +83,10 @@ final class FNQName extends Fun {
       case RESURI:
         if(it == null) return null;
         final Uri rel = Uri.uri(checkEStr(it));
-        if(!rel.valid()) Err.or(input, URIINV, it);
+        if(!rel.valid()) URIINV.thrw(input, it);
 
         final Uri base = it2 == null ? ctx.baseURI : Uri.uri(checkEStr(it2));
-        if(!base.valid()) Err.or(input, URIINV, base);
+        if(!base.valid()) URIINV.thrw(input, base);
         return base.resolve(rel);
       default:
         return super.item(ctx, ii);
@@ -110,7 +110,7 @@ final class FNQName extends Fun {
     final QNm nm = new QNm(name);
     final byte[] pref = nm.pref();
     final byte[] uri = ((Nod) checkType(it, Type.ELM)).uri(pref, ctx);
-    if(uri == null && pref.length != 0) Err.or(input, NSDECL, pref);
+    if(uri == null && pref.length != 0) NSDECL.thrw(input, pref);
     nm.uri(uri);
     return nm;
   }

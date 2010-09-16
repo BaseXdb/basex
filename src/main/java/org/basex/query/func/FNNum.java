@@ -114,7 +114,8 @@ public final class FNNum extends Fun {
     if(h2e) {
       c = p == 1 && (c % 2 == .5 || c % 2 == -1.5) ? c - .5 :
         Math.floor(c * p + .5) / p;
-    } else if(d == d && d != 0 && d >= Long.MIN_VALUE && d < Long.MAX_VALUE) {
+    } else if(!Double.isNaN(d) && d != 0
+        && d >= Long.MIN_VALUE && d < Long.MAX_VALUE) {
       final double dp = d * p;
       c = (dp >= -.5d && dp < 0 ? -0d : Math.round(dp)) / p;
     }

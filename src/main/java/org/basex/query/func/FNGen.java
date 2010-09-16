@@ -1,6 +1,6 @@
 package org.basex.query.func;
 
-import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.MemBuilder;
@@ -14,7 +14,6 @@ import org.basex.io.IOContent;
 import org.basex.io.TextInput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.QueryText;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
 import org.basex.query.item.DBNode;
@@ -138,10 +137,10 @@ final class FNGen extends Fun {
     final Item it = checkNode(expr[0].item(ctx, input));
 
     if(it == null || it.type != Type.DOC && it.type != Type.ELM)
-      Err.or(input, UPFOTYPE, expr[0]);
+      UPFOTYPE.thrw(input, expr[0]);
 
     final Uri u = Uri.uri(file);
-    if(u == Uri.EMPTY || !u.valid()) Err.or(input, UPFOURI, file);
+    if(u == Uri.EMPTY || !u.valid()) UPFOURI.thrw(input, file);
     ctx.updates.add(new Put(input, (Nod) it, u), ctx);
 
     return null;
@@ -168,7 +167,7 @@ final class FNGen extends Fun {
     try {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
-      if(!ex.code().startsWith(QueryText.FODC)) throw ex;
+      if(ex.type() != Err.Type.FODC) throw ex;
       return Bln.FALSE;
     }
   }
@@ -198,7 +197,7 @@ final class FNGen extends Fun {
       final String e = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
       return Bln.get(unparsedText(io, e, input) != null);
     } catch(final QueryException ex) {
-      if(!ex.code().startsWith(QueryText.FODC)) throw ex;
+      if(ex.type() != Err.Type.FODC) throw ex;
       return Bln.FALSE;
     }
   }
@@ -217,7 +216,7 @@ final class FNGen extends Fun {
     try {
       return Str.get(TextInput.content(io, enc).finish());
     } catch(final IOException ex) {
-      Err.or(input, NODOC, ex);
+      NODOC.thrw(input, ex);
       return null;
     }
   }
@@ -233,7 +232,7 @@ final class FNGen extends Fun {
     Uri base = ctx.baseURI;
     if(expr.length == 2) {
       base = Uri.uri(checkEStr(expr[1], ctx));
-      if(!base.valid()) Err.or(input, DOCBASE, base);
+      if(!base.valid()) DOCBASE.thrw(input, base);
     }
 
     final Prop prop = ctx.context.prop;
@@ -242,7 +241,7 @@ final class FNGen extends Fun {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
-      Err.or(input, DOCWF, ex.getMessage());
+      DOCWF.thrw(input, ex.getMessage());
       return null;
     }
   }
@@ -262,7 +261,7 @@ final class FNGen extends Fun {
       nod.serialize(xml);
       xml.close();
     } catch(final IOException ex) {
-      Err.or(input, ex.getMessage());
+      GENERR.thrw(input, ex.getMessage());
     }
     return Str.get(ao.toArray());
   }
@@ -292,7 +291,7 @@ final class FNGen extends Fun {
     try {
       return new SerializerProp(tb.toString());
     } catch(final IOException ex) {
-      Err.or(fun.input, ex.getMessage());
+      GENERR.thrw(fun.input, ex.getMessage());
       return null;
     }
   }

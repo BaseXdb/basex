@@ -1,6 +1,7 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryText.*;
+import static org.basex.query.util.Err.*;
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -62,8 +63,8 @@ public final class DTd extends Dur {
       throws QueryException {
 
     this(it);
-    if(f != f) Err.or(ii, DATECALC, desc(), f);
-    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) Err.or(ii, DATEZERO, desc());
+    if(Double.isNaN(f)) DATECALC.thrw(ii, desc(), f);
+    if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, desc());
     sc = sc.multiply(BigDecimal.valueOf(m ? f : 1 / f));
     if(Math.abs(sc.doubleValue()) < 1E-13) sc = BigDecimal.valueOf(0);
   }
