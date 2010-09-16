@@ -459,7 +459,7 @@ public abstract class W3CTS {
           logOK.append(NL);
           addLog(pth, outname + ".log", er);
         }
-        ok++;
+        ++ok;
       } else if(er == null) {
         int s = -1;
         final int rs = result.size();
@@ -522,7 +522,7 @@ public abstract class W3CTS {
                 ao.toString());
           }
           correct = false;
-          err++;
+          ++err;
         } else {
           if(print) {
             logOK.append(logStr);
@@ -533,7 +533,7 @@ public abstract class W3CTS {
             addLog(pth, outname + (xml ? IO.XMLSUFFIX : ".txt"),
                 ao.toString());
           }
-          ok++;
+          ++ok;
         }
       } else {
         if(outFiles.size() == 0 || !expError.isEmpty()) {
@@ -548,7 +548,7 @@ public abstract class W3CTS {
             logOK2.append(NL);
             addLog(pth, outname + ".log", er);
           }
-          ok2++;
+          ++ok2;
         } else {
           if(print) {
             logErr2.append(logStr);
@@ -562,7 +562,7 @@ public abstract class W3CTS {
             addLog(pth, outname + ".log", er);
           }
           correct = false;
-          err2++;
+          ++err2;
         }
       }
       if(curr != null) Close.close(context, curr.data);
@@ -603,11 +603,11 @@ public abstract class W3CTS {
           sb.append(' ');
           s = true;
         }
-        m++;
-        c++;
+        ++m;
+        ++c;
       } else if(m != 0 && ch == ':' && c + 1 < cl && in.charAt(c + 1) == ')') {
-        m--;
-        c++;
+        --m;
+        ++c;
       } else if(m == 0) {
         if(!s || ch > ' ') sb.append(ch);
         s = ch <= ' ';

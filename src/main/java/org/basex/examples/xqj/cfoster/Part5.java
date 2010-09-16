@@ -49,7 +49,7 @@ public final class Part5 extends Main {
     XQResultSequence rs = xqe.executeQuery(xqueryString);
 
     int c = 0;
-    while(rs.next()) c++;
+    while(rs.next()) ++c;
     System.out.println(c + " results.");
 
     // Closing connection to the Database.

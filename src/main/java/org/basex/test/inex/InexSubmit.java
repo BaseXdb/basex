@@ -210,7 +210,7 @@ public final class InexSubmit {
       final Str str = Str.get(tmp);
       str.score(Double.parseDouble(s));
       sq.add(str);
-      z++;
+      ++z;
     }
 
     Util.outln("Query % on %: % with size: %", qu + 1,
@@ -364,7 +364,7 @@ public final class InexSubmit {
       i = 0;
       while((l = bf[j].readLine()) != null) {
         qut[i] = Math.min(qut[i], Double.parseDouble(l));
-        i++;
+        ++i;
       }
       bf[j].close();
     }
@@ -390,7 +390,7 @@ public final class InexSubmit {
         } else {
           o.print(l);
         }
-        i++;
+        ++i;
       } else o.print(l);
       o.print(NL);
     }

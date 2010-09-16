@@ -109,8 +109,8 @@ public final class XMLTS {
           if(!inf.isEmpty()) Util.outln("[XERCES] " + inf);
         }
       }
-      if(correct) ok++;
-      else wrong++;
+      if(correct) ++ok;
+      else ++wrong;
 
       new Close().execute(context);
     }
