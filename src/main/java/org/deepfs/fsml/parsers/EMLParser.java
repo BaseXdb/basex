@@ -483,7 +483,7 @@ public final class EMLParser implements IFileParser {
         case '\t':
         case '\'':
         case '"':
-          start++;
+          ++start;
           break;
         default:
           finished = true;
@@ -497,7 +497,7 @@ public final class EMLParser implements IFileParser {
         case '\t':
         case '\'':
         case '"':
-          end--;
+          --end;
           break;
         default:
           finished = true;

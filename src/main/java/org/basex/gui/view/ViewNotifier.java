@@ -259,7 +259,7 @@ public final class ViewNotifier {
       Array.move(queries, 1, 0, hl - 1);
       Array.move(cont, 1, 0, hl - 1);
       Array.move(marked, 1, 0, hl - 1);
-      hist--;
+      --hist;
     }
   }
 }

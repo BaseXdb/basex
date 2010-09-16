@@ -74,7 +74,7 @@ final class MapFSImages extends Thread {
   void add(final int id, final int w, final int h) {
     // add image to the download stack
     if(loaderC < 0) loaderC = 0;
-    else if(loaderC == MAXNR) loaderC--;
+    else if(loaderC == MAXNR) --loaderC;
 
     idCache[loaderC] = id;
     wCache[loaderC] = w;

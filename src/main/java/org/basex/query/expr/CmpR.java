@@ -189,7 +189,7 @@ public final class CmpR extends Single {
 
     final AxisPath path = (AxisPath) expr;
     final int st = path.step.length;
-    
+
     Step step = null;
     if(text) {
       step = st == 1 ? ic.step : path.step[st - 2];

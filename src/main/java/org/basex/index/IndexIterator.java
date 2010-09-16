@@ -45,7 +45,7 @@ public abstract class IndexIterator {
    */
   final int size() {
     int c = 0;
-    while(more()) c++;
+    while(more()) ++c;
     return c;
   }
 }

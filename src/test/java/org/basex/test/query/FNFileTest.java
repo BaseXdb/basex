@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import org.basex.core.Prop;
 import org.basex.query.QueryException;
 import org.basex.query.item.B64;
@@ -18,7 +17,7 @@ import org.junit.BeforeClass;
 
 /**
  * This class tests the functions of the file library.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -60,16 +59,16 @@ public class FNFileTest extends QueryTest {
 
   static {
 
-    doc = "<?xml version='1.0' encoding='UTF-8'?>\n" + 
-          "<ACDC>\n" + 
-            "<Name>\n" + 
-              "<Vorname>Brian</Vorname>\n" +
-              "<Nachname>Johnson</Nachname>\n" + 
-            "</Name>\n" + 
+    doc = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+          "<ACDC>\n" +
             "<Name>\n" +
-              "<Vorname>Angus</Vorname>\n" + 
+              "<Vorname>Brian</Vorname>\n" +
+              "<Nachname>Johnson</Nachname>\n" +
+            "</Name>\n" +
+            "<Name>\n" +
+              "<Vorname>Angus</Vorname>\n" +
               "<Nachname>Young</Nachname>\n" +
-            "</Name>\n" + 
+            "</Name>\n" +
           "</ACDC>";
 
     queries = new Object[][] {
@@ -77,80 +76,80 @@ public class FNFileTest extends QueryTest {
         // /_tmpdir_/testDir1/test1
         { "Test file:mkdir()", nod(),
             "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR1 + "\")" },
-            
+
         // /_tmpdir_/testDir1/test2/test3
         { "Test file:mkdirs()", nod(),
             "file:mkdirs(\"" + dir1.getPath() + Prop.SEP + DIR2 + Prop.SEP
                 + DIR3 + "\")"},
-                
-        // /_tmpdir_/testDir1                
+
+        // /_tmpdir_/testDir1
         { "Test file:is-directory()", bool(true),
             "file:is-directory(\"" + dir1.getPath() + "\")" },
-            
-        // /_tmpdir_/testDir1/fileCopy    
+
+        // /_tmpdir_/testDir1/fileCopy
         { "Test file:is-file()", bool(true),
             "file:is-file(\"" + fileCopy.getPath() + "\")" },
-            
-         // /_tmpdir_/testDir1/fileCopy    
+
+         // /_tmpdir_/testDir1/fileCopy
         { "Test file:is-readable()", bool(true),
             "file:is-readable(\"" + fileCopy.getPath() + "\")" },
-            
-         // /_tmpdir_/testDir1/fileCopy    
+
+         // /_tmpdir_/testDir1/fileCopy
         { "Test file:is-writeable()", bool(true),
             "file:is-writeable(\"" + fileCopy.getPath() + "\")" },
-            
+
         { "Test file:path-separator()", str(Prop.SEP), "file:path-separator()"},
-        
+
          // /_tmpdir_/testDir1/fileCopy
-        { "Test file:read()", str("\"" + doc + "\""),  
+        { "Test file:read()", str("\"" + doc + "\""),
             "file:read(\"" + fileCopy.getPath() + "\")" },
-            
-        // /_tmpdir_/testDir1/fileCopy    
+
+        // /_tmpdir_/testDir1/fileCopy
         { "Test file:read-binary()",
             new ItemIter(new Item[] { new B64(Token.token(doc))}, 1),
             "file:read-binary(\"" + fileCopy.getPath() + "\")" },
-            
-         // /_tmpdir_/testDir1/fileWrite    
+
+         // /_tmpdir_/testDir1/fileWrite
         { "Test file:write()", nod(),
             "file:write(\"" + dir1.getPath() + Prop.SEP + TESTWRITE + "\"," +
             "//Name/Vorname, "  + "(<indent>yes</indent>))" },
-            
-        // /_tmpdir_/testDir1/fileWriteBin    
+
+        // /_tmpdir_/testDir1/fileWriteBin
         { "Test file:write-binary()", nod(),
             "file:write-binary(\"" + dir1.getPath() + Prop.SEP + TESTWRITEBIN +
             "\", \"aGF0\" cast as xs:base64Binary)" },
-                
+
         // src:  /_tmpdir_/testDir1/fileCopy
-        // dest: /_tmpdir_/testDir2/fileCopy        
+        // dest: /_tmpdir_/testDir2/fileCopy
         { "Test file:copy()", nod(),
             "file:copy(\"" + fileCopy.getPath() + "\", \"" +
             dir2.getPath() + Prop.SEP + TESTCOPY + "\")" },
-                
+
         // src:  /_tmpdir_/testDir1
-        // dest: /_tmpdir_/testDir2        
+        // dest: /_tmpdir_/testDir2
         { "Test file:move()", nod(),
-            "file:move(\"" + fileMove.getPath() + "\", \"" + 
+            "file:move(\"" + fileMove.getPath() + "\", \"" +
             dir2.getPath() + "\")" },
-                
-        // /_tmpdir_/testDir1/fileDelete        
+
+        // /_tmpdir_/testDir1/fileDelete
         { "Test file:delete()", nod(),
             "file:delete(\"" + fileDel.getPath() + "\")" },
-            
-        // /_tmpdir_/testDir1/fileCopy    
+
+        // /_tmpdir_/testDir1/fileCopy
         { "Test file:path-to-full-path()", str(fileCopy.getPath()),
             "file:path-to-full-path(\"" + fileCopy.getPath() + "\")"},
-                
-         // file:/_tmpdir_/testDir1/fileCopy    
+
+         // file:/_tmpdir_/testDir1/fileCopy
         { "Test file:path-to-uri()", new ItemIter(new Item[]
              { Uri.uri(Token.token(fileCopy.toURI().toString()))}, 1),
              "file:path-to-uri(\"" + fileCopy.getPath() + "\")"},
-             
-        // /_tmpdir_/testDir1/fileCopy     
+
+        // /_tmpdir_/testDir1/fileCopy
         { "Test file:exists()", bool(true),
             "file:file-exists(\"" + fileCopy.getPath() + "\")"},
-                
+
         { "Test file:files()", nod(), "file:files(\"etc\", " + "\"[^z]*e\")"},
-        
+
         // /_tmpdir_/testDir1/fileCopy
         { "Test file:last-modified()", null,
             "file:last-modified(\"" + fileCopy.getPath() + "\")"},
@@ -170,35 +169,35 @@ public class FNFileTest extends QueryTest {
     dir2.mkdir();
 
     try {
-      BufferedOutputStream outCopy = new BufferedOutputStream(
+      final BufferedOutputStream outCopy = new BufferedOutputStream(
           new FileOutputStream(fileCopy));
       try {
         outCopy.write(Token.token(doc));
       } finally {
         outCopy.close();
       }
-      BufferedOutputStream outMove = new BufferedOutputStream(
+      final BufferedOutputStream outMove = new BufferedOutputStream(
           new FileOutputStream(fileMove));
       try {
         outMove.write(Token.token(doc));
       } finally {
         outMove.close();
       }
-      BufferedOutputStream outDel = new BufferedOutputStream(
+      final BufferedOutputStream outDel = new BufferedOutputStream(
           new FileOutputStream(fileDel));
       try {
         outDel.write(Token.token(doc));
       } finally {
         outDel.close();
       }
-    } catch(IOException ex) {
+    } catch(final IOException ex) {
       ex.printStackTrace();
     }
 
     try {
       queries[18][1] = new ItemIter(new Item[] { new Dtm(
           fileCopy.lastModified(), null)}, 1);
-    } catch(QueryException e) { }
+    } catch(final QueryException e) { }
   }
 
    /** Finishes the test. */

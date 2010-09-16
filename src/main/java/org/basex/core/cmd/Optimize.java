@@ -61,7 +61,7 @@ public final class Optimize extends ACreate {
       if(kind == Data.DOC) {
         parStack[level++] = pre;
         if(path) data.path.add(0, level, kind);
-        d++;
+        ++d;
       } else if(kind == Data.ELEM) {
         final int id = data.name(pre);
         data.tags.index(data.tags.key(id), null, true);

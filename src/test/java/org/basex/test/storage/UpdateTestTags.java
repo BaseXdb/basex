@@ -209,7 +209,7 @@ public final class UpdateTestTags extends UpdateTest {
         final int k = data.kind(root);
         if(data.parent(root, k) != par) break;
         root += data.size(root, k);
-        currPos++;
+        ++currPos;
       }
     }
     final MemData md = new MemData(CONTEXT.data);

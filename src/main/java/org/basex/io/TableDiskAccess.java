@@ -189,7 +189,7 @@ public final class TableDiskAccess extends TableAccess {
     // first count them
     int unused = 0;
     while(npre < last) {
-      if(from == 0) unused++;
+      if(from == 0) ++unused;
       nextBlock();
       from = 0;
     }
@@ -242,7 +242,7 @@ public final class TableDiskAccess extends TableAccess {
     // make room in index for new blocks
     int newBlocks = (int) Math.ceil((double) nr / ENTRIES) + 1;
     // in case we insert at block boundary
-    if(pre == npre) newBlocks--;
+    if(pre == npre) --newBlocks;
 
     // resize the index
     final int s = allBlocks + newBlocks;
@@ -261,7 +261,7 @@ public final class TableDiskAccess extends TableAccess {
 
       fpres[++index] = nr - remain + pre;
       pages[index] = (int) bf.pos;
-      blocks++;
+      ++blocks;
       remain -= ENTRIES;
       pos += ENTRIES;
     }
@@ -273,7 +273,7 @@ public final class TableDiskAccess extends TableAccess {
 
       fpres[++index] = pre + nr;
       pages[index] = (int) bf.pos;
-      blocks++;
+      ++blocks;
     }
 
     // update index entries

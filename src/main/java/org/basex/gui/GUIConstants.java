@@ -257,7 +257,7 @@ public final class GUIConstants {
   private static int[] fwidth;
   /** Bold character widths. */
   private static int[] bwidth;
-  
+
   // KEYS =====================================================================
 
   /** Shift key. */

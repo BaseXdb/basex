@@ -225,7 +225,7 @@ public final class BaseXTextTokens {
     if(ps == 0) return '\n';
     final int p = ps;
     ps = Math.max(0, ps - 5);
-    while(ps < p && ps + cl(text, ps) < p) ps++;
+    while(ps < p && ps + cl(text, ps) < p) ++ps;
     return curr();
   }
 
@@ -255,7 +255,7 @@ public final class BaseXTextTokens {
       final int ch = str.charAt(c);
       if(ch != '\r') {
         tb.addUTF(ch);
-        cc++;
+        ++cc;
       }
     }
     tb.add(text, ps, size);

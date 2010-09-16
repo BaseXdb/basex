@@ -50,7 +50,7 @@ public final class Args {
       } else {
         return true;
       }
-      c++;
+      ++c;
     }
     return false;
   }

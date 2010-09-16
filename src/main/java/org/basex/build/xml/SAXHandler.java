@@ -54,7 +54,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
         atts.add(token(at.getQName(a)), token(at.getValue(a)));
       }
       builder.startElem(token(qn), atts);
-      nodes++;
+      ++nodes;
     } catch(final IOException ex) {
       error(ex);
     }

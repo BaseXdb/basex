@@ -230,7 +230,7 @@ public final class TokenBuilder {
       } else {
         final byte c = i + 1 < t.length ? t[i + 1] : 0;
         final boolean d = c >= '1' && c <= '9';
-        if(d) i++;
+        if(d) ++i;
         final int n = d ? c - '1' : e++;
         final Object o = n < ext.length ? ext[n] : null;
         add(o instanceof byte[] ? (byte[]) o : o == null ? null : o.toString());
@@ -243,7 +243,7 @@ public final class TokenBuilder {
    * Chops leading and trailing whitespaces.
    */
   public void chop() {
-    while(size > 0 && ws(chars[size - 1])) size--;
+    while(size > 0 && ws(chars[size - 1])) --size;
     int s = -1;
     while(++s < size && ws(chars[s]));
     if(s != 0 && s != size) Array.move(chars, s, -s, size - s);

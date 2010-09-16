@@ -231,7 +231,7 @@ public final class MP3Parser implements IFileParser {
           final int nf = (bfc.get() << 24) + (bfc.get() << 16)
               + (bfc.get() << 8) + bfc.get();
           seconds = nf * SPF[version][layr] / samples;
-          encoding++;
+          ++encoding;
           if(seconds != 0) bitrate = (int) ((bfc.size() - size) * 8 /
               seconds / 1000);
         }
@@ -426,12 +426,12 @@ public final class MP3Parser implements IFileParser {
   int skipEncBytes() throws IOException {
     bfc.buffer(3);
     // skip text encoding description bytes
-    int bytesToSkip = 0;
-    if((bfc.get() & 0xFF) <= 0x04) bytesToSkip++;
-    if((bfc.get() & 0xFF) >= 0xFE) bytesToSkip++;
-    if((bfc.get() & 0xFF) >= 0xFE) bytesToSkip++;
-    bfc.skip(bytesToSkip - 3);
-    return bytesToSkip;
+    int skip = 0;
+    if((bfc.get() & 0xFF) <= 0x04) ++skip;
+    if((bfc.get() & 0xFF) >= 0xFE) ++skip;
+    if((bfc.get() & 0xFF) >= 0xFE) ++skip;
+    bfc.skip(skip - 3);
+    return skip;
   }
 
   /**
@@ -484,7 +484,7 @@ public final class MP3Parser implements IFileParser {
     int size = s;
     if(size <= 1 || encoding == null) return EMPTY;
     if(bfc.get() != 0) bfc.skip(-1); // skip leading zero byte
-    else size--;
+    else --size;
     if(encoding.isEmpty()) // no encoding specified
       return bfc.get(new byte[size]);
     final byte[] array = new byte[size - 1];
@@ -502,8 +502,7 @@ public final class MP3Parser implements IFileParser {
     if(ws(value)) return;
     if(value[0] == '(') { // ignore brackets around genre id
       int limit = 1;
-      while(value[limit] >= '0' && value[limit] <= '9' && limit < s)
-        limit++;
+      while(value[limit] >= '0' && value[limit] <= '9' && limit < s) ++limit;
       id = toInt(value, 1, limit);
     } else id = toInt(value);
     if(id == Integer.MIN_VALUE) {
@@ -534,8 +533,7 @@ public final class MP3Parser implements IFileParser {
       value[i++] = 0;
 
     final int start = i; // first byte of the number
-    while(i < size && value[i] >= '0' && value[i] <= '9')
-      i++;
+    while(i < size && value[i] >= '0' && value[i] <= '9') ++i;
     // number of bytes of the number
     final int track = toInt(value, start, i);
     if(track == Integer.MIN_VALUE) throw new ParserException(

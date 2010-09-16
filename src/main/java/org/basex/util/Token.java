@@ -388,7 +388,7 @@ public final class Token {
    */
   public static int len(final byte[] token) {
     int l = 0;
-    for(int t = 0; t < token.length; t += cl(token, t)) l++;
+    for(int t = 0; t < token.length; t += cl(token, t)) ++l;
     return l;
   }
 
@@ -414,7 +414,7 @@ public final class Token {
     final boolean m = n < 0;
     if(m) n = -n;
     int j = numDigits(n);
-    if(m) j++;
+    if(m) ++j;
     final byte[] num = new byte[j];
 
     // faster division by 10 for values < 81920 (see Integer.getChars)
@@ -612,7 +612,7 @@ public final class Token {
   public static long toLong(final byte[] token, final int start,
       final int end) {
     int t = start;
-    while(t < end && token[t] <= ' ') t++;
+    while(t < end && token[t] <= ' ') ++t;
     if(t == end) return Long.MIN_VALUE;
     boolean m = false;
     if(token[t] == '-' || token[t] == '+') m = token[t++] == '-';
@@ -625,7 +625,7 @@ public final class Token {
       if(w < v) return Long.MIN_VALUE;
       v = w;
     }
-    while(t < end && token[t] <= ' ') t++;
+    while(t < end && token[t] <= ' ') ++t;
     return t < end ? Long.MIN_VALUE : m ? -v : v;
   }
 
@@ -659,7 +659,7 @@ public final class Token {
    */
   public static int toInt(final byte[] token, final int start, final int end) {
     int t = start;
-    while(t < end && token[t] <= ' ') t++;
+    while(t < end && token[t] <= ' ') ++t;
     if(t == end) return Integer.MIN_VALUE;
     boolean m = false;
     if(token[t] == '-' || token[t] == '+') m = token[t++] == '-';
@@ -670,7 +670,7 @@ public final class Token {
       if(c < '0' || c > '9') break;
       v = (v << 3) + (v << 1) + c - '0';
     }
-    while(t < end && token[t] <= ' ') t++;
+    while(t < end && token[t] <= ' ') ++t;
     return t < end ? Integer.MIN_VALUE : m ? -v : v;
   }
 
@@ -1014,7 +1014,7 @@ public final class Token {
       tmp[c++] = ws2 ? (byte) ' ' : token[i];
       ws1 = ws2;
     }
-    if(c > 0 && ws(tmp[c - 1])) c--;
+    if(c > 0 && ws(tmp[c - 1])) --c;
     return c == l ? tmp : Arrays.copyOf(tmp, c);
   }
 

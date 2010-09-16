@@ -81,7 +81,7 @@ public final class DOTSerializer extends Serializer {
     if(color == null) color = DOTData.color(string(tag));
     if(color == null) color = attr.length == 0 ? DOTData.ELEM1 : DOTData.ELEM2;
     print(concat(tag, attr), color);
-    level++;
+    ++level;
   }
 
   @Override
@@ -148,7 +148,7 @@ public final class DOTSerializer extends Serializer {
     out.println(Util.info(DOTNODE, count, txt, col));
     nodes.set(count, level);
     if(level > 0) children[level - 1].add(count);
-    count++;
+    ++count;
   }
 
   @Override

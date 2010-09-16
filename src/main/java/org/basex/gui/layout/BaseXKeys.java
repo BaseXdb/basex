@@ -11,6 +11,7 @@ import java.awt.event.KeyEvent;
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
+ * @author Leo Woerteler
  */
 public enum BaseXKeys {
 
@@ -73,13 +74,11 @@ public enum BaseXKeys {
 
   /** Modifiers. */
   private final int mod;
-  
   /** Key. */
   private final int key;
-  
   /** Exclusive modifiers flag. */
   private final boolean excl;
-  
+
   /**
    * Constructor.
    * @param m modifiers
@@ -91,7 +90,7 @@ public enum BaseXKeys {
     key = k;
     excl = ex;
   }
-  
+
   /**
    * Constructor for non-exclusive modifiers.
    * @param m modifiers
@@ -100,7 +99,7 @@ public enum BaseXKeys {
   private BaseXKeys(final int m, final int k) {
     this(m, k, false);
   }
-  
+
   /**
    * Constructor for ignoring modifiers.
    * @param k key code
@@ -109,7 +108,7 @@ public enum BaseXKeys {
   private BaseXKeys(final int k, final boolean ig) {
     this(0, k, ig);
   }
-  
+
   /**
    * Constructor without modifiers.
    * @param k key code

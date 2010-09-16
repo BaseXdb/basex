@@ -18,7 +18,7 @@ import org.basex.gui.layout.BaseXPanel;
  */
 final class ViewMover extends BaseXPanel {
   /** Size of splitter. */
-  private static final int SIZE = 10;
+  private static final int SIZE = 8;
   /** Flag if current mover is active. */
   private boolean active;
 

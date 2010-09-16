@@ -144,7 +144,7 @@ final class FTTrie extends FTIndex {
 
     if(id != 0) {
       int i = 0;
-      while(i < vsn.length && i < ne[0] && ne[i + 1] == vsn[i]) i++;
+      while(i < vsn.length && i < ne[0] && ne[i + 1] == vsn[i]) ++i;
       // node not contained
       if(i != ne[0]) return null;
       // leaf node found with appropriate value
@@ -284,16 +284,16 @@ final class FTTrie extends FTIndex {
 
     // compare chars current node and ending
     // skip all unlike chars, if any suitable was found
-    while(!last && i < ne[0] + 1 && ne[i] != ending[j]) i++;
+    while(!last && i < ne[0] + 1 && ne[i] != ending[j]) ++i;
 
     // skip all chars, equal to first char
-    while(i + ending.length < ne[0] + 1 && ne[i + 1] == ending[0]) i++;
+    while(i + ending.length < ne[0] + 1 && ne[i + 1] == ending[0]) ++i;
 
     skippedChars += i - nod - 1;
 
     while(i < ne[0] + 1 && j < ending.length && ne[i] == ending[j]) {
-      i++;
-      j++;
+      ++i;
+      ++j;
       last = true;
     }
 
@@ -590,7 +590,7 @@ final class FTTrie extends FTIndex {
       counter[1] += cne[0];
 
       int i = 0;
-      while(i < vsn.length && i < cne[0] && cne[i + 1] == vsn[i]) i++;
+      while(i < vsn.length && i < cne[0] && cne[i + 1] == vsn[i]) ++i;
 
       if(cne[0] == i) {
         if(vsn.length == i) {
@@ -652,7 +652,7 @@ final class FTTrie extends FTIndex {
     if(cn != 0) {
       // not root node
       int i = 0;
-      while(i < vsn.length && i < cne[0] && cne[i + 1] == vsn[i]) i++;
+      while(i < vsn.length && i < cne[0] && cne[i + 1] == vsn[i]) ++i;
 
       if(cne[0] == i) {
         // node entry processed complete

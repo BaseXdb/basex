@@ -64,7 +64,7 @@ final class IterPath extends AxisPath {
         while(p != -1) {
           final Item i = iter[p].next();
           if(i == null) {
-            p--;
+            --p;
           } else {
             if(p == iter.length - 1) {
               if(!i.node()) Err.or(input, NODESPATH, this, i.type);
@@ -75,7 +75,7 @@ final class IterPath extends AxisPath {
                 return n;
               }
             } else {
-              p++;
+              ++p;
               ctx.value = i;
               iter[p] = ctx.iter(expr[p]);
             }

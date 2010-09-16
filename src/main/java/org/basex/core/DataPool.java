@@ -54,7 +54,7 @@ public final class DataPool {
         if(close) {
           Array.move(data, i + 1, -1, size - i - 1);
           Array.move(pins, i + 1, -1, size - i - 1);
-          size--;
+          --size;
         }
         return close;
       }
@@ -85,8 +85,7 @@ public final class DataPool {
       pins = Arrays.copyOf(pins, size << 1);
     }
     data[size] = d;
-    pins[size] = 1;
-    size++;
+    pins[size++] = 1;
   }
 
   /**

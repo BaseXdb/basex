@@ -125,7 +125,7 @@ final class PlotAxis {
     if(type == Kind.TEXT)
       textToNum(vals);
     else {
-      extremeValues(vals);
+      minMax(vals);
       // calculations for axis labeling
       if(log) prepareLogAxis();
       else prepareLinAxis();
@@ -157,7 +157,7 @@ final class PlotAxis {
     final TokenSet set = new TokenSet();
     for(final byte[] v : vals) set.add(v);
     nrCats = set.size();
-    if(i > 0) nrCats--;
+    if(i > 0) --nrCats;
 
     // get first/last category for axis caption
     firstCat = i < vl ? vals[i] : EMPTY;
@@ -171,16 +171,15 @@ final class PlotAxis {
       // l: highest index in sorted array for value b
       int l = i;
       // determining highest index of value/category b
-      while(l < vl && eq(vals[l], b)) l++;
+      while(l < vl && eq(vals[l], b)) ++l;
 
       // calculating positions for all items with value b in current category
       while(i < l) {
         // centering items if only a single category exists (.5d)
         final double d = nrCats != 1 ? 1.0d / (nrCats - 1) * p : .5d;
-        co[tmpI[i]] = d;
-        i++;
+        co[tmpI[i++]] = d;
       }
-      p++;
+      ++p;
     }
   }
 
@@ -272,21 +271,18 @@ final class PlotAxis {
    * Determines the extreme values of the current data set.
    * @param vals values of plotted nodes
    */
-  private void extremeValues(final byte[][] vals) {
+  private void minMax(final byte[][] vals) {
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
-    int i = 0;
+    int i = -1;
     boolean b = false;
-    while(i < vals.length) {
+    while(++i < vals.length) {
       if(vals[i].length > 0) {
         b = true;
         final double d = toDouble(vals[i]);
-        if(d < min)
-          min = d;
-        if(d > max)
-          max = d;
+        if(d < min) min = d;
+        if(d > max) max = d;
       }
-      i++;
     }
     if(!b) {
       min = 0;

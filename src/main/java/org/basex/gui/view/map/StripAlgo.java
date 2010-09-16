@@ -74,7 +74,7 @@ final class StripAlgo extends MapAlgo {
       } else {
         row = tmp;
         rowratio = tmpratio;
-        ni++;
+        ++ni;
       }
     }
     // adding last row

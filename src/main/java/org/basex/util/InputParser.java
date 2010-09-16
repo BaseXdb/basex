@@ -102,7 +102,7 @@ public abstract class InputParser {
    */
   protected final boolean consume(final int ch) {
     final boolean found = curr() == ch;
-    if(found) qp++;
+    if(found) ++qp;
     return found;
   }
 
@@ -123,7 +123,7 @@ public abstract class InputParser {
     while(qp < ql) {
       final char ch = qu.charAt(qp);
       if(ch <= 0 || ch > ' ') break;
-      qp++;
+      ++qp;
     }
     qm = qp - 1;
   }

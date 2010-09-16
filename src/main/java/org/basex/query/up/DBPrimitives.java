@@ -58,13 +58,13 @@ final class DBPrimitives extends Primitives {
         final IntList il = new IntList();
         while(p >= 0 && (pre = nodes.get(p)) > par) {
           il.add(pre);
-          p--;
+          --p;
         }
         if(par != -1) il.add(par);
         checkNames(ctx, il.toArray());
       } else {
         if(k == Data.ELEM) checkNames(ctx, pre);
-        p--;
+        --p;
       }
     }
   }
@@ -161,8 +161,8 @@ final class DBPrimitives extends Primitives {
       final int k = d.kind(p);
       if(k == Data.ELEM) p += d.size(p, k);
       else if(p < l - 1 && k == Data.TEXT &&
-          UpdatePrimitive.mergeTexts(d, p, p + 1)) l--;
-      else p++;
+          UpdatePrimitive.mergeTexts(d, p, p + 1)) --l;
+      else ++p;
     }
   }
 

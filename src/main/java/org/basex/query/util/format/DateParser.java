@@ -50,7 +50,7 @@ final class DateParser {
         if(ch == ']') Err.or(input, PICDATE, pic);
         return 0;
       }
-      pos++;
+      ++pos;
     }
     return ch;
   }

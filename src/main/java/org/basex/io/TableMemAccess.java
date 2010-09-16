@@ -87,7 +87,7 @@ public final class TableMemAccess extends TableAccess {
       final byte[] data = new byte[IO.BLOCKSIZE];
       int a = 0;
       for(int b = 0; b < blocks; ++b) {
-        for(int p = 0; p < IO.BLOCKSIZE && a < meta.size; p += 16, a++) {
+        for(int p = 0; p < IO.BLOCKSIZE && a < meta.size; p += 16, ++a) {
           copy(buf1[a], data, p);
           copy(buf2[a], data, p + 8);
         }

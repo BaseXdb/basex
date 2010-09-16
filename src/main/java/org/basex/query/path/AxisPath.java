@@ -206,7 +206,7 @@ public class AxisPath extends Path {
       if(step[s].axis != Axis.DESC) continue;
 
       // check if child steps can be retrieved for current step
-      ArrayList<PathNode> nodes = pathNodes(data, s); 
+      ArrayList<PathNode> nodes = pathNodes(data, s);
       if(nodes == null) continue;
 
       ctx.compInfo(OPTCHILD, step[s]);

@@ -279,7 +279,7 @@ final class FNGen extends Fun {
       final QueryContext ctx) throws QueryException {
 
     if(arg >= fun.expr.length) return null;
-    
+
     // interpret query parameters
     final TokenBuilder tb = new TokenBuilder();
     final Iter ir = fun.expr[arg].iter(ctx);

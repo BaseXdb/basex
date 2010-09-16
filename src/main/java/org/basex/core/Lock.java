@@ -57,7 +57,7 @@ public final class Lock {
       synchronized(this) {
         if(state != State.WRITE && waiting.size() == 0) {
           state = State.READ;
-          activeR++;
+          ++activeR;
           return;
         }
       }
@@ -72,7 +72,7 @@ public final class Lock {
             Util.stack(ex);
           }
         }
-        activeR++;
+        ++activeR;
         state = State.READ;
       }
     }

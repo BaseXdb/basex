@@ -238,7 +238,7 @@ public final class MapView extends View implements Runnable {
     // run zooming
     while(zoomStep > 1) {
       Performance.sleep(zoomSpeed);
-      zoomStep--;
+      --zoomStep;
       repaint();
     }
     // wait until current painting is finished

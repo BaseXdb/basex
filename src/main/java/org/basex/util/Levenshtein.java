@@ -36,8 +36,8 @@ public final class Levenshtein {
    */
   public boolean similar(final byte[] token, final byte[] sub, final int err) {
     int sl = 0, tl = 0;
-    for(int s = 0; s < sub.length; s += cl(sub, s)) sl++;
-    for(int t = 0; t < token.length; t += cl(token, t)) tl++;
+    for(int s = 0; s < sub.length; s += cl(sub, s)) ++sl;
+    for(int t = 0; t < token.length; t += cl(token, t)) ++tl;
     if(tl == 0) return false;
 
     // use exact search for too short and too long values

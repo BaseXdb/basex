@@ -151,7 +151,7 @@ public final class Find extends AQuery {
       }
 
       int off = exact ? 1 : 0;
-      while(off < qu.length() && qu.charAt(off) == ' ') off++;
+      while(off < qu.length() && qu.charAt(off) == ' ') ++off;
       qu = qu.substring(off);
       if(qu.isEmpty()) continue;
 

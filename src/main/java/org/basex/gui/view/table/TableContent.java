@@ -86,7 +86,7 @@ final class TableContent extends BaseXBack {
       posY += rowH;
 
       final int pre = tdata.rows.get(l);
-      while(mpos < marked.size() && marked.nodes[mpos] < pre) mpos++;
+      while(mpos < marked.size() && marked.nodes[mpos] < pre) ++mpos;
 
       // draw line
       g.setColor(GUIConstants.color3);

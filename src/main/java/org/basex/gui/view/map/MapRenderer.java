@@ -325,11 +325,11 @@ final class MapRenderer {
         wl += lastl;
 
         if(ftp != null && ftp.contains(count)) {
-          ct++;
-          pp++;
+          ++ct;
+          ++pp;
         }
-        count++;
-        if(i < data[0].length) i++;
+        ++count;
+        if(i < data[0].length) ++i;
         else break;
       }
 
@@ -363,7 +363,7 @@ final class MapRenderer {
           if(draw) g.fillRect(xx + ll, yy, wltmp, r.thumbfh);
           ll += wltmp;
           wltmp = wl / ct + (cttmp == ct - 2 ? wl - wl / ct * ct : 0);
-          cttmp++;
+          ++cttmp;
         }
       }
 
@@ -383,13 +383,13 @@ final class MapRenderer {
         }
         ll += r.thumbsw;
         sl = 0;
-        psl++;
+        ++psl;
       }
 
       // new paragraph
       if(ppl < data[2].length && data[2][ppl] == pl) {
         pl = 0;
-        ppl++;
+        ++ppl;
         if(sen) {
           yy += r.thumblh;
           wl = 0;
@@ -456,7 +456,7 @@ final class MapRenderer {
       }
 
       ll += wl;
-      count++;
+      ++count;
 
       if(psl < data[1].length && sl == data[1][psl]) {
         // new sentence, draw dot
@@ -466,7 +466,7 @@ final class MapRenderer {
           g.setColor(textc);
         }
         ll += r.thumbsw;
-        psl++;
+        ++psl;
         sl = 0;
       }
 
@@ -477,7 +477,7 @@ final class MapRenderer {
         // new paragraph
         yy += r.thumblh;
         ll = 0;
-        ppl++;
+        ++ppl;
         pl = 0;
       }
     }
@@ -591,12 +591,12 @@ final class MapRenderer {
 
           if(apm) {
             tok[tok.length - 1] = (byte) data[4][psl];
-            sl++;
+            ++sl;
           }
           sl -= tok.length;
 
           if(sl == 0) {
-            psl--;
+            --psl;
             if(psl == -1) psl = data[1].length;
             else sl = data[1][psl];
           }
@@ -612,7 +612,7 @@ final class MapRenderer {
           ttcol.add(ftp != null && ftp.contains(i));
           if(i == 0) break;
           p -= data[0][i - 1];
-          i--;
+          --i;
         }
         if(i > 0) {
           tl.add(new byte[] { '.', '.' });
@@ -641,7 +641,7 @@ final class MapRenderer {
           if(psl < data[1].length && data[1][psl] == sl + data[0][i]) {
             apm = true;
             sl = 0;
-            psl++;
+            ++psl;
           }
           tok = new byte[data[0][i] + (apm ? 1 : 0)];
           l = 0;
@@ -662,7 +662,7 @@ final class MapRenderer {
 
           ttcol.add(ftp != null && ftp.contains(i));
           p += tok.length - (apm ? 1 : 0);
-          i++;
+          ++i;
         }
         if(i < data[0].length) {
           tl.add(new byte[] { '.', '.' });
@@ -675,18 +675,18 @@ final class MapRenderer {
       if(ds && psl < data[1].length && data[1][psl] == sl) {
         if(ll + r.thumbsw >= ww) {
           yy += r.thumblh;
-          ll = ll - ww;
+          ll -= ww;
         }
 
         ll += r.thumbsw;
         sl = 0;
-        psl++;
+        ++psl;
       }
 
       // new paragraph
       if(ppl < data[2].length && data[2][ppl] == pl) {
         pl = 0;
-        ppl++;
+        ++ppl;
         if(sen) {
           yy += r.thumblh;
           wl = 0;
@@ -726,7 +726,7 @@ final class MapRenderer {
       if(wl + l + sw < wi) {
         wl += l + sw;
       } else {
-        nl++;
+        ++nl;
         if(l > wi) wi = l;
         wl = l + sw;
       }

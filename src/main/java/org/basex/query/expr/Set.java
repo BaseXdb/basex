@@ -2,10 +2,14 @@ package org.basex.query.expr;
 
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
 import org.basex.util.InputInfo;
+import org.basex.util.Util;
 
 /**
  * Set expression.
@@ -13,16 +17,16 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public abstract class Set extends Arr {
+abstract class Set extends Arr {
   /** Duplicate flag; {@code true} if arguments contain duplicates. */
   protected boolean dupl;
-  
+
   /**
    * Constructor.
    * @param ii input info
    * @param l expression list
    */
-  public Set(final InputInfo ii, final Expr[] l) {
+  protected Set(final InputInfo ii, final Expr[] l) {
     super(ii, l);
   }
 
@@ -38,7 +42,7 @@ public abstract class Set extends Arr {
   public final NodeIter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[expr.length];
     for(int e = 0; e != expr.length; ++e) iter[e] = ctx.iter(expr[e]);
-    return dupl ? eval(iter) : iter(iter);
+    return dupl ? eval(iter).sort() : iter(iter);
   }
 
   /**
@@ -47,7 +51,7 @@ public abstract class Set extends Arr {
    * @return resulting iterator
    * @throws QueryException query exception
    */
-  protected abstract NodeIter eval(final Iter[] iter) throws QueryException;
+  protected abstract NodIter eval(final Iter[] iter) throws QueryException;
 
   /**
    * Evaluates the specified iterators in an iterative manner.
@@ -55,9 +59,46 @@ public abstract class Set extends Arr {
    * @return resulting iterator
    */
   protected abstract NodeIter iter(final Iter[] iter);
-
   @Override
   public boolean duplicates() {
     return false;
+  }
+
+  /**
+   * Abstract set iterator.
+   */
+  abstract class SetIter extends NodeIter {
+    /** Iterator. */
+    protected final Iter[] iter;
+    /** Items. */
+    protected Nod[] item;
+
+    /**
+     * Constructor.
+     * @param ir iterator
+     */
+    protected SetIter(final Iter[] ir) {
+      iter = ir;
+    }
+
+    @Override
+    public abstract Nod next() throws QueryException;
+
+    /**
+     * Sets the next iterator item.
+     * @param i index
+     * @return true if another item was found
+     * @throws QueryException query exception
+     */
+    protected boolean next(final int i) throws QueryException {
+      final Item it = iter[i].next();
+      item[i] = it == null ? null : checkNode(it);
+      return it != null;
+    }
+  }
+
+  @Override
+  public final String toString() {
+    return "(" + toString(" " + Util.name(this).toUpperCase() + " ") + ")";
   }
 }

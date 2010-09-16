@@ -86,7 +86,7 @@ public class LogListTest {
    * holds.
    */
   private static void checkMapping() {
-    for(int pre = 0; pre < context.data.meta.size; pre++) {
+    for(int pre = 0; pre < context.data.meta.size; ++pre) {
       final int id = context.data.id(pre);
       assertEquals("Wrong PRE value for ID " + id + ":", pre,
           context.data.pre(id));

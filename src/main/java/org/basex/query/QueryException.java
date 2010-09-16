@@ -100,7 +100,7 @@ public final class QueryException extends Exception {
   public int col() {
     return col;
   }
-  
+
   /**
    * Returns the marked error column.
    * @return error column

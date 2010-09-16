@@ -128,7 +128,7 @@ public final class Loader extends ClassLoader {
     for(final Class<?> c : classes) {
       try {
         Class.forName(c.getName(), true, ClassLoader.getSystemClassLoader());
-        counter++;
+        ++counter;
       } catch(final Throwable t) { // catch everything and break after an error
         Util.errln("Failed to load class (%)", t.getMessage());
         break;

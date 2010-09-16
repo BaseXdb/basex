@@ -143,7 +143,7 @@ final class XQueryText extends BaseXText {
             break;
           }
           if(last[e] == '\n') {
-            l++;
+            ++l;
             c = 0;
           }
         }

@@ -45,12 +45,11 @@ final class NodePrimitivesContainer implements NodePrimitives {
    * @return position
    */
   private int findPos(final UpdatePrimitive p) {
-    int i = 0;
+    int i = -1;
     final int to = p.type().ordinal();
-    while(i < primitives.size()) {
+    while(++i < primitives.size()) {
       final int po = primitives.get(i).type().ordinal();
       if(to <= po) return i;
-      i++;
     }
     return i;
   }

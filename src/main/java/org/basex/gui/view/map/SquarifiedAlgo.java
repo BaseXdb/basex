@@ -75,7 +75,7 @@ final class SquarifiedAlgo extends MapAlgo {
         } else {
           row = tmp;
           rowratio = tmpratio;
-          ni++;
+          ++ni;
         }
       } else {
         weight += ml.weight[ni];
@@ -118,7 +118,7 @@ final class SquarifiedAlgo extends MapAlgo {
         } else {
           row = tmp;
           rowratio = tmpratio;
-          ni++;
+          ++ni;
         }
       }
     }

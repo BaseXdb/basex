@@ -132,7 +132,7 @@ public final class FTWords extends FTExpr {
           int d = 0;
           while(ft.more()) {
             if(ctx.ftopt.sw != null && ctx.ftopt.sw.id(ft.get()) != 0) {
-              d++;
+              ++d;
             } else {
               final FTIndexIterator it = (FTIndexIterator) data.ids(ft);
               iat = iat == null ? it : FTIndexIterator.phrase(iat, it, ++d);

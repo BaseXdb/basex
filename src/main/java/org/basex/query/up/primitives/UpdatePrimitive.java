@@ -240,7 +240,7 @@ public abstract class UpdatePrimitive {
 
     int s = 1;
     NodeIter ch = n.attr();
-    while(ch.next() != null) s++;
+    while(ch.next() != null) ++s;
     if(!a) {
       ch = n.child();
       Nod i;

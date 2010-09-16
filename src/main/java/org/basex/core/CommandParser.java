@@ -123,7 +123,7 @@ public final class CommandParser extends InputParser {
       if(!consume(';')) help(null, cmd);
     }
   }
-  
+
   /**
    * Parses the input and returns a command list.
    * @param g gui flag
@@ -132,7 +132,7 @@ public final class CommandParser extends InputParser {
    */
   public Command[] parse(final boolean g) throws QueryException {
     gui = g;
-    return parse(); 
+    return parse();
   }
 
   /**

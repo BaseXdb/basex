@@ -105,7 +105,7 @@ public abstract class AQuery extends Command {
             it.serialize(xml);
             xml.closeResult();
             it = ir.next();
-            hits++;
+            ++hits;
           }
         }
         updates = qp.updates();

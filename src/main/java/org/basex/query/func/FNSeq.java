@@ -69,7 +69,7 @@ final class FNSeq extends Fun {
     // at most one returned item
     if(def == FunDef.SUBSEQ && expr.length == 3 && expr[2].type().one())
       o = SeqType.Occ.ZO;
-    
+
     type = SeqType.get(t, o);
     return this;
   }
@@ -126,9 +126,8 @@ final class FNSeq extends Fun {
         while(true) {
           final Item i = ir.next();
           if(i == null) return null;
-          c++;
-          if(i.comparable(it) && CmpV.Op.EQ.e(input, i, it))
-            return Itr.get(c);
+          ++c;
+          if(i.comparable(it) && CmpV.Op.EQ.e(input, i, it)) return Itr.get(c);
         }
       }
     };

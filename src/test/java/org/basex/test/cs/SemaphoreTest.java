@@ -94,7 +94,7 @@ public final class SemaphoreTest {
           try {
             final int t = rand.nextInt(2);
             sessions.get(j).execute(q[t]);
-            tdone++;
+            ++tdone;
           } catch(final BaseXException ex) {
             fail(ex.toString());
           }

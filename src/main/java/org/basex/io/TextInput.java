@@ -106,7 +106,7 @@ public final class TextInput {
     while(ch == 0 && ip != 0) ch = in[--ip].readChar();
     last[lp++] = ch;
     lp &= 0x0F;
-    if(ip == 0 && ch == '\n') line++;
+    if(ip == 0 && ch == '\n') ++line;
     return ch;
   }
 

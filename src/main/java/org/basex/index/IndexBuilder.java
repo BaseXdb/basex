@@ -60,7 +60,7 @@ public abstract class IndexBuilder extends Progress {
       merge = true;
       cc = 30;
     } else {
-      cc--;
+      --cc;
     }
     return full;
   }

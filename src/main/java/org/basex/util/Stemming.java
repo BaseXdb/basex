@@ -95,11 +95,11 @@ final class Stemming {
     // step 1
     if(e(S)) {
       if(e(SSES) || e(IES)) te -= 2;
-      else if(l(te - 2) != 's') te--;
+      else if(l(te - 2) != 's') --te;
     }
 
     if(e(EED)) {
-      if(m() > 0) te--;
+      if(m() > 0) --te;
     } else if((e(ED) || e(ING)) && v()) {
       te = tt;
 
@@ -109,7 +109,7 @@ final class Stemming {
       } else if(te > 1) {
         final int c = l(te - 1);
         if(c == l(te - 2) && c != 'l' && c != 's' && c != 'z') {
-          te--;
+          --te;
         } else if(m() == 1) {
           if(c(te)) a((byte) 'e');
         }
@@ -148,9 +148,9 @@ final class Stemming {
     // step 5
     if(e(E)) {
       final int m = m();
-      if(m > 1 || m == 1 && !c(te - 1)) te--;
+      if(m > 1 || m == 1 && !c(te - 1)) --te;
     }
-    if(e(LL) && e(L) && m() > 1) te--;
+    if(e(LL) && e(L) && m() > 1) --te;
 
     return te != tok.length;
   }
@@ -203,7 +203,7 @@ final class Stemming {
     boolean v = false;
     while(++i < tt) {
       if(v ^ v(i)) {
-        if(v) c++;
+        if(v) ++c;
         v ^= true;
       }
     }

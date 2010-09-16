@@ -256,7 +256,7 @@ public final class XMLSerializer extends Serializer {
       for(int k = 0; k < b.length; k += cl(b, k)) {
         final int ch = cp(b, k);
         if(ch == ']') {
-          c++;
+          ++c;
         } else {
           if(c > 1 && ch == '>') {
             print(CDATA2);
@@ -280,7 +280,7 @@ public final class XMLSerializer extends Serializer {
     int c = -1, wl = 0;
     final Tokenizer ftt = new Tokenizer(b, null);
     while(ftt.more()) {
-      c++;
+      ++c;
       for(int i = wl; i < ftt.p; i += cl(b, i)) {
         final int ch = cp(b, i);
         if(ftChar(ch) && ftp.contains(c)) print((char) 0x10);

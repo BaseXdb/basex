@@ -101,7 +101,7 @@ final class TableInput implements Runnable {
     if(ch < ' ') return false;
     flashing = true;
     text = text.substring(0, pos) + ch + text.substring(pos);
-    pos++;
+    ++pos;
     return true;
   }
 

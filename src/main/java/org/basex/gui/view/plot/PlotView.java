@@ -440,7 +440,7 @@ public final class PlotView extends View {
         final int pi = plotData.findPre(m[i]);
         if(pi > -1) drawItem(gi, plotData.xAxis.co[pi],
             plotData.yAxis.co[pi], false, true, false);
-        i++;
+        ++i;
       }
       return;
     }
@@ -455,10 +455,10 @@ public final class PlotView extends View {
     if(k > -1) {
       drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false,
           true, false);
-      k++;
+      ++k;
     } else {
-      k *= -1;
-      k--;
+      k = -k;
+      --k;
     }
 
     // context change (triggered by another view).
@@ -471,13 +471,13 @@ public final class PlotView extends View {
       if(a == b) {
         drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k], false,
             true, false);
-        k++;
+        ++k;
       } else if(a + ns >= b) {
         if(a < b) drawItem(gi, plotData.xAxis.co[k], plotData.yAxis.co[k],
             false, false, true);
-        k++;
+        ++k;
       } else {
-        i++;
+        ++i;
       }
     }
   }
@@ -564,7 +564,7 @@ public final class PlotView extends View {
       final int cl = coSorted.length;
       int i = 0;
       // find first non .0d coordinate value
-      while(i < cl && coSorted[i] == 0) i++;
+      while(i < cl && coSorted[i] == 0) ++i;
       // find nearest position for next axis caption
       while(i < cl && op < 1.0d - 0.4d * capRange) {
         if(coSorted[i] > op) {
@@ -574,19 +574,19 @@ public final class PlotView extends View {
 
           int j = 0;
           // find value for given plot position
-          while(j < axis.co.length && axis.co[j] != op) j++;
+          while(j < axis.co.length && axis.co[j] != op) ++j;
           drawCaptionAndGrid(g, drawX,
               string(axis.getValue(plotData.pres[j])), op);
           // increase to next optimum caption position
           op += capRange;
         }
-        i++;
+        ++i;
       }
       if(nrCats == 1) {
         op = .5d;
         int j = 0;
         // find value for given plot position
-        while(j < axis.co.length && axis.co[j] != op) j++;
+        while(j < axis.co.length && axis.co[j] != op) ++j;
         drawCaptionAndGrid(g, drawX,
             string(axis.getValue(plotData.pres[j])), op);
       }
@@ -637,7 +637,7 @@ public final class PlotView extends View {
               b += a;
             }
 
-            l++;
+            ++l;
             a = -1 * Math.pow(10, l);
           }
         }
@@ -670,7 +670,7 @@ public final class PlotView extends View {
               b += a;
             }
 
-            l++;
+            ++l;
             a = Math.pow(10, l);
           }
         }
@@ -680,7 +680,7 @@ public final class PlotView extends View {
         double d = axis.calcPosition(axis.startvalue);
         double f = axis.startvalue;
         while(d < 1.0d - .25d / nrCaptions) {
-          c++;
+          ++c;
           drawCaptionAndGrid(g, drawX, formatString(f, drawX), d);
           f += step;
           d = axis.calcPosition(f);

@@ -86,13 +86,13 @@ public abstract class QueryTest {
         if(!correct || !val.sameAs(cmp)) {
           sb.append("-- " + qu[0] + ": " + query + "\n[E] " + (correct ?
               qu[1] : "error") + "\n[F] " + val + " " + details() + "\n");
-          fail++;
+          ++fail;
         }
       } catch(final BaseXException ex) {
         if(correct) {
           sb.append("-- " + qu[0] + ": " + query + "\n[E] " +
               qu[1] + "\n[F] " + ex.getMessage() + " " + details() + "\n");
-          fail++;
+          ++fail;
         }
       }
     }

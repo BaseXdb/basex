@@ -519,7 +519,7 @@ public final class QueryContext extends Progress {
       // invalid collection reference
       if(contains(coll, '<') || contains(coll, '\\')) Err.or(ii, COLLINV, coll);
 
-      while(c < colls && !eq(collName[c], coll)) c++;
+      while(c < colls && !eq(collName[c], coll)) ++c;
       if(c == colls) addDocs(doc(coll, true, false, ii));
     }
     return new NodIter(collect[c].item, (int) collect[c].size());

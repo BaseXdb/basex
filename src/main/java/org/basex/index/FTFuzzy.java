@@ -178,10 +178,10 @@ final class FTFuzzy extends FTIndex {
    */
   private void addOccs(final IndexStats stats) {
     int i = 0;
-    while(i < tp.length && tp[i] == -1) i++;
+    while(i < tp.length && tp[i] == -1) ++i;
     int p = tp[i];
     int j = i + 1;
-    while(j < tp.length && tp[j] == -1) j++;
+    while(j < tp.length && tp[j] == -1) ++j;
 
     while(p < tp[tp.length - 1]) {
       if(stats.adding(size(p, i))) stats.add(ti.readBytes(p, i));

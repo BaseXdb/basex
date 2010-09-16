@@ -10,7 +10,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -41,42 +40,36 @@ public final class Union extends Set {
         ctx.compInfo(OPTREMOVE, desc(), Type.EMP);
       }
     }
-    
-    // as union is required to always returns sorted results,
-    // a single, non-sorted argument must be evaluated as well
+
+    // results must always be sorted
     return expr.length == 0 ? Empty.SEQ :
       expr.length == 1 && !dupl ? expr[0] : this;
   }
 
   @Override
-  protected NodeIter eval(final Iter[] iter) throws QueryException {
+  protected NodIter eval(final Iter[] iter) throws QueryException {
     final NodIter ni = new NodIter().random();
     for(final Iter ir : iter) {
       Item it;
-      while((it = ir.next()) != null) {
-        if(!it.node()) Err.type(this, Type.NOD, it);
-        ni.add((Nod) it);
-      }
+      while((it = ir.next()) != null) ni.add(checkNode(it));
     }
-    return ni.sort();
+    return ni;
   }
 
   @Override
   protected NodeIter iter(final Iter[] iter) {
-    return new NodeIter() {
-      Nod[] items;
-
+    return new SetIter(iter) {
       @Override
       public Nod next() throws QueryException {
-        if(items == null) {
-          items = new Nod[iter.length];
+        if(item == null) {
+          item = new Nod[iter.length];
           for(int i = 0; i != iter.length; ++i) next(i);
         }
 
         int m = -1;
-        for(int i = 0; i != items.length; ++i) {
-          if(items[i] == null) continue;
-          final int d = m == -1 ? 1 : items[m].diff(items[i]);
+        for(int i = 0; i != item.length; ++i) {
+          if(item[i] == null) continue;
+          final int d = m == -1 ? 1 : item[m].diff(item[i]);
           if(d == 0) {
             next(i--);
           } else if(d > 0) {
@@ -85,21 +78,10 @@ public final class Union extends Set {
         }
         if(m == -1) return null;
 
-        final Nod it = items[m];
+        final Nod it = item[m];
         next(m);
         return it;
       }
-
-      private void next(final int i) throws QueryException {
-        final Item it = iter[i].next();
-        if(it != null && !it.node()) Err.type(Union.this, Type.NOD, it);
-        items[i] = (Nod) it;
-      }
     };
-  }
-
-  @Override
-  public String toString() {
-    return "(" + toString(" | ") + ")";
   }
 }

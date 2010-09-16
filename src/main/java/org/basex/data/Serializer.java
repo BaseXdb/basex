@@ -285,11 +285,11 @@ public abstract class Serializer {
       // close opened elements...
       while(l > 0 && parStack[l - 1] >= r) {
         closeElement();
-        l--;
+        --l;
       }
 
       if(k == Data.DOC) {
-        p++;
+        ++p;
       } else if(k == Data.TEXT) {
         final FTPos ftd = ft != null ? ft.get(p) : null;
         if(ftd != null) text(data.text(p++, true), ftd);

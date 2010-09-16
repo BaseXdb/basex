@@ -66,7 +66,7 @@ public class StringList extends ElementList implements Iterable<String> {
   public final void sort(final boolean cs, final boolean asc) {
     sort(cs, asc, 0);
   }
-  
+
   /**
    * Sorts the elements.
    * @param cs respect case sensitivity

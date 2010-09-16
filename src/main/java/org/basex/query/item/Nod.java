@@ -34,7 +34,7 @@ public abstract class Nod extends Item {
   private static int sid;
 
   /** Unique node id. */
-  protected final int id = sid++;
+  protected final int id = ++sid;
   /** Text value. */
   protected byte[] val;
   /** Parent node. */

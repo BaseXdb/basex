@@ -154,7 +154,7 @@ public final class DiskBuilder extends Builder {
   protected void setSize(final int pre, final int val) throws IOException {
     sout.writeNum(pre);
     sout.writeNum(val);
-    ssize++;
+    ++ssize;
   }
 
   /**

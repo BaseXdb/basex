@@ -132,13 +132,13 @@ public final class Order extends ParseExpr {
         final int h = d(o, b, im);
         if(h > 0) break;
         if(h == 0) s(o, a++, b);
-        b++;
+        ++b;
       }
       while(c >= b) {
         final int h = d(o, c, im);
         if(h < 0) break;
         if(h == 0) s(o, c, d--);
-        c--;
+        --c;
       }
       if(b > c) break;
       s(o, b++, c--);

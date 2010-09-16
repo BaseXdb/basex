@@ -173,7 +173,7 @@ final class FNPat extends Fun {
       if(rep[i] == '\\') {
         if(i + 1 == rep.length || rep[i + 1] != '\\' && rep[i + 1] != '$')
           Err.or(input, FUNREGREP);
-        i++;
+        ++i;
       }
     }
 

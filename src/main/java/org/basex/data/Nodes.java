@@ -146,7 +146,7 @@ public final class Nodes implements Result {
     while(a != al && b != bl) {
       final int d = ai[a] - bi[b];
       c.add(d <= 0 ? ai[a++] : bi[b++]);
-      if(d == 0) b++;
+      if(d == 0) ++b;
     }
     while(a != al) c.add(ai[a++]);
     while(b != bl) c.add(bi[b++]);
@@ -167,8 +167,8 @@ public final class Nodes implements Result {
     while(a != al && b != bl) {
       final int d = ai[a] - bi[b];
       if(d < 0) c.add(ai[a]);
-      else b++;
-      if(d <= 0) a++;
+      else ++b;
+      if(d <= 0) ++a;
     }
     while(a != al) c.add(ai[a++]);
     return c.toArray();

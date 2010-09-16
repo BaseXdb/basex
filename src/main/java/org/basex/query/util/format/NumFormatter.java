@@ -101,9 +101,9 @@ public final class NumFormatter {
           if(cp(pat, i - 1) == DECIMAL || cp(pat, i + 1) == DECIMAL)
             Err.or(ii, PICNUM, pat);
         } else if(ch == PERCENT) {
-          pc++;
+          ++pc;
         } else if(ch == PERMILLE) {
-          pm++;
+          ++pm;
         } else if(ch == OPTIONAL) {
           if(!frac) {
             // integer part, and optional sign after digit?
@@ -159,7 +159,7 @@ public final class NumFormatter {
         final boolean a = ACTIVE.indexOf(ch) != -1;
 
         if(ch == DECIMAL) {
-          p++;
+          ++p;
           act = false;
         } else if(ch == OPTIONAL) {
           opt[p]++;

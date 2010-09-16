@@ -185,7 +185,7 @@ final class FNStr extends Fun {
     int ss = s;
     int ee = e;
     int p = 0;
-    for(l = 0; l < str.length; l += cl(str, l), p++) {
+    for(l = 0; l < str.length; l += cl(str, l), ++p) {
       if(p == s) ss = l;
       if(p == e) ee = l;
     }
@@ -245,7 +245,7 @@ final class FNStr extends Fun {
     while((i = iter.next()) != null) {
       tb.add(checkEStr(i));
       tb.add(sep);
-      c++;
+      ++c;
     }
     final byte[] v = tb.finish();
     return Str.get(c == 0 ? v : substring(v, 0, v.length - sep.length));

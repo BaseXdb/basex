@@ -56,10 +56,10 @@ final class FTFuzzyList extends FTList {
   protected byte[] token() {
     if(tp[tp.length - 1] == ptok) return EMPTY;
     if(tp[ntl] == ptok || ntl == 0) {
-      ctl++;
-      while(tp[ctl] == -1) ctl++;
+      ++ctl;
+      while(tp[ctl] == -1) ++ctl;
       ntl = ctl + 1;
-      while(tp[ntl] == -1) ntl++;
+      while(tp[ntl] == -1) ++ntl;
     }
     if(ctl == tp.length) return EMPTY;
 

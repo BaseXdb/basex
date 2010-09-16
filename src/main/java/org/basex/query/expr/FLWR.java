@@ -63,7 +63,7 @@ public final class FLWR extends FLWOR {
           } else {
             while(iter[p].next() != null) {
               if(p + 1 != fl.length) {
-                p++;
+                ++p;
               } else if(where == null || where.ebv(ctx, input).bool(input)) {
                 rtrn = ctx.iter(ret);
                 break;

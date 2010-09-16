@@ -201,13 +201,13 @@ public class IntList extends ElementList {
         final int h = g ? s(t[b], v) : d(t[b], v);
         if(f ? h > 0 : h < 0) break;
         if(h == 0) s(a++, b, t);
-        b++;
+        ++b;
       }
       while(c >= b) {
         final int h = g ? s(t[c], v) : d(t[c], v);
         if(f ? h < 0 : h > 0) break;
         if(h == 0) s(c, d--, t);
-        c--;
+        --c;
       }
       if(b > c) break;
       s(b++, c--, t);
@@ -265,13 +265,13 @@ public class IntList extends ElementList {
         final double h = t[b] - v;
         if(f ? h > 0 : h < 0) break;
         if(h == 0) s(a++, b, t);
-        b++;
+        ++b;
       }
       while(c >= b) {
         final double h = t[c] - v;
         if(f ? h < 0 : h > 0) break;
         if(h == 0) s(c, d--, t);
-        c--;
+        --c;
       }
       if(b > c) break;
       s(b++, c--, t);

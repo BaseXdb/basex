@@ -131,7 +131,7 @@ public final class FTAnd extends FTExpr {
     for(int i = 0; i < expr.length; ++i) {
       if(!expr[i].indexAccessible(ic)) return false;
       neg[i] = ic.not;
-      if(ic.not) n++;
+      if(ic.not) ++n;
       ic.not = false;
       if(is == 0 || ic.costs < is) is = ic.costs;
       if(ic.costs == 0) break;

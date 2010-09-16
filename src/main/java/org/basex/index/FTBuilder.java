@@ -155,7 +155,7 @@ public abstract class FTBuilder extends IndexBuilder {
 
       int fr = 0;
       do {
-        fr++;
+        ++fr;
         np += nl;
         if(np >= ns) break;
         p = Num.read(vpre, np);
@@ -167,7 +167,7 @@ public abstract class FTBuilder extends IndexBuilder {
       if(maxfreq[u] < fr) maxfreq[u] = fr;
       ntoken[token]++;
     }
-    token++;
+    ++token;
   }
 
   /**
@@ -252,7 +252,7 @@ public abstract class FTBuilder extends IndexBuilder {
       for(final int l = pp + Num.len(vpos, pp); pp < l; ++pp)
         out.write(vpos[pp]);
     }
-    token++;
+    ++token;
   }
 
   /**

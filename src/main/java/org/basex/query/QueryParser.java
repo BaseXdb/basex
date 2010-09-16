@@ -1427,7 +1427,7 @@ public class QueryParser extends InputParser {
       test = test(true);
       checkTest(test, true);
       if(test == null) {
-        qp--;
+        --qp;
         error(NOATTNAME);
       }
     } else {
@@ -1732,13 +1732,13 @@ public class QueryParser extends InputParser {
               tb.reset();
             }
           } else if(c == '}') {
-            qp++;
+            ++qp;
             check('}');
             tb.add('}');
           } else if(c == '<' || c == 0) {
             error(NOQUOTE, found());
           } else if(c == 0x0A || c == 0x09) {
-            qp++;
+            ++qp;
             tb.add(' ');
           } else {
             entity(tb);
@@ -2752,7 +2752,7 @@ public class QueryParser extends InputParser {
   private boolean ncName(final boolean first) {
     char c = curr();
     if(!XMLToken.isXMLLetter(c)) {
-      if(!first) qp--;
+      if(!first) --qp;
       return false;
     }
     if(!first) tok.add(':');
@@ -2942,7 +2942,7 @@ public class QueryParser extends InputParser {
         comment();
       } else {
         if(c <= 0 || c > ' ') return p != qp;
-        qp++;
+        ++qp;
       }
     }
     return p != qp;
@@ -2953,7 +2953,7 @@ public class QueryParser extends InputParser {
    * @throws QueryException query exception
    */
   private void comment() throws QueryException {
-    qp++;
+    ++qp;
     while(++qp < ql) {
       if(curr('(') && next() == ':') comment();
       if(curr(':') && next() == ')') {
@@ -2973,7 +2973,7 @@ public class QueryParser extends InputParser {
     while(more()) {
       final int c = curr();
       if(c <= 0 || c > ' ') return p != qp;
-      qp++;
+      ++qp;
     }
     return true;
   }

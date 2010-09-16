@@ -196,7 +196,7 @@ public final class FTOpt extends ExprInfo {
       }
 
       if(f) {
-        c++;
+        ++c;
         if(words.add(tpos, tpos + i - 1)) break;
       }
       tk.p = tp;

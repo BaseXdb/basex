@@ -159,7 +159,7 @@ public final class Tokenizer implements IndexToken {
    */
   public boolean more() {
     final int l = text.length;
-    pos++;
+    ++pos;
 
     lp = p;
     // parse whitespaces
@@ -176,13 +176,13 @@ public final class Tokenizer implements IndexToken {
       // [CG] XQFT: support other languages (Jap./Chin.: U+3002, etc.)
       if(!sn && (c == '.' || c == '!' || c == '?')) {
         sn = true;
-        sent++;
+        ++sent;
         pm = c;
       } else if(!pa && c == '\n') {
         pa = true;
-        para++;
+        ++para;
       } else if(ftChar(c)) {
-        if(bs) p--;
+        if(bs) --p;
         break;
       }
       bs = false;
@@ -210,7 +210,7 @@ public final class Tokenizer implements IndexToken {
         }
       }
       if(!ftChar(c)) {
-        if(bs) p--;
+        if(bs) --p;
         break;
       }
       bs = false;
@@ -273,7 +273,7 @@ public final class Tokenizer implements IndexToken {
       final int c = cp(text, p);
       if(c == '\n') {
         pa = true;
-        p++;
+        ++p;
         sc = true;
         break;
       } else if(ftChar(c)) {
@@ -284,7 +284,7 @@ public final class Tokenizer implements IndexToken {
 
     // special chars found
     if(lp < p) return true;
-    pos++;
+    ++pos;
 
     // end of text...
     s = p;

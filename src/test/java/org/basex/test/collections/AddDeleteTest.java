@@ -44,7 +44,7 @@ public class AddDeleteTest {
   static {
     int fc = 0;
     for(final IO c : IO.get(FLDR).children()) {
-      if(c.name().endsWith(IO.XMLSUFFIX)) fc++;
+      if(c.name().endsWith(IO.XMLSUFFIX)) ++fc;
     }
     FCNT = fc;
   }

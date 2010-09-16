@@ -263,7 +263,7 @@ public final class BaseXLayout {
       cr = nr;
       cg = ng;
       cb = nb;
-      hh++;
+      ++hh;
     }
     gg.fillRect(xs, ys + h - hh, w, hh);
   }

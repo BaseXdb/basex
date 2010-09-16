@@ -227,7 +227,7 @@ final class FTTrieBuilder extends FTBuilder {
       if(rp < roots.size() && tok[0] != roots.get(rp)) {
         // write subtree to disk
         siz = writeSubTree(root, outa, outc, rp, siz);
-        rp++;
+        ++rp;
         index = new FTArray(128);
       }
       index.insertSorted(tok, s, off);

@@ -137,23 +137,30 @@ public final class NodIter extends NodeIter {
 
   /**
    * Checks if the iterator contains a database node with the specified
-   * pre value. All nodes are assumed to be {@link DBNode} references and
-   * sorted.
+   * pre value.
    * @param node node to be found
-   * @return result of check
+   * @param db indicates if all nodes are sorted {@link DBNode} references
+   * @return position, or {@code -1}
    */
-  public boolean contains(final DBNode node) {
-    // binary search
-    int l = 0, h = size - 1;
-    while(l <= h) {
-      final int m = l + h >>> 1;
-      final DBNode n = (DBNode) item[m];
-      final int c = n.pre - node.pre;
-      if(c == 0) return n.data == node.data;
-      if(c < 0) l = m + 1;
-      else h = m - 1;
+  public int indexOf(final Nod node, final boolean db) {
+    if(db) {
+      // binary search
+      final DBNode dbn = (DBNode) node;
+      int l = 0, h = size - 1;
+      while(l <= h) {
+        final int m = l + h >>> 1;
+        final DBNode n = (DBNode) item[m];
+        final int c = n.pre - dbn.pre;
+        if(c == 0) return n.data == dbn.data ? m : -1;
+        if(c < 0) l = m + 1;
+        else h = m - 1;
+      }
+    } else {
+      for(int s = 0; s < size(); ++s) {
+        if(item[s].is(node)) return s;
+      }
     }
-    return false;
+    return -1;
   }
 
   /**
@@ -221,13 +228,13 @@ public final class NodIter extends NodeIter {
         final int h = item[b].diff(v);
         if(h > 0) break;
         if(h == 0) s(a++, b);
-        b++;
+        ++b;
       }
       while(c >= b) {
         final int h = item[c].diff(v);
         if(h < 0) break;
         if(h == 0) s(c, d--);
-        c--;
+        --c;
       }
       if(b > c) break;
       s(b++, c--);

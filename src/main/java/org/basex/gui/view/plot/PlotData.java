@@ -117,7 +117,7 @@ final class PlotData {
           if(data.name(p) == itmID) tmpPres.add(p);
           p += data.attSize(p, kind);
         } else {
-          p++;
+          ++p;
         }
       }
     }

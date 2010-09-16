@@ -49,8 +49,7 @@ final class TreeNodeCache implements TreeViewOptions {
               ONLY_ELEMENT_NODES & k != Data.ELEM) continue;
           int lv = 0;
           final int par = data.parent(p, k);
-          while(par != li[lv].get(li[lv].size() - 1))
-            lv++;
+          while(par != li[lv].get(li[lv].size() - 1)) ++lv;
           li[lv + 1].add(p);
         }
       }

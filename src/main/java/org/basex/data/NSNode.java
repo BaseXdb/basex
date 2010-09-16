@@ -122,7 +122,7 @@ final class NSNode {
    */
   void delete(final int p, final int sz) {
     int s = fnd(p);
-    if(s == -1 || ch[s].pre != p) s++;
+    if(s == -1 || ch[s].pre != p) ++s;
     int num = 0;
     final int upper = p + sz;
     for(int i = s; i < size && ch[i].pre < upper; ++i, ++num);

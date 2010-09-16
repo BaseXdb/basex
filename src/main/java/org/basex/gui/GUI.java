@@ -206,7 +206,7 @@ public final class GUI extends JFrame {
     hist.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu pop = new JPopupMenu("History");
+        final JPopupMenu pop = new JPopupMenu();
         final ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {

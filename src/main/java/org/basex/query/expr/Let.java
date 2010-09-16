@@ -78,7 +78,7 @@ public final class Let extends ForLet {
             final Iter ir = ctx.iter(expr);
             while((it = ir.next()) != null) {
               s += it.score();
-              c++;
+              ++c;
             }
             v = Dbl.get(ctx.score.let(s, c));
           } else {

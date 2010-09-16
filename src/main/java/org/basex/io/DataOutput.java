@@ -54,7 +54,7 @@ public final class DataOutput extends OutputStream {
   @Override
   public void write(final int b) throws IOException {
     os.write(b);
-    size++;
+    ++size;
   }
 
   /**

@@ -165,7 +165,7 @@ public final class LockingTest {
           if(!checkRes(new XQuery(PERF), s).equals("192000"))
             fail("efficiency test failed");
           closeSession(s);
-          tdone++;
+          ++tdone;
         }
       }.start();
     }

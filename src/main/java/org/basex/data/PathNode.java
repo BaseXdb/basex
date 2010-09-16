@@ -129,7 +129,7 @@ public final class PathNode {
     int c = 0;
     while(pn != null) {
       pn = pn.par;
-      c++;
+      ++c;
     }
     return c;
   }

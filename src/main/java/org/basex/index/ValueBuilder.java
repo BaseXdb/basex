@@ -86,7 +86,7 @@ public final class ValueBuilder extends IndexBuilder {
       write(f + csize, false);
       index = null;
       Performance.gc(1);
-      csize++;
+      ++csize;
 
       final int sz = merge();
       final DataAccess da = new DataAccess(data.meta.file(f + 'l'));
@@ -121,7 +121,7 @@ public final class ValueBuilder extends IndexBuilder {
     while(check(vm)) {
       checkStop();
 
-      sz++;
+      ++sz;
       outr.write5(outl.size());
       min = 0;
       ml.reset();
@@ -191,7 +191,7 @@ public final class ValueBuilder extends IndexBuilder {
 
     final int is = Num.size(pres);
     int v = 0;
-    for(int ip = 4; ip < is; ip += Num.len(pres, ip)) v++;
+    for(int ip = 4; ip < is; ip += Num.len(pres, ip)) ++v;
     outl.writeNum(v);
     outl.write(pres, 4, is - 4);
   }
@@ -228,7 +228,7 @@ public final class ValueBuilder extends IndexBuilder {
       if(all) {
         // write final structure to disk
         int v = 0;
-        for(int ip = 4; ip < is; ip += Num.len(pres, ip)) v++;
+        for(int ip = 4; ip < is; ip += Num.len(pres, ip)) ++v;
         outl.writeNum(v);
 
         for(int ip = 4, o = 0; ip < is; ip += Num.len(pres, ip)) {

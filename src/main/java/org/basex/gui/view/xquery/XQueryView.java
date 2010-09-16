@@ -14,6 +14,7 @@ import javax.swing.JPopupMenu;
 import org.basex.data.Nodes;
 import org.basex.gui.GUICommands;
 import org.basex.gui.GUIConstants;
+import org.basex.gui.GUIMenu;
 import org.basex.gui.GUIProp;
 import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
@@ -26,6 +27,7 @@ import org.basex.gui.layout.TableLayout;
 import org.basex.gui.view.View;
 import org.basex.gui.view.ViewNotifier;
 import org.basex.io.IO;
+import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
@@ -70,39 +72,29 @@ public final class XQueryView extends View {
     b.setLayout(new BorderLayout());
     b.add(header, BorderLayout.CENTER);
 
-    final BaseXButton open = BaseXButton.command(GUICommands.XQOPEN, gui);
-    final BaseXButton saveB = new BaseXButton(gui, "xqsaveas", HELPSAVE);
+    final BaseXButton openB = BaseXButton.command(GUICommands.XQOPEN, gui);
+    final BaseXButton saveB = new BaseXButton(gui, "xqsave", HELPSAVE);
     saveB.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu popup = new JPopupMenu(GUISAVE);
-        final ActionListener al = new ActionListener() {
-          @Override
-          public void actionPerformed(final ActionEvent ac) {
-            if(ac.getActionCommand().equals(GUISAVE)) {
-              GUICommands.XQSAVE.execute(gui);
-            } else {
-              GUICommands.XQSAVEAS.execute(gui);
-            } 
-          }
-        };
-        final JMenuItem save = new JMenuItem(GUISAVE);
-        final JMenuItem saveAs = new JMenuItem(GUISAVEAS + DOTS);
-        save.addActionListener(al);
-        saveAs.addActionListener(al);
+        final JPopupMenu popup = new JPopupMenu();
+        final JMenuItem save = GUIMenu.newItem(GUICommands.XQSAVE, gui);
+        final JMenuItem saveAs = GUIMenu.newItem(GUICommands.XQSAVEAS, gui);
+        GUICommands.XQSAVE.refresh(gui, save);
+        GUICommands.XQSAVEAS.refresh(gui, saveAs);
         popup.add(save);
         popup.add(saveAs);
         popup.show(saveB, 0, saveB.getHeight());
       }
     });
     final BaseXTextField find = new BaseXTextField(gui);
-    BaseXLayout.setHeight(find, (int) open.getPreferredSize().getHeight());
+    BaseXLayout.setHeight(find, (int) openB.getPreferredSize().getHeight());
 
     final BaseXButton hist = new BaseXButton(gui, "hist", HELPRECENT);
     hist.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        final JPopupMenu popup = new JPopupMenu("History");
+        final JPopupMenu popup = new JPopupMenu();
         final ActionListener al = new ActionListener() {
           @Override
           public void actionPerformed(final ActionEvent ac) {
@@ -121,20 +113,15 @@ public final class XQueryView extends View {
         popup.show(hist, 0, hist.getHeight());
       }
     });
-    
+
     final BaseXButton close = new BaseXButton(gui, "close", HELPQCLOSE);
     close.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {
-        
-        if(header.getText().endsWith("*")) {
-          if (Dialog.confirm(gui, Util.info(
-              XQUERYCONF, gui.context.query.name()))) 
-            GUICommands.XQSAVE.execute(gui);
-        }
-        text.setText(new byte[0]);
-        header.setText(XQUERYTIT);
+        confirm();
+        text.setText(Token.EMPTY);
         gui.context.query = null;
+        modified(false, true);
       }
     });
 
@@ -142,7 +129,7 @@ public final class XQueryView extends View {
     sp.setLayout(new TableLayout(1, 9));
     sp.add(find);
     sp.add(Box.createHorizontalStrut(5));
-    sp.add(open);
+    sp.add(openB);
     sp.add(Box.createHorizontalStrut(1));
     sp.add(saveB);
     sp.add(Box.createHorizontalStrut(1));

@@ -9,7 +9,7 @@ import org.basex.util.Util;
 
 /**
  * Signatures of all XQuery functions.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -148,7 +148,7 @@ public enum FunDef {
   MAPPAIRS(FNURI, FNFunc.class, 2, 2, "map-pairs(function, seq1, seq2)",
       ITEM_ZM),
   /** XQuery function. */
-  FOLDLEFT(FNURI, FNFunc.class, 3, 3, "fold-left(function, zero, seq)", 
+  FOLDLEFT(FNURI, FNFunc.class, 3, 3, "fold-left(function, zero, seq)",
       ITEM_ZM),
   /** XQuery function. */
   FOLDRIGHT(FNURI, FNFunc.class, 3, 3, "fold-right(function, zero, seq)",
@@ -289,7 +289,7 @@ public enum FunDef {
   /** XQuery function. */
   TOKEN(FNURI, FNPat.class, 2, 3, "tokenize(item, pattern, mod?)", STR_ZM),
   /** XQuery function. */
-  ANALZYE(FNURI, FNPat.class, 2, 3, "analyze-string(input, pattern, mod?)", 
+  ANALZYE(FNURI, FNPat.class, 2, 3, "analyze-string(input, pattern, mod?)",
       NOD),
 
   /* FNQName functions. */
@@ -390,7 +390,7 @@ public enum FunDef {
   /** XQuery function. */
   SUBAFTER(FNURI, FNStr.class, 2, 3, "substring-after(item, sub, coll?)", STR),
   /** XQuery function. */
-  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll?)", 
+  SUBBEFORE(FNURI, FNStr.class, 2, 3, "substring-before(item, sub, coll?)",
       STR),
   /** XQuery function. */
   TRANS(FNURI, FNStr.class, 3, 3, "translate(arg, map, trans)", STR),

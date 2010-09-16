@@ -99,7 +99,7 @@ final class TableData {
         int c = 0;
         for(final byte[] kk : data.path.desc(k, data, true, false)) {
           final Names nm = startsWith(kk, '@') ? data.atts : data.tags;
-          if(nm.stat(nm.id(delete(kk, '@'))).leaf) c++;
+          if(nm.stat(nm.id(delete(kk, '@'))).leaf) ++c;
         }
         // add keys with a minimum of three columns
         if(c > 2) roots.add(k);

@@ -508,10 +508,10 @@ public abstract class Data {
     int p = pre;
     final boolean empty = p == 0 && s == meta.size;
     if(empty) {
-      p++;
-      s--;
+      ++p;
+      --s;
     } else {
-      if(kind(p) == DOC) meta.ndocs--;
+      if(kind(p) == DOC) --meta.ndocs;
     }
 
     // delete node from table structure and reduce document size

@@ -389,14 +389,14 @@ public final class ViewContainer extends BaseXBack implements Runnable {
           } else {
             l[lvl].add(l[lvl + 1]);
           }
-          lvl++;
+          ++lvl;
         } else if(t.equals("-")) {
-          lvl--;
+          --lvl;
         } else {
           final ViewPanel view = getView(t);
           if(view == null) return false;
           l[lvl].add(view);
-          nv++;
+          ++nv;
         }
       }
       if(nv == views.length) return true;

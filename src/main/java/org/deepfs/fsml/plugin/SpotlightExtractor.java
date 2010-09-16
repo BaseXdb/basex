@@ -562,8 +562,7 @@ public final class SpotlightExtractor implements IFileParser {
         final byte[] a = Token.token((String) o);
         int i = 0;
         final int len = a.length;
-        while(i < len && a[i] >= '0' && a[i] <= '9')
-          i++;
+        while(i < len && a[i] >= '0' && a[i] <= '9') ++i;
         value = Token.toLong(a, 0, i);
         if(value == Long.MIN_VALUE) {
           Util.debug("SpotlightExtractor: invalid value for int field: %",

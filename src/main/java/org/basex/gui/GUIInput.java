@@ -206,7 +206,7 @@ public final class GUIInput extends BaseXTextField {
     } catch(final QueryException ex) {
       sl = ex.complete();
       // [CG] Query Input fix
-      boolean t = ex.col() == 1;
+      final boolean t = ex.col() == 1;
       pre = query.substring(0, ex.col() - (t ? 1 : 0));
     }
     if(getCaretPosition() < pre.length()) sl = null;

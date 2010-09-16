@@ -1,7 +1,6 @@
 package org.basex.query.expr;
 
 import static org.basex.query.QueryText.*;
-import static org.basex.query.QueryTokens.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.Empty;
@@ -11,7 +10,6 @@ import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.util.Err;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
@@ -47,47 +45,40 @@ public final class Except extends Set {
   }
 
   @Override
-  protected NodeIter eval(final Iter[] iter) throws QueryException {
+  protected NodIter eval(final Iter[] iter) throws QueryException {
     final NodIter ni = new NodIter().random();
 
     Item it;
-    while((it = iter[0].next()) != null) {
-      if(!it.node()) Err.type(this, Type.NOD, it);
-      ni.add((Nod) it);
-    }
+    while((it = iter[0].next()) != null) ni.add(checkNode(it));
+    final boolean db = ni.dbnodes();
 
-    for(int e = 1; e != expr.length; ++e) {
+    for(int e = 1; e != expr.length && ni.size() != 0; ++e) {
       final Iter ir = iter[e];
       while((it = ir.next()) != null) {
-        if(!it.node()) Err.type(this, Type.NOD, it);
-        final Nod node = (Nod) it;
-        for(int s = 0; s < ni.size(); ++s) {
-          if(ni.get(s).is(node)) ni.delete(s--);
-        }
+        final int i = ni.indexOf(checkNode(it), db);
+        if(i != -1) ni.delete(i);
       }
     }
-    return ni.sort();
+    return ni;
   }
 
   @Override
   protected NodeIter iter(final Iter[] iter) {
-    return new NodeIter() {
-      Nod[] items;
-
+    return new SetIter(iter) {
       @Override
       public Nod next() throws QueryException {
-        if(items == null) {
-          items = new Nod[iter.length];
+        if(item == null) {
+          item = new Nod[iter.length];
           for(int i = 0; i != iter.length; ++i) next(i);
         }
 
-        for(int i = 1; i != items.length; ++i) {
-          if(items[0] == null) return null;
-          if(items[i] == null) continue;
-          final int d = items[0].diff(items[i]);
+        for(int i = 1; i != item.length; ++i) {
+          if(item[0] == null) return null;
+          if(item[i] == null) continue;
+          final int d = item[0].diff(item[i]);
 
           if(d < 0) {
-            if(i + 1 == items.length) {
+            if(i + 1 == item.length) {
               break;
             }
           }
@@ -99,21 +90,10 @@ public final class Except extends Set {
             next(i--);
           }
         }
-        final Nod temp = items[0];
+        final Nod temp = item[0];
         next(0);
         return temp;
       }
-
-      private void next(final int i) throws QueryException {
-        final Item it = iter[i].next();
-        if(it != null && !it.node()) Err.type(Except.this, Type.NOD, it);
-        items[i] = (Nod) it;
-      }
     };
-  }
-
-  @Override
-  public String toString() {
-    return "(" + toString(" " + EXCEPT + " ") + ")";
   }
 }

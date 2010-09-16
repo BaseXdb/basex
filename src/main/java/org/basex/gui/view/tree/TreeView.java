@@ -357,9 +357,9 @@ public final class TreeView extends View implements TreeViewOptions {
     int nh = nodeHeight;
     g.setColor(GUIConstants.back);
     while(nh > 0) {
-      nh = nh - ss;
-      while(nh < 0)
-        nh++;
+      nh -= ss;
+      // [WM] same as "if(nh < 0) nh = 0;" ?
+      while(nh < 0) ++nh;
       g.drawLine(xx, y + nh, w, y + nh);
     }
 
@@ -629,7 +629,7 @@ public final class TreeView extends View implements TreeViewOptions {
           }
         }
       }
-      rn++;
+      ++rn;
     }
   }
 
@@ -933,7 +933,7 @@ public final class TreeView extends View implements TreeViewOptions {
                   : DRAW_CONN);
         }
       }
-      lvv++;
+      ++lvv;
     }
   }
 
@@ -1151,7 +1151,7 @@ public final class TreeView extends View implements TreeViewOptions {
         (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
         : BEST_LEVEL_DISTANCE)
         && nodeHeight >= MIN_NODE_HEIGHT)
-      nodeHeight--;
+      --nodeHeight;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
     final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight))

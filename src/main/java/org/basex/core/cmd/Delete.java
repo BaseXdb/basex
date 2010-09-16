@@ -37,7 +37,7 @@ public final class Delete extends ACreate {
       // delete all exact matches and all sub directories
       if(!eq(name, exact) && !startsWith(name, pref)) continue;
       data.delete(pre);
-      c++;
+      ++c;
     }
     // data was changed: update context
     if(c != 0) {

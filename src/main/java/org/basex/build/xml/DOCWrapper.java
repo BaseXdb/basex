@@ -81,7 +81,7 @@ public final class DOCWrapper extends Parser {
           builder.pi(new TokenBuilder(n.getNodeName() + ' ' +
               n.getNodeValue()));
         }
-        nodes++;
+        ++nodes;
       } else {
         stack.pop();
         if(stack.empty()) break;

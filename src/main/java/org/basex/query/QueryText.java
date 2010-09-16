@@ -2,7 +2,7 @@ package org.basex.query;
 
 /**
  * This class assembles textual information of the XQuery package.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -127,7 +127,7 @@ public interface QueryText {
   /** FOFL0009: Evaluation exception. */
   Object[] DIRMOVE = { FOFL, 9, "A directory cannot be moved. "};
   /** FOFL0010: Evaluation exception. */
-  Object[] FILEMOVE = { FOFL, 10, 
+  Object[] FILEMOVE = { FOFL, 10,
       "'%' cannot be moved. '%' is write-protected."};
   /** FOFL0011: Evaluation exception. */
   Object[] MKDIR = { FOFL, 11, "Directory '%' cannot be created. " +
@@ -141,7 +141,7 @@ public interface QueryText {
   /** FOFL0015: Evaluation exception. */
   Object[] CANNOTMOVE = { FOFL, 15, "File '%' cannot be moved."};
   /** FOFL0016: Evaluation exception. */
-  Object[] DIRINV = { FOFL, 16, "The path '%' is invalid in the filesystem."}; 
+  Object[] DIRINV = { FOFL, 16, "The path '%' is invalid in the filesystem."};
 
   /** FONS0004: Evaluation exception. */
   Object[] NSDECL = { FONS, 4, "Namespace prefix not declared: \"%\"."};
@@ -303,7 +303,7 @@ public interface QueryText {
   /** XPST0003: Parsing exception. */
   Object[] NOSWITCH = { XPST, 3, "Incomplete switch expression."};
   /** XPST0003: Parsing exception. */
-  Object[] TYPEPAR = { XPST, 3, 
+  Object[] TYPEPAR = { XPST, 3,
       "Expecting '(' after 'switch' or 'typeswitch'."};
   /** XPST0003: Parsing exception. */
   Object[] PRAGMAINV = { XPST, 3, "Invalid pragma expression."};
@@ -457,7 +457,7 @@ public interface QueryText {
   /** XQDY0041: Evaluation exception. */
   Object[] CPIINVAL = { XQDY, 41, "Invalid PI name: \"%\""};
   /** XQDY0044: Evaluation exception. */
-  Object[] CAINS = { XQDY, 44, 
+  Object[] CAINS = { XQDY, 44,
       "Invalid attribute namespace: \"%\" (URI \"%\")"};
   /** XQDY0064: Evaluation exception. */
   Object[] CPIXML = { XQDY, 64, "Illegal PI name: \"%\""};
@@ -481,7 +481,7 @@ public interface QueryText {
   /** XQST0033: Parsing exception. */
   Object[] DUPLNSDECL = { XQST, 33, "Duplicate declaration of namespace %."};
   /** XQST0034: Parsing exception. */
-  Object[] FUNCDEFINED = { XQST, 34, 
+  Object[] FUNCDEFINED = { XQST, 34,
       "Duplicate declaration of function \"%\"."};
   /** XQST0038: Parsing exception. */
   Object[] DUPLCOLL = { XQST, 38, "Duplicate 'collation' declaration."};

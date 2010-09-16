@@ -34,7 +34,7 @@ public final class ShowBackups extends Command {
     for(final File f : files) {
       if(f.getName().endsWith(".zip")) {
         tmp.add(NL + LI + f.getName());
-        size++;
+        ++size;
       }
     }
     final TokenBuilder tb = new TokenBuilder();

@@ -526,7 +526,7 @@ public final class FolderView extends View {
     final FolderIterator it = new FolderIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;
 
-    if(pre == curr.nodes[0] && down) pre++;
+    if(pre == curr.nodes[0] && down) ++pre;
     gui.notify.focus(pre, this);
     jumpTo(pre, false);
     repaint();

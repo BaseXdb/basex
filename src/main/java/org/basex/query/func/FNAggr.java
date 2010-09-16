@@ -93,7 +93,7 @@ final class FNAggr extends Fun {
       if(n && !un) Err.or(input, FUNNUM, this, i.type);
       if(!n && un) Err.or(input, FUNDUR, this, i.type);
       res = Calc.PLUS.ev(input, res, i);
-      c++;
+      ++c;
     }
     return avg ? Calc.DIV.ev(input, res, Itr.get(c)) : res;
   }

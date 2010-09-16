@@ -770,8 +770,8 @@ final class XMLScanner extends Progress {
       } else {
         int c = 1;
         while(c != 0) {
-          if(consume(COND)) c++;
-          else if(consume(CONE)) c--;
+          if(consume(COND)) ++c;
+          else if(consume(CONE)) --c;
           else if(consume() == 0) error(INVEND);
         }
       }

@@ -52,7 +52,7 @@ final class IndexStats {
    */
   boolean adding(final int oc) {
     co = oc;
-    size++;
+    ++size;
     return oc > occMax[max - 1] || oc < occMin[max - 1];
   }
 
@@ -85,10 +85,10 @@ final class IndexStats {
     int c = 0;
     for(int o = 0; o < max; ++o) {
       int tl = txtMin[o].length;
-      if(tl == 0) c++;
+      if(tl == 0) ++c;
       else if(m < tl) m = tl;
       tl = txtMax[o].length;
-      if(tl == 0) c++;
+      if(tl == 0) ++c;
       else if(m < tl) m = tl;
     }
 

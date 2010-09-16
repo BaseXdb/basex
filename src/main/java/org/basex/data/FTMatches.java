@@ -106,8 +106,8 @@ public final class FTMatches implements Iterable<FTMatch> {
         match[c] = match[a];
         match[c++].match[0].e = e;
       }
-      if(d >= 0) a++;
-      if(d <= 0) b++;
+      if(d >= 0) ++a;
+      if(d <= 0) ++b;
     }
     size = c;
     return size != 0;

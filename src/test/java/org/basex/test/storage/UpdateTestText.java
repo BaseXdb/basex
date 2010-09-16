@@ -235,10 +235,8 @@ public final class UpdateTestText extends UpdateTest {
       pre += data.size(pre, k);
     } else {
       pre += data.attSize(pre, k);
-      for(int p = 1; p < pos && data.parent(pre, k) == par; pre += data.size(
-          pre, k), p++) {
-        k = data.kind(pre);
-      }
+      for(int p = 1; p < pos && data.parent(pre, k) == par;
+        pre += data.size(pre, k), ++p) k = data.kind(pre);
     }
 
     if(kind == Data.TEXT && (data.kind(pre) == Data.TEXT || data.parent(pre - 1,

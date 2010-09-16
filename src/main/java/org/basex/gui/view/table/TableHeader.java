@@ -294,7 +294,7 @@ final class TableHeader extends BaseXPanel {
     if(tdata.roots.size() == 0) return;
 
     final Data data = view.gui.context.data;
-    final JPopupMenu popup = new JPopupMenu("Items");
+    final JPopupMenu popup = new JPopupMenu();
     final byte[] root = data.tags.key(tdata.root);
     for(final byte[] en : tdata.roots) {
       final int id = data.tags.id(en);
@@ -316,7 +316,7 @@ final class TableHeader extends BaseXPanel {
    * @param e event reference
    */
   private void chooseCols(final MouseEvent e) {
-    final JPopupMenu popup = new JPopupMenu("Categories");
+    final JPopupMenu popup = new JPopupMenu();
     for(final TableCol col : tdata.cols) {
       final String item = (col.elem ? "" : "@") + string(col.name);
       final JMenuItem mi = new JCheckBoxMenuItem(item, col.width != 0);

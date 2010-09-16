@@ -9,7 +9,7 @@ import org.basex.util.Util;
 
 /**
  * Base64Binary item. Derived from java.util.prefs.Base64.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
@@ -123,10 +123,10 @@ public final class B64 extends Item {
     int m = 0, n = g;
     if(l != 0) {
       if(s[l - 1] == '=') {
-        m++;
-        n--;
+        ++m;
+        --n;
       }
-      if(s[l - 2] == '=') m++;
+      if(s[l - 2] == '=') ++m;
       if(m == 2 && !Token.contains(ENDING, s[l - 3])) castErr(
           Token.substring(s, l - 3), ii);
     }

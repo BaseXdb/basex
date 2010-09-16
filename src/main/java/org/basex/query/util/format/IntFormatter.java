@@ -115,12 +115,12 @@ public final class IntFormatter {
     final String pres = mp.pres;
     int o = 0;
     for(int i = 0; i < pres.length(); ++i) {
-      if(pres.charAt(i) == '#') o++;
+      if(pres.charAt(i) == '#') ++o;
     }
     // count digits
     int d = 0;
     for(int i = 0; i < pres.length(); ++i) {
-      if(digit(pres.charAt(i))) d++;
+      if(digit(pres.charAt(i))) ++d;
     }
 
     // create string representation
