@@ -1,7 +1,6 @@
 package org.basex.test.xmldb;
 
 import static org.basex.core.Text.*;
-
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;

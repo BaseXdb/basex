@@ -272,7 +272,7 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
     try {
       final Item i = result.next();
       next = i != null;
-      pos++;
+      ++pos;
       it = new BXQItem(i, this, conn);
       if(!next) pos = -1;
       return next;

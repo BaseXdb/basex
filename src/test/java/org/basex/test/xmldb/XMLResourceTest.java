@@ -114,7 +114,7 @@ public class XMLResourceTest extends TestCase {
       @Override
       public void startElement(final String u, final String ln, final String qn,
           final Attributes a) {
-        count++;
+        ++count;
       }
       @Override
       public void endDocument() {

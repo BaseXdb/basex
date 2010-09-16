@@ -64,7 +64,7 @@ public class ResourceIteratorTest extends TestCase {
     long size = set.getSize();
     while(iter.hasMoreResources()) {
       iter.nextResource();
-      size--;
+      --size;
     }
     assertEquals("Wrong result size.", 0, size);
 
