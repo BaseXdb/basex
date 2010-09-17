@@ -46,7 +46,7 @@ public final class QueryException extends Exception {
    */
   public QueryException(final InputInfo ii, final String c, final String s,
       final Object... e) {
-    super(Util.info(s, chop(e)));
+    super((c == null ? "" : "[" + c + "] ") + Util.info(s, chop(e)));
     code = c;
     if(ii == null) return;
 
