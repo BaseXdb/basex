@@ -166,13 +166,12 @@ public final class TreeView extends View implements TreeViewOptions {
     smooth(g);
     g.setFont(font);
     fontHeight = g.getFontMetrics().getHeight();
-    
 
     if(paintType == PAINT_NEW_INIT) {
       sub = new TreeSubtree(data);
       tr = new TreeRects(gui.prop);
     }
-
+    
     if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT) 
       sub.generateBorders(c);
     

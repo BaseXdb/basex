@@ -1,11 +1,13 @@
 package org.basex.gui.view.tree;
 
+import java.util.ArrayList;
+
 import org.basex.data.Data;
 import org.basex.util.IntList;
 
 /**
  * This class determines nodes per level and caches them.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -13,26 +15,29 @@ final class TreeNodeCache implements TreeViewOptions {
   /** Document depth. */
   private final int maxLevel;
   /** All nodes document nodes per level. */
-  private final IntList[] nodes;
+  private IntList[] nodes;
 
   /**
    * This constructor invokes methods to cache all document nodes.
    * @param data data reference
    */
   TreeNodeCache(final Data data) {
-    maxLevel = data.meta.height + 1;
-
-    // long time = System.currentTimeMillis();
+    // maxLevel = data.meta.height + 1;
 
     if(USE_CHILDITERATOR) {
+      ArrayList<IntList> alil = new ArrayList<IntList>();
       IntList parList = new IntList(1);
       parList.add(0);
-      nodes = new IntList[maxLevel];
+      alil.add(parList);
       int l = 0;
-      while(maxLevel > l) {
-        nodes[l++] = parList;
+      while(true) {
         parList = getNextNodeLine(parList, data);
+        if(parList.size() == 0) break;
+        alil.add(parList);
+        ++l;
       }
+      maxLevel = l + 1;
+      nodes = alil.toArray(new IntList[maxLevel]);
     } else {
       final IntList[] li = new IntList[maxLevel];
       for(int i = 0; i < maxLevel; ++i)
@@ -45,17 +50,61 @@ final class TreeNodeCache implements TreeViewOptions {
         final int sh = i + 1 == roots.length ? ts : roots[i + 1];
         for(int p = root + 1; p < sh; ++p) {
           final int k = data.kind(p);
-          if(!SHOW_ATTR && k == Data.ATTR ||
-              ONLY_ELEMENT_NODES & k != Data.ELEM) continue;
+          if(!SHOW_ATTR && k == Data.ATTR || ONLY_ELEMENT_NODES
+              & k != Data.ELEM) continue;
           int lv = 0;
           final int par = data.parent(p, k);
-          while(par != li[lv].get(li[lv].size() - 1)) ++lv;
+          while(par != li[lv].get(li[lv].size() - 1))
+            ++lv;
           li[lv + 1].add(p);
         }
       }
       nodes = li;
     }
   }
+
+  // old version using meta.height
+  //
+  // /**
+  // * This constructor invokes methods to cache all document nodes.
+  // * @param data data reference
+  // */
+  // TreeNodeCache(final Data data) {
+  // maxLevel = data.meta.height + 1;
+  //
+  // if(USE_CHILDITERATOR) {
+  // IntList parList = new IntList(1);
+  // parList.add(0);
+  // nodes = new IntList[maxLevel];
+  // int l = 0;
+  // while(maxLevel > l) {
+  // nodes[l++] = parList;
+  // parList = getNextNodeLine(parList, data);
+  // }
+  // } else {
+  // final IntList[] li = new IntList[maxLevel];
+  // for(int i = 0; i < maxLevel; ++i)
+  // li[i] = new IntList();
+  // final int ts = data.meta.size;
+  // final int[] roots = data.doc();
+  // for(int i = 0; i < roots.length; ++i) {
+  // final int root = roots[i];
+  // li[0].add(root);
+  // final int sh = i + 1 == roots.length ? ts : roots[i + 1];
+  // for(int p = root + 1; p < sh; ++p) {
+  // final int k = data.kind(p);
+  // if(!SHOW_ATTR && k == Data.ATTR || ONLY_ELEMENT_NODES
+  // & k != Data.ELEM) continue;
+  // int lv = 0;
+  // final int par = data.parent(p, k);
+  // while(par != li[lv].get(li[lv].size() - 1))
+  // ++lv;
+  // li[lv + 1].add(p);
+  // }
+  // }
+  // nodes = li;
+  // }
+  // }
 
   /**
    * Saves node line in parentList.
@@ -179,10 +228,8 @@ final class TreeNodeCache implements TreeViewOptions {
    * Returns pre by given index.
    * @param bo border
    * @param ix index
-   * @return pre
-  int getPrePerIndex(final TreeBorder bo, final int ix) {
-    return nodes[bo.level].get(bo.start + ix);
-  }
+   * @return pre int getPrePerIndex(final TreeBorder bo, final int ix) { return
+   *         nodes[bo.level].get(bo.start + ix); }
    */
 
   /**
