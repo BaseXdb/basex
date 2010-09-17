@@ -50,12 +50,11 @@ final class FNInfo extends Fun {
         if(al > 1) {
           msg = Token.string(checkEStr(expr[1], ctx));
         }
-        final QueryException ex = new QueryException(input, code, msg);
-        if(al > 2) ex.iter = expr[2].iter(ctx);
+        Value val = al > 2 ? expr[2].value(ctx) : null;
+        final QueryException ex = new QueryException(input, code, val, msg);
         throw ex;
-        
       case TRACE:
-        final Value val = expr[0].value(ctx);
+        val = expr[0].value(ctx);
         ctx.evalInfo(checkEStr(expr[1], ctx), val.toString());
         return val.iter();
       case ENVS:

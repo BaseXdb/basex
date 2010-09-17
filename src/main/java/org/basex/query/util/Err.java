@@ -38,8 +38,8 @@ public enum Err {
   QUERYNODES(BASX, 8, Text.QUERYNODESERR),
   /** BASX0009: No nodes as result. */
   SENTLISTPARSE(BASX, 9, "% could not be parsed: %"),
-  /** BASX0099: Generic error. */
-  GENERR(BASX, 99, "%"),
+  /** BASX0099: Undefined error. */
+  UNDEF(BASX, 99, "%"),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -736,5 +736,10 @@ public enum Err {
   public static void value(final InputInfo ii,
       final org.basex.query.item.Type t, final Object v) throws QueryException {
     INVALUE.thrw(ii, t, v);
+  }
+  
+  @Override
+  public String toString() {
+    return String.format("%s%04d", type, num);
   }
 }

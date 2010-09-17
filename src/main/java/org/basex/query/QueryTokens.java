@@ -345,22 +345,26 @@ public interface QueryTokens {
 
   // URIS =====================================================================
 
+  /** W3 URI. */
+  String W3URI = "http://www.w3.org";
   /** XML URI. */
-  byte[] XMLURI = token("http://www.w3.org/XML/1998/namespace");
+  byte[] XMLURI = token(W3URI + "/XML/1998/namespace");
   /** Functions URI. */
-  byte[] FNURI = token("http://www.w3.org/2005/xpath-functions");
+  byte[] FNURI = token(W3URI + "/2005/xpath-functions");
   /** Math URI. */
-  byte[] MATHURI = token("http://www.w3.org/2005/xpath-functions/math");
+  byte[] MATHURI = token(W3URI + "/2005/xpath-functions/math");
   /** XMLNS URI. */
-  byte[] XMLNSURI = token("http://www.w3.org/2000/xmlns/");
+  byte[] XMLNSURI = token(W3URI + "/2000/xmlns/");
   /** Local Functions URI. */
-  byte[] LOCALURI = token("http://www.w3.org/2005/xquery-local-functions");
+  byte[] LOCALURI = token(W3URI + "/2005/xquery-local-functions");
   /** XMLSchema URI. */
-  byte[] XSURI = token("http://www.w3.org/2001/XMLSchema");
+  byte[] XSURI = token(W3URI + "/2001/XMLSchema");
   /** XMLSchema Instance URI. */
-  byte[] XSIURI = token("http://www.w3.org/2001/XMLSchema-instance");
+  byte[] XSIURI = token(W3URI + "/2001/XMLSchema-instance");
   /** Output URI. */
-  byte[] OUTPUTURI = token("http://www.w3.org/2009/xquery-serialization");
+  byte[] OUTPUTURI = token(W3URI + "/2009/xquery-serialization");
+  /** Error URI. */
+  byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
   /** Database URI. */
   byte[] BXURI = token(Text.URL);
   /** File module URI. */

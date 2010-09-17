@@ -2,12 +2,14 @@ package org.basex.query;
 
 import static org.basex.core.Text.*;
 import org.basex.io.IO;
-import org.basex.query.iter.Iter;
+import org.basex.query.item.Empty;
+import org.basex.query.item.Value;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.InputParser;
 import org.basex.util.StringList;
 import org.basex.util.Token;
+import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -17,19 +19,16 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class QueryException extends Exception {
-  /** Error items. */
-  public Iter iter = Iter.EMPTY;
-
-  /** File reference. */
-  private IO file;
-  /** Possible completions. */
-  private StringList complete;
-  /** Error type. */
-  private Err.Type type;
-  /** Error number. */
-  private int num;
+  /** Error reference. */
+  private Err err;
   /** Alternative error code. */
   private String code;
+  /** Error value. */
+  private Value value = Empty.SEQ;
+  /** File reference. */
+  private IO file;
+  /** Code completions. */
+  private StringList complete;
   /** Error line. */
   private int line;
   /** Error column. */
@@ -38,16 +37,30 @@ public final class QueryException extends Exception {
   private int markedCol;
 
   /**
-   * Constructor.
+   * Default constructor.
    * @param ii input info
-   * @param c code
-   * @param s message
-   * @param e message extension
+   * @param er error reference
+   * @param ext error extension
    */
-  public QueryException(final InputInfo ii, final String c, final String s,
-      final Object... e) {
-    super((c == null ? "" : "[" + c + "] ") + Util.info(s, chop(e)));
-    code = c;
+  public QueryException(final InputInfo ii, final Err er, final Object... ext) {
+    this(ii, null, null, er.desc, ext);
+    err = er;
+  }
+
+  /**
+   * Constructor, specifying the error code and message as string.
+   * @param ii input info
+   * @param errc error code
+   * @param val error value
+   * @param msg error message
+   * @param ext error extension
+   */
+  public QueryException(final InputInfo ii, final String errc, final Value val,
+      final String msg, final Object... ext) {
+
+    super(message(msg, ext));
+    code = errc;
+    value = val;
     if(ii == null) return;
 
     line = 1;
@@ -60,53 +73,26 @@ public final class QueryException extends Exception {
   }
 
   /**
-   * Constructor.
-   * @param ii input info
-   * @param s xquery error
-   * @param e error arguments
-   */
-  public QueryException(final InputInfo ii, final Err s, final Object... e) {
-    this(ii, null, s.desc, e);
-    type = s.type;
-    num = s.num;
-  }
-
-  /**
-   * Chops the specified array entries to a maximum length.
-   * @param t token array
+   * Creates the error message from the specified info and extension array.
+   * @param info info message
+   * @param ext info extensions
    * @return argument
    */
-  private static Object[] chop(final Object[] t) {
-    for(int i = 0; i < t.length; ++i) {
-      if(t[i] instanceof byte[]) {
-        t[i] = Token.string((byte[]) t[i]);
-      } else if(t[i] instanceof Throwable) {
-        final Throwable th = (Throwable) t[i];
-        t[i] = th.getMessage() != null ? th.getMessage() : th.toString();
-      } else if(!(t[i] instanceof String)) {
-        t[i] = t[i].toString();
+  private static String message(final String info, final Object[] ext) {
+    for(int i = 0; i < ext.length; ++i) {
+      if(ext[i] instanceof byte[]) {
+        ext[i] = Token.string((byte[]) ext[i]);
+      } else if(ext[i] instanceof Throwable) {
+        final Throwable th = (Throwable) ext[i];
+        ext[i] = th.getMessage() != null ? th.getMessage() : th.toString();
+      } else if(!(ext[i] instanceof String)) {
+        ext[i] = ext[i].toString();
       }
       // [CG] XQuery/Exception: verify if/which strings are to be chopped
       //final String s = t[i].toString();
       //t[i] = s.length() > 1000 ? s.substring(0, 1000) + DOTS : s;
     }
-    return t;
-  }
-
-  /**
-   * Returns the error code.
-   * @return position
-   */
-  public String code() {
-    return code == null ? String.format("%s%04d", type, num) : code;
-  }
-  
-  /**
-   * Returns the error type of this error.
-   * @return error type
-   */
-  public Err.Type type() {
-    return type;
+    return Util.info(info, ext);
   }
 
   /**
@@ -119,7 +105,7 @@ public final class QueryException extends Exception {
 
   /**
    * Returns the marked error column.
-   * @return error column
+   * @return marked error column
    */
   public int markedCol() {
     return markedCol;
@@ -134,11 +120,21 @@ public final class QueryException extends Exception {
   }
 
   /**
-   * Possible completions.
-   * @return error line
+   * Returns suggestions for code completions.
+   * @return suggestions
    */
   public StringList complete() {
     return complete == null ? new StringList() : complete;
+  }
+
+  /**
+   * Sets suggestions for code completions.
+   * @param qp query parser
+   * @param comp completions
+   */
+  public void complete(final InputParser qp, final StringList comp) {
+    complete = comp;
+    pos(qp);
   }
 
   /**
@@ -161,43 +157,35 @@ public final class QueryException extends Exception {
   }
 
   /**
-   * Sets code completions.
-   * @param qp query parser
-   * @param comp completions
+   * Returns the error code.
+   * @return error code
    */
-  public void complete(final InputParser qp, final StringList comp) {
-    complete = comp;
-    pos(qp);
+  public String code() {
+    return code == null ? err.toString() : code;
   }
 
   /**
-   * Returns the simple error message.
-   * @return string
+   * Returns the error value.
+   * @return error value
    */
-  public String simple() {
+  public Value value() {
+    return value;
+  }
+
+  @Override
+  public String getLocalizedMessage() {
     return super.getMessage();
-  }
-
-  /**
-   * Returns an extended error message.
-   * @return string
-   */
-  public String extended() {
-    final StringBuilder sb = new StringBuilder();
-    if(type != null) sb.append("[" + code() + "] ");
-    return sb + simple();
   }
 
   @Override
   public String getMessage() {
-    final StringBuilder sb = new StringBuilder();
+    final TokenBuilder tb = new TokenBuilder();
     if(line != 0) {
-      sb.append(STOPPED + ' ');
-      sb.append(Util.info(LINEINFO, line));
-      if(col != 0) sb.append(QueryTokens.SEP + Util.info(COLINFO, col));
-      if(file != null) sb.append(Util.info(' ' + FILEINFO, file));
-      sb.append(": \n");
+      tb.add(STOPPED + ' ' + Util.info(LINEINFO, line));
+      if(col != 0) tb.add(QueryTokens.SEP + Util.info(COLINFO, col));
+      if(file != null) tb.add(Util.info(' ' + FILEINFO, file));
+      tb.add(": \n");
     }
-    return sb.append(extended()).toString();
+    return tb.add("[" + code() + "] ").add(getLocalizedMessage()).toString();
   }
 }

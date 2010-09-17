@@ -167,8 +167,9 @@ final class FNGen extends Fun {
     try {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
-      if(ex.type() != Err.Type.FODC) throw ex;
-      return Bln.FALSE;
+      // FODC0002, FODC0004, errors created from user with the same codes...
+      if(ex.code().startsWith(Err.Type.FODC.toString())) return Bln.FALSE;
+      throw ex;
     }
   }
 
@@ -197,8 +198,9 @@ final class FNGen extends Fun {
       final String e = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
       return Bln.get(unparsedText(io, e, input) != null);
     } catch(final QueryException ex) {
-      if(ex.type() != Err.Type.FODC) throw ex;
-      return Bln.FALSE;
+      // error code is still to be fixed in the specs...
+      if(ex.code().startsWith(Err.UNDEF.toString())) return Bln.FALSE;
+      throw ex;
     }
   }
 
@@ -216,7 +218,7 @@ final class FNGen extends Fun {
     try {
       return Str.get(TextInput.content(io, enc).finish());
     } catch(final IOException ex) {
-      NODOC.thrw(input, ex);
+      UNDEF.thrw(input, ex);
       return null;
     }
   }
@@ -261,7 +263,7 @@ final class FNGen extends Fun {
       nod.serialize(xml);
       xml.close();
     } catch(final IOException ex) {
-      GENERR.thrw(input, ex.getMessage());
+      UNDEF.thrw(input, ex.getMessage());
     }
     return Str.get(ao.toArray());
   }
@@ -291,7 +293,7 @@ final class FNGen extends Fun {
     try {
       return new SerializerProp(tb.toString());
     } catch(final IOException ex) {
-      GENERR.thrw(fun.input, ex.getMessage());
+      UNDEF.thrw(fun.input, ex.getMessage());
       return null;
     }
   }
