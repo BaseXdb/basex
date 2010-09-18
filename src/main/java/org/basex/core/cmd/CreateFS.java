@@ -55,6 +55,7 @@ public final class CreateFS extends ACreate {
   @Override
   public void abort() {
     new Open(args[0]).run(context);
+    new Optimize().run(context);
   }
 
   @Override
