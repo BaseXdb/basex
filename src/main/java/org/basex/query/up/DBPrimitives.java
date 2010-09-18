@@ -109,32 +109,36 @@ final class DBPrimitives extends Primitives {
     // apply updates backwards, starting with the highest pre value -> no id's
     // and less table alterations needed
     int par = -2;
-    boolean check = false;
     // first is the first node of par which is updated. so 'first-1' is the
-    // lowest pre value where adjacent text nodes can exist
+    // lowest pre value where adjacent text nodes can exist.
     int first = -1;
     for(int i = nodes.size() - 1; i >= 0; i--) {
       final int pre = nodes.get(i);
       final int parT = d.parent(pre, d.kind(pre));
       if(parT != par) {
         // adjacent text nodes are merged. merges can only be applied directly
-        // after the update if no lower pre values are effected. this is not
-        // the case for 'replace node', 'delete' and 'insert before' operations
-        if(check && parT < par) mergeTexts(par, first);
-        check = false;
+        // after the update if no lower pre values or the same pre value 
+        // are effected. this is not
+        // the case for 'replace node', 'delete', 'insert before' and
+        // 'insert after' operations. a node, being target of 'insert before'
+        // or 'insert after', can still be replaced, or deleted. merging texts
+        // would result in the second node also being deleted/replaced.
+        if(first > -1) mergeTexts(par, first);
+        first = -1;
         par = parT;
       }
-      first = pre;
       int add = 0;
       for(final UpdatePrimitive p : op.get(pre)) {
         final PrimitiveType t = p.type();
         p.apply(add);
-        check = t == INSERTBEFORE || t == REPLACENODE || t == DELETE;
+        if (t == INSERTAFTER || t == INSERTBEFORE || t == REPLACENODE || 
+            t == DELETE) 
+          first = pre;
         if(t == INSERTBEFORE) add = ((NodeCopy) p).md.meta.size;
         if(t == REPLACENODE) break;
       }
     }
-    if(check) mergeTexts(par, first);
+    if(first > -1) mergeTexts(par, first);
     d.flush();
 
     if(d.meta.prop.is(Prop.WRITEBACK)) {
