@@ -11,7 +11,7 @@ import java.awt.Color;
 interface TreeViewOptions {
   // Options
   /** Use ChildIterator to cache nodes. */
-  boolean USE_CHILDITERATOR = true;
+  boolean USE_CHILDITERATOR = false;
   /** Draw only element nodes. */
   boolean ONLY_ELEMENT_NODES = false;
   /** Show Attributes. */

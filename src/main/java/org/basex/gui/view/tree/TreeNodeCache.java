@@ -22,9 +22,8 @@ final class TreeNodeCache implements TreeViewOptions {
    * @param data data reference
    */
   TreeNodeCache(final Data data) {
-    // maxLevel = data.meta.height + 1;
-
-    if(USE_CHILDITERATOR) {
+    
+    if(USE_CHILDITERATOR || !data.meta.pthindex) {
       ArrayList<IntList> alil = new ArrayList<IntList>();
       IntList parList = new IntList(1);
       parList.add(0);
@@ -39,6 +38,7 @@ final class TreeNodeCache implements TreeViewOptions {
       maxLevel = l + 1;
       nodes = alil.toArray(new IntList[maxLevel]);
     } else {
+      maxLevel = data.meta.height + 1;
       final IntList[] li = new IntList[maxLevel];
       for(int i = 0; i < maxLevel; ++i)
         li[i] = new IntList();
