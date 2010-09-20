@@ -22,9 +22,9 @@ final class TreeNodeCache implements TreeViewOptions {
    * @param data data reference
    */
   TreeNodeCache(final Data data) {
-    
-    if(USE_CHILDITERATOR || !data.meta.pthindex) {
-      ArrayList<IntList> alil = new ArrayList<IntList>();
+    final ArrayList<IntList> alil = new ArrayList<IntList>();
+
+    if(USE_CHILDITERATOR) {
       IntList parList = new IntList(1);
       parList.add(0);
       alil.add(parList);
@@ -38,15 +38,12 @@ final class TreeNodeCache implements TreeViewOptions {
       maxLevel = l + 1;
       nodes = alil.toArray(new IntList[maxLevel]);
     } else {
-      maxLevel = data.meta.height + 1;
-      final IntList[] li = new IntList[maxLevel];
-      for(int i = 0; i < maxLevel; ++i)
-        li[i] = new IntList();
       final int ts = data.meta.size;
       final int[] roots = data.doc();
+      alil.add(new IntList());
       for(int i = 0; i < roots.length; ++i) {
         final int root = roots[i];
-        li[0].add(root);
+        alil.get(0).add(root);
         final int sh = i + 1 == roots.length ? ts : roots[i + 1];
         for(int p = root + 1; p < sh; ++p) {
           final int k = data.kind(p);
@@ -54,12 +51,14 @@ final class TreeNodeCache implements TreeViewOptions {
               & k != Data.ELEM) continue;
           int lv = 0;
           final int par = data.parent(p, k);
-          while(par != li[lv].get(li[lv].size() - 1))
+          while(par != alil.get(lv).get(alil.get(lv).size() - 1))
             ++lv;
-          li[lv + 1].add(p);
+          for(int j = alil.size(); j <= lv + 1; ++j) alil.add(new IntList());
+          alil.get(lv + 1).add(p);
         }
       }
-      nodes = li;
+      maxLevel = alil.size();
+      nodes = alil.toArray(new IntList[maxLevel]);
     }
   }
 
