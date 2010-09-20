@@ -86,9 +86,9 @@ public final class GUIProp extends AProp {
 
   /** Current input mode in global text field (Search, XQuery, Command). */
   public static final Object[] SEARCHMODE = { "SEARCHMODE", 0 };
-  /** Flag for realtime context switch. */
+  /** Flag for realtime context filtering. */
   public static final Object[] FILTERRT = { "FILTERRT", false };
-  /** Flag for realtime context switch. */
+  /** Flag for realtime query execution. */
   public static final Object[] EXECRT = { "EXECRT", false };
 
   /** Show attributes in treemap. */
