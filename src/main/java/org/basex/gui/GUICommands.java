@@ -1068,7 +1068,6 @@ public enum GUICommands implements GUICommand {
    * @return function string
    */
   static String fndb(final Nodes n, final int i) {
-    return NAMELC + ":db('" + n.data.meta.name + "'," +
-      n.data.id(n.nodes[i]) + ")";
+    return NAMELC + ":db('" + n.data.meta.name + "', " + n.nodes[i] + ")";
   }
 }
