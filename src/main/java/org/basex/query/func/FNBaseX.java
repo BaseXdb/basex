@@ -23,6 +23,7 @@ import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.NodIter;
 import org.basex.query.util.Err;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
@@ -50,6 +51,7 @@ final class FNBaseX extends Fun {
       case INDEX: return index(ctx);
       case EVAL:  return eval(ctx);
       case RUN:   return run(ctx);
+      case DB:    return db(ctx);
       default:    return super.iter(ctx);
     }
   }
@@ -58,8 +60,7 @@ final class FNBaseX extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case RANDOM: return random();
-      case DB:     return db(ctx);
+      case RANDOM: return random();      
       case NODEID: return nodeId(ctx);
       case FSPATH: return fspath(ctx);
       default:     return super.item(ctx, ii);
@@ -135,15 +136,22 @@ final class FNBaseX extends Fun {
    * @return iterator
    * @throws QueryException query exception
    */
-  private DBNode db(final QueryContext ctx) throws QueryException {
-    DBNode node = ctx.doc(checkStr(expr[0], ctx), false, true, input);
+  private Iter db(final QueryContext ctx) throws QueryException {
+    NodIter iter = new NodIter();
+    DBNode node = ctx.doc(checkStr(expr[0], ctx), true, true, input);
 
     if(expr.length == 2) {
       final int pre = (int) checkItr(expr[1], ctx);
       if(pre < 0 || pre >= node.data.meta.size) NOPRE.thrw(input, pre);
       node = new DBNode(node.data, pre);
+      iter.add(node);
+    } else {
+      for(int p = 0; p < node.data.meta.size;
+      p += node.data.size(p, node.data.kind(p))) {
+        iter.add(new DBNode(node.data, p));
+      }
     }
-    return node;
+    return iter;
   }
 
   /**

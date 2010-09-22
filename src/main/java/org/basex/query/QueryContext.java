@@ -502,25 +502,28 @@ public final class QueryContext extends Progress {
 
   /**
    * Adds a collection instance or returns an existing one.
-   * @param coll name of the collection to be returned
+   * @param path name of the collection to be returned
    * @param ii input info
    * @return collection
    * @throws QueryException query exception
    */
-  public NodIter coll(final byte[] coll, final InputInfo ii)
+  public NodIter coll(final byte[] path, final InputInfo ii)
       throws QueryException {
 
     // no collection specified.. return default collection/current context set
     int c = 0;
-    if(coll == null) {
+    if(path == null) {
       // no default collection was defined
       if(colls == 0) NODEFCOLL.thrw(ii);
     } else {
       // invalid collection reference
-      if(contains(coll, '<') || contains(coll, '\\')) COLLINV.thrw(ii, coll);
-
-      while(c < colls && !eq(collName[c], coll)) ++c;
-      if(c == colls) addDocs(doc(coll, true, false, ii));
+      if(contains(path, '<') || contains(path, '\\')) COLLINV.thrw(ii, path);
+      // find specified collection
+      while(c < colls && !eq(collName[c], path)) ++c;
+      // add new collection if not found
+      // [AW] doc(coll, ...) -> specify collection root
+      //if(c == colls) addDocs(doc(path, true, false, ii), path);
+      if(c == colls) addDocs(doc(path, true, false, ii));
     }
     return new NodIter(collect[c].item, (int) collect[c].size());
   }
