@@ -1,8 +1,8 @@
 package org.deepfs.fsml;
 
 import static org.deepfs.fs.DeepFS.*;
+import static org.deepfs.fs.DeepStat.*;
 import static org.basex.util.Token.*;
-import static org.deepfs.jfuse.JFUSEAdapter.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

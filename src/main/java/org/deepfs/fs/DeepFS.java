@@ -1,7 +1,7 @@
 package org.deepfs.fs;
 
 import static org.basex.util.Token.*;
-import static org.deepfs.jfuse.JFUSEAdapter.*;
+import static org.deepfs.fs.DeepStat.*;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +24,6 @@ import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.deepfs.DeepShell;
 import org.deepfs.fsml.DeepNS;
-import org.deepfs.jfuse.DeepStat;
 
 /**
  * DeepFS: The XQuery Filesystem. Database-side implementation of DeepFS.

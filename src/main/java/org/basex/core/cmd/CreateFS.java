@@ -30,7 +30,6 @@ public final class CreateFS extends ACreate {
 
   @Override
   protected boolean run() {
-    prop.set(Prop.CHOP, true);
     prop.set(Prop.ENTITY, true);
 
     final String path;

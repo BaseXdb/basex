@@ -2,7 +2,7 @@ package org.deepfs;
 
 import static org.deepfs.fs.DeepFS.*;
 import static org.basex.util.Token.*;
-import static org.deepfs.jfuse.JFUSEAdapter.*;
+import static org.deepfs.fs.DeepStat.*;
 import java.io.File;
 import java.io.PrintStream;
 import java.lang.annotation.ElementType;
@@ -19,7 +19,7 @@ import org.basex.core.cmd.InfoTable;
 import org.basex.query.QueryProcessor;
 import org.basex.util.Util;
 import org.deepfs.fs.DeepFS;
-import org.deepfs.jfuse.DeepStat;
+import org.deepfs.fs.DeepStat;
 import org.deepfs.util.FSWalker;
 import org.deepfs.util.TreePrinter;
 
