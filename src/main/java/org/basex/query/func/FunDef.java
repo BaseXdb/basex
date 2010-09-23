@@ -427,7 +427,7 @@ public enum FunDef {
   /** Project specific function - evaluates the specified query file. */
   RUN(BXURI, FNBaseX.class, 1, 1, "run(string)", ITEM_ZM),
   /** Project specific function - opens a database node. */
-  DB(BXURI, FNBaseX.class, 1, 2, "db(string, pre?)", NOD),
+  DB(BXURI, FNBaseX.class, 1, 2, "db(string, pre?)", NOD_ZM),
   /** Project specific function - returns the id of a node. */
   NODEID(BXURI, FNBaseX.class, 1, 1, "node-id(item)", ITR),
   /** Project specific function - returns a filesystem path. */
