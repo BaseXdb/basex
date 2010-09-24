@@ -162,7 +162,7 @@ public abstract class Nod extends Item {
   }
 
   /**
-   * Compares two nodes for equality.
+   * Compares the identity of two nodes.
    * @param nod node to be compared
    * @return result of check
    */

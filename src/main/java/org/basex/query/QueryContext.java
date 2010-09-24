@@ -45,6 +45,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 import org.basex.util.Util;
@@ -521,9 +522,15 @@ public final class QueryContext extends Progress {
       // find specified collection
       while(c < colls && !eq(collName[c], path)) ++c;
       // add new collection if not found
-      // [AW] doc(coll, ...) -> specify collection root
-      //if(c == colls) addDocs(doc(path, true, false, ii), path);
-      if(c == colls) addDocs(doc(path, true, false, ii));
+      if(c == colls) {
+        int tmp = Token.string(path).indexOf("/");
+        if(tmp == -1) {
+          addDocs(doc(path, true, false, ii), "");
+        } else {
+          addDocs(doc(token(Token.string(path).substring(0, tmp)),
+              true, false, ii), Token.string(path));
+        }
+      }
     }
     return new NodIter(collect[c].item, (int) collect[c].size());
   }
@@ -531,12 +538,22 @@ public final class QueryContext extends Progress {
   /**
    * Adds database documents as a collection.
    * @param db database reference
+   * @param path inner collection path
    */
-  private void addDocs(final DBNode db) {
+  private void addDocs(final DBNode db, final String path) {
     final NodIter col = new NodIter();
     final Data data = db.data;
+    
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
-      col.add(new DBNode(data, p));
+      DBNode dbn = new DBNode(data, p);
+      if(!path.equals("")) {
+        if(Token.string(dbn.base()).toLowerCase().
+            contains(path.toLowerCase())) {
+          col.add(dbn);
+        }
+      } else {
+        col.add(dbn);
+      }
     }
     addColl(col, token(data.meta.name));
   }
