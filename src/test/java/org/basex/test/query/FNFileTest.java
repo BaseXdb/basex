@@ -30,7 +30,11 @@ public class FNFileTest extends QueryTest {
   /** Test file for file:copy. */
   private static final String TESTCOPY = "testCopy";
   /** Test file for file:delete. */
-  private static final String TESTDEL = "testDelete";
+  private static final String TESTDELDIR1 = "testDelDir1";
+  /** Test file for file:delete with $recursive = true. */
+  private static final String TESTDELDIR2 = "testDelDir2";
+  /** Test file for file:delete with $recursive = true. */
+  private static final String TESTDELFILE = "testDelFile";
   /** Test file for file:move. */
   private static final String TESTMOVE = "testMove";
   /** Test file for file:write. */
@@ -39,9 +43,9 @@ public class FNFileTest extends QueryTest {
   private static final String TESTWRITEBIN = "testWriteBin";
   /** Test directory 1 for file:mkdir. */
   private static final String DIR1 = "test1";
-  /** Test directory 2 for file:mkdirs. */
+  /** Test directory 2 for file:mkdir with $recursive = true. */
   private static final String DIR2 = "test2";
-  /** Test directory 3 for file:mkdirs. */
+  /** Test directory 3 for file:mkdir with $recursive = true. */
   private static final String DIR3 = "test3";
 
   /** /_tmpdir_/testDir1. */
@@ -51,11 +55,18 @@ public class FNFileTest extends QueryTest {
   /** /_tmpdir_/testDir1/fileCopy. */
   protected static File fileCopy = new File(dir1.getPath() + Prop.SEP
       + TESTCOPY);
+  /** /_tmpdir_/testDir1/fileCopy. */
+  protected static File fileCopyOver = new File(dir2.getPath() + Prop.SEP
+      + TESTCOPY);
   /** /_tmpdir_/testDir1/fileMove. */
   protected static File fileMove = new File(dir1.getPath() + Prop.SEP
       + TESTMOVE);
-  /** /_tmpdir_/testDir1/fileDelete. */
-  protected static File fileDel = new File(dir1.getPath() + Prop.SEP + TESTDEL);
+  /** /_tmpdir_/testDir1/testDelDir1/testDelDir2. */
+  protected static File dirDel = new File(dir1.getPath() + Prop.SEP
+      + TESTDELDIR1 + Prop.SEP + TESTDELDIR2);
+  /** /_tmpdir_/testDir1/testDelFile. */
+  protected static File fileDel = new File(dir1.getPath() + Prop.SEP
+      + TESTDELFILE);
 
   static {
 
@@ -78,9 +89,9 @@ public class FNFileTest extends QueryTest {
             "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR1 + "\")" },
 
         // /_tmpdir_/testDir1/test2/test3
-        { "Test file:mkdirs()", nod(),
-            "file:mkdirs(\"" + dir1.getPath() + Prop.SEP + DIR2 + Prop.SEP
-                + DIR3 + "\")"},
+        { "Test file:mkdir() with $recursive = fn:true()", nod(),
+            "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR2 + Prop.SEP
+                + DIR3 + "\", fn:true())"},
 
         // /_tmpdir_/testDir1
         { "Test file:is-directory()", bool(true),
@@ -113,6 +124,11 @@ public class FNFileTest extends QueryTest {
         { "Test file:write()", nod(),
             "file:write(\"" + dir1.getPath() + Prop.SEP + TESTWRITE + "\"," +
             "//Name/Vorname, "  + "(<indent>yes</indent>))" },
+            
+         // /_tmpdir_/testDir1/fileCopy
+        { "Test file:write() with $append = true", nod(),
+            "file:write(\"" + fileCopy.getPath()
+            + "\", //Name/Vorname, (<indent>yes</indent>), fn:true())" },
 
         // /_tmpdir_/testDir1/fileWriteBin
         { "Test file:write-binary()", nod(),
@@ -121,9 +137,9 @@ public class FNFileTest extends QueryTest {
 
         // src:  /_tmpdir_/testDir1/fileCopy
         // dest: /_tmpdir_/testDir2/fileCopy
-        { "Test file:copy()", nod(),
+        { "Test file:copy() with $overwrite = true", nod(),
             "file:copy(\"" + fileCopy.getPath() + "\", \"" +
-            dir2.getPath() + Prop.SEP + TESTCOPY + "\")" },
+            dir2.getPath() + Prop.SEP + TESTCOPY + "\", fn:true())" },
 
         // src:  /_tmpdir_/testDir1
         // dest: /_tmpdir_/testDir2
@@ -131,9 +147,14 @@ public class FNFileTest extends QueryTest {
             "file:move(\"" + fileMove.getPath() + "\", \"" +
             dir2.getPath() + "\")" },
 
-        // /_tmpdir_/testDir1/fileDelete
+        // /_tmpdir_/testDir1/fileDel
         { "Test file:delete()", nod(),
             "file:delete(\"" + fileDel.getPath() + "\")" },
+            
+        // /_tmpdir_/testDir1/testDelDir1/testDelDir2
+        { "Test file:delete() with $recursive = true", nod(),
+                "file:delete(\"" + dirDel.getParentFile().getPath()
+                + "\", fn:true())" },
 
         // /_tmpdir_/testDir1/fileCopy
         { "Test file:path-to-full-path()", str(fileCopy.getPath()),
@@ -167,6 +188,9 @@ public class FNFileTest extends QueryTest {
 
     // /_tmpdir_/testDir2
     dir2.mkdir();
+    
+    // /_tmpdir_/testDir1/testDelDir1/testDelDir2
+    dirDel.mkdirs();
 
     try {
       final BufferedOutputStream outCopy = new BufferedOutputStream(
@@ -175,6 +199,13 @@ public class FNFileTest extends QueryTest {
         outCopy.write(Token.token(doc));
       } finally {
         outCopy.close();
+      }
+      final BufferedOutputStream outCopyOver = new BufferedOutputStream(
+          new FileOutputStream(fileCopyOver));
+      try {
+        outCopyOver.write(Token.token(doc));
+      } finally {
+        outCopyOver.close();
       }
       final BufferedOutputStream outMove = new BufferedOutputStream(
           new FileOutputStream(fileMove));
@@ -195,7 +226,7 @@ public class FNFileTest extends QueryTest {
     }
 
     try {
-      queries[18][1] = new ItemIter(new Item[] { new Dtm(
+      queries[queries.length - 1][1] = new ItemIter(new Item[] { new Dtm(
           fileCopy.lastModified(), null)}, 1);
     } catch(final QueryException e) { }
   }

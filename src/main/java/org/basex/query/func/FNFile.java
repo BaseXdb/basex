@@ -1,7 +1,8 @@
 package org.basex.query.func;
 
-import static org.basex.util.Token.*;
 import static org.basex.query.util.Err.*;
+import static org.basex.util.Token.*;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -9,7 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.util.regex.PatternSyntaxException;
+
 import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
@@ -31,7 +34,7 @@ import org.basex.util.Token;
 
 /**
  * Functions on files and directories.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -88,11 +91,9 @@ final class FNFile extends Fun {
       case PATHTOURI:
         return pathToUri(ctx);
       case MKDIR:
-        return makeDir(path, false);
-      case MKDIRS:
-        return makeDir(path, true);
+        return makeDir(path, ctx);
       case DELETE:
-        return delete(path);
+        return delete(path, ctx);
       case READFILE:
         return read(ctx);
       case READBIN:
@@ -140,12 +141,23 @@ final class FNFile extends Fun {
 
         while(++c < files.length) {
           final String name = files[c].getName();
-          if(!files[c].isHidden() && (pattern == null  ||
+          if(!files[c].isHidden() && (pattern == null ||
               name.matches(pattern))) return Str.get(name);
         }
         return null;
       }
     };
+  }
+
+  /**
+   * Checks if a file is hidden and matches the given pattern.
+   * @param file file
+   * @param pattern pattern
+   * @return result
+   */
+  boolean checkMatch(final File file, final String pattern) {
+    return !file.isHidden()
+        && (pattern == null || file.getName().matches(pattern));
   }
 
   /**
@@ -157,7 +169,9 @@ final class FNFile extends Fun {
   private Str read(final QueryContext ctx) throws QueryException {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
-    // TODO [RS] check if encoding exists
+
+    if(enc != null) if(!Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
+
     return Str.get(FNGen.unparsedText(io, enc, input));
   }
 
@@ -186,15 +200,25 @@ final class FNFile extends Fun {
   private Item write(final File file, final QueryContext ctx)
       throws QueryException {
 
+    Bln append = expr.length == 4 ? (Bln) checkType(expr[3].item(ctx, input),
+        Type.BLN) : Bln.FALSE;
+
+    // Raise an exception, if the append flag is false and
+    // the file to be written already exists
+    if(!append.bool(input) && file.exists()) {
+      FILEEXISTS.thrw(input, file.getPath());
+    }
+
     final Iter ir = expr[1].iter(ctx);
     try {
       final BufferedOutputStream out = new BufferedOutputStream(
           new FileOutputStream(file, true));
       try {
-        final XMLSerializer xml = new XMLSerializer(out,
-            FNGen.serialPar(this, 2, ctx));
+        final XMLSerializer xml = new XMLSerializer(out, FNGen.serialPar(this,
+            2, ctx));
         Item it;
-        while((it = ir.next()) != null) it.serialize(xml);
+        while((it = ir.next()) != null)
+          it.serialize(xml);
         xml.close();
       } finally {
         out.close();
@@ -237,10 +261,20 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private Item copy(final File src, final QueryContext ctx)
-    throws QueryException {
+      throws QueryException {
+
+    Bln overwrite = expr.length == 3 ? (Bln) checkType(
+        expr[2].item(ctx, input), Type.BLN) : Bln.FALSE;
 
     final File dst = new File(string(checkStr(expr[1], ctx)));
     if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
+
+    // Raise an exception, if the file to be copied
+    // already exists in the specified destination and
+    // the $overwrite parameter evaluates to false
+    if(!overwrite.bool(input) && dst.exists()) {
+      FILEEXISTS.thrw(input, dst.getName());
+    }
 
     try {
       final FileChannel sc = new FileInputStream(src).getChannel();
@@ -255,6 +289,7 @@ final class FNFile extends Fun {
       COPYFAILED.thrw(input, src, dst, ex.getMessage());
     }
     return null;
+
   }
 
   /**
@@ -270,11 +305,11 @@ final class FNFile extends Fun {
     final String dest = string(checkStr(expr[1], ctx));
     if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
 
-    final String destFile = dest.endsWith(Prop.SEP) ? dest + src.getName() :
-      dest + Prop.SEP + src.getName();
+    final String destFile = dest.endsWith(Prop.SEP) ? dest + src.getName()
+        : dest + Prop.SEP + src.getName();
 
     // Raise an exception if the target file already exists
-    if(new File(destFile).exists()) TARGETEXISTS.thrw(input, destFile);
+    if(new File(destFile).exists()) FILEEXISTS.thrw(input, destFile);
 
     // Raise an exception if the user has no access
     // to the destination
@@ -283,28 +318,30 @@ final class FNFile extends Fun {
     // Raise an exception if a directory is to be moved
     if(src.isDirectory()) DIRMOVE.thrw(input);
 
-    if(!src.renameTo(new File(dest, src.getName())))
-      CANNOTMOVE.thrw(input, src.getPath());
+    if(!src.renameTo(new File(dest, src.getName()))) CANNOTMOVE.thrw(input,
+        src.getPath());
     return null;
   }
 
   /**
    * Creates a directory.
    * @param file directory to be created
-   * @param recursive indicator for including nonexistent parent
-   *          directories by the creation
+   * @param ctx query context
    * @return result
    * @throws QueryException query exception
    */
-  private Item makeDir(final File file, final boolean recursive)
+  private Item makeDir(final File file, final QueryContext ctx)
       throws QueryException {
+
+    Bln recursive = expr.length == 2 ? (Bln) checkType(
+        expr[1].item(ctx, input), Type.BLN) : Bln.FALSE;
 
     // Raise an exception if the directory cannot be created because
     // a file with the same name already exists
-    if(file.exists() && !file.isDirectory())
-      FILEEXISTS.thrw(input, file.getName());
+    if(file.exists() && !file.isDirectory()) FILEEXISTS.thrw(input,
+        file.getName());
 
-    if(recursive) {
+    if(recursive.bool(input)) {
       // Raise an exception if the existent directory, in which
       // the dirs are to be created, is write-protected
       final File parent = getExistingParent(file);
@@ -315,7 +352,7 @@ final class FNFile extends Fun {
     } else {
       if(!file.mkdir()) CANNOTMKDIR.thrw(input, file.getPath());
     }
-    
+
     return null;
   }
 
@@ -335,22 +372,62 @@ final class FNFile extends Fun {
   }
 
   /**
-   * Deletes a file.
+   * Deletes a file or directory.
    * @param file file to be deleted
+   * @param ctx query context
    * @return result
    * @throws QueryException query exception
    */
-  private Item delete(final File file) throws QueryException {
+  private Item delete(final File file, final QueryContext ctx)
+      throws QueryException {
+
+    Bln recursive = expr.length == 2 ? (Bln) checkType(
+        expr[1].item(ctx, input), Type.BLN) : Bln.FALSE;
 
     if(!file.exists()) PATHNOTEXISTS.thrw(input, file.getPath());
 
     if(!file.canWrite()) FILEDEL.thrw(input, file.getPath());
 
-    if(file.isDirectory() && file.listFiles().length != 0) 
-      FILEDELDIR.thrw(input, file.getPath());
+    return (recursive.bool(input)) ? deleteRecursively(file) : delete(file);
+  }
 
+  /**
+   * Deletes a single file or directory.
+   * @param file file/directory to be deleted
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item delete(final File file) throws QueryException {
+    if(file.isDirectory() && file.listFiles().length != 0) FILEDELDIR.thrw(
+        input, file.getPath());
     if(!file.delete()) CANNOTDEL.thrw(input, file.getPath());
+    return null;
+  }
 
+  /**
+   * Deletes a directory recursively.
+   * @param file directory to be deleted
+   * @return result
+   * @throws QueryException query exception
+   */
+  private Item deleteRecursively(final File file) throws QueryException {
+    if(file.isDirectory()) {
+      if(file.listFiles().length != 0) {
+        File[] children = file.listFiles();
+
+        for(int k = 0; k < children.length; k++) {
+          if(!children[k].canWrite()) {
+            FILEDEL.thrw(input, children[k].getPath());
+            return null;
+          }
+        }
+
+        for(int i = 0; i < children.length; i++) {
+          deleteRecursively(children[i]);
+        }
+      }
+    }
+    if(!file.delete()) CANNOTDEL.thrw(input, file.getPath());
     return null;
   }
 

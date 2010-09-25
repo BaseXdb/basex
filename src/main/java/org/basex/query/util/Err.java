@@ -118,8 +118,7 @@ public enum Err {
   /** FOFL0007: Evaluation exception. */
   FILEDELDIR(FOFL, 7, "Directory '%' is not empty."),
   /** FOFL0008: Evaluation exception. */
-  TARGETEXISTS(FOFL, 8,
-      "A file named '%' already exists in the specified target."),
+  FILEEXISTS(FOFL, 8, "File '%' already exists."),
   /** FOFL0009: Evaluation exception. */
   DIRMOVE(FOFL, 9, "A directory cannot be moved. "),
   /** FOFL0010: Evaluation exception. */
@@ -128,17 +127,17 @@ public enum Err {
   MKDIR(FOFL, 11, "Directory '%' cannot be created. " +
       "The parent directory '%' is write-protected."),
   /** FOFL0012: Evaluation exception. */
-  FILEEXISTS(FOFL, 12, "A file named '%' already exists."),
+  CANNOTMKDIR(FOFL, 12, "Directory '%' cannot be created."),
   /** FOFL0013: Evaluation exception. */
-  CANNOTMKDIR(FOFL, 13, "Directory '%' cannot be created."),
+  CANNOTDEL(FOFL, 13, "'%' cannot be deleted."),
   /** FOFL0014: Evaluation exception. */
-  CANNOTDEL(FOFL, 14, "'%' cannot be deleted."),
+  CANNOTMOVE(FOFL, 14, "File '%' cannot be moved."),
   /** FOFL0015: Evaluation exception. */
-  CANNOTMOVE(FOFL, 15, "File '%' cannot be moved."),
+  DIRINV(FOFL, 15, "The path '%' is invalid in the filesystem."), 
   /** FOFL0016: Evaluation exception. */
-  DIRINV(FOFL, 16, "The path '%' is invalid in the filesystem."), 
+  COPYFAILED(FOFL, 16, "Copying from '%' to '%' failed: %"),
   /** FOFL0017: Evaluation exception. */
-  COPYFAILED(FOFL, 17, "Copying from '%' to '%' failed: %"), 
+  ENCNOTEXISTS(FOFL, 17, "The encoding '%' is not supported."),
 
   /** FONS0004: Evaluation exception. */
   NSDECL(FONS, 4, "Namespace prefix not declared: \"%\"."),
