@@ -221,9 +221,9 @@ public enum FunDef {
   /** XQuery function */
   ISFILE(FILEURI, FNFile.class, 1, 1, "is-file(path)", BLN),
   /** XQuery function */
-  ISREAD(FILEURI, FNFile.class, 1, 1, "is-readable(filepath)", BLN),
+  ISREAD(FILEURI, FNFile.class, 1, 1, "is-readable(path)", BLN),
   /** XQuery function */
-  ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(filepath)", BLN),
+  ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(path)", BLN),
   /** XQuery function */
   LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
   /** XQuery function */
@@ -242,15 +242,15 @@ public enum FunDef {
   /** XQuery function */
   DELETE(FILEURI, FNFile.class, 1, 2, "delete(path, recursive?)", ITEM_Z),
   /** XQuery function */
-  READFILE(FILEURI, FNFile.class, 1, 2, "read(filepath, encoding?)", STR),
+  READFILE(FILEURI, FNFile.class, 1, 2, "read(path, encoding?)", STR),
   /** XQuery function */
-  READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(filepath)", B64),
+  READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(path)", B64),
   /** XQuery function */
   WRITE(FILEURI, FNFile.class, 2, 4,
       "write(filepath, data, params?, append?)", ITEM_Z),
   /** XQuery function */
   WRITEBIN(FILEURI, FNFile.class, 2, 2,
-      "write-binary(filepath, data)", ITEM_Z),
+      "write-binary(path, data)", ITEM_Z),
   /** XQuery function */
   COPY(FILEURI, FNFile.class, 2, 3,
       "copy(path, destination, overwrite?)", ITEM_Z),
