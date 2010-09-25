@@ -229,7 +229,8 @@ public enum FunDef {
   /** XQuery function */
   SIZE(FILEURI, FNFile.class, 1, 1, "size(path)", ITR),
   /** XQuery function */
-  FILES(FILEURI, FNFile.class, 1, 3, "files(path, pattern?)", STR_ZM),
+  FILES(FILEURI, FNFile.class, 1, 3,
+      "files(path, recursive?, pattern?)", STR_ZM),
   /** XQuery function */
   PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
   /** XQuery function */

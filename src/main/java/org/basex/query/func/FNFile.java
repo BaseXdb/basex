@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 import org.basex.core.Prop;
@@ -120,33 +123,57 @@ final class FNFile extends Fun {
   private Iter listFiles(final QueryContext ctx) throws QueryException {
     final String path = string(checkStr(expr[0], ctx));
     final String pattern;
+
+    final Bln recursive = expr.length > 1 ? (Bln) checkType(
+        expr[1].item(ctx, input), Type.BLN) : Bln.FALSE;
+
     try {
-      pattern = expr.length == 2 ? string(checkStr(expr[1], ctx)).replaceAll(
+      pattern = expr.length == 3 ? string(checkStr(expr[2], ctx)).replaceAll(
           "\\.", "\\\\.").replaceAll("\\*", ".*") : null;
     } catch(final PatternSyntaxException ex) {
       FILEPATTERN.thrw(input, expr[1]);
       return null;
     }
 
+    final List<File> files = recursive.bool(input) ? listRecursively(new File(
+        path)) : Arrays.asList(new File(path).listFiles());
+    if(files == null) FILELIST.thrw(input, path);
+
     return new Iter() {
-      File[] files;
       int c = -1;
 
       @Override
-      public Item next() throws QueryException {
-        if(files == null) {
-          files = new File(path).listFiles();
-          if(files == null) FILELIST.thrw(input, path);
-        }
-
-        while(++c < files.length) {
-          final String name = files[c].getName();
-          if(!files[c].isHidden() && (pattern == null ||
-              name.matches(pattern))) return Str.get(name);
+      public Item next() {
+        while(++c < files.size()) {
+          if(checkMatch(files.get(c), pattern)) {
+            return Str.get(files.get(c).getPath());
+          }
         }
         return null;
       }
     };
+  }
+
+  /**
+   * Lists the files in a directory recursively.
+   * @param file directory
+   * @return file listing
+   */
+  private List<File> listRecursively(final File file) {
+
+    final List<File> result = new ArrayList<File>();
+    File currFile = file;
+    int c = 0;
+    do {
+      if(currFile.isDirectory()) {
+        for(File f : currFile.listFiles()) {
+          result.add(f);
+        }
+      }
+      currFile = result.get(c);
+    } while(++c < result.size());
+
+    return result;
   }
 
   /**
@@ -411,21 +438,12 @@ final class FNFile extends Fun {
    * @throws QueryException query exception
    */
   private Item deleteRecursively(final File file) throws QueryException {
-    if(file.isDirectory()) {
-      if(file.listFiles().length != 0) {
-        File[] children = file.listFiles();
 
-        for(int k = 0; k < children.length; k++) {
-          if(!children[k].canWrite()) {
-            FILEDEL.thrw(input, children[k].getPath());
-            return null;
-          }
-        }
-
-        for(int i = 0; i < children.length; i++) {
-          deleteRecursively(children[i]);
-        }
-      }
+    if(!file.canWrite()) FILEDEL.thrw(input, file.getPath());
+    final File[] children = file.listFiles();
+    if(children != null) {
+      for(File ch : children)
+        deleteRecursively(ch);
     }
     if(!file.delete()) CANNOTDEL.thrw(input, file.getPath());
     return null;

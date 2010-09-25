@@ -81,6 +81,14 @@ public class FNFileTest extends QueryTest {
               "<Nachname>Young</Nachname>\n" +
             "</Name>\n" +
           "</ACDC>";
+    
+    ItemIter ii = new ItemIter();
+    try {
+      ii = new ItemIter(new Item[] { new Dtm(
+        new File("etc").lastModified(), null)}, 1);
+    } catch(QueryException e) {
+        ii = null;
+    }
 
     queries = new Object[][] {
 
@@ -169,16 +177,17 @@ public class FNFileTest extends QueryTest {
         { "Test file:exists()", bool(true),
             "file:file-exists(\"" + fileCopy.getPath() + "\")"},
 
-        { "Test file:files()", nod(), "file:files(\"etc\", " + "\"[^z]*e\")"},
+        { "Test file:files()", nod(), "file:files(\"etc\", "
+              + "fn:true(),\"[^z]\")"},
 
         // /_tmpdir_/testDir1/fileCopy
-        { "Test file:last-modified()", null,
-            "file:last-modified(\"" + fileCopy.getPath() + "\")"},
+        { "Test file:last-modified()", ii, "file:last-modified(\"etc\")"},
 
     };
 
   }
-
+  
+  
   /** Prepares tests. */
   @BeforeClass
   public static void prepareTest() {
@@ -225,10 +234,6 @@ public class FNFileTest extends QueryTest {
       ex.printStackTrace();
     }
 
-    try {
-      queries[queries.length - 1][1] = new ItemIter(new Item[] { new Dtm(
-          fileCopy.lastModified(), null)}, 1);
-    } catch(final QueryException e) { }
   }
 
    /** Finishes the test. */
