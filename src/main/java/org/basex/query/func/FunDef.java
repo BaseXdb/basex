@@ -247,15 +247,15 @@ public enum FunDef {
   READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(path)", B64),
   /** XQuery function */
   WRITE(FILEURI, FNFile.class, 2, 4,
-      "write(filepath, data, params?, append?)", ITEM_Z),
+      "write(path, data, params?, append?)", ITEM_Z),
   /** XQuery function */
-  WRITEBIN(FILEURI, FNFile.class, 2, 2,
-      "write-binary(path, data)", ITEM_Z),
+  WRITEBIN(FILEURI, FNFile.class, 2, 3,
+      "write-binary(path, data, append)", ITEM_Z),
   /** XQuery function */
   COPY(FILEURI, FNFile.class, 2, 3,
-      "copy(path, destination, overwrite?)", ITEM_Z),
+      "copy(source, destination, overwrite?)", ITEM_Z),
   /** XQuery function */
-  MOVE(FILEURI, FNFile.class, 2, 2, "move(path, destination)", ITEM_Z),
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(source, destination)", ITEM_Z),
 
   /* FNNum functions. */
 

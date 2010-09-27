@@ -267,6 +267,16 @@ final class FNFile extends Fun {
       throws QueryException {
 
     final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B6B);
+    
+    Bln append = expr.length == 3 ? (Bln) checkType(expr[2].item(ctx, input),
+        Type.BLN) : Bln.FALSE;
+
+    // Raise an exception, if the append flag is false and
+    // the file to be written already exists
+    if(!append.bool(input) && file.exists()) {
+      FILEEXISTS.thrw(input, file.getPath());
+    }
+    
     try {
       final FileOutputStream out = new FileOutputStream(file);
       try {
