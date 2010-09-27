@@ -12,6 +12,7 @@ import org.basex.core.cmd.Password;
 import org.basex.core.cmd.Set;
 import org.basex.query.QueryException;
 import org.basex.server.Session;
+import org.basex.util.StringList;
 import org.basex.util.Util;
 
 /**
@@ -65,8 +66,8 @@ public abstract class Main {
   protected final boolean console() throws IOException {
     while(console) {
       Util.out("> ");
-      final String in = input().trim();
-      if(in.length() != 0 && !execute(in)) return true;
+      final StringList list = input();
+      for(String in : list) if(in.length() != 0 && !execute(in)) return true;
     }
     return false;
   }
@@ -158,12 +159,16 @@ public abstract class Main {
   }
 
   /**
-   * Returns a string from standard input.
-   * @return password
+   * Returns a list of commands from standard input.
+   * @return list of commands
    */
-  protected final String input() {
-    final Scanner sc = new Scanner(System.in);
-    return sc.hasNextLine() ? sc.nextLine().trim() : "";
+  protected final StringList input() {
+    String tmp = new Scanner(System.in).useDelimiter("\\z").next();
+    StringList cmds = new StringList();
+    Scanner items = new Scanner(tmp);
+    while(items.hasNextLine()) cmds.add(items.nextLine());
+    if(cmds.size() == 0) cmds.add("");
+    return cmds;
   }
 
   /**
@@ -171,7 +176,7 @@ public abstract class Main {
    * @return password
    */
   protected final String password() {
-    if(System.console() == null) return input();
+    if(System.console() == null) return input().get(0);
     final char[] pw = System.console().readPassword();
     return pw != null ? new String(pw) : "";
   }
