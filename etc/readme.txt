@@ -79,6 +79,12 @@ class Query:
 STREAM PROTOCOL ----------------------------------------------------------------
 
  {} = item or flag; 0 = marker for end of item
+ 
+ Authentication:
+ 1. Client connects to server socket
+ 2. Server sends timestamp
+ 3. Client sends username and hash: username 0 md5(md5(password) + timestamp) 0
+ 4. Server sends 0 (successful) or 1 (error)
 
  Client streams:
  - standard mode:        -> {command} 0
