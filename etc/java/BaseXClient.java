@@ -163,7 +163,7 @@ public class BaseXClient {
     out.flush();
     while(true) {
       final int b = in.read();
-      if(b == 0) break;
+      if(b == 0 || b == -1) break;
       o.write(b);
     }
   }
