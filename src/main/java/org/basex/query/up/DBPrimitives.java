@@ -128,14 +128,13 @@ final class DBPrimitives extends Primitives {
         par = parT;
       }
       int add = 0;
-      for(final UpdatePrimitive p : op.get(pre)) {
+      final NodePrimitives prim = op.get(pre);
+      prim.optimize();
+      if(prim.textAdjacency()) first = pre;
+      for(final UpdatePrimitive p : prim) {
         final PrimitiveType t = p.type();
         p.apply(add);
-        if (t == INSERTAFTER || t == INSERTBEFORE || t == REPLACENODE || 
-            t == DELETE) 
-          first = pre;
         if(t == INSERTBEFORE) add = ((NodeCopy) p).md.meta.size;
-        if(t == REPLACENODE) break;
       }
     }
     if(first > -1) mergeTexts(par, first);

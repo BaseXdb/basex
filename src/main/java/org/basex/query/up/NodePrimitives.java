@@ -28,4 +28,20 @@ interface NodePrimitives extends Iterable<UpdatePrimitive> {
    * @return primitive of type t or null if not found
    */
   UpdatePrimitive find(final PrimitiveType t);
+  
+  /**
+   * Optimizes accumulated update operations for the specific target node.
+   * Unnecessary operations are deleted. I.e. if the corresponding target is
+   * deleted, all other operations on this node have no effect at all. 
+   */
+  void optimize();
+
+  /**
+   * Returns true if text node adjacency is possible as a result of the 
+   * aggregated updates. This is only the case if updates actually affect the
+   * sibling axis of the target node and not the descendent-or-self axis.
+   * 
+   * @return true if text node adjacency possible
+   */
+  boolean textAdjacency();
 }
