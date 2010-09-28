@@ -63,7 +63,7 @@ public final class TextInput {
     if(enc != null) ti.encoding(enc);
     final int len = (int) ti.length();
     final TokenBuilder tb = new TokenBuilder(len);
-    while(ti.pos() < len) tb.addUTF(ti.next());
+    while(ti.pos() < len) tb.add(ti.next());
     ti.close();
     return tb;
   }

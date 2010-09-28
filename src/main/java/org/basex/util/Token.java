@@ -189,7 +189,7 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder(al << 1);
     for(int c = 0; c < al; ++c) {
       final char ch = arr[c];
-      tb.addUTF(Character.isHighSurrogate(ch) && c < al - 1
+      tb.add(Character.isHighSurrogate(ch) && c < al - 1
           && Character.isLowSurrogate(arr[c + 1])
           ? Character.toCodePoint(ch, arr[++c]) : ch);
     }
@@ -896,8 +896,8 @@ public final class Token {
 
     int s = 0;
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < l; ++i) {
-      final byte c = token[i];
+    for(int i = 0; i < l; i += cl(token, i)) {
+      final int c = cp(token, i);
       if(c == sep) {
         if(tb.size() != 0) {
           split[s++] = tb.finish();
@@ -992,9 +992,13 @@ public final class Token {
    * @param ch character to be removed
    * @return resulting token
    */
-  public static byte[] delete(final byte[] token, final char ch) {
+  public static byte[] delete(final byte[] token, final int ch) {
     final TokenBuilder tb = new TokenBuilder(token.length);
-    for(final byte b : token) if(b != ch) tb.add(b);
+    final int tl = token.length;
+    for(int i = 0; i < tl; i += cl(token, i)) {
+      final int c = cp(token, i);
+      if(c != ch) tb.add(c);
+    }
     return tb.finish();
   }
 
@@ -1157,7 +1161,7 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder();
     for(int t = 0; t < tl; ++t) {
       final byte b = token[t];
-      if(letterOrDigit(b) || contains(iri ? IRIRES : RES, b)) tb.add(b);
+      if(letterOrDigit(b) || contains(iri ? IRIRES : RES, b)) tb.addByte(b);
       else hex(tb, b);
     }
     return tb.finish();
@@ -1173,7 +1177,7 @@ public final class Token {
     final TokenBuilder tb = new TokenBuilder();
     for(int t = 0; t < tl; ++t) {
       final byte b = token[t];
-      if(b >= 0x20 && b <= 0x7e) tb.add(b);
+      if(b >= 0x20 && b <= 0x7e) tb.addByte(b);
       else hex(tb, b);
     }
     return tb.finish();
@@ -1186,8 +1190,8 @@ public final class Token {
    */
   private static void hex(final TokenBuilder tb, final byte b) {
     tb.add('%');
-    tb.add(HEX[(b & 0xFF) >> 4]);
-    tb.add(HEX[b & 0xFF & 15]);
+    tb.addByte(HEX[(b & 0xFF) >> 4]);
+    tb.addByte(HEX[b & 0xFF & 15]);
   }
 
   /**
@@ -1198,15 +1202,15 @@ public final class Token {
   public static String md5(final String string) {
     try {
       final MessageDigest md = MessageDigest.getInstance("MD5");
-      md.update(Token.token(string));
-      final TokenBuilder tb = new TokenBuilder();
+      md.update(token(string));
+      final ByteList bl = new ByteList();
       for(final byte b : md.digest()) {
         final int h = b >> 4 & 0x0F;
-        tb.add((byte) (h + (h > 9 ? 0x57 : 0x30)));
+        bl.add((byte) (h + (h > 9 ? 0x57 : 0x30)));
         final int l = b & 0x0F;
-        tb.add((byte) (l + (l > 9 ? 0x57 : 0x30)));
+        bl.add((byte) (l + (l > 9 ? 0x57 : 0x30)));
       }
-      return tb.toString();
+      return string(bl.toArray());
     } catch(final Exception ex) {
       Util.notexpected(ex);
       return null;

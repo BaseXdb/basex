@@ -124,8 +124,7 @@ public enum Err {
   /** FOFL0010: Evaluation exception. */
   FILEMOVE(FOFL, 10, "'%' cannot be moved. '%' is write-protected."),
   /** FOFL0011: Evaluation exception. */
-  MKDIR(FOFL, 11, "Directory '%' cannot be created. " +
-      "The parent directory '%' is write-protected."),
+  MKDIR(FOFL, 11, "'%' cannot be created. '%' is write-protected."),
   /** FOFL0012: Evaluation exception. */
   CANNOTMKDIR(FOFL, 12, "Directory '%' cannot be created."),
   /** FOFL0013: Evaluation exception. */

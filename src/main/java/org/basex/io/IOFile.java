@@ -53,7 +53,7 @@ public final class IOFile extends IO {
   @Override
   public void cache() throws IOException {
     final BufferInput bi = new BufferInput(file);
-    cont = bi.content().finish();
+    cont = bi.content().toArray();
     bi.close();
   }
 
@@ -214,6 +214,23 @@ public final class IOFile extends IO {
     while(fn.startsWith("//")) fn = fn.substring(1);
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
+  }
+
+
+  /**
+   * Converts a file filter to a regular expression.
+   * @param filter filter
+   * @return regular expression
+   */
+  public static String regex(final String filter) {
+    final StringBuilder sb = new StringBuilder();
+    for(int f = 0; f < filter.length(); f++) {
+      final char ch = filter.charAt(f);
+      if(ch == '*') sb.append('.');
+      else if(!Character.isLetterOrDigit(ch)) sb.append('\\');
+      sb.append(ch);
+    }
+    return sb.toString();
   }
 
   /**

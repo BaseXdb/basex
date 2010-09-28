@@ -1,5 +1,6 @@
 package org.basex.gui.view.table;
 
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -137,7 +138,7 @@ final class TableContent extends BaseXBack {
       }
 
       // add dots if content is too long
-      for(final TokenBuilder t : tb) if(t.size() > 100) t.add("...");
+      for(final TokenBuilder t : tb) if(t.size() > 100) t.add(DOTS);
 
       // draw row contents
       byte[] focusStr = null;

@@ -83,6 +83,6 @@ public abstract class Fun extends Arr {
   @Override
   public final String toString() {
     return new TokenBuilder().add(def.toString().replaceAll(
-        "\\(.*\\)", "") + "(").add(expr, ", ").add(')').toString();
+        "\\(.*\\)", "") + PAR1).addSep(expr, SEP).add(PAR2).toString();
   }
 }

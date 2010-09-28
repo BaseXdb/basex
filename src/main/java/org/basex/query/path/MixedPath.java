@@ -79,10 +79,10 @@ public final class MixedPath extends Path {
       final ItemIter ii = new ItemIter();
       ctx.size = ir.size();
       ctx.pos = 1;
-      Item i;
-      while((i = ir.next()) != null) {
-        if(!i.node()) NODESPATH.thrw(input, this, i.type);
-        ctx.value = i;
+      Item it;
+      while((it = ir.next()) != null) {
+        if(!it.node()) NODESPATH.thrw(input, this, it.type);
+        ctx.value = it;
         ii.add(ctx.iter(e));
         ctx.pos++;
       }
@@ -90,14 +90,14 @@ public final class MixedPath extends Path {
       // either nodes or atomic items are allowed in a result set, but not both
       if(ii.size() != 0 && ii.get(0).node()) {
         final NodIter ni = new NodIter().random();
-        while((i = ii.next()) != null) {
-          if(!i.node()) EVALNODESVALS.thrw(input);
-          ni.add((Nod) i);
+        while((it = ii.next()) != null) {
+          if(!it.node()) EVALNODESVALS.thrw(input);
+          ni.add((Nod) it);
         }
         res = ItemIter.get(ni);
       } else {
-        while((i = ii.next()) != null) {
-          if(i.node()) EVALNODESVALS.thrw(input);
+        while((it = ii.next()) != null) {
+          if(it.node()) EVALNODESVALS.thrw(input);
         }
         res = ii;
       }

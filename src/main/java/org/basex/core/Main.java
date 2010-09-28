@@ -66,8 +66,9 @@ public abstract class Main {
   protected final boolean console() throws IOException {
     while(console) {
       Util.out("> ");
-      final StringList list = input();
-      for(String in : list) if(in.length() != 0 && !execute(in)) return true;
+      for(final String in : input()) {
+        if(in.length() != 0 && !execute(in)) return true;
+      }
     }
     return false;
   }
@@ -163,12 +164,14 @@ public abstract class Main {
    * @return list of commands
    */
   protected final StringList input() {
-    String tmp = new Scanner(System.in).useDelimiter("\\z").next();
-    StringList cmds = new StringList();
-    Scanner items = new Scanner(tmp);
-    while(items.hasNextLine()) cmds.add(items.nextLine());
-    if(cmds.size() == 0) cmds.add("");
-    return cmds;
+    final StringList sl = new StringList();
+    final Scanner scan = new Scanner(System.in).useDelimiter("\\z");
+    if(scan.hasNext()) {
+      final Scanner items = new Scanner(scan.next());
+      while(items.hasNextLine()) sl.add(items.nextLine());
+    }
+    if(sl.size() == 0) sl.add("");
+    return sl;
   }
 
   /**

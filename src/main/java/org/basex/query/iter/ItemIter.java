@@ -154,6 +154,6 @@ public final class ItemIter extends Iter implements Result {
 
   @Override
   public String toString() {
-    return new TokenBuilder().add(Arrays.copyOf(item, size), SEP).toString();
+    return new TokenBuilder().addSep(Arrays.copyOf(item, size), SEP).toString();
   }
 }

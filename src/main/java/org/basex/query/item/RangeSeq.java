@@ -11,13 +11,13 @@ import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
 /**
- * Integer sequence, containing at least two items.
+ * Range sequence, containing at least two integers.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class RangeSeq extends Seq {
-  /** Star value. */
+  /** Start value. */
   private final long start;
 
   /**
@@ -66,6 +66,6 @@ public final class RangeSeq extends Seq {
 
   @Override
   public String toString() {
-    return "(" + start + "..." + (start + size - 1) + ")";
+    return PAR1 + start + DOTS + (start + size - 1) + PAR2;
   }
 }

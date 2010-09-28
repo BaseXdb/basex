@@ -20,9 +20,6 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Treat extends Single {
-  /** Instance. */
-  final SeqType seq;
-
   /**
    * Constructor.
    * @param ii input info
@@ -31,13 +28,13 @@ public final class Treat extends Single {
    */
   public Treat(final InputInfo ii, final Expr e, final SeqType s) {
     super(ii, e);
-    seq = s;
+    type = s;
   }
 
   @Override
   public Expr comp(final QueryContext ctx) throws QueryException {
     super.comp(ctx);
-    return checkUp(expr, ctx).value() ? preEval(ctx) : this;
+    return checkUp(expr, ctx).value() ? optPre(value(ctx), ctx) : this;
   }
 
   @Override
@@ -45,13 +42,13 @@ public final class Treat extends Single {
     final Iter iter = ctx.iter(expr);
     final Item it = iter.next();
     if(it == null) {
-      if(!seq.mayBeZero() || seq.type == Type.EMP) return Iter.EMPTY;
+      if(!type.mayBeZero() || type.type == Type.EMP) return Iter.EMPTY;
       XPEMPTY.thrw(input, desc());
     }
-    if(seq.zeroOrOne()) {
-      if(iter.next() != null) NOTREATS.thrw(input, desc(), seq);
-      if(!it.type.instance(seq.type))
-        NOTREAT.thrw(input, desc(), seq, it.type);
+    if(type.zeroOrOne()) {
+      if(iter.next() != null) NOTREATS.thrw(input, desc(), type);
+      if(!it.type.instance(type.type))
+        NOTREAT.thrw(input, desc(), type, it.type);
       return it.iter();
     }
 
@@ -61,8 +58,8 @@ public final class Treat extends Single {
       @Override
       public Item next() throws QueryException {
         if(i == null) return null;
-        if(!i.type.instance(seq.type))
-          NOTREAT.thrw(input, desc(), seq, i.type);
+        if(!i.type.instance(type.type))
+          NOTREAT.thrw(input, desc(), type, i.type);
         final Item ii = i;
         i = iter.next();
         return ii;
@@ -72,13 +69,13 @@ public final class Treat extends Single {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, TYPE, Token.token(seq.toString()));
+    ser.openElement(this, TYPE, Token.token(type.toString()));
     expr.plan(ser);
     ser.closeElement();
   }
 
   @Override
   public String toString() {
-    return expr + " " + TREAT + " " + AS + " " + seq;
+    return expr + " " + TREAT + " " + AS + " " + type;
   }
 }

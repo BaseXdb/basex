@@ -97,7 +97,7 @@ public final class FuncCall extends Arr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(name.atom()).add('(').add(
-        toString(", ")).add(')').toString();
+    return new TokenBuilder(name.atom()).add(PAR1).add(
+        toString(SEP)).add(PAR2).toString();
   }
 }

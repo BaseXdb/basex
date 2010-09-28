@@ -12,6 +12,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.util.Arrays;
 import java.util.zip.ZipInputStream;
+import org.basex.util.ByteList;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -146,14 +147,14 @@ public class BufferInput extends InputStream {
 
   /**
    * Reads a token from the input stream, suffixed by a 0 byte.
-   * @return token builder
+   * @return resulting byte list
    * @throws IOException IO Exception
    */
-  public final TokenBuilder content() throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
+  public final ByteList content() throws IOException {
+    final ByteList bl = new ByteList();
     byte l;
-    while((l = readByte()) != 0) tb.add(l);
-    return tb;
+    while((l = readByte()) != 0) bl.add(l);
+    return bl;
   }
 
   /**
@@ -217,7 +218,7 @@ public class BufferInput extends InputStream {
       if(ch == 0x0D) continue;
       if(ch == 0x00) return tb.size() != 0;
       if(ch == 0x0A) return true;
-      tb.addUTF(ch);
+      tb.add(ch);
     }
   }
 

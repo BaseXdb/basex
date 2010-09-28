@@ -1,9 +1,9 @@
 package org.basex.query.item;
 
 import org.basex.query.QueryException;
+import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -87,13 +87,12 @@ public final class Hex extends Item {
    * @return hex output
    */
   private byte[] b2h() {
-    final TokenBuilder tb = new TokenBuilder();
-
+    final ByteList bl = new ByteList();
     for(final byte v : val) {
-      tb.add(b2h((v & 0xF0) >> 4));
-      tb.add(b2h(v & 0x0F));
+      bl.add(b2h((v & 0xF0) >> 4));
+      bl.add(b2h(v & 0x0F));
     }
-    return tb.finish();
+    return bl.toArray();
   }
 
   /**

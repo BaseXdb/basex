@@ -16,7 +16,7 @@ public enum Axis {
   /** Ancestor-or-self axis. */
   ANCORSELF("ancestor-or-self", false) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.ancOrSelf();
     }
   },
@@ -24,7 +24,7 @@ public enum Axis {
   /** Ancestor axis. */
   ANC("ancestor", false) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.anc();
     }
   },
@@ -32,7 +32,7 @@ public enum Axis {
   /** Attribute axis. */
   ATTR("attribute", true) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.attr();
     }
   },
@@ -40,7 +40,7 @@ public enum Axis {
   /** Child Axis. */
   CHILD("child", true) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.child();
     }
   },
@@ -48,7 +48,7 @@ public enum Axis {
   /** Descendant-or-self axis. */
   DESCORSELF("descendant-or-self", true) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.descOrSelf();
     }
   },
@@ -56,7 +56,7 @@ public enum Axis {
   /** Descendant axis. */
   DESC("descendant", true) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.descendant();
     }
   },
@@ -64,7 +64,7 @@ public enum Axis {
   /** Following-Sibling axis. */
   FOLLSIBL("following-sibling", false) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.follSibl();
     }
   },
@@ -72,7 +72,7 @@ public enum Axis {
   /** Following axis. */
   FOLL("following", false) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.foll();
     }
   },
@@ -80,7 +80,7 @@ public enum Axis {
   /** Parent axis. */
   PARENT("parent", true) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.par();
     }
   },
@@ -88,7 +88,7 @@ public enum Axis {
   /** Preceding-Sibling axis. */
   PRECSIBL("preceding-sibling", false) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.precSibl();
     }
   },
@@ -96,7 +96,7 @@ public enum Axis {
   /** Preceding axis. */
   PREC("preceding", false) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.prec();
     }
   },
@@ -104,7 +104,7 @@ public enum Axis {
   /** Step axis. */
   SELF("self", true) {
     @Override
-    NodeIter init(final Nod n) {
+    NodeIter iter(final Nod n) {
       return n.self();
     }
   };
@@ -129,7 +129,7 @@ public enum Axis {
    * @param n input node
    * @return node iterator
    */
-  abstract NodeIter init(final Nod n);
+  abstract NodeIter iter(final Nod n);
 
   @Override
   public String toString() {

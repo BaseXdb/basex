@@ -2,7 +2,6 @@ package org.basex.query.path;
 
 import static org.basex.query.QueryText.*;
 import static org.basex.query.path.Axis.*;
-import static org.basex.query.path.Test.NODE;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +13,7 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CAttr;
+import org.basex.query.expr.CDoc;
 import org.basex.query.expr.Expr;
 import org.basex.query.expr.Filter;
 import org.basex.query.item.Bln;
@@ -28,7 +28,7 @@ import org.basex.query.item.Value;
 import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.path.Test.Kind;
+import org.basex.query.path.Test.Name;
 import static org.basex.query.util.Err.*;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -101,7 +101,7 @@ public class AxisPath extends Path {
 
     for(int i = 0; i < step.length; ++i) {
       switch(step[i].axis) {
-        // reverse results - don't iterate
+        // reverse axes - don't iterate
         case ANC: case ANCORSELF: case PREC: case PRECSIBL:
           return false;
         // multiple, unsorted results - only iterate at last step
@@ -152,7 +152,8 @@ public class AxisPath extends Path {
       ctx.compInfo(OPTPATH);
       ctx.value = root(ctx);
     }
-    checkEmpty();
+    final Step s = emptyStep();
+    if(s != null) COMPSELF.thrw(input, s);
 
     for(int i = 0; i != step.length; ++i) {
       final Expr e = step[i].comp(ctx);
@@ -229,7 +230,7 @@ public class AxisPath extends Path {
         final Expr[] preds = t == ts - 1 ? step[s].pred : new Expr[0];
         final byte[] n = tl.get(ts - t - 1);
         final NameTest nt = n == null ? new NameTest(false, input) :
-          new NameTest(new QNm(n), Kind.NAME, false, input);
+          new NameTest(new QNm(n), Name.NAME, false, input);
         steps[t] = Step.get(input, Axis.CHILD, nt, preds);
       }
       while(++s < step.length) steps[ts++] = step[s];
@@ -254,7 +255,7 @@ public class AxisPath extends Path {
     ArrayList<PathNode> in = data.path.root();
     for(int s = 0; s <= l; ++s) {
       final boolean desc = step[s].axis == Axis.DESC;
-      if(!desc && step[s].axis != Axis.CHILD || step[s].test.kind != Kind.NAME)
+      if(!desc && step[s].axis != Axis.CHILD || step[s].test.test != Name.NAME)
         return null;
 
       final int name = data.tags.id(step[s].test.name.ln());
@@ -351,7 +352,7 @@ public class AxisPath extends Path {
           final Step prev = step[j - 1];
           inv = Array.add(inv, Step.get(input, a, prev.test, prev.pred));
         } else if(a != Axis.ANC && a != Axis.ANCORSELF) {
-          inv = Array.add(inv, Step.get(input, a, KindTest.DOC));
+          inv = Array.add(inv, Step.get(input, a, Test.DOC));
         }
       }
       final boolean simple = inv.length == 0 && newPreds.length == 0;
@@ -402,7 +403,7 @@ public class AxisPath extends Path {
           iter(0, citer, ctx);
         }
       } else {
-        ctx.value = null;
+        ctx.value = r;
         iter(0, citer, ctx);
       }
       citer.sort();
@@ -426,17 +427,17 @@ public class AxisPath extends Path {
   private void iter(final int l, final NodIter ni, final QueryContext ctx)
       throws QueryException {
 
-    // cast is ok as all steps are axis steps here (see calling method)
+    // cast is safe (steps will always return a node iterator)
     final NodeIter ir = (NodeIter) ctx.iter(step[l]);
     final boolean more = l + 1 != step.length;
-    Nod it;
-    while((it = ir.next()) != null) {
+    Nod nod;
+    while((nod = ir.next()) != null) {
       if(more) {
-        ctx.value = it;
+        ctx.value = nod;
         iter(l + 1, ni, ctx);
       } else {
         ctx.checkStop();
-        ni.add(it);
+        ni.add(nod);
       }
     }
   }
@@ -467,43 +468,57 @@ public class AxisPath extends Path {
 
     // set atomic type for single attribute steps to speedup predicate tests
     if(root == null && step.length == 1 && step[0].axis == ATTR &&
-        step[0].test.kind == Kind.STD) step[0].type = SeqType.NOD_ZO;
+        step[0].test.test == Name.STD) step[0].type = SeqType.NOD_ZO;
   }
 
   /**
-   * Checks at compile time if the location path will never yield results.
-   * @throws QueryException query exception
+   * Checks if the location path will never yield results.
+   * @return empty step, or {@code null}
    */
-  private void checkEmpty() throws QueryException {
+  private Step emptyStep() {
     for(int l = 0; l < step.length; ++l) {
       final Step s = step[l];
+      final Axis sa = s.axis;
       if(l == 0) {
-        if(root instanceof DBNode && ((DBNode) root).type == Type.DOC &&
-            (s.axis == ATTR || s.axis == PARENT || s.axis == SELF &&
-             s.test != NODE) || root instanceof CAttr && s.axis == CHILD)
-            COMPSELF.thrw(input, s);
+        if(root instanceof CAttr) {
+          if(sa == CHILD || sa == DESC) return s;
+        } else if(root instanceof DBNode && ((DBNode) root).type == Type.DOC ||
+            root instanceof CDoc) {
+          if(sa != CHILD && sa != DESC && sa != DESCORSELF &&
+            (sa != SELF && sa != ANCORSELF ||
+             s.test != Test.NODE && s.test != Test.DOC)) return s;
+        }
       } else {
-        final Step sp = step[l - 1];
-        if(s.axis == SELF || s.axis == DESCORSELF) {
-          if(s.test == NODE) continue;
-          if(sp.axis == ATTR) COMPSELF.thrw(input, s);
-          if(sp.test.type == Type.TXT && s.test.type != Type.TXT)
-            COMPSELF.thrw(input, s);
-
-          if(s.axis == DESCORSELF) continue;
+        final Step ls = step[l - 1];
+        final Axis lsa = ls.axis;
+        if(sa == SELF || sa == DESCORSELF) {
+          // .../self:: / .../descendant-or-self::
+          if(s.test == Test.NODE) continue;
+          // @.../...
+          if(lsa == ATTR) return s;
+          // text()/...
+          if(ls.test == Test.TXT && s.test != Test.TXT) return s;
+          if(sa == DESCORSELF) continue;
+          // .../self::
           final QNm n1 = s.test.name;
-          final QNm n0 = sp.test.name;
+          final QNm n0 = ls.test.name;
           if(n0 == null || n1 == null) continue;
-          if(!n1.eq(n0)) COMPSELF.thrw(input, s);
-        } else if(s.axis == FOLLSIBL || s.axis == PRECSIBL) {
-          if(sp.axis == ATTR) COMPSELF.thrw(input, s);
-        } else if(s.axis == DESC || s.axis == CHILD || s.axis == ATTR) {
-          if(sp.axis == ATTR || sp.test.type == Type.TXT ||
-             sp.test.type == Type.COM || sp.test.type == Type.PI)
-            COMPSELF.thrw(input, s);
+          // ...X/...Y
+          if(!n1.eq(n0)) return s;
+        } else if(sa == FOLLSIBL || sa == PRECSIBL) {
+          // .../following-sibling:: / .../preceding-sibling::
+          if(lsa == ATTR) return s;
+        } else if(sa == DESC || sa == CHILD || sa == ATTR) {
+          // .../descendant:: / .../child:: / .../attribute::
+          if(lsa == ATTR || ls.test == Test.TXT || ls.test == Test.COM ||
+             ls.test == Test.PI) return s;
+        } else if(sa == PARENT || sa == ANC) {
+          // .../parent:: / .../ancestor::
+          if(ls.test == Test.DOC) return s;
         }
       }
     }
+    return null;
   }
 
   /**
@@ -552,15 +567,14 @@ public class AxisPath extends Path {
     final Step s = step[step.length - 1];
 
     if(s.pred.length != 0 || !s.axis.down || s.test.type == Type.ATT ||
-        s.test.kind != Kind.NAME && s.test.kind != Kind.STD) return this;
+        s.test.test != Name.NAME && s.test.test != Name.STD) return this;
 
     final Data data = ctx.data();
     if(data == null || !data.meta.uptodate) return this;
 
     final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
     if(stats != null && stats.leaf) {
-      step = Array.add(step,
-          Step.get(input, Axis.CHILD, KindTest.TEXT));
+      step = Array.add(step, Step.get(input, Axis.CHILD, Test.TXT));
       ctx.compInfo(OPTTEXT, this);
     }
     return this;

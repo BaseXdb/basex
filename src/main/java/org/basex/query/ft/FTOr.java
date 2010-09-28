@@ -116,6 +116,6 @@ public final class FTOr extends FTExpr {
 
   @Override
   public String toString() {
-    return "(" + toString(" " + FTOR + " ") + ")";
+    return PAR1 + toString(" " + FTOR + " ") + PAR2;
   }
 }

@@ -167,8 +167,8 @@ final class FNGen extends Fun {
     try {
       return Bln.get(doc(ctx) != null);
     } catch(final QueryException ex) {
-      // FODC0002, FODC0004, errors created from user with the same codes...
-      if(ex.code().startsWith(Err.Type.FODC.toString())) return Bln.FALSE;
+      // catch FODC0002 and FODC0004
+      if(ex.type() == Err.Type.FODC) return Bln.FALSE;
       throw ex;
     }
   }
@@ -199,7 +199,7 @@ final class FNGen extends Fun {
       return Bln.get(unparsedText(io, e, input) != null);
     } catch(final QueryException ex) {
       // error code is still to be fixed in the specs...
-      if(ex.code().startsWith(Err.UNDEF.toString())) return Bln.FALSE;
+      if(ex.type() == Err.UNDEF.type) return Bln.FALSE;
       throw ex;
     }
   }
@@ -243,7 +243,7 @@ final class FNGen extends Fun {
       final Parser p = Parser.fileParser(io, prop, "");
       return new DBNode(MemBuilder.build(p, prop, ""), 0);
     } catch(final IOException ex) {
-      DOCWF.thrw(input, ex.getMessage());
+      DOCWF.thrw(input, ex.toString());
       return null;
     }
   }
@@ -263,7 +263,7 @@ final class FNGen extends Fun {
       nod.serialize(xml);
       xml.close();
     } catch(final IOException ex) {
-      UNDEF.thrw(input, ex.getMessage());
+      UNDEF.thrw(input, ex.toString());
     }
     return Str.get(ao.toArray());
   }
@@ -293,7 +293,7 @@ final class FNGen extends Fun {
     try {
       return new SerializerProp(tb.toString());
     } catch(final IOException ex) {
-      UNDEF.thrw(fun.input, ex.getMessage());
+      UNDEF.thrw(fun.input, ex.toString());
       return null;
     }
   }

@@ -255,6 +255,6 @@ public final class FunJava extends Arr {
 
   @Override
   public String toString() {
-    return cls + "." + mth + "(" + toString(", ") + ")";
+    return cls + "." + mth + PAR1 + toString(SEP) + PAR2;
   }
 }

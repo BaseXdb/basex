@@ -182,7 +182,7 @@ public final class Find extends AQuery {
 
     final TokenBuilder ft = new TokenBuilder();
     for(final String t : split(query)) {
-      if(Character.isLetterOrDigit(t.charAt(0))) {
+      if(XMLToken.isChar(t.charAt(0))) {
         if(ft.size() != 0) ft.add(" ftand");
         ft.add(" \"" + t + "\"");
       }
@@ -229,7 +229,7 @@ public final class Find extends AQuery {
 
         if(term[0] == '<' || term[0] == '>') {
           tb.add(term[0]);
-          tb.add(calcNum(substring(term, 1)));
+          tb.addNum(calcNum(substring(term, 1)));
         } else {
           tb.add(" " + CT + " \"");
           tb.add(term);
@@ -282,7 +282,7 @@ public final class Find extends AQuery {
       if(delim == 0) {
         if(c == '\'' || c == '"') {
           delim = c;
-        } else if(!Character.isLetterOrDigit(c) && c != '@' && c != '='
+        } else if(!XMLToken.isChar(c) && c != '@' && c != '='
             && c != '<' && c != '>' && c != '~') {
           if(sb.length() != 0) {
             split[s++] = sb.toString();

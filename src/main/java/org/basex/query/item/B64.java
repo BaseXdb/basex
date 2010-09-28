@@ -2,9 +2,9 @@ package org.basex.query.item;
 
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
+import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -27,10 +27,9 @@ public final class B64 extends Item {
    */
   public B64(final byte[] d, final InputInfo ii) throws QueryException {
     super(Type.B6B);
-    final TokenBuilder tb = new TokenBuilder();
-    for(final byte c : d)
-      if(c < 0 || c > ' ') tb.add(c);
-    b2h(tb.finish(), ii);
+    final ByteList bl = new ByteList();
+    for(final byte c : d) if(c < 0 || c > ' ') bl.add(c);
+    b2h(bl.toArray(), ii);
   }
 
   /**
@@ -71,7 +70,7 @@ public final class B64 extends Item {
    * @return base64 array
    */
   private byte[] h2b() {
-    final TokenBuilder tb = new TokenBuilder();
+    final ByteList bl = new ByteList();
     final int a = val.length;
     final int f = a / 3;
     final int p = a - 3 * f;
@@ -81,26 +80,27 @@ public final class B64 extends Item {
       final int b0 = val[c++] & 0xff;
       final int b1 = val[c++] & 0xff;
       final int b2 = val[c++] & 0xff;
-      tb.add(H2B[b0 >> 2]);
-      tb.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
-      tb.add(H2B[b1 << 2 & 0x3f | b2 >> 6]);
-      tb.add(H2B[b2 & 0x3f]);
+      bl.add(H2B[b0 >> 2]);
+      bl.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
+      bl.add(H2B[b1 << 2 & 0x3f | b2 >> 6]);
+      bl.add(H2B[b2 & 0x3f]);
     }
 
     if(p != 0) {
       final int b0 = val[c++] & 0xff;
-      tb.add(H2B[b0 >> 2]);
+      bl.add(H2B[b0 >> 2]);
       if(p == 1) {
-        tb.add(H2B[b0 << 4 & 0x3f]);
-        tb.add("==");
+        bl.add(H2B[b0 << 4 & 0x3f]);
+        bl.add((byte) '=');
+        bl.add((byte) '=');
       } else {
         final int b1 = val[c++] & 0xff;
-        tb.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
-        tb.add(H2B[b1 << 2 & 0x3f]);
-        tb.add('=');
+        bl.add(H2B[b0 << 4 & 0x3f | b1 >> 4]);
+        bl.add(H2B[b1 << 2 & 0x3f]);
+        bl.add((byte) '=');
       }
     }
-    return tb.finish();
+    return bl.toArray();
   }
 
   /** Hex to byte conversion table. */

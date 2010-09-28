@@ -47,10 +47,9 @@ public final class Uri extends Str {
    */
   public Uri resolve(final Uri add) {
     if(add.val.length == 0) return this;
-
     try {
       final URI base = new URI(Token.string(val));
-      final URI uri = base.resolve(Token.string(add.val));
+      final URI uri = base.resolve(Token.string(Token.uri(add.val, true)));
       return uri(Token.token(uri.toString()));
     } catch(final Exception ex) {
       return this;
@@ -71,7 +70,7 @@ public final class Uri extends Str {
    */
   public boolean valid() {
     try {
-      new URI(Token.string(val));
+      new URI(Token.string(Token.uri(val, true)));
       return true;
     } catch(final Exception ex) {
       return false;

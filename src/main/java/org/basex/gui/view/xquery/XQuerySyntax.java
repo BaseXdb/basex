@@ -78,7 +78,7 @@ final class XQuerySyntax extends BaseXSyntax {
       return VAR;
     }
     if(var) {
-      var = XMLToken.isLetterOrDigit(ch);
+      var = XMLToken.isChar(ch);
       return VAR;
     }
 
@@ -89,7 +89,7 @@ final class XQuerySyntax extends BaseXSyntax {
     if(FUNC.contains(word)) return FUNS;
 
     // special characters
-    if(!XMLToken.isXMLLetterOrDigit(ch)) return KEY;
+    if(!XMLToken.isNCChar(ch)) return KEY;
 
     // letters and numbers
     return Color.black;

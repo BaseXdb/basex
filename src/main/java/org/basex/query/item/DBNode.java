@@ -71,6 +71,7 @@ public class DBNode extends Nod {
     type = type(k);
     par = null;
     val = null;
+    nsp = null;
     pre = p;
   }
 
@@ -143,11 +144,10 @@ public class DBNode extends Nod {
 
   @Override
   public final DBNode copy() {
-    // par.finish() ?..
-    final DBNode node = new DBNode(data, pre, par, type);
-    node.root = root;
-    node.score = score;
-    return node;
+    final DBNode n = new DBNode(data, pre, par, type);
+    n.root = root;
+    n.score = score;
+    return n;
   }
 
   @Override
@@ -156,8 +156,8 @@ public class DBNode extends Nod {
   }
 
   @Override
-  public final Nod parent() {
-    if(par != null) return par;
+  public final DBNode parent() {
+    if(par != null) return (DBNode) par;
     final int p = data.parent(pre, data.kind(pre));
     if(p == -1) return null;
 
@@ -176,12 +176,38 @@ public class DBNode extends Nod {
   @Override
   public final NodeIter anc() {
     return new NodeIter() {
-      /** Temporary node. */
-      private Nod node = copy();
+      private final DBNode node = copy();
+      int p = pre;
+      int k = data.kind(p);
+      final double sc = node.score;
 
       @Override
       public Nod next() {
-        node = node.parent();
+        p = data.parent(p, k);
+        if(p == -1) return null;
+        k = data.kind(p);
+        node.set(p, k);
+        node.score(Scoring.step(sc));
+        return node;
+      }
+    };
+  }
+
+  @Override
+  public final NodeIter ancOrSelf() {
+    return new NodeIter() {
+      private final DBNode node = copy();
+      int p = pre;
+      int k = data.kind(p);
+      final double sc = node.score;
+
+      @Override
+      public Nod next() {
+        if(p == -1) return null;
+        k = data.kind(p);
+        node.set(p, k);
+        node.score(Scoring.step(sc));
+        p = data.parent(p, k);
         return node;
       }
     };
@@ -223,7 +249,6 @@ public class DBNode extends Nod {
         k = data.kind(p);
         node.set(p, k);
         node.score(Scoring.step(sc));
-        node.nsp = null;
         p += data.size(p, k);
         return node;
       }
@@ -264,6 +289,45 @@ public class DBNode extends Nod {
         final int k = data.kind(p);
         node.set(p, k);
         p += data.attSize(p, k);
+        return node;
+      }
+    };
+  }
+
+  @Override
+  public NodeIter foll() {
+    return new NodeIter() {
+      private final DBNode node = copy();
+      final int s = data.meta.size;
+      int k = data.kind(pre);
+      int p = pre + data.size(pre, k);
+
+      @Override
+      public Nod next() {
+        if(p == s) return null;
+        k = data.kind(p);
+        node.set(p, k);
+        p += data.attSize(p, k);
+        return node;
+      }
+    };
+  }
+
+  @Override
+  public NodeIter follSibl() {
+    return new NodeIter() {
+      private final DBNode node = copy();
+      int k = data.kind(pre);
+      private final int pp = data.parent(pre, k);
+      final int s = pp + data.size(pp, data.kind(pp));
+      int p = pre + data.size(pre, k);
+
+      @Override
+      public Nod next() {
+        if(p == s) return null;
+        k = data.kind(p);
+        node.set(p, k);
+        p += data.size(p, k);
         return node;
       }
     };

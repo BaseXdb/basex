@@ -53,7 +53,7 @@ public final class Util {
    */
   public static Object notimplemented(final Object... ext) {
     final TokenBuilder tb = new TokenBuilder("Not Implemented");
-    if(ext.length != 0) tb.add(" (%)", ext);
+    if(ext.length != 0) tb.addExt(" (%)", ext);
     throw new RuntimeException(tb.add('.').toString());
   }
 
@@ -165,7 +165,7 @@ public final class Util {
 
   /**
    * Returns a string and replaces all % characters by the specified extensions.
-   * See {@link TokenBuilder#add(Object, Object...)} for details.
+   * See {@link TokenBuilder#addExt} for details.
    * @param str string to be extended
    * @param ext text text extensions
    * @return extended string
@@ -176,13 +176,13 @@ public final class Util {
 
   /**
    * Returns a token and replaces all % characters by the specified extensions.
-   * (see {@link TokenBuilder#add(Object, Object...)} for details.
+   * (see {@link TokenBuilder#addExt} for details.
    * @param str string to be extended
    * @param ext text text extensions
    * @return token
    */
   public static byte[] inf(final Object str, final Object... ext) {
-    return new TokenBuilder().add(str, ext).finish();
+    return new TokenBuilder().addExt(str, ext).finish();
   }
 
   /**
@@ -215,10 +215,11 @@ public final class Util {
 
     // decode path; URLDecode returns wrong results
     final TokenBuilder tb = new TokenBuilder();
-    for(int p = 0; p < path.length(); ++p) {
+    final int pl = path.length();
+    for(int p = 0; p < pl; ++p) {
       final char ch = path.charAt(p);
-      if(ch == '%' && p + 2 < path.length()) {
-        tb.add((byte) Integer.parseInt(path.substring(p + 1, p + 3), 16));
+      if(ch == '%' && p + 2 < pl) {
+        tb.addByte((byte) Integer.parseInt(path.substring(p + 1, p + 3), 16));
         p += 2;
       } else {
         tb.add(ch);
@@ -229,7 +230,7 @@ public final class Util {
       return new String(tb.finish(), System.getProperty("file.encoding"));
     } catch(final Exception ex) {
       // not expected to occur
-      return tb.toString();
+      return path;
     }
   }
 }

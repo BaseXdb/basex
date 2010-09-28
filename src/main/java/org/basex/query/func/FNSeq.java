@@ -82,8 +82,7 @@ final class FNSeq extends Fun {
    */
   private Item head(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    return e.item() || e.type().zeroOrOne() ? e.item(ctx, input) :
-      e.iter(ctx).next();
+    return e.type().zeroOrOne() ? e.item(ctx, input) : e.iter(ctx).next();
   }
 
   /**
@@ -94,7 +93,7 @@ final class FNSeq extends Fun {
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    if(e.item() || e.type().zeroOrOne()) return Iter.EMPTY;
+    if(e.type().zeroOrOne()) return Iter.EMPTY;
 
     final Iter ir = e.iter(ctx);
     if(ir.next() == null) return Iter.EMPTY;
@@ -108,7 +107,7 @@ final class FNSeq extends Fun {
   }
 
   /**
-   * Looks for the index of an specified input item.
+   * Returns the indexes of an item in a sequence.
    * @param ctx query context
    * @return position(s) of item
    * @throws QueryException query exception
@@ -265,8 +264,6 @@ final class FNSeq extends Fun {
     final Iter iter = ctx.iter(expr[0]);
     // only one item found; no reversion necessary
     if(iter.size() == 1) return iter;
-    // if possible, reverse and return the same iterator
-    if(iter.reverse()) return iter;
 
     // process any other iterator...
     return new Iter() {

@@ -31,19 +31,12 @@ public final class SimpleTest extends QueryTest {
       "</html>";
 
     queries = new Object[][] {
-      { "Int 1", itr(1), "1" },
-      { "Int 2", itr(-1), "-1" },
-      { "Int 3", itr(1234567890), "1234567890" },
-      { "Double 1", dbl(1.1), "1.1e0" },
-      { "Double 2", dbl(-1.1), "-1.1e0" },
-      { "Double 3", dbl(1234567890.12), "1234567890.12e0" },
-      { "String 1", str("string"), "\"string\"" },
-      { "String 2", str(""), "\"\"" },
       { "Root 1", nod(0), "/" },
       { "Root 2", nod(0), "/." },
       { "Root 3", nod(), "/.." },
-      { "Absolute 1", nod(1), "/*" },
-      { "Absolute 2", nod(1), "/node()" },
+      { "Root 4", nod(1), "/*" },
+      { "Root 5", nod(1), "/node()" },
+
       { "Child 1", nod(1), "*" },
       { "Child 2", nod(1), "node()" },
       { "Child 3", nod(2, 3, 7, 8, 24), "node()/node()" },
@@ -52,6 +45,7 @@ public final class SimpleTest extends QueryTest {
       { "Child 6", nod(24), "node()/node()[last()]" },
       { "Child Error 1", "./" },
       { "Child Error 2", "html/" },
+
       { "Desc 1", nod(20, 22), "//li" },
       { "Desc 2", nod(20, 22), "//ul/li" },
       { "Desc 3", nod(20, 22), "//ul//li" },
@@ -65,8 +59,10 @@ public final class SimpleTest extends QueryTest {
       { "Desc 9", nod(23), "/descendant::*[last()]/text()" },
       { "Desc Error 1", "//" },
       { "Desc Error 2", "///" },
+
       { "Ancestor 1", nod(0), "/*/ancestor::node()" },
       { "Ancestor 2", nod(0, 1), "/*/*/ancestor::node()" },
+
       { "Pred 1", nod(1), "/*[/]" },
       { "Pred 2", nod(1), "/*[/*]" },
       { "Pred 3", nod(19), "//ul[li]" },
@@ -76,8 +72,9 @@ public final class SimpleTest extends QueryTest {
       { "Pred 7", nod(8), "//*[@* = '#FFFFFF']" },
       { "Pred 8", nod(8), "//*[@id = 1]" },
       { "Pred 9", nod(5, 17), "//*[text() = 'XML' or text() = 'Assignments']" },
-      { "Pred 10", nod(5, 17), "//*[text() = ('XML', 'Assignments')]" },
-      { "Pred 11", nod(5), "//title[text() = .]" },
+      { "Pred A", nod(5, 17), "//*[text() = ('XML', 'Assignments')]" },
+      { "Pred B", nod(5), "//title[text() = .]" },
+      { "Pred C", itr(1), "1[.]" },
 
       { "Pred Error 1", "/[/]" },
       { "Pred Error 2", "/*[]" },
@@ -96,6 +93,8 @@ public final class SimpleTest extends QueryTest {
       { "PosPred A", nod(), "//*[position() <= 0.9]" },
       { "PosPred B", str("XML"), "(('XML')[1])[1]" },
       { "PosPred C", itr(1), "1[position() = 1 to 2]" },
+      { "PosPred D", nod(), "//li[last()][contains(text(), '1')]" },
+      { "PosPred D", nod(22), "//li[last()][contains(text(), '2')]" },
 
       { "Prec 1", nod(3, 5), "//body/preceding::*" },
       { "Prec 2", nod(3, 5), "//@id/preceding::*" },

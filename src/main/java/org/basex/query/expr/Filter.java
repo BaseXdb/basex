@@ -4,8 +4,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.Fun;
-import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
@@ -27,8 +25,8 @@ import org.basex.util.InputInfo;
 public class Filter extends Preds {
   /** Expression. */
   Expr root;
-  /** Counter flag. */
-  private boolean offset;
+  /** Offfset flag. */
+  private boolean off;
 
   /**
    * Constructor.
@@ -60,36 +58,33 @@ public class Filter extends Preds {
 
     // no predicates.. return root
     if(pred.length == 0) return root;
-    final Expr p = pred[0];
 
     // evaluate return type
     final SeqType t = root.type();
     type = SeqType.get(t.type, t.zeroOrOne() ? SeqType.Occ.ZO : SeqType.Occ.ZM);
 
-    // position predicate
-    final Pos pos = p instanceof Pos ? (Pos) p : null;
-    // last flag
-    final boolean last = p instanceof Fun && ((Fun) p).def == FunDef.LAST;
-    // use iterative evaluation
-    if(pred.length == 1 && (last || pos != null || !uses(Use.POS)))
-      return new IterFilter(this, pos, last);
+    // no positional predicates.. use simple iterator
+    if(!super.uses(Use.POS)) return new IterFilter(this);
+
+    // iterator for simple positional predicate
+    if(iterable()) return new IterPosFilter(this);
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
-    offset = pred.length == 1 && p.type().num() && !p.uses(Use.CTX);
-
+    off = pred.length == 1 && pred[0].type().num() && !pred[0].uses(Use.CTX);
     return this;
   }
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    if(offset) {
+    if(off) {
       // evaluate offset and create position expression
       final Item it = pred[0].ebv(ctx, input);
       final long l = it.itr(input);
       final Expr e = Pos.get(l, l, input);
       // don't accept fractional numbers
-      return l != it.dbl(input) || !(e instanceof Pos) ? Iter.EMPTY :
-        new IterFilter(this, (Pos) e, false).iter(ctx);
+      if(l != it.dbl(input) || !(e instanceof Pos)) return Iter.EMPTY;
+      pos = (Pos) e;
+      return new IterPosFilter(this).iter(ctx);
     }
 
     final Iter iter = ctx.iter(root);
@@ -162,9 +157,6 @@ public class Filter extends Preds {
 
   @Override
   public final String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(root);
-    //sb.append(root.size() != 1 ? root : "(" + root + ")");
-    return sb.append(super.toString()).toString();
+    return new StringBuilder().append(root).append(super.toString()).toString();
   }
 }

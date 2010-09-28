@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.basex.util.ByteList;
 import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -567,15 +569,12 @@ public final class EMLParser implements IFileParser {
    */
   byte[] decode(final byte[] text) throws DecodingException {
     final int len = text.length;
-    final TokenBuilder tmp = new TokenBuilder(len);
+    final ByteList bl = new ByteList();
     int i = 0;
     while(i < len) {
       // add ASCII text
-      while(i < len && text[i] != '=')
-        tmp.add(text[i++]);
-      if(i + 4 >= len) {
-        break;
-      }
+      while(i < len && text[i] != '=') bl.add(text[i++]);
+      if(i + 4 >= len) break;
       // char '=' detected -> must be encoded text
       if(text[i++] == '=' && text[i++] == '?') {
         // read the charset of the encoded text
@@ -583,7 +582,7 @@ public final class EMLParser implements IFileParser {
         while(i < len) {
           final byte b = text[i++];
           if(b == '?') break;
-          subjEnc.add(b);
+          subjEnc.addNum(b);
         }
         final boolean utf = subjEnc.toString().equalsIgnoreCase(Token.UTF8);
         // read the encoding flag
@@ -594,10 +593,9 @@ public final class EMLParser implements IFileParser {
         else if(flag == 'B' || flag == 'b') enc = Encoding.BASE64;
         else enc = Encoding.NONE;
         final TokenBuilder tok = new TokenBuilder();
-        while(i < len && text[i] != '?')
-          tok.add(text[i++]);
+        while(i < len && text[i] != '?') tok.addNum(text[i++]);
         ++i; // skip '?'
-        tmp.add(enc.decode(tok.finish(), utf));
+        for(final byte b : enc.decode(tok.finish(), utf)) bl.add(b);
         assert text[i] == '=';
         ++i;
       } else {
@@ -605,7 +603,7 @@ public final class EMLParser implements IFileParser {
         break; // stop reading
       }
     }
-    return Token.replace(tmp.finish(), '_', ' ');
+    return Token.replace(bl.toArray(), '_', ' ');
   }
 
   /**
@@ -617,8 +615,8 @@ public final class EMLParser implements IFileParser {
    */
   private static void addByte(final TokenBuilder tb, final int b,
       final boolean utf) {
-    if(utf) tb.add((byte) b);
-    else tb.addUTF(b);
+    if(utf) tb.addByte((byte) b);
+    else tb.add(b);
   }
 
   /**

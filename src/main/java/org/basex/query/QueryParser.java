@@ -88,7 +88,6 @@ import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
-import org.basex.query.path.KindTest;
 import org.basex.query.path.MixedPath;
 import org.basex.query.path.NameTest;
 import org.basex.query.path.Step;
@@ -1474,7 +1473,7 @@ public class QueryParser extends InputParser {
   private Test test(final boolean att) throws QueryException {
     final int p = qp;
     final char ch = curr();
-    if(XMLToken.isXMLLetter(ch)) {
+    if(XMLToken.isNCStartChar(ch)) {
       final byte[] name = qName(null);
       final int p2 = qp;
       if(consumeWS(PAR1)) {
@@ -1485,9 +1484,7 @@ public class QueryParser extends InputParser {
             if(curr() == 0) error(TESTINCOMPLETE);
             tok.add(consume());
           }
-          final byte[] ext = tok.finish();
-          final QNm qn = checkTest(type, ext);
-          return type == Type.NOD ? Test.NODE : new KindTest(type, qn);
+          return Test.get(type, kindTest(type, tok.finish()));
         }
       } else {
         qp = p2;
@@ -1495,25 +1492,25 @@ public class QueryParser extends InputParser {
         if(contains(name, ':')) {
           skipWS();
           return new NameTest(new QNm(name, ctx, input()),
-              NameTest.Kind.STD, att, input());
+              NameTest.Name.STD, att, input());
         }
         // name test "tag"
         if(!consume(':')) {
           skipWS();
           final QNm nm = new QNm(name, att ? Uri.EMPTY : null);
-          return new NameTest(nm, NameTest.Kind.STD, att, input());
+          return new NameTest(nm, NameTest.Name.STD, att, input());
         }
         // name test "pre:*"
         if(consume('*')) {
           final QNm nm = new QNm(EMPTY, ctx.ns.uri(name, false, input()));
-          return new NameTest(nm, NameTest.Kind.NS, att, input());
+          return new NameTest(nm, NameTest.Name.NS, att, input());
         }
       }
     } else if(consume('*')) {
       // name test "*"
       if(!consume(':')) return new NameTest(att, input());
       // name test "*:tag"
-      return new NameTest(new QNm(qName(QNAMEINV)), NameTest.Kind.NAME, att,
+      return new NameTest(new QNm(qName(QNAMEINV)), NameTest.Name.NAME, att,
           input());
     }
     qp = p;
@@ -1706,7 +1703,7 @@ public class QueryParser extends InputParser {
 
     // parse attributes...
     boolean xmlDef = false; // xml prefix explicitly declared?
-    while(XMLToken.isXMLLetter(curr())) {
+    while(XMLToken.isNCStartChar(curr())) {
       final byte[] atn = qName(null);
       Expr[] attv = {};
 
@@ -1978,7 +1975,7 @@ public class QueryParser extends InputParser {
     skipWS();
 
     Expr name;
-    if(XMLToken.isXMLLetter(curr())) {
+    if(XMLToken.isNCStartChar(curr())) {
       name = new QNm(qName(null));
     } else {
       if(!consumeWS2(BRACE1)) return null;
@@ -2002,7 +1999,7 @@ public class QueryParser extends InputParser {
     skipWS();
 
     Expr nm;
-    if(XMLToken.isXMLLetter(curr())) {
+    if(XMLToken.isNCStartChar(curr())) {
       nm = new QNm(qName(null));
     } else {
       if(!consumeWS2(BRACE1)) return null;
@@ -2048,7 +2045,7 @@ public class QueryParser extends InputParser {
   private Expr compPI() throws QueryException {
     skipWS();
     Expr name;
-    if(XMLToken.isXMLLetter(curr())) {
+    if(XMLToken.isNCStartChar(curr())) {
       name = Str.get(ncName(null));
     } else {
       if(!consumeWS2(BRACE1)) return null;
@@ -2112,9 +2109,8 @@ public class QueryParser extends InputParser {
     if(t == null || t == Type.SEQ || t == Type.JAVA)
       error(par ? NOTYPE : TYPEUNKNOWN, type, par);
     if(t == Type.EMP && occ != Occ.O) error(EMPTYSEQOCC, t);
-    final QNm e = checkTest(t, tok.finish());
     skipWS();
-    return SeqType.get(t, occ, e);
+    return SeqType.get(t, occ, kindTest(t, tok.finish()));
   }
 
   /**
@@ -2124,23 +2120,29 @@ public class QueryParser extends InputParser {
    * @return arguments
    * @throws QueryException query exception
    */
-  private QNm checkTest(final Type t, final byte[] k) throws QueryException {
+  private QNm kindTest(final Type t, final byte[] k) throws QueryException {
     if(k.length == 0) return null;
-    if(!t.node() || t == Type.COM || t == Type.TXT || t == Type.DOC)
-      error(TESTINVALID, t, k);
 
-    byte[] nm = delete(delete(k, '\''), '"');
+    byte[] nm = k;
+    if(t == Type.PI) {
+      nm = delete(delete(k, '\''), '"');
+      if(!XMLToken.isNCName(nm)) error(TESTINVALID, t, k);
+      return new QNm(nm, ctx, input());
+    }
+    if(t != Type.ELM && t != Type.ATT) error(TESTINVALID, t, k);
+    
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());
       if(!eq(test.uri().atom(), XSURI)) error(TESTINVALID, t, test);
       nm = trim(substring(nm, 0, i));
       final byte[] ln = test.ln();
-      if(!eq(ln, ANYTYPE) && !eq(ln, ANYSIMPLE) && !eq(ln, UNTYPED) &&
-          !eq(ln, UNATOMIC)) return new QNm(EMPTY);
+      if(!eq(ln, ANYTYPE) && !eq(ln, ANYATOMIC) && !eq(ln, ANYSIMPLE) &&
+         !eq(ln, UNTYPED) && !eq(ln, UNATOMIC)) return new QNm(EMPTY);
     }
-    return (t == Type.ELM || t == Type.ATT) && nm.length == 1 && nm[0] == '*' ?
-        null : new QNm(nm, ctx, input());
+    if(nm.length == 1 && nm[0] == '*') return null;
+    if(!XMLToken.isQName(nm)) error(TESTINVALID, t, k);
+    return new QNm(nm, ctx, input());
   }
 
   /**
@@ -2212,7 +2214,7 @@ public class QueryParser extends InputParser {
       QNm[] codes = {};
       do {
         consumeWS();
-        if(XMLToken.isXMLLetter(curr())) {
+        if(XMLToken.isNCStartChar(curr())) {
           codes = Array.add(codes, new QNm(qName(QNAMEINV)));
         } else {
           check("*");
@@ -2755,7 +2757,7 @@ public class QueryParser extends InputParser {
    */
   private boolean ncName(final boolean first) {
     char c = curr();
-    if(!XMLToken.isXMLLetter(c)) {
+    if(!XMLToken.isNCStartChar(c)) {
       if(!first) --qp;
       return false;
     }
@@ -2763,9 +2765,7 @@ public class QueryParser extends InputParser {
     do {
       tok.add(consume());
       c = curr();
-      if(!XMLToken.isXMLLetterOrDigit(c) && c != '-' && c != '_' && c != '.')
-        break;
-    } while(c != 0);
+    } while(XMLToken.isNCChar(c));
     return true;
   }
 
@@ -2792,7 +2792,7 @@ public class QueryParser extends InputParser {
           if(!m) n += 9;
         } while(!consume(';'));
         if(!XMLToken.valid(n)) invalidEnt(p, INVCHARREF);
-        tb.addUTF(n);
+        tb.add(n);
       } else {
         if(consume("lt")) {
           tb.add('<');
@@ -2821,7 +2821,7 @@ public class QueryParser extends InputParser {
         cp = 0x0a;
         if(curr() == cp) consume();
       }
-      tb.addUTF(cp);
+      tb.add(cp);
     }
   }
 
@@ -2895,8 +2895,8 @@ public class QueryParser extends InputParser {
     final boolean ok = consumeWS2(t);
     final int q = qp;
     final int c = curr();
-    final boolean ok2 = skipWS() || !XMLToken.isFirstLetter(t.charAt(0)) ||
-        !XMLToken.isXMLLetterOrDigit(c) && c != '-';
+    final boolean ok2 = skipWS() || !XMLToken.isNCStartChar(t.charAt(0)) ||
+        !XMLToken.isNCChar(c);
     qp = ok2 ? q : p;
     return ok && ok2;
   }

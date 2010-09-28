@@ -10,6 +10,7 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.io.DataAccess;
 import org.basex.io.PrintOutput;
+import org.basex.util.ByteList;
 import org.basex.util.TokenObjMap;
 import org.basex.util.TokenMap;
 import org.basex.util.Performance;
@@ -26,7 +27,7 @@ public final class MAB2Parser extends Parser {
   /** Encoding of MAB2 input. */
   private static final String ENCODING = "iso-8859-1";
   /** Temporary token builder. */
-  private final TokenBuilder buffer = new TokenBuilder();
+  private final ByteList buffer = new ByteList();
   /** Subject assignments. */
   private final TokenMap subjects = new TokenMap();
   /** Media type assignments. */
@@ -265,7 +266,7 @@ public final class MAB2Parser extends Parser {
     buffer.reset();
     while(in.more()) {
       final byte c = in.read1();
-      if(c == delim) return buffer.finish();
+      if(c == delim) return buffer.toArray();
       if(c < 0 || c >= ' ') buffer.add(c);
     }
     return null;

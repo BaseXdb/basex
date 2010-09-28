@@ -219,7 +219,7 @@ public final class Nodes implements Result {
     final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
     for(int i = 0; i < size; ++i) {
       if(i > 0) tb.add(',');
-      tb.add(nodes[i]);
+      tb.addNum(nodes[i]);
     }
     tb.add(']');
     return tb.toString();

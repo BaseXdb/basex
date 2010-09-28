@@ -68,7 +68,7 @@ public final class Switch extends Arr {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder(SWITCH + "(" + expr[0] + ")");
+    final StringBuilder sb = new StringBuilder(SWITCH + PAR1 + expr[0] + PAR2);
     final int el = expr.length;
     for(int i = 1; i < el; ++i) {
       sb.append(" " + (i + 1 < el ? CASE + ' ' + expr[i++] : DEFAULT));

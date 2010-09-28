@@ -96,7 +96,7 @@ public final class Func extends Single {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(var.name.atom());
-    tb.add('(').add(args, ", ").add(')');
+    tb.add(PAR1).addSep(args, SEP).add(PAR2);
     if(var.type != null) tb.add(' ' + AS + ' ' + var.type);
     if(expr != null) tb.add(" { " + expr + " }; ");
     return tb.toString();

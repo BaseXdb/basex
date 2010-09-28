@@ -305,17 +305,17 @@ final class ExploreArea extends BaseXPanel implements ActionListener {
       }
 
       if(data.fs != null && tb.size() == 0) {
-        tb.add("//%", DeepFS.S_FILE);
+        tb.add("//" + DeepFS.S_FILE);
       }
       if(attr) {
         if(tb.size() == 0) tb.add("//*");
         if(pattern.isEmpty()) pattern = PATSIMPLE;
       } else {
-        if(data.fs != null) tb.add("[%", key);
+        if(data.fs != null) tb.add("[" + key);
         else tb.add("//" + key);
         key = "text()";
       }
-      tb.add(pattern, key, val1, key, val2);
+      tb.addExt(pattern, key, val1, key, val2);
       if(data.fs != null && !attr) tb.add("]");
     }
 

@@ -23,7 +23,6 @@ import org.basex.util.XMLToken;
  * @author Christian Gruen
  */
 final class FNStr extends Fun {
-
   /**
    * Constructor.
    * @param ii input info
@@ -130,7 +129,7 @@ final class FNStr extends Fun {
     while((i = iter.next()) != null) {
       final long n = checkItr(i);
       if(!XMLToken.valid((int) n)) INVCODE.thrw(input, i);
-      tb.addUTF((int) n);
+      tb.add((int) n);
     }
     return Str.get(tb.finish());
   }
@@ -219,9 +218,9 @@ final class FNStr extends Fun {
       while(++j < srch.length && tok[i] != srch[j]);
       if(j < srch.length) {
         if(j >= rep.length) continue;
-        tmp.addUTF(rep[j]);
+        tmp.add(rep[j]);
       } else {
-        tmp.addUTF(tok[i]);
+        tmp.add(tok[i]);
       }
     }
     return Str.get(tmp.finish());

@@ -9,8 +9,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import org.basex.core.Prop;
+import org.basex.util.ByteList;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 
 /**
  * <h1>Buffered {@link FileChannel} implementation.</h1>
@@ -501,15 +501,14 @@ public final class BufferedFileChannel {
    * Reads a line of text. A line is considered to be terminated by any one of a
    * line feed ('\n'), a carriage return ('\r'), or a carriage return followed
    * immediately by a line feed.
-   * @param inputEncoding the input encoding
+   * @param enc the input encoding
    * @return A (UTF-8-)String containing the contents of the line, not including
    *         any line-termination characters, or null if the end of the stream
    *         has been reached
    * @throws IOException if an I/O error occurs
    */
-  public String readLine(final String inputEncoding) throws IOException {
-    final boolean utf = inputEncoding.equalsIgnoreCase(Token.UTF8);
-    final TokenBuilder tb = new TokenBuilder(100);
+  public String readLine(final String enc) throws IOException {
+    final ByteList bl = new ByteList();
     out: while(true) {
       final int max = buf.remaining();
       for(int i = 0; i < max; ++i) {
@@ -520,8 +519,7 @@ public final class BufferedFileChannel {
           if(remaining() > 0 && buffer(1) && get() != '\n') skip(-1);
           break out;
         } else {
-          if(utf) tb.add((byte) b);
-          else tb.addUTF(b);
+          bl.add((byte) b);
         }
       }
       final long r = remaining();
@@ -529,7 +527,9 @@ public final class BufferedFileChannel {
       final int bs = getBufferSize();
       buffer(r < bs ? (int) r : bs);
     }
-    return tb.toString();
+    final byte[] bytes = bl.toArray();
+    return enc.equalsIgnoreCase(Token.UTF8) ? Token.string(bytes) :
+      new String(bytes, enc);
   }
 
   @Override

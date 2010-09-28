@@ -1,5 +1,6 @@
 package org.basex.query.ft;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.FTMatch;
@@ -97,7 +98,7 @@ public final class FTDistance extends FTFilter {
 
   @Override
   public String toString() {
-    return super.toString() + QueryTokens.DISTANCE + "(" +
-      dist[0] + "-" + dist[1] + " " + unit + ")";
+    return super.toString() + QueryTokens.DISTANCE + PAR1 +
+      dist[0] + "-" + dist[1] + " " + unit + PAR2;
   }
 }

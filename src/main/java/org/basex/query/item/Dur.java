@@ -160,13 +160,13 @@ public class Dur extends Item {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0 || sc.signum() < 0) tb.add('-');
     tb.add('P');
-    if(yea() != 0) { tb.add(Math.abs(yea())); tb.add('Y'); }
-    if(mon() != 0) { tb.add(Math.abs(mon())); tb.add('M'); }
-    if(day() != 0) { tb.add(Math.abs(day())); tb.add('D'); }
+    if(yea() != 0) { tb.addNum(Math.abs(yea())); tb.add('Y'); }
+    if(mon() != 0) { tb.addNum(Math.abs(mon())); tb.add('M'); }
+    if(day() != 0) { tb.addNum(Math.abs(day())); tb.add('D'); }
     if(sc.remainder(BigDecimal.valueOf(DAYSECONDS)).signum() != 0) {
       tb.add('T');
-      if(hou() != 0) { tb.add(Math.abs(hou())); tb.add('H'); }
-      if(min() != 0) { tb.add(Math.abs(min())); tb.add('M'); }
+      if(hou() != 0) { tb.addNum(Math.abs(hou())); tb.add('H'); }
+      if(min() != 0) { tb.addNum(Math.abs(min())); tb.add('M'); }
       if(sec().signum() != 0) { tb.add(sc()); tb.add('S'); }
     }
     if(mon == 0 && sc.signum() == 0) tb.add("T0S");

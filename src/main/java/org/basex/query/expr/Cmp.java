@@ -58,18 +58,18 @@ abstract class Cmp extends Arr {
     final Item it = (Item) a;
     if(!it.num() && !it.unt()) return this;
 
-    final double d = it.dbl(input);
-    // x > (d<0), x >= (d<=0), x != (d<=0), x != not-int(d)
-    if(o == Op.GT && d < 0 || (o == Op.GE || o == Op.NE) && d <= 0 ||
-       o == Op.NE && d != (int) d) return Bln.TRUE;
-    // x < (d<=0), x <= (d<0), x = (d<0), x = not-int(d)
-    if(o == Op.LT && d <= 0 || (o == Op.LE || o == Op.EQ) && d < 0 ||
-       o == Op.EQ && d != (int) d) return Bln.FALSE;
-    // x > (d<1), x >= (d<=1),  x != (d=0)
-    if(o == Op.GT && d < 1 || o == Op.GE && d <= 1 || o == Op.NE && d == 0)
+    final double v = it.dbl(input);
+    // TRUE: c > (v<0), c != (v<0), c >= (v<=0), c != not-int(v)
+    if((o == Op.GT || o == Op.NE) && v < 0 || o == Op.GE && v <= 0 ||
+       o == Op.NE && v != (int) v) return Bln.TRUE;
+    // FALSE: c < (v<=0), c <= (v<0), c = (v<0), c = not-int(v)
+    if(o == Op.LT && v <= 0 || (o == Op.LE || o == Op.EQ) && v < 0 ||
+       o == Op.EQ && v != (int) v) return Bln.FALSE;
+    // EXISTS: c > (v<1), c >= (v<=1), c != (v=0)
+    if(o == Op.GT && v < 1 || o == Op.GE && v <= 1 || o == Op.NE && v == 0)
       return FunDef.EXISTS.newInstance(input, ((Fun) expr[0]).expr);
-    // x < (d<=1), x <= (d<1),  x = (d=0)
-    if(o == Op.LT && d <= 1 || o == Op.LE && d < 1 || o == Op.EQ && d == 0)
+    // EMPTY: c < (v<=1), c <= (v<1), c = (v=0)
+    if(o == Op.LT && v <= 1 || o == Op.LE && v < 1 || o == Op.EQ && v == 0)
       return FunDef.EMPTY.newInstance(input, ((Fun) expr[0]).expr);
 
     return this;

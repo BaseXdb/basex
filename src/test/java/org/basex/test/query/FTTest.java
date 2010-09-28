@@ -31,7 +31,7 @@ public final class FTTest extends QueryTest {
       "     <w>hello</w>\n" +
       "  </wc>\n" +
       "  <sc>\n" +
-      "     <s>diät-joghurt</s>\n" +
+      "     <s>di\u00e4t-joghurt</s>\n" +
       "     <s>diat-joghurt</s>\n" +
       "  </sc>\n" +
       "  <at><b>B</b>ad one</at>\n" +
@@ -159,10 +159,10 @@ public final class FTTest extends QueryTest {
       { "FTDiacritics 1", nod(17, 19),
         "//s [text() contains text 'diat']" },
       { "FTDiacritics 2", nod(17, 19),
-        "//s [text() contains text 'diät joghurt' using diacritics " +
+        "//s [text() contains text 'di\u00e4t joghurt' using diacritics " +
         "insensitive]" },
       { "FTDiacritics 3", nod(17),
-        "//s [text() contains text 'diät joghurt' " +
+        "//s [text() contains text 'di\u00e4t joghurt' " +
         "using diacritics sensitive]" },
 
       { "FTCaseOption 1", nod(3, 5, 7, 9, 11),
@@ -622,7 +622,7 @@ public final class FTTest extends QueryTest {
    15   1   1   1   0  TEXT  hello
    16  15   5   1   0  ELEM  sc
    17   1   2   1   0  ELEM  s
-   18   1   1   1   0  TEXT  diät-joghurt
+   18   1   1   1   0  TEXT  di\u00e4t-joghurt
    19   3   2   1   0  ELEM  s
    20   1   1   1   0  TEXT  diat-joghurt
    21  20   4   1   0  ELEM  at

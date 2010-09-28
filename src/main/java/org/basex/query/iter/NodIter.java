@@ -7,7 +7,7 @@ import org.basex.query.item.Value;
 import org.basex.util.Array;
 
 /**
- * Simple node Iterator, ignoring duplicates.
+ * Caching node iterator, returning sorted nodes.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -15,7 +15,7 @@ import org.basex.util.Array;
 public final class NodIter extends NodeIter {
   /** Node container. */
   public Nod[] item;
-  /** Number of ize. */
+  /** Number of nodes. */
   private int size;
   /** Current iterator position. */
   private int pos = -1;

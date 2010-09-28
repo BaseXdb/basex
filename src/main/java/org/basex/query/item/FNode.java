@@ -70,6 +70,36 @@ public abstract class FNode extends Nod {
   }
 
   @Override
+  public final NodeIter anc() {
+    return new NodeIter() {
+      /** Temporary node. */
+      private Nod node = FNode.this;
+
+      @Override
+      public Nod next() {
+        node = node.parent();
+        return node;
+      }
+    };
+  }
+
+  @Override
+  public final NodeIter ancOrSelf() {
+    return new NodeIter() {
+      /** Temporary node. */
+      private Nod node = FNode.this;
+
+      @Override
+      public Nod next() {
+        if(node == null) return null;
+        final Nod n = node;
+        node = n.parent();
+        return n;
+      }
+    };
+  }
+
+  @Override
   public final NodeIter attr() {
     return iter(atts);
   }
@@ -152,6 +182,55 @@ public abstract class FNode extends Nod {
       @Override
       public Nod next() {
         return (more ^= true) ? par : null;
+      }
+    };
+  }
+
+  @Override
+  public NodeIter follSibl() {
+    return new NodeIter() {
+      /** Iterator. */
+      private NodeIter ir;
+
+      @Override
+      public Nod next() throws QueryException {
+        if(ir == null) {
+          final Nod r = parent();
+          if(r == null) return null;
+          ir = r.child();
+          Nod n;
+          while((n = ir.next()) != null && !n.is(FNode.this));
+        }
+        return ir.next();
+      }
+    };
+  }
+
+  @Override
+  public final NodeIter foll() {
+    return new NodeIter() {
+      /** Iterator. */
+      private NodIter ir;
+
+      @Override
+      public Nod next() throws QueryException {
+        if(ir == null) {
+          ir = new NodIter();
+          Nod n = FNode.this;
+          Nod p = n.parent();
+          while(p != null) {
+            final NodeIter i = p.child();
+            Nod c;
+            while(n.type != Type.ATT && (c = i.next()) != null && !c.is(n));
+            while((c = i.next()) != null) {
+              ir.add(c.finish());
+              addDesc(c.child(), ir);
+            }
+            n = p;
+            p = p.parent();
+          }
+        }
+        return ir.next();
       }
     };
   }

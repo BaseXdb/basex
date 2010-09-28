@@ -3,8 +3,8 @@ package org.basex.io;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import org.basex.util.ByteList;
 import org.basex.util.Token;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 import org.xml.sax.InputSource;
 
@@ -264,13 +264,13 @@ public abstract class IO {
    * @throws IOException I/O exception
    */
   protected final byte[] cache(final InputStream i) throws IOException {
-    final TokenBuilder tb = new TokenBuilder();
+    final ByteList bl = new ByteList();
     final InputStream bis = i instanceof BufferedInputStream ||
       i instanceof BufferInput ? i : new BufferedInputStream(i);
     int b;
-    while((b = bis.read()) != -1) tb.add((byte) b);
+    while((b = bis.read()) != -1) bl.add((byte) b);
     bis.close();
-    cont = tb.finish();
+    cont = bl.toArray();
     return cont;
   }
 }

@@ -316,7 +316,7 @@ public enum FunDef {
   /* FNSeq functions. */
 
   /** XQuery function. */
-  DISTINCT(FNURI, FNSeq.class, 1, 2, "distinct-values(item, coll?)", ITEM_ZM),
+  DISTINCT(FNURI, FNSeq.class, 1, 2, "distinct-values(seq, coll?)", ITEM_ZM),
   /** XQuery function. */
   INDEXOF(FNURI, FNSeq.class, 2, 3, "index-of(seq, item, coll?)", ITR_ZM),
   /** XQuery function. */

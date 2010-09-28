@@ -86,14 +86,14 @@ public final class ItemSeq extends Seq {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("(");
+    final StringBuilder sb = new StringBuilder(PAR1);
     for(int v = 0; v != size; ++v) {
-      sb.append((v != 0 ? ", " : "") + val[v]);
+      sb.append((v != 0 ? SEP : "") + val[v]);
       if(sb.length() > 32 && v + 1 != size) {
-        sb.append(", ...");
+        sb.append(SEP + DOTS);
         break;
       }
     }
-    return sb.append(")").toString();
+    return sb.append(PAR2).toString();
   }
 }

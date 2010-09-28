@@ -20,6 +20,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.ItemIter;
 import org.basex.util.Atts;
+import org.basex.util.ByteList;
 import org.basex.util.InputInfo;
 import org.basex.util.TokenBuilder;
 
@@ -241,27 +242,27 @@ final class FNPat extends Fun {
         else if(b == 'q' && ctx.xquery11) m |= Pattern.LITERAL;
         else if(b == 'x') {
           boolean cc = false;
-          final TokenBuilder tb = new TokenBuilder();
+          final ByteList bl = new ByteList();
           for(final byte p : pt) {
-            if(cc || p < 0 || p > ' ') tb.add(p);
+            if(cc || p < 0 || p > ' ') bl.add(p);
             cc |= p == '[';
             cc &= p != ']';
           }
-          pt = tb.finish();
+          pt = bl.toArray();
         } else {
           REGMOD.thrw(input, (char) b);
         }
       }
     }
 
-    final TokenBuilder tb = new TokenBuilder();
+    final ByteList bl = new ByteList();
     for(int i = 0; i < pt.length; ++i) {
       final byte b = pt[i];
-      tb.add(b);
-      if(b == '\\' && i + 1 != pt.length && pt[i + 1] == ' ') tb.add(b);
+      bl.add(b);
+      if(b == '\\' && i + 1 != pt.length && pt[i + 1] == ' ') bl.add(b);
     }
 
-    String str = tb.toString();
+    String str = bl.toString();
     if((m & Pattern.LITERAL) == 0 && str.indexOf('[') != -1 &&
         str.indexOf('-') != -1) {
       // replace classes by single characters to support Unicode matches

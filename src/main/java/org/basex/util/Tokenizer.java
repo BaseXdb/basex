@@ -357,7 +357,7 @@ public final class Tokenizer implements IndexToken {
       if(c != norm(c)) {
         final TokenBuilder tb = new TokenBuilder();
         tb.add(t, 0, i);
-        for(int j = i; j < tl; j += cl(t, j)) tb.addUTF(norm(cp(t, j)));
+        for(int j = i; j < tl; j += cl(t, j)) tb.add(norm(cp(t, j)));
         return tb.finish();
       }
     }
@@ -378,7 +378,7 @@ public final class Tokenizer implements IndexToken {
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t, i)) tb.addUTF(uc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(t, i)) tb.add(uc(cp(t, i)));
     return tb.finish();
   }
 
@@ -395,7 +395,7 @@ public final class Tokenizer implements IndexToken {
       return t;
     }
     final TokenBuilder tb = new TokenBuilder();
-    for(int i = 0; i < tl; i += cl(t, i)) tb.addUTF(lc(cp(t, i)));
+    for(int i = 0; i < tl; i += cl(t, i)) tb.add(lc(cp(t, i)));
     return tb.finish();
   }
 

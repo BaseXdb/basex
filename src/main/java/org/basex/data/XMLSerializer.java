@@ -180,7 +180,7 @@ public final class XMLSerializer extends Serializer {
 
   /**
    * Returns an I/O exception. Replaces all % characters in the input string
-   * (see {@link TokenBuilder#add(Object, Object...)} for details).
+   * (see {@link TokenBuilder#addExt} for details).
    * @param str string to be extended
    * @param ext extensions
    * @throws IOException I/O exception
@@ -499,7 +499,7 @@ public final class XMLSerializer extends Serializer {
         out.write(ch >>  0 & 0x3F | 0x80);
       }
     } else {
-      print(new TokenBuilder().addUTF(ch).toString());
+      print(new TokenBuilder(4).add(ch).toString());
     }
   }
 

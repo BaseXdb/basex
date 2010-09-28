@@ -220,17 +220,17 @@ final class XMLScanner extends Progress {
       if((c = nextChar()) == '>') {
         state = State.CONTENT;
       } else {
-        token.addUTF(c);
+        token.add(c);
         error(CLOSING);
       }
     } else if(s(c)) {
       // scan whitespace...
       type = Type.WS;
       return;
-    } else if(isFirstLetter(c)) {
+    } else if(isStartChar(c)) {
       // scan tag name...
       type = state == State.ATT ? Type.ATTNAME : Type.TAGNAME;
-      do token.addUTF(c); while(isLetterOrDigit(c = nextChar()));
+      do token.add(c); while(isChar(c = nextChar()));
       prev(1);
       state = State.ATT;
     } else {
@@ -275,7 +275,7 @@ final class XMLScanner extends Progress {
         if(r.length == 1) token.add(r);
         else if(!input.add(r, false)) error(RECENT);
       } else {
-        token.addUTF(c);
+        token.add(c);
       }
     } while((c = consume()) != quote);
   }
@@ -306,7 +306,7 @@ final class XMLScanner extends Progress {
             }
             prev(1);
           }
-          token.addUTF(c);
+          token.add(c);
         }
       } else {
         if(!f && !isCDATA()) {
@@ -345,12 +345,12 @@ final class XMLScanner extends Progress {
   private void cDATA() throws IOException {
     int ch;
     while(true) {
-      while((ch = nextChar()) != ']') token.addUTF(ch);
+      while((ch = nextChar()) != ']') token.add(ch);
       if(consume(']')) {
         if(consume('>')) return;
         prev(1);
       }
-      token.addUTF(ch);
+      token.add(ch);
     }
   }
 
@@ -367,7 +367,7 @@ final class XMLScanner extends Progress {
           return;
         }
       }
-      token.addUTF(ch);
+      token.add(ch);
     } while(true);
   }
 
@@ -384,7 +384,7 @@ final class XMLScanner extends Progress {
     if(ch != '?' && !ws(ch)) error(PITEXT);
     do {
       while(ch != '?') {
-        token.addUTF(ch);
+        token.add(ch);
         ch = nextChar();
       }
       if((ch = consume()) == '>') return;
@@ -470,10 +470,10 @@ final class XMLScanner extends Progress {
       final TokenBuilder ent = new TokenBuilder();
       int b = 10;
       int ch = nextChar();
-      ent.addUTF(ch);
+      ent.add(ch);
       if(ch == 'x') {
         b = 16;
-        ent.addUTF(ch = nextChar());
+        ent.add(ch = nextChar());
       }
       int n = 0;
       do {
@@ -488,7 +488,7 @@ final class XMLScanner extends Progress {
         n *= b;
         n += ch & 15;
         if(!m) n += 9;
-        ent.addUTF(ch = nextChar());
+        ent.add(ch = nextChar());
       } while(ch != ';');
 
       if(!valid(n)) {
@@ -496,7 +496,7 @@ final class XMLScanner extends Progress {
         return EMPTY;
       }
       ent.reset();
-      ent.addUTF(n);
+      ent.add(n);
       return ent.finish();
     }
 
@@ -539,7 +539,7 @@ final class XMLScanner extends Progress {
   private void completeRef(final TokenBuilder ent) throws IOException {
     int ch = consume();
     while(ent.size() < 10 && ch >= ' ' && ch != ';') {
-      ent.addUTF(ch);
+      ent.add(ch);
       ch = consume();
     }
   }
@@ -624,12 +624,12 @@ final class XMLScanner extends Progress {
   private byte[] name(final boolean f) throws IOException {
     final TokenBuilder name = new TokenBuilder();
     int c = consume();
-    if(!isFirstLetter(c)) {
+    if(!isStartChar(c)) {
       if(f) error(INVNAME);
       prev(1);
       return null;
     }
-    do name.addUTF(c); while(isLetterOrDigit(c = nextChar()));
+    do name.add(c); while(isChar(c = nextChar()));
     prev(1);
     return name.finish();
   }
@@ -642,7 +642,7 @@ final class XMLScanner extends Progress {
   private byte[] nmtoken() throws IOException {
     final TokenBuilder name = new TokenBuilder();
     int c;
-    while(isLetterOrDigit(c = nextChar())) name.addUTF(c);
+    while(isChar(c = nextChar())) name.add(c);
     prev(1);
     if(name.size() == 0) error(INVNAME);
     return name.finish();
@@ -689,7 +689,7 @@ final class XMLScanner extends Progress {
       if(qu == '\'' || qu == '"') {
         int ch = 0;
         final TokenBuilder tok = new TokenBuilder();
-        while((ch = nextChar()) != qu) tok.addUTF(ch);
+        while((ch = nextChar()) != qu) tok.add(ch);
         if(!f) return null;
         final String name = string(tok.finish());
         if(!dtd && r) return cont;
@@ -736,7 +736,7 @@ final class XMLScanner extends Progress {
     final int qu = qu();
     int ch;
     while((ch = nextChar()) != qu) {
-      if(!isLetterOrDigit(ch) && !contains(PUBIDTOK, ch))
+      if(!isChar(ch) && !contains(PUBIDTOK, ch))
         error(PUBID, (char) ch);
     }
   }
@@ -937,7 +937,7 @@ final class XMLScanner extends Progress {
         if(!p) error(INVPE);
         tok.add(peRef());
       } else {
-        tok.addUTF(ch);
+        tok.add(ch);
       }
     }
 
@@ -946,7 +946,7 @@ final class XMLScanner extends Progress {
     tok = new TokenBuilder();
     while((ch = consume()) != 0) {
       if(ch == '&') tok.add(ref(false));
-      else tok.addUTF(ch);
+      else tok.add(ch);
     }
     input = tmp;
     return tok.finish();
@@ -979,7 +979,7 @@ final class XMLScanner extends Progress {
     int ch = nextChar();
     if(letter(ch) && ch != '_') {
       while(letterOrDigit(ch) || ch == '.' || ch == '-') {
-        enc.addUTF(ch);
+        enc.add(ch);
         ch = nextChar();
       }
       prev(1);

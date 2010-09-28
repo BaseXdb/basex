@@ -1,5 +1,6 @@
 package org.basex.query.func;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ public final class FNIndex extends TokenSet {
     funcs = new FunDef[CAP];
     for(final FunDef def : FunDef.values()) {
       final String dsc = def.desc;
-      final byte[] key = token(dsc.substring(0, dsc.indexOf("(")));
+      final byte[] key = token(dsc.substring(0, dsc.indexOf(PAR1)));
       final int i = add(key);
       if(i < 0) Util.notexpected("Function defined twice:" + def);
       funcs[i] = def;

@@ -397,6 +397,8 @@ public interface QueryTokens {
   byte[] UNTYPED = token("untyped");
   /** Untyped. */
   byte[] UNATOMIC = token("untypedAtomic");
+  /** AnyAtomicType. */
+  byte[] ANYATOMIC = token("anyAtomicType");
 
   // PREFIXES =================================================================
 
@@ -432,6 +434,8 @@ public interface QueryTokens {
 
   /** Separator. */
   String SEP = ", ";
+  /** Dots. */
+  String DOTS = "...";
   /** Query Plan. */
   String ARG = "arg";
   /** Query Plan. */

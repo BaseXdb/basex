@@ -10,19 +10,16 @@ import org.basex.data.PathNode;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
-import org.basex.query.expr.Pos;
 import org.basex.query.expr.Preds;
-import org.basex.query.func.Fun;
-import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Nod;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
-import org.basex.query.iter.Iter;
+import org.basex.query.item.Value;
 import org.basex.query.iter.NodIter;
 import org.basex.query.iter.NodeIter;
-import org.basex.query.path.Test.Kind;
+import org.basex.query.path.Test.Name;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -58,7 +55,10 @@ public class Step extends Preds {
    */
   public static Step get(final InputInfo ii, final Axis a, final Test t,
       final Expr... p) {
-    return p.length == 0 ? new SimpleIterStep(ii, a, t) : new Step(ii, a, t, p);
+
+    boolean num = false;
+    for(final Expr pr : p) num |= pr.type().mayBeNum() || pr.uses(Use.POS);
+    return num ? new Step(ii, a, t, p) : new IterStep(ii, a, t, p);
   }
 
   /**
@@ -83,7 +83,7 @@ public class Step extends Preds {
     // if possible, add text() step to predicates
     final Data data = ctx.data();
     ctx.leaf = false;
-    if(data != null && test.kind == Kind.NAME && test.type != Type.ATT) {
+    if(data != null && test.test == Name.NAME && test.type != Type.ATT) {
       final byte[] ln = ((NameTest) test).ln;
       ctx.leaf = axis.down && data.meta.uptodate && data.ns.size() == 0 &&
         data.tags.stat(data.tags.id(ln)).leaf;
@@ -93,61 +93,54 @@ public class Step extends Preds {
     // a document context item is temporarily set to element
     final Type ct = ctx.value != null ? ctx.value.type : null;
     if(ct == Type.DOC) ctx.value.type = Type.ELM;
+
     final Expr e = super.comp(ctx);
     if(ct != null) ctx.value.type = ct;
     ctx.leaf = false;
-    if(e != this) return e;
 
-    // no predicates.. use simple iterator
-    if(pred.length == 0) return get(input, axis, test);
+    // return optimized step / don't re-optimize step
+    if(e != this || e instanceof IterStep) return e;
 
-    // position predicate
-    final Expr p = pred[0];
-    final Pos pos = p instanceof Pos ? (Pos) p : null;
-    // last flag
-    final boolean last = p instanceof Fun && ((Fun) p).def == FunDef.LAST;
+    // no positional predicates.. use simple iterator
+    if(!uses(Use.POS)) return new IterStep(input, axis, test, pred);
 
-    // use standard evaluation for multiple predicates or standard POS predicate
-    return pred.length > 1 || !last && pos == null && uses(Use.POS) ?
-      this : new IterStep(input, axis, test, pred, pos, last);
+    // don't re-optimize step
+    if(this instanceof IterPosStep) return this;
+
+    // use iterator for simple positional predicate
+    return iterable() ? new IterPosStep(this) : this;
   }
 
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
-    final Iter iter = checkCtx(ctx).iter(ctx);
+    final Value v = checkCtx(ctx);
+    if(!v.node()) NODESPATH.thrw(input, Step.this, v.type);
+    final NodeIter ir = axis.iter((Nod) v);
 
-    final NodIter ni = new NodIter();
     NodIter nb = new NodIter();
-    Item it;
-    while((it = iter.next()) != null) {
-      if(!it.node()) NODESPATH.thrw(input, Step.this, it.type);
-      final NodeIter ir = axis.init((Nod) it);
-      Nod nod;
-      while((nod = ir.next()) != null) {
-        if(test.eval(nod)) nb.add(nod.finish());
-      }
-
-      // evaluates predicates
-      for(final Expr p : pred) {
-        ctx.size = nb.size();
-        ctx.pos = 1;
-        int c = 0;
-        for(int s = 0; s < nb.size(); ++s) {
-          ctx.value = nb.get(s);
-          final Item i = p.test(ctx, input);
-          if(i != null) {
-            // assign score value
-            nb.get(s).score(i.score());
-            nb.item[c++] = nb.get(s);
-          }
-          ctx.pos++;
-        }
-        nb.size(c);
-      }
-      for(int n = 0; n < nb.size(); ++n) ni.add(nb.get(n));
-      nb = new NodIter();
+    Nod nod;
+    while((nod = ir.next()) != null) {
+      if(test.eval(nod)) nb.add(nod.finish());
     }
-    return ni;
+
+    // evaluate predicates
+    for(final Expr p : pred) {
+      ctx.size = nb.size();
+      ctx.pos = 1;
+      int c = 0;
+      for(int n = 0; n < nb.size(); ++n) {
+        ctx.value = nb.get(n);
+        final Item i = p.test(ctx, input);
+        if(i != null) {
+          // assign score value
+          nb.get(n).score(i.score());
+          nb.item[c++] = nb.get(n);
+        }
+        ctx.pos++;
+      }
+      nb.size(c);
+    }
+    return nb;
   }
 
   /**
@@ -158,7 +151,7 @@ public class Step extends Preds {
    */
   public final boolean simple(final Axis ax, final boolean name) {
     return axis == ax && pred.length == 0 &&
-      (name ? test.kind == Test.Kind.NAME : test == Test.NODE);
+      (name ? test.test == Test.Name.NAME : test == Test.NODE);
   }
 
   /**
@@ -179,9 +172,9 @@ public class Step extends Preds {
       kind = Nod.kind(test.type);
       if(kind == Data.PI || kind == Data.ATTR) return null;
 
-      if(test.kind == Kind.NAME) n = ((NameTest) test).ln;
+      if(test.test == Name.NAME) n = ((NameTest) test).ln;
       if(n == null) {
-        if(test.kind != null && test.kind != Kind.ALL) return null;
+        if(test.test != null && test.test != Name.ALL) return null;
       } else if(kind == Data.ELEM) {
         name = data.tags.id(n);
       }

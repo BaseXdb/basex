@@ -66,7 +66,7 @@ public final class CSVParser extends FileParser {
             continue;
           }
         }
-        if(ch != 0x0D) tb.addUTF(ch);
+        if(ch != 0x0D) tb.add(ch);
       } else {
         // separator
         if(ch == separator) {
@@ -85,7 +85,7 @@ public final class CSVParser extends FileParser {
         } else if(ch == '"') {
           quoted = true;
         } else if(ch != 0x0D) {
-          tb.addUTF(ch);
+          tb.add(ch);
         }
       }
       ch = 0;

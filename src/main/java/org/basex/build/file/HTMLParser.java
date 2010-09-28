@@ -64,7 +64,7 @@ public final class HTMLParser extends XMLParser {
       byte[] content = io.content();
       final ArrayInput ai = new ArrayInput(content);
       String enc = ai.encoding();
-      content = ai.content().finish();
+      content = ai.content().toArray();
 
       // looks for a charset definition
       final byte[] encoding = token("charset=");

@@ -254,7 +254,7 @@ public final class BaseXTextTokens {
     for(int c = 0; c < cl; ++c) {
       final int ch = str.charAt(c);
       if(ch != '\r') {
-        tb.addUTF(ch);
+        tb.add(ch);
         ++cc;
       }
     }
@@ -361,8 +361,8 @@ public final class BaseXTextTokens {
     if(ms == -1) return "";
     final TokenBuilder tb = new TokenBuilder();
     final int e = ms < me ? me : ms;
-    for(int s = ms < me ? ms : me; s < e; ++s) {
-      final byte t = text[s];
+    for(int s = ms < me ? ms : me; s < e; s += cl(text, s)) {
+      final int t = cp(text, s);
       if(t < 0 || t >= ' ' || t == 0x0A || t == 0x09) tb.add(t);
     }
     return tb.toString();

@@ -66,7 +66,7 @@ public final class DOTSerializer extends Serializer {
 
   @Override
   public void attribute(final byte[] n, final byte[] v) {
-    tb.add(DOTATTR, DOTData.name(string(n)), v);
+    tb.addExt(DOTATTR, DOTData.name(string(n)), v);
   }
 
   @Override

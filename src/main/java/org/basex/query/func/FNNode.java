@@ -98,8 +98,8 @@ final class FNNode extends Fun {
         while(n.parent() != null) n = n.parent();
         return n;
       case GENID:
-        return empty ? Str.ZERO : Str.get(
-            new TokenBuilder(QueryTokens.ID).add(checkNode(it).id()).finish());
+        return empty ? Str.ZERO : Str.get(new TokenBuilder(
+            QueryTokens.ID).addNum(checkNode(it).id()).finish());
       default:
         return super.item(ctx, ii);
     }

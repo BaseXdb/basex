@@ -90,8 +90,8 @@ public final class YMd extends Dur {
     final TokenBuilder tb = new TokenBuilder();
     if(mon < 0) tb.add('-');
     tb.add('P');
-    if(yea() != 0) { tb.add(Math.abs(yea())); tb.add('Y'); }
-    if(mon() != 0) { tb.add(Math.abs(mon())); tb.add('M'); }
+    if(yea() != 0) { tb.addNum(Math.abs(yea())); tb.add('Y'); }
+    if(mon() != 0) { tb.addNum(Math.abs(mon())); tb.add('M'); }
     if(mon == 0) tb.add("0M");
     return tb.finish();
   }

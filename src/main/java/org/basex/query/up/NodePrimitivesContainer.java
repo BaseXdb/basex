@@ -80,7 +80,7 @@ final class NodePrimitivesContainer implements NodePrimitives {
   public void optimize() {
     // unnecessary primitives can only exist when the corresponding node is
     // deleted or replaced.
-    if(rep || del){
+    if(rep || del) {
       // if a node is replaced, an eventual delete operation
       // is removed, as the actual node identity has been replaced.
       final PrimitiveType dominantOp = rep ? REPLACENODE : DELETE;

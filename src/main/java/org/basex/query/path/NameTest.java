@@ -12,7 +12,7 @@ import org.basex.query.item.Uri;
 import org.basex.util.InputInfo;
 
 /**
- * XQuery name test.
+ * Name test.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -29,40 +29,23 @@ public final class NameTest extends Test {
    * @param ii input info
    */
   public NameTest(final boolean att, final InputInfo ii) {
-    this(null, Kind.ALL, att, ii);
+    this(null, Name.ALL, att, ii);
   }
 
   /**
    * Constructor.
    * @param nm name
-   * @param t test type
+   * @param t type of name test
    * @param att attribute flag
    * @param ii input info
    */
-  public NameTest(final QNm nm, final Kind t, final boolean att,
+  public NameTest(final QNm nm, final Name t, final boolean att,
       final InputInfo ii) {
     type = att ? Type.ATT : Type.ELM;
     ln = nm != null ? nm.ln() : null;
     name = nm;
-    kind = t;
+    test = t;
     input = ii;
-  }
-
-  @Override
-  public boolean eval(final Nod node) throws QueryException {
-    // only elements and attributes will yield results
-    if(node.type != type) return false;
-
-    // wildcard - accept all nodes
-    if(kind == Kind.ALL) return true;
-    // namespaces wildcard - check only name
-    if(kind == Kind.NAME) return eq(ln, ln(node.nname()));
-    // name wildcard - check only namespace
-    if(kind == Kind.NS) return name.uri().eq(node.qname(tmpq).uri());
-    // check attributes
-    if(type == Type.ATT && !name.ns()) return eq(ln, node.nname());
-    // check everything
-    return name.eq(node.qname(tmpq));
   }
 
   @Override
@@ -79,10 +62,10 @@ public final class NameTest extends Test {
     if(data == null) return true;
     if(ctx.nsElem.length == 0 && data.ns.size() == 0) {
       // no prefix - check only name
-      if(kind == Kind.STD && !name.ns()) kind = Kind.NAME;
+      if(test == Name.STD && !name.ns()) test = Name.NAME;
 
       // pre-evaluate unknown tag/attribute names
-      if(kind == Kind.NAME && (type == Type.ELM ?
+      if(test == Name.NAME && (type == Type.ELM ?
           data.tags : data.atts).id(ln) == 0) {
         ctx.compInfo(OPTNAME, ln);
         return false;
@@ -92,11 +75,33 @@ public final class NameTest extends Test {
   }
 
   @Override
+  public boolean eval(final Nod node) throws QueryException {
+    // only elements and attributes will yield results
+    if(node.type != type) return false;
+
+    switch(test) {
+      // wildcard - accept all nodes
+      case ALL:
+        return true;
+      // namespaces wildcard - check only name
+      case NAME:
+        return eq(ln, ln(node.nname()));
+      // name wildcard - check only namespace
+      case NS:
+        return name.uri().eq(node.qname(tmpq).uri());
+      default:
+        // check attributes, or check everything
+        return type == Type.ATT && !name.ns() ? eq(ln, node.nname()) :
+          name.eq(node.qname(tmpq));
+    }
+  }
+
+  @Override
   public String toString() {
-    if(kind == Kind.ALL) return "*";
-    if(kind == Kind.NAME) return "*:" + string(name.atom());
+    if(test == Name.ALL) return "*";
+    if(test == Name.NAME) return "*:" + string(name.atom());
     final String uri = name.uri() == Uri.EMPTY || name.ns() ? "" :
       "{" + string(name.uri().atom()) + "}";
-    return uri + (kind == Kind.NS ? "*" : string(name.atom()));
+    return uri + (test == Name.NS ? "*" : string(name.atom()));
   }
 }

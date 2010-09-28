@@ -165,6 +165,14 @@ public final class QueryException extends Exception {
   }
 
   /**
+   * Returns the error code.
+   * @return error code
+   */
+  public Err.Type type() {
+    return err == null ? null : err.type;
+  }
+
+  /**
    * Returns the error value.
    * @return error value
    */
@@ -181,11 +189,13 @@ public final class QueryException extends Exception {
   public String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
     if(line != 0) {
-      tb.add(STOPPED + ' ' + Util.info(LINEINFO, line));
-      if(col != 0) tb.add(QueryTokens.SEP + Util.info(COLINFO, col));
-      if(file != null) tb.add(Util.info(' ' + FILEINFO, file));
+      tb.add(STOPPED + ' ').addExt(LINEINFO, line);
+      if(col != 0) tb.add(QueryTokens.SEP).addExt(COLINFO, col);
+      if(file != null) tb.add(' ').addExt(FILEINFO, file);
       tb.add(": \n");
     }
-    return tb.add("[" + code() + "] ").add(getLocalizedMessage()).toString();
+    final String c = code();
+    if(c.length() != 0) tb.add("[" + c + "] ");
+    return tb.add(getLocalizedMessage()).toString();
   }
 }

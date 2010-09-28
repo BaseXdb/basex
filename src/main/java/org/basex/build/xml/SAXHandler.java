@@ -75,7 +75,7 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   @Override
   public void characters(final char[] ch, final int s, final int l) {
     final int e = s + l;
-    for(int i = s; i < e; ++i) tb.addUTF(ch[i]);
+    for(int i = s; i < e; ++i) tb.add(ch[i]);
   }
 
   @Override

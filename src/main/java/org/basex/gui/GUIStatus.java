@@ -82,7 +82,7 @@ public final class GUIStatus extends BaseXPanel {
         sb.append(status.charAt(s));
         fw -= fm.charWidth(sb.charAt(s));
       }
-      sb.append("...");
+      sb.append(DOTS);
     }
     g.drawString(sb.toString(), 4, getFont().getSize());
   }

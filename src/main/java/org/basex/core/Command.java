@@ -154,7 +154,7 @@ public abstract class Command extends Progress {
    */
   protected final boolean error(final String msg, final Object... ext) {
     info.reset();
-    info.add(msg == null ? "" : msg, ext);
+    info.addExt(msg == null ? "" : msg, ext);
     return false;
   }
 
@@ -165,7 +165,7 @@ public abstract class Command extends Progress {
    * @return {@code true}
    */
   protected final boolean info(final String str, final Object... ext) {
-    info.add(str, ext);
+    info.addExt(str, ext);
     info.add(NL);
     return true;
   }

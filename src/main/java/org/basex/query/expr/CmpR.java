@@ -21,7 +21,7 @@ import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.NameTest;
 import org.basex.query.path.Step;
-import org.basex.query.path.Test.Kind;
+import org.basex.query.path.Test.Name;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -193,7 +193,7 @@ public final class CmpR extends Single {
     Step step = null;
     if(text) {
       step = st == 1 ? ic.step : path.step[st - 2];
-      if(!(step.test.kind == Kind.NAME)) return null;
+      if(!(step.test.test == Name.NAME)) return null;
     } else {
       step = path.step[st - 1];
       if(!step.simple(Axis.ATTR, true)) return null;

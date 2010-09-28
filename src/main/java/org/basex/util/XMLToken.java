@@ -24,12 +24,20 @@ public final class XMLToken {
   }
 
   /**
-   * Checks if the specified character is an XML letter.
+   * Checks if the specified character is a name start character, as required
+   * e.g. by QName and NCName.
    * @param ch character
    * @return result of check
    */
-  public static boolean isXMLLetter(final int ch) {
-    return ch == '_' || Character.isLetter(ch);
+  public static boolean isNCStartChar(final int ch) {
+    return ch < 0x80 ?
+      ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch == '_' :
+      ch < 0x300 ? ch >= 0xC0 && ch != 0xD7 && ch != 0xF7 :
+      ch >= 0x370 && ch <= 0x37D || ch >= 0x37F && ch <= 0x1FFF ||
+      ch >= 0x200C && ch <= 0x200D || ch >= 0x2070 && ch <= 0x218F ||
+      ch >= 0x2C00 && ch <= 0x2EFF || ch >= 0x3001 && ch <= 0xD7FF ||
+      ch >= 0xF900 && ch <= 0xFDCF || ch >= 0xFDF0 && ch <= 0xFFFD ||
+      ch >= 0x10000 && ch <= 0xEFFFF;
   }
 
   /**
@@ -37,8 +45,10 @@ public final class XMLToken {
    * @param ch character
    * @return result of check
    */
-  public static boolean isXMLLetterOrDigit(final int ch) {
-    return isXMLLetter(ch) || digit(ch);
+  public static boolean isNCChar(final int ch) {
+    return isNCStartChar(ch) || 
+      (ch < 0x100 ? digit(ch) || ch == '-' || ch == '.' || ch == 0xB7 :
+      ch >= 0x300 && ch <= 0x36F || ch == 0x203F || ch == 0x2040);
   }
 
   /**
@@ -46,8 +56,8 @@ public final class XMLToken {
    * @param ch the letter to be checked
    * @return result of comparison
    */
-  public static boolean isFirstLetter(final int ch) {
-    return isXMLLetter(ch) || ch == ':';
+  public static boolean isStartChar(final int ch) {
+    return isNCStartChar(ch) || ch == ':';
   }
 
   /**
@@ -55,8 +65,8 @@ public final class XMLToken {
    * @param ch the letter to be checked
    * @return result of comparison
    */
-  public static boolean isLetterOrDigit(final int ch) {
-    return isFirstLetter(ch) || digit(ch) || ch == '-' || ch == '.';
+  public static boolean isChar(final int ch) {
+    return isNCChar(ch) || ch == ':';
   }
 
   /**
@@ -66,23 +76,7 @@ public final class XMLToken {
    */
   public static boolean isNCName(final byte[] v) {
     final int l = v.length;
-    return l == 0 ? false : ncName(v, -1) == l;
-  }
-
-  /**
-   * Checks the specified token as an NCName.
-   * @param v value to be checked
-   * @param p start position minus 1
-   * @return end position
-   */
-  private static int ncName(final byte[] v, final int p) {
-    final int l = v.length;
-    for(int i = p + 1; i < l; i += cl(v, i)) {
-      final int c = cp(v, i);
-      if(isXMLLetter(c)) continue;
-      if(i == p + 1 || !digit(c) && c != '-' && c != '.') return i;
-    }
-    return l;
+    return l != 0 && ncName(v, 0) == l;
   }
 
   /**
@@ -91,9 +85,12 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isName(final byte[] v) {
-    if(v.length == 0 || !isFirstLetter(v[0])) return false;
-    for(int i = 1; i < v.length; ++i) if(!isLetterOrDigit(v[i])) return false;
-    return true;
+    final int l = v.length;
+    for(int i = 0; i < l; i += cl(v, i)) {
+      final int c = cp(v, i);
+      if(i == 0 ? !isStartChar(c) : !isChar(c)) return false;
+    }
+    return l != 0;
   }
 
   /**
@@ -102,9 +99,9 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isNMToken(final byte[] v) {
-    if(v.length == 0) return false;
-    for(final byte c : v) if(!isLetterOrDigit(c)) return false;
-    return true;
+    final int l = v.length;
+    for(int i = 0; i < l; i += cl(v, i)) if(!isChar(cp(v, i))) return false;
+    return l != 0;
   }
 
   /**
@@ -115,11 +112,26 @@ public final class XMLToken {
   public static boolean isQName(final byte[] val) {
     final int l = val.length;
     if(l == 0) return false;
-    final int i = ncName(val, -1);
+    final int i = ncName(val, 0);
     if(i == l) return true;
     if(i == 0 || val[i] != ':') return false;
-    final int j = ncName(val, i);
+    final int j = ncName(val, i + 1);
     if(j == i + 1 || j != l) return false;
     return true;
+  }
+
+  /**
+   * Checks the specified token as an NCName.
+   * @param v value to be checked
+   * @param p start position
+   * @return end position
+   */
+  private static int ncName(final byte[] v, final int p) {
+    final int l = v.length;
+    for(int i = p; i < l; i += cl(v, i)) {
+      final int c = cp(v, i);
+      if(i == p ? !isNCStartChar(c) : !isNCChar(c)) return i;
+    }
+    return l;
   }
 }

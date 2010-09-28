@@ -5,7 +5,10 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.func.Fun;
+import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
+import org.basex.query.item.Item;
 import org.basex.query.path.Step;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
@@ -21,6 +24,10 @@ import org.basex.util.InputInfo;
 public abstract class Preds extends ParseExpr {
   /** Predicates. */
   public Expr[] pred;
+  /** Compilation: first predicate uses last function. */
+  public boolean last;
+  /** Compilation: first predicate uses position. */
+  public Pos pos;
 
   /**
    * Constructor.
@@ -55,6 +62,49 @@ public abstract class Preds extends ParseExpr {
     }
     return e;
   }
+
+  /**
+   * Checks if this expression can be evaluated in an iterative manner.
+   * This is possible if no predicate, or only the first, is positional, or
+   * if a single {@code last()} predicate is specified. 
+   * @return result of check
+   */
+  protected boolean iterable() {
+    // position predicate
+    pos = pred[0] instanceof Pos ? (Pos) pred[0] : null;
+    last = pred[0] instanceof Fun && ((Fun) pred[0]).def == FunDef.LAST;
+
+    boolean pos1 = false;
+    boolean pos2 = false;
+    for(int p = 0; p < pred.length; p++) {
+      final boolean ps = pred[p].type().mayBeNum() || pred[p].uses(Use.POS);
+      pos1 |= ps;
+      if(p > 0) pos2 |= ps;
+    }
+    return !pos1 || pos != null && !pos2 || last && pred.length == 1;
+  }
+
+  /**
+   * Checks if the predicates are successful for the specified item.
+   * @param it item to be checked
+   * @param ctx query context
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  public boolean preds(final Item it, final QueryContext ctx)
+      throws QueryException {
+
+    // set context item and position
+    ctx.value = it;
+    for(final Expr p : pred) {
+      final Item i = p.test(ctx, input);
+      if(i == null) return false;
+      // item accepted.. adopt last scoring value
+      it.score(i.score());
+    }
+    return true;
+  }
+  
 
   @Override
   public boolean uses(final Use u) {

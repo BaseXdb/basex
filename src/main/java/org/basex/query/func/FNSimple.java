@@ -89,26 +89,27 @@ public final class FNSimple extends Fun {
   public Expr cmp(final QueryContext ctx) {
     // all functions have at least 1 argument
     final Expr e = expr[0];
+    
     switch(def) {
       case BOOLEAN:
-        expr[0] = expr[0].compEbv(ctx);
-        return e.type().eq(SeqType.BLN) ? e : this;
+        expr[0] = e.compEbv(ctx);
+        return expr[0].type().eq(SeqType.BLN) ? e : this;
       case NOT:
         if(e instanceof Fun) {
-          final Fun fun = (Fun) e;
-          if(fun.def == FunDef.EMPTY) {
+          final Fun f = e instanceof Fun ? (Fun) e : null;
+          if(f.def == FunDef.EMPTY) {
             // simplify: not(empty(A)) -> exists(A)
             ctx.compInfo(QueryText.OPTWRITE, this);
-            expr = fun.expr;
+            expr = f.expr;
             def = FunDef.EXISTS;
-          } else if(fun.def == FunDef.EXISTS) {
+          } else if(f.def == FunDef.EXISTS) {
             // simplify: not(exists(A)) -> empty(A)
             ctx.compInfo(QueryText.OPTWRITE, this);
-            expr = fun.expr;
+            expr = f.expr;
             def = FunDef.EMPTY;
           } else {
             // simplify: not(boolean(A)) -> not(A)
-            expr[0] = expr[0].compEbv(ctx);
+            expr[0] = e.compEbv(ctx);
           }
         }
         return this;

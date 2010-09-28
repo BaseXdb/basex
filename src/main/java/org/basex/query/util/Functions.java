@@ -215,11 +215,11 @@ public final class Functions extends ExprInfo {
   public void funError(final QNm name, final QueryParser qp)
       throws QueryException {
     // find function
-    final byte[] nm = lc(name.ln());
-    FNIndex.get().error(nm, qp);
+    FNIndex.get().error(name.ln(), qp);
 
     // find similar local function
     final Levenshtein ls = new Levenshtein();
+    final byte[] nm = lc(name.ln());
     for(int n = 0; n < func.length; ++n) {
       if(ls.similar(nm, lc(func[n].var.name.ln()), 0))
         qp.error(FUNSIMILAR, name.atom(), func[n].var.name.atom());

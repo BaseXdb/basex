@@ -111,7 +111,7 @@ final class IndexStats {
       tb.add("  ");
       tb.add(txt[o]);
       for(int j = 0; j < len - txt[o].length; ++j) tb.add(' ');
-      tb.add(ocs[o]);
+      tb.addNum(ocs[o]);
       tb.add('x');
       tb.add(NL);
     }

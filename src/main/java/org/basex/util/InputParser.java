@@ -1,5 +1,6 @@
 package org.basex.util;
 
+import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import org.basex.io.IO;
 
@@ -111,7 +112,7 @@ public abstract class InputParser {
    * @param ch character to be checked
    * @return result
    */
-  protected final boolean quote(final char ch) {
+  protected final boolean quote(final int ch) {
     return ch == '"' || ch == '\'';
   }
 
@@ -156,7 +157,7 @@ public abstract class InputParser {
    */
   protected final String rest() {
     final int e = Math.min(ql, qp + 15);
-    return qu.substring(qp, e) + (e == ql ? "" : "...");
+    return qu.substring(qp, e) + (e == ql ? "" : DOTS);
   }
 
   /**

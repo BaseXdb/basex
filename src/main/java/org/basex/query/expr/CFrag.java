@@ -1,5 +1,6 @@
 package org.basex.query.expr;
 
+import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
 import org.basex.query.QueryContext;
@@ -77,6 +78,6 @@ public abstract class CFrag extends Arr {
 
   @Override
   protected final String toString(final String pref) {
-    return pref + " { " + super.toString(", ") + " }";
+    return pref + " { " + super.toString(SEP) + " }";
   }
 }

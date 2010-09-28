@@ -88,7 +88,7 @@ final class FNBaseX extends Fun {
     try {
       return eval(ctx, io.content());
     } catch(final IOException ex) {
-      NODOC.thrw(input, ex.getMessage());
+      NODOC.thrw(input, ex.toString());
       return null;
     }
   }
@@ -137,7 +137,7 @@ final class FNBaseX extends Fun {
    * @throws QueryException query exception
    */
   private Iter db(final QueryContext ctx) throws QueryException {
-    NodIter iter = new NodIter();
+    final NodIter iter = new NodIter();
     DBNode node = ctx.doc(checkStr(expr[0], ctx), true, true, input);
 
     if(expr.length == 2) {

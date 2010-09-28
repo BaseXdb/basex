@@ -153,13 +153,13 @@ public final class Table {
         final byte[] s = e.get(u);
         final int is = ind[u] - s.length;
         if(u < align.size() && align.get(u)) {
-          for(int i = 0; i < is; ++i) tb.add((byte) ' ');
+          for(int i = 0; i < is; ++i) tb.add(' ');
           tb.add(s);
         } else {
           tb.add(s);
-          for(int i = 0; i < is; ++i) tb.add((byte) ' ');
+          for(int i = 0; i < is; ++i) tb.add(' ');
         }
-        for(int i = 0; i < DIST; ++i) tb.add((byte) ' ');
+        for(int i = 0; i < DIST; ++i) tb.add(' ');
       }
       tb.add(NL);
     }

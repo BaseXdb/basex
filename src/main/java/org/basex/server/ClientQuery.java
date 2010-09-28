@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.io.BufferInput;
-import org.basex.util.TokenBuilder;
+import org.basex.util.ByteList;
 
 /**
  * This class defines all methods for iteratively evaluating queries with the
@@ -19,7 +19,7 @@ public final class ClientQuery extends Query {
   /** Query id. */
   private final String id;
   /** Next result. */
-  private TokenBuilder next;
+  private ByteList next;
 
   /**
    * Standard constructor.
@@ -60,7 +60,7 @@ public final class ClientQuery extends Query {
   @Override
   public void next(final OutputStream out) throws BaseXException {
     try {
-      out.write(next.finish());
+      out.write(next.toArray());
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }

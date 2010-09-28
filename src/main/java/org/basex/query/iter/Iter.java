@@ -65,15 +65,6 @@ public abstract class Iter {
   }
 
   /**
-   * Reverses the iterator and returns {@code true} if operation was successful.
-   * {@code false} is returned if the iterator cannot be reversed.
-   * @return true if operator could be reversed
-   */
-  public boolean reverse() {
-    return false;
-  }
-
-  /**
    * Returns a sequence with all iterator values.
    * Must only be called if {@link #next} has not been called before.
    * @return sequence

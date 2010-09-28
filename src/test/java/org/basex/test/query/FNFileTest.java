@@ -86,7 +86,7 @@ public class FNFileTest extends QueryTest {
     try {
       ii = new ItemIter(new Item[] { new Dtm(
         new File("etc").lastModified(), null)}, 1);
-    } catch(QueryException e) {
+    } catch(final QueryException e) {
         ii = null;
     }
 

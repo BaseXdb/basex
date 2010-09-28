@@ -6,6 +6,7 @@ import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
 import org.basex.io.IO;
+import org.basex.io.IOFile;
 import org.basex.util.Util;
 
 /**
@@ -51,8 +52,7 @@ public final class DirParser extends Parser {
 
     if(path.isDir()) {
       final StringBuilder sb = new StringBuilder();
-      for(final String s : pr.get(Prop.CREATEFILTER).
-          replaceAll("\\.", "\\\\.").replaceAll("\\*", ".*").split(",")) {
+      for(final String s : IOFile.regex(pr.get(Prop.CREATEFILTER)).split(",")) {
         sb.append("|" + (s.contains(".") ? s : ".*"));
       }
       filter = sb.toString().substring(1);

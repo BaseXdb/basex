@@ -391,7 +391,7 @@ public final class QueryContext extends Progress {
     if(!inf) return;
     if(!firstOpt) info.add(QUERYSEP);
     firstOpt = false;
-    info.add(string, ext);
+    info.addExt(string, ext);
     info.add(NL);
   }
 
@@ -523,7 +523,7 @@ public final class QueryContext extends Progress {
       while(c < colls && !eq(collName[c], path)) ++c;
       // add new collection if not found
       if(c == colls) {
-        int tmp = Token.string(path).indexOf("/");
+        final int tmp = Token.string(path).indexOf("/");
         if(tmp == -1) {
           addDocs(doc(path, true, false, ii), "");
         } else {
@@ -545,7 +545,7 @@ public final class QueryContext extends Progress {
     final Data data = db.data;
     
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
-      DBNode dbn = new DBNode(data, p);
+      final DBNode dbn = new DBNode(data, p);
       if(!path.equals("")) {
         if(Token.string(dbn.base()).toLowerCase().
             contains(path.toLowerCase())) {

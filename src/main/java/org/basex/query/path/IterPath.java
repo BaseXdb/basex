@@ -37,57 +37,63 @@ final class IterPath extends AxisPath {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      final Value v = ctx.value;
       Expr[] expr;
       Iter[] iter;
-      Nod prev;
+      Nod node;
       int p;
 
       @Override
       public Nod next() throws QueryException {
         if(iter == null) {
-          expr = step;
-          if(root != null) {
-            // copy expressions to be iterated
-            expr = new Expr[step.length + 1];
-            expr[0] = root;
-            System.arraycopy(step, 0, expr, 1, step.length);
+          if(expr == null) {
+            expr = step;
+            if(root != null) {
+              // add root as first expression
+              expr = new Expr[step.length + 1];
+              expr[0] = root;
+              System.arraycopy(step, 0, expr, 1, step.length);
+            }
           }
           // create iterator array
           iter = new Iter[expr.length];
           iter[0] = ctx.iter(expr[0]);
-          prev = null;
-          p = 0;
         }
 
-        while(p != -1) {
-          final Item i = iter[p].next();
-          if(i == null) {
-            --p;
+        final Value cv = ctx.value;
+        final long cp = ctx.pos;
+
+        while(true) {
+          final Item item = iter[p].next();
+          if(item == null) {
+            if(--p == -1) {
+              node = null;
+              break;
+            }
+          } else if(p < iter.length - 1) {
+            ++p;
+            ctx.value = item;
+            if(iter[p] == null || !iter[p].reset()) iter[p] = ctx.iter(expr[p]);
           } else {
-            if(p == iter.length - 1) {
-              if(!i.node()) NODESPATH.thrw(input, this, i.type);
-              final Nod n = (Nod) i;
-              if(prev == null || !prev.is(n)) {
-                prev = n;
-                ctx.value = v;
-                return n;
-              }
-            } else {
-              ++p;
-              ctx.value = i;
-              iter[p] = ctx.iter(expr[p]);
+            if(!item.node()) NODESPATH.thrw(input, this, item.type);
+            final Nod n = (Nod) item;
+            if(node == null || !node.is(n)) {
+              node = n;
+              break;
             }
           }
         }
-        ctx.value = v;
-        return null;
+
+        // reset context and return result
+        ctx.value = cv;
+        ctx.pos = cp;
+        return node;
       }
 
       @Override
       public boolean reset() {
-        ctx.value = v;
         iter = null;
+        node = null;
+        p = 0;
         return true;
       }
     };

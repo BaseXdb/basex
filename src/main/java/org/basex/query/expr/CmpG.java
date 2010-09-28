@@ -235,7 +235,6 @@ public final class CmpG extends Cmp {
     return op.op.e(input, a, b);
   }
 
-
   /**
    * Creates a union of the existing and the specified expressions.
    * @param g general comparison

@@ -50,7 +50,7 @@ public abstract class AProp {
     final TokenBuilder err = new TokenBuilder();
     final File file = new File(filename);
     if(!file.exists()) {
-      err.add("Saving properties in \"" + filename + "\"..." + NL, filename);
+      err.addExt("Saving properties in \"" + filename + "\"..." + NL, filename);
     } else {
       try {
         final BufferedReader br = new BufferedReader(new FileReader(file));
@@ -61,7 +61,7 @@ public abstract class AProp {
           if(line.isEmpty() || line.charAt(0) == '#') continue;
           final int d = line.indexOf('=');
           if(d < 0) {
-            err.add("%: \"%\" ignored. " + NL, filename, line);
+            err.addExt("%: \"%\" ignored. " + NL, filename, line);
             continue;
           }
 
@@ -79,7 +79,7 @@ public abstract class AProp {
 
           final Object entry = props.get(key);
           if(entry == null) {
-            err.add("%: \"%\" not found. " + NL, filename, key);
+            err.addExt("%: \"%\" not found. " + NL, filename, key);
           } else if(entry instanceof String) {
             props.put(key, val);
           } else if(entry instanceof Integer) {
@@ -98,7 +98,7 @@ public abstract class AProp {
         }
         br.close();
       } catch(final Exception ex) {
-        err.add("% could not be parsed." + NL, filename);
+        err.addExt("% could not be parsed." + NL, filename);
         Util.debug(ex);
       }
     }

@@ -83,7 +83,7 @@ public abstract class Path extends ParseExpr {
    * @return result of check
    */
   protected final boolean uses(final Expr[] step, final Use use) {
-    // if no root node is given, context item will be used as input
+    // initial context will be used as input
     if(use == Use.CTX) return root == null || root.uses(use);
     for(final Expr s : step) if(s.uses(use)) return true;
     return root != null && root.uses(use);

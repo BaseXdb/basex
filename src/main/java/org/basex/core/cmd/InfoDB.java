@@ -52,14 +52,14 @@ public final class InfoDB extends AInfo {
     final TokenBuilder tb = new TokenBuilder();
     final String header = (bold ?
         new TokenBuilder().high().add("%").norm().toString() : "%") + NL;
-    tb.add(header, INFODB);
+    tb.addExt(header, INFODB);
     format(tb, INFODBNAME, meta.name);
     format(tb, INFODBSIZE, Performance.format(meta.dbsize()));
     format(tb, INFONODES, Integer.toString(meta.size));
     format(tb, INFOHEIGHT, Integer.toString(meta.height));
 
     tb.add(NL);
-    tb.add(header, INFOCREATE);
+    tb.addExt(header, INFOCREATE);
     if(create) format(tb, INFODOC, meta.file.path());
     format(tb, INFOTIME, DATE.format(new Date(meta.time)));
     format(tb, INFODOCSIZE, Performance.format(meta.filesize));
@@ -70,7 +70,7 @@ public final class InfoDB extends AInfo {
 
     if(index) {
       tb.add(NL);
-      tb.add(header, INFOINDEX);
+      tb.addExt(header, INFOINDEX);
       if(meta.oldindex) {
         tb.add(" " + INDUPDATE + NL);
       } else {

@@ -51,8 +51,6 @@ public abstract class Item extends Value {
       @Override
       public boolean reset() { more = false; return true; }
       @Override
-      public boolean reverse() { return true; }
-      @Override
       public Value finish() { return Item.this; }
     };
   }

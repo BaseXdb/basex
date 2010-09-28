@@ -11,6 +11,15 @@ import java.util.Arrays;
  * @author Christian Gruen
  */
 public final class TokenBuilder {
+  /** Highlighting flag. */
+  public static final byte HIGH = 0x02;
+  /** Standard flag. */
+  public static final byte NORM = 0x03;
+  /** new line. */
+  public static final byte NL = 0x0a;
+  /** Half new line. */
+  public static final byte HL = 0x0b;
+  
   /** Character array. */
   private byte[] chars;
   /** Entity flag. */
@@ -22,7 +31,7 @@ public final class TokenBuilder {
    * Empty constructor.
    */
   public TokenBuilder() {
-    this(8);
+    this(ElementList.CAP);
   }
 
   /**
@@ -71,8 +80,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder high() {
-    add((byte) 0x02);
-    return this;
+    return addByte(HIGH);
   }
 
   /**
@@ -81,8 +89,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder norm() {
-    add((byte) 0x03);
-    return this;
+    return addByte(NORM);
   }
 
   /**
@@ -91,8 +98,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder nl() {
-    add((byte) 0x0a);
-    return this;
+    return addByte(NL);
   }
 
   /**
@@ -101,8 +107,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder hl() {
-    add((byte) 0x0b);
-    return this;
+    return addByte(HL);
   }
 
   /**
@@ -111,19 +116,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final char ch) {
-    addUTF(ch);
-    return this;
-  }
-
-  /**
-   * Adds a single character to the token.
-   * @param b the character to be added
-   * @return self reference
-   */
-  public TokenBuilder add(final byte b) {
-    if(size == chars.length) chars = Arrays.copyOf(chars, Array.newSize(size));
-    chars[size++] = b;
-    return this;
+    return add((int) ch);
   }
 
   /**
@@ -131,33 +124,43 @@ public final class TokenBuilder {
    * @param ch the character to be added
    * @return self reference
    */
-  public TokenBuilder addUTF(final int ch) {
+  public TokenBuilder add(final int ch) {
     if(ch <= 0x7F) {
-      add((byte) ch);
+      addByte((byte) ch);
     } else if(ch <= 0x7FF) {
-      add((byte) (ch >>  6 & 0x1F | 0xC0));
-      add((byte) (ch >>  0 & 0x3F | 0x80));
+      addByte((byte) (ch >>  6 & 0x1F | 0xC0));
+      addByte((byte) (ch >>  0 & 0x3F | 0x80));
     } else if(ch <= 0xFFFF) {
-      add((byte) (ch >> 12 & 0x0F | 0xE0));
-      add((byte) (ch >>  6 & 0x3F | 0x80));
-      add((byte) (ch >>  0 & 0x3F | 0x80));
+      addByte((byte) (ch >> 12 & 0x0F | 0xE0));
+      addByte((byte) (ch >>  6 & 0x3F | 0x80));
+      addByte((byte) (ch >>  0 & 0x3F | 0x80));
     } else {
-      add((byte) (ch >> 18 & 0x07 | 0xF0));
-      add((byte) (ch >> 12 & 0x3F | 0x80));
-      add((byte) (ch >>  6 & 0x3F | 0x80));
-      add((byte) (ch >>  0 & 0x3F | 0x80));
+      addByte((byte) (ch >> 18 & 0x07 | 0xF0));
+      addByte((byte) (ch >> 12 & 0x3F | 0x80));
+      addByte((byte) (ch >>  6 & 0x3F | 0x80));
+      addByte((byte) (ch >>  0 & 0x3F | 0x80));
     }
     return this;
   }
 
   /**
-   * Adds an integer to the token.
+   * Adds a byte to the token.
+   * @param b the byte to be added
+   * @return self reference
+   */
+  public TokenBuilder addByte(final byte b) {
+    if(size == chars.length) chars = Arrays.copyOf(chars, Array.newSize(size));
+    chars[size++] = b;
+    return this;
+  }
+
+  /**
+   * Adds a number to the token.
    * @param i the integer to be added
    * @return self reference
    */
-  public TokenBuilder add(final long i) {
-    add(token(i));
-    return this;
+  public TokenBuilder addNum(final long i) {
+    return add(token(i));
   }
 
   /**
@@ -166,8 +169,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final byte[] b) {
-    add(b, 0, b.length);
-    return this;
+    return add(b, 0, b.length);
   }
 
   /**
@@ -175,8 +177,9 @@ public final class TokenBuilder {
    * @param b the character array to be added
    * @param s start position
    * @param e end position
+   * @return self reference
    */
-  public void add(final byte[] b, final int s, final int e) {
+  public TokenBuilder add(final byte[] b, final int s, final int e) {
     final int l = e - s;
     final int cl = chars.length;
     if(size + l > cl) {
@@ -185,6 +188,7 @@ public final class TokenBuilder {
     }
     System.arraycopy(b, s, chars, size, l);
     size += l;
+    return this;
   }
 
   /**
@@ -193,8 +197,7 @@ public final class TokenBuilder {
    * @return self reference
    */
   public TokenBuilder add(final String s) {
-    add(token(s));
-    return this;
+    return add(token(s));
   }
 
   /**
@@ -203,10 +206,10 @@ public final class TokenBuilder {
    * @param sep separator
    * @return self reference
    */
-  public TokenBuilder add(final Object[] s, final String sep) {
+  public TokenBuilder addSep(final Object[] s, final String sep) {
     for(int e = 0; e != s.length; ++e) {
       if(e != 0) add(sep);
-      add(s[e]);
+      addExt(s[e]);
     }
     return this;
   }
@@ -220,20 +223,21 @@ public final class TokenBuilder {
    * @param ext extensions
    * @return self reference
    */
-  public TokenBuilder add(final Object str, final Object... ext) {
+  public TokenBuilder addExt(final Object str, final Object... ext) {
     final byte[] t = str instanceof byte[] ? (byte[]) str :
       token(str == null ? "null" : str.toString());
 
     for(int i = 0, e = 0; i < t.length; ++i) {
       if(t[i] != '%' || e == ext.length) {
-        add(t[i]);
+        addByte(t[i]);
       } else {
         final byte c = i + 1 < t.length ? t[i + 1] : 0;
         final boolean d = c >= '1' && c <= '9';
         if(d) ++i;
         final int n = d ? c - '1' : e++;
         final Object o = n < ext.length ? ext[n] : null;
-        add(o instanceof byte[] ? (byte[]) o : o == null ? null : o.toString());
+        addExt(o instanceof byte[] ? (byte[]) o :
+          o == null ? null : o.toString());
       }
     }
     return this;

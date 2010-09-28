@@ -19,8 +19,8 @@ import org.basex.io.BufferInput;
 import org.basex.io.PrintOutput;
 import org.basex.io.WrapInputStream;
 import org.basex.query.QueryException;
+import org.basex.util.ByteList;
 import org.basex.util.Performance;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -119,7 +119,7 @@ public final class ServerProcess extends Thread {
             continue;
           }
           // database command
-          input = new TokenBuilder().add(b).add(in.content()).toString();
+          input = new ByteList().add(b).add(in.content().toArray()).toString();
         } catch(final IOException ex) {
           // this exception is thrown for each session if the server is stopped
           exit();

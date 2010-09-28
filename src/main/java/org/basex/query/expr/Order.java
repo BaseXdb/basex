@@ -248,7 +248,7 @@ public final class Order extends ParseExpr {
 
   @Override
   public String toString() {
-    return new TokenBuilder(' ' + ORDER + ' ' + BY + ' ').add(
-        Arrays.copyOf(ob, ob.length - 1), ", ").toString();
+    return new TokenBuilder(' ' + ORDER + ' ' + BY + ' ').addSep(
+        Arrays.copyOf(ob, ob.length - 1), SEP).toString();
   }
 }

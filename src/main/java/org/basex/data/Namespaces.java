@@ -331,7 +331,7 @@ public final class Namespaces {
         if(ks != 1) tb.add(")");
         tb.add(" = ");
       }
-      tb.add("\"%\"" + NL, val);
+      tb.addExt("\"%\"" + NL, val);
     }
     return tb.finish();
   }

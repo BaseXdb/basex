@@ -97,7 +97,7 @@ public final class IntFormatter {
       tb.add(ROMANX[v / 10 % 10]);
       tb.add(ROMANI[v % 10]);
     } else {
-      tb.add(n);
+      tb.addNum(n);
     }
   }
 
@@ -139,7 +139,6 @@ public final class IntFormatter {
     }
 
     // add ordinal suffix
-    tb.add(tmp);
-    tb.add(form.ordinal(n, mp.ord));
+    tb.add(tmp.toString()).add(form.ordinal(n, mp.ord));
   }
 }

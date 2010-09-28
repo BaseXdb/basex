@@ -177,8 +177,8 @@ public abstract class Nod extends Item {
   public abstract int diff(final Nod nod);
 
   /**
-   * Returns a final node representation. This method should be called as
-   * soon as a node is passed on as result node.
+   * Returns a final node representation. This method is called by the
+   * step expressions, before it is passed on as result.
    * @return node
    */
   public Nod finish() {
@@ -203,37 +203,13 @@ public abstract class Nod extends Item {
    * Returns an ancestor axis iterator.
    * @return iterator
    */
-  public NodeIter anc() {
-    return new NodeIter() {
-      /** Temporary node. */
-      private Nod node = Nod.this;
-
-      @Override
-      public Nod next() {
-        node = node.parent();
-        return node;
-      }
-    };
-  }
+  public abstract NodeIter anc();
 
   /**
    * Returns an ancestor-or-self axis iterator.
    * @return iterator
    */
-  public final NodeIter ancOrSelf() {
-    return new NodeIter() {
-      /** Temporary node. */
-      private Nod node = Nod.this;
-
-      @Override
-      public Nod next() {
-        if(node == null) return null;
-        final Nod n = node;
-        node = n.parent();
-        return n;
-      }
-    };
-  }
+  public abstract NodeIter ancOrSelf();
 
   /**
    * Returns an attribute axis iterator.
@@ -263,56 +239,13 @@ public abstract class Nod extends Item {
    * Returns a following axis iterator.
    * @return iterator
    */
-  public final NodeIter foll() {
-    return new NodeIter() {
-      /** Iterator. */
-      private NodIter ir;
-
-      @Override
-      public Nod next() throws QueryException {
-        if(ir == null) {
-          ir = new NodIter();
-          Nod n = Nod.this;
-          Nod p = n.parent();
-          while(p != null) {
-            final NodeIter i = p.child();
-            Nod c;
-            while(n.type != Type.ATT && (c = i.next()) != null && !c.is(n));
-            while((c = i.next()) != null) {
-              ir.add(c.finish());
-              addDesc(c.child(), ir);
-            }
-            n = p;
-            p = p.parent();
-          }
-        }
-        return ir.next();
-      }
-    };
-  }
+  public abstract NodeIter foll();
 
   /**
    * Returns a following-sibling axis iterator.
    * @return iterator
    */
-  public final NodeIter follSibl() {
-    return new NodeIter() {
-      /** Iterator. */
-      private NodeIter ir;
-
-      @Override
-      public Nod next() throws QueryException {
-        if(ir == null) {
-          final Nod r = parent();
-          if(r == null) return null;
-          ir = r.child();
-          Nod n;
-          while((n = ir.next()) != null && !n.is(Nod.this));
-        }
-        return ir.next();
-      }
-    };
-  }
+  public abstract NodeIter follSibl();
 
   /**
    * Returns a parent axis iterator.
@@ -373,10 +306,9 @@ public abstract class Nod extends Item {
           if(r == null) return null;
 
           ir = new NodIter();
-          final NodeIter iter = r.child();
+          final NodeIter ni = r.child();
           Nod n;
-          while((n = iter.next()) != null) {
-            if(n.is(Nod.this)) break;
+          while((n = ni.next()) != null && !n.is(Nod.this)) {
             ir.add(n.finish());
           }
           c = ir.size();
