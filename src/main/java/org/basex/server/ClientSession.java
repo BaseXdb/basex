@@ -94,7 +94,10 @@ public final class ClientSession extends Session {
       send(cmd);
       final BufferInput bi = bufIn();
       int l;
-      while((l = bi.read()) != 0) o.write(l);
+      while((l = bi.read()) != 0) {
+        if(l == -1) break;
+        o.write(l);
+      }
       info = bi.readString();
       if(!ok(bi)) throw new BaseXException(info);
     } catch(final IOException ex) {
