@@ -134,5 +134,14 @@
         </executions>
       </plugin>
     </plugins>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/test/java</directory>
+        <includes>
+          <include>**/xqj.sig</include>
+        </includes>
+      </resource>
+    </resources>
   </build>
 </project>
