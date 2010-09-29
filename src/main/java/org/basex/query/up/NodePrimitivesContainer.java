@@ -38,8 +38,8 @@ final class NodePrimitivesContainer implements NodePrimitives {
    */
   private void add(final int i, final UpdatePrimitive p) throws QueryException {
     final PrimitiveType pt = p.type();
-    del = pt == DELETE;
-    rep = pt == REPLACENODE;
+    del = pt == DELETE || del;
+    rep = pt == REPLACENODE || rep;
     textAdjacency = del || rep || pt == INSERTBEFORE || pt == INSERTAFTER;
     if(i < primitives.size()) {
       final UpdatePrimitive a = primitives.get(i);
