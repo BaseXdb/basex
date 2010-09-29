@@ -1,5 +1,7 @@
 package org.basex.util;
 
+import org.basex.io.IO;
+
 /**
  * Input information.
  *
@@ -11,6 +13,8 @@ public final class InputInfo {
   public final String query;
   /** Parse position. */
   public final int pos;
+  /** Input file. */
+  public IO file;
 
   /**
    * Optimizes and compiles the expression.
@@ -19,5 +23,6 @@ public final class InputInfo {
   public InputInfo(final InputParser p) {
     query = p.qu;
     pos = p.qp;
+    file = p.file;
   }
 }

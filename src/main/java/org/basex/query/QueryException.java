@@ -65,6 +65,7 @@ public final class QueryException extends Exception {
 
     line = 1;
     col = 1;
+    file = ii.file;
     final int qp = Math.min(ii.pos - 1, ii.query.length());
     for(int i = 0, ch; i < qp; i += Character.charCount(ch)) {
       ch = ii.query.codePointAt(i);

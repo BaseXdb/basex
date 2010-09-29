@@ -1,5 +1,7 @@
 package org.basex.query.ft;
 
+import static java.lang.StrictMath.*;
+
 /**
  * Simple default scoring model, assembling all scoring calculations.
  *
@@ -22,7 +24,7 @@ public final class Scoring {
    * @return result
    */
   double word(final int tl, final double l) {
-    return Math.min(1, Math.log(1 + LOG * tl / l));
+    return min(1, log(1 + LOG * tl / l));
   }
 
   /**
@@ -79,7 +81,7 @@ public final class Scoring {
    */
   public static int tfIDF(final double freq, final double mfreq,
       final double docs, final double tokens) {
-    return (int) Math.max(2, MP * freq / mfreq * Math.log(1 + docs / tokens));
+    return (int) max(2, MP * freq / mfreq * log(1 + docs / tokens));
   }
 
   /**
@@ -93,7 +95,7 @@ public final class Scoring {
    */
   public static double textNode(final double npv, final double is,
       final double tokl, final double tl) {
-    return Math.max(npv / is, Math.log(tokl * npv + 1) / Math.log(tl + 1));
+    return max(npv / is, log(tokl * npv + 1) / log(tl + 1));
   }
 
   /**
@@ -113,7 +115,7 @@ public final class Scoring {
    * @return score of the phrase
    */
   public static double union(final double w1, final double w2) {
-    return Math.max(w1, w2);
+    return max(w1, w2);
   }
 
   /**

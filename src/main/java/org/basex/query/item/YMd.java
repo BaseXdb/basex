@@ -55,7 +55,7 @@ public final class YMd extends Dur {
     this(it);
     if(Double.isNaN(f)) DATECALC.thrw(ii, desc(), f);
     if(m ? f == 1 / 0d || f == -1 / 0d : f == 0) DATEZERO.thrw(ii, desc());
-    mon = (int) Math.round(m ? mon * f : mon / f);
+    mon = (int) StrictMath.round(m ? mon * f : mon / f);
   }
 
   /**

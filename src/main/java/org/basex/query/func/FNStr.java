@@ -198,7 +198,7 @@ final class FNStr extends Fun {
    */
   private int subPos(final double d) {
     final int i = (int) d;
-    return d == i ? i - 1 : (int) Math.floor(d - .5);
+    return d == i ? i - 1 : (int) StrictMath.floor(d - .5);
   }
 
   /**

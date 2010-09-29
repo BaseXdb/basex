@@ -39,6 +39,11 @@ public class OrderBy extends ParseExpr {
   }
 
   /**
+   * Initializes the sequence builder.
+   */
+  void init() { }
+
+  /**
    * Adds an item to be sorted.
    * @param ctx query context
    * @throws QueryException query exception
@@ -47,16 +52,11 @@ public class OrderBy extends ParseExpr {
   void add(final QueryContext ctx) throws QueryException { }
 
   /**
-   * Resets the built sequence.
-   */
-  void reset() { }
-
-  /**
    * Returns the specified item.
    * @param i item index
    * @return item
    */
-  Item item(final int i) {
+  Item get(final int i) {
     return Itr.get(i);
   }
 

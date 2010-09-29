@@ -67,8 +67,7 @@ final class FNSeq extends Fun {
     if(def == FunDef.HEAD) o = SeqType.Occ.ZO;
 
     // at most one returned item
-    if(def == FunDef.SUBSEQ && expr.length == 3 && expr[2].type().one())
-      o = SeqType.Occ.ZO;
+    if(def == FunDef.SUBSEQ && expr[0].type().one()) o = SeqType.Occ.ZO;
 
     type = SeqType.get(t, o);
     return this;
@@ -211,9 +210,17 @@ final class FNSeq extends Fun {
    * @throws QueryException query exception
    */
   private Iter subsequence(final QueryContext ctx) throws QueryException {
-    final long s = Math.round(checkDbl(expr[1], ctx));
-    final long e = expr.length > 2 ? s + Math.round(checkDbl(expr[2], ctx)) :
-      Long.MAX_VALUE;
+    final double ds = checkDbl(expr[1], ctx);
+    if(Double.isNaN(ds)) return Iter.EMPTY;
+    final long s = StrictMath.round(ds);
+
+    long l = Long.MAX_VALUE;
+    if(expr.length > 2) {
+      final double dl = checkDbl(expr[2], ctx);
+      if(Double.isNaN(dl)) return Iter.EMPTY;
+      l = s + StrictMath.round(dl);
+    }
+    final long e = l;
 
     final Iter iter = ctx.iter(expr[0]);
     final long max = iter.size();

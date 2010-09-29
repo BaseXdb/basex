@@ -2,7 +2,6 @@ package org.basex.query.item;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-import static java.lang.Double.isNaN;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import org.basex.query.QueryException;
@@ -108,17 +107,12 @@ public final class Dec extends Item {
   public int diff(final InputInfo ii, final Item it) throws QueryException {
     final double d = it.dbl(ii);
     return d == 1 / 0.0 ? -1 : d == -1 / 0.0 ? 1 :
-      isNaN(d) ? UNDEF : val.compareTo(it.dec(ii));
+      Double.isNaN(d) ? UNDEF : val.compareTo(it.dec(ii));
   }
 
   @Override
   public Object toJava() {
-    switch(type) {
-      case ULN:
-        return new BigInteger(val.toString());
-      default:
-        return val;
-    }
+    return type == Type.ULN ? new BigInteger(val.toString()) : val;
   }
 
   @Override
@@ -135,7 +129,7 @@ public final class Dec extends Item {
    */
   static BigDecimal parse(final double val, final InputInfo ii)
       throws QueryException {
-    if(isNaN(val) || val == 1 / 0d || val == -1 / 0d)
+    if(Double.isNaN(val) || val == 1 / 0d || val == -1 / 0d)
       Err.value(ii, Type.DEC, val);
     return BigDecimal.valueOf(val);
   }

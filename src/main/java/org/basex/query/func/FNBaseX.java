@@ -15,7 +15,6 @@ import org.basex.query.expr.IndexAccess;
 import org.basex.query.ft.FTIndexAccess;
 import org.basex.query.ft.FTWords;
 import org.basex.query.item.DBNode;
-import org.basex.query.item.Dbl;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Nod;
@@ -60,7 +59,6 @@ final class FNBaseX extends Fun {
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
     switch(def) {
-      case RANDOM: return random();      
       case NODEID: return nodeId(ctx);
       case FSPATH: return fspath(ctx);
       default:     return super.item(ctx, ii);
@@ -168,14 +166,6 @@ final class FNBaseX extends Fun {
   }
 
   /**
-   * Performs the random function.
-   * @return iterator
-   */
-  private Dbl random() {
-    return Dbl.get(Math.random());
-  }
-
-  /**
    * Performs the index function.
    * @param ctx query context
    * @return iterator
@@ -204,10 +194,5 @@ final class FNBaseX extends Fun {
 
     WHICHIDX.thrw(input, tp);
     return null;
-  }
-
-  @Override
-  public boolean uses(final Use u) {
-    return u == Use.CTX && def == FunDef.RANDOM || super.uses(u);
   }
 }

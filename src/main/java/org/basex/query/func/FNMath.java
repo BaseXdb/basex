@@ -1,5 +1,6 @@
 package org.basex.query.func;
-
+ 
+import static java.lang.StrictMath.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -27,24 +28,41 @@ final class FNMath extends Fun {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    if(def == FunDef.PI) return Dbl.get(Math.PI);
-    if(expr[0].empty()) return null;
 
-    final double d = checkDbl(expr[0], ctx);
+    double d = 0;
+    if(expr.length > 0) {
+      if(expr[0].empty()) return null;
+      d = checkDbl(expr[0], ctx);
+    }
+    final double e = expr.length > 1 ? checkDbl(expr[1], ctx) : 0;
+
     switch(def) {
-      case SQRT: return Dbl.get(Math.sqrt(d));
-      case SIN:  return Dbl.get(Math.sin(d));
-      case COS:  return Dbl.get(Math.cos(d));
-      case TAN:  return Dbl.get(Math.tan(d));
-      case ASIN: return Dbl.get(Math.asin(d));
-      case ACOS: return Dbl.get(Math.acos(d));
-      case ATAN: return Dbl.get(Math.atan(d));
-      default:   return super.item(ctx, ii);
+      case PI:    return Dbl.get(PI);
+      case E:     return Dbl.get(E);
+      case SQRT:  return Dbl.get(sqrt(d));
+      case SIN:   return Dbl.get(sin(d));
+      case COS:   return Dbl.get(cos(d));
+      case TAN:   return Dbl.get(tan(d));
+      case ASIN:  return Dbl.get(asin(d));
+      case ACOS:  return Dbl.get(acos(d));
+      case ATAN:  return Dbl.get(atan(d));
+      // project-specific
+      case ATAN2: return Dbl.get(atan2(d, e));
+      case EXP:   return Dbl.get(exp(d));
+      case POW:   return Dbl.get(pow(d, e));
+      case LOG:   return Dbl.get(log(d));
+      case LOG10: return Dbl.get(log10(d));
+      case RAND:  return Dbl.get(random());
+      case SINH:  return Dbl.get(sinh(d));
+      case COSH:  return Dbl.get(cosh(d));
+      case TANH:  return Dbl.get(tanh(d));
+      default:    return super.item(ctx, ii);
     }
   }
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 || super.uses(u);
+    // random() is non-deterministic; don't pre-evaluate
+    return u == Use.X11 || u == Use.CTX && def == FunDef.RAND || super.uses(u);
   }
 }

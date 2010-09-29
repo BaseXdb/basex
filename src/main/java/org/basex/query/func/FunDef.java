@@ -212,51 +212,6 @@ public enum FunDef {
   /** XQuery function. */
   GENID(FNURI, FNNode.class, 0, 1, "generate-id(node?)", STR),
 
-  /* FNFile functions */
-
-  /** XQuery function */
-  FILEEXISTS(FILEURI, FNFile.class, 1, 1, "file-exists(path)", BLN),
-  /** XQuery function */
-  ISDIR(FILEURI, FNFile.class, 1, 1, "is-directory(path)", BLN),
-  /** XQuery function */
-  ISFILE(FILEURI, FNFile.class, 1, 1, "is-file(path)", BLN),
-  /** XQuery function */
-  ISREAD(FILEURI, FNFile.class, 1, 1, "is-readable(path)", BLN),
-  /** XQuery function */
-  ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(path)", BLN),
-  /** XQuery function */
-  LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
-  /** XQuery function */
-  SIZE(FILEURI, FNFile.class, 1, 1, "size(path)", ITR),
-  /** XQuery function */
-  FILES(FILEURI, FNFile.class, 1, 3,
-      "files(path, recursive?, pattern?)", STR_ZM),
-  /** XQuery function */
-  PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
-  /** XQuery function */
-  PATHTOFULL(FILEURI, FNFile.class, 1, 1, "path-to-full-path(path)", STR),
-  /** XQuery function */
-  PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", URI),
-  /** XQuery function */
-  MKDIR(FILEURI, FNFile.class, 1, 2, "mkdir(path, recursive?)", ITEM_Z),
-  /** XQuery function */
-  DELETE(FILEURI, FNFile.class, 1, 2, "delete(path, recursive?)", ITEM_Z),
-  /** XQuery function */
-  READFILE(FILEURI, FNFile.class, 1, 2, "read(path, encoding?)", STR),
-  /** XQuery function */
-  READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(path)", B64),
-  /** XQuery function */
-  WRITE(FILEURI, FNFile.class, 2, 4,
-      "write(path, data, params?, append?)", ITEM_Z),
-  /** XQuery function */
-  WRITEBIN(FILEURI, FNFile.class, 2, 3,
-      "write-binary(path, data, append)", ITEM_Z),
-  /** XQuery function */
-  COPY(FILEURI, FNFile.class, 2, 3,
-      "copy(source, destination, overwrite?)", ITEM_Z),
-  /** XQuery function */
-  MOVE(FILEURI, FNFile.class, 2, 2, "move(source, destination)", ITEM_Z),
-
   /* FNNum functions. */
 
   /** XQuery function. */
@@ -266,7 +221,7 @@ public enum FunDef {
   /** XQuery function. */
   FLOOR(FNURI, FNNum.class, 1, 1, "floor(num)", ITR_ZO),
   /** XQuery function. */
-  RND(FNURI, FNNum.class, 1, 2, "round(num, prec?)", ITR_ZO),
+  ROUND(FNURI, FNNum.class, 1, 2, "round(num, prec?)", ITR_ZO),
   /** XQuery function. */
   RNDHLF(FNURI, FNNum.class, 1, 2, "round-half-to-even(num, prec?)", ITR_ZO),
 
@@ -402,7 +357,7 @@ public enum FunDef {
   /* FNMath functions. */
 
   /** XQuery math function. */
-  PI(MATHURI, FNMath.class, 0, 0, "pi()", ITR_ZO),
+  PI(MATHURI, FNMath.class, 0, 0, "pi()", ITR),
   /** XQuery math function. */
   SQRT(MATHURI, FNMath.class, 1, 1, "sqrt(number)", ITR_ZO),
   /** XQuery math function. */
@@ -417,13 +372,77 @@ public enum FunDef {
   ACOS(MATHURI, FNMath.class, 1, 1, "acos(number)", ITR_ZO),
   /** XQuery math function. */
   ATAN(MATHURI, FNMath.class, 1, 1, "atan(number)", ITR_ZO),
+  /** XQuery math function. */
+  ATAN2(MATHURI, FNMath.class, 1, 1, "atan2(number, number)", ITR_ZO),
+
+  /** XQuery math function (project specific). */
+  POW(MATHURI, FNMath.class, 2, 2, "pow(number, nummber)", ITR_ZO),
+  /** XQuery math function (project specific). */
+  EXP(MATHURI, FNMath.class, 1, 1, "exp(number)", ITR_ZO),
+  /** XQuery math function (project specific). */
+  LOG(MATHURI, FNMath.class, 1, 1, "log(number)", ITR_ZO),
+  /** XQuery math function (project specific). */
+  LOG10(MATHURI, FNMath.class, 1, 1, "log10(number)", ITR_ZO),
+  /** XQuery math function (project specific). */
+  RAND(MATHURI, FNMath.class, 0, 0, "random(number)", ITR_ZO),
+  /** XQuery math function (project specific). */
+  E(MATHURI, FNMath.class, 0, 0, "e()", ITR),
+  /** XQuery math function (project specific). */
+  SINH(MATHURI, FNMath.class, 1, 1, "sinh(number)", ITR_ZO),
+  /** XQuery math function (project specific). */
+  COSH(MATHURI, FNMath.class, 1, 1, "cosh(number)", ITR_ZO),
+  /** XQuery math function (project specific). */
+  TANH(MATHURI, FNMath.class, 1, 1, "tanh(number)", ITR_ZO),
+
+  /* FNFile functions */
+
+  /** XQuery function */
+  FILEEXISTS(FILEURI, FNFile.class, 1, 1, "file-exists(path)", BLN),
+  /** XQuery function */
+  ISDIR(FILEURI, FNFile.class, 1, 1, "is-directory(path)", BLN),
+  /** XQuery function */
+  ISFILE(FILEURI, FNFile.class, 1, 1, "is-file(path)", BLN),
+  /** XQuery function */
+  ISREAD(FILEURI, FNFile.class, 1, 1, "is-readable(path)", BLN),
+  /** XQuery function */
+  ISWRITE(FILEURI, FNFile.class, 1, 1, "is-writeable(path)", BLN),
+  /** XQuery function */
+  LASTMOD(FILEURI, FNFile.class, 1, 1, "last-modified(path)", DAT),
+  /** XQuery function */
+  SIZE(FILEURI, FNFile.class, 1, 1, "size(path)", ITR),
+  /** XQuery function */
+  FILES(FILEURI, FNFile.class, 1, 3,
+      "files(path, recursive?, pattern?)", STR_ZM),
+  /** XQuery function */
+  PATHSEP(FILEURI, FNFile.class, 0, 0, "path-separator()", STR),
+  /** XQuery function */
+  PATHTOFULL(FILEURI, FNFile.class, 1, 1, "path-to-full-path(path)", STR),
+  /** XQuery function */
+  PATHTOURI(FILEURI, FNFile.class, 1, 1, "path-to-uri(path)", URI),
+  /** XQuery function */
+  MKDIR(FILEURI, FNFile.class, 1, 2, "mkdir(path, recursive?)", ITEM_Z),
+  /** XQuery function */
+  DELETE(FILEURI, FNFile.class, 1, 2, "delete(path, recursive?)", ITEM_Z),
+  /** XQuery function */
+  READFILE(FILEURI, FNFile.class, 1, 2, "read(path, encoding?)", STR),
+  /** XQuery function */
+  READBIN(FILEURI, FNFile.class, 1, 1, "read-binary(path)", B64),
+  /** XQuery function */
+  WRITE(FILEURI, FNFile.class, 2, 4,
+      "write(path, data, params?, append?)", ITEM_Z),
+  /** XQuery function */
+  WRITEBIN(FILEURI, FNFile.class, 2, 3,
+      "write-binary(path, data, append)", ITEM_Z),
+  /** XQuery function */
+  COPY(FILEURI, FNFile.class, 2, 3,
+      "copy(source, destination, overwrite?)", ITEM_Z),
+  /** XQuery function */
+  MOVE(FILEURI, FNFile.class, 2, 2, "move(source, destination)", ITEM_Z),
 
   /* FNBaseX functions. */
 
   /** Project specific function - evaluates the specified query. */
   EVAL(BXURI, FNBaseX.class, 1, 1, "eval(string)", ITEM_ZM),
-  /** Project specific function - returns a random number. */
-  RANDOM(BXURI, FNBaseX.class, 0, 0, "random()", ITR),
   /** Project specific function - accesses an index. */
   INDEX(BXURI, FNBaseX.class, 2, 2, "index(item, type)", NOD_ZM),
   /** Project specific function - evaluates the specified query file. */

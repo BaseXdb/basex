@@ -226,14 +226,14 @@ public class FLWOR extends ParseExpr {
 
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
-    final ValueList vl = new ValueList();
     final Iter[] iter = new Iter[fl.length];
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
+    final ValueList vl = new ValueList();
+    order.init(vl);
     iter(ctx, vl, iter, 0);
-    order.vl = vl;
     return ctx.iter(order);
   }
-
+  
   /**
    * Performs a recursive iteration on the specified variable position.
    * @param ctx root reference

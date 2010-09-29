@@ -204,27 +204,36 @@ public final class SeqType {
     }
     if(type == Type.EMP) Err.cast(ii, type, val);
 
-    boolean ins = it.type.instance(type);
-    if(!it.unt() && !ins &&
-      // implicit type promotions
-      (it.type != Type.DEC || type != Type.FLT && type != Type.DBL) &&
-      (it.type != Type.URI || type != Type.STR)) Err.cast(ii, type, it);
-
-    it = check(ins ? it : type.e(it, ctx, ii), ii);
+    it = check(instance(it, ii) ? it : type.e(it, ctx, ii), ii);
     Item n = iter.next();
     if(zeroOrOne() && n != null) Err.cast(ii, type, val);
 
     final ItemIter ir = new ItemIter();
     ir.add(it);
     while(n != null) {
-      ins = n.type.instance(type);
-      if(!n.unt() && !ins) Err.cast(ii, type, n);
-      ir.add(check(ins ? n : type.e(n, ctx, ii), ii));
+      ir.add(check(instance(n, ii) ? n : type.e(n, ctx, ii), ii));
       n = iter.next();
     }
     return ir.finish();
   }
 
+  /**
+   * Returns if item has already correct type.
+   * @param it input item
+   * @param ii input info
+   * @return result of check
+   * @throws QueryException query exception
+   */
+  private boolean instance(final Item it, final InputInfo ii)
+      throws QueryException {
+    final boolean ins = it.type.instance(type);
+    if(!it.unt() && !ins &&
+        // implicit type promotions
+        (!it.num() || type != Type.FLT && type != Type.DBL) &&
+        (it.type != Type.URI || type != Type.STR)) Err.cast(ii, type, it);
+    return ins;
+  }
+  
   /**
    * Combine two sequence types.
    * @param t second type

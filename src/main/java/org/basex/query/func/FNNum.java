@@ -40,9 +40,9 @@ public final class FNNum extends Fun {
     final double d = it.dbl(input);
     switch(def) {
       case ABS:    return abs(it, input);
-      case CEIL:   return num(it, d, Math.ceil(d));
-      case FLOOR:  return num(it, d, Math.floor(d));
-      case RND:    return rnd(it, d, false, ctx);
+      case CEIL:   return num(it, d, StrictMath.ceil(d));
+      case FLOOR:  return num(it, d, StrictMath.floor(d));
+      case ROUND:  return rnd(it, d, false, ctx);
       case RNDHLF: return rnd(it, d, true, ctx);
       default:     return super.item(ctx, ii);
     }
@@ -113,11 +113,11 @@ public final class FNNum extends Fun {
     double c = d;
     if(h2e) {
       c = p == 1 && (c % 2 == .5 || c % 2 == -1.5) ? c - .5 :
-        Math.floor(c * p + .5) / p;
+        StrictMath.floor(c * p + .5) / p;
     } else if(!Double.isNaN(d) && d != 0
         && d >= Long.MIN_VALUE && d < Long.MAX_VALUE) {
       final double dp = d * p;
-      c = (dp >= -.5d && dp < 0 ? -0d : Math.round(dp)) / p;
+      c = (dp >= -.5d && dp < 0 ? -0d : StrictMath.round(dp)) / p;
     }
     return num(it, d, c);
   }
@@ -144,7 +144,7 @@ public final class FNNum extends Fun {
 
   @Override
   public boolean uses(final Use u) {
-    return u == Use.X11 && def == FunDef.RND && expr.length == 2 ||
+    return u == Use.X11 && def == FunDef.ROUND && expr.length == 2 ||
       super.uses(u);
   }
 }

@@ -44,20 +44,18 @@ public final class Order extends ParseExpr {
   @Override
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
-      // cast to int, as expected number of results will be small enough
-      final int e = vl.size();
+      int e, p = -1;
       int[] order;
       Iter ir;
-      int p = -1;
 
       @Override
       public Item next() throws QueryException {
         if(order == null) {
           // enumerate sort array and sort entries
+          e = vl.size();
           order = new int[e];
           for(int i = 0; i < e; ++i) order[i] = i;
           sort(order, 0, e);
-          for(final OrderBy o : ob) o.reset();
         }
 
         while(true) {
@@ -72,6 +70,15 @@ public final class Order extends ParseExpr {
         }
       }
     };
+  }
+
+  /**
+   * Initializes the order expressions.
+   * @param v value list
+   */
+  void init(final ValueList v) {
+    for(final OrderBy o : ob) o.init();
+    vl = v;
   }
 
   /**
@@ -124,7 +131,7 @@ public final class Order extends ParseExpr {
     }
 
     final Item[] im = new Item[ob.length];
-    for(int k = 0; k < ob.length; ++k) im[k] = ob[k].item(o[m]);
+    for(int k = 0; k < ob.length; ++k) im[k] = ob[k].get(o[m]);
 
     int a = s, b = a, c = s + e - 1, d = c;
     while(true) {
@@ -168,7 +175,7 @@ public final class Order extends ParseExpr {
 
     for(int k = 0; k < ob.length; ++k) {
       final OrderBy or = ob[k];
-      final Item m = or.item(o[a]);
+      final Item m = or.get(o[a]);
       final Item n = it[k];
       final boolean x = m == null;
       final boolean y = n == null;
@@ -189,8 +196,8 @@ public final class Order extends ParseExpr {
    */
   private int d(final int[] o, final int a, final int b) throws QueryException {
     for(final OrderBy l : ob) {
-      final Item m = l.item(o[a]);
-      final Item n = l.item(o[b]);
+      final Item m = l.get(o[a]);
+      final Item n = l.get(o[b]);
       final boolean x = m == null;
       final boolean y = n == null;
       final int c = x ? y ? 0 : l.lst ? -1 : 1 : y ? l.lst ? 1 : -1 :

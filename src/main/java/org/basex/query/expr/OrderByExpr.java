@@ -36,7 +36,6 @@ public final class OrderByExpr extends OrderBy {
   public OrderByExpr(final InputInfo ii, final Expr e, final boolean d,
       final boolean l) {
     super(ii);
-    seq = new ItemIter();
     expr = e;
     desc = d;
     lst = l;
@@ -47,6 +46,11 @@ public final class OrderByExpr extends OrderBy {
     expr = checkUp(expr, ctx).comp(ctx);
     type = expr.type();
     return this;
+  }
+
+  @Override
+  void init() {
+    seq = new ItemIter();
   }
 
   @Override
@@ -62,12 +66,7 @@ public final class OrderByExpr extends OrderBy {
   }
 
   @Override
-  void reset() {
-    seq = new ItemIter();
-  }
-
-  @Override
-  Item item(final int i) {
+  Item get(final int i) {
     return seq.get(i);
   }
 

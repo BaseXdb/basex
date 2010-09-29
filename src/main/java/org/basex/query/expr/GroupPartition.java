@@ -183,6 +183,7 @@ final class GroupPartition {
     final ItemIter ir = new ItemIter();
     final ValueList vl = new ValueList();
     if(pggv == null) cacheRet(ctx);
+    if(order != null) order.init(vl);
 
     for(int i = 0; i < part.size(); ++i) {
       final GroupNode gn = part.get(i);
@@ -199,11 +200,7 @@ final class GroupPartition {
         vl.add(ret.value(ctx));
       } else ir.add(ctx.iter(ret));
     }
-    if(order != null) {
-      order.vl = vl;
-      return ctx.iter(order);
-    }
-    return ir;
+    return order != null ? ctx.iter(order) : ir;
   }
 
   /**
