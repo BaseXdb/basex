@@ -78,26 +78,25 @@ class Query:
 
 STREAM PROTOCOL ----------------------------------------------------------------
 
- {} = item or flag; 0 = marker for end of item
+ {} = item or flag; \0 = marker for end of item
  
  Authentication:
  1. Client connects to server socket
- 2. Server sends timestamp
- 3. Client sends username and hash: username 0 md5(md5(password) + timestamp) 0
- 4. Server sends 0 (successful) or 1 (error)
+ 2. Server sends timestamp: {timestamp} \0
+ 3. Client sends username and hash: {username} \0 {md5(md5(password) + timestamp)} \0
+ 4. Server sends {0} (successful) or {1} (error)
 
  Client streams:
- - standard mode:        -> {command} 0
- - iterative mode: start -> {0} {query} 0
-                   next  -> {1} {id} 0
-                   end   -> {2} {id} 0
+ - standard mode:        -> {command} \0
+ - iterative mode: start -> {0} {query} \0
+                   next  -> {1} {id} \0
+                   end   -> {2} {id} \0
 
  Server streams:
- - standard mode:  success -> {result} 0 {info} 0 {0}
-                   error   -> {0} 0 {error} 0 {1}
- - iterative mode: start   -> {id} 0 {0}
-                   next    -> {item} 0 {0}
-                   error   -> {0} {1} {error}
-
+ - standard mode:  success -> {result} \0 {info} \0 {0}
+                   error   -> \0 {error} \0 {1}
+ - iterative mode: start   -> {id} \0 {0}
+                   next    -> {item} \0 {0}
+                   error   -> \0 {1} {error} \0
 
 ============================================= DBIS Group, University of Konstanz
