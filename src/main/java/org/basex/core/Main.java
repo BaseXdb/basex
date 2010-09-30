@@ -195,7 +195,7 @@ public abstract class Main {
    */
   protected final String password() {
     // use standard input if no console if defined (such as in Eclipse)
-    if(!NOCONSOLE) return input();
+    if(NOCONSOLE) return input();
     // hide password
     final char[] pw = System.console().readPassword();
     return pw != null ? new String(pw) : "";
