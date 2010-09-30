@@ -1,6 +1,7 @@
 package org.basex.gui.view.tree;
 
 import static org.basex.gui.GUIConstants.*;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Transparency;
@@ -171,14 +172,13 @@ public final class TreeView extends View implements TreeViewOptions {
       sub = new TreeSubtree(data);
       tr = new TreeRects(gui.prop);
     }
-    
+
     if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT) 
       sub.generateBorders(c);
-    
-    if((winChange = windowSizeChanged()) && paintType == -1 || 
-        paintType == PAINT_NEW_INIT
-        || paintType == PAINT_NEW_CONTEXT || paintType == 
-          PAINT_NEW_WINDOW_SIZE) {
+
+    if((winChange = windowSizeChanged()) && paintType == -1
+        || paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT
+        || paintType == PAINT_NEW_WINDOW_SIZE) {
       treedist = tr.generateRects(sub, g, c, wwidth);
       nes = treedist == -1;
       if(!nes) {
@@ -491,7 +491,7 @@ public final class TreeView extends View implements TreeViewOptions {
     final int size = sub.getMaxSubtreeHeight();
     final IntList list = new IntList();
     final int rl = roots.length;
-    
+
     final int rs = getTreePerX(x);
     final int re = getTreePerX(x + w);
 
@@ -506,19 +506,19 @@ public final class TreeView extends View implements TreeViewOptions {
           final int s = sub.getLevelSize(r, i);
 
           if(tr.isBigRectangle(sub, r, i)) {
-                        
+
             if(rl > 1) {
               final TreeBorder tb = sub.getTreeBorder(r, i);
               final int si = tb.size;
-              
+
               for(int n = 0; n < si; ++n) {
                 list.add(sub.getPrePerIndex(r, i, n));
               }
 
             } else {
               final int mw = rlv[0].w;
-              
-              int sPrePos = (int) (s  * x / (double) mw);
+
+              int sPrePos = (int) (s * x / (double) mw);
               int ePrePos = (int) (s * (x + w) / (double) mw);
 
               if(sPrePos < 0) sPrePos = 0;
@@ -538,7 +538,7 @@ public final class TreeView extends View implements TreeViewOptions {
     }
     gui.notify.mark(new Nodes(list.toArray(), gui.context.data), this);
   }
-  
+
   /**
    * Creates a new translucent BufferedImage.
    * @return new translucent BufferedImage
@@ -1148,13 +1148,12 @@ public final class TreeView extends View implements TreeViewOptions {
   }
 
   @Override
-  public void mouseClicked(final MouseEvent e) {
+  public void mousePressed(final MouseEvent e) {
     final boolean left = SwingUtilities.isLeftMouseButton(e);
     final boolean right = !left;
     if(!inFocus || !right && !left || frect == null) return;
 
     if(left) {
-
       if(flv >= sub.getSubtreeHeight(frn)) return;
 
       if(tr.isBigRectangle(sub, frn, flv)) {
@@ -1172,12 +1171,15 @@ public final class TreeView extends View implements TreeViewOptions {
       } else {
         gui.notify.mark(0, null);
       }
+      if(e.getClickCount() > 1) {
+        gui.notify.context(gui.context.marked, false, this);
+        refreshContext(false, false);
+      }
+    } else {
+      if(!isMarked(mousePosX, mousePosY)) {
+        gui.notify.mark(0, null);        
+      }
     }
-    if(e.getClickCount() > 1) {
-      gui.notify.context(gui.context.marked, false, this);
-      refreshContext(false, false);
-    }
-
   }
 
   @Override
