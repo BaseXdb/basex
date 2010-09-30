@@ -60,7 +60,7 @@ public final class ValueBuilder extends IndexBuilder {
     abort();
 
     final Performance perf = Util.debug ? new Performance() : null;
-    Util.debug(det() + COL);
+    Util.debug(det());
 
     final String f = text ? DATATXT : DATAATV;
     final int k = text ? Data.TEXT : Data.ATTR;

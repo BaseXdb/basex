@@ -42,7 +42,7 @@ public final class CreateIndex extends ACreate {
           break;
         case ATTRIBUTE:
           data.meta.atvindex = true;
-          index = IndexType.ATTV;
+          index = IndexType.ATTRIBUTE;
           break;
         case FULLTEXT:
           data.meta.ftxindex = true;
@@ -51,7 +51,7 @@ public final class CreateIndex extends ACreate {
           data.meta.casesens = prop.is(Prop.CASESENS);
           data.meta.diacritics = prop.is(Prop.DIACRITICS);
           data.meta.scoring = prop.num(Prop.SCORING);
-          index = IndexType.FTXT;
+          index = IndexType.FULLTEXT;
           break;
         case PATH:
           index = IndexType.PATH;
@@ -63,7 +63,7 @@ public final class CreateIndex extends ACreate {
       index(index, data);
       data.flush();
 
-      return info(INDCREATED, perf);
+      return info(INDCREATED, index, perf);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(ex.getMessage());

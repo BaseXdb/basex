@@ -34,16 +34,17 @@ public final class DropIndex extends ACreate {
     final Data data = context.data;
     if(data instanceof MemData) return error(PROCMM);
 
-    switch(getOption(CmdIndex.class)) {
+    final CmdIndex cmd = getOption(CmdIndex.class);
+    switch(cmd) {
       case TEXT:
         data.meta.txtindex = false;
         return drop(IndexType.TEXT, DATATXT);
       case ATTRIBUTE:
         data.meta.atvindex = false;
-        return drop(IndexType.ATTV, DATAATV);
+        return drop(IndexType.ATTRIBUTE, DATAATV);
       case FULLTEXT:
         data.meta.ftxindex = false;
-        return drop(IndexType.FTXT, DATAFTX);
+        return drop(IndexType.FULLTEXT, DATAFTX);
       case PATH:
         if(data.meta.pthindex) {
           data.meta.pthindex = false;
@@ -68,7 +69,7 @@ public final class DropIndex extends ACreate {
       data.flush();
       data.closeIndex(index);
       return DropDB.drop(data.meta.name, pat + "." + IO.BASEXSUFFIX, prop) ?
-          info(INDDROP, perf) : error(INDDROP);
+          info(INDDROP, index, perf) : error(INDDROPERROR, index);
     } catch(final IOException ex) {
       Util.debug(ex);
       return error(ex.getMessage());

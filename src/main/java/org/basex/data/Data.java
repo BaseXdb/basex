@@ -161,9 +161,9 @@ public abstract class Data {
    */
   public final synchronized IndexIterator ids(final IndexToken token) {
     switch(token.type()) {
-      case TEXT: return txtindex.ids(token);
-      case ATTV: return atvindex.ids(token);
-      case FTXT: return ftxindex.ids(token);
+      case TEXT:      return txtindex.ids(token);
+      case ATTRIBUTE: return atvindex.ids(token);
+      case FULLTEXT:  return ftxindex.ids(token);
       default:  return null;
     }
   }
@@ -177,9 +177,9 @@ public abstract class Data {
     // token too long.. no results can be expected
     if(token.get().length > MAXLEN) return Integer.MAX_VALUE;
     switch(token.type()) {
-      case TEXT: return txtindex.nrIDs(token);
-      case ATTV: return atvindex.nrIDs(token);
-      case FTXT: return ftxindex.nrIDs(token);
+      case TEXT:      return txtindex.nrIDs(token);
+      case ATTRIBUTE: return atvindex.nrIDs(token);
+      case FULLTEXT:  return ftxindex.nrIDs(token);
       default:  return Integer.MAX_VALUE;
     }
   }
@@ -201,13 +201,13 @@ public abstract class Data {
    */
   public final synchronized byte[] info(final IndexType type) {
     switch(type) {
-      case TAG: return tags.info();
-      case ATTN: return atts.info();
-      case TEXT: return txtindex.info();
-      case ATTV: return atvindex.info();
-      case FTXT: return ftxindex.info();
-      case PATH: return path.info(this);
-      default:  return EMPTY;
+      case TAG:       return tags.info();
+      case ATTNAME:   return atts.info();
+      case TEXT:      return txtindex.info();
+      case ATTRIBUTE: return atvindex.info();
+      case FULLTEXT:  return ftxindex.info();
+      case PATH:      return path.info(this);
+      default:        return EMPTY;
     }
   }
 

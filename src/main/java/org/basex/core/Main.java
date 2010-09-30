@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
 import java.util.Scanner;
+import org.basex.core.Commands.Cmd;
 import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.CreateUser;
 import org.basex.core.cmd.Exit;
@@ -24,6 +25,8 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public abstract class Main {
+  /** Flag for using default standard input. */
+  private static final boolean NOCONSOLE = System.console() == null;
   /** Database context. */
   public final Context context = new Context();
   /** Successful command line parsing. */
@@ -39,7 +42,7 @@ public abstract class Main {
   protected boolean console;
   /** Verbose mode. */
   protected boolean verbose;
-
+  
   /**
    * Constructor.
    * @param args command-line arguments
@@ -66,7 +69,7 @@ public abstract class Main {
   protected final boolean console() throws IOException {
     while(console) {
       Util.out("> ");
-      for(final String in : input()) {
+      for(final String in : inputs()) {
         if(in.length() != 0 && !execute(in)) return true;
       }
     }
@@ -160,26 +163,40 @@ public abstract class Main {
   }
 
   /**
-   * Returns a list of commands from standard input.
-   * @return list of commands
+   * Returns multiple lines from standard input.
+   * @return list of strings
    */
-  protected final StringList input() {
+  protected final StringList inputs() {
     final StringList sl = new StringList();
+    // find end of input from interactive user input
     final Scanner scan = new Scanner(System.in).useDelimiter("\\z");
     if(scan.hasNext()) {
-      final Scanner items = new Scanner(scan.next());
-      while(items.hasNextLine()) sl.add(items.nextLine());
+      // catch several lines sent from redirected standard input
+      final Scanner lines = new Scanner(scan.next());
+      while(lines.hasNextLine()) sl.add(lines.nextLine());
     }
-    if(sl.size() == 0) sl.add("");
+    // no more input: send exit command
+    if(sl.size() == 0) sl.add(Cmd.EXIT.toString());
     return sl;
   }
 
+  /**
+   * Returns a single line from standard input.
+   * @return string
+   */
+  protected final String input() {
+    final Scanner sc = new Scanner(System.in);
+    return sc.hasNextLine() ? sc.nextLine().trim() : "";
+  }
+  
   /**
    * Returns a password from standard input.
    * @return password
    */
   protected final String password() {
-    if(System.console() == null) return input().get(0);
+    // use standard input if no console if defined (such as in Eclipse)
+    if(!NOCONSOLE) return input();
+    // hide password
     final char[] pw = System.console().readPassword();
     return pw != null ? new String(pw) : "";
   }

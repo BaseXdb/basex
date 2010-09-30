@@ -261,7 +261,7 @@ public final class CmpG extends Cmp {
     if(!text && !attr) return false;
 
     // support expressions
-    final IndexType ind = text ? IndexType.TEXT : IndexType.ATTV;
+    final IndexType ind = text ? IndexType.TEXT : IndexType.ATTRIBUTE;
     final Expr arg = expr[1];
     if(!arg.value()) {
       final SeqType t = arg.type();

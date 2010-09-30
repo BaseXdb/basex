@@ -149,9 +149,9 @@ public class CreateDB extends ACreate {
       final Data data = builder.build(name);
       if(data.meta.txtindex) data.setIndex(IndexType.TEXT,
         new ValueBuilder(data, true).build());
-      if(data.meta.atvindex) data.setIndex(IndexType.ATTV,
+      if(data.meta.atvindex) data.setIndex(IndexType.ATTRIBUTE,
         new ValueBuilder(data, false).build());
-      if(data.meta.ftxindex) data.setIndex(IndexType.FTXT,
+      if(data.meta.ftxindex) data.setIndex(IndexType.FULLTEXT,
         FTBuilder.get(data, data.meta.wildcards).build());
       data.close();
     } catch(final IOException ex) {

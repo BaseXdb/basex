@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.basex.BaseX;
 import org.basex.io.IOFile;
 import org.basex.util.StringList;
 import org.basex.util.Token;
@@ -133,7 +132,7 @@ public final class Lang {
 
     try {
       // supported protocols: jar and file
-      final URL url = BaseX.class.getResource("/" + SUFFIX);
+      final URL url = Lang.class.getResource("/" + SUFFIX);
       if(url.getProtocol().equals("jar")) {
         final JarURLConnection conn = (JarURLConnection) url.openConnection();
         final String pre = conn.getEntryName();

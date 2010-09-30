@@ -1,5 +1,6 @@
 package org.basex.build;
 
+import static org.basex.core.Text.*;
 import static org.basex.build.BuildText.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
@@ -77,7 +78,7 @@ public abstract class Builder extends Progress {
    */
   protected final void parse(final String name) throws IOException {
     final Performance perf = Util.debug ? new Performance() : null;
-    Util.debug("Database: ");
+    Util.debug(tit() + DOTS);
 
     // add document node and parse document
     parser.parse(this);
@@ -342,7 +343,7 @@ public abstract class Builder extends Progress {
     }
     if(meta.size != 1) inDoc = true;
 
-    if(Util.debug && c++ % 0x7FFFF == 0) Util.err(".");
+    if(Util.debug && (c++ & 0x7FFFF) == 0) Util.err(".");
 
     // check if data ranges exceed database limits,
     // based on the storage details in {@link Data}

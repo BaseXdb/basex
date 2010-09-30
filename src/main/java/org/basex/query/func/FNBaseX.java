@@ -189,7 +189,7 @@ final class FNBaseX extends Fun {
     }
     if(tp.equals(ATTRIBUTE)) {
       if(!data.meta.atvindex) NOIDX.thrw(input, ATTRIBUTE);
-      return new IndexAccess(input, expr[0], IndexType.ATTV, ic).iter(ctx);
+      return new IndexAccess(input, expr[0], IndexType.ATTRIBUTE, ic).iter(ctx);
     }
 
     WHICHIDX.thrw(input, tp);

@@ -93,8 +93,8 @@ public abstract class ACreate extends Command {
    */
   protected final void index(final Data data) throws IOException {
     if(data.meta.txtindex) index(IndexType.TEXT, data);
-    if(data.meta.atvindex) index(IndexType.ATTV, data);
-    if(data.meta.ftxindex) index(IndexType.FTXT, data);
+    if(data.meta.atvindex) index(IndexType.ATTRIBUTE, data);
+    if(data.meta.ftxindex) index(IndexType.FULLTEXT, data);
   }
 
   /**
@@ -110,8 +110,8 @@ public abstract class ACreate extends Command {
     IndexBuilder b = null;
     switch(i) {
       case TEXT: b = new ValueBuilder(d, true); break;
-      case ATTV: b = new ValueBuilder(d, false); break;
-      case FTXT: b = FTBuilder.get(d, d.meta.wildcards); break;
+      case ATTRIBUTE: b = new ValueBuilder(d, false); break;
+      case FULLTEXT: b = FTBuilder.get(d, d.meta.wildcards); break;
       case PATH: b = new PathBuilder(d); break;
       default: break;
     }

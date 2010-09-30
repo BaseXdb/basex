@@ -23,7 +23,7 @@ public final class RangeToken implements IndexToken {
    * @param mx maximum value
    */
   public RangeToken(final boolean i, final double mn, final double mx) {
-    ind = i ? IndexType.TEXT : IndexType.ATTV;
+    ind = i ? IndexType.TEXT : IndexType.ATTRIBUTE;
     min = mn;
     max = mx;
   }

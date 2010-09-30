@@ -375,9 +375,9 @@ db_notexported=Database could not be exported to '%'.
 db_notdeleted=File '%' could not be deleted.
 
 # Index commands
-in_created=Index created in %.
-in_dropped=Index dropped in %.
-in_notdropped=Index could not be dropped.
+in_created=Index '%' created in %.
+in_dropped=Index '%' dropped in %.
+in_notdropped=Index '%' could not be dropped.
 
 # Server Info
 srv_login=Access denied.

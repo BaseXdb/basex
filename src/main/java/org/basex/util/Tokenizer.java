@@ -104,7 +104,7 @@ public final class Tokenizer implements IndexToken {
 
   @Override
   public IndexType type() {
-    return IndexType.FTXT;
+    return IndexType.FULLTEXT;
   }
 
   /**

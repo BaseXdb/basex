@@ -61,7 +61,7 @@ public final class InfoIndex extends AInfo {
         return true;
       case ATTNAME:
         out.println(INFOATTS);
-        out.println(data.info(IndexType.ATTN));
+        out.println(data.info(IndexType.ATTNAME));
         return true;
       case TEXT:
         out.println(INFOTEXTINDEX);
@@ -69,11 +69,11 @@ public final class InfoIndex extends AInfo {
         return true;
       case ATTRIBUTE:
         out.println(INFOATTRINDEX);
-        if(data.meta.atvindex) out.println(data.info(IndexType.ATTV));
+        if(data.meta.atvindex) out.println(data.info(IndexType.ATTRIBUTE));
         return true;
       case FULLTEXT:
         out.println(INFOFTINDEX);
-        if(data.meta.ftxindex) out.println(data.info(IndexType.FTXT));
+        if(data.meta.ftxindex) out.println(data.info(IndexType.FULLTEXT));
         return true;
       case PATH:
         out.println(INFOPATHINDEX);

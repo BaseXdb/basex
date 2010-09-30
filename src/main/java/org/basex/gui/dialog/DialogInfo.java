@@ -149,7 +149,7 @@ public final class DialogInfo extends Dialog {
     tab4.add(panels[1]);
 
     panels[2].add(indexes[2], BorderLayout.NORTH);
-    panels[2].add(text(val[2] ? data.info(IndexType.ATTV) :
+    panels[2].add(text(val[2] ? data.info(IndexType.ATTRIBUTE) :
       Token.token(ATTINDEXINFO)), BorderLayout.CENTER);
     tab4.add(panels[2]);
 
@@ -160,7 +160,7 @@ public final class DialogInfo extends Dialog {
 
     panels[3].add(indexes[3], BorderLayout.NORTH);
     if(!val[3]) ft = new DialogFT(this, false);
-    panels[3].add(val[3] ? text(data.info(IndexType.FTXT)) : ft,
+    panels[3].add(val[3] ? text(data.info(IndexType.FULLTEXT)) : ft,
         BorderLayout.CENTER);
     tab5.add(panels[3]);
 
@@ -195,7 +195,7 @@ public final class DialogInfo extends Dialog {
     String lbl = tag ? INFOTAGS : INFOATTS;
     if(!data.meta.uptodate) lbl += " (" + INFOOUTOFDATED + ")";
     p.add(new BaseXLabel(lbl, false, true), BorderLayout.NORTH);
-    final IndexType index = tag ? IndexType.TAG : IndexType.ATTN;
+    final IndexType index = tag ? IndexType.TAG : IndexType.ATTNAME;
     p.add(text(data.info(index)), BorderLayout.CENTER);
     return p;
   }

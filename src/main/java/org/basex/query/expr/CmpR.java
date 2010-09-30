@@ -167,7 +167,7 @@ public final class CmpR extends Single {
     final AxisPath path = orig.invertPath(root, ic.step);
 
     ic.ctx.compInfo(OPTRNGINDEX);
-    if(rt.type() == IndexType.ATTV) {
+    if(rt.type() == IndexType.ATTRIBUTE) {
       // add attribute step
       final Step step = orig.step[0];
       Step[] steps = { Step.get(input, Axis.SELF, step.test) };

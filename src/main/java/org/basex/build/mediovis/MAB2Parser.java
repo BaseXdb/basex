@@ -169,9 +169,9 @@ public final class MAB2Parser extends Parser {
       else entry.pos(pos);
 
       if(Util.debug) {
-        if(++i % 50000 == 0) Util.err(" " + i + "\n");
-        else if(i % 5000 == 0) Util.err("!");
-        else if(i % 1000 == 0) Util.err(".");
+        if((++i & 0x7FFF) == 0) Util.err(" " + i + "\n");
+        else if((i & 0xFFF) == 0) Util.err("!");
+        else if((i & 0x3FF) == 0) Util.err(".");
       }
     }
 

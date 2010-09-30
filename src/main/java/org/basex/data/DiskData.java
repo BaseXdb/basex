@@ -136,17 +136,17 @@ public final class DiskData extends Data {
     texts.close();
     values.close();
     closeIndex(IndexType.TEXT);
-    closeIndex(IndexType.ATTV);
-    closeIndex(IndexType.FTXT);
+    closeIndex(IndexType.ATTRIBUTE);
+    closeIndex(IndexType.FULLTEXT);
   }
 
   @Override
   public void closeIndex(final IndexType type) throws IOException {
     switch(type) {
-      case TEXT: if(txtindex != null) txtindex.close(); break;
-      case ATTV: if(atvindex != null) atvindex.close(); break;
-      case FTXT: if(ftxindex != null) ftxindex.close(); break;
-      case PATH: if(ftxindex != null) path.close(); break;
+      case TEXT:      if(txtindex != null) txtindex.close(); break;
+      case ATTRIBUTE: if(atvindex != null) atvindex.close(); break;
+      case FULLTEXT:  if(ftxindex != null) ftxindex.close(); break;
+      case PATH:      if(ftxindex != null) path.close(); break;
       default: break;
     }
   }
@@ -154,10 +154,10 @@ public final class DiskData extends Data {
   @Override
   public void setIndex(final IndexType type, final Index index) {
     switch(type) {
-      case TEXT: if(meta.txtindex) txtindex = index; break;
-      case ATTV: if(meta.atvindex) atvindex = index; break;
-      case FTXT: if(meta.ftxindex) ftxindex = index; break;
-      case PATH: if(meta.pthindex) path = (PathSummary) index; break;
+      case TEXT:      if(meta.txtindex) txtindex = index; break;
+      case ATTRIBUTE: if(meta.atvindex) atvindex = index; break;
+      case FULLTEXT:  if(meta.ftxindex) ftxindex = index; break;
+      case PATH:      if(meta.pthindex) path = (PathSummary) index; break;
       default: break;
     }
   }

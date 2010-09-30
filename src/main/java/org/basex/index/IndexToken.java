@@ -9,11 +9,11 @@ package org.basex.index;
 public interface IndexToken {
   /** Index types. */
   public enum IndexType {
-    /** Attribute index. */ ATTN,
+    /** Attribute names. */ ATTNAME,
     /** Tag index.       */ TAG,
     /** Text index.      */ TEXT,
-    /** Attribute index. */ ATTV,
-    /** Full-text index. */ FTXT,
+    /** Attribute index. */ ATTRIBUTE,
+    /** Full-text index. */ FULLTEXT,
     /** Path index. */      PATH
   }
 

@@ -44,7 +44,7 @@ public final class BaseXClient extends BaseX {
       // user/password input
       while(user == null) {
         Util.out(SERVERUSER + COLS);
-        user = input().get(0);
+        user = input();
       }
       while(pass == null) {
         Util.out(SERVERPW + COLS);

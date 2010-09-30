@@ -89,7 +89,7 @@ public abstract class FTBuilder extends IndexBuilder {
     abort();
 
     final Performance perf = Util.debug ? new Performance() : null;
-    Util.debug(det() + COL);
+    Util.debug(det());
 
     for(pre = 0; pre < size; ++pre) {
       if((pre & 0xFFFF) == 0) check();
