@@ -336,6 +336,8 @@ public final class CommandParser extends InputParser {
     consumeWS();
     final TokenBuilder tb = new TokenBuilder();
     while(letterOrDigit(curr()) || curr('.') || curr('-')) tb.add(consume());
+    char check = consume();
+    if(check != 0 && check != ' ') return finish(cmd, new TokenBuilder());
     return finish(cmd, tb);
   }
 
