@@ -25,7 +25,7 @@ interface TreeViewOptions {
   /** Slim rectangles to text length. */
   boolean SLIM_TO_TEXT = true;
   /** Show extra node information. */
-  boolean SHOW_EXTRA_INFO = true;
+  boolean SHOW_EXTRA_INFO = false;
   /** Draw node text. */
   boolean DRAW_NODE_TEXT = true;
   /** Show 3d descendant connection. */
@@ -39,7 +39,7 @@ interface TreeViewOptions {
   /** Margin to bottom. */
   int BOTTOM_MARGIN = 5;
   /** Margin left and right. */
-  int LEFT_AND_RIGHT_MARGIN = 3;  
+  int LEFT_AND_RIGHT_MARGIN = 2;  
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
   /** Highlight Color small space. */
