@@ -46,6 +46,8 @@ public final class TreeView extends View implements TreeViewOptions {
   private int wwidth = -1;
   /** Window height. */
   private int wheight = -1;
+  /** Window start. */
+  private int wstart;
   /** Current Image of visualization. */
   private BufferedImage treeImage;
   /** Notified focus flag. */
@@ -179,7 +181,7 @@ public final class TreeView extends View implements TreeViewOptions {
     if((winChange = windowSizeChanged()) && paintType == -1
         || paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT
         || paintType == PAINT_NEW_WINDOW_SIZE) {
-      treedist = tr.generateRects(sub, g, c, wwidth);
+      treedist = tr.generateRects(sub, g, c, wstart, wwidth);
       nes = treedist == -1;
       if(!nes) {
         markedImage = null;
@@ -218,29 +220,28 @@ public final class TreeView extends View implements TreeViewOptions {
     inFocus = paintType < 0 ? focus() : false;
 
     if(inFocus && !winChange) {
-      int focused = gui.context.focused;
-
-      if(tr.isBigRectangle(sub, frn, flv)) {
-
-        final int f = getMostSizedNode(data, frn, flv, frect, focused);
-        if(f >= 0) focused = f;
+           
+      if(!refreshedFocus && tr.isBigRectangle(sub, frn, flv)) {
+        final int f = getMostSizedNode(data, frn, flv, frect, fpre);
+        if(f >= 0) fpre = f;
       }
 
-      highlightNode(g, frn, flv, frect, focused, -1, DRAW_HIGHLIGHT);
+      highlightNode(g, frn, flv, frect, fpre, -1, DRAW_HIGHLIGHT);
 
       if(SHOW_EXTRA_INFO) {
         g.setColor(new Color(0xeeeeee));
         g.fillRect(0, wheight - fontHeight - 6, wwidth, fontHeight + 6);
         final Data d = gui.context.data;
-        final int k = d.kind(focused);
-        final int s = d.size(focused, k);
-        final int as = d.attSize(focused, k);
+        final int k = d.kind(fpre);
+        final int s = d.size(fpre, k);
+        final int as = d.attSize(fpre, k);
         g.setColor(Color.BLACK);
-        g.drawString("pre: " + focused + " level: " + flv + "  level-size: "
+        g.drawString("pre: " + fpre + " level: " + flv + "  level-size: "
             + sub.getLevelSize(frn, flv) + "  node-size: " + (s - as)
-            + "  node: " + Token.string(ViewData.tag(gui.prop, d, focused)), 2,
+            + "  node: " + Token.string(ViewData.tag(gui.prop, d, fpre)), 2,
             wheight - 6);
       }
+      refreshedFocus = false;
     }
     paintType = -1;
     gui.painting = false;
@@ -428,6 +429,7 @@ public final class TreeView extends View implements TreeViewOptions {
       g.setColor(fillColor);
       g.fillRect(xx + 1, y + 1, ww - 1, h - 1);
     }
+
     if(txt && (fill || !FILL_RECTANGLES)) {
       g.setColor(textColor);
       drawRectangleText(g, rn, lv, r, pre);
@@ -510,22 +512,21 @@ public final class TreeView extends View implements TreeViewOptions {
             if(rl > 1) {
               final TreeBorder tb = sub.getTreeBorder(r, i);
               final int si = tb.size;
-
               for(int n = 0; n < si; ++n) {
                 list.add(sub.getPrePerIndex(r, i, n));
               }
-
             } else {
               final int mw = rlv[0].w;
 
-              int sPrePos = (int) (s * x / (double) mw);
-              int ePrePos = (int) (s * (x + w) / (double) mw);
+              int sPrePos = (int) (s * (x - wstart) / (double) mw);
+              int ePrePos = (int) (s * (x - wstart + w) / (double) mw);
 
               if(sPrePos < 0) sPrePos = 0;
               if(ePrePos >= s) ePrePos = s - 1;
 
-              while(sPrePos++ < ePrePos)
+              do {
                 list.add(sub.getPrePerIndex(r, i, sPrePos));
+              } while(sPrePos++ < ePrePos);
             }
           } else {
             for(int j = 0; j < s; ++j) {
@@ -617,7 +618,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final TreeRect r) {
     final int idx = sub.getPreIndex(rn, lv, pre);
     final double ratio = idx / (double) sub.getLevelSize(rn, lv);
-    return r.x + (int) Math.round((r.w - 1) * ratio) + 1;
+    return r.x + (int) Math.round((r.w) * ratio) + 1;
   }
 
   /**
@@ -668,7 +669,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final TreeRect r, final int pre, final int px, final byte t) {
 
     if(lv == -1) return;
-
+    
     final boolean br = tr.isBigRectangle(sub, rn, lv);
     final boolean isRoot = roots[rn] == pre;
     final int height = sub.getSubtreeHeight(rn);
@@ -962,31 +963,28 @@ public final class TreeView extends View implements TreeViewOptions {
    */
   private boolean focus() {
     if(refreshedFocus) {
-
-      final int pre = gui.context.focused;
+      fpre = gui.context.focused;
 
       for(int r = 0; r < roots.length; ++r) {
         for(int i = 0; i < sub.getSubtreeHeight(r); ++i) {
 
           if(tr.isBigRectangle(sub, r, i)) {
-            final int index = sub.getPreIndex(r, i, pre);
+            final int index = sub.getPreIndex(r, i, fpre);
 
             if(index > -1) {
               frn = r;
               frect = tr.getTreeRectsPerLevel(r, i)[0];
               flv = i;
-              refreshedFocus = false;
               return true;
             }
           } else {
 
-            final TreeRect rect = tr.searchRect(sub, r, i, pre);
+            final TreeRect rect = tr.searchRect(sub, r, i, fpre);
 
             if(rect != null) {
               frn = r;
               frect = rect;
               flv = i;
-              refreshedFocus = false;
               return true;
             }
           }
@@ -1044,7 +1042,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @return tree number
    */
   private int getTreePerX(final int x) {
-    return (int) (x / treedist);
+    return (int) ((x - wstart) / treedist);
   }
 
   /**
@@ -1088,9 +1086,10 @@ public final class TreeView extends View implements TreeViewOptions {
    */
   private boolean windowSizeChanged() {
     if(wwidth > -1 && wheight > -1 && getHeight() == wheight
-        && getWidth() == wwidth) return false;
+        && getWidth() == wwidth + 2 * LEFT_AND_RIGHT_MARGIN) return false;
     wheight = getHeight();
-    wwidth = getWidth();
+    wstart = LEFT_AND_RIGHT_MARGIN;
+    wwidth = getWidth() - 2 * LEFT_AND_RIGHT_MARGIN;
     return true;
   }
 
@@ -1158,8 +1157,9 @@ public final class TreeView extends View implements TreeViewOptions {
 
       if(tr.isBigRectangle(sub, frn, flv)) {
         final Nodes ns = new Nodes(gui.context.data);
-        final int sum = getHitBigRectNodesNum(frn, flv, frect);
+        int sum = getHitBigRectNodesNum(frn, flv, frect);
         final int fix = sub.getPreIndex(frn, flv, fpre);
+        if(fix + sum + 1 == sub.getLevelSize(frn, flv)) ++sum;
         final int[] m = new int[sum];
         for(int i = 0; i < sum; ++i) {
           final int pre = sub.getPrePerIndex(frn, flv, i + fix);
@@ -1177,7 +1177,7 @@ public final class TreeView extends View implements TreeViewOptions {
       }
     } else {
       if(!isMarked(mousePosX, mousePosY)) {
-        gui.notify.mark(0, null);        
+        gui.notify.mark(0, null);
       }
     }
   }

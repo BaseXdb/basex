@@ -32,15 +32,16 @@ final class TreeRects implements TreeViewOptions {
    * @param sub subtree
    * @param g graphics reference
    * @param c context
-   * @param sw screen width
+   * @param ds draw start
+   * @param dw draw width
    * @return tree distance
    */
   double generateRects(final TreeSubtree sub, final Graphics g,
-      final Context c, final int sw) {
+      final Context c, final int ds, final int dw) {
     final int[] roots = c.current.nodes;
     final int rl = roots.length;
     if(rl == 0) return 0;
-    final double w = (sw - BORDER_PADDING) / (double) rl;
+    final double w = (dw - BORDER_PADDING - ds) / (double) rl;
     if(w < 2) {
       return -1;
     }
@@ -48,7 +49,7 @@ final class TreeRects implements TreeViewOptions {
     rects = new TreeRect[rl][][];
 
     for(int i = 0; i < rl; ++i) {
-      generateRects(sub, c, g, i, w);
+      generateRects(sub, c, g, i, ds, w);
     }
     return w;
   }
@@ -59,11 +60,12 @@ final class TreeRects implements TreeViewOptions {
    * @param rn root number
    * @param c context
    * @param sub subtree
-   * @param sw screen width
+   * @param ds draw start
+   * @param dw draw width
    * @return tree distance
    */
   private int generateRects(final TreeSubtree sub, final Context c,
-      final Graphics g, final int rn, final double sw) {
+      final Graphics g, final int rn, final int ds, final double dw) {
 
     final int h = sub.getSubtreeHeight(rn);
     rects[rn] = new TreeRect[h][];
@@ -71,12 +73,12 @@ final class TreeRects implements TreeViewOptions {
 
     for(int lv = 0; lv < h; ++lv) {
 
-      w = sw / sub.getLevelSize(rn, lv);
+      w = dw / sub.getLevelSize(rn, lv);
 
       if(w < 2) {
-        bigRectangle(rn, lv, sw);
+        bigRectangle(rn, lv, ds, dw);
       } else {
-        normalRectangle(sub, c, g, rn, lv, w);
+        normalRectangle(sub, c, g, rn, lv, ds, w);
       }
     }
     return (int) w;
@@ -86,12 +88,14 @@ final class TreeRects implements TreeViewOptions {
    * Invoked if not enough space for more than one big rectangle.
    * @param rn root
    * @param lv level
+   * @param ds draw start
    * @param w the width
    */
-  private void bigRectangle(final int rn, final int lv, final double w) {
+  private void bigRectangle(final int rn, final int lv, final int ds, 
+      final double w) {
     rects[rn][lv] = new TreeRect[1];
-    rects[rn][lv][0] = new TreeRect((int) (w * rn) + BORDER_PADDING, (int) w
-        - BORDER_PADDING);
+    rects[rn][lv][0] = new TreeRect((int) (w * rn) + BORDER_PADDING + ds, 
+        (int) w - BORDER_PADDING);
   }
 
   /**
@@ -101,16 +105,18 @@ final class TreeRects implements TreeViewOptions {
    * @param rn root
    * @param lv level
    * @param c context
+   * @param ds draw start
    * @param w width
    */
   private void normalRectangle(final TreeSubtree sub, final Context c,
-      final Graphics g, final int rn, final int lv, final double w) {
+      final Graphics g, final int rn, final int lv, final int ds, 
+      final double w) {
 
     final int subSi = sub.getLevelSize(rn, lv);
     // new array, to be filled with the rectangles of the current level
     rects[rn][lv] = new TreeRect[subSi];
 
-    double xx = rn * w * subSi;
+    double xx = rn * w * subSi + ds;
     double ww = w;
 
     for(int i = 0; i < subSi; ++i) {
