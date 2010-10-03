@@ -3,6 +3,7 @@ package org.basex.query.expr;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
+import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 
 /**
@@ -27,6 +28,11 @@ public abstract class Simple extends ParseExpr {
 
   @Override
   public boolean uses(final Use u) {
+    return false;
+  }
+
+  @Override
+  public final boolean uses(final Var v) {
     return false;
   }
 

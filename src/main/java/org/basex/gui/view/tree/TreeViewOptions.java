@@ -35,11 +35,11 @@ interface TreeViewOptions {
   /** Border padding value. */
   int BORDER_PADDING = 2;
   /** Margin to top. */
-  int TOP_MARGIN = 2;
+  int TOP_MARGIN = 6;
   /** Margin to bottom. */
-  int BOTTOM_MARGIN = 5;
+  int BOTTOM_MARGIN = 9;
   /** Margin left and right. */
-  int LEFT_AND_RIGHT_MARGIN = 2;  
+  int LEFT_AND_RIGHT_MARGIN = 4;
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
   /** Highlight Color small space. */
