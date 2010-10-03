@@ -125,7 +125,6 @@ public final class BaseXServer extends Main implements Runnable {
       Util.stack(ex);
     }
     console = false;
-    context.close();
     Performance.sleep(100);
   }
 

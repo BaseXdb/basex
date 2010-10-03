@@ -42,7 +42,7 @@ public interface Text {
   /** Mail. */
   String MAIL = NAMELC + "-talk@mailman.uni-konstanz.de";
   /** Code version. */
-  String VERSION = "6.2.9";
+  String VERSION = "6.3";
   /** Company info. */
   String COMPANY = "DBIS, University of Konstanz";
   /** Version information. */
@@ -105,8 +105,6 @@ public interface Text {
 
   /** Server was started. */
   String SERVERSTART = lang("srv_start");
-  /** Server was stopped. */
-  String SERVERSTOPPING = lang("srv_stopping") + DOTS;
   /** Server was stopped. */
   String SERVERSTOPPED = lang("srv_stop");
   /** Server is running or permission was denied. */

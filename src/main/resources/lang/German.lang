@@ -385,7 +385,6 @@ srv_connect=Server ist nicht erreichbar.
 srv_timeout=Prozess hat Time-Out überschritten.
 srv_bind=Server läuft, oder der Zugriff wurde untersagt.
 srv_start=Server wurde gestartet.
-srv_stopping=Stoppe Server
 srv_stop=Server wurde gestoppt.
 srv_user=Benutzer
 srv_pw=Passwort

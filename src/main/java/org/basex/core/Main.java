@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
 import java.util.Scanner;
+import org.basex.BaseXServer;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.CreateUser;
@@ -56,9 +57,8 @@ public abstract class Main {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
-        Util.outln("Stopping server...");
         context.close();
-        Util.outln(SERVERSTOPPED);
+        if(Main.this instanceof BaseXServer) Util.outln(SERVERSTOPPED);
       }
     });
   }
