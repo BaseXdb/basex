@@ -33,7 +33,7 @@ public final class GUIProp extends AProp {
   /** Green GUI color factor. */
   public static final Object[] COLORGREEN = { "COLORGREEN", 16 };
   /** Blue GUI color factor. */
-  public static final Object[] COLORBLUE = { "COLORBLUE", 8 };
+  public static final Object[] COLORBLUE = { "COLORBLUE", 7 };
 
   // MAIN WINDOW OPTIONS ======================================================
 

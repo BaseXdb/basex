@@ -383,6 +383,7 @@ srv_connect=Không liên lạc được với máy chủ.
 srv_timeout=Lệnh hỏi của bạn đã hết giới hạn thời gian.
 srv_bind=Máy chủ đang chạy hay không được phép.
 srv_start=Server was started.
+srv_stopping=Stopping server
 srv_stop=Server was stopped.
 srv_user=Username
 srv_pw=Password

@@ -58,7 +58,7 @@ final class TableHeader extends BaseXPanel {
    */
   TableHeader(final TableView v) {
     super(v.gui);
-    setMode(Fill.UP);
+    setMode(Fill.NONE);
     tdata = v.tdata;
     view = v;
     BaseXLayout.setHeight(this, gui.prop.num(GUIProp.FONTSIZE) + 8 << 1);

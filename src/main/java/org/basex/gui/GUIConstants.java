@@ -89,8 +89,8 @@ public final class GUIConstants {
   /** Toolbar entries, containing the button commands. */
   static final GUICommand[] TOOLBAR = {
     GOBACK, GOUP, GOFORWARD, GOHOME, null, CREATE, OPEN, INFO, null,
-      SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWFOLDER,
-      SHOWTABLE, SHOWPLOT, SHOWTREE, SHOWEXPLORE, null, SHOWHELP
+      SHOWXQUERY, SHOWINFO, null, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER,
+      SHOWPLOT, SHOWTABLE, SHOWEXPLORE, null, SHOWHELP
   };
 
   // MENUBARS =================================================================
@@ -115,8 +115,8 @@ public final class GUIConstants {
     COPYPATH, FILTER
   }, {
     MENUMAIN, SHOWMENU, SHOWBUTTONS, SHOWINPUT, SHOWSTATUS, SEPARATOR,
-    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWFOLDER, SHOWTABLE, SHOWPLOT,
-    SHOWTREE, SHOWEXPLORE, SEPARATOR, FULL
+    MENUVIEWS, SHOWTEXT, SHOWMAP, SHOWTREE, SHOWFOLDER, SHOWPLOT, SHOWTABLE, 
+    SHOWEXPLORE, SEPARATOR, FULL
   }, {
     MENUINTER, RTEXEC, RTFILTER, SEPARATOR,
     MENULAYOUT, COLOR, FONTS, MAPLAYOUT,
@@ -179,8 +179,7 @@ public final class GUIConstants {
   public static enum Fill {
     /** Opaque fill mode.  */ PLAIN,
     /** Transparent mode.  */ NONE,
-    /** Upward gradient.   */ UP,
-    /** Downward gradient. */ DOWN
+    /** Downward gradient. */ GRADIENT
   }
 
   // COLORS ===================================================================
@@ -200,15 +199,8 @@ public final class GUIConstants {
   /** Colors of full-text hits. */
   public static final Color COLORFT = new Color(0, 192, 0);
 
-  /** Transparent background color. */
-  public static Color back;
-  /** Transparent frame color. */
-  public static Color frame;
-
-  /** GUI color. */
-  public static Color color;
   /** Bright GUI color. */
-  public static Color color1;
+  public static Color color1 = Color.white;
   /** Second bright GUI color. */
   public static Color color2;
   /** Middle color. */
@@ -216,12 +208,8 @@ public final class GUIConstants {
   /** Middle color. */
   public static Color color4;
   /** Dark color. */
-  public static Color color6;
+  public static Color color5;
 
-  /** Mark color, custom alpha value. */
-  public static Color colormarkA;
-  /** Second mark color, custom alpha value. */
-  public static Color colormark2A;
   /** Mark color. */
   public static Color colormark1;
   /** Second mark color. */
@@ -230,6 +218,17 @@ public final class GUIConstants {
   public static Color colormark3;
   /** Fourth mark color. */
   public static Color colormark4;
+
+  /** Alpha color. */
+  public static Color colorA;
+  /** Transparent background color. */
+  public static Color color2A;
+  /** Transparent frame color. */
+  public static Color color3A;
+  /** Mark color, custom alpha value. */
+  public static Color colormarkA;
+  /** Second mark color, custom alpha value. */
+  public static Color colormark2A;
 
   /** Cached treemap colors. */
   public static final Color[] COLORS = new Color[IO.MAXHEIGHT];
@@ -283,12 +282,11 @@ public final class GUIConstants {
 
     // calculate color c:
     // c = (255 - expectedColor) * 10 / factor (= GUIRED/BLUE/GREEN)
-    color = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
-    color1 = new Color(col(r, 8), col(g, 7), col(b, 6));
     color2 = new Color(col(r, 24), col(g, 25), col(b, 40));
     color3 = new Color(col(r, 32), col(g, 32), col(b, 44));
     color4 = new Color(col(r, 48), col(g, 50), col(b, 40));
-    color6 = new Color(col(r, 140), col(g, 100), col(b, 70));
+    color5 = new Color(col(r, 140), col(g, 100), col(b, 70));
+    colorA = new Color(col(r, 110), col(g, 150), col(b, 160), 100);
 
     colormarkA = new Color(col(r, 32), col(g, 160), col(b, 320), 100);
     colormark2A = new Color(col(r, 16), col(g, 80), col(b, 160), 100);
@@ -303,8 +301,8 @@ public final class GUIConstants {
         Math.max(255 - l * g, 0), Math.max(255 - l * b, 0));
     }
     final Color c = COLORS[16];
-    back = new Color(c.getRed(), c.getGreen(), c.getBlue(), 40);
-    frame = new Color(c.getRed(), c.getGreen(), c.getBlue(), 100);
+    color2A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 40);
+    color3A = new Color(c.getRed(), c.getGreen(), c.getBlue(), 100);
 
     dfont = new Font(prop.get(GUIProp.MONOFONT), 0,
         UIManager.getFont("TextArea.font").getSize() - 1);

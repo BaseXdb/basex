@@ -30,9 +30,6 @@ public class CmdTest {
   private static final String FILE = "etc/xml/input.xml";
   /** Test folder. */
   private static final String FLDR = "etc/xml";
-  /* Test url.
-  private static final String URL =
-    "http://www.inf.uni-konstanz.de/dbis/basex/dl/xml.xml";  */
   /** Test name. */
   private static final String NAME = "input";
   /** Test name. */
@@ -72,7 +69,6 @@ public class CmdTest {
     ok(new CreateDB(NAME));
     ok(new Add(FILE, "input"));
     ok(new Add(FILE, "input"));
-    //ok(new Add(URL, "xml"));
     ok(new Add(FLDR, "xml"));
   }
 

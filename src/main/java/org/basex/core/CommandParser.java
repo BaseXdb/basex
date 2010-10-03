@@ -336,9 +336,7 @@ public final class CommandParser extends InputParser {
     consumeWS();
     final TokenBuilder tb = new TokenBuilder();
     while(letterOrDigit(curr()) || curr('.') || curr('-')) tb.add(consume());
-    char check = consume();
-    if(check != 0 && check != ' ') return finish(cmd, new TokenBuilder());
-    return finish(cmd, tb);
+    return finish(cmd, !more() || curr(';') || ws(curr()) ? tb : null);
   }
 
   /**
@@ -350,22 +348,26 @@ public final class CommandParser extends InputParser {
    */
   private boolean key(final String key, final Cmd cmd) throws QueryException {
     consumeWS();
-    final boolean ok = consume(key) || consume(key.toLowerCase());
-    if(!ok && cmd != null) help(null, cmd);
-    consumeWS();
+    final int p = qp;
+    final boolean ok = (consume(key) || consume(key.toLowerCase())) &&
+      (curr(0) || ws(curr()));
+    if(!ok) {
+      qp = p;
+      if(cmd != null) help(null, cmd);
+    }
     return ok;
   }
 
   /**
-   * Parses and returns a name.
+   * Parses and returns a string result.
    * @param cmd referring command; if specified, the result must not be empty
-   * @param s input string
-   * @return name
+   * @param s input string, or {@code null} if invalid
+   * @return string result, or {@code null}
    * @throws QueryException query exception
    */
   private String finish(final Cmd cmd, final TokenBuilder s)
       throws QueryException {
-    if(s.size() != 0) return s.toString();
+    if(s != null && s.size() != 0) return s.toString();
     if(cmd != null) help(null, cmd);
     return null;
   }
@@ -381,7 +383,16 @@ public final class CommandParser extends InputParser {
     final TokenBuilder tb = new TokenBuilder();
     if(curr() == '-') tb.add(consume());
     while(digit(curr())) tb.add(consume());
-    return finish(cmd, tb);
+    return finish(cmd, !more() || curr(';') || ws(curr()) ? tb : null);
+  }
+
+  /**
+   * Consumes all whitespace characters from the beginning of the remaining
+   * query.
+   */
+  private void consumeWS() {
+    while(qp < ql && qu.charAt(qp) <= ' ') ++qp;
+    qm = qp - 1;
   }
 
   /**

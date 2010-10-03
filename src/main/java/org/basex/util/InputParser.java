@@ -117,19 +117,6 @@ public abstract class InputParser {
   }
 
   /**
-   * Consumes all whitespace characters from the beginning of the remaining
-   * query.
-   */
-  protected final void consumeWS() {
-    while(qp < ql) {
-      final char ch = qu.charAt(qp);
-      if(ch <= 0 || ch > ' ') break;
-      ++qp;
-    }
-    qm = qp - 1;
-  }
-
-  /**
    * Peeks forward and consumes the string if it equals the specified one.
    * @param str string to consume
    * @return true if string was found

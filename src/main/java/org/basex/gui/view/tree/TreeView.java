@@ -316,7 +316,7 @@ public final class TreeView extends View implements TreeViewOptions {
     int xx = x;
     final int y = getYperLevel(lv);
     int nh = nodeHeight;
-    g.setColor(GUIConstants.back);
+    g.setColor(GUIConstants.color2A);
     while(nh > 0) {
       nh -= ss;
       if(nh < 0) nh = 0;
@@ -381,7 +381,7 @@ public final class TreeView extends View implements TreeViewOptions {
         fill = FILL_RECTANGLES;
         break;
       case DRAW_HIGHLIGHT:
-        borderColor = color6;
+        borderColor = color5;
         final int alpha = 0xDD000000;
         final int rgb = GUIConstants.COLORCELL.getRGB();
         fillColor = new Color(rgb + alpha, true);

@@ -106,6 +106,8 @@ public interface Text {
   /** Server was started. */
   String SERVERSTART = lang("srv_start");
   /** Server was stopped. */
+  String SERVERSTOPPING = lang("srv_stopping") + DOTS;
+  /** Server was stopped. */
   String SERVERSTOPPED = lang("srv_stop");
   /** Server is running or permission was denied. */
   String SERVERBIND = lang("srv_bind");

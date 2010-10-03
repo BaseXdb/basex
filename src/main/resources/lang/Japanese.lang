@@ -388,6 +388,7 @@ srv_connect=サーバーと通信できません。
 srv_timeout=タイムアウトになりました。
 srv_bind=サーバーが既に起動しているか、権限が足りません。
 srv_start=サーーバーが開始しました。
+srv_stopping=Stopping server
 srv_stop=サーバーが停止しました。
 srv_user=ユーザー名
 srv_pw=パスワード

@@ -24,7 +24,7 @@ public abstract class View extends BaseXPanel {
    */
   protected View(final String name, final byte[] hlp, final ViewNotifier man) {
     super(hlp, man.gui);
-    setMode(GUIConstants.Fill.DOWN);
+    setMode(GUIConstants.Fill.GRADIENT);
     setName(name);
     setFocusable(true);
     addMouseListener(this);

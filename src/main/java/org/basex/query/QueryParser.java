@@ -2213,7 +2213,7 @@ public class QueryParser extends InputParser {
     do {
       QNm[] codes = {};
       do {
-        consumeWS();
+        skipWS();
         if(XMLToken.isNCStartChar(curr())) {
           codes = Array.add(codes, new QNm(qName(QNAMEINV)));
         } else {

@@ -380,11 +380,12 @@ in_dropped=Index gelöscht (%).
 in_notdropped=Index konnte nicht gelöscht werden.
 
 # Server Info
-srv_login=Zugriff verweigert.
+srv_login=Zugriff wurde verweigert.
 srv_connect=Server ist nicht erreichbar.
-srv_timeout=Der Prozess hat das Timeout überschritten.
-srv_bind=Server läuft, oder Zugriff wurde untersagt.
+srv_timeout=Prozess hat Time-Out überschritten.
+srv_bind=Server läuft, oder der Zugriff wurde untersagt.
 srv_start=Server wurde gestartet.
+srv_stopping=Stoppe Server
 srv_stop=Server wurde gestoppt.
 srv_user=Benutzer
 srv_pw=Passwort

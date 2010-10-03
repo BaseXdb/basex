@@ -376,7 +376,7 @@ public final class MapView extends View implements Runnable {
       final int y = f.y;
       final int w = f.w;
       final int h = f.h;
-      g.setColor(color6);
+      g.setColor(color5);
       g.drawRect(x, y, w, h);
       g.drawRect(x + 1, y + 1, w - 2, h - 2);
 

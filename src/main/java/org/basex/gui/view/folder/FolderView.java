@@ -22,7 +22,6 @@ import org.basex.data.Data;
 import org.basex.data.Nodes;
 import org.basex.gui.GUIFS;
 import org.basex.gui.GUIProp;
-import org.basex.gui.GUIConstants.Fill;
 import org.basex.gui.dialog.Dialog;
 import org.basex.gui.layout.BaseXBar;
 import org.basex.gui.layout.BaseXLayout;
@@ -75,7 +74,6 @@ public final class FolderView extends View {
   public FolderView(final ViewNotifier man) {
     super(FOLDERVIEW, HELPFOLDER, man);
     createBoxes();
-    setMode(Fill.UP);
     setLayout(new BorderLayout());
     scroll = new BaseXBar(this);
     add(scroll, BorderLayout.EAST);
@@ -281,7 +279,7 @@ public final class FolderView extends View {
     BaseXLayout.chopString(g, name, xx, yy - fsz, tw - xx - 10, fsz);
 
     if(gui.context.focused == pre) {
-      g.setColor(color6);
+      g.setColor(color5);
       g.drawRect(1, yy - boxW - boxMargin, totalW - 3, lineH + 1);
       g.drawRect(2, yy - boxW - boxMargin + 1, totalW - 5, lineH - 1);
     }
@@ -360,7 +358,7 @@ public final class FolderView extends View {
         BufferedImage.TYPE_INT_ARGB);
     Graphics2D g = emptyBox.createGraphics();
     smooth(g);
-    g.setColor(color6);
+    g.setColor(color5);
     g.fillOval((boxW >> 2) - 1, (boxW >> 2) + 1, boxW >> 1, boxW >> 1);
     g.setColor(color4);
     g.fillOval((boxW >> 2) - 2, boxW >> 2, boxW >> 1, boxW >> 1);
@@ -373,7 +371,7 @@ public final class FolderView extends View {
     Polygon p = new Polygon(new int[] { 0, boxW, boxW >> 1 }, new int[] {
         boxW - sp >> 1, boxW - sp >> 1, boxW }, 3);
     p.translate(0, -1);
-    g.setColor(color6);
+    g.setColor(color5);
     g.fillPolygon(p);
     p.translate(-1, -1);
     g.setColor(color4);
@@ -387,7 +385,7 @@ public final class FolderView extends View {
     p = new Polygon(new int[] { boxW - sp >> 1, boxW, boxW - sp >> 1 },
         new int[] { 0, boxW >> 1, boxW }, 3);
     p.translate(-1, 1);
-    g.setColor(color6);
+    g.setColor(color5);
     g.fillPolygon(p);
     p.translate(-1, -1);
     g.setColor(color4);

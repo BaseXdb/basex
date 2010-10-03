@@ -267,10 +267,10 @@ public final class PlotView extends View {
     final Graphics g = img.getGraphics();
     smooth(g);
 
-    Color c = color;
+    Color c = colorA;
     if(marked) c = colormarkA;
     if(markedSub) c = colormark2A;
-    if(focus) c = color6;
+    if(focus) c = color5;
 
     g.setColor(c);
     g.fillOval(0, 0, size, size);
@@ -295,7 +295,7 @@ public final class PlotView extends View {
     drawAxis(g, false);
 
     // draw items
-    g.setColor(color6);
+    g.setColor(color5);
     for(int i = 0; i < plotData.size; ++i) {
       drawItem(g, plotData.xAxis.co[i],
           plotData.yAxis.co[i], false, false, false);
@@ -403,14 +403,14 @@ public final class PlotView extends View {
 
     // draw selection box
     if(dragging) {
-      g.setColor(back);
+      g.setColor(color2A);
       final int selW = selectionBox.w;
       final int selH = selectionBox.h;
       final int x1 = selectionBox.x;
       final int y1 = selectionBox.y;
       g.fillRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
-      g.setColor(frame);
+      g.setColor(color3A);
       g.drawRect(selW > 0 ? x1 : x1 + selW, selH > 0 ? y1 : y1 + selH,
           Math.abs(selW), Math.abs(selH));
     }
@@ -509,7 +509,7 @@ public final class PlotView extends View {
    * @param drawX drawn axis is x axis
    */
   private void drawAxis(final Graphics g, final boolean drawX) {
-    g.setColor(back);
+    g.setColor(color2A);
 
     final int sz = sizeFactor();
     // the painting space provided for items which lack no value
@@ -732,7 +732,7 @@ public final class PlotView extends View {
 
     // ... after that
     // the image and the grid line are drawn beside x / y axis
-    g.setColor(back);
+    g.setColor(color2A);
     if(drawX) {
       final int y = h - MARGIN[2];
       g.drawImage(img, pos - imgW + textH - fs + 3, y, this);
@@ -787,7 +787,7 @@ public final class PlotView extends View {
     final int w = getWidth();
     final int fs = gui.prop.num(GUIProp.FONTSIZE);
     final int sf = sizeFactor();
-    g.setColor(back);
+    g.setColor(color2A);
 
     if(cap != null) {
       if(cap.length() > MAXL) cap = cap.substring(0, CUTOFF) + "..";

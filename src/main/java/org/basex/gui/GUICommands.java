@@ -552,7 +552,22 @@ public enum GUICommands implements GUICommand {
   },
 
   /** Shows the tree view. */
-  SHOWFOLDER(GUISHOWFOLDER, "% 3", GUISHOWFOLDERTT, true, true) {
+  SHOWTREE(GUISHOWTREE, "% 3", GUISHOWTREETT, true, true) {
+    @Override
+    public void execute(final GUI gui) {
+      gui.prop.invert(GUIProp.SHOWTREE);
+      gui.layoutViews();
+    }
+
+    @Override
+    public void refresh(final GUI gui, final AbstractButton b) {
+      super.refresh(gui, b);
+      select(b, gui.prop.is(GUIProp.SHOWTREE));
+    }
+  },
+
+  /** Shows the tree view. */
+  SHOWFOLDER(GUISHOWFOLDER, "% 4", GUISHOWFOLDERTT, true, true) {
     @Override
     public void execute(final GUI gui) {
       gui.prop.invert(GUIProp.SHOWFOLDER);
@@ -563,21 +578,6 @@ public enum GUICommands implements GUICommand {
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
       select(b, gui.prop.is(GUIProp.SHOWFOLDER));
-    }
-  },
-
-  /** Shows the table view. */
-  SHOWTABLE(GUISHOWTABLE, "% 4", GUISHOWTABLETT, true, true) {
-    @Override
-    public void execute(final GUI gui) {
-      gui.prop.invert(GUIProp.SHOWTABLE);
-      gui.layoutViews();
-    }
-
-    @Override
-    public void refresh(final GUI gui, final AbstractButton b) {
-      super.refresh(gui, b);
-      select(b, gui.prop.is(GUIProp.SHOWTABLE));
     }
   },
 
@@ -596,18 +596,18 @@ public enum GUICommands implements GUICommand {
     }
   },
 
-  /** Shows the tree view. */
-  SHOWTREE(GUISHOWTREE, "% 6", GUISHOWTREETT, true, true) {
+  /** Shows the table view. */
+  SHOWTABLE(GUISHOWTABLE, "% 6", GUISHOWTABLETT, true, true) {
     @Override
     public void execute(final GUI gui) {
-      gui.prop.invert(GUIProp.SHOWTREE);
+      gui.prop.invert(GUIProp.SHOWTABLE);
       gui.layoutViews();
     }
 
     @Override
     public void refresh(final GUI gui, final AbstractButton b) {
       super.refresh(gui, b);
-      select(b, gui.prop.is(GUIProp.SHOWTREE));
+      select(b, gui.prop.is(GUIProp.SHOWTABLE));
     }
   },
 

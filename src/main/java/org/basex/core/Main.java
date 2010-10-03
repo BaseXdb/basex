@@ -56,7 +56,9 @@ public abstract class Main {
     Runtime.getRuntime().addShutdownHook(new Thread() {
       @Override
       public void run() {
+        Util.outln("Stopping server...");
         context.close();
+        Util.outln(SERVERSTOPPED);
       }
     });
   }

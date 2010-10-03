@@ -234,7 +234,7 @@ public final class BaseXDSlider extends BaseXPanel {
     BaseXLayout.drawCell(g, r.xs, r.xe + ARROW, 2, h - 2, false);
 
     if(r.xs + ARROW < r.xe) {
-      g.setColor(color6);
+      g.setColor(color5);
       g.drawLine(r.xs + ARROW, 3, r.xs + ARROW, h - 4);
       g.drawLine(r.xe - 1, 3, r.xe - 1, h - 4);
       g.setColor(Color.white);
@@ -250,7 +250,7 @@ public final class BaseXDSlider extends BaseXPanel {
     final Polygon pol = new Polygon(
         new int[] { r.xs + 11, r.xs + 5, r.xs + 5, r.xs + 11 },
         new int[] { hh - 5, hh - 1, hh, hh + 5 }, 4);
-    g.setColor(focus ? color6 : COLORBUTTON);
+    g.setColor(focus ? color5 : COLORBUTTON);
     g.fillPolygon(pol);
     pol.xpoints = new int[] { r.xe + 5, r.xe + 12, r.xe + 12, r.xe + 5 };
     g.fillPolygon(pol);

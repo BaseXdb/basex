@@ -61,7 +61,6 @@ public final class InfoView extends View {
    */
   public InfoView(final ViewNotifier man) {
     super(INFOVIEW, HELPINFOO, man);
-    setMode(Fill.UP);
     setBorder(6, 8, 8, 8);
     setLayout(new BorderLayout());
 
