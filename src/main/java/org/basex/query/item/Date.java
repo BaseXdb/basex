@@ -152,8 +152,7 @@ public abstract class Date extends Item {
     final long d1 = days();
     final Date d = (Date) (it.date() ? it : type.e(it, null, ii));
     final long d2 = d.days();
-    return d1 == d2 && seconds().doubleValue() ==
-      ((Date) it).seconds().doubleValue();
+    return d1 == d2 && seconds().doubleValue() == d.seconds().doubleValue();
   }
 
   @Override
@@ -162,7 +161,7 @@ public abstract class Date extends Item {
     final Date d = (Date) (it.date() ? it : type.e(it, null, ii));
     final long d2 = d.days();
     if(d1 != d2) return (int) (d1 - d2);
-    return seconds().subtract(((Date) it).seconds()).signum();
+    return seconds().subtract(d.seconds()).signum();
   }
 
   @Override
