@@ -1,5 +1,6 @@
 package org.basex.gui.view.tree;
 
+import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
 
 import java.awt.Color;
@@ -90,13 +91,13 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param man view manager
    */
   public TreeView(final ViewNotifier man) {
-    super(TREEVIEW, null, man);
+    super(TREEVIEW, HELPTREE, man);
     new BaseXPopup(this, GUIConstants.POPUP);
   }
 
   @Override
   public void refreshContext(final boolean more, final boolean quick) {
-    paintType = PAINT_NEW_CONTEXT;
+    paintType = sub == null ? PAINT_NEW_INIT : PAINT_NEW_CONTEXT;
     repaint();
   }
 
@@ -341,7 +342,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final int w = markedImage.getWidth();
       if(y > h || y < 0 || x > w || x < 0) return false;
       final int marc = markedImage.getRGB(x, y);
-      return colormark1.getRGB() == marc || colormarkA.getRGB() == marc;
+      return colormark1.equals(marc) || colormarkA.equals(marc);
     }
     return false;
   }
@@ -420,7 +421,7 @@ public final class TreeView extends View implements TreeViewOptions {
         }
         break;
     }
-
+    
     if(border) {
       g.setColor(borderColor);
       g.drawRect(xx, y, ww, h);

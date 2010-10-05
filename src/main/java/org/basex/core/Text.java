@@ -1299,6 +1299,8 @@ public interface Text {
   /** Help string. */
   byte[] HELPMAP = token(lang("h_map"));
   /** Help string. */
+  byte[] HELPTREE = token(lang("h_tree"));
+  /** Help string. */
   byte[] HELPPLOT = token(lang("h_plot"));
   /** Help string. */
   byte[] HELPFOLDER = token(lang("h_folder"));
