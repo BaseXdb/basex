@@ -463,7 +463,7 @@ public final class GUI extends JFrame {
         updating = false;
       }
       final String time = perf.getTimer();
-
+      
       // show query info
       info.setInfo(inf, c, time, ok);
       info.reset();
@@ -474,7 +474,7 @@ public final class GUI extends JFrame {
         query.info(inf, ok);
         feedback = true;
       }
-
+      
       // check if query feedback was evaluated in the query view
       if(!ok) {
         // display error in info view
@@ -485,7 +485,8 @@ public final class GUI extends JFrame {
         final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
 
         // treat text view different to other views
-        if(ok && ao.size() != 0 && nodes == null) {
+        // [CG] fix for empty sequences
+        if(ok && nodes == null) {
           // display text view
           if(!text.visible()) GUICommands.SHOWTEXT.execute(this);
           text.setText(ao, c);
@@ -493,7 +494,7 @@ public final class GUI extends JFrame {
 
         final Data ndata = context.data;
         Nodes marked = context.marked;
-
+        
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();
