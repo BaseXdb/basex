@@ -543,13 +543,15 @@ public final class QueryContext extends Progress {
   private void addDocs(final DBNode db, final String path) {
     final NodIter col = new NodIter();
     final Data data = db.data;
-    
+    boolean tmp = path.equals("");
+    if(!tmp) doc = new DBNode[1]; docs = 0;
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       final DBNode dbn = new DBNode(data, p);
-      if(!path.equals("")) {
+      if(!tmp) {
         if(Token.string(dbn.base()).toLowerCase().
             contains(path.toLowerCase())) {
           col.add(dbn);
+          addDoc(dbn);
         }
       } else {
         col.add(dbn);

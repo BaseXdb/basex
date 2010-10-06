@@ -352,7 +352,7 @@ public class AxisPath extends Path {
           final Step prev = step[j - 1];
           inv = Array.add(inv, Step.get(input, a, prev.test, prev.pred));
         } else if(a != Axis.ANC && a != Axis.ANCORSELF) {
-          inv = Array.add(inv, Step.get(input, a, Test.DOC));
+          inv = Array.add(inv, Step.get(input, a, new DocTest(ctx)));
         }
       }
       final boolean simple = inv.length == 0 && newPreds.length == 0;
