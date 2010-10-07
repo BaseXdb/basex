@@ -296,7 +296,7 @@ public final class PlotView extends View {
 
     // draw items
     g.setColor(color5);
-    for(int i = 0; i < plotData.size; ++i) {
+    for(int i = 0; i < plotData.pres.length; ++i) {
       drawItem(g, plotData.xAxis.co[i],
           plotData.yAxis.co[i], false, false, false);
     }
@@ -517,10 +517,11 @@ public final class PlotView extends View {
     final int pHeight = plotHeight - sz;
 
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
+    
     // drawing horizontal axis line
     if(drawX) {
       if(plotChanged) {
-        axis.calcCaption(pWidth);
+        if(plotData.pres.length > 0) axis.calcCaption(pWidth);
         final Kind kind = plotData.xAxis.type;
         xLog.setEnabled((kind == Kind.DBL || kind == Kind.INT) &&
             Math.abs(axis.min - axis.max) >= 1);
@@ -528,7 +529,7 @@ public final class PlotView extends View {
     } else {
       // drawing vertical axis line
       if(plotChanged) {
-        axis.calcCaption(pHeight);
+        if(plotData.pres.length > 0) axis.calcCaption(pHeight);
         final Kind kind = plotData.yAxis.type;
         yLog.setEnabled((kind == Kind.DBL || kind == Kind.INT) &&
             Math.abs(axis.min - axis.max) >= 1);
@@ -642,7 +643,7 @@ public final class PlotView extends View {
           }
         }
 
-        // draw 0 label if necessary; logarithmic crap
+        // draw 0 label if necessary
         if(0 >= axis.min && 0 <= axis.max)
           drawCaptionAndGrid(g, drawX, formatString(0, drawX),
               axis.calcPosition(0));
@@ -947,7 +948,7 @@ public final class PlotView extends View {
     focusedPre = -1;
     int dist = Integer.MAX_VALUE;
     // all displayed items are tested for focus
-    for(int i = 0; i < plotData.size && dist != 0; ++i) {
+    for(int i = 0; i < plotData.pres.length && dist != 0; ++i) {
       // coordinates and distances for current tested item are calculated
       final int x = calcCoordinate(true, plotData.xAxis.co[i]);
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
@@ -986,7 +987,7 @@ public final class PlotView extends View {
     // get coordinates for focused item
     final int mx = calcCoordinate(true, plotData.xAxis.co[pre]);
     final int my = calcCoordinate(false, plotData.yAxis.co[pre]);
-    for(int i = 0; i < plotData.size; ++i) {
+    for(int i = 0; i < plotData.pres.length; ++i) {
       // get coordinates for current item
       final int x = calcCoordinate(true, plotData.xAxis.co[i]);
       final int y = calcCoordinate(false, plotData.yAxis.co[i]);
@@ -1105,7 +1106,7 @@ public final class PlotView extends View {
 
     // searches for items located in the selection box
     final IntList il = new IntList();
-    for(int i = 0; i < plotData.size; ++i) {
+    for(int i = 0; i < plotData.pres.length; ++i) {
       x = calcCoordinate(true, plotData.xAxis.co[i]);
       y = calcCoordinate(false, plotData.yAxis.co[i]);
       if(selectionBox.contains(x, y)) il.add(plotData.pres[i]);

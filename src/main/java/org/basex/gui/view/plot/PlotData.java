@@ -25,8 +25,6 @@ final class PlotData {
   final PlotAxis yAxis;
   /** Items pre values. */
   int[] pres;
-  /** Number of items displayed in plot. */
-  int size;
   /** Item token selected by user. */
   byte[] item = EMPTY;
 
@@ -104,7 +102,6 @@ final class PlotData {
     if(!sub) {
       pres = ctx.nodes;
       Arrays.sort(pres);
-      size = pres.length;
       return;
     }
 
@@ -123,7 +120,6 @@ final class PlotData {
     }
     pres = tmpPres.toArray();
     Arrays.sort(pres);
-    size = pres.length;
   }
 
   /**
