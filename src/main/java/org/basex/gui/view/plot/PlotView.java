@@ -350,8 +350,10 @@ public final class PlotView extends View {
       int name = d.name(focused);
       while(focused > 0 && itmID != name) {
         focused = d.parent(focused, k);
-        k = d.kind(focused);
-        name = d.name(focused);
+        if(focused > -1) {
+          k = d.kind(focused);
+          name = d.name(focused);
+        }
       }
     }
 

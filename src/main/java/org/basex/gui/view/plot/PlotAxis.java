@@ -105,6 +105,7 @@ final class PlotAxis {
     final Data data = plotData.context.data;
     final StatsKey key = tag ? data.tags.stat(attrID) :
       data.atts.stat(attrID);
+    if(key == null) return;
     type = key.kind;
     if(type == null) return;
     if(type == Kind.CAT)
