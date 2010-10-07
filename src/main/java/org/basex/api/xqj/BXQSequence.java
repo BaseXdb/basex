@@ -397,6 +397,6 @@ final class BXQSequence extends BXQAbstract implements XQResultSequence {
   private boolean cursor(final ItemIter seq, final int p) throws XQException {
     pos = p < 0 ? 0 : p >= seq.size() ? -1 : p;
     seq.pos(pos - 1);
-    return p < 0 ? false : next();
+    return p >= 0 && next();
   }
 }
