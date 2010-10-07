@@ -2,8 +2,6 @@ package org.basex.query.func;
 
 import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
-
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -19,6 +17,7 @@ import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
+import org.basex.io.PrintOutput;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -36,7 +35,7 @@ import org.basex.util.Token;
 
 /**
  * Functions on files and directories.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Rositsa Shadura
  */
@@ -159,15 +158,12 @@ final class FNFile extends Fun {
    * @return file listing
    */
   private List<File> listRecursively(final File file) {
-
     final List<File> result = new ArrayList<File>();
     File currFile = file;
     int c = 0;
     do {
       if(currFile.isDirectory()) {
-        for(final File f : currFile.listFiles()) {
-          result.add(f);
-        }
+        for(final File f : currFile.listFiles()) result.add(f);
       }
       currFile = result.get(c);
     } while(++c < result.size());
@@ -196,7 +192,7 @@ final class FNFile extends Fun {
     final IO io = checkIO(expr[0], ctx);
     final String enc = expr.length < 2 ? null : string(checkEStr(expr[1], ctx));
 
-    if(enc != null) if(!Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
+    if(enc != null && !Charset.isSupported(enc)) ENCNOTEXISTS.thrw(input, enc);
 
     return Str.get(FNGen.unparsedText(io, enc, input));
   }
@@ -235,14 +231,12 @@ final class FNFile extends Fun {
 
     final Iter ir = expr[1].iter(ctx);
     try {
-      final BufferedOutputStream out = new BufferedOutputStream(
-          new FileOutputStream(file, true));
+      final PrintOutput out = new PrintOutput(file.getPath());
       try {
-        final XMLSerializer xml = new XMLSerializer(out, FNGen.serialPar(this,
-            2, ctx));
+        final XMLSerializer xml = new XMLSerializer(out,
+            FNGen.serialPar(this, 2, ctx));
         Item it;
-        while((it = ir.next()) != null)
-          it.serialize(xml);
+        while((it = ir.next()) != null) it.serialize(xml);
         xml.close();
       } finally {
         out.close();
@@ -264,20 +258,18 @@ final class FNFile extends Fun {
       throws QueryException {
 
     final B64 b64 = (B64) checkType(expr[1].item(ctx, input), Type.B6B);
-    
-    Bln append = expr.length == 3 ? (Bln) checkType(expr[2].item(ctx, input),
-        Type.BLN) : Bln.FALSE;
+
+    final boolean append = expr.length == 3 &&
+        checkType(expr[2].item(ctx, input), Type.BLN).bool(input);
 
     // Raise an exception, if the append flag is false and
     // the file to be written already exists
-    if(!append.bool(input) && file.exists()) {
-      FILEEXISTS.thrw(input, file.getPath());
-    }
-    
+    if(!append && file.exists()) FILEEXISTS.thrw(input, file.getPath());
+
     try {
       final FileOutputStream out = new FileOutputStream(file);
       try {
-        out.write(b64.getVal());
+        out.write(b64.toJava());
       } finally {
         out.close();
       }
@@ -318,10 +310,9 @@ final class FNFile extends Fun {
         dc.close();
       }
     } catch(final IOException ex) {
-      COPYFAILED.thrw(input, src, dst, ex.toString());
+      COPYFAILED.thrw(input, src, dst, ex.getMessage());
     }
     return null;
-
   }
 
   /**
@@ -334,24 +325,25 @@ final class FNFile extends Fun {
   private Item move(final File src, final QueryContext ctx)
       throws QueryException {
 
-    final String dest = string(checkStr(expr[1], ctx));
+    final String dst = string(checkStr(expr[1], ctx));
     if(!src.exists()) PATHNOTEXISTS.thrw(input, src);
 
-    final String destFile = dest.endsWith(Prop.SEP) ? dest + src.getName()
-        : dest + Prop.SEP + src.getName();
+    final String destFile = dst + (dst.endsWith(Prop.SEP) ? "" : Prop.SEP) +
+      src.getName();
 
     // Raise an exception if the target file already exists
     if(new File(destFile).exists()) FILEEXISTS.thrw(input, destFile);
 
     // Raise an exception if the user has no access
     // to the destination
-    if(!new File(dest).canWrite()) FILEMOVE.thrw(input, src.getPath(), dest);
+    if(!new File(dst).canWrite()) FILEMOVE.thrw(input, src.getPath(), dst);
 
     // Raise an exception if a directory is to be moved
     if(src.isDirectory()) DIRMOVE.thrw(input);
 
-    if(!src.renameTo(new File(dest, src.getName()))) CANNOTMOVE.thrw(input,
-        src.getPath());
+    if(!src.renameTo(new File(dst, src.getName())))
+      CANNOTMOVE.thrw(input, src.getPath());
+
     return null;
   }
 
@@ -370,15 +362,14 @@ final class FNFile extends Fun {
 
     // Raise an exception if the directory cannot be created because
     // a file with the same name already exists
-    if(file.exists() && !file.isDirectory()) FILEEXISTS.thrw(input,
-        file.getName());
+    if(file.exists() && !file.isDirectory())
+      FILEEXISTS.thrw(input, file.getName());
 
     if(recursive) {
       // Raise an exception if the existent directory, in which
       // the dirs are to be created, is write-protected
-      final File parent = getExistingParent(file);
-      if(!parent.canWrite())
-        MKDIR.thrw(input, file.getPath(), parent.getPath());
+      final File par = getExistingParent(file);
+      if(!par.canWrite()) MKDIR.thrw(input, file.getPath(), par.getPath());
 
       if(!file.mkdirs()) CANNOTMKDIR.thrw(input, file.getPath());
     } else {
@@ -472,6 +463,5 @@ final class FNFile extends Fun {
       DIRINV.thrw(input, file);
       return null;
     }
-
   }
 }

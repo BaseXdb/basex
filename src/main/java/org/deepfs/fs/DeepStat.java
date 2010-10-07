@@ -61,15 +61,15 @@ public final class DeepStat {
     ps.println(prefix + "st_blocksize = " + stblocksize);
     ps.println(prefix + "st_flags = " + stflags);
     ps.println(prefix + "st_gen = " + stgen);
-  }  
-  
+  }
+
   /** Directory bit. */
   private static final int DFS_S_IFDIR = 0040000;
   /** Regular file bit. */
   private static final int DFS_S_IFREG = 0100000;
   /** File bit mask. */
   private static final int DFS_S_IFMT = 0170000;
-  
+
   /**
    * Gets (native) user id or default value.
    * @return user id
@@ -85,7 +85,7 @@ public final class DeepStat {
   public static long getGID() {
     return 0;
   }
-  
+
   /**
    * Returns directory bit.
    *
@@ -103,7 +103,7 @@ public final class DeepStat {
   public static int getSIFREG() {
     return DFS_S_IFREG;
   }
-  
+
   /**
    * Test mode for regular file flag.
    * @param mode of file
@@ -112,6 +112,4 @@ public final class DeepStat {
   public static boolean isReg(final int mode) {
     return (mode & DFS_S_IFMT) == DFS_S_IFREG;
   }
-  
-  
 }

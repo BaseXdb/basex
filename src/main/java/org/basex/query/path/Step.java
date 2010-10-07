@@ -117,7 +117,7 @@ public class Step extends Preds {
     if(!v.node()) NODESPATH.thrw(input, Step.this, v.type);
     final NodeIter ir = axis.iter((Nod) v);
 
-    NodIter nb = new NodIter();
+    final NodIter nb = new NodIter();
     Nod nod;
     while((nod = ir.next()) != null) {
       if(test.eval(nod)) nb.add(nod.finish());

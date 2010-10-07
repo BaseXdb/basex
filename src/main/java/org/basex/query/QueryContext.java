@@ -45,7 +45,6 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 import org.basex.util.Util;
@@ -413,52 +412,50 @@ public final class QueryContext extends Progress {
 
   /**
    * Opens an existing document/collection, or creates a new database instance.
-   * @param path database name or file path
+   * @param input database name or file path
    * @param coll collection flag
    * @param db database flag
    * @param ii input info
    * @return database instance
    * @throws QueryException query exception
    */
-  public DBNode doc(final byte[] path, final boolean coll, final boolean db,
+  public DBNode doc(final byte[] input, final boolean coll, final boolean db,
       final InputInfo ii) throws QueryException {
 
-    if(contains(path, '<') || contains(path, '>')) INVDOC.thrw(ii, path);
+    if(contains(input, '<') || contains(input, '>')) INVDOC.thrw(ii, input);
 
     // check if the existing collections contain the document
     for(int c = 0; c < colls; ++c) {
       for(int n = 0; n < collect[c].size(); ++n) {
-        if(eq(path, collect[c].get(n).base())) {
+        if(eq(input, collect[c].get(n).base())) {
           return (DBNode) collect[c].get(n);
         }
       }
     }
 
     // check if the database has already been opened
-    final String nm = string(path);
+    final String in = string(input);
     for(int d = 0; d < docs; ++d)
-      if(doc[d].data.meta.name.equals(nm)) return doc[d];
+      if(doc[d].data.meta.name.equals(in)) return doc[d];
 
     // check if the document has already been opened
-    final IO io = IO.get(string(path));
-    for(int d = 0; d < docs; ++d) {
+    final IO io = IO.get(in);
+    for(int d = 0; d < docs; ++d)
       if(doc[d].data.meta.file.eq(io)) return doc[d];
-    }
 
     // get database instance
     Data data = null;
 
     if(db) {
       try {
-        data = Open.open(nm, context);
+        data = Open.open(in, context);
       } catch(final IOException ex) {
-        NODB.thrw(ii, nm);
+        NODB.thrw(ii, in);
       }
     } else {
       final IO file = file();
-      data = doc(nm, file == null, coll, ii);
-      if(data == null) data = doc(file.merge(string(path)).path(),
-          true, coll, ii);
+      data = doc(in, file == null, coll, ii);
+      if(data == null) data = doc(file.merge(in).path(), true, coll, ii);
     }
 
     // add document to array
@@ -503,32 +500,31 @@ public final class QueryContext extends Progress {
 
   /**
    * Adds a collection instance or returns an existing one.
-   * @param path name of the collection to be returned
+   * @param input name of the collection to be returned
    * @param ii input info
    * @return collection
    * @throws QueryException query exception
    */
-  public NodIter coll(final byte[] path, final InputInfo ii)
+  public NodIter coll(final byte[] input, final InputInfo ii)
       throws QueryException {
 
     // no collection specified.. return default collection/current context set
     int c = 0;
-    if(path == null) {
+    if(input == null) {
       // no default collection was defined
       if(colls == 0) NODEFCOLL.thrw(ii);
     } else {
       // invalid collection reference
-      if(contains(path, '<') || contains(path, '\\')) COLLINV.thrw(ii, path);
+      if(contains(input, '<') || contains(input, '\\')) COLLINV.thrw(ii, input);
       // find specified collection
-      while(c < colls && !eq(collName[c], path)) ++c;
+      while(c < colls && !eq(collName[c], input)) ++c;
       // add new collection if not found
       if(c == colls) {
-        final int tmp = Token.string(path).indexOf("/");
-        if(tmp == -1) {
-          addDocs(doc(path, true, false, ii), "");
+        final int s = indexOf(input, '/');
+        if(s == -1) {
+          addDocs(doc(input, true, false, ii), EMPTY);
         } else {
-          addDocs(doc(token(Token.string(path).substring(0, tmp)),
-              true, false, ii), Token.string(path));
+          addDocs(doc(substring(input, 0, s), true, false, ii), input);
         }
       }
     }
@@ -538,23 +534,21 @@ public final class QueryContext extends Progress {
   /**
    * Adds database documents as a collection.
    * @param db database reference
-   * @param path inner collection path
+   * @param input inner collection path
    */
-  private void addDocs(final DBNode db, final String path) {
+  private void addDocs(final DBNode db, final byte[] input) {
     final NodIter col = new NodIter();
     final Data data = db.data;
-    boolean tmp = path.equals("");
-    if(!tmp) doc = new DBNode[1]; docs = 0;
+    final boolean rt = input.length == 0;
+    if(!rt) doc = new DBNode[1]; docs = 0;
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       final DBNode dbn = new DBNode(data, p);
-      if(!tmp) {
-        if(Token.string(dbn.base()).toLowerCase().
-            contains(path.toLowerCase())) {
-          col.add(dbn);
-          addDoc(dbn);
-        }
-      } else {
+      if(rt) {
         col.add(dbn);
+      } else if(contains(dbn.base(), input)) {
+        col.add(dbn);
+        // [AW] could lead to unexpected side effects
+        addDoc(dbn);
       }
     }
     addColl(col, token(data.meta.name));

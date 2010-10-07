@@ -1,7 +1,6 @@
 package org.basex.query.util;
 
 import static org.basex.query.util.Err.Type.*;
-
 import org.basex.core.Text;
 import org.basex.query.QueryException;
 import org.basex.query.expr.ParseExpr;
@@ -132,7 +131,7 @@ public enum Err {
   /** FOFL0014: Evaluation exception. */
   CANNOTMOVE(FOFL, 14, "File '%' cannot be moved."),
   /** FOFL0015: Evaluation exception. */
-  DIRINV(FOFL, 15, "The path '%' is invalid in the filesystem."), 
+  DIRINV(FOFL, 15, "The path '%' is invalid in the filesystem."),
   /** FOFL0016: Evaluation exception. */
   COPYFAILED(FOFL, 16, "Copying from '%' to '%' failed: %"),
   /** FOFL0017: Evaluation exception. */
@@ -591,16 +590,16 @@ public enum Err {
       "Source expression in copy clause must return a single node."),
   /** XUTY0022: XQuery Update type exception. */
   UPATTELM2(XUTY, 22, "Insert target must be an element.");
-  
+
   /** Error type. */
   public final Type type;
-  
+
   /** Error number. */
   public final int num;
-  
+
   /** Error description. */
   public final String desc;
-  
+
   /**
    * Constructor.
    * @param t error type
@@ -735,7 +734,7 @@ public enum Err {
       final org.basex.query.item.Type t, final Object v) throws QueryException {
     INVALUE.thrw(ii, t, v);
   }
-  
+
   @Override
   public String toString() {
     return String.format("%s%04d", type, num);

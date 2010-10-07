@@ -37,7 +37,7 @@ final class FNInfo extends Fun {
       case ERROR:
         final int al = expr.length;
         if(al == 0) FUNERR1.thrw(input);
-        
+
         String code = FUNERR1.code();
         String msg = FUNERR1.desc;
 

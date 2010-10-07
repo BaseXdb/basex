@@ -2,7 +2,6 @@ package org.basex.gui.view.tree;
 
 import static org.basex.core.Text.*;
 import static org.basex.gui.GUIConstants.*;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Transparency;
@@ -28,7 +27,7 @@ import org.basex.util.Token;
 
 /**
  * This class offers a real tree view.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -176,7 +175,7 @@ public final class TreeView extends View implements TreeViewOptions {
       tr = new TreeRects(gui.prop);
     }
 
-    if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT) 
+    if(paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT)
       sub.generateBorders(c);
 
     if((winChange = windowSizeChanged()) && paintType == -1
@@ -218,10 +217,10 @@ public final class TreeView extends View implements TreeViewOptions {
         this);
 
     // highlights the focused node
-    inFocus = paintType < 0 ? focus() : false;
+    inFocus = paintType < 0 && focus();
 
     if(inFocus && !winChange) {
-           
+
       if(!refreshedFocus && tr.isBigRectangle(sub, frn, flv)) {
         final int f = getMostSizedNode(data, frn, flv, frect, fpre);
         if(f >= 0) fpre = f;
@@ -421,7 +420,7 @@ public final class TreeView extends View implements TreeViewOptions {
         }
         break;
     }
-    
+
     if(border) {
       g.setColor(borderColor);
       g.drawRect(xx, y, ww, h);
@@ -619,7 +618,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final TreeRect r) {
     final int idx = sub.getPreIndex(rn, lv, pre);
     final double ratio = idx / (double) sub.getLevelSize(rn, lv);
-    return r.x + (int) Math.round((r.w) * ratio) + 1;
+    return r.x + (int) Math.round(r.w * ratio) + 1;
   }
 
   /**
@@ -670,7 +669,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final TreeRect r, final int pre, final int px, final byte t) {
 
     if(lv == -1) return;
-    
+
     final boolean br = tr.isBigRectangle(sub, rn, lv);
     final boolean isRoot = roots[rn] == pre;
     final int height = sub.getSubtreeHeight(rn);
@@ -703,7 +702,7 @@ public final class TreeView extends View implements TreeViewOptions {
     }
 
     // if there are descendants draw them
-    if((t == DRAW_CONN || t == DRAW_HIGHLIGHT) && size > 1 && lv + 1 < height) 
+    if((t == DRAW_CONN || t == DRAW_HIGHLIGHT) && size > 1 && lv + 1 < height)
       highlightDescendants(
         g, rn, lv, r, pre, rc, t);
 
@@ -756,7 +755,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param t highlight type
    */
   private void highlightDescendants(final Graphics g, final int rn,
-      final int lv, final TreeRect r, final int pre, final int px, 
+      final int lv, final TreeRect r, final int pre, final int px,
       final byte t) {
 
     final Data d = gui.context.current.data;
@@ -785,7 +784,7 @@ public final class TreeView extends View implements TreeViewOptions {
 
           final TreeRect dr = tr.getTreeRectPerIndex(rn, lvd, j + start);
 
-          if(SHOW_DESCENDANTS_CONN && levelDistance >= MIN_NODE_DIST_CONN) 
+          if(SHOW_DESCENDANTS_CONN && levelDistance >= MIN_NODE_DIST_CONN)
             drawDescendantsConn(
               g, lvd, dr, px, t);
 
@@ -1069,14 +1068,14 @@ public final class TreeView extends View implements TreeViewOptions {
     }
     nodeHeight = MAX_NODE_HEIGHT;
     int lD;
-    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) < 
+    while((lD = (int) ((h - lvs * nodeHeight) / (double) (lvs - 1))) <
         (nodeHeight <= BEST_NODE_HEIGHT ? MIN_LEVEL_DISTANCE
         : BEST_LEVEL_DISTANCE)
         && nodeHeight >= MIN_NODE_HEIGHT)
       nodeHeight--;
     levelDistance = lD < MIN_LEVEL_DISTANCE ? MIN_LEVEL_DISTANCE
         : lD > MAX_LEVEL_DISTANCE ? MAX_LEVEL_DISTANCE : lD;
-    final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight)) 
+    final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight))
         / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }
@@ -1101,7 +1100,7 @@ public final class TreeView extends View implements TreeViewOptions {
    * @param r rectangle
    * @return size
    */
-  private int getHitBigRectNodesNum(final int rn, final int lv, 
+  private int getHitBigRectNodesNum(final int rn, final int lv,
       final TreeRect r) {
     final int w = r.w;
     final int ls = sub.getLevelSize(rn, lv);

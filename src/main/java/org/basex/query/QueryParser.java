@@ -2130,7 +2130,7 @@ public class QueryParser extends InputParser {
       return new QNm(nm, ctx, input());
     }
     if(t != Type.ELM && t != Type.ATT) error(TESTINVALID, t, k);
-    
+
     final int i = indexOf(nm, ',');
     if(i != -1) {
       final QNm test = new QNm(trim(substring(nm, i + 1)), ctx, input());

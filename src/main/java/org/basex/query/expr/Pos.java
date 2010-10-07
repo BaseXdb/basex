@@ -68,7 +68,7 @@ public final class Pos extends Simple {
     // position() = last() -> last()
     if(a instanceof Fun && ((Fun) a).def == FunDef.LAST && cmp == Op.EQ)
       return a;
-    
+
     if(a.item()) {
       final Item it = (Item) a;
       if(it.num()) {

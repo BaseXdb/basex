@@ -80,7 +80,7 @@ public final class FuncTest extends QueryTest {
       { "deep-equal 13", bool(false), "deep-equal(text{'a'}, comment{'a'})" },
       { "deep-equal 14", bool(false),
         "deep-equal(comment{ 'a' }, processing-instruction{ 'a' } { 'a' })" },
-        
+
       { "not 1", bool(false), "not(true())" },
       { "not 2", bool(false), "not(1 eq 1)" },
 

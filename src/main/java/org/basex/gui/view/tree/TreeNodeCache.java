@@ -1,13 +1,12 @@
 package org.basex.gui.view.tree;
 
 import java.util.ArrayList;
-
 import org.basex.data.Data;
 import org.basex.util.IntList;
 
 /**
  * This class determines nodes per level and caches them.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */

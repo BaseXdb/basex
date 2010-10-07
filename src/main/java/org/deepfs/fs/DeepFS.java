@@ -520,7 +520,7 @@ public final class DeepFS implements DataText {
    * @return true if this node is a file, false otherwise
    */
   public boolean isFile(final int pre) {
-    return isValidNode(pre, fileID) ? hasValidParents(pre) : false;
+    return isValidNode(pre, fileID) && hasValidParents(pre);
   }
 
   /**
@@ -529,7 +529,7 @@ public final class DeepFS implements DataText {
    * @return true if this node is a directory, false otherwise
    */
   public boolean isDir(final int pre) {
-    return isValidNode(pre, dirID) ? hasValidParents(pre) : false;
+    return isValidNode(pre, dirID) && hasValidParents(pre);
   }
 
   /**
@@ -538,8 +538,8 @@ public final class DeepFS implements DataText {
    * @return true if this node is a deepfs node, false otherwise
    */
   public boolean isFSnode(final int pre) {
-    return isValidNode(pre, fileID, dirID, fsmlID, deepfsID) ?
-        hasValidParents(pre) : false;
+    return isValidNode(pre, fileID, dirID, fsmlID, deepfsID) &&
+        hasValidParents(pre);
   }
 
   /**

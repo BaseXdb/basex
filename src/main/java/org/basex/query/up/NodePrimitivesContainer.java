@@ -95,7 +95,7 @@ final class NodePrimitivesContainer implements NodePrimitives {
           temp.add(p);
       }
       primitives = temp;
-    } 
+    }
   }
 
   @Override

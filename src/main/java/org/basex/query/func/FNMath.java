@@ -1,5 +1,5 @@
 package org.basex.query.func;
- 
+
 import static java.lang.StrictMath.*;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;

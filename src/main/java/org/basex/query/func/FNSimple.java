@@ -89,7 +89,7 @@ public final class FNSimple extends Fun {
   public Expr cmp(final QueryContext ctx) {
     // all functions have at least 1 argument
     final Expr e = expr[0];
-    
+
     switch(def) {
       case BOOLEAN:
         expr[0] = e.compEbv(ctx);

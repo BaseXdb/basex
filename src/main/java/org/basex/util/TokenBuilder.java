@@ -19,7 +19,7 @@ public final class TokenBuilder {
   public static final byte NL = 0x0a;
   /** Half new line. */
   public static final byte HL = 0x0b;
-  
+
   /** Character array. */
   private byte[] chars;
   /** Entity flag. */

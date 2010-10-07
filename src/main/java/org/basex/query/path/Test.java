@@ -70,7 +70,7 @@ public abstract class Test {
       default:  Util.notexpected(); return null;
     }
   }
-  
+
   /**
    * Optimizes and compiles the expression.
    * @param ctx query context

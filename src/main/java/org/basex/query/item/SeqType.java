@@ -233,7 +233,7 @@ public final class SeqType {
         (it.type != Type.URI || type != Type.STR)) Err.cast(ii, type, it);
     return ins;
   }
-  
+
   /**
    * Combine two sequence types.
    * @param t second type

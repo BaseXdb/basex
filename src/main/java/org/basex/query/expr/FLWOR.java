@@ -233,7 +233,7 @@ public class FLWOR extends ParseExpr {
     iter(ctx, vl, iter, 0);
     return ctx.iter(order);
   }
-  
+
   /**
    * Performs a recursive iteration on the specified variable position.
    * @param ctx root reference

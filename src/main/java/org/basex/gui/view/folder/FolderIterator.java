@@ -41,7 +41,7 @@ final class FolderIterator {
    * @param v view reference
    */
   FolderIterator(final FolderView v) {
-    this(v, 0, 0x7FFFFFFF);
+    this(v, 0, Integer.MAX_VALUE);
   }
 
   /**

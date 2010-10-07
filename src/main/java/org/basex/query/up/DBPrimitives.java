@@ -117,7 +117,7 @@ final class DBPrimitives extends Primitives {
       final int parT = d.parent(pre, d.kind(pre));
       if(parT != par) {
         // adjacent text nodes are merged. merges can only be applied directly
-        // after the update if no lower pre values or the same pre value 
+        // after the update if no lower pre values or the same pre value
         // are effected. this is not
         // the case for 'replace node', 'delete', 'insert before' and
         // 'insert after' operations. a node, being target of 'insert before'

@@ -43,7 +43,7 @@ public abstract class Main {
   protected boolean console;
   /** Verbose mode. */
   protected boolean verbose;
-  
+
   /**
    * Constructor.
    * @param args command-line arguments
@@ -190,7 +190,7 @@ public abstract class Main {
     final Scanner sc = new Scanner(System.in);
     return sc.hasNextLine() ? sc.nextLine().trim() : "";
   }
-  
+
   /**
    * Returns a password from standard input.
    * @return password

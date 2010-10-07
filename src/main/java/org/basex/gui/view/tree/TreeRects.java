@@ -91,10 +91,10 @@ final class TreeRects implements TreeViewOptions {
    * @param ds draw start
    * @param w the width
    */
-  private void bigRectangle(final int rn, final int lv, final int ds, 
+  private void bigRectangle(final int rn, final int lv, final int ds,
       final double w) {
     rects[rn][lv] = new TreeRect[1];
-    rects[rn][lv][0] = new TreeRect((int) (w * rn) + BORDER_PADDING + ds, 
+    rects[rn][lv][0] = new TreeRect((int) (w * rn) + BORDER_PADDING + ds,
         (int) w - BORDER_PADDING);
   }
 
@@ -109,7 +109,7 @@ final class TreeRects implements TreeViewOptions {
    * @param w width
    */
   private void normalRectangle(final TreeSubtree sub, final Context c,
-      final Graphics g, final int rn, final int lv, final int ds, 
+      final Graphics g, final int rn, final int lv, final int ds,
       final double w) {
 
     final int subSi = sub.getLevelSize(rn, lv);

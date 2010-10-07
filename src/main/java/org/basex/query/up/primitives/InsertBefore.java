@@ -32,8 +32,8 @@ public final class InsertBefore extends NodeCopy {
     final int pre = n.pre;
     d.insert(pre, d.parent(pre, Nod.kind(node.type)), md);
     // no text merging allowed here, as this target can still be deleted or
-    // replaced (see primitive order). 
-    // if text is merged, the second text node is also 
+    // replaced (see primitive order).
+    // if text is merged, the second text node is also
     // replaced or deleted
     //mergeTexts(d, pre + md.meta.size - 1, pre + md.meta.size);
   }

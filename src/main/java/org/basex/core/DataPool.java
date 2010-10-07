@@ -4,7 +4,6 @@ import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.Arrays;
 import org.basex.data.Data;
-import org.basex.data.MemData;
 import org.basex.util.Array;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
@@ -45,9 +44,6 @@ public final class DataPool {
    * @return true if reference was removed from the pool
    */
   boolean unpin(final Data d) {
-    // ignore main-memory database instances
-    if(d instanceof MemData) return false;
-
     for(int i = 0; i < size; ++i) {
       if(data[i] == d) {
         final boolean close = --pins[i] == 0;
@@ -77,9 +73,6 @@ public final class DataPool {
    * @param d data reference
    */
   void add(final Data d) {
-    // ignore main-memory database instances
-    if(d instanceof MemData) return;
-
     if(size == data.length) {
       data = Arrays.copyOf(data, size << 1);
       pins = Arrays.copyOf(pins, size << 1);

@@ -180,14 +180,6 @@ public final class B64 extends Item {
     return Util.info("\"%\"", h2b());
   }
 
-  /**
-   * Returns the byte array associated with this B64.
-   * @return val
-   */
-  public byte[] getVal() {
-    return val;
-  }
-
   @Override
   public boolean sameAs(final Expr cmp) {
     if(!(cmp instanceof B64)) return false;

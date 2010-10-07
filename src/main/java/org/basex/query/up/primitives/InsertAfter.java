@@ -33,8 +33,8 @@ public final class InsertAfter extends NodeCopy {
     final int k = Nod.kind(node.type);
     d.insert(p + d.size(p, k), d.parent(p, k), md);
     // no text merging allowed here, as this target can still be deleted or
-    // replaced (see primitive order). 
-    // if text is merged, the second text node is also 
+    // replaced (see primitive order).
+    // if text is merged, the second text node is also
     // replaced or deleted
     //if(!mergeTexts(d, p - 1, p)) {
       //final int s = md.meta.size;

@@ -1,13 +1,16 @@
 package org.basex.core.cmd;
 
+import static org.basex.core.Text.*;
 import java.io.IOException;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
 import org.basex.core.User;
+import org.basex.core.Commands.CmdPerm;
 import org.basex.data.Data;
 import org.basex.data.MetaData;
 import org.basex.io.IO;
+import org.basex.util.Util;
 
 /**
  * Evaluates the 'checks' command, opens an existing database or
@@ -51,6 +54,18 @@ public final class Check extends Command {
 
     final IO io = IO.get(path);
     final String name = io.dbname();
+
+    // check if database is already opened
+    final Data data = ctx.pin(name);
+    if(data != null) {
+      final IO in = data.meta.file;
+      if(in.eq(io) && io.date() == in.date()) {
+        // check permissions
+        if(ctx.perm(User.READ, data.meta)) return data;
+        throw new IOException(Util.info(PERMNO, CmdPerm.READ));
+      }
+      ctx.unpin(data);
+    }
 
     // if found, an existing database is opened
     return MetaData.found(path, name, ctx.prop) ? Open.open(name, ctx) :

@@ -66,7 +66,7 @@ public abstract class Preds extends ParseExpr {
   /**
    * Checks if this expression can be evaluated in an iterative manner.
    * This is possible if no predicate, or only the first, is positional, or
-   * if a single {@code last()} predicate is specified. 
+   * if a single {@code last()} predicate is specified.
    * @return result of check
    */
   protected boolean iterable() {
@@ -104,7 +104,6 @@ public abstract class Preds extends ParseExpr {
     }
     return true;
   }
-  
 
   @Override
   public boolean uses(final Use u) {

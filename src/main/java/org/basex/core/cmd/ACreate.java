@@ -57,19 +57,20 @@ public abstract class ACreate extends Command {
     new Close().run(context);
 
     try {
-      final boolean mem = prop.is(Prop.MAINMEM);
-      if(!mem && context.pinned(db)) return error(DBLOCKED, db);
+      if(context.pinned(db)) return error(DBLOCKED, db);
 
+      final boolean mem = prop.is(Prop.MAINMEM);
       builder = mem ? new MemBuilder(p, prop) : new DiskBuilder(p, prop);
       progress(builder);
 
       final Data d = builder.build(db);
       if(mem) {
         context.openDB(d);
+        context.pin(d);
       } else {
         d.close();
-        final Open cmd = new Open(db);
-        if(!cmd.run(context)) return error(cmd.info());
+        final Open open = new Open(db);
+        if(!open.run(context)) return error(open.info());
         index(context.data);
       }
       return info(DBCREATED, db, perf);

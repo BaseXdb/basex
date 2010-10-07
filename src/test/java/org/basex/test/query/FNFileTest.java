@@ -81,7 +81,7 @@ public class FNFileTest extends QueryTest {
               "<Nachname>Young</Nachname>\n" +
             "</Name>\n" +
           "</ACDC>";
-    
+
     ItemIter ii = new ItemIter();
     try {
       ii = new ItemIter(new Item[] { new Dtm(
@@ -132,7 +132,7 @@ public class FNFileTest extends QueryTest {
         { "Test file:write()", nod(),
             "file:write(\"" + dir1.getPath() + Prop.SEP + TESTWRITE + "\"," +
             "//Name/Vorname, "  + "(<indent>yes</indent>))" },
-            
+
          // /_tmpdir_/testDir1/fileCopy
         { "Test file:write() with $append = true", nod(),
             "file:write(\"" + fileCopy.getPath()
@@ -158,7 +158,7 @@ public class FNFileTest extends QueryTest {
         // /_tmpdir_/testDir1/fileDel
         { "Test file:delete()", nod(),
             "file:delete(\"" + fileDel.getPath() + "\")" },
-            
+
         // /_tmpdir_/testDir1/testDelDir1/testDelDir2
         { "Test file:delete() with $recursive = true", nod(),
                 "file:delete(\"" + dirDel.getParentFile().getPath()
@@ -186,8 +186,7 @@ public class FNFileTest extends QueryTest {
     };
 
   }
-  
-  
+
   /** Prepares tests. */
   @BeforeClass
   public static void prepareTest() {
@@ -197,7 +196,7 @@ public class FNFileTest extends QueryTest {
 
     // /_tmpdir_/testDir2
     dir2.mkdir();
-    
+
     // /_tmpdir_/testDir1/testDelDir1/testDelDir2
     dirDel.mkdirs();
 

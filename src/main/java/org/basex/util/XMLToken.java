@@ -46,7 +46,7 @@ public final class XMLToken {
    * @return result of check
    */
   public static boolean isNCChar(final int ch) {
-    return isNCStartChar(ch) || 
+    return isNCStartChar(ch) ||
       (ch < 0x100 ? digit(ch) || ch == '-' || ch == '.' || ch == 0xB7 :
       ch >= 0x300 && ch <= 0x36F || ch == 0x203F || ch == 0x2040);
   }

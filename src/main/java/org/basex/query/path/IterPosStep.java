@@ -40,7 +40,7 @@ final class IterPosStep extends Step {
           if(!v.node()) NODESPATH.thrw(input, IterPosStep.this, v.type);
           ir = axis.iter((Nod) v);
         }
-        
+
         Nod lnod = null;
         while(true) {
           ctx.checkStop();
@@ -67,7 +67,7 @@ final class IterPosStep extends Step {
           }
         }
       }
-      
+
       @Override
       public boolean reset() {
         ir = null;
