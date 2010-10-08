@@ -34,10 +34,11 @@ final class TreeRects implements TreeViewOptions {
    * @param c context
    * @param ds draw start
    * @param dw draw width
+   * @param slim slim to text
    * @return tree distance
    */
   double generateRects(final TreeSubtree sub, final Graphics g,
-      final Context c, final int ds, final int dw) {
+      final Context c, final int ds, final int dw, final boolean slim) {
     final int[] roots = c.current.nodes;
     final int rl = roots.length;
     if(rl == 0) return 0;
@@ -49,7 +50,7 @@ final class TreeRects implements TreeViewOptions {
     rects = new TreeRect[rl][][];
 
     for(int i = 0; i < rl; ++i) {
-      generateRects(sub, c, g, i, ds, w);
+      generateRects(sub, c, g, i, ds, w, slim);
     }
     return w;
   }
@@ -62,10 +63,12 @@ final class TreeRects implements TreeViewOptions {
    * @param sub subtree
    * @param ds draw start
    * @param dw draw width
+   * @param slim slim to text
    * @return tree distance
    */
   private int generateRects(final TreeSubtree sub, final Context c,
-      final Graphics g, final int rn, final int ds, final double dw) {
+      final Graphics g, final int rn, final int ds, final double dw, 
+      final boolean slim) {
 
     final int h = sub.getSubtreeHeight(rn);
     rects[rn] = new TreeRect[h][];
@@ -78,7 +81,7 @@ final class TreeRects implements TreeViewOptions {
       if(w < 2) {
         bigRectangle(rn, lv, ds, dw);
       } else {
-        normalRectangle(sub, c, g, rn, lv, ds, w);
+        normalRectangle(sub, c, g, rn, lv, ds, w, slim);
       }
     }
     return (int) w;
@@ -107,10 +110,11 @@ final class TreeRects implements TreeViewOptions {
    * @param c context
    * @param ds draw start
    * @param w width
+   * @param slim slim to text
    */
   private void normalRectangle(final TreeSubtree sub, final Context c,
       final Graphics g, final int rn, final int lv, final int ds,
-      final double w) {
+      final double w, final boolean slim) {
 
     final int subSi = sub.getLevelSize(rn, lv);
     // new array, to be filled with the rectangles of the current level
@@ -121,7 +125,7 @@ final class TreeRects implements TreeViewOptions {
 
     for(int i = 0; i < subSi; ++i) {
 
-      if(SLIM_TO_TEXT) {
+      if(slim) {
         final double boxMiddle = xx + ww / 2f;
         final byte[] b = getText(c, rn, sub.getPrePerIndex(rn, lv, i));
         int o = calcOptimalRectWidth(g, b) + 10;

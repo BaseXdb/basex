@@ -100,6 +100,8 @@ public final class GUIProp extends AProp {
   /** number of children <-> size weight in (0;100). */
   public static final Object[] MAPWEIGHT = { "MAPWEIGHT", 0 };
   
+  /** Slim rectangles to text length. */
+  public static final Object[] TREESLIMS = { "TREESLIM", true};
   /** Show attributes in treeview. */
   public static final Object[] TREEATTS = { "TREEATTS", false};
 

@@ -179,6 +179,7 @@ dm_size_both=子/テキスト長
 
 dt_title=TreeView Options
 dt_atts=Show Attributes
+dt_slim=Adjust nodes to text
 
 dz_total=メモリ合計
 dz_reserved=予約メモリ量

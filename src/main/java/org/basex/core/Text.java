@@ -1239,8 +1239,10 @@ public interface Text {
   
   /** Dialog title for treeview options. */
   String TREEOPTIONSTITLE = lang("dt_title");
+  /** Slim rectangles to text length. */
+  String TREESLIM = lang("dt_slim"); 
   /** Show attributes. */
-  String TREEATT = lang("dt_atts"); 
+  String TREEATT = lang("dt_atts");
   
   /** Predefined number of layouts. */
   String[] MAPALG = {

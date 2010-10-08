@@ -15,6 +15,8 @@ import org.basex.gui.layout.TableLayout;
  * @author Wolfgang Miller
  */
 public final class DialogTreeOptions extends Dialog {
+  /** Slim rectangles to text length. */
+  private final BaseXCheckBox slim;
   /** Show attributes. */
   private final BaseXCheckBox atts;
 
@@ -26,11 +28,13 @@ public final class DialogTreeOptions extends Dialog {
     super(main, TREEOPTIONSTITLE, false);
 
     final BaseXBack p = new BaseXBack();
-    p.setLayout(new TableLayout(1, 1, 0, 8));
+    p.setLayout(new TableLayout(2, 1, 0, 8));
 
-    // create drop down
-     final GUIProp gprop = gui.prop;
+    final GUIProp gprop = gui.prop;
 
+    // create checkbox
+    slim = new BaseXCheckBox(TREESLIM, gprop.is(GUIProp.TREESLIMS), this);
+    p.add(slim);
 
     // create checkbox
     atts = new BaseXCheckBox(TREEATT, gprop.is(GUIProp.TREEATTS), this);
@@ -44,6 +48,7 @@ public final class DialogTreeOptions extends Dialog {
   @Override
   public void action(final Object cmp) {
     final GUIProp gprop = gui.prop;
+    gprop.set(GUIProp.TREESLIMS, slim.isSelected());
     gprop.set(GUIProp.TREEATTS, atts.isSelected());
     gui.notify.layout();
   }

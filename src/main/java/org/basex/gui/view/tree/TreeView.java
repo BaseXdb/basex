@@ -86,6 +86,8 @@ public final class TreeView extends View implements TreeViewOptions {
   private boolean winChange;
   /** Show attributes. */
   private boolean showAtts;
+  /** Slim rectangles to text length. */
+  private boolean slimToText;
   
 
   /**
@@ -163,6 +165,8 @@ public final class TreeView extends View implements TreeViewOptions {
     final Data data = c.data;
     if(data == null) return;
     if(showAttsChanged()) paintType = PAINT_NEW_INIT;
+    if(slimToTextChanged() && paintType == -1) paintType = 
+      PAINT_NEW_WINDOW_SIZE;
 
     super.paintComponent(g);
     gui.painting = true;
@@ -185,7 +189,7 @@ public final class TreeView extends View implements TreeViewOptions {
     if((winChange = windowSizeChanged()) && paintType == -1
         || paintType == PAINT_NEW_INIT || paintType == PAINT_NEW_CONTEXT
         || paintType == PAINT_NEW_WINDOW_SIZE) {
-      treedist = tr.generateRects(sub, g, c, wstart, wwidth);
+      treedist = tr.generateRects(sub, g, c, wstart, wwidth, slimToText);
       nes = treedist == -1;
       if(!nes) {
         markedImage = null;
@@ -1095,6 +1099,18 @@ public final class TreeView extends View implements TreeViewOptions {
     showAtts =  !showAtts;
     return true;
   }
+  
+  /**
+   * Returns true if slim to text has changed.
+   * @return slim to text has changed
+   */
+  private boolean slimToTextChanged() {
+    final GUIProp gprop = gui.prop;
+    if(gprop.is(GUIProp.TREESLIMS) == slimToText) return false;
+    slimToText = !slimToText;
+    return true;
+  }
+
 
   /**
    * Returns true if window-size has changed.

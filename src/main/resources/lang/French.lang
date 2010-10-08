@@ -179,6 +179,7 @@ dm_size_both=noeuds fils/longueur du texte
 
 dt_title=TreeView Options
 dt_atts=Show Attributes
+dt_slim=Adjust nodes to text
 
 dz_total=Mémoire totale
 dz_reserved=Mémoire réservée

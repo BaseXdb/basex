@@ -179,6 +179,7 @@ dm_size_both=không/con cái và độ dài văn bản
 
 dt_title=TreeView Options
 dt_atts=Show Attributes
+dt_slim=Adjust nodes to text
 
 dz_total=Tổng bộ nhớ
 dz_reserved=Bộ nhớ đặt trước

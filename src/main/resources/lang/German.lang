@@ -179,6 +179,7 @@ dm_size_both=Kindknoten/Textlänge
 
 dt_title=TreeView Optionen
 dt_atts=Zeige Attribute
+dt_slim=Knoten an Text anpassen
 
 dz_total=Insgesamter Speicher
 dz_reserved=Reservierter Speicher

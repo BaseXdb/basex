@@ -20,8 +20,6 @@ interface TreeViewOptions {
   boolean BORDER_RECTANGLES = true;
   /** Fill rectangles. */
   boolean FILL_RECTANGLES = true;
-  /** Slim rectangles to text length. */
-  boolean SLIM_TO_TEXT = true;
   /** Show extra node information. */
   boolean SHOW_EXTRA_INFO = false;
   /** Draw node text. */
