@@ -14,8 +14,6 @@ interface TreeViewOptions {
   boolean USE_CHILDITERATOR = false;
   /** Draw only element nodes. */
   boolean ONLY_ELEMENT_NODES = false;
-  /** Show Attributes. */
-  boolean SHOW_ATTR = false;
   /** Show descendant connection. */
   boolean SHOW_DESCENDANTS_CONN = true;
   /** Draw rectangle border. */
@@ -39,7 +37,7 @@ interface TreeViewOptions {
   /** Margin to bottom. */
   int BOTTOM_MARGIN = 9;
   /** Margin left and right. */
-  int LEFT_AND_RIGHT_MARGIN = 4;
+  int LEFT_AND_RIGHT_MARGIN = 4;  
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
   /** Highlight Color small space. */

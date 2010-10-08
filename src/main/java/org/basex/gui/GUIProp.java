@@ -99,6 +99,9 @@ public final class GUIProp extends AProp {
   public static final Object[] MAPALGO = { "MAPALGO", 0 };
   /** number of children <-> size weight in (0;100). */
   public static final Object[] MAPWEIGHT = { "MAPWEIGHT", 0 };
+  
+  /** Show attributes in treeview. */
+  public static final Object[] TREEATTS = { "TREEATTS", false};
 
   /** Dot sizes in plot. */
   public static final Object[] PLOTDOTS = { "PLOTDOTS", 0 };

@@ -1,64 +1,67 @@
 package org.basex.gui.view.tree;
 
 import java.util.ArrayList;
+
 import org.basex.data.Data;
 import org.basex.util.IntList;
 
 /**
  * This class determines nodes per level and caches them.
- *
+ * 
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
 final class TreeNodeCache implements TreeViewOptions {
   /** Document depth. */
-  private final int maxLevel;
+  private int maxLevel;
   /** All nodes document nodes per level. */
   private IntList[] nodes;
 
   /**
    * This constructor invokes methods to cache all document nodes.
    * @param data data reference
+   * @param atts show attributes
    */
-  TreeNodeCache(final Data data) {
-    final ArrayList<IntList> alil = new ArrayList<IntList>();
+  TreeNodeCache(final Data data, final boolean atts) {
+    
+      final ArrayList<IntList> alil = new ArrayList<IntList>();
 
-    if(USE_CHILDITERATOR) {
-      IntList parList = new IntList(1);
-      parList.add(0);
-      alil.add(parList);
-      int l = 0;
-      while(true) {
-        parList = getNextNodeLine(parList, data);
-        if(parList.size() == 0) break;
+      if(USE_CHILDITERATOR) {
+        IntList parList = new IntList(1);
+        parList.add(0);
         alil.add(parList);
-        ++l;
-      }
-      maxLevel = l + 1;
-      nodes = alil.toArray(new IntList[maxLevel]);
-    } else {
-      final int ts = data.meta.size;
-      final int[] roots = data.doc();
-      alil.add(new IntList());
-      for(int i = 0; i < roots.length; ++i) {
-        final int root = roots[i];
-        alil.get(0).add(root);
-        final int sh = i + 1 == roots.length ? ts : roots[i + 1];
-        for(int p = root + 1; p < sh; ++p) {
-          final int k = data.kind(p);
-          if(!SHOW_ATTR && k == Data.ATTR || ONLY_ELEMENT_NODES
-              & k != Data.ELEM) continue;
-          int lv = 0;
-          final int par = data.parent(p, k);
-          while(par != alil.get(lv).get(alil.get(lv).size() - 1))
-            ++lv;
-          for(int j = alil.size(); j <= lv + 1; ++j) alil.add(new IntList());
-          alil.get(lv + 1).add(p);
+        int l = 0;
+        while(true) {
+          parList = getNextNodeLine(parList, data);
+          if(parList.size() == 0) break;
+          alil.add(parList);
+          ++l;
         }
-      }
-      maxLevel = alil.size();
+        maxLevel = l + 1;
+      } else {
+        final int ts = data.meta.size;
+        final int[] roots = data.doc();
+        alil.add(new IntList());
+        for(int i = 0; i < roots.length; ++i) {
+          final int root = roots[i];
+          alil.get(0).add(root);
+          final int sh = i + 1 == roots.length ? ts : roots[i + 1];
+          for(int p = root + 1; p < sh; ++p) {
+            final int k = data.kind(p);
+            if(!atts && k == Data.ATTR || ONLY_ELEMENT_NODES
+                & k != Data.ELEM) continue;
+            int lv = 0;
+            final int par = data.parent(p, k);
+            while(par != alil.get(lv).get(alil.get(lv).size() - 1))
+              ++lv;
+            for(int j = alil.size(); j <= lv + 1; ++j)
+              alil.add(new IntList());
+            alil.get(lv + 1).add(p);
+          }
+        }
+        maxLevel = alil.size();
+      }       
       nodes = alil.toArray(new IntList[maxLevel]);
-    }
   }
 
   // old version using meta.height

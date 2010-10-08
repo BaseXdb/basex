@@ -18,9 +18,10 @@ final class TreeSubtree {
   /**
    * Creates new subtree.
    * @param d data
+   * @param atts show attributes
    */
-  TreeSubtree(final Data d) {
-    nc = new TreeNodeCache(d);
+  TreeSubtree(final Data d, final boolean atts) {
+    nc = new TreeNodeCache(d, atts);
   }
 
   /**

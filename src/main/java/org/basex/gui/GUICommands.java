@@ -44,6 +44,7 @@ import org.basex.gui.dialog.DialogOpen;
 import org.basex.gui.dialog.DialogPrefs;
 import org.basex.gui.dialog.DialogProgress;
 import org.basex.gui.dialog.DialogServer;
+import org.basex.gui.dialog.DialogTreeOptions;
 import org.basex.gui.layout.BaseXFileChooser;
 import org.basex.gui.view.ViewData;
 import org.basex.io.IO;
@@ -714,6 +715,15 @@ public enum GUICommands implements GUICommand {
       new DialogMapLayout(gui);
     }
   },
+  
+  /** TreeView options. */
+  TREEOPTIONS(GUITREEOPTIONS, null, GUITREEOPTIONSTT, true, false) {
+    @Override
+    public void execute(final GUI gui) {
+      new DialogTreeOptions(gui);
+    }
+  },
+  
 
   /** Shows a preference dialog. */
   PREFS(GUIPREFS + DOTS, Prop.MAC ? "% COMMA" : "% P", GUIPREFSTT, false,

@@ -784,6 +784,10 @@ public interface Text {
   /** Command info. */
   String GUIMAPLAYOUTTT = lang("c_maplayouttt");
   /** Command info. */
+  String GUITREEOPTIONS = lang("c_treeoptions") + DOTS;
+  /** Command info. */
+  String GUITREEOPTIONSTT = lang("c_treeoptionstt");
+  /** Command info. */
   String GUIOPEN = lang("c_open");
   /** Command info. */
   String GUIOPENTT = lang("c_opentt");
@@ -1232,6 +1236,12 @@ public interface Text {
     lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
     lang("dm_choice4"), lang("dm_choice5")
   };
+  
+  /** Dialog title for treeview options. */
+  String TREEOPTIONSTITLE = lang("dm_title");
+  /** Show attributes. */
+  String TREEATT = lang("dm_atts"); 
+  
   /** Predefined number of layouts. */
   String[] MAPALG = {
     "Split Layout", "Strip Layout", "Squarified Layout",

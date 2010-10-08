@@ -84,6 +84,9 @@ public final class TreeView extends View implements TreeViewOptions {
   private boolean inFocus;
   /** If window-size changed. */
   private boolean winChange;
+  /** Show attributes. */
+  private boolean showAtts;
+  
 
   /**
    * Default constructor.
@@ -159,6 +162,7 @@ public final class TreeView extends View implements TreeViewOptions {
     final Context c = gui.context;
     final Data data = c.data;
     if(data == null) return;
+    if(showAttsChanged()) paintType = PAINT_NEW_INIT;
 
     super.paintComponent(g);
     gui.painting = true;
@@ -171,7 +175,7 @@ public final class TreeView extends View implements TreeViewOptions {
     fontHeight = g.getFontMetrics().getHeight();
 
     if(paintType == PAINT_NEW_INIT) {
-      sub = new TreeSubtree(data);
+      sub = new TreeSubtree(data, showAtts);
       tr = new TreeRects(gui.prop);
     }
 
@@ -1079,6 +1083,17 @@ public final class TreeView extends View implements TreeViewOptions {
     final int ih = (int) ((h - (levelDistance * (lvs - 1) + lvs * nodeHeight))
         / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
+  }
+  
+  /**
+   * Returns true if show attributes has changed.
+   * @return show attributes has changed
+   */
+  private boolean showAttsChanged() {
+    final GUIProp gprop = gui.prop;
+    if(gprop.is(GUIProp.TREEATTS) == showAtts) return false;
+    showAtts =  !showAtts;
+    return true;
   }
 
   /**
