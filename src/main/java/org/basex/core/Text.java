@@ -1238,9 +1238,9 @@ public interface Text {
   };
   
   /** Dialog title for treeview options. */
-  String TREEOPTIONSTITLE = lang("dm_title");
+  String TREEOPTIONSTITLE = lang("dt_title");
   /** Show attributes. */
-  String TREEATT = lang("dm_atts"); 
+  String TREEATT = lang("dt_atts"); 
   
   /** Predefined number of layouts. */
   String[] MAPALG = {

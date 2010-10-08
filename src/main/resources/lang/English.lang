@@ -177,6 +177,9 @@ dm_size_fssize=file size
 dm_size_textsize=text length
 dm_size_both=children/text length
 
+dt_title=TreeView Options
+dt_atts=Show Attributes
+
 dz_total=Total Memory
 dz_reserved=Reserved Memory
 dz_used=Used Memory

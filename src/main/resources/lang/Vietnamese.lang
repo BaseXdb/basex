@@ -177,6 +177,9 @@ dm_size_fssize=kích cỡ tệp
 dm_size_textsize=độ dài văn bản
 dm_size_both=không/con cái và độ dài văn bản
 
+dt_title=TreeView Options
+dt_atts=Show Attributes
+
 dz_total=Tổng bộ nhớ
 dz_reserved=Bộ nhớ đặt trước
 dz_used=Bộ nhớ đã sử dụng

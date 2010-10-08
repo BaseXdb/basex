@@ -177,6 +177,9 @@ dm_size_fssize=Dateigröße
 dm_size_textsize=Textlänge
 dm_size_both=Kindknoten/Textlänge
 
+dt_title=TreeView Optionen
+dt_atts=Zeige Attribute
+
 dz_total=Insgesamter Speicher
 dz_reserved=Reservierter Speicher
 dz_used=Genutzter Speicher

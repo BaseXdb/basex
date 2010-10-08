@@ -177,6 +177,9 @@ dm_size_fssize=taille du fichier
 dm_size_textsize=longueur du texte
 dm_size_both=noeuds fils/longueur du texte
 
+dt_title=TreeView Options
+dt_atts=Show Attributes
+
 dz_total=Mémoire totale
 dz_reserved=Mémoire réservée
 dz_used=Mémoire utilisée

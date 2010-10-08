@@ -177,6 +177,9 @@ dm_size_fssize=ファイルサイズ
 dm_size_textsize=テキスト長
 dm_size_both=子/テキスト長
 
+dt_title=TreeView Options
+dt_atts=Show Attributes
+
 dz_total=メモリ合計
 dz_reserved=予約メモリ量
 dz_used=メモリ使用量
