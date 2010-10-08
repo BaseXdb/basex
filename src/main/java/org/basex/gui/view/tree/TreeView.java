@@ -339,9 +339,9 @@ public final class TreeView extends View implements TreeViewOptions {
     if(markedImage != null) {
       final int h = markedImage.getHeight();
       final int w = markedImage.getWidth();
-      if(y > h || y < 0 || x > w || x < 0) return false;
+      if(y >= h || 0 > y || x >= w || 0 > x) return false;
       final int marc = markedImage.getRGB(x, y);
-      return colormark1.equals(marc) || colormarkA.equals(marc);
+      return colormark1.getRGB() == marc || colormarkA.getRGB() == marc;
     }
     return false;
   }
