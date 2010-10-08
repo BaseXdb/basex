@@ -569,6 +569,7 @@ ch_exit2=Beendet %.
 # Help Texts
 h_hist=Auswahl der letzten Texteingaben.
 h_save=Speichert das Ergebnis.
+h_save=Speichert die Anfrage.
 h_go=Führt die Anfrage aus.
 h_stop=Stoppt den aktuellen Prozess.
 h_recent=Zuletzt geöffnete Dateien

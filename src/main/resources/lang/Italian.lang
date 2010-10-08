@@ -570,6 +570,7 @@ ch_exit2=Esci da %.
 # Help Texts
 h_hist=Mostra la cronologia degli inserimenti.
 h_save=Salva i risultati.
+h_save2=Salva l'interrogazione.
 h_go=Esegue l'interrogazione.
 h_stop=Ferma il processo in corso.
 h_recent=File aperti recentemente

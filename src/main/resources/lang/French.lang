@@ -570,6 +570,7 @@ ch_exit2=Quitter %.
 # Aide Texts
 h_hist=Afficher l'historique des saisies.
 h_save=Enregistre le resultat.
+h_save2=Enregistre la requête.
 h_go=Execute la requête.
 h_stop=Stoppe le processus en cours.
 h_recent=Fichiers récemment ouverts

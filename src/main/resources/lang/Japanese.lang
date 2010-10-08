@@ -571,6 +571,7 @@ ch_exit2=% を終了します。
 # Help Texts
 h_hist=入力履歴の表示
 h_save=検索結果を保存します。
+h_save2=Saves the query.
 h_go=クエリーを実行します。
 h_stop=現在の操作を中止します。
 h_recent=最近オープンしたファイル
