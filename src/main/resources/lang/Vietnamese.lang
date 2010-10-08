@@ -67,6 +67,7 @@ dc_chop=Cắt hết khoảng trống
 dc_intparse=Sử dụng bộ phân tích XML nội bộ
 dc_entities=Phân tích Entities
 dc_dtd=Phân tích DTDs
+dc_usecat=Use XML Catalog file
 dc_wcindex=Support Wildcards
 dc_ftstem=Nhét đầy
 dc_ftdc=Dấu phụ phân biệt

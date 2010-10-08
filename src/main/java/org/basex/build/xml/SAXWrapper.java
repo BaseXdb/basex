@@ -7,12 +7,16 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 import org.basex.build.FileParser;
 import org.basex.core.ProgressException;
+import org.basex.core.Prop;
 import org.basex.io.IO;
 import org.basex.io.IOFile;
 import org.basex.util.Util;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
+
+import com.sun.org.apache.xml.internal.resolver.CatalogManager;
+import com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver;
 
 /**
  * This class parses an XML document with Java's default SAX parser. Note that
@@ -34,13 +38,16 @@ public final class SAXWrapper extends FileParser {
   private final SAXSource source;
   /** File length. */
   private long length;
+  /** Properties. */
+  private final Prop prop;
 
   /**
    * Constructor.
    * @param s sax source
+   * @param pr Properties
    */
-  public SAXWrapper(final SAXSource s) {
-    this(s, IO.get(s.getSystemId()).name(), "");
+  public SAXWrapper(final SAXSource s, final Prop pr) {
+    this(s, IO.get(s.getSystemId()).name(), "", pr);
   }
 
   /**
@@ -48,10 +55,13 @@ public final class SAXWrapper extends FileParser {
    * @param s sax source
    * @param n name
    * @param ta target to insert into
+   * @param pr Properties
    */
-  public SAXWrapper(final SAXSource s, final String n, final String ta) {
+  public SAXWrapper(final SAXSource s, final String n, final String ta,
+      final Prop pr) {
     super(io(s, n), ta);
     source = s;
+    prop = pr;
   }
 
   /**
@@ -79,7 +89,17 @@ public final class SAXWrapper extends FileParser {
       }
 
       sax = new SAXHandler(builder);
-      r.setDTDHandler(sax);
+      if(prop.get(Prop.CATFILE).length() > 0) {
+        CatalogManager cm = new CatalogManager();
+        cm.setCatalogFiles(prop.get(Prop.CATFILE));
+        cm.setIgnoreMissingProperties(true);
+        cm.setPreferPublic(true);
+        cm.setUseStaticCatalog(false);
+        cm.setVerbosity(0);
+        r.setEntityResolver(new CatalogResolver(cm));
+      }
+
+      r.setDTDHandler(sax);      
       r.setContentHandler(sax);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", sax);
       r.setErrorHandler(sax);

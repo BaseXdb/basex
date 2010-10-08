@@ -4,6 +4,7 @@ import static org.basex.core.Text.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import org.basex.core.Prop;
 import org.basex.core.cmd.List;
 import org.basex.gui.GUI;
@@ -59,6 +60,12 @@ public final class DialogCreate extends Dialog {
   private final BaseXBack buttons;
   /** Available databases. */
   private final StringList db;
+  /** Catalog file. */
+  private BaseXTextField cfile;
+  /** Use XML Catalog. */
+  private final BaseXCheckBox usecat;
+  /** Browse Catalog file. */
+  private BaseXButton browsec;
 
   /**
    * Default constructor.
@@ -99,7 +106,6 @@ public final class DialogCreate extends Dialog {
     filter = new BaseXTextField(prop.get(Prop.CREATEFILTER), this);
     p.add(filter);
     p.add(new BaseXLabel());
-
     l = new BaseXLabel(CREATENAME, false, true);
     l.setBorder(5, 0, 0, 0);
     p.add(l);
@@ -119,7 +125,7 @@ public final class DialogCreate extends Dialog {
 
     // create checkboxes
     final BaseXBack p2 = new BaseXBack();
-    p2.setLayout(new TableLayout(9, 1));
+    p2.setLayout(new TableLayout(14, 1));
     p2.setBorder(8, 8, 8, 8);
 
     intparse = new BaseXCheckBox(CREATEINTPARSE,
@@ -136,8 +142,25 @@ public final class DialogCreate extends Dialog {
     chop = new BaseXCheckBox(CREATECHOP, prop.is(Prop.CHOP), 0, this);
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, true, false));
+    p2.add(new BaseXLabel(" "));
+    BaseXBack fl = new BaseXBack();
+    fl.setLayout(new TableLayout(2, 2));
+    usecat = new BaseXCheckBox(USECATFILE,
+        prop.get(Prop.CATFILE).length() > 0, 12, this);
+    fl.add(usecat);
+    fl.add(new BaseXLabel());
+    cfile = new BaseXTextField(prop.get(Prop.CATFILE), this);
+    fl.add(cfile);
 
-    // create checkboxes
+    browsec = new BaseXButton(BUTTONBROWSE, this);
+    browsec.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(final ActionEvent e) { catchoose(); }
+    });
+    fl.add(browsec);
+    p2.add(fl);
+    
+   // create checkboxes
     final BaseXBack p3 = new BaseXBack();
     p3.setLayout(new TableLayout(6, 1, 0, 0));
     p3.setBorder(8, 8, 8, 8);
@@ -202,13 +225,33 @@ public final class DialogCreate extends Dialog {
       gprop.set(GUIProp.OPENPATH, file.dir());
     }
   }
+  /**
+   * Opens a file dialog to choose an XML catalog or directory.
+   */
+  void catchoose() {
+    final GUIProp gprop = gui.prop;
+    final BaseXFileChooser fc = new BaseXFileChooser(CREATETITLE,
+        gprop.get(GUIProp.OPENPATH), gui);
+    fc.addFilter(CREATEXMLDESC, IO.XMLSUFFIX);
 
+    final IO file = fc.select(BaseXFileChooser.Mode.FDOPEN);
+    if(file != null) {
+      cfile.setText(file.path());
+    }
+  }
   /**
    * Returns the chosen XML file or directory path.
    * @return file or directory
    */
   public String path() {
     return path.getText().trim();
+  }
+  /**
+   * Returns the chosen XML file or directory path.
+   * @return file or directory
+   */
+  public String cfile() {
+    return cfile.getText().trim();
   }
 
   /**
@@ -225,10 +268,20 @@ public final class DialogCreate extends Dialog {
 
     entities.setEnabled(intparse.isSelected());
     dtd.setEnabled(intparse.isSelected());
+    usecat.setEnabled(!intparse.isSelected());
+    intparse.setEnabled(!usecat.isSelected());
+    cfile.setEnabled(!intparse.isSelected() && 
+        (gui.context.prop.get(Prop.CATFILE).length() > 0
+        || usecat.isSelected()));
 
+    browsec.setEnabled(cfile.isEnabled());
     final IO file = IO.get(path());
     final boolean exists = !path().isEmpty() && file.exists();
     if(exists) gui.prop.set(GUIProp.OPENPATH, file.path());
+    final boolean catexists = IO.get(cfile()).exists();
+    if(catexists && usecat.isSelected()) gui.context.prop.set(Prop.CATFILE,
+        cfile());
+    else gui.context.prop.set(Prop.CATFILE, "");
 
     final String nm = dbname();
     ok = exists && !nm.isEmpty();

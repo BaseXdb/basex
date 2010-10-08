@@ -67,6 +67,7 @@ dc_chop=Chop Whitespaces
 dc_intparse=Use internal XML Parser
 dc_entities=Parse Entities
 dc_dtd=Parse DTDs
+dc_usecat=Use XML Catalog file
 dc_wcindex=Support Wildcards
 dc_ftstem=(English) Stemming
 dc_ftdc=Diacritics

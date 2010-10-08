@@ -67,6 +67,7 @@ dc_chop=Leerzeichen entfernen
 dc_intparse=Internen XML-Parser benutzen
 dc_entities=Parsen von Entities
 dc_dtd=Parsen von DTDs
+dc_usecat=Use XML Catalog file
 dc_wcindex=Unterstützung von Wildcards
 dc_ftstem=Stemming (englisch)
 dc_ftdc=Diakritische Zeichen

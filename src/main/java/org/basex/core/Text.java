@@ -968,6 +968,9 @@ public interface Text {
 
   /** Dialog title for choosing a file. */
   String CREATETITLE = lang("dc_choose");
+  /** Use Catalog file Checkbox. */
+  String USECATFILE = lang("dc_usecat");
+
   /** Database creation filter. */
   String CREATEPATTERN = lang("dc_pattern");
   /** Dialog title for creating a database. */

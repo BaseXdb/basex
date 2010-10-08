@@ -68,6 +68,7 @@ dc_chop=Taglia gli spazi
 dc_intparse=Usa il parser XML interno
 dc_entities=Analizza le entità
 dc_dtd=Analizza la DTD
+dc_usecat=Use XML Catalog file
 dc_wcindex=Supporta caratteri jolly
 dc_ftstem=Radice linguistica (Inglese)
 dc_ftdc=Segni diacritici

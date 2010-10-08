@@ -67,6 +67,7 @@ dc_chop=空白を取り除く
 dc_intparse=内部XMLパーサーを使用
 dc_entities=実体のパース
 dc_dtd=DTDのパース
+dc_usecat=Use XML Catalog file
 dc_wcindex=ワイルドカードのサポート
 dc_ftstem=語幹抽出 (英語のみ)
 dc_ftdc=分音符号
