@@ -524,7 +524,8 @@ public final class QueryContext extends Progress {
         if(s == -1) {
           addDocs(doc(input, true, false, ii), EMPTY);
         } else {
-          addDocs(doc(substring(input, 0, s), true, false, ii), input);
+          addDocs(doc(substring(input, 0, s), true, false, ii),
+              substring(input, s + 1));
         }
       }
     }
@@ -545,7 +546,7 @@ public final class QueryContext extends Progress {
       final DBNode dbn = new DBNode(data, p);
       if(rt) {
         col.add(dbn);
-      } else if(contains(dbn.base(), input)) {
+      } else if(startsWith(lc(data.text(p, true)), lc(input))) {
         col.add(dbn);
         // [AW] could lead to unexpected side effects
         addDoc(dbn);

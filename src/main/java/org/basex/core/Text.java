@@ -1285,6 +1285,8 @@ public interface Text {
   /** Help string. */
   byte[] HELPSAVE = token(lang("h_save"));
   /** Help string. */
+  byte[] HELPSAVE2 = token(lang("h_save2"));
+  /** Help string. */
   byte[] HELPRECENT = token(lang("h_recent"));
   /** Help string. */
   byte[] HELPQCLOSE = token(lang("h_qclose"));
