@@ -16,6 +16,7 @@ import org.basex.query.expr.CPI;
 import org.basex.query.expr.CTxt;
 import org.basex.query.expr.Arith;
 import org.basex.query.expr.OrderByExpr;
+import org.basex.query.expr.OrderByStable;
 import org.basex.query.expr.TypeCase;
 import org.basex.query.expr.Cast;
 import org.basex.query.expr.Castable;
@@ -785,7 +786,7 @@ public class QueryParser extends InputParser {
       check(BY);
       ap = qp;
       do order = orderSpec(order); while(consumeWS2(COMMA));
-      if(order != null) order = Array.add(order, new OrderBy(input()));
+      if(order != null) order = Array.add(order, new OrderByStable(input()));
       alter = ORDERBY;
     }
 

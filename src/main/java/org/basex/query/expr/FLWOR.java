@@ -228,9 +228,11 @@ public class FLWOR extends ParseExpr {
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Iter[] iter = new Iter[fl.length];
     for(int f = 0; f < fl.length; ++f) iter[f] = ctx.iter(fl[f]);
-    final ValueList vl = new ValueList();
-    order.init(vl);
+    final int s = (int) size();
+    final ValueList vl = s >= 0 ? new ValueList(s) : new ValueList();
+    order.init(vl, s);
     iter(ctx, vl, iter, 0);
+    //if(1 == 1) return Iter.EMPTY;
     return ctx.iter(order);
   }
 

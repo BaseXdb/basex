@@ -154,11 +154,11 @@ public enum Err {
   URIINV(FORG, 2, "Invalid URI: %"),
 
   /** FORG0003: Evaluation exception. */
-  EXP01(FORG, 3, "Zero or one value expected."),
+  EXPECTZ0(FORG, 3, "Zero or one value expected."),
   /** FORG0004: Evaluation exception. */
-  EXP1M(FORG, 4, "One or more values expected."),
+  EXPECTOM(FORG, 4, "One or more values expected."),
   /** FORG0005: Evaluation exception. */
-  EXP1(FORG, 5, "Exactly one value expected."),
+  EXPECTO(FORG, 5, "Exactly one value expected."),
   /** FORG0006: Evaluation exception. */
   FUNCMP(FORG, 6, "%: % expected, % found."),
   /** FORG0006: Evaluation exception. */
@@ -378,8 +378,6 @@ public enum Err {
   NSMISS(XPST, 81, "Namespace missing."),
 
   /** XPTY0004: Typing exception. */
-  XPSORT(XPTY, 4, "No sequences allowed as sort keys."),
-  /** XPTY0004: Typing exception. */
   XPSEQ(XPTY, 4, "No sequence % allowed."),
   /** XPTY0004: Typing exception. */
   XPINVCAST(XPTY, 4, "Invalid cast from % to %: %."),
@@ -406,7 +404,7 @@ public enum Err {
   /** XPTY0004: Typing exception. */
   CPIWRONG(XPTY, 4, "% not allowed as PI name: \"%\"."),
   /** XPTY0004: Typing exception. */
-  NAMEWRONG(XPTY, 4, "Invalid QName: \"%\"."),
+  INVQNAME(XPTY, 4, "Invalid QName: \"%\"."),
   /** XPTY0004: Typing exception. */
   XPNODES(XPTY, 19, "%: nodes expected, % found."),
 
@@ -430,7 +428,7 @@ public enum Err {
   /** XQDY0072: Evaluation exception. */
   COMINVALID(XQDY, 72, "Invalid comment."),
   /** XQDY0074: Evaluation exception. */
-  INVAL(XQDY, 74, "Invalid name: \"%\""),
+  INVNAME(XQDY, 74, "Invalid name: \"%\""),
   /** XPDY0095: resulting value for any grouping variable >> 1 item. */
   XGRP(XQDY, 95, "No sequence allowed as grouping variable."),
   /** XQDY0096: Invalid namespace in constructed element. */

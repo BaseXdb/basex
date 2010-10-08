@@ -53,13 +53,16 @@ public final class CAttr extends CFrag {
   @Override
   public FAttr item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final QNm name = qname(ctx, checkItem(atn, ctx), true);
     final byte[] pre = name.pref();
     final byte[] ln = name.ln();
-    final byte[] uri = name.uri().atom();
 
-    if(comp && (eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
-        || eq(pre, XML) ^ eq(uri, XMLURI))) CAINS.thrw(input, pre, uri);
+    if(comp) {
+      final byte[] uri = name.uri().atom();
+      if(eq(pre, XMLNS) || eq(ln, XMLNS) || eq(uri, XMLNSURI)
+          || eq(pre, XML) ^ eq(uri, XMLURI)) CAINS.thrw(input, pre, uri);
+    }
 
     // TODO [CG] create a prefix if none is given but a URI exists
 

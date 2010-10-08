@@ -60,6 +60,7 @@ public final class NameTest extends Test {
     // check existence of namespaces in input document
     final Data data = ctx.data();
     if(data == null) return true;
+
     if(ctx.nsElem.length == 0 && data.ns.size() == 0) {
       // no prefix - check only name
       if(test == Name.STD && !name.ns()) test = Name.NAME;

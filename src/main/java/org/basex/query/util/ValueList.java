@@ -14,6 +14,22 @@ public final class ValueList extends ElementList {
   Value[] list = new Value[CAP];
 
   /**
+   * Default constructor.
+   */
+  public ValueList() {
+    this(CAP);
+  }
+
+
+  /**
+   * Constructor, specifying an initial array capacity.
+   * @param c array capacity
+   */
+  public ValueList(final int c) {
+    list = new Value[c];
+  }
+
+  /**
    * Adds an element to the list.
    * @param e element be added
    */

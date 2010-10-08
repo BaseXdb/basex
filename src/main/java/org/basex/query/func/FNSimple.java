@@ -41,7 +41,7 @@ public final class FNSimple extends Fun {
     switch(def) {
       case ONEORMORE:
         if(expr[0].type().mayBeZero()) ir = ItemIter.get(ir);
-        if(ir.size() < 1) EXP1M.thrw(input);
+        if(ir.size() < 1) EXPECTOM.thrw(input);
         return ir;
       case UNORDER:
         return ir;
@@ -53,6 +53,7 @@ public final class FNSimple extends Fun {
   @Override
   public Item item(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
+
     final Expr e = expr.length == 1 ? expr[0] : null;
     switch(def) {
       case FALSE:
@@ -70,15 +71,14 @@ public final class FNSimple extends Fun {
       case DEEPEQUAL:
         return Bln.get(deep(ctx));
       case ZEROORONE:
-        Iter iter = e.iter(ctx);
-        Item it = iter.next();
-        if(it == null) return null;
-        if(iter.next() != null) EXP01.thrw(input);
+        Iter ir = e.iter(ctx);
+        Item it = ir.next();
+        if(it != null && ir.next() != null) EXPECTZ0.thrw(input);
         return it;
       case EXACTLYONE:
-        iter = e.iter(ctx);
-        it = iter.next();
-        if(it == null || iter.next() != null) EXP1.thrw(input);
+        ir = e.iter(ctx);
+        it = ir.next();
+        if(it == null || ir.next() != null) EXPECTO.thrw(input);
         return it;
       default:
         return super.item(ctx, ii);

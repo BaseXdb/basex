@@ -70,7 +70,7 @@ public final class Namespaces {
     byte[] uri = find(pre);
     if(uri == null) uri = NSGlobal.uri(pre);
     if(uri.length == 0 && pre.length != 0) {
-      (dn ? INVAL : PREUNKNOWN).thrw(ii, pre);
+      (dn ? INVNAME : PREUNKNOWN).thrw(ii, pre);
     }
     return uri;
   }

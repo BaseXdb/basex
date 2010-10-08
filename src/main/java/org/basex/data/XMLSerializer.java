@@ -193,6 +193,7 @@ public final class XMLSerializer extends Serializer {
   @Override
   public void cls() throws IOException {
     if(wrap) closeElement();
+    out.flush();
   }
 
   @Override
@@ -431,7 +432,6 @@ public final class XMLSerializer extends Serializer {
     print(ELEM2);
     ind = indent;
     if(mth == M_HTML) script &= !SCRIPTS.contains(lc(t));
-    out.flush();
   }
 
   /**

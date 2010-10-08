@@ -75,9 +75,10 @@ public final class Order extends ParseExpr {
   /**
    * Initializes the order expressions.
    * @param v value list
+   * @param s expected size
    */
-  void init(final ValueList v) {
-    for(final OrderBy o : ob) o.init();
+  void init(final ValueList v, final int s) {
+    for(int o = 0; o < ob.length - 1; ++o) ob[o].init(s);
     vl = v;
   }
 
@@ -87,7 +88,7 @@ public final class Order extends ParseExpr {
    * @throws QueryException query exception
    */
   void add(final QueryContext ctx) throws QueryException {
-    for(final OrderBy o : ob) o.add(ctx);
+    for(int o = 0; o < ob.length - 1; ++o) ob[o].add(ctx);
   }
 
   @Override

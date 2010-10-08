@@ -206,7 +206,9 @@ public abstract class Serializer {
     if(inTag) {
       inTag = false;
       empty();
-    } else close(open);
+    } else {
+      close(open);
+    }
   }
 
   /**
