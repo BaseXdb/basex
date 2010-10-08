@@ -487,7 +487,6 @@ public abstract class W3CTS {
                 pre += rdata.size(pre, rdata.kind(pre));
               }
 
-              // [CG] XQuery: check if null reference is safe
               final boolean eq = FNSimple.deep(null, iter, ir);
               if(!eq && debug) {
                 iter.reset();
@@ -502,6 +501,7 @@ public abstract class W3CTS {
               }
               rdata.close();
               if(eq) break;
+            } catch(final IOException ex) {
             } catch(final Throwable ex) {
               ex.printStackTrace();
             }
@@ -582,6 +582,7 @@ public abstract class W3CTS {
     if(verbose) {
       final long t = perf.getTime();
       if(t > 100000000) Util.out(": " + Performance.getTimer(t, 1));
+      Util.outln();
     }
     return single == null || !outname.equals(single);
   }
