@@ -111,15 +111,6 @@ public final class TokenBuilder {
   }
 
   /**
-   * Adds a single character to the token.
-   * @param ch the character to be added
-   * @return self reference
-   */
-  public TokenBuilder add(final char ch) {
-    return add((int) ch);
-  }
-
-  /**
    * Adds the specified UTF8 character.
    * @param ch the character to be added
    * @return self reference

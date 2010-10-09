@@ -54,7 +54,7 @@ public final class DataAccess {
    * Returns the current file position.
    * @return text as byte array
    */
-  public synchronized long pos() {
+  public long pos() {
     return bm.current().pos + off;
   }
 
@@ -62,7 +62,7 @@ public final class DataAccess {
    * Returns file length.
    * @return file length
    */
-  public synchronized long length() {
+  public long length() {
     return len;
   }
 
@@ -70,7 +70,7 @@ public final class DataAccess {
    * Checks if more bytes can be read.
    * @return result of check
    */
-  public synchronized boolean more() {
+  public boolean more() {
     return pos() < len;
   }
 
@@ -192,7 +192,7 @@ public final class DataAccess {
    * @param p write position
    * @param v byte array to be appended
    */
-  public synchronized void writeBytes(final long p, final byte[] v) {
+  public void writeBytes(final long p, final byte[] v) {
     cursor(p);
     writeNum(v.length);
     for(final byte b : v) write(b);
@@ -203,7 +203,7 @@ public final class DataAccess {
    * @param p read position
    * @return buffer
    */
-  public synchronized Buffer cursor(final long p) {
+  public Buffer cursor(final long p) {
     off = (int) (p & IO.BLOCKSIZE - 1);
 
     final boolean ch = bm.cursor(p - off);
@@ -244,7 +244,7 @@ public final class DataAccess {
    * @param bf buffer to write
    * @throws IOException I/O exception
    */
-  private synchronized void writeBlock(final Buffer bf) throws IOException {
+  private void writeBlock(final Buffer bf) throws IOException {
     file.seek(bf.pos);
     file.write(bf.data);
   }
@@ -253,7 +253,7 @@ public final class DataAccess {
    * Appends a value to the file and return it's offset.
    * @param v number to be appended
    */
-  private synchronized void writeNum(final int v) {
+  private void writeNum(final int v) {
     if(v < 0 || v > 0x3FFFFFFF) {
       write(0xC0); write(v >>> 24); write(v >>> 16); write(v >>> 8); write(v);
     } else if(v > 0x3FFF) {
@@ -270,7 +270,7 @@ public final class DataAccess {
    * Reads the next byte.
    * @return next byte
    */
-  private synchronized int read() {
+  private int read() {
     final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.current();
     return bf.data[off++] & 0xFF;
   }
@@ -279,7 +279,7 @@ public final class DataAccess {
    * Writes the next byte.
    * @param b byte to be written
    */
-  private synchronized void write(final int b) {
+  private void write(final int b) {
     final Buffer bf = off == IO.BLOCKSIZE ? next() : bm.current();
     bf.data[off++] = (byte) b;
     len = Math.max(len, bf.pos + off);
@@ -290,7 +290,7 @@ public final class DataAccess {
    * Writes an integer value to the specified output stream.
    * @param v value to be written
    */
-  public synchronized void writeInt(final int v) {
+  public void writeInt(final int v) {
     write(v >>> 24);
     write(v >>> 16);
     write(v >>>  8);
@@ -301,7 +301,7 @@ public final class DataAccess {
    * Returns the next block.
    * @return buffer
    */
-  private synchronized Buffer next() {
+  private Buffer next() {
     off = 0;
     return cursor(bm.current().pos + IO.BLOCKSIZE);
   }

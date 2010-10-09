@@ -117,7 +117,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void flush() {
+  public synchronized void flush() {
     try {
       table.flush();
       texts.flush();
@@ -130,7 +130,7 @@ public final class DiskData extends Data {
   }
 
   @Override
-  public void cls() throws IOException {
+  protected synchronized void cls() throws IOException {
     if(meta.dirty) flush();
     table.close();
     texts.close();

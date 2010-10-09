@@ -177,8 +177,6 @@ public class BufferInput extends InputStream {
     // handle different encodings
     byte ch = readByte();
     // comparison by references
-    if(enc == UTF16LE) return ch & 0xFF | (readByte() & 0xFF) << 8;
-    if(enc == UTF16BE) return (ch & 0xFF) << 8 | readByte() & 0xFF;
     if(enc == UTF8) {
       final int cl = cl(ch);
       if(cl == 1) return ch & 0xFF;
@@ -186,6 +184,8 @@ public class BufferInput extends InputStream {
       for(int c = 1; c < cl; ++c) cache[c] = readByte();
       return cp(cache, 0);
     }
+    if(enc == UTF16LE) return ch & 0xFF | (readByte() & 0xFF) << 8;
+    if(enc == UTF16BE) return (ch & 0xFF) << 8 | readByte() & 0xFF;
     if(ch >= 0) return ch;
 
     // convert other encodings.. loop until all needed bytes have been read

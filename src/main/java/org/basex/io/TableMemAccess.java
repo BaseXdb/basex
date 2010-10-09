@@ -63,10 +63,10 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void flush() { }
+  public void flush() { }
 
   @Override
-  public synchronized void close() throws IOException {
+  public void close() throws IOException {
     if(dirty && pref != null) {
       DataOutput out = new DataOutput(meta.file(pref + 'i'));
 
@@ -99,31 +99,31 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public synchronized int read1(final int p, final int o) {
+  public int read1(final int p, final int o) {
     return (int) ((o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 7 : 15) - o << 3) & 0xFF);
   }
 
   @Override
-  public synchronized int read2(final int p, final int o) {
+  public int read2(final int p, final int o) {
     return (int) ((o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 6 : 14) - o << 3) & 0xFFFF);
   }
 
   @Override
-  public synchronized int read4(final int p, final int o) {
+  public int read4(final int p, final int o) {
     return (int) ((o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 4 : 12) - o << 3));
   }
 
   @Override
-  public synchronized long read5(final int p, final int o) {
+  public long read5(final int p, final int o) {
     return (o < 8 ? buf1 : buf2)[p] >>
       ((o < 8 ? 3 : 11) - o << 3) & 0xFFFFFFFFFFL;
   }
 
   @Override
-  public synchronized void write1(final int p, final int o, final int v) {
+  public void write1(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = (o < 8 ? 7 : 15) - o << 3;
@@ -131,7 +131,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void write2(final int p, final int o, final int v) {
+  public void write2(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = (o < 8 ? 6 : 14) - o << 3;
@@ -139,7 +139,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void write4(final int p, final int o, final int v) {
+  public void write4(final int p, final int o, final int v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = (o < 8 ? 4 : 12) - o << 3;
@@ -147,7 +147,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void write5(final int p, final int o, final long v) {
+  public void write5(final int p, final int o, final long v) {
     dirty = true;
     final long[] buf = o < 8 ? buf1 : buf2;
     final long d = (o < 8 ? 3 : 11) - o << 3;
@@ -155,12 +155,12 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void delete(final int pre, final int nr) {
+  public void delete(final int pre, final int nr) {
     move(pre + nr, pre);
   }
 
   @Override
-  public synchronized void insert(final int pre, final byte[] entries) {
+  public void insert(final int pre, final byte[] entries) {
     final int nr = entries.length >>> IO.NODEPOWER;
     move(pre, pre + nr);
     for(int l = 0, i = pre; i < pre + nr; ++i, l += 16) {
@@ -170,7 +170,7 @@ public final class TableMemAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void set(final int pre, final byte[] entries) {
+  public void set(final int pre, final byte[] entries) {
     final int nr = entries.length >>> IO.NODEPOWER;
     for(int l = 0, i = pre; i < pre + nr; ++i, l += 1 << IO.NODEPOWER) {
       buf1[i] = getLong(entries, l);
@@ -185,7 +185,7 @@ public final class TableMemAccess extends TableAccess {
    * @param op source position
    * @param np destination position
    */
-  private synchronized void move(final int op, final int np) {
+  private void move(final int op, final int np) {
     dirty = true;
     final int l = meta.size - op;
     while(l + np >= buf1.length) {
@@ -217,7 +217,7 @@ public final class TableMemAccess extends TableAccess {
    * @param a array
    * @param p position
    */
-  private synchronized void copy(final long v, final byte[] a, final int p) {
+  private void copy(final long v, final byte[] a, final int p) {
     a[p    ] = (byte) (v >> 56);
     a[p + 1] = (byte) (v >> 48);
     a[p + 2] = (byte) (v >> 40);

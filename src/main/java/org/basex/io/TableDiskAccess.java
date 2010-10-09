@@ -68,7 +68,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void flush() throws IOException {
+  public void flush() throws IOException {
     for(final Buffer b : bm.all()) if(b.dirty) writeBlock(b);
 
     if(!dirty) return;
@@ -82,7 +82,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void close() throws IOException {
+  public void close() throws IOException {
     flush();
     data.close();
   }
@@ -118,7 +118,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void write1(final int pre, final int off, final int v) {
+  public void write1(final int pre, final int off, final int v) {
     final int o = off + cursor(pre);
     final byte[] b = bf.data;
     b[o] = (byte) v;
@@ -126,7 +126,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void write2(final int pre, final int off, final int v) {
+  public void write2(final int pre, final int off, final int v) {
     final int o = off + cursor(pre);
     final byte[] b = bf.data;
     b[o] = (byte) (v >>> 8);
@@ -135,7 +135,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void write4(final int pre, final int off, final int v) {
+  public void write4(final int pre, final int off, final int v) {
     final int o = off + cursor(pre);
     final byte[] b = bf.data;
     b[o]     = (byte) (v >>> 24);
@@ -146,7 +146,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void write5(final int pre, final int off, final long v) {
+  public void write5(final int pre, final int off, final long v) {
     final int o = off + cursor(pre);
     final byte[] b = bf.data;
     b[o]     = (byte) (v >>> 32);
@@ -160,7 +160,7 @@ public final class TableDiskAccess extends TableAccess {
   /* Note to delete method: Freed blocks are currently ignored. */
 
   @Override
-  public synchronized void delete(final int first, final int nr) {
+  public void delete(final int first, final int nr) {
     // mark index as dirty and get first block
     dirty = true;
     cursor(first);
@@ -212,7 +212,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void insert(final int pre, final byte[] entries) {
+  public void insert(final int pre, final byte[] entries) {
     dirty = true;
     final int nr = entries.length >>> IO.NODEPOWER;
     meta.size += nr;
@@ -286,7 +286,7 @@ public final class TableDiskAccess extends TableAccess {
   }
 
   @Override
-  public synchronized void set(final int pre, final byte[] entries) {
+  public void set(final int pre, final byte[] entries) {
     dirty = true;
     final int nr = entries.length >>> IO.NODEPOWER;
     for(int l = 0, i = pre; i < pre + nr; ++i, l += 1 << IO.NODEPOWER) {
@@ -303,7 +303,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param pre pre of the entry to search for
    * @return offset of the entry in currentBlock
    */
-  private synchronized int cursor(final int pre) {
+  private int cursor(final int pre) {
     int fp = fpre;
     int np = npre;
 
@@ -334,9 +334,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param f first entry in that block
    * @param n first entry in the next block
    */
-  private synchronized void readBlock(final int i, final int f,
-      final int n) {
-
+  private void readBlock(final int i, final int f, final int n) {
     index = i;
     fpre = f;
     npre = n;
@@ -361,7 +359,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param buf buffer to write
    * @throws IOException I/O exception
    */
-  private synchronized void writeBlock(final Buffer buf) throws IOException {
+  private void writeBlock(final Buffer buf) throws IOException {
     data.seek(buf.pos * IO.BLOCKSIZE);
     data.write(buf.data);
     buf.dirty = false;
@@ -370,7 +368,7 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Fetches next block.
    */
-  private synchronized void nextBlock() {
+  private void nextBlock() {
     readBlock(index + 1, npre, index + 2 >= blocks ? meta.size :
       fpres[index + 2]);
   }
@@ -379,7 +377,7 @@ public final class TableDiskAccess extends TableAccess {
    * Updates the firstPre index entries.
    * @param nr number of entries to move
    */
-  private synchronized void updatePre(final int nr) {
+  private void updatePre(final int nr) {
     // update index entries for all following blocks and reduce counter
     for(int i = index + 1; i < blocks; ++i) fpres[i] -= nr;
     meta.size -= nr;
@@ -389,7 +387,7 @@ public final class TableDiskAccess extends TableAccess {
   /**
    * Creates a new, empty block.
    */
-  private synchronized void newBlock() {
+  private void newBlock() {
     try {
       if(bf.dirty) writeBlock(bf);
     } catch(final IOException ex) {
@@ -407,7 +405,7 @@ public final class TableDiskAccess extends TableAccess {
    * @param dp destination position
    * @param l source length
    */
-  private synchronized void copy(final byte[] s, final int sp, final byte[] d,
+  private void copy(final byte[] s, final int sp, final byte[] d,
       final int dp, final int l) {
     System.arraycopy(s, sp << IO.NODEPOWER, d, dp << IO.NODEPOWER,
         l << IO.NODEPOWER);
