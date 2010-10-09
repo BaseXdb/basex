@@ -121,12 +121,10 @@ public final class XQUPTest extends QueryTest {
         "replace node /up/cars/good/car/wheels/text() with 'snap'" },
         { "rep3", nod(11),
         "/up/cars/good/car/wheels[text()='snap']" },
-        /*
-        { "xxxrep4", nodes(),
+        { "xxxrep4", nod(),
         "replace node /up/cars/good/car/wheels/text() with " + SEQ1},
-        { "rep4", nodes(11),
-        "/up/cars/good/car/wheels[text()='5fooboo']" },
-        */
+        { "rep4", nod(11),
+        "/up/cars/good/car/wheels[text()='5 fooboo']" },
         // replace attribute
         { "xxxrep5", nod(),
         "replace node /up/cars/good/car[@id='1']/@id with " + SEQ3},

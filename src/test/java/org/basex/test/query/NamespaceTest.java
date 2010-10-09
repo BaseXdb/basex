@@ -36,34 +36,6 @@ public class NamespaceTest {
     { "d9", "<a xmlns='A'><b><c/><d xmlns='D'/></b><e/></a>" }
   };
 
-//  /** Test query. */
-//  @Test
-//  public final void simpleNsDuplicate() {
-//    query(
-//        "declare namespace a='aa'; insert node <a:y xmlns:a='aa'/>" +
-//        "into doc('d5')/a:x",
-//        "declare namespace a='aa';doc('d5')/a:x",
-//        "<a:x xlmns:a='aa'><a:y/></a:x>");
-//  }
-//
-//  /** Test query. */
-//  @Test
-//  public final void simpleNsDuplicate2() {
-//    query(
-//      "declare namespace a='aa'; insert node <a:y xmlns:a='aa'><a:b/></a:y> "+
-//      "into doc('d5')/a:x",
-//      "declare namespace a='aa';doc('d5')/a:x",
-//      "<a:x xlmns:a='aa'><a:y><a:b/></a:y></a:x>");
-//  }
-//
-//  /** Test query. */
-//  @Test
-//  public final void copy6() {
-//    query(
-//        "copy $c := <a:y xmlns:a='aa'><a:b/></a:y> modify () return $c",
-//        "<a:y xmlns:a='aa'><a:b/></a:y>");
-//  }
-
   /** Test query. */
   @Test
   public final void copy1() {
@@ -114,29 +86,6 @@ public class NamespaceTest {
         "declare namespace na = 'test';doc('d1')/x/na:a",
         "<a xmlns='test'><b><c/></b><d/></a>");
   }
-
-  /** Test query.
-   *  Detects malformed namespace hierarchy.
-   *  [LK][LW] to be fixed...
-  @Test
-  public final void namespaceHierarchy() {
-    query("insert node <f xmlns='F'/> into doc('d9')//*:e", "");
-    try {
-      new Open("d9").execute(context);
-      assertEquals("\n" +
-          "  Pre[1] xmlns=\"A\" \n" +
-          "    Pre[4] xmlns=\"D\" \n" +
-          "    Pre[6] xmlns=\"F\" ",
-          context.data.ns.toString());
-    } catch (Exception e) {
-      fail(e.getMessage());
-    } finally {
-      try {
-        new Close().execute(context);
-      } catch(BaseXException e) { }
-    }
-  }
-   */
 
   /** Test query.
    * Detects empty default namespace in serializer.
@@ -219,18 +168,6 @@ public class NamespaceTest {
         "<a:y xmlns:b='bb' xmlns:a='aa'/>");
   }
 
-  //  /** Test query.
-//   * Detects duplicate prefix declarations among the insertion nodes (MemData)
-//   * and the target node's data instance.
-//   */
-//  @Test
-//  public final void insertD4intoD3() {
-//    query(
-//        "declare namespace b='bb';insert node doc('d4') into doc('d3')//b:y",
-//        "declare namespace a='aa';doc('d3')/a:x",
-//        "<a:x xmlns:a='aa'><b:y xmlns:b='bb'><a:x><a:y/></a:x></b:y></a:x>");
-//  }
-
   /** Test query.
    * Detects duplicate namespace declarations in MemData instance.
    */
@@ -241,18 +178,6 @@ public class NamespaceTest {
         "doc('d1')/x",
         "<x><x xmlns='xx'><y/></x></x>");
   }
-
-//  /** Test query.
-//   * Detects duplicate namespace declarations after insert.
-//   */
-//  @Test
-//  public final void insertD2intoD6() {
-//    query(
-//        "declare namespace ns='xx';declare namespace a='aa';" +
-//        "insert node doc('d2')/ns:x into doc('d6')/a:x",
-//        "declare namespace a='aa';doc('d6')/a:x",
-//        "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/><x/></a:x>");
-//  }
 
   /** Test query.
    * Detects general problems with namespace references.
