@@ -306,7 +306,7 @@ public final class Namespaces {
       sl.add(uri.key(n.vals[i + 1]));
       t.contents.add(sl);
     }
-    for(final NSNode c : n.ch) table(t, c, s, e);
+    for(int i = 0; i < n.size; i++) table(t, n.ch[i], s, e);
   }
 
   /**
