@@ -13,6 +13,8 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import static org.basex.query.util.Err.*;
+
+import org.basex.query.util.NSGlobal;
 import org.basex.query.util.Var;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -92,13 +94,14 @@ public final class CElem extends CFrag {
     final QNm tname = checkNS(qname(ctx, it, false));
     final byte[] pref = tname.pref();
     if(!eq(pref, XML)) {
-      final byte[] uri = ctx.ns.find(pref);
+      byte[] uri = ctx.ns.find(pref);
+      if(uri == null) uri = NSGlobal.uri(pref);
       if(tname.hasUri()) {
         final byte[] muri = tname.uri().atom();
         if(uri == null || !eq(uri, muri)) {
           ctx.ns.add(new QNm(tname.pref(), tname.uri()), ii);
           nsc.add(pref, muri);
-        } else if(!nsc.contains(pref)) {
+        } else if(!eq(pref, EMPTY) && !eq(pref, XML) && !nsc.contains(pref)) {
           nsc.add(pref, uri);
         }
       } else if(uri != null) {
