@@ -155,6 +155,11 @@ public final class DialogOpen extends Dialog {
         DropDB.drop(db, ctx.prop);
         choice.setData(List.list(ctx).toArray());
         choice.requestFocusInWindow();
+        action(null);
+        if(choice.getValue().isEmpty()) {
+          doc.setText("");
+          detail.setText(Token.EMPTY);
+        }
       }
     } else {
       final String db = choice.getValue().trim();
