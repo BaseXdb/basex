@@ -45,6 +45,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 import org.basex.util.Util;
@@ -541,12 +542,16 @@ public final class QueryContext extends Progress {
     final NodIter col = new NodIter();
     final Data data = db.data;
     final boolean rt = input.length == 0;
+    System.out.println(data.meta.file);
+    System.out.println("MAINBASE: " + Token.string(data.text(0, true)));   
     if(!rt) doc = new DBNode[1]; docs = 0;
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       final DBNode dbn = new DBNode(data, p);
+      final String tmp = "/" + Token.string(input) + "/";
       if(rt) {
         col.add(dbn);
-      } else if(startsWith(lc(data.text(p, true)), lc(input))) {
+      } else if(eq(lc(data.text(p, true)), lc(input)) || 
+          contains(lc(data.text(p, true)), lc(token(tmp)))) {
         col.add(dbn);
         // [AW] could lead to unexpected side effects
         addDoc(dbn);
