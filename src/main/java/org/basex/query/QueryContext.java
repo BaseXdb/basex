@@ -541,9 +541,7 @@ public final class QueryContext extends Progress {
   private void addDocs(final DBNode db, final byte[] input) {
     final NodIter col = new NodIter();
     final Data data = db.data;
-    final boolean rt = input.length == 0;
-    System.out.println(data.meta.file);
-    System.out.println("MAINBASE: " + Token.string(data.text(0, true)));   
+    final boolean rt = input.length == 0; 
     if(!rt) doc = new DBNode[1]; docs = 0;
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       final DBNode dbn = new DBNode(data, p);
