@@ -596,6 +596,7 @@ public abstract class Data {
         int cI = 0;
         while((cI = cn.fnd(par)) > -1) {
           final NSNode ch = cn.ch[cI];
+          // add candidate to stack
           candidates.add(0, ch);
           cn = ch;
         }
@@ -604,6 +605,7 @@ public abstract class Data {
         if(candidates.size() > 0) {
           // compare candidates to ancestors of par
           int ancPre = par;
+          // take first candidate from stack
           NSNode currCandidate = candidates.remove(0);
           while(ancPre >= 1 && cn.equals(ns.rootDummy)) {
             
@@ -620,6 +622,9 @@ public abstract class Data {
                   > currCandidate.pre);
               if(currCandidate.pre == ancPre) cn = currCandidate;
             }
+            
+            // no potential for infinite loop, cause dummy root always a match,
+            // in this case ancPre ends iteration
             if(candidates.size() > 0) currCandidate = candidates.remove(0);
           }
         }
