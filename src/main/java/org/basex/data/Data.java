@@ -611,12 +611,13 @@ public abstract class Data {
             // this is the new root
             if(currCandidate.pre == ancPre) cn = currCandidate;
             // if the current candidate's pre value is lower than the current
-            // ancestor of par or par itself we have to look for a potential match
-            // for this candidate. therefore we iterate through ancestors till
-            // we find one with a lower than or the same pre value as the current 
-            // candidate.
+            // ancestor of par or par itself we have to look for a potential 
+            // match for this candidate. therefore we iterate through ancestors
+            // till we find one with a lower than or the same pre value as the 
+            // current candidate.
             else if (currCandidate.pre < ancPre) {
-              while((ancPre = parent(ancPre, kind(ancPre))) > currCandidate.pre);
+              while((ancPre = parent(ancPre, kind(ancPre))) 
+                  > currCandidate.pre);
               if(currCandidate.pre == ancPre) cn = currCandidate;
             }
             if(candidates.size() > 0) currCandidate = candidates.remove(0);
