@@ -40,6 +40,8 @@ final class NodePrimitivesContainer implements NodePrimitives {
     final PrimitiveType pt = p.type();
     del |= pt == DELETE;
     rep |= pt == REPLACENODE;
+    // text node adjacency cannot be instantly fixed if updates that affect
+    // the sibling axis are still held pending
     textAdjacency = del || rep || pt == INSERTBEFORE || pt == INSERTAFTER;
     if(i < primitives.size()) {
       final UpdatePrimitive a = primitives.get(i);

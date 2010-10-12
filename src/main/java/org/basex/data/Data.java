@@ -3,8 +3,8 @@ package org.basex.data;
 import static org.basex.util.Token.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.basex.core.cmd.InfoTable;
@@ -590,36 +590,38 @@ public abstract class Data {
       // is determined.
       if(mpre == 0) {
         // collect possible candidates for namespace root 
-        final List<NSNode> candidates = new ArrayList<NSNode>();
+        final List<NSNode> candidates = new LinkedList<NSNode>();
         NSNode cn = ns.rootDummy;
         candidates.add(cn);
         int cI = 0;
         while((cI = cn.fnd(par)) > -1) {
           final NSNode ch = cn.ch[cI];
-          candidates.add(ch);
+          candidates.add(0, ch);
           cn = ch;
         }
         
-        // compare candidates to ancestors of par
-        int ancPre = par;
-        cI = candidates.size() - 1;
         cn = ns.rootDummy;
-        while(ancPre >= 1 && cn.equals(ns.rootDummy)) {
-          final NSNode nsn = candidates.get(cI);
-          // if the current candidate is an ancestor of par or par itself, 
-          // this is the new root
-          if(nsn.pre == ancPre) cn = nsn;
-          // if the current candidate's pre value is lower than the current
-          // ancestor of par or par itself we have to look for a potential match
-          // for this candidate. therefore we iterate through ancestors till
-          // we find one with a lower pre value than the current candidate.
-          else if (nsn.pre < ancPre) {
-            while((ancPre = parent(ancPre, kind(ancPre))) > nsn.pre);
-            if(nsn.pre == ancPre) cn = nsn;
+        if(candidates.size() > 0) {
+          // compare candidates to ancestors of par
+          int ancPre = par;
+          NSNode currCandidate = candidates.remove(0);
+          while(ancPre >= 1 && cn.equals(ns.rootDummy)) {
+            
+            // if the current candidate is an ancestor of par or par itself, 
+            // this is the new root
+            if(currCandidate.pre == ancPre) cn = currCandidate;
+            // if the current candidate's pre value is lower than the current
+            // ancestor of par or par itself we have to look for a potential match
+            // for this candidate. therefore we iterate through ancestors till
+            // we find one with a lower than or the same pre value as the current 
+            // candidate.
+            else if (currCandidate.pre < ancPre) {
+              while((ancPre = parent(ancPre, kind(ancPre))) > currCandidate.pre);
+              if(currCandidate.pre == ancPre) cn = currCandidate;
+            }
+            if(candidates.size() > 0) currCandidate = candidates.remove(0);
           }
-          cI--;
         }
-        
         ns.setNearestRoot(cn, par);
       }
       
