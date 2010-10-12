@@ -31,12 +31,12 @@ public class NamespaceTest {
     { "d2", "<a xmlns='A'><b><c/><d xmlns='D'><g xmlns='G'/></d></b><e/></a>" }
   };
 
-  /** Test query.
-   *  Detects malformed namespace hierarchy.
-   *  [LK][LW] to be fixed...
+  /** 
+   * Test query.
+   * Detects malformed namespace hierarchy.
    */
   @Test
-  public final void namespaceHierarchy() {
+  public final void nsHierarchy() {
     query("insert node <f xmlns='F'/> into doc('d1')//*:e", "");
     try {
       new Open("d1").execute(context);
@@ -59,7 +59,7 @@ public class NamespaceTest {
    *  [LK][LW] to be fixed...
    */
   @Test
-  public final void namespaceHierarchy2() {
+  public final void nsHierarchy2() {
     query("insert node <f xmlns='F'/> into doc('d2')//*:e", "");
     try {
       new Open("d2").execute(context);
@@ -76,6 +76,26 @@ public class NamespaceTest {
         new Close().execute(context);
       } catch(BaseXException e) { }
     }
+  }
+
+  /** 
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public final void nsInAtt() {
+    query("data(<a a='{namespace-uri-for-prefix('x', <b/>)}' xmlns:x='X'/>/@a)",
+        "X");
+  }
+
+  /** 
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public final void nsInBraces() {
+    query("<a xmlns:x='X'>{namespace-uri-for-prefix('x', <b/>)}</a>/text()",
+        "X");
   }
 
   /**
@@ -135,11 +155,9 @@ public class NamespaceTest {
     try {
       if(first != null) new XQuery(first).execute(context);
       final String result = new XQuery(second).execute(context);
-
       // quotes are replaced by apostrophes to simplify comparison
-      final String res = result.replaceAll("\\\"", "'");
-      final String exp = expected.replaceAll("\\\"", "'");
-      if(!exp.equals(res)) fail("\n" + res + "\n" + exp + " expected");
+      assertEquals(expected.replaceAll("\\\"", "'"),
+          result.replaceAll("\\\"", "'"));
     } catch(final BaseXException ex) {
       fail(ex.getMessage());
     }
