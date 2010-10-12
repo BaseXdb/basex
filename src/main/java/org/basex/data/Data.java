@@ -584,7 +584,12 @@ public abstract class Data {
       final int dis = mpar >= 0 ? mpre - mpar : pre - ipar;
       final int par = pre - dis;
       
+      // find nearest namespace node on the ancestor axis of the insert
+      // location. possible candidates for this node are collected and 
+      // the match with the highest pre value between ancestors and candidates
+      // is determined.
       if(mpre == 0) {
+        // collect possible candidates for namespace root 
         final List<NSNode> candidates = new ArrayList<NSNode>();
         NSNode cn = ns.rootDummy;
         candidates.add(cn);
@@ -595,14 +600,19 @@ public abstract class Data {
           cn = ch;
         }
         
-        // collect ancestors and compare to candidates
+        // compare candidates to ancestors of par
         int ancPre = par;
         cI = candidates.size() - 1;
         cn = ns.rootDummy;
         while(ancPre >= 1 && cn.equals(ns.rootDummy)) {
           final NSNode nsn = candidates.get(cI);
+          // if the current candidate is an ancestor of par or par itself, 
+          // this is the new root
           if(nsn.pre == ancPre) cn = nsn;
-          // nsn.pre>ancPre?
+          // if the current candidate's pre value is lower than the current
+          // ancestor of par or par itself we have to look for a potential match
+          // for this candidate. therefore we iterate through ancestors till
+          // we find one with a lower pre value than the current candidate.
           else if (nsn.pre < ancPre) {
             while((ancPre = parent(ancPre, kind(ancPre))) > nsn.pre);
             if(nsn.pre == ancPre) cn = nsn;
@@ -610,7 +620,7 @@ public abstract class Data {
           cI--;
         }
         
-        ns.setRootNearest(cn, par);
+        ns.setNearestRoot(cn, par);
       }
       
       while(l > 0 && preStack[l - 1] > par) ns.close(preStack[--l]);

@@ -252,16 +252,13 @@ public final class Namespaces {
   }
 
   /**
-   * Finds the nearest namespace node (in document order) for the given pre
-   * value and sets it as the new root of the namespace hierarchy.
-   *
-   * This is only called when a MemData instance is inserted. Make sure the root
-   * node is pre==-1, hence the actual root of the namespace hierarchy.
-   * @param n new namespace root 
+   * This is only called when a MemData instance is inserted. The
+   * namespace node which is next on the ancestor axis of the insert location
+   * is set as new root.
+   * @param n nearest namespace node on ancestor axis 
    * @param pre pre value to find nearest namespace node for
    */
-  void setRootNearest(final NSNode n, final int pre) {
-    // [LK] what's this doing?
+  void setNearestRoot(final NSNode n, final int pre) {
     uriStack[uriL] = uri(Token.EMPTY, pre);
     setRoot(n);
   }
