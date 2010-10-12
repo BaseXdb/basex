@@ -20,7 +20,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
-import org.basex.query.path.Step;
+import org.basex.query.path.AxisStep;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -252,7 +252,7 @@ public final class CmpG extends Cmp {
   @Override
   public boolean indexAccessible(final IndexContext ic) throws QueryException {
     // accept only location path, string and equality expressions
-    final Step s = indexStep(expr[0]);
+    final AxisStep s = indexStep(expr[0]);
     if(s == null || op != Op.EQ) return false;
 
     // check which index applies
@@ -303,10 +303,10 @@ public final class CmpG extends Cmp {
     } else {
       ic.ctx.compInfo(OPTATVINDEX);
       // add attribute step
-      final Step step = orig.step[orig.step.length - 1];
+      final AxisStep step = orig.step[orig.step.length - 1];
       if(step.test.name != null) {
-        Step[] steps = { Step.get(input, Axis.SELF, step.test) };
-        for(final Step s : path.step) steps = Array.add(steps, s);
+        AxisStep[] steps = { AxisStep.get(input, Axis.SELF, step.test) };
+        for(final AxisStep s : path.step) steps = Array.add(steps, s);
         path.step = steps;
       }
     }
@@ -318,7 +318,7 @@ public final class CmpG extends Cmp {
    * @param expr expression
    * @return location step
    */
-  public static Step indexStep(final Expr expr) {
+  public static AxisStep indexStep(final Expr expr) {
     // check if index can be applied
     if(!(expr instanceof AxisPath)) return null;
     // accept only single axis steps as first expression

@@ -135,8 +135,8 @@ public class IntList extends ElementList {
 
   /**
    * Sorts the data in the order of the specified token array.
-   * Note that the input array will be resorted as well. -
-   * Sorting is derived from Java's sort algorithms in the {Arrays} class.
+   * Note that the input array will be resorted as well.
+   * The algorithm is derived from {@link Arrays#sort(int[])}.
    * @param tok token array to sort by
    * @param num numeric sort
    * @param asc ascending
@@ -148,8 +148,8 @@ public class IntList extends ElementList {
 
   /**
    * Sorts the data in the order of the specified numeric array.
-   * Note that the input array will be resorted as well. -
-   * Sorting is derived from Java's sort algorithms in the {Arrays} class.
+   * Note that the input array will be resorted as well.
+   * The algorithm is derived from {@link Arrays#sort(int[])}.
    * @param num token array to sort by
    * @param asc ascending
    */

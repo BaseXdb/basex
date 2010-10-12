@@ -91,7 +91,7 @@ import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.MixedPath;
 import org.basex.query.path.NameTest;
-import org.basex.query.path.Step;
+import org.basex.query.path.AxisStep;
 import org.basex.query.path.Test;
 import org.basex.query.up.Delete;
 import org.basex.query.up.Insert;
@@ -1330,7 +1330,7 @@ public class QueryParser extends InputParser {
     }
 
     final boolean slash = consume('/');
-    final boolean step = ex instanceof Step;
+    final boolean step = ex instanceof AxisStep;
     if(!slash && s == 0 && !step) return ex;
 
     Expr[] list = {};
@@ -1356,10 +1356,10 @@ public class QueryParser extends InputParser {
 
     // check if all steps are axis steps
     boolean axes = true;
-    final Step[] tmp = new Step[list.length];
+    final AxisStep[] tmp = new AxisStep[list.length];
     for(int l = 0; l < list.length; ++l) {
-      axes &= list[l] instanceof Step;
-      if(axes) tmp[l] = (Step) list[l];
+      axes &= list[l] instanceof AxisStep;
+      if(axes) tmp[l] = (AxisStep) list[l];
     }
 
     return axes ? AxisPath.get(input(), root, tmp) :
@@ -1370,8 +1370,8 @@ public class QueryParser extends InputParser {
    * Returns a standard descendant-or-self::node() step.
    * @return step
    */
-  private Step descOrSelf() {
-    return Step.get(input(), Axis.DESCORSELF, Test.NODE);
+  private AxisStep descOrSelf() {
+    return AxisStep.get(input(), Axis.DESCORSELF, Test.NODE);
   }
 
   // Methods for query suggestions
@@ -1418,7 +1418,7 @@ public class QueryParser extends InputParser {
    * @return query expression
    * @throws QueryException query exception
    */
-  private Step axis() throws QueryException {
+  private AxisStep axis() throws QueryException {
     Axis ax = null;
     Test test = null;
     if(consumeWS2(DOT2)) {
@@ -1460,7 +1460,7 @@ public class QueryParser extends InputParser {
       check(BR2);
       checkPred(false);
     }
-    return Step.get(input(), ax, test, pred);
+    return AxisStep.get(input(), ax, test, pred);
   }
 
   /**

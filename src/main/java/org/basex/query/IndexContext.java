@@ -1,7 +1,7 @@
 package org.basex.query;
 
 import org.basex.data.Data;
-import org.basex.query.path.Step;
+import org.basex.query.path.AxisStep;
 
 /**
  * Container for all information needed to determine whether an index is
@@ -16,7 +16,7 @@ public final class IndexContext {
   /** Data reference. */
   public final Data data;
   /** Index Step. */
-  public final Step step;
+  public final AxisStep step;
   /** Flag for potential duplicates. */
   public final boolean dupl;
 
@@ -34,7 +34,7 @@ public final class IndexContext {
    * @param s index step
    * @param l duplicate flag
    */
-  public IndexContext(final QueryContext c, final Data d, final Step s,
+  public IndexContext(final QueryContext c, final Data d, final AxisStep s,
       final boolean l) {
     ctx = c;
     data = d;

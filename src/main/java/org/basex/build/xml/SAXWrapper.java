@@ -14,7 +14,6 @@ import org.basex.util.Util;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.XMLReader;
-
 import com.sun.org.apache.xml.internal.resolver.CatalogManager;
 import com.sun.org.apache.xml.internal.resolver.tools.CatalogResolver;
 
@@ -89,9 +88,10 @@ public final class SAXWrapper extends FileParser {
       }
 
       sax = new SAXHandler(builder);
-      if(prop.get(Prop.CATFILE).length() > 0) {
-        CatalogManager cm = new CatalogManager();
-        cm.setCatalogFiles(prop.get(Prop.CATFILE));
+      final String cat = prop.get(Prop.CATFILE);
+      if(!cat.isEmpty()) {
+        final CatalogManager cm = new CatalogManager();
+        cm.setCatalogFiles(cat);
         cm.setIgnoreMissingProperties(true);
         cm.setPreferPublic(true);
         cm.setUseStaticCatalog(false);

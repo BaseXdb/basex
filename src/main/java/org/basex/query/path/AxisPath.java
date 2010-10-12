@@ -44,7 +44,7 @@ import org.basex.util.TokenList;
  */
 public class AxisPath extends Path {
   /** Expression list. */
-  public Step[] step;
+  public AxisStep[] step;
   /** Flag for result caching. */
   private boolean cache;
   /** Cached result. */
@@ -58,7 +58,7 @@ public class AxisPath extends Path {
    * @param r root expression; can be a {@code null} reference
    * @param s location steps; will at least have one entry
    */
-  protected AxisPath(final InputInfo ii, final Expr r, final Step... s) {
+  protected AxisPath(final InputInfo ii, final Expr r, final AxisStep... s) {
     super(ii, r);
     step = s;
   }
@@ -71,7 +71,7 @@ public class AxisPath extends Path {
    * @return class instance
    */
   public static final AxisPath get(final InputInfo ii, final Expr r,
-      final Step... st) {
+      final AxisStep... st) {
     return new AxisPath(ii, r, st).iterator(null);
   }
 
@@ -96,17 +96,18 @@ public class AxisPath extends Path {
     type = size != -1 ? SeqType.get(Type.NOD, size) :
       step[step.length - 1].type();
 
-    if(root == null || root.uses(Use.VAR) || root.duplicates())
-      return false;
+    if(root == null || root.uses(Use.VAR) || root.duplicates()) return false;
 
-    for(int i = 0; i < step.length; ++i) {
-      switch(step[i].axis) {
+    final int sl = step.length;
+    for(int s = 0; s < sl; ++s) {
+      switch(step[s].axis) {
         // reverse axes - don't iterate
         case ANC: case ANCORSELF: case PREC: case PRECSIBL:
           return false;
-        // multiple, unsorted results - only iterate at last step
+        // multiple, unsorted results - only iterate at last step,
+        // or if last step uses attribute axis
         case DESC: case DESCORSELF: case FOLL: case FOLLSIBL:
-          return i + 1 == step.length;
+          return s + 1 == sl || s + 2 == sl && step[s + 1].axis == Axis.ATTR;
         // allow iteration for CHILD, ATTR, PARENT and SELF
         default:
       }
@@ -128,7 +129,7 @@ public class AxisPath extends Path {
         data.ns.size() != 0) return -1;
 
     ArrayList<PathNode> nodes = data.path.root();
-    for(final Step s : step) {
+    for(final AxisStep s : step) {
       nodes = s.size(nodes, data);
       if(nodes == null) return -1;
     }
@@ -140,25 +141,25 @@ public class AxisPath extends Path {
 
   @Override
   protected Expr compPath(final QueryContext ctx) throws QueryException {
-    for(final Step s : step) checkUp(s, ctx);
+    for(final AxisStep s : step) checkUp(s, ctx);
 
     // merge two axis paths
     if(root instanceof AxisPath) {
-      Step[] st = ((AxisPath) root).step;
+      AxisStep[] st = ((AxisPath) root).step;
       root = ((AxisPath) root).root;
-      for(final Step s : step) st = Array.add(st, s);
+      for(final AxisStep s : step) st = Array.add(st, s);
       step = st;
       // refresh root context
       ctx.compInfo(OPTPATH);
       ctx.value = root(ctx);
     }
-    final Step s = emptyStep();
+    final AxisStep s = emptyStep();
     if(s != null) COMPSELF.thrw(input, s);
 
     for(int i = 0; i != step.length; ++i) {
       final Expr e = step[i].comp(ctx);
-      if(!(e instanceof Step)) return e;
-      step[i] = (Step) e;
+      if(!(e instanceof AxisStep)) return e;
+      step[i] = (AxisStep) e;
     }
     optSteps(ctx);
 
@@ -225,13 +226,13 @@ public class AxisPath extends Path {
 
       // build new steps
       int ts = tl.size();
-      final Step[] steps = new Step[ts + step.length - s - 1];
+      final AxisStep[] steps = new AxisStep[ts + step.length - s - 1];
       for(int t = 0; t < ts; ++t) {
         final Expr[] preds = t == ts - 1 ? step[s].pred : new Expr[0];
         final byte[] n = tl.get(ts - t - 1);
         final NameTest nt = n == null ? new NameTest(false, input) :
           new NameTest(new QNm(n), Name.NAME, false, input);
-        steps[t] = Step.get(input, Axis.CHILD, nt, preds);
+        steps[t] = AxisStep.get(input, Axis.CHILD, nt, preds);
       }
       while(++s < step.length) steps[ts++] = step[s];
 
@@ -294,7 +295,7 @@ public class AxisPath extends Path {
     // check if path can be converted to an index access
     for(int s = 0; s < step.length; ++s) {
       // find cheapest index access
-      final Step stp = step[s];
+      final AxisStep stp = step[s];
       if(!stp.axis.down) break;
 
       // check if resulting index path will be duplicate free
@@ -327,14 +328,14 @@ public class AxisPath extends Path {
     if(ics == null) return this;
 
     // replace expressions for index access
-    final Step stp = step[smin];
+    final AxisStep stp = step[smin];
     final Expr ie = stp.pred[pmin].indexEquivalent(ics);
 
     if(ics.seq) {
       // do not invert path
       stp.pred[pmin] = ie;
     } else {
-      Step[] inv = {};
+      AxisStep[] inv = {};
 
       // collect remaining predicates
       final Expr[] newPreds = new Expr[stp.pred.length - 1];
@@ -349,10 +350,10 @@ public class AxisPath extends Path {
         if(a == null) break;
 
         if(j != 0) {
-          final Step prev = step[j - 1];
-          inv = Array.add(inv, Step.get(input, a, prev.test, prev.pred));
+          final AxisStep prev = step[j - 1];
+          inv = Array.add(inv, AxisStep.get(input, a, prev.test, prev.pred));
         } else if(a != Axis.ANC && a != Axis.ANCORSELF) {
-          inv = Array.add(inv, Step.get(input, a, new DocTest(ctx)));
+          inv = Array.add(inv, AxisStep.get(input, a, new DocTest(ctx)));
         }
       }
       final boolean simple = inv.length == 0 && newPreds.length == 0;
@@ -363,7 +364,7 @@ public class AxisPath extends Path {
         result = (AxisPath) ie;
       } else if(smin + 1 < step.length || !simple) {
         result = simple ? new AxisPath(input, ie) :
-          new AxisPath(input, ie, Step.get(input, Axis.SELF, Test.NODE));
+          new AxisPath(input, ie, AxisStep.get(input, Axis.SELF, Test.NODE));
       } else {
         return ie;
       }
@@ -451,7 +452,7 @@ public class AxisPath extends Path {
     for(int l = 1; l < step.length; ++l) {
       if(!step[l - 1].simple(DESCORSELF, false)) continue;
 
-      final Step next = step[l];
+      final AxisStep next = step[l];
       if(next.axis == CHILD && !next.uses(Use.POS)) {
         // descendant-or-self::node()/child::X -> descendant::X
         Array.move(step, l, -1, step.length - l);
@@ -475,9 +476,9 @@ public class AxisPath extends Path {
    * Checks if the location path will never yield results.
    * @return empty step, or {@code null}
    */
-  private Step emptyStep() {
+  private AxisStep emptyStep() {
     for(int l = 0; l < step.length; ++l) {
-      final Step s = step[l];
+      final AxisStep s = step[l];
       final Axis sa = s.axis;
       if(l == 0) {
         if(root instanceof CAttr) {
@@ -489,7 +490,7 @@ public class AxisPath extends Path {
              s.test != Test.NODE && s.test != Test.DOC)) return s;
         }
       } else {
-        final Step ls = step[l - 1];
+        final AxisStep ls = step[l - 1];
         final Axis lsa = ls.axis;
         if(sa == SELF || sa == DESCORSELF) {
           // .../self:: / .../descendant-or-self::
@@ -527,10 +528,10 @@ public class AxisPath extends Path {
    * @param curr current location step
    * @return inverted path
    */
-  public final AxisPath invertPath(final Expr r, final Step curr) {
+  public final AxisPath invertPath(final Expr r, final AxisStep curr) {
     // hold the steps to the end of the inverted path
     int s = step.length;
-    final Step[] e = new Step[s--];
+    final AxisStep[] e = new AxisStep[s--];
     // add predicates of last step to new root node
     final Expr rt = step[s].pred.length != 0 ?
         new Filter(input, r, step[s].pred) : r;
@@ -538,10 +539,10 @@ public class AxisPath extends Path {
     // add inverted steps in a backward manner
     int c = 0;
     while(--s >= 0) {
-      e[c++] = Step.get(input, step[s + 1].axis.invert(),
+      e[c++] = AxisStep.get(input, step[s + 1].axis.invert(),
           step[s].test, step[s].pred);
     }
-    e[c] = Step.get(input, step[s + 1].axis.invert(), curr.test);
+    e[c] = AxisStep.get(input, step[s + 1].axis.invert(), curr.test);
     return new AxisPath(input, rt, e);
   }
 
@@ -557,14 +558,14 @@ public class AxisPath extends Path {
 
   @Override
   public final AxisPath copy() {
-    final Step[] steps = new Step[step.length];
-    for(int s = 0; s < step.length; ++s) steps[s] = Step.get(step[s]);
+    final AxisStep[] steps = new AxisStep[step.length];
+    for(int s = 0; s < step.length; ++s) steps[s] = AxisStep.get(step[s]);
     return get(input, root, steps);
   }
 
   @Override
   public final Expr addText(final QueryContext ctx) throws QueryException {
-    final Step s = step[step.length - 1];
+    final AxisStep s = step[step.length - 1];
 
     if(s.pred.length != 0 || !s.axis.down || s.test.type == Type.ATT ||
         s.test.test != Name.NAME && s.test.test != Name.STD) return this;
@@ -574,7 +575,7 @@ public class AxisPath extends Path {
 
     final StatsKey stats = data.tags.stat(data.tags.id(s.test.name.ln()));
     if(stats != null && stats.leaf) {
-      step = Array.add(step, Step.get(input, Axis.CHILD, Test.TXT));
+      step = Array.add(step, AxisStep.get(input, Axis.CHILD, Test.TXT));
       ctx.compInfo(OPTTEXT, this);
     }
     return this;
@@ -587,13 +588,13 @@ public class AxisPath extends Path {
 
   @Override
   public final boolean uses(final Var v) {
-    for(final Step s : step) if(s.uses(v)) return true;
+    for(final AxisStep s : step) if(s.uses(v)) return true;
     return super.uses(v);
   }
 
   @Override
   public final boolean removable(final Var v) {
-    for(final Step s : step) if(!s.removable(v)) return false;
+    for(final AxisStep s : step) if(!s.removable(v)) return false;
     return super.removable(v);
   }
 

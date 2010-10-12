@@ -20,7 +20,7 @@ import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
 import org.basex.query.path.NameTest;
-import org.basex.query.path.Step;
+import org.basex.query.path.AxisStep;
 import org.basex.query.path.Test.Name;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
@@ -137,7 +137,7 @@ public final class CmpR extends Single {
   @Override
   public boolean indexAccessible(final IndexContext ic) {
     // accept only location path, string and equality expressions
-    final Step s = CmpG.indexStep(expr);
+    final AxisStep s = CmpG.indexStep(expr);
     // sequential main memory is assumed to be faster than range index access
     if(s == null || ic.data instanceof MemData) return false;
 
@@ -169,9 +169,9 @@ public final class CmpR extends Single {
     ic.ctx.compInfo(OPTRNGINDEX);
     if(rt.type() == IndexType.ATTRIBUTE) {
       // add attribute step
-      final Step step = orig.step[0];
-      Step[] steps = { Step.get(input, Axis.SELF, step.test) };
-      for(final Step s : path.step) steps = Array.add(steps, s);
+      final AxisStep step = orig.step[0];
+      AxisStep[] steps = { AxisStep.get(input, Axis.SELF, step.test) };
+      for(final AxisStep s : path.step) steps = Array.add(steps, s);
       path.step = steps;
     }
     return path;
@@ -190,7 +190,7 @@ public final class CmpR extends Single {
     final AxisPath path = (AxisPath) expr;
     final int st = path.step.length;
 
-    Step step = null;
+    AxisStep step = null;
     if(text) {
       step = st == 1 ? ic.step : path.step[st - 2];
       if(!(step.test.test == Name.NAME)) return null;

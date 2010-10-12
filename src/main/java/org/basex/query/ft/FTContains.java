@@ -18,7 +18,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.AxisPath;
-import org.basex.query.path.Step;
+import org.basex.query.path.AxisStep;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
 import org.basex.util.Tokenizer;
@@ -102,7 +102,7 @@ public class FTContains extends ParseExpr {
   public final boolean indexAccessible(final IndexContext ic)
       throws QueryException {
     // return if step is no text node, or if no index is available
-    final Step s = CmpG.indexStep(expr);
+    final AxisStep s = CmpG.indexStep(expr);
     final boolean ok = s != null && ic.data.meta.ftxindex &&
       s.test.type == Type.TXT && ftexpr.indexAccessible(ic);
     ic.seq |= ic.not;

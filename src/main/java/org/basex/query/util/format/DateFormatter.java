@@ -51,7 +51,7 @@ public final class DateFormatter {
         tb.add(ch);
       } else {
         String m = fp.marker();
-        if(m.length() == 0) PICDATE.thrw(ii, pic);
+        if(m.isEmpty()) PICDATE.thrw(ii, pic);
         final int spec = cp(m, 0);
         m = m.substring(1);
         String pres = "1";

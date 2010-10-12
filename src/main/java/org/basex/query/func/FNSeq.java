@@ -149,6 +149,7 @@ final class FNSeq extends Fun {
         while(true) {
           Item i = ir.next();
           if(i == null) return null;
+          ctx.checkStop();
           i = atom(i);
           if(map.index(input, i)) return i;
         }

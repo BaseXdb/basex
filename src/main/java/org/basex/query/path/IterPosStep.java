@@ -13,12 +13,12 @@ import org.basex.query.iter.NodeIter;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class IterPosStep extends Step {
+final class IterPosStep extends AxisStep {
   /**
    * Constructor.
    * @param s step reference
    */
-  IterPosStep(final Step s) {
+  IterPosStep(final AxisStep s) {
     super(s.input, s.axis, s.test, s.pred);
     last = s.last;
     pos = s.pos;

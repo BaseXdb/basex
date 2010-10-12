@@ -4,6 +4,7 @@ import static org.basex.query.QueryTokens.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.data.Serializer;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken.IndexType;
@@ -67,6 +68,7 @@ public final class IndexAccess extends Single {
    */
   private Iter index(final byte[] term) {
     final Data data = ictx.data;
+    final boolean mem = data instanceof MemData;
     final boolean text = ind == IndexType.TEXT;
     final byte kind = text ? Data.TEXT : Data.ATTR;
 
@@ -75,7 +77,12 @@ public final class IndexAccess extends Single {
 
       @Override
       public Item next() {
-        return ii.more() ? new DBNode(data, ii.next(), kind) : null;
+        while(ii.more()) {
+          final int p = ii.next();
+          // main memory instance: check if text is no comment, etc.
+          if(!mem || data.kind(p) == kind) return new DBNode(data, p, kind);
+        }
+        return null;
       }
     } : new Iter() {
       // fallback solution: parse complete data if string is too long
@@ -85,7 +92,7 @@ public final class IndexAccess extends Single {
       public Item next() {
         while(++pre != data.meta.size) {
           if(data.kind(pre) == kind && eq(data.text(pre, text), term))
-            return new DBNode(data, pre);
+            return new DBNode(data, pre, kind);
         }
         return null;
       }

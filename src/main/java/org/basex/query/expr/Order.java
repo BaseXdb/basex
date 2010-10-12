@@ -105,7 +105,7 @@ public final class Order extends ParseExpr {
 
   /**
    * Recursively sorts the specified items.
-   * Sorting is derived from Java's sort algorithms in the {Arrays} class.
+   * The algorithm is derived from {@link Arrays#sort(int[])}.
    * @param o order array
    * @param s start position
    * @param e end position

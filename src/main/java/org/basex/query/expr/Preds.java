@@ -9,14 +9,14 @@ import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
-import org.basex.query.path.Step;
+import org.basex.query.path.AxisStep;
 import org.basex.query.util.Var;
 import org.basex.util.Array;
 import org.basex.util.InputInfo;
 
 /**
  * Abstract predicate expression, implemented by {@link Filter} and
- * {@link Step}.
+ * {@link AxisStep}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

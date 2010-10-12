@@ -61,11 +61,11 @@ public final class DialogCreate extends Dialog {
   /** Available databases. */
   private final StringList db;
   /** Catalog file. */
-  private BaseXTextField cfile;
+  private final BaseXTextField cfile;
   /** Use XML Catalog. */
   private final BaseXCheckBox usecat;
   /** Browse Catalog file. */
-  private BaseXButton browsec;
+  private final BaseXButton browsec;
 
   /**
    * Default constructor.
@@ -143,7 +143,7 @@ public final class DialogCreate extends Dialog {
     p2.add(chop);
     p2.add(new BaseXLabel(CHOPPINGINFO, true, false));
     p2.add(new BaseXLabel(" "));
-    BaseXBack fl = new BaseXBack();
+    final BaseXBack fl = new BaseXBack();
     fl.setLayout(new TableLayout(2, 2));
     usecat = new BaseXCheckBox(USECATFILE,
         prop.get(Prop.CATFILE).length() > 0, 12, this);

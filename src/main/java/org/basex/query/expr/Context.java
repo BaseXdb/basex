@@ -7,7 +7,7 @@ import org.basex.query.item.Item;
 import org.basex.query.iter.Iter;
 import org.basex.query.path.Axis;
 import org.basex.query.path.AxisPath;
-import org.basex.query.path.Step;
+import org.basex.query.path.AxisStep;
 import org.basex.query.path.Test;
 import org.basex.util.InputInfo;
 
@@ -48,7 +48,7 @@ public final class Context extends Simple {
     // replacing . with text() for possible index integration
     if(!ctx.leaf) return this;
     ctx.compInfo(OPTTEXT);
-    return AxisPath.get(input, null, Step.get(input, Axis.CHILD, Test.TXT));
+    return AxisPath.get(input, null, AxisStep.get(input, Axis.CHILD, Test.TXT));
   }
 
   @Override

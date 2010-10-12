@@ -15,7 +15,7 @@ final class TreeNodeCache implements TreeViewOptions {
   /** Document depth. */
   private int maxLevel;
   /** All nodes document nodes per level. */
-  private IntList[] nodes;
+  private final IntList[] nodes;
 
   /**
    * This constructor invokes methods to cache all document nodes.

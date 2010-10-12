@@ -15,7 +15,7 @@ import org.basex.util.InputInfo;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-final class IterStep extends Step {
+final class IterStep extends AxisStep {
   /**
    * Constructor.
    * @param ii input info

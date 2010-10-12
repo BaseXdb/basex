@@ -27,8 +27,8 @@ final class IterPath extends AxisPath {
    * @param t return type
    * @param c cardinality
    */
-  IterPath(final InputInfo ii, final Expr r, final Step[] s, final SeqType t,
-      final long c) {
+  IterPath(final InputInfo ii, final Expr r, final AxisStep[] s,
+      final SeqType t, final long c) {
     super(ii, r, s);
     type = t;
     size = c;

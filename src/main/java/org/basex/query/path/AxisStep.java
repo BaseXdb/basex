@@ -30,7 +30,7 @@ import org.basex.util.Token;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public class Step extends Preds {
+public class AxisStep extends Preds {
   /** Axis. */
   Axis axis;
   /** Node test. */
@@ -41,7 +41,7 @@ public class Step extends Preds {
    * @param s step to be copied
    * @return step
    */
-  public static Step get(final Step s) {
+  public static AxisStep get(final AxisStep s) {
     return get(s.input, s.axis, s.test, s.pred);
   }
 
@@ -53,12 +53,12 @@ public class Step extends Preds {
    * @param p predicates
    * @return step
    */
-  public static Step get(final InputInfo ii, final Axis a, final Test t,
+  public static AxisStep get(final InputInfo ii, final Axis a, final Test t,
       final Expr... p) {
 
     boolean num = false;
     for(final Expr pr : p) num |= pr.type().mayBeNum() || pr.uses(Use.POS);
-    return num ? new Step(ii, a, t, p) : new IterStep(ii, a, t, p);
+    return num ? new AxisStep(ii, a, t, p) : new IterStep(ii, a, t, p);
   }
 
   /**
@@ -68,7 +68,7 @@ public class Step extends Preds {
    * @param t node test
    * @param p predicates
    */
-  protected Step(final InputInfo ii, final Axis a, final Test t,
+  protected AxisStep(final InputInfo ii, final Axis a, final Test t,
       final Expr... p) {
     super(ii, p);
     axis = a;
@@ -114,7 +114,7 @@ public class Step extends Preds {
   @Override
   public NodeIter iter(final QueryContext ctx) throws QueryException {
     final Value v = checkCtx(ctx);
-    if(!v.node()) NODESPATH.thrw(input, Step.this, v.type);
+    if(!v.node()) NODESPATH.thrw(input, AxisStep.this, v.type);
     final NodeIter ir = axis.iter((Nod) v);
 
     final NodIter nb = new NodIter();
@@ -192,15 +192,15 @@ public class Step extends Preds {
    * @param preds predicates to be added
    * @return resulting step instance
    */
-  final Step addPreds(final Expr... preds) {
+  final AxisStep addPreds(final Expr... preds) {
     for(final Expr p : preds) pred = Array.add(pred, p);
     return get(input, axis, test, pred);
   }
 
   @Override
   public final boolean sameAs(final Expr cmp) {
-    if(!(cmp instanceof Step)) return false;
-    final Step st = (Step) cmp;
+    if(!(cmp instanceof AxisStep)) return false;
+    final AxisStep st = (AxisStep) cmp;
     if(pred.length != st.pred.length || axis != st.axis ||
         !test.sameAs(st.test)) return false;
     for(int p = 0; p < pred.length; ++p) {
