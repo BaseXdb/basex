@@ -602,7 +602,7 @@ public abstract class Data {
         }
         
         cn = ns.rootDummy;
-        if(candidates.size() > 0) {
+        if(candidates.size() > 1) {
           // compare candidates to ancestors of par
           int ancPre = par;
           // take first candidate from stack
