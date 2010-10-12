@@ -27,7 +27,8 @@ public class NamespaceTest {
 
   /** Test documents. */
   private static String[][] docs = {
-    { "d1", "<a xmlns='A'><b><c/><d xmlns='D'/></b><e/></a>" }
+    { "d1", "<a xmlns='A'><b><c/><d xmlns='D'/></b><e/></a>" },
+    { "d2", "<a xmlns='A'><b><c/><d xmlns='D'><g xmlns='G'/></d></b><e/></a>" }
   };
 
   /** Test query.
@@ -43,6 +44,30 @@ public class NamespaceTest {
           "  Pre[1] xmlns=\"A\" \n" +
           "    Pre[4] xmlns=\"D\" \n" +
           "    Pre[6] xmlns=\"F\" ",
+          context.data.ns.toString());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(BaseXException e) { }
+    }
+  }
+  
+  /** Test query.
+   *  Detects malformed namespace hierarchy.
+   *  [LK][LW] to be fixed...
+   */
+  @Test
+  public final void namespaceHierarchy2() {
+    query("insert node <f xmlns='F'/> into doc('d2')//*:e", "");
+    try {
+      new Open("d2").execute(context);
+      assertEquals("\n" +
+          "  Pre[1] xmlns=\"A\" \n" +
+          "    Pre[4] xmlns=\"D\" \n" +
+          "      Pre[5] xmlns=\"G\" \n" +
+          "    Pre[7] xmlns=\"F\" ",
           context.data.ns.toString());
     } catch (Exception e) {
       fail(e.getMessage());
