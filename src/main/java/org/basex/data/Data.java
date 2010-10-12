@@ -1,14 +1,18 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 import org.basex.core.cmd.InfoTable;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
 import org.basex.index.IndexToken;
-import org.basex.index.IndexToken.IndexType;
 import org.basex.index.Names;
+import org.basex.index.IndexToken.IndexType;
 import org.basex.io.IO;
 import org.basex.io.TableAccess;
 import org.basex.util.Atts;
@@ -579,7 +583,36 @@ public abstract class Data {
       final int pre = ipre + mpre;
       final int dis = mpar >= 0 ? mpre - mpar : pre - ipar;
       final int par = pre - dis;
-      if(mpre == 0) ns.setRootNearest(par);
+      
+      if(mpre == 0) {
+        final List<NSNode> candidates = new ArrayList<NSNode>();
+        NSNode cn = ns.rootDummy;
+        candidates.add(cn);
+        int cI = 0;
+        while((cI = cn.fnd(par)) > -1) {
+          final NSNode ch = cn.ch[cI];
+          candidates.add(ch);
+          cn = ch;
+        }
+        
+        // collect ancestors and compare to candidates
+        int ancPre = par;
+        cI = candidates.size() - 1;
+        cn = ns.rootDummy;
+        while(ancPre >= 1 && cn.equals(ns.rootDummy)) {
+          final NSNode nsn = candidates.get(cI);
+          if(nsn.pre == ancPre) cn = nsn;
+          // nsn.pre>ancPre?
+          else if (nsn.pre < ancPre) {
+            while((ancPre = parent(ancPre, kind(ancPre))) > nsn.pre);
+            if(nsn.pre == ancPre) cn = nsn;
+          }
+          cI--;
+        }
+        
+        ns.setRootNearest(cn, par);
+      }
+      
       while(l > 0 && preStack[l - 1] > par) ns.close(preStack[--l]);
 
       switch(mk) {

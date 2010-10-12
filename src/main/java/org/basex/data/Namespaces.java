@@ -2,16 +2,18 @@ package org.basex.data;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
+
 import java.io.IOException;
+
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
-import org.basex.util.TokenObjMap;
-import org.basex.util.Token;
-import org.basex.util.TokenSet;
 import org.basex.util.Table;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.TokenList;
+import org.basex.util.TokenObjMap;
+import org.basex.util.TokenSet;
 
 /**
  * This class contains the namespaces of a database.
@@ -30,6 +32,8 @@ public final class Namespaces {
   private final TokenSet uri;
   /** Root node. */
   protected NSNode root;
+  /** Root node dummy. All namespace nodes are descendants of this dummy. */
+  protected NSNode rootDummy;
   /** New namespace flag. */
   private boolean newns;
 
@@ -40,6 +44,7 @@ public final class Namespaces {
    */
   public Namespaces() {
     root = new NSNode(-1);
+    rootDummy = root;
     pref = new TokenSet();
     uri = new TokenSet();
   }
@@ -53,6 +58,7 @@ public final class Namespaces {
     pref = new TokenSet(in);
     uri = new TokenSet(in);
     root = new NSNode(in, null);
+    rootDummy = root;
   }
 
   /**
@@ -251,11 +257,13 @@ public final class Namespaces {
    *
    * This is only called when a MemData instance is inserted. Make sure the root
    * node is pre==-1, hence the actual root of the namespace hierarchy.
+   * @param n new namespace root 
    * @param pre pre value to find nearest namespace node for
    */
-  void setRootNearest(final int pre) {
+  void setRootNearest(final NSNode n, final int pre) {
+    // [LK] what's this doing?
     uriStack[uriL] = uri(Token.EMPTY, pre);
-    setRoot(root.find(pre));
+    setRoot(n);
   }
 
   /**
