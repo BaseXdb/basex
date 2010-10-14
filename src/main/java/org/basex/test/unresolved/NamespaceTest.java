@@ -54,9 +54,9 @@ public class NamespaceTest {
     }
   }
   
-  /** Test query.
-   *  Detects malformed namespace hierarchy.
-   *  [LK][LW] to be fixed...
+  /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
    */
   @Test
   public final void nsHierarchy2() {
@@ -96,6 +96,31 @@ public class NamespaceTest {
   public final void nsInBraces() {
     query("<a xmlns:x='X'>{namespace-uri-for-prefix('x', <b/>)}</a>/text()",
         "X");
+  }
+
+  /** 
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public final void newPrefix() {
+    query("<a>{ attribute {QName('http://bla', 'att')} {} }</a>",
+        "<a xmlns:ns1='http://bla' ns1:att=''/>");
+  }
+
+  /** 
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public final void newPrefix2() {
+    query("<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
+        "  <c>{attribute {QName('ns1', 'att1')} {}," +
+        "    attribute {QName('ns2', 'att2')} {}}</c>" +
+        "</b></a>",
+        "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
+        "  <c xmlns:ns2='ns2' ns1:att1='' ns2:att2=''/>" +
+        "</b></a>");
   }
 
   /**
