@@ -72,7 +72,7 @@ abstract class BXQAbstract {
    * @throws XQException exception
    */
   protected final void opened() throws XQException {
-    if(isClosed()) throw new BXQException(getClass().getSimpleName() + CLOSED);
+    if(isClosed()) throw new BXQException(Util.name(this) + CLOSED);
   }
 
   /**
@@ -84,7 +84,7 @@ abstract class BXQAbstract {
    */
   protected static final Object valid(final Object obj, final Class<?> type)
       throws BXQException {
-    if(obj == null) throw new BXQException(NULL, type.getSimpleName());
+    if(obj == null) throw new BXQException(NULL, Util.name(type));
     return obj;
   }
 
@@ -125,7 +125,7 @@ abstract class BXQAbstract {
 
     // get xquery mapping
     final Type e = FunJava.type(v);
-    if(e == null) throw new BXQException(CONV, v.getClass().getSimpleName());
+    if(e == null) throw new BXQException(CONV, Util.name(v));
 
     try {
       // return item with correct type

@@ -8,6 +8,8 @@ import java.util.Properties;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
 
+import org.basex.util.Util;
+
 /**
  * Java XQuery API - Data Source.
  *
@@ -68,8 +70,7 @@ public final class BXQDataSource implements XQDataSource {
 
   @Override
   public void setProperties(final Properties prop) throws XQException {
-    if(prop == null) throw new BXQException(NULL,
-        Properties.class.getSimpleName());
+    if(prop == null) throw new BXQException(NULL, Util.name(Properties.class));
     for(final Map.Entry<?, ?> o : prop.entrySet()) {
       setProperty(o.getKey().toString(), o.getValue().toString());
     }
