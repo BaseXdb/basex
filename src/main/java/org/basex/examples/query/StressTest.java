@@ -20,9 +20,9 @@ public final class StressTest {
   /** Verbose flag. */
   private static final boolean VERBOSE = false;
   /** Number of clients. */
-  static final int NCLIENTS = 30;
+  static final int NCLIENTS = 50;
   /** Number of runs per client. */
-  static final int NQUERIES = 30;
+  static final int NQUERIES = 50;
   /** Input document. */
   static final String INPUT = "etc/xml/factbook.xml";
   /** Query to be run ("%" serves as placeholder for dynamic content). */

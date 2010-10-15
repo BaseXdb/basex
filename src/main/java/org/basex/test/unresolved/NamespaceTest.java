@@ -31,7 +31,7 @@ public class NamespaceTest {
     { "d2", "<a xmlns='A'><b><c/><d xmlns='D'><g xmlns='G'/></d></b><e/></a>" }
   };
 
-  /** 
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
@@ -53,7 +53,7 @@ public class NamespaceTest {
       } catch(BaseXException e) { }
     }
   }
-  
+
   /**
    * Test query.
    * Detects malformed namespace hierarchy.
@@ -78,7 +78,7 @@ public class NamespaceTest {
     }
   }
 
-  /** 
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
@@ -88,7 +88,7 @@ public class NamespaceTest {
         "X");
   }
 
-  /** 
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
