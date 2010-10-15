@@ -5,7 +5,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
@@ -72,16 +71,16 @@ public abstract class Preds extends ParseExpr {
   protected boolean iterable() {
     // position predicate
     pos = pred[0] instanceof Pos ? (Pos) pred[0] : null;
-    last = pred[0] instanceof Fun && ((Fun) pred[0]).def == FunDef.LAST;
+    last = pred[0].isFun(FunDef.LAST);
 
-    boolean pos1 = false;
-    boolean pos2 = false;
+    boolean np1 = true;
+    boolean np2 = true;
     for(int p = 0; p < pred.length; p++) {
-      final boolean ps = pred[p].type().mayBeNum() || pred[p].uses(Use.POS);
-      pos1 |= ps;
-      if(p > 0) pos2 |= ps;
+      final boolean np = !pred[p].type().mayBeNum() && !pred[p].uses(Use.POS);
+      np1 &= np;
+      if(p > 0) np2 &= np;
     }
-    return !pos1 || pos != null && !pos2 || last && pred.length == 1;
+    return np1 || pos != null && np2 || last && pred.length == 1;
   }
 
   /**

@@ -178,7 +178,7 @@ public final class DialogOpen extends Dialog {
           detail.setText(Token.token(ex.getMessage()));
           ok = false;
         } finally {
-          try { in.close(); } catch(final Exception ex) { }
+          if(in != null) try { in.close(); } catch(final IOException ex) { }
         }
       }
       enableOK(buttons, BUTTONOPEN, ok);

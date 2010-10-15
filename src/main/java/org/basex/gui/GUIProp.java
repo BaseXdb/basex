@@ -99,7 +99,7 @@ public final class GUIProp extends AProp {
   public static final Object[] MAPALGO = { "MAPALGO", 0 };
   /** number of children <-> size weight in (0;100). */
   public static final Object[] MAPWEIGHT = { "MAPWEIGHT", 0 };
-  
+
   /** Slim rectangles to text length. */
   public static final Object[] TREESLIMS = { "TREESLIM", true};
   /** Show attributes in treeview. */

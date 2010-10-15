@@ -239,7 +239,7 @@ final class MapRenderer {
     // total number of bytes
     final double sum = data[3].length + data[4].length;
     // number of lines printable
-    final double nl = (int) (r.h - 3.0) / lhmi;
+    final double nl = (r.h - 3.0) / lhmi;
     // factor for the width of a thumbnail
     final double fnew = (nl * (r.w - 3) - data[4].length) / sum;
     r.thumbf = fnew;

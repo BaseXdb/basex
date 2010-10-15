@@ -2,9 +2,7 @@ package org.basex.data;
 
 import static org.basex.core.Text.*;
 import static org.basex.data.DataText.*;
-
 import java.io.IOException;
-
 import org.basex.io.DataInput;
 import org.basex.io.DataOutput;
 import org.basex.io.IO;
@@ -255,7 +253,7 @@ public final class Namespaces {
    * This is only called when a MemData instance is inserted. The
    * namespace node which is next on the ancestor axis of the insert location
    * is set as new root.
-   * @param n nearest namespace node on ancestor axis 
+   * @param n nearest namespace node on ancestor axis
    * @param pre pre value to find nearest namespace node for
    */
   void setNearestRoot(final NSNode n, final int pre) {

@@ -2,6 +2,8 @@ package org.basex.util.locale;
 
 import java.util.HashMap;
 
+import org.basex.util.Util;
+
 /**
  * Abstract class for formatting data in different languages.
  * Implementations are expected to return strings in a capitalized syntax.
@@ -31,7 +33,7 @@ public abstract class Formatter {
     if(form == null) {
       try {
         // create new instance (class name + language in upper case)
-        final String clz = Formatter.class.getSimpleName() + ln.toUpperCase();
+        final String clz = Util.name(Formatter.class) + ln.toUpperCase();
         form = (Formatter) Class.forName(clz).newInstance();
         MAP.put(ln, form);
       } catch(final Exception ex) {

@@ -67,7 +67,7 @@ final class TreeRects implements TreeViewOptions {
    * @return tree distance
    */
   private int generateRects(final TreeSubtree sub, final Context c,
-      final Graphics g, final int rn, final int ds, final double dw, 
+      final Graphics g, final int rn, final int ds, final double dw,
       final boolean slim) {
 
     final int h = sub.getSubtreeHeight(rn);

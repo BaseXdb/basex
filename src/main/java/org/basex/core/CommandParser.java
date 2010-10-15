@@ -305,7 +305,6 @@ public final class CommandParser extends InputParser {
     return arg;
   }
 
-
   /**
    * Parses and returns an xquery expression.
    * @param cmd referring command; if specified, the result must not be empty

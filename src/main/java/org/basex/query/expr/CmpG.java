@@ -10,7 +10,6 @@ import org.basex.index.ValuesToken;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -132,22 +131,19 @@ public final class CmpG extends Cmp {
       e = optPre(Bln.FALSE, ctx);
     } else if(values()) {
       e = preEval(ctx);
-    } else if(e1 instanceof Fun) {
-      final Fun fun = (Fun) e1;
-      if(fun.def == FunDef.COUNT) {
-        e = count(op.op);
-        if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-      } else if(fun.def == FunDef.POS) {
-        if(e2 instanceof Range) {
-          // position() CMP range
-          final long[] rng = ((Range) e2).range(ctx);
-          e = rng == null ? this : Pos.get(rng[0], rng[1], input);
-        } else {
-          // position() CMP number
-          e = Pos.get(op.op, e2, e, input);
-        }
-        if(e != this) ctx.compInfo(OPTWRITE, this);
+    } else if(e1.isFun(FunDef.COUNT)) {
+      e = count(op.op);
+      if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+    } else if(e1.isFun(FunDef.POS)) {
+      if(e2 instanceof Range) {
+        // position() CMP range
+        final long[] rng = ((Range) e2).range(ctx);
+        e = rng == null ? this : Pos.get(rng[0], rng[1], input);
+      } else {
+        // position() CMP number
+        e = Pos.get(op.op, e2, e, input);
       }
+      if(e != this) ctx.compInfo(OPTWRITE, this);
     } else {
       // rewrite path CMP number
       e = CmpR.get(this);
@@ -245,7 +241,7 @@ public final class CmpG extends Cmp {
   boolean union(final CmpG g, final QueryContext ctx) throws QueryException {
     if(op != g.op || !expr[0].sameAs(g.expr[0])) return false;
     expr[1] = new List(input, expr[1], g.expr[1]).comp(ctx);
-    atomic &= expr[1].type().zeroOrOne();
+    atomic = atomic && expr[1].type().zeroOrOne();
     return true;
   }
 

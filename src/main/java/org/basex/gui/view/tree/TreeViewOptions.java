@@ -35,7 +35,7 @@ interface TreeViewOptions {
   /** Margin to bottom. */
   int BOTTOM_MARGIN = 9;
   /** Margin left and right. */
-  int LEFT_AND_RIGHT_MARGIN = 4;  
+  int LEFT_AND_RIGHT_MARGIN = 4;
   /** Changes Color until given level. */
   int CHANGE_COLOR_TILL = 4;
   /** Highlight Color small space. */

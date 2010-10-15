@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Random;
 import java.util.Scanner;
-import org.basex.BaseXServer;
 import org.basex.core.Commands.Cmd;
 import org.basex.core.cmd.AlterUser;
 import org.basex.core.cmd.CreateUser;
@@ -37,10 +36,10 @@ public abstract class Main {
   /** Input file for queries. */
   protected String input;
 
-  /** Session. */
-  protected Session session;
   /** Console mode. */
   protected boolean console;
+  /** Session. */
+  protected Session session;
   /** Verbose mode. */
   protected boolean verbose;
 
@@ -58,7 +57,6 @@ public abstract class Main {
       @Override
       public void run() {
         context.close();
-        if(Main.this instanceof BaseXServer) Util.outln(SERVERSTOPPED);
       }
     });
   }

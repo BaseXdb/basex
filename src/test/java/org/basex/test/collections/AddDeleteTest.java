@@ -8,6 +8,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Delete;
 import org.basex.core.cmd.DropDB;
 import org.basex.io.IO;
+import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +24,7 @@ public class AddDeleteTest {
   private static final Context CTX = new Context();
 
   /** Test database name. */
-  private static final String DBNAME = AddDeleteTest.class.getSimpleName();
+  private static final String DBNAME = Util.name(AddDeleteTest.class);
   /** Test file. */
   private static final String FILE = "etc/xml/input.xml";
   /** Test folder. */

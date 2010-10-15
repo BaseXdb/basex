@@ -1,12 +1,10 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.basex.core.cmd.InfoTable;
 import org.basex.index.Index;
 import org.basex.index.IndexIterator;
@@ -583,13 +581,13 @@ public abstract class Data {
       final int pre = ipre + mpre;
       final int dis = mpar >= 0 ? mpre - mpar : pre - ipar;
       final int par = pre - dis;
-      
+
       // find nearest namespace node on the ancestor axis of the insert
-      // location. possible candidates for this node are collected and 
+      // location. possible candidates for this node are collected and
       // the match with the highest pre value between ancestors and candidates
       // is determined.
       if(mpre == 0) {
-        // collect possible candidates for namespace root 
+        // collect possible candidates for namespace root
         final List<NSNode> candidates = new LinkedList<NSNode>();
         NSNode cn = ns.rootDummy;
         candidates.add(cn);
@@ -600,7 +598,7 @@ public abstract class Data {
           candidates.add(0, ch);
           cn = ch;
         }
-        
+
         cn = ns.rootDummy;
         if(candidates.size() > 1) {
           // compare candidates to ancestors of par
@@ -608,21 +606,21 @@ public abstract class Data {
           // take first candidate from stack
           NSNode currCandidate = candidates.remove(0);
           while(ancPre >= 1 && cn.equals(ns.rootDummy)) {
-            
-            // if the current candidate is an ancestor of par or par itself, 
+
+            // if the current candidate is an ancestor of par or par itself,
             // this is the new root
             if(currCandidate.pre == ancPre) cn = currCandidate;
             // if the current candidate's pre value is lower than the current
-            // ancestor of par or par itself we have to look for a potential 
+            // ancestor of par or par itself we have to look for a potential
             // match for this candidate. therefore we iterate through ancestors
-            // till we find one with a lower than or the same pre value as the 
+            // till we find one with a lower than or the same pre value as the
             // current candidate.
             else if (currCandidate.pre < ancPre) {
-              while((ancPre = parent(ancPre, kind(ancPre))) 
+              while((ancPre = parent(ancPre, kind(ancPre)))
                   > currCandidate.pre);
               if(currCandidate.pre == ancPre) cn = currCandidate;
             }
-            
+
             // no potential for infinite loop, cause dummy root always a match,
             // in this case ancPre ends iteration
             if(candidates.size() > 0) currCandidate = candidates.remove(0);
@@ -630,7 +628,7 @@ public abstract class Data {
         }
         ns.setNearestRoot(cn, par);
       }
-      
+
       while(l > 0 && preStack[l - 1] > par) ns.close(preStack[--l]);
 
       switch(mk) {

@@ -25,7 +25,7 @@ import org.basex.util.InputInfo;
 public class Filter extends Preds {
   /** Expression. */
   Expr root;
-  /** Offfset flag. */
+  /** Offset flag. */
   private boolean off;
 
   /**
@@ -67,7 +67,18 @@ public class Filter extends Preds {
     if(!super.uses(Use.POS)) return new IterFilter(this);
 
     // iterator for simple positional predicate
-    if(iterable()) return new IterPosFilter(this);
+    if(iterable()) {
+      // one single position() or last() function specified:
+      if(pred.length == 1 && (last || pos != null)) {
+        // return single value
+        if(root.type().one() && (last || pos.min == 1 && pos.max == 1))
+          return optPre(root, ctx);
+
+        // pre-evaluate items
+        if(root.value()) return optPre(iter(ctx).finish(), ctx);
+      }
+      return new IterPosFilter(this);
+    }
 
     // faster runtime evaluation of variable counters (array[$pos] ...)
     off = pred.length == 1 && pred[0].type().num() && !pred[0].uses(Use.CTX);

@@ -7,7 +7,6 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Empty;
@@ -158,16 +157,13 @@ public final class CmpV extends Cmp {
       e = optPre(Empty.SEQ, ctx);
     } else if(values()) {
       e = preEval(ctx);
-    } else if(e1 instanceof Fun) {
-      final Fun fun = (Fun) e1;
-      if(fun.def == FunDef.COUNT) {
-        e = count(op);
-        if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
-      } else if(fun.def == FunDef.POS) {
-        // position() CMP number
-        e = Pos.get(op, e2, e, input);
-        if(e != this) ctx.compInfo(OPTWRITE, this);
-      }
+    } else if(e1.isFun(FunDef.COUNT)) {
+      e = count(op);
+      if(e != this) ctx.compInfo(e instanceof Bln ? OPTPRE : OPTWRITE, this);
+    } else if(e1.isFun(FunDef.POS)) {
+      // position() CMP number
+      e = Pos.get(op, e2, e, input);
+      if(e != this) ctx.compInfo(OPTWRITE, this);
     }
     type = SeqType.BLN;
     return e;

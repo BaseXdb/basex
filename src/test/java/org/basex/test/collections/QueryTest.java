@@ -10,6 +10,7 @@ import org.basex.core.cmd.CreateIndex;
 import org.basex.core.cmd.DropDB;
 import org.basex.query.QueryProcessor;
 import org.basex.query.item.Item;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class QueryTest {
   private static final Context CTX = new Context();
 
   /** Test database name. */
-  private static final String DBNAME = QueryTest.class.getSimpleName();
+  private static final String DBNAME = Util.name(QueryTest.class);
   /** Test files. */
   private static final String[] FILES = {
     "etc/xml/input.xml", "etc/xml/xmark.xml", "etc/xml/test.xml"

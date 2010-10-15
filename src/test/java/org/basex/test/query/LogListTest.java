@@ -6,6 +6,7 @@ import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -59,15 +60,16 @@ public class LogListTest {
    */
   @Before
   public void startTest() throws BaseXException {
-    new CreateDB(getClass().getSimpleName(), DOC).execute(context);
+    new CreateDB(Util.name(this), DOC).execute(context);
   }
+
   /**
    * Removes test databases and closes the database context.
    * @throws BaseXException database exception
    */
   @AfterClass
   public static void finish() throws BaseXException {
-    new DropDB(LogListTest.class.getSimpleName()).execute(context);
+    new DropDB(Util.name(LogListTest.class)).execute(context);
     context.close();
   }
 

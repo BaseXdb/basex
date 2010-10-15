@@ -303,8 +303,8 @@ public abstract class AProp {
     final Object entry = props.get(key[0].toString());
     if(entry == null) Util.notexpected("Property " + key[0] + " not defined.");
     final Class<?> cc = entry.getClass();
-    if(c != cc) Util.notexpected("Property '" + key[0] + "' is a " +
-        cc.getSimpleName());
+    if(c != cc) Util.notexpected(
+        "Property '" + key[0] + "' is a " + Util.name(cc));
     return entry;
   }
 

@@ -26,8 +26,7 @@ public final class BlockAccessTest {
   /** Test file we do updates with. */
   private static final String TESTFILE = "etc/xml/xmark.xml";
   /** Test database name. */
-  private static final String DBNAME =
-    BlockAccessTest.class.getSimpleName();
+  private static final String DBNAME = Util.name(BlockAccessTest.class);
   /** Test file we do updates with. */
   private static final Prop PROP = new Prop(true);
   /** BlockStorage. */

@@ -82,7 +82,6 @@ public final class Group extends ParseExpr {
     return true;
   }
 
-
   @Override
   public void plan(final Serializer ser) throws IOException {
     ser.openElement(this);

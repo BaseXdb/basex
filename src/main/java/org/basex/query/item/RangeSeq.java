@@ -1,6 +1,8 @@
 package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.util.Err.*;
+
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
@@ -45,7 +47,8 @@ public final class RangeSeq extends Seq {
   @Override
   public Item ebv(final QueryContext ctx, final InputInfo ii)
       throws QueryException {
-    return item(ctx, ii);
+    CONDTYPE.thrw(ii, this);
+    return null;
   }
 
   @Override
@@ -66,6 +69,6 @@ public final class RangeSeq extends Seq {
 
   @Override
   public String toString() {
-    return PAR1 + start + DOTS + (start + size - 1) + PAR2;
+    return PAR1 + start + ' ' + TO + ' ' + (start + size - 1) + PAR2;
   }
 }

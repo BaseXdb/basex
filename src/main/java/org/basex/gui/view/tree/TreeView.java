@@ -88,7 +88,6 @@ public final class TreeView extends View implements TreeViewOptions {
   private boolean showAtts;
   /** Slim rectangles to text length. */
   private boolean slimToText;
-  
 
   /**
    * Default constructor.
@@ -165,7 +164,7 @@ public final class TreeView extends View implements TreeViewOptions {
     final Data data = c.data;
     if(data == null) return;
     if(showAttsChanged()) paintType = PAINT_NEW_INIT;
-    if(slimToTextChanged() && paintType == -1) paintType = 
+    if(slimToTextChanged() && paintType == -1) paintType =
       PAINT_NEW_WINDOW_SIZE;
 
     super.paintComponent(g);
@@ -349,7 +348,7 @@ public final class TreeView extends View implements TreeViewOptions {
       final int w = markedImage.getWidth();
       if(y >= h || 0 > y || x >= w || 0 > x) return false;
       final Color markc = new Color(markedImage.getRGB(x, y));
-      return markc.getRed() > 0 && markc.getBlue() == 0 && markc.getGreen() 
+      return markc.getRed() > 0 && markc.getBlue() == 0 && markc.getGreen()
       == 0;
     }
     return false;
@@ -438,7 +437,6 @@ public final class TreeView extends View implements TreeViewOptions {
       g.setColor(fillColor);
       g.fillRect(xx + 1, y + 1, ww - 1, h - 1);
     }
-
     if(txt && (fill || !FILL_RECTANGLES)) {
       g.setColor(textColor);
       drawRectangleText(g, rn, lv, r, pre);
@@ -1088,7 +1086,7 @@ public final class TreeView extends View implements TreeViewOptions {
         / 2d);
     topMargin = ih < TOP_MARGIN ? TOP_MARGIN : ih;
   }
-  
+
   /**
    * Returns true if show attributes has changed.
    * @return show attributes has changed
@@ -1099,7 +1097,7 @@ public final class TreeView extends View implements TreeViewOptions {
     showAtts =  !showAtts;
     return true;
   }
-  
+
   /**
    * Returns true if slim to text has changed.
    * @return slim to text has changed
@@ -1110,7 +1108,6 @@ public final class TreeView extends View implements TreeViewOptions {
     slimToText = !slimToText;
     return true;
   }
-
 
   /**
    * Returns true if window-size has changed.

@@ -8,6 +8,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.io.IO;
 import org.basex.util.Token;
+import org.basex.util.Util;
 import org.junit.After;
 import org.junit.Test;
 
@@ -22,7 +23,7 @@ public class AddTest {
   private static final Context CTX = new Context();
 
   /** Test database name. */
-  private static final String DBNAME = AddTest.class.getSimpleName();
+  private static final String DBNAME = Util.name(AddTest.class);
   /** Test document name. */
   private static final String DOCNAME = "t.xml";
   /** Target. */

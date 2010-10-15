@@ -59,15 +59,12 @@ public final class If extends Arr {
     }
 
     // if not(A) then B else C -> if A then C else B
-    if(expr[0] instanceof Fun) {
-      final Fun fun = (Fun) expr[0];
-      if(fun.def == FunDef.NOT) {
-        ctx.compInfo(OPTWRITE, this);
-        expr[0] = fun.expr[0];
-        final Expr tmp = expr[1];
-        expr[1] = expr[2];
-        expr[2] = tmp;
-      }
+    if(expr[0].isFun(FunDef.NOT)) {
+      ctx.compInfo(OPTWRITE, this);
+      expr[0] = ((Fun) expr[0]).expr[0];
+      final Expr tmp = expr[1];
+      expr[1] = expr[2];
+      expr[2] = tmp;
     }
 
     type = expr[1].type().intersect(expr[2].type());

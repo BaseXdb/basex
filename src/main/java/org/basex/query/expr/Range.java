@@ -39,9 +39,9 @@ public final class Range extends Arr {
     } else {
       final long[] v = range(ctx);
       if(v != null) {
-        if(v[0] >  v[1]) e = Empty.SEQ;
-        if(v[0] == v[1]) e = Itr.get(v[0]);
-        size = v[0] <= v[1] ? v[1] - v[0] + 1 : 0;
+        size = v[1] - v[0] + 1;
+        // use iterative evaluation at runtime instead of range sequence
+        e = size < 1 ? Empty.SEQ : size == 1 ? Itr.get(v[0]) : this;
       }
     }
     type = SeqType.ITR_OM;

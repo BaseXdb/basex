@@ -96,8 +96,8 @@ public final class IOFile extends IO {
         if(zip == null) break;
         len = zip.getSize();
         init(zip.getName());
-        if(len > 0 && path.toLowerCase().endsWith(XMLSUFFIX) &&
-            !zip.isDirectory()) return true;
+        if(path.toLowerCase().endsWith(XMLSUFFIX) && !zip.isDirectory())
+          return true;
       }
       is.close();
       is = null;
@@ -170,10 +170,14 @@ public final class IOFile extends IO {
 
   @Override
   public void write(final byte[] c) throws IOException {
-    final FileOutputStream out = new FileOutputStream(path);
-    out.write(c);
-    out.close();
-    cont = c;
+    FileOutputStream out = null;
+    try {
+      out = new FileOutputStream(path);
+      out.write(c);
+      cont = c;
+    } finally {
+      if(out != null) try { out.close(); } catch(final IOException ex) { }
+    }
   }
 
   @Override
@@ -215,7 +219,6 @@ public final class IOFile extends IO {
     return fn.length() > 2 && fn.charAt(0) == '/' && fn.charAt(2) == ':' ?
         fn.substring(1) : fn;
   }
-
 
   /**
    * Converts a file filter to a regular expression.

@@ -139,7 +139,7 @@ public final class MetaData {
       Util.debug(ex);
       return false;
     } finally {
-      try { in.close(); } catch(final Exception ex) { }
+      if(in != null) try { in.close(); } catch(final IOException ex) { }
     }
   }
 

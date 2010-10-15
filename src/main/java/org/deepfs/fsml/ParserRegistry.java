@@ -50,7 +50,7 @@ public final class ParserRegistry {
       final Class<?>[] classes = Loader.load(IFileParser.class.getPackage(),
           IFileParser.class);
       for(final Class<?> c : classes) {
-        final String name = c.getSimpleName();
+        final String name = Util.name(c);
         if(!REGISTRY.containsValue(c) && fallbackParser != c)
           Util.debug("Loading % ... FAILED", name);
       }
@@ -86,15 +86,8 @@ public final class ParserRegistry {
         try {
           instance = clazz.newInstance();
         } catch(final Exception ex) {
-          final StringBuilder sb = new StringBuilder();
-          sb.append("Failed to load ");
-          sb.append(clazz.getSimpleName());
-          sb.append(" for suffix ");
-          sb.append(suffix);
-          sb.append("(");
-          sb.append(ex.getMessage());
-          sb.append(")");
-          throw new ParserException(sb.toString());
+          throw new ParserException("Failed to load " + Util.name(clazz) +
+              " for suffix " + suffix + "(" + ex.getMessage() + ")");
         }
       }
       // put in hash map ... even if null

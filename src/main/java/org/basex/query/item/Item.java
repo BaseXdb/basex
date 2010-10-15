@@ -18,6 +18,8 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public abstract class Item extends Value {
+  /** Undefined item. */
+  public static final int UNDEF = Integer.MIN_VALUE;
   /** Dummy item. */
   public static final Item DUMMY = new Item(Type.ITEM) {
     @Override public byte[] atom() { return Token.EMPTY; }
@@ -25,10 +27,9 @@ public abstract class Item extends Value {
       return false;
     }
   };
-  /** Undefined item. */
-  public static final int UNDEF = Integer.MIN_VALUE;
-  /** Score value. */
-  protected double score;
+  /** Score value. {@link Double} was preferred over a primitive double value,
+    * as it takes less less only 4 byte on 32bit if set to {@code null}. */
+  protected Double score;
 
   /**
    * Constructor.
@@ -213,7 +214,7 @@ public abstract class Item extends Value {
    * @return score value
    */
   public double score() {
-    return score;
+    return score == null ? 0 : score;
   }
 
   /**

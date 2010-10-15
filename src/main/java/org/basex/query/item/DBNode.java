@@ -163,7 +163,7 @@ public class DBNode extends Nod {
 
     final DBNode node = copy();
     node.set(p, data.kind(p));
-    node.score(Scoring.step(node.score));
+    node.score(Scoring.step(node.score()));
     return node;
   }
 
@@ -179,7 +179,7 @@ public class DBNode extends Nod {
       private final DBNode node = copy();
       int p = pre;
       int k = data.kind(p);
-      final double sc = node.score;
+      final double sc = node.score();
 
       @Override
       public Nod next() {
@@ -199,7 +199,7 @@ public class DBNode extends Nod {
       private final DBNode node = copy();
       int p = pre;
       int k = data.kind(p);
-      final double sc = node.score;
+      final double sc = node.score();
 
       @Override
       public Nod next() {
@@ -236,7 +236,7 @@ public class DBNode extends Nod {
       int p = pre + data.attSize(pre, k);
       final int s = pre + data.size(pre, k);
       final DBNode node = copy();
-      final double sc = node.score;
+      final double sc = node.score();
 
       @Override
       public boolean more() {
@@ -262,7 +262,7 @@ public class DBNode extends Nod {
       int p = pre + data.attSize(pre, k);
       final int s = pre + data.size(pre, k);
       final DBNode node = copy();
-      final double sc = node.score;
+      final double sc = node.score();
 
       @Override
       public DBNode next() {

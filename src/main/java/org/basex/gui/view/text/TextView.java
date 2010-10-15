@@ -210,7 +210,7 @@ public final class TextView extends View implements ActionListener {
     } catch(final IOException ex) {
       Dialog.error(gui, NOTSAVED);
     } finally {
-      try { out.close(); } catch(final Exception ex) { }
+      if(out != null) try { out.close(); } catch(final IOException ex) { }
     }
   }
 }

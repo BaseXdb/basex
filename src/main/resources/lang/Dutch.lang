@@ -1,0 +1,596 @@
+# LANGUAGE FILE, TRANSLATED BY
+# Huib Verweij
+#
+# The '%' character serves as placeholder for texts to be inserted
+
+# Start
+wait=Een ogenblik
+version=Versie %
+
+# Menu Commands
+m_file=Bestand
+m_edit=Wijzig
+m_view=View
+m_options=Opties
+m_help=Help
+m_db=Database
+m_main=Hoofd Window
+m_views=Visualisaties
+m_inter=Interactie
+m_layout=Layout
+
+# Buttons
+b_ok=OK
+b_opt=Optimaliseer
+b_rename=Hernoem
+b_open=Open
+b_mount=Mount
+b_cancel=Annuleer
+b_drop=Verwijder
+b_cmd=Commando
+b_xquery=XQuery
+b_browse=Bladeren
+b_search=Zoeken
+b_create=Creëer
+b_alter=Verander
+b_start=Start
+b_stop=Stop
+b_connect=Verbind
+b_disconnect=Verbreek Verbinding
+b_refresh=Ververs
+b_delete=Verwijder
+b_delall=Verwijder Alles
+b_add=Toevoegen
+
+# Visualizations
+no_data=Geen gegevens beschikbaar
+no_space=Niet genoeg ruimte
+map_binary=Binair Bestand
+info_title=Query Info
+help_title=Help
+text_title=Tekst
+explore_title=Verken
+
+# Dialog Windows
+d_info=Informatie
+d_fctitle=Kies Folder
+
+dc_choose=Input bestand of folder
+dc_pattern=Bestands patronen (gescheiden door komma's)
+dc_name=Naam van Database
+dc_xmldesc=XML Documenten
+dc_zipdesc=ge-Zipte XML Documenten
+dc_gzdesc=ge-GZipte XML Documenten
+dc_xqdesc=XQuery Bestanden
+dc_advtitle=Creer Database
+dc_chop=Verwijder Whitespaces
+dc_intparse=Gebruik interne XML Parser
+dc_entities=Parseer Entities
+dc_dtd=Parseer DTDs
+dc_usecat=Gebruik XML Catalog bestand
+dc_wcindex=Ondersteun Wildcards
+dc_ftstem=(Engelse) Stam zoeken
+dc_ftdc=Diakritische tekens
+dc_ftcs=Hoofdlettergevoeligheid
+dc_ftsw=Stopword Lijst
+dc_ftsct=TF/IDF Scoring
+dc_ftsct1=Documenten
+dc_ftsct2=Tekst Nodes
+dc_chopinfo=Deze optie verwijdert witruimte tussen tags en content
+dc_intparseinfo=Activeer deze optie om de ingebouwde XML parser te gebruiken
+dc_pathinfo=A path summary speeds up path resolutions
+dc_txtinfo=Deze index versnelt tekst vergelijkingen in predicaten
+dc_attinfo=Deze index versnelt attribute vergelijkingen in predicaten
+dc_ftxinfo=Een full-text index versnelt full-text queries
+dc_wcinfo=Deze optie versnelt wildcard zoekopdrachten
+dc_ftsteminfo=Van termen wordt  de stam bepaald voor ze geïndexeerd worden
+dc_ftcsinfo=Hoofdlettergevoeligheid wordt gebruikt in de index
+dc_ftdcinfo=Diakritische tekens worden gebruikt in de index
+dc_ftscinfo=Scoring waarden worden berekend en opgeslagen in de index
+dc_ftswinfo=Kies een stopword ljist om veelvoorkomende termen over te slaan
+dc_general=Algemeen
+dc_parse=Parsing
+dc_names=Namen
+dc_index=Indexen
+dc_meta=Metadata
+dc_ft=Full-Text
+
+do_title=Open Database
+do_large=De database is % groot. Wil je enkele visualisaties\nsluiten om sneller te kunnen werken?
+do_nodbquestion=Wil je een nieuwe maken?
+
+dqe_title=Open DeepFS instantie
+
+dmnt_title=Mount DeepFS instantie
+dmnt_nomountpath=Geen goed mount point
+
+dfs_newtitle=Creer nieuwe DeepFS Database
+dfs_all=Complete
+dfs_allinfo=Creates a complete (C:, D: etc. on Windows, '/' on UNIX) mapping of de filesystem
+dfs_text=Map Folder to DeepFS XML
+dfs_text1=Bestand Information & Metadata
+dfs_text2=Bestand Contents
+dfs_cont=Include textual file contents
+dfs_xml=Include xml contents
+dfs_meta=Include metadata
+dfs_nodefaultapp=No default application is registered to open this file type
+
+dr_title=Hernoem Database
+dr_exists=Database bestaat al
+dr_over=Oude database wordt overschreven
+dr_overbacking=Oude database en 'backing store' worden overschreven
+
+dd_title=Verwijder Database
+dd_question=Database '%' zal verwijderd worden.\nWeet je het zeker?
+
+dx_question=Wil je echt verwijderen?
+dq_question=Bewaar wijzigingen in %?
+
+dx_outdir=Output folder
+dx_overfile=Folder is niet leeg.
+dx_indent=Inspringen met whitespace tekens
+dx_invpath=Niet bestaand pad.
+
+dp_title=Preferenties
+dp_dbpath=Database Pad (databases moeten handmatig verplaatst worden)
+dp_inter=GUI & Interacties
+dp_lf=Gebruik Java Look & Feel
+dp_focus=Realtime muis focus
+dp_simplefd=Gebruik simpele bestandskiezer
+dp_names=Vervang tags door @name attributen
+dp_lang=Taal
+dp_restart=vereist een herstart
+
+dn_title=Voeg nieuwe data toe
+de_title=Wijzig data
+de_name=Naam
+de_value=Waarde
+de_text=Edit %
+de_kind1=Document
+de_kind2=Element
+de_kind3=Tekst
+de_kind4=Attribuut
+de_kind5=Commentaar
+de_kind6=PI
+
+df_title=Kies Font
+df_type1=Standaard
+df_type2=Vet
+df_type3=Cursief
+
+dy_title=Kleurenschema
+dy_red=Rood
+dy_green=Groen
+dy_blue=Blauw
+
+dm_title=Map Layout
+dm_atts=Toon Attributen
+dm_choice1=Geen Titel, geen Rand
+dm_choice2=Geen Titel, kleine Rand
+dm_choice3=Titel, geen Rand
+dm_choice4=Titel, kleine Rand
+dm_choice5=Titel, grote Rand
+dm_offset=Offsets
+dm_size=Verhouding:
+dm_size_children=aantal children
+dm_size_fssize=bestandsgrootte
+dm_size_textsize=tekst lengte
+dm_size_both=children/tekst lengte
+
+dt_title=TreeView Opties
+dt_atts=Toon Attributen
+dt_slim=Pas nodes aan tekst aan
+
+dz_total=Totaal Geheugen
+dz_reserved=Gereserveerd Geheugen
+dz_used=Geheugengebruik
+dz_help=Als er weinig geheugen beschikbaar is, start\nBaseX dan met de Java vlag -Xmx<size>
+
+da_title=Over %
+da_license=BSD license (ISC)
+da_dev=Hoofd Ontwikkelaar
+da_cont1=Team
+da_cont2=en anderen
+da_translation=Vertaling
+
+ds_localserver=Locale Server
+ds_connect=Connectie
+ds_users=Gebruikers
+ds_host=Host
+ds_port=Port
+ds_localport=Local Port
+ds_createu=Nieuwe gebruiker
+ds_globperm=Globale Permissies
+ds_locperm=Lokale Permissies
+ds_drquestion=% Gebruiker(s) worden verwijderd.\nWeet je het zeker?
+ds_dbrevoke=Permissie wordt ingetrokken voor de ingelogde gebruiker.\nWeet je het zeker?
+ds_alterpw=Verander Wachtwoord
+ds_invalid=% is ongeldig
+ds_adlogin=Administrator Login (local of remote)
+ds_databases=Databases
+ds_sessions=Sessies
+ds_logs=Logs
+ds_connected=Verbonden met %:%.
+ds_disconnected=Niet verbonden.
+ds_info1=Deze dialoog is alleen bedoeld om de client/server omgeving te beheren.
+ds_info2=Het heeft geen invloed op andere features van de GUI.
+
+# GUI Commands
+
+c_about=Over %
+c_abouttt=Toont algemene informatie over het project.
+c_all=Selecteer Alles
+c_close=Sluit
+c_closett=Sluit de actuele (geopende) database.
+c_color=Kleuren
+c_colortt=Verander de kleuren van de applicatie.
+c_cut=Knip
+c_copy=Kopieer
+c_copytt=Kopieert de geselecteerde XML nodes.
+c_cppath=Kopieer Pad
+c_cppathtt=Kopieert het pad naar de geselecteerde XML nodes.
+c_create=Nieuw
+c_creatett=Maakt een nieuwe database.
+c_delete=Verwijder
+c_deletett=Verwijdert XML nodes.
+c_drop=Verwijder
+c_droptt=Verwijdert een database.
+c_edit=Wijzig
+c_edittt=Wijzigt XML nodes.
+c_exit=Stop
+c_exittt=Stopt de applicatie.
+c_export=Exporteer XML
+c_exporttt=Exporteert de actuele database naar XML.
+c_filter=Filter Geselecteerde
+c_filtertt=Filtert de geselecteerde nodes.
+c_fonts=Fonts
+c_fontstt=Verander de gebruikte fonts.
+c_full=Volledig scherm
+c_fulltt=Schakelt naar volledig scherm.
+c_goback=Ga terug
+c_goforward=Ga vooruit
+c_goup=Ga omhoog
+c_gouptt=Ga een niveau omhoog.
+c_createfs=Creëer DeepFS mapping
+c_createfstt=Creëert een DeepFS filesysteem representatie vanaf een gegeven folder. De resulterende database kan later gebruikt worden om BaseX te starten als 'Desktop Query Engine' of als 'filesystem in gebruikerspace'.
+c_dqe=Desktop Query Engine
+c_dqett=Open DeepFS database en gebruik het als Desktop Search/Query Engine
+c_mountfs=Gebruik DB als FUSE
+c_mountfstt=Gebruik DeepFS database instantie als filesystem in gebruikerspace (alleen als je operating system het ondersteunt).
+c_props=Eigenschappen
+c_propstt=Toon informatie over de geopende database.
+c_insert=Nieuw
+c_inserttt=Maakt een nieuwe XML node.
+c_maplayout=Map Layout
+c_maplayouttt=Verandert de map layout.
+c_treeoptions=Tree Opties
+c_treeoptionstt=Opties voor de TreeView.
+c_open=Open
+c_opentt=Opens a database.
+c_paste=Plak
+c_pastett=Plakt eerder gekopieerdenodes.
+c_prefs=Voorkeuren
+c_prefstt=Toont algemene applicatie voorkeuren.
+c_redo=Opnieuw
+c_root=Ga naar Home
+c_roottt=Spring naar de root node.
+c_rtexec=Realtime Execution
+c_rtexectt=Als deze optie ingeschakeld is worden queries na elke click uitgevoerd.
+c_rtfilter=Realtime Filtering
+c_rtfiltertt=Als deze optie ingeschakeld is worden query resultaten automatisch gefiltert.
+c_showbuttons=Knoppen
+c_showbuttonstt=Schakel de knoppenbalk aan/uit.
+c_showexplore=Verkenner
+c_showexplorett=Toon het Verkennerspaneel.
+c_showhelp=Help
+c_showhelptt=Toont informatie over de component met focus.
+c_community=Gemeenschap
+c_communitytt=Toont de Basex gemeenschap webpagina.
+c_updates=Controleer op updates.
+c_updatestt=Toon de webpagina met updates.
+c_showfolder=Folder
+c_showfoldertt=Toon de folder visualisatie.
+c_showinfo=Query Info
+c_showinfott=Toon het query info paneel.
+c_showinput=Invoerveld
+c_showinputtt=Schakel het invoerveld aan/uit.
+c_showmap=Map
+c_showmaptt=Toon de map visualisatie
+c_showmenu=Menu
+c_showmenutt=Schakel het menu aan/uit.
+c_showstatus=Status Bar
+c_showstatustt=Schakel de status bar aan/uit.
+c_showtable=Table
+c_showtablett=Toon de table visualisatie.
+c_showtree=Tree
+c_showtreett=Toon de tree visualisatie.
+c_showplot=Plot
+c_showplottt=Toon de scatter-plot visualisatie.
+c_showtext=Tekst
+c_showtexttt=Toon de tekst view.
+c_showxquery=Query Editor
+c_showxquerytt=Toon de Query Editor.
+c_undo=Herstel
+c_xqopen=Open XQuery
+c_xqopentt=Opent een XQuery bestand
+c_save=Opslaan
+c_savett=Slaat het bestand op
+c_saveas=Opslaan als
+c_notopened=Bestand kon niet geopend worden.
+c_notsaved=Bestand kon niet opgeslagen worden.
+c_replace=% bestaat al.\nWil je het vervangen?
+c_dirreplace=Bestanden in % worden vervangen.\nWil je doorgaan?
+c_server=Server Administratie
+c_servertt=Toont de server administration voor gebruikersbeheer en 'log tracing'.
+
+# Commands
+proc_time=Benodigde tijd
+proc_syntax=Syntax
+proc_err=Kon % niet uitvoeren
+proc_nodb=Geen database geopend.
+proc_mm=Commando is niet beschikbaar in main memory mode.
+proc_mem=Main Geheugen is op.
+proc_memcreate=\nDe volgende hints kunnen je helpen:\n- vergroot Java's heap size met de vlag -Xmx<size>\n- kies de interne XML parser in de GUI of via 'set intparse on'\n- deactiveer de text en attribute indexen
+
+cmd_no= Commando verwacht.
+cmd_unknown=Onbekend command0 '%'
+cmd_similar=bedoelde je '%'?
+
+# Help Command
+help_short=probeer "%"
+help_intro=Probeer "%" om informatie te krijgen.
+help_long=Probeer "% [...]" om informatie over een specifiek commando te krijgen.
+
+# Create Command
+pc_create=Bezig de Database te maken
+pc_index=Bezig de Indexen te maken
+pc_update=Het database formaat is gewijzigd; maak een nieuwe database.
+pc_indupdate=Het index formaat is gewijzigd; maak nieuwe indexen.
+pc_cancel=Database creatie is geannuleerd.
+pc_indextxt=Text Indexeren
+pc_indexatt=Attributen Indexeren
+pc_indexftx=Full-Text Indexeren
+pc_parse="%" (% Nodes geparsed)
+pc_created=Database '%' gecreerd in %.
+pc_added=Pad '%' toegevoegd aan %.
+pc_deleted=% documenten verwijderd in %.
+pc_filenf=Bestand of folder "%" niet gevonden.
+pc_pathnf=Bestand of folder niet gevonden.
+pc_dbnf=Geefde database een naam.
+pc_err="%" voldoet niet aan de grammatica.
+pc_pos="%" (Regel %)
+
+# Database commands
+db_no=Database '%' is niet gevonden.
+db_locked=Database '%' is momenteel gelockt.
+db_closed=Database '%' is gesloten.
+db_closeerr=Database kon niet gesloten worden.
+db_optimized=Database geoptimaliseerd in %.
+db_dropped=Database '%' is verwijderd.
+db_notdropped=Geen database verwijderd.
+db_droperror=Database kon niet verwijderd worden.
+db_altered=Database '%' is hernoemd naar '%'.
+db_notaltered=Database '%' kon niet hernoemd worden.
+db_backup=Backup '%' gemaakt in %.
+db_nobackup=Backup van database '%' kon niet gemaakt worden.
+db_restore=Database '%' teruggezet in %.
+db_norestore=Database '%' kon niet teruggezet worden.
+db_notopened=Database '%' kon niet geopend worden.
+db_opened=Database '%' geopend in %.
+db_exported=Database '%' gexporteerd in %.
+db_notexported=Database kon niet naar '%' gexporteerd worden.
+db_notdeleted=Bestand '%' kon niet verwijderd worden.
+
+# Index commands
+in_created=Index '%' in % seconden gemaakt.
+in_dropped=Index '%' in % seconden verwijderd.
+in_notdropped=Index '%' kon niet verwijderd worden.
+
+# Server Info
+srv_login=Toegang ontzegd.
+srv_connect=Communicatie met de server mislukt.
+srv_timeout=Timeout overschreden.
+srv_bind=Server loopt al of toegang ontzegd.
+srv_start=Server is gestart.
+srv_stop=Server was gestopt.
+srv_user=Gebruikersnaam
+srv_pw=Wachtwoord
+
+# Bye
+bye1=Prettige dag.
+bye2=Later.
+bye3=Veel plezier.
+bye4=Geniet van je leven.
+
+# Query Commands
+qu_query=Query
+qu_comp=Compileren
+qu_eval=Evalueren
+qu_time=Timing
+qu_result=Resultaat
+qu_plan=Query plan
+qu_hits=Hit(s)
+qu_tabquery=Query
+qu_tabpars=Parsing
+qu_tabcomp=Compileren
+qu_tabeval=Evalueren
+qu_tabprint=Printen
+qu_tabtotal=Totale Tijd
+qu_tabmem=Geheugen
+qu_tabupdated=Bijgewerkt
+qu_tabprinted=Geprint
+qu_tabhits=Resultaten
+qu_nodeserr=Query moet een nodeset opleveren.
+qu_stopped=Gestopt bij
+qu_line=regel %
+qu_col=kolom %
+qu_file=in %
+qu_exec=Query uitgevoerd in % seconden.
+
+# Admin Commands
+ad_databases=% geopende database(s)
+ad_sessions=% sessie(s)
+ad_permno=% toegang ontzegd.
+ad_perminv=Ongeldige permissies gespecificeerd.
+ad_permup=Permissies bijgewerkt.
+ad_userno=Gebruiker '%' is onbekend.
+ad_userknown=Gebruiker '%' bestaat al.
+ad_usercreate=Gebruiker '%' gecreerd.
+ad_useralter=Wachtwoord van gebruiker '%' veranderd.
+ad_userdrop=Gebruiker '%' verwijderd.
+ad_userlog=Gebruiker '%' is momenteel ingelogd.
+ad_passno=Geen wachtwoord opgegeven.
+ad_admin=Admin gebruiker kan niet gewijzigd worden.
+ad_kill=% sessies gestopt.
+ad_killself='%' kan zichzelf niet stoppen.
+
+# General Commands
+gc_setkey=Kon '%' geen waarde geven.
+gc_setval=Kon '%' niet de waarde '%' geven.
+
+# Info Strings
+info_index=Indexen
+info_opt=Database optimaliseren
+info_stats=Statistieken creren
+info_dbname=Naam
+info_ndocs=Documenten
+info_docsize=Input Grootte
+info_dbsize=Grootte
+info_doc=Source Pad
+info_time=Time Stamp
+info_mem=Gebruikt Hoofd Geheugen
+info_nodes=Nodes
+info_height=Hoogte
+info_encoding=Encoding
+info_dbpath=Database Pad
+info_nodb=Geen database gevonden
+info_nodeepfs=Geen DeepFS database gevonden
+info_dberror=kon niet worden geopend.
+info_query=Query Info
+info_debug=Debug Mode
+info_chop=Whitespace afkappen
+info_entities=Entity Parsing
+info_serialize=Serialiseren
+info_tags=Tags
+info_atts=Attributen
+info_ns=Namespaces
+info_pathindex=Path Summary
+info_txtindex=Tekst Index
+info_atvindex=Attribuut Index
+info_ftindex=Full-Text Index
+info_wcindex=jokers
+info_outofdated=out-of-dated
+info_db=Database Eigenschappen
+info_create=Database Creatie
+info_general=Algemene Informatie
+info_resultchop=afgekapt
+info_on=AAN
+info_off=UIT
+info_error=Fout
+info_entries=% entries
+info_browsererror=Kon geen browser openen.\nOpen zelf de URL:\n\n%
+
+# Command Help
+ch_nohelp=Sorry, geen help beschikbaar.
+ch_helpdatabase0=Database Commando's:
+ch_create1=Maak database, index van gebruiker.
+ch_create2=Maakt een nieuwe database, index van gebruiker:
+ch_create3=maakt de database [%] met een optionele [%]
+ch_create5=maakt de opgegeven index
+ch_create6=maakt filesystem database [%] voor [%]
+ch_create7=(gebruik makend van [%] en [%] als FUSE geactiveerd is)
+ch_create8=creert de opgegeven gebruiker
+ch_add1=Voeg document aan database toe.
+ch_add2=Voegt [%] als [%] toe aan de database, met een optional pad\n[%].
+ch_delete1=Verwijder document uit de database.
+ch_delete2=Verwijdert een document uit de actuele database.
+ch_open1=Open database.
+ch_open2=Opent de opgegeven database [%].
+ch_info1=Toon informatie over de actuele database.
+ch_info21=Toont informatie over de momenteel geopende database:
+ch_info22=geen argument: toon globale informatie
+ch_info23=toont database informatie
+ch_info24=toont index informatie
+ch_info25=toon interne database tabel
+ch_close1=Sluit actuele database.
+ch_close2=Sluit de actuele database.
+ch_list1=Toon beschikbare databases.
+ch_list2=Toon alle beschikbare databases.
+ch_drop1=Verwijder database, index van gebruiker.
+ch_drop2=Verwijder een database, index van gebruiker:
+ch_drop21=verwijdert de database
+ch_drop22=verwijdert de opgegeven index
+ch_drop3=verwijdert de opgegeven gebruiker
+ch_alter1=Wijzig gebruiker password of database naam.
+ch_alter2=Wijzigt gebruiker password of database naam:
+ch_alterpw=wijzigt  de password of a gebruiker.
+ch_alterdb=wijzigt de naam of a database.
+ch_optimize1=Optimaliseer de database.
+ch_optimize2=Optimaliseert de actuele database structuren.
+ch_export1=Exporteer database naar XML.
+ch_export2=Exporteert de database naar [%].
+ch_helpquery0=Query Commando's:
+ch_xquery1=Evalueer XQuery.
+ch_xquery2=Evalueert de opgegeven query en print het resultaat.
+ch_run1=Evalueer bestand als XQuery.
+ch_run2=Evalueert een query van [%] en print het resultaat.
+ch_find1=Evalueer een keyword query.
+ch_find2=De volgende modifiers kunnen gebruikt worden:\n =  : zoekt naar exacte tekst nodes"\n @= : zoekt naar exacte attributen\n @  : zoekt naar attributen
+ch_cs1=Evalueer XQuery en neem resultaat als nieuwe context set.
+ch_cs2=Evalueert de query en neemt het resultaat als nieuwe context set.
+ch_helpadmin0=Admin Commando's:
+ch_kill1=Stop gebruiker sessions.
+ch_kill2=Stopt alle sessies van de opgegeven gebruiker.
+ch_backup1=Backup database.
+ch_backup2=Maakt een backup van de opgegeven database.
+ch_restore1=Herstel database.
+ch_restore2=Herstelt een backup van de opgegeven database.
+ch_show1=Toon server informatie.
+ch_show21=Toont server informatie:
+ch_show22=toont momenteel geopende databases.
+ch_show23=toont actuele database sessies.
+ch_show24=toont gebruikers (van een database).
+ch_show25=toont backups.
+ch_grant1=Geef gebruiker permissies.
+ch_grant2=Geeft permissies (op een database) aan een gebruiker.
+ch_helpgeneral0=Algemene Commando's:
+ch_set1=Stel globale opties in (actuele waarden: probeer '%').
+ch_set2=Beschikbare opties [%] met waarde [%] = aan/uit:
+ch_set21=Tonen van query info
+ch_set22=Tonen van debug info
+ch_set23=Serialisatie van query resultaten
+ch_set26=Verwijderen van witruimte in de XML
+ch_set27=Parseren van XML entities
+ch_set28=Tekst indexing
+ch_set29=Attribute value indexeren
+ch_set31=Full-text indexeren
+ch_set32=Path indexeren
+ch_password1=Verander wachtwoord.
+ch_password2=Verandert het wachtwoord van de gebruiker.
+ch_help1=Vraag hulp over % commando's.
+ch_help2=Als [%] is opgegeven, dan wordt informatie over het specifieke\ncommando geprint; anders worden alle commando's getoond.
+ch_exit1=Stop applicatie.
+ch_exit2=Stop %.
+
+# Help Texts
+h_hist=Toon input geschiedenis.
+h_save=Bewaart het resultaat.
+h_save2=Bewaart de query.
+h_go=Voer de query uit.
+h_stop=Stopt het actuele proces.
+h_recent=Recent geopende bestanden
+h_qclose=Sluit de query en schoont het tekstveld op
+h_cmd=Hier kun je BaseX commando's invoeren. Probeer 'help' voor een overzicht van beschikbare commando's.\n\nJe kunt eerdere invoer terughalen met de UP en DOWN cursor keys.
+h_searchxml=Type iets in het tekstveld om in je XML document te zoeken. De volgende syntax wordt ondersteund:\n...      Vind tags en tekst\n=...   Vind exacte tekst nodes\n@ ...  Vind attributen en attribute waarden\n@=   Vind exacte attribute waarden\n/...     Evalueer input als XQuery
+h_searchfs=Type iets in het tekstveld om in je filesystem te zoeken. De volgende syntax wordt ondersteund:\n...      Vind bestanden of folders\n= ...  Vind exacte namen\n. ..     Vind bestandsextensies\n< ...  Vind bestanden kleiner dan de opgegeven grootte\n> ...  Vind bestanden groter dan de opgegeven grootte\n\nJe kunt BaseX commando's gebruiken door ze vooraf te laten gaan door een uitroepteken.
+h_xpath=In de XQuery mode kun je simpele XQuery requests opgeven.
+h_map=Deze visualisatie heet TreeMap. Alle nodes van het XML document worden als vierkanten getoond, het hele vlak wordt gevuld. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.
+h_tree=Deze visualizatie heet TreeView. Zij toont het XML document als boom en tekent de nodes in een hierarchie. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.
+h_plot=Deze visualisatie heet Scatterplot. Alle XML nodes worden getoond in een plot. Nodes kun je uitlichten met een muisklik en filteren kun je door te dubbelklikken. Als je met rechts klikt op een element krijg je een popup menu.
+h_folder=Deze visualisatie toont alle XML nodes in een folder view. Nodes kunnen uitgeklapt en ingeklapt worden door op de pijlen te klikken. Nodes kun je uitlichten met een muisklik en zoomen kun je door te dubbelklikken. Dit is een efficiënte manier om je XML document te verkennen. Als je met rechts klikt op een element krijg je een popup menu.
+h_table=Deze visualisatie toont XML nodes in een tabel. Als je op een tekst klikt worden alle nodes met dezelfde tekst uitgelicht. Door te dubbelklikken op een tekst worden de query resultaten gefilterd.  Als je met rechts klikt op een element krijg je een popup menu.
+h_text=Dit paneel toont query resultaten en andere tekstuele output.\n\nToetsen: Type '-' en '+' om de font grootte van alle penelen te wijzigen. Type tekst in de Vind popup om incrementeel te zoeken. Dat is een gemakkelijke manier om speciale teksten te vinden.
+h_info=Dit paneel toont informatie over de compilatie en uitvoering van een XQuery request, inclusief enige profiling informatie.
+h_explore=De Eenvoudige Zoek Mode facilteert eenvoudige queries in het XML document.
+h_xquery=In dit tekst veld kun je een XQuery 1.0 invoeren. De invoer wordt uitgevoerd na elke toetsaanslag.\n\nHet volgende voorbeeld toont alle boek titels met het onderwerp 'BaseX':\n\n for $a in //book\n where $a/topic = "BaseX"\n return $a/title"
+h_mover=Je kunt een view verplaatsen door het met de bovenste balk te verslepen.\n Als je een view buiten het hoofd window sleept wordt het gesloten.

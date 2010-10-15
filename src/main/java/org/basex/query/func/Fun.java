@@ -69,6 +69,11 @@ public abstract class Fun extends Arr {
   }
 
   @Override
+  public boolean isFun(final FunDef f) {
+    return def == f;
+  }
+
+  @Override
   public final String desc() {
     return def.toString();
   }

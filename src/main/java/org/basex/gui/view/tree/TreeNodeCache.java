@@ -7,7 +7,7 @@ import org.basex.util.IntList;
 
 /**
  * This class determines nodes per level and caches them.
- * 
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Wolfgang Miller
  */
@@ -23,7 +23,7 @@ final class TreeNodeCache implements TreeViewOptions {
    * @param atts show attributes
    */
   TreeNodeCache(final Data data, final boolean atts) {
-    
+
       final ArrayList<IntList> alil = new ArrayList<IntList>();
 
       if(USE_CHILDITERATOR) {
@@ -60,7 +60,7 @@ final class TreeNodeCache implements TreeViewOptions {
           }
         }
         maxLevel = alil.size();
-      }       
+      }
       nodes = alil.toArray(new IntList[maxLevel]);
   }
 

@@ -1,6 +1,5 @@
 package org.basex.util;
 
-
 /**
  * This is a simple container for attributes (key/value tokens).
  *

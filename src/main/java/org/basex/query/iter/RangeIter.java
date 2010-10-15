@@ -6,7 +6,7 @@ import org.basex.query.item.RangeSeq;
 import org.basex.query.item.Value;
 
 /**
- * Range iterator.
+ * Range iterator, returning at least two integers.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen

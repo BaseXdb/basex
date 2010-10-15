@@ -99,7 +99,7 @@ public final class SAXWrapper extends FileParser {
         r.setEntityResolver(new CatalogResolver(cm));
       }
 
-      r.setDTDHandler(sax);      
+      r.setDTDHandler(sax);
       r.setContentHandler(sax);
       r.setProperty("http://xml.org/sax/properties/lexical-handler", sax);
       r.setErrorHandler(sax);

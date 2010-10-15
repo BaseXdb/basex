@@ -6,7 +6,6 @@ import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV.Op;
-import org.basex.query.func.Fun;
 import org.basex.query.func.FunDef;
 import org.basex.query.item.Bln;
 import org.basex.query.item.Item;
@@ -66,8 +65,7 @@ public final class Pos extends Simple {
       final InputInfo ii) throws QueryException {
 
     // position() = last() -> last()
-    if(a instanceof Fun && ((Fun) a).def == FunDef.LAST && cmp == Op.EQ)
-      return a;
+    if(a.isFun(FunDef.LAST) && cmp == Op.EQ) return a;
 
     if(a.item()) {
       final Item it = (Item) a;

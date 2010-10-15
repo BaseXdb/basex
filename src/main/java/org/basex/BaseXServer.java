@@ -69,6 +69,16 @@ public final class BaseXServer extends Main implements Runnable {
     log = new Log(context, quiet);
     stop = stopFile(port);
 
+    // guarantee correct shutdown...
+    Runtime.getRuntime().addShutdownHook(new Thread() {
+      @Override
+      public void run() {
+        log.write(SERVERSTOPPED);
+        log.close();
+        Util.outln(SERVERSTOPPED);
+      }
+    });
+
     try {
       server = new ServerSocket(port);
       new Thread(this).start();
@@ -107,7 +117,7 @@ public final class BaseXServer extends Main implements Runnable {
    * @return stop file
    */
   private static IO stopFile(final int port) {
-    return IO.get(Prop.TMP + BaseXServer.class.getSimpleName() + port);
+    return IO.get(Prop.TMP + Util.name(BaseXServer.class) + port);
   }
 
   @Override
@@ -186,9 +196,9 @@ public final class BaseXServer extends Main implements Runnable {
           "-p", String.valueOf(port) }).start();
 
       // try to connect to the new server instance
-      for(int c = 0; c < 25; ++c) {
+      for(int c = 0; c < 5; ++c) {
         if(ping(LOCALHOST, port)) return SERVERSTART;
-        Performance.sleep(200);
+        Performance.sleep(100);
       }
     } catch(final IOException ex) {
       Util.notexpected(ex);

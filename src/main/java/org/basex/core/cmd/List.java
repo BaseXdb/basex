@@ -55,7 +55,7 @@ public final class List extends Command {
       } catch(final IOException ex) {
         file = INFODBERR;
       } finally {
-        try { in.close(); } catch(final Exception ex) { }
+        if(in != null) try { in.close(); } catch(final IOException ex) { }
       }
       if(file != null) {
         final TokenList sl = new TokenList();
@@ -110,7 +110,7 @@ public final class List extends Command {
       } catch(final IOException ex) {
         Util.debug(ex.getMessage());
       } finally {
-        try { in.close(); } catch(final Exception ex) { }
+        if(in != null) try { in.close(); } catch(final IOException ex) { }
       }
     }
     return dbl;

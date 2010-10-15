@@ -41,13 +41,13 @@ import static org.basex.util.Token.*;
  */
 public class BaseXText extends BaseXPanel {
   /** Text array to be written. */
-  protected BaseXTextTokens text = new BaseXTextTokens(EMPTY);
+  protected transient BaseXTextTokens text = new BaseXTextTokens(EMPTY);
   /** Renderer reference. */
   protected final BaseXTextRenderer rend;
   /** Scrollbar reference. */
   private final BaseXBar scroll;
   /** Undo history; if set to {@code null}, text will be read-only. */
-  protected final Undo undo;
+  protected final transient Undo undo;
 
   /** Search field. */
   private BaseXTextField find;

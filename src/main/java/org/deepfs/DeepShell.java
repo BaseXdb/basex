@@ -132,7 +132,7 @@ public final class DeepShell {
       return;
     }
     final int err = fs.mkdir(args[1], getSIFDIR() | 0775);
-    if(err == -1) System.err.printf("mkdir failed. %d\n", err);
+    if(err == -1) System.err.printf("mkdir failed. %d%n", err);
   }
 
   /**
@@ -147,7 +147,7 @@ public final class DeepShell {
       return;
     }
     final int err = fs.rmdir(args[1]);
-    if(err != 0) System.err.printf("rmdir failed. %d\n", err);
+    if(err != 0) System.err.printf("rmdir failed. %d%n", err);
   }
 
   /**
@@ -162,7 +162,7 @@ public final class DeepShell {
       return;
     }
     final int err = fs.create(args[1], 0100644);
-    if(err < 0) System.err.printf("touch failed. %d\n", err);
+    if(err < 0) System.err.printf("touch failed. %d%n", err);
   }
 
   /**
@@ -260,7 +260,7 @@ public final class DeepShell {
             || args.length > 1 && m.getName().equals(args[1])
             || args.length > 1 && args[1].length() == 1
                 && c.shortcut() == args[1].charAt(0))
-          System.out.printf("%-40s %-40s\n",
+          System.out.printf("%-40s %-40s%n",
               m.getName() + " " + c.args(),
               c.help() + " (" + c.shortcut() + ")");
       }

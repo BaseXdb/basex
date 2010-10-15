@@ -250,8 +250,7 @@ public class AxisPath extends Path {
    */
   private ArrayList<PathNode> pathNodes(final Data data, final int l) {
     // convert single descendant step to child steps
-    if(!data.meta.pthindex || !data.meta.uptodate || data.ns.size() != 0)
-      return null;
+    if(!data.meta.pthindex || !data.meta.uptodate) return null;
 
     ArrayList<PathNode> in = data.path.root();
     for(int s = 0; s <= l; ++s) {
@@ -404,7 +403,7 @@ public class AxisPath extends Path {
           iter(0, citer, ctx);
         }
       } else {
-        ctx.value = r;
+        ctx.value = null;
         iter(0, citer, ctx);
       }
       citer.sort();

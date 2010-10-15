@@ -715,7 +715,7 @@ public enum GUICommands implements GUICommand {
       new DialogMapLayout(gui);
     }
   },
-  
+
   /** TreeView options. */
   TREEOPTIONS(GUITREEOPTIONS, null, GUITREEOPTIONSTT, true, false) {
     @Override
@@ -723,7 +723,6 @@ public enum GUICommands implements GUICommand {
       new DialogTreeOptions(gui);
     }
   },
-  
 
   /** Shows a preference dialog. */
   PREFS(GUIPREFS + DOTS, Prop.MAC ? "% COMMA" : "% P", GUIPREFSTT, false,

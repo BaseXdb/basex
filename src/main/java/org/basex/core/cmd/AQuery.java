@@ -127,7 +127,7 @@ public abstract class AQuery extends Command {
       err = PROGERR;
     }
     // close processor after exceptions
-    try { if(qp != null) qp.close(); } catch(final IOException ex) { }
+    if(qp != null) try { qp.close(); } catch(final IOException ex) { }
 
     error(err);
     if(Util.debug) {

@@ -60,7 +60,7 @@ public class FLWOR extends ParseExpr {
     for(final ForLet f : fl) {
       // disable fast full-text evaluation if score value exists
       final boolean fast = ctx.ftfast;
-      ctx.ftfast &= f.simple();
+      ctx.ftfast = ctx.ftfast && f.simple();
       f.comp(ctx);
       ctx.ftfast = fast;
     }

@@ -1,5 +1,7 @@
 package org.basex.data;
 
+import org.basex.util.Util;
+
 /**
  * This class contains formatting information for the DOT output.
  *
@@ -150,7 +152,7 @@ final class DOTData {
       if(!(o[1] instanceof Class<?>)) continue;
       final Class<?> c = (Class<?>) o[1];
       if(!c.isInstance(e)) continue;
-      return o[0] != null ? o[0].toString() : c.getSimpleName();
+      return o[0] != null ? o[0].toString() : Util.name(c);
     }
     return name;
   }

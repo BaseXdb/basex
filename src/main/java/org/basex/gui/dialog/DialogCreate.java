@@ -159,7 +159,7 @@ public final class DialogCreate extends Dialog {
     });
     fl.add(browsec);
     p2.add(fl);
-    
+
    // create checkboxes
     final BaseXBack p3 = new BaseXBack();
     p3.setLayout(new TableLayout(6, 1, 0, 0));
@@ -270,9 +270,8 @@ public final class DialogCreate extends Dialog {
     dtd.setEnabled(intparse.isSelected());
     usecat.setEnabled(!intparse.isSelected());
     intparse.setEnabled(!usecat.isSelected());
-    cfile.setEnabled(!intparse.isSelected() && 
-        (gui.context.prop.get(Prop.CATFILE).length() > 0
-        || usecat.isSelected()));
+    cfile.setEnabled(!intparse.isSelected() &&
+        (!gui.context.prop.get(Prop.CATFILE).isEmpty() || usecat.isSelected()));
 
     browsec.setEnabled(cfile.isEnabled());
     final IO file = IO.get(path());

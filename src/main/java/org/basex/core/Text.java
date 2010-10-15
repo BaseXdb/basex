@@ -1236,14 +1236,14 @@ public interface Text {
     lang("dm_choice1"), lang("dm_choice2"), lang("dm_choice3"),
     lang("dm_choice4"), lang("dm_choice5")
   };
-  
+
   /** Dialog title for treeview options. */
   String TREEOPTIONSTITLE = lang("dt_title");
   /** Slim rectangles to text length. */
-  String TREESLIM = lang("dt_slim"); 
+  String TREESLIM = lang("dt_slim");
   /** Show attributes. */
   String TREEATT = lang("dt_atts");
-  
+
   /** Predefined number of layouts. */
   String[] MAPALG = {
     "Split Layout", "Strip Layout", "Squarified Layout",

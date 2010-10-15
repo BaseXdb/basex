@@ -9,6 +9,7 @@ import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.Open;
 import org.basex.query.QueryProcessor;
+import org.basex.util.Util;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,20 +21,19 @@ import org.junit.Test;
  * @author Andreas Weiler
  */
 public class PathTest {
-  
   /** Database context. */
   private static final Context CTX = new Context();
   /** Test database name. */
-  private static final String INPUT = PathTest.class.getSimpleName();
+  private static final String INPUT = Util.name(PathTest.class);
   /** Test database name. */
-  private static final String WEEK1 = PathTest.class.getSimpleName() + "2";
+  private static final String WEEK1 = Util.name(PathTest.class) + "2";
   /** Test database name. */
-  private static final String WEEK2 = PathTest.class.getSimpleName() + "3";
+  private static final String WEEK2 = Util.name(PathTest.class) + "3";
   /** Test file. */
   private static final String INPUTF = "etc/xml/input.xml";
   /** Test file. */
   private static final String WEEK = "etc/xml/week.zip";
-  
+
   /**
    * Creates initial databases.
    * @throws BaseXException exception
@@ -47,7 +47,7 @@ public class PathTest {
     new Add(INPUTF, "input").execute(CTX);
     new Add(INPUTF, "input2").execute(CTX);
   }
-  
+
   /**
    * Drops the initial databases.
    * @throws BaseXException exception
@@ -59,7 +59,7 @@ public class PathTest {
     new DropDB(WEEK2).execute(CTX);
     CTX.close();
   }
-  
+
   /**
    * Checks the results of the query without index access.
    * @throws BaseXException exception
@@ -67,12 +67,12 @@ public class PathTest {
    */
   @Test
   public void withoutIndexTestInput() throws Exception {
-    String count = "count(collection('" + INPUT + "/input'))";
+    final String count = "count(collection('" + INPUT + "/input'))";
     final QueryProcessor qp = new QueryProcessor(count, CTX);
     assertEquals(1, Integer.parseInt(qp.execute().toString()));
     qp.close();
   }
-  
+
   /**
    * Checks the results of the query without index access.
    * @throws BaseXException exception
@@ -80,25 +80,25 @@ public class PathTest {
    */
   @Test
   public void withoutIndexTestWeek() throws Exception {
-    String count = "count(collection('" + WEEK1 + "/monday'))";
+    final String count = "count(collection('" + WEEK1 + "/monday'))";
     final QueryProcessor qp = new QueryProcessor(count, CTX);
     assertEquals(3, Integer.parseInt(qp.execute().toString()));
     qp.close();
   }
-  
+
   /**
    * Checks the results of the query with index access.
    */
   @Test
   public void withIndexTest() {
-    
+
   }
-  
+
   /**
    * Checks the results of the query with access of two collections.
    */
   @Test
   public void with2CollectionsTest() {
-    
+
   }
 }

@@ -114,7 +114,7 @@ public abstract class ACreate extends Command {
       case ATTRIBUTE: b = new ValueBuilder(d, false); break;
       case FULLTEXT: b = FTBuilder.get(d, d.meta.wildcards); break;
       case PATH: b = new PathBuilder(d); break;
-      default: break;
+      default: Util.notexpected();
     }
     d.closeIndex(i);
     d.meta.dirty = true;

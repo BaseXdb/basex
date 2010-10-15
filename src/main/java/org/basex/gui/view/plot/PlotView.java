@@ -519,7 +519,7 @@ public final class PlotView extends View {
     final int pHeight = plotHeight - sz;
 
     final PlotAxis axis = drawX ? plotData.xAxis : plotData.yAxis;
-    
+
     // drawing horizontal axis line
     if(drawX) {
       if(plotChanged) {

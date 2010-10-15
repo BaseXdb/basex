@@ -4,6 +4,7 @@ import org.basex.data.ExprInfo;
 import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
+import org.basex.query.func.FunDef;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.item.Value;
@@ -241,6 +242,16 @@ public abstract class Expr extends ExprInfo {
    */
   public boolean sameAs(final Expr cmp) {
     return this == cmp;
+  }
+
+  /**
+   * Checks if this expression is a certain function.
+   * @param f function definition
+   * @return function, or {@code null}
+   */
+  @SuppressWarnings("unused")
+  public boolean isFun(final FunDef f) {
+    return false;
   }
 
   /**

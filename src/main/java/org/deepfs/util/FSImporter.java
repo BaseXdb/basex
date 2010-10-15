@@ -155,7 +155,7 @@ public final class FSImporter implements FSTraversal {
             "FSImporter: Failed to insert a node for the file % into the " +
             "document (%)", f.getAbsolutePath(), ex);
       } finally {
-        try { qp.close(); } catch(final Exception ex) { }
+        try { qp.close(); } catch(final IOException ex) { }
       }
     }
 

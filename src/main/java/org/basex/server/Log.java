@@ -1,6 +1,7 @@
 package org.basex.server;
 
 import static org.basex.core.Text.*;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,15 +47,6 @@ public final class Log {
 
     create(new Date());
     write(SERVERSTART);
-
-    // guarantee correct shutdown...
-    Runtime.getRuntime().addShutdownHook(new Thread() {
-      @Override
-      public void run() {
-        write(SERVERSTOPPED);
-        close();
-      }
-    });
   }
 
   /**
@@ -100,7 +92,8 @@ public final class Log {
   /**
    * Closes the log file.
    */
-  synchronized void close() {
+  public synchronized void close() {
+    if(quiet) return;
     try {
       fw.close();
     } catch(final IOException ex) {

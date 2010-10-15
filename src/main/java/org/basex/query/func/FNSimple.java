@@ -95,22 +95,19 @@ public final class FNSimple extends Fun {
         expr[0] = e.compEbv(ctx);
         return expr[0].type().eq(SeqType.BLN) ? e : this;
       case NOT:
-        if(e instanceof Fun) {
-          final Fun f = e instanceof Fun ? (Fun) e : null;
-          if(f.def == FunDef.EMPTY) {
-            // simplify: not(empty(A)) -> exists(A)
-            ctx.compInfo(QueryText.OPTWRITE, this);
-            expr = f.expr;
-            def = FunDef.EXISTS;
-          } else if(f.def == FunDef.EXISTS) {
-            // simplify: not(exists(A)) -> empty(A)
-            ctx.compInfo(QueryText.OPTWRITE, this);
-            expr = f.expr;
-            def = FunDef.EMPTY;
-          } else {
-            // simplify: not(boolean(A)) -> not(A)
-            expr[0] = e.compEbv(ctx);
-          }
+        if(e.isFun(FunDef.EMPTY)) {
+          // simplify: not(empty(A)) -> exists(A)
+          ctx.compInfo(QueryText.OPTWRITE, this);
+          expr = ((Fun) e).expr;
+          def = FunDef.EXISTS;
+        } else if(e.isFun(FunDef.EXISTS)) {
+          // simplify: not(exists(A)) -> empty(A)
+          ctx.compInfo(QueryText.OPTWRITE, this);
+          expr = ((Fun) e).expr;
+          def = FunDef.EMPTY;
+        } else {
+          // simplify: not(boolean(A)) -> not(A)
+          expr[0] = e.compEbv(ctx);
         }
         return this;
       case ZEROORONE:
