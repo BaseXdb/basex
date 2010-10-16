@@ -33,7 +33,7 @@ public final class FTOrder extends FTFilter {
     int p = 0, s = 0;
     boolean f = true;
     for(final FTStringMatch sm : mtc) {
-      if(sm.n) continue;
+      if(sm.ex) continue;
       if(f) {
         if(p == sm.q) continue;
         p = sm.q;

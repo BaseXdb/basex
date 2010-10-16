@@ -39,24 +39,28 @@ public final class FTScope extends FTFilter {
   @Override
   protected boolean filter(final QueryContext ctx, final FTMatch mtc,
       final Tokenizer ft) {
+
     if(same) {
       int s = -1;
       for(final FTStringMatch sm : mtc) {
-        if(sm.n) continue;
+        if(sm.ex) continue;
         final int p = pos(sm.s, ft);
         if(s == -1) s = p;
         else if(s != p) return false;
       }
-    } else {
-      final BoolList bl = new BoolList();
-      for(final FTStringMatch sm : mtc) {
-        if(sm.n) continue;
-        final int p = pos(sm.s, ft);
-        if(bl.get(p)) return false;
-        bl.set(true, p);
-      }
+      return true;
     }
-    return true;
+    int c = 0;
+    final BoolList bl = new BoolList();
+    for(final FTStringMatch sm : mtc) {
+      if(sm.ex) continue;
+      c++;
+      final int p = pos(sm.s, ft);
+      final int s = bl.size();
+      if(p < s && bl.get(p) && p == pos(sm.e, ft)) return false;
+      bl.set(true, p);
+    }
+    return c > 1;
   }
 
   @Override

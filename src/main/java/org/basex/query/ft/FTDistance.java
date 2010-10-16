@@ -57,7 +57,7 @@ public final class FTDistance extends FTFilter {
     FTStringMatch sm = null;
     FTStringMatch f = null;
     for(final FTStringMatch m : mtc) {
-      if(m.n) {
+      if(m.ex) {
         match.add(m);
       } else {
         if(sm != null) {

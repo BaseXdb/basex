@@ -87,7 +87,7 @@ public final class FTNot extends FTExpr {
       all.add(new FTMatch());
     } else {
       for(final FTStringMatch s : m.match[i]) {
-        s.n ^= true;
+        s.ex ^= true;
         for(final FTMatch tmp : not(m, i + 1)) {
           all.add(new FTMatch().add(s).add(tmp));
         }
