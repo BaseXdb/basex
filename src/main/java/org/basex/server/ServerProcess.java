@@ -5,7 +5,6 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
-import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
@@ -56,11 +55,12 @@ public final class ServerProcess extends Thread {
   /**
    * Constructor.
    * @param s socket
-   * @param b server reference
+   * @param c database context
+   * @param l log reference
    */
-  public ServerProcess(final Socket s, final BaseXServer b) {
-    context = new Context(b.context);
-    log = b.log;
+  public ServerProcess(final Socket s, final Context c, final Log l) {
+    context = new Context(c);
+    log = l;
     socket = s;
   }
 

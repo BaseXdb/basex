@@ -65,41 +65,50 @@ public interface Text {
 
   /** Local (standalone) mode. */
   String LOCALMODE = "Standalone";
-  /** Client mode. */
-  String CLIENTMODE = "Client";
-  /** Local (standalone) mode. */
-  String SERVERMODE = "Server";
-
-  /** Start information. */
-  String CLIENTINFO =
-    " [-npPU] [-dovVwz] [-cq] [query]" + NL +
-    "  [query]    query file to be executed" + NL +
-    "  -c<cmd>    commands to be executed" + NL +
-    "  -d         switch on debugging" + NL +
-    "  -n<name>   server name" + NL +
-    "  -o<file>   write output to file" + NL +
-    "  -p<port>   server port" + NL +
-    "  -P<pass>   user password" + NL +
-    "  -q<expr>   query to be evaluated" + NL +
-    "  -U<name>   user name" + NL +
-    "  -v/V       show (all) process info" + NL +
-    "  -w         wrap query result to xml" + NL +
-    "  -z         skip query result output";
-
   /** Start information. */
   String LOCALINFO =
-    " [-diosuvVwz] [-cq] [query]" + NL +
-    "  [query]    query file to be executed" + NL +
-    "  -c<cmd>    commands to be executed" + NL +
-    "  -d         switch on debugging" + NL +
-    "  -i<file>   initial context set" + NL +
-    "  -o<file>   write output to file" + NL +
-    "  -q<expr>   query string to be executed" + NL +
-    "  -s<pars>   serialization parameters" + NL +
-    "  -u         write back update results" + NL +
-    "  -v/V       show (all) process info" + NL +
-    "  -w         wrap query result to xml" + NL +
-    "  -z         skip query result output";
+    " [-diosuvVwz] [-cq] [file]" + NL +
+    "  [file]     Execute XQuery file" + NL +
+    "  -c<cmd>    Execute database command(s)" + NL +
+    "  -d         Activate debugging mode" + NL +
+    "  -i<input>  Open initial file or database" + NL +
+    "  -o<file>   Write output to file" + NL +
+    "  -q<expr>   Execute XQuery expression" + NL +
+    "  -s<pars>   Set serialization parameters" + NL +
+    "  -u         Modify original files after updates" + NL +
+    "  -v/V       Show (all) process info" + NL +
+    "  -z         Skip output of results";
+
+  /** Client mode. */
+  String CLIENTMODE = "Client";
+  /** Start information. */
+  String CLIENTINFO =
+    " [-npPU] [-dovVwz] [-cq] [file]" + NL +
+    "  [file]     Execute XQuery file" + NL +
+    "  -c<cmd>    Execute database command(s)" + NL +
+    "  -d         Activate debugging mode" + NL +
+    "  -n<name>   Set server (host) name" + NL +
+    "  -o<file>   Write output to file" + NL +
+    "  -p<num>    Set server port" + NL +
+    "  -P<pass>   Specify user password" + NL +
+    "  -q<expr>   Execute XQuery expression" + NL +
+    "  -U<name>   Specify user name" + NL +
+    "  -v/V       Show (all) process info" + NL +
+    "  -w         Wrap query result to xml" + NL +
+    "  -z         Skip output of results";
+
+  /** Server mode. */
+  String SERVERMODE = "Server";
+  /** Start information. */
+  String SERVERINFO =
+    " [-s] [-dpz] [-c] [stop]" + NL +
+    " stop     Stop existing server" + NL +
+    " -c<cmd>  Execute initial database command(s)" + NL +
+    " -d       Activate debugging mode" + NL +
+    " -i       Enter interactive mode" + NL +
+    " -p<num>  Set server port" + NL +
+    " -s       Start as service" + NL +
+    " -z       Suppress logging";
 
   // SERVER ===================================================================
 
@@ -121,15 +130,6 @@ public interface Text {
   String SERVERPW = lang("srv_pw");
   /** Localhost. */
   String LOCALHOST = "localhost";
-
-  /** Start information. */
-  String SERVERINFO =
-    " [-dpz] [stop]" + NL +
-    " stop     stop server" + NL +
-    " -d       debug mode" + NL +
-    " -p<port> server port" + NL +
-    " -s       start as service" + NL +
-    " -z       suppress logging";
 
   // COMMANDS =================================================================
 

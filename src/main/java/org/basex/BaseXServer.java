@@ -32,6 +32,8 @@ public final class BaseXServer extends Main implements Runnable {
   /** Log. */
   public Log log;
 
+  /** User query. */
+  private String commands;
   /** Quiet mode (no logging). */
   private boolean quiet;
   /** Start as daemon. */
@@ -85,6 +87,12 @@ public final class BaseXServer extends Main implements Runnable {
       do Performance.sleep(100); while(!running);
 
       Util.outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
+
+      if(commands != null) {
+        // execute command-line arguments
+        execute(commands);
+      }
+      
       if(console) quit(console());
     } catch(final Exception ex) {
       log.write(ex.getMessage());
@@ -97,12 +105,13 @@ public final class BaseXServer extends Main implements Runnable {
     running = true;
     while(running) {
       try {
-        final ServerProcess s = new ServerProcess(server.accept(), this);
+        final Socket s = server.accept();
+        final ServerProcess sp = new ServerProcess(s, context, log);
         if(stop.exists()) {
           if(!stop.delete()) log.write(Util.info(DBNOTDELETED, stop));
           quit(false);
-        } else if(s.init()) {
-          context.add(s);
+        } else if(sp.init()) {
+          context.add(sp);
         }
       } catch(final IOException ex) {
         // socket was closed..
@@ -150,7 +159,10 @@ public final class BaseXServer extends Main implements Runnable {
     while(arg.more()) {
       if(arg.dash()) {
         final char c = arg.next();
-        if(c == 'd') {
+        if(c == 'c') {
+          // send database commands
+          commands = arg.remaining();
+        } else if(c == 'd') {
           // activate debug mode
           context.prop.set(Prop.DEBUG, true);
         } else if(c == 'i') {

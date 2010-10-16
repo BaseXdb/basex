@@ -64,7 +64,7 @@ public final class FTMatch implements Iterable<FTStringMatch> {
    * @return result of check
    */
   boolean match() {
-    for(final FTStringMatch s : this) if(s.n) return false;
+    for(final FTStringMatch s : this) if(s.ex) return false;
     return true;
   }
 

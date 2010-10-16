@@ -13,8 +13,8 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   public final int s;
   /** End position. */
   public int e;
-  /** Include/exclude flag. */
-  public boolean n;
+  /** Exclude flag. */
+  public boolean ex;
   /** Gaps (non-contiguous) flag. */
   public boolean g;
 
@@ -48,7 +48,7 @@ public final class FTStringMatch implements Comparable<FTStringMatch> {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append((n ? "-" : "+") + "[" + q + ": ");
+    sb.append((ex ? "-" : "+") + "[" + q + ": ");
     sb.append(s == e ? "" + s : s + "-" + e);
     return sb.append("]").toString();
   }

@@ -29,6 +29,8 @@ public class BaseX extends Main {
   private String commands;
   /** Query file. */
   private String file;
+  /** Input file for queries. */
+  protected String input;
   /** Query. */
   private String query;
   /** User name. */
@@ -129,11 +131,8 @@ public class BaseX extends Main {
         if(arg.dash()) {
           final char c = arg.next();
           if(c == 'c') {
-            // send database commands
+            // specify command to be evaluated
             commands = arg.remaining();
-          } else if(c == 'C' && sa()) {
-            // hidden option: show original query plan
-            arg.check(set(Prop.COMPPLAN, false));
           } else if(c == 'd') {
             // activate debug mode
             context.prop.set(Prop.DEBUG, true);
@@ -141,36 +140,36 @@ public class BaseX extends Main {
             // hidden option: show dot query graph
             arg.check(set(Prop.DOTPLAN, true));
           } else if(c == 'i' && sa()) {
-            // hidden option: show dot query graph
+            // open initial file or database
             input = arg.string();
-          } else if(c == 'm') {
-            // hidden option: activate table main-memory mode
-            arg.check(set(Prop.TABLEMEM, true));
-          } else if(c == 'M') {
+          /*} else if(c == 'm') {
             // hidden option: activate main-memory mode
             arg.check(set(Prop.MAINMEM, true));
+          } else if(c == 'M') {
+            // hidden option: activate table main-memory mode
+            arg.check(set(Prop.TABLEMEM, true));*/
           } else if(c == 'n' && !sa()) {
-            // parse server name
+            // set server name
             context.prop.set(Prop.HOST, arg.string());
           } else if(c == 'o') {
             // specify file for result output
             out = new PrintOutput(arg.string());
           } else if(c == 'p' && !sa()) {
-            // parse server port
+            // set server port
             context.prop.set(Prop.PORT, arg.num());
           } else if(c == 'P' && !sa()) {
             // specify password
             pass = arg.string();
           } else if(c == 'q') {
-            // specify password
+            // specify query to be evaluated
             query = arg.remaining();
+          } else if(c == 'r') {
+            // hidden option: parse number of runs
+            arg.check(set(Prop.RUNS, arg.string()));
           } else if(c == 's') {
             // set/add serialization parameter
             serial += "," + arg.string();
             arg.check(set(Prop.SERIALIZER, serial));
-          } else if(c == 'r') {
-            // hidden option: parse number of runs
-            arg.check(set(Prop.RUNS, arg.string()));
           } else if(c == 'u') {
             // activate write-back for updates
             arg.check(set(Prop.WRITEBACK, true));
@@ -184,9 +183,12 @@ public class BaseX extends Main {
             // show query info
             verbose = true;
             arg.check(set(Prop.QUERYINFO, true));
-          } else if(c == 'w') {
-            // activate well-formed XML output
-            arg.check(set(Prop.WRAPOUTPUT, true));
+          } else if (c == 'W') {
+            // hidden option: write properties before exit
+            writeProps = true;
+          } else if(c == 'x' && sa()) {
+            // hidden option: show original query plan
+            arg.check(set(Prop.COMPPLAN, false));
           } else if(c == 'X') {
             // hidden option: show xml query plan
             arg.check(set(Prop.XMLPLAN, true));
@@ -194,9 +196,6 @@ public class BaseX extends Main {
           } else if(c == 'z') {
             // turn off result serialization
             arg.check(set(Prop.SERIALIZE, false));
-          } else if (c == 'W') {
-            // hidden option: write properties before exit
-            writeProps = true;
           } else {
             arg.check(false);
           }

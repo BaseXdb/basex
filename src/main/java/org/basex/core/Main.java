@@ -33,8 +33,6 @@ public abstract class Main {
   protected final boolean success;
   /** Output file for queries. */
   protected OutputStream out = System.out;
-  /** Input file for queries. */
-  protected String input;
 
   /** Console mode. */
   protected boolean console;
