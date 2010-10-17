@@ -125,8 +125,7 @@ public class AxisPath extends Path {
     final Data data = rt != null && rt.type == Type.DOC &&
       rt instanceof DBNode ? ((DBNode) rt).data : null;
 
-    if(data == null || !data.meta.pthindex || !data.meta.uptodate ||
-        data.ns.size() != 0) return -1;
+    if(data == null || !data.meta.pthindex || !data.meta.uptodate) return -1;
 
     ArrayList<PathNode> nodes = data.path.root();
     for(final AxisStep s : step) {
@@ -363,7 +362,7 @@ public class AxisPath extends Path {
         result = (AxisPath) ie;
       } else if(smin + 1 < step.length || !simple) {
         result = simple ? new AxisPath(input, ie) :
-          new AxisPath(input, ie, AxisStep.get(input, Axis.SELF, Test.NODE));
+          new AxisPath(input, ie, AxisStep.get(input, Axis.SELF, Test.NOD));
       } else {
         return ie;
       }
@@ -486,14 +485,14 @@ public class AxisPath extends Path {
             root instanceof CDoc) {
           if(sa != CHILD && sa != DESC && sa != DESCORSELF &&
             (sa != SELF && sa != ANCORSELF ||
-             s.test != Test.NODE && s.test != Test.DOC)) return s;
+             s.test != Test.NOD && s.test != Test.DOC)) return s;
         }
       } else {
         final AxisStep ls = step[l - 1];
         final Axis lsa = ls.axis;
         if(sa == SELF || sa == DESCORSELF) {
           // .../self:: / .../descendant-or-self::
-          if(s.test == Test.NODE) continue;
+          if(s.test == Test.NOD) continue;
           // @.../...
           if(lsa == ATTR) return s;
           // text()/...

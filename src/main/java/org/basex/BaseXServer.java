@@ -19,10 +19,8 @@ import org.basex.util.Token;
 import org.basex.util.Util;
 
 /**
- * This is the starter class for the database server.
+ * This is the starter class for running the database server.
  * It handles concurrent requests from multiple users.
- * Add the '-h' option to get a list on all available command-line
- * arguments.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -30,7 +28,7 @@ import org.basex.util.Util;
  */
 public final class BaseXServer extends Main implements Runnable {
   /** Log. */
-  public Log log;
+  Log log;
 
   /** User query. */
   private String commands;
@@ -46,8 +44,8 @@ public final class BaseXServer extends Main implements Runnable {
   private IO stop;
 
   /**
-   * Main method, launching the server process. Command-line arguments can be
-   * listed with the {@code -h} argument.
+   * Main method, launching the server process.
+   * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String... args) {
@@ -88,11 +86,9 @@ public final class BaseXServer extends Main implements Runnable {
 
       Util.outln(CONSOLE, SERVERMODE, console ? CONSOLE2 : SERVERSTART);
 
-      if(commands != null) {
-        // execute command-line arguments
-        execute(commands);
-      }
-      
+      // execute command-line arguments
+      if(commands != null) execute(commands);
+
       if(console) quit(console());
     } catch(final Exception ex) {
       log.write(ex.getMessage());
@@ -136,7 +132,7 @@ public final class BaseXServer extends Main implements Runnable {
     super.quit(user);
 
     try {
-      // close input streams
+      // close interactive input if server was stopped by another process
       if(console) System.in.close();
       server.close();
     } catch(final IOException ex) {
@@ -144,7 +140,6 @@ public final class BaseXServer extends Main implements Runnable {
       Util.stack(ex);
     }
     console = false;
-    Performance.sleep(100);
   }
 
   @Override

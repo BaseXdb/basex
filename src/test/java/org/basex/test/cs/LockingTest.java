@@ -48,7 +48,7 @@ public final class LockingTest {
     "where $c/@id = $n/@country and $n/name = 'Tirane' " +
     "return $n/population/text()";
   /** Number of performance tests. */
-  private static final int TESTS = 5;
+  private static final int TESTS = 3;
 
   /** Server reference. */
   static BaseXServer server;
@@ -59,8 +59,6 @@ public final class LockingTest {
 
   /** Status of test. */
   boolean done;
-  /** Number of done tests. */
-  static int tdone;
 
   /** Starts the server. */
   @BeforeClass
@@ -93,7 +91,7 @@ public final class LockingTest {
       @Override
       public void run() {
         // wait until first command is running
-        Performance.sleep(200);
+        Performance.sleep(100);
         try {
           session2.execute(new CreateDB(NAME, FILE));
           fail(FILE + " should still be locked.");
@@ -154,6 +152,9 @@ public final class LockingTest {
     }
   }
 
+  /** Number of done tests. */
+  static int tdone;
+
   /** Efficiency test. */
   @Test
   public void efficiencyTest() {
@@ -164,14 +165,13 @@ public final class LockingTest {
         public void run() {
           if(!checkRes(new XQuery(PERF), s).equals("192000"))
             fail("efficiency test failed");
-          closeSession(s);
-          ++tdone;
+          synchronized(this) { ++tdone; }
         }
       }.start();
     }
 
     // wait until all test have been finished
-    while(tdone < TESTS) Performance.sleep(200);
+    while(tdone < TESTS) Performance.sleep(100);
   }
 
   /**
@@ -207,9 +207,7 @@ public final class LockingTest {
     } else {
       session1.execute(new XQuery(WRITE1));
     }
-    while(!done) {
-      Performance.sleep(200);
-    }
+    while(!done) Performance.sleep(100);
     done = false;
   }
 

@@ -17,7 +17,6 @@ import org.basex.util.Util;
 /**
  * This is the starter class for the stand-alone console mode.
  * It executes all commands locally.
- * Add the '-h' option to get a list on all available command-line arguments.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -40,7 +39,7 @@ public class BaseX extends Main {
 
   /**
    * Main method, launching the standalone console mode.
-   * Use {@code -h} to get a list of optional command-line arguments.
+   * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String... args) {

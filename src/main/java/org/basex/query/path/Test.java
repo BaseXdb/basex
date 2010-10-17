@@ -14,29 +14,26 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public abstract class Test {
-  /** Text node test. */
+  /** Static text node test. */
   public static final Test TXT = new KindTest(Type.TXT);
-  /** PI node test. */
+  /** Static PI node test. */
   public static final Test PI = new KindTest(Type.PI);
-  /** Element node test. */
+  /** Static element node test. */
   public static final Test ELM = new KindTest(Type.ELM);
-  /** Document node test. */
+  /** Static document node test. */
   public static final Test DOC = new KindTest(Type.DOC);
-  /** Attribute node test. */
+  /** Static attribute node test. */
   public static final Test ATT = new KindTest(Type.ATT);
-  /** Comment node test. */
+  /** Static comment node test. */
   public static final Test COM = new KindTest(Type.COM);
-
   /** Static node test. */
-  public static final Test NODE = new Test() {
+  public static final Test NOD = new Test() {
     @Override
     public boolean eval(final Nod node) { return true; }
     @Override
     public String toString() { return Type.NOD.toString(); }
   };
 
-  /** Cached QName instance. */
-  final QNm tmpq = new QNm();
   /** Name test types. */
   public enum Name {
     /** Accept all nodes (*).     */ ALL,
@@ -44,12 +41,16 @@ public abstract class Test {
     /** Test namespaces (pre:*).  */ NS,
     /** Test all nodes (pre:tag). */ STD
   }
-  /** Type of name test. */
-  public Name test;
-  /** Node test. */
+
+  /** Type of node test. */
   public Type type;
-  /** Name test. */
+  /** Type of name test. Set to {@code null} for other kind tests. */
+  public Name test;
+  /** Name test. Set to {@code null} for other kind tests. */
   public QNm name;
+
+  /** Cached QName instance. */
+  protected final QNm tmpq = new QNm();
 
   /**
    * Returns a test instance.
@@ -66,7 +67,7 @@ public abstract class Test {
       case DOC: return DOC;
       case ATT: return ATT;
       case COM: return COM;
-      case NOD: return NODE;
+      case NOD: return NOD;
       default:  Util.notexpected(); return null;
     }
   }

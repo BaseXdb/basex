@@ -1371,7 +1371,7 @@ public class QueryParser extends InputParser {
    * @return step
    */
   private AxisStep descOrSelf() {
-    return AxisStep.get(input(), Axis.DESCORSELF, Test.NODE);
+    return AxisStep.get(input(), Axis.DESCORSELF, Test.NOD);
   }
 
   // Methods for query suggestions
@@ -1423,7 +1423,7 @@ public class QueryParser extends InputParser {
     Test test = null;
     if(consumeWS2(DOT2)) {
       ax = Axis.PARENT;
-      test = Test.NODE;
+      test = Test.NOD;
       checkTest(test, false);
     } else if(consume('@')) {
       ax = Axis.ATTR;

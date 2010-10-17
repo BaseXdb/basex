@@ -37,7 +37,7 @@ public final class SemaphoreTest {
       "xquery for $n in 1 to 100000 where $n = 0 return $n"
   };
   /** Number of performance tests. */
-  private static final int TESTS = 10;
+  private static final int TESTS = 5;
   /** List to administer the clients. */
   static LinkedList<ClientSession> sessions = new LinkedList<ClientSession>();
 
@@ -45,9 +45,6 @@ public final class SemaphoreTest {
   static BaseXServer server;
   /** Socket reference. */
   static Session sess;
-
-  /** Number of done tests. */
-  static int tdone;
 
   /** Starts the server. */
   @BeforeClass
@@ -82,19 +79,22 @@ public final class SemaphoreTest {
     }
   }
 
+  /** Number of done tests. */
+  static int tdone;
+
   /** Efficiency test. */
   @Test
   public void runClients() {
     for(int n = 0; n < TESTS; ++n) {
       final int j = n;
-      Performance.sleep(rand.nextInt(500));
+      Performance.sleep(50 + rand.nextInt(200));
       new Thread() {
         @Override
         public void run() {
           try {
             final int t = rand.nextInt(2);
             sessions.get(j).execute(q[t]);
-            ++tdone;
+            synchronized(this) { ++tdone; }
           } catch(final BaseXException ex) {
             fail(ex.toString());
           }
@@ -102,7 +102,7 @@ public final class SemaphoreTest {
       }.start();
     }
     // wait until all test have been finished
-    while(tdone < TESTS) Performance.sleep(200);
+    while(tdone < TESTS) Performance.sleep(100);
   }
 
   /**

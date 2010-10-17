@@ -8,17 +8,15 @@ import org.basex.util.Util;
 
 /**
  * This is the starter class for the client console mode.
- * It sends all commands to the server instance.
- * Add the '-h' option to get a list on all available command-line arguments.
+ * All input is sent to the server instance.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class BaseXClient extends BaseX {
   /**
-   * Main method of the database client, launching a local
-   * client instance that sends all commands to a server instance.
-   * Use {@code -h} to get a list command-line arguments.
+   * Main method of the database client, launching a client instance.
+   * Command-line arguments are listed with the {@code -h} argument.
    * @param args command-line arguments
    */
   public static void main(final String... args) {

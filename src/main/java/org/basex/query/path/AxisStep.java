@@ -151,7 +151,7 @@ public class AxisStep extends Preds {
    */
   public final boolean simple(final Axis ax, final boolean name) {
     return axis == ax && pred.length == 0 &&
-      (name ? test.test == Test.Name.NAME : test == Test.NODE);
+      (name ? test.test == Test.Name.NAME : test == Test.NOD);
   }
 
   /**
@@ -163,22 +163,26 @@ public class AxisStep extends Preds {
   final ArrayList<PathNode> size(final ArrayList<PathNode> nodes,
       final Data data) {
 
+    // skip steps with predicates
     if(pred.length != 0) return null;
-    int kind = -1;
-    byte[] n = null;
-    int name = 0;
 
+    // check restrictions on node type
+    int kind = -1, name = 0;
     if(test.type != null) {
       kind = Nod.kind(test.type);
+      // skip processing instructions and attributes
       if(kind == Data.PI || kind == Data.ATTR) return null;
 
-      if(test.test == Name.NAME) n = ((NameTest) test).ln;
-      if(n == null) {
-        if(test.test != null && test.test != Name.ALL) return null;
-      } else if(kind == Data.ELEM) {
-        name = data.tags.id(n);
+      if(test.test == Name.NAME) {
+        // element test (*:ln)
+        name = data.tags.id(((NameTest) test).ln);
+      } else if(test.test != null && test.test != Name.ALL) {
+        // skip namespace and standard tests
+        return null;
       }
     }
+
+    // skip axes other than descendant and child
     final boolean desc = axis == Axis.DESC;
     if(!desc && axis != Axis.CHILD) return null;
 
@@ -221,7 +225,7 @@ public class AxisStep extends Preds {
   @Override
   public final String toString() {
     final StringBuilder sb = new StringBuilder();
-    if(test == Test.NODE) {
+    if(test == Test.NOD) {
       if(axis == Axis.PARENT) sb.append("..");
       if(axis == Axis.SELF) sb.append(".");
     }

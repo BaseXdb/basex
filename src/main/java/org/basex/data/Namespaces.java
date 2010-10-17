@@ -72,7 +72,7 @@ public final class Namespaces {
 
   /**
    * Adds the specified namespace to the namespace structure
-   * and changes the root node.
+   * and changes the root node. Needed for building the namespace structure.
    * @param p prefix
    * @param u uri
    * @param pre pre value
@@ -90,7 +90,7 @@ public final class Namespaces {
   }
 
   /**
-   * Opens an element.
+   * Opens an element. Needed for building the namespace structure.
    * @return true if a new namespace has been added
    */
   public boolean open() {
@@ -102,7 +102,7 @@ public final class Namespaces {
   }
 
   /**
-   * Closes a node.
+   * Closes a node. Needed for building the namespace structure.
    * @param pre current pre value
    */
   public void close(final int pre) {
@@ -133,6 +133,28 @@ public final class Namespaces {
    */
   public int size() {
     return uri.size();
+  }
+
+  /**
+   * Returns the default global namespace of the database, or {@code null}
+   * if several default namespaces are defined.
+   * @return global default namespace
+   */
+  public byte[] globalNS() {
+    // no namespaces defined: default namespace is empty
+    if(root.size == 0) return Token.EMPTY;
+    // more than one namespace defined: skip test
+    if(root.size > 1) return null;
+    // check namespaces of first child
+    final NSNode n = root.ch[0];
+    // namespace has more children; skip traversal
+    if(n.size != 0 || n.pre != 1) return null;
+    // loop through all globally defined namespaces
+    for(int i = 0; i < n.vals.length; i += 2) {
+      // return default namespace found
+      if(pref.key(n.vals[i]).length == 0) return uri.key(n.vals[i + 1]);
+    }
+    return null;
   }
 
   /**
@@ -192,6 +214,8 @@ public final class Namespaces {
     }
     return 0;
   }
+
+  // Updating Namespaces ======================================================
 
   /**
    * Deletes the specified number of entries from the namespace structure.
