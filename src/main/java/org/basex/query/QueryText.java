@@ -60,7 +60,7 @@ public interface QueryText {
   /** Optimization info. */
   String OPTPREF = "skipping namespace test for \"%\"";
   /** Optimization info. */
-  String OPTNAME = "removing unknown tag/attribute \"%\"";
+  String OPTNAME = "removing unknown tag/attribute %";
   /** Optimization info. */
   String OPTTXTINDEX = "applying text index";
   /** Optimization info. */

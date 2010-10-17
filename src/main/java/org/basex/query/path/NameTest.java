@@ -61,24 +61,29 @@ public final class NameTest extends Test {
     final Data data = ctx.data();
     if(data == null) return true;
 
+    // skip optimizations if several namespaces are defined in the database
     final byte[] ns = data.ns.globalNS();
-    // skip optimizations if several default namespaces are defined in the
-    // database, or if default and database namespace are different
-    if(ns == null || !eq(ns, ctx.nsElem)) return true;
+    if(ns == null) return true;
 
-    // no prefix: check only local name (faster)
+    // true if results can be expected
+    boolean ok = true;
+
     if(test == Name.STD && !name.ns()) {
-      ctx.compInfo(OPTPREF, ln);
-      test = Name.NAME;
+      // no results if default and database namespaces of elements are different
+      ok = type == Type.ATT || eq(ns, ctx.nsElem);
+      if(ok) {
+        // identical namespace: ignore prefix to speed up test
+        ctx.compInfo(OPTPREF, ln);
+        test = Name.NAME;
+      }
     }
 
-    // pre-evaluate unknown tag/attribute names
-    if(test == Name.NAME && (type == Type.ELM ?
-        data.tags : data.atts).id(ln) == 0) {
-      ctx.compInfo(OPTNAME, ln);
-      return false;
-    }
-    return true;
+    // check existence of tag/attribute names
+    ok = ok && (test != Name.NAME || (type == Type.ELM ?
+        data.tags : data.atts).id(ln) != 0);
+
+    if(!ok) ctx.compInfo(OPTNAME, name);
+    return ok;
   }
 
   @Override
