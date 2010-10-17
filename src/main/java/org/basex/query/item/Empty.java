@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.iter.Iter;
+import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -46,7 +47,7 @@ public final class Empty extends Value {
   }
 
   @Override
-  public Iter iter() {
+  public ValueIter iter() {
     return Iter.EMPTY;
   }
 

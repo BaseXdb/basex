@@ -45,7 +45,6 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 import org.basex.util.Util;
@@ -526,7 +525,7 @@ public final class QueryContext extends Progress {
           addDocs(doc(input, true, false, ii), EMPTY);
         } else {
           addDocs(doc(substring(input, 0, s), true, false, ii),
-              substring(input, s + 1));
+              lc(substring(input, s + 1)));
         }
       }
     }
@@ -542,17 +541,17 @@ public final class QueryContext extends Progress {
     final NodIter col = new NodIter();
     final Data data = db.data;
     final boolean rt = input.length == 0;
-    if(!rt) doc = new DBNode[1]; docs = 0;
+
+    final byte[] path = token("/" + string(input) + "/");
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       final DBNode dbn = new DBNode(data, p);
-      final String tmp = "/" + Token.string(input) + "/";
       if(rt) {
+        // add all documents
         col.add(dbn);
-      } else if(eq(lc(data.text(p, true)), lc(input)) ||
-          contains(lc(data.text(p, true)), lc(token(tmp)))) {
-        col.add(dbn);
-        // [AW] could lead to unexpected side effects
-        addDoc(dbn);
+      } else {
+        // add documents which match specified input path
+        final byte[] name = lc(data.text(p, true));
+        if(eq(name, input) || contains(name, path)) col.add(dbn);
       }
     }
     addColl(col, token(data.meta.name));

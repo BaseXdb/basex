@@ -82,9 +82,9 @@ public final class NameTest extends Test {
   }
 
   @Override
-  public boolean eval(final Nod node) throws QueryException {
+  public boolean eval(final Nod nod) throws QueryException {
     // only elements and attributes will yield results
-    if(node.type != type) return false;
+    if(nod.type != type) return false;
 
     switch(test) {
       // wildcard - accept all nodes
@@ -92,14 +92,14 @@ public final class NameTest extends Test {
         return true;
       // namespaces wildcard - check only name
       case NAME:
-        return eq(ln, ln(node.nname()));
+        return eq(ln, ln(nod.nname()));
       // name wildcard - check only namespace
       case NS:
-        return name.uri().eq(node.qname(tmpq).uri());
+        return name.uri().eq(nod.qname(tmpq).uri());
       default:
         // check attributes, or check everything
-        return type == Type.ATT && !name.ns() ? eq(ln, node.nname()) :
-          name.eq(node.qname(tmpq));
+        return type == Type.ATT && !name.ns() ? eq(ln, nod.nname()) :
+          name.eq(nod.qname(tmpq));
     }
   }
 

@@ -344,14 +344,17 @@ public class AxisPath extends Path {
 
       // invert path before index step
       for(int j = smin; j >= 0; j--) {
-        final Axis a = step[j].axis.invert();
-        if(a == null) break;
+        final Axis ax = step[j].axis.invert();
+        if(ax == null) break;
 
         if(j != 0) {
           final AxisStep prev = step[j - 1];
-          inv = Array.add(inv, AxisStep.get(input, a, prev.test, prev.pred));
-        } else if(a != Axis.ANC && a != Axis.ANCORSELF) {
-          inv = Array.add(inv, AxisStep.get(input, a, new DocTest(ctx)));
+          inv = Array.add(inv, AxisStep.get(input, ax, prev.test, prev.pred));
+        } else {
+          final Test test = DocTest.get(ctx, data);
+          // add document test for collections and axes other than ancestors
+          if(test != Test.DOC || ax != Axis.ANC && ax != Axis.ANCORSELF)
+            inv = Array.add(inv, AxisStep.get(input, ax, test));
         }
       }
       final boolean simple = inv.length == 0 && newPreds.length == 0;

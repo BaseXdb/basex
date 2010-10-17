@@ -31,8 +31,8 @@ public final class KindTest extends Test {
   }
 
   @Override
-  public boolean eval(final Nod n) throws QueryException {
-    return n.type == type && (name == null || n.qname(tmpq).eq(name));
+  public boolean eval(final Nod nod) throws QueryException {
+    return nod.type == type && (name == null || nod.qname(tmpq).eq(name));
   }
 
   @Override

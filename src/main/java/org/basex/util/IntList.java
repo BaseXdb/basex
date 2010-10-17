@@ -110,11 +110,11 @@ public class IntList extends ElementList {
 
   /**
    * Searches the specified element via binary search.
-   * Note that the elements must be sorted.
+   * Note that all elements must be sorted.
    * @param e element to be found
    * @return index of the search key, or the negative insertion point - 1
    */
-  public final int find(final int e) {
+  public final int sortedIndex(final int e) {
     return Arrays.binarySearch(list, 0, size, e);
   }
 

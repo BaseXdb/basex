@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -40,8 +40,8 @@ public abstract class Item extends Value {
   }
 
   @Override
-  public Iter iter() {
-    return new Iter() {
+  public ValueIter iter() {
+    return new ValueIter() {
       private boolean more;
       @Override
       public Item next() { return (more ^= true) ? Item.this : null; }

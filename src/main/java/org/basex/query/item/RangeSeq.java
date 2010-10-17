@@ -2,13 +2,12 @@ package org.basex.query.item;
 
 import static org.basex.query.QueryTokens.*;
 import static org.basex.query.util.Err.*;
-
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.RangeIter;
+import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
 
@@ -40,7 +39,7 @@ public final class RangeSeq extends Seq {
   }
 
   @Override
-  public Iter iter() {
+  public ValueIter iter() {
     return new RangeIter(start, start + size - 1);
   }
 

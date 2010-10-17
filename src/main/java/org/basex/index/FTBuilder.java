@@ -150,7 +150,7 @@ public abstract class FTBuilder extends IndexBuilder {
     int p = Num.read(vpre, np);
     final int ns = Num.size(vpre);
     while(np < ns) {
-      int u = unit.find(p);
+      int u = unit.sortedIndex(p);
       if(u < 0) u = -u - 1;
 
       int fr = 0;
@@ -229,7 +229,7 @@ public abstract class FTBuilder extends IndexBuilder {
         final int p = Num.read(vpre, np);
         if(lp != p) {
           // find document root
-          int u = unit.find(p);
+          int u = unit.sortedIndex(p);
           if(u < 0) u = -u - 1;
 
           if(lu != u) {

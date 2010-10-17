@@ -2,7 +2,7 @@ package org.basex.query.item;
 
 import org.basex.query.QueryContext;
 import org.basex.query.expr.Expr;
-import org.basex.query.iter.Iter;
+import org.basex.query.iter.ValueIter;
 import org.basex.query.util.Var;
 
 /**
@@ -29,7 +29,7 @@ public abstract class Value extends Expr {
   }
 
   @Override
-  public final Iter iter(final QueryContext ctx) {
+  public final ValueIter iter(final QueryContext ctx) {
     return iter();
   }
 
@@ -37,7 +37,7 @@ public abstract class Value extends Expr {
    * Returns an iterator.
    * @return iterator
    */
-  public abstract Iter iter();
+  public abstract ValueIter iter();
 
   @Override
   public final Value value(final QueryContext ctx) {

@@ -11,7 +11,7 @@ import org.basex.query.item.Value;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class RangeIter extends Iter {
+public final class RangeIter extends ValueIter {
   /** Minimum value. */
   private final long min;
   /** Maximum value (plus one). */

@@ -15,7 +15,7 @@ import org.basex.util.Array;
  */
 public abstract class Iter {
   /** Empty iterator. */
-  public static final Iter EMPTY = new Iter() {
+  public static final ValueIter EMPTY = new ValueIter() {
     @Override public Item next() { return null; }
     @Override public Value finish() { return Empty.SEQ; }
     @Override public long size() { return 0; }

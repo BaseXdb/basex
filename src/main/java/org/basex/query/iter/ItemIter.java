@@ -17,7 +17,7 @@ import org.basex.util.TokenBuilder;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class ItemIter extends Iter implements Result {
+public final class ItemIter extends ValueIter implements Result {
   /** Item container. */
   public Item[] item;
   /** Number of items. */

@@ -65,7 +65,7 @@ public final class Backup extends Command {
       for(final File f : inFolder.listFiles()) {
         final BufferedInputStream bis = new BufferedInputStream(
             new FileInputStream(f), IO.BLOCKSIZE);
-        zos.putNextEntry(new ZipEntry(inFolder.getName() + "/" + f.getName()));
+        zos.putNextEntry(new ZipEntry(inFolder.getName() + '/' + f.getName()));
         int c;
         while((c = bis.read(data)) != -1) zos.write(data, 0, c);
         zos.closeEntry();
