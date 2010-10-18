@@ -45,6 +45,7 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 import org.basex.util.Util;
@@ -542,7 +543,8 @@ public final class QueryContext extends Progress {
     final Data data = db.data;
     final boolean rt = input.length == 0;
 
-    final byte[] path = token("/" + string(input) + "/");
+    final byte[] path = endsWith(input, token("/")) ? concat(token("/"), input)
+        : concat(token("/"), input, token("/")); 
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       final DBNode dbn = new DBNode(data, p);
       if(rt) {
@@ -550,8 +552,10 @@ public final class QueryContext extends Progress {
         col.add(dbn);
       } else {
         // add documents which match specified input path
-        final byte[] name = lc(data.text(p, true));
-        if(eq(name, input) || contains(name, path)) col.add(dbn);
+        final byte[] name = lc(Token.concat(Token.token("/"),
+            data.text(p, true)));
+        if(eq(name, concat(token("/"), input)) || startsWith(name, path)) 
+          col.add(dbn);
       }
     }
     addColl(col, token(data.meta.name));

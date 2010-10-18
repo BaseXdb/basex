@@ -80,7 +80,7 @@ public class PathTest {
    */
   @Test
   public void withoutIndexTestWeek() throws Exception {
-    final String count = "count(collection('" + WEEK1 + "/monday'))";
+    final String count = "count(collection('" + WEEK1 + "/week/monday'))";
     final QueryProcessor qp = new QueryProcessor(count, CTX);
     assertEquals(3, Integer.parseInt(qp.execute().toString()));
     qp.close();
