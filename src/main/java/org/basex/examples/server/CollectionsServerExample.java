@@ -18,10 +18,10 @@ import org.basex.server.ClientSession;
 public final class CollectionsServerExample {
   /** Session reference. */
   static ClientSession session;
-  /** XML Document Fragment Pt. 1*/
+  /** XML Document Fragment Pt. 1. */
   static final String XML_1 = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
     + "<text version=\"draft\"><title>Chapter ";
-  /** XML Document Fragment Pt. 2*/
+  /** XML Document Fragment Pt. 2. */
   static final String XML_2 = "</title></text>";
   
   /** Private constructor. */
@@ -34,10 +34,10 @@ public final class CollectionsServerExample {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerExample ===");
+    System.out.println("=== CollectionServerExample ===");
 
     // ------------------------------------------------------------------------
-    // Start server on default port 1984.
+    // Start server on default port 1984
     BaseXServer server = new BaseXServer();
 
     // Create a client session with host name, port, user name and password
@@ -49,7 +49,7 @@ public final class CollectionsServerExample {
 
     // ------------------------------------------------------------------------
     // Add some 50 documents
-    System.out.println("\n* Adding some documents");
+    System.out.println("\n* Adding 50 documents");
     
     for(int i = 0; i < 50; i++) {
       add(XML_1 + i + XML_2, "Chapter-" + i + ".xml", "/book/chapters/" + i);
