@@ -443,7 +443,7 @@ public final class GUI extends JFrame {
       // execute command and cache result
       final ArrayOutput ao =
         new ArrayOutput().max(context.prop.num(Prop.MAXTEXT));
-      final boolean up = c.writing(context);
+      boolean up = c.writing(context);
       updating = up;
 
       boolean ok = true;
@@ -494,15 +494,19 @@ public final class GUI extends JFrame {
 
         final Data ndata = context.data;
         Nodes marked = context.marked;
-
+        
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();
+          // [LK] check if context really changed - an empty 
+          // updating function i.e.
+          // sets up==true, but does not change the current context
+          // 
         } else if(up) {
           // update command
           notify.update();
         } else if(result != null) {
-          if(context.current != current || prop.is(GUIProp.FILTERRT)) {
+          if(!context.current.sameAs(current) || prop.is(GUIProp.FILTERRT)) {
             // refresh context
             if(nodes != null) {
               notify.context((Nodes) result, prop.is(GUIProp.FILTERRT), null);
