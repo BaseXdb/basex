@@ -73,7 +73,7 @@ public final class NameTest extends Test {
       ok = type == Type.ATT || eq(ns, ctx.nsElem);
       if(ok) {
         // identical namespace: ignore prefix to speed up test
-        ctx.compInfo(OPTPREF, ln);
+        if(ns.length != 0) ctx.compInfo(OPTPREF, ln);
         test = Name.NAME;
       }
     }

@@ -361,13 +361,13 @@ public class DBNode extends Nod {
       case ATT:
       case PI:
         return type.name + " " + string(nname()) + " { \"" +
-          string(atom()) + "\" }";
+          string(chop(atom(), 64)) + "\" }";
       case ELM:
         return type.name + " " + string(nname()) + " { ... }";
       case DOC:
         return type.name + " { \"" + string(data.text(pre, true)) + "\" }";
       default:
-        return type.name + " { \"" + string(atom()) + "\" }";
+        return type.name + " { \"" + string(chop(atom(), 64)) + "\" }";
     }
   }
 }

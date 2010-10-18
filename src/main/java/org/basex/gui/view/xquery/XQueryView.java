@@ -242,13 +242,12 @@ public final class XQueryView extends View {
    * @param file query file
    */
   public void setQuery(final IO file) {
-    gui.prop.files(file);
-    gui.context.query = file;
+    if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
     try {
-      if(!visible()) GUICommands.SHOWXQUERY.execute(gui);
+      text.setText(file.content());
+      gui.context.query = file;
+      gui.prop.files(file);
       modified(false, true);
-      final byte[] query = file.content();
-      text.setText(query);
       if(gui.prop.is(GUIProp.EXECRT)) text.query();
     } catch(final IOException ex) {
       Dialog.error(gui, NOTOPENED);

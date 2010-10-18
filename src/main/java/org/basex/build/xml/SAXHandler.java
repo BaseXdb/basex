@@ -75,7 +75,15 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
   @Override
   public void characters(final char[] ch, final int s, final int l) {
     final int e = s + l;
-    for(int i = s; i < e; ++i) tb.add(ch[i]);
+    for(int i = s; i < e; ++i) {
+      final char c = ch[i];
+      if(sb.length() != 0 || Character.isHighSurrogate(c)) {
+        // high surrogates found: store remaining text in default string builder
+        sb.append(c);
+      } else {
+        tb.add(c);
+      }
+    }
   }
 
   @Override
@@ -104,8 +112,10 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
     }
   }
 
-  /** Temporary string builder. */
+  /** Temporary token builder. */
   private final TokenBuilder tb = new TokenBuilder();
+  /** Temporary string builder for high surrogates. */
+  private final StringBuilder sb = new StringBuilder();
   /** Temporary namespaces. */
   private final Atts ns = new Atts();
 
@@ -114,7 +124,13 @@ final class SAXHandler extends DefaultHandler implements LexicalHandler {
    * @throws IOException I/O exception
    */
   private void finishText() throws IOException {
-    if(tb.size() != 0) {
+    final boolean sur = sb.length() != 0;
+    if(tb.size() != 0 || sur) {
+      if(sur) {
+        // add string with high surrogates
+        tb.add(token(sb.toString()));
+        sb.setLength(0);
+      }
       builder.text(tb);
       tb.reset();
     }

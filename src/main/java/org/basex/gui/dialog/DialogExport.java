@@ -161,11 +161,10 @@ public final class DialogExport extends Dialog {
   public void close() {
     if(!ok) return;
     super.close();
-    gui.set(Prop.EXPORTER, "," +
-        SerializerProp.S_INDENT[0] + "=" +
-        (format.isSelected() ? YES : NO) + "," +
-        SerializerProp.S_ENCODING[0] + "=" +
-        encoding.getSelectedItem() + "," +
+    final boolean indent = format.isSelected();
+    gui.set(Prop.EXPORTER,
+        SerializerProp.S_INDENT[0] + "=" + (indent ? YES : NO) + "," +
+        SerializerProp.S_ENCODING[0] + "=" + encoding.getSelectedItem() + "," +
         SerializerProp.S_OMIT_XML_DECLARATION[0] + "=" + NO);
   }
 }

@@ -110,7 +110,7 @@ final class DOTData {
     { "Declaration", org.basex.query.expr.Func.class },
     { "Function", org.basex.query.func.Fun.class },
     { null, org.basex.query.path.Path.class },
-    { null, org.basex.query.path.AxisStep.class },
+    { "Step", org.basex.query.path.AxisStep.class },
     { "Variables", org.basex.query.util.VarList.class },
     { "OrderBy", org.basex.query.expr.OrderByExpr.class },
     { "operator", "op" },
