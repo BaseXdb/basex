@@ -2,6 +2,7 @@ package org.basex.build.xml;
 
 import static org.basex.core.Text.*;
 import java.io.IOException;
+import java.util.regex.Pattern;
 import org.basex.build.Builder;
 import org.basex.build.Parser;
 import org.basex.core.Prop;
@@ -17,10 +18,10 @@ import org.basex.util.Util;
  * @author Christian Gruen
  */
 public final class DirParser extends Parser {
+  /** File pattern. */
+  private final Pattern filter;
   /** Properties. */
   private final Prop prop;
-  /** File filter. */
-  private final String filter;
   /** Initial file path. */
   private final String root;
 
@@ -49,16 +50,8 @@ public final class DirParser extends Parser {
     prop = pr;
     final String dir = path.dir();
     root = dir.endsWith("/") ? dir : dir + '/';
-
-    if(path.isDir()) {
-      final StringBuilder sb = new StringBuilder();
-      for(final String s : IOFile.regex(pr.get(Prop.CREATEFILTER)).split(",")) {
-        sb.append("|" + (s.contains(".") ? s : ".*"));
-      }
-      filter = sb.toString().substring(1);
-    } else {
-      filter = ".*";
-    }
+    filter = !path.isDir() ? null :
+      Pattern.compile(IOFile.regex(pr.get(Prop.CREATEFILTER)));
   }
 
   @Override
@@ -80,7 +73,7 @@ public final class DirParser extends Parser {
     } else {
       file = io;
       while(io.more()) {
-        if(!io.name().matches(filter)) continue;
+        if(filter != null && !filter.matcher(io.name()).matches()) continue;
         b.meta.filesize += file.length();
 
         // use global target as prefix

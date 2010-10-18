@@ -25,6 +25,8 @@ public abstract class FTIndexIterator extends IndexIterator {
     @Override
     public FTMatches matches() { return null; }
     @Override
+    public int indexSize() { return 1; }
+    @Override
     public double score() { return -1; }
   };
 
@@ -46,9 +48,7 @@ public abstract class FTIndexIterator extends IndexIterator {
    * Returns the number of index entries.
    * @return number of index entries
    */
-  public final int indexSize() {
-    return size;
-  }
+  public abstract int indexSize();
 
   /**
    * Merges two index array iterators.
@@ -88,6 +88,11 @@ public abstract class FTIndexIterator extends IndexIterator {
       public void setTokenNum(final byte tn) {
         i1.toknum = tn;
         i2.toknum = tn;
+      }
+
+      @Override
+      public synchronized int indexSize() {
+        return i1.indexSize() + i2.indexSize();
       }
 
       @Override
@@ -136,6 +141,11 @@ public abstract class FTIndexIterator extends IndexIterator {
       public void setTokenNum(final byte tn) {
         i1.toknum = tn;
         i2.toknum = tn;
+      }
+
+      @Override
+      public synchronized int indexSize() {
+        return Math.min(i1.indexSize(), i2.indexSize());
       }
 
       @Override

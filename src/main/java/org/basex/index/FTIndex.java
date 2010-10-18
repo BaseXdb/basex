@@ -112,6 +112,11 @@ public abstract class FTIndex implements Index {
       }
 
       @Override
+      public synchronized int indexSize() {
+        return s;
+      }
+
+      @Override
       public synchronized double score() {
         return sc;
       }

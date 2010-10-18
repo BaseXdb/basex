@@ -43,13 +43,14 @@ public final class FTItem extends DBNode {
     all = a;
     tl = tol;
     is = tis;
-    score = s;
+    if(s != -1) score = s;
   }
 
   @Override
   public double score() {
-    if(score == null)
+    if(score == null) {
       score = Scoring.textNode(all.size, is, tl, data.textLen(pre, true));
+    }
     return score;
   }
 

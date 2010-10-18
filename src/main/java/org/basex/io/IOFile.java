@@ -221,18 +221,37 @@ public final class IOFile extends IO {
   }
 
   /**
-   * Converts a file filter to a regular expression.
+   * Converts a file filter (glob) to a regular expression. A filter may
+   * contain asterisks (*) and question marks (?); commas (,) are used to
+   * separate multiple filters. Special characters can be backslashed (\).
    * @param filter filter
    * @return regular expression
    */
   public static String regex(final String filter) {
     final StringBuilder sb = new StringBuilder();
+    boolean wild = false;
+    boolean back = false;
     for(int f = 0; f < filter.length(); f++) {
-      final char ch = filter.charAt(f);
-      if(ch == '*') sb.append('.');
-      else if(!Character.isLetterOrDigit(ch)) sb.append('\\');
+      char ch = filter.charAt(f);
+      if(!back) {
+        if(ch == '*') {
+          sb.append('.');
+          wild = true;
+        } else if(ch == ',') {
+          ch = '|';
+          if(!wild) sb.append(".*");
+          wild = false;
+        } else if(!Character.isLetterOrDigit(ch)) {
+          back = ch == '\\';
+          if(!back) sb.append('\\');
+          if(ch == '.') wild = true;
+        }
+      } else {
+        back = false;
+      }
       sb.append(ch);
     }
+    if(!wild) sb.append(".*");
     return sb.toString();
   }
 
