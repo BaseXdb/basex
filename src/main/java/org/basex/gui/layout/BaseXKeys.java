@@ -145,7 +145,7 @@ public enum BaseXKeys {
    */
   public static boolean control(final KeyEvent e) {
     // Mac offers special characters via ALT, Windows/Linux don't..
-    return sc(e) || !MAC && e.isAltDown();
+    return e.isControlDown() || e.isMetaDown() || !MAC && e.isAltDown();
   }
 
   /**
