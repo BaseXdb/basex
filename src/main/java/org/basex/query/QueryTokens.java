@@ -304,7 +304,7 @@ public interface QueryTokens {
   String IGNORE = null;
 
   /** Updating tokens. */
-  String[] UPDATES = { UPDATING, INSERT, DELETE, RENAME, REPLACE };
+  String[] UPDATES = { INSERT, DELETE, RENAME, REPLACE };
 
   /** Parser token. */
   String ASSIGN = ":=";
