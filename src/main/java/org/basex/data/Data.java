@@ -605,7 +605,7 @@ public abstract class Data {
           int ancPre = par;
           // take first candidate from stack
           NSNode currCandidate = candidates.remove(0);
-          while(ancPre >= 1 && cn.equals(ns.rootDummy)) {
+          while(ancPre > -1 && cn.equals(ns.rootDummy)) {
 
             // if the current candidate is an ancestor of par or par itself,
             // this is the new root
