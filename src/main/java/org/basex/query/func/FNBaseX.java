@@ -195,4 +195,10 @@ final class FNBaseX extends Fun {
     WHICHIDX.thrw(input, tp);
     return null;
   }
+
+  @Override
+  public boolean uses(final Use u) {
+    return u == Use.CTX && (def == FunDef.INDEX || def == FunDef.EVAL ||
+        def == FunDef.RUN);
+  }
 }
