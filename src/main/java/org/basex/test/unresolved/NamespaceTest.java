@@ -1,15 +1,26 @@
 package org.basex.test.unresolved;
 
 import static org.junit.Assert.*;
+import static org.basex.util.Token.*;
+
+import java.io.IOException;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
-import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
-import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
+import org.basex.data.Data;
+import org.basex.io.IOContent;
+import org.basex.query.QueryException;
+import org.basex.query.QueryProcessor;
+import org.basex.query.func.FNSimple;
+import org.basex.query.item.DBNode;
+import org.basex.query.item.Nod;
+import org.basex.query.iter.Iter;
+import org.basex.query.iter.NodIter;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -27,56 +38,9 @@ public class NamespaceTest {
 
   /** Test documents. */
   private static String[][] docs = {
-    { "d1", "<a xmlns='A'><b><c/><d xmlns='D'/></b><e/></a>" },
-    { "d2", "<a xmlns='A'><b><c/><d xmlns='D'><g xmlns='G'/></d></b><e/></a>" }
+    { "d1", "<a xmlns:ns0='A'><b><d xmlns:ns1='D'>" +
+        "<g xmlns:ns2='G'/></d></b></a>" },
   };
-
-  /**
-   * Test query.
-   * Detects malformed namespace hierarchy.
-   */
-  @Test
-  public final void nsHierarchy() {
-    query("insert node <f xmlns='F'/> into doc('d1')//*:e", "");
-    try {
-      new Open("d1").execute(context);
-      assertEquals("\n" +
-          "  Pre[1] xmlns=\"A\" \n" +
-          "    Pre[4] xmlns=\"D\" \n" +
-          "    Pre[6] xmlns=\"F\" ",
-          context.data.ns.toString());
-    } catch (Exception e) {
-      fail(e.getMessage());
-    } finally {
-      try {
-        new Close().execute(context);
-      } catch(BaseXException e) { }
-    }
-  }
-
-  /**
-   * Test query.
-   * Detects malformed namespace hierarchy.
-   */
-  @Test
-  public final void nsHierarchy2() {
-    query("insert node <f xmlns='F'/> into doc('d2')//*:e", "");
-    try {
-      new Open("d2").execute(context);
-      assertEquals("\n" +
-          "  Pre[1] xmlns=\"A\" \n" +
-          "    Pre[4] xmlns=\"D\" \n" +
-          "      Pre[5] xmlns=\"G\" \n" +
-          "    Pre[7] xmlns=\"F\" ",
-          context.data.ns.toString());
-    } catch (Exception e) {
-      fail(e.getMessage());
-    } finally {
-      try {
-        new Close().execute(context);
-      } catch(BaseXException e) { }
-    }
-  }
 
   /**
    * Test query.
@@ -121,6 +85,63 @@ public class NamespaceTest {
         "<a xmlns:ns1='ns1'><b xmlns='ns1'>" +
         "  <c xmlns:ns2='ns2' ns1:att1='' ns2:att2=''/>" +
         "</b></a>");
+  }
+
+  /** 
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public final void newPrefix3() {
+    query("insert node attribute {QName('test', 'att')}{} into doc('d1')//g",
+        "doc('d1')//g",
+        "<g xmlns:ns2='G' xmlns:ns3='test' ns3:att=''/>");
+  }
+
+  /** 
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public final void xuty0004() {
+    try {
+      new QueryProcessor("declare variable $input-context external;" +
+          "let $source as node()* := (" +
+          "    <status>on leave</status>," +
+          "    <!-- for 6 months -->" +
+          "  )," +
+          "  $target := $input-context/works[1]/employee[1]" +
+          "return insert nodes $source into $target", context).execute();
+    } catch(QueryException e) {
+      e.printStackTrace();
+      assertEquals("XUTY0004", e.code());
+    }
+    fail("should throw XUTY0004");
+  }
+  
+  /**
+   * Extension to the JUnit methods to test for deep equality of XML fragments.
+   * @param exp expected fragment
+   * @param actual actual fragment
+   */
+  public static void assertDeepEquals(final String exp, final String actual) {
+    try {
+      if(!FNSimple.deep(null, getIter(exp), getIter(actual)))
+        assertEquals(exp, actual);
+    } catch(final QueryException e) { fail(e.getMessage()); }
+  }
+  
+  /**
+   * Creates an iterator for the given XML fragment.
+   * @param xml XML fragment
+   * @return iterator
+   */
+  private static Iter getIter(final String xml) {
+    try {
+      final Data ex = CreateDB.xml(new IOContent(token(xml)), context);
+      return new NodIter(new Nod[]{new DBNode(ex, 0)}, 1);
+    } catch(final IOException e) { fail(e.getMessage()); }
+    return null;
   }
 
   /**
