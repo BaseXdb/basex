@@ -506,7 +506,9 @@ public final class GUI extends JFrame {
           // update command
           notify.update();
         } else if(result != null) {
-          if(!context.current.sameAs(current) || prop.is(GUIProp.FILTERRT)) {
+          Nodes nd = context.current;
+          if((nd != null && !context.current.sameAs(current))
+              || prop.is(GUIProp.FILTERRT)) {
             // refresh context
             if(nodes != null) {
               notify.context((Nodes) result, prop.is(GUIProp.FILTERRT), null);
