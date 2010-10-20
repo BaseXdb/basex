@@ -1,7 +1,6 @@
 package org.basex.data;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import org.basex.util.Util;
 
@@ -72,12 +71,7 @@ public final class FTMatch implements Iterable<FTStringMatch> {
    * Sorts the matches.
    */
   public void sort() {
-    Arrays.sort(match, 0, size, new Comparator<FTStringMatch>() {
-      @Override
-      public int compare(final FTStringMatch s1, final FTStringMatch s2) {
-        return s1.compareTo(s2);
-      }
-    });
+    Arrays.sort(match, 0, size, null);
   }
 
   @Override

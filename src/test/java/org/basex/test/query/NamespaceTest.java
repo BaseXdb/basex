@@ -1,11 +1,14 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
+
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
+import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Set;
 import org.basex.core.cmd.XQuery;
 import org.junit.AfterClass;
@@ -33,7 +36,8 @@ public class NamespaceTest {
     { "d6", "<a:x xmlns='xx' xmlns:a='aa'><a:y xmlns:b='bb'/></a:x>" },
     { "d7", "<x xmlns='xx'><y/></x>" },
     { "d8", "<a><b xmlns='B'/><c/></a>" },
-    { "d9", "<a xmlns='A'><b><c/><d xmlns='D'/></b><e/></a>" }
+    { "d9", "<a xmlns='A'><b><c/><d xmlns='D'/></b><e/></a>" },
+    { "d10", "<a xmlns='A'><b><c/><d xmlns='D'><g xmlns='G'/></d></b><e/></a>" }
   };
 
   /** Test query. */
@@ -103,6 +107,53 @@ public class NamespaceTest {
   public final void duplicateDefaultNamespace() {
     query("<ns:x xmlns:ns='X'><y/></ns:x>",
         "<ns:x xmlns:ns='X'><y/></ns:x>");
+  }
+
+  /** 
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public final void nsHierarchy() {
+    query("insert node <f xmlns='F'/> into doc('d9')//*:e", "");
+    try {
+      new Open("d9").execute(context);
+      assertEquals("\n" +
+          "  Pre[1] xmlns=\"A\" \n" +
+          "    Pre[4] xmlns=\"D\" \n" +
+          "    Pre[6] xmlns=\"F\" ",
+          context.data.ns.toString());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(BaseXException e) { }
+    }
+  }
+  
+  /**
+   * Test query.
+   * Detects malformed namespace hierarchy.
+   */
+  @Test
+  public final void nsHierarchy2() {
+    query("insert node <f xmlns='F'/> into doc('d10')//*:e", "");
+    try {
+      new Open("d10").execute(context);
+      assertEquals("\n" +
+          "  Pre[1] xmlns=\"A\" \n" +
+          "    Pre[4] xmlns=\"D\" \n" +
+          "      Pre[5] xmlns=\"G\" \n" +
+          "    Pre[7] xmlns=\"F\" ",
+          context.data.ns.toString());
+    } catch (Exception e) {
+      fail(e.getMessage());
+    } finally {
+      try {
+        new Close().execute(context);
+      } catch(BaseXException e) { }
+    }
   }
 
   /** Test query. */

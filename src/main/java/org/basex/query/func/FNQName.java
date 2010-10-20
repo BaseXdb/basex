@@ -75,7 +75,7 @@ final class FNQName extends Fun {
         if(it == null) return null;
         nm = (QNm) checkType(it, Type.QNM);
         return !nm.ns() ? null : new NCN(nm.pref(), input);
-      case NSURIPRE:
+      case NSURIPRE: // [LW][LK] broken...
         final byte[] pre = checkEStr(it);
         final Atts at = ((Nod) checkType(it2, Type.ELM)).nsScope();
         final int i = at != null ? at.get(pre) : -1;

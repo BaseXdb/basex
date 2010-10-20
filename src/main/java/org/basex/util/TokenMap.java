@@ -46,4 +46,15 @@ public class TokenMap extends TokenSet {
     super.rehash();
     values = Array.copyOf(values, size << 1);
   }
+  
+  @Override
+  public String toString() {
+    final TokenBuilder tb = new TokenBuilder("TokenMap[");
+    final byte[][] ks = keys();
+    for(int i = 0; i < ks.length; i++) {
+      tb.add(ks[i]).add(" = ").add(get(ks[i]));
+      if(i < ks.length - 1) tb.add(", ");
+    }
+    return tb.add(']').toString();
+  }
 }

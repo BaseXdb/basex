@@ -29,10 +29,8 @@ public final class QueryException extends Exception {
   private IO file;
   /** Code completions. */
   private StringList complete;
-  /** Error line. */
-  private int line;
-  /** Error column. */
-  private int col;
+  /** Error line and column. */
+  private int[] lineCol;
   /** Marked error column. */
   private int markedCol;
 
@@ -63,14 +61,8 @@ public final class QueryException extends Exception {
     value = val;
     if(ii == null) return;
 
-    line = 1;
-    col = 1;
     file = ii.file;
-    final int qp = Math.min(ii.pos - 1, ii.query.length());
-    for(int i = 0, ch; i < qp; i += Character.charCount(ch)) {
-      ch = ii.query.codePointAt(i);
-      if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
-    }
+    lineCol = ii.lineCol();
   }
 
   /**
@@ -101,7 +93,7 @@ public final class QueryException extends Exception {
    * @return error column
    */
   public int col() {
-    return col;
+    return lineCol == null ? 0 : lineCol[1];
   }
 
   /**
@@ -117,7 +109,7 @@ public final class QueryException extends Exception {
    * @return error line
    */
   public int line() {
-    return line;
+    return lineCol == null ? 0 : lineCol[0];
   }
 
   /**
@@ -145,16 +137,10 @@ public final class QueryException extends Exception {
   void pos(final InputParser parser) {
     markedCol = parser.qm;
     // check if information has already been added
-    if(line != 0) return;
+    if(lineCol != null) return;
 
     file = parser.file;
-    line = 1;
-    col = 1;
-    final int len = Math.min(parser.qm, parser.ql);
-    for(int i = 0, ch; i < len; i += Character.charCount(ch)) {
-      ch = parser.qu.codePointAt(i);
-      if(ch == 0x0A) { line++; col = 1; } else if(ch != 0x0D) { col++; }
-    }
+    lineCol = InputInfo.lineCol(parser.qu, Math.min(parser.qm, parser.ql));
   }
 
   /**
@@ -189,9 +175,9 @@ public final class QueryException extends Exception {
   @Override
   public String getMessage() {
     final TokenBuilder tb = new TokenBuilder();
-    if(line != 0) {
-      tb.add(STOPPED + ' ').addExt(LINEINFO, line);
-      if(col != 0) tb.add(QueryTokens.SEP).addExt(COLINFO, col);
+    if(lineCol != null) {
+      tb.add(STOPPED + ' ').addExt(LINEINFO, lineCol[0]);
+      if(lineCol[1] != 0) tb.add(QueryTokens.SEP).addExt(COLINFO, lineCol[1]);
       if(file != null) tb.add(' ').addExt(FILEINFO, file);
       tb.add(": \n");
     }

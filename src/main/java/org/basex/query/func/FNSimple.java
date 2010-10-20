@@ -205,7 +205,8 @@ public final class FNSimple extends Fun {
         } else {
           // compare names
           final QNm n1 = s1.qname(), n2 = s2.qname();
-          if(n1 != null && n2 != null && !n1.eq(n2)) return false;
+          if(n1 != null && n2 != null && !n1.eq(n2))
+            return false;
 
           // compare string values
           if((t1 == Type.TXT || t1 == Type.ATT || t1 == Type.COM ||
