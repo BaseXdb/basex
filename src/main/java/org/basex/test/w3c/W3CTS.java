@@ -467,8 +467,8 @@ public abstract class W3CTS {
           inspect |= s < cmpFiles.nodes.length &&
             eq(data.atom(cmpFiles.nodes[s]), INSPECT);
 
-          final byte[] res = result.get(s);
-          if(res.length == ao.size() && eq(res, ao.toArray())) break;
+          final byte[] res = result.get(s), actual = ao.toArray();
+          if(res.length == ao.size() && eq(res, actual)) break;
 
           if(xml || frag) {
             iter.reset();
@@ -487,7 +487,18 @@ public abstract class W3CTS {
                 pre += rdata.size(pre, rdata.kind(pre));
               }
 
-              final boolean eq = FNSimple.deep(null, iter, ir);
+              boolean eq = FNSimple.deep(null, iter, ir);
+              if(!eq && !doc) {
+                ir.reset();
+                final Data adata = CreateDB.xml(IO.get("<X>" + string(actual)
+                    + "</X>"), context);
+                final ItemIter ia = new ItemIter();
+                for(int pre = 2; pre < adata.meta.size;) {
+                  ia.add(new DBNode(adata, pre));
+                  pre += adata.size(pre, adata.kind(pre));
+                }
+                eq = FNSimple.deep(null, ia, ir);
+              }
               if(!eq && debug) {
                 iter.reset();
                 ir.reset();
