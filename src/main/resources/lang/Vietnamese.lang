@@ -573,7 +573,6 @@ ch_exit2=Exits %.
 # Help Texts
 h_hist=Hiển thị lich sử thông tin nhập.
 h_save=Saves the result.
-h_save2=Saves the query.
 h_go=Chạy lệnh hỏi.
 h_stop=Dừng qua trình hiện hành.
 h_recent=Những tệp vừa được mở

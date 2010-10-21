@@ -575,7 +575,6 @@ ch_exit2=Exits %.
 # Help Texts
 h_hist=Show input history.
 h_save=Saves the result.
-h_save2=Saves the query.
 h_go=Executes the query.
 h_stop=Stops the current process.
 h_recent=Recently opened files

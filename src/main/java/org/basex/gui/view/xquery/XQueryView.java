@@ -73,7 +73,8 @@ public final class XQueryView extends View {
     b.add(header, BorderLayout.CENTER);
 
     final BaseXButton openB = BaseXButton.command(GUICommands.XQOPEN, gui);
-    final BaseXButton saveB = new BaseXButton(gui, "xqsave", HELPSAVE2);
+    final BaseXButton saveB = new BaseXButton(gui, "xqsave",
+        Token.token(GUISAVETT));
     saveB.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(final ActionEvent e) {

@@ -575,7 +575,6 @@ ch_exit2=Stop %.
 # Help Texts
 h_hist=Toon input geschiedenis.
 h_save=Bewaart het resultaat.
-h_save2=Bewaart de query.
 h_go=Voer de query uit.
 h_stop=Stopt het actuele proces.
 h_recent=Recent geopende bestanden
