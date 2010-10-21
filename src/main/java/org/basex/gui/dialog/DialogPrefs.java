@@ -112,10 +112,11 @@ public final class DialogPrefs extends Dialog {
 
     lang = new BaseXCombo(LANGS[0], this);
     lang.setSelectedItem(prop.get(Prop.LANGUAGE));
-
+    
     p.add(lang);
     creds = new BaseXLabel();
     p.add(creds);
+    creds.setText(TRANSLATION + creds(lang.getSelectedItem().toString()));
 
     pp.add(p);
 
@@ -128,8 +129,8 @@ public final class DialogPrefs extends Dialog {
   }
 
   @Override
-  public void action(final Object cmp) {
-    creds.setText("Translation: " + creds(lang.getSelectedItem().toString()));
+  public void action(final Object cmp) { 
+    creds.setText(TRANSLATION + creds(lang.getSelectedItem().toString()));
     gui.notify.layout();
   }
 
