@@ -74,7 +74,8 @@ public final class Transform extends Arr {
       final Item i = ir.next();
       if(i == null || !i.node() || ir.next() != null) UPCOPYMULT.thrw(input);
       final Data m = UpdatePrimitive.buildDB(
-          new NodIter(new Nod[] { (Nod) i }, 1), new MemData(ctx.context.prop));
+          new NodIter(new Nod[] { (Nod) i }, 1), new MemData(ctx.context.prop),
+          ctx);
       ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());
       pu.addDataReference(m);
     }

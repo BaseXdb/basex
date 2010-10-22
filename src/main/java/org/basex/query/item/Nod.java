@@ -136,7 +136,7 @@ public abstract class Nod extends Item {
     } while(n != null && n.type == Type.ELM);
     return ns;
   }
-
+  
   /**
    * Returns the uri for the specified prefix.
    * @param pref prefix

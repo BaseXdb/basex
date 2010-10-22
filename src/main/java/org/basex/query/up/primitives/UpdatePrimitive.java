@@ -3,6 +3,7 @@ package org.basex.query.up.primitives;
 import static org.basex.util.Token.*;
 import org.basex.data.Data;
 import org.basex.data.MemData;
+import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
 import org.basex.query.item.FTxt;
@@ -127,15 +128,19 @@ public abstract class UpdatePrimitive {
    * Builds new data instance from iterator.
    * @param ch sequence iterator
    * @param md memory data reference
+   * @param ctx query context
    * @return new data instance
    * @throws QueryException query exception
    */
-  public static MemData buildDB(final NodIter ch, final MemData md)
+  public static MemData buildDB(final NodIter ch, final MemData md,
+      final QueryContext ctx)
       throws QueryException {
 
     int pre = 1;
     Nod n;
-    while((n = ch.next()) != null) pre = addNode(null, n, md, pre, 0);
+    while((n = ch.next()) != null) pre = addNode(null, n, md, pre, 0, 
+        ctx == null ? true : ctx.nsPreserve,
+            ctx == null ? true : ctx.nsInherit);
     return md;
   }
 
@@ -147,12 +152,16 @@ public abstract class UpdatePrimitive {
    * @param m data reference
    * @param pre node position
    * @param par node parent
+   * @param nsPreserve copy namespaces preserve flag
+   * @param nsInherit copy namespaces inherit flag
    * @return pre value of next node
    * @throws QueryException query exception
    */
   private static int addNode(final Nod ndPar, final Nod nd, final MemData m,
-      final int pre, final int par) throws QueryException {
-
+      final int pre, final int par, final boolean nsPreserve,
+      final boolean nsInherit) 
+  throws QueryException {
+    
     final int k = Nod.kind(nd.type);
     final int ms = m.meta.size;
     switch(k) {
@@ -162,8 +171,10 @@ public abstract class UpdatePrimitive {
         int p = pre + 1;
         NodeIter ir = nd.child();
         Nod i;
-        while((i = ir.next()) != null) p = addNode(null, i, m, p, pre);
+        while((i = ir.next()) != null) p = addNode(null, i, m, p, pre, 
+            nsPreserve, nsInherit);
         return p;
+        // [LK] preserve/inherit - any effects here?
       case Data.ATTR:
         QNm q = nd.qname();
         byte[] uri = q.uri().atom();
@@ -190,9 +201,24 @@ public abstract class UpdatePrimitive {
         q = nd.qname();
         m.ns.open();
         ne = false;
-        final Atts ns = par == 0 ? nd.nsScope() : nd.ns();
+        // [LK] copy-namespaces no-preserve
+        // best way to determine necessary descendant ns bindings?
+        Atts ns = null;
+        if(!nsPreserve) {
+          ns = nd.ns();
+          // detect default namespace bindings on ancestor axis of nd and
+          // remove them to avoid duplicates
+          final Atts ns2 = nd.nsScope();
+          int uid;
+          if((uid = ns2.get(EMPTY)) != -1) 
+            ns.add(ns2.key[uid], ns2.val[uid]);
+        } else {
+          ns = par == 0 ? nd.nsScope() : nd.ns();
+        }
+        
+        // remove duplicate namespace bindings
         if(ns != null) {
-          if(ns.size > 0 && ndPar != null) {
+          if(ns.size > 0 && ndPar != null && nsPreserve) {
             final Atts nsPar = ndPar.nsScope();
             for(int j = 0; j < nsPar.size; ++j) {
               final byte[] key = nsPar.key[j];
@@ -216,9 +242,11 @@ public abstract class UpdatePrimitive {
         m.insert(ms);
         ir = nd.attr();
         p = pre + 1;
-        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre);
+        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre, 
+            nsPreserve, nsInherit);
         ir = nd.child();
-        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre);
+        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre, 
+            nsPreserve, nsInherit);
         m.ns.close(ms);
         return p;
     }
