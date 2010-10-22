@@ -78,6 +78,7 @@ public final class Transform extends Arr {
           ctx);
       ctx.vars.add(fo.var.bind(new DBNode(m, 0), ctx).copy());
       pu.addDataReference(m);
+      ctx.copiedNods.add(m);
     }
 
     final Updates tmp = ctx.updates;

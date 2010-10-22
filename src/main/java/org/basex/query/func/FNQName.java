@@ -1,8 +1,9 @@
 package org.basex.query.func;
 
-import static org.basex.query.util.Err.*;
 import static org.basex.query.QueryTokens.*;
+import static org.basex.query.util.Err.*;
 import static org.basex.util.Token.*;
+
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
@@ -13,8 +14,8 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Str;
 import org.basex.query.item.Type;
 import org.basex.query.item.Uri;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.ItemIter;
+import org.basex.query.iter.Iter;
 import org.basex.query.util.Err;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
@@ -77,7 +78,12 @@ final class FNQName extends Fun {
         return !nm.ns() ? null : new NCN(nm.pref(), input);
       case NSURIPRE: // [LW][LK] broken...
         final byte[] pre = checkEStr(it);
-        final Atts at = ((Nod) checkType(it2, Type.ELM)).nsScope();
+        
+        // [LK] find out if inherit flag has a persistent effect - if positive,
+        // we're screwed. test case added to unresolved namespace tests.
+        final Nod nod = ((Nod) checkType(it2, Type.ELM));
+        final Atts at = nod.nsScope(ctx.isCopiedNod(nod) ? 
+            ctx.nsInherit : true);
         final int i = at != null ? at.get(pre) : -1;
         return i != -1 ? Uri.uri(at.val[i]) : null;
       case RESURI:

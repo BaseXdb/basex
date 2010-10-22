@@ -7,6 +7,9 @@ import static org.basex.util.Token.*;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -29,6 +32,7 @@ import org.basex.query.item.DBNode;
 import org.basex.query.item.Dat;
 import org.basex.query.item.Dtm;
 import org.basex.query.item.Item;
+import org.basex.query.item.Nod;
 import org.basex.query.item.Seq;
 import org.basex.query.item.Tim;
 import org.basex.query.item.Uri;
@@ -163,6 +167,9 @@ public final class QueryContext extends Progress {
   public Updates updates = new Updates(false);
   /** Indicates if this query performs updates. */
   public boolean updating;
+  /** MemData references of copied nodes, resulting from 
+   * transform expression. */
+  public final Set<Data> copiedNods = new HashSet<Data>();
 
   /** Compilation flag: current node has leaves. */
   public boolean leaf;
@@ -308,7 +315,18 @@ public final class QueryContext extends Progress {
     }
     return ir;
   }
-
+  
+  /**
+   * Determines if the given node has been constructed via a transform
+   * expression.
+   * @param nod Nod
+   * @return true, if part of copied nodes
+   */
+  public boolean isCopiedNod(final Nod nod) {
+    if(!(nod instanceof DBNode)) return false;
+    return copiedNods.contains(((DBNode) nod).data);
+  }
+  
   /**
    * Returns a result iterator.
    * @return result iterator

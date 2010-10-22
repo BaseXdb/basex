@@ -122,10 +122,21 @@ public abstract class Nod extends Item {
    * [LW][LK] TODO: this isn't enough
    */
   public final Atts nsScope() {
+    return nsScope(true);
+  }
+  
+  /**
+   * Returns the namespace hierarchy.
+   * @param nsInherit copy-namespaces inherit
+   * @return namespaces
+   * [LW][LK] TODO: this isn't enough
+   */
+  public final Atts nsScope(final boolean nsInherit) {
     final Atts ns = new Atts();
     Nod n = this;
     do {
       final Atts nns = n.ns();
+      if(!nsInherit) return nns;
       if(nns != null) {
         for(int a = nns.size - 1; a >= 0; a--) {
           final byte[] key = nns.key[a];
