@@ -124,31 +124,13 @@ public class NamespaceTest {
    * [LK] 
    * Test query.
    * Tests preserve, no-inherit for copy expression. Related to XQUTS
-   * id-insert-expr-081-no-inherit.xq 
-   */
-  @Test
-  public final void copyPreserveNoInherit() {
-    query("declare copy-namespaces preserve,no-inherit;" +
-    		"declare namespace my = 'ns';" +
-    		"let $v :=" +
-    		"(copy $c := <my:n><my:a/></my:n>" +
-    		"modify insert node <new/> into $c " +
-    		"return $c)" +
-    		"return namespace-uri-for-prefix('my', $v/new)"
-        , "");
-  }
-  
-  /**
-   * [LK] 
-   * Test query.
-   * Tests preserve, no-inherit for copy expression. Related to XQUTS
    * id-insert-expr-081-no-inherit.xq. Tests if no-inherit has a persistent
-   * effect. Is it actually supposed to? Check with i.e. saxon.
+   * effect. Is it actually supposed to?
    * The <new/> tag is inserted into a fragment f using no-inherit and copy.
    * The resulting fragment is inserted into a database. The
    * namespaces in scope with prefix 'ns' are finally checked for the 
    * inserted <new/> tag. If the result is non-empty we may have a problem -
-   * being not able popagate the no-inherent flag to our table.   
+   * being not able popagate the no-inherit flag to our table.   
    */
   @Test
   public final void copyPreserveNoInheritPersistent() {
