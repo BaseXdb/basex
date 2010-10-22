@@ -40,6 +40,7 @@ public class NamespaceTest {
   private static String[][] docs = {
     { "d1", "<a xmlns:ns0='A'><b><d xmlns:ns1='D'>" +
         "<g xmlns:ns2='G'/></d></b></a>" },
+    { "d2", "<n/>" }
   };
 
   /**
@@ -117,6 +118,97 @@ public class NamespaceTest {
       assertEquals("XUTY0004", e.code());
     }
     fail("should throw XUTY0004");
+  }
+  
+  /**
+   * [LK] 
+   * Test query.
+   * Tests preserve, no-inherit for copy expression. Related to XQUTS
+   * id-insert-expr-081-no-inherit.xq 
+   */
+  @Test
+  public final void copyPreserveNoInherit() {
+    query("declare copy-namespaces preserve,no-inherit;" +
+    		"declare namespace my = 'ns';" +
+    		"let $v :=" +
+    		"(copy $c := <my:n><my:a/></my:n>" +
+    		"modify insert node <new/> into $c " +
+    		"return $c)" +
+    		"return namespace-uri-for-prefix('my', $v/new)"
+        , "");
+  }
+  
+  /**
+   * [LK] 
+   * Test query.
+   * Tests preserve, no-inherit for copy expression. Related to XQUTS
+   * id-insert-expr-081-no-inherit.xq. Tests if no-inherit has a persistent
+   * effect. Is it actually supposed to? Check with i.e. saxon.
+   * The <new/> tag is inserted into a fragment f using no-inherit and copy.
+   * The resulting fragment is inserted into a database. The
+   * namespaces in scope with prefix 'ns' are finally checked for the 
+   * inserted <new/> tag. If the result is non-empty we may have a problem -
+   * being not able popagate the no-inherent flag to our table.   
+   */
+  @Test
+  public final void copyPreserveNoInheritPersistent() {
+    query("declare copy-namespaces preserve,no-inherit;" +
+        "declare namespace my = 'ns';" +
+        "let $v :=" +
+        "(copy $c := <my:n><my:a/></my:n>" +
+        "modify insert node <new/> into $c " +
+        "return $c)" +
+        "return insert node $v into doc('d2')/n",
+        "namespace-uri-for-prefix('my', doc('d2')//*:new)",
+        "");
+  }
+  
+  /**
+   * [LK] 
+   * Test query.
+   * Tests no-preserve, inherit for copy expression.
+   */
+  @Test
+  public final void copyNoPreserveInherit1() {
+    query("declare namespace my='ns';" +
+    		"declare copy-namespaces no-preserve,inherit; " +
+    		"let $og := <my:a><n/></my:a> " +
+    		"let $f:= (copy $c := $og/n modify () return $c) " +
+    		"return (namespace-uri-for-prefix('my', $f))",
+        "");
+  }
+  
+  /**
+   * [LK] 
+   * Test query.
+   * Tests no-preserve, inherit for copy expression.
+   */
+  @Test
+  public final void copyNoPreserveInherit2() {
+    query("declare namespace my='ns'; " +
+    		"declare namespace my2='ns2'; " +
+    		"declare copy-namespaces no-preserve,inherit; " +
+    		"let $og := <my:a xmlns='ns2'><n/></my:a> " +
+    		"let $f:= (copy $c := $og/my2:n modify () return $c) " +
+    		"return (namespace-uri-for-prefix('my',$f), " +
+    		"namespace-uri-for-prefix('',$f))",
+        "ns2");
+  }
+  
+  /**
+   * [LK] 
+   * Test query.
+   * Tests no-preserve, inherit for copy expression.
+   */
+  @Test
+  public final void copyNoPreserveInherit3() {
+    query("declare namespace my='ns'; " +
+    		"declare copy-namespaces no-preserve,inherit; " +
+    		"let $og := <my:a><n><my:m/></n></my:a> " +
+    		"let $f:= (copy $c := $og/n modify () return $c) " +
+    		"return (namespace-uri-for-prefix('my', $f)," +
+    		"namespace-uri-for-prefix('my', $f/my:m))",
+        "ns");
   }
   
   /**
