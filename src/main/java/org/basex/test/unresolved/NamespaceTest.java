@@ -164,54 +164,6 @@ public class NamespaceTest {
   }
   
   /**
-   * [LK] 
-   * Test query.
-   * Tests no-preserve, inherit for copy expression.
-   */
-  @Test
-  public final void copyNoPreserveInherit1() {
-    query("declare namespace my='ns';" +
-    		"declare copy-namespaces no-preserve,inherit; " +
-    		"let $og := <my:a><n/></my:a> " +
-    		"let $f:= (copy $c := $og/n modify () return $c) " +
-    		"return (namespace-uri-for-prefix('my', $f))",
-        "");
-  }
-  
-  /**
-   * [LK] 
-   * Test query.
-   * Tests no-preserve, inherit for copy expression.
-   */
-  @Test
-  public final void copyNoPreserveInherit2() {
-    query("declare namespace my='ns'; " +
-    		"declare namespace my2='ns2'; " +
-    		"declare copy-namespaces no-preserve,inherit; " +
-    		"let $og := <my:a xmlns='ns2'><n/></my:a> " +
-    		"let $f:= (copy $c := $og/my2:n modify () return $c) " +
-    		"return (namespace-uri-for-prefix('my',$f), " +
-    		"namespace-uri-for-prefix('',$f))",
-        "ns2");
-  }
-  
-  /**
-   * [LK] 
-   * Test query.
-   * Tests no-preserve, inherit for copy expression.
-   */
-  @Test
-  public final void copyNoPreserveInherit3() {
-    query("declare namespace my='ns'; " +
-    		"declare copy-namespaces no-preserve,inherit; " +
-    		"let $og := <my:a><n><my:m/></n></my:a> " +
-    		"let $f:= (copy $c := $og/n modify () return $c) " +
-    		"return (namespace-uri-for-prefix('my', $f)," +
-    		"namespace-uri-for-prefix('my', $f/my:m))",
-        "ns");
-  }
-  
-  /**
    * Extension to the JUnit methods to test for deep equality of XML fragments.
    * @param exp expected fragment
    * @param actual actual fragment
