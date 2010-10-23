@@ -81,7 +81,7 @@ final class FNQName extends Fun {
         
         // [LK] find out if inherit flag has a persistent effect - if positive,
         // we're screwed. test case added to unresolved namespace tests.
-        final Nod nod = ((Nod) checkType(it2, Type.ELM));
+        final Nod nod = (Nod) checkType(it2, Type.ELM);
         final Atts at = nod.nsScope(ctx.isCopiedNod(nod) ? 
             ctx.nsInherit : true);
         final int i = at != null ? at.get(pre) : -1;
