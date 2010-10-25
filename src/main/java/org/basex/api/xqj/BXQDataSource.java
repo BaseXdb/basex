@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Properties;
 import javax.xml.xquery.XQDataSource;
 import javax.xml.xquery.XQException;
-
 import org.basex.util.Util;
 
 /**
