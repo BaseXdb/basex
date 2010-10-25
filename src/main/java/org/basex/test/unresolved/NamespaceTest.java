@@ -2,9 +2,7 @@ package org.basex.test.unresolved;
 
 import static org.junit.Assert.*;
 import static org.basex.util.Token.*;
-
 import java.io.IOException;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -63,7 +61,7 @@ public class NamespaceTest {
         "X");
   }
 
-  /** 
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
@@ -73,7 +71,7 @@ public class NamespaceTest {
         "<a xmlns:ns1='http://bla' ns1:att=''/>");
   }
 
-  /** 
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
@@ -88,7 +86,7 @@ public class NamespaceTest {
         "</b></a>");
   }
 
-  /** 
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
@@ -99,7 +97,7 @@ public class NamespaceTest {
         "<g xmlns:ns2='G' xmlns:ns3='test' ns3:att=''/>");
   }
 
-  /** 
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
@@ -119,18 +117,18 @@ public class NamespaceTest {
     }
     fail("should throw XUTY0004");
   }
-  
+
   /**
-   * [LK] 
+   * [LK]
    * Test query.
    * Tests preserve, no-inherit for copy expression. Related to XQUTS
    * id-insert-expr-081-no-inherit.xq. Tests if no-inherit has a persistent
    * effect. Is it actually supposed to?
    * The <new/> tag is inserted into a fragment f using no-inherit and copy.
    * The resulting fragment is inserted into a database. The
-   * namespaces in scope with prefix 'ns' are finally checked for the 
+   * namespaces in scope with prefix 'ns' are finally checked for the
    * inserted <new/> tag. If the result is non-empty we may have a problem -
-   * being not able popagate the no-inherit flag to our table.   
+   * being not able popagate the no-inherit flag to our table.
    */
   @Test
   public final void copyPreserveNoInheritPersistent() {
@@ -144,7 +142,7 @@ public class NamespaceTest {
         "namespace-uri-for-prefix('my', doc('d2')//*:new)",
         "");
   }
-  
+
   /**
    * Extension to the JUnit methods to test for deep equality of XML fragments.
    * @param exp expected fragment
@@ -156,7 +154,7 @@ public class NamespaceTest {
         assertEquals(exp, actual);
     } catch(final QueryException e) { fail(e.getMessage()); }
   }
-  
+
   /**
    * Creates an iterator for the given XML fragment.
    * @param xml XML fragment

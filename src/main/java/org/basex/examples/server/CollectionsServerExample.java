@@ -23,7 +23,7 @@ public final class CollectionsServerExample {
     + "<text version=\"draft\"><title>Chapter ";
   /** XML Document Fragment Pt. 2. */
   static final String XML_2 = "</title></text>";
-  
+
   /** Private constructor. */
   private CollectionsServerExample() { }
 
@@ -50,7 +50,7 @@ public final class CollectionsServerExample {
     // ------------------------------------------------------------------------
     // Add some 50 documents
     System.out.println("\n* Adding 50 documents");
-    
+
     for(int i = 0; i < 50; i++) {
       add(XML_1 + i + XML_2, "Chapter-" + i + ".xml", "/book/chapters/" + i);
     }
@@ -60,12 +60,12 @@ public final class CollectionsServerExample {
     // ------------------------------------------------------------------------
     // Find some documents using the collection command
     find();
-    
+
     // ------------------------------------------------------------------------
     // Modify specific document(s)
     System.out.println("\n* Modifying documents in folder /book/chapters/0:");
     modify();
-    
+
     // ------------------------------------------------------------------------
     // Drop the database
     session.execute("DROP DB input");
@@ -118,7 +118,7 @@ public final class CollectionsServerExample {
    */
   private static void add(final String xmlFragment, final String docname,
       final String target) throws BaseXException {
-    
+
     session.execute(new Add(xmlFragment, docname, target));
   }
 }
