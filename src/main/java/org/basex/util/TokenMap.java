@@ -46,7 +46,7 @@ public class TokenMap extends TokenSet {
     super.rehash();
     values = Array.copyOf(values, size << 1);
   }
-  
+
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder("TokenMap[");

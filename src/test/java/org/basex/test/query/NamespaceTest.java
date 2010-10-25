@@ -1,7 +1,6 @@
 package org.basex.test.query;
 
 import static org.junit.Assert.*;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.Prop;
@@ -109,7 +108,7 @@ public class NamespaceTest {
         "<ns:x xmlns:ns='X'><y/></ns:x>");
   }
 
-  /** 
+  /**
    * Test query.
    * Detects malformed namespace hierarchy.
    */
@@ -131,7 +130,7 @@ public class NamespaceTest {
       } catch(BaseXException e) { }
     }
   }
-  
+
   /**
    * Test query.
    * Detects malformed namespace hierarchy.

@@ -14,12 +14,21 @@ import org.basex.util.Token;
  * @author Christian Gruen
  */
 public final class Bln extends Item {
-  /** Static boolean item (use with care). */
-  public static final Bln TRUE = new Bln(true, 0);
-  /** Static boolean item (use with care). */
-  public static final Bln FALSE = new Bln(false, 0);
+  /** Static boolean item without scoring. */
+  public static final Bln TRUE = new Bln(true);
+  /** Static boolean item without scoring. */
+  public static final Bln FALSE = new Bln(false);
   /** Data. */
   private final boolean val;
+
+  /**
+   * Constructor, adding a full-text score.
+   * @param b boolean value
+   */
+  private Bln(final boolean b) {
+    super(Type.BLN);
+    val = b;
+  }
 
   /**
    * Constructor, adding a full-text score.
@@ -27,8 +36,7 @@ public final class Bln extends Item {
    * @param s score value
    */
   private Bln(final boolean b, final double s) {
-    super(Type.BLN);
-    val = b;
+    this(b);
     score = s;
   }
 

@@ -2,6 +2,8 @@ package org.basex.query.up.primitives;
 
 import static org.basex.query.util.Err.*;
 import java.io.IOException;
+import org.basex.data.DataText;
+import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
@@ -36,7 +38,10 @@ public final class Put extends UpdatePrimitive {
     PrintOutput out = null;
     try {
       out = new PrintOutput(Token.string(path()));
-      node.serialize(new XMLSerializer(out));
+      final SerializerProp sp = new SerializerProp();
+      sp.set(SerializerProp.S_INDENT, DataText.NO);
+      XMLSerializer xml = new XMLSerializer(out, sp);
+      node.serialize(xml);
     } catch(final IOException ex) {
       UPPUTERR.thrw(input, path());
     } finally {

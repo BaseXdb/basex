@@ -13,7 +13,6 @@ import org.basex.query.item.Nod;
 import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import static org.basex.query.util.Err.*;
-
 import org.basex.query.util.NSGlobal;
 import org.basex.query.util.Var;
 import org.basex.util.Atts;

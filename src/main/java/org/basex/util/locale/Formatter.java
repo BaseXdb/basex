@@ -1,7 +1,6 @@
 package org.basex.util.locale;
 
 import java.util.HashMap;
-
 import org.basex.util.Util;
 
 /**

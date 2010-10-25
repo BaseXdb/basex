@@ -138,7 +138,7 @@ public abstract class UpdatePrimitive {
 
     int pre = 1;
     Nod n;
-    while((n = ch.next()) != null) pre = addNode(null, n, md, pre, 0, 
+    while((n = ch.next()) != null) pre = addNode(null, n, md, pre, 0,
         ctx == null ? true : ctx.nsPreserve,
             ctx == null ? true : ctx.nsInherit);
     return md;
@@ -159,9 +159,9 @@ public abstract class UpdatePrimitive {
    */
   private static int addNode(final Nod ndPar, final Nod nd, final MemData m,
       final int pre, final int par, final boolean nsPreserve,
-      final boolean nsInherit) 
+      final boolean nsInherit)
   throws QueryException {
-    
+
     final int k = Nod.kind(nd.type);
     final int ms = m.meta.size;
     switch(k) {
@@ -171,7 +171,7 @@ public abstract class UpdatePrimitive {
         int p = pre + 1;
         NodeIter ir = nd.child();
         Nod i;
-        while((i = ir.next()) != null) p = addNode(null, i, m, p, pre, 
+        while((i = ir.next()) != null) p = addNode(null, i, m, p, pre,
             nsPreserve, nsInherit);
         return p;
         // [LK] preserve/inherit - any effects here?
@@ -210,12 +210,12 @@ public abstract class UpdatePrimitive {
           // remove them to avoid duplicates
           final Atts ns2 = nd.nsScope();
           int uid;
-          if((uid = ns2.get(EMPTY)) != -1) 
+          if((uid = ns2.get(EMPTY)) != -1)
             ns.add(ns2.key[uid], ns2.val[uid]);
         } else {
           ns = par == 0 ? nd.nsScope() : nd.ns();
         }
-        
+
         // remove duplicate namespace bindings
         if(ns != null) {
           if(ns.size > 0 && ndPar != null && nsPreserve) {
@@ -242,10 +242,10 @@ public abstract class UpdatePrimitive {
         m.insert(ms);
         ir = nd.attr();
         p = pre + 1;
-        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre, 
+        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre,
             nsPreserve, nsInherit);
         ir = nd.child();
-        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre, 
+        while((i = ir.next()) != null) p = addNode(nd, i, m, p, pre,
             nsPreserve, nsInherit);
         m.ns.close(ms);
         return p;

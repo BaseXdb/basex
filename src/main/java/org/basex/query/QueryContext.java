@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
@@ -167,7 +166,7 @@ public final class QueryContext extends Progress {
   public Updates updates = new Updates(false);
   /** Indicates if this query performs updates. */
   public boolean updating;
-  /** MemData references of copied nodes, resulting from 
+  /** MemData references of copied nodes, resulting from
    * transform expression. */
   public final Set<Data> copiedNods = new HashSet<Data>();
 
@@ -315,7 +314,7 @@ public final class QueryContext extends Progress {
     }
     return ir;
   }
-  
+
   /**
    * Determines if the given node has been constructed via a transform
    * expression.
@@ -326,7 +325,7 @@ public final class QueryContext extends Progress {
     if(!(nod instanceof DBNode)) return false;
     return copiedNods.contains(((DBNode) nod).data);
   }
-  
+
   /**
    * Returns a result iterator.
    * @return result iterator
@@ -562,7 +561,7 @@ public final class QueryContext extends Progress {
     final boolean rt = input.length == 0;
 
     final byte[] path = endsWith(input, token("/")) ? concat(token("/"), input)
-        : concat(token("/"), input, token("/")); 
+        : concat(token("/"), input, token("/"));
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       final DBNode dbn = new DBNode(data, p);
       if(rt) {
@@ -572,7 +571,7 @@ public final class QueryContext extends Progress {
         // add documents which match specified input path
         final byte[] name = lc(Token.concat(Token.token("/"),
             data.text(p, true)));
-        if(eq(name, concat(token("/"), input)) || startsWith(name, path)) 
+        if(eq(name, concat(token("/"), input)) || startsWith(name, path))
           col.add(dbn);
       }
     }

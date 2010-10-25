@@ -179,7 +179,7 @@ public final class TreeView extends View implements TreeViewOptions {
         return;
       }
     }
-    
+
     smooth(g);
     g.setFont(font);
     fontHeight = g.getFontMetrics().getHeight();
@@ -302,7 +302,7 @@ public final class TreeView extends View implements TreeViewOptions {
   }
 
   /**
-   * Displays Message if there is not enough space to draw all roots or an 
+   * Displays Message if there is not enough space to draw all roots or an
    * attribute-context but no attributes in cache.
    * @param g graphics reference
    * @param t type

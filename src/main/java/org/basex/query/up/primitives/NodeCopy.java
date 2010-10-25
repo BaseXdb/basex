@@ -1,7 +1,6 @@
 package org.basex.query.up.primitives;
 
 import java.util.LinkedList;
-
 import org.basex.data.Data;
 import org.basex.data.MemData;
 import org.basex.query.QueryException;

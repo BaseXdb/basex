@@ -1,7 +1,6 @@
 package org.basex.gui.view.tree;
 
 import java.util.ArrayList;
-
 import org.basex.data.Data;
 import org.basex.util.IntList;
 

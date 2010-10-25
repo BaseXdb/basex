@@ -494,14 +494,14 @@ public final class GUI extends JFrame {
 
         final Data ndata = context.data;
         Nodes marked = context.marked;
-        
+
         if(ndata != data) {
           // database reference has changed - notify views
           notify.init();
-          // [LK] check if context really changed - an empty 
+          // [LK] check if context really changed - an empty
           // updating function i.e.
           // sets up==true, but does not change the current context
-          // 
+          //
         } else if(up) {
           // update command
           notify.update();

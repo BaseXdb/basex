@@ -1,7 +1,6 @@
 package org.basex.test.collections;
 
 import static org.junit.Assert.*;
-
 import org.basex.core.BaseXException;
 import org.basex.core.Context;
 import org.basex.core.cmd.Add;
@@ -61,7 +60,7 @@ public class PathTest {
     new DropDB(WEEK2).execute(CTX);
     CTX.close();
   }
-  
+
   /**
    * Checks the number of documents under the specified path.
    * @throws Exception exception
@@ -73,7 +72,7 @@ public class PathTest {
     assertEquals(1, Integer.parseInt(qp.execute().toString()));
     qp.close();
   }
-  
+
   /**
    * Checks the number of documents under the specified path.
    * @throws Exception exception
@@ -95,7 +94,7 @@ public class PathTest {
     weekTest();
     weekTest2();
   }
-  
+
   /**
    * Checks the results of the query without index access.
    * @throws Exception exception
@@ -109,9 +108,9 @@ public class PathTest {
     weekTest();
     weekTest2();
   }
-  
+
   /** Checks the results of the queries with the db week.
-   * @throws Exception exception 
+   * @throws Exception exception
    */
   public void weekTest() throws Exception {
     final String count = "count(collection('" + WEEK1 +
@@ -126,9 +125,9 @@ public class PathTest {
     assertEquals(4, Integer.parseInt(qp2.execute().toString()));
     qp2.close();
   }
-  
+
   /** Checks the results of the queries with the db week.
-   * @throws Exception exception 
+   * @throws Exception exception
    */
   public void weekTest2() throws Exception {
     final String count = "count(collection('" + WEEK1 +

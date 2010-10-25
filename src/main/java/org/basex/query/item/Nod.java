@@ -124,7 +124,7 @@ public abstract class Nod extends Item {
   public final Atts nsScope() {
     return nsScope(true);
   }
-  
+
   /**
    * Returns the namespace hierarchy.
    * @param nsInherit copy-namespaces inherit
@@ -147,7 +147,7 @@ public abstract class Nod extends Item {
     } while(n != null && n.type == Type.ELM);
     return ns;
   }
-  
+
   /**
    * Returns the uri for the specified prefix.
    * @param pref prefix

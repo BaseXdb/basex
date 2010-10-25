@@ -27,16 +27,16 @@ public final class InputInfo {
     pos = p.qp;
     file = p.file;
   }
-  
+
   /**
-   * Getter for line and column number. 
+   * Getter for line and column number.
    * @return two element array of line and column number
    */
   public int[] lineCol() {
     if(lc == null) lc = lineCol(query, Math.min(pos - 1, query.length()));
     return lc;
   }
-  
+
   /**
    * Calculates the column and line number of a given offset in the string.
    * @param qu query string
@@ -51,7 +51,7 @@ public final class InputInfo {
     }
     return lc;
   }
-  
+
   @Override
   public String toString() {
     final int[] p = lineCol();
