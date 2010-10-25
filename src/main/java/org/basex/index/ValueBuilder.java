@@ -126,12 +126,12 @@ public final class ValueBuilder extends IndexBuilder {
       min = 0;
       ml.reset();
       for(int i = 0; i < csize; ++i) {
-        if(min == i || vm[i].token.length == 0) continue;
+        if(min == i || vm[i].pre.length == 0) continue;
         final int d = diff(vm[min].token, vm[i].token);
-        if(d > 0 || vm[min].token.length == 0) {
+        if(d > 0 || vm[min].pre.length == 0) {
           min = i;
           ml.reset();
-        } else if(d == 0 && vm[i].token.length != 0) {
+        } else if(d == 0 && vm[i].pre.length != 0) {
           if(ml.size() == 0) ml.add(min);
           ml.add(i);
         }
