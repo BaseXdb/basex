@@ -58,6 +58,7 @@ public final class ServerQueryExample {
     // Loop through all results
     while(query.more()) {
       System.out.print(query.next());
+      System.out.print(" ");
     }
 
     // close iterator
@@ -70,9 +71,10 @@ public final class ServerQueryExample {
     // Create query instance
     query = session.query("1 to 4");
 
-    // Loop through all results
+    // Loop through all results (faster)
     while(query.more()) {
       query.next(System.out);
+      System.out.print(" ");
     }
 
     // close iterator
