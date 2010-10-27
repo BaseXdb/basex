@@ -48,18 +48,18 @@ public final class XQFTTS extends W3CTS {
   @Override
   void init(final Nodes root) throws Exception {
     Util.outln("Caching Full-text Structures...");
-    for(final int s : nodes("//*:stopwords", root).nodes) {
+    for(final int s : nodes("//*:stopwords", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       stop.put(text("@uri", srcRoot), val);
       stop2.put(text("@ID", srcRoot), val);
     }
-    for(final int s : nodes("//*:stemming-dictionary", root).nodes) {
+    for(final int s : nodes("//*:stemming-dictionary", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       stem.put(text("@ID", srcRoot), val);
     }
-    for(final int s : nodes("//*:thesaurus", root).nodes) {
+    for(final int s : nodes("//*:thesaurus", root).list) {
       final Nodes srcRoot = new Nodes(s, data);
       final String val = (path + text("@FileName", srcRoot)).replace('\\', '/');
       thes.put(text("@uri", srcRoot), val);
