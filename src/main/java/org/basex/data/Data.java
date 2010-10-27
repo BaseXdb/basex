@@ -132,6 +132,14 @@ public abstract class Data {
   }
 
   /**
+   * Checks if the database contains no documents.
+   * @return result of check
+   */
+  public final boolean empty() {
+    return meta.size == 1;
+  }
+
+  /**
    * Internal method to close the database.
    * @throws IOException I/O exception
    */

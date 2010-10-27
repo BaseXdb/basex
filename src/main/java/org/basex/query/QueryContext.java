@@ -567,15 +567,17 @@ public final class QueryContext extends Progress {
     // build root path
     final byte[] start = endsWith(exact, slash) ? exact : concat(exact, slash);
 
-    for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
-      final DBNode dbn = new DBNode(data, p);
-      if(all) {
-        // add all documents
-        col.add(dbn);
-      } else {
-        // add documents which match specified input path
-        final byte[] path = concat(slash, lc(data.text(p, true)));
-        if(eq(path, exact) || startsWith(path, start)) col.add(dbn);
+    if(!data.empty()) {
+      for(int p = 0; p < data.meta.size; p += data.size(p, Data.DOC)) {
+        final DBNode dbn = new DBNode(data, p);
+        if(all) {
+          // add all documents
+          col.add(dbn);
+        } else {
+          // add documents which match specified input path
+          final byte[] path = concat(slash, lc(data.text(p, true)));
+          if(eq(path, exact) || startsWith(path, start)) col.add(dbn);
+        }
       }
     }
     addColl(col, token(data.meta.name));
