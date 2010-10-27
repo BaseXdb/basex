@@ -347,6 +347,7 @@ pc_index=Creating Indexes
 pc_update=The database format has changed; please create a new database.
 pc_indupdate=The index format has changed; please create new indexes.
 pc_cancel=Database creation was canceled.
+pc_finish=Finishing
 pc_indextxt=Indexing Text
 pc_indexatt=Indexing Attributes
 pc_indexftx=Indexing Full-Text

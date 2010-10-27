@@ -1,6 +1,5 @@
 package org.basex.build.xml;
 
-import static org.basex.core.Text.*;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import org.basex.build.Builder;
@@ -92,11 +91,6 @@ public final class DirParser extends Parser {
         if(Util.debug && (++c & 0x3FF) == 0) Util.err(";");
       }
     }
-  }
-
-  @Override
-  public String tit() {
-    return parser != null ? parser.tit() : PROGCREATE;
   }
 
   @Override

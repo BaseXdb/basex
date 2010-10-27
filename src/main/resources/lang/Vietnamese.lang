@@ -345,6 +345,7 @@ pc_index=Đang tạo Indexes
 pc_update=Định dạng cơ sở dữ liệu đã bị đổi; xin tạo cơ sở dữ liệu mới.
 pc_indupdate=Định dạng index đã bị đổi; xin tạo index mới.
 pc_cancel=Việc tạo cơ sở dữ liệu đã bị hủy.
+pc_finish=Finishing
 pc_indextxt=Đang index văn bản
 pc_indexatt=Đang index thuộc tính
 pc_indexftx=Đang index nội dung

@@ -92,11 +92,6 @@ public final class DOCWrapper extends Parser {
   }
 
   @Override
-  public String tit() {
-    return PROGCREATE;
-  }
-
-  @Override
   public String det() {
     return Util.info(NODESPARSED, filename, nodes);
   }

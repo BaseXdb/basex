@@ -347,6 +347,7 @@ pc_index=Indizes werden erzeugt
 pc_update=Das Datenbankformat hat sich geändert; bitte erstellen Sie eine neue Datenbank.
 pc_indupdate=Das Indexformat hat sich geändert; bitte erstellen Sie neue Indizes.
 pc_cancel=Die Erzeugung der Datenbank wurde abgebrochen.
+pc_finish=Beenden
 pc_indextxt=Indiziere Texte
 pc_indexatt=Indiziere Attribute
 pc_indexftx=Indiziere Volltext

@@ -1,6 +1,5 @@
 package org.basex.build;
 
-import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.io.IO;
@@ -45,9 +44,4 @@ public abstract class FileParser extends Parser {
    * @throws IOException I/O exception
    */
   protected abstract void parse() throws IOException;
-
-  @Override
-  public String tit() {
-    return PROGCREATE;
-  }
 }

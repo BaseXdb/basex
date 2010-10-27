@@ -347,6 +347,7 @@ pc_index=インデックスを作成中です。
 pc_update=データベース形式を変更しました。新しいデータベースを作成して下さい。
 pc_indupdate=インデックス形式を変更しました。新しくインデックスを作成して下さい。
 pc_cancel=データベース作成処理はキャンセルされました。
+pc_finish=Finishing
 pc_indextxt=テキストインデックスを作成中です。
 pc_indexatt=属性インデックスを作成中です。
 pc_indexftx=全文インデックスを作成中です。

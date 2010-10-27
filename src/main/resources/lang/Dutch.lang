@@ -347,6 +347,7 @@ pc_index=Bezig de Indexen te maken
 pc_update=Het database formaat is gewijzigd; maak een nieuwe database.
 pc_indupdate=Het index formaat is gewijzigd; maak nieuwe indexen.
 pc_cancel=Database creatie is geannuleerd.
+pc_finish=Finishing
 pc_indextxt=Text Indexeren
 pc_indexatt=Attributen Indexeren
 pc_indexftx=Full-Text Indexeren

@@ -149,11 +149,6 @@ public final class SAXWrapper extends FileParser {
   }
 
   @Override
-  public String tit() {
-    return PROGCREATE;
-  }
-
-  @Override
   public String det() {
     return length == 0 ? super.det() : Util.info(SCANPOS, file.name(), line);
   }

@@ -365,7 +365,7 @@ public interface Text {
 
   /** Create database information. */
   String PROGCREATE = lang("pc_create");
-  /** Create database information. */
+  /** Create index information. */
   String PROGINDEX = lang("pc_index");
   /** Database update. */
   String DBUPDATE = lang("pc_update");
@@ -378,11 +378,13 @@ public interface Text {
   /** Scanner position. */
   String SCANPOS = lang("pc_pos");
 
-  /** Create database index. */
+  /** Finish database creation. */
+  String DBFINISH = lang("pc_finish") + DOTS;
+  /** Create text index. */
   String INDEXTXT = lang("pc_indextxt") + DOTS;
-  /** Create database index. */
+  /** Create attribute index. */
   String INDEXATT = lang("pc_indexatt") + DOTS;
-  /** Create database index. */
+  /** Create full-text index. */
   String INDEXFTX = lang("pc_indexftx") + DOTS;
 
   /** Database created. */

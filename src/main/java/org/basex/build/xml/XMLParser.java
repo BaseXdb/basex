@@ -1,7 +1,6 @@
 package org.basex.build.xml;
 
 import static org.basex.build.BuildText.*;
-import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
 import java.io.IOException;
 import org.basex.build.BuildException;
@@ -158,11 +157,6 @@ public class XMLParser extends FileParser {
    */
   private void skipSpace() throws IOException {
     if(scanner.type == Type.WS) scanner.more();
-  }
-
-  @Override
-  public String tit() {
-    return PROGCREATE;
   }
 
   @Override

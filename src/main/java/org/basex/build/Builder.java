@@ -217,17 +217,17 @@ public abstract class Builder extends Progress {
 
   @Override
   public final String tit() {
-    return parser.tit();
+    return PROGCREATE;
   }
 
   @Override
   public final String det() {
-    return parser.det();
+    return spos == 0 ? parser.det() : DBFINISH;
   }
 
   @Override
   public final double prog() {
-    return parser.prog();
+    return spos == 0 ? parser.prog() : (double) spos / ssize;
   }
 
   // ABSTRACT METHODS =========================================================

@@ -347,6 +347,7 @@ pc_index=Création index en cours
 pc_update=Le format de base de données a changé ; Veuillez créer une nouvelle base de données.
 pc_indupdate=Le format des index a changé ;  Veuillez créer de nouveaux indexes.
 pc_cancel=La création de la base de données a été annulée.
+pc_finish=Termination
 pc_indextxt=Indexation du texte en cours
 pc_indexatt=Indexation des attributs en cours
 pc_indexftx=Indexation plein texte en cours
