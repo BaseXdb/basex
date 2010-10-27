@@ -89,11 +89,6 @@ final class XMLStreamWrapper extends Parser {
   }
 
   @Override
-  public String tit() {
-    return PROGCREATE;
-  }
-
-  @Override
   public String det() {
     return Util.info(NODESPARSED, file.name(), nodes);
   }
