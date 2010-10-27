@@ -27,8 +27,6 @@ public final class Nodes implements Result {
   public int[] nodes;
   /** Sorted pre values. */
   public int[] sorted;
-  /** Number of stored nodes. */
-  private int size;
 
   /**
    * Constructor, specifying a database instance.
@@ -77,22 +75,40 @@ public final class Nodes implements Result {
    */
   public Nodes(final int[] n) {
     nodes = n;
-    size = nodes.length;
     ftpos = null;
   }
 
   @Override
   public long size() {
-    return size;
+    return nodes.length;
   }
 
   @Override
   public boolean sameAs(final Result v) {
-    if(!(v instanceof Nodes) || v.size() != size) return false;
+    final int s = nodes.length;
+    if(!(v instanceof Nodes) || v.size() != s) return false;
     final Nodes n = (Nodes) v;
     if(data != n.data) return false;
-    for(int c = 0; c < size; ++c) if(n.nodes[c] != nodes[c]) return false;
+    for(int c = 0; c < s; ++c) if(n.nodes[c] != nodes[c]) return false;
     return ftpos == null || ftpos.sameAs(n.ftpos);
+  }
+
+  /**
+   * Checks if the node set contains all root nodes of the data instance,
+   * and sets the {@link #root} flag.
+   * @return self reference
+   */
+  public Nodes checkRoot() {
+    root = true;
+    int c = 0;
+    for(int p = 0; c < nodes.length && p < data.meta.size;
+      ++c, p += data.size(p, Data.DOC)) {
+      if(p != nodes[c]) {
+        root = false;
+        break;
+      }
+    }
+    return this;
   }
 
   /**
@@ -180,7 +196,6 @@ public final class Nodes implements Result {
    */
   private void set(final int[] n) {
     nodes = n;
-    size = n.length;
     sorted = null;
   }
 
@@ -193,7 +208,7 @@ public final class Nodes implements Result {
     int i = Integer.MIN_VALUE;
     for(final int n : nodes) {
       if(i > n) {
-        sorted = Arrays.copyOf(nodes, size);
+        sorted = Arrays.copyOf(nodes, nodes.length);
         Arrays.sort(sorted);
         return;
       }
@@ -204,7 +219,7 @@ public final class Nodes implements Result {
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < size && !ser.finished(); ++c) serialize(ser, c);
+    for(int c = 0; c < nodes.length && !ser.finished(); ++c) serialize(ser, c);
   }
 
   @Override
@@ -217,7 +232,7 @@ public final class Nodes implements Result {
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
-    for(int i = 0; i < size; ++i) {
+    for(int i = 0; i < nodes.length; ++i) {
       if(i > 0) tb.add(',');
       tb.addNum(nodes[i]);
     }

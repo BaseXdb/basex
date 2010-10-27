@@ -155,7 +155,7 @@ final class TableData {
     if(cols.length == 0) return;
 
     final Nodes n = context.current;
-    if(!create && n.root) {
+    if(!create && n.root && rootRows != null) {
       rows = rootRows;
       sortCol = -1;
     } else {
