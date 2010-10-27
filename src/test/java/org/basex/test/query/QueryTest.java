@@ -110,6 +110,14 @@ public abstract class QueryTest {
 
   /**
    * Creates a container for the specified node values.
+   * @return node array
+   */
+  static ItemIter empty() {
+    return new ItemIter(new Item[] {}, 0);
+  }
+
+  /**
+   * Creates a container for the specified node values.
    * @param nodes node values
    * @return node array
    */

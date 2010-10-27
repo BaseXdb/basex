@@ -13,6 +13,7 @@ import org.basex.query.IndexContext;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.item.DBNode;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.SeqType;
 import org.basex.query.iter.Iter;
@@ -57,7 +58,7 @@ public final class IndexAccess extends Single {
       iter = tmp;
       iter[s] = index(it.atom());
     }
-    return iter.length == 0 ? Iter.EMPTY : iter.length == 1 ? iter[0] :
+    return iter.length == 0 ? Empty.ITER : iter.length == 1 ? iter[0] :
       new Union(input, expr).eval(iter);
   }
 

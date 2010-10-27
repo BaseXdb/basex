@@ -362,9 +362,8 @@ public final class GUI extends JFrame {
   public void xquery(final String qu, final boolean main) {
     // check and add default namespace
     final Namespaces ns = context.data.ns;
-    final int u = ns.uri(Token.EMPTY, 0);
-    // [CG] fix for empty sequences
     String in = qu.trim().isEmpty() ? "()" : qu;
+    final int u = ns.uri(Token.EMPTY, 0);
     if(u != 0) in = Util.info("declare default element namespace \"%\"; %",
         ns.uri(u), in);
     execute(new XQuery(in), main);
@@ -482,7 +481,8 @@ public final class GUI extends JFrame {
       } else {
         // get query result
         final Result result = c.result();
-        final Nodes nodes = result instanceof Nodes ? (Nodes) result : null;
+        final Nodes nodes = result instanceof Nodes && 
+          ((Nodes) result).size() != 0 ? (Nodes) result : null;
 
         // treat text view different to other views
         // [CG] fix for empty sequences
@@ -508,7 +508,7 @@ public final class GUI extends JFrame {
           final Nodes nd = context.current;
           if(nd != null && !nd.sameAs(current) || prop.is(GUIProp.FILTERRT)) {
             // refresh context if at least one node was found
-            if(nodes != null && nodes.size() != 0) {
+            if(nodes != null) {
               notify.context((Nodes) result, prop.is(GUIProp.FILTERRT), null);
             }
           } else if(marked != null) {

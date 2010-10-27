@@ -48,7 +48,6 @@ import org.basex.util.Array;
 import org.basex.util.InputInfo;
 import org.basex.util.IntList;
 import org.basex.util.StringList;
-import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.Tokenizer;
 import org.basex.util.Util;
@@ -299,10 +298,11 @@ public final class QueryContext extends Progress {
       }
 
       // completed... return standard nodeset with full-text positions
-      if(i == null) return new Nodes(pre.toArray(), data, ftpos).checkRoot();
+      final int ps = pre.size();
+      if(i == null)
+        return ps == 0 ? ir : new Nodes(pre.toArray(), data, ftpos).checkRoot();
 
       // otherwise, add nodes to standard iterator
-      final int ps = pre.size();
       for(int p = 0; p < ps; ++p) ir.add(new DBNode(data, pre.get(p)));
       ir.add(i);
     }
@@ -543,7 +543,7 @@ public final class QueryContext extends Progress {
           addDocs(doc(input, true, false, ii), EMPTY);
         } else {
           addDocs(doc(substring(input, 0, s), true, false, ii),
-              lc(substring(input, s + 1)));
+              substring(input, s + 1));
         }
       }
     }
@@ -558,21 +558,24 @@ public final class QueryContext extends Progress {
   private void addDocs(final DBNode db, final byte[] input) {
     final NodIter col = new NodIter();
     final Data data = db.data;
-    final boolean rt = input.length == 0;
 
-    final byte[] path = endsWith(input, token("/")) ? concat(token("/"), input)
-        : concat(token("/"), input, token("/"));
+    final boolean all = input.length == 0;
+    final byte[] slash = token("/");
+    // build exact path: remove redundant slashes and switch to lower case
+    final byte[] exact = lc(concat(slash,
+        token(string(input).replaceAll("/+", "/"))));
+    // build root path
+    final byte[] start = endsWith(exact, slash) ? exact : concat(exact, slash);
+
     for(int p = 0; p < data.meta.size; p += data.size(p, data.kind(p))) {
       final DBNode dbn = new DBNode(data, p);
-      if(rt) {
+      if(all) {
         // add all documents
         col.add(dbn);
       } else {
         // add documents which match specified input path
-        final byte[] name = lc(Token.concat(Token.token("/"),
-            data.text(p, true)));
-        if(eq(name, concat(token("/"), input)) || startsWith(name, path))
-          col.add(dbn);
+        final byte[] path = concat(slash, lc(data.text(p, true)));
+        if(eq(path, exact) || startsWith(path, start)) col.add(dbn);
       }
     }
     addColl(col, token(data.meta.name));

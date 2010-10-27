@@ -93,11 +93,11 @@ public class FNFileTest extends QueryTest {
     queries = new Object[][] {
 
         // /_tmpdir_/testDir1/test1
-        { "Test file:mkdir()", nod(),
+        { "Test file:mkdir()", empty(),
             "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR1 + "\")" },
 
         // /_tmpdir_/testDir1/test2/test3
-        { "Test file:mkdir() with $recursive = fn:true()", nod(),
+        { "Test file:mkdir() with $recursive = fn:true()", empty(),
             "file:mkdir(\"" + dir1.getPath() + Prop.SEP + DIR2 + Prop.SEP
                 + DIR3 + "\", fn:true())"},
 
@@ -129,38 +129,38 @@ public class FNFileTest extends QueryTest {
             "file:read-binary(\"" + fileCopy.getPath() + "\")" },
 
          // /_tmpdir_/testDir1/fileWrite
-        { "Test file:write()", nod(),
+        { "Test file:write()", empty(),
             "file:write(\"" + dir1.getPath() + Prop.SEP + TESTWRITE + "\"," +
             "//Name/Vorname, "  + "(<indent>yes</indent>))" },
 
          // /_tmpdir_/testDir1/fileCopy
-        { "Test file:write() with $append = true", nod(),
+        { "Test file:write() with $append = true", empty(),
             "file:write(\"" + fileCopy.getPath()
             + "\", //Name/Vorname, (<indent>yes</indent>), fn:true())" },
 
         // /_tmpdir_/testDir1/fileWriteBin
-        { "Test file:write-binary()", nod(),
+        { "Test file:write-binary()", empty(),
             "file:write-binary(\"" + dir1.getPath() + Prop.SEP + TESTWRITEBIN +
             "\", \"aGF0\" cast as xs:base64Binary)" },
 
         // src:  /_tmpdir_/testDir1/fileCopy
         // dest: /_tmpdir_/testDir2/fileCopy
-        { "Test file:copy() with $overwrite = true", nod(),
+        { "Test file:copy() with $overwrite = true", empty(),
             "file:copy(\"" + fileCopy.getPath() + "\", \"" +
             dir2.getPath() + Prop.SEP + TESTCOPY + "\", fn:true())" },
 
         // src:  /_tmpdir_/testDir1
         // dest: /_tmpdir_/testDir2
-        { "Test file:move()", nod(),
+        { "Test file:move()", empty(),
             "file:move(\"" + fileMove.getPath() + "\", \"" +
             dir2.getPath() + "\")" },
 
         // /_tmpdir_/testDir1/fileDel
-        { "Test file:delete()", nod(),
+        { "Test file:delete()", empty(),
             "file:delete(\"" + fileDel.getPath() + "\")" },
 
         // /_tmpdir_/testDir1/testDelDir1/testDelDir2
-        { "Test file:delete() with $recursive = true", nod(),
+        { "Test file:delete() with $recursive = true", empty(),
                 "file:delete(\"" + dirDel.getParentFile().getPath()
                 + "\", fn:true())" },
 
@@ -177,7 +177,7 @@ public class FNFileTest extends QueryTest {
         { "Test file:exists()", bool(true),
             "file:file-exists(\"" + fileCopy.getPath() + "\")"},
 
-        { "Test file:files()", nod(), "file:files(\"etc\", "
+        { "Test file:files()", empty(), "file:files(\"etc\", "
               + "fn:true(),\"[^z]\")"},
 
         // /_tmpdir_/testDir1/fileCopy

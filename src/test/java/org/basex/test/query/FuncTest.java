@@ -212,7 +212,7 @@ public final class FuncTest extends QueryTest {
       { "lang 2", nod(3), "//desc[lang('en-US')]" },
       { "lang 3", nod(7), "//desc[lang('fr')]" },
       { "lang 4", nod(5), "//desc/line[lang('en')]" },
-      { "lang 5", nod(),  "/.[lang('en-US')]" },
+      { "lang 5", empty(),  "/.[lang('en-US')]" },
       { "lang 6", nod(7), "//desc[lang('FR')]" },
     };
   }

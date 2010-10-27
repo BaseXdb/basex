@@ -93,7 +93,7 @@ public class Filter extends Preds {
       final long l = it.itr(input);
       final Expr e = Pos.get(l, l, input);
       // don't accept fractional numbers
-      if(l != it.dbl(input) || !(e instanceof Pos)) return Iter.EMPTY;
+      if(l != it.dbl(input) || !(e instanceof Pos)) return Empty.ITER;
       pos = (Pos) e;
       return new IterPosFilter(this).iter(ctx);
     }

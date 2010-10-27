@@ -8,6 +8,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Expr;
 import org.basex.query.item.Bln;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.Str;
@@ -141,7 +142,7 @@ final class FNStr extends Fun {
    * @throws QueryException query exception
    */
   private Iter str2cp(final Item it) throws QueryException {
-    if(it == null) return Iter.EMPTY;
+    if(it == null) return Empty.ITER;
     final byte[] s = checkEStr(it);
 
     return new Iter() {

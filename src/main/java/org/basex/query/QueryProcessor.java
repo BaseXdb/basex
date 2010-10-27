@@ -148,7 +148,12 @@ public final class QueryProcessor extends Progress {
    */
   public Nodes queryNodes() throws QueryException {
     final Result res = execute();
-    if(!(res instanceof Nodes)) QUERYNODES.thrw(null);
+    if(!(res instanceof Nodes)) {
+      // convert empty result to node set
+      if(res.size() == 0) return new Nodes(ctx.nodes.data);
+      // otherwise, throw error
+      QUERYNODES.thrw(null);
+    }
     return (Nodes) res;
   }
 

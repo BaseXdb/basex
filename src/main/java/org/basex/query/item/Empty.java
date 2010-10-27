@@ -4,7 +4,6 @@ import static org.basex.query.QueryTokens.*;
 import java.io.IOException;
 import org.basex.data.Serializer;
 import org.basex.query.QueryContext;
-import org.basex.query.iter.Iter;
 import org.basex.query.iter.ValueIter;
 import org.basex.util.InputInfo;
 import org.basex.util.Token;
@@ -18,6 +17,13 @@ import org.basex.util.Token;
 public final class Empty extends Value {
   /** Single instance. */
   public static final Empty SEQ = new Empty();
+  /** Empty iterator. */
+  public static final ValueIter ITER = new ValueIter() {
+    @Override public Item next() { return null; }
+    @Override public Value finish() { return SEQ; }
+    @Override public long size() { return 0; }
+    @Override public boolean reset() { return true; }
+  };
 
   /**
    * Private constructor.
@@ -48,7 +54,7 @@ public final class Empty extends Value {
 
   @Override
   public ValueIter iter() {
-    return Iter.EMPTY;
+    return ITER;
   }
 
   @Override

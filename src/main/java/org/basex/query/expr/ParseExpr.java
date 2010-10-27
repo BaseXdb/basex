@@ -45,7 +45,7 @@ public abstract class ParseExpr extends Expr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final Item it = item(ctx, input);
-    return it != null ? it.iter() : Iter.EMPTY;
+    return it != null ? it.iter() : Empty.ITER;
   }
 
   @Override

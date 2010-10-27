@@ -47,7 +47,6 @@ public final class FLWR extends FLWOR {
   public Iter iter(final QueryContext ctx) {
     return new Iter() {
       private Iter[] iter;
-      private long[] sizes;
       private Iter rtrn;
       private int p;
 
@@ -75,44 +74,9 @@ public final class FLWR extends FLWOR {
       }
 
       @Override
-      public long size() throws QueryException {
-        // expected: a single return item and a missing where clause
-        if(where != null || !ret.type().one()) return -1;
-
-        // check if the number of returned items is known for all iterators
-        init();
-        long s = 1;
-        sizes = new long[fl.length];
-        for(int f = 0; f != fl.length; ++f) {
-          sizes[f] = iter[f].size();
-          if(sizes[f] == -1) return -1;
-          s *= sizes[f];
-        }
-        return s;
-      }
-
-      @Override
-      public Item get(final long i) throws QueryException {
-        // only called for a single return item and a missing where clause
-        long s = 1;
-        for(int f = 1; f != fl.length; ++f) s *= sizes[f];
-
-        // calculate variable positions and call iterators
-        long o = i;
-        for(int f = 0; f != fl.length; ++f) {
-          if(f != 0) s /= sizes[f];
-          final long n = o / s;
-          iter[f].get(n);
-          o -= n * s;
-        }
-        return ret.item(ctx, input);
-      }
-
-      @Override
       public boolean reset() {
         if(iter != null) {
           for(final Iter i : iter) i.reset();
-          sizes = null;
           iter = null;
           rtrn = null;
           p = 0;

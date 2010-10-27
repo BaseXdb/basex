@@ -4,6 +4,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.CmpV;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Item;
 import org.basex.query.item.Itr;
 import org.basex.query.item.SeqType;
@@ -92,10 +93,10 @@ final class FNSeq extends Fun {
    */
   private Iter tail(final QueryContext ctx) throws QueryException {
     final Expr e = expr[0];
-    if(e.type().zeroOrOne()) return Iter.EMPTY;
+    if(e.type().zeroOrOne()) return Empty.ITER;
 
     final Iter ir = e.iter(ctx);
-    if(ir.next() == null) return Iter.EMPTY;
+    if(ir.next() == null) return Empty.ITER;
 
     return new Iter() {
       @Override
@@ -212,13 +213,13 @@ final class FNSeq extends Fun {
    */
   private Iter subsequence(final QueryContext ctx) throws QueryException {
     final double ds = checkDbl(expr[1], ctx);
-    if(Double.isNaN(ds)) return Iter.EMPTY;
+    if(Double.isNaN(ds)) return Empty.ITER;
     final long s = StrictMath.round(ds);
 
     long l = Long.MAX_VALUE;
     if(expr.length > 2) {
       final double dl = checkDbl(expr[2], ctx);
-      if(Double.isNaN(dl)) return Iter.EMPTY;
+      if(Double.isNaN(dl)) return Empty.ITER;
       l = s + StrictMath.round(dl);
     }
     final long e = l;

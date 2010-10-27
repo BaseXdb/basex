@@ -51,7 +51,7 @@ public final class Range extends Arr {
   @Override
   public Iter iter(final QueryContext ctx) throws QueryException {
     final long[] v = rng(ctx);
-    return v == null || v[0] > v[1] ? Iter.EMPTY :
+    return v == null || v[0] > v[1] ? Empty.ITER :
       v[0] == v[1] ? Itr.get(v[0]).iter(ctx) : new RangeIter(v[0], v[1]);
   }
 

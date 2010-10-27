@@ -18,6 +18,7 @@ import org.basex.query.QueryContext;
 import org.basex.query.QueryException;
 import org.basex.query.expr.Arr;
 import org.basex.query.expr.Expr;
+import org.basex.query.item.Empty;
 import org.basex.query.item.Jav;
 import org.basex.query.item.Type;
 import org.basex.query.item.Value;
@@ -90,7 +91,7 @@ public final class FunJava extends Arr {
       Util.debug(ex);
       FUNJAVA.thrw(input, desc());
     }
-    return result == null ? Iter.EMPTY : iter(result, ctx);
+    return result == null ? Empty.ITER : iter(result, ctx);
   }
 
   /**
