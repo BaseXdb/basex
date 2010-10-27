@@ -170,7 +170,7 @@ public final class TreeView extends View implements TreeViewOptions {
     super.paintComponent(g);
     gui.painting = true;
 
-    roots = gui.context.current.nodes;
+    roots = gui.context.current.list;
     if(roots.length == 0) return;
 
     for(int i = 0; !showAtts && i < roots.length; ++i) {
@@ -580,7 +580,7 @@ public final class TreeView extends View implements TreeViewOptions {
     smooth(mg);
     mg.setFont(font);
 
-    final int[] mark = gui.context.marked.nodes;
+    final int[] mark = gui.context.marked.list;
     if(mark.length == 0) return;
 
     int rn = 0;

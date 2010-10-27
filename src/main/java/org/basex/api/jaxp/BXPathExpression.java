@@ -98,7 +98,7 @@ final class BXPathExpression implements XPathExpression {
       if(nodes.size() == 0) return null;
       final Data data = nodes.data;
       return res == XPathConstants.NODESET ? new BXNList(nodes) :
-        new DBNode(data, nodes.nodes[0]).toJava();
+        new DBNode(data, nodes.list[0]).toJava();
     }
 
     try {

@@ -129,7 +129,7 @@ public final class FolderView extends View {
     scroll.pos(0);
 
     final Nodes curr = gui.context.current;
-    if(more && curr.size() != 0) jumpTo(curr.nodes[0], true);
+    if(more && curr.size() != 0) jumpTo(curr.list[0], true);
     refreshHeight();
     repaint();
   }
@@ -154,7 +154,7 @@ public final class FolderView extends View {
     scroll.pos(0);
 
     final Nodes marked = gui.context.marked;
-    if(marked.size() != 0) jumpTo(marked.nodes[0], true);
+    if(marked.size() != 0) jumpTo(marked.list[0], true);
     refreshHeight();
     repaint();
   }
@@ -520,11 +520,11 @@ public final class FolderView extends View {
     // calculate new tree position
     gui.context.focused = -1;
     final Nodes curr = gui.context.current;
-    int pre = curr.nodes[0];
+    int pre = curr.list[0];
     final FolderIterator it = new FolderIterator(this);
     while(it.more() && focus-- != 0) pre = it.pre;
 
-    if(pre == curr.nodes[0] && down) ++pre;
+    if(pre == curr.list[0] && down) ++pre;
     gui.notify.focus(pre, this);
     jumpTo(pre, false);
     repaint();

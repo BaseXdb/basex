@@ -24,7 +24,7 @@ public final class Nodes implements Result {
   /** Root node. */
   public Data data;
   /** Pre values container. */
-  public int[] nodes;
+  public int[] list;
   /** Sorted pre values. */
   public int[] sorted;
 
@@ -74,22 +74,22 @@ public final class Nodes implements Result {
    * @param n node set
    */
   public Nodes(final int[] n) {
-    nodes = n;
+    list = n;
     ftpos = null;
   }
 
   @Override
   public long size() {
-    return nodes.length;
+    return list.length;
   }
 
   @Override
   public boolean sameAs(final Result v) {
-    final int s = nodes.length;
+    final int s = list.length;
     if(!(v instanceof Nodes) || v.size() != s) return false;
     final Nodes n = (Nodes) v;
     if(data != n.data) return false;
-    for(int c = 0; c < s; ++c) if(n.nodes[c] != nodes[c]) return false;
+    for(int c = 0; c < s; ++c) if(n.list[c] != list[c]) return false;
     return ftpos == null || ftpos.sameAs(n.ftpos);
   }
 
@@ -101,9 +101,9 @@ public final class Nodes implements Result {
   public Nodes checkRoot() {
     root = true;
     int c = 0;
-    for(int p = 0; c < nodes.length && p < data.meta.size;
+    for(int p = 0; c < list.length && p < data.meta.size;
       ++c, p += data.size(p, Data.DOC)) {
-      if(p != nodes[c]) {
+      if(p != list[c]) {
         root = false;
         break;
       }
@@ -137,7 +137,7 @@ public final class Nodes implements Result {
    */
   public void toggle(final int p) {
     final int[] n = new int[] { p };
-    set(contains(p) ? except(nodes, n) : union(nodes, n));
+    set(contains(p) ? except(list, n) : union(list, n));
   }
 
   /**
@@ -145,7 +145,7 @@ public final class Nodes implements Result {
    * @param p pre value
    */
   public void union(final int[] p) {
-    set(union(nodes, p));
+    set(union(list, p));
   }
 
   /**
@@ -195,7 +195,7 @@ public final class Nodes implements Result {
    * @param n values
    */
   private void set(final int[] n) {
-    nodes = n;
+    list = n;
     sorted = null;
   }
 
@@ -206,35 +206,35 @@ public final class Nodes implements Result {
   private void sort() {
     if(sorted != null) return;
     int i = Integer.MIN_VALUE;
-    for(final int n : nodes) {
+    for(final int n : list) {
       if(i > n) {
-        sorted = Arrays.copyOf(nodes, nodes.length);
+        sorted = Arrays.copyOf(list, list.length);
         Arrays.sort(sorted);
         return;
       }
       i = n;
     }
-    sorted = nodes;
+    sorted = list;
   }
 
   @Override
   public void serialize(final Serializer ser) throws IOException {
-    for(int c = 0; c < nodes.length && !ser.finished(); ++c) serialize(ser, c);
+    for(int c = 0; c < list.length && !ser.finished(); ++c) serialize(ser, c);
   }
 
   @Override
   public void serialize(final Serializer ser, final int n) throws IOException {
     ser.openResult();
-    ser.node(data, nodes[n], ftpos);
+    ser.node(data, list[n], ftpos);
     ser.closeResult();
   }
 
   @Override
   public String toString() {
     final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
-    for(int i = 0; i < nodes.length; ++i) {
+    for(int i = 0; i < list.length; ++i) {
       if(i > 0) tb.add(',');
-      tb.addNum(nodes[i]);
+      tb.addNum(list[i]);
     }
     tb.add(']');
     return tb.toString();

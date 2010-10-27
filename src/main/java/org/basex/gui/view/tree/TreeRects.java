@@ -39,7 +39,7 @@ final class TreeRects implements TreeViewOptions {
    */
   double generateRects(final TreeSubtree sub, final Graphics g,
       final Context c, final int ds, final int dw, final boolean slim) {
-    final int[] roots = c.current.nodes;
+    final int[] roots = c.current.list;
     final int rl = roots.length;
     if(rl == 0) return 0;
     final double w = (dw - BORDER_PADDING - ds) / (double) rl;
@@ -172,7 +172,7 @@ final class TreeRects implements TreeViewOptions {
    */
   byte[] getText(final Context c, final int rn, final int pre) {
     final Data d = c.data;
-    if(pre == c.current.nodes[rn]) return ViewData.path(d, pre);
+    if(pre == c.current.list[rn]) return ViewData.path(d, pre);
     if(d.fs != null && d.kind(pre) != Data.TEXT || d.kind(pre) == Data.ELEM)
       return ViewData.tag(
         prop, d, pre);

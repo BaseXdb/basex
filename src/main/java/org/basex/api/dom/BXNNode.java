@@ -28,7 +28,7 @@ public final class BXNNode extends BXNList implements NamedNodeMap {
     final int s = getLength();
     for(int i = 0; i < s; ++i) {
       final byte[] n = xquery != null ? xquery.get(i).nname() :
-        nodes.data.name(nodes.nodes[i], Data.ELEM);
+        nodes.data.name(nodes.list[i], Data.ELEM);
       if(Token.eq(n, nm)) return item(i);
     }
     return null;

@@ -100,12 +100,12 @@ final class PlotData {
     final int itmID = data.tags.id(item);
 
     if(!sub) {
-      pres = ctx.nodes;
+      pres = ctx.list;
       Arrays.sort(pres);
       return;
     }
 
-    final int[] contextPres = ctx.nodes;
+    final int[] contextPres = ctx.list;
     for(int p : contextPres) {
       final int nl = p + data.size(p, Data.ELEM);
       while(p < nl) {

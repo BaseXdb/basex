@@ -28,9 +28,9 @@ public final class Cs extends AQuery {
       context.current = nodes;
       // determine if new context set refers to root documents
       final int[] docs = context.data.doc();
-      if(nodes.nodes.length != docs.length) return true;
+      if(nodes.list.length != docs.length) return true;
       for(int i = 0; i < docs.length; ++i) {
-        if(nodes.nodes[i] != docs[i]) return true;
+        if(nodes.list[i] != docs[i]) return true;
       }
       nodes.root = true;
     }

@@ -41,7 +41,7 @@ public class BXNList implements NodeList {
     if(xquery != null) {
       if(i < xquery.size()) n = xquery.get(i);
     } else {
-      if(i < nodes.size()) n = new DBNode(nodes.data, nodes.nodes[i]);
+      if(i < nodes.size()) n = new DBNode(nodes.data, nodes.list[i]);
     }
     return n != null ? n.toJava() : null;
   }

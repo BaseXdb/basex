@@ -433,7 +433,7 @@ public final class PlotView extends View {
 
     final Nodes marked = gui.context.marked;
     if(marked.size() == 0) return;
-    final int[] m = Arrays.copyOf(marked.nodes, marked.nodes.length);
+    final int[] m = Arrays.copyOf(marked.list, marked.list.length);
     int i = 0;
 
     // no child nodes of the marked context nodes are marked

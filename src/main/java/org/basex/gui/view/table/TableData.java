@@ -186,7 +186,7 @@ final class TableData {
    */
   private void createRows() {
     final Data data = context.data;
-    final int[] n = context.current.nodes;
+    final int[] n = context.current.list;
     final boolean fs = data.fs != null;
 
     rows = new IntList();

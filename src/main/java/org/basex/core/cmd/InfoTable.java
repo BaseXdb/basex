@@ -45,7 +45,7 @@ public final class InfoTable extends AQuery {
     final Data data = context.data;
     if(result != null) {
       final Table table = th();
-      for(final int n : ((Nodes) result).nodes) table(table, data, n);
+      for(final int n : ((Nodes) result).list) table(table, data, n);
       out.print(table.finish());
     } else {
       int ps = 0;

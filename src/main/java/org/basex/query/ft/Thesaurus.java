@@ -118,7 +118,7 @@ public final class Thesaurus {
           Parser.fileParser(file, ctx.prop, ""), ctx.prop);
       final Nodes result = nodes("//*:entry", new Nodes(0, data));
       for(int n = 0; n < result.size(); ++n) {
-        build(new Nodes(result.nodes[n], data));
+        build(new Nodes(result.list[n], data));
       }
     } catch(final IOException ex) {
       NOTHES.thrw(ii, file);
@@ -137,7 +137,7 @@ public final class Thesaurus {
 
     final ThesNode node = getNode(text("*:term", in));
     for(int n = 0; n < sub.size(); ++n) {
-      final Nodes tmp = new Nodes(sub.nodes[n], sub.data);
+      final Nodes tmp = new Nodes(sub.list[n], sub.data);
       final ThesNode snode = getNode(text("*:term", tmp));
       final byte[] rs = text("*:relationship", tmp);
       node.add(snode, rs);

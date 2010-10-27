@@ -291,7 +291,7 @@ public final class DeepFS implements DataText {
   private int path2pre(final String path) {
     try {
       final Nodes n = xquery(pn2xp(path, false));
-      return n.size() == 0 ? -1 : n.nodes[0];
+      return n.size() == 0 ? -1 : n.list[0];
     } catch(final QueryException ex) {
       Util.stack(ex);
       return -1;
@@ -306,7 +306,7 @@ public final class DeepFS implements DataText {
   private int[] path2preChildren(final String path) {
     try {
       final Nodes n = xquery(pn2xp(path, true) + "/child::*");
-      return n.nodes;
+      return n.list;
     } catch(final QueryException ex) {
       Util.stack(ex);
       return null;
@@ -462,7 +462,7 @@ public final class DeepFS implements DataText {
   private int parentPre(final String path) {
     try {
       final Nodes n = xquery(pn2xp(dirname(path), true));
-      return n.size() == 0 ? -1 : n.nodes[0];
+      return n.size() == 0 ? -1 : n.list[0];
     } catch(final QueryException ex) {
       Util.stack(ex);
       return -1;
@@ -495,7 +495,7 @@ public final class DeepFS implements DataText {
       if(!dir && cont) qb.append("/content");
       final Nodes n = xquery(qb.toString());
       if(n.size() == 0) return -1;
-      data.delete(n.nodes[0]);
+      data.delete(n.list[0]);
     } catch(final QueryException ex) {
       Util.stack(ex);
       return -1;

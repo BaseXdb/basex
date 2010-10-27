@@ -162,6 +162,6 @@ public class AddTest {
    * @return first document name
    */
   private String docName() {
-    return Token.string(CTX.data.text(CTX.current.nodes[0], true));
+    return Token.string(CTX.data.text(CTX.current.list[0], true));
   }
 }

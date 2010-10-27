@@ -94,7 +94,7 @@ public final class Context {
    * @return result of check
    */
   public int[] doc() {
-    return current.root ? current.nodes : data.doc();
+    return current.root ? current.list : data.doc();
   }
 
   /**

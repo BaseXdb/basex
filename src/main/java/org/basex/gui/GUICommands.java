@@ -268,7 +268,7 @@ public enum GUICommands implements GUICommand {
   COPYPATH(GUICPPATH, "% shift C", GUICPPATHTT, true, false) {
     @Override
     public void execute(final GUI gui) {
-      final int pre = gui.context.marked.nodes[0];
+      final int pre = gui.context.marked.list[0];
       final byte[] txt = ViewData.path(gui.context.data, pre);
       // copy path to clipboard
       final Clipboard clip = Toolkit.getDefaultToolkit().getSystemClipboard();
@@ -289,7 +289,7 @@ public enum GUICommands implements GUICommand {
     public void execute(final GUI gui) {
       final Context ctx = gui.context;
       final Nodes n = ctx.marked;
-      ctx.copied = new Nodes(n.nodes, n.data);
+      ctx.copied = new Nodes(n.list, n.data);
     }
 
     @Override
@@ -382,7 +382,7 @@ public enum GUICommands implements GUICommand {
     @Override
     public void execute(final GUI gui) {
       final Nodes n = gui.context.marked;
-      final DialogEdit edit = new DialogEdit(gui, n.nodes[0]);
+      final DialogEdit edit = new DialogEdit(gui, n.list[0]);
       if(!edit.ok()) return;
 
       String rename = null;
@@ -879,7 +879,7 @@ public enum GUICommands implements GUICommand {
       final Context ctx = gui.context;
       if(!ctx.root()) {
         boolean root = true;
-        for(final int pre : ctx.current.nodes) {
+        for(final int pre : ctx.current.list) {
           root &= ctx.data.kind(pre) == Data.DOC;
         }
         gui.execute(new Cs(root ? "/" : ".."));
@@ -1056,7 +1056,7 @@ public enum GUICommands implements GUICommand {
     if(n == null || (no.length == 0 ? n.size() < 1 : n.size() != 1))
       return false;
 
-    final int k = n.data.kind(n.nodes[0]);
+    final int k = n.data.kind(n.list[0]);
     for(final int i : no) if(k == i) return false;
     return true;
   }
@@ -1077,6 +1077,6 @@ public enum GUICommands implements GUICommand {
    * @return function string
    */
   static String fndb(final Nodes n, final int i) {
-    return NAMELC + ":db('" + n.data.meta.name + "', " + n.nodes[i] + ")";
+    return NAMELC + ":db('" + n.data.meta.name + "', " + n.list[i] + ")";
   }
 }

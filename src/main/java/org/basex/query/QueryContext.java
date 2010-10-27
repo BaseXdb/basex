@@ -223,31 +223,31 @@ public final class QueryContext extends Progress {
         if(!context.perm(User.READ, data.meta))
           Err.PERMNO.thrw(null, CmdPerm.READ);
 
-        final int s = (int) nodes.size();
-        if(nodes.root) {
-          // create document nodes
-          doc = new DBNode[s];
-          for(int n = 0; n < s; ++n) {
-            addDoc(new DBNode(data, nodes.nodes[n], Data.DOC));
+        if(!data.empty()) {
+          final int s = (int) nodes.size();
+          if(nodes.root) {
+            // create document nodes
+            doc = new DBNode[s];
+            for(int n = 0; n < s; ++n) {
+              addDoc(new DBNode(data, nodes.list[n], Data.DOC));
+            }
+          } else {
+            for(final int p : data.doc()) addDoc(new DBNode(data, p, Data.DOC));
           }
-        } else {
-          for(final int p : data.doc()) addDoc(new DBNode(data, p, Data.DOC));
-        }
-        rootDocs = docs;
-
-        // create initial context items
-        if(nodes.root) {
-          value = Seq.get(doc, docs);
-        } else {
-          // otherwise, add all context items
-          final ItemIter ir = new ItemIter(s);
-          for(int n = 0; n < s; ++n) {
-            ir.add(new DBNode(data, nodes.nodes[n]));
+          rootDocs = docs;
+  
+          // create initial context items
+          if(nodes.root) {
+            value = Seq.get(doc, docs);
+          } else {
+            // otherwise, add all context items
+            final ItemIter ir = new ItemIter(s);
+            for(int n = 0; n < s; ++n) ir.add(new DBNode(data, nodes.list[n]));
+            value = ir.finish();
           }
-          value = ir.finish();
+          // add collection instances
+          addColl(new NodIter(doc, docs), token(data.meta.name));
         }
-        // add collection instances
-        addColl(new NodIter(doc, docs), token(data.meta.name));
       }
 
       // dump compilation info
@@ -256,6 +256,7 @@ public final class QueryContext extends Progress {
       // cache initial context
       final boolean empty = value == null;
       if(empty) value = Item.DUMMY;
+
       // compile global functions.
       // variables will be compiled if called for the first time
       funcs.comp(this);
