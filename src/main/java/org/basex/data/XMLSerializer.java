@@ -37,8 +37,6 @@ public final class XMLSerializer extends Serializer {
   /** HTML: URI attributes. */
   private static final TokenSet URIS = new TokenSet();
 
-  /** Output stream. */
-  private final PrintOutput out;
   /** CData elements. */
   private final TokenList cdata = new TokenList();
   /** Indentation flag. */
@@ -64,14 +62,16 @@ public final class XMLSerializer extends Serializer {
   /** Serialization method. */
   private final String mth;
 
+  /** Output stream. */
+  private PrintOutput out;
   /** System document type. */
   private String docsys;
   /** Public document type. */
   private String docpub;
 
-  /** Temporary indentation flag. */
+  /** Indentation flag (used for formatting). */
   private boolean ind;
-  /** Temporary item flag. */
+  /** Item flag (used for formatting). */
   private boolean item;
   /** Script flag. */
   private boolean script;
@@ -188,6 +188,24 @@ public final class XMLSerializer extends Serializer {
   private static void error(final Object str, final Object... ext)
       throws IOException {
     throw new IOException(Util.info(str, ext));
+  }
+
+  /**
+   * Sets a new output stream.
+   * @param os output stream
+   * @return self reference
+   */
+  public XMLSerializer out(final PrintOutput os) {
+    out = os;
+    return this;
+  }
+
+  /**
+   * Initializes the serializer (resets current indentation).
+   */
+  public void init() {
+    ind = false;
+    item = false;
   }
 
   @Override

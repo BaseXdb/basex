@@ -218,7 +218,7 @@ public final class ServerProcess extends Thread {
     QueryProcess qp = null;
     if(c == 0) {
       // c = 0: create new query process
-      qp = new QueryProcess(arg, out, context);
+      qp = new QueryProcess(arg, context);
       arg = Integer.toString(id++);
       queries.put(arg, qp);
     } else {
@@ -231,7 +231,7 @@ public final class ServerProcess extends Thread {
       if(c == 0) {
         // c = 0: initialize iterator
         if(qp != null) {
-          qp.init();
+          qp.init(out);
           log.write(this, qp.query, OK);
         }
         // send {ID}0 and 0 as success flag

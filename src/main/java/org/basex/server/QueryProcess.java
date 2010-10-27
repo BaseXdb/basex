@@ -6,6 +6,7 @@ import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
+import org.basex.io.ArrayOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -22,8 +23,6 @@ import org.basex.query.iter.Iter;
 final class QueryProcess extends Progress {
   /** Query processor. */
   private final QueryProcessor qp;
-  /** Output stream reference. */
-  private final PrintOutput out;
   /** Database context. */
   private final Context ctx;
   /** Query string. */
@@ -41,29 +40,29 @@ final class QueryProcess extends Progress {
   /**
    * Constructor.
    * @param q query string
-   * @param o output
    * @param c database context
    */
-  QueryProcess(final String q, final PrintOutput o, final Context c) {
+  QueryProcess(final String q, final Context c) {
     query = q;
     qp = new QueryProcessor(q, c);
-    out = o;
     ctx = c;
   }
 
   /**
    * Constructor.
+   * @param out output
    * @throws IOException Exception
    * @throws QueryException query exception
    */
-  void init() throws IOException, QueryException {
+  void init(final PrintOutput out) throws IOException, QueryException {
     qp.parse();
     startTimeout(ctx.prop.num(Prop.TIMEOUT));
     monitored = true;
     ctx.lock.before(qp.ctx.updating);
     iter = qp.iter();
     item = iter.next();
-    xml = qp.getSerializer(out);
+    // don't serialize potential initialization parameters
+    xml = qp.getSerializer(new ArrayOutput()).out(out);
   }
 
   /**
@@ -77,6 +76,7 @@ final class QueryProcess extends Progress {
     if(more) {
       if(stopped) SERVERTIMEOUT.thrw(null);
       // item found: send {ITEM}
+      xml.init();
       item.serialize(xml);
       item = iter.next();
     }
@@ -89,7 +89,7 @@ final class QueryProcess extends Progress {
    */
   void close() throws IOException {
     qp.stopTimeout();
-    if(xml != null) xml.close();
+    if(xml != null) xml.out(new ArrayOutput()).close();
     qp.close();
     if(monitored) ctx.lock.after(qp.ctx.updating);
   }
