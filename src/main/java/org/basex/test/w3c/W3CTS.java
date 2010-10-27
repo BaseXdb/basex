@@ -62,6 +62,8 @@ public abstract class W3CTS {
   private static final byte[] FRAGMENT = token("Fragment");
   /** XML flag. */
   private static final byte[] XML = token("XML");
+  /** XML flag. */
+  private static final byte[] IGNORE = token("Ignore");
   /** Replacement pattern. */
   private static final Pattern SLASH = Pattern.compile("/", Pattern.LITERAL);
 
@@ -407,20 +409,25 @@ public abstract class W3CTS {
         Util.errln(in);
       }
 
-      final Nodes outFiles = nodes("*:output-file/text()", state);
+      final Nodes expOut = nodes("*:output-file/text()", state);
+      final TokenList result = new TokenList();
+      for(int o = 0; o < expOut.size(); ++o) {
+        final String resFile = string(data.atom(expOut.nodes[o]));
+        final IO exp = IO.get(expected + pth + resFile);
+        result.add(read(exp));
+      }
+
       final Nodes cmpFiles = nodes("*:output-file/@compare", state);
       boolean xml = false;
       boolean frag = false;
-
-      final TokenList result = new TokenList();
-      for(int o = 0; o < outFiles.size(); ++o) {
-        final String resFile = string(data.atom(outFiles.nodes[o]));
-        final IO exp = IO.get(expected + pth + resFile);
-        result.add(read(exp));
+      boolean ignore = false;
+      for(int o = 0; o < cmpFiles.size(); ++o) {
         final byte[] type = data.atom(cmpFiles.nodes[o]);
         xml |= eq(type, XML);
         frag |= eq(type, FRAGMENT);
-      }
+        ignore |= eq(type, IGNORE);
+      }      
+
       String expError = text("*:expected-error/text()", state);
 
       final StringBuilder log = new StringBuilder(pth + inname + IO.XQSUFFIX);
@@ -439,7 +446,7 @@ public abstract class W3CTS {
       final boolean print = currTime || !logStr.contains("current-");
 
       boolean correctError = false;
-      if(er != null && (outFiles.size() == 0 || !expError.isEmpty())) {
+      if(er != null && (expOut.size() == 0 || !expError.isEmpty())) {
         expError = error(pth + outname, expError);
         final String code = er.substring(0, Math.min(8, er.length()));
         for(final String e : SLASH.split(expError)) {
@@ -463,7 +470,8 @@ public abstract class W3CTS {
       } else if(er == null) {
         int s = -1;
         final int rs = result.size();
-        while(++s < rs) {
+        
+        while(!ignore && ++s < rs) {
           inspect |= s < cmpFiles.nodes.length &&
             eq(data.atom(cmpFiles.nodes[s]), INSPECT);
 
@@ -520,7 +528,7 @@ public abstract class W3CTS {
         }
         if((rs > 0 || !expError.isEmpty()) && s == rs && !inspect) {
           if(print) {
-            if(outFiles.size() == 0) result.add(error(pth + outname, expError));
+            if(expOut.size() == 0) result.add(error(pth + outname, expError));
             logErr.append(logStr);
             logErr.append("[" + testid + " ] ");
             logErr.append(norm(string(result.get(0))));
@@ -547,7 +555,7 @@ public abstract class W3CTS {
           ++ok;
         }
       } else {
-        if(outFiles.size() == 0 || !expError.isEmpty()) {
+        if(expOut.size() == 0 || !expError.isEmpty()) {
           if(print) {
             logOK2.append(logStr);
             logOK2.append("[" + testid + " ] ");
