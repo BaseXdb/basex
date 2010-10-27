@@ -155,13 +155,12 @@ final class TableData {
     if(cols.length == 0) return;
 
     final Nodes n = context.current;
-    final boolean r = n.size() == 1 && n.nodes[0] < 2;
-    if(!create && r) {
+    if(!create && n.root) {
       rows = rootRows;
       sortCol = -1;
     } else {
       createRows();
-      if(r) rootRows = rows;
+      if(n.root) rootRows = rows;
     }
     if(cols[0].width == 0 && cols[0].hwidth == 0) calcWidths();
   }

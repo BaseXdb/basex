@@ -19,8 +19,8 @@ import org.basex.util.Util;
 public final class Nodes implements Result {
   /** Full-text position data (for visualization). */
   public final FTPosData ftpos;
-  /** Doc flag (all nodes refer to documents). */
-  public boolean doc;
+  /** Root flag (nodes represent root documents). */
+  public boolean root;
   /** Root node. */
   public Data data;
   /** Pre values container. */

@@ -86,7 +86,7 @@ public final class Context {
    * @return result of check
    */
   public boolean root() {
-    return current != null && current.doc;
+    return current != null && current.root;
   }
 
   /**
@@ -94,7 +94,7 @@ public final class Context {
    * @return result of check
    */
   public int[] doc() {
-    return current.doc ? current.nodes : data.doc();
+    return current.root ? current.nodes : data.doc();
   }
 
   /**
@@ -124,7 +124,7 @@ public final class Context {
    */
   public void update() {
     current = new Nodes(data.doc(), data);
-    current.doc = true;
+    current.root = true;
   }
 
   /**

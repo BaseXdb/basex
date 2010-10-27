@@ -32,7 +32,7 @@ public final class Cs extends AQuery {
       for(int i = 0; i < docs.length; ++i) {
         if(nodes.nodes[i] != docs[i]) return true;
       }
-      nodes.doc = true;
+      nodes.root = true;
     }
     return true;
   }

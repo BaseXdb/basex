@@ -225,7 +225,7 @@ public final class QueryContext extends Progress {
           Err.PERMNO.thrw(null, CmdPerm.READ);
 
         final int s = (int) nodes.size();
-        if(nodes.doc) {
+        if(nodes.root) {
           // create document nodes
           doc = new DBNode[s];
           for(int n = 0; n < s; ++n) {
@@ -237,7 +237,7 @@ public final class QueryContext extends Progress {
         rootDocs = docs;
 
         // create initial context items
-        if(nodes.doc) {
+        if(nodes.root) {
           value = Seq.get(doc, docs);
         } else {
           // otherwise, add all context items
