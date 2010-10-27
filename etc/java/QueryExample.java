@@ -31,7 +31,7 @@ public final class QueryExample {
 
         // loop through all results
         while(query.more()) {
-          System.out.print(query.next());
+          System.out.println(query.next());
         }
 
         // close query instance
