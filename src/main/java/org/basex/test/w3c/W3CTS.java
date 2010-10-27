@@ -345,7 +345,7 @@ public abstract class W3CTS {
         final Data d = Check.check(context,
             srcs.get(string(data.atom(cont.nodes[0]))));
         curr = new Nodes(d.doc(), d);
-        curr.doc = true;
+        curr.root = true;
       }
 
       context.prop.set(Prop.QUERYINFO, compile);
