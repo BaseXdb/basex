@@ -67,7 +67,7 @@ namespace BaseXClient
     /** see readme.txt */
     public void Create(string name, Stream s)
     {
-      stream.WriteByte(3);
+      stream.WriteByte(8);
       Send(name);
       while (true)
       {

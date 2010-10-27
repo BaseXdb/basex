@@ -96,8 +96,8 @@ public class BaseXClient {
    */
   public void create(final String name, final InputStream input)
       throws IOException {
-    // send 3 to mark start of query execution, and {Query}0 as query string
-    out.write(3);
+    // send 8 to mark start of query execution, and {Query}0 as query string
+    out.write(8);
     send(name);
     int l;
     while((l = input.read()) != -1) out.write(l);

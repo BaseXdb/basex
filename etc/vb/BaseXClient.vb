@@ -53,7 +53,7 @@ Module BaseXClient
     
     ' see readme.txt
     Public Sub Create(name As String, ms As Stream)
-      stream.WriteByte(3)
+      stream.WriteByte(8)
       Send(name)
       While True:
       	Dim t As Integer = ms.ReadByte()

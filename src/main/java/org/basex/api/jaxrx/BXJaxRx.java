@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.Scanner;
 import java.util.Set;
 import javax.ws.rs.core.StreamingOutput;
 import org.basex.core.BaseXException;
@@ -13,11 +14,11 @@ import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Run;
-import org.basex.core.cmd.XQuery;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
+import org.basex.server.ClientQuery;
 import org.basex.util.Table;
 import org.basex.util.Token;
 import org.basex.util.TokenList;
@@ -46,6 +47,7 @@ public final class BXJaxRx implements JaxRx {
     p.add(QueryParameter.OUTPUT);
     p.add(QueryParameter.START);
     p.add(QueryParameter.WRAP);
+    p.add(QueryParameter.VAR);
     return p;
   }
 
@@ -81,13 +83,32 @@ public final class BXJaxRx implements JaxRx {
       @Override
       void code() {
         // wrap start and counter around query expression
+        final String xq = query != null ? query : ".";
+        // evaluate first result and number of results
         final int s = num(rp, QueryParameter.START, 1);
         final int m = num(rp, QueryParameter.COUNT, Integer.MAX_VALUE - s);
-        String xq = query != null ? query : ".";
 
-        if(s != 1 || m != Integer.MAX_VALUE - s)
-          xq = "(" + query + ")[position() = " + s + " to " + (s + m - 1) + "]";
-        exec(new XQuery(xq), out);
+        // [CG] REST: ensure that results will be correctly wrapped
+        try {
+          // create query instance
+          final ClientQuery cq = cs.query(xq);
+          final String var = path.getValue(QueryParameter.VAR);
+          if(var != null) {
+            final Scanner sc = new Scanner(var);
+            sc.useDelimiter("\t");
+            while(sc.hasNext()) {
+              final String v = sc.next();
+              final String[] sp = v.split(":", 2);
+              cq.bind(sp[0], sp.length == 1 ? "" : sp[1]);
+            }
+          }
+          // loop through all results
+          int c = 0;
+          while(++c < s + m && cq.more()) if(c >= s) cq.next(out);
+          cq.close();
+        } catch(final BaseXException ex) {
+          throw new JaxRxException(400, ex.getMessage());
+        }
       }
     };
   }
