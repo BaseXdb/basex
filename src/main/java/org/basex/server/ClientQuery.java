@@ -43,6 +43,18 @@ public final class ClientQuery extends Query {
   }
 
   @Override
+  public void bind(final String n, final Object o) throws BaseXException {
+    try {
+      // send 3 to announce variable declaration, {ID}0 for identification,
+      // and {key}0 {value}0
+      cs.out.write(3);
+      cs.send(id + '\0' + n + '\0' + o);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  @Override
   public boolean more() throws BaseXException {
     // send 1 to get next result item, and {ID}0 for identification
     try {

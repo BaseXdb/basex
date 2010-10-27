@@ -40,6 +40,15 @@ public final class LocalQuery extends Query {
   }
 
   @Override
+  public void bind(final String n, final Object o) throws BaseXException {
+    try {
+      qp.bind(n, o);
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  @Override
   public boolean more() throws BaseXException {
     try {
       if(iter == null) {

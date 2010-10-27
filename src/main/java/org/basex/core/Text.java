@@ -528,7 +528,7 @@ public interface Text {
 
   /** User name. */
   String[] USERHEAD = { "Username", "Read", "Write", "Create", "Admin" };
-  /** Admin user. */
+  /** Default admin user and password. */
   String ADMIN = "admin";
 
   // ADMIN COMMANDS ==========================================================

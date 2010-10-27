@@ -12,29 +12,38 @@ import org.basex.core.BaseXException;
  */
 public abstract class Query {
   /**
+   * Binds an object to a global variable.
+   * @param n name of variable
+   * @param o object to be bound
+   * @throws BaseXException command exception
+   */
+  public abstract void bind(final String n, final Object o)
+      throws BaseXException;
+
+  /**
    * Returns {@code true} if more items are available.
    * @return result of check
-   * @throws BaseXException database exception
+   * @throws BaseXException command exception
    */
   public abstract boolean more() throws BaseXException;
 
   /**
    * Prints the next result to the specified output stream.
    * @param out output stream
-   * @throws BaseXException database exception
+   * @throws BaseXException command exception
    */
   public abstract void next(final OutputStream out) throws BaseXException;
 
   /**
    * Returns the next item.
    * @return item string
-   * @throws BaseXException database exception
+   * @throws BaseXException command exception
    */
   public abstract String next() throws BaseXException;
 
   /**
    * Closes the iterator.
-   * @throws BaseXException database exception
+   * @throws BaseXException command exception
    */
   public abstract void close() throws BaseXException;
 }

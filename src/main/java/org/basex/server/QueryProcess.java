@@ -46,41 +46,43 @@ final class QueryProcess extends Progress {
     query = q;
     qp = new QueryProcessor(q, c);
     ctx = c;
+    startTimeout(ctx.prop.num(Prop.TIMEOUT));
   }
 
   /**
-   * Constructor.
-   * @param out output
-   * @throws IOException Exception
+   * Binds an object to a global variable.
+   * @param n name of variable
+   * @param o object to be bound
    * @throws QueryException query exception
    */
-  void init(final PrintOutput out) throws IOException, QueryException {
-    qp.parse();
-    startTimeout(ctx.prop.num(Prop.TIMEOUT));
-    monitored = true;
-    ctx.lock.before(qp.ctx.updating);
-    iter = qp.iter();
-    item = iter.next();
-    // don't serialize potential initialization parameters
-    xml = qp.getSerializer(new ArrayOutput()).out(out);
+  public void bind(final String n, final Object o) throws QueryException {
+    qp.bind(n, o);
   }
 
   /**
    * Serializes the next item and tests if more items can be returned.
+   * @param out output
    * @return result of check
    * @throws IOException Exception
    * @throws QueryException query exception
    */
-  boolean next() throws IOException, QueryException {
-    final boolean more = item != null;
-    if(more) {
-      if(stopped) SERVERTIMEOUT.thrw(null);
-      // item found: send {ITEM}
-      xml.init();
-      item.serialize(xml);
-      item = iter.next();
+  boolean next(final PrintOutput out) throws IOException, QueryException {
+    if(xml == null) {
+      qp.parse();
+      monitored = true;
+      ctx.lock.before(qp.ctx.updating);
+      iter = qp.iter();
+      xml = qp.getSerializer(new ArrayOutput()).out(out);
     }
-    return !more;
+    if(stopped) SERVERTIMEOUT.thrw(null);
+    
+    item = iter.next();
+    if(item == null) return false;
+    
+    // item found: send {ITEM}
+    xml.init();
+    item.serialize(xml);
+    return true;
   }
 
   /**

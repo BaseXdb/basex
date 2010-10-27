@@ -113,7 +113,7 @@ public final class ClientSession extends Session {
       throws BaseXException {
 
     try {
-      out.write(3);
+      out.write(8);
       send(name);
       int l;
       while((l = input.read()) != -1) out.write(l);

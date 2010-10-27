@@ -108,12 +108,12 @@ public final class ServerProcess extends Thread {
         try {
           // receive first byte
           final byte b = in.readByte();
-          if(b < 3) {
+          if(b < 8) {
             // jump to query iterator
             query(b);
             continue;
           }
-          if(b == 3) {
+          if(b == 8) {
             // jump to database creation
             create();
             continue;
@@ -226,30 +226,30 @@ public final class ServerProcess extends Thread {
       qp = queries.get(arg);
     }
 
-    boolean close = false;
+    boolean more = true;
     try {
       if(c == 0) {
         // c = 0: initialize iterator
-        if(qp != null) {
-          qp.init(out);
-          log.write(this, qp.query, OK);
-        }
+        if(qp != null) log.write(this, qp.query, OK);
         // send {ID}0 and 0 as success flag
         out.writeString(arg);
         out.write(0);
       } else if(c == 1) {
         // c = 1: request next item
-        if(qp != null) close = qp.next();
+        if(qp != null) more = qp.next(out);
         // send 0 to mark end of result and 0 as success flag
         out.write(0);
         out.write(0);
       } else if(c == 2) {
         // c = 2: close iterator
-        close = true;
+        more = false;
+      } else if(c == 3) {
+        // c = 3: bind variable
+        qp.bind(in.readString(), in.readString());
       }
     } catch(final QueryException ex) {
       // exception may occur during qp.init() or qp.next()
-      close = true;
+      more = false;
 
       // log exception (static or runtime)
       final String msg = ex.getMessage();
@@ -262,7 +262,7 @@ public final class ServerProcess extends Thread {
     out.flush();
 
     // close query process after last item, close command or exception
-    if(close && qp != null) {
+    if(!more && qp != null) {
       qp.close();
       queries.remove(arg);
     }

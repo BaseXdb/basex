@@ -99,7 +99,7 @@ public final class QueryProcessor extends Progress {
   }
 
   /**
-   * Binds an object to a global variables. If the object is an {@link Expr}
+   * Binds an object to a global variable. If the object is an {@link Expr}
    * instance, it is directly assigned. Otherwise, it is first cast to the
    * appropriate XQuery type.
    * @param n name of variable
