@@ -1,5 +1,6 @@
 package org.basex.server;
 
+import static org.basex.core.Text.*;
 import java.io.IOException;
 
 /**
@@ -13,6 +14,6 @@ public final class LoginException extends IOException {
    * Constructor.
    */
   LoginException() {
-    super();
+    super(SERVERLOGIN);
   }
 }

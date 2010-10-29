@@ -20,7 +20,6 @@ public final class ValueList extends ElementList {
     this(CAP);
   }
 
-
   /**
    * Constructor, specifying an initial array capacity.
    * @param c array capacity

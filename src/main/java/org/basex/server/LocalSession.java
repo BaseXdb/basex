@@ -8,6 +8,7 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.query.QueryException;
+import org.basex.util.Util;
 
 /**
  * This wrapper executes commands locally.
@@ -17,31 +18,24 @@ import org.basex.query.QueryException;
  */
 public class LocalSession extends Session {
   /** Database context. */
-  final Context ctx;
+  private final Context ctx;
 
   /**
    * Constructor.
    * @param context context
    */
   public LocalSession(final Context context) {
+    this(context, null);
+  }
+
+  /**
+   * Constructor.
+   * @param context context
+   * @param output output stream
+   */
+  public LocalSession(final Context context, final OutputStream output) {
+    super(output);
     ctx = context;
-  }
-
-  @Override
-  public void execute(final String str, final OutputStream out)
-      throws BaseXException {
-    try {
-      execute(new CommandParser(str, ctx).parseSingle(), out);
-    } catch(final QueryException ex) {
-      throw new BaseXException(ex);
-    }
-  }
-
-  @Override
-  public void execute(final Command cmd, final OutputStream out)
-      throws BaseXException {
-    cmd.execute(ctx, out);
-    info = cmd.info();
   }
 
   @Override
@@ -51,11 +45,29 @@ public class LocalSession extends Session {
   }
 
   @Override
-  public LocalQuery query(final String query) {
-    return new LocalQuery(query, ctx);
+  public Query query(final String query) {
+    Util.notimplemented();
+    return null;
   }
 
   @Override
   public void close() {
+  }
+
+  @Override
+  protected void execute(final String str, final OutputStream os)
+      throws BaseXException {
+    try {
+      execute(new CommandParser(str, ctx).parseSingle(), os);
+    } catch(final QueryException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  @Override
+  protected void execute(final Command cmd, final OutputStream os)
+      throws BaseXException {
+    cmd.execute(ctx, os);
+    info = cmd.info();
   }
 }

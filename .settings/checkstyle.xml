@@ -54,7 +54,6 @@
     <module name="RightCurly"/>
     <module name="DoubleCheckedLocking"/>
     <module name="EqualsHashCode"/>
-    <module name="HiddenField"/>
     <module name="IllegalInstantiation"/>
     <module name="MagicNumber">
       <property name="severity" value="ignore"/>

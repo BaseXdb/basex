@@ -117,7 +117,7 @@ public class BaseX extends Main {
   @SuppressWarnings("unused")
   @Override
   protected Session session() throws IOException {
-    if(session == null) session = new LocalSession(context);
+    if(session == null) session = new LocalSession(context, out);
     return session;
   }
 

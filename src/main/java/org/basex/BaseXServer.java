@@ -145,7 +145,7 @@ public final class BaseXServer extends Main implements Runnable {
 
   @Override
   protected Session session() {
-    if(session == null) session = new LocalSession(context);
+    if(session == null) session = new LocalSession(context, out);
     return session;
   }
 

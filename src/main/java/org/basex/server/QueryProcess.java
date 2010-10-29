@@ -6,7 +6,6 @@ import org.basex.core.Context;
 import org.basex.core.Progress;
 import org.basex.core.Prop;
 import org.basex.data.XMLSerializer;
-import org.basex.io.ArrayOutput;
 import org.basex.io.PrintOutput;
 import org.basex.query.QueryException;
 import org.basex.query.QueryProcessor;
@@ -28,6 +27,8 @@ final class QueryProcess extends Progress {
   /** Query string. */
   public String query;
 
+  /** Print output. */
+  private PrintOutput out;
   /** Serializer. */
   private XMLSerializer xml;
   /** Monitored flag. */
@@ -39,12 +40,14 @@ final class QueryProcess extends Progress {
 
   /**
    * Constructor.
-   * @param q query string
+   * @param qu query string
+   * @param po output stream
    * @param c database context
    */
-  QueryProcess(final String q, final Context c) {
-    query = q;
-    qp = new QueryProcessor(q, c);
+  QueryProcess(final String qu, final PrintOutput po, final Context c) {
+    query = qu;
+    qp = new QueryProcessor(qu, c);
+    out = po;
     ctx = c;
     startTimeout(ctx.prop.num(Prop.TIMEOUT));
   }
@@ -53,45 +56,53 @@ final class QueryProcess extends Progress {
    * Binds an object to a global variable.
    * @param n name of variable
    * @param o object to be bound
+   * @param t type
    * @throws QueryException query exception
    */
-  public void bind(final String n, final Object o) throws QueryException {
-    qp.bind(n, o);
+  public void bind(final String n, final String o, final String t)
+      throws QueryException {
+    qp.bind(n, o, t);
+  }
+
+  /**
+   * Initializes the iterative evaluation.
+   * @throws IOException Exception
+   * @throws QueryException query exception
+   */
+  public void init() throws IOException, QueryException {
+    qp.parse();
+    monitored = true;
+    ctx.lock.before(qp.ctx.updating);
+    xml = qp.getSerializer(out);
+    iter = qp.iter();
   }
 
   /**
    * Serializes the next item and tests if more items can be returned.
-   * @param out output
-   * @return result of check
    * @throws IOException Exception
    * @throws QueryException query exception
    */
-  boolean next(final PrintOutput out) throws IOException, QueryException {
-    if(xml == null) {
-      qp.parse();
-      monitored = true;
-      ctx.lock.before(qp.ctx.updating);
-      iter = qp.iter();
-      xml = qp.getSerializer(new ArrayOutput()).out(out);
-    }
+  void next() throws IOException, QueryException {
+    if(xml == null) init();
     if(stopped) SERVERTIMEOUT.thrw(null);
-    
+
     item = iter.next();
-    if(item == null) return false;
-    
-    // item found: send {ITEM}
-    xml.init();
-    item.serialize(xml);
-    return true;
+    if(item != null) {
+      xml.init();
+      xml.openResult();
+      item.serialize(xml);
+      xml.closeResult();
+    }
   }
 
   /**
    * Closes the query process.
+   * @param forced forced close
    * @throws IOException I/O exception
    */
-  void close() throws IOException {
+  void close(final boolean forced) throws IOException {
+    if(xml != null && !forced) xml.close();
     qp.stopTimeout();
-    if(xml != null) xml.out(new ArrayOutput()).close();
     qp.close();
     if(monitored) ctx.lock.after(qp.ctx.updating);
   }

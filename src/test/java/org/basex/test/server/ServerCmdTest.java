@@ -1,4 +1,4 @@
-package org.basex.test.cs;
+package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import org.basex.BaseXServer;
@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class CmdServerTest extends CmdTest {
+public final class ServerCmdTest extends CmdTest {
   /** Server instance. */
   private static BaseXServer server;
 

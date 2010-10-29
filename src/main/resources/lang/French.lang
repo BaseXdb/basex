@@ -476,6 +476,7 @@ info_serialize=Sérialiser
 info_tags=Balises
 info_atts=Attributs
 info_ns=Espaces de noms
+info_uptodate=Up-to-date
 info_pathindex=Path summary
 info_txtindex=Index texte
 info_atvindex=Index attributs

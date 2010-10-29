@@ -475,6 +475,7 @@ info_serialize=Serialisierung
 info_tags=Tags
 info_atts=Attribute
 info_ns=Namespaces
+info_uptodate=Up-to-date
 info_pathindex=Path Summary
 info_txtindex=Text-Index
 info_atvindex=Attribut-Index

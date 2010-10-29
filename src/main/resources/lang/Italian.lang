@@ -42,7 +42,6 @@ b_delete=Cancella
 b_delall=Cancella tutto
 b_add=Aggiungi
 
-
 # Visualizations
 no_data=Nessun dato disponibile
 no_space=Spazio insufficiente
@@ -476,6 +475,7 @@ info_serialize=Serializza
 info_tags=Tag
 info_atts=Attributi
 info_ns=Namespace
+info_uptodate=Up-to-date
 info_pathindex=Indice strutturale
 info_txtindex=Indice sul testo
 info_atvindex=Indice sugli attributi

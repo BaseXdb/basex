@@ -473,6 +473,7 @@ info_serialize=Ghi ra(Serialize)
 info_tags=Tags
 info_atts=Thuộc tình
 info_ns=Namespaces
+info_uptodate=Up-to-date
 info_pathindex=Path Summary
 info_txtindex=Mục lục (index) văn bản
 info_atvindex=Mục lục (index) văn bản thuộc tính

@@ -89,15 +89,10 @@ public final class QueryContext extends Progress {
   /** Current context size. */
   public long size;
 
-  /** Used documents. */
+  /** Opened documents. */
   public DBNode[] doc = new DBNode[1];
   /** Number of documents. */
   public int docs;
-
-  /** Full-text position data (for visualization). */
-  public FTPosData ftpos;
-  /** Full-text token counter (for visualization). */
-  public byte ftoknum;
 
   /** Current full-text options. */
   public FTOpt ftopt;
@@ -133,6 +128,25 @@ public final class QueryContext extends Progress {
   /** Construction mode. */
   public boolean construct;
 
+  /** Full-text position data (only utilized by visualization). */
+  public FTPosData ftpos;
+  /** Full-text token counter (only utilized by visualization). */
+  public byte ftoknum;
+
+  /** Copied nodes, resulting from transform expression. */
+  public final Set<Data> copiedNods = new HashSet<Data>();
+  /** Pending updates. */
+  public Updates updates = new Updates(false);
+  /** Indicates if this query performs updates. */
+  public boolean updating;
+
+  /** Compilation flag: current node has leaves. */
+  public boolean leaf;
+  /** Compilation flag: FLWOR clause performs grouping. */
+  public boolean grouping;
+  /** Compilation flag: full-text evaluation can be stopped after first hit. */
+  public boolean ftfast = true;
+
   /** String container for query background information. */
   private final TokenBuilder info = new TokenBuilder();
   /** Info flag. */
@@ -142,17 +156,17 @@ public final class QueryContext extends Progress {
   /** Evaluation flag. */
   private boolean firstEval = true;
 
-  /** Serializer options. */
-  SerializerProp serProp;
   /** List of modules. */
   final StringList modules = new StringList();
   /** List of loaded modules. */
   final StringList modLoaded = new StringList();
+  /** Serializer options. */
+  SerializerProp serProp;
   /** Initial context set (default: null). */
   Nodes nodes;
 
   /** Collections. */
-  private NodIter[] collect = new NodIter[1];
+  private NodIter[] coll = new NodIter[1];
   /** Collection names. */
   private byte[][] collName = new byte[1][];
   /** Collection counter. */
@@ -160,21 +174,6 @@ public final class QueryContext extends Progress {
 
   /** Initial number of documents. */
   private int rootDocs;
-
-  /** Pending updates. */
-  public Updates updates = new Updates(false);
-  /** Indicates if this query performs updates. */
-  public boolean updating;
-  /** MemData references of copied nodes, resulting from
-   * transform expression. */
-  public final Set<Data> copiedNods = new HashSet<Data>();
-
-  /** Compilation flag: current node has leaves. */
-  public boolean leaf;
-  /** Compilation flag: FLWOR clause performs grouping. */
-  public boolean grouping;
-  /** Compilation flag: full-text evaluation can be stopped after first hit. */
-  public boolean ftfast = true;
 
   /**
    * Constructor.
@@ -244,8 +243,8 @@ public final class QueryContext extends Progress {
           for(int n = 0; n < s; ++n) ir.add(new DBNode(data, nodes.list[n]));
           value = ir.finish();
         }
-        // add collection instances
-        addColl(new NodIter(doc, docs), token(data.meta.name));
+        // add default collection
+        addCollection(new NodIter(doc, docs), token(data.meta.name));
       }
 
       // dump compilation info
@@ -317,12 +316,11 @@ public final class QueryContext extends Progress {
   /**
    * Determines if the given node has been constructed via a transform
    * expression.
-   * @param nod Nod
+   * @param nod node to be checked
    * @return true, if part of copied nodes
    */
   public boolean isCopiedNod(final Nod nod) {
-    if(!(nod instanceof DBNode)) return false;
-    return copiedNods.contains(((DBNode) nod).data);
+    return nod instanceof DBNode && copiedNods.contains(((DBNode) nod).data);
   }
 
   /**
@@ -356,7 +354,6 @@ public final class QueryContext extends Progress {
     final boolean r = funcs.size() != 0 || vars.global().size != 0;
     if(r) ser.openElement(PLAN);
     funcs.plan(ser);
-    //vars.plan(ser);
     root.plan(ser);
     if(r) ser.closeElement();
   }
@@ -428,37 +425,38 @@ public final class QueryContext extends Progress {
   }
 
   /**
-   * Opens an existing document/collection, or creates a new database instance.
+   * Opens an existing document/collection, or creates a new main memory
+   * document instance.
    * @param input database name or file path
-   * @param coll collection flag
+   * @param col collection flag
    * @param db database flag
    * @param ii input info
    * @return database instance
    * @throws QueryException query exception
    */
-  public DBNode doc(final byte[] input, final boolean coll, final boolean db,
+  public DBNode doc(final byte[] input, final boolean col, final boolean db,
       final InputInfo ii) throws QueryException {
 
     if(contains(input, '<') || contains(input, '>')) INVDOC.thrw(ii, input);
 
     // check if the existing collections contain the document
     for(int c = 0; c < colls; ++c) {
-      for(int n = 0; n < collect[c].size(); ++n) {
-        if(eq(input, collect[c].get(n).base())) {
-          return (DBNode) collect[c].get(n);
-        }
+      for(int n = 0; n < coll[c].size(); ++n) {
+        if(eq(input, coll[c].get(n).base())) return (DBNode) coll[c].get(n);
       }
     }
 
     // check if the database has already been opened
     final String in = string(input);
-    for(int d = 0; d < docs; ++d)
+    for(int d = 0; d < docs; ++d) {
       if(doc[d].data.meta.name.equals(in)) return doc[d];
+    }
 
     // check if the document has already been opened
     final IO io = IO.get(in);
-    for(int d = 0; d < docs; ++d)
+    for(int d = 0; d < docs; ++d) {
       if(doc[d].data.meta.file.eq(io)) return doc[d];
+    }
 
     // get database instance
     Data data = null;
@@ -471,27 +469,14 @@ public final class QueryContext extends Progress {
       }
     } else {
       final IO file = file();
-      data = doc(in, file == null, coll, ii);
-      if(data == null) data = doc(file.merge(in).path(), true, coll, ii);
+      data = doc(in, file == null, col, ii);
+      if(data == null) data = doc(file.merge(in).path(), true, col, ii);
     }
 
-    // add document to array
+    // add node to global array
     final DBNode node = new DBNode(data, 0, Data.DOC);
     addDoc(node);
     return node;
-  }
-
-  /**
-   * Adds a document to the document array.
-   * @param node node to be added
-   */
-  private void addDoc(final DBNode node) {
-    if(docs == doc.length) {
-      final DBNode[] tmp = new DBNode[Array.newSize(docs)];
-      System.arraycopy(doc, 0, tmp, 0, docs);
-      doc = tmp;
-    }
-    doc[docs++] = node;
   }
 
   /**
@@ -499,18 +484,18 @@ public final class QueryContext extends Progress {
    * document.
    * @param path document path
    * @param err error flag
-   * @param coll collection flag
+   * @param col collection flag
    * @param ii input info
    * @return data instance
    * @throws QueryException query exception
    */
-  private Data doc(final String path, final boolean err, final boolean coll,
+  private Data doc(final String path, final boolean err, final boolean col,
       final InputInfo ii) throws QueryException {
 
     try {
       return Check.check(context, path);
     } catch(final IOException ex) {
-      if(err) (coll ? NOCOLL : NODOC).thrw(ii, ex.getMessage());
+      if(err) (col ? NOCOLL : NODOC).thrw(ii, ex.getMessage());
       return null;
     }
   }
@@ -546,7 +531,7 @@ public final class QueryContext extends Progress {
         }
       }
     }
-    return new NodIter(collect[c].item, (int) collect[c].size());
+    return new NodIter(coll[c].item, (int) coll[c].size());
   }
 
   /**
@@ -579,26 +564,39 @@ public final class QueryContext extends Progress {
         }
       }
     }
-    addColl(col, token(data.meta.name));
+    addCollection(col, token(data.meta.name));
   }
 
   /**
-   * Adds a collection.
+   * Adds a collection to the global document list.
+   * @param node node to be added
+   */
+  private void addDoc(final DBNode node) {
+    if(docs == doc.length) {
+      final DBNode[] tmp = new DBNode[Array.newSize(docs)];
+      System.arraycopy(doc, 0, tmp, 0, docs);
+      doc = tmp;
+    }
+    doc[docs++] = node;
+  }
+
+  /**
+   * Adds a collection to the global collection list.
    * @param ni collection nodes
    * @param name name
    */
-  public void addColl(final NodIter ni, final byte[] name) {
-    if(colls == collect.length) {
-      collect = Arrays.copyOf(collect, colls << 1);
+  public void addCollection(final NodIter ni, final byte[] name) {
+    if(colls == coll.length) {
+      coll = Arrays.copyOf(coll, colls << 1);
       collName = Array.copyOf(collName, colls << 1);
     }
-    collect[colls] = ni;
+    coll[colls] = ni;
     collName[colls++] = name;
   }
 
   /**
-   * Returns the common database reference of all items or null.
-   * @return database reference or null
+   * Returns the common database reference of all items, or {@code null}.
+   * @return database reference
    * @throws QueryException query exception
    */
   public Data data() throws QueryException {

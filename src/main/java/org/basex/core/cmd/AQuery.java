@@ -9,7 +9,6 @@ import org.basex.core.ProgressException;
 import org.basex.core.Prop;
 import org.basex.data.DOTSerializer;
 import org.basex.data.Result;
-import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
 import org.basex.io.IO;
@@ -61,13 +60,6 @@ public abstract class AQuery extends Command {
     final int runs = Math.max(1, prop.num(Prop.RUNS));
     String err = null;
     try {
-      // define serialization parameters
-      final SerializerProp sp = new SerializerProp(prop.get(Prop.SERIALIZER));
-      if(prop.is(Prop.WRAPOUTPUT)) {
-        sp.set(SerializerProp.S_WRAP_PRE, NAMELC);
-        sp.set(SerializerProp.S_WRAP_URI, URL);
-      }
-
       final boolean ser = prop.is(Prop.SERIALIZE);
       long hits = 0;
       int updates = 0;
@@ -90,7 +82,7 @@ public abstract class AQuery extends Command {
         if(context.prop.is(Prop.CACHEQUERY)) {
           result = qp.execute();
           eval += per.getTime();
-          xml = qp.getSerializer(po, sp);
+          xml = qp.getSerializer(po);
           result.serialize(xml);
           hits = result.size();
         } else {
@@ -98,7 +90,7 @@ public abstract class AQuery extends Command {
           eval += per.getTime();
           hits = 0;
           Item it = ir.next();
-          xml = qp.getSerializer(po, sp);
+          xml = qp.getSerializer(po);
           while(it != null) {
             checkStop();
             xml.openResult();

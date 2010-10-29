@@ -141,7 +141,6 @@ public final class FNNum extends Fun {
     }
   }
 
-
   @Override
   public boolean uses(final Use u) {
     return u == Use.X11 && def == FunDef.ROUND && expr.length == 2 ||

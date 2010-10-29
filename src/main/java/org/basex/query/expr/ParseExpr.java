@@ -295,7 +295,8 @@ public abstract class ParseExpr extends Expr {
   }
 
   /**
-   * Checks if the specified item is no empty sequence.
+   * Checks if the specified item is an empty sequence; if yes, throws
+   * an exception.
    * @param it item to be checked
    * @return specified item
    * @throws QueryException query exception

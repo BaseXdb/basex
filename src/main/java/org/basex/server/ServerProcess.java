@@ -2,6 +2,7 @@ package org.basex.server;
 
 import static org.basex.core.Text.*;
 import static org.basex.util.Token.*;
+import static org.basex.server.ServerCmd.*;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.HashMap;
@@ -106,18 +107,19 @@ public final class ServerProcess extends Thread {
     try {
       while(running) {
         try {
-          // receive first byte
+          // [CG] Server: replace control codes with strings.
+          //final ServerCmd sc = ServerCommand.valueOf(in.readString());
           final byte b = in.readByte();
-          if(b < 8) {
-            // jump to query iterator
-            query(b);
-            continue;
-          }
-          if(b == 8) {
-            // jump to database creation
+          final ServerCmd sc = ServerCmd.get(b);
+          if(sc == CREATE) {
             create();
             continue;
           }
+          if(sc != CMD) {
+            query(sc);
+            continue;
+          }
+
           // database command
           input = new ByteList().add(b).add(in.content().toArray()).toString();
         } catch(final IOException ex) {
@@ -208,64 +210,62 @@ public final class ServerProcess extends Thread {
 
   /**
    * Processes the query iterator.
-   * @param c control code (first received byte from client)
+   * @param sc server command
    * @throws IOException I/O exception
    */
-  private void query(final byte c) throws IOException {
+  private void query(final ServerCmd sc) throws IOException {
     // iterator argument
     String arg = in.readString();
 
     QueryProcess qp = null;
-    if(c == 0) {
-      // c = 0: create new query process
-      qp = new QueryProcess(arg, context);
-      arg = Integer.toString(id++);
-      queries.put(arg, qp);
-    } else {
-      // find query process
-      qp = queries.get(arg);
-    }
-
-    boolean more = true;
+    String err = null;
     try {
-      if(c == 0) {
-        // c = 0: initialize iterator
-        if(qp != null) log.write(this, qp.query, OK);
-        // send {ID}0 and 0 as success flag
+      if(sc == QUERY) {
+        qp = new QueryProcess(arg, out, context);
+        arg = Integer.toString(id++);
+        queries.put(arg, qp);
+
+        log.write(this, arg, qp.query, OK);
+        // send {ID}0
         out.writeString(arg);
+      } else {
+        // find query process
+        qp = queries.get(arg);
+        // avoid multiple close calls
+        if(qp == null && sc != CLOSE)
+          throw new BaseXException("Unknown query ID (" + arg + ")");
+
+        if(sc == BIND) {
+          qp.bind(in.readString(), in.readString(), in.readString());
+        } else if(sc == INIT) {
+          qp.init();
+        } else if(sc == NEXT) {
+          qp.next();
+        } else if(sc == CLOSE && qp != null) {
+          qp.close(false);
+          queries.remove(arg);
+        }
+        // send 0 as end marker
         out.write(0);
-      } else if(c == 1) {
-        // c = 1: request next item
-        if(qp != null) more = qp.next(out);
-        // send 0 to mark end of result and 0 as success flag
-        out.write(0);
-        out.write(0);
-      } else if(c == 2) {
-        // c = 2: close iterator
-        more = false;
-      } else if(c == 3) {
-        // c = 3: bind variable
-        qp.bind(in.readString(), in.readString());
       }
-    } catch(final QueryException ex) {
-      // exception may occur during qp.init() or qp.next()
-      more = false;
-
-      // log exception (static or runtime)
-      final String msg = ex.getMessage();
-      if(qp != null) log.write(this, qp.query, INFOERROR + msg);
-      // send 0 to mark end of potential result, 1 as error flag, and {MSG}0
+      // send 0 as success flag
       out.write(0);
-      out.write(1);
-      out.writeString(msg);
-    }
-    out.flush();
-
-    // close query process after last item, close command or exception
-    if(!more && qp != null) {
-      qp.close();
+    } catch(final BaseXException ex) {
+      err = ex.getMessage();
+    } catch(final QueryException ex) {
+      // log exception (static or runtime)
+      err = ex.getMessage();
+      qp.close(true);
       queries.remove(arg);
     }
+    if(err != null) {
+      // send 0 as end marker, 1 as error flag, and {MSG}0
+      log.write(this, arg, INFOERROR + err);
+      out.write(0);
+      out.write(1);
+      out.writeString(err);
+    }
+    out.flush();
   }
 
   /**
@@ -284,7 +284,7 @@ public final class ServerProcess extends Thread {
   public void exit() {
     // close remaining query processes
     for(final QueryProcess q : queries.values()) {
-      try { q.close(); } catch(final IOException ex) { }
+      try { q.close(true); } catch(final IOException ex) { }
     }
 
     try {

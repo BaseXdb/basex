@@ -481,7 +481,7 @@ public final class GUI extends JFrame {
       } else {
         // get query result
         final Result result = c.result();
-        final Nodes nodes = result instanceof Nodes && 
+        final Nodes nodes = result instanceof Nodes &&
           ((Nodes) result).size() != 0 ? (Nodes) result : null;
 
         // treat text view different to other views

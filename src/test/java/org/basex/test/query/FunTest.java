@@ -6,7 +6,7 @@ package org.basex.test.query;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
-public final class FuncTest extends QueryTest {
+public final class FunTest extends QueryTest {
   /** Constructor. */
   static {
     doc = "<desclist xml:lang='en'><desc xml:lang='en-US'>" +

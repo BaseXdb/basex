@@ -477,6 +477,7 @@ info_serialize=シリアル化
 info_tags=タグインデックス
 info_atts=属性名インデックス
 info_ns=名前空間
+info_uptodate=Up-to-date
 info_pathindex=Path Summary
 info_txtindex=テキストインデックス
 info_atvindex=属性インデックス

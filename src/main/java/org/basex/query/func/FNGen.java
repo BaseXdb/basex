@@ -134,7 +134,7 @@ final class FNGen extends Fun {
   private Item put(final QueryContext ctx) throws QueryException {
     checkAdmin(ctx);
     final byte[] file = checkEStr(expr[1], ctx);
-    final Item it = checkNode(expr[0].item(ctx, input));
+    final Item it = checkNode(checkEmpty(expr[0].item(ctx, input)));
 
     if(it == null || it.type != Type.DOC && it.type != Type.ELM)
       UPFOTYPE.thrw(input, expr[0]);

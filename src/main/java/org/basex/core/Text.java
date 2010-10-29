@@ -134,17 +134,17 @@ public interface Text {
   // COMMANDS =================================================================
 
   /** Command help. */
-  String QUERY = "query";
+  String C_QUERY = "query";
   /** Command help. */
-  String PATH = "path";
+  String C_PATH = "path";
   /** Command help. */
   String INPUT = "input";
   /** Command help. */
-  String NAM = "name";
+  String C_NAME = "name";
   /** Command help. */
-  String PW = "password";
+  String C_PW = "password";
   /** Command help. */
-  String TARGET = "target";
+  String C_TARGET = "target";
 
   /** Command keyword. */
   String AS = "AS";
@@ -170,33 +170,34 @@ public interface Text {
     CmdCreate.INDEX + "|" + CmdCreate.USER + "] [...]",
     lang("ch_create1"),
     lang("ch_create2") + NL +
-    LI + CmdCreate.DB + " [" + NAM + "] ([" + INPUT + "]):"  + NL +
-      "  " + lang("ch_create3", NAM, INPUT) + NL +
+    LI + CmdCreate.DB + " [" + C_NAME + "] ([" + INPUT + "]):"  + NL +
+      "  " + lang("ch_create3", C_NAME, INPUT) + NL +
     LI + CmdCreate.INDEX + " [" + CmdIndex.TEXT + "|" + CmdIndex.ATTRIBUTE +
       "|" + CmdIndex.FULLTEXT + "|" + CmdIndex.PATH + "]: " + NL +
       "  " + lang("ch_create5") + NL +
-    LI + CmdCreate.FS + " [" + NAM + "] [" + PATH +
+    LI + CmdCreate.FS + " [" + C_NAME + "] [" + C_PATH +
       "] ([mountpoint] [backingstore]): " + NL +
-      "  " + lang("ch_create6", NAM, PATH) + NL +
+      "  " + lang("ch_create6", C_NAME, C_PATH) + NL +
       "  " + lang("ch_create7", "mountpoint", "backingstore") + NL +
-    LI + CmdCreate.USER + " [" + NAM + "] ([" + PW + "]): " + NL +
+    LI + CmdCreate.USER + " [" + C_NAME + "] ([" + C_PW + "]): " + NL +
       "  " + lang("ch_create8")
   };
 
   /** Command help. */
   String[] HELPADD = {
-    "(" + AS + " [" + NAM + "]) (" + TO + " [" + TARGET + "]) [" + INPUT + "]",
-    lang("ch_add1"), lang("ch_add2", INPUT, NAM, TARGET)
+    "(" + AS + " [" + C_NAME + "]) (" + TO + " [" + C_TARGET + "]) [" +
+    INPUT + "]",
+    lang("ch_add1"), lang("ch_add2", INPUT, C_NAME, C_TARGET)
   };
 
   /** Command help. */
   String[] HELPDELETE = {
-    "[" + NAM  + "]", lang("ch_delete1"), lang("ch_delete2")
+    "[" + C_NAME  + "]", lang("ch_delete1"), lang("ch_delete2")
   };
 
   /** Command help. */
   String[] HELPOPEN = {
-    "[" + NAM + "]", lang("ch_open1"), lang("ch_open2", NAM)
+    "[" + C_NAME + "]", lang("ch_open1"), lang("ch_open2", C_NAME)
   };
   /** Command help. */
   String[] HELPINFO = {
@@ -206,7 +207,8 @@ public interface Text {
     LI + lang("ch_info22") + NL +
     LI + CmdInfo.DB + ": " + lang("ch_info23") + NL +
     LI + CmdInfo.INDEX + ": " + lang("ch_info24") + NL +
-    LI + CmdInfo.TABLE + " [start end] | [" + QUERY + "]: " + lang("ch_info25")
+    LI + CmdInfo.TABLE + " [start end] | [" + C_QUERY + "]: " +
+    lang("ch_info25")
   };
   /** Command help. */
   String[] HELPCLOSE = {
@@ -221,16 +223,17 @@ public interface Text {
     "[" + CmdDrop.DB + "|" + CmdDrop.INDEX + "|" + CmdDrop.USER + "] [...]",
     lang("ch_drop1"),
     lang("ch_drop2") + NL +
-    LI + CmdDrop.DB + " [" + NAM + "]:" + NL +
+    LI + CmdDrop.DB + " [" + C_NAME + "]:" + NL +
       "  " + lang("ch_drop21") + NL +
     LI + CmdDrop.INDEX + " [" + CmdIndex.PATH + "|" + CmdIndex.TEXT + "|" +
       CmdIndex.ATTRIBUTE + "|" + CmdIndex.FULLTEXT + "]:" + NL +
       "  " + lang("ch_drop22") + NL +
-    LI + CmdDrop.USER + " [" + NAM + "]:" + NL + "  " + lang("ch_drop3", NAM)
+    LI + CmdDrop.USER + " [" + C_NAME + "]:" + NL + "  " +
+    lang("ch_drop3", C_NAME)
   };
   /** Command help. */
   String[] HELPEXPORT = {
-    "[" + PATH + "]", lang("ch_export1"), lang("ch_export2", PATH)
+    "[" + C_PATH + "]", lang("ch_export1"), lang("ch_export2", C_PATH)
   };
 
   /** Command help. */
@@ -241,34 +244,34 @@ public interface Text {
   String[] HELPQ = { lang("ch_helpquery0") };
   /** Command help. */
   String[] HELPXQUERY = {
-    "[" + QUERY + "]", lang("ch_xquery1"), lang("ch_xquery2")
+    "[" + C_QUERY + "]", lang("ch_xquery1"), lang("ch_xquery2")
   };
   /** Command help. */
   String[] HELPFIND = {
-    "[" + QUERY + "]", lang("ch_find1"), lang("ch_find2")
+    "[" + C_QUERY + "]", lang("ch_find1"), lang("ch_find2")
   };
   /** Command help. */
   String[] HELPRUN = {
-    "[" + PATH + "]", lang("ch_run1"), lang("ch_run2", PATH)
+    "[" + C_PATH + "]", lang("ch_run1"), lang("ch_run2", C_PATH)
   };
   /** Command help. */
   String[] HELPCS = {
-    "[" + QUERY + "]", lang("ch_cs1"), lang("ch_cs2")
+    "[" + C_QUERY + "]", lang("ch_cs1"), lang("ch_cs2")
   };
 
   /** Command help. */
   String[] HELPA = { lang("ch_helpadmin0") };
   /** Command help. */
   String[] HELPKILL = {
-    "[" + NAM + "]", lang("ch_kill1"), lang("ch_kill2")
+    "[" + C_NAME + "]", lang("ch_kill1"), lang("ch_kill2")
   };
   /** Command help. */
   String[] HELPBACKUP = {
-    "[" + NAM + "]", lang("ch_backup1"), lang("ch_backup2")
+    "[" + C_NAME + "]", lang("ch_backup1"), lang("ch_backup2")
   };
   /** Command help. */
   String[] HELPRESTORE = {
-    "[" + NAM + "]", lang("ch_restore1"), lang("ch_restore2")
+    "[" + C_NAME + "]", lang("ch_restore1"), lang("ch_restore2")
   };
   /** Command help. */
   String[] HELPSHOW = {
@@ -294,9 +297,9 @@ public interface Text {
     "[" + USER + "|" + CmdCreate.DB + "] [...]",
     lang("ch_alter1"),
     lang("ch_alter2") + NL  +
-    LI + USER  + " [" + NAM + "] ([" + PW + "]):" + NL +
+    LI + USER  + " [" + C_NAME + "] ([" + C_PW + "]):" + NL +
     "  " + lang("ch_alterpw") + NL +
-    LI + CmdCreate.DB + " [" + NAM + "] [newname]" + NL +
+    LI + CmdCreate.DB + " [" + C_NAME + "] [newname]" + NL +
     "  " + lang("ch_alterdb")
   };
 
@@ -319,7 +322,7 @@ public interface Text {
   };
   /** Command help. */
   String[] HELPPASSWORD = {
-    "([" + PW + "])", lang("ch_password1"), lang("ch_password2")
+    "([" + C_PW + "])", lang("ch_password1"), lang("ch_password2")
   };
   /** Command help. */
   String[] HELPHELP = {
@@ -632,6 +635,8 @@ public interface Text {
   String INFOFTINDEX = lang("info_ftindex");
   /** Info on path summary. */
   String INFOPATHINDEX = lang("info_pathindex");
+  /** Info on up-to-date. */
+  String INFOUPTODATE = lang("info_uptodate");
   /** Info on database path. */
   String INFODBPATH = lang("info_dbpath");
 

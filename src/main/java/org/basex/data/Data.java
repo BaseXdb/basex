@@ -140,6 +140,14 @@ public abstract class Data {
   }
 
   /**
+   * Checks if the database contains a single document.
+   * @return result of check
+   */
+  public final boolean single() {
+    return meta.size == size(0, DOC);
+  }
+
+  /**
    * Internal method to close the database.
    * @throws IOException I/O exception
    */

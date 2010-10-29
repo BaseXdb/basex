@@ -366,6 +366,8 @@ public interface QueryTokens {
   byte[] ERRORURI = token(W3URI + "/2005/xqt-errors");
   /** Database URI. */
   byte[] BXURI = token(Text.URL);
+  /** DB module URI. */
+  byte[] DBURI = token(Text.URL + "/db");
   /** File module URI. */
   byte[] FILEURI = token(Text.URL + "/file");
   /** Sentiment URI.*/
@@ -415,6 +417,8 @@ public interface QueryTokens {
   byte[] OUTPUT = token("output");
   /** BaseX token. */
   byte[] BASEX = token("basex");
+  /** DB token. */
+  byte[] DB = token("db");
   /** XS token. */
   byte[] XS = token("xs");
   /** XS token. */

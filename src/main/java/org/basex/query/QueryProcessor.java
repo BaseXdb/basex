@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import org.basex.core.Context;
 import org.basex.core.Progress;
+import org.basex.core.Prop;
 import org.basex.data.Nodes;
 import org.basex.data.Result;
 import org.basex.data.Serializer;
@@ -104,13 +105,28 @@ public final class QueryProcessor extends Progress {
    * appropriate XQuery type.
    * @param n name of variable
    * @param o object to be bound
+   * @param t data type
+   * @throws QueryException query exception
+   */
+  public void bind(final String n, final String o, final String t)
+      throws QueryException {
+    // [CG] XQuery: handle data type
+    if(t == null);
+    bind(n, o);
+  }
+
+  /**
+   * Binds an object to a global variable. If the object is an {@link Expr}
+   * instance, it is directly assigned. Otherwise, it is first cast to the
+   * appropriate XQuery type.
+   * @param n name of variable
+   * @param o object to be bound
    * @throws QueryException query exception
    */
   public void bind(final String n, final Object o) throws QueryException {
     final Expr ex = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
     ctx.vars.addGlobal(new Var(new QNm(Token.token(n))).bind(ex, ctx));
   }
-
 
   /**
    * Returns a serializer for the given output stream.
@@ -123,22 +139,18 @@ public final class QueryProcessor extends Progress {
    */
   public XMLSerializer getSerializer(final OutputStream os) throws IOException,
       QueryException {
-    return getSerializer(os, null);
-  }
 
-  /**
-   * Returns a serializer for the given output stream, specifying a default
-   * serializer.
-   * @param os output stream
-   * @param props serializer properties
-   * @return serializer instance
-   * @throws IOException query exception
-   * @throws QueryException query exception
-   */
-  public XMLSerializer getSerializer(final OutputStream os,
-      final SerializerProp props) throws IOException, QueryException {
     compile();
-    return new XMLSerializer(os, ctx.serProp == null ? props : ctx.serProp);
+
+    SerializerProp sp = ctx.serProp;
+    if(sp == null) {
+      sp = new SerializerProp(ctx.context.prop.get(Prop.SERIALIZER));
+      if(ctx.context.prop.is(Prop.WRAPOUTPUT)) {
+        sp.set(SerializerProp.S_WRAP_PRE, NAMELC);
+        sp.set(SerializerProp.S_WRAP_URI, URL);
+      }
+    }
+    return new XMLSerializer(os, sp);
   }
 
   /**

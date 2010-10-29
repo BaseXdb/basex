@@ -37,10 +37,10 @@ import org.basex.util.Token;
 public final class ClientSession extends Session {
   /** Socket reference. */
   final Socket socket;
-  /** Output stream. */
-  final PrintOutput out;
-  /** Input stream. */
-  final InputStream in;
+  /** Server output. */
+  final PrintOutput sout;
+  /** Server input. */
+  final InputStream sin;
 
   /**
    * Constructor, specifying the database context and the
@@ -52,7 +52,23 @@ public final class ClientSession extends Session {
    */
   public ClientSession(final Context context, final String user,
       final String pw) throws IOException {
-    this(context.prop.get(Prop.HOST), context.prop.num(Prop.PORT), user, pw);
+    this(context, user, pw, null);
+  }
+
+  /**
+   * Constructor, specifying the database context and the
+   * login and password.
+   * @param context database context
+   * @param user user name
+   * @param pw password
+   * @param output client output; if set to {@code null}, results will
+   * be returned as strings.
+   * @throws IOException I/O exception
+   */
+  public ClientSession(final Context context, final String user,
+      final String pw, final OutputStream output) throws IOException {
+    this(context.prop.get(Prop.HOST), context.prop.num(Prop.PORT),
+        user, pw, output);
   }
 
   /**
@@ -66,46 +82,42 @@ public final class ClientSession extends Session {
    */
   public ClientSession(final String host, final int port,
       final String user, final String pw) throws IOException {
+    this(host, port, user, pw, null);
+  }
+
+  /**
+   * Constructor, specifying the server host:port combination and the
+   * login and password.
+   * @param host server name
+   * @param port server port
+   * @param user user name
+   * @param pw password
+   * @param output client output; if set to {@code null}, results will
+   * be returned as strings.
+   * @throws IOException I/O exception
+   */
+  public ClientSession(final String host, final int port, final String user,
+      final String pw, final OutputStream output) throws IOException {
+
+    super(output);
 
     // 5 seconds timeout
     socket = new Socket();
     socket.connect(new InetSocketAddress(host, port), 5000);
-    in = socket.getInputStream();
+    sin = socket.getInputStream();
 
     // receive timestamp
-    final BufferInput bi = bufIn();
+    final BufferInput bi = new BufferInput(sin);
     final String ts = bi.readString();
 
     // send user name and hashed password/timestamp
-    out = PrintOutput.get(socket.getOutputStream());
+    sout = PrintOutput.get(socket.getOutputStream());
     send(user);
     send(Token.md5(Token.md5(pw) + ts));
-    out.flush();
+    sout.flush();
 
     // receive success flag
     if(!ok(bi)) throw new LoginException();
-  }
-
-  @Override
-  public void execute(final String cmd, final OutputStream o)
-      throws BaseXException {
-
-    try {
-      send(cmd);
-      final BufferInput bi = bufIn();
-      int l;
-      while((l = bi.read()) != 0) o.write(l);
-      info = bi.readString();
-      if(!ok(bi)) throw new BaseXException(info);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
-  }
-
-  @Override
-  public void execute(final Command cmd, final OutputStream o)
-      throws BaseXException {
-    execute(cmd.toString(), o);
   }
 
   @Override
@@ -113,13 +125,13 @@ public final class ClientSession extends Session {
       throws BaseXException {
 
     try {
-      out.write(8);
+      sout.write(8);
       send(name);
       int l;
-      while((l = input.read()) != -1) out.write(l);
-      out.write(0);
-      out.flush();
-      final BufferInput bi = bufIn();
+      while((l = input.read()) != -1) sout.write(l);
+      sout.write(0);
+      sout.flush();
+      final BufferInput bi = new BufferInput(sin);
       info = bi.readString();
       if(!ok(bi)) throw new BaseXException(info);
     } catch(final IOException ex) {
@@ -129,7 +141,7 @@ public final class ClientSession extends Session {
 
   @Override
   public ClientQuery query(final String query) throws BaseXException {
-    return new ClientQuery(this, query);
+    return new ClientQuery(query, this);
   }
 
   @Override
@@ -144,18 +156,9 @@ public final class ClientSession extends Session {
    * @throws IOException I/O exception
    */
   void send(final String s) throws IOException {
-    out.print(s);
-    out.write(0);
-    out.flush();
-  }
-
-  /**
-   * Returns a new buffer input instance.
-   * @return buffer input
-   * @throws IOException I/O exception
-   */
-  BufferInput bufIn() throws IOException {
-    return new BufferInput(in);
+    sout.print(s);
+    sout.write(0);
+    sout.flush();
   }
 
   /**
@@ -166,5 +169,27 @@ public final class ClientSession extends Session {
    */
   boolean ok(final BufferInput bi) throws IOException {
     return bi.read() == 0;
+  }
+
+  @Override
+  protected void execute(final String cmd, final OutputStream os)
+      throws BaseXException {
+
+    try {
+      send(cmd);
+      final BufferInput bi = new BufferInput(sin);
+      int l;
+      while((l = bi.read()) != 0) os.write(l);
+      info = bi.readString();
+      if(!ok(bi)) throw new BaseXException(info);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  @Override
+  protected void execute(final Command cmd, final OutputStream os)
+      throws BaseXException {
+    execute(cmd.toString(), os);
   }
 }

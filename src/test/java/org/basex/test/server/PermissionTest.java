@@ -1,4 +1,4 @@
-package org.basex.test.cs;
+package org.basex.test.server;
 
 import static org.basex.core.Text.*;
 import static org.junit.Assert.*;
@@ -214,7 +214,6 @@ public final class PermissionTest {
     ok(new Exit(), testSession);
     ok(new DropUser("test"), adminSession);
   }
-
 
   /**
    * Assumes that this command is successful.

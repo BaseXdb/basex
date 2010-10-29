@@ -253,7 +253,6 @@ public enum Err {
   NOEXPR(XPST, 3, "Expecting expression."),
   /** XPST0003: Parsing exception. */
   WRONGCHAR(XPST, 3, "Expecting \"%\"%."),
-
   /** XPST0003: Parsing exception. */
   WRONGEND(XPST, 3, "Expecting \"%\"."),
   /** XPST0003: Parsing exception. */
@@ -343,7 +342,8 @@ public enum Err {
   TESTINVALID(XPST, 3, "Invalid % test: %."),
   /** XPST0003: Parsing exception. */
   QNAMEINV(XPST, 3, "Expecting QName."),
-
+  /** XPST0003: Parsing exception. */
+  PROLOGORDER(XPST, 3, "Default declaration must be declared first."),
   /** XPST0003: Parsing exception. */
   FTRANGE(XPST, 3, "Expecting full-text range."),
   /** XPST0003: Parsing exception. */

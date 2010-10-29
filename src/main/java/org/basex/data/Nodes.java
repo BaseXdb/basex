@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import org.basex.core.Context;
 import org.basex.core.Prop;
+import org.basex.io.ArrayOutput;
 import org.basex.util.IntList;
-import org.basex.util.TokenBuilder;
 import org.basex.util.Util;
 
 /**
@@ -231,12 +231,12 @@ public final class Nodes implements Result {
 
   @Override
   public String toString() {
-    final TokenBuilder tb = new TokenBuilder(Util.name(this) + '[');
-    for(int i = 0; i < list.length; ++i) {
-      if(i > 0) tb.add(',');
-      tb.addNum(list[i]);
+    final ArrayOutput ao = new ArrayOutput();
+    try {
+      serialize(new XMLSerializer(ao));
+    } catch(final IOException ex) {
+      Util.notexpected(ex);
     }
-    tb.add(']');
-    return tb.toString();
+    return ao.toString();
   }
 }

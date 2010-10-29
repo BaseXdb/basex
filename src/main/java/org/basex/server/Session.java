@@ -8,8 +8,13 @@ import org.basex.core.Command;
 import org.basex.io.ArrayOutput;
 
 /**
- * This class defines all commands for a generic command execution.
- * It is implemented both by {@link ClientSession} and {@link LocalSession}.
+ * This class defines methods for evaluating commands via the client/server
+ * architecture or locally.
+ * The results of database commands are returned as strings.
+ * If an output stream is specified in the constructor or with
+ * {@link #setOutputStream(OutputStream)}, results are only serialized
+ * to that stream.
+ * The class is implemented by {@link ClientSession} and {@link LocalSession}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -17,47 +22,40 @@ import org.basex.io.ArrayOutput;
 public abstract class Session {
   /** Command info. */
   protected String info;
+  /** Client output. */
+  protected OutputStream out;
 
   /**
-   * Executes a command and prints the result to the specified output stream.
-   * @param cmd command to be parsed
-   * @param out output stream
-   * @throws BaseXException database exception
+   * Specifies an output stream. The output stream is invalidated if
+   * {@code null} is specified.
+   * @param output client output stream.
    */
-  public abstract void execute(final String cmd, final OutputStream out)
-    throws BaseXException;
+  public void setOutputStream(final OutputStream output) {
+    out = output;
+  }
 
   /**
-   * Executes a command and prints the result to the specified output stream.
-   * @param cmd command to be executed
-   * @param out output stream
-   * @throws BaseXException database exception
-   */
-  public abstract void execute(final Command cmd, final OutputStream out)
-    throws BaseXException;
-
-  /**
-   * Executes a command and returns the result as string.
-   * @param cmd command to be executed
+   * Executes a {@link Command} instance.
+   * @param command command to be executed
    * @return result
    * @throws BaseXException database exception
    */
-  public final String execute(final Command cmd) throws BaseXException {
-    final ArrayOutput out = new ArrayOutput();
-    execute(cmd, out);
-    return out.toString();
+  public final String execute(final Command command) throws BaseXException {
+    final ArrayOutput ao = out == null ? new ArrayOutput() : null;
+    execute(command, ao != null ? ao : out);
+    return ao != null ? ao.toString() : null;
   }
 
   /**
    * Executes a command and returns the result as string.
-   * @param cmd command to be parsed
+   * @param command command to be parsed
    * @return result
    * @throws BaseXException database exception
    */
-  public final String execute(final String cmd) throws BaseXException {
-    final ArrayOutput out = new ArrayOutput();
-    execute(cmd, out);
-    return out.toString();
+  public final String execute(final String command) throws BaseXException {
+    final ArrayOutput ao = out == null ? new ArrayOutput() : null;
+    execute(command, ao != null ? ao : out);
+    return ao != null ? ao.toString() : null;
   }
 
   /**
@@ -90,4 +88,33 @@ public abstract class Session {
    * @throws IOException I/O exception
    */
   public abstract void close() throws IOException;
+
+  // PROTECTED METHODS ========================================================
+
+  /**
+   * Constructor.
+   * @param output client output stream; if set to {@code null}, all
+   * results will be returned as strings.
+   */
+  protected Session(final OutputStream output) {
+    out = output;
+  }
+
+  /**
+   * Executes a command and prints the result to the specified output stream.
+   * @param cmd command to be parsed
+   * @param os output stream
+   * @throws BaseXException database exception
+   */
+  protected abstract void execute(final String cmd, final OutputStream os)
+    throws BaseXException;
+
+  /**
+   * Executes a command and prints the result to the specified output stream.
+   * @param cmd command to be executed
+   * @param os output stream
+   * @throws BaseXException database exception
+   */
+  protected abstract void execute(final Command cmd, final OutputStream os)
+    throws BaseXException;
 }

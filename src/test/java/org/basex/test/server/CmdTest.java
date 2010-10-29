@@ -1,4 +1,4 @@
-package org.basex.test.cs;
+package org.basex.test.server;
 
 import org.basex.core.BaseXException;
 import org.basex.core.Context;

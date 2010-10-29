@@ -1,94 +1,101 @@
 package org.basex.server;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import org.basex.core.BaseXException;
 import org.basex.io.BufferInput;
 import org.basex.util.ByteList;
 
 /**
  * This class defines all methods for iteratively evaluating queries with the
- * client/server architecture.
+ * client/server architecture. All sent data is received by the
+ * {@link ServerProcess} and interpreted by the {@link QueryProcess}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
  */
 public final class ClientQuery extends Query {
   /** Client session. */
-  private final ClientSession cs;
+  protected final ClientSession cs;
   /** Query id. */
-  private final String id;
+  protected final String id;
   /** Next result. */
-  private ByteList next;
+  protected ByteList next;
 
   /**
    * Standard constructor.
-   * @param session client session
    * @param query query to be run
+   * @param session client session
    * @throws BaseXException database exception
    */
-  public ClientQuery(final ClientSession session, final String query)
+  public ClientQuery(final String query, final ClientSession session)
       throws BaseXException {
 
     cs = session;
-    try {
-      cs.out.write(0);
-      cs.send(query);
-      final BufferInput bi = cs.bufIn();
-      id = bi.readString();
-      if(!cs.ok(bi)) throw new BaseXException(bi.readString());
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
+    id = exec(ServerCmd.QUERY, query).toString();
   }
 
   @Override
-  public void bind(final String n, final Object o) throws BaseXException {
-    try {
-      // send 3 to announce variable declaration, {ID}0 for identification,
-      // and {key}0 {value}0
-      cs.out.write(3);
-      cs.send(id + '\0' + n + '\0' + o);
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
+  public void bind(final String n, final String v, final String t)
+      throws BaseXException {
+    exec(ServerCmd.BIND, id + '\0' + n + '\0' + v + '\0' +
+        (t == null ? "" : t));
+  }
+
+  @Override
+  public String init() throws BaseXException {
+    return print(exec(ServerCmd.INIT, id));
   }
 
   @Override
   public boolean more() throws BaseXException {
-    // send 1 to get next result item, and {ID}0 for identification
+    next = exec(ServerCmd.NEXT, id);
+    return next.size() != 0;
+  }
+
+  @Override
+  public String next() throws BaseXException {
+    if(next == null) more();
+    final ByteList bl = next;
+    next = null;
+    return print(bl);
+  }
+
+  @Override
+  public String close() throws BaseXException {
+    return print(exec(ServerCmd.CLOSE, id));
+  }
+
+  /**
+   * Executes the specified command.
+   * @param cmd server command
+   * @param arg argument
+   * @return result
+   * @throws BaseXException command exception
+   */
+  ByteList exec(final ServerCmd cmd, final String arg) throws BaseXException {
     try {
-      cs.out.write(1);
-      cs.send(id);
-      final BufferInput bi = cs.bufIn();
-      next = bi.content();
+      cs.sout.write(cmd.code);
+      cs.send(arg);
+      final BufferInput bi = new BufferInput(cs.sin);
+      final ByteList bl = bi.content();
       if(!cs.ok(bi)) throw new BaseXException(bi.readString());
-      return next.size() != 0;
+      return bl;
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
   }
 
-  @Override
-  public void next(final OutputStream out) throws BaseXException {
+  /**
+   * Returns the specified result.
+   * @param bl result
+   * @return string, or {@code null} if result was sent to output stream.
+   * @throws BaseXException command exception
+   */
+  String print(final ByteList bl) throws BaseXException {
+    if(cs.out == null) return bl.toString();
     try {
-      out.write(next.toArray());
-    } catch(final IOException ex) {
-      throw new BaseXException(ex);
-    }
-  }
-
-  @Override
-  public String next() {
-    return next.toString();
-  }
-
-  @Override
-  public void close() throws BaseXException {
-    // send 2 to mark end of query execution, and {ID}0 for identification
-    try {
-      cs.out.write(2);
-      cs.send(id);
+      cs.out.write(bl.toArray());
+      return null;
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }

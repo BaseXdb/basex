@@ -1,6 +1,5 @@
 package org.basex.util;
 
-
 /**
  * This class parses command-line arguments.
  *

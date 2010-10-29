@@ -136,9 +136,7 @@ public class PathTest {
     "/week/tuesday')/root/monday/text[text() = 'text']) ";
     final QueryProcessor qp = new QueryProcessor(count, CTX);
     String result = qp.execute().toString();
-    int comma = result.indexOf(",");
-    assertEquals(3, Integer.parseInt(result.substring(0, comma)));
-    assertEquals(1, Integer.parseInt(result.substring(comma + 2)));
+    assertEquals("3 1", result);
     qp.close();
   }
 }

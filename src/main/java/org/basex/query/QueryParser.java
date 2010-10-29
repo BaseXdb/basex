@@ -358,6 +358,8 @@ public class QueryParser extends InputParser {
         functionDecl(false);
       } else if(consumeWS(OPTION)) {
         optionDecl();
+      } else if(consumeWS(DEFAULT)) {
+        error(PROLOGORDER);
       } else {
         qp = p;
         return;

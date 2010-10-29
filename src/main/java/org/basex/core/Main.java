@@ -128,7 +128,7 @@ public abstract class Main {
     final Session ss = session();
     if(ss == null) return false;
     try {
-      ss.execute(cmd, out);
+      ss.execute(cmd);
       if(info) Util.out(ss.info());
       if(cmd instanceof Exit) return true;
       return true;

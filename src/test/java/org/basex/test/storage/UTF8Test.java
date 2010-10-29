@@ -1,4 +1,4 @@
-package org.basex.test.query;
+package org.basex.test.storage;
 
 import static org.junit.Assert.*;
 import static org.basex.util.Token.*;

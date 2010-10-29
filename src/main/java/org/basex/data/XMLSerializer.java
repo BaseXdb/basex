@@ -175,6 +175,7 @@ public final class XMLSerializer extends Serializer {
     if(wrap) {
       openElement(concat(wrapPre, COL, RESULTS));
       namespace(wrapPre, wrapUri);
+      finishElement();
     }
   }
 

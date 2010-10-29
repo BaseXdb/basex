@@ -205,7 +205,6 @@ public final class TokenBuilder {
     return this;
   }
 
-
   /**
    * Replaces all % characters in the input string by the specified extension
    * objects, which can be byte arrays or any other object.
