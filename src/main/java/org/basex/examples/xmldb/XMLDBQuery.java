@@ -19,9 +19,6 @@ public final class XMLDBQuery {
   /** Sample query. */
   private static final String QUERY = "//li";
 
-  /** Private constructor. */
-  private XMLDBQuery() { }
-
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
@@ -33,41 +30,41 @@ public final class XMLDBQuery {
 
     System.out.println("\n* Run query via XML:DB:");
 
-    // Collection instance.
+    // Collection instance
     Collection coll = null;
 
     try {
-      // Register the database.
+      // Register the database
       Class<?> c = Class.forName(DRIVER);
       Database db = (Database) c.newInstance();
       DatabaseManager.registerDatabase(db);
 
-      // Receive the database.
+      // Receive the database
       coll = DatabaseManager.getCollection(DBNAME);
 
-      // Receive the XPath query service.
+      // Receive the XPath query service
       XPathQueryService service = (XPathQueryService)
         coll.getService("XPathQueryService", "1.0");
 
-      // Execute the query and receives all results.
+      // Execute the query and receives all results
       ResourceSet set = service.query(QUERY);
 
-      // Create a result iterator.
+      // Create a result iterator
       ResourceIterator iter = set.getIterator();
 
-      // Loop through all result items.
+      // Loop through all result items
       while(iter.hasMoreResources()) {
-        // Receive the next results.
+        // Receive the next results
         Resource res = iter.nextResource();
 
-        // Write the result to the console.
+        // Write the result to the console
         System.out.println(res.getContent());
       }
     } catch(final XMLDBException ex) {
-      // Handle exceptions.
+      // Handle exceptions
       System.err.println("XML:DB Exception occured " + ex.errorCode);
     } finally {
-      // Close the collection.
+      // Close the collection
       if(coll != null) coll.close();
     }
   }

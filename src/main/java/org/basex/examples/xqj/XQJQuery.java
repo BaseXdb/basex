@@ -18,9 +18,6 @@ public final class XQJQuery {
   /** Sample query. */
   private static final String QUERY = "doc('etc/xml/input.xml')//li";
 
-  /** Private constructor. */
-  private XQJQuery() { }
-
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments

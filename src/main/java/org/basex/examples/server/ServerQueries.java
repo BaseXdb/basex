@@ -1,25 +1,18 @@
-package org.basex.examples.query;
+package org.basex.examples.server;
 
 import org.basex.BaseXServer;
-import org.basex.core.Context;
-import org.basex.server.LocalSession;
-import org.basex.server.Query;
-import org.basex.server.Session;
+import org.basex.server.ClientSession;
+import org.basex.server.ClientQuery;
 
 /**
- * This class demonstrates local query execution via the session architecture.
+ * This class demonstrates query execution via the client/server architecture.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class SessionQueryExample {
-  /** Database context. */
-  private static Context context = new Context();
+public final class ServerQueries {
   /** Session reference. */
-  private static Session session;
-
-  /** Private constructor. */
-  private SessionQueryExample() { }
+  private static ClientSession session;
 
   /**
    * Runs the example code.
@@ -28,17 +21,17 @@ public final class SessionQueryExample {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== LocalQueryExample ===");
+    System.out.println("=== ServerQueryExample ===");
 
     // ------------------------------------------------------------------------
-    // Start server on default port 1984.
+    // Start server on default port 1984
     BaseXServer server = new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
     System.out.println("\n* Create a client session.");
 
-    session = new LocalSession(context);
+    session = new ClientSession("localhost", 1984, "admin", "admin");
 
     // ------------------------------------------------------------------------
     // Run a query
@@ -50,33 +43,42 @@ public final class SessionQueryExample {
     // Run a query, specifying an output stream
     System.out.println("\n* Run a query (faster):");
 
-    session.execute("XQUERY 1 to 2", System.out);
+    System.out.println(session.execute("XQUERY 1 to 2"));
 
     // ------------------------------------------------------------------------
     // Iteratively run a query
-    System.out.println("\n\n* Iterate a query:");
+    System.out.println("\n* Iterate a query:");
 
     // Create query instance
-    Query query = session.query("1 to 3");
+    ClientQuery query = session.query("1 to 3");
 
     // Loop through all results
-    while(query.more()) System.out.print(query.next());
+    while(query.more()) {
+      System.out.print(query.next() + " ");
+    }
 
-    // close iterator
+    // Close iterator
     query.close();
 
     // ------------------------------------------------------------------------
-    // Iteratively run a query
+    // Iteratively run a query, specifying an output stream
     System.out.println("\n\n* Iterate a query (faster):");
+    session.setOutputStream(System.out);
 
     // Create query instance
     query = session.query("1 to 4");
 
-    // Loop through all results
-    while(query.more()) query.next(System.out);
+    // Loop through all results (faster)
+    while(query.more()) {
+      query.next();
+      System.out.print(" ");
+    }
 
-    // close iterator
+    // Close iterator
     query.close();
+
+    // Reset output stream
+    session.setOutputStream(null);
 
     // ------------------------------------------------------------------------
     // Close the client session

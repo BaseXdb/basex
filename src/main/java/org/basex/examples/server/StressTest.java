@@ -34,9 +34,6 @@ public final class StressTest {
   /** Result counter. */
   static int counter;
 
-  /** Private constructor. */
-  private StressTest() { }
-
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -45,11 +42,11 @@ public final class StressTest {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== Server StressTest ===");
 
-    // run server instance
+    // Run server instance
     System.out.println("\n* Start server.");
     server = new BaseXServer("-z");
 
-    // create test database
+    // Create test database
     System.out.println("\n* Create test database.");
 
     final ClientSession cs = newSession();
@@ -57,7 +54,7 @@ public final class StressTest {
     System.out.print(cs.info());
     cs.close();
 
-    // run clients
+    // Run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
     final Client[] cl = new Client[NCLIENTS];
     for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client();
@@ -71,7 +68,7 @@ public final class StressTest {
    * @throws Exception exception
    */
   static void stopServer() throws Exception {
-    // drop database and stop server
+    // Drop database and stop server
     System.out.println("\n* Stop server and drop test database.");
 
     final ClientSession cs = newSession();
@@ -101,11 +98,11 @@ public final class StressTest {
       try {
         session = newSession();
 
-        // perform some queries
+        // Perform some queries
         for(int i = 0; i < NQUERIES; ++i) {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
-          // return nth text of the database
+          // Return nth text of the database
           final int n = (RND.nextInt() & 0xFF) + 1;
           final String qu = Util.info(QUERY, n);
           final String result = session.execute("xquery " + qu);

@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.basex.api.jaxrx.JaxRxServer;
 
 /**
  * This class is a simple Java client to demonstrate the JAX-RX implementation.
@@ -15,64 +16,57 @@ import java.net.URL;
  * @author Lukas Lewandowski
  */
 public final class JaxRxPOSTQuery {
-
-  /** Private constructor. */
-  private JaxRxPOSTQuery() { }
-
   /**
-   * This method demonstrates the available GET method. In this example,
-   * a query on a resource is processed.
-   * @param args (ignored) command-line arguments
+   * Constructor.
    * @throws IOException I/O exception
    */
-  public static void main(final String[] args) throws IOException {
-
+  JaxRxPOSTQuery() throws IOException {
     System.out.println("=== POST request: process a query ===");
 
-    // The java URL connection to the resource.
+    // The java URL connection to the resource
     URL url = new URL("http://localhost:8984/basex/jax-rx/factbook");
     System.out.println("\n* URL: " + url);
 
-    // Query to be sent to the server.
+    // Query to be sent to the server
     String request =
       "<query xmlns:jax-rx='http://jax-rx.sourceforge.net'>\n" +
       "  <text>//city/name</text>\n" +
       "  <parameter name='wrap' value='yes'/>\n" +
-      "  <parameter name='count' value='5'/>\n" +
+      "  <parameter name='count' value='2'/>\n" +
       "</query>";
     System.out.println("\n* Query:\n" + request);
 
-    // Establish the connection to the URL.
+    // Establish the connection to the URL
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-    // Set an output connection.
+    // Set an output connection
     conn.setDoOutput(true);
-    // Set as PUT request.
+    // Set as PUT request
     conn.setRequestMethod("POST");
-    // Specify content type.
+    // Specify content type
     conn.setRequestProperty("Content-Type", "application/query+xml");
 
-    // Get and cache output stream.
+    // Get and cache output stream
     OutputStream out = conn.getOutputStream();
 
-    // Send UTF-8 encoded query to server.
+    // Send UTF-8 encoded query to server
     out.write(request.getBytes("UTF-8"));
     out.close();
 
-    // Print the HTTP response code.
+    // Print the HTTP response code
     int code = conn.getResponseCode();
     System.out.println("\n* HTTP response: " + code +
         " (" + conn.getResponseMessage() + ")");
 
-    // Check if request was successful.
+    // Check if request was successful
     if(code == HttpURLConnection.HTTP_OK) {
-      // Print the received result to standard output (same as GET request).
+      // Print the received result to standard output (same as GET request)
       System.out.println("\n* Result:");
 
-      // Get and cache input as UTF-8 encoded stream.
+      // Get and cache input as UTF-8 encoded stream
       BufferedReader br = new BufferedReader(new InputStreamReader(
           conn.getInputStream(), "UTF-8"));
 
-      // Print all lines of the result.
+      // Print all lines of the result
       String line;
       while((line = br.readLine()) != null) {
         System.out.println(line);
@@ -80,7 +74,22 @@ public final class JaxRxPOSTQuery {
       br.close();
     }
 
-    // Close connection.
+    // Close connection
     conn.disconnect();
+  }
+
+  /**
+   * This method demonstrates the POST method. In this example, a query on a
+   * resource is processed.
+   * @param args (ignored) command-line arguments
+   * @throws IOException I/O exception
+   */
+  public static void main(final String... args) throws IOException {
+    // Start servers
+    JaxRxServer jaxrx = new JaxRxServer();
+    // Run example
+    new JaxRxPOSTQuery();
+    // Stop servers
+    jaxrx.stop();
   }
 }

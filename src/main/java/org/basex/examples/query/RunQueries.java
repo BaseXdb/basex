@@ -19,14 +19,11 @@ import org.basex.query.iter.Iter;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class QueryExample {
+public final class RunQueries {
   /** Database context. */
   static Context context = new Context();
   /** Output stream. */
   static OutputStream out = System.out;
-
-  /** Private constructor. */
-  private QueryExample() { }
 
   /**
    * Runs the example code.
@@ -52,13 +49,13 @@ public final class QueryExample {
 
     // ------------------------------------------------------------------------
     // Directly use the query processor
-    System.out.println("\n\n* Query by directly using the query processor:");
+    System.out.println("\n* Query by directly using the query processor:");
 
     process(query);
 
     // ------------------------------------------------------------------------
     // Iterate through all query results
-    System.out.println("\n\n* Query by iterating through all query results:");
+    System.out.println("\n* Query by iterating through all query results:");
 
     iterate(query);
 
@@ -66,19 +63,18 @@ public final class QueryExample {
     // iterate("for error s$x in . return $x");
 
     // ------------------------------------------------------------------------
-    // Flush output.
+    // Flush output
     System.out.println();
   }
 
   /**
    * This method evaluates a query by using the database command.
-   * The results are automatically serialized and printed to a specified
-   * output stream.
+   * The results are automatically serialized and printed.
    * @param query query to be evaluated
    * @throws BaseXException if a database command fails
    */
   static void query(final String query) throws BaseXException {
-    new XQuery(query).execute(context, out);
+    System.out.println(new XQuery(query).execute(context));
   }
 
   /**
@@ -91,23 +87,19 @@ public final class QueryExample {
   static void process(final String query) throws QueryException, IOException {
     // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor processor = new QueryProcessor(query, context);
+    QueryProcessor proc = new QueryProcessor(query, context);
 
     // ------------------------------------------------------------------------
     // Execute the query
-    Result result = processor.execute();
+    Result result = proc.execute();
 
     // ------------------------------------------------------------------------
-    // Create an XML serializer
-    XMLSerializer xml = processor.getSerializer(out);
-
-    // ------------------------------------------------------------------------
-    // Serialize all results to OUT, using the specified serializer
-    result.serialize(xml);
+    // Print result as string.
+    System.out.println(result);
 
     // ------------------------------------------------------------------------
     // Close the query processor
-    processor.close();
+    proc.close();
   }
 
   /**
@@ -122,15 +114,15 @@ public final class QueryExample {
   static void iterate(final String query) throws QueryException, IOException {
     // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor processor = new QueryProcessor(query, context);
+    QueryProcessor proc = new QueryProcessor(query, context);
 
     // ------------------------------------------------------------------------
     // Store the pointer to the result in an iterator:
-    Iter iter = processor.iter();
+    Iter iter = proc.iter();
 
     // ------------------------------------------------------------------------
     // Create an XML serializer
-    XMLSerializer xml = processor.getSerializer(out);
+    XMLSerializer xml = proc.getSerializer(out);
 
     // ------------------------------------------------------------------------
     // Iterate through all items and serialize contents
@@ -145,6 +137,6 @@ public final class QueryExample {
 
     // ------------------------------------------------------------------------
     // Close the query processor
-    processor.close();
+    proc.close();
   }
 }

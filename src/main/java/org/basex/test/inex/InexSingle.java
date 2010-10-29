@@ -132,8 +132,9 @@ public final class InexSingle {
     String file = Integer.toString(quindex) + ".xml";
     while(file.length() < 7) file = "0" + file;
     final OutputStream out = quiet ? new NullOutput() : new PrintOutput(file);
+    session.setOutputStream(out);
     try {
-      session.execute(new XQuery(qu.toString()), out);
+      session.execute(new XQuery(qu.toString()));
       // output result
       Util.outln("- " + query);
       Util.outln("Result saved to % in %", file, p);

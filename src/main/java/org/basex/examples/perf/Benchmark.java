@@ -39,7 +39,7 @@ public abstract class Benchmark {
   private boolean start;
 
   /**
-   * Private constructor.
+   * Initializes the benchmark.
    * @param args command-line arguments
    * @return result flag
    * @throws Exception exception
@@ -50,7 +50,7 @@ public abstract class Benchmark {
 
     final Context ctx = new Context();
 
-    // check if server is (not) running
+    // Check if server is (not) running
     start = !local &&
       !BaseXServer.ping(LOCALHOST, ctx.prop.num(Prop.SERVERPORT));
 
@@ -59,7 +59,7 @@ public abstract class Benchmark {
     session = local ? new LocalSession(ctx) :
       new ClientSession(ctx, "admin", "admin");
 
-    // create test database
+    // Create test database
     session.execute(new Set(Prop.QUERYINFO, true));
 
     drop();

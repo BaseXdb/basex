@@ -426,7 +426,7 @@ public abstract class W3CTS {
         xml |= eq(type, XML);
         frag |= eq(type, FRAGMENT);
         ignore |= eq(type, IGNORE);
-      }      
+      }
 
       String expError = text("*:expected-error/text()", state);
 
@@ -470,7 +470,7 @@ public abstract class W3CTS {
       } else if(er == null) {
         int s = -1;
         final int rs = result.size();
-        
+
         while(!ignore && ++s < rs) {
           inspect |= s < cmpFiles.list.length &&
             eq(data.atom(cmpFiles.list[s]), INSPECT);
@@ -658,6 +658,7 @@ public abstract class W3CTS {
 
       Expr expr = null;
       if(src == null) {
+        // assign collection
         expr = coll(nm, qp);
       } else {
         // assign document
@@ -666,7 +667,6 @@ public abstract class W3CTS {
           def = FunDef.DB;
           src = IO.get(src).dbname();
         }
-        // [CG] XQuery/Query Info
         expr = def.newInstance(null, Str.get(src));
       }
       if(var != null) qp.bind(string(data.atom(var.list[c])), expr);
@@ -712,7 +712,7 @@ public abstract class W3CTS {
         Util.errln("Warning: \"%\" not found.", cl);
       }
     }
-    qp.ctx.addColl(col, name);
+    qp.ctx.addCollection(col, name);
     return Uri.uri(name);
   }
 

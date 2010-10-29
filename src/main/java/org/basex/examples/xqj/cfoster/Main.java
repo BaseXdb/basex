@@ -13,9 +13,6 @@ import org.basex.api.xqj.BXQDataSource;
  * @author BaseX Team
  */
 abstract class Main {
-  /** Private constructor. */
-  protected Main() { }
-
   /**
    * Initializes the query example.
    * @param info info

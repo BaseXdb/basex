@@ -12,9 +12,6 @@ import org.basex.core.cmd.*;
  * @author Christian Gruen
  */
 public final class CSVExample {
-  /** Private constructor. */
-  private CSVExample() { }
-
   /**
    * Main test method.
    * @param args command-line arguments
@@ -28,7 +25,7 @@ public final class CSVExample {
     // Create database context
     final Context ctx = new Context();
 
-    // input file and name of database
+    // Input file and name of database
     final String file = "etc/example.csv";
     final String name = "csvexample";
 

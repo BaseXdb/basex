@@ -12,10 +12,7 @@ import org.basex.core.cmd.*;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class DatabaseExample {
-  /** Private constructor. */
-  private DatabaseExample() { }
-
+public final class RunCommands {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -28,7 +25,7 @@ public final class DatabaseExample {
     System.out.println("=== DBExample ===");
 
     // ------------------------------------------------------------------------
-    // Create a database from a local or remote XML document or XML String.
+    // Create a database from a local or remote XML document or XML String
     System.out.println("\n* Create a database.");
 
     new CreateDB("DBExample", "etc/xml/input.xml").execute(context);

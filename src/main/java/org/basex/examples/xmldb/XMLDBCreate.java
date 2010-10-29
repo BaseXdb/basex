@@ -16,9 +16,6 @@ public final class XMLDBCreate {
   /** Name of the collection. */
   public static final String COLL = "XMLDBCollection";
 
-  /** Private constructor. */
-  private XMLDBCreate() { }
-
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
@@ -29,7 +26,7 @@ public final class XMLDBCreate {
     System.out.println("=== XMLDBCreate ===");
 
     try {
-      // Register the database.
+      // Register the database
       Class<?> c = Class.forName(DRIVER);
       Database db = (Database) c.newInstance();
       DatabaseManager.registerDatabase(db);
@@ -51,7 +48,7 @@ public final class XMLDBCreate {
       coll.close();
 
     } catch(final XMLDBException ex) {
-      // Handle exceptions.
+      // Handle exceptions
       System.err.println("XML:DB Exception occured " + ex.errorCode);
     }
   }

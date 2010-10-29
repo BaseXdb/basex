@@ -14,9 +14,6 @@ import org.basex.core.cmd.XQuery;
  * @author Christian Gruen
  */
 public final class SimpleFSExample {
-  /** Private constructor. */
-  private SimpleFSExample() { }
-
   /**
    * Main test method.
    * @param args command-line arguments
@@ -30,7 +27,7 @@ public final class SimpleFSExample {
     // Create database context
     final Context context = new Context();
 
-    // input path and name of database
+    // Input path and name of database
     final String path = ".";
     final String name = "fsexample";
 

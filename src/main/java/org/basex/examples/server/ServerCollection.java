@@ -4,18 +4,19 @@ import org.basex.BaseXServer;
 import org.basex.core.BaseXException;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.XQuery;
-import org.basex.examples.query.CollectionQueryExample;
+import org.basex.examples.query.QueryCollection;
 import org.basex.server.ClientSession;
 
 /**
  * This class demonstrates database access via the client/server architecture.
  * It shows how to {@link #add(String, String, String)},
- *  {@link #modify()} files.
- *  For further options see {@link CollectionQueryExample}.
+ * {@link #modify()} files.
+ * For further options see {@link QueryCollection}.
+ *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class CollectionsServerExample {
+public final class ServerCollection {
   /** Session reference. */
   static ClientSession session;
   /** XML Document Fragment Pt. 1. */
@@ -23,9 +24,6 @@ public final class CollectionsServerExample {
     + "<text version=\"draft\"><title>Chapter ";
   /** XML Document Fragment Pt. 2. */
   static final String XML_2 = "</title></text>";
-
-  /** Private constructor. */
-  private CollectionsServerExample() { }
 
   /**
    * Runs the example code.
@@ -54,7 +52,7 @@ public final class CollectionsServerExample {
     for(int i = 0; i < 50; i++) {
       add(XML_1 + i + XML_2, "Chapter-" + i + ".xml", "/book/chapters/" + i);
     }
-    // add another Test Document in folder /book/chapters/0
+    // Add another Test Document in folder /book/chapters/0
     add(XML_1 + "test" + XML_2, "Chapter-test.xml", "/book/chapters/0");
 
     // ------------------------------------------------------------------------
@@ -86,11 +84,10 @@ public final class CollectionsServerExample {
   private static void find() throws BaseXException {
     // ------------------------------------------------------------------------
     System.out.println("\n* Finding documents in folder /book/chapters/0:");
-    session.execute(
+    System.out.println(session.execute(
         new XQuery(
          "for $doc in collection('input/book/chapters/0') " +
-         "return $doc"),
-        System.out);
+         "return $doc")));
   }
 
   /**
@@ -102,11 +99,11 @@ public final class CollectionsServerExample {
     session.execute(new XQuery(
         "for $doc in collection('input/book/chapters/0/')" + " return "
             + "replace value of node  doc(base-uri($doc))/text/title  "
-            + "with (1 to 3)"), System.out);
-    // validate result:
-    session.execute(new XQuery(
-        "for $doc in collection('input/book/chapters/0')" + " return $doc"),
-        System.out);
+            + "with (1 to 3)"));
+
+    // Validate result
+    System.out.println(session.execute(new XQuery(
+        "for $doc in collection('input/book/chapters/0')" + " return $doc")));
   }
 
   /**

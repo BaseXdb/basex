@@ -14,9 +14,6 @@ import org.basex.core.cmd.*;
  * @author Christian Gruen
  */
 public final class HTMLExample {
-  /** Private constructor. */
-  private HTMLExample() { }
-
   /**
    * Main test method.
    * @param args command-line arguments
@@ -30,7 +27,7 @@ public final class HTMLExample {
     // Create database context
     final Context ctx = new Context();
 
-    // input file and name of database
+    // Input file and name of database
     final String file = "http://www.google.com/index.html";
     final String name = "htmlexample";
 

@@ -13,10 +13,7 @@ import org.basex.query.QueryProcessor;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class QueryBindExample {
-  /** Private constructor. */
-  private QueryBindExample() { }
-
+public final class BindVariable {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -29,37 +26,42 @@ public final class QueryBindExample {
     /** Database context. */
     Context context = new Context();
 
-    System.out.println("=== QueryBindExample ===");
+    System.out.println("=== BindVariable ===");
 
     // ------------------------------------------------------------------------
-    // Evaluate the specified XQuery
-    String query = "declare variable $var external; $var";
+    // Specify query to be executed
+    String query =
+      "declare variable $var1 as xs:string external; " +
+      "declare variable $var2 as xs:integer external; " +
+      "($var1, $var2)";
 
     // ------------------------------------------------------------------------
     // Create a query processor
-    QueryProcessor processor = new QueryProcessor(query, context);
+    QueryProcessor proc = new QueryProcessor(query, context);
 
     // ------------------------------------------------------------------------
-    // Create the item to be bound
+    // Define the items to be bound
     String string = "Hello World!\n";
+    Integer number = new Integer(123);
 
     // ------------------------------------------------------------------------
-    // Binds a variable to the global context
-    processor.bind("var", string);
+    // Bind the variables
+    proc.bind("var1", string);
+    proc.bind("var2", number);
 
     // ------------------------------------------------------------------------
     // Execute the query
-    Result result = processor.execute();
+    Result result = proc.execute();
 
     System.out.println("\n* Execute query:");
 
     // ------------------------------------------------------------------------
-    // Serialize all results to OUT, using the specified serializer
-    result.serialize(processor.getSerializer(System.out));
+    // Print result as string
+    System.out.println(result);
 
     // ------------------------------------------------------------------------
     // Close the query processor
-    processor.close();
+    proc.close();
 
     // ------------------------------------------------------------------------
     // Close the database context

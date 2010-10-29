@@ -81,9 +81,6 @@ public final class DeepFSExample {
   /** Query - DB mapping. */
   static final int[] INDEX = new int[] { 1, 1, 1, 2, 2, 1 };
 
-  /** Private constructor. */
-  private DeepFSExample() { }
-
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments

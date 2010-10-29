@@ -14,7 +14,4 @@ abstract class Main {
   static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Database url. */
   static final String URI = "xmldb:basex://localhost:1984/input";
-
-  /** Private constructor. */
-  protected Main() { }
 }

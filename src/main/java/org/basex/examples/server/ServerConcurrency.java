@@ -15,14 +15,14 @@ import org.basex.server.ClientSession;
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class ServerConcurrencyExample {
+public final class ServerConcurrency {
   /**
    * Main method of the example class.
    * @param args (ignored) command-line arguments
    * @throws Exception exception
    */
   public static void main(final String[] args) throws Exception {
-    new ServerConcurrencyExample().run();
+    new ServerConcurrency().run();
   }
 
   /**
@@ -42,7 +42,7 @@ public final class ServerConcurrencyExample {
     System.out.println("\n* Create a client session.");
 
     ClientSession session =
-      new ClientSession("localhost", 1984, "admin", "admin");
+      new ClientSession("localhost", 1984, "admin", "admin", System.out);
 
     // ------------------------------------------------------------------------
     // Create a database
@@ -109,7 +109,7 @@ public final class ServerConcurrencyExample {
   void send(final String cmd, final ClientSession cs) throws BaseXException {
     // ------------------------------------------------------------------------
     // Execute the command
-    cs.execute(cmd, System.out);
+    cs.execute(cmd);
   }
 
   /**

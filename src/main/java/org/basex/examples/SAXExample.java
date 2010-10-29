@@ -38,9 +38,9 @@ public final class SAXExample extends DefaultHandler {
 
     // ----------------------------------------------------------------------
     // Execute the query
-    final QueryProcessor processor =
+    final QueryProcessor proc =
       new QueryProcessor("doc('etc/xml/input.xml')//title", ctx);
-    final Result result = processor.execute();
+    final Result result = proc.execute();
 
     // ----------------------------------------------------------------------
     // Create an XML reader, set the content handler and start parsing

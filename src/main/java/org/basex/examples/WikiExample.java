@@ -13,9 +13,6 @@ import org.basex.core.cmd.*;
  * @author BaseX Team
  */
 public final class WikiExample {
-  /** Default constructor. */
-  private WikiExample() { }
-
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -49,7 +46,7 @@ public final class WikiExample {
 
     // ----------------------------------------------------------------------
     // Match all paragraphs' textual contents against
-    // 'edit.*' AND ('article' or 'page').
+    // 'edit.*' AND ('article' or 'page')
     System.out.println("\n* Perform a full-text query:");
 
     System.out.println(new XQuery(

@@ -14,9 +14,6 @@ import org.basex.core.cmd.XQuery;
  * @author Christian Gruen
  */
 public final class LSTExample {
-  /** Private constructor. */
-  private LSTExample() { }
-
   /**
    * Main test method.
    * @param args command-line arguments
@@ -30,7 +27,7 @@ public final class LSTExample {
     // Create database context
     final Context ctx = new Context();
 
-    // encoding, input file and name of database
+    // Encoding, input file and name of database
     final String file = "etc/example.lst";
     final String name = "lstexample";
 

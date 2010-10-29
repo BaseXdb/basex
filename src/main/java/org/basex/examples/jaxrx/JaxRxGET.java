@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.basex.api.jaxrx.JaxRxServer;
 
 /**
  * This class is a simple Java client to demonstrate the JAX-RX implementation.
@@ -14,43 +15,36 @@ import java.net.URL;
  * @author Lukas Lewandowski
  */
 public final class JaxRxGET {
-
-  /** Private constructor. */
-  private JaxRxGET() { }
-
   /**
-   * This method demonstrates the available GET method. In this example,
-   * a query on a resource is processed.
-   * @param args (ignored) command-line arguments
+   * Constructor.
    * @throws IOException I/O exception
    */
-  public static void main(final String[] args) throws IOException {
-
+  JaxRxGET() throws IOException {
     System.out.println("=== GET request: process a query ===");
 
-    // The java URL connection to the resource.
+    // The java URL connection to the resource
     URL url = new URL(
-      "http://localhost:8984/basex/jax-rx/factbook?query=//city/name&count=5");
+      "http://localhost:8984/basex/jax-rx/factbook?query=//city/name&count=3");
     System.out.println("\n* URL: " + url);
 
-    // Establish the connection to the URL.
+    // Establish the connection to the URL
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-    // Print the HTTP response code.
+    // Print the HTTP response code
     int code = conn.getResponseCode();
     System.out.println("\n* HTTP response: " + code +
         " (" + conn.getResponseMessage() + ")");
 
-    // Check if request was successful.
+    // Check if request was successful
     if(code == HttpURLConnection.HTTP_OK) {
-      // Print the received result to standard output.
+      // Print the received result to standard output
       System.out.println("\n* Result:");
 
-      // Get and cache input as UTF-8 encoded stream.
+      // Get and cache input as UTF-8 encoded stream
       BufferedReader br = new BufferedReader(new InputStreamReader(
           conn.getInputStream(), "UTF-8"));
 
-      // Print all lines of the result.
+      // Print all lines of the result
       String line;
       while((line = br.readLine()) != null) {
         System.out.println(line);
@@ -58,7 +52,22 @@ public final class JaxRxGET {
       br.close();
     }
 
-    // Close connection.
+    // Close connection
     conn.disconnect();
+  }
+
+  /**
+   * This method demonstrates the GET method. In this example, a query on a
+   * resource is processed.
+   * @param args (ignored) command-line arguments
+   * @throws IOException I/O exception
+   */
+  public static void main(final String... args) throws IOException {
+    // Start servers
+    JaxRxServer jaxrx = new JaxRxServer();
+    // Run example
+    new JaxRxGET();
+    // Stop servers
+    jaxrx.stop();
   }
 }

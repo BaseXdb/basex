@@ -6,26 +6,23 @@ import org.basex.core.Context;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.XQuery;
-import org.basex.examples.query.QueryExample;
+import org.basex.examples.query.RunQueries;
 import org.basex.server.ClientSession;
 
 /**
  * This class sends a query to a database server instance.
  * The query result is used to create and query a local database.
- * For more information on server functionalities, see {@link ServerExample}
- * For more information on local query processing, see {@link QueryExample}.
+ * For more information on server functionalities, see {@link ServerCommands}
+ * For more information on local query processing, see {@link RunQueries}.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseX Team
  */
-public final class ServerLocalExample {
+public final class ServerAndLocal {
   /** Local database context. */
   static final Context CONTEXT = new Context();
   /** Reference to the client session. */
   static ClientSession session;
-
-  /** Private constructor. */
-  private ServerLocalExample() { }
 
   /**
    * Runs the example code.

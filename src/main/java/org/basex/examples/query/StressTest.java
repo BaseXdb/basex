@@ -35,9 +35,6 @@ public final class StressTest {
   /** Result counter. */
   static int counter;
 
-  /** Private constructor. */
-  private StressTest() { }
-
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
@@ -46,13 +43,13 @@ public final class StressTest {
   public static void main(final String[] args) throws Exception {
     System.out.println("=== Local StressTest ===");
 
-    // create test database
+    // Create test database
     System.out.println("\n* Create test database.");
     final CreateDB cmd = new CreateDB("test", INPUT);
     cmd.execute(CONTEXT);
     System.out.print(cmd.info());
 
-    // run clients
+    // Run clients
     System.out.println("\n* Run " + NCLIENTS + " client threads.");
     final Client[] cl = new Client[NCLIENTS];
     for(int i = 0; i < NCLIENTS; ++i) cl[i] = new Client();
@@ -66,7 +63,7 @@ public final class StressTest {
    * @throws BaseXException exception
    */
   static void dropDB() throws BaseXException {
-    // drop database
+    // Drop database
     System.out.println("\n* Drop test database.");
 
     final DropDB cmd = new DropDB("test");
@@ -79,11 +76,11 @@ public final class StressTest {
     @Override
     public void run() {
       try {
-        // perform some queries
+        // Perform some queries
         for(int i = 0; i < NQUERIES; ++i) {
           Performance.sleep((long) (50 * RND.nextDouble()));
 
-          // return nth text of the database
+          // Return nth text of the database
           final int n = (RND.nextInt() & 0xFF) + 1;
           final String qu = Util.info(QUERY, n);
           final String result = new XQuery(qu).execute(CONTEXT);

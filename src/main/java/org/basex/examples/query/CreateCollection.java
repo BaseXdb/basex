@@ -9,22 +9,19 @@ import org.basex.core.cmd.*;
  * Collections provide access to several XML documents inside one database.
  * Collections may be created by importing a folder or adding single files.
  * For some XQuery examples in a collection context,
- * please see {@link CollectionQueryExample}
+ * please see {@link QueryCollection}
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author BaseXTeam
  */
-public final class CollectionExample {
-  /** Private constructor. */
-  private CollectionExample() { }
-
+public final class CreateCollection {
   /**
    * Runs the example code.
    * @param args (ignored) command-line arguments
    * @throws BaseXException if a database command fails
    */
   public static void main(final String[] args) throws BaseXException {
-    // Create database context.
+    // Create database context
     Context context = new Context();
 
     System.out.println("=== CollectionExample ===");
