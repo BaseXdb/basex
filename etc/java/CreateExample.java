@@ -36,7 +36,10 @@ public final class CreateExample {
         System.out.println(session.info());
 
         // run query on database
-        System.out.println(session.execute("xquery /"));
+        System.out.println(session.execute("xquery doc('database')"));
+
+        // drop database
+        session.execute("drop db database");
 
       } catch(IOException ex) {
         // print exception
@@ -50,5 +53,5 @@ public final class CreateExample {
       // print exception
       ex.printStackTrace();
     }
-  };
+  }
 }

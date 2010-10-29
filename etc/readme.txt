@@ -8,7 +8,6 @@ BASEX LANGUAGE BINDINGS ========================================================
 
  BaseX Team, 2010
 
-
 DESCRIPTION --------------------------------------------------------------------
 
  The Session class provides methods to connect to and communicate with the
@@ -33,7 +32,6 @@ DESCRIPTION --------------------------------------------------------------------
 
  Most bindings are accompanied by some example files, demonstrating how
  database commands can be executed and how the query iterator can be used.
-
 
 CLASS STRUCTURE ----------------------------------------------------------------
 
@@ -60,11 +58,16 @@ class Session:
   // Closes the session
   void close()
 
-
 class Query:
 
   // Creates query object with session and query
   contructor(Session s, String query)
+
+  // Binds an external variable
+  void bind(String name, String value)
+
+  // Initializes the iterator
+  String init()
 
   // Checks for next item of the result and returns boolean
   boolean more()
@@ -72,31 +75,36 @@ class Query:
   // Returns next result item
   String next()
 
-  // Closes the query object
-  void close()
+  // Closes the iterator and query
+  String close()
 
 
-STREAM PROTOCOL ----------------------------------------------------------------
+STREAM PROTOCOL (BaseX 6.3.1 ff.) ----------------------------------------------
 
- {} = item or flag; \0 = marker for end of item
+ {...} = string; \n = single byte
  
  Authentication:
  1. Client connects to server socket
  2. Server sends timestamp: {timestamp} \0
  3. Client sends username and hash: {username} \0 {md5(md5(password) + timestamp)} \0
- 4. Server sends {0} (successful) or {1} (error)
+ 4. Server sends \0 (successful) or \1 (error)
 
  Client streams:
- - standard mode:        -> {command} \0
- - iterative mode: start -> {0} {query} \0
-                   next  -> {1} {id} \0
-                   end   -> {2} {id} \0
+ - command:        -> {command} \0
+ - iterator: start -> \0 {query} \0
+             bind  -> \3 {id} \0 {variable} \0 {value}\0 {type}\0
+             init  -> \4 {id} \0
+             next  -> \1 {id} \0
+             end   -> \2 {id} \0
 
  Server streams:
- - standard mode:  success -> {result} \0 {info} \0 {0}
-                   error   -> \0 {error} \0 {1}
- - iterative mode: start   -> {id} \0 {0}
-                   next    -> {item} \0 {0}
-                   error   -> \0 {1} {error} \0
+ - command:  success -> {result} \0 {info} \0 \0
+             error   -> \0 {error} \0 \1
+ - iterator: start   -> {id} \0 \0
+             bind    -> \0 \0
+             init    -> {result} \0 \0
+             next    -> {result} \0 \0
+             close   -> {result} \0 \0
+             error   -> \0 \1 {error} \0
 
 ============================================= DBIS Group, University of Konstanz

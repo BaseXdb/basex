@@ -10,7 +10,7 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Language Binding for BaseX.
- * Works with BaseX 6.1.9 and later
+ * Works with BaseX 6.3.1 and later
  * Documentation: http://basex.org/api
  *
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -205,24 +205,25 @@ public class BaseXClient {
      * @throws IOException I/O exception
      */
     public Query(final String query) throws IOException {
-      // send 0 to mark start of query execution, and {Query}0 as query string
-      out.write(0);
-      send(query);
-      id = receive();
-      if(!ok()) throw new IOException(receive());
+      id = execute(0, query);
     }
 
     /**
      * Checks for the next item.
-     * @return value of check
+     * @return item string
+     * @throws IOException I/O exception
+     */
+    public String init() throws IOException {
+      return execute(4, id);
+    }
+
+    /**
+     * Checks for the next item.
+     * @return result of check
      * @throws IOException I/O exception
      */
     public boolean more() throws IOException {
-      // send 1 to get next result item, and {ID}0 for identification
-      out.write(1);
-      send(id);
-      next = receive();
-      if(!ok()) throw new IOException(receive());
+      next = execute(1, id);
       return next.length() != 0;
     }
 
@@ -236,13 +237,30 @@ public class BaseXClient {
 
     /**
      * Closes the query.
+     * @return item string
      * @throws IOException I/O exception
      */
-    public void close() throws IOException {
-      // send 2 to mark end of query execution, and {ID}0 for identification
-      out.write(2);
-      send(id);
+    public String close() throws IOException {
+      final String s = execute(2, id);
       out.flush();
+      return s;
+    }
+
+    /**
+     * Executes the specified command.
+     * @param cmd command
+     * @param arg argument
+     * @return resulting string
+     * @throws IOException I/O exception
+     */
+    private String execute(final int cmd, final String arg)
+        throws IOException {
+
+      out.write(cmd);
+      send(arg);
+      final String s = receive();
+      if(!ok()) throw new IOException(receive());
+      return s;
     }
   }
 }

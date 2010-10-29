@@ -1,8 +1,8 @@
 /*
  * Language Binding for BaseX.
- * Works with BaseX 6.1.9 and later
+ * Works with BaseX 6.3.1 and later
  * Documentation: http://basex.org/api
- * 
+ *
  * (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 using System;
@@ -36,7 +36,7 @@ namespace BaseXClient
         throw new IOException("Access denied.");
       }
     }
-    
+
     /** see readme.txt */
     public void Execute(string com, Stream ms)
     {
@@ -44,12 +44,12 @@ namespace BaseXClient
       Init();
       Receive(ms);
       info = Receive();
-      if(!Ok()) 
+      if(!Ok())
       {
         throw new IOException(info);
       }
     }
-    
+
     /** see readme.txt */
     public String Execute(string com)
     {
@@ -57,13 +57,13 @@ namespace BaseXClient
       Execute(com, ms);
       return System.Text.Encoding.UTF8.GetString(ms.ToArray());
     }
-    
+
     /** see readme.txt */
-    public Query Query(string q) 
+    public Query Query(string q)
     {
       return new Query(this, q);
     }
-    
+
     /** see readme.txt */
     public void Create(string name, Stream s)
     {
@@ -77,12 +77,12 @@ namespace BaseXClient
       }
       stream.WriteByte(0);
       info = Receive();
-      if(!Ok()) 
+      if(!Ok())
       {
         throw new IOException(info);
       }
     }
-    
+
     /** see readme.txt */
     public string Info
     {
@@ -91,21 +91,21 @@ namespace BaseXClient
         return info;
       }
     }
-    
+
     /** see readme.txt */
     public void Close()
     {
       Send("exit");
       socket.Close();
     }
-    
+
     /** Initializes the byte transfer. */
     private void Init()
     {
       bpos = 0;
       bsize = 0;
     }
-    
+
     /** Returns a single byte from the socket. */
     private byte Read()
     {
@@ -116,7 +116,7 @@ namespace BaseXClient
       }
       return cache[bpos++];
     }
-    
+
     /** Receives a string from the socket. */
     private void Receive(Stream ms)
     {
@@ -127,7 +127,7 @@ namespace BaseXClient
         ms.WriteByte(b);
       }
     }
-    
+
     /** Receives a string from the socket. */
     public string Receive()
     {
@@ -135,7 +135,7 @@ namespace BaseXClient
       Receive(ms);
       return System.Text.Encoding.UTF8.GetString(ms.ToArray());
     }
-    
+
     /** Sends strings to server. */
     public void Send(string message)
     {
@@ -143,13 +143,13 @@ namespace BaseXClient
       stream.Write(msg, 0, msg.Length);
       stream.WriteByte(0);
     }
-    
+
     /** Returns success check. */
     public bool Ok()
     {
       return Read() == 0;
     }
-    
+
     /** Returns the md5 hash of a string. */
     private string MD5(string input)
     {
@@ -164,50 +164,63 @@ namespace BaseXClient
       return sb.ToString();
     }
   }
-  
+
   class Query
   {
     private Session session;
     private string id;
-    private string nextItem;
+    private string next;
 
     /** see readme.txt */
     public Query(Session s, string query)
     {
       session = s;
-      session.stream.WriteByte(0);
-      session.Send(query);
-      id = session.Receive();
-      if(!session.Ok())
-      {
-        throw new IOException(session.Receive());
-      }
+      id = Execute(0, query);
     }
-    
+
     /** see readme.txt */
-    public bool More() 
+    public bool Init()
     {
-      session.stream.WriteByte(1);
-      session.Send(id);
-      nextItem = session.Receive();
-      if(!session.Ok())
-      {
-        throw new IOException(session.Receive());
-      }
-      return nextItem.Length != 0;
+      return Execute(4, id);
     }
-    
+
+    /** see readme.txt */
+    public void Bind(string name, string value)
+    {
+      next = Execute(3, id + '\0' + name + '\0' + value + '\0');
+      return next.Length != 0;
+    }
+
+    /** see readme.txt */
+    public bool More()
+    {
+      next = Execute(1, id);
+      return next.Length != 0;
+    }
+
     /** see readme.txt */
     public string Next()
     {
-      return nextItem;      
+      return next;
     }
-    
+
     /** see readme.txt */
-    public void Close()
+    public string Close()
     {
-      session.stream.WriteByte(2);
+      return Execute(2, id);
+    }
+
+    /** see readme.txt */
+    private bool Execute(int cmd, string arg) throws IOException
+    {
+      session.stream.WriteByte(cmd);
       session.Send(id);
+      string s = session.Receive();
+      if(!session.Ok())
+      {
+        throw new IOException(session.Receive());
+      }
+      return s;
     }
   }
 }

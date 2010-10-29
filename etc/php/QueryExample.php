@@ -16,6 +16,9 @@ try {
     $input = 'for $i in 1 to 10 return <xml>Text { $i }</xml>';
     $query = $session->query($input);
 
+    // initialize query
+    $query->init();
+
     // loop through all results
     while($query->more()) {
       print $query->next()."\n";

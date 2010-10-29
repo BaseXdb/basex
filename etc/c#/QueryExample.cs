@@ -25,13 +25,16 @@ namespace BaseXClient
           string input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
           Query query = session.Query(input);
 
+          // initialize query
+          query.Init();
+
           // loop through all results
           while (query.More()) 
           {
             Console.WriteLine(query.Next());
           }
 
-          // close query instance
+          // close query
           query.Close();
         }
         catch (IOException e)

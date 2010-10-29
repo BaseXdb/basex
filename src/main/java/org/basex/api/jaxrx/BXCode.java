@@ -48,7 +48,7 @@ abstract class BXCode {
   abstract void code() throws IOException;
 
   /**
-   * Runs the class code and closes the client session.
+   * Runs the {@link #code()} method and closes the client session.
    * A server exception is thrown if I/O errors occur.
    */
   final void run() {

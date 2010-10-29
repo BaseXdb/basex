@@ -2,6 +2,7 @@ import java.io.IOException;
 
 /**
  * This example shows how queries can be executed in an iterative manner.
+ * The database server must be started first to make this example work.
  * Documentation: http://basex.org/api
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -12,13 +13,6 @@ public final class QueryExample {
    * @param args command-line arguments
    */
   public static void main(final String[] args) {
-    new QueryExample();
-  }
-
-  /**
-   * Constructor.
-   */
-  private QueryExample() {
     try {
       // create session
       BaseXClient session =
@@ -29,13 +23,16 @@ public final class QueryExample {
         String input = "for $i in 1 to 10 return <xml>Text { $i }</xml>";
         BaseXClient.Query query = session.query(input);
 
+        // initialize iterator
+        System.out.print(query.init());
+
         // loop through all results
         while(query.more()) {
           System.out.println(query.next());
         }
 
         // close query instance
-        query.close();
+        System.out.print(query.close());
 
       } catch(IOException ex) {
         // print exception
@@ -49,5 +46,5 @@ public final class QueryExample {
       // print exception
       ex.printStackTrace();
     }
-  };
+  }
 }

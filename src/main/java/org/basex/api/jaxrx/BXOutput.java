@@ -32,6 +32,7 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
   @Override
   public void write(final OutputStream os) {
     out = os;
+
     if(path != null) {
       // open database if a single resource was specified
       try {
@@ -39,11 +40,9 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
       } catch(final BaseXException ex) {
         throw new JaxRxException(404, ex.getMessage());
       }
-
       try {
         // set serialization parameters
-        final String par = params(path);
-        cs.execute(new Set(Prop.SERIALIZER, par));
+        cs.execute(new Set(Prop.SERIALIZER, params(path)));
       } catch(final BaseXException ex) {
         throw new JaxRxException(400, ex.getMessage());
       }
@@ -52,14 +51,17 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
   }
 
   /**
-   * Executes the specified command. If command execution fails,
-   * an exception is thrown.
+   * Executes the specified command.
+   * If command execution fails, an exception is thrown.
    * @param command command to be executed
-   * @param os output stream
+   * @param os output stream, or {@code null}
+   * @return result, or {@code null} if output stream was specified
    */
-  final void exec(final Object command, final OutputStream os) {
+  final String exec(final Object command, final OutputStream os) {
+    cs.setOutputStream(os);
+
     try {
-      cs.execute(command.toString(), os);
+      return cs.execute(command.toString());
     } catch(final BaseXException ex) {
       throw new JaxRxException(400, ex.getMessage());
     }

@@ -1,5 +1,5 @@
 # Language Binding for BaseX.
-# Works with BaseX 6.1.9 and later
+# Works with BaseX 6.3.1 and later
 # Documentation: http://basex.org/api
 # 
 # (C) Workgroup DBIS, University of Konstanz 2005-10, ISC License
@@ -115,22 +115,26 @@ sub new {
   $session = shift;
   my $cmd = shift;
   my $self = bless({}, $class);
-  $session->send("\0$cmd");
-  $id = $session->_readString();
-  if (!$session->ok()) {
-    die $session->_readString();
-  }
+  $id = execute("\0", $cmd);
   return $self;
 }
 
 # see readme.txt
+sub init {
+  return execute("\4", $id);
+}
+
+# see readme.txt
+sub bind {
+  my $name = shift;
+  my $value = shift;
+  execute("\3", "$id\0$name\0$value\0");
+}
+
+# see readme.txt
 sub more {
-  $session->send("\1$id");
-  $next = $session->_readString();
-  if (!$session->ok()) {
-    die $session->_readString();
-  }
-  return length($next) != 0;
+  $next = execute("\1", $id);
+  return $next;
 }
 
 # see readme.txt
@@ -140,7 +144,19 @@ sub next {
 
 # see readme.txt
 sub close {
-  $session->send("\2$id");
+  return execute("\2", $id);
+}
+
+# see readme.txt
+sub execute {
+  my $cmd = shift;
+  my $arg = shift;
+  $session->send("$cmd$arg");
+  my $s = $session->_readString();
+  if (!$session->ok()) {
+    die $session->_readString();
+  }
+  return $s;
 }
 
 1;

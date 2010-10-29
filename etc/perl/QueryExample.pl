@@ -16,13 +16,16 @@ eval {
   my $input = "for \$i in 1 to 10 return <xml>Text { \$i }</xml>";
   my $query = $session->query($input);
 
+  # initialize query
+  print $query->init();
+
   # loop through all results
   while ($query->more()) {
     print $query->next()."\n";
   }
 
-  # close query instance
-  $query->close();
+  # close query
+  print $query->close();
 
   # close session
   $session->close();

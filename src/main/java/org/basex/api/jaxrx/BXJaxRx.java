@@ -6,14 +6,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Scanner;
-import java.util.Set;
 import javax.ws.rs.core.StreamingOutput;
 import org.basex.core.BaseXException;
+import org.basex.core.Prop;
 import org.basex.core.cmd.Add;
 import org.basex.core.cmd.DropDB;
 import org.basex.core.cmd.List;
 import org.basex.core.cmd.Open;
 import org.basex.core.cmd.Run;
+import org.basex.core.cmd.Set;
 import org.basex.data.SerializerProp;
 import org.basex.data.XMLSerializer;
 import org.basex.io.ArrayOutput;
@@ -38,8 +39,8 @@ import org.jaxrx.core.ResourcePath;
  */
 public final class BXJaxRx implements JaxRx {
   @Override
-  public Set<QueryParameter> getParameters() {
-    final Set<QueryParameter> p = new HashSet<QueryParameter>();
+  public HashSet<QueryParameter> getParameters() {
+    final HashSet<QueryParameter> p = new HashSet<QueryParameter>();
     p.add(QueryParameter.COMMAND);
     p.add(QueryParameter.QUERY);
     p.add(QueryParameter.RUN);
@@ -58,14 +59,11 @@ public final class BXJaxRx implements JaxRx {
     return new BXOutput(null) {
       @Override
       void code() throws IOException {
-        // retrieve list of databases
-        final ArrayOutput ao = new ArrayOutput();
-        exec(new List(), ao);
-        final Table table = new Table(ao.toString());
-
         final XMLSerializer xml = new XMLSerializer(out,
             new SerializerProp(params(rp)));
 
+        // retrieve list of databases
+        final Table table = new Table(exec(new List(), null));
         for(final TokenList l : table.contents) {
           xml.emptyElement(Token.token(JAXRX + ":" + "resource"),
               Token.token("name"), l.get(0),
@@ -88,8 +86,10 @@ public final class BXJaxRx implements JaxRx {
         final int s = num(rp, QueryParameter.START, 1);
         final int m = num(rp, QueryParameter.COUNT, Integer.MAX_VALUE - s);
 
-        // [CG] REST: ensure that results will be correctly wrapped
         try {
+          cs.execute(new Set(Prop.SERIALIZER, params(path)));
+          cs.setOutputStream(out);
+
           // create query instance
           final ClientQuery cq = cs.query(xq);
           final String var = path.getValue(QueryParameter.VAR);
@@ -99,12 +99,13 @@ public final class BXJaxRx implements JaxRx {
             while(sc.hasNext()) {
               final String v = sc.next();
               final String[] sp = v.split(":", 2);
-              cq.bind(sp[0], sp.length == 1 ? "" : sp[1]);
+              cq.bind(sp[0], sp.length == 1 ? "" : sp[1], "");
             }
           }
           // loop through all results
           int c = 0;
-          while(++c < s + m && cq.more()) if(c >= s) cq.next(out);
+          cq.init();
+          while(++c < s + m && cq.more()) if(c >= s) cq.next();
           cq.close();
         } catch(final BaseXException ex) {
           throw new JaxRxException(400, ex.getMessage());
@@ -153,10 +154,11 @@ public final class BXJaxRx implements JaxRx {
     return new BXOutput(rp) {
       @Override
       void code() throws IOException {
-        // perform command and serialize output
+        // perform command
         final ArrayOutput ao = new ArrayOutput();
         exec(cmd, ao);
 
+        // serialize output and remove carriage returns
         final XMLSerializer xml =
           new XMLSerializer(out, new SerializerProp(params(path)));
         xml.text(Token.delete(ao.toArray(), '\r'));

@@ -54,7 +54,6 @@
     <module name="RightCurly"/>
     <module name="DoubleCheckedLocking"/>
     <module name="EqualsHashCode"/>
-    <module name="HiddenField"/>
     <module name="IllegalInstantiation"/>
     <module name="MagicNumber">
       <property name="severity" value="ignore"/>
@@ -68,7 +67,6 @@
       <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
     </module>
     <module name="FinalClass"/>
-    <module name="HideUtilityClassConstructor"/>
     <module name="FinalParameters">
       <property name="tokens" value="CTOR_DEF,METHOD_DEF"/>
     </module>
