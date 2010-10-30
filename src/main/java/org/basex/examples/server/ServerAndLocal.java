@@ -35,47 +35,47 @@ public final class ServerAndLocal {
 
     // ------------------------------------------------------------------------
     // Start server
+    System.out.println("* Start server.");
     BaseXServer server = new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
-    System.out.println("\n* Create a client session.");
+    System.out.println("* Create a client session.");
 
     session = new ClientSession("localhost", 1984, "admin", "admin");
 
     // -------------------------------------------------------------------------
     // Locally cache the result of a server-side query
-    System.out.println("\n* Cache server-side query results.");
+    System.out.println("* Cache server-side query results.");
 
     String result = send("XQUERY for $x in doc('etc/xml/input.xml') return $x");
 
     // -------------------------------------------------------------------------
     // Create a local database from the XML result string
-    System.out.println("\n* Create a local database.");
+    System.out.println("* Create a local database.");
 
     new CreateDB("LocalDB", result).execute(CONTEXT);
 
     // -------------------------------------------------------------------------
     // Run a query on the locally cached results
-    System.out.println("\n* Run a local query:");
+    System.out.print("* Run a local query: ");
 
     System.out.println(new XQuery("//title").execute(CONTEXT));
 
     // ------------------------------------------------------------------------
     // Close the client session
-    System.out.println("\n* Close the client session.");
+    System.out.println("* Close the client session.");
 
     session.close();
 
     // ------------------------------------------------------------------------
     // Stop the server
-    System.out.println("\n* Stop the server:");
-
+    System.out.println("* Stop the server.");
     server.stop();
 
     // ----------------------------------------------------------------------
     // Drop the local database
-    System.out.println("\n* Drop the local database.");
+    System.out.println("* Drop the local database.");
 
     new DropDB("LocalDB").execute(CONTEXT);
   }

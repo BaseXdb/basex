@@ -23,7 +23,7 @@ public final class XMLDBCreate {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== XMLDBCreate ===");
+    System.out.println("=== XMLDBCreate ===\n");
 
     try {
       // Register the database
@@ -31,7 +31,7 @@ public final class XMLDBCreate {
       Database db = (Database) c.newInstance();
       DatabaseManager.registerDatabase(db);
 
-      System.out.println("\n* Create a new collection.");
+      System.out.println("* Create a new collection.");
 
       // Create a new collection
       BXCollection coll = new BXCollection(COLL, false);
@@ -39,7 +39,7 @@ public final class XMLDBCreate {
       // Close the connection
       coll.close();
 
-      System.out.println("\n* Create existing collection.");
+      System.out.println("* Create existing collection.");
 
       // Open an existing collection
       coll = new BXCollection(COLL, true);

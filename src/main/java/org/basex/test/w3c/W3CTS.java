@@ -346,7 +346,7 @@ public abstract class W3CTS {
       if(cont.size() != 0) {
         final Data d = Check.check(context,
             srcs.get(string(data.atom(cont.list[0]))));
-        curr = new Nodes(d.doc(), d);
+        curr = new Nodes(d.doc().toArray(), d);
         curr.root = true;
       }
 

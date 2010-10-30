@@ -26,7 +26,10 @@ public final class WikiExample {
 
     // ----------------------------------------------------------------------
     // Create a database from a remote XML document
-    System.out.println("\n* Create a database from a file via http.");
+    System.out.println("* Create a database from a file via http.");
+
+    // Use internal parser to skip DTD parsing
+    new Set("intparse", true).execute(context);
 
     final String doc = "http://en.wikipedia.org/wiki/Wikipedia";
     new CreateDB("WikiExample", doc).execute(context);
@@ -34,7 +37,7 @@ public final class WikiExample {
     // -------------------------------------------------------------------------
     // Insert a node before the closing body tag
     // N.B. do not forget to specify the namespace
-    System.out.println("\n* Update the document.");
+    System.out.println("* Update the document.");
 
     new XQuery(
         "declare namespace xhtml='http://www.w3.org/1999/xhtml';" +
@@ -47,7 +50,7 @@ public final class WikiExample {
     // ----------------------------------------------------------------------
     // Match all paragraphs' textual contents against
     // 'edit.*' AND ('article' or 'page')
-    System.out.println("\n* Perform a full-text query:");
+    System.out.println("* Perform a full-text query:");
 
     System.out.println(new XQuery(
         "declare namespace xhtml='http://www.w3.org/1999/xhtml';" +
@@ -59,7 +62,7 @@ public final class WikiExample {
 
     // ----------------------------------------------------------------------
     // Drop the database
-    System.out.println("\n* Drop the database.");
+    System.out.println("* Drop the database.");
 
     new DropDB("WikiExample").execute(context);
 

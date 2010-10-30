@@ -23,15 +23,15 @@ public final class JaxRxPOSTAdd {
    * @throws IOException I/O exception
    */
   JaxRxPOSTAdd() throws IOException {
-    System.out.println("=== POST request: add a document to a database ===");
+    System.out.println("=== POST: add a document to a database ===\n");
 
     // The java URL connection to the resource
-    URL url = new URL("http://localhost:8984/basex/jax-rx/factbook");
-    System.out.println("\n* URL: " + url);
+    URL url = new URL("http://localhost:8984/basex/jax-rx/factbook/input.xml");
+    System.out.println("* URL: " + url);
 
     // File to be sent to the server
     String doc = "etc/xml/input.xml";
-    System.out.println("\n* Document: " + doc);
+    System.out.println("* Document: " + doc);
 
     // Establish the connection to the URL
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -48,7 +48,7 @@ public final class JaxRxPOSTAdd {
     InputStream in = new BufferedInputStream(new FileInputStream(doc));
 
     // Send document to server
-    System.out.println("\n* Send document...");
+    System.out.println("* Send document...");
     int i;
     while((i = in.read()) != -1) {
       out.write(i);
@@ -57,7 +57,7 @@ public final class JaxRxPOSTAdd {
     out.close();
 
     // Print the HTTP response code
-    System.out.println("\n* HTTP response: " + conn.getResponseCode() +
+    System.out.println("* HTTP response: " + conn.getResponseCode() +
         " (" + conn.getResponseMessage() + ")");
 
     // Close connection

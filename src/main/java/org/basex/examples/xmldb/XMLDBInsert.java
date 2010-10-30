@@ -15,7 +15,8 @@ public final class XMLDBInsert {
   /** Database driver. */
   private static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Name of the referenced database. */
-  private static final String DBNAME = "xmldb:basex://localhost:1984/input";
+  private static final String DBNAME =
+    "xmldb:basex://localhost:1984/XMLDBCollection";
 
   /**
    * Main method of the example class.
@@ -24,7 +25,7 @@ public final class XMLDBInsert {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== XMLDBInsert ===");
+    System.out.println("=== XMLDBInsert ===\n");
 
     // Collection instance
     Collection col = null;
@@ -35,18 +36,18 @@ public final class XMLDBInsert {
       Database db = (Database) c.newInstance();
       DatabaseManager.registerDatabase(db);
 
-      System.out.println("\n* Get collection.");
+      System.out.println("* Get collection.");
 
       // Receive the collection
       col = DatabaseManager.getCollection(DBNAME);
 
       // ID for the new document
-      String id = "SecondDoc";
+      String id = "world";
 
       // Content of the new document
-      String doc = "<xml>This is the second document.</xml>";
+      String doc = "<xml>Hello World!</xml>";
 
-      System.out.println("\n* Create new resource.");
+      System.out.println("* Create new resource.");
 
       // Create a new XML resource with the specified ID
       XMLResource res = (XMLResource) col.createResource(id,
@@ -55,7 +56,7 @@ public final class XMLDBInsert {
       // Set the content of the XML resource as the document
       res.setContent(doc);
 
-      System.out.println("\n* Store new resource.");
+      System.out.println("* Store new resource.");
 
       // Store the resource into the database
       col.storeResource(res);

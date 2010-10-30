@@ -21,7 +21,7 @@ public final class SimpleFSExample {
    */
   public static void main(final String[] args) throws BaseXException {
 
-    System.out.println("=== SimpleFSExample ===");
+    System.out.println("=== SimpleFSExample ===\n");
 
     // ------------------------------------------------------------------------
     // Create database context
@@ -33,19 +33,19 @@ public final class SimpleFSExample {
 
     // ------------------------------------------------------------------------
     // Import a directory as database
-    System.out.println("\n* Import '" + path + "'.");
+    System.out.println("* Import: \"" + path + "\".");
 
     new Create(new SimpleFSParser(path), name).execute(context);
 
     // ------------------------------------------------------------------------
     // Perform query
-    System.out.println("\n* Number of files:");
+    System.out.print("* Number of files: ");
 
     System.out.println(new XQuery("count(//file)").execute(context));
 
     // ------------------------------------------------------------------------
     // Drop database and close context
-    System.out.println("\n* Drop database.");
+    System.out.println("* Drop database.");
 
     new DropDB(name).execute(context);
 

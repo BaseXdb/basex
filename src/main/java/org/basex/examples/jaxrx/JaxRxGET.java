@@ -20,25 +20,25 @@ public final class JaxRxGET {
    * @throws IOException I/O exception
    */
   JaxRxGET() throws IOException {
-    System.out.println("=== GET request: process a query ===");
+    System.out.println("=== GET: execute a query ===\n");
 
     // The java URL connection to the resource
     URL url = new URL(
       "http://localhost:8984/basex/jax-rx/factbook?query=//city/name&count=3");
-    System.out.println("\n* URL: " + url);
+    System.out.println("* URL: " + url);
 
     // Establish the connection to the URL
     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
     // Print the HTTP response code
     int code = conn.getResponseCode();
-    System.out.println("\n* HTTP response: " + code +
+    System.out.println("* HTTP response: " + code +
         " (" + conn.getResponseMessage() + ")");
 
     // Check if request was successful
     if(code == HttpURLConnection.HTTP_OK) {
       // Print the received result to standard output
-      System.out.println("\n* Result:");
+      System.out.println("* Result:");
 
       // Get and cache input as UTF-8 encoded stream
       BufferedReader br = new BufferedReader(new InputStreamReader(

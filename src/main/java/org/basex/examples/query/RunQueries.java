@@ -35,7 +35,7 @@ public final class RunQueries {
   public static void main(final String[] args)
       throws IOException, QueryException, BaseXException {
 
-    System.out.println("=== QueryExample ===");
+    System.out.println("=== QueryExample ===\n");
 
     // ------------------------------------------------------------------------
     // Evaluate the specified XQuery
@@ -43,19 +43,19 @@ public final class RunQueries {
 
     // ------------------------------------------------------------------------
     // Process the query by using the database command
-    System.out.println("\n* Query by using the database command:");
+    System.out.println("* Query by using the database command:");
 
     query(query);
 
     // ------------------------------------------------------------------------
     // Directly use the query processor
-    System.out.println("\n* Query by directly using the query processor:");
+    System.out.println("* Query by directly using the query processor:");
 
     process(query);
 
     // ------------------------------------------------------------------------
     // Iterate through all query results
-    System.out.println("\n* Query by iterating through all query results:");
+    System.out.println("* Query by iterating through all query results:");
 
     iterate(query);
 

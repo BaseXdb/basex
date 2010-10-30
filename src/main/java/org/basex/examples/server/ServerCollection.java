@@ -32,22 +32,23 @@ public final class ServerCollection {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== CollectionServerExample ===");
+    System.out.println("=== CollectionServerExample ===\n");
 
     // ------------------------------------------------------------------------
-    // Start server on default port 1984
+    // Start server
+    System.out.println("* Start server.");
     BaseXServer server = new BaseXServer();
 
     // Create a client session with host name, port, user name and password
     session = new ClientSession("localhost", 1984, "admin", "admin");
 
     // ------------------------------------------------------------------------
-    System.out.println("\n* Create a Collection.");
+    System.out.println("* Create a Collection.");
     session.execute("CREATE DB input");
 
     // ------------------------------------------------------------------------
     // Add some 50 documents
-    System.out.println("\n* Adding 50 documents");
+    System.out.println("* Adding 50 documents");
 
     for(int i = 0; i < 50; i++) {
       add(XML_1 + i + XML_2, "Chapter-" + i + ".xml", "/book/chapters/" + i);
@@ -61,7 +62,7 @@ public final class ServerCollection {
 
     // ------------------------------------------------------------------------
     // Modify specific document(s)
-    System.out.println("\n* Modifying documents in folder /book/chapters/0:");
+    System.out.println("* Modifying documents in folder /book/chapters/0:");
     modify();
 
     // ------------------------------------------------------------------------
@@ -74,7 +75,7 @@ public final class ServerCollection {
 
     // ------------------------------------------------------------------------
     // Stop the server
-    System.out.println("\n* Stop the server.");
+    System.out.println("* Stop server.");
     server.stop();
   }
 
@@ -83,7 +84,7 @@ public final class ServerCollection {
    */
   private static void find() throws BaseXException {
     // ------------------------------------------------------------------------
-    System.out.println("\n* Finding documents in folder /book/chapters/0:");
+    System.out.println("* Finding documents in folder /book/chapters/0:");
     System.out.println(session.execute(
         new XQuery(
          "for $doc in collection('input/book/chapters/0') " +

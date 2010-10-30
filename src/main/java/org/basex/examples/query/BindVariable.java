@@ -26,7 +26,7 @@ public final class BindVariable {
     /** Database context. */
     Context context = new Context();
 
-    System.out.println("=== BindVariable ===");
+    System.out.println("=== BindVariable ===\n");
 
     // ------------------------------------------------------------------------
     // Specify query to be executed
@@ -47,13 +47,13 @@ public final class BindVariable {
     // ------------------------------------------------------------------------
     // Bind the variables
     proc.bind("var1", string);
-    proc.bind("var2", number, "xs:intege");
+    proc.bind("var2", number, "xs:integer");
 
     // ------------------------------------------------------------------------
     // Execute the query
     Result result = proc.execute();
 
-    System.out.println("\n* Execute query:");
+    System.out.println("* Execute query:");
 
     // ------------------------------------------------------------------------
     // Print result as string

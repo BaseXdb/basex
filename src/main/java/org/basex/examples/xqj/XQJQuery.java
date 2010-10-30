@@ -25,9 +25,9 @@ public final class XQJQuery {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== XQJQuery ===");
+    System.out.println("=== XQJQuery ===\n");
 
-    System.out.println("\n* Run query via XQJ:");
+    System.out.println("* Run query via XQJ:");
 
     // Build a connection to the specified driver.
     XQConnection conn = ((XQDataSource) Class.forName(DRIVER).

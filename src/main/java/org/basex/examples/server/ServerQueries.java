@@ -21,33 +21,40 @@ public final class ServerQueries {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== ServerQueryExample ===");
+    System.out.println("=== ServerQueryExample ===\n");
 
     // ------------------------------------------------------------------------
-    // Start server on default port 1984
+    // Start server
+    System.out.println("* Start server.");
+
     BaseXServer server = new BaseXServer();
 
     // ------------------------------------------------------------------------
     // Create a client session with host name, port, user name and password
-    System.out.println("\n* Create a client session.");
+    System.out.println("* Create a client session.");
 
     session = new ClientSession("localhost", 1984, "admin", "admin");
 
     // ------------------------------------------------------------------------
     // Run a query
-    System.out.println("\n* Run a query:");
+    System.out.println("* Run a query:");
 
     System.out.println(session.execute("XQUERY 1"));
 
     // ------------------------------------------------------------------------
     // Run a query, specifying an output stream
-    System.out.println("\n* Run a query (faster):");
+    System.out.println("* Run a query (faster):");
+    session.setOutputStream(System.out);
 
-    System.out.println(session.execute("XQUERY 1 to 2"));
+    session.execute("XQUERY 1 to 2");
+    System.out.println();
+
+    // Reset output stream
+    session.setOutputStream(null);
 
     // ------------------------------------------------------------------------
     // Iteratively run a query
-    System.out.println("\n* Iterate a query:");
+    System.out.println("* Iterate a query:");
 
     // Create query instance
     ClientQuery query = session.query("1 to 3");
@@ -56,13 +63,14 @@ public final class ServerQueries {
     while(query.more()) {
       System.out.print(query.next() + " ");
     }
+    System.out.println();
 
     // Close iterator
     query.close();
 
     // ------------------------------------------------------------------------
     // Iteratively run a query, specifying an output stream
-    System.out.println("\n\n* Iterate a query (faster):");
+    System.out.println("* Iterate a query (faster):");
     session.setOutputStream(System.out);
 
     // Create query instance
@@ -73,6 +81,7 @@ public final class ServerQueries {
       query.next();
       System.out.print(" ");
     }
+    System.out.println();
 
     // Close iterator
     query.close();
@@ -82,13 +91,13 @@ public final class ServerQueries {
 
     // ------------------------------------------------------------------------
     // Close the client session
-    System.out.println("\n\n* Close the client session.");
+    System.out.println("* Close the client session.");
 
     session.close();
 
     // ------------------------------------------------------------------------
     // Stop the server
-    System.out.println("\n* Stop the server.");
+    System.out.println("* Stop the server.");
 
     server.stop();
   }

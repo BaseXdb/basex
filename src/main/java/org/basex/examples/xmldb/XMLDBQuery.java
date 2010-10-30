@@ -15,9 +15,10 @@ public final class XMLDBQuery {
   /** Database driver. */
   private static final String DRIVER = "org.basex.api.xmldb.BXDatabase";
   /** Name of the referenced database. */
-  private static final String DBNAME = "xmldb:basex://localhost:1984/input";
+  private static final String DBNAME =
+    "xmldb:basex://localhost:1984/XMLDBCollection";
   /** Sample query. */
-  private static final String QUERY = "//li";
+  private static final String QUERY = "/";
 
   /**
    * Main method of the example class.
@@ -26,9 +27,9 @@ public final class XMLDBQuery {
    */
   public static void main(final String[] args) throws Exception {
 
-    System.out.println("=== XMLDBQuery ===");
+    System.out.println("=== XMLDBQuery ===\n");
 
-    System.out.println("\n* Run query via XML:DB:");
+    System.out.println("* Run query via XML:DB:");
 
     // Collection instance
     Collection coll = null;

@@ -45,7 +45,7 @@ public abstract class Benchmark {
    * @throws Exception exception
    */
   protected boolean init(final String... args) throws Exception {
-    out.println("=== " + Util.name(this) + " Test ===\n");
+    out.println("=== " + Util.name(this) + " Test ===");
     if(!parseArguments(args)) return false;
 
     final Context ctx = new Context();
@@ -55,6 +55,7 @@ public abstract class Benchmark {
       !BaseXServer.ping(LOCALHOST, ctx.prop.num(Prop.SERVERPORT));
 
     if(start) new BaseXServer("");
+    out.println();
 
     session = local ? new LocalSession(ctx) :
       new ClientSession(ctx, "admin", "admin");

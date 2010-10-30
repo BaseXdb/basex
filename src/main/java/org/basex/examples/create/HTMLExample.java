@@ -21,32 +21,35 @@ public final class HTMLExample {
    */
   public static void main(final String[] args) throws BaseXException {
 
-    System.out.println("=== HTMLExample ===");
+    System.out.println("=== HTMLExample ===\n");
 
     // ------------------------------------------------------------------------
     // Create database context
     final Context ctx = new Context();
 
     // Input file and name of database
-    final String file = "http://www.google.com/index.html";
+    final String file = "http://news.google.com/index.html";
     final String name = "htmlexample";
 
     // ------------------------------------------------------------------------
     // Import the specified file
-    System.out.println("\n* Import '" + file + "'.");
+    System.out.println("* Import: \"" + file + "\".");
 
     new Set(Prop.PARSER, "html").execute(ctx);
     new CreateDB(name, file).execute(ctx);
 
     // ------------------------------------------------------------------------
     // Perform query
-    System.out.println("\n* <a/> elements:");
+    System.out.println("* First 10 headlines:");
 
-    System.out.println(new XQuery("//*:a").execute(ctx));
+    String query =
+      "(for $i in //*:h2/*:a/*:span[@class='titletext']" +
+      "return <news>{ $i/text() }</news>)[position() <= 10]";
+    System.out.println(new XQuery(query).execute(ctx));
 
     // ------------------------------------------------------------------------
     // Drop database and close context
-    System.out.println("\n* Drop database.");
+    System.out.println("* Drop database.");
 
     new DropDB(name).execute(ctx);
     ctx.close();

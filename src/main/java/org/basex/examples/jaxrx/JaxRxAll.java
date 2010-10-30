@@ -18,7 +18,7 @@ public final class JaxRxAll {
    */
   public static void main(final String[] args) throws Exception {
     // Start servers
-    JaxRxServer jaxrx = new JaxRxServer();
+    final JaxRxServer jaxrx = new JaxRxServer();
 
     // Create a database
     // Run all JAX-RX examples

@@ -22,43 +22,43 @@ public final class RunCommands {
     /** Database context. */
     Context context = new Context();
 
-    System.out.println("=== DBExample ===");
+    System.out.println("=== DBExample ===\n");
 
     // ------------------------------------------------------------------------
     // Create a database from a local or remote XML document or XML String
-    System.out.println("\n* Create a database.");
+    System.out.println("* Create a database.");
 
     new CreateDB("DBExample", "etc/xml/input.xml").execute(context);
 
     // ------------------------------------------------------------------------
     // Close and reopen the database
-    System.out.println("\n* Close and reopen database.");
+    System.out.println("* Close and reopen database.");
 
     new Close().execute(context);
     new Open("DBExample").execute(context);
 
     // ------------------------------------------------------------------------
     // Additionally create a full-text index
-    System.out.println("\n* Create a full-text index.");
+    System.out.println("* Create a full-text index.");
 
     new CreateIndex("fulltext").execute(context);
 
     // ------------------------------------------------------------------------
     // Show information on the currently opened database
-    System.out.println("\n* Show database information:");
+    System.out.println("* Show database information:");
 
     System.out.println(new InfoDB().execute(context));
 
     // ------------------------------------------------------------------------
     // Optimize the internal database structures.
     // This command is recommendable after all kinds of database updates
-    System.out.println("\n* Optimize the database.");
+    System.out.println("* Optimize the database.");
 
     new Optimize().execute(context);
 
     // ------------------------------------------------------------------------
     // Drop indexes to save disk space
-    System.out.println("\n* Drop indexes.");
+    System.out.println("* Drop indexes.");
 
     new DropIndex("text").execute(context);
     new DropIndex("attribute").execute(context);
@@ -67,7 +67,7 @@ public final class RunCommands {
 
     // ------------------------------------------------------------------------
     // Show all existing databases
-    System.out.println("\n* Show existing databases:");
+    System.out.println("* Show existing databases:");
 
     System.out.println(new List().execute(context));
 
