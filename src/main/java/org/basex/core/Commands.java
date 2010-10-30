@@ -34,25 +34,23 @@ public interface Commands {
 
   /** Command flag: command which will not be shown in the help. */
   int HID = 1;
-  /** Command flag: command which cannot be run by the user. */
-  int INT = 2;
 
   /** Command definitions. */
   enum Cmd {
     // Database commands
-    HD(HID, HELPDB), CREATE(HELPCREATE), C(HID), OPEN(HELPOPEN), O(HID),
-    CHECK(HID), ADD(HELPADD), DELETE(HELPDELETE), INFO(HELPINFO), I(HID),
+    HD(HID, HELPDB), CREATE(HELPCREATE), OPEN(HELPOPEN),
+    CHECK(HID), ADD(HELPADD), DELETE(HELPDELETE), INFO(HELPINFO),
     CLOSE(HELPCLOSE), LIST(HELPLIST), DROP(HELPDROP), EXPORT(HELPEXPORT),
     OPTIMIZE(HELPOPTIMIZE),
     // Query commands
-    HQ(HID, HELPQ), XQUERY(HELPXQUERY), X(HID), FIND(HELPFIND),
+    HQ(HID, HELPQ), XQUERY(HELPXQUERY), FIND(HELPFIND),
     RUN(HELPRUN), CS(HELPCS),
     // Admin commands
     HA(HID, HELPA), SHOW(HELPSHOW), GRANT(HELPGRANT),
     ALTER(HELPALTER), KILL(HELPKILL), BACKUP(HELPBACKUP), RESTORE(HELPRESTORE),
     // General commands
     HG(HID, HELPG), GET(HID), SET(HELPSET), PASSWORD(HELPPASSWORD),
-    HELP(HELPHELP), EXIT(HELPEXIT), Q(HID), QUIT(HID);
+    HELP(HELPHELP), EXIT(HELPEXIT), QUIT(HID);
 
     /** Flags for controlling command parsing. */
     private final int flags;
@@ -83,14 +81,6 @@ public interface Commands {
      */
     boolean hidden() {
       return (flags & HID) != 0;
-    }
-
-    /**
-     * Tests if this is an internal command which cannot be run by the user.
-     * @return result of check
-     */
-    boolean internal() {
-      return (flags & INT) != 0;
     }
 
     /**

@@ -7,20 +7,22 @@ package org.basex.server;
  * @author Christian Gruen
  */
 public enum ServerCmd {
-  /** Code for running a database command. */
-  CMD(10),
-  /** Code for creating a query process. */
+  /** Code for creating a query process: {query}0. */
   QUERY(0),
-  /** Code for binding an external query variable. */
+  /** Code for binding an external query variable: {id}0{name}0{val}0{type}0. */
   BIND(3),
-  /** Code for initializing the result iteration. */
+  /** Code for initializing the result iteration: {id}0. */
   INIT(4),
-  /** Code for returning next query result. */
+  /** Code for returning next query result: {id}0. */
   NEXT(1),
-  /** Code for closing the iterator. */
+  /** Code for closing the iterator: {id}0. */
   CLOSE(2),
-  /** Code for creating a database. */
-  CREATE(8);
+  /** Code for creating a database: {name}0{input}0. */
+  CREATE(8),
+  /** Code for adding a document to a database: {name}0{path}0{input}0. */
+  ADD(9),
+  /** Code for running a database command: {command} \0. */
+  CMD(-1);
 
   /** Control code (soon obsolete). */
   public int code;

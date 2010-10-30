@@ -72,7 +72,7 @@ public final class Export extends Command {
 
     if(!root.exists()) root.md();
 
-    for(final int pre : data.doc()) {
+    for(final int pre : data.doc().toArray()) {
       // create file path
       final IO file = root.merge(Token.string(data.text(pre, true)));
       // create dir if necessary

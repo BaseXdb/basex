@@ -28,11 +28,17 @@ public final class Open extends Command {
   @Override
   protected boolean run() {
     new Close().run(context);
-    final String db = args[0];
+    String db = args[0];
+    int i = db.indexOf('/');
+    String path = null;
+    if(i != -1) {
+      path = db.substring(i + 1);
+      db = db.substring(0, i);
+    }
 
     try {
       final Data data = open(db, context);
-      context.openDB(data);
+      context.openDB(data, path);
       if(data.meta.oldindex) info(INDUPDATE);
       return info(DBOPENED, db, perf);
     } catch(final IOException ex) {

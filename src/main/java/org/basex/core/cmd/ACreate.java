@@ -128,7 +128,7 @@ public abstract class ACreate extends Command {
    * @param p input path
    * @return normalized path
    */
-  protected final String path(final String p) {
+  protected static final String path(final String p) {
     return p.replaceAll("[\\\\//]+", "/").replaceAll("^/|/$", "");
   }
 }

@@ -123,22 +123,43 @@ public final class ClientSession extends Session {
   @Override
   public void create(final String name, final InputStream input)
       throws BaseXException {
-
     try {
       sout.write(8);
       send(name);
-      int l;
-      while((l = input.read()) != -1) sout.write(l);
-      sout.write(0);
-      sout.flush();
-      final BufferInput bi = new BufferInput(sin);
-      info = bi.readString();
-      if(!ok(bi)) throw new BaseXException(info);
+      send(input);
     } catch(final IOException ex) {
       throw new BaseXException(ex);
     }
   }
 
+  @Override
+  public void add(final String name, final String target,
+      final InputStream input) throws BaseXException {
+    try {
+      sout.write(9);
+      send(name);
+      send(target);
+      send(input);
+    } catch(final IOException ex) {
+      throw new BaseXException(ex);
+    }
+  }
+
+  /**
+   * Sends the specified stream to the server.
+   * @param input input stream
+   * @throws IOException I/O exception
+   */
+  private void send(final InputStream input) throws IOException {
+    int l;
+    while((l = input.read()) != -1) sout.write(l);
+    sout.write(0);
+    sout.flush();
+    final BufferInput bi = new BufferInput(sin);
+    info = bi.readString();
+    if(!ok(bi)) throw new IOException(info);
+  }
+  
   @Override
   public ClientQuery query(final String query) throws BaseXException {
     return new ClientQuery(query, this);

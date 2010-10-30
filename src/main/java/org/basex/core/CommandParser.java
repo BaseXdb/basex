@@ -69,8 +69,6 @@ import org.basex.util.TokenBuilder;
 public final class CommandParser extends InputParser {
   /** Context. */
   private final Context ctx;
-  /** Flag for including internal commands. */
-  private final boolean internal;
   /** Flag for gui command. */
   private boolean gui;
 
@@ -80,19 +78,8 @@ public final class CommandParser extends InputParser {
    * @param c context
    */
   public CommandParser(final String in, final Context c) {
-    this(in, c, false);
-  }
-
-  /**
-   * Constructor, parsing internal commands.
-   * @param in query input
-   * @param c context
-   * @param i internal flag
-   */
-  public CommandParser(final String in, final Context c, final boolean i) {
     super(in);
     ctx = c;
-    internal = i;
   }
 
   /**
@@ -145,7 +132,7 @@ public final class CommandParser extends InputParser {
   private Command parse(final Cmd cmd, final boolean s)
       throws QueryException {
     switch(cmd) {
-      case CREATE: case C:
+      case CREATE:
         switch(consume(CmdCreate.class, cmd)) {
           case DATABASE: case DB:
             return new CreateDB(name(cmd), s ? remaining(null) : string(null));
@@ -167,8 +154,8 @@ public final class CommandParser extends InputParser {
             return new AlterUser(name(cmd), string(null));
         }
         break;
-      case OPEN: case O:
-        return new Open(name(cmd));
+      case OPEN:
+        return new Open(string(cmd));
       case CHECK:
         return new Check(string(cmd));
       case ADD:
@@ -177,7 +164,7 @@ public final class CommandParser extends InputParser {
         return new Add(s ? remaining(cmd) : string(cmd), arg1, arg2);
       case DELETE:
         return new Delete(string(cmd));
-      case INFO: case I:
+      case INFO:
         switch(consume(CmdInfo.class, cmd)) {
           case NULL:
             return new Info();
@@ -210,7 +197,7 @@ public final class CommandParser extends InputParser {
         return new Optimize();
       case EXPORT:
         return new Export(string(cmd));
-      case XQUERY: case X:
+      case XQUERY:
         return new XQuery(xquery(cmd));
       case RUN:
         return new Run(string(cmd));
@@ -231,7 +218,7 @@ public final class CommandParser extends InputParser {
           hc = consume(Cmd.class, cmd).toString();
         }
         return new Help(hc);
-      case EXIT: case QUIT: case Q:
+      case EXIT: case QUIT:
         return new Exit();
       case KILL:
         return new Kill(name(cmd));
@@ -412,10 +399,7 @@ public final class CommandParser extends InputParser {
       // return command reference; allow empty strings as input ("NULL")
       final String t = token == null ? "NULL" : token.toUpperCase();
       final E cmd = Enum.valueOf(cmp, t);
-      if(!Cmd.class.isInstance(cmd)) return cmd;
-      final Cmd c = Cmd.class.cast(cmd);
-
-      if(!c.help() && (internal || !c.internal())) return cmd;
+      if(!Cmd.class.isInstance(cmd) || !Cmd.class.cast(cmd).help()) return cmd;
     } catch(final IllegalArgumentException ex) { /* will not happen. */ }
     }
     final Enum<?>[] alt = list(cmp, token);
@@ -467,7 +451,7 @@ public final class CommandParser extends InputParser {
     for(final Enum<?> e : en.getEnumConstants()) {
       if(Cmd.class.isInstance(e)) {
         final Cmd c = Cmd.class.cast(e);
-        if(c.help() || c.hidden() || c.internal()) continue;
+        if(c.help() || c.hidden()) continue;
       }
       if(e.name().startsWith(t)) {
         final int s = list.length;

@@ -11,6 +11,7 @@ import org.basex.core.CommandParser;
 import org.basex.core.Context;
 import org.basex.core.Command;
 import org.basex.core.Prop;
+import org.basex.core.cmd.Add;
 import org.basex.core.cmd.Close;
 import org.basex.core.cmd.CreateDB;
 import org.basex.core.cmd.Exit;
@@ -115,6 +116,10 @@ public final class ServerProcess extends Thread {
             create();
             continue;
           }
+          if(sc == ADD) {
+            add();
+            continue;
+          }
           if(sc != CMD) {
             query(sc);
             continue;
@@ -132,7 +137,7 @@ public final class ServerProcess extends Thread {
         final Performance perf = new Performance();
         cmd = null;
         try {
-          cmd = new CommandParser(input, context, true).parseSingle();
+          cmd = new CommandParser(input, context).parseSingle();
         } catch(final QueryException ex) {
           // log invalid command
           final String msg = ex.getMessage();
@@ -196,8 +201,29 @@ public final class ServerProcess extends Thread {
     try {
       final String name = in.readString();
       final WrapInputStream is = new WrapInputStream(in);
-      // send {MSG}0 and 0 as success flag
       final String info = CreateDB.xml(name, is, context);
+      // send {MSG}0 and 0 as success flag
+      out.writeString(info);
+      out.write(0);
+    } catch(final BaseXException ex) {
+      // send {MSG}0 and 1 as error flag
+      out.writeString(ex.getMessage());
+      out.write(1);
+    }
+    out.flush();
+  }
+
+  /**
+   * Adds a document to a database.
+   * @throws IOException I/O exception
+   */
+  private void add() throws IOException {
+    try {
+      final String name = in.readString();
+      final String path = in.readString();
+      final WrapInputStream is = new WrapInputStream(in);
+      final String info = Add.add(name, path, is, context);
+      // send {MSG}0 and 0 as success flag
       out.writeString(info);
       out.write(0);
     } catch(final BaseXException ex) {

@@ -1,18 +1,28 @@
 package org.basex.core.cmd;
 
 import static org.basex.core.Text.*;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import javax.xml.transform.sax.SAXSource;
 import org.basex.build.MemBuilder;
+import org.basex.build.Parser;
 import org.basex.build.xml.DirParser;
+import org.basex.build.xml.SAXWrapper;
+import org.basex.core.BaseXException;
 import org.basex.core.CommandBuilder;
+import org.basex.core.Context;
 import org.basex.core.User;
 import org.basex.data.Data;
+import org.basex.data.MemData;
 import org.basex.io.IO;
 import org.basex.io.IOContent;
+import org.basex.util.Performance;
 import org.basex.util.Util;
+import org.xml.sax.InputSource;
 
 /**
- * Evaluates the 'add' command and adds a single document to a collection.
+ * Evaluates the 'add' command and adds a document to a collection.
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  * @author Christian Gruen
@@ -62,24 +72,70 @@ public class Add extends ACreate {
 
     final String name   = io.name();
     final String target = path(args[2]);
-
     final DirParser p = new DirParser(io, context.prop, target);
     try {
-      final Data data = context.data;
-      data.insert(data.meta.size, -1, MemBuilder.build(p, context.prop, name));
-      data.flush();
-    } catch(final IOException ex) {
-      Util.debug(ex);
-      final String msg = ex.getMessage();
-      return error(msg != null ? msg : name);
+      return info(add(p, context, target + name));
+    } catch(final BaseXException ex) {
+      return error(ex.getMessage());
     }
-
-    context.update();
-    return info(PATHADDED, name, perf);
   }
 
   @Override
   public void build(final CommandBuilder cb) {
     cb.init().arg(AS, 1).arg(TO, 2).arg(0);
+  }
+
+  /**
+   * Adds a document to the database.
+   * @param name name of document. If {@code null}, the name of the input
+   *   will be used
+   * @param target target. If {@code null}, target will be set to root
+   * @param input XML input stream
+   * @param ctx database context
+   * @return info string
+   * @throws BaseXException database exception
+   */
+  public static String add(final String name, final String target,
+      final InputStream input, final Context ctx) throws BaseXException {
+
+    final Data data = ctx.data;
+    if(data == null) return PROCNODB;
+
+    String trg = path(target);
+    if(trg.length() != 0) trg += '/';
+
+    final BufferedInputStream is = new BufferedInputStream(input);
+    final SAXSource sax = new SAXSource(new InputSource(is));
+    final Parser parser = new SAXWrapper(sax, name, trg, ctx.prop);
+    try {
+      ctx.lock.before(true);
+      return add(parser, ctx, trg + name);
+    } finally {
+      ctx.lock.after(true);
+    }
+  }
+  
+  /**
+   * Adds a document to the database.
+   * @param parser parser instance
+   * @param ctx database context
+   * @param path database path
+   * @return info string
+   * @throws BaseXException database exception
+   */
+  public static String add(final Parser parser, final Context ctx,
+      final String path) throws BaseXException {
+
+    final Performance p = new Performance();
+    try {
+      final MemData md = MemBuilder.build(parser, ctx.prop, path);
+      ctx.data.insert(ctx.data.meta.size, -1, md);
+      ctx.data.flush();
+      ctx.update();
+      return Util.info(PATHADDED, path, p);
+    } catch(final IOException ex) {
+      Util.debug(ex);
+      throw new BaseXException(ex);
+    }
   }
 }

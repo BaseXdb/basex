@@ -1,6 +1,7 @@
 package org.basex.data;
 
 import static org.basex.util.Token.*;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -204,12 +205,41 @@ public abstract class Data {
 
   /**
    * Returns the document nodes.
+   * A dummy node is returned if the database is empty. 
    * @return root nodes
    */
-  public final int[] doc() {
+  public final IntList doc() {
     final IntList il = new IntList();
     for(int i = 0; i < meta.size; i += size(i, Data.DOC)) il.add(i);
-    return il.toArray();
+    return il;
+  }
+
+  /**
+   * Returns the document nodes for the specified path.
+   * @param input input path
+   * @return root nodes
+   */
+  public final IntList doc(final String input) {
+    final boolean all = input.length() == 0;
+    final byte[] slash = token("/");
+    // build exact path: remove redundant slashes and switch to lower case
+    final byte[] exact = lc(concat(slash, token(input.replaceAll("/+", "/"))));
+    // build root path
+    final byte[] start = endsWith(exact, slash) ? exact : concat(exact, slash);
+    final IntList il = new IntList();
+    if(!empty()) {
+      for(int i = 0; i < meta.size; i += size(i, Data.DOC)) {
+        if(all) {
+          // add all documents
+          il.add(i);
+        } else {
+          // add documents which match specified input path
+          final byte[] pth = concat(slash, lc(text(i, true)));
+          if(eq(pth, exact) || startsWith(pth, start)) il.add(i);
+        }
+      }
+    }
+    return il;
   }
 
   /**

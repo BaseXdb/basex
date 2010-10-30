@@ -76,6 +76,16 @@ public abstract class Session {
     throws BaseXException;
 
   /**
+   * Adds a document to an open database.
+   * @param name name of document
+   * @param target target path
+   * @param input xml input
+   * @throws BaseXException database exception
+   */
+  public abstract void add(final String name, final String target,
+      final InputStream input) throws BaseXException;
+
+  /**
    * Returns command info.
    * @return command info
    */

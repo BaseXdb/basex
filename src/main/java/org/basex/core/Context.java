@@ -7,6 +7,7 @@ import org.basex.data.Nodes;
 import org.basex.io.IO;
 import org.basex.server.ServerProcess;
 import org.basex.server.Sessions;
+import org.basex.util.IntList;
 
 /**
  * This class serves as a central database context.
@@ -94,7 +95,7 @@ public final class Context {
    * @return result of check
    */
   public int[] doc() {
-    return current.root ? current.list : data.doc();
+    return current.root ? current.list : data.doc().toArray();
   }
 
   /**
@@ -102,10 +103,22 @@ public final class Context {
    * @param d data reference
    */
   public void openDB(final Data d) {
+    openDB(d, null);
+  }
+
+  /**
+   * Sets the specified data instance as current database and restricts
+   * the context nodes to the given path.
+   * @param d data reference
+   * @param path database path
+   */
+  public void openDB(final Data d, final String path) {
     data = d;
     copied = null;
     marked = new Nodes(d);
-    update();
+    final IntList il = path == null ? data.doc() : data.doc(path);
+    current = new Nodes(il.toArray(), data);
+    current.root = path == null;
   }
 
   /**
@@ -123,7 +136,7 @@ public final class Context {
    * Updates references to the document nodes.
    */
   public void update() {
-    current = new Nodes(data.doc(), data);
+    current = new Nodes(data.doc().toArray(), data);
     current.root = true;
   }
 

@@ -230,7 +230,9 @@ public final class QueryContext extends Progress {
             addDoc(new DBNode(data, nodes.list[n], Data.DOC));
           }
         } else {
-          for(final int p : data.doc()) addDoc(new DBNode(data, p, Data.DOC));
+          final IntList il = data.doc();
+          for(int p = 0; p < il.size(); p++)
+            addDoc(new DBNode(data, il.get(p), Data.DOC));
         }
         rootDocs = docs;
 
@@ -542,28 +544,8 @@ public final class QueryContext extends Progress {
   private void addDocs(final DBNode db, final byte[] input) {
     final NodIter col = new NodIter();
     final Data data = db.data;
-
-    final boolean all = input.length == 0;
-    final byte[] slash = token("/");
-    // build exact path: remove redundant slashes and switch to lower case
-    final byte[] exact = lc(concat(slash,
-        token(string(input).replaceAll("/+", "/"))));
-    // build root path
-    final byte[] start = endsWith(exact, slash) ? exact : concat(exact, slash);
-
-    if(!data.empty()) {
-      for(int p = 0; p < data.meta.size; p += data.size(p, Data.DOC)) {
-        final DBNode dbn = new DBNode(data, p);
-        if(all) {
-          // add all documents
-          col.add(dbn);
-        } else {
-          // add documents which match specified input path
-          final byte[] path = concat(slash, lc(data.text(p, true)));
-          if(eq(path, exact) || startsWith(path, start)) col.add(dbn);
-        }
-      }
-    }
+    final IntList il = data.doc(string(input));
+    for(int i = 0; i < il.size(); i++) col.add(new DBNode(data, il.get(i)));
     addCollection(col, token(data.meta.name));
   }
 

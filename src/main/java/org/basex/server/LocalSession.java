@@ -6,6 +6,7 @@ import org.basex.core.BaseXException;
 import org.basex.core.Command;
 import org.basex.core.CommandParser;
 import org.basex.core.Context;
+import org.basex.core.cmd.Add;
 import org.basex.core.cmd.CreateDB;
 import org.basex.query.QueryException;
 import org.basex.util.Util;
@@ -42,6 +43,12 @@ public class LocalSession extends Session {
   public void create(final String name, final InputStream input)
     throws BaseXException {
     info = CreateDB.xml(name, input, ctx);
+  }
+
+  @Override
+  public void add(final String name, final String target,
+      final InputStream input) throws BaseXException {
+    info = Add.add(name, target, input, ctx);
   }
 
   @Override
