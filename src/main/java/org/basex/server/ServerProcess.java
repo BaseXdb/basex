@@ -281,7 +281,7 @@ public final class ServerProcess extends Thread {
     } catch(final QueryException ex) {
       // log exception (static or runtime)
       err = ex.getMessage();
-      qp.close(true);
+      if(qp != null) qp.close(true);
       queries.remove(arg);
     }
     if(err != null) {

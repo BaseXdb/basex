@@ -43,10 +43,19 @@ final class QueryProcess extends Progress {
    * @param qu query string
    * @param po output stream
    * @param c database context
+   * @throws QueryException query exception
    */
-  QueryProcess(final String qu, final PrintOutput po, final Context c) {
+  QueryProcess(final String qu, final PrintOutput po, final Context c)
+      throws QueryException {
+
     query = qu;
     qp = new QueryProcessor(qu, c);
+    try {
+      qp.parse();
+    } catch(final QueryException ex) {
+      try { qp.close(); } catch(final Exception e) { }
+      throw ex;
+    }
     out = po;
     ctx = c;
     startTimeout(ctx.prop.num(Prop.TIMEOUT));
@@ -70,7 +79,6 @@ final class QueryProcess extends Progress {
    * @throws QueryException query exception
    */
   public void init() throws IOException, QueryException {
-    qp.parse();
     monitored = true;
     ctx.lock.before(qp.ctx.updating);
     xml = qp.getSerializer(out);

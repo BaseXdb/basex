@@ -112,7 +112,6 @@ public final class QueryProcessor extends Progress {
   public void bind(final String n, final String o, final String t)
       throws QueryException {
 
-    // [CG] XQuery: handle data type
     Object obj = o;
     if(t != null && t.length() != 0) {
       final QNm type = new QNm(Token.token(t));
@@ -133,8 +132,15 @@ public final class QueryProcessor extends Progress {
    * @throws QueryException query exception
    */
   public void bind(final String n, final Object o) throws QueryException {
-    final Expr ex = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
-    ctx.vars.addGlobal(new Var(new QNm(Token.token(n))).bind(ex, ctx));
+    Expr ex = o instanceof Expr ? (Expr) o : FunJava.type(o).e(o, null);
+    final Var var = new Var(new QNm(Token.token(n))).bind(ex, ctx);
+    Var gl = ctx.vars.get(var);
+    if(gl == null) {
+      ctx.vars.addGlobal(var);
+    } else {
+      if(gl.type != null) ex = gl.type.type.e(var.item(ctx, null), ctx, null);
+      gl.bind(ex, ctx);
+    }
   }
 
   /**

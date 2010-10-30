@@ -258,19 +258,20 @@ public final class ServerQueryTest {
     cq.close();
   }
 
-  /** Runs an erroneous query. */
+  /** Runs a query with an external variable declaration.
+   * @throws BaseXException command exception */
   @Test
-  public void queryError() {
-    try {
-      cs.query("(").close();
-    } catch(final BaseXException ex) {
-      fail("No error expected, as query should not have been evaluated.");
-    }
+  public void queryBindDynamic() throws BaseXException {
+    final ClientQuery cq = cs.query(
+        "declare variable $a as xs:integer external; $a");
+    cq.bind("a", "1");
+    assertEquals("1", cq.next());
+    cq.close();
   }
 
   /** Runs an erroneous query. */
   @Test
-  public void queryError2() {
+  public void queryError() {
     try {
       final ClientQuery cq = cs.query("(");
       cq.next();
@@ -278,23 +279,19 @@ public final class ServerQueryTest {
     } catch(final BaseXException ex) { }
   }
 
-  /** Runs an erroneous query.
-   * @throws BaseXException command exception */
+  /** Runs an erroneous query. */
   @Test
-  public void queryError3() throws BaseXException {
-    ClientQuery cq = null;
+  public void queryError2() {
     try {
-      cq = cs.query("(");
-      cq.next();
+      cs.query("(");
       fail("Error expected.");
     } catch(final BaseXException ex) {
-      cq.close();
     }
   }
 
   /** Runs an erroneous query. */
   @Test
-  public void queryError4() {
+  public void queryError3() {
     try {
       final ClientQuery cq = cs.query("(1,'a')[. eq 1]");
       cq.init();
