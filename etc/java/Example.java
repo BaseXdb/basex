@@ -2,15 +2,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * This example shows how database commands can be executed.
+ * This example shows how commands can be executed via the server instance.
+ * The database server must be started first to make this example work.
  * Documentation: http://basex.org/api
  *
  * @author Workgroup DBIS, University of Konstanz 2005-10, ISC License
  */
 public final class Example {
-  /** Private constructor. */
-  private Example() { }
-
   /**
    * Main method, launching the standalone console mode.
    * @param args command-line arguments
@@ -42,5 +40,5 @@ public final class Example {
       // print exception
       ex.printStackTrace();
     }
-  };
+  }
 }

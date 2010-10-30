@@ -116,7 +116,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
   @Override
   public int getResourceCount() throws XMLDBException {
     check();
-    return ctx.data.doc().length;
+    return ctx.data.doc().size();
   }
 
   @Override
@@ -124,7 +124,9 @@ public final class BXCollection implements Collection, BXXMLDBText {
     check();
     final StringList sl = new StringList();
     final Data data = ctx.data;
-    for(final int d : data.doc()) sl.add(Token.string(data.text(d, true)));
+    for(final int d : data.doc().toArray()) {
+      sl.add(Token.string(data.text(d, true)));
+    }
     return sl.toArray();
   }
 
@@ -203,7 +205,7 @@ public final class BXCollection implements Collection, BXXMLDBText {
     if(id == null) return null;
     final Data data = ctx.data;
     final byte[] idd = Token.token(id);
-    for(final int d : data.doc()) {
+    for(final int d : data.doc().toArray()) {
       if(Token.eq(data.text(d, true), idd))
         return new BXXMLResource(data, d, id, this);
     }

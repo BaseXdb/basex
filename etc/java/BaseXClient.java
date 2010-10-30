@@ -1,4 +1,5 @@
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,12 +97,40 @@ public class BaseXClient {
    */
   public void create(final String name, final InputStream input)
       throws IOException {
-    // send 8 to mark start of query execution, and {Query}0 as query string
+
     out.write(8);
     send(name);
+    send(input);
+  }
+
+  /**
+   * Adds a database.
+   * @param name name of database
+   * @param target target path
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  public void add(final String name, final String target,
+      final InputStream input) throws IOException {
+
+    out.write(9);
+    send(name);
+    send(target);
+    send(input);
+  }
+
+  /**
+   * Sends an input stream to the server.
+   * @param input xml input
+   * @throws IOException I/O exception
+   */
+  private void send(final InputStream input) throws IOException {
     int l;
-    while((l = input.read()) != -1) out.write(l);
-    out.write(0);
+    final BufferedInputStream bis = new BufferedInputStream(input);
+    final BufferedOutputStream bos = new BufferedOutputStream(out);
+    while((l = bis.read()) != -1) bos.write(l);
+    bos.write(0);
+    bos.flush();
     info = receive();
     if(!ok()) throw new IOException(info);
   }
@@ -215,6 +244,17 @@ public class BaseXClient {
      */
     public String init() throws IOException {
       return execute(4, id);
+    }
+
+    /**
+     * Binds a variable.
+     * @param name name of variable
+     * @param value value
+     * @throws IOException I/O exception
+     */
+    public void bind(final String name, final String value)
+        throws IOException {
+      execute(3, id + '\0' + name + '\0' + value + '\0');
     }
 
     /**

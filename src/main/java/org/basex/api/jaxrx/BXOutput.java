@@ -34,9 +34,9 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
     out = os;
 
     if(path != null) {
-      // open database if a single resource was specified
       try {
-        if(path.getDepth() != 0) cs.execute(new Open(root(path)));
+        // open database if a resource path was specified
+        if(path.getDepth() != 0) cs.execute(new Open(path.getResourcePath()));
       } catch(final BaseXException ex) {
         throw new JaxRxException(404, ex.getMessage());
       }
@@ -59,7 +59,6 @@ abstract class BXOutput extends BXCode implements StreamingOutput {
    */
   final String exec(final Object command, final OutputStream os) {
     cs.setOutputStream(os);
-
     try {
       return cs.execute(command.toString());
     } catch(final BaseXException ex) {

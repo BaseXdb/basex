@@ -43,17 +43,19 @@ abstract class BXCode {
 
   /**
    * Code to be run.
+   * @return string info message
    * @throws IOException I/O exception
    */
-  abstract void code() throws IOException;
+  abstract String code() throws IOException;
 
   /**
    * Runs the {@link #code()} method and closes the client session.
    * A server exception is thrown if I/O errors occur.
+   * @return info message
    */
-  final void run() {
+  final String run() {
     try {
-      code();
+      return code();
     } catch(final IOException ex) {
       throw new JaxRxException(ex);
     } finally {
@@ -68,9 +70,21 @@ abstract class BXCode {
    * @param path path
    * @return root resource
    */
-  final String root(final ResourcePath path) {
-    if(path.getDepth() == 1) return path.getResourcePath();
-    throw new JaxRxException(404, "Resource '" + path + "' was not found.");
+  final String db(final ResourcePath path) {
+    return path.getResource(0);
+  }
+
+  /**
+   * Returns the collection path for a database.
+   * @param path path
+   * @return root resource
+   */
+  final String path(final ResourcePath path) {
+    final StringBuilder sb = new StringBuilder();
+    for(int i = 1; i < path.getDepth(); ++i) {
+      sb.append('/').append(path.getResource(i));
+    }
+    return sb.substring(Math.min(1, sb.length()));
   }
 
   /**
