@@ -47,7 +47,7 @@ public final class Namespaces {
   }
 
   /**
-   * Assigns a uri to the specified QName.
+   * Assigns a URI to the specified QName.
    * @param qname qname
    */
   public void uri(final QNm qname) {
@@ -58,7 +58,7 @@ public final class Namespaces {
   }
 
   /**
-   * Finds the uri for the specified prefix in the local and global namespaces.
+   * Finds the URI for the specified prefix in the local and global namespaces.
    * @param pre prefix of the namespace
    * @param dn dynamic error
    * @param ii input info

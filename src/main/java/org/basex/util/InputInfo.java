@@ -23,7 +23,7 @@ public final class InputInfo {
    * @param p parsing position
    */
   public InputInfo(final InputParser p) {
-    query = p.qu;
+    query = p.query;
     pos = p.qp;
     file = p.file;
   }

@@ -17,6 +17,7 @@ import org.basex.query.util.NSGlobal;
 import org.basex.query.util.Var;
 import org.basex.util.Atts;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 
 /**
  * Element fragment.
@@ -153,6 +154,6 @@ public final class CElem extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.ELM.name + " { " + tag + " }");
+    return toString(Token.string(Type.ELM.nam) + " { " + tag + " }");
   }
 }

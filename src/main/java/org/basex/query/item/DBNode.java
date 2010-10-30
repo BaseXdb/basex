@@ -11,6 +11,7 @@ import org.basex.query.iter.NodeIter;
 import org.basex.query.iter.NodeMore;
 import org.basex.query.util.NSGlobal;
 import org.basex.util.Atts;
+import org.basex.util.TokenBuilder;
 
 /**
  * Disk-based Node item.
@@ -357,17 +358,22 @@ public class DBNode extends Nod {
 
   @Override
   public String toString() {
+    final TokenBuilder tb = new TokenBuilder(type.nam).add(' ');
     switch(type) {
       case ATT:
       case PI:
-        return type.name + " " + string(nname()) + " { \"" +
-          string(chop(atom(), 64)) + "\" }";
+        tb.add(nname()).add(" { \"").add(chop(atom(), 64)).add("\" }");
+        break;
       case ELM:
-        return type.name + " " + string(nname()) + " { ... }";
+        tb.add(nname()).add(" { ... }");
+        break;
       case DOC:
-        return type.name + " { \"" + string(data.text(pre, true)) + "\" }";
+        tb.add(" { \"").add(data.text(pre, true)).add("\" }");
+        break;
       default:
-        return type.name + " { \"" + string(chop(atom(), 64)) + "\" }";
+        tb.add(" { \"").add(chop(atom(), 64)).add("\" }");
+        break;
     }
+    return tb.toString();
   }
 }

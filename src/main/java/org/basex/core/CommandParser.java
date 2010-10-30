@@ -315,10 +315,10 @@ public final class CommandParser extends InputParser {
     consumeWS();
     final TokenBuilder tb = new TokenBuilder();
     if(more() && !curr(';')) {
-      final QueryParser p = new QueryParser(qu, new QueryContext(ctx));
+      final QueryParser p = new QueryParser(query, new QueryContext(ctx));
       p.qp = qp;
       p.parse(null, false);
-      tb.add(qu.substring(qp, p.qp));
+      tb.add(query.substring(qp, p.qp));
       qp = p.qp;
     }
     return finish(cmd, tb);
@@ -390,7 +390,7 @@ public final class CommandParser extends InputParser {
    * query.
    */
   private void consumeWS() {
-    while(qp < ql && qu.charAt(qp) <= ' ') ++qp;
+    while(qp < ql && query.charAt(qp) <= ' ') ++qp;
     qm = qp - 1;
   }
 

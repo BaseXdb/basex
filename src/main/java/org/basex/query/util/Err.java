@@ -17,7 +17,7 @@ import org.basex.util.InputInfo;
 public enum Err {
 
   /** BASX0000: Evaluation exception. */
-  NOTIMPL(BASX, 0, "Not implemented yet: %"),
+  NOTIMPL(BASX, 0, "Not implemented yet: %."),
 
   /** BASX0001: Evaluation exception. */
   NOIDX(BASX, 1, "Index not available: '%'."),
@@ -36,9 +36,9 @@ public enum Err {
   /** BASX0008: No nodes as result. */
   QUERYNODES(BASX, 8, Text.QUERYNODESERR),
   /** BASX0009: No nodes as result. */
-  SENTLISTPARSE(BASX, 9, "% could not be parsed: %"),
+  SENTLISTPARSE(BASX, 9, "% could not be parsed: %."),
   /** BASX0099: Undefined error. */
-  UNDEF(BASX, 99, "%"),
+  UNDEF(BASX, 99, "%."),
 
   /** FOAR0001: Evaluation exception. */
   DIVZERO(FOAR, 1, "'%' was divided by zero."),
@@ -47,12 +47,12 @@ public enum Err {
   /** FOAR0002: Parsing exception. */
   BOUNDS(FOAR, 2, "Integer value % out of bounds."),
   /** FOAR0002: Evaluation exception. */
-  RANGE(FOAR, 2, "Value out of range: %"),
+  RANGE(FOAR, 2, "Value out of range: %."),
 
   /** FOCA0002: Evaluation exception. */
-  INVALUE(FOCA, 2, "Invalid value for %: %"),
+  INVALUE(FOCA, 2, "Invalid value for %: %."),
   /** FOCA0003: Evaluation exception. */
-  INTRANGE(FOCA, 3, "Integer value out of range: %"),
+  INTRANGE(FOCA, 3, "Integer value out of range: %."),
   /** FOCA0005: Evaluation exception. */
   DATECALC(FOCA, 5, "Invalid % calculation: %."),
 
@@ -80,7 +80,7 @@ public enum Err {
   /** FODC0005: Evaluation exception. */
   INVDOC(FODC, 5, "Invalid document \"%\"."),
   /** FODC0006: Evaluation exception. */
-  DOCWF(FODC, 6, "SAX: %"),
+  DOCWF(FODC, 6, "SAX: %."),
   /** FODC0007: Evaluation exception. */
   DOCBASE(FODC, 7, "Base-uri % is invalid."),
 
@@ -119,7 +119,7 @@ public enum Err {
   /** FOFL0008: Evaluation exception. */
   FILEEXISTS(FOFL, 8, "File '%' already exists."),
   /** FOFL0009: Evaluation exception. */
-  DIRMOVE(FOFL, 9, "A directory cannot be moved. "),
+  DIRMOVE(FOFL, 9, "A directory cannot be moved."),
   /** FOFL0010: Evaluation exception. */
   FILEMOVE(FOFL, 10, "'%' cannot be moved. '%' is write-protected."),
   /** FOFL0011: Evaluation exception. */
@@ -133,7 +133,7 @@ public enum Err {
   /** FOFL0015: Evaluation exception. */
   DIRINV(FOFL, 15, "The path '%' is invalid in the filesystem."),
   /** FOFL0016: Evaluation exception. */
-  COPYFAILED(FOFL, 16, "Copying from '%' to '%' failed: %"),
+  COPYFAILED(FOFL, 16, "Copying from '%' to '%' failed: %."),
   /** FOFL0017: Evaluation exception. */
   ENCNOTEXISTS(FOFL, 17, "The encoding '%' is not supported."),
 
@@ -149,9 +149,9 @@ public enum Err {
   /** FORG0001: Evaluation exception. */
   DATEFORMAT(FORG, 1, "Wrong % format: \"%\" (try: \"%\")."),
   /** FORG0001: Evaluation exception. */
-  QNMINV(FORG, 1, "Invalid QName: \"%\""),
+  QNMINV(FORG, 1, "Invalid QName: \"%\"."),
   /** FORG0002: Evaluation exception. */
-  URIINV(FORG, 2, "Invalid URI: %"),
+  URIINV(FORG, 2, "Invalid URI: %."),
 
   /** FORG0003: Evaluation exception. */
   EXPECTZ0(FORG, 3, "Zero or one value expected."),
@@ -197,11 +197,11 @@ public enum Err {
   UPPUTERR(FOUP, 2, "'%' could not be written."),
 
   /** FTDY0016: Evaluation exception. */
-  FTWEIGHT(FTDY, 16, "Invalid weight value: %"),
+  FTWEIGHT(FTDY, 16, "Invalid weight value: %."),
   /** FTDY0017: Evaluation exception. */
   FTMILD(FTDY, 17, "Invalid mild not selection."),
   /** FTDY0020: Evaluation exception. */
-  FTREG(FTDY, 20, "Invalid regular expression: '%'"),
+  FTREG(FTDY, 20, "Invalid regular expression: '%'."),
 
   /** FTST0000: Parsing exception. */
   FTFZWC(FTST, 0, "Only wildcards or Fuzzy search allowed."),
@@ -350,12 +350,16 @@ public enum Err {
   FTSTOP(XPST, 3, "Stop words expected."),
   /** XPST0003: Parsing exception. */
   FTMATCH(XPST, 3, "Unknown match option '%...'."),
+  /** XQDY0041: Evaluation exception. */
+  INVALPI(XPST, 3, "Invalid PI name: \"%\"."),
 
   /** XPST0005: Parsing exception. */
   COMPSELF(XPST, 5, "Warning: '%' will not yield any results."),
 
   /** XPST0008: Parsing exception. */
-  VARNOTDEFINED(XPST, 8, "Undefined variable %."),
+  VARUNDEF(XPST, 8, "Undefined variable %."),
+  /** XPST0008: Parsing exception. */
+  TYPEUNDEF(XPST, 8, "Undefined type %."),
   /** XPST0017: Parsing Exception. */
   XPARGS(XPST, 17, "Wrong arguments: % expected."),
   /** XPST0017: Parsing exception. */
@@ -371,7 +375,7 @@ public enum Err {
   /** XPST0051: Parsing exception. */
   TYPEUNKNOWN(XPST, 51, "Unknown type %."),
   /** XPST0080: Parsing exception. */
-  CASTUNKNOWN(XPST, 80, "Unknown cast type %."),
+  CASTUNKNOWN(XPST, 80, "Invalid cast type %."),
   /** XPST0081: Parsing exception. */
   PREUNKNOWN(XPST, 81, "Unknown prefix: \"%\"."),
   /** XPST0081: Parsing exception. */
@@ -418,21 +422,21 @@ public enum Err {
   /** XPDY0002: Parsing exception. */
   VAREMPTY(XQDY, 2, "No value defined for \"%\"."),
   /** XQDY0026: Evaluation exception. */
-  CPICONT(XQDY, 26, "Invalid PI content: \"%\""),
+  CPICONT(XQDY, 26, "Invalid PI content: \"%\"."),
   /** XQDY0041: Evaluation exception. */
-  CPIINVAL(XQDY, 41, "Invalid PI name: \"%\""),
+  CPIINVAL(XQDY, 41, "Invalid PI name: \"%\"."),
   /** XQDY0044: Evaluation exception. */
-  CAINS(XQDY, 44, "Invalid attribute namespace: \"%\" (URI \"%\")"),
+  CAINS(XQDY, 44, "Invalid attribute namespace: \"%\" (URI \"%\")."),
   /** XQDY0064: Evaluation exception. */
-  CPIXML(XQDY, 64, "Illegal PI name: \"%\""),
+  CPIXML(XQDY, 64, "Illegal PI name: \"%\"."),
   /** XQDY0072: Evaluation exception. */
   COMINVALID(XQDY, 72, "Invalid comment."),
   /** XQDY0074: Evaluation exception. */
-  INVNAME(XQDY, 74, "Invalid name: \"%\""),
+  INVNAME(XQDY, 74, "Invalid name: \"%\"."),
   /** XPDY0095: resulting value for any grouping variable >> 1 item. */
   XGRP(XQDY, 95, "No sequence allowed as grouping variable."),
   /** XQDY0096: Invalid namespace in constructed element. */
-  CEINS(XQDY, 96, "Invalid element namespace: \"%\" (URI \"%\")"),
+  CEINS(XQDY, 96, "Invalid element namespace: \"%\" (URI \"%\")."),
 
   /** XQST0009: Parsing exception. */
   IMPLSCHEMA(XQST, 9, "Schema import not supported."),
@@ -491,7 +495,7 @@ public enum Err {
   /** XQST0069: Parsing exception. */
   DUPLORDEMP(XQST, 69, "Duplicate 'order empty' declaration."),
   /** XQST0070: Parsing exception. */
-  NSDEF(XQST, 70, "Cannot overwrite namespace %"),
+  NSDEF(XQST, 70, "Cannot overwrite namespace %."),
   /** XQST0070: Parsing exception. */
   NOXMLNS(XQST, 70, "Cannot declare % namespace."),
   /** XQST0071: Parsing exception. */
@@ -591,10 +595,8 @@ public enum Err {
 
   /** Error type. */
   public final Type type;
-
   /** Error number. */
   public final int num;
-
   /** Error description. */
   public final String desc;
 

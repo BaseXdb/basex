@@ -357,7 +357,7 @@ public enum GUICommands implements GUICommand {
 
       final StringList sl = insert.result;
       final Type type = Nod.type(insert.kind);
-      String item = type.name + " { " + quote(sl.get(0)) + " }";
+      String item = Token.string(type.nam) + " { " + quote(sl.get(0)) + " }";
 
       if(type == Type.ATT || type == Type.PI) {
         item += " { " + quote(sl.get(1)) + " }";

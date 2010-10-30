@@ -46,7 +46,8 @@ final class DOTData {
   /** Hash map, caching colors for expressions. */
   private static final Object[][] COLORS = {
     // blue
-    { "6666FF", org.basex.query.item.Value.class },
+    { "6666FF", "Item" },
+    { "6666FF", "sequence" },
     // violet
     { "9933FF", org.basex.query.expr.CFrag.class },
     { "9933CC", org.basex.query.expr.And.class },

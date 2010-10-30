@@ -55,8 +55,8 @@ final class FNAcc extends Fun {
         it = e.item(ctx, input);
         if(it == null) return null;
         final QNm qn = (QNm) checkType(it, Type.QNM);
-        return qn.hasUri() ? qn.uri()
-            : Uri.uri(ctx.ns.uri(qn.pref(), true, ii));
+        return qn.hasUri() ? qn.uri() :
+          Uri.uri(ctx.ns.uri(qn.pref(), true, ii));
       default:
         return super.item(ctx, ii);
     }

@@ -222,7 +222,7 @@ public final class ServerQueryTest {
   @Test
   public void queryBind() throws BaseXException {
     final ClientQuery cq = cs.query("declare variable $a external; $a");
-    cq.bind("a", "5", "");
+    cq.bind("a", "5");
     assertEquals("5", cq.next());
     cq.close();
   }
@@ -234,6 +234,28 @@ public final class ServerQueryTest {
       cs.query("declare variable $a external; $a").next();
       fail("Error expected.");
     } catch(final BaseXException ex) { }
+  }
+
+  /** Runs a query with an external variable declaration.
+   * @throws BaseXException command exception */
+  @Test
+  public void queryBindURI() throws BaseXException {
+    final ClientQuery cq = cs.query(
+        "declare variable $a external; $a");
+    cq.bind("a", "X", "xs:anyURI");
+    assertEquals("X", cq.next());
+    cq.close();
+  }
+
+  /** Runs a query with an external variable declaration.
+   * @throws BaseXException command exception */
+  @Test
+  public void queryBindInt() throws BaseXException {
+    final ClientQuery cq = cs.query(
+        "declare variable $a as xs:integer external; $a");
+    cq.bind("a", "5", "xs:integer");
+    assertEquals("5", cq.next());
+    cq.close();
   }
 
   /** Runs an erroneous query. */

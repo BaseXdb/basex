@@ -259,7 +259,7 @@ public abstract class Item extends Value {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(this, VAL, atom());
+    ser.emptyElement(ITM, VAL, atom(), TYPE, Token.token(name()));
   }
 
   @Override

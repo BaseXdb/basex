@@ -8,6 +8,7 @@ import org.basex.query.item.Item;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -49,6 +50,6 @@ public final class CComm extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.COM.name);
+    return toString(Token.string(Type.COM.nam));
   }
 }

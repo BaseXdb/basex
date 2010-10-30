@@ -9,6 +9,7 @@ import org.basex.query.item.SeqType;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -54,6 +55,6 @@ public final class CTxt extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.TXT.name);
+    return toString(Token.string(Type.TXT.nam));
   }
 }

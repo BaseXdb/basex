@@ -158,10 +158,10 @@ public final class SeqType {
     Item it = iter.next();
     if(it == null) return mayBeZero();
     if(zeroOrOne()) return iter.next() == null && it.type.instance(type) &&
-      checkInstance(it);
+      checkExtension(it);
 
     do {
-      if(!it.type.instance(type) || !checkInstance(it)) return false;
+      if(!it.type.instance(type) || !checkExtension(it)) return false;
     } while((it = iter.next()) != null);
     return true;
   }
@@ -302,7 +302,7 @@ public final class SeqType {
    * @throws QueryException query exception
    */
   private Item check(final Item it, final InputInfo ii) throws QueryException {
-    if(!checkInstance(it)) XPCAST.thrw(ii, it.type, ext);
+    if(!checkExtension(it)) XPCAST.thrw(ii, it.type, ext);
     return it;
   }
 
@@ -311,7 +311,7 @@ public final class SeqType {
    * @param it item
    * @return same item
    */
-  private boolean checkInstance(final Item it) {
+  private boolean checkExtension(final Item it) {
     return ext == null || ext.eq(((Nod) it).qname());
   }
 

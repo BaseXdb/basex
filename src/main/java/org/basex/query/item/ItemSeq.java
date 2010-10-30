@@ -79,7 +79,7 @@ public final class ItemSeq extends Seq {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.openElement(this, SIZE, Token.token(size));
+    ser.openElement(Type.SEQ.nam, SIZE, Token.token(size));
     for(int v = 0; v != Math.min(size, 5); ++v) val[v].plan(ser);
     ser.closeElement();
   }

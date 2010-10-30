@@ -21,7 +21,6 @@ public final class NSGlobal {
     NS.add(OUTPUT, OUTPUTURI);
     NS.add(FN, FNURI);
     NS.add(MATH, MATHURI);
-    NS.add(XMLNS, XMLNSURI);
     NS.add(XML, XMLURI);
     NS.add(BASEX, BXURI);
     NS.add(DB, DBURI);

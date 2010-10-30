@@ -16,7 +16,7 @@ public abstract class InputParser {
   private static final String FOUND = ", found \"%\"";
 
   /** Input query. */
-  public final String qu;
+  public final String query;
   /** Query length. */
   public final int ql;
   /** Optional reference to query input. */
@@ -31,8 +31,8 @@ public abstract class InputParser {
    * @param q input query
    */
   public InputParser(final String q) {
-    qu = q;
-    ql = qu.length();
+    query = q;
+    ql = query.length();
   }
 
   /**
@@ -42,7 +42,7 @@ public abstract class InputParser {
   protected final int valid() {
     int cp;
     for(int p = 0; p < ql; p += Character.charCount(cp)) {
-      cp = qu.codePointAt(p);
+      cp = query.codePointAt(p);
       if(!XMLToken.valid(cp)) return p;
     }
     return -1;
@@ -61,7 +61,7 @@ public abstract class InputParser {
    * @return current character
    */
   protected final char curr() {
-    return qp >= ql ? 0 : qu.charAt(qp);
+    return qp >= ql ? 0 : query.charAt(qp);
   }
 
   /**
@@ -85,7 +85,7 @@ public abstract class InputParser {
    * @return result of check
    */
   protected final char next() {
-    return qp + 1 >= ql ? 0 : qu.charAt(qp + 1);
+    return qp + 1 >= ql ? 0 : query.charAt(qp + 1);
   }
 
   /**
@@ -93,7 +93,7 @@ public abstract class InputParser {
    * @return next character
    */
   protected final char consume() {
-    return qp >= ql ? 0 : qu.charAt(qp++);
+    return qp >= ql ? 0 : query.charAt(qp++);
   }
 
   /**
@@ -125,7 +125,9 @@ public abstract class InputParser {
     int p = qp;
     final int l = str.length();
     if(p + l > ql) return false;
-    for(int s = 0; s < l; ++s) if(qu.charAt(p++) != str.charAt(s)) return false;
+    for(int s = 0; s < l; ++s) {
+      if(query.charAt(p++) != str.charAt(s)) return false;
+    }
     qp = p;
     return true;
   }
@@ -144,7 +146,7 @@ public abstract class InputParser {
    */
   protected final String rest() {
     final int e = Math.min(ql, qp + 15);
-    return qu.substring(qp, e) + (e == ql ? "" : DOTS);
+    return query.substring(qp, e) + (e == ql ? "" : DOTS);
   }
 
   /**

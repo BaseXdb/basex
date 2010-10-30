@@ -11,6 +11,7 @@ import org.basex.query.item.QNm;
 import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 import org.basex.util.XMLToken;
 
@@ -60,6 +61,6 @@ public final class CPI extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.PI.name);
+    return toString(Token.string(Type.PI.nam));
   }
 }

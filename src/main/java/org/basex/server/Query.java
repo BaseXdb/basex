@@ -14,10 +14,20 @@ import org.basex.core.BaseXException;
  */
 public abstract class Query {
   /**
-   * Binds an object to a global variable.
+   * Binds a value to an external variable.
    * @param n name of variable
    * @param v value to be bound
-   * @param t optional type ({@code null} references are handled as strings)
+   * @throws BaseXException command exception
+   */
+  public final void bind(final String n, final String v) throws BaseXException {
+    bind(n, v, "");
+  }
+
+  /**
+   * Binds a value with a specific type to an external variable.
+   * @param n name of variable
+   * @param v value to be bound
+   * @param t data type
    * @throws BaseXException command exception
    */
   public abstract void bind(final String n, final String v, final String t)

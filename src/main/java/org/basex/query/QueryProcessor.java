@@ -16,6 +16,7 @@ import org.basex.data.XMLSerializer;
 import org.basex.query.expr.Expr;
 import org.basex.query.func.FunJava;
 import org.basex.query.item.QNm;
+import org.basex.query.item.Type;
 import org.basex.query.iter.Iter;
 import org.basex.query.util.Var;
 import org.basex.util.Token;
@@ -110,9 +111,17 @@ public final class QueryProcessor extends Progress {
    */
   public void bind(final String n, final String o, final String t)
       throws QueryException {
+
     // [CG] XQuery: handle data type
-    if(t == null);
-    bind(n, o);
+    Object obj = o;
+    if(t != null && t.length() != 0) {
+      final QNm type = new QNm(Token.token(t));
+      if(type.ns()) type.uri(ctx.ns.uri(type.pref(), false, null));
+      final Type typ = Type.find(type, true);
+      if(typ == null) NOTYPE.thrw(null, type);
+      obj = typ.e(o, null);
+    }
+    bind(n, obj);
   }
 
   /**

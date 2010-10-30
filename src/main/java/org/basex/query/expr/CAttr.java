@@ -15,6 +15,7 @@ import org.basex.query.iter.Iter;
 import static org.basex.query.util.Err.*;
 import org.basex.query.util.Var;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 import org.basex.util.TokenBuilder;
 
 /**
@@ -113,6 +114,6 @@ public final class CAttr extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.ATT.name + " { " + atn + " }");
+    return toString(Token.string(Type.ATT.nam) + " { " + atn + " }");
   }
 }

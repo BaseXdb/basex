@@ -55,11 +55,9 @@ public abstract class Test {
   /**
    * Returns a test instance.
    * @param t node type
-   * @param ext type extension
    * @return kind test
    */
-  public static Test get(final Type t, final QNm ext) {
-    if(ext != null) return new KindTest(t, ext);
+  public static Test get(final Type t) {
     switch(t) {
       case TXT: return TXT;
       case PI:  return PI;

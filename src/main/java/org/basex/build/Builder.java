@@ -179,7 +179,7 @@ public abstract class Builder extends Progress {
    */
   public final void text(final TokenBuilder t) throws IOException {
     // chop whitespaces in text nodes
-    if(meta.chop) t.chop();
+    if(meta.chop) t.trim();
 
     // check if text appears before or after root node
     final boolean ignore = !inDoc || lvl == 1;

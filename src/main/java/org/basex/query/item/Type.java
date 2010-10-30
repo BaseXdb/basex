@@ -725,17 +725,17 @@ public enum Type {
     }
   },
 
-  /** Sequence type. */
-  SEQ("sequence", null, EMPTY, false, false, false, false, false),
-
   /** Empty sequence type. */
   EMP("empty-sequence", null, EMPTY, false, false, false, false, false),
+
+  /** Sequence type. */
+  SEQ("sequence", null, EMPTY, false, false, false, false, false),
 
   /** Java type. */
   JAVA("java", null, EMPTY, true, true, true, false, false);
 
   /** String representation. */
-  public final String name;
+  public final byte[] nam;
   /** URI representation. */
   public final byte[] uri;
   /** Number flag. */
@@ -794,7 +794,7 @@ public enum Type {
    */
   private Type(final String nm, final Type pr, final byte[] ur, final boolean n,
       final boolean u, final boolean s, final boolean d, final boolean t) {
-    name = nm;
+    nam = token(nm);
     par = pr;
     uri = ur;
     num = n;
@@ -916,16 +916,19 @@ public enum Type {
   /**
    * Finds and returns the specified data type.
    * @param type type as string
-   * @param root include root types
+   * @param atom atomic type
    * @return type or null
    */
-  public static Type find(final QNm type, final boolean root) {
-    final String ln = string(type.ln());
-    final byte[] uri = type.uri().atom();
-
-    for(final Type t : values()) {
-      if((root || t.par != null && t != AAT) && ln.equals(t.name) &&
-          eq(uri, t.uri) && t != Type.SEQ && t != Type.JAVA) return t;
+  public static Type find(final QNm type, final boolean atom) {
+    // type must be atomic, or must not have a namespace
+    if(atom ^ !type.ns()) {
+      final byte[] ln = type.ln();
+      final byte[] uri = type.uri().atom();
+      for(final Type t : values()) {
+        // skip non-standard types
+        if(t == Type.SEQ || t == Type.JAVA) continue;
+        if(eq(ln, t.nam) && eq(uri, t.uri)) return t;
+      }
     }
     return null;
   }
@@ -936,10 +939,10 @@ public enum Type {
    * @return type or null
    */
   public static Type node(final QNm type) {
-    final String ln = string(type.ln());
+    final byte[] ln = type.ln();
     final byte[] uri = type.uri().atom();
     for(final Type t : Type.values()) {
-      if(t.node() && ln.equals(t.name) && eq(uri, t.uri)) return t;
+      if(t.node() && eq(ln, t.nam) && eq(uri, t.uri)) return t;
     }
     return null;
   }
@@ -951,7 +954,7 @@ public enum Type {
       tb.add(XS);
       tb.add(':');
     }
-    tb.add(name);
+    tb.add(nam);
     if(uri != XSURI) tb.add("()");
     return tb.toString();
   }

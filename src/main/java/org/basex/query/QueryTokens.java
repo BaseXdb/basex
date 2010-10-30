@@ -396,10 +396,6 @@ public interface QueryTokens {
   byte[] ANYSIMPLE = token("anySimpleType");
   /** Untyped. */
   byte[] UNTYPED = token("untyped");
-  /** Untyped. */
-  byte[] UNATOMIC = token("untypedAtomic");
-  /** AnyAtomicType. */
-  byte[] ANYATOMIC = token("anyAtomicType");
 
   // PREFIXES =================================================================
 
@@ -463,6 +459,8 @@ public interface QueryTokens {
   byte[] WHR = token("Where");
   /** Query Plan. */
   byte[] RET = token("Return");
+  /** Query Plan. */
+  byte[] ITM = token("Item");
   /** Query Plan. */
   byte[] THN = token("Then");
   /** Query Plan. */

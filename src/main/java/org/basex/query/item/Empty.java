@@ -84,7 +84,7 @@ public final class Empty extends Value {
 
   @Override
   public void plan(final Serializer ser) throws IOException {
-    ser.emptyElement(Token.token(Type.SEQ.name), SIZE, Token.ZERO);
+    ser.emptyElement(Type.SEQ.nam, SIZE, Token.ZERO);
   }
 
   @Override

@@ -7,6 +7,7 @@ import org.basex.query.QueryTokens;
 import org.basex.query.item.FDoc;
 import org.basex.query.item.Type;
 import org.basex.util.InputInfo;
+import org.basex.util.Token;
 
 /**
  * Document fragment.
@@ -44,6 +45,6 @@ public final class CDoc extends CFrag {
 
   @Override
   public String toString() {
-    return toString(Type.DOC.name);
+    return toString(Token.string(Type.DOC.nam));
   }
 }

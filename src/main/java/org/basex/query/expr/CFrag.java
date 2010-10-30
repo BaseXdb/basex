@@ -37,28 +37,28 @@ public abstract class CFrag extends Arr {
   /**
    * Returns an updated name expression.
    * @param ctx query context
-   * @param i item
+   * @param it item
    * @param att attribute flag
    * @return result
    * @throws QueryException query exception
    */
-  final QNm qname(final QueryContext ctx, final Item i, final boolean att)
+  final QNm qname(final QueryContext ctx, final Item it, final boolean att)
       throws QueryException {
 
     QNm n = null;
-    if(i.type == Type.QNM) {
-      n = (QNm) i;
+    if(it.type == Type.QNM) {
+      n = (QNm) it;
     } else {
-      final byte[] nm = i.atom();
+      final byte[] nm = it.atom();
       if(!XMLToken.isQName(nm)) {
-        (i.str() || i.unt() ? INVNAME : INVQNAME).thrw(input, nm);
+        (it.str() || it.unt() ? INVNAME : INVQNAME).thrw(input, nm);
       }
       n = new QNm(nm);
     }
 
     // attributes don't inherit namespaces
     if(!n.hasUri()) {
-      n.uri(att && !n.ns() ? EMPTY : ctx.ns.uri(n.pref(), n != i, input));
+      n.uri(att && !n.ns() ? EMPTY : ctx.ns.uri(n.pref(), n != it, input));
     }
     return n;
   }

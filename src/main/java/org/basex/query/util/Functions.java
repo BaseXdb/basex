@@ -63,17 +63,17 @@ public final class Functions extends ExprInfo {
 
     // parse data type constructors
     if(eq(uri, XSURI)) {
-      final SeqType seq = SeqType.get(Type.find(name, false), SeqType.Occ.ZO);
-      if(seq.type == null) {
+      final Type type = Type.find(name, true);
+      if(type == null || type == Type.NOT || type == Type.AAT) {
         final Levenshtein ls = new Levenshtein();
         for(final Type t : Type.values()) {
-          if(t.par != null && ls.similar(lc(ln), lc(token(t.name)), 0))
-            qp.error(FUNSIMILAR, ln, t.name);
+          if(t.par != null && ls.similar(lc(ln), lc(t.nam), 0))
+            qp.error(FUNSIMILAR, ln, t.nam);
         }
         qp.error(FUNCUNKNOWN, name.atom());
       }
       if(args.length != 1) qp.error(FUNCTYPE, name.atom());
-      return new Cast(qp.input(), args[0], seq);
+      return new Cast(qp.input(), args[0], SeqType.get(type, SeqType.Occ.ZO));
     }
 
     // check Java functions - only allowed with administrator permissions
@@ -119,7 +119,7 @@ public final class Functions extends ExprInfo {
     }
 
     // add function call for function that has not been defined yet
-    if(Type.find(name, true) == null) {
+    if(Type.find(name, false) == null) {
       return add(qp.input(), name, add(new Func(qp.input(),
           new Var(name), new Var[args.length], false), qp), args);
     }

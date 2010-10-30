@@ -140,7 +140,7 @@ public final class QueryException extends Exception {
     if(lineCol != null) return;
 
     file = parser.file;
-    lineCol = InputInfo.lineCol(parser.qu, Math.min(parser.qm, parser.ql));
+    lineCol = InputInfo.lineCol(parser.query, Math.min(parser.qm, parser.ql));
   }
 
   /**

@@ -234,9 +234,9 @@ public final class TokenBuilder {
   }
 
   /**
-   * Chops leading and trailing whitespaces.
+   * Trims leading and trailing whitespaces.
    */
-  public void chop() {
+  public void trim() {
     while(size > 0 && ws(chars[size - 1])) --size;
     int s = -1;
     while(++s < size && ws(chars[s]));
