@@ -42,12 +42,12 @@ public final class BindVariable {
     // ------------------------------------------------------------------------
     // Define the items to be bound
     String string = "Hello World!\n";
-    Integer number = new Integer(123);
+    String number = "123";
 
     // ------------------------------------------------------------------------
     // Bind the variables
     proc.bind("var1", string);
-    proc.bind("var2", number);
+    proc.bind("var2", number, "xs:intege");
 
     // ------------------------------------------------------------------------
     // Execute the query
