@@ -481,33 +481,15 @@ public abstract class W3CTS {
           if(xml || frag) {
             iter.reset();
 
-            String ri = string(res).trim();
-            if(!doc) {
-              if(ri.startsWith("<?xml")) ri = ri.replaceAll("^<.*?>\\s*", "");
-              ri = "<X>" + ri + "</X>";
-            }
-
             try {
-              final Data rdata = CreateDB.xml(IO.get(ri), context);
-              final ItemIter ir = new ItemIter();
-              for(int pre = doc ? 0 : 2; pre < rdata.meta.size;) {
-                ir.add(new DBNode(rdata, pre));
-                pre += rdata.size(pre, rdata.kind(pre));
-              }
+              final ItemIter ir = toIter(res, doc);
+              if(FNSimple.deep(null, iter, ir)) break;
 
-              boolean eq = FNSimple.deep(null, iter, ir);
-              if(!eq && !doc) {
-                ir.reset();
-                final Data adata = CreateDB.xml(IO.get("<X>" + string(actual)
-                    + "</X>"), context);
-                final ItemIter ia = new ItemIter();
-                for(int pre = 2; pre < adata.meta.size;) {
-                  ia.add(new DBNode(adata, pre));
-                  pre += adata.size(pre, adata.kind(pre));
-                }
-                eq = FNSimple.deep(null, ia, ir);
-              }
-              if(!eq && debug) {
+              ir.reset();
+              final ItemIter ia = toIter(actual, doc);
+              if(FNSimple.deep(null, ia, ir)) break;
+
+              if(debug) {
                 iter.reset();
                 ir.reset();
                 final XMLSerializer ser = new XMLSerializer(System.out);
@@ -518,8 +500,6 @@ public abstract class W3CTS {
                 while((it = iter.next()) != null) it.serialize(ser);
                 Util.outln();
               }
-              rdata.close();
-              if(eq) break;
             } catch(final IOException ex) {
             } catch(final Throwable ex) {
               ex.printStackTrace();
@@ -604,6 +584,25 @@ public abstract class W3CTS {
       Util.outln();
     }
     return single == null || !outname.equals(single);
+  }
+  
+  /**
+   * Creates an item iterator for the given XML fragment.
+   * @param xml fragment
+   * @param doc document flag
+   * @return iterator
+   */
+  private ItemIter toIter(final byte[] xml, final boolean doc) {
+    final ItemIter it = new ItemIter();
+    try {
+      String str = string(xml).trim();
+      if(!doc) str = "<X>" + str + "</X>";
+      final Data d = CreateDB.xml(IO.get(str), context);
+      
+      for(int p = doc ? 0 : 2; p < d.meta.size; p += d.size(p, d.kind(p)))
+        it.add(new DBNode(d, p));
+    } catch (final IOException e) { /* never happens */ }
+    return it;
   }
 
   /**
