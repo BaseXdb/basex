@@ -620,6 +620,14 @@ public final class QueryContext extends Progress {
   String info() {
     return info.toString();
   }
+  
+  /**
+   * Returns the serialization properties.
+   * @return serialization properties
+   */
+  public SerializerProp serProp() {
+    return serProp;
+  }
 
   @Override
   public String tit() {

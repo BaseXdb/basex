@@ -141,7 +141,7 @@ final class FNGen extends Fun {
 
     final Uri u = Uri.uri(file);
     if(u == Uri.EMPTY || !u.valid()) UPFOURI.thrw(input, file);
-    ctx.updates.add(new Put(input, (Nod) it, u), ctx);
+    ctx.updates.add(new Put(input, (Nod) it, u, ctx.serProp()), ctx);
 
     return null;
   }

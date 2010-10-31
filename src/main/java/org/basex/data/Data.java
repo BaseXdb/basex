@@ -569,7 +569,7 @@ public abstract class Data {
     // restore empty document node
     if(empty) {
       doc(0, 1, EMPTY);
-      table.set(0, f());
+      table.set(0, buffer());
     }
   }
 
@@ -830,7 +830,7 @@ public abstract class Data {
    * @param pre insert position
    */
   public final void insert(final int pre) {
-    table.insert(pre, f());
+    table.insert(pre, buffer());
   }
 
   /**
@@ -944,7 +944,7 @@ public abstract class Data {
    * Returns the byte buffer.
    * @return byte buffer
    */
-  private byte[] f() {
+  private byte[] buffer() {
     final byte[] bb = bp == b.length ? b : Arrays.copyOf(b, bp);
     bp = 0;
     return bb;
