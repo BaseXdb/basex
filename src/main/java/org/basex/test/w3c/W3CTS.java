@@ -482,11 +482,11 @@ public abstract class W3CTS {
             iter.reset();
 
             try {
-              final ItemIter ir = toIter(res, doc);
+              final ItemIter ir = toIter(res, frag);
               if(FNSimple.deep(null, iter, ir)) break;
 
               ir.reset();
-              final ItemIter ia = toIter(actual, doc);
+              final ItemIter ia = toIter(actual, frag);
               if(FNSimple.deep(null, ia, ir)) break;
 
               if(debug) {
@@ -589,17 +589,17 @@ public abstract class W3CTS {
   /**
    * Creates an item iterator for the given XML fragment.
    * @param xml fragment
-   * @param doc document flag
+   * @param frag fragment flag
    * @return iterator
    */
-  private ItemIter toIter(final byte[] xml, final boolean doc) {
+  private ItemIter toIter(final byte[] xml, final boolean frag) {
     final ItemIter it = new ItemIter();
     try {
-      String str = string(xml).trim();
-      if(!doc) str = "<X>" + str + "</X>";
+      String str = string(xml).replaceAll("^<\\?xml.*?\\?>", "").trim();
+      if(frag) str = "<X>" + str + "</X>";
       final Data d = CreateDB.xml(IO.get(str), context);
       
-      for(int p = doc ? 0 : 2; p < d.meta.size; p += d.size(p, d.kind(p)))
+      for(int p = !frag ? 0 : 2; p < d.meta.size; p += d.size(p, d.kind(p)))
         it.add(new DBNode(d, p));
     } catch (final IOException e) { /* never happens */ }
     return it;
