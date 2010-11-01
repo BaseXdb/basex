@@ -17,7 +17,7 @@ try {
     $query = $session->query($input);
 
     // initialize query
-    $query->init();
+    print $query->init();
 
     // loop through all results
     while($query->more()) {

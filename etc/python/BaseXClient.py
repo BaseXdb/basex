@@ -100,17 +100,19 @@ class Query():
   # see readme.txt
   def __init__(self, session, q):
     self.__session = session
-    self.__session.send('\0' + q)
-    self.__id = self.__session.receive()
-    if not self.__session.ok():
-      raise IOError(self.__session.readString())
+    self.__id = self.execute('\0', q)
+  
+  # see readme.txt  
+  def init(self):
+    return self.execute('\4', self.__id)
+    
+  # see readme.txt  
+  def bind(self, name, value):
+    return self.execute('\3', self.__id + '\0' + name + '\0' + value + '\0')
   
   # see readme.txt
   def more(self):
-    self.__session.send('\1' + self.__id)
-    self.__next = self.__session.receive()
-    if not self.__session.ok():
-      raise IOError(self.__session.readString())  
+    self.__next = self.execute('\1', self.__id)  
     return len(self.__next) != 0  
     
   # see readme.txt
@@ -119,4 +121,12 @@ class Query():
   
   # see readme.txt  
   def close(self):
-    self.__session.send('\2' + self.__id);
+    return self.execute('\2', self.__id)
+  
+  # see readme.txt  
+  def execute(self, cmd, arg):
+    self.__session.send(cmd + arg)
+    s = self.__session.receive()
+    if not self.__session.ok():
+      raise IOError(self.__session.readString())
+    return s

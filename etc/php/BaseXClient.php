@@ -109,20 +109,22 @@ class Query {
   /* see readme.txt */
   function __construct($s, $q) {
     $this->session = $s;
-    $this->session->send("\0$q");
-    $this->id = $this->session->receive();
-    if($this->session->ok() != True) {
-      throw new Exception($this->session->readString());
-    }
+    $this->id = $this->execute("\0", $q);
+  }
+  
+  /* see readme.txt */
+  function init() {
+    return $this->execute("\4", $this->id);
+  }
+  
+  /* see readme.txt */
+  function bind($name, $value) {
+    $this->execute("\3", "$this->id\0$name\0$value\0");
   }
 
   /* see readme.txt */
   public function more() {
-    $this->session->send("\1$this->id");
-    $this->next = $this->session->receive();
-    if($this->session->ok() != True) {
-      throw new Exception($this->session->readString());
-    }
+    $this->next = $this->execute("\1", $this->id);
     return strlen($this->next) > 0; 
   }
 
@@ -133,7 +135,17 @@ class Query {
 
   /* see readme.txt */
   public function close() {
-    $this->session->send("\2$this->id");   
+  	$this->execute("\2", $this->id);   
+  }
+  
+  /* see readme.txt */
+  public function execute($cmd, $arg) {
+  	$this->session->send("$cmd$arg");
+  	$s = $this->session->receive();
+  	if($this->session->ok() != True) {
+  	  throw new Exception($this->session->readString());
+  	}
+  	return $s;
   }
 }
 ?>

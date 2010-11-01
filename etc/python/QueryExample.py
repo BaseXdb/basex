@@ -13,6 +13,9 @@ try:
     # create query instance
     input = "for $i in 1 to 10 return <xml>Text { $i }</xml>"
     query = session.query(input)
+    
+    # initialize query
+    print query.init()
 
     # loop through all results
     while query.more():
