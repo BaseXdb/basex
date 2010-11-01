@@ -482,11 +482,12 @@ public abstract class W3CTS {
             iter.reset();
 
             try {
-              final ItemIter ir = toIter(res, frag);
+              final ItemIter ir = toIter(string(res).replaceAll(
+                  "^<\\?xml.*?\\?>", "").trim(), frag);
               if(FNSimple.deep(null, iter, ir)) break;
 
               ir.reset();
-              final ItemIter ia = toIter(actual, frag);
+              final ItemIter ia = toIter(string(actual), frag);
               if(FNSimple.deep(null, ia, ir)) break;
 
               if(debug) {
@@ -592,10 +593,10 @@ public abstract class W3CTS {
    * @param frag fragment flag
    * @return iterator
    */
-  private ItemIter toIter(final byte[] xml, final boolean frag) {
+  private ItemIter toIter(final String xml, final boolean frag) {
     final ItemIter it = new ItemIter();
     try {
-      String str = string(xml).replaceAll("^<\\?xml.*?\\?>", "").trim();
+      String str = xml;
       if(frag) str = "<X>" + str + "</X>";
       final Data d = CreateDB.xml(IO.get(str), context);
       
