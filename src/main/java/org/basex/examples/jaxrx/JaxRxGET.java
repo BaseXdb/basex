@@ -23,8 +23,9 @@ public final class JaxRxGET {
     System.out.println("=== GET: execute a query ===\n");
 
     // The java URL connection to the resource
-    URL url = new URL(
-      "http://localhost:8984/basex/jax-rx/factbook?query=//city/name&count=3");
+    String base = "http://localhost:8984/basex/jax-rx/";
+
+    URL url = new URL(base + "factbook?query=//city/name&count=3");
     System.out.println("* URL: " + url);
 
     // Establish the connection to the URL
