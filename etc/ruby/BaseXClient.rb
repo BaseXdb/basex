@@ -90,20 +90,22 @@ class Query
   # see readme.txt
   def initialize(s, q)
     @session = s
-    @session.send("\0" + q)
-    @id = @session.readString
-    if @session.ok != true
-      raise @session.readString
-    end
+    @id = execute("\0", q)
+  end
+  
+  # see readme.txt
+  def init()
+    return execute("\4", @id)
+  end
+  
+  # see readme.txt
+  def bind(name, value)
+    execute("\3", @id + "\0" + name + "\0" + value + "\0")
   end
   
   # see readme.txt  
   def more()
-    @session.send("\1" + @id)
-    @next = @session.readString
-    if @session.ok != true
-      raise @session.readString
-    end
+    @next = execute("\1", @id)
     return @next.length != 0
   end
   
@@ -114,6 +116,16 @@ class Query
   
   # see readme.txt
   def close()
-    @session.send("\2" + @id)
+    return execute("\2", @id)
+  end
+  
+  # see readme.txt
+  def execute(cmd, arg)
+    @session.send(cmd + arg)
+    s = @session.readString
+    if @session.ok != true
+      raise @session.readString
+    end
+    return s
   end
 end

@@ -108,7 +108,7 @@ class Query():
     
   # see readme.txt  
   def bind(self, name, value):
-    return self.execute('\3', self.__id + '\0' + name + '\0' + value + '\0')
+    self.execute('\3', self.__id + '\0' + name + '\0' + value + '\0')
   
   # see readme.txt
   def more(self):

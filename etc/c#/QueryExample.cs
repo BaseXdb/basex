@@ -26,7 +26,7 @@ namespace BaseXClient
           Query query = session.Query(input);
 
           // initialize query
-          query.Init();
+          Console.WriteLine(query.Init());
 
           // loop through all results
           while (query.More()) 

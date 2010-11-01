@@ -161,22 +161,22 @@ End Class
     ' see readme.txt
     Public Sub New(s As Session, query As String)
       session = s
-      session.stream.WriteByte(0)
-      session.Send(query)
-      id = session.Receive()
-      If Not session.Ok() Then
-        Throw New IOException(session.Receive())
-      End If
+      id = Execute(0, query)
+    End Sub
+    
+    ' see readme.txt
+    Public Function Init() As String
+      Return Execute(4, id)
+    End Function
+      
+    ' see readme.txt
+    Public Sub Bind(name As String, value As String)
+      Execute(3, id)
     End Sub
 
     ' see readme.txt 
     Public Function More() As Boolean
-      session.stream.WriteByte(1)
-      session.Send(id)
-      nextItem = session.Receive()
-      If Not session.Ok() Then
-        Throw New IOException(session.Receive())
-      End If
+      nextItem = Execute(1, id)
       Return nextItem.Length <> 0
     End Function
 
@@ -186,9 +186,21 @@ End Class
     End Function
 
     ' see readme.txt 
-    Public Sub Close()
-      session.stream.WriteByte(2)
-      session.Send(id)
-    End Sub
+    Public Function Close() As String
+      Return Execute(2, id)
+    End Function
+    
+    
+    ' see readme.txt
+    Public Function Execute(cmd As Integer, arg As String) As String
+      session.stream.WriteByte(cmd)
+      session.send(arg)
+      Dim Res As String = session.Receive()
+      If Not session.Ok() Then
+        Throw New IOException(session.Receive())
+      End If
+      Return Res
+    End Function
+          
   End Class
 End Module

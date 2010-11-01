@@ -179,7 +179,7 @@ namespace BaseXClient
     }
 
     /** see readme.txt */
-    public bool Init()
+    public string Init()
     {
       return Execute(4, id);
     }
@@ -187,8 +187,7 @@ namespace BaseXClient
     /** see readme.txt */
     public void Bind(string name, string value)
     {
-      next = Execute(3, id + '\0' + name + '\0' + value + '\0');
-      return next.Length != 0;
+      Execute(3, id + '\0' + name + '\0' + value + '\0');
     }
 
     /** see readme.txt */
@@ -211,10 +210,10 @@ namespace BaseXClient
     }
 
     /** see readme.txt */
-    private bool Execute(int cmd, string arg) throws IOException
+    private string Execute(byte cmd, string arg)
     {
       session.stream.WriteByte(cmd);
-      session.Send(id);
+      session.Send(arg);
       string s = session.Receive();
       if(!session.Ok())
       {

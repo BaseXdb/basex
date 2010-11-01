@@ -21,7 +21,10 @@ Module QueryExample
         ' create query instance
         Dim input As String = "for $i in 1 to 10 return <xml>Text { $i }</xml>"
         Dim query As Query = session.Query(input)
-
+        
+        ' initialize query
+		Console.WriteLine(query.Init())
+		
         ' loop through all results
         While query.More()
           Console.WriteLine(query.Nexty())
