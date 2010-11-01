@@ -586,7 +586,7 @@ public abstract class W3CTS {
     }
     return single == null || !outname.equals(single);
   }
-  
+
   /**
    * Creates an item iterator for the given XML fragment.
    * @param xml fragment
@@ -599,7 +599,7 @@ public abstract class W3CTS {
       String str = xml;
       if(frag) str = "<X>" + str + "</X>";
       final Data d = CreateDB.xml(IO.get(str), context);
-      
+
       for(int p = !frag ? 0 : 2; p < d.meta.size; p += d.size(p, d.kind(p)))
         it.add(new DBNode(d, p));
     } catch (final IOException e) { /* never happens */ }

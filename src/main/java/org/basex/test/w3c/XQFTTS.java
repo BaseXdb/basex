@@ -6,10 +6,10 @@ import org.basex.io.IO;
 import org.basex.query.QueryContext;
 import org.basex.query.QueryProcessor;
 import org.basex.query.ft.StemDir;
-import org.basex.query.ft.StopWords;
 import org.basex.query.ft.ThesQuery;
 import org.basex.query.ft.Thesaurus;
 import org.basex.util.Util;
+import org.basex.util.ft.StopWords;
 
 /**
  * XQuery Full Text Test Suite wrapper.
